@@ -1,0 +1,94 @@
+@import '~antd/lib/style/themes/default.less';
+
+.head {
+  width: 100%;
+  transition: background 0.3s, width 0.2s;
+  height: @layout-header-height;
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  position: relative;
+  :global {
+    .ant-menu-submenu.ant-menu-submenu-horizontal {
+      line-height: @layout-header-height ;
+      height: 100%;
+      .ant-menu-submenu-title {
+        height: 100%;
+      }
+    }
+    .ant-menu-submenu-selected{
+      .ant-menu-submenu-title {
+        position: relative;
+        &::after{
+          content: '';
+          position:absolute;
+          height: 5px;
+          bottom: -2px;
+          left: 20px;
+          width: ~'calc(100% - 40px)';
+          background: #EB5C20;    
+        }
+      }
+    }
+    .ant-menu.ant-menu-dark .ant-menu-item-selected, .ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected{
+      background: unset;
+      height:calc(~"@{layout-header-height} - 13px");
+      line-height: calc(~"@{layout-header-height} - 13px");
+      position: relative;
+      &::after{
+        content: '';
+        position:absolute;
+        height: 5px;
+        bottom: -2px;
+        left: 20px;
+        width: ~'calc(100% - 40px)';
+        background: #EB5C20;    
+      }
+    }
+    .top-nav-menu li.ant-menu-item{
+      height:calc(~"@{layout-header-height} - 13px");
+      line-height: calc(~"@{layout-header-height} - 13px");
+    }
+  }
+  &.light {
+    background-color: #fff;
+  }
+  .main {
+    display: flex;
+    height: @layout-header-height;
+    padding-left: 24px;
+    margin: 0 17px;
+    .left {
+      flex: 1;
+      display: flex;
+    }
+    .right {
+      width: 324px;
+    }
+  }
+}
+
+.logo {
+  width: 165px;
+  height: @layout-header-height;
+  position: relative;
+  line-height: @layout-header-height;
+  transition: all 0.3s;
+  overflow: hidden;
+  img {
+    display: inline-block;
+    vertical-align: middle;
+    height: 32px;
+  }
+}
+
+.light {
+  h1 {
+    color: #002140;
+  }
+}
+
+.menu {
+  height:calc(~"@{layout-header-height} - 13px");
+  line-height: calc(~"@{layout-header-height} - 13px");
+  border-bottom: 1px solid #707070 !important;
+  font-size: 24px;
+}

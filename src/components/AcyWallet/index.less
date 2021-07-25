@@ -1,0 +1,24 @@
+@import '~antd/lib/style/themes/default.less';
+.acycheckbox{
+  :global{
+    .ant-checkbox{
+      width: 30px;
+      height: 30px;
+    }
+    .ant-checkbox-inner{
+      width: 30px;
+      height: 30px;
+      background: #373739;
+      border: 3px solid #707070;
+      &::after{
+        left: 30%;
+      }
+    }
+    .ant-checkbox-checked{
+      .ant-checkbox-inner{
+        background-color:@primary-color;
+        border-color: @primary-color;
+      }
+    }
+  }
+}
