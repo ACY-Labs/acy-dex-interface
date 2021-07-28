@@ -3,7 +3,10 @@ body,
 #root {
   height: 100%;
 }
-
+p {
+  margin: 0;
+  padding: 0;
+}
 .colorWeak {
   filter: invert(80%);
 }
@@ -33,4 +36,19 @@ li {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+.ant-table-tbody > tr > td {
+  border: 0 !important;
+  margin: 20px 0 !important;
+  color: #b5b6b6 !important;
+}
+.ant-table-thead > tr,
+.ant-table-tbody > tr {
+  // display: inline-table !important;
+  background-color: #373739 !important;
+  border-radius: 10px !important;
+  margin: 10px auto !important;
+  width: 100%;
+  border-bottom: 20px solid #2a2a2d;
+  border-top: 20px solid #2a2a2d;
 }

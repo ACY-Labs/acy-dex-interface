@@ -5,19 +5,18 @@ import { rest } from 'lodash-decorators';
 const AcyModal = ({ children, ...rest }) => {
   return (
     <Modal
-    className={styles.acymodal}
-      {...rest}
+      className={styles.acymodal}
       bodyStyle={{
         padding: '21px',
-        background:'#2A2A2D',
-        borderRadius:' 20px'
+        background: '#2A2A2D',
+        borderRadius: ' 20px',
       }}
       footer={null}
       closable={false}
+      {...rest}
     >
       {children}
     </Modal>
-
   );
-}
+};
 export default AcyModal;

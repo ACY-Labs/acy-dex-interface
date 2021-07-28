@@ -1,0 +1,20 @@
+@import '~antd/lib/style/themes/default.less';
+
+.acyconfirm {
+  .title {
+    position: relative;
+    font-size: 36px;
+    color: @primary-color;
+    & > div {
+      top: -19px;
+      right: -87px;
+      position: absolute;
+    }
+  }
+  :global {
+    .ant-modal-content {
+      border-radius: 20px;
+      background: transparent;
+    }
+  }
+}
