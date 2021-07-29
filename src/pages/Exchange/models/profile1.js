@@ -18,8 +18,12 @@ export default {
         payload: response,
       });
     },
-    *fetchAdvanced(_, { call, put }) {
+    *fetchAdvanced({callback}, { call, put }) {
       const response = yield call(queryAdvancedProfile);
+      
+      callback&&callback(response);
+
+      
       yield put({
         type: 'show',
         payload: response,

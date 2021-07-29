@@ -12,8 +12,8 @@ import styles from './Applications.less';
 const { Option } = Select;
 const FormItem = Form.Item;
 
-@connect(({ list, loading }) => ({
-  list,
+@connect(({ list,from,loading }) => ({
+  list,from,
   loading: loading.models.list,
 }))
 @Form.create({

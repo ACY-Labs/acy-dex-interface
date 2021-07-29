@@ -1,6 +1,8 @@
 import React, { Suspense } from 'react';
 import { Layout } from 'antd';
 import DocumentTitle from 'react-document-title';
+import { Web3ReactProvider } from "@web3-react/core";
+import { Web3Provider } from "@ethersproject/providers";
 import isEqual from 'lodash/isEqual';
 import memoizeOne from 'memoize-one';
 import { connect } from 'umi';
@@ -153,6 +155,10 @@ class BasicLayout extends React.PureComponent {
     return <SettingDrawer />;
   };
 
+  getLibrary(provider, connector) {
+    return new Web3Provider(provider); // this will vary according to whether you use e.g. ethers or web3.js
+  }
+  
   render() {
     const {
       navTheme,
@@ -213,7 +219,9 @@ class BasicLayout extends React.PureComponent {
           <ContainerQuery query={query}>
             {params => (
               <Context.Provider value={this.getContext()}>
-                <div className={classNames(params)}>{layout}</div>
+                <Web3ReactProvider getLibrary={this.getLibrary}>
+                  <div className={classNames(params)}>{layout}</div>
+                </Web3ReactProvider>
               </Context.Provider>
             )}
           </ContainerQuery>

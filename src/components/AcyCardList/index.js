@@ -3,7 +3,7 @@ import styles from './style.less';
 
 const Thin = ({ children, ...rest }) => {
   return (
-    <div className={styles.thin}>
+    <div className={styles.thin} {...rest}>
       {children}
     </div>
 
@@ -11,7 +11,7 @@ const Thin = ({ children, ...rest }) => {
 }
 const Fat = ({ children, ...rest }) => {
   return (
-    <div className={styles.fat}>
+    <div className={styles.fat} {...rest}>
        {children}
     </div>
 
@@ -19,7 +19,7 @@ const Fat = ({ children, ...rest }) => {
 }
 const Agree = ({ children, ...rest }) => {
   return (
-    <div className={styles.agree}>
+    <div className={styles.agree} {...rest}>
        {children}
     </div>
 

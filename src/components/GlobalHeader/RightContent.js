@@ -117,6 +117,11 @@ export default class GlobalHeaderRight extends PureComponent {
     });
   };
   handleVisibleChange = () => {};
+
+  // 选择钱包 
+  selectWallet=()=>{
+    activate(injected);
+  }
   render() {
     const {
       currentUser,
@@ -351,7 +356,7 @@ export default class GlobalHeaderRight extends PureComponent {
             <AcyIcon onClick={this.onhandCancel} name="close" />
           </div>
           <AcyCardList title="Select Network">
-            <AcyCardList.Thin>
+            <AcyCardList.Thin onClick={this.selectWallet}>
               <AcyIcon name="eth" />
               Ethereum
             </AcyCardList.Thin>

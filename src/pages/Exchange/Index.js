@@ -16,6 +16,7 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
+import MyComponent from '@/components/MyComponent';
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
@@ -82,12 +83,12 @@ const columns = [
           <p className={styles.bigtitle}>WETH-WBTC</p>
           <p className={styles.value}>0xE34780…25f7</p>
         </div>
-        <div style={{ width: '100px' }}>
+        {/* <div style={{ width: '100px' }}>
           <AcyIcon name="eth" width={18} />
           <AcyIcon name="eth" width={18} />
           <AcyIcon name="eth" width={18} />
           <AcyIcon name="eth" width={18} />
-        </div>
+        </div> */}
       </div>
     ),
   },
@@ -249,7 +250,26 @@ class BasicProfile extends Component {
               </div>
             </AcyTabPane>
             <AcyTabPane tab="Liquidity" key="2">
-              <Button type="primary" onClick={() => this.onHandModalConfirmOrder(true)}>
+            <div className={styles.trade}>
+                <AcyCuarrencyCard
+                  icon="eth"
+                  coin="ETH"
+                  yuan="566.228"
+                  dollar="679545.545"
+                  onClick={this.onClickCoin}
+                />
+                <AcyIcon name="double-right" />
+                <AcyCuarrencyCard
+                  title="999.999"
+                  icon="eth"
+                  coin="BTC"
+                  yuan="566.228"
+                  dollar="679545.545"
+                />
+                <AcyConnectWalletBig>Connect Wallet</AcyConnectWalletBig>
+              </div>
+              <h1>这里设计稿没有，暂时展示页面功能使用</h1>
+              <Button style={{marginRight:'30px'}} type="primary" onClick={() => this.onHandModalConfirmOrder(true)}>
                 Confirm Order
               </Button>
               <Button type="primary" onClick={() => this.setState({ visibleLoading: true })}>
@@ -304,6 +324,9 @@ class BasicProfile extends Component {
           onCancel={() => this.setState({ visibleLoading: false })}
           visible={visibleLoading}
         />
+        <AcyModal visible={true}>
+          <MyComponent />
+        </AcyModal>
       </PageHeaderWrapper>
     );
   }

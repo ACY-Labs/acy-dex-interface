@@ -191,9 +191,12 @@ class AdvancedProfile extends Component {
   };
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch,profile:{basicGoods} } = this.props;
     dispatch({
       type: 'profile/fetchAdvanced',
+      callback:res=>{
+
+      }
     });
 
     this.setStepDirection();
