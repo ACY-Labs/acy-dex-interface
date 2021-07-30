@@ -1,6 +1,14 @@
-import { useWeb3React } from "@web3-react/core";
-import { InjectedConnector } from "@web3-react/injected-connector";
-import { useState, useEffect, useCallback } from "react";
+/* eslint-disable no-console */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-param-reassign */
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable react/react-in-jsx-scope */
+/* eslint-disable no-return-await */
+/* eslint-disable no-restricted-globals */
+/* eslint-disable consistent-return */
+import { useWeb3React } from '@web3-react/core';
+import { InjectedConnector } from '@web3-react/injected-connector';
+import { useState, useEffect, useCallback } from 'react';
 import {
   getRouterContract,
   calculateGasMargin,
@@ -12,12 +20,12 @@ import {
   computeTradePriceBreakdown,
   getUserTokenAmount,
   getUserTokenAmountExact,
-} from "@/utils/Acyhelpers";
-import { Form, Button, Alert, Dropdown } from "react-bootstrap";
-import ERC20ABI from "@/abis/ERC20.json";
-import WETHABI from "@/abis/WETH.json";
+  INITIAL_ALLOWED_SLIPPAGE,
+} from '@/utils/Acyhelpers';
+import { Form, Button, Alert, Dropdown } from 'react-bootstrap';
+import ERC20ABI from '@/abis/ERC20.json';
+import WETHABI from '@/abis/WETH.json';
 import {
-  ChainId,
   Token,
   TokenAmount,
   Pair,
@@ -32,23 +40,22 @@ import {
   CurrencyAmount,
   InsufficientReservesError,
   FACTORY_ADDRESS,
-} from "@uniswap/sdk";
-import { MaxUint256 } from "@ethersproject/constants";
-import { BigNumber } from "@ethersproject/bignumber";
-import { parseUnits, formatUnits } from "@ethersproject/units";
-import "bootstrap/dist/css/bootstrap.min.css";
-const INITIAL_ALLOWED_SLIPPAGE = 50; //bips
+} from '@uniswap/sdk';
+import { MaxUint256 } from '@ethersproject/constants';
+import { BigNumber } from '@ethersproject/bignumber';
+import { parseUnits } from '@ethersproject/units';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 async function approve(tokenAddress, requiredAmount, library, account) {
-  if (requiredAmount === "0") {
-    console.log("Unncessary call to approve");
+  if (requiredAmount === '0') {
+    console.log('Unncessary call to approve');
     return;
   }
 
-  let allowance = await getAllowance(
+  const allowance = await getAllowance(
     tokenAddress,
     account, // owner
-    ROUTER_ADDRESS, //spender
+    ROUTER_ADDRESS, // spender
     library, // provider
     account // active account
   );
@@ -57,21 +64,17 @@ async function approve(tokenAddress, requiredAmount, library, account) {
   console.log(allowance);
 
   if (allowance.lt(BigNumber.from(requiredAmount))) {
-    let tokenContract = getContract(tokenAddress, ERC20ABI, library, account);
+    const tokenContract = getContract(tokenAddress, ERC20ABI, library, account);
     let useExact = false;
-    console.log("NOT ENOUGH ALLOWANCE");
+    console.log('NOT ENOUGH ALLOWANCE');
     // try to get max allowance
-    let estimatedGas = await tokenContract.estimateGas["approve"](
-      ROUTER_ADDRESS,
-      MaxUint256
-    ).catch(() => {
-      // general fallback for tokens who restrict approval amounts
-      useExact = true;
-      return tokenContract.estimateGas.approve(
-        ROUTER_ADDRESS,
-        requiredAmount.raw.toString()
-      );
-    });
+    const estimatedGas = await tokenContract.estimateGas
+      .approve(ROUTER_ADDRESS, MaxUint256)
+      .catch(() => {
+        // general fallback for tokens who restrict approval amounts
+        useExact = true;
+        return tokenContract.estimateGas.approve(ROUTER_ADDRESS, requiredAmount.raw.toString());
+      });
 
     console.log(`Exact? ${useExact}`);
     await tokenContract.approve(
@@ -82,53 +85,246 @@ async function approve(tokenAddress, requiredAmount, library, account) {
       }
     );
   } else {
-    console.log("Allowance sufficient");
-    return;
+    console.log('Allowance sufficient');
   }
 }
-async function getEstimated(
-  inputToken0,
-  inputToken1,
-  exactIn = true,
-  chainId,
-  library
-) {
-  let {
+
+async function checkTokenIsApproved(tokenAddress, requiredAmount, library, account) {
+  const allowance = await getAllowance(
+    tokenAddress,
+    account, // owner
+    ROUTER_ADDRESS, // spender
+    library, // provider
+    account // active account
+  );
+
+  console.log('REQUIRED AMOUNT:');
+  console.log(requiredAmount);
+  console.log(`ALLOWANCE FOR TOKEN ${tokenAddress}:`);
+  console.log(allowance);
+
+  return allowance.gte(BigNumber.from(requiredAmount));
+}
+
+async function getEstimated(inputToken0, inputToken1, exactIn = true, chainId, library) {
+  const {
     address: token0Address,
     symbol: token0Symbol,
     decimal: token0Decimal,
     amount: token0Amount,
   } = inputToken0;
-  let {
+  const {
     address: token1Address,
     symbol: token1Symbol,
     decimal: token1Decimal,
     amount: token1Amount,
   } = inputToken1;
 
-  if (exactIn && (isNaN(parseFloat(token0Amount)) || token0Amount === ""))
-    return;
-  if (!exactIn && (isNaN(parseFloat(token1Amount)) || token1Amount === ""))
-    return;
+  if (exactIn && (isNaN(parseFloat(token0Amount)) || token0Amount === '')) return;
+  if (!exactIn && (isNaN(parseFloat(token1Amount)) || token1Amount === '')) return;
 
-  let token0IsETH = token0Symbol === "ETH";
-  let token1IsETH = token1Symbol === "ETH";
+  const token0IsETH = token0Symbol === 'ETH';
+  const token1IsETH = token1Symbol === 'ETH';
 
   // if one is ETH and other WETH, use WETH contract's deposit and withdraw
   // wrap ETH into WETH
-  if (
-    (token0IsETH && token1Symbol === "WETH") ||
-    (token0Symbol === "WETH" && token1IsETH)
-  ) {
+  if ((token0IsETH && token1Symbol === 'WETH') || (token0Symbol === 'WETH' && token1IsETH)) {
     // UI should sync value of ETH and WETH
     if (exactIn) return token0Amount;
-    else return token1Amount;
+    return token1Amount;
   }
   // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
-  else {
-    console.log("SWAP");
 
-    console.log("------------------ CONSTRUCT TOKEN ------------------");
+  // use WETH for ETHER to work with Uniswap V2 SDK
+  const token0 = token0IsETH
+    ? WETH[chainId]
+    : new Token(chainId, token0Address, token0Decimal, token0Symbol);
+  const token1 = token1IsETH
+    ? WETH[chainId]
+    : new Token(chainId, token1Address, token1Decimal, token1Symbol);
+
+  if (token0.equals(token1)) return exactIn ? token0Amount : token1Amount;
+
+  // get pair using our own provider
+  const pair = await Fetcher.fetchPairData(token0, token1, library).catch(
+    e =>
+      new ACYSwapErrorStatus(`${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`)
+  );
+  if (pair instanceof ACYSwapErrorStatus) return exactIn ? token1Amount : token0Amount;
+  console.log(pair);
+
+  console.log('------------------ CONSTRUCT ROUTE ------------------');
+  // This is where we let Uniswap SDK know we are not using WETH but ETHER
+  const route = new Route([pair], token0IsETH ? ETHER : token0, token1IsETH ? ETHER : token1);
+  console.log(route);
+
+  console.log('------------------ PARSE AMOUNT ------------------');
+  // convert typed in amount to BigNumbe rusing ethers.js's parseUnits then to string,
+  console.log(token0Amount);
+  console.log(token0Decimal);
+  const parsedAmount = exactIn
+    ? new TokenAmount(token0, parseUnits(token0Amount, token0Decimal)).raw.toString(16)
+    : new TokenAmount(token1, parseUnits(token1Amount, token1Decimal)).raw.toString(16);
+
+  let inputAmount;
+
+  // CurrencyAmount instance is required for Trade contructor if input is ETHER
+  if ((token0IsETH && exactIn) || (token1IsETH && !exactIn)) {
+    inputAmount = new CurrencyAmount(ETHER, `0x${parsedAmount}`);
+  } else {
+    inputAmount = new TokenAmount(exactIn ? token0 : token1, `0x${parsedAmount}`);
+  }
+
+  console.log('------------------ CONSTRUCT TRADE ------------------');
+  let trade;
+  try {
+    trade = new Trade(route, inputAmount, exactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT);
+  } catch (e) {
+    if (e instanceof InsufficientReservesError) {
+      console.log('Insufficient reserve!');
+    } else {
+      console.log('Unhandled exception!');
+      console.log(e);
+    }
+    return exactIn ? token1Amount : token0Amount;
+  }
+
+  if (exactIn) {
+    console.log(trade.outputAmount.toExact());
+
+    return trade.outputAmount.toExact();
+  }
+  console.log(trade.inputAmount.toExact());
+
+  return trade.inputAmount.toExact();
+}
+
+async function getUserTokenBalance(token, chainId, account, library) {
+  const { address, symbol, decimal } = token;
+
+  if (!token) return;
+  const tokenIsETH = symbol === 'ETH';
+  return await getUserTokenAmountExact(
+    tokenIsETH ? ETHER : new Token(chainId, address, decimal, symbol),
+    account,
+    library
+  );
+}
+
+async function swap(
+  inputToken0,
+  inputToken1,
+  allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
+  exactIn = true,
+  chainId,
+  library,
+  account,
+  setNeedApprove,
+  setApproveAmount,
+  setSwapStatus,
+  setSwapBreakdown,
+  setToken0ApproxAmount,
+  setToken1ApproxAmount
+) {
+  const status = await (async () => {
+    // check uniswap
+    console.log(FACTORY_ADDRESS);
+
+    // change slippage from bips (0.01%) into percentage
+    allowedSlippage = new Percent(allowedSlippage, 10000);
+
+    const contract = getRouterContract(library, account);
+
+    const {
+      address: token0Address,
+      symbol: token0Symbol,
+      decimal: token0Decimal,
+      amount: token0Amount,
+    } = inputToken0;
+    const {
+      address: token1Address,
+      symbol: token1Symbol,
+      decimal: token1Decimal,
+      amount: token1Amount,
+    } = inputToken1;
+
+    const token0IsETH = token0Symbol === 'ETH';
+    const token1IsETH = token1Symbol === 'ETH';
+
+    if (!inputToken0.symbol || !inputToken1.symbol)
+      return new ACYSwapErrorStatus('One or more token input is missing');
+    if (exactIn && (isNaN(parseFloat(token0Amount)) || token0Amount === '0'))
+      return new ACYSwapErrorStatus('Format Error');
+    if (!exactIn && (isNaN(parseFloat(token1Amount)) || token1Amount === '0'))
+      return new ACYSwapErrorStatus('Format Error');
+
+    console.log(inputToken0);
+    console.log(inputToken1);
+    if (token0IsETH && token1IsETH) return new ACYSwapErrorStatus("Doesn't support ETH to ETH");
+
+    // check user account balance
+    console.log('------------------ CHECK BALANCE ------------------');
+    // Big Number comparison
+    const userToken0Balance = await getUserTokenAmount(
+      token0IsETH ? ETHER : new Token(chainId, token0Address, token0Decimal, token0Symbol),
+      account,
+      library
+    );
+
+    console.log(userToken0Balance);
+    let userHasSufficientBalance = userToken0Balance.gt(parseUnits(token0Amount, token0Decimal));
+
+    // quit if user doesn't have enough balance, otherwise this will cause error
+    if (!userHasSufficientBalance) return new ACYSwapErrorStatus('Not enough balance');
+
+    let wethContract;
+
+    console.log('------------------ WRAP OR SWAP  ------------------');
+    // if one is ETH and other WETH, use WETH contract's deposit and withdraw
+    // wrap ETH into WETH
+    if (token0IsETH && token1Symbol === 'WETH') {
+      console.log('WRAP');
+
+      // UI should sync value of ETH and WETH
+      if (exactIn) setToken1ApproxAmount(token0Amount);
+      else setToken0ApproxAmount(token1Amount);
+
+      wethContract = getContract(token1Address, WETHABI, library, account);
+      const wrappedAmount = BigNumber.from(parseUnits(token0Amount, token0Decimal)).toHexString();
+      const result = await wethContract
+        .deposit({
+          value: wrappedAmount,
+        })
+        .catch(e => {
+          console.log(e);
+          return new ACYSwapErrorStatus('WETH Deposit failed');
+        });
+
+      return result;
+    }
+    // unwrap WETH into ETH
+    if (token0Symbol === 'WETH' && token1IsETH) {
+      console.log('UNWRAP');
+
+      // UI should sync value of ETH and WETH
+      if (exactIn) setToken1ApproxAmount(token0Amount);
+      else setToken0ApproxAmount(token1Amount);
+
+      wethContract = getContract(token0Address, WETHABI, library, account);
+
+      const wrappedAmount = BigNumber.from(parseUnits(token0Amount, token0Decimal)).toHexString();
+
+      const result = await wethContract.withdraw(wrappedAmount).catch(e => {
+        console.log(e);
+        return new ACYSwapErrorStatus('WETH Withdrawal failed');
+      });
+      return result;
+    }
+    // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
+
+    console.log('SWAP');
+
+    console.log('------------------ CONSTRUCT TOKEN ------------------');
     // use WETH for ETHER to work with Uniswap V2 SDK
     const token0 = token0IsETH
       ? WETH[chainId]
@@ -141,43 +337,34 @@ async function getEstimated(
     console.log(token1);
 
     // quit if the two tokens are equivalent, i.e. have the same chainId and address
-    if (token0.equals(token1)) return new ACYSwapErrorStatus("Equal tokens!");
+    if (token0.equals(token1)) return new ACYSwapErrorStatus('Equal tokens!');
+
+    // helper function from uniswap sdk to get pair address, probably needed if want to replace fetchPairData
+    const pairAddress = Pair.getAddress(token0, token1);
+    console.log(`Pair address: ${pairAddress}`);
 
     // get pair using our own provider
-    console.log("------------------ CONSTRUCT PAIR ------------------");
-    console.log("FETCH");
+    console.log('------------------ CONSTRUCT PAIR ------------------');
+    console.log('FETCH');
     const pair = await Fetcher.fetchPairData(token0, token1, library).catch(
-      (e) => {
-        return new ACYSwapErrorStatus(
+      e =>
+        new ACYSwapErrorStatus(
           `${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`
-        );
-      }
+        )
     );
     if (pair instanceof ACYSwapErrorStatus) return pair;
     console.log(pair);
 
-    console.log("------------------ CONSTRUCT ROUTE ------------------");
+    console.log('------------------ CONSTRUCT ROUTE ------------------');
     // This is where we let Uniswap SDK know we are not using WETH but ETHER
-    const route = new Route(
-      [pair],
-      token0IsETH ? ETHER : token0,
-      token1IsETH ? ETHER : token1
-    );
+    const route = new Route([pair], token0IsETH ? ETHER : token0, token1IsETH ? ETHER : token1);
     console.log(route);
 
-    console.log("------------------ PARSE AMOUNT ------------------");
+    console.log('------------------ PARSE AMOUNT ------------------');
     // convert typed in amount to BigNumbe rusing ethers.js's parseUnits then to string,
-    console.log(token0Amount);
-    console.log(token0Decimal);
-    let parsedAmount = exactIn
-      ? new TokenAmount(
-          token0,
-          parseUnits(token0Amount, token0Decimal)
-        ).raw.toString(16)
-      : new TokenAmount(
-          token1,
-          parseUnits(token1Amount, token1Decimal)
-        ).raw.toString(16);
+    const parsedAmount = exactIn
+      ? new TokenAmount(token0, parseUnits(token0Amount, token0Decimal)).raw.toString(16)
+      : new TokenAmount(token1, parseUnits(token1Amount, token1Decimal)).raw.toString(16);
 
     let inputAmount;
 
@@ -185,13 +372,10 @@ async function getEstimated(
     if ((token0IsETH && exactIn) || (token1IsETH && !exactIn)) {
       inputAmount = new CurrencyAmount(ETHER, `0x${parsedAmount}`);
     } else {
-      inputAmount = new TokenAmount(
-        exactIn ? token0 : token1,
-        `0x${parsedAmount}`
-      );
+      inputAmount = new TokenAmount(exactIn ? token0 : token1, `0x${parsedAmount}`);
     }
 
-    console.log("------------------ CONSTRUCT TRADE ------------------");
+    console.log('------------------ CONSTRUCT TRADE ------------------');
     let trade;
     try {
       trade = new Trade(
@@ -201,317 +385,70 @@ async function getEstimated(
       );
     } catch (e) {
       if (e instanceof InsufficientReservesError) {
-        console.log("Insufficient reserve!");
+        console.log('Insufficient reserve!');
       } else {
-        console.log("Unhandled exception!");
+        console.log('Unhandled exception!');
         console.log(e);
       }
-      return new ACYSwapErrorStatus("Error with Trade object");
+      return new ACYSwapErrorStatus('Error with Trade object');
     }
 
     console.log(trade);
+
+    console.log('------------------ SLIPPAGE CALCULATE ------------------');
+    let slippageAdjustedAmount;
+    let minAmountOut;
+    let maxAmountIn;
+
+    // calculate slippage adjusted amount
     if (exactIn) {
-      return trade.outputAmount.toExact();
+      console.log(`By algorithm, expected to get: ${trade.outputAmount.toExact()}`);
+      // if provided exact token in, we want to know min out token amount
+      minAmountOut = trade.minimumAmountOut(allowedSlippage);
+      slippageAdjustedAmount = minAmountOut.raw.toString();
+
+      // update UI with estimated output token amount
+      setToken1ApproxAmount(trade.outputAmount.toExact());
+
+      console.log(`Minimum received: ${slippageAdjustedAmount}`);
     } else {
-      return trade.inputAmount.toExact();
-    }
-  }
-}
+      console.log(`By algorithm, expected to get: ${trade.inputAmount.toExact()}`);
+      maxAmountIn = trade.maximumAmountIn(allowedSlippage);
+      slippageAdjustedAmount = maxAmountIn.raw.toString();
 
-async function swap(
-  inputToken0,
-  inputToken1,
-  allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
-  exactIn = true,
-  chainId,
-  library,
-  account,
-  setApproveAmount,
-  setToken0Balance,
-  setToken1Balance,
-  setSwapStatus,
-  setSwapBreakdown,
-  setToken0ApproxAmount,
-  setToken1ApproxAmount
-) {
-  let status = await (async () => {
-    // check uniswap
-    console.log(FACTORY_ADDRESS);
+      setToken0ApproxAmount(trade.inputAmount.toExact());
 
-    // change slippage from bips (0.01%) into percentage
-    allowedSlippage = new Percent(allowedSlippage, 10000);
+      // updated input token field, check if still below account balance
 
-    let contract = getRouterContract(library, account);
-
-    let {
-      address: token0Address,
-      symbol: token0Symbol,
-      decimal: token0Decimal,
-      amount: token0Amount,
-    } = inputToken0;
-    let {
-      address: token1Address,
-      symbol: token1Symbol,
-      decimal: token1Decimal,
-      amount: token1Amount,
-    } = inputToken1;
-
-    let token0IsETH = token0Symbol === "ETH";
-    let token1IsETH = token1Symbol === "ETH";
-
-    if (!inputToken0.symbol || !inputToken1.symbol)
-      return new ACYSwapErrorStatus("One or more token input is missing");
-    if (exactIn && (isNaN(parseFloat(token0Amount)) || token0Amount === "0"))
-      return new ACYSwapErrorStatus("Format Error");
-    if (!exactIn && (isNaN(parseFloat(token1Amount)) || token1Amount === "0"))
-      return new ACYSwapErrorStatus("Format Error");
-
-    console.log(inputToken0);
-    console.log(inputToken1);
-    if (token0IsETH && token1IsETH)
-      return new ACYSwapErrorStatus("Doesn't support ETH to ETH");
-
-    // check user account balance
-    console.log("------------------ CHECK BALANCE ------------------");
-    // Big Number comparison
-    let userToken0Balance = await getUserTokenAmount(
-      token0IsETH
-        ? ETHER
-        : new Token(chainId, token0Address, token0Decimal, token0Symbol),
-      account,
-      library
-    );
-
-    setToken0Balance(
-      await getUserTokenAmountExact(
-        token0IsETH
-          ? ETHER
-          : new Token(chainId, token0Address, token0Decimal, token0Symbol),
-        account,
-        library
-      )
-    );
-    setToken1Balance(
-      await getUserTokenAmountExact(
-        token1IsETH
-          ? ETHER
-          : new Token(chainId, token1Address, token1Decimal, token1Symbol),
-        account,
-        library
-      )
-    );
-
-    console.log(userToken0Balance);
-    let userHasSufficientBalance = userToken0Balance.gt(
-      parseUnits(token0Amount, token0Decimal)
-    );
-
-    // quit if user doesn't have enough balance, otherwise this will cause error
-    if (!userHasSufficientBalance)
-      return new ACYSwapErrorStatus("Not enough balance");
-
-    let wethContract;
-
-    console.log("------------------ WRAP OR SWAP  ------------------");
-    // if one is ETH and other WETH, use WETH contract's deposit and withdraw
-    // wrap ETH into WETH
-    if (token0IsETH && token1Symbol === "WETH") {
-      console.log("WRAP");
-
-      // UI should sync value of ETH and WETH
-      // if (exactIn) setToken1ApproxAmount(token0Amount);
-      // else setToken0ApproxAmount(token1Amount);
-
-      wethContract = getContract(token1Address, WETHABI, library, account);
-      let wrappedAmount = BigNumber.from(
-        parseUnits(token0Amount, token0Decimal)
-      ).toHexString();
-      let result = await wethContract
-        .deposit({
-          value: wrappedAmount,
-        })
-        .catch((e) => {
-          console.log(e);
-          return new ACYSwapErrorStatus("WETH Deposit failed");
-        });
-
-      return result;
-    }
-    // unwrap WETH into ETH
-    else if (token0Symbol === "WETH" && token1IsETH) {
-      console.log("UNWRAP");
-
-      // UI should sync value of ETH and WETH
-      // if (exactIn) setToken1ApproxAmount(token0Amount);
-      // else setToken0ApproxAmount(token1Amount);
-
-      wethContract = getContract(token0Address, WETHABI, library, account);
-
-      let wrappedAmount = BigNumber.from(
-        parseUnits(token0Amount, token0Decimal)
-      ).toHexString();
-
-      let result = await wethContract.withdraw(wrappedAmount).catch((e) => {
-        console.log(e);
-        return new ACYSwapErrorStatus("WETH Withdrawal failed");
-      });
-      return result;
-    }
-    // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
-    else {
-      console.log("SWAP");
-
-      console.log("------------------ CONSTRUCT TOKEN ------------------");
-      // use WETH for ETHER to work with Uniswap V2 SDK
-      const token0 = token0IsETH
-        ? WETH[chainId]
-        : new Token(chainId, token0Address, token0Decimal, token0Symbol);
-      const token1 = token1IsETH
-        ? WETH[chainId]
-        : new Token(chainId, token1Address, token1Decimal, token1Symbol);
-
-      console.log(token0);
-      console.log(token1);
-
-      // quit if the two tokens are equivalent, i.e. have the same chainId and address
-      if (token0.equals(token1)) return new ACYSwapErrorStatus("Equal tokens!");
-
-      // helper function from uniswap sdk to get pair address, probably needed if want to replace fetchPairData
-      let pairAddress = Pair.getAddress(token0, token1);
-      console.log(`Pair address: ${pairAddress}`);
-
-      // get pair using our own provider
-      console.log("------------------ CONSTRUCT PAIR ------------------");
-      console.log("FETCH");
-      const pair = await Fetcher.fetchPairData(token0, token1, library).catch(
-        (e) => {
-          return new ACYSwapErrorStatus(
-            `${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`
-          );
-        }
+      console.log(userToken0Balance.toString());
+      console.log(trade.inputAmount.raw.toString());
+      userHasSufficientBalance = userToken0Balance.gt(
+        BigNumber.from(trade.inputAmount.raw.toString())
       );
-      if (pair instanceof ACYSwapErrorStatus) return pair;
-      console.log(pair);
 
-      console.log("------------------ CONSTRUCT ROUTE ------------------");
-      // This is where we let Uniswap SDK know we are not using WETH but ETHER
-      const route = new Route(
-        [pair],
-        token0IsETH ? ETHER : token0,
-        token1IsETH ? ETHER : token1
-      );
-      console.log(route);
+      // quit if user doesn't have enough balance, otherwise this will cause error
+      if (!userHasSufficientBalance) return new ACYSwapErrorStatus('Not enough balance');
 
-      console.log("------------------ PARSE AMOUNT ------------------");
-      // convert typed in amount to BigNumbe rusing ethers.js's parseUnits then to string,
-      let parsedAmount = exactIn
-        ? new TokenAmount(
-            token0,
-            parseUnits(token0Amount, token0Decimal)
-          ).raw.toString(16)
-        : new TokenAmount(
-            token1,
-            parseUnits(token1Amount, token1Decimal)
-          ).raw.toString(16);
+      console.log(`Maximum pay: ${slippageAdjustedAmount}`);
+    }
 
-      let inputAmount;
+    console.log('------------------ BREAKDOWN ------------------');
 
-      // CurrencyAmount instance is required for Trade contructor if input is ETHER
-      if ((token0IsETH && exactIn) || (token1IsETH && !exactIn)) {
-        inputAmount = new CurrencyAmount(ETHER, `0x${parsedAmount}`);
-      } else {
-        inputAmount = new TokenAmount(
-          exactIn ? token0 : token1,
-          `0x${parsedAmount}`
-        );
-      }
+    const { priceImpactWithoutFee, realizedLPFee } = computeTradePriceBreakdown(trade);
 
-      console.log("------------------ CONSTRUCT TRADE ------------------");
-      let trade;
-      try {
-        trade = new Trade(
-          route,
-          inputAmount,
-          exactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
-        );
-      } catch (e) {
-        if (e instanceof InsufficientReservesError) {
-          console.log("Insufficient reserve!");
-        } else {
-          console.log("Unhandled exception!");
-          console.log(e);
-        }
-        return new ACYSwapErrorStatus("Error with Trade object");
-      }
+    const breakdownInfo = [
+      `Price impact : ${priceImpactWithoutFee.toFixed(2)}%`,
+      `LP FEE : ${realizedLPFee?.toSignificant(6)} ${trade.inputAmount.currency.symbol}`,
+      `${exactIn ? 'Min received:' : 'Max sold'} : ${
+        exactIn ? minAmountOut.toSignificant(4) : maxAmountIn.toSignificant(4)
+      } ${exactIn ? trade.outputAmount.currency.symbol : trade.inputAmount.currency.symbol}`,
+    ];
+    setSwapBreakdown(breakdownInfo);
+    console.log(breakdownInfo);
 
-      console.log(trade);
-
-      console.log("------------------ SLIPPAGE CALCULATE ------------------");
-      let slippageAdjustedAmount;
-      let minAmountOut;
-      let maxAmountIn;
-
-      // calculate slippage adjusted amount
-      if (exactIn) {
-        console.log(
-          `By algorithm, expected to get: ${trade.outputAmount.toExact()}`
-        );
-        // if provided exact token in, we want to know min out token amount
-        minAmountOut = trade.minimumAmountOut(allowedSlippage);
-        slippageAdjustedAmount = minAmountOut.raw.toString();
-
-        // update UI with estimated output token amount
-        setToken1ApproxAmount(trade.outputAmount.toExact());
-
-        console.log(`Minimum received: ${slippageAdjustedAmount}`);
-      } else {
-        console.log(
-          `By algorithm, expected to get: ${trade.inputAmount.toExact()}`
-        );
-        maxAmountIn = trade.maximumAmountIn(allowedSlippage);
-        slippageAdjustedAmount = maxAmountIn.raw.toString();
-
-        setToken0ApproxAmount(trade.inputAmount.toExact());
-
-        // updated input token field, check if still below account balance
-
-        console.log(userToken0Balance.toString());
-        console.log(trade.inputAmount.raw.toString());
-        userHasSufficientBalance = userToken0Balance.gt(
-          BigNumber.from(trade.inputAmount.raw.toString())
-        );
-
-        // quit if user doesn't have enough balance, otherwise this will cause error
-        if (!userHasSufficientBalance)
-          return new ACYSwapErrorStatus("Not enough balance");
-
-        console.log(`Maximum pay: ${slippageAdjustedAmount}`);
-      }
-
-      console.log("------------------ BREAKDOWN ------------------");
-
-      let { priceImpactWithoutFee, realizedLPFee } =
-        computeTradePriceBreakdown(trade);
-
-      let breakdownInfo = [
-        `Price impact : ${priceImpactWithoutFee.toFixed(2)}%`,
-        `LP FEE : ${realizedLPFee?.toSignificant(6)} ${
-          trade.inputAmount.currency.symbol
-        }`,
-        `${exactIn ? "Min received:" : "Max sold"} : ${
-          exactIn ? minAmountOut.toSignificant(4) : maxAmountIn.toSignificant(4)
-        } ${
-          exactIn
-            ? trade.outputAmount.currency.symbol
-            : trade.inputAmount.currency.symbol
-        }`,
-      ];
-      setSwapBreakdown(breakdownInfo);
-      console.log(breakdownInfo);
-
-      console.log("------------------ ALLOWANCE ------------------");
-
-      let allowance = await getAllowance(
+    console.log('------------------ ALLOWANCE ------------------');
+    if (!token0IsETH) {
+      const allowance = await getAllowance(
         token0Address,
         account,
         ROUTER_ADDRESS,
@@ -519,111 +456,118 @@ async function swap(
         account
       );
 
-      console.log(
-        `Current allowance for ${trade.inputAmount.currency.symbol}:`
-      );
+      console.log(`Current allowance for ${trade.inputAmount.currency.symbol}:`);
       console.log(allowance);
 
-      if (allowance.lt(BigNumber.from(slippageAdjustedAmount))) {
-        console.log("Not enough allowance");
-        setApproveAmount(slippageAdjustedAmount);
-        return new ACYSwapErrorStatus("Need approve");
+      const token0AmountToApprove = exactIn ? inputAmount.raw.toString() : slippageAdjustedAmount;
+
+      const token0approval = await checkTokenIsApproved(
+        token0Address,
+        token0AmountToApprove,
+        library,
+        account
+      );
+      console.log(token0approval);
+
+      if (!token0approval) {
+        console.log('Not enough allowance');
+        setApproveAmount(token0AmountToApprove);
+        setNeedApprove(true);
+        return new ACYSwapErrorStatus('Need approve');
       }
-
-      console.log("------------------ PREPARE SWAP ------------------");
-
-      let { methodName, args, value } = Router.swapCallParameters(trade, {
-        feeOnTransfer: false,
-        allowedSlippage,
-        recipient: account,
-        ttl: 60,
-      });
-
-      const options = !value || isZero(value) ? {} : { value };
-
-      console.log("------------------ ARGUMENTS ------------------");
-      console.log(options);
-      console.log(args);
-
-      let result = await contract.estimateGas[methodName](...args, options)
-        .then((gasEstimate) => {
-          return contract[methodName](...args, {
-            gasLimit: calculateGasMargin(gasEstimate),
-            ...options,
-          });
-        })
-        .catch((e) => {
-          return new ACYSwapErrorStatus(`${methodName} failed with error ${e}`);
-        });
-
-      return result;
     }
+
+    console.log('------------------ PREPARE SWAP ------------------');
+
+    const { methodName, args, value } = Router.swapCallParameters(trade, {
+      feeOnTransfer: false,
+      allowedSlippage,
+      recipient: account,
+      ttl: 60,
+    });
+
+    const options = !value || isZero(value) ? {} : { value };
+
+    console.log('------------------ ARGUMENTS ------------------');
+    console.log(options);
+    console.log(args);
+
+    const result = await contract.estimateGas[methodName](...args, options)
+      .then(gasEstimate =>
+        contract[methodName](...args, {
+          gasLimit: calculateGasMargin(gasEstimate),
+          ...options,
+        })
+      )
+      .catch(e => new ACYSwapErrorStatus(`${methodName} failed with error ${e}`));
+
+    return result;
   })();
   if (status instanceof ACYSwapErrorStatus) {
     setSwapStatus(status.getErrorText());
   } else {
     console.log(status);
-    setSwapStatus("OK");
+    setSwapStatus('OK');
   }
 }
 
 const MyComponent = () => {
-  let [token0, setToken0] = useState(null);
-  let [token1, setToken1] = useState(null);
-  let [token0Balance, setToken0Balance] = useState("0");
-  let [token1Balance, setToken1Balance] = useState("0");
-  let [token0Amount, setToken0Amount] = useState("0");
-  let [token1Amount, setToken1Amount] = useState("0");
-  let [swapBreakdown, setSwapBreakdown] = useState();
-  let [swapStatus, setSwapStatus] = useState();
+  const [token0, setToken0] = useState(null);
+  const [token1, setToken1] = useState(null);
+  const [token0Balance, setToken0Balance] = useState('0');
+  const [token1Balance, setToken1Balance] = useState('0');
+  const [token0Amount, setToken0Amount] = useState('0');
+  const [token1Amount, setToken1Amount] = useState('0');
+  const [swapBreakdown, setSwapBreakdown] = useState();
+  const [swapStatus, setSwapStatus] = useState();
+  const [needApprove, setNeedApprove] = useState(false);
+  const [approveAmount, setApproveAmount] = useState('0');
+  const [token0ApproxAmount, setToken0ApproxAmount] = useState('0');
+  const [token1ApproxAmount, setToken1ApproxAmount] = useState('0');
+  const [exactIn, setExactIn] = useState(true);
 
-  let [approveAmount, setApproveAmount] = useState("0");
-  let [token0ApproxAmount, setToken0ApproxAmount] = useState("0");
-  let [token1ApproxAmount, setToken1ApproxAmount] = useState("0");
-  let [exactIn, setExactIn] = useState(true);
-
-  const individualFieldPlaceholder = "Enter amount";
-  const dependentFieldPlaceholder = "Estimated value";
+  const individualFieldPlaceholder = 'Enter amount';
+  const dependentFieldPlaceholder = 'Estimated value';
 
   const { account, chainId, library, activate } = useWeb3React();
   const injected = new InjectedConnector({
     supportedChainIds: [1, 3, 4, 5, 42],
   });
 
-  let supportedTokens = [
+  const supportedTokens = [
     {
-      symbol: "USDC",
-      address: "0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b",
+      symbol: 'USDC',
+      address: '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b',
       decimal: 6,
     },
     {
-      symbol: "ETH",
-      address: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
+      symbol: 'ETH',
+      address: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
       decimal: 18,
     },
     {
-      symbol: "WETH",
-      address: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
+      symbol: 'WETH',
+      address: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
       decimal: 18,
     },
     {
-      symbol: "UNI",
-      address: "0x03e6c12ef405ac3f642b9184eded8e1322de1a9e",
+      symbol: 'UNI',
+      address: '0x03e6c12ef405ac3f642b9184eded8e1322de1a9e',
       decimal: 18,
     },
     {
-      symbol: "DAI",
-      address: "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea",
+      symbol: 'DAI',
+      address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
       decimal: 18,
     },
     {
-      symbol: "cDAI",
-      address: "0x6d7f0754ffeb405d23c51ce938289d4835be3b14",
+      symbol: 'cDAI',
+      address: '0x6d7f0754ffeb405d23c51ce938289d4835be3b14',
       decimal: 8,
     },
     {
-      symbol: "WBTC",
-      address: "0x577d296678535e4903d59a4c929b718e1d575e0a",
+      symbol: 'WBTC',
+      address: '0x577d296678535e4903d59a4c929b718e1d575e0a',
       decimal: 8,
     },
   ];
@@ -632,33 +576,82 @@ const MyComponent = () => {
     activate(injected);
   }, []);
 
-  let t0Changed = useCallback(async () => {
-    setToken1ApproxAmount(
-      await getEstimated(
-        {
-          ...token0,
-          amount: token0Amount,
-        },
-        {
-          ...token1,
-          amount: token1Amount,
-        },
+  const t0Changed = useCallback(
+    async () => {
+      if (!token0 || !token1) return;
+      setToken1ApproxAmount(
+        await getEstimated(
+          {
+            ...token0,
+            amount: token0Amount,
+          },
+          {
+            ...token1,
+            amount: token1Amount,
+          },
 
-        true,
-        chainId,
-        library
-      )
-    );
-    console.log(token1ApproxAmount);
-  }, [
-    token0,
-    token1,
-    token0Amount,
-    token1Amount,
-    chainId,
-    library,
-    token1ApproxAmount,
-  ]);
+          true,
+          chainId,
+          library
+        )
+      );
+    },
+    [token0, token1, token0Amount, token1Amount, chainId, library]
+  );
+
+  const t1Changed = useCallback(
+    async () => {
+      if (!token0 || !token1) return;
+      setToken0ApproxAmount(
+        await getEstimated(
+          {
+            ...token0,
+            amount: token0Amount,
+          },
+          {
+            ...token1,
+            amount: token1Amount,
+          },
+
+          false,
+          chainId,
+          library
+        )
+      );
+    },
+    [token0, token1, token0Amount, token1Amount, chainId, library]
+  );
+
+  useEffect(
+    () => {
+      t0Changed();
+    },
+    [token0Amount]
+  );
+
+  useEffect(
+    () => {
+      t1Changed();
+    },
+    [token1Amount]
+  );
+
+  const checkApprovalStatus = useCallback(async () => {
+    if (token0 && token1) {
+      const approved = await checkTokenIsApproved(
+        token0.address,
+        parseUnits(token0Amount, token0.decimals),
+        library,
+        account
+      );
+
+      if (approved) {
+        setNeedApprove(false);
+      }
+
+      console.log(`Token 0 is approved? ${approved}`);
+    }
+  });
 
   return (
     <div>
@@ -671,15 +664,16 @@ const MyComponent = () => {
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
-              {(token0 && token0.symbol) || "In token"}
+              {(token0 && token0.symbol) || 'In token'}
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
               {supportedTokens.map((token, index) => (
                 <Dropdown.Item
                   key={index}
-                  onClick={() => {
+                  onClick={async () => {
                     setToken0(token);
+                    setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
                   }}
                 >
                   {token.symbol}
@@ -689,11 +683,8 @@ const MyComponent = () => {
           </Dropdown>
           <Form.Control
             value={token0ApproxAmount}
-            placeholder={
-              exactIn ? individualFieldPlaceholder : dependentFieldPlaceholder
-            }
-            onChange={(e) => {
-              t0Changed();
+            placeholder={exactIn ? individualFieldPlaceholder : dependentFieldPlaceholder}
+            onChange={e => {
               setToken0ApproxAmount(e.target.value);
               setToken0Amount(e.target.value);
               setExactIn(true);
@@ -705,15 +696,16 @@ const MyComponent = () => {
         <Form.Group className="mb-3" controlId="formBasicPassword">
           <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
-              {(token1 && token1.symbol) || "Out token"}
+              {(token1 && token1.symbol) || 'Out token'}
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
               {supportedTokens.map((token, index) => (
                 <Dropdown.Item
                   key={index}
-                  onClick={() => {
+                  onClick={async () => {
                     setToken1(token);
+                    setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
                   }}
                 >
                   {token.symbol}
@@ -723,10 +715,8 @@ const MyComponent = () => {
           </Dropdown>
           <Form.Control
             value={token1ApproxAmount}
-            placeholder={
-              exactIn ? dependentFieldPlaceholder : individualFieldPlaceholder
-            }
-            onChange={(e) => {
+            placeholder={exactIn ? dependentFieldPlaceholder : individualFieldPlaceholder}
+            onChange={e => {
               setToken1ApproxAmount(e.target.value);
               setToken1Amount(e.target.value);
               setExactIn(false);
@@ -734,13 +724,10 @@ const MyComponent = () => {
           />
           <small>Balance: {token1Balance}</small>
         </Form.Group>
-        <Alert variant="danger">
-          Slippage tolerance: {INITIAL_ALLOWED_SLIPPAGE} bips (0.01%)
-        </Alert>
-        <Alert variant="primary">
-          {swapBreakdown && swapBreakdown.map((info) => <p>{info}</p>)}
-        </Alert>
+        <Alert variant="danger">Slippage tolerance: {INITIAL_ALLOWED_SLIPPAGE} bips (0.01%)</Alert>
+        <Alert variant="primary">{swapBreakdown && swapBreakdown.map(info => <p>{info}</p>)}</Alert>
         <Alert variant="info">Swap status: {swapStatus}</Alert>
+        <Button onClick={checkApprovalStatus}>Refresh to check approval status</Button>
         <Button
           variant="warning"
           onClick={() => {
@@ -750,6 +737,7 @@ const MyComponent = () => {
           Approve
         </Button>
         <Button
+          disabled={needApprove}
           variant="success"
           onClick={() => {
             swap(
@@ -767,9 +755,8 @@ const MyComponent = () => {
               chainId,
               library,
               account,
+              setNeedApprove,
               setApproveAmount,
-              setToken0Balance,
-              setToken1Balance,
               setSwapStatus,
               setSwapBreakdown,
               setToken0ApproxAmount,

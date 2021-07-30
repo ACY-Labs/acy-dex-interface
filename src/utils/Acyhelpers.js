@@ -1,21 +1,18 @@
-import { abi as IUniswapV2Router02ABI } from "../abis/IUniswapV2Router02.json";
-import ERC20ABI from "../abis/ERC20.json";
-import { getAddress } from "@ethersproject/address";
-import { Contract } from "@ethersproject/contracts";
-import { AddressZero } from "@ethersproject/constants";
-import { BigNumber } from "@ethersproject/bignumber";
-import { parseUnits, formatUnits } from "@ethersproject/units";
-import {
-  CurrencyAmount,
-  ETHER,
-  Fraction,
-  JSBI,
-  Percent,
-  TokenAmount,
-  Trade,
-} from "@uniswap/sdk";
+/* eslint-disable no-return-await */
+/* eslint-disable lines-between-class-members */
+/* eslint-disable import/order */
+import { abi as IUniswapV2Router02ABI } from '../abis/IUniswapV2Router02.json';
+import ERC20ABI from '../abis/ERC20.json';
+import { getAddress } from '@ethersproject/address';
+import { Contract } from '@ethersproject/contracts';
+import { AddressZero } from '@ethersproject/constants';
+import { BigNumber } from '@ethersproject/bignumber';
+import { formatUnits } from '@ethersproject/units';
+import { CurrencyAmount, ETHER, JSBI, Percent, TokenAmount } from '@uniswap/sdk';
 
-export const ROUTER_ADDRESS = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
+export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
+
+export const ROUTER_ADDRESS = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';
 // export const ROUTER_ADDRESS = "0xF3726d6acfeda3E73a6F2328b948834f3Af39A2B";
 
 export function isAddress(value) {
@@ -50,24 +47,16 @@ export function getRouterContract(library, account) {
 
 // add 10%
 export function calculateGasMargin(value) {
-  return value
-    .mul(BigNumber.from(10000).add(BigNumber.from(1000)))
-    .div(BigNumber.from(10000));
+  return value.mul(BigNumber.from(10000).add(BigNumber.from(1000))).div(BigNumber.from(10000));
 }
 
 export function isZero(hexNumberString) {
   return /^0x0*$/.test(hexNumberString);
 }
 
-export async function getAllowance(
-  tokenAddress,
-  owner,
-  spender,
-  library,
-  account
-) {
-  let tokenContract = getContract(tokenAddress, ERC20ABI, library, account);
-  let allowance = await tokenContract.allowance(owner, spender);
+export async function getAllowance(tokenAddress, owner, spender, library, account) {
+  const tokenContract = getContract(tokenAddress, ERC20ABI, library, account);
+  const allowance = await tokenContract.allowance(owner, spender);
   console.log(allowance);
   return allowance;
 }
@@ -92,16 +81,14 @@ export function computeTradePriceBreakdown(trade) {
     ? undefined
     : ONE_HUNDRED_PERCENT.subtract(
         trade.route.pairs.reduce(
-          (currentFee) => currentFee.multiply(INPUT_FRACTION_AFTER_FEE),
+          currentFee => currentFee.multiply(INPUT_FRACTION_AFTER_FEE),
           ONE_HUNDRED_PERCENT
         )
       );
 
   // remove lp fees from price impact
   const priceImpactWithoutFeeFraction =
-    trade && realizedLPFee
-      ? trade.priceImpact.subtract(realizedLPFee)
-      : undefined;
+    trade && realizedLPFee ? trade.priceImpact.subtract(realizedLPFee) : undefined;
 
   // the x*y=k impact
   const priceImpactWithoutFeePercent = priceImpactWithoutFeeFraction
@@ -120,9 +107,7 @@ export function computeTradePriceBreakdown(trade) {
           trade.inputAmount.token,
           realizedLPFee.multiply(trade.inputAmount.raw).quotient
         )
-      : CurrencyAmount.ether(
-          realizedLPFee.multiply(trade.inputAmount.raw).quotient
-        ));
+      : CurrencyAmount.ether(realizedLPFee.multiply(trade.inputAmount.raw).quotient));
 
   return {
     priceImpactWithoutFee: priceImpactWithoutFeePercent,
@@ -133,20 +118,11 @@ export function computeTradePriceBreakdown(trade) {
 export async function getUserTokenAmount(token, account, library) {
   if (token === ETHER) {
     return await library.getBalance(account);
-  } else {
-    let contractToCheckForBalance = getContract(
-      token.address,
-      ERC20ABI,
-      library,
-      account
-    );
-    return await contractToCheckForBalance.balanceOf(account);
   }
+  const contractToCheckForBalance = getContract(token.address, ERC20ABI, library, account);
+  return await contractToCheckForBalance.balanceOf(account);
 }
 
 export async function getUserTokenAmountExact(token, account, library) {
-  return formatUnits(
-    await getUserTokenAmount(token, account, library),
-    token.decimals
-  );
+  return formatUnits(await getUserTokenAmount(token, account, library), token.decimals);
 }
