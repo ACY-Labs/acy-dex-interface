@@ -146,6 +146,7 @@ export default defineConfig({
   },
   // 暂时关闭
   pwa: false,
+  history: { type: 'hash' },
   lessLoader: { javascriptEnabled: true },
   chainWebpack(config) {
     config.optimization.splitChunks({

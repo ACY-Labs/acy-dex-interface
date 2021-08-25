@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  backend:
+    container_name: acy_backend
+    build: .
+    ports:
+      - "8001:8001"
+    depends_on:
+      - mongodb
+    volumes:
+      - ./src:/code/src
+      - ./node_modules:/code/node_modules
+      - ./public:/code/public
+    networks:
+      - web_network
+      - db_network
+    command: npm run deploy
+  mongodb:
+    container_name: mongodb
+    restart: always
+    build: ./mongodb
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - ./mongodb/:/docker-entrypoint-initdb.d/
+      - mongo-volume:/data/db
+    networks:
+      - db_network
+
+volumes:
+  mongo-volume:
+
+networks:
+  web_network:
+    driver: bridge
+  db_network:
+    driver: bridge
