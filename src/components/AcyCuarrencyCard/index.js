@@ -1,21 +1,20 @@
-import { Card, Icon } from 'antd';
+import { Card, Icon,Input } from 'antd';
 import AcyIcon from '@/components/AcyIcon';
 import styles from './index.less';
-const AcyCuarrencyCard =({title,icon,coin,yuan,dollar,...rest})=>{
+const AcyCuarrencyCard =({title,icon,coin,yuan,dollar,onChoseToken,onChangeToken,token,...rest})=>{
   return <div {...rest} className={styles.acycuarrencycard}>
     {title&&<div className={styles.cua_title}>
-      <div>Receive</div>
-      <div>Available: <span>{title}</span></div>
+     {title}
     </div>}
     <div className={styles.cua_body}>
-      <div className={styles.coin}>
+      <div className={styles.coin} onClick={onChoseToken}>
         <AcyIcon name={icon}/>
         {coin}
         <AcyIcon name="nabla"/>
       </div>
       <div className={styles.price}>
         <ul>
-          <li>{yuan}</li>
+          <li><Input value={token} onChange={onChangeToken}/></li>
           <li className={styles.dollar}>${dollar}</li>
         </ul>
       </div>

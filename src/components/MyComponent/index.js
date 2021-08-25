@@ -6,6 +6,23 @@
 /* eslint-disable no-return-await */
 /* eslint-disable no-restricted-globals */
 /* eslint-disable consistent-return */
+import {
+  AcyCard,
+  AcyIcon,
+  AcyPeriodTime,
+  AcyTabs,
+  AcyCuarrencyCard,
+  AcyConnectWalletBig,
+  AcyModal,
+  AcyInput,
+  AcyCoinItem,
+  AcyLineChart,
+  AcyConfirm,
+  AcyApprove,
+} from '@/components/Acy';
+import {connect} from 'umi';
+import styles from './styles.less';
+import { sortAddress } from '@/utils/utils';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { useState, useEffect, useCallback } from 'react';
@@ -45,7 +62,9 @@ import { MaxUint256 } from '@ethersproject/constants';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import 'bootstrap/dist/css/bootstrap.min.css';
+const { AcyTabPane } = AcyTabs;
 
+// 交易对授权操作
 async function approve(tokenAddress, requiredAmount, library, account) {
   if (requiredAmount === '0') {
     console.log('Unncessary call to approve');
@@ -106,13 +125,16 @@ async function checkTokenIsApproved(tokenAddress, requiredAmount, library, accou
   return allowance.gte(BigNumber.from(requiredAmount));
 }
 
+// 获取估算的值
 async function getEstimated(inputToken0, inputToken1, exactIn = true, chainId, library) {
+  // 前置货币
   const {
-    address: token0Address,
-    symbol: token0Symbol,
-    decimal: token0Decimal,
-    amount: token0Amount,
+    address: token0Address,// 地址
+    symbol: token0Symbol,// 货币
+    decimal: token0Decimal,// 小数
+    amount: token0Amount,// 数量
   } = inputToken0;
+  // 后置货币
   const {
     address: token1Address,
     symbol: token1Symbol,
@@ -120,12 +142,15 @@ async function getEstimated(inputToken0, inputToken1, exactIn = true, chainId, l
     amount: token1Amount,
   } = inputToken1;
 
+  // 校验货币是否为空
   if (exactIn && (isNaN(parseFloat(token0Amount)) || token0Amount === '')) return;
   if (!exactIn && (isNaN(parseFloat(token1Amount)) || token1Amount === '')) return;
 
+  // 校验是否为eth,这里还看不到为啥要非得是eth
   const token0IsETH = token0Symbol === 'ETH';
   const token1IsETH = token1Symbol === 'ETH';
 
+  // 这里没看懂
   // if one is ETH and other WETH, use WETH contract's deposit and withdraw
   // wrap ETH into WETH
   if ((token0IsETH && token1Symbol === 'WETH') || (token0Symbol === 'WETH' && token1IsETH)) {
@@ -439,8 +464,7 @@ async function swap(
     const breakdownInfo = [
       `Price impact : ${priceImpactWithoutFee.toFixed(2)}%`,
       `LP FEE : ${realizedLPFee?.toSignificant(6)} ${trade.inputAmount.currency.symbol}`,
-      `${exactIn ? 'Min received:' : 'Max sold'} : ${
-        exactIn ? minAmountOut.toSignificant(4) : maxAmountIn.toSignificant(4)
+      `${exactIn ? 'Min received:' : 'Max sold'} : ${exactIn ? minAmountOut.toSignificant(4) : maxAmountIn.toSignificant(4)
       } ${exactIn ? trade.outputAmount.currency.symbol : trade.inputAmount.currency.symbol}`,
     ];
     setSwapBreakdown(breakdownInfo);
@@ -511,29 +535,56 @@ async function swap(
   }
 }
 
-const MyComponent = () => {
+const MyComponent = (props) => {
+  const {dispatch}=props;
+  // 选择货币的弹窗
+  const [visible, setVisible] = useState(null);
+  // 选择货币前置和后置
+  const [before,setBefore]=useState(true);
+
+  // 交易对前置货币
   const [token0, setToken0] = useState(null);
-  const [token1, setToken1] = useState(null);
+  // 交易对前置货币余额
   const [token0Balance, setToken0Balance] = useState('0');
-  const [token1Balance, setToken1Balance] = useState('0');
+  // 交易对前置货币兑换量
   const [token0Amount, setToken0Amount] = useState('0');
+
+  // 交易对后置货币
+  const [token1, setToken1] = useState(null);
+  // 交易对后置货币余额
+  const [token1Balance, setToken1Balance] = useState('0');
+  // 交易对后置货币兑换量
   const [token1Amount, setToken1Amount] = useState('0');
+
+  // swap交易信息分析 Price impact,LP FEE,Min received
   const [swapBreakdown, setSwapBreakdown] = useState();
+  // swap交易状态
   const [swapStatus, setSwapStatus] = useState();
+
+  // 授权,这里指交易对的授权操作
   const [needApprove, setNeedApprove] = useState(false);
+  // 授权量
   const [approveAmount, setApproveAmount] = useState('0');
+  // 交易对前置货币授权量
   const [token0ApproxAmount, setToken0ApproxAmount] = useState('0');
+  // 交易对后置货币授权量
   const [token1ApproxAmount, setToken1ApproxAmount] = useState('0');
+
+  // 是否需要精度的计算方式
   const [exactIn, setExactIn] = useState(true);
 
+  // 占位符
   const individualFieldPlaceholder = 'Enter amount';
   const dependentFieldPlaceholder = 'Estimated value';
 
+  // 连接钱包函数
   const { account, chainId, library, activate } = useWeb3React();
+  // 连接钱包时支持的货币id
   const injected = new InjectedConnector({
     supportedChainIds: [1, 3, 4, 5, 42],
   });
 
+  // 临时货币可选列表,将来需要去修改
   const supportedTokens = [
     {
       symbol: 'USDC',
@@ -572,9 +623,11 @@ const MyComponent = () => {
     },
   ];
 
+  // 初始化函数时连接钱包
   useEffect(() => {
-    activate(injected);
+     activate(injected);
   }, []);
+
 
   const t0Changed = useCallback(
     async () => {
@@ -636,7 +689,7 @@ const MyComponent = () => {
     [token1Amount]
   );
 
-  const checkApprovalStatus = useCallback(async () => {
+  const checkApprovalStatus = useCallback(async () => {debugger
     if (token0 && token1) {
       const approved = await checkTokenIsApproved(
         token0.address,
@@ -653,13 +706,55 @@ const MyComponent = () => {
     }
   });
 
+
+  const onClickCoin = () => {
+    setVisible(true);
+  }
+  const onCancel = () => {
+    setVisible(false);
+  }
+  const ConnectWallet = () => {
+    activate(injected);
+  }
   return (
     <div>
-      <Alert variant="success">
-        <Alert.Heading>Hey, nice to see you</Alert.Heading>
-        <p>{account}</p>
-      </Alert>
+      <AcyCuarrencyCard
+        icon="eth"
+        title={`Balance: ${token0Balance}`}
+        coin={(token0 && token0.symbol) || 'In token'}
+        yuan="566.228"
+        dollar="679545.545"
+        token={token0ApproxAmount}
+        onChoseToken={()=>{
+          onClickCoin();
+          setBefore(false);
+        }}
+        onChangeToken={e => {
+          setToken0ApproxAmount(e.target.value);
+          setToken0Amount(e.target.value);
+          setExactIn(true);
+        }}
+      />
+      <AcyIcon name="double-right" />
+      <AcyCuarrencyCard
+        icon="eth"
+        title={`Balance: ${token1Balance}`}
+        coin={(token1 && token1.symbol) || 'Out token'}
+        yuan="566.228"
+        dollar="679545.545"
+        token={token1ApproxAmount}
+        onChoseToken={()=>{
+          onClickCoin();
+          setBefore(true);
+        }}
+        onChangeToken={e => {
+          setToken1ApproxAmount(e.target.value);
+          setToken1Amount(e.target.value);
+          setExactIn(true);
+        }}
+      />
 
+      <AcyConnectWalletBig onClick={ConnectWallet}>{account && sortAddress(account) || 'Connect Wallet'}</AcyConnectWalletBig>
       <Form className="p-5">
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Dropdown>
@@ -680,7 +775,7 @@ const MyComponent = () => {
                 </Dropdown.Item>
               ))}
             </Dropdown.Menu>
-          </Dropdown>
+          </Dropdown>3333333333
           <Form.Control
             value={token0ApproxAmount}
             placeholder={exactIn ? individualFieldPlaceholder : dependentFieldPlaceholder}
@@ -725,7 +820,7 @@ const MyComponent = () => {
           <small>Balance: {token1Balance}</small>
         </Form.Group>
         <Alert variant="danger">Slippage tolerance: {INITIAL_ALLOWED_SLIPPAGE} bips (0.01%)</Alert>
-        <Alert variant="primary">{swapBreakdown && swapBreakdown.map(info => <p>{info}</p>)}</Alert>
+        <Alert variant="primary">{swapBreakdown && swapBreakdown.map(info => <p>{info}</p>)}123456</Alert>
         <Alert variant="info">Swap status: {swapStatus}</Alert>
         <Button onClick={checkApprovalStatus}>Refresh to check approval status</Button>
         <Button
@@ -767,8 +862,54 @@ const MyComponent = () => {
           Swap
         </Button>
       </Form>
+      <AcyModal onCancel={onCancel} width={600} visible={visible}>
+        <div className={styles.title}>
+          <AcyIcon name="back" /> Select a token
+        </div>
+        <div className={styles.search}>
+          <AcyInput
+            placeholder="Enter the token symbol or address"
+            suffix={<AcyIcon name="search" />}
+          />
+        </div>
+        <div className={styles.coinList}>
+          <AcyTabs>
+            <AcyTabPane tab="All" key="1">
+              {supportedTokens.map((token, index) => (
+                <AcyCoinItem data={token} key={index} onClick={async () => {
+                  if(!before){
+                    setToken0(token);
+                    setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
+                    onCancel();
+                  }
+                 else{
+                  setToken1(token);
+                  setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
+                  onCancel();
+                 }
+                }} />
+                // <Dropdown.Item
+                //   key={index}
+                //   onClick={async () => {
+                //     setToken0(token);
+                //     setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
+                //   }}
+                // >
+                //   {token.symbol}
+                // </Dropdown.Item>
+              ))}
+            </AcyTabPane>
+            <AcyTabPane tab="Favorite" key="2" />
+            <AcyTabPane tab="Index" key="3" />
+            <AcyTabPane tab="Synth" key="4" />
+          </AcyTabs>
+        </div>
+      </AcyModal>
     </div>
   );
 };
 
-export default MyComponent;
+export default connect(({ global, loading }) => ({
+  global,
+  loading: loading.global,
+}))(MyComponent);

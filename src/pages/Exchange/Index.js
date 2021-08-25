@@ -20,7 +20,6 @@ import MyComponent from '@/components/MyComponent';
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
-
 const { Description } = DescriptionList;
 const { AcyTabPane } = AcyTabs;
 const progressColumns = [
@@ -231,7 +230,8 @@ class BasicProfile extends Component {
           <AcyTabs onChange={this.onChangeTabs}>
             <AcyTabPane tab="Trade" key="1">
               <div className={styles.trade}>
-                <AcyCuarrencyCard
+                <MyComponent />
+                {/* <AcyCuarrencyCard
                   icon="eth"
                   coin="ETH"
                   yuan="566.228"
@@ -246,7 +246,7 @@ class BasicProfile extends Component {
                   yuan="566.228"
                   dollar="679545.545"
                 />
-                <AcyConnectWalletBig>Connect Wallet</AcyConnectWalletBig>
+                <AcyConnectWalletBig>Connect Wallet</AcyConnectWalletBig> */}
               </div>
             </AcyTabPane>
             <AcyTabPane tab="Liquidity" key="2">
@@ -324,9 +324,6 @@ class BasicProfile extends Component {
           onCancel={() => this.setState({ visibleLoading: false })}
           visible={visibleLoading}
         />
-        <AcyModal visible={true}>
-          <MyComponent />
-        </AcyModal>
       </PageHeaderWrapper>
     );
   }

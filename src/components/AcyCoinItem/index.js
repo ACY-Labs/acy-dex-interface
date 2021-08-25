@@ -2,15 +2,15 @@ import AcyIcon from '@/components/AcyIcon';
 import { Rate } from 'antd';
 import styles from './style.less';
 
-const AcyCoinItem = ({ children, ...rest }) => {
+const AcyCoinItem = ({data,children, ...rest }) => {
   return (
-    <div className={styles.acycoinitem}>
+    <div className={styles.acycoinitem} {...rest}>
       <ul>
         <li>
           <AcyIcon name="eth"/>
         </li>
         <li className={styles.conititle}>
-          BTC
+          {data.symbol}
         </li>
         <li>
         Bitcoin

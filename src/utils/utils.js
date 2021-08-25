@@ -181,3 +181,16 @@ export function formatWan(val) {
 export function isAntdPro() {
   return window.location.hostname === 'preview.pro.ant.design';
 }
+
+// 截取字符串
+export function sortAddress(text) {
+  // 转为string
+  text = text + "";
+  const length = text.length;
+  if (text.length > 10) {
+    return text.substring(0, 4) + "..." + text.substring(length - 4, length);
+  }
+  else {
+    return text;
+  }
+}
