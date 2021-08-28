@@ -19,6 +19,8 @@ import {
   AcyLineChart,
   AcyConfirm,
   AcyApprove,
+  AcyButton,
+  AcyDescriptions
 } from '@/components/Acy';
 
 import { connect } from 'umi';
@@ -109,9 +111,9 @@ const MyComponent = props => {
   // 授权量
   const [approveAmount, setApproveAmount] = useState('0');
   // 交易对前置货币授权量
-  const [token0ApproxAmount, setToken0ApproxAmount] = useState('0');
+  const [token0ApproxAmount, setToken0ApproxAmount] = useState();
   // 交易对后置货币授权量
-  const [token1ApproxAmount, setToken1ApproxAmount] = useState('0');
+  const [token1ApproxAmount, setToken1ApproxAmount] = useState();
 
   let [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
   // 是否需要精度的计算方式
@@ -132,7 +134,19 @@ const MyComponent = props => {
   useEffect(() => {
     activate(injected);
   }, []);
-
+  // 通知钱包连接成功
+  useEffect(() => {
+    // todo....
+    if(account){
+      const{dispatch}=props;
+      dispatch({
+        type: 'global/updateAccount',
+        payload:{
+          account
+        }
+      });
+    }
+ }, account);
   const t0Changed = useCallback(
     async () => {
       if (!token0 || !token1) return;
@@ -224,34 +238,7 @@ const MyComponent = props => {
   };
 
   return (
-    <div>
-      <Button type="primary" onClick={ConnectWallet}>
-        connect
-      </Button>
-      <br />
-      <alert type="success">{account} </alert>
-      {/*<Row>*/}
-      {/*  <Col span={24}>*/}
-      {/*    <AcyCuarrencyCard*/}
-      {/*      icon="eth"*/}
-      {/*      title={`Balance: ${token0Balance}`}*/}
-      {/*      coin={(token0 && token0.symbol) || 'In token'}*/}
-      {/*      yuan="566.228"*/}
-      {/*      dollar={`${token0Balance}`}*/}
-      {/*      token={token0ApproxAmount}*/}
-      {/*      onChoseToken={()=>{*/}
-      {/*        onClickCoin();*/}
-      {/*        setBefore(false);*/}
-      {/*      }}*/}
-      {/*      onChangeToken={e => {*/}
-      {/*        setToken0ApproxAmount(e.target.value);*/}
-      {/*        setToken0Amount(e.target.value);*/}
-      {/*        setExactIn(true);*/}
-      {/*      }}*/}
-      {/*    />*/}
-      {/*  </Col>*/}
-      {/*</Row>*/}
-      <br />
+    <div className={styles.sc}>
       <AcyCuarrencyCard
         icon="eth"
         title={`Balance: ${token0Balance}`}
@@ -269,7 +256,9 @@ const MyComponent = props => {
           setExactIn(true);
         }}
       />
-      <AcyIcon name="double-right" />
+      <div style={{margin:'12px auto',textAlign:'center'}}>
+        <AcyIcon width={21.5} name="double-down" />
+      </div>
       <AcyCuarrencyCard
         icon="eth"
         title={`Balance: ${token1Balance}`}
@@ -287,22 +276,26 @@ const MyComponent = props => {
           setExactIn(true);
         }}
       />
-      <AcyConnectWalletBig onClick={ConnectWallet}>
-        {(account && sortAddress(account)) || 'Connect Wallet'}
-      </AcyConnectWalletBig>
-      <br />
-      <div>the Slippage Tolerance you choose is [ {slippageTolerance}% ]</div>
-      <br />
-      <Button
+      <AcyDescriptions>
+        <AcyDescriptions.Item>
+          the Slippage Tolerance you choose is{slippageTolerance}%
+        </AcyDescriptions.Item>
+        <AcyDescriptions.Item>
+          ETH：0.0001
+        </AcyDescriptions.Item>
+      </AcyDescriptions>
+      {/* <AcyButton
         type="primary"
         onClick={() => {
           approve(token0.address, approveAmount, library, account);
         }}
       >
         approve
-      </Button>{' '}
-      <Button
-        type="primary"
+      </AcyButton> */}
+
+      {
+        account&&<AcyButton
+        disabled={!token0 || !token1}
         onClick={() => {
           swap(
             {
@@ -328,7 +321,11 @@ const MyComponent = props => {
         }}
       >
         Swap
-      </Button>
+      </AcyButton>||<AcyButton onClick={ConnectWallet}>
+        Connect
+      </AcyButton>
+      }
+      
       <AcyModal onCancel={onCancel} width={600} height={400} visible={visible}>
         <div className={styles.title}>
           <AcyIcon name="back" /> Select a token
@@ -347,14 +344,13 @@ const MyComponent = props => {
                   data={token}
                   key={index}
                   onClick={async () => {
+                    onCancel();
                     if (!before) {
                       setToken0(token);
                       setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
-                      onCancel();
                     } else {
                       setToken1(token);
                       setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
-                      onCancel();
                     }
                   }}
                 />

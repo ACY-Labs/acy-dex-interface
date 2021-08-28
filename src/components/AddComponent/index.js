@@ -19,6 +19,8 @@ import {
   AcyLineChart,
   AcyConfirm,
   AcyApprove,
+  AcyButton,
+  AcyDescriptions
 } from '@/components/Acy';
 
 //^mark
@@ -237,13 +239,6 @@ const MyComponent = props => {
 
   return (
     <div>
-      <Button type="primary" onClick={ConnectWallet}>
-        connect
-      </Button>
-
-      <br />
-
-      <alert type="success">{account} </alert>
       {/*<Row>*/}
 
       {/*  <Col span={24}>*/}
@@ -270,7 +265,6 @@ const MyComponent = props => {
 
       {/*</Row>*/}
 
-      <br />
       <AcyCuarrencyCard
         icon="eth"
         title={`Balance: ${token0Balance}`}
@@ -288,9 +282,9 @@ const MyComponent = props => {
           setExactIn(true);
         }}
       />
-
-      <AcyIcon name="double-right" />
-
+      <div style={{ margin: '12px auto', textAlign: 'center' }}>
+        <AcyIcon width={21.5} name="double-down" />
+      </div>
       <AcyCuarrencyCard
         icon="eth"
         title={`Balance: ${token1Balance}`}
@@ -313,9 +307,120 @@ const MyComponent = props => {
       {/*  the Slippage Tolerance you choose is [ {slippageTolerance}% ]*/}
       {/*</Alert>*/}
 
-      <AcyConnectWalletBig onClick={ConnectWallet}>
-        {(account && sortAddress(account)) || 'Connect Wallet'}
-      </AcyConnectWalletBig>
+
+      <AcyDescriptions>
+        <AcyDescriptions.Item>
+          the Slippage Tolerance you choose is [ {slippageTolerance}% ]
+        </AcyDescriptions.Item>
+        <AcyDescriptions.Item>
+          <div>
+          {liquidityBreakdown && liquidityBreakdown.map(info => <p>{info}</p>)}
+
+          </div>
+        </AcyDescriptions.Item>
+      </AcyDescriptions>
+      <AcyDescriptions>
+        <AcyDescriptions.Item>
+          Liquidity status: {liquidityStatus}
+        </AcyDescriptions.Item>
+      </AcyDescriptions>
+      {/* <AcyDescriptions>
+        <AcyDescriptions.Item>
+          {needApproveToken0 == 'true'
+            ? 'plase click the left approve button'
+            : "you don't need to click the left approve button"}{' '}
+          <br />
+          {needApproveToken1 == 'true'
+            ? 'plase click the right approve button'
+            : "you don't need to click the right approve button"}{' '}
+          <br />
+        </AcyDescriptions.Item>
+      </AcyDescriptions> */}
+      {/* <br />
+
+      <div>the Slippage Tolerance you choose is [ {slippageTolerance}% ]</div>
+
+      <div>{liquidityBreakdown && liquidityBreakdown.map(info => <p>{info}</p>)}</div>
+      <br />
+      <br />
+      <div>Liquidity status: {liquidityStatus}</div>
+      <br />
+      <br />
+
+      <div>
+        {needApproveToken0 == 'true'
+          ? 'plase click the left approve button'
+          : "you don't need to click the left approve button"}{' '}
+        <br />
+        {needApproveToken1 == 'true'
+          ? 'plase click the right approve button'
+          : "you don't need to click the right approve button"}{' '}
+        <br />
+      </div> */}
+      {
+        !account && <AcyButton onClick={ConnectWallet}>Connect</AcyButton> ||
+        <div>
+          <div style={{display:'flex',marginBottom:'15px'}}>
+           {
+             token0&&<Button
+             type="primary"
+             style={{marginRight:'15px'}}
+             onClick={() => {
+               approve(token0.address, approveAmountToken0, library, account);
+             }}
+             
+           >
+             Approve {token0 && token0.symbol}
+           </Button>
+           } 
+           {
+             token1&&<Button
+             type="primary"
+             onClick={() => {
+               approve(token1.address, approveAmountToken1, library, account);
+             }}
+           >
+             Approve {token1 && token1.symbol}
+           </Button>
+           }
+            
+            </div>
+         
+          {
+            <AcyButton
+            disabled={!(token1&&token1.symbol&&token0&&token0.symbol)}
+            onClick={() => {
+              addLiquidity(
+                {
+                  ...token0,
+                  amount: token0Amount,
+                },
+                {
+                  ...token1,
+                  amount: token1Amount,
+                },
+                100 * slippageTolerance,
+                exactIn,
+                chainId,
+                library,
+                account,
+                setNeedApproveToken0,
+                setNeedApproveToken1,
+                setApproveAmountToken0,
+                setApproveAmountToken1,
+                setLiquidityStatus,
+                setLiquidityBreakdown,
+                setToken0Amount,
+                setToken1Amount
+              );
+            }}
+          >
+            Add Liquidity
+          </AcyButton>
+          }
+          
+        </div>
+      }
       <AcyModal onCancel={onCancel} width={600} height={400} visible={visible}>
         <div className={styles.title}>
           <AcyIcon name="back" /> Select a token
@@ -334,15 +439,14 @@ const MyComponent = props => {
                   data={token}
                   key={index}
                   onClick={async () => {
+                    onCancel();
                     if (before) {
                       setToken0(token);
                       //^mark 这里的await拖慢了速度
                       setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
-                      onCancel();
                     } else {
                       setToken1(token);
                       setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
-                      onCancel();
                     }
                   }}
                 />
@@ -364,77 +468,6 @@ const MyComponent = props => {
         </div>
       </AcyModal>
 
-      <br />
-
-      <div>the Slippage Tolerance you choose is [ {slippageTolerance}% ]</div>
-
-      <div>{liquidityBreakdown && liquidityBreakdown.map(info => <p>{info}</p>)}</div>
-      <br />
-      <br />
-      <div>Liquidity status: {liquidityStatus}</div>
-      <br />
-      <br />
-
-      <div>
-        {needApproveToken0 == 'true'
-          ? 'plase click the left approve button'
-          : "you don't need to click the left approve button"}{' '}
-        <br />
-        {needApproveToken1 == 'true'
-          ? 'plase click the right approve button'
-          : "you don't need to click the right approve button"}{' '}
-        <br />
-      </div>
-
-      <br />
-
-      <Button
-        variant="warning"
-        onClick={() => {
-          approve(token0.address, approveAmountToken0, library, account);
-        }}
-      >
-        Approve {token0 && token0.symbol}
-      </Button>
-      <Button
-        variant="warning"
-        onClick={() => {
-          approve(token1.address, approveAmountToken1, library, account);
-        }}
-      >
-        Approve {token1 && token1.symbol}
-      </Button>
-
-      <Button
-        type="primary"
-        onClick={() => {
-          addLiquidity(
-            {
-              ...token0,
-              amount: token0Amount,
-            },
-            {
-              ...token1,
-              amount: token1Amount,
-            },
-            100 * slippageTolerance,
-            exactIn,
-            chainId,
-            library,
-            account,
-            setNeedApproveToken0,
-            setNeedApproveToken1,
-            setApproveAmountToken0,
-            setApproveAmountToken1,
-            setLiquidityStatus,
-            setLiquidityBreakdown,
-            setToken0Amount,
-            setToken1Amount
-          );
-        }}
-      >
-        Add Liquidity
-      </Button>
     </div>
   );
 };

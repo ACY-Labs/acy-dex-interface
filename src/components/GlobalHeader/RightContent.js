@@ -133,6 +133,7 @@ export default class GlobalHeaderRight extends PureComponent {
       onNoticeClear,
       skeletonCount,
       theme,
+      account
     } = this.props;
     const { visible, visibleMetaMask, visibleSetting } = this.state;
     const menu = (
@@ -170,7 +171,7 @@ export default class GlobalHeaderRight extends PureComponent {
     return (
       <div className={className}>
         <AcyIcon onClick={this.onhandConnect} name="acy" />
-        <AcyConnectWallet onClick={this.onhandMetaMask} />
+        <AcyConnectWallet value={account}  onClick={this.onhandMetaMask} />
         <Dropdown
           overlay={
             <div className={styles.setting} onClick={e => e.preventDefault()}>

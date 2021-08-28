@@ -14,19 +14,24 @@ const AcyCuarrencyCard = ({
 }) => {
   return (
     <div {...rest} className={styles.acycuarrencycard}>
-      {title && <div className={styles.cua_title}>{title}</div>}
+      
       <div className={styles.cua_body}>
-        <div className={styles.coin} onClick={onChoseToken}>
-          <AcyIcon name={icon} />
-          {coin}
-          <AcyIcon name="nabla" />
+        <div>
+          <div className={styles.coin} onClick={onChoseToken}>
+            <AcyIcon width={33} name={icon} />
+            {coin}
+            <AcyIcon name="nabla" />
+          
+          </div>
+          {title && <div className={styles.cua_title}>{title}</div>}
         </div>
+        
         <div className={styles.price}>
           <ul>
             <li>
-              <Input value={token} onChange={onChangeToken} />
+              <Input placeholder="0.0" value={token} onChange={onChangeToken} />
             </li>
-            <li className={styles.dollar}> ${dollar}</li>
+            {/* <li className={styles.dollar}> ${dollar}</li> */}
           </ul>
         </div>
       </div>

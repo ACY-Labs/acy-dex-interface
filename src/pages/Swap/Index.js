@@ -17,6 +17,7 @@ import {
   AcyApprove,
 } from '@/components/Acy';
 import SwapComponent from '@/components/SwapComponent';
+import AddComponent from '@/components/AddComponent';
 import MyComponent from '@/components/MyComponent';
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -210,9 +211,9 @@ class BasicProfile extends Component {
     const { visible, visibleConfirmOrder, visibleLoading, tabIndex } = this.state;
     return (
       <PageHeaderWrapper>
-        <Row>
-          <Col span={12}>
-            {(tabIndex == 1 && (
+        <div className={styles.main}>
+          <div>
+          {(tabIndex == 1 && (
               <AcyCard title={this.lineTitleRender()} extra={<AcyIcon name="maximize" />}>
                 <div
                   style={{
@@ -230,13 +231,9 @@ class BasicProfile extends Component {
                 <Table dataSource={dataSource} columns={columns} pagination={false} />
               </AcyCard>
             )}
-          </Col>
-          <Col span={3}>
-            {' '}
-            <div>{'this is now'}</div>
-          </Col>
-          <Col span={11}>
-            <AcyCard
+          </div>
+          <div>
+          <AcyCard
               extra={
                 <div>
                   <AcyIcon name="time" />
@@ -244,13 +241,17 @@ class BasicProfile extends Component {
                 </div>
               }
             >
-              <AcyTabs onChange={this.onChangeTabs}>
-                <AcyTabPane tab="swap" key="1">
+              <AcyTabs style={{marginTop:'-70px'}} onChange={this.onChangeTabs}>
+                <AcyTabPane tab="Swap" key="1">
                   <div className={styles.trade}>
                     <SwapComponent />
                   </div>
                 </AcyTabPane>
-
+                <AcyTabPane tab="Liquidity" key="2">
+                  <div className={styles.trade}>
+                    <AddComponent />
+                  </div>
+                </AcyTabPane>
                 {/*<AcyTabPane tab="Liquidity" key="2">*/}
                 {/*<div className={styles.trade}>*/}
                 {/*    <AcyCuarrencyCard*/}
@@ -280,8 +281,8 @@ class BasicProfile extends Component {
                 {/*</AcyTabPane>*/}
               </AcyTabs>
             </AcyCard>
-          </Col>
-        </Row>
+          </div>
+        </div>
 
         <AcyModal onCancel={this.onCancel} width={600} visible={visible}>
           <div className={styles.title}>

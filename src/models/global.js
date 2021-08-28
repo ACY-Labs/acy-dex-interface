@@ -7,9 +7,11 @@ export default {
     collapsed: false,
     notices: [],
     loadedAllNotices: false,
+    account:null
   },
 
   effects: {
+    
     *fetchNotices(_, { call, put, select }) {
       const data = yield call(queryNotices);
       const loadedAllNotices = data && data.length && data[data.length - 1] === null;
@@ -93,9 +95,21 @@ export default {
         },
       });
     },
+    *updateAccount({ payload }, { put, select }) {
+      yield put({
+        type: 'changeAccount',
+        payload: payload,
+      });
+    },
   },
 
   reducers: {
+    changeAccount(state, { payload }) {
+      return {
+        ...state,
+        ...payload,                                                                         // 将数据返回给页面
+      };
+    },
     changeLayoutCollapsed(state, { payload }) {
       return {
         ...state,

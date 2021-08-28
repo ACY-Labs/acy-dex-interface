@@ -19,34 +19,39 @@ export default [
       { path: '/', redirect: '/exange' },
       {
         name: 'Market',
-        path: '/list/table-list',
-        component: './List/TableList',
+        path: '/market',
+        component: './Swap/Index',
       },
       {
         path: '/exange',
         name: 'Exchange',
-        component: './Exchange/Index',
-      },
-      {
-        path: '/swap',
-        name: 'Swap',
         component: './Swap/Index',
       },
       {
-        path: '/add',
-        name: 'Add',
-        component: './Add/Index',
+        path: '/lending',
+        name: 'Lending',
+        component: './Swap/Index',
       },
-      {
-        path: '/remove',
-        name: 'Remove',
-        component: './Remove/Index',
-      },
-      {
-        path: '/dashboard/monitor',
-        name: 'Liquidity',
-        component: './Dashboard/Monitor',
-      },
+      // {
+      //   path: '/swap',
+      //   name: 'Swap',
+      //   component: './Swap/Index',
+      // },
+      // {
+      //   path: '/add',
+      //   name: 'Add',
+      //   component: './Add/Index',
+      // },
+      // {
+      //   path: '/remove',
+      //   name: 'Remove',
+      //   component: './Remove/Index',
+      // },
+      // {
+      //   path: '/dashboard/monitor',
+      //   name: 'Liquidity',
+      //   component: './Dashboard/Monitor',
+      // },
       // // dashboard
       // { path: '/', redirect: '/dashboard/analysis' },
       // {
