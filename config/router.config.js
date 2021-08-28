@@ -28,9 +28,9 @@ export default [
         component: './Swap/Index',
       },
       {
-        path: '/lending',
-        name: 'Lending',
-        component: './Swap/Index',
+        path: '/liquidity',
+        name: 'Liquidity',
+        component: './Liquidity/Index',
       },
       // {
       //   path: '/swap',
