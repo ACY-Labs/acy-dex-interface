@@ -170,7 +170,7 @@ export default class GlobalHeaderRight extends PureComponent {
     }
     return (
       <div className={className}>
-        <AcyIcon onClick={this.onhandConnect} name="acy" />
+        {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
         <AcyConnectWallet value={account}  onClick={this.onhandMetaMask} />
         <Dropdown
           overlay={

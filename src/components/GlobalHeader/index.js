@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Icon } from 'antd';
 import { Link } from 'umi';
+import {AcyIcon} from '@/components/Acy';
 import Debounce from 'lodash-decorators/debounce';
 import styles from './index.less';
 import RightContent from './RightContent';
@@ -28,7 +29,7 @@ export default class GlobalHeader extends PureComponent {
       <div className={styles.header}>
         {isMobile && (
           <Link to="/" className={styles.logo} key="logo">
-            <img src={logo} alt="logo" />
+            <AcyIcon name="acy" />
           </Link>
         )}
         <span className={styles.trigger} onClick={this.toggle}>

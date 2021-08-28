@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import { Link } from 'umi';
 import RightContent from '../GlobalHeader/RightContent';
 import BaseMenu from '../SiderMenu/BaseMenu';
+import {AcyIcon} from '@/components/Acy';
 import { getFlatMenuKeys } from '../SiderMenu/SiderMenuUtils';
 import styles from './index.less';
 
@@ -31,7 +32,7 @@ export default class TopNavHeader extends PureComponent {
           <div className={styles.left}>
             <div className={styles.logo} key="logo" id="logo">
               <Link to="/">
-                <img src={logo} alt="logo" />
+                <AcyIcon name="acy" />
               </Link>
             </div>
             <div
