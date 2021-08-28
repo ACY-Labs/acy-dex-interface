@@ -20,7 +20,8 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
-import {connect} from 'umi';
+
+import { connect } from 'umi';
 import styles from './styles.less';
 import { sortAddress } from '@/utils/utils';
 import { useWeb3React } from '@web3-react/core';
@@ -61,7 +62,7 @@ import {
 import { MaxUint256 } from '@ethersproject/constants';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 const { AcyTabPane } = AcyTabs;
 
 // 交易对授权操作
@@ -129,10 +130,10 @@ async function checkTokenIsApproved(tokenAddress, requiredAmount, library, accou
 async function getEstimated(inputToken0, inputToken1, exactIn = true, chainId, library) {
   // 前置货币
   const {
-    address: token0Address,// 地址
-    symbol: token0Symbol,// 货币
-    decimal: token0Decimal,// 小数
-    amount: token0Amount,// 数量
+    address: token0Address, // 地址
+    symbol: token0Symbol, // 货币
+    decimal: token0Decimal, // 小数
+    amount: token0Amount, // 数量
   } = inputToken0;
   // 后置货币
   const {
@@ -464,7 +465,8 @@ async function swap(
     const breakdownInfo = [
       `Price impact : ${priceImpactWithoutFee.toFixed(2)}%`,
       `LP FEE : ${realizedLPFee?.toSignificant(6)} ${trade.inputAmount.currency.symbol}`,
-      `${exactIn ? 'Min received:' : 'Max sold'} : ${exactIn ? minAmountOut.toSignificant(4) : maxAmountIn.toSignificant(4)
+      `${exactIn ? 'Min received:' : 'Max sold'} : ${
+        exactIn ? minAmountOut.toSignificant(4) : maxAmountIn.toSignificant(4)
       } ${exactIn ? trade.outputAmount.currency.symbol : trade.inputAmount.currency.symbol}`,
     ];
     setSwapBreakdown(breakdownInfo);
@@ -535,12 +537,12 @@ async function swap(
   }
 }
 
-const MyComponent = (props) => {
-  const {dispatch}=props;
+const MyComponent = props => {
+  const { dispatch } = props;
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
   // 选择货币前置和后置
-  const [before,setBefore]=useState(true);
+  const [before, setBefore] = useState(true);
 
   // 交易对前置货币
   const [token0, setToken0] = useState(null);
@@ -625,9 +627,8 @@ const MyComponent = (props) => {
 
   // 初始化函数时连接钱包
   useEffect(() => {
-     activate(injected);
+    activate(injected);
   }, []);
-
 
   const t0Changed = useCallback(
     async () => {
@@ -689,7 +690,8 @@ const MyComponent = (props) => {
     [token1Amount]
   );
 
-  const checkApprovalStatus = useCallback(async () => {debugger
+  const checkApprovalStatus = useCallback(async () => {
+    debugger;
     if (token0 && token1) {
       const approved = await checkTokenIsApproved(
         token0.address,
@@ -706,16 +708,15 @@ const MyComponent = (props) => {
     }
   });
 
-
   const onClickCoin = () => {
     setVisible(true);
-  }
+  };
   const onCancel = () => {
     setVisible(false);
-  }
+  };
   const ConnectWallet = () => {
     activate(injected);
-  }
+  };
   return (
     <div>
       <AcyCuarrencyCard
@@ -725,7 +726,7 @@ const MyComponent = (props) => {
         yuan="566.228"
         dollar="679545.545"
         token={token0ApproxAmount}
-        onChoseToken={()=>{
+        onChoseToken={() => {
           onClickCoin();
           setBefore(false);
         }}
@@ -743,7 +744,7 @@ const MyComponent = (props) => {
         yuan="566.228"
         dollar="679545.545"
         token={token1ApproxAmount}
-        onChoseToken={()=>{
+        onChoseToken={() => {
           onClickCoin();
           setBefore(true);
         }}
@@ -754,7 +755,9 @@ const MyComponent = (props) => {
         }}
       />
 
-      <AcyConnectWalletBig onClick={ConnectWallet}>{account && sortAddress(account) || 'Connect Wallet'}</AcyConnectWalletBig>
+      <AcyConnectWalletBig onClick={ConnectWallet}>
+        {(account && sortAddress(account)) || 'Connect Wallet'}
+      </AcyConnectWalletBig>
       <Form className="p-5">
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Dropdown>
@@ -775,7 +778,8 @@ const MyComponent = (props) => {
                 </Dropdown.Item>
               ))}
             </Dropdown.Menu>
-          </Dropdown>3333333333
+          </Dropdown>
+          3333333333
           <Form.Control
             value={token0ApproxAmount}
             placeholder={exactIn ? individualFieldPlaceholder : dependentFieldPlaceholder}
@@ -820,7 +824,9 @@ const MyComponent = (props) => {
           <small>Balance: {token1Balance}</small>
         </Form.Group>
         <Alert variant="danger">Slippage tolerance: {INITIAL_ALLOWED_SLIPPAGE} bips (0.01%)</Alert>
-        <Alert variant="primary">{swapBreakdown && swapBreakdown.map(info => <p>{info}</p>)}123456</Alert>
+        <Alert variant="primary">
+          {swapBreakdown && swapBreakdown.map(info => <p>{info}</p>)}123456
+        </Alert>
         <Alert variant="info">Swap status: {swapStatus}</Alert>
         <Button onClick={checkApprovalStatus}>Refresh to check approval status</Button>
         <Button
@@ -876,18 +882,21 @@ const MyComponent = (props) => {
           <AcyTabs>
             <AcyTabPane tab="All" key="1">
               {supportedTokens.map((token, index) => (
-                <AcyCoinItem data={token} key={index} onClick={async () => {
-                  if(!before){
-                    setToken0(token);
-                    setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
-                    onCancel();
-                  }
-                 else{
-                  setToken1(token);
-                  setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
-                  onCancel();
-                 }
-                }} />
+                <AcyCoinItem
+                  data={token}
+                  key={index}
+                  onClick={async () => {
+                    if (!before) {
+                      setToken0(token);
+                      setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
+                      onCancel();
+                    } else {
+                      setToken1(token);
+                      setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
+                      onCancel();
+                    }
+                  }}
+                />
                 // <Dropdown.Item
                 //   key={index}
                 //   onClick={async () => {

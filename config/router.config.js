@@ -28,10 +28,25 @@ export default [
         component: './Exchange/Index',
       },
       {
+        path: '/swap',
+        name: 'Swap',
+        component: './Swap/Index',
+      },
+      {
+        path: '/add',
+        name: 'Add',
+        component: './Add/Index',
+      },
+      {
+        path: '/remove',
+        name: 'Remove',
+        component: './Remove/Index',
+      },
+      {
         path: '/dashboard/monitor',
         name: 'Liquidity',
         component: './Dashboard/Monitor',
-      }
+      },
       // // dashboard
       // { path: '/', redirect: '/dashboard/analysis' },
       // {

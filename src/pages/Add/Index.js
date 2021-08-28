@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'umi';
 import classnames from 'classnames';
-import { Card, Badge, Table, Divider, Button, Tabs } from 'antd';
+import { Card, Badge, Table, Divider, Button, Tabs, Row, Col } from 'antd';
 import {
   AcyCard,
   AcyIcon,
@@ -16,7 +16,10 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
-import MyComponent from '@/components/MyComponent';
+// import SwapComponent from '@/components/SwapComponent';
+// import MyComponent from '@/components/MyComponent';
+import AddComponent from '@/components/AddComponent';
+
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
@@ -111,6 +114,7 @@ const columns = [
     render: () => '$ 444.21',
   },
 ];
+
 @connect(({ profile, loading }) => ({
   profile,
   loading: loading.effects['profile/fetchBasic'],
@@ -154,11 +158,13 @@ class BasicProfile extends Component {
       visible: true,
     });
   };
+
   onCancel = () => {
     this.setState({
       visible: false,
     });
   };
+
   onHandModalConfirmOrder = falg => {
     this.setState({
       visibleConfirmOrder: !!falg,
@@ -173,83 +179,73 @@ class BasicProfile extends Component {
     const { visible, visibleConfirmOrder, visibleLoading, tabIndex } = this.state;
     return (
       <PageHeaderWrapper>
-        {(tabIndex == 1 && (
-          <AcyCard title={this.lineTitleRender()} extra={<AcyIcon name="maximize" />}>
-            <div
-              style={{ width: '100%', height: '576px', background: '#000', borderRadius: '20px' }}
-            >
-              <AcyLineChart backData={[]} />
-            </div>
-          </AcyCard>
-        )) || (
-          <AcyCard>
-            <Table dataSource={dataSource} columns={columns} pagination={false} />
-          </AcyCard>
-        )}
+        <Row>
+          {/*<Col span={12}>*/}
+          {/*  {(tabIndex == 1 && (*/}
+          {/*    <AcyCard title={this.lineTitleRender()} extra={<AcyIcon name="maximize" />}>*/}
+          {/*      <div*/}
+          {/*        style={{ width: '100%', height: '576px', background: '#000', borderRadius: '20px' }}*/}
+          {/*      >*/}
+          {/*        <AcyLineChart backData={[]} />*/}
+          {/*      </div>*/}
+          {/*    </AcyCard>*/}
+          {/*  )) || (*/}
+          {/*    <AcyCard>*/}
+          {/*      <Table dataSource={dataSource} columns={columns} pagination={false} />*/}
+          {/*    </AcyCard>*/}
+          {/*  )}*/}
 
-        <AcyCard
-          extra={
-            <div>
-              <AcyIcon name="time" />
-              <AcyIcon name="setting" />
-            </div>
-          }
-        >
-          <AcyTabs onChange={this.onChangeTabs}>
-            <AcyTabPane tab="Trade" key="1">
-              <div className={styles.trade}>
-                <MyComponent />
-                {/* <AcyCuarrencyCard
-                  icon="eth"
-                  coin="ETH"
-                  yuan="566.228"
-                  dollar="679545.545"
-                  onClick={this.onClickCoin}
-                />
-                <AcyIcon name="double-right" />
-                <AcyCuarrencyCard
-                  title="999.999"
-                  icon="eth"
-                  coin="BTC"
-                  yuan="566.228"
-                  dollar="679545.545"
-                />
-                <AcyConnectWalletBig>Connect Wallet</AcyConnectWalletBig> */}
-              </div>
-            </AcyTabPane>
-            <AcyTabPane tab="Liquidity" key="2">
-              <div className={styles.trade}>
-                <AcyCuarrencyCard
-                  icon="eth"
-                  coin="ETH"
-                  yuan="566.228"
-                  dollar="679545.545"
-                  onClick={this.onClickCoin}
-                />
-                <AcyIcon name="double-right" />
-                <AcyCuarrencyCard
-                  title="999.999"
-                  icon="eth"
-                  coin="BTC"
-                  yuan="566.228"
-                  dollar="679545.545"
-                />
-                <AcyConnectWalletBig>Connect Wallet</AcyConnectWalletBig>
-              </div>
-              <h1>这里设计稿没有，暂时展示页面功能使用</h1>
-              <Button
-                style={{ marginRight: '30px' }}
-                type="primary"
-                onClick={() => this.onHandModalConfirmOrder(true)}
-              >
-                Confirm Order
-              </Button>
-              <Button type="primary" onClick={() => this.setState({ visibleLoading: true })}>
-                Loading
-              </Button>
-            </AcyTabPane>
-          </AcyTabs>
-        </AcyCard>
+          {/*</Col>*/}
+          <Col span={6} />
+
+          <Col span={10}>
+            <AcyCard
+              extra={
+                <div>
+                  <AcyIcon name="time" />
+                  <AcyIcon name="setting" />
+                </div>
+              }
+            >
+              <AcyTabs onChange={this.onChangeTabs}>
+                <AcyTabPane tab="add liquidity" key="1">
+                  <div className={styles.trade}>
+                    <AddComponent />
+                  </div>
+                </AcyTabPane>
+
+                {/*<AcyTabPane tab="Liquidity" key="2">*/}
+                {/*<div className={styles.trade}>*/}
+                {/*    <AcyCuarrencyCard*/}
+                {/*      icon="eth"*/}
+                {/*      coin="ETH"*/}
+                {/*      yuan="566.228"*/}
+                {/*      dollar="679545.545"*/}
+                {/*      onClick={this.onClickCoin}*/}
+                {/*    />*/}
+                {/*    <AcyIcon name="double-right" />*/}
+                {/*    <AcyCuarrencyCard*/}
+                {/*      title="999.999"*/}
+                {/*      icon="eth"*/}
+                {/*      coin="BTC"*/}
+                {/*      yuan="566.228"*/}
+                {/*      dollar="679545.545"*/}
+                {/*    />*/}
+                {/*    <AcyConnectWalletBig>Connect Wallet</AcyConnectWalletBig>*/}
+                {/*  </div>*/}
+                {/*  <h1>这里设计稿没有，暂时展示页面功能使用</h1>*/}
+                {/*  <Button style={{marginRight:'30px'}} type="primary" onClick={() => this.onHandModalConfirmOrder(true)}>*/}
+                {/*    Confirm Order*/}
+                {/*  </Button>*/}
+                {/*  <Button type="primary" onClick={() => this.setState({ visibleLoading: true })}>*/}
+                {/*    Loading*/}
+                {/*  </Button>*/}
+                {/*</AcyTabPane>*/}
+              </AcyTabs>
+            </AcyCard>
+          </Col>
+        </Row>
+
         <AcyModal onCancel={this.onCancel} width={600} visible={visible}>
           <div className={styles.title}>
             <AcyIcon name="back" /> Select a token
@@ -274,6 +270,7 @@ class BasicProfile extends Component {
             </AcyTabs>
           </div>
         </AcyModal>
+
         <AcyConfirm
           onCancel={this.onHandModalConfirmOrder}
           title="Comfirm Order"
@@ -292,6 +289,7 @@ class BasicProfile extends Component {
             </Button>
           </div>
         </AcyConfirm>
+
         <AcyApprove
           onCancel={() => this.setState({ visibleLoading: false })}
           visible={visibleLoading}
