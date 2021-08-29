@@ -110,6 +110,7 @@ const MyComponent = props => {
   const [needApprove, setNeedApprove] = useState(false);
   // 授权量
   const [approveAmount, setApproveAmount] = useState('0');
+
   // 交易对前置货币授权量
   const [token0ApproxAmount, setToken0ApproxAmount] = useState();
   // 交易对后置货币授权量
@@ -118,6 +119,8 @@ const MyComponent = props => {
   let [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
   // 是否需要精度的计算方式
   const [exactIn, setExactIn] = useState(true);
+
+
 
   // 占位符
   const individualFieldPlaceholder = 'Enter amount';
@@ -132,7 +135,7 @@ const MyComponent = props => {
 
   // 初始化函数时连接钱包
   useEffect(() => {
-    activate(injected);
+    // activate(injected);
   }, []);
   // 通知钱包连接成功
   useEffect(() => {
@@ -277,12 +280,12 @@ const MyComponent = props => {
         }}
       />
       <AcyDescriptions>
-        <AcyDescriptions.Item>
-          the Slippage Tolerance you choose is{slippageTolerance}%
-        </AcyDescriptions.Item>
-        <AcyDescriptions.Item>
-          ETH：0.0001
-        </AcyDescriptions.Item>
+        {swapBreakdown &&  <AcyDescriptions.Item>swap breakdown</AcyDescriptions.Item> }
+        {swapBreakdown && swapBreakdown.map((info) => <AcyDescriptions.Item>{info}</AcyDescriptions.Item>)}
+
+        {/*<AcyDescriptions.Item>*/}
+        {/*  ETH：0.0001*/}
+        {/*</AcyDescriptions.Item>*/}
       </AcyDescriptions>
       {/* <AcyButton
         type="primary"
@@ -325,7 +328,7 @@ const MyComponent = props => {
         Connect
       </AcyButton>
       }
-      
+
       <AcyModal onCancel={onCancel} width={600} height={400} visible={visible}>
         <div className={styles.title}>
           <AcyIcon name="back" /> Select a token

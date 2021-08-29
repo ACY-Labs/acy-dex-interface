@@ -34,7 +34,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import { splitSignature } from '@ethersproject/bytes';
 
-async function processInput(
+export async function processInput(
   inputToken0,
   inputToken1,
   allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
@@ -154,7 +154,7 @@ async function processInput(
   }
 }
 
-async function signOrApprove(
+export async function signOrApprove(
   inputToken0,
   inputToken1,
   allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
@@ -395,7 +395,7 @@ async function signOrApprove(
   }
 }
 
-async function removeLiquidity(
+export async function removeLiquidity(
   inputToken0,
   inputToken1,
   allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,

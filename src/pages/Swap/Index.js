@@ -151,6 +151,7 @@ const columns = [
   profile,
   loading: loading.effects['profile/fetchBasic'],
 }))
+
 class BasicProfile extends Component {
   state = {
     visible: false,
@@ -233,6 +234,8 @@ class BasicProfile extends Component {
             )}
           </div>
           <div>
+
+
           <AcyCard
               extra={
                 <div>

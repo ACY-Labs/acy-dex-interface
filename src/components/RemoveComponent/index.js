@@ -44,11 +44,16 @@ import {
   getUserTokenBalanceRaw,
   getUserTokenBalance,
   addLiquidityGetEstimated,
+  getUserRemoveLiquidityBalance,
+  removeLiquidityGetEstimated,
   calculateSlippageAmount,
   INITIAL_ALLOWED_SLIPPAGE,
+  usePairContract,
+  ROUTER_ADDRESS,
 } from '@/acy-dex-swap/utils/index';
 
-import { addLiquidity } from '@/acy-dex-swap/components/LiquidityComponent';
+import { processInput, signOrApprove,removeLiquidity}
+from '@/acy-dex-swap/components/RemoveLiquidityComponent';
 
 import ERC20ABI from '@/abis/ERC20.json';
 import WETHABI from '@/abis/WETH.json';
@@ -79,11 +84,14 @@ import { Row, Col, Button, Alert } from 'antd';
 
 const MyComponent = props => {
   const { dispatch } = props;
+
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
-
   // 选择货币前置和后置
   const [before, setBefore] = useState(true);
+
+  let [needApprove, setNeedApprove] = useState(false);
+  let [userLiquidityPosition, setUserLiquidityPosition] = useState('you need to get tokens');
 
   // 交易对前置货币
   const [token0, setToken0] = useState(null);
@@ -91,41 +99,18 @@ const MyComponent = props => {
   const [token0Balance, setToken0Balance] = useState('0');
   // 交易对前置货币兑换量
   const [token0Amount, setToken0Amount] = useState('0');
-
   // 交易对后置货币
   const [token1, setToken1] = useState(null);
   // 交易对后置货币余额
   const [token1Balance, setToken1Balance] = useState('0');
   // 交易对后置货币兑换量
   const [token1Amount, setToken1Amount] = useState('0');
-
   let [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
-
   let [liquidityBreakdown, setLiquidityBreakdown] = useState();
   let [liquidityStatus, setLiquidityStatus] = useState();
-  //
-  // // swap交易信息分析 Price impact,LP FEE,Min received
-  // const [swapBreakdown, setSwapBreakdown] = useState();
-  // // swap交易状态
-  // const [swapStatus, setSwapStatus] = useState();
-
-  let [needApproveToken0, setNeedApproveToken0] = useState(false);
-  let [needApproveToken1, setNeedApproveToken1] = useState(false);
-  let [approveAmountToken0, setApproveAmountToken0] = useState('0');
-  let [approveAmountToken1, setApproveAmountToken1] = useState('0');
-  let [userLiquidityPositions, setUserLiquidityPositions] = useState([]);
   let [exactIn, setExactIn] = useState(true);
-  // 授权,这里指交易对的授权操作
-  // const [needApprove, setNeedApprove] = useState(false);
-  // // 授权量
-  // const [approveAmount, setApproveAmount] = useState('0');
-  // // 交易对前置货币授权量
-  // const [token0ApproxAmount, setToken0ApproxAmount] = useState('0');
-  // // 交易对后置货币授权量
-  // const [token1ApproxAmount, setToken1ApproxAmount] = useState('0');
-
-  // 是否需要精度的计算方式
-  //  const [exactIn, setExactIn] = useState(true);
+  let [removeLiquidityStatus, setRemoveLiquidityStatus] = useState('');
+  let [signatureData, setSignatureData] = useState(null);
 
   // 占位符
   const individualFieldPlaceholder = 'Enter amount';
@@ -143,9 +128,40 @@ const MyComponent = props => {
     // activate(injected);
   }, []);
 
-  let getDependentField = useCallback(
+  useEffect(
+    () => {
+      async function getUserRemoveLiquidityPositions() {
+        if (!token0 && !token1) {
+          setUserLiquidityPosition('you need to choose  tokens');
+          return;
+        }
+        if (!token0 || !token1) {
+          setUserLiquidityPosition('please choose the other token ');
+          return;
+        }
+        if (account == undefined) {
+          setUserLiquidityPosition('you need to set your account');
+          return;
+        }
+        await getUserRemoveLiquidityBalance(
+          token0,
+          token1,
+          chainId,
+          account,
+          library,
+          setUserLiquidityPosition,
+          setToken0Balance,
+          setToken1Balance
+        );
+      }
+      getUserRemoveLiquidityPositions();
+    },
+    [token0, token1, chainId, account, library]
+  );
+
+  let inputChange = useCallback(
     async () => {
-      let estimated = await addLiquidityGetEstimated(
+      processInput(
         {
           ...token0,
           amount: token0Amount,
@@ -154,61 +170,38 @@ const MyComponent = props => {
           ...token1,
           amount: token1Amount,
         },
+        100 * slippageTolerance,
         exactIn,
         chainId,
-        library
+        library,
+        account,
+        setToken0Amount,
+        setToken1Amount,
+        setSignatureData,
+        setRemoveLiquidityStatus
       );
-
-      if (!estimated) estimated = 0;
-
-      return estimated;
     },
-    [token0, token1, token0Amount, token1Amount, chainId, library, exactIn]
-  );
-
-  let t0Changed = useCallback(
-    async () => {
-      if (!token0 || !token1) return;
-
-      if (!exactIn) return;
-
-      let estimated = await getDependentField();
-
-      setToken1Amount(estimated);
-    },
-    [token0, token1, getDependentField, exactIn]
-  );
-
-  let t1Changed = useCallback(
-    async () => {
-      if (!token0 || !token1) return;
-
-      if (exactIn) return;
-
-      let estimated = await getDependentField();
-
-      setToken0Amount(estimated);
-    },
-    [token0, token1, getDependentField, exactIn]
+    [
+      token0,
+      token1,
+      token0Amount,
+      token1Amount,
+      slippageTolerance,
+      exactIn,
+      chainId,
+      library,
+      account,
+    ]
   );
 
   useEffect(
     () => {
-      t0Changed();
+      inputChange();
     },
-    [token0Amount, t0Changed]
-  );
-
-  useEffect(
-    () => {
-      t1Changed();
-    },
-    [token1Amount, t1Changed]
+    [token0Amount, token1Amount]
   );
 
   // ^mark
-  //
-  //
   // const checkApprovalStatus = useCallback(async () => {debugger
   //   if (token0 && token1) {
   //     const approved = await checkTokenIsApproved(
@@ -277,9 +270,10 @@ const MyComponent = props => {
           setBefore(true);
         }}
         onChangeToken={e => {
-          setApproveAmountToken0(e.target.value);
+
           setToken0Amount(e.target.value);
           setExactIn(true);
+          // setApproveAmountToken0(e.target.value);
         }}
       />
       <div style={{ margin: '12px auto', textAlign: 'center' }}>
@@ -297,7 +291,7 @@ const MyComponent = props => {
           setBefore(false);
         }}
         onChangeToken={e => {
-          setApproveAmountToken1(e.target.value);
+          // setApproveAmountToken1(e.target.value);
           setToken1Amount(e.target.value);
           setExactIn(false);
         }}
@@ -312,12 +306,21 @@ const MyComponent = props => {
         <AcyDescriptions.Item>
           the Slippage Tolerance: [ {slippageTolerance}% ]
         </AcyDescriptions.Item>
-        {liquidityBreakdown && <AcyDescriptions.Item> Liquidity status:  </AcyDescriptions.Item>}
-        {liquidityBreakdown && liquidityBreakdown.map((info) => <AcyDescriptions.Item>{info}</AcyDescriptions.Item>)}
+        <AcyDescriptions.Item>
+          userLiquidityPosition: {userLiquidityPosition}
+        </AcyDescriptions.Item>
+        <AcyDescriptions.Item>
+          removeLiquidityStatus: [ {removeLiquidityStatus} ]
+        </AcyDescriptions.Item>
+
+        {/*{liquidityBreakdown && <AcyDescriptions.Item> Liquidity status:  </AcyDescriptions.Item>}*/}
+        {/*{liquidityBreakdown && liquidityBreakdown.map((info) => <AcyDescriptions.Item>{info}</AcyDescriptions.Item>)}*/}
         <AcyDescriptions.Item>
           {liquidityStatus}
         </AcyDescriptions.Item>
       </AcyDescriptions>
+
+
       {/* <AcyDescriptions>
         <AcyDescriptions.Item>
           {needApproveToken0 == 'true'
@@ -359,21 +362,30 @@ const MyComponent = props => {
              type="primary"
              style={{marginRight:'15px'}}
              onClick={() => {
-               approve(token0.address, approveAmountToken0, library, account);
+               // approve(token0.address, approveAmountToken0, library, account);
+               signOrApprove(
+                 {
+                   ...token0,
+                   amount: token0Amount,
+                 },
+                 {
+                   ...token1,
+                   amount: token1Amount,
+                 },
+                 slippageTolerance * 100,
+                 exactIn,
+                 chainId,
+                 library,
+                 account,
+                 setToken0Amount,
+                 setToken1Amount,
+                 setSignatureData,
+                 setRemoveLiquidityStatus
+               );
+               console.log('Approve');
              }}
-
            >
-             Approve {token0 && token0.symbol}
-           </Button>
-           }
-           {
-             token1&&<Button
-             type="primary"
-             onClick={() => {
-               approve(token1.address, approveAmountToken1, library, account);
-             }}
-           >
-             Approve {token1 && token1.symbol}
+             signOrApprove
            </Button>
            }
 
@@ -383,7 +395,7 @@ const MyComponent = props => {
             <AcyButton
             disabled={!(token1&&token1.symbol&&token0&&token0.symbol)}
             onClick={() => {
-              addLiquidity(
+              removeLiquidity(
                 {
                   ...token0,
                   amount: token0Amount,
@@ -392,28 +404,27 @@ const MyComponent = props => {
                   ...token1,
                   amount: token1Amount,
                 },
-                100 * slippageTolerance,
+                slippageTolerance * 100,
                 exactIn,
                 chainId,
                 library,
                 account,
-                setNeedApproveToken0,
-                setNeedApproveToken1,
-                setApproveAmountToken0,
-                setApproveAmountToken1,
-                setLiquidityStatus,
-                setLiquidityBreakdown,
+                signatureData,
                 setToken0Amount,
-                setToken1Amount
+                setToken1Amount,
+                setSignatureData,
+                setRemoveLiquidityStatus
               );
             }}
           >
-            Add Liquidity
+            remove Liquidity
           </AcyButton>
           }
 
         </div>
       }
+
+
       <AcyModal onCancel={onCancel} width={600} height={400} visible={visible}>
         <div className={styles.title}>
           <AcyIcon name="back" /> Select a token
@@ -436,10 +447,10 @@ const MyComponent = props => {
                     if (before) {
                       setToken0(token);
                       //^mark 这里的await拖慢了速度
-                      setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
+                      // setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
                     } else {
                       setToken1(token);
-                      setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
+                      // setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
                     }
                   }}
                 />

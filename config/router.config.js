@@ -32,6 +32,11 @@ export default [
         name: 'Liquidity',
         component: './Liquidity/Index',
       },
+      {
+        path: '/remove',
+        name: 'Remove',
+        component: './Remove/Index',
+      },
       // {
       //   path: '/swap',
       //   name: 'Swap',

@@ -16,47 +16,17 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
-import SwapComponent from '@/components/SwapComponent';
-import MyComponent from '@/components/MyComponent';
+// import SwapComponent from '@/components/SwapComponent';
+// import AddComponent from '@/components/AddComponent';
+// import MyComponent from '@/components/MyComponent';
+import RemoveComponent from '@/components/RemoveComponent';
+
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
 const { Description } = DescriptionList;
 const { AcyTabPane } = AcyTabs;
 
-// const progressColumns = [
-//   {
-//     title: '时间',
-//     dataIndex: 'time',
-//     key: 'time',
-//   },
-//   {
-//     title: '当前进度',
-//     dataIndex: 'rate',
-//     key: 'rate',
-//   },
-//   {
-//     title: '状态',
-//     dataIndex: 'status',
-//     key: 'status',
-//     render: text =>
-//       text === 'success' ? (
-//         <Badge status="success" text="成功" />
-//       ) : (
-//         <Badge status="processing" text="进行中" />
-//       ),
-//   },
-//   {
-//     title: '操作员ID',
-//     dataIndex: 'operator',
-//     key: 'operator',
-//   },
-//   {
-//     title: '耗时',
-//     dataIndex: 'cost',
-//     key: 'cost',
-//   },
-// ];
 const dataSource = [
   {
     key: '1',
@@ -210,32 +180,13 @@ class BasicProfile extends Component {
     const { visible, visibleConfirmOrder, visibleLoading, tabIndex } = this.state;
     return (
       <PageHeaderWrapper>
-        <Row>
-          <Col span={12}>
-            {(tabIndex == 1 && (
-              <AcyCard title={this.lineTitleRender()} extra={<AcyIcon name="maximize" />}>
-                <div
-                  style={{
-                    width: '100%',
-                    height: '576px',
-                    background: '#000',
-                    borderRadius: '20px',
-                  }}
-                >
-                  <AcyLineChart backData={[]} />
-                </div>
-              </AcyCard>
-            )) || (
-              <AcyCard>
-                <Table dataSource={dataSource} columns={columns} pagination={false} />
-              </AcyCard>
-            )}
-          </Col>
-          <Col span={3}>
-            {' '}
-            <div>{'this is now'}</div>
-          </Col>
-          <Col span={11}>
+        <div className={styles.main}>
+          <div>
+            <AcyCard>
+              <Table dataSource={dataSource} columns={columns} pagination={false} />
+            </AcyCard>
+          </div>
+          <div>
             <AcyCard
               extra={
                 <div>
@@ -244,13 +195,12 @@ class BasicProfile extends Component {
                 </div>
               }
             >
-              <AcyTabs onChange={this.onChangeTabs}>
-                <AcyTabPane tab="swap" key="1">
+              <AcyTabs style={{marginTop:'-70px'}} onChange={this.onChangeTabs}>
+                <AcyTabPane tab="Liquidity" key="1">
                   <div className={styles.trade}>
-                    <SwapComponent />
+                    <RemoveComponent />
                   </div>
                 </AcyTabPane>
-
                 {/*<AcyTabPane tab="Liquidity" key="2">*/}
                 {/*<div className={styles.trade}>*/}
                 {/*    <AcyCuarrencyCard*/}
@@ -280,8 +230,8 @@ class BasicProfile extends Component {
                 {/*</AcyTabPane>*/}
               </AcyTabs>
             </AcyCard>
-          </Col>
-        </Row>
+          </div>
+        </div>
 
         <AcyModal onCancel={this.onCancel} width={600} visible={visible}>
           <div className={styles.title}>
