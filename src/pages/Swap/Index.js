@@ -208,14 +208,19 @@ class BasicProfile extends Component {
       tabIndex: e,
     });
   };
+  maximize=()=>{
+    this.setState({
+      maxLine:!this.state.maxLine
+    });
+  }
   render() {
-    const { visible, visibleConfirmOrder, visibleLoading, tabIndex } = this.state;
+    const { visible, visibleConfirmOrder, visibleLoading, tabIndex,maxLine } = this.state;
     return (
       <PageHeaderWrapper>
         <div className={styles.main}>
           <div>
           {(tabIndex == 1 && (
-              <AcyCard title={this.lineTitleRender()} extra={<AcyIcon name="maximize" />}>
+              <AcyCard title={this.lineTitleRender()} extra={<AcyIcon name="maximize" onClick={this.maximize} />}>
                 <div
                   style={{
                     width: '100%',

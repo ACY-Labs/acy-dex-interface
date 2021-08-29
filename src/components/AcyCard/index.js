@@ -1,10 +1,12 @@
 import { Card } from 'antd';
 import { Children } from 'react';
+import className from 'classnames';
 import styles from './index.less';
 const AcyCard =(props)=>{
+  const {max}=props;
   return <Card 
       {...props} 
-      className={styles.acycard}
+      className={!max&&styles.acycard||className(styles.acycard,styles.max)}
       headStyle={{
         borderBottom:0
       }} 
