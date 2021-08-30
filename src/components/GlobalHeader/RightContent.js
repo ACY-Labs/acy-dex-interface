@@ -118,10 +118,10 @@ export default class GlobalHeaderRight extends PureComponent {
   };
   handleVisibleChange = () => {};
 
-  // 选择钱包 
-  selectWallet=()=>{
+  // 选择钱包
+  selectWallet = () => {
     activate(injected);
-  }
+  };
   render() {
     const {
       currentUser,
@@ -133,7 +133,7 @@ export default class GlobalHeaderRight extends PureComponent {
       onNoticeClear,
       skeletonCount,
       theme,
-      account
+      account,
     } = this.props;
     const { visible, visibleMetaMask, visibleSetting } = this.state;
     const menu = (
@@ -171,7 +171,7 @@ export default class GlobalHeaderRight extends PureComponent {
     return (
       <div className={className}>
         {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
-        <AcyConnectWallet value={account}  onClick={this.onhandMetaMask} />
+        <AcyConnectWallet value={account} onClick={this.onhandMetaMask} />
         <Dropdown
           overlay={
             <div className={styles.setting} onClick={e => e.preventDefault()}>
@@ -260,7 +260,10 @@ export default class GlobalHeaderRight extends PureComponent {
           visible={visibleSetting}
           onVisibleChange={this.onhandSetting}
         >
-          <AcyIcon name="colors" onClick={() => this.onhandSetting(true)} />
+          <AcyIcon
+            name={visibleSetting ? 'colors-active' : 'colors'}
+            onClick={() => this.onhandSetting(true)}
+          />
         </Dropdown>
 
         {/* <HeaderSearch
