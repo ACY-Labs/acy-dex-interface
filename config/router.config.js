@@ -20,7 +20,7 @@ export default [
       {
         name: 'Market',
         path: '/market',
-        component: './Swap/Index',
+        component: './Market/Index',
       },
       {
         path: '/exange',

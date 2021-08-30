@@ -1,0 +1,113 @@
+h3 {
+    color: #B5B6B6;
+}
+
+.priceChangeDown{
+    color: red;
+    font-weight:bold;
+}
+
+.priceChangeUp{
+    color:greenyellow;
+    font-weight:bold;
+}
+
+.coinName {
+    font-weight: bold;
+}
+
+.coinShort{
+    color: #919191;
+}
+
+// .tableData{
+//     width: 20%;
+// }
+
+// .firstColumn{
+//     width: vw;
+//     background-color: red;
+// }
+
+.marketRoot{
+    width: 90%;
+    max-width: 1000px;
+    margin:auto;
+}
+
+.marketOverview {
+    background-color: #2F3135;
+    color: #B5B6B6;
+    padding: 15px;
+    border-radius: 15px 15px 15px 15px ;
+    
+    margin-bottom:10px;
+}
+
+.marketHeader {
+    font-weight : bold;
+    background-color: #2F3135;
+    color: #B5B6B6;
+    padding: 15px;
+    border-radius: 15px 15px 0 0 ;
+    text-align: left;
+}
+
+.tableIcon {
+    width: 5px;
+    height: 5px;
+}
+
+.marketBody {
+    background-color: #373739;
+    color: #B5B6B6;
+    padding: 15px;
+    text-align: left;
+}
+
+.marketFooter {
+    background-color: #2F3135;
+    padding: 15px;
+    border-radius: 0 0 15px 15px  ;
+    margin-bottom:10px;
+}
+
+.chartWrapper{
+    height: 40vh;
+    max-height: 500px;
+    background-color: #2F3135;
+    margin:auto;
+    margin-bottom: 10px;
+    padding: 15px;
+}
+.chartWrapper:nth-child(1){
+    border-radius: 15px 0 0  15px;
+    
+}
+.chartWrapper:nth-child(2){
+    border-radius: 0 15px 15px 0;
+}
+
+.graphStats{
+    padding: 0;
+}
+.statName{
+    font-size: 13pt;
+    line-height: 13pt;
+    color: #B5B6B6;
+}
+.statValue{
+    font-size: 24pt;
+    line-height: 24pt;
+    font-weight: bold;
+}
+
+@media screen and(max-width: 768px) {
+    .priceColumn, .priceChangeColumn, .tvlColumn{
+        display: none;
+    }
+
+    .volColumn{
+        text-align: right;
+    }
+}
