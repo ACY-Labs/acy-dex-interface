@@ -14,7 +14,7 @@ const AcyCard =(props)=>{
         padding:'0 24px 24px'
       }}
       title={
-        <div className={styles.card_header}>
+        props.title&&  <div className={styles.card_header}>
             {
               props.title
             }

@@ -124,6 +124,12 @@ class AcyLineChart extends Component {
       data: currentData.map(b => b.linkAmount) || [],
     };
     return {
+      grid: { 
+        left: '2%',
+        right: '2%',
+        bottom: '3%',
+        top:'top'
+      },
       tooltip: {
         trigger: 'axis',
         alwaysShowContent: true,

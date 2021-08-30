@@ -220,13 +220,11 @@ class BasicProfile extends Component {
         <div className={styles.main}>
           <div>
           {(tabIndex == 1 && (
-              <AcyCard title={this.lineTitleRender()} >
+              <AcyCard style={{background:'transparent'}} title={this.lineTitleRender()} >
                 <div
                   style={{
                     width: '100%',
-                    height: '576px',
-                    background: '#000',
-                    borderRadius: '20px',
+                    height: '576px'
                   }}
                 >
                   <AcyLineChart backData={[]} />
@@ -242,7 +240,7 @@ class BasicProfile extends Component {
 
 
           <AcyCard>
-              <AcyTabs style={{marginTop:'-70px'}} onChange={this.onChangeTabs}>
+              <AcyTabs onChange={this.onChangeTabs}>
                 <AcyTabPane tab="Swap" key="1">
                   <div className={styles.trade}>
                     <SwapComponent />

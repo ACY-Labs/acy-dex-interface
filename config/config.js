@@ -69,7 +69,7 @@ export default defineConfig({
     'layout-header-height': '63px',
     'layout-header-background': '#1b1b1c',
     'card-background': '#2A2A2D',
-    'card-radius': '30px',
+    'card-radius': '10px',
     'text-color': '#FFFFFF',
     'tabs-title-font-size': '18px',
     'input-bg': '#191B20',

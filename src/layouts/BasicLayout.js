@@ -176,9 +176,6 @@ class BasicLayout extends React.PureComponent {
     const contentStyle = !fixedHeader ? { paddingTop: 0 } : {};
     const layout = (
       <Layout
-        style={{
-          backgroundColor:'#1B1B1C'
-        }}
       >
         {isTop && !isMobile ? null : (
           <SiderMenu
