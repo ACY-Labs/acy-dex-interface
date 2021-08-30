@@ -1,7 +1,6 @@
 import { abi as IUniswapV2Router02ABI } from '../abis/IUniswapV2Router02.json';
 import { abi as IUniswapV2PairABI } from '@uniswap/v2-core/build/IUniswapV2Pair.json';
 import ERC20ABI from '../abis/ERC20.json';
-
 import { getAddress } from '@ethersproject/address';
 import { Contract } from '@ethersproject/contracts';
 import { AddressZero } from '@ethersproject/constants';
@@ -271,107 +270,6 @@ export async function checkTokenIsApproved(tokenAddress, requiredAmount, library
   console.log(allowance);
 
   return allowance.gte(BigNumber.from(requiredAmount));
-}
-
-// get the estimated amount  of the other token required when swapping, in readable string.
-export async function swapGetEstimated(inputToken0, inputToken1, exactIn = true, chainId, library) {
-  let {
-    address: token0Address,
-    symbol: token0Symbol,
-    decimal: token0Decimal,
-    amount: token0Amount,
-  } = inputToken0;
-  let {
-    address: token1Address,
-    symbol: token1Symbol,
-    decimal: token1Decimal,
-    amount: token1Amount,
-  } = inputToken1;
-
-  if (exactIn && (isNaN(parseFloat(token0Amount)) || token0Amount === '')) return;
-  if (!exactIn && (isNaN(parseFloat(token1Amount)) || token1Amount === '')) return;
-
-  let token0IsETH = token0Symbol === 'ETH';
-  let token1IsETH = token1Symbol === 'ETH';
-
-  // if one is ETH and other WETH, use WETH contract's deposit and withdraw
-  // wrap ETH into WETH
-  if ((token0IsETH && token1Symbol === 'WETH') || (token0Symbol === 'WETH' && token1IsETH)) {
-    // UI should sync value of ETH and WETH
-    if (exactIn) return token0Amount;
-    else return token1Amount;
-  }
-  // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
-  else {
-    // use WETH for ETHER to work with Uniswap V2 SDK
-    const token0 = token0IsETH
-      ? WETH[chainId]
-      : new Token(chainId, token0Address, token0Decimal, token0Symbol);
-    const token1 = token1IsETH
-      ? WETH[chainId]
-      : new Token(chainId, token1Address, token1Decimal, token1Symbol);
-
-    if (token0.equals(token1)) return exactIn ? token0Amount : token1Amount;
-
-    // get pair using our own provider
-    const pair = await Fetcher.fetchPairData(token0, token1, library).catch(e => {
-      return new ACYSwapErrorStatus(
-        `${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`
-      );
-    });
-    if (pair instanceof ACYSwapErrorStatus) return exactIn ? token1Amount : token0Amount;
-    console.log(pair);
-
-    console.log('------------------ CONSTRUCT ROUTE ------------------');
-    // This is where we let Uniswap SDK know we are not using WETH but ETHER
-    const route = new Route([pair], token0IsETH ? ETHER : token0, token1IsETH ? ETHER : token1);
-    console.log(route);
-
-    console.log('------------------ PARSE AMOUNT ------------------');
-    // convert typed in amount to BigNumbe rusing ethers.js's parseUnits then to string,
-    console.log(token0Amount);
-    console.log(token0Decimal);
-    let parsedAmount = exactIn
-      ? new TokenAmount(token0, parseUnits(token0Amount, token0Decimal)).raw.toString(16)
-      : new TokenAmount(token1, parseUnits(token1Amount, token1Decimal)).raw.toString(16);
-
-    let inputAmount;
-
-    // CurrencyAmount instance is required for Trade contructor if input is ETHER
-    if ((token0IsETH && exactIn) || (token1IsETH && !exactIn)) {
-      inputAmount = new CurrencyAmount(ETHER, `0x${parsedAmount}`);
-    } else {
-      inputAmount = new TokenAmount(exactIn ? token0 : token1, `0x${parsedAmount}`);
-    }
-
-    console.log('------------------ CONSTRUCT TRADE ------------------');
-    let trade;
-    try {
-      trade = new Trade(
-        route,
-        inputAmount,
-        exactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
-      );
-    } catch (e) {
-      if (e instanceof InsufficientReservesError) {
-        console.log('Insufficient reserve!');
-      } else {
-        console.log('Unhandled exception!');
-        console.log(e);
-      }
-      return exactIn ? token1Amount : token0Amount;
-    }
-
-    if (exactIn) {
-      console.log(trade.outputAmount.toExact());
-
-      return trade.outputAmount.toExact();
-    } else {
-      console.log(trade.inputAmount.toExact());
-
-      return trade.inputAmount.toExact();
-    }
-  }
 }
 
 // get the estimated amount of the other token required when adding liquidity, in readable string.
