@@ -220,7 +220,7 @@ class BasicProfile extends Component {
         <div className={styles.main}>
           <div>
           {(tabIndex == 1 && (
-              <AcyCard title={this.lineTitleRender()} extra={<AcyIcon name="maximize" onClick={this.maximize} />}>
+              <AcyCard title={this.lineTitleRender()} >
                 <div
                   style={{
                     width: '100%',
@@ -241,14 +241,7 @@ class BasicProfile extends Component {
           <div>
 
 
-          <AcyCard
-              extra={
-                <div>
-                  <AcyIcon name="time" />
-                  <AcyIcon name="setting" />
-                </div>
-              }
-            >
+          <AcyCard>
               <AcyTabs style={{marginTop:'-70px'}} onChange={this.onChangeTabs}>
                 <AcyTabPane tab="Swap" key="1">
                   <div className={styles.trade}>
