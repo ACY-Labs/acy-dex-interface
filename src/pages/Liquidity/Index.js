@@ -218,18 +218,10 @@ class BasicProfile extends Component {
               </AcyCard>
           </div>
           <div>
-          <AcyCard
-              extra={
-                <div>
-                  <AcyIcon name="time" />
-                  <AcyIcon name="setting" />
-                </div>
-              }
-            >
+          <AcyCard>
               <div className={styles.trade}>
                   <AddComponent />
               </div>
-                
             </AcyCard>
           </div>
         </div>
