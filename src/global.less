@@ -45,7 +45,7 @@ li {
 }
 .ant-table-thead > tr,
 .ant-table-tbody > tr {
-  display: inline-table !important;
+  // display: block !important;
   background-color: #373739 !important;
   border-radius: 10px !important;
   margin: 10px auto !important;
@@ -53,6 +53,14 @@ li {
   border: 0;
 }
 .ant-table-thead > tr > th{
+  border: 0 !important;
+}
+
+.ant-table-footer::before{
+  background-color: #2F3135 !important;
+}
+.ant-table-footer{
+  background-color: #2F3135 !important;
   border: 0 !important;
 }
 

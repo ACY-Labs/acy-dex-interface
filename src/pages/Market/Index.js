@@ -158,66 +158,119 @@ var data = [
   ];
   
 
-// const columns = [
-//     {
-//         title: 'Name',
-//         dataIndex: 'name',
-//         key: 'name',
-//         render:(text, record) => {
-//             return (
-//                 <div className={styles.firstColumn}>
-//                     <span className={styles.coinName}>{record.name}</span><span> ({record.short})</span>
-//                 </div>
-//             )
-//         }
-//     },
-//     {
-//         title: 'Price',
-//         dataIndex: 'price',
-//         key: 'price',
-//         render:(text, record) => {
-//             return (
-//                 <div className={styles.tableData}>
-//                     $ {abbrNumber(text)}
-//                 </div>
-//             )
-//         }
-//     },
-//     {
-//         title: 'Price Change',
-//         dataIndex: 'priceChange',
-//         key: 'priceChange',
-//         render: (priceChange) => {
-//             return (
-//                 <span className={priceChange <  0 ? styles.priceChangeDown : styles.priceChangeUp}>{priceChange}</span>
-//             ) 
-//         }
-//     },
-//     {
-//         title: 'Volume 24H',
-//         dataIndex: 'volume24h',
-//         key: 'volume24h',
-//         render:(text, record) => {
-//             return (
-//                 <div className={styles.tableData}>
-//                     $ {abbrNumber(text)}
-//                 </div>
-//             )
-//         }
-//     },
-//     {
-//         title: 'TVL',
-//         dataIndex: 'tvl',
-//         key: 'tvl',
-//         render:(text, record) => {
-//             return (
-//                 <div className={styles.tableData}>
-//                     $ {abbrNumber(text)}
-//                 </div>
-//             )
-//         }
-//     }
-// ];
+const columnsCoin = [
+    {
+        title: 'Name',
+        dataIndex: 'name',
+        key: 'name',
+        render:(text, record) => {
+            return (
+                <div className={styles.firstColumn}>
+                    <span className={styles.coinName}>{record.name}</span><span> / {record.short}</span>
+                </div>
+            )
+        }
+    },
+    {
+        title: 'Price',
+        dataIndex: 'price',
+        key: 'price',
+        render:(text, record) => {
+            return (
+                <div className={styles.tableData}>
+                    $ {abbrNumber(text)}
+                </div>
+            )
+        }
+    },
+    {
+        title: 'Price Change',
+        dataIndex: 'priceChange',
+        key: 'priceChange',
+        render: (priceChange) => {
+            return (
+                <span className={priceChange <  0 ? styles.priceChangeDown : styles.priceChangeUp}>{priceChange}</span>
+            ) 
+        }
+    },
+    {
+        title: 'Volume 24H',
+        dataIndex: 'volume24h',
+        key: 'volume24h',
+        render:(text, record) => {
+            return (
+                <div className={styles.tableData}>
+                    $ {abbrNumber(text)}
+                </div>
+            )
+        }
+    },
+    {
+        title: 'TVL',
+        dataIndex: 'tvl',
+        key: 'tvl',
+        render:(text, record) => {
+            return (
+                <div className={styles.tableData}>
+                    $ {abbrNumber(text)}
+                </div>
+            )
+        }
+    }
+];
+
+const columnsPool = [
+    {
+        title: 'Pool',
+        dataIndex: 'pool',
+        key: 'pool',
+        render:(text, record) => {
+            return (
+                <div className={styles.tableData}>
+                    <AcyIcon name={record.coin1.toLowerCase()} width={20} height={20}/>
+                    <AcyIcon name={record.coin2.toLowerCase()} width={20} height={20}/>
+                    <span className={styles.coinName}>{record.coin1}/{record.coin2}</span>
+                </div>
+            )
+        }
+    },
+    {
+        title: 'TVL',
+        dataIndex: 'tvl',
+        key: 'tvl',
+        render:(text, record) => {
+            return (
+                <div className={styles.tableData}>
+                    $ {abbrNumber(record.tvl)}
+                </div>
+            )
+        }
+    },
+    {
+        title: 'Volume 24H',
+        dataIndex: 'volume24h',
+        key: 'volume24h',
+        render:(text, record) => {
+            return (
+                <div className={styles.tableData}>
+                    $ {abbrNumber(record.volume24h)}
+                </div>
+            )
+        }
+    },
+    {
+        title: 'Volume 7D',
+        dataIndex: 'volume7d',
+        key: 'volume7d',
+        render:(text, record) => {
+            return (
+                <div className={styles.tableData}>
+                    $ {abbrNumber(record.volume7d)}
+                </div>
+            )
+        }
+    },
+]
 
 export class BasicProfile extends Component {
     state = {
@@ -301,7 +354,7 @@ export class BasicProfile extends Component {
                     <h3>Top Coins</h3>
 
                     {/* Individual Coins */}
-                    <Row className={styles.marketHeader} justify="space-around">
+                    {/* <Row className={styles.marketHeader} justify="space-around">
                         <Col span={5} className={styles.nameColumn}>Name</Col>
                         <Col span={5} className={styles.priceColumn}>Price</Col>
                         <Col span={4} className={styles.priceChangeColumn}>Price Change</Col>
@@ -315,10 +368,11 @@ export class BasicProfile extends Component {
                         <Col span={4} className={styles.priceChangeColumn}></Col>
                         <Col span={5} className={styles.volColumn}></Col>
                         <Col span={5} className={styles.tvlColumn}></Col>
-                    </Row>
+                    </Row> */}
+                    <Table dataSource={dataSource} columns={columnsCoin} footer={() => (<></>)}/>
 
                     <h3>Top Pools</h3>
-                    <Row className={styles.marketHeader} justify="space-between">
+                    {/* <Row className={styles.marketHeader} justify="space-between">
                         <Col span={6} className={styles.nameColumn}>
                             Pool
                         </Col>
@@ -332,7 +386,8 @@ export class BasicProfile extends Component {
                         <Col span={6} className={styles.tvlColumn}></Col>
                         <Col span={6} className={styles.volColumn}></Col>
                         <Col span={6} className={styles.priceColumn}></Col>
-                    </Row>
+                    </Row> */}
+                    <Table dataSource={dataSourcePool} columns={columnsPool} footer={() => (<></>)}/>
                 </div>
             </PageHeaderWrapper>
         )
