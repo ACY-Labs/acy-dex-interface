@@ -7,13 +7,14 @@
   .cua_title{
     font-size: 14px;
     font-weight: 400;
-    color: #929298;
+    color: #f3f3fc;
     padding: 0 10px;
     display: flex;
     justify-content: space-between;
   }
   .cua_body{
-    background: #191B20;
+    border: solid 1px #5a5a5e;
+    background: transparent;
     border-radius: 15px;
     padding:10px;
     font-size: 20px;
@@ -33,15 +34,16 @@
         color: #929298;
       }
       .inputBar{
+        background: transparent;
         height: 50px;
         font-size: 20pt;
         font-weight: bold;
         width: 150px;
         margin-right: 50px;
-        border: none;
+        border-color: transparent;
       }
-      .inputBar:hover{
-        border: active;
+      .inputBar:focus{
+        border-color: transparent;
       }
     }
   }

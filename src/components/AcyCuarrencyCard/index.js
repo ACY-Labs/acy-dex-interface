@@ -12,6 +12,7 @@ const AcyCuarrencyCard = ({
   token,
   ...rest
 }) => {
+
   return (
     <div {...rest} className={styles.acycuarrencycard}>
       
@@ -33,7 +34,7 @@ const AcyCuarrencyCard = ({
             <div className={styles.price}>
             <ul>
               <li>
-                <Input className={styles.inputBar} placeholder="0.0" value={token} onChange={onChangeToken} />
+                <Input className={styles.inputBar} placeholder="0.0" bordered={false} value={token} onChange={onChangeToken} />
               </li>
               {/* <li className={styles.dollar}> ${dollar}</li> */}
             </ul>
