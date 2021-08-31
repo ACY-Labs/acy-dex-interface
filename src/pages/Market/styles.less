@@ -31,6 +31,42 @@ h3 {
 //     background-color: red;
 // }
 
+.chartSection{
+    height: 40vh;
+    max-height: 700px;
+    background-color: @cardColor;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    padding: 15px;
+    overflow: hidden;
+    .graphStats{
+        padding: 0;
+        margin-bottom: 5px;
+    }
+    .statName{
+        font-size: 13pt;
+        line-height: 14pt;
+        color: #B5B6B6;
+    }
+    .statValue{
+        font-size: 24pt;
+        line-height: 25pt;
+        font-weight: bold;
+    }
+    .chartWrapper {
+        height: 86%;
+    }
+    
+}
+
+.chartSection:nth-child(1){
+    margin-right: 5px;
+}
+.chartSection:nth-child(2){
+    margin-left: 5px;
+}
+
+
 .marketRoot{
     width: 90%;
     max-width: 1000px;
@@ -74,35 +110,8 @@ h3 {
     margin-bottom:10px;
 }
 
-.chartWrapper{
-    height: 40vh;
-    max-height: 500px;
-    background-color: @cardColor;
-    margin:auto;
-    margin-bottom: 10px;
-    padding: 15px;
-}
-.chartWrapper:nth-child(1){
-    border-radius: 15px 0 0  15px;
-    
-}
-.chartWrapper:nth-child(2){
-    border-radius: 0 15px 15px 0;
-}
 
-.graphStats{
-    padding: 0;
-}
-.statName{
-    font-size: 13pt;
-    line-height: 13pt;
-    color: #B5B6B6;
-}
-.statValue{
-    font-size: 24pt;
-    line-height: 24pt;
-    font-weight: bold;
-}
+
 
 @media screen and(max-width: 768px) {
     .priceColumn, .priceChangeColumn, .tvlColumn{

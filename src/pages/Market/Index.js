@@ -13,6 +13,7 @@ import {
     AcyInput,
     AcyCoinItem,
     AcyLineChart,
+    AcyBarChart,
     AcyConfirm,
     AcyApprove,
   } from '@/components/Acy';
@@ -264,24 +265,31 @@ export class BasicProfile extends Component {
         const { visible, visibleConfirmOrder, visibleLoading, tabIndex,maxLine } = this.state;
         return (
             <PageHeaderWrapper>
-
-
-
                 <div className={styles.marketRoot}>
                     <Row>
-                        <Col span={12} className={styles.chartWrapper}>
-                            <div className={styles.graphStats}>
-                                <div className={styles.statName}>TVL</div>
-                                <div className={styles.statValue}>$2.19b</div>
+                        <Col span={12}>
+                            <div className={styles.chartSection}>
+                                <div className={styles.graphStats}>
+                                    <div className={styles.statName}>TVL</div>
+                                    <div className={styles.statValue}>$2.19b</div>
+                                </div>
+                                <div className={styles.chartWrapper}>
+                                    <AcyLineChart backData={data}/>
+                                </div>
+                                
                             </div>
-                            <AcyLineChart backData={data}></AcyLineChart>
                         </Col>
-                        <Col span={12} className={styles.chartWrapper}>
-                            <div className={styles.graphStats}>
-                                <div className={styles.statName}>VOLUME 24H</div>
-                                <div className={styles.statValue}>$2.19b</div>
-                            </div>
-                            <AcyLineChart backData={data}></AcyLineChart>
+                        <Col span={12} >
+                            <div className={styles.chartSection}>
+                                <div className={styles.graphStats}>
+                                    <div className={styles.statName}>VOLUME 24H</div>
+                                    <div className={styles.statValue}>$2.19b</div>
+                                </div>
+                                <div className={styles.chartWrapper}>
+                                    <AcyBarChart backData={data}/>
+                                </div>
+                                
+                            </div>    
                         </Col>
                     </Row>
                     <Row className={styles.marketOverview} justify="space-around">

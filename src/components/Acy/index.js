@@ -10,6 +10,7 @@ import AcyModal from '@/components/AcyModal';
 import AcyInput from '@/components/AcyInput';
 import AcyCoinItem from '@/components/AcyCoinItem';
 import AcyLineChart from '@/components/AcyLineChart';
+import AcyBarChart from '@/components/AcyBarChart';
 import AcyCheckBox from '@/components/AcyCheckBox';
 import AcyCardList from '@/components/AcyCardList';
 import AcyWarp from '@/components/AcyWarp';
@@ -20,6 +21,7 @@ import AcyDescriptions from '@/components/AcyDescriptions';
 const Acy = {
   AcyTabs,
   AcyLineChart,
+  AcyBarChart,
   AcyCardList,
   AcyModal,
   AcyInput,
@@ -43,6 +45,7 @@ export {
   Acy as default,
   AcyTabs,
   AcyLineChart,
+  AcyBarChart,
   AcyCardList,
   AcyModal,
   AcyIcon,
