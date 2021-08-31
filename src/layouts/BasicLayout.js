@@ -190,9 +190,11 @@ class BasicLayout extends React.PureComponent {
         <Layout
           style={{
             ...this.getLayoutStyle(),
-            minHeight: '100vh',
-            backgroundColor:'#1B1B1C'
+            minHeight: '100vh'
+            // background: styles.radialBg
           }}
+
+          className={styles.radialBg}
         >
           <Header
             menuData={menuData}

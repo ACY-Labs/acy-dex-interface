@@ -174,7 +174,7 @@ class BasicProfile extends Component {
       <AcyPeriodTime
         onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
         className={styles.pt}
-        times={['1D', '7D', '30D', '360D', 'All']}
+        times={['1D', '7D', '1M', '1Y', 'All']}
       />,
     ];
   };
@@ -218,48 +218,10 @@ class BasicProfile extends Component {
               </AcyCard>
           </div>
           <div>
-          <AcyCard
-              extra={
-                <div>
-                  <AcyIcon name="time" />
-                  <AcyIcon name="setting" />
-                </div>
-              }
-            >
-              <AcyTabs style={{marginTop:'-70px'}} onChange={this.onChangeTabs}>
-                <AcyTabPane tab="Liquidity" key="1">
-                  <div className={styles.trade}>
-                    <AddComponent />
-                  </div>
-                </AcyTabPane>
-                {/*<AcyTabPane tab="Liquidity" key="2">*/}
-                {/*<div className={styles.trade}>*/}
-                {/*    <AcyCuarrencyCard*/}
-                {/*      icon="eth"*/}
-                {/*      coin="ETH"*/}
-                {/*      yuan="566.228"*/}
-                {/*      dollar="679545.545"*/}
-                {/*      onClick={this.onClickCoin}*/}
-                {/*    />*/}
-                {/*    <AcyIcon name="double-right" />*/}
-                {/*    <AcyCuarrencyCard*/}
-                {/*      title="999.999"*/}
-                {/*      icon="eth"*/}
-                {/*      coin="BTC"*/}
-                {/*      yuan="566.228"*/}
-                {/*      dollar="679545.545"*/}
-                {/*    />*/}
-                {/*    <AcyConnectWalletBig>Connect Wallet</AcyConnectWalletBig>*/}
-                {/*  </div>*/}
-                {/*  <h1>这里设计稿没有，暂时展示页面功能使用</h1>*/}
-                {/*  <Button style={{marginRight:'30px'}} type="primary" onClick={() => this.onHandModalConfirmOrder(true)}>*/}
-                {/*    Confirm Order*/}
-                {/*  </Button>*/}
-                {/*  <Button type="primary" onClick={() => this.setState({ visibleLoading: true })}>*/}
-                {/*    Loading*/}
-                {/*  </Button>*/}
-                {/*</AcyTabPane>*/}
-              </AcyTabs>
+          <AcyCard>
+              <div className={styles.trade}>
+                  <AddComponent />
+              </div>
             </AcyCard>
           </div>
         </div>

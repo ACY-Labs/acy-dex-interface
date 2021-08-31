@@ -999,7 +999,7 @@ const RemoveLiquidityComponent = () => {
         <Form.Group className="mb-3" controlId="formBasicPassword">
           <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
-              {(token1 && token1.symbol) || "Out token"}
+              {(token1 && token1.symbol) || 'Out'}
             </Dropdown.Toggle>
 
             <Dropdown.Menu>

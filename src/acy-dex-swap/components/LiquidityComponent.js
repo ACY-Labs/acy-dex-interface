@@ -1136,7 +1136,7 @@ const LiquidityComponent = ()=>{
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Dropdown>
               <Dropdown.Toggle variant="success" id="dropdown-basic">
-                {(token0 && token0.symbol) || "In token"}
+                {(token0 && token0.symbol) || "In"}
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
@@ -1271,6 +1271,7 @@ const LiquidityComponent = ()=>{
                   onClick={() => {
                     approve(token1.address, approveAmountToken1, library, account);
                     setNeedApproveToken1(false);
+
                   }}
               >
                 Approve {token1 && token1.symbol}
