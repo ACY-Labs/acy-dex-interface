@@ -171,12 +171,7 @@ class BasicProfile extends Component {
           <span className={styles.lighttitle}>212.123</span>{' '}
           <span className={styles.percentage}>+12.45%</span> 2021.07.11
         </div>
-      </div>,
-      <AcyPeriodTime
-        onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
-        className={styles.pt}
-        times={['1D', '7D', '30D', '360D', 'All']}
-      />,
+      </div>
     ];
   };
 
@@ -228,6 +223,11 @@ class BasicProfile extends Component {
                   }}
                 >
                   <AcyLineChart backData={[]} />
+                  <AcyPeriodTime
+        onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
+        className={styles.pt}
+        times={['1D', '7D', '30D', '360D', 'All']}
+      />
                 </div>
               </AcyCard>
             )) || (

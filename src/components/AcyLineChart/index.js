@@ -145,11 +145,11 @@ class AcyLineChart extends Component {
         },
       },
       xAxis: {
-        show: true,
+        show: false,
         splitNumber: 5,
         boundaryGap: false,
         data: dateList,
-        axisTick: { show: true }, // 刻度
+        axisTick: { show: false }, // 刻度
         axisLine: { show: false }, // 轴线
         splitLine: {
           show: false,
@@ -167,19 +167,19 @@ class AcyLineChart extends Component {
       series: [
         {
           data: valueList,
-          areaStyle: {
-            opacity: 0.8,
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              {
-                offset: 0,
-                color: '#c6224e',
-              },
-              {
-                offset: 1,
-                color: '#000',
-              },
-            ]),
-          },
+          // areaStyle: {
+          //   opacity: 0.8,
+          //   color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          //     {
+          //       offset: 0,
+          //       color: '#c6224e',
+          //     },
+          //     {
+          //       offset: 1,
+          //       color: '#000',
+          //     },
+          //   ]),
+          // },
           // emphasis: {
           //     focus: 'series'
           // },
