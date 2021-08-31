@@ -246,13 +246,13 @@ export default class GlobalHeaderRight extends PureComponent {
                   </div>
                 </li>
               </ul>
-              <div className={styles.message}>
+              {/* <div className={styles.message}>
                 <AcyIcon width={30} name="twitter" title="Twitter" />
                 <AcyIcon width={30} name="twitter" title="Twitter" />
                 <AcyIcon width={30} name="twitter" title="Twitter" />
                 <AcyIcon width={30} name="twitter" title="Twitter" />
                 <AcyIcon width={30} name="twitter" title="Twitter" />
-              </div>
+              </div> */}
             </div>
           }
           trigger={['click']}
