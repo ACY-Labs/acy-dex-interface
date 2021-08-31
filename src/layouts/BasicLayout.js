@@ -190,9 +190,8 @@ class BasicLayout extends React.PureComponent {
         <Layout
           style={{
             ...this.getLayoutStyle(),
-            minHeight: '100vh',
-            // background:  "radial-gradient(circle at 20% 20%, #ea5c1f, #1B1B1C)",
-            
+            minHeight: '100vh'
+            // background: styles.radialBg
           }}
 
           className={styles.radialBg}
