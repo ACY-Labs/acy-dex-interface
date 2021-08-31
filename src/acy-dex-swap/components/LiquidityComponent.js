@@ -577,7 +577,7 @@ const LiquidityComponent = () => {
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
-              {(token0 && token0.symbol) || 'In token'}
+              {(token0 && token0.symbol) || 'In'}
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
@@ -608,7 +608,7 @@ const LiquidityComponent = () => {
         <Form.Group className="mb-3" controlId="formBasicPassword">
           <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
-              {(token1 && token1.symbol) || 'Out token'}
+              {(token1 && token1.symbol) || 'Out'}
             </Dropdown.Toggle>
 
             <Dropdown.Menu>

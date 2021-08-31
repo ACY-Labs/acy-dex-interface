@@ -268,7 +268,7 @@ const MyComponent = props => {
       <AcyCuarrencyCard
         icon="eth"
         title={`Balance: ${token0Balance}`}
-        coin={(token0 && token0.symbol) || 'In token'}
+        coin={(token0 && token0.symbol) || 'In'}
         yuan="566.228"
         dollar={`${token0Balance}`}
         token={token0Amount}
@@ -288,7 +288,7 @@ const MyComponent = props => {
       <AcyCuarrencyCard
         icon="eth"
         title={`Balance: ${token1Balance}`}
-        coin={(token1 && token1.symbol) || 'Out token'}
+        coin={(token1 && token1.symbol) || 'Out'}
         yuan="566.228"
         dollar={`${token1Balance}`}
         token={token1Amount}

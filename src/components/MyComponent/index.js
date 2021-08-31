@@ -429,7 +429,7 @@ async function swap(
     // calculate slippage adjusted amount
     if (exactIn) {
       console.log(`By algorithm, expected to get: ${trade.outputAmount.toExact()}`);
-      // if provided exact token in, we want to know min out token amount
+      // if provided exact token in, we want to know min Out amount
       minAmountOut = trade.minimumAmountOut(allowedSlippage);
       slippageAdjustedAmount = minAmountOut.raw.toString();
 
@@ -722,7 +722,7 @@ const MyComponent = props => {
       <AcyCuarrencyCard
         icon="eth"
         title={`Balance: ${token0Balance}`}
-        coin={(token0 && token0.symbol) || 'In token'}
+        coin={(token0 && token0.symbol) || 'In'}
         yuan="566.228"
         dollar="679545.545"
         token={token0ApproxAmount}
@@ -740,7 +740,7 @@ const MyComponent = props => {
       <AcyCuarrencyCard
         icon="eth"
         title={`Balance: ${token1Balance}`}
-        coin={(token1 && token1.symbol) || 'Out token'}
+        coin={(token1 && token1.symbol) || 'Out'}
         yuan="566.228"
         dollar="679545.545"
         token={token1ApproxAmount}
@@ -762,7 +762,7 @@ const MyComponent = props => {
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
-              {(token0 && token0.symbol) || 'In token'}
+              {(token0 && token0.symbol) || 'In'}
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
@@ -795,7 +795,7 @@ const MyComponent = props => {
         <Form.Group className="mb-3" controlId="formBasicPassword">
           <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
-              {(token1 && token1.symbol) || 'Out token'}
+              {(token1 && token1.symbol) || 'Out'}
             </Dropdown.Toggle>
 
             <Dropdown.Menu>

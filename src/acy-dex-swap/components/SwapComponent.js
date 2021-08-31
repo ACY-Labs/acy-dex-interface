@@ -281,7 +281,7 @@ export async function swapGetEstimated(
       // console.log(trade.outputAmount.toExact());
       // setToken1Amount(trade.outputAmount.toExact());
       console.log(`By algorithm, expected to get: ${trade.outputAmount.toExact()}`);
-      // if provided exact token in, we want to know min out token amount
+      // if provided exact token in, we want to know min Out amount
       minAmountOut = trade.minimumAmountOut(allowedSlippage);
       slippageAdjustedAmount = minAmountOut.raw.toString();
 
@@ -564,7 +564,7 @@ export async function swap(
       // calculate slippage adjusted amount
       if (exactIn) {
         console.log(`By algorithm, expected to get: ${trade.outputAmount.toExact()}`);
-        // if provided exact token in, we want to know min out token amount
+        // if provided exact token in, we want to know min Out amount
         minAmountOut = trade.minimumAmountOut(allowedSlippage);
         slippageAdjustedAmount = minAmountOut.raw.toString();
 
@@ -855,7 +855,7 @@ const SwapComponent = () => {
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
-              {(token0 && token0.symbol) || 'In token'}
+              {(token0 && token0.symbol) || 'In'}
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
@@ -900,7 +900,7 @@ const SwapComponent = () => {
         <Form.Group className="mb-3" controlId="formBasicPassword">
           <Dropdown>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
-              {(token1 && token1.symbol) || 'Out token'}
+              {(token1 && token1.symbol) || 'Out'}
             </Dropdown.Toggle>
             <Dropdown.Menu>
               {supportedTokens.map((token, index) => (

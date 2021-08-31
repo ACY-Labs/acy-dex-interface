@@ -3,11 +3,12 @@
   display: inline-block;
   width: 100%;
   word-break: break-all;
+  margin: 0 0;
   .cua_title{
     font-size: 14px;
     font-weight: 400;
     color: #929298;
-    padding: 0 18px;
+    padding: 0 10px;
     display: flex;
     justify-content: space-between;
   }
@@ -15,14 +16,15 @@
     background: #191B20;
     border-radius: 15px;
     padding:10px;
-    display: flex;
-    justify-content: space-between;
     font-size: 20px;
     font-weight: 400;
+    .bottomRow{
+      display:flex;
+      align-items: center;
+    }
     .coin{
       cursor: pointer;
       display: flex;
-      margin-right: 44px;
     }
     .price{
       .dollar{
@@ -30,12 +32,17 @@
         font-weight: 400;
         color: #929298;
       }
-     :global{
-      .ant-input{
-        height: 30px;
-        width: 100px
+      .inputBar{
+        height: 50px;
+        font-size: 20pt;
+        font-weight: bold;
+        width: 150px;
+        margin-right: 50px;
+        border: none;
       }
-     }
+      .inputBar:hover{
+        border: active;
+      }
     }
   }
 }
