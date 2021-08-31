@@ -305,7 +305,7 @@ const MyComponent = props => {
         token={token0Amount}
         onChoseToken={() => {
           onClickCoin();
-          setBefore(false);
+          setBefore(true);
         }}
         onChangeToken={e => {
           setToken0Amount(e.target.value);
@@ -326,7 +326,7 @@ const MyComponent = props => {
         token={token1Amount}
         onChoseToken={() => {
           onClickCoin();
-          setBefore(true);
+          setBefore(false);
         }}
         onChangeToken={e => {
           // setToken1ApproxAmount(e.target.value);
@@ -417,7 +417,7 @@ const MyComponent = props => {
                   key={index}
                   onClick={async () => {
                     onCancel();
-                    if (!before) {
+                    if (before) {
                       if (account == undefined) {
                         alert('please connect to your account');
                       } else if (chainId == undefined) {
