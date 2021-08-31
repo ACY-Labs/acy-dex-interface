@@ -210,18 +210,18 @@ export default class GlobalHeaderRight extends PureComponent {
                   </div>
                 </li>
                 <li>
-                  <div className={styles.listitem}>
+                  {/* <div className={styles.listitem}>
                     <span>Network</span>
                     <span>
                       Ethereum
                       <AcyIcon width={16} name="nabla" />{' '}
                     </span>
-                  </div>
+                  </div> */}
                   {/* <div>
                 <AcyRadioButton data={["Ethereum","BSC","Polygon","Solana"]}/>
               </div> */}
                 </li>
-                <li>
+                {/* <li>
                   <div className={styles.listitem}>
                     <span>
                       <AcyIcon width={25} name="help" />
@@ -244,7 +244,7 @@ export default class GlobalHeaderRight extends PureComponent {
                       <span>Documents</span>
                     </span>
                   </div>
-                </li>
+                </li> */}
               </ul>
               {/* <div className={styles.message}>
                 <AcyIcon width={30} name="twitter" title="Twitter" />
