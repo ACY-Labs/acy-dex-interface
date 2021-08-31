@@ -206,7 +206,7 @@ export default class GlobalHeaderRight extends PureComponent {
                     </span>
                   </div>
                   <div>
-                    <AcyRadioButton data={['English', '中文', 'Pусский', '日本語']} />
+                    <AcyRadioButton data={['English', '中文']} />
                   </div>
                 </li>
                 <li>
