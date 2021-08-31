@@ -33,7 +33,7 @@
       height:calc(~"@{layout-header-height} - 13px");
       line-height: calc(~"@{layout-header-height} - 13px");
       position: relative;
-      &::after{
+      &:after{
         content: '';
         position:absolute;
         height: 5px;
@@ -41,6 +41,21 @@
         left: 20px;
         width: ~'calc(100% - 40px)';
         background: #EB5C20;    
+       
+      }
+      &:hover{
+        &:after{
+          content: '';
+          position:absolute;
+          height: 5px;
+          bottom: -12px;
+          left: 20px;
+          width: ~'calc(100% - 40px)';
+          background: #EB5C20;    
+          transition-property: bottom;
+          transition-timing-function: cubic-bezier(.4,0,.2,1);
+          transition-duration: .15s;
+        }
       }
     }
     .top-nav-menu li.ant-menu-item{
