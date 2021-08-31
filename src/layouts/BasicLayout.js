@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense,useEffect  } from 'react';
 import { Layout } from 'antd';
 import DocumentTitle from 'react-document-title';
 import { Web3ReactProvider } from "@web3-react/core";
@@ -52,18 +52,34 @@ const query = {
   },
 };
 
-class BasicLayout extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this.getPageTitle = memoizeOne(this.getPageTitle);
-    this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual);
-  }
+const  BasicLayout =props=> {
+  // constructor(props) {
+  //   super(props);
+  //   getPageTitle = memoizeOne(getPageTitle);
+  //   matchParamsPath = memoizeOne(matchParamsPath, isEqual);
+  // }
 
-  componentDidMount() {
-    const {
+  // componentDidMount() {
+  //   const {
+  //     dispatch,
+  //     route: { routes, authority },
+  //   } = props;
+  //   // dispatch({
+  //   //   type: 'user/fetchCurrent',
+  //   // });
+  //   dispatch({
+  //     type: 'setting/getSetting',
+  //   });
+  //   dispatch({
+  //     type: 'menu/getMenuData',
+  //     payload: { routes, authority },
+  //   });
+  // }
+  useEffect(() => {
+  const {
       dispatch,
       route: { routes, authority },
-    } = this.props;
+    } = props;
     // dispatch({
     //   type: 'user/fetchCurrent',
     // });
@@ -74,31 +90,31 @@ class BasicLayout extends React.PureComponent {
       type: 'menu/getMenuData',
       payload: { routes, authority },
     });
-  }
 
-  componentDidUpdate(preProps) {
-    // After changing to phone mode,
-    // if collapsed is true, you need to click twice to display
-    const { collapsed, isMobile } = this.props;
-    if (isMobile && !preProps.isMobile && !collapsed) {
-      this.handleMenuCollapse(false);
-    }
-  }
+  },[])
+  // componentDidUpdate(preProps) {
+  //   // After changing to phone mode,
+  //   // if collapsed is true, you need to click twice to display
+  //   const { collapsed, isMobile } = props;
+  //   if (isMobile && !preProps.isMobile && !collapsed) {
+  //     handleMenuCollapse(false);
+  //   }
+  // }
 
-  getContext() {
-    const { location, breadcrumbNameMap } = this.props;
+ const  getContext=()=> {
+    const { location, breadcrumbNameMap } = props;
     return {
       location,
       breadcrumbNameMap,
     };
   }
 
-  matchParamsPath = (pathname, breadcrumbNameMap) => {
+  const matchParamsPath = (pathname, breadcrumbNameMap) => {
     const pathKey = Object.keys(breadcrumbNameMap).find(key => pathToRegexp(key).test(pathname));
     return breadcrumbNameMap[pathKey];
   };
 
-  getRouterAuthority = (pathname, routeData) => {
+  const getRouterAuthority = (pathname, routeData) => {
     let routeAuthority = ['noAuthority'];
     const getAuthority = (key, routes) => {
       routes.forEach(route => {
@@ -114,8 +130,8 @@ class BasicLayout extends React.PureComponent {
     return getAuthority(pathname, routeData);
   };
 
-  getPageTitle = (pathname, breadcrumbNameMap) => {
-    const currRouterData = this.matchParamsPath(pathname, breadcrumbNameMap);
+  const getPageTitle = (pathname, breadcrumbNameMap) => {
+    const currRouterData = matchParamsPath(pathname, breadcrumbNameMap);
 
     if (!currRouterData) {
       return title;
@@ -128,8 +144,8 @@ class BasicLayout extends React.PureComponent {
     return `${pageName} - ${title}`;
   };
 
-  getLayoutStyle = () => {
-    const { fixSiderbar, isMobile, collapsed, layout } = this.props;
+  const getLayoutStyle = () => {
+    const { fixSiderbar, isMobile, collapsed, layout } = props;
     if (fixSiderbar && layout !== 'topmenu' && !isMobile) {
       return {
         paddingLeft: collapsed ? '80px' : '256px',
@@ -138,15 +154,15 @@ class BasicLayout extends React.PureComponent {
     return null;
   };
 
-  handleMenuCollapse = collapsed => {
-    const { dispatch } = this.props;
+  const handleMenuCollapse = collapsed => {
+    const { dispatch } = props;
     dispatch({
       type: 'global/changeLayoutCollapsed',
       payload: collapsed,
     });
   };
 
-  renderSettingDrawer = () => {
+  const renderSettingDrawer = () => {
     // Do not render SettingDrawer in production
     // unless it is deployed in preview.pro.ant.design as demo
     if (process.env.NODE_ENV === 'production' && APP_TYPE !== 'site') {
@@ -155,11 +171,10 @@ class BasicLayout extends React.PureComponent {
     return <SettingDrawer />;
   };
 
-  getLibrary(provider, connector) {
+  const getLibrary=(provider, connector)=> {
     return new Web3Provider(provider); // this will vary according to whether you use e.g. ethers or web3.js
   }
   
-  render() {
     const {
       navTheme,
       layout: PropsLayout,
@@ -170,9 +185,9 @@ class BasicLayout extends React.PureComponent {
       breadcrumbNameMap,
       route: { routes },
       fixedHeader,
-    } = this.props;
+    } = props;
     const isTop = PropsLayout === 'topmenu';
-    const routerConfig = this.getRouterAuthority(pathname, routes);
+    const routerConfig = getRouterAuthority(pathname, routes);
     const contentStyle = !fixedHeader ? { paddingTop: 0 } : {};
     const layout = (
       <Layout
@@ -181,15 +196,15 @@ class BasicLayout extends React.PureComponent {
           <SiderMenu
             logo={logo}
             theme={navTheme}
-            onCollapse={this.handleMenuCollapse}
+            onCollapse={handleMenuCollapse}
             menuData={menuData}
             isMobile={isMobile}
-            {...this.props}
+            {...props}
           />
         )}
         <Layout
           style={{
-            ...this.getLayoutStyle(),
+            ...getLayoutStyle(),
             minHeight: '100vh'
             // background: styles.radialBg
           }}
@@ -198,10 +213,10 @@ class BasicLayout extends React.PureComponent {
         >
           <Header
             menuData={menuData}
-            handleMenuCollapse={this.handleMenuCollapse}
+            handleMenuCollapse={handleMenuCollapse}
             logo={logo}
             isMobile={isMobile}
-            {...this.props}
+            {...props}
           />
           <Content className={styles.content} style={contentStyle}>
             {/* <Authorized authority={routerConfig} noMatch={<Exception403 />}> */}
@@ -214,21 +229,20 @@ class BasicLayout extends React.PureComponent {
     );
     return (
       <React.Fragment>
-        <DocumentTitle title={this.getPageTitle(pathname, breadcrumbNameMap)}>
+        <DocumentTitle title={getPageTitle(pathname, breadcrumbNameMap)}>
           <ContainerQuery query={query}>
             {params => (
-              <Context.Provider value={this.getContext()}>
-                <Web3ReactProvider getLibrary={this.getLibrary}>
+              <Context.Provider value={getContext()}>
+                <Web3ReactProvider getLibrary={getLibrary}>
                   <div className={classNames(params)}>{layout}</div>
                 </Web3ReactProvider>
               </Context.Provider>
             )}
           </ContainerQuery>
         </DocumentTitle>
-        {/* <Suspense fallback={<PageLoading />}>{this.renderSettingDrawer()}</Suspense> */}
+        {/* <Suspense fallback={<PageLoading />}>{renderSettingDrawer()}</Suspense> */}
       </React.Fragment>
     );
-  }
 }
 
 export default connect(({ global, setting, menu }) => ({
