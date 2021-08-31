@@ -240,45 +240,10 @@ class BasicProfile extends Component {
 
 
           <AcyCard>
-              <AcyTabs onChange={this.onChangeTabs}>
-                <AcyTabPane tab="Swap" key="1">
-                  <div className={styles.trade}>
+              <div className={styles.trade}>
                     <SwapComponent />
-                  </div>
-                </AcyTabPane>
-                <AcyTabPane tab="Liquidity" key="2">
-                  <div className={styles.trade}>
-                    <AddComponent />
-                  </div>
-                </AcyTabPane>
-                {/*<AcyTabPane tab="Liquidity" key="2">*/}
-                {/*<div className={styles.trade}>*/}
-                {/*    <AcyCuarrencyCard*/}
-                {/*      icon="eth"*/}
-                {/*      coin="ETH"*/}
-                {/*      yuan="566.228"*/}
-                {/*      dollar="679545.545"*/}
-                {/*      onClick={this.onClickCoin}*/}
-                {/*    />*/}
-                {/*    <AcyIcon name="double-right" />*/}
-                {/*    <AcyCuarrencyCard*/}
-                {/*      title="999.999"*/}
-                {/*      icon="eth"*/}
-                {/*      coin="BTC"*/}
-                {/*      yuan="566.228"*/}
-                {/*      dollar="679545.545"*/}
-                {/*    />*/}
-                {/*    <AcyConnectWalletBig>Connect Wallet</AcyConnectWalletBig>*/}
-                {/*  </div>*/}
-                {/*  <h1>这里设计稿没有，暂时展示页面功能使用</h1>*/}
-                {/*  <Button style={{marginRight:'30px'}} type="primary" onClick={() => this.onHandModalConfirmOrder(true)}>*/}
-                {/*    Confirm Order*/}
-                {/*  </Button>*/}
-                {/*  <Button type="primary" onClick={() => this.setState({ visibleLoading: true })}>*/}
-                {/*    Loading*/}
-                {/*  </Button>*/}
-                {/*</AcyTabPane>*/}
-              </AcyTabs>
+              </div>
+             
             </AcyCard>
           </div>
         </div>
