@@ -138,7 +138,7 @@ class BasicProfile extends Component {
       <AcyPeriodTime
         onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
         className={styles.pt}
-        times={['1D', '7D', '30D', '360D', 'All']}
+        times={['1D', '7D', '1M', '1Y', 'All']}
       />,
     ];
   };
