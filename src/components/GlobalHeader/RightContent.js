@@ -403,10 +403,9 @@ export default class GlobalHeaderRight extends PureComponent {
             </AcyCardList.Agree>
           </AcyCardList>
         </AcyModal>
-        <AcyModal width={957} visible={visibleMetaMask} onCancel={this.onhandCancelMetaMask}>
+        <AcyModal width={600} visible={visibleMetaMask} onCancel={this.onhandCancelMetaMask}>
           <div className={styles.metamasktitle}>
             <span>0xE34780…25f7</span>
-            <AcyIcon onClick={this.onhandCancelMetaMask} name="close" />
           </div>
           <AcyCardList title="MetaMask">
             <AcyWarp>
@@ -422,7 +421,7 @@ export default class GlobalHeaderRight extends PureComponent {
               </div>
             </AcyWarp>
           </AcyCardList>
-          <AcyCardList style={{ marginTop: '44px' }}>
+          <AcyCardList style={{ marginTop: '20px' }}>
             <AcyIcon name="view" width={80} title="View" />
             <AcyIcon name="copy" width={80} title="Copy" />
             <AcyIcon name="switch" width={80} title="Switch" />
@@ -430,14 +429,18 @@ export default class GlobalHeaderRight extends PureComponent {
           </AcyCardList>
           <p className={styles.buyCrypto}>Buy Crypto</p>
           <div className={styles.transak}>
-            <AcyIcon name="eth" width={60} /> Transak
+            <AcyIcon name="eth" width={50} /> Transak
           </div>
           <div className={styles.clear}>
             <div>
-              <p>Recent Transactions</p>
+              <div className={styles.recentTransaction}>
+              <strong>Recent Transactions</strong>
+              <AcyIcon width={20} onClick={this.onhandCancel} name="clear" />
+              </div>
+              
               <p className={styles.subtitle}>No results found</p>
             </div>
-            <AcyIcon width={60} title="Clear" onClick={this.onhandCancel} name="clear" />
+            
           </div>
         </AcyModal>
       </div>
