@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { Table,  Row, Col} from 'antd';
+import { Table,  Row, Col,Input} from 'antd';
 import styles from './styles.less';
 import {
     AcyCard,
@@ -17,6 +17,8 @@ import {
     AcyConfirm,
     AcyApprove,
   } from '@/components/Acy';
+
+const {Search} = Input
 
 function abbrNumber(number){
     const THOUSAND = 0
@@ -389,7 +391,7 @@ const columnsCoin = [
         key: 'priceChange',
         render: (priceChange) => {
             return (
-                <span className={priceChange <  0 ? styles.priceChangeDown : styles.priceChangeUp}>{priceChange}</span>
+                <span className={priceChange <  0 ? styles.priceChangeDown : styles.priceChangeUp}>{priceChange.toFixed(2)}</span>
             ) 
         }
     },
@@ -475,16 +477,44 @@ const columnsPool = [
 export class BasicProfile extends Component {
     state = {
         visible: true,
+        visibleSearchBar: false,
         visibleConfirmOrder: false,
         visibleLoading: false,
         tabIndex: 0,
       };
     componentDidMount() {}
+    onSearchFocus = () => {
+       this.setState({
+           visibleSearchBar:true
+       })
+    }
+    onSearchBlur = ()=> {
+        this.setState({
+            visibleSearchBar:false
+        })
+    }
     render() {
-        const { visible, visibleConfirmOrder, visibleLoading, tabIndex,maxLine } = this.state;
+        const { visible, visibleSearchBar, visibleConfirmOrder, visibleLoading, tabIndex,maxLine } = this.state;
         return (
             <PageHeaderWrapper>
                 <div className={styles.marketRoot}>
+                    <div className={styles.searchSection} style={{"marginBottom": "10px"}}>
+                        <Row>
+                            <Col span={12}>
+                            </Col>
+                            <Col span={12}>
+                                <Input 
+                                    placeholder="Search" 
+                                    size="large"
+                                    style={{
+                                        backgroundColor: "#373739",
+                                    }}
+                                    onFocus={this.onSearchFocus}
+                                    onBlur={this.onSearchBlur}
+                                />
+                            </Col>
+                        </Row>
+                    </div>
                     <Row>
                         <Col span={12}>
                             <div className={styles.chartSection}>
@@ -517,11 +547,13 @@ export class BasicProfile extends Component {
                         <Col span={8} >TVL  <strong>$2.90b</strong>  <span className={styles.priceChangeDown}>-0.36%</span></Col>
                     </Row>
 
-                    <h3>Top Coins</h3>
+                    <h2>Top Coins</h2>
                     <Table dataSource={dataSource} columns={columnsCoin} footer={() => (<></>)}/>
 
-                    <h3>Top Pools</h3>
+                    <h2>Top Pools</h2>
                     <Table dataSource={dataSourcePool} columns={columnsPool} footer={() => (<></>)}/>
+
+                    <h2>Transactions</h2>
                 </div>
             </PageHeaderWrapper>
         )
