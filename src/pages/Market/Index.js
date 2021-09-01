@@ -22,6 +22,7 @@ import {
 const {Search} = Input
 
 const TransactionType = {
+    ALL: "All",
     SWAP: "Swap",
     ADD: "Add",
     REMOVE: "Remove"
@@ -682,101 +683,147 @@ const columnsPool = [
     },
 ]
 
-let columnsTransaction = [
-  {
-    title: '',
-    dataIndex: '',
-    key: 'transactionName',
-    render:(text, record) => {
+// header for the transaction table
+function transactionHeader(selectedTransaction, onClickHandler){
 
+  let styleArrangement = {
+   "All" : "normal",
+   "Swap" : "normal",
+   "Add" : "normal",
+   "Remove" : "normal",
+  }
+
+  styleArrangement[selectedTransaction] = "bold"
+
+  return [
+    {
+      title: (<div className={styles.transactionHeader}>
+                <div 
+                  className={styles.transactionType} 
+                  style={{fontWeight: styleArrangement["All"]}}
+                  onClick={onClickHandler}
+                  id={TransactionType.ALL}
+                >
+                  All
+                </div>
+                <div 
+                  className={styles.transactionType} 
+                  style={{fontWeight: styleArrangement["Swap"]}}
+                  onClick={onClickHandler}
+                  id={TransactionType.SWAP}
+                >
+                  Swap
+                </div>
+                <div 
+                  className={styles.transactionType} 
+                  style={{fontWeight: styleArrangement["Add"]}}
+                  onClick={onClickHandler}
+                  id={TransactionType.ADD}
+                >
+                  Add
+                </div>
+                <div 
+                  className={styles.transactionType} 
+                  style={{fontWeight: styleArrangement["Remove"]}}
+                  onClick={onClickHandler}
+                  id={TransactionType.REMOVE}
+                >
+                  Remove
+                </div>
+              </div>),
+      dataIndex: '',
+      key: 'transactionName',
+      render:(text, record) => {
+  
+          return (
+              <div className={styles.tableData}>
+                  {record.type} {record.coin1} {
+                    record.type == TransactionType.SWAP ? "for" : "and"
+                  } {record.coin1}
+              </div>
+          )
+      }
+    },
+    {
+      title: 'Total Value',
+      dataIndex: 'totalValue',
+      key: 'totalValue',
+      render:(text, record) => {
         return (
             <div className={styles.tableData}>
-                {record.type} {record.coin1} {
-                  record.type == TransactionType.SWAP ? "for" : "and"
-                } {record.coin1}
+                $ {abbrNumber(record.totalValue)}
             </div>
         )
-    }
-  },
-  {
-    title: 'Total Value',
-    dataIndex: 'totalValue',
-    key: 'totalValue',
-    render:(text, record) => {
-      return (
-          <div className={styles.tableData}>
-              $ {abbrNumber(record.totalValue)}
-          </div>
-      )
-    }
-  },
-  {
-    title: 'Token Amount',
-    dataIndex: 'coin1Amount',
-    key: 'coin1Amount',
-    render:(text, record) => {
-      return (
-          <div className={styles.tableData}>
-              {abbrNumber(record.coin1Amount)} {record.coin1}
-          </div>
-      )
-    }
-  },
-  {
-    title: 'Token Amount',
-    dataIndex: 'coin2Amount',
-    key: 'coin2Amount',
-    render:(text, record) => {
-      return (
-          <div className={styles.tableData}>
-              {abbrNumber(record.coin2Amount)} {record.coin2}
-          </div>
-      )
-    }
-  },
-  {
-    title: 'Account',
-    dataIndex: 'account',
-    key: 'account',
-    render:(text, record) => {
-      return (
-          <div className={styles.tableData} style={{textOverflow:"ellipsis"}}>
-              {abbrHash(text)}
-          </div>
-      )
-    }
-  },
-  {
-    title: 'Time',
-    dataIndex: 'time',
-    key: 'time',
-    render:(text, record) => {
-
-      function getRelTime(timeString){
-        let a = moment(new Date(timeString))  
-        return a.fromNow()
       }
+    },
+    {
+      title: 'Token Amount',
+      dataIndex: 'coin1Amount',
+      key: 'coin1Amount',
+      render:(text, record) => {
+        return (
+            <div className={styles.tableData}>
+                {abbrNumber(record.coin1Amount)} {record.coin1}
+            </div>
+        )
+      }
+    },
+    {
+      title: 'Token Amount',
+      dataIndex: 'coin2Amount',
+      key: 'coin2Amount',
+      render:(text, record) => {
+        return (
+            <div className={styles.tableData}>
+                {abbrNumber(record.coin2Amount)} {record.coin2}
+            </div>
+        )
+      }
+    },
+    {
+      title: 'Account',
+      dataIndex: 'account',
+      key: 'account',
+      render:(text, record) => {
+        return (
+            <div className={styles.tableData} style={{textOverflow:"ellipsis"}}>
+                {abbrHash(text)}
+            </div>
+        )
+      }
+    },
+    {
+      title: 'Time',
+      dataIndex: 'time',
+      key: 'time',
+      render:(text, record) => {
+  
+        function getRelTime(timeString){
+          let a = moment(new Date(timeString))  
+          return a.fromNow()
+        }
+  
+  
+        return (
+            
+            <div className={styles.tableData} >
+                {getRelTime(text)}
+            </div>
+        )
+      }
+    },
+  
+  ]
+}
 
-
-      return (
-          
-          <div className={styles.tableData} >
-              {getRelTime(text)}
-          </div>
-      )
-    }
-  },
-
-]
 
 export class BasicProfile extends Component {
     state = {
         visible: true,
         visibleSearchBar: false,
-        visibleConfirmOrder: false,
-        visibleLoading: false,
         tabIndex: 0,
-      };
+        transactionView: TransactionType.ALL
+    }
     componentDidMount() {}
     onSearchFocus = () => {
        this.setState({
@@ -788,8 +835,22 @@ export class BasicProfile extends Component {
             visibleSearchBar:false
         })
     }
+    onClickTransaction = (e) => {
+      let destFilter = e.target.id
+      
+      this.setState({
+        transactionView : e.target.id
+      })
+    }
+
+    filterTransaction(table, category){
+      if (category == TransactionType.ALL)
+        return table
+      else
+        return table.filter(item => item.type == category)
+    }
     render() {
-        const { visible, visibleSearchBar, visibleConfirmOrder, visibleLoading, tabIndex,maxLine } = this.state;
+        const { visible, visibleSearchBar, tabIndex, transactionView} = this.state;
         return (
             <PageHeaderWrapper>
                 <div className={styles.marketRoot}>
@@ -839,7 +900,7 @@ export class BasicProfile extends Component {
                     <Table dataSource={dataSourcePool} columns={columnsPool} footer={() => (<></>)}/>
 
                     <h2>Transactions</h2>
-                    <Table dataSource={dataSourceTransaction} columns={columnsTransaction} footer={() => (<></>)}/>
+                    <Table dataSource={this.filterTransaction(dataSourceTransaction, transactionView)} columns={transactionHeader(transactionView, this.onClickTransaction)} footer={() => (<></>)}/>
                 </div>
             </PageHeaderWrapper>
         )
