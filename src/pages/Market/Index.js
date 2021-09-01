@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { Table,  Row, Col,Input} from 'antd';
 import styles from './styles.less';
+import moment from 'moment'
 import {
     AcyCard,
     AcyIcon,
@@ -750,9 +751,17 @@ let columnsTransaction = [
     dataIndex: 'time',
     key: 'time',
     render:(text, record) => {
+
+      function getRelTime(timeString){
+        let a = moment(new Date(timeString))  
+        return a.fromNow()
+      }
+
+
       return (
+          
           <div className={styles.tableData} >
-              {text}
+              {getRelTime(text)}
           </div>
       )
     }
