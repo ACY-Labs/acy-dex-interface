@@ -480,40 +480,6 @@ export class BasicProfile extends Component {
         tabIndex: 0,
       };
     componentDidMount() {}
-
-    renderCoinTableEntry = (record) => {
-        return (
-            <Row className={styles.marketBody} justify="space-between">
-                <Col span={5} className={styles.nameColumn}>
-                    <AcyIcon name={record.short.toLowerCase()} width={20} height={20}/>
-                    <span className={styles.coinName}>{record.name}</span>
-                    <span className={styles.coinShort}> / {record.short}</span>
-                </Col>
-                <Col span={5} className={styles.priceColumn}>$ {abbrNumber(record.price)}</Col>
-                <Col span={4} className={styles.priceChangeColumn}>
-                    <span className={record.priceChange <  0 ? styles.priceChangeDown : styles.priceChangeUp}>{record.priceChange.toFixed(2)}</span>
-                </Col>
-                <Col span={5} className={styles.volColumn}>$ {abbrNumber(record.volume24h)}</Col>
-                <Col span={5} className={styles.tvlColumn}>$ {abbrNumber(record.tvl)}</Col>
-            </Row>
-        )
-    }
-
-    renderPoolTableEntry = (record) => {
-        return (
-            <Row className={styles.marketBody} justify="space-between">
-                <Col span={6} className={styles.nameColumn}>
-                    <AcyIcon name={record.coin1.toLowerCase()} width={20} height={20}/>
-                    <AcyIcon name={record.coin2.toLowerCase()} width={20} height={20}/>
-                    <span className={styles.coinName}>{record.coin1}/{record.coin2}</span>
-                </Col>
-                <Col span={6} className={styles.tvlColumn}>$ {abbrNumber(record.tvl)}</Col>
-                <Col span={6} className={styles.volColumn}>$ {abbrNumber(record.volume24h)}</Col>
-                <Col span={6} className={styles.priceColumn}>$ {abbrNumber(record.volume7d)}</Col>
-            </Row>
-        )
-    }
-
     render() {
         const { visible, visibleConfirmOrder, visibleLoading, tabIndex,maxLine } = this.state;
         return (
