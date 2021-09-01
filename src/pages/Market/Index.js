@@ -54,40 +54,238 @@ function abbrNumber(number){
 
 const dataSource = [
     {
-        name : "Ether",
-        short: "ETH",
-        price: 3170,
-        priceChange: -0.79,
-        volume24h: 804110000,
-        tvl: 899640000
+      "name": "Ether",
+      "short": "ETH",
+      "price": 3170,
+      "priceChange": -0.79,
+      "volume24h": 804110000,
+      "tvl": 899640000
     },
     {
-        name : "USD Coin",
-        short: "USDC",
-        price: 1,
-        priceChange: 0.00,
-        volume24h: 3741750000,
-        tvl: 547500000
+      "name": "USD Coin",
+      "short": "USDC",
+      "price": 1,
+      "priceChange": 0,
+      "volume24h": 741750000,
+      "tvl": 547500000
     },
     {
-        name : "Wrapped BTC",
-        short: "WBTC",
-        price: 47960,
-        priceChange: -0.88,
-        volume24h: 47960000,
-        tvl: 220550000
+      "name": "Wrapped BTC",
+      "short": "WBTC",
+      "price": 47960,
+      "priceChange": -0.88,
+      "volume24h": 47960000,
+      "tvl": 220550000
     },
     {
-        name : "Tether USD",
-        short: "USDT",
-        price: 1.00,
-        priceChange: 0.00,
-        volume24h: 210430000,
-        tvl: 217030000
+      "name": "Tether USD",
+      "short": "USDT",
+      "price": 1,
+      "priceChange": 0,
+      "volume24h": 210430000,
+      "tvl": 217030000
+    },
+    {
+      "name": "Ether",
+      "short": "ETH",
+      "price": 3170,
+      "priceChange": -0.79,
+      "volume24h": 804110000,
+      "tvl": 899640000
+    },
+    {
+      "name": "USD Coin",
+      "short": "USDC",
+      "price": 1,
+      "priceChange": 0,
+      "volume24h": 741750000,
+      "tvl": 547500000
+    },
+    {
+      "name": "Wrapped BTC",
+      "short": "WBTC",
+      "price": 47960,
+      "priceChange": -0.88,
+      "volume24h": 47960000,
+      "tvl": 220550000
+    },
+    {
+      "name": "Tether USD",
+      "short": "USDT",
+      "price": 1,
+      "priceChange": 0,
+      "volume24h": 210430000,
+      "tvl": 217030000
+    },
+    {
+      "name": "Ether",
+      "short": "ETH",
+      "price": 3170,
+      "priceChange": -0.79,
+      "volume24h": 804110000,
+      "tvl": 899640000
+    },
+    {
+      "name": "USD Coin",
+      "short": "USDC",
+      "price": 1,
+      "priceChange": 0,
+      "volume24h": 741750000,
+      "tvl": 547500000
+    },
+    {
+      "name": "Wrapped BTC",
+      "short": "WBTC",
+      "price": 47960,
+      "priceChange": -0.88,
+      "volume24h": 47960000,
+      "tvl": 220550000
+    },
+    {
+      "name": "Tether USD",
+      "short": "USDT",
+      "price": 1,
+      "priceChange": 0,
+      "volume24h": 210430000,
+      "tvl": 217030000
+    },
+    {
+      "name": "Ether",
+      "short": "ETH",
+      "price": 3170,
+      "priceChange": -0.79,
+      "volume24h": 804110000,
+      "tvl": 899640000
+    },
+    {
+      "name": "USD Coin",
+      "short": "USDC",
+      "price": 1,
+      "priceChange": 0,
+      "volume24h": 741750000,
+      "tvl": 547500000
+    },
+    {
+      "name": "Wrapped BTC",
+      "short": "WBTC",
+      "price": 47960,
+      "priceChange": -0.88,
+      "volume24h": 47960000,
+      "tvl": 220550000
+    },
+    {
+      "name": "Tether USD",
+      "short": "USDT",
+      "price": 1,
+      "priceChange": 0,
+      "volume24h": 210430000,
+      "tvl": 217030000
+    },
+    {
+      "name": "Ether",
+      "short": "ETH",
+      "price": 3170,
+      "priceChange": -0.79,
+      "volume24h": 804110000,
+      "tvl": 899640000
+    },
+    {
+      "name": "USD Coin",
+      "short": "USDC",
+      "price": 1,
+      "priceChange": 0,
+      "volume24h": 741750000,
+      "tvl": 547500000
+    },
+    {
+      "name": "Wrapped BTC",
+      "short": "WBTC",
+      "price": 47960,
+      "priceChange": -0.88,
+      "volume24h": 47960000,
+      "tvl": 220550000
+    },
+    {
+      "name": "Tether USD",
+      "short": "USDT",
+      "price": 1,
+      "priceChange": 0,
+      "volume24h": 210430000,
+      "tvl": 217030000
     }
-]
+  ]
 
 const dataSourcePool = [
+    {
+        coin1:"USDC",
+        coin2:"ETH",
+        tvl: 370900000,
+        volume24h: 68680000,
+        volume7d:667220000
+    },
+    {
+        coin1:"WBTC",
+        coin2:"ETH",
+        tvl: 370900000,
+        volume24h: 68680000,
+        volume7d:667220000
+    },
+    {
+        coin1:"USDC",
+        coin2:"ETH",
+        tvl: 370900000,
+        volume24h: 68680000,
+        volume7d:667220000
+    },
+    {
+        coin1:"WBTC",
+        coin2:"ETH",
+        tvl: 370900000,
+        volume24h: 68680000,
+        volume7d:667220000
+    },
+    {
+        coin1:"USDC",
+        coin2:"ETH",
+        tvl: 370900000,
+        volume24h: 68680000,
+        volume7d:667220000
+    },
+    {
+        coin1:"WBTC",
+        coin2:"ETH",
+        tvl: 370900000,
+        volume24h: 68680000,
+        volume7d:667220000
+    },
+    {
+        coin1:"USDC",
+        coin2:"ETH",
+        tvl: 370900000,
+        volume24h: 68680000,
+        volume7d:667220000
+    },
+    {
+        coin1:"WBTC",
+        coin2:"ETH",
+        tvl: 370900000,
+        volume24h: 68680000,
+        volume7d:667220000
+    },
+    {
+        coin1:"USDC",
+        coin2:"ETH",
+        tvl: 370900000,
+        volume24h: 68680000,
+        volume7d:667220000
+    },
+    {
+        coin1:"WBTC",
+        coin2:"ETH",
+        tvl: 370900000,
+        volume24h: 68680000,
+        volume7d:667220000
+    },
     {
         coin1:"USDC",
         coin2:"ETH",
@@ -166,7 +364,9 @@ const columnsCoin = [
         render:(text, record) => {
             return (
                 <div className={styles.firstColumn}>
-                    <span className={styles.coinName}>{record.name}</span><span> / {record.short}</span>
+                    <AcyIcon name={record.short.toLowerCase()} width={20} height={20}/>
+                    <span className={styles.coinName}>{record.name}</span>
+                    <span className={styles.coinShort}> / {record.short}</span>
                 </div>
             )
         }
@@ -352,41 +552,9 @@ export class BasicProfile extends Component {
                     </Row>
 
                     <h3>Top Coins</h3>
-
-                    {/* Individual Coins */}
-                    {/* <Row className={styles.marketHeader} justify="space-around">
-                        <Col span={5} className={styles.nameColumn}>Name</Col>
-                        <Col span={5} className={styles.priceColumn}>Price</Col>
-                        <Col span={4} className={styles.priceChangeColumn}>Price Change</Col>
-                        <Col span={5} className={styles.volColumn}>Volume 24H</Col>
-                        <Col span={5} className={styles.tvlColumn}>TVL</Col>
-                    </Row>
-                    {dataSource.map(item => this.renderCoinTableEntry(item))} 
-                    <Row className={styles.marketFooter} justify="space-around">
-                    <Col span={5} className={styles.nameColumn}></Col>
-                        <Col span={5} className={styles.priceColumn}></Col>
-                        <Col span={4} className={styles.priceChangeColumn}></Col>
-                        <Col span={5} className={styles.volColumn}></Col>
-                        <Col span={5} className={styles.tvlColumn}></Col>
-                    </Row> */}
                     <Table dataSource={dataSource} columns={columnsCoin} footer={() => (<></>)}/>
 
                     <h3>Top Pools</h3>
-                    {/* <Row className={styles.marketHeader} justify="space-between">
-                        <Col span={6} className={styles.nameColumn}>
-                            Pool
-                        </Col>
-                        <Col span={6} className={styles.tvlColumn}>TVL</Col>
-                        <Col span={6} className={styles.volColumn}>Volume 24H</Col>
-                        <Col span={6} className={styles.priceColumn}>Volume 7D</Col>
-                    </Row>
-                    {dataSourcePool.map(item => this.renderPoolTableEntry(item))} 
-                    <Row className={styles.marketFooter} justify="space-between">
-                        <Col span={6} className={styles.nameColumn}></Col>
-                        <Col span={6} className={styles.tvlColumn}></Col>
-                        <Col span={6} className={styles.volColumn}></Col>
-                        <Col span={6} className={styles.priceColumn}></Col>
-                    </Row> */}
                     <Table dataSource={dataSourcePool} columns={columnsPool} footer={() => (<></>)}/>
                 </div>
             </PageHeaderWrapper>
