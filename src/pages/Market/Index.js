@@ -739,7 +739,7 @@ function transactionHeader(selectedTransaction, onClickHandler){
               <div className={styles.tableData}>
                   {record.type} {record.coin1} {
                     record.type == TransactionType.SWAP ? "for" : "and"
-                  } {record.coin1}
+                  } {record.coin2}
               </div>
           )
       }
