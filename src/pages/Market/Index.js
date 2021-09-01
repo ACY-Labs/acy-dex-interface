@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useState, useCallback } from 'react'
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { Table,  Row, Col,Input} from 'antd';
 import styles from './styles.less';
@@ -19,7 +19,9 @@ import {
     AcyApprove,
   } from '@/components/Acy';
 
-const {Search} = Input
+import { useDetectClickOutside } from 'react-detect-click-outside';
+
+const {AcyTabPane } = AcyTabs;
 
 const TransactionType = {
     ALL: "All",
@@ -239,85 +241,73 @@ const dataSourcePool = [
         coin2:"ETH",
         tvl: 370900000,
         volume24h: 68680000,
-        volume7d:667220000
+        volume7d:667220000,
+        price: 3570
     },
     {
         coin1:"WBTC",
         coin2:"ETH",
         tvl: 370900000,
         volume24h: 68680000,
-        volume7d:667220000
+        volume7d:667220000,
+        price: 23523
     },
     {
         coin1:"USDC",
         coin2:"ETH",
         tvl: 370900000,
         volume24h: 68680000,
-        volume7d:667220000
+        volume7d:667220000,
+        price: 3523
     },
     {
-        coin1:"WBTC",
-        coin2:"ETH",
-        tvl: 370900000,
-        volume24h: 68680000,
-        volume7d:667220000
-    },
-    {
-        coin1:"USDC",
-        coin2:"ETH",
-        tvl: 370900000,
-        volume24h: 68680000,
-        volume7d:667220000
-    },
-    {
-        coin1:"WBTC",
-        coin2:"ETH",
-        tvl: 370900000,
-        volume24h: 68680000,
-        volume7d:667220000
-    },
-    {
-        coin1:"USDC",
-        coin2:"ETH",
-        tvl: 370900000,
-        volume24h: 68680000,
-        volume7d:667220000
-    },
-    {
-        coin1:"WBTC",
-        coin2:"ETH",
-        tvl: 370900000,
-        volume24h: 68680000,
-        volume7d:667220000
-    },
-    {
-        coin1:"USDC",
-        coin2:"ETH",
-        tvl: 370900000,
-        volume24h: 68680000,
-        volume7d:667220000
-    },
-    {
-        coin1:"WBTC",
-        coin2:"ETH",
-        tvl: 370900000,
-        volume24h: 68680000,
-        volume7d:667220000
-    },
-    {
-        coin1:"USDC",
-        coin2:"ETH",
-        tvl: 370900000,
-        volume24h: 68680000,
-        volume7d:667220000
-    },
-    {
-        coin1:"WBTC",
-        coin2:"ETH",
-        tvl: 370900000,
-        volume24h: 68680000,
-        volume7d:667220000
-    }
+      coin1:"USDC",
+      coin2:"ETH",
+      tvl: 370900000,
+      volume24h: 68680000,
+      volume7d:667220000,
+      price: 3570
+  },
+  {
+      coin1:"WBTC",
+      coin2:"ETH",
+      tvl: 370900000,
+      volume24h: 68680000,
+      volume7d:667220000,
+      price: 23523
+  },
+  {
+      coin1:"USDC",
+      coin2:"ETH",
+      tvl: 370900000,
+      volume24h: 68680000,
+      volume7d:667220000,
+      price: 3523
+  },
+  {
+    coin1:"USDC",
+    coin2:"ETH",
+    tvl: 370900000,
+    volume24h: 68680000,
+    volume7d:667220000,
+    price: 3570
+  },
+  {
+      coin1:"WBTC",
+      coin2:"ETH",
+      tvl: 370900000,
+      volume24h: 68680000,
+      volume7d:667220000,
+      price: 23523
+  },
+  {
+      coin1:"USDC",
+      coin2:"ETH",
+      tvl: 370900000,
+      volume24h: 68680000,
+      volume7d:667220000,
+      price: 3523
+  },
 ]
 
 const dataSourceTransaction = [
@@ -572,12 +562,12 @@ const columnsCoin = [
         title: 'Name',
         dataIndex: 'name',
         key: 'name',
-        render:(text, record) => {
+        render:(text, entry) => {
             return (
                 <div className={styles.firstColumn}>
-                    <AcyIcon name={record.short.toLowerCase()} width={20} height={20}/>
-                    <span className={styles.coinName}>{record.name}</span>
-                    <span className={styles.coinShort}> / {record.short}</span>
+                    <AcyIcon name={entry.short.toLowerCase()} width={20} height={20}/>
+                    <span className={styles.coinName}>{entry.name}</span>
+                    <span className={styles.coinShort}> / {entry.short}</span>
                 </div>
             )
         }
@@ -586,7 +576,7 @@ const columnsCoin = [
         title: 'Price',
         dataIndex: 'price',
         key: 'price',
-        render:(text, record) => {
+        render:(text, entry) => {
             return (
                 <div className={styles.tableData}>
                     $ {abbrNumber(text)}
@@ -608,7 +598,7 @@ const columnsCoin = [
         title: 'Volume 24H',
         dataIndex: 'volume24h',
         key: 'volume24h',
-        render:(text, record) => {
+        render:(text, entry) => {
             return (
                 <div className={styles.tableData}>
                     $ {abbrNumber(text)}
@@ -620,7 +610,7 @@ const columnsCoin = [
         title: 'TVL',
         dataIndex: 'tvl',
         key: 'tvl',
-        render:(text, record) => {
+        render:(text, entry) => {
             return (
                 <div className={styles.tableData}>
                     $ {abbrNumber(text)}
@@ -635,12 +625,12 @@ const columnsPool = [
         title: 'Pool',
         dataIndex: 'pool',
         key: 'pool',
-        render:(text, record) => {
+        render:(text, entry) => {
             return (
                 <div className={styles.tableData}>
-                    <AcyIcon name={record.coin1.toLowerCase()} width={20} height={20}/>
-                    <AcyIcon name={record.coin2.toLowerCase()} width={20} height={20}/>
-                    <span className={styles.coinName}>{record.coin1}/{record.coin2}</span>
+                    <AcyIcon name={entry.coin1.toLowerCase()} width={20} height={20}/>
+                    <AcyIcon name={entry.coin2.toLowerCase()} width={20} height={20}/>
+                    <span className={styles.coinName}>{entry.coin1}/{entry.coin2}</span>
                 </div>
             )
         }
@@ -649,10 +639,10 @@ const columnsPool = [
         title: 'TVL',
         dataIndex: 'tvl',
         key: 'tvl',
-        render:(text, record) => {
+        render:(text, entry) => {
             return (
                 <div className={styles.tableData}>
-                    $ {abbrNumber(record.tvl)}
+                    $ {abbrNumber(entry.tvl)}
                 </div>
             )
         }
@@ -661,10 +651,10 @@ const columnsPool = [
         title: 'Volume 24H',
         dataIndex: 'volume24h',
         key: 'volume24h',
-        render:(text, record) => {
+        render:(text, entry) => {
             return (
                 <div className={styles.tableData}>
-                    $ {abbrNumber(record.volume24h)}
+                    $ {abbrNumber(entry.volume24h)}
                 </div>
             )
         }
@@ -673,10 +663,10 @@ const columnsPool = [
         title: 'Volume 7D',
         dataIndex: 'volume7d',
         key: 'volume7d',
-        render:(text, record) => {
+        render:(text, entry) => {
             return (
                 <div className={styles.tableData}>
-                    $ {abbrNumber(record.volume7d)}
+                    $ {abbrNumber(entry.volume7d)}
                 </div>
             )
         }
@@ -698,48 +688,48 @@ function transactionHeader(selectedTransaction, onClickHandler){
   return [
     {
       title: (<div className={styles.transactionHeader}>
-                <div 
+                <a 
                   className={styles.transactionType} 
                   style={{fontWeight: styleArrangement["All"]}}
                   onClick={onClickHandler}
                   id={TransactionType.ALL}
                 >
                   All
-                </div>
-                <div 
+                </a>
+                <a
                   className={styles.transactionType} 
                   style={{fontWeight: styleArrangement["Swap"]}}
                   onClick={onClickHandler}
                   id={TransactionType.SWAP}
                 >
                   Swap
-                </div>
-                <div 
+                </a>
+                <a 
                   className={styles.transactionType} 
                   style={{fontWeight: styleArrangement["Add"]}}
                   onClick={onClickHandler}
                   id={TransactionType.ADD}
                 >
                   Add
-                </div>
-                <div 
+                </a>
+                <a 
                   className={styles.transactionType} 
                   style={{fontWeight: styleArrangement["Remove"]}}
                   onClick={onClickHandler}
                   id={TransactionType.REMOVE}
                 >
                   Remove
-                </div>
+                </a>
               </div>),
       dataIndex: '',
       key: 'transactionName',
-      render:(text, record) => {
+      render:(text, entry) => {
   
           return (
               <div className={styles.tableData}>
-                  {record.type} {record.coin1} {
-                    record.type == TransactionType.SWAP ? "for" : "and"
-                  } {record.coin2}
+                  {entry.type} {entry.coin1} {
+                    entry.type == TransactionType.SWAP ? "for" : "and"
+                  } {entry.coin2}
               </div>
           )
       }
@@ -748,10 +738,10 @@ function transactionHeader(selectedTransaction, onClickHandler){
       title: 'Total Value',
       dataIndex: 'totalValue',
       key: 'totalValue',
-      render:(text, record) => {
+      render:(text, entry) => {
         return (
             <div className={styles.tableData}>
-                $ {abbrNumber(record.totalValue)}
+                $ {abbrNumber(entry.totalValue)}
             </div>
         )
       }
@@ -760,10 +750,10 @@ function transactionHeader(selectedTransaction, onClickHandler){
       title: 'Token Amount',
       dataIndex: 'coin1Amount',
       key: 'coin1Amount',
-      render:(text, record) => {
+      render:(text, entry) => {
         return (
             <div className={styles.tableData}>
-                {abbrNumber(record.coin1Amount)} {record.coin1}
+                {abbrNumber(entry.coin1Amount)} {entry.coin1}
             </div>
         )
       }
@@ -772,10 +762,10 @@ function transactionHeader(selectedTransaction, onClickHandler){
       title: 'Token Amount',
       dataIndex: 'coin2Amount',
       key: 'coin2Amount',
-      render:(text, record) => {
+      render:(text, entry) => {
         return (
             <div className={styles.tableData}>
-                {abbrNumber(record.coin2Amount)} {record.coin2}
+                {abbrNumber(entry.coin2Amount)} {entry.coin2}
             </div>
         )
       }
@@ -784,7 +774,7 @@ function transactionHeader(selectedTransaction, onClickHandler){
       title: 'Account',
       dataIndex: 'account',
       key: 'account',
-      render:(text, record) => {
+      render:(text, entry) => {
         return (
             <div className={styles.tableData} style={{textOverflow:"ellipsis"}}>
                 {abbrHash(text)}
@@ -796,7 +786,7 @@ function transactionHeader(selectedTransaction, onClickHandler){
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
-      render:(text, record) => {
+      render:(text, entry) => {
   
         function getRelTime(timeString){
           let a = moment(new Date(timeString))  
@@ -816,25 +806,164 @@ function transactionHeader(selectedTransaction, onClickHandler){
   ]
 }
 
+class SmallTable extends React.Component {
+  state={
+    mode: this.props.mode,
+    tableData: this.props.data,
+    displayNumber: this.props.displayNumber
+  }
+
+  expandSmallTable = () => {
+    this.setState({
+      displayNumber : this.state.displayNumber + 2
+    })
+  }
+
+  renderBody = (entry) => {
+
+    let content = (<></>)
+    if (this.state.mode == "token"){
+      content = (
+        <div>
+          <AcyIcon name={entry.short.toLowerCase()} width={20} height={20}/>
+          <span className={styles.coinName}>{entry.name}</span>
+          <span className={styles.coinShort}> / {entry.short}</span>
+        </div>
+      )
+    } else {
+      content = (
+        <div>
+          <AcyIcon name={entry.coin1.toLowerCase()} width={20} height={20}/>
+          <AcyIcon name={entry.coin2.toLowerCase()} width={20} height={20}/>
+          <span className={styles.coinName}>{entry.coin1}/{entry.coin2}</span>
+        </div>
+      )  
+    }
+
+
+    
+    return (
+      <div className={styles.smallTableRow}>
+        <div className={styles.smallTableBody}>{content}</div>
+        <div className={styles.smallTableBody}>{abbrNumber(entry.volume24h)}</div>
+        <div className={styles.smallTableBody}>{abbrNumber(entry.tvl)}</div>
+        <div className={styles.smallTableBody}>{abbrNumber(entry.price)}</div>
+      </div>
+    )
+  }
+
+  render() {
+    return (
+      <div className={styles.smallTable}>
+        <div className={styles.smallTableRow}>
+          <div className={styles.smallTableHeader}>{this.state.mode == "token" ? "Token" : "Pool"}</div>
+          <div className={styles.smallTableHeader}>Volume 24H</div>
+          <div className={styles.smallTableHeader}>TVL</div>
+          <div className={styles.smallTableHeader}>Price</div>
+        </div>
+
+        {
+          this.state.tableData.slice(0, this.state.displayNumber - 1).map(item => this.renderBody(item))
+        }
+
+        <a className={styles.smallTableSeeMore} onClick={this.expandSmallTable}>See more...</a>
+      </div>      
+    );
+  }
+}
+
+// react functional component
+function MarketSearchBar () {
+    // states
+    const [visibleSearchBar, setVisibleSearchBar] = useState(false)
+
+    // callback event handlers
+    const onSearchFocus = useCallback(() => {
+      setVisibleSearchBar(true)
+    })
+
+    // refs
+    const outsideClickRef = useDetectClickOutside({ onTriggered: () => { setVisibleSearchBar(false) } });
+
+    // the DOM itself
+    return (
+      <div 
+          className={styles.searchSection} 
+          style={
+            {
+              marginBottom: "10px"
+            }
+          } 
+          
+      >
+          {/* this is the gray background */}
+          {visibleSearchBar && <div className={styles.searchBackground}/>}
+
+          <div ref={outsideClickRef}>
+            <div className={styles.searchWrapper}>
+              <div className={styles.searchInnerWrapper}>
+                <Input 
+                    placeholder="Search" 
+                    size="large"
+                    style={{
+                        backgroundColor: "#373739",
+                    }}
+                    onFocus={onSearchFocus}
+                    className={styles.searchBar}
+                />
+              </div>            
+            </div>
+            {/* Search modal */}
+            <div 
+              style={
+                {"width":"100%", 
+                "position": "relative", 
+                "marginTop": "10px",
+                "zIndex": 10
+              }}
+
+              
+            >
+              {
+                visibleSearchBar && (
+                  <div  
+                    className={styles.searchModal} 
+                    style={
+                      {"position": "absolute", 
+                      "left": 0, 
+                      "right":0}
+                    }
+                  >
+                    <AcyTabs>
+                      <AcyTabPane tab="Market" key="1">
+                        <SmallTable mode="token" data={dataSource} displayNumber={4}/>
+                        <SmallTable mode="pool" data={dataSourcePool} displayNumber={4}/>
+                      </AcyTabPane>
+                      <AcyTabPane tab="Watchlist" key="2">
+                        <SmallTable mode="token" data={dataSource} displayNumber={4}/>
+                        <SmallTable mode="pool" data={dataSourcePool} displayNumber={4}/>
+                      </AcyTabPane>
+                    </AcyTabs>
+                    
+                  </div>
+                )
+              }
+              
+            </div>
+          </div>
+          
+          
+      </div>
+    )
+}
 
 export class BasicProfile extends Component {
     state = {
         visible: true,
-        visibleSearchBar: false,
         tabIndex: 0,
         transactionView: TransactionType.ALL
     }
     componentDidMount() {}
-    onSearchFocus = () => {
-       this.setState({
-           visibleSearchBar:true
-       })
-    }
-    onSearchBlur = ()=> {
-        this.setState({
-            visibleSearchBar:false
-        })
-    }
     onClickTransaction = (e) => {
       let destFilter = e.target.id
       
@@ -850,21 +979,12 @@ export class BasicProfile extends Component {
         return table.filter(item => item.type == category)
     }
     render() {
+        // const outsideClickRef = useDetectClickOutside({ onTriggered: this.onSearchBlur });
         const { visible, visibleSearchBar, tabIndex, transactionView} = this.state;
         return (
             <PageHeaderWrapper>
                 <div className={styles.marketRoot}>
-                    <div className={styles.searchSection} style={{"marginBottom": "10px"}}>
-                        <Input 
-                            placeholder="Search" 
-                            size="large"
-                            style={{
-                                backgroundColor: "#373739",
-                            }}
-                            onFocus={this.onSearchFocus}
-                            onBlur={this.onSearchBlur}
-                        />
-                    </div>
+                    <MarketSearchBar/>
                     <div className={styles.charts}>
                         <div className={styles.chartSection}>
                               <div className={styles.graphStats}>

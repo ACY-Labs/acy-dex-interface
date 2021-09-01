@@ -192,7 +192,7 @@ class AcyBarChart extends Component {
           // symbolSize: 2,   //设定实心点的大小
           itemStyle: {
             normal: {
-              color: '#1e5d91'
+              color: '#1c9965'
               //   color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
               //     { offset: 0, color: color[index] },
               //     { offset: 1, color: '#fff' },

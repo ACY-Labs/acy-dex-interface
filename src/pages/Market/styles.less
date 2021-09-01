@@ -1,5 +1,12 @@
 @cardColor:   #2f3135b6;
 
+.marketRoot{
+    width: 90%;
+    max-width: 1000px;
+    margin:auto;
+    z-index:0;
+}
+
 h2 {
     color: #B5B6B6;
 }
@@ -22,11 +29,60 @@ h2 {
     color: #919191;
 }
 
-.searchSection{
-    z-index: 2;
-    .searchModal {
-        background-color: red;
+
+.smallTable{
+    display: table;
+    width: 100%;
+    .smallTableRow{
+        display: table-row;
     }
+    .smallTableHeader{
+        display:table-cell;
+        padding: 10px;
+        font-weight: bold;
+    }
+    .smallTableBody{
+        display:table-cell;
+        padding: 10px;
+    }
+    .smallTableSeeMore{
+        margin-left: 10px;
+        margin-top: 30px;
+    }
+}
+
+
+.searchSection{
+    z-index: 10;
+    .searchBackground{
+        background: rgba(0,0,0,0.50);
+        position:fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 4;
+    }
+    .searchWrapper{
+        width: 100%;
+        display:flex;
+        justify-content:flex-end;
+    }
+    .searchBar{
+        width: 100%;
+    }
+    .searchModal{
+        background: #373739;
+        border: solid 1px #eb5c20;
+        border-radius: 15px;
+        z-index:5;
+        padding: 20px;
+    }
+    
+}
+.searchInnerWrapper{
+    z-index:5;
+    width: 40%;
 }
 
 .charts{
@@ -65,6 +121,7 @@ h2 {
     
 }
 
+
 // .chartSection:nth-child(1){
 //     margin-right: 5px;
 // }
@@ -73,11 +130,7 @@ h2 {
 // }
 
 
-.marketRoot{
-    width: 90%;
-    max-width: 1000px;
-    margin:auto;
-}
+
 
 .marketOverview {
     background-color: @cardColor;
@@ -126,17 +179,20 @@ h2 {
 
 
 
-@media screen and(max-width: 768px) {
+@media screen and (max-width: 768px) {
+
+    .searchInnerWrapper{
+        width: 100%;
+        color: red;
+    }
 
     .chartSection{
         width: 100%;
     }
 
-    .priceColumn, .priceChangeColumn, .tvlColumn{
-        display: none;
-    }
-
     .volColumn{
         text-align: right;
     }
+
+    
 }
