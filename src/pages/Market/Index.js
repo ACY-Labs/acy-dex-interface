@@ -785,37 +785,28 @@ export class BasicProfile extends Component {
             <PageHeaderWrapper>
                 <div className={styles.marketRoot}>
                     <div className={styles.searchSection} style={{"marginBottom": "10px"}}>
-                        <Row>
-                            <Col span={12}>
-                            </Col>
-                            <Col span={12}>
-                                <Input 
-                                    placeholder="Search" 
-                                    size="large"
-                                    style={{
-                                        backgroundColor: "#373739",
-                                    }}
-                                    onFocus={this.onSearchFocus}
-                                    onBlur={this.onSearchBlur}
-                                />
-                            </Col>
-                        </Row>
+                        <Input 
+                            placeholder="Search" 
+                            size="large"
+                            style={{
+                                backgroundColor: "#373739",
+                            }}
+                            onFocus={this.onSearchFocus}
+                            onBlur={this.onSearchBlur}
+                        />
                     </div>
-                    <Row>
-                        <Col span={12}>
-                            <div className={styles.chartSection}>
-                                <div className={styles.graphStats}>
-                                    <div className={styles.statName}>TVL</div>
-                                    <div className={styles.statValue}>$2.19b</div>
-                                </div>
-                                <div className={styles.chartWrapper}>
-                                    <AcyLineChart backData={data}/>
-                                </div>
-                                
-                            </div>
-                        </Col>
-                        <Col span={12} >
-                            <div className={styles.chartSection}>
+                    <div className={styles.charts}>
+                        <div className={styles.chartSection}>
+                              <div className={styles.graphStats}>
+                                  <div className={styles.statName}>TVL</div>
+                                  <div className={styles.statValue}>$2.19b</div>
+                              </div>
+                              <div className={styles.chartWrapper}>
+                                  <AcyLineChart backData={data}/>
+                              </div>
+                              
+                        </div>
+                        <div className={styles.chartSection}>
                                 <div className={styles.graphStats}>
                                     <div className={styles.statName}>VOLUME 24H</div>
                                     <div className={styles.statValue}>$2.19b</div>
@@ -824,9 +815,8 @@ export class BasicProfile extends Component {
                                     <AcyBarChart backData={data}/>
                                 </div>
                                 
-                            </div>    
-                        </Col>
-                    </Row>
+                        </div> 
+                    </div>
                     <Row className={styles.marketOverview} justify="space-around">
                         <Col span={8} >Volume 24H   <strong>$882.20m</strong> <span className={styles.priceChangeUp}>0.36%</span></Col>
                         <Col span={8} >Fees 24H <strong>$1.66m </strong>    <span className={styles.priceChangeUp}>0.36%</span></Col>

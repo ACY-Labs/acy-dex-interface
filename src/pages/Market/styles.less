@@ -29,7 +29,15 @@ h2 {
     }
 }
 
+.charts{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
 .chartSection{
+    width: 49%;
     height: 40vh;
     max-height: 700px;
     background-color: @cardColor;
@@ -57,12 +65,12 @@ h2 {
     
 }
 
-.chartSection:nth-child(1){
-    margin-right: 5px;
-}
-.chartSection:nth-child(2){
-    margin-left: 5px;
-}
+// .chartSection:nth-child(1){
+//     margin-right: 5px;
+// }
+// .chartSection:nth-child(2){
+//     margin-left: 5px;
+// }
 
 
 .marketRoot{
@@ -112,6 +120,11 @@ h2 {
 
 
 @media screen and(max-width: 768px) {
+
+    .chartSection{
+        width: 100%;
+    }
+
     .priceColumn, .priceChangeColumn, .tvlColumn{
         display: none;
     }
