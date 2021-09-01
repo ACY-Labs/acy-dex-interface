@@ -1,6 +1,6 @@
 import React, { Component, useState, useCallback } from 'react'
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { Table,  Row, Col,Input} from 'antd';
+import { Table,  Row, Col,Input, Divider} from 'antd';
 import styles from './styles.less';
 import moment from 'moment'
 import {
@@ -822,6 +822,11 @@ class SmallTable extends React.Component {
   renderBody = (entry) => {
 
     let content = (<></>)
+
+    if(this.props.data.length == 0){
+      return  
+    }
+
     if (this.state.mode == "token"){
       content = (
         <div>
@@ -862,8 +867,9 @@ class SmallTable extends React.Component {
           <div className={styles.smallTableHeader}>Price</div>
         </div>
 
+
         {
-          this.state.tableData.slice(0, this.state.displayNumber - 1).map(item => this.renderBody(item))
+          this.state.tableData.slice(0, this.state.displayNumber).map(item => this.renderBody(item))
         }
 
         <a className={styles.smallTableSeeMore} onClick={this.expandSmallTable}>See more...</a>
@@ -873,13 +879,46 @@ class SmallTable extends React.Component {
 }
 
 // react functional component
-function MarketSearchBar () {
+const MarketSearchBar  = () => {
     // states
     const [visibleSearchBar, setVisibleSearchBar] = useState(false)
+    const [searchQuery, setSearchQuery] = useState("")
+    const [searchCoinReturns, setSearchCoinReturns] = useState([...dataSource])
+    const [searchPoolReturns, setSearchPoolReturns] = useState([...dataSourcePool])
+    const [displayNumber, setDisplayNumber] = useState(3)
+
+    // some helper functions
+    const matchQueryCoin = (data, query) => {
+      let lowercase = query.toLowerCase()
+      let newData = data.filter((item) => {
+        if (lowercase.length == 0){
+          return true;
+        }
+        return item.name.toLowerCase().includes(lowercase) || item.short.toLowerCase().includes(lowercase)
+      })
+
+      return newData
+    }
+
+    const matchQueryPool= (data, query) => {
+      let lowercase = query.toLowerCase()
+      let newData = data.filter((item) => {
+        if (lowercase.length == 0){
+          return true;
+        }
+        return item.coin1.toLowerCase().includes(lowercase) || item.coin2.toLowerCase().includes(lowercase)
+      })
+
+      return newData
+    }
 
     // callback event handlers
     const onSearchFocus = useCallback(() => {
       setVisibleSearchBar(true)
+    })
+
+    const onInput = useCallback((e) => {
+      setSearchQuery(e.target.value)
     })
 
     // refs
@@ -909,7 +948,9 @@ function MarketSearchBar () {
                         backgroundColor: "#373739",
                     }}
                     onFocus={onSearchFocus}
+                    onChange={onInput}
                     className={styles.searchBar}
+                    value={"" || searchQuery}
                 />
               </div>            
             </div>
@@ -936,12 +977,20 @@ function MarketSearchBar () {
                   >
                     <AcyTabs>
                       <AcyTabPane tab="Market" key="1">
-                        <SmallTable mode="token" data={dataSource} displayNumber={4}/>
-                        <SmallTable mode="pool" data={dataSourcePool} displayNumber={4}/>
+                        {
+                          searchCoinReturns.length > 0 ? <SmallTable mode="token" data={dataSource} displayNumber={displayNumber}/> 
+                          : <div style={{fontSize:"20px", margin: "20px"}}>No results</div>
+                        }
+                        <Divider className={styles.searchModalDivider}/>
+                        {
+                          searchPoolReturns.length > 0 ? <SmallTable mode="pool" data={dataSourcePool} displayNumber={displayNumber}/>
+                          : <div style={{fontSize:"20px", margin: "20px"}}>No results</div>
+                        }
                       </AcyTabPane>
                       <AcyTabPane tab="Watchlist" key="2">
-                        <SmallTable mode="token" data={dataSource} displayNumber={4}/>
-                        <SmallTable mode="pool" data={dataSourcePool} displayNumber={4}/>
+                        <SmallTable mode="token" data={dataSource} displayNumber={displayNumber}/>
+                        <Divider className={styles.searchModalDivider}/>
+                        <SmallTable mode="pool" data={dataSourcePool} displayNumber={displayNumber}/>
                       </AcyTabPane>
                     </AcyTabs>
                     
