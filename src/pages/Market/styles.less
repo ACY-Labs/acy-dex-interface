@@ -1,5 +1,7 @@
 @cardColor:   #2f3135b6;
 
+
+// root element
 .marketRoot{
     width: 90%;
     max-width: 1000px;
@@ -7,29 +9,30 @@
     z-index:0;
 }
 
+
+// headers
 h2 {
     color: #B5B6B6;
 }
 
+
+// table entries
 .priceChangeDown{
     color: red;
     font-weight:bold;
 }
-
 .priceChangeUp{
     color:greenyellow;
     font-weight:bold;
 }
-
 .coinName {
     font-weight: bold;
 }
-
 .coinShort{
     color: #919191;
 }
 
-
+// small table compoenent
 .smallTable{
     display: table;
     width: 100%;
@@ -51,7 +54,7 @@ h2 {
     }
 }
 
-
+// search component
 .searchSection{
     z-index: 10;
     .searchBackground{
@@ -88,14 +91,14 @@ h2 {
     width: 40%;
 }
 
-.charts{
+// Chart on main page
+.chartsMain{
     width: 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
 }
-
-.chartSection{
+.chartSectionMain{
     width: 49%;
     height: 40vh;
     max-height: 700px;
@@ -124,17 +127,7 @@ h2 {
     
 }
 
-
-// .chartSection:nth-child(1){
-//     margin-right: 5px;
-// }
-// .chartSection:nth-child(2){
-//     margin-left: 5px;
-// }
-
-
-
-
+// Market overview
 .marketOverview {
     background-color: @cardColor;
     color: #B5B6B6;
@@ -144,34 +137,7 @@ h2 {
     margin-bottom:10px;
 }
 
-.marketHeader {
-    font-weight : bold;
-    background-color: @cardColor;
-    color: #B5B6B6;
-    padding: 15px;
-    border-radius: 15px 15px 0 0 ;
-    text-align: left;
-}
-
-.tableIcon {
-    width: 5px;
-    height: 5px;
-}
-
-.marketBody {
-    background-color: #373739;
-    color: #B5B6B6;
-    padding: 15px;
-    text-align: left;
-}
-
-.marketFooter {
-    background-color: @cardColor;
-    padding: 15px;
-    border-radius: 0 0 15px 15px  ;
-    margin-bottom:10px;
-}
-
+// Transaction table
 .transactionHeader{
     display:flex;
     justify-content:space-around;
@@ -182,6 +148,7 @@ h2 {
 
 
 
+// mobile changes
 @media screen and (max-width: 768px) {
 
     .searchInnerWrapper{
@@ -189,7 +156,7 @@ h2 {
         color: red;
     }
 
-    .chartSection{
+    .chartSectionMain{
         width: 100%;
     }
 

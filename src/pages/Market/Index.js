@@ -75,8 +75,8 @@ export class BasicProfile extends Component {
             <PageHeaderWrapper>
                 <div className={styles.marketRoot}>
                     <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
-                    <div className={styles.charts}>
-                        <div className={styles.chartSection}>
+                    <div className={styles.chartsMain}>
+                        <div className={styles.chartSectionMain}>
                               <div className={styles.graphStats}>
                                   <div className={styles.statName}>TVL</div>
                                   <div className={styles.statValue}>$2.19b</div>
@@ -86,7 +86,7 @@ export class BasicProfile extends Component {
                               </div>
                               
                         </div>
-                        <div className={styles.chartSection}>
+                        <div className={styles.chartSectionMain}>
                                 <div className={styles.graphStats}>
                                     <div className={styles.statName}>VOLUME 24H</div>
                                     <div className={styles.statValue}>$2.19b</div>

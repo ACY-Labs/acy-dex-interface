@@ -67,7 +67,9 @@ function MarketTokenInfo(){
                 <div className={styles.rightButton}></div>
             </div>
             <div style={{display:"flex", justifyContent: "space-between"}}>
-                <div className={styles.contentInfo} style={{background: "red"}}> hello</div>
+                <div className={styles.contentInfo} style={{background: "red"}}>
+                    
+                </div>
                 <div className={styles.contentCta} style={{background: "blue"}}> hello</div>
             </div>
             <div style={{display:"flex", justifyContent: "space-between"}}>
