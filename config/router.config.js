@@ -29,6 +29,10 @@ export default [
           {
             path: '/market/info/token',
             component: './Market/TokenInfo',
+          },
+          {
+            path: '/market/info/pool',
+            component: './Market/PoolInfo',
           }
         ] 
       },

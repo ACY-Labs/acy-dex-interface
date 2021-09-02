@@ -45,11 +45,11 @@ import {
 } from './UtilComponent.js';
 
 const {AcyTabPane } = AcyTabs;
-let sampleToken = dataSourceCoin[0]
+let samplePool = dataSourcePool[0]
 
 
-function MarketTokenInfo(props){
-    const [tokenData, setTokenData] = useState(sampleToken)
+function PoolInfo(props){
+    const [tokenData, setTokenData] = useState(samplePool)
     const [transactionView, setTransactionView ] = useState(TransactionType.ALL) 
     const [graphTabIndex, setGraphTabIndex] = useState(0)
 
@@ -80,17 +80,23 @@ function MarketTokenInfo(props){
             <div style={{display:"flex", justifyContent: "space-between", alignItems:"center", flexWrap:"wrap"}}>
                 <div className={styles.contentInfo}>
                     <div style={{display:"flex", alignItems:"center"}}>
-                        <AcyIcon name={tokenData.short.toLowerCase()} width={36} height={36}/>
-                        <span style={{fontSize:"26px", fontWeight: "bold"}}>{tokenData.name}</span>
-                        <span style={{fontSize:"26px", fontWeight: "thin", marginLeft:"10px"}}>({tokenData.short})</span>
+                        <AcyIcon name={samplePool.coin1.toLowerCase()} width={36} height={36}/>
+                        <AcyIcon name={samplePool.coin2.toLowerCase()} width={36} height={36}/>
+                        <span style={{fontSize:"26px", fontWeight: "thin", marginLeft:"10px"}} className={styles.coinName}>{samplePool.coin1}/{samplePool.coin2}</span>
                     </div>
-                    <div>
-                        <span style={{fontSize:"30px", fontWeight: "bold"}}> 
-                            $ {abbrNumber(tokenData.price)} 
-                        </span>
-                        <span  style={{fontSize:"20px", fontWeight: "thin", marginLeft: "16px"}} className={tokenData.priceChange <  0 ? styles.priceChangeDown : styles.priceChangeUp}>
-                            {(tokenData.priceChange).toFixed(2)} %
-                        </span>
+                    <div classname={styles.exchangeValueWrapper} style={{display:"flex", alignItems:"center", marginTop:"20px"}}>
+                        <div className={styles.exchangeValueCard} style={{display:"flex", alignItems:"center"}}>
+                            <AcyIcon name={samplePool.coin1.toLowerCase()} width={30} height={30}/>
+                            <strong>
+                                1 {samplePool.coin1} = {abbrNumber(0.00001)} {samplePool.coin2}
+                            </strong>
+                        </div>
+                        <div className={styles.exchangeValueCard} style={{display:"flex", alignItems:"center"}}>
+                            <AcyIcon name={samplePool.coin2.toLowerCase()} width={30} height={30}/>
+                            <strong>
+                                1 {samplePool.coin2} = {abbrNumber(274047502)} {samplePool.coin1}
+                            </strong>
+                        </div>
                     </div>
                 </div>
                 <div className={styles.contentCta}>
@@ -121,17 +127,33 @@ function MarketTokenInfo(props){
             <div style={{display:"flex", flexWrap:"wrap", "justifyContent": "space-between"}}>
                 <div className={styles.contentStats}>
                     <div className={styles.statEntry}>
+                        <div className={styles.statEntryTokenLock}>
+                            <strong>Total tokens locked</strong>
+                            <div className={styles.tokenLockEntry}>
+                                <div className={styles.tokenLockName}>
+                                    {/* change data later */}
+                                    <AcyIcon name={"eth"} width={20} height={20}/>
+                                    <div> ETH</div>
+                                </div>
+                                <div>{abbrNumber(234560)}</div>
+                            </div>
+                            <div className={styles.tokenLockEntry}>
+                                <div className={styles.tokenLockName}>
+                                    {/* change data later */}
+                                    <AcyIcon name={"eth"} width={20} height={20}/>
+                                    <div> ETH</div>
+                                </div>
+                                <div>{abbrNumber(234560)}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={styles.statEntry}>
                         <div className={styles.statEntryName}>TVL</div>
                         <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.tvl)}</div>
                         <div className={styles.statEntryChange}>5.12%</div>
                     </div>
                     <div className={styles.statEntry}>
                         <div className={styles.statEntryName}>24h Trading Vol</div>
-                        <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.volume24h)}</div>
-                        <div className={styles.statEntryChange}>5.12%</div>
-                    </div>
-                    <div className={styles.statEntry}>
-                        <div className={styles.statEntryName}>7d Trading Vol</div>
                         <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.volume24h)}</div>
                         <div className={styles.statEntryChange}>5.12%</div>
                     </div>
@@ -179,7 +201,7 @@ function MarketTokenInfo(props){
                                 onClick={() => switchChart(2)}
                                 id="2"
                             >
-                                Price
+                                Liquidity
                             </AcySmallButton>
                         </div>
                     </div>
@@ -202,9 +224,6 @@ function MarketTokenInfo(props){
                         </div>
                 </div>
             </div>
-        
-            <h2>Pools</h2>
-            <Table dataSource={dataSourcePool} columns={columnsPool} footer={() => (<></>)}/>
 
             <h2>Transactions</h2>
             <Table dataSource={filterTransaction(dataSourceTransaction, transactionView)} columns={transactionHeader(transactionView, onClickTransaction)} footer={() => (<></>)}/>
@@ -212,4 +231,4 @@ function MarketTokenInfo(props){
     )
 }
 
-export default MarketTokenInfo;
+export default PoolInfo;

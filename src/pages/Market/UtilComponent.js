@@ -63,7 +63,9 @@ export class SmallTable extends React.Component {
         <div>
           <AcyIcon name={entry.coin1.toLowerCase()} width={20} height={20}/>
           <AcyIcon name={entry.coin2.toLowerCase()} width={20} height={20}/>
-          <span className={styles.coinName}>{entry.coin1}/{entry.coin2}</span>
+          <Link className={styles.coinName} to='/market/info/pool' >
+            <span className={styles.coinName}>{entry.coin1}/{entry.coin2}</span>
+          </Link>
         </div>
       )  
     }
