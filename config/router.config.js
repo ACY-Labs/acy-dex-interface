@@ -18,9 +18,15 @@ export default [
     routes: [
       { path: '/', redirect: '/exange' },
       {
-        name: 'Market',
         path: '/market',
+        name: 'Market',
         component: './Market/Index',
+        routes: [
+          {
+            path: '/market/info/token',
+            component: './Market/TokenInfo',
+          }
+        ] 
       },
       {
         path: '/exange',
@@ -296,4 +302,5 @@ export default [
       // },
     ],
   },
+  
 ];
