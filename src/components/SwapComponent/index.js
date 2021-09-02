@@ -399,7 +399,7 @@ const MyComponent = props => {
 
       <AcyModal onCancel={onCancel} width={600} height={400} visible={visible}>
         <div className={styles.title}>
-          <AcyIcon name="back" /> Select a token
+         Select a token
         </div>
         <div className={styles.search}>
           <AcyInput
@@ -460,8 +460,7 @@ const MyComponent = props => {
               ))}
             </AcyTabPane>
             <AcyTabPane tab="Favorite" key="2" />
-            <AcyTabPane tab="Index" key="3" />
-            <AcyTabPane tab="Synth" key="4" />
+          
           </AcyTabs>
         </div>
       </AcyModal>

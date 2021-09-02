@@ -339,7 +339,7 @@ const MyComponent = props =>{
         }}
       />
       <div style={{ margin: '12px auto', textAlign: 'center' }}>
-        <AcyIcon width={21.5} name="double-down" />
+        <AcyIcon width={21.5} name="plus_light" />
       </div>
 
       <AcyCuarrencyCard
@@ -442,16 +442,14 @@ const MyComponent = props =>{
               setToken0Amount,
               setToken1Amount
             );
-
           }
-
         }}
       >
         {buttonContent}
       </AcyButton>
       <AcyDescriptions>
         {
-          liquidityStatus &&   <AcyDescriptions.Item>
+          liquidityStatus &&  <AcyDescriptions.Item>
             liquidityStatus
           </AcyDescriptions.Item>
         }
@@ -466,7 +464,7 @@ const MyComponent = props =>{
 
       <AcyModal onCancel={onCancel} width={600} height={400} visible={visible}>
         <div className={styles.title}>
-          <AcyIcon name="back" /> Select a token
+           Select a token
         </div>
         <div className={styles.search}>
           <AcyInput
@@ -526,8 +524,8 @@ const MyComponent = props =>{
               ))}
             </AcyTabPane>
             <AcyTabPane tab="Favorite" key="2" />
-            <AcyTabPane tab="Index" key="3" />
-            <AcyTabPane tab="Synth" key="4" />
+            {/* <AcyTabPane tab="Index" key="3" />
+            <AcyTabPane tab="Synth" key="4" /> */}
           </AcyTabs>
         </div>
       </AcyModal>
