@@ -3,6 +3,7 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { Table,  Row, Col,Input, Divider} from 'antd';
 import styles from './styles.less';
 import moment from 'moment'
+import {Link} from 'react-router-dom'
 import {
     AcyCard,
     AcyIcon,
@@ -78,7 +79,7 @@ export const columnsCoin = [
             return (
                 <div className={styles.firstColumn}>
                     <AcyIcon name={entry.short.toLowerCase()} width={20} height={20}/>
-                    <span className={styles.coinName}>{entry.name}</span>
+                    <Link className={styles.coinName} to='/market/info/token' >{entry.name}</Link>
                     <span className={styles.coinShort}> / {entry.short}</span>
                 </div>
             )
