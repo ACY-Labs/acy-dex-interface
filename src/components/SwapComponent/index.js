@@ -308,7 +308,7 @@ const MyComponent = props => {
           setBefore(true);
         }}
         onChangeToken={e => {
-          setToken0Amount(e.target.value);
+          setToken0Amount(e);
           setExactIn(true);
         }}
       />
@@ -329,8 +329,8 @@ const MyComponent = props => {
           setBefore(false);
         }}
         onChangeToken={e => {
-          // setToken1ApproxAmount(e.target.value);
-          setToken1Amount(e.target.value);
+          // setToken1ApproxAmount(e);
+          setToken1Amount(e);
           setExactIn(false);
         }}
       />

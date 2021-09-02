@@ -261,6 +261,7 @@ export default class GlobalHeaderRight extends PureComponent {
           onVisibleChange={this.onhandSetting}
         >
           <AcyIcon
+          width={30}
             name={visibleSetting ? 'colors-active' : 'colors'}
             onClick={() => this.onhandSetting(true)}
           />

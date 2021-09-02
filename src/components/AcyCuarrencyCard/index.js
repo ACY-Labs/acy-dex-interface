@@ -1,6 +1,7 @@
 import { Card, Icon, Input, Row, Col} from 'antd';
 import AcyIcon from '@/components/AcyIcon';
 import styles from './index.less';
+import Pattern from '@/utils/pattern';
 const AcyCuarrencyCard = ({
   title,
   icon,
@@ -12,7 +13,12 @@ const AcyCuarrencyCard = ({
   token,
   ...rest
 }) => {
-
+const onChange=e=>{
+  // const check=Pattern.coinNum.test(e.target.value);
+  // if(!check){
+    onChangeToken&&onChangeToken(e.target.value)
+  // }
+}
   return (
     <div {...rest} className={styles.acycuarrencycard}>
       
@@ -34,7 +40,7 @@ const AcyCuarrencyCard = ({
             <div className={styles.price}>
             <ul>
               <li>
-                <Input className={styles.inputBar} placeholder="0.0" bordered={false} value={token} onChange={onChangeToken} />
+                <Input className={styles.inputBar} placeholder="0.0" bordered={false} value={token} onChange={onChange} />
               </li>
               {/* <li className={styles.dollar}> ${dollar}</li> */}
             </ul>

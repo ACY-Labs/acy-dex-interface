@@ -312,8 +312,8 @@ const MyComponent = props =>{
 
       {/*      }}*/}
       {/*      onChangeToken={e => {*/}
-      {/*        setToken0ApproxAmount(e.target.value);*/}
-      {/*        setToken0Amount(e.target.value);*/}
+      {/*        setToken0ApproxAmount(e);*/}
+      {/*        setToken0Amount(e);*/}
       {/*        setExactIn(true);*/}
       {/*      }}*/}
       {/*    />*/}
@@ -335,7 +335,7 @@ const MyComponent = props =>{
         }}
         onChangeToken={e => {
           setExactIn(true);
-          setToken0Amount(e.target.value);
+          setToken0Amount(e);
         }}
       />
       <div style={{ margin: '12px auto', textAlign: 'center' }}>
@@ -355,7 +355,7 @@ const MyComponent = props =>{
         }}
         onChangeToken={e => {
           setExactIn(false);
-          setToken1Amount(e.target.value);
+          setToken1Amount(e);
         }}
 
       />
