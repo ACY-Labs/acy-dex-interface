@@ -20,8 +20,12 @@ export default [
       {
         path: '/market',
         name: 'Market',
-        component: './Market/Index',
+        hideChildrenInMenu: true,
         routes: [
+          {
+            path: '/market',
+            component: './Market/Index',
+          },
           {
             path: '/market/info/token',
             component: './Market/TokenInfo',
