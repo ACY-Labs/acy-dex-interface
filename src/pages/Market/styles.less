@@ -19,11 +19,9 @@ h2 {
 // table entries
 .priceChangeDown{
     color: red;
-    font-weight:bold;
 }
 .priceChangeUp{
     color:greenyellow;
-    font-weight:bold;
 }
 .coinName {
     font-weight: bold;
@@ -146,7 +144,77 @@ h2 {
     }
 }
 
+// info pages
+.contentCta {
+    display:flex;
+    justify-content: flex-end;
+    font-family: sans-serif;
+    width: 60%;
+    
+}
+.ctaButton {
+    margin-right:10px;
+}
+.contentStats, .contentCharts{
+    background: @cardColor;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-radius: 15px;
+    padding: 15px;
+}
+.contentStats{
+    margin-right: 5px;
+    width: 23%;
+}
+.contentCharts{
+    margin-left: 5px;
+    width: 75%;
+}
 
+// info page left stats
+.statEntry{
+    margin-bottom: 18px;
+}
+.statEntryValue{
+    font-size:26px;
+    line-height:28px;
+    font-weight: bold;
+}
+.statEntryName, .statEntryChange{
+    font-size:18px;
+    line-height: 20px;
+    color: #B5B6B6;
+}
+
+// chart section in info page
+.contentChartsHeader{
+    width: 100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap: wrap-reverse;
+    margin-bottom:5px;
+}
+.chartIndicatorValue{
+    font-size:26px;
+    line-height:28px;
+    font-weight: bold;
+}
+.chartIndicatorTime{
+    font-size:16px;
+    line-height: 18px;
+    color: #B5B6B6;
+}
+.contentChartsBody{
+    height: 100%;
+}
+.contentChartWrapper{
+    height: 86%;
+}
+.contentChartsSelector{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 
 // mobile changes
 @media screen and (max-width: 768px) {
@@ -162,6 +230,23 @@ h2 {
 
     .volColumn{
         text-align: right;
+    }
+
+    .contentCta {
+
+        width: 100%;
+        justify-content :flex-start;
+        
+    }
+
+    .contentStats{
+        margin-right: 0px;
+        width: 100%;
+    }
+    .contentCharts{
+        margin-left: 0px;
+        width: 100%;
+        height: 40vh;
     }
 
     

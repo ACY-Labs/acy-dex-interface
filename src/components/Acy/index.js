@@ -18,6 +18,8 @@ import AcyRadioButton from '@/components/AcyRadioButton';
 import AcyConfirm from '@/components/AcyConfirm';
 import AcyApprove from '@/components/AcyApprove';
 import AcyDescriptions from '@/components/AcyDescriptions';
+import AcySmallButton from '@/components/AcySmallButton';
+
 const Acy = {
   AcyTabs,
   AcyLineChart,
@@ -38,7 +40,8 @@ const Acy = {
   AcyConfirm,
   AcyApprove,
   AcyButton,
-  AcyDescriptions
+  AcyDescriptions,
+  AcySmallButton
 };
 
 export {
@@ -62,5 +65,6 @@ export {
   AcyConfirm,
   AcyApprove,
   AcyButton,
-  AcyDescriptions
+  AcyDescriptions,
+  AcySmallButton
 };
