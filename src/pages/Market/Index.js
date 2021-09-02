@@ -4,6 +4,7 @@ import { Table,  Row, Col,Input, Divider} from 'antd';
 import styles from './styles.less';
 import moment from 'moment';
 import { useDetectClickOutside } from 'react-detect-click-outside';
+import {Link} from 'react-router-dom'
 import {
     AcyCard,
     AcyIcon,
@@ -103,10 +104,25 @@ export class BasicProfile extends Component {
                         <Col span={8} >TVL  <strong>$2.90b</strong>  <span className={styles.priceChangeDown}>-0.36%</span></Col>
                     </Row>
 
-                    <h2>Top Coins</h2>
+                    <div style={{display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
+                      <h2>Top Pools</h2>
+                      <h3>
+                        <Link to='/market/list/token' >
+                          Explore
+                        </Link>
+                      </h3>
+                    </div>
                     <Table dataSource={dataSourceCoin} columns={columnsCoin} footer={() => (<></>)}/>
 
-                    <h2>Top Pools</h2>
+                    <div style={{display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
+                      <h2>Top Pools</h2>
+                      <h3>
+                        <Link to='/market/list/pool' >
+                          Explore
+                        </Link>
+                      </h3>
+                    </div>
+
                     <Table dataSource={dataSourcePool} columns={columnsPool} footer={() => (<></>)}/>
 
                     <h2>Transactions</h2>

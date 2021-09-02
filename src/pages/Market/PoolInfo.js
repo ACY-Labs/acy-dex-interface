@@ -48,7 +48,7 @@ const {AcyTabPane } = AcyTabs;
 let samplePool = dataSourcePool[0]
 
 
-function PoolInfo(props){
+function MarketPoolInfo(props){
     const [tokenData, setTokenData] = useState(samplePool)
     const [transactionView, setTransactionView ] = useState(TransactionType.ALL) 
     const [graphTabIndex, setGraphTabIndex] = useState(0)
@@ -231,4 +231,4 @@ function PoolInfo(props){
     )
 }
 
-export default PoolInfo;
+export default MarketPoolInfo;

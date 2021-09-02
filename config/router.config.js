@@ -27,6 +27,14 @@ export default [
             component: './Market/Index',
           },
           {
+            path: '/market/list/token',
+            component: './Market/TokenList',
+          },
+          {
+            path: '/market/list/pool',
+            component: './Market/PoolList',
+          },
+          {
             path: '/market/info/token',
             component: './Market/TokenInfo',
           },
