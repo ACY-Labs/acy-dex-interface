@@ -120,25 +120,23 @@ function MarketTokenInfo(props){
             </div>
             <div style={{display:"flex", flexWrap:"wrap", "justifyContent": "space-between"}}>
                 <div className={styles.contentStats}>
-                    <div className={styles.statEntry}>
+                <div className={styles.statEntry}>
                         <div className={styles.statEntryName}>TVL</div>
                         <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.tvl)}</div>
-                        <div className={styles.statEntryChange}>5.12%</div>
+                        <div className={styles.statEntryChange} style={{color:"greenyellow"}}>5.12%</div>
                     </div>
                     <div className={styles.statEntry}>
                         <div className={styles.statEntryName}>24h Trading Vol</div>
                         <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.volume24h)}</div>
-                        <div className={styles.statEntryChange}>5.12%</div>
+                        <div className={styles.statEntryChange} style={{color:"red"}}> - 5.12%</div>
                     </div>
                     <div className={styles.statEntry}>
                         <div className={styles.statEntryName}>7d Trading Vol</div>
                         <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.volume24h)}</div>
-                        <div className={styles.statEntryChange}>5.12%</div>
                     </div>
                     <div className={styles.statEntry}>
                         <div className={styles.statEntryName}>24h Fees</div>
                         <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.volume24h)}</div>
-                        <div className={styles.statEntryChange}>5.12%</div>
                     </div>
                 </div>
                 <div className={styles.contentCharts}>
@@ -192,11 +190,11 @@ function MarketTokenInfo(props){
                             }
                             {graphTabIndex == 1 && 
                                 <div className={styles.contentChartWrapper}>
-                                    <AcyLineChart backData={graphSampleData}/>
+                                    <AcyLineChart backData={graphSampleData} showGradient={true} lineColor='#e29227' bgColor='#29292c'/>
                                 </div>}
                             {graphTabIndex == 2 && 
                                 <div className={styles.contentChartWrapper}>
-                                    <AcyBarChart backData={graphSampleData}/>
+                                    <AcyLineChart backData={graphSampleData} showGradient={true} lineColor='#e29227' bgColor='#29292c'/>
                                 </div>
                             }
                         </div>
