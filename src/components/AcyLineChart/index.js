@@ -128,7 +128,7 @@ class AcyLineChart extends Component {
       grid: { 
         left: '2%',
         right: '2%',
-        bottom: '3%',
+        // bottom: '3%',
         top:'top'
       },
       tooltip: {
@@ -146,10 +146,12 @@ class AcyLineChart extends Component {
         },
       },
       xAxis: {
-        show: false,
+        show: true,
         splitNumber: 5,
         boundaryGap: false,
-        data: dateList,
+        data: dateList.map(function(item){
+          return item.slice(item.length - 2, item.length)
+        }),
         axisTick: { show: false }, // 刻度
         axisLine: { show: false }, // 轴线
         splitLine: {
