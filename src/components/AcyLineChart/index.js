@@ -123,7 +123,8 @@ class AcyLineChart extends Component {
       barWidth: 10,
       data: currentData.map(b => b.linkAmount) || [],
     };
-    return {
+
+    let options = {
       grid: { 
         left: '2%',
         right: '2%',
@@ -193,18 +194,27 @@ class AcyLineChart extends Component {
           itemStyle: {
             normal: {
               lineStyle: {
-                color: '#c6224e',
+                color: this.props.lineColor || '#c6224e',
                 width: 3,
               },
-              //   color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              //     { offset: 0, color: color[index] },
-              //     { offset: 1, color: '#fff' },
-              //   ]),
+              
+              
             },
-          },
+          }
         },
       ],
     };
+
+    if (this.props.showGradient == true) {
+      options.series[0].areaStyle = {
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          { offset: 0, color: this.props.lineColor || '#c6224e' },
+          { offset: 1, color: this.props.bgColor || '#29292c' },
+        ]),
+      }
+    }
+
+    return options
   };
   onChartClick = (param, echarts) => {
     alert(1);
