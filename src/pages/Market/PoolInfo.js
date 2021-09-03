@@ -28,7 +28,8 @@ import {
   abbrNumber,
   columnsCoin, 
   columnsPool,
-  transactionHeader
+  transactionHeader,
+  sortTable
 } from './Util.js';
 
 import {
@@ -52,6 +53,7 @@ function MarketPoolInfo(props){
     const [tokenData, setTokenData] = useState(samplePool)
     const [transactionView, setTransactionView ] = useState(TransactionType.ALL) 
     const [graphTabIndex, setGraphTabIndex] = useState(0)
+    const [transactionDisplayNumber, setTransactionDisplayNumber] = useState(10)
 
     const filterTransaction = (table, category) => {
         if (category == TransactionType.ALL)
@@ -226,7 +228,19 @@ function MarketPoolInfo(props){
             </div>
 
             <h2>Transactions</h2>
-            <Table dataSource={filterTransaction(dataSourceTransaction, transactionView)} columns={transactionHeader(transactionView, onClickTransaction)} footer={() => (<></>)}/>
+            <Table 
+                dataSource={sortTable(filterTransaction(dataSourceTransaction, transactionView), "time", true).slice(0, transactionDisplayNumber + 1)} 
+                columns={transactionHeader(transactionView, onClickTransaction)} 
+                pagination={false}
+                style={{
+                marginBottom: "20px"
+                }}
+                footer={() => (
+                <div className={styles.tableSeeMoreWrapper}>
+                    <a className={styles.tableSeeMore} onClick={() => {setTransactionDisplayNumber(transactionDisplayNumber +  5)}}>See More...</a>
+                </div>
+                )} 
+            />
         </div>
     )
 }

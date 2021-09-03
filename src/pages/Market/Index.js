@@ -27,7 +27,8 @@ import {
   abbrNumber,
   columnsCoin, 
   columnsPool,
-  transactionHeader
+  transactionHeader,
+  sortTable
 } from './Util.js';
 
 import {
@@ -48,7 +49,10 @@ export class BasicProfile extends Component {
     state = {
         visible: true,
         tabIndex: 0,
-        transactionView: TransactionType.ALL
+        transactionView: TransactionType.ALL,
+        tokenDisplayNumber: 10,
+        poolDisplayNumber: 10,
+        transactionDisplayNumber: 10
     }
 
     componentDidMount() {};
@@ -61,6 +65,27 @@ export class BasicProfile extends Component {
         transactionView : e.target.id
       })
     };
+
+    expandTokenTable =  () => {
+      let tokenDisplayNumber = this.state.tokenDisplayNumber + 5
+      this.setState({
+        tokenDisplayNumber: tokenDisplayNumber
+      })
+    }
+
+    expandTransactionTable =  () => {
+      let transactionDisplayNumber = this.state.transactionDisplayNumber + 5
+      this.setState({
+        transactionDisplayNumber: transactionDisplayNumber
+      })
+    }
+
+    expandPoolTable =  () => {
+      let poolDisplayNumber = this.state.poolDisplayNumber + 5
+      this.setState({
+        poolDisplayNumber: poolDisplayNumber
+      })
+    }
 
     filterTransaction(table, category){
       if (category == TransactionType.ALL)
@@ -105,14 +130,26 @@ export class BasicProfile extends Component {
                     </Row>
 
                     <div style={{display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
-                      <h2>Top Pools</h2>
+                      <h2>Top Tokens</h2>
                       <h3>
                         <Link to='/market/list/token' >
                           Explore
                         </Link>
                       </h3>
                     </div>
-                    <Table dataSource={dataSourceCoin} columns={columnsCoin} footer={() => (<></>)}/>
+                    <Table 
+                      dataSource={sortTable(dataSourceCoin, "tvl", true).slice(0, this.state.tokenDisplayNumber + 1)} 
+                      columns={columnsCoin} 
+                      pagination={false}
+                      style={{
+                        marginBottom: "20px"
+                      }}
+                      footer={() => (
+                        <div className={styles.tableSeeMoreWrapper}>
+                          <a className={styles.tableSeeMore} onClick={this.expandTokenTable}>See More...</a>
+                        </div>
+                      )} 
+                    />
 
                     <div style={{display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
                       <h2>Top Pools</h2>
@@ -123,10 +160,35 @@ export class BasicProfile extends Component {
                       </h3>
                     </div>
 
-                    <Table dataSource={dataSourcePool} columns={columnsPool} footer={() => (<></>)}/>
-
+                    <Table 
+                      dataSource={sortTable(dataSourcePool, "tvl", true).slice(0, this.state.poolDisplayNumber + 1)} 
+                      columns={columnsPool} 
+                      pagination={false}
+                      style={{
+                        marginBottom: "20px"
+                      }}
+                      footer={() => (
+                        <div className={styles.tableSeeMoreWrapper}>
+                          <a className={styles.tableSeeMore} onClick={this.expandPoolTable}>See More...</a>
+                        </div>
+                      )} 
+                    />
+                  
                     <h2>Transactions</h2>
-                    <Table dataSource={this.filterTransaction(dataSourceTransaction, transactionView)} columns={transactionHeader(transactionView, this.onClickTransaction)} footer={() => (<></>)}/>
+                    <Table 
+                      dataSource={sortTable(this.filterTransaction(dataSourceTransaction, transactionView), "time", true).slice(0, this.state.transactionDisplayNumber + 1)} 
+                      columns={transactionHeader(transactionView, this.onClickTransaction)} 
+                      pagination={false}
+                      style={{
+                        marginBottom: "20px"
+                      }}
+                      footer={() => (
+                        <div className={styles.tableSeeMoreWrapper}>
+                          <a className={styles.tableSeeMore} onClick={this.expandTransactionTable}>See More...</a>
+                        </div>
+                      )} 
+                    />
+                
                 </div>
             </PageHeaderWrapper>
         )

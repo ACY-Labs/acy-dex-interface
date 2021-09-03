@@ -28,7 +28,8 @@ import {
   abbrNumber,
   columnsCoin, 
   columnsPool,
-  transactionHeader
+  transactionHeader,
+  sortTable
 } from './Util.js';
 
 import {
@@ -48,11 +49,25 @@ const {AcyTabPane } = AcyTabs;
 let sampleToken = dataSourceCoin[0]
 
 function MarketPoolList(props){
+    const [poolDisplayNumber, setPoolDisplayNumber] = useState(10)
+
     return (
         <div className={styles.marketRoot}>
             <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
-            <h2>All pools</h2>
-            <Table dataSource={dataSourcePool} columns={columnsPool} footer={() => (<></>)}/>
+            <h2>All Pools</h2>
+            <Table 
+                dataSource={sortTable(dataSourcePool, "tvl", true).slice(0, poolDisplayNumber + 1)} 
+                columns={columnsPool} 
+                pagination={false}
+                style={{
+                marginBottom: "20px"
+                }}
+                footer={() => (
+                <div className={styles.tableSeeMoreWrapper}>
+                    <a className={styles.tableSeeMore} onClick={() => {setPoolDisplayNumber(poolDisplayNumber +  5)}}>See More...</a>
+                </div>
+                )} 
+            />
         </div>
     )
 }

@@ -28,7 +28,8 @@ import {
   abbrNumber,
   columnsCoin, 
   columnsPool,
-  transactionHeader
+  transactionHeader,
+  sortTable
 } from './Util.js';
 
 import {
@@ -49,13 +50,27 @@ let sampleToken = dataSourceCoin[0]
 
 
 function MarketTokenList(props){
-    return (
-        <div className={styles.marketRoot}>
-            <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
-            <h2>All tokens</h2>
-            <Table dataSource={dataSourceCoin} columns={columnsCoin} footer={() => (<></>)}/>
-        </div>
-    )
+  const [tokenDisplayNumber, setTokenDisplayNumber] = useState(10)
+
+  return (
+      <div className={styles.marketRoot}>
+          <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
+          <h2>All Tokens</h2>
+          <Table 
+              dataSource={sortTable(dataSourceCoin, "tvl", true).slice(0, tokenDisplayNumber + 1)} 
+              columns={columnsCoin} 
+              pagination={false}
+              style={{
+              marginBottom: "20px"
+              }}
+              footer={() => (
+              <div className={styles.tableSeeMoreWrapper}>
+                  <a className={styles.tableSeeMore} onClick={() => {setTokenDisplayNumber(tokenDisplayNumber +  5)}}>See More...</a>
+              </div>
+              )} 
+          />
+      </div>
+  )
 }
 
 export default MarketTokenList;

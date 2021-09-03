@@ -79,8 +79,8 @@ export const columnsCoin = [
             return (
                 <div className={styles.firstColumn}>
                     <AcyIcon name={entry.short.toLowerCase()} width={20} height={20}/>
-                    <Link className={styles.coinName} to='/market/info/token' >{entry.name}</Link>
-                    <span className={styles.coinShort}> / {entry.short}</span>
+                    <Link className={styles.coinName} to='/market/info/token' >{entry.short}</Link>
+                    <span className={styles.coinShort}> ({entry.name})</span>
                 </div>
             )
         }
@@ -319,4 +319,17 @@ export function transactionHeader(selectedTransaction, onClickHandler){
     },
   
   ]
+}
+
+// sort the table
+// Reverse means high to low
+export function sortTable(table, key, isReverse){
+    return table.sort((a, b) => {
+        if (isReverse){
+            return b[key] - a[key]
+        }
+        else{
+            return a[key] - b[key]
+        }
+    })
 }
