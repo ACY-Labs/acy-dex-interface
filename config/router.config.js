@@ -41,8 +41,8 @@ export default [
           {
             path: '/market/info/pool',
             component: './Market/PoolInfo',
-          }
-        ] 
+          },
+        ],
       },
       {
         path: '/exange',
@@ -318,5 +318,4 @@ export default [
       // },
     ],
   },
-  
 ];
