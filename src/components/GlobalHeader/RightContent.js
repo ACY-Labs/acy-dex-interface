@@ -11,6 +11,7 @@ import {
   AcyCardList,
   AcyWarp,
   AcyRadioButton,
+  AcySeting
 } from '@/components/Acy';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
@@ -173,45 +174,49 @@ const GlobalHeaderRight =(props)=> {
           overlay={
             <div className={styles.setting} onClick={e => e.preventDefault()}>
               <ul className={styles.list}>
-                <li>
+                {/* <li>
                   <div className={styles.listitem}>
                     <span>Gas Price</span>
                     <span>
-                      18.0 GWEI <AcyIcon width={16} name="nabla" />{' '}
+                      18.0 GWEI <AcyIcon width={16} name="nabla" />
                     </span>
-                  </div>
+                  </div> */}
                   {/* <div>
                 <AcyRadioButton data={["22.0 gwei ～ 15s～ Rapid ","18.5 gwei ～ 45s～ Fast ","14.5 gwei ～ 2min～ Medium "]}/>
               </div> */}
-                </li>
+                {/* </li>
                 <li>
                   <div className={styles.listitem}>
                     <span>Endpoint</span>
                     <span>
-                      Global 159.2ms <AcyIcon width={16} name="nabla" />{' '}
+                      Global 159.2ms <AcyIcon width={16} name="nabla" />
                     </span>
-                  </div>
+                  </div> */}
                   {/* <div>
                 <AcyRadioButton data={["Global 210.7ms","APAC 210.5ms","N. America 879.6ms","Europe 880.2ms"]}/>
               </div> */}
-                </li>
+                {/* </li> */}
                 <li>
-                  <div className={styles.listitem}>
+                  <AcySeting title="Language" current="English">
+                   <AcyRadioButton data={['English', '中文']} />
+
+                  </AcySeting>
+                  {/* <div className={styles.listitem}>
                     <span>Language</span>
                     <span>
-                      English <AcyIcon width={16} name="nabla" />{' '}
+                      English <AcyIcon width={16} name="nabla" />
                     </span>
                   </div>
                   <div>
                     <AcyRadioButton data={['English', '中文']} />
-                  </div>
+                  </div> */}
                 </li>
                 <li>
                   {/* <div className={styles.listitem}>
                     <span>Network</span>
                     <span>
                       Ethereum
-                      <AcyIcon width={16} name="nabla" />{' '}
+                      <AcyIcon width={16} name="nabla" />
                     </span>
                   </div> */}
                   {/* <div>
