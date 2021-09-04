@@ -139,6 +139,14 @@ const MyComponent = props => {
   useEffect(() => {
     // activate(injected);
   }, []);
+
+
+  // setSwapButtonContent
+  // 监听钱包的连接
+  useEffect(() => {
+    // activate(injected);
+  }, []);
+
   // 通知钱包连接成功
   useEffect(() => {
     // todo....
@@ -150,6 +158,12 @@ const MyComponent = props => {
           account,
         },
       });
+      if (swapFunction == 0) {
+        activate(injected);
+        setSwapFunction(1);
+        setSwapButtonContent('choose tokens and amount');
+        setSwapButtonState(false);
+      }
     }
   }, account);
 
@@ -470,5 +484,6 @@ const MyComponent = props => {
 
 export default connect(({ global, loading }) => ({
   global,
+  account:global.account,
   loading: loading.global,
 }))(MyComponent);

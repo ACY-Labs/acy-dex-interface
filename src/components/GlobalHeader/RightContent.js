@@ -1,4 +1,4 @@
-import React, { PureComponent,useState } from 'react';
+import React, { PureComponent,useState,useEffect  } from 'react';
 import { FormattedMessage, formatMessage } from 'umi';
 import { Spin, Tag, Menu, Icon, Avatar, Tooltip, Checkbox, Dropdown } from 'antd';
 import moment from 'moment';
@@ -23,6 +23,7 @@ import styles from './index.less';
 import { T } from 'antd/lib/upload/utils';
 
 const GlobalHeaderRight =(props)=> {
+  const{global}=props;
   // 选择货币的弹窗
   const [visible, setVisible] = useState(false);
   const [visibleMetaMask, setVisibleMetaMask] = useState(false);
@@ -122,6 +123,20 @@ const GlobalHeaderRight =(props)=> {
   const selectWallet = () => {
     activate(injected);
   };
+    // 通知钱包连接成功
+    useEffect(() => {
+      // todo....
+      if (account) {
+        const { dispatch } = props;
+        dispatch({
+          type: 'global/updateAccount',
+          payload: {
+            account,
+          },
+        });
+        setVisibleMetaMask(false);
+      }
+    }, account);
     const {
       currentUser,
       fetchingMoreNotices,
