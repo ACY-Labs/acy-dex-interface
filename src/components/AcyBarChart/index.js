@@ -123,6 +123,9 @@ class AcyBarChart extends Component {
       barWidth: 5,
       data: currentData.map(b => b.linkAmount) || [],
     };
+
+    const barColor = this.props.barColor
+
     return {
       grid: { 
         left: '2%',
@@ -194,7 +197,7 @@ class AcyBarChart extends Component {
           // symbolSize: 2,   //设定实心点的大小
           itemStyle: {
             normal: {
-              color: '#1c9965' || this.props.barColor
+              color: barColor ||'#1c9965'
               //   color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
               //     { offset: 0, color: color[index] },
               //     { offset: 1, color: '#fff' },

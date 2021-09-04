@@ -188,16 +188,16 @@ function MarketTokenInfo(props){
                             {
                                 graphTabIndex == 0 && 
                                 <div className={styles.contentChartWrapper}>
-                                    <AcyBarChart backData={graphSampleData}/>
+                                    <AcyBarChart backData={graphSampleData} barColor='#1e5d91'/>
                                 </div>
                             }
                             {graphTabIndex == 1 && 
                                 <div className={styles.contentChartWrapper}>
-                                    <AcyLineChart backData={graphSampleData} showGradient={true} lineColor='#e29227' bgColor='#29292c'/>
+                                    <AcyLineChart showXAxis={true} backData={graphSampleData} showGradient={true} lineColor='#1e5d91' bgColor='#29292c'/>
                                 </div>}
                             {graphTabIndex == 2 && 
                                 <div className={styles.contentChartWrapper}>
-                                    <AcyLineChart backData={graphSampleData} showGradient={true} lineColor='#e29227' bgColor='#29292c'/>
+                                    <AcyLineChart showXAxis={true} backData={graphSampleData} showGradient={true} lineColor='#1e5d91' bgColor='#29292c'/>
                                 </div>
                             }
                         </div>

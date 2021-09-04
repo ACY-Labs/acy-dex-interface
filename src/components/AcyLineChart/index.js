@@ -124,6 +124,8 @@ class AcyLineChart extends Component {
       data: currentData.map(b => b.linkAmount) || [],
     };
 
+    let showXAxis = this.props.showXAxis
+
     let options = {
       grid: { 
         left: '2%',
@@ -146,7 +148,7 @@ class AcyLineChart extends Component {
         },
       },
       xAxis: {
-        show: true,
+        show: showXAxis,
         splitNumber: 5,
         boundaryGap: false,
         data: dateList.map(function(item){
