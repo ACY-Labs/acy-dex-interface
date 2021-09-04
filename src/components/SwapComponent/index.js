@@ -151,13 +151,6 @@ const MyComponent = props => {
   useEffect(() => {
     // todo....
     if (account) {
-      const { dispatch } = props;
-      dispatch({
-        type: 'global/updateAccount',
-        payload: {
-          account,
-        },
-      });
       if (swapFunction == 0) {
         activate(injected);
         setSwapFunction(1);

@@ -127,13 +127,6 @@ const GlobalHeaderRight =(props)=> {
     useEffect(() => {
       // todo....
       if (account) {
-        const { dispatch } = props;
-        dispatch({
-          type: 'global/updateAccount',
-          payload: {
-            account,
-          },
-        });
         setVisibleMetaMask(false);
       }
     }, account);
