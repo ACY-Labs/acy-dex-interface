@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { Link } from 'umi';
 import RightContent from '../GlobalHeader/RightContent';
 import BaseMenu from '../SiderMenu/BaseMenu';
-import {AcyIcon} from '@/components/Acy';
+import { AcyIcon } from '@/components/Acy';
 import { getFlatMenuKeys } from '../SiderMenu/SiderMenuUtils';
 import styles from './index.less';
 
@@ -21,6 +21,7 @@ export default class TopNavHeader extends PureComponent {
     const { theme, contentWidth, menuData, logo } = this.props;
     const { maxWidth } = this.state;
     const flatMenuKeys = getFlatMenuKeys(menuData);
+
     return (
       <div className={`${styles.head} ${theme === 'light' ? styles.light : ''}`}>
         <div

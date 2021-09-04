@@ -54,6 +54,11 @@ export default [
         name: 'Liquidity',
         component: './Liquidity/Index',
       },
+      {
+        path: '/dao',
+        name: 'Dao',
+        component: './Dao/Index',
+      },
 
       // {
       //   path: '/swap',

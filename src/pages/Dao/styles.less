@@ -1,0 +1,60 @@
+@cardColor: #2f313583;
+@ACYOrange: #eb5c20;
+// Chart on main page
+.stakeSectionMain {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.toggleChart {
+  display: flex;
+  justify-content: end;
+
+  div {
+    background-color: @cardColor;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+  }
+
+  div:hover {
+    color: @ACYOrange;
+  }
+}
+
+.chartSection {
+  width: 49%;
+  height: 40vh;
+  max-height: 700px;
+  background-color: @cardColor;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  padding: 15px;
+  overflow: hidden;
+  .graphStats {
+    padding: 0;
+    margin-bottom: 5px;
+  }
+  .statName {
+    font-size: 13pt;
+    line-height: 14pt;
+    color: #b5b6b6;
+  }
+  .statValue {
+    font-size: 24pt;
+    line-height: 25pt;
+    font-weight: bold;
+  }
+  .chartWrapper {
+    height: 100%;
+  }
+}
+
+.stakeSection {
+  width: 49%;
+  height: 40vh;
+  max-height: 700px;
+  background-color: @cardColor;
+}
