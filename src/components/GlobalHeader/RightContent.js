@@ -122,6 +122,7 @@ const GlobalHeaderRight =(props)=> {
   // 选择钱包
   const selectWallet = () => {
     activate(injected);
+    setVisibleMetaMask(false);
   };
     // 通知钱包连接成功
     useEffect(() => {
