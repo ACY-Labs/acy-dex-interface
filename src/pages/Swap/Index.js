@@ -222,7 +222,7 @@ class BasicProfile extends Component {
                     height: '576px'
                   }}
                 >
-                  <AcyLineChart backData={[]} />
+                  <AcyLineChart backData={[]} showGradient={false} showXAxis={false} lineColor='#e29227'/>
                   <AcyPeriodTime
         onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
         className={styles.pt}

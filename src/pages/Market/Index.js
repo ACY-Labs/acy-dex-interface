@@ -108,7 +108,7 @@ export class BasicProfile extends Component {
                                   <div className={styles.statValue}>$2.19b</div>
                               </div>
                               <div className={styles.chartWrapper}>
-                                  <AcyLineChart backData={graphSampleData} showGradient={true} lineColor='#e29227' bgColor='#29292c'/>
+                                  <AcyLineChart  backData={graphSampleData} showXAxis={true} showGradient={true} lineColor='#e29227' bgColor='#29292c'/>
                               </div>
                               
                         </div>
