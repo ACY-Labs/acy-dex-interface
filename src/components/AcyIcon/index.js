@@ -1,4 +1,6 @@
 import styles from './index.less';
+import {Icon} from 'antd';
+import iconjs from './iconfont.js';
 import classnames from 'classnames';
 const AcyIcon = props => {
   return (
@@ -11,4 +13,14 @@ const AcyIcon = props => {
     </span>
   );
 };
+// 自定义图标
+const MyIcon =Icon.createFromIconfontCN({
+  scriptUrl: iconjs, // 在 iconfont.cn 上生成
+});
+// 包裹样式
+const IconCustom=(props)=>{
+  const { width,...rest }=props;
+  return <span style={{margin:'5px'}}>{width&& <MyIcon style={{fontSize:`${width}px`}} {...rest} />||<MyIcon {...rest} />}</span>
+}
+AcyIcon.MyIcon=IconCustom;
 export default AcyIcon;

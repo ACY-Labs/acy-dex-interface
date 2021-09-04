@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent,useState } from 'react';
 import { FormattedMessage, formatMessage } from 'umi';
 import { Spin, Tag, Menu, Icon, Avatar, Tooltip, Checkbox, Dropdown } from 'antd';
 import moment from 'moment';
@@ -12,6 +12,8 @@ import {
   AcyWarp,
   AcyRadioButton,
 } from '@/components/Acy';
+import { useWeb3React } from '@web3-react/core';
+import { InjectedConnector } from '@web3-react/injected-connector';
 import NoticeIcon from '../NoticeIcon';
 import HeaderSearch from '../HeaderSearch';
 import HeaderDropdown from '../HeaderDropdown';
@@ -19,14 +21,19 @@ import SelectLang from '../SelectLang';
 import styles from './index.less';
 import { T } from 'antd/lib/upload/utils';
 
-export default class GlobalHeaderRight extends PureComponent {
-  state = {
-    visible: false,
-    visibleMetaMask: false,
-    visibleSetting: false,
-  };
-  getNoticeData() {
-    const { notices = [] } = this.props;
+const GlobalHeaderRight =(props)=> {
+  // 选择货币的弹窗
+  const [visible, setVisible] = useState(false);
+  const [visibleMetaMask, setVisibleMetaMask] = useState(false);
+  const [visibleSetting, setVisibleSetting] = useState(false);
+  // 连接钱包函数
+  const { account, chainId, library, activate } = useWeb3React();
+    // 连接钱包时支持的货币id
+    const injected = new InjectedConnector({
+      supportedChainIds: [1, 3, 4, 5, 42],
+    });
+  const getNoticeData=()=> {
+    const { notices = [] } = props;
     if (notices.length === 0) {
       return {};
     }
@@ -56,7 +63,7 @@ export default class GlobalHeaderRight extends PureComponent {
     return groupBy(newNotices, 'type');
   }
 
-  getUnreadData = noticeData => {
+  const  getUnreadData = noticeData => {
     const unreadMsg = {};
     Object.entries(noticeData).forEach(([key, value]) => {
       if (!unreadMsg[key]) {
@@ -69,18 +76,18 @@ export default class GlobalHeaderRight extends PureComponent {
     return unreadMsg;
   };
 
-  changeReadState = clickedItem => {
+  const changeReadState = clickedItem => {
     const { id } = clickedItem;
-    const { dispatch } = this.props;
+    const { dispatch } = props;
     dispatch({
       type: 'global/changeNoticeReadState',
       payload: id,
     });
   };
 
-  fetchMoreNotices = tabProps => {
+  const  fetchMoreNotices = tabProps => {
     const { list, name } = tabProps;
-    const { dispatch, notices = [] } = this.props;
+    const { dispatch, notices = [] } = props;
     const lastItemId = notices[notices.length - 1].id;
     dispatch({
       type: 'global/fetchMoreNotices',
@@ -91,38 +98,29 @@ export default class GlobalHeaderRight extends PureComponent {
       },
     });
   };
-  onhandConnect = () => {
-    this.setState({
-      visible: true,
-    });
+  const onhandConnect = () => {
+
+    setVisible(true);
   };
-  onhandCancel = () => {
-    this.setState({
-      visible: false,
-    });
+  const  onhandCancel = () => {
+
+    setVisibleMetaMask(false);
   };
-  onhandMetaMask = () => {
-    this.setState({
-      visibleMetaMask: true,
-    });
+  const  onhandMetaMask = () => {
+    setVisibleMetaMask(true);
   };
-  onhandCancelMetaMask = () => {
-    this.setState({
-      visibleMetaMask: false,
-    });
+  const  onhandCancelMetaMask = () => {
+    setVisibleMetaMask(false);
   };
-  onhandSetting = flag => {
-    this.setState({
-      visibleSetting: !!flag,
-    });
+  const  onhandSetting = flag => {
+    setVisibleSetting(!!flag);
   };
-  handleVisibleChange = () => {};
+  const  handleVisibleChange = () => {};
 
   // 选择钱包
-  selectWallet = () => {
+  const selectWallet = () => {
     activate(injected);
   };
-  render() {
     const {
       currentUser,
       fetchingMoreNotices,
@@ -133,9 +131,8 @@ export default class GlobalHeaderRight extends PureComponent {
       onNoticeClear,
       skeletonCount,
       theme,
-      account,
-    } = this.props;
-    const { visible, visibleMetaMask, visibleSetting } = this.state;
+    } = props;
+    // const { visible, visibleMetaMask, visibleSetting } = this.state;
     const menu = (
       <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
         <Menu.Item key="userCenter">
@@ -162,8 +159,8 @@ export default class GlobalHeaderRight extends PureComponent {
       loadedAll: loadedAllNotices,
       loading: fetchingMoreNotices,
     };
-    const noticeData = this.getNoticeData();
-    const unreadMsg = this.getUnreadData(noticeData);
+    const noticeData = getNoticeData();
+    const unreadMsg = getUnreadData(noticeData);
     let className = styles.right;
     if (theme === 'dark') {
       className = `${styles.right}  ${styles.dark}`;
@@ -171,7 +168,7 @@ export default class GlobalHeaderRight extends PureComponent {
     return (
       <div className={className}>
         {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
-        <AcyConnectWallet value={account} onClick={this.onhandMetaMask} />
+        <AcyConnectWallet value={account} onClick={onhandMetaMask} />
         <Dropdown
           overlay={
             <div className={styles.setting} onClick={e => e.preventDefault()}>
@@ -258,12 +255,12 @@ export default class GlobalHeaderRight extends PureComponent {
           trigger={['click']}
           placement="bottomLeft"
           visible={visibleSetting}
-          onVisibleChange={this.onhandSetting}
+          onVisibleChange={onhandSetting}
         >
           <AcyIcon
           width={30}
             name={visibleSetting ? 'colors-active' : 'colors'}
-            onClick={() => this.onhandSetting(true)}
+            onClick={() => onhandSetting(true)}
           />
         </Dropdown>
 
@@ -355,47 +352,39 @@ export default class GlobalHeaderRight extends PureComponent {
           <Spin size="small" style={{ marginLeft: 8, marginRight: 8 }} />
         )}
         <SelectLang className={styles.action} /> */}
-        <AcyModal width={957} visible={visible} onCancel={this.onhandCancel}>
+        <AcyModal width={600} visible={visibleMetaMask} onCancel={onhandCancel}>
           <div className={styles.walltitle}>
             <span>Connect Wallet</span>
-            <AcyIcon onClick={this.onhandCancel} name="close" />
+            {/* <AcyIcon onClick={this.onhandCancel} name="close" /> */}
           </div>
-          <AcyCardList title="Select Network">
-            <AcyCardList.Thin onClick={this.selectWallet}>
-              <AcyIcon name="eth" />
-              Ethereum
+          <AcyCardList>
+            <AcyCardList.Thin onClick={selectWallet}>
+              <AcyIcon.MyIcon width={32} type="Metamask" />
+              <span>
+                MetaMask
+              </span>
             </AcyCardList.Thin>
             <AcyCardList.Thin>
-              <AcyIcon name="eth" />
-              Ethereum
+              <AcyIcon.MyIcon width={32} type="Trezor" />
+              <span>
+              Trezor
+              </span>
             </AcyCardList.Thin>
             <AcyCardList.Thin>
-              <AcyIcon name="eth" />
-              Ethereum
+              <AcyIcon.MyIcon width={32} type="Ledger" />
+              <span>
+               Ledger
+              </span>
             </AcyCardList.Thin>
             <AcyCardList.Thin>
-              <AcyIcon name="eth" />
-              Ethereum
+              <AcyIcon.MyIcon width={32} type="Fortmatic" />
+              <span>
+                Fortmatic
+              </span>
             </AcyCardList.Thin>
+            
           </AcyCardList>
-          <AcyCardList title="Select Wallet" style={{ marginTop: '70px' }}>
-            <AcyCardList.Fat>
-              <AcyIcon name="eth" big />
-              <p>Ethereum</p>
-            </AcyCardList.Fat>
-            <AcyCardList.Fat>
-              <AcyIcon name="eth" big />
-              <p>Ethereum</p>
-            </AcyCardList.Fat>
-            <AcyCardList.Fat>
-              <AcyIcon name="eth" big />
-              <p>Ethereum</p>
-            </AcyCardList.Fat>
-            <AcyCardList.Fat>
-              <AcyIcon name="eth" big />
-              <p>Ethereum</p>
-            </AcyCardList.Fat>
-          </AcyCardList>
+          <p className={styles.showmore}>Show More</p>
           <AcyCardList style={{ marginTop: '50px' }}>
             <AcyCardList.Agree>
               <AcyCheckBox>
@@ -404,7 +393,7 @@ export default class GlobalHeaderRight extends PureComponent {
             </AcyCardList.Agree>
           </AcyCardList>
         </AcyModal>
-        <AcyModal width={600} visible={visibleMetaMask} onCancel={this.onhandCancelMetaMask}>
+        <AcyModal width={600} visible={visible} onCancel={onhandCancelMetaMask}>
           <div className={styles.metamasktitle}>
             <span>0xE34780…25f7</span>
           </div>
@@ -436,7 +425,7 @@ export default class GlobalHeaderRight extends PureComponent {
             <div>
               <div className={styles.recentTransaction}>
               <strong>Recent Transactions</strong>
-              <AcyIcon width={20} onClick={this.onhandCancel} name="clear" />
+              <AcyIcon width={20} onClick={onhandCancel} name="clear" />
               </div>
               
               <p className={styles.subtitle}>No results found</p>
@@ -446,5 +435,5 @@ export default class GlobalHeaderRight extends PureComponent {
         </AcyModal>
       </div>
     );
-  }
 }
+export default GlobalHeaderRight;
