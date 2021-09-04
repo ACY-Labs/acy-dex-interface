@@ -29,14 +29,14 @@ const onChange=e=>{
           </Col>
         </Row>
         <Row className={styles.bottomRow}>
-          <Col span={10}>
+          <Col span={6}>
             <div className={styles.coin} onClick={onChoseToken}>
-              <AcyIcon width={22} name={icon} />
+              <AcyIcon width={14} name={icon} />
                 {coin}
               <AcyIcon name="nabla" />
             </div>
           </Col>
-          <Col span={14}>
+          <Col span={18}>
             <div className={styles.price}>
             <ul>
               <li>
