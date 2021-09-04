@@ -33,7 +33,7 @@ const onChange=e=>{
             <div className={styles.coin} onClick={onChoseToken}>
               <AcyIcon width={14} name={icon} />
                 {coin}
-              <AcyIcon name="nabla" />
+                <Icon type="down" />
             </div>
           </Col>
           <Col span={18}>

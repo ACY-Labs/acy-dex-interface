@@ -66,7 +66,7 @@ export default defineConfig({
   // // https://ant.design/docs/react/customize-theme-cn
   theme: {
     'primary-color': defaultSettings.primaryColor,
-    'layout-header-height': '63px',
+    'layout-header-height': '50px',
     'layout-header-background': '#1b1b1c',
     'card-background': '#2A2A2D',
     'card-radius': '10px',
