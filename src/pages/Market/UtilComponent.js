@@ -24,7 +24,8 @@ import {
 import {
     TransactionType,
     abbrHash,
-    abbrNumber
+    abbrNumber,
+    isDesktop
 } from './Util.js'
 
 const {AcyTabPane } = AcyTabs;
@@ -75,9 +76,9 @@ export class SmallTable extends React.Component {
     return (
       <div className={styles.smallTableRow}>
         <div className={styles.smallTableBody}>{content}</div>
-        <div className={styles.smallTableBody}>{abbrNumber(entry.volume24h)}</div>
-        <div className={styles.smallTableBody}>{abbrNumber(entry.tvl)}</div>
-        <div className={styles.smallTableBody}>{abbrNumber(entry.price)}</div>
+        <div className={styles.smallTableBody} style={{display:(isDesktop() == true ? "block" : "none")}}>{abbrNumber(entry.volume24h)}</div>
+        <div className={styles.smallTableBody} style={{display:(isDesktop() == true ? "block" : "none")}}>{abbrNumber(entry.tvl)}</div>
+        <div className={styles.smallTableBody} style={{display:(isDesktop() == true ? "block" : "none")}}>{abbrNumber(entry.price)}</div>
       </div>
     )
   }
@@ -87,9 +88,9 @@ export class SmallTable extends React.Component {
       <div className={styles.smallTable}>
         <div className={styles.smallTableRow}>
           <div className={styles.smallTableHeader}>{this.state.mode == "token" ? "Token" : "Pool"}</div>
-          <div className={styles.smallTableHeader}>Volume 24H</div>
-          <div className={styles.smallTableHeader}>TVL</div>
-          <div className={styles.smallTableHeader}>Price</div>
+          <div className={styles.smallTableHeader} style={{display:(isDesktop() == true ? "block" : "none")}}>Volume 24H</div>
+          <div className={styles.smallTableHeader} style={{display:(isDesktop() == true ? "block" : "none")}}>TVL</div>
+          <div className={styles.smallTableHeader} style={{display:(isDesktop() == true ? "block" : "none")}}>Price</div>
         </div>
 
 

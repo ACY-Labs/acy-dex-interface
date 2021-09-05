@@ -230,7 +230,7 @@ function MarketPoolInfo(props){
             <h2>Transactions</h2>
             <Table 
                 dataSource={sortTable(filterTransaction(dataSourceTransaction, transactionView), "time", true).slice(0, transactionDisplayNumber + 1)} 
-                columns={transactionHeader(transactionView, onClickTransaction)} 
+                columns={transactionHeader(transactionView, onClickTransaction).filter(item => item.visible == true)} 
                 pagination={false}
                 style={{
                 marginBottom: "20px"
