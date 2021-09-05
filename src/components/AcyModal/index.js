@@ -57,7 +57,7 @@ const AcyModal = ({ children, ...rest }) => {
       className={styles.acymodal}
       bodyStyle={{
         padding: '21px',
-        background: '#2A2A2D',
+        background: 'rgba(42,42,45)',
         borderRadius: ' 20px',
       }}
       footer={null}

@@ -99,9 +99,9 @@ const MyComponent = props =>{
   // 交易对后置货币余额
   let [token1Balance, setToken1Balance] = useState("0");
   // 交易对前置货币兑换量
-  let [token0Amount, setToken0Amount] = useState("0");
+  let [token0Amount, setToken0Amount] = useState();
   // 交易对后置货币兑换量
-  let [token1Amount, setToken1Amount] = useState("0");
+  let [token1Amount, setToken1Amount] = useState();
   let [token0BalanceShow,setToken0BalanceShow]=useState(false);
   let [token1BalanceShow,setToken1BalanceShow]=useState(false);
 
@@ -325,7 +325,7 @@ const MyComponent = props =>{
       <AcyCuarrencyCard
         icon="eth"
         title={`Balance: ${token0Balance}`}
-        coin={(token0 && token0.symbol) || 'In'}
+        coin={(token0 && token0.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token0Balance}`}
         token={token0Amount}
@@ -345,7 +345,7 @@ const MyComponent = props =>{
       <AcyCuarrencyCard
         icon="eth"
         title={`Balance: ${token1Balance}`}
-        coin={(token1 && token1.symbol) || 'Out'}
+        coin={(token1 && token1.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token1Balance}`}
         token={token1Amount}
