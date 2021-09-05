@@ -93,6 +93,13 @@ class AcyLineChart extends Component {
         // bottom: '3%',
         top: 'top',
       },
+      title: {
+        text: this.props.title,
+        left: 'center',
+        textStyle: {
+          color: 'white',
+        },
+      },
       tooltip: {
         trigger: 'axis',
         alwaysShowContent: true,

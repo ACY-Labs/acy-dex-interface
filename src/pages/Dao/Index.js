@@ -113,6 +113,7 @@ export class Dao extends Component {
                 ACY
               </div>
               <div
+                style={{ marginLeft: 20 }}
                 onClick={() => {
                   this.changeGraphData(1);
                 }}
@@ -302,19 +303,60 @@ export class Dao extends Component {
               style={{ display: 'flex', justifyContent: 'end' }}
               className={stakeInfoStyles.stakeDetails}
             >
-              <span>Allocation</span>
-              <span>sACY</span>
-              <span>Reward</span>
+              <span
+                onClick={() => {
+                  this.setState({ activeStakeInfoPanel: 0 });
+                }}
+              >
+                Allocation
+              </span>
+              <span
+                onClick={() => {
+                  this.setState({ activeStakeInfoPanel: 1 });
+                }}
+              >
+                sACY
+              </span>
+              <span
+                onClick={() => {
+                  this.setState({ activeStakeInfoPanel: 2 });
+                }}
+              >
+                Reward
+              </span>
             </div>
-            <AcyPieChart />
-            <AcyLineChart
-              backData={activeGraphData}
-              data={activeGraphData}
-              showXAxis
-              showGradient
-              lineColor="#e29227"
-              bgColor="#29292c"
-            />
+            {this.state.activeStakeInfoPanel === 0 && (
+              <div className={stakeInfoStyles.stakeInfoTab}>
+                <AcyPieChart />
+              </div>
+            )}
+            {this.state.activeStakeInfoPanel === 1 && (
+              <div className={stakeInfoStyles.stakeInfoTab}>
+                <AcyLineChart
+                  title="Total stake"
+                  backData={activeGraphData}
+                  data={activeGraphData}
+                  showXAxis
+                  showGradient
+                  lineColor="#e29227"
+                  bgColor="#29292c"
+                />
+              </div>
+            )}
+
+            {this.state.activeStakeInfoPanel === 2 && (
+              <div className={stakeInfoStyles.stakeInfoTab}>
+                <AcyLineChart
+                  title="Reward"
+                  backData={activeGraphData}
+                  data={activeGraphData}
+                  showXAxis
+                  showGradient
+                  lineColor="#e29227"
+                  bgColor="#29292c"
+                />
+              </div>
+            )}
           </div>
         </div>
       </PageHeaderWrapper>
