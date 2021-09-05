@@ -232,7 +232,12 @@ class BasicProfile extends Component {
                     width: '100%',
                   }}
                 >
-                  <AcyLineChart backData={[]} showGradient={false} showXAxis={false} lineColor='#e29227' />
+                  <div   style={{
+                    height: '576px',
+                  }}>
+                  <AcyLineChart  backData={[]} showGradient={false} showXAxis={false} lineColor='#e29227' />
+
+                    </div>
                   <AcyPeriodTime
                     onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
                     className={styles.pt}

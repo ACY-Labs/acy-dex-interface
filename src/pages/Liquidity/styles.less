@@ -70,6 +70,13 @@
     color: #b5b6b6;
   }
 }
+.main{
+  :global{
+    .ant-table-thead > tr, .ant-table-tbody > tr{
+      display: inline-table !important;
+    }
+  }
+}
 @media (min-width: 768px){
   .main{
     display: grid;
