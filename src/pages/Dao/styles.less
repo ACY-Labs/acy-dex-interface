@@ -55,7 +55,7 @@
 
 .stakeSection {
   width: 49%;
-  background-color: @cardColor;
+  background-color: #2f3135aa;
   color: #B5B6B6;
   border-radius: 15px;
   display: flex;
@@ -109,6 +109,12 @@
             .tokenPercentage {
               margin-bottom: 0.75rem;
 
+              .suffix {
+                font-size: 1.5rem;
+                position: relative;
+                right: 1.5rem;
+              }
+
               .tokenPercentageInput {
                 width: 50%;
                 background-color: #4C4C4D;
@@ -122,7 +128,7 @@
         }
 
         .stakeSubmitButton {
-          width: 100%;
+          width: 70%;
           background-color: #4C4C4D;
           border: none;
           border-radius: 7.5px;
@@ -157,7 +163,7 @@
     flex: 3;
 
     input {
-      width: 100%;
+      width: 70%;
       background-color: #4C4C4D;
       border: none;
       border-radius: 7.5px;
@@ -178,12 +184,50 @@
   display: flex;
   margin-bottom: 1.5rem;
 
-  div:first-child {
+  .balanceRowTitle {
     flex: 1;
   }
 
-  div:last-child {
+  .sliderContainer {
     flex: 3;
+    display: flex;
+    align-items: center;
+
+    .slider {
+      margin-left: 1.5rem;
+      margin-right: 1.5rem;
+      margin-bottom: 0.6rem;
+
+      -webkit-appearance: none;
+      appearance: none;
+      height: 3px; /* Specified height */
+      background: black; /* Grey background */
+      outline: none; /* Remove outline */
+      opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+      -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+      transition: opacity .2s;
+    }
+
+    .slider:hover {
+      opacity: 1; /* Fully shown on mouse-over */
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none; /* Override default look */
+      appearance: none;
+      width: 15px; /* Set a specific slider handle width */
+      height: 15px; /* Slider handle height */
+      border-radius: 50%;
+      background-color: #5F5F5F;; /* Green background */
+      cursor: pointer; /* Cursor on hover */
+    }
+
+    .slider::-moz-range-thumb {
+      width: 15px; /* Set a specific slider handle width */
+      height: 15px; /* Slider handle height */
+      background-color: #5F5F5F;; /* Green background */
+      cursor: pointer; /* Cursor on hover */
+    }
   }
 }
 
@@ -282,6 +326,24 @@
 
 .tableSeeMore {
   font-size: 16px;
+}
+
+.createProposalContainer {
+  text-align: end;
+  margin-bottom: 1.5rem;
+
+  .createProposalButton {
+    background-color: #4C4C4D;
+    border: none;
+    border-radius: 7.5px;
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
+
+  .createProposalButton:hover {
+    background-color: #5F5F5F;
+    cursor: pointer;
+  }
 }
 
 
