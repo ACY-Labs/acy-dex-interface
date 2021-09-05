@@ -1,6 +1,8 @@
 import styles from './index.less';
 import {Icon} from 'antd';
 import iconjs from './iconfont.js';
+import { ReactComponent as Opera }  from './Opera.svg'; //
+
 import classnames from 'classnames';
 const AcyIcon = props => {
   return (
@@ -17,10 +19,14 @@ const AcyIcon = props => {
 const MyIcon =Icon.createFromIconfontCN({
   scriptUrl: iconjs, // 在 iconfont.cn 上生成
 });
+const MyIconSvg =(props)=><Icon {...props}/>
+
 // 包裹样式
 const IconCustom=(props)=>{
   const { width,...rest }=props;
   return <span style={{margin:'5px'}}>{width&& <MyIcon style={{fontSize:`${width}px`}} {...rest} />||<MyIcon {...rest} />}</span>
 }
+
 AcyIcon.MyIcon=IconCustom;
+AcyIcon.MyIconSvg=MyIconSvg;
 export default AcyIcon;

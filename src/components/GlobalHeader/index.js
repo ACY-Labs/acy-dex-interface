@@ -28,7 +28,7 @@ export default class GlobalHeader extends PureComponent {
     return (
       <div className={styles.header}>
           <Link to="/" className={styles.logo} key="logo">
-            <AcyIcon name="acy" />
+            <AcyIcon width={24} name="acy" />
           </Link>
         
         <RightContent {...this.props} />

@@ -20,6 +20,7 @@ import HeaderSearch from '../HeaderSearch';
 import HeaderDropdown from '../HeaderDropdown';
 import SelectLang from '../SelectLang';
 import styles from './index.less';
+import { ReactComponent as Opera } from './Opera.svg'; //
 import { T } from 'antd/lib/upload/utils';
 
 const GlobalHeaderRight = (props) => {
@@ -171,102 +172,90 @@ const GlobalHeaderRight = (props) => {
     loading: fetchingMoreNotices,
   };
   // 货币列表
-  const walletList=[{
-    name:'MetaMask',
-    icon:'MetaMask',
-    onClick:()=>{
-
-    }
-  },
-  {
-    name:'Trezor',
-    icon:'Trezor',
-    onClick:()=>{
-
-    }
-  },
-  {
-    name:'Ledger',
-    icon:'Ledger',
-    onClick:()=>{
-
-    }
-  },
-  {
-    name:'Fortmatic',
-    icon:'Fortmatic',
-    onClick:()=>{
-
-    }
-  },
-  {
-    name:'WalletConnect',
-    icon:'WalletConnect',
-    onClick:()=>{
-
-    }
-  },
-  {
-    name:'MetaMask',
-    icon:'MetaMask',
-    onClick:()=>{
-
-    }
-  },
-  {
-    name:'Coi',
-    icon:'MetaMask',
-    onClick:()=>{
-
-    }
-  },
-  {
-    name:'MetaMask',
-    icon:'MetaMask',
-    onClick:()=>{
-
-    }
-  },
-  {
-    name:'MetaMask',
-    icon:'MetaMask',
-    onClick:()=>{
-
-    }
-  },
-  {
-    name:'MetaMask',
-    icon:'MetaMask',
-    onClick:()=>{
-
-    }
-  },
-  {
-    name:'MetaMask',
-    icon:'MetaMask',
-    onClick:()=>{
-
-    }
-  },
-  {
-    name:'MetaMask',
-    icon:'MetaMask',
-    onClick:()=>{
-
-    }
-  },{
-    name:'MetaMask',
-    icon:'MetaMask',
-    onClick:()=>{
-
-    }
-  },{
-    name:'MetaMask',
-    icon:'MetaMask',
-    onClick:()=>{
-
+  const MetaMask = [{
+    name: 'MetaMask',
+    icon: 'Metamask',
+    onClick: () => {
+      selectWallet()
     }
   }];
+  const walletList = [
+
+    {
+      name: 'Coinbase Wallet',
+      icon: 'Coinbase',
+      onClick: () => {
+
+      }
+    },
+
+    {
+      name: 'TrustWallet',
+      icon: 'TrustWallet',
+      onClick: () => {
+
+      }
+    }, {
+      name: 'WalletConnect',
+      icon: 'WalletConnect',
+      onClick: () => {
+
+      }
+    },
+    {
+      name: 'Trezor',
+      icon: 'Trezor',
+      onClick: () => {
+
+      }
+    },
+    {
+      name: 'Ledger',
+      icon: 'Ledger',
+      onClick: () => {
+
+      }
+    },
+    {
+      name: 'Fortmatic',
+      icon: 'Fortmatic',
+      onClick: () => {
+
+      }
+    },
+    {
+      name: 'Portis',
+      icon: 'Portis',
+      onClick: () => {
+
+      }
+    },
+    {
+      name: 'Torus',
+      icon: 'Torus',
+      onClick: () => {
+
+      }
+    },
+    {
+      name: 'Opera',
+      icon: 'Opera',
+      svgicon: true,
+      onClick: () => {
+
+      }
+    },
+    {
+      name: 'Gnosis Safe',
+      icon: 'Gnosis',
+      onClick: () => {
+
+      }
+    }];
+  const [only, setOnly] = useState(true);
+  const showMore = () => {
+    setOnly(!only);
+  }
   const noticeData = getNoticeData();
   const unreadMsg = getUnreadData(noticeData);
   let className = styles.right;
@@ -464,25 +453,52 @@ const GlobalHeaderRight = (props) => {
           <Spin size="small" style={{ marginLeft: 8, marginRight: 8 }} />
         )}
         <SelectLang className={styles.action} /> */}
-      <AcyModal width={600} visible={visibleMetaMask} onCancel={onhandCancel}>
+      <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}>
         <div className={styles.walltitle}>
-          <span>Connect Wallet</span>
+          <AcyIcon.MyIcon width={20} type='Wallet' /> <span style={{marginLeft:'10px'}}>Select a Wallet</span>
           {/* <AcyIcon onClick={this.onhandCancel} name="close" /> */}
         </div>
         <AcyCardList style={{ marginTop: '20px' }}>
           <AcyCardList.Agree>
-            By connecting a wallet, you agree to Acy Labs’ Terms of Service.
+            By connecting a wallet, you agree to Acy Labs’ <a target="_blank" href="https://acy.finance/terms-of-use">Terms of Service</a> .
           </AcyCardList.Agree>
         </AcyCardList>
         <AcyCardList>
-          <AcyCardList.Thin onClick={selectWallet}>
-            <AcyIcon.MyIcon width={32} type="Metamask" />
-            <span>
-              MetaMask
-            </span>
-          </AcyCardList.Thin>
+
+          {
+            MetaMask.map(item => <AcyCardList.Thin onClick={() => item.onClick()}>
+              {
+                item.svgicon && <Opera width={32} style={{ margin: '5px' }} /> || <AcyIcon.MyIcon width={32} type={item.icon} />
+              }
+              <span>
+                {item.name}
+              </span>
+            </AcyCardList.Thin>
+            )
+          }
         </AcyCardList>
         <AcyCardList>
+
+          {
+            walletList.map((item, index) => {
+              if (only && index > 1) {
+                return;
+              }
+              else {
+                return <AcyCardList.Thin onClick={() => item.onClick()}>
+                  {
+                    item.svgicon && <Opera width={32} style={{ margin: '5px' }} /> || <AcyIcon.MyIcon width={32} type={item.icon} />
+                  }
+                  <span>
+                    {item.name}
+                  </span>
+                </AcyCardList.Thin>;
+              }
+            }
+            )
+          }
+        </AcyCardList>
+        {/* <AcyCardList>
           <AcyCardList.Thin>
             <AcyIcon.MyIcon width={32} type="Trezor" />
             <span>
@@ -502,8 +518,8 @@ const GlobalHeaderRight = (props) => {
             </span>
           </AcyCardList.Thin>
 
-        </AcyCardList>
-        <p className={styles.showmore}>Show More</p>
+        </AcyCardList> */}
+      {only&&<p className={styles.showmore} onClick={showMore}>See More</p>}  
 
       </AcyModal>
       <AcyModal width={600} visible={visible} onCancel={onhandCancelMetaMask}>

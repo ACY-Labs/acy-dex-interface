@@ -70,7 +70,7 @@ export default defineConfig({
     'layout-header-background':'transparent',// 'rgba(27,27,28,0.75)',
     'card-background': '#2a292e',
     'card-radius': '15px',
-    'text-color': '#FFFFFF',
+    'text-color': '#b5b5b6',
     'tabs-title-font-size': '18px',
     'input-bg': '#191B20',
     'input-border-color': 'transparent',
