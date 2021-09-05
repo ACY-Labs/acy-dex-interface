@@ -56,7 +56,7 @@ export default [
       },
       {
         path: '/dao',
-        name: 'Dao',
+        name: 'ACY DAO',
         component: './Dao/Index',
       },
 
