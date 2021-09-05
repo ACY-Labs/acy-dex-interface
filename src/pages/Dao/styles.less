@@ -1,4 +1,5 @@
 @cardColor: #2f313583;
+@buttonColor: #4c4c4d;
 @ACYOrange: #eb5c20;
 // Chart on main page
 .stakeSectionMain {
@@ -6,6 +7,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  margin-bottom: 1.5rem;
 }
 
 .toggleChart {
@@ -13,7 +15,8 @@
   justify-content: end;
 
   div {
-    background-color: @cardColor;
+    background-color: @buttonColor;
+    border-radius: 10px;
     color: white;
     padding: 10px;
     cursor: pointer;
@@ -54,8 +57,8 @@
 
 .stakeSection {
   width: 49%;
-  background-color: @cardColor;
-  color: #B5B6B6;
+  background-color: #2f3135aa;
+  color: #b5b6b6;
   border-radius: 15px;
   display: flex;
   flex-direction: column;
@@ -108,9 +111,15 @@
             .tokenPercentage {
               margin-bottom: 0.75rem;
 
+              .suffix {
+                font-size: 1.5rem;
+                position: relative;
+                right: 1.5rem;
+              }
+
               .tokenPercentageInput {
                 width: 50%;
-                background-color: #4C4C4D;
+                background-color: #4c4c4d;
                 border: none;
                 border-radius: 7.5px;
                 padding: 0 1rem;
@@ -121,8 +130,8 @@
         }
 
         .stakeSubmitButton {
-          width: 100%;
-          background-color: #4C4C4D;
+          width: 70%;
+          background-color: #4c4c4d;
           border: none;
           border-radius: 7.5px;
           font-size: 1.5rem;
@@ -130,7 +139,7 @@
         }
 
         .stakeSubmitButton:hover {
-          background-color: #5F5F5F;
+          background-color: #5f5f5f;
           cursor: pointer;
         }
       }
@@ -156,8 +165,8 @@
     flex: 3;
 
     input {
-      width: 100%;
-      background-color: #4C4C4D;
+      width: 70%;
+      background-color: #4c4c4d;
       border: none;
       border-radius: 7.5px;
       font-size: 1.5rem;
@@ -177,12 +186,50 @@
   display: flex;
   margin-bottom: 1.5rem;
 
-  div:first-child {
+  .balanceRowTitle {
     flex: 1;
   }
 
-  div:last-child {
+  .sliderContainer {
     flex: 3;
+    display: flex;
+    align-items: center;
+
+    .slider {
+      margin-left: 1.5rem;
+      margin-right: 1.5rem;
+      margin-bottom: 0.6rem;
+
+      -webkit-appearance: none;
+      appearance: none;
+      height: 3px; /* Specified height */
+      background: black; /* Grey background */
+      outline: none; /* Remove outline */
+      opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+      -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+      transition: opacity 0.2s;
+    }
+
+    .slider:hover {
+      opacity: 1; /* Fully shown on mouse-over */
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none; /* Override default look */
+      appearance: none;
+      width: 15px; /* Set a specific slider handle width */
+      height: 15px; /* Slider handle height */
+      border-radius: 50%;
+      background-color: #5f5f5f; /* Green background */
+      cursor: pointer; /* Cursor on hover */
+    }
+
+    .slider::-moz-range-thumb {
+      width: 15px; /* Set a specific slider handle width */
+      height: 15px; /* Slider handle height */
+      background-color: #5f5f5f; /* Green background */
+      cursor: pointer; /* Cursor on hover */
+    }
   }
 }
 
@@ -207,8 +254,8 @@
 
       .presetDurationSelection {
         flex: 1;
-        color: #B5B6B6;
-        background-color: #4C4C4D;
+        color: #b5b6b6;
+        background-color: #4c4c4d;
         border-radius: 0.3rem;
         padding: 0 1rem;
         text-align: center;
@@ -219,7 +266,7 @@
       }
 
       .presetDurationSelection:hover {
-        background-color: #5F5F5F;
+        background-color: #5f5f5f;
         cursor: pointer;
       }
     }
@@ -227,21 +274,21 @@
 }
 
 .datePickerInput {
-  color: #B5B6B6;
-  background-color: #4C4C4D;
+  color: #b5b6b6;
+  background-color: #4c4c4d;
   border: none;
   border-radius: 0.3rem;
   padding: 0 1rem;
 }
 
 .datePickerInput:hover {
-  background-color: #5F5F5F;
+  background-color: #5f5f5f;
   cursor: pointer;
 }
 
-.modal{
-  :global{
-    .ant-modal-content{
+.modal {
+  :global {
+    .ant-modal-content {
       border-radius: 20px;
       background: transparent;
     }
@@ -265,13 +312,38 @@
   }
 
   .modalListItem:hover {
-    background-color: #5F5F5F;
+    background-color: #5f5f5f;
     cursor: pointer;
   }
 }
 
+.tableData {
+  text-align: right;
+}
 
+.tableSeeMoreWrapper {
+  text-align: center;
+  width: 100%;
+}
 
+.tableSeeMore {
+  font-size: 16px;
+}
 
+.createProposalContainer {
+  text-align: end;
+  margin-bottom: 1.5rem;
 
+  .createProposalButton {
+    background-color: @buttonColor;
+    border: none;
+    border-radius: 7.5px;
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
 
+  .createProposalButton:hover {
+    background-color: #5f5f5f;
+    cursor: pointer;
+  }
+}

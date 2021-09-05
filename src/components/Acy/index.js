@@ -20,7 +20,9 @@ import AcyApprove from '@/components/AcyApprove';
 import AcyDescriptions from '@/components/AcyDescriptions';
 import AcySmallButton from '@/components/AcySmallButton';
 import AcySeting from '@/components/AcySeting';
+import AcyPieChart from '@/components/AcyPieChart';
 const Acy = {
+  AcyPieChart,
   AcyTabs,
   AcyLineChart,
   AcyBarChart,
@@ -42,11 +44,12 @@ const Acy = {
   AcyButton,
   AcyDescriptions,
   AcySmallButton,
-  AcySeting
+  AcySeting,
 };
 
 export {
   Acy as default,
+  AcyPieChart,
   AcyTabs,
   AcyLineChart,
   AcyBarChart,
@@ -68,5 +71,5 @@ export {
   AcyButton,
   AcyDescriptions,
   AcySmallButton,
-  AcySeting
+  AcySeting,
 };
