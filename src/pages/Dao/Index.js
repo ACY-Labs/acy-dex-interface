@@ -24,6 +24,8 @@ export class Dao extends Component {
     isModal1Visible: false,
     isModal2Visible: false,
     stake: 0,
+    balance: 123456,
+    balancePercentage: 0
   };
   componentDidMount() {}
 
@@ -46,8 +48,22 @@ export class Dao extends Component {
     }
   }
 
+  updateBalancePercentage(percentage) {
+    this.setState({...this.state, stake: this.state.balance * percentage / 100, balancePercentage: percentage})
+  }
+
   render() {
-    const { activeGraphData, startDate, token1, token2, isModal1Visible, isModal2Visible, stake } = this.state;
+    const {
+      activeGraphData,
+      startDate,
+      token1,
+      token2,
+      isModal1Visible,
+      isModal2Visible,
+      stake,
+      balance,
+      balancePercentage
+    } = this.state;
 
     const CustomDatePickerInput = forwardRef(({ value, onClick }, ref) => (
       <button type="button" className={styles.datePickerInput} onClick={onClick} ref={ref}>
@@ -110,8 +126,21 @@ export class Dao extends Component {
                   </div>
                 </div>
                 <div className={styles.balanceRow}>
-                  <div>Balance:</div>
-                  <div>43765 ACY</div>
+                  <div className={styles.balanceRowTitle}>Balance:</div>
+                  <div className={styles.sliderContainer}>
+                    <div>{balance} ACY</div>
+                    <div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        className={styles.slider}
+                        value={balancePercentage}
+                        onChange={(e) => this.updateBalancePercentage(e.target.value)}
+                      />
+                    </div>
+                    <div>{balancePercentage}%</div>
+                  </div>
                 </div>
                 <div className={styles.lockTimeRow}>
                   <div className={styles.lockTimeRowTitle}>Lock Time:</div>
