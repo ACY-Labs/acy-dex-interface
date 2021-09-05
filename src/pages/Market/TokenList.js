@@ -58,7 +58,7 @@ function MarketTokenList(props){
           <h2>All Tokens</h2>
           <Table 
               dataSource={sortTable(dataSourceCoin, "tvl", true).slice(0, tokenDisplayNumber + 1)} 
-              columns={columnsCoin} 
+              columns={columnsCoin.filter(item => item.visible == true)} 
               pagination={false}
               style={{
               marginBottom: "20px"

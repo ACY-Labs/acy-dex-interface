@@ -139,7 +139,7 @@ export class BasicProfile extends Component {
                     </div>
                     <Table 
                       dataSource={sortTable(dataSourceCoin, "tvl", true).slice(0, this.state.tokenDisplayNumber + 1)} 
-                      columns={columnsCoin} 
+                      columns={columnsCoin.filter(item => item.visible == true)} 
                       pagination={false}
                       style={{
                         marginBottom: "20px"
@@ -162,7 +162,7 @@ export class BasicProfile extends Component {
 
                     <Table 
                       dataSource={sortTable(dataSourcePool, "tvl", true).slice(0, this.state.poolDisplayNumber + 1)} 
-                      columns={columnsPool} 
+                      columns={columnsPool.filter(item => item.visible == true)} 
                       pagination={false}
                       style={{
                         marginBottom: "20px"
@@ -177,7 +177,7 @@ export class BasicProfile extends Component {
                     <h2>Transactions</h2>
                     <Table 
                       dataSource={sortTable(this.filterTransaction(dataSourceTransaction, transactionView), "time", true).slice(0, this.state.transactionDisplayNumber + 1)} 
-                      columns={transactionHeader(transactionView, this.onClickTransaction)} 
+                      columns={transactionHeader(transactionView, this.onClickTransaction).filter(item => item.visible == true)} 
                       pagination={false}
                       style={{
                         marginBottom: "20px"

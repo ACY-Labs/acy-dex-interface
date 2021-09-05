@@ -70,23 +70,30 @@ export function abbrNumber(number){
       
   }
 
+export function isDesktop(){
+    const { innerWidth: width, innerHeight: height } = window;
+    if (innerWidth < 768) return false
+    return true
+}
+
 export const columnsCoin = [
     {
-        title: 'Name',
+        title: <div className={styles.tableHeaderFirst}>Name</div>,
         dataIndex: 'name',
         key: 'name',
         render:(text, entry) => {
             return (
-                <div className={styles.firstColumn}>
+                <div className={styles.tableDataFirstColumn}>
                     <AcyIcon name={entry.short.toLowerCase()} width={20} height={20}/>
                     <Link className={styles.coinName} to='/market/info/token' >{entry.short}</Link>
                     <span className={styles.coinShort}> ({entry.name})</span>
                 </div>
             )
-        }
+        },
+        visible:true
     },
     {
-        title: 'Price',
+        title: <div className={styles.tableHeader}>Price</div>,
         dataIndex: 'price',
         key: 'price',
         render:(text, entry) => {
@@ -95,20 +102,24 @@ export const columnsCoin = [
                     $ {abbrNumber(text)}
                 </div>
             )
-        }
+        },
+        visible: isDesktop()
     },
     {
-        title: 'Price Change',
+        title: <div className={styles.tableHeader}>Price Change</div>,
         dataIndex: 'priceChange',
         key: 'priceChange',
         render: (priceChange) => {
             return (
-                <span className={priceChange <  0 ? styles.priceChangeDown : styles.priceChangeUp}>{priceChange.toFixed(2)}</span>
+                <div className={styles.tableData}>
+                    <span className={priceChange <  0 ? styles.priceChangeDown : styles.priceChangeUp}>{priceChange.toFixed(2)}</span>
+                </div>
             ) 
-        }
+        },
+        visible: isDesktop()
     },
     {
-        title: 'Volume 24H',
+        title: <div className={styles.tableHeader}>Volume 24H</div>,
         dataIndex: 'volume24h',
         key: 'volume24h',
         render:(text, entry) => {
@@ -117,10 +128,11 @@ export const columnsCoin = [
                     $ {abbrNumber(text)}
                 </div>
             )
-        }
+        },
+        visible:true
     },
     {
-        title: 'TVL',
+        title: <div className={styles.tableHeader}>TVL</div>,
         dataIndex: 'tvl',
         key: 'tvl',
         render:(text, entry) => {
@@ -129,18 +141,19 @@ export const columnsCoin = [
                     $ {abbrNumber(text)}
                 </div>
             )
-        }
+        },
+        visible: isDesktop()
     }
 ];
 
 export const columnsPool = [
     {
-        title: 'Pool',
+        title: <div className={styles.tableHeaderFirst}>Pool</div>,
         dataIndex: 'pool',
         key: 'pool',
         render:(text, entry) => {
             return (
-                <div className={styles.tableData}>
+                <div className={styles.tableDataFirstColumn}>
                     <AcyIcon name={entry.coin1.toLowerCase()} width={20} height={20}/>
                     <AcyIcon name={entry.coin2.toLowerCase()} width={20} height={20}/>
                     <Link className={styles.coinName} to='/market/info/pool' >
@@ -148,10 +161,11 @@ export const columnsPool = [
                     </Link>
                 </div>
             )
-        }
+        },
+        visible:true
     },
     {
-        title: 'TVL',
+        title: <div className={styles.tableHeader}>TVL</div>,
         dataIndex: 'tvl',
         key: 'tvl',
         render:(text, entry) => {
@@ -160,10 +174,11 @@ export const columnsPool = [
                     $ {abbrNumber(entry.tvl)}
                 </div>
             )
-        }
+        },
+        visible: isDesktop()
     },
     {
-        title: 'Volume 24H',
+        title: <div className={styles.tableHeader}>Volume 24H</div>,
         dataIndex: 'volume24h',
         key: 'volume24h',
         render:(text, entry) => {
@@ -172,10 +187,11 @@ export const columnsPool = [
                     $ {abbrNumber(entry.volume24h)}
                 </div>
             )
-        }
+        },
+        visible:true
     },
     {
-        title: 'Volume 7D',
+        title: <div className={styles.tableHeader}>Volume 7D</div>,
         dataIndex: 'volume7d',
         key: 'volume7d',
         render:(text, entry) => {
@@ -184,7 +200,8 @@ export const columnsPool = [
                     $ {abbrNumber(entry.volume7d)}
                 </div>
             )
-        }
+        },
+        visible: isDesktop()
     },
 ]
 
@@ -202,7 +219,9 @@ export function transactionHeader(selectedTransaction, onClickHandler){
 
   return [
     {
-      title: (<div className={styles.transactionHeader}>
+      title: (
+        <div className={styles.tableHeaderFIrst}>
+            <div className={styles.transactionHeader}>
                 <a 
                   className={styles.transactionType} 
                   style={{fontWeight: styleArrangement["All"]}}
@@ -235,22 +254,25 @@ export function transactionHeader(selectedTransaction, onClickHandler){
                 >
                   Remove
                 </a>
-              </div>),
+              </div>
+        </div>
+        ),
       dataIndex: '',
       key: 'transactionName',
       render:(text, entry) => {
   
           return (
-              <div className={styles.tableData}>
+              <div className={styles.tableDataFirstColumn}>
                   {entry.type} {entry.coin1} {
                     entry.type == TransactionType.SWAP ? "for" : "and"
                   } {entry.coin2}
               </div>
           )
-      }
+      },
+      visible:true
     },
     {
-      title: 'Total Value',
+      title: <div className={styles.tableHeader}>Total Value</div>,
       dataIndex: 'totalValue',
       key: 'totalValue',
       render:(text, entry) => {
@@ -259,10 +281,11 @@ export function transactionHeader(selectedTransaction, onClickHandler){
                 $ {abbrNumber(entry.totalValue)}
             </div>
         )
-      }
+      },
+      visible: isDesktop()
     },
     {
-      title: 'Token Amount',
+      title: <div className={styles.tableHeader}>Token Amount</div>,
       dataIndex: 'coin1Amount',
       key: 'coin1Amount',
       render:(text, entry) => {
@@ -271,10 +294,11 @@ export function transactionHeader(selectedTransaction, onClickHandler){
                 {abbrNumber(entry.coin1Amount)} {entry.coin1}
             </div>
         )
-      }
+      },
+      visible: isDesktop()
     },
     {
-      title: 'Token Amount',
+      title: <div className={styles.tableHeader}>Token Amount</div>,
       dataIndex: 'coin2Amount',
       key: 'coin2Amount',
       render:(text, entry) => {
@@ -283,10 +307,11 @@ export function transactionHeader(selectedTransaction, onClickHandler){
                 {abbrNumber(entry.coin2Amount)} {entry.coin2}
             </div>
         )
-      }
+      },
+      visible: isDesktop()
     },
     {
-      title: 'Account',
+      title: <div className={styles.tableHeader}>Account</div>,
       dataIndex: 'account',
       key: 'account',
       render:(text, entry) => {
@@ -295,10 +320,11 @@ export function transactionHeader(selectedTransaction, onClickHandler){
                 {abbrHash(text)}
             </div>
         )
-      }
+      },
+      visible: isDesktop()
     },
     {
-      title: 'Time',
+      title: <div className={styles.tableHeader}>Time</div>,
       dataIndex: 'time',
       key: 'time',
       render:(text, entry) => {
@@ -315,7 +341,8 @@ export function transactionHeader(selectedTransaction, onClickHandler){
                 {getRelTime(text)}
             </div>
         )
-      }
+      },
+      visible:true
     },
   
   ]

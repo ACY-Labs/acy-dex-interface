@@ -57,7 +57,7 @@ function MarketPoolList(props){
             <h2>All Pools</h2>
             <Table 
                 dataSource={sortTable(dataSourcePool, "tvl", true).slice(0, poolDisplayNumber + 1)} 
-                columns={columnsPool} 
+                columns={columnsPool.filter(item => item.visible == true)} 
                 pagination={false}
                 style={{
                 marginBottom: "20px"
