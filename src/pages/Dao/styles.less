@@ -1,0 +1,277 @@
+@cardColor: #2f313583;
+@ACYOrange: #eb5c20;
+// Chart on main page
+.stakeSectionMain {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.toggleChart {
+  display: flex;
+  justify-content: end;
+
+  div {
+    background-color: @cardColor;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+  }
+
+  div:hover {
+    color: @ACYOrange;
+  }
+}
+
+.chartSection {
+  width: 49%;
+  height: 40vh;
+  max-height: 700px;
+  background-color: @cardColor;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  padding: 15px;
+  overflow: hidden;
+  .graphStats {
+    padding: 0;
+    margin-bottom: 5px;
+  }
+  .statName {
+    font-size: 13pt;
+    line-height: 14pt;
+    color: #b5b6b6;
+  }
+  .statValue {
+    font-size: 24pt;
+    line-height: 25pt;
+    font-weight: bold;
+  }
+  .chartWrapper {
+    height: 100%;
+  }
+}
+
+.stakeSection {
+  width: 49%;
+  background-color: @cardColor;
+  color: #B5B6B6;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+
+  .stakeContentWrapper {
+    padding: 15px;
+    border-bottom: 1px solid #434343;
+  }
+
+  .rewardContentWrapper {
+    padding: 15px;
+
+    .rewardRow {
+      display: flex;
+
+      .rewardRowTitle {
+        flex: 1;
+        font-size: 1.5rem;
+      }
+      .cryptoSelectionContainer {
+        flex: 3;
+
+        .tokenSelectionContainer {
+          display: flex;
+
+          .tokenSelection {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            flex-direction: column;
+
+            .tokenDropdown {
+              margin-bottom: 0.75rem;
+              display: flex;
+              align-items: center;
+
+              .tokenImg {
+                width: 32px;
+              }
+
+              .tokenSymbol {
+                margin-left: 0.5rem;
+              }
+            }
+
+            .tokenDropdown:hover {
+              cursor: pointer;
+            }
+
+            .tokenPercentage {
+              margin-bottom: 0.75rem;
+
+              .tokenPercentageInput {
+                width: 50%;
+                background-color: #4C4C4D;
+                border: none;
+                border-radius: 7.5px;
+                padding: 0 1rem;
+                font-size: 1.5rem;
+              }
+            }
+          }
+        }
+
+        .stakeSubmitButton {
+          width: 100%;
+          background-color: #4C4C4D;
+          border: none;
+          border-radius: 7.5px;
+          font-size: 1.5rem;
+          padding: 0 1rem;
+        }
+
+        .stakeSubmitButton:hover {
+          background-color: #5F5F5F;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
+
+.stakeUpperSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.amountRow {
+  display: flex;
+  margin-bottom: 1.5rem;
+
+  div:first-child {
+    flex: 1;
+    font-size: 1.5rem;
+  }
+
+  div:last-child {
+    flex: 3;
+
+    input {
+      width: 100%;
+      background-color: #4C4C4D;
+      border: none;
+      border-radius: 7.5px;
+      font-size: 1.5rem;
+      padding: 0 1rem;
+      -moz-appearance: textfield;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+}
+
+.balanceRow {
+  display: flex;
+  margin-bottom: 1.5rem;
+
+  div:first-child {
+    flex: 1;
+  }
+
+  div:last-child {
+    flex: 3;
+  }
+}
+
+.lockTimeRow {
+  display: flex;
+
+  .lockTimeRowTitle {
+    flex: 1;
+  }
+
+  .dateSelectionContainer {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+
+    .datePickerContainer {
+      margin-bottom: 0.75rem;
+    }
+
+    .presetDurationContainer {
+      display: flex;
+
+      .presetDurationSelection {
+        flex: 1;
+        color: #B5B6B6;
+        background-color: #4C4C4D;
+        border-radius: 0.3rem;
+        padding: 0 1rem;
+        text-align: center;
+      }
+
+      .presetDurationSelection:not(:first-child) {
+        margin-left: 1rem;
+      }
+
+      .presetDurationSelection:hover {
+        background-color: #5F5F5F;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.datePickerInput {
+  color: #B5B6B6;
+  background-color: #4C4C4D;
+  border: none;
+  border-radius: 0.3rem;
+  padding: 0 1rem;
+}
+
+.datePickerInput:hover {
+  background-color: #5F5F5F;
+  cursor: pointer;
+}
+
+.modal{
+  :global{
+    .ant-modal-content{
+      border-radius: 20px;
+      background: transparent;
+    }
+  }
+
+  .modalListItem {
+    border-radius: 0.3rem;
+    display: flex;
+    margin-bottom: 1rem;
+    padding: 0.25rem 0.5rem;
+
+    .modalListLogoContainer {
+      .modalListLogo {
+        width: 32px;
+      }
+    }
+
+    .modalListSymbol {
+      margin-left: 1.5rem;
+    }
+  }
+
+  .modalListItem:hover {
+    background-color: #5F5F5F;
+    cursor: pointer;
+  }
+}
+
+
+
+
+
+

@@ -41,8 +41,8 @@ export default [
           {
             path: '/market/info/pool',
             component: './Market/PoolInfo',
-          }
-        ] 
+          },
+        ],
       },
       {
         path: '/exange',
@@ -53,6 +53,11 @@ export default [
         path: '/liquidity',
         name: 'Liquidity',
         component: './Liquidity/Index',
+      },
+      {
+        path: '/dao',
+        name: 'ACY DAO',
+        component: './Dao/Index',
       },
 
       // {
@@ -318,5 +323,4 @@ export default [
       // },
     ],
   },
-  
 ];
