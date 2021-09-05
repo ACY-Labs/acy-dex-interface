@@ -4,6 +4,7 @@ import * as echarts from 'echarts'; //渐变色
 import 'echarts/lib/chart/line';
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/title'; // 此处是按需引入
+import style from './index.less';
 
 let defaultData = [
   ['2000-06-05', 116],
@@ -86,6 +87,7 @@ class AcyLineChart extends Component {
     });
     let showXAxis = this.props.showXAxis;
 
+    let props = this.props;
     let options = {
       grid: {
         left: '2%',
@@ -104,14 +106,13 @@ class AcyLineChart extends Component {
         trigger: 'axis',
         alwaysShowContent: true,
         backgroundColor: null,
-        // borderColor: '#FCEA00',
         borderWidth: 0,
         borderRadius: 0,
-        //   extraCssText: 'box-shadow: 0 0 0 rgba(0, 0, 0, 0.3);',
         formatter: function(v) {
           // var inner = '<div style="padding: 25px 20px; border: 1px solid #FCEA00; background-color: rgba(0, 0, 0, 0.7);">'+v[0].value+'</div>'
-          var out = '<div>' + v[0].value + '</div>';
-          return <br />;
+
+          if (props.showTootip) return `<span style="color:#b5b5b6"> $ ${v[0].data} </span>`;
+          else return;
         },
       },
       xAxis: {
@@ -139,23 +140,6 @@ class AcyLineChart extends Component {
       series: [
         {
           data: valueList,
-          // areaStyle: {
-          //   opacity: 0.8,
-          //   color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          //     {
-          //       offset: 0,
-          //       color: '#c6224e',
-          //     },
-          //     {
-          //       offset: 1,
-          //       color: '#000',
-          //     },
-          //   ]),
-          // },
-          // emphasis: {
-          //     focus: 'series'
-          // },
-          // silent:false,
           type: 'line',
           // symbol: 'none', //去掉折线图中的节点
           smooth: 1, //true 为平滑曲线，false为直线
