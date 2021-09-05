@@ -3,8 +3,14 @@ import { sortAddress } from '@/utils/utils';
 
 import { Button } from 'antd';
 const AcyConnectWallet = props => {
-  const {value,onClick,...rest}=props;
+  const {value,onClick,isMobile,...rest}=props;
   return (
+    isMobile&&<div {...rest} className={styles.connect}>
+      <div className={styles.address} onClick={onClick}>
+        {
+          value&&sortAddress(value)||'Connect'
+        }</div>
+  </div>||
     <div {...rest} className={styles.connect}>
       <div className={styles.wrap}>
         Ethereum

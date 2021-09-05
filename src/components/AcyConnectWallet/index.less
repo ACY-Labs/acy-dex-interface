@@ -1,3 +1,4 @@
+@import '~antd/lib/style/themes/default.less';
 .connect{
   display: inline-block;
   padding:0 11px;
@@ -14,20 +15,28 @@
       font-weight: 400;
       color: #FFFFFF;
     }
-    .address{
-      display: inline-block;
-      vertical-align: middle;
-      border: 2px solid #A34520;
-      border-radius: 20px;
-      font-weight: 400;
-      color: #EB5C20;
-      padding: 0 30px;
-      margin-top: -4px;
-      margin-left: 11px;
-      &:hover{
-        cursor: pointer;
-      }
+    
+  }
+  .address{
+    display: inline-block;
+    vertical-align: middle;
+    border: 2px solid #A34520;
+    border-radius: 20px;
+    font-weight: 400;
+    color: #EB5C20;
+    padding: 0 30px;
+    line-height: 30px;
+    margin-top: -4px;
+    margin-left: 11px;
+    &:hover{
+      cursor: pointer;
     }
   }
-  
+  @media screen and (max-width: @screen-xs) {
+    .address{
+      padding: 0 10px;
+    margin-left: 0;
+    }
+
+  }
 }

@@ -141,6 +141,7 @@ const GlobalHeaderRight =(props)=> {
       onNoticeClear,
       skeletonCount,
       theme,
+      isMobile
     } = props;
     // const { visible, visibleMetaMask, visibleSetting } = this.state;
     const menu = (
@@ -178,7 +179,7 @@ const GlobalHeaderRight =(props)=> {
     return (
       <div className={className}>
         {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
-        <AcyConnectWallet value={account} onClick={onhandMetaMask} />
+        <AcyConnectWallet isMobile={isMobile} value={account} onClick={onhandMetaMask} />
         <Dropdown
           overlay={
             <div className={styles.setting} onClick={e => e.preventDefault()}>
