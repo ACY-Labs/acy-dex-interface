@@ -1,8 +1,11 @@
 @import '~antd/lib/style/themes/default.less';
 
 .content {
-  margin: 24px;
+  margin-top:@layout-header-height;
   padding-top: @layout-header-height;
+  height:calc(100vh - 64px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .bc{
   background: linear-gradient(top right, #1B1B1C, #d4fc79);
