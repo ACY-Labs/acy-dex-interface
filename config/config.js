@@ -67,7 +67,7 @@ export default defineConfig({
   theme: {
     'primary-color': defaultSettings.primaryColor,
     'layout-header-height': '64px',
-    'layout-header-background': 'rgba(27,27,28,0.75)',
+    'layout-header-background':'transparent',// 'rgba(27,27,28,0.75)',
     'card-background': 'rgba(42,42,45,0.75)',
     'card-radius': '10px',
     'text-color': '#FFFFFF',
