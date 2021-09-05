@@ -4,13 +4,16 @@
 /* eslint-disable import/order */
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { graphSampleData, graphSampleData2 } from './SampleData';
-import { Component, forwardRef } from 'react';
-import { AcyCuarrencyCard, AcyLineChart } from '@/components/Acy';
+import React, { Component, forwardRef } from 'react';
+import { AcyCoinItem, AcyLineChart, AcyModal, AcyTabs } from '@/components/Acy';
 import styles from './styles.less';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import SampleToken from './SampleToken';
-import TokenSelectionModal from '@/pages/Dao/TokenSelectionModal';
+import { Input } from 'antd';
+import { supportedTokens } from '@/acy-dex-swap/utils';
+import StakeHistoryTable from './StakeHistoryTable';
+const { AcyTabPane } = AcyTabs;
 
 export class Dao extends Component {
   state = {
@@ -32,9 +35,14 @@ export class Dao extends Component {
   }
 
   updateStake(newStake) {
-    const newStakeInt = parseInt(newStake, 10)
-    if (!Number.isNaN(newStakeInt)) {
-      this.setState({...this.state, stake: 'hello'})
+    let newStakeInt
+    if (newStake !== '') {
+      newStakeInt = parseInt(newStake, 10)
+    } else {
+      newStakeInt = ''
+    }
+    if (newStakeInt === '' || !Number.isNaN(newStakeInt)) {
+      this.setState({...this.state, stake: newStakeInt})
     }
   }
 
@@ -141,7 +149,34 @@ export class Dao extends Component {
                         />
                         <p className={styles.tokenSymbol}>{token1.symbol}</p>
                       </div>
-                      <TokenSelectionModal isModalVisible={isModal1Visible} handleCancel={handleCancel1} handleClick={handleSelectToken1} />
+                      <AcyModal onCancel={handleCancel1} width={400} visible={isModal1Visible}>
+                        <div className={styles.title}>
+                          Select a token
+                        </div>
+                        <div className={styles.search}>
+                          <Input
+                            size="large"
+                            style={{
+                              backgroundColor: "#373739",
+                              borderRadius:'40px'
+                            }}
+                            placeholder="Enter the token symbol or address"
+                          />
+                        </div>
+
+                        <div className={styles.coinList}>
+                          <AcyTabs>
+                            <AcyTabPane tab="All" key="1">
+                              {supportedTokens.map((token, index) => (
+                                <AcyCoinItem
+                                  data={token}
+                                  key={index}
+                                />
+                              ))}
+                            </AcyTabPane>
+                            <AcyTabPane tab="Favorite" key="2" /></AcyTabs>
+                        </div>
+                      </AcyModal>
                       <div className={styles.tokenPercentage}>
                         <input type="text" className={styles.tokenPercentageInput} />
                       </div>
@@ -155,7 +190,34 @@ export class Dao extends Component {
                         />
                         <p className={styles.tokenSymbol}>{token2.symbol}</p>
                       </div>
-                      <TokenSelectionModal isModalVisible={isModal2Visible} handleCancel={handleCancel2} handleClick={handleSelectToken2} />
+                      <AcyModal onCancel={handleCancel2} width={400} visible={isModal2Visible}>
+                        <div className={styles.title}>
+                          Select a token
+                        </div>
+                        <div className={styles.search}>
+                          <Input
+                            size="large"
+                            style={{
+                              backgroundColor: "#373739",
+                              borderRadius:'40px'
+                            }}
+                            placeholder="Enter the token symbol or address"
+                          />
+                        </div>
+
+                        <div className={styles.coinList}>
+                          <AcyTabs>
+                            <AcyTabPane tab="All" key="1">
+                              {supportedTokens.map((token, index) => (
+                                <AcyCoinItem
+                                  data={token}
+                                  key={index}
+                                />
+                              ))}
+                            </AcyTabPane>
+                            <AcyTabPane tab="Favorite" key="2" /></AcyTabs>
+                        </div>
+                      </AcyModal>
                       <div className={styles.tokenPercentage}>
                         <input type="text" className={styles.tokenPercentageInput} />
                       </div>
@@ -168,6 +230,9 @@ export class Dao extends Component {
               </div>
             </div>
           </div>
+        </div>
+        <div>
+          <StakeHistoryTable />
         </div>
       </PageHeaderWrapper>
     );

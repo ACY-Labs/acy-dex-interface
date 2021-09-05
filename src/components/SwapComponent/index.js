@@ -472,7 +472,7 @@ const MyComponent = props => {
               ))}
             </AcyTabPane>
             <AcyTabPane tab="Favorite" key="2" />
-          
+
           </AcyTabs>
         </div>
       </AcyModal>
