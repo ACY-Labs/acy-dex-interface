@@ -89,6 +89,9 @@ export class Dao extends Component {
 
     return (
       <PageHeaderWrapper>
+        <div className={styles.createProposalContainer}>
+          <button type="button" className={styles.createProposalButton}>Create Proposal</button>
+        </div>
         <div className={styles.stakeSectionMain}>
           <div className={styles.chartSection}>
             <div className={styles.toggleChart}>
@@ -208,6 +211,7 @@ export class Dao extends Component {
                       </AcyModal>
                       <div className={styles.tokenPercentage}>
                         <input type="text" className={styles.tokenPercentageInput} />
+                        <span className={styles.suffix}>%</span>
                       </div>
                     </div>
                     <div className={styles.tokenSelection}>
@@ -249,6 +253,7 @@ export class Dao extends Component {
                       </AcyModal>
                       <div className={styles.tokenPercentage}>
                         <input type="text" className={styles.tokenPercentageInput} />
+                        <span className={styles.suffix}>%</span>
                       </div>
                     </div>
                   </div>
