@@ -519,7 +519,7 @@ const GlobalHeaderRight = (props) => {
           </AcyCardList.Thin>
 
         </AcyCardList> */}
-      {only&&<p className={styles.showmore} onClick={showMore}>See More</p>}  
+      {only&&<p className={styles.showmore} onClick={showMore}>See More...</p>}  
 
       </AcyModal>
       <AcyModal width={600} visible={visible} onCancel={onhandCancelMetaMask}>
