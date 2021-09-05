@@ -270,87 +270,15 @@ const GlobalHeaderRight = (props) => {
         overlay={
           <div className={styles.setting} onClick={e => e.preventDefault()}>
             <ul className={styles.list}>
-              {/* <li>
-                  <div className={styles.listitem}>
-                    <span>Gas Price</span>
-                    <span>
-                      18.0 GWEI <AcyIcon width={16} name="nabla" />
-                    </span>
-                  </div> */}
-              {/* <div>
-                <AcyRadioButton data={["22.0 gwei ～ 15s～ Rapid ","18.5 gwei ～ 45s～ Fast ","14.5 gwei ～ 2min～ Medium "]}/>
-              </div> */}
-              {/* </li>
-                <li>
-                  <div className={styles.listitem}>
-                    <span>Endpoint</span>
-                    <span>
-                      Global 159.2ms <AcyIcon width={16} name="nabla" />
-                    </span>
-                  </div> */}
-              {/* <div>
-                <AcyRadioButton data={["Global 210.7ms","APAC 210.5ms","N. America 879.6ms","Europe 880.2ms"]}/>
-              </div> */}
-              {/* </li> */}
+              
               <li>
                 <AcySeting title="Language" current="English">
                   <AcyRadioButton data={['English', '中文']} />
 
                 </AcySeting>
-                {/* <div className={styles.listitem}>
-                    <span>Language</span>
-                    <span>
-                      English <AcyIcon width={16} name="nabla" />
-                    </span>
-                  </div>
-                  <div>
-                    <AcyRadioButton data={['English', '中文']} />
-                  </div> */}
               </li>
-              <li>
-                {/* <div className={styles.listitem}>
-                    <span>Network</span>
-                    <span>
-                      Ethereum
-                      <AcyIcon width={16} name="nabla" />
-                    </span>
-                  </div> */}
-                {/* <div>
-                <AcyRadioButton data={["Ethereum","BSC","Polygon","Solana"]}/>
-              </div> */}
-              </li>
-              {/* <li>
-                  <div className={styles.listitem}>
-                    <span>
-                      <AcyIcon width={25} name="help" />
-                      <span>FAQ</span>
-                    </span>
-                  </div>
-                </li>
-                <li>
-                  <div className={styles.listitem}>
-                    <span>
-                      <AcyIcon width={25} name="announcements" />
-                      <span>Announcements</span>
-                    </span>
-                  </div>
-                </li>
-                <li>
-                  <div className={styles.listitem}>
-                    <span>
-                      <AcyIcon width={25} name="documents" />
-                      <span>Documents</span>
-                    </span>
-                  </div>
-                </li> */}
+              
             </ul>
-            {/* <div className={styles.message}>
-                <AcyIcon width={30} name="twitter" title="Twitter" />
-                <AcyIcon width={30} name="twitter" title="Twitter" />
-                <AcyIcon width={30} name="twitter" title="Twitter" />
-                <AcyIcon width={30} name="twitter" title="Twitter" />
-                <AcyIcon width={30} name="twitter" title="Twitter" />
-              </div> */}
           </div>
         }
         trigger={['click']}
@@ -364,103 +292,14 @@ const GlobalHeaderRight = (props) => {
           onClick={() => onhandSetting(true)}
         />
       </Dropdown>
-
-      {/* <HeaderSearch
-          className={`${styles.action} ${styles.search}`}
-          placeholder={formatMessage({ id: 'component.globalHeader.search' })}
-          dataSource={[
-            formatMessage({ id: 'component.globalHeader.search.example1' }),
-            formatMessage({ id: 'component.globalHeader.search.example2' }),
-            formatMessage({ id: 'component.globalHeader.search.example3' }),
-          ]}
-          onSearch={value => {
-            console.log('input', value); // eslint-disable-line
-          }}
-          onPressEnter={value => {
-            console.log('enter', value); // eslint-disable-line
-          }}
-        />
-        <Tooltip title={formatMessage({ id: 'component.globalHeader.help' })}>
-          <a
-            target="_blank"
-            href="https://pro.ant.design/docs/getting-started"
-            rel="noopener noreferrer"
-            className={styles.action}
-          >
-            <Icon type="question-circle-o" />
-          </a>
-        </Tooltip>
-        <NoticeIcon
-          className={styles.action}
-          count={currentUser.unreadCount}
-          onItemClick={(item, tabProps) => {
-            console.log(item, tabProps); // eslint-disable-line
-            this.changeReadState(item, tabProps);
-          }}
-          locale={{
-            emptyText: formatMessage({ id: 'component.noticeIcon.empty' }),
-            clear: formatMessage({ id: 'component.noticeIcon.clear' }),
-            loadedAll: formatMessage({ id: 'component.noticeIcon.loaded' }),
-            loadMore: formatMessage({ id: 'component.noticeIcon.loading-more' }),
-          }}
-          onClear={onNoticeClear}
-          onLoadMore={this.fetchMoreNotices}
-          onPopupVisibleChange={onNoticeVisibleChange}
-          loading={fetchingNotices}
-          clearClose
-        >
-          <NoticeIcon.Tab
-            count={unreadMsg.notification}
-            list={noticeData.notification}
-            title={formatMessage({ id: 'component.globalHeader.notification' })}
-            name="notification"
-            emptyText={formatMessage({ id: 'component.globalHeader.notification.empty' })}
-            emptyImage="https://gw.alipayobjects.com/zos/rmsportal/wAhyIChODzsoKIOBHcBk.svg"
-            {...loadMoreProps}
-          />
-          <NoticeIcon.Tab
-            count={unreadMsg.message}
-            list={noticeData.message}
-            title={formatMessage({ id: 'component.globalHeader.message' })}
-            name="message"
-            emptyText={formatMessage({ id: 'component.globalHeader.message.empty' })}
-            emptyImage="https://gw.alipayobjects.com/zos/rmsportal/sAuJeJzSKbUmHfBQRzmZ.svg"
-            {...loadMoreProps}
-          />
-          <NoticeIcon.Tab
-            count={unreadMsg.event}
-            list={noticeData.event}
-            title={formatMessage({ id: 'component.globalHeader.event' })}
-            name="event"
-            emptyText={formatMessage({ id: 'component.globalHeader.event.empty' })}
-            emptyImage="https://gw.alipayobjects.com/zos/rmsportal/HsIsxMZiWKrNUavQUXqx.svg"
-            {...loadMoreProps}
-          />
-        </NoticeIcon>
-        {currentUser.name ? (
-          <HeaderDropdown overlay={menu}>
-            <span className={`${styles.action} ${styles.account}`}>
-              <Avatar
-                size="small"
-                className={styles.avatar}
-                src={currentUser.avatar}
-                alt="avatar"
-              />
-              <span className={styles.name}>{currentUser.name}</span>
-            </span>
-          </HeaderDropdown>
-        ) : (
-          <Spin size="small" style={{ marginLeft: 8, marginRight: 8 }} />
-        )}
-        <SelectLang className={styles.action} /> */}
       <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}>
         <div className={styles.walltitle}>
           <AcyIcon.MyIcon width={20} type='Wallet' /> <span style={{marginLeft:'10px'}}>Select a Wallet</span>
           {/* <AcyIcon onClick={this.onhandCancel} name="close" /> */}
         </div>
-        <AcyCardList style={{ marginTop: '20px' }}>
+        <AcyCardList style={{ marginTop: '10px' }}>
           <AcyCardList.Agree>
-            By connecting a wallet, you agree to Acy Labs’ <a target="_blank" href="https://acy.finance/terms-of-use">Terms of Service</a> .
+            By connecting a wallet, you agree to ACY <a target="_blank" href="https://acy.finance/terms-of-use">Terms of Service</a> .
           </AcyCardList.Agree>
         </AcyCardList>
         <AcyCardList>
@@ -498,69 +337,8 @@ const GlobalHeaderRight = (props) => {
             )
           }
         </AcyCardList>
-        {/* <AcyCardList>
-          <AcyCardList.Thin>
-            <AcyIcon.MyIcon width={32} type="Trezor" />
-            <span>
-              Trezor
-            </span>
-          </AcyCardList.Thin>
-          <AcyCardList.Thin>
-            <AcyIcon.MyIcon width={32} type="Ledger" />
-            <span>
-              Ledger
-            </span>
-          </AcyCardList.Thin>
-          <AcyCardList.Thin>
-            <AcyIcon.MyIcon width={32} type="Fortmatic" />
-            <span>
-              Fortmatic
-            </span>
-          </AcyCardList.Thin>
-
-        </AcyCardList> */}
       {only&&<p className={styles.showmore} onClick={showMore}>See More...</p>}  
 
-      </AcyModal>
-      <AcyModal width={600} visible={visible} onCancel={onhandCancelMetaMask}>
-        <div className={styles.metamasktitle}>
-          <span>0xE34780…25f7</span>
-        </div>
-        <AcyCardList title="MetaMask">
-          <AcyWarp>
-            <div className={styles.coin}>
-              <div className={styles.coinname}>
-                <AcyIcon name="eth" width={55} />
-                ETH
-              </div>
-              <div className={styles.coinprice}>
-                <p>0.5213</p>
-                <p className={styles.dollar}>$615.39</p>
-              </div>
-            </div>
-          </AcyWarp>
-        </AcyCardList>
-        <AcyCardList style={{ marginTop: '20px' }}>
-          <AcyIcon name="view" width={80} title="View" />
-          <AcyIcon name="copy" width={80} title="Copy" />
-          <AcyIcon name="switch" width={80} title="Switch" />
-          <AcyIcon name="disconnect" width={80} title="Disconnect" />
-        </AcyCardList>
-        <p className={styles.buyCrypto}>Buy Crypto</p>
-        <div className={styles.transak}>
-          <AcyIcon name="eth" width={50} /> Transak
-        </div>
-        <div className={styles.clear}>
-          <div>
-            <div className={styles.recentTransaction}>
-              <strong>Recent Transactions</strong>
-              <AcyIcon width={20} onClick={onhandCancel} name="clear" />
-            </div>
-
-            <p className={styles.subtitle}>No results found</p>
-          </div>
-
-        </div>
       </AcyModal>
     </div>
   );

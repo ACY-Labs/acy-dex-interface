@@ -22,7 +22,7 @@ import {
   AcyButton,
   AcyDescriptions,
 } from '@/components/Acy';
-
+import {Input} from 'antd';
 import { connect } from 'umi';
 import styles from './styles.less';
 import { sortAddress } from '@/utils/utils';
@@ -410,9 +410,13 @@ const MyComponent = props => {
          Select a token
         </div>
         <div className={styles.search}>
-          <AcyInput
+          <Input
+          size="large"
+          style={{
+              backgroundColor: "#373739",
+              borderRadius:'40px'
+          }}
             placeholder="Enter the token symbol or address"
-            suffix={<AcyIcon name="search" />}
           />
         </div>
 

@@ -172,6 +172,7 @@ export const MarketSearchBar  = (props) => {
                     size="large"
                     style={{
                         backgroundColor: "#373739",
+                        borderRadius:'40px'
                     }}
                     onFocus={onSearchFocus}
                     onChange={onInput}

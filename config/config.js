@@ -74,7 +74,7 @@ export default defineConfig({
     'tabs-title-font-size': '18px',
     'input-bg': '#191B20',
     'input-border-color': 'transparent',
-    'border-radius-base': '10px',
+    'input-border-radius': '20px',
     'checkbox-check-bg': '#707070',
     'table-bg': '#2A2A2D',
     'table-header-bg': '#2F3135',
