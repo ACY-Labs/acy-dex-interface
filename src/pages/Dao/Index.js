@@ -20,6 +20,7 @@ export class Dao extends Component {
     token2: SampleToken[1],
     isModal1Visible: false,
     isModal2Visible: false,
+    stake: 0,
   };
   componentDidMount() {}
 
@@ -30,8 +31,15 @@ export class Dao extends Component {
     this.setState({ activeGraphData });
   }
 
+  updateStake(newStake) {
+    const newStakeInt = parseInt(newStake, 10)
+    if (!Number.isNaN(newStakeInt)) {
+      this.setState({...this.state, stake: 'hello'})
+    }
+  }
+
   render() {
-    const { activeGraphData, startDate, token1, token2, isModal1Visible, isModal2Visible } = this.state;
+    const { activeGraphData, startDate, token1, token2, isModal1Visible, isModal2Visible, stake } = this.state;
 
     const CustomDatePickerInput = forwardRef(({ value, onClick }, ref) => (
       <button type="button" className={styles.datePickerInput} onClick={onClick} ref={ref}>
@@ -41,10 +49,19 @@ export class Dao extends Component {
 
     const showModal1 = () => this.setState({...this.state, isModal1Visible: true})
     const showModal2 = () => this.setState({...this.state, isModal2Visible: true})
-    const handleSelectToken1 = (newtoken) => this.setState({...this.state, token1: newtoken, isModal1Visible: false})
-    const handleSelectToken2 = (newtoken) => this.setState({...this.state, token2: newtoken, isModal2Visible: false})
+    const handleSelectToken1 = (newToken) => this.setState({...this.state, token1: newToken, isModal1Visible: false})
+    const handleSelectToken2 = (newToken) => this.setState({...this.state, token2: newToken, isModal2Visible: false})
     const handleCancel1 = () => this.setState({...this.state, isModal1Visible: false})
     const handleCancel2 = () => this.setState({...this.state, isModal2Visible: false})
+
+    const updateDate = (type, value) => {
+      const newDate = new Date()
+      if (type === 'week') newDate.setHours(newDate.getHours() + (24 * 7 * value))
+      else if (type === 'month') newDate.setMonth(newDate.getMonth() + value)
+      else if(type === 'year') newDate.setFullYear(newDate.getFullYear() + value)
+      else return
+      this.setState({...this.state, startDate: newDate})
+    }
 
     return (
       <PageHeaderWrapper>
@@ -81,7 +98,7 @@ export class Dao extends Component {
                 <div className={styles.amountRow}>
                   <div>Stake</div>
                   <div>
-                    <input type="number" />
+                    <input type="text" value={stake} onChange={(e) => this.updateStake(e.target.value)} />
                   </div>
                 </div>
                 <div className={styles.balanceRow}>
@@ -99,12 +116,12 @@ export class Dao extends Component {
                       />
                     </div>
                     <div className={styles.presetDurationContainer}>
-                      <div className={styles.presetDurationSelection}>1W</div>
-                      <div className={styles.presetDurationSelection}>1M</div>
-                      <div className={styles.presetDurationSelection}>3M</div>
-                      <div className={styles.presetDurationSelection}>6M</div>
-                      <div className={styles.presetDurationSelection}>1Y</div>
-                      <div className={styles.presetDurationSelection}>4Y</div>
+                      <div className={styles.presetDurationSelection} onClick={() => updateDate('week', 1)}>1W</div>
+                      <div className={styles.presetDurationSelection} onClick={() => updateDate('month', 1)}>1M</div>
+                      <div className={styles.presetDurationSelection} onClick={() => updateDate('month', 3)}>3M</div>
+                      <div className={styles.presetDurationSelection} onClick={() => updateDate('month', 6)}>6M</div>
+                      <div className={styles.presetDurationSelection} onClick={() => updateDate('year', 1)}>1Y</div>
+                      <div className={styles.presetDurationSelection} onClick={() => updateDate('year', 4)}>4Y</div>
                     </div>
                   </div>
                 </div>
