@@ -121,25 +121,15 @@ class HeaderView extends PureComponent {
     const width = this.getHeadWidth();
     const HeaderDom = visible ? (
       <Header style={{ padding: 0, width }} className={fixedHeader ? styles.fixedHeader : ''}>
-        {isTop && !isMobile ? (
-          <TopNavHeader
-            theme={navTheme}
-            mode="horizontal"
-            onCollapse={handleMenuCollapse}
-            onNoticeClear={this.handleNoticeClear}
-            onMenuClick={this.handleMenuClick}
-            onNoticeVisibleChange={this.handleNoticeVisibleChange}
-            {...this.props}
-          />
-        ) : (
-          <GlobalHeader
-            onCollapse={handleMenuCollapse}
-            onNoticeClear={this.handleNoticeClear}
-            onMenuClick={this.handleMenuClick}
-            onNoticeVisibleChange={this.handleNoticeVisibleChange}
-            {...this.props}
-          />
-        )}
+        <TopNavHeader
+          theme={navTheme}
+          mode="horizontal"
+          onCollapse={handleMenuCollapse}
+          onNoticeClear={this.handleNoticeClear}
+          onMenuClick={this.handleMenuClick}
+          onNoticeVisibleChange={this.handleNoticeVisibleChange}
+          {...this.props}
+        />
       </Header>
     ) : null;
     return (
@@ -157,5 +147,6 @@ export default connect(({ user, global, setting, loading }) => ({
   fetchingNotices: loading.effects['global/fetchNotices'],
   loadedAllNotices: global.loadedAllNotices,
   notices: global.notices,
+  global,
   setting,
 }))(HeaderView);

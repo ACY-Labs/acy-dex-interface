@@ -16,6 +16,7 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
+import Media from 'react-media';
 import SwapComponent from '@/components/SwapComponent';
 import AddComponent from '@/components/AddComponent';
 import MyComponent from '@/components/MyComponent';
@@ -151,7 +152,6 @@ const columns = [
   profile,
   loading: loading.effects['profile/fetchBasic'],
 }))
-
 class BasicProfile extends Component {
   state = {
     visible: false,
@@ -159,7 +159,7 @@ class BasicProfile extends Component {
     visibleLoading: false,
     tabIndex: 1,
   };
-  componentDidMount() {}
+  componentDidMount() { }
 
   lineTitleRender = () => {
     return [
@@ -203,49 +203,63 @@ class BasicProfile extends Component {
       tabIndex: e,
     });
   };
-  maximize=()=>{
+  maximize = () => {
     this.setState({
-      maxLine:!this.state.maxLine
+      maxLine: !this.state.maxLine
     });
   }
   render() {
-    const { visible, visibleConfirmOrder, visibleLoading, tabIndex,maxLine } = this.state;
+    const { visible, visibleConfirmOrder, visibleLoading, tabIndex, maxLine } = this.state;
+    const { isMobile } = this.props;
     return (
       <PageHeaderWrapper>
+
         <div className={styles.main}>
+          {
+            isMobile && <div>
+            <AcyCard>
+              <div className={styles.trade}>
+                <SwapComponent />
+              </div>
+            </AcyCard>
+           </div>
+          }
           <div>
-          {(tabIndex == 1 && (
-              <AcyCard style={{background:'transparent'}} title={this.lineTitleRender()} >
+            {(tabIndex == 1 && (
+              <AcyCard style={{ background: 'transparent' }} title={this.lineTitleRender()} >
                 <div
                   style={{
                     width: '100%',
-                    height: '576px'
                   }}
                 >
-                  <AcyLineChart backData={[]} showGradient={false} showXAxis={false} lineColor='#e29227'/>
+                  <div   style={{
+                    height: '576px',
+                  }}>
+                  <AcyLineChart  backData={[]} showGradient={false} showXAxis={false} lineColor='#e29227' />
+
+                    </div>
                   <AcyPeriodTime
-        onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
-        className={styles.pt}
-        times={['1D', '7D', '1M', '1Y', 'All']}
-      />
+                    onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
+                    className={styles.pt}
+                    times={['1D', '7D', '1M', '1Y', 'All']}
+                  />
                 </div>
               </AcyCard>
             )) || (
-              <AcyCard>
-                <Table dataSource={dataSource} columns={columns} pagination={false} />
-              </AcyCard>
-            )}
+                <AcyCard>
+                  <Table dataSource={dataSource} columns={columns} pagination={false} />
+                </AcyCard>
+              )}
           </div>
-          <div>
-
-
-          <AcyCard>
+          {
+            !isMobile && <div>
+            <AcyCard>
               <div className={styles.trade}>
-                    <SwapComponent />
+                <SwapComponent />
               </div>
-             
             </AcyCard>
-          </div>
+           </div>
+          }
         </div>
 
         <AcyModal onCancel={this.onCancel} width={600} visible={visible}>
@@ -301,4 +315,8 @@ class BasicProfile extends Component {
   }
 }
 
-export default BasicProfile;
+export default (props => (
+  <Media query="(max-width: 599px)">
+    {isMobile => <BasicProfile {...props} isMobile={isMobile} />}
+  </Media>
+)) ;

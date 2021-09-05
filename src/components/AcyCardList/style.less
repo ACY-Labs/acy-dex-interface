@@ -1,6 +1,5 @@
 @import '~antd/lib/style/themes/default.less';
 .acycardlist{
-  padding: 0 50px;
   .acl_title{
     font-size: 18px;
     line-height: 20px;
@@ -10,17 +9,24 @@
   .acl_list{
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: center;
   }
 }
 .thin{
-  text-align: center;
-  margin: 10px 0;
-  display: inline-block;
-  font-size: 24px;
-  padding: 25px 87px;
-  background: #2F3033;
-  border-radius: 15px;
+  width: 45%;
+  display: flex;
+  align-items: center;
+  margin: 10px auto;
+  font-size: 14px;
+  padding: 5px;
+  border:1px solid transparent;
+  border-radius: 5px;
+  &:hover{
+    border:1px solid #e29227;
+    border-radius: 55px;
+    transform: all 0.2;
+    cursor: pointer;
+  }
 }
 .fat{
   text-align: center;
@@ -32,15 +38,11 @@
 }
 .agree{
   width: 100%;
-  padding: 24px 26px;
+  padding: 10px;
   background: #373739;
-  font-size: 24px;
-  color: #ffffff;
-  border-radius: 15px;
-  span{
-    font-size: 24px;
-    vertical-align: bottom;
-  }
+  font-size: 12px;
+  color: #b5b5b6;
+  border-radius: 5px;
   strong{
     color: #EB5C20;
   }

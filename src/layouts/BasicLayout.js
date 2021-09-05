@@ -192,16 +192,6 @@ const  BasicLayout =props=> {
     const layout = (
       <Layout
       >
-        {isTop && !isMobile ? null : (
-          <SiderMenu
-            logo={logo}
-            theme={navTheme}
-            onCollapse={handleMenuCollapse}
-            menuData={menuData}
-            isMobile={isMobile}
-            {...props}
-          />
-        )}
         <Layout
           style={{
             ...getLayoutStyle(),

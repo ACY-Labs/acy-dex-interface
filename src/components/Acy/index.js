@@ -19,7 +19,7 @@ import AcyConfirm from '@/components/AcyConfirm';
 import AcyApprove from '@/components/AcyApprove';
 import AcyDescriptions from '@/components/AcyDescriptions';
 import AcySmallButton from '@/components/AcySmallButton';
-
+import AcySeting from '@/components/AcySeting';
 const Acy = {
   AcyTabs,
   AcyLineChart,
@@ -41,7 +41,8 @@ const Acy = {
   AcyApprove,
   AcyButton,
   AcyDescriptions,
-  AcySmallButton
+  AcySmallButton,
+  AcySeting
 };
 
 export {
@@ -66,5 +67,6 @@ export {
   AcyApprove,
   AcyButton,
   AcyDescriptions,
-  AcySmallButton
+  AcySmallButton,
+  AcySeting
 };

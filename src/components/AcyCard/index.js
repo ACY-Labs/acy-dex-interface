@@ -8,10 +8,10 @@ const AcyCard =(props)=>{
       {...props} 
       className={!max&&styles.acycard||className(styles.acycard,styles.max)}
       headStyle={{
-        borderBottom:0
+        borderBottom:0,
       }} 
       bodyStyle={{
-        padding:'0 24px 24px'
+        padding:'8px'
       }}
       title={
         props.title&&  <div className={styles.card_header}>

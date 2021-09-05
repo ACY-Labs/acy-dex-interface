@@ -22,7 +22,7 @@ import {
   AcyButton,
   AcyDescriptions,
 } from '@/components/Acy';
-
+import {Input} from 'antd';
 import { connect } from 'umi';
 import styles from './styles.less';
 import { sortAddress } from '@/utils/utils';
@@ -79,7 +79,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 
 const { AcyTabPane } = AcyTabs;
-import { Row, Col, Button } from 'antd';
+import { Row, Col, Button,Icon  } from 'antd';
 import { Alert } from 'antd';
 
 const MyComponent = props => {
@@ -101,9 +101,9 @@ const MyComponent = props => {
   const [token1Balance, setToken1Balance] = useState('0');
 
   // 交易对前置货币兑换量
-  const [token0Amount, setToken0Amount] = useState('0');
+  const [token0Amount, setToken0Amount] = useState();
   // 交易对后置货币兑换量
-  const [token1Amount, setToken1Amount] = useState('0');
+  const [token1Amount, setToken1Amount] = useState();
 
   const [token0BalanceShow, setToken0BalanceShow] = useState(false);
   const [token1BalanceShow, setToken1BalanceShow] = useState(false);
@@ -139,17 +139,24 @@ const MyComponent = props => {
   useEffect(() => {
     // activate(injected);
   }, []);
+
+
+  // setSwapButtonContent
+  // 监听钱包的连接
+  useEffect(() => {
+    // activate(injected);
+  }, []);
+
   // 通知钱包连接成功
   useEffect(() => {
     // todo....
     if (account) {
-      const { dispatch } = props;
-      dispatch({
-        type: 'global/updateAccount',
-        payload: {
-          account,
-        },
-      });
+      if (swapFunction == 0) {
+        activate(injected);
+        setSwapFunction(1);
+        setSwapButtonContent('choose tokens and amount');
+        setSwapButtonState(false);
+      }
     }
   }, account);
 
@@ -299,7 +306,7 @@ const MyComponent = props => {
       <AcyCuarrencyCard
         icon="eth"
         title={`Balance: ${token0Balance}`}
-        coin={(token0 && token0.symbol) || 'In'}
+        coin={(token0 && token0.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token0Balance}`}
         token={token0Amount}
@@ -313,14 +320,14 @@ const MyComponent = props => {
         }}
       />
 
-      <div style={{ margin: '12px auto', textAlign: 'center' }}>
-        <AcyIcon width={21.5} name="double-down" />
+      <div className={styles.arrow}>
+        <Icon style={{fontSize:'16px'}} type="arrow-down" />
       </div>
 
       <AcyCuarrencyCard
         icon="eth"
         title={`Balance: ${token1Balance}`}
-        coin={(token1 && token1.symbol) || 'Out'}
+        coin={(token1 && token1.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token1Balance}`}
         token={token1Amount}
@@ -361,6 +368,7 @@ const MyComponent = props => {
 
       {
         <AcyButton
+        style={{marginTop:'25px'}}
           disabled={!swapButtonState}
           onClick={() => {
             if (swapFunction == 0) {
@@ -397,14 +405,18 @@ const MyComponent = props => {
         {swapOperatorStatus && <AcyDescriptions.Item> {swapOperatorStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
-      <AcyModal onCancel={onCancel} width={600} height={400} visible={visible}>
+      <AcyModal onCancel={onCancel} width={400} visible={visible}>
         <div className={styles.title}>
          Select a token
         </div>
         <div className={styles.search}>
-          <AcyInput
+          <Input
+          size="large"
+          style={{
+              backgroundColor: "#373739",
+              borderRadius:'40px'
+          }}
             placeholder="Enter the token symbol or address"
-            suffix={<AcyIcon name="search" />}
           />
         </div>
 
@@ -470,5 +482,6 @@ const MyComponent = props => {
 
 export default connect(({ global, loading }) => ({
   global,
+  account:global.account,
   loading: loading.global,
 }))(MyComponent);

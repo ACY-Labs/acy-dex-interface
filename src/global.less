@@ -20,10 +20,6 @@ canvas {
   display: block;
 }
 
-a {
-  color: #b5b5b6;
-}
-
 body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -49,15 +45,19 @@ li {
 }
 .ant-table-thead > tr,
 .ant-table-tbody > tr {
-  // display: block !important;
   background-color: #373739 !important;
   border-radius: 10px !important;
   margin: 10px auto !important;
-  width: 100%;
+  width: 100% !important;
   border: 0;
 }
 .ant-table-thead > tr > th{
   border: 0 !important;
+  text-align:right !important;
+}
+.ant-table-thead > tr > th:nth-child(1){
+  border: 0 !important;
+  text-align:left !important;
 }
 
 .ant-table-footer::before{

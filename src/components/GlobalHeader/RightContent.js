@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, useState, useEffect } from 'react';
 import { FormattedMessage, formatMessage } from 'umi';
 import { Spin, Tag, Menu, Icon, Avatar, Tooltip, Checkbox, Dropdown } from 'antd';
 import moment from 'moment';
@@ -11,22 +11,32 @@ import {
   AcyCardList,
   AcyWarp,
   AcyRadioButton,
+  AcySeting
 } from '@/components/Acy';
+import { useWeb3React } from '@web3-react/core';
+import { InjectedConnector } from '@web3-react/injected-connector';
 import NoticeIcon from '../NoticeIcon';
 import HeaderSearch from '../HeaderSearch';
 import HeaderDropdown from '../HeaderDropdown';
 import SelectLang from '../SelectLang';
 import styles from './index.less';
+import { ReactComponent as Opera } from './Opera.svg'; //
 import { T } from 'antd/lib/upload/utils';
 
-export default class GlobalHeaderRight extends PureComponent {
-  state = {
-    visible: false,
-    visibleMetaMask: false,
-    visibleSetting: false,
-  };
-  getNoticeData() {
-    const { notices = [] } = this.props;
+const GlobalHeaderRight = (props) => {
+  const { global } = props;
+  // 选择货币的弹窗
+  const [visible, setVisible] = useState(false);
+  const [visibleMetaMask, setVisibleMetaMask] = useState(false);
+  const [visibleSetting, setVisibleSetting] = useState(false);
+  // 连接钱包函数
+  const { account, chainId, library, activate } = useWeb3React();
+  // 连接钱包时支持的货币id
+  const injected = new InjectedConnector({
+    supportedChainIds: [1, 3, 4, 5, 42],
+  });
+  const getNoticeData = () => {
+    const { notices = [] } = props;
     if (notices.length === 0) {
       return {};
     }
@@ -56,7 +66,7 @@ export default class GlobalHeaderRight extends PureComponent {
     return groupBy(newNotices, 'type');
   }
 
-  getUnreadData = noticeData => {
+  const getUnreadData = noticeData => {
     const unreadMsg = {};
     Object.entries(noticeData).forEach(([key, value]) => {
       if (!unreadMsg[key]) {
@@ -69,18 +79,18 @@ export default class GlobalHeaderRight extends PureComponent {
     return unreadMsg;
   };
 
-  changeReadState = clickedItem => {
+  const changeReadState = clickedItem => {
     const { id } = clickedItem;
-    const { dispatch } = this.props;
+    const { dispatch } = props;
     dispatch({
       type: 'global/changeNoticeReadState',
       payload: id,
     });
   };
 
-  fetchMoreNotices = tabProps => {
+  const fetchMoreNotices = tabProps => {
     const { list, name } = tabProps;
-    const { dispatch, notices = [] } = this.props;
+    const { dispatch, notices = [] } = props;
     const lastItemId = notices[notices.length - 1].id;
     dispatch({
       type: 'global/fetchMoreNotices',
@@ -91,360 +101,246 @@ export default class GlobalHeaderRight extends PureComponent {
       },
     });
   };
-  onhandConnect = () => {
-    this.setState({
-      visible: true,
-    });
+  const onhandConnect = () => {
+
+    setVisible(true);
   };
-  onhandCancel = () => {
-    this.setState({
-      visible: false,
-    });
+  const onhandCancel = () => {
+
+    setVisibleMetaMask(false);
   };
-  onhandMetaMask = () => {
-    this.setState({
-      visibleMetaMask: true,
-    });
+  const onhandMetaMask = () => {
+    setVisibleMetaMask(true);
   };
-  onhandCancelMetaMask = () => {
-    this.setState({
-      visibleMetaMask: false,
-    });
+  const onhandCancelMetaMask = () => {
+    setVisibleMetaMask(false);
   };
-  onhandSetting = flag => {
-    this.setState({
-      visibleSetting: !!flag,
-    });
+  const onhandSetting = flag => {
+    setVisibleSetting(!!flag);
   };
-  handleVisibleChange = () => {};
+  const handleVisibleChange = () => { };
 
   // 选择钱包
-  selectWallet = () => {
+  const selectWallet = () => {
     activate(injected);
+    setVisibleMetaMask(false);
   };
-  render() {
-    const {
-      currentUser,
-      fetchingMoreNotices,
-      fetchingNotices,
-      loadedAllNotices,
-      onNoticeVisibleChange,
-      onMenuClick,
-      onNoticeClear,
-      skeletonCount,
-      theme,
-      account,
-    } = this.props;
-    const { visible, visibleMetaMask, visibleSetting } = this.state;
-    const menu = (
-      <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
-        <Menu.Item key="userCenter">
-          <Icon type="user" />
-          <FormattedMessage id="menu.account.center" defaultMessage="account center" />
-        </Menu.Item>
-        <Menu.Item key="userinfo">
-          <Icon type="setting" />
-          <FormattedMessage id="menu.account.settings" defaultMessage="account settings" />
-        </Menu.Item>
-        <Menu.Item key="triggerError">
-          <Icon type="close-circle" />
-          <FormattedMessage id="menu.account.trigger" defaultMessage="Trigger Error" />
-        </Menu.Item>
-        <Menu.Divider />
-        <Menu.Item key="logout">
-          <Icon type="logout" />
-          <FormattedMessage id="menu.account.logout" defaultMessage="logout" />
-        </Menu.Item>
-      </Menu>
-    );
-    const loadMoreProps = {
-      skeletonCount,
-      loadedAll: loadedAllNotices,
-      loading: fetchingMoreNotices,
-    };
-    const noticeData = this.getNoticeData();
-    const unreadMsg = this.getUnreadData(noticeData);
-    let className = styles.right;
-    if (theme === 'dark') {
-      className = `${styles.right}  ${styles.dark}`;
+  // 通知钱包连接成功
+  useEffect(() => {
+    // todo....
+    if (account) {
+      setVisibleMetaMask(false);
     }
-    return (
-      <div className={className}>
-        {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
-        <AcyConnectWallet value={account} onClick={this.onhandMetaMask} />
-        <Dropdown
-          overlay={
-            <div className={styles.setting} onClick={e => e.preventDefault()}>
-              <ul className={styles.list}>
-                <li>
-                  <div className={styles.listitem}>
-                    <span>Gas Price</span>
-                    <span>
-                      18.0 GWEI <AcyIcon width={16} name="nabla" />{' '}
-                    </span>
-                  </div>
-                  {/* <div>
-                <AcyRadioButton data={["22.0 gwei ～ 15s～ Rapid ","18.5 gwei ～ 45s～ Fast ","14.5 gwei ～ 2min～ Medium "]}/>
-              </div> */}
-                </li>
-                <li>
-                  <div className={styles.listitem}>
-                    <span>Endpoint</span>
-                    <span>
-                      Global 159.2ms <AcyIcon width={16} name="nabla" />{' '}
-                    </span>
-                  </div>
-                  {/* <div>
-                <AcyRadioButton data={["Global 210.7ms","APAC 210.5ms","N. America 879.6ms","Europe 880.2ms"]}/>
-              </div> */}
-                </li>
-                <li>
-                  <div className={styles.listitem}>
-                    <span>Language</span>
-                    <span>
-                      English <AcyIcon width={16} name="nabla" />{' '}
-                    </span>
-                  </div>
-                  <div>
-                    <AcyRadioButton data={['English', '中文']} />
-                  </div>
-                </li>
-                <li>
-                  {/* <div className={styles.listitem}>
-                    <span>Network</span>
-                    <span>
-                      Ethereum
-                      <AcyIcon width={16} name="nabla" />{' '}
-                    </span>
-                  </div> */}
-                  {/* <div>
-                <AcyRadioButton data={["Ethereum","BSC","Polygon","Solana"]}/>
-              </div> */}
-                </li>
-                {/* <li>
-                  <div className={styles.listitem}>
-                    <span>
-                      <AcyIcon width={25} name="help" />
-                      <span>FAQ</span>
-                    </span>
-                  </div>
-                </li>
-                <li>
-                  <div className={styles.listitem}>
-                    <span>
-                      <AcyIcon width={25} name="announcements" />
-                      <span>Announcements</span>
-                    </span>
-                  </div>
-                </li>
-                <li>
-                  <div className={styles.listitem}>
-                    <span>
-                      <AcyIcon width={25} name="documents" />
-                      <span>Documents</span>
-                    </span>
-                  </div>
-                </li> */}
-              </ul>
-              {/* <div className={styles.message}>
-                <AcyIcon width={30} name="twitter" title="Twitter" />
-                <AcyIcon width={30} name="twitter" title="Twitter" />
-                <AcyIcon width={30} name="twitter" title="Twitter" />
-                <AcyIcon width={30} name="twitter" title="Twitter" />
-                <AcyIcon width={30} name="twitter" title="Twitter" />
-              </div> */}
-            </div>
-          }
-          trigger={['click']}
-          placement="bottomLeft"
-          visible={visibleSetting}
-          onVisibleChange={this.onhandSetting}
-        >
-          <AcyIcon
-          width={30}
-            name={visibleSetting ? 'colors-active' : 'colors'}
-            onClick={() => this.onhandSetting(true)}
-          />
-        </Dropdown>
+  }, account);
+  const {
+    currentUser,
+    fetchingMoreNotices,
+    fetchingNotices,
+    loadedAllNotices,
+    onNoticeVisibleChange,
+    onMenuClick,
+    onNoticeClear,
+    skeletonCount,
+    theme,
+    isMobile
+  } = props;
+  // const { visible, visibleMetaMask, visibleSetting } = this.state;
+  const menu = (
+    <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
+      <Menu.Item key="userCenter">
+        <Icon type="user" />
+        <FormattedMessage id="menu.account.center" defaultMessage="account center" />
+      </Menu.Item>
+      <Menu.Item key="userinfo">
+        <Icon type="setting" />
+        <FormattedMessage id="menu.account.settings" defaultMessage="account settings" />
+      </Menu.Item>
+      <Menu.Item key="triggerError">
+        <Icon type="close-circle" />
+        <FormattedMessage id="menu.account.trigger" defaultMessage="Trigger Error" />
+      </Menu.Item>
+      <Menu.Divider />
+      <Menu.Item key="logout">
+        <Icon type="logout" />
+        <FormattedMessage id="menu.account.logout" defaultMessage="logout" />
+      </Menu.Item>
+    </Menu>
+  );
+  const loadMoreProps = {
+    skeletonCount,
+    loadedAll: loadedAllNotices,
+    loading: fetchingMoreNotices,
+  };
+  // 货币列表
+  const MetaMask = [{
+    name: 'MetaMask',
+    icon: 'Metamask',
+    onClick: () => {
+      selectWallet()
+    }
+  }];
+  const walletList = [
 
-        {/* <HeaderSearch
-          className={`${styles.action} ${styles.search}`}
-          placeholder={formatMessage({ id: 'component.globalHeader.search' })}
-          dataSource={[
-            formatMessage({ id: 'component.globalHeader.search.example1' }),
-            formatMessage({ id: 'component.globalHeader.search.example2' }),
-            formatMessage({ id: 'component.globalHeader.search.example3' }),
-          ]}
-          onSearch={value => {
-            console.log('input', value); // eslint-disable-line
-          }}
-          onPressEnter={value => {
-            console.log('enter', value); // eslint-disable-line
-          }}
-        />
-        <Tooltip title={formatMessage({ id: 'component.globalHeader.help' })}>
-          <a
-            target="_blank"
-            href="https://pro.ant.design/docs/getting-started"
-            rel="noopener noreferrer"
-            className={styles.action}
-          >
-            <Icon type="question-circle-o" />
-          </a>
-        </Tooltip>
-        <NoticeIcon
-          className={styles.action}
-          count={currentUser.unreadCount}
-          onItemClick={(item, tabProps) => {
-            console.log(item, tabProps); // eslint-disable-line
-            this.changeReadState(item, tabProps);
-          }}
-          locale={{
-            emptyText: formatMessage({ id: 'component.noticeIcon.empty' }),
-            clear: formatMessage({ id: 'component.noticeIcon.clear' }),
-            loadedAll: formatMessage({ id: 'component.noticeIcon.loaded' }),
-            loadMore: formatMessage({ id: 'component.noticeIcon.loading-more' }),
-          }}
-          onClear={onNoticeClear}
-          onLoadMore={this.fetchMoreNotices}
-          onPopupVisibleChange={onNoticeVisibleChange}
-          loading={fetchingNotices}
-          clearClose
-        >
-          <NoticeIcon.Tab
-            count={unreadMsg.notification}
-            list={noticeData.notification}
-            title={formatMessage({ id: 'component.globalHeader.notification' })}
-            name="notification"
-            emptyText={formatMessage({ id: 'component.globalHeader.notification.empty' })}
-            emptyImage="https://gw.alipayobjects.com/zos/rmsportal/wAhyIChODzsoKIOBHcBk.svg"
-            {...loadMoreProps}
-          />
-          <NoticeIcon.Tab
-            count={unreadMsg.message}
-            list={noticeData.message}
-            title={formatMessage({ id: 'component.globalHeader.message' })}
-            name="message"
-            emptyText={formatMessage({ id: 'component.globalHeader.message.empty' })}
-            emptyImage="https://gw.alipayobjects.com/zos/rmsportal/sAuJeJzSKbUmHfBQRzmZ.svg"
-            {...loadMoreProps}
-          />
-          <NoticeIcon.Tab
-            count={unreadMsg.event}
-            list={noticeData.event}
-            title={formatMessage({ id: 'component.globalHeader.event' })}
-            name="event"
-            emptyText={formatMessage({ id: 'component.globalHeader.event.empty' })}
-            emptyImage="https://gw.alipayobjects.com/zos/rmsportal/HsIsxMZiWKrNUavQUXqx.svg"
-            {...loadMoreProps}
-          />
-        </NoticeIcon>
-        {currentUser.name ? (
-          <HeaderDropdown overlay={menu}>
-            <span className={`${styles.action} ${styles.account}`}>
-              <Avatar
-                size="small"
-                className={styles.avatar}
-                src={currentUser.avatar}
-                alt="avatar"
-              />
-              <span className={styles.name}>{currentUser.name}</span>
-            </span>
-          </HeaderDropdown>
-        ) : (
-          <Spin size="small" style={{ marginLeft: 8, marginRight: 8 }} />
-        )}
-        <SelectLang className={styles.action} /> */}
-        <AcyModal width={957} visible={visible} onCancel={this.onhandCancel}>
-          <div className={styles.walltitle}>
-            <span>Connect Wallet</span>
-            <AcyIcon onClick={this.onhandCancel} name="close" />
-          </div>
-          <AcyCardList title="Select Network">
-            <AcyCardList.Thin onClick={this.selectWallet}>
-              <AcyIcon name="eth" />
-              Ethereum
-            </AcyCardList.Thin>
-            <AcyCardList.Thin>
-              <AcyIcon name="eth" />
-              Ethereum
-            </AcyCardList.Thin>
-            <AcyCardList.Thin>
-              <AcyIcon name="eth" />
-              Ethereum
-            </AcyCardList.Thin>
-            <AcyCardList.Thin>
-              <AcyIcon name="eth" />
-              Ethereum
-            </AcyCardList.Thin>
-          </AcyCardList>
-          <AcyCardList title="Select Wallet" style={{ marginTop: '70px' }}>
-            <AcyCardList.Fat>
-              <AcyIcon name="eth" big />
-              <p>Ethereum</p>
-            </AcyCardList.Fat>
-            <AcyCardList.Fat>
-              <AcyIcon name="eth" big />
-              <p>Ethereum</p>
-            </AcyCardList.Fat>
-            <AcyCardList.Fat>
-              <AcyIcon name="eth" big />
-              <p>Ethereum</p>
-            </AcyCardList.Fat>
-            <AcyCardList.Fat>
-              <AcyIcon name="eth" big />
-              <p>Ethereum</p>
-            </AcyCardList.Fat>
-          </AcyCardList>
-          <AcyCardList style={{ marginTop: '50px' }}>
-            <AcyCardList.Agree>
-              <AcyCheckBox>
-                I have read, understand, and agree to the <strong>Terms of Service</strong>.
-              </AcyCheckBox>
-            </AcyCardList.Agree>
-          </AcyCardList>
-        </AcyModal>
-        <AcyModal width={600} visible={visibleMetaMask} onCancel={this.onhandCancelMetaMask}>
-          <div className={styles.metamasktitle}>
-            <span>0xE34780…25f7</span>
-          </div>
-          <AcyCardList title="MetaMask">
-            <AcyWarp>
-              <div className={styles.coin}>
-                <div className={styles.coinname}>
-                  <AcyIcon name="eth" width={55} />
-                  ETH
-                </div>
-                <div className={styles.coinprice}>
-                  <p>0.5213</p>
-                  <p className={styles.dollar}>$615.39</p>
-                </div>
-              </div>
-            </AcyWarp>
-          </AcyCardList>
-          <AcyCardList style={{ marginTop: '20px' }}>
-            <AcyIcon name="view" width={80} title="View" />
-            <AcyIcon name="copy" width={80} title="Copy" />
-            <AcyIcon name="switch" width={80} title="Switch" />
-            <AcyIcon name="disconnect" width={80} title="Disconnect" />
-          </AcyCardList>
-          <p className={styles.buyCrypto}>Buy Crypto</p>
-          <div className={styles.transak}>
-            <AcyIcon name="eth" width={50} /> Transak
-          </div>
-          <div className={styles.clear}>
-            <div>
-              <div className={styles.recentTransaction}>
-              <strong>Recent Transactions</strong>
-              <AcyIcon width={20} onClick={this.onhandCancel} name="clear" />
-              </div>
-              
-              <p className={styles.subtitle}>No results found</p>
-            </div>
-            
-          </div>
-        </AcyModal>
-      </div>
-    );
+    {
+      name: 'Coinbase Wallet',
+      icon: 'Coinbase',
+      onClick: () => {
+
+      }
+    },
+
+    {
+      name: 'TrustWallet',
+      icon: 'TrustWallet',
+      onClick: () => {
+
+      }
+    }, {
+      name: 'WalletConnect',
+      icon: 'WalletConnect',
+      onClick: () => {
+
+      }
+    },
+    {
+      name: 'Trezor',
+      icon: 'Trezor',
+      onClick: () => {
+
+      }
+    },
+    {
+      name: 'Ledger',
+      icon: 'Ledger',
+      onClick: () => {
+
+      }
+    },
+    {
+      name: 'Fortmatic',
+      icon: 'Fortmatic',
+      onClick: () => {
+
+      }
+    },
+    {
+      name: 'Portis',
+      icon: 'Portis',
+      onClick: () => {
+
+      }
+    },
+    {
+      name: 'Torus',
+      icon: 'Torus',
+      onClick: () => {
+
+      }
+    },
+    {
+      name: 'Opera',
+      icon: 'Opera',
+      svgicon: true,
+      onClick: () => {
+
+      }
+    },
+    {
+      name: 'Gnosis Safe',
+      icon: 'Gnosis',
+      onClick: () => {
+
+      }
+    }];
+  const [only, setOnly] = useState(true);
+  const showMore = () => {
+    setOnly(!only);
   }
+  const noticeData = getNoticeData();
+  const unreadMsg = getUnreadData(noticeData);
+  let className = styles.right;
+  if (theme === 'dark') {
+    className = `${styles.right}  ${styles.dark}`;
+  }
+  return (
+    <div className={className}>
+      {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
+      <AcyConnectWallet isMobile={isMobile} value={account} onClick={onhandMetaMask} />
+      <Dropdown
+        overlay={
+          <div className={styles.setting} onClick={e => e.preventDefault()}>
+            <ul className={styles.list}>
+              
+              <li>
+                <AcySeting title="Language" current="English">
+                  <AcyRadioButton data={['English', '中文']} />
+
+                </AcySeting>
+              </li>
+              
+            </ul>
+          </div>
+        }
+        trigger={['click']}
+        placement="bottomLeft"
+        visible={visibleSetting}
+        onVisibleChange={onhandSetting}
+      >
+        <AcyIcon
+          width={30}
+          name={visibleSetting ? 'colors-active' : 'colors'}
+          onClick={() => onhandSetting(true)}
+        />
+      </Dropdown>
+      <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}>
+        <div className={styles.walltitle}>
+          <AcyIcon.MyIcon width={20} type='Wallet' /> <span style={{marginLeft:'10px'}}>Select a Wallet</span>
+          {/* <AcyIcon onClick={this.onhandCancel} name="close" /> */}
+        </div>
+        <AcyCardList style={{ marginTop: '10px' }}>
+          <AcyCardList.Agree>
+            By connecting a wallet, you agree to ACY <a target="_blank" href="https://acy.finance/terms-of-use">Terms of Service</a> .
+          </AcyCardList.Agree>
+        </AcyCardList>
+        <AcyCardList>
+
+          {
+            MetaMask.map(item => <AcyCardList.Thin onClick={() => item.onClick()}>
+              {
+                item.svgicon && <Opera width={32} style={{ margin: '5px' }} /> || <AcyIcon.MyIcon width={32} type={item.icon} />
+              }
+              <span>
+                {item.name}
+              </span>
+            </AcyCardList.Thin>
+            )
+          }
+        </AcyCardList>
+        <AcyCardList>
+
+          {
+            walletList.map((item, index) => {
+              if (only && index > 1) {
+                return;
+              }
+              else {
+                return <AcyCardList.Thin onClick={() => item.onClick()}>
+                  {
+                    item.svgicon && <Opera width={32} style={{ margin: '5px' }} /> || <AcyIcon.MyIcon width={32} type={item.icon} />
+                  }
+                  <span>
+                    {item.name}
+                  </span>
+                </AcyCardList.Thin>;
+              }
+            }
+            )
+          }
+        </AcyCardList>
+      {only&&<p className={styles.showmore} onClick={showMore}>See More...</p>}  
+
+      </AcyModal>
+    </div>
+  );
 }
+export default GlobalHeaderRight;

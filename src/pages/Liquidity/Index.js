@@ -95,23 +95,6 @@ const columns = [
     ),
   },
   {
-    title: 'Fee Rate',
-    dataIndex: 'age',
-    key: 'age',
-    render: () => '0.008%',
-  },
-  {
-    title: 'Liquidity',
-    dataIndex: 'address',
-    key: 'address',
-    render: () => (
-      <div>
-        <p>5662.88 WETH</p>
-        <p>26.69 WBTC</p>
-      </div>
-    ),
-  },
-  {
     title: 'My Liquidity',
     dataIndex: 'address',
     key: 'address',
