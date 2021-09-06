@@ -99,7 +99,7 @@ class AcyLineChart extends Component {
         text: this.props.title,
         left: 'center',
         textStyle: {
-          color: 'white',
+          color: '#b5b5b6',
         },
       },
       tooltip: {

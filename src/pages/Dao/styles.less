@@ -8,6 +8,8 @@
   flex-wrap: wrap;
   justify-content: space-between;
   margin-bottom: 1.5rem;
+  padding: 20px;
+  align-items: stretch;
 }
 
 .toggleChart {
@@ -15,9 +17,7 @@
   justify-content: end;
 
   div {
-    background-color: @buttonColor;
     border-radius: 10px;
-    color: white;
     padding: 10px;
     cursor: pointer;
   }
@@ -29,12 +29,10 @@
 
 .chartSection {
   width: 49%;
-  height: 40vh;
-  max-height: 700px;
   background-color: @cardColor;
   border-radius: 15px;
-  margin-bottom: 10px;
-  padding: 15px;
+  margin: 0px 15px 0px 0px;
+  padding: 15px 15px 0px 15px;
   overflow: hidden;
   .graphStats {
     padding: 0;
@@ -55,295 +53,41 @@
   }
 }
 
-.stakeSection {
-  width: 49%;
-  background-color: #2f3135aa;
-  color: #b5b6b6;
-  border-radius: 15px;
-  display: flex;
-  flex-direction: column;
-
-  .stakeContentWrapper {
-    padding: 15px;
-    border-bottom: 1px solid #434343;
-  }
-
-  .rewardContentWrapper {
-    padding: 15px;
-
-    .rewardRow {
-      display: flex;
-
-      .rewardRowTitle {
-        flex: 1;
-        font-size: 1.5rem;
-      }
-      .cryptoSelectionContainer {
-        flex: 3;
-
-        .tokenSelectionContainer {
-          display: flex;
-
-          .tokenSelection {
-            flex: 1;
-            display: flex;
-            align-items: flex-start;
-            flex-direction: column;
-
-            .tokenDropdown {
-              margin-bottom: 0.75rem;
-              display: flex;
-              align-items: center;
-
-              .tokenImg {
-                width: 32px;
-              }
-
-              .tokenSymbol {
-                margin-left: 0.5rem;
-              }
-            }
-
-            .tokenDropdown:hover {
-              cursor: pointer;
-            }
-
-            .tokenPercentage {
-              margin-bottom: 0.75rem;
-
-              .suffix {
-                font-size: 1.5rem;
-                position: relative;
-                right: 1.5rem;
-              }
-
-              .tokenPercentageInput {
-                width: 50%;
-                background-color: #4c4c4d;
-                border: none;
-                border-radius: 7.5px;
-                padding: 0 1rem;
-                font-size: 1.5rem;
-              }
-            }
-          }
-        }
-
-        .stakeSubmitButton {
-          width: 70%;
-          background-color: #4c4c4d;
-          border: none;
-          border-radius: 7.5px;
-          font-size: 1.5rem;
-          padding: 0 1rem;
-        }
-
-        .stakeSubmitButton:hover {
-          background-color: #5f5f5f;
-          cursor: pointer;
-        }
-      }
-    }
-  }
-}
-
-.stakeUpperSection {
-  display: flex;
-  flex-direction: column;
-}
-
-.amountRow {
-  display: flex;
-  margin-bottom: 1.5rem;
-
-  div:first-child {
-    flex: 1;
-    font-size: 1.5rem;
-  }
-
-  div:last-child {
-    flex: 3;
-
-    input {
-      width: 70%;
-      background-color: #4c4c4d;
-      border: none;
-      border-radius: 7.5px;
-      font-size: 1.5rem;
-      padding: 0 1rem;
-      -moz-appearance: textfield;
-    }
-
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-  }
-}
-
-.balanceRow {
-  display: flex;
-  margin-bottom: 1.5rem;
-
-  .balanceRowTitle {
-    flex: 1;
-  }
-
-  .sliderContainer {
-    flex: 3;
-    display: flex;
-    align-items: center;
-
-    .slider {
-      margin-left: 1.5rem;
-      margin-right: 1.5rem;
-      margin-bottom: 0.6rem;
-
-      -webkit-appearance: none;
-      appearance: none;
-      height: 3px; /* Specified height */
-      background: black; /* Grey background */
-      outline: none; /* Remove outline */
-      opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
-      -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
-      transition: opacity 0.2s;
-    }
-
-    .slider:hover {
-      opacity: 1; /* Fully shown on mouse-over */
-    }
-
-    .slider::-webkit-slider-thumb {
-      -webkit-appearance: none; /* Override default look */
-      appearance: none;
-      width: 15px; /* Set a specific slider handle width */
-      height: 15px; /* Slider handle height */
-      border-radius: 50%;
-      background-color: #5f5f5f; /* Green background */
-      cursor: pointer; /* Cursor on hover */
-    }
-
-    .slider::-moz-range-thumb {
-      width: 15px; /* Set a specific slider handle width */
-      height: 15px; /* Slider handle height */
-      background-color: #5f5f5f; /* Green background */
-      cursor: pointer; /* Cursor on hover */
-    }
-  }
-}
-
-.lockTimeRow {
-  display: flex;
-
-  .lockTimeRowTitle {
-    flex: 1;
-  }
-
-  .dateSelectionContainer {
-    flex: 3;
-    display: flex;
-    flex-direction: column;
-
-    .datePickerContainer {
-      margin-bottom: 0.75rem;
-    }
-
-    .presetDurationContainer {
-      display: flex;
-
-      .presetDurationSelection {
-        flex: 1;
-        color: #b5b6b6;
-        background-color: #4c4c4d;
-        border-radius: 0.3rem;
-        padding: 0 1rem;
-        text-align: center;
-      }
-
-      .presetDurationSelection:not(:first-child) {
-        margin-left: 1rem;
-      }
-
-      .presetDurationSelection:hover {
-        background-color: #5f5f5f;
-        cursor: pointer;
-      }
-    }
-  }
-}
-
-.datePickerInput {
-  color: #b5b6b6;
-  background-color: #4c4c4d;
-  border: none;
-  border-radius: 0.3rem;
-  padding: 0 1rem;
-}
-
-.datePickerInput:hover {
-  background-color: #5f5f5f;
-  cursor: pointer;
-}
-
-.modal {
-  :global {
-    .ant-modal-content {
-      border-radius: 20px;
-      background: transparent;
-    }
-  }
-
-  .modalListItem {
-    border-radius: 0.3rem;
-    display: flex;
-    margin-bottom: 1rem;
-    padding: 0.25rem 0.5rem;
-
-    .modalListLogoContainer {
-      .modalListLogo {
-        width: 32px;
-      }
-    }
-
-    .modalListSymbol {
-      margin-left: 1.5rem;
-    }
-  }
-
-  .modalListItem:hover {
-    background-color: #5f5f5f;
-    cursor: pointer;
-  }
-}
-
-.tableData {
-  text-align: right;
-}
-
-.tableSeeMoreWrapper {
-  text-align: center;
-  width: 100%;
-}
-
-.tableSeeMore {
-  font-size: 16px;
-}
-
 .createProposalContainer {
   text-align: end;
-  margin-bottom: 1.5rem;
+  padding: 20px;
 
   .createProposalButton {
-    background-color: @buttonColor;
+    background-color: #eb5c20;
+    color: white;
     border: none;
     border-radius: 7.5px;
-    font-size: 1rem;
-    padding: 0 1rem;
+    font-size: 1.25rem;
+    padding: 0.5rem 1.25rem;
   }
 
   .createProposalButton:hover {
-    background-color: #5f5f5f;
     cursor: pointer;
+  }
+}
+
+@media (max-width: 768px) {
+  .stakeSectionMain {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .chartSection {
+    width: 90%;
+    height: 400px;
+  }
+  .createProposalButton {
+    background-color: #eb5c20;
+    color: white;
+    border: none;
+    border-radius: 7.5px;
+    font-size: 0.75rem;
+    padding: 0.5rem 1.25rem;
+    margin-right: 30px;
   }
 }

@@ -1,7 +1,7 @@
 import { React } from 'react';
 import { Modal } from 'antd';
 import styles from '@/pages/Dao/styles.less';
-import SampleToken from '@/pages/Dao/SampleToken';
+import SampleToken from '@/pages/Dao/sample_data/SampleToken';
 import placeholderTokenImg from '@/pages/Dao/placeholder-round.png';
 
 const TokenSelectionModal = ({ isModalVisible, handleCancel, handleClick }) => (

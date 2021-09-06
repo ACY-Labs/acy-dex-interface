@@ -1,4 +1,4 @@
-import { TransactionType } from './Util.js';
+import { TransactionType } from '../Util.js';
 
 export const dataSourceCoin = [
   {

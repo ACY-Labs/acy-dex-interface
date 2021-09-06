@@ -40,6 +40,9 @@ class AcyPieChart extends Component {
       title: {
         text: 'Gauge relative weight',
         left: 'center',
+        textStyle: {
+          color: '#b5b5b6',
+        },
       },
       tooltip: {
         trigger: 'item',
