@@ -1,9 +1,10 @@
 import React, { Component, useState, useCallback, useEffect } from 'react';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { Table,  Row, Col,Input, Divider} from 'antd';
+import { Table,  Row, Col,Input, Divider, Breadcrumb} from 'antd';
 import styles from './styles.less';
 import moment from 'moment';
 import { useDetectClickOutside } from 'react-detect-click-outside';
+import {Link} from 'react-router-dom'
 import {
     AcyButton,
     AcyCard,
@@ -77,6 +78,15 @@ function MarketTokenInfo(props){
     return (
         <div className={styles.marketRoot}>
             <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
+            <Breadcrumb separator={<span style={{color:"#b5b5b6"}}>&gt;</span>} style={{marginBottom: "20px",color:"#b5b5b6"}}>
+                <Breadcrumb.Item>
+                    <Link style={{color:"#b5b5b6"}} to='/market' >Overview</Link>
+                </Breadcrumb.Item>
+                <Breadcrumb.Item>
+                    <Link style={{color:"#b5b5b6"}} to='/market/list/pool' >Pools</Link>
+                </Breadcrumb.Item >
+                <Breadcrumb.Item style={{fontWeight:"bold"}}>ETH</Breadcrumb.Item>
+            </Breadcrumb>
             <div>
                 <div className={styles.rightButton}></div>
             </div>
@@ -233,6 +243,7 @@ function MarketTokenInfo(props){
                 </div>
                 )} 
             />
+            <div style={{height:"40px"}}></div>
         </div>
     )
 }
