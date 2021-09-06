@@ -1,750 +1,410 @@
 export default [
   {
     "chainId": 1,
-    "address": "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
-    "name": "0x Protocol Token",
-    "symbol": "ZRX",
+    "address": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
+    "name": "Aave",
+    "symbol": "AAVE",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_ZRX.svg"
+    "logoURI": "https://assets.coingecko.com/coins/images/12645/thumb/AAVE.png?1601374110"
   },
   {
     "chainId": 1,
-    "address": "0x39AA39c021dfbaE8faC545936693aC917d5E7563",
-    "name": "Compound USD Coin",
-    "symbol": "cUSDC",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_usdc.svg"
-  },
-  {
-    "chainId": 1,
-    "address": "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643",
-    "name": "Compound Dai",
-    "symbol": "cDAI",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_dai.svg"
-  },
-  {
-    "chainId": 1,
-    "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-    "name": "Dai Stablecoin",
-    "symbol": "DAI",
+    "address": "0xfF20817765cB7f73d4bde2e66e067E58D11095C2",
+    "name": "Amp",
+    "symbol": "AMP",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_DAI.svg"
+    "logoURI": "https://assets.coingecko.com/coins/images/12409/thumb/amp-200x200.png?1599625397"
   },
   {
-    "chainId": 1,
-    "address": "0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359",
-    "name": "Sai Stablecoin v1.0",
-    "symbol": "SAI",
+    "name": "Aragon Network Token",
+    "address": "0x960b236A07cf122663c4303350609A66A7B288C0",
+    "symbol": "ANT",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_SAI.svg"
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x960b236A07cf122663c4303350609A66A7B288C0/logo.png"
+  },
+  {
+    "name": "Balancer",
+    "address": "0xba100000625a3754423978a60c9317c58a424e3D",
+    "symbol": "BAL",
+    "decimals": 18,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xba100000625a3754423978a60c9317c58a424e3D/logo.png"
   },
   {
     "chainId": 1,
-    "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-    "name": "Tether USD",
-    "symbol": "USDT",
-    "decimals": 6,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDT.svg"
+    "address": "0xBA11D00c5f74255f56a5E366F4F77f5A186d7f55",
+    "name": "Band Protocol",
+    "symbol": "BAND",
+    "decimals": 18,
+    "logoURI": "https://assets.coingecko.com/coins/images/9545/thumb/band-protocol.png?1568730326"
   },
   {
+    "name": "Bancor Network Token",
+    "address": "0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C",
+    "symbol": "BNT",
+    "decimals": 18,
     "chainId": 1,
-    "address": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C/logo.png"
+  },
+  {
     "name": "Compound",
+    "address": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
     "symbol": "COMP",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_COMP.svg"
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc00e94Cb662C3520282E6f5717214004A7f26888/logo.png"
   },
   {
-    "chainId": 1,
-    "address": "0x70e36f6BF80a52b3B46b3aF8e106CC0ed743E8e4",
-    "name": "Compound Collateral",
-    "symbol": "cCOMP",
-    "decimals": 8
-  },
-  {
-    "chainId": 1,
-    "address": "0xf650C3d88D12dB855b8bf7D11Be6C55A4e07dCC9",
-    "name": "Compound USDT",
-    "symbol": "cUSDT",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_usdt.svg"
-  },
-  {
-    "chainId": 1,
-    "address": "0x6C8c6b02E7b2BE14d4fA6022Dfd6d75921D90E4E",
-    "name": "Compound Basic Attention Token",
-    "symbol": "cBAT",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_bat.svg"
-  },
-  {
-    "chainId": 1,
-    "address": "0x0D8775F648430679A709E98d2b0Cb6250d2887EF",
-    "name": "Basic Attention Token",
-    "symbol": "BAT",
+    "name": "Curve DAO Token",
+    "address": "0xD533a949740bb3306d119CC777fa900bA034cd52",
+    "symbol": "CRV",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_BAT.svg"
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xD533a949740bb3306d119CC777fa900bA034cd52/logo.png"
   },
   {
     "chainId": 1,
-    "address": "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5",
-    "name": "Compound Ether",
-    "symbol": "cETH",
+    "address": "0x41e5560054824eA6B0732E656E3Ad64E20e94E45",
+    "name": "Civic",
+    "symbol": "CVC",
     "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_eth.svg"
+    "logoURI": "https://assets.coingecko.com/coins/images/788/thumb/civic.png?1547034556"
+  },
+  {
+    "name": "Dai Stablecoin",
+    "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    "symbol": "DAI",
+    "decimals": 18,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png"
   },
   {
     "chainId": 1,
-    "address": "0xF5DCe57282A584D2746FaF1593d3121Fcac444dC",
-    "name": "Compound Sai",
-    "symbol": "cSAI",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_sai.svg"
+    "address": "0x0AbdAce70D3790235af448C88547603b945604ea",
+    "name": "district0x",
+    "symbol": "DNT",
+    "decimals": 18,
+    "logoURI": "https://assets.coingecko.com/coins/images/849/thumb/district0x.png?1547223762"
+  },
+  {
+    "name": "Gnosis Token",
+    "address": "0x6810e776880C02933D47DB1b9fc05908e5386b96",
+    "symbol": "GNO",
+    "decimals": 18,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6810e776880C02933D47DB1b9fc05908e5386b96/logo.png"
   },
   {
     "chainId": 1,
-    "address": "0x158079Ee67Fce2f58472A96584A73C7Ab9AC95c1",
-    "name": "Compound Augur",
-    "symbol": "cREP",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_rep.svg"
+    "address": "0xc944E90C64B2c07662A292be6244BDf05Cda44a7",
+    "name": "The Graph",
+    "symbol": "GRT",
+    "decimals": 18,
+    "logoURI": "https://assets.coingecko.com/coins/images/13397/thumb/Graph_Token.png?1608145566"
   },
   {
     "chainId": 1,
-    "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-    "name": "Wrapped BTC",
-    "symbol": "WBTC",
-    "decimals": 8
+    "address": "0x85Eee30c52B0b379b046Fb0F85F4f3Dc3009aFEC",
+    "name": "Keep Network",
+    "symbol": "KEEP",
+    "decimals": 18,
+    "logoURI": "https://assets.coingecko.com/coins/images/3373/thumb/IuNzUb5b_400x400.jpg?1589526336"
+  },
+  {
+    "name": "Kyber Network Crystal",
+    "address": "0xdd974D5C2e2928deA5F71b9825b8b646686BD200",
+    "symbol": "KNC",
+    "decimals": 18,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdd974D5C2e2928deA5F71b9825b8b646686BD200/logo.png"
+  },
+  {
+    "name": "ChainLink Token",
+    "address": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+    "symbol": "LINK",
+    "decimals": 18,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x514910771AF9Ca656af840dff83E8264EcF986CA/logo.png"
+  },
+  {
+    "name": "Loom Network",
+    "address": "0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0",
+    "symbol": "LOOM",
+    "decimals": 18,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0/logo.png"
+  },
+  {
+    "name": "LoopringCoin V2",
+    "address": "0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD",
+    "symbol": "LRC",
+    "decimals": 18,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD/logo.png"
   },
   {
     "chainId": 1,
+    "address": "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942",
+    "name": "Decentraland",
+    "symbol": "MANA",
+    "decimals": 18,
+    "logoURI": "https://assets.coingecko.com/coins/images/878/thumb/decentraland-mana.png?1550108745"
+  },
+  {
+    "name": "Maker",
+    "address": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
+    "symbol": "MKR",
+    "decimals": 18,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2/logo.png"
+  },
+  {
+    "chainId": 1,
+    "address": "0xec67005c4E498Ec7f55E092bd1d35cbC47C91892",
+    "name": "Melon",
+    "symbol": "MLN",
+    "decimals": 18,
+    "logoURI": "https://assets.coingecko.com/coins/images/605/thumb/melon.png?1547034295"
+  },
+  {
+    "name": "Numeraire",
+    "address": "0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671",
+    "symbol": "NMR",
+    "decimals": 18,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671/logo.png"
+  },
+  {
+    "chainId": 1,
+    "address": "0x4fE83213D56308330EC302a8BD641f1d0113A4Cc",
+    "name": "NuCypher",
+    "symbol": "NU",
+    "decimals": 18,
+    "logoURI": "https://assets.coingecko.com/coins/images/3318/thumb/photo1198982838879365035.jpg?1547037916"
+  },
+  {
+    "name": "Orchid",
+    "address": "0x4575f41308EC1483f3d399aa9a2826d74Da13Deb",
+    "symbol": "OXT",
+    "decimals": 18,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x4575f41308EC1483f3d399aa9a2826d74Da13Deb/logo.png"
+  },
+  {
+    "name": "Republic Token",
+    "address": "0x408e41876cCCDC0F92210600ef50372656052a38",
+    "symbol": "REN",
+    "decimals": 18,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x408e41876cCCDC0F92210600ef50372656052a38/logo.png"
+  },
+  {
+    "name": "Reputation Augur v1",
     "address": "0x1985365e9f78359a9B6AD760e32412f4a445E862",
-    "name": "Reputation",
     "symbol": "REP",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_REP.svg"
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x1985365e9f78359a9B6AD760e32412f4a445E862/logo.png"
   },
   {
-    "chainId": 1,
-    "address": "0xB3319f5D18Bc0D84dD1b4825Dcde5d5f7266d407",
-    "name": "Compound 0x",
-    "symbol": "cZRX",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_zrx.svg"
-  },
-  {
-    "chainId": 1,
-    "address": "0xC11b1268C1A384e55C48c2391d8d480264A3A7F4",
-    "name": "Compound Wrapped BTC",
-    "symbol": "cWBTC",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_wbtc.svg"
-  },
-  {
-    "chainId": 1,
-    "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    "name": "USD Coin USDC",
-    "symbol": "USDC",
-    "decimals": 6,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDC.svg"
-  },
-  {
-    "chainId": 1,
-    "address": "0xdd974D5C2e2928deA5F71b9825b8b646686BD200",
-    "name": "Kyber Network Crystal",
-    "symbol": "KNC",
-    "decimals": 18
-  },
-  {
-    "chainId": 1,
-    "address": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
-    "name": "ChainLink Token",
-    "symbol": "LINK",
-    "decimals": 18
-  },
-  {
-    "chainId": 1,
-    "address": "0xFAce851a4921ce59e912d19329929CE6da6EB0c7",
-    "name": "Compound ChainLink",
-    "symbol": "cLINK",
-    "decimals": 8
-  },
-  {
-    "chainId": 1,
-    "address": "0x0cec1a9154ff802e7934fc916ed7ca50bde6844e",
-    "name": "PoolTogether Governance Token",
-    "symbol": "POOL",
+    "name": "Reputation Augur v2",
+    "address": "0x221657776846890989a759BA2973e427DfF5C9bB",
+    "symbol": "REPv2",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_POOL.svg"
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x221657776846890989a759BA2973e427DfF5C9bB/logo.png"
+  },
+  {
+    "name": "Synthetix Network Token",
+    "address": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
+    "symbol": "SNX",
+    "decimals": 18,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F/logo.png"
+  },
+  {
+    "name": "Storj Token",
+    "address": "0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC",
+    "symbol": "STORJ",
+    "decimals": 8,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC/logo.png"
   },
   {
     "chainId": 1,
-    "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+    "address": "0x8dAEBADE922dF735c38C80C7eBD708Af50815fAa",
+    "name": "tBTC",
+    "symbol": "TBTC",
+    "decimals": 18,
+    "logoURI": "https://assets.coingecko.com/coins/images/11224/thumb/tBTC.png?1589620754"
+  },
+  {
+    "name": "UMA Voting Token v1",
+    "address": "0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828",
+    "symbol": "UMA",
+    "decimals": 18,
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828/logo.png"
+  },
+  {
     "name": "Uniswap",
+    "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
     "symbol": "UNI",
     "decimals": 18,
+    "chainId": 1,
     "logoURI": "ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg"
   },
   {
+    "name": "USDCoin",
+    "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "symbol": "USDC",
+    "decimals": 6,
     "chainId": 1,
-    "address": "0x35A18000230DA775CAc24873d00Ff85BccdeD550",
-    "name": "Compound Uniswap",
-    "symbol": "cUNI",
-    "decimals": 8
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png"
   },
   {
-    "chainId": 1,
-    "address": "0x0000000000085d4780B73119b644AE5ecd22b376",
-    "name": "TrueUSD",
-    "symbol": "TUSD",
-    "decimals": 18
-  },
-  {
-    "chainId": 1,
-    "address": "0x12392F67bdf24faE0AF363c24aC620a2f67DAd86",
-    "name": "Compound TrueUSD",
-    "symbol": "cTUSD",
-    "decimals": 8
-  },
-  {
-    "chainId": 3,
-    "address": "0xc0e2D7d9279846B80EacdEa57220AB2333BC049d",
-    "name": "0x Protocol Token",
-    "symbol": "ZRX",
-    "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_ZRX.svg"
-  },
-  {
-    "chainId": 3,
-    "address": "0x2973e69b20563bcc66dC63Bde153072c33eF37fe",
-    "name": "Compound USD Coin",
-    "symbol": "cUSDC",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_usdc.svg"
-  },
-  {
-    "chainId": 3,
-    "address": "0xbc689667C13FB2a04f09272753760E38a95B998C",
-    "name": "Compound Dai",
-    "symbol": "cDAI",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_dai.svg"
-  },
-  {
-    "chainId": 3,
-    "address": "0x31F42841c2db5173425b5223809CF3A38FEde360",
-    "name": "Dai Stablecoin",
-    "symbol": "DAI",
-    "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_DAI.svg"
-  },
-  {
-    "chainId": 3,
-    "address": "0x110a13FC3efE6A245B50102D2d79B3E76125Ae83",
     "name": "Tether USD",
+    "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
     "symbol": "USDT",
     "decimals": 6,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDT.svg"
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png"
   },
   {
-    "chainId": 3,
-    "address": "0xf76D4a441E4ba86A923ce32B89AFF89dBccAA075",
-    "name": "Compound",
-    "symbol": "COMP",
-    "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_COMP.svg"
-  },
-  {
-    "chainId": 3,
-    "address": "0x70014768996439F71C041179Ffddce973a83EEf2",
-    "name": "Compound Collateral",
-    "symbol": "cCOMP",
-    "decimals": 8
-  },
-
-  {
-    "chainId": 3,
-    "address": "0xF6958Cf3127e62d3EB26c79F4f45d3F3b2CcdeD4",
-    "name": "Compound USDT",
-    "symbol": "cUSDT",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_usdt.svg"
-  },
-  {
-    "chainId": 3,
-    "address": "0xaF50a5A6Af87418DAC1F28F9797CeB3bfB62750A",
-    "name": "Compound Basic Attention Token",
-    "symbol": "cBAT",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_bat.svg"
-  },
-  {
-    "chainId": 3,
-    "address": "0x50390975D942E83D661D4Bde43BF73B0ef27b426",
-    "name": "Basic Attention Token",
-    "symbol": "BAT",
-    "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_BAT.svg"
-  },
-  {
-    "chainId": 3,
-    "address": "0x859e9d8a4edadfEDb5A2fF311243af80F85A91b8",
-    "name": "Compound Ether",
-    "symbol": "cETH",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_eth.svg"
-  },
-  {
-    "chainId": 3,
-    "address": "0x442Be68395613bDCD19778e761f03261ec46C06D",
     "name": "Wrapped BTC",
+    "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
     "symbol": "WBTC",
-    "decimals": 8
-  },
-  {
-    "chainId": 3,
-    "address": "0x541c9cB0E97b77F142684cc33E8AC9aC17B1990F",
-    "name": "Compound Wrapped BTC",
-    "symbol": "cWBTC",
     "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_wbtc.svg"
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png"
   },
   {
-    "chainId": 3,
-    "address": "0x6B8b0D7875B4182Fb126877023fB93b934dD302A",
-    "name": "Compound 0x",
-    "symbol": "cZRX",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_zrx.svg"
-  },
-  {
-    "chainId": 3,
-    "address": "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
-    "name": "USD Coin USDC",
-    "symbol": "USDC",
-    "decimals": 6,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDC.svg"
-  },
-  {
-    "chainId": 3,
-    "address": "0x2862065D57749f1576F48eF4393eb81c45fC2d88",
-    "name": "Compound Augur",
-    "symbol": "cREP",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_rep.svg"
-  },
-  {
-    "chainId": 3,
-    "address": "0xb1cBa8b721C7a241b9AD08C17F328886B014ACfE",
-    "name": "Reputation",
-    "symbol": "REP",
+    "name": "Wrapped Ether",
+    "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "symbol": "WETH",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_REP.svg"
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png"
   },
   {
-    "chainId": 3,
-    "address": "0x7Ac65E0f6dBA0EcB8845f17d07bF0776842690f8",
-    "name": "Compound Sai",
-    "symbol": "cSAI",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_sai.svg"
-  },
-  {
-    "chainId": 3,
-    "address": "0x63F7AB2f24322Ae2eaD6b971Cb9a71A1CC2eee03",
-    "name": "Sai Stablecoin v1.0",
-    "symbol": "SAI",
+    "chainId": 1,
+    "address": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
+    "name": "yearn finance",
+    "symbol": "YFI",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_SAI.svg"
+    "logoURI": "https://assets.coingecko.com/coins/images/11849/thumb/yfi-192x192.png?1598325330"
   },
   {
-    "chainId": 4,
-    "address": "0xddea378A6dDC8AfeC82C36E9b0078826bf9e68B6",
     "name": "0x Protocol Token",
+    "address": "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
     "symbol": "ZRX",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_ZRX.svg"
+    "chainId": 1,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xE41d2489571d322189246DaFA5ebDe1F4699F498/logo.png"
   },
   {
-    "chainId": 4,
-    "address": "0x5B281A6DdA0B271e91ae35DE655Ad301C976edb1",
-    "name": "Compound USD Coin",
-    "symbol": "cUSDC",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_usdc.svg"
-  },
-  {
-    "chainId": 4,
-    "address": "0x6D7F0754FFeb405d23C51CE938289d4835bE3b14",
-    "name": "Compound Dai",
-    "symbol": "cDAI",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_dai.svg"
-  },
-  {
-    "chainId": 4,
-    "address": "0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa",
     "name": "Dai Stablecoin",
+    "address": "0xaD6D458402F60fD3Bd25163575031ACDce07538D",
     "symbol": "DAI",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_DAI.svg"
+    "chainId": 3,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xaD6D458402F60fD3Bd25163575031ACDce07538D/logo.png"
   },
   {
-    "chainId": 4,
-    "address": "0xD9BA894E0097f8cC2BBc9D24D308b98e36dc6D02",
-    "name": "Tether USD",
-    "symbol": "USDT",
-    "decimals": 6,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDT.svg"
-  },
-  {
-    "chainId": 4,
-    "address": "0x2fB298BDbeF468638AD6653FF8376575ea41e768",
-    "name": "Compound USDT",
-    "symbol": "cUSDT",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_usdt.svg"
-  },
-  {
-    "chainId": 4,
-    "address": "0xEBf1A11532b93a529b5bC942B4bAA98647913002",
-    "name": "Compound Basic Attention Token",
-    "symbol": "cBAT",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_bat.svg"
-  },
-  {
-    "chainId": 4,
-    "address": "0xbF7A7169562078c96f0eC1A8aFD6aE50f12e5A99",
-    "name": "Basic Attention Token",
-    "symbol": "BAT",
+    "name": "Uniswap",
+    "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+    "symbol": "UNI",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_BAT.svg"
+    "chainId": 3,
+    "logoURI": "ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg"
   },
   {
-    "chainId": 4,
-    "address": "0xd6801a1DfFCd0a410336Ef88DeF4320D6DF1883e",
-    "name": "Compound Ether",
-    "symbol": "cETH",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_eth.svg"
-  },
-  {
-    "chainId": 4,
-    "address": "0x577D296678535e4903D59A4C929B718e1D575e0A",
-    "name": "Wrapped BTC",
-    "symbol": "WBTC",
-    "decimals": 8
-  },
-  {
-    "chainId": 4,
-    "address": "0x0014F450B8Ae7708593F4A46F8fa6E5D50620F96",
-    "name": "Compound Wrapped BTC",
-    "symbol": "cWBTC",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_wbtc.svg"
-  },
-  {
-    "chainId": 4,
-    "address": "0x52201ff1720134bBbBB2f6BC97Bf3715490EC19B",
-    "name": "Compound 0x",
-    "symbol": "cZRX",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_zrx.svg"
-  },
-  {
-    "chainId": 4,
-    "address": "0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b",
-    "name": "USD Coin USDC",
-    "symbol": "USDC",
-    "decimals": 6,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDC.svg"
-  },
-  {
-    "chainId": 4,
-    "address": "0xEBe09eB3411D18F4FF8D859e096C533CAC5c6B60",
-    "name": "Compound Augur",
-    "symbol": "cREP",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_rep.svg"
-  },
-  {
-    "chainId": 4,
-    "address": "0x6e894660985207feb7cf89Faf048998c71E8EE89",
-    "name": "Reputation",
-    "symbol": "REP",
+    "name": "Wrapped Ether",
+    "address": "0xc778417E063141139Fce010982780140Aa0cD5Ab",
+    "symbol": "WETH",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_REP.svg"
+    "chainId": 3,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc778417E063141139Fce010982780140Aa0cD5Ab/logo.png"
   },
   {
-    "chainId": 5,
-    "address": "0xe4E81Fa6B16327D4B78CFEB83AAdE04bA7075165",
-    "name": "0x Protocol Token",
-    "symbol": "ZRX",
-    "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_ZRX.svg"
-  },
-  {
-    "chainId": 5,
-    "address": "0xCEC4a43eBB02f9B80916F1c718338169d6d5C1F0",
-    "name": "Compound USD Coin",
-    "symbol": "cUSDC",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_usdc.svg"
-  },
-  {
-    "chainId": 5,
-    "address": "0x822397d9a55d0fefd20F5c4bCaB33C5F65bd28Eb",
-    "name": "Compound Dai",
-    "symbol": "cDAI",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_dai.svg"
-  },
-  {
-    "chainId": 5,
-    "address": "0xdc31Ee1784292379Fbb2964b3B9C4124D8F89C60",
     "name": "Dai Stablecoin",
+    "address": "0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735",
     "symbol": "DAI",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_DAI.svg"
+    "chainId": 4,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735/logo.png"
   },
   {
-    "chainId": 5,
-    "address": "0xe16C7165C8FeA64069802aE4c4c9C320783f2b6e",
-    "name": "Compound",
-    "symbol": "COMP",
+    "name": "Maker",
+    "address": "0xF9bA5210F91D0474bd1e1DcDAeC4C58E359AaD85",
+    "symbol": "MKR",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_COMP.svg"
+    "chainId": 4,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xF9bA5210F91D0474bd1e1DcDAeC4C58E359AaD85/logo.png"
   },
   {
-    "chainId": 5,
-    "address": "0xCCaF265E7492c0d9b7C2f0018bf6382Ba7f0148D",
-    "name": "Compound Basic Attention Token",
-    "symbol": "cBAT",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_bat.svg"
-  },
-  {
-    "chainId": 5,
-    "address": "0x70cBa46d2e933030E2f274AE58c951C800548AeF",
-    "name": "Basic Attention Token",
-    "symbol": "BAT",
+    "name": "Uniswap",
+    "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+    "symbol": "UNI",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_BAT.svg"
+    "chainId": 4,
+    "logoURI": "ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg"
   },
   {
-    "chainId": 5,
-    "address": "0x20572e4c090f15667cF7378e16FaD2eA0e2f3EfF",
-    "name": "Compound Ether",
-    "symbol": "cETH",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_eth.svg"
-  },
-  {
-    "chainId": 5,
-    "address": "0xC04B0d3107736C32e19F1c62b2aF67BE61d63a05",
-    "name": "Wrapped BTC",
-    "symbol": "WBTC",
-    "decimals": 8
-  },
-  {
-    "chainId": 5,
-    "address": "0x6CE27497A64fFFb5517AA4aeE908b1E7EB63B9fF",
-    "name": "Compound Wrapped BTC",
-    "symbol": "cWBTC",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_wbtc.svg"
-  },
-  {
-    "chainId": 5,
-    "address": "0xA253295eC2157B8b69C44b2cb35360016DAa25b1",
-    "name": "Compound 0x",
-    "symbol": "cZRX",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_zrx.svg"
-  },
-  {
-    "chainId": 5,
-    "address": "0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C",
-    "name": "USD Coin USDC",
-    "symbol": "USDC",
-    "decimals": 6,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDC.svg"
-  },
-  {
-    "chainId": 5,
-    "address": "0x1d70B01A2C3e3B2e56FcdcEfe50d5c5d70109a5D",
-    "name": "Compound Augur",
-    "symbol": "cREP",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_rep.svg"
-  },
-  {
-    "chainId": 5,
-    "address": "0x183Faf58c4461972765f3F90c6272A4ecE66Bd96",
-    "name": "Reputation",
-    "symbol": "REP",
+    "name": "Wrapped Ether",
+    "address": "0xc778417E063141139Fce010982780140Aa0cD5Ab",
+    "symbol": "WETH",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_REP.svg"
+    "chainId": 4,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xc778417E063141139Fce010982780140Aa0cD5Ab/logo.png"
   },
   {
-    "chainId": 5,
-    "address": "0x5D4373F8C1AF21C391aD7eC755762D8dD3CCA809",
-    "name": "Compound Sai",
-    "symbol": "cSAI",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_sai.svg"
-  },
-  {
-    "chainId": 5,
-    "address": "0x8e9192D6f9d903b1BEb3836F52a9f71E05846e42",
-    "name": "Sai Stablecoin v1.0",
-    "symbol": "SAI",
+    "name": "Uniswap",
+    "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+    "symbol": "UNI",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_SAI.svg"
+    "chainId": 5,
+    "logoURI": "ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg"
   },
   {
-    "chainId": 42,
-    "address": "0x162c44e53097e7B5aaE939b297ffFD6Bf90D1EE3",
-    "name": "0x Protocol Token",
-    "symbol": "ZRX",
+    "name": "Wrapped Ether",
+    "address": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
+    "symbol": "WETH",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_ZRX.svg"
+    "chainId": 5,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6/logo.png"
   },
   {
-    "chainId": 42,
-    "address": "0x4a92E71227D294F041BD82dd8f78591B75140d63",
-    "name": "Compound USD Coin",
-    "symbol": "cUSDC",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_usdc.svg"
-  },
-  {
-    "chainId": 42,
-    "address": "0xF0d0EB522cfa50B716B3b1604C4F0fA6f04376AD",
-    "name": "Compound Dai",
-    "symbol": "cDAI",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_dai.svg"
-  },
-  {
-    "chainId": 42,
+    "name": "Dai Stablecoin",
     "address": "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa",
-    "name": "Dai Stablecoin",
     "symbol": "DAI",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_DAI.svg"
+    "chainId": 42,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa/logo.png"
   },
   {
-    "chainId": 42,
-    "address": "0xD1308F63823221518Ec88EB209CBaa1ac182105f",
-    "name": "Sai Stablecoin v1.0",
-    "symbol": "SAI",
+    "name": "Maker",
+    "address": "0xAaF64BFCC32d0F15873a02163e7E500671a4ffcD",
+    "symbol": "MKR",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_SAI.svg"
+    "chainId": 42,
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xAaF64BFCC32d0F15873a02163e7E500671a4ffcD/logo.png"
   },
   {
-    "chainId": 42,
-    "address": "0x07de306FF27a2B630B1141956844eB1552B956B5",
-    "name": "Tether USD",
-    "symbol": "USDT",
-    "decimals": 6,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDT.svg"
-  },
-  {
-    "chainId": 42,
-    "address": "0x61460874a7196d6a22D1eE4922473664b3E95270",
-    "name": "Compound",
-    "symbol": "COMP",
+    "name": "Uniswap",
+    "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+    "symbol": "UNI",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_COMP.svg"
+    "chainId": 42,
+    "logoURI": "ipfs://QmXttGpZrECX5qCyXbBQiqgQNytVGeZW5Anewvh2jc4psg"
   },
   {
-    "chainId": 42,
-    "address": "0x3f0A0EA2f86baE6362CF9799B523BA06647Da018",
-    "name": "Compound USDT",
-    "symbol": "cUSDT",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_usdt.svg"
-  },
-  {
-    "chainId": 42,
-    "address": "0x4a77fAeE9650b09849Ff459eA1476eaB01606C7a",
-    "name": "Compound Basic Attention Token",
-    "symbol": "cBAT",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_bat.svg"
-  },
-  {
-    "chainId": 42,
-    "address": "0x482dC9bB08111CB875109B075A40881E48aE02Cd",
-    "name": "Basic Attention Token",
-    "symbol": "BAT",
+    "name": "Wrapped Ether",
+    "address": "0xd0A1E359811322d97991E03f863a0C30C2cF029C",
+    "symbol": "WETH",
     "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_BAT.svg"
-  },
-  {
     "chainId": 42,
-    "address": "0x41B5844f4680a8C38fBb695b7F9CFd1F64474a72",
-    "name": "Compound Ether",
-    "symbol": "cETH",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_eth.svg"
-  },
-  {
-    "chainId": 42,
-    "address": "0xb3f7fB482492f4220833De6D6bfCC81157214bEC",
-    "name": "Compound Sai",
-    "symbol": "cSAI",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_sai.svg"
-  },
-  {
-    "chainId": 42,
-    "address": "0xA4eC170599a1Cf87240a35b9B1B8Ff823f448b57",
-    "name": "Compound Augur",
-    "symbol": "cREP",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_rep.svg"
-  },
-  {
-    "chainId": 42,
-    "address": "0xd3A691C852CDB01E281545A27064741F0B7f6825",
-    "name": "Wrapped BTC",
-    "symbol": "WBTC",
-    "decimals": 8
-  },
-  {
-    "chainId": 42,
-    "address": "0x50DD65531676F718B018De3dc48F92B53D756996",
-    "name": "Reputation",
-    "symbol": "REP",
-    "decimals": 18,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_REP.svg"
-  },
-  {
-    "chainId": 42,
-    "address": "0xAf45ae737514C8427D373D50Cd979a242eC59e5a",
-    "name": "Compound 0x",
-    "symbol": "cZRX",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_zrx.svg"
-  },
-  {
-    "chainId": 42,
-    "address": "0xa1fAA15655B0e7b6B6470ED3d096390e6aD93Abb",
-    "name": "Compound Wrapped BTC",
-    "symbol": "cWBTC",
-    "decimals": 8,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/ctoken_wbtc.svg"
-  },
-  {
-    "chainId": 42,
-    "address": "0xb7a4F3E9097C08dA09517b5aB877F7a917224ede",
-    "name": "USD Coin USDC",
-    "symbol": "USDC",
-    "decimals": 6,
-    "logoURI": "https://raw.githubusercontent.com/compound-finance/token-list/master/assets/asset_USDC.svg"
+    "logoURI": "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xd0A1E359811322d97991E03f863a0C30C2cF029C/logo.png"
   }
 ]
