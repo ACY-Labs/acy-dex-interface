@@ -17,6 +17,7 @@ export class Dao extends Component {
   state = {
     activeGraphData: graphSampleData,
     activeStakeInfoPanel: 0,
+    activeGraphId: 0,
   };
 
   componentDidMount() {}
@@ -29,7 +30,7 @@ export class Dao extends Component {
   }
 
   render() {
-    const { activeGraphData } = this.state;
+    const { activeGraphData, activeStakeInfoPanel, activeGraphId } = this.state;
 
     return (
       <PageHeaderWrapper>
@@ -44,15 +45,18 @@ export class Dao extends Component {
               <div
                 onClick={() => {
                   this.changeGraphData(0);
+                  this.setState({ activeGraphId: 0 });
                 }}
+                style={{ color: activeGraphId === 0 ? '#eb5c20' : '#b5b5b6' }}
               >
                 ACY
               </div>
               <div
-                style={{ marginLeft: 20 }}
                 onClick={() => {
                   this.changeGraphData(1);
+                  this.setState({ activeGraphId: 1 });
                 }}
+                style={{ marginLeft: 20, color: activeGraphId === 1 ? '#eb5c20' : '#b5b5b6' }}
               >
                 Reward
               </div>
@@ -68,17 +72,20 @@ export class Dao extends Component {
           </div>
           <StakeSection />
         </div>
-        <div>
-          <StakeHistoryTable />
+        <div style={{ padding: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <StakeHistoryTable />
+          </div>
           <div style={{ paddingTop: '30px' }}>
             <div
-              style={{ display: 'flex', justifyContent: 'end' }}
+              style={{ display: 'flex', justifyContent: 'end', marginBottom: 30 }}
               className={stakeInfoStyles.stakeDetails}
             >
               <span
                 onClick={() => {
                   this.setState({ activeStakeInfoPanel: 0 });
                 }}
+                style={{ color: activeStakeInfoPanel === 0 ? '#eb5c20' : '#b5b5b6' }}
               >
                 Allocation
               </span>
@@ -86,6 +93,7 @@ export class Dao extends Component {
                 onClick={() => {
                   this.setState({ activeStakeInfoPanel: 1 });
                 }}
+                style={{ color: activeStakeInfoPanel === 1 ? '#eb5c20' : '#b5b5b6' }}
               >
                 sACY
               </span>
@@ -93,6 +101,7 @@ export class Dao extends Component {
                 onClick={() => {
                   this.setState({ activeStakeInfoPanel: 2 });
                 }}
+                style={{ color: activeStakeInfoPanel === 2 ? '#eb5c20' : '#b5b5b6' }}
               >
                 Reward
               </span>

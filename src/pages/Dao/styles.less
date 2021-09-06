@@ -8,6 +8,8 @@
   flex-wrap: wrap;
   justify-content: space-between;
   margin-bottom: 1.5rem;
+  padding: 20px;
+  align-items: stretch;
 }
 
 .toggleChart {
@@ -15,9 +17,7 @@
   justify-content: end;
 
   div {
-    background-color: @buttonColor;
     border-radius: 10px;
-    color: white;
     padding: 10px;
     cursor: pointer;
   }
@@ -29,12 +29,10 @@
 
 .chartSection {
   width: 49%;
-  height: 40vh;
-  max-height: 700px;
   background-color: @cardColor;
   border-radius: 15px;
-  margin-bottom: 10px;
-  padding: 15px;
+  margin: 0px 15px 0px 0px;
+  padding: 15px 15px 0px 15px;
   overflow: hidden;
   .graphStats {
     padding: 0;
@@ -57,10 +55,10 @@
 
 .createProposalContainer {
   text-align: end;
-  margin-bottom: 1.5rem;
+  padding: 20px;
 
   .createProposalButton {
-    background-color: #EB5C20;
+    background-color: #eb5c20;
     color: white;
     border: none;
     border-radius: 7.5px;
@@ -70,5 +68,26 @@
 
   .createProposalButton:hover {
     cursor: pointer;
+  }
+}
+
+@media (max-width: 768px) {
+  .stakeSectionMain {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .chartSection {
+    width: 90%;
+    height: 400px;
+  }
+  .createProposalButton {
+    background-color: #eb5c20;
+    color: white;
+    border: none;
+    border-radius: 7.5px;
+    font-size: 0.75rem;
+    padding: 0.5rem 1.25rem;
+    margin-right: 30px;
   }
 }
