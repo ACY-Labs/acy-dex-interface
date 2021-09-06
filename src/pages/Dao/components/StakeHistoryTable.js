@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Table } from 'antd';
-import SampleStakeHistoryData, {sampleStakeHistoryColumns} from './SampleStakeHistoryData';
-import styles from './styles.less';
+import SampleStakeHistoryData, {sampleStakeHistoryColumns} from '../sample_data/SampleStakeHistoryData';
+import styles from '../styles.less';
 
 
 const StakeHistoryTable = () => {
