@@ -74,32 +74,36 @@ export class SmallTable extends React.Component {
 
     
     return (
-      <div className={styles.smallTableRow}>
-        <div className={styles.smallTableBody}>{content}</div>
-        <div className={styles.smallTableBody} style={{display:(isDesktop() == true ? "block" : "none")}}>{abbrNumber(entry.volume24h)}</div>
-        <div className={styles.smallTableBody} style={{display:(isDesktop() == true ? "block" : "none")}}>{abbrNumber(entry.tvl)}</div>
-        <div className={styles.smallTableBody} style={{display:(isDesktop() == true ? "block" : "none")}}>{abbrNumber(entry.price)}</div>
-      </div>
+      <tr className={styles.smallTableRow}>
+        <td className={styles.smallTableBody}>{content}</td>
+        <td className={styles.smallTableBody} style={{display:(isDesktop() == true ? "table-cell" : "none")}}>{abbrNumber(entry.volume24h)}</td>
+        <td className={styles.smallTableBody} style={{display:(isDesktop() == true ? "table-cell" : "none")}}>{abbrNumber(entry.tvl)}</td>
+        <td className={styles.smallTableBody} style={{display:(isDesktop() == true ? "table-cell" : "none")}}>{abbrNumber(entry.price)}</td>
+      </tr>
     )
   }
 
   render() {
     return (
-      <div className={styles.smallTable}>
-        <div className={styles.smallTableRow}>
-          <div className={styles.smallTableHeader}>{this.state.mode == "token" ? "Token" : "Pool"}</div>
-          <div className={styles.smallTableHeader} style={{display:(isDesktop() == true ? "block" : "none")}}>Volume 24H</div>
-          <div className={styles.smallTableHeader} style={{display:(isDesktop() == true ? "block" : "none")}}>TVL</div>
-          <div className={styles.smallTableHeader} style={{display:(isDesktop() == true ? "block" : "none")}}>Price</div>
-        </div>
+      <table className={styles.smallTable}>
+        <tbody>
+          <tr className={styles.smallTableRow}>
+            <td className={styles.smallTableHeader}>{this.state.mode == "token" ? "Token" : "Pool"}</td>
+            <td className={styles.smallTableHeader} style={{display:(isDesktop() == true ? "table-cell" : "none")}}>Volume 24H</td>
+            <td className={styles.smallTableHeader} style={{display:(isDesktop() == true ? "table-cell" : "none")}}>TVL</td>
+            <td className={styles.smallTableHeader} style={{display:(isDesktop() == true ? "table-cell" : "none")}}>Price</td>
+          </tr>
 
 
-        {
-          this.state.tableData.slice(0, this.state.displayNumber).map(item => this.renderBody(item))
-        }
+          {
+            this.state.tableData.slice(0, this.state.displayNumber).map(item => this.renderBody(item))
+          }
 
-        <a className={styles.smallTableSeeMore} onClick={this.expandSmallTable}>See more...</a>
-      </div>      
+          <tr>
+            <a className={styles.smallTableSeeMore} onClick={this.expandSmallTable}>See more...</a>
+          </tr>
+        </tbody>
+      </table>      
     );
   }
 }
