@@ -1,3 +1,4 @@
+@import '~antd/lib/style/themes/default.less';
 @cardColor:   #2f313583;
 
 
@@ -8,6 +9,13 @@
     margin:auto;
     z-index:0;
     color: #B5B6B6;
+    position:relative;
+    top: @layout-header-height - 3px;
+    margin-bottom: 20px;
+}
+
+.marketLink{
+    color: #B5B6B6 !important;
 }
 
 // headers
@@ -51,10 +59,33 @@ h2 {
         margin-top: 30px;
     }
 }
+.marketNavbar{
+    position:fixed;
+    top: @layout-header-height;
+    left: 0;
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 10px 30px;
+    z-index: 11;
+    background-color: #0e0304;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    flex-wrap: wrap;
+}
+
+.marketNavbarMenu{
+    display:flex;
+    width: 15%;
+    font-size: 18px;
+    justify-content:space-around;
+}
 
 // search component
 .searchSection{
     z-index: 10;
+    width: 40%;
+    padding:auto;
     .searchBackground{
         background: rgba(0,0,0,0.50);
         position:fixed;
@@ -63,11 +94,14 @@ h2 {
         width: 100vw;
         height: 100vh;
         z-index: 4;
+        
     }
     .searchWrapper{
         width: 100%;
+        z-index: 5;
         display:flex;
         justify-content:flex-end;
+        align-items: center;
     }
     .searchBar{
         width: 100%;
@@ -84,9 +118,12 @@ h2 {
     }
     
 }
+
 .searchInnerWrapper{
     z-index:5;
-    width: 40%;
+    width: 100%;
+    display:flex;
+    align-items: center;
 }
 
 // Chart on main page
@@ -263,10 +300,11 @@ h2 {
 // mobile changes
 @media screen and (max-width: 768px) {
 
-    .searchInnerWrapper{
+    .searchSection, .marketNavbarMenu{
         width: 100%;
-        color: red;
+        margin-bottom:10px;
     }
+
 
     .chartSectionMain{
         width: 100%;

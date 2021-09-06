@@ -98,8 +98,9 @@ export class BasicProfile extends Component {
         // const outsideClickRef = useDetectClickOutside({ onTriggered: this.onSearchBlur });
         const { visible, visibleSearchBar, tabIndex, transactionView} = this.state;
         return (
+          <div>
+            <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
             <div className={styles.marketRoot}>
-                <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
                 <div className={styles.chartsMain}>
                     <div className={styles.chartSectionMain}>
                           <div className={styles.graphStats}>
@@ -131,7 +132,7 @@ export class BasicProfile extends Component {
                 <div style={{display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
                   <h2>Top Tokens</h2>
                   <h3>
-                    <Link to='/market/list/token' >
+                    <Link style={{color:"#b5b5b6"}}  to='/market/list/token' >
                       Explore
                     </Link>
                   </h3>
@@ -153,7 +154,7 @@ export class BasicProfile extends Component {
                 <div style={{display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
                   <h2>Top Pools</h2>
                   <h3>
-                    <Link to='/market/list/pool' >
+                    <Link style={{color:"#b5b5b6"}}  to='/market/list/pool' >
                       Explore
                     </Link>
                   </h3>
@@ -187,8 +188,10 @@ export class BasicProfile extends Component {
                     </div>
                   )} 
                 />
-            
+            <div style={{height:"20px"}}></div>
             </div>
+          </div>
+            
         )
     };
 }

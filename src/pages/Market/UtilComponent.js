@@ -55,7 +55,7 @@ export class SmallTable extends React.Component {
       content = (
         <div>
           <AcyIcon name={entry.short.toLowerCase()} width={20} height={20}/>
-          <Link className={styles.coinName} to='/market/info/token' >{entry.short}</Link>
+          <Link style={{color:"#b5b5b6"}}  className={styles.coinName} to='/market/info/token' >{entry.short}</Link>
           <span className={styles.coinShort}> ({entry.name})</span>
         </div>
       )
@@ -64,7 +64,7 @@ export class SmallTable extends React.Component {
         <div>
           <AcyIcon name={entry.coin1.toLowerCase()} width={20} height={20}/>
           <AcyIcon name={entry.coin2.toLowerCase()} width={20} height={20}/>
-          <Link className={styles.coinName} to='/market/info/pool' style={{color: "#b5b5b6"}}>
+          <Link style={{color:"#b5b5b6"}}  className={styles.coinName} to='/market/info/pool' style={{color: "#b5b5b6"}}>
             <span className={styles.coinName}>{entry.coin1}/{entry.coin2}</span>
           </Link>
         </div>
@@ -91,7 +91,7 @@ export class SmallTable extends React.Component {
             <td className={styles.smallTableHeader}>{this.state.mode == "token" ? "Token" : "Pool"}</td>
             <td className={styles.smallTableHeader} style={{display:(isDesktop() == true ? "table-cell" : "none")}}>Volume 24H</td>
             <td className={styles.smallTableHeader} style={{display:(isDesktop() == true ? "table-cell" : "none")}}>TVL</td>
-            <td className={styles.smallTableHeader} style={{display:(isDesktop() == true ? "table-cell" : "none")}}>Price</td>
+            <td className={styles.smallTableHeader} style={{display:(isDesktop() == true ? "table-cell " : "none")}}>Price</td>
           </tr>
 
 
@@ -156,83 +156,85 @@ export const MarketSearchBar  = (props) => {
 
     // the DOM itself
     return (
-      <div 
-          className={styles.searchSection} 
-          style={
-            {
-              marginBottom: "10px"
-            }
-          } 
-          
-      >
-          {/* this is the gray background */}
-          {visibleSearchBar && <div className={styles.searchBackground}/>}
+      <div className={styles.marketNavbar}>
+        <div className={styles.marketNavbarMenu}>
+          <Link style={{color:"#b5b5b6", fontWeight: "bold"}} to='/market' >Overview</Link>
+          <Link style={{color:"#b5b5b6", fontWeight: "bold"}} to='/market/list/pool' >Pools</Link>
+          <Link style={{color:"#b5b5b6", fontWeight: "bold"}} to='/market/list/token' >Tokens</Link>
+        </div>
+        <div 
+            className={styles.searchSection}           
+        >
+            {/* this is the gray background */}
+            {visibleSearchBar && <div className={styles.searchBackground}/>}
 
-          <div ref={outsideClickRef}>
-            <div className={styles.searchWrapper}>
-              <div className={styles.searchInnerWrapper}>
-                <Input 
-                    placeholder="Search" 
-                    size="large"
-                    style={{
-                        backgroundColor: "#373739",
-                        borderRadius:'40px'
-                    }}
-                    onFocus={onSearchFocus}
-                    onChange={onInput}
-                    className={styles.searchBar}
-                    value={"" || searchQuery}
-                />
-              </div>            
-            </div>
-            {/* Search modal */}
-            <div 
-              style={
-                {"width":"100%", 
-                "position": "relative", 
-                "marginTop": "10px",
-                "zIndex": 10
-              }}
+            <div style={{display:"flex", alignItems:"center", flexDirection:"column", width:"100%"}}ref={outsideClickRef}>
+              <div className={styles.searchWrapper}>
+                <div className={styles.searchInnerWrapper}>
+                  <Input 
+                      placeholder="Search" 
+                      size="large"
+                      style={{
+                          backgroundColor: "#373739",
+                          borderRadius:'40px',
+                      }}
+                      onFocus={onSearchFocus}
+                      onChange={onInput}
+                      className={styles.searchBar}
+                      value={"" || searchQuery}
+                  />
+                </div>            
+              </div>
+              {/* Search modal */}
+              <div 
+                style={
+                  {"width":"100%", 
+                  "position": "relative", 
+                  "zIndex": 10
+                }}
 
-              
-            >
-              {
-                visibleSearchBar && (
-                  <div  
-                    className={styles.searchModal} 
-                    style={
-                      {"position": "absolute", 
-                      "left": 0, 
-                      "right":0}
-                    }
-                  >
-                    <AcyTabs>
-                      <AcyTabPane tab="Search" key="1">
-                        {
-                          searchCoinReturns.length > 0 ? <SmallTable mode="token" data={props.dataSourceCoin} displayNumber={displayNumber}/> 
-                          : <div style={{fontSize:"20px", margin: "20px"}}>No results</div>
-                        }
-                        <Divider className={styles.searchModalDivider}/>
-                        {
-                          searchPoolReturns.length > 0 ? <SmallTable mode="pool" data={props.dataSourcePool} displayNumber={displayNumber}/>
-                          : <div style={{fontSize:"20px", margin: "20px"}}>No results</div>
-                        }
-                      </AcyTabPane>
-                      <AcyTabPane tab="Watchlist" key="2">
-                        <SmallTable mode="token" data={props.dataSourceCoin} displayNumber={displayNumber}/>
-                        <Divider className={styles.searchModalDivider}/>
-                        <SmallTable mode="pool" data={props.dataSourcePool} displayNumber={displayNumber}/>
-                      </AcyTabPane>
-                    </AcyTabs>
-                    
-                  </div>
-                )
-              }
-              
+                
+              >
+                {
+                  visibleSearchBar && (
+                    <div  
+                      className={styles.searchModal} 
+                      style={
+                        {"position": "absolute", 
+                        "left": 0, 
+                        "right":0,
+                        "top": "10px"}
+                      }
+                    >
+                      <AcyTabs>
+                        <AcyTabPane tab="Search" key="1">
+                          {
+                            searchCoinReturns.length > 0 ? <SmallTable mode="token" data={props.dataSourceCoin} displayNumber={displayNumber}/> 
+                            : <div style={{fontSize:"20px", margin: "20px"}}>No results</div>
+                          }
+                          <Divider className={styles.searchModalDivider}/>
+                          {
+                            searchPoolReturns.length > 0 ? <SmallTable mode="pool" data={props.dataSourcePool} displayNumber={displayNumber}/>
+                            : <div style={{fontSize:"20px", margin: "20px"}}>No results</div>
+                          }
+                        </AcyTabPane>
+                        <AcyTabPane tab="Watchlist" key="2">
+                          <SmallTable mode="token" data={props.dataSourceCoin} displayNumber={displayNumber}/>
+                          <Divider className={styles.searchModalDivider}/>
+                          <SmallTable mode="pool" data={props.dataSourcePool} displayNumber={displayNumber}/>
+                        </AcyTabPane>
+                      </AcyTabs>
+                      
+                    </div>
+                  )
+                }
+                
+              </div>
             </div>
-          </div>
-          
-          
+            
+            
+        </div>
       </div>
+
     )
 }

@@ -85,7 +85,7 @@ export const columnsCoin = [
             return (
                 <div className={styles.tableDataFirstColumn}>
                     <AcyIcon name={entry.short.toLowerCase()} width={20} height={20}/>
-                    <Link className={styles.coinName} to='/market/info/token' >{entry.short}</Link>
+                    <Link style={{color:"#b5b5b6"}}  className={styles.coinName} to='/market/info/token' >{entry.short}</Link>
                     <span className={styles.coinShort}> ({entry.name})</span>
                 </div>
             )
@@ -156,7 +156,7 @@ export const columnsPool = [
                 <div className={styles.tableDataFirstColumn}>
                     <AcyIcon name={entry.coin1.toLowerCase()} width={20} height={20}/>
                     <AcyIcon name={entry.coin2.toLowerCase()} width={20} height={20}/>
-                    <Link className={styles.coinName} to='/market/info/pool' >
+                    <Link style={{color:"#b5b5b6"}}  className={styles.coinName} to='/market/info/pool' >
                         <span className={styles.coinName}>{entry.coin1}/{entry.coin2}</span>
                     </Link>
                 </div>
