@@ -209,21 +209,31 @@ h2 {
     background: @cardColor;
     margin-top: 15px;
     margin-bottom: 15px;
-    border-radius: 15px;
-    padding: 15px;
 }
 .contentStats{
+    background-color: transparent;
     margin-right: 5px;
     width: 23%;
+    display:flex;
+    flex-direction:column;
+    justify-content: space-between;
 }
 .contentCharts{
     margin-left: 5px;
     width: 75%;
+    padding: 15px;
+    border-radius: 15px;
 }
 
 // info page left stats
 .statEntry{
-    margin-bottom: 18px;
+    margin-bottom: 10px;
+    background: @cardColor;
+    border-radius: 15px;
+    padding: 15px;
+}
+.statEntry:nth-last-child(1){
+    margin-bottom: 0;
 }
 .statEntryValue{
     font-size:26px;
@@ -256,10 +266,10 @@ h2 {
     color: #B5B6B6;
 }
 .contentChartsBody{
-    height: 100%;
+    height: 90%;
 }
 .contentChartWrapper{
-    height: 100%;
+    height: 95%;
 }
 .contentChartsSelector{
     margin-top: 10px;

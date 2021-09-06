@@ -83,7 +83,7 @@ function MarketTokenInfo(props){
                     <Link style={{color:"#b5b5b6"}} to='/market' >Overview</Link>
                 </Breadcrumb.Item>
                 <Breadcrumb.Item>
-                    <Link style={{color:"#b5b5b6"}} to='/market/list/pool' >Pools</Link>
+                    <Link style={{color:"#b5b5b6"}} to='/market/list/pool' >Tokens</Link>
                 </Breadcrumb.Item >
                 <Breadcrumb.Item style={{fontWeight:"bold"}}>ETH</Breadcrumb.Item>
             </Breadcrumb>
@@ -107,11 +107,10 @@ function MarketTokenInfo(props){
                     </div>
                 </div>
                 <div className={styles.contentCta}>
-                    <div className={styles.ctaButton}>
+                <div className={styles.ctaButton}>
                         <AcySmallButton 
-                                color="#eb5c20"
-                                textColor="white" 
-                                borderColor="#eb5c20"
+                                color="#1b1b1c"
+                                borderColor="#1b1b1c"
                                 borderRadius="15px"
                                 padding="5px"
                             >
@@ -120,9 +119,8 @@ function MarketTokenInfo(props){
                     </div>
                     <div className={styles.ctaButton}>
                             <AcySmallButton 
-                                color="#eb5c20"
-                                textColor="white" 
-                                borderColor="#eb5c20"
+                                color="#757579"
+                                borderColor="#757579"
                                 borderRadius="15px"
                                 padding="5px"
                             >
@@ -160,9 +158,9 @@ function MarketTokenInfo(props){
                         </div>
                         <div className={styles.contentChartsSelector}>
                             <AcySmallButton 
-                                color={graphTabIndex == 0 ? "#eb5c20" : "transparent"} 
+                                color={graphTabIndex == 0 ? "#1b1b1c" : "#757579"} 
                                 textColor="white" 
-                                borderColor="#eb5c20"
+                                borderColor="#757579"
                                 borderRadius="15px 0 0 15px"
                                 padding="5px"
                                 onClick={() => switchChart(0)}
@@ -171,9 +169,9 @@ function MarketTokenInfo(props){
                                 Volume
                             </AcySmallButton>
                             <AcySmallButton 
-                                color={graphTabIndex == 1 ? "#eb5c20" : "transparent"}  
+                                color={graphTabIndex == 1 ? "#1b1b1c" : "#757579"}  
                                 textColor="white" 
-                                borderColor="#eb5c20"
+                                borderColor="#757579"
                                 borderRadius="0 0 0 0"
                                 padding="5px"
                                 onClick={() => switchChart(1)}
@@ -182,9 +180,9 @@ function MarketTokenInfo(props){
                                 TVL
                             </AcySmallButton>
                             <AcySmallButton 
-                                color={graphTabIndex == 2 ? "#eb5c20" : "transparent"} 
+                                color={graphTabIndex == 2 ? "#1b1b1c": "#757579"} 
                                 textColor="white" 
-                                borderColor="#eb5c20"
+                                borderColor="#757579"
                                 borderRadius="0 15px 15px 0"
                                 padding="5px"
                                 onClick={() => switchChart(2)}

@@ -114,9 +114,8 @@ function MarketPoolInfo(props){
                 <div className={styles.contentCta}>
                     <div className={styles.ctaButton}>
                         <AcySmallButton 
-                                color="#eb5c20"
-                                textColor="white" 
-                                borderColor="#eb5c20"
+                                color="#1b1b1c"
+                                borderColor="#1b1b1c"
                                 borderRadius="15px"
                                 padding="5px"
                             >
@@ -125,9 +124,8 @@ function MarketPoolInfo(props){
                     </div>
                     <div className={styles.ctaButton}>
                             <AcySmallButton 
-                                color="#eb5c20"
-                                textColor="white" 
-                                borderColor="#eb5c20"
+                                color="#757579"
+                                borderColor="#757579"
                                 borderRadius="15px"
                                 padding="5px"
                             >
@@ -139,24 +137,22 @@ function MarketPoolInfo(props){
             <div style={{display:"flex", flexWrap:"wrap", "justifyContent": "space-between"}}>
                 <div className={styles.contentStats}>
                     <div className={styles.statEntry}>
-                        <div className={styles.statEntryTokenLock}>
-                            <strong>Total tokens locked</strong>
-                            <div className={styles.tokenLockEntry}>
-                                <div className={styles.tokenLockName}>
-                                    {/* change data later */}
-                                    <AcyIcon name={"eth"} width={20} height={20}/>
-                                    <div> ETH</div>
-                                </div>
-                                <div>{abbrNumber(234560)}</div>
+                        <strong>Total tokens locked</strong>
+                        <div className={styles.tokenLockEntry}>
+                            <div className={styles.tokenLockName}>
+                                {/* change data later */}
+                                <AcyIcon name={"eth"} width={20} height={20}/>
+                                <div> ETH</div>
                             </div>
-                            <div className={styles.tokenLockEntry}>
-                                <div className={styles.tokenLockName}>
-                                    {/* change data later */}
-                                    <AcyIcon name={"eth"} width={20} height={20}/>
-                                    <div> ETH</div>
-                                </div>
-                                <div>{abbrNumber(234560)}</div>
+                            <div>{abbrNumber(234560)}</div>
+                        </div>
+                        <div className={styles.tokenLockEntry}>
+                            <div className={styles.tokenLockName}>
+                                {/* change data later */}
+                                <AcyIcon name={"eth"} width={20} height={20}/>
+                                <div> ETH</div>
                             </div>
+                            <div>{abbrNumber(234560)}</div>
                         </div>
                     </div>
                     <div className={styles.statEntry}>
@@ -182,10 +178,10 @@ function MarketPoolInfo(props){
                             <div className={styles.chartIndicatorTime}>2020-11-20</div>
                         </div>
                         <div className={styles.contentChartsSelector}>
-                            <AcySmallButton 
-                                color={graphTabIndex == 0 ? "#eb5c20" : "transparent"} 
+                        <AcySmallButton 
+                                color={graphTabIndex == 0 ? "#1b1b1c" : "#757579"} 
                                 textColor="white" 
-                                borderColor="#eb5c20"
+                                borderColor="#757579"
                                 borderRadius="15px 0 0 15px"
                                 padding="5px"
                                 onClick={() => switchChart(0)}
@@ -194,9 +190,9 @@ function MarketPoolInfo(props){
                                 Volume
                             </AcySmallButton>
                             <AcySmallButton 
-                                color={graphTabIndex == 1 ? "#eb5c20" : "transparent"}  
+                                color={graphTabIndex == 1 ? "#1b1b1c" : "#757579"}  
                                 textColor="white" 
-                                borderColor="#eb5c20"
+                                borderColor="#757579"
                                 borderRadius="0 0 0 0"
                                 padding="5px"
                                 onClick={() => switchChart(1)}
@@ -205,9 +201,9 @@ function MarketPoolInfo(props){
                                 TVL
                             </AcySmallButton>
                             <AcySmallButton 
-                                color={graphTabIndex == 2 ? "#eb5c20" : "transparent"} 
+                                color={graphTabIndex == 2 ? "#1b1b1c": "#757579"} 
                                 textColor="white" 
-                                borderColor="#eb5c20"
+                                borderColor="#757579"
                                 borderRadius="0 15px 15px 0"
                                 padding="5px"
                                 onClick={() => switchChart(2)}
