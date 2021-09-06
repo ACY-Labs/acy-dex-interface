@@ -66,6 +66,7 @@ export class Dao extends Component {
               data={activeGraphData}
               showXAxis
               showGradient
+              showTootip
               lineColor="#e29227"
               bgColor="#29292c"
             />
@@ -115,10 +116,11 @@ export class Dao extends Component {
               <div className={stakeInfoStyles.stakeInfoTab}>
                 <AcyLineChart
                   title="Total stake"
-                  backData={activeGraphData}
-                  data={activeGraphData}
+                  backData={graphSampleData}
+                  data={graphSampleData}
                   showXAxis
                   showGradient
+                  showTootip
                   lineColor="#e29227"
                   bgColor="#29292c"
                 />
@@ -129,9 +131,10 @@ export class Dao extends Component {
               <div className={stakeInfoStyles.stakeInfoTab}>
                 <AcyLineChart
                   title="Reward"
-                  backData={activeGraphData}
-                  data={activeGraphData}
+                  backData={graphSampleData2}
+                  data={graphSampleData2}
                   showXAxis
+                  showTootip
                   showGradient
                   lineColor="#e29227"
                   bgColor="#29292c"

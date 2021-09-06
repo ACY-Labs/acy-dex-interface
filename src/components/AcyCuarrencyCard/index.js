@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Card, Icon, Input, Row, Col } from 'antd';
 import AcyIcon from '@/components/AcyIcon';
 import styles from './index.less';
@@ -13,16 +14,23 @@ const AcyCuarrencyCard = ({
   token,
   ...rest
 }) => {
+  const [light,setLight]=useState(false);
   const onChange = e => {
     const check=Pattern.coinNum.test(e.target.value);
     if(check){
     onChangeToken && onChangeToken(e.target.value)
     }
   }
+  const onBlur=()=>{
+    setLight(false);
+  }
+  const onFocus=()=>{
+    setLight(true);
+  }
   return (
     <div {...rest} className={styles.acycuarrencycard}>
 
-      <div className={styles.cua_body}>
+      <div className={`${styles.cua_body} ${light&&styles.cua_light}`}>
 
         <div className={styles.cua_group}>
           <button className={styles.switchcoin}  onClick={onChoseToken}>
@@ -38,7 +46,7 @@ const AcyCuarrencyCard = ({
             </span>
             
           </button>
-          <input className={styles.input} placeholder="0.0" bordered={false} value={token} onChange={onChange} />
+          <input onFocus={onFocus} onBlur={onBlur} className={styles.input} placeholder="0.0" bordered={false} value={token} onChange={onChange} />
         </div>
         <div className={styles.cua_blanace}>
           {title ||''}
