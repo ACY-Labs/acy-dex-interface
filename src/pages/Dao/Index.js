@@ -5,7 +5,7 @@
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { graphSampleData, graphSampleData2 } from './sample_data/SampleData';
 import React, { Component, forwardRef } from 'react';
-import { AcyLineChart, AcyPieChart } from '@/components/Acy';
+import { AcyLineChart, AcyBarChart, AcyPieChart } from '@/components/Acy';
 import styles from './styles.less';
 import stakeInfoStyles from './styles2.less';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -61,15 +61,19 @@ export class Dao extends Component {
                 Reward
               </div>
             </div>
-            <AcyLineChart
-              backData={activeGraphData}
-              data={activeGraphData}
-              showXAxis
-              showGradient
-              showTootip
-              lineColor="#e29227"
-              bgColor="#29292c"
-            />
+            {activeGraphId === 0 ? (
+              <AcyBarChart backData={activeGraphData} />
+            ) : (
+              <AcyLineChart
+                backData={activeGraphData}
+                data={activeGraphData}
+                showXAxis
+                showGradient
+                showTootip
+                lineColor="#e29227"
+                bgColor="#29292c"
+              />
+            )}
           </div>
           <StakeSection />
         </div>

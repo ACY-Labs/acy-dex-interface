@@ -11,8 +11,8 @@ const StakeSection = () => {
   const [date, setDate] = useState(new Date())
   const [isModal1Visible, setIsModal1Visible] = useState(false)
   const [isModal2Visible, setIsModal2Visible] = useState(false)
-  const [token1, setToken1] = useState(SampleToken[0])
-  const [token2, setToken2] = useState(SampleToken[1])
+  const [token1, setToken1] = useState(SampleToken.filter((token) => token.symbol === 'WBTC')[0])
+  const [token2, setToken2] = useState(SampleToken.filter((token) => token.symbol === 'WETH')[0])
   const [token1Percentage, setToken1Percentage] = useState(50)
   const [token2Percentage, setToken2Percentage] = useState(50)
   const [presetDate, setPresetDate] = useState([
