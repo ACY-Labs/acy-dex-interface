@@ -17,10 +17,34 @@ const StakeSection = () => {
   const [isModal2Visible, setIsModal2Visible] = useState(false)
   const [token1, setToken1] = useState(SampleToken[0])
   const [token2, setToken2] = useState(SampleToken[1])
+  const [token1Percentage, setToken1Percentage] = useState(50)
+  const [token2Percentage, setToken2Percentage] = useState(50)
+  const [presetDate, setPresetDate] = useState([
+    ['week', 1, '1W', false],
+    ['month', 1, '1M', false],
+    ['month', 3, '3M', false],
+    ['month', 6, '6M', false],
+    ['year', 1, '1Y', false],
+    ['year', 4, '4Y', false],
+  ])
 
   const updateStake = (newStake) => {
     const newStakeInt = newStake !== '' ? parseInt(newStake, 10) : ''
     if (newStakeInt === '' || !Number.isNaN(newStakeInt)) setStake(newStakeInt)
+  }
+
+  const updateToken1Percentage = (percentage) => {
+    let percentageInt = percentage !== '' ? parseInt(percentage, 10) : ''
+    percentageInt = percentageInt > 100 ? 100 : percentageInt
+    setToken1Percentage(percentageInt)
+    setToken2Percentage(100 - percentageInt)
+  }
+
+  const updateToken2Percentage = (percentage) => {
+    let percentageInt = percentage !== '' ? parseInt(percentage, 10) : ''
+    percentageInt = percentageInt > 100 ? 100 : percentageInt
+    setToken2Percentage(percentageInt)
+    setToken1Percentage(100 - percentageInt)
   }
 
   const updateBalancePercentage = (percentage) => {
@@ -28,14 +52,23 @@ const StakeSection = () => {
     setBalancePercentage(percentage)
   }
 
-  const updateDate = (type, value) => {
+  const updateDate = (type, value, index) => {
     const newDate = new Date();
     if (type === 'week') newDate.setHours(newDate.getHours() + 24 * 7 * value);
     else if (type === 'month') newDate.setMonth(newDate.getMonth() + value);
     else if (type === 'year') newDate.setFullYear(newDate.getFullYear() + value);
     else return;
     setDate(newDate);
+    const presetDateCopy = [...presetDate]
+    for (let i = 0; i < presetDateCopy.length; i ++) presetDateCopy[i][3] = index === i
+    setPresetDate(presetDateCopy)
   };
+
+  const datePickerChangeHandler = (newDate) => {
+    setDate(newDate)
+    const presetDateCopy = [...presetDate]
+    for (let i = 0; i < presetDateCopy.length; i++) presetDateCopy[i][3] = false
+  }
 
   const CustomDatePickerInput = forwardRef(({ value, onClick }, ref) => (
     <button type="button" className={styles.datePickerInput} onClick={onClick} ref={ref}>
@@ -59,15 +92,6 @@ const StakeSection = () => {
   const handleCancel1 = () => setIsModal1Visible(false);
   const handleCancel2 = () => setIsModal2Visible(false);
 
-  const presetDate = [
-    ['week', 1, '1W'],
-    ['month', 1, '1M'],
-    ['month', 3, '3M'],
-    ['month', 6, '6M'],
-    ['year', 1, '1Y'],
-    ['year', 4, '4Y'],
-  ]
-
   return (
     <div className={styles.stakeSection}>
       <div className={styles.stakeContentWrapper}>
@@ -82,38 +106,47 @@ const StakeSection = () => {
               />
             </div>
           </div>
+
+          {/* BALANCE ROW */}
+
           <div className={styles.balanceRow}>
             <div className={styles.balanceRowTitle}>Balance:</div>
             <div className={styles.sliderContainer}>
-              <div>{balance} ACY</div>
-              <div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  className={styles.slider}
-                  value={balancePercentage}
-                  onChange={e => updateBalancePercentage(e.target.value)}
-                />
+              <div className={styles.sliderContentWrapper}>
+                <div>{balance} ACY</div>
+                <div className={styles.sliderWrapper}>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    className={styles.slider}
+                    value={balancePercentage}
+                    onChange={e => updateBalancePercentage(e.target.value)}
+                  />
+                </div>
               </div>
-              <div>{balancePercentage}%</div>
+              <div className={styles.balancePercentage}>{balancePercentage}%</div>
             </div>
           </div>
+
+          {/* LOCK TIME SECTION */}
+
           <div className={styles.lockTimeRow}>
             <div className={styles.lockTimeRowTitle}>Lock Time:</div>
             <div className={styles.dateSelectionContainer}>
               <div className={styles.datePickerContainer}>
                 <DatePicker
                   selected={date}
-                  onChange={(newDate) => setDate(newDate)}
+                  onChange={datePickerChangeHandler}
                   customInput={<CustomDatePickerInput />}
                 />
               </div>
               <div className={styles.presetDurationContainer}>
-                {presetDate.map(([type, value, text]) => (
+                {presetDate.map(([type, value, text, isSelected], index) => (
                   <div
+                    style={isSelected ? { backgroundColor: '#EB5C20', color: 'white' } : null}
                     className={styles.presetDurationSelection}
-                    onClick={() => updateDate(type, value)}
+                    onClick={() => updateDate(type, value, index)}
                   >
                     {text}
                   </div>
@@ -158,7 +191,12 @@ const StakeSection = () => {
                   </div>
                 </AcyModal>
                 <div className={styles.tokenPercentage}>
-                  <input type="text" className={styles.tokenPercentageInput} />
+                  <input
+                    type="text"
+                    className={styles.tokenPercentageInput}
+                    value={token1Percentage}
+                    onChange={(e) => updateToken1Percentage(e.target.value)}
+                  />
                   <span className={styles.suffix}>%</span>
                 </div>
               </div>
@@ -192,7 +230,12 @@ const StakeSection = () => {
                   </div>
                 </AcyModal>
                 <div className={styles.tokenPercentage}>
-                  <input type="text" className={styles.tokenPercentageInput} />
+                  <input
+                    type="text"
+                    className={styles.tokenPercentageInput}
+                    value={token2Percentage}
+                    onChange={(e) => updateToken2Percentage(e.target.value)}
+                  />
                   <span className={styles.suffix}>%</span>
                 </div>
               </div>

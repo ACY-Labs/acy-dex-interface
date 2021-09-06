@@ -138,40 +138,54 @@
     display: flex;
     align-items: center;
 
-    .slider {
-      margin-left: 1.5rem;
-      margin-right: 1.5rem;
-      margin-bottom: 0.6rem;
-
-      -webkit-appearance: none;
-      appearance: none;
-      height: 3px; /* Specified height */
-      background: black; /* Grey background */
-      outline: none; /* Remove outline */
-      opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
-      -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
-      transition: opacity 0.2s;
+    .balancePercentage {
+      margin-left: 0.5rem;
     }
 
-    .slider:hover {
-      opacity: 1; /* Fully shown on mouse-over */
-    }
+    .sliderContentWrapper {
+      width: 70%;
+      display: flex;
+      align-items: center;
 
-    .slider::-webkit-slider-thumb {
-      -webkit-appearance: none; /* Override default look */
-      appearance: none;
-      width: 15px; /* Set a specific slider handle width */
-      height: 15px; /* Slider handle height */
-      border-radius: 50%;
-      background-color: #5f5f5f; /* Green background */
-      cursor: pointer; /* Cursor on hover */
-    }
+      .sliderWrapper {
+        flex: 1;
+        margin-left: 1.5rem;
+      }
 
-    .slider::-moz-range-thumb {
-      width: 15px; /* Set a specific slider handle width */
-      height: 15px; /* Slider handle height */
-      background-color: #5f5f5f; /* Green background */
-      cursor: pointer; /* Cursor on hover */
+      .slider {
+        margin-bottom: 0.7rem;
+        width: 100%;
+
+        -webkit-appearance: none;
+        appearance: none;
+        height: 3px; /* Specified height */
+        background: black; /* Grey background */
+        outline: none; /* Remove outline */
+        opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+        transition: opacity 0.2s;
+      }
+
+      .slider:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+      }
+
+      .slider::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 15px; /* Set a specific slider handle width */
+        height: 15px; /* Slider handle height */
+        border-radius: 50%;
+        background-color: #5f5f5f; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+      }
+
+      .slider::-moz-range-thumb {
+        width: 15px; /* Set a specific slider handle width */
+        height: 15px; /* Slider handle height */
+        background-color: #5f5f5f; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+      }
     }
   }
 }
@@ -221,6 +235,7 @@
   background-color: #4c4c4d;
   border: none;
   border-radius: 0.3rem;
+  font-size: 1.25rem;
   padding: 0 1rem;
 }
 
@@ -258,19 +273,6 @@
     background-color: #5f5f5f;
     cursor: pointer;
   }
-}
-
-.tableData {
-  text-align: right;
-}
-
-.tableSeeMoreWrapper {
-  text-align: center;
-  width: 100%;
-}
-
-.tableSeeMore {
-  font-size: 16px;
 }
 
 .title {
