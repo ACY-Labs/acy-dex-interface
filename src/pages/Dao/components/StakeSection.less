@@ -1,6 +1,6 @@
 .stakeSection {
   width: 49%;
-  background-color: #2f3135aa;
+  background-color: #1B1B1C;
   color: #b5b6b6;
   border-radius: 15px;
   display: flex;
@@ -68,6 +68,12 @@
                 padding: 0 1rem;
                 font-size: 1.5rem;
               }
+
+              .tokenPercentageInput:focus {
+                outline: none;
+                box-shadow: 0 0 0 1pt #EB5C20;
+                transition: .1s;
+              }
             }
           }
         }
@@ -115,6 +121,19 @@
       font-size: 1.5rem;
       padding: 0 1rem;
       -moz-appearance: textfield;
+      box-shadow: 0 0 0 1pt transparent;
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 0 1pt #EB5C20;
+      transition: .1s;
+    }
+
+    .suffix {
+      font-size: 1.5rem;
+      position: relative;
+      right: 3.75rem;
     }
 
     input::-webkit-outer-spin-button,

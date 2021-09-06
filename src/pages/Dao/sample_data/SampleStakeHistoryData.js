@@ -1,4 +1,4 @@
-import styles from '../styles.less'
+import styles from '../components/StakeHistoryTable.less'
 
 export default [
   {
