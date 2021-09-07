@@ -140,7 +140,7 @@ const GlobalHeaderRight = props => {
 
   // 选择钱包
   const selectWallet = walletName => {
-    if (walletName === 'metamask') {
+    if (walletName === 'metamask' || walletName === 'opera') {
       activate(injected);
     } else if (walletName === 'coinbase') {
       activate(walletlink);
@@ -264,7 +264,9 @@ const GlobalHeaderRight = props => {
       name: 'Opera',
       icon: 'Opera',
       svgicon: true,
-      onClick: () => {},
+      onClick: () => {
+        selectWallet('opera');
+      },
     },
     {
       name: 'Gnosis Safe',
