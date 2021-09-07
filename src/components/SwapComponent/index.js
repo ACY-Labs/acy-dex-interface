@@ -22,6 +22,8 @@ import {
   AcyButton,
   AcyDescriptions,
 } from '@/components/Acy';
+
+
 import {Input} from 'antd';
 import { connect } from 'umi';
 import styles from './styles.less';
@@ -32,24 +34,23 @@ import { InjectedConnector } from '@web3-react/injected-connector';
 import { useState, useEffect, useCallback } from 'react';
 
 import {
-  supportedTokens,
-  getRouterContract,
+  ACYSwapErrorStatus,
+  approve,
   calculateGasMargin,
+  checkTokenIsApproved,
+  computeTradePriceBreakdown,
+  getAllowance,
   getContract,
+  getRouterContract,
+  getUserTokenBalance,
+  getUserTokenBalanceRaw,
+  INITIAL_ALLOWED_SLIPPAGE,
   isZero,
   ROUTER_ADDRESS,
-  getAllowance,
-  ACYSwapErrorStatus,
-  computeTradePriceBreakdown,
-  getUserTokenBalanceRaw,
-  approve,
-  checkTokenIsApproved,
-  getUserTokenBalance,
-  INITIAL_ALLOWED_SLIPPAGE,
+  supportedTokens,
 } from '@/acy-dex-swap/utils/index';
 
 import {
-  checkSwapGetEstimated,
   swapGetEstimated,
   swap,
 } from '@/acy-dex-swap/components/SwapComponent';
@@ -114,32 +115,39 @@ const MyComponent = props => {
   // when exactIn is false, it means the second line
   let [exactIn, setExactIn] = useState(true);
 
-  let [swapStatus, setSwapStatus] = useState();
   let [needApprove, setNeedApprove] = useState(false);
-  let [approveAmount, setApproveAmount] = useState('0');
+  let [approveAmount, setApproveAmount] = useState("0");
+  let [approveButtonStatus,setApproveButtonStatus]=useState(true);
+
   // Breakdown shows the estimated information for swap
+
+  // let [estimatedStatus,setEstimatedStatus]=useState();
   let [swapBreakdown, setSwapBreakdown] = useState();
-
-  let [swapButtonContent, setSwapButtonContent] = useState('Connect to Wallet');
   let [swapButtonState, setSwapButtonState] = useState(true);
-  let [swapFunction, setSwapFunction] = useState(0);
-  let [swapOperatorStatus, setSwapOperatorStatus] = useState('');
-  // 占位符
-  const individualFieldPlaceholder = 'Enter amount';
-  const dependentFieldPlaceholder = 'Estimated value';
+  let [swapButtonContent, setSwapButtonContent] = useState("Connect to Wallet");
+  let [swapStatus, setSwapStatus] = useState();
 
-  // 连接钱包函数
-  const { account, chainId, library, activate } = useWeb3React();
-  // 连接钱包时支持的货币id
+
+  let[pair,setPair]=useState();
+  let[route,setRoute]=useState();
+  let[trade,setTrade]=useState();
+  let[slippageAdjustedAmount,setSlippageAdjustedAmount]=useState();
+  let[minAmountOut,setMinAmountOut]=useState();
+  let[maxAmountIn,setMaxAmountIn]=useState();
+  let[wethContract,setWethContract]=useState();
+  let[wrappedAmount,setWrappedAmount]=useState();
+
+
+  const individualFieldPlaceholder = "Enter amount";
+  const dependentFieldPlaceholder = "Estimated value";
+  const slippageTolerancePlaceholder = "please input a number from 1.00 to 100.00";
+
+  const {account, chainId, library, activate} = useWeb3React();
+
+
   const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42],
+    supportedChainIds: [1, 3, 4, 5, 42, 80001],
   });
-
-  // 初始化函数时连接钱包
-  useEffect(() => {
-    // activate(injected);
-  }, []);
-
 
   // setSwapButtonContent
   // 监听钱包的连接
@@ -147,148 +155,97 @@ const MyComponent = props => {
     // activate(injected);
   }, []);
 
-  // 通知钱包连接成功
-  useEffect(() => {
-    // todo....
-    if (account) {
-      if (swapFunction == 0) {
-        activate(injected);
-        setSwapFunction(1);
-        setSwapButtonContent('choose tokens and amount');
-        setSwapButtonState(false);
-      }
-    }
-  }, account);
 
   // token1Amount is changed according to token0Amount
-  let t0Changed = useCallback(
-    async () => {
-      if (!token0 || !token1) return;
-      if (!exactIn) return;
-
-      let state = checkSwapGetEstimated(
-        {
-          ...token0,
-          amount: token0Amount,
-        },
-        {
-          ...token1,
-          amount: token1Amount,
-        },
-
-        exactIn,
-        chainId,
-        library
-      );
-      if (state == false) return;
-
-      await swapGetEstimated(
-        {
-          ...token0,
-          amount: token0Amount,
-        },
-        {
-          ...token1,
-          amount: token1Amount,
-        },
-        slippageTolerance * 100,
-        exactIn,
-        chainId,
-        library,
-        account,
-        setSwapStatus,
-        setSwapBreakdown,
-        setToken0Amount,
-        setToken1Amount,
-        setSwapButtonContent,
-        setSwapButtonState,
-        setNeedApprove,
-        setApproveAmount
-      );
-    },
-    [token0, token1, token0Amount, token1Amount, exactIn, chainId, library]
-  );
-
+  let t0Changed = useCallback(async () => {
+    if (!token0 || !token1) return;
+    if (!exactIn) return;
+    await swapGetEstimated(
+      {
+        ...token0,
+        amount: token0Amount,
+      },
+      {
+        ...token1,
+        amount: token1Amount,
+      },
+      slippageTolerance * 100,
+      exactIn,
+      chainId,
+      library,
+      account,
+      setToken0Amount,
+      setToken1Amount,
+      setNeedApprove,
+      setApproveAmount,
+      setApproveButtonStatus,
+      setSwapBreakdown,
+      setSwapButtonState,
+      setSwapButtonContent,
+      setSwapStatus,
+      setPair,
+      setRoute,
+      setTrade,
+      setSlippageAdjustedAmount,
+      setMinAmountOut,
+      setMaxAmountIn,
+      setWethContract,
+      setWrappedAmount
+    );
+  }, [token0, token1, token0Amount, token1Amount, slippageTolerance, exactIn, chainId, library, account]);
   // token0Amount is changed according to token1Amount
-  let t1Changed = useCallback(
-    async () => {
-      if (!token0 || !token1) return;
-      if (exactIn) return;
-      let state = checkSwapGetEstimated(
-        {
-          ...token0,
-          amount: token0Amount,
-        },
-        {
-          ...token1,
-          amount: token1Amount,
-        },
-        exactIn,
-        chainId,
-        library
-      );
-      if (state == false) return;
+  let t1Changed = useCallback(async () => {
+    if (!token0 || !token1) return;
+    if (exactIn) return;
+    await swapGetEstimated(
+      {
+        ...token0,
+        amount: token0Amount,
+      },
+      {
+        ...token1,
+        amount: token1Amount,
+      },
+      slippageTolerance * 100,
+      exactIn,
+      chainId,
+      library,
+      account,
+      setToken0Amount,
+      setToken1Amount,
+      setNeedApprove,
+      setApproveAmount,
+      setApproveButtonStatus,
+      setSwapBreakdown,
+      setSwapButtonState,
+      setSwapButtonContent,
+      setSwapStatus,
+      setPair,
+      setRoute,
+      setTrade,
+      setSlippageAdjustedAmount,
+      setMinAmountOut,
+      setMaxAmountIn,
+      setWethContract,
+      setWrappedAmount
+    );
+  }, [token0, token1, token0Amount, token1Amount, slippageTolerance, exactIn, chainId, library, account]);
+  useEffect(() => {
+    t0Changed();
+  }, [token0, token1, token0Amount, token1Amount, slippageTolerance, exactIn, chainId, library, account]);
+  useEffect(() => {
+    t1Changed();
+  }, [token0, token1, token0Amount, token1Amount, slippageTolerance, exactIn, chainId, library, account]);
 
-      await swapGetEstimated(
-        {
-          ...token0,
-          amount: token0Amount,
-        },
-        {
-          ...token1,
-          amount: token1Amount,
-        },
-        slippageTolerance * 100,
-        exactIn,
-        chainId,
-        library,
-        account,
-        setSwapStatus,
-        setSwapBreakdown,
-        setToken0Amount,
-        setToken1Amount,
-        setSwapButtonContent,
-        setSwapButtonState,
-        setNeedApprove,
-        setApproveAmount
-      );
-    },
-    [token0, token1, token0Amount, token1Amount, exactIn, chainId, library]
-  );
-
-  useEffect(
-    () => {
-      t0Changed();
-    },
-    [token0Amount]
-  );
-
-  useEffect(
-    () => {
-      t1Changed();
-    },
-    [token1Amount]
-  );
-
-  //
-  //
-  // const checkApprovalStatus = useCallback(async () => {
-  //   debugger;
-  //   if (token0 && token1) {
-  //     const approved = await checkTokenIsApproved(
-  //       token0.address,
-  //       parseUnits(token0Amount, token0.decimals),
-  //       library,
-  //       account
-  //     );
-  //
-  //     if (approved) {
-  //       setNeedApprove(false);
-  //     }
-  //
-  //     console.log(`Token 0 is approved? ${approved}`);
-  //   }
-  // });
+  useEffect(() => {
+    if (account == undefined) {
+      setSwapButtonState(true);
+      setSwapButtonContent("Connect to Wallet");
+    } else {
+      setSwapButtonState(false);
+      setSwapButtonContent("choose tokens and amount");
+    }
+  }, [account]);
 
   const onClickCoin = () => {
     setVisible(true);
@@ -342,10 +299,10 @@ const MyComponent = props => {
         }}
       />
 
-      <AcyDescriptions>
-        {swapStatus && <AcyDescriptions.Item>swap status: </AcyDescriptions.Item>}
-        {swapStatus && <AcyDescriptions.Item>{swapStatus}</AcyDescriptions.Item>}
-      </AcyDescriptions>
+      {/*<AcyDescriptions>*/}
+      {/*  {swapStatus && <AcyDescriptions.Item>swap status: </AcyDescriptions.Item>}*/}
+      {/*  {swapStatus && <AcyDescriptions.Item>{swapStatus}</AcyDescriptions.Item>}*/}
+      {/*</AcyDescriptions>*/}
 
       <AcyDescriptions>
         {swapBreakdown && <AcyDescriptions.Item>swap breakdown</AcyDescriptions.Item>}
@@ -354,16 +311,21 @@ const MyComponent = props => {
       </AcyDescriptions>
 
       {needApprove == true && (
-        <mark>
+        <div>
           <AcyButton
-            onClick={() => {
-              approve(token0.address, approveAmount, library, account);
+            onClick={async() => {
+              let state = await approve(token0.address, approveAmount, library, account);
+              if (state == true) {
+                setSwapButtonState(true);
+                setSwapButtonContent("SWAP");
+                setApproveButtonStatus(false);
+              }
             }}
-            disabled={!needApprove}
+            disabled={!approveButtonStatus}
           >
             approve
           </AcyButton>{' '}
-        </mark>
+        </div>
       )}
 
       {
@@ -371,11 +333,8 @@ const MyComponent = props => {
         style={{marginTop:'25px'}}
           disabled={!swapButtonState}
           onClick={() => {
-            if (swapFunction == 0) {
+            if (account == undefined) {
               activate(injected);
-              setSwapFunction(1);
-              setSwapButtonContent('choose tokens and amount');
-              setSwapButtonState(false);
             } else {
               swap(
                 {
@@ -391,7 +350,15 @@ const MyComponent = props => {
                 chainId,
                 library,
                 account,
-                setSwapOperatorStatus
+                pair,
+                route,
+                trade,
+                slippageAdjustedAmount,
+                minAmountOut,
+                maxAmountIn,
+                wethContract,
+                wrappedAmount,
+                setSwapStatus
               );
             }
           }}
@@ -401,8 +368,8 @@ const MyComponent = props => {
       }
 
       <AcyDescriptions>
-        {swapOperatorStatus && <AcyDescriptions.Item>swapOperatorStatus: </AcyDescriptions.Item>}
-        {swapOperatorStatus && <AcyDescriptions.Item> {swapOperatorStatus}</AcyDescriptions.Item>}
+        { swapStatus && <AcyDescriptions.Item>swapStatus: </AcyDescriptions.Item>}
+        { swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
       <AcyModal onCancel={onCancel} width={400} visible={visible}>
@@ -425,35 +392,37 @@ const MyComponent = props => {
             <AcyTabPane tab="All" key="1">
               {supportedTokens.map((token, index) => (
                 <AcyCoinItem
-                  data={token}
+                token={token}
                   key={index}
                   onClick={async () => {
                     onCancel();
                     if (before) {
                       if (account == undefined) {
-                        alert('please connect to your account');
-                      } else if (chainId == undefined) {
-                        alert('please connect to rinkey testnet');
-                      } else if (library == undefined) {
-                        alert('please get your library connected');
+                        alert("please connect to your account");
                       } else {
                         setToken0(token);
                         setToken0Balance(
-                          await getUserTokenBalance(token, chainId, account, library)
+                          await getUserTokenBalance(
+                            token,
+                            chainId,
+                            account,
+                            library
+                          )
                         );
                         setToken0BalanceShow(true);
                       }
                     } else {
                       if (account == undefined) {
                         alert('please connect to your account');
-                      } else if (chainId == undefined) {
-                        alert('please connect to rinkey testnet');
-                      } else if (library == undefined) {
-                        alert('please get your library connected');
-                      } else {
+                      }  else {
                         setToken1(token);
                         setToken1Balance(
-                          await getUserTokenBalance(token, chainId, account, library)
+                          await getUserTokenBalance(
+                            token,
+                            chainId,
+                            account,
+                            library
+                          )
                         );
                         setToken1BalanceShow(true);
                       }

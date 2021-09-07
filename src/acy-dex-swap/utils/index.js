@@ -97,8 +97,15 @@ export function getRouterContract(library, account) {
   return getContract(ROUTER_ADDRESS, IUniswapV2Router02ABI, library, account);
 }
 
+export function getPairContract(pairAddress, library, account) {
+  return getContract(pairAddress, IUniswapV2PairABI, library, account);
+}
+
+
 // return gas with 10% added margin in BigNumber
 export function calculateGasMargin(value) {
+
+  console.log("just calculateGasMargin");
   return value
       .mul(BigNumber.from(10000).add(BigNumber.from(1000)))
       .div(BigNumber.from(10000));
@@ -239,7 +246,7 @@ export function calculateSlippageAmount(value, slippage) {
 export async function approve(tokenAddress, requiredAmount, library, account) {
   if (requiredAmount === "0") {
     console.log("Unncessary call to approve");
-    return;
+    return true;
   }
 
   let allowance = await getAllowance(
@@ -263,26 +270,56 @@ export async function approve(tokenAddress, requiredAmount, library, account) {
     let estimatedGas = await tokenContract.estimateGas["approve"](
         ROUTER_ADDRESS,
         MaxUint256
-    ).catch(() => {
+    ).catch(async() => {
       // general fallback for tokens who restrict approval amounts
       useExact = true;
-      return tokenContract.estimateGas.approve(
+      let result= await tokenContract.estimateGas.approve(
           ROUTER_ADDRESS,
           requiredAmount.raw.toString()
       );
+      return result;
     });
 
     console.log(`Exact? ${useExact}`);
-    await tokenContract.approve(
+    let res=await tokenContract.approve(
         ROUTER_ADDRESS,
         useExact ? requiredAmount.raw.toString() : MaxUint256,
         {
           gasLimit: calculateGasMargin(estimatedGas),
         }
-    );
+    ).catch(()=>{
+      console.log("not approve success");
+        return false;
+    });
+    console.log(res);
+
+    if(res==false){
+      return false;
+
+    }
+
+    let flag=false;
+    
+    while(1){
+      let newAllowance = await getAllowance(
+        tokenAddress,
+        account, // owner
+        ROUTER_ADDRESS, //spender
+        library, // provider
+        account // active account
+     );
+      
+      if(newAllowance.gte(BigNumber.from(requiredAmount))){
+        flag=true;
+        break;
+        
+      }
+    }
+    if(flag) return true;
+
   } else {
     console.log("Allowance sufficient");
-    return;
+    return true;
   }
 }
 
@@ -293,6 +330,7 @@ export async function checkTokenIsApproved(
     library,
     account
 ) {
+
   let allowance = await getAllowance(
       tokenAddress,
       account, // owner
@@ -305,7 +343,6 @@ export async function checkTokenIsApproved(
   console.log(requiredAmount);
   console.log(`ALLOWANCE FOR TOKEN ${tokenAddress}:`);
   console.log(allowance);
-
   return allowance.gte(BigNumber.from(requiredAmount));
 }
 
@@ -321,253 +358,4 @@ export async function getTokenTotalSupply(token, library, account) {
   return parsedResult;
 }
 
-export function usePairContract(pairAddress, library, account) {
-  return getContract(pairAddress, IUniswapV2PairABI, library, account);
-}
 
-export async function getUserRemoveLiquidityBalance(
-    tokenA,
-    tokenB,
-    chainId,
-    account,
-    library,
-    setUserLiquidityPosition,
-    setToken0Balance,
-    setToken1Balance
-) {
-
-  let {
-    address: token0Address,
-    symbol: token0Symbol,
-    decimal: token0Decimal,
-  } = tokenA;
-  let {
-    address: token1Address,
-    symbol: token1Symbol,
-    decimal: token1Decimal,
-  } = tokenB;
-
-
-  const token0 = new Token(
-      chainId,
-      token0Address,
-      token0Decimal,
-      token0Symbol
-  );
-  const token1 = new Token(
-      chainId,
-      token1Address,
-      token1Decimal,
-      token1Symbol
-  );
-
-  if(token0.equals(token1)) {
-    setUserLiquidityPosition("two token can't be the same");
-    return;
-  }
-
-  let checkLiquidityPositionTasks=[];
-  let userNonZeroLiquidityPositions = [];
-
-  // queue get pair task
-  const pairTask = Fetcher.fetchPairData(token0, token1, library);
-  checkLiquidityPositionTasks.push(pairTask);
-
-  let pairs = await Promise.allSettled(checkLiquidityPositionTasks);
-
-  for(let pair of pairs){
-    if (pair.status === "rejected") {
-      setUserLiquidityPosition("this pair's fetch is reject");
-      return;
-    }
-    pair=pair.value;
-    let userPoolBalance = await getUserTokenBalanceRaw(
-        pair.liquidityToken,
-        account,
-        library
-    );
-
-    if (userPoolBalance.isZero()) {
-      setToken0Balance("0");
-      setToken1Balance("0");
-      setUserLiquidityPosition("user pool balance is zero");
-      return;
-    }
-
-    userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
-
-    let totalPoolTokens = await getTokenTotalSupply(
-        pair.liquidityToken,
-        library,
-        account
-    );
-
-    let token0Deposited = pair.getLiquidityValue(
-        pair.token0,
-        totalPoolTokens,
-        userPoolBalance,
-        false
-    );
-    let token1Deposited = pair.getLiquidityValue(
-        pair.token1,
-        totalPoolTokens,
-        userPoolBalance,
-        false
-    );
-    let totalSupply = await getTokenTotalSupply(
-        pair.liquidityToken,
-        library,
-        account
-    );
-
-    let liquidityMinted = pair.getLiquidityMinted(
-        totalSupply,
-        token0Deposited,
-        token1Deposited
-    );
-
-    let poolTokenPercentage = new Percent(
-        liquidityMinted.raw,
-        totalSupply.raw
-    ).toFixed(4);
-
-
-    userNonZeroLiquidityPositions.push({
-      pool: `${pair.token0.symbol}/${pair.token1.symbol}`,
-      token0Amount: `${token0Deposited.toSignificant(6)} ${pair.token0.symbol}`,
-      token1Amount: `${token1Deposited.toSignificant(6)} ${pair.token1.symbol}`,
-      token0Reserve: `${pair.reserve0.toExact()} ${pair.token0.symbol}`,
-      token1Reserve: `${pair.reserve1.toExact()} ${pair.token1.symbol}`,
-      share: `${poolTokenPercentage}%`,
-    });
-
-    console.log("token pairs that user has positions:");
-    console.log(userNonZeroLiquidityPositions);
-
-    setToken0Balance(`${token0Deposited.toSignificant(6)} ${pair.token0.symbol}`);
-    setToken1Balance(`${token1Deposited.toSignificant(6)} ${pair.token1.symbol}`);
-
-    setUserLiquidityPosition(" your balance is showed ");
-
-    return;
-  }
-}
-
-// get the estimated amount of the other token required when adding liquidity, in readable string.
-export async function removeLiquidityGetEstimated(
-    inputToken0,
-    inputToken1,
-    exactIn = true,
-    chainId,
-    library
-) {
-  let {
-    address: token0Address,
-    symbol: token0Symbol,
-    decimal: token0Decimal,
-    amount: token0Amount,
-  } = inputToken0;
-  let {
-    address: token1Address,
-    symbol: token1Symbol,
-    decimal: token1Decimal,
-    amount: token1Amount,
-  } = inputToken1;
-
-  if (exactIn && (isNaN(parseFloat(token0Amount)) || token0Amount === ""))
-    return;
-  if (!exactIn && (isNaN(parseFloat(token1Amount)) || token1Amount === ""))
-    return;
-  let token0IsETH = token0Symbol === "ETH";
-  let token1IsETH = token1Symbol === "ETH";
-
-  if (
-      (token0IsETH && token1Symbol === "WETH") ||
-      (token0Symbol === "WETH" && token1IsETH)
-  ) {
-    return;
-  }
-  // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
-  else {
-    // use WETH for ETHER to work with Uniswap V2 SDK
-    const token0 = token0IsETH
-        ? WETH[chainId]
-        : new Token(chainId, token0Address, token0Decimal, token0Symbol);
-    const token1 = token1IsETH
-        ? WETH[chainId]
-        : new Token(chainId, token1Address, token1Decimal, token1Symbol);
-
-    if (token0.equals(token1)) return;
-
-    // get pair using our own provider
-    const pair = await Fetcher.fetchPairData(token0, token1, library)
-        .then((pair) => {
-          console.log(pair.reserve0.raw.toString());
-          console.log(pair.reserve1.raw.toString());
-          return pair;
-        })
-        .catch((e) => {
-          return new ACYSwapErrorStatus(
-              `${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`
-          );
-        });
-    if (pair instanceof ACYSwapErrorStatus)
-      return exactIn ? token1Amount : token0Amount;
-    console.log(pair);
-
-    console.log("------------------ PARSE AMOUNT ------------------");
-    // convert typed in amount to BigNumber rusing ethers.js's parseUnits then to string,
-    let parsedAmount = exactIn
-        ? new TokenAmount(
-            token0,
-            parseUnits(token0Amount, token0Decimal)
-        ).raw.toString(16)
-        : new TokenAmount(
-            token1,
-            parseUnits(token1Amount, token1Decimal)
-        ).raw.toString(16);
-
-    let inputAmount;
-
-    // CurrencyAmount instance is required for Trade contructor if input is ETHER
-    if ((token0IsETH && exactIn) || (token1IsETH && !exactIn)) {
-      inputAmount = new CurrencyAmount(ETHER, `0x${parsedAmount}`);
-    } else {
-      inputAmount = new TokenAmount(
-          exactIn ? token0 : token1,
-          `0x${parsedAmount}`
-      );
-    }
-
-    console.log(exactIn ? "Exact input" : "Exact output");
-    console.log("inputAmount");
-    console.log(inputAmount.raw.toString());
-    console.log("estimated dependent amount");
-
-    let dependentTokenAmount;
-    let parsed;
-
-    if (exactIn) {
-      dependentTokenAmount = pair
-          .priceOf(token0)
-          .quote(new TokenAmount(token0, inputAmount.raw));
-
-      parsed =
-          token1 === ETHER
-              ? CurrencyAmount.ether(dependentTokenAmount.raw)
-              : dependentTokenAmount;
-    } else {
-      dependentTokenAmount = pair
-          .priceOf(token1)
-          .quote(new TokenAmount(token1, inputAmount.raw));
-
-      parsed =
-          token0 === ETHER
-              ? CurrencyAmount.ether(dependentTokenAmount.raw)
-              : dependentTokenAmount;
-    }
-
-    console.log(parsed.toExact());
-    return parsed.toExact();
-  }
-}

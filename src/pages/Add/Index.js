@@ -16,12 +16,14 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
+
 // import SwapComponent from '@/components/SwapComponent';
 // import MyComponent from '@/components/MyComponent';
 import AddComponent from '@/components/AddComponent';
 
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+
 import styles from './styles.less';
 const { Description } = DescriptionList;
 const { AcyTabPane } = AcyTabs;
@@ -213,6 +215,12 @@ class BasicProfile extends Component {
                     <AddComponent />
                   </div>
                 </AcyTabPane>
+
+                {/*<AcyTabPane tab="remove liquidity" key="2">*/}
+                {/*  <div className={styles.trade}>*/}
+                {/*    <AddComponent />*/}
+                {/*  </div>*/}
+                {/*</AcyTabPane>*/}
 
                 {/*<AcyTabPane tab="Liquidity" key="2">*/}
                 {/*<div className={styles.trade}>*/}
