@@ -1,32 +1,22 @@
-import React, { PureComponent, useState, useEffect } from 'react';
-import { FormattedMessage, formatMessage } from 'umi';
-import { Spin, Tag, Menu, Icon, Avatar, Tooltip, Checkbox, Dropdown } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { FormattedMessage } from 'umi';
+import { Spin, Tag, Menu, Icon, Dropdown } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
 import {
   AcyIcon,
   AcyConnectWallet,
   AcyModal,
-  AcyCheckBox,
   AcyCardList,
-  AcyWarp,
   AcyRadioButton,
   AcySeting,
 } from '@/components/Acy';
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
-import { WalletLinkConnector } from '@web3-react/walletlink-connector';
-import { FortmaticConnector } from '@web3-react/fortmatic-connector';
-import { PortisConnector } from '@web3-react/portis-connector';
-import { TorusConnector } from '@web3-react/torus-connector';
 
-import NoticeIcon from '../NoticeIcon';
-import HeaderSearch from '../HeaderSearch';
-import HeaderDropdown from '../HeaderDropdown';
-import SelectLang from '../SelectLang';
+import { injected, walletconnect, walletlink, fortmatic, portis, torus } from '@/connectors';
+
 import styles from './index.less';
-import { ReactComponent as Opera } from './Opera.svg'; //
-import { T } from 'antd/lib/upload/utils';
+import { ReactComponent as Opera } from './Opera.svg';
 
 const GlobalHeaderRight = props => {
   const { global } = props;
@@ -35,26 +25,8 @@ const GlobalHeaderRight = props => {
   const [visibleMetaMask, setVisibleMetaMask] = useState(false);
   const [visibleSetting, setVisibleSetting] = useState(false);
   // 连接钱包函数
-  const { account, chainId, library, activate } = useWeb3React();
-  const RPC_URLS = {
-    1: 'https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
-    4: 'https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
-  };
-  // 连接钱包时支持的货币id
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42],
-  });
-  const walletlink = new WalletLinkConnector({
-    url: RPC_URLS['4'],
-    appName: 'ACY swap',
-    supportedChainIds: [1, 3, 4, 5, 42, 10, 137, 69, 420, 80001],
-  });
-  const fortmatic = new FortmaticConnector({ apiKey: 'pk_test_1897AD5B792BA339', chainId: 4 });
-  const portis = new PortisConnector({
-    dAppId: 'c474625b-8239-4ce8-ab42-bd16489873c3',
-    networks: [1, 3, 4, 5, 42],
-  });
-  const torus = new TorusConnector({ chainId: 1 });
+  const { account, chainId, library, activate, deactivate } = useWeb3React();
+
   const getNoticeData = () => {
     const { notices = [] } = props;
     if (notices.length === 0) {
@@ -99,31 +71,6 @@ const GlobalHeaderRight = props => {
     return unreadMsg;
   };
 
-  const changeReadState = clickedItem => {
-    const { id } = clickedItem;
-    const { dispatch } = props;
-    dispatch({
-      type: 'global/changeNoticeReadState',
-      payload: id,
-    });
-  };
-
-  const fetchMoreNotices = tabProps => {
-    const { list, name } = tabProps;
-    const { dispatch, notices = [] } = props;
-    const lastItemId = notices[notices.length - 1].id;
-    dispatch({
-      type: 'global/fetchMoreNotices',
-      payload: {
-        lastItemId,
-        type: name,
-        offset: list.length,
-      },
-    });
-  };
-  const onhandConnect = () => {
-    setVisible(true);
-  };
   const onhandCancel = () => {
     setVisibleMetaMask(false);
   };
@@ -142,6 +89,8 @@ const GlobalHeaderRight = props => {
   const selectWallet = walletName => {
     if (walletName === 'metamask' || walletName === 'opera') {
       activate(injected);
+    } else if (walletName === 'walletconnect') {
+      activate(walletconnect);
     } else if (walletName === 'coinbase') {
       activate(walletlink);
     } else if (walletName === 'fortmatic') {
@@ -218,16 +167,12 @@ const GlobalHeaderRight = props => {
         selectWallet('coinbase');
       },
     },
-
-    {
-      name: 'TrustWallet',
-      icon: 'TrustWallet',
-      onClick: () => {},
-    },
     {
       name: 'WalletConnect',
       icon: 'WalletConnect',
-      onClick: () => {},
+      onClick: () => {
+        selectWallet('walletconnect');
+      },
     },
     {
       name: 'Trezor',
@@ -287,7 +232,13 @@ const GlobalHeaderRight = props => {
   return (
     <div className={className}>
       {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
-      <AcyConnectWallet isMobile={isMobile} value={account} onClick={onhandMetaMask} />
+
+      <AcyConnectWallet
+        chainId={chainId}
+        isMobile={isMobile}
+        value={account}
+        onClick={onhandMetaMask}
+      />
       <Dropdown
         overlay={
           <div className={styles.setting} onClick={e => e.preventDefault()}>
