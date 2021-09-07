@@ -58,8 +58,8 @@ const TokenSelection = (
           value={tokenPercentage}
           onChange={(e) => updateTokenPercentage(e.target.value)}
         />
-        <span className={styles.suffix}>%</span>
       </div>
+      <span className={styles.suffix}>%</span>
     </div>
   )
 }

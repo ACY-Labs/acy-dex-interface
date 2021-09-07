@@ -8,12 +8,12 @@
   justify-content: center;
 
   .stakeContentWrapper {
-    padding: 2.5rem 2.5rem 1.5rem 2.5rem;
+    padding: 0 1.5rem 1.5rem 1.5rem;
     border-bottom: 1px solid #434343;
   }
 
   .rewardContentWrapper {
-    padding: 1.5rem 2.5rem 2.5rem 2.5rem;
+    padding: 1.5rem 1.5rem 0 1.5rem;
 
     .rewardRow {
       display: flex;
@@ -27,20 +27,25 @@
 
         .tokenSelectionContainer {
           display: flex;
+          flex-direction: column;
 
           .tokenSelection {
             flex: 1;
             display: flex;
-            align-items: flex-start;
-            flex-direction: column;
+            background-color: #1B1B1C;
+            margin-bottom: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            border-radius: 7.5px;
 
             .tokenDropdown {
-              margin-bottom: 0.75rem;
               display: flex;
               align-items: center;
+              flex: 1;
 
               .tokenImg {
-                width: 32px;
+                width: 24px;
               }
 
               .tokenSymbol {
@@ -53,21 +58,16 @@
             }
 
             .tokenPercentage {
-              margin-bottom: 0.75rem;
-
-              .suffix {
-                font-size: 1.5rem;
-                position: relative;
-                right: 1.5rem;
-              }
+              flex: 1;
 
               .tokenPercentageInput {
-                width: 50%;
-                background-color: #4c4c4d;
+                width: 100%;
+                background-color: transparent;
                 border: none;
                 border-radius: 7.5px;
-                padding: 0 1rem;
-                font-size: 1.5rem;
+                padding: 0 1.75rem;
+                font-size: 1rem;
+                text-align: right;
               }
 
               .tokenPercentageInput:focus {
@@ -76,6 +76,12 @@
                 transition: .1s;
               }
             }
+
+            .suffix {
+               font-size: 1rem;
+               position: relative;
+               right: 1.5rem;
+             }
           }
         }
 
@@ -171,7 +177,7 @@
     }
 
     .balancePercentage {
-      margin-left: 1.5rem;
+      margin-left: 0.5rem;
 
       .balancePercentageInput {
         background: transparent;
