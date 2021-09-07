@@ -13,7 +13,7 @@ import {
 } from '@/components/Acy';
 import { useWeb3React } from '@web3-react/core';
 
-import { injected, walletconnect, walletlink, fortmatic, portis, torus } from '@/connectors';
+// import { injected, walletconnect, walletlink, fortmatic, portis, torus } from '@/connectors';
 
 import styles from './index.less';
 import { ReactComponent as Opera } from './Opera.svg';

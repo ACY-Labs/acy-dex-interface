@@ -4,7 +4,6 @@ import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 import { FortmaticConnector } from '@web3-react/fortmatic-connector';
 import { PortisConnector } from '@web3-react/portis-connector';
 import { TorusConnector } from '@web3-react/torus-connector';
-import { NetworkConnector } from '@web3-react/network-connector';
 
 const RPC_URLS = {
   1: 'https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
@@ -13,11 +12,6 @@ const RPC_URLS = {
 // 连接钱包时支持的货币id
 const injected = new InjectedConnector({
   supportedChainIds: [1, 3, 4, 5, 42],
-});
-
-const network = new NetworkConnector({
-  urls: { 1: RPC_URLS['1'], 4: RPC_URLS['4'] },
-  defaultChainId: 4,
 });
 
 const walletconnect = new WalletConnectConnector({
@@ -36,4 +30,4 @@ const portis = new PortisConnector({
 });
 const torus = new TorusConnector({ chainId: 4, initOptions: { network: { host: 'rinkeby' } } });
 
-export { injected, walletconnect, walletlink, fortmatic, portis, torus, network };
+export { injected, walletconnect, walletlink, fortmatic, portis, torus };
