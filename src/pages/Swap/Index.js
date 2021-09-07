@@ -19,7 +19,6 @@ import {
 import Media from 'react-media';
 import SwapComponent from '@/components/SwapComponent';
 import AddComponent from '@/components/AddComponent';
-import MyComponent from '@/components/MyComponent';
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
@@ -159,7 +158,7 @@ class BasicProfile extends Component {
     visibleLoading: false,
     tabIndex: 1,
   };
-  componentDidMount() { }
+  componentDidMount() {}
 
   lineTitleRender = () => {
     return [
@@ -171,7 +170,7 @@ class BasicProfile extends Component {
           <span className={styles.lighttitle}>212.123</span>{' '}
           <span className={styles.percentage}>+12.45%</span> 2021.07.11
         </div>
-      </div>
+      </div>,
     ];
   };
 
@@ -205,40 +204,44 @@ class BasicProfile extends Component {
   };
   maximize = () => {
     this.setState({
-      maxLine: !this.state.maxLine
+      maxLine: !this.state.maxLine,
     });
-  }
+  };
   render() {
     const { visible, visibleConfirmOrder, visibleLoading, tabIndex, maxLine } = this.state;
     const { isMobile } = this.props;
     return (
       <PageHeaderWrapper>
-
         <div className={styles.main}>
-          {
-            isMobile && <div>
-            <AcyCard>
-              <div className={styles.trade}>
-
-                <SwapComponent />
-              </div>
-            </AcyCard>
-           </div>
-          }
+          {isMobile && (
+            <div>
+              <AcyCard>
+                <div className={styles.trade}>
+                  <SwapComponent />
+                </div>
+              </AcyCard>
+            </div>
+          )}
           <div>
             {(tabIndex == 1 && (
-              <AcyCard style={{ background: 'transparent' }} title={this.lineTitleRender()} >
+              <AcyCard style={{ background: 'transparent' }} title={this.lineTitleRender()}>
                 <div
                   style={{
                     width: '100%',
                   }}
                 >
-                  <div   style={{
-                    height: '576px',
-                  }}>
-                  <AcyLineChart  backData={[]} showGradient={false} showXAxis={false} lineColor='#e29227' />
-
-                    </div>
+                  <div
+                    style={{
+                      height: '576px',
+                    }}
+                  >
+                    <AcyLineChart
+                      backData={[]}
+                      showGradient={false}
+                      showXAxis={false}
+                      lineColor="#e29227"
+                    />
+                  </div>
                   <AcyPeriodTime
                     onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
                     className={styles.pt}
@@ -247,20 +250,20 @@ class BasicProfile extends Component {
                 </div>
               </AcyCard>
             )) || (
-                <AcyCard>
-                  <Table dataSource={dataSource} columns={columns} pagination={false} />
-                </AcyCard>
-              )}
+              <AcyCard>
+                <Table dataSource={dataSource} columns={columns} pagination={false} />
+              </AcyCard>
+            )}
           </div>
-          {
-            !isMobile && <div>
-            <AcyCard>
-              <div className={styles.trade}>
-                <SwapComponent />
-              </div>
-            </AcyCard>
-           </div>
-          }
+          {!isMobile && (
+            <div>
+              <AcyCard>
+                <div className={styles.trade}>
+                  <SwapComponent />
+                </div>
+              </AcyCard>
+            </div>
+          )}
         </div>
 
         <AcyModal onCancel={this.onCancel} width={600} visible={visible}>
@@ -316,8 +319,8 @@ class BasicProfile extends Component {
   }
 }
 
-export default (props => (
+export default props => (
   <Media query="(max-width: 599px)">
     {isMobile => <BasicProfile {...props} isMobile={isMobile} />}
   </Media>
-)) ;
+);

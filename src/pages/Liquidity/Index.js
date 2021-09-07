@@ -16,9 +16,7 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
-import SwapComponent from '@/components/SwapComponent';
 import AddComponent from '@/components/AddComponent';
-import MyComponent from '@/components/MyComponent';
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
@@ -196,14 +194,14 @@ class BasicProfile extends Component {
       <PageHeaderWrapper>
         <div className={styles.main}>
           <div>
-          <AcyCard>
-                <Table dataSource={dataSource} columns={columns} pagination={false} />
-              </AcyCard>
+            <AcyCard>
+              <Table dataSource={dataSource} columns={columns} pagination={false} />
+            </AcyCard>
           </div>
           <div>
-          <AcyCard>
+            <AcyCard>
               <div className={styles.trade}>
-                  <AddComponent />
+                <AddComponent />
               </div>
             </AcyCard>
           </div>

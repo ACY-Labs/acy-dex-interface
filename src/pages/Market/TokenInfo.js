@@ -109,8 +109,8 @@ function MarketTokenInfo(props){
                 <div className={styles.contentCta}>
                 <div className={styles.ctaButton}>
                         <AcySmallButton 
-                                color="#1b1b1c"
-                                borderColor="#1b1b1c"
+                                color="#2a282e"
+                                borderColor="#2a282e"
                                 borderRadius="15px"
                                 padding="5px"
                             >

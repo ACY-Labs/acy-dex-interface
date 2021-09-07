@@ -46,6 +46,11 @@ import {
 
 
 export class BasicProfile extends Component {
+    constructor(props){
+      super(props)
+      this.rootElemRef = React.createRef();
+    }
+
     state = {
         visible: true,
         tabIndex: 0,
@@ -55,7 +60,9 @@ export class BasicProfile extends Component {
         transactionDisplayNumber: 10
     }
 
-    componentDidMount() {};
+    componentDidMount() {
+
+    };
 
     onClickTransaction = (e) => {
 
@@ -94,13 +101,15 @@ export class BasicProfile extends Component {
         return table.filter(item => item.type == category)
     };
 
+
+
     render() {
         // const outsideClickRef = useDetectClickOutside({ onTriggered: this.onSearchBlur });
         const { visible, visibleSearchBar, tabIndex, transactionView} = this.state;
         return (
           <div>
-            <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
             <div className={styles.marketRoot}>
+            <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
                 <div className={styles.chartsMain}>
                     <div className={styles.chartSectionMain}>
                           <div className={styles.graphStats}>

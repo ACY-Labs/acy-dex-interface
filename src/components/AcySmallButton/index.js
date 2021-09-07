@@ -7,6 +7,7 @@ function AcySmallButton (props) {
             style={{
                 background: String(color),
                 color: {textColor},
+                fontWeight:"600",
                 border:`solid 1px ${borderColor}`,
                 borderRadius: String(borderRadius),
                 paddingTop: String(padding),

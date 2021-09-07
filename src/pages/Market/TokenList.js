@@ -54,9 +54,9 @@ function MarketTokenList(props){
 
   return (
     <div>
-      <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
+      
       <div className={styles.marketRoot}>
-          
+      <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
           <h2>All Tokens</h2>
           <Table 
               dataSource={sortTable(dataSourceCoin, "tvl", true).slice(0, tokenDisplayNumber + 1)} 
