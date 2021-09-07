@@ -1,7 +1,7 @@
 import React from 'react';
-import { Input } from 'antd';
+import { Icon, Input } from 'antd';
 import styles from '@/pages/Dao/components/StakeSection.less';
-import { AcyCoinItem, AcyModal, AcyTabs } from '@/components/Acy';
+import { AcyCoinItem, AcyIcon, AcyModal, AcyTabs } from '@/components/Acy';
 import SampleToken from '@/pages/Dao/sample_data/SampleToken';
 import placeholder from '../placeholder-round.png';
 
@@ -23,6 +23,7 @@ const TokenSelection = (
       <div className={styles.tokenDropdown} onClick={showModal}>
         <img src={token.logoURI || placeholder} alt={token.symbol} className={styles.tokenImg} />
         <p className={styles.tokenSymbol}>{token.symbol}</p>
+        <Icon type="down" style={{ fontSize:'12px', margin:'0px 0.25rem 0px 0.35rem' }} />
       </div>
 
       {/* POP UP MODAL */}
@@ -44,7 +45,7 @@ const TokenSelection = (
           <AcyTabs>
             <AcyTabPane tab="All" key="1">
               {SampleToken.map((supToken, index) => (
-                <AcyCoinItem token={supToken} key={index} selectToken={selectToken} customIcon={false} />
+                <AcyCoinItem data={supToken} key={index} selectToken={selectToken} customIcon={false} />
               ))}
             </AcyTabPane>
             <AcyTabPane tab="Favorite" key="2" />

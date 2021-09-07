@@ -77,11 +77,11 @@ export class Dao extends Component {
           </div>
           <StakeSection />
         </div>
-        <div style={{ padding: 20 }}>
+        <div className={styles.tableChartContainer}>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <StakeHistoryTable />
           </div>
-          <div style={{ paddingTop: '30px' }}>
+          <div className={styles.chartContainer}>
             <div
               style={{ display: 'flex', justifyContent: 'end', marginBottom: 30 }}
               className={stakeInfoStyles.stakeDetails}
