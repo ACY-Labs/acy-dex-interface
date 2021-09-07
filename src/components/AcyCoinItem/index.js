@@ -5,17 +5,17 @@ import styles from './style.less';
 import stakeStyles from '@/pages/Dao/components/StakeSection.less'
 import placeholder from '@/pages/Dao/placeholder-round.png';
 
-const AcyCoinItem = ({token, children, selectToken, customIcon = true, ...rest }) => {
+const AcyCoinItem = ({token, children,onClick, selectToken, customIcon = true, ...rest }) => {
   return (
-    <div className={styles.acycoinitem} {...rest} onClick={() => selectToken(token) || null}>
+    <div className={styles.acycoinitem} {...rest} onClick={() => onClick(token) || null}>
       <ul>
         <li>
           {customIcon
             ? <AcyIcon name="eth" />
-            : <img src={token.logoURI || placeholder} alt={token.symbol} style={{ width: '32px' }} />}
+            : <img src={token&&token.logoURI || placeholder}style={{ width: '32px' }} />}
         </li>
         <li className={styles.conititle}>
-          {token.symbol}
+          {token&&token.symbol}
         </li>
         <li>
           Bitcoin

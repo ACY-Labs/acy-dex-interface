@@ -425,7 +425,7 @@ const MyComponent = props => {
             <AcyTabPane tab="All" key="1">
               {supportedTokens.map((token, index) => (
                 <AcyCoinItem
-                  data={token}
+                token={token}
                   key={index}
                   onClick={async () => {
                     onCancel();
