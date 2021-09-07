@@ -25,8 +25,10 @@ const StakeSection = () => {
   ])
 
   const updateStake = (newStake) => {
-    const newStakeInt = newStake !== '' ? parseInt(newStake, 10) : ''
+    let newStakeInt = newStake !== '' ? parseInt(newStake, 10) : ''
+    newStakeInt = newStakeInt > balance ? balance : newStakeInt
     if (newStakeInt === '' || !Number.isNaN(newStakeInt)) setStake(newStakeInt)
+    setBalancePercentage(Math.floor(newStakeInt / balance * 100))
   }
 
   const updateToken1Percentage = (percentage) => {
@@ -92,22 +94,27 @@ const StakeSection = () => {
     <div className={styles.stakeSection}>
       <div className={styles.stakeContentWrapper}>
         <div className={styles.stakeUpperSection}>
+
+          {/* AMOUNT ROW */}
+
           <div className={styles.amountRow}>
-            <div>Stake</div>
-            <div>
+            <div className={styles.amountRowTitle}>Stake</div>
+            <div className={styles.amountRowInputContainer}>
               <input
                 type="text"
                 value={stake}
                 onChange={e => updateStake(e.target.value)}
               />
-              <span className={styles.suffix}>ACY</span>
             </div>
+            <span className={styles.suffix}>ACY</span>
           </div>
 
           {/* BALANCE ROW */}
 
           <div className={styles.balanceRow}>
-            <div className={styles.balanceRowTitle}>Balance:</div>
+            <div className={styles.balanceRowTitleContainer}>
+              <div className={styles.balanceRowTitle}>Balance:</div>
+            </div>
             <div className={styles.sliderContainer}>
               <div className={styles.sliderContentWrapper}>
                 <div>{balance} ACY</div>
@@ -121,15 +128,25 @@ const StakeSection = () => {
                     onChange={e => updateBalancePercentage(e.target.value)}
                   />
                 </div>
+                <div className={styles.balancePercentage}>
+                  <input
+                    className={styles.balancePercentageInput}
+                    type="text"
+                    value={balancePercentage}
+                    onChange={(e) => updateBalancePercentage(e.target.value)}
+                  />
+                </div>
               </div>
-              <div className={styles.balancePercentage}>{balancePercentage}%</div>
+              <span className={styles.balancePercentageSuffix}>%</span>
             </div>
           </div>
 
           {/* LOCK TIME SECTION */}
 
           <div className={styles.lockTimeRow}>
-            <div className={styles.lockTimeRowTitle}>Lock Time:</div>
+            <div className={styles.lockTimeRowTitleContainer}>
+              <div className={styles.lockTimeRowTitle}>Lock Time:</div>
+            </div>
             <div className={styles.dateSelectionContainer}>
               <div className={styles.datePickerContainer}>
                 <DatePicker

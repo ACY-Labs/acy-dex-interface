@@ -8,7 +8,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
   margin-bottom: 1.5rem;
-  padding: 20px;
+  padding: 0 20px 20px 20px;
   align-items: stretch;
 }
 
@@ -29,7 +29,7 @@
 
 .chartSection {
   width: 49%;
-  background-color: #1B1B1C;
+  background-color: #29292C;
   border-radius: 15px;
   margin: 0px 15px 0px 0px;
   padding: 15px 15px 0px 15px;
@@ -55,20 +55,25 @@
 
 .createProposalContainer {
   text-align: end;
-  padding: 20px;
+  padding: 0 20px 0.5rem 0;
 
   .createProposalButton {
-    background-color: #eb5c20;
+    background-color: #4c4c4d;
     color: white;
     border: none;
     border-radius: 7.5px;
     font-size: 1.25rem;
-    padding: 0.5rem 1.25rem;
+    padding: 0.25rem 2.5rem;
   }
 
   .createProposalButton:hover {
     cursor: pointer;
+    background-color: #5f5f5f;
   }
+}
+
+.chartContainer {
+  padding-top: 30px;
 }
 
 @media (max-width: 768px) {
@@ -90,4 +95,16 @@
     padding: 0.5rem 1.25rem;
     margin-right: 30px;
   }
+
+  .chartSection {
+    margin: 0 0 2.5rem 0;
+  }
+
+  .chartContainer {
+    padding: 2rem 2rem 0 2rem;
+  }
+}
+
+.tableChartContainer {
+  padding: 0 20px;
 }
