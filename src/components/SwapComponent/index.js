@@ -23,8 +23,7 @@ import {
   AcyDescriptions,
 } from '@/components/Acy';
 
-
-import {Input} from 'antd';
+import { Input } from 'antd';
 import { connect } from 'umi';
 import styles from './styles.less';
 import { sortAddress } from '@/utils/utils';
@@ -50,10 +49,7 @@ import {
   supportedTokens,
 } from '@/acy-dex-swap/utils/index';
 
-import {
-  swapGetEstimated,
-  swap,
-} from '@/acy-dex-swap/components/SwapComponent';
+import { swapGetEstimated, swap } from '@/acy-dex-swap/components/SwapComponent';
 
 import ERC20ABI from '@/abis/ERC20.json';
 import WETHABI from '@/abis/WETH.json';
@@ -80,7 +76,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 
 const { AcyTabPane } = AcyTabs;
-import { Row, Col, Button,Icon  } from 'antd';
+import { Row, Col, Button, Icon } from 'antd';
 import { Alert } from 'antd';
 
 const MyComponent = props => {
@@ -116,34 +112,31 @@ const MyComponent = props => {
   let [exactIn, setExactIn] = useState(true);
 
   let [needApprove, setNeedApprove] = useState(false);
-  let [approveAmount, setApproveAmount] = useState("0");
-  let [approveButtonStatus,setApproveButtonStatus]=useState(true);
+  let [approveAmount, setApproveAmount] = useState('0');
+  let [approveButtonStatus, setApproveButtonStatus] = useState(true);
 
   // Breakdown shows the estimated information for swap
 
   // let [estimatedStatus,setEstimatedStatus]=useState();
   let [swapBreakdown, setSwapBreakdown] = useState();
   let [swapButtonState, setSwapButtonState] = useState(true);
-  let [swapButtonContent, setSwapButtonContent] = useState("Connect to Wallet");
+  let [swapButtonContent, setSwapButtonContent] = useState('Connect to Wallet');
   let [swapStatus, setSwapStatus] = useState();
 
+  let [pair, setPair] = useState();
+  let [route, setRoute] = useState();
+  let [trade, setTrade] = useState();
+  let [slippageAdjustedAmount, setSlippageAdjustedAmount] = useState();
+  let [minAmountOut, setMinAmountOut] = useState();
+  let [maxAmountIn, setMaxAmountIn] = useState();
+  let [wethContract, setWethContract] = useState();
+  let [wrappedAmount, setWrappedAmount] = useState();
 
-  let[pair,setPair]=useState();
-  let[route,setRoute]=useState();
-  let[trade,setTrade]=useState();
-  let[slippageAdjustedAmount,setSlippageAdjustedAmount]=useState();
-  let[minAmountOut,setMinAmountOut]=useState();
-  let[maxAmountIn,setMaxAmountIn]=useState();
-  let[wethContract,setWethContract]=useState();
-  let[wrappedAmount,setWrappedAmount]=useState();
+  const individualFieldPlaceholder = 'Enter amount';
+  const dependentFieldPlaceholder = 'Estimated value';
+  const slippageTolerancePlaceholder = 'please input a number from 1.00 to 100.00';
 
-
-  const individualFieldPlaceholder = "Enter amount";
-  const dependentFieldPlaceholder = "Estimated value";
-  const slippageTolerancePlaceholder = "please input a number from 1.00 to 100.00";
-
-  const {account, chainId, library, activate} = useWeb3React();
-
+  const { account, chainId, library, activate } = useWeb3React();
 
   const injected = new InjectedConnector({
     supportedChainIds: [1, 3, 4, 5, 42, 80001],
@@ -155,97 +148,151 @@ const MyComponent = props => {
     // activate(injected);
   }, []);
 
-
   // token1Amount is changed according to token0Amount
-  let t0Changed = useCallback(async () => {
-    if (!token0 || !token1) return;
-    if (!exactIn) return;
-    await swapGetEstimated(
-      {
-        ...token0,
-        amount: token0Amount,
-      },
-      {
-        ...token1,
-        amount: token1Amount,
-      },
-      slippageTolerance * 100,
+  let t0Changed = useCallback(
+    async () => {
+      if (!token0 || !token1) return;
+      if (!exactIn) return;
+      await swapGetEstimated(
+        {
+          ...token0,
+          amount: token0Amount,
+        },
+        {
+          ...token1,
+          amount: token1Amount,
+        },
+        slippageTolerance * 100,
+        exactIn,
+        chainId,
+        library,
+        account,
+        setToken0Amount,
+        setToken1Amount,
+        setNeedApprove,
+        setApproveAmount,
+        setApproveButtonStatus,
+        setSwapBreakdown,
+        setSwapButtonState,
+        setSwapButtonContent,
+        setSwapStatus,
+        setPair,
+        setRoute,
+        setTrade,
+        setSlippageAdjustedAmount,
+        setMinAmountOut,
+        setMaxAmountIn,
+        setWethContract,
+        setWrappedAmount
+      );
+    },
+    [
+      token0,
+      token1,
+      token0Amount,
+      token1Amount,
+      slippageTolerance,
       exactIn,
       chainId,
       library,
       account,
-      setToken0Amount,
-      setToken1Amount,
-      setNeedApprove,
-      setApproveAmount,
-      setApproveButtonStatus,
-      setSwapBreakdown,
-      setSwapButtonState,
-      setSwapButtonContent,
-      setSwapStatus,
-      setPair,
-      setRoute,
-      setTrade,
-      setSlippageAdjustedAmount,
-      setMinAmountOut,
-      setMaxAmountIn,
-      setWethContract,
-      setWrappedAmount
-    );
-  }, [token0, token1, token0Amount, token1Amount, slippageTolerance, exactIn, chainId, library, account]);
+    ]
+  );
   // token0Amount is changed according to token1Amount
-  let t1Changed = useCallback(async () => {
-    if (!token0 || !token1) return;
-    if (exactIn) return;
-    await swapGetEstimated(
-      {
-        ...token0,
-        amount: token0Amount,
-      },
-      {
-        ...token1,
-        amount: token1Amount,
-      },
-      slippageTolerance * 100,
+  let t1Changed = useCallback(
+    async () => {
+      if (!token0 || !token1) return;
+      if (exactIn) return;
+      await swapGetEstimated(
+        {
+          ...token0,
+          amount: token0Amount,
+        },
+        {
+          ...token1,
+          amount: token1Amount,
+        },
+        slippageTolerance * 100,
+        exactIn,
+        chainId,
+        library,
+        account,
+        setToken0Amount,
+        setToken1Amount,
+        setNeedApprove,
+        setApproveAmount,
+        setApproveButtonStatus,
+        setSwapBreakdown,
+        setSwapButtonState,
+        setSwapButtonContent,
+        setSwapStatus,
+        setPair,
+        setRoute,
+        setTrade,
+        setSlippageAdjustedAmount,
+        setMinAmountOut,
+        setMaxAmountIn,
+        setWethContract,
+        setWrappedAmount
+      );
+    },
+    [
+      token0,
+      token1,
+      token0Amount,
+      token1Amount,
+      slippageTolerance,
       exactIn,
       chainId,
       library,
       account,
-      setToken0Amount,
-      setToken1Amount,
-      setNeedApprove,
-      setApproveAmount,
-      setApproveButtonStatus,
-      setSwapBreakdown,
-      setSwapButtonState,
-      setSwapButtonContent,
-      setSwapStatus,
-      setPair,
-      setRoute,
-      setTrade,
-      setSlippageAdjustedAmount,
-      setMinAmountOut,
-      setMaxAmountIn,
-      setWethContract,
-      setWrappedAmount
-    );
-  }, [token0, token1, token0Amount, token1Amount, slippageTolerance, exactIn, chainId, library, account]);
-  useEffect(() => {
-    t0Changed();
-  }, [token0, token1, token0Amount, token1Amount, slippageTolerance, exactIn, chainId, library, account]);
-  useEffect(() => {
-    t1Changed();
-  }, [token0, token1, token0Amount, token1Amount, slippageTolerance, exactIn, chainId, library, account]);
+    ]
+  );
+  useEffect(
+    () => {
+      t0Changed();
+    },
+    [
+      token0,
+      token1,
+      token0Amount,
+      token1Amount,
+      slippageTolerance,
+      exactIn,
+      chainId,
+      library,
+      account,
+    ]
+  );
+  useEffect(
+    () => {
+      t1Changed();
+    },
+    [
+      token0,
+      token1,
+      token0Amount,
+      token1Amount,
+      slippageTolerance,
+      exactIn,
+      chainId,
+      library,
+      account,
+    ]
+  );
 
-  useEffect(() => {
-    if (account == undefined) {
-      setSwapButtonState(true);
-      setSwapButtonContent("Connect to Wallet");
-    } else {
-      setSwapButtonState(false);
-      setSwapButtonContent("choose tokens and amount");
-    }
-  }, [account]);
+  useEffect(
+    () => {
+      if (account == undefined) {
+        setSwapButtonState(true);
+        setSwapButtonContent('Connect to Wallet');
+      } else {
+        setSwapButtonState(false);
+        setSwapButtonContent('choose tokens and amount');
+      }
+    },
+    [account]
+  );
 
   const onClickCoin = () => {
     setVisible(true);
@@ -278,7 +325,7 @@ const MyComponent = props => {
       />
 
       <div className={styles.arrow}>
-        <Icon style={{fontSize:'16px'}} type="arrow-down" />
+        <Icon style={{ fontSize: '16px' }} type="arrow-down" />
       </div>
 
       <AcyCuarrencyCard
@@ -313,11 +360,11 @@ const MyComponent = props => {
       {needApprove == true && (
         <div>
           <AcyButton
-            onClick={async() => {
+            onClick={async () => {
               let state = await approve(token0.address, approveAmount, library, account);
               if (state == true) {
                 setSwapButtonState(true);
-                setSwapButtonContent("SWAP");
+                setSwapButtonContent('SWAP');
                 setApproveButtonStatus(false);
               }
             }}
@@ -330,7 +377,7 @@ const MyComponent = props => {
 
       {
         <AcyButton
-        style={{marginTop:'25px'}}
+          style={{ marginTop: '25px' }}
           disabled={!swapButtonState}
           onClick={() => {
             if (account == undefined) {
@@ -368,21 +415,19 @@ const MyComponent = props => {
       }
 
       <AcyDescriptions>
-        { swapStatus && <AcyDescriptions.Item>swapStatus: </AcyDescriptions.Item>}
-        { swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
+        {swapStatus && <AcyDescriptions.Item>swapStatus: </AcyDescriptions.Item>}
+        {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
       <AcyModal onCancel={onCancel} width={400} visible={visible}>
-        <div className={styles.title}>
-         Select a token
-        </div>
+        <div className={styles.title}>Select a token</div>
         <div className={styles.search}>
           <Input
-          size="large"
-          style={{
-              backgroundColor: "#373739",
-              borderRadius:'40px'
-          }}
+            size="large"
+            style={{
+              backgroundColor: '#373739',
+              borderRadius: '40px',
+            }}
             placeholder="Enter the token symbol or address"
           />
         </div>
@@ -390,45 +435,40 @@ const MyComponent = props => {
         <div className={styles.coinList}>
           <AcyTabs>
             <AcyTabPane tab="All" key="1">
-              {supportedTokens.map((token, index) => (
-                <AcyCoinItem
-                token={token}
-                  key={index}
-                  onClick={async () => {
-                    onCancel();
-                    if (before) {
-                      if (account == undefined) {
-                        alert("please connect to your account");
-                      } else {
-                        setToken0(token);
-                        setToken0Balance(
-                          await getUserTokenBalance(
-                            token,
-                            chainId,
-                            account,
-                            library
-                          )
-                        );
-                        setToken0BalanceShow(true);
-                      }
-                    } else {
-                      if (account == undefined) {
-                        alert('please connect to your account');
-                      }  else {
-                        setToken1(token);
-                        setToken1Balance(
-                          await getUserTokenBalance(
-                            token,
-                            chainId,
-                            account,
-                            library
-                          )
-                        );
-                        setToken1BalanceShow(true);
-                      }
-                    }
-                  }}
-                />
+              {supportedTokens.map(
+                (token, index) => {
+                  console.log(token);
+                  return (
+                    <AcyCoinItem
+                      data={token}
+                      key={index}
+                      selectToken={async () => {
+                        onCancel();
+                        if (before) {
+                          if (account == undefined) {
+                            alert('please connect to your account');
+                          } else {
+                            setToken0(token);
+                            setToken0Balance(
+                              await getUserTokenBalance(token, chainId, account, library)
+                            );
+                            setToken0BalanceShow(true);
+                          }
+                        } else {
+                          if (account == undefined) {
+                            alert('please connect to your account');
+                          } else {
+                            setToken1(token);
+                            setToken1Balance(
+                              await getUserTokenBalance(token, chainId, account, library)
+                            );
+                            setToken1BalanceShow(true);
+                          }
+                        }
+                      }}
+                    />
+                  );
+                }
                 // <Dropdown.Item
                 //   key={index}
                 //   onClick={async () => {
@@ -438,10 +478,9 @@ const MyComponent = props => {
                 // >
                 //   {token.symbol}
                 // </Dropdown.Item>
-              ))}
+              )}
             </AcyTabPane>
             <AcyTabPane tab="Favorite" key="2" />
-
           </AcyTabs>
         </div>
       </AcyModal>
@@ -451,6 +490,6 @@ const MyComponent = props => {
 
 export default connect(({ global, loading }) => ({
   global,
-  account:global.account,
+  account: global.account,
   loading: loading.global,
 }))(MyComponent);
