@@ -36,7 +36,7 @@ export class Dao extends Component {
       <PageHeaderWrapper>
         <div className={styles.createProposalContainer}>
           <button type="button" className={styles.createProposalButton}>
-            Create Proposal
+            Proposal
           </button>
         </div>
         <div className={styles.stakeSectionMain}>
