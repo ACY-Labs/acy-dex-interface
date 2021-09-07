@@ -219,6 +219,7 @@ class BasicProfile extends Component {
             isMobile && <div>
             <AcyCard>
               <div className={styles.trade}>
+
                 <SwapComponent />
               </div>
             </AcyCard>
