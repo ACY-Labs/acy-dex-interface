@@ -1,18 +1,19 @@
 .stakeSection {
   width: 49%;
-  background-color: #1B1B1C;
+  background-color: #29292C;
   color: #b5b6b6;
   border-radius: 15px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
 
   .stakeContentWrapper {
-    padding: 15px;
+    padding: 2.5rem 2.5rem 1.5rem 2.5rem;
     border-bottom: 1px solid #434343;
   }
 
   .rewardContentWrapper {
-    padding: 15px;
+    padding: 1.5rem 2.5rem 2.5rem 2.5rem;
 
     .rewardRow {
       display: flex;
@@ -22,7 +23,7 @@
         font-size: 1.5rem;
       }
       .cryptoSelectionContainer {
-        flex: 3;
+        flex: 2;
 
         .tokenSelectionContainer {
           display: flex;
@@ -79,7 +80,7 @@
         }
 
         .stakeSubmitButton {
-          width: 70%;
+          width: 100%;
           background-color: #4c4c4d;
           border: none;
           border-radius: 7.5px;
@@ -104,18 +105,19 @@
 .amountRow {
   display: flex;
   margin-bottom: 1.5rem;
+  position: relative;
 
-  div:first-child {
+  .amountRowTitle {
     flex: 1;
     font-size: 1.5rem;
   }
 
-  div:last-child {
-    flex: 3;
+  .amountRowInputContainer {
+    flex: 2;
 
     input {
-      width: 70%;
-      background-color: #4c4c4d;
+      width: 100%;
+      background-color: #1B1B1C;
       border: none;
       border-radius: 7.5px;
       font-size: 1.5rem;
@@ -130,17 +132,17 @@
       transition: .1s;
     }
 
-    .suffix {
-      font-size: 1.5rem;
-      position: relative;
-      right: 3.75rem;
-    }
-
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
+  }
+
+  .suffix {
+    font-size: 1.5rem;
+    position: absolute;
+    right: 1.25rem;
   }
 }
 
@@ -148,33 +150,60 @@
   display: flex;
   margin-bottom: 1.5rem;
 
-  .balanceRowTitle {
+  .balanceRowTitleContainer {
     flex: 1;
+
+    .balanceRowTitle {
+      text-align: right;
+      padding-right: 1.5rem;
+    }
   }
 
   .sliderContainer {
-    flex: 3;
+    flex: 2;
     display: flex;
     align-items: center;
+    position: relative;
+
+    .balancePercentageSuffix {
+      position: absolute;
+      right: 0;
+    }
 
     .balancePercentage {
-      margin-left: 0.5rem;
+      margin-left: 1.5rem;
+
+      .balancePercentageInput {
+        background: transparent;
+        border: none;
+        width: 2.75rem;
+        padding-right: 1rem;
+        text-align: right;
+        border-radius: 4px;
+      }
+
+      .balancePercentageInput:focus {
+        outline: none;
+        box-shadow: 0 0 0 1pt #EB5C20;
+        transition: .1s;
+      }
     }
 
     .sliderContentWrapper {
-      width: 70%;
+      width: 100%;
       display: flex;
       align-items: center;
 
       .sliderWrapper {
         flex: 1;
+        display: flex;
         margin-left: 1.5rem;
+        align-items: center;
       }
 
       .slider {
-        margin-bottom: 0.7rem;
         width: 100%;
-
+        padding: 0;
         -webkit-appearance: none;
         appearance: none;
         height: 3px; /* Specified height */
@@ -195,14 +224,14 @@
         width: 15px; /* Set a specific slider handle width */
         height: 15px; /* Slider handle height */
         border-radius: 50%;
-        background-color: #5f5f5f; /* Green background */
+        background-color: #C4C4C4; /* Green background */
         cursor: pointer; /* Cursor on hover */
       }
 
       .slider::-moz-range-thumb {
         width: 15px; /* Set a specific slider handle width */
         height: 15px; /* Slider handle height */
-        background-color: #5f5f5f; /* Green background */
+        background-color: #C4C4C4; /* Green background */
         cursor: pointer; /* Cursor on hover */
       }
     }
@@ -212,12 +241,18 @@
 .lockTimeRow {
   display: flex;
 
-  .lockTimeRowTitle {
+  .lockTimeRowTitleContainer {
     flex: 1;
+
+    .lockTimeRowTitle {
+      text-align: right;
+      padding-right: 1.5rem;
+    }
   }
 
+
   .dateSelectionContainer {
-    flex: 3;
+    flex: 2;
     display: flex;
     flex-direction: column;
 
@@ -226,6 +261,7 @@
     }
 
     .presetDurationContainer {
+      width: 100%;
       display: flex;
 
       .presetDurationSelection {
@@ -233,12 +269,12 @@
         color: #b5b6b6;
         background-color: #4c4c4d;
         border-radius: 0.3rem;
-        padding: 0 0.5rem;
+        padding: 0;
         text-align: center;
       }
 
       .presetDurationSelection:not(:first-child) {
-        margin-left: 1rem;
+        margin-left: 0.5rem;
       }
 
       .presetDurationSelection:hover {
@@ -254,7 +290,7 @@
   background-color: #4c4c4d;
   border: none;
   border-radius: 0.3rem;
-  font-size: 1.25rem;
+  font-size: 1rem;
   padding: 0 1rem;
 }
 
