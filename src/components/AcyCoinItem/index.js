@@ -6,6 +6,7 @@ import stakeStyles from '@/pages/Dao/components/StakeSection.less';
 import placeholder from '@/pages/Dao/placeholder-round.png';
 
 const AcyCoinItem = ({ data, children, selectToken, customIcon = true, ...rest }) => {
+  console.log(data)
   return (
     <div className={styles.acycoinitem} {...rest} onClick={() => selectToken(data) || null}>
       <ul>
@@ -13,7 +14,9 @@ const AcyCoinItem = ({ data, children, selectToken, customIcon = true, ...rest }
           {customIcon ? (
             <AcyIcon name="eth" />
           ) : (
-            <img src={data.logoURI || placeholder} alt={data.symbol} style={{ width: '32px' }} />
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '24px' }}>
+              <img src={data.logoURI || placeholder} alt={data.symbol} style={{ height: '24px' }} />
+            </div>
           )}
         </li>
         <li className={styles.conititle}>{data.symbol}</li>

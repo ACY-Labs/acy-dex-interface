@@ -21,7 +21,9 @@ const TokenSelection = (
   return (
     <div className={styles.tokenSelection}>
       <div className={styles.tokenDropdown} onClick={showModal}>
-        <img src={token.logoURI || placeholder} alt={token.symbol} className={styles.tokenImg} />
+        <div className={styles.tokenImgContainer}>
+          <img src={token.logoURI || placeholder} alt={token.symbol} className={styles.tokenImg} />
+        </div>
         <p className={styles.tokenSymbol}>{token.symbol}</p>
         <Icon type="down" style={{ fontSize:'12px', margin:'0px 0.25rem 0px 0.35rem' }} />
       </div>
