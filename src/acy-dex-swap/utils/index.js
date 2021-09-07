@@ -270,17 +270,18 @@ export async function approve(tokenAddress, requiredAmount, library, account) {
     let estimatedGas = await tokenContract.estimateGas["approve"](
         ROUTER_ADDRESS,
         MaxUint256
-    ).catch(() => {
+    ).catch(async() => {
       // general fallback for tokens who restrict approval amounts
       useExact = true;
-      return tokenContract.estimateGas.approve(
+      let result= await tokenContract.estimateGas.approve(
           ROUTER_ADDRESS,
           requiredAmount.raw.toString()
       );
+      return result;
     });
 
     console.log(`Exact? ${useExact}`);
-    await tokenContract.approve(
+    let res=await tokenContract.approve(
         ROUTER_ADDRESS,
         useExact ? requiredAmount.raw.toString() : MaxUint256,
         {
@@ -290,8 +291,31 @@ export async function approve(tokenAddress, requiredAmount, library, account) {
       console.log("not approve success");
         return false;
     });
+    console.log(res);
 
-    return true;
+    if(res==false){
+      return false;
+
+    }
+
+    let flag=false;
+    
+    while(1){
+      let newAllowance = await getAllowance(
+        tokenAddress,
+        account, // owner
+        ROUTER_ADDRESS, //spender
+        library, // provider
+        account // active account
+     );
+      
+      if(newAllowance.gte(BigNumber.from(requiredAmount))){
+        flag=true;
+        break;
+        
+      }
+    }
+    if(flag) return true;
 
   } else {
     console.log("Allowance sufficient");

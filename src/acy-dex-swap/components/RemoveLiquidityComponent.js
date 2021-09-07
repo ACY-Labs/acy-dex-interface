@@ -166,7 +166,8 @@ export async function getEstimated(
     setBreakdown,
     setNeedApprove,
     setButtonStatus,
-    setButtonContent
+    setButtonContent,
+    setRemoveStatus
 ) {
     let {
         address: inToken0Address,
@@ -198,6 +199,7 @@ export async function getEstimated(
     setNeedApprove(false);
     setButtonStatus(false);
     setButtonContent("loading...");
+    setRemoveStatus("");
 
     let token0IsETH = inToken0Symbol === "ETH";
     let token1IsETH = inToken1Symbol === "ETH";
@@ -802,6 +804,20 @@ export async function removeLiquidity(
         if (!inputToken0.symbol || !inputToken1.symbol)
             return new ACYSwapErrorStatus("One or more token input is missing");
 
+
+            if (index==0 && percent == "0")
+            return new ACYSwapErrorStatus("percent is 0");
+        if (index==1 && amount == "0")
+            return new ACYSwapErrorStatus("amount is 0");
+        if(index==0 && percent == "")
+            return new ACYSwapErrorStatus("percent is \"\"");
+        if(index==1 && amount=="")
+            return new ACYSwapErrorStatus("amount is \"\"");
+        if (index==0 && (isNaN(parseFloat(percent))))
+            return new ACYSwapErrorStatus("percent is NaN");
+        if (index==1 && (isNaN(parseFloat(amount))))
+            return new ACYSwapErrorStatus("amount is NaN");
+
         console.log("------------------ RECEIVED TOKEN ------------------");
         console.log("token0");
         console.log(inputToken0);
@@ -1059,10 +1075,7 @@ export async function removeLiquidity(
                 }
             }
 
-
                 //return new ACYSwapErrorStatus("safeGasEstimates is wrong");
-
-
 
             const indexOfSuccessfulEstimation = safeGasEstimates.findIndex(safeGasEstimate =>
                 BigNumber.isBigNumber(safeGasEstimate)
@@ -1123,19 +1136,14 @@ const RemoveLiquidityComponent = () => {
     // 代币的数额
     let [amount, setAmount] = useState("0");
     let [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
-
     let [breakdown, setBreakdown] = useState();
-
     let [needApprove, setNeedApprove] = useState(false);
-
     let [buttonStatus, setButtonStatus] = useState();
     let [buttonContent, setButtonContent] = useState();
-
     // 点击按钮之后的返回信息
     let [removeStatus, setRemoveStatus] = useState();
-
     let [signatureData, setSignatureData] = useState(null);
-    const slippageTolerancePlaceholder = "please input a number from 1.00 to 100.00"
+    const slippageTolerancePlaceholder = "please input a number from 1.00 to 100.00";
 
 
     const {account, chainId, library, activate} = useWeb3React();
@@ -1177,7 +1185,7 @@ const RemoveLiquidityComponent = () => {
     let inputChange = useCallback(async () => {
         if(!token0||!token1) return;
 
-
+        //  alert(percent+" "+amount+" "+needApprove);
         await getEstimated(
             {
                 ...token0
@@ -1202,13 +1210,14 @@ const RemoveLiquidityComponent = () => {
             setBreakdown,
             setNeedApprove,
             setButtonStatus,
-            setButtonContent);
-    }, [token0, token1, index, percent, amount, needApprove,slippageTolerance,chainId, library, account]);
+            setButtonContent,
+            setRemoveStatus);
+    }, [token0, token1, index, percent, amount,slippageTolerance,chainId, library, account]);
 
 
-    useEffect(() => {
+    useEffect(() => {  
         inputChange();
-    }, [token0, token1, index, percent, amount, needApprove,slippageTolerance,chainId, library, account]);
+    }, [token0, token1, index, percent, amount,slippageTolerance,chainId, library, account]);
 
     useEffect(()=>{
         if (account == undefined) {

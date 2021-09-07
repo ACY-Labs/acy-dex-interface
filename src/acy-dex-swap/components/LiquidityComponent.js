@@ -901,7 +901,7 @@ const LiquidityComponent = () => {
             setArgs,
             setValue);
 
-    }, [token0, token1, token0Amount, token1Amount, slippageTolerance, needApproveToken0,needApproveToken1,exactIn, chainId, library, account]);
+    }, [token0, token1, token0Amount, token1Amount, slippageTolerance,exactIn, chainId, library, account]);
     let t1Changed = useCallback(async () => {
         if (!token0 || !token1) return;
         if (exactIn) return;
@@ -937,13 +937,13 @@ const LiquidityComponent = () => {
             setParsedToken1Amount,
             setArgs,
             setValue);
-    }, [token0, token1, token0Amount, token1Amount, slippageTolerance,needApproveToken0,needApproveToken1, exactIn, chainId, library, account]);
+    }, [token0, token1, token0Amount, token1Amount, slippageTolerance, exactIn, chainId, library, account]);
     useEffect(() => {
         t0Changed();
-    }, [token0, token1, token0Amount, token1Amount, slippageTolerance, needApproveToken0,needApproveToken1,exactIn, chainId, library, account]);
+    }, [token0, token1, token0Amount, token1Amount, slippageTolerance,exactIn, chainId, library, account]);
     useEffect(() => {
         t1Changed();
-    }, [token0, token1, token0Amount, token1Amount, slippageTolerance,needApproveToken0,needApproveToken1, exactIn, chainId, library, account]);
+    }, [token0, token1, token0Amount, token1Amount, slippageTolerance,exactIn, chainId, library, account]);
 
 
     useEffect(() => {
@@ -1103,13 +1103,52 @@ const LiquidityComponent = () => {
                             variant="warning"
                             onClick={async () => {
                                 let state = await approve(token0.address, approveAmountToken0, library, account);
+                                
                                 if (state == true) {
+                                 
                                     setNeedApproveToken0(false);
+
+                                    await getEstimated(
+                                        {
+                                            ...token0,
+                                            amount: token0Amount,
+                                        },
+                                        {
+                                            ...token1,
+                                            amount: token1Amount,
+                                        },
+                                        slippageTolerance * 100,
+                                        exactIn,
+                                        chainId,
+                                        library,
+                                        account,
+                                        setToken0Amount,
+                                        setToken1Amount,
+                                        setNeedApproveToken0,
+                                        setNeedApproveToken1,
+                                        setApproveAmountToken0,
+                                        setApproveAmountToken1,
+                                        setApproveToken0ButtonShow,
+                                        setApproveToken1ButtonShow,
+                                        setLiquidityBreakdown,
+                                        setButtonContent,
+                                        setButtonStatus,
+                                        setLiquidityStatus,
+                                        setPair,
+                                        setNoLiquidity,
+                                        setParsedToken0Amount,
+                                        setParsedToken1Amount,
+                                        setArgs,
+                                        setValue);
+
+
+
                                     if (needApproveToken1 == false) {
                                         if (!noLiquidity) setButtonContent("add liquidity");
                                         else setButtonStatus("create new pool");
                                         setButtonStatus(true);
                                     }
+
                                 }
                             }}
                             disabled={!needApproveToken0}
@@ -1127,7 +1166,42 @@ const LiquidityComponent = () => {
                                 let state = await approve(token1.address, approveAmountToken1, library, account);
 
                                 if (state == true) {
+                                    // console.log("TTTTTTTTTTTTTTTTTTTTTTT");
+                                    // alert("TTTTTTTTTTTTTT");
                                     setNeedApproveToken1(false);
+
+                                    await getEstimated(
+                                        {
+                                            ...token0,
+                                            amount: token0Amount,
+                                        },
+                                        {
+                                            ...token1,
+                                            amount: token1Amount,
+                                        },
+                                        slippageTolerance * 100,
+                                        exactIn,
+                                        chainId,
+                                        library,
+                                        account,
+                                        setToken0Amount,
+                                        setToken1Amount,
+                                        setNeedApproveToken0,
+                                        setNeedApproveToken1,
+                                        setApproveAmountToken0,
+                                        setApproveAmountToken1,
+                                        setApproveToken0ButtonShow,
+                                        setApproveToken1ButtonShow,
+                                        setLiquidityBreakdown,
+                                        setButtonContent,
+                                        setButtonStatus,
+                                        setLiquidityStatus,
+                                        setPair,
+                                        setNoLiquidity,
+                                        setParsedToken0Amount,
+                                        setParsedToken1Amount,
+                                        setArgs,
+                                        setValue);
                                     if (needApproveToken0 == false) {
                                         if (!noLiquidity) setButtonContent("add liquidity");
                                         else setButtonStatus("create new pool");
