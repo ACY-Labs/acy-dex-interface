@@ -17,6 +17,7 @@ import {
   AcyApprove,
 } from '@/components/Acy';
 import Media from 'react-media';
+import AcyPieChart from '@/components/AcyPieChartAlpha';
 import SwapComponent from '@/components/SwapComponent';
 import AddComponent from '@/components/AddComponent';
 import MyComponent from '@/components/MyComponent';
@@ -217,13 +218,13 @@ class BasicProfile extends Component {
         <div className={styles.main}>
           {
             isMobile && <div>
-            <AcyCard>
-              <div className={styles.trade}>
+              <AcyCard>
+                <div className={styles.trade}>
 
-                <SwapComponent />
-              </div>
-            </AcyCard>
-           </div>
+                  <SwapComponent />
+                </div>
+              </AcyCard>
+            </div>
           }
           <div>
             {(tabIndex == 1 && (
@@ -233,12 +234,12 @@ class BasicProfile extends Component {
                     width: '100%',
                   }}
                 >
-                  <div   style={{
+                  <div style={{
                     height: '576px',
                   }}>
-                  <AcyLineChart  backData={[]} showGradient={false} showXAxis={false} lineColor='#e29227' />
+                    <AcyLineChart backData={[]} showGradient={false} showXAxis={false} lineColor='#e29227' />
 
-                    </div>
+                  </div>
                   <AcyPeriodTime
                     onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
                     className={styles.pt}
@@ -254,15 +255,117 @@ class BasicProfile extends Component {
           </div>
           {
             !isMobile && <div>
-            <AcyCard>
-              <div className={styles.trade}>
-                <SwapComponent />
-              </div>
-            </AcyCard>
-           </div>
+              <AcyCard>
+                <div className={styles.trade}>
+                  <SwapComponent />
+                </div>
+              </AcyCard>
+            </div>
           }
         </div>
+        {/* Routing */}
+        <div className={styles.routing}>
+          <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px', color: '#EB5C20' }}>
+            <span>
+              Routing
 
+            </span>
+          </div>
+          <div className={styles.routing_left}>
+            <p className={styles.r_title}>93.246ETH</p>
+            <p className={styles.r_desc}>325,340$</p>
+            <div style={{ marginTop: '30px' }}>
+              <AcyIcon.MyIcon width={50} type="Eth" />
+
+            </div>
+          </div>
+          <div className={styles.routing_middle}>
+            <div className={styles.lines}>
+              <div className={styles.line}></div>
+              <div className={styles.line}></div>
+              <div className={styles.line}></div>
+            </div>
+            <div className={styles.nodes}>
+              <div className={styles.node}>
+                <div>
+                  <AcyIcon.MyIcon width={50} type="Eth" />
+                </div>
+                <div>
+                  <p className={styles.r_title}>93.246ETH</p>
+                  <p className={styles.r_desc}>325,340$</p>
+                </div>
+              </div>
+              <div className={styles.node} style={{ opacity: '0' }}></div>
+              <div className={styles.node}>
+              <div>
+                  <AcyIcon.MyIcon width={50} type="Eth" />
+                </div>
+                <div>
+                  <p className={styles.r_title}>93.246ETH</p>
+                  <p className={styles.r_desc}>325,340$</p>
+                </div>
+              </div>
+            </div>
+            <div className={styles.texts}>
+              <div className={styles.text}>30%</div>
+              <div className={styles.text}>45%</div>
+              <div className={styles.text}>25%</div>
+            </div>
+          </div>
+          <div className={styles.routing_left}>
+            <p className={styles.r_title}>93.246ETH</p>
+            <p className={styles.r_desc}>325,340$</p>
+            <div style={{ marginTop: '30px' }}>
+              <AcyIcon.MyIcon width={50} type="Eth" />
+
+            </div>
+          </div>
+        </div>
+        {/* Alpha */}
+        <div className={styles.routing}>
+          <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px', color: '#EB5C20' }}>
+            <span>
+              Alpha
+            </span>
+          </div>
+          <div style={{width:'300px',height:'300px'}}>
+          <AcyPieChart />
+
+          </div>
+          <div className={styles.routing_middle}>
+            
+            <div className={styles.nodes}>
+              <div className={styles.node}>
+                <div>
+                  <AcyIcon.MyIcon width={50} type="Eth" />
+                </div>
+                <div>
+                  <p className={styles.r_title}>93.246ETH</p>
+                  <p className={styles.r_desc}>325,340$</p>
+                </div>
+              </div>
+              <div className={styles.node} style={{ opacity: '0' }}></div>
+              <div className={styles.node}>
+              <div>
+                  <AcyIcon.MyIcon width={50} type="Eth" />
+                </div>
+                <div>
+                  <p className={styles.r_title}>93.246ETH</p>
+                  <p className={styles.r_desc}>325,340$</p>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+          <div className={styles.routing_left}>
+            <p className={styles.r_title}>93.246ETH</p>
+            <p className={styles.r_desc}>325,340$</p>
+            <div style={{ marginTop: '30px' }}>
+              <AcyIcon.MyIcon width={50} type="Eth" />
+
+            </div>
+          </div>
+        </div>
         <AcyModal onCancel={this.onCancel} width={600} visible={visible}>
           <div className={styles.title}>
             <AcyIcon name="back" /> Select a token
@@ -320,4 +423,4 @@ export default (props => (
   <Media query="(max-width: 599px)">
     {isMobile => <BasicProfile {...props} isMobile={isMobile} />}
   </Media>
-)) ;
+));
