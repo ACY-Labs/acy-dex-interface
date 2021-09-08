@@ -28,7 +28,6 @@
   justify-content: flex-end;
 }
 .trade {
-  padding-top: 25px;
 }
 .title {
   font-size: 18px;
@@ -74,6 +73,92 @@
   .main{
     display: grid;
     grid-template-columns: auto 425px;
+  }
+}
+.routing{
+  display: flex;
+  margin-bottom: 30px;
+  font-size: 18px;
+  width:600px;
+  .r_title{
+    color: #ffffff;
+  }
+  .r_desc{
+    color: #757579;
+
+  }
+  .routing_left{
+    width: 132px;
+    height: 250px;
+    background: #2E3032;
+    border-radius: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+  .routing_middle{
+    position: relative;
+    flex: 1 1 auto;//可放大 可缩小
+    .lines{
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-around;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      .line{
+        height: 1px;
+        background: #757579;
+      }
+    }
+    .nodes{
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-around;
+      align-items: center;
+      .nodes_item{
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        color:#EB5C20;
+        margin: 10px;
+        .node{
+          width: 200px;
+          height: 80px;
+          background: #2E3032;
+          border-radius: 10px;
+          display: flex;
+      align-items: center;
+      justify-content: center;
+        }
+      }
+      
+    }
+    .texts{
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-around;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      .text{
+        color: #EB5C20;
+        margin: -35px 0 0 20px;
+        font-size: 24px;
+      }
+    }
+  }
+  .routing_right{
+    width: 132px;
+    height: 250px;
+    background: #2E3032;
+    border-radius: 10px;
   }
 }
 

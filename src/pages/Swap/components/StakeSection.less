@@ -27,7 +27,7 @@
 
       .rewardRowTitle {
         flex: 1;
-        font-size: 1.25rem;
+        font-size: 1.5rem;
       }
       .cryptoSelectionContainer {
         flex: 2;
@@ -67,7 +67,7 @@
               }
 
               .tokenSymbol {
-                margin-left: 1rem;
+                margin-left: 0.5rem;
               }
             }
 
@@ -136,11 +136,10 @@
   display: flex;
   margin-bottom: 1.5rem;
   position: relative;
-  align-items: center;
 
   .amountRowTitle {
     flex: 1;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
 
   .amountRowInputContainer {
@@ -175,7 +174,7 @@
   }
 
   .suffix {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     position: absolute;
     right: 1.25rem;
   }
@@ -249,6 +248,10 @@
         transition: opacity 0.2s;
       }
 
+      .slider:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+      }
+
       .slider::-webkit-slider-thumb {
         -webkit-appearance: none; /* Override default look */
         appearance: none;
@@ -257,19 +260,6 @@
         border-radius: 50%;
         background-color: #C4C4C4; /* Green background */
         cursor: pointer; /* Cursor on hover */
-        transition: .2s;
-      }
-
-      .slider::-webkit-slider-thumb:hover {
-        background-color: #eb5c20;
-        width: 17.5px;
-        height: 17.5px;
-      }
-
-      .slider::-webkit-slider-thumb:active {
-        background-color: #eb5c20;
-        width: 17.5px;
-        height: 17.5px;
       }
 
       .slider::-moz-range-thumb {
