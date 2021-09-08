@@ -1,6 +1,6 @@
 .removeAmountContainer,
 .tokenAmountContainer {
-  background-color: #1B1B1C;
+  background-color: #1b1b1c;
   border-radius: 0.5rem;
   padding: 0.5rem;
   margin-bottom: 1rem;
@@ -40,14 +40,14 @@
   width: 15px; /* Set a specific slider handle width */
   height: 15px; /* Slider handle height */
   border-radius: 50%;
-  background-color: #C4C4C4; /* Green background */
+  background-color: #c4c4c4; /* Green background */
   cursor: pointer; /* Cursor on hover */
 }
 
 .sliderInput::-moz-range-thumb {
   width: 15px; /* Set a specific slider handle width */
   height: 15px; /* Slider handle height */
-  background-color: #C4C4C4; /* Green background */
+  background-color: #c4c4c4; /* Green background */
   cursor: pointer; /* Cursor on hover */
 }
 
@@ -94,8 +94,8 @@
   background-color: #eb5c20;
 }
 
-.button:last-child {
-  background-color: #1B1B1C;
+.button:last-child:not([disabled]) {
+  background-color: #1b1b1c;
 }
 
 .button:first-child:hover {
@@ -103,7 +103,18 @@
   cursor: pointer;
 }
 
-.button:last-child:hover {
+.button:last-child:hover:not([disabled]) {
   background-color: #29292c;
   cursor: pointer;
+}
+
+.breakdownLine {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.breakdownContainer {
+  padding: 20px;
+  border-radius: 20px;
+  border: 3px solid #c4c4c4;
 }
