@@ -28,7 +28,6 @@
   justify-content: flex-end;
 }
 .trade {
-  padding-top: 25px;
 }
 .title {
   font-size: 18px;
@@ -80,8 +79,7 @@
   display: flex;
   margin-bottom: 30px;
   font-size: 18px;
-  width: 900px;
-  margin: 30px auto;
+  width:600px;
   .r_title{
     color: #ffffff;
   }
@@ -121,19 +119,25 @@
       flex-direction: column;
       height: 100%;
       justify-content: space-around;
-      position: absolute;
-      width: 100%;
-      height: 100%;
       align-items: center;
-      .node{
-        width: 200px;
-        height: 80px;
-        background: #2E3032;
-        border-radius: 10px;
+      .nodes_item{
+        width: 100%;
         display: flex;
-    align-items: center;
-    justify-content: center;
+        align-items: center;
+        justify-content: space-around;
+        color:#EB5C20;
+        margin: 10px;
+        .node{
+          width: 200px;
+          height: 80px;
+          background: #2E3032;
+          border-radius: 10px;
+          display: flex;
+      align-items: center;
+      justify-content: center;
+        }
       }
+      
     }
     .texts{
       display: flex;

@@ -43,7 +43,7 @@ class AcyPieChart extends Component {
         bottom: '0',
         top: '0',
       }, 
-      backgroundColor:'rgba(128, 128, 128, 0.1)', //rgba设置透明度0.1
+      backgroundColor:'rgba(128, 128, 128, 0)', //rgba设置透明度0.1
       series: [
         {
           type: 'pie',
@@ -65,6 +65,7 @@ class AcyPieChart extends Component {
     };
     return (
       <ReactEcharts
+      style={{width:'100%',height:'300px'}}
         option={this.getOption()}
         notMerge
         lazyUpdate

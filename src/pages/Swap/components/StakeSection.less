@@ -1,0 +1,385 @@
+.stakeSection {
+  width: 49%;
+  background-color: #29292C;
+  color: #b5b6b6;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .stakeContentWrapper {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+    border-bottom: 1px solid #434343;
+  }
+
+  @media (max-width: 768px) {
+    .stakeContentWrapper {
+      padding: 1.5rem;
+      border-bottom: 1px solid #434343;
+    }
+  }
+
+  .rewardContentWrapper {
+    padding: 1.5rem 1.5rem 0 1.5rem;
+
+    .rewardRow {
+      display: flex;
+
+      .rewardRowTitle {
+        flex: 1;
+        font-size: 1.5rem;
+      }
+      .cryptoSelectionContainer {
+        flex: 2;
+
+        .tokenSelectionContainer {
+          display: flex;
+          flex-direction: column;
+
+          .tokenSelection {
+            flex: 1;
+            display: flex;
+            background-color: #1B1B1C;
+            margin-bottom: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            border-radius: 7.5px;
+            border: 1px solid #40444f99;
+
+            &:hover {
+              border: 1px solid #40444fff;
+            }
+
+            .tokenDropdown {
+              display: flex;
+              align-items: center;
+              flex: 1;
+
+              .tokenImgContainer {
+                width: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .tokenImg {
+                  height: 24px;
+                }
+              }
+
+              .tokenSymbol {
+                margin-left: 0.5rem;
+              }
+            }
+
+            .tokenDropdown:hover {
+              cursor: pointer;
+            }
+
+            .tokenPercentage {
+              flex: 1;
+
+              .tokenPercentageInput {
+                width: 100%;
+                background-color: transparent;
+                border: none;
+                border-radius: 7.5px;
+                padding: 0 1.75rem;
+                font-size: 1rem;
+                text-align: right;
+              }
+
+              .tokenPercentageInput:focus {
+                outline: none;
+                box-shadow: 0 0 0 1pt #EB5C20;
+                transition: .1s;
+              }
+            }
+
+            .suffix {
+               font-size: 1rem;
+               position: relative;
+               right: 1.5rem;
+             }
+          }
+        }
+
+        .stakeSubmitButton {
+          width: 100%;
+          background-color: #4c4c4d;
+          border: none;
+          border-radius: 7.5px;
+          font-size: 1.5rem;
+          padding: 0 1rem;
+        }
+
+        .stakeSubmitButton:hover {
+          background-color: #5f5f5f;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .rewardContentWrapper {
+      padding: 1.5rem;
+    }
+  }
+}
+
+.stakeUpperSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.amountRow {
+  display: flex;
+  margin-bottom: 1.5rem;
+  position: relative;
+
+  .amountRowTitle {
+    flex: 1;
+    font-size: 1.5rem;
+  }
+
+  .amountRowInputContainer {
+    flex: 2;
+
+    input {
+      width: 100%;
+      background-color: #1B1B1C;
+      border: 1px solid #40444f99;
+      border-radius: 7.5px;
+      font-size: 1.5rem;
+      padding: 0 1rem;
+      -moz-appearance: textfield;
+      box-shadow: 0 0 0 1pt transparent;
+
+      &:hover {
+        border: 1px solid #40444fff;
+      }
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 0 1pt #EB5C20;
+      transition: .1s;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  .suffix {
+    font-size: 1.5rem;
+    position: absolute;
+    right: 1.25rem;
+  }
+}
+
+.balanceRow {
+  display: flex;
+  margin-bottom: 1.5rem;
+
+  .balanceRowTitleContainer {
+    flex: 1;
+
+    .balanceRowTitle {
+      text-align: right;
+      padding-right: 1.5rem;
+    }
+  }
+
+  .sliderContainer {
+    flex: 2;
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    .balancePercentageSuffix {
+      position: absolute;
+      right: 0;
+    }
+
+    .balancePercentage {
+      margin-left: 0.5rem;
+
+      .balancePercentageInput {
+        background: transparent;
+        border: none;
+        width: 2.75rem;
+        padding-right: 1rem;
+        text-align: right;
+        border-radius: 4px;
+      }
+
+      .balancePercentageInput:focus {
+        outline: none;
+        box-shadow: 0 0 0 1pt #EB5C20;
+        transition: .1s;
+      }
+    }
+
+    .sliderContentWrapper {
+      width: 100%;
+      display: flex;
+      align-items: center;
+
+      .sliderWrapper {
+        flex: 1;
+        display: flex;
+        margin-left: 1.5rem;
+        align-items: center;
+      }
+
+      .slider {
+        width: 100%;
+        padding: 0;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 3px; /* Specified height */
+        background: black; /* Grey background */
+        outline: none; /* Remove outline */
+        opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+        transition: opacity 0.2s;
+      }
+
+      .slider:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+      }
+
+      .slider::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 15px; /* Set a specific slider handle width */
+        height: 15px; /* Slider handle height */
+        border-radius: 50%;
+        background-color: #C4C4C4; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+      }
+
+      .slider::-moz-range-thumb {
+        width: 15px; /* Set a specific slider handle width */
+        height: 15px; /* Slider handle height */
+        background-color: #C4C4C4; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+      }
+    }
+  }
+}
+
+.lockTimeRow {
+  display: flex;
+
+  .lockTimeRowTitleContainer {
+    flex: 1;
+
+    .lockTimeRowTitle {
+      text-align: right;
+      padding-right: 1.5rem;
+    }
+  }
+
+
+  .dateSelectionContainer {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+
+    .datePickerContainer {
+      margin-bottom: 0.75rem;
+    }
+
+    .presetDurationContainer {
+      width: 100%;
+      display: flex;
+
+      .presetDurationSelection {
+        flex: 1;
+        color: #b5b6b6;
+        background-color: #4c4c4d;
+        border-radius: 0.3rem;
+        padding: 0;
+        text-align: center;
+      }
+
+      .presetDurationSelection:not(:first-child) {
+        margin-left: 0.5rem;
+      }
+
+      .presetDurationSelection:hover {
+        background-color: #5f5f5f;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.datePickerInput {
+  color: #b5b6b6;
+  background-color: #4c4c4d;
+  border: none;
+  border-radius: 0.3rem;
+  font-size: 1rem;
+  padding: 0 1rem;
+}
+
+.datePickerInput:hover {
+  background-color: #5f5f5f;
+  cursor: pointer;
+}
+
+.modal {
+  :global {
+    .ant-modal-content {
+      border-radius: 20px;
+      background: transparent;
+    }
+  }
+
+  .modalListItem {
+    border-radius: 0.3rem;
+    display: flex;
+    margin-bottom: 1rem;
+    padding: 0.25rem 0.5rem;
+
+    .modalListLogoContainer {
+      .modalListLogo {
+        width: 32px;
+      }
+    }
+
+    .modalListSymbol {
+      margin-left: 1.5rem;
+    }
+  }
+
+  .modalListItem:hover {
+    background-color: #5f5f5f;
+    cursor: pointer;
+  }
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 52px;
+  color: #b5b6b6;
+}
+.search {
+  margin-top: 12px;
+}
+.coinList {
+  width: 100%;
+  padding: 20px 0;
+}
+
+@media (max-width: 768px) {
+  .stakeSection {
+    width: 90%;
+  }
+}

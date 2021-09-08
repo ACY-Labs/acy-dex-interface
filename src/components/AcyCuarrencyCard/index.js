@@ -28,7 +28,7 @@ const AcyCuarrencyCard = ({
     setLight(true);
   }
   return (
-    <div {...rest} className={styles.acycuarrencycard}>
+    <div {...rest} className={styles.acycuarrencycard} tabindex="-1"  onFocus={onFocus} onBlur={onBlur}>
 
       <div className={`${styles.cua_body} ${light&&styles.cua_light}`}>
 
@@ -46,7 +46,7 @@ const AcyCuarrencyCard = ({
             </span>
             
           </button>
-          <input onFocus={onFocus} onBlur={onBlur} className={styles.input} placeholder="0.0" bordered={false} value={token} onChange={onChange} />
+          <input className={styles.input} placeholder="0.0" bordered={false} value={token} onChange={onChange} />
         </div>
         <div className={styles.cua_blanace}>
           {title ||''}
