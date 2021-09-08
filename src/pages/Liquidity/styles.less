@@ -57,31 +57,19 @@
     }
   }
 }
-.pool {
-  display: flex;
-  .bigtitle {
-    font-size: 18px;
-    font-weight: 600;
-    color: #eb5c20;
-  }
-  .value {
-    font-size: 14px;
-    font-weight: 400;
-    color: #b5b6b6;
-  }
-}
-.main{
-  :global{
-    .ant-table-thead > tr, .ant-table-tbody > tr{
-      display: inline-table !important;
+
+.main {
+  :global {
+    .ant-table-thead > tr,
+    .ant-table-tbody > tr {
+      // display: block;
+      text-align: right !important;
     }
   }
 }
-@media (min-width: 768px){
-  .main{
+@media (min-width: 768px) {
+  .main {
     display: grid;
     grid-template-columns: auto 425px;
   }
 }
-
-

@@ -16,7 +16,7 @@ export default [
     component: '../layouts/DaoLayout',
     Routes: ['src/pages/Authorized'],
     routes: [
-      { path: '/', redirect: '/exange' },
+      { path: '/', redirect: '/exchange' },
       {
         path: '/market',
         name: 'Market',
@@ -45,7 +45,7 @@ export default [
         ],
       },
       {
-        path: '/exange',
+        path: '/exchange',
         name: 'Exchange',
         component: './Swap/Index',
       },
@@ -66,7 +66,7 @@ export default [
     component: '../layouts/MarketLayout',
     Routes: ['src/pages/Authorized'],
     routes: [
-      { path: '/', redirect: '/exange' },
+      { path: '/', redirect: '/exchange' },
       {
         path: '/market',
         name: 'Market',
@@ -95,7 +95,7 @@ export default [
         ],
       },
       {
-        path: '/exange',
+        path: '/exchange',
         name: 'Exchange',
         component: './Swap/Index',
       },
@@ -117,7 +117,7 @@ export default [
     component: '../layouts/BasicLayout',
     Routes: ['src/pages/Authorized'],
     routes: [
-      { path: '/', redirect: '/exange' },
+      { path: '/', redirect: '/exchange' },
       {
         path: '/market',
         name: 'Market',
@@ -146,7 +146,7 @@ export default [
         ],
       },
       {
-        path: '/exange',
+        path: '/exchange',
         name: 'Exchange',
         component: './Swap/Index',
       },

@@ -1,132 +1,22 @@
 import React, { Component } from 'react';
 import { connect } from 'umi';
-import classnames from 'classnames';
-import { Card, Badge, Table, Divider, Button, Tabs, Row, Col } from 'antd';
+import { Button } from 'antd';
 import {
   AcyCard,
   AcyIcon,
   AcyPeriodTime,
   AcyTabs,
-  AcyCuarrencyCard,
-  AcyConnectWalletBig,
+  AcyLiquidityPositions,
   AcyModal,
   AcyInput,
   AcyCoinItem,
-  AcyLineChart,
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
 import AddComponent from '@/components/AddComponent';
-import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
-const { Description } = DescriptionList;
 const { AcyTabPane } = AcyTabs;
-
-// const progressColumns = [
-//   {
-//     title: '时间',
-//     dataIndex: 'time',
-//     key: 'time',
-//   },
-//   {
-//     title: '当前进度',
-//     dataIndex: 'rate',
-//     key: 'rate',
-//   },
-//   {
-//     title: '状态',
-//     dataIndex: 'status',
-//     key: 'status',
-//     render: text =>
-//       text === 'success' ? (
-//         <Badge status="success" text="成功" />
-//       ) : (
-//         <Badge status="processing" text="进行中" />
-//       ),
-//   },
-//   {
-//     title: '操作员ID',
-//     dataIndex: 'operator',
-//     key: 'operator',
-//   },
-//   {
-//     title: '耗时',
-//     dataIndex: 'cost',
-//     key: 'cost',
-//   },
-// ];
-const dataSource = [
-  {
-    key: '1',
-    name: '胡彦斌',
-    age: 32,
-    address: '西湖区湖底公园1号',
-  },
-  {
-    key: '2',
-    name: '胡彦祖',
-    age: 42,
-    address: '西湖区湖底公园1号',
-  },
-];
-
-const columns = [
-  {
-    title: 'Pool',
-    dataIndex: 'name',
-    key: 'name',
-    width: 250,
-    render: () => (
-      <div className={styles.pool}>
-        <div>
-          <p className={styles.bigtitle}>WETH-WBTC</p>
-          <p className={styles.value}>0xE34780…25f7</p>
-        </div>
-        {/* <div style={{ width: '100px' }}>
-          <AcyIcon name="eth" width={18} />
-          <AcyIcon name="eth" width={18} />
-          <AcyIcon name="eth" width={18} />
-          <AcyIcon name="eth" width={18} />
-        </div> */}
-      </div>
-    ),
-  },
-  {
-    title: 'My Liquidity',
-    dataIndex: 'address',
-    key: 'address',
-    render: () => (
-      <div>
-        <p>5662.88 WETH</p>
-        <p>26.69 WBTC</p>
-      </div>
-    ),
-  },
-  {
-    title: 'Pool Share',
-    dataIndex: 'address',
-    key: 'address',
-    render: () => (
-      <div>
-        <p>10%</p>
-        <p>8.8%</p>
-      </div>
-    ),
-  },
-  {
-    title: 'Create Time',
-    dataIndex: 'address',
-    key: 'address',
-    render: () => '2021.07.11',
-  },
-  {
-    title: 'Volume (24h)',
-    dataIndex: 'address',
-    key: 'address',
-    render: () => '$ 444.21',
-  },
-];
 
 @connect(({ profile, loading }) => ({
   profile,
@@ -194,9 +84,7 @@ class BasicProfile extends Component {
       <PageHeaderWrapper>
         <div className={styles.main}>
           <div>
-            <AcyCard>
-              <Table dataSource={dataSource} columns={columns} pagination={false} />
-            </AcyCard>
+            <AcyLiquidityPositions />
           </div>
           <div>
             <AcyCard>
