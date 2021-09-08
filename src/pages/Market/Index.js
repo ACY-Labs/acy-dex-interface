@@ -116,7 +116,6 @@ export class BasicProfile extends Component {
         // const outsideClickRef = useDetectClickOutside({ onTriggered: this.onSearchBlur });
         const { visible, visibleSearchBar, tabIndex, transactionView} = this.state;
         return (
-          <div ref={this.rootElemRef}>
             <div className={styles.marketRoot}>
             <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool} visible={true}/>
                 <div className={styles.chartsMain}>
@@ -208,8 +207,6 @@ export class BasicProfile extends Component {
                 />
             <div style={{height:"20px"}}></div>
             </div>
-          </div>
-            
         )
     };
 }

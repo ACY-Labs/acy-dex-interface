@@ -53,8 +53,6 @@ function MarketTokenList(props){
   const [tokenDisplayNumber, setTokenDisplayNumber] = useState(10)
 
   return (
-    <div>
-      
       <div className={styles.marketRoot}>
       <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
           <h2>All Tokens</h2>
@@ -72,10 +70,7 @@ function MarketTokenList(props){
               )} 
           />
           <div style={{height:"40px"}}></div>
-      </div>
-      
-    </div>
-      
+      </div> 
   )
 }
 

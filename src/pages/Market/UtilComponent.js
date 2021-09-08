@@ -173,7 +173,7 @@ export const MarketSearchBar  = (props) => {
 
     const onScroll = (e) => {
       let scrollValue = e.target.scrollTop
-      if (scrollValue > 200) setVisible(false)
+      if (scrollValue > 20) setVisible(false)
       else setVisible(true)
     }
 
@@ -184,7 +184,7 @@ export const MarketSearchBar  = (props) => {
 
     // lifecycle methods
     useEffect(() => {
-      let contentRoot = ReactDOM.findDOMNode(rootRef.current).parentNode.parentNode.parentNode
+      let contentRoot = ReactDOM.findDOMNode(rootRef.current).parentNode.parentNode
       contentRoot.addEventListener("scroll", onScroll)
 
       return function cleanup() {
