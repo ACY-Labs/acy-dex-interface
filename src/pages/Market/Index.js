@@ -53,6 +53,7 @@ export class BasicProfile extends Component {
 
     state = {
         visible: true,
+        visibleNavbar: true,
         tabIndex: 0,
         transactionView: TransactionType.ALL,
         tokenDisplayNumber: 10,
@@ -61,8 +62,16 @@ export class BasicProfile extends Component {
     }
 
     componentDidMount() {
-
+      window.addEventListener("scroll", () => {
+        console.log(window)
+      })
     };
+
+    componentWillUnmount() {
+      window.removeEventListener("scroll", () => {
+        console.log(window)
+      })
+    }
 
     onClickTransaction = (e) => {
 
@@ -107,9 +116,9 @@ export class BasicProfile extends Component {
         // const outsideClickRef = useDetectClickOutside({ onTriggered: this.onSearchBlur });
         const { visible, visibleSearchBar, tabIndex, transactionView} = this.state;
         return (
-          <div>
+          <div ref={this.rootElemRef}>
             <div className={styles.marketRoot}>
-            <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
+            <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool} visible={true}/>
                 <div className={styles.chartsMain}>
                     <div className={styles.chartSectionMain}>
                           <div className={styles.graphStats}>
