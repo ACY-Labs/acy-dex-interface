@@ -88,7 +88,7 @@ class BasicProfile extends Component {
           </div>
           <div>
             <AcyCard>
-              <div className={styles.trade}>
+              <div className={styles.addLiquidity}>
                 <AddComponent />
               </div>
             </AcyCard>

@@ -67,9 +67,19 @@
     }
   }
 }
-@media (min-width: 768px) {
+
+@media (max-width: 1024px) {
+  .main {
+    display: flex;
+    flex-direction: column;
+    padding: 10%;
+  }
+}
+
+@media (min-width: 1024px) {
   .main {
     display: grid;
     grid-template-columns: auto 425px;
+    column-gap: 30px;
   }
 }
