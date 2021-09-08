@@ -73,6 +73,7 @@
     "rc-animate": "^2.4.4",
     "react": "^17.0.2",
     "react-bootstrap": "^2.0.0-beta.4",
+    "react-click-outside": "^3.0.1",
     "react-container-query": "^0.11.0",
     "react-copy-to-clipboard": "^5.0.1",
     "react-datepicker": "^4.2.1",

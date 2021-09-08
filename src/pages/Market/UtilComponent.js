@@ -29,13 +29,25 @@ import {
     isDesktop
 } from './Util.js'
 
+import {
+  WatchlistManager
+} from './WatchlistManager.js'
+
 const {AcyTabPane } = AcyTabs;
+const watchlistManagerToken = new WatchlistManager("token")
+const watchlistManagerPool = new WatchlistManager("pool")
 
 export class SmallTable extends React.Component {
+
+  constructor(props){
+    super(props)
+  }
+
   state={
     mode: this.props.mode,
     tableData: this.props.data,
-    displayNumber: this.props.displayNumber
+    displayNumber: this.props.displayNumber,
+    updateState: 0
   }
 
   expandSmallTable = () => {
@@ -43,6 +55,37 @@ export class SmallTable extends React.Component {
       displayNumber : this.state.displayNumber + 2
     })
   }
+
+  toggleWatchlist = (mode, data) => {
+    let refreshWatchlist = this.props.refreshWatchlist
+    if(mode == "token"){
+      let oldArray = watchlistManagerToken.getData()
+      if (oldArray.includes(data)){
+        oldArray = oldArray.filter((item) => item != data)
+      } else {
+        oldArray.push(data)
+      }
+      watchlistManagerToken.saveData(oldArray)
+    }
+
+    if(mode == "pool"){
+      let oldArray = watchlistManagerPool.getData()
+      if (oldArray.toString().includes(data.toString())){
+        oldArray = oldArray.filter((item) => !(item[0] == data[0] && item[1] == data[1]))
+      } else {
+        oldArray.push(data)
+      }
+      watchlistManagerPool.saveData(oldArray)
+    }
+
+    refreshWatchlist()
+
+    this.setState({
+      updateState : 1
+    })
+  }
+
+
 
   renderBody = (entry) => {
 
@@ -54,20 +97,22 @@ export class SmallTable extends React.Component {
 
     if (this.state.mode == "token"){
       content = (
-        <div>
+        <div style={{display:"flex", alignItems:"center"}}>
           <AcyIcon name={entry.short.toLowerCase()} width={20} height={20}/>
           <Link style={{color:"#b5b5b6"}}  className={styles.coinName} to='/market/info/token' >{entry.short}</Link>
           <span className={styles.coinShort}> ({entry.name})</span>
+          <AcyIcon name={watchlistManagerToken.getData().includes(entry.short) ? "star_active" : "star"} width={14} style={{marginLeft:"0.5rem"}} onClick={() => {this.toggleWatchlist("token", entry.short)}}></AcyIcon>
         </div>
       )
     } else {
       content = (
-        <div>
+        <div style={{display:"flex", alignItems:"center"}}>
           <AcyIcon name={entry.coin1.toLowerCase()} width={20} height={20}/>
           <AcyIcon name={entry.coin2.toLowerCase()} width={20} height={20}/>
           <Link style={{color:"#b5b5b6"}}  className={styles.coinName} to='/market/info/pool' style={{color: "#b5b5b6"}}>
             <span className={styles.coinName}>{entry.coin1}/{entry.coin2}</span>
           </Link>
+          <AcyIcon name={watchlistManagerPool.getData().toString().includes([entry.coin1, entry.coin2].toString()) ? "star_active" : "star"} width={14} style={{marginLeft:"0.5rem"}} onClick={() => {this.toggleWatchlist("pool", [entry.coin1, entry.coin2])}}></AcyIcon>
         </div>
       )  
     }
@@ -76,7 +121,10 @@ export class SmallTable extends React.Component {
     
     return (
       <tr className={styles.smallTableRow}>
-        <td className={styles.smallTableBody}>{content}</td>
+        <td className={styles.smallTableBody} >
+          {content}
+          
+        </td>
         <td className={styles.smallTableBody} style={{display:(isDesktop() == true ? "table-cell" : "none")}}>{abbrNumber(entry.volume24h)}</td>
         <td className={styles.smallTableBody} style={{display:(isDesktop() == true ? "table-cell" : "none")}}>{abbrNumber(entry.tvl)}</td>
         <td className={styles.smallTableBody} style={{display:(isDesktop() == true ? "table-cell" : "none")}}>{abbrNumber(entry.price)}</td>
@@ -120,6 +168,9 @@ export const MarketSearchBar  = (props) => {
     const [searchCoinReturns, setSearchCoinReturns] = useState([...props.dataSourceCoin])
     const [searchPoolReturns, setSearchPoolReturns] = useState([...props.dataSourcePool])
     const [displayNumber, setDisplayNumber] = useState(3)
+    const [watchlistToken, setWatchlistToken] = useState([])
+    const [watchlistPool, setWatchlistPool] = useState([])
+    const[, update] = useState()
 
     const networkOptions = [
       {
@@ -177,8 +228,42 @@ export const MarketSearchBar  = (props) => {
       else setVisible(true)
     }
 
+    let refreshWatchlist = () => {
+        let tokenWatchlistData = watchlistManagerToken.getData()
+        let poolWatchlistData = watchlistManagerPool.getData()
+  
+        let newWatchlistToken = props.dataSourceCoin.filter(item => tokenWatchlistData.includes(item.short))
+        let newWatchlistPool = props.dataSourcePool.filter(item => poolWatchlistData.toString().includes([item.coin1, item.coin2].toString()))
+
+        // console.log(newWatchlistToken)
+        setWatchlistToken([...newWatchlistToken])
+        setWatchlistPool([...newWatchlistPool])
+        // update()
+        
+        if(props.refreshWatchlist)
+          props.refreshWatchlist()
+    }
+
+    // const refreshWatchlist = useCallback((e) => {
+
+    //   if (key == 2){
+    //     let tokenWatchlistData = watchlistManagerToken.getData()
+    //     let poolWatchlistData = watchlistManagerPool.getData()
+
+    //     let newWatchlistToken = props.dataSourceCoin.filter(item => tokenWatchlistData.includes(item.short))
+    //     let newWatchlistPool = props.dataSourcePool.filter(item => poolWatchlistData.toString().includes([item.coin1, item.coin2].toString()))
+
+    //     console.log(newWatchlistToken)
+
+    //     setWatchlistToken([...newWatchlistToken])
+    //     setWatchlistPool([...newWatchlistPool])
+    //   }
+    // })
+
+    
+
     // refs
-    const outsideClickRef = useDetectClickOutside({ onTriggered: () => { setVisibleSearchBar(false) } });
+    const outsideClickRef = useDetectClickOutside({ onTriggered: () => { setVisibleSearchBar(false); console.log("cheh") } });
     const outsideClickRefNetwork = useDetectClickOutside({ onTriggered: () => { setVisibleNetwork(false) } });
     const rootRef = React.useRef()
 
@@ -186,6 +271,7 @@ export const MarketSearchBar  = (props) => {
     useEffect(() => {
       let contentRoot = ReactDOM.findDOMNode(rootRef.current).parentNode.parentNode
       contentRoot.addEventListener("scroll", onScroll)
+      refreshWatchlist()
 
       return function cleanup() {
         contentRoot.addEventListener("scroll", onScroll)
@@ -235,8 +321,8 @@ export const MarketSearchBar  = (props) => {
           >
               {/* this is the gray background */}
               {visibleSearchBar && <div className={styles.searchBackground}/>}
-
-              <div style={{display:"flex", alignItems:"center", flexDirection:"column", width:"100%"}}ref={outsideClickRef}>
+              <div  ref={outsideClickRef}>
+              <div style={{display:"flex", alignItems:"center", flexDirection:"column", width:"100%"}}>
                 <div className={styles.searchWrapper}>
                   <div className={styles.searchInnerWrapper}>
                     <Input 
@@ -274,22 +360,39 @@ export const MarketSearchBar  = (props) => {
                           "top": "10px"}
                         }
                       >
-                        <AcyTabs>
-                          <AcyTabPane tab="Search" key="1">
+                        <AcyTabs destroyInactiveTabPane={true}>
+                          <AcyTabPane tab="Search" key="1" >
                             {
-                              searchCoinReturns.length > 0 ? <SmallTable mode="token" data={props.dataSourceCoin} displayNumber={displayNumber}/> 
+                              searchCoinReturns.length > 0 ? <SmallTable mode="token" data={props.dataSourceCoin} displayNumber={displayNumber} refreshWatchlist={refreshWatchlist}/> 
                               : <div style={{fontSize:"20px", margin: "20px"}}>No results</div>
                             }
                             <Divider className={styles.searchModalDivider}/>
                             {
-                              searchPoolReturns.length > 0 ? <SmallTable mode="pool" data={props.dataSourcePool} displayNumber={displayNumber}/>
-                              : <div style={{fontSize:"20px", margin: "20px"}}>No results</div>
+                              searchPoolReturns.length > 0 ? <SmallTable mode="pool" data={props.dataSourcePool} displayNumber={displayNumber} refreshWatchlist={refreshWatchlist}/>
+                              : <div style={{fontSize:"20px", margin: "20px"}} refreshWatchlist={refreshWatchlist}>No results</div>
                             }
                           </AcyTabPane>
                           <AcyTabPane tab="Watchlist" key="2">
-                            <SmallTable mode="token" data={props.dataSourceCoin} displayNumber={displayNumber}/>
+
+                            {watchlistToken.length > 0 ? 
+                            <SmallTable 
+                              mode="token" 
+                              data={watchlistToken} 
+                              displayNumber={displayNumber} 
+                              refreshWatchlist={refreshWatchlist}
+                            /> : <span style={{color: "#757579", fontWeight:"600", paddingTop:"30px"}}>Add items by clicking on the star</span>
+                            }
+
                             <Divider className={styles.searchModalDivider}/>
-                            <SmallTable mode="pool" data={props.dataSourcePool} displayNumber={displayNumber}/>
+
+                            {watchlistPool.length > 0 ? 
+                            <SmallTable 
+                              mode="pool" 
+                              data={watchlistPool} 
+                              displayNumber={displayNumber} 
+                              refreshWatchlist={refreshWatchlist}
+                            /> : <span style={{color: "#757579", fontWeight:"600", marginTop:"10px"}}>Add items by clicking on the star</span>
+                            }
                           </AcyTabPane>
                         </AcyTabs>
                         
@@ -299,6 +402,8 @@ export const MarketSearchBar  = (props) => {
                   
                 </div>
               </div>
+              </div>
+
               
               
           </div>
