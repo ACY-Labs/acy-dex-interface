@@ -36,7 +36,7 @@ export class Dao extends Component {
       <PageHeaderWrapper>
         <div className={styles.createProposalContainer}>
           <button type="button" className={styles.createProposalButton}>
-            Create Proposal
+            Proposal
           </button>
         </div>
         <div className={styles.stakeSectionMain}>
@@ -77,11 +77,11 @@ export class Dao extends Component {
           </div>
           <StakeSection />
         </div>
-        <div style={{ padding: 20 }}>
+        <div className={styles.tableChartContainer}>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <StakeHistoryTable />
           </div>
-          <div style={{ paddingTop: '30px' }}>
+          <div className={styles.chartContainer}>
             <div
               style={{ display: 'flex', justifyContent: 'end', marginBottom: 30 }}
               className={stakeInfoStyles.stakeDetails}

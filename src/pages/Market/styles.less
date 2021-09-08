@@ -1,7 +1,6 @@
 @import '~antd/lib/style/themes/default.less';
 @cardColor:   #2f313583;
 
-
 // root element
 .marketRoot{
     width: 90%;
@@ -9,9 +8,8 @@
     margin:auto;
     z-index:0;
     color: #B5B6B6;
-    position:relative;
-    top: @layout-header-height - 3px;
     margin-bottom: 20px;
+    font-weight:400;
 }
 
 .marketLink{
@@ -20,6 +18,10 @@
 
 // headers
 h2 {
+    color: #B5B6B6;
+}
+
+h3, h4{
     color: #B5B6B6;
 }
 
@@ -32,7 +34,8 @@ h2 {
     color:greenyellow;
 }
 .coinName {
-    font-weight: bold;
+    font-weight: 600;
+    margin-left: 0.5rem;
 }
 .coinShort{
     color: #919191;
@@ -60,32 +63,98 @@ h2 {
     }
 }
 .marketNavbar{
-    position:fixed;
-    top: @layout-header-height;
-    left: 0;
+    position:sticky;
+    top: 0px;
+    margin-bottom:35px;
+    max-width: 1000px;
     display:flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    padding: 10px 30px;
     z-index: 11;
-    background-color: #0e0304;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    // box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     flex-wrap: wrap;
+    .active{
+        background:red;
+    }
 }
 
 .marketNavbarMenu{
     display:flex;
-    width: 15%;
-    font-size: 18px;
-    justify-content:space-around;
+    width: 20%;
+    font-size: 16px;
+    justify-content:flex-begin;
+}
+
+.marketNavbarButton{
+    background-color: #2e3032;
+    padding: 7px 15px;
+    border-radius:20px;
+    height: 100%;
+    margin-right: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.marketNavbarRight{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    flex-wrap:wrap;
+    width: 80%;
+}
+
+.marketDropdownWrapper{
+    width: 25%;
+    display:flex;
+    flex-direction: column;
+    justify-content:flex-end;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.marketSelector{
+    background-color: #2e3032;
+    width: 80%;
+    text-align:center;
+    padding: 5px;
+    border-radius:20px;
+    padding: 7px 15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    max-width: 180px;
+    border: transparent;
+    font-weight: 600;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.marketNetworkDropdown{
+    position:absolute;
+    width:100%;
+    top:10px;
+    background: #2e3032;
+    padding: 10px 15px;
+    border-radius:15px;
+    z-index:10;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    h4 {
+        color: #757579;
+    }
+}
+
+.marketNetworkItem{
+    display:flex;
+    align-items:center;
+    padding-bottom:10px;
+    background: transparent;
+    border: transparent;
+    font-weight: 600;
 }
 
 // search component
 .searchSection{
     z-index: 10;
-    width: 40%;
     padding:auto;
+    width: 75%;
     .searchBackground{
         background: rgba(0,0,0,0.50);
         position:fixed;
@@ -105,6 +174,7 @@ h2 {
     }
     .searchBar{
         width: 100%;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     }
     .searchModal{
         background: #373739;
@@ -149,7 +219,8 @@ h2 {
     .statName{
         font-size: 13pt;
         line-height: 14pt;
-        color: #B5B6B6;
+        color: #757579;
+        font-weight:600;
     }
     .statValue{
         font-size: 24pt;
@@ -241,9 +312,10 @@ h2 {
     font-weight: bold;
 }
 .statEntryName, .statEntryChange{
-    font-size:18px;
+    font-size:16px;
+    font-weight:600;
     line-height: 20px;
-    color: #B5B6B6;
+    color: #757579;
 }
 
 // chart section in info page
@@ -262,8 +334,9 @@ h2 {
 }
 .chartIndicatorTime{
     font-size:16px;
-    line-height: 18px;
-    color: #B5B6B6;
+    line-height: 16px;
+    font-weight:600;
+    color: #757579;
 }
 .contentChartsBody{
     height: 90%;
@@ -308,11 +381,31 @@ h2 {
 
 
 // mobile changes
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1060px) {
 
-    .searchSection, .marketNavbarMenu{
+    .marketNavbarRight, .marketNavbarMenu{
         width: 100%;
         margin-bottom:10px;
+    }
+
+    .marketNavbarRight{
+        width: 100%;
+        flex-direction: column;
+        align-items:flex-start;
+    }
+
+    .marketDropdownWrapper{
+        width: 50%;
+        justify-content:flex-start;
+        left: 0;
+    }
+
+    .searchSection{
+        margin-top: 10px;
+        width: 100%;
+    }
+    .searchInnerWrapper {
+        width:100%;
     }
 
 

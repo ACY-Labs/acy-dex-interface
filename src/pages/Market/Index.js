@@ -46,8 +46,14 @@ import {
 
 
 export class BasicProfile extends Component {
+    constructor(props){
+      super(props)
+      this.rootElemRef = React.createRef();
+    }
+
     state = {
         visible: true,
+        visibleNavbar: true,
         tabIndex: 0,
         transactionView: TransactionType.ALL,
         tokenDisplayNumber: 10,
@@ -55,7 +61,17 @@ export class BasicProfile extends Component {
         transactionDisplayNumber: 10
     }
 
-    componentDidMount() {};
+    componentDidMount() {
+      window.addEventListener("scroll", () => {
+        console.log(window)
+      })
+    };
+
+    componentWillUnmount() {
+      window.removeEventListener("scroll", () => {
+        console.log(window)
+      })
+    }
 
     onClickTransaction = (e) => {
 
@@ -94,13 +110,14 @@ export class BasicProfile extends Component {
         return table.filter(item => item.type == category)
     };
 
+
+
     render() {
         // const outsideClickRef = useDetectClickOutside({ onTriggered: this.onSearchBlur });
         const { visible, visibleSearchBar, tabIndex, transactionView} = this.state;
         return (
-          <div>
-            <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
             <div className={styles.marketRoot}>
+            <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool} visible={true}/>
                 <div className={styles.chartsMain}>
                     <div className={styles.chartSectionMain}>
                           <div className={styles.graphStats}>
@@ -108,7 +125,7 @@ export class BasicProfile extends Component {
                               <div className={styles.statValue}>$2.19b</div>
                           </div>
                           <div className={styles.chartWrapper}>
-                              <AcyLineChart  backData={graphSampleData} showXAxis={true} showGradient={true} lineColor='#e29227' bgColor='#29292c'/>
+                              <AcyLineChart  backData={graphSampleData} showXAxis={true} showGradient={true} lineColor='#e29227' bgColor='#2f313583'/>
                           </div>
                           
                     </div>
@@ -190,8 +207,6 @@ export class BasicProfile extends Component {
                 />
             <div style={{height:"20px"}}></div>
             </div>
-          </div>
-            
         )
     };
 }

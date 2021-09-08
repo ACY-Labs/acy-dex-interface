@@ -1,167 +1,79 @@
 import {TransactionType} from './Util.js'
 
 export const dataSourceCoin = [
-    {
-      "name": "Ether",
-      "short": "ETH",
-      "price": 3170,
-      "priceChange": -0.79,
-      "volume24h": 804110000,
-      "tvl": 899640000
-    },
-    {
-      "name": "USD Coin",
-      "short": "USDC",
-      "price": 1,
-      "priceChange": 0,
-      "volume24h": 741750000,
-      "tvl": 547500000
-    },
-    {
-      "name": "Wrapped BTC",
-      "short": "WBTC",
-      "price": 47960,
-      "priceChange": -0.88,
-      "volume24h": 47960000,
-      "tvl": 220550000
-    },
-    {
-      "name": "Tether USD",
-      "short": "USDT",
-      "price": 1,
-      "priceChange": 0,
-      "volume24h": 210430000,
-      "tvl": 217030000
-    },
-    {
-      "name": "Ether",
-      "short": "ETH",
-      "price": 3170,
-      "priceChange": -0.79,
-      "volume24h": 804110000,
-      "tvl": 899640000
-    },
-    {
-      "name": "USD Coin",
-      "short": "USDC",
-      "price": 1,
-      "priceChange": 0,
-      "volume24h": 741750000,
-      "tvl": 547500000
-    },
-    {
-      "name": "Wrapped BTC",
-      "short": "WBTC",
-      "price": 47960,
-      "priceChange": -0.88,
-      "volume24h": 47960000,
-      "tvl": 220550000
-    },
-    {
-      "name": "Tether USD",
-      "short": "USDT",
-      "price": 1,
-      "priceChange": 0,
-      "volume24h": 210430000,
-      "tvl": 217030000
-    },
-    {
-      "name": "Ether",
-      "short": "ETH",
-      "price": 3170,
-      "priceChange": -0.79,
-      "volume24h": 804110000,
-      "tvl": 899640000
-    },
-    {
-      "name": "USD Coin",
-      "short": "USDC",
-      "price": 1,
-      "priceChange": 0,
-      "volume24h": 741750000,
-      "tvl": 547500000
-    },
-    {
-      "name": "Wrapped BTC",
-      "short": "WBTC",
-      "price": 47960,
-      "priceChange": -0.88,
-      "volume24h": 47960000,
-      "tvl": 220550000
-    },
-    {
-      "name": "Tether USD",
-      "short": "USDT",
-      "price": 1,
-      "priceChange": 0,
-      "volume24h": 210430000,
-      "tvl": 217030000
-    },
-    {
-      "name": "Ether",
-      "short": "ETH",
-      "price": 3170,
-      "priceChange": -0.79,
-      "volume24h": 804110000,
-      "tvl": 899640000
-    },
-    {
-      "name": "USD Coin",
-      "short": "USDC",
-      "price": 1,
-      "priceChange": 0,
-      "volume24h": 741750000,
-      "tvl": 547500000
-    },
-    {
-      "name": "Wrapped BTC",
-      "short": "WBTC",
-      "price": 47960,
-      "priceChange": -0.88,
-      "volume24h": 47960000,
-      "tvl": 220550000
-    },
-    {
-      "name": "Tether USD",
-      "short": "USDT",
-      "price": 1,
-      "priceChange": 0,
-      "volume24h": 210430000,
-      "tvl": 217030000
-    },
-    {
-      "name": "Ether",
-      "short": "ETH",
-      "price": 3170,
-      "priceChange": -0.79,
-      "volume24h": 804110000,
-      "tvl": 899640000
-    },
-    {
-      "name": "USD Coin",
-      "short": "USDC",
-      "price": 1,
-      "priceChange": 0,
-      "volume24h": 741750000,
-      "tvl": 547500000
-    },
-    {
-      "name": "Wrapped BTC",
-      "short": "WBTC",
-      "price": 47960,
-      "priceChange": -0.88,
-      "volume24h": 47960000,
-      "tvl": 220550000
-    },
-    {
-      "name": "Tether USD",
-      "short": "USDT",
-      "price": 1,
-      "priceChange": 0,
-      "volume24h": 210430000,
-      "tvl": 217030000
-    }
-  ]
+  {
+    "name": "Ether",
+    "short": "ETH",
+    "price": 3170,
+    "priceChange": -0.79,
+    "volume24h": 804110000,
+    "tvl": 899640000
+  },
+  {
+    "name": "USD Coin",
+    "short": "USDC",
+    "price": 1,
+    "priceChange": 0,
+    "volume24h": 741750000,
+    "tvl": 547500000
+  },
+  {
+    "name": "Wrapped BTC",
+    "short": "WBTC",
+    "price": 47960,
+    "priceChange": -0.88,
+    "volume24h": 47960000,
+    "tvl": 220550000
+  },
+  {
+    "name": "Tether USD",
+    "short": "USDT",
+    "price": 1,
+    "priceChange": 0,
+    "volume24h": 210430000,
+    "tvl": 217030000
+  },
+  {
+    "name": "Dai Stablecoin",
+    "short": "DAI",
+    "price": 1,
+    "priceChange": 0.53,
+    "volume24h": 804110000,
+    "tvl": 899640000
+  },
+  {
+    "name": "Frax",
+    "short": "FRAX",
+    "price": 1,
+    "priceChange": 0.32,
+    "volume24h": 741750000,
+    "tvl": 547500000
+  },
+  {
+    "name": "Uniswap",
+    "short": "UNI",
+    "price": 24.15,
+    "priceChange": -16.04,
+    "volume24h": 47960000,
+    "tvl": 220550000
+  },
+  {
+    "name": "Paxos Standard",
+    "short": "PAX",
+    "price": 1,
+    "priceChange": -0.29,
+    "volume24h": 210430000,
+    "tvl": 217030000
+  },
+  {
+    "name": "ChainLink Token",
+    "short": "LINK",
+    "price": 28.14,
+    "priceChange": 18.67,
+    "volume24h": 741750000,
+    "tvl": 547500000
+  }
+ ]
 
 export const dataSourcePool = [
     {

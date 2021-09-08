@@ -10,13 +10,13 @@ export default [
       { path: '/user/register-result', component: './User/RegisterResult' },
     ],
   },
-  // app
+  // use special layout for dao page only
   {
-    path: '/',
-    component: '../layouts/BasicLayout',
+    path: '/dao',
+    component: '../layouts/DaoLayout',
     Routes: ['src/pages/Authorized'],
     routes: [
-      { path: '/', redirect: '/exange' },
+      { path: '/', redirect: '/exchange' },
       {
         path: '/market',
         name: 'Market',
@@ -45,7 +45,108 @@ export default [
         ],
       },
       {
-        path: '/exange',
+        path: '/exchange',
+        name: 'Exchange',
+        component: './Swap/Index',
+      },
+      {
+        path: '/liquidity',
+        name: 'Liquidity',
+        component: './Liquidity/Index',
+      },
+      {
+        path: '/dao',
+        name: 'DAO',
+        component: './Dao/Index',
+      },
+    ],
+  },
+  {
+    path: '/market',
+    component: '../layouts/MarketLayout',
+    Routes: ['src/pages/Authorized'],
+    routes: [
+      { path: '/', redirect: '/exchange' },
+      {
+        path: '/market',
+        name: 'Market',
+        hideChildrenInMenu: true,
+        routes: [
+          {
+            path: '/market',
+            component: './Market/Index',
+          },
+          {
+            path: '/market/list/token',
+            component: './Market/TokenList',
+          },
+          {
+            path: '/market/list/pool',
+            component: './Market/PoolList',
+          },
+          {
+            path: '/market/info/token',
+            component: './Market/TokenInfo',
+          },
+          {
+            path: '/market/info/pool',
+            component: './Market/PoolInfo',
+          },
+        ],
+      },
+      {
+        path: '/exchange',
+        name: 'Exchange',
+        component: './Swap/Index',
+      },
+      {
+        path: '/liquidity',
+        name: 'Liquidity',
+        component: './Liquidity/Index',
+      },
+      {
+        path: '/dao',
+        name: 'DAO',
+        component: './Dao/Index',
+      },
+    ],
+  },
+  // the rest of the pages except dao uses basic layout
+  {
+    path: '/',
+    component: '../layouts/BasicLayout',
+    Routes: ['src/pages/Authorized'],
+    routes: [
+      { path: '/', redirect: '/exchange' },
+      {
+        path: '/market',
+        name: 'Market',
+        hideChildrenInMenu: true,
+        routes: [
+          {
+            path: '/market',
+            component: './Market/Index',
+          },
+          {
+            path: '/market/list/token',
+            component: './Market/TokenList',
+          },
+          {
+            path: '/market/list/pool',
+            component: './Market/PoolList',
+          },
+          {
+            path: '/market/info/token',
+            component: './Market/TokenInfo',
+          },
+          {
+            path: '/market/info/pool',
+            component: './Market/PoolInfo',
+          },
+        ],
+      },
+      {
+        path: '/exchange',
         name: 'Exchange',
         component: './Swap/Index',
       },

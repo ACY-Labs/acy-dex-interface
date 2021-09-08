@@ -45,15 +45,46 @@ import {
   SmallTable
 } from './UtilComponent.js';
 
+import {
+  WatchlistManager
+} from './WatchlistManager.js'
+
 const {AcyTabPane } = AcyTabs;
-let sampleToken = dataSourceCoin[0]
+const watchlistManagerPool = new WatchlistManager("pool")
 
 function MarketPoolList(props){
     const [poolDisplayNumber, setPoolDisplayNumber] = useState(10)
+    const [watchlistPool, setWatchlistPool] = useState([])
 
+    let refreshWatchlist = () => {
+      let poolWatchlistData = watchlistManagerPool.getData()
+      let newWatchlistPool = dataSourcePool.filter(item => poolWatchlistData.toString().includes([item.coin1, item.coin2].toString()))
+      setWatchlistPool([...newWatchlistPool])
+    }
+  
+    useEffect(() => {
+      let poolWatchlistData = watchlistManagerPool.getData()
+      let newWatchlistPool = dataSourcePool.filter(item => poolWatchlistData.toString().includes([item.coin1, item.coin2].toString()))
+      setWatchlistPool([...newWatchlistPool])
+    }, [])
+  
     return (
         <div className={styles.marketRoot}>
-            <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
+            <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool} refreshWatchlist={refreshWatchlist}/>
+            <h2>Watchlist</h2>
+            <Table 
+              dataSource={watchlistPool} 
+              columns={columnsPool.filter(item => item.visible == true)} 
+              pagination={false}
+              style={{
+              marginBottom: "20px"
+              }}
+              footer={() => (
+              <div className={styles.tableSeeMoreWrapper}>
+                  <a className={styles.tableSeeMore} onClick={() => {setTokenDisplayNumber(tokenDisplayNumber +  5)}}>See More...</a>
+              </div>
+              )} 
+            />
             <h2>All Pools</h2>
             <Table 
                 dataSource={sortTable(dataSourcePool, "tvl", true).slice(0, poolDisplayNumber + 1)} 

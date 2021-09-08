@@ -20,7 +20,6 @@ import Media from 'react-media';
 import AcyPieChart from '@/components/AcyPieChartAlpha';
 import SwapComponent from '@/components/SwapComponent';
 import AddComponent from '@/components/AddComponent';
-import MyComponent from '@/components/MyComponent';
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
@@ -160,7 +159,7 @@ class BasicProfile extends Component {
     visibleLoading: false,
     tabIndex: 1,
   };
-  componentDidMount() { }
+  componentDidMount() {}
 
   lineTitleRender = () => {
     return [
@@ -172,7 +171,7 @@ class BasicProfile extends Component {
           <span className={styles.lighttitle}>212.123</span>{' '}
           <span className={styles.percentage}>+12.45%</span> 2021.07.11
         </div>
-      </div>
+      </div>,
     ];
   };
 
@@ -206,15 +205,14 @@ class BasicProfile extends Component {
   };
   maximize = () => {
     this.setState({
-      maxLine: !this.state.maxLine
+      maxLine: !this.state.maxLine,
     });
-  }
+  };
   render() {
     const { visible, visibleConfirmOrder, visibleLoading, tabIndex, maxLine } = this.state;
     const { isMobile } = this.props;
     return (
       <PageHeaderWrapper>
-
         <div className={styles.main}>
           {
             isMobile && <div>
@@ -228,7 +226,7 @@ class BasicProfile extends Component {
           }
           <div>
             {(tabIndex == 1 && (
-              <AcyCard style={{ background: 'transparent' }} title={this.lineTitleRender()} >
+              <AcyCard style={{ background: 'transparent' }} title={this.lineTitleRender()}>
                 <div
                   style={{
                     width: '100%',
@@ -248,10 +246,10 @@ class BasicProfile extends Component {
                 </div>
               </AcyCard>
             )) || (
-                <AcyCard>
-                  <Table dataSource={dataSource} columns={columns} pagination={false} />
-                </AcyCard>
-              )}
+              <AcyCard>
+                <Table dataSource={dataSource} columns={columns} pagination={false} />
+              </AcyCard>
+            )}
           </div>
           {
             !isMobile && <div>
@@ -322,7 +320,7 @@ class BasicProfile extends Component {
           </div>
         </div>
         {/* Alpha */}
-        <div className={styles.routing}>
+        {/* <div className={styles.routing}>
           <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px', color: '#EB5C20' }}>
             <span>
               Alpha
@@ -365,7 +363,7 @@ class BasicProfile extends Component {
 
             </div>
           </div>
-        </div>
+        </div> */}
         <AcyModal onCancel={this.onCancel} width={600} visible={visible}>
           <div className={styles.title}>
             <AcyIcon name="back" /> Select a token
@@ -419,8 +417,8 @@ class BasicProfile extends Component {
   }
 }
 
-export default (props => (
+export default props => (
   <Media query="(max-width: 599px)">
     {isMobile => <BasicProfile {...props} isMobile={isMobile} />}
   </Media>
-));
+);

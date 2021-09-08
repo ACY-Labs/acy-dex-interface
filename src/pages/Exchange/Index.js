@@ -16,7 +16,7 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
-import MyComponent from '@/components/MyComponent';
+import SwapComponent from '@/components/SwapComponent';
 import DescriptionList from '@/components/DescriptionList';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
@@ -198,7 +198,7 @@ class BasicProfile extends Component {
           <AcyTabs onChange={this.onChangeTabs}>
             <AcyTabPane tab="Trade" key="1">
               <div className={styles.trade}>
-                <MyComponent />
+                <SwapComponent />
                 {/* <AcyCuarrencyCard
                   icon="eth"
                   coin="ETH"

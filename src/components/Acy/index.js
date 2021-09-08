@@ -21,6 +21,7 @@ import AcyDescriptions from '@/components/AcyDescriptions';
 import AcySmallButton from '@/components/AcySmallButton';
 import AcySeting from '@/components/AcySeting';
 import AcyPieChart from '@/components/AcyPieChart';
+import AcyLiquidityPositions from '@/components/AcyLiquidityPositions';
 const Acy = {
   AcyPieChart,
   AcyTabs,
@@ -45,6 +46,7 @@ const Acy = {
   AcyDescriptions,
   AcySmallButton,
   AcySeting,
+  AcyLiquidityPositions,
 };
 
 export {
@@ -72,4 +74,5 @@ export {
   AcyDescriptions,
   AcySmallButton,
   AcySeting,
+  AcyLiquidityPositions,
 };

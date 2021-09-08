@@ -45,18 +45,49 @@ import {
   SmallTable
 } from './UtilComponent.js';
 
+import {
+  WatchlistManager
+} from './WatchlistManager.js'
+
 const {AcyTabPane } = AcyTabs;
+const watchlistManagerToken = new WatchlistManager("token")
+
 let sampleToken = dataSourceCoin[0]
 
 
 function MarketTokenList(props){
   const [tokenDisplayNumber, setTokenDisplayNumber] = useState(10)
+  const [watchlistToken, setWatchlistToken] = useState([])
+
+  let refreshWatchlist = () => {
+    let tokenWatchlistData = watchlistManagerToken.getData()
+    let newWatchlistToken = dataSourceCoin.filter(item => tokenWatchlistData.includes(item.short))
+    setWatchlistToken([...newWatchlistToken])
+  }
+
+  useEffect(() => {
+    let tokenWatchlistData = watchlistManagerToken.getData()
+    let newWatchlistToken = dataSourceCoin.filter(item => tokenWatchlistData.includes(item.short))
+    setWatchlistToken([...newWatchlistToken])
+  }, [])
 
   return (
-    <div>
-      <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool}/>
       <div className={styles.marketRoot}>
-          
+      <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool} refreshWatchlist={refreshWatchlist}/>
+        <h2>Watchlist</h2>
+          <Table 
+              dataSource={watchlistToken} 
+              columns={columnsCoin.filter(item => item.visible == true)} 
+              pagination={false}
+              style={{
+              marginBottom: "20px"
+              }}
+              footer={() => (
+              <div className={styles.tableSeeMoreWrapper}>
+                  <a className={styles.tableSeeMore} onClick={() => {setTokenDisplayNumber(tokenDisplayNumber +  5)}}>See More...</a>
+              </div>
+              )} 
+          />
           <h2>All Tokens</h2>
           <Table 
               dataSource={sortTable(dataSourceCoin, "tvl", true).slice(0, tokenDisplayNumber + 1)} 
@@ -72,10 +103,7 @@ function MarketTokenList(props){
               )} 
           />
           <div style={{height:"40px"}}></div>
-      </div>
-      
-    </div>
-      
+      </div> 
   )
 }
 
