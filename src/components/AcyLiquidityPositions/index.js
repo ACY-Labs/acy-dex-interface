@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import styles from './styles.less';
 import { AcyCard } from '@/components/Acy';
-import { Table } from 'antd';
+import { Table, Empty } from 'antd';
 import {
   supportedTokens,
   getUserTokenBalanceRaw,
@@ -74,12 +74,14 @@ export async function getAllLiquidityPositions(tokens, chainId, library, account
     const poolTokenPercentage = new Percent(userPoolBalance.raw, totalSupply.raw).toFixed(4);
 
     userNonZeroLiquidityPositions.push({
+      token0: pair.token0,
+      token1: pair.token1,
       pool: `${pair.token0.symbol}/${pair.token1.symbol}`,
       poolAddress: `${pair.liquidityToken.address}`,
-      token0Amount: `${token0Deposited.toSignificant(6)} ${pair.token0.symbol}`,
-      token1Amount: `${token1Deposited.toSignificant(6)} ${pair.token1.symbol}`,
-      token0Reserve: `${pair.reserve0.toExact()} ${pair.token0.symbol}`,
-      token1Reserve: `${pair.reserve1.toExact()} ${pair.token1.symbol}`,
+      token0Amount: `${token0Deposited.toSignificant(4)} ${pair.token0.symbol}`,
+      token1Amount: `${token1Deposited.toSignificant(4)} ${pair.token1.symbol}`,
+      token0Reserve: `${pair.reserve0.toExact(2)} ${pair.token0.symbol}`,
+      token1Reserve: `${pair.reserve1.toExact(2)} ${pair.token1.symbol}`,
       share: `${poolTokenPercentage}%`,
     });
   }
@@ -92,7 +94,8 @@ const AcyLiquidityPositions = () => {
   const { account, chainId, library, activate } = useWeb3React();
 
   let [loading, setLoading] = useState(true);
-  let [isModalVisible, setIsModalVisible] = useState(true);
+  let [isModalVisible, setIsModalVisible] = useState(false);
+  let [removeLiquidityPosition, setRemoveLiquidityPosition] = useState(null);
 
   const columns = useMemo(() => [
     {
@@ -147,9 +150,11 @@ const AcyLiquidityPositions = () => {
       render: (text, record, index) => (
         <div>
           <button
+            className={styles.removeLiquidityButton}
             type="button"
             onClick={() => {
               setIsModalVisible(true);
+              setRemoveLiquidityPosition(record);
             }}
           >
             Remove
@@ -182,8 +187,26 @@ const AcyLiquidityPositions = () => {
         <h2>Loading...</h2>
       ) : (
         <>
-          <Table dataSource={userLiquidityPositions} columns={columns} pagination={false} />
-          <AcyRemoveLiquidityModal isModalVisible={isModalVisible} />
+          <Table
+            id="liquidityPositionTable"
+            dataSource={userLiquidityPositions}
+            columns={columns}
+            pagination={false}
+            locale={{
+              emptyText: (
+                <span>
+                  <h2>No positions available. </h2>
+                </span>
+              ),
+            }}
+          />
+          <AcyRemoveLiquidityModal
+            removeLiquidityPosition={removeLiquidityPosition}
+            isModalVisible={isModalVisible}
+            onCancel={() => {
+              setIsModalVisible(false);
+            }}
+          />
         </>
       )}
     </AcyCard>
