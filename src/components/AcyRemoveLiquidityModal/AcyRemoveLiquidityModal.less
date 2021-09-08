@@ -1,0 +1,109 @@
+.removeAmountContainer,
+.tokenAmountContainer {
+  background-color: #1B1B1C;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.amountText {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.sliderContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.sliderInput {
+  width: 100%;
+  padding: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px; /* Specified height */
+  background: black; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+  transition: opacity 0.2s;
+}
+
+.sliderInput:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+.sliderInput::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 15px; /* Set a specific slider handle width */
+  height: 15px; /* Slider handle height */
+  border-radius: 50%;
+  background-color: #C4C4C4; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.sliderInput::-moz-range-thumb {
+  width: 15px; /* Set a specific slider handle width */
+  height: 15px; /* Slider handle height */
+  background-color: #C4C4C4; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.tokenAmountContent {
+  display: flex;
+  justify-content: space-between;
+}
+
+.tokenDetailContainer {
+  display: flex;
+  align-items: center;
+}
+
+.tokenAmount {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.tokenImg {
+  height: 24px;
+}
+
+.tokenSymbol {
+  font-size: 1.25rem;
+  margin-left: 0.5rem;
+  font-weight: bold;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button {
+  flex: 1;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  color: white;
+}
+
+.button:first-child {
+  margin-right: 0.5rem;
+  background-color: #eb5c20;
+}
+
+.button:last-child {
+  background-color: #1B1B1C;
+}
+
+.button:first-child:hover {
+  background-color: #e29227;
+  cursor: pointer;
+}
+
+.button:last-child:hover {
+  background-color: #29292c;
+  cursor: pointer;
+}
