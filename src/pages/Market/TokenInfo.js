@@ -30,7 +30,8 @@ import {
   columnsCoin, 
   columnsPool,
   transactionHeader,
-  sortTable
+  sortTable,
+  sortTableTime
 } from './Util.js';
 
 import {
@@ -57,6 +58,8 @@ function MarketTokenInfo(props){
     const [graphTabIndex, setGraphTabIndex] = useState(0)
     const [poolDisplayNumber, setPoolDisplayNumber] = useState(10)
     const [transactionDisplayNumber, setTransactionDisplayNumber] = useState(10)
+    const [poolSortAscending, setPoolSortAscending] = useState(false)
+    const [transactionSortAscending, setTransactionSortAscending] = useState(true)
 
     const filterTransaction = (table, category) => {
         if (category == TransactionType.ALL)
@@ -215,8 +218,8 @@ function MarketTokenInfo(props){
             
             <h2>Pools</h2>
             <Table 
-                dataSource={sortTable(dataSourcePool, "tvl", true).slice(0, poolDisplayNumber + 1)} 
-                columns={columnsPool.filter(item => item.visible == true)} 
+                dataSource={sortTable(dataSourcePool, "tvl", poolSortAscending).slice(0, poolDisplayNumber + 1)} 
+                columns={columnsPool(poolSortAscending, () => {setPoolSortAscending(!poolSortAscending)}).filter(item => item.visible == true)} 
                 pagination={false}
                 style={{
                 marginBottom: "20px"
@@ -230,8 +233,8 @@ function MarketTokenInfo(props){
             
             <h2>Transactions</h2>
             <Table 
-                dataSource={sortTable(filterTransaction(dataSourceTransaction, transactionView), "time", true).slice(0, transactionDisplayNumber + 1)} 
-                columns={transactionHeader(transactionView, onClickTransaction).filter(item => item.visible == true)} 
+                dataSource={sortTableTime(filterTransaction(dataSourceTransaction, transactionView, transactionSortAscending), "time", transactionSortAscending).slice(0, transactionDisplayNumber + 1)} 
+                columns={transactionHeader(transactionView, onClickTransaction, transactionSortAscending, () => {setTransactionSortAscending(!transactionSortAscending)}).filter(item => item.visible == true)} 
                 pagination={false}
                 style={{
                 marginBottom: "20px"

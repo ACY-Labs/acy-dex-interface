@@ -262,7 +262,7 @@ export const MarketSearchBar  = (props) => {
 
     // the DOM itself
     return (
-      <div className={styles.marketNavbar} style={{opacity:visible ? 1: 0, zIndex: visible ? 0 : -1}} ref={rootRef}>
+      <div className={styles.marketNavbar} style={{opacity:visible ? 1: 0, zIndex: visible ? 10 : -1}} ref={rootRef}>
         <div className={styles.marketNavbarMenu}>
           <div className={styles.marketNavbarButton}>
             <Link style={{color:"#b5b5b6", fontWeight: "600"}} to='/market/list/token' >Tokens</Link>

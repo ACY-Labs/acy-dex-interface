@@ -28,7 +28,8 @@ import {
   columnsCoin, 
   columnsPool,
   transactionHeader,
-  sortTable
+  sortTable,
+  sortTableTime
 } from './Util.js';
 
 import {
@@ -58,7 +59,10 @@ export class BasicProfile extends Component {
         transactionView: TransactionType.ALL,
         tokenDisplayNumber: 10,
         poolDisplayNumber: 10,
-        transactionDisplayNumber: 10
+        transactionDisplayNumber: 10,
+        tokenSortAscending: false, 
+        poolSortAscending: false,
+        transactionSortAscending: true
     }
 
     componentDidMount() {
@@ -155,8 +159,8 @@ export class BasicProfile extends Component {
                   </h3>
                 </div>
                 <Table 
-                  dataSource={sortTable(dataSourceCoin, "tvl", true).slice(0, this.state.tokenDisplayNumber + 1)} 
-                  columns={columnsCoin.filter(item => item.visible == true)} 
+                  dataSource={sortTable(dataSourceCoin, "tvl", !this.state.tokenSortAscending).slice(0, this.state.tokenDisplayNumber + 1)} 
+                  columns={columnsCoin(this.state.tokenSortAscending, () => {this.setState({tokenSortAscending : !this.state.tokenSortAscending})}).filter(item => item.visible == true)} 
                   pagination={false}
                   style={{
                     marginBottom: "20px"
@@ -178,8 +182,8 @@ export class BasicProfile extends Component {
                 </div>
 
                 <Table 
-                  dataSource={sortTable(dataSourcePool, "tvl", true).slice(0, this.state.poolDisplayNumber + 1)} 
-                  columns={columnsPool.filter(item => item.visible == true)} 
+                  dataSource={sortTable(dataSourcePool, "tvl", !this.state.poolSortAscending).slice(0, this.state.poolDisplayNumber + 1)} 
+                  columns={columnsPool(this.state.poolSortAscending, () => {this.setState({poolSortAscending : !this.state.poolSortAscending})}).filter(item => item.visible == true)} 
                   pagination={false}
                   style={{
                     marginBottom: "20px"
@@ -193,8 +197,8 @@ export class BasicProfile extends Component {
               
                 <h2>Transactions</h2>
                 <Table 
-                  dataSource={sortTable(this.filterTransaction(dataSourceTransaction, transactionView), "time", true).slice(0, this.state.transactionDisplayNumber + 1)} 
-                  columns={transactionHeader(transactionView, this.onClickTransaction).filter(item => item.visible == true)} 
+                  dataSource={sortTableTime(this.filterTransaction(dataSourceTransaction, transactionView), "time", this.state.transactionSortAscending).slice(0, this.state.transactionDisplayNumber + 1)} 
+                  columns={transactionHeader(transactionView, this.onClickTransaction,this.state.transactionSortAscending, () => {this.setState({transactionSortAscending : !this.state.transactionSortAscending})}).filter(item => item.visible == true)} 
                   pagination={false}
                   style={{
                     marginBottom: "20px"

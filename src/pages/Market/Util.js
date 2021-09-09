@@ -1,6 +1,6 @@
 import React, { Component, useState, useCallback } from 'react'
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { Table,  Row, Col,Input, Divider} from 'antd';
+import { Table,  Row, Col,Input, Divider, Icon} from 'antd';
 import styles from './styles.less';
 import moment from 'moment'
 import {Link} from 'react-router-dom'
@@ -76,137 +76,149 @@ export function isDesktop(){
     return true
 }
 
-export const columnsCoin = [
-    {
-        title: <div className={styles.tableHeaderFirst}>Name</div>,
-        dataIndex: 'name',
-        key: 'name',
-        render:(text, entry) => {
-            return (
-                <div className={styles.tableDataFirstColumn}>
-                    <AcyIcon name={entry.short.toLowerCase()} width={20} height={20}/>
-                    <Link style={{color:"#b5b5b6"}}  className={styles.coinName} to='/market/info/token' >{entry.short}</Link>
-                    <span className={styles.coinShort}> ({entry.name})</span>
-                </div>
-            )
-        },
-        visible:true
-    },
-    {
-        title: <div className={styles.tableHeader}>Price</div>,
-        dataIndex: 'price',
-        key: 'price',
-        render:(text, entry) => {
-            return (
-                <div className={styles.tableData}>
-                    $ {abbrNumber(text)}
-                </div>
-            )
-        },
-        visible: isDesktop()
-    },
-    {
-        title: <div className={styles.tableHeader}>Price Change</div>,
-        dataIndex: 'priceChange',
-        key: 'priceChange',
-        render: (priceChange) => {
-            return (
-                <div className={styles.tableData}>
-                    <span className={priceChange <  0 ? styles.priceChangeDown : styles.priceChangeUp}>{priceChange.toFixed(2)}</span>
-                </div>
-            ) 
-        },
-        visible: isDesktop()
-    },
-    {
-        title: <div className={styles.tableHeader}>Volume 24H</div>,
-        dataIndex: 'volume24h',
-        key: 'volume24h',
-        render:(text, entry) => {
-            return (
-                <div className={styles.tableData}>
-                    $ {abbrNumber(text)}
-                </div>
-            )
-        },
-        visible:true
-    },
-    {
-        title: <div className={styles.tableHeader}>TVL</div>,
-        dataIndex: 'tvl',
-        key: 'tvl',
-        render:(text, entry) => {
-            return (
-                <div className={styles.tableData}>
-                    $ {abbrNumber(text)}
-                </div>
-            )
-        },
-        visible: isDesktop()
-    }
-];
 
-export const columnsPool = [
-    {
-        title: <div className={styles.tableHeaderFirst}>Pool</div>,
-        dataIndex: 'pool',
-        key: 'pool',
-        render:(text, entry) => {
-            return (
-                <div className={styles.tableDataFirstColumn}>
-                    <AcyIcon name={entry.coin1.toLowerCase()} width={20} height={20}/>
-                    <AcyIcon name={entry.coin2.toLowerCase()} width={20} height={20}/>
-                    <Link style={{color:"#b5b5b6"}}  className={styles.coinName} to='/market/info/pool' >
-                        <span className={styles.coinName}>{entry.coin1}/{entry.coin2}</span>
-                    </Link>
-                </div>
-            )
+export function columnsCoin(isAscending, onSortChange){
+
+    return [
+        {
+            title: <div className={styles.tableHeaderFirst}>Name</div>,
+            dataIndex: 'name',
+            key: 'name',
+            render:(text, entry) => {
+                return (
+                    <div className={styles.tableDataFirstColumn}>
+                        <AcyIcon name={entry.short.toLowerCase()} width={20} height={20}/>
+                        <Link style={{color:"#b5b5b6"}}  className={styles.coinName} to='/market/info/token' >{entry.short}</Link>
+                        <span className={styles.coinShort}> ({entry.name})</span>
+                    </div>
+                )
+            },
+            visible:true
         },
-        visible:true
-    },
-    {
-        title: <div className={styles.tableHeader}>TVL</div>,
-        dataIndex: 'tvl',
-        key: 'tvl',
-        render:(text, entry) => {
-            return (
-                <div className={styles.tableData}>
-                    $ {abbrNumber(entry.tvl)}
-                </div>
-            )
+        {
+            title: <div className={styles.tableHeader}>Price</div>,
+            dataIndex: 'price',
+            key: 'price',
+            render:(text, entry) => {
+                return (
+                    <div className={styles.tableData}>
+                        $ {abbrNumber(text)}
+                    </div>
+                )
+            },
+            visible: isDesktop()
         },
-        visible: isDesktop()
-    },
-    {
-        title: <div className={styles.tableHeader}>Volume 24H</div>,
-        dataIndex: 'volume24h',
-        key: 'volume24h',
-        render:(text, entry) => {
-            return (
-                <div className={styles.tableData}>
-                    $ {abbrNumber(entry.volume24h)}
-                </div>
-            )
+        {
+            title: <div className={styles.tableHeader}>Price Change</div>,
+            dataIndex: 'priceChange',
+            key: 'priceChange',
+            render: (priceChange) => {
+                return (
+                    <div className={styles.tableData}>
+                        <span className={priceChange <  0 ? styles.priceChangeDown : styles.priceChangeUp}>{priceChange.toFixed(2)}</span>
+                    </div>
+                ) 
+            },
+            visible: isDesktop()
         },
-        visible:true
-    },
-    {
-        title: <div className={styles.tableHeader}>Volume 7D</div>,
-        dataIndex: 'volume7d',
-        key: 'volume7d',
-        render:(text, entry) => {
-            return (
-                <div className={styles.tableData}>
-                    $ {abbrNumber(entry.volume7d)}
-                </div>
-            )
+        {
+            title: <div className={styles.tableHeader}>Volume 24H</div>,
+            dataIndex: 'volume24h',
+            key: 'volume24h',
+            render:(text, entry) => {
+                return (
+                    <div className={styles.tableData}>
+                        $ {abbrNumber(text)}
+                    </div>
+                )
+            },
+            visible:true
         },
-        visible: isDesktop()
-    },
-]
+        {
+            title: <div className={styles.tableHeader}  onClick={onSortChange}>
+                TVL
+                <Icon type={!isAscending ? "up" : "down"} style={{fontSize:'14px', marginLeft:'4px'}}/>
+                </div>,
+            dataIndex: 'tvl',
+            key: 'tvl',
+            render:(text, entry) => {
+                return (
+                    <div className={styles.tableData}>
+                        $ {abbrNumber(text)}
+                    </div>
+                )
+            },
+            visible: isDesktop()
+        }
+    ]; 
+}
+
+export function columnsPool(isAscending, onSortChange) {
+    return [
+        {
+            title: <div className={styles.tableHeaderFirst}>Pool</div>,
+            dataIndex: 'pool',
+            key: 'pool',
+            render:(text, entry) => {
+                return (
+                    <div className={styles.tableDataFirstColumn}>
+                        <AcyIcon name={entry.coin1.toLowerCase()} width={20} height={20}/>
+                        <AcyIcon name={entry.coin2.toLowerCase()} width={20} height={20}/>
+                        <Link style={{color:"#b5b5b6"}}  className={styles.coinName} to='/market/info/pool' >
+                            <span className={styles.coinName}>{entry.coin1}/{entry.coin2}</span>
+                        </Link>
+                    </div>
+                )
+            },
+            visible:true
+        },
+        {
+            title: <div className={styles.tableHeader}  onClick={onSortChange}>
+                TVL
+                <Icon type={!isAscending ? "up" : "down"} style={{fontSize:'14px', marginLeft:'4px'}}/>
+            </div>,
+            dataIndex: 'tvl',
+            key: 'tvl',
+            render:(text, entry) => {
+                return (
+                    <div className={styles.tableData}>
+                        $ {abbrNumber(entry.tvl)}
+                    </div>
+                )
+            },
+            visible: isDesktop()
+        },
+        {
+            title: <div className={styles.tableHeader}>Volume 24H</div>,
+            dataIndex: 'volume24h',
+            key: 'volume24h',
+            render:(text, entry) => {
+                return (
+                    <div className={styles.tableData}>
+                        $ {abbrNumber(entry.volume24h)}
+                    </div>
+                )
+            },
+            visible:true
+        },
+        {
+            title: <div className={styles.tableHeader}>Volume 7D</div>,
+            dataIndex: 'volume7d',
+            key: 'volume7d',
+            render:(text, entry) => {
+                return (
+                    <div className={styles.tableData}>
+                        $ {abbrNumber(entry.volume7d)}
+                    </div>
+                )
+            },
+            visible: isDesktop()
+        },
+    ]
+}
 
 // header for the transaction table
-export function transactionHeader(selectedTransaction, onClickHandler){
+export function transactionHeader(selectedTransaction, onClickHandler, isAscending, onSortChange){
 
   let styleArrangement = {
    "All" : "normal",
@@ -220,7 +232,7 @@ export function transactionHeader(selectedTransaction, onClickHandler){
   return [
     {
       title: (
-        <div className={styles.tableHeaderFIrst}>
+        <div className={styles.tableHeaderFirst}>
             <div className={styles.transactionHeader}>
                 <a 
                   className={styles.transactionType} 
@@ -324,7 +336,10 @@ export function transactionHeader(selectedTransaction, onClickHandler){
       visible: isDesktop()
     },
     {
-      title: <div className={styles.tableHeader}>Time</div>,
+      title: <div className={styles.tableHeader}  onClick={onSortChange}>
+      Time
+      <Icon type={!isAscending ? "up" : "down"} style={{fontSize:'14px', marginLeft:'4px'}}/>
+  </div>,
       dataIndex: 'time',
       key: 'time',
       render:(text, entry) => {
@@ -357,6 +372,17 @@ export function sortTable(table, key, isReverse){
         }
         else{
             return a[key] - b[key]
+        }
+    })
+}
+
+export function sortTableTime(table, key, isReverse){
+    return table.sort((a, b) => {
+        if (isReverse){
+            return new Date(b[key]).getTime() - new Date(a[key]).getTime()
+        }
+        else{
+            return new Date(a[key]).getTime() - new Date(b[key]).getTime()
         }
     })
 }
