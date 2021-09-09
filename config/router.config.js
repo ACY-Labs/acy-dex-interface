@@ -113,6 +113,57 @@ export default [
   },
   // the rest of the pages except dao uses basic layout
   {
+    path: '/liquidity',
+    component: '../layouts/LiquidityLayout',
+    Routes: ['src/pages/Authorized'],
+    routes: [
+      { path: '/', redirect: '/exchange' },
+      {
+        path: '/market',
+        name: 'Market',
+        hideChildrenInMenu: true,
+        routes: [
+          {
+            path: '/market',
+            component: './Market/Index',
+          },
+          {
+            path: '/market/list/token',
+            component: './Market/TokenList',
+          },
+          {
+            path: '/market/list/pool',
+            component: './Market/PoolList',
+          },
+          {
+            path: '/market/info/token',
+            component: './Market/TokenInfo',
+          },
+          {
+            path: '/market/info/pool',
+            component: './Market/PoolInfo',
+          },
+        ],
+      },
+      {
+        path: '/exchange',
+        name: 'Exchange',
+        component: './Swap/Index',
+      },
+      {
+        path: '/liquidity',
+        name: 'Liquidity',
+        component: './Liquidity/Index',
+      },
+      {
+        path: '/dao',
+        name: 'DAO',
+        component: './Dao/Index',
+      }
+    ]
+  },
+  // the rest of the pages except dao uses basic layout
+  {
     path: '/',
     component: '../layouts/BasicLayout',
     Routes: ['src/pages/Authorized'],

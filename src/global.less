@@ -2,7 +2,6 @@ html,
 body,
 #root {
   height: 100%;
-  word-break: break-all;
 }
 p {
   margin: 0;
@@ -51,25 +50,34 @@ li {
   width: 100% !important;
   border: 0;
 }
-.ant-table-thead > tr > th{
+.ant-table-thead > tr > th {
   border: 0 !important;
-  text-align:right !important;
+  overflow-wrap: normal !important;
 }
-.ant-table-thead > tr > th:nth-child(1){
+.ant-table-thead > tr > th:not(.leftAlignTableHeader) {
+  text-align: right !important;
+}
+.ant-table-thead > tr > th:nth-child(1) {
   border: 0 !important;
-  text-align:left !important;
+  text-align: left !important;
 }
 
-.ant-table-footer::before{
-  background-color: #2F3135 !important;
+.ant-table-footer::before {
+  background-color: #2f3135 !important;
 }
-.ant-table-footer{
-  background-color: #2F3135 !important;
+.ant-table-footer {
+  background-color: #2f3135 !important;
   border: 0 !important;
 }
 
-
-.ant-input{
+.ant-input {
   height: 30px;
-  width: 100px
+  width: 100px;
+}
+leftAlignTableHeader .leftAlign {
+  text-align: left !important;
+}
+
+.ant-menu-submenu-popup {
+  background-color: #2f3135 !important;
 }

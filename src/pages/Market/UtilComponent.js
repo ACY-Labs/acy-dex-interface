@@ -224,7 +224,7 @@ export const MarketSearchBar  = (props) => {
 
     const onScroll = (e) => {
       let scrollValue = e.target.scrollTop
-      if (scrollValue > 20) setVisible(false)
+      if (scrollValue > 250) setVisible(false)
       else setVisible(true)
     }
 
@@ -242,25 +242,7 @@ export const MarketSearchBar  = (props) => {
         
         if(props.refreshWatchlist)
           props.refreshWatchlist()
-    }
-
-    // const refreshWatchlist = useCallback((e) => {
-
-    //   if (key == 2){
-    //     let tokenWatchlistData = watchlistManagerToken.getData()
-    //     let poolWatchlistData = watchlistManagerPool.getData()
-
-    //     let newWatchlistToken = props.dataSourceCoin.filter(item => tokenWatchlistData.includes(item.short))
-    //     let newWatchlistPool = props.dataSourcePool.filter(item => poolWatchlistData.toString().includes([item.coin1, item.coin2].toString()))
-
-    //     console.log(newWatchlistToken)
-
-    //     setWatchlistToken([...newWatchlistToken])
-    //     setWatchlistPool([...newWatchlistPool])
-    //   }
-    // })
-
-    
+    }    
 
     // refs
     const outsideClickRef = useDetectClickOutside({ onTriggered: () => { setVisibleSearchBar(false); console.log("cheh") } });
@@ -274,13 +256,13 @@ export const MarketSearchBar  = (props) => {
       refreshWatchlist()
 
       return function cleanup() {
-        contentRoot.addEventListener("scroll", onScroll)
+        contentRoot.removeEventListener("scroll", onScroll)
       }
     }, [])
 
     // the DOM itself
     return (
-      <div className={styles.marketNavbar} style={{display:visible ? "flex" : "none"}} ref={rootRef}>
+      <div className={styles.marketNavbar} style={{opacity:visible ? 1: 0, zIndex: visible ? 10 : -1}} ref={rootRef}>
         <div className={styles.marketNavbarMenu}>
           <div className={styles.marketNavbarButton}>
             <Link style={{color:"#b5b5b6", fontWeight: "600"}} to='/market/list/token' >Tokens</Link>

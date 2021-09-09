@@ -55,6 +55,8 @@ const watchlistManagerPool = new WatchlistManager("pool")
 function MarketPoolList(props){
     const [poolDisplayNumber, setPoolDisplayNumber] = useState(10)
     const [watchlistPool, setWatchlistPool] = useState([])
+    const [poolSortAscending, setPoolSortAscending] = useState(true)
+    const [watchlistSortAscending, setWatchlistSortAscending] = useState(true)
 
     let refreshWatchlist = () => {
       let poolWatchlistData = watchlistManagerPool.getData()
@@ -73,8 +75,8 @@ function MarketPoolList(props){
             <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool} refreshWatchlist={refreshWatchlist}/>
             <h2>Watchlist</h2>
             <Table 
-              dataSource={watchlistPool} 
-              columns={columnsPool.filter(item => item.visible == true)} 
+              dataSource={sortTable(watchlistPool, "tvl", watchlistSortAscending)} 
+              columns={columnsPool(watchlistSortAscending, () => {setWatchlistSortAscending(!watchlistSortAscending)}).filter(item => item.visible == true)} 
               pagination={false}
               style={{
               marginBottom: "20px"
@@ -87,8 +89,8 @@ function MarketPoolList(props){
             />
             <h2>All Pools</h2>
             <Table 
-                dataSource={sortTable(dataSourcePool, "tvl", true).slice(0, poolDisplayNumber + 1)} 
-                columns={columnsPool.filter(item => item.visible == true)} 
+                dataSource={sortTable(dataSourcePool, "tvl", poolSortAscending).slice(0, poolDisplayNumber + 1)} 
+                columns={columnsPool(poolSortAscending, () => {setPoolSortAscending(!poolSortAscending)}).filter(item => item.visible == true)} 
                 pagination={false}
                 style={{
                 marginBottom: "20px"
