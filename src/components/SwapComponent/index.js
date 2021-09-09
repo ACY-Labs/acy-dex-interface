@@ -31,7 +31,7 @@ import tokenList from '@/constants/TokenList';
 
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import {
   ACYSwapErrorStatus,
@@ -147,6 +147,16 @@ const SwapComponent = props => {
   useEffect(() => {
     // activate(injected);
   }, []);
+
+  const [favTokenList, setFavTokenList] = useState([])
+
+  const setTokenAsFav = (index) => {
+    setFavTokenList((prevState) => {
+      const prevFavTokenList = [...prevState]
+      prevFavTokenList.push(tokenList[index])
+      return prevFavTokenList
+    })
+  }
 
   // token1Amount is changed according to token0Amount
   const t0Changed = useCallback(
@@ -293,6 +303,33 @@ const SwapComponent = props => {
     },
     [account]
   );
+
+  const onCoinClick = async () => {
+    onCancel();
+    if (before) {
+      if (account == undefined) {
+        alert('please connect to your account');
+      } else {
+        setToken0(token);
+        console.log('GETTING BALANCES');
+        console.log(chainId);
+        setToken0Balance(
+          await getUserTokenBalance(token, chainId, account, library)
+        );
+        setToken0BalanceShow(true);
+      }
+    } else {
+      if (account == undefined) {
+        alert('please connect to your account');
+      } else {
+        setToken1(token);
+        setToken1Balance(
+          await getUserTokenBalance(token, chainId, account, library)
+        );
+        setToken1BalanceShow(true);
+      }
+    }
+  }
 
   const onClickCoin = () => {
     setVisible(true);
@@ -441,37 +478,25 @@ const SwapComponent = props => {
                     data={token}
                     key={index}
                     customIcon={false}
-                    selectToken={async () => {
-                      onCancel();
-                      if (before) {
-                        if (account == undefined) {
-                          alert('please connect to your account');
-                        } else {
-                          setToken0(token);
-                          console.log('GETTING BALANCES');
-                          console.log(chainId);
-                          setToken0Balance(
-                            await getUserTokenBalance(token, chainId, account, library)
-                          );
-                          setToken0BalanceShow(true);
-                        }
-                      } else {
-                        if (account == undefined) {
-                          alert('please connect to your account');
-                        } else {
-                          setToken1(token);
-                          setToken1Balance(
-                            await getUserTokenBalance(token, chainId, account, library)
-                          );
-                          setToken1BalanceShow(true);
-                        }
-                      }
-                    }}
+                    setAsFav={() => setTokenAsFav(index)}
+                    selectToken={onCoinClick}
                   />
                 );
               })}
             </AcyTabPane>
-            <AcyTabPane tab="Favorite" key="2" />
+            <AcyTabPane tab="Favorite" key="2">
+              {favTokenList.map((supToken, index) => (
+                <AcyCoinItem
+                  data={supToken}
+                  key={index}
+                  selectToken={onCoinClick}
+                  customIcon={false}
+                  index={index}
+                  setAsFav={() => setTokenAsFav(index)}
+                  hideFavButton
+                />
+              ))}
+            </AcyTabPane>
           </AcyTabs>
         </div>
       </AcyModal>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Icon, Input } from 'antd';
 import styles from '@/pages/Dao/components/StakeSection.less';
 import { AcyCoinItem, AcyIcon, AcyModal, AcyTabs } from '@/components/Acy';
@@ -16,6 +16,8 @@ const TokenSelection = (
     tokenPercentage,
     updateTokenPercentage,
     selectToken,
+    favTokenList,
+    setTokenAsFav
   }
 ) => {
   return (
@@ -47,10 +49,14 @@ const TokenSelection = (
           <AcyTabs>
             <AcyTabPane tab="All" key="1">
               {tokenList.map((supToken, index) => (
-                <AcyCoinItem data={supToken} key={index} selectToken={selectToken} customIcon={false} />
+                <AcyCoinItem data={supToken} key={index} selectToken={selectToken} customIcon={false} index={index} setAsFav={() => setTokenAsFav(index)} />
               ))}
             </AcyTabPane>
-            <AcyTabPane tab="Favorite" key="2" />
+            <AcyTabPane tab="Favorite" key="2">
+              {favTokenList.map((supToken, index) => (
+                <AcyCoinItem data={supToken} key={index} selectToken={selectToken} customIcon={false} index={index} setAsFav={() => setTokenAsFav(index)} hideFavButton />
+              ))}
+            </AcyTabPane>
           </AcyTabs>
         </div>
       </AcyModal>
