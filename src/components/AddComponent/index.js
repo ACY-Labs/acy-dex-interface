@@ -32,6 +32,7 @@ import { sortAddress } from '@/utils/utils';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { useState, useEffect, useCallback } from 'react';
+import tokenList from '@/constants/TokenList';
 
 import {
   supportedTokens,
@@ -519,10 +520,11 @@ const MyComponent = props => {
         <div className={styles.coinList}>
           <AcyTabs>
             <AcyTabPane tab="All" key="1">
-              {supportedTokens.map((token, index) => (
+              {tokenList.map((token, index) => (
                 <AcyCoinItem
                   data={token}
                   key={index}
+                  customIcon={false}
                   selectToken={async () => {
                     onCancel();
                     if (before) {

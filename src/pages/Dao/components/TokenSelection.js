@@ -2,7 +2,7 @@ import React from 'react';
 import { Icon, Input } from 'antd';
 import styles from '@/pages/Dao/components/StakeSection.less';
 import { AcyCoinItem, AcyIcon, AcyModal, AcyTabs } from '@/components/Acy';
-import SampleToken from '@/pages/Dao/sample_data/SampleToken';
+import tokenList from '@/constants/TokenList';
 import placeholder from '../placeholder-round.png';
 
 const { AcyTabPane } = AcyTabs
@@ -46,7 +46,7 @@ const TokenSelection = (
         <div className={styles.coinList}>
           <AcyTabs>
             <AcyTabPane tab="All" key="1">
-              {SampleToken.map((supToken, index) => (
+              {tokenList.map((supToken, index) => (
                 <AcyCoinItem data={supToken} key={index} selectToken={selectToken} customIcon={false} />
               ))}
             </AcyTabPane>

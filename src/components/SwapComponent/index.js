@@ -27,6 +27,7 @@ import { Input } from 'antd';
 import { connect } from 'umi';
 import styles from './styles.less';
 import { sortAddress } from '@/utils/utils';
+import tokenList from '@/constants/TokenList';
 
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
@@ -46,7 +47,6 @@ import {
   INITIAL_ALLOWED_SLIPPAGE,
   isZero,
   ROUTER_ADDRESS,
-  supportedTokens,
 } from '@/acy-dex-swap/utils/index';
 
 import { swapGetEstimated, swap } from '@/acy-dex-swap/components/SwapComponent';
@@ -435,11 +435,12 @@ const SwapComponent = props => {
         <div className={styles.coinList}>
           <AcyTabs>
             <AcyTabPane tab="All" key="1">
-              {supportedTokens.map((token, index) => {
+              {tokenList.map((token, index) => {
                 return (
                   <AcyCoinItem
                     data={token}
                     key={index}
+                    customIcon={false}
                     selectToken={async () => {
                       onCancel();
                       if (before) {

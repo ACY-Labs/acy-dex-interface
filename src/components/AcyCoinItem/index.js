@@ -15,7 +15,7 @@ const AcyCoinItem = ({ data, children, selectToken, customIcon = true, ...rest }
             <AcyIcon name="eth" />
           ) : (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '24px' }}>
-              <img src={data.logoURI || placeholder} alt={data.symbol} style={{ height: '24px' }} />
+              <img src={data.logoURI || placeholder} alt={data.symbol} style={{ maxHeight: '24px', maxWidth: '24px' }} />
             </div>
           )}
         </li>
