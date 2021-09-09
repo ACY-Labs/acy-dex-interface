@@ -224,7 +224,7 @@ export const MarketSearchBar  = (props) => {
 
     const onScroll = (e) => {
       let scrollValue = e.target.scrollTop
-      if (scrollValue > 20) setVisible(false)
+      if (scrollValue > 200) setVisible(false)
       else setVisible(true)
     }
 
