@@ -16,6 +16,7 @@ import {
 import AddComponent from '@/components/AddComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
+
 const { AcyTabPane } = AcyTabs;
 
 @connect(({ profile, loading }) => ({
@@ -29,26 +30,25 @@ class BasicProfile extends Component {
     visibleLoading: false,
     tabIndex: 1,
   };
+
   componentDidMount() {}
 
-  lineTitleRender = () => {
-    return [
-      <div>
-        <div className={styles.maintitle}>
-          <span className={styles.lighttitle}>ETH</span>/BTC
-        </div>
-        <div className={styles.secondarytitle}>
-          <span className={styles.lighttitle}>212.123</span>{' '}
-          <span className={styles.percentage}>+12.45%</span> 2021.07.11
-        </div>
-      </div>,
-      <AcyPeriodTime
-        onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
-        className={styles.pt}
-        times={['1D', '7D', '1M', '1Y', 'All']}
-      />,
-    ];
-  };
+  lineTitleRender = () => [
+    <div>
+      <div className={styles.maintitle}>
+        <span className={styles.lighttitle}>ETH</span>/BTC
+      </div>
+      <div className={styles.secondarytitle}>
+        <span className={styles.lighttitle}>212.123</span>{' '}
+        <span className={styles.percentage}>+12.45%</span> 2021.07.11
+      </div>
+    </div>,
+    <AcyPeriodTime
+      onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
+      className={styles.pt}
+      times={['1D', '7D', '1M', '1Y', 'All']}
+    />,
+  ];
 
   // 时间段选择
   onhandPeriodTimeChoose = pt => {
@@ -73,11 +73,13 @@ class BasicProfile extends Component {
       visibleConfirmOrder: !!falg,
     });
   };
+
   onChangeTabs = e => {
     this.setState({
       tabIndex: e,
     });
   };
+
   render() {
     const { visible, visibleConfirmOrder, visibleLoading, tabIndex } = this.state;
     return (

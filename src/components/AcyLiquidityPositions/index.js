@@ -1,3 +1,4 @@
+/* eslint-disable react/react-in-jsx-scope */
 import { useState, useEffect, useMemo } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import styles from './styles.less';
@@ -11,6 +12,7 @@ import {
 import { Fetcher, Percent, Token, TokenAmount } from '@uniswap/sdk';
 import TokenSelection from '@/pages/Dao/components/TokenSelection';
 import AcyRemoveLiquidityModal from '@/components/AcyRemoveLiquidityModal';
+import { isMobile } from 'react-device-detect';
 
 export async function getAllLiquidityPositions(tokens, chainId, library, account) {
   // we only want WETH
@@ -102,7 +104,7 @@ const AcyLiquidityPositions = () => {
       title: 'Pool',
       dataIndex: 'name',
       key: 'poolAddress',
-      width: 250,
+      className: 'leftAlignTableHeader',
       render: (text, record, index) => {
         let addressLength = record.poolAddress.length;
         return (
@@ -119,34 +121,46 @@ const AcyLiquidityPositions = () => {
           </div>
         );
       },
+      visible: true,
     },
     {
       title: 'My Liquidity',
       dataIndex: 'token0Amount',
+      key: 'token0Amount',
+      className: 'leftAlignTableHeader',
       render: (text, record, index) => (
         <div>
           <p>{record.token0Amount}</p>
           <p>{record.token1Amount}</p>
         </div>
       ),
+      visible: !isMobile,
     },
     {
       title: 'Pool Share',
       dataIndex: 'share',
+      className: 'leftAlignTableHeader',
+      key: 'share',
       render: (text, record, index) => <div>{record.share}</div>,
+      visible: true,
     },
     {
       title: 'Reserve',
+      key: 'token0Reserve',
       dataIndex: 'token0Reserve',
+      className: 'leftAlignTableHeader',
       render: (text, record, index) => (
         <div>
           <p>{record.token0Reserve}</p>
           <p>{record.token1Reserve}</p>
         </div>
       ),
+      visible: !isMobile,
     },
     {
       title: 'Operation',
+      key: 'poolAddress',
+
       render: (text, record, index) => (
         <div>
           <button
@@ -161,6 +175,7 @@ const AcyLiquidityPositions = () => {
           </button>
         </div>
       ),
+      visible: true,
     },
   ]);
 
@@ -182,15 +197,16 @@ const AcyLiquidityPositions = () => {
   );
 
   return (
-    <AcyCard>
+    <div>
       {loading ? (
         <h2>Loading...</h2>
       ) : (
         <>
           <Table
             id="liquidityPositionTable"
+            style={{ textAlign: 'left' }}
             dataSource={userLiquidityPositions}
-            columns={columns}
+            columns={columns.filter(item => item.visible)}
             pagination={false}
             locale={{
               emptyText: (
@@ -209,7 +225,7 @@ const AcyLiquidityPositions = () => {
           />
         </>
       )}
-    </AcyCard>
+    </div>
   );
 };
 
