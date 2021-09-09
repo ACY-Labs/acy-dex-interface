@@ -3,6 +3,7 @@ import DatePicker from 'react-datepicker';
 import styles from './StakeSection.less';
 import SampleToken from '@/pages/Dao/sample_data/SampleToken';
 import TokenSelection from '@/pages/Dao/components/TokenSelection';
+import tokenList from '@/constants/TokenList';
 
 const StakeSection = () => {
   const [stake, setStake] = useState(0)
@@ -89,6 +90,16 @@ const StakeSection = () => {
 
   const handleCancel1 = () => setIsModal1Visible(false);
   const handleCancel2 = () => setIsModal2Visible(false);
+
+  const [favTokenList, setFavTokenList] = useState([])
+
+  const setTokenAsFav = (index) => {
+    setFavTokenList((prevState) => {
+      const prevFavTokenList = [...prevState]
+      prevFavTokenList.push(tokenList[index])
+      return prevFavTokenList
+    })
+  }
 
   return (
     <div className={styles.stakeSection}>
@@ -186,6 +197,8 @@ const StakeSection = () => {
                 tokenPercentage={token1Percentage}
                 updateTokenPercentage={updateToken1Percentage}
                 selectToken={handleSelectToken1}
+                favTokenList={favTokenList}
+                setTokenAsFav={setTokenAsFav}
               />
               <TokenSelection
                 showModal={showModal2}
@@ -195,6 +208,8 @@ const StakeSection = () => {
                 tokenPercentage={token2Percentage}
                 updateTokenPercentage={updateToken2Percentage}
                 selectToken={handleSelectToken2}
+                favTokenList={favTokenList}
+                setTokenAsFav={setTokenAsFav}
               />
             </div>
             <div>
