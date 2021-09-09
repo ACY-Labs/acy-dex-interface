@@ -177,17 +177,19 @@ h3, h4{
         width: 100%;
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     }
-    .searchModal{
-        background: #373739;
-        border: solid 1px #eb5c20;
-        border-radius: 15px;
-        z-index:5;
-        padding: 20px;
-        .searchModalDivider{
-            background-color: #666666;
-        }
-    }
     
+    
+}
+
+.searchModal{
+    background: #373739;
+    border: solid 1px #eb5c20;
+    border-radius: 15px;
+    z-index:5;
+    padding: 20px;
+    .searchModalDivider{
+        background-color: #666666;
+    }
 }
 
 .searchInnerWrapper{
@@ -407,6 +409,10 @@ h3, h4{
     }
     .searchInnerWrapper {
         width:100%;
+    }
+    .searchModal{
+        height: 50vh;
+        overflow-y:scroll;
     }
 
 
