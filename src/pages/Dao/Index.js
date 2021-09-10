@@ -5,13 +5,15 @@
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { graphSampleData, graphSampleData2 } from './sample_data/SampleData';
 import React, { Component, forwardRef } from 'react';
-import { AcyLineChart, AcyBarChart, AcyPieChart } from '@/components/Acy';
+import { AcyLineChart, AcyBarChart, AcyPieChart, AcySmallButton } from '@/components/Acy';
 import styles from './styles.less';
 import stakeInfoStyles from './styles2.less';
 import 'react-datepicker/dist/react-datepicker.css';
 import SampleToken from './sample_data/SampleToken';
 import StakeHistoryTable from './components/StakeHistoryTable';
 import StakeSection from '@/pages/Dao/components/StakeSection';
+import styles2 from '../Market/styles.less';
+import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 
 export class Dao extends Component {
   state = {
@@ -41,26 +43,26 @@ export class Dao extends Component {
         </div>
         <div className={styles.stakeSectionMain}>
           <div className={styles.chartSection}>
-            <div className={styles.toggleChart}>
-              <div
-                onClick={() => {
-                  this.changeGraphData(0);
-                  this.setState({ activeGraphId: 0 });
-                }}
-                style={{ color: activeGraphId === 0 ? '#eb5c20' : '#b5b5b6' }}
-              >
-                ACY
-              </div>
-              <div
-                onClick={() => {
-                  this.changeGraphData(1);
-                  this.setState({ activeGraphId: 1 });
-                }}
-                style={{ marginLeft: 20, color: activeGraphId === 1 ? '#eb5c20' : '#b5b5b6' }}
-              >
-                Reward
-              </div>
-            </div>
+            <AcySmallButtonGroup
+              activeButton={activeGraphId}
+              buttonList={[
+                [
+                  'ACY',
+                  () => {
+                    this.changeGraphData(0);
+                    this.setState({ activeGraphId: 0 });
+                  }
+                ],
+                [
+                  'Reward',
+                  () => {
+                    this.changeGraphData(1);
+                    this.setState({ activeGraphId: 1 });
+                  }
+                ],
+              ]}
+              containerClass={styles.switchChartsSelector}
+            />
             {activeGraphId === 0 ? (
               <AcyBarChart backData={activeGraphData} />
             ) : (
@@ -82,35 +84,15 @@ export class Dao extends Component {
             <StakeHistoryTable />
           </div>
           <div className={styles.chartContainer}>
-            <div
-              style={{ display: 'flex', justifyContent: 'end', marginBottom: 30 }}
-              className={stakeInfoStyles.stakeDetails}
-            >
-              <span
-                onClick={() => {
-                  this.setState({ activeStakeInfoPanel: 0 });
-                }}
-                style={{ color: activeStakeInfoPanel === 0 ? '#eb5c20' : '#b5b5b6' }}
-              >
-                Allocation
-              </span>
-              <span
-                onClick={() => {
-                  this.setState({ activeStakeInfoPanel: 1 });
-                }}
-                style={{ color: activeStakeInfoPanel === 1 ? '#eb5c20' : '#b5b5b6' }}
-              >
-                sACY
-              </span>
-              <span
-                onClick={() => {
-                  this.setState({ activeStakeInfoPanel: 2 });
-                }}
-                style={{ color: activeStakeInfoPanel === 2 ? '#eb5c20' : '#b5b5b6' }}
-              >
-                Reward
-              </span>
-            </div>
+            <AcySmallButtonGroup
+              activeButton={activeStakeInfoPanel}
+              buttonList={[
+                ['Volume', () => this.setState({ activeStakeInfoPanel: 0 })],
+                ['TVL', () => this.setState({ activeStakeInfoPanel: 1 })],
+                ['Price', () => this.setState({ activeStakeInfoPanel: 2 })],
+              ]}
+              containerClass={styles.contentChartsSelector}
+            />
             {this.state.activeStakeInfoPanel === 0 && (
               <div className={stakeInfoStyles.stakeInfoTab}>
                 <AcyPieChart />

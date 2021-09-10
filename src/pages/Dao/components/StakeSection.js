@@ -4,6 +4,7 @@ import styles from './StakeSection.less';
 import SampleToken from '@/pages/Dao/sample_data/SampleToken';
 import TokenSelection from '@/pages/Dao/components/TokenSelection';
 import tokenList from '@/constants/TokenList';
+import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 
 const StakeSection = () => {
   const [stake, setStake] = useState(0)
@@ -24,6 +25,7 @@ const StakeSection = () => {
     ['year', 1, '1Y', false],
     ['year', 4, '4Y', false],
   ])
+  const [selectedPresetDate, setSelectedPresetDate] = useState(null)
 
   const updateStake = (newStake) => {
     let newStakeInt = newStake !== '' ? parseInt(newStake, 10) : ''
@@ -58,15 +60,12 @@ const StakeSection = () => {
     else if (type === 'year') newDate.setFullYear(newDate.getFullYear() + value);
     else return;
     setDate(newDate);
-    const presetDateCopy = [...presetDate]
-    for (let i = 0; i < presetDateCopy.length; i ++) presetDateCopy[i][3] = index === i
-    setPresetDate(presetDateCopy)
+    setSelectedPresetDate(index)
   };
 
   const datePickerChangeHandler = (newDate) => {
     setDate(newDate)
-    const presetDateCopy = [...presetDate]
-    for (let i = 0; i < presetDateCopy.length; i++) presetDateCopy[i][3] = false
+    setSelectedPresetDate(null)
   }
 
   const CustomDatePickerInput = forwardRef(({ value, onClick }, ref) => (
@@ -167,15 +166,18 @@ const StakeSection = () => {
                 />
               </div>
               <div className={styles.presetDurationContainer}>
-                {presetDate.map(([type, value, text, isSelected], index) => (
-                  <div
-                    style={isSelected ? { backgroundColor: '#EB5C20', color: 'white' } : null}
-                    className={styles.presetDurationSelection}
-                    onClick={() => updateDate(type, value, index)}
-                  >
-                    {text}
-                  </div>
-                ))}
+                <AcySmallButtonGroup
+                  activeButton={selectedPresetDate}
+                  buttonList={[
+                    ['1W', () => updateDate('week', 1, 0)],
+                    ['1M', () => updateDate('month', 1, 1)],
+                    ['3M', () => updateDate('month', 3, 2)],
+                    ['6M', () => updateDate('month', 6, 3)],
+                    ['1Y', () => updateDate('year', 1, 4)],
+                    ['4Y', () => updateDate('year', 4, 5)],
+                  ]}
+                  containerClass={styles.presetDurationSelection}
+                />
               </div>
             </div>
           </div>

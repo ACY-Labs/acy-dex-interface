@@ -11,11 +11,11 @@ export default class AcyTabs extends PureComponent {
       <div className="acytabs"  ref={node => {
         this.container = node;
       }}>
-        <Tabs  {...restProps}>
+        <Tabs  {...restProps} className={styles.tabContainer}>
           {children}
         </Tabs>
       </div>
-      
+
     );
   }
 }
