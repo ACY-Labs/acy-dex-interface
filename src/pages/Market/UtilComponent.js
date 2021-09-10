@@ -112,6 +112,9 @@ export class SmallTable extends React.Component {
           <Link style={{color:"#b5b5b6"}}  className={styles.coinName} to='/market/info/pool' style={{color: "#b5b5b6"}}>
             <span className={styles.coinName}>{entry.coin1}/{entry.coin2}</span>
           </Link>
+          <div className={styles.percentBadge} style={{marginLeft:"10px", fontSize:"14px", lineHeight:"15px"}}>
+              {entry.percent} %
+          </div>
           <AcyIcon name={watchlistManagerPool.getData().toString().includes([entry.coin1, entry.coin2, entry.percent].toString()) ? "star_active" : "star"} width={14} style={{marginLeft:"0.5rem"}} onClick={() => {this.toggleWatchlist("pool", [entry.coin1, entry.coin2, entry.percent])}}></AcyIcon>
         </div>
       )  
