@@ -1,0 +1,32 @@
+export default [
+  {
+    token1: 'AAVE',
+    token1Logo: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/AAVE.svg',
+    token1Reward: 0,
+    token2: 'BAL',
+    token2Logo: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/BAL.svg',
+    token2Reward: null,
+    totalApr: 89.02,
+    tvl: 144542966,
+  },
+  {
+    token1: 'BNT',
+    token1Logo: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/BNT.svg',
+    token1Reward: 0,
+    token2: 'COMP',
+    token2Logo: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/COMP.svg',
+    token2Reward: null,
+    totalApr: 110.82,
+    tvl: 99232200,
+  },
+  {
+    token1: 'BNT',
+    token1Logo: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/BNT.svg',
+    token1Reward: 0,
+    token2: 'COMP',
+    token2Logo: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/COMP.svg',
+    token2Reward: 0,
+    totalApr: 110.82,
+    tvl: 99232200,
+  },
+]
