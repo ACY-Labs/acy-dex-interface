@@ -42,7 +42,8 @@ import {
 
 import {
   MarketSearchBar,
-  SmallTable
+  SmallTable,
+  PoolTable
 } from './UtilComponent.js';
 
 import {
@@ -53,10 +54,7 @@ const {AcyTabPane } = AcyTabs;
 const watchlistManagerPool = new WatchlistManager("pool")
 
 function MarketPoolList(props){
-    const [poolDisplayNumber, setPoolDisplayNumber] = useState(10)
     const [watchlistPool, setWatchlistPool] = useState([])
-    const [poolSortAscending, setPoolSortAscending] = useState(true)
-    const [watchlistSortAscending, setWatchlistSortAscending] = useState(true)
 
     let refreshWatchlist = () => {
       let poolWatchlistData = watchlistManagerPool.getData()
@@ -73,34 +71,9 @@ function MarketPoolList(props){
     return (
         <div className={styles.marketRoot}>
             <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool} refreshWatchlist={refreshWatchlist}/>
-            <h2>Watchlist</h2>
-            <Table 
-              dataSource={sortTable(watchlistPool, "tvl", watchlistSortAscending)} 
-              columns={columnsPool(watchlistSortAscending, () => {setWatchlistSortAscending(!watchlistSortAscending)}).filter(item => item.visible == true)} 
-              pagination={false}
-              style={{
-              marginBottom: "20px"
-              }}
-              footer={() => (
-              <div className={styles.tableSeeMoreWrapper}>
-                  <a className={styles.tableSeeMore} onClick={() => {setTokenDisplayNumber(tokenDisplayNumber +  5)}}>See More...</a>
-              </div>
-              )} 
-            />
+            <PoolTable dataSourcePool={watchlistPool}></PoolTable>
             <h2>All Pools</h2>
-            <Table 
-                dataSource={sortTable(dataSourcePool, "tvl", poolSortAscending).slice(0, poolDisplayNumber + 1)} 
-                columns={columnsPool(poolSortAscending, () => {setPoolSortAscending(!poolSortAscending)}).filter(item => item.visible == true)} 
-                pagination={false}
-                style={{
-                marginBottom: "20px"
-                }}
-                footer={() => (
-                <div className={styles.tableSeeMoreWrapper}>
-                    <a className={styles.tableSeeMore} onClick={() => {setPoolDisplayNumber(poolDisplayNumber +  5)}}>See More...</a>
-                </div>
-                )} 
-            />
+            <PoolTable dataSourcePool={dataSourcePool}></PoolTable>
             <div style={{height:"40px"}}></div>
         </div>
     )

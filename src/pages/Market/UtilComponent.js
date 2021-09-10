@@ -26,7 +26,11 @@ import {
     TransactionType,
     abbrHash,
     abbrNumber,
-    isDesktop
+    isDesktop,
+    sortTable,
+    columnsCoin,
+    columnsPool,
+    transactionHeader
 } from './Util.js'
 
 import {
@@ -158,6 +162,86 @@ export class SmallTable extends React.Component {
       </table>      
     );
   }
+}
+
+export function TokenTable(props) {
+  const [tokenSortAscending, setTokenSortAscending] = useState(true)
+  const [tokenDisplayNumber, setTokenDisplayNumber] = useState(10)
+
+  return (
+      <Table 
+          dataSource={sortTable(props.dataSourceCoin, "tvl", tokenSortAscending).slice(0, tokenDisplayNumber + 1)} 
+          columns={columnsCoin(tokenSortAscending, () => {setTokenSortAscending(!tokenSortAscending)}).filter(item => item.visible == true)} 
+          pagination={false}
+          style={{
+          marginBottom: "20px"
+          }}
+          footer={() => (
+          <div className={styles.tableSeeMoreWrapper}>
+              <a className={styles.tableSeeMore} onClick={() => {setTokenDisplayNumber(tokenDisplayNumber +  5)}}>See More...</a>
+          </div>
+          )} 
+      />
+  )
+}
+
+export function PoolTable(props){
+  const [poolSortAscending, setPoolSortAscending] = useState(true)
+  const [poolDisplayNumber, setPoolDisplayNumber] = useState(10)
+
+  return (
+      <Table 
+        dataSource={sortTable(props.dataSourcePool, "tvl", poolSortAscending).slice(0, poolDisplayNumber + 1)} 
+        columns={columnsPool(poolSortAscending, () => {setPoolSortAscending(!poolSortAscending)}).filter(item => item.visible == true)} 
+        pagination={false}
+        style={{
+        marginBottom: "20px"
+        }}
+        footer={() => (
+        <div className={styles.tableSeeMoreWrapper}>
+            <a className={styles.tableSeeMore} onClick={() => {setPoolDisplayNumber(poolDisplayNumber +  5)}}>See More...</a>
+        </div>
+        )} 
+      />
+  )
+}
+
+export function TransactionTable(props){
+  const [transactionSortAscending, setTransactionSortAscending] = useState(true)
+  const [transactionView, setTransactionView ] = useState(TransactionType.ALL) 
+  const [transactionDisplayNumber, setTransactionDisplayNumber] = useState(10)
+
+  // event handler callbacks
+  const onClickTransaction = useCallback((e) => {
+      let destFilter = e.target.id
+      setTransactionView(destFilter)
+    }
+  );
+
+  const filterTransaction = (table, category) => {
+    if (category == TransactionType.ALL)
+      return table
+    else
+      return table.filter(item => item.type == category)
+  }
+
+// 
+
+  return (
+    <Table 
+      dataSource={sortTable(filterTransaction(props.dataSourceTransaction, transactionView, transactionSortAscending), "time", transactionSortAscending).slice(0, transactionDisplayNumber + 1)} 
+      columns={transactionHeader(transactionView, onClickTransaction, transactionSortAscending, () => {setTransactionSortAscending(!transactionSortAscending)}).filter(item => item.visible == true)} 
+      pagination={false}
+      style={{
+      marginBottom: "20px"
+      }}
+      footer={() => (
+      <div className={styles.tableSeeMoreWrapper}>
+          <a className={styles.tableSeeMore} onClick={() => {setTransactionDisplayNumber(transactionDisplayNumber +  5)}}>See More...</a>
+      </div>
+      )} 
+    />
+  )
 }
 
 // react functional component

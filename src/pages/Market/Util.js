@@ -77,7 +77,7 @@ export function isDesktop(){
 }
 
 
-export function columnsCoin(isAscending, onSortChange){
+export function columnsCoin(isAscending, onSortChange, currentKey){
 
     return [
         {
@@ -135,9 +135,10 @@ export function columnsCoin(isAscending, onSortChange){
             visible:true
         },
         {
+            
             title: <div className={styles.tableHeader}  onClick={onSortChange}>
                 TVL
-                <Icon type={!isAscending ? "up" : "down"} style={{fontSize:'14px', marginLeft:'4px'}}/>
+                {currentKey == 'tvl' && <Icon type={!isAscending ? "up" : "down"} style={{fontSize:'14px', marginLeft:'4px'}}/>}
                 </div>,
             dataIndex: 'tvl',
             key: 'tvl',
@@ -368,7 +369,7 @@ export function transactionHeader(selectedTransaction, onClickHandler, isAscendi
 
 // sort the table
 // Reverse means high to low
-export function sortTable(table, key, isReverse){
+function sortTableRegular(table, key, isReverse){
     return table.sort((a, b) => {
         if (isReverse){
             return b[key] - a[key]
@@ -379,7 +380,7 @@ export function sortTable(table, key, isReverse){
     })
 }
 
-export function sortTableTime(table, key, isReverse){
+function sortTableTime(table, key, isReverse){
     return table.sort((a, b) => {
         if (isReverse){
             return new Date(b[key]).getTime() - new Date(a[key]).getTime()
@@ -388,4 +389,14 @@ export function sortTableTime(table, key, isReverse){
             return new Date(a[key]).getTime() - new Date(b[key]).getTime()
         }
     })
+}
+
+
+
+// wrapper sort function
+export function sortTable(table, key, isReverse){
+    if (key == "time")
+        return sortTableTime(table, key, isReverse)
+    else
+        return sortTableRegular(table, key, isReverse)
 }

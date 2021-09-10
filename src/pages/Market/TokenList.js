@@ -42,7 +42,8 @@ import {
 
 import {
   MarketSearchBar,
-  SmallTable
+  SmallTable,
+  TokenTable
 } from './UtilComponent.js';
 
 import {
@@ -56,10 +57,7 @@ let sampleToken = dataSourceCoin[0]
 
 
 function MarketTokenList(props){
-  const [tokenDisplayNumber, setTokenDisplayNumber] = useState(10)
   const [watchlistToken, setWatchlistToken] = useState([])
-  const [tokenSortAscending, setTokenSortAscending] = useState(true)
-  const [watchlistSortAscending, setWatchlistSortAscending] = useState(true)
 
   let refreshWatchlist = () => {
     let tokenWatchlistData = watchlistManagerToken.getData()
@@ -77,33 +75,9 @@ function MarketTokenList(props){
       <div className={styles.marketRoot}>
       <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool} refreshWatchlist={refreshWatchlist}/>
         <h2>Watchlist</h2>
-          <Table 
-              dataSource={sortTable(watchlistToken, "tvl", watchlistSortAscending)} 
-              columns={columnsCoin(watchlistSortAscending, () => {setWatchlistSortAscending(!watchlistSortAscending)}).filter(item => item.visible == true)} 
-              pagination={false}
-              style={{
-              marginBottom: "20px"
-              }}
-              footer={() => (
-              <div className={styles.tableSeeMoreWrapper}>
-                  <a className={styles.tableSeeMore} onClick={() => {setTokenDisplayNumber(tokenDisplayNumber +  5)}}>See More...</a>
-              </div>
-              )} 
-          />
+          <TokenTable dataSourceCoin={watchlistToken}></TokenTable>
           <h2>All Tokens</h2>
-          <Table 
-              dataSource={sortTable(dataSourceCoin, "tvl", tokenSortAscending).slice(0, tokenDisplayNumber + 1)} 
-              columns={columnsCoin(tokenSortAscending, () => {setTokenSortAscending(!tokenSortAscending)}).filter(item => item.visible == true)} 
-              pagination={false}
-              style={{
-              marginBottom: "20px"
-              }}
-              footer={() => (
-              <div className={styles.tableSeeMoreWrapper}>
-                  <a className={styles.tableSeeMore} onClick={() => {setTokenDisplayNumber(tokenDisplayNumber +  5)}}>See More...</a>
-              </div>
-              )} 
-          />
+          <TokenTable dataSourceCoin={dataSourceCoin}></TokenTable>
           <div style={{height:"40px"}}></div>
       </div> 
   )

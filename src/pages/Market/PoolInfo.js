@@ -44,7 +44,8 @@ import {
 
 import {
   MarketSearchBar,
-  SmallTable
+  SmallTable,
+  TransactionTable
 } from './UtilComponent.js';
 
 const {AcyTabPane } = AcyTabs;
@@ -53,24 +54,7 @@ let samplePool = dataSourcePool[0]
 
 function MarketPoolInfo(props){
     const [tokenData, setTokenData] = useState(samplePool)
-    const [transactionView, setTransactionView ] = useState(TransactionType.ALL) 
     const [graphTabIndex, setGraphTabIndex] = useState(0)
-    const [transactionDisplayNumber, setTransactionDisplayNumber] = useState(10)
-    const [transactionSortAscending, setTransactionSortAscending] = useState(true)
-
-    const filterTransaction = (table, category) => {
-        if (category == TransactionType.ALL)
-          return table
-        else
-          return table.filter(item => item.type == category)
-    }
-
-    // event handler callbacks
-    const onClickTransaction = useCallback((e) => {
-        let destFilter = e.target.id
-        setTransactionView(destFilter)
-      }
-    );
 
     function switchChart(dest) {
         setGraphTabIndex(dest)
@@ -241,19 +225,7 @@ function MarketPoolInfo(props){
             </div>
 
             <h2>Transactions</h2>
-            <Table 
-                dataSource={sortTableTime(filterTransaction(dataSourceTransaction, transactionView, transactionSortAscending), "time", transactionSortAscending).slice(0, transactionDisplayNumber + 1)} 
-                columns={transactionHeader(transactionView, onClickTransaction, transactionSortAscending, () => {setTransactionSortAscending(!transactionSortAscending)}).filter(item => item.visible == true)} 
-                pagination={false}
-                style={{
-                marginBottom: "20px"
-                }}
-                footer={() => (
-                <div className={styles.tableSeeMoreWrapper}>
-                    <a className={styles.tableSeeMore} onClick={() => {setTransactionDisplayNumber(transactionDisplayNumber +  5)}}>See More...</a>
-                </div>
-                )} 
-            />
+            <TransactionTable dataSourceTransaction={dataSourceTransaction}></TransactionTable>
             <div style={{height:"40px"}}></div>
         </div>
     )

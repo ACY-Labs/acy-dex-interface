@@ -27,8 +27,6 @@ import {
   TransactionType,
   abbrHash,
   abbrNumber,
-  columnsCoin, 
-  columnsPool,
   transactionHeader,
   sortTable,
   sortTableTime
@@ -44,7 +42,9 @@ import {
 
 import {
   MarketSearchBar,
-  SmallTable
+  SmallTable,
+  PoolTable,
+  TransactionTable
 } from './UtilComponent.js';
 
 
@@ -54,26 +54,7 @@ let sampleToken = dataSourceCoin[0]
 
 function MarketTokenInfo(props){
     const [tokenData, setTokenData] = useState(sampleToken)
-    const [transactionView, setTransactionView ] = useState(TransactionType.ALL) 
     const [graphTabIndex, setGraphTabIndex] = useState(0)
-    const [poolDisplayNumber, setPoolDisplayNumber] = useState(10)
-    const [transactionDisplayNumber, setTransactionDisplayNumber] = useState(10)
-    const [poolSortAscending, setPoolSortAscending] = useState(false)
-    const [transactionSortAscending, setTransactionSortAscending] = useState(true)
-
-    const filterTransaction = (table, category) => {
-        if (category == TransactionType.ALL)
-          return table
-        else
-          return table.filter(item => item.type == category)
-    }
-
-    // event handler callbacks
-    const onClickTransaction = useCallback((e) => {
-        let destFilter = e.target.id
-        setTransactionView(destFilter)
-      }
-    );
 
     function switchChart(dest) {
         setGraphTabIndex(dest)
@@ -217,34 +198,10 @@ function MarketTokenInfo(props){
             </div>
             
             <h2>Pools</h2>
-            <Table 
-                dataSource={sortTable(dataSourcePool, "tvl", poolSortAscending).slice(0, poolDisplayNumber + 1)} 
-                columns={columnsPool(poolSortAscending, () => {setPoolSortAscending(!poolSortAscending)}).filter(item => item.visible == true)} 
-                pagination={false}
-                style={{
-                marginBottom: "20px"
-                }}
-                footer={() => (
-                <div className={styles.tableSeeMoreWrapper}>
-                    <a className={styles.tableSeeMore} onClick={() => {setPoolDisplayNumber(poolDisplayNumber +  5)}}>See More...</a>
-                </div>
-                )} 
-            />
+            <PoolTable dataSourcePool={dataSourcePool}></PoolTable>
             
             <h2>Transactions</h2>
-            <Table 
-                dataSource={sortTableTime(filterTransaction(dataSourceTransaction, transactionView, transactionSortAscending), "time", transactionSortAscending).slice(0, transactionDisplayNumber + 1)} 
-                columns={transactionHeader(transactionView, onClickTransaction, transactionSortAscending, () => {setTransactionSortAscending(!transactionSortAscending)}).filter(item => item.visible == true)} 
-                pagination={false}
-                style={{
-                marginBottom: "20px"
-                }}
-                footer={() => (
-                <div className={styles.tableSeeMoreWrapper}>
-                    <a className={styles.tableSeeMore} onClick={() => {setTransactionDisplayNumber(transactionDisplayNumber +  5)}}>See More...</a>
-                </div>
-                )} 
-            />
+            <TransactionTable dataSourceTransaction={dataSourceTransaction}></TransactionTable>
             <div style={{height:"40px"}}></div>
         </div>
     )

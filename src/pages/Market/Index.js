@@ -25,11 +25,8 @@ import {
   TransactionType,
   abbrHash,
   abbrNumber,
-  columnsCoin, 
-  columnsPool,
   transactionHeader,
-  sortTable,
-  sortTableTime
+  sortTable
 } from './Util.js';
 
 import {
@@ -42,79 +39,23 @@ import {
 
 import {
   MarketSearchBar,
-  SmallTable
+  SmallTable,
+  TokenTable,
+  PoolTable,
+  TransactionTable
 } from './UtilComponent.js';
 
 
-export class BasicProfile extends Component {
+
+export class MarketIndex extends Component {
     constructor(props){
       super(props)
-      this.rootElemRef = React.createRef();
     }
 
     state = {
         visible: true,
-        visibleNavbar: true,
         tabIndex: 0,
-        transactionView: TransactionType.ALL,
-        tokenDisplayNumber: 10,
-        poolDisplayNumber: 10,
-        transactionDisplayNumber: 10,
-        tokenSortAscending: false, 
-        poolSortAscending: false,
-        transactionSortAscending: true
     }
-
-    componentDidMount() {
-      window.addEventListener("scroll", () => {
-        console.log(window)
-      })
-    };
-
-    componentWillUnmount() {
-      window.removeEventListener("scroll", () => {
-        console.log(window)
-      })
-    }
-
-    onClickTransaction = (e) => {
-
-      let destFilter = e.target.id
-      
-      this.setState({
-        transactionView : e.target.id
-      })
-    };
-
-    expandTokenTable =  () => {
-      let tokenDisplayNumber = this.state.tokenDisplayNumber + 5
-      this.setState({
-        tokenDisplayNumber: tokenDisplayNumber
-      })
-    }
-
-    expandTransactionTable =  () => {
-      let transactionDisplayNumber = this.state.transactionDisplayNumber + 5
-      this.setState({
-        transactionDisplayNumber: transactionDisplayNumber
-      })
-    }
-
-    expandPoolTable =  () => {
-      let poolDisplayNumber = this.state.poolDisplayNumber + 5
-      this.setState({
-        poolDisplayNumber: poolDisplayNumber
-      })
-    }
-
-    filterTransaction(table, category){
-      if (category == TransactionType.ALL)
-        return table
-      else
-        return table.filter(item => item.type == category)
-    };
-
-
 
     render() {
         // const outsideClickRef = useDetectClickOutside({ onTriggered: this.onSearchBlur });
@@ -158,20 +99,7 @@ export class BasicProfile extends Component {
                     </Link>
                   </h3>
                 </div>
-                <Table 
-                  dataSource={sortTable(dataSourceCoin, "tvl", !this.state.tokenSortAscending).slice(0, this.state.tokenDisplayNumber + 1)} 
-                  columns={columnsCoin(this.state.tokenSortAscending, () => {this.setState({tokenSortAscending : !this.state.tokenSortAscending})}).filter(item => item.visible == true)} 
-                  pagination={false}
-                  style={{
-                    marginBottom: "20px"
-                  }}
-                  footer={() => (
-                    <div className={styles.tableSeeMoreWrapper}>
-                      <a className={styles.tableSeeMore} onClick={this.expandTokenTable}>See More...</a>
-                    </div>
-                  )} 
-                />
-
+                <TokenTable dataSourceCoin={dataSourceCoin}></TokenTable>
                 <div style={{display:"flex", justifyContent:"space-between", alignItems:"baseline"}}>
                   <h2>Top Pools</h2>
                   <h3>
@@ -181,38 +109,14 @@ export class BasicProfile extends Component {
                   </h3>
                 </div>
 
-                <Table 
-                  dataSource={sortTable(dataSourcePool, "tvl", !this.state.poolSortAscending).slice(0, this.state.poolDisplayNumber + 1)} 
-                  columns={columnsPool(this.state.poolSortAscending, () => {this.setState({poolSortAscending : !this.state.poolSortAscending})}).filter(item => item.visible == true)} 
-                  pagination={false}
-                  style={{
-                    marginBottom: "20px"
-                  }}
-                  footer={() => (
-                    <div className={styles.tableSeeMoreWrapper}>
-                      <a className={styles.tableSeeMore} onClick={this.expandPoolTable}>See More...</a>
-                    </div>
-                  )} 
-                />
+                <PoolTable dataSourcePool={dataSourcePool}></PoolTable>
               
                 <h2>Transactions</h2>
-                <Table 
-                  dataSource={sortTableTime(this.filterTransaction(dataSourceTransaction, transactionView), "time", this.state.transactionSortAscending).slice(0, this.state.transactionDisplayNumber + 1)} 
-                  columns={transactionHeader(transactionView, this.onClickTransaction,this.state.transactionSortAscending, () => {this.setState({transactionSortAscending : !this.state.transactionSortAscending})}).filter(item => item.visible == true)} 
-                  pagination={false}
-                  style={{
-                    marginBottom: "20px"
-                  }}
-                  footer={() => (
-                    <div className={styles.tableSeeMoreWrapper}>
-                      <a className={styles.tableSeeMore} onClick={this.expandTransactionTable}>See More...</a>
-                    </div>
-                  )} 
-                />
+                <TransactionTable dataSourceTransaction={dataSourceTransaction}></TransactionTable>
             <div style={{height:"20px"}}></div>
             </div>
         )
     };
 }
 
-export default BasicProfile;
+export default MarketIndex;
