@@ -4,7 +4,7 @@ import { Table, Row, Col, Input, Divider, Breadcrumb } from 'antd';
 import styles from './styles.less';
 import moment from 'moment';
 import { useDetectClickOutside } from 'react-detect-click-outside';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import {
   AcyButton,
   AcyCard,
@@ -42,37 +42,90 @@ import {
 } from './SampleData.js';
 
 import { MarketSearchBar, SmallTable, TransactionTable } from './UtilComponent.js';
+import { WatchlistManager } from './WatchlistManager.js';
 
 const { AcyTabPane } = AcyTabs;
+const watchlistManagerPool = new WatchlistManager('pool');
+
 let poolData = dataSourcePool[0];
 
 function MarketPoolInfo(props) {
-  const [poolData, setpoolData] = useState(props.location.state.poolData);
+  let { address } = useParams();
+
+  const [poolData, setpoolData] = useState(
+    dataSourcePool.filter(item => item.address == address)[0]
+  );
   const [graphTabIndex, setGraphTabIndex] = useState(0);
+  const [isWatchlist, setIsWatchlist] = useState(false);
 
   function switchChart(dest) {
     setGraphTabIndex(dest);
   }
 
+  const toggleWatchlist = data => {
+    let oldArray = watchlistManagerPool.getData();
+    if (oldArray.toString().includes(data.toString())) {
+      oldArray = oldArray.filter(
+        item => !(item[0] == data[0] && item[1] == data[1]) && item[2] == data[2]
+      );
+      setIsWatchlist(false);
+    } else {
+      oldArray.push(data);
+      setIsWatchlist(true);
+    }
+    watchlistManagerPool.saveData(oldArray);
+  };
+
+  const updateWatchlistStatus = () => {
+    let data = watchlistManagerPool.getData();
+    if (data.toString() == [poolData.coin1, poolData.coin2, poolData.percent].toString())
+      setIsWatchlist(true);
+    else setIsWatchlist(false);
+  };
+
+  useEffect(() => {
+    // set the watchlists
+    updateWatchlistStatus();
+  }, []);
+
   return (
     <div className={styles.marketRoot}>
-      <MarketSearchBar dataSourceCoin={dataSourceCoin} dataSourcePool={dataSourcePool} />
-      <Breadcrumb
-        separator={<span style={{ color: '#b5b5b6' }}>&gt;</span>}
-        style={{ marginBottom: '20px', color: '#b5b5b6' }}
-      >
-        <Breadcrumb.Item>
-          <Link style={{ color: '#b5b5b6' }} to="/market">
-            Overview
-          </Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item>
-          <Link style={{ color: '#b5b5b6' }} to="/market/list/pool">
-            Pools
-          </Link>
-        </Breadcrumb.Item>
-        <Breadcrumb.Item style={{ fontWeight: 'bold' }}>{poolData.coin1}/{poolData.coin2} {poolData.percent}%</Breadcrumb.Item>
-      </Breadcrumb>
+      <MarketSearchBar
+        dataSourceCoin={dataSourceCoin}
+        dataSourcePool={dataSourcePool}
+        onRefreshWatchlist={() => {
+          updateWatchlistStatus();
+        }}
+      />
+      <div className={styles.infoHeader}>
+        <Breadcrumb
+          separator={<span style={{ color: '#b5b5b6' }}>&gt;</span>}
+          style={{ marginBottom: '20px', color: '#b5b5b6' }}
+        >
+          <Breadcrumb.Item>
+            <Link style={{ color: '#b5b5b6' }} to="/market">
+              Overview
+            </Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link style={{ color: '#b5b5b6' }} to="/market/list/pool">
+              Pools
+            </Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item style={{ fontWeight: 'bold' }}>
+            {poolData.coin1}/{poolData.coin2} {poolData.percent}%
+          </Breadcrumb.Item>
+        </Breadcrumb>
+        <div className={styles.rightButton}>
+          <AcyIcon
+            name={isWatchlist ? 'star_active' : 'star'}
+            style={{ marginLeft: '10px' }}
+            onClick={() => toggleWatchlist([poolData.coin1, poolData.coin2, poolData.percent])}
+          />
+          <AcyIcon name="redirect" style={{ marginLeft: '10px' }} />
+        </div>
+      </div>
+
       <div>
         <div className={styles.rightButton} />
       </div>
@@ -255,7 +308,13 @@ function MarketPoolInfo(props) {
       </div>
 
       <h2>Transactions</h2>
-      <TransactionTable dataSourceTransaction={dataSourceTransaction.filter(item => (item.coin1 == poolData.coin1 && item.coin2 == poolData.coin2) || (item.coin1 == poolData.coin2 && item.coin2 == poolData.coin1) )} />
+      <TransactionTable
+        dataSourceTransaction={dataSourceTransaction.filter(
+          item =>
+            (item.coin1 == poolData.coin1 && item.coin2 == poolData.coin2) ||
+            (item.coin1 == poolData.coin2 && item.coin2 == poolData.coin1)
+        )}
+      />
       <div style={{ height: '40px' }} />
     </div>
   );

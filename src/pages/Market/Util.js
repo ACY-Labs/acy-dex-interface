@@ -113,3 +113,9 @@ export function sortTable(table, key, isReverse) {
     return sortString(table, key, isReverse);
   else return sortTableRegular(table, key, isReverse);
 }
+
+// open link in new tab
+export const openInNewTab = url => {
+  const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+  if (newWindow) newWindow.opener = null;
+};

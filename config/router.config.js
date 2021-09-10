@@ -85,11 +85,11 @@ export default [
             component: './Market/PoolList',
           },
           {
-            path: '/market/info/token',
+            path: '/market/info/token/:address',
             component: './Market/TokenInfo',
           },
           {
-            path: '/market/info/pool',
+            path: '/market/info/pool/:address',
             component: './Market/PoolInfo',
           },
         ],
