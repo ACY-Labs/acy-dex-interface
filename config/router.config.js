@@ -59,6 +59,11 @@ export default [
         name: 'DAO',
         component: './Dao/Index',
       },
+      {
+        path: '/farms',
+        name: 'Farms',
+        component: './Farms/',
+      },
     ],
   },
   {
@@ -108,6 +113,11 @@ export default [
         path: '/dao',
         name: 'DAO',
         component: './Dao/Index',
+      },
+      {
+        path: '/farms',
+        name: 'Farms',
+        component: './Farms/',
       },
     ],
   },
@@ -159,7 +169,12 @@ export default [
         path: '/dao',
         name: 'DAO',
         component: './Dao/Index',
-      }
+      },
+      {
+        path: '/farms',
+        name: 'Farms',
+        component: './Farms/',
+      },
     ]
   },
   // the rest of the pages except dao uses basic layout
@@ -210,6 +225,11 @@ export default [
         path: '/dao',
         name: 'DAO',
         component: './Dao/Index',
+      },
+      {
+        path: '/farms',
+        name: 'Farms',
+        component: './Farms/',
       },
 
       // {

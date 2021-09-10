@@ -1,0 +1,121 @@
+// Farms Container
+
+.farmsContainer {
+  padding: 0 1.25rem;
+
+  .tableToggleButtonContainer {
+    margin-bottom: 1.5rem;
+  }
+}
+
+// Table Container
+
+.tableContainer {
+  background-color: #29292c;
+  border-radius: 0.5rem;
+
+  .tableBodyContainer {
+    padding: 0 0.5rem 0.5rem 0.5rem;
+  }
+}
+
+// Table Header Container
+
+.tableHeaderContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+
+  .tableHeaderTitleContainer {
+
+  }
+
+  .tableHeaderButtonContainer {
+    display: flex;
+    align-items: center;
+
+    .tableHeaderRadioButtonContainer {
+      margin-right: 0.5rem;
+    }
+
+    .tableHeaderSearchInputContainer {
+      .searchInput {
+        border: none;
+        background-color: #1b1b1c;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        margin-right: 0.5rem;
+      }
+    }
+  }
+}
+
+// Table Row Container
+
+.tableBodyRowContainer {
+  background-color: #1b1b1c;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+
+  .tableBodyRowContentContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .tableBodyTitleColContainer {
+      flex: 5;
+      display: flex;
+
+      .token1LogoContainer,
+      .token2LogoContainer {
+        width: 1.5rem;
+        height: 1.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        img {
+          max-width: 100%;
+          max-height: 100%;
+        }
+      }
+    }
+
+    .tableBodyRewardColContainer {
+      flex: 3;
+    }
+
+    .tableBodyAprColContainer {
+      flex: 3;
+    }
+
+    .tableBodyTvlColContainer {
+      flex: 3;
+    }
+
+    .tableBodyArrowColContainer {
+      flex: 1;
+      text-align: right;
+
+      .arrowIcon {
+        max-width: 1.25rem;
+        max-height: 1.25rem;
+      }
+    }
+  }
+
+  &:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  .tableBodyDrawerContainer {
+    border-top: 1px solid #29292c;
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+  }
+}
