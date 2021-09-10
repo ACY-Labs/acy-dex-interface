@@ -14,3 +14,29 @@
   }
  }
 }
+
+/* width */
+.tabContainer::-webkit-scrollbar {
+  width: 7.5px;
+}
+
+/* Track */
+.tabContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+.tabContainer::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 0.5rem;
+}
+
+/* Handle on hover */
+.tabContainer::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.tabContainer {
+  overflow-y: auto;
+  max-height: 28rem;
+}
