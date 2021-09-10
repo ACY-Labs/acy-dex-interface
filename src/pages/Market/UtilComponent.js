@@ -244,7 +244,16 @@ export function TokenTable(props) {
               <Link
                 style={{ color: '#b5b5b6' }}
                 className={styles.coinName}
-                to="/market/info/token"
+                to={
+                  {
+                    pathname: "/market/info/token",
+                    state: {
+                      tokenData: entry
+                    }
+                  }
+                }
+                
+                tokenData={entry}
               >
                 {entry.short}
               </Link>
@@ -426,7 +435,14 @@ export function PoolTable(props) {
             <div className={styles.tableDataFirstColumn}>
               <AcyIcon name={entry.coin1.toLowerCase()} width={20} height={20} />
               <AcyIcon name={entry.coin2.toLowerCase()} width={20} height={20} />
-              <Link style={{ color: '#b5b5b6' }} className={styles.coinName} to="/market/info/pool">
+              <Link style={{ color: '#b5b5b6' }} className={styles.coinName} 
+              to={{
+                pathname: "/market/info/pool",
+                state: {
+                  poolData: entry
+                }
+              }
+              }>
                 <span className={styles.coinName}>
                   {entry.coin1}/{entry.coin2}
                 </span>

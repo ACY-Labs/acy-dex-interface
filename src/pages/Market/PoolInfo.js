@@ -44,10 +44,10 @@ import {
 import { MarketSearchBar, SmallTable, TransactionTable } from './UtilComponent.js';
 
 const { AcyTabPane } = AcyTabs;
-let samplePool = dataSourcePool[0];
+let poolData = dataSourcePool[0];
 
 function MarketPoolInfo(props) {
-  const [tokenData, setTokenData] = useState(samplePool);
+  const [poolData, setpoolData] = useState(props.location.state.poolData);
   const [graphTabIndex, setGraphTabIndex] = useState(0);
 
   function switchChart(dest) {
@@ -71,7 +71,7 @@ function MarketPoolInfo(props) {
             Pools
           </Link>
         </Breadcrumb.Item>
-        <Breadcrumb.Item style={{ fontWeight: 'bold' }}>USDC/ETH</Breadcrumb.Item>
+        <Breadcrumb.Item style={{ fontWeight: 'bold' }}>{poolData.coin1}/{poolData.coin2} {poolData.percent}%</Breadcrumb.Item>
       </Breadcrumb>
       <div>
         <div className={styles.rightButton} />
@@ -86,19 +86,19 @@ function MarketPoolInfo(props) {
       >
         <div className={styles.contentInfo}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <AcyIcon name={samplePool.coin1.toLowerCase()} width={36} height={36} />
-            <AcyIcon name={samplePool.coin2.toLowerCase()} width={36} height={36} />
+            <AcyIcon name={poolData.coin1.toLowerCase()} width={36} height={36} />
+            <AcyIcon name={poolData.coin2.toLowerCase()} width={36} height={36} />
             <span
-              style={{ fontSize: '26px', fontWeight: 'thin', marginLeft: '10px' }}
+              style={{ fontSize: '26px', fontWeight: 'bold', marginLeft: '10px' }}
               className={styles.coinName}
             >
-              {samplePool.coin1}/{samplePool.coin2}
+              {poolData.coin1}/{poolData.coin2}
             </span>
             <div
               className={styles.percentBadge}
               style={{ marginLeft: '20px', fontSize: '18px', lineHeight: '20px' }}
             >
-              {samplePool.percent} %
+              {poolData.percent} %
             </div>
           </div>
         </div>
@@ -129,18 +129,18 @@ function MarketPoolInfo(props) {
             className={styles.exchangeValueCard}
             style={{ display: 'flex', alignItems: 'center' }}
           >
-            <AcyIcon name={samplePool.coin1.toLowerCase()} width={20} />
+            <AcyIcon name={poolData.coin1.toLowerCase()} width={20} />
             <strong style={{ marginLeft: '10px' }}>
-              1 {samplePool.coin1} = {abbrNumber(0.00001)} {samplePool.coin2}
+              1 {poolData.coin1} = {abbrNumber(0.00001)} {poolData.coin2}
             </strong>
           </div>
           <div
             className={styles.exchangeValueCard}
             style={{ display: 'flex', alignItems: 'center' }}
           >
-            <AcyIcon name={samplePool.coin2.toLowerCase()} width={20} />
+            <AcyIcon name={poolData.coin2.toLowerCase()} width={20} />
             <strong style={{ marginLeft: '10px' }}>
-              1 {samplePool.coin2} = {abbrNumber(274047502)} {samplePool.coin1}
+              1 {poolData.coin2} = {abbrNumber(274047502)} {poolData.coin1}
             </strong>
           </div>
         </div>
@@ -168,14 +168,14 @@ function MarketPoolInfo(props) {
           </div>
           <div className={styles.statEntry}>
             <div className={styles.statEntryName}>TVL</div>
-            <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.tvl)}</div>
+            <div className={styles.statEntryValue}>$ {abbrNumber(poolData.tvl)}</div>
             <div className={styles.statEntryChange} style={{ color: 'greenyellow' }}>
               5.12%
             </div>
           </div>
           <div className={styles.statEntry}>
             <div className={styles.statEntryName}>24h Trading Vol</div>
-            <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.volume24h)}</div>
+            <div className={styles.statEntryValue}>$ {abbrNumber(poolData.volume24h)}</div>
             <div className={styles.statEntryChange} style={{ color: 'red' }}>
               {' '}
               - 5.12%
@@ -183,7 +183,7 @@ function MarketPoolInfo(props) {
           </div>
           <div className={styles.statEntry}>
             <div className={styles.statEntryName}>24h Fees</div>
-            <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.volume24h)}</div>
+            <div className={styles.statEntryValue}>$ {abbrNumber(poolData.volume24h)}</div>
           </div>
         </div>
         <div className={styles.contentCharts}>
@@ -255,7 +255,7 @@ function MarketPoolInfo(props) {
       </div>
 
       <h2>Transactions</h2>
-      <TransactionTable dataSourceTransaction={dataSourceTransaction} />
+      <TransactionTable dataSourceTransaction={dataSourceTransaction.filter(item => (item.coin1 == poolData.coin1 && item.coin2 == poolData.coin2) || (item.coin1 == poolData.coin2 && item.coin2 == poolData.coin1) )} />
       <div style={{ height: '40px' }} />
     </div>
   );

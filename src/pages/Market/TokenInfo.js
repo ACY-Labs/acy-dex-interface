@@ -53,7 +53,7 @@ let sampleToken = dataSourceCoin[0]
 
 
 function MarketTokenInfo(props){
-    const [tokenData, setTokenData] = useState(sampleToken)
+    const [tokenData, setTokenData] = useState(props.location.state.tokenData)
     const [graphTabIndex, setGraphTabIndex] = useState(0)
 
     function switchChart(dest) {
@@ -70,7 +70,7 @@ function MarketTokenInfo(props){
                 <Breadcrumb.Item>
                     <Link style={{color:"#b5b5b6"}} to='/market/list/pool' >Tokens</Link>
                 </Breadcrumb.Item >
-                <Breadcrumb.Item style={{fontWeight:"bold"}}>ETH</Breadcrumb.Item>
+                <Breadcrumb.Item style={{fontWeight:"bold"}}>{tokenData.short}</Breadcrumb.Item>
             </Breadcrumb>
             <div>
                 <div className={styles.rightButton}></div>
@@ -79,8 +79,8 @@ function MarketTokenInfo(props){
                 <div className={styles.contentInfo}>
                     <div style={{display:"flex", alignItems:"center"}}>
                         <AcyIcon name={tokenData.short.toLowerCase()} width={36} height={36}/>
-                        <span style={{fontSize:"26px", fontWeight: "bold"}}>{tokenData.name}</span>
-                        <span style={{fontSize:"26px", fontWeight: "thin", marginLeft:"10px"}}>({tokenData.short})</span>
+                        <span style={{fontSize:"26px", fontWeight: "bold", marginLeft:"10px"}}>{tokenData.short}</span>
+                        <span style={{fontSize:"26px", fontWeight: "thin", marginLeft:"10px"}}>({tokenData.name})</span>
                     </div>
                     <div>
                         <span style={{fontSize:"30px", fontWeight: "bold"}}> 
@@ -198,10 +198,10 @@ function MarketTokenInfo(props){
             </div>
             
             <h2>Pools</h2>
-            <PoolTable dataSourcePool={dataSourcePool}></PoolTable>
+            <PoolTable dataSourcePool={dataSourcePool.filter((item) => item.coin1 == tokenData.short || item.coin2 == tokenData.short)}></PoolTable>
             
             <h2>Transactions</h2>
-            <TransactionTable dataSourceTransaction={dataSourceTransaction}></TransactionTable>
+            <TransactionTable dataSourceTransaction={dataSourceTransaction.filter((item) => item.coin1 == tokenData.short || item.coin2 == tokenData.short)}></TransactionTable>
             <div style={{height:"40px"}}></div>
         </div>
     )
