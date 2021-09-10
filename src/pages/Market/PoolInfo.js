@@ -101,20 +101,6 @@ function MarketPoolInfo(props){
                             {samplePool.percent} %
                         </div>
                     </div>
-                    <div classname={styles.exchangeValueWrapper} style={{display:"flex", alignItems:"center", marginTop:"20px"}}>
-                        <div className={styles.exchangeValueCard} style={{display:"flex", alignItems:"center"}}>
-                            <AcyIcon name={samplePool.coin1.toLowerCase()} width={30} height={30}/>
-                            <strong>
-                                1 {samplePool.coin1} = {abbrNumber(0.00001)} {samplePool.coin2}
-                            </strong>
-                        </div>
-                        <div className={styles.exchangeValueCard} style={{display:"flex", alignItems:"center"}}>
-                            <AcyIcon name={samplePool.coin2.toLowerCase()} width={30} height={30}/>
-                            <strong>
-                                1 {samplePool.coin2} = {abbrNumber(274047502)} {samplePool.coin1}
-                            </strong>
-                        </div>
-                    </div>
                 </div>
                 <div className={styles.contentCta}>
                     <div className={styles.ctaButton}>
@@ -136,6 +122,22 @@ function MarketPoolInfo(props){
                             >
                                Trade
                         </AcySmallButton>
+                    </div>
+                </div>
+            </div>
+            <div className={styles.exchangeValuePadder}>
+                <div className={styles.exchangeValueWrapper} style={{display:"flex", flexDirection:"column",alignItems:"flex-start", marginTop:"20px"}}>
+                    <div className={styles.exchangeValueCard} style={{display:"flex", alignItems:"center"}}>
+                        <AcyIcon name={samplePool.coin1.toLowerCase()} width={20}/>
+                        <strong style={{marginLeft:"10px"}}>
+                            1 {samplePool.coin1} = {abbrNumber(0.00001)} {samplePool.coin2}
+                        </strong>
+                    </div>
+                    <div className={styles.exchangeValueCard} style={{display:"flex", alignItems:"center"}}>
+                        <AcyIcon name={samplePool.coin2.toLowerCase()} width={20}/>
+                        <strong style={{marginLeft:"10px"}}>
+                            1 {samplePool.coin2} = {abbrNumber(274047502)} {samplePool.coin1}
+                        </strong>
                     </div>
                 </div>
             </div>
