@@ -213,11 +213,28 @@ export class SmallTable extends React.Component {
 export function TokenTable(props) {
   const [tokenSortAscending, setTokenSortAscending] = useState(true);
   const [tokenDisplayNumber, setTokenDisplayNumber] = useState(10);
+  const [currentKey, setCurrentKey] = useState('');
 
-  function columnsCoin(isAscending, onSortChange, currentKey) {
+  function columnsCoin(isAscending, onSortChange) {
     return [
       {
-        title: <div className={styles.tableHeaderFirst}>Name</div>,
+        title: (
+          <div
+            className={styles.tableHeaderFirst}
+            onClick={() => {
+              setCurrentKey('name');
+              onSortChange();
+            }}
+          >
+            Name
+            {currentKey == 'name' && (
+              <Icon
+                type={!isAscending ? 'up' : 'down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
         dataIndex: 'name',
         key: 'name',
         render: (text, entry) => {
@@ -238,7 +255,23 @@ export function TokenTable(props) {
         visible: true,
       },
       {
-        title: <div className={styles.tableHeader}>Price</div>,
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('price');
+              onSortChange();
+            }}
+          >
+            Price
+            {currentKey == 'price' && (
+              <Icon
+                type={!isAscending ? 'up' : 'down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
         dataIndex: 'price',
         key: 'price',
         render: (text, entry) => {
@@ -247,14 +280,30 @@ export function TokenTable(props) {
         visible: isDesktop(),
       },
       {
-        title: <div className={styles.tableHeader}>Price Change</div>,
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('priceChange');
+              onSortChange();
+            }}
+          >
+            Price Change
+            {currentKey == 'priceChange' && (
+              <Icon
+                type={!isAscending ? 'up' : 'down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
         dataIndex: 'priceChange',
         key: 'priceChange',
         render: priceChange => {
           return (
             <div className={styles.tableData}>
               <span className={priceChange < 0 ? styles.priceChangeDown : styles.priceChangeUp}>
-                {priceChange.toFixed(2)}
+                {priceChange.toFixed(2)} %
               </span>
             </div>
           );
@@ -262,7 +311,23 @@ export function TokenTable(props) {
         visible: isDesktop(),
       },
       {
-        title: <div className={styles.tableHeader}>Volume 24H</div>,
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('volume24h');
+              onSortChange();
+            }}
+          >
+            Volume 24H
+            {currentKey == 'volume24h' && (
+              <Icon
+                type={!isAscending ? 'up' : 'down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
         dataIndex: 'volume24h',
         key: 'volume24h',
         render: (text, entry) => {
@@ -272,7 +337,13 @@ export function TokenTable(props) {
       },
       {
         title: (
-          <div className={styles.tableHeader} onClick={onSortChange}>
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('tvl');
+              onSortChange();
+            }}
+          >
             TVL
             {currentKey == 'tvl' && (
               <Icon
@@ -294,7 +365,7 @@ export function TokenTable(props) {
 
   return (
     <Table
-      dataSource={sortTable(props.dataSourceCoin, 'tvl', tokenSortAscending).slice(
+      dataSource={sortTable(props.dataSourceCoin, currentKey, tokenSortAscending).slice(
         0,
         tokenDisplayNumber + 1
       )}
@@ -307,14 +378,18 @@ export function TokenTable(props) {
       }}
       footer={() => (
         <div className={styles.tableSeeMoreWrapper}>
-          <a
-            className={styles.tableSeeMore}
-            onClick={() => {
-              setTokenDisplayNumber(tokenDisplayNumber + 5);
-            }}
-          >
-            See More...
-          </a>
+          {props.dataSourceCoin.slice(
+        0,
+        tokenDisplayNumber + 1
+      ).length > tokenDisplayNumber && <a
+      className={styles.tableSeeMore}
+      onClick={() => {
+        setTokenDisplayNumber(tokenDisplayNumber + 5);
+      }}
+    >
+      See More...
+    </a>}
+          
         </div>
       )}
     />
@@ -324,11 +399,28 @@ export function TokenTable(props) {
 export function PoolTable(props) {
   const [poolSortAscending, setPoolSortAscending] = useState(true);
   const [poolDisplayNumber, setPoolDisplayNumber] = useState(10);
+  const [currentKey, setCurrentKey] = useState('');
 
   function columnsPool(isAscending, onSortChange) {
     return [
       {
-        title: <div className={styles.tableHeaderFirst}>Pool</div>,
+        title: (
+          <div
+            className={styles.tableHeaderFirst}
+            onClick={() => {
+              setCurrentKey('percent');
+              onSortChange();
+            }}
+          >
+            Pool
+            {currentKey == 'percent' && (
+              <Icon
+                type={!isAscending ? 'up' : 'down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
         dataIndex: 'pool',
         key: 'pool',
         render: (text, entry) => {
@@ -354,12 +446,20 @@ export function PoolTable(props) {
       },
       {
         title: (
-          <div className={styles.tableHeader} onClick={onSortChange}>
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('tvl');
+              onSortChange();
+            }}
+          >
             TVL
-            <Icon
-              type={!isAscending ? 'up' : 'down'}
-              style={{ fontSize: '14px', marginLeft: '4px' }}
-            />
+            {currentKey == 'tvl' && (
+              <Icon
+                type={!isAscending ? 'up' : 'down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
           </div>
         ),
         dataIndex: 'tvl',
@@ -370,7 +470,23 @@ export function PoolTable(props) {
         visible: isDesktop(),
       },
       {
-        title: <div className={styles.tableHeader}>Volume 24H</div>,
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('volume24h');
+              onSortChange();
+            }}
+          >
+            Volume 24H
+            {currentKey == 'volume24h' && (
+              <Icon
+                type={!isAscending ? 'up' : 'down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
         dataIndex: 'volume24h',
         key: 'volume24h',
         render: (text, entry) => {
@@ -379,7 +495,23 @@ export function PoolTable(props) {
         visible: true,
       },
       {
-        title: <div className={styles.tableHeader}>Volume 7D</div>,
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('volume7d');
+              onSortChange();
+            }}
+          >
+            Volume 7D
+            {currentKey == 'volume7d' && (
+              <Icon
+                type={!isAscending ? 'up' : 'down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
         dataIndex: 'volume7d',
         key: 'volume7d',
         render: (text, entry) => {
@@ -392,7 +524,7 @@ export function PoolTable(props) {
 
   return (
     <Table
-      dataSource={sortTable(props.dataSourcePool, 'tvl', poolSortAscending).slice(
+      dataSource={sortTable(props.dataSourcePool, currentKey, poolSortAscending).slice(
         0,
         poolDisplayNumber + 1
       )}
@@ -405,14 +537,16 @@ export function PoolTable(props) {
       }}
       footer={() => (
         <div className={styles.tableSeeMoreWrapper}>
-          <a
-            className={styles.tableSeeMore}
-            onClick={() => {
-              setPoolDisplayNumber(poolDisplayNumber + 5);
-            }}
-          >
-            See More...
-          </a>
+          {props.dataSourcePool.slice(0, poolDisplayNumber + 1).length > poolDisplayNumber && (
+            <a
+              className={styles.tableSeeMore}
+              onClick={() => {
+                setPoolDisplayNumber(poolDisplayNumber + 5);
+              }}
+            >
+              See More...
+            </a>
+          )}
         </div>
       )}
     />
@@ -423,6 +557,7 @@ export function TransactionTable(props) {
   const [transactionSortAscending, setTransactionSortAscending] = useState(true);
   const [transactionView, setTransactionView] = useState(TransactionType.ALL);
   const [transactionDisplayNumber, setTransactionDisplayNumber] = useState(10);
+  const [currentKey, setCurrentKey] = useState('');
 
   // header for the transaction table
   function transactionHeader(selectedTransaction, onClickHandler, isAscending, onSortChange) {
@@ -488,7 +623,23 @@ export function TransactionTable(props) {
         visible: true,
       },
       {
-        title: <div className={styles.tableHeader}>Total Value</div>,
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('totalValue');
+              onSortChange();
+            }}
+          >
+            Total Value
+            {currentKey == 'totalValue' && (
+              <Icon
+                type={!isAscending ? 'up' : 'down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
         dataIndex: 'totalValue',
         key: 'totalValue',
         render: (text, entry) => {
@@ -497,7 +648,23 @@ export function TransactionTable(props) {
         visible: isDesktop(),
       },
       {
-        title: <div className={styles.tableHeader}>Token Amount</div>,
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('coin1Amount');
+              onSortChange();
+            }}
+          >
+            Token Amount
+            {currentKey == 'coin1Amount' && (
+              <Icon
+                type={!isAscending ? 'up' : 'down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
         dataIndex: 'coin1Amount',
         key: 'coin1Amount',
         render: (text, entry) => {
@@ -510,7 +677,23 @@ export function TransactionTable(props) {
         visible: isDesktop(),
       },
       {
-        title: <div className={styles.tableHeader}>Token Amount</div>,
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('coin2Amount');
+              onSortChange();
+            }}
+          >
+            Token Amount
+            {currentKey == 'coin2Amount' && (
+              <Icon
+                type={!isAscending ? 'up' : 'down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
         dataIndex: 'coin2Amount',
         key: 'coin2Amount',
         render: (text, entry) => {
@@ -523,7 +706,23 @@ export function TransactionTable(props) {
         visible: isDesktop(),
       },
       {
-        title: <div className={styles.tableHeader}>Account</div>,
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('account');
+              onSortChange();
+            }}
+          >
+            Account
+            {currentKey == 'account' && (
+              <Icon
+                type={!isAscending ? 'up' : 'down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
         dataIndex: 'account',
         key: 'account',
         render: (text, entry) => {
@@ -537,12 +736,20 @@ export function TransactionTable(props) {
       },
       {
         title: (
-          <div className={styles.tableHeader} onClick={onSortChange}>
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('time');
+              onSortChange();
+            }}
+          >
             Time
-            <Icon
-              type={!isAscending ? 'up' : 'down'}
-              style={{ fontSize: '14px', marginLeft: '4px' }}
-            />
+            {currentKey == 'time' && (
+              <Icon
+                type={!isAscending ? 'up' : 'down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
           </div>
         ),
         dataIndex: 'time',
@@ -576,8 +783,8 @@ export function TransactionTable(props) {
   return (
     <Table
       dataSource={sortTable(
-        filterTransaction(props.dataSourceTransaction, transactionView, transactionSortAscending),
-        'time',
+        filterTransaction(props.dataSourceTransaction, transactionView),
+        currentKey,
         transactionSortAscending
       ).slice(0, transactionDisplayNumber + 1)}
       columns={transactionHeader(
@@ -594,14 +801,19 @@ export function TransactionTable(props) {
       }}
       footer={() => (
         <div className={styles.tableSeeMoreWrapper}>
-          <a
-            className={styles.tableSeeMore}
-            onClick={() => {
-              setTransactionDisplayNumber(transactionDisplayNumber + 5);
-            }}
-          >
-            See More...
-          </a>
+          {filterTransaction(props.dataSourceTransaction, transactionView).slice(
+            0,
+            transactionDisplayNumber + 1
+          ).length > transactionDisplayNumber && (
+            <a
+              className={styles.tableSeeMore}
+              onClick={() => {
+                setTransactionDisplayNumber(transactionDisplayNumber + 5);
+              }}
+            >
+              See More...
+            </a>
+          )}
         </div>
       )}
     />

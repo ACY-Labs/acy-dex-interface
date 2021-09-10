@@ -96,8 +96,20 @@ function sortTableTime(table, key, isReverse) {
   });
 }
 
+function sortString(table, key, isReverse) {
+  return table.sort((a, b) => {
+    if (isReverse) {
+      return b[key].localeCompare(a[key]);
+    } else {
+      return a[key].localeCompare(b[key]);
+    }
+  });
+}
+
 // wrapper sort function
 export function sortTable(table, key, isReverse) {
   if (key == 'time') return sortTableTime(table, key, isReverse);
+  else if (key == 'name' || key == 'coin1' || key == 'coin2' || key == 'account')
+    return sortString(table, key, isReverse);
   else return sortTableRegular(table, key, isReverse);
 }
