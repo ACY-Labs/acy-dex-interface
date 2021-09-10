@@ -4,18 +4,17 @@
 // save only COIN shorthands for tokens
 // save only the pair name for the POOL
 export class WatchlistManager {
-    constructor(mode){
-        this.mode = mode
-        if (!localStorage.getItem(this.mode))
-            localStorage.setItem(this.mode, JSON.stringify([]))
-    }
-    getMode(){
-        return this.mode
-    }
-    getData() {
-        return JSON.parse(localStorage.getItem(this.mode))
-    }
-    saveData(data) {
-        localStorage.setItem(this.mode, JSON.stringify(data))
-    }
+  constructor(mode) {
+    this.mode = mode;
+    if (!localStorage.getItem(this.mode)) localStorage.setItem(this.mode, JSON.stringify([]));
+  }
+  getMode() {
+    return this.mode;
+  }
+  getData() {
+    return JSON.parse(localStorage.getItem(this.mode));
+  }
+  saveData(data) {
+    localStorage.setItem(this.mode, JSON.stringify(data));
+  }
 }
