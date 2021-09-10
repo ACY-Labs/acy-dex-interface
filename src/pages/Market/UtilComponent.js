@@ -378,18 +378,16 @@ export function TokenTable(props) {
       }}
       footer={() => (
         <div className={styles.tableSeeMoreWrapper}>
-          {props.dataSourceCoin.slice(
-        0,
-        tokenDisplayNumber + 1
-      ).length > tokenDisplayNumber && <a
-      className={styles.tableSeeMore}
-      onClick={() => {
-        setTokenDisplayNumber(tokenDisplayNumber + 5);
-      }}
-    >
-      See More...
-    </a>}
-          
+          {props.dataSourceCoin.slice(0, tokenDisplayNumber + 1).length > tokenDisplayNumber && (
+            <a
+              className={styles.tableSeeMore}
+              onClick={() => {
+                setTokenDisplayNumber(tokenDisplayNumber + 5);
+              }}
+            >
+              See More...
+            </a>
+          )}
         </div>
       )}
     />
