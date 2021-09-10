@@ -40,7 +40,7 @@
             flex: 1;
             display: flex;
             background-color: #1B1B1C;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
             align-items: center;
             justify-content: center;
             padding: 0.5rem;
@@ -306,24 +306,10 @@
 
     .presetDurationContainer {
       width: 100%;
-      display: flex;
 
       .presetDurationSelection {
-        flex: 1;
-        color: #b5b6b6;
-        background-color: #4c4c4d;
-        border-radius: 0.3rem;
-        padding: 0;
-        text-align: center;
-      }
-
-      .presetDurationSelection:not(:first-child) {
-        margin-left: 0.5rem;
-      }
-
-      .presetDurationSelection:hover {
-        background-color: #5f5f5f;
-        cursor: pointer;
+        width: 100%;
+        display: flex;
       }
     }
   }
@@ -331,15 +317,18 @@
 
 .datePickerInput {
   color: #b5b6b6;
-  background-color: #4c4c4d;
-  border: none;
+  background-color: #1B1B1C;
+  border: 1px solid #40444f99;
   border-radius: 0.3rem;
   font-size: 1rem;
-  padding: 0 1rem;
+  padding: 0.25rem 1.5rem;
+  box-shadow: 0 0 0 1pt transparent;
+  margin-bottom: 0.5rem;
 }
 
 .datePickerInput:hover {
-  background-color: #5f5f5f;
+  box-shadow: 0 0 0 1pt #EB5C20;
+  transition: .1s;
   cursor: pointer;
 }
 

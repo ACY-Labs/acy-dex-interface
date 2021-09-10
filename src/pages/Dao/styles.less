@@ -32,8 +32,17 @@
   background-color: #29292C;
   border-radius: 15px;
   margin: 0px 15px 0px 0px;
-  padding: 15px 15px 0px 15px;
+  padding: 55px 15px 0px 15px;
   overflow: hidden;
+  height: 450px;
+  position: relative;
+
+  .switchChartsSelector{
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+
   .graphStats {
     padding: 0;
     margin-bottom: 5px;
@@ -55,7 +64,7 @@
 
 .createProposalContainer {
   text-align: end;
-  padding: 0 20px 0.5rem 0;
+  padding: 0 20px 1rem 0;
 
   .createProposalButton {
     background-color: #4c4c4d;
@@ -73,7 +82,22 @@
 }
 
 .chartContainer {
-  padding-top: 30px;
+  margin-top: 3rem;
+  padding-top: 5rem;
+  position: relative;
+}
+
+.contentChartsSelector{
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+@media (max-width: 768px) {
+  .contentChartsSelector {
+    right: 50%;
+    transform: translate(50%, 0);
+  }
 }
 
 @media (max-width: 768px) {
@@ -101,7 +125,7 @@
   }
 
   .chartContainer {
-    padding: 2rem 2rem 0 2rem;
+    padding: 5rem 2rem 0 2rem;
   }
 }
 
