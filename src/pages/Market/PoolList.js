@@ -60,13 +60,13 @@ function MarketPoolList(props){
 
     let refreshWatchlist = () => {
       let poolWatchlistData = watchlistManagerPool.getData()
-      let newWatchlistPool = dataSourcePool.filter(item => poolWatchlistData.toString().includes([item.coin1, item.coin2].toString()))
+      let newWatchlistPool = dataSourcePool.filter(item => poolWatchlistData.toString().includes([item.coin1, item.coin2, item.percent].toString()))
       setWatchlistPool([...newWatchlistPool])
     }
   
     useEffect(() => {
       let poolWatchlistData = watchlistManagerPool.getData()
-      let newWatchlistPool = dataSourcePool.filter(item => poolWatchlistData.toString().includes([item.coin1, item.coin2].toString()))
+      let newWatchlistPool = dataSourcePool.filter(item => poolWatchlistData.toString().includes([item.coin1, item.coin2, item.percent].toString()))
       setWatchlistPool([...newWatchlistPool])
     }, [])
   

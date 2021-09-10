@@ -1,6 +1,6 @@
 import React, { Component, useState, useCallback } from 'react'
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { Table,  Row, Col,Input, Divider, Icon} from 'antd';
+import { Table,  Row, Col,Input, Divider, Icon, Badge} from 'antd';
 import styles from './styles.less';
 import moment from 'moment'
 import {Link} from 'react-router-dom'
@@ -167,6 +167,9 @@ export function columnsPool(isAscending, onSortChange) {
                         <Link style={{color:"#b5b5b6"}}  className={styles.coinName} to='/market/info/pool' >
                             <span className={styles.coinName}>{entry.coin1}/{entry.coin2}</span>
                         </Link>
+                        <div className={styles.percentBadge} style={{marginLeft:"10px", fontSize:"14px", lineHeight:"15px"}}>
+                            {entry.percent} %
+                        </div>
                     </div>
                 )
             },

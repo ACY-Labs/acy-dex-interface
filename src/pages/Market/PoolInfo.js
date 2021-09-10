@@ -97,6 +97,9 @@ function MarketPoolInfo(props){
                         <AcyIcon name={samplePool.coin1.toLowerCase()} width={36} height={36}/>
                         <AcyIcon name={samplePool.coin2.toLowerCase()} width={36} height={36}/>
                         <span style={{fontSize:"26px", fontWeight: "thin", marginLeft:"10px"}} className={styles.coinName}>{samplePool.coin1}/{samplePool.coin2}</span>
+                        <div className={styles.percentBadge} style={{marginLeft:"20px", fontSize:"18px", lineHeight:"20px"}}>
+                            {samplePool.percent} %
+                        </div>
                     </div>
                     <div classname={styles.exchangeValueWrapper} style={{display:"flex", alignItems:"center", marginTop:"20px"}}>
                         <div className={styles.exchangeValueCard} style={{display:"flex", alignItems:"center"}}>
