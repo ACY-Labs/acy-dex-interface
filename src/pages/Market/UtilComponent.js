@@ -761,10 +761,10 @@ export function TransactionTable(props) {
         key: 'time',
         render: (text, entry) => {
           function getRelTime(timeString) {
-            let a = moment(new Date(timeString));
+            let a = moment(new Date(timeString)).locale("en");
             return a.fromNow();
           }
-
+          
           return <div className={styles.tableData}>{getRelTime(text)}</div>;
         },
         visible: true,

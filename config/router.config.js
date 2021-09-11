@@ -96,8 +96,8 @@ export default [
           {
             path: '/market/info/pool/:address',
             component: './Market/PoolInfo',
-          },
-        ],
+          }
+        ]
       },
       {
         path: '/exchange',
