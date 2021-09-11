@@ -3,6 +3,53 @@
 .farmsContainer {
   padding: 0 1.25rem;
 
+  .tableControlButtonContainer {
+    display: flex;
+    justify-content: space-between;
+
+    .tableHeaderButtonContainer {
+      display: flex;
+      align-items: center;
+
+      .tableHeaderRadioButtonContainer {
+        margin-right: 0.5rem;
+      }
+
+      .tableHeaderSearchInputContainer {
+        .searchInput {
+          border: none;
+          background-color: #1b1b1c;
+          padding: 0.25rem 0.5rem;
+          border-radius: 0.25rem;
+          margin-right: 0.5rem;
+        }
+      }
+
+      .tableHeaderToggleButtonContainer {
+        .activeToggleButton,
+        .endedToggleButton {
+          border: none;
+          background-color: #1b1b1c;
+          padding: 0.25rem 0.5rem;
+
+          &:hover {
+            background-color: #29292c;
+            cursor: pointer;
+          }
+        }
+
+        .activeToggleButton {
+          border-radius: 0.25rem 0 0 0.25rem;
+        }
+
+        .endedToggleButton {
+          border-left: 1px solid #29292c;
+          border-radius: 0 0.25rem 0.25rem 0;
+        }
+      }
+    }
+  }
+
   .tableToggleButtonContainer {
     margin-bottom: 1.5rem;
   }
@@ -23,7 +70,6 @@
 
 .tableHeaderContainer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 1rem;
 
@@ -35,25 +81,6 @@
 
     .tableHeaderSubtitle {
       font-weight: lighter;
-    }
-  }
-
-  .tableHeaderButtonContainer {
-    display: flex;
-    align-items: center;
-
-    .tableHeaderRadioButtonContainer {
-      margin-right: 0.5rem;
-    }
-
-    .tableHeaderSearchInputContainer {
-      .searchInput {
-        border: none;
-        background-color: #1b1b1c;
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
-        margin-right: 0.5rem;
-      }
     }
   }
 }

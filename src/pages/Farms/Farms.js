@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import styles from './Farms.less'
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import FarmsTable from './FarmsTable';
-import farmsTableContent from '@/pages/Farms/FarmsTableContent';
+import farmsTableContent from './FarmsTableContent';
+import ToggleButtonGroup from './ToggleButtonGroup';
+import Switch from '@material-ui/core/Switch';
+import { FormControlLabel } from '@material-ui/core';
 
 const Farms = () => {
   const INITIAL_TABLE_DATA = farmsTableContent.map((row) => {
@@ -13,6 +16,7 @@ const Farms = () => {
 
   const [selectedTable, setSelectedTable] = useState(0)
   const [tableRow, setTableRow] = useState(INITIAL_TABLE_DATA)
+  const [searchInput, setSearchInput] = useState('')
 
   const onRowClick = (index) => setTableRow((prevState) => {
     const prevTableRow = [ ...prevState ]
@@ -42,31 +46,35 @@ const Farms = () => {
   return (
     <PageHeaderWrapper>
       <div className={styles.farmsContainer}>
-        <div className={styles.tableToggleButtonContainer}>
-          <button
-            type="button"
-            className={styles.firstToggleButton}
-            style={{ borderColor: selectedTable === 0 && '#1d5e91' }}
-            onClick={onAllToggleButtonClick}
-          >
-            All
-          </button>
-          <button
-            type="button"
-            className={styles.middleToggleButton}
-            style={{ borderColor: selectedTable === 1 && '#1d5e91' }}
-            onClick={onAcyToggleButtonClick}
-          >
-            ACY
-          </button>
-          <button
-            type="button"
-            className={styles.lastToggleButton}
-            style={{ borderColor: selectedTable === 2 && '#1d5e91' }}
-            onClick={onPremierToggleButtonClick}
-          >
-            Premier
-          </button>
+        <div className={styles.tableControlButtonContainer}>
+          <ToggleButtonGroup
+            selectedTable={selectedTable}
+            onAllToggleButtonClick={onAllToggleButtonClick}
+            onAcyToggleButtonClick={onAcyToggleButtonClick}
+            onPremierToggleButtonClick={onPremierToggleButtonClick}
+          />
+          <div className={styles.tableHeaderButtonContainer}>
+            <div className={styles.tableHeaderRadioButtonContainer}>
+              <FormControlLabel
+                control={<Switch name="checkedA" color="default" />}
+                label="Stake Only"
+                labelPlacement="start"
+              />
+            </div>
+            <div className={styles.tableHeaderSearchInputContainer}>
+              <input
+                type="text"
+                placeholder="Search by token symbol"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className={styles.searchInput}
+              />
+            </div>
+            <div className={styles.tableHeaderToggleButtonContainer}>
+              <button type="button" className={styles.activeToggleButton}>Active</button>
+              <button type="button" className={styles.endedToggleButton}>Ended</button>
+            </div>
+          </div>
         </div>
         <FarmsTable
           tableRow={tableRow}

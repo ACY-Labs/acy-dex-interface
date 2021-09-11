@@ -55,14 +55,14 @@ export default [
         component: './Liquidity/Index',
       },
       {
-        path: '/dao',
-        name: 'DAO',
-        component: './Dao/Index',
-      },
-      {
         path: '/farms',
         name: 'Farms',
         component: './Farms/',
+      },
+      {
+        path: '/dao',
+        name: 'DAO',
+        component: './Dao/Index',
       },
     ],
   },
@@ -111,14 +111,14 @@ export default [
         component: './Liquidity/Index',
       },
       {
-        path: '/dao',
-        name: 'DAO',
-        component: './Dao/Index',
-      },
-      {
         path: '/farms',
         name: 'Farms',
         component: './Farms/',
+      },
+      {
+        path: '/dao',
+        name: 'DAO',
+        component: './Dao/Index',
       },
     ],
   },
@@ -166,14 +166,14 @@ export default [
         component: './Liquidity/Index',
       },
       {
-        path: '/dao',
-        name: 'DAO',
-        component: './Dao/Index',
-      },
-      {
         path: '/farms',
         name: 'Farms',
         component: './Farms/',
+      },
+      {
+        path: '/dao',
+        name: 'DAO',
+        component: './Dao/Index',
       },
     ],
   },
@@ -222,14 +222,14 @@ export default [
         component: './Liquidity/Index',
       },
       {
-        path: '/dao',
-        name: 'DAO',
-        component: './Dao/Index',
-      },
-      {
         path: '/farms',
         name: 'Farms',
         component: './Farms/',
+      },
+      {
+        path: '/dao',
+        name: 'DAO',
+        component: './Dao/Index',
       },
     ]
   },
@@ -278,14 +278,14 @@ export default [
         component: './Liquidity/Index',
       },
       {
-        path: '/dao',
-        name: 'DAO',
-        component: './Dao/Index',
-      },
-      {
         path: '/farms',
         name: 'Farms',
         component: './Farms/',
+      },
+      {
+        path: '/dao',
+        name: 'DAO',
+        component: './Dao/Index',
       },
 
       // {

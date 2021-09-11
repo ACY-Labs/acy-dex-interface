@@ -5,14 +5,10 @@ import FarmsTableRow from '@/pages/Farms/FarmsTableRow';
 import FarmsTableHeader from '@/pages/Farms/FarmsTableHeader';
 
 const FarmsTable = ({ tableRow, onRowClick }) => {
-  const [searchInput, setSearchInput] = useState('')
 
   return (
     <div className={styles.tableContainer}>
-      <FarmsTableHeader
-        searchInput={searchInput}
-        setSearchInput={setSearchInput}
-      />
+      <FarmsTableHeader />
       <div className={styles.tableBodyContainer}>
         {tableRow.map((content, index) => (
           <FarmsTableRow
