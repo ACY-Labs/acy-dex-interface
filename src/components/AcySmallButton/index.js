@@ -16,6 +16,7 @@ const AcySmallButton = (
       paddingBottom: String(padding),
       paddingLeft: '15px',
       paddingRight: '15px',
+      cursor: 'pointer',
     }}
     onClick={onClick}
   >
@@ -24,10 +25,10 @@ const AcySmallButton = (
 );
 
 const AcySmallButtonGroup = ({ activeButton, buttonList, containerClass }) => {
-  const [colorList, setColorList] = useState(buttonList.map((button, index) => index === 0 ? "#1b1b1c" : "#757579"))
+  const [colorList, setColorList] = useState(buttonList.map((button, index) => index === 0 ? "#1b1b1c" : "#4c4c4d"))
 
   useEffect(() => {
-    setColorList((prevState) => prevState.map((color, index) => index === activeButton ? "#1b1b1c" : "#757579"))
+    setColorList((prevState) => prevState.map((color, index) => index === activeButton ? "#1b1b1c" : "#4c4c4d"))
   }, [activeButton])
 
   return (
@@ -43,7 +44,7 @@ const AcySmallButtonGroup = ({ activeButton, buttonList, containerClass }) => {
           <AcySmallButton
             color={colorList[index]}
             textColor="white"
-            borderColor="#757579"
+            borderColor="#4c4c4d"
             borderRadius={borderRadius}
             padding="5px"
             onClick={onClick}

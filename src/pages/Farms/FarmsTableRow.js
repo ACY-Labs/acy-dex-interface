@@ -2,7 +2,7 @@ import React from 'react';
 import styles from '@/pages/Farms/Farms.less';
 
 const FarmsTableRow = (
-  { token1, token1Logo, token1Reward, token2, token2Logo, token2Reward, totalApr, tvl, hidden, rowClickHandler }
+  { token1, token1Logo, token2, token2Logo, totalApr, tvl, hidden, rowClickHandler, pendingReward }
 ) => {
   return (
     <div className={styles.tableBodyRowContainer}>
@@ -29,16 +29,11 @@ const FarmsTableRow = (
 
         <div className={styles.tableBodyRewardColContainer}>
           <div className={styles.pendingRewardTitleContainer}>Pending Reward</div>
-          {token1Reward !== null && (
+          {pendingReward.map((reward) => (
             <div className={styles.pendingReward1ContentContainer}>
-              {`${token1Reward} ${token1}`}
+              {`${reward.amount} ${reward.token}`}
             </div>
-          )}
-          {token2Reward !== null && (
-            <div className={styles.pendingReward2ContentContainer}>
-              {`${token2Reward} ${token2}`}
-            </div>
-          )}
+          ))}
         </div>
 
         {/* Total APR Column */}
@@ -67,7 +62,38 @@ const FarmsTableRow = (
       {/* Table Drawer */}
 
       <div className={styles.tableBodyDrawerContainer} hidden={hidden}>
-        Hello
+
+        {/* Add Liquidity Column */}
+
+        <div className={styles.tableBodyDrawerLiquidityContainer}>
+          <div>Add Liquidity:</div>
+          <div><a className={styles.tableCodyDrawerLiquidityLink}>{token1}-{token2} LP</a></div>
+        </div>
+
+        {/* Harvest Reward Column */}
+
+        <div className={styles.tableBodyDrawerRewardContainer}>
+          <div className={styles.tableBodyDrawerRewardTitle}>Pending Reward</div>
+          <div className={styles.tableBodyDrawerRewardContent}>
+            <div className={styles.tableBodyDrawerRewardTokenContainer}>
+              {pendingReward.map((reward) => (
+                <div className={styles.pendingReward1ContentContainer}>
+                  {`${reward.amount} ${reward.token}`}
+                </div>
+              ))}
+            </div>
+            <button type="button" className={styles.tableBodyDrawerRewardHarvestButton}>Harvest</button>
+          </div>
+        </div>
+
+        {/* Farm Column */}
+
+        <div className={styles.tableBodyDrawerFarmContainer}>
+          <div className={styles.tableBodyDrawerWalletTitle}>Start Farming</div>
+          <div>
+            <button type="button" className={styles.tableBodyDrawerWalletButton}>Connect Wallet</button>
+          </div>
+        </div>
       </div>
     </div>
   )

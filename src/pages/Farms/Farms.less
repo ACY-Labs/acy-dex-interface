@@ -3,6 +3,53 @@
 .farmsContainer {
   padding: 0 1.25rem;
 
+  .tableControlButtonContainer {
+    display: flex;
+    justify-content: space-between;
+
+    .tableHeaderButtonContainer {
+      display: flex;
+      align-items: center;
+
+      .tableHeaderRadioButtonContainer {
+        margin-right: 0.5rem;
+      }
+
+      .tableHeaderSearchInputContainer {
+        .searchInput {
+          border: none;
+          background-color: #1b1b1c;
+          padding: 0.25rem 0.5rem;
+          border-radius: 0.25rem;
+          margin-right: 0.5rem;
+        }
+      }
+
+      .tableHeaderToggleButtonContainer {
+        .activeToggleButton,
+        .endedToggleButton {
+          border: none;
+          background-color: #1b1b1c;
+          padding: 0.25rem 0.5rem;
+
+          &:hover {
+            background-color: #29292c;
+            cursor: pointer;
+          }
+        }
+
+        .activeToggleButton {
+          border-radius: 0.25rem 0 0 0.25rem;
+        }
+
+        .endedToggleButton {
+          border-left: 1px solid #29292c;
+          border-radius: 0 0.25rem 0.25rem 0;
+        }
+      }
+    }
+  }
+
   .tableToggleButtonContainer {
     margin-bottom: 1.5rem;
   }
@@ -23,30 +70,17 @@
 
 .tableHeaderContainer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 1rem;
 
   .tableHeaderTitleContainer {
-
-  }
-
-  .tableHeaderButtonContainer {
-    display: flex;
-    align-items: center;
-
-    .tableHeaderRadioButtonContainer {
-      margin-right: 0.5rem;
+    .tableHeaderTitle {
+      font-size: 1.25rem;
+      font-weight: bold;
     }
 
-    .tableHeaderSearchInputContainer {
-      .searchInput {
-        border: none;
-        background-color: #1b1b1c;
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.25rem;
-        margin-right: 0.5rem;
-      }
+    .tableHeaderSubtitle {
+      font-weight: lighter;
     }
   }
 }
@@ -62,6 +96,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    &:hover {
+      cursor: pointer;
+    }
 
     .tableBodyTitleColContainer {
       flex: 5;
@@ -80,18 +118,47 @@
           max-height: 100%;
         }
       }
+
+      .tokenTitleContainer {
+        margin-left: 0.5rem;
+        font-size: 1rem;
+      }
     }
 
     .tableBodyRewardColContainer {
       flex: 3;
+
+      .pendingRewardTitleContainer {
+        font-weight: lighter;
+      }
+
+      .pendingReward1ContentContainer {
+        font-size: 1rem;
+      }
     }
 
     .tableBodyAprColContainer {
       flex: 3;
+
+      .totalAprTitleContainer {
+        font-weight: lighter;
+      }
+
+      .totalAprContentContainer {
+        font-size: 1rem;
+      }
     }
 
     .tableBodyTvlColContainer {
       flex: 3;
+
+      .tvlTitleContainer {
+        font-weight: lighter;
+      }
+
+      .tvlContentContainer {
+        font-size: 1rem;
+      }
     }
 
     .tableBodyArrowColContainer {
@@ -109,13 +176,111 @@
     margin-bottom: 0.5rem;
   }
 
-  &:hover {
-    cursor: pointer;
-  }
-
   .tableBodyDrawerContainer {
     border-top: 1px solid #29292c;
     padding-top: 0.5rem;
     margin-top: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+
+    .tableBodyDrawerLiquidityContainer {
+      flex: 1;
+      margin-right: 0.5rem;
+
+      .tableCodyDrawerLiquidityLink {
+        color: #1d5e91;
+        font-weight: bold;
+      }
+    }
+
+    .tableBodyDrawerRewardContainer {
+      flex: 2;
+      margin-right: 0.5rem;
+      border: 1px solid #29292c;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+
+      .tableBodyDrawerRewardTitle {
+        margin-bottom: 0.5rem;
+      }
+
+      .tableBodyDrawerRewardContent {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .tableBodyDrawerRewardHarvestButton {
+          border: 1px solid #1d5e91;
+          background-color: #1b1b1c;
+          padding: 0.25rem 0.5rem;
+          border-radius: 0.25rem;
+
+          &:hover {
+            background-color: #29292c;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+
+    .tableBodyDrawerFarmContainer {
+      flex: 2;
+      border: 1px solid #29292c;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+
+      .tableBodyDrawerWalletTitle {
+        margin-bottom: 0.5rem;
+      }
+
+      .tableBodyDrawerWalletButton {
+        border: 1px solid #1d5e91;
+        background-color: #1b1b1c;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        width: 100%;
+
+        &:hover {
+          background-color: #29292c;
+          cursor: pointer;
+        }
+      }
+    }
   }
+}
+
+// Toggle Button
+
+.firstToggleButton {
+  border: 1px solid transparent;
+  background-color: #29292c;
+  padding: 0.25rem 1.25rem;
+  border-radius: 0.25rem;
+  margin-right: 0.5rem;
+  font-size: 1.24rem;
+}
+
+.middleToggleButton {
+  border: 1px solid transparent;
+  background-color: #29292c;
+  padding: 0.25rem 1.25rem;
+  border-radius: 0.25rem 0 0 0.25rem;
+  margin-right: 0;
+  font-size: 1.24rem;
+}
+
+.lastToggleButton {
+  border: 1px solid transparent;
+  background-color: #29292c;
+  padding: 0.25rem 1.25rem;
+  border-radius: 0 0.25rem 0.25rem 0;
+  margin-right: 0;
+  font-size: 1.24rem;
+}
+
+.firstToggleButton:hover,
+.middleToggleButton:hover,
+.lastToggleButton:hover {
+  cursor: pointer;
+  border-color: #1d5e9180;
 }
