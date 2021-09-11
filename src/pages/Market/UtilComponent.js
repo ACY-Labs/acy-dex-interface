@@ -99,7 +99,7 @@ export class SmallTable extends React.Component {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <AcyIcon name={entry.short.toLowerCase()} width={20} height={20} />
-          <Link style={{ color: '#b5b5b6' }} className={styles.coinName} to="/market/info/token">
+          <Link style={{ color: '#b5b5b6' }} className={styles.coinName} to={`/market/info/token/${entry.address}`}>
             {entry.short}
           </Link>
           <span className={styles.coinShort}> ({entry.name})</span>
@@ -121,7 +121,7 @@ export class SmallTable extends React.Component {
           <Link
             style={{ color: '#b5b5b6' }}
             className={styles.coinName}
-            to="/market/info/pool"
+            to={`/market/info/pool/${entry.address}`}
             style={{ color: '#b5b5b6' }}
           >
             <span className={styles.coinName}>
