@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React,{ useState } from 'react';
 import { Card, Icon, Input, Row, Col } from 'antd';
 import AcyIcon from '@/components/AcyIcon';
 import styles from './index.less';
@@ -26,7 +26,9 @@ const AcyCuarrencyCard = ({
   }
   const onFocus=()=>{
     setLight(true);
+    inputRef.current.focus();
   }
+  const inputRef=React.createRef();
   return (
     <div {...rest} className={styles.acycuarrencycard} tabindex="-1"  onFocus={onFocus} onBlur={onBlur}>
 
@@ -42,11 +44,11 @@ const AcyCuarrencyCard = ({
 
                   </span>
               </div>
-              <Icon type="down" style={{fontSize:'12px',margin:'0px 0.25rem 0px 0.35rem'}}/>
+              <AcyIcon.MyIcon type="triangleGray" width={10} />
             </span>
             
           </button>
-          <input className={styles.input} placeholder="0.0" bordered={false} value={token} onChange={onChange} />
+          <input ref={inputRef} className={styles.input} placeholder="0.0" bordered={false} value={token} onChange={onChange} />
         </div>
         <div className={styles.cua_blanace}>
           {title ||''}

@@ -346,7 +346,7 @@ const SwapComponent = props => {
     <div className={styles.sc}>
       <AcyCuarrencyCard
         icon="eth"
-        title={`Balance: ${token0Balance}`}
+        title={token0Balance!=0&&`Balance: ${token0Balance}`}
         coin={(token0 && token0.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token0Balance}`}
@@ -367,7 +367,7 @@ const SwapComponent = props => {
 
       <AcyCuarrencyCard
         icon="eth"
-        title={`Balance: ${token1Balance}`}
+        title={token0Balance!=0&&`Balance: ${token1Balance}`}
         coin={(token1 && token1.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token1Balance}`}

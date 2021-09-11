@@ -94,29 +94,18 @@ const sampleStakeHistoryColumns = [
     key: 'time',
   },
   {
-    title: 'Amount',
+    title: 'From',
     dataIndex: 'amount',
     key: 'amount',
     render: text => <p className={styles.tableData}>{text}</p>,
   },
   {
-    title: 'Reward',
+    title: 'To',
     dataIndex: 'reward',
     key: 'reward',
     render: text => <p className={styles.tableData}>{text}</p>,
   },
-  {
-    title: 'Lock Period',
-    dataIndex: 'lock period',
-    key: 'lock period',
-    render: text => <p className={styles.tableData}>{text}</p>,
-  },
-  {
-    title: 'APY',
-    dataIndex: 'apy',
-    key: 'apy',
-    render: text => <p className={styles.tableData}>{text}</p>,
-  },
+  
 ]
 
 export {sampleStakeHistoryColumns}
