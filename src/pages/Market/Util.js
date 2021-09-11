@@ -1,25 +1,3 @@
-import React, { Component, useState, useCallback } from 'react';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { Table, Row, Col, Input, Divider, Icon, Badge } from 'antd';
-import styles from './styles.less';
-import moment from 'moment';
-import { Link } from 'react-router-dom';
-import {
-  AcyCard,
-  AcyIcon,
-  AcyPeriodTime,
-  AcyTabs,
-  AcyCuarrencyCard,
-  AcyConnectWalletBig,
-  AcyModal,
-  AcyInput,
-  AcyCoinItem,
-  AcyLineChart,
-  AcyBarChart,
-  AcyConfirm,
-  AcyApprove,
-} from '@/components/Acy';
-
 export const TransactionType = {
   ALL: 'All',
   SWAP: 'Swap',

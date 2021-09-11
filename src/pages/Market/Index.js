@@ -1,42 +1,23 @@
-import React, { Component, useState, useCallback } from 'react';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { Table, Row, Col, Input, Divider } from 'antd';
-import styles from './styles.less';
-import moment from 'moment';
-import { useDetectClickOutside } from 'react-detect-click-outside';
-import { Link } from 'react-router-dom';
 import {
-  AcyCard,
-  AcyIcon,
-  AcyPeriodTime,
-  AcyTabs,
-  AcyCuarrencyCard,
-  AcyConnectWalletBig,
-  AcyModal,
-  AcyInput,
-  AcyCoinItem,
-  AcyLineChart,
-  AcyBarChart,
-  AcyConfirm,
-  AcyApprove,
+  AcyBarChart, AcyLineChart
 } from '@/components/Acy';
-
-import { TransactionType, abbrHash, abbrNumber, transactionHeader, sortTable } from './Util.js';
-
+import { Col, Row } from 'antd';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import {
   dataSourceCoin,
   dataSourcePool,
   dataSourceTransaction,
-  graphSampleData,
+  graphSampleData
 } from './SampleData.js';
-
+import styles from './styles.less';
+import { abbrNumber } from './Util.js';
 import {
-  MarketSearchBar,
-  SmallTable,
-  TokenTable,
-  PoolTable,
-  TransactionTable,
+  MarketSearchBar, PoolTable, TokenTable, TransactionTable
 } from './UtilComponent.js';
+
+
+
 
 export class MarketIndex extends Component {
   constructor(props) {

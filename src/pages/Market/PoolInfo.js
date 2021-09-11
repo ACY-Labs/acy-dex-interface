@@ -1,52 +1,27 @@
-import React, { Component, useState, useCallback, useEffect } from 'react';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { Table, Row, Col, Input, Divider, Breadcrumb } from 'antd';
-import styles from './styles.less';
-import moment from 'moment';
-import { useDetectClickOutside } from 'react-detect-click-outside';
-import { Link, useParams } from 'react-router-dom';
-import { isMobile } from 'react-device-detect';
 import {
-  AcyButton,
-  AcyCard,
-  AcyIcon,
-  AcyPeriodTime,
-  AcyTabs,
-  AcyCuarrencyCard,
-  AcyConnectWalletBig,
-  AcyModal,
-  AcyInput,
-  AcyCoinItem,
-  AcyLineChart,
-  AcyBarChart,
-  AcyConfirm,
-  AcyApprove,
-  AcySmallButton,
+  AcyBarChart, AcyIcon,
+  AcyLineChart, AcySmallButton
 } from '@/components/Acy';
-
-import {
-  TransactionType,
-  abbrHash,
-  abbrNumber,
-  columnsCoin,
-  columnsPool,
-  transactionHeader,
-  sortTable,
-  sortTableTime,
-  isDesktop,
-} from './Util.js';
-
+import { Breadcrumb } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import {
   dataSourceCoin,
   dataSourcePool,
   dataSourceTransaction,
-  graphSampleData,
+  graphSampleData
 } from './SampleData.js';
-
-import { MarketSearchBar, SmallTable, TransactionTable } from './UtilComponent.js';
+import styles from './styles.less';
+import {
+  abbrNumber,
+  isDesktop
+} from './Util.js';
+import { MarketSearchBar, TransactionTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
 
-const { AcyTabPane } = AcyTabs;
+
+
+
 const watchlistManagerPool = new WatchlistManager('pool');
 
 let poolData = dataSourcePool[0];
