@@ -113,10 +113,11 @@ function MarketTokenInfo(props) {
           <AcyIcon
             name={isWatchlist ? 'star_active' : 'star'}
             style={{ marginLeft: '10px' }}
+            width={16}
             onClick={() => toggleWatchlist(tokenData.short)}
           />
-          <AcyIcon name="cmc" style={{ marginLeft: '10px' }} />
-          <AcyIcon name="redirect" style={{ marginLeft: '10px' }} />
+          <AcyIcon name="cmc" style={{ marginLeft: '10px' }}  width={16}/>
+          <AcyIcon name="redirect" style={{ marginLeft: '10px' }}  width={16}/>
         </div>
       </div>
 
@@ -152,12 +153,13 @@ function MarketTokenInfo(props) {
         </div>
         <div className={styles.contentCta}>
           <div className={styles.ctaButton}>
-            <AcySmallButton color="#2a282e" borderColor="#2a282e" borderRadius="15px" padding="5px">
+            <AcySmallButton color="#2e3032" borderColor="#2e3032" borderRadius="15px" padding="10px">
+              <AcyIcon name="addlq" width={16} style={{marginRight:"10px"}}/>
               Add Liquidity
             </AcySmallButton>
           </div>
           <div className={styles.ctaButton}>
-            <AcySmallButton color="#757579" borderColor="#757579" borderRadius="15px" padding="5px">
+            <AcySmallButton color="#1e5d91" borderColor="#1e5d91" borderRadius="15px" padding="10px">
               Trade
             </AcySmallButton>
           </div>
@@ -183,10 +185,12 @@ function MarketTokenInfo(props) {
           <div className={styles.statEntry}>
             <div className={styles.statEntryName}>7d Trading Vol</div>
             <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.volume24h)}</div>
+            <div className={styles.statEntryChange} style={{ visibility: "hidden"}}>00 </div>
           </div>
           <div className={styles.statEntry}>
             <div className={styles.statEntryName}>24h Fees</div>
             <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.volume24h)}</div>
+            <div className={styles.statEntryChange} style={{ visibility: "hidden"}}>00 </div>
           </div>
         </div>
         <div className={styles.contentCharts}>
@@ -201,7 +205,7 @@ function MarketTokenInfo(props) {
                 textColor="white"
                 borderColor="#757579"
                 borderRadius="15px 0 0 15px"
-                padding="5px"
+                padding="2px 5px"
                 onClick={() => switchChart(0)}
                 id="0"
               >
@@ -212,7 +216,7 @@ function MarketTokenInfo(props) {
                 textColor="white"
                 borderColor="#757579"
                 borderRadius="0 0 0 0"
-                padding="5px"
+                padding="2px 5px"
                 onClick={() => switchChart(1)}
                 id="1"
               >
@@ -223,11 +227,11 @@ function MarketTokenInfo(props) {
                 textColor="white"
                 borderColor="#757579"
                 borderRadius="0 15px 15px 0"
-                padding="5px"
+                padding="2px 5px"
                 onClick={() => switchChart(2)}
                 id="2"
               >
-                Price
+                Liquidity
               </AcySmallButton>
             </div>
           </div>
