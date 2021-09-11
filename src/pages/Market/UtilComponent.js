@@ -951,7 +951,6 @@ export const MarketSearchBar = props => {
   const outsideClickRef = useDetectClickOutside({
     onTriggered: () => {
       setVisibleSearchBar(false);
-      console.log('cheh');
     },
   });
   const outsideClickRefNetwork = useDetectClickOutside({

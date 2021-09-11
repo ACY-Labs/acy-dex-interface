@@ -59,6 +59,18 @@ function MarketPoolInfo(props) {
   );
   const [graphTabIndex, setGraphTabIndex] = useState(0);
   const [isWatchlist, setIsWatchlist] = useState(false);
+  const [selectChartDataVol, setSelectChartDataVol] = useState(
+    graphSampleData[graphSampleData.length - 1][1]
+  );
+  const [selectChartIndexVol, setSelectChartIndexVol] = useState(graphSampleData.length - 1);
+  const [selectChartDataTvl, setSelectChartDataTvl] = useState(
+    graphSampleData[graphSampleData.length - 1][1]
+  );
+  const [selectChartIndexTvl, setSelectChartIndexTvl] = useState(graphSampleData.length - 1);
+  const [selectChartDataLiq, setSelectChartDataLiq] = useState(
+    graphSampleData[graphSampleData.length - 1][1]
+  );
+  const [selectChartIndexLiq, setSelectChartIndexLiq] = useState(graphSampleData.length - 1);
 
   function switchChart(dest) {
     setGraphTabIndex(dest);
@@ -125,7 +137,7 @@ function MarketPoolInfo(props) {
             style={{ marginLeft: '10px' }}
             onClick={() => toggleWatchlist([poolData.coin1, poolData.coin2, poolData.percent])}
           />
-          <AcyIcon name="redirect" style={{ marginLeft: '10px' }} width={16}/>
+          <AcyIcon name="redirect" style={{ marginLeft: '10px' }} width={16} />
         </div>
       </div>
 
@@ -253,10 +265,30 @@ function MarketPoolInfo(props) {
         </div>
         <div className={styles.contentCharts}>
           <div className={styles.contentChartsHeader}>
-            <div className={styles.contentChartsIndicator}>
-              <div className={styles.chartIndicatorValue}>$999.99m</div>
-              <div className={styles.chartIndicatorTime}>2020-11-20</div>
-            </div>
+            {graphTabIndex == 0 && (
+              <div className={styles.contentChartsIndicator}>
+                <div className={styles.chartIndicatorValue}>$ {selectChartDataVol}</div>
+                <div className={styles.chartIndicatorTime}>
+                  {graphSampleData[selectChartIndexVol][0]}
+                </div>
+              </div>
+            )}
+            {graphTabIndex == 1 && (
+              <div className={styles.contentChartsIndicator}>
+                <div className={styles.chartIndicatorValue}>$ {selectChartDataTvl}</div>
+                <div className={styles.chartIndicatorTime}>
+                  {graphSampleData[selectChartIndexTvl][0]}
+                </div>
+              </div>
+            )}
+            {graphTabIndex == 2 && (
+              <div className={styles.contentChartsIndicator}>
+                <div className={styles.chartIndicatorValue}>$ {selectChartDataLiq}</div>
+                <div className={styles.chartIndicatorTime}>
+                  {graphSampleData[selectChartIndexLiq][0]}
+                </div>
+              </div>
+            )}
             <div className={styles.contentChartsSelector}>
               <AcySmallButton
                 color={graphTabIndex == 0 ? '#1b1b1c' : '#757579'}
@@ -296,7 +328,15 @@ function MarketPoolInfo(props) {
           <div className={styles.contentChartsBody}>
             {graphTabIndex == 0 && (
               <div className={styles.contentChartWrapper}>
-                <AcyBarChart backData={graphSampleData} barColor="#1e5d91" />
+                <AcyBarChart
+                  backData={graphSampleData}
+                  barColor="#1e5d91"
+                  showXAxis
+                  onHover={(data, index) => {
+                    setSelectChartDataVol(abbrNumber(data));
+                    setSelectChartIndexVol(index);
+                  }}
+                />
               </div>
             )}
             {graphTabIndex == 1 && (
@@ -307,12 +347,24 @@ function MarketPoolInfo(props) {
                   showGradient={true}
                   lineColor="#1e5d91"
                   bgColor="#29292c"
+                  onHover={(data, index) => {
+                    setSelectChartDataTvl(abbrNumber(data));
+                    setSelectChartIndexTvl(index);
+                  }}
                 />
               </div>
             )}
             {graphTabIndex == 2 && (
               <div className={styles.contentChartWrapper}>
-                <AcyBarChart backData={graphSampleData} barColor="#1e5d91" />
+                <AcyBarChart
+                  backData={graphSampleData}
+                  barColor="#1e5d91"
+                  showXAxis
+                  onHover={(data, index) => {
+                    setSelectChartDataLiq(abbrNumber(data));
+                    setSelectChartIndexLiq(index);
+                  }}
+                />
               </div>
             )}
           </div>

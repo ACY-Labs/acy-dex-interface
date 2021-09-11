@@ -71,7 +71,7 @@ export class Dao extends Component {
                 data={activeGraphData}
                 showXAxis
                 showGradient
-                showTootip
+                showTooltip
                 lineColor="#e29227"
                 bgColor="#29292c"
               />

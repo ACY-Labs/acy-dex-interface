@@ -46,6 +46,24 @@ export class MarketIndex extends Component {
   state = {
     visible: true,
     tabIndex: 0,
+    selectedIndexLine: graphSampleData.length - 1,
+    selectedDataLine: graphSampleData[graphSampleData.length - 1][1],
+    selectedIndexBar: graphSampleData.length - 1,
+    selectedDataBar: graphSampleData[graphSampleData.length - 1][1],
+  };
+
+  onLineGraphHover = (newData, newIndex) => {
+    this.setState({
+      selectedDataLine: abbrNumber(newData),
+      selectedIndexLine: newIndex,
+    });
+  };
+
+  onBarGraphHover = (newData, newIndex) => {
+    this.setState({
+      selectedDataBar: abbrNumber(newData),
+      selectedIndexBar: newIndex,
+    });
   };
 
   render() {
@@ -62,11 +80,15 @@ export class MarketIndex extends Component {
           <div className={styles.chartSectionMain}>
             <div className={styles.graphStats}>
               <div className={styles.statName}>TVL</div>
-              <div className={styles.statValue}>$2.19b</div>
+              <div className={styles.statValue}>$ {this.state.selectedDataLine}</div>
+              <div className={styles.statName}>
+                {graphSampleData[this.state.selectedIndexLine][0]}
+              </div>
             </div>
             <div className={styles.chartWrapper}>
               <AcyLineChart
-                backData={graphSampleData}
+                data={graphSampleData}
+                onHover={this.onLineGraphHover}
                 showXAxis={true}
                 showGradient={true}
                 lineColor="#e29227"
@@ -77,10 +99,18 @@ export class MarketIndex extends Component {
           <div className={styles.chartSectionMain}>
             <div className={styles.graphStats}>
               <div className={styles.statName}>VOLUME 24H</div>
-              <div className={styles.statValue}>$2.19b</div>
+              <div className={styles.statValue}>$ {this.state.selectedDataBar}</div>
+              <div className={styles.statName}>
+                {graphSampleData[this.state.selectedIndexBar][0]}
+              </div>
             </div>
             <div className={styles.chartWrapper}>
-              <AcyBarChart backData={graphSampleData} />
+              <AcyBarChart
+                data={graphSampleData}
+                showXAxis
+                barColor="#1c9965"
+                onHover={this.onBarGraphHover}
+              />
             </div>
           </div>
         </div>

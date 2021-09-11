@@ -71,6 +71,16 @@ class AcyLineChart extends Component {
   componentDidMount() {}
   // getOption 这个函数主要用于配置 option，包括将数据配置进去
   // 也可以将其放在 state 中，然后通过 setState 更新
+  // setState wrapper
+
+  renderTooltip = v => {
+    // var inner = '<div style="padding: 25px 20px; border: 1px solid #FCEA00; background-color: rgba(0, 0, 0, 0.7);">'+v[0].value+'</div>'
+    if (this.props.onHover) this.props.onHover(v[0].data, v[0].dataIndex);
+
+    if (this.props.showTooltip) return `<span style="color:#b5b5b6"> $ ${v[0].data} </span>`;
+    else return;
+  };
+
   getOption = () => {
     // 组装数据，返回配置 option
     const { imgType, xtitle, data } = this.state;
@@ -85,9 +95,11 @@ class AcyLineChart extends Component {
     var valueList = chartData.map(function(item) {
       return item[1];
     });
-    let showXAxis = this.props.showXAxis;
 
+    let showXAxis = this.props.showXAxis;
     let props = this.props;
+    let component = this;
+
     let options = {
       grid: {
         left: '2%',
@@ -108,12 +120,7 @@ class AcyLineChart extends Component {
         backgroundColor: null,
         borderWidth: 0,
         borderRadius: 0,
-        formatter: function(v) {
-          // var inner = '<div style="padding: 25px 20px; border: 1px solid #FCEA00; background-color: rgba(0, 0, 0, 0.7);">'+v[0].value+'</div>'
-
-          if (props.showTootip) return `<span style="color:#b5b5b6"> $ ${v[0].data} </span>`;
-          else return;
-        },
+        formatter: this.renderTooltip,
       },
       xAxis: {
         show: showXAxis,
@@ -182,7 +189,7 @@ class AcyLineChart extends Component {
         style={{ height: '100%' }}
         option={this.getOption()}
         notMerge
-        lazyUpdate
+        lazyUpdate={false}
         theme={'theme_name'}
         ref={e => {
           this.echartsElement = e;
