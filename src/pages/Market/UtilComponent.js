@@ -79,6 +79,15 @@ export class SmallTable extends React.Component {
     });
   };
 
+  componentDidUpdate(prevProps) {
+    // Typical usage (don't forget to compare props):
+    if (this.props.data !== prevProps.data) {
+      this.setState({
+        tableData: this.props.data
+      })
+    }
+  }
+
   renderBody = entry => {
     let content = <></>;
 
@@ -897,6 +906,18 @@ export const MarketSearchBar = props => {
 
   const onInput = useCallback(e => {
     setSearchQuery(e.target.value);
+
+    let query = e.target.value.toLowerCase();
+
+    // coins return
+    let newCoin = props.dataSourceCoin.filter(item => item.name
+          .toLowerCase()
+          .includes(query) || item.short.toLowerCase().includes(query));
+    setSearchCoinReturns(newCoin);
+    let newPool = props.dataSourcePool.filter(item => item.coin1
+          .toLowerCase()
+          .includes(query) || item.coin2.toLowerCase().includes(query));
+    setSearchPoolReturns(newPool);
   });
 
   const onScroll = e => {
@@ -1037,23 +1058,23 @@ export const MarketSearchBar = props => {
                     className={styles.searchModal}
                     style={{ position: 'absolute', left: 0, right: 0, top: '10px' }}
                   >
-                    <AcyTabs destroyInactiveTabPane={true}>
+                    <AcyTabs>
                       <AcyTabPane tab="Search" key="1">
                         {searchCoinReturns.length > 0 ? (
                           <SmallTable
                             mode="token"
-                            data={props.dataSourceCoin}
+                            data={searchCoinReturns}
                             displayNumber={displayNumber}
                             refreshWatchlist={refreshWatchlist}
                           />
                         ) : (
-                          <div style={{ fontSize: '20px', margin: '20px' }}>No results</div>
+                          <div style={{ fontSize: '16x', margin: '20px' }}>No results</div>
                         )}
                         <Divider className={styles.searchModalDivider} />
                         {searchPoolReturns.length > 0 ? (
                           <SmallTable
                             mode="pool"
-                            data={props.dataSourcePool}
+                            data={searchPoolReturns}
                             displayNumber={displayNumber}
                             refreshWatchlist={refreshWatchlist}
                           />
