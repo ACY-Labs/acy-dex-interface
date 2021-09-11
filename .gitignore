@@ -37,3 +37,4 @@ functions/mock
 screenshot
 .firebase
 node_modules
+.vs/
