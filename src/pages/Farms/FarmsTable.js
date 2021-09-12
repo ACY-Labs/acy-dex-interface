@@ -4,13 +4,9 @@ import farmsTableContent from './FarmsTableContent'
 import FarmsTableRow from '@/pages/Farms/FarmsTableRow';
 import FarmsTableHeader from '@/pages/Farms/FarmsTableHeader';
 
-const FarmsTable = ({ tableRow, onRowClick, tableTitle, tableSubtitle }) => {
-  const [walletConnected, setWalletConnected] = useState(true) // todo change
-  const [isModalVisible, setIsModalVisible] = useState(true) // todo change
-
-  const stakeLp = () => {
-
-  }
+const FarmsTable = ({ tableRow, onRowClick, tableTitle, tableSubtitle, rowNumber, setRowNumber }) => {
+  const [walletConnected, setWalletConnected] = useState(false)
+  const [isModalVisible, setIsModalVisible] = useState(false)
 
   const hideModal = () => setIsModalVisible(false)
   const showModal = () => setIsModalVisible(true)
@@ -22,7 +18,7 @@ const FarmsTable = ({ tableRow, onRowClick, tableTitle, tableSubtitle }) => {
         tableSubtitle={tableSubtitle}
       />
       <div className={styles.tableBodyContainer}>
-        {tableRow.map((content, index) => (
+        {tableRow.slice(0, rowNumber).map((content, index) => (
           <FarmsTableRow
             key={index}
             token1={content.token1}
@@ -41,6 +37,9 @@ const FarmsTable = ({ tableRow, onRowClick, tableTitle, tableSubtitle }) => {
             isModalVisible={isModalVisible}
           />
         ))}
+      </div>
+      <div className={styles.tableFooterContainer} onClick={() => setRowNumber(rowNumber + 5)}>
+        More
       </div>
     </div>
   )

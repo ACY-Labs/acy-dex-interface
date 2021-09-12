@@ -13,12 +13,14 @@ const Farms = () => {
     prevRow.hidden = true
     return prevRow
   })
+  const INITIAL_ROW_NUMBER = 5
 
   const [selectedTable, setSelectedTable] = useState(0)
   const [tableRow, setTableRow] = useState(INITIAL_TABLE_DATA)
   const [searchInput, setSearchInput] = useState('')
   const [tableTitle, setTableTitle] = useState('All Farms')
   const [tableSubtitle, setTableSubtitle] = useState('Stake your LP tokens and earn token rewards')
+  const [rowNumber, setRowNumber] = useState(INITIAL_ROW_NUMBER)
 
   const onRowClick = (index) => setTableRow((prevState) => {
     const prevTableRow = [ ...prevState ]
@@ -31,6 +33,7 @@ const Farms = () => {
     setTableRow(INITIAL_TABLE_DATA)
     setTableTitle('All Farms')
     setTableSubtitle('Stake your LP tokens and earn token rewards')
+    setRowNumber(5)
   }
 
   const onAcyToggleButtonClick = () => {
@@ -40,6 +43,7 @@ const Farms = () => {
     ))
     setTableTitle('ACY Farms')
     setTableSubtitle('Stake your LP tokens and earn ACY token rewards')
+    setRowNumber(5)
   }
 
   const onPremierToggleButtonClick = () => {
@@ -49,6 +53,7 @@ const Farms = () => {
     ))
     setTableTitle('Premier Farms')
     setTableSubtitle('Stake your LP tokens and earn project/other token rewards')
+    setRowNumber(INITIAL_ROW_NUMBER)
   }
 
   return (
@@ -89,6 +94,8 @@ const Farms = () => {
           onRowClick={onRowClick}
           tableTitle={tableTitle}
           tableSubtitle={tableSubtitle}
+          rowNumber={rowNumber}
+          setRowNumber={setRowNumber}
         />
       </div>
     </PageHeaderWrapper>
