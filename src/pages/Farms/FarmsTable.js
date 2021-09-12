@@ -4,11 +4,23 @@ import farmsTableContent from './FarmsTableContent'
 import FarmsTableRow from '@/pages/Farms/FarmsTableRow';
 import FarmsTableHeader from '@/pages/Farms/FarmsTableHeader';
 
-const FarmsTable = ({ tableRow, onRowClick }) => {
+const FarmsTable = ({ tableRow, onRowClick, tableTitle, tableSubtitle }) => {
+  const [walletConnected, setWalletConnected] = useState(true) // todo change
+  const [isModalVisible, setIsModalVisible] = useState(true) // todo change
+
+  const stakeLp = () => {
+
+  }
+
+  const hideModal = () => setIsModalVisible(false)
+  const showModal = () => setIsModalVisible(true)
 
   return (
     <div className={styles.tableContainer}>
-      <FarmsTableHeader />
+      <FarmsTableHeader
+        tableTitle={tableTitle}
+        tableSubtitle={tableSubtitle}
+      />
       <div className={styles.tableBodyContainer}>
         {tableRow.map((content, index) => (
           <FarmsTableRow
@@ -22,6 +34,11 @@ const FarmsTable = ({ tableRow, onRowClick }) => {
             hidden={content.hidden}
             rowClickHandler={() => onRowClick(index)}
             pendingReward={content.pendingReward}
+            walletConnected={walletConnected}
+            setWalletConnected={setWalletConnected}
+            showModal={showModal}
+            hideModal={hideModal}
+            isModalVisible={isModalVisible}
           />
         ))}
       </div>

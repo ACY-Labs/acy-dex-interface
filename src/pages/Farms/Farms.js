@@ -17,6 +17,8 @@ const Farms = () => {
   const [selectedTable, setSelectedTable] = useState(0)
   const [tableRow, setTableRow] = useState(INITIAL_TABLE_DATA)
   const [searchInput, setSearchInput] = useState('')
+  const [tableTitle, setTableTitle] = useState('All Farms')
+  const [tableSubtitle, setTableSubtitle] = useState('Stake your LP tokens and earn token rewards')
 
   const onRowClick = (index) => setTableRow((prevState) => {
     const prevTableRow = [ ...prevState ]
@@ -27,6 +29,8 @@ const Farms = () => {
   const onAllToggleButtonClick = () => {
     setSelectedTable(0)
     setTableRow(INITIAL_TABLE_DATA)
+    setTableTitle('All Farms')
+    setTableSubtitle('Stake your LP tokens and earn token rewards')
   }
 
   const onAcyToggleButtonClick = () => {
@@ -34,6 +38,8 @@ const Farms = () => {
     setTableRow(INITIAL_TABLE_DATA.filter((tableData) => (
       tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) === 'ACY'
     ))
+    setTableTitle('ACY Farms')
+    setTableSubtitle('Stake your LP tokens and earn ACY token rewards')
   }
 
   const onPremierToggleButtonClick = () => {
@@ -41,6 +47,8 @@ const Farms = () => {
     setTableRow(INITIAL_TABLE_DATA.filter((tableData) => (
       (tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) !== 'ACY') || tableData.pendingReward.length !== 1
     ))
+    setTableTitle('Premier Farms')
+    setTableSubtitle('Stake your LP tokens and earn project/other token rewards')
   }
 
   return (
@@ -79,6 +87,8 @@ const Farms = () => {
         <FarmsTable
           tableRow={tableRow}
           onRowClick={onRowClick}
+          tableTitle={tableTitle}
+          tableSubtitle={tableSubtitle}
         />
       </div>
     </PageHeaderWrapper>
