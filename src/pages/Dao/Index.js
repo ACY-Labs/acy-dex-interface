@@ -62,6 +62,7 @@ export class Dao extends Component {
                 ],
               ]}
               containerClass={styles.switchChartsSelector}
+              theme="#c6224e"
             />
             {activeGraphId === 0 ? (
               <AcyBarChart backData={activeGraphData} />
@@ -92,6 +93,7 @@ export class Dao extends Component {
                 ['Price', () => this.setState({ activeStakeInfoPanel: 2 })],
               ]}
               containerClass={styles.contentChartsSelector}
+              theme="#c6224e"
             />
             {this.state.activeStakeInfoPanel === 0 && (
               <div className={stakeInfoStyles.stakeInfoTab}>

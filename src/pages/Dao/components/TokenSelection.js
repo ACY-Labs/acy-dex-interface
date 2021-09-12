@@ -60,7 +60,11 @@ const TokenSelection = (
           </AcyTabs>
         </div>
       </AcyModal>
+
+      {/* Percentage Input */}
+
       <div className={styles.tokenPercentage}>
+        <span className={styles.suffix}>%</span>
         <input
           type="text"
           className={styles.tokenPercentageInput}
@@ -68,7 +72,6 @@ const TokenSelection = (
           onChange={(e) => updateTokenPercentage(e.target.value)}
         />
       </div>
-      <span className={styles.suffix}>%</span>
     </div>
   )
 }

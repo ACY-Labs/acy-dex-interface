@@ -24,11 +24,11 @@ const AcySmallButton = (
   </button>
 );
 
-const AcySmallButtonGroup = ({ activeButton, buttonList, containerClass }) => {
-  const [colorList, setColorList] = useState(buttonList.map((button, index) => index === 0 ? "#1b1b1c" : "#4c4c4d"))
+const AcySmallButtonGroup = ({ activeButton, buttonList, containerClass, theme }) => {
+  const [colorList, setColorList] = useState(buttonList.map((button, index) => index === 0 ? theme : "#1B1B1C"))
 
   useEffect(() => {
-    setColorList((prevState) => prevState.map((color, index) => index === activeButton ? "#1b1b1c" : "#4c4c4d"))
+    setColorList((prevState) => prevState.map((color, index) => index === activeButton ? theme : "#1B1B1C"))
   }, [activeButton])
 
   return (
@@ -42,9 +42,9 @@ const AcySmallButtonGroup = ({ activeButton, buttonList, containerClass }) => {
         }
         return (
           <AcySmallButton
-            color={colorList[index]}
+            color="#1B1B1C"
             textColor="white"
-            borderColor="#4c4c4d"
+            borderColor={colorList[index]}
             borderRadius={borderRadius}
             padding="5px"
             onClick={onClick}

@@ -20,8 +20,15 @@
           border: none;
           background-color: #1b1b1c;
           padding: 0.25rem 0.5rem;
-          border-radius: 0.25rem;
+          border-radius: 9999px;
           margin-right: 0.5rem;
+          width: 14rem;
+          outline: none;
+          box-shadow: 0 0 0 0.5px transparent;
+
+          &:focus {
+            box-shadow: 0 0 0 0.5px #1d5e91;
+          }
         }
       }
 
@@ -30,7 +37,7 @@
         .endedToggleButton {
           border: none;
           background-color: #1b1b1c;
-          padding: 0.25rem 0.5rem;
+          padding: 0.25rem 1rem;
 
           &:hover {
             background-color: #29292c;
@@ -39,12 +46,12 @@
         }
 
         .activeToggleButton {
-          border-radius: 0.25rem 0 0 0.25rem;
+          border-radius: 9999px 0 0 9999px;
         }
 
         .endedToggleButton {
           border-left: 1px solid #29292c;
-          border-radius: 0 0.25rem 0.25rem 0;
+          border-radius: 0 9999px 9999px 0;
         }
       }
     }
@@ -60,9 +67,23 @@
 .tableContainer {
   background-color: #29292c;
   border-radius: 0.5rem;
+  margin-bottom: 3rem;
+  overflow: hidden;
 
   .tableBodyContainer {
     padding: 0 0.5rem 0.5rem 0.5rem;
+  }
+
+  .tableFooterContainer {
+    background-color: #1b1b1c;
+    text-align: center;
+    padding: 0.75rem 0;
+    transition: .2s;
+
+    &:hover {
+      background-color: #0e0304;
+      cursor: pointer;
+    }
   }
 }
 
@@ -283,4 +304,165 @@
 .lastToggleButton:hover {
   cursor: pointer;
   border-color: #1d5e9180;
+}
+
+.amountRowContainer {
+  display: flex;
+  position: relative;
+
+  .amountRowInputContainer {
+    flex: 1;
+    margin-bottom: 0.5rem;
+
+    input {
+      width: 100%;
+      background-color: #1B1B1C;
+      border: 1px solid #40444f99;
+      border-radius: 9999px;
+      font-size: 1.5rem;
+      padding: 0 1rem;
+      -moz-appearance: textfield;
+      box-shadow: 0 0 0 0.5px transparent;
+      margin-bottom: 0.25rem;
+
+      &:hover {
+        border: 1px solid #40444fff;
+      }
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 0 0.5px #1d5e91;
+      transition: .1s;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  .suffix {
+    font-size: 1.25rem;
+    position: absolute;
+    right: 1.25rem;
+    top: 0.25rem;
+  }
+}
+
+.balanceAmountContainer {
+  margin-bottom: 1rem;
+}
+
+.sliderWrapper {
+  display: flex;
+  margin-bottom: 1rem;
+
+  .slider {
+    flex: 1;
+    padding: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3px; /* Specified height */
+    background: black; /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+    transition: opacity 0.2s;
+  }
+
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 15px; /* Set a specific slider handle width */
+    height: 15px; /* Slider handle height */
+    border-radius: 50%;
+    background-color: #C4C4C4; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+    transition: .2s;
+  }
+
+  .slider::-webkit-slider-thumb:hover {
+    background-color: #1d5e91;
+    width: 17.5px;
+    height: 17.5px;
+  }
+
+  .slider::-webkit-slider-thumb:active {
+    background-color: #1d5e91;
+    width: 17.5px;
+    height: 17.5px;
+  }
+
+  .slider::-moz-range-thumb {
+    width: 15px; /* Set a specific slider handle width */
+    height: 15px; /* Slider handle height */
+    background-color: #C4C4C4; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+  }
+}
+
+.lockTimeRow {
+  margin-bottom: 1rem;
+
+  .lockTimeRowTitleContainer {
+    flex: 1;
+
+    .lockTimeRowTitle {
+      text-align: right;
+      padding-right: 1.5rem;
+    }
+  }
+
+
+  .dateSelectionContainer {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+
+    .datePickerContainer {
+      margin-bottom: 0.75rem;
+    }
+
+    .presetDurationContainer {
+      width: 100%;
+
+      .presetDurationSelection {
+        width: 100%;
+        display: flex;
+      }
+    }
+  }
+}
+
+.datePickerInput {
+  color: #b5b6b6;
+  background-color: #1B1B1C;
+  border: 1px solid #40444f99;
+  border-radius: 0.3rem;
+  font-size: 1rem;
+  padding: 0.25rem 1.5rem;
+  box-shadow: 0 0 0 0.5px transparent;
+  margin-bottom: 0;
+}
+
+.datePickerInput:hover {
+  box-shadow: 0 0 0 0.5px #1d5e91;
+  transition: .1s;
+  cursor: pointer;
+}
+
+.stakeSubmitButton {
+  width: 100%;
+  background-color: #4c4c4d;
+  border: none;
+  border-radius: 7.5px;
+  font-size: 1.5rem;
+  padding: 0 1rem;
+}
+
+.stakeSubmitButton:hover {
+  background-color: #5f5f5f;
+  cursor: pointer;
 }

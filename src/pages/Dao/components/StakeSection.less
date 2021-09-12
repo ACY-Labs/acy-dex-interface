@@ -43,8 +43,8 @@
             margin-bottom: 1rem;
             align-items: center;
             justify-content: center;
-            padding: 0.5rem;
-            border-radius: 7.5px;
+            padding: 0;
+            border-radius: 9999px;
             border: 1px solid #40444f99;
 
             &:hover {
@@ -54,6 +54,7 @@
             .tokenDropdown {
               display: flex;
               align-items: center;
+              padding: 0.4rem 0 0.4rem 1rem;
               flex: 1;
 
               .tokenImgContainer {
@@ -76,29 +77,31 @@
             }
 
             .tokenPercentage {
-              flex: 1;
+              position: relative;
+              width: 4.75rem;
 
               .tokenPercentageInput {
                 width: 100%;
                 background-color: transparent;
                 border: none;
-                border-radius: 7.5px;
-                padding: 0 1.75rem;
+                border-radius: 9999px;
+                padding: 0.4rem 2rem 0.4rem 0;
                 font-size: 1rem;
                 text-align: right;
               }
 
               .tokenPercentageInput:focus {
                 outline: none;
-                box-shadow: 0 0 0 1pt #EB5C20;
+                box-shadow: 0 0 0 0.5px #c6224e;
                 transition: .1s;
               }
             }
 
             .suffix {
-               font-size: 1rem;
-               position: relative;
-               right: 1.5rem;
+              font-size: 1rem;
+              position: absolute;
+              right: 1rem;
+              top: 0.4rem;
              }
           }
         }
@@ -150,7 +153,7 @@
       width: 100%;
       background-color: #1B1B1C;
       border: 1px solid #40444f99;
-      border-radius: 7.5px;
+      border-radius: 9999px;
       font-size: 1.5rem;
       padding: 0 1rem;
       -moz-appearance: textfield;
@@ -164,7 +167,7 @@
 
     input:focus {
       outline: none;
-      box-shadow: 0 0 0 0.5px #EB5C20;
+      box-shadow: 0 0 0 0.5px #c6224e;
       transition: .1s;
     }
 
@@ -220,7 +223,7 @@
 
       .balancePercentageInput:focus {
         outline: none;
-        box-shadow: 0 0 0 0.5px #EB5C20;
+        box-shadow: 0 0 0 0.5px #c6224e;
         transition: .1s;
       }
     }
@@ -262,13 +265,13 @@
       }
 
       .slider::-webkit-slider-thumb:hover {
-        background-color: #eb5c20;
+        background-color: #c6224e;
         width: 17.5px;
         height: 17.5px;
       }
 
       .slider::-webkit-slider-thumb:active {
-        background-color: #eb5c20;
+        background-color: #c6224e;
         width: 17.5px;
         height: 17.5px;
       }
@@ -328,7 +331,7 @@
 }
 
 .datePickerInput:hover {
-  box-shadow: 0 0 0 0.5px #EB5C20;
+  box-shadow: 0 0 0 0.5px #c6224e;
   transition: .1s;
   cursor: pointer;
 }
