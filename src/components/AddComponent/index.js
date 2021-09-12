@@ -32,7 +32,7 @@ import { sortAddress } from '@/utils/utils';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import React, { useState, useEffect, useCallback } from 'react';
-import tokenList from '@/constants/TokenList';
+// import tokenList from '@/constants/TokenList';
 
 import {
   supportedTokens,
@@ -301,16 +301,14 @@ const MyComponent = props => {
     activate(injected);
   };
 
-  const onTokenClick = async () => {
+  const onTokenClick = async token => {
     onCancel();
     if (before) {
       if (account == undefined) {
         alert('please connect to your account');
       } else {
         setToken0(token);
-        setToken0Balance(
-          await getUserTokenBalance(token, chainId, account, library)
-        );
+        setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
         setToken0BalanceShow(true);
       }
     } else {
@@ -318,23 +316,21 @@ const MyComponent = props => {
         alert('please connect to your account');
       } else {
         setToken1(token);
-        setToken1Balance(
-          await getUserTokenBalance(token, chainId, account, library)
-        );
+        setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
         setToken1BalanceShow(true);
       }
     }
-  }
+  };
 
-  const [favTokenList, setFavTokenList] = useState([])
+  const [favTokenList, setFavTokenList] = useState([]);
 
-  const setTokenAsFav = (index) => {
-    setFavTokenList((prevState) => {
-      const prevFavTokenList = [...prevState]
-      prevFavTokenList.push(tokenList[index])
-      return prevFavTokenList
-    })
-  }
+  const setTokenAsFav = index => {
+    setFavTokenList(prevState => {
+      const prevFavTokenList = [...prevState];
+      prevFavTokenList.push(tokenList[index]);
+      return prevFavTokenList;
+    });
+  };
 
   return (
     <div>
@@ -555,13 +551,15 @@ const MyComponent = props => {
         <div className={styles.coinList}>
           <AcyTabs>
             <AcyTabPane tab="All" key="1">
-              {tokenList.map((token, index) => (
+              {supportedTokens.map((token, index) => (
                 <AcyCoinItem
                   data={token}
                   key={index}
                   customIcon={false}
                   setAsFav={() => setTokenAsFav(index)}
-                  selectToken={onTokenClick}
+                  selectToken={() => {
+                    onTokenClick(token);
+                  }}
                 />
               ))}
             </AcyTabPane>

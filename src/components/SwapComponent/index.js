@@ -27,7 +27,7 @@ import { Input } from 'antd';
 import { connect } from 'umi';
 import styles from './styles.less';
 import { sortAddress } from '@/utils/utils';
-import tokenList from '@/constants/TokenList';
+// import tokenList from '@/constants/TokenList';
 
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
@@ -47,6 +47,7 @@ import {
   INITIAL_ALLOWED_SLIPPAGE,
   isZero,
   ROUTER_ADDRESS,
+  supportedTokens,
 } from '@/acy-dex-swap/utils/index';
 
 import { swapGetEstimated, swap } from '@/acy-dex-swap/components/SwapComponent';
@@ -148,15 +149,15 @@ const SwapComponent = props => {
     // activate(injected);
   }, []);
 
-  const [favTokenList, setFavTokenList] = useState([])
+  const [favTokenList, setFavTokenList] = useState([]);
 
-  const setTokenAsFav = (index) => {
-    setFavTokenList((prevState) => {
-      const prevFavTokenList = [...prevState]
-      prevFavTokenList.push(tokenList[index])
-      return prevFavTokenList
-    })
-  }
+  const setTokenAsFav = index => {
+    setFavTokenList(prevState => {
+      const prevFavTokenList = [...prevState];
+      prevFavTokenList.push(tokenList[index]);
+      return prevFavTokenList;
+    });
+  };
 
   // token1Amount is changed according to token0Amount
   const t0Changed = useCallback(
@@ -304,7 +305,7 @@ const SwapComponent = props => {
     [account]
   );
 
-  const onCoinClick = async () => {
+  const onCoinClick = async token => {
     onCancel();
     if (before) {
       if (account == undefined) {
@@ -313,9 +314,7 @@ const SwapComponent = props => {
         setToken0(token);
         console.log('GETTING BALANCES');
         console.log(chainId);
-        setToken0Balance(
-          await getUserTokenBalance(token, chainId, account, library)
-        );
+        setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
         setToken0BalanceShow(true);
       }
     } else {
@@ -323,13 +322,11 @@ const SwapComponent = props => {
         alert('please connect to your account');
       } else {
         setToken1(token);
-        setToken1Balance(
-          await getUserTokenBalance(token, chainId, account, library)
-        );
+        setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
         setToken1BalanceShow(true);
       }
     }
-  }
+  };
 
   const onClickCoin = () => {
     setVisible(true);
@@ -472,14 +469,16 @@ const SwapComponent = props => {
         <div className={styles.coinList}>
           <AcyTabs>
             <AcyTabPane tab="All" key="1">
-              {tokenList.map((token, index) => {
+              {supportedTokens.map((token, index) => {
                 return (
                   <AcyCoinItem
                     data={token}
                     key={index}
                     customIcon={false}
                     setAsFav={() => setTokenAsFav(index)}
-                    selectToken={onCoinClick}
+                    selectToken={() => {
+                      onCoinClick(token);
+                    }}
                   />
                 );
               })}
@@ -489,7 +488,9 @@ const SwapComponent = props => {
                 <AcyCoinItem
                   data={supToken}
                   key={index}
-                  selectToken={onCoinClick}
+                  selectToken={() => {
+                    onCoinClick(token);
+                  }}
                   customIcon={false}
                   index={index}
                   setAsFav={() => setTokenAsFav(index)}
