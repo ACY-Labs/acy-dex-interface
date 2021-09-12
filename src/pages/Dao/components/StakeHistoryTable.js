@@ -59,10 +59,9 @@ const StakeHistoryTable = () => {
       className={styles.tableStyle}
       pagination={false}
       footer={() => (
-        <div className={styles.tableSeeMoreWrapper}>
+        <div className={styles.tableSeeMoreWrapper} onClick={() => setStakeDisplayNumber(prevState => prevState + 5)}>
           <a
             className={styles.tableSeeMore}
-            onClick={() => setStakeDisplayNumber(prevState => prevState + 5)}
           >
             See More...
           </a>

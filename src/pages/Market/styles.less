@@ -239,7 +239,7 @@ h3, h4{
         font-weight: bold;
     }
     .chartWrapper {
-        height: 100%;
+        height: 90%;
     }
     
 }
@@ -302,10 +302,13 @@ h3, h4{
     display:flex;
     justify-content: flex-end;
     font-family: sans-serif;
-    
+    margin-right: 0;
 }
-.ctaButton {
-    margin-right:10px;
+.ctaButton:nth-child(1) {
+    margin-right:5px;
+}
+.ctaButton:nth-child(2) {
+    margin-left:5px;
 }
 .contentStats, .contentCharts{
     background: @cardColor;
@@ -399,20 +402,37 @@ h3, h4{
     width: 100%;
 }
 .exchangeValueWrapper{
+    display:flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
     margin-top:30px;
     margin-bottom: 15px;
-    background-color: @cardColor;
-    width: 23%;
-    border-radius:15px;
+    width: 100%;
+    // width: 23%;
+    
 }
 .exchangeValueCard{
-    margin-right: 10px;
-    
+    display:flex;
+    align-items: center;
+    background-color: @cardColor;
+    border-radius:15px;
     padding: 10px;
     padding-right:20px;
     
     // margin-bottom: 10px;
 }
+.exchangeValueCard:nth-child(1){
+    width: 23%;
+}
+
+.exchangeValueRight{
+    width: 75%;
+    display:flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+
 
 
 
@@ -461,7 +481,7 @@ h3, h4{
 
         width: 100%;
         justify-content :flex-start;
-        
+        margin-left: 0;
     }
 
     .contentInfo{
@@ -473,7 +493,6 @@ h3, h4{
         width: 100%;
     }
     .contentCharts{
-        margin-left: 0px;
         width: 100%;
         height: 40vh;
     }
@@ -484,6 +503,10 @@ h3, h4{
     .exchangeValueWrapper{
         width: 100%;
     }
-
-    
+    .exchangeValueRight{
+        width: 100%;
+    }
+    .exchangeValueCard:nth-child(1){
+        width: 100%;
+    }
 }

@@ -1,30 +1,18 @@
-import React, { Component, useState, useCallback, useEffect } from 'react';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { Table, Row, Col, Input, Divider, Icon } from 'antd';
-import styles from './styles.less';
-import moment from 'moment';
-import { useDetectClickOutside } from 'react-detect-click-outside';
-import { Link } from 'react-router-dom';
-import ReactDOM from 'react-dom';
 import {
-  AcyCard,
   AcyIcon,
-  AcyPeriodTime,
-  AcyTabs,
-  AcyCuarrencyCard,
-  AcyConnectWalletBig,
-  AcyModal,
-  AcyInput,
-  AcyCoinItem,
-  AcyLineChart,
-  AcyBarChart,
-  AcyConfirm,
-  AcyApprove,
+  AcyTabs
 } from '@/components/Acy';
-
-import { TransactionType, abbrHash, abbrNumber, isDesktop, sortTable } from './Util.js';
-
+import { Divider, Icon, Input, Table } from 'antd';
+import moment from 'moment';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useDetectClickOutside } from 'react-detect-click-outside';
+import ReactDOM from 'react-dom';
+import { Link } from 'react-router-dom';
+import styles from './styles.less';
+import { abbrHash, abbrNumber, isDesktop, sortTable, TransactionType } from './Util.js';
 import { WatchlistManager } from './WatchlistManager.js';
+
+
 
 const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');
@@ -79,6 +67,15 @@ export class SmallTable extends React.Component {
     });
   };
 
+  componentDidUpdate(prevProps) {
+    // Typical usage (don't forget to compare props):
+    if (this.props.data !== prevProps.data) {
+      this.setState({
+        tableData: this.props.data
+      })
+    }
+  }
+
   renderBody = entry => {
     let content = <></>;
 
@@ -90,7 +87,7 @@ export class SmallTable extends React.Component {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <AcyIcon name={entry.short.toLowerCase()} width={20} height={20} />
-          <Link style={{ color: '#b5b5b6' }} className={styles.coinName} to="/market/info/token">
+          <Link style={{ color: '#b5b5b6' }} className={styles.coinName} to={`/market/info/token/${entry.address}`}>
             {entry.short}
           </Link>
           <span className={styles.coinShort}> ({entry.name})</span>
@@ -112,7 +109,7 @@ export class SmallTable extends React.Component {
           <Link
             style={{ color: '#b5b5b6' }}
             className={styles.coinName}
-            to="/market/info/pool"
+            to={`/market/info/pool/${entry.address}`}
             style={{ color: '#b5b5b6' }}
           >
             <span className={styles.coinName}>
@@ -761,10 +758,10 @@ export function TransactionTable(props) {
         key: 'time',
         render: (text, entry) => {
           function getRelTime(timeString) {
-            let a = moment(new Date(timeString));
+            let a = moment(new Date(timeString)).locale("en");
             return a.fromNow();
           }
-
+          
           return <div className={styles.tableData}>{getRelTime(text)}</div>;
         },
         visible: true,
@@ -897,6 +894,18 @@ export const MarketSearchBar = props => {
 
   const onInput = useCallback(e => {
     setSearchQuery(e.target.value);
+
+    let query = e.target.value.toLowerCase();
+
+    // coins return
+    let newCoin = props.dataSourceCoin.filter(item => item.name
+          .toLowerCase()
+          .includes(query) || item.short.toLowerCase().includes(query));
+    setSearchCoinReturns(newCoin);
+    let newPool = props.dataSourcePool.filter(item => item.coin1
+          .toLowerCase()
+          .includes(query) || item.coin2.toLowerCase().includes(query));
+    setSearchPoolReturns(newPool);
   });
 
   const onScroll = e => {
@@ -930,7 +939,6 @@ export const MarketSearchBar = props => {
   const outsideClickRef = useDetectClickOutside({
     onTriggered: () => {
       setVisibleSearchBar(false);
-      console.log('cheh');
     },
   });
   const outsideClickRefNetwork = useDetectClickOutside({
@@ -1037,23 +1045,23 @@ export const MarketSearchBar = props => {
                     className={styles.searchModal}
                     style={{ position: 'absolute', left: 0, right: 0, top: '10px' }}
                   >
-                    <AcyTabs destroyInactiveTabPane={true}>
+                    <AcyTabs>
                       <AcyTabPane tab="Search" key="1">
                         {searchCoinReturns.length > 0 ? (
                           <SmallTable
                             mode="token"
-                            data={props.dataSourceCoin}
+                            data={searchCoinReturns}
                             displayNumber={displayNumber}
                             refreshWatchlist={refreshWatchlist}
                           />
                         ) : (
-                          <div style={{ fontSize: '20px', margin: '20px' }}>No results</div>
+                          <div style={{ fontSize: '16x', margin: '20px' }}>No results</div>
                         )}
                         <Divider className={styles.searchModalDivider} />
                         {searchPoolReturns.length > 0 ? (
                           <SmallTable
                             mode="pool"
-                            data={props.dataSourcePool}
+                            data={searchPoolReturns}
                             displayNumber={displayNumber}
                             refreshWatchlist={refreshWatchlist}
                           />

@@ -1,50 +1,27 @@
-import React, { Component, useState, useCallback, useEffect } from 'react';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { Table, Row, Col, Input, Divider, Breadcrumb } from 'antd';
-import styles from './styles.less';
-import moment from 'moment';
-import { useDetectClickOutside } from 'react-detect-click-outside';
-import { Link, useParams } from 'react-router-dom';
 import {
-  AcyButton,
-  AcyCard,
-  AcyIcon,
-  AcyPeriodTime,
-  AcyTabs,
-  AcyCuarrencyCard,
-  AcyConnectWalletBig,
-  AcyModal,
-  AcyInput,
-  AcyCoinItem,
-  AcyLineChart,
-  AcyBarChart,
-  AcyConfirm,
-  AcyApprove,
-  AcySmallButton,
+  AcyBarChart, AcyIcon,
+  AcyLineChart, AcySmallButton
 } from '@/components/Acy';
-
-import {
-  TransactionType,
-  abbrHash,
-  abbrNumber,
-  columnsCoin,
-  columnsPool,
-  transactionHeader,
-  sortTable,
-  sortTableTime,
-} from './Util.js';
-
+import { Breadcrumb } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import {
   dataSourceCoin,
   dataSourcePool,
   dataSourceTransaction,
-  graphSampleData,
+  graphSampleData
 } from './SampleData.js';
-
-import { MarketSearchBar, SmallTable, TransactionTable } from './UtilComponent.js';
+import styles from './styles.less';
+import {
+  abbrNumber,
+  isDesktop
+} from './Util.js';
+import { MarketSearchBar, TransactionTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
 
-const { AcyTabPane } = AcyTabs;
+
+
+
 const watchlistManagerPool = new WatchlistManager('pool');
 
 let poolData = dataSourcePool[0];
@@ -57,6 +34,18 @@ function MarketPoolInfo(props) {
   );
   const [graphTabIndex, setGraphTabIndex] = useState(0);
   const [isWatchlist, setIsWatchlist] = useState(false);
+  const [selectChartDataVol, setSelectChartDataVol] = useState(
+    graphSampleData[graphSampleData.length - 1][1]
+  );
+  const [selectChartIndexVol, setSelectChartIndexVol] = useState(graphSampleData.length - 1);
+  const [selectChartDataTvl, setSelectChartDataTvl] = useState(
+    graphSampleData[graphSampleData.length - 1][1]
+  );
+  const [selectChartIndexTvl, setSelectChartIndexTvl] = useState(graphSampleData.length - 1);
+  const [selectChartDataLiq, setSelectChartDataLiq] = useState(
+    graphSampleData[graphSampleData.length - 1][1]
+  );
+  const [selectChartIndexLiq, setSelectChartIndexLiq] = useState(graphSampleData.length - 1);
 
   function switchChart(dest) {
     setGraphTabIndex(dest);
@@ -119,10 +108,11 @@ function MarketPoolInfo(props) {
         <div className={styles.rightButton}>
           <AcyIcon
             name={isWatchlist ? 'star_active' : 'star'}
+            width={16}
             style={{ marginLeft: '10px' }}
             onClick={() => toggleWatchlist([poolData.coin1, poolData.coin2, poolData.percent])}
           />
-          <AcyIcon name="redirect" style={{ marginLeft: '10px' }} />
+          <AcyIcon name="redirect" style={{ marginLeft: '10px' }} width={16} />
         </div>
       </div>
 
@@ -155,46 +145,52 @@ function MarketPoolInfo(props) {
             </div>
           </div>
         </div>
-        <div className={styles.contentCta}>
-          <div className={styles.ctaButton}>
-            <AcySmallButton color="#2a282e" borderColor="#2a282e" borderRadius="15px" padding="5px">
-              Add Liquidity
-            </AcySmallButton>
-          </div>
-          <div className={styles.ctaButton}>
-            <AcySmallButton color="#757579" borderColor="#757579" borderRadius="15px" padding="5px">
-              Trade
-            </AcySmallButton>
-          </div>
-        </div>
       </div>
       <div className={styles.exchangeValuePadder}>
-        <div
-          className={styles.exchangeValueWrapper}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            marginTop: '20px',
-          }}
-        >
-          <div
-            className={styles.exchangeValueCard}
-            style={{ display: 'flex', alignItems: 'center' }}
-          >
+        <div className={styles.exchangeValueWrapper}>
+          <div className={styles.exchangeValueCard}>
             <AcyIcon name={poolData.coin1.toLowerCase()} width={20} />
             <strong style={{ marginLeft: '10px' }}>
               1 {poolData.coin1} = {abbrNumber(0.00001)} {poolData.coin2}
             </strong>
           </div>
-          <div
-            className={styles.exchangeValueCard}
-            style={{ display: 'flex', alignItems: 'center' }}
-          >
-            <AcyIcon name={poolData.coin2.toLowerCase()} width={20} />
-            <strong style={{ marginLeft: '10px' }}>
-              1 {poolData.coin2} = {abbrNumber(274047502)} {poolData.coin1}
-            </strong>
+          <div className={styles.exchangeValueRight}>
+            <div
+              className={styles.exchangeValueCard}
+              style={{
+                width: isDesktop() ? '35%' : '100%',
+                marginTop: isDesktop() ? 0 : '10px',
+                marginBottom: isDesktop() ? 0 : '10px',
+              }}
+            >
+              <AcyIcon name={poolData.coin2.toLowerCase()} width={20} />
+              <strong style={{ marginLeft: '10px' }}>
+                1 {poolData.coin2} = {abbrNumber(274047502)} {poolData.coin1}
+              </strong>
+            </div>
+            <div className={styles.contentCta}>
+              <div className={styles.ctaButton}>
+                <AcySmallButton
+                  color="#2e3032"
+                  borderColor="#2e3032"
+                  borderRadius="15px"
+                  padding="10px"
+                >
+                  <AcyIcon name="addlq" width={16} style={{ marginRight: '10px' }} />
+                  Add Liquidity
+                </AcySmallButton>
+              </div>
+              <div className={styles.ctaButton}>
+                <AcySmallButton
+                  color="#1e5d91"
+                  borderColor="#1e5d91"
+                  borderRadius="15px"
+                  padding="10px"
+                >
+                  Trade
+                </AcySmallButton>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -237,21 +233,44 @@ function MarketPoolInfo(props) {
           <div className={styles.statEntry}>
             <div className={styles.statEntryName}>24h Fees</div>
             <div className={styles.statEntryValue}>$ {abbrNumber(poolData.volume24h)}</div>
+            <div className={styles.statEntryChange} style={{ visibility: 'hidden' }}>
+              00{' '}
+            </div>
           </div>
         </div>
         <div className={styles.contentCharts}>
           <div className={styles.contentChartsHeader}>
-            <div className={styles.contentChartsIndicator}>
-              <div className={styles.chartIndicatorValue}>$999.99m</div>
-              <div className={styles.chartIndicatorTime}>2020-11-20</div>
-            </div>
+            {graphTabIndex == 0 && (
+              <div className={styles.contentChartsIndicator}>
+                <div className={styles.chartIndicatorValue}>$ {selectChartDataVol}</div>
+                <div className={styles.chartIndicatorTime}>
+                  {graphSampleData[selectChartIndexVol][0]}
+                </div>
+              </div>
+            )}
+            {graphTabIndex == 1 && (
+              <div className={styles.contentChartsIndicator}>
+                <div className={styles.chartIndicatorValue}>$ {selectChartDataTvl}</div>
+                <div className={styles.chartIndicatorTime}>
+                  {graphSampleData[selectChartIndexTvl][0]}
+                </div>
+              </div>
+            )}
+            {graphTabIndex == 2 && (
+              <div className={styles.contentChartsIndicator}>
+                <div className={styles.chartIndicatorValue}>$ {selectChartDataLiq}</div>
+                <div className={styles.chartIndicatorTime}>
+                  {graphSampleData[selectChartIndexLiq][0]}
+                </div>
+              </div>
+            )}
             <div className={styles.contentChartsSelector}>
               <AcySmallButton
                 color={graphTabIndex == 0 ? '#1b1b1c' : '#757579'}
                 textColor="white"
                 borderColor="#757579"
                 borderRadius="15px 0 0 15px"
-                padding="5px"
+                padding="2px 5px"
                 onClick={() => switchChart(0)}
                 id="0"
               >
@@ -262,7 +281,7 @@ function MarketPoolInfo(props) {
                 textColor="white"
                 borderColor="#757579"
                 borderRadius="0 0 0 0"
-                padding="5px"
+                padding="2px 5px"
                 onClick={() => switchChart(1)}
                 id="1"
               >
@@ -273,7 +292,7 @@ function MarketPoolInfo(props) {
                 textColor="white"
                 borderColor="#757579"
                 borderRadius="0 15px 15px 0"
-                padding="5px"
+                padding="2px 5px"
                 onClick={() => switchChart(2)}
                 id="2"
               >
@@ -284,7 +303,15 @@ function MarketPoolInfo(props) {
           <div className={styles.contentChartsBody}>
             {graphTabIndex == 0 && (
               <div className={styles.contentChartWrapper}>
-                <AcyBarChart backData={graphSampleData} barColor="#1e5d91" />
+                <AcyBarChart
+                  backData={graphSampleData}
+                  barColor="#1e5d91"
+                  showXAxis
+                  onHover={(data, index) => {
+                    setSelectChartDataVol(abbrNumber(data));
+                    setSelectChartIndexVol(index);
+                  }}
+                />
               </div>
             )}
             {graphTabIndex == 1 && (
@@ -295,12 +322,24 @@ function MarketPoolInfo(props) {
                   showGradient={true}
                   lineColor="#1e5d91"
                   bgColor="#29292c"
+                  onHover={(data, index) => {
+                    setSelectChartDataTvl(abbrNumber(data));
+                    setSelectChartIndexTvl(index);
+                  }}
                 />
               </div>
             )}
             {graphTabIndex == 2 && (
               <div className={styles.contentChartWrapper}>
-                <AcyBarChart backData={graphSampleData} barColor="#1e5d91" />
+                <AcyBarChart
+                  backData={graphSampleData}
+                  barColor="#1e5d91"
+                  showXAxis
+                  onHover={(data, index) => {
+                    setSelectChartDataLiq(abbrNumber(data));
+                    setSelectChartIndexLiq(index);
+                  }}
+                />
               </div>
             )}
           </div>

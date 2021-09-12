@@ -17,14 +17,6 @@ const StakeSection = () => {
   const [token2, setToken2] = useState(SampleToken.filter((token) => token.symbol === 'WETH')[0])
   const [token1Percentage, setToken1Percentage] = useState(50)
   const [token2Percentage, setToken2Percentage] = useState(50)
-  const [presetDate, setPresetDate] = useState([
-    ['week', 1, '1W', false],
-    ['month', 1, '1M', false],
-    ['month', 3, '3M', false],
-    ['month', 6, '6M', false],
-    ['year', 1, '1Y', false],
-    ['year', 4, '4Y', false],
-  ])
   const [selectedPresetDate, setSelectedPresetDate] = useState(null)
 
   const updateStake = (newStake) => {
@@ -177,6 +169,7 @@ const StakeSection = () => {
                     ['4Y', () => updateDate('year', 4, 5)],
                   ]}
                   containerClass={styles.presetDurationSelection}
+                  theme="#eb5c20"
                 />
               </div>
             </div>

@@ -1,50 +1,27 @@
-import React, { Component, useState, useCallback, useEffect } from 'react';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { Table, Row, Col, Input, Divider, Breadcrumb } from 'antd';
-import styles from './styles.less';
-import moment from 'moment';
-import { useDetectClickOutside } from 'react-detect-click-outside';
-import { Link, useParams } from 'react-router-dom';
 import {
-  AcyButton,
-  AcyCard,
-  AcyIcon,
-  AcyPeriodTime,
-  AcyTabs,
-  AcyCuarrencyCard,
-  AcyConnectWalletBig,
-  AcyModal,
-  AcyInput,
-  AcyCoinItem,
-  AcyLineChart,
-  AcyBarChart,
-  AcyConfirm,
-  AcyApprove,
-  AcySmallButton,
+  AcyBarChart, AcyIcon,
+  AcyLineChart, AcySmallButton
 } from '@/components/Acy';
-
-import {
-  TransactionType,
-  abbrHash,
-  abbrNumber,
-  transactionHeader,
-  sortTable,
-  sortTableTime,
-  openInNewTab,
-} from './Util.js';
-
+import { Breadcrumb } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import {
   dataSourceCoin,
   dataSourcePool,
   dataSourceTransaction,
-  graphSampleData,
+  graphSampleData
 } from './SampleData.js';
-
-import { MarketSearchBar, SmallTable, PoolTable, TransactionTable } from './UtilComponent.js';
-
+import styles from './styles.less';
+import {
+  abbrNumber
+} from './Util.js';
+import { MarketSearchBar, PoolTable, TransactionTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
 
-const { AcyTabPane } = AcyTabs;
+
+
+
+
 const watchlistManagerToken = new WatchlistManager('token');
 
 function MarketTokenInfo(props) {
@@ -55,6 +32,18 @@ function MarketTokenInfo(props) {
   );
   const [graphTabIndex, setGraphTabIndex] = useState(0);
   const [isWatchlist, setIsWatchlist] = useState(false);
+  const [selectChartDataVol, setSelectChartDataVol] = useState(
+    graphSampleData[graphSampleData.length - 1][1]
+  );
+  const [selectChartIndexVol, setSelectChartIndexVol] = useState(graphSampleData.length - 1);
+  const [selectChartDataTvl, setSelectChartDataTvl] = useState(
+    graphSampleData[graphSampleData.length - 1][1]
+  );
+  const [selectChartIndexTvl, setSelectChartIndexTvl] = useState(graphSampleData.length - 1);
+  const [selectChartDataPrice, setSelectChartDataPrice] = useState(
+    graphSampleData[graphSampleData.length - 1][1]
+  );
+  const [selectChartIndexPrice, setSelectChartIndexPrice] = useState(graphSampleData.length - 1);
 
   function switchChart(dest) {
     setGraphTabIndex(dest);
@@ -113,10 +102,11 @@ function MarketTokenInfo(props) {
           <AcyIcon
             name={isWatchlist ? 'star_active' : 'star'}
             style={{ marginLeft: '10px' }}
+            width={16}
             onClick={() => toggleWatchlist(tokenData.short)}
           />
-          <AcyIcon name="cmc" style={{ marginLeft: '10px' }} />
-          <AcyIcon name="redirect" style={{ marginLeft: '10px' }} />
+          <AcyIcon name="cmc" style={{ marginLeft: '10px' }} width={16} />
+          <AcyIcon name="redirect" style={{ marginLeft: '10px' }} width={16} />
         </div>
       </div>
 
@@ -152,12 +142,23 @@ function MarketTokenInfo(props) {
         </div>
         <div className={styles.contentCta}>
           <div className={styles.ctaButton}>
-            <AcySmallButton color="#2a282e" borderColor="#2a282e" borderRadius="15px" padding="5px">
+            <AcySmallButton
+              color="#2e3032"
+              borderColor="#2e3032"
+              borderRadius="15px"
+              padding="10px"
+            >
+              <AcyIcon name="addlq" width={16} style={{ marginRight: '10px' }} />
               Add Liquidity
             </AcySmallButton>
           </div>
           <div className={styles.ctaButton}>
-            <AcySmallButton color="#757579" borderColor="#757579" borderRadius="15px" padding="5px">
+            <AcySmallButton
+              color="#1e5d91"
+              borderColor="#1e5d91"
+              borderRadius="15px"
+              padding="10px"
+            >
               Trade
             </AcySmallButton>
           </div>
@@ -183,25 +184,52 @@ function MarketTokenInfo(props) {
           <div className={styles.statEntry}>
             <div className={styles.statEntryName}>7d Trading Vol</div>
             <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.volume24h)}</div>
+            <div className={styles.statEntryChange} style={{ visibility: 'hidden' }}>
+              00{' '}
+            </div>
           </div>
           <div className={styles.statEntry}>
             <div className={styles.statEntryName}>24h Fees</div>
             <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.volume24h)}</div>
+            <div className={styles.statEntryChange} style={{ visibility: 'hidden' }}>
+              00{' '}
+            </div>
           </div>
         </div>
         <div className={styles.contentCharts}>
           <div className={styles.contentChartsHeader}>
-            <div className={styles.contentChartsIndicator}>
-              <div className={styles.chartIndicatorValue}>$999.99m</div>
-              <div className={styles.chartIndicatorTime}>2020-11-20</div>
-            </div>
+            {graphTabIndex == 0 && (
+              <div className={styles.contentChartsIndicator}>
+                <div className={styles.chartIndicatorValue}>$ {selectChartDataVol}</div>
+                <div className={styles.chartIndicatorTime}>
+                  {graphSampleData[selectChartIndexVol][0]}
+                </div>
+              </div>
+            )}
+            {graphTabIndex == 1 && (
+              <div className={styles.contentChartsIndicator}>
+                <div className={styles.chartIndicatorValue}>$ {selectChartDataTvl}</div>
+                <div className={styles.chartIndicatorTime}>
+                  {graphSampleData[selectChartIndexTvl][0]}
+                </div>
+              </div>
+            )}
+            {graphTabIndex == 2 && (
+              <div className={styles.contentChartsIndicator}>
+                <div className={styles.chartIndicatorValue}>$ {selectChartDataPrice}</div>
+                <div className={styles.chartIndicatorTime}>
+                  {graphSampleData[selectChartIndexPrice][0]}
+                </div>
+              </div>
+            )}
+
             <div className={styles.contentChartsSelector}>
               <AcySmallButton
                 color={graphTabIndex == 0 ? '#1b1b1c' : '#757579'}
                 textColor="white"
                 borderColor="#757579"
                 borderRadius="15px 0 0 15px"
-                padding="5px"
+                padding="2px 5px"
                 onClick={() => switchChart(0)}
                 id="0"
               >
@@ -212,7 +240,7 @@ function MarketTokenInfo(props) {
                 textColor="white"
                 borderColor="#757579"
                 borderRadius="0 0 0 0"
-                padding="5px"
+                padding="2px 5px"
                 onClick={() => switchChart(1)}
                 id="1"
               >
@@ -223,7 +251,7 @@ function MarketTokenInfo(props) {
                 textColor="white"
                 borderColor="#757579"
                 borderRadius="0 15px 15px 0"
-                padding="5px"
+                padding="2px 5px"
                 onClick={() => switchChart(2)}
                 id="2"
               >
@@ -234,7 +262,15 @@ function MarketTokenInfo(props) {
           <div className={styles.contentChartsBody}>
             {graphTabIndex == 0 && (
               <div className={styles.contentChartWrapper}>
-                <AcyBarChart backData={graphSampleData} barColor="#1e5d91" />
+                <AcyBarChart
+                  data={graphSampleData}
+                  barColor="#1e5d91"
+                  showXAxis
+                  onHover={(data, index) => {
+                    setSelectChartDataVol(abbrNumber(data));
+                    setSelectChartIndexVol(index);
+                  }}
+                />
               </div>
             )}
             {graphTabIndex == 1 && (
@@ -245,6 +281,10 @@ function MarketTokenInfo(props) {
                   showGradient={true}
                   lineColor="#1e5d91"
                   bgColor="#29292c"
+                  onHover={(data, index) => {
+                    setSelectChartDataTvl(abbrNumber(data));
+                    setSelectChartIndexTvl(index);
+                  }}
                 />
               </div>
             )}
@@ -256,6 +296,10 @@ function MarketTokenInfo(props) {
                   showGradient={true}
                   lineColor="#1e5d91"
                   bgColor="#29292c"
+                  onHover={(data, index) => {
+                    setSelectChartDataPrice(abbrNumber(data));
+                    setSelectChartIndexPrice(index);
+                  }}
                 />
               </div>
             )}

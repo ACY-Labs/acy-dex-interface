@@ -1,0 +1,468 @@
+// Farms Container
+
+.farmsContainer {
+  padding: 0 1.25rem;
+
+  .tableControlButtonContainer {
+    display: flex;
+    justify-content: space-between;
+
+    .tableHeaderButtonContainer {
+      display: flex;
+      align-items: center;
+
+      .tableHeaderRadioButtonContainer {
+        margin-right: 0.5rem;
+      }
+
+      .tableHeaderSearchInputContainer {
+        .searchInput {
+          border: none;
+          background-color: #1b1b1c;
+          padding: 0.25rem 0.5rem;
+          border-radius: 9999px;
+          margin-right: 0.5rem;
+          width: 14rem;
+          outline: none;
+          box-shadow: 0 0 0 0.5px transparent;
+
+          &:focus {
+            box-shadow: 0 0 0 0.5px #eb5c20;
+          }
+        }
+      }
+
+      .tableHeaderToggleButtonContainer {
+        .activeToggleButton,
+        .endedToggleButton {
+          border: none;
+          background-color: #1b1b1c;
+          padding: 0.25rem 1rem;
+
+          &:hover {
+            background-color: #29292c;
+            cursor: pointer;
+          }
+        }
+
+        .activeToggleButton {
+          border-radius: 9999px 0 0 9999px;
+        }
+
+        .endedToggleButton {
+          border-left: 1px solid #29292c;
+          border-radius: 0 9999px 9999px 0;
+        }
+      }
+    }
+  }
+
+  .tableToggleButtonContainer {
+    margin-bottom: 1.5rem;
+  }
+}
+
+// Table Container
+
+.tableContainer {
+  background-color: #29292c;
+  border-radius: 0.5rem;
+  margin-bottom: 3rem;
+  overflow: hidden;
+
+  .tableBodyContainer {
+    padding: 0 0.5rem 0.5rem 0.5rem;
+  }
+
+  .tableFooterContainer {
+    background-color: #1b1b1c;
+    text-align: center;
+    padding: 0.75rem 0;
+    transition: .2s;
+
+    &:hover {
+      background-color: #0e0304;
+      cursor: pointer;
+    }
+  }
+}
+
+// Table Header Container
+
+.tableHeaderContainer {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+
+  .tableHeaderTitleContainer {
+    .tableHeaderTitle {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+
+    .tableHeaderSubtitle {
+      font-weight: lighter;
+    }
+  }
+}
+
+// Table Row Container
+
+.tableBodyRowContainer {
+  background-color: #1b1b1c;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+
+  .tableBodyRowContentContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    .tableBodyTitleColContainer {
+      flex: 5;
+      display: flex;
+
+      .token1LogoContainer,
+      .token2LogoContainer {
+        width: 1.5rem;
+        height: 1.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        img {
+          max-width: 100%;
+          max-height: 100%;
+        }
+      }
+
+      .tokenTitleContainer {
+        margin-left: 0.5rem;
+        font-size: 1rem;
+      }
+    }
+
+    .tableBodyRewardColContainer {
+      flex: 3;
+
+      .pendingRewardTitleContainer {
+        font-weight: lighter;
+      }
+
+      .pendingReward1ContentContainer {
+        font-size: 1rem;
+      }
+    }
+
+    .tableBodyAprColContainer {
+      flex: 3;
+
+      .totalAprTitleContainer {
+        font-weight: lighter;
+      }
+
+      .totalAprContentContainer {
+        font-size: 1rem;
+      }
+    }
+
+    .tableBodyTvlColContainer {
+      flex: 3;
+
+      .tvlTitleContainer {
+        font-weight: lighter;
+      }
+
+      .tvlContentContainer {
+        font-size: 1rem;
+      }
+    }
+
+    .tableBodyArrowColContainer {
+      flex: 1;
+      text-align: right;
+
+      .arrowIcon {
+        max-width: 1.25rem;
+        max-height: 1.25rem;
+      }
+    }
+  }
+
+  &:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+
+  .tableBodyDrawerContainer {
+    border-top: 1px solid #29292c;
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+
+    .tableBodyDrawerLiquidityContainer {
+      flex: 1;
+      margin-right: 0.5rem;
+
+      .tableCodyDrawerLiquidityLink {
+        color: #eb5c20;
+        font-weight: bold;
+      }
+    }
+
+    .tableBodyDrawerRewardContainer {
+      flex: 2;
+      margin-right: 0.5rem;
+      border: 1px solid #29292c;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+
+      .tableBodyDrawerRewardTitle {
+        margin-bottom: 0.5rem;
+      }
+
+      .tableBodyDrawerRewardContent {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .tableBodyDrawerRewardHarvestButton {
+          border: 1px solid #eb5c20;
+          background-color: #1b1b1c;
+          padding: 0.25rem 0.5rem;
+          border-radius: 0.25rem;
+
+          &:hover {
+            background-color: #29292c;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+
+    .tableBodyDrawerFarmContainer {
+      flex: 2;
+      border: 1px solid #29292c;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+
+      .tableBodyDrawerWalletTitle {
+        margin-bottom: 0.5rem;
+      }
+
+      .tableBodyDrawerWalletButton {
+        border: 1px solid #eb5c20;
+        background-color: #1b1b1c;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        width: 100%;
+
+        &:hover {
+          background-color: #29292c;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
+
+// Toggle Button
+
+.firstToggleButton {
+  border: 1px solid transparent;
+  background-color: #29292c;
+  padding: 0.25rem 1.25rem;
+  border-radius: 0.25rem;
+  margin-right: 0.5rem;
+  font-size: 1.24rem;
+}
+
+.middleToggleButton {
+  border: 1px solid transparent;
+  background-color: #29292c;
+  padding: 0.25rem 1.25rem;
+  border-radius: 0.25rem 0 0 0.25rem;
+  margin-right: 0;
+  font-size: 1.24rem;
+}
+
+.lastToggleButton {
+  border: 1px solid transparent;
+  background-color: #29292c;
+  padding: 0.25rem 1.25rem;
+  border-radius: 0 0.25rem 0.25rem 0;
+  margin-right: 0;
+  font-size: 1.24rem;
+}
+
+.firstToggleButton:hover,
+.middleToggleButton:hover,
+.lastToggleButton:hover {
+  cursor: pointer;
+  border-color: #eb5c2080;
+}
+
+.amountRowContainer {
+  display: flex;
+  position: relative;
+
+  .amountRowInputContainer {
+    flex: 1;
+    margin-bottom: 0.5rem;
+
+    input {
+      width: 100%;
+      background-color: #1B1B1C;
+      border: 1px solid #40444f99;
+      border-radius: 9999px;
+      font-size: 1.5rem;
+      padding: 0 1rem;
+      -moz-appearance: textfield;
+      box-shadow: 0 0 0 0.5px transparent;
+      margin-bottom: 0.25rem;
+
+      &:hover {
+        border: 1px solid #40444fff;
+      }
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 0 0.5px #eb5c20;
+      transition: .1s;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  .suffix {
+    font-size: 1.25rem;
+    position: absolute;
+    right: 1.25rem;
+    top: 0.25rem;
+  }
+}
+
+.balanceAmountContainer {
+  margin-bottom: 1rem;
+}
+
+.sliderWrapper {
+  display: flex;
+  margin-bottom: 1rem;
+
+  .slider {
+    flex: 1;
+    padding: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3px; /* Specified height */
+    background: black; /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+    transition: opacity 0.2s;
+  }
+
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 15px; /* Set a specific slider handle width */
+    height: 15px; /* Slider handle height */
+    border-radius: 50%;
+    background-color: #C4C4C4; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+    transition: .2s;
+  }
+
+  .slider::-webkit-slider-thumb:hover {
+    background-color: #eb5c20;
+    width: 17.5px;
+    height: 17.5px;
+  }
+
+  .slider::-webkit-slider-thumb:active {
+    background-color: #eb5c20;
+    width: 17.5px;
+    height: 17.5px;
+  }
+
+  .slider::-moz-range-thumb {
+    width: 15px; /* Set a specific slider handle width */
+    height: 15px; /* Slider handle height */
+    background-color: #C4C4C4; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+  }
+}
+
+.lockTimeRow {
+  margin-bottom: 1rem;
+
+  .lockTimeRowTitleContainer {
+    flex: 1;
+
+    .lockTimeRowTitle {
+      text-align: right;
+      padding-right: 1.5rem;
+    }
+  }
+
+
+  .dateSelectionContainer {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+
+    .datePickerContainer {
+      margin-bottom: 0.75rem;
+    }
+
+    .presetDurationContainer {
+      width: 100%;
+
+      .presetDurationSelection {
+        width: 100%;
+        display: flex;
+      }
+    }
+  }
+}
+
+.datePickerInput {
+  color: #b5b6b6;
+  background-color: #1B1B1C;
+  border: 1px solid #40444f99;
+  border-radius: 0.3rem;
+  font-size: 1rem;
+  padding: 0.25rem 1.5rem;
+  box-shadow: 0 0 0 0.5px transparent;
+  margin-bottom: 0;
+}
+
+.datePickerInput:hover {
+  box-shadow: 0 0 0 0.5px #eb5c20;
+  transition: .1s;
+  cursor: pointer;
+}
+
+.stakeSubmitButton {
+  width: 100%;
+  background-color: #4c4c4d;
+  border: none;
+  border-radius: 7.5px;
+  font-size: 1.5rem;
+  padding: 0 1rem;
+}
+
+.stakeSubmitButton:hover {
+  background-color: #5f5f5f;
+  cursor: pointer;
+}

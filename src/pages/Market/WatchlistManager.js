@@ -4,6 +4,7 @@
 // save only COIN shorthands for tokens
 // save only the pair name for the POOL
 // includes callback when storage changes
+// mode is either "pool" or "token"
 export class WatchlistManager {
   constructor(mode) {
     this.mode = mode;

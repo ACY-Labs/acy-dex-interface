@@ -73,6 +73,16 @@
   .main{
     display: grid;
     grid-template-columns: auto 425px;
+    padding: 0 40px;
+  }
+}
+
+@media (max-width: 768px){
+  .main{
+    padding: 0 40px;
+  }
+  .option{
+    padding: 0 40px;
   }
 }
 .routing{
@@ -159,6 +169,15 @@
     height: 250px;
     background: #2E3032;
     border-radius: 10px;
+  }
+}
+@media (max-width: 768px){
+  .routing{
+    font-size: 16px;
+    .node{
+      width: 108px !important;
+      height: 54px !important;
+    }
   }
 }
 
