@@ -169,7 +169,7 @@ const StakeSection = () => {
                     ['4Y', () => updateDate('year', 4, 5)],
                   ]}
                   containerClass={styles.presetDurationSelection}
-                  theme="#c6224e"
+                  theme="#eb5c20"
                 />
               </div>
             </div>

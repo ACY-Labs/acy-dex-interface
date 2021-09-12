@@ -211,7 +211,7 @@ const FarmsTableRow = (
                   ['4Y', () => updateDate('year', 4, 5)],
                 ]}
                 containerClass={styles.presetDurationSelection}
-                theme="#1d5e91"
+                theme="#eb5c20"
               />
             </div>
           </div>
