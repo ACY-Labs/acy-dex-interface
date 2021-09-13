@@ -405,7 +405,7 @@ const SwapComponent = props => {
       {/*</AcyDescriptions>*/}
 
       <AcyDescriptions>
-        {swapBreakdown && <AcyDescriptions.Item>swap breakdown</AcyDescriptions.Item>}
+        {/* {swapBreakdown && <AcyDescriptions.Item>swap breakdown</AcyDescriptions.Item>} */}
         {swapBreakdown &&
           swapBreakdown.map(info => <AcyDescriptions.Item>{info}</AcyDescriptions.Item>)}
       </AcyDescriptions>
