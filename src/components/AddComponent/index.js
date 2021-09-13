@@ -142,7 +142,7 @@ const AddLiquidityComponent = props => {
   // 初始化函数时连接钱包
   useEffect(
     () => {
-      // activate(injected);
+      activate(injected);
     },
     [account]
   );
@@ -377,13 +377,22 @@ const AddLiquidityComponent = props => {
       />
 
       <AcyDescriptions>
-        <AcyDescriptions.Item>
-          the Slippage Tolerance: [ {slippageTolerance}% ]
-        </AcyDescriptions.Item>
-
-        {liquidityBreakdown && <AcyDescriptions.Item>liquidity breakdown</AcyDescriptions.Item>}
-        {liquidityBreakdown &&
-          liquidityBreakdown.map(info => <AcyDescriptions.Item>{info}</AcyDescriptions.Item>)}
+        {liquidityBreakdown && (
+          <div className={styles.acyDescriptionContainer}>
+            <AcyDescriptions.Item>
+              <div className={styles.acyDescriptionTitle}>
+                liquidity breakdown
+              </div>
+            </AcyDescriptions.Item>
+            {liquidityBreakdown.map(info => (
+              <AcyDescriptions.Item>
+                <div className={styles.acyDescriptionItem}>
+                  {info}
+                </div>
+              </AcyDescriptions.Item>
+            ))}
+          </div>
+        )}
       </AcyDescriptions>
 
       {approveToken0ButtonShow == true && (
