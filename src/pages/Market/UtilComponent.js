@@ -228,7 +228,7 @@ export function TokenTable(props) {
             Name
             {currentKey == 'name' && (
               <Icon
-                type={!isAscending ? 'up' : 'down'}
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
               />
             )}
@@ -266,7 +266,7 @@ export function TokenTable(props) {
             Price
             {currentKey == 'price' && (
               <Icon
-                type={!isAscending ? 'up' : 'down'}
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
               />
             )}
@@ -291,7 +291,7 @@ export function TokenTable(props) {
             Price Change
             {currentKey == 'priceChange' && (
               <Icon
-                type={!isAscending ? 'up' : 'down'}
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
               />
             )}
@@ -322,7 +322,7 @@ export function TokenTable(props) {
             Volume 24H
             {currentKey == 'volume24h' && (
               <Icon
-                type={!isAscending ? 'up' : 'down'}
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
               />
             )}
@@ -347,7 +347,7 @@ export function TokenTable(props) {
             TVL
             {currentKey == 'tvl' && (
               <Icon
-                type={!isAscending ? 'up' : 'down'}
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
               />
             )}
@@ -413,7 +413,7 @@ export function PoolTable(props) {
             Pool
             {currentKey == 'percent' && (
               <Icon
-                type={!isAscending ? 'up' : 'down'}
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
               />
             )}
@@ -458,7 +458,7 @@ export function PoolTable(props) {
             TVL
             {currentKey == 'tvl' && (
               <Icon
-                type={!isAscending ? 'up' : 'down'}
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
               />
             )}
@@ -483,7 +483,7 @@ export function PoolTable(props) {
             Volume 24H
             {currentKey == 'volume24h' && (
               <Icon
-                type={!isAscending ? 'up' : 'down'}
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
               />
             )}
@@ -508,7 +508,7 @@ export function PoolTable(props) {
             Volume 7D
             {currentKey == 'volume7d' && (
               <Icon
-                type={!isAscending ? 'up' : 'down'}
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
               />
             )}
@@ -636,7 +636,7 @@ export function TransactionTable(props) {
             Total Value
             {currentKey == 'totalValue' && (
               <Icon
-                type={!isAscending ? 'up' : 'down'}
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
               />
             )}
@@ -661,7 +661,7 @@ export function TransactionTable(props) {
             Token Amount
             {currentKey == 'coin1Amount' && (
               <Icon
-                type={!isAscending ? 'up' : 'down'}
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
               />
             )}
@@ -690,7 +690,7 @@ export function TransactionTable(props) {
             Token Amount
             {currentKey == 'coin2Amount' && (
               <Icon
-                type={!isAscending ? 'up' : 'down'}
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
               />
             )}
@@ -719,7 +719,7 @@ export function TransactionTable(props) {
             Account
             {currentKey == 'account' && (
               <Icon
-                type={!isAscending ? 'up' : 'down'}
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
               />
             )}
@@ -748,7 +748,7 @@ export function TransactionTable(props) {
             Time
             {currentKey == 'time' && (
               <Icon
-                type={!isAscending ? 'up' : 'down'}
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
               />
             )}
