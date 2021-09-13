@@ -1,0 +1,122 @@
+@import '~antd/lib/style/themes/default.less';
+.acycuarrencycard{
+  display: flex;
+  flex-flow: column nowrap;
+  position: relative;
+  // border-radius: 20px;
+  // background-color: rgb(44, 47, 54);
+  z-index: 1;
+  width: initial;
+  .cua_title{
+    font-size: 14px;
+    font-weight: 400;
+    color: #f3f3fc;
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .cua_body{
+    border-radius: 10px;
+    // border: 1px solid rgb(44, 47, 54);
+    // background-color: rgb(33, 36, 41);
+    width: initial;
+    // &:hover{
+    //   border: 1px solid rgb(64, 68, 79);
+    // }
+    .cua_group{
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      // padding:1rem 1rem 0.75rem;
+      .switchcoin{
+        align-items: center;
+        font-size: 18px;
+        font-weight: 500;
+        background-color: rgb(25, 27, 31);
+        color: rgb(255, 255, 255);
+        border-radius: 10px;
+        outline: none;
+        cursor: pointer;
+        user-select: none;
+        border: none;
+        height: 2.4rem;
+        width: initial;
+        padding: 0px 8px;
+        justify-content: space-between;
+        margin-right: 12px;
+        line-height: inherit;
+        &:hover{
+          cursor: pointer;
+          background-color: rgb(44, 47, 54);
+        }
+        .wrap{
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          box-sizing: border-box;
+          margin: 0px;
+          min-width: 0px;
+          .coin{
+            width: fit-content;
+            display: flex;
+            padding: 0px;
+            align-items: center;
+            justify-content: flex-start;
+           
+          }
+        }
+      }
+      :global{
+        input:focus{
+          outline:medium !important;
+          border: 1px solid #e29228;
+        }
+      }
+      .input{
+        color: rgb(255, 255, 255);
+        width: 0px;
+        position: relative;
+        font-weight: 500;
+        outline: none;
+        border: none;
+        flex: 1 1 auto;
+        height: unset;
+        border: 0;
+        border-radius: 0;
+        background-color: rgb(25, 27, 31);
+        border-radius: 10px;
+        font-size: 22px;
+        padding: 0px 8px;
+        height: 2.4rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        appearance: textfield;
+        text-align: right;
+      }
+    }
+    .cua_balance{
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: flex-end;
+      line-height: 0.6rem;
+      padding: 1rem 0;
+      box-sizing: border-box;
+      margin: 0px;
+      min-width: 0px;
+      font-weight: 400;
+      font-size: 14px;
+      color: rgb(195, 197, 203);
+    }
+  }
+  .cua_light{
+    // border: 1px solid #e29228;
+    &:hover{
+      cursor: pointer;
+      // border: 1px solid #e29228;
+    }
+  }
+}
