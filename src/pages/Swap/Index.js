@@ -161,7 +161,7 @@ class BasicProfile extends Component {
     visibleLoading: false,
     tabIndex: 1,
   };
-  componentDidMount() { }
+  componentDidMount() {}
 
   lineTitleRender = () => {
     return [
@@ -216,16 +216,15 @@ class BasicProfile extends Component {
     return (
       <PageHeaderWrapper>
         <div className={styles.main}>
-          {
-            isMobile && <div>
-              <AcyCard style={{backgroundColor:"#1b1b1c", padding:"10px"}}>
+          {isMobile && (
+            <div>
+              <AcyCard style={{ backgroundColor: '#1b1b1c', padding: '10px' }}>
                 <div className={styles.trade}>
-
                   <SwapComponent />
                 </div>
               </AcyCard>
             </div>
-          }
+          )}
           <div>
             {(tabIndex == 1 && (
               <AcyCard style={{ background: 'transparent' }} title={this.lineTitleRender()}>
@@ -234,11 +233,17 @@ class BasicProfile extends Component {
                     width: '100%',
                   }}
                 >
-                  <div style={{
-                    height: '576px',
-                  }}>
-                    <AcyLineChart backData={[]} showGradient={false} showXAxis={false} lineColor='#e29227' />
-
+                  <div
+                    style={{
+                      height: '576px',
+                    }}
+                  >
+                    <AcyLineChart
+                      backData={[]}
+                      showGradient={false}
+                      showXAxis={false}
+                      lineColor="#e29227"
+                    />
                   </div>
                   <AcyPeriodTime
                     onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
@@ -248,97 +253,40 @@ class BasicProfile extends Component {
                 </div>
               </AcyCard>
             )) || (
-                <AcyCard>
-                  <Table dataSource={dataSource} columns={columns} pagination={false} />
-                </AcyCard>
-              )}
+              <AcyCard>
+                <Table dataSource={dataSource} columns={columns} pagination={false} />
+              </AcyCard>
+            )}
           </div>
-          {
-            !isMobile && <div>
-               <AcyCard style={{backgroundColor:"#1b1b1c", padding:"10px"}}>
+          {!isMobile && (
+            <div>
+              <AcyCard style={{ backgroundColor: '#1b1b1c', padding: '10px' }}>
                 <div className={styles.trade}>
                   <SwapComponent />
                 </div>
               </AcyCard>
             </div>
-          }
-          
-
-
-
+          )}
         </div>
 
         <div className={styles.option}>
-        <Row gutter={[16, 16]}>
-          <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-            <AcyCard title="Routing">
-              <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                <div className={styles.routing}>
-                  <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px', color: '#EB5C20', borderRight: '1px solid #2c2f36' }}>
-                    <AcyIcon.MyIcon width={isMobile&&30||50} type="Eth" />
-                  </div>
-                  {/* <div className={styles.routing_left}>
-            <p className={styles.r_title}>93.246ETH</p>
-            <p className={styles.r_desc}>325,340$</p>
-            <div style={{ marginTop: '30px' }}>
-              <AcyIcon.MyIcon width={isMobile&&30||50} type="Eth" />
-
-            </div>
-          </div> */}
-                  <div className={styles.routing_middle}>
-                    <div className={styles.nodes}>
-                      <div className={styles.nodes_item}>
-                        <span>
-                          30%
-                        </span>
-                        <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                        <div className={styles.node}>
-                          <div>
-                            <AcyIcon.MyIcon width={isMobile&&30||50} type="Eth" />
-                          </div>
-                          <div>
-                            <p className={styles.r_title}>93.246ETH</p>
-                            <p className={styles.r_desc}>325,340$</p>
-                          </div>
-                        </div>
-                        <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                      </div>
-                      <div className={styles.nodes_item}>
-                        <span>
-                          30%
-                        </span>
-                        <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                        <div className={styles.node}>
-                          <div>
-                            <AcyIcon.MyIcon width={isMobile&&30||50} type="Eth" />
-                          </div>
-                          <div>
-                            <p className={styles.r_title}>93.246ETH</p>
-                            <p className={styles.r_desc}>325,340$</p>
-                          </div>
-                        </div>
-                        <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                      </div>
-                      <div className={styles.nodes_item}>
-                        <span>
-                          30%
-                        </span>
-                        <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                        <div className={styles.node}>
-                          <div>
-                            <AcyIcon.MyIcon width={isMobile&&30||50} type="Eth" />
-                          </div>
-                          <div>
-                            <p className={styles.r_title}>93.246ETH</p>
-                            <p className={styles.r_desc}>325,340$</p>
-                          </div>
-                        </div>
-                        <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                      </div>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+              <AcyCard title="Routing">
+                <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                  <div className={styles.routing}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginRight: '10px',
+                        color: '#EB5C20',
+                        borderRight: '1px solid #2c2f36',
+                      }}
+                    >
+                      <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="Eth" />
                     </div>
-                    <div style={{ textAlign: 'center', color: '#EB5C20' }}>See More...</div>
-                  </div>
-                  {/* <div className={styles.routing_left}>
+                    {/* <div className={styles.routing_left}>
             <p className={styles.r_title}>93.246ETH</p>
             <p className={styles.r_desc}>325,340$</p>
             <div style={{ marginTop: '30px' }}>
@@ -346,35 +294,89 @@ class BasicProfile extends Component {
 
             </div>
           </div> */}
-                  <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px', color: '#EB5C20', borderLeft: '1px solid #2c2f36' }}>
-                    <AcyIcon.MyIcon width={isMobile&&30||50} type="BTC" />
+                    <div className={styles.routing_middle}>
+                      <div className={styles.nodes}>
+                        <div className={styles.nodes_item}>
+                          <span>30%</span>
+                          <Icon style={{ margin: '0 10px' }} type="arrow-right" />
+                          <div className={styles.node}>
+                            <div>
+                              <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="Eth" />
+                            </div>
+                            <div>
+                              <p className={styles.r_title}>93.246ETH</p>
+                              <p className={styles.r_desc}>325,340$</p>
+                            </div>
+                          </div>
+                          <Icon style={{ margin: '0 10px' }} type="arrow-right" />
+                        </div>
+                        <div className={styles.nodes_item}>
+                          <span>30%</span>
+                          <Icon style={{ margin: '0 10px' }} type="arrow-right" />
+                          <div className={styles.node}>
+                            <div>
+                              <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="Eth" />
+                            </div>
+                            <div>
+                              <p className={styles.r_title}>93.246ETH</p>
+                              <p className={styles.r_desc}>325,340$</p>
+                            </div>
+                          </div>
+                          <Icon style={{ margin: '0 10px' }} type="arrow-right" />
+                        </div>
+                        <div className={styles.nodes_item}>
+                          <span>30%</span>
+                          <Icon style={{ margin: '0 10px' }} type="arrow-right" />
+                          <div className={styles.node}>
+                            <div>
+                              <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="Eth" />
+                            </div>
+                            <div>
+                              <p className={styles.r_title}>93.246ETH</p>
+                              <p className={styles.r_desc}>325,340$</p>
+                            </div>
+                          </div>
+                          <Icon style={{ margin: '0 10px' }} type="arrow-right" />
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'center', color: '#EB5C20' }}>See More...</div>
+                    </div>
+                    {/* <div className={styles.routing_left}>
+            <p className={styles.r_title}>93.246ETH</p>
+            <p className={styles.r_desc}>325,340$</p>
+            <div style={{ marginTop: '30px' }}>
+              <AcyIcon.MyIcon width={isMobile&&30||50} type="Eth" />
+
+            </div>
+          </div> */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginRight: '10px',
+                        color: '#EB5C20',
+                        borderLeft: '1px solid #2c2f36',
+                      }}
+                    >
+                      <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="BTC" />
+                    </div>
                   </div>
                 </div>
-
-              </div>
-            </AcyCard>
-          </Col>
-          <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-            <AcyCard style={{ height: '428px' }} title="Alpha">
-              <AcyPieChart />
-
-            </AcyCard>
-
-
-
-
-          </Col>
-        </Row>
+              </AcyCard>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+              <AcyCard style={{ height: '428px' }} title="Alpha">
+                <AcyPieChart />
+              </AcyCard>
+            </Col>
+          </Row>
         </div>
         <div className={styles.option}>
-        <div style={{ marginTop: '-10px', marginBottom: '30px' }}>
-          <StakeHistoryTable />
-
+          <div style={{ marginTop: '-10px', marginBottom: '30px' }}>
+            <StakeHistoryTable />
+          </div>
         </div>
-
-        </div>
-                {/* Routing */}
-             
+        {/* Routing */}
 
         {/* Alpha */}
         {/* <div className={styles.routing}>
