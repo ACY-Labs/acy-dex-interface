@@ -11,6 +11,7 @@ import {
 } from '@uniswap/sdk';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
+import { connect } from 'umi';
 import {
   ACYSwapErrorStatus,
   calculateGasMargin,
@@ -23,7 +24,7 @@ import {
 } from '../utils';
 
 // get the estimated amount of the other token required when adding liquidity, in readable string.
-export async function getEstimated(
+async function getEstimated(
   inputToken0,
   inputToken1,
   allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
@@ -511,7 +512,7 @@ export async function getEstimated(
   }
 }
 
-export async function addLiquidity(
+const addLiquidity = props => async (
   inputToken0,
   inputToken1,
   allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
@@ -526,7 +527,7 @@ export async function addLiquidity(
   args,
   value,
   setLiquidityStatus
-) {
+) => {
   let status = await (async () => {
     // check uniswap
     console.log(FACTORY_ADDRESS);
@@ -632,6 +633,20 @@ export async function addLiquidity(
     console.log('status');
     console.log(status);
     let url = 'https://rinkeby.etherscan.io/tx/' + status.hash;
+
+    window.checkTx = () => {
+      library.getTransactionReceipt(status.hash).then(receipt => {
+        // receipt is not null when transaction is done
+        console.log(receipt);
+      });
+    };
+    const { dispatch } = props;
+    debugger;
+    dispatch({
+      type: 'transaction/addTransaction',
+      payload: { hash: status.hash, type: 'Add Liquidity' },
+    });
+
     setLiquidityStatus(
       <a href={url} target={'_blank'}>
         view it on etherscan
@@ -639,4 +654,10 @@ export async function addLiquidity(
     );
   }
   return;
-}
+};
+
+export default connect(({ transaction }) => ({
+  transaction,
+}))(addLiquidity);
+
+export { addLiquidity, getEstimated };

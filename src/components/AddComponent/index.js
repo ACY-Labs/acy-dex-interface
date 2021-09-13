@@ -71,11 +71,11 @@ import {
 import { MaxUint256 } from '@ethersproject/constants';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
-
-const { AcyTabPane } = AcyTabs;
 import { Row, Col, Button, Alert, Input } from 'antd';
 
 import { getEstimated, addLiquidity } from '@/acy-dex-swap/core/addLiquidity';
+
+const { AcyTabPane } = AcyTabs;
 
 const AddLiquidityComponent = props => {
   const { dispatch, onLoggedIn } = props;
