@@ -158,7 +158,7 @@ function MarketPoolInfo(props) {
             <div
               className={styles.exchangeValueCard}
               style={{
-                width: isDesktop() ? '35%' : '100%',
+                width: isDesktop() ? '30%' : '100%',
                 marginTop: isDesktop() ? 0 : '10px',
                 marginBottom: isDesktop() ? 0 : '10px',
               }}
