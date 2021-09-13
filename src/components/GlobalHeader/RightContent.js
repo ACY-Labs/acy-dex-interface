@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FormattedMessage } from 'umi';
+import { FormattedMessage,connect } from 'umi';
 import { Spin, Tag, Menu, Icon, Dropdown } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
@@ -312,4 +312,6 @@ const GlobalHeaderRight = props => {
     </div>
   );
 };
-export default GlobalHeaderRight;
+export default connect(({ transaction }) => ({
+  transaction
+}))(GlobalHeaderRight);

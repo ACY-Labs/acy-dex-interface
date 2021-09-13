@@ -527,7 +527,6 @@ export async function addLiquidity(
   setLiquidityStatus,
   addLiquidityCallback
 ){
-  addLiquidityCallback('交易中');
   let status = await (async () => {
     // check uniswap
     console.log(FACTORY_ADDRESS);
@@ -633,19 +632,7 @@ export async function addLiquidity(
     console.log('status');
     console.log(status);
     let url = 'https://rinkeby.etherscan.io/tx/' + status.hash;
-
-    // 循环获取交易结果
-    const sti=setInterval(() => {
-      library.getTransactionReceipt(status.hash).then(receipt => {
-        // receipt is not null when transaction is done
-        if(receipt){
-          addLiquidityCallback('交易完成');
-          clearInterval(sti);
-        }
-      });
-    }, 500);
-      
-
+    addLiquidityCallback(status);
     setLiquidityStatus(
       <a href={url} target={'_blank'}>
         view it on etherscan
