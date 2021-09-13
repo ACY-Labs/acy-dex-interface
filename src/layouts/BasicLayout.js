@@ -1,4 +1,4 @@
-import React, { Suspense,useEffect  } from 'react';
+import React, { Suspense,useEffect,useState  } from 'react';
 import { Layout } from 'antd';
 import DocumentTitle from 'react-document-title';
 import { Web3ReactProvider } from "@web3-react/core";
@@ -76,7 +76,7 @@ const  BasicLayout =props=> {
   //   });
   // }
   useEffect(() => {
-  const {
+    const {
       dispatch,
       route: { routes, authority },
     } = props;
@@ -90,8 +90,29 @@ const  BasicLayout =props=> {
       type: 'menu/getMenuData',
       payload: { routes, authority },
     });
-
   },[])
+  // 根据不同页面切换背景色
+  const [bgColor,setBgColor]=useState('radialBg');
+  useEffect(() => {
+    const {
+      location: { pathname },
+    } = props;
+    if(pathname.indexOf('/market')>-1){
+      setBgColor('marketRadialBg');
+    }
+    if(pathname.indexOf('/exchange')>-1){
+      setBgColor('radialBg');
+    }
+    if(pathname.indexOf('/liquidity')>-1){
+      setBgColor('liquidityRadialBg');
+    }
+    if(pathname.indexOf('/farms')>-1){
+      setBgColor('farmsRadialBg');
+    }
+    if(pathname.indexOf('/dao')>-1){
+      setBgColor('daoRadialBg');
+    }
+  })
   // componentDidUpdate(preProps) {
   //   // After changing to phone mode,
   //   // if collapsed is true, you need to click twice to display
@@ -199,7 +220,7 @@ const  BasicLayout =props=> {
             // background: styles.radialBg
           }}
 
-          className={styles.radialBg}
+          className={styles[bgColor]}
         >
           <Header
             menuData={menuData}
