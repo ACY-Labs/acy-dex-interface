@@ -335,6 +335,20 @@ const SwapComponent = props => {
     setVisible(false);
   };
 
+  const onSwitchCoinCard = () => {
+    let tempToken = token1
+    let tempAmount = token1Amount
+    let tempBalance = token1Balance
+
+    setToken1(token0)
+    setToken1Amount(token0Amount)
+    setToken1Balance(token0Balance)
+
+    setToken0(tempToken)
+    setToken0Amount(tempAmount)
+    setToken0Balance(tempBalance)
+  }
+
   const ConnectWallet = () => {
     activate(injected);
   };
@@ -343,7 +357,7 @@ const SwapComponent = props => {
     <div className={styles.sc}>
       <AcyCuarrencyCard
         icon="eth"
-        title={token0Balance!=0&&`Balance: ${token0Balance}`}
+        title={token0Balance!=0&&`Balance: ${parseFloat(token0Balance).toFixed(3)}`}
         coin={(token0 && token0.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token0Balance}`}
@@ -358,13 +372,13 @@ const SwapComponent = props => {
         }}
       />
 
-      <div className={styles.arrow}>
+      <div className={styles.arrow} onClick={() => {onSwitchCoinCard()}}>
         <Icon style={{ fontSize: '16px' }} type="arrow-down" />
       </div>
 
       <AcyCuarrencyCard
         icon="eth"
-        title={token0Balance!=0&&`Balance: ${token1Balance}`}
+        title={token0Balance!=0&&`Balance: ${parseFloat(token1Balance).toFixed(3)}`}
         coin={(token1 && token1.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token1Balance}`}
