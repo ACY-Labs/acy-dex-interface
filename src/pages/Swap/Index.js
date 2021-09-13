@@ -16,6 +16,7 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
+import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 import Media from 'react-media';
 import AcyPieChart from '@/components/AcyPieChartAlpha';
 import SwapComponent from '@/components/SwapComponent';
