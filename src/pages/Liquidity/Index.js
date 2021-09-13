@@ -29,6 +29,7 @@ class BasicProfile extends Component {
     visibleConfirmOrder: false,
     visibleLoading: false,
     tabIndex: 1,
+    loggedIn: false,
   };
 
   componentDidMount() {}
@@ -80,18 +81,22 @@ class BasicProfile extends Component {
     });
   };
 
+  onLoggedIn = () => {
+    this.setState({
+      loggedIn: true,
+    });
+  };
+
   render() {
-    const { visible, visibleConfirmOrder, visibleLoading, tabIndex } = this.state;
+    const { visible, visibleConfirmOrder, visibleLoading, tabIndex, loggedIn } = this.state;
     return (
       <PageHeaderWrapper>
-        <div className={styles.main}>
-          <div>
-            <AcyLiquidityPositions />
-          </div>
+        <div className={loggedIn ? styles.main : styles.main_notLoggedIn}>
+          <div>{loggedIn && <AcyLiquidityPositions />}</div>
           <div>
             <AcyCard>
               <div className={styles.addLiquidity}>
-                <AddComponent />
+                <AddComponent onLoggedIn={this.onLoggedIn} />
               </div>
             </AcyCard>
           </div>

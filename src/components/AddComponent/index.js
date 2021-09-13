@@ -77,8 +77,8 @@ import { Row, Col, Button, Alert, Input } from 'antd';
 
 import { getEstimated, addLiquidity } from '@/acy-dex-swap/components/LiquidityComponent';
 
-const MyComponent = props => {
-  const { dispatch } = props;
+const AddLiquidityComponent = props => {
+  const { dispatch, onLoggedIn } = props;
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
   // 选择货币前置和后置
@@ -140,9 +140,12 @@ const MyComponent = props => {
   });
 
   // 初始化函数时连接钱包
-  useEffect(() => {
-    // activate(injected);
-  }, []);
+  useEffect(
+    () => {
+      // activate(injected);
+    },
+    [account]
+  );
 
   let t0Changed = useCallback(
     async () => {
@@ -285,6 +288,8 @@ const MyComponent = props => {
       } else {
         setButtonContent('choose tokens and amount');
         setButtonStatus(false);
+        // set login state to true
+        onLoggedIn();
       }
     },
     [chainId, library, account]
@@ -586,4 +591,4 @@ const MyComponent = props => {
 export default connect(({ global, loading }) => ({
   global,
   loading: loading.global,
-}))(MyComponent);
+}))(AddLiquidityComponent);
