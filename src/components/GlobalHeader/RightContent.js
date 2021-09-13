@@ -232,7 +232,7 @@ const GlobalHeaderRight = props => {
   return (
     <div className={className}>
       {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
-
+      {props.transaction.status}
       <AcyConnectWallet
         chainId={chainId}
         isMobile={isMobile}

@@ -256,11 +256,12 @@ const  BasicLayout =props=> {
     );
 }
 
-export default connect(({ global, setting, menu }) => ({
+export default connect(({ global, setting,transaction, menu }) => ({
   collapsed: global.collapsed,
   account:global.account,
   layout: setting.layout,
   menuData: menu.menuData,
+  transaction,
   breadcrumbNameMap: menu.breadcrumbNameMap,
   ...setting,
 }))(props => (

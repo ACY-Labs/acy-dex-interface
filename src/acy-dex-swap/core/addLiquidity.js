@@ -11,7 +11,6 @@ import {
 } from '@uniswap/sdk';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
-import { connect } from 'umi';
 import {
   ACYSwapErrorStatus,
   calculateGasMargin,
@@ -22,9 +21,8 @@ import {
   getUserTokenBalanceRaw,
   INITIAL_ALLOWED_SLIPPAGE,
 } from '../utils';
-
 // get the estimated amount of the other token required when adding liquidity, in readable string.
-async function getEstimated(
+export async function getEstimated(
   inputToken0,
   inputToken1,
   allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
@@ -512,7 +510,7 @@ async function getEstimated(
   }
 }
 
-const addLiquidity = props => async (
+export async function addLiquidity(
   inputToken0,
   inputToken1,
   allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
@@ -526,8 +524,10 @@ const addLiquidity = props => async (
   parsedToken1Amount,
   args,
   value,
-  setLiquidityStatus
-) => {
+  setLiquidityStatus,
+  addLiquidityCallback
+){
+  addLiquidityCallback('交易中');
   let status = await (async () => {
     // check uniswap
     console.log(FACTORY_ADDRESS);
@@ -634,18 +634,17 @@ const addLiquidity = props => async (
     console.log(status);
     let url = 'https://rinkeby.etherscan.io/tx/' + status.hash;
 
-    window.checkTx = () => {
+    // 循环获取交易结果
+    const sti=setInterval(() => {
       library.getTransactionReceipt(status.hash).then(receipt => {
         // receipt is not null when transaction is done
-        console.log(receipt);
+        if(receipt){
+          addLiquidityCallback('交易完成');
+          clearInterval(sti);
+        }
       });
-    };
-    const { dispatch } = props;
-    debugger;
-    dispatch({
-      type: 'transaction/addTransaction',
-      payload: { hash: status.hash, type: 'Add Liquidity' },
-    });
+    }, 500);
+      
 
     setLiquidityStatus(
       <a href={url} target={'_blank'}>
@@ -655,9 +654,3 @@ const addLiquidity = props => async (
   }
   return;
 };
-
-export default connect(({ transaction }) => ({
-  transaction,
-}))(addLiquidity);
-
-export { addLiquidity, getEstimated };

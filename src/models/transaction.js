@@ -3,6 +3,7 @@ export default {
 
   state: {
     transactions: [],
+    status:''
   },
 
   effects: {

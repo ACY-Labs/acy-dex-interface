@@ -336,7 +336,14 @@ const AddLiquidityComponent = props => {
       return prevFavTokenList;
     });
   };
-
+  const addLiquidityCallback=(status)=>{
+    dispatch({
+      type:'transaction/addTransaction',
+      payload:{
+        status
+      }
+    });
+  }
   return (
     <div>
       <AcyCuarrencyCard
@@ -537,7 +544,8 @@ const AddLiquidityComponent = props => {
               parsedToken1Amount,
               args,
               value,
-              setLiquidityStatus
+              setLiquidityStatus,
+              addLiquidityCallback
             );
           }
         }}
@@ -597,7 +605,7 @@ const AddLiquidityComponent = props => {
   );
 };
 
-export default connect(({ global, loading }) => ({
-  global,
+export default connect(({ global,transaction, loading }) => ({
+  global,transaction,
   loading: loading.global,
 }))(AddLiquidityComponent);
