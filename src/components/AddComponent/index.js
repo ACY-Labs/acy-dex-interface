@@ -75,7 +75,7 @@ import { parseUnits } from '@ethersproject/units';
 const { AcyTabPane } = AcyTabs;
 import { Row, Col, Button, Alert, Input } from 'antd';
 
-import { getEstimated, addLiquidity } from '@/acy-dex-swap/components/LiquidityComponent';
+import { getEstimated, addLiquidity } from '@/acy-dex-swap/core/addLiquidity';
 
 const AddLiquidityComponent = props => {
   const { dispatch, onLoggedIn } = props;

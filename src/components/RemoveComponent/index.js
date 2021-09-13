@@ -20,7 +20,7 @@ import {
   AcyConfirm,
   AcyApprove,
   AcyButton,
-  AcyDescriptions
+  AcyDescriptions,
 } from '@/components/Acy';
 
 //^mark
@@ -52,8 +52,7 @@ import {
   ROUTER_ADDRESS,
 } from '@/acy-dex-swap/utils/index';
 
-import { processInput, signOrApprove,removeLiquidity}
-from '@/acy-dex-swap/components/RemoveLiquidityComponent';
+import { processInput, signOrApprove, removeLiquidity } from '@/acy-dex-swap/core/removeLiquidity';
 
 import ERC20ABI from '@/abis/ERC20.json';
 import WETHABI from '@/abis/WETH.json';
@@ -270,7 +269,6 @@ const MyComponent = props => {
           setBefore(true);
         }}
         onChangeToken={e => {
-
           setToken0Amount(e.target.value);
           setExactIn(true);
           // setApproveAmountToken0(e.target.value);
@@ -301,25 +299,19 @@ const MyComponent = props => {
       {/*  the Slippage Tolerance you choose is [ {slippageTolerance}% ]*/}
       {/*</Alert>*/}
 
-
       <AcyDescriptions>
         <AcyDescriptions.Item>
           the Slippage Tolerance: [ {slippageTolerance}% ]
         </AcyDescriptions.Item>
-        <AcyDescriptions.Item>
-          userLiquidityPosition: {userLiquidityPosition}
-        </AcyDescriptions.Item>
+        <AcyDescriptions.Item>userLiquidityPosition: {userLiquidityPosition}</AcyDescriptions.Item>
         <AcyDescriptions.Item>
           removeLiquidityStatus: [ {removeLiquidityStatus} ]
         </AcyDescriptions.Item>
 
         {/*{liquidityBreakdown && <AcyDescriptions.Item> Liquidity status:  </AcyDescriptions.Item>}*/}
         {/*{liquidityBreakdown && liquidityBreakdown.map((info) => <AcyDescriptions.Item>{info}</AcyDescriptions.Item>)}*/}
-        <AcyDescriptions.Item>
-          {liquidityStatus}
-        </AcyDescriptions.Item>
+        <AcyDescriptions.Item>{liquidityStatus}</AcyDescriptions.Item>
       </AcyDescriptions>
-
 
       {/* <AcyDescriptions>
         <AcyDescriptions.Item>
@@ -353,77 +345,73 @@ const MyComponent = props => {
           : "you don't need to click the right approve button"}{' '}
         <br />
       </div> */}
-      {
-        !account && <AcyButton onClick={ConnectWallet}>Connect</AcyButton> ||
+      {(!account && <AcyButton onClick={ConnectWallet}>Connect</AcyButton>) || (
         <div>
-          <div style={{display:'flex',marginBottom:'15px'}}>
-           {
-             token0&&<Button
-             type="primary"
-             style={{marginRight:'15px'}}
-             onClick={() => {
-               // approve(token0.address, approveAmountToken0, library, account);
-               signOrApprove(
-                 {
-                   ...token0,
-                   amount: token0Amount,
-                 },
-                 {
-                   ...token1,
-                   amount: token1Amount,
-                 },
-                 slippageTolerance * 100,
-                 exactIn,
-                 chainId,
-                 library,
-                 account,
-                 setToken0Amount,
-                 setToken1Amount,
-                 setSignatureData,
-                 setRemoveLiquidityStatus
-               );
-               console.log('Approve');
-             }}
-           >
-             signOrApprove
-           </Button>
-           }
-
-            </div>
+          <div style={{ display: 'flex', marginBottom: '15px' }}>
+            {token0 && (
+              <Button
+                type="primary"
+                style={{ marginRight: '15px' }}
+                onClick={() => {
+                  // approve(token0.address, approveAmountToken0, library, account);
+                  signOrApprove(
+                    {
+                      ...token0,
+                      amount: token0Amount,
+                    },
+                    {
+                      ...token1,
+                      amount: token1Amount,
+                    },
+                    slippageTolerance * 100,
+                    exactIn,
+                    chainId,
+                    library,
+                    account,
+                    setToken0Amount,
+                    setToken1Amount,
+                    setSignatureData,
+                    setRemoveLiquidityStatus
+                  );
+                  console.log('Approve');
+                }}
+              >
+                signOrApprove
+              </Button>
+            )}
+          </div>
 
           {
             <AcyButton
-            disabled={!(token1&&token1.symbol&&token0&&token0.symbol)}
-            onClick={() => {
-              removeLiquidity(
-                {
-                  ...token0,
-                  amount: token0Amount,
-                },
-                {
-                  ...token1,
-                  amount: token1Amount,
-                },
-                slippageTolerance * 100,
-                exactIn,
-                chainId,
-                library,
-                account,
-                signatureData,
-                setToken0Amount,
-                setToken1Amount,
-                setSignatureData,
-                setRemoveLiquidityStatus
-              );
-            }}
-          >
-            remove Liquidity
-          </AcyButton>
+              disabled={!(token1 && token1.symbol && token0 && token0.symbol)}
+              onClick={() => {
+                removeLiquidity(
+                  {
+                    ...token0,
+                    amount: token0Amount,
+                  },
+                  {
+                    ...token1,
+                    amount: token1Amount,
+                  },
+                  slippageTolerance * 100,
+                  exactIn,
+                  chainId,
+                  library,
+                  account,
+                  signatureData,
+                  setToken0Amount,
+                  setToken1Amount,
+                  setSignatureData,
+                  setRemoveLiquidityStatus
+                );
+              }}
+            >
+              remove Liquidity
+            </AcyButton>
           }
-
         </div>
-      }
-
+      )}
 
       <AcyModal onCancel={onCancel} width={600} height={400} visible={visible}>
         <div className={styles.title}>
@@ -471,7 +459,6 @@ const MyComponent = props => {
           </AcyTabs>
         </div>
       </AcyModal>
-
     </div>
   );
 };
