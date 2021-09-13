@@ -146,7 +146,7 @@ const SwapComponent = props => {
   // setSwapButtonContent
   // 监听钱包的连接
   useEffect(() => {
-    // activate(injected);
+    activate(injected);
   }, []);
 
   const [favTokenList, setFavTokenList] = useState([]);
@@ -400,9 +400,22 @@ const SwapComponent = props => {
       {/*</AcyDescriptions>*/}
 
       <AcyDescriptions>
-        {swapBreakdown && <AcyDescriptions.Item>swap breakdown</AcyDescriptions.Item>}
-        {swapBreakdown &&
-          swapBreakdown.map(info => <AcyDescriptions.Item>{info}</AcyDescriptions.Item>)}
+        {swapBreakdown && (
+          <div className={styles.acyDescriptionContainer}>
+            <AcyDescriptions.Item>
+              <div className={styles.acyDescriptionTitle}>
+                Swap Breakdown
+              </div>
+            </AcyDescriptions.Item>
+            {swapBreakdown.map(info => (
+              <AcyDescriptions.Item>
+                <div className={styles.acyDescriptionItem}>
+                  {info}
+                </div>
+              </AcyDescriptions.Item>
+            ))}
+          </div>
+        )}
       </AcyDescriptions>
 
       {needApprove == true && (
