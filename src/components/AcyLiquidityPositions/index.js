@@ -2,15 +2,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import styles from './styles.less';
-import { AcyCard } from '@/components/Acy';
-import { Table, Empty } from 'antd';
+import { Table } from 'antd';
 import {
   supportedTokens,
   getUserTokenBalanceRaw,
   getTokenTotalSupply,
 } from '@/acy-dex-swap/utils/index';
 import { Fetcher, Percent, Token, TokenAmount } from '@uniswap/sdk';
-import TokenSelection from '@/pages/Dao/components/TokenSelection';
 import AcyRemoveLiquidityModal from '@/components/AcyRemoveLiquidityModal';
 import { isMobile } from 'react-device-detect';
 

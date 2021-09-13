@@ -50,7 +50,7 @@ import {
   supportedTokens,
 } from '@/acy-dex-swap/utils/index';
 
-import { swapGetEstimated, swap } from '@/acy-dex-swap/components/SwapComponent';
+import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
 
 import ERC20ABI from '@/abis/ERC20.json';
 import WETHABI from '@/abis/WETH.json';
@@ -336,18 +336,18 @@ const SwapComponent = props => {
   };
 
   const onSwitchCoinCard = () => {
-    let tempToken = token1
-    let tempAmount = token1Amount
-    let tempBalance = token1Balance
+    let tempToken = token1;
+    let tempAmount = token1Amount;
+    let tempBalance = token1Balance;
 
-    setToken1(token0)
-    setToken1Amount(token0Amount)
-    setToken1Balance(token0Balance)
+    setToken1(token0);
+    setToken1Amount(token0Amount);
+    setToken1Balance(token0Balance);
 
-    setToken0(tempToken)
-    setToken0Amount(tempAmount)
-    setToken0Balance(tempBalance)
-  }
+    setToken0(tempToken);
+    setToken0Amount(tempAmount);
+    setToken0Balance(tempBalance);
+  };
 
   const ConnectWallet = () => {
     activate(injected);
@@ -357,7 +357,7 @@ const SwapComponent = props => {
     <div className={styles.sc}>
       <AcyCuarrencyCard
         icon="eth"
-        title={token0Balance!=0&&`Balance: ${parseFloat(token0Balance).toFixed(3)}`}
+        title={token0Balance != 0 && `Balance: ${parseFloat(token0Balance).toFixed(3)}`}
         coin={(token0 && token0.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token0Balance}`}
@@ -372,13 +372,18 @@ const SwapComponent = props => {
         }}
       />
 
-      <div className={styles.arrow} onClick={() => {onSwitchCoinCard()}}>
+      <div
+        className={styles.arrow}
+        onClick={() => {
+          onSwitchCoinCard();
+        }}
+      >
         <Icon style={{ fontSize: '16px' }} type="arrow-down" />
       </div>
 
       <AcyCuarrencyCard
         icon="eth"
-        title={token0Balance!=0&&`Balance: ${parseFloat(token1Balance).toFixed(3)}`}
+        title={token0Balance != 0 && `Balance: ${parseFloat(token1Balance).toFixed(3)}`}
         coin={(token1 && token1.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token1Balance}`}

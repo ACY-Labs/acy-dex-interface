@@ -440,7 +440,7 @@ export async function swapGetEstimated(
         // `Slice Slippage tolerance:` ${allowedSlippage} %`
         `Slippage tolerance : ${slippage}%`,
         `Price impact : ${priceImpactWithoutFee.toFixed(2)}%`,
-        `LP FEE : ${realizedLPFee?.toSignificant(6)} ${trade.inputAmount.currency.symbol}`,
+        // `LP FEE : ${realizedLPFee?.toSignificant(6)} ${trade.inputAmount.currency.symbol}`,
         `${exactIn ? 'Min received:' : 'Max sold'} : ${
           exactIn ? minAmountOut.toSignificant(4) : maxAmountIn.toSignificant(4)
         } ${exactIn ? trade.outputAmount.currency.symbol : trade.inputAmount.currency.symbol}`,
