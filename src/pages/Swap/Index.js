@@ -241,7 +241,7 @@ class BasicProfile extends Component {
                     <AcyLineChart
                       backData={[]}
                       showGradient={false}
-                      showXAxis={false}
+                      showXAxis={true}
                       lineColor="#e29227"
                     />
                   </div>

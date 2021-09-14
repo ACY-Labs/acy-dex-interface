@@ -203,7 +203,7 @@ export async function getEstimated(
             token1 === ETHER
               ? CurrencyAmount.ether(dependentTokenAmount.raw)
               : dependentTokenAmount;
-          setToken1Amount(dependentTokenAmount.toExact());
+          setToken1Amount(dependentTokenAmount.toFixed(5));
           inToken1Amount = dependentTokenAmount.toExact();
         } else {
           dependentTokenAmount = pair.priceOf(token1).quote(parsedAmount);
@@ -234,7 +234,7 @@ export async function getEstimated(
 
           parsedToken1Amount =
             token1 === ETHER ? CurrencyAmount.ether(token1TokenAmount.raw) : token1TokenAmount;
-          setToken0Amount(dependentTokenAmount.toExact());
+          setToken0Amount(dependentTokenAmount.toFixed(5));
           inToken0Amount = dependentTokenAmount.toExact();
         }
       } else {
@@ -336,12 +336,12 @@ export async function getEstimated(
 
           setLiquidityBreakdown([
             `Slippage tolerance : ${slippage}%`,
-            `Pool reserve: ${pair.reserve0.toExact()} ${
+            `Pool reserve: ${pair.reserve0.toFixed(3)} ${
               pair.token0.symbol
-            } + ${pair.reserve1.toExact()} ${pair.token1.symbol}`,
+            } + ${pair.reserve1.toFixed(3)} ${pair.token1.symbol}`,
             `Pool share: ${poolTokenPercentage}%`,
-            `${token0.symbol}: ${parsedToken0Amount.toExact()}`,
-            `${token1.symbol}: ${parsedToken1Amount.toExact()}`,
+            // `${token0.symbol}: ${parsedToken0Amount.toExact()}`,
+            // `${token1.symbol}: ${parsedToken1Amount.toExact()}`,
             // noLiquidity ? "100" : `${poolTokenPercentage?.toSignificant(4)}} %`,
           ]);
         } catch (e) {

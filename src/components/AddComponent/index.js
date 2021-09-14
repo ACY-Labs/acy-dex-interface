@@ -383,7 +383,7 @@ const AddLiquidityComponent = props => {
     <div>
       <AcyCuarrencyCard
         icon="eth"
-        title={`Balance: ${token0Balance}`}
+        title={`Balance: ${parseFloat(token0Balance).toFixed(5)}`}
         coin={(token0 && token0.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token0Balance}`}
@@ -403,7 +403,7 @@ const AddLiquidityComponent = props => {
 
       <AcyCuarrencyCard
         icon="eth"
-        title={`Balance: ${token1Balance}`}
+        title={`Balance: ${parseFloat(token1Balance).toFixed(5)}`}
         coin={(token1 && token1.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token1Balance}`}
@@ -421,9 +421,11 @@ const AddLiquidityComponent = props => {
       <AcyDescriptions>
         {liquidityBreakdown && (
           <div className={styles.acyDescriptionContainer}>
-            <AcyDescriptions.Item>
-              <div className={styles.acyDescriptionTitle}>liquidity breakdown</div>
-            </AcyDescriptions.Item>
+            {/* <AcyDescriptions.Item>
+              <div className={styles.acyDescriptionTitle}>
+                liquidity breakdown
+              </div>
+            </AcyDescriptions.Item> */}
             {liquidityBreakdown.map(info => (
               <AcyDescriptions.Item>
                 <div className={styles.acyDescriptionItem}>{info}</div>
