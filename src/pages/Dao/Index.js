@@ -16,7 +16,7 @@ import stakeInfoStyles from './styles2.less';
 export class Dao extends Component {
   state = {
     activeGraphData: graphSampleData,
-    activeStakeInfoPanel: 0,
+    activeStakeInfoPanel: 1,
     activeGraphId: 0,
   };
 
@@ -94,7 +94,7 @@ export class Dao extends Component {
               theme="#eb5c20"
             /> */}
             {activeGraphId === 0 ? (
-              <AcyBarChart backData={activeGraphData} />
+              <AcyBarChart data={activeGraphData} showXAxis/>
             ) : (
               <AcyLineChart
                 backData={activeGraphData}
@@ -116,7 +116,7 @@ export class Dao extends Component {
           <div className={styles.chartContainer}>
             <AcyPeriodTime
                 onhandPeriodTimeChoose={this.selectGraph}
-                times={['Volume', 'TVL', 'Price']}
+                times={['TVL', 'Price']}
                 className={styles.contentChartsSelector}
             />
             {/* <AcySmallButtonGroup
@@ -129,11 +129,11 @@ export class Dao extends Component {
               containerClass={styles.contentChartsSelector}
               theme="#eb5c20"
             /> */}
-            {this.state.activeStakeInfoPanel === 0 && (
+            {/* {this.state.activeStakeInfoPanel === 0 && (
               <div className={stakeInfoStyles.stakeInfoTab}>
                 <AcyPieChart />
               </div>
-            )}
+            )} */}
             {this.state.activeStakeInfoPanel === 1 && (
               <div className={stakeInfoStyles.stakeInfoTab}>
                 <AcyLineChart

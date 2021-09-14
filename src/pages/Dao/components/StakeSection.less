@@ -5,17 +5,17 @@
   border-radius: 15px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 
   .stakeContentWrapper {
-    padding: 0 1.5rem 1.5rem 1.5rem;
-    border-bottom: 1px solid #434343;
+    padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+    // border-bottom: 1px solid #434343;
   }
 
   @media (max-width: 768px) {
     .stakeContentWrapper {
       padding: 1.5rem;
-      border-bottom: 1px solid #434343;
+      // border-bottom: 1px solid #434343;
     }
   }
 
@@ -104,20 +104,6 @@
               top: 0.4rem;
              }
           }
-        }
-
-        .stakeSubmitButton {
-          width: 100%;
-          background-color: #4c4c4d;
-          border: none;
-          border-radius: 7.5px;
-          font-size: 1.5rem;
-          padding: 0 1rem;
-        }
-
-        .stakeSubmitButton:hover {
-          background-color: #5f5f5f;
-          cursor: pointer;
         }
       }
     }
@@ -333,6 +319,21 @@
 .datePickerInput:hover {
   box-shadow: 0 0 0 0.5px #eb5c20;
   transition: .1s;
+  cursor: pointer;
+}
+
+.stakeSubmitButton {
+  margin-top: 8px;
+  width: 100%;
+  background-color: #4c4c4d;
+  border: none;
+  border-radius: 15px;
+  font-size: 1rem;
+  padding: 0.5rem 1.5rem;
+}
+
+.stakeSubmitButton:hover {
+  background-color: #5f5f5f;
   cursor: pointer;
 }
 
