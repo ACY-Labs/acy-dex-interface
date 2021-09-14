@@ -153,15 +153,16 @@ const SwapComponent = props => {
 
   useEffect(
     () => {
-      console.log(account, chainId, library);
-      if (!account || !chainId || !library) return;
+      if (!account || !chainId || !library) {
+        setToken0BalanceShow(false);
+        setToken1BalanceShow(false);
+        return;
+      }
       async function refreshBalances() {
         setToken0Balance(await getUserTokenBalance(token0, chainId, account, library));
         setToken0BalanceShow(true);
         setToken1Balance(await getUserTokenBalance(token1, chainId, account, library));
         setToken1BalanceShow(true);
-        console.log('Inside refresh balances');
-        console.log(token0, token1);
       }
 
       refreshBalances();
@@ -377,7 +378,7 @@ const SwapComponent = props => {
     <div className={styles.sc}>
       <AcyCuarrencyCard
         icon="eth"
-        title={token0Balance != 0 && `Balance: ${parseFloat(token0Balance).toFixed(3)}`}
+        title={token0BalanceShow && `Balance: ${parseFloat(token0Balance).toFixed(3)}`}
         coin={(token0 && token0.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token0Balance}`}
@@ -403,7 +404,7 @@ const SwapComponent = props => {
 
       <AcyCuarrencyCard
         icon="eth"
-        title={token0Balance != 0 && `Balance: ${parseFloat(token1Balance).toFixed(3)}`}
+        title={token1BalanceShow && `Balance: ${parseFloat(token1Balance).toFixed(3)}`}
         coin={(token1 && token1.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token1Balance}`}

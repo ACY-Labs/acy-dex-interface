@@ -71,7 +71,7 @@ export async function swapGetEstimated(
 ) {
   let status = await (async () => {
     // check uniswap
-    console.log(FACTORY_ADDRESS);
+    console.log('SWAP GET ESTIMATED');
     // change slippage from bips (0.01%) into percentage
     let slippage = allowedSlippage * 0.01;
     allowedSlippage = new Percent(allowedSlippage, 10000);
@@ -94,16 +94,17 @@ export async function swapGetEstimated(
       amount: inToken1Amount,
     } = inputToken1;
 
+    if (!account) return new ACYSwapErrorStatus('Connect to wallet');
     if (!inputToken0.symbol || !inputToken1.symbol)
       return new ACYSwapErrorStatus('please choose tokens');
-    if (exactIn && inToken0Amount == '0') return new ACYSwapErrorStatus('token0Amount is 0');
-    if (!exactIn && inToken1Amount == '0') return new ACYSwapErrorStatus('token1Amount is 0');
-    if (exactIn && inToken0Amount == '') return new ACYSwapErrorStatus('token0Amount is ""');
-    if (!exactIn && inToken1Amount == '') return new ACYSwapErrorStatus('token1Amount is ""');
+    if (exactIn && inToken0Amount == '0') return new ACYSwapErrorStatus('Enter an amount');
+    if (!exactIn && inToken1Amount == '0') return new ACYSwapErrorStatus('Enter an amount');
+    if (exactIn && inToken0Amount == '') return new ACYSwapErrorStatus('Enter an amount');
+    if (!exactIn && inToken1Amount == '') return new ACYSwapErrorStatus('Enter an amount');
     if (exactIn && isNaN(parseFloat(inToken0Amount)))
-      return new ACYSwapErrorStatus('token0Amount is NaN');
+      return new ACYSwapErrorStatus('Enter an amount');
     if (!exactIn && isNaN(parseFloat(inToken1Amount)))
-      return new ACYSwapErrorStatus('token1Amount is NaN');
+      return new ACYSwapErrorStatus('Enter an amount');
 
     console.log(`token0Amount: ${inToken0Amount}`);
     console.log(`token1Amount: ${inToken1Amount}`);
@@ -491,7 +492,7 @@ export async function swapGetEstimated(
     }
   })();
   if (status instanceof ACYSwapErrorStatus) {
-    console.log(status.getErrorText());
+    setSwapButtonContent(status.getErrorText());
   } else {
     console.log(status);
   }
