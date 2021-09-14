@@ -2,18 +2,16 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable react/react-in-jsx-scope */
 /* eslint-disable import/order */
+import { AcyBarChart, AcyLineChart, AcyPeriodTime, AcyPieChart } from '@/components/Acy';
+import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import StakeSection from '@/pages/Dao/components/StakeSection';
+import React, { Component } from 'react';
+import 'react-datepicker/dist/react-datepicker.css';
+import StakeHistoryTable from './components/StakeHistoryTable';
 import { graphSampleData, graphSampleData2 } from './sample_data/SampleData';
-import React, { Component, forwardRef } from 'react';
-import { AcyLineChart, AcyBarChart, AcyPieChart, AcySmallButton } from '@/components/Acy';
 import styles from './styles.less';
 import stakeInfoStyles from './styles2.less';
-import 'react-datepicker/dist/react-datepicker.css';
-import SampleToken from './sample_data/SampleToken';
-import StakeHistoryTable from './components/StakeHistoryTable';
-import StakeSection from '@/pages/Dao/components/StakeSection';
-import styles2 from '../Market/styles.less';
-import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 
 export class Dao extends Component {
   state = {
@@ -31,6 +29,32 @@ export class Dao extends Component {
     this.setState({ activeGraphData });
   }
 
+  selectTopChart = (pt) => {
+    let functionDict = {
+        'ACY': () => {
+          this.changeGraphData(0);
+          this.setState({ activeGraphId: 0 });
+        }
+      ,
+        'Reward': () => {
+          this.changeGraphData(1);
+          this.setState({ activeGraphId: 1 });
+        }
+    }
+    functionDict[pt]();
+  }
+
+  selectGraph = (pt) => {
+    let functionDict = {
+      'Volume' : () => this.setState({ activeStakeInfoPanel: 0 }),
+      'TVL' : ()=> this.setState({ activeStakeInfoPanel: 1 }),
+      'Price' : () => this.setState({ activeStakeInfoPanel: 2 })
+    }
+
+    functionDict[pt]();
+
+  }
+
   render() {
     const { activeGraphData, activeStakeInfoPanel, activeGraphId } = this.state;
 
@@ -43,7 +67,12 @@ export class Dao extends Component {
         </div>
         <div className={styles.stakeSectionMain}>
           <div className={styles.chartSection}>
-            <AcySmallButtonGroup
+            <AcyPeriodTime
+                onhandPeriodTimeChoose={this.selectTopChart}
+                times={['ACY', 'Reward']}
+                className={styles.switchChartsSelector}
+            />
+            {/* <AcySmallButtonGroup
               activeButton={activeGraphId}
               buttonList={[
                 [
@@ -63,7 +92,7 @@ export class Dao extends Component {
               ]}
               containerClass={styles.switchChartsSelector}
               theme="#eb5c20"
-            />
+            /> */}
             {activeGraphId === 0 ? (
               <AcyBarChart backData={activeGraphData} />
             ) : (
@@ -85,7 +114,12 @@ export class Dao extends Component {
             <StakeHistoryTable />
           </div>
           <div className={styles.chartContainer}>
-            <AcySmallButtonGroup
+            <AcyPeriodTime
+                onhandPeriodTimeChoose={this.selectGraph}
+                times={['Volume', 'TVL', 'Price']}
+                className={styles.contentChartsSelector}
+            />
+            {/* <AcySmallButtonGroup
               activeButton={activeStakeInfoPanel}
               buttonList={[
                 ['Volume', () => this.setState({ activeStakeInfoPanel: 0 })],
@@ -94,7 +128,7 @@ export class Dao extends Component {
               ]}
               containerClass={styles.contentChartsSelector}
               theme="#eb5c20"
-            />
+            /> */}
             {this.state.activeStakeInfoPanel === 0 && (
               <div className={stakeInfoStyles.stakeInfoTab}>
                 <AcyPieChart />
