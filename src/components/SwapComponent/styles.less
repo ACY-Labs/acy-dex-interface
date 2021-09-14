@@ -75,7 +75,7 @@
     color: #b5b6b6;
   }
 }
-.arrow{
+.arrow {
   padding: 4px;
   border-radius: 100%;
   height: 32px;
@@ -87,7 +87,7 @@
   background-color: rgb(33, 36, 41);
   border: 4px solid rgb(25, 27, 31);
   z-index: 2;
-  &:hover{
+  &:hover {
     cursor: pointer;
     opacity: 0.9;
   }
@@ -115,4 +115,21 @@
 .acyDescriptionTitle {
   opacity: 0.5;
   margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotateZ(0deg);
+  }
+  from {
+    transform: rotateZ(360deg);
+  }
+}
+
+.spinner {
+  animation-name: spin;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  transform: rotateZ(0deg);
+  animation-timing-function: linear;
 }

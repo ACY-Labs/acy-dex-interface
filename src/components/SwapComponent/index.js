@@ -79,6 +79,7 @@ import { parseUnits } from '@ethersproject/units';
 const { AcyTabPane } = AcyTabs;
 import { Row, Col, Button, Icon } from 'antd';
 import { Alert } from 'antd';
+import spinner from '@/assets/loading.svg';
 
 const SwapComponent = props => {
   const { dispatch } = props;
@@ -89,9 +90,9 @@ const SwapComponent = props => {
   const [before, setBefore] = useState(true);
 
   // 交易对前置货币
-  const [token0, setToken0] = useState(null);
+  const [token0, setToken0] = useState(supportedTokens[0]);
   // 交易对后置货币
-  const [token1, setToken1] = useState(null);
+  const [token1, setToken1] = useState(supportedTokens[1]);
 
   // 交易对前置货币余额
   const [token0Balance, setToken0Balance] = useState('0');
@@ -132,6 +133,7 @@ const SwapComponent = props => {
   const [maxAmountIn, setMaxAmountIn] = useState();
   const [wethContract, setWethContract] = useState();
   const [wrappedAmount, setWrappedAmount] = useState();
+  const [showSpinner, setShowSpinner] = useState(false);
 
   const individualFieldPlaceholder = 'Enter amount';
   const dependentFieldPlaceholder = 'Estimated value';
@@ -148,6 +150,24 @@ const SwapComponent = props => {
   useEffect(() => {
     activate(injected);
   }, []);
+
+  useEffect(
+    () => {
+      console.log(account, chainId, library);
+      if (!account || !chainId || !library) return;
+      async function refreshBalances() {
+        setToken0Balance(await getUserTokenBalance(token0, chainId, account, library));
+        setToken0BalanceShow(true);
+        setToken1Balance(await getUserTokenBalance(token1, chainId, account, library));
+        setToken1BalanceShow(true);
+        console.log('Inside refresh balances');
+        console.log(token0, token1);
+      }
+
+      refreshBalances();
+    },
+    [account, chainId, library]
+  );
 
   const [favTokenList, setFavTokenList] = useState([]);
 
@@ -408,15 +428,11 @@ const SwapComponent = props => {
         {swapBreakdown && (
           <div className={styles.acyDescriptionContainer}>
             <AcyDescriptions.Item>
-              <div className={styles.acyDescriptionTitle}>
-                Swap Breakdown
-              </div>
+              <div className={styles.acyDescriptionTitle}>Swap Breakdown</div>
             </AcyDescriptions.Item>
             {swapBreakdown.map(info => (
               <AcyDescriptions.Item>
-                <div className={styles.acyDescriptionItem}>
-                  {info}
-                </div>
+                <div className={styles.acyDescriptionItem}>{info}</div>
               </AcyDescriptions.Item>
             ))}
           </div>
@@ -427,8 +443,13 @@ const SwapComponent = props => {
         <div>
           <AcyButton
             onClick={async () => {
+              setShowSpinner(true);
+              setApproveButtonStatus(false);
               const state = await approve(token0.address, approveAmount, library, account);
-              if (state == true) {
+              setApproveButtonStatus(true);
+              setShowSpinner(false);
+
+              if (state) {
                 setSwapButtonState(true);
                 setSwapButtonContent('SWAP');
                 setApproveButtonStatus(false);
@@ -436,7 +457,15 @@ const SwapComponent = props => {
             }}
             disabled={!approveButtonStatus}
           >
-            approve
+            approve{' '}
+            {showSpinner && (
+              <img
+                style={{ width: 30, height: 30 }}
+                src={spinner}
+                className={styles.spinner}
+                alt="spinner"
+              />
+            )}
           </AcyButton>{' '}
         </div>
       )}
