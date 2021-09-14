@@ -85,9 +85,9 @@ const AddLiquidityComponent = props => {
   const [before, setBefore] = useState(true);
 
   // 交易对前置货币
-  let [token0, setToken0] = useState(null);
+  let [token0, setToken0] = useState(supportedTokens[0]);
   // 交易对后置货币
-  let [token1, setToken1] = useState(null);
+  let [token1, setToken1] = useState(supportedTokens[1]);
   // 交易对前置货币余额
   let [token0Balance, setToken0Balance] = useState('0');
   // 交易对后置货币余额
