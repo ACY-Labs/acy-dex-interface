@@ -94,7 +94,7 @@ class BasicProfile extends Component {
         <div className={loggedIn ? styles.main : styles.main_notLoggedIn}>
           <div>{loggedIn && <AcyLiquidityPositions />}</div>
           <div>
-            <AcyCard style={{background:"#1b1b1c"}}>
+            <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
               <div className={styles.addLiquidity}>
                 <AddComponent onLoggedIn={this.onLoggedIn} />
               </div>
