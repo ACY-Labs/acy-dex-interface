@@ -257,7 +257,7 @@ class BasicProfile extends Component {
                 <Table dataSource={dataSource} columns={columns} pagination={false} />
               </AcyCard>
             )}
-          </div>
+          </div>  
           {!isMobile && (
             <div>
               <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
