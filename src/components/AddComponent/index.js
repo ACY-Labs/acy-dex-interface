@@ -336,52 +336,49 @@ const AddLiquidityComponent = props => {
       return prevFavTokenList;
     });
   };
-  const addLiquidityCallback = (status) => {
+  const addLiquidityCallback = status => {
     // 循环获取交易结果
-    dispatch({
-      type:'transaction/addTransaction',
-      payload:{
-        status:'交易完成',
-        transactions:[...transactions,receipt]
-      }
-    });
-
-let lists=[{
-  hash:status.hash,
-  receipt
-},
-{
-  hash:status.hash,
-  receipt
-}];
-    const sti = setInterval(() => {
-      library.getTransactionReceipt(status.hash).then(receipt => {
-        // receipt is not null when transaction is done
-        const {transaction:{transactions}}=props;
-        console.log('transactions',transactions);
-        if (receipt) {
-          clearInterval(sti);
-           dispatch({
-              type:'transaction/addTransaction',
-              payload:{
-                status:'交易完成',
-                transactions:[...transactions,receipt]
-              }
-            });
-        }
-        else{
-          dispatch({
-            type:'transaction/addTransaction',
-            payload:{
-              status:'交易中...'
-            }
-          });
-        }
-      });
-    }, 500);
-
-
-  }
+    //     dispatch({
+    //       type:'transaction/addTransaction',
+    //       payload:{
+    //         status:'交易完成',
+    //         transactions:[...transactions,receipt]
+    //       }
+    //     });
+    // let lists=[{
+    //   hash:status.hash,
+    //   receipt
+    // },
+    // {
+    //   hash:status.hash,
+    //   receipt
+    // }];
+    //     const sti = setInterval(() => {
+    //       library.getTransactionReceipt(status.hash).then(receipt => {
+    //         // receipt is not null when transaction is done
+    //         const {transaction:{transactions}}=props;
+    //         console.log('transactions',transactions);
+    //         if (receipt) {
+    //           clearInterval(sti);
+    //            dispatch({
+    //               type:'transaction/addTransaction',
+    //               payload:{
+    //                 status:'交易完成',
+    //                 transactions:[...transactions,receipt]
+    //               }
+    //             });
+    //         }
+    //         else{
+    //           dispatch({
+    //             type:'transaction/addTransaction',
+    //             payload:{
+    //               status:'交易中...'
+    //             }
+    //           });
+    //         }
+    //       });
+    //     }, 500);
+  };
   return (
     <div>
       <AcyCuarrencyCard
@@ -425,15 +422,11 @@ let lists=[{
         {liquidityBreakdown && (
           <div className={styles.acyDescriptionContainer}>
             <AcyDescriptions.Item>
-              <div className={styles.acyDescriptionTitle}>
-                liquidity breakdown
-              </div>
+              <div className={styles.acyDescriptionTitle}>liquidity breakdown</div>
             </AcyDescriptions.Item>
             {liquidityBreakdown.map(info => (
               <AcyDescriptions.Item>
-                <div className={styles.acyDescriptionItem}>
-                  {info}
-                </div>
+                <div className={styles.acyDescriptionItem}>{info}</div>
               </AcyDescriptions.Item>
             ))}
           </div>
@@ -644,6 +637,7 @@ let lists=[{
 };
 
 export default connect(({ global, transaction, loading }) => ({
-  global, transaction,
+  global,
+  transaction,
   loading: loading.global,
 }))(AddLiquidityComponent);
