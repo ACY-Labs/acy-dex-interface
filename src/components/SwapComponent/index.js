@@ -428,7 +428,9 @@ const SwapComponent = props => {
         {swapBreakdown && (
           <div className={styles.acyDescriptionContainer}>
             <AcyDescriptions.Item>
-              <div className={styles.acyDescriptionTitle}>Swap Breakdown</div>
+              {/* <div className={styles.acyDescriptionTitle}>
+                Swap Breakdown
+              </div> */}
             </AcyDescriptions.Item>
             {swapBreakdown.map(info => (
               <AcyDescriptions.Item>
@@ -510,7 +512,7 @@ const SwapComponent = props => {
       }
 
       <AcyDescriptions>
-        {swapStatus && <AcyDescriptions.Item>swapStatus: </AcyDescriptions.Item>}
+        {swapStatus && <AcyDescriptions.Item>Swap Status: </AcyDescriptions.Item>}
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
