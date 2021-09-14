@@ -1,10 +1,11 @@
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useState, useCallback } from 'react';
 import DatePicker from 'react-datepicker';
 import styles from './StakeSection.less';
 import SampleToken from '@/pages/Dao/sample_data/SampleToken';
 import TokenSelection from '@/pages/Dao/components/TokenSelection';
 import tokenList from '@/constants/TokenList';
 import { AcySmallButtonGroup } from '@/components/AcySmallButton';
+import {AcyPeriodTime} from '@/components/Acy';
 
 const StakeSection = () => {
   const [stake, setStake] = useState(0)
@@ -92,6 +93,20 @@ const StakeSection = () => {
     })
   }
 
+  const selectTime = useCallback((pt) => {
+    let dateSwitchFunctions = {
+      '1W': () => {updateDate('week', 1, 0)},
+      '1M': () => {updateDate('month', 1, 1)},
+      '3M': () => {updateDate('month', 3, 2)},
+      '6M': () => {updateDate('month', 6, 3)},
+      '1Y': () => {updateDate('year', 1, 4)},
+      '4Y':() => {updateDate('year', 4, 5)},
+    }
+
+    dateSwitchFunctions[pt]();
+      
+  })
+
   return (
     <div className={styles.stakeSection}>
       <div className={styles.stakeContentWrapper}>
@@ -158,18 +173,10 @@ const StakeSection = () => {
                 />
               </div>
               <div className={styles.presetDurationContainer}>
-                <AcySmallButtonGroup
-                  activeButton={selectedPresetDate}
-                  buttonList={[
-                    ['1W', () => updateDate('week', 1, 0)],
-                    ['1M', () => updateDate('month', 1, 1)],
-                    ['3M', () => updateDate('month', 3, 2)],
-                    ['6M', () => updateDate('month', 6, 3)],
-                    ['1Y', () => updateDate('year', 1, 4)],
-                    ['4Y', () => updateDate('year', 4, 5)],
-                  ]}
-                  containerClass={styles.presetDurationSelection}
-                  theme="#eb5c20"
+                <AcyPeriodTime
+                    onhandPeriodTimeChoose={selectTime}
+                    times={['1W', '1M', '3M', '6M', '1Y', '4Y']}
+                    className={styles.presetDurationSelection}
                 />
               </div>
             </div>

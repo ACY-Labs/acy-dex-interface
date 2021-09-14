@@ -1,6 +1,7 @@
 import {
   AcyBarChart, AcyIcon,
-  AcyLineChart, AcySmallButton
+  AcyLineChart, AcySmallButton,
+  AcyPeriodTime
 } from '@/components/Acy';
 import { Breadcrumb } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -76,6 +77,11 @@ function MarketPoolInfo(props) {
     // set the watchlists
     updateWatchlistStatus();
   }, []);
+
+  const selectGraph = (pt) => {
+    let index = ['Volume', 'TVL', 'Liquidity'].indexOf(pt)
+    switchChart(index)
+  }
 
   return (
     <div className={styles.marketRoot}>
@@ -265,7 +271,11 @@ function MarketPoolInfo(props) {
               </div>
             )}
             <div className={styles.contentChartsSelector}>
-              <AcySmallButton
+              <AcyPeriodTime
+                  onhandPeriodTimeChoose={selectGraph}
+                  times={['Volume', 'TVL', 'Liquidity']}
+              />
+              {/* <AcySmallButton
                 color={graphTabIndex == 0 ? '#1b1b1c' : '#757579'}
                 textColor="white"
                 borderColor="#757579"
@@ -297,7 +307,7 @@ function MarketPoolInfo(props) {
                 id="2"
               >
                 Liquidity
-              </AcySmallButton>
+              </AcySmallButton> */}
             </div>
           </div>
           <div className={styles.contentChartsBody}>

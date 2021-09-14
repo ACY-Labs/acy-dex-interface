@@ -1,6 +1,7 @@
 import {
   AcyBarChart, AcyIcon,
-  AcyLineChart, AcySmallButton
+  AcyLineChart, AcySmallButton,
+  AcyPeriodTime
 } from '@/components/Acy';
 import { Breadcrumb } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -71,6 +72,11 @@ function MarketTokenInfo(props) {
     // set the watchlists
     updateWatchlistStatus();
   }, []);
+
+  const selectGraph = (pt) => {
+    let index = ['Volume', 'TVL', 'Price'].indexOf(pt)
+    switchChart(index)
+  }
 
   return (
     <div className={styles.marketRoot}>
@@ -224,7 +230,11 @@ function MarketTokenInfo(props) {
             )}
 
             <div className={styles.contentChartsSelector}>
-              <AcySmallButton
+              <AcyPeriodTime
+                  onhandPeriodTimeChoose={selectGraph}
+                  times={['Volume', 'TVL', 'Price']}
+              />
+              {/* <AcySmallButton
                 color={graphTabIndex == 0 ? '#1b1b1c' : '#757579'}
                 textColor="white"
                 borderColor="#757579"
@@ -256,7 +266,7 @@ function MarketTokenInfo(props) {
                 id="2"
               >
                 Price
-              </AcySmallButton>
+              </AcySmallButton> */}
             </div>
           </div>
           <div className={styles.contentChartsBody}>
