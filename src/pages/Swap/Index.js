@@ -218,7 +218,7 @@ class BasicProfile extends Component {
         <div className={styles.main}>
           {isMobile && (
             <div>
-              <AcyCard style={{ backgroundColor: '#1b1b1c', padding: '10px' }}>
+              <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
                 <div className={styles.trade}>
                   <SwapComponent />
                 </div>
@@ -260,7 +260,7 @@ class BasicProfile extends Component {
           </div>
           {!isMobile && (
             <div>
-              <AcyCard style={{ backgroundColor: '#1b1b1c', padding: '10px' }}>
+              <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
                 <div className={styles.trade}>
                   <SwapComponent />
                 </div>
