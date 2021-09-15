@@ -32,36 +32,43 @@ export const  supportedTokens= [
     symbol: "USDC",
     address: "0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b",
     decimal: 6,
+    logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg"
   },
   {
     symbol: "ETH",
     address: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
     decimal: 18,
+    logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg"
   },
   {
     symbol: "WETH",
     address: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
     decimal: 18,
+    logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg"
   },
   {
     symbol: "UNI",
     address: "0x03e6c12ef405ac3f642b9184eded8e1322de1a9e",
     decimal: 18,
+    logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/UNI.svg"
   },
   {
     symbol: "DAI",
     address: "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea",
     decimal: 18,
+    logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg"
   },
   {
     symbol: "cDAI",
     address: "0x6d7f0754ffeb405d23c51ce938289d4835be3b14",
     decimal: 8,
+    logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg"
   },
   {
     symbol: "WBTC",
     address: "0x577d296678535e4903d59a4c929b718e1d575e0a",
     decimal: 8,
+    logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/WBTC.svg"
   },
 ];
 
@@ -299,7 +306,7 @@ export async function approve(tokenAddress, requiredAmount, library, account) {
     }
 
     let flag=false;
-    
+
     while(1){
       let newAllowance = await getAllowance(
         tokenAddress,
@@ -308,11 +315,11 @@ export async function approve(tokenAddress, requiredAmount, library, account) {
         library, // provider
         account // active account
      );
-      
+
       if(newAllowance.gte(BigNumber.from(requiredAmount))){
         flag=true;
         break;
-        
+
       }
     }
     if(flag) return true;

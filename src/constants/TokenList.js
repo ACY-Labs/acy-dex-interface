@@ -333,7 +333,6 @@ export default [
     "symbol": "DAI",
     "decimals": 18,
     "chainId": 4,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg"
   },
   {
     "name": "Maker",

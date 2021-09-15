@@ -69,6 +69,8 @@ export async function getAllLiquidityPositions(tokens, chainId, library, account
       false
     );
 
+    console.log(pair)
+
     const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
 
     const poolTokenPercentage = new Percent(userPoolBalance.raw, totalSupply.raw).toFixed(4);
@@ -76,6 +78,8 @@ export async function getAllLiquidityPositions(tokens, chainId, library, account
     userNonZeroLiquidityPositions.push({
       token0: pair.token0,
       token1: pair.token1,
+      token0Symbol: pair.token0.symbol,
+      token1Symbol: pair.token1.symbol,
       pool: `${pair.token0.symbol}/${pair.token1.symbol}`,
       poolAddress: `${pair.liquidityToken.address}`,
       token0Amount: `${token0Deposited.toSignificant(4)} ${pair.token0.symbol}`,
@@ -105,10 +109,26 @@ const AcyLiquidityPositions = () => {
       className: 'leftAlignTableHeader',
       render: (text, record, index) => {
         let addressLength = record.poolAddress.length;
+
+        let token0logo = null
+        let token1logo = null
+        for (let j = 0; j < supportedTokens.length; j++) {
+          if (record.token0Symbol === supportedTokens[j].symbol) {
+            token0logo = supportedTokens[j].logoURI
+          }
+          if (record.token1Symbol === supportedTokens[j].symbol) {
+            token1logo = supportedTokens[j].logoURI
+          }
+        }
+
         return (
           <div className={styles.pool}>
+            <img src={token0logo} alt={record.token0Symbol} style={{ maxWidth: '24px', maxHeight: '24px', marginRight: '0.25rem', marginTop: '0.1rem' }} />
+            <img src={token1logo} alt={record.token1Symbol} style={{ maxWidth: '24px', maxHeight: '24px', marginRight: '0.5rem', marginTop: '0.1rem' }} />
             <div>
-              <p className={styles.bigtitle}>{record.pool}</p>
+              <p className={styles.bigtitle}>
+                {record.pool}
+              </p>
               <p className={styles.value}>
                 {`${record.poolAddress.slice(0, 5)}...${record.poolAddress.slice(
                   addressLength - 5,
@@ -193,6 +213,22 @@ const AcyLiquidityPositions = () => {
     },
     [chainId, library, account]
   );
+
+  // useEffect(() => {
+  //   const userLiquidityPositionsCopy = [...userLiquidityPositions]
+  //   console.log(userLiquidityPositionsCopy)
+  //   for (let i = 0; i < userLiquidityPositionsCopy.length; i++) {
+  //     for (let j = 0; j < supportedTokens.length; j++) {
+  //       if (userLiquidityPositionsCopy[i].token0Symbol === supportedTokens[j].symbol) {
+  //         userLiquidityPositionsCopy[i].token0logo = supportedTokens[j].logoURI
+  //       }
+  //       if (userLiquidityPositionsCopy[i].token1Symbol === supportedTokens[j].symbol) {
+  //         userLiquidityPositionsCopy[i].token1logo = supportedTokens[j].logoURI
+  //       }
+  //     }
+  //   }
+  //   setUserLiquidityPositions(userLiquidityPositionsCopy)
+  // }, [userLiquidityPositions])
 
   return (
     <div>
