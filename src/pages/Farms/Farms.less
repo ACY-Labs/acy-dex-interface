@@ -2,14 +2,17 @@
 
 .farmsContainer {
   padding: 0 1.25rem;
+  // width: 90%;
 
   .tableControlButtonContainer {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap-reverse;
 
     .tableHeaderButtonContainer {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
 
       .tableHeaderRadioButtonContainer {
         margin-right: 0.5rem;
@@ -18,7 +21,7 @@
       .tableHeaderSearchInputContainer {
         .searchInput {
           border: none;
-          background-color: #1b1b1c;
+          background-color: #29292c;
           padding: 0.25rem 0.5rem;
           border-radius: 9999px;
           margin-right: 0.5rem;
@@ -27,7 +30,7 @@
           box-shadow: 0 0 0 0.5px transparent;
 
           &:focus {
-            box-shadow: 0 0 0 0.5px #eb5c20;
+            box-shadow: 0 0 0 0.5px #1e5d91;
           }
         }
       }
@@ -36,11 +39,11 @@
         .activeToggleButton,
         .endedToggleButton {
           border: none;
-          background-color: #1b1b1c;
+          background-color: #29292c;
           padding: 0.25rem 1rem;
 
           &:hover {
-            background-color: #29292c;
+            background-color: #2e3032;
             cursor: pointer;
           }
         }
@@ -150,7 +153,7 @@
       flex: 3;
 
       .pendingRewardTitleContainer {
-        font-weight: lighter;
+        font-weight: bold;
       }
 
       .pendingReward1ContentContainer {
@@ -162,7 +165,7 @@
       flex: 3;
 
       .totalAprTitleContainer {
-        font-weight: lighter;
+        font-weight: bold;
       }
 
       .totalAprContentContainer {
@@ -174,7 +177,7 @@
       flex: 3;
 
       .tvlTitleContainer {
-        font-weight: lighter;
+        font-weight: bold;
       }
 
       .tvlContentContainer {
@@ -209,7 +212,7 @@
       margin-right: 0.5rem;
 
       .tableCodyDrawerLiquidityLink {
-        color: #eb5c20;
+        color: #1e5d91;
         font-weight: bold;
       }
     }
@@ -231,7 +234,7 @@
         align-items: center;
 
         .tableBodyDrawerRewardHarvestButton {
-          border: 1px solid #eb5c20;
+          border: 1px solid #1e5d91;
           background-color: #1b1b1c;
           padding: 0.25rem 0.5rem;
           border-radius: 0.25rem;
@@ -255,7 +258,7 @@
       }
 
       .tableBodyDrawerWalletButton {
-        border: 1px solid #eb5c20;
+        border: 1px solid #1e5d91;
         background-color: #1b1b1c;
         padding: 0.25rem 0.5rem;
         border-radius: 0.25rem;
@@ -276,34 +279,36 @@
   border: 1px solid transparent;
   background-color: #29292c;
   padding: 0.25rem 1.25rem;
-  border-radius: 0.25rem;
+  border-radius: 15px;
   margin-right: 0.5rem;
-  font-size: 1.24rem;
+  font-size: 1rem;
 }
 
 .middleToggleButton {
   border: 1px solid transparent;
+  border-radius: 15px 0 0 15px;
   background-color: #29292c;
   padding: 0.25rem 1.25rem;
-  border-radius: 0.25rem 0 0 0.25rem;
+  // border-radius: 0.25rem 0 0 0.25rem;
   margin-right: 0;
-  font-size: 1.24rem;
+  font-size: 1rem;
 }
 
 .lastToggleButton {
   border: 1px solid transparent;
+  border-radius: 0 15px 15px 0;
   background-color: #29292c;
   padding: 0.25rem 1.25rem;
-  border-radius: 0 0.25rem 0.25rem 0;
+  // border-radius: 0 0.25rem 0.25rem 0;
   margin-right: 0;
-  font-size: 1.24rem;
+  font-size: 1rem;
 }
 
 .firstToggleButton:hover,
 .middleToggleButton:hover,
 .lastToggleButton:hover {
   cursor: pointer;
-  border-color: #eb5c2080;
+  border-color: #1e5d9180;
 }
 
 .amountRowContainer {
@@ -332,7 +337,7 @@
 
     input:focus {
       outline: none;
-      box-shadow: 0 0 0 0.5px #eb5c20;
+      box-shadow: 0 0 0 0.5px #1e5d91;
       transition: .1s;
     }
 
@@ -384,13 +389,13 @@
   }
 
   .slider::-webkit-slider-thumb:hover {
-    background-color: #eb5c20;
+    background-color: #1e5d91;
     width: 17.5px;
     height: 17.5px;
   }
 
   .slider::-webkit-slider-thumb:active {
-    background-color: #eb5c20;
+    background-color: #1e5d91;
     width: 17.5px;
     height: 17.5px;
   }
@@ -448,7 +453,7 @@
 }
 
 .datePickerInput:hover {
-  box-shadow: 0 0 0 0.5px #eb5c20;
+  box-shadow: 0 0 0 0.5px #1e5d91;
   transition: .1s;
   cursor: pointer;
 }
@@ -465,4 +470,25 @@
 .stakeSubmitButton:hover {
   background-color: #5f5f5f;
   cursor: pointer;
+}
+
+
+@media screen and (max-width: 786px){
+
+  .farmsContainer{
+    padding: 2rem;
+    .tableControlButtonContainer{
+      // justify-content: center;
+      margin-bottom: 5px;
+    }
+    .tableToggleButtonContainer {
+      margin-top: 7px;
+    margin-bottom: 5px;
+    }
+  }
+
+  .farmsContainer > .tableControlButtonContainer > .tableHeaderButtonContainer > .tableHeaderToggleButtonContainer {
+    justify-content: center;
+  }
+  
 }

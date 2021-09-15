@@ -3,6 +3,9 @@ import styles from '@/pages/Farms/Farms.less';
 import { AcyModal } from '@/components/Acy';
 import DatePicker from 'react-datepicker';
 import { AcySmallButtonGroup } from '@/components/AcySmallButton';
+import {
+  isMobile
+} from "react-device-detect";
 
 const FarmsTableRow = (
   { token1,
@@ -82,8 +85,8 @@ const FarmsTableRow = (
         </div>
 
         {/* Pending Reward Column */}
-
-        <div className={styles.tableBodyRewardColContainer}>
+        {
+          !isMobile && <div className={styles.tableBodyRewardColContainer}>
           <div className={styles.pendingRewardTitleContainer}>Pending Reward</div>
           {pendingReward.map((reward) => (
             <div className={styles.pendingReward1ContentContainer}>
@@ -91,13 +94,17 @@ const FarmsTableRow = (
             </div>
           ))}
         </div>
+        }
+        
 
         {/* Total APR Column */}
 
-        <div className={styles.tableBodyAprColContainer}>
+        { !isMobile && <div className={styles.tableBodyAprColContainer}>
           <div className={styles.totalAprTitleContainer}>Total APR</div>
           <div className={styles.totalAprContentContainer}>{totalApr}%</div>
-        </div>
+        </div>}
+
+        
 
         {/* TVL Column */}
 
