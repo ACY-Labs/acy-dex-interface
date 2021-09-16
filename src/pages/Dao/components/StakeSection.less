@@ -8,7 +8,7 @@
   justify-content: flex-start;
 
   .stakeContentWrapper {
-    padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+    padding: 1.5rem 1.5rem 0rem 1.5rem;
     // border-bottom: 1px solid #434343;
   }
 
@@ -130,15 +130,17 @@
   .amountRowTitle {
     flex: 1;
     font-size: 1.25rem;
+    
+    text-align: left;
   }
 
   .amountRowInputContainer {
-    flex: 2;
+    flex: 4;
 
     input {
       width: 100%;
       background-color: #1B1B1C;
-      border: 1px solid #40444f99;
+      border: 0 solid #40444f99;
       border-radius: 9999px;
       font-size: 1.5rem;
       padding: 0 1rem;
@@ -147,7 +149,7 @@
       margin-bottom: 0.25rem;
 
       &:hover {
-        border: 1px solid #40444fff;
+        border: 0 solid #40444fff;
       }
     }
 
@@ -177,15 +179,16 @@
 
   .balanceRowTitleContainer {
     flex: 1;
+    
 
     .balanceRowTitle {
-      text-align: right;
+      text-align: left;
       padding-right: 1.5rem;
     }
   }
 
   .sliderContainer {
-    flex: 2;
+    flex: 4;
     display: flex;
     align-items: center;
     position: relative;
@@ -277,16 +280,17 @@
 
   .lockTimeRowTitleContainer {
     flex: 1;
+    
 
     .lockTimeRowTitle {
-      text-align: right;
+      text-align: left;
       padding-right: 1.5rem;
     }
   }
 
 
   .dateSelectionContainer {
-    flex: 2;
+    flex: 4;
     display: flex;
     flex-direction: column;
 
@@ -308,7 +312,7 @@
 .datePickerInput {
   color: #b5b6b6;
   background-color: #1B1B1C;
-  border: 1px solid #40444f99;
+  border: 0 solid #40444f99;
   border-radius: 0.3rem;
   font-size: 1rem;
   padding: 0.25rem 1.5rem;
@@ -323,7 +327,7 @@
 }
 
 .stakeSubmitButton {
-  margin-top: 8px;
+  margin-top: 32px;
   width: 100%;
   background-color: #4c4c4d;
   border: none;
