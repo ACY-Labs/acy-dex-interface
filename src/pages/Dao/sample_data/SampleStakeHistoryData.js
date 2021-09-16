@@ -6,6 +6,7 @@ export default [
     "amount": "400 sACY",
     "reward": "500 sACY",
     "lock period": "3M",
+    "unlock remaining": "5 days",
     "apy": "4.7%",
   },
   {
@@ -13,6 +14,7 @@ export default [
     "amount": "500 sACY",
     "reward": "100 sACY",
     "lock period": "3M",
+    "unlock remaining": "5 days",
     "apy": "4.7%",
   },
   {
@@ -20,6 +22,7 @@ export default [
     "amount": "600 sACY",
     "reward": "200 sACY",
     "lock period": "3M",
+    "unlock remaining": "5 days",
     "apy": "4.7%",
   },
   {
@@ -27,6 +30,7 @@ export default [
     "amount": "200 sACY",
     "reward": "300 sACY",
     "lock period": "3M",
+    "unlock remaining": "5 days",
     "apy": "4.7%",
   },
   {
@@ -34,6 +38,7 @@ export default [
     "amount": "400 sACY",
     "reward": "1000 sACY",
     "lock period": "3M",
+    "unlock remaining": "5 days",
     "apy": "4.7%",
   },
   {
@@ -41,6 +46,7 @@ export default [
     "amount": "500 sACY",
     "reward": "500 sACY",
     "lock period": "3M",
+    "unlock remaining": "5 days",
     "apy": "4.7%",
   },
   {
@@ -48,6 +54,7 @@ export default [
     "amount": "600 sACY",
     "reward": "500 sACY",
     "lock period": "3M",
+    "unlock remaining": "5 days",
     "apy": "4.7%",
   },
   {
@@ -55,6 +62,7 @@ export default [
     "amount": "200 sACY",
     "reward": "500 sACY",
     "lock period": "3M",
+    "unlock remaining": "5 days",
     "apy": "4.7%",
   },
   {
@@ -62,6 +70,7 @@ export default [
     "amount": "400 sACY",
     "reward": "500 sACY",
     "lock period": "3M",
+    "unlock remaining": "5 days",
     "apy": "4.7%",
   },
   {
@@ -69,6 +78,7 @@ export default [
     "amount": "500 sACY",
     "reward": "500 sACY",
     "lock period": "3M",
+    "unlock remaining": "5 days",
     "apy": "4.7%",
   },
   {
@@ -76,6 +86,7 @@ export default [
     "amount": "600 sACY",
     "reward": "500 sACY",
     "lock period": "3M",
+    "unlock remaining": "5 days",
     "apy": "4.7%",
   },
   {
@@ -83,6 +94,7 @@ export default [
     "amount": "200 sACY",
     "reward": "500 sACY",
     "lock period": "3M",
+    "unlock remaining": "5 days",
     "apy": "4.7%",
   },
 ]
@@ -110,6 +122,12 @@ const sampleStakeHistoryColumns = [
     dataIndex: 'lock period',
     key: 'lock period',
     render: text => <p className={styles.tableData}>{text}</p>,
+  },
+  {
+    title: 'Unlock remaining',
+    dataIndex: 'unlock remaining',
+    key: 'unlock remaining',
+    render: text => <p className={styles.tableData}>{text}</p>
   },
   {
     title: 'APY',
