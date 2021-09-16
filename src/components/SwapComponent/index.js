@@ -21,6 +21,7 @@ import {
   AcyApprove,
   AcyButton,
   AcyDescriptions,
+  AcySmallButton,
 } from '@/components/Acy';
 
 import { Input } from 'antd';
@@ -108,6 +109,8 @@ const SwapComponent = props => {
   const [token1BalanceShow, setToken1BalanceShow] = useState(false);
 
   const [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
+  const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
+  const [slippageError, setSlippageError] = useState('');
 
   // when exactIn is true, it means the firt line
   // when exactIn is false, it means the second line
@@ -427,18 +430,67 @@ const SwapComponent = props => {
 
       <AcyDescriptions>
         {swapBreakdown && (
-          <div className={styles.acyDescriptionContainer}>
-            <AcyDescriptions.Item>
-              {/* <div className={styles.acyDescriptionTitle}>
-                Swap Breakdown
-              </div> */}
-            </AcyDescriptions.Item>
-            {swapBreakdown.map(info => (
+          <>
+            <div className={styles.breakdownTopContainer}>
+              <div className={styles.slippageContainer}>
+                <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '7px' }}>
+                  <Button type="link" style={{ marginRight: '5px' }}>
+                    Auto
+                  </Button>
+                  <Input
+                    value={inputSlippageTol || ''}
+                    onChange={e => {
+                      setInputSlippageTol(e.target.value);
+                    }}
+                    suffix={<strong>%</strong>}
+                  />
+                  <Button
+                    type="primary"
+                    style={{ marginLeft: '10px' }}
+                    onClick={() => {
+                      if (isNaN(inputSlippageTol)) {
+                        setSlippageError('Please input valid slippage value!');
+                      } else {
+                        setSlippageError("");
+                        setSlippageTolerance(parseFloat(inputSlippageTol));
+                      }
+                    }}
+                  >
+                    Set
+                  </Button>
+                </div>
+                {slippageError.length > 0 && (
+                  <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
+                )}
+              </div>
+              <div className={styles.slippageContainer}>
+                <span style={{ fontWeight: 600, marginBottom: '10px' }}>Transaction deadline</span>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    width: '50%',
+                    marginTop: '7px',
+                  }}
+                >
+                  <Input placeholder={30} suffix={<strong>minutes</strong>} />
+                </div>
+              </div>
+            </div>
+            <div className={styles.acyDescriptionContainer}>
               <AcyDescriptions.Item>
-                <div className={styles.acyDescriptionItem}>{info}</div>
+                {/* <div className={styles.acyDescriptionTitle}>
+                  Swap Breakdown
+                </div> */}
               </AcyDescriptions.Item>
-            ))}
-          </div>
+              {swapBreakdown.map(info => (
+                <AcyDescriptions.Item>
+                  <div className={styles.acyDescriptionItem}>{info}</div>
+                </AcyDescriptions.Item>
+              ))}
+            </div>
+          </>
         )}
       </AcyDescriptions>
 

@@ -439,7 +439,7 @@ export async function swapGetEstimated(
       let { priceImpactWithoutFee, realizedLPFee } = computeTradePriceBreakdown(trade);
       let breakdownInfo = [
         // `Slice Slippage tolerance:` ${allowedSlippage} %`
-        `Slippage tolerance : ${slippage}%`,
+        // `Slippage tolerance : ${slippage}%`,
         `Price impact : ${priceImpactWithoutFee.toFixed(2)}%`,
         // `LP FEE : ${realizedLPFee?.toSignificant(6)} ${trade.inputAmount.currency.symbol}`,
         `${exactIn ? 'Min received:' : 'Max sold'} : ${
