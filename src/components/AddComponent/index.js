@@ -286,7 +286,7 @@ const AddLiquidityComponent = props => {
         setButtonStatus(true);
         setButtonContent('Connect to Wallet');
       } else {
-        setButtonContent('choose tokens and amount');
+        setButtonContent('Choose tokens and amount');
         setButtonStatus(false);
         // set login state to true
         onLoggedIn();
@@ -554,7 +554,7 @@ const AddLiquidityComponent = props => {
         onClick={async () => {
           if (account == undefined) {
             activate(injected);
-            setButtonContent('choose tokens and amount');
+            setButtonContent('Choose tokens and amount');
             setButtonStatus(false);
           } else {
             await addLiquidity(
@@ -586,7 +586,7 @@ const AddLiquidityComponent = props => {
         {buttonContent}
       </AcyButton>
       <AcyDescriptions>
-        {liquidityStatus && <AcyDescriptions.Item>liquidityStatus</AcyDescriptions.Item>}
+        {liquidityStatus && <AcyDescriptions.Item>Liquidity Status</AcyDescriptions.Item>}
         {liquidityStatus && <AcyDescriptions.Item>{liquidityStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 

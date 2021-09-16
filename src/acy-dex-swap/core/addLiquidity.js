@@ -57,7 +57,7 @@ export async function getEstimated(
     setApproveToken0ButtonShow(false);
     setApproveToken1ButtonShow(false);
     setLiquidityBreakdown('');
-    setButtonContent('loading...');
+    setButtonContent('Loading...');
     setButtonStatus(false);
     setLiquidityStatus('');
 
@@ -305,7 +305,7 @@ export async function getEstimated(
           setButtonContent(e.fault);
           return new ACYSwapErrorStatus(e.fault);
         } else {
-          setButtonContent('unknow error');
+          setButtonContent('Unknown error');
           return new ACYSwapErrorStatus('unknow error');
         }
       }
@@ -403,7 +403,7 @@ export async function getEstimated(
       }
       if (approveStatus > 0) {
         setButtonStatus(false);
-        setButtonContent('need approve');
+        setButtonContent('Need approval');
 
         return new ACYSwapErrorStatus(
           `Need approve ${
@@ -417,9 +417,9 @@ export async function getEstimated(
       }
       setButtonStatus(true);
       if (noLiquidity) {
-        setButtonContent('create a new pool');
+        setButtonContent('Create a new pool');
       } else {
-        setButtonContent('add liquidity');
+        setButtonContent('Add liquidity');
       }
 
       console.log('------------------ PREPARE ADD LIQUIDITY ------------------');
@@ -635,7 +635,7 @@ export async function addLiquidity(
     addLiquidityCallback(status);
     setLiquidityStatus(
       <a href={url} target={'_blank'}>
-        view it on etherscan
+        View it on etherscan
       </a>
     );
   }
