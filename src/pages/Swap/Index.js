@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useCallback } from 'react';
 import { connect } from 'umi';
 import classnames from 'classnames';
 import { Card, Badge, Table, Divider, Button, Tabs, Row, Col, Icon } from 'antd';
@@ -15,6 +15,7 @@ import {
   AcyLineChart,
   AcyConfirm,
   AcyApprove,
+  AcyBarChart,
 } from '@/components/Acy';
 import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 import Media from 'react-media';
@@ -160,6 +161,7 @@ class BasicProfile extends Component {
     visibleConfirmOrder: false,
     visibleLoading: false,
     tabIndex: 1,
+    alphaTable: 'Line',
   };
   componentDidMount() {}
 
@@ -175,6 +177,19 @@ class BasicProfile extends Component {
         </div>
       </div>,
     ];
+  };
+
+  selectTime = (pt) => {
+    const dateSwitchFunctions = {
+      'Line': () => {
+        this.setState({ alphaTable: 'Line'})
+      },
+      'Bar': () => {
+        this.setState({ alphaTable: 'Bar'})
+      },
+    };
+
+    dateSwitchFunctions[pt]();
   };
 
   // 时间段选择
@@ -211,7 +226,7 @@ class BasicProfile extends Component {
     });
   };
   render() {
-    const { visible, visibleConfirmOrder, visibleLoading, tabIndex, maxLine } = this.state;
+    const { visible, visibleConfirmOrder, visibleLoading, tabIndex, maxLine, alphaTable } = this.state;
     const { isMobile } = this.props;
     return (
       <PageHeaderWrapper>
@@ -257,7 +272,7 @@ class BasicProfile extends Component {
                 <Table dataSource={dataSource} columns={columns} pagination={false} />
               </AcyCard>
             )}
-          </div>  
+          </div>
           {!isMobile && (
             <div>
               <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
@@ -365,8 +380,20 @@ class BasicProfile extends Component {
               </AcyCard>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-              <AcyCard style={{ height: '428px' }} title="Alpha">
-                <AcyPieChart />
+              <AcyCard style={{ height: '428px', position: 'relative' }} title="Alpha">
+                <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
+                  <AcyPeriodTime
+                    onhandPeriodTimeChoose={this.selectTime}
+                    times={['Line', 'Bar']}
+                  />
+                </div>
+                {alphaTable === 'Bar' ? (
+                  <div style={{ height: '358px' }}>
+                    <AcyBarChart showXAxis />
+                  </div>
+                ) : (
+                  <AcyPieChart />
+                )}
               </AcyCard>
             </Col>
           </Row>
@@ -390,7 +417,7 @@ class BasicProfile extends Component {
 
           </div>
           <div className={styles.routing_middle}>
-            
+
             <div className={styles.nodes}>
               <div className={styles.node}>
                 <div>
@@ -412,7 +439,7 @@ class BasicProfile extends Component {
                 </div>
               </div>
             </div>
-            
+
           </div>
           <div className={styles.routing_left}>
             <p className={styles.r_title}>93.246ETH</p>
