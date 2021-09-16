@@ -129,13 +129,13 @@ const sampleStakeHistoryColumns = [
     title: 'From',
     dataIndex: 'from',
     key: 'from',
-    render: text => <p className={styles.tableData}>{abbrHash(text)}</p>,
+    render: text =>text&& <p className={styles.tableData}>{abbrHash(text)}</p>,
   },
   {
     title: 'To',
     dataIndex: 'to',
     key: 'to',
-    render: text => <p className={styles.tableData}>{abbrHash(text)}</p>,
+    render: text =>text&& <p className={styles.tableData}>{abbrHash(text)}</p>,
   },
   {
     title: 'Amount',

@@ -151,8 +151,9 @@ const columns = [
   },
 ];
 
-@connect(({ profile, loading }) => ({
+@connect(({ profile,transaction, loading }) => ({
   profile,
+  transaction,
   loading: loading.effects['profile/fetchBasic'],
 }))
 class BasicProfile extends Component {
@@ -227,7 +228,7 @@ class BasicProfile extends Component {
   };
   render() {
     const { visible, visibleConfirmOrder, visibleLoading, tabIndex, maxLine, alphaTable } = this.state;
-    const { isMobile } = this.props;
+    const { isMobile,transaction:{transactions} } = this.props;
     return (
       <PageHeaderWrapper>
         <div className={styles.main}>
@@ -400,7 +401,7 @@ class BasicProfile extends Component {
         </div>
         <div className={styles.option}>
           <div style={{ marginTop: '-10px', marginBottom: '30px' }}>
-            <StakeHistoryTable />
+            <StakeHistoryTable dataSource={transactions} />
           </div>
         </div>
         {/* Routing */}

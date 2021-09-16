@@ -1,9 +1,9 @@
 import styles from './index.less';
 import { sortAddress } from '@/utils/utils';
 
-import { Button } from 'antd';
+import { Button,Icon } from 'antd';
 const AcyConnectWallet = props => {
-  const { value, onClick, isMobile, chainId, ...rest } = props;
+  const { value, onClick, isMobile, chainId,pendingLength, ...rest } = props;
   return (
     (isMobile && (
       <div {...rest} className={styles.connect}>
@@ -15,9 +15,17 @@ const AcyConnectWallet = props => {
       <div {...rest} className={styles.connect}>
         <div className={styles.wrap}>
           Ethereum ( {chainId || 'disconnected'} )
-          <div className={styles.address} onClick={onClick}>
-            {(value && sortAddress(value)) || 'Connect'}
-          </div>
+          {/* pending */}
+          {pendingLength
+            &&
+              <div className={styles.pending}>
+                {pendingLength} Pending <Icon type="redo" spin/>
+              </div>
+            || 
+              <div className={styles.address} onClick={onClick}>
+                {value && sortAddress(value) || 'Connect'}
+              </div>
+            }
         </div>
       </div>
     )

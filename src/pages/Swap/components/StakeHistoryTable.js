@@ -5,16 +5,14 @@ import SampleStakeHistoryData, {
 } from '../sample_data/SampleStakeHistoryData';
 import styles from './StakeHistoryTable.less';
 
-const StakeHistoryTable = () => {
+const StakeHistoryTable = (props) => {
   const [stakeDisplayNumber, setStakeDisplayNumber] = useState(5);
-
+  const {dataSource}=props;
+  console.log('dataSource',dataSource);
   return (
     <Table
       columns={sampleStakeHistoryColumns}
-      dataSource={SampleStakeHistoryData.sort((a, b) => new Date(b.time) - new Date(a.time)).slice(
-        0,
-        stakeDisplayNumber
-      )}
+      dataSource={dataSource}
       className={styles.tableStyle}
       pagination={false}
       footer={() => (

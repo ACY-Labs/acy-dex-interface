@@ -229,15 +229,16 @@ const GlobalHeaderRight = props => {
   if (theme === 'dark') {
     className = `${styles.right}  ${styles.dark}`;
   }
+  
   return (
     <div className={className}>
       {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
-      {props.transaction.status}
       <AcyConnectWallet
         chainId={chainId}
         isMobile={isMobile}
         value={account}
         onClick={onhandMetaMask}
+        pendingLength={props.transaction.transactions.filter(item=>item.blockHash==undefined).length}
       />
       <Dropdown
         overlay={
