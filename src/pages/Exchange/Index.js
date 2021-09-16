@@ -178,7 +178,7 @@ class BasicProfile extends Component {
             <div
               style={{ width: '100%', height: '576px', background: '#000', borderRadius: '20px' }}
             >
-              <AcyLineChart backData={[]} />
+              <AcyLineChart backData={[['2021-09-16T13:45:54.000Z', 3592.567192353448]]} />
             </div>
           </AcyCard>
         )) || (

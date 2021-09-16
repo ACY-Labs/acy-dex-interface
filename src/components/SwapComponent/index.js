@@ -83,7 +83,7 @@ import { Alert } from 'antd';
 import spinner from '@/assets/loading.svg';
 
 const SwapComponent = props => {
-  const { dispatch } = props;
+  const { dispatch, onSelectToken0, onSelectToken1 } = props;
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
 
@@ -335,6 +335,7 @@ const SwapComponent = props => {
       if (account == undefined) {
         alert('Please connect to your account');
       } else {
+        onSelectToken0(token.symbol);
         setToken0(token);
         console.log('GETTING BALANCES');
         console.log(chainId);
@@ -345,6 +346,7 @@ const SwapComponent = props => {
       if (account == undefined) {
         alert('Please connect to your account');
       } else {
+        onSelectToken1(token.symbol);
         setToken1(token);
         setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
         setToken1BalanceShow(true);
@@ -423,11 +425,6 @@ const SwapComponent = props => {
         }}
       />
 
-      {/*<AcyDescriptions>*/}
-      {/*  {swapStatus && <AcyDescriptions.Item>swap status: </AcyDescriptions.Item>}*/}
-      {/*  {swapStatus && <AcyDescriptions.Item>{swapStatus}</AcyDescriptions.Item>}*/}
-      {/*</AcyDescriptions>*/}
-
       <AcyDescriptions>
         {swapBreakdown && (
           <>
@@ -452,7 +449,7 @@ const SwapComponent = props => {
                       if (isNaN(inputSlippageTol)) {
                         setSlippageError('Please input valid slippage value!');
                       } else {
-                        setSlippageError("");
+                        setSlippageError('');
                         setSlippageTolerance(parseFloat(inputSlippageTol));
                       }
                     }}
