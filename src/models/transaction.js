@@ -10,7 +10,9 @@ export default {
     *addTransaction({ payload }, { put }) {
       yield put({
         type: 'putTransaction',
-        payload: { ...payload },
+        payload:{
+          ...payload
+        }
       });
     },
   },
@@ -19,7 +21,7 @@ export default {
     putTransaction(state, { payload }) {
       return {
         ...state,
-        ...payload,
+       ...payload
       };
     },
   },

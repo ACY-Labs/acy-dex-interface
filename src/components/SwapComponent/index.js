@@ -378,7 +378,46 @@ const SwapComponent = props => {
   const ConnectWallet = () => {
     activate(injected);
   };
+  // swap的交易状态
+  const swapCallback=(status)=>{
+    // 循环获取交易结果
+    const {transaction:{transactions}}=props;
+    // 检查是否包含交易
+    const transLength=transactions.filter(item=>item.hash==status.hash).length;
+    if(transLength==0){
+      dispatch({
+        type:'transaction/addTransaction',
+        payload:{
+          transactions:[...transactions,{hash:status.hash}]
+        }
+      });
+    }
+    // let lists=[{
+    //   hash:status.hash,
+    //   receipt
+    // },
+    // {
+    //   hash:status.hash,
+    //   receipt
+    // }];
 
+        const sti = setInterval(() => {
+          library.getTransactionReceipt(status.hash).then(receipt => {
+            console.log('receiptreceipt',receipt);
+            // receipt is not null when transaction is done
+            if (receipt) {
+              clearInterval(sti);
+                let newData=transactions.filter(item=>item.hash!=status.hash);
+               dispatch({
+                  type:'transaction/addTransaction',
+                  payload:{
+                    transactions:[...newData,{hash:status.hash,...receipt}]
+                  }
+                });
+            }
+          });
+        }, 500);
+  }
   return (
     <div className={styles.sc}>
       <AcyCuarrencyCard
@@ -552,7 +591,8 @@ const SwapComponent = props => {
                 maxAmountIn,
                 wethContract,
                 wrappedAmount,
-                setSwapStatus
+                setSwapStatus,
+                swapCallback
               );
             }
           }}
@@ -618,8 +658,9 @@ const SwapComponent = props => {
   );
 };
 
-export default connect(({ global, loading }) => ({
+export default connect(({ global,transaction, loading }) => ({
   global,
+  transaction,
   account: global.account,
   loading: loading.global,
 }))(SwapComponent);

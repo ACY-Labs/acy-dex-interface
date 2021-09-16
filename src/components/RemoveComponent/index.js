@@ -201,7 +201,7 @@ const MyComponent = props => {
   );
 
   // ^mark
-  // const checkApprovalStatus = useCallback(async () => {debugger
+  // const checkApprovalStatus = useCallback(async () => {
   //   if (token0 && token1) {
   //     const approved = await checkTokenIsApproved(
   //       token0.address,

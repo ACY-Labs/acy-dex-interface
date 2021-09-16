@@ -515,7 +515,8 @@ export async function swap(
   maxAmountIn,
   wethContract,
   wrappedAmount,
-  setSwapStatus
+  setSwapStatus,
+  swapCallback
 ) {
   let status = await (async () => {
     // check uniswap
@@ -641,11 +642,14 @@ export async function swap(
       return result;
     }
   })();
+  
   if (status instanceof ACYSwapErrorStatus) {
     setSwapStatus(status.getErrorText());
   } else {
     console.log(status);
+    
     let url = 'https://rinkeby.etherscan.io/tx/' + status.hash;
+    swapCallback(status);
     setSwapStatus(
       <div>
         <a href={url} target={'_blank'}>
