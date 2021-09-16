@@ -77,7 +77,7 @@ export async function swapGetEstimated(
     allowedSlippage = new Percent(allowedSlippage, 10000);
     setSwapBreakdown('');
     setSwapButtonState(false);
-    setSwapButtonContent('loading...');
+    setSwapButtonContent('Loading...');
     setSwapStatus('');
 
     let contract = getRouterContract(library, account);
@@ -477,15 +477,15 @@ export async function swapGetEstimated(
           setNeedApprove(true);
           setApproveButtonStatus(true);
           setSwapButtonState(false);
-          setSwapButtonContent('need approve');
+          setSwapButtonContent('Need approval');
           return 'approve is ok';
         } else {
-          setSwapButtonContent('swap');
+          setSwapButtonContent('Swap');
           setSwapButtonState(true);
           return 'swap is ok';
         }
       }
-      setSwapButtonContent('swap');
+      setSwapButtonContent('Swap');
       setSwapButtonState(true);
 
       return 'swap is ok';
@@ -649,7 +649,7 @@ export async function swap(
     setSwapStatus(
       <div>
         <a href={url} target={'_blank'}>
-          view it on etherscan
+          View it on etherscan
         </a>
       </div>
     );

@@ -140,7 +140,7 @@ const SwapComponent = props => {
 
   const individualFieldPlaceholder = 'Enter amount';
   const dependentFieldPlaceholder = 'Estimated value';
-  const slippageTolerancePlaceholder = 'please input a number from 1.00 to 100.00';
+  const slippageTolerancePlaceholder = 'Please input a number from 1.00 to 100.00';
 
   const { account, chainId, library, activate } = useWeb3React();
 
@@ -323,7 +323,7 @@ const SwapComponent = props => {
         setSwapButtonContent('Connect to Wallet');
       } else {
         setSwapButtonState(false);
-        setSwapButtonContent('choose tokens and amount');
+        setSwapButtonContent('Choose tokens and amount');
       }
     },
     [account]
@@ -333,7 +333,7 @@ const SwapComponent = props => {
     onCancel();
     if (before) {
       if (account == undefined) {
-        alert('please connect to your account');
+        alert('Please connect to your account');
       } else {
         setToken0(token);
         console.log('GETTING BALANCES');
@@ -343,7 +343,7 @@ const SwapComponent = props => {
       }
     } else {
       if (account == undefined) {
-        alert('please connect to your account');
+        alert('Please connect to your account');
       } else {
         setToken1(token);
         setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
@@ -506,7 +506,7 @@ const SwapComponent = props => {
 
               if (state) {
                 setSwapButtonState(true);
-                setSwapButtonContent('SWAP');
+                setSwapButtonContent('Swap');
                 setApproveButtonStatus(false);
               }
             }}
