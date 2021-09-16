@@ -103,6 +103,8 @@ const AddLiquidityComponent = props => {
   let [exactIn, setExactIn] = useState(true);
 
   let [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
+  const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
+  const [slippageError, setSlippageError] = useState('');
 
   let [needApproveToken0, setNeedApproveToken0] = useState(false);
   let [needApproveToken1, setNeedApproveToken1] = useState(false);
@@ -310,7 +312,7 @@ const AddLiquidityComponent = props => {
     onCancel();
     if (before) {
       if (account == undefined) {
-        alert('please connect to your account');
+        alert('Please connect to your account');
       } else {
         setToken0(token);
         setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
@@ -318,7 +320,7 @@ const AddLiquidityComponent = props => {
       }
     } else {
       if (account == undefined) {
-        alert('please connect to your account');
+        alert('Please connect to your account');
       } else {
         setToken1(token);
         setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
@@ -420,6 +422,42 @@ const AddLiquidityComponent = props => {
 
       <AcyDescriptions>
         {liquidityBreakdown && (
+          <>
+            <div className={styles.breakdownTopContainer}>
+              <div className={styles.slippageContainer}>
+                <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '7px' }}>
+                  <Button type="link" style={{ marginRight: '5px' }}>
+                    Auto
+                  </Button>
+                  <Input
+                    value={inputSlippageTol || ''}
+                    onChange={e => {
+                      setInputSlippageTol(e.target.value);
+                    }}
+                    suffix={<strong>%</strong>}
+                  />
+                  <Button
+                    type="primary"
+                    style={{ marginLeft: '10px' }}
+                    onClick={() => {
+                      if (isNaN(inputSlippageTol)) {
+                        setSlippageError('Please input valid slippage value!');
+                      } else {
+                        setSlippageError("");
+                        setSlippageTolerance(parseFloat(inputSlippageTol));
+                      }
+                    }}
+                  >
+                    Set
+                  </Button>
+                </div>
+                {slippageError.length > 0 && (
+                  <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
+                )}
+              </div>
+            </div>
+          
           <div className={styles.acyDescriptionContainer}>
             {/* <AcyDescriptions.Item>
               <div className={styles.acyDescriptionTitle}>
@@ -432,6 +470,7 @@ const AddLiquidityComponent = props => {
               </AcyDescriptions.Item>
             ))}
           </div>
+          </>
         )}
       </AcyDescriptions>
 

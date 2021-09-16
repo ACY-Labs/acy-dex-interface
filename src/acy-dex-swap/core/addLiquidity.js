@@ -335,7 +335,7 @@ export async function getEstimated(
           ).toFixed(4);
 
           setLiquidityBreakdown([
-            `Slippage tolerance : ${slippage}%`,
+            // `Slippage tolerance : ${slippage}%`,
             `Pool reserve: ${pair.reserve0.toFixed(3)} ${
               pair.token0.symbol
             } + ${pair.reserve1.toFixed(3)} ${pair.token1.symbol}`,
