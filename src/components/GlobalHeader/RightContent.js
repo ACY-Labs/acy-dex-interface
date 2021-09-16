@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FormattedMessage,connect } from 'umi';
+import { FormattedMessage, connect } from 'umi';
 import { Spin, Tag, Menu, Icon, Dropdown } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
@@ -87,6 +87,7 @@ const GlobalHeaderRight = props => {
 
   // 选择钱包
   const selectWallet = walletName => {
+    console.log('selecting wallet');
     if (walletName === 'metamask' || walletName === 'opera') {
       activate(injected);
     } else if (walletName === 'walletconnect') {
@@ -229,7 +230,7 @@ const GlobalHeaderRight = props => {
   if (theme === 'dark') {
     className = `${styles.right}  ${styles.dark}`;
   }
-  
+
   return (
     <div className={className}>
       {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
@@ -238,7 +239,9 @@ const GlobalHeaderRight = props => {
         isMobile={isMobile}
         value={account}
         onClick={onhandMetaMask}
-        pendingLength={props.transaction.transactions.filter(item=>item.blockHash==undefined).length}
+        pendingLength={
+          props.transaction.transactions.filter(item => item.blockHash == undefined).length
+        }
       />
       <Dropdown
         overlay={
@@ -314,5 +317,5 @@ const GlobalHeaderRight = props => {
   );
 };
 export default connect(({ transaction }) => ({
-  transaction
+  transaction,
 }))(GlobalHeaderRight);

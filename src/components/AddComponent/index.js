@@ -308,25 +308,40 @@ const AddLiquidityComponent = props => {
     activate(injected);
   };
 
+  useEffect(
+    () => {
+      if (!account || !chainId || !library) return;
+      console.log('get balances in liquidity');
+      async function getTokenBalances() {
+        setToken0BalanceShow(true);
+        setToken1BalanceShow(true);
+        setToken0Balance(await getUserTokenBalance(token0, chainId, account, library));
+        setToken1Balance(await getUserTokenBalance(token1, chainId, account, library));
+      }
+      getTokenBalances();
+    },
+    [account, chainId, library, token0, token1]
+  );
+
   const onTokenClick = async token => {
     onCancel();
-    if (before) {
-      if (account == undefined) {
-        alert('Please connect to your account');
-      } else {
-        setToken0(token);
-        setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
-        setToken0BalanceShow(true);
-      }
-    } else {
-      if (account == undefined) {
-        alert('Please connect to your account');
-      } else {
-        setToken1(token);
-        setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
-        setToken1BalanceShow(true);
-      }
-    }
+    // if (before) {
+    //   if (account == undefined) {
+    //     alert('Please connect to your account');
+    //   } else {
+    //     setToken0(token);
+    //     setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
+    //     setToken0BalanceShow(true);
+    //   }
+    // } else {
+    //   if (account == undefined) {
+    //     alert('Please connect to your account');
+    //   } else {
+    //     setToken1(token);
+    //     setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
+    //     setToken1BalanceShow(true);
+    //   }
+    // }
   };
 
   const [favTokenList, setFavTokenList] = useState([]);
@@ -385,7 +400,7 @@ const AddLiquidityComponent = props => {
     <div>
       <AcyCuarrencyCard
         icon="eth"
-        title={`Balance: ${parseFloat(token0Balance).toFixed(5)}`}
+        title={token0BalanceShow && `Balance: ${parseFloat(token0Balance).toFixed(5)}`}
         coin={(token0 && token0.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token0Balance}`}
@@ -405,7 +420,7 @@ const AddLiquidityComponent = props => {
 
       <AcyCuarrencyCard
         icon="eth"
-        title={`Balance: ${parseFloat(token1Balance).toFixed(5)}`}
+        title={token1BalanceShow && `Balance: ${parseFloat(token1Balance).toFixed(5)}`}
         coin={(token1 && token1.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token1Balance}`}
@@ -444,7 +459,7 @@ const AddLiquidityComponent = props => {
                       if (isNaN(inputSlippageTol)) {
                         setSlippageError('Please input valid slippage value!');
                       } else {
-                        setSlippageError("");
+                        setSlippageError('');
                         setSlippageTolerance(parseFloat(inputSlippageTol));
                       }
                     }}
@@ -457,19 +472,19 @@ const AddLiquidityComponent = props => {
                 )}
               </div>
             </div>
-          
-          <div className={styles.acyDescriptionContainer}>
-            {/* <AcyDescriptions.Item>
+
+            <div className={styles.acyDescriptionContainer}>
+              {/* <AcyDescriptions.Item>
               <div className={styles.acyDescriptionTitle}>
                 liquidity breakdown
               </div>
             </AcyDescriptions.Item> */}
-            {liquidityBreakdown.map(info => (
-              <AcyDescriptions.Item>
-                <div className={styles.acyDescriptionItem}>{info}</div>
-              </AcyDescriptions.Item>
-            ))}
-          </div>
+              {liquidityBreakdown.map(info => (
+                <AcyDescriptions.Item>
+                  <div className={styles.acyDescriptionItem}>{info}</div>
+                </AcyDescriptions.Item>
+              ))}
+            </div>
           </>
         )}
       </AcyDescriptions>

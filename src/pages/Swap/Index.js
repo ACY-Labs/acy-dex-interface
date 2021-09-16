@@ -212,7 +212,15 @@ class BasicProfile extends Component {
             <div>
               <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
                 <div className={styles.trade}>
-                  <SwapComponent />
+                  <SwapComponent
+                    onSelectToken={this.getPrice}
+                    onSelectToken0={token => {
+                      this.setState({ activeToken0: token });
+                    }}
+                    onSelectToken1={token => {
+                      this.setState({ activeToken1: token });
+                    }}
+                  />
                 </div>
               </AcyCard>
             </div>

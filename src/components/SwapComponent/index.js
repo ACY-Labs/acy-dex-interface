@@ -84,6 +84,7 @@ import spinner from '@/assets/loading.svg';
 
 const SwapComponent = props => {
   const { dispatch, onSelectToken0, onSelectToken1 } = props;
+
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
 
@@ -379,17 +380,19 @@ const SwapComponent = props => {
     activate(injected);
   };
   // swap的交易状态
-  const swapCallback=(status)=>{
+  const swapCallback = status => {
     // 循环获取交易结果
-    const {transaction:{transactions}}=props;
+    const {
+      transaction: { transactions },
+    } = props;
     // 检查是否包含交易
-    const transLength=transactions.filter(item=>item.hash==status.hash).length;
-    if(transLength==0){
+    const transLength = transactions.filter(item => item.hash == status.hash).length;
+    if (transLength == 0) {
       dispatch({
-        type:'transaction/addTransaction',
-        payload:{
-          transactions:[...transactions,{hash:status.hash}]
-        }
+        type: 'transaction/addTransaction',
+        payload: {
+          transactions: [...transactions, { hash: status.hash }],
+        },
       });
     }
     // let lists=[{
@@ -401,23 +404,23 @@ const SwapComponent = props => {
     //   receipt
     // }];
 
-        const sti = setInterval(() => {
-          library.getTransactionReceipt(status.hash).then(receipt => {
-            console.log('receiptreceipt',receipt);
-            // receipt is not null when transaction is done
-            if (receipt) {
-              clearInterval(sti);
-                let newData=transactions.filter(item=>item.hash!=status.hash);
-               dispatch({
-                  type:'transaction/addTransaction',
-                  payload:{
-                    transactions:[...newData,{hash:status.hash,...receipt}]
-                  }
-                });
-            }
+    const sti = setInterval(() => {
+      library.getTransactionReceipt(status.hash).then(receipt => {
+        console.log('receiptreceipt', receipt);
+        // receipt is not null when transaction is done
+        if (receipt) {
+          clearInterval(sti);
+          let newData = transactions.filter(item => item.hash != status.hash);
+          dispatch({
+            type: 'transaction/addTransaction',
+            payload: {
+              transactions: [...newData, { hash: status.hash, ...receipt }],
+            },
           });
-        }, 500);
-  }
+        }
+      });
+    }, 500);
+  };
   return (
     <div className={styles.sc}>
       <AcyCuarrencyCard
@@ -658,7 +661,7 @@ const SwapComponent = props => {
   );
 };
 
-export default connect(({ global,transaction, loading }) => ({
+export default connect(({ global, transaction, loading }) => ({
   global,
   transaction,
   account: global.account,
