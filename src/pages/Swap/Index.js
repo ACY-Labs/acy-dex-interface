@@ -324,7 +324,7 @@ class BasicProfile extends Component {
         </div>
         <div className={styles.option}>
           <div style={{ marginTop: '-10px', marginBottom: '30px' }}>
-            <StakeHistoryTable dataSource={transactions} />
+            <StakeHistoryTable isMobile={isMobile} dataSource={transactions} />
           </div>
         </div>
         {/* Routing */}
