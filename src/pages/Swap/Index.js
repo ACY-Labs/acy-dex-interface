@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { connect } from 'umi';
-import { Button, Row, Col, Icon } from 'antd';
+import { Button, Row, Col, Icon, Skeleton } from 'antd';
 import {
   AcyCard,
   AcyIcon,
@@ -23,8 +23,42 @@ import axios from 'axios';
 import StakeHistoryTable from './components/StakeHistoryTable';
 import styles from './styles.less';
 import moment from 'moment';
+import {supportedTokens} from '@/acy-dex-swap/utils/index';
 
 const { AcyTabPane } = AcyTabs;
+
+function abbrNumber(number) {
+  const THOUSAND = 0;
+  const MILLION = 1;
+
+  let currentDivision = -1;
+  let result = '';
+  let tempNumber = number;
+
+  if (number >= 1000) {
+    tempNumber /= 1000;
+    currentDivision = 0;
+  }
+
+  if (number >= 1000000) {
+    tempNumber /= 1000;
+    currentDivision = 1;
+  }
+
+  switch (currentDivision) {
+    case 0:
+      result = `${tempNumber.toFixed(2)}k`;
+      break;
+    case 1:
+      result = `${tempNumber.toFixed(2)}m`;
+      break;
+    default:
+      result = `${number.toFixed(2)}`;
+      break;
+  }
+
+  return result;
+}
 
 @connect(({ profile, transaction, loading }) => ({
   profile,
@@ -46,10 +80,37 @@ class BasicProfile extends Component {
     token0Address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
     token1Address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
     format: 'h:mm:ss a',
+    routeData: [],
+    isReceiptObtained: false,
+
+    // previous token shown on routing, used to maintain the route display to the previous tokens
+    pastToken0: 'USDC',
+    pastToken1: 'ETH',
+
+    // price point for the token (for now uses the USDC/ETH)
+    pricePoint: 0,
   };
 
   componentDidMount() {
     this.getPrice();
+  }
+
+  // workaround way to get USD price (put token1 as USDC)
+  // NEEDS ETHEREUM ADDRESS, RINKEBY DOES NOT WORK HERE
+  getRoutePrice(token0Address, token1Address) {
+    axios
+      .post(
+        `https://api.acy.finance/api/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
+      )
+      .then(data => {
+        console.log(data);
+        const { swaps } = data.data.data;
+        const lastDataPoint = swaps[swaps.length - 1];
+        console.log("ROUTE PRICE POINT",lastDataPoint)
+        this.setState({
+          pricePoint: lastDataPoint.rate,
+        });
+      });
   }
 
   getPrice() {
@@ -73,9 +134,25 @@ class BasicProfile extends Component {
 
   lineTitleRender = () => {
     const { activeTime, activeRate, activeToken0, activeToken1, format } = this.state;
+
+    let token0logo = null
+    let token1logo = null
+    for (let j = 0; j < supportedTokens.length; j++) {
+      if (activeToken0 === supportedTokens[j].symbol) {
+        token0logo = supportedTokens[j].logoURI
+      }
+      if (activeToken1 === supportedTokens[j].symbol) {
+        token1logo = supportedTokens[j].logoURI
+      }
+    }
+
     return [
       <div>
         <div className={styles.maintitle}>
+          <div style={{display:"flex"}}>
+            <img src={token0logo} alt={activeToken0 } style={{ width: 24,maxWidth: '24px', maxHeight: '24px', marginRight: '0.25rem', marginTop: '0.1rem' }} />
+            <img src={token1logo} alt={token1logo} style={{ width: 24,maxHeight: '24px', marginRight: '0.5rem', marginTop: '0.1rem' }} />
+          </div>
           <span className={styles.lighttitle}>
             {activeToken0}/{activeToken1}
           </span>
@@ -141,6 +218,42 @@ class BasicProfile extends Component {
     });
   };
 
+  onGetReceipt = receipt => {
+    console.log('RECEIPT', receipt);
+    let newRouteData = [];
+
+    let decimal = supportedTokens.filter(item => item.address.toLowerCase() == receipt.logs[0].address.toLowerCase())[0].decimal
+
+    let routeDataEntry = {
+      from: receipt.logs[0].address.toLowerCase(),
+      to: receipt.logs[1].address.toLowerCase(),
+      value: parseInt(receipt.logs[0].data.replace('0x', ''), 16) / Math.pow(10, decimal),
+    };
+
+    newRouteData.push(routeDataEntry);
+
+    // get eth addresses
+    let token0EthAddress = supportedTokens.filter(item => item.address.toLowerCase() == receipt.logs[0].address.toLowerCase())[0].addressOnEth
+    
+    // if token is USDC, set price point to the same value
+    // this check is needed because the swap History API cannot support same coins
+    if (token0EthAddress.toLowerCase() == '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'){
+      console.log("usdc as token 0")
+      this.setState({
+        pricePoint: 1,
+      })
+    }
+    else
+      this.getRoutePrice(token0EthAddress, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48')
+
+    this.setState({
+      routeData: [...newRouteData],
+      isReceiptObtained: true,
+      pastToken0: this.state.activeToken0,
+      pastToken1: this.state.activeToken1
+    });
+  };
+
   render() {
     const {
       visible,
@@ -170,6 +283,7 @@ class BasicProfile extends Component {
                     onSelectToken1={token => {
                       this.setState({ activeToken1: token });
                     }}
+                    onGetReceipt={this.onGetReceipt}
                   />
                 </div>
               </AcyCard>
@@ -220,6 +334,7 @@ class BasicProfile extends Component {
                     onSelectToken1={token => {
                       this.setState({ activeToken1: token });
                     }}
+                    onGetReceipt={this.onGetReceipt}
                   />
                 </div>
               </AcyCard>
@@ -231,79 +346,94 @@ class BasicProfile extends Component {
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>
               <AcyCard title="Routing">
-                <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                  <div className={styles.routing}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        marginRight: '10px',
-                        color: '#EB5C20',
-                        borderRight: '1px solid #2c2f36',
-                      }}
-                    >
-                      <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="Eth" />
-                    </div>
-                    <div className={styles.routing_middle}>
-                      <div className={styles.nodes}>
-                        <div className={styles.nodes_item}>
-                          <span>30%</span>
-                          <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                          <div className={styles.node}>
-                            <div>
-                              <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="Eth" />
-                            </div>
-                            <div>
-                              <p className={styles.r_title}>93.246ETH</p>
-                              <p className={styles.r_desc}>325,340$</p>
-                            </div>
-                          </div>
-                          <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                        </div>
-                        <div className={styles.nodes_item}>
-                          <span>30%</span>
-                          <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                          <div className={styles.node}>
-                            <div>
-                              <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="Eth" />
-                            </div>
-                            <div>
-                              <p className={styles.r_title}>93.246ETH</p>
-                              <p className={styles.r_desc}>325,340$</p>
-                            </div>
-                          </div>
-                          <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                        </div>
-                        <div className={styles.nodes_item}>
-                          <span>30%</span>
-                          <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                          <div className={styles.node}>
-                            <div>
-                              <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="Eth" />
-                            </div>
-                            <div>
-                              <p className={styles.r_title}>93.246ETH</p>
-                              <p className={styles.r_desc}>325,340$</p>
-                            </div>
-                          </div>
-                          <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                        </div>
+                {this.state.isReceiptObtained ? (
+                  <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                    <div className={styles.routing}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          marginRight: '10px',
+                          color: '#EB5C20',
+                          borderRight: '1px solid #2c2f36',
+                        }}
+                      >
+                        <img
+                          src={
+                            supportedTokens.filter(entry => entry.symbol == this.state.pastToken0)[0]
+                              .logoURI
+                          }
+                          width={(isMobile && 30) || 50}
+                          height={(isMobile && 30) || 50}
+                          style={{ marginRight: '10px' }}
+                        />
+                        {/* <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="USDC" /> */}
                       </div>
-                      <div style={{ textAlign: 'center', color: '#EB5C20' }}>See More...</div>
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        marginRight: '10px',
-                        color: '#EB5C20',
-                        borderLeft: '1px solid #2c2f36',
-                      }}
-                    >
-                      <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="BTC" />
+                      <div className={styles.routing_middle}>
+                        <div className={styles.nodes}>
+                          {this.state.routeData.map(item => {
+                            return (
+                              <div className={styles.nodes_item}>
+                                <span>100%</span>
+                                <Icon style={{ margin: '0 10px' }} type="arrow-right" />
+                                <div className={styles.node}>
+                                  <div>
+                                    <img
+                                      src={
+                                        supportedTokens.filter(entry => entry.address.toLowerCase() == item.from.toLowerCase())[0]
+                                          .logoURI
+                                      }
+                                      width={(isMobile && 30) || 50}
+                                      height={(isMobile && 30) || 50}
+                                      style={{ padding: '10px' }}
+                                    />
+                                  </div>
+                                  <div>
+                                    <p className={styles.r_title}>
+                                      {item.value}{' '}
+                                      {
+                                        supportedTokens.filter(entry => entry.address.toLowerCase() == item.from.toLowerCase())[0]
+                                          .symbol
+                                      }
+                                    </p>
+                                    <p className={styles.r_desc}>{abbrNumber(this.state.pricePoint * item.value)} $</p>
+                                  </div>
+                                </div>
+                                <Icon style={{ margin: '0 10px' }} type="arrow-right" />
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div style={{ textAlign: 'center', color: '#EB5C20' }}>See More...</div>
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          marginRight: '10px',
+                          color: '#EB5C20',
+                          borderLeft: '1px solid #2c2f36',
+                        }}
+                      >
+                        <img
+                          src={
+                            supportedTokens.filter(entry => entry.symbol == this.state.pastToken1)[0]
+                              .logoURI
+                          }
+                          width={(isMobile && 30) || 50}
+                          height={(isMobile && 30) || 50}
+                          style={{ marginLeft: '10px' }}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div
+                    style={{ width: '100%', padding: '30px', fontWeight: 600, textAlign: 'center' }}
+                  >
+                    The routing will be shown here after a receipt is obtained.
+                  </div>
+                )}
               </AcyCard>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} xl={12}>

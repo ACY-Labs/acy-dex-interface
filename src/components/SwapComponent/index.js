@@ -409,6 +409,7 @@ const SwapComponent = props => {
         console.log('receiptreceipt', receipt);
         // receipt is not null when transaction is done
         if (receipt) {
+          props.onGetReceipt(receipt)
           clearInterval(sti);
           let newData = transactions.filter(item => item.hash != status.hash);
           dispatch({
@@ -474,7 +475,10 @@ const SwapComponent = props => {
               <div className={styles.slippageContainer}>
                 <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '7px' }}>
-                  <Button type="link" style={{ marginRight: '5px' }}>
+                  <Button type="link" style={{ marginRight: '5px' }} onClick={() => {
+                    setInputSlippageTol(INITIAL_ALLOWED_SLIPPAGE / 100);
+                    setSlippageTolerance(INITIAL_ALLOWED_SLIPPAGE / 100)
+                  }} >
                     Auto
                   </Button>
                   <Input
