@@ -112,7 +112,7 @@ const sampleStakeHistoryColumns = [
     render: text => <p className={styles.tableData}>{text}</p>,
   },
   {
-    title: 'Reward',
+    title: 'Pending Rewards',
     dataIndex: 'reward',
     key: 'reward',
     render: text => <p className={styles.tableData}>{text}</p>,

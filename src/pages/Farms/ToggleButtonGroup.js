@@ -7,7 +7,7 @@ const ToggleButtonGroup = ({ selectedTable, onAllToggleButtonClick, onAcyToggleB
       <button
         type="button"
         className={styles.firstToggleButton}
-        style={{ backgroundColor: selectedTable === 0 ? "#2e3032" : "#29292c"}}
+        style={{ backgroundColor: selectedTable === 0 ? "#29292c" : "#2e3032", color: selectedTable === 0 ? "#1e5d91": ""}}
         onClick={onAllToggleButtonClick}
       >
         All
@@ -15,7 +15,7 @@ const ToggleButtonGroup = ({ selectedTable, onAllToggleButtonClick, onAcyToggleB
       <button
         type="button"
         className={styles.middleToggleButton}
-        style={{ backgroundColor: selectedTable === 1 ? "#2e3032" : "#29292c"}}
+        style={{ backgroundColor: selectedTable === 1 ? "#29292c" : "#2e3032", color: selectedTable === 1 ? "#1e5d91": ""}}
         onClick={onAcyToggleButtonClick}
       >
         ACY
@@ -23,7 +23,7 @@ const ToggleButtonGroup = ({ selectedTable, onAllToggleButtonClick, onAcyToggleB
       <button
         type="button"
         className={styles.lastToggleButton}
-        style={{ backgroundColor: selectedTable === 2 ? "#2e3032" : "#29292c"}}
+        style={{ backgroundColor: selectedTable === 2 ? "#29292c" : "#2e3032", color: selectedTable === 2 ? "#1e5d91": ""}}
         onClick={onPremierToggleButtonClick}
       >
         Premier

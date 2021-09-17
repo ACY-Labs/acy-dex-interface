@@ -19,6 +19,7 @@ const StakeSection = () => {
   const [token1Percentage, setToken1Percentage] = useState(50);
   const [token2Percentage, setToken2Percentage] = useState(50);
   const [selectedPresetDate, setSelectedPresetDate] = useState(null);
+  const [stakeBarFocus, setStakeBarFocus] = useState(false)
 
   const updateStake = newStake => {
     let newStakeInt = newStake !== '' ? parseInt(newStake, 10) : '';
@@ -126,9 +127,9 @@ const StakeSection = () => {
           <div className={styles.amountRow}>
             <div className={styles.amountRowTitle}>Stake</div>
             <div className={styles.amountRowInputContainer}>
-              <input type="text" value={stake} onChange={e => updateStake(e.target.value)} />
+              <input type="text" value={stake} onChange={e => updateStake(e.target.value)} onFocus={() => setStakeBarFocus(true)} onBlur={() => setStakeBarFocus(false)}/>
             </div>
-            <span className={styles.suffix}>ACY</span>
+            <span className={styles.suffix} style={{color: stakeBarFocus ? "#eb5c20" : "#b5b5b6"}}>ACY</span>
           </div>
 
           {/* BALANCE ROW */}
