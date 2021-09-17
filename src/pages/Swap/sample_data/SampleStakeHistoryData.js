@@ -126,25 +126,19 @@ const sampleStakeHistoryColumns = [
     key: 'time',
   },
   {
-    title: 'From',
+    title: 'Pay',
     dataIndex: 'from',
     key: 'from',
     render: text =>text&& <p className={styles.tableData}>{abbrHash(text)}</p>,
   },
   {
-    title: 'To',
+    title: 'Receive',
     dataIndex: 'to',
     key: 'to',
     render: text =>text&& <p className={styles.tableData}>{abbrHash(text)}</p>,
   },
   {
-    title: 'Amount',
-    dataIndex: 'amount',
-    key: 'amount',
-    render: text => <p className={styles.tableData}>{text}</p>,
-  },
-  {
-    title: 'Alpha Return ',
+    title: 'Alpha',
     dataIndex: 'alpha',
     key: 'alpha',
     render: text => <p className={styles.tableData}>{text}</p>,

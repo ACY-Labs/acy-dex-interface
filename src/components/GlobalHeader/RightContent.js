@@ -248,10 +248,36 @@ const GlobalHeaderRight = props => {
           <div className={styles.setting} onClick={e => e.preventDefault()}>
             <ul className={styles.list}>
               <li>
+                <AcySeting title="Gas Price" current="Rapid(85.1gwei) ~3">
+                  <AcyRadioButton data={['Rapid(85.1gwei) ~3', 'Rapid(67.1gwei) ~6']} />
+                </AcySeting>
+              </li>
+              <li>
+                <AcySeting title="Endpoint" current="Global 122.0ms">
+                  <AcyRadioButton data={['Global 122.0ms', 'Custom']} />
+                </AcySeting>
+              </li>
+              <li>
+                <AcySeting title="Network" current="ETH">
+                  <AcyRadioButton data={['ETH', 'BSC','Heco','Polygon','Arbitrum','OkChain']} />
+                </AcySeting>
+              </li>
+              {/* <li style={{borderBottom:'1px solid rgb(64, 64, 64)',paddingBottom:'20px'}}>
                 <AcySeting title="Language" current="English">
                   <AcyRadioButton data={['English', '中文']} />
                 </AcySeting>
-              </li>
+              </li> */}
+              {/* <li style={{marginTop:'30px'}}>
+                  <a className={styles.setitem}>
+                    <Icon type="question-circle" />Help
+                  </a>
+                  <a className={styles.setitem}>
+                  <Icon type="notification" />Announcements
+                  </a>
+                  <a className={styles.setitem}>
+                  <Icon type="message" />Forum
+                  </a>
+              </li> */}
             </ul>
           </div>
         }

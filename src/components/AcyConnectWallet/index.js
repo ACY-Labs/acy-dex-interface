@@ -7,9 +7,17 @@ const AcyConnectWallet = props => {
   return (
     (isMobile && (
       <div {...rest} className={styles.connect}>
-        <div className={styles.address} onClick={onClick}>
-          {(value && sortAddress(value)) || 'Connect'}
-        </div>
+       {/* pending */}
+       {pendingLength
+            &&
+              <div className={styles.pending}>
+                {pendingLength} Pending <Icon type="redo" spin/>
+              </div>
+            || 
+              <div className={styles.address} onClick={onClick}>
+                {value && sortAddress(value) || 'Connect'}
+              </div>
+            }
       </div>
     )) || (
       <div {...rest} className={styles.connect}>
