@@ -1,23 +1,18 @@
-import {
-  AcyBarChart, AcyLineChart
-} from '@/components/Acy';
-import { Col, Row } from 'antd';
+import { AcyBarChart, AcyLineChart } from '@/components/Acy';
+import { Col, Row, Icon, Skeleton } from 'antd';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import {
   dataSourceCoin,
   dataSourcePool,
   dataSourceTransaction,
-  graphSampleData
+  graphSampleData,
 } from './SampleData.js';
 import styles from './styles.less';
 import { abbrNumber } from './Util.js';
-import {
-  MarketSearchBar, PoolTable, TokenTable, TransactionTable
-} from './UtilComponent.js';
+import { MarketSearchBar, PoolTable, TokenTable, TransactionTable } from './UtilComponent.js';
 
-
-
+import { fetchMarketData, marketClient } from './Data/index.js';
 
 export class MarketIndex extends Component {
   constructor(props) {
@@ -31,7 +26,21 @@ export class MarketIndex extends Component {
     selectedDataLine: graphSampleData[graphSampleData.length - 1][1],
     selectedIndexBar: graphSampleData.length - 1,
     selectedDataBar: graphSampleData[graphSampleData.length - 1][1],
+
+    // dictionary for the tvl and volume chart
+    chartData: {
+      tvl: [],
+      volume24h: [],
+    },
   };
+
+  componentDidMount() {
+    fetchMarketData(marketClient).then(dataDict => {
+      this.setState({
+        chartData: dataDict,
+      });
+    });
+  }
 
   onLineGraphHover = (newData, newIndex) => {
     this.setState({
@@ -59,16 +68,17 @@ export class MarketIndex extends Component {
         />
         <div className={styles.chartsMain}>
           <div className={styles.chartSectionMain}>
+          {this.state.chartData.tvl.length > 0 ? <>
             <div className={styles.graphStats}>
               <div className={styles.statName}>TVL</div>
               <div className={styles.statValue}>$ {this.state.selectedDataLine}</div>
               <div className={styles.statName}>
-                {graphSampleData[this.state.selectedIndexLine][0]}
+                {this.state.chartData.tvl[this.state.selectedIndexLine][0]}
               </div>
             </div>
             <div className={styles.chartWrapper}>
               <AcyLineChart
-                data={graphSampleData}
+                data={this.state.chartData.tvl}
                 onHover={this.onLineGraphHover}
                 showXAxis={true}
                 showGradient={true}
@@ -76,23 +86,28 @@ export class MarketIndex extends Component {
                 bgColor="#2f313583"
               />
             </div>
+          </>: <Icon type="loading"/>}
           </div>
           <div className={styles.chartSectionMain}>
-            <div className={styles.graphStats}>
+            {this.state.chartData.volume24h.length > 0 ? <>
+              <div className={styles.graphStats}>
               <div className={styles.statName}>VOLUME 24H</div>
-              <div className={styles.statValue}>$ {this.state.selectedDataBar}</div>
+              <div className={styles.statValue}>{`$ ${this.state.selectedDataBar}`}</div>
               <div className={styles.statName}>
-                {graphSampleData[this.state.selectedIndexBar][0]}
+                {this.state.chartData.volume24h[this.state.selectedIndexBar][0]}
               </div>
             </div>
             <div className={styles.chartWrapper}>
               <AcyBarChart
-                data={graphSampleData}
+                data={this.state.chartData.volume24h}
                 showXAxis
                 barColor="#1c9965"
                 onHover={this.onBarGraphHover}
               />
             </div>
+            </> : 
+            <Icon type="loading"/>}
+         
           </div>
         </div>
         <Row className={styles.marketOverview} justify="space-around">

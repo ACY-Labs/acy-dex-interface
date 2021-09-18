@@ -16,6 +16,7 @@ export function abbrHash(hash) {
 export function abbrNumber(number) {
   const THOUSAND = 0;
   const MILLION = 1;
+  const BILLION = 2;
 
   let currentDivision = -1;
   let result = '';
@@ -31,12 +32,20 @@ export function abbrNumber(number) {
     currentDivision = 1;
   }
 
+  if (number >= 1000000000) {
+    tempNumber /= 1000;
+    currentDivision = 2;
+  }
+
   switch (currentDivision) {
     case 0:
       result = `${tempNumber.toFixed(2)}k`;
       break;
     case 1:
       result = `${tempNumber.toFixed(2)}m`;
+      break;
+    case 2:
+      result = `${tempNumber.toFixed(2)}b`;
       break;
     default:
       result = `${number.toFixed(2)}`;
@@ -97,3 +106,4 @@ export const openInNewTab = url => {
   const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
   if (newWindow) newWindow.opener = null;
 };
+
