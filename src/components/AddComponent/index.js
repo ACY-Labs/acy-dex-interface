@@ -23,7 +23,7 @@ import {
   AcyDescriptions,
 } from '@/components/Acy';
 
-import INITIAL_TOKEN_LIST from '@/constants/TokenList'
+import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 
 //^mark
 import { connect } from 'umi';
@@ -129,13 +129,15 @@ const AddLiquidityComponent = props => {
   let [args, setArgs] = useState();
   let [value, setValue] = useState();
 
-  const [tokenSearchInput, setTokenSearchInput] = useState('')
-  const [tokenList, setTokenList] = useState(INITIAL_TOKEN_LIST)
+  const [tokenSearchInput, setTokenSearchInput] = useState('');
+  const [tokenList, setTokenList] = useState(INITIAL_TOKEN_LIST);
 
-  const onTokenSearchChange = (e) => {
-    setTokenSearchInput(e.target.value)
-    setTokenList(INITIAL_TOKEN_LIST.filter((token) => token.symbol.includes(e.target.value.toUpperCase())))
-  }
+  const onTokenSearchChange = e => {
+    setTokenSearchInput(e.target.value);
+    setTokenList(
+      INITIAL_TOKEN_LIST.filter(token => token.symbol.includes(e.target.value.toUpperCase()))
+    );
+  };
 
   let [userLiquidityPositions, setUserLiquidityPositions] = useState([]);
 
@@ -649,7 +651,6 @@ const AddLiquidityComponent = props => {
         {buttonContent}
       </AcyButton>
       <AcyDescriptions>
-        {liquidityStatus && <AcyDescriptions.Item>Liquidity Status</AcyDescriptions.Item>}
         {liquidityStatus && <AcyDescriptions.Item>{liquidityStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 

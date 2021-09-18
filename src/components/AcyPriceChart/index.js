@@ -89,12 +89,6 @@ class AcyPriceChart extends Component {
     const valueList = chartData.map(item => item[1]);
 
     const options = {
-      grid: {
-        left: '2%',
-        right: '2%',
-        // bottom: '3%',
-        top: 'top',
-      },
       title: {
         text: title,
         left: 'center',
@@ -104,18 +98,25 @@ class AcyPriceChart extends Component {
       },
       tooltip: {
         trigger: 'axis',
-        alwaysShowContent: true,
-        backgroundColor: null,
-        borderWidth: 0,
-        borderRadius: 0,
+        axisPointer: {
+          type: 'cross',
+          axis: 'x',
+          label: {
+            backgroundColor: 'black',
+          },
+        },
         formatter: this.renderTooltip,
       },
       xAxis: {
+        axisLabel: {
+          fontSize: 15,
+        },
         show: showXAxis,
         splitNumber: 5,
         boundaryGap: false,
         data: dateList.map(item =>
           moment(item)
+            .locale('en')
             .local()
             .format(format)
         ),
@@ -129,8 +130,9 @@ class AcyPriceChart extends Component {
         show: false,
         type: 'value',
         splitLine: {
-          show: true,
+          show: false,
         },
+        scale: true,
         axisTick: { show: false }, // 刻度
         axisLine: { show: false }, // 轴线
       },

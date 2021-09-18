@@ -526,7 +526,7 @@ export async function addLiquidity(
   value,
   setLiquidityStatus,
   addLiquidityCallback
-){
+) {
   let status = await (async () => {
     // check uniswap
     console.log(FACTORY_ADDRESS);
@@ -602,7 +602,6 @@ export async function addLiquidity(
         console.log(value);
       }
 
-      setLiquidityStatus('Processing add liquidity request');
       console.log('parsed token 0 amount');
       console.log(parsedToken0Amount.raw);
       console.log('parsed token 1 amount');
@@ -640,4 +639,4 @@ export async function addLiquidity(
     );
   }
   return;
-};
+}

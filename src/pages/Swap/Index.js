@@ -23,7 +23,7 @@ import axios from 'axios';
 import StakeHistoryTable from './components/StakeHistoryTable';
 import styles from './styles.less';
 import moment from 'moment';
-import {supportedTokens} from '@/acy-dex-swap/utils/index';
+import { supportedTokens } from '@/acy-dex-swap/utils/index';
 
 const { AcyTabPane } = AcyTabs;
 
@@ -75,8 +75,20 @@ class BasicProfile extends Component {
     range: '1D',
     activeTime: 'Loading...',
     activeRate: 'Loading...',
-    activeToken0: 'USDC',
-    activeToken1: 'ETH',
+    activeToken0: {
+      symbol: 'USDC',
+      address: '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b',
+      addressOnEth: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+      decimal: 6,
+      logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
+    },
+    activeToken1: {
+      symbol: 'ETH',
+      address: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
+      addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+      decimal: 18,
+      logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
+    },
     token0Address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
     token1Address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
     format: 'h:mm:ss a',
@@ -106,7 +118,7 @@ class BasicProfile extends Component {
         console.log(data);
         const { swaps } = data.data.data;
         const lastDataPoint = swaps[swaps.length - 1];
-        console.log("ROUTE PRICE POINT",lastDataPoint)
+        console.log('ROUTE PRICE POINT', lastDataPoint);
         this.setState({
           pricePoint: lastDataPoint.rate,
         });
@@ -135,32 +147,47 @@ class BasicProfile extends Component {
   lineTitleRender = () => {
     const { activeTime, activeRate, activeToken0, activeToken1, format } = this.state;
 
-    let token0logo = null
-    let token1logo = null
+    let token0logo = null;
+    let token1logo = null;
     for (let j = 0; j < supportedTokens.length; j++) {
-      if (activeToken0 === supportedTokens[j].symbol) {
-        token0logo = supportedTokens[j].logoURI
+      if (activeToken0.symbol === supportedTokens[j].symbol) {
+        token0logo = supportedTokens[j].logoURI;
       }
-      if (activeToken1 === supportedTokens[j].symbol) {
-        token1logo = supportedTokens[j].logoURI
+      if (activeToken1.symbol === supportedTokens[j].symbol) {
+        token1logo = supportedTokens[j].logoURI;
       }
     }
 
     return [
       <div>
         <div className={styles.maintitle}>
-          <div style={{display:"flex"}}>
-            <img src={token0logo} alt={activeToken0 } style={{ width: 24,maxWidth: '24px', maxHeight: '24px', marginRight: '0.25rem', marginTop: '0.1rem' }} />
-            <img src={token1logo} alt={token1logo} style={{ width: 24,maxHeight: '24px', marginRight: '0.5rem', marginTop: '0.1rem' }} />
+          <div style={{ display: 'flex' }}>
+            <img
+              src={token0logo}
+              alt={activeToken0.symbol}
+              style={{
+                width: 24,
+                maxWidth: '24px',
+                maxHeight: '24px',
+                marginRight: '0.25rem',
+                marginTop: '0.1rem',
+              }}
+            />
+            <img
+              src={token1logo}
+              alt={activeToken1.symbol}
+              style={{ width: 24, maxHeight: '24px', marginRight: '0.5rem', marginTop: '0.1rem' }}
+            />
           </div>
           <span className={styles.lighttitle}>
-            {activeToken0}/{activeToken1}
+            {activeToken0.symbol}/{activeToken1.symbol}
           </span>
         </div>
         <div className={styles.secondarytitle}>
           <span className={styles.lighttitle}>{activeRate}</span>{' '}
-          <span className={styles.percentage}>+12.45%</span>{' '}
+          <span className={styles.percentage}>12.4%</span>{' '}
           {moment(activeTime)
+            .locale('en')
             .local()
             .format(format)}
         </div>
@@ -187,6 +214,9 @@ class BasicProfile extends Component {
     switch (pt) {
       case '1D':
         _format = 'h:mm:ss a';
+        break;
+      case '1W':
+        _format = 'ha DD MMM';
         break;
       case '1M':
         _format = 'DD/MM';
@@ -222,7 +252,9 @@ class BasicProfile extends Component {
     console.log('RECEIPT', receipt);
     let newRouteData = [];
 
-    let decimal = supportedTokens.filter(item => item.address.toLowerCase() == receipt.logs[0].address.toLowerCase())[0].decimal
+    let decimal = supportedTokens.filter(
+      item => item.address.toLowerCase() == receipt.logs[0].address.toLowerCase()
+    )[0].decimal;
 
     let routeDataEntry = {
       from: receipt.logs[0].address.toLowerCase(),
@@ -233,24 +265,24 @@ class BasicProfile extends Component {
     newRouteData.push(routeDataEntry);
 
     // get eth addresses
-    let token0EthAddress = supportedTokens.filter(item => item.address.toLowerCase() == receipt.logs[0].address.toLowerCase())[0].addressOnEth
-    
+    let token0EthAddress = supportedTokens.filter(
+      item => item.address.toLowerCase() == receipt.logs[0].address.toLowerCase()
+    )[0].addressOnEth;
+
     // if token is USDC, set price point to the same value
     // this check is needed because the swap History API cannot support same coins
-    if (token0EthAddress.toLowerCase() == '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'){
-      console.log("usdc as token 0")
+    if (token0EthAddress.toLowerCase() == '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48') {
+      console.log('usdc as token 0');
       this.setState({
         pricePoint: 1,
-      })
-    }
-    else
-      this.getRoutePrice(token0EthAddress, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48')
+      });
+    } else this.getRoutePrice(token0EthAddress, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48');
 
     this.setState({
       routeData: [...newRouteData],
       isReceiptObtained: true,
-      pastToken0: this.state.activeToken0,
-      pastToken1: this.state.activeToken1
+      pastToken0: this.state.activeToken0.symbol,
+      pastToken1: this.state.activeToken1.symbol,
     });
   };
 
@@ -298,27 +330,27 @@ class BasicProfile extends Component {
               >
                 <div
                   style={{
-                    height: '576px',
+                    height: '480px',
                   }}
+                  className={styles.showPeriodOnHover}
                 >
                   <AcyPriceChart
                     data={chartData}
                     format={format}
-                    showGradient={false}
                     showXAxis
+                    showGradient
                     lineColor="#e29227"
                     range={range}
-                    showTooltip
                     onHover={(data, dataIndex) => {
                       this.setState({ activeTime: chartData[dataIndex][0], activeRate: data });
                     }}
                   />
+                  <AcyPeriodTime
+                    onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
+                    className={styles.pt}
+                    times={['1D', '1W', '1M']}
+                  />
                 </div>
-                <AcyPeriodTime
-                  onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
-                  className={styles.pt}
-                  times={['1D', '1W', '1M']}
-                />
               </div>
             </AcyCard>
           </div>
@@ -341,169 +373,122 @@ class BasicProfile extends Component {
             </div>
           )}
         </div>
-
-        <div className={styles.option}>
-          <Row gutter={[16, 16]}>
-            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-              <AcyCard title="Routing">
-                {this.state.isReceiptObtained ? (
-                  <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                    <div className={styles.routing}>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          marginRight: '10px',
-                          color: '#EB5C20',
-                          borderRight: '1px solid #2c2f36',
-                        }}
-                      >
-                        <img
-                          src={
-                            supportedTokens.filter(entry => entry.symbol == this.state.pastToken0)[0]
-                              .logoURI
-                          }
-                          width={(isMobile && 30) || 50}
-                          height={(isMobile && 30) || 50}
-                          style={{ marginRight: '10px' }}
-                        />
-                        {/* <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="USDC" /> */}
-                      </div>
-                      <div className={styles.routing_middle}>
-                        <div className={styles.nodes}>
-                          {this.state.routeData.map(item => {
-                            return (
-                              <div className={styles.nodes_item}>
-                                <span>100%</span>
-                                <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                                <div className={styles.node}>
-                                  <div>
-                                    <img
-                                      src={
-                                        supportedTokens.filter(entry => entry.address.toLowerCase() == item.from.toLowerCase())[0]
-                                          .logoURI
-                                      }
-                                      width={(isMobile && 30) || 50}
-                                      height={(isMobile && 30) || 50}
-                                      style={{ padding: '10px' }}
-                                    />
-                                  </div>
-                                  <div>
-                                    <p className={styles.r_title}>
-                                      {item.value}{' '}
-                                      {
-                                        supportedTokens.filter(entry => entry.address.toLowerCase() == item.from.toLowerCase())[0]
-                                          .symbol
-                                      }
-                                    </p>
-                                    <p className={styles.r_desc}>{abbrNumber(this.state.pricePoint * item.value)} $</p>
-                                  </div>
-                                </div>
-                                <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                              </div>
-                            );
-                          })}
+        <div className={styles.exchangeBottomWrapper}>
+          {this.state.isReceiptObtained && (
+            <div className={styles.option}>
+              <div>
+                <AcyCard title="">
+                  {this.state.isReceiptObtained ? (
+                    <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                      <div className={styles.routing}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginRight: '10px',
+                            color: '#EB5C20',
+                            borderRight: '1px solid #2c2f36',
+                          }}
+                        >
+                          <img
+                            src={
+                              supportedTokens.filter(
+                                entry => entry.symbol == this.state.pastToken0
+                              )[0].logoURI
+                            }
+                            width={(isMobile && 30) || 50}
+                            height={(isMobile && 30) || 50}
+                            style={{ marginRight: '10px' }}
+                          />
+                          {/* <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="USDC" /> */}
                         </div>
-                        <div style={{ textAlign: 'center', color: '#EB5C20' }}>See More...</div>
-                      </div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          marginRight: '10px',
-                          color: '#EB5C20',
-                          borderLeft: '1px solid #2c2f36',
-                        }}
-                      >
-                        <img
-                          src={
-                            supportedTokens.filter(entry => entry.symbol == this.state.pastToken1)[0]
-                              .logoURI
-                          }
-                          width={(isMobile && 30) || 50}
-                          height={(isMobile && 30) || 50}
-                          style={{ marginLeft: '10px' }}
-                        />
+                        <div className={styles.routing_middle}>
+                          <div className={styles.nodes}>
+                            {this.state.routeData.map(item => {
+                              return (
+                                <div className={styles.nodes_item}>
+                                  <span>100%</span>
+                                  <Icon style={{ margin: '0 10px' }} type="arrow-right" />
+                                  <div className={styles.node}>
+                                    <div>
+                                      <img
+                                        src={
+                                          supportedTokens.filter(
+                                            entry =>
+                                              entry.address.toLowerCase() == item.from.toLowerCase()
+                                          )[0].logoURI
+                                        }
+                                        width={(isMobile && 30) || 50}
+                                        height={(isMobile && 30) || 50}
+                                        style={{ padding: '10px' }}
+                                      />
+                                    </div>
+                                    <div>
+                                      <p className={styles.r_title}>
+                                        {item.value}{' '}
+                                        {
+                                          supportedTokens.filter(
+                                            entry =>
+                                              entry.address.toLowerCase() == item.from.toLowerCase()
+                                          )[0].symbol
+                                        }
+                                      </p>
+                                      <p className={styles.r_desc}>
+                                        {abbrNumber(this.state.pricePoint * item.value)} $
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <Icon style={{ margin: '0 10px' }} type="arrow-right" />
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginRight: '10px',
+                            color: '#EB5C20',
+                            borderLeft: '1px solid #2c2f36',
+                          }}
+                        >
+                          <img
+                            src={
+                              supportedTokens.filter(
+                                entry => entry.symbol == this.state.pastToken1
+                              )[0].logoURI
+                            }
+                            width={(isMobile && 30) || 50}
+                            height={(isMobile && 30) || 50}
+                            style={{ marginLeft: '10px' }}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <div
-                    style={{ width: '100%', padding: '30px', fontWeight: 600, textAlign: 'center' }}
-                  >
-                    The routing will be shown here after a receipt is obtained.
-                  </div>
-                )}
-              </AcyCard>
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-              <AcyCard style={{ height: '428px', position: 'relative' }} title="Alpha & Fees">
-                <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
-                  <AcyPeriodTime onhandPeriodTimeChoose={this.selectTime} times={['Line', 'Bar']} />
-                </div>
-                {alphaTable === 'Bar' ? (
-                  <div style={{ height: '358px' }}>
-                    <AcyBarChart showXAxis />
-                  </div>
-                ) : (
-                  <AcyPieChart />
-                )}
-              </AcyCard>
-            </Col>
-          </Row>
-        </div>
-        <div className={styles.option}>
-          <div style={{ marginTop: '-10px', marginBottom: '30px' }}>
-            <StakeHistoryTable isMobile={isMobile} dataSource={transactions} />
-          </div>
-        </div>
-        {/* Routing */}
-
-        {/* Alpha */}
-        {/* <div className={styles.routing}>
-          <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px', color: '#EB5C20' }}>
-            <span>
-              Alpha
-            </span>
-          </div>
-          <div style={{width:'300px',height:'300px'}}>
-          <AcyPieChart />
-
-          </div>
-          <div className={styles.routing_middle}>
-
-            <div className={styles.nodes}>
-              <div className={styles.node}>
-                <div>
-                  <AcyIcon.MyIcon width={isMobile&&30||50} type="Eth" />
-                </div>
-                <div>
-                  <p className={styles.r_title}>93.246ETH</p>
-                  <p className={styles.r_desc}>325,340$</p>
-                </div>
-              </div>
-              <div className={styles.node} style={{ opacity: '0' }}></div>
-              <div className={styles.node}>
-              <div>
-                  <AcyIcon.MyIcon width={isMobile&&30||50} type="Eth" />
-                </div>
-                <div>
-                  <p className={styles.r_title}>93.246ETH</p>
-                  <p className={styles.r_desc}>325,340$</p>
-                </div>
+                  ) : (
+                    <div
+                      style={{
+                        width: '100%',
+                        padding: '30px',
+                        fontWeight: 600,
+                        textAlign: 'center',
+                      }}
+                    >
+                      The routing will be shown here after a receipt is obtained.
+                    </div>
+                  )}
+                </AcyCard>
               </div>
             </div>
-
-          </div>
-          <div className={styles.routing_left}>
-            <p className={styles.r_title}>93.246ETH</p>
-            <p className={styles.r_desc}>325,340$</p>
-            <div style={{ marginTop: '30px' }}>
-              <AcyIcon.MyIcon width={isMobile&&30||50} type="Eth" />
-
+          )}
+          <div className={styles.option}>
+            <div style={{ marginTop: '-10px', marginBottom: '30px' }}>
+              <StakeHistoryTable isMobile={isMobile} dataSource={transactions} />
             </div>
           </div>
-        </div> */}
+        </div>
+
         <AcyModal onCancel={this.onCancel} width={600} visible={visible}>
           <div className={styles.title}>
             <AcyIcon name="back" /> Select a token
