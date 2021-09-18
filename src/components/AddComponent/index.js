@@ -326,23 +326,23 @@ const AddLiquidityComponent = props => {
 
   const onTokenClick = async token => {
     onCancel();
-    // if (before) {
-    //   if (account == undefined) {
-    //     alert('Please connect to your account');
-    //   } else {
-    //     setToken0(token);
-    //     setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
-    //     setToken0BalanceShow(true);
-    //   }
-    // } else {
-    //   if (account == undefined) {
-    //     alert('Please connect to your account');
-    //   } else {
-    //     setToken1(token);
-    //     setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
-    //     setToken1BalanceShow(true);
-    //   }
-    // }
+    if (before) {
+      if (account == undefined) {
+        alert('Please connect to your account');
+      } else {
+        setToken0(token);
+        setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
+        setToken0BalanceShow(true);
+      }
+    } else {
+      if (account == undefined) {
+        alert('Please connect to your account');
+      } else {
+        setToken1(token);
+        setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
+        setToken1BalanceShow(true);
+      }
+    }
   };
 
   const [favTokenList, setFavTokenList] = useState([]);

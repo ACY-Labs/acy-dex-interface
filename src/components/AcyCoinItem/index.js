@@ -9,7 +9,7 @@ const AcyCoinItem = ({ data, children, selectToken, setAsFav, hideFavButton = fa
   return (
     <div className={styles.tokenRowContainer} {...rest}>
       <div className={styles.tokenRowContent} onClick={() => selectToken(data) || null}>
-        <div>
+        <div style={{ flex: '2' }}>
           {customIcon ? (
             <AcyIcon name="eth" />
         ) : (
@@ -18,9 +18,9 @@ const AcyCoinItem = ({ data, children, selectToken, setAsFav, hideFavButton = fa
           </div>
         )}
         </div>
-        <div>{data.symbol}</div>
-        <div>Bitcoin</div>
-        <div>0.233</div>
+        <div style={{ flex: '2', color: 'white', fontWeight: '500' }}>{data.symbol}</div>
+        <div style={{ flex: '7' }}>{data.name}</div>
+        <div style={{ flex: '1' }}>0.233</div>
       </div>
       <div hidden={hideFavButton} className={styles.favButtonContainer} onClick={setAsFav}>
         <Rate className={styles.rate} count={1} />

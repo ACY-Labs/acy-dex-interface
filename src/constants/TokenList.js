@@ -1,5 +1,6 @@
 export default [
   {
+    "name": "Wrapped Ether",
     symbol: "ETH",
     address: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
     addressOnEth: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
@@ -7,6 +8,7 @@ export default [
     logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg"
   },
   {
+    "name": "USD Coin",
     symbol: "USDC",
     address: "0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b",
     addressOnEth: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
@@ -14,6 +16,7 @@ export default [
     logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg"
   },
   {
+    "name": "Wrapped Ether",
     symbol: "WETH",
     address: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
     addressOnEth: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
@@ -21,6 +24,7 @@ export default [
     logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg"
   },
   {
+    "name": "Uniswap",
     symbol: "UNI",
     address: "0x03e6c12ef405ac3f642b9184eded8e1322de1a9e",
     addressOnEth: "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
@@ -28,6 +32,7 @@ export default [
     logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/UNI.svg"
   },
   {
+    "name": "Dai Stablecoin",
     symbol: "DAI",
     address: "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea",
     addressOnEth: "0x6b175474e89094c44da98b954eedeac495271d0f",
@@ -35,6 +40,7 @@ export default [
     logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg"
   },
   {
+    "name": "Compound Dai",
     symbol: "cDAI",
     address: "0x6d7f0754ffeb405d23c51ce938289d4835be3b14",
     addressOnEth: "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643",
@@ -42,6 +48,7 @@ export default [
     logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg"
   },
   {
+    "name": "Wrapped BTC",
     symbol: "WBTC",
     address: "0x577d296678535e4903d59a4c929b718e1d575e0a",
     addressOnEth: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
