@@ -38,6 +38,10 @@ export class MarketIndex extends Component {
     fetchMarketData(marketClient).then(dataDict => {
       this.setState({
         chartData: dataDict,
+        selectedIndexLine: dataDict.tvl.length - 1,
+        selectedDataLine : abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]),
+        selectedIndexBar: dataDict.volume24h.length - 1,
+        selectedDataBar : abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]),
       });
     });
   }
