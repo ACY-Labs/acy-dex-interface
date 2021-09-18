@@ -243,7 +243,7 @@ const GlobalHeaderRight = props => {
           props.transaction.transactions.filter(item => item.blockHash == undefined).length
         }
       />
-      <Dropdown
+     {false&&<Dropdown 
         overlay={
           <div className={styles.setting} onClick={e => e.preventDefault()}>
             <ul className={styles.list}>
@@ -292,6 +292,7 @@ const GlobalHeaderRight = props => {
           onClick={() => onhandSetting(true)}
         />
       </Dropdown>
+      }
       <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}>
         <div className={styles.walltitle}>
           <AcyIcon.MyIcon width={20} type="Wallet" />{' '}
