@@ -1,7 +1,4 @@
-import {
-  AcyIcon,
-  AcyTabs
-} from '@/components/Acy';
+import { AcyIcon, AcyTabs } from '@/components/Acy';
 import { Divider, Icon, Input, Table } from 'antd';
 import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -11,12 +8,27 @@ import { Link } from 'react-router-dom';
 import styles from './styles.less';
 import { abbrHash, abbrNumber, isDesktop, sortTable, TransactionType } from './Util.js';
 import { WatchlistManager } from './WatchlistManager.js';
-
-
+import supportedTokens from '@/constants/TokenList';
 
 const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');
 const watchlistManagerPool = new WatchlistManager('pool');
+
+function TableImage(props) {
+  const [isError, setIsError] = useState(false);
+
+  return (
+    <>
+    {!isError ? <img
+      src={`https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/${props.symbol === "WETH" ? "ETH" : props.symbol}.svg`}
+      width={20}
+      height={20}
+      onError={() => setIsError(true)}
+    /> : <AcyIcon name="unknown" width={20}/>}
+    
+    </>
+  );
+}
 
 export class SmallTable extends React.Component {
   constructor(props) {
@@ -71,8 +83,8 @@ export class SmallTable extends React.Component {
     // Typical usage (don't forget to compare props):
     if (this.props.data !== prevProps.data) {
       this.setState({
-        tableData: this.props.data
-      })
+        tableData: this.props.data,
+      });
     }
   }
 
@@ -87,7 +99,11 @@ export class SmallTable extends React.Component {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <AcyIcon name={entry.short.toLowerCase()} width={20} height={20} />
-          <Link style={{ color: '#b5b5b6' }} className={styles.coinName} to={`/market/info/token/${entry.address}`}>
+          <Link
+            style={{ color: '#b5b5b6' }}
+            className={styles.coinName}
+            to={`/market/info/token/${entry.address}`}
+          >
             {entry.short}
           </Link>
           <span className={styles.coinShort}> ({entry.name})</span>
@@ -172,7 +188,7 @@ export class SmallTable extends React.Component {
         <tbody>
           <tr className={styles.smallTableRow}>
             <td className={styles.smallTableHeader}>
-              {this.state.mode == 'token' ? 'Token' : 'Pool'}
+              {this.state.mode == 'token' ? 'TokenList' : 'Pool'}
             </td>
             <td
               className={styles.smallTableHeader}
@@ -239,7 +255,7 @@ export function TokenTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableDataFirstColumn}>
-              <AcyIcon name={entry.short.toLowerCase()} width={20} height={20} />
+              <TableImage symbol={entry.short}/>
               <Link
                 style={{ color: '#b5b5b6' }}
                 className={styles.coinName}
@@ -303,7 +319,11 @@ export function TokenTable(props) {
           return (
             <div className={styles.tableData}>
               <span className={priceChange < 0 ? styles.priceChangeDown : styles.priceChangeUp}>
-                {priceChange.toFixed(2)} %
+                {Math.abs(priceChange) > 0.01 && Math.abs(priceChange) > 0
+                  ? `${priceChange.toFixed(3)} %`
+                  : priceChange >= 0
+                  ? '<0.001 %'
+                  : '- <0.001%'}
               </span>
             </div>
           );
@@ -424,8 +444,8 @@ export function PoolTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableDataFirstColumn}>
-              <AcyIcon name={entry.coin1.toLowerCase()} width={20} height={20} />
-              <AcyIcon name={entry.coin2.toLowerCase()} width={20} height={20} />
+              <TableImage symbol={entry.coin1}/>
+              <TableImage symbol={entry.coin2}/>
               <Link
                 style={{ color: '#b5b5b6' }}
                 className={styles.coinName}
@@ -658,7 +678,7 @@ export function TransactionTable(props) {
               onSortChange();
             }}
           >
-            Token Amount
+            TokenList Amount
             {currentKey == 'coin1Amount' && (
               <Icon
                 type={!isAscending ? 'arrow-up' : 'arrow-down'}
@@ -687,7 +707,7 @@ export function TransactionTable(props) {
               onSortChange();
             }}
           >
-            Token Amount
+            TokenList Amount
             {currentKey == 'coin2Amount' && (
               <Icon
                 type={!isAscending ? 'arrow-up' : 'arrow-down'}
@@ -758,10 +778,10 @@ export function TransactionTable(props) {
         key: 'time',
         render: (text, entry) => {
           function getRelTime(timeString) {
-            let a = moment(new Date(timeString)).locale("en");
+            let a = moment(new Date(timeString)).locale('en');
             return a.fromNow();
           }
-          
+
           return <div className={styles.tableData}>{getRelTime(text)}</div>;
         },
         visible: true,
@@ -898,13 +918,13 @@ export const MarketSearchBar = props => {
     let query = e.target.value.toLowerCase();
 
     // coins return
-    let newCoin = props.dataSourceCoin.filter(item => item.name
-          .toLowerCase()
-          .includes(query) || item.short.toLowerCase().includes(query));
+    let newCoin = props.dataSourceCoin.filter(
+      item => item.name.toLowerCase().includes(query) || item.short.toLowerCase().includes(query)
+    );
     setSearchCoinReturns(newCoin);
-    let newPool = props.dataSourcePool.filter(item => item.coin1
-          .toLowerCase()
-          .includes(query) || item.coin2.toLowerCase().includes(query));
+    let newPool = props.dataSourcePool.filter(
+      item => item.coin1.toLowerCase().includes(query) || item.coin2.toLowerCase().includes(query)
+    );
     setSearchPoolReturns(newPool);
   });
 
