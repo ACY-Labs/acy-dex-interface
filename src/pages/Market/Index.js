@@ -12,7 +12,7 @@ import styles from './styles.less';
 import { abbrNumber } from './Util.js';
 import { MarketSearchBar, PoolTable, TokenTable, TransactionTable } from './UtilComponent.js';
 
-import { fetchMarketData, marketClient } from './Data/index.js';
+import { fetchMarketData, marketClient, fetchGlobalTransaction } from './Data/index.js';
 
 export class MarketIndex extends Component {
   constructor(props) {
@@ -32,9 +32,17 @@ export class MarketIndex extends Component {
       tvl: [],
       volume24h: [],
     },
+
+    // transaction data
+    transactions: []
   };
 
   componentDidMount() {
+    fetchGlobalTransaction(marketClient).then(globalTransactions => {
+      this.setState({
+        transactions: globalTransactions
+      })
+    })
     fetchMarketData(marketClient).then(dataDict => {
       this.setState({
         chartData: dataDict,
@@ -87,7 +95,7 @@ export class MarketIndex extends Component {
                 showXAxis={true}
                 showGradient={true}
                 lineColor="#e29227"
-                bgColor="#2f313583"
+                bgColor="#2f313500"
               />
             </div>
           </>: <Icon type="loading"/>}
@@ -147,7 +155,7 @@ export class MarketIndex extends Component {
         <PoolTable dataSourcePool={dataSourcePool} />
 
         <h2>Transactions</h2>
-        <TransactionTable dataSourceTransaction={dataSourceTransaction} />
+        {this.state.transactions.length > 0 && <TransactionTable dataSourceTransaction={this.state.transactions} />}
         <div style={{ height: '20px' }} />
       </div>
     );

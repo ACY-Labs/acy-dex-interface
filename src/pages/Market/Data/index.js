@@ -1,13 +1,16 @@
 import {fetchMarketData} from './marketData'
+import {fetchGlobalTransaction} from './txData'
 import {marketClient} from './client'
 
 const DataFetch = {
     marketClient, 
-    fetchMarketData
+    fetchMarketData,
+    fetchGlobalTransaction
 }
 
 export {
     DataFetch as default,
     fetchMarketData,
-    marketClient
+    marketClient,
+    fetchGlobalTransaction
 }
