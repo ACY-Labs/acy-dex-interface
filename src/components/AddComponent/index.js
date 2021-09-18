@@ -23,7 +23,7 @@ import {
   AcyDescriptions,
 } from '@/components/Acy';
 
-import tokenList from '@/constants/TokenList'
+import INITIAL_TOKEN_LIST from '@/constants/TokenList'
 
 //^mark
 import { connect } from 'umi';
@@ -33,7 +33,7 @@ import { sortAddress } from '@/utils/utils';
 
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import {
   supportedTokens,
@@ -86,9 +86,9 @@ const AddLiquidityComponent = props => {
   const [before, setBefore] = useState(true);
 
   // 交易对前置货币
-  let [token0, setToken0] = useState(tokenList[0]);
+  let [token0, setToken0] = useState(INITIAL_TOKEN_LIST[0]);
   // 交易对后置货币
-  let [token1, setToken1] = useState(tokenList[1]);
+  let [token1, setToken1] = useState(INITIAL_TOKEN_LIST[1]);
   // 交易对前置货币余额
   let [token0Balance, setToken0Balance] = useState('0');
   // 交易对后置货币余额
@@ -128,6 +128,14 @@ const AddLiquidityComponent = props => {
 
   let [args, setArgs] = useState();
   let [value, setValue] = useState();
+
+  const [tokenSearchInput, setTokenSearchInput] = useState('')
+  const [tokenList, setTokenList] = useState(INITIAL_TOKEN_LIST)
+
+  const onTokenSearchChange = (e) => {
+    setTokenSearchInput(e.target.value)
+    setTokenList(INITIAL_TOKEN_LIST.filter((token) => token.symbol.includes(e.target.value.toUpperCase())))
+  }
 
   let [userLiquidityPositions, setUserLiquidityPositions] = useState([]);
 
@@ -655,6 +663,8 @@ const AddLiquidityComponent = props => {
               borderRadius: '40px',
             }}
             placeholder="Enter the token symbol or address"
+            value={tokenSearchInput}
+            onChange={onTokenSearchChange}
           />
         </div>
 

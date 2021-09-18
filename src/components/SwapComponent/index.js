@@ -50,8 +50,6 @@ import {
   supportedTokens,
 } from '@/acy-dex-swap/utils/index';
 
-import tokenList from '@/constants/TokenList'
-
 import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
 
 import ERC20ABI from '@/abis/ERC20.json';
@@ -82,6 +80,7 @@ const { AcyTabPane } = AcyTabs;
 import { Row, Col, Button, Icon } from 'antd';
 import { Alert } from 'antd';
 import spinner from '@/assets/loading.svg';
+import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 
 const SwapComponent = props => {
   const { dispatch, onSelectToken0, onSelectToken1 } = props;
@@ -93,9 +92,9 @@ const SwapComponent = props => {
   const [before, setBefore] = useState(true);
 
   // 交易对前置货币
-  const [token0, setToken0] = useState(tokenList[0]);
+  const [token0, setToken0] = useState(INITIAL_TOKEN_LIST[0]);
   // 交易对后置货币
-  const [token1, setToken1] = useState(tokenList[1]);
+  const [token1, setToken1] = useState(INITIAL_TOKEN_LIST[1]);
 
   // 交易对前置货币余额
   const [token0Balance, setToken0Balance] = useState('0');
@@ -139,6 +138,14 @@ const SwapComponent = props => {
   const [wethContract, setWethContract] = useState();
   const [wrappedAmount, setWrappedAmount] = useState();
   const [showSpinner, setShowSpinner] = useState(false);
+
+  const [tokenSearchInput, setTokenSearchInput] = useState('')
+  const [tokenList, setTokenList] = useState(INITIAL_TOKEN_LIST)
+
+  const onTokenSearchChange = (e) => {
+    setTokenSearchInput(e.target.value)
+    setTokenList(INITIAL_TOKEN_LIST.filter((token) => token.symbol.includes(e.target.value.toUpperCase())))
+  }
 
   const individualFieldPlaceholder = 'Enter amount';
   const dependentFieldPlaceholder = 'Estimated value';
@@ -624,6 +631,8 @@ const SwapComponent = props => {
               borderRadius: '40px',
             }}
             placeholder="Enter the token symbol or address"
+            value={tokenSearchInput}
+            onChange={onTokenSearchChange}
           />
         </div>
 
