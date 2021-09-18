@@ -1,409 +1,337 @@
 export default [
   {
-    "chainId": 1,
-    "address": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
+    symbol: "ETH",
+    address: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
+    addressOnEth: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    decimal: 18,
+    logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg"
+  },
+  {
+    symbol: "USDC",
+    address: "0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b",
+    addressOnEth: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    decimal: 6,
+    logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg"
+  },
+  {
+    symbol: "WETH",
+    address: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
+    addressOnEth: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    decimal: 18,
+    logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg"
+  },
+  {
+    symbol: "UNI",
+    address: "0x03e6c12ef405ac3f642b9184eded8e1322de1a9e",
+    addressOnEth: "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+    decimal: 18,
+    logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/UNI.svg"
+  },
+  {
+    symbol: "DAI",
+    address: "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea",
+    addressOnEth: "0x6b175474e89094c44da98b954eedeac495271d0f",
+    decimal: 18,
+    logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg"
+  },
+  {
+    symbol: "cDAI",
+    address: "0x6d7f0754ffeb405d23c51ce938289d4835be3b14",
+    addressOnEth: "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643",
+    decimal: 8,
+    logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg"
+  },
+  {
+    symbol: "WBTC",
+    address: "0x577d296678535e4903d59a4c929b718e1d575e0a",
+    addressOnEth: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    decimal: 8,
+    logoURI: "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/WBTC.svg"
+  },
+  {
     "name": "Aave",
     "symbol": "AAVE",
-    "decimals": 18,
+    "address": "0x42447d5f59d5bf78a82c34663474922bdf278162",
+    "addressOnEth": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/AAVE.svg"
   },
-  {
-    "chainId": 1,
-    "address": "0xfF20817765cB7f73d4bde2e66e067E58D11095C2",
-    "name": "Amp",
-    "symbol": "AMP",
-    "decimals": 18,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/AMP.svg"
-  },
+  // token not exist in testnet
+  // {
+  //   "chainId": 1,
+  //   "address": "0xfF20817765cB7f73d4bde2e66e067E58D11095C2",
+  //   "name": "Amp",
+  //   "symbol": "AMP",
+  //   "decimals": 18,
+  //   "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/AMP.svg"
+  // },
   {
     "name": "Aragon Network Token",
-    "address": "0x960b236A07cf122663c4303350609A66A7B288C0",
     "symbol": "ANT",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0x2d23f49a6c1b60e614952d8b0d53bd7a2dbf6433",
+    "addressOnEth": "0x960b236A07cf122663c4303350609A66A7B288C0",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ANT.svg"
   },
+  // balancer token address in testnet is not verified
+  // address is chosen based on highest transactions
   {
     "name": "Balancer",
-    "address": "0xba100000625a3754423978a60c9317c58a424e3D",
     "symbol": "BAL",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0xdB07b7746D6b48d3eaB8de25fF7bAbfeb13F24CD",
+    "addressOnEth": "0xba100000625a3754423978a60c9317c58a424e3D",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/BAL.svg"
   },
+  // band protocol token address in testnet is not verified
+  // address is chosen based on highest transactions
   {
-    "chainId": 1,
-    "address": "0xBA11D00c5f74255f56a5E366F4F77f5A186d7f55",
     "name": "Band Protocol",
     "symbol": "BAND",
-    "decimals": 18,
+    "address": "0x4A35A28a0fc767b911E613cd455500B9e37C4064",
+    "addressOnEth": "0xBA11D00c5f74255f56a5E366F4F77f5A186d7f55",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/BAND.svg"
   },
+  // bancor network token address in testnet is not verified
+  // address is chosen based on highest transactions
   {
     "name": "Bancor Network Token",
-    "address": "0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C",
     "symbol": "BNT",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0x323Ec61cDA3A1f21bCFF671223AbE3bC9A6C48F4",
+    "addressOnEth": "0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/BNT.svg"
   },
+  // compound token address in testnet is not verified
+  // address is chosen based on highest transactions
   {
     "name": "Compound",
-    "address": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
     "symbol": "COMP",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0xb46Ddbf37659033cCDB976418dCf36C7ec4Ba919",
+    "addressOnEth": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/COMP.svg"
   },
   {
     "name": "Curve DAO Token",
-    "address": "0xD533a949740bb3306d119CC777fa900bA034cd52",
     "symbol": "CRV",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0x1eB4996bD8BF37817fD437dF510CE52e1EF5F18B",
+    "addressOnEth": "0xD533a949740bb3306d119CC777fa900bA034cd52",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/CRV.svg"
   },
   {
-    "chainId": 1,
-    "address": "0x41e5560054824eA6B0732E656E3Ad64E20e94E45",
     "name": "Civic",
     "symbol": "CVC",
-    "decimals": 8,
+    "address": "0x8b79FdA5e3A654AC61aED96Fedc7091D74cf15Be",
+    "addressOnEth": "0x41e5560054824eA6B0732E656E3Ad64E20e94E45",
+    "decimal": 8,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/CVC.svg"
   },
   {
-    "name": "Dai Stablecoin",
-    "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-    "symbol": "DAI",
-    "decimals": 18,
-    "chainId": 1,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg"
-  },
-  {
-    "chainId": 1,
-    "address": "0x0AbdAce70D3790235af448C88547603b945604ea",
     "name": "district0x",
     "symbol": "DNT",
-    "decimals": 18,
+    "address": "0xAA45686cD61764b28057CE64b8C4D996E213E90c",
+    "addressOnEth": "0x0AbdAce70D3790235af448C88547603b945604ea",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DNT.svg"
   },
+  // gnosis token address in testnet is not verified
+  // address is chosen based on highest transactions
   {
     "name": "Gnosis Token",
-    "address": "0x6810e776880C02933D47DB1b9fc05908e5386b96",
     "symbol": "GNO",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0xcB0591ba2D74EdD4211d5200D5d3b19cf598c548",
+    "addressOnEth": "0x6810e776880C02933D47DB1b9fc05908e5386b96",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/GNO.svg"
   },
+  // the graph token address in testnet is not verified
+  // address is chosen based on highest transactions
   {
-    "chainId": 1,
-    "address": "0xc944E90C64B2c07662A292be6244BDf05Cda44a7",
     "name": "The Graph",
     "symbol": "GRT",
-    "decimals": 18,
+    "address": "0x31958e219073d60FDCeb1d608c293754331dd352",
+    "addressOnEth": "0xc944E90C64B2c07662A292be6244BDf05Cda44a7",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/GRT.svg"
   },
+  // keep network token address in testnet is not verified
+  // address is chosen based on highest transactions
   {
-    "chainId": 1,
-    "address": "0x85Eee30c52B0b379b046Fb0F85F4f3Dc3009aFEC",
     "name": "Keep Network",
     "symbol": "KEEP",
-    "decimals": 18,
+    "address": "0x839004b13Dcd9d40512a92b3538fFaBF9c09B39d",
+    "addressOnEth": "0x85Eee30c52B0b379b046Fb0F85F4f3Dc3009aFEC",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/KEEP.svg"
   },
+  // kyber network crystal token address in testnet is not verified
+  // address is chosen based on highest transactions
   {
     "name": "Kyber Network Crystal",
-    "address": "0xdd974D5C2e2928deA5F71b9825b8b646686BD200",
     "symbol": "KNC",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0x7DbC01BB5E0eC9fBF1B7618827d9BDb9ceC67006",
+    "addressOnEth": "0xdd974D5C2e2928deA5F71b9825b8b646686BD200",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/KNC.svg"
   },
   {
     "name": "ChainLink Token",
-    "address": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
     "symbol": "LINK",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0x8825D49dea3A8Fc5643217F61217fE5d0564e616",
+    "addressOnEth": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/LINK.svg"
   },
   {
     "name": "Loom Network",
-    "address": "0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0",
     "symbol": "LOOM",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0x50d3a47b5c4ca9f6154e5db7be49b857984333a0",
+    "addressOnEth": "0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/LOOM.svg"
   },
   {
     "name": "LoopringCoin V2",
-    "address": "0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD",
     "symbol": "LRC",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0x5463a11816d3a59e2687cec1edb1c0e92d928de8",
+    "addressOnEth": "0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/LRC.svg"
   },
   {
-    "chainId": 1,
-    "address": "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942",
     "name": "Decentraland",
     "symbol": "MANA",
-    "decimals": 18,
+    "address": "0x28bce5263f5d7f4eb7e8c6d5d78275ca455bac63",
+    "addressOnEth": "0x0F5D2fB29fb7d3CFeE444a200298f468908cC942",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/MANA.svg"
   },
   {
-    "name": "Maker",
-    "address": "0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2",
-    "symbol": "MKR",
-    "decimals": 18,
-    "chainId": 1,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/MKR.svg"
-  },
-  {
-    "chainId": 1,
-    "address": "0xec67005c4E498Ec7f55E092bd1d35cbC47C91892",
     "name": "Melon",
     "symbol": "MLN",
-    "decimals": 18,
+    "address": "0x578180b15e528e816255ca79f1bb7ce4bfb93413",
+    "addressOnEth": "0xec67005c4E498Ec7f55E092bd1d35cbC47C91892",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/MLN.svg"
   },
+  // numeraire token address in testnet is not verified
+  // address is chosen based on highest transactions
   {
     "name": "Numeraire",
-    "address": "0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671",
     "symbol": "NMR",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0xccc019d54ee139f76252dbffb782eaf5f5e2a201",
+    "addressOnEth": "0xec67005c4E498Ec7f55E092bd1d35cbC47C91892",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/NMR.svg"
   },
+  // nucypher token address in testnet is not verified
+  // address is chosen based on highest transactions
   {
-    "chainId": 1,
-    "address": "0x4fE83213D56308330EC302a8BD641f1d0113A4Cc",
     "name": "NuCypher",
     "symbol": "NU",
-    "decimals": 18,
+    "address": "0x1916644d825f23c739296be6bcd165764d92e18e",
+    "addressOnEth": "0x4fE83213D56308330EC302a8BD641f1d0113A4Cc",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/NU.svg"
   },
+  // orchid token address in testnet is not verified
+  // address is chosen based on highest transactions
   {
     "name": "Orchid",
-    "address": "0x4575f41308EC1483f3d399aa9a2826d74Da13Deb",
     "symbol": "OXT",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0x1532bf04929c50f484a0dfe83486fd2edbfe049b",
+    "addressOnEth": "0x4575f41308EC1483f3d399aa9a2826d74Da13Deb",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/OXT.svg"
   },
+  // republic token address in testnet is not verified
+  // address is chosen based on highest transactions
   {
     "name": "Republic Token",
-    "address": "0x408e41876cCCDC0F92210600ef50372656052a38",
     "symbol": "REN",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0xb57810f5fc0491a3b4e390d6505423c37e0c2e8a",
+    "addressOnEth": "0x408e41876cCCDC0F92210600ef50372656052a38",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/REN.svg"
   },
   {
     "name": "Reputation Augur v1",
-    "address": "0x1985365e9f78359a9B6AD760e32412f4a445E862",
     "symbol": "REP",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0x175ac784563de645647c6350f0cfc577dcc7ee5b",
+    "addressOnEth": "0x1985365e9f78359a9B6AD760e32412f4a445E862",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/REP.svg"
   },
-  {
-    "name": "Reputation Augur v2",
-    "address": "0x221657776846890989a759BA2973e427DfF5C9bB",
-    "symbol": "REPv2",
-    "decimals": 18,
-    "chainId": 1,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/REPv2.svg"
-  },
+  // token not exist in testnet
+  // {
+  //   "name": "Reputation Augur v2",
+  //   "address": "0x221657776846890989a759BA2973e427DfF5C9bB",
+  //   "symbol": "REPv2",
+  //   "decimals": 18,
+  //   "chainId": 1,
+  //   "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/REPv2.svg"
+  // },
   {
     "name": "Synthetix Network Token",
-    "address": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
     "symbol": "SNX",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0xda1d628f42deca56bf3d323af05096c6d4b7c06a",
+    "addressOnEth": "0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/SNX.svg"
   },
   {
     "name": "Storj Token",
-    "address": "0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC",
     "symbol": "STORJ",
-    "decimals": 8,
-    "chainId": 1,
+    "address": "0xff5ada2bea34247da87f0fd26c24ead2b64edebf",
+    "addressOnEth": "0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC",
+    "decimal": 8,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/STORJ.svg"
   },
   {
-    "chainId": 1,
-    "address": "0x8dAEBADE922dF735c38C80C7eBD708Af50815fAa",
     "name": "tBTC",
     "symbol": "TBTC",
-    "decimals": 18,
+    "address": "0x188453155c9c56b892748b7da6ad345a96dc8f9e",
+    "addressOnEth": "0x8dAEBADE922dF735c38C80C7eBD708Af50815fAa",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/TBTC.png"
   },
+  // republic token address in testnet is not verified
+  // address is chosen based on highest transactions
   {
     "name": "UMA Voting Token v1",
-    "address": "0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828",
     "symbol": "UMA",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0x739697ff55c017448909334b5c200fe147ce8aa5",
+    "addressOnEth": "0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/UMA.svg"
   },
   {
-    "name": "Uniswap",
-    "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-    "symbol": "UNI",
-    "decimals": 18,
-    "chainId": 1,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/UNI.svg"
-  },
-  {
-    "name": "USDCoin",
-    "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    "symbol": "USDC",
-    "decimals": 6,
-    "chainId": 1,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg"
-  },
-  {
     "name": "Tether USD",
-    "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
     "symbol": "USDT",
-    "decimals": 6,
-    "chainId": 1,
+    "address": "0xa1cba00d6e99f52b8cb5f867a6f2db0f3ad62276",
+    "addressOnEth": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    "decimal": 6,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg"
   },
   {
-    "name": "Wrapped BTC",
-    "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-    "symbol": "WBTC",
-    "decimals": 8,
-    "chainId": 1,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/WBTC.svg"
-  },
-  {
-    "name": "Wrapped Ether",
-    "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-    "symbol": "WETH",
-    "decimals": 18,
-    "chainId": 1,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg"
-  },
-  {
-    "chainId": 1,
-    "address": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
     "name": "yearn finance",
     "symbol": "YFI",
-    "decimals": 18,
+    "address": "0x7e2a04ffcc9b5dda2ddc880d31c7c3228ce9744c",
+    "addressOnEth": "0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/YFI.svg"
   },
+  // zrx token address in testnet is not verified
+  // address is chosen based on highest transactions
   {
     "name": "0x Protocol Token",
-    "address": "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
     "symbol": "ZRX",
-    "decimals": 18,
-    "chainId": 1,
+    "address": "0x669f55bca5b2e4b9dd1c72c37260d6ede833dd35",
+    "addressOnEth": "0xE41d2489571d322189246DaFA5ebDe1F4699F498",
+    "decimal": 18,
     "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ZRX.svg"
   },
-  {
-    "name": "Dai Stablecoin",
-    "address": "0xaD6D458402F60fD3Bd25163575031ACDce07538D",
-    "symbol": "DAI",
-    "decimals": 18,
-    "chainId": 3,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg"
-  },
-  {
-    "name": "Uniswap",
-    "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-    "symbol": "UNI",
-    "decimals": 18,
-    "chainId": 3,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/UNI.svg"
-  },
-  {
-    "name": "Wrapped Ether",
-    "address": "0xc778417E063141139Fce010982780140Aa0cD5Ab",
-    "symbol": "WETH",
-    "decimals": 18,
-    "chainId": 3,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg"
-  },
-  {
-    "name": "Dai Stablecoin",
-    "address": "0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735",
-    "symbol": "DAI",
-    "decimals": 18,
-    "chainId": 4,
-  },
-  {
-    "name": "Maker",
-    "address": "0xF9bA5210F91D0474bd1e1DcDAeC4C58E359AaD85",
-    "symbol": "MKR",
-    "decimals": 18,
-    "chainId": 4,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/MKR.svg"
-  },
-  {
-    "name": "Uniswap",
-    "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-    "symbol": "UNI",
-    "decimals": 18,
-    "chainId": 4,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/UNI.svg"
-  },
-  {
-    "name": "Wrapped Ether",
-    "address": "0xc778417E063141139Fce010982780140Aa0cD5Ab",
-    "symbol": "WETH",
-    "decimals": 18,
-    "chainId": 4,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg"
-  },
-  {
-    "name": "Uniswap",
-    "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-    "symbol": "UNI",
-    "decimals": 18,
-    "chainId": 5,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/UNI.svg"
-  },
-  {
-    "name": "Wrapped Ether",
-    "address": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-    "symbol": "WETH",
-    "decimals": 18,
-    "chainId": 5,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg"
-  },
-  {
-    "name": "Dai Stablecoin",
-    "address": "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa",
-    "symbol": "DAI",
-    "decimals": 18,
-    "chainId": 42,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg"
-  },
-  {
-    "name": "Maker",
-    "address": "0xAaF64BFCC32d0F15873a02163e7E500671a4ffcD",
-    "symbol": "MKR",
-    "decimals": 18,
-    "chainId": 42,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/MKR.svg"
-  },
-  {
-    "name": "Uniswap",
-    "address": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-    "symbol": "UNI",
-    "decimals": 18,
-    "chainId": 42,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/UNI.svg"
-  },
-  {
-    "name": "Wrapped Ether",
-    "address": "0xd0A1E359811322d97991E03f863a0C30C2cF029C",
-    "symbol": "WETH",
-    "decimals": 18,
-    "chainId": 42,
-    "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg"
-  }
 ]

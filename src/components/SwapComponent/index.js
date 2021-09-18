@@ -28,7 +28,6 @@ import { Input } from 'antd';
 import { connect } from 'umi';
 import styles from './styles.less';
 import { sortAddress } from '@/utils/utils';
-// import tokenList from '@/constants/TokenList';
 
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
@@ -50,6 +49,8 @@ import {
   ROUTER_ADDRESS,
   supportedTokens,
 } from '@/acy-dex-swap/utils/index';
+
+import tokenList from '@/constants/TokenList'
 
 import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
 
@@ -92,9 +93,9 @@ const SwapComponent = props => {
   const [before, setBefore] = useState(true);
 
   // 交易对前置货币
-  const [token0, setToken0] = useState(supportedTokens[0]);
+  const [token0, setToken0] = useState(tokenList[0]);
   // 交易对后置货币
-  const [token1, setToken1] = useState(supportedTokens[1]);
+  const [token1, setToken1] = useState(tokenList[1]);
 
   // 交易对前置货币余额
   const [token0Balance, setToken0Balance] = useState('0');
@@ -629,13 +630,14 @@ const SwapComponent = props => {
         <div className={styles.coinList}>
           <AcyTabs>
             <AcyTabPane tab="All" key="1">
-              {supportedTokens.map((token, index) => {
+              {tokenList.map((token, index) => {
                 return (
                   <AcyCoinItem
                     data={token}
                     key={index}
                     customIcon={false}
-                    setAsFav={() => setTokenAsFav(index)}
+                    // setAsFav={() => setTokenAsFav(index)}
+                    setAsFav={() => console.log(index)}
                     selectToken={() => {
                       onCoinClick(token);
                     }}
@@ -649,7 +651,7 @@ const SwapComponent = props => {
                   data={supToken}
                   key={index}
                   selectToken={() => {
-                    onCoinClick(token);
+                    onCoinClick(supToken);
                   }}
                   customIcon={false}
                   index={index}

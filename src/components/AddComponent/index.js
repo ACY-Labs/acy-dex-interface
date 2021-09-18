@@ -23,6 +23,8 @@ import {
   AcyDescriptions,
 } from '@/components/Acy';
 
+import tokenList from '@/constants/TokenList'
+
 //^mark
 import { connect } from 'umi';
 
@@ -32,7 +34,6 @@ import { sortAddress } from '@/utils/utils';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import React, { useState, useEffect, useCallback } from 'react';
-// import tokenList from '@/constants/TokenList';
 
 import {
   supportedTokens,
@@ -85,9 +86,9 @@ const AddLiquidityComponent = props => {
   const [before, setBefore] = useState(true);
 
   // 交易对前置货币
-  let [token0, setToken0] = useState(supportedTokens[0]);
+  let [token0, setToken0] = useState(tokenList[0]);
   // 交易对后置货币
-  let [token1, setToken1] = useState(supportedTokens[1]);
+  let [token1, setToken1] = useState(tokenList[1]);
   // 交易对前置货币余额
   let [token0Balance, setToken0Balance] = useState('0');
   // 交易对后置货币余额
@@ -644,7 +645,7 @@ const AddLiquidityComponent = props => {
         {liquidityStatus && <AcyDescriptions.Item>{liquidityStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
-      <AcyModal onCancel={onCancel} width={600} height={400} visible={visible}>
+      <AcyModal onCancel={onCancel} width={400} visible={visible}>
         <div className={styles.title}>Select a token</div>
         <div className={styles.search}>
           <Input
@@ -660,7 +661,7 @@ const AddLiquidityComponent = props => {
         <div className={styles.coinList}>
           <AcyTabs>
             <AcyTabPane tab="All" key="1">
-              {supportedTokens.map((token, index) => (
+              {tokenList.map((token, index) => (
                 <AcyCoinItem
                   data={token}
                   key={index}
