@@ -13,7 +13,16 @@ import {
 } from '@/components/Acy';
 import { useWeb3React } from '@web3-react/core';
 
-import { injected, walletconnect, walletlink, fortmatic, portis, torus } from '@/connectors';
+import {
+  injected,
+  walletconnect,
+  walletlink,
+  fortmatic,
+  portis,
+  torus,
+  trezor,
+  ledger,
+} from '@/connectors';
 
 import styles from './index.less';
 import { ReactComponent as Opera } from './Opera.svg';
@@ -100,6 +109,10 @@ const GlobalHeaderRight = props => {
       activate(portis);
     } else if (walletName === 'torus') {
       activate(torus);
+    } else if (walletName === 'trezor') {
+      activate(trezor);
+    } else if (walletName === 'ledger') {
+      activate(ledger);
     }
     setVisibleMetaMask(false);
   };
@@ -178,12 +191,16 @@ const GlobalHeaderRight = props => {
     {
       name: 'Trezor',
       icon: 'Trezor',
-      onClick: () => {},
+      onClick: () => {
+        selectWallet('trezor');
+      },
     },
     {
       name: 'Ledger',
       icon: 'Ledger',
-      onClick: () => {},
+      onClick: () => {
+        selectWallet('ledger');
+      },
     },
     {
       name: 'Fortmatic',
@@ -214,11 +231,6 @@ const GlobalHeaderRight = props => {
         selectWallet('opera');
       },
     },
-    {
-      name: 'Gnosis Safe',
-      icon: 'Gnosis',
-      onClick: () => {},
-    },
   ];
   const [only, setOnly] = useState(true);
   const showMore = () => {
@@ -243,31 +255,34 @@ const GlobalHeaderRight = props => {
           props.transaction.transactions.filter(item => item.blockHash == undefined).length
         }
       />
-     {false&&<Dropdown 
-        overlay={
-          <div className={styles.setting} onClick={e => e.preventDefault()}>
-            <ul className={styles.list}>
-              <li>
-                <AcySeting title="Gas Price" current="Rapid(85.1gwei) ~3">
-                  <AcyRadioButton data={['Rapid(85.1gwei) ~3', 'Rapid(67.1gwei) ~6']} />
-                </AcySeting>
-              </li>
-              <li>
-                <AcySeting title="Endpoint" current="Global 122.0ms">
-                  <AcyRadioButton data={['Global 122.0ms', 'Custom']} />
-                </AcySeting>
-              </li>
-              <li>
-                <AcySeting title="Network" current="ETH">
-                  <AcyRadioButton data={['ETH', 'BSC','Heco','Polygon','Arbitrum','OkChain']} />
-                </AcySeting>
-              </li>
-              {/* <li style={{borderBottom:'1px solid rgb(64, 64, 64)',paddingBottom:'20px'}}>
+      {false && (
+        <Dropdown
+          overlay={
+            <div className={styles.setting} onClick={e => e.preventDefault()}>
+              <ul className={styles.list}>
+                <li>
+                  <AcySeting title="Gas Price" current="Rapid(85.1gwei) ~3">
+                    <AcyRadioButton data={['Rapid(85.1gwei) ~3', 'Rapid(67.1gwei) ~6']} />
+                  </AcySeting>
+                </li>
+                <li>
+                  <AcySeting title="Endpoint" current="Global 122.0ms">
+                    <AcyRadioButton data={['Global 122.0ms', 'Custom']} />
+                  </AcySeting>
+                </li>
+                <li>
+                  <AcySeting title="Network" current="ETH">
+                    <AcyRadioButton
+                      data={['ETH', 'BSC', 'Heco', 'Polygon', 'Arbitrum', 'OkChain']}
+                    />
+                  </AcySeting>
+                </li>
+                {/* <li style={{borderBottom:'1px solid rgb(64, 64, 64)',paddingBottom:'20px'}}>
                 <AcySeting title="Language" current="English">
                   <AcyRadioButton data={['English', '中文']} />
                 </AcySeting>
               </li> */}
-              {/* <li style={{marginTop:'30px'}}>
+                {/* <li style={{marginTop:'30px'}}>
                   <a className={styles.setitem}>
                     <Icon type="question-circle" />Help
                   </a>
@@ -278,21 +293,21 @@ const GlobalHeaderRight = props => {
                   <Icon type="message" />Forum
                   </a>
               </li> */}
-            </ul>
-          </div>
-        }
-        trigger={['click']}
-        placement="bottomLeft"
-        visible={visibleSetting}
-        onVisibleChange={onhandSetting}
-      >
-        <AcyIcon
-          width={30}
-          name={visibleSetting ? 'colors-active' : 'colors'}
-          onClick={() => onhandSetting(true)}
-        />
-      </Dropdown>
-      }
+              </ul>
+            </div>
+          }
+          trigger={['click']}
+          placement="bottomLeft"
+          visible={visibleSetting}
+          onVisibleChange={onhandSetting}
+        >
+          <AcyIcon
+            width={30}
+            name={visibleSetting ? 'colors-active' : 'colors'}
+            onClick={() => onhandSetting(true)}
+          />
+        </Dropdown>
+      )}
       <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}>
         <div className={styles.walltitle}>
           <AcyIcon.MyIcon width={20} type="Wallet" />{' '}

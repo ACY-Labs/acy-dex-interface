@@ -4,11 +4,15 @@ import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 import { FortmaticConnector } from '@web3-react/fortmatic-connector';
 import { PortisConnector } from '@web3-react/portis-connector';
 import { TorusConnector } from '@web3-react/torus-connector';
+import { LedgerConnector } from '@web3-react/ledger-connector';
+import { TrezorConnector } from '@web3-react/trezor-connector';
 
 const RPC_URLS = {
   1: 'https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
   4: 'https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
 };
+const POLLING_INTERVAL = 12000;
+
 // 连接钱包时支持的货币id
 const injected = new InjectedConnector({
   supportedChainIds: [1, 3, 4, 5, 42],
@@ -30,4 +34,15 @@ const portis = new PortisConnector({
 });
 const torus = new TorusConnector({ chainId: 4, initOptions: { network: { host: 'rinkeby' } } });
 
-export { injected, walletconnect, walletlink, fortmatic, portis, torus };
+const ledger = new LedgerConnector({
+  chainId: 1,
+  url: RPC_URLS[1],
+  pollingInterval: POLLING_INTERVAL,
+});
+
+const trezor = new TrezorConnector({
+  chainId: 4,
+  url: RPC_URLS[4],
+});
+
+export { injected, walletconnect, walletlink, fortmatic, portis, torus, ledger, trezor };
