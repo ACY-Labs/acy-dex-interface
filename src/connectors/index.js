@@ -35,8 +35,8 @@ const portis = new PortisConnector({
 const torus = new TorusConnector({ chainId: 4, initOptions: { network: { host: 'rinkeby' } } });
 
 const ledger = new LedgerConnector({
-  chainId: 1,
-  url: RPC_URLS[1],
+  chainId: 4,
+  url: RPC_URLS[4],
   pollingInterval: POLLING_INTERVAL,
 });
 
