@@ -6,6 +6,7 @@ import farmsTableContent from './FarmsTableContent';
 import ToggleButtonGroup from './ToggleButtonGroup';
 import Switch from '@material-ui/core/Switch';
 import { FormControlLabel } from '@material-ui/core';
+import DaoTable from './DaoTable';
 
 const Farms = () => {
   const INITIAL_TABLE_DATA = farmsTableContent.map((row) => {
@@ -108,6 +109,7 @@ const Farms = () => {
           setRowNumber={setRowNumber}
           hideDao={hideDao}
         />
+        {selectedTable === 3 && <DaoTable />}
       </div>
     </PageHeaderWrapper>
   )
