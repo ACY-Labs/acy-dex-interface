@@ -5,13 +5,12 @@ import SampleStakeHistoryData, {
 } from '../sample_data/SampleStakeHistoryData';
 import styles from './StakeHistoryTable.less';
 
-const StakeHistoryTable = (props) => {
+const StakeHistoryTable = props => {
   const [stakeDisplayNumber, setStakeDisplayNumber] = useState(5);
-  const {dataSource,isMobile}=props;
-  console.log('dataSource',isMobile);
+  const { dataSource, isMobile } = props;
   return (
     <Table
-      columns={isMobile&&sampleStakeHistoryColumns.slice(0,3)||sampleStakeHistoryColumns}
+      columns={(isMobile && sampleStakeHistoryColumns.slice(0, 3)) || sampleStakeHistoryColumns}
       dataSource={dataSource}
       className={styles.tableStyle}
       pagination={false}
