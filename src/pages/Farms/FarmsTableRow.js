@@ -39,8 +39,10 @@ const FarmsTableRow = (
   }
 
   const updateBalancePercentage = (percentage) => {
-    setStake(balance * percentage / 100)
-    setBalancePercentage(percentage)
+    const percentageInt = percentage === '' ? 0 : parseInt(percentage, 10)
+    if (Number.isNaN(percentageInt)) return
+    setStake(balance * percentageInt / 100)
+    setBalancePercentage(percentageInt)
   }
 
   const updateDate = (type, value, index) => {
@@ -174,7 +176,7 @@ const FarmsTableRow = (
         </div>
       </div>
 
-      <AcyModal onCancel={hideModal} width={400} visible={isModalVisible}>
+      <AcyModal onCancel={hideModal} width={400} visible={true}>
         <div className={styles.amountRowContainer}>
           <div className={styles.amountRowInputContainer}>
             <input
@@ -185,7 +187,17 @@ const FarmsTableRow = (
           </div>
           <span className={styles.suffix}>ACY</span>
         </div>
-        <div className={styles.balanceAmountContainer}>Balance: 12345 {token1}-{token2}</div>
+        <div className={styles.balanceAmountContainer}>
+          <div>Balance: 12345 {token1}-{token2}</div>
+          <div className={styles.balanceAmountInputContainer}>
+            <input
+              className={styles.balanceAmountInput}
+              value={balancePercentage}
+              onChange={e => updateBalancePercentage(e.target.value)}
+            />
+            <span className={styles.balanceAmountSuffix}>%</span>
+          </div>
+        </div>
         <div className={styles.sliderWrapper}>
           <input
             type="range"
