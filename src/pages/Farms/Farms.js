@@ -4,9 +4,8 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import FarmsTable from './FarmsTable';
 import farmsTableContent from './FarmsTableContent';
 import ToggleButtonGroup from './ToggleButtonGroup';
-import Switch from '@material-ui/core/Switch';
-import { FormControlLabel } from '@material-ui/core';
 import DaoTable from './DaoTable';
+import TableControl from './TableControl';
 
 const Farms = () => {
   const INITIAL_TABLE_DATA = farmsTableContent.map((row) => {
@@ -77,28 +76,7 @@ const Farms = () => {
             onPremierToggleButtonClick={onPremierToggleButtonClick}
             onDaoToggleButtonClick={onDaoToggleButtonClick}
           />
-          <div className={styles.tableHeaderButtonContainer}>
-            <div className={styles.tableHeaderRadioButtonContainer}>
-              <FormControlLabel
-                control={<Switch name="checkedA" color="default" />}
-                label="Stake Only"
-                labelPlacement="start"
-              />
-            </div>
-            <div className={styles.tableHeaderSearchInputContainer}>
-              <input
-                type="text"
-                placeholder="Search by token symbol"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className={styles.searchInput}
-              />
-            </div>
-            <div className={styles.tableHeaderToggleButtonContainer}>
-              <button type="button" className={styles.activeToggleButton}>Active</button>
-              <button type="button" className={styles.endedToggleButton}>Ended</button>
-            </div>
-          </div>
+          <TableControl searchInput={searchInput} setSearchInput={setSearchInput} />
         </div>
         <FarmsTable
           tableRow={tableRow}
