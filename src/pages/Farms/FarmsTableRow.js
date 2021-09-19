@@ -176,7 +176,7 @@ const FarmsTableRow = (
         </div>
       </div>
 
-      <AcyModal onCancel={hideModal} width={400} visible={true}>
+      <AcyModal onCancel={hideModal} width={400} visible={isModalVisible}>
         <div className={styles.amountRowContainer}>
           <div className={styles.amountRowInputContainer}>
             <input
