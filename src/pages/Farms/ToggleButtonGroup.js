@@ -1,7 +1,14 @@
 import React from 'react';
 import styles from '@/pages/Farms/Farms.less';
 
-const ToggleButtonGroup = ({ selectedTable, onAllToggleButtonClick, onAcyToggleButtonClick, onPremierToggleButtonClick }) => {
+const ToggleButtonGroup = (
+  { selectedTable,
+    onAllToggleButtonClick,
+    onAcyToggleButtonClick,
+    onPremierToggleButtonClick,
+    onDaoToggleButtonClick,
+  }
+) => {
   return (
     <div className={styles.tableToggleButtonContainer}>
       <button
@@ -14,11 +21,19 @@ const ToggleButtonGroup = ({ selectedTable, onAllToggleButtonClick, onAcyToggleB
       </button>
       <button
         type="button"
-        className={styles.middleToggleButton}
+        className={styles.leftToggleButton}
         style={{ backgroundColor: selectedTable === 1 ? "#29292c" : "#2e3032", color: selectedTable === 1 ? "#1e5d91": ""}}
         onClick={onAcyToggleButtonClick}
       >
-        ACY
+        Standard
+      </button>
+      <button
+        type="button"
+        className={styles.middleToggleButton}
+        style={{ backgroundColor: selectedTable === 3 ? "#29292c" : "#2e3032", color: selectedTable === 3 ? "#1e5d91": ""}}
+        onClick={onDaoToggleButtonClick}
+      >
+        DAO
       </button>
       <button
         type="button"

@@ -284,9 +284,18 @@
   font-size: 1rem;
 }
 
-.middleToggleButton {
+.leftToggleButton {
   border: 1px solid transparent;
   border-radius: 15px 0 0 15px;
+  background-color: #29292c;
+  padding: 0.25rem 1.25rem;
+  // border-radius: 0.25rem 0 0 0.25rem;
+  margin-right: 0;
+  font-size: 1rem;
+}
+
+.middleToggleButton {
+  border: 1px solid transparent;
   background-color: #29292c;
   padding: 0.25rem 1.25rem;
   // border-radius: 0.25rem 0 0 0.25rem;
@@ -305,6 +314,7 @@
 }
 
 .firstToggleButton:hover,
+.leftToggleButton:hover,
 .middleToggleButton:hover,
 .lastToggleButton:hover {
   cursor: pointer;
@@ -490,5 +500,5 @@
   .farmsContainer > .tableControlButtonContainer > .tableHeaderButtonContainer > .tableHeaderToggleButtonContainer {
     justify-content: center;
   }
-  
+
 }

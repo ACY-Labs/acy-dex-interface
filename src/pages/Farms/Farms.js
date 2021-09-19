@@ -21,6 +21,7 @@ const Farms = () => {
   const [tableTitle, setTableTitle] = useState('All Farms')
   const [tableSubtitle, setTableSubtitle] = useState('Stake your LP tokens and earn token rewards')
   const [rowNumber, setRowNumber] = useState(INITIAL_ROW_NUMBER)
+  const [hideDao, setHideDao] = useState(true)
 
   const onRowClick = (index) => setTableRow((prevState) => {
     const prevTableRow = [ ...prevState ]
@@ -34,6 +35,7 @@ const Farms = () => {
     setTableTitle('All Farms')
     setTableSubtitle('Stake your LP tokens and earn token rewards')
     setRowNumber(5)
+    setHideDao(true)
   }
 
   const onAcyToggleButtonClick = () => {
@@ -44,6 +46,12 @@ const Farms = () => {
     setTableTitle('ACY Farms')
     setTableSubtitle('Stake your LP tokens and earn ACY token rewards')
     setRowNumber(5)
+    setHideDao(true)
+  }
+
+  const onDaoToggleButtonClick = () => {
+    setSelectedTable(3)
+    setHideDao(false)
   }
 
   const onPremierToggleButtonClick = () => {
@@ -54,6 +62,7 @@ const Farms = () => {
     setTableTitle('Premier Farms')
     setTableSubtitle('Stake your LP tokens and earn project/other token rewards')
     setRowNumber(INITIAL_ROW_NUMBER)
+    setHideDao(true)
   }
 
   return (
@@ -65,6 +74,7 @@ const Farms = () => {
             onAllToggleButtonClick={onAllToggleButtonClick}
             onAcyToggleButtonClick={onAcyToggleButtonClick}
             onPremierToggleButtonClick={onPremierToggleButtonClick}
+            onDaoToggleButtonClick={onDaoToggleButtonClick}
           />
           <div className={styles.tableHeaderButtonContainer}>
             <div className={styles.tableHeaderRadioButtonContainer}>
@@ -96,6 +106,7 @@ const Farms = () => {
           tableSubtitle={tableSubtitle}
           rowNumber={rowNumber}
           setRowNumber={setRowNumber}
+          hideDao={hideDao}
         />
       </div>
     </PageHeaderWrapper>
