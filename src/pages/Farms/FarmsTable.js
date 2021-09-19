@@ -3,6 +3,9 @@ import styles from '@/pages/Farms/Farms.less';
 import farmsTableContent from './FarmsTableContent'
 import FarmsTableRow from '@/pages/Farms/FarmsTableRow';
 import FarmsTableHeader from '@/pages/Farms/FarmsTableHeader';
+import { AcyBarChart, AcyLineChart, AcyPeriodTime } from '@/components/Acy';
+import StakeSection from '@/pages/Dao/components/StakeSection';
+import { graphSampleData, graphSampleData2 } from '@/pages/Dao/sample_data/SampleData';
 
 const FarmsTable = ({ tableRow, onRowClick, tableTitle, tableSubtitle, rowNumber, setRowNumber, hideDao }) => {
   const [walletConnected, setWalletConnected] = useState(false)
@@ -10,6 +13,28 @@ const FarmsTable = ({ tableRow, onRowClick, tableTitle, tableSubtitle, rowNumber
 
   const hideModal = () => setIsModalVisible(false)
   const showModal = () => setIsModalVisible(true)
+  const [activeGraphId, setActiveGraphId] = useState(0)
+  const [activeGraphData, setActiveGraphData] = useState(graphSampleData)
+
+  const changeGraphData = (id = 0) => {
+    if (id === 0) setActiveGraphData(graphSampleData)
+    else setActiveGraphData(graphSampleData2)
+  }
+
+  const selectTopChart = (pt) => {
+    const functionDict = {
+      'ACY': () => {
+        changeGraphData(0);
+        setActiveGraphId(0)
+      }
+      ,
+      'Reward': () => {
+        changeGraphData(1);
+        setActiveGraphId(1)
+      }
+    }
+    functionDict[pt]();
+  }
 
   return (
     <div className={styles.tableContainer}>
@@ -55,6 +80,31 @@ const FarmsTable = ({ tableRow, onRowClick, tableTitle, tableSubtitle, rowNumber
             hideModal={hideModal}
             isModalVisible={isModalVisible}
           />
+          <div>
+            <div className={styles.stakeSectionMain}>
+              <div className={styles.chartSection}>
+                <AcyPeriodTime
+                  onhandPeriodTimeChoose={selectTopChart}
+                  times={['ACY', 'Reward']}
+                  className={styles.switchChartsSelector}
+                />
+                {activeGraphId === 0 ? (
+                  <AcyBarChart data={activeGraphData} showXAxis />
+                ) : (
+                  <AcyLineChart
+                    backData={activeGraphData}
+                    data={activeGraphData}
+                    showXAxis
+                    showGradient
+                    showTooltip
+                    lineColor="#e29227"
+                    bgColor="#29292c"
+                  />
+                )}
+              </div>
+              <StakeSection />
+            </div>
+          </div>
         </div>
       )}
       <div className={styles.tableFooterContainer} onClick={() => setRowNumber(rowNumber + 5)} hidden={!hideDao}>

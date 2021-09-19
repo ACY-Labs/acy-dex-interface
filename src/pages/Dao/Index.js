@@ -68,31 +68,10 @@ export class Dao extends Component {
         <div className={styles.stakeSectionMain}>
           <div className={styles.chartSection}>
             <AcyPeriodTime
-                onhandPeriodTimeChoose={this.selectTopChart}
-                times={['ACY', 'Reward']}
-                className={styles.switchChartsSelector}
+              onhandPeriodTimeChoose={this.selectTopChart}
+              times={['ACY', 'Reward']}
+              className={styles.switchChartsSelector}
             />
-            {/* <AcySmallButtonGroup
-              activeButton={activeGraphId}
-              buttonList={[
-                [
-                  'ACY',
-                  () => {
-                    this.changeGraphData(0);
-                    this.setState({ activeGraphId: 0 });
-                  }
-                ],
-                [
-                  'Reward',
-                  () => {
-                    this.changeGraphData(1);
-                    this.setState({ activeGraphId: 1 });
-                  }
-                ],
-              ]}
-              containerClass={styles.switchChartsSelector}
-              theme="#eb5c20"
-            /> */}
             {activeGraphId === 0 ? (
               <AcyBarChart data={activeGraphData} showXAxis/>
             ) : (
