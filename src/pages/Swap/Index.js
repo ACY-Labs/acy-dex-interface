@@ -17,6 +17,8 @@ import {
 } from '@/components/Acy';
 import Media from 'react-media';
 import AcyPieChart from '@/components/AcyPieChartAlpha';
+import AcyRoutingChart from '@/components/AcyRoutingChart';
+
 import SwapComponent from '@/components/SwapComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import axios from 'axios';
@@ -116,12 +118,13 @@ class BasicProfile extends Component {
       )
       .then(data => {
         console.log(data);
-        const { swaps } = data.data.data;
-        const lastDataPoint = swaps[swaps.length - 1];
-        console.log('ROUTE PRICE POINT', lastDataPoint);
-        this.setState({
-          pricePoint: lastDataPoint.rate,
-        });
+        debugger
+        // const { swaps } = data.data.data;
+        // const lastDataPoint = swaps[swaps.length - 1];
+        // console.log('ROUTE PRICE POINT', lastDataPoint);
+        // this.setState({
+        //   pricePoint: lastDataPoint.rate,
+        // });
       });
   }
 
@@ -374,98 +377,102 @@ class BasicProfile extends Component {
           )}
         </div>
         <div className={styles.exchangeBottomWrapper}>
+          <div style={{height:'300px'}}>
+            <AcyRoutingChart />
+          </div>
           {this.state.isReceiptObtained && (
             <div className={styles.option}>
               <div>
                 <AcyCard title="">
-                  {this.state.isReceiptObtained ? (
-                    <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                      <div className={styles.routing}>
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            marginRight: '10px',
-                            color: '#EB5C20',
-                            borderRight: '1px solid #2c2f36',
-                          }}
-                        >
-                          <img
-                            src={
-                              supportedTokens.filter(
-                                entry => entry.symbol == this.state.pastToken0
-                              )[0].logoURI
-                            }
-                            width={(isMobile && 30) || 50}
-                            height={(isMobile && 30) || 50}
-                            style={{ marginRight: '10px' }}
-                          />
-                          {/* <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="USDC" /> */}
-                        </div>
-                        <div className={styles.routing_middle}>
-                          <div className={styles.nodes}>
-                            {this.state.routeData.map(item => {
-                              return (
-                                <div className={styles.nodes_item}>
-                                  <span>100%</span>
-                                  <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                                  <div className={styles.node}>
-                                    <div>
-                                      <img
-                                        src={
-                                          supportedTokens.filter(
-                                            entry =>
-                                              entry.address.toLowerCase() == item.from.toLowerCase()
-                                          )[0].logoURI
-                                        }
-                                        width={(isMobile && 30) || 50}
-                                        height={(isMobile && 30) || 50}
-                                        style={{ padding: '10px' }}
-                                      />
-                                    </div>
-                                    <div>
-                                      <p className={styles.r_title}>
-                                        {item.value}{' '}
-                                        {
-                                          supportedTokens.filter(
-                                            entry =>
-                                              entry.address.toLowerCase() == item.from.toLowerCase()
-                                          )[0].symbol
-                                        }
-                                      </p>
-                                      <p className={styles.r_desc}>
-                                        {abbrNumber(this.state.pricePoint * item.value)} $
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            marginRight: '10px',
-                            color: '#EB5C20',
-                            borderLeft: '1px solid #2c2f36',
-                          }}
-                        >
-                          <img
-                            src={
-                              supportedTokens.filter(
-                                entry => entry.symbol == this.state.pastToken1
-                              )[0].logoURI
-                            }
-                            width={(isMobile && 30) || 50}
-                            height={(isMobile && 30) || 50}
-                            style={{ marginLeft: '10px' }}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                  {/* {this.state.isReceiptObtained ? (<AcyRoutingChart /> */}
+                  {false ? (<AcyRoutingChart />
+                    // <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                    //   <div className={styles.routing}>
+                    //     <div
+                    //       style={{
+                    //         display: 'flex',
+                    //         alignItems: 'center',
+                    //         marginRight: '10px',
+                    //         color: '#EB5C20',
+                    //         borderRight: '1px solid #2c2f36',
+                    //       }}
+                    //     >
+                    //       <img
+                    //         src={
+                    //           supportedTokens.filter(
+                    //             entry => entry.symbol == this.state.pastToken0
+                    //           )[0].logoURI
+                    //         }
+                    //         width={(isMobile && 30) || 50}
+                    //         height={(isMobile && 30) || 50}
+                    //         style={{ marginRight: '10px' }}
+                    //       />
+                    //       {/* <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="USDC" /> */}
+                    //     </div>
+                    //     <div className={styles.routing_middle}>
+                    //       <div className={styles.nodes}>
+                    //         {this.state.routeData.map(item => {
+                    //           return (
+                    //             <div className={styles.nodes_item}>
+                    //               <span>100%</span>
+                    //               <Icon style={{ margin: '0 10px' }} type="arrow-right" />
+                    //               <div className={styles.node}>
+                    //                 <div>
+                    //                   <img
+                    //                     src={
+                    //                       supportedTokens.filter(
+                    //                         entry =>
+                    //                           entry.address.toLowerCase() == item.from.toLowerCase()
+                    //                       )[0].logoURI
+                    //                     }
+                    //                     width={(isMobile && 30) || 50}
+                    //                     height={(isMobile && 30) || 50}
+                    //                     style={{ padding: '10px' }}
+                    //                   />
+                    //                 </div>
+                    //                 <div>
+                    //                   <p className={styles.r_title}>
+                    //                     {item.value}{' '}
+                    //                     {
+                    //                       supportedTokens.filter(
+                    //                         entry =>
+                    //                           entry.address.toLowerCase() == item.from.toLowerCase()
+                    //                       )[0].symbol
+                    //                     }
+                    //                   </p>
+                    //                   <p className={styles.r_desc}>
+                    //                     {abbrNumber(this.state.pricePoint * item.value)} $
+                    //                   </p>
+                    //                 </div>
+                    //               </div>
+                    //               <Icon style={{ margin: '0 10px' }} type="arrow-right" />
+                    //             </div>
+                    //           );
+                    //         })}
+                    //       </div>
+                    //     </div>
+                    //     <div
+                    //       style={{
+                    //         display: 'flex',
+                    //         alignItems: 'center',
+                    //         marginRight: '10px',
+                    //         color: '#EB5C20',
+                    //         borderLeft: '1px solid #2c2f36',
+                    //       }}
+                    //     >
+                    //       <img
+                    //         src={
+                    //           supportedTokens.filter(
+                    //             entry => entry.symbol == this.state.pastToken1
+                    //           )[0].logoURI
+                    //         }
+                    //         width={(isMobile && 30) || 50}
+                    //         height={(isMobile && 30) || 50}
+                    //         style={{ marginLeft: '10px' }}
+                    //       />
+                    //     </div>
+                    //   </div>
+                    // </div>
                   ) : (
                     <div
                       style={{
