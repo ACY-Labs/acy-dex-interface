@@ -13,17 +13,15 @@ import {
   AcyPriceChart,
   AcyConfirm,
   AcyApprove,
-  AcyBarChart,
 } from '@/components/Acy';
 import Media from 'react-media';
-import AcyPieChart from '@/components/AcyPieChartAlpha';
 import SwapComponent from '@/components/SwapComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import axios from 'axios';
+import supportedTokens from '@/constants/TokenList';
+import moment from 'moment';
 import StakeHistoryTable from './components/StakeHistoryTable';
 import styles from './styles.less';
-import moment from 'moment';
-import { supportedTokens } from '@/acy-dex-swap/utils/index';
 
 const { AcyTabPane } = AcyTabs;
 
@@ -75,22 +73,21 @@ class BasicProfile extends Component {
     range: '1D',
     activeTime: 'Loading...',
     activeRate: 'Loading...',
-    activeToken0: {
+    activePercentageChange: '+0.00',
+    activeToken1: {
       symbol: 'USDC',
       address: '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b',
       addressOnEth: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
       decimal: 6,
       logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
     },
-    activeToken1: {
+    activeToken0: {
       symbol: 'ETH',
       address: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
       addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
       decimal: 18,
       logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
     },
-    token0Address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-    token1Address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
     format: 'h:mm:ss a',
     routeData: [],
     isReceiptObtained: false,
@@ -126,14 +123,15 @@ class BasicProfile extends Component {
   }
 
   getPrice() {
-    const { range, token0Address, token1Address, format } = this.state;
-    console.log('AXIOS BOY');
+    const { range, activeToken0, activeToken1 } = this.state;
+
     axios
       .post(
-        `https://api.acy.finance/api/chart/swap?token0=${token0Address}&token1=${token1Address}&range=${range}`
+        `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${
+          activeToken1.addressOnEth
+        }&range=${range}`
       )
       .then(data => {
-        console.log(data);
         const { swaps } = data.data.data;
         const lastDataPoint = swaps[swaps.length - 1];
         this.setState({
@@ -141,11 +139,25 @@ class BasicProfile extends Component {
           activeRate: lastDataPoint.rate.toFixed(3),
           activeTime: lastDataPoint.time,
         });
+      })
+      .catch(e => {
+        this.setState({
+          chartData: [],
+          activeRate: 'No data',
+          activeTime: 'No data',
+        });
       });
   }
 
   lineTitleRender = () => {
-    const { activeTime, activeRate, activeToken0, activeToken1, format } = this.state;
+    const {
+      activeTime,
+      activeRate,
+      activePercentageChange,
+      activeToken0,
+      activeToken1,
+      format,
+    } = this.state;
 
     let token0logo = null;
     let token1logo = null;
@@ -164,7 +176,7 @@ class BasicProfile extends Component {
           <div style={{ display: 'flex' }}>
             <img
               src={token0logo}
-              alt={activeToken0.symbol}
+              alt=""
               style={{
                 width: 24,
                 maxWidth: '24px',
@@ -175,7 +187,7 @@ class BasicProfile extends Component {
             />
             <img
               src={token1logo}
-              alt={activeToken1.symbol}
+              alt=""
               style={{ width: 24, maxHeight: '24px', marginRight: '0.5rem', marginTop: '0.1rem' }}
             />
           </div>
@@ -185,7 +197,7 @@ class BasicProfile extends Component {
         </div>
         <div className={styles.secondarytitle}>
           <span className={styles.lighttitle}>{activeRate}</span>{' '}
-          <span className={styles.percentage}>12.4%</span>{' '}
+          <span className={styles.percentage}>{activePercentageChange}%</span>{' '}
           {moment(activeTime)
             .locale('en')
             .local()
@@ -308,12 +320,15 @@ class BasicProfile extends Component {
               <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
                 <div className={styles.trade}>
                   <SwapComponent
-                    onSelectToken={this.getPrice}
                     onSelectToken0={token => {
-                      this.setState({ activeToken0: token });
+                      this.setState({ activeToken0: token }, () => {
+                        this.getPrice();
+                      });
                     }}
                     onSelectToken1={token => {
-                      this.setState({ activeToken1: token });
+                      this.setState({ activeToken1: token }, () => {
+                        this.getPrice();
+                      });
                     }}
                     onGetReceipt={this.onGetReceipt}
                   />
@@ -342,7 +357,15 @@ class BasicProfile extends Component {
                     lineColor="#e29227"
                     range={range}
                     onHover={(data, dataIndex) => {
-                      this.setState({ activeTime: chartData[dataIndex][0], activeRate: data });
+                      const prevData = dataIndex === 0 ? 0 : chartData[dataIndex - 1][1];
+                      this.setState({
+                        activeTime: chartData[dataIndex][0],
+                        activeRate: data,
+                        activePercentageChange:
+                          dataIndex === 0
+                            ? '0'
+                            : `${(((data - prevData) / prevData) * 100).toFixed(2)}`,
+                      });
                     }}
                   />
                   <AcyPeriodTime
@@ -359,12 +382,15 @@ class BasicProfile extends Component {
               <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
                 <div className={styles.trade}>
                   <SwapComponent
-                    onSelectToken={this.getPrice}
                     onSelectToken0={token => {
-                      this.setState({ activeToken0: token });
+                      this.setState({ activeToken0: token }, () => {
+                        this.getPrice();
+                      });
                     }}
                     onSelectToken1={token => {
-                      this.setState({ activeToken1: token });
+                      this.setState({ activeToken1: token }, () => {
+                        this.getPrice();
+                      });
                     }}
                     onGetReceipt={this.onGetReceipt}
                   />
