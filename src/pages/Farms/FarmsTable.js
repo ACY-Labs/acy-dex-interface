@@ -6,6 +6,7 @@ import FarmsTableHeader from '@/pages/Farms/FarmsTableHeader';
 import { AcyBarChart, AcyLineChart, AcyPeriodTime } from '@/components/Acy';
 import StakeSection from '@/pages/Dao/components/StakeSection';
 import { graphSampleData, graphSampleData2 } from '@/pages/Dao/sample_data/SampleData';
+import DaoChart from './DaoChart';
 
 const FarmsTable = ({ tableRow, onRowClick, tableTitle, tableSubtitle, rowNumber, setRowNumber, hideDao }) => {
   const [walletConnected, setWalletConnected] = useState(false)
@@ -26,8 +27,7 @@ const FarmsTable = ({ tableRow, onRowClick, tableTitle, tableSubtitle, rowNumber
       'ACY': () => {
         changeGraphData(0);
         setActiveGraphId(0)
-      }
-      ,
+      },
       'Reward': () => {
         changeGraphData(1);
         setActiveGraphId(1)
@@ -82,27 +82,16 @@ const FarmsTable = ({ tableRow, onRowClick, tableTitle, tableSubtitle, rowNumber
           />
           <div>
             <div className={styles.stakeSectionMain}>
-              <div className={styles.chartSection}>
-                <AcyPeriodTime
-                  onhandPeriodTimeChoose={selectTopChart}
-                  times={['ACY', 'Reward']}
-                  className={styles.switchChartsSelector}
-                />
-                {activeGraphId === 0 ? (
-                  <AcyBarChart data={activeGraphData} showXAxis />
-                ) : (
-                  <AcyLineChart
-                    backData={activeGraphData}
-                    data={activeGraphData}
-                    showXAxis
-                    showGradient
-                    showTooltip
-                    lineColor="#e29227"
-                    bgColor="#29292c"
-                  />
-                )}
-              </div>
-              <StakeSection />
+              <DaoChart
+                activeGraphId={activeGraphId}
+                activeGraphData={activeGraphData}
+                selectTopChart={selectTopChart}
+              />
+              <DaoChart
+                activeGraphId={activeGraphId}
+                activeGraphData={activeGraphData}
+                selectTopChart={selectTopChart}
+              />
             </div>
           </div>
         </div>
