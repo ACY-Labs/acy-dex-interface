@@ -52,6 +52,8 @@ const Farms = () => {
   const onDaoToggleButtonClick = () => {
     setSelectedTable(3)
     setHideDao(false)
+    setTableTitle('DAO Farms')
+    setTableSubtitle('Stake your ACY tokens and earn ACY token rewards')
   }
 
   const onPremierToggleButtonClick = () => {
@@ -65,6 +67,10 @@ const Farms = () => {
     setHideDao(true)
   }
 
+  const onMyFarmsButtonClick = () => {
+    setSelectedTable(4)
+  }
+
   return (
     <PageHeaderWrapper>
       <div className={styles.farmsContainer}>
@@ -75,19 +81,22 @@ const Farms = () => {
             onAcyToggleButtonClick={onAcyToggleButtonClick}
             onPremierToggleButtonClick={onPremierToggleButtonClick}
             onDaoToggleButtonClick={onDaoToggleButtonClick}
+            onMyFarmsToggleButtonClick={onMyFarmsButtonClick}
           />
           <TableControl searchInput={searchInput} setSearchInput={setSearchInput} />
         </div>
-        <FarmsTable
-          tableRow={tableRow}
-          onRowClick={onRowClick}
-          tableTitle={tableTitle}
-          tableSubtitle={tableSubtitle}
-          rowNumber={rowNumber}
-          setRowNumber={setRowNumber}
-          hideDao={hideDao}
-        />
-        {selectedTable === 3 && <DaoTable />}
+        {selectedTable !== 4 && (
+          <FarmsTable
+            tableRow={tableRow}
+            onRowClick={onRowClick}
+            tableTitle={tableTitle}
+            tableSubtitle={tableSubtitle}
+            rowNumber={rowNumber}
+            setRowNumber={setRowNumber}
+            hideDao={hideDao}
+          />
+        )}
+        {selectedTable === 4 && <DaoTable />}
       </div>
     </PageHeaderWrapper>
   )

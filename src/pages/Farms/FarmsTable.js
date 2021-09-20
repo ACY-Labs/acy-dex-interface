@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styles from '@/pages/Farms/Farms.less';
-import farmsTableContent from './FarmsTableContent'
 import FarmsTableRow from '@/pages/Farms/FarmsTableRow';
 import FarmsTableHeader from '@/pages/Farms/FarmsTableHeader';
-import { AcyBarChart, AcyLineChart, AcyPeriodTime } from '@/components/Acy';
-import StakeSection from '@/pages/Dao/components/StakeSection';
 import { graphSampleData, graphSampleData2 } from '@/pages/Dao/sample_data/SampleData';
 import DaoChart from './DaoChart';
 
