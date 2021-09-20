@@ -23,6 +23,7 @@ import AcySeting from '@/components/AcySeting';
 import AcyPieChart from '@/components/AcyPieChart';
 import AcyLiquidityPositions from '@/components/AcyLiquidityPositions';
 import AcyPriceChart from '@/components/AcyPriceChart';
+import AcyTokenIcon from '@/components/AcyTokenIcon'
 
 const Acy = {
   AcyPieChart,
@@ -50,6 +51,7 @@ const Acy = {
   AcySeting,
   AcyLiquidityPositions,
   AcyPriceChart,
+  AcyTokenIcon
 };
 
 export {
@@ -79,4 +81,5 @@ export {
   AcySeting,
   AcyLiquidityPositions,
   AcyPriceChart,
+  AcyTokenIcon
 };

@@ -132,6 +132,8 @@ const AddLiquidityComponent = props => {
   const [tokenSearchInput, setTokenSearchInput] = useState('');
   const [tokenList, setTokenList] = useState(INITIAL_TOKEN_LIST);
 
+  // method to update the value of token search input field,
+  // and filter the token list based on the comparison of the value of search input field and token symbol.
   const onTokenSearchChange = e => {
     setTokenSearchInput(e.target.value);
     setTokenList(
@@ -307,6 +309,13 @@ const AddLiquidityComponent = props => {
     },
     [chainId, library, account]
   );
+
+  useEffect(() => {
+    // focus search input every time token modal is opened.
+    // setTimeout is used as a workaround as document.getElementById always return null without  some delay.
+    const focusSearchInput = () => document.getElementById('liquidity-token-search-input').focus()
+    if (visible === true) setTimeout(focusSearchInput, 100)
+  }, [visible])
 
   const onClickCoin = () => {
     setVisible(true);
@@ -666,6 +675,7 @@ const AddLiquidityComponent = props => {
             placeholder="Enter the token symbol or address"
             value={tokenSearchInput}
             onChange={onTokenSearchChange}
+            id="liquidity-token-search-input"
           />
         </div>
 

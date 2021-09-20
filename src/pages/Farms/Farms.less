@@ -70,7 +70,7 @@
 .tableContainer {
   background-color: #29292c;
   border-radius: 0.5rem;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   overflow: hidden;
 
   .tableBodyContainer {
@@ -284,9 +284,18 @@
   font-size: 1rem;
 }
 
-.middleToggleButton {
+.leftToggleButton {
   border: 1px solid transparent;
   border-radius: 15px 0 0 15px;
+  background-color: #29292c;
+  padding: 0.25rem 1.25rem;
+  // border-radius: 0.25rem 0 0 0.25rem;
+  margin-right: 0;
+  font-size: 1rem;
+}
+
+.middleToggleButton {
+  border: 1px solid transparent;
   background-color: #29292c;
   padding: 0.25rem 1.25rem;
   // border-radius: 0.25rem 0 0 0.25rem;
@@ -305,6 +314,7 @@
 }
 
 .firstToggleButton:hover,
+.leftToggleButton:hover,
 .middleToggleButton:hover,
 .lastToggleButton:hover {
   cursor: pointer;
@@ -358,6 +368,37 @@
 
 .balanceAmountContainer {
   margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .balanceAmountInputContainer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    position: relative;
+
+    .balanceAmountInput {
+      background-color: #1B1B1C;
+      border: none;
+      border-radius: 9999px;
+      box-shadow: 0 0 0 0.5px transparent;
+      padding: 1px 1.5rem 1px 0.75rem;
+      text-align: right;
+      width: 4rem;
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.5px #1e5d91;
+      }
+    }
+
+    .balanceAmountSuffix {
+      position: absolute;
+      top: 1px;
+      right: 0.5rem;
+    }
+  }
 }
 
 .sliderWrapper {
@@ -490,5 +531,29 @@
   .farmsContainer > .tableControlButtonContainer > .tableHeaderButtonContainer > .tableHeaderToggleButtonContainer {
     justify-content: center;
   }
-  
+}
+
+.stakeSectionMain {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding: 0;
+}
+
+.chartSection {
+  width: 49%;
+  background-color: #1b1b1c;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  padding: 55px 15px 0 15px;
+  overflow: hidden;
+  height: 315px;
+  position: relative;
+
+  .switchChartsSelector {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
 }

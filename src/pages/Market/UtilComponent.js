@@ -1,4 +1,4 @@
-import { AcyIcon, AcyTabs } from '@/components/Acy';
+import { AcyIcon, AcyTabs, AcyTokenIcon } from '@/components/Acy';
 import { Divider, Icon, Input, Table } from 'antd';
 import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -8,27 +8,10 @@ import { Link } from 'react-router-dom';
 import styles from './styles.less';
 import { abbrHash, abbrNumber, isDesktop, sortTable, TransactionType } from './Util.js';
 import { WatchlistManager } from './WatchlistManager.js';
-import supportedTokens from '@/constants/TokenList';
 
 const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');
 const watchlistManagerPool = new WatchlistManager('pool');
-
-function TableImage(props) {
-  const [isError, setIsError] = useState(false);
-
-  return (
-    <>
-    {!isError ? <img
-      src={`https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/${props.symbol === "WETH" ? "ETH" : props.symbol}.svg`}
-      width={20}
-      height={20}
-      onError={() => setIsError(true)}
-    /> : <AcyIcon name="unknown" width={20}/>}
-    
-    </>
-  );
-}
 
 export class SmallTable extends React.Component {
   constructor(props) {
@@ -255,7 +238,7 @@ export function TokenTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableDataFirstColumn}>
-              <TableImage symbol={entry.short}/>
+              <AcyTokenIcon symbol={entry.short}/>
               <Link
                 style={{ color: '#b5b5b6' }}
                 className={styles.coinName}
@@ -444,8 +427,8 @@ export function PoolTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableDataFirstColumn}>
-              <TableImage symbol={entry.coin1}/>
-              <TableImage symbol={entry.coin2}/>
+              <AcyTokenIcon symbol={entry.coin1}/>
+              <AcyTokenIcon symbol={entry.coin2}/>
               <Link
                 style={{ color: '#b5b5b6' }}
                 className={styles.coinName}

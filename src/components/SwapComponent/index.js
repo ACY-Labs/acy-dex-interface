@@ -85,7 +85,7 @@ import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import moment from 'moment';
 
 const SwapComponent = props => {
-  const { dispatch, onSelectToken0, onSelectToken1 } = props;
+  const { dispatch, onSelectToken0, onSelectToken1, onSelectToken } = props;
 
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
@@ -144,6 +144,8 @@ const SwapComponent = props => {
   const [tokenSearchInput, setTokenSearchInput] = useState('');
   const [tokenList, setTokenList] = useState(INITIAL_TOKEN_LIST);
 
+  // method to update the value of token search input field,
+  // and filter the token list based on the comparison of the value of search input field and token symbol.
   const onTokenSearchChange = e => {
     setTokenSearchInput(e.target.value);
     setTokenList(
@@ -348,10 +350,10 @@ const SwapComponent = props => {
       if (account == undefined) {
         alert('Please connect to your account');
       } else {
-        onSelectToken0(token.symbol);
+        console.log('SET TOKEN 0');
+        console.log(onSelectToken0);
+        onSelectToken0(token);
         setToken0(token);
-        console.log('GETTING BALANCES');
-        console.log(chainId);
         setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
         setToken0BalanceShow(true);
       }
@@ -359,13 +361,24 @@ const SwapComponent = props => {
       if (account == undefined) {
         alert('Please connect to your account');
       } else {
-        onSelectToken1(token.symbol);
+        onSelectToken1(token);
         setToken1(token);
         setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
         setToken1BalanceShow(true);
       }
     }
   };
+
+  useEffect(
+    () => {
+      // focus search input every time token modal is opened.
+      // setTimeout is used as a workaround as document.getElementById always return null without  some delay.
+      const focusSearchInput = () =>
+        document.getElementById('liquidity-token-search-input').focus();
+      if (visible === true) setTimeout(focusSearchInput, 100);
+    },
+    [visible]
+  );
 
   const onClickCoin = () => {
     setVisible(true);
@@ -681,6 +694,7 @@ const SwapComponent = props => {
             placeholder="Enter the token symbol or address"
             value={tokenSearchInput}
             onChange={onTokenSearchChange}
+            id="liquidity-token-search-input"
           />
         </div>
 

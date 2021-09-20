@@ -131,7 +131,7 @@
   .amountRowTitle {
     flex: 1;
     font-size: 1.25rem;
-    
+
     text-align: left;
   }
 
@@ -141,23 +141,18 @@
     input {
       width: 100%;
       background-color: #1B1B1C;
-      border: 0 solid #40444f99;
+      border: none;
+      box-shadow: 0 0 0 0.5px #1B1B1C;
       border-radius: 9999px;
       font-size: 1.5rem;
       padding: 0 1rem;
       -moz-appearance: textfield;
-      box-shadow: 0 0 0 0.5px transparent;
-      margin-bottom: 0.25rem;
-
-      &:hover {
-        border: 0 solid #40444fff;
-      }
+      margin: 1px 0 0.25rem 0;
     }
 
     input:focus {
       outline: none;
       box-shadow: 0 0 0 0.5px #eb5c20;
-      // transition: .1s;
     }
 
     input::-webkit-outer-spin-button,
@@ -172,6 +167,7 @@
     font-size: 1rem;
     position: absolute;
     right: 1.25rem;
+    top: 0.45rem;
   }
 }
 
@@ -181,7 +177,7 @@
 
   .balanceRowTitleContainer {
     flex: 1;
-    
+
 
     .balanceRowTitle {
       text-align: left;
@@ -282,7 +278,7 @@
 
   .lockTimeRowTitleContainer {
     flex: 1;
-    
+
 
     .lockTimeRowTitle {
       text-align: left;
