@@ -194,3 +194,37 @@ export function sortAddress(text) {
     return text;
   }
 }
+
+// 数字格式化
+export function abbrNumber(number) {
+  const THOUSAND = 0;
+  const MILLION = 1;
+
+  let currentDivision = -1;
+  let result = '';
+  let tempNumber = number;
+
+  if (number >= 1000) {
+    tempNumber /= 1000;
+    currentDivision = 0;
+  }
+
+  if (number >= 1000000) {
+    tempNumber /= 1000;
+    currentDivision = 1;
+  }
+
+  switch (currentDivision) {
+    case 0:
+      result = `${tempNumber.toFixed(2)}k`;
+      break;
+    case 1:
+      result = `${tempNumber.toFixed(2)}m`;
+      break;
+    default:
+      result = `${number.toFixed(4)}`;
+      break;
+  }
+
+  return result;
+}

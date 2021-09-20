@@ -27,7 +27,7 @@ import {
 import { Input } from 'antd';
 import { connect } from 'umi';
 import styles from './styles.less';
-import { sortAddress } from '@/utils/utils';
+import { sortAddress,abbrNumber } from '@/utils/utils';
 import axios from 'axios';
 
 import { useWeb3React } from '@web3-react/core';
@@ -441,15 +441,16 @@ const SwapComponent = props => {
           await library.getBlock(receipt.logs[0].blockNumber).then((data)=>{
             transactionTime=moment(parseInt(data.timestamp*1000)).format('YYYY-MM-DD hh:mm:ss')
           });
-          debugger
           receipt.logs.map(item=>{
             if(item.address==inputToken.address){
               // inputtoken 数量
-              inputTokenNum=BigNumber.from(receipt.logs[0].data).toString()/Math.pow(10,18);
+              // inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimal))).toString();
+              inputTokenNum=item.data/Math.pow(10,inputToken.decimal).toString();
             }
             if(item.address==outToken.address){
               // outtoken 数量
-              outTokenNum=BigNumber.from(receipt.logs[2].data).toString()/Math.pow(10,6);
+              // outTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0", outToken.decimal))).toString();
+              outTokenNum=item.data/Math.pow(10,outToken.decimal).toString();
             }
           });
           // 获取美元价值
@@ -457,8 +458,8 @@ const SwapComponent = props => {
          .post(
            `https://api.acy.finance/api/chart/swap?token0=${inputToken.addressOnEth}&token1=${outToken.addressOnEth}&range=1D`
          )
-         .then(data => {debugger
-          totalToken=inputTokenNum*data.data.data.swaps[data.data.data.swaps.length-1].rate;
+         .then(data => {
+          totalToken=abbrNumber(inputTokenNum*data.data.data.swaps[data.data.data.swaps.length-1].rate);
            
            // const { swaps } = data.data.data;
            // const lastDataPoint = swaps[swaps.length - 1];

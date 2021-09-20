@@ -231,3 +231,97 @@
     }
   }
 }
+:global{
+  @keyframes expand {
+    10% {
+      r: 0;
+    }
+    20% {
+      r: 40;
+    }
+    100% {
+      r: 40;
+    }
+  }
+  
+  .myCircle {
+    animation: expand 6s ease infinite;
+    animation-fill-mode: forwards;
+  }
+  
+  .coin circle {
+    fill: #757579;
+    stroke-width: 0px;
+  }
+  
+  .coin text {
+    stroke: white;
+    stroke-width: 1px;
+    fill: white;
+  }
+  
+  @keyframes showAndHide {
+    0% {
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    40% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  
+  @keyframes highlightOnEnd {
+    0% {
+      font-weight: auto;
+      font-size: 14px;
+    }
+    20% {
+      font-weight: auto;
+      font-size: 14px;
+    }
+    25% {
+      font-weight: bold;
+      font-size: 20px;
+    }
+    30% {
+      font-weight: auto;
+      font-size: 14px;
+    }
+    100% {
+      font-weight: auto;
+      font-size: 14px;
+    }
+  }
+  
+  .ratios {
+    color: #ea5c1f;
+    border-radius: 3px;
+    padding: 2px;
+    min-width: 30px;
+    text-align: center;
+    animation: highlightOnEnd 8.5s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+  }
+  
+  .ratios.id-1 {
+    color: #70ba33;
+  }
+  
+  .ratios.id-3 {
+    color: #e29227 !important;
+  }
+  
+  #algo_title {
+    color: white;
+    animation: showAndHide 8.5s;
+    animation-fill-mode: forwards;
+    animation-iteration-count: infinite;
+  }
+  
+}

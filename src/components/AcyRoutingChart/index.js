@@ -1,262 +1,193 @@
-import React, { Component } from 'react';
-import ReactEcharts from 'echarts-for-react';
-import * as echarts from 'echarts'; //渐变色
-import 'echarts/lib/chart/line';
-import 'echarts/lib/component/tooltip';
-import 'echarts/lib/component/title'; // 此处是按需引入
+import React, { Component,useState } from 'react';
 import style from './index.less';
 
-let defaultData = [
-  ['2000-06-05', 116],
-  ['2000-06-06', 129],
-  ['2000-06-07', 135],
-  ['2000-06-08', 86],
-  ['2000-06-09', 73],
-  ['2000-06-10', 85],
-  ['2000-06-11', 73],
-  ['2000-06-12', 68],
-  ['2000-06-13', 92],
-  ['2000-06-14', 130],
-  ['2000-06-15', 245],
-  ['2000-06-16', 139],
-  ['2000-06-17', 115],
-  ['2000-06-18', 111],
-  ['2000-06-19', 309],
-  ['2000-06-20', 206],
-  ['2000-06-21', 137],
-  ['2000-06-22', 1000],
-  ['2000-06-23', 85],
-  ['2000-06-24', 94],
-  ['2000-06-25', 71],
-  ['2000-06-26', 106],
-  ['2000-06-27', 84],
-  ['2000-06-28', 93],
-  ['2000-06-29', 85],
-  ['2000-06-30', 73],
-  ['2000-07-01', 83],
-  ['2000-07-02', 125],
-  ['2000-07-03', 107],
-  ['2000-07-04', 82],
-  ['2000-07-05', 44],
-  ['2000-07-06', 72],
-  ['2000-07-07', 106],
-  ['2000-07-08', 107],
-  ['2000-07-09', 66],
-  ['2000-07-10', 91],
-  ['2000-07-11', 92],
-  ['2000-07-12', 113],
-  ['2000-07-13', 107],
-  ['2000-07-14', 131],
-  ['2000-07-15', 111],
-  ['2000-07-16', 64],
-  ['2000-07-17', 69],
-  ['2000-07-18', 88],
-  ['2000-07-19', 77],
-  ['2000-07-20', 83],
-  ['2000-07-21', 111],
-  ['2000-07-22', 57],
-  ['2000-07-23', 55],
-  ['2000-07-24', 60],
-];
+const AcyRoutingChart = (props) => {
 
-class AcyLineChart extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      imgType: 'line', // 默认折线图
-      xtitle: this.props.xtitle, // x轴类目名称取参
-      data: this.props.data,
-    };
-  }
-  componentDidMount() {}
-  // getOption 这个函数主要用于配置 option，包括将数据配置进去
-  // 也可以将其放在 state 中，然后通过 setState 更新
-  // setState wrapper
+  console.log('routing',props.data);
+  // 上行路径
+  const [topLine,setTopLine]=useState();
+  // 中间路径
+  const [middleLine,setMiddleLine]=useState();
+  // 下行路径
+  const [bottomLine,setBottomLine]=useState();
 
-  renderTooltip = v => {
-    // var inner = '<div style="padding: 25px 20px; border: 1px solid #FCEA00; background-color: rgba(0, 0, 0, 0.7);">'+v[0].value+'</div>'
-    if (this.props.onHover) this.props.onHover(v[0].data, v[0].dataIndex);
+  return <svg style={{ width: "100%", height: "100%" }} viewBox="0 0 600 400">
+    <g transform="translate(50,200)">
+      {/* <g>
+        <path
+          id="upcurve"
+          d="M0,0
+          a220,110 0 1,1 500,0"
+          style={{ fill: "none", stroke: "gray", strokeWidth: 2 }}
+        />
+      </g> */}
+      <g>
+        <path
+          id="line"
+          d="M0,0 L500,0"
+          style={{ fill: "none", stroke: "gray", strokeWidth: 2 }}
+        />
+      </g>
+      {/* <g>
+        <path
+          id="downcurve"
+          d="M0,0
+          a220,110 0 1,0 500,0"
+          style={{ fill: "none", stroke: "gray", strokeWidth: 2 }}
+        />
+      </g> */}
+      <g>
+        {/* <g
+          transform="translate(60,-120)"
+          textAnchor="middle"
+          alignmentBaseline="middle"
+        >
+          <text
+            x="0"
+            y="15"
+            textAnchor="middle"
+            stroke="white"
+            strokeWidth="1px"
+            alignmentBaseline="middle"
+          >
+            15%
+          </text>
+        </g> */}
+        <g
+          transform="translate(60,-40)"
+          textAnchor="middle"
+          alignmentBaseline="middle"
+        >
+          <text
+            x="0"
+            y="15"
+            textAnchor="middle"
+            stroke="white"
+            strokeWidth="1px"
+            alignmentBaseline="middle"
+          >
+            100%
+          </text>
+        </g>
+        {/* <g
+          transform="translate(60,40)"
+          textAnchor="middle"
+          alignmentBaseline="middle"
+        >
+          <text
+            x="0"
+            y="15"
+            textAnchor="middle"
+            stroke="white"
+            strokeWidth="1px"
+            alignmentBaseline="middle"
+          >
+            15%
+          </text>
+        </g> */}
+      </g>
+      <g className="coin">
+        <g>
+          <circle id="USDC" r="30" cx="0" cy="0">
 
-    if (this.props.showTooltip) return `<span style="color:#b5b5b6"> $ ${v[0].data} </span>`;
-    else return;
-  };
+          </circle>
+          <text
+            x="0"
+            y="0"
+            textAnchor="middle"
+            stroke="white"
+            strokeWidth="1px"
+            alignmentBaseline="middle"
+          >
+            USDC
+          </text>
+        </g>
+        {/* <g>
+          <circle
+            id="ETH"
+            r="30"
+            cx="250"
+            cy="-125"
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+          >
 
-  getOption = () => {
-    // 组装数据，返回配置 option
-    const { imgType, xtitle, data } = this.state;
+          </circle>
+          <text
+            x="250"
+            y="-125"
+            textAnchor="middle"
+            stroke="red"
+            strokeWidth="1px"
+            alignmentBaseline="middle"
+          >
+            {" "}
+            ETH
+          </text>
+        </g>
+        <g>
+          <circle
+            id="DOT"
+            r="30"
+            cx="250"
+            cy="130"
+            fill="none"
+            stroke="white"
+            stroke-width="2"
+          >
 
-    let chartData = this.props.data;
-    if (!this.props.data) {
-      chartData = defaultData;
-    }
-    var dateList = chartData.map(function(item) {
-      return item[0];
-    });
-    var valueList = chartData.map(function(item) {
-      return item[1];
-    });
-
-    let showXAxis = this.props.showXAxis;
-    let props = this.props;
-    let component = this;
-
-    let options  = {
-      animation :true,
-      animationDurationUpdate: 1500,
-      animationEasingUpdate: 'quinticInOut',
-      series: [
-          {
-              type: 'graph',
-              layout: 'none',
-              symbolSize: 70,
-              roam: true,
-              label: {
-                show: true,
-                color:'#ffffff'
-              },
-              itemStyle:{
-                color:'#2E3032'
-              },
-              edgeSymbol: ['none', 'none'],
-              edgeSymbolSize: [4, 10],
-              edgeLabel: {
-                  fontSize: 20
-              },
-              data: [{
-                  name: 'ETH',
-                  x: 300,
-                  y: 300
-              }, 
-              {
-                name: 'BNB',
-                x: 550,
-                y: 200
-              }, 
-              {
-                name: 'NONE',
-                x: 550,
-                y: 300,
-                itemStyle:{
-                  opacity:0
-                }
-              }, 
-              {
-                name: 'Matic',
-                x: 550,
-                y: 400
-              },
-              {
-                  name: 'BTC',
-                  x: 800,
-                  y: 300
-              }],
-              // links: [],
-              links: [{
-                  source: 'ETH',
-                  target: 'NONE',
-                  lineStyle:{
-                    color:'#757579'
-                  },
-                  label:{
-                    show:true,
-                    position:'middle',
-                    formatter:'70%',
-                    color:'#EB5C20',
-                    fontSize:20,
-                    verticalAlign:'bottom'
-                  }
-              },
-              {
-                source: 'NONE',
-                target: 'BTC',
-                lineStyle:{
-                  color:'#757579'
-                },
-              },{
-                source: 'ETH',
-                target: 'BNB',
-                lineStyle: {
-                  curveness: 0.2,
-                  color:'#757579'
-                },
-                label:{
-                  show:true,
-                  position:'middle',
-                  formatter:'15%',
-                  align:'left',
-                  color:'#EB5C20',
-                  fontSize:20,
-                  verticalAlign:'bottom'
-                }
-            
-          },{
-            source: 'BNB',
-            target: 'BTC',
-            lineStyle: {
-              curveness: 0.2,
-              color:'#757579'
-            }
-        
-      },{
-        source: 'ETH',
-        target: 'Matic',
-        lineStyle: {
-          curveness: -0.2,
-          color:'#757579'
-        },
-        label:{
-          show:true,
-          position:'middle',
-          formatter:'15%',
-          color:'#EB5C20',
-          fontSize:20,
-          verticalAlign:'bottom'
-        }
-    
-  },{
-    source: 'Matic',
-    target: 'BTC',
-    lineStyle: {
-      curveness: -0.2,
-      color:'#757579'
-    }
-
-}],
-          }
-      ]
-  };
-
-    if (this.props.showGradient == true) {
-      options.series[0].areaStyle = {
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: this.props.lineColor || '#c6224e' },
-          { offset: 1, color: this.props.bgColor || '#29292c' },
-        ]),
-      };
-    }
-
-    return options;
-  };
-  render() {
-    const onEvents = {
-      click: this.onChartClick,
-    };
-    return (
-      <ReactEcharts
-        style={{ height: '100%' }}
-        option={this.getOption()}
-        notMerge
-        lazyUpdate={false}
-        theme={'theme_name'}
-        ref={e => {
-          this.echartsElement = e;
-        }}
-        onEvents={onEvents}
-        // onChartReady={this.onChartReadyCallback}
-        // onEvents={EventsDict}
-      />
-    );
-  }
+          </circle>
+          <text
+            x="250"
+            y="130"
+            textAnchor="middle"
+            stroke="red"
+            strokeWidth="1px"
+            alignmentBaseline="middle"
+          >
+            DOT
+          </text>
+        </g> */}
+        <g>
+          <circle
+            id="BTC"
+            r="30"
+            cx="500"
+            cy="0"
+            fill="none"
+            stroke="white"
+            stroke-width="2"
+          >
+          </circle>
+          <text
+            x="500"
+            y="0"
+            text-anchor="middle"
+            stroke-width="1px"
+            alignmentBaseline="middle"
+          >
+            BTC
+          </text>
+        </g>
+      </g>
+      {/* 交易金额 */}
+      <g>
+        <g>
+          <text
+            x="250"
+            y="-20"
+            text-anchor="middle"
+            stroke-width="1px"
+            stroke="white"
+            alignmentBaseline="middle"
+          >
+            {props.data&&props.data[0].value}
+          </text>
+        </g>
+      </g>
+    </g>
+  </svg>;
 }
 
-export default AcyLineChart;
+export default AcyRoutingChart;

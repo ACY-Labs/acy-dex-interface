@@ -18,6 +18,7 @@ import Media from 'react-media';
 import AcyPieChart from '@/components/AcyPieChartAlpha';
 import AcyRoutingChart from '@/components/AcyRoutingChart';
 import { BigNumber } from '@ethersproject/bignumber';
+import { parseUnits } from '@ethersproject/units';
 
 import SwapComponent from '@/components/SwapComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -107,6 +108,12 @@ class BasicProfile extends Component {
   componentDidMount() {
 
     this.getPrice();
+
+    // 临时
+
+    // const data='0x00000000000000000000000000000000000000000000000000038d7ea4c68000';
+    // console.log('BigNumber.from(data).toString()',BigNumber.from(data));
+    // console.log('BigNumber.from(data).div',(BigNumber.from(data)).div(BigNumber.from(parseUnits("1.0",15))).toString());
   }
 
   // workaround way to get USD price (put token1 as USDC)
@@ -118,7 +125,7 @@ class BasicProfile extends Component {
       )
       .then(data => {
         console.log(data);
-        
+
         // const { swaps } = data.data.data;
         // const lastDataPoint = swaps[swaps.length - 1];
         // console.log('ROUTE PRICE POINT', lastDataPoint);
@@ -133,8 +140,7 @@ class BasicProfile extends Component {
 
     axios
       .post(
-        `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${
-          activeToken1.addressOnEth
+        `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${activeToken1.addressOnEth
         }&range=${range}`
       )
       .then(data => {
@@ -407,132 +413,37 @@ class BasicProfile extends Component {
         </div>
         <div className={styles.exchangeBottomWrapper}>
 
-          <div className={styles.exchangeItem}>
-            <h3>
-              <AcyIcon.MyIcon width={30} type="arrow"/>
-              <span className={styles.span}>FLASH ROUTE</span>
-               
-            </h3>
-            <div style={{ height: '350px' }}>
-              <AcyRoutingChart />
-            </div>
-          </div>
+          {this.state.isReceiptObtained &&
+            <div className={styles.exchangeItem}>
+              <h3>
+                <AcyIcon.MyIcon width={30} type="arrow" />
+                <span className={styles.span}>FLASH ROUTE</span>
 
-          {this.state.isReceiptObtained && (
-            <div className={styles.option}>
+              </h3>
               <div>
-                <AcyCard title="">
-                  {/* {this.state.isReceiptObtained ? (<AcyRoutingChart /> */}
-                  {false ? (<AcyRoutingChart />
-                    // <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                    //   <div className={styles.routing}>
-                    //     <div
-                    //       style={{
-                    //         display: 'flex',
-                    //         alignItems: 'center',
-                    //         marginRight: '10px',
-                    //         color: '#EB5C20',
-                    //         borderRight: '1px solid #2c2f36',
-                    //       }}
-                    //     >
-                    //       <img
-                    //         src={
-                    //           supportedTokens.filter(
-                    //             entry => entry.symbol == this.state.pastToken0
-                    //           )[0].logoURI
-                    //         }
-                    //         width={(isMobile && 30) || 50}
-                    //         height={(isMobile && 30) || 50}
-                    //         style={{ marginRight: '10px' }}
-                    //       />
-                    //       {/* <AcyIcon.MyIcon width={(isMobile && 30) || 50} type="USDC" /> */}
-                    //     </div>
-                    //     <div className={styles.routing_middle}>
-                    //       <div className={styles.nodes}>
-                    //         {this.state.routeData.map(item => {
-                    //           return (
-                    //             <div className={styles.nodes_item}>
-                    //               <span>100%</span>
-                    //               <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                    //               <div className={styles.node}>
-                    //                 <div>
-                    //                   <img
-                    //                     src={
-                    //                       supportedTokens.filter(
-                    //                         entry =>
-                    //                           entry.address.toLowerCase() == item.from.toLowerCase()
-                    //                       )[0].logoURI
-                    //                     }
-                    //                     width={(isMobile && 30) || 50}
-                    //                     height={(isMobile && 30) || 50}
-                    //                     style={{ padding: '10px' }}
-                    //                   />
-                    //                 </div>
-                    //                 <div>
-                    //                   <p className={styles.r_title}>
-                    //                     {item.value}{' '}
-                    //                     {
-                    //                       supportedTokens.filter(
-                    //                         entry =>
-                    //                           entry.address.toLowerCase() == item.from.toLowerCase()
-                    //                       )[0].symbol
-                    //                     }
-                    //                   </p>
-                    //                   <p className={styles.r_desc}>
-                    //                     {abbrNumber(this.state.pricePoint * item.value)} $
-                    //                   </p>
-                    //                 </div>
-                    //               </div>
-                    //               <Icon style={{ margin: '0 10px' }} type="arrow-right" />
-                    //             </div>
-                    //           );
-                    //         })}
-                    //       </div>
-                    //     </div>
-                    //     <div
-                    //       style={{
-                    //         display: 'flex',
-                    //         alignItems: 'center',
-                    //         marginRight: '10px',
-                    //         color: '#EB5C20',
-                    //         borderLeft: '1px solid #2c2f36',
-                    //       }}
-                    //     >
-                    //       <img
-                    //         src={
-                    //           supportedTokens.filter(
-                    //             entry => entry.symbol == this.state.pastToken1
-                    //           )[0].logoURI
-                    //         }
-                    //         width={(isMobile && 30) || 50}
-                    //         height={(isMobile && 30) || 50}
-                    //         style={{ marginLeft: '10px' }}
-                    //       />
-                    //     </div>
-                    //   </div>
-                    // </div>
-                  ) : (
-                    <div
-                      style={{
-                        width: '100%',
-                        padding: '30px',
-                        fontWeight: 600,
-                        textAlign: 'center',
-                      }}
-                    >
-                      The routing will be shown here after a receipt is obtained.
-                    </div>
-                  )}
-                </AcyCard>
+                {this.state.isReceiptObtained ? (
+
+                  <AcyRoutingChart data={this.state.routeData} />) : (
+                  <div
+                    style={{
+                      width: '100%',
+                      padding: '30px',
+                      fontWeight: 600,
+                      textAlign: 'center',
+                    }}
+                  >
+                    The routing will be shown here after a receipt is obtained.
+                  </div>
+                )}
               </div>
             </div>
-          )}
+          }
           <div className={styles.exchangeItem}>
-              <h3>
-                <AcyIcon.MyIcon width={30} type="arrow"/> 
-                <span className={styles.span}>HISTORY TRANSACTION</span> 
-              </h3>
-              <StakeHistoryTable isMobile={isMobile} dataSource={transactions} />
+            <h3>
+              <AcyIcon.MyIcon width={30} type="arrow" />
+              <span className={styles.span}>HISTORY TRANSACTION</span>
+            </h3>
+            <StakeHistoryTable isMobile={isMobile} dataSource={transactions} />
           </div>
         </div>
 
