@@ -106,7 +106,27 @@
     .tableHeaderSubtitle {
       font-weight: lighter;
     }
+
+    .premierCheckboxContainer {
+      margin-top: 0.75rem;
+      display: flex;
+      align-items: center;
+
+      .premierCheckboxText {
+        margin-right: 0.75rem;
+      }
+
+      .ant-checkbox-checked .ant-checkbox-inner {
+        background-color: blue !important;
+        border-color: blue !important;
+      }
+    }
   }
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: blue !important;
+  border-color: blue !important;
 }
 
 // Table Row Container
