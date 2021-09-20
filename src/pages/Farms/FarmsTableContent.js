@@ -5,7 +5,7 @@ export default [
     token2: 'BAL',
     token2Logo: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/BAL.svg',
     pendingReward: [
-      { token: 'AAVE', amount: 0 },
+      { token: 'BTC', amount: 0 },
     ],
     totalApr: 89.02,
     tvl: 144542966,
@@ -50,7 +50,7 @@ export default [
     token2: 'BAL',
     token2Logo: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/BAL.svg',
     pendingReward: [
-      { token: 'AAVE', amount: 0 },
+      { token: 'ETH', amount: 0 },
     ],
     totalApr: 89.02,
     tvl: 144542966,

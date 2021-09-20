@@ -2,16 +2,16 @@ import React from 'react';
 import styles from '@/pages/Farms/Farms.less';
 import { AcyBarChart, AcyLineChart, AcyPeriodTime } from '@/components/Acy';
 
-const DaoChart = ({ activeGraphId, activeGraphData, selectTopChart }) => {
+const DaoChart = ({ activeGraphId, activeGraphData, selectTopChart, selection }) => {
   return (
     <div className={styles.chartSection}>
       <AcyPeriodTime
         onhandPeriodTimeChoose={selectTopChart}
-        times={['ACY', 'Reward']}
+        times={selection}
         className={styles.switchChartsSelector}
       />
       {activeGraphId === 0 ? (
-        <AcyBarChart data={activeGraphData} showXAxis />
+        <AcyBarChart data={activeGraphData} showXAxis barColor="#1d5e91" />
       ) : (
         <AcyLineChart
           backData={activeGraphData}
@@ -19,7 +19,7 @@ const DaoChart = ({ activeGraphId, activeGraphData, selectTopChart }) => {
           showXAxis
           showGradient
           showTooltip
-          lineColor="#e29227"
+          lineColor="#1d5e91"
           bgColor="#29292c"
         />
       )}

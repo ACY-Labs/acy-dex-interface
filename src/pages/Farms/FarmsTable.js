@@ -1,37 +1,57 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styles from '@/pages/Farms/Farms.less';
-import farmsTableContent from './FarmsTableContent'
 import FarmsTableRow from '@/pages/Farms/FarmsTableRow';
 import FarmsTableHeader from '@/pages/Farms/FarmsTableHeader';
-import { AcyBarChart, AcyLineChart, AcyPeriodTime } from '@/components/Acy';
-import StakeSection from '@/pages/Dao/components/StakeSection';
 import { graphSampleData, graphSampleData2 } from '@/pages/Dao/sample_data/SampleData';
 import DaoChart from './DaoChart';
 
-const FarmsTable = ({ tableRow, onRowClick, tableTitle, tableSubtitle, rowNumber, setRowNumber, hideDao }) => {
+const FarmsTable = (
+  {
+    tableRow,
+    onRowClick,
+    tableTitle,
+    tableSubtitle,
+    rowNumber,
+    setRowNumber,
+    hideDao,
+    selectedTable,
+    tokenFilter,
+    setTokenFilter,
+  }
+) => {
   const [walletConnected, setWalletConnected] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false)
 
   const hideModal = () => setIsModalVisible(false)
   const showModal = () => setIsModalVisible(true)
-  const [activeGraphId, setActiveGraphId] = useState(0)
-  const [activeGraphData, setActiveGraphData] = useState(graphSampleData)
+  const [myChartId, setMyChartId] = useState(0)
+  const [totalChartId, setTotalChartId] = useState(0)
+  const [myChartData, setMyChartData] = useState(graphSampleData)
+  const [totalChartData, setTotalChartData] = useState(graphSampleData)
 
-  const changeGraphData = (id = 0) => {
-    if (id === 0) setActiveGraphData(graphSampleData)
-    else setActiveGraphData(graphSampleData2)
+  const changeGraphData = (id = 0, chartSetter) => {
+    if (id === 0) chartSetter(graphSampleData)
+    else chartSetter(graphSampleData2)
   }
 
   const selectTopChart = (pt) => {
     const functionDict = {
-      'ACY': () => {
-        changeGraphData(0);
-        setActiveGraphId(0)
+      'My ACY': () => {
+        changeGraphData(0, setMyChartData);
+        setMyChartId(0)
       },
-      'Reward': () => {
-        changeGraphData(1);
-        setActiveGraphId(1)
-      }
+      'My Reward': () => {
+        changeGraphData(1, setMyChartData);
+        setMyChartId(1)
+      },
+      'Total ACY': () => {
+        changeGraphData(0, setTotalChartData);
+        setTotalChartId(0)
+      },
+      'Total Reward': () => {
+        changeGraphData(1, setTotalChartData);
+        setTotalChartId(1)
+      },
     }
     functionDict[pt]();
   }
@@ -41,6 +61,9 @@ const FarmsTable = ({ tableRow, onRowClick, tableTitle, tableSubtitle, rowNumber
       <FarmsTableHeader
         tableTitle={tableTitle}
         tableSubtitle={tableSubtitle}
+        selectedTable={selectedTable}
+        tokenFilter={tokenFilter}
+        setTokenFilter={setTokenFilter}
       />
       {hideDao ? (
         <div className={styles.tableBodyContainer}>
@@ -83,14 +106,16 @@ const FarmsTable = ({ tableRow, onRowClick, tableTitle, tableSubtitle, rowNumber
           <div>
             <div className={styles.stakeSectionMain}>
               <DaoChart
-                activeGraphId={activeGraphId}
-                activeGraphData={activeGraphData}
+                activeGraphId={myChartId}
+                activeGraphData={myChartData}
                 selectTopChart={selectTopChart}
+                selection={['My ACY', 'My Reward']}
               />
               <DaoChart
-                activeGraphId={activeGraphId}
-                activeGraphData={activeGraphData}
+                activeGraphId={totalChartId}
+                activeGraphData={totalChartData}
                 selectTopChart={selectTopChart}
+                selection={['Total ACY', 'Total Reward']}
               />
             </div>
           </div>

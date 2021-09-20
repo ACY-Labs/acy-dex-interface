@@ -7,6 +7,7 @@ const ToggleButtonGroup = (
     onAcyToggleButtonClick,
     onPremierToggleButtonClick,
     onDaoToggleButtonClick,
+    onMyFarmsToggleButtonClick,
   }
 ) => {
   return (
@@ -14,7 +15,7 @@ const ToggleButtonGroup = (
       <button
         type="button"
         className={styles.firstToggleButton}
-        style={{ backgroundColor: selectedTable === 0 ? "#29292c" : "#2e3032", color: selectedTable === 0 ? "#1e5d91": ""}}
+        style={{ backgroundColor: selectedTable === 0 ? "#174163" : "#2e3032", color: selectedTable === 0 ? "white": ""}}
         onClick={onAllToggleButtonClick}
       >
         All
@@ -22,7 +23,7 @@ const ToggleButtonGroup = (
       <button
         type="button"
         className={styles.leftToggleButton}
-        style={{ backgroundColor: selectedTable === 1 ? "#29292c" : "#2e3032", color: selectedTable === 1 ? "#1e5d91": ""}}
+        style={{ backgroundColor: selectedTable === 1 ? "#174163" : "#2e3032", color: selectedTable === 1 ? "white": ""}}
         onClick={onAcyToggleButtonClick}
       >
         Standard
@@ -30,18 +31,26 @@ const ToggleButtonGroup = (
       <button
         type="button"
         className={styles.middleToggleButton}
-        style={{ backgroundColor: selectedTable === 3 ? "#29292c" : "#2e3032", color: selectedTable === 3 ? "#1e5d91": ""}}
+        style={{ backgroundColor: selectedTable === 3 ? "#174163" : "#2e3032", color: selectedTable === 3 ? "white": ""}}
         onClick={onDaoToggleButtonClick}
       >
         DAO
       </button>
       <button
         type="button"
-        className={styles.lastToggleButton}
-        style={{ backgroundColor: selectedTable === 2 ? "#29292c" : "#2e3032", color: selectedTable === 2 ? "#1e5d91": ""}}
+        className={styles.rightToggleButton}
+        style={{ backgroundColor: selectedTable === 2 ? "#174163" : "#2e3032", color: selectedTable === 2 ? "white": ""}}
         onClick={onPremierToggleButtonClick}
       >
         Premier
+      </button>
+      <button
+        type="button"
+        className={styles.lastToggleButton}
+        style={{ backgroundColor: selectedTable === 4 ? "#174163" : "#2e3032", color: selectedTable === 4 ? "white": ""}}
+        onClick={onMyFarmsToggleButtonClick}
+      >
+        My Farms
       </button>
     </div>
   )

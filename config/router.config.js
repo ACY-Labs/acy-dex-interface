@@ -282,11 +282,11 @@ export default [
         name: 'Farms',
         component: './Farms/',
       },
-      {
-        path: '/dao',
-        name: 'DAO',
-        component: './Dao/Index',
-      },
+      // {
+      //   path: '/dao',
+      //   name: 'DAO',
+      //   component: './Dao/Index',
+      // },
 
       // {
       //   path: '/swap',

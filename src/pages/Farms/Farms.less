@@ -7,7 +7,9 @@
   .tableControlButtonContainer {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     flex-wrap: wrap-reverse;
+    margin-bottom: 1.5rem;
 
     .tableHeaderButtonContainer {
       display: flex;
@@ -15,6 +17,7 @@
       flex-wrap: wrap;
 
       .tableHeaderRadioButtonContainer {
+        margin-left: -1rem;
         margin-right: 0.5rem;
       }
 
@@ -61,7 +64,7 @@
   }
 
   .tableToggleButtonContainer {
-    margin-bottom: 1.5rem;
+
   }
 }
 
@@ -106,7 +109,27 @@
     .tableHeaderSubtitle {
       font-weight: lighter;
     }
+
+    .premierCheckboxContainer {
+      margin-top: 0.75rem;
+      display: flex;
+      align-items: center;
+
+      .premierCheckboxText {
+        margin-right: 0.75rem;
+      }
+
+      .ant-checkbox-checked .ant-checkbox-inner {
+        background-color: blue !important;
+        border-color: blue !important;
+      }
+    }
   }
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: blue !important;
+  border-color: blue !important;
 }
 
 // Table Row Container
@@ -273,6 +296,79 @@
   }
 }
 
+@media (max-width: 768px) {
+  .tableHeaderTitleContainer {
+    .tableHeaderTitle {
+      font-size: 1rem !important;
+    }
+
+    .tableHeaderSubtitle {
+      font-size: 0.75rem !important;
+    }
+
+    .premierCheckboxContainer {
+      flex-direction: column;
+      align-items: start !important;
+
+      .premierCheckboxText {
+        font-size: 0.75rem;
+      }
+
+      .premierCheckbox {
+        font-size: 0.75rem;
+
+        &:last-child {
+          margin-left: 0;
+        }
+      }
+    }
+  }
+
+  .tableBodyDrawerContainer {
+    flex-direction: column;
+
+    .tableBodyDrawerLiquidityContainer {
+      margin-right: 0;
+      margin-bottom: 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    .tableBodyDrawerRewardContainer {
+      margin-right: 0 !important;
+      margin-bottom: 0.5rem;
+      font-size: 0.75rem;
+
+      .tableBodyDrawerRewardTitle {
+        margin-bottom: 0.25rem !important;
+      }
+    }
+
+    .tableBodyDrawerFarmContainer {
+      font-size: 0.75rem;
+    }
+  }
+
+  .token1LogoContainer,
+  .token2LogoContainer {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+
+  .tokenTitleContainer {
+    font-size: 0.75rem !important;
+  }
+
+  .tableBodyTvlColContainer {
+    .tvlTitleContainer {
+      font-size: 0.75rem !important;
+    }
+
+    .tvlContentContainer {
+      font-size: 0.75rem !important;
+    }
+  }
+}
+
 // Toggle Button
 
 .firstToggleButton {
@@ -303,9 +399,19 @@
   font-size: 1rem;
 }
 
-.lastToggleButton {
+.rightToggleButton {
   border: 1px solid transparent;
   border-radius: 0 15px 15px 0;
+  background-color: #29292c;
+  padding: 0.25rem 1.25rem;
+  // border-radius: 0 0.25rem 0.25rem 0;
+  margin-right: 0.5rem;
+  font-size: 1rem;
+}
+
+.lastToggleButton {
+  border: 1px solid transparent;
+  border-radius: 15px;
   background-color: #29292c;
   padding: 0.25rem 1.25rem;
   // border-radius: 0 0.25rem 0.25rem 0;
@@ -316,9 +422,55 @@
 .firstToggleButton:hover,
 .leftToggleButton:hover,
 .middleToggleButton:hover,
+.rightToggleButton:hover,
 .lastToggleButton:hover {
   cursor: pointer;
   border-color: #1e5d91;
+}
+
+@media (max-width: 768px) {
+  .firstToggleButton {
+    padding: 0.1rem 0.5rem;
+    margin-right: 0;
+    font-size: 0.75rem;
+    border-radius: 15px 0 0 15px;
+  }
+
+  .leftToggleButton {
+    padding: 0.1rem 0.5rem;
+    margin-right: 0;
+    font-size: 0.75rem;
+    border-radius: 0;
+  }
+
+  .middleToggleButton {
+    padding: 0.1rem 0.5rem;
+    margin-right: 0;
+    font-size: 0.75rem;
+  }
+
+  .rightToggleButton {
+    padding: 0.1rem 0.75rem;
+    margin-right: 0;
+    font-size: 0.75rem;
+    border-radius: 0;
+  }
+
+  .lastToggleButton {
+    padding: 0.1rem 0.5rem;
+    margin-right: 0;
+    font-size: 0.75rem;
+    border-radius: 0 15px 15px 0;
+  }
+
+  .firstToggleButton:hover,
+  .leftToggleButton:hover,
+  .middleToggleButton:hover,
+  .rightToggleButton:hover,
+  .lastToggleButton:hover {
+    cursor: pointer;
+    border-color: #1e5d91;
+  }
 }
 
 .amountRowContainer {
@@ -524,7 +676,7 @@
     }
     .tableToggleButtonContainer {
       margin-top: 7px;
-    margin-bottom: 5px;
+      margin-bottom: 5px;
     }
   }
 
@@ -555,5 +707,20 @@
     position: absolute;
     top: 1rem;
     right: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .stakeSectionMain {
+    flex-direction: column;
+  }
+
+  .chartSection {
+    width: 100%;
+    margin-top: 0;
+
+    &:first-child {
+      margin-bottom: 0.5rem;
+    }
   }
 }
