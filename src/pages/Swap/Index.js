@@ -15,13 +15,10 @@ import {
   AcyApprove,
 } from '@/components/Acy';
 import Media from 'react-media';
-<<<<<<< HEAD
 import AcyPieChart from '@/components/AcyPieChartAlpha';
 import AcyRoutingChart from '@/components/AcyRoutingChart';
 import { BigNumber } from '@ethersproject/bignumber';
 
-=======
->>>>>>> b51a2f0cd4915e15a1343484a7869989fe0dfb20
 import SwapComponent from '@/components/SwapComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import axios from 'axios';
