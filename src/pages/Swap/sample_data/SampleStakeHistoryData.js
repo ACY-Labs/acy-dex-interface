@@ -118,30 +118,48 @@ export default [
     "to": "0x9aaED666836F3acb0563c3f74fb2a0Ae8353C967"
   }
 ]
-
 const sampleStakeHistoryColumns = [
   {
+    title: 'Swap',
+    key: 'fromforto',
+    render: record =>`Swap ${record.inputTokenSymbol} for ${record.outTokenSymbol}`
+  },
+  {
+    title: 'Total Value',
+    dataIndex: 'totalToken',
+    key: 'totalToken',
+    render: text =>`$ ${text}`
+
+  },
+  {
+    title: 'Token Amount',
+    dataIndex: 'inputTokenNum',
+    key: 'inputTokenNum',
+    render: (text,record) =>`${text} ${record.inputTokenSymbol}`
+
+  },
+  {
+    title: 'Token Amount',
+    dataIndex: 'outTokenNum',
+    key: 'outTokenNum',
+    render: (text,record) =>`${text} ${record.outTokenSymbol}`
+  },
+  // {
+  //   title: '',
+  //   dataIndex: 'from',
+  //   key: 'from',
+  //   render: text =>text&& <p className={styles.tableData}>{abbrHash(text)}</p>,
+  // },
+  // {
+  //   title: 'Receive',
+  //   dataIndex: 'to',
+  //   key: 'to',
+  //   render: text =>text&& <p className={styles.tableData}>{abbrHash(text)}</p>,
+  // },
+  {
     title: 'Time',
-    dataIndex: 'time',
-    key: 'time',
-  },
-  {
-    title: 'Pay',
-    dataIndex: 'from',
-    key: 'from',
-    render: text =>text&& <p className={styles.tableData}>{abbrHash(text)}</p>,
-  },
-  {
-    title: 'Receive',
-    dataIndex: 'to',
-    key: 'to',
-    render: text =>text&& <p className={styles.tableData}>{abbrHash(text)}</p>,
-  },
-  {
-    title: 'Alpha',
-    dataIndex: 'alpha',
-    key: 'alpha',
-    render: text => <p className={styles.tableData}>{text}</p>,
+    dataIndex: 'transactionTime',
+    key: 'transactionTime'
   },
   
 ]

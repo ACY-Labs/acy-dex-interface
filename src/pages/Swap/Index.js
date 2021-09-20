@@ -18,6 +18,7 @@ import {
 import Media from 'react-media';
 import AcyPieChart from '@/components/AcyPieChartAlpha';
 import AcyRoutingChart from '@/components/AcyRoutingChart';
+import { BigNumber } from '@ethersproject/bignumber';
 
 import SwapComponent from '@/components/SwapComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -106,6 +107,7 @@ class BasicProfile extends Component {
   };
 
   componentDidMount() {
+
     this.getPrice();
   }
 
@@ -118,7 +120,7 @@ class BasicProfile extends Component {
       )
       .then(data => {
         console.log(data);
-        debugger
+        
         // const { swaps } = data.data.data;
         // const lastDataPoint = swaps[swaps.length - 1];
         // console.log('ROUTE PRICE POINT', lastDataPoint);
@@ -377,9 +379,18 @@ class BasicProfile extends Component {
           )}
         </div>
         <div className={styles.exchangeBottomWrapper}>
-          <div style={{height:'300px'}}>
-            <AcyRoutingChart />
+
+          <div className={styles.exchangeItem}>
+            <h3>
+              <AcyIcon.MyIcon width={30} type="arrow"/>
+              <span className={styles.span}>FLASH ROUTE</span>
+               
+            </h3>
+            <div style={{ height: '350px' }}>
+              <AcyRoutingChart />
+            </div>
           </div>
+
           {this.state.isReceiptObtained && (
             <div className={styles.option}>
               <div>
@@ -489,10 +500,12 @@ class BasicProfile extends Component {
               </div>
             </div>
           )}
-          <div className={styles.option}>
-            <div style={{ marginTop: '-10px', marginBottom: '30px' }}>
+          <div className={styles.exchangeItem}>
+              <h3>
+                <AcyIcon.MyIcon width={30} type="arrow"/> 
+                <span className={styles.span}>HISTORY TRANSACTION</span> 
+              </h3>
               <StakeHistoryTable isMobile={isMobile} dataSource={transactions} />
-            </div>
           </div>
         </div>
 

@@ -44,7 +44,7 @@ const query = {
     maxWidth: 1199,
   },
   'screen-xl': {
-    minWidth: 1200,
+    minWidth: 1300,
     maxWidth: 1599,
   },
   'screen-xxl': {

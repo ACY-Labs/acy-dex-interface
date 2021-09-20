@@ -108,7 +108,7 @@ class AcyLineChart extends Component {
           {
               type: 'graph',
               layout: 'none',
-              symbolSize: 50,
+              symbolSize: 70,
               roam: true,
               label: {
                 show: true,
@@ -130,7 +130,7 @@ class AcyLineChart extends Component {
               {
                 name: 'BNB',
                 x: 550,
-                y: 250
+                y: 200
               }, 
               {
                 name: 'NONE',
@@ -143,7 +143,7 @@ class AcyLineChart extends Component {
               {
                 name: 'Matic',
                 x: 550,
-                y: 350
+                y: 400
               },
               {
                   name: 'BTC',
@@ -176,13 +176,14 @@ class AcyLineChart extends Component {
                 source: 'ETH',
                 target: 'BNB',
                 lineStyle: {
-                  curveness: 0.1,
+                  curveness: 0.2,
                   color:'#757579'
                 },
                 label:{
                   show:true,
                   position:'middle',
                   formatter:'15%',
+                  align:'left',
                   color:'#EB5C20',
                   fontSize:20,
                   verticalAlign:'bottom'
@@ -192,7 +193,7 @@ class AcyLineChart extends Component {
             source: 'BNB',
             target: 'BTC',
             lineStyle: {
-              curveness: 0.1,
+              curveness: 0.2,
               color:'#757579'
             }
         
@@ -200,7 +201,7 @@ class AcyLineChart extends Component {
         source: 'ETH',
         target: 'Matic',
         lineStyle: {
-          curveness: -0.1,
+          curveness: -0.2,
           color:'#757579'
         },
         label:{
@@ -216,7 +217,7 @@ class AcyLineChart extends Component {
     source: 'Matic',
     target: 'BTC',
     lineStyle: {
-      curveness: -0.1,
+      curveness: -0.2,
       color:'#757579'
     }
 

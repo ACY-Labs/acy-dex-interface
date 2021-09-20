@@ -649,7 +649,7 @@ export async function swap(
     console.log(status);
     
     let url = 'https://rinkeby.etherscan.io/tx/' + status.hash;
-    swapCallback(status);
+    swapCallback(status,inputToken0,inputToken1);
     setSwapStatus(
       <div>
         <a href={url} target={'_blank'}>

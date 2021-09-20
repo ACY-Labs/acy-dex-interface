@@ -10,22 +10,34 @@ const StakeHistoryTable = (props) => {
   const {dataSource,isMobile}=props;
   console.log('dataSource',isMobile);
   return (
-    <Table
-      columns={isMobile&&sampleStakeHistoryColumns.slice(0,3)||sampleStakeHistoryColumns}
-      dataSource={dataSource}
-      className={styles.tableStyle}
-      pagination={false}
-      footer={() => (
-        <div className={styles.tableSeeMoreWrapper}>
-          <a
-            className={styles.tableSeeMore}
-            onClick={() => setStakeDisplayNumber(prevState => prevState + 5)}
-          >
-            See More...
-          </a>
-        </div>
-      )}
-    />
+    <div className={styles.nobgTable}>
+      <Table
+        columns={isMobile&&sampleStakeHistoryColumns.slice(0,3)||sampleStakeHistoryColumns}
+        dataSource={dataSource}
+        className={styles.tableStyle}
+        pagination={false}
+        onRow={record => {
+          return {
+            onClick: event => {
+              // 跳转到eths
+              window.open(`https://rinkeby.etherscan.io/tx/${record.hash}`);
+              
+            }, // 点击行
+          };
+        }}
+        footer={() => (
+          <div className={styles.tableSeeMoreWrapper}>
+            <a
+              className={styles.tableSeeMore}
+              onClick={() => setStakeDisplayNumber(prevState => prevState + 5)}
+            >
+              See More...
+            </a>
+          </div>
+        )}
+      />
+    </div>
+    
   );
 };
 

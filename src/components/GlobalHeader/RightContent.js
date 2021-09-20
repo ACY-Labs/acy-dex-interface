@@ -240,7 +240,7 @@ const GlobalHeaderRight = props => {
         value={account}
         onClick={onhandMetaMask}
         pendingLength={
-          props.transaction.transactions.filter(item => item.blockHash == undefined).length
+          props.transaction.transactions.filter(item => item.totalToken == undefined).length
         }
       />
      {false&&<Dropdown 

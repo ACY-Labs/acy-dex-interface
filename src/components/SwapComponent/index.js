@@ -28,6 +28,7 @@ import { Input } from 'antd';
 import { connect } from 'umi';
 import styles from './styles.less';
 import { sortAddress } from '@/utils/utils';
+import axios from 'axios';
 
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
@@ -81,6 +82,7 @@ import { Row, Col, Button, Icon } from 'antd';
 import { Alert } from 'antd';
 import spinner from '@/assets/loading.svg';
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
+import moment from 'moment';
 
 const SwapComponent = props => {
   const { dispatch, onSelectToken0, onSelectToken1 } = props;
@@ -390,7 +392,7 @@ const SwapComponent = props => {
     activate(injected);
   };
   // swap的交易状态
-  const swapCallback = status => {
+  const  swapCallback = async (status,inputToken,outToken) => {
     // 循环获取交易结果
     const {
       transaction: { transactions },
@@ -415,17 +417,58 @@ const SwapComponent = props => {
     // }];
 
     const sti = setInterval(() => {
-      library.getTransactionReceipt(status.hash).then(receipt => {
+      library.getTransactionReceipt(status.hash).then(async receipt => {
         console.log('receiptreceipt', receipt);
         // receipt is not null when transaction is done
         if (receipt) {
           props.onGetReceipt(receipt);
           clearInterval(sti);
           let newData = transactions.filter(item => item.hash != status.hash);
+          let transactionTime='',inputTokenNum,outTokenNum,totalToken;
+          await library.getBlock(receipt.logs[0].blockNumber).then((data)=>{
+            transactionTime=moment(parseInt(data.timestamp*1000)).format('YYYY-MM-DD hh:mm:ss')
+          });
+          debugger
+          receipt.logs.map(item=>{
+            if(item.address==inputToken.address){
+              // inputtoken 数量
+              inputTokenNum=BigNumber.from(receipt.logs[0].data).toString()/Math.pow(10,18);
+            }
+            if(item.address==outToken.address){
+              // outtoken 数量
+              outTokenNum=BigNumber.from(receipt.logs[2].data).toString()/Math.pow(10,6);
+            }
+          });
+          // 获取美元价值
+         await axios
+         .post(
+           `https://api.acy.finance/api/chart/swap?token0=${inputToken.addressOnEth}&token1=${outToken.addressOnEth}&range=1D`
+         )
+         .then(data => {debugger
+          totalToken=inputTokenNum*data.data.data.swaps[data.data.data.swaps.length-1].rate;
+           
+           // const { swaps } = data.data.data;
+           // const lastDataPoint = swaps[swaps.length - 1];
+           // console.log('ROUTE PRICE POINT', lastDataPoint);
+           // this.setState({
+           //   pricePoint: lastDataPoint.rate,
+           // });
+         });
           dispatch({
             type: 'transaction/addTransaction',
             payload: {
-              transactions: [...newData, { hash: status.hash, ...receipt }],
+              transactions: [
+                ...newData, 
+                { 
+                  hash: status.hash, 
+                  inputTokenNum,
+                  inputTokenSymbol:inputToken.symbol,
+                  outTokenNum,
+                  outTokenSymbol:outToken.symbol,
+                  totalToken,
+                  transactionTime
+                }
+              ],
             },
           });
         }

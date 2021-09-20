@@ -40,6 +40,7 @@
   opacity: 0;
 }
 .exchangeBottomWrapper {
+  width: 65%;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -50,8 +51,24 @@
   transition: opacity 1s;
 }
 
-.exchangeBottomWrapper > div {
-  width: 60vw;
+.exchangeBottomWrapper{
+  .exchangeItem{
+    width: 100%;
+    padding: 48px 0;
+    h3{
+      font-size: 20px;
+      margin-top: 0px;
+      display: flex;
+      &:hover{
+        color: #eb5c20;
+        transform: translate(10px,0);
+        transition-duration: 0.5s;
+      }
+      .span{
+        transform: translate(0,3px);
+      }
+    }
+  }
 }
 .title {
   font-size: 18px;
@@ -93,16 +110,23 @@
     color: #b5b6b6;
   }
 }
+.thinMain{
+  width: 70%;
+}
 @media (min-width: 768px) {
   .main {
     display: grid;
-    grid-template-columns: auto 425px;
+    grid-template-columns: auto 380px;
     padding: 0 40px;
   }
 }
 
 @media (max-width: 768px) {
   .main {
+    padding: 0 40px;
+  }
+  .exchangeBottomWrapper{
+    width: 100%;
     padding: 0 40px;
   }
   .option {
