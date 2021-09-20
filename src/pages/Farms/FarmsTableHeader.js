@@ -14,12 +14,14 @@ const FarmsTableHeader = ({ tableTitle, tableSubtitle, selectedTable, tokenFilte
             <Checkbox
               checked={tokenFilter.liquidityToken}
               onChange={(e) => setTokenFilter({...tokenFilter, liquidityToken: e.target.checked})}
+              className={styles.premierCheckbox}
             >
               Liquidity Tokens
             </Checkbox>
             <Checkbox
               checked={tokenFilter.btcEthToken}
               onChange={(e) => setTokenFilter({...tokenFilter, btcEthToken: e.target.checked})}
+              className={styles.premierCheckbox}
             >
               BTC, ETH
             </Checkbox>
