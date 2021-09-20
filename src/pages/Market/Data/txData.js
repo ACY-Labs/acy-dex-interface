@@ -56,7 +56,6 @@ export async function fetchGlobalTransaction(client) {
       );
     }
   }
-  console.log(globalTransactions)
 
   return globalTransactions;
 }

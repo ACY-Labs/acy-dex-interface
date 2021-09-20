@@ -23,16 +23,12 @@ export async  function fetchMarketData(client){
         volume24h: [],
     }
 
-    console.log(data)
-
     let dayData = data.uniswapDayDatas
-    let remappedData = dayData.map(item => [new Date(item.date * 1000).toLocaleDateString('en-CA'), parseFloat(item.volumeUSD)])
+    let remappedData = dayData.map(item => [new Date(item.date * 1000).toLocaleDateString('en-CA'), parseFloat(item.dailyVolumeUSD)])
     dataDict.volume24h = remappedData
 
-    remappedData = dayData.map(item => [new Date(item.date * 1000).toLocaleDateString('en-CA'), parseFloat(item.tvlUSD)])
+    remappedData = dayData.map(item => [new Date(item.date * 1000).toLocaleDateString('en-CA'), parseFloat(item.totalLiquidityUSD)])
     dataDict.tvl = remappedData
-
-    console.log(dataDict)
 
     return dataDict
 }

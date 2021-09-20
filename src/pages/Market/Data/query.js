@@ -13,30 +13,63 @@ export const GET_MARKET_DATA = gql`
     ) {
       id
       date
-      volumeUSD
-      tvlUSD
+      dailyVolumeUSD
+      totalLiquidityUSD
     }
   }
 `;
+
 // get general token list
-export const GET_TOP_TOKEN = gql`
-  query topPools {
-    tokens(first: 50, orderBy: totalValueLockedUSD, orderDirection: desc, subgraphError: allow) {
-      id
-      symbol
-      name
-      tokenDayData(first: 2, orderBy: date, orderDirection: desc) {
-        priceUSD
-        volumeUSD
-        totalValueLockedUSD
+// this is for the current day, use get token day data to fetch yesterday's and calculate the price
+export const GET_TOKEN_LIST = gql`
+  query tokenDayDatas($date: Int!, $tokenAmount: Int!) {
+    tokenDayDatas(first: $tokenAmount, orderBy: totalLiquidityUSD, orderDirection: desc, where: { date: $date }) {
+      token {
+        id
+        name
+        symbol
       }
+      dailyVolumeUSD
+      totalLiquidityUSD
+      priceUSD
     }
   }
 `;
 
-// get general pool list 
-// export const GET_TOP_POOL = gql`ss`;
+export const GET_TOKEN_DAY_SIMPLE = gql`
+  query tokenDayDatas($tokenId: ID!) {
+    tokenDayDatas(first: 2, orderBy: date, orderDirection: desc, where: { token: $tokenId }) {
+      id
+      date
+      priceUSD
+      totalLiquidityToken
+      totalLiquidityUSD
+      totalLiquidityETH
+      dailyVolumeETH
+      dailyVolumeToken
+      dailyVolumeUSD
+    }
+  }
+`;
 
+export const GET_TOKEN_DAY_DATA = gql`
+  query tokenDayDatas($tokenId: ID!) {
+    tokenDayDatas(orderBy: date, orderDirection: asc, where: { token: $tokenId }) {
+      id
+      date
+      priceUSD
+      totalLiquidityToken
+      totalLiquidityUSD
+      totalLiquidityETH
+      dailyVolumeETH
+      dailyVolumeToken
+      dailyVolumeUSD
+    }
+  }
+`;
+
+// get general pool list
+// export const GET_TOP_POOL = gql`ss`;
 
 // get individual token history data
 export const GET_TOKEN_HISTORY_DATA = undefined;
@@ -48,7 +81,7 @@ export const GET_GLOBAL_TRANSACTIONS = gql`
       id
       timestamp
       mints {
-        pool {
+        pair {
           token0 {
             id
             symbol
@@ -58,15 +91,13 @@ export const GET_GLOBAL_TRANSACTIONS = gql`
             symbol
           }
         }
-        owner
         sender
-        origin
         amount0
         amount1
         amountUSD
       }
       swaps {
-        pool {
+        pair {
           token0 {
             id
             symbol
@@ -76,13 +107,13 @@ export const GET_GLOBAL_TRANSACTIONS = gql`
             symbol
           }
         }
-        origin
-        amount0
-        amount1
+        sender
+        amount0In
+        amount1Out
         amountUSD
       }
       burns {
-        pool {
+        pair {
           token0 {
             id
             symbol
@@ -92,8 +123,7 @@ export const GET_GLOBAL_TRANSACTIONS = gql`
             symbol
           }
         }
-        owner
-        origin
+        sender
         amount0
         amount1
         amountUSD
