@@ -144,24 +144,23 @@ const sampleStakeHistoryColumns = [
     key: 'outTokenNum',
     render: (text,record) =>`${text} ${record.outTokenSymbol}`
   },
-  // {
-  //   title: '',
-  //   dataIndex: 'from',
-  //   key: 'from',
-  //   render: text =>text&& <p className={styles.tableData}>{abbrHash(text)}</p>,
-  // },
-  // {
-  //   title: 'Receive',
-  //   dataIndex: 'to',
-  //   key: 'to',
-  //   render: text =>text&& <p className={styles.tableData}>{abbrHash(text)}</p>,
-  // },
   {
     title: 'Time',
     dataIndex: 'transactionTime',
     key: 'transactionTime'
   },
-  
 ]
-
+const sampleStakeHistoryMobileColumns = [
+  {
+    title: 'Swap',
+    key: 'fromforto',
+    render: record =>`Swap ${record.inputTokenSymbol} for ${record.outTokenSymbol}`
+  },
+  
+  {
+    title: 'Time',
+    dataIndex: 'transactionTime',
+    key: 'transactionTime'
+  },
+]
 export {sampleStakeHistoryColumns}

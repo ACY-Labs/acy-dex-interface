@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Table } from 'antd';
 import SampleStakeHistoryData, {
   sampleStakeHistoryColumns,
+  sampleStakeHistoryMobileColumns,
 } from '../sample_data/SampleStakeHistoryData';
 import styles from './StakeHistoryTable.less';
 
@@ -11,7 +12,7 @@ const StakeHistoryTable = props => {
   return (
     <div className={styles.nobgTable}>
       <Table
-        columns={isMobile&&sampleStakeHistoryColumns.slice(0,3)||sampleStakeHistoryColumns}
+        columns={isMobile&&sampleStakeHistoryMobileColumns||sampleStakeHistoryColumns}
         dataSource={dataSource}
         className={styles.tableStyle}
         pagination={false}

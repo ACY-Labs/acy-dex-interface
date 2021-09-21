@@ -228,3 +228,10 @@ export function abbrNumber(number) {
 
   return result;
 }
+
+// 对象数组去重
+export function  uniqueFun(arr,type)
+{
+   const res = new Map();
+   return arr.filter((a)=>!res.has(a[type])&& res.set(a[type],1));
+} 

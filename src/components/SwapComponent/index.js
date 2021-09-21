@@ -485,6 +485,21 @@ const SwapComponent = props => {
               ],
             },
           });
+          // 保存到loac
+          localStorage.setItem('transactions',JSON.stringify([
+            ...newData, 
+            { 
+              hash: status.hash, 
+              inputTokenNum,
+              inputTokenSymbol:inputToken.symbol,
+              outTokenNum,
+              outTokenSymbol:outToken.symbol,
+              totalToken,
+              transactionTime
+            }
+          ]));
+
+// 读取数据：localStorage.getItem(key);
         }
       });
     }, 500);

@@ -19,6 +19,7 @@ import AcyPieChart from '@/components/AcyPieChartAlpha';
 import AcyRoutingChart from '@/components/AcyRoutingChart';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
+import {uniqueFun} from '@/utils/utils';
 
 import SwapComponent from '@/components/SwapComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -109,11 +110,19 @@ class BasicProfile extends Component {
 
     this.getPrice();
 
-    // 临时
-
-    // const data='0x00000000000000000000000000000000000000000000000000038d7ea4c68000';
-    // console.log('BigNumber.from(data).toString()',BigNumber.from(data));
-    // console.log('BigNumber.from(data).div',(BigNumber.from(data)).div(BigNumber.from(parseUnits("1.0",15))).toString());
+    // 还原存储的交易信息
+    const {transaction:{transactions},dispatch}=this.props;
+    let newData=[...transactions];
+    if(localStorage.getItem('transactions')){
+      newData.push(...JSON.parse(localStorage.getItem('transactions'))) 
+    }
+    // 更新数据
+    dispatch({
+      type: 'transaction/addTransaction',
+      payload: {
+        transactions: [...uniqueFun(newData,'hash')],
+      },
+    });
   }
 
   // workaround way to get USD price (put token1 as USDC)
@@ -412,7 +421,6 @@ class BasicProfile extends Component {
           )}
         </div>
         <div className={styles.exchangeBottomWrapper}>
-
           {this.state.isReceiptObtained &&
             <div className={styles.exchangeItem}>
               <h3>
@@ -443,7 +451,7 @@ class BasicProfile extends Component {
               <AcyIcon.MyIcon width={30} type="arrow" />
               <span className={styles.span}>HISTORY TRANSACTION</span>
             </h3>
-            <StakeHistoryTable isMobile={isMobile} dataSource={transactions} />
+            <StakeHistoryTable isMobile={isMobile} dataSource={transactions.filter(item=>item.inputTokenNum!=undefined)} />
           </div>
         </div>
 

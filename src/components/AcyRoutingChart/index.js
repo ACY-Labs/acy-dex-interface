@@ -11,7 +11,7 @@ const AcyRoutingChart = (props) => {
   // 下行路径
   const [bottomLine,setBottomLine]=useState();
 
-  return <svg style={{ width: "100%", height: "100%" }} viewBox="0 0 600 400">
+  return <svg style={{ width: "100%", height: "100%" }} viewBox="0 0 600 300">
     <g transform="translate(50,200)">
       {/* <g>
         <path
@@ -62,7 +62,7 @@ const AcyRoutingChart = (props) => {
             x="0"
             y="15"
             textAnchor="middle"
-            stroke="white"
+            stroke="#eb5c20"
             strokeWidth="1px"
             alignmentBaseline="middle"
           >
@@ -182,7 +182,7 @@ const AcyRoutingChart = (props) => {
             stroke="white"
             alignmentBaseline="middle"
           >
-            {props.data&&props.data[0].value}
+            {props.data&&props.data.length>0&&props.data[0].value}
           </text>
         </g>
       </g>
