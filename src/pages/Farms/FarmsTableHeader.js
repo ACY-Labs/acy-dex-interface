@@ -23,7 +23,7 @@ const FarmsTableHeader = ({ tableTitle, tableSubtitle, selectedTable, tokenFilte
               onChange={(e) => setTokenFilter({...tokenFilter, btcEthToken: e.target.checked})}
               className={styles.premierCheckbox}
             >
-              BTC, ETH
+              BTC, ETH...
             </Checkbox>
           </div>
         )}

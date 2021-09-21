@@ -4,6 +4,7 @@ import FarmsTableRow from '@/pages/Farms/FarmsTableRow';
 import FarmsTableHeader from '@/pages/Farms/FarmsTableHeader';
 import { graphSampleData, graphSampleData2 } from '@/pages/Dao/sample_data/SampleData';
 import DaoChart from './DaoChart';
+import AcyIcon from '@/assets/icon_acy.svg'
 
 const FarmsTable = (
   {
@@ -84,6 +85,7 @@ const FarmsTable = (
               showModal={showModal}
               hideModal={hideModal}
               isModalVisible={isModalVisible}
+              selectedTable={selectedTable}
             />
           ))}
         </div>
@@ -91,8 +93,8 @@ const FarmsTable = (
         <div className={styles.tableBodyContainer}>
           <FarmsTableRow
             token1="ACY"
-            token1Logo={tableRow[0].token1Logo}
-            token2Logo={tableRow[0].token1Logo}
+            token1Logo={AcyIcon}
+            token2Logo={AcyIcon}
             totalApr="12345"
             tvl="12345"
             hidden={false}
@@ -102,6 +104,7 @@ const FarmsTable = (
             showModal={showModal}
             hideModal={hideModal}
             isModalVisible={isModalVisible}
+            hideArrow
           />
           <div>
             <div className={styles.stakeSectionMain}>

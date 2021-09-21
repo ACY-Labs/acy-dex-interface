@@ -19,6 +19,7 @@ const DaoTable = () => {
         const prevDataColumn = [...prevState]
         prevDataColumn[2].show = false
         prevDataColumn[4].show = false
+        prevDataColumn[5].show = false
         return prevDataColumn
       })
     } else {
@@ -26,6 +27,7 @@ const DaoTable = () => {
         const prevDataColumn = [...prevState]
         prevDataColumn[2].show = true
         prevDataColumn[4].show = true
+        prevDataColumn[5].show = true
         return prevDataColumn
       })
     }

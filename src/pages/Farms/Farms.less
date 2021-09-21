@@ -17,8 +17,11 @@
       flex-wrap: wrap;
 
       .tableHeaderRadioButtonContainer {
-        margin-left: -1rem;
         margin-right: 0.5rem;
+
+        label {
+          font-size: 1rem;
+        }
       }
 
       .tableHeaderSearchInputContainer {
@@ -65,6 +68,31 @@
 
   .tableToggleButtonContainer {
 
+  }
+}
+
+@media (max-width: 768px) {
+  .tableHeaderRadioButtonContainer {
+    margin-right: 0.5rem;
+
+    label {
+      font-size: 0.75rem;
+    }
+  }
+
+  .tableHeaderSearchInputContainer {
+    .searchInput {
+      font-size: 0.75rem;
+      width: 8rem !important;
+    }
+  }
+
+  .tableHeaderToggleButtonContainer {
+    .activeToggleButton,
+    .endedToggleButton {
+      padding: 0.25rem 0.5rem !important;
+      font-size: 0.75rem;
+    }
   }
 }
 
@@ -176,7 +204,7 @@
       flex: 3;
 
       .pendingRewardTitleContainer {
-        font-weight: bold;
+        font-weight: lighter;
       }
 
       .pendingReward1ContentContainer {
@@ -188,7 +216,7 @@
       flex: 3;
 
       .totalAprTitleContainer {
-        font-weight: bold;
+        font-weight: lighter;
       }
 
       .totalAprContentContainer {
@@ -200,7 +228,7 @@
       flex: 3;
 
       .tvlTitleContainer {
-        font-weight: bold;
+        font-weight: lighter;
       }
 
       .tvlContentContainer {
@@ -358,6 +386,26 @@
     font-size: 0.75rem !important;
   }
 
+  .tableBodyRewardColContainer {
+     .pendingRewardTitleContainer {
+       font-size: 0.75rem !important;
+     }
+
+     .pendingReward1ContentContainer {
+       font-size: 0.75rem !important;
+     }
+   }
+
+  .tableBodyAprColContainer {
+    .totalAprTitleContainer {
+      font-size: 0.75rem !important;
+    }
+
+    .totalAprContentContainer {
+      font-size: 0.75rem !important;
+    }
+  }
+
   .tableBodyTvlColContainer {
     .tvlTitleContainer {
       font-size: 0.75rem !important;
@@ -430,34 +478,34 @@
 
 @media (max-width: 768px) {
   .firstToggleButton {
-    padding: 0.1rem 0.5rem;
+    padding: 0.25rem 0.5rem;
     margin-right: 0;
     font-size: 0.75rem;
     border-radius: 15px 0 0 15px;
   }
 
   .leftToggleButton {
-    padding: 0.1rem 0.5rem;
+    padding: 0.25rem 0.5rem;
     margin-right: 0;
     font-size: 0.75rem;
     border-radius: 0;
   }
 
   .middleToggleButton {
-    padding: 0.1rem 0.5rem;
+    padding: 0.25rem 0.5rem;
     margin-right: 0;
     font-size: 0.75rem;
   }
 
   .rightToggleButton {
-    padding: 0.1rem 0.75rem;
+    padding: 0.25rem 0.5rem;
     margin-right: 0;
     font-size: 0.75rem;
     border-radius: 0;
   }
 
   .lastToggleButton {
-    padding: 0.1rem 0.5rem;
+    padding: 0.25rem 0.5rem;
     margin-right: 0;
     font-size: 0.75rem;
     border-radius: 0 15px 15px 0;
