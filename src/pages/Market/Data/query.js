@@ -104,7 +104,7 @@ export const GET_POOL_DAY_DATA = gql`
     pairDayDatas(
       first: $timespan
       orderBy: date
-      orderDirection: asc
+      orderDirection: desc
       where: { pairAddress: $pairAddress }
     ) {
       dailyVolumeUSD

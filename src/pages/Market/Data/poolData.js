@@ -43,7 +43,7 @@ export async function fetchGeneralPoolInfoDay(client) {
       let weekDataLength = weekDatas.length;
       let volume7d = 0;
       for (let i = 0; i < weekDataLength; i++) {
-        volume7d += weekDatas[i].dailyVolumeUSD;
+        volume7d += parseFloat(weekDatas[i].dailyVolumeUSD);
       }
 
       poolListProcessed.push(convertPoolForList(rawPoolList[i], volume7d));
@@ -51,7 +51,7 @@ export async function fetchGeneralPoolInfoDay(client) {
       console.log(err);
     }
   }
-  
+
   return poolListProcessed;
 }
 
