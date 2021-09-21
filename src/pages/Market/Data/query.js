@@ -23,7 +23,12 @@ export const GET_MARKET_DATA = gql`
 // this is for the current day, use get token day data to fetch yesterday's and calculate the price
 export const GET_TOKEN_LIST = gql`
   query tokenDayDatas($date: Int!, $tokenAmount: Int!) {
-    tokenDayDatas(first: $tokenAmount, orderBy: totalLiquidityUSD, orderDirection: desc, where: { date: $date }) {
+    tokenDayDatas(
+      first: $tokenAmount
+      orderBy: totalLiquidityUSD
+      orderDirection: desc
+      where: { date: $date }
+    ) {
       token {
         id
         name
@@ -52,6 +57,7 @@ export const GET_TOKEN_DAY_SIMPLE = gql`
   }
 `;
 
+// get individual token history data
 export const GET_TOKEN_DAY_DATA = gql`
   query tokenDayDatas($tokenId: ID!) {
     tokenDayDatas(orderBy: date, orderDirection: asc, where: { token: $tokenId }) {
@@ -69,10 +75,43 @@ export const GET_TOKEN_DAY_DATA = gql`
 `;
 
 // get general pool list
-// export const GET_TOP_POOL = gql`ss`;
+export const GET_TOP_POOL = gql`
+  query pairDayDatas($poolAmount: Int!, $date: Int!) {
+    pairDayDatas(
+      first: $poolAmount
+      orderBy: reserveUSD
+      orderDirection: desc
+      where: { date: $date }
+    ) {
+      pairAddress
+      token0 {
+        symbol
+      }
+      token1 {
+        symbol
+      }
+      reserveUSD
+      dailyVolumeUSD
+    }
+  }
+`;
 
-// get individual token history data
-export const GET_TOKEN_HISTORY_DATA = undefined;
+
+// get pool day data
+// @params timespan, pairAddress
+export const GET_POOL_DAY_DATA = gql`
+  query pairDayDatas($timespan: Int!, $pairAddress: ID!) {
+    pairDayDatas(
+      first: $timespan
+      orderBy: date
+      orderDirection: asc
+      where: { pairAddress: $pairAddress }
+    ) {
+      dailyVolumeUSD
+      reserveUSD
+    }
+  }
+`;
 
 // get main transactions
 export const GET_GLOBAL_TRANSACTIONS = gql`

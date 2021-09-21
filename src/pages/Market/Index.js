@@ -17,6 +17,7 @@ import {
   marketClient,
   fetchGlobalTransaction,
   fetchGeneralTokenInfo,
+  fetchGeneralPoolInfoDay
 } from './Data/index.js';
 
 export class MarketIndex extends Component {
@@ -43,9 +44,20 @@ export class MarketIndex extends Component {
 
     // token data
     tokenInfo: [],
+
+    // pool data
+    poolInfo: []
   };
 
   componentDidMount() {
+
+    // fetch pool data
+    fetchGeneralPoolInfoDay(marketClient).then(poolInfo => {
+      this.setState({
+        poolInfo: poolInfo
+      })
+    });
+
     // fetch token info
     fetchGeneralTokenInfo(marketClient).then(tokenInfo => {
       this.setState({
@@ -180,8 +192,12 @@ export class MarketIndex extends Component {
             </Link>
           </h3>
         </div>
-
-        <PoolTable dataSourcePool={dataSourcePool} />
+        
+        {this.state.poolInfo.length > 0 ? (
+          <PoolTable dataSourcePool={this.state.poolInfo} />
+        ) : (
+          <Icon type="loading" />
+        )}
 
         <h2>Transactions</h2>
         {this.state.transactions.length > 0 ? (

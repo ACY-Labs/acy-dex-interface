@@ -438,12 +438,12 @@ export function PoolTable(props) {
                   {entry.coin1}/{entry.coin2}
                 </span>
               </Link>
-              <div
+              {/* <div
                 className={styles.percentBadge}
                 style={{ marginLeft: '10px', fontSize: '14px', lineHeight: '15px' }}
               >
                 {entry.percent} %
-              </div>
+              </div> */}
             </div>
           );
         },
