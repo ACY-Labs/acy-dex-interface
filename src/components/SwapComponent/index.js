@@ -439,7 +439,7 @@ const SwapComponent = props => {
           let newData = transactions.filter(item => item.hash != status.hash);
           let transactionTime='',inputTokenNum,outTokenNum,totalToken;
           await library.getBlock(receipt.logs[0].blockNumber).then((data)=>{
-            transactionTime=moment(parseInt(data.timestamp*1000)).format('YYYY-MM-DD hh:mm:ss')
+            transactionTime=moment(parseInt(data.timestamp*1000)).format('YYYY-MM-DD HH:mm:ss')
           });
           receipt.logs.map(item=>{
             if(item.address==inputToken.address){
