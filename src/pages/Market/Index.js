@@ -17,7 +17,7 @@ import {
   marketClient,
   fetchGlobalTransaction,
   fetchGeneralTokenInfo,
-  fetchGeneralPoolInfoDay
+  fetchGeneralPoolInfoDay,
 } from './Data/index.js';
 
 export class MarketIndex extends Component {
@@ -39,6 +39,10 @@ export class MarketIndex extends Component {
       volume24h: [],
     },
 
+    // overall chart data
+    overallVolume: -1,
+    overallTvl: -1,
+
     // transaction data
     transactions: [],
 
@@ -46,16 +50,23 @@ export class MarketIndex extends Component {
     tokenInfo: [],
 
     // pool data
-    poolInfo: []
+    poolInfo: [],
+
+    // error messages
+    tokenError: '',
+    pullError: '',
+    transactionError: '',
+    barChartError: '',
+    lineChartError: '',
+    overviewError: '',
   };
 
   componentDidMount() {
-
     // fetch pool data
     fetchGeneralPoolInfoDay(marketClient).then(poolInfo => {
       this.setState({
-        poolInfo: poolInfo
-      })
+        poolInfo: poolInfo,
+      });
     });
 
     // fetch token info
@@ -76,6 +87,8 @@ export class MarketIndex extends Component {
     fetchMarketData(marketClient).then(dataDict => {
       this.setState({
         chartData: dataDict,
+        overallVolume: abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]),
+        overallTvl: abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]),
         selectedIndexLine: dataDict.tvl.length - 1,
         selectedDataLine: abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]),
         selectedIndexBar: dataDict.volume24h.length - 1,
@@ -158,17 +171,23 @@ export class MarketIndex extends Component {
             )}
           </div>
         </div>
-        <Row className={styles.marketOverview} justify="space-around">
-          <Col span={8}>
-            Volume 24H <strong>$882.20m</strong> <span className={styles.priceChangeUp}>0.36%</span>
-          </Col>
-          <Col span={8}>
-            Fees 24H <strong>$1.66m </strong> <span className={styles.priceChangeUp}>0.36%</span>
-          </Col>
-          <Col span={8}>
-            TVL <strong>$2.90b</strong> <span className={styles.priceChangeDown}>-0.36%</span>
-          </Col>
-        </Row>
+        {this.state.overallVolume !== -1 && this.state.overallTvl !== -1 ? (
+          <Row className={styles.marketOverview} justify="space-around">
+            <Col span={8}>
+              Volume 24H <strong>$ {this.state.overallVolume}</strong>{' '}
+              <span className={styles.priceChangeUp}>0.36%</span>
+            </Col>
+            <Col span={8}>
+              Fees 24H <strong>$1.66m </strong> <span className={styles.priceChangeUp}>0.36%</span>
+            </Col>
+            <Col span={8}>
+              TVL <strong>$ {this.state.overallTvl}</strong>{' '}
+              <span className={styles.priceChangeDown}>-0.36%</span>
+            </Col>
+          </Row>
+        ) : (
+          <Icon type="loading" />
+        )}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
           <h2>Top Tokens</h2>
@@ -192,7 +211,7 @@ export class MarketIndex extends Component {
             </Link>
           </h3>
         </div>
-        
+
         {this.state.poolInfo.length > 0 ? (
           <PoolTable dataSourcePool={this.state.poolInfo} />
         ) : (

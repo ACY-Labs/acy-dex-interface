@@ -303,10 +303,10 @@ export function TokenTable(props) {
             <div className={styles.tableData}>
               <span className={priceChange < 0 ? styles.priceChangeDown : styles.priceChangeUp}>
                 {Math.abs(priceChange) > 0.01 && Math.abs(priceChange) > 0
-                  ? `${priceChange.toFixed(3)} %`
+                  ? `${priceChange.toFixed(2)} %`
                   : priceChange >= 0
-                  ? '<0.001 %'
-                  : '- <0.001%'}
+                  ? '<0.01 %'
+                  : '- <0.01%'}
               </span>
             </div>
           );
@@ -409,12 +409,12 @@ export function PoolTable(props) {
           <div
             className={styles.tableHeaderFirst}
             onClick={() => {
-              setCurrentKey('percent');
+              setCurrentKey('coin1');
               onSortChange();
             }}
           >
             Pool
-            {currentKey == 'percent' && (
+            {currentKey == 'coin1' && (
               <Icon
                 type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}

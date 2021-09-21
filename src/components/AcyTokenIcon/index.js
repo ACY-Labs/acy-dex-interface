@@ -7,18 +7,14 @@ function AcyTokenIcon(props) {
   return (
     <>
       {!isError ? (
-        props.symbol === 'WETH' ? (
-          <AcyIcon name="eth" width={props.width || 20} />
-        ) : (
-          <img
-            src={`https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/${
-              props.symbol
-            }.svg`}
-            width={props.width || 20}
-            height={props.width || 20}
-            onError={() => setIsError(true)}
-          />
-        )
+        <img
+          src={`https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/${
+            props.symbol === 'WETH' ? 'ETH' : props.symbol
+          }.svg`}
+          width={props.width || 20}
+          height={props.width || 20}
+          onError={() => setIsError(true)}
+        />
       ) : (
         <AcyIcon name="unknown" width={props.width || 20} />
       )}
