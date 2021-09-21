@@ -51,8 +51,13 @@ export async function fetchGeneralTokenInfo(client){
     let rawTopTokenLength = rawTopToken.length
     let topTokens = []
     for(let i = 0; i < rawTopTokenLength; i++){
-        const tokenDayData = await fetchTokenDaySimple(client, rawTopToken[i].token.id)
-        topTokens.push(convertTokenForList(rawTopToken[i], tokenDayData.tokenDayDatas[1]))
+        try{
+            const tokenDayData = await fetchTokenDaySimple(client, rawTopToken[i].token.id)
+            topTokens.push(convertTokenForList(rawTopToken[i], tokenDayData.tokenDayDatas[1]))
+        }
+        catch(err){
+            console.log(err)
+        }
     }
 
     return topTokens

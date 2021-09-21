@@ -661,7 +661,7 @@ export function TransactionTable(props) {
               onSortChange();
             }}
           >
-            TokenList Amount
+            Token Amount
             {currentKey == 'coin1Amount' && (
               <Icon
                 type={!isAscending ? 'arrow-up' : 'arrow-down'}
@@ -690,7 +690,7 @@ export function TransactionTable(props) {
               onSortChange();
             }}
           >
-            TokenList Amount
+            Token Amount
             {currentKey == 'coin2Amount' && (
               <Icon
                 type={!isAscending ? 'arrow-up' : 'arrow-down'}

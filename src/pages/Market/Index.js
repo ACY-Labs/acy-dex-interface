@@ -1,24 +1,19 @@
 import { AcyBarChart, AcyLineChart } from '@/components/Acy';
-import { Col, Row, Icon, Skeleton } from 'antd';
+import { Col, Icon, Row } from 'antd';
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  dataSourceCoin,
-  dataSourcePool,
-  dataSourceTransaction,
-  graphSampleData,
-} from './SampleData.js';
+  fetchGeneralPoolInfoDay,
+  fetchGeneralTokenInfo,
+  fetchGlobalTransaction,
+  fetchMarketData,
+  marketClient,
+} from './Data/index.js';
+import { dataSourceCoin, dataSourcePool } from './SampleData.js';
 import styles from './styles.less';
 import { abbrNumber } from './Util.js';
 import { MarketSearchBar, PoolTable, TokenTable, TransactionTable } from './UtilComponent.js';
-
-import {
-  fetchMarketData,
-  marketClient,
-  fetchGlobalTransaction,
-  fetchGeneralTokenInfo,
-  fetchGeneralPoolInfoDay,
-} from './Data/index.js';
+import { isMobile } from 'react-device-detect';
 
 export class MarketIndex extends Component {
   constructor(props) {
@@ -42,6 +37,8 @@ export class MarketIndex extends Component {
     // overall chart data
     overallVolume: -1,
     overallTvl: -1,
+    ovrVolChange: 0.0,
+    ovrTvlChange: 0.0,
 
     // transaction data
     transactions: [],
@@ -85,10 +82,21 @@ export class MarketIndex extends Component {
 
     // fetch market data
     fetchMarketData(marketClient).then(dataDict => {
+      let volumeChange =
+        (dataDict.volume24h[dataDict.tvl.length - 1][1] -
+          dataDict.volume24h[dataDict.tvl.length - 2][1]) /
+        dataDict.volume24h[dataDict.tvl.length - 2][1];
+
+      let tvlChange =
+        (dataDict.tvl[dataDict.tvl.length - 1][1] - dataDict.tvl[dataDict.tvl.length - 2][1]) /
+        dataDict.tvl[dataDict.tvl.length - 2][1];
+
       this.setState({
         chartData: dataDict,
         overallVolume: abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]),
         overallTvl: abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]),
+        ovrVolChange: (volumeChange * 100).toFixed(2),
+        ovrTvlChange: (tvlChange * 100).toFixed(2),
         selectedIndexLine: dataDict.tvl.length - 1,
         selectedDataLine: abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]),
         selectedIndexBar: dataDict.volume24h.length - 1,
@@ -112,7 +120,6 @@ export class MarketIndex extends Component {
   };
 
   render() {
-    // const outsideClickRef = useDetectClickOutside({ onTriggered: this.onSearchBlur });
     const { visible, visibleSearchBar, tabIndex, transactionView } = this.state;
     return (
       <div className={styles.marketRoot}>
@@ -171,22 +178,34 @@ export class MarketIndex extends Component {
             )}
           </div>
         </div>
-        {this.state.overallVolume !== -1 && this.state.overallTvl !== -1 ? (
+        {this.state.overallVolume !== -1 && this.state.overallTvl !== -1 && !isMobile ? (
           <Row className={styles.marketOverview} justify="space-around">
             <Col span={8}>
               Volume 24H <strong>$ {this.state.overallVolume}</strong>{' '}
-              <span className={styles.priceChangeUp}>0.36%</span>
+              <span
+                className={
+                  this.state.ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
+                }
+              >
+                {this.state.ovrVolChange} %
+              </span>
             </Col>
-            <Col span={8}>
+            {/* <Col span={8}>
               Fees 24H <strong>$1.66m </strong> <span className={styles.priceChangeUp}>0.36%</span>
-            </Col>
+            </Col> */}
             <Col span={8}>
               TVL <strong>$ {this.state.overallTvl}</strong>{' '}
-              <span className={styles.priceChangeDown}>-0.36%</span>
+              <span
+                className={
+                  this.state.ovrTvlChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
+                }
+              >
+                {this.state.ovrTvlChange} %
+              </span>
             </Col>
           </Row>
         ) : (
-          <Icon type="loading" />
+          !isMobile && <Icon type="loading" />
         )}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
