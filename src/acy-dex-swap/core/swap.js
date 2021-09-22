@@ -574,65 +574,65 @@ export async function swap(
       return result;
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
-    else {
-      console.log('SWAP');
 
-      console.log('------------------ CONSTRUCT TOKEN ------------------');
-      // use WETH for ETHER to work with Uniswap V2 SDK
-      const token0 = token0IsETH
-        ? WETH[chainId]
-        : new Token(chainId, inToken0Address, inToken0Decimal, inToken0Symbol);
-      const token1 = token1IsETH
-        ? WETH[chainId]
-        : new Token(chainId, inToken1Address, inToken1Decimal, inToken1Symbol);
-      console.log(token0);
-      console.log(token1);
-      // quit if the two tokens are equivalent, i.e. have the same chainId and address
-      if (token0.equals(token1)) return new ACYSwapErrorStatus('Equal tokens!');
-      // helper function from uniswap sdk to get pair address, probably needed if want to replace fetchPairData
-      // get pair using our own provider
-      console.log('------------------ CONSTRUCT PAIR ------------------');
-      console.log('FETCH');
-      console.log(pair);
-      console.log('------------------ CONSTRUCT ROUTE ------------------');
-      // This is where we let Uniswap SDK know we are not using WETH but ETHER
-      console.log(route);
-      console.log('------------------ PARSE AMOUNT ------------------');
+    console.log('SWAP');
 
-      console.log('------------------ CONSTRUCT TRADE ------------------');
-      console.log(trade);
-      console.log('------------------ SLIPPAGE CALCULATE ------------------');
-      console.log(slippageAdjustedAmount);
-      console.log(minAmountOut);
-      console.log(maxAmountIn);
-      console.log('------------------ ALLOWANCE ------------------');
-      console.log('say something about allowance');
-      console.log('------------------ PREPARE SWAP ------------------');
+    console.log('------------------ CONSTRUCT TOKEN ------------------');
+    // use WETH for ETHER to work with Uniswap V2 SDK
+    const token0 = token0IsETH
+      ? WETH[chainId]
+      : new Token(chainId, inToken0Address, inToken0Decimal, inToken0Symbol);
+    const token1 = token1IsETH
+      ? WETH[chainId]
+      : new Token(chainId, inToken1Address, inToken1Decimal, inToken1Symbol);
+    console.log(token0);
+    console.log(token1);
+    // quit if the two tokens are equivalent, i.e. have the same chainId and address
+    if (token0.equals(token1)) return new ACYSwapErrorStatus('Equal tokens!');
+    // helper function from uniswap sdk to get pair address, probably needed if want to replace fetchPairData
+    // get pair using our own provider
+    console.log('------------------ CONSTRUCT PAIR ------------------');
+    console.log('FETCH');
+    console.log(pair);
+    console.log('------------------ CONSTRUCT ROUTE ------------------');
+    // This is where we let Uniswap SDK know we are not using WETH but ETHER
+    console.log(route);
+    console.log('------------------ PARSE AMOUNT ------------------');
 
-      let { methodName, args, value } = Router.swapCallParameters(trade, {
-        feeOnTransfer: false,
-        allowedSlippage,
-        recipient: account,
-        ttl: 60,
-      });
-      const options = !value || isZero(value) ? {} : { value };
+    console.log('------------------ CONSTRUCT TRADE ------------------');
+    console.log(trade);
+    console.log('------------------ SLIPPAGE CALCULATE ------------------');
+    console.log(slippageAdjustedAmount);
+    console.log(minAmountOut);
+    console.log(maxAmountIn);
+    console.log('------------------ ALLOWANCE ------------------');
+    console.log('say something about allowance');
+    console.log('------------------ PREPARE SWAP ------------------');
 
-      console.log('------------------ ARGUMENTS ------------------');
-      console.log(options);
-      console.log(args);
+    let { methodName, args, value } = Router.swapCallParameters(trade, {
+      feeOnTransfer: false,
+      allowedSlippage,
+      recipient: account,
+      ttl: 60,
+    });
+    const options = !value || isZero(value) ? {} : { value };
 
-      let result = await contract.estimateGas[methodName](...args, options)
-        .then(gasEstimate => {
-          return contract[methodName](...args, {
-            gasLimit: calculateGasMargin(gasEstimate),
-            ...options,
-          });
-        })
-        .catch(e => {
-          return new ACYSwapErrorStatus(`${methodName} failed with error ${e}`);
+    console.log('------------------ ARGUMENTS ------------------');
+    console.log(options);
+    console.log(args);
+
+    console.log(contract);
+    let result = await contract.estimateGas[methodName](...args, options)
+      .then(gasEstimate => {
+        return contract[methodName](...args, {
+          gasLimit: calculateGasMargin(gasEstimate),
+          ...options,
         });
-      return result;
-    }
+      })
+      .catch(e => {
+        return new ACYSwapErrorStatus(`${methodName} failed with error ${e}`);
+      });
+    return result;
   })();
 
   if (status instanceof ACYSwapErrorStatus) {
