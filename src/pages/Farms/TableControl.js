@@ -1,6 +1,5 @@
-import { FormControlLabel } from '@material-ui/core';
 import Switch from '@material-ui/core/Switch';
-import React, { useEffect } from 'react';
+import React from 'react';
 import styles from './Farms.less';
 
 const TableControl = ({ searchInput, setSearchInput }) => {

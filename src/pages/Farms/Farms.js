@@ -6,6 +6,7 @@ import farmsTableContent from './FarmsTableContent';
 import ToggleButtonGroup from './ToggleButtonGroup';
 import DaoTable from './DaoTable';
 import TableControl from './TableControl';
+import SampleStakeHistoryData from './SampleDaoData';
 
 const Farms = () => {
   const INITIAL_TABLE_DATA = farmsTableContent.map((row) => {
@@ -26,6 +27,8 @@ const Farms = () => {
     liquidityToken: true,
     btcEthToken: true,
   })
+  const [currentTableRow, setCurrentTableRow] = useState(INITIAL_TABLE_DATA)
+  const [daoDataSource, setDaoDataSource] = useState(SampleStakeHistoryData)
 
   const onRowClick = (index) => setTableRow((prevState) => {
     const prevTableRow = [ ...prevState ]
@@ -68,22 +71,45 @@ const Farms = () => {
     setSelectedTable(4)
   }
 
+  useEffect(() => {
+    if (selectedTable === 4) {
+      const currentTableData = SampleStakeHistoryData.filter((tableData) => {
+        const [token1, token2] = tableData.tokens.split('-')
+        if (token1.toLowerCase().includes(searchInput.toLowerCase()) || token2.toLowerCase().includes(searchInput.toLowerCase())) return true
+      })
+      setDaoDataSource(currentTableData)
+    } else {
+      const currentTableRowCopy = currentTableRow.filter((tableData) =>
+        (
+          tableData.token1.toLowerCase().includes(searchInput.toLowerCase()) ||
+          tableData.token2.toLowerCase().includes(searchInput.toLowerCase())
+        ))
+      setTableRow(currentTableRowCopy)
+    }
+  }, [searchInput, selectedTable])
+
   // watch changes of the index of selected table and checkbox filter in premier tab.
   // basic filter when selected table is all, standard, and dao.
   // when premier is selected, basic filter out acy tokens only reward,
   // and advance filter again for bth/eth only or others or both.
   useEffect(() => {
+    setSearchInput('')
+
     // when selected table is all,
     // display all data.
     if (selectedTable === 0) {
-      setTableRow(INITIAL_TABLE_DATA)
+      const filteredTableData = INITIAL_TABLE_DATA
+      setTableRow(filteredTableData)
+      setCurrentTableRow(filteredTableData)
     }
     // when selected table is standard,
     // display acy token only rewards.
     else if (selectedTable === 1) {
-      setTableRow(INITIAL_TABLE_DATA.filter((tableData) => (
+      const filteredTableData = INITIAL_TABLE_DATA.filter((tableData) => (
         tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) === 'ACY'
-      ))
+      )
+      setTableRow(filteredTableData)
+      setCurrentTableRow(filteredTableData)
     // when selected table is premier,
     // filter out all acy tokens only rewards,
     // and filter again based on bth/eth and liquidity checkboxes.
@@ -94,9 +120,11 @@ const Farms = () => {
       )
       // advance filter based on bth/eth and liquidity checkboxes.
       if (tokenFilter.btcEthToken && tokenFilter.liquidityToken) {
-        setTableRow(tableDataTemp)
+        const filteredTableData = tableDataTemp
+        setTableRow(filteredTableData)
+        setCurrentTableRow(filteredTableData)
       } else if (tokenFilter.btcEthToken && !tokenFilter.liquidityToken) {
-        setTableRow(tableDataTemp.filter((tableData) => {
+        const filteredTableData = tableDataTemp.filter((tableData) => {
           let isBtcEth = false
           tableData.pendingReward.forEach(({ token }) => {
             if (token === 'BTC' || token === 'ETH') {
@@ -104,9 +132,11 @@ const Farms = () => {
             }
           })
           return isBtcEth
-        }))
+        })
+        setTableRow(filteredTableData)
+        setCurrentTableRow(filteredTableData)
       } else if (!tokenFilter.btcEthToken && tokenFilter.liquidityToken) {
-        setTableRow(tableDataTemp.filter((tableData) => {
+        const filteredTableData = tableDataTemp.filter((tableData) => {
           let isLiquidity = false
           tableData.pendingReward.forEach(({ token }) => {
             if (token !== 'BTC' && token !== 'ETH') {
@@ -114,9 +144,12 @@ const Farms = () => {
             }
           })
           return isLiquidity
-        }))
+        })
+        setTableRow(filteredTableData)
+        setCurrentTableRow(filteredTableData)
       } else {
         setTableRow([])
+        setCurrentTableRow([])
       }
     }
   }, [selectedTable, tokenFilter])
@@ -149,7 +182,7 @@ const Farms = () => {
             setTokenFilter={setTokenFilter}
           />
         )}
-        {selectedTable === 4 && <DaoTable />}
+        {selectedTable === 4 && <DaoTable dataSource={daoDataSource} />}
       </div>
     </PageHeaderWrapper>
   )

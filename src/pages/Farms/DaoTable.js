@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Table } from 'antd';
-import SampleStakeHistoryData, {
-  sampleStakeHistoryColumns,
-} from './SampleDaoData';
+import { sampleStakeHistoryColumns } from './SampleDaoData';
 import styles from './DaoTable.less';
 
-const DaoTable = () => {
+const DaoTable = ({ dataSource }) => {
   const [stakeDisplayNumber, setStakeDisplayNumber] = useState(5);
   const [dataColumns, setDataColumns] = useState(sampleStakeHistoryColumns.map((column) => {
     const newColumn = {...column}
@@ -55,7 +53,7 @@ const DaoTable = () => {
     <div style={{ marginBottom: '3rem' }}>
       <Table
         columns={dataColumns.filter((column) => column.show === true)}
-        dataSource={SampleStakeHistoryData.sort((a, b) => new Date(b.time) - new Date(a.time)).slice(
+        dataSource={dataSource.sort((a, b) => new Date(b.time) - new Date(a.time)).slice(
           0,
           stakeDisplayNumber
         )}

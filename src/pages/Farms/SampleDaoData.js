@@ -2,6 +2,8 @@ import styles from './DaoTable.less'
 
 export default [
   {
+    "tokens": "AAVE-BAL",
+    "type": "Premier",
     "time": "2021-05-06",
     "amount": "400 sACY",
     "reward": "500 sACY",
@@ -10,6 +12,8 @@ export default [
     "apy": "4.7%",
   },
   {
+    "tokens": "AAVE-BAL",
+    "type": "Premier",
     "time": "2021-05-04",
     "amount": "500 sACY",
     "reward": "100 sACY",
@@ -18,6 +22,8 @@ export default [
     "apy": "4.7%",
   },
   {
+    "tokens": "AAVE-BAL",
+    "type": "Premier",
     "time": "2021-05-01",
     "amount": "600 sACY",
     "reward": "200 sACY",
@@ -26,6 +32,8 @@ export default [
     "apy": "4.7%",
   },
   {
+    "tokens": "AAVE-BAL",
+    "type": "Premier",
     "time": "2021-05-02",
     "amount": "200 sACY",
     "reward": "300 sACY",
@@ -34,6 +42,8 @@ export default [
     "apy": "4.7%",
   },
   {
+    "tokens": "AAVE-BAL",
+    "type": "Premier",
     "time": "2021-04-06",
     "amount": "400 sACY",
     "reward": "1000 sACY",
@@ -42,6 +52,8 @@ export default [
     "apy": "4.7%",
   },
   {
+    "tokens": "AAVE-BAL",
+    "type": "Premier",
     "time": "2021-04-04",
     "amount": "500 sACY",
     "reward": "500 sACY",
@@ -50,6 +62,8 @@ export default [
     "apy": "4.7%",
   },
   {
+    "tokens": "AAVE-BAL",
+    "type": "Premier",
     "time": "2021-02-01",
     "amount": "600 sACY",
     "reward": "500 sACY",
@@ -58,6 +72,8 @@ export default [
     "apy": "4.7%",
   },
   {
+    "tokens": "AAVE-BAL",
+    "type": "Premier",
     "time": "2021-03-02",
     "amount": "200 sACY",
     "reward": "500 sACY",
@@ -66,6 +82,8 @@ export default [
     "apy": "4.7%",
   },
   {
+    "tokens": "AAVE-BAL",
+    "type": "Premier",
     "time": "2021-07-06",
     "amount": "400 sACY",
     "reward": "500 sACY",
@@ -74,6 +92,8 @@ export default [
     "apy": "4.7%",
   },
   {
+    "tokens": "AAVE-BAL",
+    "type": "Premier",
     "time": "2021-07-04",
     "amount": "500 sACY",
     "reward": "500 sACY",
@@ -82,6 +102,8 @@ export default [
     "apy": "4.7%",
   },
   {
+    "tokens": "AAVE-BAL",
+    "type": "Premier",
     "time": "2021-08-13",
     "amount": "600 sACY",
     "reward": "500 sACY",
@@ -90,6 +112,8 @@ export default [
     "apy": "4.7%",
   },
   {
+    "tokens": "AAVE-BAL",
+    "type": "Premier",
     "time": "2021-08-15",
     "amount": "200 sACY",
     "reward": "500 sACY",
@@ -101,9 +125,15 @@ export default [
 
 const sampleStakeHistoryColumns = [
   {
-    title: 'Time',
-    dataIndex: 'time',
-    key: 'time',
+    title: 'Tokens',
+    dataIndex: 'tokens',
+    key: 'tokens',
+  },
+  {
+    title: 'Type',
+    dataIndex: 'type',
+    key: 'type',
+    render: text => <p className={styles.tableData}>{text}</p>,
   },
   {
     title: 'Amount',
@@ -115,6 +145,12 @@ const sampleStakeHistoryColumns = [
     title: 'Pending Rewards',
     dataIndex: 'reward',
     key: 'reward',
+    render: text => <p className={styles.tableData}>{text}</p>,
+  },
+  {
+    title: 'Time',
+    dataIndex: 'time',
+    key: 'time',
     render: text => <p className={styles.tableData}>{text}</p>,
   },
   {
