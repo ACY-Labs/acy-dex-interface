@@ -8,7 +8,7 @@ import {
   getUserTokenBalanceRaw,
   getTokenTotalSupply,
 } from '@/acy-dex-swap/utils/index';
-import { Fetcher, Percent, Token, TokenAmount } from '@uniswap/sdk';
+import { Fetcher, Percent, Token, TokenAmount } from '@acyswap/sdk';
 import AcyRemoveLiquidityModal from '@/components/AcyRemoveLiquidityModal';
 import { isMobile } from 'react-device-detect';
 
@@ -69,7 +69,7 @@ export async function getAllLiquidityPositions(tokens, chainId, library, account
       false
     );
 
-    console.log(pair)
+    console.log(pair);
 
     const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
 
@@ -110,25 +110,41 @@ const AcyLiquidityPositions = () => {
       render: (text, record, index) => {
         let addressLength = record.poolAddress.length;
 
-        let token0logo = null
-        let token1logo = null
+        let token0logo = null;
+        let token1logo = null;
         for (let j = 0; j < supportedTokens.length; j++) {
           if (record.token0Symbol === supportedTokens[j].symbol) {
-            token0logo = supportedTokens[j].logoURI
+            token0logo = supportedTokens[j].logoURI;
           }
           if (record.token1Symbol === supportedTokens[j].symbol) {
-            token1logo = supportedTokens[j].logoURI
+            token1logo = supportedTokens[j].logoURI;
           }
         }
 
         return (
           <div className={styles.pool}>
-            <img src={token0logo} alt={record.token0Symbol} style={{ maxWidth: '24px', maxHeight: '24px', marginRight: '0.25rem', marginTop: '0.1rem' }} />
-            <img src={token1logo} alt={record.token1Symbol} style={{ maxWidth: '24px', maxHeight: '24px', marginRight: '0.5rem', marginTop: '0.1rem' }} />
+            <img
+              src={token0logo}
+              alt={record.token0Symbol}
+              style={{
+                maxWidth: '24px',
+                maxHeight: '24px',
+                marginRight: '0.25rem',
+                marginTop: '0.1rem',
+              }}
+            />
+            <img
+              src={token1logo}
+              alt={record.token1Symbol}
+              style={{
+                maxWidth: '24px',
+                maxHeight: '24px',
+                marginRight: '0.5rem',
+                marginTop: '0.1rem',
+              }}
+            />
             <div>
-              <p className={styles.bigtitle}>
-                {record.pool}
-              </p>
+              <p className={styles.bigtitle}>{record.pool}</p>
               <p className={styles.value}>
                 {`${record.poolAddress.slice(0, 5)}...${record.poolAddress.slice(
                   addressLength - 5,

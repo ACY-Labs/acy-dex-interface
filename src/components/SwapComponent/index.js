@@ -27,7 +27,7 @@ import {
 import { Input } from 'antd';
 import { connect } from 'umi';
 import styles from './styles.less';
-import { sortAddress,abbrNumber } from '@/utils/utils';
+import { sortAddress, abbrNumber } from '@/utils/utils';
 import axios from 'axios';
 
 import { useWeb3React } from '@web3-react/core';
@@ -71,7 +71,7 @@ import {
   CurrencyAmount,
   InsufficientReservesError,
   FACTORY_ADDRESS,
-} from '@uniswap/sdk';
+} from '@acyswap/sdk';
 
 import { MaxUint256 } from '@ethersproject/constants';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -405,7 +405,7 @@ const SwapComponent = props => {
     activate(injected);
   };
   // swap的交易状态
-  const  swapCallback = async (status,inputToken,outToken) => {
+  const swapCallback = async (status, inputToken, outToken) => {
     // 循环获取交易结果
     const {
       transaction: { transactions },
@@ -437,69 +437,79 @@ const SwapComponent = props => {
           props.onGetReceipt(receipt);
           clearInterval(sti);
           let newData = transactions.filter(item => item.hash != status.hash);
-          let transactionTime='',inputTokenNum,outTokenNum,totalToken;
-          await library.getBlock(receipt.logs[0].blockNumber).then((data)=>{
-            transactionTime=moment(parseInt(data.timestamp*1000)).format('YYYY-MM-DD HH:mm:ss')
+          let transactionTime = '',
+            inputTokenNum,
+            outTokenNum,
+            totalToken;
+          await library.getBlock(receipt.logs[0].blockNumber).then(data => {
+            transactionTime = moment(parseInt(data.timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
           });
-          receipt.logs.map(item=>{
-            if(item.address==inputToken.address){
+          receipt.logs.map(item => {
+            if (item.address == inputToken.address) {
               // inputtoken 数量
               // inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimal))).toString();
-              inputTokenNum=item.data/Math.pow(10,inputToken.decimal).toString();
+              inputTokenNum = item.data / Math.pow(10, inputToken.decimal).toString();
             }
-            if(item.address==outToken.address){
+            if (item.address == outToken.address) {
               // outtoken 数量
               // outTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0", outToken.decimal))).toString();
-              outTokenNum=item.data/Math.pow(10,outToken.decimal).toString();
+              outTokenNum = item.data / Math.pow(10, outToken.decimal).toString();
             }
           });
           // 获取美元价值
-         await axios
-         .post(
-           `https://api.acy.finance/api/chart/swap?token0=${inputToken.addressOnEth}&token1=${outToken.addressOnEth}&range=1D`
-         )
-         .then(data => {
-          totalToken=abbrNumber(inputTokenNum*data.data.data.swaps[data.data.data.swaps.length-1].rate);
-           
-           // const { swaps } = data.data.data;
-           // const lastDataPoint = swaps[swaps.length - 1];
-           // console.log('ROUTE PRICE POINT', lastDataPoint);
-           // this.setState({
-           //   pricePoint: lastDataPoint.rate,
-           // });
-         });
+          await axios
+            .post(
+              `https://api.acy.finance/api/chart/swap?token0=${inputToken.addressOnEth}&token1=${
+                outToken.addressOnEth
+              }&range=1D`
+            )
+            .then(data => {
+              totalToken = abbrNumber(
+                inputTokenNum * data.data.data.swaps[data.data.data.swaps.length - 1].rate
+              );
+
+              // const { swaps } = data.data.data;
+              // const lastDataPoint = swaps[swaps.length - 1];
+              // console.log('ROUTE PRICE POINT', lastDataPoint);
+              // this.setState({
+              //   pricePoint: lastDataPoint.rate,
+              // });
+            });
           dispatch({
             type: 'transaction/addTransaction',
             payload: {
               transactions: [
-                ...newData, 
-                { 
-                  hash: status.hash, 
+                ...newData,
+                {
+                  hash: status.hash,
                   inputTokenNum,
-                  inputTokenSymbol:inputToken.symbol,
+                  inputTokenSymbol: inputToken.symbol,
                   outTokenNum,
-                  outTokenSymbol:outToken.symbol,
+                  outTokenSymbol: outToken.symbol,
                   totalToken,
-                  transactionTime
-                }
+                  transactionTime,
+                },
               ],
             },
           });
           // 保存到loac
-          localStorage.setItem('transactions',JSON.stringify([
-            ...newData, 
-            { 
-              hash: status.hash, 
-              inputTokenNum,
-              inputTokenSymbol:inputToken.symbol,
-              outTokenNum,
-              outTokenSymbol:outToken.symbol,
-              totalToken,
-              transactionTime
-            }
-          ]));
+          localStorage.setItem(
+            'transactions',
+            JSON.stringify([
+              ...newData,
+              {
+                hash: status.hash,
+                inputTokenNum,
+                inputTokenSymbol: inputToken.symbol,
+                outTokenNum,
+                outTokenSymbol: outToken.symbol,
+                totalToken,
+                transactionTime,
+              },
+            ])
+          );
 
-// 读取数据：localStorage.getItem(key);
+          // 读取数据：localStorage.getItem(key);
         }
       });
     }, 500);

@@ -67,7 +67,7 @@ import {
   CurrencyAmount,
   InsufficientReservesError,
   FACTORY_ADDRESS,
-} from '@uniswap/sdk';
+} from '@acyswap/sdk';
 
 import { MaxUint256 } from '@ethersproject/constants';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -310,12 +310,16 @@ const AddLiquidityComponent = props => {
     [chainId, library, account]
   );
 
-  useEffect(() => {
-    // focus search input every time token modal is opened.
-    // setTimeout is used as a workaround as document.getElementById always return null without  some delay.
-    const focusSearchInput = () => document.getElementById('liquidity-token-search-input').focus()
-    if (visible === true) setTimeout(focusSearchInput, 100)
-  }, [visible])
+  useEffect(
+    () => {
+      // focus search input every time token modal is opened.
+      // setTimeout is used as a workaround as document.getElementById always return null without  some delay.
+      const focusSearchInput = () =>
+        document.getElementById('liquidity-token-search-input').focus();
+      if (visible === true) setTimeout(focusSearchInput, 100);
+    },
+    [visible]
+  );
 
   const onClickCoin = () => {
     setVisible(true);

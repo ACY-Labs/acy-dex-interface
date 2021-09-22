@@ -1,24 +1,16 @@
-import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
-import { useCallback, useEffect, useState } from 'react';
 import {
   ACYSwapErrorStatus,
-  approve,
   calculateGasMargin,
   checkTokenIsApproved,
   computeTradePriceBreakdown,
   getAllowance,
   getContract,
   getRouterContract,
-  getUserTokenBalance,
   getUserTokenBalanceRaw,
   INITIAL_ALLOWED_SLIPPAGE,
   isZero,
   ROUTER_ADDRESS,
-  supportedTokens,
 } from '../utils';
-
-import { Alert, Button, Dropdown, Form, FormControl, InputGroup } from 'react-bootstrap';
 
 import WETHABI from '../abis/WETH.json';
 
@@ -37,7 +29,7 @@ import {
   Trade,
   TradeType,
   WETH,
-} from '@uniswap/sdk';
+} from '@acyswap/sdk';
 
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
@@ -642,14 +634,14 @@ export async function swap(
       return result;
     }
   })();
-  
+
   if (status instanceof ACYSwapErrorStatus) {
     setSwapStatus(status.getErrorText());
   } else {
     console.log(status);
-    
+
     let url = 'https://rinkeby.etherscan.io/tx/' + status.hash;
-    swapCallback(status,inputToken0,inputToken1);
+    swapCallback(status, inputToken0, inputToken1);
     setSwapStatus(
       <div>
         <a href={url} target={'_blank'}>

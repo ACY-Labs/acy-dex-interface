@@ -1,30 +1,26 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { AcyModal } from '@/components/Acy';
-import styles from './AcyRemoveLiquidityModal.less';
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAddress } from '@ethersproject/address';
-import { Alert, Button, Dropdown, Form, FormControl, InputGroup } from 'react-bootstrap';
 import {
   ACYSwapErrorStatus,
   approve,
   calculateGasMargin,
   calculateSlippageAmount,
   checkTokenIsApproved,
-  getAllowance,
   getPairContract,
   getRouterContract,
   getTokenTotalSupply,
   getUserTokenBalanceRaw,
   INITIAL_ALLOWED_SLIPPAGE,
   ROUTER_ADDRESS,
-  supportedTokens,
 } from '@/acy-dex-swap/utils/index';
-import { ETHER, Fetcher, Percent, Token, TokenAmount, WETH, CurrencyAmount } from '@uniswap/sdk';
+import { ETHER, Fetcher, Percent, Token, TokenAmount, WETH, CurrencyAmount } from '@acyswap/sdk';
 
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import { splitSignature } from '@ethersproject/bytes';
+import styles from './AcyRemoveLiquidityModal.less';
 
 export async function getEstimated(
   inputToken0,
@@ -92,85 +88,85 @@ export async function getEstimated(
     return;
   }
   // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
-  else {
-    // use WETH for ETHER to work with Uniswap V2 SDK
-    const token0 = token0IsETH
-      ? WETH[chainId]
-      : new Token(chainId, inToken0Address, inToken0Decimal, inToken0Symbol);
-    const token1 = token1IsETH
-      ? WETH[chainId]
-      : new Token(chainId, inToken1Address, inToken1Decimal, inToken1Symbol);
 
-    if (token0.equals(token1)) {
-      setToken0Amount('0');
-      setToken1Amount('0');
-      setBalanceShow(false);
-      setNeedApprove(false);
-      setButtonStatus(false);
-      setButtonContent("tokens can't be the same");
-      return;
-    }
+  // use WETH for ETHER to work with Uniswap V2 SDK
+  const token0 = token0IsETH
+    ? WETH[chainId]
+    : new Token(chainId, inToken0Address, inToken0Decimal, inToken0Symbol);
+  const token1 = token1IsETH
+    ? WETH[chainId]
+    : new Token(chainId, inToken1Address, inToken1Decimal, inToken1Symbol);
 
-    // get pair using our own provider
-    let pair = await Fetcher.fetchPairData(token0, token1, library)
-      .then(pair => {
-        console.log(pair.reserve0.raw.toString());
-        console.log(pair.reserve1.raw.toString());
-        return pair;
-      })
-      .catch(e => {
-        return new ACYSwapErrorStatus(
-          `${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`
-        );
-      });
-    if (pair instanceof ACYSwapErrorStatus) {
-      setToken0Amount('0');
-      setToken1Amount('0');
-      setBalance('');
-      setBalanceShow(false);
-      setNeedApprove(false);
-      setButtonStatus(false);
-      setButtonContent('pool does not exist');
-      return;
-    }
+  if (token0.equals(token1)) {
+    setToken0Amount('0');
+    setToken1Amount('0');
+    setBalanceShow(false);
+    setNeedApprove(false);
+    setButtonStatus(false);
+    setButtonContent("tokens can't be the same");
+    return;
+  }
 
-    console.log('this is pair');
-    console.log(pair);
-    // 流动性代币的总量
-    let totalPoolTokens = await getTokenTotalSupply(pair.liquidityToken, library, account);
+  // get pair using our own provider
+  let pair = await Fetcher.fetchPairData(token0, token1, library)
+    .then(pair => {
+      console.log(pair.reserve0.raw.toString());
+      console.log(pair.reserve1.raw.toString());
+      return pair;
+    })
+    .catch(e => {
+      return new ACYSwapErrorStatus(
+        `${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`
+      );
+    });
+  if (pair instanceof ACYSwapErrorStatus) {
+    setToken0Amount('0');
+    setToken1Amount('0');
+    setBalance('');
+    setBalanceShow(false);
+    setNeedApprove(false);
+    setButtonStatus(false);
+    setButtonContent('pool does not exist');
+    return;
+  }
 
-    let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
+  console.log('this is pair');
+  console.log(pair);
+  // 流动性代币的总量
+  let totalPoolTokens = await getTokenTotalSupply(pair.liquidityToken, library, account);
 
-    if (userPoolBalance.isZero()) {
-      setToken0Amount('0');
-      setToken1Amount('0');
-      setBalance('0');
-      setBalanceShow(true);
-      setNeedApprove(false);
-      setButtonStatus(false);
-      setButtonContent('user pool balance is zero');
-      return;
-    }
-    // 用户拥有的流动性代币
-    userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
+  let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
 
-    console.log(userPoolBalance);
-    console.log(userPoolBalance.toExact());
-
-    setBalance(userPoolBalance.toExact());
+  if (userPoolBalance.isZero()) {
+    setToken0Amount('0');
+    setToken1Amount('0');
+    setBalance('0');
     setBalanceShow(true);
+    setNeedApprove(false);
+    setButtonStatus(false);
+    setButtonContent('user pool balance is zero');
+    return;
+  }
+  // 用户拥有的流动性代币
+  userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
 
-    console.log(token0);
-    console.log(pair.token0);
-    console.log(token0 == pair.token0);
+  console.log(userPoolBalance);
+  console.log(userPoolBalance.toExact());
 
-    let token0Deposited = pair.getLiquidityValue(token0, totalPoolTokens, userPoolBalance, false);
-    let token1Deposited = pair.getLiquidityValue(token1, totalPoolTokens, userPoolBalance, false);
-    console.log(token0Deposited);
-    console.log(token1Deposited);
+  setBalance(userPoolBalance.toExact());
+  setBalanceShow(true);
 
-    // 这个也是用户拥有的流动代币的总值？
-    /*
+  console.log(token0);
+  console.log(pair.token0);
+  console.log(token0 == pair.token0);
+
+  let token0Deposited = pair.getLiquidityValue(token0, totalPoolTokens, userPoolBalance, false);
+  let token1Deposited = pair.getLiquidityValue(token1, totalPoolTokens, userPoolBalance, false);
+  console.log(token0Deposited);
+  console.log(token1Deposited);
+
+  // 这个也是用户拥有的流动代币的总值？
+  /*
         这是错误的，因为getLiquidityValue的输出不能作为 liqudityMinted的输入
         let liquidityMinted = pair.getLiquidityMinted(
             totalSupply,
@@ -179,115 +175,115 @@ export async function getEstimated(
         );
         */
 
-    console.log('----------------------------');
+  console.log('----------------------------');
+  console.log(userPoolBalance.raw);
+  console.log(userPoolBalance.toExact());
+
+  let liquidityAmount;
+  let percentToRemove;
+
+  if (index === 0) {
+    let shang = percent * 100;
+    percentToRemove = new Percent(shang.toString(), '10000');
+
+    console.log('shoe percentToMove');
+    console.log(shang.toString());
+    console.log('10000');
+    console.log(percentToRemove.toSignificant());
+
+    liquidityAmount = new TokenAmount(
+      userPoolBalance.token,
+      percentToRemove.multiply(userPoolBalance.raw).quotient
+    );
+
+    setAmount(liquidityAmount.toExact());
+  } else {
+    liquidityAmount = new TokenAmount(
+      userPoolBalance.token,
+      parseUnits(amount, userPoolBalance.token.decimals)
+    );
+
+    percentToRemove = new Percent(liquidityAmount.raw, userPoolBalance.raw);
+    console.log('hello');
+    console.log(liquidityAmount.raw);
     console.log(userPoolBalance.raw);
-    console.log(userPoolBalance.toExact());
+    setPercent(percentToRemove.toSignificant(2));
+  }
 
-    let liquidityAmount;
-    let percentToRemove;
+  let first = new TokenAmount(token0, parseUnits('1', inToken0Decimal));
+  let firstPrice = pair.priceOf(token0).quote(first);
+  let second = new TokenAmount(token1, parseUnits('1', inToken1Decimal));
+  let secondPrice = pair.priceOf(token1).quote(second);
 
-    if (index === 0) {
-      let shang = percent * 100;
-      percentToRemove = new Percent(shang.toString(), '10000');
+  let token0TokenAmount = new TokenAmount(
+    token0,
+    percentToRemove.multiply(token0Deposited.raw).quotient
+  );
 
-      console.log('shoe percentToMove');
-      console.log(shang.toString());
-      console.log('10000');
-      console.log(percentToRemove.toSignificant());
+  let token1TokenAmount = new TokenAmount(
+    token1,
+    percentToRemove.multiply(token1Deposited.raw).quotient
+  );
 
-      liquidityAmount = new TokenAmount(
-        userPoolBalance.token,
-        percentToRemove.multiply(userPoolBalance.raw).quotient
-      );
+  let parsedToken0Amount;
+  let parsedToken1Amount;
 
-      setAmount(liquidityAmount.toExact());
-    } else {
-      liquidityAmount = new TokenAmount(
-        userPoolBalance.token,
-        parseUnits(amount, userPoolBalance.token.decimals)
-      );
+  parsedToken0Amount =
+    token0 === ETHER ? CurrencyAmount.ether(token0TokenAmount.raw) : token0TokenAmount;
+  parsedToken1Amount =
+    token1 === ETHER ? CurrencyAmount.ether(token1TokenAmount.raw) : token1TokenAmount;
 
-      percentToRemove = new Percent(liquidityAmount.raw, userPoolBalance.raw);
-      console.log('hello');
-      console.log(liquidityAmount.raw);
-      console.log(userPoolBalance.raw);
-      setPercent(percentToRemove.toSignificant(2));
-    }
+  setToken0Amount(parsedToken0Amount.toExact());
+  setToken1Amount(parsedToken1Amount.toExact());
 
-    let first = new TokenAmount(token0, parseUnits('1', inToken0Decimal));
-    let firstPrice = pair.priceOf(token0).quote(first);
-    let second = new TokenAmount(token1, parseUnits('1', inToken1Decimal));
-    let secondPrice = pair.priceOf(token1).quote(second);
+  setBreakdown([
+    'You will receive',
+    `${parsedToken0Amount.toExact(2)} ${token0.symbol}`,
+    `${parsedToken1Amount.toExact(2)} ${token1.symbol}`,
+    `Output is estimated. If the price changes by more than 0.5% your transaction will revert.`,
+    `Pair token burned ${amount}`,
+    `Price0: 1${inToken0Symbol} = ${firstPrice.toExact(2)} ${inToken1Symbol}`,
+    `Price1: 1${inToken1Symbol} = ${secondPrice.toExact(2)} ${inToken0Symbol}`,
+  ]);
 
-    let token0TokenAmount = new TokenAmount(
-      token0,
-      percentToRemove.multiply(token0Deposited.raw).quotient
-    );
+  console.log('CHECK IF HAVE ENOUGH BALANCE');
+  console.log(pair.liquidityToken);
+  let pairBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
+  let needAmount = parseUnits(amount, pair.liquidityToken.decimals);
+  console.log(pairBalance);
+  console.log(needAmount);
 
-    let token1TokenAmount = new TokenAmount(
-      token1,
-      percentToRemove.multiply(token1Deposited.raw).quotient
-    );
+  let userHasSufficientBalance = pairBalance.gte(needAmount);
 
-    let parsedToken0Amount;
-    let parsedToken1Amount;
-
-    parsedToken0Amount =
-      token0 === ETHER ? CurrencyAmount.ether(token0TokenAmount.raw) : token0TokenAmount;
-    parsedToken1Amount =
-      token1 === ETHER ? CurrencyAmount.ether(token1TokenAmount.raw) : token1TokenAmount;
-
-    setToken0Amount(parsedToken0Amount.toExact());
-    setToken1Amount(parsedToken1Amount.toExact());
-
-    setBreakdown([
-      'You will receive',
-      `${parsedToken0Amount.toExact(2)} ${token0.symbol}`,
-      `${parsedToken1Amount.toExact(2)} ${token1.symbol}`,
-      `Output is estimated. If the price changes by more than 0.5% your transaction will revert.`,
-      `Pair token burned ${amount}`,
-      `Price0: 1${inToken0Symbol} = ${firstPrice.toExact(2)} ${inToken1Symbol}`,
-      `Price1: 1${inToken1Symbol} = ${secondPrice.toExact(2)} ${inToken0Symbol}`,
-    ]);
-
-    console.log('CHECK IF HAVE ENOUGH BALANCE');
-    console.log(pair.liquidityToken);
-    let pairBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
-    let needAmount = parseUnits(amount, pair.liquidityToken.decimals);
-    console.log(pairBalance);
-    console.log(needAmount);
-
-    let userHasSufficientBalance = pairBalance.gte(needAmount);
-
-    if (!userHasSufficientBalance) {
-      setNeedApprove(false);
-      setButtonStatus(false);
-      setButtonContent('not enough balance');
-      return;
-    }
-
-    console.log('GET ALLOWANCE');
-    let liquidityApproval = await checkTokenIsApproved(
-      liquidityAmount.token.address,
-      liquidityAmount.raw.toString(),
-      library,
-      account
-    );
-
-    console.log(liquidityApproval);
-
-    if (!liquidityApproval) {
-      setNeedApprove(true);
-      setButtonStatus(false);
-      setButtonContent('need approve');
-      return;
-    }
-
+  if (!userHasSufficientBalance) {
     setNeedApprove(false);
-    setButtonStatus(true);
-    setButtonContent('remove Liquidity');
+    setButtonStatus(false);
+    setButtonContent('not enough balance');
     return;
   }
+
+  console.log('GET ALLOWANCE');
+  let liquidityApproval = await checkTokenIsApproved(
+    liquidityAmount.token.address,
+    liquidityAmount.raw.toString(),
+    library,
+    account
+  );
+
+  console.log(liquidityApproval);
+
+  if (!liquidityApproval) {
+    setNeedApprove(true);
+    setButtonStatus(false);
+    setButtonContent('need approve');
+    return;
+  }
+
+  setNeedApprove(false);
+  setButtonStatus(true);
+  setButtonContent('remove Liquidity');
+  return;
+
   return;
 }
 
