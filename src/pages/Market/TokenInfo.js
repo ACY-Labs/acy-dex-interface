@@ -13,6 +13,7 @@ import {
   fetchTokenDayData,
   fetchPoolDayData,
   marketClient,
+  fetchTokenInfo,
   fetchFilteredTransaction,
 } from './Data/index.js';
 import {
@@ -22,7 +23,7 @@ import {
   graphSampleData,
 } from './SampleData.js';
 import styles from './styles.less';
-import { abbrNumber, openInNewTab, sortTable } from './Util.js';
+import { abbrNumber, openInNewTab, sortTable, calcPercentChange, FEE_PERCENT } from './Util.js';
 import { convertPoolForList } from './Data/util.js';
 import { MarketSearchBar, PoolTable, TransactionTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
@@ -49,7 +50,13 @@ function MarketTokenInfo(props) {
   const [selectChartIndexPrice, setSelectChartIndexPrice] = useState(graphSampleData.length - 1);
 
   // additional datas
+  const [volume24h, setVolume24h] = useState(0);
+  const [tvl, setTvl] = useState(0);
   const [volume7d, setVolume7d] = useState(0);
+  const [txCount, setTxCount] = useState(0)
+  const [vol24Change, setVol24Change] = useState(0);
+  const [tvlChange, setTvlChange] = useState(0);
+
   const [dayDatas, setDayDatas] = useState({});
   const [poolData, setPoolData] = useState([]);
   const [tx, setTx] = useState([]);
@@ -82,15 +89,13 @@ function MarketTokenInfo(props) {
   };
 
   useEffect(() => {
-    // {
-    //   name: 'Ether',
-    //   short: 'ETH',
-    //   address: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
-    //   price: 3170,
-    //   priceChange: -0.79,
-    //   volume24h: 804110000,
-    //   tvl: 899640000,
-    // },
+    let todayTimestamp = Math.floor(Date.now() / 1000);
+    let volumeChange = [0, 0, 0, 0];
+    let txChange = [0,0,0]
+    let tokenAddress = address
+
+
+    
 
     // request the token info
     fetchTokenDayData(marketClient, address).then(([data, pairs0, pairs1]) => {
@@ -135,6 +140,9 @@ function MarketTokenInfo(props) {
       setSelectChartDataVol(abbrNumber(volumeGraphData[length - 1][1]));
       setSelectChartDataTvl(abbrNumber(tvlGraphData[length - 1][1]));
       setSelectChartDataPrice(abbrNumber(priceGraphData[length - 1][1]));
+
+      setTvl(parseFloat(tvlGraphData[length - 1][1]));
+      setTvlChange(calcPercentChange(tvlGraphData[length - 1][1],tvlGraphData[length - 2][1]))
 
       // process and set pool data
       let pairLen0 = pairs0.length;
@@ -220,6 +228,43 @@ function MarketTokenInfo(props) {
         volume24h: parseFloat(data[length - 1].dailyVolumeUSD),
         tvl: parseFloat(data[length - 1].totalLiquidityUSD),
       });
+    });
+
+    // get volume and tvl
+    let snapshotsPromise = [];
+    snapshotsPromise.push(
+      fetchTokenInfo(marketClient, tokenAddress, todayTimestamp).then(tokenInfoPresent => {
+        volumeChange[0] = parseFloat(tokenInfoPresent.tradeVolumeUSD);
+        txChange[0] = parseInt(tokenInfoPresent.txCount)
+      })
+    );
+    snapshotsPromise.push(
+      fetchTokenInfo(marketClient, tokenAddress, todayTimestamp - 86400).then(tokenInfo24h => {
+        volumeChange[1] = parseFloat(tokenInfo24h.tradeVolumeUSD);
+        txChange[1] = parseInt(tokenInfo24h.txCount)
+      })
+    );
+    snapshotsPromise.push(
+      fetchTokenInfo(marketClient, tokenAddress, todayTimestamp - (86400 * 2)).then(tokenInfo48h => {
+        volumeChange[2] = parseFloat(tokenInfo48h.tradeVolumeUSD);
+        txChange[2] = parseInt(tokenInfo48h.txCount)
+      })
+    );
+    snapshotsPromise.push(
+      fetchTokenInfo(marketClient, tokenAddress, todayTimestamp - (86400 * 7)).then(tokenInfo7d => {
+        volumeChange[3] = parseFloat(tokenInfo7d.tradeVolumeUSD);
+      })
+    );
+
+    Promise.all(snapshotsPromise).then(() => {
+      setVolume24h(volumeChange[0] - volumeChange[1]);
+      setVol24Change(
+        calcPercentChange(volumeChange[0] - volumeChange[1], volumeChange[1] - volumeChange[2])
+      );
+
+      // setVolume7d(volumeChange[0] - volumeChange[3]);
+
+      setTxCount(txChange[0] - txChange[1])
     });
 
     // set the watchlists
@@ -310,7 +355,7 @@ function MarketTokenInfo(props) {
               </div>
               <div>
                 <span style={{ fontSize: '30px', fontWeight: 'bold' }}>
-                  $ {abbrNumber(tokenData.price)}
+                  $ {tokenData.price.toFixed(3)}
                 </span>
                 <span
                   style={{ fontSize: '20px', fontWeight: 'thin', marginLeft: '16px' }}
@@ -352,17 +397,23 @@ function MarketTokenInfo(props) {
             <div className={styles.contentStats}>
               <div className={styles.statEntry}>
                 <div className={styles.statEntryName}>TVL</div>
-                <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.tvl)}</div>
-                <div className={styles.statEntryChange} style={{ color: 'greenyellow' }}>
-                  5.12%
+                <div className={styles.statEntryValue}>$ {abbrNumber(tvl)}</div>
+                <div
+                  className={styles.statEntryChange}
+                  style={{ color: tvlChange >= 0 ? 'greenyellow' : 'red' }}
+                >
+                  {`${vol24Change.toFixed(2)} %`}
                 </div>
               </div>
               <div className={styles.statEntry}>
                 <div className={styles.statEntryName}>24h Trading Vol</div>
-                <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.volume24h)}</div>
-                <div className={styles.statEntryChange} style={{ color: 'red' }}>
+                <div className={styles.statEntryValue}>$ {abbrNumber(volume24h)}</div>
+                <div
+                  className={styles.statEntryChange}
+                  style={{ color: vol24Change >= 0 ? 'greenyellow' : 'red' }}
+                >
                   {' '}
-                  - 5.12%
+                  {`${vol24Change.toFixed(2)} %`}
                 </div>
               </div>
               <div className={styles.statEntry}>
@@ -373,8 +424,8 @@ function MarketTokenInfo(props) {
                 </div>
               </div>
               <div className={styles.statEntry}>
-                <div className={styles.statEntryName}>24h Fees</div>
-                <div className={styles.statEntryValue}>$ {abbrNumber(tokenData.volume24h)}</div>
+                <div className={styles.statEntryName}>24h Transactions</div>
+                <div className={styles.statEntryValue}>{abbrNumber(txCount)}</div>
                 <div className={styles.statEntryChange} style={{ visibility: 'hidden' }}>
                   00{' '}
                 </div>

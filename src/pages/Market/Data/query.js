@@ -2,7 +2,12 @@ import { gql } from '@apollo/client';
 
 export const GET_BLOCK_FROM_TIMESTAMP = gql`
   query blocks($timestamp: Int!) {
-    blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_lt: $timestamp }) {
+    blocks(
+      first: 1
+      orderBy: timestamp
+      orderDirection: desc
+      where: { timestamp_lte: $timestamp }
+    ) {
       id
       number
       timestamp
@@ -63,6 +68,21 @@ export const GET_TOKEN_DAY_SIMPLE = gql`
       dailyVolumeETH
       dailyVolumeToken
       dailyVolumeUSD
+    }
+  }
+`;
+
+export const GET_TOKEN_INFO = gql`
+  query tokens($address: ID!, $block: Int!) {
+    tokens(where: { id: $address }, block: { number: $block }) {
+      id
+      symbol
+      name
+      decimals
+      untrackedVolumeUSD
+      tradeVolumeUSD
+      totalLiquidity
+      txCount
     }
   }
 `;
@@ -144,7 +164,7 @@ export const GET_TOP_POOL = gql`
 // get pool info
 export const GET_POOL_INFO = gql`
   query($pairAddress: ID!, $block: Int!) {
-    pairs(where: { id: $pairAddress }, block: {number: $block}) {
+    pairs(where: { id: $pairAddress }, block: { number: $block }) {
       token0 {
         id
         symbol
