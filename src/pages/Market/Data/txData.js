@@ -37,21 +37,21 @@ export async function fetchGlobalTransaction(client) {
 
 
   // get all burns
-  for (let j = 0; j < TRANSACTION_AMOUNT; j++) {
+  for (let j = 0; j < burns.length; j++) {
     globalTransactions.push(
       convertTx(burns[j], burns[j].transaction.id, burns[j].transaction.timestamp, TransactionType.REMOVE)
     );
   }
 
   // get all mints
-  for (let j = 0; j < TRANSACTION_AMOUNT; j++) {
+  for (let j = 0; j < mints.length; j++) {
     globalTransactions.push(
       convertTx(mints[j], mints[j].transaction.id, mints[j].transaction.timestamp, TransactionType.ADD)
     );
   }
 
   // get all swaps
-  for (let j = 0; j < TRANSACTION_AMOUNT; j++) {
+  for (let j = 0; j < swaps.length; j++) {
     globalTransactions.push(
       convertTx(swaps[j], swaps[j].transaction.id, swaps[j].transaction.timestamp, TransactionType.SWAP)
     );
@@ -80,21 +80,21 @@ export async function fetchFilteredTransaction(client, pairAddresses) {
 
 
   // get all burns
-  for (let j = 0; j < FILTERED_AMOUNT; j++) {
+  for (let j = 0; j < burns.length; j++) {
     globalTransactions.push(
       convertTx(burns[j], burns[j].transaction.id, burns[j].transaction.timestamp, TransactionType.REMOVE)
     );
   }
 
   // get all mints
-  for (let j = 0; j < FILTERED_AMOUNT; j++) {
+  for (let j = 0; j < mints.length; j++) {
     globalTransactions.push(
       convertTx(mints[j], mints[j].transaction.id, mints[j].transaction.timestamp, TransactionType.ADD)
     );
   }
 
   // get all swaps
-  for (let j = 0; j < FILTERED_AMOUNT; j++) {
+  for (let j = 0; j < swaps.length; j++) {
     globalTransactions.push(
       convertTx(swaps[j], swaps[j].transaction.id, swaps[j].transaction.timestamp, TransactionType.SWAP)
     );

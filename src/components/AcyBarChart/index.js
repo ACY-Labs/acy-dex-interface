@@ -73,6 +73,17 @@ class AcyBarChart extends Component {
   // 也可以将其放在 state 中，然后通过 setState 更新
   // setState wrapper
 
+  // re render when the data changes
+  componentDidUpdate(prevProps, prevState){
+    if (prevProps.data !== this.props.data) {
+      
+      // dummy state update to force re render
+      this.setState({
+        data: this.props.data
+      })
+    }
+  }
+
   renderTooltip = v => {
     // var inner = '<div style="padding: 25px 20px; border: 1px solid #FCEA00; background-color: rgba(0, 0, 0, 0.7);">'+v[0].value+'</div>'
     if (this.props.onHover) this.props.onHover(v[0].data, v[0].dataIndex);

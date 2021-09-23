@@ -1,5 +1,26 @@
-import { GET_TOP_POOL, GET_POOL_DAY_DATA } from './query';
+import { GET_TOP_POOL, GET_POOL_DAY_DATA, GET_POOL_INFO } from './query';
 import { convertPoolForList } from './util';
+import {getBlockFromTimestamp} from './blocks'
+
+export async function fetchPoolInfo(client, address, timestamp){
+
+  const block = await getBlockFromTimestamp(timestamp)
+
+  const { loading, error, data } = await client.query({
+    query: GET_POOL_INFO,
+    variables: {
+      pairAddress: address,
+      block: parseInt(block.number)
+    },
+  });
+
+  if (loading) return null;
+  if (error) return `Error! ${error}`;
+
+  console.log(data)
+
+  return data.pairs[0];
+}
 
 export async function fetchPoolDayData(client, address, timespan) {
   const { loading, error, data } = await client.query({

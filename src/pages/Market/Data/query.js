@@ -1,5 +1,15 @@
 import { gql } from '@apollo/client';
 
+export const GET_BLOCK_FROM_TIMESTAMP = gql`
+  query blocks($timestamp: Int!) {
+    blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_lt: $timestamp }) {
+      id
+      number
+      timestamp
+    }
+  }
+`;
+
 // get general market data
 export const GET_MARKET_DATA = gql`
   query uniswapDayDatas($startTime: Int!, $skip: Int!) {
@@ -131,16 +141,41 @@ export const GET_TOP_POOL = gql`
   }
 `;
 
+// get pool info
+export const GET_POOL_INFO = gql`
+  query($pairAddress: ID!, $block: Int!) {
+    pairs(where: { id: $pairAddress }, block: {number: $block}) {
+      token0 {
+        id
+        symbol
+      }
+      token1 {
+        id
+        symbol
+      }
+      volumeUSD
+      untrackedVolumeUSD
+      reserveUSD
+      token0Price
+      token1Price
+      reserve0
+      reserve1
+    }
+  }
+`;
+
 // get pool day data
 // @params timespan, pairAddress
 export const GET_POOL_DAY_DATA = gql`
-  query pairDayData($timespan: Int!, $pairAddress: ID!) {
+  query pairDayDatas($timespan: Int!, $pairAddress: ID!) {
     pairDayDatas(
       first: $timespan
       orderBy: date
       orderDirection: desc
       where: { pairAddress: $pairAddress }
     ) {
+      id
+      date
       dailyVolumeUSD
       reserveUSD
     }
@@ -149,85 +184,73 @@ export const GET_POOL_DAY_DATA = gql`
 
 // get main transactions
 export const GET_GLOBAL_TRANSACTIONS = gql`
-query transactions($txAmount: Int!) {
-  mints(
-    first: $txAmount
-    orderBy: timestamp
-    orderDirection: desc
-  ) {
-    transaction{
+  query transactions($txAmount: Int!) {
+    mints(first: $txAmount, orderBy: timestamp, orderDirection: desc) {
+      transaction {
+        id
+        timestamp
+      }
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+      sender
+      liquidity
+      amount0
+      amount1
+      amountUSD
+    }
+    burns(first: $txAmount, orderBy: timestamp, orderDirection: desc) {
+      transaction {
+        id
+        timestamp
+      }
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+      sender
+      liquidity
+      amount0
+      amount1
+      amountUSD
+    }
+    swaps(first: $txAmount, orderBy: timestamp, orderDirection: desc) {
       id
-      timestamp
-    }
-    pair {
-      token0 {
+      transaction {
         id
-        symbol
+        timestamp
       }
-      token1 {
-        id
-        symbol
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
       }
+      sender
+      amount0In
+      amount0Out
+      amount1In
+      amount1Out
+      amountUSD
     }
-    sender
-    liquidity
-    amount0
-    amount1
-    amountUSD
   }
-  burns(
-    first: $txAmount
-    orderBy: timestamp
-    orderDirection: desc
-  ) {
-    transaction{
-      id
-      timestamp
-    }
-    pair {
-      token0 {
-        id
-        symbol
-      }
-      token1 {
-        id
-        symbol
-      }
-    }
-    sender
-    liquidity
-    amount0
-    amount1
-    amountUSD
-  }
-  swaps(
-    first: $txAmount
-    orderBy: timestamp
-    orderDirection: desc
-  ) {
-    id
-    transaction{
-      id
-      timestamp
-    }
-    pair {
-      token0 {
-        id
-        symbol
-      }
-      token1 {
-        id
-        symbol
-      }
-    }
-    sender
-    amount0In
-    amount0Out
-    amount1In
-    amount1Out
-    amountUSD
-  }
-}
 `;
 
 export const FILTERED_TRANSACTIONS = gql`
@@ -238,7 +261,7 @@ export const FILTERED_TRANSACTIONS = gql`
       orderBy: timestamp
       orderDirection: desc
     ) {
-      transaction{
+      transaction {
         id
         timestamp
       }
@@ -264,7 +287,7 @@ export const FILTERED_TRANSACTIONS = gql`
       orderBy: timestamp
       orderDirection: desc
     ) {
-      transaction{
+      transaction {
         id
         timestamp
       }
@@ -291,7 +314,7 @@ export const FILTERED_TRANSACTIONS = gql`
       orderDirection: desc
     ) {
       id
-      transaction{
+      transaction {
         id
         timestamp
       }

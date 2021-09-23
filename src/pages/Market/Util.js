@@ -5,6 +5,8 @@ export const TransactionType = {
   REMOVE: 'Remove',
 };
 
+export const FEE_PERCENT = 0.003
+
 export function abbrHash(hash) {
   let len = hash.length;
   let first = hash.slice(0, 6);
@@ -50,6 +52,10 @@ export function abbrNumber(number) {
     default:
       result = `${number.toFixed(2)}`;
       break;
+  }
+
+  if (number < 0.01 && number > 0){
+    return '<0.01'
   }
 
   return result;
@@ -106,4 +112,8 @@ export const openInNewTab = url => {
   const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
   if (newWindow) newWindow.opener = null;
 };
+
+export function calcPercentChange(today, prev){
+  return ((today - prev) / prev) * 100;
+}
 

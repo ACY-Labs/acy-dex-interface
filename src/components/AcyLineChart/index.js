@@ -66,12 +66,24 @@ class AcyLineChart extends Component {
       imgType: 'line', // 默认折线图
       xtitle: this.props.xtitle, // x轴类目名称取参
       data: this.props.data,
+      update: 0
     };
   }
   componentDidMount() {}
   // getOption 这个函数主要用于配置 option，包括将数据配置进去
   // 也可以将其放在 state 中，然后通过 setState 更新
   // setState wrapper
+
+  // re render when the data changes
+  componentDidUpdate(prevProps, prevState){
+    if (prevProps.data !== this.props.data) {
+      
+      // dummy state update to force re render
+      this.setState({
+        data: this.props.data
+      })
+    }
+  }
 
   renderTooltip = v => {
     // var inner = '<div style="padding: 25px 20px; border: 1px solid #FCEA00; background-color: rgba(0, 0, 0, 0.7);">'+v[0].value+'</div>'

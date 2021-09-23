@@ -9,7 +9,12 @@ import {
 import { Breadcrumb, Icon, Spin } from 'antd';
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
-import { fetchTokenDayData, fetchPoolDayData, marketClient, fetchFilteredTransaction } from './Data/index.js';
+import {
+  fetchTokenDayData,
+  fetchPoolDayData,
+  marketClient,
+  fetchFilteredTransaction,
+} from './Data/index.js';
 import {
   dataSourceCoin,
   dataSourcePool,
@@ -88,11 +93,9 @@ function MarketTokenInfo(props) {
     // },
 
     // request the token info
-    fetchTokenDayData(marketClient, address).then(([data, pairs0, pairs1, mints, burns, swaps]) => {
+    fetchTokenDayData(marketClient, address).then(([data, pairs0, pairs1]) => {
       let newData = [...data].reverse();
       data = newData;
-
-      console.log(mints)
 
       let length = data.length;
 
@@ -136,31 +139,33 @@ function MarketTokenInfo(props) {
       // process and set pool data
       let pairLen0 = pairs0.length;
       let pairLen1 = pairs1.length;
-      let pairAddresses = [...pairs0.map(item => item.id), ...pairs1.map(item => item.id)]
+      let pairAddresses = [...pairs0.map(item => item.id), ...pairs1.map(item => item.id)];
       let pairData = [];
       let pairPromises = [];
       for (let i = 0; i < pairLen0; i++) {
         pairPromises.push(
           fetchPoolDayData(marketClient, pairs0[i].id, 7).then(pair0DayData => {
-            // calculate volume 7d
-            let dayDataLen0 = pair0DayData.length;
-            let p0VolumeWeek = 0;
-            for (let j = 0; j < dayDataLen0; j++) {
-              p0VolumeWeek += parseFloat(pair0DayData[j].dailyVolumeUSD);
-            }
+            if (pair0DayData.length > 0) {
+              // calculate volume 7d
+              let dayDataLen0 = pair0DayData.length;
+              let p0VolumeWeek = 0;
+              for (let j = 0; j < dayDataLen0; j++) {
+                p0VolumeWeek += parseFloat(pair0DayData[j].dailyVolumeUSD);
+              }
 
-            // push to list
-            let newPair = {
-              coin1: pairs0[i].token0.symbol,
-              coin2: pairs0[i].token1.symbol,
-              address: pairs0[i].id,
-              percent: 0,
-              tvl: parseFloat(pair0DayData[0].reserveUSD),
-              volume24h: parseFloat(pair0DayData[0].dailyVolumeUSD),
-              volume7d: p0VolumeWeek,
-              price: 0,
-            };
-            pairData.push(newPair);
+              // push to list
+              let newPair = {
+                coin1: pairs0[i].token0.symbol,
+                coin2: pairs0[i].token1.symbol,
+                address: pairs0[i].id,
+                percent: 0,
+                tvl: parseFloat(pair0DayData[0].reserveUSD),
+                volume24h: parseFloat(pair0DayData[0].dailyVolumeUSD),
+                volume7d: p0VolumeWeek,
+                price: 0,
+              };
+              pairData.push(newPair);
+            }
           })
         );
       }
@@ -168,27 +173,28 @@ function MarketTokenInfo(props) {
       for (let i = 0; i < pairLen1; i++) {
         pairPromises.push(
           fetchPoolDayData(marketClient, pairs1[i].id, 7).then(pair1DayData => {
-            console.log(pair1DayData);
+            if (pair1DayData.length > 0) {
+              // calculate volume 7d
+              let dayDataLen1 = pair1DayData.length;
+              let p1VolumeWeek = 0;
+              for (let j = 0; j < dayDataLen1; j++) {
+                p1VolumeWeek += parseFloat(pair1DayData[j].dailyVolumeUSD);
+              }
 
-            // calculate volume 7d
-            let dayDataLen1 = pair1DayData.length;
-            let p1VolumeWeek = 0;
-            for (let j = 0; j < dayDataLen1; j++) {
-              p1VolumeWeek += parseFloat(pair1DayData[j].dailyVolumeUSD);
+              // push to list
+              let newPair = {
+                coin1: pairs1[i].token0.symbol,
+                coin2: pairs1[i].token1.symbol,
+                address: pairs1[i].id,
+                percent: 0,
+                tvl: parseFloat(pair1DayData[0].reserveUSD),
+                volume24h: parseFloat(pair1DayData[0].dailyVolumeUSD),
+                volume7d: p1VolumeWeek,
+                price: 0,
+              };
+
+              pairData.push(newPair);
             }
-
-            // push to list
-            let newPair = {
-              coin1: pairs1[i].token0.symbol,
-              coin2: pairs1[i].token1.symbol,
-              address: pairs1[i].id,
-              percent: 0,
-              tvl: parseFloat(pair1DayData[0].reserveUSD),
-              volume24h: parseFloat(pair1DayData[0].dailyVolumeUSD),
-              volume7d: p1VolumeWeek,
-              price: 0,
-            };
-            pairData.push(newPair);
           })
         );
       }
@@ -197,13 +203,12 @@ function MarketTokenInfo(props) {
       Promise.all(pairPromises).then(() => {
         pairData = sortTable(pairData, 'tvl', true);
         setPoolData(pairData);
-        
       });
 
-      fetchFilteredTransaction(marketClient, pairAddresses).then((transactions) => {
-        console.log("TOIKEN TRANSAC", transactions)
-        setTx(transactions)
-      })
+      fetchFilteredTransaction(marketClient, pairAddresses).then(transactions => {
+        console.log('TOIKEN TRANSAC', transactions);
+        setTx(transactions);
+      });
 
       // set token data last
       setTokenData({
@@ -463,7 +468,7 @@ function MarketTokenInfo(props) {
                       data={dayDatas.tvlDayData}
                       showGradient={true}
                       lineColor="#1e5d91"
-                      bgColor="#29292c"
+                      bgColor="#00000000"
                       onHover={(data, index) => {
                         setSelectChartDataTvl(abbrNumber(data));
                         setSelectChartIndexTvl(index);
@@ -478,7 +483,7 @@ function MarketTokenInfo(props) {
                       data={dayDatas.priceDayData}
                       showGradient={true}
                       lineColor="#1e5d91"
-                      bgColor="#29292c"
+                      bgColor="#00000000"
                       onHover={(data, index) => {
                         setSelectChartDataPrice(abbrNumber(data));
                         setSelectChartIndexPrice(index);
@@ -494,10 +499,11 @@ function MarketTokenInfo(props) {
           {poolData.length > 0 ? <PoolTable dataSourcePool={poolData} /> : <Icon type="loading" />}
 
           <h2>Transactions</h2>
-          {tx.length > 0 ? <TransactionTable
-            dataSourceTransaction={tx}
-          /> : <Icon type="loading" />}
-          
+          {tx.length > 0 ? (
+            <TransactionTable dataSourceTransaction={tx} />
+          ) : (
+            <Icon type="loading" />
+          )}
         </>
       )}
 
