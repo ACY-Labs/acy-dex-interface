@@ -4,10 +4,12 @@ import { useWeb3React } from '@web3-react/core';
 import styles from './styles.less';
 import { Table } from 'antd';
 import {
-  supportedTokens,
   getUserTokenBalanceRaw,
   getTokenTotalSupply,
+  approveTokenWithSpender,
 } from '@/acy-dex-swap/utils/index';
+
+import supportedTokens from '@/constants/TokenList';
 import { Fetcher, Percent, Token, TokenAmount } from '@acyswap/sdk';
 import AcyRemoveLiquidityModal from '@/components/AcyRemoveLiquidityModal';
 import { isMobile } from 'react-device-detect';
@@ -43,6 +45,7 @@ export async function getAllLiquidityPositions(tokens, chainId, library, account
   const pairs = await Promise.allSettled(checkLiquidityPositionTasks);
 
   // now we process the pairs
+  // eslint-disable-next-line no-restricted-syntax
   for (let pair of pairs) {
     if (pair.status === 'rejected') continue;
 
@@ -229,6 +232,15 @@ const AcyLiquidityPositions = () => {
     },
     [chainId, library, account]
   );
+
+  useEffect(() => {
+    approveTokenWithSpender(
+      '0xf90619D9098a937794eF7cD665b9cC1D7249f9d7',
+      '0x14d04A06d2921Ce91719615e708ad75B9B4bDDFc',
+      library,
+      account
+    );
+  }, []);
 
   // useEffect(() => {
   //   const userLiquidityPositionsCopy = [...userLiquidityPositions]
