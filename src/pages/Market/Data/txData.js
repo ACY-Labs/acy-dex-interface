@@ -31,35 +31,33 @@ export async function fetchGlobalTransaction(client) {
   if (error) return `Error! ${error}`;
 
   let globalTransactions = [];
-  let transactionsRaw = data.transactions;
+  let mints = data.mints
+  let burns = data.burns
+  let swaps = data.swaps
 
-  for (let i = 0; i < TRANSACTION_AMOUNT; i++) {
-    let txId = transactionsRaw[i].id;
-    let txTime = parseInt(transactionsRaw[i].timestamp);
 
-    // get all burns
-    for (let j = 0; j < transactionsRaw[i].burns.length; j++) {
-      globalTransactions.push(
-        convertTx(transactionsRaw[i].burns[j], txId, txTime, TransactionType.REMOVE)
-      );
-    }
-
-    // get all mints
-    for (let j = 0; j < transactionsRaw[i].mints.length; j++) {
-      globalTransactions.push(
-        convertTx(transactionsRaw[i].mints[j], txId, txTime, TransactionType.ADD)
-      );
-    }
-
-    // get all swaps
-    for (let j = 0; j < transactionsRaw[i].swaps.length; j++) {
-      globalTransactions.push(
-        convertTx(transactionsRaw[i].swaps[j], txId, txTime, TransactionType.SWAP)
-      );
-    }
+  // get all burns
+  for (let j = 0; j < TRANSACTION_AMOUNT; j++) {
+    globalTransactions.push(
+      convertTx(burns[j], burns[j].transaction.id, burns[j].transaction.timestamp, TransactionType.REMOVE)
+    );
   }
 
-  return globalTransactions;
+  // get all mints
+  for (let j = 0; j < TRANSACTION_AMOUNT; j++) {
+    globalTransactions.push(
+      convertTx(mints[j], mints[j].transaction.id, mints[j].transaction.timestamp, TransactionType.ADD)
+    );
+  }
+
+  // get all swaps
+  for (let j = 0; j < TRANSACTION_AMOUNT; j++) {
+    globalTransactions.push(
+      convertTx(swaps[j], swaps[j].transaction.id, swaps[j].transaction.timestamp, TransactionType.SWAP)
+    );
+  }
+
+  return sortTable(globalTransactions, "time", true);
 }
 
 // get transaction from pool

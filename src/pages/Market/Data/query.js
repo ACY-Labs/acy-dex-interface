@@ -149,60 +149,85 @@ export const GET_POOL_DAY_DATA = gql`
 
 // get main transactions
 export const GET_GLOBAL_TRANSACTIONS = gql`
-  query transactions($txAmount: Int!) {
-    transactions(first: $txAmount, orderBy: timestamp, orderDirection: desc, subgraphError: allow) {
+query transactions($txAmount: Int!) {
+  mints(
+    first: $txAmount
+    orderBy: timestamp
+    orderDirection: desc
+  ) {
+    transaction{
       id
       timestamp
-      mints {
-        pair {
-          token0 {
-            id
-            symbol
-          }
-          token1 {
-            id
-            symbol
-          }
-        }
-        sender
-        amount0
-        amount1
-        amountUSD
+    }
+    pair {
+      token0 {
+        id
+        symbol
       }
-      swaps {
-        pair {
-          token0 {
-            id
-            symbol
-          }
-          token1 {
-            id
-            symbol
-          }
-        }
-        sender
-        amount0In
-        amount1Out
-        amountUSD
-      }
-      burns {
-        pair {
-          token0 {
-            id
-            symbol
-          }
-          token1 {
-            id
-            symbol
-          }
-        }
-        sender
-        amount0
-        amount1
-        amountUSD
+      token1 {
+        id
+        symbol
       }
     }
+    sender
+    liquidity
+    amount0
+    amount1
+    amountUSD
   }
+  burns(
+    first: $txAmount
+    orderBy: timestamp
+    orderDirection: desc
+  ) {
+    transaction{
+      id
+      timestamp
+    }
+    pair {
+      token0 {
+        id
+        symbol
+      }
+      token1 {
+        id
+        symbol
+      }
+    }
+    sender
+    liquidity
+    amount0
+    amount1
+    amountUSD
+  }
+  swaps(
+    first: $txAmount
+    orderBy: timestamp
+    orderDirection: desc
+  ) {
+    id
+    transaction{
+      id
+      timestamp
+    }
+    pair {
+      token0 {
+        id
+        symbol
+      }
+      token1 {
+        id
+        symbol
+      }
+    }
+    sender
+    amount0In
+    amount0Out
+    amount1In
+    amount1Out
+    amountUSD
+  }
+}
 `;
 
 export const FILTERED_TRANSACTIONS = gql`
