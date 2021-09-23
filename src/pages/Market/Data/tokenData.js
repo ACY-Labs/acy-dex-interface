@@ -12,7 +12,9 @@ export async function fetchTokenDayData(client, tokenId){
     if (loading) return null;
     if (error) return `Error! ${error}`;
 
-    return data
+    console.log(data)
+
+    return [ data.tokenDayDatas, data.pairs0, data.pairs1]
 }
 
 export async function fetchTokenDaySimple(client, tokenId){

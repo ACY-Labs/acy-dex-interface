@@ -19,7 +19,7 @@ const FarmsTableRow = (
     rowClickHandler,
     pendingReward,
     walletConnected,
-    setWalletConnected,
+    connectWallet,
     showModal,
     hideModal,
     isModalVisible,
@@ -168,7 +168,7 @@ const FarmsTableRow = (
                 <button
                   type="button"
                   className={styles.tableBodyDrawerWalletButton}
-                  onClick={() => setWalletConnected(true)}
+                  onClick={connectWallet}
                 >
                   Connect Wallet
                 </button>

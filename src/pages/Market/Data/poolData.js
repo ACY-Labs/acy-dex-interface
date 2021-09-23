@@ -42,6 +42,7 @@ export async function fetchGeneralPoolInfoDay(client) {
       let weekDatas = rawWeekDatas;
       let weekDataLength = weekDatas.length;
       let volume7d = 0;
+      
       for (let i = 0; i < weekDataLength; i++) {
         volume7d += parseFloat(weekDatas[i].dailyVolumeUSD);
       }

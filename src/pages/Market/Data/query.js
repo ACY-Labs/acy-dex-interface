@@ -60,16 +60,51 @@ export const GET_TOKEN_DAY_SIMPLE = gql`
 // get individual token history data
 export const GET_TOKEN_DAY_DATA = gql`
   query tokenDayDatas($tokenId: ID!) {
-    tokenDayDatas(orderBy: date, orderDirection: asc, where: { token: $tokenId }) {
+    tokenDayDatas(orderBy: date, orderDirection: desc, where: { token: $tokenId }) {
       id
       date
+      token {
+        id
+        symbol
+        name
+      }
       priceUSD
       totalLiquidityToken
       totalLiquidityUSD
-      totalLiquidityETH
-      dailyVolumeETH
       dailyVolumeToken
       dailyVolumeUSD
+      mostLiquidPairs {
+        id
+        date
+      }
+    }
+    pairs0: pairs(
+      where: { token0: $tokenId }
+      first: 50
+      orderBy: reserveUSD
+      orderDirection: desc
+    ) {
+      id
+      token0 {
+        symbol
+      }
+      token1 {
+        symbol
+      }
+    }
+    pairs1: pairs(
+      where: { token1: $tokenId }
+      first: 50
+      orderBy: reserveUSD
+      orderDirection: desc
+    ) {
+      id
+      token0 {
+        symbol
+      }
+      token1 {
+        symbol
+      }
     }
   }
 `;
@@ -96,11 +131,10 @@ export const GET_TOP_POOL = gql`
   }
 `;
 
-
 // get pool day data
 // @params timespan, pairAddress
 export const GET_POOL_DAY_DATA = gql`
-  query pairDayDatas($timespan: Int!, $pairAddress: ID!) {
+  query pairDayData($timespan: Int!, $pairAddress: ID!) {
     pairDayDatas(
       first: $timespan
       orderBy: date
@@ -115,58 +149,168 @@ export const GET_POOL_DAY_DATA = gql`
 
 // get main transactions
 export const GET_GLOBAL_TRANSACTIONS = gql`
-  query transactions($txAmount: Int!) {
-    transactions(first: $txAmount, orderBy: timestamp, orderDirection: desc, subgraphError: allow) {
+query transactions($txAmount: Int!) {
+  mints(
+    first: $txAmount
+    orderBy: timestamp
+    orderDirection: desc
+  ) {
+    transaction{
       id
       timestamp
-      mints {
-        pair {
-          token0 {
-            id
-            symbol
-          }
-          token1 {
-            id
-            symbol
-          }
-        }
-        sender
-        amount0
-        amount1
-        amountUSD
+    }
+    pair {
+      token0 {
+        id
+        symbol
       }
-      swaps {
-        pair {
-          token0 {
-            id
-            symbol
-          }
-          token1 {
-            id
-            symbol
-          }
-        }
-        sender
-        amount0In
-        amount1Out
-        amountUSD
+      token1 {
+        id
+        symbol
       }
-      burns {
-        pair {
-          token0 {
-            id
-            symbol
-          }
-          token1 {
-            id
-            symbol
-          }
-        }
-        sender
-        amount0
-        amount1
-        amountUSD
+    }
+    sender
+    liquidity
+    amount0
+    amount1
+    amountUSD
+  }
+  burns(
+    first: $txAmount
+    orderBy: timestamp
+    orderDirection: desc
+  ) {
+    transaction{
+      id
+      timestamp
+    }
+    pair {
+      token0 {
+        id
+        symbol
       }
+      token1 {
+        id
+        symbol
+      }
+    }
+    sender
+    liquidity
+    amount0
+    amount1
+    amountUSD
+  }
+  swaps(
+    first: $txAmount
+    orderBy: timestamp
+    orderDirection: desc
+  ) {
+    id
+    transaction{
+      id
+      timestamp
+    }
+    pair {
+      token0 {
+        id
+        symbol
+      }
+      token1 {
+        id
+        symbol
+      }
+    }
+    sender
+    amount0In
+    amount0Out
+    amount1In
+    amount1Out
+    amountUSD
+  }
+}
+`;
+
+export const FILTERED_TRANSACTIONS = gql`
+  query transactions($txAmount: Int!, $allPairs: [Bytes]!) {
+    mints(
+      first: $txAmount
+      where: { pair_in: $allPairs }
+      orderBy: timestamp
+      orderDirection: desc
+    ) {
+      transaction{
+        id
+        timestamp
+      }
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+      sender
+      liquidity
+      amount0
+      amount1
+      amountUSD
+    }
+    burns(
+      first: $txAmount
+      where: { pair_in: $allPairs }
+      orderBy: timestamp
+      orderDirection: desc
+    ) {
+      transaction{
+        id
+        timestamp
+      }
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+      sender
+      liquidity
+      amount0
+      amount1
+      amountUSD
+    }
+    swaps(
+      first: $txAmount
+      where: { pair_in: $allPairs }
+      orderBy: timestamp
+      orderDirection: desc
+    ) {
+      id
+      transaction{
+        id
+        timestamp
+      }
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+      sender
+      amount0In
+      amount0Out
+      amount1In
+      amount1Out
+      amountUSD
     }
   }
 `;
