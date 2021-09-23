@@ -401,6 +401,11 @@ export function PoolTable(props) {
   const [poolSortAscending, setPoolSortAscending] = useState(true);
   const [poolDisplayNumber, setPoolDisplayNumber] = useState(10);
   const [currentKey, setCurrentKey] = useState('');
+  const [, update] = useState(0)
+
+  useEffect(() => {
+    update(1)
+  }, [props.poolData])
 
   function columnsPool(isAscending, onSortChange) {
     return [
