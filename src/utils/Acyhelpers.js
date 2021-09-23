@@ -8,7 +8,7 @@ import { Contract } from '@ethersproject/contracts';
 import { AddressZero } from '@ethersproject/constants';
 import { BigNumber } from '@ethersproject/bignumber';
 import { formatUnits } from '@ethersproject/units';
-import { CurrencyAmount, ETHER, JSBI, Percent, TokenAmount } from '@uniswap/sdk';
+import { CurrencyAmount, ETHER, JSBI, Percent, TokenAmount } from '@acyswap/sdk';
 
 export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 

@@ -18,9 +18,10 @@ const FarmsTable = (
     selectedTable,
     tokenFilter,
     setTokenFilter,
+    walletConnected,
+    connectWallet,
   }
 ) => {
-  const [walletConnected, setWalletConnected] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false)
 
   const hideModal = () => setIsModalVisible(false)
@@ -81,7 +82,7 @@ const FarmsTable = (
               rowClickHandler={() => onRowClick(index)}
               pendingReward={content.pendingReward}
               walletConnected={walletConnected}
-              setWalletConnected={setWalletConnected}
+              connectWallet={connectWallet}
               showModal={showModal}
               hideModal={hideModal}
               isModalVisible={isModalVisible}
@@ -100,7 +101,7 @@ const FarmsTable = (
             hidden={false}
             pendingReward={[{token: 'ACY', amount: 0}]}
             walletConnected={walletConnected}
-            setWalletConnected={setWalletConnected}
+            connectWallet={connectWallet}
             showModal={showModal}
             hideModal={hideModal}
             isModalVisible={isModalVisible}

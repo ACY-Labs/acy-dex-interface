@@ -7,8 +7,19 @@ import ToggleButtonGroup from './ToggleButtonGroup';
 import DaoTable from './DaoTable';
 import TableControl from './TableControl';
 import SampleStakeHistoryData from './SampleDaoData';
+import { useWeb3React } from '@web3-react/core';
+import { getContract } from '@/utils/Acyhelpers';
+import { abi } from './ACYMultiFarm.json'
+import { InjectedConnector } from '@web3-react/injected-connector';
 
 const Farms = () => {
+  // useWeb3React hook will listen to wallet connection.
+  // if wallet is connected, account, chainId, library, and activate will not be not be undefined.
+  const { account, chainId, library, activate } = useWeb3React();
+  const injected = new InjectedConnector({
+    supportedChainIds: [1, 3, 4, 5, 42, 80001],
+  });
+
   const INITIAL_TABLE_DATA = farmsTableContent.map((row) => {
     const prevRow = { ...row }
     prevRow.hidden = true
@@ -29,6 +40,30 @@ const Farms = () => {
   })
   const [currentTableRow, setCurrentTableRow] = useState(INITIAL_TABLE_DATA)
   const [daoDataSource, setDaoDataSource] = useState(SampleStakeHistoryData)
+  const [contract, setContract] = useState(null)
+  const [walletConnected, setWalletConnected] = useState(false)
+
+  // method to activate metamask wallet.
+  // calling this method for the first time will cause metamask to pop up,
+  // and require user to approve this connection.
+  const connectWallet = () => {
+    activate(injected)
+  }
+
+  useEffect(() => {
+    // automatically connect to wallet at the start of the application.
+    connectWallet()
+
+    // account will be returned if wallet is connected.
+    // so if account is present, retrieve the farms contract.
+    if (account) {
+      setContract(getContract('0x71db57438743591b2A4aBBA20D6096f0eD99cDf2', abi, library, account))
+      setWalletConnected(true)
+    } else {
+      setContract(null)
+      setWalletConnected(false)
+    }
+  }, [account])
 
   const onRowClick = (index) => setTableRow((prevState) => {
     const prevTableRow = [ ...prevState ]
@@ -180,6 +215,8 @@ const Farms = () => {
             selectedTable={selectedTable}
             tokenFilter={tokenFilter}
             setTokenFilter={setTokenFilter}
+            walletConnected={walletConnected}
+            connectWallet={connectWallet}
           />
         )}
         {selectedTable === 4 && <DaoTable dataSource={daoDataSource} />}

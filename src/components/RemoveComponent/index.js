@@ -54,30 +54,6 @@ import {
 
 import { processInput, signOrApprove, removeLiquidity } from '@/acy-dex-swap/core/removeLiquidity';
 
-import ERC20ABI from '@/abis/ERC20.json';
-import WETHABI from '@/abis/WETH.json';
-
-import {
-  Token,
-  TokenAmount,
-  Pair,
-  TradeType,
-  Route,
-  Trade,
-  Fetcher,
-  Percent,
-  Router,
-  WETH,
-  ETHER,
-  CurrencyAmount,
-  InsufficientReservesError,
-  FACTORY_ADDRESS,
-} from '@uniswap/sdk';
-
-import { MaxUint256 } from '@ethersproject/constants';
-import { BigNumber } from '@ethersproject/bignumber';
-import { parseUnits } from '@ethersproject/units';
-
 const { AcyTabPane } = AcyTabs;
 import { Row, Col, Button, Alert } from 'antd';
 
