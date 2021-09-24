@@ -1,4 +1,5 @@
 import { AcyIcon, AcyTabs, AcyTokenIcon } from '@/components/Acy';
+import className from 'classnames';
 import { Divider, Icon, Input, Table } from 'antd';
 import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -6,7 +7,14 @@ import { useDetectClickOutside } from 'react-detect-click-outside';
 import ReactDOM from 'react-dom';
 import { Link, useHistory } from 'react-router-dom';
 import styles from './styles.less';
-import { abbrHash, abbrNumber, isDesktop, sortTable, TransactionType } from './Util.js';
+import {
+  abbrHash,
+  abbrNumber,
+  isDesktop,
+  openInNewTab,
+  sortTable,
+  TransactionType,
+} from './Util.js';
 import { WatchlistManager } from './WatchlistManager.js';
 
 const { AcyTabPane } = AcyTabs;
@@ -212,8 +220,8 @@ export function TokenTable(props) {
   const [tokenSortAscending, setTokenSortAscending] = useState(true);
   const [tokenDisplayNumber, setTokenDisplayNumber] = useState(10);
   const [currentKey, setCurrentKey] = useState('');
-  const [isHover, setIsHover] = useState(false)
-  const navHistory = useHistory()
+  const [isHover, setIsHover] = useState(false);
+  const navHistory = useHistory();
 
   function columnsCoin(isAscending, onSortChange) {
     return [
@@ -240,7 +248,7 @@ export function TokenTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableDataFirstColumn}>
-              <AcyTokenIcon symbol={entry.short}/>
+              <AcyTokenIcon symbol={entry.short} />
               <Link
                 style={{ color: '#b5b5b6' }}
                 className={styles.coinName}
@@ -380,10 +388,10 @@ export function TokenTable(props) {
       pagination={false}
       style={{
         marginBottom: '20px',
-        cursor:isHover ? "pointer" : "default"
+        cursor: isHover ? 'pointer' : 'default',
       }}
-      onRowClick={(record,index, event) => {
-        navHistory.push(`/market/info/token/${record.address}`)
+      onRowClick={(record, index, event) => {
+        navHistory.push(`/market/info/token/${record.address}`);
       }}
       onRowMouseEnter={() => setIsHover(true)}
       onRowMouseLeave={() => setIsHover(false)}
@@ -409,14 +417,17 @@ export function PoolTable(props) {
   const [poolSortAscending, setPoolSortAscending] = useState(true);
   const [poolDisplayNumber, setPoolDisplayNumber] = useState(10);
   const [currentKey, setCurrentKey] = useState('');
-  const [isHover, setIsHover] = useState(false)
-  const [, update] = useState(0)
+  const [isHover, setIsHover] = useState(false);
+  const [, update] = useState(0);
 
   const navHistory = useHistory();
 
-  useEffect(() => {
-    update(1)
-  }, [props.poolData])
+  useEffect(
+    () => {
+      update(1);
+    },
+    [props.poolData]
+  );
 
   function columnsPool(isAscending, onSortChange) {
     return [
@@ -443,8 +454,8 @@ export function PoolTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableDataFirstColumn}>
-              <AcyTokenIcon symbol={entry.coin1}/>
-              <AcyTokenIcon symbol={entry.coin2}/>
+              <AcyTokenIcon symbol={entry.coin1} />
+              <AcyTokenIcon symbol={entry.coin2} />
               <Link
                 style={{ color: '#b5b5b6' }}
                 className={styles.coinName}
@@ -555,12 +566,12 @@ export function PoolTable(props) {
       pagination={false}
       onRowMouseEnter={() => setIsHover(true)}
       onRowMouseLeave={() => setIsHover(false)}
-      onRowClick={(record,index, event) => {
-        navHistory.push(`/market/info/pool/${record.address}`)
+      onRowClick={(record, index, event) => {
+        navHistory.push(`/market/info/pool/${record.address}`);
       }}
       style={{
         marginBottom: '20px',
-        cursor:isHover ? "pointer" : "default"
+        cursor: isHover ? 'pointer' : 'default',
       }}
       footer={() => (
         <div className={styles.tableSeeMoreWrapper}>
@@ -641,7 +652,11 @@ export function TransactionTable(props) {
         key: 'transactionName',
         render: (text, entry) => {
           return (
-            <div className={styles.tableDataFirstColumn}>
+            <div
+              className={className(styles.tableDataFirstColumn, styles.transactionLink)}
+              style={{ fontWeight: 600 }}
+              onClick={() => openInNewTab(`https://etherscan.io/tx/${entry.transactionID}`)}
+            >
               {entry.type} {entry.coin1} {entry.type == TransactionType.SWAP ? 'for' : 'and'}{' '}
               {entry.coin2}
             </div>
@@ -754,7 +769,11 @@ export function TransactionTable(props) {
         key: 'account',
         render: (text, entry) => {
           return (
-            <div className={styles.tableData} style={{ textOverflow: 'ellipsis' }}>
+            <div
+              onClick={() => openInNewTab(`https://etherscan.io/address/${entry.account}`)}
+              className={className(styles.tableData, styles.transactionLink)}
+              style={{ textOverflow: 'ellipsis' }}
+            >
               {abbrHash(text)}
             </div>
           );
