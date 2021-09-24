@@ -320,3 +320,7 @@ export async function approveTokenWithSpender(tokenAddress, spender, library, ac
     gasLimit: calculateGasMargin(estimatedGas),
   });
 }
+
+export function getTokenContract(tokenAddress, library, account){
+  return getContract(tokenAddress, ERC20ABI, library, account)
+}

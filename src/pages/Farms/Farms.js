@@ -12,6 +12,7 @@ import { getContract } from '@/utils/Acyhelpers';
 import { abi } from './ACYMultiFarm.json'
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAllPools } from '@/acy-dex-swap/core/farms';
+import AcyIcon from '@/assets/icon_acy.svg';
 
 const Farms = () => {
   // useWeb3React hook will listen to wallet connection.
@@ -41,8 +42,8 @@ const Farms = () => {
   })
   const [currentTableRow, setCurrentTableRow] = useState(INITIAL_TABLE_DATA)
   const [daoDataSource, setDaoDataSource] = useState(SampleStakeHistoryData)
-  const [contract, setContract] = useState(null)
   const [walletConnected, setWalletConnected] = useState(false)
+  const [farmsContent, setFarmsContent] = useState([])
 
   // method to activate metamask wallet.
   // calling this method for the first time will cause metamask to pop up,
@@ -55,15 +56,42 @@ const Farms = () => {
     // automatically connect to wallet at the start of the application.
     connectWallet()
 
+    const getPools = async (library, account) => {
+      const pools = await getAllPools(library, account)
+      const newFarmsContents = []
+
+      pools.forEach((pool) => {
+        const newFarmsContent = {
+          lpTokens: pool.lpTokens,
+          token1: null,
+          token1Logo: null,
+          token2: null,
+          token2Logo: null,
+          pendingReward: [
+            {token: 'ACY', amount: 0}
+          ],
+          totalApr: 89.02,
+          tvl: 144542966,
+        }
+        newFarmsContents.push(newFarmsContent)
+      })
+
+      setFarmsContent(newFarmsContents)
+    }
+
     // account will be returned if wallet is connected.
     // so if account is present, retrieve the farms contract.
     if (account) {
       setWalletConnected(true)
-      getAllPools(library, account)
+      getPools(library, account)
     } else {
       setWalletConnected(false)
     }
   }, [account])
+
+  useEffect(() => {
+    console.log(farmsContent)
+  }, [farmsContent])
 
   const onRowClick = (index) => setTableRow((prevState) => {
     const prevTableRow = [ ...prevState ]
