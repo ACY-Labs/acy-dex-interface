@@ -4,7 +4,7 @@ import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 import ReactDOM from 'react-dom';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import styles from './styles.less';
 import { abbrHash, abbrNumber, isDesktop, sortTable, TransactionType } from './Util.js';
 import { WatchlistManager } from './WatchlistManager.js';
@@ -212,6 +212,8 @@ export function TokenTable(props) {
   const [tokenSortAscending, setTokenSortAscending] = useState(true);
   const [tokenDisplayNumber, setTokenDisplayNumber] = useState(10);
   const [currentKey, setCurrentKey] = useState('');
+  const [isHover, setIsHover] = useState(false)
+  const navHistory = useHistory()
 
   function columnsCoin(isAscending, onSortChange) {
     return [
@@ -378,7 +380,13 @@ export function TokenTable(props) {
       pagination={false}
       style={{
         marginBottom: '20px',
+        cursor:isHover ? "pointer" : "default"
       }}
+      onRowClick={(record,index, event) => {
+        navHistory.push(`/market/info/token/${record.address}`)
+      }}
+      onRowMouseEnter={() => setIsHover(true)}
+      onRowMouseLeave={() => setIsHover(false)}
       footer={() => (
         <div className={styles.tableSeeMoreWrapper}>
           {props.dataSourceCoin.slice(0, tokenDisplayNumber + 1).length > tokenDisplayNumber && (
@@ -401,7 +409,10 @@ export function PoolTable(props) {
   const [poolSortAscending, setPoolSortAscending] = useState(true);
   const [poolDisplayNumber, setPoolDisplayNumber] = useState(10);
   const [currentKey, setCurrentKey] = useState('');
+  const [isHover, setIsHover] = useState(false)
   const [, update] = useState(0)
+
+  const navHistory = useHistory();
 
   useEffect(() => {
     update(1)
@@ -542,8 +553,14 @@ export function PoolTable(props) {
         setPoolSortAscending(!poolSortAscending);
       }).filter(item => item.visible == true)}
       pagination={false}
+      onRowMouseEnter={() => setIsHover(true)}
+      onRowMouseLeave={() => setIsHover(false)}
+      onRowClick={(record,index, event) => {
+        navHistory.push(`/market/info/pool/${record.address}`)
+      }}
       style={{
         marginBottom: '20px',
+        cursor:isHover ? "pointer" : "default"
       }}
       footer={() => (
         <div className={styles.tableSeeMoreWrapper}>
