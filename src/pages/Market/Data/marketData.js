@@ -2,6 +2,11 @@ import { useQuery } from '@apollo/client';
 import {GET_MARKET_DATA} from './query'
 
 
+// get market info snapshot
+export async function fetchMarketInfo(client, timestamp){
+    return;
+}
+
 // get general market data
 export async  function fetchMarketData(client){
 

@@ -11,7 +11,7 @@ import {
 } from './Data/index.js';
 import { dataSourceCoin, dataSourcePool } from './SampleData.js';
 import styles from './styles.less';
-import { abbrNumber } from './Util.js';
+import { abbrNumber, FEE_PERCENT } from './Util.js';
 import { MarketSearchBar, PoolTable, TokenTable, TransactionTable } from './UtilComponent.js';
 import { isMobile } from 'react-device-detect';
 
@@ -37,8 +37,10 @@ export class MarketIndex extends Component {
     // overall chart data
     overallVolume: -1,
     overallTvl: -1,
+    overallFees: -1,
     ovrVolChange: 0.0,
     ovrTvlChange: 0.0,
+    ovrFeeChange: 0.0,
 
     // transaction data
     transactions: [],
@@ -91,11 +93,15 @@ export class MarketIndex extends Component {
         (dataDict.tvl[dataDict.tvl.length - 1][1] - dataDict.tvl[dataDict.tvl.length - 2][1]) /
         dataDict.tvl[dataDict.tvl.length - 2][1];
 
+      let fee = dataDict.volume24h[dataDict.tvl.length - 1][1] * FEE_PERCENT
+
       this.setState({
         chartData: dataDict,
         overallVolume: abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]),
         overallTvl: abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]),
+        overallFees: abbrNumber(fee) ,
         ovrVolChange: (volumeChange * 100).toFixed(2),
+        ovrFeeChange: (volumeChange * 100).toFixed(2),
         ovrTvlChange: (tvlChange * 100).toFixed(2),
         selectedIndexLine: dataDict.tvl.length - 1,
         selectedDataLine: abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]),
@@ -190,9 +196,15 @@ export class MarketIndex extends Component {
                 {this.state.ovrVolChange} %
               </span>
             </Col>
-            {/* <Col span={8}>
-              Fees 24H <strong>$1.66m </strong> <span className={styles.priceChangeUp}>0.36%</span>
-            </Col> */}
+            <Col span={8}>
+              Fees 24H <strong>$ {this.state.overallFees} </strong> <span
+                className={
+                  this.state.ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
+                }
+              >
+                {this.state.ovrVolChange} %
+              </span>
+            </Col>
             <Col span={8}>
               TVL <strong>$ {this.state.overallTvl}</strong>{' '}
               <span
