@@ -6,11 +6,13 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { formatUnits } from '@ethersproject/units';
 import { JSBI, Token, TokenAmount, Percent, ETHER, CurrencyAmount } from '@acyswap/sdk';
 import { abi as IUniswapV2Router02ABI } from '../abis/IUniswapV2Router02.json';
+import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import ERC20ABI from '../abis/ERC20.json';
 
 export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
 export const ROUTER_ADDRESS = '0xc858026830a9A060beC7A408B8b4b4852c10B189';
+export const FARMS_ADDRESS = '0x7AA3f390Ba28D0CEe20db0373B0E9a40F1835829';
 
 // (RICK NOTES) need address on ethereum network to get price
 export const supportedTokens = [
@@ -94,6 +96,10 @@ export function getContract(address, ABI, library, account) {
 
 export function getRouterContract(library, account) {
   return getContract(ROUTER_ADDRESS, IUniswapV2Router02ABI, library, account);
+}
+
+export function getFarmsContract(library, account) {
+  return getContract(FARMS_ADDRESS, FarmsABI, library, account);
 }
 
 export function getPairContract(pairAddress, library, account) {

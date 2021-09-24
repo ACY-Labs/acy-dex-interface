@@ -11,6 +11,7 @@ import { useWeb3React } from '@web3-react/core';
 import { getContract } from '@/utils/Acyhelpers';
 import { abi } from './ACYMultiFarm.json'
 import { InjectedConnector } from '@web3-react/injected-connector';
+import { getAllPools } from '@/acy-dex-swap/core/farms';
 
 const Farms = () => {
   // useWeb3React hook will listen to wallet connection.
@@ -57,10 +58,9 @@ const Farms = () => {
     // account will be returned if wallet is connected.
     // so if account is present, retrieve the farms contract.
     if (account) {
-      setContract(getContract('0x71db57438743591b2A4aBBA20D6096f0eD99cDf2', abi, library, account))
       setWalletConnected(true)
+      getAllPools(library, account)
     } else {
-      setContract(null)
       setWalletConnected(false)
     }
   }, [account])
