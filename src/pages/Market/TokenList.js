@@ -6,6 +6,13 @@ import {
 import styles from './styles.less';
 import { MarketSearchBar, TokenTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
+import {
+  fetchGeneralPoolInfoDay,
+  fetchGeneralTokenInfo,
+  fetchGlobalTransaction,
+  fetchMarketData,
+  marketClient,
+} from './Data/index.js';
 
 
 
@@ -15,6 +22,7 @@ const watchlistManagerToken = new WatchlistManager('token');
 
 function MarketTokenList(props) {
   const [watchlistToken, setWatchlistToken] = useState([]);
+  const [tokenInfo, setTokenInfo] = useState([])
 
   let refreshWatchlist = () => {
     let tokenWatchlistData = watchlistManagerToken.getData();
@@ -23,6 +31,12 @@ function MarketTokenList(props) {
   };
 
   useEffect(() => {
+
+    // fetch token info
+    fetchGeneralTokenInfo(marketClient).then(tokenInfo => {
+      setTokenInfo(tokenInfo)
+    });
+
     let tokenWatchlistData = watchlistManagerToken.getData();
     let newWatchlistToken = dataSourceCoin.filter(item => tokenWatchlistData.includes(item.short));
     setWatchlistToken([...newWatchlistToken]);
@@ -38,7 +52,7 @@ function MarketTokenList(props) {
       <h2>Watchlist</h2>
       <TokenTable dataSourceCoin={watchlistToken} />
       <h2>All Tokens</h2>
-      <TokenTable dataSourceCoin={dataSourceCoin} />
+      <TokenTable dataSourceCoin={tokenInfo} />
       <div style={{ height: '40px' }} />
     </div>
   );
