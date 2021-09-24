@@ -305,3 +305,12 @@ export async function getTokenTotalSupply(token, library, account) {
 
   return parsedResult;
 }
+
+export async function approveTokenWithSpender(tokenAddress, spender, library, account) {
+  const tokenContract = getContract(tokenAddress, ERC20ABI, library, account);
+  const estimatedGas = await tokenContract.estimateGas['approve'](spender, MaxUint256);
+
+  const res = await tokenContract.approve(spender, MaxUint256, {
+    gasLimit: calculateGasMargin(estimatedGas),
+  });
+}
