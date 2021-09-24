@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Icon} from 'antd';
 import { fetchGeneralTokenInfo, marketClient } from './Data/index.js';
 import { dataSourceCoin, dataSourcePool } from './SampleData.js';
 import styles from './styles.less';
@@ -19,8 +20,8 @@ function MarketTokenList(props) {
 
   useEffect(() => {
     // fetch token info
-    fetchGeneralTokenInfo(marketClient).then(tokenInfo => {
-      setTokenInfo(tokenInfo);
+    fetchGeneralTokenInfo(marketClient).then(tokenList => {
+      setTokenInfo(tokenList);
     });
 
     let tokenWatchlistData = watchlistManagerToken.getData();
@@ -38,7 +39,8 @@ function MarketTokenList(props) {
       <h2>Watchlist</h2>
       <TokenTable dataSourceCoin={watchlistToken} />
       <h2>All Tokens</h2>
-      <TokenTable dataSourceCoin={tokenInfo} />
+      {tokenInfo.length > 0 ? <TokenTable dataSourceCoin={tokenInfo} /> : <Icon type="loading" / >}
+      
       <div style={{ height: '40px' }} />
     </div>
   );

@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import {
-  fetchGeneralPoolInfoDay, marketClient
-} from './Data/index.js';
-import {
   dataSourceCoin,
   dataSourcePool
 } from './SampleData.js';
+import { Icon} from 'antd';
 import styles from './styles.less';
 import { MarketSearchBar, PoolTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
+import {
+  fetchGeneralPoolInfoDay,
+  fetchGeneralTokenInfo,
+  fetchGlobalTransaction,
+  fetchMarketData,
+  marketClient,
+} from './Data/index.js';
 
 
 const watchlistManagerPool = new WatchlistManager('pool');
@@ -27,8 +32,8 @@ function MarketPoolList(props) {
 
   useEffect(() => {
     // fetch pool data
-    fetchGeneralPoolInfoDay(marketClient).then(poolInfo => {
-      setPoolInfo(poolInfo)
+    fetchGeneralPoolInfoDay(marketClient).then(poolList => {
+      setPoolInfo(poolList)
     });
 
 
@@ -48,7 +53,8 @@ function MarketPoolList(props) {
       />
       <PoolTable dataSourcePool={watchlistPool} />
       <h2>All Pools</h2>
-      <PoolTable dataSourcePool={poolInfo} />
+      {poolInfo.length > 0 ? <PoolTable dataSourcePool={poolInfo} /> : <Icon type="loading" />}
+      
       <div style={{ height: '40px' }} />
     </div>
   );
