@@ -1,28 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import {
-  dataSourceCoin,
-  dataSourcePool
-} from './SampleData.js';
+import { fetchGeneralTokenInfo, marketClient } from './Data/index.js';
+import { dataSourceCoin, dataSourcePool } from './SampleData.js';
 import styles from './styles.less';
 import { MarketSearchBar, TokenTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
-import {
-  fetchGeneralPoolInfoDay,
-  fetchGeneralTokenInfo,
-  fetchGlobalTransaction,
-  fetchMarketData,
-  marketClient,
-} from './Data/index.js';
-
-
-
 
 const watchlistManagerToken = new WatchlistManager('token');
 
-
 function MarketTokenList(props) {
   const [watchlistToken, setWatchlistToken] = useState([]);
-  const [tokenInfo, setTokenInfo] = useState([])
+  const [tokenInfo, setTokenInfo] = useState([]);
 
   let refreshWatchlist = () => {
     let tokenWatchlistData = watchlistManagerToken.getData();
@@ -31,10 +18,9 @@ function MarketTokenList(props) {
   };
 
   useEffect(() => {
-
     // fetch token info
     fetchGeneralTokenInfo(marketClient).then(tokenInfo => {
-      setTokenInfo(tokenInfo)
+      setTokenInfo(tokenInfo);
     });
 
     let tokenWatchlistData = watchlistManagerToken.getData();
