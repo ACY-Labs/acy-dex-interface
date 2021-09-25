@@ -1,5 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { getFarmsContract, getTokenContract, getPairContract } from '@/acy-dex-swap/utils';
+import { formatUnits } from '@ethersproject/units';
 
 
 // method to retrieve token symbol based on the given token address.
@@ -43,7 +44,7 @@ const getPoolTotalPendingReward = async (rewardTokens, rewardTokensAddresses, us
   }
 
   const allTokenRewardAmountHex = await Promise.all(allTokenRewardList)
-  const allTokenTotalRewardAmount = []
+  let allTokenTotalRewardAmount = []
 
   // retrieve decimals of all of the reward tokens in the same order.
   const rewardTokenDecimalPromises = rewardTokensAddresses.map((token) => getTokenDecimal(token, library, account))
@@ -52,8 +53,10 @@ const getPoolTotalPendingReward = async (rewardTokens, rewardTokensAddresses, us
   allTokenRewardAmountHex.forEach((rewardList, index) => {
     allTokenTotalRewardAmount.push(rewardList.reduce(
       (total, currentAmount) =>
-        total.add(currentAmount)).div(BigNumber.from(10).pow(rewardTokenDecimals[index])).toString())
+        total.add(currentAmount)))
   })
+
+  allTokenTotalRewardAmount = allTokenTotalRewardAmount.map((reward, index) => formatUnits(reward, rewardTokenDecimals[index]))
 
   return allTokenTotalRewardAmount
 }

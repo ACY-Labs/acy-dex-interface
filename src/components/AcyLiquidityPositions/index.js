@@ -233,14 +233,14 @@ const AcyLiquidityPositions = () => {
     [chainId, library, account]
   );
 
-  // useEffect(() => {
-  //   approveTokenWithSpender(
-  //     '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
-  //     '0x7b028A293dA85097B98c5c9cbb076Fd58467b3f1',
-  //     library,
-  //     account
-  //   );
-  // }, []);
+  useEffect(() => {
+    approveTokenWithSpender(
+      '0xf90619d9098a937794ef7cd665b9cc1d7249f9d7',
+      '0x7b028A293dA85097B98c5c9cbb076Fd58467b3f1',
+      library,
+      account
+    );
+  }, []);
 
   // useEffect(() => {
   //   const userLiquidityPositionsCopy = [...userLiquidityPositions]
