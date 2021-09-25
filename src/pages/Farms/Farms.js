@@ -264,6 +264,7 @@ const Farms = () => {
             connectWallet={connectWallet}
             account={account}
             library={library}
+            chainId={chainId}
           />
         )}
         {selectedTable === 4 && <DaoTable dataSource={daoDataSource} />}

@@ -21,11 +21,8 @@ const FarmsTable = ({
   connectWallet,
   library,
   account,
+  chainId,
 }) => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const hideModal = () => setIsModalVisible(false);
-  const showModal = () => setIsModalVisible(true);
   const [myChartId, setMyChartId] = useState(0);
   const [totalChartId, setTotalChartId] = useState(0);
   const [myChartData, setMyChartData] = useState(graphSampleData);
@@ -86,12 +83,10 @@ const FarmsTable = ({
               pendingReward={content.pendingReward}
               walletConnected={walletConnected}
               connectWallet={connectWallet}
-              showModal={showModal}
-              hideModal={hideModal}
-              isModalVisible={isModalVisible}
               selectedTable={selectedTable}
               account={account}
               library={library}
+              chainId={chainId}
             />
           ))}
         </div>
@@ -109,9 +104,6 @@ const FarmsTable = ({
             pendingReward={[{ token: 'ACY', amount: 0 }]}
             walletConnected={walletConnected}
             connectWallet={connectWallet}
-            showModal={showModal}
-            hideModal={hideModal}
-            isModalVisible={isModalVisible}
             hideArrow
           />
           <div>

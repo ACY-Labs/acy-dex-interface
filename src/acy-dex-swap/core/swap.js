@@ -1,20 +1,4 @@
 import {
-  CustomError,
-  calculateGasMargin,
-  checkTokenIsApproved,
-  computeTradePriceBreakdown,
-  getAllowance,
-  getContract,
-  getRouterContract,
-  getUserTokenBalanceRaw,
-  INITIAL_ALLOWED_SLIPPAGE,
-  isZero,
-  ROUTER_ADDRESS,
-} from '../utils';
-
-import WETHABI from '../abis/WETH.json';
-
-import {
   CurrencyAmount,
   ETHER,
   FACTORY_ADDRESS,
@@ -33,6 +17,20 @@ import {
 
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
+import WETHABI from '../abis/WETH.json';
+import {
+  CustomError,
+  calculateGasMargin,
+  checkTokenIsApproved,
+  computeTradePriceBreakdown,
+  getAllowance,
+  getContract,
+  getRouterContract,
+  getUserTokenBalanceRaw,
+  INITIAL_ALLOWED_SLIPPAGE,
+  isZero,
+  ROUTER_ADDRESS,
+} from '../utils';
 
 // get the estimated amount  of the other token required when swapping, in readable string.
 export async function swapGetEstimated(
@@ -61,7 +59,7 @@ export async function swapGetEstimated(
   setWethContract,
   setWrappedAmount
 ) {
-  let status = await (async () => {
+  const status = await (async () => {
     // check uniswap
     console.log('SWAP GET ESTIMATED');
     // change slippage from bips (0.01%) into percentage
@@ -111,7 +109,7 @@ export async function swapGetEstimated(
     }
     // if one is ETH and other WETH, use WETH contract's deposit and withdraw
     // wrap ETH into WETH
-    else if (token0IsETH && inToken1Symbol === 'WETH') {
+    if (token0IsETH && inToken1Symbol === 'WETH') {
       // UI should sync value of ETH and WETH
       if (exactIn) {
         setToken1Amount(inToken0Amount);
@@ -169,10 +167,9 @@ export async function swapGetEstimated(
         if (e.fault === 'underflow') {
           setSwapButtonContent(e.fault);
           return new CustomError(e.fault);
-        } else {
-          setSwapButtonContent('unknow error');
-          return new CustomError('unknow error');
         }
+        setSwapButtonContent('unknow error');
+        return new CustomError('unknow error');
       }
 
       setWethContract(wethContract);
@@ -188,7 +185,8 @@ export async function swapGetEstimated(
       //     });
       // return result;
       return 'Wrap is ok';
-    } else if (inToken0Symbol === 'WETH' && token1IsETH) {
+    }
+    if (inToken0Symbol === 'WETH' && token1IsETH) {
       console.log('UNWRAP');
       if (exactIn) {
         setToken1Amount(inToken0Amount);
@@ -216,10 +214,9 @@ export async function swapGetEstimated(
         if (e.fault === 'underflow') {
           setSwapButtonContent(e.fault);
           return new CustomError(e.fault);
-        } else {
-          setSwapButtonContent('unknow error');
-          return new CustomError('unknow error');
         }
+        setSwapButtonContent('unknow error');
+        return new CustomError('unknow error');
       }
 
       // quit if user doesn't have enough balance, otherwise this will cause error
@@ -244,10 +241,9 @@ export async function swapGetEstimated(
         if (e.fault === 'underflow') {
           setSwapButtonContent(e.fault);
           return new CustomError(e.fault);
-        } else {
-          setSwapButtonContent('unknow error');
-          return new CustomError('unknow error');
         }
+        setSwapButtonContent('unknow error');
+        return new CustomError('unknow error');
       }
       setWethContract(wethContract);
       setWrappedAmount(wrappedAmount);
@@ -261,231 +257,222 @@ export async function swapGetEstimated(
       return 'unwrap is ok';
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
-    else {
-      console.log('SWAP');
-      console.log('------------------ CONSTRUCT TOKEN ------------------');
-      // use WETH for ETHER to work with Uniswap V2 SDK
-      const token0 = token0IsETH
-        ? WETH[chainId]
-        : new Token(chainId, inToken0Address, inToken0Decimal, inToken0Symbol);
-      const token1 = token1IsETH
-        ? WETH[chainId]
-        : new Token(chainId, inToken1Address, inToken1Decimal, inToken1Symbol);
 
-      if (token0.equals(token1)) {
-        setSwapButtonState(false);
-        setSwapButtonContent('tokens are same');
-        return new CustomError('tokens are same');
-      }
-      // get pair using our own provider
-      const pair = await Fetcher.fetchPairData(token0, token1, library).catch(e => {
-        return new CustomError(
-          `${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`
-        );
-      });
-      if (pair instanceof CustomError) {
-        setSwapButtonState(false);
-        setSwapButtonContent("pool doesn't exist");
-        return pair;
-      }
+    console.log('SWAP');
+    console.log('------------------ CONSTRUCT TOKEN ------------------');
+    // use WETH for ETHER to work with Uniswap V2 SDK
+    const token0 = token0IsETH
+      ? WETH[chainId]
+      : new Token(chainId, inToken0Address, inToken0Decimal, inToken0Symbol);
+    const token1 = token1IsETH
+      ? WETH[chainId]
+      : new Token(chainId, inToken1Address, inToken1Decimal, inToken1Symbol);
 
-      console.log(pair);
-      setPair(pair);
-      console.log('------------------ CONSTRUCT ROUTE ------------------');
-      // This is where we let Uniswap SDK know we are not using WETH but ETHER
-
-      const route = new Route([pair], token0IsETH ? ETHER : token0, token1IsETH ? ETHER : token1);
-
-      console.log(route);
-
-      setRoute(route);
-      console.log('------------------ PARSE AMOUNT ------------------');
-
-      // convert typed in amount to BigNumbe rusing ethers.js's parseUnits then to string,
-      console.log(inToken0Amount);
-      console.log(inToken0Decimal);
-
-      let parsedAmount;
-
-      try {
-        parsedAmount = exactIn
-          ? new TokenAmount(token0, parseUnits(inToken0Amount, inToken0Decimal)).raw.toString(16)
-          : new TokenAmount(token1, parseUnits(inToken1Amount, inToken1Decimal)).raw.toString(16);
-      } catch (e) {
-        console.log('parsedAmount!!!');
-        console.log(e);
-        setSwapButtonState(false);
-        if (e.fault === 'underflow') {
-          setSwapButtonContent(e.fault);
-          return new CustomError(e.fault);
-        } else {
-          setSwapButtonContent('unknow error');
-          return new CustomError('unknow error');
-        }
-      }
-
-      let inputAmount;
-      // CurrencyAmount instance is required for Trade contructor if input is ETHER
-      if ((token0IsETH && exactIn) || (token1IsETH && !exactIn)) {
-        inputAmount = new CurrencyAmount(ETHER, `0x${parsedAmount}`);
-      } else {
-        inputAmount = new TokenAmount(exactIn ? token0 : token1, `0x${parsedAmount}`);
-      }
-      console.log('estimated dependent amount');
-      // console.log(pair.priceOf(token0).quote(inputAmount).raw.toString());
-      let dependentTokenAmount = pair
-        .priceOf(token0)
-        .quote(new TokenAmount(token0, inputAmount.raw));
-
-      let parsed =
-        token1 === ETHER ? CurrencyAmount.ether(dependentTokenAmount.raw) : dependentTokenAmount;
-      console.log(parsed.toExact());
-
-      //===================================================================================
-
-      console.log('------------------ CONSTRUCT TRADE ------------------');
-      let trade;
-      try {
-        trade = new Trade(
-          route,
-          inputAmount,
-          exactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
-        );
-      } catch (e) {
-        if (e instanceof InsufficientReservesError) {
-          setSwapButtonState(false);
-          setSwapButtonContent('Insufficient liquidity for this trade');
-          console.log('Insufficient reserve!');
-          return new CustomError('Insufficient reserve!');
-        } else {
-          setSwapButtonState(false);
-          setSwapButtonContent('Unhandled exception!');
-          console.log('Unhandled exception!');
-          console.log(e);
-          return new CustomError('Unhandled exception!');
-        }
-      }
-
-      console.log(trade);
-      setTrade(trade);
-      console.log('------------------ SLIPPAGE CALCULATE ------------------');
-
-      let slippageAdjustedAmount;
-      let minAmountOut;
-      let maxAmountIn;
-
-      // calculate slippage adjusted amount
-      if (exactIn) {
-        // console.log(trade.outputAmount.toExact());
-        // setToken1Amount(trade.outputAmount.toExact());
-        console.log(`By algorithm, expected to get: ${trade.outputAmount.toExact()}`);
-        // if provided exact token in, we want to know min out token amount
-        minAmountOut = trade.minimumAmountOut(allowedSlippage);
-        slippageAdjustedAmount = minAmountOut.raw.toString();
-
-        // update UI with estimated output token amount
-        setToken1Amount(trade.outputAmount.toFixed(6));
-        console.log(`Minimum received: ${slippageAdjustedAmount}`);
-      } else {
-        console.log(`By algorithm, expected to get: ${trade.inputAmount.toExact()}`);
-        maxAmountIn = trade.maximumAmountIn(allowedSlippage);
-        slippageAdjustedAmount = maxAmountIn.raw.toString();
-        setToken0Amount(trade.inputAmount.toFixed(6));
-        console.log(`Maximum pay: ${slippageAdjustedAmount}`);
-      }
-
-      setSlippageAdjustedAmount(slippageAdjustedAmount);
-      setMinAmountOut(minAmountOut);
-      setMaxAmountIn(maxAmountIn);
-
-      let userToken0Balance = await getUserTokenBalanceRaw(
-        token0IsETH ? ETHER : new Token(chainId, inToken0Address, inToken0Decimal, inToken0Symbol),
-        account,
-        library
+    if (token0.equals(token1)) {
+      setSwapButtonState(false);
+      setSwapButtonContent('tokens are same');
+      return new CustomError('tokens are same');
+    }
+    // get pair using our own provider
+    const pair = await Fetcher.fetchPairData(token0, token1, library).catch(e => {
+      return new CustomError(
+        `${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`
       );
+    });
+    if (pair instanceof CustomError) {
+      setSwapButtonState(false);
+      setSwapButtonContent("pool doesn't exist");
+      return pair;
+    }
 
-      let userHasSufficientBalance;
-      try {
-        userHasSufficientBalance = userToken0Balance.gte(
-          parseUnits(inToken0Amount, inToken0Decimal)
-        );
-      } catch (e) {
-        console.log('wrappedAmount!!!');
-        console.log(e);
-        setSwapButtonState(false);
+    console.log(pair);
+    setPair(pair);
+    console.log('------------------ CONSTRUCT ROUTE ------------------');
+    // This is where we let Uniswap SDK know we are not using WETH but ETHER
+
+    const route = new Route([pair], token0IsETH ? ETHER : token0, token1IsETH ? ETHER : token1);
+
+    console.log(route);
+
+    setRoute(route);
+    console.log('------------------ PARSE AMOUNT ------------------');
+
+    // convert typed in amount to BigNumbe rusing ethers.js's parseUnits then to string,
+    console.log(inToken0Amount);
+    console.log(inToken0Decimal);
+
+    let parsedAmount;
+
+    try {
+      parsedAmount = exactIn
+        ? new TokenAmount(token0, parseUnits(inToken0Amount, inToken0Decimal)).raw.toString(16)
+        : new TokenAmount(token1, parseUnits(inToken1Amount, inToken1Decimal)).raw.toString(16);
+    } catch (e) {
+      console.log('parsedAmount!!!');
+      console.log(e);
+      setSwapButtonState(false);
+      if (e.fault === 'underflow') {
         setSwapButtonContent(e.fault);
         return new CustomError(e.fault);
       }
+      setSwapButtonContent('unknow error');
+      return new CustomError('unknow error');
+    }
 
-      // quit if user doesn't have enough balance, otherwise this will cause error
-      if (!userHasSufficientBalance) {
+    let inputAmount;
+    // CurrencyAmount instance is required for Trade contructor if input is ETHER
+    if ((token0IsETH && exactIn) || (token1IsETH && !exactIn)) {
+      inputAmount = new CurrencyAmount(ETHER, `0x${parsedAmount}`);
+    } else {
+      inputAmount = new TokenAmount(exactIn ? token0 : token1, `0x${parsedAmount}`);
+    }
+    console.log('estimated dependent amount');
+    // console.log(pair.priceOf(token0).quote(inputAmount).raw.toString());
+    let dependentTokenAmount = pair.priceOf(token0).quote(new TokenAmount(token0, inputAmount.raw));
+
+    let parsed =
+      token1 === ETHER ? CurrencyAmount.ether(dependentTokenAmount.raw) : dependentTokenAmount;
+    console.log(parsed.toExact());
+
+    //===================================================================================
+
+    console.log('------------------ CONSTRUCT TRADE ------------------');
+    let trade;
+    try {
+      trade = new Trade(
+        route,
+        inputAmount,
+        exactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
+      );
+    } catch (e) {
+      if (e instanceof InsufficientReservesError) {
         setSwapButtonState(false);
-        setSwapButtonContent('Not Enough balance');
-        return;
+        setSwapButtonContent('Insufficient liquidity for this trade');
+        console.log('Insufficient reserve!');
+        return new CustomError('Insufficient reserve!');
       }
+      setSwapButtonState(false);
+      setSwapButtonContent('Unhandled exception!');
+      console.log('Unhandled exception!');
+      console.log(e);
+      return new CustomError('Unhandled exception!');
+    }
 
-      console.log('------------------ BREAKDOWN ------------------');
-      let { priceImpactWithoutFee, realizedLPFee } = computeTradePriceBreakdown(trade);
-      let breakdownInfo = [
-        // `Slice Slippage tolerance:` ${allowedSlippage} %`
-        // `Slippage tolerance : ${slippage}%`,
-        `Price impact : ${priceImpactWithoutFee.toFixed(2)}%`,
-        // `LP FEE : ${realizedLPFee?.toSignificant(6)} ${trade.inputAmount.currency.symbol}`,
-        `${exactIn ? 'Min received:' : 'Max sold'} : ${
-          exactIn ? minAmountOut.toSignificant(4) : maxAmountIn.toSignificant(4)
-        } ${exactIn ? trade.outputAmount.currency.symbol : trade.inputAmount.currency.symbol}`,
-      ];
+    console.log(trade);
+    setTrade(trade);
+    console.log('------------------ SLIPPAGE CALCULATE ------------------');
 
-      // setEstimatedStatus("you can click the swap button");
-      setSwapBreakdown(breakdownInfo);
+    let slippageAdjustedAmount;
+    let minAmountOut;
+    let maxAmountIn;
 
-      console.log('------------------ ALLOWANCE ------------------');
-      if (!token0IsETH) {
-        let allowance = await getAllowance(
-          inToken0Address,
-          account,
-          ROUTER_ADDRESS,
-          library,
-          account
-        );
+    // calculate slippage adjusted amount
+    if (exactIn) {
+      // console.log(trade.outputAmount.toExact());
+      // setToken1Amount(trade.outputAmount.toExact());
+      console.log(`By algorithm, expected to get: ${trade.outputAmount.toExact()}`);
+      // if provided exact token in, we want to know min out token amount
+      minAmountOut = trade.minimumAmountOut(allowedSlippage);
+      slippageAdjustedAmount = minAmountOut.raw.toString();
 
-        console.log(`Current allowance for ${trade.inputAmount.currency.symbol}:`);
-        console.log(allowance);
-        let token0AmountToApprove = exactIn ? inputAmount.raw.toString() : slippageAdjustedAmount;
-        let token0approval = await checkTokenIsApproved(
-          inToken0Address,
-          token0AmountToApprove,
-          library,
-          account
-        );
-        console.log(token0approval);
-        if (!token0approval) {
-          console.log('Not enough allowance');
-          setApproveAmount(token0AmountToApprove);
-          // when needApprove = true, please show the button of [Approve]
-          setNeedApprove(true);
-          setApproveButtonStatus(true);
-          setSwapButtonState(false);
-          setSwapButtonContent('Need approval');
-          return 'approve is ok';
-        } else {
-          setSwapButtonContent('Swap');
-          setSwapButtonState(true);
-          return 'swap is ok';
-        }
+      // update UI with estimated output token amount
+      setToken1Amount(trade.outputAmount.toFixed(6));
+      console.log(`Minimum received: ${slippageAdjustedAmount}`);
+    } else {
+      console.log(`By algorithm, expected to get: ${trade.inputAmount.toExact()}`);
+      maxAmountIn = trade.maximumAmountIn(allowedSlippage);
+      slippageAdjustedAmount = maxAmountIn.raw.toString();
+      setToken0Amount(trade.inputAmount.toFixed(6));
+      console.log(`Maximum pay: ${slippageAdjustedAmount}`);
+    }
+
+    setSlippageAdjustedAmount(slippageAdjustedAmount);
+    setMinAmountOut(minAmountOut);
+    setMaxAmountIn(maxAmountIn);
+
+    let userToken0Balance = await getUserTokenBalanceRaw(
+      token0IsETH ? ETHER : new Token(chainId, inToken0Address, inToken0Decimal, inToken0Symbol),
+      account,
+      library
+    );
+
+    let userHasSufficientBalance;
+    try {
+      userHasSufficientBalance = userToken0Balance.gte(parseUnits(inToken0Amount, inToken0Decimal));
+    } catch (e) {
+      console.log('wrappedAmount!!!');
+      console.log(e);
+      setSwapButtonState(false);
+      setSwapButtonContent(e.fault);
+      return new CustomError(e.fault);
+    }
+
+    // quit if user doesn't have enough balance, otherwise this will cause error
+    if (!userHasSufficientBalance) {
+      setSwapButtonState(false);
+      setSwapButtonContent('Not Enough balance');
+      return;
+    }
+
+    console.log('------------------ BREAKDOWN ------------------');
+    let { priceImpactWithoutFee, realizedLPFee } = computeTradePriceBreakdown(trade);
+    let breakdownInfo = [
+      // `Slice Slippage tolerance:` ${allowedSlippage} %`
+      // `Slippage tolerance : ${slippage}%`,
+      `Price impact : ${priceImpactWithoutFee.toFixed(2)}%`,
+      // `LP FEE : ${realizedLPFee?.toSignificant(6)} ${trade.inputAmount.currency.symbol}`,
+      `${exactIn ? 'Min received:' : 'Max sold'} : ${
+        exactIn ? minAmountOut.toSignificant(4) : maxAmountIn.toSignificant(4)
+      } ${exactIn ? trade.outputAmount.currency.symbol : trade.inputAmount.currency.symbol}`,
+    ];
+
+    // setEstimatedStatus("you can click the swap button");
+    setSwapBreakdown(breakdownInfo);
+
+    console.log('------------------ ALLOWANCE ------------------');
+    if (!token0IsETH) {
+      let allowance = await getAllowance(
+        inToken0Address,
+        account,
+        ROUTER_ADDRESS,
+        library,
+        account
+      );
+
+      console.log(`Current allowance for ${trade.inputAmount.currency.symbol}:`);
+      console.log(allowance);
+      let token0AmountToApprove = exactIn ? inputAmount.raw.toString() : slippageAdjustedAmount;
+      let token0approval = await checkTokenIsApproved(
+        inToken0Address,
+        token0AmountToApprove,
+        library,
+        account
+      );
+      console.log(token0approval);
+      if (!token0approval) {
+        console.log('Not enough allowance');
+        setApproveAmount(token0AmountToApprove);
+        // when needApprove = true, please show the button of [Approve]
+        setNeedApprove(true);
+        setApproveButtonStatus(true);
+        setSwapButtonState(false);
+        setSwapButtonContent('Need approval');
+        return 'approve is ok';
       }
       setSwapButtonContent('Swap');
       setSwapButtonState(true);
-
       return 'swap is ok';
     }
+    setSwapButtonContent('Swap');
+    setSwapButtonState(true);
+
+    return 'swap is ok';
   })();
   if (status instanceof CustomError) {
     setSwapButtonContent(status.getErrorText());
   } else {
     console.log(status);
   }
-  return;
 }
 
 export async function swap(
@@ -507,20 +494,20 @@ export async function swap(
   setSwapStatus,
   swapCallback
 ) {
-  let status = await (async () => {
+  const status = await (async () => {
     // check uniswap
     console.log(FACTORY_ADDRESS);
     // change slippage from bips (0.01%) into percentage
     allowedSlippage = new Percent(allowedSlippage, 10000);
 
-    let contract = getRouterContract(library, account);
-    let {
+    const contract = getRouterContract(library, account);
+    const {
       address: inToken0Address,
       symbol: inToken0Symbol,
       decimal: inToken0Decimal,
       amount: inToken0Amount,
     } = inputToken0;
-    let {
+    const {
       address: inToken1Address,
       symbol: inToken1Symbol,
       decimal: inToken1Decimal,
@@ -530,8 +517,8 @@ export async function swap(
     console.log(`token0Amount: ${inToken0Amount}`);
     console.log(`token1Amount: ${inToken1Amount}`);
 
-    let token0IsETH = inToken0Symbol === 'ETH';
-    let token1IsETH = inToken1Symbol === 'ETH';
+    const token0IsETH = inToken0Symbol === 'ETH';
+    const token1IsETH = inToken1Symbol === 'ETH';
 
     console.log(inputToken0);
     console.log(inputToken1);
@@ -545,7 +532,7 @@ export async function swap(
       // UI should sync value of ETH and WETH
       // if (exactIn) setToken1Amount(token0Amount);
       // else setToken0Amount(token1Amount);
-      let result = await wethContract
+      const result = await wethContract
         .deposit({
           value: wrappedAmount,
         })
@@ -557,14 +544,14 @@ export async function swap(
       return result;
     }
     // unwrap WETH into ETH
-    else if (inToken0Symbol === 'WETH' && token1IsETH) {
+    if (inToken0Symbol === 'WETH' && token1IsETH) {
       console.log('UNWRAP');
 
       // UI should sync value of ETH and WETH
       // if (exactIn) setToken1Amount(token0Amount);
       // else setToken0Amount(token1Amount);
 
-      let result = await wethContract.withdraw(wrappedAmount).catch(e => {
+      const result = await wethContract.withdraw(wrappedAmount).catch(e => {
         console.log(e);
         return new CustomError('WETH Withdrawal failed');
       });
@@ -606,7 +593,7 @@ export async function swap(
     console.log('say something about allowance');
     console.log('------------------ PREPARE SWAP ------------------');
 
-    let { methodName, args, value } = Router.swapCallParameters(trade, {
+    const { methodName, args, value } = Router.swapCallParameters(trade, {
       feeOnTransfer: false,
       allowedSlippage,
       recipient: account,
@@ -619,16 +606,14 @@ export async function swap(
     console.log(args);
 
     console.log(contract);
-    let result = await contract.estimateGas[methodName](...args, options)
-      .then(gasEstimate => {
-        return contract[methodName](...args, {
+    const result = await contract.estimateGas[methodName](...args, options)
+      .then(gasEstimate =>
+        contract[methodName](...args, {
           gasLimit: calculateGasMargin(gasEstimate),
           ...options,
-        });
-      })
-      .catch(e => {
-        return new CustomError(`${methodName} failed with error ${e}`);
-      });
+        })
+      )
+      .catch(e => new CustomError(`${methodName} failed with error ${e}`));
     return result;
   })();
 
@@ -637,11 +622,11 @@ export async function swap(
   } else {
     console.log(status);
 
-    let url = 'https://rinkeby.etherscan.io/tx/' + status.hash;
+    const url = `https://rinkeby.etherscan.io/tx/${status.hash}`;
     swapCallback(status, inputToken0, inputToken1);
     setSwapStatus(
       <div>
-        <a href={url} target={'_blank'}>
+        <a href={url} target="_blank" rel="noreferrer">
           View it on etherscan
         </a>
       </div>

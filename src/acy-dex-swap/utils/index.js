@@ -211,8 +211,6 @@ export async function getUserTokenBalance(token, chainId, account, library) {
 }
 
 export async function getUserTokenBalanceWithAddress(address, chainId, account, library) {
-  console.log('---------- getUserTokenBalanceWithAddress ----------');
-  console.log(address, account, library);
   const tokenContract = getTokenContract(address, library, account);
   const symbol = await tokenContract.symbol();
   const decimal = await tokenContract.decimals();
