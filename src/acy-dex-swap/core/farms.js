@@ -1,6 +1,9 @@
-import { BigNumber } from '@ethersproject/bignumber';
-import { getFarmsContract, getTokenContract, getPairContract } from '@/acy-dex-swap/utils';
 import { formatUnits } from '@ethersproject/units';
+import {
+  getFarmsContract,
+  getTokenContract,
+  getPairContract,
+} from '@/acy-dex-swap/utils';
 
 
 // method to retrieve token symbol based on the given token address.
@@ -121,9 +124,7 @@ const getAllPools = async (library, account) => {
 
 const harvestAll = async (poolId, library, account) => {
   const farmContract = getFarmsContract(library, account);
-  console.log('farm contract', farmContract)
   const response = await farmContract.harvestAll(poolId, false, false)
-  console.log(response)
 }
 
 export { getAllPools, harvestAll };

@@ -232,6 +232,8 @@ const Farms = () => {
             setTokenFilter={setTokenFilter}
             walletConnected={walletConnected}
             connectWallet={connectWallet}
+            account={account}
+            library={library}
           />
         )}
         {selectedTable === 4 && <DaoTable dataSource={daoDataSource} />}

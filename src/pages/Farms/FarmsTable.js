@@ -20,6 +20,8 @@ const FarmsTable = (
     setTokenFilter,
     walletConnected,
     connectWallet,
+    library,
+    account,
   }
 ) => {
   const [isModalVisible, setIsModalVisible] = useState(false)
@@ -89,6 +91,8 @@ const FarmsTable = (
               hideModal={hideModal}
               isModalVisible={isModalVisible}
               selectedTable={selectedTable}
+              account={account}
+              library={library}
             />
           ))}
         </div>

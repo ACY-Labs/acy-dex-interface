@@ -27,6 +27,8 @@ const FarmsTableRow = (
     hideModal,
     isModalVisible,
     hideArrow = false,
+    account,
+    library,
   }
 ) => {
   const [date, setDate] = useState(new Date())
@@ -155,7 +157,7 @@ const FarmsTableRow = (
                 </div>
               ))}
             </div>
-            <button type="button" className={styles.tableBodyDrawerRewardHarvestButton} onClick={() => harvestAll(index)}>Harvest</button>
+            <button type="button" className={styles.tableBodyDrawerRewardHarvestButton} onClick={() => harvestAll(index, library, account)}>Harvest</button>
           </div>
         </div>
 
