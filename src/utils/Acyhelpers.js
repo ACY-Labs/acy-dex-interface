@@ -61,7 +61,7 @@ export async function getAllowance(tokenAddress, owner, spender, library, accoun
   return allowance;
 }
 
-export class Error {
+export class CustomError {
   getErrorText() {
     return this.errorText;
   }

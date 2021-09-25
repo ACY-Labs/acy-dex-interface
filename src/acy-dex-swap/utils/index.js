@@ -15,7 +15,7 @@ export const ROUTER_ADDRESS = '0xc858026830a9A060beC7A408B8b4b4852c10B189';
 export const FARMS_ADDRESS = '0x7b028A293dA85097B98c5c9cbb076Fd58467b3f1';
 
 // a custom error class for custom error text and handling
-export class Error {
+export class CustomError {
   getErrorText() {
     return this.errorText;
   }

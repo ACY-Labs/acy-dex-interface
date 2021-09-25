@@ -6,9 +6,9 @@ import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 import { isMobile } from 'react-device-detect';
 import { harvestAll } from '@/acy-dex-swap/core/farms';
 
-<<<<<<< HEAD
 const FarmsTableRow = ({
   index,
+  lpTokens,
   poolId,
   stakedTokenAddr,
   token1,
@@ -34,37 +34,7 @@ const FarmsTableRow = ({
   const [stake, setStake] = useState(0);
   const [balance, setBalance] = useState(12345);
   const [balancePercentage, setBalancePercentage] = useState(0);
-=======
-const FarmsTableRow = (
-  {
-    index,
-    lpTokens,
-    token1,
-    token1Logo,
-    token2,
-    token2Logo,
-    totalApr,
-    tvl,
-    hidden,
-    rowClickHandler,
-    pendingReward,
-    walletConnected,
-    connectWallet,
-    showModal,
-    hideModal,
-    isModalVisible,
-    hideArrow = false,
-    account,
-    library,
-  }
-) => {
-  const [date, setDate] = useState(new Date())
-  const [selectedPresetDate, setSelectedPresetDate] = useState(null)
-  const [stake, setStake] = useState(0)
-  const [balance, setBalance] = useState(12345)
-  const [balancePercentage, setBalancePercentage] = useState(0)
-  const [isHarvestDisabled, setIsHarvestDisabled] = useState(false)
->>>>>>> 225b2d25a8c2aecdbb3442a21960bbdf778d25d4
+  const [isHarvestDisabled, setIsHarvestDisabled] = useState(false);
 
   const updateStake = newStake => {
     let newStakeInt = newStake !== '' ? parseInt(newStake, 10) : '';
@@ -138,15 +108,10 @@ const FarmsTableRow = (
 
         {/* Pending Reward Column */}
         <div className={styles.tableBodyRewardColContainer}>
-<<<<<<< HEAD
           <div className={styles.pendingRewardTitleContainer}>
-            {isMobile ? 'Reward' : 'Pending Reward'}
+            {isMobile ? 'Reward' : 'Total Reward'}
           </div>
           {pendingReward.map(reward => (
-=======
-          <div className={styles.pendingRewardTitleContainer}>{isMobile ? 'Reward' : 'Total Reward'}</div>
-          {pendingReward.map((reward) => (
->>>>>>> 225b2d25a8c2aecdbb3442a21960bbdf778d25d4
             <div className={styles.pendingReward1ContentContainer}>
               {`${reward.amount} ${reward.token}`}
             </div>
@@ -209,13 +174,9 @@ const FarmsTableRow = (
             <button
               type="button"
               className={styles.tableBodyDrawerRewardHarvestButton}
-<<<<<<< HEAD
-              onClick={() => harvestAll(index, library, account)}
-=======
               style={isHarvestDisabled ? { cursor: 'not-allowed' } : {}}
               onClick={() => harvestAll(index, library, account, setIsHarvestDisabled)}
               disabled={isHarvestDisabled}
->>>>>>> 225b2d25a8c2aecdbb3442a21960bbdf778d25d4
             >
               Harvest
             </button>

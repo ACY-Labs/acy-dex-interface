@@ -3,7 +3,7 @@ import { AcyModal } from '@/components/Acy';
 import { useWeb3React } from '@web3-react/core';
 import { getAddress } from '@ethersproject/address';
 import {
-  Error,
+  CustomError,
   approve,
   calculateGasMargin,
   calculateSlippageAmount,
@@ -115,9 +115,11 @@ export async function getEstimated(
       return pair;
     })
     .catch(e => {
-      return new Error(`${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`);
+      return new CustomError(
+        `${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`
+      );
     });
-  if (pair instanceof Error) {
+  if (pair instanceof CustomError) {
     setToken0Amount('0');
     setToken1Amount('0');
     setBalance('');
@@ -322,7 +324,7 @@ export async function signOrApprove(
     let token1IsETH = inToken1Symbol === 'ETH';
 
     if (!inputToken0.symbol || !inputToken1.symbol)
-      return new Error('One or more token input is missing');
+      return new CustomError('One or more token input is missing');
 
     console.log('------------------ RECEIVED TOKEN ------------------');
     console.log('token0');
@@ -330,10 +332,10 @@ export async function signOrApprove(
     console.log('token1');
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new Error("Doesn't support ETH to ETH");
+    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support ETH to ETH");
 
     if ((token0IsETH && inToken1Symbol === 'WETH') || (inToken0Symbol === 'WETH' && token1IsETH)) {
-      return new Error('Invalid pair WETH/ETH');
+      return new CustomError('Invalid pair WETH/ETH');
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
     else {
@@ -348,7 +350,7 @@ export async function signOrApprove(
         ? WETH[chainId]
         : new Token(chainId, inToken1Address, inToken1Decimal, inToken1Symbol);
 
-      if (token0.equals(token1)) return new Error('Equal tokens!');
+      if (token0.equals(token1)) return new CustomError('Equal tokens!');
 
       // get pair using our own provider
       console.log('------------------ CONSTRUCT PAIR ------------------');
@@ -356,10 +358,10 @@ export async function signOrApprove(
       // if an error occurs, because pair doesn't exists
       const pair = await Fetcher.fetchPairData(token0, token1, library).catch(e => {
         console.log(e);
-        return new Error(`${token0.symbol} - ${token1.symbol} pool does not exist.`);
+        return new CustomError(`${token0.symbol} - ${token1.symbol} pool does not exist.`);
       });
       console.log(pair);
-      if (pair instanceof Error) {
+      if (pair instanceof CustomError) {
         setRemoveStatus(pair.getErrorText());
         return pair;
       }
@@ -504,14 +506,16 @@ export async function signOrApprove(
           } else {
             alert('error code 4001!');
             console.log('error code 4001!');
-            return new Error(' 4001 (EIP-1193 user rejected request), fall back to manual approve');
+            return new CustomError(
+              ' 4001 (EIP-1193 user rejected request), fall back to manual approve'
+            );
           }
         });
 
       return 'end';
     }
   })();
-  if (status instanceof Error) {
+  if (status instanceof CustomError) {
     setRemoveStatus(status.getErrorText());
   } else {
     setRemoveStatus('just click right button');
@@ -555,14 +559,14 @@ export async function removeLiquidity(
     let token1IsETH = token1Symbol === 'ETH';
 
     if (!inputToken0.symbol || !inputToken1.symbol)
-      return new Error('One or more token input is missing');
+      return new CustomError('One or more token input is missing');
 
-    if (index == 0 && percent == '0') return new Error('percent is 0');
-    if (index == 1 && amount == '0') return new Error('amount is 0');
-    if (index == 0 && percent == '') return new Error('percent is ""');
-    if (index == 1 && amount == '') return new Error('amount is ""');
-    if (index == 0 && isNaN(parseFloat(percent))) return new Error('percent is NaN');
-    if (index == 1 && isNaN(parseFloat(amount))) return new Error('amount is NaN');
+    if (index == 0 && percent == '0') return new CustomError('percent is 0');
+    if (index == 1 && amount == '0') return new CustomError('amount is 0');
+    if (index == 0 && percent == '') return new CustomError('percent is ""');
+    if (index == 1 && amount == '') return new CustomError('amount is ""');
+    if (index == 0 && isNaN(parseFloat(percent))) return new CustomError('percent is NaN');
+    if (index == 1 && isNaN(parseFloat(amount))) return new CustomError('amount is NaN');
 
     console.log('------------------ RECEIVED TOKEN ------------------');
     console.log('token0');
@@ -570,10 +574,10 @@ export async function removeLiquidity(
     console.log('token1');
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new Error("Doesn't support ETH to ETH");
+    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support ETH to ETH");
 
     if ((token0IsETH && token1Symbol === 'WETH') || (token0Symbol === 'WETH' && token1IsETH)) {
-      return new Error('Invalid pair WETH/ETH');
+      return new CustomError('Invalid pair WETH/ETH');
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
     else {
@@ -586,7 +590,7 @@ export async function removeLiquidity(
         ? WETH[chainId]
         : new Token(chainId, token1Address, token1Decimal, token1Symbol);
 
-      if (token0.equals(token1)) return new Error('Equal tokens!');
+      if (token0.equals(token1)) return new CustomError('Equal tokens!');
 
       // get pair using our own provider
       console.log('------------------ CONSTRUCT PAIR ------------------');
@@ -594,10 +598,10 @@ export async function removeLiquidity(
       // if an error occurs, because pair doesn't exists
       const pair = await Fetcher.fetchPairData(token0, token1, library).catch(e => {
         console.log(e);
-        return new Error(`${token0.symbol} - ${token1.symbol} pool does not exist.`);
+        return new CustomError(`${token0.symbol} - ${token1.symbol} pool does not exist.`);
       });
       console.log(pair);
-      if (pair instanceof Error) {
+      if (pair instanceof CustomError) {
         setRemoveStatus(pair.getErrorText());
         return pair;
       }
@@ -746,7 +750,7 @@ export async function removeLiquidity(
           ];
         }
       } else {
-        return new Error(
+        return new CustomError(
           'Attempting to confirm without approval or a signature. Please contact support.'
         );
       }
@@ -760,7 +764,7 @@ export async function removeLiquidity(
             .then(calculateGasMargin)
             .catch(error => {
               console.error(`estimateGas failed`, methodName, args, error);
-              return new Error(console.error(`estimateGas failed`, methodName, args, error));
+              return new CustomError(console.error(`estimateGas failed`, methodName, args, error));
             })
         ))
       );
@@ -775,7 +779,7 @@ export async function removeLiquidity(
 
       if (indexOfSuccessfulEstimation === -1) {
         console.error('This transaction would fail. Please contact support.');
-        return new Error('safeGasEstimates is wrong');
+        return new CustomError('safeGasEstimates is wrong');
       } else {
         const methodName = methodNames[indexOfSuccessfulEstimation];
         const safeGasEstimate = safeGasEstimates[indexOfSuccessfulEstimation];
@@ -788,17 +792,17 @@ export async function removeLiquidity(
             return response;
           })
           .catch(e => {
-            return new Error('error happen');
+            return new CustomError('error happen');
           });
 
-        if (result instanceof Error) {
+        if (result instanceof CustomError) {
           console.log('result is error');
         }
         return result;
       }
     }
   })();
-  if (status instanceof Error) {
+  if (status instanceof CustomError) {
     setRemoveStatus(status.getErrorText());
   } else {
     console.log(status);

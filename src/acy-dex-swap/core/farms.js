@@ -159,14 +159,14 @@ const deposit = async (lpTokenAddr, amount, poolId, library, account) => {
     const depositTokenContract = getTokenContract(lpTokenAddr, library, account);
     const hasBalance = checkUserHasSufficientLPBalance(lpTokenAddr, amount, library, account);
     const approved = checkTokenIsApproved(lpTokenAddr, amount, library, account);
-    if (!hasBalance) return new Error(`Insufficient balance`);
+    if (!hasBalance) return new CustomError(`Insufficient balance`);
 
     const tokenDecimals = await depositTokenContract.decimals();
     const depositAmount = parseUnits(amount, tokenDecimals).toString();
 
     if (!approved) {
       approve(lpTokenAddr, depositAmount, library, account);
-      return new Error(`Please approve your tokens first`);
+      return new CustomError(`Please approve your tokens first`);
     }
 
     let args = [poolId, depositAmount];
@@ -179,12 +179,12 @@ const deposit = async (lpTokenAddr, amount, poolId, library, account) => {
         });
       })
       .catch(e => {
-        return new Error(`Farms deposit failed with error ${e}`);
+        return new CustomError(`Farms deposit failed with error ${e}`);
       });
     return result;
   })();
 
-  if (status instanceof Error) {
+  if (status instanceof CustomError) {
     console.log(status.getErrorText());
   } else {
     console.log(status);

@@ -12,7 +12,7 @@ import {
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import {
-  Error,
+  CustomError,
   calculateGasMargin,
   calculateSlippageAmount,
   checkTokenIsApproved,
@@ -78,13 +78,14 @@ export async function getEstimated(
       amount: inToken1Amount,
     } = inputToken1;
 
-    if (!inputToken0.symbol || !inputToken1.symbol) return new Error('please choose tokens');
-    if (exactIn && inToken0Amount == '0') return new Error('token0Amount is 0');
-    if (!exactIn && inToken1Amount == '0') return new Error('token1Amount is 0');
-    if (exactIn && inToken0Amount == '') return new Error('token0Amount is ""');
-    if (!exactIn && inToken1Amount == '') return new Error('token1Amount is ""');
-    if (exactIn && isNaN(parseFloat(inToken0Amount))) return new Error('token0Amount is NaN');
-    if (!exactIn && isNaN(parseFloat(inToken1Amount))) return new Error('token1Amount is NaN');
+    if (!inputToken0.symbol || !inputToken1.symbol) return new CustomError('please choose tokens');
+    if (exactIn && inToken0Amount == '0') return new CustomError('token0Amount is 0');
+    if (!exactIn && inToken1Amount == '0') return new CustomError('token1Amount is 0');
+    if (exactIn && inToken0Amount == '') return new CustomError('token0Amount is ""');
+    if (!exactIn && inToken1Amount == '') return new CustomError('token1Amount is ""');
+    if (exactIn && isNaN(parseFloat(inToken0Amount))) return new CustomError('token0Amount is NaN');
+    if (!exactIn && isNaN(parseFloat(inToken1Amount)))
+      return new CustomError('token1Amount is NaN');
 
     let token0IsETH = inToken0Symbol === 'ETH';
     let token1IsETH = inToken1Symbol === 'ETH';
@@ -94,14 +95,14 @@ export async function getEstimated(
     if (token0IsETH && token1IsETH) {
       setButtonContent("Doesn't support ETH to ETH");
       setButtonStatus(false);
-      return new Error("Doesn't support ETH to ETH");
+      return new CustomError("Doesn't support ETH to ETH");
     } else if (
       (token0IsETH && inToken1Symbol === 'WETH') ||
       (inToken0Symbol === 'WETH' && token1IsETH)
     ) {
       setButtonContent('Invalid pair WETH/ETH');
       setButtonStatus(false);
-      return new Error('Invalid pair WETH/ETH');
+      return new CustomError('Invalid pair WETH/ETH');
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
     else {
@@ -119,7 +120,7 @@ export async function getEstimated(
       if (token0.equals(token1)) {
         setButtonContent('Equal tokens');
         setButtonStatus(false);
-        return new Error('Equal tokens!');
+        return new CustomError('Equal tokens!');
       }
       // get pair using our own provider
       const pair = await Fetcher.fetchPairData(token0, token1, library)
@@ -129,7 +130,9 @@ export async function getEstimated(
           return pair;
         })
         .catch(e => {
-          return new Error(`${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`);
+          return new CustomError(
+            `${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`
+          );
         });
 
       console.log('pair');
@@ -137,7 +140,7 @@ export async function getEstimated(
       setPair(pair);
 
       let noLiquidity = false;
-      if (pair instanceof Error) {
+      if (pair instanceof CustomError) {
         noLiquidity = true;
       }
       setNoLiquidity(noLiquidity);
@@ -155,10 +158,10 @@ export async function getEstimated(
         setButtonStatus(false);
         if (e.fault === 'underflow') {
           setButtonContent(e.fault);
-          return new Error(e.fault);
+          return new CustomError(e.fault);
         } else {
           setButtonContent('unknow error');
-          return new Error('unknow error');
+          return new CustomError('unknow error');
         }
       }
 
@@ -184,10 +187,10 @@ export async function getEstimated(
             setButtonStatus(false);
             if (e.fault === 'underflow') {
               setButtonContent(e.fault);
-              return new Error(e.fault);
+              return new CustomError(e.fault);
             } else {
               setButtonContent('unknow error');
-              return new Error('unknow error');
+              return new CustomError('unknow error');
             }
           }
 
@@ -215,10 +218,10 @@ export async function getEstimated(
             setButtonStatus(false);
             if (e.fault === 'underflow') {
               setButtonContent(e.fault);
-              return new Error(e.fault);
+              return new CustomError(e.fault);
             } else {
               setButtonContent('unknow error');
-              return new Error('unknow error');
+              return new CustomError('unknow error');
             }
           }
 
@@ -239,11 +242,11 @@ export async function getEstimated(
             setButtonStatus(false);
             setButtonContent('create new pool');
 
-            return new Error('Creating a new pool, please enter both amounts');
+            return new CustomError('Creating a new pool, please enter both amounts');
           } else {
             setButtonStatus(false);
             setButtonContent('add liquidity');
-            return new Error("One field is empty, it's probably a new pool");
+            return new CustomError("One field is empty, it's probably a new pool");
           }
         }
 
@@ -257,10 +260,10 @@ export async function getEstimated(
           setButtonStatus(false);
           if (e.fault === 'underflow') {
             setButtonContent(e.fault);
-            return new Error(e.fault);
+            return new CustomError(e.fault);
           } else {
             setButtonContent('unknow error');
-            return new Error('unknow error');
+            return new CustomError('unknow error');
           }
         }
       }
@@ -298,10 +301,10 @@ export async function getEstimated(
         setButtonStatus(false);
         if (e.fault === 'underflow') {
           setButtonContent(e.fault);
-          return new Error(e.fault);
+          return new CustomError(e.fault);
         } else {
           setButtonContent('Unknown error');
-          return new Error('unknow error');
+          return new CustomError('unknow error');
         }
       }
 
@@ -309,7 +312,7 @@ export async function getEstimated(
       if (!userHasSufficientBalance) {
         setButtonContent('Not enough balance');
         setButtonStatus(false);
-        return new Error('Not enough balance');
+        return new CustomError('Not enough balance');
       }
 
       console.log('------------------ BREAKDOWN ------------------');
@@ -344,12 +347,12 @@ export async function getEstimated(
             setButtonContent('Insufficient reserve!');
             setButtonStatus(false);
             // alert("something wrong !!!!");
-            return new Error('Insufficient reserve!');
+            return new CustomError('Insufficient reserve!');
             console.log('Insufficient reserve!');
           } else {
             setButtonContent('Unhandled exception!');
             setButtonStatus(false);
-            return new Error('Unhandled exception!');
+            return new CustomError('Unhandled exception!');
             console.log('Unhandled exception!');
             console.log(e);
           }
@@ -400,7 +403,7 @@ export async function getEstimated(
         setButtonStatus(false);
         setButtonContent('Need approval');
 
-        return new Error(
+        return new CustomError(
           `Need approve ${
             approveStatus === 1
               ? inToken0Symbol
@@ -498,7 +501,7 @@ export async function getEstimated(
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
   })();
 
-  if (status instanceof Error) {
+  if (status instanceof CustomError) {
     console.log(status.getErrorText());
   } else {
     console.log(status);
@@ -549,11 +552,11 @@ export async function addLiquidity(
     console.log('token1');
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new Error("Doesn't support ETH to ETH");
+    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support ETH to ETH");
 
     if ((token0IsETH && inToken1Symbol === 'WETH') || (inToken0Symbol === 'WETH' && token1IsETH)) {
       // UI should sync value of ETH and WETH
-      return new Error('Invalid pair WETH/ETH');
+      return new CustomError('Invalid pair WETH/ETH');
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
     else {
@@ -568,7 +571,7 @@ export async function addLiquidity(
         : new Token(chainId, inToken1Address, inToken1Decimal, inToken1Symbol);
 
       // quit if the two tokens are equivalent, i.e. have the same chainId and address
-      if (token0.equals(token1)) return new Error('Equal tokens!');
+      if (token0.equals(token1)) return new CustomError('Equal tokens!');
 
       // get pair using our own provider
       console.log('------------------ CONSTRUCT PAIR ------------------');
@@ -614,13 +617,13 @@ export async function addLiquidity(
           ...(value ? { value } : {}),
           gasLimit: calculateGasMargin(estimatedGasLimit),
         }).catch(e => {
-          return new Error('Error in transaction');
+          return new CustomError('CustomError in transaction');
         })
       );
       return result;
     }
   })();
-  if (status instanceof Error) {
+  if (status instanceof CustomError) {
     setLiquidityStatus(status.getErrorText());
   } else {
     console.log('status');

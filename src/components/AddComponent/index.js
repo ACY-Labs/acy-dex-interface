@@ -40,7 +40,7 @@ import {
   getRouterContract,
   calculateGasMargin,
   getTokenTotalSupply,
-  Error,
+  CustomError,
   approve,
   checkTokenIsApproved,
   getUserTokenBalanceRaw,
