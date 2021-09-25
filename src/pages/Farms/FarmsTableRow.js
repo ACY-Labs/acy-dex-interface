@@ -36,6 +36,7 @@ const FarmsTableRow = (
   const [stake, setStake] = useState(0)
   const [balance, setBalance] = useState(12345)
   const [balancePercentage, setBalancePercentage] = useState(0)
+  const [isHarvestDisabled, setIsHarvestDisabled] = useState(false)
 
   const updateStake = (newStake) => {
     let newStakeInt = newStake !== '' ? parseInt(newStake, 10) : ''
@@ -97,15 +98,16 @@ const FarmsTableRow = (
           {/* conditionally hide and show token 2 symbol */}
           {/* only display token 1 symbol if token 2 is undefined or null. */}
           <div className={styles.tokenTitleContainer}>
-            {token1 && token2 && `${token1}-${token2} ${!isMobile ? 'LP' : ''}`}
-            {token1 && !token2 && `${token1} ${!isMobile ? 'LP' : ''}`}
-            {token2 && !token1 && `${token2} ${!isMobile ? 'LP' : ''}`}
+            {token1 && token2 && `${token1}-${token2}`}
+            {token1 && !token2 && `${token1}`}
+            {token2 && !token1 && `${token2}`}
+            {!isMobile ? token1 && token2 && <span style={{ opacity: '0.5' }}> LP</span> : ''}
           </div>
         </div>
 
         {/* Pending Reward Column */}
         <div className={styles.tableBodyRewardColContainer}>
-          <div className={styles.pendingRewardTitleContainer}>{isMobile ? 'Reward' : 'Pending Reward'}</div>
+          <div className={styles.pendingRewardTitleContainer}>{isMobile ? 'Reward' : 'Total Reward'}</div>
           {pendingReward.map((reward) => (
             <div className={styles.pendingReward1ContentContainer}>
               {`${reward.amount} ${reward.token}`}
@@ -157,7 +159,15 @@ const FarmsTableRow = (
                 </div>
               ))}
             </div>
-            <button type="button" className={styles.tableBodyDrawerRewardHarvestButton} onClick={() => harvestAll(index, library, account)}>Harvest</button>
+            <button
+              type="button"
+              className={styles.tableBodyDrawerRewardHarvestButton}
+              style={isHarvestDisabled ? { cursor: 'not-allowed' } : {}}
+              onClick={() => harvestAll(index, library, account, setIsHarvestDisabled)}
+              disabled={isHarvestDisabled}
+            >
+              Harvest
+            </button>
           </div>
         </div>
 

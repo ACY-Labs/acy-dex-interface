@@ -111,7 +111,8 @@ const getAllPools = async (library, account) => {
           rewardTokens,
           rewardTokensAddresses,
           rewardTokensSymbols,
-          rewardTokensAmount: allTokenTotalRewardAmount
+          rewardTokensAmount: allTokenTotalRewardAmount,
+          hasUserPosition: userPositions.length !== 0
         };
       })()
     );
@@ -122,9 +123,10 @@ const getAllPools = async (library, account) => {
   });
 };
 
-const harvestAll = async (poolId, library, account) => {
+const harvestAll = async (poolId, library, account, setIsHarvestDisabled) => {
   const farmContract = getFarmsContract(library, account);
   const response = await farmContract.harvestAll(poolId, false, false)
+  console.log(response)
 }
 
 export { getAllPools, harvestAll };

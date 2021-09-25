@@ -101,7 +101,8 @@ const FarmsTable = (
           <FarmsTableRow
             token1="ACY"
             token1Logo={AcyIcon}
-            token2Logo={AcyIcon}
+            token2={null}
+            token2Logo={null}
             totalApr="12345"
             tvl="12345"
             hidden={false}

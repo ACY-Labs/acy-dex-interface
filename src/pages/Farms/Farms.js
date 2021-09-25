@@ -35,6 +35,7 @@ const Farms = () => {
   const [daoDataSource, setDaoDataSource] = useState(SampleStakeHistoryData)
   const [walletConnected, setWalletConnected] = useState(false)
   const [farmsContent, setFarmsContent] = useState([])
+  const [isMyFarms, setIsMyFarms] = useState(false)
 
   // method to activate metamask wallet.
   // calling this method for the first time will cause metamask to pop up,
@@ -61,6 +62,7 @@ const Farms = () => {
           pendingReward: pool.rewardTokensSymbols.map((token, index) => ({ token, amount: pool.rewardTokensAmount[index] })),
           totalApr: 89.02,
           tvl: 144542966,
+          hasUserPosition: pool.hasUserPosition,
           hidden: true
         }
         newFarmsContents.push(newFarmsContent)
@@ -135,9 +137,10 @@ const Farms = () => {
           tableData.token1.toLowerCase().includes(searchInput.toLowerCase()) ||
           tableData.token2.toLowerCase().includes(searchInput.toLowerCase())
         ))
-      setTableRow(currentTableRowCopy)
+      if (isMyFarms) setTableRow(currentTableRowCopy.filter((tableData) => tableData.hasUserPosition))
+      else setTableRow((currentTableRowCopy))
     }
-  }, [searchInput, selectedTable])
+  }, [searchInput, selectedTable, isMyFarms])
 
   // watch changes of the index of selected table and checkbox filter in premier tab.
   // basic filter when selected table is all, standard, and dao.
@@ -145,6 +148,7 @@ const Farms = () => {
   // and advance filter again for bth/eth only or others or both.
   useEffect(() => {
     setSearchInput('')
+    setIsMyFarms(false)
 
     // when selected table is all,
     // display all data.
@@ -216,7 +220,12 @@ const Farms = () => {
             onDaoToggleButtonClick={onDaoToggleButtonClick}
             onMyFarmsToggleButtonClick={onMyFarmsButtonClick}
           />
-          <TableControl searchInput={searchInput} setSearchInput={setSearchInput} />
+          <TableControl
+            searchInput={searchInput}
+            setSearchInput={setSearchInput}
+            isMyFarms={isMyFarms}
+            setIsMyFarms={setIsMyFarms}
+          />
         </div>
         {selectedTable !== 4 && (
           <FarmsTable

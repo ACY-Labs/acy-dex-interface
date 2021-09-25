@@ -2,13 +2,13 @@ import Switch from '@material-ui/core/Switch';
 import React from 'react';
 import styles from './Farms.less';
 
-const TableControl = ({ searchInput, setSearchInput }) => {
+const TableControl = ({ searchInput, setSearchInput, isMyFarms, setIsMyFarms }) => {
   const isMobile = window.innerWidth <= 768
 
   return (
     <div className={styles.tableHeaderButtonContainer}>
       <div className={styles.tableHeaderRadioButtonContainer}>
-        <Switch name="checkedA" color="default" size="small" id="stake-switch" />
+        <Switch name="checkedA" color="default" size="small" id="stake-switch" onChange={(e) => setIsMyFarms(e.target.checked)} checked={isMyFarms} />
         <label htmlFor="stake-switch">My Farms</label>
       </div>
       <div className={styles.tableHeaderSearchInputContainer}>
