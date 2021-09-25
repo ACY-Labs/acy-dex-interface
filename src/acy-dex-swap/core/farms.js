@@ -13,6 +13,51 @@ const getTokenDecimal = async (address, library, account) => {
   return await tokenContract.decimals()
 }
 
+const getPoolTotalPendingReward = async (rewardTokens, rewardTokensAddresses, userPositions, farmContract, poolIndex, library, account) => {
+  // if user does not have any positions (does not deposit any lp tokens into this pool),
+  // returns 0 to all pending reward tokens.
+  if (userPositions.length === 0) {
+    const totalPendingRewards = []
+    for (let tX = 0; tX < rewardTokens.length; tX++) {
+      totalPendingRewards.push(0)
+    }
+    return totalPendingRewards
+  }
+
+  // collect and gather user pending reward of the tokens in the pool of this iteration.
+  // gather the returned promises after invoking the pending method into a multi-array.
+  // first level of array includes an array of pending promises of the reward tokens.
+  // second level of array includes the individual pending promises of the reward token.
+  const allTokenRewardPromises = []
+  for (let rewardIndex = 0; rewardIndex < rewardTokens.length; rewardIndex++) {
+    const tokenRewardPromise = []
+    for (let positionIndex = 0; positionIndex < userPositions.length; positionIndex++) {
+      tokenRewardPromise.push(farmContract.pending(poolIndex, userPositions[positionIndex], rewardTokens[rewardIndex]))
+    }
+    allTokenRewardPromises.push(tokenRewardPromise)
+  }
+
+  const allTokenRewardList = []
+  for (let promiseIndex = 0; promiseIndex < allTokenRewardPromises.length; promiseIndex++) {
+    allTokenRewardList.push(Promise.all(allTokenRewardPromises[promiseIndex]))
+  }
+
+  const allTokenRewardAmountHex = await Promise.all(allTokenRewardList)
+  const allTokenTotalRewardAmount = []
+
+  // retrieve decimals of all of the reward tokens in the same order.
+  const rewardTokenDecimalPromises = rewardTokensAddresses.map((token) => getTokenDecimal(token, library, account))
+  const rewardTokenDecimals = await Promise.all(rewardTokenDecimalPromises)
+
+  allTokenRewardAmountHex.forEach((rewardList, index) => {
+    allTokenTotalRewardAmount.push(rewardList.reduce(
+      (total, currentAmount) =>
+        total.add(currentAmount)).div(BigNumber.from(10).pow(rewardTokenDecimals[index])).toString())
+  })
+
+  return allTokenTotalRewardAmount
+}
+
 const getAllPools = async (library, account) => {
   const contract = getFarmsContract(library, account);
   const numPoolHex = await contract.numPools();
@@ -46,34 +91,7 @@ const getAllPools = async (library, account) => {
         // positions returned from getUserPositions are in the base of hex,
         // hence it has to be converted to decimal for use.
         const userPositions = (await contract.getUserPositions(account, i)).map((positionHex) => positionHex.toNumber())
-
-        const allTokenRewardPromises = []
-        for (let rewardIndex = 0; rewardIndex < rewardTokens.length; rewardIndex++) {
-          const tokenRewardPromise = []
-          for (let positionIndex = 0; positionIndex < userPositions.length; positionIndex++) {
-            tokenRewardPromise.push(contract.pending(i, userPositions[positionIndex], rewardTokens[rewardIndex]))
-          }
-          allTokenRewardPromises.push(tokenRewardPromise)
-        }
-
-        const allTokenRewardList = []
-        for (let promiseIndex = 0; promiseIndex < allTokenRewardPromises.length; promiseIndex++) {
-          allTokenRewardList.push(Promise.all(allTokenRewardPromises[promiseIndex]))
-        }
-
-        const allTokenRewardAmountHex = await Promise.all(allTokenRewardList)
-        const allTokenTotalRewardAmount = []
-
-        // retrieve decimals of all of the reward tokens in the same order.
-        const rewardTokenDecimalPromises = rewardTokensAddresses.map((token) => getTokenDecimal(token, library, account))
-        const rewardTokenDecimals = await Promise.all(rewardTokenDecimalPromises)
-
-        allTokenRewardAmountHex.forEach((rewardList, index) => {
-          allTokenTotalRewardAmount.push(rewardList.reduce(
-            (total, currentAmount) =>
-              total.add(currentAmount)).div(BigNumber.from(10).pow(rewardTokenDecimals[index])).toString())
-        })
-
+        const allTokenTotalRewardAmount = await getPoolTotalPendingReward(rewardTokens, rewardTokensAddresses, userPositions, contract, i, library, account)
 
         return {
           lpTokenAddress: poolInfo[0],
