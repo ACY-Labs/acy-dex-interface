@@ -202,6 +202,81 @@ export const GET_POOL_DAY_DATA = gql`
   }
 `;
 
+export const TOKEN_SEARCH = gql`
+  query tokens($value: String, $id: String) {
+    asSymbol: tokens(
+      where: { symbol_contains: $value }
+      orderBy: totalLiquidity
+      orderDirection: desc
+    ) {
+      id
+      symbol
+      name
+      totalLiquidity
+    }
+    asName: tokens(
+      where: { name_contains: $value }
+      orderBy: totalLiquidity
+      orderDirection: desc
+    ) {
+      id
+      symbol
+      name
+      totalLiquidity
+    }
+    asAddress: tokens(where: { id: $id }, orderBy: totalLiquidity, orderDirection: desc) {
+      id
+      symbol
+      name
+      totalLiquidity
+    }
+  }
+`;
+
+export const POOL_SEARCH = gql`
+  query pairs($tokens: [Bytes]!, $id: String) {
+    as0: pairs(where: { token0_in: $tokens }) {
+      id
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+    }
+    as1: pairs(where: { token1_in: $tokens }) {
+      id
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+    }
+    asAddress: pairs(where: { id: $id }) {
+      id
+      token0 {
+        id
+        symbol
+        name
+      }
+      token1 {
+        id
+        symbol
+        name
+      }
+    }
+  }
+`;
+
 // get main transactions
 export const GET_GLOBAL_TRANSACTIONS = gql`
   query transactions($txAmount: Int!) {

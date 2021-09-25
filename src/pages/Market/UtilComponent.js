@@ -123,12 +123,12 @@ export class SmallTable extends React.Component {
               {entry.coin1}/{entry.coin2}
             </span>
           </Link>
-          <div
+          {/* <div
             className={styles.percentBadge}
             style={{ marginLeft: '10px', fontSize: '14px', lineHeight: '15px' }}
           >
             {entry.percent} %
-          </div>
+          </div> */}
           <AcyIcon
             name={
               watchlistManagerPool
@@ -155,19 +155,19 @@ export class SmallTable extends React.Component {
           className={styles.smallTableBody}
           style={{ display: isDesktop() == true ? 'table-cell' : 'none' }}
         >
-          {abbrNumber(entry.volume24h)}
+          $ {abbrNumber(entry.volume24h)}
         </td>
         <td
           className={styles.smallTableBody}
           style={{ display: isDesktop() == true ? 'table-cell' : 'none' }}
         >
-          {abbrNumber(entry.tvl)}
+          $ {abbrNumber(entry.tvl)}
         </td>
         <td
           className={styles.smallTableBody}
           style={{ display: isDesktop() == true ? 'table-cell' : 'none' }}
         >
-          {abbrNumber(entry.price)}
+          $ {this.state.mode == 'token' ? abbrNumber(entry.price) : abbrNumber(entry.tvl)}
         </td>
       </tr>
     );
@@ -1002,6 +1002,8 @@ export const MarketSearchBar = props => {
       contentRoot.removeEventListener('scroll', onScroll);
     };
   }, []);
+
+  
 
   // the DOM itself
   return (
