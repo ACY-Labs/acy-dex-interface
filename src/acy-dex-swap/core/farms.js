@@ -24,7 +24,7 @@ const getAllPools = async (library, account) => {
           rewardTokensSymbolsRequests.push(getTokenSymbol(address, library, account));
         });
         const rewardTokensSymbols = await Promise.all(rewardTokensSymbolsRequests).then(
-          symbols => symbols
+          (symbols) => symbols
         );
         const lpTokenContract = await getPairContract(poolInfo[0], library, account)
         const token0 = await lpTokenContract.token0()
