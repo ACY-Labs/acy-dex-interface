@@ -58,7 +58,7 @@ const Farms = () => {
           token1Logo: null,
           token2: pool.token1Symbol,
           token2Logo: null,
-          pendingReward: pool.rewardTokensSymbols.map((token) => ({ token, amount: 0 })),
+          pendingReward: pool.rewardTokensSymbols.map((token, index) => ({ token, amount: pool.rewardTokensAmount[index] })),
           totalApr: 89.02,
           tvl: 144542966,
           hidden: true
