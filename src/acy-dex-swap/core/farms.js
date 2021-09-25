@@ -140,6 +140,7 @@ const getAllPools = async (library, account) => {
           rewardTokensAddresses,
           rewardTokensSymbols,
           rewardTokensAmount: allTokenTotalRewardAmount,
+          hasUserPosition: userPositions.length !== 0,
         };
       })()
     );
