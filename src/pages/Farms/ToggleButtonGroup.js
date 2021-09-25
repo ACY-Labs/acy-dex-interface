@@ -44,14 +44,14 @@ const ToggleButtonGroup = (
       >
         Premier
       </button>
-      <button
-        type="button"
-        className={styles.lastToggleButton}
-        style={{ backgroundColor: selectedTable === 4 ? "#174163" : "#2e3032", color: selectedTable === 4 ? "white": ""}}
-        onClick={onMyFarmsToggleButtonClick}
-      >
-        My Farms
-      </button>
+      {/*<button*/}
+      {/*  type="button"*/}
+      {/*  className={styles.lastToggleButton}*/}
+      {/*  style={{ backgroundColor: selectedTable === 4 ? "#174163" : "#2e3032", color: selectedTable === 4 ? "white": ""}}*/}
+      {/*  onClick={onMyFarmsToggleButtonClick}*/}
+      {/*>*/}
+      {/*  My Farms*/}
+      {/*</button>*/}
     </div>
   )
 }

@@ -9,7 +9,7 @@ const TableControl = ({ searchInput, setSearchInput }) => {
     <div className={styles.tableHeaderButtonContainer}>
       <div className={styles.tableHeaderRadioButtonContainer}>
         <Switch name="checkedA" color="default" size="small" id="stake-switch" />
-        <label htmlFor="stake-switch">Stake Only</label>
+        <label htmlFor="stake-switch">My Farms</label>
       </div>
       <div className={styles.tableHeaderSearchInputContainer}>
         <input

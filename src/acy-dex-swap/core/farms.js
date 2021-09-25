@@ -50,12 +50,14 @@ const getPoolTotalPendingReward = async (rewardTokens, rewardTokensAddresses, us
   const rewardTokenDecimalPromises = rewardTokensAddresses.map((token) => getTokenDecimal(token, library, account))
   const rewardTokenDecimals = await Promise.all(rewardTokenDecimalPromises)
 
-  allTokenRewardAmountHex.forEach((rewardList, index) => {
+  allTokenRewardAmountHex.forEach((rewardList) => {
     allTokenTotalRewardAmount.push(rewardList.reduce(
       (total, currentAmount) =>
         total.add(currentAmount)))
   })
 
+  // add decimal points to the pending rewards,
+  // according to each token decimal points.
   allTokenTotalRewardAmount = allTokenTotalRewardAmount.map((reward, index) => formatUnits(reward, rewardTokenDecimals[index]))
 
   return allTokenTotalRewardAmount
@@ -117,4 +119,11 @@ const getAllPools = async (library, account) => {
   });
 };
 
-export { getAllPools };
+const harvestAll = async (poolId, library, account) => {
+  const farmContract = getFarmsContract(library, account);
+  console.log('farm contract', farmContract)
+  const response = await farmContract.harvestAll(poolId, false, false)
+  console.log(response)
+}
+
+export { getAllPools, harvestAll };

@@ -6,9 +6,11 @@ import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 import {
   isMobile
 } from "react-device-detect";
+import { harvestAll } from '@/acy-dex-swap/core/farms';
 
 const FarmsTableRow = (
   {
+    index,
     lpTokens,
     token1,
     token1Logo,
@@ -101,7 +103,7 @@ const FarmsTableRow = (
 
         {/* Pending Reward Column */}
         <div className={styles.tableBodyRewardColContainer}>
-          <div className={styles.pendingRewardTitleContainer}>Reward</div>
+          <div className={styles.pendingRewardTitleContainer}>{isMobile ? 'Reward' : 'Pending Reward'}</div>
           {pendingReward.map((reward) => (
             <div className={styles.pendingReward1ContentContainer}>
               {`${reward.amount} ${reward.token}`}
@@ -153,7 +155,7 @@ const FarmsTableRow = (
                 </div>
               ))}
             </div>
-            <button type="button" className={styles.tableBodyDrawerRewardHarvestButton}>Harvest</button>
+            <button type="button" className={styles.tableBodyDrawerRewardHarvestButton} onClick={() => harvestAll(index)}>Harvest</button>
           </div>
         </div>
 

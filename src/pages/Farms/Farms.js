@@ -149,8 +149,6 @@ const Farms = () => {
     // when selected table is all,
     // display all data.
     if (farmsContent && selectedTable === 0) {
-      // const filteredTableData = INITIAL_TABLE_DATA
-      // todo change
       const filteredTableData = farmsContent
       setTableRow(filteredTableData)
       setCurrentTableRow(filteredTableData)
@@ -158,10 +156,6 @@ const Farms = () => {
     // when selected table is standard,
     // display acy token only rewards.
     else if (farmsContent && selectedTable === 1) {
-      // const filteredTableData = INITIAL_TABLE_DATA.filter((tableData) => (
-      //   tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) === 'ACY'
-      // )
-      // todo change
       const filteredTableData = farmsContent.filter((tableData) => (
         tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) === 'ACY'
       )
@@ -171,11 +165,6 @@ const Farms = () => {
     // filter out all acy tokens only rewards,
     // and filter again based on bth/eth and liquidity checkboxes.
     } else if (farmsContent && selectedTable === 2) {
-      // basic filter out all acy tokens only rewards.
-      // const tableDataTemp = INITIAL_TABLE_DATA.filter((tableData) => (
-      //   (tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) !== 'ACY') || tableData.pendingReward.length !== 1
-      // )
-      // todo change
       const tableDataTemp = farmsContent.filter((tableData) => (
         (tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) !== 'ACY') || tableData.pendingReward.length !== 1
       )
