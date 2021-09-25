@@ -1,5 +1,5 @@
 import {
-  ACYSwapErrorStatus,
+  Error,
   calculateGasMargin,
   checkTokenIsApproved,
   computeTradePriceBreakdown,
@@ -86,17 +86,14 @@ export async function swapGetEstimated(
       amount: inToken1Amount,
     } = inputToken1;
 
-    if (!account) return new ACYSwapErrorStatus('Connect to wallet');
-    if (!inputToken0.symbol || !inputToken1.symbol)
-      return new ACYSwapErrorStatus('please choose tokens');
-    if (exactIn && inToken0Amount == '0') return new ACYSwapErrorStatus('Enter an amount');
-    if (!exactIn && inToken1Amount == '0') return new ACYSwapErrorStatus('Enter an amount');
-    if (exactIn && inToken0Amount == '') return new ACYSwapErrorStatus('Enter an amount');
-    if (!exactIn && inToken1Amount == '') return new ACYSwapErrorStatus('Enter an amount');
-    if (exactIn && isNaN(parseFloat(inToken0Amount)))
-      return new ACYSwapErrorStatus('Enter an amount');
-    if (!exactIn && isNaN(parseFloat(inToken1Amount)))
-      return new ACYSwapErrorStatus('Enter an amount');
+    if (!account) return new Error('Connect to wallet');
+    if (!inputToken0.symbol || !inputToken1.symbol) return new Error('please choose tokens');
+    if (exactIn && inToken0Amount == '0') return new Error('Enter an amount');
+    if (!exactIn && inToken1Amount == '0') return new Error('Enter an amount');
+    if (exactIn && inToken0Amount == '') return new Error('Enter an amount');
+    if (!exactIn && inToken1Amount == '') return new Error('Enter an amount');
+    if (exactIn && isNaN(parseFloat(inToken0Amount))) return new Error('Enter an amount');
+    if (!exactIn && isNaN(parseFloat(inToken1Amount))) return new Error('Enter an amount');
 
     console.log(`token0Amount: ${inToken0Amount}`);
     console.log(`token1Amount: ${inToken1Amount}`);
@@ -110,7 +107,7 @@ export async function swapGetEstimated(
     if (token0IsETH && token1IsETH) {
       setSwapButtonState(false);
       setSwapButtonContent("don't support ETH to ETH");
-      return new ACYSwapErrorStatus("don't support ETH to ETH");
+      return new Error("don't support ETH to ETH");
     }
     // if one is ETH and other WETH, use WETH contract's deposit and withdraw
     // wrap ETH into WETH
@@ -143,7 +140,7 @@ export async function swapGetEstimated(
         setSwapButtonState(false);
         if (e.fault === 'underflow') setSwapButtonContent(e.fault);
         else setSwapButtonContent('unknow error');
-        return new ACYSwapErrorStatus(e.fault);
+        return new Error(e.fault);
       }
 
       console.log(userToken0Balance);
@@ -154,7 +151,7 @@ export async function swapGetEstimated(
       if (!userHasSufficientBalance) {
         setSwapButtonState(false);
         setSwapButtonContent('NOT enough balance');
-        return new ACYSwapErrorStatus('NOT enough balance');
+        return new Error('NOT enough balance');
       }
       // setEstimatedStatus("change ETH to WETH");
       setSwapButtonState(true);
@@ -171,10 +168,10 @@ export async function swapGetEstimated(
         setSwapButtonState(false);
         if (e.fault === 'underflow') {
           setSwapButtonContent(e.fault);
-          return new ACYSwapErrorStatus(e.fault);
+          return new Error(e.fault);
         } else {
           setSwapButtonContent('unknow error');
-          return new ACYSwapErrorStatus('unknow error');
+          return new Error('unknow error');
         }
       }
 
@@ -187,7 +184,7 @@ export async function swapGetEstimated(
       //     })
       //     .catch((e) => {
       //         console.log(e);
-      //         return new ACYSwapErrorStatus("WETH Deposit failed");
+      //         return new Error("WETH Deposit failed");
       //     });
       // return result;
       return 'Wrap is ok';
@@ -218,10 +215,10 @@ export async function swapGetEstimated(
         setSwapButtonState(false);
         if (e.fault === 'underflow') {
           setSwapButtonContent(e.fault);
-          return new ACYSwapErrorStatus(e.fault);
+          return new Error(e.fault);
         } else {
           setSwapButtonContent('unknow error');
-          return new ACYSwapErrorStatus('unknow error');
+          return new Error('unknow error');
         }
       }
 
@@ -229,7 +226,7 @@ export async function swapGetEstimated(
       if (!userHasSufficientBalance) {
         setSwapButtonState(false);
         setSwapButtonContent('Not enough balance');
-        return new ACYSwapErrorStatus('NOT enough balance');
+        return new Error('NOT enough balance');
       }
 
       setSwapButtonState(true);
@@ -246,10 +243,10 @@ export async function swapGetEstimated(
         setSwapButtonState(false);
         if (e.fault === 'underflow') {
           setSwapButtonContent(e.fault);
-          return new ACYSwapErrorStatus(e.fault);
+          return new Error(e.fault);
         } else {
           setSwapButtonContent('unknow error');
-          return new ACYSwapErrorStatus('unknow error');
+          return new Error('unknow error');
         }
       }
       setWethContract(wethContract);
@@ -257,7 +254,7 @@ export async function swapGetEstimated(
 
       // let result = await wethContract.withdraw(wrappedAmount).catch((e) => {
       //     console.log(e);
-      //     return new ACYSwapErrorStatus("WETH Withdrawal failed");
+      //     return new Error("WETH Withdrawal failed");
       // });
       // return result;
 
@@ -278,15 +275,13 @@ export async function swapGetEstimated(
       if (token0.equals(token1)) {
         setSwapButtonState(false);
         setSwapButtonContent('tokens are same');
-        return new ACYSwapErrorStatus('tokens are same');
+        return new Error('tokens are same');
       }
       // get pair using our own provider
       const pair = await Fetcher.fetchPairData(token0, token1, library).catch(e => {
-        return new ACYSwapErrorStatus(
-          `${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`
-        );
+        return new Error(`${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`);
       });
-      if (pair instanceof ACYSwapErrorStatus) {
+      if (pair instanceof Error) {
         setSwapButtonState(false);
         setSwapButtonContent("pool doesn't exist");
         return pair;
@@ -320,10 +315,10 @@ export async function swapGetEstimated(
         setSwapButtonState(false);
         if (e.fault === 'underflow') {
           setSwapButtonContent(e.fault);
-          return new ACYSwapErrorStatus(e.fault);
+          return new Error(e.fault);
         } else {
           setSwapButtonContent('unknow error');
-          return new ACYSwapErrorStatus('unknow error');
+          return new Error('unknow error');
         }
       }
 
@@ -359,13 +354,13 @@ export async function swapGetEstimated(
           setSwapButtonState(false);
           setSwapButtonContent('Insufficient liquidity for this trade');
           console.log('Insufficient reserve!');
-          return new ACYSwapErrorStatus('Insufficient reserve!');
+          return new Error('Insufficient reserve!');
         } else {
           setSwapButtonState(false);
           setSwapButtonContent('Unhandled exception!');
           console.log('Unhandled exception!');
           console.log(e);
-          return new ACYSwapErrorStatus('Unhandled exception!');
+          return new Error('Unhandled exception!');
         }
       }
 
@@ -417,7 +412,7 @@ export async function swapGetEstimated(
         console.log(e);
         setSwapButtonState(false);
         setSwapButtonContent(e.fault);
-        return new ACYSwapErrorStatus(e.fault);
+        return new Error(e.fault);
       }
 
       // quit if user doesn't have enough balance, otherwise this will cause error
@@ -483,7 +478,7 @@ export async function swapGetEstimated(
       return 'swap is ok';
     }
   })();
-  if (status instanceof ACYSwapErrorStatus) {
+  if (status instanceof Error) {
     setSwapButtonContent(status.getErrorText());
   } else {
     console.log(status);
@@ -539,7 +534,7 @@ export async function swap(
     console.log(inputToken0);
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new ACYSwapErrorStatus("Doesn't support ETH to ETH");
+    if (token0IsETH && token1IsETH) return new Error("Doesn't support ETH to ETH");
     console.log('------------------ WRAP OR SWAP  ------------------');
     // if one is ETH and other WETH, use WETH contract's deposit and withdraw
     // wrap ETH into WETH
@@ -554,7 +549,7 @@ export async function swap(
         })
         .catch(e => {
           console.log(e);
-          return new ACYSwapErrorStatus('WETH Deposit failed');
+          return new Error('WETH Deposit failed');
         });
 
       return result;
@@ -569,7 +564,7 @@ export async function swap(
 
       let result = await wethContract.withdraw(wrappedAmount).catch(e => {
         console.log(e);
-        return new ACYSwapErrorStatus('WETH Withdrawal failed');
+        return new Error('WETH Withdrawal failed');
       });
       return result;
     }
@@ -588,7 +583,7 @@ export async function swap(
     console.log(token0);
     console.log(token1);
     // quit if the two tokens are equivalent, i.e. have the same chainId and address
-    if (token0.equals(token1)) return new ACYSwapErrorStatus('Equal tokens!');
+    if (token0.equals(token1)) return new Error('Equal tokens!');
     // helper function from uniswap sdk to get pair address, probably needed if want to replace fetchPairData
     // get pair using our own provider
     console.log('------------------ CONSTRUCT PAIR ------------------');
@@ -630,12 +625,12 @@ export async function swap(
         });
       })
       .catch(e => {
-        return new ACYSwapErrorStatus(`${methodName} failed with error ${e}`);
+        return new Error(`${methodName} failed with error ${e}`);
       });
     return result;
   })();
 
-  if (status instanceof ACYSwapErrorStatus) {
+  if (status instanceof Error) {
     setSwapStatus(status.getErrorText());
   } else {
     console.log(status);

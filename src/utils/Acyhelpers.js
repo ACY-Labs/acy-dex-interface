@@ -61,7 +61,7 @@ export async function getAllowance(tokenAddress, owner, spender, library, accoun
   return allowance;
 }
 
-export class ACYSwapErrorStatus {
+export class Error {
   getErrorText() {
     return this.errorText;
   }

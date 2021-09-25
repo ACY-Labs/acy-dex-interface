@@ -35,7 +35,7 @@ import { InjectedConnector } from '@web3-react/injected-connector';
 import React, { useState, useEffect, useCallback } from 'react';
 
 import {
-  ACYSwapErrorStatus,
+  Error,
   approve,
   calculateGasMargin,
   checkTokenIsApproved,

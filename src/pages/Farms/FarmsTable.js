@@ -4,59 +4,57 @@ import FarmsTableRow from '@/pages/Farms/FarmsTableRow';
 import FarmsTableHeader from '@/pages/Farms/FarmsTableHeader';
 import { graphSampleData, graphSampleData2 } from '@/pages/Dao/sample_data/SampleData';
 import DaoChart from './DaoChart';
-import AcyIcon from '@/assets/icon_acy.svg'
+import AcyIcon from '@/assets/icon_acy.svg';
 
-const FarmsTable = (
-  {
-    tableRow,
-    onRowClick,
-    tableTitle,
-    tableSubtitle,
-    rowNumber,
-    setRowNumber,
-    hideDao,
-    selectedTable,
-    tokenFilter,
-    setTokenFilter,
-    walletConnected,
-    connectWallet,
-  }
-) => {
-  const [isModalVisible, setIsModalVisible] = useState(false)
+const FarmsTable = ({
+  tableRow,
+  onRowClick,
+  tableTitle,
+  tableSubtitle,
+  rowNumber,
+  setRowNumber,
+  hideDao,
+  selectedTable,
+  tokenFilter,
+  setTokenFilter,
+  walletConnected,
+  connectWallet,
+}) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const hideModal = () => setIsModalVisible(false)
-  const showModal = () => setIsModalVisible(true)
-  const [myChartId, setMyChartId] = useState(0)
-  const [totalChartId, setTotalChartId] = useState(0)
-  const [myChartData, setMyChartData] = useState(graphSampleData)
-  const [totalChartData, setTotalChartData] = useState(graphSampleData)
+  const hideModal = () => setIsModalVisible(false);
+  const showModal = () => setIsModalVisible(true);
+  const [myChartId, setMyChartId] = useState(0);
+  const [totalChartId, setTotalChartId] = useState(0);
+  const [myChartData, setMyChartData] = useState(graphSampleData);
+  const [totalChartData, setTotalChartData] = useState(graphSampleData);
 
   const changeGraphData = (id = 0, chartSetter) => {
-    if (id === 0) chartSetter(graphSampleData)
-    else chartSetter(graphSampleData2)
-  }
+    if (id === 0) chartSetter(graphSampleData);
+    else chartSetter(graphSampleData2);
+  };
 
-  const selectTopChart = (pt) => {
+  const selectTopChart = pt => {
     const functionDict = {
       'My ACY': () => {
         changeGraphData(0, setMyChartData);
-        setMyChartId(0)
+        setMyChartId(0);
       },
       'My Reward': () => {
         changeGraphData(1, setMyChartData);
-        setMyChartId(1)
+        setMyChartId(1);
       },
       'Total ACY': () => {
         changeGraphData(0, setTotalChartData);
-        setTotalChartId(0)
+        setTotalChartId(0);
       },
       'Total Reward': () => {
         changeGraphData(1, setTotalChartData);
-        setTotalChartId(1)
+        setTotalChartId(1);
       },
-    }
+    };
     functionDict[pt]();
-  }
+  };
 
   return (
     <div className={styles.tableContainer}>
@@ -72,7 +70,8 @@ const FarmsTable = (
           {tableRow.slice(0, rowNumber).map((content, index) => (
             <FarmsTableRow
               key={index}
-              lpTokens={content.lpTokens}
+              poolId={content.poolId}
+              stakedTokenAddr={content.lpTokens}
               token1={content.token1}
               token1Logo={content.token1Logo}
               token2={content.token2}
@@ -94,13 +93,14 @@ const FarmsTable = (
       ) : (
         <div className={styles.tableBodyContainer}>
           <FarmsTableRow
+            key={index}
             token1="ACY"
             token1Logo={AcyIcon}
             token2Logo={AcyIcon}
             totalApr="12345"
             tvl="12345"
             hidden={false}
-            pendingReward={[{token: 'ACY', amount: 0}]}
+            pendingReward={[{ token: 'ACY', amount: 0 }]}
             walletConnected={walletConnected}
             connectWallet={connectWallet}
             showModal={showModal}
@@ -126,11 +126,15 @@ const FarmsTable = (
           </div>
         </div>
       )}
-      <div className={styles.tableFooterContainer} onClick={() => setRowNumber(rowNumber + 5)} hidden={!hideDao}>
+      <div
+        className={styles.tableFooterContainer}
+        onClick={() => setRowNumber(rowNumber + 5)}
+        hidden={!hideDao}
+      >
         More
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default FarmsTable
+export default FarmsTable;

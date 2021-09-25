@@ -3,49 +3,50 @@ import styles from '@/pages/Farms/Farms.less';
 import { AcyModal } from '@/components/Acy';
 import DatePicker from 'react-datepicker';
 import { AcySmallButtonGroup } from '@/components/AcySmallButton';
-import {
-  isMobile
-} from "react-device-detect";
+import { isMobile } from 'react-device-detect';
+import { deposit } from '@/acy-dex-swap/core/farms';
+import { useWeb3React } from '@web3-react/core';
+import { getUserTokenBalanceWithAddress } from '@/acy-dex-swap/utils';
 
-const FarmsTableRow = (
-  {
-    lpTokens,
-    token1,
-    token1Logo,
-    token2,
-    token2Logo,
-    totalApr,
-    tvl,
-    hidden,
-    rowClickHandler,
-    pendingReward,
-    walletConnected,
-    connectWallet,
-    showModal,
-    hideModal,
-    isModalVisible,
-    hideArrow = false,
-  }
-) => {
-  const [date, setDate] = useState(new Date())
-  const [selectedPresetDate, setSelectedPresetDate] = useState(null)
-  const [stake, setStake] = useState(0)
-  const [balance, setBalance] = useState(12345)
-  const [balancePercentage, setBalancePercentage] = useState(0)
+const FarmsTableRow = ({
+  stakedTokenAddr,
+  poolId,
+  token1,
+  token1Logo,
+  token2,
+  token2Logo,
+  totalApr,
+  tvl,
+  hidden,
+  rowClickHandler,
+  pendingReward,
+  walletConnected,
+  connectWallet,
+  showModal,
+  hideModal,
+  isModalVisible,
+  hideArrow = false,
+}) => {
+  const [date, setDate] = useState(new Date());
+  const [selectedPresetDate, setSelectedPresetDate] = useState(null);
+  const [stake, setStake] = useState(0);
+  const [tokenBalance, setTokenBalance] = useState(12345);
+  const [balancePercentage, setBalancePercentage] = useState(0);
+  const { account, library, chainId } = useWeb3React();
 
-  const updateStake = (newStake) => {
-    let newStakeInt = newStake !== '' ? parseInt(newStake, 10) : ''
-    newStakeInt = newStakeInt > balance ? balance : newStakeInt
-    if (newStakeInt === '' || !Number.isNaN(newStakeInt)) setStake(newStakeInt)
-    setBalancePercentage(Math.floor(newStakeInt / balance * 100))
-  }
+  const updateStake = newStake => {
+    let newStakeInt = newStake !== '' ? parseInt(newStake, 10) : '';
+    newStakeInt = newStakeInt > tokenBalance ? tokenBalance : newStakeInt;
+    if (newStakeInt === '' || !Number.isNaN(newStakeInt)) setStake(newStakeInt);
+    setBalancePercentage(Math.floor((newStakeInt / tokenBalance) * 100));
+  };
 
-  const updateBalancePercentage = (percentage) => {
-    const percentageInt = percentage === '' ? 0 : parseInt(percentage, 10)
-    if (Number.isNaN(percentageInt)) return
-    setStake(balance * percentageInt / 100)
-    setBalancePercentage(percentageInt)
-  }
+  const updateBalancePercentage = percentage => {
+    const percentageInt = percentage === '' ? 0 : parseInt(percentage, 10);
+    if (Number.isNaN(percentageInt)) return;
+    setStake((tokenBalance * percentageInt) / 100);
+    setBalancePercentage(percentageInt);
+  };
 
   const updateDate = (type, value, index) => {
     const newDate = new Date();
@@ -54,13 +55,13 @@ const FarmsTableRow = (
     else if (type === 'year') newDate.setFullYear(newDate.getFullYear() + value);
     else return;
     setDate(newDate);
-    setSelectedPresetDate(index)
+    setSelectedPresetDate(index);
   };
 
-  const datePickerChangeHandler = (newDate) => {
-    setDate(newDate)
-    setSelectedPresetDate(null)
-  }
+  const datePickerChangeHandler = newDate => {
+    setDate(newDate);
+    setSelectedPresetDate(null);
+  };
 
   const CustomDatePickerInput = forwardRef(({ value, onClick }, ref) => (
     <button type="button" className={styles.datePickerInput} onClick={onClick} ref={ref}>
@@ -68,12 +69,15 @@ const FarmsTableRow = (
     </button>
   ));
 
+  const updateBalance = () => {
+    console.log('update balance');
+    setTokenBalance(tokenBalance + 1);
+  };
+
   return (
     <div className={styles.tableBodyRowContainer}>
-
       {/* Table Content */}
       <div className={styles.tableBodyRowContentContainer} onClick={rowClickHandler}>
-
         {/* Token Title Row */}
         <div className={styles.tableBodyTitleColContainer}>
           {token1Logo && (
@@ -102,7 +106,7 @@ const FarmsTableRow = (
         {/* Pending Reward Column */}
         <div className={styles.tableBodyRewardColContainer}>
           <div className={styles.pendingRewardTitleContainer}>Reward</div>
-          {pendingReward.map((reward) => (
+          {pendingReward.map(reward => (
             <div className={styles.pendingReward1ContentContainer}>
               {`${reward.amount} ${reward.token}`}
             </div>
@@ -126,7 +130,13 @@ const FarmsTableRow = (
         {/* Arrow Icon Column */}
         {!hideArrow && (
           <div className={styles.tableBodyArrowColContainer}>
-            <svg xmlns="http://www.w3.org/2000/svg" className={styles.arrowIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={styles.arrowIcon}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </div>
@@ -135,11 +145,14 @@ const FarmsTableRow = (
 
       {/* Table Drawer */}
       <div className={styles.tableBodyDrawerContainer} hidden={hidden}>
-
         {/* Add Liquidity Column */}
         <div className={styles.tableBodyDrawerLiquidityContainer}>
           <div>Add Liquidity:</div>
-          <div><a className={styles.tableCodyDrawerLiquidityLink}>{token2 ? `${token1}-${token2}` : `${token1}`} {!isMobile ? 'LP': ''}</a></div>
+          <div>
+            <a className={styles.tableCodyDrawerLiquidityLink}>
+              {token2 ? `${token1}-${token2}` : `${token1}`} {!isMobile ? 'LP' : ''}
+            </a>
+          </div>
         </div>
 
         {/* Harvest Reward Column */}
@@ -147,13 +160,15 @@ const FarmsTableRow = (
           <div className={styles.tableBodyDrawerRewardTitle}>Pending Reward</div>
           <div className={styles.tableBodyDrawerRewardContent}>
             <div className={styles.tableBodyDrawerRewardTokenContainer}>
-              {pendingReward.map((reward) => (
+              {pendingReward.map(reward => (
                 <div className={styles.pendingReward1ContentContainer}>
                   {`${reward.amount} ${reward.token}`}
                 </div>
               ))}
             </div>
-            <button type="button" className={styles.tableBodyDrawerRewardHarvestButton}>Harvest</button>
+            <button type="button" className={styles.tableBodyDrawerRewardHarvestButton}>
+              Harvest
+            </button>
           </div>
         </div>
 
@@ -165,18 +180,29 @@ const FarmsTableRow = (
               <button
                 type="button"
                 className={styles.tableBodyDrawerWalletButton}
-                onClick={showModal}
+                onClick={() => {
+                  updateBalance();
+                  showModal();
+                  console.log('show modal');
+                  // let tokenBalance = await getUserTokenBalanceWithAddress(
+                  //   stakedTokenAddr,
+                  //   chainId,
+                  //   account,
+                  //   library
+                  // );
+                  // console.log(tokenBalance);
+                }}
               >
                 Stake LP
               </button>
-              ) : (
-                <button
-                  type="button"
-                  className={styles.tableBodyDrawerWalletButton}
-                  onClick={connectWallet}
-                >
-                  Connect Wallet
-                </button>
+            ) : (
+              <button
+                type="button"
+                className={styles.tableBodyDrawerWalletButton}
+                onClick={connectWallet}
+              >
+                Connect Wallet
+              </button>
             )}
           </div>
         </div>
@@ -185,16 +211,14 @@ const FarmsTableRow = (
       <AcyModal onCancel={hideModal} width={400} visible={isModalVisible}>
         <div className={styles.amountRowContainer}>
           <div className={styles.amountRowInputContainer}>
-            <input
-              type="text"
-              value={stake}
-              onChange={e => updateStake(e.target.value)}
-            />
+            <input type="text" value={stake} onChange={e => updateStake(e.target.value)} />
           </div>
           <span className={styles.suffix}>ACY</span>
         </div>
         <div className={styles.balanceAmountContainer}>
-          <div>Balance: 12345 {token1}-{token2}</div>
+          <div>
+            tokenBalance: {tokenBalance} {token1}-{token2}
+          </div>
           <div className={styles.balanceAmountInputContainer}>
             <input
               className={styles.balanceAmountInput}
@@ -214,7 +238,7 @@ const FarmsTableRow = (
             onChange={e => updateBalancePercentage(e.target.value)}
           />
         </div>
-        <div className={styles.lockTimeRow}>
+        <div className={styles.lockTimeRow} onClick={updateBalance}>
           <div className={styles.dateSelectionContainer}>
             <div className={styles.datePickerContainer}>
               <DatePicker
@@ -241,13 +265,19 @@ const FarmsTableRow = (
           </div>
         </div>
         <div>
-          <button type="button" className={styles.stakeSubmitButton}>
+          <button
+            type="button"
+            className={styles.stakeSubmitButton}
+            onClick={async () => {
+              // deposit(stakedTokenAddr, stake, poolId, library, account);
+            }}
+          >
             Stake
           </button>
         </div>
       </AcyModal>
     </div>
-  )
-}
+  );
+};
 
-export default FarmsTableRow
+export default FarmsTableRow;

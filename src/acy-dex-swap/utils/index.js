@@ -3,7 +3,7 @@ import { getAddress } from '@ethersproject/address';
 import { Contract } from '@ethersproject/contracts';
 import { AddressZero, MaxUint256 } from '@ethersproject/constants';
 import { BigNumber } from '@ethersproject/bignumber';
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits, parseUnits } from '@ethersproject/units';
 import { JSBI, Token, TokenAmount, Percent, ETHER, CurrencyAmount } from '@acyswap/sdk';
 import { abi as IUniswapV2Router02ABI } from '../abis/IUniswapV2Router02.json';
 import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
@@ -13,6 +13,17 @@ export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
 export const ROUTER_ADDRESS = '0xc858026830a9A060beC7A408B8b4b4852c10B189';
 export const FARMS_ADDRESS = '0x7AA3f390Ba28D0CEe20db0373B0E9a40F1835829';
+
+// a custom error class for custom error text and handling
+export class Error {
+  getErrorText() {
+    return this.errorText;
+  }
+
+  constructor(errorText) {
+    this.errorText = errorText;
+  }
+}
 
 // (RICK NOTES) need address on ethereum network to get price
 export const supportedTokens = [
@@ -102,6 +113,10 @@ export function getFarmsContract(library, account) {
   return getContract(FARMS_ADDRESS, FarmsABI, library, account);
 }
 
+export function getTokenContract(tokenAddress, library, account) {
+  return getContract(tokenAddress, ERC20ABI, library, account);
+}
+
 export function getPairContract(pairAddress, library, account) {
   return getContract(pairAddress, IUniswapV2PairABI, library, account);
 }
@@ -121,17 +136,6 @@ export async function getAllowance(tokenAddress, owner, spender, library, accoun
   const tokenContract = getContract(tokenAddress, ERC20ABI, library, account);
   const allowance = await tokenContract.allowance(owner, spender);
   return allowance;
-}
-
-// a custom error class for custom error text and handling
-export class ACYSwapErrorStatus {
-  getErrorText() {
-    return this.errorText;
-  }
-
-  constructor(errorText) {
-    this.errorText = errorText;
-  }
 }
 
 // taken from Uniswap, used for price impact and realized liquid provider fee
@@ -183,10 +187,10 @@ export function computeTradePriceBreakdown(trade) {
 // get user token balance in BigNumber
 export async function getUserTokenBalanceRaw(token, account, library) {
   if (token === ETHER) {
-    return await library.getBalance(account);
+    return library.getBalance(account);
   }
   const contractToCheckForBalance = getContract(token.address, ERC20ABI, library, account);
-  return await contractToCheckForBalance.balanceOf(account);
+  return contractToCheckForBalance.balanceOf(account);
 }
 
 // get user token balance in readable string foramt
@@ -204,6 +208,15 @@ export async function getUserTokenBalance(token, chainId, account, library) {
     ),
     decimal
   );
+}
+
+export async function getUserTokenBalanceWithAddress(address, chainId, account, library) {
+  console.log('---------- getUserTokenBalanceWithAddress ----------');
+  console.log(address, account, library);
+  const tokenContract = getTokenContract(address, library, account);
+  const symbol = await tokenContract.symbol();
+  const decimal = await tokenContract.decimals();
+  return getUserTokenBalance({ address, symbol, decimal }, chainId, account, library);
 }
 
 // return slippage adjusted amount for arguments when adding liquidity. Returns JSBI
@@ -321,6 +334,12 @@ export async function approveTokenWithSpender(tokenAddress, spender, library, ac
   });
 }
 
-export function getTokenContract(tokenAddress, library, account){
-  return getContract(tokenAddress, ERC20ABI, library, account)
+export async function checkUserHasSufficientLPBalance(lpTokenAddr, amount, library, account) {
+  if (!account || !library) return;
+  const pair = getPairContract(lpTokenAddr, library, account);
+  const decimals = (await pair.decimals()).toNumber();
+  const balance = pair.balanceOf(account);
+  const requiredAmount = parseUnits(amount, decimals);
+  if (balance.lt(requiredAmount)) return false;
+  return true;
 }

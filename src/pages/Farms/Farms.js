@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styles from './Farms.less'
+import styles from './Farms.less';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import FarmsTable from './FarmsTable';
 import farmsTableContent from './FarmsTableContent';
@@ -24,205 +24,221 @@ const Farms = () => {
   //   prevRow.hidden = true
   //   return prevRow
   // })
-  const INITIAL_ROW_NUMBER = 5
+  const INITIAL_ROW_NUMBER = 5;
 
-  const [selectedTable, setSelectedTable] = useState(0)
-  const [tableRow, setTableRow] = useState([])
-  const [searchInput, setSearchInput] = useState('')
-  const [tableTitle, setTableTitle] = useState('All Farms')
-  const [tableSubtitle, setTableSubtitle] = useState('Stake your LP tokens and earn token rewards')
-  const [rowNumber, setRowNumber] = useState(INITIAL_ROW_NUMBER)
-  const [hideDao, setHideDao] = useState(true)
+  const [selectedTable, setSelectedTable] = useState(0);
+  const [tableRow, setTableRow] = useState([]);
+  const [searchInput, setSearchInput] = useState('');
+  const [tableTitle, setTableTitle] = useState('All Farms');
+  const [tableSubtitle, setTableSubtitle] = useState('Stake your LP tokens and earn token rewards');
+  const [rowNumber, setRowNumber] = useState(INITIAL_ROW_NUMBER);
+  const [hideDao, setHideDao] = useState(true);
   const [tokenFilter, setTokenFilter] = useState({
     liquidityToken: true,
     btcEthToken: true,
-  })
-  const [currentTableRow, setCurrentTableRow] = useState([])
-  const [daoDataSource, setDaoDataSource] = useState(SampleStakeHistoryData)
-  const [walletConnected, setWalletConnected] = useState(false)
-  const [farmsContent, setFarmsContent] = useState([])
+  });
+  const [currentTableRow, setCurrentTableRow] = useState([]);
+  const [daoDataSource, setDaoDataSource] = useState(SampleStakeHistoryData);
+  const [walletConnected, setWalletConnected] = useState(false);
+  const [farmsContent, setFarmsContent] = useState([]);
 
   // method to activate metamask wallet.
   // calling this method for the first time will cause metamask to pop up,
   // and require user to approve this connection.
   const connectWallet = () => {
-    activate(injected)
-  }
+    activate(injected);
+  };
 
-  useEffect(() => {
-    // automatically connect to wallet at the start of the application.
-    connectWallet()
+  useEffect(
+    () => {
+      // automatically connect to wallet at the start of the application.
+      connectWallet();
 
-    const getPools = async (library, account) => {
-      const pools = await getAllPools(library, account)
-      console.log(pools)
-      const newFarmsContents = []
+      const getPools = async (library, account) => {
+        const pools = await getAllPools(library, account);
+        console.log(pools);
+        const newFarmsContents = [];
 
-      pools.forEach((pool) => {
-        const newFarmsContent = {
-          lpTokens: pool.lpTokenAddress,
-          token1: pool.token0Symbol,
-          token1Logo: null,
-          token2: pool.token1Symbol,
-          token2Logo: null,
-          pendingReward: [
-            {token: 'ACY', amount: 0}
-          ],
-          totalApr: 89.02,
-          tvl: 144542966,
-          hidden: true
-        }
-        newFarmsContents.push(newFarmsContent)
-      })
+        pools.forEach(pool => {
+          const newFarmsContent = {
+            pooldId: pool.id,
+            lpTokens: pool.lpTokenAddress,
+            token1: pool.token0Symbol,
+            token1Logo: null,
+            token2: pool.token1Symbol,
+            token2Logo: null,
+            pendingReward: [{ token: 'ACY', amount: 0 }],
+            totalApr: 89.02,
+            tvl: 144542966,
+            hidden: true,
+          };
+          newFarmsContents.push(newFarmsContent);
+        });
 
-      setFarmsContent(newFarmsContents)
-      setCurrentTableRow(newFarmsContents)
-      setTableRow(newFarmsContents)
-    }
+        setFarmsContent(newFarmsContents);
+        setCurrentTableRow(newFarmsContents);
+        setTableRow(newFarmsContents);
+      };
 
-    // account will be returned if wallet is connected.
-    // so if account is present, retrieve the farms contract.
-    if (account) {
-      setWalletConnected(true)
-      getPools(library, account)
-    } else {
-      setWalletConnected(false)
-    }
-  }, [account])
+      // account will be returned if wallet is connected.
+      // so if account is present, retrieve the farms contract.
+      if (account) {
+        setWalletConnected(true);
+        getPools(library, account);
+      } else {
+        setWalletConnected(false);
+      }
+    },
+    [account]
+  );
 
-  useEffect(() => {
-    console.log(farmsContent)
-  }, [farmsContent])
+  useEffect(
+    () => {
+      console.log(farmsContent);
+    },
+    [farmsContent]
+  );
 
-  const onRowClick = (index) => setTableRow((prevState) => {
-    const prevTableRow = [ ...prevState ]
-    prevTableRow[index].hidden = !prevTableRow[index].hidden
-    return prevTableRow
-  })
+  const onRowClick = index =>
+    setTableRow(prevState => {
+      const prevTableRow = [...prevState];
+      prevTableRow[index].hidden = !prevTableRow[index].hidden;
+      return prevTableRow;
+    });
 
   const onAllToggleButtonClick = () => {
-    setSelectedTable(0)
-    setTableTitle('All Farms')
-    setTableSubtitle('Stake your LP tokens and earn token rewards')
-    setRowNumber(5)
-    setHideDao(true)
-  }
+    setSelectedTable(0);
+    setTableTitle('All Farms');
+    setTableSubtitle('Stake your LP tokens and earn token rewards');
+    setRowNumber(5);
+    setHideDao(true);
+  };
 
   const onAcyToggleButtonClick = () => {
-    setSelectedTable(1)
-    setTableTitle('ACY Farms')
-    setTableSubtitle('Stake your LP tokens and earn ACY token rewards')
-    setRowNumber(5)
-    setHideDao(true)
-  }
+    setSelectedTable(1);
+    setTableTitle('ACY Farms');
+    setTableSubtitle('Stake your LP tokens and earn ACY token rewards');
+    setRowNumber(5);
+    setHideDao(true);
+  };
 
   const onDaoToggleButtonClick = () => {
-    setSelectedTable(3)
-    setHideDao(false)
-    setTableTitle('DAO Farms')
-    setTableSubtitle('Stake your ACY tokens and earn ACY token rewards')
-  }
+    setSelectedTable(3);
+    setHideDao(false);
+    setTableTitle('DAO Farms');
+    setTableSubtitle('Stake your ACY tokens and earn ACY token rewards');
+  };
 
   const onPremierToggleButtonClick = () => {
-    setSelectedTable(2)
-    setTableTitle('Premier Farms')
-    setTableSubtitle('Stake your LP tokens and earn project/other token rewards')
-    setRowNumber(INITIAL_ROW_NUMBER)
-    setHideDao(true)
-  }
+    setSelectedTable(2);
+    setTableTitle('Premier Farms');
+    setTableSubtitle('Stake your LP tokens and earn project/other token rewards');
+    setRowNumber(INITIAL_ROW_NUMBER);
+    setHideDao(true);
+  };
 
   const onMyFarmsButtonClick = () => {
-    setSelectedTable(4)
-  }
+    setSelectedTable(4);
+  };
 
-  useEffect(() => {
-    if (selectedTable === 4) {
-      const currentTableData = SampleStakeHistoryData.filter((tableData) => {
-        const [token1, token2] = tableData.tokens.split('-')
-        if (token1.toLowerCase().includes(searchInput.toLowerCase()) || token2.toLowerCase().includes(searchInput.toLowerCase())) return true
-      })
-      setDaoDataSource(currentTableData)
-    } else {
-      const currentTableRowCopy = currentTableRow.filter((tableData) =>
-        (
-          tableData.token1.toLowerCase().includes(searchInput.toLowerCase()) ||
-          tableData.token2.toLowerCase().includes(searchInput.toLowerCase())
-        ))
-      setTableRow(currentTableRowCopy)
-    }
-  }, [searchInput, selectedTable])
+  useEffect(
+    () => {
+      if (selectedTable === 4) {
+        const currentTableData = SampleStakeHistoryData.filter(tableData => {
+          const [token1, token2] = tableData.tokens.split('-');
+          if (
+            token1.toLowerCase().includes(searchInput.toLowerCase()) ||
+            token2.toLowerCase().includes(searchInput.toLowerCase())
+          )
+            return true;
+        });
+        setDaoDataSource(currentTableData);
+      } else {
+        const currentTableRowCopy = currentTableRow.filter(
+          tableData =>
+            tableData.token1.toLowerCase().includes(searchInput.toLowerCase()) ||
+            tableData.token2.toLowerCase().includes(searchInput.toLowerCase())
+        );
+        setTableRow(currentTableRowCopy);
+      }
+    },
+    [searchInput, selectedTable]
+  );
 
   // watch changes of the index of selected table and checkbox filter in premier tab.
   // basic filter when selected table is all, standard, and dao.
   // when premier is selected, basic filter out acy tokens only reward,
   // and advance filter again for bth/eth only or others or both.
-  useEffect(() => {
-    setSearchInput('')
+  useEffect(
+    () => {
+      setSearchInput('');
 
-    // when selected table is all,
-    // display all data.
-    if (selectedTable === 0) {
-      // const filteredTableData = INITIAL_TABLE_DATA
-      // todo change
-      const filteredTableData = []
-      setTableRow(filteredTableData)
-      setCurrentTableRow(filteredTableData)
-    }
-    // when selected table is standard,
-    // display acy token only rewards.
-    else if (selectedTable === 1) {
-      // const filteredTableData = INITIAL_TABLE_DATA.filter((tableData) => (
-      //   tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) === 'ACY'
-      // )
-      // todo change
-      const filteredTableData = []
-      setTableRow(filteredTableData)
-      setCurrentTableRow(filteredTableData)
-    // when selected table is premier,
-    // filter out all acy tokens only rewards,
-    // and filter again based on bth/eth and liquidity checkboxes.
-    } else if (selectedTable === 2) {
-      // basic filter out all acy tokens only rewards.
-      // const tableDataTemp = INITIAL_TABLE_DATA.filter((tableData) => (
-      //   (tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) !== 'ACY') || tableData.pendingReward.length !== 1
-      // )
-      // todo change
-      const tableDataTemp = []
-      // advance filter based on bth/eth and liquidity checkboxes.
-      if (tokenFilter.btcEthToken && tokenFilter.liquidityToken) {
-        const filteredTableData = tableDataTemp
-        setTableRow(filteredTableData)
-        setCurrentTableRow(filteredTableData)
-      } else if (tokenFilter.btcEthToken && !tokenFilter.liquidityToken) {
-        const filteredTableData = tableDataTemp.filter((tableData) => {
-          let isBtcEth = false
-          tableData.pendingReward.forEach(({ token }) => {
-            if (token === 'BTC' || token === 'ETH') {
-              isBtcEth = true
-            }
-          })
-          return isBtcEth
-        })
-        setTableRow(filteredTableData)
-        setCurrentTableRow(filteredTableData)
-      } else if (!tokenFilter.btcEthToken && tokenFilter.liquidityToken) {
-        const filteredTableData = tableDataTemp.filter((tableData) => {
-          let isLiquidity = false
-          tableData.pendingReward.forEach(({ token }) => {
-            if (token !== 'BTC' && token !== 'ETH') {
-              isLiquidity = true
-            }
-          })
-          return isLiquidity
-        })
-        setTableRow(filteredTableData)
-        setCurrentTableRow(filteredTableData)
-      } else {
-        setTableRow([])
-        setCurrentTableRow([])
+      // when selected table is all,
+      // display all data.
+      if (selectedTable === 0) {
+        // const filteredTableData = INITIAL_TABLE_DATA
+        // todo change
+        const filteredTableData = [];
+        setTableRow(filteredTableData);
+        setCurrentTableRow(filteredTableData);
       }
-    }
-  }, [selectedTable, tokenFilter])
+      // when selected table is standard,
+      // display acy token only rewards.
+      else if (selectedTable === 1) {
+        // const filteredTableData = INITIAL_TABLE_DATA.filter((tableData) => (
+        //   tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) === 'ACY'
+        // )
+        // todo change
+        const filteredTableData = [];
+        setTableRow(filteredTableData);
+        setCurrentTableRow(filteredTableData);
+        // when selected table is premier,
+        // filter out all acy tokens only rewards,
+        // and filter again based on bth/eth and liquidity checkboxes.
+      } else if (selectedTable === 2) {
+        // basic filter out all acy tokens only rewards.
+        // const tableDataTemp = INITIAL_TABLE_DATA.filter((tableData) => (
+        //   (tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) !== 'ACY') || tableData.pendingReward.length !== 1
+        // )
+        // todo change
+        const tableDataTemp = [];
+        // advance filter based on bth/eth and liquidity checkboxes.
+        if (tokenFilter.btcEthToken && tokenFilter.liquidityToken) {
+          const filteredTableData = tableDataTemp;
+          setTableRow(filteredTableData);
+          setCurrentTableRow(filteredTableData);
+        } else if (tokenFilter.btcEthToken && !tokenFilter.liquidityToken) {
+          const filteredTableData = tableDataTemp.filter(tableData => {
+            let isBtcEth = false;
+            tableData.pendingReward.forEach(({ token }) => {
+              if (token === 'BTC' || token === 'ETH') {
+                isBtcEth = true;
+              }
+            });
+            return isBtcEth;
+          });
+          setTableRow(filteredTableData);
+          setCurrentTableRow(filteredTableData);
+        } else if (!tokenFilter.btcEthToken && tokenFilter.liquidityToken) {
+          const filteredTableData = tableDataTemp.filter(tableData => {
+            let isLiquidity = false;
+            tableData.pendingReward.forEach(({ token }) => {
+              if (token !== 'BTC' && token !== 'ETH') {
+                isLiquidity = true;
+              }
+            });
+            return isLiquidity;
+          });
+          setTableRow(filteredTableData);
+          setCurrentTableRow(filteredTableData);
+        } else {
+          setTableRow([]);
+          setCurrentTableRow([]);
+        }
+      }
+    },
+    [selectedTable, tokenFilter]
+  );
 
   return (
     <PageHeaderWrapper>
@@ -257,7 +273,7 @@ const Farms = () => {
         {selectedTable === 4 && <DaoTable dataSource={daoDataSource} />}
       </div>
     </PageHeaderWrapper>
-  )
-}
+  );
+};
 
-export default Farms
+export default Farms;

@@ -12,7 +12,7 @@ import {
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import {
-  ACYSwapErrorStatus,
+  Error,
   calculateGasMargin,
   calculateSlippageAmount,
   checkTokenIsApproved,
@@ -78,16 +78,13 @@ export async function getEstimated(
       amount: inToken1Amount,
     } = inputToken1;
 
-    if (!inputToken0.symbol || !inputToken1.symbol)
-      return new ACYSwapErrorStatus('please choose tokens');
-    if (exactIn && inToken0Amount == '0') return new ACYSwapErrorStatus('token0Amount is 0');
-    if (!exactIn && inToken1Amount == '0') return new ACYSwapErrorStatus('token1Amount is 0');
-    if (exactIn && inToken0Amount == '') return new ACYSwapErrorStatus('token0Amount is ""');
-    if (!exactIn && inToken1Amount == '') return new ACYSwapErrorStatus('token1Amount is ""');
-    if (exactIn && isNaN(parseFloat(inToken0Amount)))
-      return new ACYSwapErrorStatus('token0Amount is NaN');
-    if (!exactIn && isNaN(parseFloat(inToken1Amount)))
-      return new ACYSwapErrorStatus('token1Amount is NaN');
+    if (!inputToken0.symbol || !inputToken1.symbol) return new Error('please choose tokens');
+    if (exactIn && inToken0Amount == '0') return new Error('token0Amount is 0');
+    if (!exactIn && inToken1Amount == '0') return new Error('token1Amount is 0');
+    if (exactIn && inToken0Amount == '') return new Error('token0Amount is ""');
+    if (!exactIn && inToken1Amount == '') return new Error('token1Amount is ""');
+    if (exactIn && isNaN(parseFloat(inToken0Amount))) return new Error('token0Amount is NaN');
+    if (!exactIn && isNaN(parseFloat(inToken1Amount))) return new Error('token1Amount is NaN');
 
     let token0IsETH = inToken0Symbol === 'ETH';
     let token1IsETH = inToken1Symbol === 'ETH';
@@ -97,14 +94,14 @@ export async function getEstimated(
     if (token0IsETH && token1IsETH) {
       setButtonContent("Doesn't support ETH to ETH");
       setButtonStatus(false);
-      return new ACYSwapErrorStatus("Doesn't support ETH to ETH");
+      return new Error("Doesn't support ETH to ETH");
     } else if (
       (token0IsETH && inToken1Symbol === 'WETH') ||
       (inToken0Symbol === 'WETH' && token1IsETH)
     ) {
       setButtonContent('Invalid pair WETH/ETH');
       setButtonStatus(false);
-      return new ACYSwapErrorStatus('Invalid pair WETH/ETH');
+      return new Error('Invalid pair WETH/ETH');
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
     else {
@@ -122,7 +119,7 @@ export async function getEstimated(
       if (token0.equals(token1)) {
         setButtonContent('Equal tokens');
         setButtonStatus(false);
-        return new ACYSwapErrorStatus('Equal tokens!');
+        return new Error('Equal tokens!');
       }
       // get pair using our own provider
       const pair = await Fetcher.fetchPairData(token0, token1, library)
@@ -132,9 +129,7 @@ export async function getEstimated(
           return pair;
         })
         .catch(e => {
-          return new ACYSwapErrorStatus(
-            `${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`
-          );
+          return new Error(`${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`);
         });
 
       console.log('pair');
@@ -142,7 +137,7 @@ export async function getEstimated(
       setPair(pair);
 
       let noLiquidity = false;
-      if (pair instanceof ACYSwapErrorStatus) {
+      if (pair instanceof Error) {
         noLiquidity = true;
       }
       setNoLiquidity(noLiquidity);
@@ -160,10 +155,10 @@ export async function getEstimated(
         setButtonStatus(false);
         if (e.fault === 'underflow') {
           setButtonContent(e.fault);
-          return new ACYSwapErrorStatus(e.fault);
+          return new Error(e.fault);
         } else {
           setButtonContent('unknow error');
-          return new ACYSwapErrorStatus('unknow error');
+          return new Error('unknow error');
         }
       }
 
@@ -189,10 +184,10 @@ export async function getEstimated(
             setButtonStatus(false);
             if (e.fault === 'underflow') {
               setButtonContent(e.fault);
-              return new ACYSwapErrorStatus(e.fault);
+              return new Error(e.fault);
             } else {
               setButtonContent('unknow error');
-              return new ACYSwapErrorStatus('unknow error');
+              return new Error('unknow error');
             }
           }
 
@@ -220,10 +215,10 @@ export async function getEstimated(
             setButtonStatus(false);
             if (e.fault === 'underflow') {
               setButtonContent(e.fault);
-              return new ACYSwapErrorStatus(e.fault);
+              return new Error(e.fault);
             } else {
               setButtonContent('unknow error');
-              return new ACYSwapErrorStatus('unknow error');
+              return new Error('unknow error');
             }
           }
 
@@ -244,11 +239,11 @@ export async function getEstimated(
             setButtonStatus(false);
             setButtonContent('create new pool');
 
-            return new ACYSwapErrorStatus('Creating a new pool, please enter both amounts');
+            return new Error('Creating a new pool, please enter both amounts');
           } else {
             setButtonStatus(false);
             setButtonContent('add liquidity');
-            return new ACYSwapErrorStatus("One field is empty, it's probably a new pool");
+            return new Error("One field is empty, it's probably a new pool");
           }
         }
 
@@ -262,10 +257,10 @@ export async function getEstimated(
           setButtonStatus(false);
           if (e.fault === 'underflow') {
             setButtonContent(e.fault);
-            return new ACYSwapErrorStatus(e.fault);
+            return new Error(e.fault);
           } else {
             setButtonContent('unknow error');
-            return new ACYSwapErrorStatus('unknow error');
+            return new Error('unknow error');
           }
         }
       }
@@ -303,10 +298,10 @@ export async function getEstimated(
         setButtonStatus(false);
         if (e.fault === 'underflow') {
           setButtonContent(e.fault);
-          return new ACYSwapErrorStatus(e.fault);
+          return new Error(e.fault);
         } else {
           setButtonContent('Unknown error');
-          return new ACYSwapErrorStatus('unknow error');
+          return new Error('unknow error');
         }
       }
 
@@ -314,7 +309,7 @@ export async function getEstimated(
       if (!userHasSufficientBalance) {
         setButtonContent('Not enough balance');
         setButtonStatus(false);
-        return new ACYSwapErrorStatus('Not enough balance');
+        return new Error('Not enough balance');
       }
 
       console.log('------------------ BREAKDOWN ------------------');
@@ -349,12 +344,12 @@ export async function getEstimated(
             setButtonContent('Insufficient reserve!');
             setButtonStatus(false);
             // alert("something wrong !!!!");
-            return new ACYSwapErrorStatus('Insufficient reserve!');
+            return new Error('Insufficient reserve!');
             console.log('Insufficient reserve!');
           } else {
             setButtonContent('Unhandled exception!');
             setButtonStatus(false);
-            return new ACYSwapErrorStatus('Unhandled exception!');
+            return new Error('Unhandled exception!');
             console.log('Unhandled exception!');
             console.log(e);
           }
@@ -405,7 +400,7 @@ export async function getEstimated(
         setButtonStatus(false);
         setButtonContent('Need approval');
 
-        return new ACYSwapErrorStatus(
+        return new Error(
           `Need approve ${
             approveStatus === 1
               ? inToken0Symbol
@@ -503,7 +498,7 @@ export async function getEstimated(
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
   })();
 
-  if (status instanceof ACYSwapErrorStatus) {
+  if (status instanceof Error) {
     console.log(status.getErrorText());
   } else {
     console.log(status);
@@ -554,11 +549,11 @@ export async function addLiquidity(
     console.log('token1');
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new ACYSwapErrorStatus("Doesn't support ETH to ETH");
+    if (token0IsETH && token1IsETH) return new Error("Doesn't support ETH to ETH");
 
     if ((token0IsETH && inToken1Symbol === 'WETH') || (inToken0Symbol === 'WETH' && token1IsETH)) {
       // UI should sync value of ETH and WETH
-      return new ACYSwapErrorStatus('Invalid pair WETH/ETH');
+      return new Error('Invalid pair WETH/ETH');
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
     else {
@@ -573,7 +568,7 @@ export async function addLiquidity(
         : new Token(chainId, inToken1Address, inToken1Decimal, inToken1Symbol);
 
       // quit if the two tokens are equivalent, i.e. have the same chainId and address
-      if (token0.equals(token1)) return new ACYSwapErrorStatus('Equal tokens!');
+      if (token0.equals(token1)) return new Error('Equal tokens!');
 
       // get pair using our own provider
       console.log('------------------ CONSTRUCT PAIR ------------------');
@@ -619,13 +614,13 @@ export async function addLiquidity(
           ...(value ? { value } : {}),
           gasLimit: calculateGasMargin(estimatedGasLimit),
         }).catch(e => {
-          return new ACYSwapErrorStatus('Error in transaction');
+          return new Error('Error in transaction');
         })
       );
       return result;
     }
   })();
-  if (status instanceof ACYSwapErrorStatus) {
+  if (status instanceof Error) {
     setLiquidityStatus(status.getErrorText());
   } else {
     console.log('status');
