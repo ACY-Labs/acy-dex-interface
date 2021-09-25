@@ -4,13 +4,12 @@ import { AcyModal } from '@/components/Acy';
 import DatePicker from 'react-datepicker';
 import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 import { isMobile } from 'react-device-detect';
-import { deposit } from '@/acy-dex-swap/core/farms';
-import { useWeb3React } from '@web3-react/core';
-import { getUserTokenBalanceWithAddress } from '@/acy-dex-swap/utils';
+import { harvestAll } from '@/acy-dex-swap/core/farms';
 
 const FarmsTableRow = ({
-  stakedTokenAddr,
+  index,
   poolId,
+  stakedTokenAddr,
   token1,
   token1Logo,
   token2,
@@ -26,25 +25,26 @@ const FarmsTableRow = ({
   hideModal,
   isModalVisible,
   hideArrow = false,
+  account,
+  library,
 }) => {
   const [date, setDate] = useState(new Date());
   const [selectedPresetDate, setSelectedPresetDate] = useState(null);
   const [stake, setStake] = useState(0);
-  const [tokenBalance, setTokenBalance] = useState(12345);
+  const [balance, setBalance] = useState(12345);
   const [balancePercentage, setBalancePercentage] = useState(0);
-  const { account, library, chainId } = useWeb3React();
 
   const updateStake = newStake => {
     let newStakeInt = newStake !== '' ? parseInt(newStake, 10) : '';
-    newStakeInt = newStakeInt > tokenBalance ? tokenBalance : newStakeInt;
+    newStakeInt = newStakeInt > balance ? balance : newStakeInt;
     if (newStakeInt === '' || !Number.isNaN(newStakeInt)) setStake(newStakeInt);
-    setBalancePercentage(Math.floor((newStakeInt / tokenBalance) * 100));
+    setBalancePercentage(Math.floor((newStakeInt / balance) * 100));
   };
 
   const updateBalancePercentage = percentage => {
     const percentageInt = percentage === '' ? 0 : parseInt(percentage, 10);
     if (Number.isNaN(percentageInt)) return;
-    setStake((tokenBalance * percentageInt) / 100);
+    setStake((balance * percentageInt) / 100);
     setBalancePercentage(percentageInt);
   };
 
@@ -71,7 +71,7 @@ const FarmsTableRow = ({
 
   const updateBalance = () => {
     console.log('update balance');
-    setTokenBalance(tokenBalance + 1);
+    setBalance(balance + 1);
   };
 
   return (
@@ -105,7 +105,9 @@ const FarmsTableRow = ({
 
         {/* Pending Reward Column */}
         <div className={styles.tableBodyRewardColContainer}>
-          <div className={styles.pendingRewardTitleContainer}>Reward</div>
+          <div className={styles.pendingRewardTitleContainer}>
+            {isMobile ? 'Reward' : 'Pending Reward'}
+          </div>
           {pendingReward.map(reward => (
             <div className={styles.pendingReward1ContentContainer}>
               {`${reward.amount} ${reward.token}`}
@@ -166,7 +168,11 @@ const FarmsTableRow = ({
                 </div>
               ))}
             </div>
-            <button type="button" className={styles.tableBodyDrawerRewardHarvestButton}>
+            <button
+              type="button"
+              className={styles.tableBodyDrawerRewardHarvestButton}
+              onClick={() => harvestAll(index, library, account)}
+            >
               Harvest
             </button>
           </div>
@@ -217,7 +223,7 @@ const FarmsTableRow = ({
         </div>
         <div className={styles.balanceAmountContainer}>
           <div>
-            tokenBalance: {tokenBalance} {token1}-{token2}
+            tokenBalance: {balance} {token1}-{token2}
           </div>
           <div className={styles.balanceAmountInputContainer}>
             <input

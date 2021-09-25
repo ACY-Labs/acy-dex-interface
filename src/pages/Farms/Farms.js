@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import styles from './Farms.less';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import FarmsTable from './FarmsTable';
-import farmsTableContent from './FarmsTableContent';
 import ToggleButtonGroup from './ToggleButtonGroup';
 import DaoTable from './DaoTable';
 import TableControl from './TableControl';
@@ -19,11 +18,6 @@ const Farms = () => {
     supportedChainIds: [1, 3, 4, 5, 42, 80001],
   });
 
-  // const INITIAL_TABLE_DATA = farmsTableContent.map((row) => {
-  //   const prevRow = { ...row }
-  //   prevRow.hidden = true
-  //   return prevRow
-  // })
   const INITIAL_ROW_NUMBER = 5;
 
   const [selectedTable, setSelectedTable] = useState(0);
@@ -56,7 +50,6 @@ const Farms = () => {
 
       const getPools = async (library, account) => {
         const pools = await getAllPools(library, account);
-        console.log(pools);
         const newFarmsContents = [];
 
         pools.forEach(pool => {
@@ -67,7 +60,10 @@ const Farms = () => {
             token1Logo: null,
             token2: pool.token1Symbol,
             token2Logo: null,
-            pendingReward: [{ token: 'ACY', amount: 0 }],
+            pendingReward: pool.rewardTokensSymbols.map((token, index) => ({
+              token,
+              amount: pool.rewardTokensAmount[index],
+            })),
             totalApr: 89.02,
             tvl: 144542966,
             hidden: true,
@@ -90,13 +86,6 @@ const Farms = () => {
       }
     },
     [account]
-  );
-
-  useEffect(
-    () => {
-      console.log(farmsContent);
-    },
-    [farmsContent]
   );
 
   const onRowClick = index =>
@@ -175,33 +164,29 @@ const Farms = () => {
 
       // when selected table is all,
       // display all data.
-      if (selectedTable === 0) {
-        // const filteredTableData = INITIAL_TABLE_DATA
-        // todo change
-        const filteredTableData = [];
+      if (farmsContent && selectedTable === 0) {
+        const filteredTableData = farmsContent;
         setTableRow(filteredTableData);
         setCurrentTableRow(filteredTableData);
       }
       // when selected table is standard,
       // display acy token only rewards.
-      else if (selectedTable === 1) {
-        // const filteredTableData = INITIAL_TABLE_DATA.filter((tableData) => (
-        //   tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) === 'ACY'
-        // )
-        // todo change
-        const filteredTableData = [];
+      else if (farmsContent && selectedTable === 1) {
+        const filteredTableData = farmsContent.filter(
+          tableData =>
+            (tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) === 'ACY'
+        );
         setTableRow(filteredTableData);
         setCurrentTableRow(filteredTableData);
         // when selected table is premier,
         // filter out all acy tokens only rewards,
         // and filter again based on bth/eth and liquidity checkboxes.
-      } else if (selectedTable === 2) {
-        // basic filter out all acy tokens only rewards.
-        // const tableDataTemp = INITIAL_TABLE_DATA.filter((tableData) => (
-        //   (tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) !== 'ACY') || tableData.pendingReward.length !== 1
-        // )
-        // todo change
-        const tableDataTemp = [];
+      } else if (farmsContent && selectedTable === 2) {
+        const tableDataTemp = farmsContent.filter(
+          tableData =>
+            (tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) !== 'ACY' ||
+            tableData.pendingReward.length !== 1
+        );
         // advance filter based on bth/eth and liquidity checkboxes.
         if (tokenFilter.btcEthToken && tokenFilter.liquidityToken) {
           const filteredTableData = tableDataTemp;
@@ -237,7 +222,7 @@ const Farms = () => {
         }
       }
     },
-    [selectedTable, tokenFilter]
+    [selectedTable, tokenFilter, farmsContent]
   );
 
   return (
@@ -268,6 +253,8 @@ const Farms = () => {
             setTokenFilter={setTokenFilter}
             walletConnected={walletConnected}
             connectWallet={connectWallet}
+            account={account}
+            library={library}
           />
         )}
         {selectedTable === 4 && <DaoTable dataSource={daoDataSource} />}

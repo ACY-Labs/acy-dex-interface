@@ -19,6 +19,8 @@ const FarmsTable = ({
   setTokenFilter,
   walletConnected,
   connectWallet,
+  library,
+  account,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -70,6 +72,7 @@ const FarmsTable = ({
           {tableRow.slice(0, rowNumber).map((content, index) => (
             <FarmsTableRow
               key={index}
+              index={index}
               poolId={content.poolId}
               stakedTokenAddr={content.lpTokens}
               token1={content.token1}
@@ -87,6 +90,8 @@ const FarmsTable = ({
               hideModal={hideModal}
               isModalVisible={isModalVisible}
               selectedTable={selectedTable}
+              account={account}
+              library={library}
             />
           ))}
         </div>
