@@ -9,6 +9,7 @@ import {
 
 const FarmsTableRow = (
   {
+    lpTokens,
     token1,
     token1Logo,
     token2,
@@ -75,13 +76,15 @@ const FarmsTableRow = (
 
         {/* Token Title Row */}
         <div className={styles.tableBodyTitleColContainer}>
-          <div className={styles.token1LogoContainer}>
-            <img src={token1Logo} alt={token1} />
-          </div>
+          {token1Logo && (
+            <div className={styles.token1LogoContainer}>
+              <img src={token1Logo} alt={token1} />
+            </div>
+          )}
 
           {/* conditionally hide and show token 2 logo. */}
           {/* if token 2 is undefined or null, hide token 2 logo. */}
-          {token2 && (
+          {token2Logo && (
             <div className={styles.token2LogoContainer}>
               <img src={token2Logo} alt={token2} />
             </div>
@@ -90,7 +93,9 @@ const FarmsTableRow = (
           {/* conditionally hide and show token 2 symbol */}
           {/* only display token 1 symbol if token 2 is undefined or null. */}
           <div className={styles.tokenTitleContainer}>
-            {token2 ? `${token1}-${token2} ${!isMobile ? 'LP' : ''}` : `${token1} ${!isMobile ? 'LP' : ''}`}
+            {token1 && token2 && `${token1}-${token2} ${!isMobile ? 'LP' : ''}`}
+            {token1 && !token2 && `${token1} ${!isMobile ? 'LP' : ''}`}
+            {token2 && !token1 && `${token2} ${!isMobile ? 'LP' : ''}`}
           </div>
         </div>
 

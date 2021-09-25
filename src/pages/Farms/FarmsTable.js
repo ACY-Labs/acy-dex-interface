@@ -72,6 +72,7 @@ const FarmsTable = (
           {tableRow.slice(0, rowNumber).map((content, index) => (
             <FarmsTableRow
               key={index}
+              lpTokens={content.lpTokens}
               token1={content.token1}
               token1Logo={content.token1Logo}
               token2={content.token2}

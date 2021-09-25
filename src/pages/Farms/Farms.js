@@ -8,11 +8,8 @@ import DaoTable from './DaoTable';
 import TableControl from './TableControl';
 import SampleStakeHistoryData from './SampleDaoData';
 import { useWeb3React } from '@web3-react/core';
-import { getContract } from '@/utils/Acyhelpers';
-import { abi } from './ACYMultiFarm.json'
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAllPools } from '@/acy-dex-swap/core/farms';
-import AcyIcon from '@/assets/icon_acy.svg';
 
 const Farms = () => {
   // useWeb3React hook will listen to wallet connection.
@@ -22,15 +19,15 @@ const Farms = () => {
     supportedChainIds: [1, 3, 4, 5, 42, 80001],
   });
 
-  const INITIAL_TABLE_DATA = farmsTableContent.map((row) => {
-    const prevRow = { ...row }
-    prevRow.hidden = true
-    return prevRow
-  })
+  // const INITIAL_TABLE_DATA = farmsTableContent.map((row) => {
+  //   const prevRow = { ...row }
+  //   prevRow.hidden = true
+  //   return prevRow
+  // })
   const INITIAL_ROW_NUMBER = 5
 
   const [selectedTable, setSelectedTable] = useState(0)
-  const [tableRow, setTableRow] = useState(INITIAL_TABLE_DATA)
+  const [tableRow, setTableRow] = useState([])
   const [searchInput, setSearchInput] = useState('')
   const [tableTitle, setTableTitle] = useState('All Farms')
   const [tableSubtitle, setTableSubtitle] = useState('Stake your LP tokens and earn token rewards')
@@ -40,7 +37,7 @@ const Farms = () => {
     liquidityToken: true,
     btcEthToken: true,
   })
-  const [currentTableRow, setCurrentTableRow] = useState(INITIAL_TABLE_DATA)
+  const [currentTableRow, setCurrentTableRow] = useState([])
   const [daoDataSource, setDaoDataSource] = useState(SampleStakeHistoryData)
   const [walletConnected, setWalletConnected] = useState(false)
   const [farmsContent, setFarmsContent] = useState([])
@@ -58,25 +55,29 @@ const Farms = () => {
 
     const getPools = async (library, account) => {
       const pools = await getAllPools(library, account)
+      console.log(pools)
       const newFarmsContents = []
 
       pools.forEach((pool) => {
         const newFarmsContent = {
-          lpTokens: pool.lpTokens,
-          token1: null,
+          lpTokens: pool.lpTokenAddress,
+          token1: pool.token0Symbol,
           token1Logo: null,
-          token2: null,
+          token2: pool.token1Symbol,
           token2Logo: null,
           pendingReward: [
             {token: 'ACY', amount: 0}
           ],
           totalApr: 89.02,
           tvl: 144542966,
+          hidden: true
         }
         newFarmsContents.push(newFarmsContent)
       })
 
       setFarmsContent(newFarmsContents)
+      setCurrentTableRow(newFarmsContents)
+      setTableRow(newFarmsContents)
     }
 
     // account will be returned if wallet is connected.
@@ -161,16 +162,20 @@ const Farms = () => {
     // when selected table is all,
     // display all data.
     if (selectedTable === 0) {
-      const filteredTableData = INITIAL_TABLE_DATA
+      // const filteredTableData = INITIAL_TABLE_DATA
+      // todo change
+      const filteredTableData = []
       setTableRow(filteredTableData)
       setCurrentTableRow(filteredTableData)
     }
     // when selected table is standard,
     // display acy token only rewards.
     else if (selectedTable === 1) {
-      const filteredTableData = INITIAL_TABLE_DATA.filter((tableData) => (
-        tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) === 'ACY'
-      )
+      // const filteredTableData = INITIAL_TABLE_DATA.filter((tableData) => (
+      //   tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) === 'ACY'
+      // )
+      // todo change
+      const filteredTableData = []
       setTableRow(filteredTableData)
       setCurrentTableRow(filteredTableData)
     // when selected table is premier,
@@ -178,9 +183,11 @@ const Farms = () => {
     // and filter again based on bth/eth and liquidity checkboxes.
     } else if (selectedTable === 2) {
       // basic filter out all acy tokens only rewards.
-      const tableDataTemp = INITIAL_TABLE_DATA.filter((tableData) => (
-        (tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) !== 'ACY') || tableData.pendingReward.length !== 1
-      )
+      // const tableDataTemp = INITIAL_TABLE_DATA.filter((tableData) => (
+      //   (tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) !== 'ACY') || tableData.pendingReward.length !== 1
+      // )
+      // todo change
+      const tableDataTemp = []
       // advance filter based on bth/eth and liquidity checkboxes.
       if (tokenFilter.btcEthToken && tokenFilter.liquidityToken) {
         const filteredTableData = tableDataTemp
