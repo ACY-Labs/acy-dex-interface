@@ -265,6 +265,10 @@ export default [
             path: '/market/info/pool/:address',
             component: './Market/PoolInfo',
           },
+          {
+            path: '/market/accounts',
+            component: './Market/AccountOverview',
+          },
         ],
       },
       {
