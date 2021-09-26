@@ -269,6 +269,10 @@ export default [
             path: '/market/accounts',
             component: './Market/AccountOverview',
           },
+          {
+            path: '/market/accounts/:address',
+            component: './Market/AccountInfo',
+          },
         ],
       },
       {

@@ -91,14 +91,18 @@ function AccountsTable(props) {
   const [isHover, setIsHover] = useState(false);
   const navHistory = useHistory();
 
-  function columnsCoin(isAscending, onSortChange) {
+  function columnsAccounts(isAscending, onSortChange) {
     return [
       {
         title: <div className={styles.tableHeaderFirst}>Account</div>,
         dataIndex: 'account',
         key: 'account',
         render: (text, entry) => {
-          return <div className={styles.tableDataFirstColumn}>{text}</div>;
+          return (
+            <div className={styles.tableDataFirstColumn}>
+              <Link to={`/market/accounts/${entry.account}`}>{text}</Link>
+            </div>
+          );
         },
         visible: true,
       },
@@ -108,13 +112,12 @@ function AccountsTable(props) {
         key: 'pair',
         render: (text, entry) => {
           return (
-            <div className={styles.tableData} >
+            <div className={styles.tableData}>
               <AcyTokenIcon symbol={entry.token1} />
               <AcyTokenIcon symbol={entry.token2} />
               <span>
-              {entry.token1} / {entry.token2}
+                {entry.token1} / {entry.token2}
               </span>
-              
             </div>
           );
         },
@@ -154,7 +157,7 @@ function AccountsTable(props) {
         0,
         accountDisplayNumber + 1
       )}
-      columns={columnsCoin(accountSortAscending, () => {
+      columns={columnsAccounts(accountSortAscending, () => {
         setAccountSortAscending(!accountSortAscending);
       }).filter(item => item.visible == true)}
       pagination={false}
@@ -162,11 +165,6 @@ function AccountsTable(props) {
         marginBottom: '20px',
         cursor: isHover ? 'pointer' : 'default',
       }}
-      onRowClick={(record, index, event) => {
-        navHistory.push(`/market/info/token/${record.address}`);
-      }}
-      onRowMouseEnter={() => setIsHover(true)}
-      onRowMouseLeave={() => setIsHover(false)}
       footer={() => (
         <div className={styles.tableSeeMoreWrapper}>
           {props.dataSourceAccounts.slice(0, accountDisplayNumber + 1).length >

@@ -1023,9 +1023,14 @@ export const MarketSearchBar = props => {
             Pools
           </Link>
         </div>
+        <div className={styles.marketNavbarButton}>
+          <Link style={{ color: '#b5b5b6', fontWeight: '600' }} to="/market/accounts">
+            Account
+          </Link>
+        </div>
       </div>
       <div className={styles.marketNavbarRight}>
-        <div className={styles.marketDropdownWrapper} ref={outsideClickRefNetwork}>
+        {/* <div className={styles.marketDropdownWrapper} ref={outsideClickRefNetwork}>
           <button
             className={styles.marketSelector}
             onClick={() => {
@@ -1055,7 +1060,7 @@ export const MarketSearchBar = props => {
               </div>
             )}
           </div>
-        </div>
+        </div> */}
         <div className={styles.searchSection}>
           {/* this is the gray background */}
           {visibleSearchBar && <div className={styles.searchBackground} />}

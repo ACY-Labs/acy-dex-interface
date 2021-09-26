@@ -1,529 +1,578 @@
 @import '~antd/lib/style/themes/default.less';
-@cardColor:   #2f313583;
+@cardColor: #2f313583;
+@primary: #e29227;
 
-// root element
-.marketRoot{
-    width: 90%;
-    max-width: 1000px;
-    margin:auto;
-    z-index:0;
-    color: #B5B6B6;
-    margin-bottom: 20px;
-    font-weight:400;
+a {
+    color: @primary
 }
 
-.marketLink{
-    color: #B5B6B6 !important;
+// root element
+.marketRoot {
+  width: 90%;
+  max-width: 1000px;
+  margin: auto;
+  z-index: 0;
+  color: #b5b6b6;
+  margin-bottom: 20px;
+  font-weight: 400;
+}
+
+.marketLink {
+  color: #b5b6b6 !important;
 }
 
 // headers
 h2 {
-    color: #B5B6B6;
+  color: #b5b6b6;
 }
 
-h3, h4{
-    color: #B5B6B6;
+h3,
+h4 {
+  color: #b5b6b6;
 }
-
 
 // table entries
-.priceChangeDown{
-    color: red;
-    font-weight: 600;
+.priceChangeDown {
+  color: red;
+  font-weight: 600;
 }
-.priceChangeUp{
-    color:greenyellow;
-    font-weight: 600;
+.priceChangeUp {
+  color: greenyellow;
+  font-weight: 600;
 }
 .coinName {
-    font-weight: 600;
-    margin-left: 0.5rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
 }
-.coinShort{
-    color: #919191;
+.coinShort {
+  color: #919191;
 }
-.tableHeader, .tableHeaderFirst{
-    cursor: pointer;
+.tableHeader,
+.tableHeaderFirst {
+  cursor: pointer;
 }
-.tableHeader:hover, .tableHeaderFirst:hover{
-    color: #eb5c20;
+.tableHeader:hover,
+.tableHeaderFirst:hover {
+  color: @primary;
 }
-
 
 //small table compoenent
-.smallTable{
-    display: table;
-    width: 100%;
-    .smallTableRow{
-        display: table-row;
-    }
-    .smallTableHeader{
-        display:table-cell;
-        padding: 10px;
-        font-weight: bold;
-    }
-    .smallTableBody{
-        display:table-cell;
-        padding: 10px;
-    }
-    .smallTableSeeMore{
-        margin-left: 10px;
-        margin-top: 30px;
-    }
+.smallTable {
+  display: table;
+  width: 100%;
+  .smallTableRow {
+    display: table-row;
+  }
+  .smallTableHeader {
+    display: table-cell;
+    padding: 10px;
+    font-weight: bold;
+  }
+  .smallTableBody {
+    display: table-cell;
+    padding: 10px;
+  }
+  .smallTableSeeMore {
+    margin-left: 10px;
+    margin-top: 30px;
+  }
 }
-.marketNavbar{
-    position:sticky;
-    top: 0px;
-    margin-bottom:35px;
-    max-width: 1000px;
-    display:flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 11;
-    // box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    flex-wrap: wrap;
-    .active{
-        background:red;
-    }
-}
-
-.marketNavbarMenu{
-    display:flex;
-    width: 20%;
-    font-size: 16px;
-    justify-content:flex-begin;
+.marketNavbar {
+  position: sticky;
+  top: 0px;
+  margin-bottom: 35px;
+  max-width: 1000px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 11;
+  // box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  flex-wrap: wrap;
+  .active {
+    background: red;
+  }
 }
 
-.marketNavbarButton{
-    background-color: #2e3032;
-    padding: 7px 15px;
-    border-radius:20px;
-    height: 100%;
-    margin-right: 10px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+.marketNavbarMenu {
+  display: flex;
+  width: 20%;
+  font-size: 16px;
+  justify-content: flex-begin;
 }
 
-.marketNavbarRight{
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    flex-wrap:wrap;
-    width: 80%;
+.marketNavbarButton {
+  background-color: #2e3032;
+  padding: 7px 15px;
+  border-radius: 20px;
+  height: 100%;
+  margin-right: 10px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.marketNavbarButton:hover {
+  cursor: pointer;
 }
 
-.marketDropdownWrapper{
-    width: 25%;
-    display:flex;
-    flex-direction: column;
-    justify-content:flex-end;
-    font-size: 16px;
-    font-weight: 600;
+.marketNavbarRight {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 60%;
 }
 
-.marketSelector{
-    background-color: #2e3032;
-    width: 80%;
-    text-align:center;
-    padding: 5px;
-    border-radius:20px;
-    padding: 7px 15px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    max-width: 180px;
-    min-width:160px;
-    border: transparent;
-    font-weight: 600;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+.marketDropdownWrapper {
+  width: 25%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  font-size: 16px;
+  font-weight: 600;
 }
 
-.marketNetworkDropdown{
-    position:absolute;
-    width:100%;
-    top:10px;
-    background: #2e3032;
-    padding: 10px 15px;
-    border-radius:15px;
-    z-index:10;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    h4 {
-        color: #757579;
-    }
+.marketSelector {
+  background-color: #2e3032;
+  width: 80%;
+  text-align: center;
+  padding: 5px;
+  border-radius: 20px;
+  padding: 7px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 180px;
+  min-width: 160px;
+  border: transparent;
+  font-weight: 600;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-.marketNetworkItem{
-    display:flex;
-    align-items:center;
-    padding-bottom:10px;
-    background: transparent;
-    border: transparent;
-    font-weight: 600;
+.marketNetworkDropdown {
+  position: absolute;
+  width: 100%;
+  top: 10px;
+  background: #2e3032;
+  padding: 10px 15px;
+  border-radius: 15px;
+  z-index: 10;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  h4 {
+    color: #757579;
+  }
+}
+
+.marketNetworkItem {
+  display: flex;
+  align-items: center;
+  padding-bottom: 10px;
+  background: transparent;
+  border: transparent;
+  font-weight: 600;
 }
 
 // search component
-.searchSection{
-    z-index: 10;
-    padding:auto;
-    width: 75%;
-    .searchBackground{
-        background: rgba(0,0,0,0.50);
-        position:fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 4;
-        
-    }
-    .searchWrapper{
-        width: 100%;
-        z-index: 5;
-        display:flex;
-        justify-content:flex-end;
-        align-items: center;
-    }
-    .searchBar{
-        width: 100%;
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    }
-    
-    
-}
-
-.searchModal{
-    background: #373739;
-    border: solid 1px #eb5c20;
-    border-radius: 15px;
-    z-index:5;
-    padding: 20px;
-    .searchModalDivider{
-        background-color: #666666;
-    }
-}
-
-.searchInnerWrapper{
-    z-index:5;
+.searchSection {
+  z-index: 10;
+  padding: auto;
+  width: 100%;
+  .searchBackground {
+    background: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 4;
+  }
+  .searchWrapper {
     width: 100%;
-    display:flex;
+    z-index: 5;
+    display: flex;
+    justify-content: flex-end;
     align-items: center;
+  }
+  .searchBar {
+    width: 100%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
 }
 
+.searchModal {
+  background: #373739;
+  border: solid 1px @primary;
+  border-radius: 15px;
+  z-index: 5;
+  padding: 20px;
+  .searchModalDivider {
+    background-color: #666666;
+  }
+}
+
+.searchInnerWrapper {
+  z-index: 5;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
 
 // Chart on main page
-.chartsMain{
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+.chartsMain {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
-.chartSectionMain{
-    width: 49%;
-    height: 40vh;
-    max-height: 700px;
-    background-color: @cardColor;
-    border-radius: 15px;
-    margin-bottom: 10px;
-    padding: 15px;
-    overflow: hidden;
-    .graphStats{
-        padding: 0;
-        margin-bottom: 5px;
-    }
-    .statName{
-        font-size: 13pt;
-        line-height: 14pt;
-        color: #757579;
-        font-weight:600;
-    }
-    .statValue{
-        font-size: 24pt;
-        line-height: 25pt;
-        font-weight: bold;
-    }
-    .chartWrapper {
-        height: 90%;
-    }
-    
+.chartSectionMain {
+  width: 49%;
+  height: 40vh;
+  max-height: 700px;
+  background-color: @cardColor;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  padding: 15px;
+  overflow: hidden;
+  .graphStats {
+    padding: 0;
+    margin-bottom: 5px;
+  }
+  .statName {
+    font-size: 13pt;
+    line-height: 14pt;
+    color: #757579;
+    font-weight: 600;
+  }
+  .statValue {
+    font-size: 24pt;
+    line-height: 25pt;
+    font-weight: bold;
+  }
+  .chartWrapper {
+    height: 90%;
+  }
 }
 
 // Market overview
 .marketOverview {
-    background-color: @cardColor;
-    color: #B5B6B6;
-    padding: 15px;
-    border-radius: 15px 15px 15px 15px ;
-    
-    margin-bottom:10px;
+  background-color: @cardColor;
+  color: #b5b6b6;
+  padding: 15px;
+  border-radius: 15px 15px 15px 15px;
+
+  margin-bottom: 10px;
 }
 
 // Transaction table
-.transactionHeader{
-    display:flex;
-    justify-content:space-around;
-    .transactionType{
-        margin: 5px;
-    }
+.transactionHeader {
+  display: flex;
+  justify-content: space-around;
+  .transactionType {
+    margin: 5px;
+  }
 }
 
-.tableData{
-    text-align: right;
+.tableData {
+  text-align: right;
 }
-.tableDataFirstColumn{
-    text-align:left;
-    display:flex;
-    align-items:center;
+.tableDataFirstColumn {
+  text-align: left;
+  display: flex;
+  align-items: center;
 }
-.percentBadge{
-    background-color: #29292c;
-    padding: 3px 5px;
-    border-radius: 5px;
-    font-weight: 600;
+.percentBadge {
+  background-color: #29292c;
+  padding: 3px 5px;
+  border-radius: 5px;
+  font-weight: 600;
 }
 .tableSeeMoreWrapper {
-    text-align: center;
-    width: 100%;
+  text-align: center;
+  width: 100%;
 }
 .tableSeeMore {
-    font-size: 16px;
+  font-size: 16px;
 }
 
 // info pages
-.infoHeader{
-    width: 100%;
-    display:flex;
-    justify-content:space-between;
-    flex-wrap: wrap-reverse;
+.infoHeader {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap-reverse;
 }
-.rightButton{
-    display:flex;
-    align-items:center;
-    
+.rightButton {
+  display: flex;
+  align-items: center;
 }
 
 .contentCta {
-    display:flex;
-    justify-content: flex-end;
-    font-family: sans-serif;
-    margin-right: 0;
+  display: flex;
+  justify-content: flex-end;
+  font-family: sans-serif;
+  margin-right: 0;
 }
 .ctaButton:nth-child(1) {
-    margin-right:5px;
+  margin-right: 5px;
 }
 .ctaButton:nth-child(2) {
-    margin-left:5px;
+  margin-left: 5px;
 }
-.contentStats, .contentCharts{
-    background: @cardColor;
-    margin-top: 15px;
-    margin-bottom: 15px;
+.contentStats,
+.contentCharts {
+  background: @cardColor;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
-.contentStats{
-    background-color: transparent;
-    margin-right: 5px;
-    width: 20%;
-    display:flex;
-    flex-direction:column;
-    justify-content: space-between;
+.contentStats {
+  background-color: transparent;
+  margin-right: 5px;
+  width: 20%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-.contentCharts{
-    margin-left: 5px;
-    width: 79%;
-    padding: 15px;
-    border-radius: 15px;
+.contentCharts {
+  margin-left: 5px;
+  width: 79%;
+  padding: 15px;
+  border-radius: 15px;
 }
 
 // info page left stats
-.statEntry{
-    margin-bottom: 10px;
-    background: @cardColor;
-    border-radius: 15px;
-    padding: 15px;
+.statEntry {
+  margin-bottom: 10px;
+  background: @cardColor;
+  border-radius: 15px;
+  padding: 15px;
 }
-.statEntry:nth-last-child(1){
-    margin-bottom: 0;
+.statEntry:nth-last-child(1) {
+  margin-bottom: 0;
 }
-.statEntryValue{
-    font-size:26px;
-    line-height:28px;
-    font-weight: bold;
+.statEntryValue {
+  font-size: 26px;
+  line-height: 28px;
+  font-weight: bold;
 }
-.statEntryName, .statEntryChange{
-    font-size:16px;
-    font-weight:600;
-    line-height: 20px;
-    color: #757579;
+.statEntryName,
+.statEntryChange {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  color: #757579;
 }
 
 // chart section in info page
-.contentChartsHeader{
-    width: 100%;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap: wrap-reverse;
-    margin-bottom:5px;
+.contentChartsHeader {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap-reverse;
+  margin-bottom: 5px;
 }
-.chartIndicatorValue{
-    font-size:26px;
-    line-height:28px;
-    font-weight: bold;
+.chartIndicatorValue {
+  font-size: 26px;
+  line-height: 28px;
+  font-weight: bold;
 }
-.chartIndicatorTime{
-    font-size:16px;
-    line-height: 16px;
-    font-weight:600;
-    color: #757579;
+.chartIndicatorTime {
+  font-size: 16px;
+  line-height: 16px;
+  font-weight: 600;
+  color: #757579;
 }
-.contentChartsBody{
-    height: 90%;
+.contentChartsBody {
+  height: 90%;
 }
-.contentChartWrapper{
-    height: 95%;
+.contentChartWrapper {
+  height: 95%;
 }
-.contentChartsSelector{
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.statEntryTokenLock{
-    background-color: #2e3032;
-    border-radius: 15px;
-    padding: 15px;
-}
-.tokenLockEntry{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-}
-.tokenLockName{
-    display:flex;
-    align-items:center;
+.contentChartsSelector {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
-.exchangeValuePadder{
-    width: 100%;
+.statEntryTokenLock {
+  background-color: #2e3032;
+  border-radius: 15px;
+  padding: 15px;
 }
-.exchangeValueWrapper{
-    display:flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin-top:30px;
-    margin-bottom: 15px;
-    width: 100%;
-    // width: 23%;
-    
+.tokenLockEntry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-.exchangeValueCard{
-    display:flex;
-    align-items: center;
-    background-color: @cardColor;
-    border-radius:15px;
-    padding: 10px;
-    padding-right:20px;
-    
-    // margin-bottom: 10px;
+.tokenLockName {
+  display: flex;
+  align-items: center;
 }
 
-.exchangeValueCard:hover{
-    cursor: pointer;
-    background-color: #2e3032;
+.exchangeValuePadder {
+  width: 100%;
 }
-.exchangeValueCard:nth-child(1){
-    width: 20%;
+.exchangeValueWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  width: 100%;
+  // width: 23%;
+}
+.exchangeValueCard {
+  display: flex;
+  align-items: center;
+  background-color: @cardColor;
+  border-radius: 15px;
+  padding: 10px;
+  padding-right: 20px;
+
+  // margin-bottom: 10px;
 }
 
-.exchangeValueRight{
-    width: 79%;
-    display:flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+.exchangeValueCard:hover {
+  cursor: pointer;
+  background-color: #2e3032;
+}
+.exchangeValueCard:nth-child(1) {
+  width: 20%;
 }
 
-.transactionLink:hover{
-    color: #eb5c20;
-    cursor: pointer;
+.exchangeValueRight {
+  width: 79%;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.transactionLink:hover {
+  color: @primary;
+  cursor: pointer;
 }
 
 .savedAccountCard {
-    background: @cardColor;
-    padding: 15px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    border-radius: 10px;
+  background: @cardColor;
+  padding: 15px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+
+.walletStatCard {
+  background: @cardColor;
+  padding: 15px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+    .walletStatEntry{
+        .walletStatValue{
+            font-size:22px;
+            font-weight: bold;
+        }
+    }
+}
+
+.accountPageRow {
+  margin-bottom: 10px;
+  position:relative;
+  width:100%;
+}
+
+.posTableInnerButton{
+    background:#2e3032;
+    color: #757579;
+    border: solid 1px transparent;
+    border-radius:10px;
+}
+.posTableInnerButton:hover{
+    background:#2e3032;
+    color: @primary;
+    font-weight: 600;
+}
+
+.accountDropdown{
+    width: 100%;
 }
 
 
+.accountDropdownItem:hover{
+    color: @primary;
+}
+
+.accountGraphCard{
+    background: @cardColor;
+    width:100%;
+    padding:20px;
+    border-radius: 10px;
+}
+
 // mobile changes
 @media screen and (max-width: 1060px) {
+  .marketNavbarRight,
+  .marketNavbarMenu {
+    width: 100%;
+    margin-bottom: 10px;
+  }
 
-    .marketNavbarRight, .marketNavbarMenu{
-        width: 100%;
-        margin-bottom:10px;
-    }
+  .marketNavbarRight {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-    .marketNavbarRight{
-        width: 100%;
-        flex-direction: column;
-        align-items:flex-start;
-    }
+  .marketDropdownWrapper {
+    width: 50%;
+    justify-content: flex-start;
+    left: 0;
+  }
 
-    .marketDropdownWrapper{
-        width: 50%;
-        justify-content:flex-start;
-        left: 0;
-    }
+  .searchSection {
+    margin-top: 10px;
+    width: 100%;
+  }
+  .searchInnerWrapper {
+    width: 100%;
+  }
+  .searchModal {
+    height: 50vh;
+    overflow-y: scroll;
+  }
 
-    .searchSection{
-        margin-top: 10px;
-        width: 100%;
-    }
-    .searchInnerWrapper {
-        width:100%;
-    }
-    .searchModal{
-        height: 50vh;
-        overflow-y:scroll;
-    }
+  .chartSectionMain {
+    width: 100%;
+  }
 
+  .volColumn {
+    text-align: right;
+  }
 
-    .chartSectionMain{
-        width: 100%;
-    }
+  .contentCta {
+    width: 100%;
+    justify-content: flex-start;
+    margin-left: 0;
+  }
 
-    .volColumn{
-        text-align: right;
-    }
+  .contentInfo {
+    margin-bottom: 10px;
+  }
 
-    .contentCta {
+  .contentStats {
+    margin-right: 0px;
+    width: 100%;
+  }
+  .contentCharts {
+    width: 100%;
+    height: 40vh;
+  }
 
-        width: 100%;
-        justify-content :flex-start;
-        margin-left: 0;
-    }
-
-    .contentInfo{
-        margin-bottom:10px;
-    }
-
-    .contentStats{
-        margin-right: 0px;
-        width: 100%;
-    }
-    .contentCharts{
-        width: 100%;
-        height: 40vh;
-    }
-
-    .contentChartWrapper{
-        height: 80%;
-    }
-    .exchangeValueWrapper{
-        width: 100%;
-    }
-    .exchangeValueRight{
-        width: 100%;
-    }
-    .exchangeValueCard:nth-child(1){
-        width: 100%;
-    }
+  .contentChartWrapper {
+    height: 80%;
+  }
+  .exchangeValueWrapper {
+    width: 100%;
+  }
+  .exchangeValueRight {
+    width: 100%;
+  }
+  .exchangeValueCard:nth-child(1) {
+    width: 100%;
+  }
 }
