@@ -29,7 +29,6 @@ export async function getAllLiquidityPositions(tokens, chainId, library, account
     for (let j = i + 1; j < totalTokenCount; j++) {
       const { address: token0Address, symbol: token0Symbol, decimal: token0Decimal } = tokens[i];
       const { address: token1Address, symbol: token1Symbol, decimal: token1Decimal } = tokens[j];
-
       const token0 = new Token(chainId, token0Address, token0Decimal, token0Symbol);
       const token1 = new Token(chainId, token1Address, token1Decimal, token1Symbol);
 
@@ -218,6 +217,7 @@ const AcyLiquidityPositions = () => {
 
   useEffect(
     () => {
+      if (!chainId || !library || !account) return;
       async function getAllUserLiquidityPositions() {
         if (account != undefined) {
           setUserLiquidityPositions(
