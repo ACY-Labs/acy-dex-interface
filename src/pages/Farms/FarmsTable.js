@@ -93,7 +93,6 @@ const FarmsTable = ({
       ) : (
         <div className={styles.tableBodyContainer}>
           <FarmsTableRow
-            key={index}
             token1="ACY"
             token1Logo={AcyIcon}
             token2={null}

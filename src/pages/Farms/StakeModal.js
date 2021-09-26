@@ -11,11 +11,6 @@ const StakeModal = ({ onCancel, isModalVisible, token1, token2, balance }) => {
   const [stake, setStake] = useState(0);
   const [balancePercentage, setBalancePercentage] = useState(0);
 
-  useEffect(() => {
-    console.log('inside modal');
-    console.log(balance);
-  });
-
   const updateStake = newStake => {
     let newStakeInt = newStake !== '' ? parseInt(newStake, 10) : '';
     newStakeInt = newStakeInt > balance ? balance : newStakeInt;

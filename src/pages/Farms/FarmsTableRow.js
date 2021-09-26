@@ -35,8 +35,7 @@ const FarmsTableRow = ({
 
   useEffect(
     () => {
-      console.log('------ props ------');
-      console.log(stakedTokenAddr);
+      if (!stakedTokenAddr || !chainId || !account || !library) return;
       async function getFarmTokenUserBalance() {
         const bal = await getUserTokenBalanceWithAddress(
           stakedTokenAddr,
