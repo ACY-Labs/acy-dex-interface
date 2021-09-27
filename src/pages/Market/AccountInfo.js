@@ -14,6 +14,7 @@ import {
 import FarmsTable from '@/pages/Farms/FarmsTable';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
+import { getAllPools } from '@/acy-dex-swap/core/farms';
 
 let samplePositionData = [
   {
@@ -268,21 +269,70 @@ function AccountInfo(props) {
   const [isWatchlist, setIsWatchlist] = useState(false);
   const [tableRow, setTableRow] = useState([]);
   const [rowNumber, setRowNumber] = useState(INITIAL_ROW_NUMBER);
+  const [walletConnected, setWalletConnected] = useState(false);
   const { account, chainId, library, activate } = useWeb3React();
   const injected = new InjectedConnector({
     supportedChainIds: [1, 3, 4, 5, 42, 80001],
   });
-
   const { address } = useParams()
 
-  useEffect(() => console.log('address', address), [address])
-
+  // method to hide/unhidden table row.
   const onRowClick = index =>
     setTableRow(prevState => {
       const prevTableRow = [...prevState];
       prevTableRow[index].hidden = !prevTableRow[index].hidden;
       return prevTableRow;
     });
+
+  // method to prompt metamask extension for user to connect their wallet.
+  const connectWallet = () => activate(injected)
+
+  useEffect(
+    () => {
+      // automatically connect to wallet at the start of the application.
+      connectWallet();
+
+      const getPools = async (library, account) => {
+        // get all pools from the farm contract.
+        // todo: currently account refers to the current user viewing this webpage,
+        // todo: needs to be change to the user in this webpage.
+        const pools = (await getAllPools(library, account)).filter((pool) => pool.hasUserPosition);
+        const newFarmsContents = [];
+
+        // format pools data to the required format that the table can read.
+        pools.forEach(pool => {
+          const newFarmsContent = {
+            lpTokens: pool.lpTokenAddress,
+            token1: pool.token0Symbol,
+            token1Logo: null,
+            token2: pool.token1Symbol,
+            token2Logo: null,
+            pendingReward: pool.rewardTokensSymbols.map((token, index) => ({
+              token,
+              amount: pool.rewardTokensAmount[index],
+            })),
+            totalApr: 89.02,
+            tvl: 144542966,
+            hasUserPosition: pool.hasUserPosition,
+            hidden: true,
+          };
+          newFarmsContents.push(newFarmsContent);
+        });
+
+        setTableRow(newFarmsContents);
+      };
+
+      // account will be returned if wallet is connected.
+      // so if account is present, retrieve the farms contract.
+      if (account) {
+        setWalletConnected(true);
+        getPools(library, account);
+      } else {
+        setWalletConnected(false);
+      }
+    },
+    [account]
+  );
 
   return (
     <div className={styles.marketRoot}>
@@ -390,9 +440,9 @@ function AccountInfo(props) {
           selectedTable={0}
           tokenFilter={{ liquidityToken: true, btcEthToken: true }}
           setTokenFilter={() => {}}
-          walletConnected
-          connectWallet={() => activate(injected)}
-          account={address}
+          walletConnected={walletConnected}
+          connectWallet={connectWallet}
+          account={account}
           library={library}
           chainId={chainId}
         />
