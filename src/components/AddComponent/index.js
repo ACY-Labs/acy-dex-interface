@@ -75,6 +75,7 @@ import { parseUnits } from '@ethersproject/units';
 import { Row, Col, Button, Alert, Input } from 'antd';
 
 import { getEstimated, addLiquidity } from '@/acy-dex-swap/core/addLiquidity';
+import spinner from '@/assets/loading.svg';
 
 const { AcyTabPane } = AcyTabs;
 
@@ -117,7 +118,7 @@ const AddLiquidityComponent = props => {
   let [approveToken1ButtonShow, setApproveToken1ButtonShow] = useState(false);
 
   let [liquidityBreakdown, setLiquidityBreakdown] = useState();
-  let [buttonContent, setButtonContent] = useState('connect to wallet');
+  let [buttonContent, setButtonContent] = useState('Connect to wallet');
   let [buttonStatus, setButtonStatus] = useState(true);
   let [liquidityStatus, setLiquidityStatus] = useState();
 
@@ -131,6 +132,9 @@ const AddLiquidityComponent = props => {
 
   const [tokenSearchInput, setTokenSearchInput] = useState('');
   const [tokenList, setTokenList] = useState(INITIAL_TOKEN_LIST);
+
+  const [showSpinner0, setShowSpinner0] = useState(false);
+  const [showSpinner1, setShowSpinner1] = useState(false);
 
   // method to update the value of token search input field,
   // and filter the token list based on the comparison of the value of search input field and token symbol.
@@ -438,7 +442,11 @@ const AddLiquidityComponent = props => {
                   />
                   <Button
                     type="primary"
-                    style={{ marginLeft: '10px', background: "#2e3032", borderColor: "transparent" }}
+                    style={{
+                      marginLeft: '10px',
+                      background: '#2e3032',
+                      borderColor: 'transparent',
+                    }}
                     onClick={() => {
                       if (isNaN(inputSlippageTol)) {
                         setSlippageError('Please input valid slippage value!');
@@ -478,7 +486,11 @@ const AddLiquidityComponent = props => {
           <AcyButton
             variant="warning"
             onClick={async () => {
+              setShowSpinner0(true);
+              setNeedApproveToken0(false);
               let state = await approve(token0.address, approveAmountToken0, library, account);
+              setNeedApproveToken0(true);
+              setShowSpinner0(false);
 
               if (state == true) {
                 setNeedApproveToken0(false);
@@ -518,8 +530,8 @@ const AddLiquidityComponent = props => {
                 );
 
                 if (needApproveToken1 == false) {
-                  if (!noLiquidity) setButtonContent('add liquidity');
-                  else setButtonStatus('create new pool');
+                  if (!noLiquidity) setButtonContent('Add liquidity');
+                  else setButtonStatus('Create new pool');
                   setButtonStatus(true);
                 }
               }
@@ -527,6 +539,14 @@ const AddLiquidityComponent = props => {
             disabled={!needApproveToken0}
           >
             Approve {token0 && token0.symbol}
+            {showSpinner0 && (
+              <img
+                style={{ width: 30, height: 30, marginLeft: '1%' }}
+                src={spinner}
+                className={styles.spinner}
+                alt="spinner"
+              />
+            )}
           </AcyButton>{' '}
         </div>
       )}
@@ -535,7 +555,12 @@ const AddLiquidityComponent = props => {
           <AcyButton
             variant="warning"
             onClick={async () => {
+              setShowSpinner1(true);
+              setNeedApproveToken1(false);
               let state = await approve(token1.address, approveAmountToken1, library, account);
+              setNeedApproveToken1(true);
+              setShowSpinner1(false);
+
               if (state == true) {
                 setNeedApproveToken1(false);
                 await getEstimated(
@@ -573,8 +598,8 @@ const AddLiquidityComponent = props => {
                 );
 
                 if (needApproveToken0 == false) {
-                  if (!noLiquidity) setButtonContent('add liquidity');
-                  else setButtonStatus('create new pool');
+                  if (!noLiquidity) setButtonContent('Add liquidity');
+                  else setButtonStatus('Create new pool');
                   setButtonStatus(true);
                 }
               }
@@ -582,6 +607,14 @@ const AddLiquidityComponent = props => {
             disabled={!needApproveToken1}
           >
             Approve {token1 && token1.symbol}
+            {showSpinner1 && (
+              <img
+                style={{ width: 30, height: 30, marginLeft: '1%' }}
+                src={spinner}
+                className={styles.spinner}
+                alt="spinner"
+              />
+            )}
           </AcyButton>
         </div>
       )}

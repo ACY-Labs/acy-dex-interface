@@ -1,7 +1,6 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useState, useEffect, useMemo } from 'react';
 import { useWeb3React } from '@web3-react/core';
-import styles from './styles.less';
 import { Table } from 'antd';
 import {
   getUserTokenBalanceRaw,
@@ -13,6 +12,16 @@ import supportedTokens from '@/constants/TokenList';
 import { Fetcher, Percent, Token, TokenAmount } from '@acyswap/sdk';
 import AcyRemoveLiquidityModal from '@/components/AcyRemoveLiquidityModal';
 import { isMobile } from 'react-device-detect';
+import styles from './styles.less';
+
+function getLogoURIWithSymbol(symbol) {
+  for (let j = 0; j < supportedTokens.length; j++) {
+    if (symbol === supportedTokens[j].symbol) {
+      return supportedTokens[j].logoURI;
+    }
+  }
+  return 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg';
+}
 
 export async function getAllLiquidityPositions(tokens, chainId, library, account) {
   // we only want WETH
@@ -80,6 +89,8 @@ export async function getAllLiquidityPositions(tokens, chainId, library, account
     userNonZeroLiquidityPositions.push({
       token0: pair.token0,
       token1: pair.token1,
+      token0LogoURI: getLogoURIWithSymbol(pair.token0.symbol),
+      token1LogoURI: getLogoURIWithSymbol(pair.token1.symbol),
       token0Symbol: pair.token0.symbol,
       token1Symbol: pair.token1.symbol,
       pool: `${pair.token0.symbol}/${pair.token1.symbol}`,
@@ -99,9 +110,9 @@ const AcyLiquidityPositions = () => {
   const [userLiquidityPositions, setUserLiquidityPositions] = useState([]);
   const { account, chainId, library, activate } = useWeb3React();
 
-  let [loading, setLoading] = useState(true);
-  let [isModalVisible, setIsModalVisible] = useState(false);
-  let [removeLiquidityPosition, setRemoveLiquidityPosition] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [removeLiquidityPosition, setRemoveLiquidityPosition] = useState(null);
 
   const columns = useMemo(() => [
     {
@@ -110,18 +121,10 @@ const AcyLiquidityPositions = () => {
       key: 'poolAddress',
       className: 'leftAlignTableHeader',
       render: (text, record, index) => {
-        let addressLength = record.poolAddress.length;
+        const addressLength = record.poolAddress.length;
 
-        let token0logo = null;
-        let token1logo = null;
-        for (let j = 0; j < supportedTokens.length; j++) {
-          if (record.token0Symbol === supportedTokens[j].symbol) {
-            token0logo = supportedTokens[j].logoURI;
-          }
-          if (record.token1Symbol === supportedTokens[j].symbol) {
-            token1logo = supportedTokens[j].logoURI;
-          }
-        }
+        const token0logo = getLogoURIWithSymbol(record.token0Symbol);
+        const token1logo = getLogoURIWithSymbol(record.token1Symbol);
 
         return (
           <div className={styles.pool}>

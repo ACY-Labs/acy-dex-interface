@@ -343,7 +343,9 @@ export async function getEstimated(
         return new CustomError('Unhandled exception!');
       }
     } else {
-      setLiquidityBreakdown(['new pool']);
+      setLiquidityBreakdown([
+        `Ready to create ${inToken0Symbol} ${inToken1Symbol} liquidity pool.`,
+      ]);
     }
     console.log('------------------ ALLOWANCE ------------------');
     let approveStatus = 0;

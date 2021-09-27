@@ -106,6 +106,23 @@
   background-color: green;
 }
 
-.slippageContainer{
+.slippageContainer {
   margin-bottom: 10px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotateZ(0deg);
+  }
+  from {
+    transform: rotateZ(360deg);
+  }
+}
+
+.spinner {
+  animation-name: spin;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  transform: rotateZ(0deg);
+  animation-timing-function: linear;
 }
