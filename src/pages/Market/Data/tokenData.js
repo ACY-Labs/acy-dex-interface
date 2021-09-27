@@ -86,6 +86,9 @@ export async function fetchGeneralTokenInfo(client) {
 }
 
 // fetch individual token from string (search)
+export async function fetchTokenSearch(client, searchQuery){
+  return 
+}
 
 // fetch individual token info from id
 
