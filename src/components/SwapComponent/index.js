@@ -588,7 +588,7 @@ const SwapComponent = props => {
                   />
                   <Button
                     type="primary"
-                    style={{ marginLeft: '10px' }}
+                    style={{ marginLeft: '10px', background: "#2e3032", borderColor: "transparent"}}
                     onClick={() => {
                       if (isNaN(inputSlippageTol)) {
                         setSlippageError('Please input valid slippage value!');
