@@ -520,6 +520,7 @@ const SwapComponent = props => {
         icon="eth"
         title={token0BalanceShow && `Balance: ${parseFloat(token0Balance).toFixed(3)}`}
         coin={(token0 && token0.symbol) || 'Select'}
+        logoURI={token0 && token0.logoURI}
         yuan="566.228"
         dollar={`${token0Balance}`}
         token={token0Amount}
@@ -546,6 +547,7 @@ const SwapComponent = props => {
         icon="eth"
         title={token1BalanceShow && `Balance: ${parseFloat(token1Balance).toFixed(3)}`}
         coin={(token1 && token1.symbol) || 'Select'}
+        logoURI={token1 && token1.logoURI}
         yuan="566.228"
         dollar={`${token1Balance}`}
         token={token1Amount}

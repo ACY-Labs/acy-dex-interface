@@ -377,54 +377,13 @@ const AddLiquidityComponent = props => {
       return prevFavTokenList;
     });
   };
-  const addLiquidityCallback = status => {
-    // 循环获取交易结果
-    //     dispatch({
-    //       type:'transaction/addTransaction',
-    //       payload:{
-    //         status:'交易完成',
-    //         transactions:[...transactions,receipt]
-    //       }
-    //     });
-    // let lists=[{
-    //   hash:status.hash,
-    //   receipt
-    // },
-    // {
-    //   hash:status.hash,
-    //   receipt
-    // }];
-    //     const sti = setInterval(() => {
-    //       library.getTransactionReceipt(status.hash).then(receipt => {
-    //         // receipt is not null when transaction is done
-    //         const {transaction:{transactions}}=props;
-    //         console.log('transactions',transactions);
-    //         if (receipt) {
-    //           clearInterval(sti);
-    //            dispatch({
-    //               type:'transaction/addTransaction',
-    //               payload:{
-    //                 status:'交易完成',
-    //                 transactions:[...transactions,receipt]
-    //               }
-    //             });
-    //         }
-    //         else{
-    //           dispatch({
-    //             type:'transaction/addTransaction',
-    //             payload:{
-    //               status:'交易中...'
-    //             }
-    //           });
-    //         }
-    //       });
-    //     }, 500);
-  };
+
   return (
     <div>
       <AcyCuarrencyCard
         icon="eth"
         title={token0BalanceShow && `Balance: ${parseFloat(token0Balance).toFixed(5)}`}
+        logoURI={token0 && token0.logoURI}
         coin={(token0 && token0.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token0Balance}`}
@@ -445,6 +404,7 @@ const AddLiquidityComponent = props => {
       <AcyCuarrencyCard
         icon="eth"
         title={token1BalanceShow && `Balance: ${parseFloat(token1Balance).toFixed(5)}`}
+        logoURI={token1 && token1.logoURI}
         coin={(token1 && token1.symbol) || 'Select'}
         yuan="566.228"
         dollar={`${token1Balance}`}

@@ -411,7 +411,7 @@ export async function signOrApprove(
         { name: 'verifyingContract', type: 'address' },
       ];
       const domain = {
-        name: 'Uniswap V2',
+        name: 'Acy V1',
         version: '1',
         chainId: chainId,
         verifyingContract: pair.liquidityToken.address,

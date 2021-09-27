@@ -133,11 +133,9 @@ export async function swapGetEstimated(
           parseUnits(inToken0Amount, inToken0Decimal)
         );
       } catch (e) {
-        console.log('this is wrong!');
-        console.log(e);
         setSwapButtonState(false);
         if (e.fault === 'underflow') setSwapButtonContent(e.fault);
-        else setSwapButtonContent('unknow error');
+        else setSwapButtonContent('Failed to get balance');
         return new CustomError(e.fault);
       }
 
@@ -148,12 +146,12 @@ export async function swapGetEstimated(
       // quit if user doesn't have enough balance, otherwise this will cause error
       if (!userHasSufficientBalance) {
         setSwapButtonState(false);
-        setSwapButtonContent('NOT enough balance');
-        return new CustomError('NOT enough balance');
+        setSwapButtonContent('Not enough balance');
+        return new CustomError('Not enough balance');
       }
       // setEstimatedStatus("change ETH to WETH");
       setSwapButtonState(true);
-      setSwapButtonContent('wrap');
+      setSwapButtonContent('Wrap');
 
       const wethContract = getContract(inToken1Address, WETHABI, library, account);
       let wrappedAmount;
@@ -168,8 +166,8 @@ export async function swapGetEstimated(
           setSwapButtonContent(e.fault);
           return new CustomError(e.fault);
         }
-        setSwapButtonContent('unknow error');
-        return new CustomError('unknow error');
+        setSwapButtonContent('Failed to parse amounts');
+        return new CustomError('Failed to parse amounts');
       }
 
       setWethContract(wethContract);
@@ -215,19 +213,19 @@ export async function swapGetEstimated(
           setSwapButtonContent(e.fault);
           return new CustomError(e.fault);
         }
-        setSwapButtonContent('unknow error');
-        return new CustomError('unknow error');
+        setSwapButtonContent('Failed to parse balance');
+        return new CustomError('Failed to parse balance');
       }
 
       // quit if user doesn't have enough balance, otherwise this will cause error
       if (!userHasSufficientBalance) {
         setSwapButtonState(false);
         setSwapButtonContent('Not enough balance');
-        return new CustomError('NOT enough balance');
+        return new CustomError('Not enough balance');
       }
 
       setSwapButtonState(true);
-      setSwapButtonContent('unwrap');
+      setSwapButtonContent('Unwrap');
 
       const wethContract = getContract(inToken0Address, WETHABI, library, account);
 
@@ -242,8 +240,8 @@ export async function swapGetEstimated(
           setSwapButtonContent(e.fault);
           return new CustomError(e.fault);
         }
-        setSwapButtonContent('unknow error');
-        return new CustomError('unknow error');
+        setSwapButtonContent('Failed to parse wrap amount');
+        return new CustomError('Failed to parse wrap amount');
       }
       setWethContract(wethContract);
       setWrappedAmount(wrappedAmount);
@@ -254,7 +252,7 @@ export async function swapGetEstimated(
       // });
       // return result;
 
-      return 'unwrap is ok';
+      return 'Unwrap is ok';
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 

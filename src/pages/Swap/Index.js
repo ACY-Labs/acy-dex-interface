@@ -19,7 +19,7 @@ import AcyPieChart from '@/components/AcyPieChartAlpha';
 import AcyRoutingChart from '@/components/AcyRoutingChart';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
-import {uniqueFun} from '@/utils/utils';
+import { uniqueFun } from '@/utils/utils';
 
 import SwapComponent from '@/components/SwapComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -80,20 +80,8 @@ class BasicProfile extends Component {
     activeTime: 'Loading...',
     activeRate: 'Loading...',
     activePercentageChange: '+0.00',
-    activeToken1: {
-      symbol: 'USDC',
-      address: '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b',
-      addressOnEth: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-      decimal: 6,
-      logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
-    },
-    activeToken0: {
-      symbol: 'ETH',
-      address: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
-      addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-      decimal: 18,
-      logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
-    },
+    activeToken1: supportedTokens[1],
+    activeToken0: supportedTokens[0],
     format: 'h:mm:ss a',
     routeData: [],
     isReceiptObtained: false,
@@ -107,20 +95,22 @@ class BasicProfile extends Component {
   };
 
   componentDidMount() {
-
     this.getPrice();
 
     // 还原存储的交易信息
-    const {transaction:{transactions},dispatch}=this.props;
-    let newData=[...transactions];
-    if(localStorage.getItem('transactions')){
-      newData.push(...JSON.parse(localStorage.getItem('transactions'))) 
+    const {
+      transaction: { transactions },
+      dispatch,
+    } = this.props;
+    let newData = [...transactions];
+    if (localStorage.getItem('transactions')) {
+      newData.push(...JSON.parse(localStorage.getItem('transactions')));
     }
     // 更新数据
     dispatch({
       type: 'transaction/addTransaction',
       payload: {
-        transactions: [...uniqueFun(newData,'hash')],
+        transactions: [...uniqueFun(newData, 'hash')],
       },
     });
   }
@@ -149,7 +139,8 @@ class BasicProfile extends Component {
 
     axios
       .post(
-        `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${activeToken1.addressOnEth
+        `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${
+          activeToken1.addressOnEth
         }&range=${range}`
       )
       .then(data => {
@@ -421,17 +412,16 @@ class BasicProfile extends Component {
           )}
         </div>
         <div className={styles.exchangeBottomWrapper}>
-          {this.state.isReceiptObtained &&
+          {this.state.isReceiptObtained && (
             <div className={styles.exchangeItem}>
               <h3>
                 <AcyIcon.MyIcon width={30} type="arrow" />
                 <span className={styles.span}>FLASH ROUTE</span>
-
               </h3>
               <div>
                 {this.state.isReceiptObtained ? (
-
-                  <AcyRoutingChart data={this.state.routeData} />) : (
+                  <AcyRoutingChart data={this.state.routeData} />
+                ) : (
                   <div
                     style={{
                       width: '100%',
@@ -445,13 +435,16 @@ class BasicProfile extends Component {
                 )}
               </div>
             </div>
-          }
+          )}
           <div className={styles.exchangeItem}>
             <h3>
               <AcyIcon.MyIcon width={30} type="arrow" />
               <span className={styles.span}>HISTORY TRANSACTION</span>
             </h3>
-            <StakeHistoryTable isMobile={isMobile} dataSource={transactions.filter(item=>item.inputTokenNum!=undefined)} />
+            <StakeHistoryTable
+              isMobile={isMobile}
+              dataSource={transactions.filter(item => item.inputTokenNum != undefined)}
+            />
           </div>
         </div>
 

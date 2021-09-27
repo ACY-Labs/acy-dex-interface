@@ -1,16 +1,8 @@
 export default [
   {
-    name: 'ACY',
-    symbol: 'ACY',
-    address: '0xd0da907ec2F98E23ecf75CA12b6C83744dFBDf30',
-    addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-    decimal: 18,
-    logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
-  },
-  {
-    name: 'Wrapped Ether',
+    name: 'Ether',
     symbol: 'ETH',
-    address: '0xE7DA759360Da493B110E8B16F764356A5Be8a1Dc',
+    address: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimal: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
@@ -23,6 +15,23 @@ export default [
     decimal: 6,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
   },
+  {
+    name: 'Wrapped Ether',
+    symbol: 'WETH',
+    address: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
+    addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    decimal: 18,
+    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
+  },
+  {
+    name: 'ACY',
+    symbol: 'ACY',
+    address: '0xd0da907ec2F98E23ecf75CA12b6C83744dFBDf30',
+    addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    decimal: 18,
+    logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
+  },
+
   {
     name: 'Uniswap',
     symbol: 'UNI',
