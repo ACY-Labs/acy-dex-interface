@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Breadcrumb, Button, Table, Icon, Dropdown, Menu } from 'antd';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import styles from './styles.less';
 import { AcyIcon, AcyTokenIcon, AcyPeriodTime, AcyAccountChart } from '@/components/Acy';
 import { abbrNumber, abbrHash, isDesktop, sortTable } from './Util';
@@ -11,6 +11,9 @@ import {
   dataSourceTransaction,
   graphSampleData,
 } from './SampleData.js';
+import FarmsTable from '@/pages/Farms/FarmsTable';
+import { useWeb3React } from '@web3-react/core';
+import { InjectedConnector } from '@web3-react/injected-connector';
 
 let samplePositionData = [
   {
@@ -261,7 +264,25 @@ function PositionDropdown({ positions, onHandleMenuClick }) {
 }
 
 function AccountInfo(props) {
+  const INITIAL_ROW_NUMBER = 5
   const [isWatchlist, setIsWatchlist] = useState(false);
+  const [tableRow, setTableRow] = useState([]);
+  const [rowNumber, setRowNumber] = useState(INITIAL_ROW_NUMBER);
+  const { account, chainId, library, activate } = useWeb3React();
+  const injected = new InjectedConnector({
+    supportedChainIds: [1, 3, 4, 5, 42, 80001],
+  });
+
+  const { address } = useParams()
+
+  useEffect(() => console.log('address', address), [address])
+
+  const onRowClick = index =>
+    setTableRow(prevState => {
+      const prevTableRow = [...prevState];
+      prevTableRow[index].hidden = !prevTableRow[index].hidden;
+      return prevTableRow;
+    });
 
   return (
     <div className={styles.marketRoot}>
@@ -344,8 +365,8 @@ function AccountInfo(props) {
           <div style={{height:"50vh"}}>
             <AcyAccountChart lineColor="#1e5d91"/>
           </div>
-            
-          
+
+
         </div>
       </div>
 
@@ -358,7 +379,23 @@ function AccountInfo(props) {
       {/* Farms */}
       <div className={styles.accountPageRow}>
         <h2>Farms</h2>
-        <emphasis>TBD</emphasis>
+        <FarmsTable
+          tableRow={tableRow}
+          onRowClick={onRowClick}
+          tableTitle="User Farms"
+          tableSubtitle="Stake your LP tokens and earn token rewards"
+          rowNumber={rowNumber}
+          setRowNumber={setRowNumber}
+          hideDao
+          selectedTable={0}
+          tokenFilter={{ liquidityToken: true, btcEthToken: true }}
+          setTokenFilter={() => {}}
+          walletConnected
+          connectWallet={() => activate(injected)}
+          account={address}
+          library={library}
+          chainId={chainId}
+        />
       </div>
 
       {/* transaction table */}
