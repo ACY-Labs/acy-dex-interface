@@ -4,12 +4,24 @@ import styles from '@/pages/Farms/Farms.less';
 
 import DatePicker from 'react-datepicker';
 import { AcySmallButtonGroup } from '@/components/AcySmallButton';
+import { useWeb3React } from '@web3-react/core';
+import { deposit } from '@/acy-dex-swap/core/farms';
 
-const StakeModal = ({ onCancel, isModalVisible, token1, token2, balance }) => {
+const StakeModal = ({
+  onCancel,
+  isModalVisible,
+  token1,
+  token2,
+  balance,
+  stakedTokenAddr,
+  poolId,
+}) => {
   const [date, setDate] = useState(new Date());
   const [selectedPresetDate, setSelectedPresetDate] = useState(null);
   const [stake, setStake] = useState(0);
   const [balancePercentage, setBalancePercentage] = useState(0);
+  const [buttonText, setButtonText] = useState('Stake');
+  const { account, chainId, library, activate } = useWeb3React();
 
   const updateStake = newStake => {
     let newStakeInt = newStake !== '' ? parseInt(newStake, 10) : '';
@@ -114,10 +126,10 @@ const StakeModal = ({ onCancel, isModalVisible, token1, token2, balance }) => {
           type="button"
           className={styles.stakeSubmitButton}
           onClick={async () => {
-            // deposit(stakedTokenAddr, stake, poolId, library, account);
+            deposit(stakedTokenAddr, stake, poolId, library, account, setButtonText);
           }}
         >
-          Stake
+          {buttonText}
         </button>
       </div>
     </AcyModal>

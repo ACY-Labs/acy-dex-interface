@@ -189,6 +189,8 @@ const FarmsTableRow = ({
         token1={token1}
         token2={token2}
         balance={balance}
+        poolId={poolId}
+        stakedTokenAddr={stakedTokenAddr}
       />
     </div>
   );

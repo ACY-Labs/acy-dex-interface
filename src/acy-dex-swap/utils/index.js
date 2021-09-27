@@ -12,7 +12,7 @@ import ERC20ABI from '../abis/ERC20.json';
 export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
 export const ROUTER_ADDRESS = '0x89563c65C3BE875D65d43470Aa22113d24eB3e2E';
-export const FARMS_ADDRESS = '0x7b028A293dA85097B98c5c9cbb076Fd58467b3f1';
+export const FARMS_ADDRESS = '0xf132Fdd642Afa79FDF6C1B77e787865C652eC824';
 
 // a custom error class for custom error text and handling
 export class CustomError {
@@ -302,14 +302,14 @@ export async function checkTokenIsApproved(tokenAddress, requiredAmount, library
   let allowance = await getAllowance(
     tokenAddress,
     account, // owner
-    ROUTER_ADDRESS, //spender
+    ROUTER_ADDRESS, // spender
     library, // provider
     account // active account
   );
 
   console.log('REQUIRED AMOUNT:');
   console.log(requiredAmount);
-  console.log(`ALLOWANCE FOR TOKEN ${tokenAddress}:`);
+  console.log(`ALLOWANCE FOR TOKEN ${tokenAddress}`);
   console.log(allowance);
   return allowance.gte(BigNumber.from(requiredAmount));
 }
@@ -330,6 +330,37 @@ export async function approveTokenWithSpender(tokenAddress, spender, library, ac
   const res = await tokenContract.approve(spender, MaxUint256, {
     gasLimit: calculateGasMargin(estimatedGas),
   });
+}
+
+export async function disapproveTokenWithSpender(tokenAddress, spender, library, account) {
+  const tokenContract = getContract(tokenAddress, ERC20ABI, library, account);
+  const estimatedGas = await tokenContract.estimateGas['approve'](spender, 0);
+
+  const res = await tokenContract.approve(spender, 0, {
+    gasLimit: calculateGasMargin(estimatedGas),
+  });
+}
+
+export async function checkTokenIsApprovedWithSpender(
+  tokenAddress,
+  spender,
+  requiredAmount,
+  library,
+  account
+) {
+  let allowance = await getAllowance(
+    tokenAddress,
+    account, // owner
+    spender, // spender
+    library, // provider
+    account // active account
+  );
+
+  console.log('REQUIRED AMOUNT:');
+  console.log(requiredAmount);
+  console.log(`ALLOWANCE FOR TOKEN ${tokenAddress}`);
+  console.log(allowance);
+  return allowance.gte(BigNumber.from(requiredAmount));
 }
 
 export async function checkUserHasSufficientLPBalance(lpTokenAddr, amount, library, account) {

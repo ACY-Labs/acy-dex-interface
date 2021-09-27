@@ -55,6 +55,7 @@ const Farms = () => {
 
         pools.forEach(pool => {
           const newFarmsContent = {
+            poolId: pool.poolId,
             lpTokens: pool.lpTokenAddress,
             token1: pool.token0Symbol,
             token1Logo: null,

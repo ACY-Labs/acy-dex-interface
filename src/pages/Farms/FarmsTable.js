@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '@/pages/Farms/Farms.less';
 import FarmsTableRow from '@/pages/Farms/FarmsTableRow';
 import FarmsTableHeader from '@/pages/Farms/FarmsTableHeader';
 import { graphSampleData, graphSampleData2 } from '@/pages/Dao/sample_data/SampleData';
 import DaoChart from './DaoChart';
 import AcyIcon from '@/assets/icon_acy.svg';
+import { approveTokenWithSpender, disapproveTokenWithSpender } from '@/acy-dex-swap/utils';
 
 const FarmsTable = ({
   tableRow,
@@ -55,6 +56,20 @@ const FarmsTable = ({
     functionDict[pt]();
   };
 
+  // useEffect(
+  //   () => {
+  //     if (!account || !library) return;
+  //     console.log(library, account);
+  //     disapproveTokenWithSpender(
+  //       '0x8c2a011ee757C78eB3570ed4e63bD86d64399b99',
+  //       '0xf132Fdd642Afa79FDF6C1B77e787865C652eC824',
+  //       library,
+  //       account
+  //     );
+  //   },
+  //   [library, account]
+  // );
+
   return (
     <div className={styles.tableContainer}>
       <FarmsTableHeader
@@ -66,29 +81,32 @@ const FarmsTable = ({
       />
       {hideDao ? (
         <div className={styles.tableBodyContainer}>
-          {tableRow.slice(0, rowNumber).map((content, index) => (
-            <FarmsTableRow
-              key={index}
-              index={index}
-              poolId={content.poolId}
-              stakedTokenAddr={content.lpTokens}
-              token1={content.token1}
-              token1Logo={content.token1Logo}
-              token2={content.token2}
-              token2Logo={content.token2Logo}
-              totalApr={content.totalApr}
-              tvl={content.tvl}
-              hidden={content.hidden}
-              rowClickHandler={() => onRowClick(index)}
-              pendingReward={content.pendingReward}
-              walletConnected={walletConnected}
-              connectWallet={connectWallet}
-              selectedTable={selectedTable}
-              account={account}
-              library={library}
-              chainId={chainId}
-            />
-          ))}
+          {tableRow.slice(0, rowNumber).map((content, index) => {
+            console.log(content);
+            return (
+              <FarmsTableRow
+                key={index}
+                index={index}
+                poolId={content.poolId}
+                stakedTokenAddr={content.lpTokens}
+                token1={content.token1}
+                token1Logo={content.token1Logo}
+                token2={content.token2}
+                token2Logo={content.token2Logo}
+                totalApr={content.totalApr}
+                tvl={content.tvl}
+                hidden={content.hidden}
+                rowClickHandler={() => onRowClick(index)}
+                pendingReward={content.pendingReward}
+                walletConnected={walletConnected}
+                connectWallet={connectWallet}
+                selectedTable={selectedTable}
+                account={account}
+                library={library}
+                chainId={chainId}
+              />
+            );
+          })}
         </div>
       ) : (
         <div className={styles.tableBodyContainer}>

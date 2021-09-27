@@ -4,9 +4,11 @@ import {
   getTokenContract,
   getPairContract,
   checkUserHasSufficientLPBalance,
-  checkTokenIsApproved,
+  checkTokenIsApprovedWithSpender,
   calculateGasMargin,
-  approve,
+  approveTokenWithSpender,
+  FARMS_ADDRESS,
+  CustomError,
 } from '@/acy-dex-swap/utils';
 
 // method to retrieve token symbol based on the given token address.
@@ -151,25 +153,37 @@ const getAllPools = async (library, account) => {
   });
 };
 
-const deposit = async (lpTokenAddr, amount, poolId, library, account) => {
+const deposit = async (lpTokenAddr, amount, poolId, library, account, setButtonText) => {
   console.log('--------- deposit arguments -------------');
   console.log(lpTokenAddr, amount, poolId);
   let status = await (async () => {
     const contract = getFarmsContract(library, account);
     const depositTokenContract = getTokenContract(lpTokenAddr, library, account);
-    const hasBalance = checkUserHasSufficientLPBalance(lpTokenAddr, amount, library, account);
-    const approved = checkTokenIsApproved(lpTokenAddr, amount, library, account);
-    if (!hasBalance) return new CustomError(`Insufficient balance`);
+    // const hasBalance = checkUserHasSufficientLPBalance(lpTokenAddr, amount, library, account);
+
+    // if (!hasBalance) return new CustomError(`Insufficient balance`);
 
     const tokenDecimals = await depositTokenContract.decimals();
-    const depositAmount = parseUnits(amount, tokenDecimals).toString();
+    const depositAmount = parseUnits(amount.toString(), tokenDecimals).toString();
+    const approved = await checkTokenIsApprovedWithSpender(
+      lpTokenAddr,
+      FARMS_ADDRESS,
+      depositAmount,
+      library,
+      account
+    );
+
+    console.log(`Approval: ${approved}`);
 
     if (!approved) {
-      approve(lpTokenAddr, depositAmount, library, account);
-      return new CustomError(`Please approve your tokens first`);
+      setButtonText('Approval required');
+      approveTokenWithSpender(lpTokenAddr, FARMS_ADDRESS, library, account);
+      return new CustomError(`Try again`);
     }
 
     let args = [poolId, depositAmount];
+
+    console.log(args);
     const options = {};
     let result = await contract.estimateGas['deposit'](...args, options)
       .then(gasEstimate => {
@@ -186,6 +200,7 @@ const deposit = async (lpTokenAddr, amount, poolId, library, account) => {
 
   if (status instanceof CustomError) {
     console.log(status.getErrorText());
+    setButtonText(status.getErrorText());
   } else {
     console.log(status);
   }
