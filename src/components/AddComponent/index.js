@@ -382,6 +382,10 @@ const AddLiquidityComponent = props => {
     });
   };
 
+  const addLiquidityCallback = status => {
+    console.log(status);
+  };
+
   return (
     <div>
       <AcyCuarrencyCard
