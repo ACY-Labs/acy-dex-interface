@@ -17,7 +17,7 @@ import {
   TransactionType,
 } from './Util.js';
 import { WatchlistManager } from './WatchlistManager.js';
-import { marketClient, fetchTokenSearch } from './Data';
+import { marketClient, fetchTokenSearch, fetchPoolSearch } from './Data';
 
 const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');
@@ -883,6 +883,7 @@ export const MarketSearchBar = props => {
   const [watchlistToken, setWatchlistToken] = useState([]);
   const [watchlistPool, setWatchlistPool] = useState([]);
   const [, update] = useState();
+  const [isLoading, setIsLoading] = useState(false)
 
   const networkOptions = [
     {
@@ -943,25 +944,31 @@ export const MarketSearchBar = props => {
     setSearchQuery(e.target.value);
 
     lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
-      console.log(data);
       setSearchCoinReturns(
         data.map(item => {
           return { address: item.id, name: item.name, short: item.symbol };
         })
       );
+      lastPromiseWrapper(fetchPoolSearch(marketClient, e.target.value, data.map(item => item.id))).then(pooldata => {
+        setSearchPoolReturns(
+          pooldata.map(item => {
+            return { address: item.id, coin1:item.token0, coin2: item.token1, percent: 0};
+          })
+        );
+      });
     });
 
-    let query = e.target.value.toLowerCase();
+    // let query = e.target.value.toLowerCase();
 
-    // coins return
-    let newCoin = props.dataSourceCoin.filter(
-      item => item.name.toLowerCase().includes(query) || item.short.toLowerCase().includes(query)
-    );
-    // setSearchCoinReturns(newCoin);
-    let newPool = props.dataSourcePool.filter(
-      item => item.coin1.toLowerCase().includes(query) || item.coin2.toLowerCase().includes(query)
-    );
-    setSearchPoolReturns(newPool);
+    // // coins return
+    // let newCoin = props.dataSourceCoin.filter(
+    //   item => item.name.toLowerCase().includes(query) || item.short.toLowerCase().includes(query)
+    // );
+    // // setSearchCoinReturns(newCoin);
+    // let newPool = props.dataSourcePool.filter(
+    //   item => item.coin1.toLowerCase().includes(query) || item.coin2.toLowerCase().includes(query)
+    // );
+    // setSearchPoolReturns(newPool);
   });
 
   const onScroll = e => {
@@ -1016,7 +1023,17 @@ export const MarketSearchBar = props => {
           return { address: item.id, name: item.name, short: item.symbol };
         })
       );
+
+      lastPromiseWrapper(fetchPoolSearch(marketClient, "", data.map(item => item.id))).then(pooldata => {
+        setSearchPoolReturns(
+          pooldata.map(item => {
+            return { address: item.id, coin1:item.token0, coin2: item.token1, percent: 0};
+          })
+        );
+      });
     });
+
+    
 
     refreshWatchlist();
 

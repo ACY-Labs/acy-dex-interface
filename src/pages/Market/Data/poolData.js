@@ -1,23 +1,23 @@
-import { GET_TOP_POOL, GET_POOL_DAY_DATA, GET_POOL_INFO } from './query';
+import { GET_TOP_POOL, GET_POOL_DAY_DATA, GET_POOL_INFO, POOL_SEARCH } from './query';
 import { convertPoolForList } from './util';
-import {getBlockFromTimestamp} from './blocks'
+import { getBlockFromTimestamp } from './blocks';
+import { sortTable } from '../Util';
 
-export async function fetchPoolInfo(client, address, timestamp){
-
-  const block = await getBlockFromTimestamp(timestamp)
+export async function fetchPoolInfo(client, address, timestamp) {
+  const block = await getBlockFromTimestamp(timestamp);
 
   const { loading, error, data } = await client.query({
     query: GET_POOL_INFO,
     variables: {
       pairAddress: address,
-      block: parseInt(block.number)
+      block: parseInt(block.number),
     },
   });
 
   if (loading) return null;
   if (error) return `Error! ${error}`;
 
-  console.log(data)
+  console.log(data);
 
   return data.pairs[0];
 }
@@ -63,7 +63,7 @@ export async function fetchGeneralPoolInfoDay(client) {
       let weekDatas = rawWeekDatas;
       let weekDataLength = weekDatas.length;
       let volume7d = 0;
-      
+
       for (let i = 0; i < weekDataLength; i++) {
         volume7d += parseFloat(weekDatas[i].dailyVolumeUSD);
       }
@@ -78,6 +78,31 @@ export async function fetchGeneralPoolInfoDay(client) {
 }
 
 // get pools from string (search)
+export async function fetchPoolSearch(client, searchQuery, tokens) {
+  const { loading, error, data } = await client.query({
+    query: POOL_SEARCH,
+    variables: {
+      tokens: tokens,
+      id: searchQuery,
+    },
+  });
+
+  if (loading) return null;
+  if (error) return `Error! ${error}`;
+
+  return sortTable(
+    [...data.asAddress, ...data.as0, ...data.as1]
+      .filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)
+      .map(item => ({
+        id: item.id,
+        token0: item.token0.symbol,
+        token1: item.token1.symbol,
+        txCount: parseInt(item.txCount),
+      })),
+    'txCount',
+    true
+  );
+}
 
 // get individual pool info from id
 

@@ -253,6 +253,7 @@ export const POOL_SEARCH = gql`
         symbol
         name
       }
+      txCount
     }
     as1: pairs(where: { token1_in: $tokens }) {
       id
@@ -266,6 +267,7 @@ export const POOL_SEARCH = gql`
         symbol
         name
       }
+      txCount
     }
     asAddress: pairs(where: { id: $id }) {
       id
@@ -279,6 +281,7 @@ export const POOL_SEARCH = gql`
         symbol
         name
       }
+      txCount
     }
   }
 `;

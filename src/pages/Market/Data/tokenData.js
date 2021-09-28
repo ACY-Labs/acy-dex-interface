@@ -112,8 +112,6 @@ export async function fetchTokenSearch(client, searchQuery) {
         id: item.id,
         name: item.name,
         symbol: item.symbol,
-        totalLiquidity: parseFloat(item.totalLiquidity),
-        tradeVolume: parseFloat(item.tradeVolume),
         txCount: parseInt(item.txCount)
       })),
     'txCount',

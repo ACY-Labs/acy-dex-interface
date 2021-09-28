@@ -1,7 +1,7 @@
 import {fetchMarketData} from './marketData'
 import {fetchGlobalTransaction, fetchFilteredTransaction} from './txData'
 import {fetchGeneralTokenInfo, fetchTokenDayData, fetchTokenInfo, fetchTokenSearch} from './tokenData'
-import {fetchGeneralPoolInfoDay, fetchPoolDayData, fetchPoolInfo} from './poolData'
+import {fetchGeneralPoolInfoDay, fetchPoolDayData, fetchPoolInfo, fetchPoolSearch} from './poolData'
 import {getBlocksFromTimestamps} from './blocks'
 import {marketClient} from './client'
 
@@ -16,7 +16,8 @@ const DataFetch = {
     fetchFilteredTransaction,
     fetchPoolInfo,
     fetchTokenInfo,
-    fetchTokenSearch
+    fetchTokenSearch,
+    fetchPoolSearch
 }
 
 export {
@@ -31,5 +32,6 @@ export {
     fetchFilteredTransaction,
     fetchPoolInfo,
     fetchTokenInfo,
-    fetchTokenSearch
+    fetchTokenSearch,
+    fetchPoolSearch
 }
