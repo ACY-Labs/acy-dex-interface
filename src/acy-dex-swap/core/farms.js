@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import {
   getFarmsContract,
@@ -108,11 +109,23 @@ const getAllPools = async (library, account) => {
         );
 
         // retrieve lp tokens symbol.
-        const lpTokenContract = await getPairContract(poolInfo[0], library, account);
-        const token0 = await lpTokenContract.token0();
-        const token1 = await lpTokenContract.token1();
+
+        let token0;
+        let token1;
+
+        try {
+          const lpTokenContract = await getPairContract(poolInfo[0], library, account);
+          token0 = await lpTokenContract.token0();
+          token1 = await lpTokenContract.token1();
+        } catch (e) {
+          // not a lp token, maybe a single token?
+          token0 = poolInfo[0];
+          token1 = null;
+        }
+
+        console.log(`lp tokens symbol OK`);
         const token0Symbol = await getTokenSymbol(token0, library, account);
-        const token1Symbol = await getTokenSymbol(token1, library, account);
+        const token1Symbol = token1 === null ? '' : await getTokenSymbol(token1, library, account);
 
         // first store all the positions that the user staked in the pool in this iteration.
         // positions returned from getUserPositions are in the base of hex,
