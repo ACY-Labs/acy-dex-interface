@@ -74,21 +74,18 @@ function MarketPoolInfo(props) {
 
   const toggleWatchlist = data => {
     let oldArray = watchlistManagerPool.getData();
-    if (oldArray.toString().includes(data.toString())) {
-      oldArray = oldArray.filter(
-        item => !(item[0] == data[0] && item[1] == data[1]) && item[2] == data[2]
-      );
-      setIsWatchlist(false);
-    } else {
-      oldArray.push(data);
-      setIsWatchlist(true);
-    }
-    watchlistManagerPool.saveData(oldArray);
+      if (oldArray.includes(data)) {
+        oldArray = oldArray.filter(item => item != data);
+      } else {
+        oldArray.push(data);
+      }
+      watchlistManagerPool.saveData(oldArray);
+      updateWatchlistStatus();
   };
 
   const updateWatchlistStatus = () => {
     let data = watchlistManagerPool.getData();
-    if (data.toString() == [poolData.coin1, poolData.coin2, poolData.percent].toString())
+    if (data.includes(address))
       setIsWatchlist(true);
     else setIsWatchlist(false);
   };
@@ -239,7 +236,7 @@ function MarketPoolInfo(props) {
                 name={isWatchlist ? 'star_active' : 'star'}
                 width={16}
                 style={{ marginLeft: '10px' }}
-                onClick={() => toggleWatchlist([poolData.coin1, poolData.coin2, poolData.percent])}
+                onClick={() => toggleWatchlist(address)}
               />
               <AcyIcon
                 name="redirect"
