@@ -3,6 +3,7 @@ import {
   GET_TOKEN_LIST,
   GET_TOKEN_DAY_SIMPLE,
   GET_TOKEN_INFO,
+  GET_TOKEN_FROM_ID,
   TOKEN_SEARCH,
 } from './query';
 import { convertTokenForList } from './util';
@@ -120,5 +121,19 @@ export async function fetchTokenSearch(client, searchQuery) {
 }
 
 // fetch individual token info from id
+export async function fetchTokensFromId(client, id){
+  const { loading, error, data } = await client.query({
+    query: GET_TOKEN_FROM_ID,
+    variables: {
+      id: id,
+    },
+  });
+
+  if (loading) return null;
+  if (error) return `Error! ${error}`;
+
+  return data
+
+}
 
 // fetch individual token history

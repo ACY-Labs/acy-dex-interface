@@ -1,4 +1,10 @@
-import { GET_TOP_POOL, GET_POOL_DAY_DATA, GET_POOL_INFO, POOL_SEARCH } from './query';
+import {
+  GET_TOP_POOL,
+  GET_POOL_DAY_DATA,
+  GET_POOL_INFO,
+  POOL_SEARCH,
+  GET_POOL_FROM_ID,
+} from './query';
 import { convertPoolForList } from './util';
 import { getBlockFromTimestamp } from './blocks';
 import { sortTable } from '../Util';
@@ -105,6 +111,19 @@ export async function fetchPoolSearch(client, searchQuery, tokens) {
 }
 
 // get individual pool info from id
+export async function fetchPoolsFromId(client, id) {
+  const { loading, error, data } = await client.query({
+    query: GET_POOL_FROM_ID,
+    variables: {
+      id: id,
+    },
+  });
+
+  if (loading) return null;
+  if (error) return `Error! ${error}`;
+
+  return data;
+}
 
 // get individual pool info from token
 

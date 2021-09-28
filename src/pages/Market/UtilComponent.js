@@ -17,7 +17,13 @@ import {
   TransactionType,
 } from './Util.js';
 import { WatchlistManager } from './WatchlistManager.js';
-import { marketClient, fetchTokenSearch, fetchPoolSearch } from './Data';
+import {
+  marketClient,
+  fetchTokenSearch,
+  fetchPoolSearch,
+  fetchTokensFromId,
+  fetchPoolsFromId,
+} from './Data';
 
 const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');
@@ -56,10 +62,8 @@ export class SmallTable extends React.Component {
 
     if (mode == 'pool') {
       let oldArray = watchlistManagerPool.getData();
-      if (oldArray.toString().includes(data.toString())) {
-        oldArray = oldArray.filter(
-          item => !(item[0] == data[0] && item[1] == data[1] && item[2] == data[2])
-        );
+      if (oldArray.includes(data)) {
+        oldArray = oldArray.filter(item => item != data);
       } else {
         oldArray.push(data);
       }
@@ -102,11 +106,11 @@ export class SmallTable extends React.Component {
           </Link>
           <span className={styles.coinShort}> ({entry.name})</span>
           <AcyIcon
-            name={watchlistManagerToken.getData().includes(entry.short) ? 'star_active' : 'star'}
+            name={watchlistManagerToken.getData().includes(entry.address) ? 'star_active' : 'star'}
             width={14}
             style={{ marginLeft: '0.5rem' }}
             onClick={() => {
-              this.toggleWatchlist('token', entry.short);
+              this.toggleWatchlist('token', entry.address);
             }}
           />
         </div>
@@ -137,14 +141,14 @@ export class SmallTable extends React.Component {
               watchlistManagerPool
                 .getData()
                 .toString()
-                .includes([entry.coin1, entry.coin2, entry.percent].toString())
+                .includes(entry.address)
                 ? 'star_active'
                 : 'star'
             }
             width={14}
             style={{ marginLeft: '0.5rem' }}
             onClick={() => {
-              this.toggleWatchlist('pool', [entry.coin1, entry.coin2, entry.percent]);
+              this.toggleWatchlist('pool', entry.address);
             }}
           />
         </div>
@@ -941,7 +945,7 @@ export const MarketSearchBar = props => {
   });
 
   const onInput = useCallback(e => {
-    setIsLoading(true)
+    setIsLoading(false);
     setSearchQuery(e.target.value);
 
     lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
@@ -958,7 +962,7 @@ export const MarketSearchBar = props => {
             return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
           })
         );
-        setIsLoading(false)
+        setIsLoading(false);
       });
     });
 
@@ -987,16 +991,24 @@ export const MarketSearchBar = props => {
     let tokenWatchlistData = watchlistManagerToken.getData();
     let poolWatchlistData = watchlistManagerPool.getData();
 
-    let newWatchlistToken = props.dataSourceCoin.filter(item =>
-      tokenWatchlistData.includes(item.short)
-    );
-    let newWatchlistPool = props.dataSourcePool.filter(item =>
-      poolWatchlistData.toString().includes([item.coin1, item.coin2, item.percent].toString())
-    );
+    // fetch the data here
+    fetchTokensFromId(marketClient, tokenWatchlistData).then(data => {
+      setWatchlistToken(
+        data.tokens.map(item => ({ address: item.id, name: item.name, short: item.symbol }))
+      );
+    });
 
-    // console.log(newWatchlistToken)
-    setWatchlistToken([...newWatchlistToken]);
-    setWatchlistPool([...newWatchlistPool]);
+    fetchPoolsFromId(marketClient, poolWatchlistData).then(data => {
+      setWatchlistPool(
+        data.pairs.map(item => ({ address: item.id, coin1: item.token0.symbol, coin2: item.token1.symbol, percent: 0 }))
+      );
+     })
+
+    // let newWatchlistPool = props.dataSourcePool.filter(item =>
+    //   poolWatchlistData.toString().includes([item.coin1, item.coin2, item.percent].toString())
+    // );
+
+    // setWatchlistPool([...newWatchlistPool]);
     // update()
 
     if (props.refreshWatchlist) props.refreshWatchlist();
@@ -1020,7 +1032,21 @@ export const MarketSearchBar = props => {
     let contentRoot = ReactDOM.findDOMNode(rootRef.current).parentNode.parentNode;
     contentRoot.addEventListener('scroll', onScroll);
 
-    setIsLoading(true)
+    setIsLoading(true);
+
+
+    // get data corresponding to the watchlist
+    fetchTokensFromId(marketClient, watchlistManagerToken.getData()).then(data => {
+      setWatchlistToken(
+        data.tokens.map(item => ({ address: item.id, name: item.name, short: item.symbol }))
+      );
+    });
+
+    fetchPoolsFromId(marketClient, watchlistManagerPool.getData()).then(data => {
+      setWatchlistPool(
+        data.pairs.map(item => ({ address: item.id, coin1: item.token0.symbol, coin2: item.token1.symbol, percent: 0 }))
+      );
+     })
 
     lastPromiseWrapper(fetchTokenSearch(marketClient, '')).then(data => {
       console.log(data);
@@ -1037,7 +1063,7 @@ export const MarketSearchBar = props => {
               return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
             })
           );
-          setIsLoading(false)
+          setIsLoading(false);
         }
       );
     });

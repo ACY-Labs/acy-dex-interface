@@ -202,6 +202,30 @@ export const GET_POOL_DAY_DATA = gql`
   }
 `;
 
+export const GET_TOKEN_FROM_ID = gql`
+  query tokens($id: [Bytes]!) {
+    tokens(where: { id_in: $id }, orderDirection: asc) {
+      id
+      name
+      symbol
+    }
+  }
+`;
+
+export const GET_POOL_FROM_ID = gql`
+  query pairs($id: [Bytes]!) {
+    pairs(where: { id_in: $id }, orderDirection: asc) {
+      id
+      token0 {
+        symbol
+      }
+      token1 {
+        symbol
+      }
+    }
+  }
+`;
+
 export const TOKEN_SEARCH = gql`
   query tokens($value: String, $id: String) {
     asSymbol: tokens(
