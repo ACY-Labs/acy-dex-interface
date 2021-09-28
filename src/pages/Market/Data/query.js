@@ -60,6 +60,11 @@ export const GET_TOKEN_DAY_SIMPLE = gql`
   query tokenDayDatas($tokenId: ID!) {
     tokenDayDatas(first: 2, orderBy: date, orderDirection: desc, where: { token: $tokenId }) {
       id
+      token {
+        id
+        name
+        symbol
+      }
       date
       priceUSD
       totalLiquidityToken
@@ -195,9 +200,39 @@ export const GET_POOL_DAY_DATA = gql`
       where: { pairAddress: $pairAddress }
     ) {
       id
+      token0 {
+        symbol
+      }
+      token1 {
+        symbol
+      }
       date
       dailyVolumeUSD
       reserveUSD
+    }
+  }
+`;
+
+export const GET_TOKEN_FROM_ID = gql`
+  query tokens($id: [Bytes]!) {
+    tokens(where: { id_in: $id }, orderDirection: asc) {
+      id
+      name
+      symbol
+    }
+  }
+`;
+
+export const GET_POOL_FROM_ID = gql`
+  query pairs($id: [Bytes]!) {
+    pairs(where: { id_in: $id }, orderDirection: asc) {
+      id
+      token0 {
+        symbol
+      }
+      token1 {
+        symbol
+      }
     }
   }
 `;
@@ -213,6 +248,8 @@ export const TOKEN_SEARCH = gql`
       symbol
       name
       totalLiquidity
+      tradeVolume
+      txCount
     }
     asName: tokens(
       where: { name_contains: $value }
@@ -223,12 +260,16 @@ export const TOKEN_SEARCH = gql`
       symbol
       name
       totalLiquidity
+      tradeVolume
+      txCount
     }
     asAddress: tokens(where: { id: $id }, orderBy: totalLiquidity, orderDirection: desc) {
       id
       symbol
       name
       totalLiquidity
+      tradeVolume
+      txCount
     }
   }
 `;
@@ -247,6 +288,7 @@ export const POOL_SEARCH = gql`
         symbol
         name
       }
+      txCount
     }
     as1: pairs(where: { token1_in: $tokens }) {
       id
@@ -260,6 +302,7 @@ export const POOL_SEARCH = gql`
         symbol
         name
       }
+      txCount
     }
     asAddress: pairs(where: { id: $id }) {
       id
@@ -273,6 +316,7 @@ export const POOL_SEARCH = gql`
         symbol
         name
       }
+      txCount
     }
   }
 `;

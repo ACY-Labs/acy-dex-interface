@@ -76,6 +76,7 @@
     "numeral": "^2.0.6",
     "nzh": "^1.0.3",
     "omit.js": "^1.0.0",
+    "only-last-promise": "^1.0.0",
     "path-to-regexp": "^2.4.0",
     "prop-types": "^15.5.10",
     "qs": "^6.6.0",

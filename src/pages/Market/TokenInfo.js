@@ -84,7 +84,7 @@ function MarketTokenInfo(props) {
 
   const updateWatchlistStatus = () => {
     let data = watchlistManagerToken.getData();
-    if (data.includes(tokenData.short)) setIsWatchlist(true);
+    if (data.includes(address)) setIsWatchlist(true);
     else setIsWatchlist(false);
   };
 
@@ -313,7 +313,7 @@ function MarketTokenInfo(props) {
                 name={isWatchlist ? 'star_active' : 'star'}
                 style={{ marginLeft: '10px' }}
                 width={16}
-                onClick={() => toggleWatchlist(tokenData.short)}
+                onClick={() => toggleWatchlist(address)}
               />
               {/* <AcyIcon name="cmc" style={{ marginLeft: '10px' }} width={16} /> */}
               <AcyIcon
