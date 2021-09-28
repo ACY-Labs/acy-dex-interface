@@ -60,6 +60,11 @@ export const GET_TOKEN_DAY_SIMPLE = gql`
   query tokenDayDatas($tokenId: ID!) {
     tokenDayDatas(first: 2, orderBy: date, orderDirection: desc, where: { token: $tokenId }) {
       id
+      token {
+        id
+        name
+        symbol
+      }
       date
       priceUSD
       totalLiquidityToken

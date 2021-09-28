@@ -6,6 +6,7 @@ import {
   fetchTokenInfo,
   fetchTokenSearch,
   fetchTokensFromId,
+  fetchTokenDaySimple
 } from './tokenData';
 import {
   fetchGeneralPoolInfoDay,
@@ -32,6 +33,7 @@ const DataFetch = {
   fetchPoolSearch,
   fetchTokensFromId,
   fetchPoolsFromId,
+  fetchTokenDaySimple
 };
 
 export {
@@ -50,4 +52,5 @@ export {
   fetchPoolSearch,
   fetchTokensFromId,
   fetchPoolsFromId,
+  fetchTokenDaySimple
 };
