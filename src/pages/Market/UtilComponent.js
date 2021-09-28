@@ -92,7 +92,7 @@ export class SmallTable extends React.Component {
     if (this.state.mode == 'token') {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyTokenIcon symbol={entry.short}  width={20}></AcyTokenIcon>
+          <AcyTokenIcon symbol={entry.short} width={20} />
           <Link
             style={{ color: '#b5b5b6' }}
             className={styles.coinName}
@@ -114,8 +114,8 @@ export class SmallTable extends React.Component {
     } else {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyTokenIcon symbol={entry.coin1}  width={20}></AcyTokenIcon>
-          <AcyTokenIcon symbol={entry.coin2}  width={20}></AcyTokenIcon>
+          <AcyTokenIcon symbol={entry.coin1} width={20} />
+          <AcyTokenIcon symbol={entry.coin2} width={20} />
           <Link
             style={{ color: '#b5b5b6' }}
             className={styles.coinName}
@@ -883,7 +883,7 @@ export const MarketSearchBar = props => {
   const [watchlistToken, setWatchlistToken] = useState([]);
   const [watchlistPool, setWatchlistPool] = useState([]);
   const [, update] = useState();
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const networkOptions = [
     {
@@ -941,6 +941,7 @@ export const MarketSearchBar = props => {
   });
 
   const onInput = useCallback(e => {
+    setIsLoading(true)
     setSearchQuery(e.target.value);
 
     lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
@@ -949,12 +950,15 @@ export const MarketSearchBar = props => {
           return { address: item.id, name: item.name, short: item.symbol };
         })
       );
-      lastPromiseWrapper(fetchPoolSearch(marketClient, e.target.value, data.map(item => item.id))).then(pooldata => {
+      lastPromiseWrapper(
+        fetchPoolSearch(marketClient, e.target.value, data.map(item => item.id))
+      ).then(pooldata => {
         setSearchPoolReturns(
           pooldata.map(item => {
-            return { address: item.id, coin1:item.token0, coin2: item.token1, percent: 0};
+            return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
           })
         );
+        setIsLoading(false)
       });
     });
 
@@ -1015,25 +1019,28 @@ export const MarketSearchBar = props => {
   useEffect(() => {
     let contentRoot = ReactDOM.findDOMNode(rootRef.current).parentNode.parentNode;
     contentRoot.addEventListener('scroll', onScroll);
-    
-    lastPromiseWrapper(fetchTokenSearch(marketClient, "")).then(data => {
-      console.log(data)
+
+    setIsLoading(true)
+
+    lastPromiseWrapper(fetchTokenSearch(marketClient, '')).then(data => {
+      console.log(data);
       setSearchCoinReturns(
         data.map(item => {
           return { address: item.id, name: item.name, short: item.symbol };
         })
       );
 
-      lastPromiseWrapper(fetchPoolSearch(marketClient, "", data.map(item => item.id))).then(pooldata => {
-        setSearchPoolReturns(
-          pooldata.map(item => {
-            return { address: item.id, coin1:item.token0, coin2: item.token1, percent: 0};
-          })
-        );
-      });
+      lastPromiseWrapper(fetchPoolSearch(marketClient, '', data.map(item => item.id))).then(
+        pooldata => {
+          setSearchPoolReturns(
+            pooldata.map(item => {
+              return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
+            })
+          );
+          setIsLoading(false)
+        }
+      );
     });
-
-    
 
     refreshWatchlist();
 
@@ -1135,31 +1142,44 @@ export const MarketSearchBar = props => {
                   >
                     <AcyTabs>
                       <AcyTabPane tab="Search" key="1">
-                        {searchCoinReturns.length > 0 ? (
-                          <SmallTable
-                            mode="token"
-                            data={searchCoinReturns}
-                            displayNumber={displayNumber}
-                            refreshWatchlist={refreshWatchlist}
-                          />
+                        {isLoading ? (
+                          <Icon type="loading" />
                         ) : (
-                          <div style={{ fontSize: '16x', margin: '20px' }}>No results</div>
+                          <>
+                            {searchCoinReturns.length > 0 ? (
+                              <SmallTable
+                                mode="token"
+                                data={searchCoinReturns}
+                                displayNumber={displayNumber}
+                                refreshWatchlist={refreshWatchlist}
+                              />
+                            ) : (
+                              <div style={{ fontSize: '16x', margin: '20px' }}>No results</div>
+                            )}
+                          </>
                         )}
+
                         <Divider className={styles.searchModalDivider} />
-                        {searchPoolReturns.length > 0 ? (
-                          <SmallTable
-                            mode="pool"
-                            data={searchPoolReturns}
-                            displayNumber={displayNumber}
-                            refreshWatchlist={refreshWatchlist}
-                          />
+                        {isLoading ? (
+                          <Icon type="loading" />
                         ) : (
-                          <div
-                            style={{ fontSize: '20px', margin: '20px' }}
-                            refreshWatchlist={refreshWatchlist}
-                          >
-                            No results
-                          </div>
+                          <>
+                            {searchPoolReturns.length > 0 ? (
+                              <SmallTable
+                                mode="pool"
+                                data={searchPoolReturns}
+                                displayNumber={displayNumber}
+                                refreshWatchlist={refreshWatchlist}
+                              />
+                            ) : (
+                              <div
+                                style={{ fontSize: '20px', margin: '20px' }}
+                                refreshWatchlist={refreshWatchlist}
+                              >
+                                No results
+                              </div>
+                            )}
+                          </>
                         )}
                       </AcyTabPane>
                       <AcyTabPane tab="Watchlist" key="2">
