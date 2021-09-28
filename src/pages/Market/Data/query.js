@@ -195,6 +195,12 @@ export const GET_POOL_DAY_DATA = gql`
       where: { pairAddress: $pairAddress }
     ) {
       id
+      token0 {
+        symbol
+      }
+      token1 {
+        symbol
+      }
       date
       dailyVolumeUSD
       reserveUSD
