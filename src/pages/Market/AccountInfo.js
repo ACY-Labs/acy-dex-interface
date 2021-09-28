@@ -62,9 +62,9 @@ function PositionTable({ data }) {
               <div>{`${entry.token0} / ${entry.token1}`}</div>
               <div style={{ height: 5 }} />
               <div style={{ display: 'flex' }}>
-                <Button className={styles.posTableInnerButton}>Add</Button>
+                <Button className={styles.posTableInnerButton} style={{background: "#2e3032"}}>Add</Button>
                 <div style={{ width: 5 }} />
-                <Button className={styles.posTableInnerButton}>Remove</Button>
+                <Button className={styles.posTableInnerButton} style={{background: "#2e3032"}}>Remove</Button>
               </div>
             </div>
           </div>
