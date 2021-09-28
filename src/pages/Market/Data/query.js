@@ -213,6 +213,8 @@ export const TOKEN_SEARCH = gql`
       symbol
       name
       totalLiquidity
+      tradeVolume
+      txCount
     }
     asName: tokens(
       where: { name_contains: $value }
@@ -223,12 +225,16 @@ export const TOKEN_SEARCH = gql`
       symbol
       name
       totalLiquidity
+      tradeVolume
+      txCount
     }
     asAddress: tokens(where: { id: $id }, orderBy: totalLiquidity, orderDirection: desc) {
       id
       symbol
       name
       totalLiquidity
+      tradeVolume
+      txCount
     }
   }
 `;

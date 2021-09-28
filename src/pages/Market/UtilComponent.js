@@ -4,6 +4,7 @@ import { Divider, Icon, Input, Table } from 'antd';
 import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
+import onlyLastPromise, { DiscardSignal } from 'only-last-promise';
 import ReactDOM from 'react-dom';
 import { Link, useHistory } from 'react-router-dom';
 import styles from './styles.less';
@@ -16,10 +17,12 @@ import {
   TransactionType,
 } from './Util.js';
 import { WatchlistManager } from './WatchlistManager.js';
+import { marketClient, fetchTokenSearch } from './Data';
 
 const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');
 const watchlistManagerPool = new WatchlistManager('pool');
+const lastPromiseWrapper = onlyLastPromise();
 
 export class SmallTable extends React.Component {
   constructor(props) {
@@ -89,7 +92,7 @@ export class SmallTable extends React.Component {
     if (this.state.mode == 'token') {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyIcon name={entry.short.toLowerCase()} width={20} height={20} />
+          <AcyTokenIcon symbol={entry.short}  width={20}></AcyTokenIcon>
           <Link
             style={{ color: '#b5b5b6' }}
             className={styles.coinName}
@@ -111,8 +114,8 @@ export class SmallTable extends React.Component {
     } else {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyIcon name={entry.coin1.toLowerCase()} width={20} height={20} />
-          <AcyIcon name={entry.coin2.toLowerCase()} width={20} height={20} />
+          <AcyTokenIcon symbol={entry.coin1}  width={20}></AcyTokenIcon>
+          <AcyTokenIcon symbol={entry.coin2}  width={20}></AcyTokenIcon>
           <Link
             style={{ color: '#b5b5b6' }}
             className={styles.coinName}
@@ -151,7 +154,7 @@ export class SmallTable extends React.Component {
     return (
       <tr className={styles.smallTableRow}>
         <td className={styles.smallTableBody}>{content}</td>
-        <td
+        {/* <td
           className={styles.smallTableBody}
           style={{ display: isDesktop() == true ? 'table-cell' : 'none' }}
         >
@@ -168,7 +171,7 @@ export class SmallTable extends React.Component {
           style={{ display: isDesktop() == true ? 'table-cell' : 'none' }}
         >
           $ {this.state.mode == 'token' ? abbrNumber(entry.price) : abbrNumber(entry.tvl)}
-        </td>
+        </td> */}
       </tr>
     );
   };
@@ -179,9 +182,9 @@ export class SmallTable extends React.Component {
         <tbody>
           <tr className={styles.smallTableRow}>
             <td className={styles.smallTableHeader}>
-              {this.state.mode == 'token' ? 'TokenList' : 'Pool'}
+              {this.state.mode == 'token' ? 'Token' : 'Pool'}
             </td>
-            <td
+            {/* <td
               className={styles.smallTableHeader}
               style={{ display: isDesktop() == true ? 'table-cell' : 'none' }}
             >
@@ -198,7 +201,7 @@ export class SmallTable extends React.Component {
               style={{ display: isDesktop() == true ? 'table-cell ' : 'none' }}
             >
               Price
-            </td>
+            </td> */}
           </tr>
 
           {this.state.tableData
@@ -939,13 +942,22 @@ export const MarketSearchBar = props => {
   const onInput = useCallback(e => {
     setSearchQuery(e.target.value);
 
+    lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
+      console.log(data);
+      setSearchCoinReturns(
+        data.map(item => {
+          return { address: item.id, name: item.name, short: item.symbol };
+        })
+      );
+    });
+
     let query = e.target.value.toLowerCase();
 
     // coins return
     let newCoin = props.dataSourceCoin.filter(
       item => item.name.toLowerCase().includes(query) || item.short.toLowerCase().includes(query)
     );
-    setSearchCoinReturns(newCoin);
+    // setSearchCoinReturns(newCoin);
     let newPool = props.dataSourcePool.filter(
       item => item.coin1.toLowerCase().includes(query) || item.coin2.toLowerCase().includes(query)
     );
@@ -996,14 +1008,22 @@ export const MarketSearchBar = props => {
   useEffect(() => {
     let contentRoot = ReactDOM.findDOMNode(rootRef.current).parentNode.parentNode;
     contentRoot.addEventListener('scroll', onScroll);
+    
+    lastPromiseWrapper(fetchTokenSearch(marketClient, "")).then(data => {
+      console.log(data)
+      setSearchCoinReturns(
+        data.map(item => {
+          return { address: item.id, name: item.name, short: item.symbol };
+        })
+      );
+    });
+
     refreshWatchlist();
 
     return function cleanup() {
       contentRoot.removeEventListener('scroll', onScroll);
     };
   }, []);
-
-  
 
   // the DOM itself
   return (
