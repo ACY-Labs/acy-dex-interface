@@ -76,7 +76,7 @@ const AcyCoinItem = ({
       {/* token icon container. */}
       {/* display default ethereum icon if customIcon is true, else display the relative token icon. */}
       <div className={styles.tokenRowContent} onClick={() => selectToken(data) || null}>
-        <div style={{ flex: '2' }}>
+        <div style={{ width: "13%" }}>
           {customIcon ? (
             <AcyIcon name="eth" />
           ) : (
@@ -98,13 +98,15 @@ const AcyCoinItem = ({
         </div>
 
         {/* token symbol container. */}
-        <div style={{ flex: '2', color: 'white', fontWeight: '500' }}>{data.symbol}</div>
+        <div style={{ width: "17%", color: 'white', fontWeight: '500' }}>{data.symbol}</div>
+        
+        <div style={{ width: "70%", display: "flex", justifyContent: "space-between"}}>
+          {/* token name container. */}
+          <div style={{ minWidth: "20%", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>{data.name}</div>
 
-        {/* token name container. */}
-        <div style={{ flex: '7' }}>{data.name}</div>
-
-        {/* token balance container. */}
-        <div style={{ flex: '1' }}>{balance}</div>
+          {/* token balance container. */}
+          <div style={{ textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>{balance}</div>
+        </div>
       </div>
 
       {/* star button for user to set token as favourite. */}
