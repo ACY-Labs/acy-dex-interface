@@ -1,11 +1,19 @@
-import { GET_TOKEN_DAY_DATA, GET_TOKEN_LIST, GET_TOKEN_DAY_SIMPLE, GET_TOKEN_INFO } from './query';
+import {
+  GET_TOKEN_DAY_DATA,
+  GET_TOKEN_LIST,
+  GET_TOKEN_DAY_SIMPLE,
+  GET_TOKEN_INFO,
+  GET_TOKEN_FROM_ID,
+  TOKEN_SEARCH,
+} from './query';
 import { convertTokenForList } from './util';
+import { sortTable } from '../Util';
 import { getBlockFromTimestamp } from './blocks';
 
 export async function fetchTokenInfo(client, tokenAddress, timestamp) {
   const block = await getBlockFromTimestamp(timestamp);
 
-  console.log("TOKEN ADDRESS", tokenAddress)
+  console.log('TOKEN ADDRESS', tokenAddress);
 
   const { loading, error, data } = await client.query({
     query: GET_TOKEN_INFO,
@@ -86,10 +94,46 @@ export async function fetchGeneralTokenInfo(client) {
 }
 
 // fetch individual token from string (search)
-export async function fetchTokenSearch(client, searchQuery){
-  return 
+export async function fetchTokenSearch(client, searchQuery) {
+  const { loading, error, data } = await client.query({
+    query: TOKEN_SEARCH,
+    variables: {
+      value: searchQuery ? searchQuery.toUpperCase() : '',
+      id: searchQuery,
+    },
+  });
+
+  if (loading) return null;
+  if (error) return `Error! ${error}`;
+
+  return sortTable(
+    [...data.asAddress, ...data.asSymbol, ...data.asName]
+      .filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)
+      .map(item => ({
+        id: item.id,
+        name: item.name,
+        symbol: item.symbol,
+        txCount: parseInt(item.txCount)
+      })),
+    'txCount',
+    true
+  );
 }
 
 // fetch individual token info from id
+export async function fetchTokensFromId(client, id){
+  const { loading, error, data } = await client.query({
+    query: GET_TOKEN_FROM_ID,
+    variables: {
+      id: id,
+    },
+  });
+
+  if (loading) return null;
+  if (error) return `Error! ${error}`;
+
+  return data
+
+}
 
 // fetch individual token history
