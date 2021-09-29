@@ -11,6 +11,7 @@ import {
   dataSourceTransaction,
   graphSampleData,
 } from './SampleData.js';
+import { WatchlistManager } from './WatchlistManager.js';
 import FarmsTable from '@/pages/Farms/FarmsTable';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
