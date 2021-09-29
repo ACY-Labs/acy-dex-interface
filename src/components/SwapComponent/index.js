@@ -49,6 +49,7 @@ import {
   isZero,
   ROUTER_ADDRESS,
   supportedTokens,
+  parseArbitrageLog,
 } from '@/acy-dex-swap/utils/index';
 
 import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
@@ -434,13 +435,18 @@ const SwapComponent = props => {
         console.log('receiptreceipt', receipt);
         // receipt is not null when transaction is done
         if (receipt) {
-          props.onGetReceipt(receipt);
+          const { logs } = receipt;
+          const decodedLog = parseArbitrageLog(logs[logs.length - 1]);
+          console.log('receipt OK, these are logs');
+          console.log(decodedLog);
+
+          props.onGetReceipt(decodedLog);
           clearInterval(sti);
           let newData = transactions.filter(item => item.hash != status.hash);
-          let transactionTime = '',
-            inputTokenNum,
-            outTokenNum,
-            totalToken;
+          let transactionTime = '';
+          let inputTokenNum;
+          let outTokenNum;
+          let totalToken;
           await library.getBlock(receipt.logs[0].blockNumber).then(data => {
             transactionTime = moment(parseInt(data.timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
           });
@@ -588,7 +594,11 @@ const SwapComponent = props => {
                   />
                   <Button
                     type="primary"
-                    style={{ marginLeft: '10px', background: "#2e3032", borderColor: "transparent"}}
+                    style={{
+                      marginLeft: '10px',
+                      background: '#2e3032',
+                      borderColor: 'transparent',
+                    }}
                     onClick={() => {
                       if (isNaN(inputSlippageTol)) {
                         setSlippageError('Please input valid slippage value!');
