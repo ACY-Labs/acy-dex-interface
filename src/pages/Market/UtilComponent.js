@@ -225,13 +225,28 @@ export class SmallTable extends React.Component {
 
 export function TokenTable(props) {
   const [tokenSortAscending, setTokenSortAscending] = useState(true);
-  const [tokenDisplayNumber, setTokenDisplayNumber] = useState(10);
+  const [tokenDisplayNumber, setTokenDisplayNumber] = useState(9);
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
   const navHistory = useHistory();
 
   function columnsCoin(isAscending, onSortChange) {
     return [
+      {
+        title: (
+          <div className={className(styles.tableHeaderFirst,styles.tableIndex)}>
+            #
+          </div>
+          ),
+        key: 'index',
+        width: '3rem',
+        render:  (text, record, index) => (
+          <div className={className(styles.tableDataFirstColumn,styles.tableIndex)}>
+            {index + 1}
+          </div>
+        ),
+        visible: isDesktop()
+      },
       {
         title: (
           <div
@@ -252,6 +267,7 @@ export function TokenTable(props) {
         ),
         dataIndex: 'name',
         key: 'name',
+        className: 'leftAlignTableHeader',
         render: (text, entry) => {
           return (
             <div className={styles.tableDataFirstColumn}>
@@ -264,6 +280,7 @@ export function TokenTable(props) {
               >
                 {entry.short}
               </Link>
+              <div style={{width:5}}></div>
               <span className={styles.coinShort}> ({entry.name})</span>
             </div>
           );
@@ -422,7 +439,7 @@ export function TokenTable(props) {
 
 export function PoolTable(props) {
   const [poolSortAscending, setPoolSortAscending] = useState(true);
-  const [poolDisplayNumber, setPoolDisplayNumber] = useState(10);
+  const [poolDisplayNumber, setPoolDisplayNumber] = useState(9);
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
   const [, update] = useState(0);
@@ -438,6 +455,21 @@ export function PoolTable(props) {
 
   function columnsPool(isAscending, onSortChange) {
     return [
+      {
+        title: (
+          <div className={className(styles.tableHeaderFirst,styles.tableIndex)}>
+            #
+          </div>
+          ),
+        key: 'index',
+        render:  (text, record, index) => (
+          <div className={className(styles.tableDataFirstColumn,styles.tableIndex)}>
+            {index + 1}
+          </div>
+        ),
+        width: '3rem',
+        visible: isDesktop()
+      },
       {
         title: (
           <div
@@ -458,6 +490,7 @@ export function PoolTable(props) {
         ),
         dataIndex: 'pool',
         key: 'pool',
+        className: 'leftAlignTableHeader',
         render: (text, entry) => {
           return (
             <div className={styles.tableDataFirstColumn}>
@@ -601,7 +634,7 @@ export function PoolTable(props) {
 export function TransactionTable(props) {
   const [transactionSortAscending, setTransactionSortAscending] = useState(true);
   const [transactionView, setTransactionView] = useState(TransactionType.ALL);
-  const [transactionDisplayNumber, setTransactionDisplayNumber] = useState(10);
+  const [transactionDisplayNumber, setTransactionDisplayNumber] = useState(9);
   const [currentKey, setCurrentKey] = useState('');
 
   // header for the transaction table
