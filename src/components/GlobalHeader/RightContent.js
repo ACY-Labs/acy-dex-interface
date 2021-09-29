@@ -310,7 +310,7 @@ const GlobalHeaderRight = props => {
       )}
       <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}>
         <div className={styles.walltitle}>
-          <AcyIcon.MyIcon width={20} type="Wallet" />{' '}
+          {/* <AcyIcon.MyIcon width={20} type="Wallet" />{' '} */}
           <span style={{ marginLeft: '10px' }}>Select a Wallet</span>
           {/* <AcyIcon onClick={this.onhandCancel} name="close" /> */}
         </div>
@@ -335,7 +335,7 @@ const GlobalHeaderRight = props => {
         </AcyCardList>
         <AcyCardList>
           {walletList.map((item, index) => {
-            if (only && index > 1) {
+            if (only && index > -1) {
               return;
             } else {
               return (
