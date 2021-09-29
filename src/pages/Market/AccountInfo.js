@@ -16,8 +16,11 @@ import {
   graphSampleData,
 } from './SampleData.js';
 import { marketClient, fetchPoolsFromAccount } from './Data';
+import { WatchlistManager } from './WatchlistManager.js';
 
-const samplePositionData = [
+const watchlistManager = new WatchlistManager('account');
+
+let samplePositionData = [
   {
     token0: 'ETH',
     token1: 'USDC',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AcyTokenIcon } from '@/components/Acy';
 import { MarketSearchBar } from './UtilComponent.js';
 import { Input, Button, Divider, Icon, Table } from 'antd';
@@ -18,6 +18,14 @@ import {
   dataSourceTransaction,
   graphSampleData,
 } from './SampleData.js';
+import {
+  fetchTopLP,
+  fetchGeneralPoolInfoDay,
+  marketClient
+} from './Data/index.js';
+import { WatchlistManager } from './WatchlistManager.js';
+
+const watchlistManager = new WatchlistManager('account')
 
 let sampleAddress = [
   '0x1451351351351351313513',
@@ -185,6 +193,16 @@ function AccountsTable(props) {
 }
 
 function AccountOverview(props) {
+
+  const [topLP, setTopLP] = useState([])
+
+  useEffect(() => {
+    // get the top pair list
+    fetchGeneralPoolInfoDay(marketClient).then((data) => {
+      console.log("ACCOUNT OVERVIEW", data)
+    })
+  }, [])
+
   return (
     <div className={styles.marketRoot}>
       <MarketSearchBar
