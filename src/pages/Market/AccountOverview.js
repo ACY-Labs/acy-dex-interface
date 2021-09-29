@@ -197,7 +197,10 @@ function AccountOverview(props) {
   const [topLP, setTopLP] = useState([])
 
   useEffect(() => {
-
+    // get the top pair list
+    fetchGeneralPoolInfoDay(marketClient).then((data) => {
+      console.log("ACCOUNT OVERVIEW", data)
+    })
   }, [])
 
   return (

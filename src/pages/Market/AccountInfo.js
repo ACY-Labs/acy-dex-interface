@@ -17,6 +17,8 @@ import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAllPools } from '@/acy-dex-swap/core/farms';
 
+const watchlistManager = new WatchlistManager('account')
+
 let samplePositionData = [
   {
     token0: 'ETH',
