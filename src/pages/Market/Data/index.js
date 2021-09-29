@@ -6,7 +6,7 @@ import {
   fetchTokenInfo,
   fetchTokenSearch,
   fetchTokensFromId,
-  fetchTokenDaySimple
+  fetchTokenDaySimple,
 } from './tokenData';
 import {
   fetchGeneralPoolInfoDay,
@@ -14,6 +14,7 @@ import {
   fetchPoolInfo,
   fetchPoolSearch,
   fetchPoolsFromId,
+  fetchPoolsFromAccount,
 } from './poolData';
 import { getBlocksFromTimestamps } from './blocks';
 import { marketClient } from './client';
@@ -33,7 +34,8 @@ const DataFetch = {
   fetchPoolSearch,
   fetchTokensFromId,
   fetchPoolsFromId,
-  fetchTokenDaySimple
+  fetchPoolsFromAccount,
+  fetchTokenDaySimple,
 };
 
 export {
@@ -52,5 +54,6 @@ export {
   fetchPoolSearch,
   fetchTokensFromId,
   fetchPoolsFromId,
-  fetchTokenDaySimple
+  fetchPoolsFromAccount,
+  fetchTokenDaySimple,
 };

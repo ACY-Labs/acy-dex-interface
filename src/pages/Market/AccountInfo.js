@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Breadcrumb, Button, Table, Icon, Dropdown, Menu } from 'antd';
 import { Link, useHistory, useParams } from 'react-router-dom';
-import styles from './styles.less';
 import { AcyIcon, AcyTokenIcon, AcyPeriodTime, AcyAccountChart } from '@/components/Acy';
-import { abbrNumber, abbrHash, isDesktop, sortTable } from './Util';
+import FarmsTable from '@/pages/Farms/FarmsTable';
+import { useWeb3React } from '@web3-react/core';
+import { InjectedConnector } from '@web3-react/injected-connector';
+import { getAllPools } from '@/acy-dex-swap/core/farms';
+import styles from './styles.less';
+import { abbrNumber, abbrHash, isDesktop, sortTable, openInNewTab } from './Util';
 import { MarketSearchBar, TransactionTable } from './UtilComponent';
 import {
   dataSourceCoin,
@@ -11,12 +15,9 @@ import {
   dataSourceTransaction,
   graphSampleData,
 } from './SampleData.js';
-import FarmsTable from '@/pages/Farms/FarmsTable';
-import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
-import { getAllPools } from '@/acy-dex-swap/core/farms';
+import { marketClient, fetchPoolsFromAccount } from './Data';
 
-let samplePositionData = [
+const samplePositionData = [
   {
     token0: 'ETH',
     token1: 'USDC',
@@ -44,32 +45,34 @@ function PositionTable({ data }) {
   const [isAscending, setIsAscending] = useState(false);
   const [currentKey, setCurrentKey] = useState('');
 
-  let positionColumn = [
+  const positionColumn = [
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
       visible: true,
-      render: (text, entry) => {
-        return (
-          <div className={styles.tableDataFirstColumn} style={{ display: 'flex' }}>
+      render: (text, entry) => (
+        <div className={styles.tableDataFirstColumn} style={{ display: 'flex' }}>
+          <div style={{ display: 'flex' }}>
+            <AcyTokenIcon symbol={entry.token0} />
+            <AcyTokenIcon symbol={entry.token1} />
+          </div>
+          <div style={{ width: 20 }} />
+          <div style={{ fontWeight: 600 }}>
+            <div>{`${entry.token0} / ${entry.token1}`}</div>
+            <div style={{ height: 5 }} />
             <div style={{ display: 'flex' }}>
-              <AcyTokenIcon symbol={entry.token0} />
-              <AcyTokenIcon symbol={entry.token1} />
-            </div>
-            <div style={{ width: 20 }} />
-            <div style={{ fontWeight: 600 }}>
-              <div>{`${entry.token0} / ${entry.token1}`}</div>
-              <div style={{ height: 5 }} />
-              <div style={{ display: 'flex' }}>
-                <Button className={styles.posTableInnerButton} style={{background: "#2e3032"}}>Add</Button>
-                <div style={{ width: 5 }} />
-                <Button className={styles.posTableInnerButton} style={{background: "#2e3032"}}>Remove</Button>
-              </div>
+              <Button className={styles.posTableInnerButton} style={{ background: '#2e3032' }}>
+                Add
+              </Button>
+              <div style={{ width: 5 }} />
+              <Button className={styles.posTableInnerButton} style={{ background: '#2e3032' }}>
+                Remove
+              </Button>
             </div>
           </div>
-        );
-      },
+        </div>
+      ),
     },
     {
       title: (
@@ -92,17 +95,15 @@ function PositionTable({ data }) {
       dataIndex: 'totalLiquidity',
       key: 'totalLiquidity',
       visible: true,
-      render: (text, entry) => {
-        return (
-          <div className={styles.tableData}>
-            <div style={{ fontWeight: 'bold' }}>{`$ ${abbrNumber(entry.totalLiquidity)}`}</div>
-            <div>
-              <div style={{ fontSize: 12 }}>{`${abbrNumber(entry.reserve0)} ${entry.token0}`}</div>
-              <div style={{ fontSize: 12 }}>{`${abbrNumber(entry.reserve1)} ${entry.token1}`}</div>
-            </div>
+      render: (text, entry) => (
+        <div className={styles.tableData}>
+          <div style={{ fontWeight: 'bold' }}>{`$ ${abbrNumber(entry.totalLiquidity)}`}</div>
+          <div>
+            <div style={{ fontSize: 12 }}>{`${abbrNumber(entry.reserve0)} ${entry.token0}`}</div>
+            <div style={{ fontSize: 12 }}>{`${abbrNumber(entry.reserve1)} ${entry.token1}`}</div>
           </div>
-        );
-      },
+        </div>
+      ),
     },
     {
       title: (
@@ -125,17 +126,15 @@ function PositionTable({ data }) {
       dataIndex: 'fees',
       key: 'fees',
       visible: isDesktop(),
-      render: (text, entry) => {
-        return (
-          <div className={styles.tableData}>
-            <div style={{ fontWeight: 'bold' }}>{`$ ${abbrNumber(entry.totalFees)}`}</div>
-            <div>
-              <div style={{ fontSize: 12 }}>{`${abbrNumber(entry.fees0)} ${entry.token0}`}</div>
-              <div style={{ fontSize: 12 }}>{`${abbrNumber(entry.fees1)} ${entry.token1}`}</div>
-            </div>
+      render: (text, entry) => (
+        <div className={styles.tableData}>
+          <div style={{ fontWeight: 'bold' }}>{`$ ${abbrNumber(entry.totalFees)}`}</div>
+          <div>
+            <div style={{ fontSize: 12 }}>{`${abbrNumber(entry.fees0)} ${entry.token0}`}</div>
+            <div style={{ fontSize: 12 }}>{`${abbrNumber(entry.fees1)} ${entry.token1}`}</div>
           </div>
-        );
-      },
+        </div>
+      ),
     },
   ];
 
@@ -178,7 +177,7 @@ function PositionDropdown({ positions, onHandleMenuClick }) {
 
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
-  let menu = (
+  const menu = (
     <Menu
       onClick={e => {
         const selected = JSON.parse(e.key);
@@ -265,16 +264,18 @@ function PositionDropdown({ positions, onHandleMenuClick }) {
 }
 
 function AccountInfo(props) {
-  const INITIAL_ROW_NUMBER = 5
+  const INITIAL_ROW_NUMBER = 5;
   const [isWatchlist, setIsWatchlist] = useState(false);
   const [tableRow, setTableRow] = useState([]);
   const [rowNumber, setRowNumber] = useState(INITIAL_ROW_NUMBER);
   const [walletConnected, setWalletConnected] = useState(false);
   const { account, chainId, library, activate } = useWeb3React();
+  const [liquidityPositions, setLiquidityPositions] = useState(samplePositionData);
+
   const injected = new InjectedConnector({
     supportedChainIds: [1, 3, 4, 5, 42, 80001],
   });
-  const { address } = useParams()
+  const { address } = useParams();
 
   // method to hide/unhidden table row.
   const onRowClick = index =>
@@ -285,18 +286,26 @@ function AccountInfo(props) {
     });
 
   // method to prompt metamask extension for user to connect their wallet.
-  const connectWallet = () => activate(injected)
+  const connectWallet = () => activate(injected);
 
   useEffect(
     () => {
       // automatically connect to wallet at the start of the application.
       connectWallet();
 
+      fetchPoolsFromAccount(marketClient, address).then(data => {
+        const parsedPositions = data.liquidityPositions.map(position => {
+          let { pair } = position;
+          return { ...pair, token0: pair.token0.symbol, token1: pair.token1.symbol };
+        });
+        setLiquidityPositions(parsedPositions);
+      });
+
       const getPools = async (library, account) => {
         // get all pools from the farm contract.
         // todo: currently account refers to the current user viewing this webpage,
         // todo: needs to be change to the user in this webpage.
-        const pools = (await getAllPools(library, account)).filter((pool) => pool.hasUserPosition);
+        const pools = (await getAllPools(library, account)).filter(pool => pool.hasUserPosition);
         const newFarmsContents = [];
 
         // format pools data to the required format that the table can read.
@@ -358,7 +367,7 @@ function AccountInfo(props) {
               Accounts
             </Link>
           </Breadcrumb.Item>
-          <Breadcrumb.Item style={{ fontWeight: 'bold' }}>0x89750238520672062</Breadcrumb.Item>
+          <Breadcrumb.Item style={{ fontWeight: 'bold' }}>{address}</Breadcrumb.Item>
         </Breadcrumb>
       </div>
 
@@ -368,10 +377,11 @@ function AccountInfo(props) {
         style={{ display: 'flex', justifyContent: 'space-between' }}
       >
         <div>
-          <div style={{ fontSize: '26px', fontWeight: 'bold' }}>
-            {abbrHash('0x89750238520672062')}
-          </div>
-          <a href="" style={{ color: '#e29227', fontWeight: 600 }}>
+          <div style={{ fontSize: '26px', fontWeight: 'bold' }}>{abbrHash(address)}</div>
+          <a
+            onClick={() => openInNewTab(`https://etherscan.io/address/${address}`)}
+            style={{ color: '#e29227', fontWeight: 600 }}
+          >
             View on etherscan
           </a>
         </div>
@@ -385,7 +395,7 @@ function AccountInfo(props) {
 
       {/* dropdown */}
       <div className={styles.accountPageRow}>
-        <PositionDropdown positions={[...new Set(samplePositionData)]} />
+        <PositionDropdown positions={[...new Set(liquidityPositions)]} />
       </div>
 
       {/* liquidity and fees earned */}
@@ -408,15 +418,13 @@ function AccountInfo(props) {
       {/* graphs */}
       <div className={styles.accountPageRow}>
         <div className={styles.accountGraphCard}>
-          <div style={{display:"flex", justifyContent:"space-between"}}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <AcyPeriodTime onhandPeriodTimeChoose={() => {}} times={['Liquidity', 'Fees']} />
             <AcyPeriodTime onhandPeriodTimeChoose={() => {}} times={['1W', '1M', 'All']} />
           </div>
-          <div style={{height:"50vh"}}>
-            <AcyAccountChart lineColor="#1e5d91"/>
+          <div style={{ height: '50vh' }}>
+            <AcyAccountChart lineColor="#1e5d91" />
           </div>
-
-
         </div>
       </div>
 

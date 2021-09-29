@@ -476,3 +476,28 @@ export const FILTERED_TRANSACTIONS = gql`
     }
   }
 `;
+
+export const USER_POSITIONS = gql`
+  query liquidityPositions($user: Bytes!) {
+    liquidityPositions(where: { user: $user }) {
+      pair {
+        id
+        reserve0
+        reserve1
+        reserveUSD
+        token0 {
+          id
+          symbol
+          derivedETH
+        }
+        token1 {
+          id
+          symbol
+          derivedETH
+        }
+        totalSupply
+      }
+      liquidityTokenBalance
+    }
+  }
+`;

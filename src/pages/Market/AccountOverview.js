@@ -27,7 +27,7 @@ let sampleAddress = [
 
 let accountsList = [
   {
-    account: '0x752056730636362626',
+    account: '0x663a5c229c09b049e36dcc11a9b0d4a8eb9db214',
     token1: 'ETH',
     token2: 'USDC',
     value: 357235035259,
@@ -116,7 +116,7 @@ function AccountsTable(props) {
               <AcyTokenIcon symbol={entry.token1} />
               <AcyTokenIcon symbol={entry.token2} />
               <span>
-                {entry.token1}{' '}/{' '}{entry.token2}
+                {entry.token1} / {entry.token2}
               </span>
             </div>
           );
