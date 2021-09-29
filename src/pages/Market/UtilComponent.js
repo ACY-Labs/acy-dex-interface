@@ -98,12 +98,13 @@ export class SmallTable extends React.Component {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <AcyTokenIcon symbol={entry.short} width={20} />
           <Link
-            style={{ color: '#b5b5b6' }}
+            style={{ color: 'white' }}
             className={styles.coinName}
             to={`/market/info/token/${entry.address}`}
           >
             {entry.short}
           </Link>
+          <div style={{width:5}}></div>
           <span className={styles.coinShort}> ({entry.name})</span>
           <AcyIcon
             name={watchlistManagerToken.getData().includes(entry.address) ? 'star_active' : 'star'}
@@ -121,13 +122,11 @@ export class SmallTable extends React.Component {
           <AcyTokenIcon symbol={entry.coin1} width={20} />
           <AcyTokenIcon symbol={entry.coin2} width={20} />
           <Link
-            style={{ color: '#b5b5b6' }}
-            className={styles.coinName}
+            style={{ color: 'white' }}
             to={`/market/info/pool/${entry.address}`}
-            style={{ color: '#b5b5b6' }}
           >
             <span className={styles.coinName}>
-              {entry.coin1}/{entry.coin2}
+              {entry.coin1}{' / '}{entry.coin2}
             </span>
           </Link>
           {/* <div
@@ -273,7 +272,7 @@ export function TokenTable(props) {
             <div className={styles.tableDataFirstColumn}>
               <AcyTokenIcon symbol={entry.short} />
               <Link
-                style={{ color: '#b5b5b6' }}
+                style={{ color: 'white' }}
                 className={styles.coinName}
                 to={`/market/info/token/${entry.address}`}
                 tokenData={entry}
@@ -497,12 +496,11 @@ export function PoolTable(props) {
               <AcyTokenIcon symbol={entry.coin1} />
               <AcyTokenIcon symbol={entry.coin2} />
               <Link
-                style={{ color: '#b5b5b6' }}
-                className={styles.coinName}
+                style={{ color: 'white' }}
                 to={`/market/info/pool/${entry.address}`}
               >
                 <span className={styles.coinName}>
-                  {entry.coin1}/{entry.coin2}
+                  {entry.coin1}{' '}/{' '}{entry.coin2}
                 </span>
               </Link>
               {/* <div

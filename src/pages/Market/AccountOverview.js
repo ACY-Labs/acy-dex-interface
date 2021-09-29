@@ -116,7 +116,7 @@ function AccountsTable(props) {
               <AcyTokenIcon symbol={entry.token1} />
               <AcyTokenIcon symbol={entry.token2} />
               <span>
-                {entry.token1} / {entry.token2}
+                {entry.token1}{' '}/{' '}{entry.token2}
               </span>
             </div>
           );

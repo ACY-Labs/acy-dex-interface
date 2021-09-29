@@ -187,7 +187,7 @@ export class MarketIndex extends Component {
         {this.state.overallVolume !== -1 && this.state.overallTvl !== -1 && !isMobile ? (
           <Row className={styles.marketOverview} justify="space-around">
             <Col span={8}>
-              Volume 24H <strong>$ {this.state.overallVolume}</strong>{' '}
+              Volume 24H <strong style={{color: "white"}}>$ {this.state.overallVolume}</strong>{' '}
               <span
                 className={
                   this.state.ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
@@ -197,7 +197,7 @@ export class MarketIndex extends Component {
               </span>
             </Col>
             <Col span={8}>
-              Fees 24H <strong>$ {this.state.overallFees} </strong> <span
+              Fees 24H <strong style={{color: "white"}}>$ {this.state.overallFees} </strong> <span
                 className={
                   this.state.ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
                 }
@@ -206,7 +206,7 @@ export class MarketIndex extends Component {
               </span>
             </Col>
             <Col span={8}>
-              TVL <strong>$ {this.state.overallTvl}</strong>{' '}
+              TVL <strong style={{color: "white"}}>$ {this.state.overallTvl}</strong>{' '}
               <span
                 className={
                   this.state.ovrTvlChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown

@@ -273,10 +273,10 @@ function MarketPoolInfo(props) {
                 <AcyTokenIcon symbol={poolData.coin1} width={36} height={36} />
                 <AcyTokenIcon symbol={poolData.coin2} width={36} height={36} />
                 <span
-                  style={{ fontSize: '26px', fontWeight: 'bold', marginLeft: '10px' }}
+                  style={{ fontSize: '26px', fontWeight: 'bold', marginLeft: '10px', color: "white" }}
                   className={styles.coinName}
                 >
-                  {poolData.coin1}/{poolData.coin2}
+                  {poolData.coin1}{' '}/{' '}{poolData.coin2}
                 </span>
                 {/* <div
               className={styles.percentBadge}
