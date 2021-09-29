@@ -3,6 +3,7 @@ import { FormattedMessage, connect } from 'umi';
 import { Spin, Tag, Menu, Icon, Dropdown } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
+import { Link } from 'react-router-dom';
 import {
   AcyIcon,
   AcyConnectWallet,
@@ -353,6 +354,37 @@ const GlobalHeaderRight = props => {
           <p className={styles.showmore} onClick={showMore}>
             See More...
           </p>
+        )}
+        {account && (
+          <AcyCardList>
+            <div
+              style={{
+                background: '#29292c',
+                width: '100%',
+                marginTop: 10,
+                borderRadius: 10,
+                padding: 10,
+              }}
+            >
+              <Link to={`/market/accounts/${account}`} style={{ color: '#eb5c20' }}>
+                See My Account
+              </Link>
+              <div style={{ marginTop: 5 }}>
+                <div className={styles.descLine}>
+                  <div style={{fontWeight: "bold"}}>My Liquidity</div>
+                  <div>$999.99</div>
+                </div>
+                <div className={styles.descLine}>
+                  <div style={{fontWeight: "bold"}}>My Volume</div>
+                  <div>$999.99</div>
+                </div>
+                <div className={styles.descLine}>
+                  <div style={{fontWeight: "bold"}}>My Farms</div>
+                  <div>$999.99</div>
+                </div>
+              </div>
+            </div>
+          </AcyCardList>
         )}
       </AcyModal>
     </div>
