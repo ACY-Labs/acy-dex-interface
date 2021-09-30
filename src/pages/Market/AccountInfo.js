@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Breadcrumb, Button, Table, Icon, Dropdown, Menu } from 'antd';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { AcyIcon, AcyTokenIcon, AcyPeriodTime, AcyAccountChart } from '@/components/Acy';
@@ -7,7 +7,7 @@ import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAllPools } from '@/acy-dex-swap/core/farms';
 import styles from './styles.less';
-import { abbrNumber, abbrHash, isDesktop, sortTable, openInNewTab } from './Util';
+import { abbrNumber, abbrHash, isDesktop, sortTable, openInNewTab, formattedNum } from './Util';
 import { MarketSearchBar, TransactionTable } from './UtilComponent';
 import {
   dataSourceCoin,
@@ -164,7 +164,7 @@ function PositionTable({ data }) {
   );
 }
 
-function PositionDropdown({ positions, onHandleMenuClick }) {
+function PositionDropdown({ positions, onPositionClick }) {
   /*
     pair format:
     {
@@ -210,18 +210,19 @@ function PositionDropdown({ positions, onHandleMenuClick }) {
           className={styles.accountDropdownItem}
           onClick={() => {
             setDropdownVisible(false);
+            onPositionClick(item);
           }}
           style={{ background: '#2e3032' }}
           key={JSON.stringify({
-            token0: item.token0,
-            token1: item.token1,
+            token0: item.pair.token0.symbol,
+            token1: item.pair.token1.symbol,
           })}
         >
           <div style={{ display: 'flex', alignItems: 'center', marginTop: 6, marginBottom: 6 }}>
-            <AcyTokenIcon symbol={item.token0} />
-            <AcyTokenIcon symbol={item.token1} />
+            <AcyTokenIcon symbol={item.pair.token0.symbol} />
+            <AcyTokenIcon symbol={item.pair.token1.symbol} />
             <div style={{ width: 10 }} />
-            {`${item.token0} / ${item.token1} position`}
+            {`${item.pair.token0.symbol} / ${item.pair.token1.symbol} position`}
           </div>
         </Menu.Item>
       ))}
@@ -273,7 +274,8 @@ function AccountInfo(props) {
   const [rowNumber, setRowNumber] = useState(INITIAL_ROW_NUMBER);
   const [walletConnected, setWalletConnected] = useState(false);
   const { account, chainId, library, activate } = useWeb3React();
-  const [liquidityPositions, setLiquidityPositions] = useState(samplePositionData);
+  const [liquidityPositions, setLiquidityPositions] = useState([]);
+  const [activePosition, setActivePosition] = useState(null);
 
   const injected = new InjectedConnector({
     supportedChainIds: [1, 3, 4, 5, 42, 80001],
@@ -297,11 +299,7 @@ function AccountInfo(props) {
       connectWallet();
 
       fetchPoolsFromAccount(marketClient, address).then(data => {
-        const parsedPositions = data.liquidityPositions.map(position => {
-          let { pair } = position;
-          return { ...pair, token0: pair.token0.symbol, token1: pair.token1.symbol };
-        });
-        setLiquidityPositions(parsedPositions);
+        setLiquidityPositions(data);
       });
 
       const getPools = async (library, account) => {
@@ -344,6 +342,29 @@ function AccountInfo(props) {
       }
     },
     [account]
+  );
+
+  const dynamicPositions = activePosition ? [activePosition] : liquidityPositions;
+
+  const aggregateFees = dynamicPositions?.reduce((total, position) => {
+    return total + (isNaN(position.fees.sum) ? 0 : position.fees.sum);
+  }, 0);
+
+  const positionValue = useMemo(
+    () => {
+      if (!dynamicPositions) return;
+      const reduced = dynamicPositions
+        ? dynamicPositions.reduce((total, position) => {
+            const positionUSDValue =
+              (parseFloat(position.liquidityTokenBalance) / parseFloat(position.pair.totalSupply)) *
+              parseFloat(position.pair.reserveUSD);
+            return total + (isNaN(positionUSDValue) ? 0 : positionUSDValue);
+          }, 0)
+        : null;
+
+      return reduced;
+    },
+    [dynamicPositions]
   );
 
   return (
@@ -398,7 +419,10 @@ function AccountInfo(props) {
 
       {/* dropdown */}
       <div className={styles.accountPageRow}>
-        <PositionDropdown positions={[...new Set(liquidityPositions)]} />
+        <PositionDropdown
+          positions={[...new Set(liquidityPositions)]}
+          onPositionClick={setActivePosition}
+        />
       </div>
 
       {/* liquidity and fees earned */}
@@ -406,13 +430,19 @@ function AccountInfo(props) {
         <div style={{ display: 'flex' }} className={styles.walletStatCard}>
           <div className={styles.walletStatEntry}>
             <div className={styles.walletStatIndicator}>Liquidity (including fees)</div>
-            <div className={styles.walletStatValue}>$999.99m</div>
+            <div className={styles.walletStatValue}>
+              {positionValue
+                ? formattedNum(positionValue, true)
+                : positionValue === 0
+                ? formattedNum(0, true)
+                : '-'}
+            </div>
           </div>
           <div style={{ width: 20 }} />
           <div className={styles.walletStatEntry}>
             <div className={styles.walletStatIndicator}>Fees earned (cumulative)</div>
             <div className={styles.walletStatValue} style={{ color: 'greenyellow' }}>
-              $999.99m
+              {aggregateFees ? formattedNum(aggregateFees, true, true) : '-'}
             </div>
           </div>
         </div>

@@ -129,20 +129,3 @@ export async function fetchPoolsFromId(client, id) {
 // get individual pool info from token
 
 // pool history
-
-// get user pool positions
-export async function fetchPoolsFromAccount(client, account) {
-  const { loading, error, data } = await client.query({
-    query: USER_POSITIONS,
-    variables: {
-      user: account,
-    },
-  });
-
-  if (loading) return null;
-  if (error) return `Error! ${error}`;
-
-  console.log('fetchPoolsFromAccount');
-  console.log(data);
-  return data;
-}

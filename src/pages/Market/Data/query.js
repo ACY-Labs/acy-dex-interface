@@ -520,3 +520,85 @@ export const TOP_LPS_PER_PAIRS = gql`
     }
   }
 `;
+
+export const USER_HISTORY = gql`
+  query snapshots($user: Bytes!, $skip: Int!) {
+    liquidityPositionSnapshots(first: 1000, skip: $skip, where: { user: $user }) {
+      timestamp
+      reserveUSD
+      liquidityTokenBalance
+      liquidityTokenTotalSupply
+      reserve0
+      reserve1
+      token0PriceUSD
+      token1PriceUSD
+      pair {
+        id
+        reserve0
+        reserve1
+        reserveUSD
+        token0 {
+          id
+        }
+        token1 {
+          id
+        }
+      }
+    }
+  }
+`;
+
+export const USER_MINTS_BUNRS_PER_PAIR = gql`
+  query events($user: Bytes!, $pair: Bytes!) {
+    mints(where: { to: $user, pair: $pair }) {
+      amountUSD
+      amount0
+      amount1
+      timestamp
+      pair {
+        token0 {
+          id
+        }
+        token1 {
+          id
+        }
+      }
+    }
+    burns(where: { sender: $user, pair: $pair }) {
+      amountUSD
+      amount0
+      amount1
+      timestamp
+      pair {
+        token0 {
+          id
+        }
+        token1 {
+          id
+        }
+      }
+    }
+  }
+`;
+
+export const BUNDLE_ID = '1';
+
+export const ETH_PRICE = block => {
+  const queryString = block
+    ? `
+    query bundles {
+      bundles(where: { id: ${BUNDLE_ID} } block: {number: ${block}}) {
+        id
+        ethPrice
+      }
+    }
+  `
+    : ` query bundles {
+      bundles(where: { id: ${BUNDLE_ID} }) {
+        id
+        ethPrice
+      }
+    }
+  `;
+  return gql(queryString);
+};

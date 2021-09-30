@@ -14,11 +14,11 @@ import {
   fetchPoolInfo,
   fetchPoolSearch,
   fetchPoolsFromId,
-  fetchPoolsFromAccount,
 } from './poolData';
-import { fetchTopLP } from './accountData';
+import { fetchTopLP, fetchUserSnapshot, fetchPoolsFromAccount } from './accountData';
 import { getBlocksFromTimestamps } from './blocks';
 import { marketClient } from './client';
+import { fetchEthPrice } from './eth';
 
 const DataFetch = {
   marketClient,
@@ -38,6 +38,8 @@ const DataFetch = {
   fetchPoolsFromAccount,
   fetchTokenDaySimple,
   fetchTopLP,
+  fetchUserSnapshot,
+  fetchEthPrice,
 };
 
 export {
@@ -59,4 +61,6 @@ export {
   fetchPoolsFromAccount,
   fetchTokenDaySimple,
   fetchTopLP,
+  fetchUserSnapshot,
+  fetchEthPrice,
 };
