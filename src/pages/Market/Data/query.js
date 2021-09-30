@@ -477,10 +477,14 @@ export const FILTERED_TRANSACTIONS = gql`
   }
 `;
 
-
 export const TOP_LPS_PER_PAIRS = gql`
   query lps($pair: Bytes!) {
-    liquidityPositions(where: { pair: $pair }, orderBy: liquidityTokenBalance, orderDirection: desc, first: 3) {
+    liquidityPositions(
+      where: { pair: $pair }
+      orderBy: liquidityTokenBalance
+      orderDirection: desc
+      first: 3
+    ) {
       user {
         id
       }
@@ -492,4 +496,29 @@ export const TOP_LPS_PER_PAIRS = gql`
       liquidityTokenBalance
     }
   }
-`
+`;
+
+export const TOP_XCHANGE_VOL = gql`
+  query swapData($offset: Int!) {
+    swaps(first: 5, skip: $offset, orderDirection: desc, orderBy: timestamp) {
+      id
+      sender
+      transaction {
+        id
+        timestamp
+      }
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+
+      amountUSD
+    }
+  }
+`;

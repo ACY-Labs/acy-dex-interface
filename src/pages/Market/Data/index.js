@@ -16,7 +16,8 @@ import {
   fetchPoolsFromId,
 } from './poolData';
 import {
-  fetchTopLP
+  fetchTopLP,
+  fetchTopExchangeVolumes
 } from './accountData'
 import { getBlocksFromTimestamps } from './blocks';
 import { marketClient } from './client';
@@ -37,7 +38,8 @@ const DataFetch = {
   fetchTokensFromId,
   fetchPoolsFromId,
   fetchTokenDaySimple,
-  fetchTopLP
+  fetchTopLP,
+  fetchTopExchangeVolumes
 };
 
 export {
@@ -57,5 +59,6 @@ export {
   fetchTokensFromId,
   fetchPoolsFromId,
   fetchTokenDaySimple,
-  fetchTopLP
+  fetchTopLP,
+  fetchTopExchangeVolumes
 };

@@ -19,7 +19,12 @@ import {
   dataSourceTransaction,
   graphSampleData,
 } from './SampleData.js';
-import { fetchTopLP, fetchGeneralPoolInfoDay, marketClient } from './Data/index.js';
+import {
+  fetchTopLP,
+  fetchGeneralPoolInfoDay,
+  fetchTopExchangeVolumes,
+  marketClient,
+} from './Data/index.js';
 import { WatchlistManager } from './WatchlistManager.js';
 
 const watchlistManager = new WatchlistManager('account');
@@ -63,12 +68,15 @@ let accountsList = [
   },
 ];
 
-function SavedAccounts({ accounts , onRemoveItem}) {
+function SavedAccounts({ accounts, onRemoveItem }) {
   const [accountsData, setAccountsData] = useState(accounts);
 
-  useEffect(() => {
-    setAccountsData(accounts)
-  }, [accounts])
+  useEffect(
+    () => {
+      setAccountsData(accounts);
+    },
+    [accounts]
+  );
 
   return (
     <div className={styles.savedAccountCard}>
@@ -93,7 +101,7 @@ function SavedAccounts({ accounts , onRemoveItem}) {
                 let newAccount = accounts.filter(entry => entry != item);
                 setAccountsData(newAccount);
                 watchlistManager.saveData(newAccount);
-                onRemoveItem(item)
+                onRemoveItem(item);
               }}
             />
           </div>
@@ -223,15 +231,149 @@ function AccountsTable(props) {
   );
 }
 
+function VolumesTable(props) {
+  const [accountSortAscending, setAccountSortAscending] = useState(true);
+  const [accountDisplayNumber, setAccountDisplayNumber] = useState(9);
+  const [currentKey, setCurrentKey] = useState('value');
+  const [isHover, setIsHover] = useState(false);
+  const navHistory = useHistory();
+
+  function columnsAccounts(isAscending, onSortChange) {
+    return [
+      {
+        title: <div className={className(styles.tableHeaderFirst, styles.tableIndex)}>#</div>,
+        key: 'index',
+        width: '4em',
+        render: (text, record, index) => (
+          <div className={className(styles.tableDataFirstColumn, styles.tableIndex)}>
+            {index + 1}
+          </div>
+        ),
+        visible: isDesktop(),
+      },
+      {
+        title: <div className={styles.tableHeaderFirst}>Account</div>,
+        dataIndex: 'account',
+        key: 'account',
+        className: 'leftAlignTableHeader',
+        render: (text, entry) => {
+          return (
+            <div className={styles.tableDataFirstColumn}>
+              <Link to={`/market/accounts/${entry.account}`}>{text}</Link>
+            </div>
+          );
+        },
+        visible: true,
+      },
+      {
+        title: <div className={styles.tableHeader}>Tokens</div>,
+        dataIndex: 'tokens',
+        key: 'tokens',
+        render: (text, entry) => {
+          return (
+            <div
+              className={styles.tableData}
+              style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}
+            >
+              <AcyTokenIcon symbol={entry.token1} />
+              <div style={{ width: 3 }} />
+              {entry.token1}
+              <div style={{ width: 3 }} /> <Icon type="arrow-right" /> <div style={{ width: 3 }} />
+              <AcyTokenIcon symbol={entry.token2} />
+              <span style={{ width: 3 }} />
+              {entry.token2}
+            </div>
+          );
+        },
+        visible: true,
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('value');
+              onSortChange();
+            }}
+          >
+            Value
+            {currentKey == 'value' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
+        dataIndex: 'value',
+        key: 'value',
+        render: (text, entry) => {
+          return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
+        },
+        visible: isDesktop(),
+      },
+    ];
+  }
+
+  return (
+    <Table
+      dataSource={sortTable(props.dataSourceAccounts, currentKey, accountSortAscending).slice(
+        0,
+        accountDisplayNumber + 1
+      )}
+      columns={columnsAccounts(accountSortAscending, () => {
+        setAccountSortAscending(!accountSortAscending);
+      }).filter(item => item.visible == true)}
+      pagination={false}
+      style={{
+        marginBottom: '20px',
+        cursor: isHover ? 'pointer' : 'default',
+      }}
+      footer={() => (
+        <div className={styles.tableSeeMoreWrapper}>
+          {props.dataSourceAccounts.slice(0, accountDisplayNumber + 1).length >
+            accountDisplayNumber && (
+            <a
+              className={styles.tableSeeMore}
+              onClick={() => {
+                setAccountDisplayNumber(accountDisplayNumber + 5);
+              }}
+            >
+              See More...
+            </a>
+          )}
+        </div>
+      )}
+    />
+  );
+}
+
 function AccountOverview(props) {
   const [topLP, setTopLP] = useState([]);
   const [watchlist, setWatchlist] = useState([]);
-  const [accountInput, setAccountInput] = useState("");
-  const [inputError, setInputError] = useState("");
+  const [accountInput, setAccountInput] = useState('');
+  const [inputError, setInputError] = useState('');
+  const [topEV, setTopEV] = useState([]);
 
   useEffect(() => {
     // fetch the watchlist
     setWatchlist(watchlistManager.getData());
+
+    // fetch exchange volumes
+    // TODO: sort data with total transaction value for the coins
+    // TODO: fins a way to calculater the volume
+    fetchTopExchangeVolumes(marketClient)
+      .then(data => {
+        let formatted = data.map(item => ({
+          account: item.sender,
+          token1: item.pair.token0.symbol,
+          token2: item.pair.token1.symbol,
+          value: parseFloat(item.amountUSD),
+        }));
+
+        setTopEV(formatted);
+      })
+      .catch(err => console.log(err));
 
     // fetch pool and its respective liquidity positions
     fetchGeneralPoolInfoDay(marketClient).then(data => {
@@ -280,15 +422,14 @@ function AccountOverview(props) {
       }
 
       Promise.all(infoPromise).then(() => {
-        console.log(topLPData);
         setTopLP(topLPData.slice(0, 100));
       });
     });
   }, []);
 
-  const onInput = useCallback((e) => {
-    setAccountInput(e.target.value)
-  })
+  const onInput = useCallback(e => {
+    setAccountInput(e.target.value);
+  });
 
   const navHistory = useHistory();
 
@@ -315,30 +456,36 @@ function AccountOverview(props) {
         <Input
           placeholder="Search account address..."
           style={{ background: '#2e3032', marginRight: 5, borderRadius: 10 }}
-          value={ accountInput|| ""}
+          value={accountInput || ''}
           onChange={onInput}
         />
         <Button
           style={{ background: '#e29227', border: 'transparent', color: 'white', borderRadius: 10 }}
           onClick={() => {
-            if(!isNaN(accountInput) && accountInput.length == 42){
-              redirectToInputAddress()
-            }
-            else{
-              setInputError("Invalid account number!")
+            if (!isNaN(accountInput) && accountInput.length == 42) {
+              redirectToInputAddress();
+            } else {
+              setInputError('Invalid account number!');
             }
           }}
         >
           Load Account Details
         </Button>
       </div>
-      <div style={{color: "#c6224e", marginTop:5, fontWeight: 600}}>{inputError}</div>
-      <SavedAccounts accounts={watchlist} onRemoveItem={(removedAddress) => {
-        setWatchlist(watchlist.filter(item => item != removedAddress))
-      }}/>
+      <div style={{ color: '#c6224e', marginTop: 5, fontWeight: 600 }}>{inputError}</div>
+      <SavedAccounts
+        accounts={watchlist}
+        onRemoveItem={removedAddress => {
+          setWatchlist(watchlist.filter(item => item != removedAddress));
+        }}
+      />
 
-      <h2>Top Accounts</h2>
+      <h2>Top Liquidity Positions</h2>
       {topLP.length > 0 ? <AccountsTable dataSourceAccounts={topLP} /> : <Icon type="loading" />}
+
+      <h2>Top Exchange Volume</h2>
+      {/* NOTE: THIS TABLE DATA IS STILL PARTIALLY INCORRECT, NEED TO SORT BY THE BIGGEST VOLUME */}
+      {topEV.length > 0 ? <VolumesTable dataSourceAccounts={topEV} /> : <Icon type="loading" />}
     </div>
   );
 }
