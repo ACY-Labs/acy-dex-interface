@@ -508,15 +508,42 @@ export const TOP_LPS_PER_PAIRS = gql`
       where: { pair: $pair }
       orderBy: liquidityTokenBalance
       orderDirection: desc
-      first: 10
+      first: 3
     ) {
       user {
         id
       }
       pair {
         id
+        totalSupply
+        reserveUSD
       }
       liquidityTokenBalance
+    }
+  }
+`;
+
+export const TOP_XCHANGE_VOL = gql`
+  query swapData($offset: Int!) {
+    swaps(first: 5, skip: $offset, orderDirection: desc, orderBy: timestamp) {
+      id
+      sender
+      transaction {
+        id
+        timestamp
+      }
+      pair {
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+
+      amountUSD
     }
   }
 `;
