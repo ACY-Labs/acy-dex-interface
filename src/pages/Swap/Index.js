@@ -182,30 +182,34 @@ class BasicProfile extends Component {
       }
     }
 
+    const revertTokenPosition = () => {
+      const tempSwapToken = activeToken0;
+      this.setState({
+        activeToken0: activeToken1,
+        activeToken1: tempSwapToken
+      })
+      this.getPrice();
+    }
+
     return [
       <div>
         <div className={styles.maintitle}>
-          <div style={{ display: 'flex' }}>
+          <div className={styles.lighttitle} style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }} onClick={revertTokenPosition}>
             <img
               src={token0logo}
               alt=""
-              style={{
-                width: 24,
-                maxWidth: '24px',
-                maxHeight: '24px',
-                marginRight: '0.25rem',
-                marginTop: '0.1rem',
-              }}
+              style={{ width: 24, maxWidth: '24px', maxHeight: '24px', marginRight: '0.25rem', marginTop: '0.1rem' }}
             />
             <img
               src={token1logo}
               alt=""
               style={{ width: 24, maxHeight: '24px', marginRight: '0.5rem', marginTop: '0.1rem' }}
             />
+            <span>
+              {activeToken0.symbol}&nbsp;/&nbsp;{activeToken1.symbol}
+            </span>
           </div>
-          <span className={styles.lighttitle}>
-            {activeToken0.symbol}/{activeToken1.symbol}
-          </span>
+          
         </div>
         <div className={styles.secondarytitle}>
           <span className={styles.lighttitle}>{activeRate}</span>{' '}
