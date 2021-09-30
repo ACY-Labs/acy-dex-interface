@@ -1,3 +1,4 @@
+// verify at etherscan with optimization on and compiler version v0.6.7
 export default [
   {
     name: 'Ether',

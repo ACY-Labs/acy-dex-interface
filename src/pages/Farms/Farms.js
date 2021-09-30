@@ -51,6 +51,7 @@ const Farms = () => {
 
       const getPools = async (library, account) => {
         const pools = await getAllPools(library, account);
+        console.log('getAllPools OK');
         const newFarmsContents = [];
 
         pools.forEach(pool => {

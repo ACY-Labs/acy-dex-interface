@@ -346,9 +346,10 @@ function MarketTokenInfo(props) {
             <div className={styles.contentInfo}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <AcyTokenIcon symbol={tokenData.short} width={36} />
-                <span style={{ fontSize: '26px', fontWeight: 'bold', marginLeft: '10px' }}>
+                <span style={{ fontSize: '26px', fontWeight: 'bold', marginLeft: '10px', color: "white" }}>
                   {tokenData.short}
                 </span>
+                <div style={{width:5}}></div>
                 <span style={{ fontSize: '26px', fontWeight: 'thin', marginLeft: '10px' }}>
                   ({tokenData.name})
                 </span>

@@ -3,6 +3,7 @@ import { FormattedMessage, connect } from 'umi';
 import { Spin, Tag, Menu, Icon, Dropdown } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
+import { Link } from 'react-router-dom';
 import {
   AcyIcon,
   AcyConnectWallet,
@@ -310,7 +311,7 @@ const GlobalHeaderRight = props => {
       )}
       <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}>
         <div className={styles.walltitle}>
-          <AcyIcon.MyIcon width={20} type="Wallet" />{' '}
+          {/* <AcyIcon.MyIcon width={20} type="Wallet" />{' '} */}
           <span style={{ marginLeft: '10px' }}>Select a Wallet</span>
           {/* <AcyIcon onClick={this.onhandCancel} name="close" /> */}
         </div>
@@ -335,7 +336,7 @@ const GlobalHeaderRight = props => {
         </AcyCardList>
         <AcyCardList>
           {walletList.map((item, index) => {
-            if (only && index > 1) {
+            if (only && index > -1) {
               return;
             } else {
               return (
@@ -353,6 +354,37 @@ const GlobalHeaderRight = props => {
           <p className={styles.showmore} onClick={showMore}>
             See More...
           </p>
+        )}
+        {account && (
+          <AcyCardList>
+            <div
+              style={{
+                background: '#29292c',
+                width: '100%',
+                marginTop: 10,
+                borderRadius: 10,
+                padding: 10,
+              }}
+            >
+              <Link to={`/market/accounts/${account}`} style={{ color: '#eb5c20' }}>
+                See My Account
+              </Link>
+              <div style={{ marginTop: 5 }}>
+                <div className={styles.descLine}>
+                  <div style={{fontWeight: "bold"}}>My Liquidity</div>
+                  <div>$999.99</div>
+                </div>
+                <div className={styles.descLine}>
+                  <div style={{fontWeight: "bold"}}>My Volume</div>
+                  <div>$999.99</div>
+                </div>
+                <div className={styles.descLine}>
+                  <div style={{fontWeight: "bold"}}>My Farms</div>
+                  <div>$999.99</div>
+                </div>
+              </div>
+            </div>
+          </AcyCardList>
         )}
       </AcyModal>
     </div>

@@ -4,6 +4,7 @@ import { Contract } from '@ethersproject/contracts';
 import { AddressZero, MaxUint256 } from '@ethersproject/constants';
 import { BigNumber } from '@ethersproject/bignumber';
 import { formatUnits, parseUnits } from '@ethersproject/units';
+import { Interface } from '@ethersproject/abi';
 import { JSBI, Token, TokenAmount, Percent, ETHER, CurrencyAmount } from '@acyswap/sdk';
 import { abi as IUniswapV2Router02ABI } from '../abis/IUniswapV2Router02.json';
 import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
@@ -371,4 +372,29 @@ export async function checkUserHasSufficientLPBalance(lpTokenAddr, amount, libra
   const requiredAmount = parseUnits(amount, decimals);
   if (balance.lt(requiredAmount)) return false;
   return true;
+}
+
+export function parseArbitrageLog({ data, topics }) {
+  const eventABI = [
+    'event flashArbitrageSwapPath(address inToken,uint amountIn,address outToken,address[] allPath, uint[] XiArr)',
+  ];
+  const iface = new Interface(eventABI);
+  let parsedLogs = iface.parseLog({ data, topics }).args;
+  const nonZeroToken = [];
+  const nonZeroTokenAmount = [];
+  console.log(parsedLogs);
+  parsedLogs.XiArr.forEach((amount, index) => {
+    if (!amount.isZero()) {
+      nonZeroToken.push(parsedLogs.allPath[index]);
+      nonZeroTokenAmount.push(amount);
+    }
+  });
+
+  return {
+    inTokenAddr: parsedLogs[0],
+    amount: parsedLogs[1],
+    outTokenAddr: parsedLogs[2],
+    nonZeroToken,
+    nonZeroTokenAmount,
+  };
 }

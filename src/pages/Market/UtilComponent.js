@@ -98,12 +98,13 @@ export class SmallTable extends React.Component {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <AcyTokenIcon symbol={entry.short} width={20} />
           <Link
-            style={{ color: '#b5b5b6' }}
+            style={{ color: 'white' }}
             className={styles.coinName}
             to={`/market/info/token/${entry.address}`}
           >
             {entry.short}
           </Link>
+          <div style={{width:5}}></div>
           <span className={styles.coinShort}> ({entry.name})</span>
           <AcyIcon
             name={watchlistManagerToken.getData().includes(entry.address) ? 'star_active' : 'star'}
@@ -121,13 +122,11 @@ export class SmallTable extends React.Component {
           <AcyTokenIcon symbol={entry.coin1} width={20} />
           <AcyTokenIcon symbol={entry.coin2} width={20} />
           <Link
-            style={{ color: '#b5b5b6' }}
-            className={styles.coinName}
+            style={{ color: 'white' }}
             to={`/market/info/pool/${entry.address}`}
-            style={{ color: '#b5b5b6' }}
           >
             <span className={styles.coinName}>
-              {entry.coin1}/{entry.coin2}
+              {entry.coin1}{' / '}{entry.coin2}
             </span>
           </Link>
           {/* <div
@@ -225,13 +224,28 @@ export class SmallTable extends React.Component {
 
 export function TokenTable(props) {
   const [tokenSortAscending, setTokenSortAscending] = useState(true);
-  const [tokenDisplayNumber, setTokenDisplayNumber] = useState(10);
+  const [tokenDisplayNumber, setTokenDisplayNumber] = useState(9);
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
   const navHistory = useHistory();
 
   function columnsCoin(isAscending, onSortChange) {
     return [
+      {
+        title: (
+          <div className={className(styles.tableHeaderFirst,styles.tableIndex)}>
+            #
+          </div>
+          ),
+        key: 'index',
+        width: '3rem',
+        render:  (text, record, index) => (
+          <div className={className(styles.tableDataFirstColumn,styles.tableIndex)}>
+            {index + 1}
+          </div>
+        ),
+        visible: isDesktop()
+      },
       {
         title: (
           <div
@@ -252,18 +266,20 @@ export function TokenTable(props) {
         ),
         dataIndex: 'name',
         key: 'name',
+        className: 'leftAlignTableHeader',
         render: (text, entry) => {
           return (
             <div className={styles.tableDataFirstColumn}>
               <AcyTokenIcon symbol={entry.short} />
               <Link
-                style={{ color: '#b5b5b6' }}
+                style={{ color: 'white' }}
                 className={styles.coinName}
                 to={`/market/info/token/${entry.address}`}
                 tokenData={entry}
               >
                 {entry.short}
               </Link>
+              <div style={{width:5}}></div>
               <span className={styles.coinShort}> ({entry.name})</span>
             </div>
           );
@@ -422,7 +438,7 @@ export function TokenTable(props) {
 
 export function PoolTable(props) {
   const [poolSortAscending, setPoolSortAscending] = useState(true);
-  const [poolDisplayNumber, setPoolDisplayNumber] = useState(10);
+  const [poolDisplayNumber, setPoolDisplayNumber] = useState(9);
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
   const [, update] = useState(0);
@@ -438,6 +454,21 @@ export function PoolTable(props) {
 
   function columnsPool(isAscending, onSortChange) {
     return [
+      {
+        title: (
+          <div className={className(styles.tableHeaderFirst,styles.tableIndex)}>
+            #
+          </div>
+          ),
+        key: 'index',
+        render:  (text, record, index) => (
+          <div className={className(styles.tableDataFirstColumn,styles.tableIndex)}>
+            {index + 1}
+          </div>
+        ),
+        width: '3rem',
+        visible: isDesktop()
+      },
       {
         title: (
           <div
@@ -458,18 +489,18 @@ export function PoolTable(props) {
         ),
         dataIndex: 'pool',
         key: 'pool',
+        className: 'leftAlignTableHeader',
         render: (text, entry) => {
           return (
             <div className={styles.tableDataFirstColumn}>
               <AcyTokenIcon symbol={entry.coin1} />
               <AcyTokenIcon symbol={entry.coin2} />
               <Link
-                style={{ color: '#b5b5b6' }}
-                className={styles.coinName}
+                style={{ color: 'white' }}
                 to={`/market/info/pool/${entry.address}`}
               >
                 <span className={styles.coinName}>
-                  {entry.coin1}/{entry.coin2}
+                  {entry.coin1}{' '}/{' '}{entry.coin2}
                 </span>
               </Link>
               {/* <div
@@ -601,7 +632,7 @@ export function PoolTable(props) {
 export function TransactionTable(props) {
   const [transactionSortAscending, setTransactionSortAscending] = useState(true);
   const [transactionView, setTransactionView] = useState(TransactionType.ALL);
-  const [transactionDisplayNumber, setTransactionDisplayNumber] = useState(10);
+  const [transactionDisplayNumber, setTransactionDisplayNumber] = useState(9);
   const [currentKey, setCurrentKey] = useState('');
 
   // header for the transaction table

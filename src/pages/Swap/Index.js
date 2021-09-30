@@ -20,6 +20,7 @@ import AcyRoutingChart from '@/components/AcyRoutingChart';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import { uniqueFun } from '@/utils/utils';
+import { getTokenContract } from '@/acy-dex-swap/utils/index';
 
 import SwapComponent from '@/components/SwapComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -288,25 +289,35 @@ class BasicProfile extends Component {
     });
   };
 
-  onGetReceipt = receipt => {
+  getTokenSymbol = async (address, library, account) => {
+    const tokenContract = getTokenContract(address, library, account);
+    return tokenContract.symbol();
+  };
+
+  getTokenDecimal = async (address, library, account) => {
+    const tokenContract = getTokenContract(address, library, account);
+    return tokenContract.decimals();
+  };
+
+  onGetReceipt = async (receipt, library, account) => {
     console.log('RECEIPT', receipt);
+
+    const { inTokenAddr, amount, outTokenAddr, nonZeroToken, nonZeroTokenAmount } = receipt;
     let newRouteData = [];
 
-    let decimal = supportedTokens.filter(
-      item => item.address.toLowerCase() == receipt.logs[0].address.toLowerCase()
-    )[0].decimal;
-
     let routeDataEntry = {
-      from: receipt.logs[0].address.toLowerCase(),
-      to: receipt.logs[1].address.toLowerCase(),
-      value: parseInt(receipt.logs[0].data.replace('0x', ''), 16) / Math.pow(10, decimal),
+      from: await this.getTokenSymbol(inTokenAddr),
+      to: await this.getTokenSymbol(outTokenAddr),
+      value:
+        parseInt(amount.toString().replace('0x', ''), 16) /
+        Math.pow(10, await this.getTokenDecimal(inTokenAddr)),
     };
 
     newRouteData.push(routeDataEntry);
 
     // get eth addresses
     let token0EthAddress = supportedTokens.filter(
-      item => item.address.toLowerCase() == receipt.logs[0].address.toLowerCase()
+      item => item.address.toLowerCase() == inTokenAddr.toLowerCase()
     )[0].addressOnEth;
 
     // if token is USDC, set price point to the same value
