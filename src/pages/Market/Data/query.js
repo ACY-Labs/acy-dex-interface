@@ -480,12 +480,14 @@ export const FILTERED_TRANSACTIONS = gql`
 
 export const TOP_LPS_PER_PAIRS = gql`
   query lps($pair: Bytes!) {
-    liquidityPositions(where: { pair: $pair }, orderBy: liquidityTokenBalance, orderDirection: desc, first: 10) {
+    liquidityPositions(where: { pair: $pair }, orderBy: liquidityTokenBalance, orderDirection: desc, first: 3) {
       user {
         id
       }
       pair {
         id
+        totalSupply
+        reserveUSD
       }
       liquidityTokenBalance
     }

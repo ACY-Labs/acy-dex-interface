@@ -1080,7 +1080,6 @@ export const MarketSearchBar = props => {
      })
 
     lastPromiseWrapper(fetchTokenSearch(marketClient, '')).then(data => {
-      console.log(data);
       setSearchCoinReturns(
         data.map(item => {
           return { address: item.id, name: item.name, short: item.symbol };

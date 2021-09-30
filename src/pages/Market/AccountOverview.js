@@ -4,6 +4,7 @@ import { MarketSearchBar } from './UtilComponent.js';
 import { Input, Button, Divider, Icon, Table } from 'antd';
 import styles from './styles.less';
 import { Link, useHistory } from 'react-router-dom';
+import className from 'classnames';
 import {
   abbrHash,
   abbrNumber,
@@ -18,14 +19,10 @@ import {
   dataSourceTransaction,
   graphSampleData,
 } from './SampleData.js';
-import {
-  fetchTopLP,
-  fetchGeneralPoolInfoDay,
-  marketClient
-} from './Data/index.js';
+import { fetchTopLP, fetchGeneralPoolInfoDay, marketClient } from './Data/index.js';
 import { WatchlistManager } from './WatchlistManager.js';
 
-const watchlistManager = new WatchlistManager('account')
+const watchlistManager = new WatchlistManager('account');
 
 let sampleAddress = [
   '0x1451351351351351313513',
@@ -94,17 +91,29 @@ function SavedAccounts({ accounts }) {
 
 function AccountsTable(props) {
   const [accountSortAscending, setAccountSortAscending] = useState(true);
-  const [accountDisplayNumber, setAccountDisplayNumber] = useState(10);
-  const [currentKey, setCurrentKey] = useState('');
+  const [accountDisplayNumber, setAccountDisplayNumber] = useState(9);
+  const [currentKey, setCurrentKey] = useState('value');
   const [isHover, setIsHover] = useState(false);
   const navHistory = useHistory();
 
   function columnsAccounts(isAscending, onSortChange) {
     return [
       {
+        title: <div className={className(styles.tableHeaderFirst, styles.tableIndex)}>#</div>,
+        key: 'index',
+        width: '4em',
+        render: (text, record, index) => (
+          <div className={className(styles.tableDataFirstColumn, styles.tableIndex)}>
+            {index + 1}
+          </div>
+        ),
+        visible: isDesktop(),
+      },
+      {
         title: <div className={styles.tableHeaderFirst}>Account</div>,
         dataIndex: 'account',
         key: 'account',
+        className: 'leftAlignTableHeader',
         render: (text, entry) => {
           return (
             <div className={styles.tableDataFirstColumn}>
@@ -120,12 +129,18 @@ function AccountsTable(props) {
         key: 'pair',
         render: (text, entry) => {
           return (
-            <div className={styles.tableData}>
+            <div
+              className={styles.tableData}
+              style={{ display: 'flex', justifyContent: 'flex-end' }}
+            >
               <AcyTokenIcon symbol={entry.token1} />
               <AcyTokenIcon symbol={entry.token2} />
-              <span>
-                {entry.token1}{' '}/{' '}{entry.token2}
-              </span>
+              <div style={{ width: 3 }} />
+              <Link to={`/market/info/pool/${entry.pairAddress}`}>
+                {entry.token1}
+                {' / '}
+                {entry.token2}
+              </Link>
             </div>
           );
         },
@@ -193,15 +208,62 @@ function AccountsTable(props) {
 }
 
 function AccountOverview(props) {
-
-  const [topLP, setTopLP] = useState([])
+  const [topLP, setTopLP] = useState([]);
 
   useEffect(() => {
     // get the top pair list
-    fetchGeneralPoolInfoDay(marketClient).then((data) => {
-      console.log("ACCOUNT OVERVIEW", data)
-    })
-  }, [])
+    console.log('executing promises 1');
+    fetchGeneralPoolInfoDay(marketClient).then(data => {
+      let poolAddresses = data.map(item => item.address);
+      console.log(poolAddresses);
+      let infoPromise = [];
+      let topLPData = [];
+      let length = poolAddresses.length;
+      for (let i = 0; i < length; i++) {
+        infoPromise.push(
+          fetchTopLP(marketClient, poolAddresses[i]).then(posData => {
+            let rawArr = posData.liquidityPositions;
+            let arrLen = rawArr.length;
+            let tempArr = [];
+
+            for (let j = 0; j < arrLen; j++) {
+              let tableEntry = {
+                account: rawArr[j].user.id,
+                token1: data[i].coin1,
+                token2: data[i].coin2,
+                value:
+                  (parseFloat(rawArr[j].liquidityTokenBalance) /
+                    parseFloat(rawArr[j].pair.totalSupply)) *
+                  parseFloat(rawArr[j].pair.reserveUSD),
+                pairAddress: rawArr[j].pair.id,
+              };
+
+              // remove duplicate same account by value
+              let presentElem = topLPData.filter(item => item.account == tableEntry.account);
+
+              if (presentElem.length == 0) topLPData.push(tableEntry);
+              else {
+                let isMaxPresentInArray = false;
+                for (let k = 0; k < presentElem.length; k++) {
+                  if (presentElem[k].value >= tableEntry.value) {
+                    isMaxPresentInArray = true;
+                    break;
+                  }
+                }
+
+                if (!isMaxPresentInArray) topLPData.push(tableEntry);
+              }
+            }
+          })
+        );
+      }
+
+      Promise.all(infoPromise).then(() => {
+        console.log(topLPData);
+        setTopLP(topLPData.slice(0, 100));
+      });
+    });
+  }, []);
 
   return (
     <div className={styles.marketRoot}>
@@ -229,8 +291,8 @@ function AccountOverview(props) {
       </div>
       <SavedAccounts accounts={sampleAddress} />
 
-      <h2>Top Account</h2>
-      <AccountsTable dataSourceAccounts={accountsList} />
+      <h2>Top Accounts</h2>
+      {topLP.length > 0 ? <AccountsTable dataSourceAccounts={topLP} /> : <Icon type="loading" />}
     </div>
   );
 }
