@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AcyTokenIcon } from '@/components/Acy';
 import { MarketSearchBar } from './UtilComponent.js';
 import { Input, Button, Divider, Icon, Table } from 'antd';
@@ -63,13 +63,19 @@ let accountsList = [
   },
 ];
 
-function SavedAccounts({ accounts }) {
+function SavedAccounts({ accounts , onRemoveItem}) {
+  const [accountsData, setAccountsData] = useState(accounts);
+
+  useEffect(() => {
+    setAccountsData(accounts)
+  }, [accounts])
+
   return (
     <div className={styles.savedAccountCard}>
       <h3>Saved Accounts</h3>
       <Divider style={{ background: '#2e3032', marginTop: 0, marginBottom: 0 }} />
-      {accounts.length > 0 ? (
-        accounts.map(item => (
+      {accountsData.length > 0 ? (
+        accountsData.map(item => (
           <div
             style={{
               marginTop: 10,
@@ -78,8 +84,18 @@ function SavedAccounts({ accounts }) {
               justifyContent: 'space-between',
             }}
           >
-            <span style={{ color: '#e29227', fontWeight: 600 }}>{item}</span>
-            <Icon type="close" />
+            <Link to={`/market/accounts/${item}`} style={{ fontWeight: 600 }}>
+              {item}
+            </Link>
+            <Icon
+              type="close"
+              onClick={() => {
+                let newAccount = accounts.filter(entry => entry != item);
+                setAccountsData(newAccount);
+                watchlistManager.saveData(newAccount);
+                onRemoveItem(item)
+              }}
+            />
           </div>
         ))
       ) : (
@@ -209,16 +225,21 @@ function AccountsTable(props) {
 
 function AccountOverview(props) {
   const [topLP, setTopLP] = useState([]);
+  const [watchlist, setWatchlist] = useState([]);
+  const [accountInput, setAccountInput] = useState("");
+  const [inputError, setInputError] = useState("");
 
   useEffect(() => {
-    // get the top pair list
-    console.log('executing promises 1');
+    // fetch the watchlist
+    setWatchlist(watchlistManager.getData());
+
+    // fetch pool and its respective liquidity positions
     fetchGeneralPoolInfoDay(marketClient).then(data => {
       let poolAddresses = data.map(item => item.address);
-      console.log(poolAddresses);
       let infoPromise = [];
       let topLPData = [];
       let length = poolAddresses.length;
+
       for (let i = 0; i < length; i++) {
         infoPromise.push(
           fetchTopLP(marketClient, poolAddresses[i]).then(posData => {
@@ -265,6 +286,18 @@ function AccountOverview(props) {
     });
   }, []);
 
+  const onInput = useCallback((e) => {
+    setAccountInput(e.target.value)
+  })
+
+  const navHistory = useHistory();
+
+  function switchChart(dest) {
+    setGraphTabIndex(dest);
+  }
+
+  const redirectToInputAddress = () => navHistory.push(`/market/accounts/${accountInput}`);
+
   return (
     <div className={styles.marketRoot}>
       <MarketSearchBar
@@ -282,14 +315,27 @@ function AccountOverview(props) {
         <Input
           placeholder="Search account address..."
           style={{ background: '#2e3032', marginRight: 5, borderRadius: 10 }}
+          value={ accountInput|| ""}
+          onChange={onInput}
         />
         <Button
           style={{ background: '#e29227', border: 'transparent', color: 'white', borderRadius: 10 }}
+          onClick={() => {
+            if(!isNaN(accountInput) && accountInput.length == 42){
+              redirectToInputAddress()
+            }
+            else{
+              setInputError("Invalid account number!")
+            }
+          }}
         >
           Load Account Details
         </Button>
       </div>
-      <SavedAccounts accounts={sampleAddress} />
+      <div style={{color: "#c6224e", marginTop:5, fontWeight: 600}}>{inputError}</div>
+      <SavedAccounts accounts={watchlist} onRemoveItem={(removedAddress) => {
+        setWatchlist(watchlist.filter(item => item != removedAddress))
+      }}/>
 
       <h2>Top Accounts</h2>
       {topLP.length > 0 ? <AccountsTable dataSourceAccounts={topLP} /> : <Icon type="loading" />}
