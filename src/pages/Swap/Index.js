@@ -138,19 +138,32 @@ class BasicProfile extends Component {
   getPrice() {
     const { range, activeToken0, activeToken1 } = this.state;
 
-    axios
-      .post(
+    // FIXME: current api doesn't take token0/1 sequence into consideration, always return ratio based on alphabetical order of token symbol
+    axios.post(
         `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${
           activeToken1.addressOnEth
         }&range=${range}`
       )
       .then(data => {
-        const { swaps } = data.data.data;
-        const lastDataPoint = swaps[swaps.length - 1];
+        let { swaps } = data.data.data;
+        // invert the nominator and denominator when toggled on the token image (top right of the page)
+        if (activeToken1.symbol < activeToken0.symbol) {
+          console.log("swapping token position")
+          swaps = Array.from(swaps, o => ({...o, "rate": 1/o.rate}))
+        }
+        console.log(activeToken0.symbol, activeToken1.symbol)
+        console.log(swaps)
+        const lastDataPointIndex = swaps.length - 1;
+
+        let precisionedData = swaps.map(item => [item.time, item.rate.toFixed(3)])
+        // add precision if the ratio is close to zero
+        if (Math.max(...precisionedData.map(item => item[1])) === 0) {
+          precisionedData = swaps.map(item => [item.time, item.rate.toFixed(6)])
+        }
         this.setState({
-          chartData: swaps.map(item => [item.time, item.rate.toFixed(3)]),
-          activeRate: lastDataPoint.rate.toFixed(3),
-          activeTime: lastDataPoint.time,
+          chartData: precisionedData,
+          activeRate: precisionedData[lastDataPointIndex][1],
+          activeTime: precisionedData[lastDataPointIndex][0],
         });
       })
       .catch(e => {
@@ -183,30 +196,33 @@ class BasicProfile extends Component {
       }
     }
 
+    const swapTokenPosition = () => {
+      const tempSwapToken = activeToken0;
+      this.setState({
+        activeToken0: activeToken1,
+        activeToken1: tempSwapToken
+      }, () => {this.getPrice()})
+    }
+
     return [
       <div>
         <div className={styles.maintitle}>
-          <div style={{ display: 'flex' }}>
+          <div className={styles.lighttitle} style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }} onClick={swapTokenPosition}>
             <img
               src={token0logo}
               alt=""
-              style={{
-                width: 24,
-                maxWidth: '24px',
-                maxHeight: '24px',
-                marginRight: '0.25rem',
-                marginTop: '0.1rem',
-              }}
+              style={{ width: 24, maxWidth: '24px', maxHeight: '24px', marginRight: '0.25rem', marginTop: '0.1rem' }}
             />
             <img
               src={token1logo}
               alt=""
               style={{ width: 24, maxHeight: '24px', marginRight: '0.5rem', marginTop: '0.1rem' }}
             />
+            <span>
+              {activeToken0.symbol}&nbsp;/&nbsp;{activeToken1.symbol}
+            </span>
           </div>
-          <span className={styles.lighttitle}>
-            {activeToken0.symbol}/{activeToken1.symbol}
-          </span>
+          
         </div>
         <div className={styles.secondarytitle}>
           <span className={styles.lighttitle}>{activeRate}</span>{' '}
