@@ -128,19 +128,19 @@ const sampleStakeHistoryColumns = [
     title: 'Total Value',
     dataIndex: 'totalToken',
     key: 'totalToken',
-    render: text =><Tooltip title={text}>{text&&text.toFixed(4)}</Tooltip>
+    render: text =><Tooltip title={text}>{text && Number.parseFloat(text).toFixed(4)}</Tooltip>
   },
   {
     title: 'Token Amount',
     dataIndex: 'inputTokenNum',
     key: 'inputTokenNum',
-    render: (text,record) =><Tooltip title={text}>{text&&text.toFixed(4)} {record.inputTokenSymbol}</Tooltip>
+    render: (text,record) =><Tooltip title={text}>{text && Number.parseFloat(text).toFixed(4)} {record.inputTokenSymbol}</Tooltip>
   },
   {
     title: 'Token Amount',
     dataIndex: 'outTokenNum',
     key: 'outTokenNum',
-    render: (text,record) =><Tooltip title={text}>{text&&text.toFixed(4)} {record.outTokenSymbol}</Tooltip>
+    render: (text,record) =><Tooltip title={text}>{text && Number.parseFloat(text).toFixed(4)} {record.outTokenSymbol}</Tooltip>
   },
   {
     title: 'Time',
