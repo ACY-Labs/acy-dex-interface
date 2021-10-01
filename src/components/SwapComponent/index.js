@@ -435,12 +435,12 @@ const SwapComponent = props => {
         console.log('receiptreceipt', receipt);
         // receipt is not null when transaction is done
         if (receipt) {
-          const { logs } = receipt;
-          const decodedLog = parseArbitrageLog(logs[logs.length - 1]);
-          console.log('receipt OK, these are logs');
-          console.log(decodedLog);
+          // const { logs } = receipt;
+          // const decodedLog = parseArbitrageLog(logs[logs.length - 1]);
+          // console.log('receipt OK, these are logs');
+          // console.log(decodedLog);
 
-          props.onGetReceipt(decodedLog);
+          // props.onGetReceipt(decodedLog);
           clearInterval(sti);
           let newData = transactions.filter(item => item.hash != status.hash);
           let transactionTime = '';
@@ -470,9 +470,9 @@ const SwapComponent = props => {
               }&range=1D`
             )
             .then(data => {
-              totalToken = abbrNumber(
-                inputTokenNum * data.data.data.swaps[data.data.data.swaps.length - 1].rate
-              );
+              // totalToken = abbrNumber(
+              //   inputTokenNum * data.data.data.swaps[data.data.data.swaps.length - 1].rate
+              // );
 
               // const { swaps } = data.data.data;
               // const lastDataPoint = swaps[swaps.length - 1];

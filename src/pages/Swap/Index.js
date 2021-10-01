@@ -312,7 +312,7 @@ class BasicProfile extends Component {
         parseInt(amount.toString().replace('0x', ''), 16) /
         Math.pow(10, await this.getTokenDecimal(inTokenAddr)),
     };
-
+debugger
     newRouteData.push(routeDataEntry);
 
     // get eth addresses

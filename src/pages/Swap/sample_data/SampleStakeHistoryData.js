@@ -1,5 +1,5 @@
 import styles from '../components/StakeHistoryTable.less'
-
+import { Tooltip } from 'antd';
 function abbrHash(hash) {
   let len = hash.length;
   let first = hash.slice(0, 6);
@@ -128,21 +128,19 @@ const sampleStakeHistoryColumns = [
     title: 'Total Value',
     dataIndex: 'totalToken',
     key: 'totalToken',
-    render: text =>`$ ${text}`
-
+    render: text =><Tooltip title={text}>{text&&text.toFixed(4)}</Tooltip>
   },
   {
     title: 'Token Amount',
     dataIndex: 'inputTokenNum',
     key: 'inputTokenNum',
-    render: (text,record) =>`${text} ${record.inputTokenSymbol}`
-
+    render: (text,record) =><Tooltip title={text}>{text&&text.toFixed(4)} {record.inputTokenSymbol}</Tooltip>
   },
   {
     title: 'Token Amount',
     dataIndex: 'outTokenNum',
     key: 'outTokenNum',
-    render: (text,record) =>`${text} ${record.outTokenSymbol}`
+    render: (text,record) =><Tooltip title={text}>{text&&text.toFixed(4)} {record.outTokenSymbol}</Tooltip>
   },
   {
     title: 'Time',
