@@ -27,6 +27,8 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import axios from 'axios';
 import supportedTokens from '@/constants/TokenList';
 import moment from 'moment';
+import abi from '@/acy-dex-swap/abis/ERC20.json';
+import { Conflux } from 'js-conflux-sdk/dist/js-conflux-sdk.umd.min.js';
 import StakeHistoryTable from './components/StakeHistoryTable';
 import styles from './styles.less';
 
@@ -65,6 +67,44 @@ function abbrNumber(number) {
   return result;
 }
 
+function confluxTest() {
+  async function main() {
+    const conflux = new Conflux({
+      url: 'https://test.confluxrpc.com',
+      networkId: 1,
+    });
+    console.log(conflux.wallet);
+    window.conflux.enable();
+
+    const accounts = await conflux.send({ method: 'cfx_accounts' });
+    console.log('accounts');
+    console.log(accounts);
+    // 1. initialize contract with abi and address
+    const contract = conflux.Contract({
+      abi,
+      address: 'cfxtest:accvfzzwkxxps79xu01uh1aa80zvzmptrph4epwwzm',
+    });
+    // 2. call method to get contract state
+    const name = await contract.name();
+    console.log('---------- token name ------------');
+    console.log(name); // MiniERC20
+    // 3. user can set options by `contract.name().call({ from: account, ... })`
+
+    // 4. call method with arguments
+    const balance = await contract.balanceOf('cfxtest:aarh2340wg8cdka1kfh219sfz5g3y7vcp688nsuhhw');
+    console.log('---------- token balance ------------');
+    console.log(balance); // 10000n
+
+    // 4. change contract state by send a transaction
+    console.log(contract.transfer('cfxtest:aajjb1n1sf20echx77a4d21h4ydy2wvwxpcxsjep2j', 10));
+    const transactionHash = await contract
+      .transfer('cfxtest:aajjb1n1sf20echx77a4d21h4ydy2wvwxpcxsjep2j', 1000)
+      .sendTransaction({ from: 'cfxtest:aarh2340wg8cdka1kfh219sfz5g3y7vcp688nsuhhw' });
+    console.log(transactionHash); // 0xb31eb095b62bed1ef6fee6b7b4ee43d4127e4b42411e95f761b1fdab89780f1a
+  }
+  main();
+}
+
 @connect(({ profile, transaction, loading }) => ({
   profile,
   transaction,
@@ -96,6 +136,7 @@ class BasicProfile extends Component {
   };
 
   componentDidMount() {
+    confluxTest();
     this.getPrice();
 
     // 还原存储的交易信息
@@ -139,7 +180,8 @@ class BasicProfile extends Component {
     const { range, activeToken0, activeToken1 } = this.state;
 
     // FIXME: current api doesn't take token0/1 sequence into consideration, always return ratio based on alphabetical order of token symbol
-    axios.post(
+    axios
+      .post(
         `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${
           activeToken1.addressOnEth
         }&range=${range}`
@@ -148,17 +190,17 @@ class BasicProfile extends Component {
         let { swaps } = data.data.data;
         // invert the nominator and denominator when toggled on the token image (top right of the page)
         if (activeToken1.symbol < activeToken0.symbol) {
-          console.log("swapping token position")
-          swaps = Array.from(swaps, o => ({...o, "rate": 1/o.rate}))
+          console.log('swapping token position');
+          swaps = Array.from(swaps, o => ({ ...o, rate: 1 / o.rate }));
         }
-        console.log(activeToken0.symbol, activeToken1.symbol)
-        console.log(swaps)
+        console.log(activeToken0.symbol, activeToken1.symbol);
+        console.log(swaps);
         const lastDataPointIndex = swaps.length - 1;
 
-        let precisionedData = swaps.map(item => [item.time, item.rate.toFixed(3)])
+        let precisionedData = swaps.map(item => [item.time, item.rate.toFixed(3)]);
         // add precision if the ratio is close to zero
         if (Math.max(...precisionedData.map(item => item[1])) === 0) {
-          precisionedData = swaps.map(item => [item.time, item.rate.toFixed(6)])
+          precisionedData = swaps.map(item => [item.time, item.rate.toFixed(6)]);
         }
         this.setState({
           chartData: precisionedData,
@@ -198,20 +240,35 @@ class BasicProfile extends Component {
 
     const swapTokenPosition = () => {
       const tempSwapToken = activeToken0;
-      this.setState({
-        activeToken0: activeToken1,
-        activeToken1: tempSwapToken
-      }, () => {this.getPrice()})
-    }
+      this.setState(
+        {
+          activeToken0: activeToken1,
+          activeToken1: tempSwapToken,
+        },
+        () => {
+          this.getPrice();
+        }
+      );
+    };
 
     return [
       <div>
         <div className={styles.maintitle}>
-          <div className={styles.lighttitle} style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }} onClick={swapTokenPosition}>
+          <div
+            className={styles.lighttitle}
+            style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }}
+            onClick={swapTokenPosition}
+          >
             <img
               src={token0logo}
               alt=""
-              style={{ width: 24, maxWidth: '24px', maxHeight: '24px', marginRight: '0.25rem', marginTop: '0.1rem' }}
+              style={{
+                width: 24,
+                maxWidth: '24px',
+                maxHeight: '24px',
+                marginRight: '0.25rem',
+                marginTop: '0.1rem',
+              }}
             />
             <img
               src={token1logo}
@@ -222,7 +279,6 @@ class BasicProfile extends Component {
               {activeToken0.symbol}&nbsp;/&nbsp;{activeToken1.symbol}
             </span>
           </div>
-          
         </div>
         <div className={styles.secondarytitle}>
           <span className={styles.lighttitle}>{activeRate}</span>{' '}
