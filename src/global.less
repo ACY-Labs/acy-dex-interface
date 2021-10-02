@@ -96,3 +96,66 @@ leftAlignTableHeader .leftAlign {
 .ant-empty-normal{
   color: #b5b5b6 !important;
 }
+
+// pagination
+// place override styles inside #root when dynamicImport is switched on.
+// https://juejin.cn/post/6901934719542231053
+#root {
+  .ant-pagination {
+    margin: 1rem 0;
+    display: flex;
+    justify-content: center;
+  }
+  .ant-pagination-prev {
+    margin-right: 20%;
+  }
+  .ant-pagination-next {
+    margin-left: 20%;
+  }
+  .ant-pagination-item, .ant-pagination-prev, .ant-pagination-next, .ant-pagination-jump-next, .ant-pagination-jump-prev, .ant-pagination-item-ellipsis {
+    color: white;
+    border: 0;
+    border-radius: 50%;
+    background-color: transparent;
+  
+    a {
+      border: 0;
+      background-color: transparent;
+      color: white;
+    }
+    
+    &:hover {
+      // color: black;
+      background-color: #282828;
+  
+      a {
+        color: white;
+      }
+    }
+  }
+  .ant-pagination-item-active, .ant-pagination-item-active:hover {
+    background-color: #3f3f3f;
+    
+    a {
+      color: white;
+    }
+  }
+  .ant-pagination-item-container {
+    i, span {
+      color: whitesmoke;
+    }
+  }
+  .ant-pagination-disabled {
+    color: transparent;
+    a {
+      cursor: default;
+      color: transparent;
+    }
+    &:hover {
+      background-color: inherit;
+      a {
+        color: transparent;
+      }
+    }
+  }
+}
