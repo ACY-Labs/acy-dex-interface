@@ -1,8 +1,41 @@
 import React, { Component, useEffect } from 'react';
 import { Conflux } from 'js-conflux-sdk/dist/js-conflux-sdk.umd.min.js';
-import abi from '@/acy-dex-swap/abis/ERC20.json';
+import ERC20ABI from '@/acy-dex-swap/abis/ERC20.json';
+import { abi as ROUTERABI } from '@/acy-dex-swap/abis/IUniswapV2Router02.json';
 
-function confluxTest() {
+const ROUTER_ADDRESS = 'cfxtest:aceh5g5vgx6c9stfk8war5mrv870utgwjj2cxnrvmg';
+
+const token0Address = 'cfxtest:accn7py5k3255sr7e1jxx9z9cg9z0gducevgnjfnkv'; // USD Coin
+const token1Address = 'cfxtest:accvfzzwkxxps79xu01uh1aa80zvzmptrph4epwwzm'; // ACY
+
+async function approve(tokenAddress, spenderAddress) {
+  const conflux = new Conflux();
+  const confluxPortal = window.conflux;
+  conflux.provider = confluxPortal;
+
+  confluxPortal.enable();
+
+  const accounts = await confluxPortal.send({ method: 'cfx_accounts' });
+  console.log('accounts');
+  console.log(accounts);
+
+  const account = accounts[0];
+
+  const tokenContract = conflux.Contract({
+    abi: ERC20ABI,
+    address: tokenAddress,
+  });
+
+  const approveArgs = [spenderAddress, '100000000000000000'];
+
+  const result = await tokenContract.approve(...approveArgs).sendTransaction({
+    from: account,
+  });
+
+  console.log(result);
+}
+
+function addLiquidity() {
   async function main() {
     const conflux = new Conflux();
     const confluxPortal = window.conflux;
@@ -14,27 +47,32 @@ function confluxTest() {
     console.log('accounts');
     console.log(accounts);
 
-    // 1. initialize contract with abi and address
-    const contract = conflux.Contract({
-      abi,
-      address: 'cfxtest:accvfzzwkxxps79xu01uh1aa80zvzmptrph4epwwzm',
+    const account = accounts[0];
+
+    const routerContract = conflux.Contract({
+      abi: ROUTERABI,
+      address: ROUTER_ADDRESS,
     });
-    // 2. call method to get contract state
-    const name = await contract.name();
-    console.log('---------- token name ------------');
-    console.log(name); // MiniERC20
-    // 3. user can set options by `contract.name().call({ from: account, ... })`
 
-    // 4. call method with arguments
-    const balance = await contract.balanceOf('cfxtest:aarh2340wg8cdka1kfh219sfz5g3y7vcp688nsuhhw');
-    console.log('---------- token balance ------------');
-    console.log(balance); // 10000n
+    console.log(routerContract);
 
-    // 4. change contract state by send a transaction
-    console.log(contract.transfer('cfxtest:aajjb1n1sf20echx77a4d21h4ydy2wvwxpcxsjep2j', 10));
-    const transactionHash = await contract
-      .transfer('cfxtest:aajjb1n1sf20echx77a4d21h4ydy2wvwxpcxsjep2j', '100000000')
-      .sendTransaction({ from: 'cfxtest:aarh2340wg8cdka1kfh219sfz5g3y7vcp688nsuhhw' });
+    const args = [
+      token0Address,
+      token1Address,
+      '10000',
+      '10000',
+      '9000',
+      '9000',
+      account,
+      99999999999,
+    ];
+
+    console.log(args);
+
+    const transactionHash = await routerContract.addLiquidity(...args).sendTransaction({
+      from: account,
+    });
+
     console.log(transactionHash); // 0xb31eb095b62bed1ef6fee6b7b4ee43d4127e4b42411e95f761b1fdab89780f1a
   }
   main();
@@ -42,7 +80,12 @@ function confluxTest() {
 
 const ConfluxComponent = () => {
   useEffect(() => {
-    confluxTest();
+    // approve(
+    //   'cfxtest:accvfzzwkxxps79xu01uh1aa80zvzmptrph4epwwzm',
+    //   ROUTER_ADDRESS
+    // );
+
+    addLiquidity();
   }, []);
   return <div>This is Conflux</div>;
 };
