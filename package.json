@@ -80,7 +80,7 @@
     "omit.js": "^1.0.0",
     "only-last-promise": "^1.0.0",
     "path-to-regexp": "^2.4.0",
-    "prop-types": "^15.5.10",
+    "prop-types": "^15.7.2",
     "qs": "^6.6.0",
     "rc-animate": "^2.4.4",
     "react": "^17.0.2",
@@ -102,6 +102,7 @@
   },
   "devDependencies": {
     "@types/react": "^16.7.7",
+    "@types/react-datepicker": "^4.1.7",
     "@types/react-dom": "^16.0.10",
     "@umijs/plugin-qiankun": "^2.24.1",
     "@umijs/preset-react": "^1.2.2",

@@ -84,7 +84,7 @@ const FarmsTableRow = ({
         {/* Pending Reward Column */}
         <div className={styles.tableBodyRewardColContainer}>
           <div className={styles.pendingRewardTitleContainer}>
-            {isMobile ? 'Reward' : 'Total Reward'}
+            {isMobile ? 'Reward' : 'My Reward'}
           </div>
           {pendingReward.map(reward => (
             <div className={styles.pendingReward1ContentContainer}>

@@ -9,6 +9,7 @@ import SampleStakeHistoryData from './SampleDaoData';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAllPools } from '@/acy-dex-swap/core/farms';
+import supportedTokens from '@/constants/TokenList';
 
 const Farms = () => {
   // useWeb3React hook will listen to wallet connection.
@@ -23,7 +24,7 @@ const Farms = () => {
   const [selectedTable, setSelectedTable] = useState(0);
   const [tableRow, setTableRow] = useState([]);
   const [searchInput, setSearchInput] = useState('');
-  const [tableTitle, setTableTitle] = useState('All Farms');
+  const [tableTitle, setTableTitle] = useState('My Farms');
   const [tableSubtitle, setTableSubtitle] = useState('Stake your LP tokens and earn token rewards');
   const [rowNumber, setRowNumber] = useState(INITIAL_ROW_NUMBER);
   const [hideDao, setHideDao] = useState(true);
@@ -44,6 +45,16 @@ const Farms = () => {
     activate(injected);
   };
 
+  //function to get logo URI
+  function getLogoURIWithSymbol(symbol) {
+    for (let j = 0; j < supportedTokens.length; j++) {
+      if (symbol === supportedTokens[j].symbol) {
+        return supportedTokens[j].logoURI;
+      }
+    }
+    return 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg';
+  }
+
   useEffect(
     () => {
       // automatically connect to wallet at the start of the application.
@@ -52,6 +63,7 @@ const Farms = () => {
       const getPools = async (library, account) => {
         const pools = await getAllPools(library, account);
         console.log('getAllPools OK');
+        // console.log(pools);
         const newFarmsContents = [];
 
         pools.forEach(pool => {
@@ -59,9 +71,9 @@ const Farms = () => {
             poolId: pool.poolId,
             lpTokens: pool.lpTokenAddress,
             token1: pool.token0Symbol,
-            token1Logo: null,
+            token1Logo: getLogoURIWithSymbol(pool.token0Symbol),
             token2: pool.token1Symbol,
-            token2Logo: null,
+            token2Logo: getLogoURIWithSymbol(pool.token1Symbol),
             pendingReward: pool.rewardTokensSymbols.map((token, index) => ({
               token,
               amount: pool.rewardTokensAmount[index],
@@ -100,7 +112,7 @@ const Farms = () => {
 
   const onAllToggleButtonClick = () => {
     setSelectedTable(0);
-    setTableTitle('All Farms');
+    setTableTitle('My Farms');
     setTableSubtitle('Stake your LP tokens and earn token rewards');
     setRowNumber(5);
     setHideDao(true);

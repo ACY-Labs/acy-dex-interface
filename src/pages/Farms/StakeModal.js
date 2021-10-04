@@ -1,7 +1,6 @@
 import { AcyModal } from '@/components/Acy';
 import React, { useState, useEffect, forwardRef } from 'react';
 import styles from '@/pages/Farms/Farms.less';
-
 import DatePicker from 'react-datepicker';
 import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 import { useWeb3React } from '@web3-react/core';
@@ -70,7 +69,7 @@ const StakeModal = ({
         <div className={styles.amountRowInputContainer}>
           <input type="text" value={stake} onChange={e => updateStake(e.target.value)} />
         </div>
-        <span className={styles.suffix}>ACY</span>
+        <span className={styles.suffix}>{token1}-{token2}</span>
       </div>
       <div className={styles.balanceAmountContainer}>
         <div>
@@ -95,13 +94,14 @@ const StakeModal = ({
           onChange={e => updateBalancePercentage(e.target.value)}
         />
       </div>
+
       <div className={styles.lockTimeRow}>
         <div className={styles.dateSelectionContainer}>
           <div className={styles.datePickerContainer}>
             <DatePicker
               selected={date}
               onChange={datePickerChangeHandler}
-              customInput={<CustomDatePickerInput />}
+              customInput={<CustomDatePickerInput />} 
             />
           </div>
           <div className={styles.presetDurationContainer}>
