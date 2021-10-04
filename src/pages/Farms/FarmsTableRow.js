@@ -25,6 +25,7 @@ const FarmsTableRow = ({
   chainId,
   account,
   library,
+  isMyFarms,
 }) => {
   const [balance, setBalance] = useState(12345);
   const [isHarvestDisabled, setIsHarvestDisabled] = useState(false);
@@ -84,7 +85,9 @@ const FarmsTableRow = ({
         {/* Pending Reward Column */}
         <div className={styles.tableBodyRewardColContainer}>
           <div className={styles.pendingRewardTitleContainer}>
-            {isMobile ? 'Reward' : 'My Reward'}
+            {(isMyFarms && !isMobile ) ? 'My Reward' : ''}
+            {(!isMyFarms && !isMobile ) ? 'All Reward' : ''}
+            {(isMobile) ? 'Reward' : ''}
           </div>
           {pendingReward.map(reward => (
             <div className={styles.pendingReward1ContentContainer}>

@@ -24,7 +24,7 @@ const Farms = () => {
   const [selectedTable, setSelectedTable] = useState(0);
   const [tableRow, setTableRow] = useState([]);
   const [searchInput, setSearchInput] = useState('');
-  const [tableTitle, setTableTitle] = useState('My Farms');
+  const [tableTitle, setTableTitle] = useState('All Farms');
   const [tableSubtitle, setTableSubtitle] = useState('Stake your LP tokens and earn token rewards');
   const [rowNumber, setRowNumber] = useState(INITIAL_ROW_NUMBER);
   const [hideDao, setHideDao] = useState(true);
@@ -112,7 +112,7 @@ const Farms = () => {
 
   const onAllToggleButtonClick = () => {
     setSelectedTable(0);
-    setTableTitle('My Farms');
+    setTableTitle('All Farms');
     setTableSubtitle('Stake your LP tokens and earn token rewards');
     setRowNumber(5);
     setHideDao(true);
@@ -163,9 +163,14 @@ const Farms = () => {
             tableData.token1.toLowerCase().includes(searchInput.toLowerCase()) ||
             tableData.token2.toLowerCase().includes(searchInput.toLowerCase())
         );
-        if (isMyFarms)
+        if (isMyFarms){
+          setTableTitle('My Farm');
           setTableRow(currentTableRowCopy.filter(tableData => tableData.hasUserPosition));
-        else setTableRow(currentTableRowCopy);
+        }
+        else{
+          setTableRow(currentTableRowCopy);
+          setTableTitle('All Farm');
+        } 
       }
     },
     [searchInput, selectedTable, isMyFarms]
@@ -279,6 +284,7 @@ const Farms = () => {
             account={account}
             library={library}
             chainId={chainId}
+            isMyFarms={isMyFarms}
           />
         )}
         {selectedTable === 4 && <DaoTable dataSource={daoDataSource} />}

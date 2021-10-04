@@ -23,6 +23,7 @@ const FarmsTable = ({
   library,
   account,
   chainId,
+  isMyFarms,
 }) => {
   const [myChartId, setMyChartId] = useState(0);
   const [totalChartId, setTotalChartId] = useState(0);
@@ -104,6 +105,7 @@ const FarmsTable = ({
                 account={account}
                 library={library}
                 chainId={chainId}
+                isMyFarms={isMyFarms}
               />
             );
           })}
@@ -121,6 +123,7 @@ const FarmsTable = ({
             pendingReward={[{ token: 'ACY', amount: 0 }]}
             walletConnected={walletConnected}
             connectWallet={connectWallet}
+            isMyFarms={isMyFarms}
             hideArrow
           />
           <div>
