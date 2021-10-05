@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component,useState,useEffect } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton } from 'antd';
@@ -65,44 +65,33 @@ function abbrNumber(number) {
   return result;
 }
 
-@connect(({ profile, transaction, loading }) => ({
-  profile,
-  transaction,
-  loading: loading.effects['profile/fetchBasic'],
-}))
-class BasicProfile extends Component {
-  state = {
-    visible: false,
-    visibleConfirmOrder: false,
-    visibleLoading: false,
-    alphaTable: 'Line',
-    chartData: [],
-    range: '1D',
-    activeTime: 'Loading...',
-    activeRate: 'Loading...',
-    activePercentageChange: '+0.00',
-    activeToken1: supportedTokens[1],
-    activeToken0: supportedTokens[0],
-    format: 'h:mm:ss a',
-    routeData: [],
-    isReceiptObtained: false,
+const Swap =props=> {
 
-    // previous token shown on routing, used to maintain the route display to the previous tokens
-    pastToken0: 'USDC',
-    pastToken1: 'ETH',
+  const [pricePoint,setPricePoint]=useState(0);
+  const [pastToken1,setPastToken1]=useState('ETH');
+  const [pastToken0,setPastToken0]=useState('USDC');
+  const [isReceiptObtained,setIsReceiptObtained]=useState(false);
+  const [routeData,setRouteData]=useState([]);
+  const [format,setFormat]=useState('h:mm:ss a');
+  const [activeToken1,setActiveToken1]=useState(supportedTokens[1]);
+  const [activeToken0,setActiveToken0]=useState(supportedTokens[0]);
+  const [activePercentageChange,setActivePercentageChange]=useState('+0.00');
+  const [activeRate,setActiveRate]=useState('Loading...');
+  const [activeTime,setActiveTime]=useState('Loading...');
+  const [range,setRange]=useState('1D');
+  const [chartData,setChartData]=useState([]);
+  const [alphaTable,setAlphaTable]=useState('Line');
+  const [visibleLoading,setVisibleLoading]=useState(false);
+  const [visible,setVisible]=useState(false);
+  const [visibleConfirmOrder,setVisibleConfirmOrder]=useState(false);
 
-    // price point for the token (for now uses the USDC/ETH)
-    pricePoint: 0,
-  };
-
-  componentDidMount() {
-    this.getPrice();
-
+  useEffect(()=>{
+    getPrice();
     // 还原存储的交易信息
     const {
       transaction: { transactions },
       dispatch,
-    } = this.props;
+    } = props;
     let newData = [...transactions];
     if (localStorage.getItem('transactions')) {
       newData.push(...JSON.parse(localStorage.getItem('transactions')));
@@ -114,11 +103,23 @@ class BasicProfile extends Component {
         transactions: [...uniqueFun(newData, 'hash')],
       },
     });
-  }
+  },[])
+
+  useEffect(()=>{
+    getPrice()
+  },activeToken1);
+
+  useEffect(()=>{
+    getPrice()
+  },activeToken0);
+
+  useEffect(()=>{
+    getPrice()
+  },format);
 
   // workaround way to get USD price (put token1 as USDC)
   // NEEDS ETHEREUM ADDRESS, RINKEBY DOES NOT WORK HERE
-  getRoutePrice(token0Address, token1Address) {
+  const getRoutePrice=(token0Address, token1Address)=> {
     axios
       .post(
         `https://api.acy.finance/api/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
@@ -135,9 +136,7 @@ class BasicProfile extends Component {
       });
   }
 
-  getPrice() {
-    const { range, activeToken0, activeToken1 } = this.state;
-
+ const getPrice=()=> {
     // FIXME: current api doesn't take token0/1 sequence into consideration, always return ratio based on alphabetical order of token symbol
     axios.post(
         `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${
@@ -160,30 +159,18 @@ class BasicProfile extends Component {
         if (Math.max(...precisionedData.map(item => item[1])) === 0) {
           precisionedData = swaps.map(item => [item.time, item.rate.toFixed(6)])
         }
-        this.setState({
-          chartData: precisionedData,
-          activeRate: precisionedData[lastDataPointIndex][1],
-          activeTime: precisionedData[lastDataPointIndex][0],
-        });
+        setChartData(precisionedData);
+        setActiveRate(precisionedData[lastDataPointIndex][1]);
+        setActiveTime(precisionedData[lastDataPointIndex][0]);
       })
       .catch(e => {
-        this.setState({
-          chartData: [],
-          activeRate: 'No data',
-          activeTime: 'No data',
-        });
+        setChartData([]);
+        setActiveRate('No data');
+        setActiveTime('No data');
       });
   }
 
-  lineTitleRender = () => {
-    const {
-      activeTime,
-      activeRate,
-      activePercentageChange,
-      activeToken0,
-      activeToken1,
-      format,
-    } = this.state;
+  const lineTitleRender = () => {
 
     let token0logo = null;
     let token1logo = null;
@@ -198,10 +185,8 @@ class BasicProfile extends Component {
 
     const swapTokenPosition = () => {
       const tempSwapToken = activeToken0;
-      this.setState({
-        activeToken0: activeToken1,
-        activeToken1: tempSwapToken
-      }, () => {this.getPrice()})
+      setActiveToken0(activeToken1);
+      setActiveToken1(tempSwapToken);
     }
 
     return [
@@ -236,13 +221,13 @@ class BasicProfile extends Component {
     ];
   };
 
-  selectTime = pt => {
+  const selectTime = pt => {
     const dateSwitchFunctions = {
       Line: () => {
-        this.setState({ alphaTable: 'Line' });
+        setAlphaTable('Line');
       },
       Bar: () => {
-        this.setState({ alphaTable: 'Bar' });
+        setAlphaTable('Bar');
       },
     };
 
@@ -250,7 +235,7 @@ class BasicProfile extends Component {
   };
 
   // 时间段选择
-  onhandPeriodTimeChoose = pt => {
+  const onhandPeriodTimeChoose = pt => {
     let _format = 'h:mm:ss a';
     switch (pt) {
       case '1D':
@@ -265,41 +250,34 @@ class BasicProfile extends Component {
       default:
         _format = 'h:mm:ss a';
     }
-    this.setState({ range: pt, format: _format }, () => {
-      this.getPrice();
-    });
+    setRange(pt);
+    setFormat(_format);
   };
 
   // 选择Coin
-  onClickCoin = () => {
-    this.setState({
-      visible: true,
-    });
+  const onClickCoin = () => {
+    setVisible(true);
   };
 
-  onCancel = () => {
-    this.setState({
-      visible: false,
-    });
+  const onCancel = () => {
+    setVisible(false);
   };
 
-  onHandModalConfirmOrder = falg => {
-    this.setState({
-      visibleConfirmOrder: !!falg,
-    });
+  const onHandModalConfirmOrder = falg => {
+    setVisibleConfirmOrder(!!falg);
   };
 
-  getTokenSymbol = async (address, library, account) => {
+ const  getTokenSymbol = async (address, library, account) => {
     const tokenContract = getTokenContract(address, library, account);
     return tokenContract.symbol();
   };
 
-  getTokenDecimal = async (address, library, account) => {
+  const getTokenDecimal = async (address, library, account) => {
     const tokenContract = getTokenContract(address, library, account);
     return tokenContract.decimals();
   };
 
-  onGetReceipt = async (receipt, library, account) => {
+  const onGetReceipt = async (receipt, library, account) => {
     console.log('RECEIPT', receipt);
 
     const { inTokenAddr, amount, outTokenAddr, nonZeroToken, nonZeroTokenAmount } = receipt;
@@ -312,7 +290,7 @@ class BasicProfile extends Component {
         parseInt(amount.toString().replace('0x', ''), 16) /
         Math.pow(10, await this.getTokenDecimal(inTokenAddr)),
     };
-debugger
+
     newRouteData.push(routeDataEntry);
 
     // get eth addresses
@@ -324,33 +302,18 @@ debugger
     // this check is needed because the swap History API cannot support same coins
     if (token0EthAddress.toLowerCase() == '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48') {
       console.log('usdc as token 0');
-      this.setState({
-        pricePoint: 1,
-      });
+      setPricePoint(1);
     } else this.getRoutePrice(token0EthAddress, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48');
 
-    this.setState({
-      routeData: [...newRouteData],
-      isReceiptObtained: true,
-      pastToken0: this.state.activeToken0.symbol,
-      pastToken1: this.state.activeToken1.symbol,
-    });
+    setRouteData([...newRouteData]);
+    setIsReceiptObtained(true);
+    setPastToken0(activeToken0.symbol);
+    setPastToken1(activeToken1.symbol);
   };
-
-  render() {
-    const {
-      visible,
-      visibleConfirmOrder,
-      visibleLoading,
-      alphaTable,
-      chartData,
-      range,
-      format,
-    } = this.state;
     const {
       isMobile,
       transaction: { transactions },
-    } = this.props;
+    } = props;
     return (
       <PageHeaderWrapper>
         <div className={styles.main}>
@@ -360,14 +323,10 @@ debugger
                 <div className={styles.trade}>
                   <SwapComponent
                     onSelectToken0={token => {
-                      this.setState({ activeToken0: token }, () => {
-                        this.getPrice();
-                      });
+                      setActiveToken0(token);
                     }}
                     onSelectToken1={token => {
-                      this.setState({ activeToken1: token }, () => {
-                        this.getPrice();
-                      });
+                      setActiveToken1(token);
                     }}
                     onGetReceipt={this.onGetReceipt}
                   />
@@ -376,7 +335,7 @@ debugger
             </div>
           )}
           <div>
-            <AcyCard style={{ background: 'transparent' }} title={this.lineTitleRender()}>
+            <AcyCard style={{ background: 'transparent' }} title={lineTitleRender()}>
               <div
                 style={{
                   width: '100%',
@@ -397,18 +356,15 @@ debugger
                     range={range}
                     onHover={(data, dataIndex) => {
                       const prevData = dataIndex === 0 ? 0 : chartData[dataIndex - 1][1];
-                      this.setState({
-                        activeTime: chartData[dataIndex][0],
-                        activeRate: data,
-                        activePercentageChange:
-                          dataIndex === 0
-                            ? '0'
-                            : `${(((data - prevData) / prevData) * 100).toFixed(2)}`,
-                      });
+                      setActiveTime(chartData[dataIndex][0]);
+                      setActiveRate(data);
+                      setActivePercentageChange(dataIndex === 0
+                        ? '0'
+                        : `${(((data - prevData) / prevData) * 100).toFixed(2)}`);
                     }}
                   />
                   <AcyPeriodTime
-                    onhandPeriodTimeChoose={this.onhandPeriodTimeChoose}
+                    onhandPeriodTimeChoose={onhandPeriodTimeChoose}
                     className={styles.pt}
                     times={['1D', '1W', '1M']}
                   />
@@ -422,16 +378,13 @@ debugger
                 <div className={styles.trade}>
                   <SwapComponent
                     onSelectToken0={token => {
-                      this.setState({ activeToken0: token }, () => {
-                        this.getPrice();
-                      });
+                      setActiveToken0(token);
                     }}
                     onSelectToken1={token => {
-                      this.setState({ activeToken1: token }, () => {
-                        this.getPrice();
-                      });
+                      setActiveToken1(token);
+
                     }}
-                    onGetReceipt={this.onGetReceipt}
+                    onGetReceipt={onGetReceipt}
                   />
                 </div>
               </AcyCard>
@@ -439,15 +392,15 @@ debugger
           )}
         </div>
         <div className={styles.exchangeBottomWrapper}>
-          {this.state.isReceiptObtained && (
+          {isReceiptObtained && (
             <div className={styles.exchangeItem}>
               <h3>
                 <AcyIcon.MyIcon width={30} type="arrow" />
                 <span className={styles.span}>FLASH ROUTE</span>
               </h3>
               <div>
-                {this.state.isReceiptObtained ? (
-                  <AcyRoutingChart data={this.state.routeData} />
+                {isReceiptObtained ? (
+                  <AcyRoutingChart data={routeData} />
                 ) : (
                   <div
                     style={{
@@ -475,7 +428,7 @@ debugger
           </div>
         </div>
 
-        <AcyModal onCancel={this.onCancel} width={600} visible={visible}>
+        <AcyModal onCancel={onCancel} width={600} visible={visible}>
           <div className={styles.title}>
             <AcyIcon name="back" /> Select a token
           </div>
@@ -501,7 +454,7 @@ debugger
         </AcyModal>
 
         <AcyConfirm
-          onCancel={this.onHandModalConfirmOrder}
+          onCancel={onHandModalConfirmOrder}
           title="Comfirm Order"
           visible={visibleConfirmOrder}
         >
@@ -520,16 +473,19 @@ debugger
         </AcyConfirm>
 
         <AcyApprove
-          onCancel={() => this.setState({ visibleLoading: false })}
+          onCancel={() => setVisibleLoading(false)}
           visible={visibleLoading}
         />
       </PageHeaderWrapper>
     );
-  }
 }
-
-export default props => (
+export default connect(({ profile, transaction, loading }) => ({
+  profile,
+  transaction,
+  loading: loading.effects['profile/fetchBasic'],
+}))(props => (
   <Media query="(max-width: 599px)">
-    {isMobile => <BasicProfile {...props} isMobile={isMobile} />}
+    {isMobile => <Swap {...props} isMobile={isMobile} />}
   </Media>
-);
+))
+
