@@ -328,7 +328,7 @@ const Swap =props=> {
                     onSelectToken1={token => {
                       setActiveToken1(token);
                     }}
-                    onGetReceipt={this.onGetReceipt}
+                    onGetReceipt={onGetReceipt}
                   />
                 </div>
               </AcyCard>
