@@ -284,8 +284,8 @@ const Swap =props=> {
     let newRouteData = [];
 
     let routeDataEntry = {
-      from: await this.getTokenSymbol(inTokenAddr),
-      to: await this.getTokenSymbol(outTokenAddr),
+      from: await getTokenSymbol(inTokenAddr),
+      to: await getTokenSymbol(outTokenAddr),
       value:
         parseInt(amount.toString().replace('0x', ''), 16) /
         Math.pow(10, await this.getTokenDecimal(inTokenAddr)),
@@ -304,7 +304,7 @@ const Swap =props=> {
       console.log('usdc as token 0');
       setPricePoint(1);
     } else this.getRoutePrice(token0EthAddress, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48');
-
+debugger;
     setRouteData([...newRouteData]);
     setIsReceiptObtained(true);
     setPastToken0(activeToken0.symbol);
