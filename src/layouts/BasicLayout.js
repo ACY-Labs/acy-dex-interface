@@ -16,7 +16,6 @@ import logo from '../assets/logo.png';
 import Footer from './Footer';
 import Header from './Header';
 import Context from './MenuContext';
-import Exception403 from '../pages/Exception/403';
 import PageLoading from '@/components/PageLoading';
 import SiderMenu from '@/components/SiderMenu';
 import { title } from '../defaultSettings';
@@ -230,9 +229,7 @@ const  BasicLayout =props=> {
             {...props}
           />
           <Content className={styles.content} style={contentStyle}>
-            {/* <Authorized authority={routerConfig} noMatch={<Exception403 />}> */}
               {children}
-            {/* </Authorized> */}
           </Content>
           {/* <Footer /> */}
         </Layout>
