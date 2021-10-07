@@ -435,13 +435,14 @@ const SwapComponent = props => {
         console.log('receiptreceipt', receipt);
         // receipt is not null when transaction is done
         if (receipt) {
+          clearInterval(sti);
           const { logs } = receipt;
+          console.log("logs: ", logs);
           const decodedLog = parseArbitrageLog(logs[logs.length - 1]);
           console.log('receipt OK, these are logs');
-          console.log(decodedLog);
+          console.log("decodedLog", decodedLog);
 
-          props.onGetReceipt(decodedLog);
-          clearInterval(sti);
+          props.onGetReceipt(decodedLog, library, account);
           let newData = transactions.filter(item => item.hash != status.hash);
           let transactionTime = '';
           let inputTokenNum;

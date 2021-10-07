@@ -284,11 +284,11 @@ const Swap =props=> {
     let newRouteData = [];
 
     let routeDataEntry = {
-      from: await getTokenSymbol(inTokenAddr),
-      to: await getTokenSymbol(outTokenAddr),
+      from: await getTokenSymbol(inTokenAddr, library, account),
+      to: await getTokenSymbol(outTokenAddr, library, account),
       value:
         parseInt(amount.toString().replace('0x', ''), 16) /
-        Math.pow(10, await this.getTokenDecimal(inTokenAddr)),
+        Math.pow(10, await getTokenDecimal(inTokenAddr, library, account)),
     };
 
     newRouteData.push(routeDataEntry);
@@ -297,18 +297,18 @@ const Swap =props=> {
     let token0EthAddress = supportedTokens.filter(
       item => item.address.toLowerCase() == inTokenAddr.toLowerCase()
     )[0].addressOnEth;
-
     // if token is USDC, set price point to the same value
     // this check is needed because the swap History API cannot support same coins
     if (token0EthAddress.toLowerCase() == '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48') {
       console.log('usdc as token 0');
       setPricePoint(1);
-    } else this.getRoutePrice(token0EthAddress, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48');
-debugger;
+    } else getRoutePrice(token0EthAddress, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48');
+// debugger;
     setRouteData([...newRouteData]);
     setIsReceiptObtained(true);
     setPastToken0(activeToken0.symbol);
     setPastToken1(activeToken1.symbol);
+    console.log("end of operation")
   };
     const {
       isMobile,
