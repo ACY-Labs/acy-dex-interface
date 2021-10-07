@@ -1,5 +1,6 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useState, useEffect, useMemo } from 'react';
+import axios from 'axios';
 import { useWeb3React } from '@web3-react/core';
 import { Table, Pagination } from 'antd';
 import {
@@ -9,7 +10,7 @@ import {
 } from '@/acy-dex-swap/utils/index';
 
 import supportedTokens from '@/constants/TokenList';
-import { Fetcher, Percent, Token, TokenAmount } from '@acyswap/sdk';
+import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import AcyRemoveLiquidityModal from '@/components/AcyRemoveLiquidityModal';
 import { isMobile } from 'react-device-detect';
 import styles from './styles.less';
@@ -23,113 +24,16 @@ function getLogoURIWithSymbol(symbol) {
   return 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg';
 }
 
-// // this section should be moved to backend, fetch the updated list of valid pairs, and return slice of it.
-// export async function getAllLiquidityPositions(tokens, chainId, library, account, page, pageEntryCount) {
-//   // we only want WETH
-//   tokens = tokens.filter(token => token.symbol !== 'ETH');
-
-//   const totalTokenCount = tokens.length;
-//   const userNonZeroLiquidityPositions = [];
-
-//   if (totalTokenCount === 1) return;
-
-//   const checkLiquidityPositionTasks = [];
-
-//   for (let i = 0; i < totalTokenCount; i++) {
-//     for (let j = i + 1; j < totalTokenCount; j++) {
-//       const { address: token0Address, symbol: token0Symbol, decimal: token0Decimal } = tokens[i];
-//       const { address: token1Address, symbol: token1Symbol, decimal: token1Decimal } = tokens[j];
-//       const token0 = new Token(chainId, token0Address, token0Decimal, token0Symbol);
-//       const token1 = new Token(chainId, token1Address, token1Decimal, token1Symbol);
-
-//       // quit if the two tokens are equivalent, i.e. have the same chainId and address
-//       if (token0.equals(token1)) continue;
-
-//       // queue get pair task
-//       const pairTask = Fetcher.fetchPairData(token0, token1, library);
-//       checkLiquidityPositionTasks.push(pairTask);
-//     }
-//   }
-//   console.log("test length1: ", checkLiquidityPositionTasks.length);
-
-//   const pairs = await Promise.allSettled(checkLiquidityPositionTasks);
-
-//   // now we process the pairs
-//   // eslint-disable-next-line no-restricted-syntax
-//   for (let pair of pairs) {
-//     if (pair.status === 'rejected') continue;
-
-//     pair = pair.value;
-
-//     let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
-
-//     if (userPoolBalance.isZero()) continue;
-
-//     userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
-
-//     const totalPoolTokens = await getTokenTotalSupply(pair.liquidityToken, library, account);
-
-//     const token0Deposited = pair.getLiquidityValue(
-//       pair.token0,
-//       totalPoolTokens,
-//       userPoolBalance,
-//       false
-//     );
-//     const token1Deposited = pair.getLiquidityValue(
-//       pair.token1,
-//       totalPoolTokens,
-//       userPoolBalance,
-//       false
-//     );
-
-//     console.log(pair);
-
-//     const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
-
-//     const poolTokenPercentage = new Percent(userPoolBalance.raw, totalSupply.raw).toFixed(4);
-
-//     userNonZeroLiquidityPositions.push({
-//       token0: pair.token0,
-//       token1: pair.token1,
-//       token0LogoURI: getLogoURIWithSymbol(pair.token0.symbol),
-//       token1LogoURI: getLogoURIWithSymbol(pair.token1.symbol),
-//       token0Symbol: pair.token0.symbol,
-//       token1Symbol: pair.token1.symbol,
-//       pool: `${pair.token0.symbol}/${pair.token1.symbol}`,
-//       poolAddress: `${pair.liquidityToken.address}`,
-//       token0Amount: `${token0Deposited.toSignificant(4)} ${pair.token0.symbol}`,
-//       token1Amount: `${token1Deposited.toSignificant(4)} ${pair.token1.symbol}`,
-//       token0Reserve: `${pair.reserve0.toExact(2)} ${pair.token0.symbol}`,
-//       token1Reserve: `${pair.reserve1.toExact(2)} ${pair.token1.symbol}`,
-//       share: `${poolTokenPercentage}%`,
-//     });
-//   }
-//   console.log("test length2: ", userNonZeroLiquidityPositions.length);
-//   console.log("nonZeroPositions: ", userNonZeroLiquidityPositions);
-
-//   return userNonZeroLiquidityPositions;
-// }
-
-// this test version uses data from "./samplePairs/samplePairs.js"
-export async function getAllLiquidityPositions(tokens, chainId, library, account, page, pageEntryCount) {
-  let pairs = require("../../pages/Liquidity/samplePairs/samplePairs.json");
-  const startIdx = (page - 1) * pageEntryCount;
-  const endIdx = page * pageEntryCount;
-
-  return pairs.slice(startIdx, endIdx);
-}
-
 const AcyLiquidityPositions = () => {
-  const [userLiquidityPositions, setUserLiquidityPositions] = useState([]);
+  const [userLiquidityPositions, setUserLiquidityPositions] = useState([]); // list of pools that user has share
   const { account, chainId, library, activate } = useWeb3React();
 
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [removeLiquidityPosition, setRemoveLiquidityPosition] = useState(null);
-  const [page, setPage] = useState(1);
-
-  const pageEntryCount = 15;
-  const totalPairCount = 345;
+  const [validPoolPairs, setValidPoolPairs] = useState([]); // fetch a list of valid pool from backend
+  const [readListPointer, setReadListPointer] = useState(0);  // last processed read position of "validPoolPairs"
+  const displayCountIncrement = 5;
 
   const columns = useMemo(() => [
     {
@@ -235,53 +139,179 @@ const AcyLiquidityPositions = () => {
     },
   ]);
 
-  useEffect(
-    () => {
-      if (!chainId || !library || !account) return;
-      async function getAllUserLiquidityPositions() {
-        if (account != undefined) {
-          setUserLiquidityPositions(
-            await getAllLiquidityPositions(supportedTokens, chainId, library, account, page, pageEntryCount)
-          );
-        }
+  function getValidPoolList() {
+    console.log("getting list on chain ", chainId);
+    axios.get(
+      // fetch valid pool list from remote
+      `https://api.acy.finance/api/pool?chainId=${chainId}`
+      // `http://localhost:3001/api/pool?chainId=${chainId}`
+    ).then(res => {
+      const tokens = supportedTokens;
+  
+      // construct pool list locally
+      const array = res.data;
+      const validPairs = [];
+      for (let pairIdx of array) {
+        const token0Idx = pairIdx["token0Idx"];
+        const token1Idx = pairIdx["token1Idx"];
+        validPairs.push([token0Idx, token1Idx]);
       }
-      setLoading(true);
-      getAllUserLiquidityPositions().finally(() => {
-        setLoading(false);
+  
+      setValidPoolPairs(validPairs);
+      console.log(validPairs);
+  
+    }).catch(e => console.log("error: ", e));
+  }
+  
+  async function getPoolPage() {
+    const tokens = supportedTokens.filter(token => token.symbol !== "ETH");
+  
+    // const checkLiquidityPositionTasks = [];
+    const userNonZeroLiquidityPositions = [];
+    let readIdx = readListPointer;
+    let newPoolCount = 0;
+    while (readIdx < validPoolPairs.length) {
+  
+      const [token0Idx, token1Idx] = validPoolPairs[readIdx];
+      readIdx++;
+  
+      const { address: token0Address, symbol: token0Symbol, decimal: token0Decimal } = tokens[token0Idx];
+      const { address: token1Address, symbol: token1Symbol, decimal: token1Decimal } = tokens[token1Idx];
+      const token0 = new Token(chainId, token0Address, token0Decimal, token0Symbol);
+      const token1 = new Token(chainId, token1Address, token1Decimal, token1Symbol);
+  
+      // almost impossible: quit if the two tokens are equivalent, i.e. have the same chainId and address
+      if (token0.equals(token1)) continue;
+  
+      // queue get pair task
+      const pair = await Fetcher.fetchPairData(token0, token1, library);
+      console.log("decoding pair: ", pair);
+      
+      // check if user has share in this pool
+      let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
+      if (userPoolBalance.isZero()) continue;
+  
+      userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
+  
+      const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
+  
+      const token0Deposited = pair.getLiquidityValue(
+        pair.token0,
+        totalSupply,
+        userPoolBalance,
+        false
+      );
+      const token1Deposited = pair.getLiquidityValue(
+        pair.token1,
+        totalSupply,
+        userPoolBalance,
+        false
+      );
+  
+      const poolTokenPercentage = new Percent(userPoolBalance.raw, totalSupply.raw).toFixed(4);
+  
+      userNonZeroLiquidityPositions.push({
+        token0: pair.token0,
+        token1: pair.token1,
+        token0LogoURI: getLogoURIWithSymbol(pair.token0.symbol),
+        token1LogoURI: getLogoURIWithSymbol(pair.token1.symbol),
+        token0Symbol: pair.token0.symbol,
+        token1Symbol: pair.token1.symbol,
+        pool: `${pair.token0.symbol}/${pair.token1.symbol}`,
+        poolAddress: `${pair.liquidityToken.address}`,
+        token0Amount: `${token0Deposited.toSignificant(4)} ${pair.token0.symbol}`,
+        token1Amount: `${token1Deposited.toSignificant(4)} ${pair.token1.symbol}`,
+        token0Reserve: `${pair.reserve0.toExact(2)} ${pair.token0.symbol}`,
+        token1Reserve: `${pair.reserve1.toExact(2)} ${pair.token1.symbol}`,
+        share: `${poolTokenPercentage}%`,
       });
-    },
-    [chainId, library, account, page]
+  
+      newPoolCount ++;
+  
+      if (newPoolCount == displayCountIncrement)
+        break;
+    }
+  
+    // write readpoolpointer to state
+    setReadListPointer(readIdx);
+  
+    // const validPairs = await Promise.allSettled(checkLiquidityPositionTasks);
+  
+    // console.log(validPairs)
+  
+    // // now we process the pairs
+    // // eslint-disable-next-line no-restricted-syntax
+    // const userNonZeroLiquidityPositions = [];
+    // for (let pair of validPairs) {
+    //   pair = pair.value;
+  
+    //   let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
+    //   if (userPoolBalance.isZero()) continue;
+  
+    //   userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
+  
+    //   const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
+  
+    //   const token0Deposited = pair.getLiquidityValue(
+    //     pair.token0,
+    //     totalSupply,
+    //     userPoolBalance,
+    //     false
+    //   );
+    //   const token1Deposited = pair.getLiquidityValue(
+    //     pair.token1,
+    //     totalSupply,
+    //     userPoolBalance,
+    //     false
+    //   );
+  
+    //   const poolTokenPercentage = new Percent(userPoolBalance.raw, totalSupply.raw).toFixed(4);
+  
+    //   userNonZeroLiquidityPositions.push({
+    //     token0: pair.token0,
+    //     token1: pair.token1,
+    //     token0LogoURI: getLogoURIWithSymbol(pair.token0.symbol),
+    //     token1LogoURI: getLogoURIWithSymbol(pair.token1.symbol),
+    //     token0Symbol: pair.token0.symbol,
+    //     token1Symbol: pair.token1.symbol,
+    //     pool: `${pair.token0.symbol}/${pair.token1.symbol}`,
+    //     poolAddress: `${pair.liquidityToken.address}`,
+    //     token0Amount: `${token0Deposited.toSignificant(4)} ${pair.token0.symbol}`,
+    //     token1Amount: `${token1Deposited.toSignificant(4)} ${pair.token1.symbol}`,
+    //     token0Reserve: `${pair.reserve0.toExact(2)} ${pair.token0.symbol}`,
+    //     token1Reserve: `${pair.reserve1.toExact(2)} ${pair.token1.symbol}`,
+    //     share: `${poolTokenPercentage}%`,
+    //   });
+    // }
+    // console.log("test length2: ", userNonZeroLiquidityPositions.length);
+    // console.log("nonZeroPositions: ", userNonZeroLiquidityPositions);
+  
+    return userNonZeroLiquidityPositions;
+
+  }
+
+  async function getAllUserLiquidityPositions() {
+    if (!chainId || !library || !account || validPoolPairs.length === 0) return;
+    setLoading(true);
+    console.log("getting user liquidity")
+    const pagePool = await getPoolPage();
+    setUserLiquidityPositions(prevState => {
+      return [...prevState, ...pagePool]
+    });
+    setLoading(false);
+  }
+
+  useEffect(() => getValidPoolList(), []);
+
+  useEffect(
+    () => { getAllUserLiquidityPositions() },
+    [chainId, library, account, validPoolPairs]
   );
-
-  // useEffect(() => {
-  //   approveTokenWithSpender(
-  //     '0xf90619d9098a937794ef7cd665b9cc1d7249f9d7',
-  //     '0x7b028A293dA85097B98c5c9cbb076Fd58467b3f1',
-  //     library,
-  //     account
-  //   );
-  // }, []);
-
-  // useEffect(() => {
-  //   const userLiquidityPositionsCopy = [...userLiquidityPositions]
-  //   console.log(userLiquidityPositionsCopy)
-  //   for (let i = 0; i < userLiquidityPositionsCopy.length; i++) {
-  //     for (let j = 0; j < supportedTokens.length; j++) {
-  //       if (userLiquidityPositionsCopy[i].token0Symbol === supportedTokens[j].symbol) {
-  //         userLiquidityPositionsCopy[i].token0logo = supportedTokens[j].logoURI
-  //       }
-  //       if (userLiquidityPositionsCopy[i].token1Symbol === supportedTokens[j].symbol) {
-  //         userLiquidityPositionsCopy[i].token1logo = supportedTokens[j].logoURI
-  //       }
-  //     }
-  //   }
-  //   setUserLiquidityPositions(userLiquidityPositionsCopy)
-  // }, [userLiquidityPositions])
 
   return (
     <div>
-      {loading ? (
-        <h2>Loading...</h2>
+      {!(userLiquidityPositions.length) && loading ? (
+        <h2 style={{ textAlign: "center", color: "white" }}>Loading...</h2>
       ) : (
         <>
           <Table
@@ -297,13 +327,29 @@ const AcyLiquidityPositions = () => {
                 </span>
               ),
             }}
+            footer={() => (
+              <>
+                {userLiquidityPositions.length < validPoolPairs.length && (
+                  <div className={styles.tableSeeMoreWrapper}>
+                    <a
+                      className={styles.tableSeeMore}
+                      onClick={() => {
+                        getAllUserLiquidityPositions()
+                      }}
+                    >
+                      {loading ? "Loading..." : " See More..."}
+                    </a>
+                  </div>
+                )}
+              </>
+            )}
           />
-            <Pagination
+          {/* <Pagination
               current={page}
               defaultPageSize={pageEntryCount}
-              total={totalPairCount}
+              total={userLiquidityPositions.length}
               onChange={(newPage) => setPage(newPage)}
-            />
+            /> */}
           <AcyRemoveLiquidityModal
             removeLiquidityPosition={removeLiquidityPosition}
             isModalVisible={isModalVisible}
