@@ -1,4 +1,4 @@
-import React, { Component,useState,useEffect } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton } from 'antd';
@@ -65,27 +65,27 @@ function abbrNumber(number) {
   return result;
 }
 
-const Swap =props=> {
+const Swap = props => {
 
-  const [pricePoint,setPricePoint]=useState(0);
-  const [pastToken1,setPastToken1]=useState('ETH');
-  const [pastToken0,setPastToken0]=useState('USDC');
-  const [isReceiptObtained,setIsReceiptObtained]=useState(false);
-  const [routeData,setRouteData]=useState([]);
-  const [format,setFormat]=useState('h:mm:ss a');
-  const [activeToken1,setActiveToken1]=useState(supportedTokens[1]);
-  const [activeToken0,setActiveToken0]=useState(supportedTokens[0]);
-  const [activePercentageChange,setActivePercentageChange]=useState('+0.00');
-  const [activeRate,setActiveRate]=useState('Loading...');
-  const [activeTime,setActiveTime]=useState('Loading...');
-  const [range,setRange]=useState('1D');
-  const [chartData,setChartData]=useState([]);
-  const [alphaTable,setAlphaTable]=useState('Line');
-  const [visibleLoading,setVisibleLoading]=useState(false);
-  const [visible,setVisible]=useState(false);
-  const [visibleConfirmOrder,setVisibleConfirmOrder]=useState(false);
+  const [pricePoint, setPricePoint] = useState(0);
+  const [pastToken1, setPastToken1] = useState('ETH');
+  const [pastToken0, setPastToken0] = useState('USDC');
+  const [isReceiptObtained, setIsReceiptObtained] = useState(false);
+  const [routeData, setRouteData] = useState([]);
+  const [format, setFormat] = useState('h:mm:ss a');
+  const [activeToken1, setActiveToken1] = useState(supportedTokens[1]);
+  const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
+  const [activePercentageChange, setActivePercentageChange] = useState('+0.00');
+  const [activeRate, setActiveRate] = useState('Loading...');
+  const [activeTime, setActiveTime] = useState('Loading...');
+  const [range, setRange] = useState('1D');
+  const [chartData, setChartData] = useState([]);
+  const [alphaTable, setAlphaTable] = useState('Line');
+  const [visibleLoading, setVisibleLoading] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
 
-  useEffect(()=>{
+  useEffect(() => {
     getPrice();
     // 还原存储的交易信息
     const {
@@ -103,23 +103,23 @@ const Swap =props=> {
         transactions: [...uniqueFun(newData, 'hash')],
       },
     });
-  },[])
+  }, [])
 
-  useEffect(()=>{
+  useEffect(() => {
     getPrice()
-  },activeToken1);
+  }, activeToken1);
 
-  useEffect(()=>{
+  useEffect(() => {
     getPrice()
-  },activeToken0);
+  }, activeToken0);
 
-  useEffect(()=>{
+  useEffect(() => {
     getPrice()
-  },format);
+  }, format);
 
   // workaround way to get USD price (put token1 as USDC)
   // NEEDS ETHEREUM ADDRESS, RINKEBY DOES NOT WORK HERE
-  const getRoutePrice=(token0Address, token1Address)=> {
+  const getRoutePrice = (token0Address, token1Address) => {
     axios
       .post(
         `https://api.acy.finance/api/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
@@ -130,25 +130,24 @@ const Swap =props=> {
         // const { swaps } = data.data.data;
         // const lastDataPoint = swaps[swaps.length - 1];
         // console.log('ROUTE PRICE POINT', lastDataPoint);
-        // this.setState({
+        // setState({
         //   pricePoint: lastDataPoint.rate,
         // });
       });
   }
 
- const getPrice=()=> {
+  const getPrice = () => {
     // FIXME: current api doesn't take token0/1 sequence into consideration, always return ratio based on alphabetical order of token symbol
     axios.post(
-        `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${
-          activeToken1.addressOnEth
-        }&range=${range}`
-      )
+      `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${activeToken1.addressOnEth
+      }&range=${range}`
+    )
       .then(data => {
         let { swaps } = data.data.data;
         // invert the nominator and denominator when toggled on the token image (top right of the page)
         if (activeToken1.symbol < activeToken0.symbol) {
           console.log("swapping token position")
-          swaps = Array.from(swaps, o => ({...o, "rate": 1/o.rate}))
+          swaps = Array.from(swaps, o => ({ ...o, "rate": 1 / o.rate }))
         }
         console.log(activeToken0.symbol, activeToken1.symbol)
         console.log(swaps)
@@ -207,7 +206,7 @@ const Swap =props=> {
               {activeToken0.symbol}&nbsp;/&nbsp;{activeToken1.symbol}
             </span>
           </div>
-          
+
         </div>
         <div className={styles.secondarytitle}>
           <span className={styles.lighttitle}>{activeRate}</span>{' '}
@@ -267,7 +266,7 @@ const Swap =props=> {
     setVisibleConfirmOrder(!!falg);
   };
 
- const  getTokenSymbol = async (address, library, account) => {
+  const getTokenSymbol = async (address, library, account) => {
     const tokenContract = getTokenContract(address, library, account);
     return tokenContract.symbol();
   };
@@ -282,7 +281,7 @@ const Swap =props=> {
 
     const { inTokenAddr, amount, outTokenAddr, nonZeroToken, nonZeroTokenAmount } = receipt;
     let newRouteData = [];
-
+    debugger
     let routeDataEntry = {
       from: await getTokenSymbol(inTokenAddr, library, account),
       to: await getTokenSymbol(outTokenAddr, library, account),
@@ -303,181 +302,177 @@ const Swap =props=> {
       console.log('usdc as token 0');
       setPricePoint(1);
     } else getRoutePrice(token0EthAddress, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48');
-// debugger;
-    setRouteData([...newRouteData]);
-    setIsReceiptObtained(true);
     setPastToken0(activeToken0.symbol);
-    setPastToken1(activeToken1.symbol);
     console.log("end of operation")
   };
-    const {
-      isMobile,
-      transaction: { transactions },
-    } = props;
-    return (
-      <PageHeaderWrapper>
-        <div className={styles.main}>
-          {isMobile && (
-            <div>
-              <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
-                <div className={styles.trade}>
-                  <SwapComponent
-                    onSelectToken0={token => {
-                      setActiveToken0(token);
-                    }}
-                    onSelectToken1={token => {
-                      setActiveToken1(token);
-                    }}
-                    onGetReceipt={onGetReceipt}
-                  />
-                </div>
-              </AcyCard>
-            </div>
-          )}
+  const {
+    isMobile,
+    transaction: { transactions },
+  } = props;
+  return (
+    <PageHeaderWrapper>
+      <div className={styles.main}>
+        {isMobile && (
           <div>
-            <AcyCard style={{ background: 'transparent' }} title={lineTitleRender()}>
-              <div
-                style={{
-                  width: '100%',
-                }}
-              >
-                <div
-                  style={{
-                    height: '480px',
+            <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
+              <div className={styles.trade}>
+                <SwapComponent
+                  onSelectToken0={token => {
+                    setActiveToken0(token);
                   }}
-                  className={styles.showPeriodOnHover}
-                >
-                  <AcyPriceChart
-                    data={chartData}
-                    format={format}
-                    showXAxis
-                    showGradient
-                    lineColor="#e29227"
-                    range={range}
-                    onHover={(data, dataIndex) => {
-                      const prevData = dataIndex === 0 ? 0 : chartData[dataIndex - 1][1];
-                      setActiveTime(chartData[dataIndex][0]);
-                      setActiveRate(data);
-                      setActivePercentageChange(dataIndex === 0
-                        ? '0'
-                        : `${(((data - prevData) / prevData) * 100).toFixed(2)}`);
-                    }}
-                  />
-                  <AcyPeriodTime
-                    onhandPeriodTimeChoose={onhandPeriodTimeChoose}
-                    className={styles.pt}
-                    times={['1D', '1W', '1M']}
-                  />
-                </div>
+                  onSelectToken1={token => {
+                    setActiveToken1(token);
+                  }}
+                  onGetReceipt={onGetReceipt}
+                />
               </div>
             </AcyCard>
           </div>
-          {!isMobile && (
-            <div>
-              <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
-                <div className={styles.trade}>
-                  <SwapComponent
-                    onSelectToken0={token => {
-                      setActiveToken0(token);
-                    }}
-                    onSelectToken1={token => {
-                      setActiveToken1(token);
-
-                    }}
-                    onGetReceipt={onGetReceipt}
-                  />
-                </div>
-              </AcyCard>
-            </div>
-          )}
-        </div>
-        <div className={styles.exchangeBottomWrapper}>
-          {isReceiptObtained && (
-            <div className={styles.exchangeItem}>
-              <h3>
-                <AcyIcon.MyIcon width={30} type="arrow" />
-                <span className={styles.span}>FLASH ROUTE</span>
-              </h3>
-              <div>
-                {isReceiptObtained ? (
-                  <AcyRoutingChart data={routeData} />
-                ) : (
-                  <div
-                    style={{
-                      width: '100%',
-                      padding: '30px',
-                      fontWeight: 600,
-                      textAlign: 'center',
-                    }}
-                  >
-                    The routing will be shown here after a receipt is obtained.
-                  </div>
-                )}
+        )}
+        <div>
+          <AcyCard style={{ background: 'transparent' }} title={lineTitleRender()}>
+            <div
+              style={{
+                width: '100%',
+              }}
+            >
+              <div
+                style={{
+                  height: '480px',
+                }}
+                className={styles.showPeriodOnHover}
+              >
+                <AcyPriceChart
+                  data={chartData}
+                  format={format}
+                  showXAxis
+                  showGradient
+                  lineColor="#e29227"
+                  range={range}
+                  onHover={(data, dataIndex) => {
+                    const prevData = dataIndex === 0 ? 0 : chartData[dataIndex - 1][1];
+                    setActiveTime(chartData[dataIndex][0]);
+                    setActiveRate(data);
+                    setActivePercentageChange(dataIndex === 0
+                      ? '0'
+                      : `${(((data - prevData) / prevData) * 100).toFixed(2)}`);
+                  }}
+                />
+                <AcyPeriodTime
+                  onhandPeriodTimeChoose={onhandPeriodTimeChoose}
+                  className={styles.pt}
+                  times={['1D', '1W', '1M']}
+                />
               </div>
             </div>
-          )}
+          </AcyCard>
+        </div>
+        {!isMobile && (
+          <div>
+            <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
+              <div className={styles.trade}>
+                <SwapComponent
+                  onSelectToken0={token => {
+                    setActiveToken0(token);
+                  }}
+                  onSelectToken1={token => {
+                    setActiveToken1(token);
+
+                  }}
+                  onGetReceipt={onGetReceipt}
+                />
+              </div>
+            </AcyCard>
+          </div>
+        )}
+      </div>
+      <div className={styles.exchangeBottomWrapper}>
+        {isReceiptObtained && (
           <div className={styles.exchangeItem}>
             <h3>
               <AcyIcon.MyIcon width={30} type="arrow" />
-              <span className={styles.span}>HISTORY TRANSACTION</span>
+              <span className={styles.span}>FLASH ROUTE</span>
             </h3>
-            <StakeHistoryTable
-              isMobile={isMobile}
-              dataSource={transactions.filter(item => item.inputTokenNum != undefined)}
-            />
+            <div>
+              {isReceiptObtained ? (
+                <AcyRoutingChart data={routeData} />
+              ) : (
+                <div
+                  style={{
+                    width: '100%',
+                    padding: '30px',
+                    fontWeight: 600,
+                    textAlign: 'center',
+                  }}
+                >
+                  The routing will be shown here after a receipt is obtained.
+                </div>
+              )}
+            </div>
           </div>
+        )}
+        <div className={styles.exchangeItem}>
+          <h3>
+            <AcyIcon.MyIcon width={30} type="arrow" />
+            <span className={styles.span}>HISTORY TRANSACTION</span>
+          </h3>
+          <StakeHistoryTable
+            isMobile={isMobile}
+            dataSource={transactions.filter(item => item.inputTokenNum != undefined)}
+          />
         </div>
+      </div>
 
-        <AcyModal onCancel={onCancel} width={600} visible={visible}>
-          <div className={styles.title}>
-            <AcyIcon name="back" /> Select a token
-          </div>
-          <div className={styles.search}>
-            <AcyInput
-              placeholder="Enter the token symbol or address"
-              suffix={<AcyIcon name="search" />}
-            />
-          </div>
-          <div className={styles.coinList}>
-            <AcyTabs>
-              <AcyTabPane tab="All" key="1">
-                <AcyCoinItem />
-                <AcyCoinItem />
-                <AcyCoinItem />
-                <AcyCoinItem />
-              </AcyTabPane>
-              <AcyTabPane tab="Favorite" key="2" />
-              <AcyTabPane tab="Index" key="3" />
-              <AcyTabPane tab="Synth" key="4" />
-            </AcyTabs>
-          </div>
-        </AcyModal>
+      <AcyModal onCancel={onCancel} width={600} visible={visible}>
+        <div className={styles.title}>
+          <AcyIcon name="back" /> Select a token
+        </div>
+        <div className={styles.search}>
+          <AcyInput
+            placeholder="Enter the token symbol or address"
+            suffix={<AcyIcon name="search" />}
+          />
+        </div>
+        <div className={styles.coinList}>
+          <AcyTabs>
+            <AcyTabPane tab="All" key="1">
+              <AcyCoinItem />
+              <AcyCoinItem />
+              <AcyCoinItem />
+              <AcyCoinItem />
+            </AcyTabPane>
+            <AcyTabPane tab="Favorite" key="2" />
+            <AcyTabPane tab="Index" key="3" />
+            <AcyTabPane tab="Synth" key="4" />
+          </AcyTabs>
+        </div>
+      </AcyModal>
 
-        <AcyConfirm
-          onCancel={onHandModalConfirmOrder}
-          title="Comfirm Order"
-          visible={visibleConfirmOrder}
-        >
-          <div className={styles.confirm}>
-            <p>ETH： 566.228</p>
-            <p>BTC：2.669</p>
-            <p>Price：212.123</p>
-            <p>Price Impact：2.232%</p>
-            <p>Liquidity Provide Fee: 0.321%</p>
-            <p>Alpha: 0.371%</p>
-            <p>Maximum sold: 566.221</p>
-            <Button size="large" type="primary">
-              Confirm
-            </Button>
-          </div>
-        </AcyConfirm>
+      <AcyConfirm
+        onCancel={onHandModalConfirmOrder}
+        title="Comfirm Order"
+        visible={visibleConfirmOrder}
+      >
+        <div className={styles.confirm}>
+          <p>ETH： 566.228</p>
+          <p>BTC：2.669</p>
+          <p>Price：212.123</p>
+          <p>Price Impact：2.232%</p>
+          <p>Liquidity Provide Fee: 0.321%</p>
+          <p>Alpha: 0.371%</p>
+          <p>Maximum sold: 566.221</p>
+          <Button size="large" type="primary">
+            Confirm
+          </Button>
+        </div>
+      </AcyConfirm>
 
-        <AcyApprove
-          onCancel={() => setVisibleLoading(false)}
-          visible={visibleLoading}
-        />
-      </PageHeaderWrapper>
-    );
+      <AcyApprove
+        onCancel={() => setVisibleLoading(false)}
+        visible={visibleLoading}
+      />
+    </PageHeaderWrapper>
+  );
 }
 export default connect(({ profile, transaction, loading }) => ({
   profile,
