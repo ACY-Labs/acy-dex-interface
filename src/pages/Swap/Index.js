@@ -96,7 +96,6 @@ class BasicProfile extends Component {
   };
 
   componentDidMount() {
-    confluxTest();
     this.getPrice();
 
     // 还原存储的交易信息
