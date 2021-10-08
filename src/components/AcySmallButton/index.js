@@ -36,9 +36,9 @@ const AcySmallButtonGroup = ({ activeButton, buttonList, containerClass, theme }
       {buttonList.map(([text, onClick], index) => {
         let borderRadius = '0 0 0 0'
         if (index === 0) {
-          borderRadius = '15px 0 0 15px'
+          borderRadius = '.5rem 0 0 .5rem'
         } else if (index === buttonList.length - 1) {
-          borderRadius = '0 15px 15px 0'
+          borderRadius = '0 .5rem .5rem 0'
         }
         return (
           <AcySmallButton

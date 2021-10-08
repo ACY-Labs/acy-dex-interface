@@ -5,6 +5,7 @@ import DatePicker from 'react-datepicker';
 import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 import { useWeb3React } from '@web3-react/core';
 import { deposit } from '@/acy-dex-swap/core/farms';
+import { white } from '@umijs/deps/compiled/chalk';
 
 const StakeModal = ({
   onCancel,
@@ -21,6 +22,9 @@ const StakeModal = ({
   const [balancePercentage, setBalancePercentage] = useState(0);
   const [buttonText, setButtonText] = useState('Stake');
   const { account, chainId, library, activate } = useWeb3React();
+  const [aprList, setAprList] = useState([[12.23,false],[14.53,false],[16.27,false],[18.13,false],[19.63,false],[22.83,false]])
+  const [pickingDate,setPickingDate] = useState(false);
+  const [aprCounted, serAprCounted] = useState(13.2);
 
   const updateStake = newStake => {
     let newStakeInt = newStake !== '' ? parseInt(newStake, 10) : '';
@@ -38,21 +42,32 @@ const StakeModal = ({
 
   const updateDate = (type, value, index) => {
     const newDate = new Date();
-    if (type === 'week') newDate.setHours(newDate.getHours() + 24 * 7 * value);
+    if (type === 'week')newDate.setHours(newDate.getHours() + 24 * 7 * value);
     else if (type === 'month') newDate.setMonth(newDate.getMonth() + value);
     else if (type === 'year') newDate.setFullYear(newDate.getFullYear() + value);
     else return;
+
+    let newArr = [...aprList]; 
+    for (let i = 0; i < 6; i++) newArr[i][1] = false;
+    newArr[index][1] = true; 
+    setAprList(newArr);   
     setDate(newDate);
     setSelectedPresetDate(index);
+    setPickingDate(false);
   };
 
   const datePickerChangeHandler = newDate => {
     setDate(newDate);
     setSelectedPresetDate(null);
+
+    let newArr = [...aprList]; 
+    for (let i = 0; i < 6; i++) newArr[i][1] = false;
+    setAprList(newArr);  
+    setPickingDate(true);
   };
 
   const CustomDatePickerInput = forwardRef(({ value, onClick }, ref) => (
-    <button type="button" className={styles.datePickerInput} onClick={onClick} ref={ref}>
+    <button type="button" className={` ${styles.datePickerInput} ${pickingDate ? styles.pickingDate : '' }`} onClick={onClick} ref={ref}>
       {value}
     </button>
   ));
@@ -62,18 +77,23 @@ const StakeModal = ({
       key={`${token1}${token2}`}
       onCancel={onCancel}
       width={400}
+      bodyStyle={{
+        padding: '21px',
+        background: '#2F3032',
+        borderRadius: '.5rem',
+      }}
       visible={isModalVisible}
       destroyOnClose
     >
       <div className={styles.amountRowContainer}>
         <div className={styles.amountRowInputContainer}>
-          <input type="text" value={stake} onChange={e => updateStake(e.target.value)} />
+          <input type="text" value={stake.toFixed(6)} onChange={e => updateStake(e.target.value)} />
         </div>
         <span className={styles.suffix}>{token1}-{token2}</span>
       </div>
       <div className={styles.balanceAmountContainer}>
-        <div>
-          Balance: {balance} {token1}-{token2}
+        <div className={styles.balanceAmount}>
+          Balance: {(parseFloat(balance)).toFixed(6)} {token1}-{token2}
         </div>
         <div className={styles.balanceAmountInputContainer}>
           <input
@@ -99,10 +119,33 @@ const StakeModal = ({
         <div className={styles.dateSelectionContainer}>
           <div className={styles.datePickerContainer}>
             <DatePicker
+              wrapperClassName={styles.datePickerWrapper}
               selected={date}
               onChange={datePickerChangeHandler}
-              customInput={<CustomDatePickerInput />} 
+              customInput={<CustomDatePickerInput /> }
             />
+            {pickingDate ? 
+              <div className={styles.APRBox1}>
+                {aprCounted}%
+              </div> : ''
+            }
+
+          </div>
+          <div className={styles.APRRow}>
+            {aprList.map(([text, selected], index) => {
+              let APRstyle = ''
+              if (selected){
+                APRstyle = styles.APRBoxSelected
+              }
+              else{
+                APRstyle = styles.APRBox
+              }
+              return (
+                <div className={APRstyle}>
+                  {text}%
+                </div>
+              )
+            })}
           </div>
           <div className={styles.presetDurationContainer}>
             <AcySmallButtonGroup

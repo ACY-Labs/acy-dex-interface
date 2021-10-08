@@ -537,12 +537,13 @@
       width: 100%;
       background-color: #1B1B1C;
       border: 1px solid #40444f99;
-      border-radius: 9999px;
-      font-size: 1.5rem;
+      border-radius: .5rem;
+      font-size: 1rem;
       padding: 0 1rem;
       -moz-appearance: textfield;
       box-shadow: 0 0 0 0.5px transparent;
       margin-bottom: 0.25rem;
+      height: 2rem;
 
       &:hover {
         border: 1px solid #40444fff;
@@ -563,7 +564,7 @@
   }
 
   .suffix {
-    font-size: 1.25rem;
+    font-size: 1rem;
     position: absolute;
     right: 1.25rem;
     top: 0.25rem;
@@ -575,7 +576,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-
+  .balanceAmount{
+    font-size: .8rem;
+  }
   .balanceAmountInputContainer {
     display: flex;
     justify-content: flex-end;
@@ -585,7 +588,7 @@
     .balanceAmountInput {
       background-color: #1B1B1C;
       border: none;
-      border-radius: 9999px;
+      border-radius: .5rem;
       box-shadow: 0 0 0 0.5px transparent;
       padding: 1px 1.5rem 1px 0.75rem;
       text-align: right;
@@ -607,7 +610,7 @@
 
 .sliderWrapper {
   display: flex;
-  margin-bottom: 1rem;
+  margin-bottom: 3rem;
 
   .slider {
     flex: 1;
@@ -672,10 +675,50 @@
     flex-direction: column;
 
     .datePickerContainer {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
       margin-bottom: 0.75rem;
+
+      .datePickerWrapper{
+        width: fit-content;
+      }
+
+      .APRBox1{
+        font-size: .7rem;
+        background-color: #1E5D91;
+        border-radius: .2rem;
+        margin-left: 1rem;
+        padding-left: .5rem;
+        padding-right: .5rem;
+        color: white;
+        height: fit-content;
+      }
     }
 
+    .APRRow{
+      display: flex;
+      justify-content: space-around;
+      padding-bottom: .7rem;
+
+      .APRBoxSelected{
+        font-size: .7rem;
+        background-color: #1E5D91;
+        border-radius: .2rem;
+        padding-left: .5rem;
+        padding-right: .5rem;
+        color: white;
+      }
+      .APRBox{
+        font-size: .7rem;
+        background-color: #4C4C4E;
+        border-radius: .2rem;
+        padding-left: .2rem;
+        padding-right: .2rem;
+      }
+    }
     .presetDurationContainer {
+      border-radius: 0rem !important;
       width: 100%;
 
       .presetDurationSelection {
@@ -689,13 +732,20 @@
 .datePickerInput {
   color: #b5b6b6;
   background-color: #1B1B1C;
-  border: 1px solid #40444f99;
+  border: none;
   border-radius: 0.3rem;
   font-size: 1rem;
   padding: 0.25rem 1.5rem;
   box-shadow: 0 0 0 0.5px transparent;
   margin-bottom: 0;
 }
+
+.pickingDate{
+  background-color: #1E5D91;
+  color : white;
+}
+
+
 
 .datePickerInput:hover {
   box-shadow: 0 0 0 0.5px #1e5d91;
@@ -704,16 +754,17 @@
 }
 
 .stakeSubmitButton {
+  color: white;
   width: 100%;
-  background-color: #4c4c4d;
+  background-color: #1E5D91;
   border: none;
-  border-radius: 7.5px;
+  border-radius: .5rem;
   font-size: 1.5rem;
   padding: 0 1rem;
 }
 
 .stakeSubmitButton:hover {
-  background-color: #5f5f5f;
+  background-color: #184a72;
   cursor: pointer;
 }
 

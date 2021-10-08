@@ -19,7 +19,7 @@ const Farms = () => {
     supportedChainIds: [1, 3, 4, 5, 42, 80001],
   });
 
-  const INITIAL_ROW_NUMBER = 5;
+  const INITIAL_ROW_NUMBER = 10;
 
   const [selectedTable, setSelectedTable] = useState(0);
   const [tableRow, setTableRow] = useState([]);
@@ -114,7 +114,7 @@ const Farms = () => {
     setSelectedTable(0);
     setTableTitle('All Farms');
     setTableSubtitle('Stake your LP tokens and earn token rewards');
-    setRowNumber(5);
+    setRowNumber(10);
     setHideDao(true);
   };
 
@@ -122,7 +122,7 @@ const Farms = () => {
     setSelectedTable(1);
     setTableTitle('ACY Farms');
     setTableSubtitle('Stake your LP tokens and earn ACY token rewards');
-    setRowNumber(5);
+    setRowNumber(10);
     setHideDao(true);
   };
 
@@ -164,13 +164,24 @@ const Farms = () => {
             tableData.token2.toLowerCase().includes(searchInput.toLowerCase())
         );
         if (isMyFarms){
-          setTableTitle('My Farm');
+          setTableTitle('My Farms');
           setTableRow(currentTableRowCopy.filter(tableData => tableData.hasUserPosition));
         }
-        else{
+        else if (selectedTable === 0){
           setTableRow(currentTableRowCopy);
-          setTableTitle('All Farm');
+          setTableTitle('All Farms');
         } 
+        else if (selectedTable === 1){
+          setTableRow(currentTableRowCopy);
+          setTableTitle('ACY Farms');
+        } 
+        else if (selectedTable === 2){
+          setTableRow(currentTableRowCopy);
+          setTableTitle('Premier Farms');
+        } 
+        else{
+          setTableTitle('DAO Farms'); 
+        }
       }
     },
     [searchInput, selectedTable, isMyFarms]
