@@ -228,7 +228,7 @@ const AcyLiquidityPositions = () => {
       });
   
       newPoolCount ++;
-  
+      console.log(`break the loop? ${newPoolCount} <=> ${displayCountIncrement}`); 
       if (newPoolCount == displayCountIncrement)
         break;
     }
