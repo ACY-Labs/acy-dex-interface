@@ -76,6 +76,8 @@ import { Row, Col, Button, Alert, Input } from 'antd';
 
 import { getEstimated, addLiquidity } from '@/acy-dex-swap/core/addLiquidity';
 import spinner from '@/assets/loading.svg';
+import {Icon} from "antd";
+import moment from 'moment';
 
 const { AcyTabPane } = AcyTabs;
 
@@ -383,7 +385,57 @@ const AddLiquidityComponent = props => {
   };
 
   const addLiquidityCallback = status => {
-    console.log(status);
+    console.log("test status:", status);
+    const transactions = props.transaction.transactions;
+    const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
+    console.log("is current dispatched? ", isCurrentTransactionDispatched);
+    // trigger loading spin on top right
+    if (isCurrentTransactionDispatched == 0) {
+      dispatch({
+        type: "transaction/addTransaction",
+        payload: {
+          transactions: [...transactions, { hash: status.hash }]
+        }
+      })
+    }
+
+    const sti = setInterval(() => {
+      library.getTransactionReceipt(status.hash).then(async receipt => {
+        console.log("receipt ", receipt);
+
+        if (receipt) {
+          clearInterval(sti);
+          let transactionTime;
+          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
+            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
+            console.log("test transactionTime: ", transactionTime)
+          });
+
+          // update table UI
+
+          // clear top right loading spin
+          const newData = transactions.filter(item => item.hash != status.hash);
+          dispatch({
+            type: "transaction/addTransaction",
+            payload: {
+              transactions: [
+                ...newData,
+                { hash: status.hash, transactionTime }
+              ]
+            }
+          });
+          setButtonStatus(true);
+          console.log(buttonContent);
+          setButtonContent(buttonContent);
+          console.log("state should be updated to : ", [
+            ...newData,
+            { hash: status.hash, transactionTime }
+          ]);
+
+          // store to localStorage
+        }
+      })
+    }, 500);
   };
 
   return (
@@ -632,6 +684,8 @@ const AddLiquidityComponent = props => {
             setButtonContent('Choose tokens and amount');
             setButtonStatus(false);
           } else {
+            setButtonStatus(false);
+            setButtonContent(<>Processing <Icon type="loading" /></>);
             await addLiquidity(
               {
                 ...token0,

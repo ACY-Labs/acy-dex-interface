@@ -1,6 +1,7 @@
 .removeAmountContainer,
 .tokenAmountContainer {
-  background-color: #1b1b1c;
+  // background-color: #1b1b1c;
+  background-color: #2e3032;
   border-radius: 0.5rem;
   padding: 0.5rem;
   margin-bottom: 1rem;
@@ -57,11 +58,15 @@
 }
 
 .tokenDetailContainer {
+  margin-left: 1em;
   display: flex;
   align-items: center;
 }
 
 .tokenAmount {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   font-size: 1.25rem;
   font-weight: bold;
 }

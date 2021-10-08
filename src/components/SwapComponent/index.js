@@ -411,7 +411,7 @@ const SwapComponent = props => {
     const {
       transaction: { transactions },
     } = props;
-    // 检查是否包含交易
+    // 检查是否已经包含此交易
     const transLength = transactions.filter(item => item.hash == status.hash).length;
     if (transLength == 0) {
       dispatch({

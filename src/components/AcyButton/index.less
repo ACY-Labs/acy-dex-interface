@@ -1,5 +1,6 @@
 @import '~antd/lib/style/themes/default.less';
 .acybutton {
+  position: relative;
   width: 100%;
   padding: 15px;
   font-size: 20px;
@@ -11,8 +12,11 @@
   text-align: center;
   cursor: pointer;
   margin-bottom: 20px;
+  &:active {
+    background-color: #c55222;
+  }
 }
-.disabled{
+.disabled {
   color: rgb(86, 90, 105);
-  background: rgb(206, 208, 217);
+  background: rgb(206, 208, 217)!important;
 }
