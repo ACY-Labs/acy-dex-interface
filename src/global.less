@@ -158,4 +158,46 @@ leftAlignTableHeader .leftAlign {
       }
     }
   }
+
+
+  // swap page position table style
+  #liquidityPositionTable {
+    .ant-table-tbody > tr > td {
+      padding: 8px 16px;
+      overflow-wrap: break-word;
+    }
+    .ant-table-fixed-header .ant-table-scroll .ant-table-header::-webkit-scrollbar {
+      border: 0;
+    }
+    .ant-table-header, .ant-table-body {
+      background-color: transparent;
+    }
+    .ant-table-header {
+      overflow: hidden!important;
+      padding-bottom: 20px!important;
+    }
+    .ant-table-body {
+      // the max-height will only work when AcyLiquidityPositions.js scroll: {y: ??} is set 
+      // and overwrite its max-height by "!important"
+      // the mentioned setting in source file will move table header and table body into separate div,
+      // max-height will be set to the div containing tbody.
+      max-height: 50vh!important;
+      overflow-y: overlay;
+    }
+    .ant-table-row.ant-table-row-level-0 {
+      background-color: transparent!important;
+    }
+    .centerAlignTableHeader {
+      text-align: center!important;
+      white-space: nowrap;
+    }
+  }
+
+  // scrollbar
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #4d4d4d; 
+  }
 }

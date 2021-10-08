@@ -9,6 +9,7 @@ import {
   approveTokenWithSpender,
 } from '@/acy-dex-swap/utils/index';
 
+import {Icon} from "antd";
 import supportedTokens from '@/constants/TokenList';
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import AcyRemoveLiquidityModal from '@/components/AcyRemoveLiquidityModal';
@@ -40,7 +41,7 @@ const AcyLiquidityPositions = () => {
       title: 'Pool',
       dataIndex: 'name',
       key: 'poolAddress',
-      className: 'leftAlignTableHeader',
+      className: 'centerAlignTableHeader',
       render: (text, record, index) => {
         const addressLength = record.poolAddress.length;
 
@@ -87,7 +88,7 @@ const AcyLiquidityPositions = () => {
       title: 'My Liquidity',
       dataIndex: 'token0Amount',
       key: 'token0Amount',
-      className: 'leftAlignTableHeader',
+      className: 'centerAlignTableHeader',
       render: (text, record, index) => (
         <div>
           <p>{record.token0Amount}</p>
@@ -99,7 +100,7 @@ const AcyLiquidityPositions = () => {
     {
       title: 'Pool Share',
       dataIndex: 'share',
-      className: 'leftAlignTableHeader',
+      className: 'centerAlignTableHeader',
       key: 'share',
       render: (text, record, index) => <div>{record.share}</div>,
       visible: true,
@@ -108,7 +109,7 @@ const AcyLiquidityPositions = () => {
       title: 'Reserve',
       key: 'token0Reserve',
       dataIndex: 'token0Reserve',
-      className: 'leftAlignTableHeader',
+      className: 'centerAlignTableHeader',
       render: (text, record, index) => (
         <div>
           <p>{record.token0Reserve}</p>
@@ -120,7 +121,7 @@ const AcyLiquidityPositions = () => {
     {
       title: 'Operation',
       key: 'poolAddress',
-
+      className: 'centerAlignTableHeader',
       render: (text, record, index) => (
         <div>
           <button
@@ -295,11 +296,15 @@ const AcyLiquidityPositions = () => {
     setLoading(true);
     console.log("getting user liquidity")
     const pagePool = await getPoolPage();
-    setUserLiquidityPositions(prevState => {
-      return [...prevState, ...pagePool]
-    });
+    setUserLiquidityPositions([...userLiquidityPositions, ...pagePool]);
     setLoading(false);
   }
+  useEffect(() => {
+    if (userLiquidityPositions.length > 0) {
+      document.querySelector(`#liquidityPositionTable > div > div >div.ant-table-body > table > tbody > tr:nth-child(${userLiquidityPositions.length - 1})`).scrollIntoView({behavior: "smooth"});
+      console.log(`scroll ${userLiquidityPositions.length} into view`);
+    }
+  }, [userLiquidityPositions]);
 
   useEffect(() => getValidPoolList(), []);
 
@@ -311,7 +316,7 @@ const AcyLiquidityPositions = () => {
   return (
     <div>
       {!(userLiquidityPositions.length) && loading ? (
-        <h2 style={{ textAlign: "center", color: "white" }}>Loading...</h2>
+        <h2 style={{ textAlign: "center", color: "white" }}> <Icon type="loading" /> Loading...</h2>
       ) : (
         <>
           <Table
@@ -320,6 +325,7 @@ const AcyLiquidityPositions = () => {
             dataSource={userLiquidityPositions}
             columns={columns.filter(item => item.visible)}
             pagination={false}
+            scroll={{y: 300}} // this height is override by global.less #root > .ant-table-body
             locale={{
               emptyText: (
                 <span>
@@ -337,7 +343,7 @@ const AcyLiquidityPositions = () => {
                         getAllUserLiquidityPositions()
                       }}
                     >
-                      {loading ? "Loading..." : " See More..."}
+                      {loading ? <><Icon type="loading" /> Loading... </> : " See More..."}
                     </a>
                   </div>
                 )}
