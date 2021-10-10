@@ -281,17 +281,28 @@ const Swap = props => {
 
     const { inTokenAddr, amount, outTokenAddr, nonZeroToken, nonZeroTokenAmount } = receipt;
     let newRouteData = [];
-    debugger
-    let routeDataEntry = {
-      from: await getTokenSymbol(inTokenAddr, library, account),
-      to: await getTokenSymbol(outTokenAddr, library, account),
-      value:
-        parseInt(amount.toString().replace('0x', ''), 16) /
-        Math.pow(10, await getTokenDecimal(inTokenAddr, library, account)),
-    };
-
-    newRouteData.push(routeDataEntry);
-
+    
+    // let routeDataEntry = {
+    //   from: await getTokenSymbol(inTokenAddr, library, account),
+    //   to: await getTokenSymbol(outTokenAddr, library, account),
+    //   value:
+    //     parseInt(amount.toString().replace('0x', ''), 16) /
+    //     Math.pow(10, await getTokenDecimal(inTokenAddr, library, account)),
+    // };
+    // newRouteData.push(routeDataEntry);
+    for (let i = 0; i < nonZeroToken.length; i++) {
+      // token
+      newRouteData.push({
+        from:await getTokenSymbol(inTokenAddr, library, account),
+        middle: await getTokenSymbol(nonZeroToken[i], library, account),
+        to: await getTokenSymbol(outTokenAddr, library, account),
+        value:
+          parseInt(nonZeroTokenAmount[i].toString().replace('0x', ''), 16)
+      });
+      // token amount
+    }
+    
+    
     // get eth addresses
     let token0EthAddress = supportedTokens.filter(
       item => item.address.toLowerCase() == inTokenAddr.toLowerCase()
@@ -304,6 +315,9 @@ const Swap = props => {
     } else getRoutePrice(token0EthAddress, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48');
     setPastToken0(activeToken0.symbol);
     console.log("end of operation")
+    setIsReceiptObtained(true);
+    setRouteData(newRouteData);
+    
   };
   const {
     isMobile,
