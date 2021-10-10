@@ -1,15 +1,24 @@
 import React, { Component, useEffect } from 'react';
-import { Conflux } from 'js-conflux-sdk/dist/js-conflux-sdk.umd.min.js';
+//import { Conflux } from 'js-conflux-sdk/dist/js-conflux-sdk.umd.min.js';
 import ERC20ABI from '@/acy-dex-swap/abis/ERC20.json';
 import { abi as ROUTERABI } from '@/acy-dex-swap/abis/IUniswapV2Router02.json';
+
+// import conflux
+const { Conflux } = require('js-conflux-sdk');
 
 const ROUTER_ADDRESS = 'cfxtest:aceh5g5vgx6c9stfk8war5mrv870utgwjj2cxnrvmg';
 
 const token0Address = 'cfxtest:accn7py5k3255sr7e1jxx9z9cg9z0gducevgnjfnkv'; // USD Coin
 const token1Address = 'cfxtest:accvfzzwkxxps79xu01uh1aa80zvzmptrph4epwwzm'; // ACY
 
+const conflux = new Conflux({
+  url: 'https://test.confluxrpc.com', // testnet provider
+  logger: console, // for debug: this will log all the RPC request and response to console
+  networkId: 1,
+  // timeout: 300 * 1000, // request timeout in ms, default 300*1000 ms === 5 minute
+});
 async function approve(tokenAddress, spenderAddress) {
-  const conflux = new Conflux();
+
   const confluxPortal = window.conflux;
   conflux.provider = confluxPortal;
 
@@ -29,7 +38,7 @@ async function approve(tokenAddress, spenderAddress) {
   const approveArgs = [spenderAddress, '100000000000000000'];
 
   const result = await tokenContract.approve(...approveArgs).sendTransaction({
-    from: account,
+    from: account,to:spenderAddress,value:0
   });
 
   console.log(result);
