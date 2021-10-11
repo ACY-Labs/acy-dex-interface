@@ -38,6 +38,18 @@ const AcyLiquidityPositions = () => {
 
   const columns = useMemo(() => [
     {
+      title: '#',
+      key: 'index',
+      className: 'centerAlignTableHeader',
+      render:  (text, record, index) => (
+        <div>
+          {index + 1}
+        </div>
+      ),
+      width: '3rem',
+      visible: !isMobile
+    },
+    {
       title: 'Pool',
       dataIndex: 'name',
       key: 'poolAddress',
@@ -186,12 +198,17 @@ const AcyLiquidityPositions = () => {
   
       // queue get pair task
       const pair = await Fetcher.fetchPairData(token0, token1, library);
-      console.log("decoding pair: ", pair);
+      console.log("fetched pair: ", pair);
       
       // check if user has share in this pool
       let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
-      if (userPoolBalance.isZero()) continue;
-  
+      if (userPoolBalance.isZero()) {
+        console.log("zero balance, discard");
+        continue;
+      }
+      
+      console.log(">> added pair");
+
       userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
   
       const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
@@ -226,9 +243,9 @@ const AcyLiquidityPositions = () => {
         token1Reserve: `${pair.reserve1.toExact(2)} ${pair.token1.symbol}`,
         share: `${poolTokenPercentage}%`,
       });
-  
+      
       newPoolCount ++;
-      console.log(`break the loop? ${newPoolCount} <=> ${displayCountIncrement}`); 
+      console.log(`validPoolPairs.length: ${validPoolPairs.length}. break the loop? ${newPoolCount} <=> ${displayCountIncrement}`); 
       if (newPoolCount == displayCountIncrement)
         break;
     }
