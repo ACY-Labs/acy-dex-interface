@@ -300,7 +300,7 @@ export async function signOrApprove(
   setButtonContent,
   setRemoveStatus,
   setSignatureData,
-  setRemoveOK
+  setButtonProcessing
 ) {
   const status = await (async () => {
     console.log('hhhh');
@@ -476,6 +476,7 @@ export async function signOrApprove(
         });
 
         setNeedApprove(false);
+        setButtonProcessing(false); // recover the active button style
         setButtonContent('Remove liquidity');
         setButtonStatus(true);
       })
@@ -498,7 +499,7 @@ export async function signOrApprove(
           );
           if (state == true) {
             setNeedApprove(false);
-            setButtonContent('remove liquidity');
+            setButtonContent('Remove liquidity');
             setButtonStatus(true);
             return 'approve success';
           }
@@ -517,7 +518,6 @@ export async function signOrApprove(
     setRemoveStatus(status.getErrorText());
   } else {
     setRemoveStatus('Please approve in your wallet');
-    setRemoveOK(true);
     console.log(status);
   }
 }

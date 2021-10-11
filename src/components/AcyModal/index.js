@@ -57,8 +57,8 @@ const AcyModal = ({ children, ...rest }) => {
       className={styles.acymodal}
       bodyStyle={{
         padding: '21px',
-        // background: '#2e3032',
-        backgroundColor: 'black',
+        background: rest.backgroundColor ? rest.backgroundColor : '#2e3032',
+        // backgroundColor: '#1b1b1c',
         borderRadius: ' 20px',
         boxShadow: '0 0 14px #2d2d2d'
       }}
