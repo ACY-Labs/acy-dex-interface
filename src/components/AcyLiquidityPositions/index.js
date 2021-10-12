@@ -54,6 +54,7 @@ const AcyLiquidityPositions = () => {
       dataIndex: 'name',
       key: 'poolAddress',
       className: 'centerAlignTableHeader',
+      sorter: (a, b) => a.pool.localeCompare(b.pool),
       render: (text, record, index) => {
         const addressLength = record.poolAddress.length;
 
