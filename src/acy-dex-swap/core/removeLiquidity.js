@@ -47,8 +47,8 @@ export async function getEstimated(
   setButtonContent,
   setRemoveStatus
 ) {
-  let { address: inToken0Address, symbol: inToken0Symbol, decimal: inToken0Decimal } = inputToken0;
-  let { address: inToken1Address, symbol: inToken1Symbol, decimal: inToken1Decimal } = inputToken1;
+  let { address: inToken0Address, symbol: inToken0Symbol, decimals: inToken0Decimal } = inputToken0;
+  let { address: inToken1Address, symbol: inToken1Symbol, decimals: inToken1Decimal } = inputToken1;
 
   if (!inToken0Symbol || !inToken1Symbol) {
     setToken0Amount('0');
@@ -311,12 +311,12 @@ export async function signOrApprove(
     const {
       symbol: inToken0Symbol,
       address: inToken0Address,
-      decimal: inToken0Decimal,
+      decimals: inToken0Decimal,
     } = inputToken0;
     const {
       symbol: inToken1Symbol,
       address: inToken1Address,
-      decimal: inToken1Decimal,
+      decimals: inToken1Decimal,
     } = inputToken1;
 
     const token0IsETH = inToken0Symbol === 'ETH';
@@ -542,8 +542,8 @@ export async function removeLiquidity(
 ) {
   const status = await (async () => {
     let router = getRouterContract(library, account);
-    let { address: token0Address, symbol: token0Symbol, decimal: token0Decimal } = inputToken0;
-    let { address: token1Address, symbol: token1Symbol, decimal: token1Decimal } = inputToken1;
+    let { address: token0Address, symbol: token0Symbol, decimals: token0Decimal } = inputToken0;
+    let { address: token1Address, symbol: token1Symbol, decimals: token1Decimal } = inputToken1;
 
     console.log(token0Address);
     token0Address = getAddress(token0Address);

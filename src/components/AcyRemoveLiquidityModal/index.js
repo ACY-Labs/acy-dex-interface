@@ -92,13 +92,13 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
         const token0 = {
           symbol: removeLiquidityPosition.token0.symbol,
           address: removeLiquidityPosition.token0.address,
-          decimal: removeLiquidityPosition.token0.decimals,
+          decimals: removeLiquidityPosition.token0.decimals,
         };
         setToken0(token0);
         const token1 = {
           symbol: removeLiquidityPosition.token1.symbol,
           address: removeLiquidityPosition.token1.address,
-          decimal: removeLiquidityPosition.token1.decimals,
+          decimals: removeLiquidityPosition.token1.decimals,
         };
         setToken1(token1);
       }

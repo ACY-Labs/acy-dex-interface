@@ -24,26 +24,26 @@ const AcyCoinItem = ({
     () => {
       if (!library || !account || !chainId) return;
       function processString(bal) {
-        let decimal = bal.split('.')[0];
+        let decimals = bal.split('.')[0];
         let fraction = bal.split('.')[1] || '0';
-        // console.log(`decimal: ${decimal} fraction:${fraction}`);
+        // console.log(`decimals: ${decimals} fraction:${fraction}`);
         const million = BigNumber.from('1000000');
         const billion = BigNumber.from('1000000000');
         const trillion = BigNumber.from('1000000000000');
 
-        const decimalBN = BigNumber.from(decimal);
+        const decimalBN = BigNumber.from(decimals);
         let unit = '';
         if (decimalBN.gt(trillion)) {
-          decimal = `${decimalBN.div(trillion)}`;
+          decimals = `${decimalBN.div(trillion)}`;
           unit = 'T';
         } else if (decimalBN.gt(billion)) {
-          decimal = `${decimalBN.div(billion)}`;
+          decimals = `${decimalBN.div(billion)}`;
           unit = 'B';
         } else if (decimalBN.gt(million)) {
-          decimal = `${decimalBN.div(million)}`;
+          decimals = `${decimalBN.div(million)}`;
           unit = 'M';
         }
-        decimal = decimal.toString();
+        decimals = decimals.toString();
 
         const fractionBN = BigNumber.from(fraction);
         if (fractionBN.gt(trillion)) fraction = `${fractionBN.div(trillion)}`;
@@ -51,14 +51,14 @@ const AcyCoinItem = ({
         else if (fractionBN.gt(million)) fraction = `${fractionBN.div(million)}`;
         fraction = fraction.toString();
 
-        console.log(`decimal: ${decimal}`);
+        console.log(`decimals: ${decimals}`);
         console.log(fractionBN);
-        return `${decimal}${!fractionBN.isZero() ? `.${fraction}` : ''}${unit}`;
+        return `${decimals}${!fractionBN.isZero() ? `.${fraction}` : ''}${unit}`;
       }
       async function getThisTokenBalance() {
-        const { address, symbol, decimal } = data;
+        const { address, symbol, decimals } = data;
         const bal = await getUserTokenBalance(
-          { address, symbol, decimal },
+          { address, symbol, decimals },
           chainId,
           account,
           library

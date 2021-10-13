@@ -438,6 +438,28 @@ const AddLiquidityComponent = props => {
     }, 500);
   };
 
+  // link to liquidity position table
+  const {liquidity} = props;
+  useEffect(async () => {
+    // // set token0
+    let {token0, token1} = liquidity;
+    console.log("new tokens to set in addComponent, " , token0, token1)
+    if (token0 && token1) {
+      // fetch the token data structure 
+      token0 = tokenList.filter(item => item.symbol === token0.symbol)[0]
+      token1 = tokenList.filter(item => item.symbol === token1.symbol)[0]
+      console.log("fetched token ds", token0, token1)
+
+      setToken0(token0);
+      setToken0Balance(await getUserTokenBalance(token0, chainId, account, library));
+      setToken0BalanceShow(true);
+      setToken1(token1);
+      setToken1Balance(await getUserTokenBalance(token1, chainId, account, library));
+      setToken1BalanceShow(true);
+
+    }
+  }, [liquidity]);
+
   return (
     <div>
       <AcyCuarrencyCard
@@ -453,6 +475,7 @@ const AddLiquidityComponent = props => {
           setBefore(true);
         }}
         onChangeToken={e => {
+          console.log("onChangeToken")
           setExactIn(true);
           setToken0Amount(e);
         }}
@@ -769,8 +792,9 @@ const AddLiquidityComponent = props => {
   );
 };
 
-export default connect(({ global, transaction, loading }) => ({
+export default connect(({ global, transaction, loading, liquidity }) => ({
   global,
   transaction,
   loading: loading.global,
+  liquidity
 }))(AddLiquidityComponent);
