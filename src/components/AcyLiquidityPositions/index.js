@@ -10,7 +10,7 @@ import {
   approveTokenWithSpender,
 } from '@/acy-dex-swap/utils/index';
 
-import {Icon} from "antd";
+import { Icon } from "antd";
 import supportedTokens from '@/constants/TokenList';
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import AcyRemoveLiquidityModal from '@/components/AcyRemoveLiquidityModal';
@@ -36,6 +36,7 @@ const AcyLiquidityPositions = (props) => {
   const [validPoolPairs, setValidPoolPairs] = useState([]); // fetch a list of valid pool from backend
   const [readListPointer, setReadListPointer] = useState(0);  // last processed read position of "validPoolPairs"
   const displayCountIncrement = 5;
+  const [selectedRow, setSelectedRow] = useState(null);
 
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({
@@ -93,7 +94,7 @@ const AcyLiquidityPositions = (props) => {
       title: '#',
       className: 'centerAlignTableHeader',
       key: 'index',
-      render:  (text, record, index) => (
+      render: (text, record, index) => (
         <div>
           {index + 1}
         </div>
@@ -141,15 +142,20 @@ const AcyLiquidityPositions = (props) => {
               }}
             />
             <div>
-              <p className={styles.bigtitle} onClick={() => setAddComponentPairs(record.token0, record.token1)} >
+              <p className={styles.bigtitle} onClick={() => {
+                setAddComponentPairs(record.token0, record.token1);
+                setSelectedRow(index);
+              }} >
                 {record.pool}
               </p>
-              <p className={styles.value}>
-                {`${record.poolAddress.slice(0, 5)}...${record.poolAddress.slice(
-                  addressLength - 5,
-                  addressLength
-                )}`}
-              </p>
+              <a target="_blank" href={`https://rinkeby.etherscan.io/address/${record.poolAddress}`} >
+                <p className={styles.value}>
+                  {`${record.poolAddress.slice(0, 5)}...${record.poolAddress.slice(
+                    addressLength - 5,
+                    addressLength
+                  )}`}
+                </p>
+              </a>
             </div>
           </div>
         );
@@ -222,7 +228,7 @@ const AcyLiquidityPositions = (props) => {
       // `http://localhost:3001/api/pool?chainId=${chainId}`
     ).then(res => {
       const tokens = supportedTokens;
-  
+
       // construct pool list locally
       const array = res.data;
       const validPairs = [];
@@ -231,50 +237,50 @@ const AcyLiquidityPositions = (props) => {
         const token1Idx = pairIdx["token1Idx"];
         validPairs.push([token0Idx, token1Idx]);
       }
-  
+
       setValidPoolPairs(validPairs);
       console.log(validPairs);
-  
+
     }).catch(e => console.log("error: ", e));
   }
   // fetch user shares in above pools
   async function getUserPoolShare() {
     const tokens = supportedTokens.filter(token => token.symbol !== "ETH");
-  
+
     // const checkLiquidityPositionTasks = [];
     const userNonZeroLiquidityPositions = [];
     let readIdx = readListPointer;
     let newPoolCount = 0;
     while (readIdx < validPoolPairs.length) {
-  
+
       const [token0Idx, token1Idx] = validPoolPairs[readIdx];
       readIdx++;
-  
+
       const { address: token0Address, symbol: token0Symbol, decimals: token0Decimal } = tokens[token0Idx];
       const { address: token1Address, symbol: token1Symbol, decimals: token1Decimal } = tokens[token1Idx];
       const token0 = new Token(chainId, token0Address, token0Decimal, token0Symbol);
       const token1 = new Token(chainId, token1Address, token1Decimal, token1Symbol);
-  
+
       // almost impossible: quit if the two tokens are equivalent, i.e. have the same chainId and address
       if (token0.equals(token1)) continue;
-  
+
       // queue get pair task
       const pair = await Fetcher.fetchPairData(token0, token1, library);
       console.log("fetched pair: ", pair);
-      
+
       // check if user has share in this pool
       let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
       if (userPoolBalance.isZero()) {
         console.log("zero balance, discard");
         continue;
       }
-      
+
       console.log(">> added pair");
 
       userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
-  
+
       const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
-  
+
       const token0Deposited = pair.getLiquidityValue(
         pair.token0,
         totalSupply,
@@ -287,9 +293,9 @@ const AcyLiquidityPositions = (props) => {
         userPoolBalance,
         false
       );
-  
+
       const poolTokenPercentage = new Percent(userPoolBalance.raw, totalSupply.raw).toFixed(4);
-  
+
       userNonZeroLiquidityPositions.push({
         token0: pair.token0,
         token1: pair.token1,
@@ -305,33 +311,33 @@ const AcyLiquidityPositions = (props) => {
         token1Reserve: `${pair.reserve1.toExact(2)} ${pair.token1.symbol}`,
         share: `${poolTokenPercentage}%`,
       });
-      
-      newPoolCount ++;
-      console.log(`validPoolPairs.length: ${validPoolPairs.length}. break the loop? ${newPoolCount} <=> ${displayCountIncrement}`); 
+
+      newPoolCount++;
+      console.log(`validPoolPairs.length: ${validPoolPairs.length}. break the loop? ${newPoolCount} <=> ${displayCountIncrement}`);
       if (newPoolCount == displayCountIncrement)
         break;
     }
-  
+
     // write readpoolpointer to state
     setReadListPointer(readIdx);
-  
+
     // const validPairs = await Promise.allSettled(checkLiquidityPositionTasks);
-  
+
     // console.log(validPairs)
-  
+
     // // now we process the pairs
     // // eslint-disable-next-line no-restricted-syntax
     // const userNonZeroLiquidityPositions = [];
     // for (let pair of validPairs) {
     //   pair = pair.value;
-  
+
     //   let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
     //   if (userPoolBalance.isZero()) continue;
-  
+
     //   userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
-  
+
     //   const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
-  
+
     //   const token0Deposited = pair.getLiquidityValue(
     //     pair.token0,
     //     totalSupply,
@@ -344,9 +350,9 @@ const AcyLiquidityPositions = (props) => {
     //     userPoolBalance,
     //     false
     //   );
-  
+
     //   const poolTokenPercentage = new Percent(userPoolBalance.raw, totalSupply.raw).toFixed(4);
-  
+
     //   userNonZeroLiquidityPositions.push({
     //     token0: pair.token0,
     //     token1: pair.token1,
@@ -365,7 +371,7 @@ const AcyLiquidityPositions = (props) => {
     // }
     // console.log("test length2: ", userNonZeroLiquidityPositions.length);
     // console.log("nonZeroPositions: ", userNonZeroLiquidityPositions);
-  
+
     return userNonZeroLiquidityPositions;
 
   }
@@ -379,11 +385,11 @@ const AcyLiquidityPositions = (props) => {
     setUserLiquidityPositions([...userLiquidityPositions, ...userPoolShare]);
     setLoading(false);
   }
-  
+
   // auto scroll to newly loaded data
   useEffect(() => {
     if (userLiquidityPositions.length > 0) {
-      document.querySelector(`#liquidityPositionTable > div > div >div.ant-table-body > table > tbody > tr:last-child`).scrollIntoView({behavior: "smooth"});
+      document.querySelector(`#liquidityPositionTable > div > div >div.ant-table-body > table > tbody > tr:last-child`).scrollIntoView({ behavior: "smooth" });
       console.log(`scroll last row of table into view`);
     }
   }, [userLiquidityPositions]);
@@ -396,7 +402,7 @@ const AcyLiquidityPositions = (props) => {
   );
 
   // link liquidity position table and add component together
-  const {dispatch, liquidity} = props;
+  const { dispatch, liquidity } = props;
   const setAddComponentPairs = (token0, token1) => {
     dispatch({
       type: "liquidity/setAddTokens",
@@ -417,10 +423,11 @@ const AcyLiquidityPositions = (props) => {
           <Table
             id="liquidityPositionTable"
             style={{ textAlign: 'center' }}
+            rowClassName={(record, index) => index === selectedRow ? styles.rowHighlighted : styles.rowNormal}
             dataSource={userLiquidityPositions}
             columns={columns.filter(item => item.visible)}
             pagination={false}
-            scroll={{y: 300}} // this height is override by global.less #root > .ant-table-body
+            scroll={{ y: 300 }} // this height is override by global.less #root > .ant-table-body
             locale={{
               emptyText: (
                 <span>
