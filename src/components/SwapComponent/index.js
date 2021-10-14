@@ -454,13 +454,13 @@ const SwapComponent = props => {
           receipt.logs.map(item => {
             if (item.address == inputToken.address) {
               // inputtoken 数量
-              // inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimal))).toString();
-              inputTokenNum = item.data / Math.pow(10, inputToken.decimal).toString();
+              // inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
+              inputTokenNum = item.data / Math.pow(10, inputToken.decimals).toString();
             }
             if (item.address == outToken.address) {
               // outtoken 数量
-              // outTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0", outToken.decimal))).toString();
-              outTokenNum = item.data / Math.pow(10, outToken.decimal).toString();
+              // outTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0", outToken.decimals))).toString();
+              outTokenNum = item.data / Math.pow(10, outToken.decimals).toString();
             }
           });
           // 获取美元价值

@@ -77,8 +77,8 @@ const getPoolTotalPendingReward = async (
     );
   });
 
-  // add decimal points to the pending rewards,
-  // according to each token decimal points.
+  // add decimals points to the pending rewards,
+  // according to each token decimals points.
   allTokenTotalRewardAmount = allTokenTotalRewardAmount.map((reward, index) =>
     formatUnits(reward, rewardTokenDecimals[index])
   );
@@ -129,7 +129,7 @@ const getAllPools = async (library, account) => {
 
         // first store all the positions that the user staked in the pool in this iteration.
         // positions returned from getUserPositions are in the base of hex,
-        // hence it has to be converted to decimal for use.
+        // hence it has to be converted to decimals for use.
         const userPositions = (await contract.getUserPositions(account, i)).map(positionHex =>
           positionHex.toNumber()
         );

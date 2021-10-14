@@ -1,7 +1,8 @@
 .removeAmountContainer,
 .tokenAmountContainer {
-  // background-color: #1b1b1c;
-  background-color: #2e3032;
+  color: white;
+  background-color: #1b1b1c;
+  // background-color: #2e3032;
   border-radius: 0.5rem;
   padding: 0.5rem;
   margin-bottom: 1rem;
@@ -10,6 +11,25 @@
 .amountText {
   font-size: 3.5rem;
   margin-bottom: 0.5rem;
+  display: flex;
+}
+
+.amountInput {
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
 
 .sliderContainer {
@@ -71,6 +91,20 @@
   font-weight: bold;
 }
 
+.transactionSettingHeader {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.transactionSettingKey {
+}
+
+.transactionSettingVal {
+  margin-left: 1em;
+  display: flex;
+  align-items: center;
+}
 .tokenImg {
   height: 24px;
 }
