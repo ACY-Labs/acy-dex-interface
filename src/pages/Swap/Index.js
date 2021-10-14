@@ -107,15 +107,7 @@ const Swap = props => {
 
   useEffect(() => {
     getPrice()
-  }, activeToken1);
-
-  useEffect(() => {
-    getPrice()
-  }, activeToken0);
-
-  useEffect(() => {
-    getPrice()
-  }, format);
+  }, [activeToken0, activeToken1, format]);
 
   // workaround way to get USD price (put token1 as USDC)
   // NEEDS ETHEREUM ADDRESS, RINKEBY DOES NOT WORK HERE
