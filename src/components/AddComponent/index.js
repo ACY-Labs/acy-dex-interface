@@ -440,7 +440,10 @@ const AddLiquidityComponent = props => {
 
   // link to liquidity position table
   const {liquidity} = props;
+  console.log("liquidity state: ", liquidity);
   useEffect(async () => {
+    console.log("liquidity updated");
+    console.log("liquidity state: ", liquidity);
     // // set token0
     let {token0, token1} = liquidity;
     console.log("new tokens to set in addComponent, " , token0, token1)
