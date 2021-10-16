@@ -24,7 +24,6 @@ import {
   AcySmallButton,
 } from '@/components/Acy';
 
-import { Input } from 'antd';
 import { connect } from 'umi';
 import styles from './styles.less';
 import { sortAddress, abbrNumber } from '@/utils/utils';
@@ -79,7 +78,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 
 const { AcyTabPane } = AcyTabs;
-import { Row, Col, Button, Icon } from 'antd';
+import { Row, Col, Button, Input, Icon } from 'antd';
 import { Alert } from 'antd';
 import spinner from '@/assets/loading.svg';
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
