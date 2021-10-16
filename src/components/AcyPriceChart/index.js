@@ -114,11 +114,12 @@ class AcyPriceChart extends Component {
         show: showXAxis,
         splitNumber: 5,
         boundaryGap: false,
-        data: dateList.map(item =>
-          moment(item)
+        data: dateList.map((item, index) =>
+          index !== 0 && index !== dateList.length-1 ? moment(item)
             .locale('en')
             .local()
             .format(format)
+            : ""
         ),
         axisTick: { show: false }, // 刻度
         axisLine: { show: false }, // 轴线
@@ -146,12 +147,18 @@ class AcyPriceChart extends Component {
             normal: {
               lineStyle: {
                 color: lineColor || '#c6224e',
-                width: 3,
+                width: 2,
               },
             },
           },
         },
       ],
+      grid: {
+        left: 0,
+        right: 0,
+        top: 0,
+        // bottom: 0,
+      }
     };
 
     if (showGradient == true) {

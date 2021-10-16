@@ -76,14 +76,34 @@ const Swap = props => {
   const [activeToken1, setActiveToken1] = useState(supportedTokens[1]);
   const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
   const [activePercentageChange, setActivePercentageChange] = useState('+0.00');
+  const [activeAbsoluteChange, setActiveAbsoluteChange] = useState('+0.00');
   const [activeRate, setActiveRate] = useState('Loading...');
-  const [activeTime, setActiveTime] = useState('Loading...');
   const [range, setRange] = useState('1D');
   const [chartData, setChartData] = useState([]);
   const [alphaTable, setAlphaTable] = useState('Line');
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
+
+  // 时间段选择
+  const onhandPeriodTimeChoose = pt => {
+    let _format = 'h:mm:ss a';
+    switch (pt) {
+      case '1D':
+        _format = 'h:mm:ss a';
+        break;
+      case '1W':
+        _format = 'ha DD MMM';
+        break;
+      case '1M':
+        _format = 'DD/MM';
+        break;
+      default:
+        _format = 'h:mm:ss a';
+    }
+    setRange(pt);
+    setFormat(_format);
+  };
 
   useEffect(() => {
     getPrice();
@@ -152,12 +172,10 @@ const Swap = props => {
         }
         setChartData(precisionedData);
         setActiveRate(precisionedData[lastDataPointIndex][1]);
-        setActiveTime(precisionedData[lastDataPointIndex][0]);
       })
       .catch(e => {
         setChartData([]);
         setActiveRate('No data');
-        setActiveTime('No data');
       });
   }
 
@@ -197,16 +215,13 @@ const Swap = props => {
             <span>
               {activeToken0.symbol}&nbsp;/&nbsp;{activeToken1.symbol}
             </span>
+            
           </div>
 
         </div>
         <div className={styles.secondarytitle}>
           <span className={styles.lighttitle}>{activeRate}</span>{' '}
-          <span className={styles.percentage}>{activePercentageChange}%</span>{' '}
-          {moment(activeTime)
-            .locale('en')
-            .local()
-            .format(format)}
+          <span className={styles.percentage}>{activePercentageChange}%({activeAbsoluteChange})</span>
         </div>
       </div>,
     ];
@@ -225,25 +240,7 @@ const Swap = props => {
     dateSwitchFunctions[pt]();
   };
 
-  // 时间段选择
-  const onhandPeriodTimeChoose = pt => {
-    let _format = 'h:mm:ss a';
-    switch (pt) {
-      case '1D':
-        _format = 'h:mm:ss a';
-        break;
-      case '1W':
-        _format = 'ha DD MMM';
-        break;
-      case '1M':
-        _format = 'DD/MM';
-        break;
-      default:
-        _format = 'h:mm:ss a';
-    }
-    setRange(pt);
-    setFormat(_format);
-  };
+  
 
   // 选择Coin
   const onClickCoin = () => {
@@ -339,7 +336,8 @@ const Swap = props => {
           <AcyCard style={{ background: 'transparent' }} title={lineTitleRender()}>
             <div
               style={{
-                width: '100%',
+                // width: '100%',
+                marginRight: "30px"
               }}
             >
               <div
@@ -348,6 +346,11 @@ const Swap = props => {
                 }}
                 className={styles.showPeriodOnHover}
               >
+                <AcyPeriodTime
+                  onhandPeriodTimeChoose={onhandPeriodTimeChoose}
+                  className={styles.pt}
+                  times={['1D', '1W', '1M']}
+                />
                 <AcyPriceChart
                   data={chartData}
                   format={format}
@@ -357,18 +360,15 @@ const Swap = props => {
                   range={range}
                   onHover={(data, dataIndex) => {
                     const prevData = dataIndex === 0 ? 0 : chartData[dataIndex - 1][1];
-                    setActiveTime(chartData[dataIndex][0]);
+                    const absoluteChange = dataIndex === 0 ? 0 : data - prevData;
                     setActiveRate(data);
+                    setActiveAbsoluteChange(absoluteChange.toFixed(3));
                     setActivePercentageChange(dataIndex === 0
                       ? '0'
-                      : `${(((data - prevData) / prevData) * 100).toFixed(2)}`);
+                      : `${((absoluteChange / prevData) * 100).toFixed(2)}`);
                   }}
                 />
-                <AcyPeriodTime
-                  onhandPeriodTimeChoose={onhandPeriodTimeChoose}
-                  className={styles.pt}
-                  times={['1D', '1W', '1M']}
-                />
+                
               </div>
             </div>
           </AcyCard>
