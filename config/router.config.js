@@ -1,7 +1,7 @@
 /*
  * @Author: Doctor
  * @Date: 2021-09-29 22:07:58
- * @LastEditTime: 2021-10-05 22:56:39
+ * @LastEditTime: 2021-10-18 18:30:54
  * @LastEditors: Doctor
  * @Description: 
  * @FilePath: \acy-dex-interface\config\router.config.js
@@ -63,6 +63,12 @@ export default [
         path: '/farms',
         name: 'Farms',
         component: './Farms/',
+      },
+      {
+        path: '/transaction/:id?',
+        name: 'Transaction',
+        hideInMenu:true,
+        component: './Transaction/',
       }
     ],
   },

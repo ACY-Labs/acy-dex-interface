@@ -1,3 +1,12 @@
+/*
+ * @Author: Doctor
+ * @Date: 2021-09-20 13:10:40
+ * @LastEditTime: 2021-10-18 18:31:41
+ * @LastEditors: Doctor
+ * @Description: 
+ * @FilePath: \acy-dex-interface\src\pages\Swap\components\StakeHistoryTable.js
+ * jianqiang
+ */
 import React, { useState } from 'react';
 import { Table } from 'antd';
 import SampleStakeHistoryData, {
@@ -20,7 +29,7 @@ const StakeHistoryTable = props => {
           return {
             onClick: event => {
               // 跳转到eths
-              window.open(`https://rinkeby.etherscan.io/tx/${record.hash}`);
+              window.open(`#/transaction/${record.hash}`);
               
             }, // 点击行
           };

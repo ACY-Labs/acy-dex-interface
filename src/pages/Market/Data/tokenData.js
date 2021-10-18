@@ -57,7 +57,7 @@ export async function fetchTokenDaySimple(client, tokenId) {
 
   if (loading) return null;
   if (error) return `Error! ${error}`;
-
+  console.log('swaptokenDayData2',data,tokenId);
   return data;
 }
 
