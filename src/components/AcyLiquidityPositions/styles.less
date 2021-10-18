@@ -3,12 +3,19 @@
   .bigtitle {
     font-size: 18px;
     font-weight: 600;
-    color: #eb5c20;
+    color: white;
+    cursor: pointer;
+    &:hover {
+      color: #eb5c20;
+    }
   }
   .value {
     font-size: 14px;
     font-weight: 400;
     color: #b5b6b6;
+    &:hover {
+      color: #eb5c20;
+    }
   }
 }
 
@@ -59,4 +66,11 @@ th {
 }
 .tableSeeMore {
   font-size: 16px;
+}
+
+.rowHighlighted {
+  background: #373739!important;
+}
+.rowNormal {
+  background: transparent!important;
 }

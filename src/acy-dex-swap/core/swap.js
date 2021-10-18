@@ -74,13 +74,13 @@ export async function swapGetEstimated(
     let {
       address: inToken0Address,
       symbol: inToken0Symbol,
-      decimal: inToken0Decimal,
+      decimals: inToken0Decimal,
       amount: inToken0Amount,
     } = inputToken0;
     let {
       address: inToken1Address,
       symbol: inToken1Symbol,
-      decimal: inToken1Decimal,
+      decimals: inToken1Decimal,
       amount: inToken1Amount,
     } = inputToken1;
 
@@ -502,13 +502,13 @@ export async function swap(
     const {
       address: inToken0Address,
       symbol: inToken0Symbol,
-      decimal: inToken0Decimal,
+      decimals: inToken0Decimal,
       amount: inToken0Amount,
     } = inputToken0;
     const {
       address: inToken1Address,
       symbol: inToken1Symbol,
-      decimal: inToken1Decimal,
+      decimals: inToken1Decimal,
       amount: inToken1Amount,
     } = inputToken1;
 

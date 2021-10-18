@@ -1,16 +1,13 @@
 import { queryBasicProfile, queryAdvancedProfile } from '@/services/api';
 
 export default {
-  namespace: 'liquidity',
+  namespace: 'swap',
 
   state: {
     basicGoods: [],
     advancedOperation1: [],
     advancedOperation2: [],
     advancedOperation3: [],
-    
-    token0: '',
-    token1: ''
   },
 
   effects: {
@@ -40,11 +37,5 @@ export default {
         ...payload,
       };
     },
-    setAddTokens(state, { payload }) {
-      return {
-        ...state, 
-        ...payload,
-      }
-    }
   },
 };

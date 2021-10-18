@@ -15,37 +15,37 @@ const AcyModal = ({ children, ...rest }) => {
   //   {
   //     symbol: "USDC",
   //     address: "0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b",
-  //     decimal: 6,
+  //     decimals: 6,
   //   },
   //   {
   //     symbol: "ETH",
   //     address: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
-  //     decimal: 18,
+  //     decimals: 18,
   //   },
   //   {
   //     symbol: "WETH",
   //     address: "0xc778417E063141139Fce010982780140Aa0cD5Ab",
-  //     decimal: 18,
+  //     decimals: 18,
   //   },
   //   {
   //     symbol: "UNI",
   //     address: "0x03e6c12ef405ac3f642b9184eded8e1322de1a9e",
-  //     decimal: 18,
+  //     decimals: 18,
   //   },
   //   {
   //     symbol: "DAI",
   //     address: "0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea",
-  //     decimal: 18,
+  //     decimals: 18,
   //   },
   //   {
   //     symbol: "cDAI",
   //     address: "0x6d7f0754ffeb405d23c51ce938289d4835be3b14",
-  //     decimal: 8,
+  //     decimals: 8,
   //   },
   //   {
   //     symbol: "WBTC",
   //     address: "0x577d296678535e4903d59a4c929b718e1d575e0a",
-  //     decimal: 8,
+  //     decimals: 8,
   //   },
   // ];
 
@@ -57,8 +57,8 @@ const AcyModal = ({ children, ...rest }) => {
       className={styles.acymodal}
       bodyStyle={{
         padding: '21px',
-        // background: '#2e3032',
-        backgroundColor: 'black',
+        background: rest.backgroundColor ? rest.backgroundColor : '#2e3032',
+        // backgroundColor: '#1b1b1c',
         borderRadius: ' 20px',
         boxShadow: '0 0 14px #2d2d2d'
       }}
