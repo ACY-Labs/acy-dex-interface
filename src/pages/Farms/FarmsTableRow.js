@@ -29,7 +29,8 @@ const FarmsTableRow = ({
 }) => {
   const [balance, setBalance] = useState(12345);
   const [isHarvestDisabled, setIsHarvestDisabled] = useState(false);
-
+  const [remainingDays, setRemainingDays] = useState(120)
+  const [date, setDate] = useState("10/12/2021")
   const [isModalVisible, setIsModalVisible] = useState(false);
   const hideModal = () => setIsModalVisible(false);
   const showModal = () => setIsModalVisible(true);
@@ -88,6 +89,7 @@ const FarmsTableRow = ({
             {(isMyFarms && !isMobile ) ? 'My Reward' : ''}
             {(!isMyFarms && !isMobile ) ? 'All Reward' : ''}
             {(isMobile) ? 'Reward' : ''}
+            {isMobile}
           </div>
           {pendingReward.map(reward => (
             <div className={styles.pendingReward1ContentContainer}>
@@ -129,37 +131,38 @@ const FarmsTableRow = ({
       {/* Table Drawer */}
       <div className={styles.tableBodyDrawerContainer} hidden={hidden}>
         {/* Add Liquidity Column */}
-        <div className={styles.tableBodyDrawerLiquidityContainer}>
+        {/* <div className={styles.tableBodyDrawerLiquidityContainer}>
           <div>Add Liquidity:</div>
           <div>
             <a className={styles.tableCodyDrawerLiquidityLink}>
               {token2 ? `${token1}-${token2}` : `${token1}`} {!isMobile ? 'LP' : ''}
             </a>
           </div>
-        </div>
+        </div> */}
 
-        {/* Harvest Reward Column */}
-        <div className={styles.tableBodyDrawerRewardContainer}>
-          <div className={styles.tableBodyDrawerRewardTitle}>Pending Reward</div>
-          <div className={styles.tableBodyDrawerRewardContent}>
-            <div className={styles.tableBodyDrawerRewardTokenContainer}>
-              {pendingReward.map(reward => (
-                <div className={styles.pendingReward1ContentContainer}>
-                  {`${reward.amount} ${reward.token}`}
-                </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              className={styles.tableBodyDrawerRewardHarvestButton}
-              style={isHarvestDisabled ? { cursor: 'not-allowed' } : {}}
-              onClick={() => harvestAll(index, library, account, setIsHarvestDisabled)}
-              disabled={isHarvestDisabled}
-            >
-              Harvest
-            </button>
+        {/* Staking Propotion */}
+        {!isMyFarms && (
+          <div className={styles.tableBodyDrawerStakingPropotionContainer}>
+            <div className={styles.tableBodyDrawerStakingPropotionTitle}>Staking Propotion</div>
+            <div className={styles.tableBodyDrawerStakingPropotionEquation}> ({token1}-{token2} LP) / ({token1}-{token2}) = 20% </div>
           </div>
-        </div>
+        )}
+
+
+
+        {/* Add Liquidity */}
+        {!isMyFarms && (
+          <div className={styles.tableBodyDrawerAddLiquidityContainer}>
+            <div className={styles.tableBodyDrawerAddLiquidityTitle}>Add Liquidity</div>
+              <button
+                type="button"
+                className={styles.tableBodyDrawerAddLiquidityButton}
+              >
+                Add
+              </button>
+          </div>
+        )}
+
 
         {/* Farm Column */}
         <div className={styles.tableBodyDrawerFarmContainer}>
@@ -184,6 +187,59 @@ const FarmsTableRow = ({
             )}
           </div>
         </div>
+
+        {/* Withdraw */}
+        {isMyFarms && (
+          <div className={styles.tableBodyDrawerWithdrawContainer}>
+            <div className={styles.tableBodyDrawerWithdrawTitle}>Remaining</div>
+            <div className={styles.tableBodyDrawerWithdrawContent}>
+              <div className={styles.tableBodyDrawerWithdrawDaysDateContainer}>
+                <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
+                  {remainingDays} Days
+                </div>
+                <div className={styles.tableBodyDrawerWithdrawDateContainer}>
+                  {date}
+                </div>
+              </div>
+              <button
+                type="button"
+                className={styles.tableBodyDrawerWithdrawButton}
+              >
+                Withdraw
+              </button>
+            </div>
+          </div>
+        )}
+
+
+
+        {/* Harvest Reward Column */}
+        {isMyFarms && (
+          <div className={styles.tableBodyDrawerRewardContainer}>
+            <div className={styles.tableBodyDrawerRewardTitle}>Pending Reward</div>
+            <div className={styles.tableBodyDrawerRewardContent}>
+              <div className={styles.tableBodyDrawerRewardTokenContainer}>
+                {pendingReward.map(reward => (
+                  <div className={styles.pendingReward1ContentContainer}>
+                    {`${reward.amount} ${reward.token}`}
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                className={styles.tableBodyDrawerRewardHarvestButton}
+                style={isHarvestDisabled ? { cursor: 'not-allowed' } : {}}
+                onClick={() => harvestAll(index, library, account, setIsHarvestDisabled)}
+                disabled={isHarvestDisabled}
+              >
+                Harvest
+              </button>
+            </div>
+          </div>
+        )}
+        
+
+
       </div>
 
       <StakeModal

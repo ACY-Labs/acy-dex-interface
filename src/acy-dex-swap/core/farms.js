@@ -11,6 +11,7 @@ import {
   FARMS_ADDRESS,
   CustomError,
 } from '@/acy-dex-swap/utils';
+import { Fetcher} from '@acyswap/sdk';
 
 // method to retrieve token symbol based on the given token address.
 const getTokenSymbol = async (address, library, account) => {
@@ -122,6 +123,7 @@ const getAllPools = async (library, account) => {
           token0 = poolInfo[0];
           token1 = null;
         }
+
 
         console.log(`lp tokens symbol OK`);
         const token0Symbol = await getTokenSymbol(token0, library, account);

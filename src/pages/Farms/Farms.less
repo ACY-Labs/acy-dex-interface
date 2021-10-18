@@ -262,18 +262,75 @@
     display: flex;
     justify-content: space-between;
 
-    .tableBodyDrawerLiquidityContainer {
+    // .tableBodyDrawerLiquidityContainer {
+    //   flex: 1;
+    //   margin-right: 0.5rem;
+
+    //   .tableCodyDrawerLiquidityLink {
+    //     color: #1e5d91;
+    //     font-weight: bold;
+    //   }
+    // }
+
+    .tableBodyDrawerStakingPropotionContainer {
       flex: 1;
       margin-right: 0.5rem;
+      border: 1px solid #29292c;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
 
-      .tableCodyDrawerLiquidityLink {
-        color: #1e5d91;
-        font-weight: bold;
+      .tableBodyDrawerStakingPropotionTitle {
+        margin-bottom: 0.5rem;
+      }
+
+      .tableBodyDrawerStakingPropotionEquation{
+        text-align: center;
+      }
+
+    }
+
+    .tableBodyDrawerWithdrawContainer {
+      flex: 1;
+      margin-right: 0.5rem;
+      border: 1px solid #29292c;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+
+      .tableBodyDrawerWithdrawTitle {
+        margin-bottom: 0.5rem;
+      }
+
+      .tableBodyDrawerWithdrawContent {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        .tableBodyDrawerWithdrawDaysDateContainer{
+          display: flex;
+          .tableBodyDrawerWithdrawDaysContainer{
+            margin-right: 1rem;
+          }
+          .tableBodyDrawerWithdrawDateContainer{
+            
+          }
+        }
+
+        .tableBodyDrawerWithdrawButton {
+          border: 1px solid #1e5d91;
+          background-color: #1b1b1c;
+          padding: 0.25rem 0.5rem;
+          border-radius: 0.25rem;
+
+          &:hover {
+            background-color: #29292c;
+            cursor: pointer;
+          }
+        }
       }
     }
 
     .tableBodyDrawerRewardContainer {
-      flex: 2;
+      flex: 1;
       margin-right: 0.5rem;
       border: 1px solid #29292c;
       padding: 0.5rem;
@@ -302,11 +359,36 @@
       }
     }
 
-    .tableBodyDrawerFarmContainer {
-      flex: 2;
+    .tableBodyDrawerAddLiquidityContainer {
+      flex: 1;
+      margin-right: 0.5rem;
       border: 1px solid #29292c;
       padding: 0.5rem;
       border-radius: 0.25rem;
+
+      .tableBodyDrawerAddLiquidityTitle {
+        margin-bottom: 0.5rem;
+      }
+      .tableBodyDrawerAddLiquidityButton {
+        border: 1px solid #1e5d91;
+        background-color: #1b1b1c;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        width: 100%;
+
+        &:hover {
+          background-color: #29292c;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .tableBodyDrawerFarmContainer {
+      flex: 1;
+      border: 1px solid #29292c;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      margin-right: 0.5rem;
 
       .tableBodyDrawerWalletTitle {
         margin-bottom: 0.5rem;

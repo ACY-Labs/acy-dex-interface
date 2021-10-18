@@ -18,6 +18,7 @@ const StakeModal = ({
 }) => {
   const [date, setDate] = useState(new Date());
   const [selectedPresetDate, setSelectedPresetDate] = useState(null);
+  const [showStake, setShowStake] = useState(0);
   const [stake, setStake] = useState(0);
   const [balancePercentage, setBalancePercentage] = useState(0);
   const [buttonText, setButtonText] = useState('Stake');
@@ -27,16 +28,20 @@ const StakeModal = ({
   const [aprCounted, serAprCounted] = useState(13.2);
 
   const updateStake = newStake => {
-    let newStakeInt = newStake !== '' ? parseInt(newStake, 10) : '';
+    let newStakeInt = newStake !== '' ? parseFloat(newStake, 10) : '';
     newStakeInt = newStakeInt > balance ? balance : newStakeInt;
-    if (newStakeInt === '' || !Number.isNaN(newStakeInt)) setStake(newStakeInt);
+    if (newStakeInt === '' || !Number.isNaN(newStakeInt)){
+      setShowStake(newStakeInt);
+      setStake(newStakeInt);
+    } 
     setBalancePercentage(Math.floor((newStakeInt / balance) * 100));
   };
 
   const updateBalancePercentage = percentage => {
     const percentageInt = percentage === '' ? 0 : parseInt(percentage, 10);
     if (Number.isNaN(percentageInt)) return;
-    setStake((balance * percentageInt) / 100);
+    setShowStake((parseFloat((balance * percentageInt) / 100)).toFixed(6));
+    setStake(parseFloat((balance * percentageInt) / 100));
     setBalancePercentage(percentageInt);
   };
 
@@ -87,7 +92,7 @@ const StakeModal = ({
     >
       <div className={styles.amountRowContainer}>
         <div className={styles.amountRowInputContainer}>
-          <input type="text" value={stake.toFixed(6)} onChange={e => updateStake(e.target.value)} />
+          <input type="text" value={showStake} onChange={e => updateStake(e.target.value)} />
         </div>
         <span className={styles.suffix}>{token1}-{token2}</span>
       </div>
