@@ -199,7 +199,7 @@ const sampleStakeHistoryColumns = [
     title: 'Token Amount',
     dataIndex: 'inputTokenNum',
     key: 'inputTokenNum',
-    render: (text,record) =><Tooltip title={text}>{text && toolNumber(text)} {record.inputTokenSymbol}</Tooltip>
+    render: (text,record) =><Tooltip title={text}>{text} {record.inputTokenSymbol}</Tooltip>
   },
   {
     title: 'Token Amount',
