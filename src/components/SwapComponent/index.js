@@ -76,7 +76,8 @@ import {
 
 import { MaxUint256 } from '@ethersproject/constants';
 import { BigNumber } from '@ethersproject/bignumber';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits  } from '@ethersproject/units';
+import { hexlify  } from '@ethersproject/bytes';
 
 const { AcyTabPane } = AcyTabs;
 import { Row, Col, Button, Icon } from 'antd';
@@ -452,9 +453,12 @@ const SwapComponent = props => {
             transactionTime = moment(parseInt(data.timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
           });
           receipt.logs.map(item => {
+            // debugger
+            // let topics=hexlify(item.topics[0]).toText();
+            
             if (item.address == inputToken.address) {
               // inputtoken 数量
-              // inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
+              inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
               inputTokenNum = item.data / Math.pow(10, inputToken.decimals).toString();
             }
             if (item.address == outToken.address) {
