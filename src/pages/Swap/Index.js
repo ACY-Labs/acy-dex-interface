@@ -125,8 +125,16 @@ const Swap = props => {
     });
   }, [])
 
+  // connect to page model, changes will be reflected in SwapComponent
   useEffect(() => {
-    getPrice()
+    dispatch({
+      type: "swap/updateTokens",
+      payload: {
+        token0: activeToken0,
+        token1: activeToken1
+      }
+    });
+    getPrice();
   }, [activeToken0, activeToken1, format]);
 
   // workaround way to get USD price (put token1 as USDC)
@@ -311,6 +319,8 @@ const Swap = props => {
   const {
     isMobile,
     transaction: { transactions },
+    swap: {token0, token1},
+    dispatch
   } = props;
   return (
     <PageHeaderWrapper>
@@ -480,9 +490,10 @@ const Swap = props => {
     </PageHeaderWrapper>
   );
 }
-export default connect(({ profile, transaction, loading }) => ({
+export default connect(({ profile, transaction, swap, loading }) => ({
   profile,
   transaction,
+  swap,
   loading: loading.effects['profile/fetchBasic'],
 }))(props => (
   <Media query="(max-width: 599px)">
