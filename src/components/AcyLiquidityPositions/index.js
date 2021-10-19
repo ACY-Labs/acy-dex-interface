@@ -1,5 +1,5 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { connect } from 'umi';
 import { useWeb3React } from '@web3-react/core';
@@ -26,6 +26,41 @@ function getLogoURIWithSymbol(symbol) {
   return 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg';
 }
 
+// table pool column search component
+const SearchField = ({setKeyword, showSearch, setShowSearch}) => {
+  const inputRef = useRef();
+
+  let renderComponent;
+  if (showSearch) {
+    renderComponent = <div style={{ display: "flex", alignItems: "center", backgroundColor: "#191b20", margin: "0 -16px 0 0", borderRadius: "4px"}}>
+    <input
+      ref={inputRef}
+      style={{ display: showSearch ? "block" : "none", width: "100%", backgroundColor: "transparent", border: 0, outline: 0, paddingLeft: "0.4rem" }}
+      onKeyPress={e => { if (e.key === "Enter") setKeyword(e.target.value); inputRef.current.value=e.target.value }}
+    />
+    <Icon type="close"
+      className={styles.hoverToWhite}
+      style={{justifyContent: "end", marginRight: "0.2rem", fontSize: "0.7rem"}}
+      onClick={ () => {
+      setKeyword("");
+      inputRef.current.value = "";
+      setShowSearch(false);
+    }} />
+    </div>;
+  } else {
+    renderComponent = <>
+      pool
+      <Icon
+        type="search"
+        className={styles.hoverToWhite}
+        style={{ backgroundColor: "transparent", color: "white", marginLeft: "1rem" }}
+        onClick={() => {setShowSearch(true); console.log(showSearch) } }
+      />
+    </>;
+  }
+  return renderComponent;
+}
+
 const AcyLiquidityPositions = (props) => {
   const [userLiquidityPositions, setUserLiquidityPositions] = useState([]); // list of pools that user has share
   const { account, chainId, library, activate } = useWeb3React();
@@ -38,55 +73,76 @@ const AcyLiquidityPositions = (props) => {
   const displayCountIncrement = 5;
   const [selectedRow, setSelectedRow] = useState(null);
 
-  const getColumnSearchProps = (dataIndex) => ({
-    filterDropdown: ({
-      setSelectedKeys,
-      selectedKeys,
-      confirm,
-      clearFilters
-    }) => (
-      <div style={{ padding: 8, backgroundColor: "grey", borderRadius: "3px" }}>
-        <Input
-          onChange={(e) =>
-            setSelectedKeys(e.target.value ? [e.target.value] : [])
-          }
-          onPressEnter={() =>
-            handleSearch(selectedKeys, confirm, dataIndex)
-          }
-          style={{ width: 188, marginBottom: 8, display: "block" }}
-        />
-        <Button
-          type="primary"
-          onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-          icon="search"
-          size="small"
-          style={{ width: 90, marginRight: 8 }}
-        >
-          Search
-        </Button>
-        <Button
-          onClick={() => handleReset(clearFilters)}
-          size="small"
-          style={{ width: 90, backgroundColor: "black" }}
-        >
-          Reset
-        </Button>
-      </div>
-    ),
-    filterIcon: (filtered) => (
-      <Icon type="search" style={{ backgroundColor: "transparent", color: filtered ? "orange" : "white" }} />
-    ),
-    onFilter: (value, record) => {
-      console.log("onFilter");
-      return record[dataIndex].toString().toLowerCase().includes(value.toLowerCase());
-    },
-  });
-  const handleSearch = (selectedKeys, confirm, dataIndex) => {
-    confirm();
-  };
-  const handleReset = (clearFilters) => {
-    clearFilters();
-  };
+  // search component
+  const [filteredData, setFilteredData] = useState([]);
+  const [keyword, setKeyword] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
+  useEffect(() => {
+    let filtered = userLiquidityPositions;
+    if (keyword !== "" && filtered.length) {
+      filtered = filtered.filter(item => item.pool.toLowerCase().includes(keyword.toLowerCase()));
+    }
+    setFilteredData(filtered);
+  }, [userLiquidityPositions, keyword]);
+
+
+  // const getColumnSearchProps = (dataIndex) => ({
+  //   filterDropdown: ({
+  //     setSelectedKeys,
+  //     selectedKeys,
+  //     confirm,
+  //     clearFilters
+  //   }) => 
+  //     // {
+  //     //   setTableFilters([dataIndex, setSelectedKeys, selectedKeys, confirm, clearFilters])
+  //     //   return (<></>)
+  //     // },
+  //     (
+  //     <div style={{ padding: 8, backgroundColor: "grey", borderRadius: "3px" }}>
+  //       {/* {setTableFilters([dataIndex, setSelectedKeys, selectedKeys, confirm, clearFilters])} */}
+  //       {setTableFilters(() => setSelectedKeys)}
+  //       <Input
+  //         onChange={(e) =>
+  //           setSelectedKeys(e.target.value ? [e.target.value] : [])
+  //         }
+  //         onPressEnter={() =>
+  //           handleSearch(selectedKeys, confirm, dataIndex)
+  //         }
+  //         style={{ width: 188, marginBottom: 8, display: "block" }}
+  //       />
+  //       <Button
+  //         type="primary"
+  //         onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+  //         icon="search"
+  //         size="small"
+  //         style={{ width: 90, marginRight: 8 }}
+  //       >
+  //         Search
+  //       </Button>
+  //       <Button
+  //         onClick={() => handleReset(clearFilters)}
+  //         size="small"
+  //         style={{ width: 90, backgroundColor: "black" }}
+  //       >
+  //         Reset
+  //       </Button>
+  //     </div>
+  //   ),
+  //   filterDropdown: () => <> </>,
+  //   filterIcon: (filtered) => (
+  //     <Icon type="search" style={{ backgroundColor: "transparent", color: filtered ? "orange" : "white" }} onClick={() => {setShowSearch(!showSearch); console.log(showSearch) } } />
+  //   ),
+  //   onFilter: (value, record) => {
+  //     console.log("onFilter");
+  //     return record[dataIndex].toString().toLowerCase().includes(value.toLowerCase());
+  //   },
+  // });
+  // const handleSearch = (selectedKeys, confirm, dataIndex) => {
+  //   confirm();
+  // };
+  // const handleReset = (clearFilters) => {
+  //   clearFilters();
+  // };
 
   // table data definitions
   const columns = useMemo(() => [
@@ -103,7 +159,7 @@ const AcyLiquidityPositions = (props) => {
       visible: !isMobile
     },
     {
-      title: 'Pool',
+      title: <SearchField {...{showSearch, setShowSearch, setKeyword}} />,
       dataIndex: 'pool',
       // key can be omitted if dataIndex is given (specified in docs)
       // duplicate column keys will cause search filter problems.
@@ -111,8 +167,7 @@ const AcyLiquidityPositions = (props) => {
       // sort
       // sorter: (a, b) => a.pool.localeCompare(b.pool),
       // search
-      ...getColumnSearchProps("pool"),
-      //
+      // ...getColumnSearchProps("pool"),
       render: (text, record, index) => {
         const addressLength = record.poolAddress.length;
 
@@ -388,11 +443,11 @@ const AcyLiquidityPositions = (props) => {
 
   // auto scroll to newly loaded data
   useEffect(() => {
-    if (userLiquidityPositions.length > 0) {
+    if (filteredData.length) {
       document.querySelector(`#liquidityPositionTable > div > div >div.ant-table-body > table > tbody > tr:last-child`).scrollIntoView({ behavior: "smooth" });
       console.log(`scroll last row of table into view`);
     }
-  }, [userLiquidityPositions]);
+  }, [filteredData]);
 
   useEffect(() => getValidPoolList(), []);
 
@@ -424,7 +479,7 @@ const AcyLiquidityPositions = (props) => {
             id="liquidityPositionTable"
             style={{ textAlign: 'center' }}
             rowClassName={(record, index) => index === selectedRow ? styles.rowHighlighted : styles.rowNormal}
-            dataSource={userLiquidityPositions}
+            dataSource={filteredData}
             columns={columns.filter(item => item.visible)}
             pagination={false}
             scroll={{ y: 300 }} // this height is override by global.less #root > .ant-table-body
