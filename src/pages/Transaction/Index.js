@@ -1,7 +1,7 @@
 /*
  * @Author: Doctor
  * @Date: 2021-10-18 14:09:29
- * @LastEditTime: 2021-10-20 00:03:06
+ * @LastEditTime: 2021-10-20 09:28:53
  * @LastEditors: Doctor
  * @Description: 
  * @FilePath: \acy-dex-interface\src\pages\Transaction\Index.js
@@ -30,7 +30,7 @@ const Transaction = props => {
               <div>0.009%</div>
             </div>
             <div className={styles.smallblock}>
-              <div>0.875392845</div>
+              <div>0.875392845</div>   
               <div>0.009%</div>
             </div>
             <div className={styles.smallblock}>
