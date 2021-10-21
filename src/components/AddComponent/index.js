@@ -27,6 +27,7 @@ import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 
 //^mark
 import { connect } from 'umi';
+import axios from 'axios';
 
 import styles from './styles.less';
 import { sortAddress } from '@/utils/utils';
@@ -126,6 +127,7 @@ const AddLiquidityComponent = props => {
 
   let [pair, setPair] = useState();
   let [noLiquidity, setNoLiquidity] = useState();
+  let [pairToAddOnServer, setPairToAddOnServer] = useState(null);
   let [parsedToken0Amount, setParsedToken0Amount] = useState();
   let [parsedToken1Amount, setParsedToken1Amount] = useState();
 
@@ -200,6 +202,7 @@ const AddLiquidityComponent = props => {
         setLiquidityStatus,
         setPair,
         setNoLiquidity,
+        setPairToAddOnServer,
         setParsedToken0Amount,
         setParsedToken1Amount,
         setArgs,
@@ -250,6 +253,7 @@ const AddLiquidityComponent = props => {
         setLiquidityStatus,
         setPair,
         setNoLiquidity,
+        setPairToAddOnServer,
         setParsedToken0Amount,
         setParsedToken1Amount,
         setArgs,
@@ -399,12 +403,15 @@ const AddLiquidityComponent = props => {
       })
     }
 
-    const sti = setInterval(() => {
-      library.getTransactionReceipt(status.hash).then(async receipt => {
+    console.log("test test see how many times setInterval is called");
+    const checkStatusAndFinish = async () => {
+      await library.getTransactionReceipt(status.hash).then(async receipt => {
         console.log("receipt ", receipt);
 
-        if (receipt) {
-          clearInterval(sti);
+        if (!receipt) {
+          setTimeout(checkStatusAndFinish, 500);
+        } else {
+          // clearInterval(sti);
           let transactionTime;
           await library.getBlock(receipt.logs[0].blockNumber).then(res => {
             transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
@@ -427,20 +434,31 @@ const AddLiquidityComponent = props => {
           setButtonStatus(true);
           console.log(buttonContent);
           setButtonContent(buttonContent);
-          console.log("state should be updated to : ", [
-            ...newData,
-            { hash: status.hash, transactionTime }
-          ]);
+
+          // update backend userPool record
+          console.log("test pair to add on server", pairToAddOnServer);
+          if (pairToAddOnServer) {
+            const {token0, token1} = pairToAddOnServer;
+            axios.post(
+              // fetch valid pool list from remote
+              `https://api.acy.finance/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
+              // `http://localhost:3001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
+            ).then(res => {
+              console.log("add to server return: ", res);
+        
+            }).catch(e => console.log("error: ", e));
+          }
 
           // store to localStorage
         }
       })
-    }, 500);
+    };
+    // const sti = setInterval(, 500);
+    checkStatusAndFinish();
   };
 
   // link to liquidity position table
   const {liquidity} = props;
-  console.log("liquidity state: ", liquidity);
   useEffect(async () => {
     console.log("liquidity updated");
     console.log("liquidity state: ", liquidity);
@@ -605,6 +623,7 @@ const AddLiquidityComponent = props => {
                   setLiquidityStatus,
                   setPair,
                   setNoLiquidity,
+                  setPairToAddOnServer,
                   setParsedToken0Amount,
                   setParsedToken1Amount,
                   setArgs,
@@ -654,7 +673,7 @@ const AddLiquidityComponent = props => {
                     ...token1,
                     amount: token1Amount,
                   },
-                  slippageTolerance * 100,
+                  slippageTolerance,
                   exactIn,
                   chainId,
                   library,
@@ -673,6 +692,7 @@ const AddLiquidityComponent = props => {
                   setLiquidityStatus,
                   setPair,
                   setNoLiquidity,
+                  setPairToAddOnServer,
                   setParsedToken0Amount,
                   setParsedToken1Amount,
                   setArgs,
