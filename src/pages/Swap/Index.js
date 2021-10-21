@@ -403,7 +403,7 @@ const Swap = props => {
         )}
       </div>
       <div className={styles.exchangeBottomWrapper}>
-        {isReceiptObtained && (
+        {/* {isReceiptObtained && (
           <div className={styles.exchangeItem}>
             <h3>
               <AcyIcon.MyIcon width={30} type="arrow" />
@@ -426,7 +426,7 @@ const Swap = props => {
               )}
             </div>
           </div>
-        )}
+        )} */}
         <div className={styles.exchangeItem}>
           <h3>
             <AcyIcon.MyIcon width={30} type="arrow" />
