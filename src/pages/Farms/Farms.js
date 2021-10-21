@@ -83,6 +83,10 @@ const Farms = () => {
             hasUserPosition: pool.hasUserPosition,
             hidden: true,
           };
+          //if user has farm, direct to myfarm
+          if(newFarmsContent.hasUserPosition) {
+            setIsMyFarms(true);
+          }
           newFarmsContents.push(newFarmsContent);
         });
 
@@ -195,7 +199,7 @@ const Farms = () => {
   useEffect(
     () => {
       setSearchInput('');
-      setIsMyFarms(false);
+      // setIsMyFarms(false);
 
       // when selected table is all,
       // display all data.
@@ -272,6 +276,7 @@ const Farms = () => {
             onPremierToggleButtonClick={onPremierToggleButtonClick}
             onDaoToggleButtonClick={onDaoToggleButtonClick}
             onMyFarmsToggleButtonClick={onMyFarmsButtonClick}
+            isMyFarms={isMyFarms}
           />
           <TableControl
             searchInput={searchInput}

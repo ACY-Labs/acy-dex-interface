@@ -164,6 +164,15 @@ const AddLiquidityComponent = props => {
   useEffect(
     () => {
       activate(injected);
+      //read the fav tokens code in storage
+      var tokens_symbol = JSON.parse(localStorage.getItem('tokens_symbol'));
+      //set to fav token
+      if(tokens_symbol != null)
+      {
+        setFavTokenList(
+          INITIAL_TOKEN_LIST.filter(token => tokens_symbol.includes(token.symbol))
+        );
+      }
     },
     [account]
   );
@@ -376,10 +385,19 @@ const AddLiquidityComponent = props => {
 
   const [favTokenList, setFavTokenList] = useState([]);
 
-  const setTokenAsFav = index => {
+  const setTokenAsFav = token => {  
     setFavTokenList(prevState => {
       const prevFavTokenList = [...prevState];
-      prevFavTokenList.push(tokenList[index]);
+      if(prevFavTokenList.includes(token)) {
+        var tokens = prevFavTokenList.filter(value => value != token);
+        localStorage.setItem('token', JSON.stringify(tokens.map(e => e.addressOnEth)));
+        localStorage.setItem('tokens_symbol', JSON.stringify(tokens.map(e => e.symbol)));
+        return tokens
+      }
+      prevFavTokenList.push(token);
+      localStorage.setItem('token', JSON.stringify(prevFavTokenList.map(e => e.addressOnEth)));
+      localStorage.setItem('tokens_symbol', JSON.stringify(prevFavTokenList.map(e => e.symbol)));
+
       return prevFavTokenList;
     });
   };
@@ -768,10 +786,11 @@ const AddLiquidityComponent = props => {
                   data={token}
                   key={index}
                   customIcon={false}
-                  setAsFav={() => setTokenAsFav(index)}
+                  setAsFav={() => setTokenAsFav(token)}
                   selectToken={() => {
                     onTokenClick(token);
                   }}
+                  isFav={favTokenList.includes(token)}
                 />
               ))}
             </AcyTabPane>
@@ -783,8 +802,9 @@ const AddLiquidityComponent = props => {
                   selectToken={() => setTokenAsFav(index)}
                   customIcon={false}
                   index={index}
-                  setAsFav={() => setTokenAsFav(index)}
+                  setAsFav={() => setTokenAsFav(token)}
                   hideFavButton
+                  isFav={favTokenList.includes(supToken)}
                 />
               ))}
             </AcyTabPane>

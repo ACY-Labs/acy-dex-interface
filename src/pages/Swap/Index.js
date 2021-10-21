@@ -300,7 +300,7 @@ const Swap = props => {
           parseInt(nonZeroTokenAmount[i].toString().replace('0x', ''), 16)
       });
       const tokenDayData = await fetchTokenDaySimple(marketClient, inTokenAddr);
-      console.log('swaptokenDayData',tokenDayData);
+      // console.log('swaptokenDayData',tokenDayData);
       // token amount
     }
     

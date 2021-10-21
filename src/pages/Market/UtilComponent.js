@@ -48,24 +48,29 @@ export class SmallTable extends React.Component {
     });
   };
 
-  toggleWatchlist = (mode, data) => {
+  toggleWatchlist = (mode, address, tokenSymbol = null) => {
     let refreshWatchlist = this.props.refreshWatchlist;
     if (mode == 'token') {
       let oldArray = watchlistManagerToken.getData();
-      if (oldArray.includes(data)) {
-        oldArray = oldArray.filter(item => item != data);
+      let oldSymbolArray = watchlistManagerToken.getTokensSymbol();
+      console.log('oldSymbolArray:',oldSymbolArray);
+      if (oldArray.includes(address)) {
+        oldArray       = oldArray.filter(item => item != address);
+        oldSymbolArray = oldSymbolArray.filter(item => item != tokenSymbol);
       } else {
-        oldArray.push(data);
+        oldArray.push(address);
+        oldSymbolArray.push(tokenSymbol);
       }
       watchlistManagerToken.saveData(oldArray);
+      watchlistManagerToken.saveTokensSymbol(oldSymbolArray);
     }
 
     if (mode == 'pool') {
       let oldArray = watchlistManagerPool.getData();
-      if (oldArray.includes(data)) {
-        oldArray = oldArray.filter(item => item != data);
+      if (oldArray.includes(dataddressa)) {
+        oldArray = oldArray.filter(item => item != address);
       } else {
-        oldArray.push(data);
+        oldArray.push(address);
       }
       watchlistManagerPool.saveData(oldArray);
     }
@@ -111,7 +116,7 @@ export class SmallTable extends React.Component {
             width={14}
             style={{ marginLeft: '0.5rem' }}
             onClick={() => {
-              this.toggleWatchlist('token', entry.address);
+              this.toggleWatchlist('token', entry.address, entry.short);
             }}
           />
         </div>
@@ -980,6 +985,7 @@ export const MarketSearchBar = props => {
     setSearchQuery(e.target.value);
 
     lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
+      console.log('token info:',data);
       setSearchCoinReturns(
         data.map(item => {
           return { address: item.id, name: item.name, short: item.symbol };

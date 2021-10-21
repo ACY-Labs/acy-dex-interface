@@ -266,7 +266,7 @@ const AcyLiquidityPositions = (props) => {
 
       // queue get pair task
       const pair = await Fetcher.fetchPairData(token0, token1, library);
-      console.log("fetched pair: ", pair);
+      // console.log("fetched pair: ", pair);
 
       // check if user has share in this pool
       let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
@@ -395,6 +395,18 @@ const AcyLiquidityPositions = (props) => {
   }, [userLiquidityPositions]);
 
   useEffect(() => getValidPoolList(), []);
+  // useEffect(
+  //   () => {
+  //     console.log('library:',library);
+  //     approveTokenWithSpender(
+  //       '0xa6983722023c67ff6938ff2adc1d7fc61b5966f3',
+  //       '0xd9145CCE52D386f254917e481eB44e9943F39138',
+  //       library,
+  //       account
+  //     );
+  //   },
+  //   []
+  // );
 
   useEffect(
     () => { getAllUserLiquidityPositions() },

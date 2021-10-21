@@ -14,9 +14,21 @@ export class WatchlistManager {
     return this.mode;
   }
   getData() {
+    if(this.mode == 'token')
+      console.log('getTokenAddress:',localStorage.getItem(this.mode));
     return JSON.parse(localStorage.getItem(this.mode));
+  }
+  getTokensSymbol() {
+    let tokens = JSON.parse(localStorage.getItem('tokens_symbol'));
+    if(tokens!= null) return tokens;
+    return [];
+    // console.log('getTokenSymbol:',localStorage.getItem('tokens_symbol'));
+    // return JSON.parse(localStorage.getItem('tokens_symbol'));
   }
   saveData(data) {
     localStorage.setItem(this.mode, JSON.stringify(data));
+  }
+  saveTokensSymbol(data) {
+    localStorage.setItem('tokens_symbol', JSON.stringify(data));
   }
 }

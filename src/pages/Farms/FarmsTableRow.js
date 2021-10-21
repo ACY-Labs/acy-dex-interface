@@ -34,7 +34,28 @@ const FarmsTableRow = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const hideModal = () => setIsModalVisible(false);
   const showModal = () => setIsModalVisible(true);
-
+  // if(index == 2){
+  //   console.log(index);
+  //   console.log(lpTokens);
+  //   console.log(poolId);
+  //   console.log(stakedTokenAddr);
+  //   console.log(token1);
+  //   console.log(token1Logo);
+  //   console.log(token2);
+  //   console.log(token2Logo);
+  //   console.log(totalApr);
+  //   console.log(tvl);
+  //   console.log(hidden);
+  //   console.log(rowClickHandler);
+  //   console.log(pendingReward);
+  //   console.log(walletConnected);
+  //   console.log(hideArrow);
+  //   console.log(chainId);
+  //   console.log(account);
+  //   console.log(library);
+  //   console.log(isMyFarms);
+  // }
+  
   useEffect(
     () => {
       if (!stakedTokenAddr || !chainId || !account || !library) return;
@@ -237,9 +258,113 @@ const FarmsTableRow = ({
             </div>
           </div>
         )}
+      </div>
+      <div className={styles.tableBodyDrawerContainer} hidden={hidden}>
+        {/* Add Liquidity Column */}
+        {/* <div className={styles.tableBodyDrawerLiquidityContainer}>
+          <div>Add Liquidity:</div>
+          <div>
+            <a className={styles.tableCodyDrawerLiquidityLink}>
+              {token2 ? `${token1}-${token2}` : `${token1}`} {!isMobile ? 'LP' : ''}
+            </a>
+          </div>
+        </div> */}
+
+        {/* Staking Propotion */}
+        {!isMyFarms && (
+          <div className={styles.tableBodyDrawerStakingPropotionContainer}>
+            <div className={styles.tableBodyDrawerStakingPropotionTitle}>Staking Propotion</div>
+            <div className={styles.tableBodyDrawerStakingPropotionEquation}> ({token1}-{token2} LP) / ({token1}-{token2}) = 20% </div>
+          </div>
+        )}
+
+
+
+        {/* Add Liquidity */}
+        {!isMyFarms && (
+          <div className={styles.tableBodyDrawerAddLiquidityContainer}>
+            <div className={styles.tableBodyDrawerAddLiquidityTitle}>Add Liquidity</div>
+              <button
+                type="button"
+                className={styles.tableBodyDrawerAddLiquidityButton}
+              >
+                Add
+              </button>
+          </div>
+        )}
+
+
+        {/* Farm Column */}
+        <div className={styles.tableBodyDrawerFarmContainer}>
+          {/* <div className={styles.tableBodyDrawerWalletTitle}>Start Farming</div>
+          <div>
+            {walletConnected ? (
+              <button
+                type="button"
+                className={styles.tableBodyDrawerWalletButton}
+                onClick={showModal}
+              >
+                Stake LP
+              </button>
+            ) : (
+              <button
+                type="button"
+                className={styles.tableBodyDrawerWalletButton}
+                onClick={connectWallet}
+              >
+                Connect Wallet
+              </button>
+            )}
+          </div> */}
+        </div>
+
+        {/* Withdraw */}
+        {isMyFarms && (
+          <div className={styles.tableBodyDrawerWithdrawContainer}>
+            <div className={styles.tableBodyDrawerWithdrawTitle}>Remaining</div>
+            <div className={styles.tableBodyDrawerWithdrawContent}>
+              <div className={styles.tableBodyDrawerWithdrawDaysDateContainer}>
+                <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
+                  {remainingDays} Days
+                </div>
+                <div className={styles.tableBodyDrawerWithdrawDateContainer}>
+                  {date}
+                </div>
+              </div>
+              <button
+                type="button"
+                className={styles.tableBodyDrawerWithdrawButton}
+              >
+                Withdraw
+              </button>
+            </div>
+          </div>
+        )}
+        {/* Harvest Reward Column */}
+        {isMyFarms && (
+          <div className={styles.tableBodyDrawerRewardContainer}>
+            <div className={styles.tableBodyDrawerRewardTitle}>Pending Reward</div>
+            <div className={styles.tableBodyDrawerRewardContent}>
+              <div className={styles.tableBodyDrawerRewardTokenContainer}>
+                {pendingReward.map(reward => (
+                  <div className={styles.pendingReward1ContentContainer}>
+                    {`${reward.amount} ${reward.token}`}
+                  </div>
+                ))}
+              </div>
+              <button
+                type="button"
+                className={styles.tableBodyDrawerRewardHarvestButton}
+                style={isHarvestDisabled ? { cursor: 'not-allowed' } : {}}
+                onClick={() => harvestAll(index, library, account, setIsHarvestDisabled)}
+                disabled={isHarvestDisabled}
+              >
+                Harvest
+              </button>
+            </div>
+          </div>
+        )}
         
-
-
       </div>
 
       <StakeModal
