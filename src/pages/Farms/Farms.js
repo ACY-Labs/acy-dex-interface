@@ -63,7 +63,7 @@ const Farms = () => {
       const getPools = async (library, account) => {
         const pools = await getAllPools(library, account);
         console.log('getAllPools OK');
-        // console.log(pools);
+        console.log(pools);
         const newFarmsContents = [];
 
         pools.forEach(pool => {
@@ -165,7 +165,8 @@ const Farms = () => {
         );
         if (isMyFarms){
           setTableTitle('My Farms');
-          setTableRow(currentTableRowCopy.filter(tableData => tableData.hasUserPosition));
+          // setTableRow(currentTableRowCopy.filter(tableData => tableData.hasUserPosition));
+          setTableRow(currentTableRowCopy);
         }
         else if (selectedTable === 0){
           setTableRow(currentTableRowCopy);
@@ -250,7 +251,8 @@ const Farms = () => {
           });
           setTableRow(filteredTableData);
           setCurrentTableRow(filteredTableData);
-        } else {
+        } 
+        else {
           setTableRow([]);
           setCurrentTableRow([]);
         }

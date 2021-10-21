@@ -21,7 +21,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import { uniqueFun } from '@/utils/utils';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
-
+import { fetchGeneralTokenInfo, marketClient, fetchTokenDaySimple } from '../Market/Data/index.js';
 import SwapComponent from '@/components/SwapComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import axios from 'axios';
@@ -291,6 +291,8 @@ const Swap = props => {
         value:
           parseInt(nonZeroTokenAmount[i].toString().replace('0x', ''), 16)
       });
+      const tokenDayData = await fetchTokenDaySimple(marketClient, inTokenAddr);
+      console.log('swaptokenDayData',tokenDayData);
       // token amount
     }
     
@@ -393,7 +395,7 @@ const Swap = props => {
         )}
       </div>
       <div className={styles.exchangeBottomWrapper}>
-        {isReceiptObtained && (
+        {/* {isReceiptObtained && (
           <div className={styles.exchangeItem}>
             <h3>
               <AcyIcon.MyIcon width={30} type="arrow" />
@@ -416,7 +418,7 @@ const Swap = props => {
               )}
             </div>
           </div>
-        )}
+        )} */}
         <div className={styles.exchangeItem}>
           <h3>
             <AcyIcon.MyIcon width={30} type="arrow" />
