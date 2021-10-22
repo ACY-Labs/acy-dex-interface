@@ -65,7 +65,7 @@ const Farms = () => {
         console.log('getAllPools OK');
         console.log(pools);
         const newFarmsContents = [];
-
+        let ismyfarm = false;
         pools.forEach(pool => {
           const newFarmsContent = {
             poolId: pool.poolId,
@@ -86,13 +86,20 @@ const Farms = () => {
           //if user has farm, direct to myfarm
           if(newFarmsContent.hasUserPosition) {
             setIsMyFarms(true);
+            ismyfarm = true;
           }
           newFarmsContents.push(newFarmsContent);
         });
-
         setFarmsContent(newFarmsContents);
         setCurrentTableRow(newFarmsContents);
-        setTableRow(newFarmsContents);
+        if(ismyfarm) {
+          // setCurrentTableRow(newFarmsContents.filter(tableData => tableData.hasUserPosition));
+          setTableRow(newFarmsContents.filter(tableData => tableData.hasUserPosition));
+        } else {
+          // setCurrentTableRow(newFarmsContents);
+          setTableRow(newFarmsContents);
+        }
+        
       };
 
       // account will be returned if wallet is connected.
@@ -170,7 +177,9 @@ const Farms = () => {
         if (isMyFarms){
           setTableTitle('My Farms');
           // setTableRow(currentTableRowCopy.filter(tableData => tableData.hasUserPosition));
-          setTableRow(currentTableRowCopy);
+          setTableRow(currentTableRowCopy.filter(tableData => tableData.hasUserPosition));
+          // setTableRow(currentTableRowCopy);
+          
         }
         else if (selectedTable === 0){
           setTableRow(currentTableRowCopy);
