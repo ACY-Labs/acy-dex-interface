@@ -62,8 +62,8 @@ const FarmsTable = ({
   //     if (!account || !library) return;
   //     console.log(library, account);
   //     disapproveTokenWithSpender(
-  //       '0x8c2a011ee757C78eB3570ed4e63bD86d64399b99',
-  //       '0xf132Fdd642Afa79FDF6C1B77e787865C652eC824',
+  //       '0xa6983722023c67ff6938ff2adc1d7fc61b5966f3',
+  //       '0xd9145CCE52D386f254917e481eB44e9943F39138',
   //       library,
   //       account
   //     );

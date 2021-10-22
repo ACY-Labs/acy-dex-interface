@@ -44,6 +44,7 @@ export async function getEstimated(
   setLiquidityStatus,
   setPair,
   setNoLiquidity,
+  setPairToAddOnServer,
   setParsedToken0Amount,
   setParsedToken1Amount,
   setArgs,
@@ -147,6 +148,19 @@ export async function getEstimated(
       noLiquidity = true;
     }
     setNoLiquidity(noLiquidity);
+
+    // check if user has balance in the pair, will handle this in callback function
+    // const userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
+    // if (userPoolBalance.isZero()) {
+    //   setPairToAddOnServer({"token0": inToken0Address, "token1": inToken0Address});
+    //   console.log("test add to server", {"token0": inToken0Address, "token1": inToken0Address})
+    // } else {
+    //   setPairToAddOnServer(null);
+    //   console.log("test do not add")
+    // }
+    setPairToAddOnServer({"token0": inToken0Address, "token1": inToken1Address});
+    console.log("test add to server", {"token0": inToken0Address, "token1": inToken1Address})
+
     console.log('------------------ PARSE AMOUNT ------------------');
     // convert typed in amount to BigNumber using ethers.js's parseUnits,
 

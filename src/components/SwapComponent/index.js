@@ -24,7 +24,6 @@ import {
   AcySmallButton,
 } from '@/components/Acy';
 
-import { Input } from 'antd';
 import { connect } from 'umi';
 import styles from './styles.less';
 import { sortAddress, abbrNumber } from '@/utils/utils';
@@ -76,10 +75,11 @@ import {
 
 import { MaxUint256 } from '@ethersproject/constants';
 import { BigNumber } from '@ethersproject/bignumber';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits  } from '@ethersproject/units';
+import { hexlify  } from '@ethersproject/bytes';
 
 const { AcyTabPane } = AcyTabs;
-import { Row, Col, Button, Icon } from 'antd';
+import { Row, Col, Button, Input, Icon } from 'antd';
 import { Alert } from 'antd';
 import spinner from '@/assets/loading.svg';
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
@@ -145,6 +145,13 @@ const SwapComponent = props => {
   const [tokenSearchInput, setTokenSearchInput] = useState('');
   const [tokenList, setTokenList] = useState(INITIAL_TOKEN_LIST);
 
+  // connect to page model, reflect changes of pair ratio in this component
+  useEffect(() => {
+    const { swap: {token0: modelToken0, token1: modelToken1} } = props;
+    setToken0(modelToken0);
+    setToken1(modelToken1);
+  }, [props.swap]);
+
   // method to update the value of token search input field,
   // and filter the token list based on the comparison of the value of search input field and token symbol.
   const onTokenSearchChange = e => {
@@ -168,6 +175,18 @@ const SwapComponent = props => {
   // 监听钱包的连接
   useEffect(() => {
     activate(injected);
+
+    //read the fav tokens code in storage
+    var tokens_symbol = JSON.parse(localStorage.getItem('tokens_symbol'));
+    //set to fav token
+    if(tokens_symbol != null)
+    {
+      setFavTokenList(
+        INITIAL_TOKEN_LIST.filter(token => tokens_symbol.includes(token.symbol))
+      );
+    }
+    
+
   }, []);
 
   useEffect(
@@ -191,10 +210,19 @@ const SwapComponent = props => {
 
   const [favTokenList, setFavTokenList] = useState([]);
 
-  const setTokenAsFav = index => {
+  const setTokenAsFav = token => {  
     setFavTokenList(prevState => {
       const prevFavTokenList = [...prevState];
-      prevFavTokenList.push(tokenList[index]);
+      if(prevFavTokenList.includes(token)) {
+        var tokens = prevFavTokenList.filter(value => value != token);
+        localStorage.setItem('token', JSON.stringify(tokens.map(e => e.addressOnEth)));
+        localStorage.setItem('tokens_symbol', JSON.stringify(tokens.map(e => e.symbol)));
+        return tokens
+      }
+      prevFavTokenList.push(token);
+      localStorage.setItem('token', JSON.stringify(prevFavTokenList.map(e => e.addressOnEth)));
+      localStorage.setItem('tokens_symbol', JSON.stringify(prevFavTokenList.map(e => e.symbol)));
+
       return prevFavTokenList;
     });
   };
@@ -452,9 +480,12 @@ const SwapComponent = props => {
             transactionTime = moment(parseInt(data.timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
           });
           receipt.logs.map(item => {
+            // debugger
+            // let topics=hexlify(item.topics[0]).toText();
+            
             if (item.address == inputToken.address) {
               // inputtoken 数量
-              // inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
+              inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
               inputTokenNum = item.data / Math.pow(10, inputToken.decimals).toString();
             }
             if (item.address == outToken.address) {
@@ -521,6 +552,8 @@ const SwapComponent = props => {
       });
     }, 500);
   };
+
+  useEffect(() => console.log("test slippage: ", slippageTolerance), [slippageTolerance]);
   return (
     <div className={styles.sc}>
       <AcyCuarrencyCard
@@ -746,11 +779,12 @@ const SwapComponent = props => {
                     data={token}
                     key={index}
                     customIcon={false}
-                    // setAsFav={() => setTokenAsFav(index)}
-                    setAsFav={() => console.log(index)}
+                    setAsFav={() => setTokenAsFav(token)}
+                    // setAsFav={() => console.log('token:',token)}
                     selectToken={() => {
                       onCoinClick(token);
                     }}
+                    isFav={favTokenList.includes(token)}
                   />
                 );
               })}
@@ -765,8 +799,9 @@ const SwapComponent = props => {
                   }}
                   customIcon={false}
                   index={index}
-                  setAsFav={() => setTokenAsFav(index)}
+                  setAsFav={() => setTokenAsFav(supToken)}
                   hideFavButton
+                  isFav={favTokenList.includes(supToken)}
                 />
               ))}
             </AcyTabPane>
@@ -777,9 +812,10 @@ const SwapComponent = props => {
   );
 };
 
-export default connect(({ global, transaction, loading }) => ({
+export default connect(({ global, transaction, swap, loading }) => ({
   global,
   transaction,
   account: global.account,
+  swap,
   loading: loading.global,
 }))(SwapComponent);

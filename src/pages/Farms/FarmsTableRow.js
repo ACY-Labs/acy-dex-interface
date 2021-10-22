@@ -34,7 +34,28 @@ const FarmsTableRow = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const hideModal = () => setIsModalVisible(false);
   const showModal = () => setIsModalVisible(true);
-
+  // if(index == 2){
+  //   console.log(index);
+  //   console.log(lpTokens);
+  //   console.log(poolId);
+  //   console.log(stakedTokenAddr);
+  //   console.log(token1);
+  //   console.log(token1Logo);
+  //   console.log(token2);
+  //   console.log(token2Logo);
+  //   console.log(totalApr);
+  //   console.log(tvl);
+  //   console.log(hidden);
+  //   console.log(rowClickHandler);
+  //   console.log(pendingReward);
+  //   console.log(walletConnected);
+  //   console.log(hideArrow);
+  //   console.log(chainId);
+  //   console.log(account);
+  //   console.log(library);
+  //   console.log(isMyFarms);
+  // }
+  
   useEffect(
     () => {
       if (!stakedTokenAddr || !chainId || !account || !library) return;
@@ -237,10 +258,8 @@ const FarmsTableRow = ({
             </div>
           </div>
         )}
-        
-
-
       </div>
+      
 
       <StakeModal
         onCancel={hideModal}

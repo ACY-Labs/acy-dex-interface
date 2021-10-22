@@ -1,7 +1,7 @@
 /*
  * @Author: Doctor
  * @Date: 2021-10-18 14:09:29
- * @LastEditTime: 2021-10-18 18:23:20
+ * @LastEditTime: 2021-10-20 09:28:53
  * @LastEditors: Doctor
  * @Description: 
  * @FilePath: \acy-dex-interface\src\pages\Transaction\Index.js
@@ -21,16 +21,16 @@ const Transaction = props => {
   return <PageHeaderWrapper>
     <div className={styles.transaction}>
       <div>
-        <h1>Flash Routers</h1>
+        <h1 style={{marginTop: '0'}}><AcyIcon.MyIcon width={30} type="arrow" />Flash Routers</h1>
         <div className={styles.routers}>
           <div>
-            <div className={styles.block}>Swap  AAVE </div>
+            <div className={styles.block}>Swap  1.9 AAVE </div>
             <div className={styles.smallblock}>
               <div>0.875392845</div>
               <div>0.009%</div>
             </div>
             <div className={styles.smallblock}>
-              <div>0.875392845</div>
+              <div>0.875392845</div>   
               <div>0.009%</div>
             </div>
             <div className={styles.smallblock}>
@@ -38,7 +38,7 @@ const Transaction = props => {
               <div>0.009%</div>
             </div>
           </div>
-          <div><AcyIcon.MyIcon width={30} type="arrow" /></div>
+          <div className={styles.arrow}><AcyIcon.MyIcon width={20} type="rightArrow" /></div>
           <div>
             <div className={styles.block}>Pass</div>
             <div className={styles.smallblock}>
@@ -54,7 +54,7 @@ const Transaction = props => {
               <div>ACY</div>
             </div>
           </div>
-          <div><AcyIcon.MyIcon width={30} type="arrow" /></div>
+          <div className={styles.arrow}><AcyIcon.MyIcon width={20} type="rightArrow" /></div>
           <div>
           <div className={styles.block}>For USDC</div>
             <div className={styles.smallblock}>
@@ -72,8 +72,8 @@ const Transaction = props => {
           </div>
 
         </div>
-        <Divider />
-        <h1>Flash Arbitrage Revenue </h1>
+        
+        <h1><AcyIcon.MyIcon width={30} type="arrow" />Flash Arbitrage Revenue </h1>
         <table style={{width:'500px'}}>
            <tr>
              <td>ACY Output</td>
@@ -91,8 +91,8 @@ const Transaction = props => {
              <td>USDC</td>
            </tr>
         </table>
-        <Divider />
-        <h1>Flash Arbitrage Revenue Allocation</h1>
+        
+        <h1><AcyIcon.MyIcon width={30} type="arrow" />Flash Arbitrage Revenue Allocation</h1>
         <table style={{width:'500px'}}>
            <tr>
              <td>Trader</td>
@@ -110,8 +110,8 @@ const Transaction = props => {
              <td>314,876.94</td>
            </tr>
         </table>
-        <Divider />
-        <h1>Basic Fee</h1>
+        
+        <h1><AcyIcon.MyIcon width={30} type="arrow" />Basic Fee</h1>
         <table style={{width:'500px'}}>
            <tr>
              <td>Gas Fee</td>
@@ -122,8 +122,8 @@ const Transaction = props => {
              <td>4988.4</td>
            </tr>
         </table>
-        <Divider />
-        <h1>Trading Fee Allocation</h1>
+        
+        <h1><AcyIcon.MyIcon width={30} type="arrow" />Trading Fee Allocation</h1>
         <table style={{width:'500px'}}>
            <tr>
              <td>Liquidity Providers</td>
@@ -134,8 +134,8 @@ const Transaction = props => {
              <td>831.4</td>
            </tr>
         </table>
-        <Divider />
-        <h1>Trader Receive</h1>
+        
+        <h1><AcyIcon.MyIcon width={30} type="arrow" />Trader Receive</h1>
         <table style={{width:'500px'}}>
            <tr>
              <td>USDC</td>

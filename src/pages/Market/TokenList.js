@@ -6,7 +6,7 @@ import styles from './styles.less';
 import { MarketSearchBar, TokenTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
 import { convertTokenForList } from './Data/util.js';
-
+import ConnectWallet from './ConnectWallet';
 const watchlistManagerToken = new WatchlistManager('token');
 
 function MarketTokenList(props) {
@@ -56,6 +56,7 @@ function MarketTokenList(props) {
 
   return (
     <div className={styles.marketRoot}>
+      <ConnectWallet/>
       <MarketSearchBar
         dataSourceCoin={dataSourceCoin}
         dataSourcePool={dataSourcePool}
