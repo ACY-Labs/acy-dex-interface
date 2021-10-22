@@ -278,7 +278,8 @@ const AcyLiquidityPositions = (props) => {
     axios.get(
       // fetch valid pool list from remote
       // `https://api.acy.finance/api/pool?chainId=${chainId}`
-      `http://localhost:3001/api/userpool?walletId=${account}`
+      `https://api.acy.finance/api/userpool?walletId=${account}`
+      // `http://localhost:3001/api/userpool?walletId=${account}`
     ).then( async res => {
       console.log(res);
       
@@ -532,6 +533,19 @@ const AcyLiquidityPositions = (props) => {
     console.log("test elapsed time", new Date());
     await getValidPoolList();
   }, []);
+  
+  // useEffect(
+  //   () => {
+  //     console.log('library:',library);
+  //     approveTokenWithSpender(
+  //       '0xa6983722023c67ff6938ff2adc1d7fc61b5966f3',
+  //       '0xd9145CCE52D386f254917e481eB44e9943F39138',
+  //       library,
+  //       account
+  //     );
+  //   },
+  //   []
+  // );
 
   useEffect(
     async () => {

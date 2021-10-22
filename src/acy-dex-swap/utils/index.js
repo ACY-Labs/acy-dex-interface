@@ -13,7 +13,7 @@ import ERC20ABI from '../abis/ERC20.json';
 export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
 export const ROUTER_ADDRESS = '0x9c040CC3CE4B2C135452370Eed152A72ce5d5b18';
-export const FARMS_ADDRESS = '0xf132Fdd642Afa79FDF6C1B77e787865C652eC824';
+export const FARMS_ADDRESS  = '0xf132Fdd642Afa79FDF6C1B77e787865C652eC824';
 
 // a custom error class for custom error text and handling
 export class CustomError {

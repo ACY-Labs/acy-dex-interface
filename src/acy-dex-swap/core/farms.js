@@ -135,6 +135,20 @@ const getAllPools = async (library, account) => {
         const userPositions = (await contract.getUserPositions(account, i)).map(positionHex =>
           positionHex.toNumber()
         );
+        if(userPositions.length > 0)
+        {
+          // console.log('-----------------------userPosition-----------------------',userPositions);
+          for(var a in userPositions)
+          {
+            // var timestampe = await contract
+            //   .stakingPosition(i,a)
+            //   .then(x => console.log(x))
+            //   ;
+            // var totalReward = await contract.getTotalReward(i,a,0x0100000000000000000000000000000000000000000000000000000000000000);
+            // console.log('-----------------------stakingPosition-----------------------',timestampe);
+            // console.log('-----------------------totalReward-----------------------',totalReward);
+          }
+        }
         const allTokenTotalRewardAmount = await getPoolTotalPendingReward(
           rewardTokens,
           rewardTokensAddresses,

@@ -306,7 +306,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
             <div className={styles.acyDescriptionContainer}>
               {breakdown.map(info => (
                 <AcyDescriptions.Item>
-                  <div className={styles.acyDescriptionItem}>{info}</div>
+                  <div className={styles.acyDescriptionItem} style={{color: "white", fontSize: "1rem", fontWeight: "normal"}}>{info}</div>
                 </AcyDescriptions.Item>
               ))}
             </div>

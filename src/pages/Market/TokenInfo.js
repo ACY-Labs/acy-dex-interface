@@ -27,6 +27,7 @@ import { abbrNumber, openInNewTab, sortTable, calcPercentChange, FEE_PERCENT } f
 import { convertPoolForList } from './Data/util.js';
 import { MarketSearchBar, PoolTable, TransactionTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
+import ConnectWallet from './ConnectWallet';
 
 const watchlistManagerToken = new WatchlistManager('token');
 
@@ -278,6 +279,7 @@ function MarketTokenInfo(props) {
 
   return (
     <div className={styles.marketRoot}>
+      <ConnectWallet/>
       <MarketSearchBar
         dataSourceCoin={dataSourceCoin}
         dataSourcePool={dataSourcePool}
