@@ -111,6 +111,9 @@ const  BasicLayout =props=> {
     if(pathname.indexOf('/dao')>-1){
       setBgColor('daoRadialBg');
     }
+    if(pathname.indexOf('/launchpad')>-1){
+      setBgColor('launchpadRadialBg');
+    }
   })
   // componentDidUpdate(preProps) {
   //   // After changing to phone mode,

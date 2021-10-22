@@ -61,8 +61,13 @@ export default [
       },
       {
         path: '/farms',
-        name: 'Farms',
+        name: 'Farm',
         component: './Farms/',
+      },
+      {
+        path: '/launchpad',
+        name: 'Launch',
+        component: './LaunchPad/Index',
       },
       {
         path: '/transaction/:id?',

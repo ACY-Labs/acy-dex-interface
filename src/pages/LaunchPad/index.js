@@ -2,13 +2,6 @@
 import React from 'react';
 import "antd/dist/antd.css";
 import {Button, Menu, Dropdown, Icon, Progress, Tag, Table} from 'antd';
-import { Swiper, SwiperSlide } from "swiper/react";
-import { SwiperCore, 
-Mousewheel,Pagination
-} from 'swiper';
-// swiper css
-import "swiper/css";
-import "swiper/css/navigation"
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { AcyLineChart } from '@/components/Acy';
 import acyIcon from '@/assets/icon_acy.png';
