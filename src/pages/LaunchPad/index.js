@@ -190,9 +190,19 @@ const LaunchpadComponent = () => {
                         </Button>
                     </Dropdown>
                 </div>
-                <div>
+                <div className={styles.defiHashtag}>
                     <img src={hashtagIcon} alt="" className={styles.hashtagImage} />
                     <span style={hashtagText}>DeFi Market</span>
+                </div>
+                <div className={styles.userTotalTicket}>
+                    <div className={styles.ticketAllocation}>
+                        <h3 style={{fontWeight:'bold', textAlign:'left'}}>0 Ticket(s)</h3>
+                        <p style={token}>Your Winning Ticket</p>
+                    </div>
+                    <div className={styles.totalTickets}>
+                        <h3 style={{fontWeight:'bold', textAlign:'left'}}>0 ACY</h3>
+                        <p style={token}>Total Tickets Deposited</p>
+                    </div>
                 </div>
             </div>
             
@@ -214,45 +224,36 @@ const LaunchpadComponent = () => {
                 <span style={{marginLeft:'5vw', marginTop: '8px', color:'#C4C4C4', fontFamily:'Inter, sans-serif'}}>25-10-2021 ~ 26-10-2021</span>
                 <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', marginTop:'25px', textAlign:'center', fontSize:'18px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
             </div>
-            <span className={styles.line}> </span>
-            <div className={styles.tokenDetails}>
-                <div className={styles.tokenTotalRaise}>
-                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>30,000,000 ACY</h3>
-                    <p style={token}>Total Raise</p>
-                </div>
-                <div className={styles.tokenPrice}>
-                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>0.02 USDC</h3>
-                    <p style={token}>Per ACY</p>
-                </div>
-                <div className={styles.ticketAllocation}>
-                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>100 USDC</h3>
-                    <p style={token}>Allocation Per Winning Ticket</p>
-                </div>
-                <div className={styles.totalTickets}>
-                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>82795 Tickets</h3>
-                    <p style={token}>Total Tickets Deposited</p>
-                </div>
-            </div>
             <div className={styles.tokenProgress}>
                 <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={90} status='active' />
             </div>
+            <div className={styles.tokenDetails}>
+                <div className={styles.tokenTotalRaise}>                   
+                    <p style={token}>Total Raise</p>
+                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>30,000,000 ACY</h3>
+                </div>
+                <div className={styles.tokenPrice}>                    
+                    <p style={token}>Per ACY</p>
+                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>0.02 USDC</h3>
+                </div>
+                <div className={styles.ticketAllocation}>                   
+                    <p style={token}>Allocation Per Winning Ticket</p>
+                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>100 USDC</h3>
+                </div>
+                <div className={styles.totalTickets}>              
+                    <p style={token}>Total Tickets Deposited</p>
+                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>82795 Tickets</h3>
+                </div>
+            </div>
             <span className={styles.line}> </span>
             <div className={styles.tokenDetails}>
-                <div className={styles.tokenTotalRaise}>
-                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>0 Ticket(s)</h3>
+                <div className={styles.tokenTotalRaise}>                    
                     <p style={token}>Your Eligible Tickets</p>
-                </div>
-                <div className={styles.tokenPrice}>
                     <h3 style={{fontWeight:'bold', textAlign:'left'}}>0 Ticket(s)</h3>
+                </div>
+                <div className={styles.tokenPrice}>                  
                     <p style={token}>Your Deposited Tickets</p>
-                </div>
-                <div className={styles.ticketAllocation}>
                     <h3 style={{fontWeight:'bold', textAlign:'left'}}>0 Ticket(s)</h3>
-                    <p style={token}>Your Winning Ticket</p>
-                </div>
-                <div className={styles.totalTickets}>
-                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>0 ACY</h3>
-                    <p style={token}>Total Tickets Deposited</p>
                 </div>
             </div>
         </div>
