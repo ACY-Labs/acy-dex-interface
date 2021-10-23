@@ -1,13 +1,23 @@
 /* eslint-disable react/jsx-indent */
 import React from 'react';
-import "antd/dist/antd.css";
 import {Button, Menu, Dropdown, Icon, Progress, Tag, Table} from 'antd';
+import "swiper/bundle";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/swiper.less";
+import "swiper/components/navigation/navigation.less";
+import "swiper/components/pagination/pagination.less";
+import SwiperCore, {
+  Navigation,Pagination,Mousewheel,Keyboard
+} from 'swiper';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { AcyLineChart } from '@/components/Acy';
 import acyIcon from '@/assets/icon_acy.png';
 import hashtagIcon from '@/assets/icon_hashtag.png';
 import telegramIcon from '@/assets/icon_telegram_black.png';
 import styles from './styles.less';
+
+// install swiper modules
+SwiperCore.use([Navigation,Pagination,Mousewheel,Keyboard]);
 
 const LaunchpadComponent = () => {
     const links = [
@@ -261,6 +271,23 @@ const LaunchpadComponent = () => {
             <div className={styles.ticketDescription}>
                 <h1 style={{color:'#c4c4c4', textAlign:'center', fontFamily:'Inter, sans-serif', marginTop:'7px'}}>Follow these steps to get the tickets which are then used to swap for ACY tokens: </h1>
             </div>
+            <Swiper cssMode navigation pagination mousewheel keyboard className={styles.mySwiper}>
+                <SwiperSlide>
+                    <h2 style={{color:'#c4c4c4', padding:'10px', textAlign:'center'}}>Join Our Telegram Community To Get 1 Ticket</h2>
+                    <div className={styles.verticalCenter}>
+                        <Button type="link" href={links[2]} target="_blank" style={buttonCustomStyle}>
+                            <img src={telegramIcon} alt="" style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '8px 8px 0 0', float:'left'}} /> Telegram
+                        </Button>  
+                    </div>      
+                </SwiperSlide>
+                <SwiperSlide>
+                    <h2 style={{color:'#c4c4c4', padding:'10px', textAlign:'center'}}>Follow Our Twitter Page To Get 1 Ticket</h2>
+                    <div className={styles.verticalCenter}>
+                        <Button type="link" href={links[3]} target="_blank" style={buttonCustomStyle} icon="twitter">Twitter</Button> 
+                    </div>     
+                </SwiperSlide>
+                <SwiperSlide>Slide 3</SwiperSlide>
+            </Swiper>
         </div>
         <div className={styles.dateTableBox}>
             <Table style={{marginTop:'20px', textAlign:'center'}} columns={tableColumns} dataSource={tableData} />

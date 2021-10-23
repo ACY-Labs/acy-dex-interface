@@ -54,8 +54,8 @@
     "@web3-react/portis-connector": "^6.1.9",
     "@web3-react/torus-connector": "^6.1.9",
     "@web3-react/trezor-connector": "^6.1.9",
-    "@web3-react/walletconnect-connector": "^6.2.4",
-    "@web3-react/walletlink-connector": "^6.2.3",
+    "@web3-react/walletconnect-connector": "^6.2.7",
+    "@web3-react/walletlink-connector": "^6.2.7",
     "accounting-js": "^1.1.1",
     "antd": "^3.26.20",
     "apollo-boost": "^0.4.9",
@@ -102,7 +102,7 @@
     "react-redux": "^7.2.3",
     "react-router-dom": "^4.3.1",
     "redux": "^4.0.5",
-    "swiper": "^7.0.9"
+    "swiper": "^6.8.4"
   },
   "devDependencies": {
     "@types/react": "^16.7.7",
