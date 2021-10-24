@@ -490,6 +490,7 @@ export async function swap(
   wethContract,
   wrappedAmount,
   setSwapStatus,
+  setSwapButtonContent,
   swapCallback
 ) {
   const status = await (async () => {
@@ -617,6 +618,7 @@ export async function swap(
 
   if (status instanceof CustomError) {
     setSwapStatus(status.getErrorText());
+    setSwapButtonContent("Please try again");
   } else {
     console.log(status);
 

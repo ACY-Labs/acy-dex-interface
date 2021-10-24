@@ -429,7 +429,6 @@ const AddLiquidityComponent = props => {
         if (!receipt) {
           setTimeout(checkStatusAndFinish, 500);
         } else {
-          // clearInterval(sti);
           let transactionTime;
           await library.getBlock(receipt.logs[0].blockNumber).then(res => {
             transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
@@ -449,9 +448,10 @@ const AddLiquidityComponent = props => {
               ]
             }
           });
-          setButtonStatus(true);
+
+          // disable button after each transaction on default, enable it after re-entering amount to add
           console.log(buttonContent);
-          setButtonContent(buttonContent);
+          setButtonContent("Done");
 
           // update backend userPool record
           console.log("test pair to add on server", pairToAddOnServer);
@@ -599,7 +599,7 @@ const AddLiquidityComponent = props => {
         )}
       </AcyDescriptions>
 
-      {approveToken0ButtonShow == true && (
+      {/* {approveToken0ButtonShow == true && (
         <div>
           <AcyButton
             variant="warning"
@@ -668,8 +668,8 @@ const AddLiquidityComponent = props => {
             )}
           </AcyButton>{' '}
         </div>
-      )}
-      {approveToken1ButtonShow == true && (
+      )} */}
+      {/* {approveToken1ButtonShow == true && (
         <div>
           <AcyButton
             variant="warning"
@@ -737,7 +737,7 @@ const AddLiquidityComponent = props => {
             )}
           </AcyButton>
         </div>
-      )}
+      )} */}
 
       <AcyButton
         variant="success"
@@ -771,6 +771,7 @@ const AddLiquidityComponent = props => {
               args,
               value,
               setLiquidityStatus,
+              setButtonContent,
               addLiquidityCallback
             );
           }

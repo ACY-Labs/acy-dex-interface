@@ -458,6 +458,7 @@ const SwapComponent = props => {
     //   receipt
     // }];
 
+    // FIXME: implement the following logic with setTimeout(). refer to AddComponent.js checkStatusAndFinish()
     const sti = setInterval(() => {
       library.getTransactionReceipt(status.hash).then(async receipt => {
         console.log('receiptreceipt', receipt);
@@ -546,6 +547,9 @@ const SwapComponent = props => {
               },
             ])
           );
+
+          // set button to done and disabled on default
+          setSwapButtonContent("Done");
 
           // 读取数据：localStorage.getItem(key);
         }
@@ -679,7 +683,7 @@ const SwapComponent = props => {
         )}
       </AcyDescriptions>
 
-      {needApprove == true && (
+      {/* {needApprove == true && (
         <div>
           <AcyButton
             onClick={async () => {
@@ -708,9 +712,8 @@ const SwapComponent = props => {
             )}
           </AcyButton>{' '}
         </div>
-      )}
+      )} */}
 
-      {
         <AcyButton
           style={{ marginTop: '25px' }}
           disabled={!swapButtonState}
@@ -718,6 +721,8 @@ const SwapComponent = props => {
             if (account == undefined) {
               activate(injected);
             } else {
+              setSwapButtonState(false);
+              setSwapButtonContent(<>Processing <Icon type="loading" /></>)
               swap(
                 {
                   ...token0,
@@ -741,6 +746,7 @@ const SwapComponent = props => {
                 wethContract,
                 wrappedAmount,
                 setSwapStatus,
+                setSwapButtonContent,
                 swapCallback
               );
             }
@@ -748,7 +754,6 @@ const SwapComponent = props => {
         >
           {swapButtonContent}
         </AcyButton>
-      }
 
       <AcyDescriptions>
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
