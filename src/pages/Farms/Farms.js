@@ -65,7 +65,7 @@ const Farms = () => {
         console.log('getAllPools OK');
         console.log(pools);
         const newFarmsContents = [];
-
+        let ismyfarm = false;
         pools.forEach(pool => {
           const newFarmsContent = {
             poolId: pool.poolId,
@@ -83,12 +83,23 @@ const Farms = () => {
             hasUserPosition: pool.hasUserPosition,
             hidden: true,
           };
+          //if user has farm, direct to myfarm
+          if(newFarmsContent.hasUserPosition) {
+            setIsMyFarms(true);
+            ismyfarm = true;
+          }
           newFarmsContents.push(newFarmsContent);
         });
-
         setFarmsContent(newFarmsContents);
         setCurrentTableRow(newFarmsContents);
-        setTableRow(newFarmsContents);
+        if(ismyfarm) {
+          // setCurrentTableRow(newFarmsContents.filter(tableData => tableData.hasUserPosition));
+          setTableRow(newFarmsContents.filter(tableData => tableData.hasUserPosition));
+        } else {
+          // setCurrentTableRow(newFarmsContents);
+          setTableRow(newFarmsContents);
+        }
+        
       };
 
       // account will be returned if wallet is connected.
@@ -166,7 +177,9 @@ const Farms = () => {
         if (isMyFarms){
           setTableTitle('My Farms');
           // setTableRow(currentTableRowCopy.filter(tableData => tableData.hasUserPosition));
-          setTableRow(currentTableRowCopy);
+          setTableRow(currentTableRowCopy.filter(tableData => tableData.hasUserPosition));
+          // setTableRow(currentTableRowCopy);
+          
         }
         else if (selectedTable === 0){
           setTableRow(currentTableRowCopy);
@@ -195,7 +208,7 @@ const Farms = () => {
   useEffect(
     () => {
       setSearchInput('');
-      setIsMyFarms(false);
+      // setIsMyFarms(false);
 
       // when selected table is all,
       // display all data.
@@ -272,6 +285,7 @@ const Farms = () => {
             onPremierToggleButtonClick={onPremierToggleButtonClick}
             onDaoToggleButtonClick={onDaoToggleButtonClick}
             onMyFarmsToggleButtonClick={onMyFarmsButtonClick}
+            isMyFarms={isMyFarms}
           />
           <TableControl
             searchInput={searchInput}

@@ -14,6 +14,7 @@ import styles from './styles.less';
 import { abbrNumber, FEE_PERCENT } from './Util.js';
 import { MarketSearchBar, PoolTable, TokenTable, TransactionTable } from './UtilComponent.js';
 import { isMobile } from 'react-device-detect';
+import ConnectWallet from './ConnectWallet';
 
 export class MarketIndex extends Component {
   constructor(props) {
@@ -129,6 +130,7 @@ export class MarketIndex extends Component {
     const { visible, visibleSearchBar, tabIndex, transactionView } = this.state;
     return (
       <div className={styles.marketRoot}>
+        <ConnectWallet/>
         <MarketSearchBar
           dataSourceCoin={dataSourceCoin}
           dataSourcePool={dataSourcePool}
