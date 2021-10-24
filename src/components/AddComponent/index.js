@@ -83,16 +83,29 @@ import moment from 'moment';
 const { AcyTabPane } = AcyTabs;
 
 const AddLiquidityComponent = props => {
-  const { dispatch, onLoggedIn } = props;
+  const { dispatch, token, onLoggedIn } = props;
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
   // 选择货币前置和后置
   const [before, setBefore] = useState(true);
 
+  
+  let token0pass = INITIAL_TOKEN_LIST[0];
+  let token1pass = INITIAL_TOKEN_LIST[1];
+
+  // Check if token is passed from Farm
+  for(var i = 0; i<INITIAL_TOKEN_LIST.length; i++){
+    if(INITIAL_TOKEN_LIST[i].symbol == token.token1){
+      token0pass = INITIAL_TOKEN_LIST[i];
+    }
+    if(INITIAL_TOKEN_LIST[i].symbol == token.token2){
+      token1pass = INITIAL_TOKEN_LIST[i];
+    }
+  }
   // 交易对前置货币
-  let [token0, setToken0] = useState(INITIAL_TOKEN_LIST[0]);
+  let [token0, setToken0] = useState(token0pass);
   // 交易对后置货币
-  let [token1, setToken1] = useState(INITIAL_TOKEN_LIST[1]);
+  let [token1, setToken1] = useState(token1pass);
   // 交易对前置货币余额
   let [token0Balance, setToken0Balance] = useState('0');
   // 交易对后置货币余额
