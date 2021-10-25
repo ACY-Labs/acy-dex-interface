@@ -13,6 +13,7 @@ import {
   AcySeting,
 } from '@/components/Acy';
 import { useWeb3React } from '@web3-react/core';
+import { Conflux } from 'js-conflux-sdk/dist/js-conflux-sdk.umd.min.js';
 
 import {
   injected,
@@ -35,7 +36,31 @@ const GlobalHeaderRight = props => {
   const [visibleMetaMask, setVisibleMetaMask] = useState(false);
   const [visibleSetting, setVisibleSetting] = useState(false);
   // 连接钱包函数
-  const { account, chainId, library, activate, deactivate } = useWeb3React();
+  // const { account, chainId, library, activate, deactivate } = useWeb3React();
+//conflux version
+const [account ,setAccount] = useState();
+const [library,setLibrary] = useState();
+const [chainId,setChainId] = useState();
+const [conflux,setConflux] = useState();
+
+useEffect(async () => {
+    const conflux = new Conflux();
+    const confluxPortal = window.conflux;
+  
+    conflux.provider = confluxPortal;
+  
+    confluxPortal.enable();
+  
+    const accounts = await confluxPortal.send('cfx_requestAccounts');
+    console.log('accounts');
+    console.log(accounts);
+    setAccount(accounts[0]);
+    setChainId(1);
+    setLibrary(window.conflux);
+    setConflux(conflux);
+    console.log(accounts[0]);
+}, []);
+
 
   const getNoticeData = () => {
     const { notices = [] } = props;
@@ -98,23 +123,27 @@ const GlobalHeaderRight = props => {
   // 选择钱包
   const selectWallet = walletName => {
     console.log('selecting wallet');
-    if (walletName === 'metamask' || walletName === 'opera') {
-      activate(injected);
-    } else if (walletName === 'walletconnect') {
-      activate(walletconnect);
-    } else if (walletName === 'coinbase') {
-      activate(walletlink);
-    } else if (walletName === 'fortmatic') {
-      activate(fortmatic);
-    } else if (walletName === 'portis') {
-      activate(portis);
-    } else if (walletName === 'torus') {
-      activate(torus);
-    } else if (walletName === 'trezor') {
-      activate(trezor);
-    } else if (walletName === 'ledger') {
-      activate(ledger);
-    }
+    // if (walletName === 'metamask' || walletName === 'opera') {
+    //   activate(injected);
+    // } else if (walletName === 'walletconnect') {
+    //   activate(walletconnect);
+    // } else if (walletName === 'coinbase') {
+    //   activate(walletlink);
+    // } else if (walletName === 'fortmatic') {
+    //   activate(fortmatic);
+    // } else if (walletName === 'portis') {
+    //   activate(portis);
+    // } else if (walletName === 'torus') {
+    //   activate(torus);
+    // } else if (walletName === 'trezor') {
+    //   activate(trezor);
+    // } else if (walletName === 'ledger') {
+    //   activate(ledger);
+    // }
+      if (walletName == 'Conflux')
+      {
+        window.conflux.enable();
+      }
     setVisibleMetaMask(false);
   };
   // 通知钱包连接成功
@@ -167,10 +196,10 @@ const GlobalHeaderRight = props => {
   // 货币列表
   const MetaMask = [
     {
-      name: 'MetaMask',
-      icon: 'Metamask',
+      name: 'Conflux',
+      icon: 'Conflux',
       onClick: () => {
-        selectWallet('metamask');
+        selectWallet('Conflux');
       },
     },
   ];
