@@ -89,6 +89,12 @@ class BasicProfile extends Component {
 
   render() {
     const { visible, visibleConfirmOrder, visibleLoading, tabIndex, loggedIn } = this.state;
+    let token = "";
+    if(this.props.location.state){
+      token = this.props.location.state;
+      console.log(token)
+    }
+
     return (
       <PageHeaderWrapper>
         <div className={loggedIn ? styles.main : styles.main_notLoggedIn}>
@@ -96,7 +102,7 @@ class BasicProfile extends Component {
           <div>
             <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
               <div className={styles.addLiquidity}>
-                <AddComponent onLoggedIn={this.onLoggedIn} />
+                <AddComponent token={token} onLoggedIn={this.onLoggedIn} />
               </div>
             </AcyCard>
           </div>

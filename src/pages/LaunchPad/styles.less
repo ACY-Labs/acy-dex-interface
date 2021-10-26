@@ -3,17 +3,16 @@
 
 .topContainer{
     width: 100%;
+    flex-direction: row;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    margin-bottom: 20px;
 }
 
 .tokenContainer{
-    width: 49%;
-    height: 20vh;
-    padding: 0%;
-    margin: 0%;
+    width: 48%;
+    max-height: 700px;
+    height: 100%;
     box-sizing: border-box;
     overflow: hidden;
     position: relative;
@@ -29,6 +28,38 @@
     }
 }
 
+.chartWrapper{
+    width: 49%;
+    height: 315px;
+    max-height: 700px;
+    float: right;
+    overflow: hidden;
+}
+
+.hashtagBox{
+    width: 100%;
+    height: auto;
+    display: inline-block;
+    padding: 15px 0;
+}
+
+.userTotalTicket{
+    width: 100%;
+    height: auto;
+    margin-left: 1px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-evenly;
+    padding: 10px;
+    .ticketAllocation{
+        float: left;
+    }
+    .totalTickets{
+        margin-left: 20px;
+    }
+}
+
+
 .mainImage{
     padding: 5px;
     width: 60px;
@@ -42,7 +73,7 @@
     width: 20px;
     height: auto;
     float: left;
-    margin-top: 20px;
+    margin-top: 15px;
     margin-right: 15px;
 }
 
@@ -53,41 +84,24 @@
     width: auto;
 }
 
-.whitelistBox {
-    width: 40%;
-    height: 20vh;
-    max-height: 700px;
-    position: relative;
-    background-color: @cardColor;
-    border-radius: 15px;
-    margin: 40px 0 15px 0;
-    overflow: hidden;
-    float: right;
-    p {
-        color: @mainColor;
-        font-size: 15px;
-        padding: 5px;
-        text-align: center;
-        vertical-align: middle;
-    }
+.tokenDate{
+    padding: 0 20px 10px 0;
+    width: 100%;
 }
 
-.chartWrapper{
-    width: 49%;
-    height: 20vh;
-    max-height: 700px;
-    border-radius: 15px;
-    margin-bottom: 10px;
-    padding: 15px;
-    float: right;
-    overflow: hidden;
+.midContainer{
+    width: 100%;
+    padding: 0%;
+    margin: 0%;
+    flex-direction: row;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
 
 .tokenInfoBox{
-    width: 49%;
-    height: 23vh;
-    padding: 0%;
-    margin: 0%;
+    width: 59%;
     background-color: @cardColor;
     box-sizing: border-box;
     border-radius: 10px;
@@ -95,32 +109,12 @@
     position: relative;
     display: inline-block;
     .tokenSym{
-        padding: 10px;
-        margin-bottom: 12px;
+        padding: 20px;
         width: 100%;
     }
     .idoDeadline{
         width: 35%;
         float: right;
-    }
-}
-
-.defiHashtag{
-    width: 100%;
-}
-
-.userTotalTicket{
-    width: 80%;
-    height: auto;
-    margin-left: 1px;
-    display: flex;
-    justify-content: left;
-    margin-top: 2.5em;
-    .ticketAllocation{
-        float: left;
-    }
-    .totalTickets{
-        margin-left: 20px;
     }
 }
 
@@ -133,25 +127,22 @@
 .tokenDetails{
     width: 100%;
     height: auto;
-    margin-left: 1em;
+    display: flex;
+    padding: 15px 0;
+    justify-content: space-evenly;
+}
+
+.tokenMoreInfo{
+    width: 100%;
+    max-height: 700px;
+    padding: 20px 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    position: relative;
+    margin-top: 10px;
     display: flex;
     justify-content: space-evenly;
-    .tokenTotalRaise{
-        width: auto;
-        padding: 15px;
-        height: auto;
-    }
-    .tokenPrice{
-        width: auto;
-        padding: 15px;
-        height: auto;
-    }
-    .ticketAllocation{
-        width: auto;
-        padding: 15px;
-        height: auto;
-    }
-    .totalTickets{
+    .tokenRaiseSize .tokenAmount .totalTickets .tokenMaxAllo .tokenShowPrice{
         width: auto;
         padding: 15px;
         height: auto;
@@ -163,22 +154,12 @@
     display: inline-block;
     text-align: center;
     padding: 5px;
-    .tokenTotalRaise{
-        width: auto;
-        padding: 15px;
-        height: auto;
-    }
-    .tokenPrice{
-        width: auto;
-        padding: 15px;
-        height: auto;
-    }
 }
 
 .tokenProgress{
     width: 100%;
     height: auto;
-    padding: 0 15px 15px 15px;
+    padding: 15px;
     display: inline-block;
     :global{
         .ant-progress-text{
@@ -188,10 +169,7 @@
 }
 
 .ticketBox{
-    width: 49%;
-    height: 23vh;
-    padding: 0%;
-    margin: 0%;
+    width: 40%;
     background-color: @cardColor;
     box-sizing: border-box;
     border-radius: 10px;

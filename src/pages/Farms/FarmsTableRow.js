@@ -1,9 +1,11 @@
-import React, { forwardRef, useState, useEffect } from 'react';
+import React, { forwardRef, useState, useEffect} from 'react';
+import { useHistory } from 'react-router-dom';
 import styles from '@/pages/Farms/Farms.less';
 import { isMobile } from 'react-device-detect';
 import { harvestAll } from '@/acy-dex-swap/core/farms';
 import { getUserTokenBalanceWithAddress } from '@/acy-dex-swap/utils';
 import StakeModal from './StakeModal';
+import { addLiquidity } from '@/acy-dex-swap/core/addLiquidity';
 
 const FarmsTableRow = ({
   index,
@@ -34,6 +36,7 @@ const FarmsTableRow = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const hideModal = () => setIsModalVisible(false);
   const showModal = () => setIsModalVisible(true);
+  
   // if(index == 2){
   //   console.log(index);
   //   console.log(lpTokens);
@@ -73,6 +76,20 @@ const FarmsTableRow = ({
     },
     [stakedTokenAddr]
   );
+  
+  let history = useHistory();
+
+  const redirectLiquidity = () => {
+    console.log(token1,token2);
+    history.push({
+      pathname: '/liquidity',
+      // search: '?update=true',  // query string
+      state: {  // location state
+        token1 : token1,
+        token2 : token2,
+      },
+    });
+  };
 
   return (
     <div className={styles.tableBodyRowContainer}>
@@ -107,8 +124,8 @@ const FarmsTableRow = ({
         {/* Pending Reward Column */}
         <div className={styles.tableBodyRewardColContainer}>
           <div className={styles.pendingRewardTitleContainer}>
-            {(isMyFarms && !isMobile ) ? 'My Reward' : ''}
-            {(!isMyFarms && !isMobile ) ? 'All Reward' : ''}
+            {(isMyFarms && !isMobile ) ? 'Accumulated Reward' : ''}
+            {(!isMyFarms && !isMobile ) ? 'Accumulated Reward' : ''}
             {(isMobile) ? 'Reward' : ''}
             {isMobile}
           </div>
@@ -178,6 +195,7 @@ const FarmsTableRow = ({
               <button
                 type="button"
                 className={styles.tableBodyDrawerAddLiquidityButton}
+                onClick={redirectLiquidity}
               >
                 Add
               </button>

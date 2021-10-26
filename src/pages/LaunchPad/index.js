@@ -11,7 +11,7 @@ import SwiperCore, {
 } from 'swiper';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { AcyLineChart } from '@/components/Acy';
-import acyIcon from '@/assets/icon_acy.png';
+import AcyIcon from '@/assets/icon_acy.svg';
 import hashtagIcon from '@/assets/icon_hashtag.png';
 import telegramIcon from '@/assets/icon_telegram_black.png';
 import styles from './styles.less';
@@ -103,7 +103,7 @@ const LaunchpadComponent = () => {
           round: "Round 1",
           date: "10-10-2021",
           price: '0.05 USDC',
-          raiseSize: "1000000 SHI",
+          raiseSize: "1000000 ACY",
           amount: "25M",
           marketCap:"10M",
           maxAllocation: "10M",
@@ -115,7 +115,7 @@ const LaunchpadComponent = () => {
           round: "Round 2",
           date: "17-10-2021",
           price: '0.10 USDC',
-          raiseSize: "1000000 SHI",
+          raiseSize: "1000000 ACY",
           amount: "25M",
           marketCap:"20M",
           maxAllocation: "10M",
@@ -127,7 +127,7 @@ const LaunchpadComponent = () => {
           round: "Round 3",
           date: "28-10-2021",
           price: '0.15 USDC',
-          raiseSize: "1000000 SHI",
+          raiseSize: "1000000 ACY",
           amount: "25M",
           marketCap:"30M",
           maxAllocation: "10M",
@@ -143,11 +143,17 @@ const LaunchpadComponent = () => {
         fontFamily:'Inter, sans-serif'
     }
 
+    const tokenContent = {
+        fontWeight:'bold', 
+        textAlign:'left', 
+        color:'#FFF'
+    }
+
     const hashtagText = {
         color: '#C4C4C4',
         position: 'relative',
-        top: '19px',
-        marginTop: '15px',
+        top: '12px',
+        marginTop: '14px',
         fontSize: '15px'
     }
 
@@ -194,27 +200,22 @@ const LaunchpadComponent = () => {
                 </div>
                 <div className={styles.snsBox3}>
                     <Button type="link" href={links[4]} target="_blank" style={{background: "#C4C4C4", border: "#eb5c20", color: 'black', height: "2em"}} icon="file-ppt">Deck</Button>
+                    <Button type="link" href={links[1]} target="_blank" style={buttonCustomStyle}>
+                        <Icon type="youtube" theme="filled" />
+                            YouTube
+                    </Button>
                     <Dropdown overlay={menu} trigger={['click']}>
                         <Button onClick={e => e.preventDefault()} style={buttonCustomStyle}>
                             Explorer <Icon type="down" />
                         </Button>
                     </Dropdown>
                 </div>
-                <div className={styles.defiHashtag}>
+                <div className={styles.hashtagBox}>
                     <img src={hashtagIcon} alt="" className={styles.hashtagImage} />
-                    <span style={hashtagText}>DeFi Market</span>
-                </div>
-                <div className={styles.userTotalTicket}>
-                    <div className={styles.ticketAllocation}>
-                        <h3 style={{fontWeight:'bold', textAlign:'left'}}>0 Ticket(s)</h3>
-                        <p style={token}>Your Winning Ticket</p>
-                    </div>
-                    <div className={styles.totalTickets}>
-                        <h3 style={{fontWeight:'bold', textAlign:'left'}}>0 ACY</h3>
-                        <p style={token}>Total Tickets Deposited</p>
-                    </div>
+                    <span style={hashtagText}>DeFi Market, AMM, DEX</span>
                 </div>
             </div>
+            
             
             <div className={styles.chartWrapper}>
                 <AcyLineChart
@@ -227,67 +228,84 @@ const LaunchpadComponent = () => {
             </div>
             
         </div>
-        <div className={styles.tokenInfoBox}>
-            <div className={styles.tokenSym}>
-                <img src={acyIcon} alt="Token" className={styles.mainImage} />
-                <h2 className={styles.tokenName}> ACY </h2>
-                <span style={{marginLeft:'5vw', marginTop: '8px', color:'#C4C4C4', fontFamily:'Inter, sans-serif'}}>25-10-2021 ~ 26-10-2021</span>
-                <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', marginTop:'25px', textAlign:'center', fontSize:'18px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
-            </div>
-            <div className={styles.tokenProgress}>
-                <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={90} status='active' />
-            </div>
-            <div className={styles.tokenDetails}>
-                <div className={styles.tokenTotalRaise}>                   
-                    <p style={token}>Total Raise</p>
-                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>30,000,000 ACY</h3>
-                </div>
-                <div className={styles.tokenPrice}>                    
-                    <p style={token}>Per ACY</p>
-                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>0.02 USDC</h3>
-                </div>
-                <div className={styles.ticketAllocation}>                   
-                    <p style={token}>Allocation Per Winning Ticket</p>
-                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>100 USDC</h3>
-                </div>
-                <div className={styles.totalTickets}>              
-                    <p style={token}>Total Tickets Deposited</p>
-                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>82795 Tickets</h3>
-                </div>
-            </div>
-            <span className={styles.line}> </span>
-            <div className={styles.tokenDetails}>
-                <div className={styles.tokenTotalRaise}>                    
-                    <p style={token}>Your Eligible Tickets</p>
-                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>0 Ticket(s)</h3>
-                </div>
-                <div className={styles.tokenPrice}>                  
-                    <p style={token}>Your Deposited Tickets</p>
-                    <h3 style={{fontWeight:'bold', textAlign:'left'}}>0 Ticket(s)</h3>
-                </div>
-            </div>
+        <div className={styles.tokenDate}>
+            <h2 style={{fontWeight:'bold'}}>Round 1</h2>
+            <h3 style={{color:'#fff'}}>2021-10-31 10:00:00 ~ 2021-11-01 10:00:00</h3>
         </div>
-        <div className={styles.ticketBox}>
-            <div className={styles.ticketDescription}>
-                <h1 style={{color:'#c4c4c4', textAlign:'center', fontFamily:'Inter, sans-serif', marginTop:'7px'}}>Follow these steps to get the tickets which are then used to swap for ACY tokens: </h1>
+        <div className={styles.midContainer}>
+            <div className={styles.tokenInfoBox}>
+                <div className={styles.tokenSym}>
+                    <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
+                    <h2 className={styles.tokenName}> ACY </h2>
+                    <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', marginTop:'25px', textAlign:'center', fontSize:'18px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
+                </div>
+                <div className={styles.tokenProgress}>
+                    <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={90} status='active' />
+                </div>
+                <div className={styles.tokenDetails}>
+                    <div className={styles.tokenTotalRaise}>                   
+                        <p style={token}>Raise Size</p>
+                        <h3 style={tokenContent}>30,000,000 ACY</h3>
+                    </div>
+                    <div className={styles.tokenPrice}>                    
+                        <p style={token}>Per ACY</p>
+                        <h3 style={tokenContent}>0.02 USDC</h3>
+                    </div>
+                    <div className={styles.ticketAllocation}>    
+                        <p style={token}>Amount</p>
+                        <h3 style={tokenContent}>25000000</h3> 
+                    </div>
+                    <div className={styles.tokenMarketCap}>   
+                        <p style={token}>Market Cap</p>
+                        <h3 style={tokenContent}>10M</h3>             
+                    </div>
+                </div>
+                <span className={styles.line}> </span>
+                <div className={styles.tokenMoreInfo}>
+                    <div className={styles.tokenShowPrice}>
+                        <p style={token}>Price</p>
+                        <h3 style={tokenContent}>0.02 USDC</h3>   
+                    </div>
+                    <div className={styles.tokenRaiseSize}>                
+                        <p style={token}>Raise Size</p>
+                        <h3 style={tokenContent}>30,000,000 ACY</h3>
+                    </div>
+                    <div className={styles.tokenAmount}>                    
+                        <p style={token}>Total Tickets Deposited</p>
+                        <h3 style={tokenContent}>82795 Tickets</h3>
+                    </div>
+                    <div className={styles.tokenMaxAllo}>              
+                        <p style={token}>Lottery</p>
+                        <h3 style={tokenContent}>10M</h3>
+                    </div>
+                    <div className={styles.totalTickets}>                   
+                    <p style={token}>Allocation Per Winning Ticket</p>
+                        <h3 style={tokenContent}>100 USDC</h3>
+                    </div>
+                </div>
             </div>
-            <Swiper cssMode navigation pagination mousewheel keyboard className={styles.mySwiper}>
-                <SwiperSlide>
-                    <h2 style={{color:'#c4c4c4', padding:'10px', textAlign:'center'}}>Join Our Telegram Community To Get 1 Ticket</h2>
-                    <div className={styles.verticalCenter}>
-                        <Button type="link" href={links[2]} target="_blank" style={buttonCustomStyle}>
-                            <img src={telegramIcon} alt="" style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '8px 8px 0 0', float:'left'}} /> Telegram
-                        </Button>  
-                    </div>      
-                </SwiperSlide>
-                <SwiperSlide>
-                    <h2 style={{color:'#c4c4c4', padding:'10px', textAlign:'center'}}>Follow Our Twitter Page To Get 1 Ticket</h2>
-                    <div className={styles.verticalCenter}>
-                        <Button type="link" href={links[3]} target="_blank" style={buttonCustomStyle} icon="twitter">Twitter</Button> 
-                    </div>     
-                </SwiperSlide>
-                <SwiperSlide>Slide 3</SwiperSlide>
-            </Swiper>
+            <div className={styles.ticketBox}>
+                <div className={styles.ticketDescription}>
+                    <h1 style={{color:'#c4c4c4', textAlign:'center', fontFamily:'Inter, sans-serif', marginTop:'7px'}}>Check your remaining winning tickets and earn more by following these steps: </h1>
+                </div>
+                <Swiper cssMode navigation pagination mousewheel keyboard className={styles.mySwiper}>
+                    <SwiperSlide>
+                        <h2 style={{color:'#c4c4c4', padding:'10px', textAlign:'center'}}>Join Our Telegram Community To Get 1 Ticket</h2>
+                        <div className={styles.verticalCenter}>
+                            <Button type="link" href={links[2]} target="_blank" style={buttonCustomStyle}>
+                                <img src={telegramIcon} alt="" style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '8px 8px 0 0', float:'left'}} /> Telegram
+                            </Button>  
+                        </div>      
+                    </SwiperSlide>
+                    <SwiperSlide>
+                        <h2 style={{color:'#c4c4c4', padding:'10px', textAlign:'center'}}>Follow Our Twitter Page To Get 1 Ticket</h2>
+                        <div className={styles.verticalCenter}>
+                            <Button type="link" href={links[3]} target="_blank" style={buttonCustomStyle} icon="twitter">Twitter</Button> 
+                        </div>     
+                    </SwiperSlide>
+                    <SwiperSlide>Slide 3</SwiperSlide>
+                </Swiper>
+            </div>
         </div>
         <div className={styles.dateTableBox}>
             <Table style={{marginTop:'20px', textAlign:'center'}} columns={tableColumns} dataSource={tableData} />
