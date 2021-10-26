@@ -244,7 +244,7 @@ const Farms = () => {
           const filteredTableData = tableDataTemp.filter(tableData => {
             let isBtcEth = false;
             tableData.pendingReward.forEach(({ token }) => {
-              if (token === 'BTC' || token === 'ETH') {
+              if (token === 'BTC' || token === 'ETH' || token === 'USDC' || token === 'USDT') {
                 isBtcEth = true;
               }
             });
@@ -256,7 +256,7 @@ const Farms = () => {
           const filteredTableData = tableDataTemp.filter(tableData => {
             let isLiquidity = false;
             tableData.pendingReward.forEach(({ token }) => {
-              if (token !== 'BTC' && token !== 'ETH') {
+              if (token !== 'BTC' && token !== 'ETH' && token !== 'USDC' && token !== 'USDT') {
                 isLiquidity = true;
               }
             });

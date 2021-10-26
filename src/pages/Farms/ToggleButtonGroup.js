@@ -24,7 +24,7 @@ const ToggleButtonGroup = (
       </button>
       <button
         type="button"
-        className={styles.leftToggleButton}
+        className={`${isMyFarms ? styles.tableToggleButtonMyFarm : styles.leftToggleButton}`}
         style={{ backgroundColor: selectedTable === 1 && !isMyFarms ? "#174163" : "#2e3032", color: selectedTable === 1 && !isMyFarms? "white": ""}}
         onClick={onAcyToggleButtonClick}
         disabled={isMyFarms}
@@ -33,7 +33,7 @@ const ToggleButtonGroup = (
       </button>
       <button
         type="button"
-        className={styles.middleToggleButton}
+        className={`${isMyFarms ? styles.tableToggleButtonMyFarm : styles.middleToggleButton}`}
         style={{ backgroundColor: selectedTable === 3 && !isMyFarms ? "#174163" : "#2e3032", color: selectedTable === 3 && !isMyFarms? "white": ""}}
         onClick={onDaoToggleButtonClick}
         disabled={isMyFarms}
@@ -42,7 +42,7 @@ const ToggleButtonGroup = (
       </button>
       <button
         type="button"
-        className={styles.rightToggleButton}
+        className={`${isMyFarms ? styles.tableToggleButtonMyFarm : styles.rightToggleButton}`}
         style={{ backgroundColor: selectedTable === 2 && !isMyFarms ? "#174163" : "#2e3032", color: selectedTable === 2 && !isMyFarms? "white": ""}}
         onClick={onPremierToggleButtonClick}
         disabled={isMyFarms}
