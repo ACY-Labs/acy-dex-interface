@@ -66,6 +66,7 @@
     "chalk": "^2.4.2",
     "classnames": "^2.2.6",
     "core-js": "^3.17.2",
+    "crypto-js": "^4.1.1",
     "dayjs": "^1.10.7",
     "echarts": "^5.1.2",
     "echarts-for-react": "^3.0.1",
