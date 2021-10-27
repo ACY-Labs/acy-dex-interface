@@ -75,7 +75,6 @@ const Swap = props => {
   const [format, setFormat] = useState('h:mm:ss a');
   const [activeToken1, setActiveToken1] = useState(supportedTokens[1]);
   const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
-  const [activePercentageChange, setActivePercentageChange] = useState('+0.00');
   const [activeAbsoluteChange, setActiveAbsoluteChange] = useState('+0.00');
   const [activeRate, setActiveRate] = useState('Loading...');
   const [range, setRange] = useState('1D');
@@ -229,7 +228,7 @@ const Swap = props => {
         </div>
         <div className={styles.secondarytitle}>
           <span className={styles.lighttitle}>{activeRate}</span>{' '}
-          <span className={styles.percentage}>{activePercentageChange}%({activeAbsoluteChange})</span>
+          <span className={styles.percentage}>{activeAbsoluteChange}</span>
         </div>
       </div>,
     ];
@@ -372,12 +371,10 @@ const Swap = props => {
                   range={range}
                   onHover={(data, dataIndex) => {
                     const prevData = dataIndex === 0 ? 0 : chartData[dataIndex - 1][1];
-                    const absoluteChange = dataIndex === 0 ? 0 : data - prevData;
+                    const absoluteChange = (dataIndex === 0 ? 0 : data - prevData).toFixed(3);
+                    const formattedAbsChange = absoluteChange > 0 ? "+"+absoluteChange : absoluteChange;
                     setActiveRate(data);
-                    setActiveAbsoluteChange(absoluteChange.toFixed(3));
-                    setActivePercentageChange(dataIndex === 0
-                      ? '0'
-                      : `${((absoluteChange / prevData) * 100).toFixed(2)}`);
+                    setActiveAbsoluteChange(formattedAbsChange);
                   }}
                 />
                 

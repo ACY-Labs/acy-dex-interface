@@ -69,7 +69,7 @@ class AcyPriceChart extends Component {
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() { }
 
   renderTooltip = v => {
     const { onHover, showTooltip } = this.props;
@@ -115,7 +115,7 @@ class AcyPriceChart extends Component {
         splitNumber: 5,
         boundaryGap: false,
         data: dateList.map((item, index) =>
-          index !== 0 && index !== dateList.length-1 ? moment(item)
+          index !== 0 && index !== dateList.length - 1 ? moment(item)
             .locale('en')
             .local()
             .format(format)
@@ -128,10 +128,14 @@ class AcyPriceChart extends Component {
         },
       },
       yAxis: {
-        show: false,
+        // show: false,
         type: 'value',
         splitLine: {
-          show: false,
+          show: true,
+          lineStyle: {
+            color: "#757579",
+            type: "dashed"
+          }
         },
         scale: true,
         axisTick: { show: false }, // 刻度
