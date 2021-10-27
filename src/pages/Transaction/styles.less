@@ -18,29 +18,41 @@
   }
   .routers{
     display: flex;
+    font-size: 16px;
     .block{
       width: 300px;
       text-align: left;
-      border: 1px solid #29292C;
+      border: 2px solid #757579;
       padding: 10px 20px;
       font-weight:bold;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       border-radius: 5px;
       color: #ffffff;
+      &:hover{
+        background-color: rgba(234,92,31,0.1)
+      }
     }
     .smallblock{
       width: 300px;
-      border: 1px solid #29292C;
-      margin: 5px auto;
+      border: 1px solid #757579;
+      margin:10px auto;
       display: flex;
-      padding: 5px 20px;
+      padding: 10px 20px;
       border-radius: 5px;
       color: #ffffff;
       justify-content: space-between;
+      &:hover{
+        background-color: rgba(234,92,31,0.1)
+      }
     }
   }
   .arrow{
     padding: 8.5px 20px;
+    &:hover{
+      color: #eb5c20;
+      transform: translate(5px,0);
+      transition-duration: 0.5s;
+    }
   }
   table{
     color: #ffffff;
