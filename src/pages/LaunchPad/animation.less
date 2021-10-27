@@ -1,0 +1,131 @@
+@keyframes shake {
+    0% {
+      padding-left: 0;
+    }
+    50% {
+      padding-left: 10px;
+    }
+    100% {
+      padding-left: 0px;
+    }
+  }
+  
+  @keyframes shakeTR {
+    0% {
+      top: 10px;
+      right: 10px;
+    }
+    50% {
+      top: 5px;
+      right: 5px;
+    }
+    100% {
+      top: 10px;
+      right: 10px;
+    }
+  }
+  
+  @keyframes shakeTD {
+    0% {
+      margin-top: 0px;
+    }
+    33% {
+      margin-top: -10px;
+    }
+    66% {
+      margin-top: 10px;
+    }
+    100% {
+      margin-top: 0px;
+    }
+  }
+  
+  @keyframes light {
+    0% {
+      background-color: transparent;
+    }
+    50% {
+      background-color: #ea5c1f;
+    }
+    100% {
+      background-color: transparent;
+      color: white;
+    }
+  }
+  
+  @keyframes upDown {
+    0% {
+      margin-top: 0px;
+      margin-bottom: 30px;
+    }
+    50% {
+      margin-top: 30px;
+      margin-bottom: 0px;
+    }
+    100% {
+      margin-top: 0px;
+      margin-bottom: 30px;
+    }
+  }
+  
+  .moveTDOnHover {
+    margin-top: 0;
+  }
+  .moveTDOnHover:hover {
+    animation: shakeTD 0.5s;
+  }
+  
+  .moveLROnHover,
+  .moveLROnClick {
+    padding-left: 0;
+  }
+  .moveLROnHover:hover,
+  .moveLROnClick:active {
+    animation: shake 0.5s;
+  }
+  
+  .moveTopRightOnHover img {
+    top: 10px;
+    right: 10px;
+  }
+  
+  .moveTopRightOnHover:hover img {
+    animation: shakeTR 0.5s;
+  }
+  
+  .rotateOnHover {
+    transition: transform 0.25s;
+    transform: rotateY(0deg);
+  }
+  
+  .rotateOnHover:hover {
+    transform: rotateY(30deg);
+  }
+  
+  .rotateOnHover:active {
+    transform: rotateY(360deg);
+  }
+  
+  .blink1 div {
+    animation: light 3s infinite;
+    animation-delay: 3s;
+  }
+  
+  .blink2 div {
+    animation: light 3s infinite;
+    animation-delay: 4s;
+  }
+  
+  .blink3 div {
+    animation: light 3s infinite;
+    animation-delay: 5s;
+  }
+  
+  .moveUpDownInfinite {
+    animation: upDown 3s infinite;
+  }
+  
+  .heightTransition {
+    max-height: 0px;
+    transition: max-height 1s;
+  }

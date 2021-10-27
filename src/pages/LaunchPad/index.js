@@ -1,11 +1,13 @@
 /* eslint-disable react/jsx-indent */
-import React from 'react';
+import React, {useState} from 'react';
+import { Link } from 'react-router-dom'
 import {Button, Menu, Dropdown, Icon, Progress, Tag, Table} from 'antd';
 import "swiper/bundle";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper.less";
 import "swiper/components/navigation/navigation.less";
 import "swiper/components/pagination/pagination.less";
+import InputEmail from "./inputEmail";
 import SwiperCore, {
   Navigation,Pagination,Mousewheel,Keyboard
 } from 'swiper';
@@ -180,6 +182,8 @@ const LaunchpadComponent = () => {
         </Menu>
     );
 
+    const [showForm, setShowForm] = useState(false)
+
     return(
       <PageHeaderWrapper>
         <div className={styles.topContainer}>
@@ -275,8 +279,8 @@ const LaunchpadComponent = () => {
                         <h3 style={tokenContent}>82795 Tickets</h3>
                     </div>
                     <div className={styles.tokenMaxAllo}>              
-                        <p style={token}>Lottery</p>
-                        <h3 style={tokenContent}>10M</h3>
+                        <p style={token}>Max Allocation</p>
+                        <h3 style={tokenContent}>Lottery</h3>
                     </div>
                     <div className={styles.totalTickets}>                   
                     <p style={token}>Allocation Per Winning Ticket</p>
@@ -284,28 +288,40 @@ const LaunchpadComponent = () => {
                     </div>
                 </div>
             </div>
+            { !showForm ? (
             <div className={styles.ticketBox}>
                 <div className={styles.ticketDescription}>
-                    <h1 style={{color:'#c4c4c4', textAlign:'center', fontFamily:'Inter, sans-serif', marginTop:'7px'}}>Check your remaining winning tickets and earn more by following these steps: </h1>
+                    <h1 style={{color:'#c4c4c4', textAlign:'center', fontFamily:'Inter, sans-serif', marginTop:'7px'}}>Check your remaining winning tickets and earn more by entering the whitelist: </h1>
                 </div>
-                <Swiper cssMode navigation pagination mousewheel keyboard className={styles.mySwiper}>
-                    <SwiperSlide>
-                        <h2 style={{color:'#c4c4c4', padding:'10px', textAlign:'center'}}>Join Our Telegram Community To Get 1 Ticket</h2>
-                        <div className={styles.verticalCenter}>
-                            <Button type="link" href={links[2]} target="_blank" style={buttonCustomStyle}>
-                                <img src={telegramIcon} alt="" style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '8px 8px 0 0', float:'left'}} /> Telegram
-                            </Button>  
-                        </div>      
-                    </SwiperSlide>
-                    <SwiperSlide>
-                        <h2 style={{color:'#c4c4c4', padding:'10px', textAlign:'center'}}>Follow Our Twitter Page To Get 1 Ticket</h2>
-                        <div className={styles.verticalCenter}>
-                            <Button type="link" href={links[3]} target="_blank" style={buttonCustomStyle} icon="twitter">Twitter</Button> 
-                        </div>     
-                    </SwiperSlide>
-                    <SwiperSlide>Slide 3</SwiperSlide>
-                </Swiper>
+                <div className={styles.showTicketBox}>
+                    <div className={styles.showTicketBox1}>
+                        <div className={styles.userEligibleTickets}>
+                            <p>Your Eligible Tickets</p>
+                            <h3 style={tokenContent}>0 Ticket(s)</h3>
+                        </div>
+                        <div className={styles.userDepositedTickets}>
+                            <p>Your Deposited Tickets</p>
+                            <h3 style={tokenContent}>0 Ticket(s)</h3>
+                        </div>
+                    </div>
+                    <div className={styles.showTicketBox2}>
+                        <div className={styles.userWinningTickets}>
+                            <p>Your Winning Tickets</p>
+                            <h3 style={tokenContent}>0 Ticket(s)</h3>
+                        </div>
+                        <div className={styles.userTicketsAllo}>
+                            <p>Your Allocation</p>
+                            <h3 style={tokenContent}>0 SHI</h3>
+                        </div>
+                    </div>
+                </div>
+                <div className={styles.whitelistBox}>
+                    <Button type="primary" shape="round" onClick={() => setShowForm(() => true)}>Enter Whitelist</Button>
+                </div>
             </div>
+            ) : (
+                <InputEmail />
+            )}
         </div>
         <div className={styles.dateTableBox}>
             <Table style={{marginTop:'20px', textAlign:'center'}} columns={tableColumns} dataSource={tableData} />

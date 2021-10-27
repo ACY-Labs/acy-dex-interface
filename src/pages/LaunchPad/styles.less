@@ -178,6 +178,32 @@
     float: right;
 }
 
+.showTicketBox{
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+    margin-top: 2em;
+    .showTicketBox1{
+        width: auto;
+        height:auto;
+        display: inline-block;
+    }
+    
+    .showTicketBox2{
+        width: auto;
+        height:auto;
+        position: relative;
+        display: inline-block;
+    }
+}
+
+.whitelistBox{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
 .dateTableBox{
     width: 100%;
     height: auto;
@@ -185,38 +211,6 @@
         .ant-table-thead > tr > th:not(.leftAlignTableHeader){
             text-align: left !important;
         }
-    }
-}
-
-.mySwiper {
-    width: 100%;
-    height: 100%;
-    .swiper-slide {
-        text-align: center;
-        font-size: 18px;
-        background: #fff;
-        display: flex;
-        justify-content: center;
-        align-items: center;            
-    }
-    .swiper-slide img {
-        display: block;
-        position: relative;
-        width: 100%;
-        object-fit: cover;
-    }
-    .swiper-button-prev {
-        color: @mainColor !important; 
-    }
-    .swiper-button-next {
-        opacity: 0 !important;
-    }
-    .swiper-button-disabled{
-        display:none;   
-    }
-    .swiper-wrapper{
-        width: auto;
-        height: 85% !important;
     }
 }
   
