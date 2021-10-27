@@ -116,6 +116,8 @@ const SwapComponent = props => {
   const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
   const [slippageError, setSlippageError] = useState('');
 
+  const [deadline, setDeadline] = useState();
+
   // when exactIn is true, it means the firt line
   // when exactIn is false, it means the second line
   const [exactIn, setExactIn] = useState(true);
@@ -663,7 +665,7 @@ const SwapComponent = props => {
                     marginTop: '7px',
                   }}
                 >
-                  <Input placeholder={30} suffix={<strong>minutes</strong>} />
+                  <Input type="number" value={Number(deadline).toString()} onChange={e => setDeadline(e.target.valueAsNumber || 0)} placeholder={30} suffix={<strong>minutes</strong>} />
                 </div>
               </div>
             </div>
@@ -745,6 +747,7 @@ const SwapComponent = props => {
                 maxAmountIn,
                 wethContract,
                 wrappedAmount,
+                deadline,
                 setSwapStatus,
                 setSwapButtonContent,
                 swapCallback
