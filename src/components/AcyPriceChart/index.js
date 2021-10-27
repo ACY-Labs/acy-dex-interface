@@ -5,6 +5,7 @@ import 'echarts/lib/chart/line';
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/title'; // 此处是按需引入
 import moment from 'moment';
+import {Icon} from 'antd';
 
 const defaultData = [
   ['2000-06-05', 116],
@@ -90,8 +91,9 @@ class AcyPriceChart extends Component {
 
     const options = {
       title: {
-        text: title,
+        text: valueList.length ? title : "No data",
         left: 'center',
+        top: valueList.length ? 'auto' : 'center',
         textStyle: {
           color: '#b5b5b6',
         },
