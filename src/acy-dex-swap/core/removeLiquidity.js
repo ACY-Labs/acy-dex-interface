@@ -576,7 +576,8 @@ export async function removeLiquidity(
   setNeedApprove,
   setButtonStatus,
   setButtonContent,
-  setRemoveStatus
+  setRemoveStatus,
+  removeLiquidityCallback
 ) {
   const status = await (async () => {
     let router = getRouterContract(library, account);
@@ -849,8 +850,8 @@ export async function removeLiquidity(
     setRemoveStatus(status.getErrorText());
   } else {
     console.log(status);
-
-    // FIXME: add callback
+    
+    removeLiquidityCallback(status, percent);
 
     const url = `https://rinkeby.etherscan.io/tx/${status.hash}`;
     setRemoveStatus(

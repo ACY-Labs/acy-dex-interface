@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import axios from 'axios';
+import { connect } from 'umi';
 import { AcyModal, AcyDescriptions, AcyButton } from '@/components/Acy';
 import { useWeb3React } from '@web3-react/core';
 import { INITIAL_ALLOWED_SLIPPAGE } from '@/acy-dex-swap/utils/index';
 import { getEstimated, signOrApprove, removeLiquidity } from '@/acy-dex-swap/core/removeLiquidity';
 import { Icon, Button, Input } from "antd";
+import moment from 'moment';
 import styles from './AcyRemoveLiquidityModal.less';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
@@ -40,7 +42,7 @@ const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
 };
 
 // FIXME: use state machine to rewrite the logic (needApprove, approving, removeLiquidity, processing, done).
-const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCancel }) => {
+const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCancel, ...props }) => {
   const [token0, setToken0] = useState(null);
   const [token1, setToken1] = useState(null);
   const [token0Amount, setToken0Amount] = useState('0');
@@ -182,7 +184,79 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
     setRemoveStatus();
     setSignatureData(null);
     setRemoveOK(false);
+  }
 
+  const removeLiquidityCallback = (status, percent) => {
+    console.log("test status:", status);
+    const {dispatch, transaction: {transactions}} = props;
+    // const transactions = props.transaction.transactions;
+    const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
+    console.log("is current dispatched? ", isCurrentTransactionDispatched);
+    // trigger loading spin on top right
+    if (isCurrentTransactionDispatched == 0) {
+      dispatch({
+        type: "transaction/addTransaction",
+        payload: {
+          transactions: [...transactions, { hash: status.hash }]
+        }
+      })
+    }
+
+    // timeout loop
+    const checkStatusAndFinish = async () => {
+      await library.getTransactionReceipt(status.hash).then(async receipt => {
+        console.log("receipt ", receipt);
+
+        if (!receipt) {
+          setTimeout(checkStatusAndFinish, 500);
+        } else {
+          let transactionTime;
+          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
+            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
+            console.log("test transactionTime: ", transactionTime)
+          });
+
+          // remove pair if user has totally withdrawn from pool
+          if (percent === 100) {
+            axios.post(
+              // fetch valid pool list from remote
+              `https://api.acy.finance/api/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
+              // `http://localhost:3001/api/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
+            ).then(res => {
+              console.log("remove to server return: ", res);
+
+            }).catch(e => console.log("error: ", e));
+          }
+
+          // clear top right loading spin
+          const newData = transactions.filter(item => item.hash != status.hash);
+          dispatch({
+            type: "transaction/addTransaction",
+            payload: {
+              transactions: [
+                ...newData,
+                { hash: status.hash, transactionTime }
+              ]
+            }
+          });
+
+          // refresh the table
+          dispatch({
+            type: "liquidity/setRefreshTable",
+            payload: true,
+          });
+
+          // disable button after each transaction on default, enable it after re-entering amount to add
+          setButtonStatus(true);
+          setButtonContent("Done");
+
+          
+          // store to localStorage
+        }
+      })
+    };
+    // const sti = setInterval(, 500);
+    checkStatusAndFinish();
   }
 
   return (
@@ -369,22 +443,9 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
                   setNeedApprove,
                   setButtonStatus,
                   setButtonContent,
-                  setRemoveStatus
-                );
-
-                // remove pair if user has totally withdrawn from pool
-                if (percent === 100) {
-                  axios.post(
-                    // fetch valid pool list from remote
-                    `https://api.acy.finance/api/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
-                    // `http://localhost:3001/api/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
-                  ).then(res => {
-                    console.log("remove to server return: ", res);
-
-                  }).catch(e => console.log("error: ", e));
-                }
-                setButtonStatus(false);
-                setButtonContent("Done");
+                  setRemoveStatus,
+                  removeLiquidityCallback
+                );                
               }
             }
           }}
@@ -398,4 +459,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
   );
 };
 
-export default AcyRemoveLiquidityModal;
+export default connect(({ transaction, liquidity }) => ({
+  transaction,
+  liquidity
+}))(AcyRemoveLiquidityModal);

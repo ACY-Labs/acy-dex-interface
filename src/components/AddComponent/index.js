@@ -435,24 +435,6 @@ const AddLiquidityComponent = props => {
             console.log("test transactionTime: ", transactionTime)
           });
 
-          // update table UI
-
-          // clear top right loading spin
-          const newData = transactions.filter(item => item.hash != status.hash);
-          dispatch({
-            type: "transaction/addTransaction",
-            payload: {
-              transactions: [
-                ...newData,
-                { hash: status.hash, transactionTime }
-              ]
-            }
-          });
-
-          // disable button after each transaction on default, enable it after re-entering amount to add
-          console.log(buttonContent);
-          setButtonContent("Done");
-
           // update backend userPool record
           console.log("test pair to add on server", pairToAddOnServer);
           if (pairToAddOnServer) {
@@ -467,6 +449,28 @@ const AddLiquidityComponent = props => {
             }).catch(e => console.log("error: ", e));
           }
 
+          // clear top right loading spin
+          const newData = transactions.filter(item => item.hash != status.hash);
+          dispatch({
+            type: "transaction/addTransaction",
+            payload: {
+              transactions: [
+                ...newData,
+                { hash: status.hash, transactionTime }
+              ]
+            }
+          });
+
+          // refresh the table
+          dispatch({
+            type: "liquidity/setRefreshTable",
+            payload: true,
+          });
+
+          // disable button after each transaction on default, enable it after re-entering amount to add
+          console.log(buttonContent);
+          setButtonContent("Done");
+
           // store to localStorage
         }
       })
@@ -480,24 +484,24 @@ const AddLiquidityComponent = props => {
   useEffect(async () => {
     console.log("liquidity updated");
     console.log("liquidity state: ", liquidity);
-    // // set token0
-    let {token0, token1} = liquidity;
-    console.log("new tokens to set in addComponent, " , token0, token1)
-    if (token0 && token1) {
+    
+    let {token0: modelToken0, token1: modelToken1} = liquidity;
+    console.log("new tokens to set in addComponent, " , modelToken0, modelToken1)
+    if (modelToken0 && modelToken1) {
       // fetch the token data structure 
-      token0 = tokenList.filter(item => item.symbol === token0.symbol)[0]
-      token1 = tokenList.filter(item => item.symbol === token1.symbol)[0]
-      console.log("fetched token ds", token0, token1)
+      modelToken0 = tokenList.filter(item => item.symbol === modelToken0.symbol)[0]
+      modelToken1 = tokenList.filter(item => item.symbol === modelToken1.symbol)[0]
+      console.log("fetched token ds", modelToken0, modelToken1)
 
-      setToken0(token0);
-      setToken0Balance(await getUserTokenBalance(token0, chainId, account, library));
+      setToken0(modelToken0);
+      setToken0Balance(await getUserTokenBalance(modelToken0, chainId, account, library));
       setToken0BalanceShow(true);
-      setToken1(token1);
-      setToken1Balance(await getUserTokenBalance(token1, chainId, account, library));
+      setToken1(modelToken1);
+      setToken1Balance(await getUserTokenBalance(modelToken1, chainId, account, library));
       setToken1BalanceShow(true);
 
     }
-  }, [liquidity]);
+  }, [liquidity.token0, liquidity.token1]);
 
   return (
     <div>

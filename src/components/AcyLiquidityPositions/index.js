@@ -351,7 +351,8 @@ const AcyLiquidityPositions = (props) => {
 
   // fetch lists of valid pool
   const getValidPoolList = () => {
-    console.log("getting list on chain ", chainId);
+    setLoading(true);
+    console.log("fetching user pool list");
     axios.get(
       // fetch valid pool list from remote
       // `https://api.acy.finance/api/pool?chainId=${chainId}`
@@ -384,7 +385,7 @@ const AcyLiquidityPositions = (props) => {
 
       const LPHandlers = pairs.map(pair => pair.value);
       setUserLPHandlers(LPHandlers);
-      console.log("userLPHandlers is updated");
+      console.log("userLPHandlers is updated with length", LPHandlers.length);
 
     }).catch(e => console.log("error: ", e));
   }
@@ -404,7 +405,7 @@ const AcyLiquidityPositions = (props) => {
         token1Reserve: `${pair.reserve1.toExact(2)} ${pair.token1.symbol}`,
       });
     }
-    console.log("userLPData is updated");
+    console.log("userLPData is updated with length", userPools.length);
     setLoading(false);
     console.log("test elapsed time", new Date());
     return userPools;
@@ -597,6 +598,19 @@ const AcyLiquidityPositions = (props) => {
 
   }
 
+  // link liquidity position table and add component together
+  const { dispatch, liquidity } = props;
+  const setAddComponentPairs = (token0, token1) => {
+    dispatch({
+      type: "liquidity/setAddTokens",
+      payload: {
+        token0: token0,
+        token1: token1
+      }
+    });
+    console.log("test done setAddTokens from table")
+  }
+
   // auto scroll to newly loaded data
   useEffect(() => {
     if (filteredData.length) {
@@ -605,11 +619,23 @@ const AcyLiquidityPositions = (props) => {
     }
   }, [filteredData]);
 
-  useEffect(async () => {
-    setLoading(true);
-    console.log("test elapsed time", new Date());
-    await getValidPoolList();
+  // first time loading
+  useEffect(() => {
+    getValidPoolList();
   }, []);
+  // refresh table data on add/remove liquidity
+  useEffect(() => {
+    if (liquidity.refreshTable) {
+      getValidPoolList();
+      setUserLPShares({});
+      getUserPoolShare();
+      
+      dispatch({
+        type: "liquidity/setRefreshTable",
+        payload: false,
+      });
+    }
+  }, [liquidity.refreshTable]);
 
   // useEffect(
   //   () => {
@@ -633,18 +659,7 @@ const AcyLiquidityPositions = (props) => {
     [chainId, library, account, userLPHandlers]
   );
 
-  // link liquidity position table and add component together
-  const { dispatch, liquidity } = props;
-  const setAddComponentPairs = (token0, token1) => {
-    dispatch({
-      type: "liquidity/setAddTokens",
-      payload: {
-        token0: token0,
-        token1: token1
-      }
-    });
-    console.log("test done setAddTokens from table")
-  }
+  
 
   return (
     <div>
@@ -710,6 +725,7 @@ const AcyLiquidityPositions = (props) => {
                           onClick={() => {
                             setIsModalVisible(true);
                             setRemoveLiquidityPosition(record);
+                            console.log("remove record", record);
                           }}
                         >
                           Remove

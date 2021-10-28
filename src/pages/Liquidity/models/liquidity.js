@@ -10,7 +10,8 @@ export default {
     advancedOperation3: [],
     
     token0: '',
-    token1: ''
+    token1: '',
+    refreshTable: false,
   },
 
   effects: {
@@ -44,6 +45,13 @@ export default {
       return {
         ...state, 
         ...payload,
+      }
+    },
+    setRefreshTable(state, { payload }) {
+      console.log("refreshTable is set in model");
+      return {
+        ...state, 
+        refreshTable: payload
       }
     }
   },
