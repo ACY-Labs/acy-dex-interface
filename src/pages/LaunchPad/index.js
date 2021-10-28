@@ -1,25 +1,13 @@
 /* eslint-disable react/jsx-indent */
 import React, {useState} from 'react';
-import { Link } from 'react-router-dom'
 import {Button, Menu, Dropdown, Icon, Progress, Tag, Table} from 'antd';
-import "swiper/bundle";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/swiper.less";
-import "swiper/components/navigation/navigation.less";
-import "swiper/components/pagination/pagination.less";
 import InputEmail from "./inputEmail";
-import SwiperCore, {
-  Navigation,Pagination,Mousewheel,Keyboard
-} from 'swiper';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { AcyLineChart } from '@/components/Acy';
 import AcyIcon from '@/assets/icon_acy.svg';
 import hashtagIcon from '@/assets/icon_hashtag.png';
 import telegramIcon from '@/assets/icon_telegram_black.png';
 import styles from './styles.less';
-
-// install swiper modules
-SwiperCore.use([Navigation,Pagination,Mousewheel,Keyboard]);
 
 const LaunchpadComponent = () => {
     const links = [
@@ -232,16 +220,21 @@ const LaunchpadComponent = () => {
             </div>
             
         </div>
-        <div className={styles.tokenDate}>
-            <h2 style={{fontWeight:'bold'}}>Round 1</h2>
-            <h3 style={{color:'#fff'}}>2021-10-31 10:00:00 ~ 2021-11-01 10:00:00</h3>
-        </div>
         <div className={styles.midContainer}>
             <div className={styles.tokenInfoBox}>
-                <div className={styles.tokenSym}>
-                    <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
-                    <h2 className={styles.tokenName}> ACY </h2>
-                    <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', marginTop:'25px', textAlign:'center', fontSize:'18px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
+                <div className={styles.tokenInfoBoxTop}>
+                    <div className={styles.tokenSym}>
+                        <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
+                        <h2 className={styles.tokenName}> ACY </h2>
+                    </div>
+                    <div className={styles.tokenIDODate}>
+                        <h2 style={{fontWeight:'bold'}}>Round 1</h2>
+                        <h3 style={{color:'#fff'}}>Open: 2021-10-31 10:00 UST</h3>
+                        <h3 style={{color:'#fff'}}>Close: 2021-11-01 10:00 UST</h3>
+                    </div>
+                    <div className={styles.tokenIDOStatus}>
+                        <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', marginTop:'25px', textAlign:'center', fontSize:'18px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
+                    </div>
                 </div>
                 <div className={styles.tokenProgress}>
                     <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={90} status='active' />
@@ -266,10 +259,6 @@ const LaunchpadComponent = () => {
                 </div>
                 <span className={styles.line}> </span>
                 <div className={styles.tokenMoreInfo}>
-                    <div className={styles.tokenShowPrice}>
-                        <p style={token}>Price</p>
-                        <h3 style={tokenContent}>0.02 USDC</h3>   
-                    </div>
                     <div className={styles.tokenRaiseSize}>                
                         <p style={token}>Raise Size</p>
                         <h3 style={tokenContent}>30,000,000 ACY</h3>
@@ -278,20 +267,20 @@ const LaunchpadComponent = () => {
                         <p style={token}>Total Tickets Deposited</p>
                         <h3 style={tokenContent}>82795 Tickets</h3>
                     </div>
-                    <div className={styles.tokenMaxAllo}>              
-                        <p style={token}>Max Allocation</p>
-                        <h3 style={tokenContent}>Lottery</h3>
-                    </div>
                     <div className={styles.totalTickets}>                   
                     <p style={token}>Allocation Per Winning Ticket</p>
                         <h3 style={tokenContent}>100 USDC</h3>
+                    </div>
+                    <div className={styles.tokenMaxAllo}>              
+                        <p style={token}>Max Allocation</p>
+                        <h3 style={tokenContent}>Lottery</h3>
                     </div>
                 </div>
             </div>
             { !showForm ? (
             <div className={styles.ticketBox}>
                 <div className={styles.ticketDescription}>
-                    <h1 style={{color:'#c4c4c4', textAlign:'center', fontFamily:'Inter, sans-serif', marginTop:'7px'}}>Check your remaining winning tickets and earn more by entering the whitelist: </h1>
+                    <h3 style={{color:'#c4c4c4', fontFamily:'Inter, sans-serif', padding:'15px'}}>Whitelist | Participate </h3>
                 </div>
                 <div className={styles.showTicketBox}>
                     <div className={styles.showTicketBox1}>
@@ -311,12 +300,12 @@ const LaunchpadComponent = () => {
                         </div>
                         <div className={styles.userTicketsAllo}>
                             <p>Your Allocation</p>
-                            <h3 style={tokenContent}>0 SHI</h3>
+                            <h3 style={tokenContent}>0 ACY</h3>
                         </div>
                     </div>
                 </div>
                 <div className={styles.whitelistBox}>
-                    <Button type="primary" shape="round" onClick={() => setShowForm(() => true)}>Enter Whitelist</Button>
+                    <Button className={styles.whiteListToggleButton} shape="round" onClick={() => setShowForm(() => true)}>Whitelist</Button>
                 </div>
             </div>
             ) : (
