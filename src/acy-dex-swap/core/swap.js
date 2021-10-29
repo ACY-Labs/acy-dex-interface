@@ -594,6 +594,8 @@ export async function swap(
     console.log('say something about allowance');
     console.log('------------------ PREPARE SWAP ------------------');
 
+    deadline = deadline || 30;
+    console.log("deadline", deadline);
     const { methodName, args, value } = Router.swapCallParameters(trade, {
       feeOnTransfer: false,
       allowedSlippage,
