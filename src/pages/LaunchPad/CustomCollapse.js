@@ -23,7 +23,7 @@ const StyledCollapse = styled(AntCollapse)`
 const CustomCollapse = (props) => {
   const [disabled, setDisabled] = useState(true);
   const [followed, setFollowed] = useState(false);
-  const [open, setOpen] = useState(["1"]);
+  const [open, setOpen] = useState(props.isOpened);
 
   useEffect(() => {
     setDisabled(props.isDisabled);
@@ -33,26 +33,22 @@ const CustomCollapse = (props) => {
     setFollowed(props.isFollowed)
   }, [props.isFollowed])
 
-  useEffect(() => {
-    setOpen(props.isOpened)
-  }, [props.isOpened])
-
   const setFun1= () => setDisabled(prev => !prev);
-  const setFun2= () => () => setOpen(prev => !prev);
+  const setFun2= () => setOpen(prev => [1]);
 
   const combineFunc = () =>{
     setFun1();
     setFun2();
   }
   
-
   return (
-    <StyledCollapse activeKey={open} onChange={combineFunc()}>
+    <StyledCollapse activeKey={open} onChange={combineFunc}>
       <AntCollapse.Panel
         header={props.header}
         key="1"
         showArrow={false}
         bordered={false}
+        onChange={() => setOpen(prev => [1])}
         extra={
           <span>
             <span style={{ color: "#0076de", float: "right" }}>

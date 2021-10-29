@@ -11,12 +11,14 @@ const FollowTelegram = () => {
   const [open, setOpen] = useState(["1"]);
   const [followed, setFollowed] = useState(true);
   const [disabledCollapse, setDisabledCollapse] = useState(true);
+
   const toggleDisabledCollapse = () => {
     setDisabledCollapse(prev => !prev)
   }
   const handleSubmit = () => {
     setOpen([]);
-  }
+  };
+  
   const links = [
     "https://t.me/acyfinance"
   ]
