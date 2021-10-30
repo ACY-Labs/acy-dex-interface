@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { AcyModal, AcyDescriptions } from '@/components/Acy';
+import { connect } from 'umi';
+import { AcyModal, AcyDescriptions, AcyButton } from '@/components/Acy';
 import { useWeb3React } from '@web3-react/core';
 import { INITIAL_ALLOWED_SLIPPAGE } from '@/acy-dex-swap/utils/index';
 import { getEstimated, signOrApprove, removeLiquidity } from '@/acy-dex-swap/core/removeLiquidity';
 import { Icon, Button, Input } from "antd";
+import moment from 'moment';
 import styles from './AcyRemoveLiquidityModal.less';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
@@ -40,11 +42,12 @@ const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
 };
 
 // FIXME: use state machine to rewrite the logic (needApprove, approving, removeLiquidity, processing, done).
-const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCancel }) => {
+const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCancel, ...props }) => {
   const [token0, setToken0] = useState(null);
   const [token1, setToken1] = useState(null);
   const [token0Amount, setToken0Amount] = useState('0');
   const [token1Amount, setToken1Amount] = useState('0');
+  const [args, setArgs] = useState([]);
   // 仓位信息，确定两种代币之后就可以确定了
   const [position, setPosition] = useState();
   // uni-v2 的余额
@@ -64,6 +67,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
   const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
   const [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
   const [slippageError, setSlippageError] = useState('');
+  const [deadline, setDeadline] = useState();
   // 点击按钮之后的返回信息
   const [removeStatus, setRemoveStatus] = useState();
   const [signatureData, setSignatureData] = useState(null);
@@ -72,8 +76,6 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
 
   const { account, chainId, library, activate } = useWeb3React();
 
-  // Button styling status
-  const [buttonProcessing, setButtonProcessing] = useState(false);
 
   useEffect(
     () => {
@@ -126,6 +128,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
         index,
         percent,
         amount,
+        slippageTolerance,
         chainId,
         library,
         account,
@@ -139,7 +142,8 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
         setNeedApprove,
         setButtonStatus,
         setButtonContent,
-        setRemoveStatus
+        setRemoveStatus,
+        setArgs
       );
     },
     [token0, token1, index, percent, amount, slippageTolerance, chainId, library, account]
@@ -180,9 +184,79 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
     setRemoveStatus();
     setSignatureData(null);
     setRemoveOK(false);
+  }
 
-    // Button styling status
-    setButtonProcessing(false);
+  const removeLiquidityCallback = (status, percent) => {
+    console.log("test status:", status);
+    const {dispatch, transaction: {transactions}} = props;
+    // const transactions = props.transaction.transactions;
+    const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
+    console.log("is current dispatched? ", isCurrentTransactionDispatched);
+    // trigger loading spin on top right
+    if (isCurrentTransactionDispatched == 0) {
+      dispatch({
+        type: "transaction/addTransaction",
+        payload: {
+          transactions: [...transactions, { hash: status.hash }]
+        }
+      })
+    }
+
+    // timeout loop
+    const checkStatusAndFinish = async () => {
+      await library.getTransactionReceipt(status.hash).then(async receipt => {
+        console.log("receipt ", receipt);
+
+        if (!receipt) {
+          setTimeout(checkStatusAndFinish, 500);
+        } else {
+          let transactionTime;
+          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
+            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
+            console.log("test transactionTime: ", transactionTime)
+          });
+
+          // remove pair if user has totally withdrawn from pool
+          if (percent === 100) {
+            axios.post(
+              // fetch valid pool list from remote
+              `https://api.acy.finance/api/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
+              // `http://localhost:3001/api/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
+            ).then(res => {
+              console.log("remove to server return: ", res);
+
+            }).catch(e => console.log("error: ", e));
+          }
+
+          // clear top right loading spin
+          const newData = transactions.filter(item => item.hash != status.hash);
+          dispatch({
+            type: "transaction/addTransaction",
+            payload: {
+              transactions: [
+                ...newData,
+                { hash: status.hash, transactionTime }
+              ]
+            }
+          });
+
+          // refresh the table
+          dispatch({
+            type: "liquidity/setRefreshTable",
+            payload: true,
+          });
+
+          // disable button after each transaction on default, enable it after re-entering amount to add
+          setButtonStatus(true);
+          setButtonContent("Done");
+
+          
+          // store to localStorage
+        }
+      })
+    };
+    // const sti = setInterval(, 500);
+    checkStatusAndFinish();
   }
 
   return (
@@ -260,9 +334,10 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
                     Auto
                   </Button>
                   <Input
-                    value={inputSlippageTol || ''}
+                    type="number"
+                    value={Number(inputSlippageTol).toString()}
                     onChange={e => {
-                      setInputSlippageTol(e.target.value);
+                      setInputSlippageTol(e.target.valueAsNumber || 0);
                     }}
                     suffix={<strong>%</strong>}
                   />
@@ -299,14 +374,14 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
                     marginTop: '7px',
                   }}
                 >
-                  <Input placeholder={30} suffix={<strong>minutes</strong>} />
+                  <Input type="number" value={deadline} onChange={e => setDeadline(e.target.valueAsNumber)} placeholder={30} suffix={<strong>minutes</strong>} />
                 </div>
               </div>
             </div>
-            <div className={styles.acyDescriptionContainer}>
+            <div className={styles.breakdownContainer}>
               {breakdown.map(info => (
                 <AcyDescriptions.Item>
-                  <div className={styles.acyDescriptionItem} style={{color: "white", fontSize: "1rem", fontWeight: "normal"}}>{info}</div>
+                  <div className={styles.acyDescriptionItem} style={{ color: "white", fontSize: "1rem", fontWeight: "lighter", opacity: "0.8" }}>{info}</div>
                 </AcyDescriptions.Item>
               ))}
             </div>
@@ -316,18 +391,17 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
 
       <h2>{removeStatus}</h2>
       <div className={styles.buttonContainer}>
-        <button
-          type="button"
-          className={buttonProcessing ? styles.inactive_button : styles.active_button}
-          // className={styles.active_button}
+        <AcyButton
+          variant="success"
+          disabled={!buttonStatus}
           onClick={async () => {
-            
+
             if (buttonContent === "Done") {
               handleCancel();
               return;
             }
 
-            setButtonProcessing(true);
+            setButtonStatus(false);
             if (needApprove) {
               setButtonContent(<>Approving <Icon type="loading" /></>);
               await signOrApprove(
@@ -336,7 +410,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
                 index,
                 percent,
                 amount,
-                slippageTolerance * 100,
+                deadline,
                 chainId,
                 library,
                 account,
@@ -345,7 +419,6 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
                 setButtonContent,
                 setRemoveStatus,
                 setSignatureData,
-                setButtonProcessing
               );
             } else if (buttonStatus) {
               if (account == undefined) {
@@ -363,39 +436,30 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
                   chainId,
                   library,
                   account,
+                  args,
                   setToken0Amount,
                   setToken1Amount,
                   signatureData,
                   setNeedApprove,
                   setButtonStatus,
                   setButtonContent,
-                  setRemoveStatus
-                );
-
-                // remove pair if user has totally withdrawn from pool
-                if (percent === 100) {
-                  axios.post(
-                    // fetch valid pool list from remote
-                    `https://api.acy.finance/api/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
-                    // `http://localhost:3001/api/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
-                  ).then(res => {
-                    console.log("remove to server return: ", res);
-              
-                  }).catch(e => console.log("error: ", e));
-                }
-
-                setButtonProcessing(false);
-                setButtonContent("Done");
+                  setRemoveStatus,
+                  removeLiquidityCallback
+                );                
               }
             }
           }}
         >
           {/* approve is the default text, it will always be shown */}
-          {needApprove || buttonStatus ? buttonContent : "Calculating"}
-        </button>
+          {buttonContent}
+        </AcyButton>
+
       </div>
     </AcyModal>
   );
 };
 
-export default AcyRemoveLiquidityModal;
+export default connect(({ transaction, liquidity }) => ({
+  transaction,
+  liquidity
+}))(AcyRemoveLiquidityModal);

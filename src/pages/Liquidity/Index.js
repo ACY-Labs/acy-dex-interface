@@ -32,7 +32,7 @@ class BasicProfile extends Component {
     loggedIn: false,
   };
 
-  componentDidMount() {}
+  componentDidMount() { }
 
   lineTitleRender = () => [
     <div>
@@ -89,7 +89,7 @@ class BasicProfile extends Component {
 
   render() {
     const { visible, visibleConfirmOrder, visibleLoading, tabIndex, loggedIn } = this.state;
-    let token = "";
+    let token = null;
     if(this.props.location.state){
       token = this.props.location.state;
       console.log(token)
@@ -100,11 +100,7 @@ class BasicProfile extends Component {
         <div className={loggedIn ? styles.main : styles.main_notLoggedIn}>
           <div>{loggedIn && <AcyLiquidityPositions />}</div>
           <div>
-            <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
-              <div className={styles.addLiquidity}>
-                <AddComponent token={token} onLoggedIn={this.onLoggedIn} />
-              </div>
-            </AcyCard>
+            <AddComponent onLoggedIn={this.onLoggedIn} />
           </div>
         </div>
 

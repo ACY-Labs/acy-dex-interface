@@ -116,6 +116,8 @@ const SwapComponent = props => {
   const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
   const [slippageError, setSlippageError] = useState('');
 
+  const [deadline, setDeadline] = useState();
+
   // when exactIn is true, it means the firt line
   // when exactIn is false, it means the second line
   const [exactIn, setExactIn] = useState(true);
@@ -458,6 +460,7 @@ const SwapComponent = props => {
     //   receipt
     // }];
 
+    // FIXME: implement the following logic with setTimeout(). refer to AddComponent.js checkStatusAndFinish()
     const sti = setInterval(() => {
       library.getTransactionReceipt(status.hash).then(async receipt => {
         console.log('receiptreceipt', receipt);
@@ -548,6 +551,9 @@ const SwapComponent = props => {
             ])
           );
 
+          // set button to done and disabled on default
+          setSwapButtonContent("Done");
+
           // 读取数据：localStorage.getItem(key);
         }
       });
@@ -610,7 +616,7 @@ const SwapComponent = props => {
               <div className={styles.slippageContainer}>
                 <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '7px' }}>
-                  <Button
+                  {/* <Button
                     type="link"
                     style={{ marginRight: '5px' }}
                     onClick={() => {
@@ -619,7 +625,7 @@ const SwapComponent = props => {
                     }}
                   >
                     Auto
-                  </Button>
+                  </Button> */}
                   <Input
                     value={inputSlippageTol || ''}
                     onChange={e => {
@@ -660,7 +666,7 @@ const SwapComponent = props => {
                     marginTop: '7px',
                   }}
                 >
-                  <Input placeholder={30} suffix={<strong>minutes</strong>} />
+                  <Input type="number" value={Number(deadline).toString()} onChange={e => setDeadline(e.target.valueAsNumber || 0)} placeholder={30} suffix={<strong>minutes</strong>} />
                 </div>
               </div>
             </div>
@@ -680,7 +686,7 @@ const SwapComponent = props => {
         )}
       </AcyDescriptions>
 
-      {needApprove == true && (
+      {/* {needApprove == true && (
         <div>
           <AcyButton
             onClick={async () => {
@@ -709,9 +715,8 @@ const SwapComponent = props => {
             )}
           </AcyButton>{' '}
         </div>
-      )}
+      )} */}
 
-      {
         <AcyButton
           style={{ marginTop: '25px' }}
           disabled={!swapButtonState}
@@ -719,6 +724,8 @@ const SwapComponent = props => {
             if (account == undefined) {
               activate(injected);
             } else {
+              setSwapButtonState(false);
+              setSwapButtonContent(<>Processing <Icon type="loading" /></>)
               swap(
                 {
                   ...token0,
@@ -741,7 +748,9 @@ const SwapComponent = props => {
                 maxAmountIn,
                 wethContract,
                 wrappedAmount,
+                deadline,
                 setSwapStatus,
+                setSwapButtonContent,
                 swapCallback
               );
             }
@@ -749,7 +758,6 @@ const SwapComponent = props => {
         >
           {swapButtonContent}
         </AcyButton>
-      }
 
       <AcyDescriptions>
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}

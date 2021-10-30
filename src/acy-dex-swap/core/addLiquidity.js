@@ -524,6 +524,7 @@ export async function addLiquidity(
   args,
   value,
   setLiquidityStatus,
+  setButtonContent,
   addLiquidityCallback
 ) {
   let status = await (async () => {
@@ -617,14 +618,13 @@ export async function addLiquidity(
       method(...args, {
         ...(value ? { value } : {}),
         gasLimit: calculateGasMargin(estimatedGasLimit),
-      }).catch(e => {
-        return new CustomError('CustomError in transaction');
-      })
+      }).catch(e => new CustomError('CustomError in transaction'))
     );
     return result;
   })();
   if (status instanceof CustomError) {
     setLiquidityStatus(status.getErrorText());
+    setButtonContent("Please try again");
   } else {
     console.log('status');
     console.log(status);

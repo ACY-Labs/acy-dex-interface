@@ -5,6 +5,7 @@ import 'echarts/lib/chart/line';
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/title'; // 此处是按需引入
 import moment from 'moment';
+import {Icon} from 'antd';
 
 const defaultData = [
   ['2000-06-05', 116],
@@ -69,7 +70,7 @@ class AcyPriceChart extends Component {
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() { }
 
   renderTooltip = v => {
     const { onHover, showTooltip } = this.props;
@@ -90,8 +91,9 @@ class AcyPriceChart extends Component {
 
     const options = {
       title: {
-        text: title,
+        text: valueList.length ? title : "No data",
         left: 'center',
+        top: valueList.length ? 'auto' : 'center',
         textStyle: {
           color: '#b5b5b6',
         },
@@ -115,7 +117,7 @@ class AcyPriceChart extends Component {
         splitNumber: 5,
         boundaryGap: false,
         data: dateList.map((item, index) =>
-          index !== 0 && index !== dateList.length-1 ? moment(item)
+          index !== 0 && index !== dateList.length - 1 ? moment(item)
             .locale('en')
             .local()
             .format(format)
@@ -128,10 +130,14 @@ class AcyPriceChart extends Component {
         },
       },
       yAxis: {
-        show: false,
+        // show: false,
         type: 'value',
         splitLine: {
-          show: false,
+          show: true,
+          lineStyle: {
+            color: "#757579",
+            type: "dashed"
+          }
         },
         scale: true,
         axisTick: { show: false }, // 刻度
@@ -139,6 +145,7 @@ class AcyPriceChart extends Component {
       },
       series: [
         {
+          // shaded area setting is set via "showGradient" down below.
           data: valueList,
           type: 'line',
           smooth: 1, // true 为平滑曲线，false为直线
