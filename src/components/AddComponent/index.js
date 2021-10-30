@@ -77,7 +77,7 @@ import { Row, Col, Button, Alert, Input } from 'antd';
 
 import { getEstimated, addLiquidity } from '@/acy-dex-swap/core/addLiquidity';
 import spinner from '@/assets/loading.svg';
-import {Icon} from "antd";
+import { Icon } from "antd";
 import moment from 'moment';
 
 const { AcyTabPane } = AcyTabs;
@@ -140,6 +140,9 @@ const AddLiquidityComponent = props => {
   const [showSpinner0, setShowSpinner0] = useState(false);
   const [showSpinner1, setShowSpinner1] = useState(false);
 
+  // shake this component when tokens are changed via page model "props.liquidity"
+  const [shake, setShake] = useState(false);
+
   // method to update the value of token search input field,
   // and filter the token list based on the comparison of the value of search input field and token symbol.
   const onTokenSearchChange = e => {
@@ -169,8 +172,7 @@ const AddLiquidityComponent = props => {
       //read the fav tokens code in storage
       var tokens_symbol = JSON.parse(localStorage.getItem('tokens_symbol'));
       //set to fav token
-      if(tokens_symbol != null)
-      {
+      if (tokens_symbol != null) {
         setFavTokenList(
           INITIAL_TOKEN_LIST.filter(token => tokens_symbol.includes(token.symbol))
         );
@@ -389,10 +391,10 @@ const AddLiquidityComponent = props => {
 
   const [favTokenList, setFavTokenList] = useState([]);
 
-  const setTokenAsFav = token => {  
+  const setTokenAsFav = token => {
     setFavTokenList(prevState => {
       const prevFavTokenList = [...prevState];
-      if(prevFavTokenList.includes(token)) {
+      if (prevFavTokenList.includes(token)) {
         var tokens = prevFavTokenList.filter(value => value != token);
         localStorage.setItem('token', JSON.stringify(tokens.map(e => e.addressOnEth)));
         localStorage.setItem('tokens_symbol', JSON.stringify(tokens.map(e => e.symbol)));
@@ -438,14 +440,14 @@ const AddLiquidityComponent = props => {
           // update backend userPool record
           console.log("test pair to add on server", pairToAddOnServer);
           if (pairToAddOnServer) {
-            const {token0, token1} = pairToAddOnServer;
+            const { token0, token1 } = pairToAddOnServer;
             axios.post(
               // fetch valid pool list from remote
               `https://api.acy.finance/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
               // `http://localhost:3001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
             ).then(res => {
               console.log("add to server return: ", res);
-        
+
             }).catch(e => console.log("error: ", e));
           }
 
@@ -480,14 +482,18 @@ const AddLiquidityComponent = props => {
   };
 
   // link to liquidity position table
-  const {liquidity} = props;
+  const { liquidity } = props;
   useEffect(async () => {
     console.log("liquidity updated");
     console.log("liquidity state: ", liquidity);
-    
-    let {token0: modelToken0, token1: modelToken1} = liquidity;
-    console.log("new tokens to set in addComponent, " , modelToken0, modelToken1)
+
+    let { token0: modelToken0, token1: modelToken1 } = liquidity;
+    console.log("new tokens to set in addComponent, ", modelToken0, modelToken1)
     if (modelToken0 && modelToken1) {
+      // shake the component
+      setShake(true);
+      setTimeout(() => setShake(false), 1000);
+
       // fetch the token data structure 
       modelToken0 = tokenList.filter(item => item.symbol === modelToken0.symbol)[0]
       modelToken1 = tokenList.filter(item => item.symbol === modelToken1.symbol)[0]
@@ -504,106 +510,109 @@ const AddLiquidityComponent = props => {
   }, [liquidity.token0, liquidity.token1]);
 
   return (
-    <div>
-      <AcyCuarrencyCard
-        icon="eth"
-        title={token0BalanceShow && `Balance: ${parseFloat(token0Balance).toFixed(5)}`}
-        logoURI={token0 && token0.logoURI}
-        coin={(token0 && token0.symbol) || 'Select'}
-        yuan="566.228"
-        dollar={`${token0Balance}`}
-        token={token0Amount}
-        onChoseToken={async () => {
-          onClickCoin();
-          setBefore(true);
-        }}
-        onChangeToken={e => {
-          console.log("onChangeToken")
-          setExactIn(true);
-          setToken0Amount(e);
-        }}
-      />
-      <div style={{ margin: '12px auto', textAlign: 'center' }}>
-        <AcyIcon width={21.5} name="plus_light" />
-      </div>
-
-      <AcyCuarrencyCard
-        icon="eth"
-        title={token1BalanceShow && `Balance: ${parseFloat(token1Balance).toFixed(5)}`}
-        logoURI={token1 && token1.logoURI}
-        coin={(token1 && token1.symbol) || 'Select'}
-        yuan="566.228"
-        dollar={`${token1Balance}`}
-        token={token1Amount}
-        onChoseToken={async () => {
-          onClickCoin();
-          setBefore(false);
-        }}
-        onChangeToken={e => {
-          setExactIn(false);
-          setToken1Amount(e);
-        }}
-      />
-
-      <AcyDescriptions>
-        {liquidityBreakdown && (
-          <>
-            <div className={styles.breakdownTopContainer}>
-              <div className={styles.slippageContainer}>
-                <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '7px' }}>
-                  <Button type="link" style={{ marginRight: '5px' }}>
-                    Auto
-                  </Button>
-                  <Input
-                    value={inputSlippageTol || ''}
-                    onChange={e => {
-                      setInputSlippageTol(e.target.value);
-                    }}
-                    suffix={<strong>%</strong>}
-                  />
-                  <Button
-                    type="primary"
-                    style={{
-                      marginLeft: '10px',
-                      background: '#2e3032',
-                      borderColor: 'transparent',
-                    }}
-                    onClick={() => {
-                      if (isNaN(inputSlippageTol)) {
-                        setSlippageError('Please input valid slippage value!');
-                      } else {
-                        setSlippageError('');
-                        setSlippageTolerance(parseFloat(inputSlippageTol));
-                      }
-                    }}
-                  >
-                    Set
-                  </Button>
-                </div>
-                {slippageError.length > 0 && (
-                  <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
-                )}
-              </div>
+    <div className={shake ? styles.shake : null}>
+      <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
+        <div className={styles.addLiquidity}>
+          <div className={styles.addComponent}>
+            <AcyCuarrencyCard
+              icon="eth"
+              title={token0BalanceShow && `Balance: ${parseFloat(token0Balance).toFixed(5)}`}
+              logoURI={token0 && token0.logoURI}
+              coin={(token0 && token0.symbol) || 'Select'}
+              yuan="566.228"
+              dollar={`${token0Balance}`}
+              token={token0Amount}
+              onChoseToken={async () => {
+                onClickCoin();
+                setBefore(true);
+              }}
+              onChangeToken={e => {
+                console.log("onChangeToken")
+                setExactIn(true);
+                setToken0Amount(e);
+              }}
+            />
+            <div style={{ margin: '12px auto', textAlign: 'center' }}>
+              <AcyIcon width={21.5} name="plus_light" />
             </div>
 
-            <div className={styles.acyDescriptionContainer}>
-              {/* <AcyDescriptions.Item>
+            <AcyCuarrencyCard
+              icon="eth"
+              title={token1BalanceShow && `Balance: ${parseFloat(token1Balance).toFixed(5)}`}
+              logoURI={token1 && token1.logoURI}
+              coin={(token1 && token1.symbol) || 'Select'}
+              yuan="566.228"
+              dollar={`${token1Balance}`}
+              token={token1Amount}
+              onChoseToken={async () => {
+                onClickCoin();
+                setBefore(false);
+              }}
+              onChangeToken={e => {
+                setExactIn(false);
+                setToken1Amount(e);
+              }}
+            />
+
+            <AcyDescriptions>
+              {liquidityBreakdown && (
+                <>
+                  <div className={styles.breakdownTopContainer}>
+                    <div className={styles.slippageContainer}>
+                      <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '7px' }}>
+                        <Button type="link" style={{ marginRight: '5px' }}>
+                          Auto
+                        </Button>
+                        <Input
+                          value={inputSlippageTol || ''}
+                          onChange={e => {
+                            setInputSlippageTol(e.target.value);
+                          }}
+                          suffix={<strong>%</strong>}
+                        />
+                        <Button
+                          type="primary"
+                          style={{
+                            marginLeft: '10px',
+                            background: '#2e3032',
+                            borderColor: 'transparent',
+                          }}
+                          onClick={() => {
+                            if (isNaN(inputSlippageTol)) {
+                              setSlippageError('Please input valid slippage value!');
+                            } else {
+                              setSlippageError('');
+                              setSlippageTolerance(parseFloat(inputSlippageTol));
+                            }
+                          }}
+                        >
+                          Set
+                        </Button>
+                      </div>
+                      {slippageError.length > 0 && (
+                        <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className={styles.acyDescriptionContainer}>
+                    {/* <AcyDescriptions.Item>
               <div className={styles.acyDescriptionTitle}>
                 liquidity breakdown
               </div>
             </AcyDescriptions.Item> */}
-              {liquidityBreakdown.map(info => (
-                <AcyDescriptions.Item>
-                  <div className={styles.acyDescriptionItem}>{info}</div>
-                </AcyDescriptions.Item>
-              ))}
-            </div>
-          </>
-        )}
-      </AcyDescriptions>
+                    {liquidityBreakdown.map(info => (
+                      <AcyDescriptions.Item>
+                        <div className={styles.acyDescriptionItem}>{info}</div>
+                      </AcyDescriptions.Item>
+                    ))}
+                  </div>
+                </>
+              )}
+            </AcyDescriptions>
 
-      {/* {approveToken0ButtonShow == true && (
+            {/* {approveToken0ButtonShow == true && (
         <div>
           <AcyButton
             variant="warning"
@@ -673,7 +682,7 @@ const AddLiquidityComponent = props => {
           </AcyButton>{' '}
         </div>
       )} */}
-      {/* {approveToken1ButtonShow == true && (
+            {/* {approveToken1ButtonShow == true && (
         <div>
           <AcyButton
             variant="warning"
@@ -743,99 +752,102 @@ const AddLiquidityComponent = props => {
         </div>
       )} */}
 
-      <AcyButton
-        variant="success"
-        disabled={!buttonStatus}
-        onClick={async () => {
-          if (account == undefined) {
-            activate(injected);
-            setButtonContent('Choose tokens and amount');
-            setButtonStatus(false);
-          } else {
-            setButtonStatus(false);
-            setButtonContent(<>Processing <Icon type="loading" /></>);
-            await addLiquidity(
-              {
-                ...token0,
-                amount: token0Amount,
-              },
-              {
-                ...token1,
-                amount: token1Amount,
-              },
-              100 * slippageTolerance,
-              exactIn,
-              chainId,
-              library,
-              account,
-              pair,
-              noLiquidity,
-              parsedToken0Amount,
-              parsedToken1Amount,
-              args,
-              value,
-              setLiquidityStatus,
-              setButtonContent,
-              addLiquidityCallback
-            );
-          }
-        }}
-      >
-        {buttonContent}
-      </AcyButton>
-      <AcyDescriptions>
-        {liquidityStatus && <AcyDescriptions.Item>{liquidityStatus}</AcyDescriptions.Item>}
-      </AcyDescriptions>
+            <AcyButton
+              variant="success"
+              disabled={!buttonStatus}
+              onClick={async () => {
+                if (account == undefined) {
+                  activate(injected);
+                  setButtonContent('Choose tokens and amount');
+                  setButtonStatus(false);
+                } else {
+                  setButtonStatus(false);
+                  setButtonContent(<>Processing <Icon type="loading" /></>);
+                  await addLiquidity(
+                    {
+                      ...token0,
+                      amount: token0Amount,
+                    },
+                    {
+                      ...token1,
+                      amount: token1Amount,
+                    },
+                    100 * slippageTolerance,
+                    exactIn,
+                    chainId,
+                    library,
+                    account,
+                    pair,
+                    noLiquidity,
+                    parsedToken0Amount,
+                    parsedToken1Amount,
+                    args,
+                    value,
+                    setLiquidityStatus,
+                    setButtonContent,
+                    addLiquidityCallback
+                  );
+                }
+              }}
+            >
+              {buttonContent}
+            </AcyButton>
+            <AcyDescriptions>
+              {liquidityStatus && <AcyDescriptions.Item>{liquidityStatus}</AcyDescriptions.Item>}
+            </AcyDescriptions>
 
-      <AcyModal onCancel={onCancel} width={400} visible={visible}>
-        <div className={styles.title}>Select a token</div>
-        <div className={styles.search}>
-          <Input
-            size="large"
-            style={{
-              backgroundColor: '#373739',
-              borderRadius: '40px',
-            }}
-            placeholder="Enter the token symbol or address"
-            value={tokenSearchInput}
-            onChange={onTokenSearchChange}
-            id="liquidity-token-search-input"
-          />
-        </div>
-
-        <div className={styles.coinList}>
-          <AcyTabs>
-            <AcyTabPane tab="All" key="1">
-              {tokenList.map((token, index) => (
-                <AcyCoinItem
-                  data={token}
-                  key={index}
-                  customIcon={false}
-                  setAsFav={() => setTokenAsFav(token)}
-                  selectToken={() => {
-                    onTokenClick(token);
+            <AcyModal onCancel={onCancel} width={400} visible={visible}>
+              <div className={styles.title}>Select a token</div>
+              <div className={styles.search}>
+                <Input
+                  size="large"
+                  style={{
+                    backgroundColor: '#373739',
+                    borderRadius: '40px',
                   }}
-                  isFav={favTokenList.includes(token)}
+                  placeholder="Enter the token symbol or address"
+                  value={tokenSearchInput}
+                  onChange={onTokenSearchChange}
+                  id="liquidity-token-search-input"
                 />
-              ))}
-            </AcyTabPane>
-            <AcyTabPane tab="Favorite" key="2">
-              {favTokenList.map((supToken, index) => (
-                <AcyCoinItem
-                  data={supToken}
-                  key={index}
-                  selectToken={() => setTokenAsFav(index)}
-                  customIcon={false}
-                  index={index}
-                  setAsFav={() => setTokenAsFav(token)}
-                  hideFavButton
-                  isFav={favTokenList.includes(supToken)}
-                />
-              ))}
-            </AcyTabPane>
-          </AcyTabs>
+              </div>
+
+              <div className={styles.coinList}>
+                <AcyTabs>
+                  <AcyTabPane tab="All" key="1">
+                    {tokenList.map((token, index) => (
+                      <AcyCoinItem
+                        data={token}
+                        key={index}
+                        customIcon={false}
+                        setAsFav={() => setTokenAsFav(token)}
+                        selectToken={() => {
+                          onTokenClick(token);
+                        }}
+                        isFav={favTokenList.includes(token)}
+                      />
+                    ))}
+                  </AcyTabPane>
+                  <AcyTabPane tab="Favorite" key="2">
+                    {favTokenList.map((supToken, index) => (
+                      <AcyCoinItem
+                        data={supToken}
+                        key={index}
+                        selectToken={() => setTokenAsFav(index)}
+                        customIcon={false}
+                        index={index}
+                        setAsFav={() => setTokenAsFav(token)}
+                        hideFavButton
+                        isFav={favTokenList.includes(supToken)}
+                      />
+                    ))}
+                  </AcyTabPane>
+                </AcyTabs>
+              </div>
+            </AcyModal>
+          </div>
         </div>
-      </AcyModal>
+      </AcyCard>
     </div>
   );
 };
