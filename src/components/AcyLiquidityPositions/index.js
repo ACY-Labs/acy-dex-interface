@@ -36,12 +36,12 @@ const SearchField = ({ setKeyword, showSearch, setShowSearch }) => {
     renderComponent = <div style={{ display: "flex", alignItems: "center", backgroundColor: "#191b20", margin: "0 -16px 0 0", borderRadius: "4px" }}>
       <input
         ref={inputRef}
-        style={{ display: showSearch ? "block" : "none", width: "100%", backgroundColor: "transparent", border: 0, outline: 0, paddingLeft: "0.4rem" }}
+        style={{ display: showSearch ? "block" : "none", width: "100%", backgroundColor: "transparent", border: "1px solid #1c9965", borderRadius: "30px", outline: 0, paddingLeft: "0.4rem" }}
         onKeyPress={e => { if (e.key === "Enter") setKeyword(e.target.value); inputRef.current.value = e.target.value }}
       />
       <Icon type="close"
         className={styles.hoverToWhite}
-        style={{ justifyContent: "end", marginRight: "0.2rem", fontSize: "0.7rem" }}
+        style={{ justifyContent: "end", marginLeft: "0.7rem", marginRight: "0.2rem", fontSize: "0.9rem" }}
         onClick={() => {
           setKeyword("");
           inputRef.current.value = "";
@@ -50,7 +50,7 @@ const SearchField = ({ setKeyword, showSearch, setShowSearch }) => {
     </div>;
   } else {
     renderComponent = <>
-      <b>Pool</b>
+      Pool
       <Icon
         type="search"
         className={styles.hoverToWhite}
@@ -172,7 +172,6 @@ const AcyLiquidityPositions = (props) => {
   const [userLPShares, setUserLPShares] = useState([]);
   const [readListPointer, setReadListPointer] = useState(0);  // last processed read position of "validPoolPairs"
   const displayCountIncrement = 5;
-  const [selectedRow, setSelectedRow] = useState(null);
 
   // search component
   const [filteredData, setFilteredData] = useState([]);
@@ -295,7 +294,6 @@ const AcyLiquidityPositions = (props) => {
             <div>
               <p className={styles.bigtitle} onClick={() => {
                 setAddComponentPairs(record.token0, record.token1);
-                setSelectedRow(index);
               }} >
                 {record.pool}
               </p>
@@ -314,7 +312,7 @@ const AcyLiquidityPositions = (props) => {
       visible: true,
     },
     {
-      title: <b>7D volume</b>,
+      title: "7D Volume",
       dataIndex: 'share',
       className: 'centerAlignTableHeader',
       key: 'share',
@@ -322,7 +320,7 @@ const AcyLiquidityPositions = (props) => {
       visible: true,
     },
     {
-      title: <b>24H fee</b>,
+      title: "24H Fee",
       dataIndex: 'token0Amount',
       key: 'token0Amount',
       className: 'centerAlignTableHeader',
@@ -334,12 +332,12 @@ const AcyLiquidityPositions = (props) => {
       visible: !isMobile,
     },
     {
-      title: <b>Reserve</b>,
+      title: "Reserve",
       key: 'token0Reserve',
       dataIndex: 'token0Reserve',
       className: 'centerAlignTableHeader',
       render: (text, record, index) => (
-        <div>
+        <div style={{color: "white"}}>
           <p>{record.token0Reserve}</p>
           <p>{record.token1Reserve}</p>
         </div>
@@ -629,7 +627,7 @@ const AcyLiquidityPositions = (props) => {
       getValidPoolList();
       setUserLPShares({});
       getUserPoolShare();
-      
+
       dispatch({
         type: "liquidity/setRefreshTable",
         payload: false,
@@ -659,7 +657,7 @@ const AcyLiquidityPositions = (props) => {
     [chainId, library, account, userLPHandlers]
   );
 
-  
+
 
   return (
     <div>
@@ -700,36 +698,57 @@ const AcyLiquidityPositions = (props) => {
                 }}><Icon type="right" /></a>
               }
             }}
-            expandedRowRender={(record) => {
+            expandedRowRender={(record, index) => {
               const data = userLPShares[record.poolAddress];
               return (
                 <div style={{ display: "flex", paddingLeft: "3rem" }}>
                   <table id="expandedRowTable">
                     <tr>
-                      <th>My liquidity</th>
-                      <th>Pool share</th>
-                      <th colSpan="2">Operation</th>
+                      <td>My liquidity</td>
+                      <td>Pool share</td>
+                      <td>APR</td>
+                      {/* the following height is randomly set to 10px,
+                      it's only useful for its div children to get full height info */}
+                      <td rowSpan="2" style={{height: "10px"}}> 
+                        <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-around" }} >
+                          <button
+                            className={styles.removeLiquidityButton}
+                            style={{ background: "#eb5c20" }}
+                            type="button"
+                            onClick={() => {
+                              setAddComponentPairs(record.token0, record.token1);
+                            }}
+                          >
+                            Add
+                          </button>
+
+                          <button
+                            className={styles.removeLiquidityButton}
+                            style={{ background: "#1b1b1c" }}
+                            type="button"
+                            onClick={() => {
+                              setIsModalVisible(true);
+                              setRemoveLiquidityPosition(record);
+                              console.log("remove record", record);
+                            }}
+                          >
+                            Remove
+                          </button>
+
+                        </div>
+                      </td>
                     </tr>
-                    <tr>
+
+                    <tr className={styles.whiteTextExpandableRow}>
                       <td>
                         <p>{data?.token0Amount || "loading..."}</p>
                         <p>{data?.token1Amount || "loading..."}</p>
                       </td>
                       <td>
-                        {data?.share || "loading..."}
+                        <p>{data?.share || "loading..."}</p>
                       </td>
-                      <td colSpan="2">
-                        <button
-                          className={styles.removeLiquidityButton}
-                          type="button"
-                          onClick={() => {
-                            setIsModalVisible(true);
-                            setRemoveLiquidityPosition(record);
-                            console.log("remove record", record);
-                          }}
-                        >
-                          Remove
-                        </button>
+                      <td>
+                        <p>No data</p>
                       </td>
                     </tr>
                   </table>

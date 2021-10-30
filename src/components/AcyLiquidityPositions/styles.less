@@ -1,7 +1,7 @@
 .pool {
   display: flex;
   .bigtitle {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 600;
     color: white;
     cursor: pointer;
@@ -28,19 +28,25 @@ th {
 #expandedRowTable > tr, td, th {
   text-align: center !important;
 }
+.whiteTextExpandableRow > td > p {
+  color: white;
+}
 
 .removeLiquidityButton {
-  width: 50%;
-  background-color: #eb5c20;
+  width: 72px;
+  // background-color: #eb5c20;
   color: white;
   // opacity: 0.8;
-  border-radius: 10px;
+  border-radius: 30px;
   border-width: 0px;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
+  // padding: 0.25rem 0.5rem;
+  // font-size: 1.5rem;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.8rem;
   cursor: pointer;
   &:hover {
-    background-color: #eb7a20;
+    // background-color: #eb7a20;
+    opacity: 0.3;
   }
 }
 
@@ -75,9 +81,12 @@ th {
   background: #373739!important;
 }
 .rowExpanded {
-  background: #101010!important;
+  background: #29292c!important;
   &:hover .ant-table-tbody > tr.ant-table-row-level-1:hover > td {
     background: unset;
+  }
+  td {
+    border: 0!important;
   }
 }
 .rowNormal {
