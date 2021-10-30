@@ -12,6 +12,7 @@ const StyledInput = styled.input`
   width: 90%;
   border-width: 1px;
   line-height: 50px;
+  margin-left: 20px;
   border-right: 0px solid transparent;
   border-top: 0px solid transparent;
   border-left: 0px solid transparent;
@@ -62,19 +63,17 @@ const inputEmail = () => {
   }
 
   return (
-    <div className={styles.ticketBox}>
+    <div className={styles.emailContainer}>
       {success ? (
         <FollowTelegram />
       ) : (
-        <div className={styles.emailBox}>
-          <div>
+        <div>
+          <div className={styles.emailBox}>
             <div>
-              <div>
-                <StyledInput value={name} required placeholder="Full Name" onChange={(e) => { setName(e.target.value);}} />
-              </div>
-              <div>
-                <StyledInput required placeholder="Email Address" value={email} onChange={(e) => { setEmail(e.target.value);}} />
-              </div>
+              <StyledInput value={name} required placeholder="Full Name" onChange={(e) => { setName(e.target.value);}} />
+            </div>
+            <div>
+              <StyledInput required placeholder="Email Address" value={email} onChange={(e) => { setEmail(e.target.value);}} />
             </div>
             {hasError && <small className={errorText}>{errorMsg}</small>}
           </div>

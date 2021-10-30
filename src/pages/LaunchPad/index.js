@@ -2,6 +2,7 @@
 import React, {useState} from 'react';
 import {Button, Menu, Dropdown, Icon, Progress, Tag, Table} from 'antd';
 import InputEmail from "./inputEmail";
+import ToggleButton from "./ToggleButton";
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { AcyLineChart } from '@/components/Acy';
 import AcyIcon from '@/assets/icon_acy.svg';
@@ -171,6 +172,15 @@ const LaunchpadComponent = () => {
     );
 
     const [showForm, setShowForm] = useState(false)
+    const [selectedTab, setSelectedTab] = useState(0);
+
+    const onWhitelistToggleButtonClick = () => {
+        setSelectedTab(1);
+    };
+
+    const onParticipateToggleButtonClick = () => {
+        setSelectedTab(2);
+    };
 
     return(
       <PageHeaderWrapper>
@@ -224,12 +234,12 @@ const LaunchpadComponent = () => {
             <div className={styles.tokenInfoBox}>
                 <div className={styles.tokenInfoBoxTop}>
                     <div className={styles.tokenSym}>
+                        <h2 style={{fontWeight:'bold'}}>Round 1</h2>
                         <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
                         <h2 className={styles.tokenName}> ACY </h2>
                     </div>
                     <div className={styles.tokenIDODate}>
-                        <h2 style={{fontWeight:'bold'}}>Round 1</h2>
-                        <h3 style={{color:'#fff'}}>Open: 2021-10-31 10:00 UST</h3>
+                        <h3 style={{color:'#fff', marginTop: '20px'}}>Open: 2021-10-31 10:00 UST</h3>
                         <h3 style={{color:'#fff'}}>Close: 2021-11-01 10:00 UST</h3>
                     </div>
                     <div className={styles.tokenIDOStatus}>
@@ -277,40 +287,48 @@ const LaunchpadComponent = () => {
                     </div>
                 </div>
             </div>
-            { !showForm ? (
+            
             <div className={styles.ticketBox}>
                 <div className={styles.ticketDescription}>
-                    <h3 style={{color:'#c4c4c4', fontFamily:'Inter, sans-serif', padding:'15px'}}>Whitelist | Participate </h3>
+                    <ToggleButton 
+                      selectedTab={selectedTab}
+                      onWhitelistToggleButtonClick={onWhitelistToggleButtonClick}
+                      onParticipateToggleButtonClick={onParticipateToggleButtonClick}
+                    />
                 </div>
-                <div className={styles.showTicketBox}>
-                    <div className={styles.showTicketBox1}>
-                        <div className={styles.userEligibleTickets}>
-                            <p>Your Eligible Tickets</p>
-                            <h3 style={tokenContent}>0 Ticket(s)</h3>
+                { !showForm ? (
+                <div className={styles.showTicketContainer}>
+                    <div className={styles.showTicketBox}>
+                        <div className={styles.showTicketBox1}>
+                            <div className={styles.userEligibleTickets}>
+                                <p>Your Eligible Tickets</p>
+                                <h3 style={tokenContent}>0 Ticket(s)</h3>
+                            </div>
+                            <div className={styles.userDepositedTickets}>
+                                <p>Your Deposited Tickets</p>
+                                <h3 style={tokenContent}>0 Ticket(s)</h3>
+                            </div>
                         </div>
-                        <div className={styles.userDepositedTickets}>
-                            <p>Your Deposited Tickets</p>
-                            <h3 style={tokenContent}>0 Ticket(s)</h3>
+                        <div className={styles.showTicketBox2}>
+                            <div className={styles.userWinningTickets}>
+                                <p>Your Winning Tickets</p>
+                                <h3 style={tokenContent}>0 Ticket(s)</h3>
+                            </div>
+                            <div className={styles.userTicketsAllo}>
+                                <p>Your Allocation</p>
+                                <h3 style={tokenContent}>0 ACY</h3>
+                            </div>
                         </div>
                     </div>
-                    <div className={styles.showTicketBox2}>
-                        <div className={styles.userWinningTickets}>
-                            <p>Your Winning Tickets</p>
-                            <h3 style={tokenContent}>0 Ticket(s)</h3>
-                        </div>
-                        <div className={styles.userTicketsAllo}>
-                            <p>Your Allocation</p>
-                            <h3 style={tokenContent}>0 ACY</h3>
-                        </div>
+                    <div className={styles.whitelistBox}>
+                        <Button className={styles.whiteListToggleButton} shape="round" onClick={() => setShowForm(() => true)}>Whitelist</Button>
                     </div>
                 </div>
-                <div className={styles.whitelistBox}>
-                    <Button className={styles.whiteListToggleButton} shape="round" onClick={() => setShowForm(() => true)}>Whitelist</Button>
-                </div>
+                ) : (
+                    <InputEmail />
+                )}
             </div>
-            ) : (
-                <InputEmail />
-            )}
+            
         </div>
         <div className={styles.dateTableBox}>
             <Table style={{marginTop:'20px', textAlign:'center'}} columns={tableColumns} dataSource={tableData} />

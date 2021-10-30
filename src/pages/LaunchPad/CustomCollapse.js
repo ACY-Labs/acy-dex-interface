@@ -20,41 +20,51 @@ const StyledCollapse = styled(AntCollapse)`
   }
 `;
 
-const CustomCollapse = (props) => {
+const defaultProp = () => {};
+
+const CustomCollapse = ({dataList, changeKeys = defaultProp, keys, ...props}) => {
   const [disabled, setDisabled] = useState(true);
   const [followed, setFollowed] = useState(false);
-  const [open, setOpen] = useState(props.isOpened);
-
-  useEffect(() => {
-    setDisabled(props.isDisabled);
-  }, [props.isDisabled])
+  const [opened, setOpen] = useState(false);
+  let [key, setKey] = useState(["1","2","3","4"]);
 
   useEffect(() => {
     setFollowed(props.isFollowed)
   }, [props.isFollowed])
 
-  const setFun1= () => setDisabled(prev => !prev);
-  const setFun2= () => setOpen(prev => [1]);
+  const handleKeyChange = (e) => {
+    changeKeys(false);
+    setKey(e);
+  }
+
+  const setFun1= () => setOpen(prev => !prev);
 
   const combineFunc = () =>{
     setFun1();
-    setFun2();
+    handleKeyChange();
   }
   
   return (
-    <StyledCollapse activeKey={open} onChange={combineFunc}>
+    <StyledCollapse activeKey={keys ? [] : key} onChange={combineFunc}> 
       <AntCollapse.Panel
+        {...props}
         header={props.header}
-        key="1"
         showArrow={false}
         bordered={false}
-        onChange={() => setOpen(prev => [1])}
+        key={props.key}
         extra={
           <span>
-            <span style={{ color: "#0076de", float: "right" }}>
-              {followed ? <div id={styles.emptyBox}><p>+10</p></div> : <img src={tickIcon} alt="" style={{height:'1.2em', marginLRight:'10px', width:'auto', objectFit:'contain'}} />}
-              {disabled ? <div id={styles.themeBox}><p>+10</p></div> : <img src={arrowDownIcon} alt="" style={{height:'1.2em', marginLRight:'10px', width:'auto', objectFit:'contain'}} />}
+            <span style={{float: 'right'}}>
+              {followed ? <img src={tickIcon} alt="" style={{height:'1.2em', marginLRight:'10px', width:'auto', objectFit:'contain'}} /> :  ""}
             </span>
+            <div className={styles.extraContainer}>
+              {
+                !opened && !followed && <div id={styles.themeBox}><p>+10</p></div>  // show this box
+              }
+              {
+                opened && !followed && <img src={arrowDownIcon} alt="" style={{height:'1.2em', marginLRight:'10px', width:'auto', objectFit:'contain'}} />  // show this icon
+              }
+            </div>
           </span>
         }
       >

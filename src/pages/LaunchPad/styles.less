@@ -97,6 +97,7 @@
 
 .tokenInfoBox{
     width: 59%;
+    height: 450px;
     background-color: @cardColor;
     box-sizing: border-box;
     border-radius: 10px;
@@ -118,12 +119,12 @@
     .tokenIDODate{
         padding: 20px 20px 10px 0;
         width: 400px;
+        top: 50%;
     }
     .tokenIDOStatus{
         margin-top: 35px;
     }
 }
-
 
 .line{
     border-bottom: 2px solid black;
@@ -153,7 +154,7 @@
         margin-left: 108px;
     }
     .tokenMarketCap{
-        margin-left: 60px;
+        margin-left: 150px;
     }
 }
 
@@ -174,12 +175,30 @@
     }
 }
 
-.ticketDescription{
-    width: 100%;
-    display: flex;
-    justify-content: right;
-    padding: 5px;
+.leftToggleButton {
+    border: 1px solid transparent;
+    border-radius: 15px 0 0 15px;
+    background-color: #29292c;
+    padding: 0.25rem 1.25rem;
+    margin-right: 0;
+    font-size: 1rem;
 }
+
+.rightToggleButton {
+    border: 1px solid transparent;
+    border-radius: 0 15px 15px 0;
+    background-color: #29292c;
+    padding: 0.25rem 1.25rem;
+    margin-right: 0.5rem;
+    font-size: 1rem;
+}
+
+.leftToggleButton:hover,
+.rightToggleButton:hover {
+  cursor: pointer;
+  border-color: #c6224e;
+}
+
 
 .whiteListToggleButton{
   border: 1px solid transparent;
@@ -202,6 +221,27 @@
   opacity: 90%;
 }
 
+.swapToggleButton{
+    border: 1px solid transparent;
+  background-color: #c6224e;
+  width: 10em;
+  height: 40px;
+  color: #fff;
+  margin-top: 20px;
+  padding: 0.25rem 1.25rem;
+  // border-radius: 0.25rem 0 0 0.25rem;
+  margin-right: 0;
+  font-size: 1rem;
+}
+
+.swapToggleButton:hover{
+    cursor: pointer;
+    background: #c6224e;
+    color: #fff;
+    border-color: #c6224e;
+    opacity: 90%;
+}
+
 
 .tokenProgress{
     width: 100%;
@@ -217,23 +257,41 @@
 
 .ticketBox{
     width: 40%;
+    height: 450px;
     background-color: @cardColor;
     box-sizing: border-box;
     border-radius: 10px;
-    overflow: hidden;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.ticketDescription{
+    width: 100%;
+    display: inline-flex;
+    justify-content: right;
     float: right;
+    padding: 5px;
+    .tableToggleButtonContainer{
+      margin-top: 15px;
+      margin-bottom: 5px;
+    }
+}
+
+.showTicketContainer{
+    width: 100%;
+    height: auto;
+    position: relative;
 }
 
 .showTicketBox{
     width: 100%;
     display: flex;
     justify-content: space-around;
-    padding: 0 20px 20px 20px;
-    margin-top: 2em;
+    padding: 20px;
+    margin-top: 6em;
     .showTicketBox1{
         width: auto;
-        height:auto;
+        height: auto;
         display: inline-block;
     }
     
@@ -246,11 +304,11 @@
 }
 
 .showTicketBox1 .userEligibleTickets{
-    margin-bottom: 30px;
+    margin-bottom: 50px;
 }
 
 .showTicketBox2 .userWinningTickets{
-    margin-bottom: 30px;
+    margin-bottom: 50px;
 }
 
 .whitelistBox{
@@ -279,25 +337,31 @@
 }
 
 // Email css
-.emailBox{
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+.emailContainer{
+    width:100%;
+    height: auto;
+    .emailBox{
+        width: 100%;
+        height: auto;
+        padding: 20px;
+        margin-top: 5em;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .emailSubmitButton{
+        min-width: 60px;
+        max-width: 60px;
+        margin-left: 40px;
+    }
+    
+    .emailSubmitButton:hover{
+        cursor: pointer;
+        opacity: 80%;
+    }
 }
 
-.emailSubmitButton{
-    min-width: 60px;
-    max-width: 60px;
-    margin-top: 15px;
-}
-
-.emailSubmitButton:hover{
-    cursor: pointer;
-    opacity: 60%;
-}
 
 
 // telegram box
@@ -315,15 +379,16 @@
     text-align: center;
     padding: 15px;
     color: @mainColor;
-    h2{
-        padding: 15px;
-    }
 }
 
 .telegramLinks{
     width: 100%;
     position: relative;
     display: inline-block;
+}
+
+.extraContainer{
+    float: right ;
 }
 
 #themeBox{
@@ -336,19 +401,8 @@
     background-color: #c6224e;
 }
 
-#emptyBox{
-    width: 50px;
-    color: white;
-    height: 25px;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #c6224e;
-    display: none;
-}
-
-
-#telegramHeader1{
+.telegramPanel1{
+    width: 100%;
     display: inline-block;
     align-items: center;
 }
