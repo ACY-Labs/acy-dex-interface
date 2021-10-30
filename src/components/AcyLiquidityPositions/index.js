@@ -713,7 +713,7 @@ const AcyLiquidityPositions = (props) => {
                         <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-around" }} >
                           <button
                             className={styles.removeLiquidityButton}
-                            style={{ background: "#eb5c20" }}
+                            style={{ background: "transparent", border: "1px solid green" }}
                             type="button"
                             onClick={() => {
                               setAddComponentPairs(record.token0, record.token1);
@@ -724,7 +724,7 @@ const AcyLiquidityPositions = (props) => {
 
                           <button
                             className={styles.removeLiquidityButton}
-                            style={{ background: "#1b1b1c" }}
+                            style={{ background: "transparent", border: "1px solid green" }}
                             type="button"
                             onClick={() => {
                               setIsModalVisible(true);
