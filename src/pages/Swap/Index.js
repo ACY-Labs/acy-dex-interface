@@ -366,7 +366,7 @@ const Swap = props => {
                   data={chartData}
                   format={format}
                   showXAxis
-                  showGradient
+                  // showGradient
                   lineColor="#e29227"
                   range={range}
                   onHover={(data, dataIndex) => {
