@@ -615,7 +615,7 @@ const SwapComponent = props => {
               <div className={styles.slippageContainer}>
                 <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '7px' }}>
-                  <Button
+                  {/* <Button
                     type="link"
                     style={{ marginRight: '5px' }}
                     onClick={() => {
@@ -624,7 +624,7 @@ const SwapComponent = props => {
                     }}
                   >
                     Auto
-                  </Button>
+                  </Button> */}
                   <Input
                     value={inputSlippageTol || ''}
                     onChange={e => {
