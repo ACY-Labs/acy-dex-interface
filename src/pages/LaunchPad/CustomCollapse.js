@@ -10,48 +10,41 @@ const StyledCollapse = styled(AntCollapse)`
     border: none;
     border-radius: 0px;
     background-color: #f7f7f7;
-    box-shadow: none;
+    box-shadow: none;   
   }
   .ant-collapse-content {
     background: #f7f7f7;
   }
-  .ant-collapse-header{
+  .ant-collapse-header {
       fontSize: 25px;
   }
 `;
 
-const defaultProp = () => {};
-
-const CustomCollapse = ({dataList, changeKeys = defaultProp, keys, ...props}) => {
-  const [disabled, setDisabled] = useState(true);
+const CustomCollapse = (props) => {
   const [followed, setFollowed] = useState(false);
   const [opened, setOpen] = useState(false);
-  let [key, setKey] = useState(["1","2","3","4"]);
+  const [key, setKey] = useState([props.keys]);
 
   useEffect(() => {
     setFollowed(props.isFollowed)
   }, [props.isFollowed])
 
-  const handleKeyChange = (e) => {
-    changeKeys(false);
-    setKey(e);
-  }
-
-  const setFun1= () => setOpen(prev => !prev);
+  const handlePanel= () => setOpen(prev => !prev);
+  const handlePanelClose = () => props.setShow(prev => !prev);
 
   const combineFunc = () =>{
-    setFun1();
-    handleKeyChange();
+    handlePanel();
+    handlePanelClose();
   }
-  
+
   return (
-    <StyledCollapse activeKey={keys ? [] : key} onChange={combineFunc}> 
+    <StyledCollapse accordian activeKey={props.show ? key : []} onChange={combineFunc}> 
       <AntCollapse.Panel
         {...props}
         header={props.header}
         showArrow={false}
         bordered={false}
-        key={props.key}
+        key={props.keys}
         extra={
           <span>
             <span style={{float: 'right'}}>

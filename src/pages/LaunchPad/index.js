@@ -289,13 +289,6 @@ const LaunchpadComponent = () => {
             </div>
             
             <div className={styles.ticketBox}>
-                <div className={styles.ticketDescription}>
-                    <ToggleButton 
-                      selectedTab={selectedTab}
-                      onWhitelistToggleButtonClick={onWhitelistToggleButtonClick}
-                      onParticipateToggleButtonClick={onParticipateToggleButtonClick}
-                    />
-                </div>
                 { !showForm ? (
                 <div className={styles.showTicketContainer}>
                     <div className={styles.showTicketBox}>
