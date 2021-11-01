@@ -703,6 +703,7 @@ const AcyLiquidityPositions = (props) => {
               return (
                 <div style={{ display: "flex", paddingLeft: "3rem" }}>
                   <table id="expandedRowTable">
+                    <tbody>
                     <tr>
                       <td>My liquidity</td>
                       <td>Pool share</td>
@@ -751,6 +752,7 @@ const AcyLiquidityPositions = (props) => {
                         <p>No data</p>
                       </td>
                     </tr>
+                    </tbody>
                   </table>
                 </div>
               )
