@@ -85,7 +85,13 @@ const Swap = props => {
   const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
 
   // 时间段选择
-  const onhandPeriodTimeChoose = pt => {
+  const onhandPeriodTimeChoose = periodTimeName => {
+    let pt;
+    switch (periodTimeName) {
+      case '24h': pt = '1D'; break;
+      case 'Max': pt = '1M'; break;
+    }
+
     let _format = 'h:mm:ss a';
     switch (pt) {
       case '1D':
@@ -360,7 +366,8 @@ const Swap = props => {
                 <AcyPeriodTime
                   onhandPeriodTimeChoose={onhandPeriodTimeChoose}
                   className={styles.pt}
-                  times={['1D', '1W', '1M']}
+                  // times={['1D', '1W', '1M']}
+                  times={['24h', 'Max']}
                 />
                 <AcyPriceChart
                   data={chartData}
