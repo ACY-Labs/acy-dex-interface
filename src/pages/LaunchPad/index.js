@@ -40,58 +40,62 @@ const LaunchpadComponent = () => {
             title: 'Round',
             dataIndex: 'round',
             width: 80,
-            align: 'left'
+            align: 'center'
         },
         {
             title: 'Date',
             dataIndex: 'openDate',
             className: 'column-date',
             width: 100,
-            align: 'left'
+            align: 'center'
         },
         {
             title: 'Price',
             dataIndex: 'price',
             width: 70,
-            align: 'left'
+            align: 'center'
         },
         {
             title: 'Raise Size',
             dataIndex: 'raiseSize',
             width: 100,
-            align: 'left'
+            align: 'center'
         },
         {
             title: 'Quantity',
             dataIndex: 'quantity',
             width: 70,
+            align: 'center'
         },
         {
             title: 'Market Cap',
             dataIndex: 'marketCap',
             width: 100,
-            align: 'left'
+            align: 'center'
         },
         {
             title: 'Max Allocation',
             dataIndex: 'maxAllocation',
             width: 100,
+            align: 'center'
         },
         {
             title: 'Filled',
             dataIndex: 'filled',
             width: 100,
-            align: 'left'
+            align: 'center'
         },
         {
             title: 'Status',
             dataIndex: 'status',
             width: 100,
+            align: 'center'
         },
         {
             title: 'Yield',
             dataIndex: 'yieldPer',
             width: 100,
+            align: 'center'
         },
     ];
 
@@ -347,16 +351,16 @@ const LaunchpadComponent = () => {
             
         </div>
         <div className={styles.dateTableBox}>
-            <Table style={{marginTop:'20px', textAlign:'left'}} 
-                columns={tableColumns} dataSource={tableData}
-                onRow={(record, rowIndex) => {
-                    return {
-                      onClick: event => {
-                        setSelectedTableRow(record);
-                      }, // click row
-                    };
-                  }}
-            />
+        <Table style={{marginTop:'20px', textAlign:'center'}} 
+            columns={tableColumns} dataSource={tableData}
+            onRow={(record, rowIndex) => {
+                return {
+                    onClick: event => {
+                    setSelectedTableRow(record);
+                    }, // click row
+                };
+            }}
+        />
         </div>
       </PageHeaderWrapper>
     );
