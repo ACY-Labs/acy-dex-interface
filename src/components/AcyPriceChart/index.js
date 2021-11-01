@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactEcharts from 'echarts-for-react';
 import * as echarts from 'echarts'; // 渐变色
 import 'echarts/lib/chart/line';
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/title'; // 此处是按需引入
 import moment from 'moment';
-import {Icon} from 'antd';
+import { Icon } from 'antd';
 
 const defaultData = [
   ['2000-06-05', 116],
@@ -59,32 +59,44 @@ const defaultData = [
   ['2000-07-23', 55],
   ['2000-07-24', 60],
 ];
+const AcyPriceChart = (props) => {
 
-class AcyPriceChart extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      imgType: 'line', // 默认折线图
-      xtitle: this.props.xtitle, // x轴类目名称取参
-      data: this.props.data,
-    };
-  }
+  const echartsElement = useRef();
+  const [echartInstance, setEchartInstance] = useState(null);
+  
+  // get a reference to the echartInstance
+  // https://github.com/hustcc/echarts-for-react#component-api--echarts-api
+  useEffect(() => {
+    if (echartsElement.current) {
+      console.log("echartsElement", echartsElement)
+      setEchartInstance(echartsElement.current.getEchartsInstance());
+    }
+  }, [echartsElement]);
 
-  componentDidMount() { }
+  // update chart data from props
+  // clear and setOption will enable plotting animation
+  useEffect(() => {
+    let options = {};
+    if (props.data.length) {
+      console.log("test update chartData", props.data)
+      options = getOption(props.data);
+    }
+    if (echartInstance) {
+      console.log("cleared and set option");
+      echartInstance.clear();
+      echartInstance.setOption(options);
+    }
+  }, [props.data, echartInstance]);
 
-  renderTooltip = v => {
-    const { onHover, showTooltip } = this.props;
+  const renderTooltip = v => {
+    const { onHover, showTooltip } = props;
     if (onHover) onHover(v[0].data, v[0].dataIndex);
 
     if (showTooltip) return `<span style="color:#b5b5b6"> $ ${v[0].data} </span>`;
   };
 
-  getOption = () => {
-    const { showXAxis, title, lineColor, showGradient, bgColor, range, format } = this.props;
-    let { data: chartData } = this.props;
-    if (!chartData) {
-      chartData = defaultData;
-    }
+  const getOption = (chartData) => {
+    const { showXAxis, title, lineColor, showGradient, bgColor, range, format } = props;
 
     const dateList = chartData.map(item => item[0]);
     const valueList = chartData.map(item => item[1]);
@@ -107,7 +119,7 @@ class AcyPriceChart extends Component {
             backgroundColor: 'black',
           },
         },
-        formatter: this.renderTooltip,
+        formatter: renderTooltip,
       },
       xAxis: {
         axisLabel: {
@@ -148,7 +160,7 @@ class AcyPriceChart extends Component {
           // shaded area setting is set via "showGradient" down below.
           data: valueList,
           type: 'line',
-          smooth: 1, // true 为平滑曲线，false为直线
+          smooth: false, // true 为平滑曲线，false为直线
           showSymbol: false, // 是否默认展示圆点
           itemStyle: {
             normal: {
@@ -161,9 +173,9 @@ class AcyPriceChart extends Component {
         },
       ],
       grid: {
-        left: 0,
-        right: 0,
-        top: 0,
+        // left: 0,
+        right: 10,
+        // top: 0,
         // bottom: 0,
       }
     };
@@ -180,19 +192,17 @@ class AcyPriceChart extends Component {
     return options;
   };
 
-  render() {
+
     return (
       <ReactEcharts
-        style={{ height: '100%' }}
-        option={this.getOption()}
+        style={{ height: '100%', marginLeft: "-40px" }}
+        option={{}} // it will be override by useEffect
         notMerge
-        lazyUpdate={false}
-        ref={e => {
-          this.echartsElement = e;
-        }}
+        lazyUpdate={true}
+        ref={echartsElement}
       />
     );
-  }
+  
 }
 
 export default AcyPriceChart;
