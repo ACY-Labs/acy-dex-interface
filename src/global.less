@@ -173,6 +173,9 @@ leftAlignTableHeader .leftAlign {
       padding: 8px 16px;
       overflow-wrap: break-word;
     }
+    .ant-table-expanded-row-level-1 > td {
+      padding: 8px 0 !important;
+    }
     .ant-table-fixed-header .ant-table-scroll .ant-table-header::-webkit-scrollbar {
       border: 0;
     }
@@ -208,11 +211,22 @@ leftAlignTableHeader .leftAlign {
       white-space: nowrap;
     }
     tr.ant-table-expanded-row, tr.ant-table-expanded-row:hover {
-      background-color: #101010;
+      background-color: #29292c;
     }
 
+    // dash line on expanded row
+    .ant-table-expanded-row.ant-table-row-level-0 > td {
+      border-bottom: dashed 2px #75757933 !important;
+    }
+    .ant-table-thead > tr, .ant-table-thead > tr > th {
+      background-color: transparent;
+      font-weight: normal;
+    }
     .ant-table-thead > tr > th.ant-table-column-sort {
-      background: inherit;
+      background: transparent;
+    }
+    .ant-table-footer {
+      background: transparent !important;
     }
   }
 

@@ -473,6 +473,7 @@ export async function swapGetEstimated(
   }
 }
 
+// FIXME: slippageAdjustedAmount, minAmountOut, maxAmountIn are only used for logging to console. Calculation is done once more by Router.swapCallParameters()
 export async function swap(
   inputToken0,
   inputToken1,
@@ -489,7 +490,9 @@ export async function swap(
   maxAmountIn,
   wethContract,
   wrappedAmount,
+  deadline,
   setSwapStatus,
+  setSwapButtonContent,
   swapCallback
 ) {
   const status = await (async () => {
@@ -591,11 +594,13 @@ export async function swap(
     console.log('say something about allowance');
     console.log('------------------ PREPARE SWAP ------------------');
 
+    deadline = deadline || 30;
+    console.log("deadline", deadline);
     const { methodName, args, value } = Router.swapCallParameters(trade, {
       feeOnTransfer: false,
       allowedSlippage,
       recipient: account,
-      ttl: 60,
+      ttl: deadline * 60,
     });
     const options = !value || isZero(value) ? {} : { value };
 
@@ -617,6 +622,7 @@ export async function swap(
 
   if (status instanceof CustomError) {
     setSwapStatus(status.getErrorText());
+    setSwapButtonContent("Please try again");
   } else {
     console.log(status);
 

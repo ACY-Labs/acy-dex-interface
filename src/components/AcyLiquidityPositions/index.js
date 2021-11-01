@@ -28,39 +28,137 @@ function getLogoURIWithSymbol(symbol) {
 }
 
 // table pool column search component
-const SearchField = ({setKeyword, showSearch, setShowSearch}) => {
+const SearchField = ({ setKeyword, showSearch, setShowSearch }) => {
   const inputRef = useRef();
 
   let renderComponent;
   if (showSearch) {
-    renderComponent = <div style={{ display: "flex", alignItems: "center", backgroundColor: "#191b20", margin: "0 -16px 0 0", borderRadius: "4px"}}>
-    <input
-      ref={inputRef}
-      style={{ display: showSearch ? "block" : "none", width: "100%", backgroundColor: "transparent", border: 0, outline: 0, paddingLeft: "0.4rem" }}
-      onKeyPress={e => { if (e.key === "Enter") setKeyword(e.target.value); inputRef.current.value=e.target.value }}
-    />
-    <Icon type="close"
-      className={styles.hoverToWhite}
-      style={{justifyContent: "end", marginRight: "0.2rem", fontSize: "0.7rem"}}
-      onClick={ () => {
-      setKeyword("");
-      inputRef.current.value = "";
-      setShowSearch(false);
-    }} />
+    renderComponent = <div style={{ display: "flex", alignItems: "center", backgroundColor: "#191b20", margin: "0 -16px 0 0", borderRadius: "4px" }}>
+      <input
+        ref={inputRef}
+        style={{ display: showSearch ? "block" : "none", width: "100%", backgroundColor: "transparent", border: "1px solid #1c9965", borderRadius: "30px", outline: 0, paddingLeft: "0.4rem" }}
+        onKeyPress={e => { if (e.key === "Enter") setKeyword(e.target.value); inputRef.current.value = e.target.value }}
+      />
+      <Icon type="close"
+        className={styles.hoverToWhite}
+        style={{ justifyContent: "end", marginLeft: "0.7rem", marginRight: "0.2rem", fontSize: "0.9rem" }}
+        onClick={() => {
+          setKeyword("");
+          inputRef.current.value = "";
+          setShowSearch(false);
+        }} />
     </div>;
   } else {
     renderComponent = <>
-      pool
+      Pool
       <Icon
         type="search"
         className={styles.hoverToWhite}
         style={{ backgroundColor: "transparent", color: "white", marginLeft: "1rem" }}
-        onClick={() => {setShowSearch(true); console.log(showSearch) } }
+        onClick={() => { setShowSearch(true); console.log(showSearch) }}
       />
     </>;
   }
   return renderComponent;
 }
+
+// const ExpandableRowTable = (dataSource) => {
+//   const columns = useMemo(() => [
+//     {
+//       title: '#',
+//       className: 'centerAlignTableHeader',
+//       key: 'index',
+//       render: (text, record, index) => (
+//         <div>
+//           {index + 1}
+//         </div>
+//       ),
+//       width: '3rem',
+//     },
+//     {
+//       title: 'My liquidity',
+//       dataIndex: ,
+//       // key can be omitted if dataIndex is given (specified in docs)
+//       // duplicate column keys will cause search filter problems.
+//       className: 'centerAlignTableHeader',
+//       render: (text, record, index) => {
+
+//       },
+//     },
+//     {
+//       title: 'Pool share',
+//       dataIndex: 'token0Amount',
+//       key: 'token0Amount',
+//       className: 'centerAlignTableHeader',
+//       render: (text, record, index) => (
+//         <div>
+//           <p>{record.token0Amount}</p>
+//           <p>{record.token1Amount}</p>
+//         </div>
+//       ),
+//       visible: !isMobile,
+//     },
+//     {
+//       title: '',
+//       dataIndex: 'share',
+//       className: 'centerAlignTableHeader',
+//       key: 'share',
+//       render: (text, record, index) => <div>{record.share}</div>,
+//       visible: true,
+//     },
+//     {
+//       title: '',
+//       key: 'token0Reserve',
+//       dataIndex: 'token0Reserve',
+//       className: 'centerAlignTableHeader',
+//       render: (text, record, index) => (
+//         <div>
+//           <p>{record.token0Reserve}</p>
+//           <p>{record.token1Reserve}</p>
+//         </div>
+//       ),
+//       visible: !isMobile,
+//     },
+//     {
+//       title: <b>Operation</b>,
+//       key: 'poolAddress',
+//       className: 'centerAlignTableHeader',
+//       render: (text, record, index) => (
+//         <div>
+//           <button
+//             className={styles.removeLiquidityButton}
+//             type="button"
+//             onClick={() => {
+//               setIsModalVisible(true);
+//               setRemoveLiquidityPosition(record);
+//             }}
+//           >
+//             Remove
+//           </button>
+//         </div>
+//       ),
+//       visible: true,
+//     },
+//     // { title: "Expand", key: "expand",  visible: true},
+//   ]);
+
+//   return (
+//     <Table
+//             style={{ textAlign: 'center' }}
+//             rowKey="?"
+//             dataSource={dataSource}
+//             columns={columns}
+//             pagination={false}
+//             locale={{
+//               emptyText: (
+//                 <span>
+//                   <h2>No data for this pool.</h2>
+//                 </span>
+//               ),
+//             }}
+//           />
+//   )
+// }
 
 const AcyLiquidityPositions = (props) => {
   // const [userLiquidityPools, setUserLiquidityPools] = useState([]); // list of pools that user has share
@@ -74,7 +172,6 @@ const AcyLiquidityPositions = (props) => {
   const [userLPShares, setUserLPShares] = useState([]);
   const [readListPointer, setReadListPointer] = useState(0);  // last processed read position of "validPoolPairs"
   const displayCountIncrement = 5;
-  const [selectedRow, setSelectedRow] = useState(null);
 
   // search component
   const [filteredData, setFilteredData] = useState([]);
@@ -157,7 +254,7 @@ const AcyLiquidityPositions = (props) => {
       visible: !isMobile
     },
     {
-      title: <SearchField {...{showSearch, setShowSearch, setKeyword}} />,
+      title: <SearchField {...{ showSearch, setShowSearch, setKeyword }} />,
       dataIndex: 'pool',
       // key can be omitted if dataIndex is given (specified in docs)
       // duplicate column keys will cause search filter problems.
@@ -197,7 +294,6 @@ const AcyLiquidityPositions = (props) => {
             <div>
               <p className={styles.bigtitle} onClick={() => {
                 setAddComponentPairs(record.token0, record.token1);
-                setSelectedRow(index);
               }} >
                 {record.pool}
               </p>
@@ -216,20 +312,7 @@ const AcyLiquidityPositions = (props) => {
       visible: true,
     },
     {
-      title: 'My Liquidity',
-      dataIndex: 'token0Amount',
-      key: 'token0Amount',
-      className: 'centerAlignTableHeader',
-      render: (text, record, index) => (
-        <div>
-          <p>{record.token0Amount}</p>
-          <p>{record.token1Amount}</p>
-        </div>
-      ),
-      visible: !isMobile,
-    },
-    {
-      title: 'Pool Share',
+      title: "7D Volume",
       dataIndex: 'share',
       className: 'centerAlignTableHeader',
       key: 'share',
@@ -237,52 +320,45 @@ const AcyLiquidityPositions = (props) => {
       visible: true,
     },
     {
-      title: 'Reserve',
+      title: "24H Fee",
+      dataIndex: 'token0Amount',
+      key: 'token0Amount',
+      className: 'centerAlignTableHeader',
+      render: (text, record, index) => (
+        <div>
+          <p></p>
+        </div>
+      ),
+      visible: !isMobile,
+    },
+    {
+      title: "Reserve",
       key: 'token0Reserve',
       dataIndex: 'token0Reserve',
       className: 'centerAlignTableHeader',
       render: (text, record, index) => (
-        <div>
+        <div style={{color: "white"}}>
           <p>{record.token0Reserve}</p>
           <p>{record.token1Reserve}</p>
         </div>
       ),
       visible: !isMobile,
     },
-    {
-      title: 'Operation',
-      key: 'poolAddress',
-      className: 'centerAlignTableHeader',
-      render: (text, record, index) => (
-        <div>
-          <button
-            className={styles.removeLiquidityButton}
-            type="button"
-            onClick={() => {
-              setIsModalVisible(true);
-              setRemoveLiquidityPosition(record);
-            }}
-          >
-            Remove
-          </button>
-        </div>
-      ),
-      visible: true,
-    },
     // { title: "Expand", key: "expand",  visible: true},
   ]);
 
   // fetch lists of valid pool
   const getValidPoolList = () => {
-    console.log("getting list on chain ", chainId);
+    setLoading(true);
+    console.log("fetching user pool list");
     axios.get(
       // fetch valid pool list from remote
       // `https://api.acy.finance/api/pool?chainId=${chainId}`
       `https://api.acy.finance/api/userpool?walletId=${account}`
       // `http://localhost:3001/api/userpool?walletId=${account}`
-    ).then( async res => {
+    ).then(async res => {
       console.log(res);
-      
+
       const tokens = supportedTokens;
 
       // construct pool list locally
@@ -307,7 +383,7 @@ const AcyLiquidityPositions = (props) => {
 
       const LPHandlers = pairs.map(pair => pair.value);
       setUserLPHandlers(LPHandlers);
-      console.log("userLPHandlers is updated");
+      console.log("userLPHandlers is updated with length", LPHandlers.length);
 
     }).catch(e => console.log("error: ", e));
   }
@@ -327,7 +403,7 @@ const AcyLiquidityPositions = (props) => {
         token1Reserve: `${pair.reserve1.toExact(2)} ${pair.token1.symbol}`,
       });
     }
-    console.log("userLPData is updated");
+    console.log("userLPData is updated with length", userPools.length);
     setLoading(false);
     console.log("test elapsed time", new Date());
     return userPools;
@@ -344,7 +420,7 @@ const AcyLiquidityPositions = (props) => {
 
   // fetch user shares in above pools
   async function getUserPoolShare() {
-    
+
     const fetchPoolShare = async (pair) => {
       console.log("poolToken,", pair.liquidityToken)
       let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
@@ -371,19 +447,19 @@ const AcyLiquidityPositions = (props) => {
       );
 
       const poolTokenPercentage = new Percent(userPoolBalance.raw, totalSupply.raw).toFixed(4);
-      
+
       const newData = {
-          token0Amount: `${token0Deposited.toSignificant(4)} ${pair.token0.symbol}`,
-          token1Amount: `${token1Deposited.toSignificant(4)} ${pair.token1.symbol}`,
-          share: `${poolTokenPercentage}%`,
+        token0Amount: `${token0Deposited.toSignificant(4)} ${pair.token0.symbol}`,
+        token1Amount: `${token1Deposited.toSignificant(4)} ${pair.token1.symbol}`,
+        share: `${poolTokenPercentage}%`,
       };
 
       console.log("userLPShares is updated: ", newData);
-      
-      setUserLPShares(prev => ({...prev, [pair.liquidityToken.address]: newData}));
+
+      setUserLPShares(prev => ({ ...prev, [pair.liquidityToken.address]: newData }));
     }
 
-    (async () =>{ for (let pair of userLPHandlers) fetchPoolShare(pair); })();
+    (async () => { for (let pair of userLPHandlers) fetchPoolShare(pair); })();
 
     // setUserLPShares([...userLPShares, ...userShares]);
     // lpHandlers.splice(0, userShares.length);
@@ -391,7 +467,7 @@ const AcyLiquidityPositions = (props) => {
     // console.log("done 5 updates");
 
     // if (lpHandlers.length)
-      // await getUserPoolShare();
+    // await getUserPoolShare();
 
     // while (readIdx < userLiquidityPools.length) {
 
@@ -520,6 +596,19 @@ const AcyLiquidityPositions = (props) => {
 
   }
 
+  // link liquidity position table and add component together
+  const { dispatch, liquidity } = props;
+  const setAddComponentPairs = (token0, token1) => {
+    dispatch({
+      type: "liquidity/setAddTokens",
+      payload: {
+        token0: token0,
+        token1: token1
+      }
+    });
+    console.log("test done setAddTokens from table")
+  }
+
   // auto scroll to newly loaded data
   useEffect(() => {
     if (filteredData.length) {
@@ -528,12 +617,24 @@ const AcyLiquidityPositions = (props) => {
     }
   }, [filteredData]);
 
-  useEffect(async () => {
-    setLoading(true);
-    console.log("test elapsed time", new Date());
-    await getValidPoolList();
+  // first time loading
+  useEffect(() => {
+    getValidPoolList();
   }, []);
-  
+  // refresh table data on add/remove liquidity
+  useEffect(() => {
+    if (liquidity.refreshTable) {
+      getValidPoolList();
+      setUserLPShares({});
+      getUserPoolShare();
+
+      dispatch({
+        type: "liquidity/setRefreshTable",
+        payload: false,
+      });
+    }
+  }, [liquidity.refreshTable]);
+
   // useEffect(
   //   () => {
   //     console.log('library:',library);
@@ -556,32 +657,21 @@ const AcyLiquidityPositions = (props) => {
     [chainId, library, account, userLPHandlers]
   );
 
-  // link liquidity position table and add component together
-  const { dispatch, liquidity } = props;
-  const setAddComponentPairs = (token0, token1) => {
-    dispatch({
-      type: "liquidity/setAddTokens",
-      payload: {
-        token0: token0,
-        token1: token1
-      }
-    });
-    console.log("test done setAddTokens from table")
-  }
+
 
   return (
     <div>
       {!(userLPData.length) && loading ? (
-        <h2 style={{ textAlign: "center", color: "white" }}> <Icon type="loading" /> Loading...</h2>
+        <h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>
       ) : (
         <>
           <Table
             id="liquidityPositionTable"
             style={{ textAlign: 'center' }}
             rowKey="poolAddress"
-            rowClassName={(record, index) => index === selectedRow ? styles.rowHighlighted : styles.rowNormal}
+            rowClassName={(record, index) => record.poolAddress === expandedRowKey ? `${styles.rowExpanded} ant-table-expanded-row` : styles.rowNormal}
             expandedRowKeys={expandedRowKey}
-            onExpand={(expanded, record) => { expandedRowKey === record.poolAddress ? setExpandedRowKey([]) : setExpandedRowKey(record.poolAddress)}}
+            onExpand={(expanded, record) => { expandedRowKey === record.poolAddress ? setExpandedRowKey("") : setExpandedRowKey(record.poolAddress) }}
             dataSource={filteredData}
             columns={columns.filter(item => item.visible)}
             pagination={false}
@@ -608,15 +698,63 @@ const AcyLiquidityPositions = (props) => {
                 }}><Icon type="right" /></a>
               }
             }}
-            expandedRowRender={(record) => {
+            expandedRowRender={(record, index) => {
               const data = userLPShares[record.poolAddress];
               return (
-                <div>
-                  <p>poolAddress: {record.poolAddress}</p>
-                  <p>Token0 amount: {data?.token0Amount || "loading..."}</p>
-                  <p>Token1 amount: {data?.token1Amount || "loading..."}</p>
-                  <p>Share: {data?.share || "loading..."}</p>
-              </div>
+                <div style={{ display: "flex", paddingLeft: "3rem" }}>
+                  <table id="expandedRowTable">
+                    <tbody>
+                    <tr>
+                      <td>My liquidity</td>
+                      <td>Pool share</td>
+                      <td>APR</td>
+                      {/* the following height is randomly set to 10px,
+                      it's only useful for its div children to get full height info */}
+                      <td rowSpan="2" style={{height: "10px"}}> 
+                        <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-around" }} >
+                          <button
+                            className={styles.removeLiquidityButton}
+                            style={{ background: "transparent", border: "1px solid green" }}
+                            type="button"
+                            onClick={() => {
+                              setAddComponentPairs(record.token0, record.token1);
+                            }}
+                          >
+                            Add
+                          </button>
+
+                          <button
+                            className={styles.removeLiquidityButton}
+                            style={{ background: "transparent", border: "1px solid green" }}
+                            type="button"
+                            onClick={() => {
+                              setIsModalVisible(true);
+                              setRemoveLiquidityPosition(record);
+                              console.log("remove record", record);
+                            }}
+                          >
+                            Remove
+                          </button>
+
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr className={styles.whiteTextExpandableRow}>
+                      <td>
+                        <p>{data?.token0Amount || "loading..."}</p>
+                        <p>{data?.token1Amount || "loading..."}</p>
+                      </td>
+                      <td>
+                        <p>{data?.share || "loading..."}</p>
+                      </td>
+                      <td>
+                        <p>No data</p>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
               )
             }}
             footer={() => (

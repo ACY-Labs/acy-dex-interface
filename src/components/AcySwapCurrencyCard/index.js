@@ -32,7 +32,7 @@ const AcySwapCurrencyCard = ({
   }
   const inputRef=React.createRef();
   return (
-    <div {...rest} className={styles.acycuarrencycard} tabindex="-1"  onFocus={onFocus} onBlur={onBlur}>
+    <div {...rest} className={styles.acycuarrencycard} tabIndex="-1"  onFocus={onFocus} onBlur={onBlur}>
 
       <div className={`${styles.cua_body} ${light&&styles.cua_light}`}>
 

@@ -32,6 +32,7 @@ export async function getEstimated(
   index,
   percent,
   amount,
+  allowedSlippage,
   chainId,
   library,
   account,
@@ -45,7 +46,8 @@ export async function getEstimated(
   setNeedApprove,
   setButtonStatus,
   setButtonContent,
-  setRemoveStatus
+  setRemoveStatus,
+  setArgs
 ) {
   let { address: inToken0Address, symbol: inToken0Symbol, decimals: inToken0Decimal } = inputToken0;
   let { address: inToken1Address, symbol: inToken1Symbol, decimals: inToken1Decimal } = inputToken1;
@@ -237,16 +239,6 @@ export async function getEstimated(
   setToken0Amount(parsedToken0Amount.toExact(6));
   setToken1Amount(parsedToken1Amount.toExact(6));
 
-  setBreakdown([
-    'You will receive',
-    `${parsedToken0Amount.toExact(2)} ${token0.symbol}`,
-    `${parsedToken1Amount.toExact(2)} ${token1.symbol}`,
-    `Output is estimated. If the price changes by more than 0.5% your transaction will revert.`,
-    `Pair token burned ${amount}`,
-    `Price0: 1${inToken0Symbol} = ${firstPrice.toExact(2)} ${inToken1Symbol}`,
-    `Price1: 1${inToken1Symbol} = ${secondPrice.toExact(2)} ${inToken0Symbol}`,
-  ]);
-
   console.log('CHECK IF HAVE ENOUGH BALANCE');
   console.log(pair.liquidityToken);
   let pairBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
@@ -263,6 +255,55 @@ export async function getEstimated(
     return;
   }
 
+  console.log("------- SLIPPAGE TOLERANCE ------");
+
+  const amountsMin = {
+    ['CURRENCY_A']: calculateSlippageAmount(parsedToken0Amount, allowedSlippage*100)[0],
+    ['CURRENCY_B']: calculateSlippageAmount(parsedToken1Amount, allowedSlippage*100)[0],
+  };
+
+  console.log("------ PREPARING ARGS ------");
+
+  let oneCurrencyIsETH = token0IsETH || token1IsETH;
+  let methodNames, args;
+  if (oneCurrencyIsETH) {
+    console.log('333');
+    methodNames = [
+      'removeLiquidityETHWithPermit',
+      'removeLiquidityETHWithPermitSupportingFeeOnTransferTokens',
+    ];
+    args = [
+      token1IsETH ? inToken0Address : inToken1Address,
+      liquidityAmount.raw.toString(),
+      amountsMin[token0IsETH ? 'CURRENCY_A' : 'CURRENCY_B'].toString(),
+      amountsMin[token1IsETH ? 'CURRENCY_B' : 'CURRENCY_A'].toString(),
+      account,
+      // deadlineTime, false, signature v, r, s will be added in SignOrApprove
+    ];
+  } else {
+    console.log('444');
+    methodNames = ['removeLiquidityWithPermit'];
+    args = [
+      inToken0Address,
+      inToken1Address,
+      liquidityAmount.raw.toString(),
+      amountsMin['CURRENCY_A'].toString(),
+      amountsMin['CURRENCY_B'].toString(),
+      account,
+      // deadlineTime, false, signature v, r, s will be added in SignOrApprove
+    ];
+  }
+
+  setArgs(args);
+
+  const minAmount0 = new TokenAmount(inputToken0, amountsMin['CURRENCY_A']);
+  const minAmount1 = new TokenAmount(inputToken1, amountsMin['CURRENCY_B']);
+  setBreakdown([
+    'You will receive at least',
+    `${minAmount0.toExact(2)} ${inToken0Symbol}`,
+    `${minAmount1.toExact(2)} ${inToken1Symbol}`,
+  ]);
+
   console.log('GET ALLOWANCE');
   let liquidityApproval = await checkTokenIsApproved(
     liquidityAmount.token.address,
@@ -271,11 +312,11 @@ export async function getEstimated(
     account
   );
 
-  console.log(liquidityApproval);
+  console.log("liquidityApproval", liquidityApproval);
 
   if (!liquidityApproval) {
     setNeedApprove(true);
-    setButtonStatus(false);
+    setButtonStatus(true);
     setButtonContent('Need approve');
     return;
   }
@@ -291,7 +332,7 @@ export async function signOrApprove(
   index,
   percent,
   amount,
-  allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
+  deadline,
   chainId,
   library,
   account,
@@ -299,8 +340,7 @@ export async function signOrApprove(
   setButtonStatus,
   setButtonContent,
   setRemoveStatus,
-  setSignatureData,
-  setButtonProcessing
+  setSignatureData
 ) {
   const status = await (async () => {
     console.log('hhhh');
@@ -430,14 +470,11 @@ export async function signOrApprove(
       { name: 'deadline', type: 'uint256' },
     ];
 
+    console.log("------- DEADLINE TIMER ------");
     const now = new Date();
-
-    const deadlineTime = Math.floor(now.getTime() / 1000) + 60 * 20;
-
-    console.log('deadlineTime');
-    console.log(deadlineTime);
-    console.log(deadlineTime);
-    console.log(deadlineTime);
+    const deadlineDuration = deadline || 30;
+    const deadlineTime = Math.floor(now.getTime() / 1000) + 60 * deadlineDuration;
+    console.log('deadlineTime', deadlineTime);
 
     const message = {
       owner: account,
@@ -445,7 +482,6 @@ export async function signOrApprove(
       value: liquidityAmount.raw.toString(),
       nonce: nonce.toHexString(),
       deadline: deadlineTime,
-      // 1630718219////Math.floor(new Date().getTime() / 1000) + 60,
     };
 
     console.log('message');
@@ -472,11 +508,10 @@ export async function signOrApprove(
           v: signature.v,
           r: signature.r,
           s: signature.s,
-          deadline: deadlineTime, // 1630718219//Math.floor(new Date().getTime() / 1000) + 60//1630717588 //Math.floor(new Date().getTime() / 1000) + 60,
+          deadline: deadlineTime,
         });
 
         setNeedApprove(false);
-        setButtonProcessing(false); // recover the active button style
         setButtonContent('Remove liquidity');
         setButtonStatus(true);
       })
@@ -516,6 +551,8 @@ export async function signOrApprove(
   })();
   if (status instanceof CustomError) {
     setRemoveStatus(status.getErrorText());
+    setButtonStatus(false);
+    setButtonContent("Please try again");
   } else {
     setRemoveStatus('Please approve in your wallet');
     console.log(status);
@@ -532,13 +569,15 @@ export async function removeLiquidity(
   chainId,
   library,
   account,
+  args,
   setToken0Amount,
   setToken1Amount,
   signatureData,
   setNeedApprove,
   setButtonStatus,
   setButtonContent,
-  setRemoveStatus
+  setRemoveStatus,
+  removeLiquidityCallback
 ) {
   const status = await (async () => {
     let router = getRouterContract(library, account);
@@ -608,150 +647,159 @@ export async function removeLiquidity(
 
     console.log(pairContract);
 
-    let totalPoolTokens = await getTokenTotalSupply(pair.liquidityToken, library, account);
+    // let totalPoolTokens = await getTokenTotalSupply(pair.liquidityToken, library, account);
 
-    let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
+    // let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
 
-    userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
+    // userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
 
-    let token0Deposited = pair.getLiquidityValue(
-      pair.token0,
-      totalPoolTokens,
-      userPoolBalance,
-      false
-    );
-    let token1Deposited = pair.getLiquidityValue(
-      pair.token1,
-      totalPoolTokens,
-      userPoolBalance,
-      false
-    );
-    // 这是一个tokenAMount
-    console.log(token0Deposited);
-    console.log(token1Deposited);
+    // let token0Deposited = pair.getLiquidityValue(
+    //   pair.token0,
+    //   totalPoolTokens,
+    //   userPoolBalance,
+    //   false
+    // );
+    // let token1Deposited = pair.getLiquidityValue(
+    //   pair.token1,
+    //   totalPoolTokens,
+    //   userPoolBalance,
+    //   false
+    // );
+    // // 这是一个tokenAMount
+    // console.log(token0Deposited);
+    // console.log(token1Deposited);
 
-    let shang = percent * 100;
-    let percentToRemove = new Percent(shang.toString(), '10000');
+    // let shang = percent * 100;
+    // let percentToRemove = new Percent(shang.toString(), '10000');
 
-    let liquidityAmount = new TokenAmount(
-      userPoolBalance.token,
-      percentToRemove.multiply(userPoolBalance.raw).quotient
-    );
+    // let liquidityAmount = new TokenAmount(
+    //   userPoolBalance.token,
+    //   percentToRemove.multiply(userPoolBalance.raw).quotient
+    // );
 
-    let token0TokenAmount = new TokenAmount(
-      token0,
-      percentToRemove.multiply(token0Deposited.raw).quotient
-    );
+    // let token0TokenAmount = new TokenAmount(
+    //   token0,
+    //   percentToRemove.multiply(token0Deposited.raw).quotient
+    // );
 
-    console.log('this is ok?');
-    console.log(percentToRemove.multiply(token0Deposited.raw).quotient);
-    console.log(token0TokenAmount.raw);
-    console.log(token0TokenAmount.toExact());
-    console.log(token0TokenAmount);
+    // console.log('this is ok?');
+    // console.log(percentToRemove.multiply(token0Deposited.raw).quotient);
+    // console.log(token0TokenAmount.raw);
+    // console.log(token0TokenAmount.toExact());
+    // console.log(token0TokenAmount);
 
-    let token1TokenAmount = new TokenAmount(
-      token1,
-      percentToRemove.multiply(token1Deposited.raw).quotient
-    );
+    // let token1TokenAmount = new TokenAmount(
+    //   token1,
+    //   percentToRemove.multiply(token1Deposited.raw).quotient
+    // );
 
-    let parsedToken0Amount;
-    let parsedToken1Amount;
+    // let parsedToken0Amount;
+    // let parsedToken1Amount;
 
-    // 先假设都不是ETH
-    parsedToken0Amount =
-      token0 === ETHER ? CurrencyAmount.ether(token0TokenAmount.raw) : token0TokenAmount;
-    parsedToken1Amount =
-      token1 === ETHER ? CurrencyAmount.ether(token1TokenAmount.raw) : token1TokenAmount;
+    // // 先假设都不是ETH
+    // parsedToken0Amount =
+    //   token0 === ETHER ? CurrencyAmount.ether(token0TokenAmount.raw) : token0TokenAmount;
+    // parsedToken1Amount =
+    //   token1 === ETHER ? CurrencyAmount.ether(token1TokenAmount.raw) : token1TokenAmount;
 
-    let liquidityApproval = await checkTokenIsApproved(
-      liquidityAmount.token.address,
-      liquidityAmount.raw.toString(),
-      library,
-      account
-    );
+    // let liquidityApproval = await checkTokenIsApproved(
+    //   liquidityAmount.token.address,
+    //   liquidityAmount.raw.toString(),
+    //   library,
+    //   account
+    // );
 
     let oneCurrencyIsETH = token0IsETH || token1IsETH;
-    let estimate;
+    // let estimate;
+    // let methodNames;
+    // let args;
+    // let value;
+
+    // console.log('allowedSlippage', allowedSlippage);
+
+    // const amountsMin = {
+    //   ['CURRENCY_A']: calculateSlippageAmount(parsedToken0Amount, allowedSlippage)[0].toString(),
+    //   ['CURRENCY_B']: calculateSlippageAmount(parsedToken1Amount, allowedSlippage)[0].toString(),
+    // };
+    // console.log("test amountsMin", amountsMin);
     let methodNames;
-    let args;
-    let value;
-
-    console.log('allowedSlippage');
-    console.log(allowedSlippage);
-
-    const amountsMin = {
-      ['CURRENCY_A']: calculateSlippageAmount(parsedToken0Amount, allowedSlippage)[0].toString(),
-      ['CURRENCY_B']: calculateSlippageAmount(parsedToken1Amount, allowedSlippage)[0].toString(),
-    };
-
-    if (liquidityApproval) {
-      if (oneCurrencyIsETH) {
-        console.log('111');
-        methodNames = ['removeLiquidityETH', 'removeLiquidityETHSupportingFeeOnTransferTokens'];
-        args = [
-          token1IsETH ? token0Address : token1Address,
-          liquidityAmount.raw.toString(),
-          amountsMin[token0IsETH ? 'CURRENCY_A' : 'CURRENCY_B'].toString(),
-          amountsMin[token1IsETH ? 'CURRENCY_B' : 'CURRENCY_A'].toString(),
-          // amountsMin[currencyBIsETH ? Field.CURRENCY_A : Field.CURRENCY_B].toString(),
-          // amountsMin[currencyBIsETH ? Field.CURRENCY_B : Field.CURRENCY_A].toString(),
-          account,
-          `0x${(Math.floor(new Date().getTime() / 1000) + 60).toString(16)}`,
-        ];
-      } else {
-        console.log('222');
-        methodNames = ['removeLiquidity'];
-        args = [
-          token0Address,
-          token1Address,
-          liquidityAmount.raw.toString(),
-          amountsMin['CURRENCY_A'].toString(),
-          amountsMin['CURRENCY_B'].toString(),
-          account,
-          `0x${(Math.floor(new Date().getTime() / 1000) + 60).toString(16)}`,
-        ];
-      }
-    } else if (signatureData !== null) {
+    // if (liquidityApproval) {
+      // console.log("remove liquidity is approved");
+      // if (oneCurrencyIsETH) {
+        //   console.log('111');
+        // methodNames = ['removeLiquidityETH', 'removeLiquidityETHSupportingFeeOnTransferTokens'];
+        //   args = [
+        //     token1IsETH ? token0Address : token1Address,
+        //     liquidityAmount.raw.toString(),
+        //     amountsMin[token0IsETH ? 'CURRENCY_A' : 'CURRENCY_B'].toString(),
+        //     amountsMin[token1IsETH ? 'CURRENCY_B' : 'CURRENCY_A'].toString(),
+        //     // amountsMin[currencyBIsETH ? Field.CURRENCY_A : Field.CURRENCY_B].toString(),
+        //     // amountsMin[currencyBIsETH ? Field.CURRENCY_B : Field.CURRENCY_A].toString(),
+        //     account,
+        //     `0x${(Math.floor(new Date().getTime() / 1000) + 60).toString(16)}`,
+        //   ];
+      // } else {
+        //   console.log('222');
+        // methodNames = ['removeLiquidity'];
+        //   args = [
+        //     token0Address,
+        //     token1Address,
+        //     liquidityAmount.raw.toString(),
+        //     amountsMin['CURRENCY_A'].toString(),
+        //     amountsMin['CURRENCY_B'].toString(),
+        //     account,
+        //     `0x${(Math.floor(new Date().getTime() / 1000) + 60).toString(16)}`,
+        //   ];
+      // }
+      
+    // }
+    if (signatureData !== null) {
       if (oneCurrencyIsETH) {
         console.log('333');
         methodNames = [
           'removeLiquidityETHWithPermit',
           'removeLiquidityETHWithPermitSupportingFeeOnTransferTokens',
         ];
-        args = [
-          token1IsETH ? token0Address : token1Address,
-          liquidityAmount.raw.toString(),
-          amountsMin[token1IsETH ? 'CURRENCY_A' : 'CURRENCY_B'].toString(),
-          amountsMin[token1IsETH ? 'CURRENCY_B' : 'CURRENCY_A'].toString(),
-          account,
-          signatureData.deadline,
-          false,
-          signatureData.v,
-          signatureData.r,
-          signatureData.s,
-        ];
+    //     args = [
+    //       token1IsETH ? token0Address : token1Address,
+    //       liquidityAmount.raw.toString(),
+    //       amountsMin[token1IsETH ? 'CURRENCY_A' : 'CURRENCY_B'].toString(),
+    //       amountsMin[token1IsETH ? 'CURRENCY_B' : 'CURRENCY_A'].toString(),
+    //       account,
+    //       signatureData.deadline,
+    //       false,
+    //       signatureData.v,
+    //       signatureData.r,
+    //       signatureData.s,
+    //     ];
       } else {
         console.log('444');
         methodNames = ['removeLiquidityWithPermit'];
-        args = [
-          token0Address,
-          token1Address,
-          liquidityAmount.raw.toString(),
-          amountsMin['CURRENCY_A'].toString(),
-          amountsMin['CURRENCY_B'].toString(),
-          account,
-          signatureData.deadline,
-          false,
-          signatureData.v,
-          signatureData.r,
-          signatureData.s,
-        ];
+    //     args = [
+    //       token0Address,
+    //       token1Address,
+    //       liquidityAmount.raw.toString(),
+    //       amountsMin['CURRENCY_A'].toString(),
+    //       amountsMin['CURRENCY_B'].toString(),
+    //       account,
+    //       signatureData.deadline,
+    //       false,
+    //       signatureData.v,
+    //       signatureData.r,
+    //       signatureData.s,
+    //     ];
       }
-    } else {
+    }
+    else {
       return new CustomError(
         'Attempting to confirm without approval or a signature. Please contact support.'
       );
     }
+
+    console.log("signatureData", signatureData)
+    args = [...args, signatureData.deadline, false, signatureData.v, signatureData.r, signatureData.s];
+    console.log("transaction args", args);
+
     let safeGasEstimates;
 
     let result;
@@ -802,6 +850,8 @@ export async function removeLiquidity(
     setRemoveStatus(status.getErrorText());
   } else {
     console.log(status);
+    
+    removeLiquidityCallback(status, percent);
 
     const url = `https://rinkeby.etherscan.io/tx/${status.hash}`;
     setRemoveStatus(
