@@ -62,9 +62,9 @@ const LaunchpadComponent = () => {
             align: 'center'
         },
         {
-            title: 'Quantity',
-            dataIndex: 'quantity',
-            width: 70,
+            title: 'Quantities',
+            dataIndex: 'quantities',
+            width: 75,
             align: 'center'
         },
         {
@@ -106,7 +106,7 @@ const LaunchpadComponent = () => {
           closeDate: "10-10-2021",
           price: '0.05 USDC',
           raiseSize: "1000000 ACY",
-          quantity: "25M",
+          quantities: "25M",
           marketCap:"10M",
           maxAllocation: "10M",
           filled: "1379%",
@@ -121,7 +121,7 @@ const LaunchpadComponent = () => {
           closeDate: "17-11-2021",
           price: '0.10 USDC',
           raiseSize: "1000000 ACY",
-          quantity: "25M",
+          quantities: "25M",
           marketCap:"20M",
           maxAllocation: "10M",
           filled: "1579%",
@@ -136,7 +136,7 @@ const LaunchpadComponent = () => {
           closeDate: "28-11-2021",
           price: '0.15 USDC',
           raiseSize: "1000000 ACY",
-          quantity: "25M",
+          quantities: "25M",
           marketCap:"30M",
           maxAllocation: "10M",
           filled: "1379%",
@@ -252,18 +252,20 @@ const LaunchpadComponent = () => {
         </div>
         <div className={styles.midContainer}>
             <div className={styles.tokenInfoBox}>
-                <div className={styles.tokenInfoBoxTop}>
-                    <div className={styles.tokenSym}>
-                        <h2 style={{fontWeight:'bold',color:'#eb5c20'}}>{selectedTableRow.round}</h2>
-                        <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
-                        <h2 style={{color:'#eb5c20'}} className={styles.tokenName}> ACY </h2>
-                    </div>
-                    <div className={styles.tokenIDODate}>
-                        <h3 style={{color:'#fff', marginTop: '20px'}}>Open: {selectedTableRow.openDate}</h3>
-                        <h3 style={{color:'#fff'}}>Close: {selectedTableRow.closeDate}</h3>
-                    </div>
-                    <div className={styles.tokenIDOStatus}>
-                        <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', marginTop:'25px', textAlign:'center', fontSize:'18px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
+                <div className={styles.tokenInfoContainer }>
+                    <h2 style={{fontWeight:'bold',color:'#eb5c20'}}>{selectedTableRow.round}</h2>
+                    <div className={styles.tokenInfoBoxTop}>
+                        <div className={styles.tokenSym}>
+                            <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
+                            <h2 style={{color:'#eb5c20'}} className={styles.tokenName}> ACY </h2>
+                        </div>
+                        <div className={styles.tokenIDODate}>
+                            <h4 style={{color:'#fff'}}>Open: {selectedTableRow.openDate}</h4>
+                            <h4 style={{color:'#fff'}}>Close: {selectedTableRow.closeDate}</h4>
+                        </div>
+                        <div className={styles.tokenIDOStatus}>
+                            <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', textAlign:'center', fontSize:'18px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
+                        </div>
                     </div>
                 </div>
                 <div className={styles.tokenProgress}>
@@ -279,8 +281,8 @@ const LaunchpadComponent = () => {
                         <h3 style={tokenContent}>{selectedTableRow.price}</h3>
                     </div>
                     <div className={styles.ticketAllocation}>    
-                        <p style={token}>Quantity</p>
-                        <h3 style={tokenContent}>{selectedTableRow.quantity}</h3> 
+                        <p style={token}>Quantities</p>
+                        <h3 style={tokenContent}>{selectedTableRow.quantities}</h3> 
                     </div>
                     <div className={styles.tokenMarketCap}>   
                         <p style={token}>Market Cap</p>
@@ -351,16 +353,16 @@ const LaunchpadComponent = () => {
             
         </div>
         <div className={styles.dateTableBox}>
-        <Table style={{marginTop:'20px', textAlign:'center'}} 
-            columns={tableColumns} dataSource={tableData}
-            onRow={(record, rowIndex) => {
-                return {
-                    onClick: event => {
-                    setSelectedTableRow(record);
-                    }, // click row
-                };
-            }}
-        />
+            <Table style={{marginTop:'20px', textAlign:'center'}} 
+                columns={tableColumns} dataSource={tableData}
+                onRow={(record, rowIndex) => {
+                    return {
+                        onClick: event => {
+                        setSelectedTableRow(record);
+                        }, // click row
+                    };
+                }}
+            />
         </div>
       </PageHeaderWrapper>
     );
