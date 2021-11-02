@@ -1,3 +1,5 @@
+@import '~antd/lib/style/themes/default.less';
+
 @cardColor: #2f313583;
 @mainColor: #c4c4c4;
 
@@ -149,10 +151,10 @@
         width: 180px;
     }
     .ticketAllocation{
-        width: 200px;
+        width: 230px;
     }
     .tokenMarketCap{
-        width: 180px;
+        width: auto;
     }
 }
 
@@ -181,10 +183,10 @@
         width: 180px;
     }
     .totalTickets {
-        width: 200px;
+        width: 230px;
     }
     .tokenMaxAllo {
-        width: 180px;
+        width: auto;
     }
     
 }
@@ -426,4 +428,153 @@
     width: 100%;
     display: inline-block;
     align-items: center;
+}
+
+//tan
+.swapContainer{
+    width: 100%;
+    height: auto;
+    padding: 50px 50px;
+}
+.acycuarrencycard{
+  display: flex;
+  flex-flow: column nowrap;
+  position: relative;
+  border-radius: 20px;
+  background-color: rgb(44, 47, 54);
+  z-index: 1;
+  width: initial;
+  .cua_title{
+    font-size: 14px;
+    font-weight: 400;
+    color: #f3f3fc;
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .cua_body{
+    border-radius: 10px;
+    // border: 1px solid rgb(44, 47, 54);
+    background-color: #191B20;
+    width: initial;
+    // &:hover{
+    //   border: 1px solid rgb(64, 68, 79);
+    // }
+    .cua_group{
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      padding:1rem 1rem 0.75rem;
+      .switchcoin{
+        align-items: center;
+        font-size: 18px;
+        font-weight: 500;
+        background-color: #191B20;
+        color: rgb(255, 255, 255);
+        border-radius: 10px;
+        outline: none;
+        cursor: pointer;
+        user-select: none;
+        border: none;
+        height: 2.4rem;
+        width: initial;
+        padding: 0px 8px;
+        justify-content: space-between;
+        margin-right: 12px;
+        line-height: inherit;
+        &:hover{
+          cursor: pointer;
+          background-color: rgb(44, 47, 54);
+        }
+        .wrap{
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          box-sizing: border-box;
+          margin: 0px;
+          min-width: 0px;
+          .coin{
+            width: fit-content;
+            display: flex;
+            padding: 0px;
+            align-items: center;
+            justify-content: flex-start;
+           
+          }
+        }
+      }
+      :global{
+        input:focus{
+          outline:medium !important;
+        }
+      }
+      .input{
+        color: rgb(255, 255, 255);
+        width: 0px;
+        position: relative;
+        font-weight: 500;
+        outline: none;
+        border: none;
+        flex: 1 1 auto;
+        height: unset;
+        border: 0;
+        border-radius: 0;
+        background-color: #191B20;
+        font-size: 22px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 0px;
+        appearance: textfield;
+        text-align: right;
+      }
+    }
+    .cua_blanace{
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: right;
+      justify-content: right;
+      line-height: 1rem;
+      padding: 0px 1rem 1rem;
+      box-sizing: border-box;
+      margin: 0px;
+      min-width: 0px;
+      font-weight: 400;
+      font-size: 18px;
+      color: rgb(195, 197, 203);
+    }
+  }
+  .cua_light{
+    border: 1px solid #e29228;
+    &:hover{
+      cursor: pointer;
+      border: 1px solid #e29228;
+    }
+  }
+}
+
+.swap_button {
+    position: relative;
+    width: 100%;
+    padding: 15px;
+    font-size: 20px;
+    font-family: PingFang SC;
+    font-weight: 600;
+    color: #ffffff;
+    background: #7A2A2A;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 25px;
+    &:active {
+      background-color: #862e2e;
+    }
+  }
+.double_arrow {
+    margin: 12px auto;
+    text-align: center;
+    width: 25px;
+    height: auto;
 }
