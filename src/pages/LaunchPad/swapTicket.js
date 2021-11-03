@@ -24,21 +24,22 @@ const swapTicket = (props) => {
     <div>
       <div className={styles.swapContainer}>
         <SwapInput
+            title={"USDT"}
+
+            value={value? value * TICKETPRICE_USDT: ''}
+            token={'test'}
+          />
+        
+        <div className={styles.double_arrow}>
+          <img src={AcyIcon} />
+        </div>
+        <SwapInput
           title={"Ticket"}
           onChangeToken={ amount => {
             setValue(amount)
           }}
           value={value}
           TicketPrice={TICKETPRICE_ACY}
-        />
-        <div className={styles.double_arrow}>
-          <img src={AcyIcon} />
-        </div>
-        <SwapInput
-          title={"USDT"}
-
-          value={value? value * TICKETPRICE_USDT: ''}
-          token={'test'}
         />
         <div className={styles.swap_button}
           onClick={() => {

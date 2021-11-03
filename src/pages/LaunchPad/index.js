@@ -10,6 +10,8 @@ import hashtagIcon from '@/assets/icon_hashtag.png';
 import telegramIcon from '@/assets/icon_telegram_black.png';
 import styles from './styles.less';
 
+const ACY_PRICE = 0.2  // acy per usdc
+
 const LaunchpadComponent = () => {
     const links = [
         "https://google.com",
@@ -56,14 +58,14 @@ const LaunchpadComponent = () => {
             align: 'center'
         },
         {
-            title: 'Raise Size',
-            dataIndex: 'raiseSize',
+            title: 'Max Winning',
+            dataIndex: 'maxWinning',
             width: 100,
             align: 'center'
         },
         {
-            title: 'Quantities',
-            dataIndex: 'quantities',
+            title: 'Quantity',
+            dataIndex: 'quantity',
             width: 75,
             align: 'center'
         },
@@ -104,46 +106,52 @@ const LaunchpadComponent = () => {
           round: "Round 1",
           openDate: "2021-10-30",
           closeDate: "2021-11-01",
-          price: '0.05 USDC',
-          raiseSize: "1000000 ACY",
-          quantities: "25M",
-          marketCap:"10M",
-          maxAllocation: "10M",
+          price: ACY_PRICE.toString() + ' USDC',
+          maxWinning: "1000000 ACY",
+          quantity: 2500,
+          marketCap:"$10M",
           filled: "1379%",
           status: "Filled",
           yieldPer:"+223%",
           totalTickets: "82795 Tickets",
           perWinTicket: "100 USDC",
+          get maxAllocation() {
+              return this.quantity * ACY_PRICE;
+          }
         },
         {
           round: "Round 2",
           openDate: "2021-10-13",
           closeDate: "2021-10-20",
-          price: '0.10 USDC',
-          raiseSize: "1000000 ACY",
-          quantities: "25M",
-          marketCap:"20M",
-          maxAllocation: "10M",
+          price: ACY_PRICE.toString() + ' USDC',
+          maxWinning: "1000000 ACY",
+          quantity: 3000,
+          marketCap:"$20M",
           filled: "1579%",
           status: "Filled",
           yieldPer:"+203%",
           totalTickets: "82700 Tickets",
           perWinTicket: "110 USDC",
+          get maxAllocation() {
+            return this.quantity * ACY_PRICE;
+        }
         },
         {
           round: "Round 3",
           openDate: "2021-10-28",
           closeDate: "2021-11-03",
-          price: '0.15 USDC',
-          raiseSize: "1000000 ACY",
-          quantities: "25M",
-          marketCap:"30M",
-          maxAllocation: "10M",
+          price: ACY_PRICE.toString() + ' USDC',
+          maxWinning: "1000000 ACY",
+          quantity: 5000,
+          marketCap:"$30M",
           filled: "1379%",
           status: "Upcoming",
           yieldPer:"-",
           totalTickets: "82790 Tickets",
           perWinTicket: "111 USDC",
+          get maxAllocation() {
+            return this.quantity * ACY_PRICE;
+        }
         },
       ];
 
@@ -272,17 +280,18 @@ const LaunchpadComponent = () => {
                     <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={90} status='active' />
                 </div>
                 <div className={styles.tokenDetails}>
-                    <div className={styles.tokenTotalRaise}>                   
-                        <p style={token}>Raise Size</p>
-                        <h3 style={tokenContent}>{selectedTableRow.raiseSize}</h3>
-                    </div>
+                    
                     <div className={styles.tokenPrice}>                    
                         <p style={token}>Per ACY</p>
                         <h3 style={tokenContent}>{selectedTableRow.price}</h3>
                     </div>
                     <div className={styles.ticketAllocation}>    
-                        <p style={token}>Quantities</p>
-                        <h3 style={tokenContent}>{selectedTableRow.quantities}</h3> 
+                        <p style={token}>Quantity</p>
+                        <h3 style={tokenContent}>{selectedTableRow.quantity}</h3> 
+                    </div>
+                    <div className={styles.tokenTotalRaise}>                   
+                        <p style={token}>Max Winning</p>
+                        <h3 style={tokenContent}>{selectedTableRow.maxWinning}</h3>
                     </div>
                     <div className={styles.tokenMarketCap}>   
                         <p style={token}>Market Cap</p>
@@ -291,17 +300,13 @@ const LaunchpadComponent = () => {
                 </div>
                 <span className={styles.line}> </span>
                 <div className={styles.tokenMoreInfo}>
-                    <div className={styles.tokenRaiseSize}>                
-                        <p style={token}>Raise Size</p>
-                        <h3 style={tokenContent}>{selectedTableRow.raiseSize}</h3>
+                    <div className={styles.totalTickets}>                   
+                        <p style={token}>Allocation Per Winning Ticket</p>
+                        <h3 style={tokenContent}>{selectedTableRow.perWinTicket}</h3>
                     </div>
                     <div className={styles.tokenAmount}>                    
                         <p style={token}>Total Tickets Deposited</p>
                         <h3 style={tokenContent}>{selectedTableRow.totalTickets}</h3>
-                    </div>
-                    <div className={styles.totalTickets}>                   
-                        <p style={token}>Allocation Per Winning Ticket</p>
-                        <h3 style={tokenContent}>{selectedTableRow.perWinTicket}</h3>
                     </div>
                     <div className={styles.tokenMaxAllo}>              
                         <p style={token}>Max Allocation</p>
