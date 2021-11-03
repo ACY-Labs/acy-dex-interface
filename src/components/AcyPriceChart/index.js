@@ -140,6 +140,7 @@ const AcyPriceChart = (props) => {
         splitLine: {
           show: false,
         },
+        axisLabel: { color: "#b5b5b6"}
       },
       yAxis: {
         // show: false,
@@ -147,13 +148,14 @@ const AcyPriceChart = (props) => {
         splitLine: {
           show: true,
           lineStyle: {
-            color: "#757579",
-            type: "dashed"
+            color: "#29292c",
+            type: "solid"
           }
         },
         scale: true,
         axisTick: { show: false }, // 刻度
         axisLine: { show: false }, // 轴线
+        axisLabel: { color: "#b5b5b6"}
       },
       series: [
         {
