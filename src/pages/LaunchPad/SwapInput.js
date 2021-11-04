@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
-import { Card, Icon, Input, Row, Col } from 'antd';
+import { Divider, Card, Icon, Input, Row, Col } from 'antd';
 import AcyIcon from '@/components/AcyIcon';
 import styles from './styles.less';
 import Pattern from '@/utils/pattern';
+import AcyLogoIcon from '@/assets/icon_acy.svg';
+
 const SwapInput = ({
   title,
   onChoseToken,
   onChangeToken,
   value,
-  calAcy = false,
+  isInput = false,
   TicketPrice,
   ...rest
 }) => {
   const [light, setLight] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const onChange = e => {
     const check = Pattern.coinNum.test(e.target.value);
     if (check) { 
@@ -26,6 +29,9 @@ const SwapInput = ({
     setLight(true);
     inputRef.current.focus();
   };
+  const onChose = () => {
+
+  };
   const inputRef = React.createRef();
   return (
     <div
@@ -36,37 +42,51 @@ const SwapInput = ({
       onBlur={onBlur}
     >
       <div className={`${styles.cua_body} ${light && styles.cua_light}`}>
-        <div className={styles.cua_group}>
-          <button className={styles.switchcoin} onClick={onChoseToken}>
-            <span className={styles.wrap}>
-              <div className={styles.coin}>
-                {/* <img src={logoURI} style={{ width: '24px', marginRight: '0.5rem' }} /> */}
-                <span style={{ margin: '0px 0.25rem' }}>{title}</span>
+        <div className={styles.coinContainer}>
+          <div className={styles.cua_group}>
+            <div className={styles.switchcoin}>
+                <div className={styles.wrap}>
+                    <div className={styles.coin}>
+                      {  isInput && (
+                        <div>
+                          <img src='https://storageapi.fleek.co/chwizdo-team-bucket/ACY%20Token%20List/USDT.svg' style={{ width: '24px'}} />
+                          <span style={{ margin: '0px 0.25rem' }}>{title}</span>
+                        </div>
+                      )}
+
+                      {  !isInput && (
+                        <div>
+                          <div style={{ width: '24px', marginRight: '0.5rem' }}></div>
+                          <span style={{ margin: '0px 0.85rem' }}>{title}</span>
+                        </div>
+                      )}
+                    </div>
+                </div>            
               </div>
-              {/* <AcyIcon.MyIcon type="triangleGray" width={10} /> */}
-            </span>
-          </button>
-          <input
-            ref={inputRef}
-            disabled={!TicketPrice}
-            className={styles.input}
-            placeholder="0"
-            bordered={false}
-            value={value}
-            onChange={onChange}
-            onKeyPress={(event) => {
-              if (!/[0-9]/.test(event.key)) {
-                event.preventDefault();
-              }
-            }}
-          />
-        </div>
-        {
+            
+            <input
+              ref={inputRef}
+              disabled={!isInput}
+              className={styles.input}
+              placeholder="0"
+              bordered={false}
+              value={value}
+              onChange={onChange}
+            />
+          </div>
+          {
           TicketPrice && (
-            <div className={styles.cua_blanace}>{  value? TicketPrice * value:0 } ACY</div>
+            <div>
+            <div className={styles.cua_blanace}>
+              {  value? (TicketPrice * value * 100).toFixed(1):0 }
+              <span>&nbsp;</span>
+              ACY
+            </div>
+            
+            </div>
           )
         }
-        
+        </div>
       </div>
     </div>
   );
