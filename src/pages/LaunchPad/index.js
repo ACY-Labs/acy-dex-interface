@@ -35,6 +35,8 @@ function getTIMESTAMP(time) {
   }
   
 
+const ACY_PRICE = 0.2  // acy per usdc
+
 const LaunchpadComponent = () => {
 
     //let price = [];
@@ -137,91 +139,116 @@ const LaunchpadComponent = () => {
             title: 'Round',
             dataIndex: 'round',
             width: 80,
+            align: 'center'
         },
         {
             title: 'Date',
-            dataIndex: 'date',
+            dataIndex: 'openDate',
             className: 'column-date',
             width: 100,
+            align: 'center'
         },
         {
             title: 'Price',
             dataIndex: 'price',
             width: 70,
+            align: 'center'
         },
         {
-            title: 'Raise Size',
-            dataIndex: 'raiseSize',
+            title: 'Max Winning',
+            dataIndex: 'maxWinning',
             width: 100,
+            align: 'center'
         },
         {
-            title: 'Amount',
-            dataIndex: 'amount',
-            width: 60,
+            title: 'Quantity',
+            dataIndex: 'quantity',
+            width: 75,
+            align: 'center'
         },
         {
             title: 'Market Cap',
             dataIndex: 'marketCap',
             width: 100,
+            align: 'center'
         },
         {
             title: 'Max Allocation',
             dataIndex: 'maxAllocation',
             width: 100,
+            align: 'center'
         },
         {
             title: 'Filled',
             dataIndex: 'filled',
             width: 100,
+            align: 'center'
         },
         {
             title: 'Status',
             dataIndex: 'status',
             width: 100,
+            align: 'center'
         },
         {
             title: 'Yield',
             dataIndex: 'yieldPer',
             width: 100,
+            align: 'center'
         },
     ];
 
     const tableData = [
         {
           round: "Round 1",
-          date: "10-10-2021",
-          price: '0.05 USDC',
-          raiseSize: "1000000 ACY",
-          amount: "25M",
-          marketCap:"10M",
-          maxAllocation: "10M",
+          openDate: "2021-10-30",
+          closeDate: "2021-11-01",
+          price: ACY_PRICE.toString() + ' USDC',
+          maxWinning: "1000000 ACY",
+          quantity: 2500,
+          marketCap:"$10M",
           filled: "1379%",
           status: "Filled",
-          yieldPer:"+223%"
+          yieldPer:"+223%",
+          totalTickets: "82795 Tickets",
+          perWinTicket: "100 USDC",
+          get maxAllocation() {
+              return this.quantity * ACY_PRICE;
+          }
         },
         {
           round: "Round 2",
-          date: "17-10-2021",
-          price: '0.10 USDC',
-          raiseSize: "1000000 ACY",
-          amount: "25M",
-          marketCap:"20M",
-          maxAllocation: "10M",
+          openDate: "2021-10-13",
+          closeDate: "2021-10-20",
+          price: ACY_PRICE.toString() + ' USDC',
+          maxWinning: "1000000 ACY",
+          quantity: 3000,
+          marketCap:"$20M",
           filled: "1579%",
           status: "Filled",
-          yieldPer:"+203%"
+          yieldPer:"+203%",
+          totalTickets: "82700 Tickets",
+          perWinTicket: "110 USDC",
+          get maxAllocation() {
+            return this.quantity * ACY_PRICE;
+        }
         },
         {
           round: "Round 3",
-          date: "28-10-2021",
-          price: '0.15 USDC',
-          raiseSize: "1000000 ACY",
-          amount: "25M",
-          marketCap:"30M",
-          maxAllocation: "10M",
+          openDate: "2021-10-28",
+          closeDate: "2021-11-03",
+          price: ACY_PRICE.toString() + ' USDC',
+          maxWinning: "1000000 ACY",
+          quantity: 5000,
+          marketCap:"$30M",
           filled: "1379%",
           status: "Upcoming",
-          yieldPer:"-"
+          yieldPer:"-",
+          totalTickets: "82790 Tickets",
+          perWinTicket: "111 USDC",
+          get maxAllocation() {
+            return this.quantity * ACY_PRICE;
+        }
         },
       ];
 
@@ -270,6 +297,7 @@ const LaunchpadComponent = () => {
 
     const [showForm, setShowForm] = useState(false)
     const [selectedTab, setSelectedTab] = useState(0);
+    const [selectedTableRow, setSelectedTableRow] = useState(tableData[0]);
 
     const onWhitelistToggleButtonClick = () => {
         setSelectedTab(1);
@@ -331,70 +359,62 @@ const LaunchpadComponent = () => {
         </div>
         <div className={styles.midContainer}>
             <div className={styles.tokenInfoBox}>
-                <div className={styles.tokenInfoBoxTop}>
-                    <div className={styles.tokenSym}>
-                        <h2 style={{fontWeight:'bold'}}>Round 1</h2>
-                        <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
-                        <h2 className={styles.tokenName}> ACY </h2>
-                    </div>
-                    <div className={styles.tokenIDODate}>
-                        <h3 style={{color:'#fff', marginTop: '20px'}}>Open: 2021-10-31 10:00 UST</h3>
-                        <h3 style={{color:'#fff'}}>Close: 2021-11-01 10:00 UST</h3>
-                    </div>
-                    <div className={styles.tokenIDOStatus}>
-                        <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', marginTop:'25px', textAlign:'center', fontSize:'18px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
+                <div className={styles.tokenInfoContainer }>
+                    <h2 style={{fontWeight:'bold'}}>{selectedTableRow.round}</h2>
+                    <div className={styles.tokenInfoBoxTop}>
+                        <div className={styles.tokenSym}>
+                            <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
+                            <h2 style={{color:'#eb5c20'}} className={styles.tokenName}> ACY </h2>
+                        </div>
+                        <div className={styles.tokenIDODate}>
+                            <h4 style={{color:'#fff'}}>Open: {selectedTableRow.openDate} 10:00 UST</h4>
+                            <h4 style={{color:'#fff'}}>Close: {selectedTableRow.closeDate} 10:00 UST</h4>
+                        </div>
+                        <div className={styles.tokenIDOStatus}>
+                            <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', textAlign:'center', fontSize:'18px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
+                        </div>
                     </div>
                 </div>
                 <div className={styles.tokenProgress}>
                     <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={90} status='active' />
                 </div>
                 <div className={styles.tokenDetails}>
-                    <div className={styles.tokenTotalRaise}>                   
-                        <p style={token}>Raise Size</p>
-                        <h3 style={tokenContent}>30,000,000 ACY</h3>
-                    </div>
+                    
                     <div className={styles.tokenPrice}>                    
                         <p style={token}>Per ACY</p>
-                        <h3 style={tokenContent}>0.02 USDC</h3>
+                        <h3 style={tokenContent}>{selectedTableRow.price}</h3>
                     </div>
                     <div className={styles.ticketAllocation}>    
-                        <p style={token}>Amount</p>
-                        <h3 style={tokenContent}>25000000</h3> 
+                        <p style={token}>Quantity</p>
+                        <h3 style={tokenContent}>{selectedTableRow.quantity}</h3> 
+                    </div>
+                    <div className={styles.tokenTotalRaise}>                   
+                        <p style={token}>Max Winning</p>
+                        <h3 style={tokenContent}>{selectedTableRow.maxWinning}</h3>
                     </div>
                     <div className={styles.tokenMarketCap}>   
                         <p style={token}>Market Cap</p>
-                        <h3 style={tokenContent}>10M</h3>             
+                        <h3 style={tokenContent}>{selectedTableRow.marketCap}</h3>             
                     </div>
                 </div>
                 <span className={styles.line}> </span>
                 <div className={styles.tokenMoreInfo}>
-                    <div className={styles.tokenRaiseSize}>                
-                        <p style={token}>Raise Size</p>
-                        <h3 style={tokenContent}>30,000,000 ACY</h3>
+                    <div className={styles.totalTickets}>                   
+                        <p style={token}>Allocation Per Winning Ticket</p>
+                        <h3 style={tokenContent}>{selectedTableRow.perWinTicket}</h3>
                     </div>
                     <div className={styles.tokenAmount}>                    
                         <p style={token}>Total Tickets Deposited</p>
-                        <h3 style={tokenContent}>82795 Tickets</h3>
-                    </div>
-                    <div className={styles.totalTickets}>                   
-                    <p style={token}>Allocation Per Winning Ticket</p>
-                        <h3 style={tokenContent}>100 USDC</h3>
+                        <h3 style={tokenContent}>{selectedTableRow.totalTickets}</h3>
                     </div>
                     <div className={styles.tokenMaxAllo}>              
                         <p style={token}>Max Allocation</p>
-                        <h3 style={tokenContent}>Lottery</h3>
-                    </div>
+                        <h3 style={tokenContent}>{selectedTableRow.maxAllocation}</h3>
+                    </div> 
                 </div>
             </div>
             
             <div className={styles.ticketBox}>
-                <div className={styles.ticketDescription}>
-                    <ToggleButton 
-                      selectedTab={selectedTab}
-                      onWhitelistToggleButtonClick={onWhitelistToggleButtonClick}
-                      onParticipateToggleButtonClick={onParticipateToggleButtonClick}
-                    />
-                </div>
                 { !showForm ? (
                 <div className={styles.showTicketContainer}>
                     <div className={styles.showTicketBox}>
@@ -430,7 +450,16 @@ const LaunchpadComponent = () => {
             
         </div>
         <div className={styles.dateTableBox}>
-            <Table style={{marginTop:'20px', textAlign:'center'}} columns={tableColumns} dataSource={tableData} />
+            <Table style={{marginTop:'20px', textAlign:'center'}} 
+                columns={tableColumns} dataSource={tableData}
+                onRow={(record, rowIndex) => {
+                    return {
+                        onClick: event => {
+                        setSelectedTableRow(record);
+                        }, // click row
+                    };
+                }}
+            />
         </div>
             </PageHeaderWrapper>
         );
