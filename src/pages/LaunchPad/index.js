@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-indent */
-import React, {useState} from 'react';
 import {Button, Menu, Dropdown, Icon, Progress, Tag, Table} from 'antd';
 import InputEmail from "./inputEmail";
 import ToggleButton from "./ToggleButton";
@@ -9,8 +8,114 @@ import AcyIcon from '@/assets/icon_acy.svg';
 import hashtagIcon from '@/assets/icon_hashtag.png';
 import telegramIcon from '@/assets/icon_telegram_black.png';
 import styles from './styles.less';
+import { useWeb3React } from '@web3-react/core';
+import { InjectedConnector } from '@web3-react/injected-connector';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import ERC20ABI from '@/abis/ERC20.json';
+import WETHABI from '@/abis/WETH.json';
+import Eth from "web3-eth";
+import Utils from "web3-utils";
+var Contract = require('web3-eth-contract');
+// set provider for all later instances to use
+var eth = new Eth('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
+Contract.setProvider('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
+
+function getTIMESTAMP(time) {
+    var date = new Date(time);
+    var year = date.getFullYear(time);
+    var month = ("0" + (date.getMonth(time) + 1)).substr(-2);
+    var day = ("0" + date.getDate(time)).substr(-2);
+    var hour = ("0" + date.getHours(time)).substr(-2);
+    var minutes = ("0" + date.getMinutes(time)).substr(-2);
+    var seconds = ("0" + date.getSeconds(time)).substr(-2);
+  
+    //return year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + seconds;
+    return year + "-" + month + "-" + day;
+
+  }
+  
 
 const LaunchpadComponent = () => {
+
+    //let price = [];
+    const recordNum = 10;
+    const [price,setPrice] = useState([]);
+    const [chardData,setChartData] = useState([]);
+    const [timeData,setTimeData] = useState([]);
+    const [pendingEnd,setPending]= useState(false);
+    const [fetchEnd,setFetchEnd] = useState(false);
+
+    const getTime = async (blockNumber) => {
+
+        const result = await eth.getBlock(blockNumber).then(function(events){
+
+        const timeStamp = events['timestamp'];
+       // const time = new Date(timeStamp * 1000).toISOString().slice(0, 19).replace('T', ' ')
+        //console.log(time);
+        const time = getTIMESTAMP(timeStamp*1000);
+
+        return time;
+        })
+        
+        return result;
+        }                
+
+    useEffect(async() =>{
+         // price = [[blockNumber,value]]
+        //calculate the time then finally get  Time:value array
+
+        var index = price.length-1;
+        if(price[index] != undefined)
+        {
+        getTime(price[index][0]).then(function(result){
+            var newElement = [result,price[index][1]];
+            setTimeData( timeData => [...timeData,newElement]);
+        })
+        }
+
+
+    }
+    ,[price])
+    useEffect( async () => {
+        // set provider for all later instances to use    
+        const contract = new Contract(ERC20ABI, '0xaf9db9e362e306688af48c4acb9618c06db38ac3');
+            console.log("test");
+
+
+        const result = (contract.getPastEvents("Transfer", {
+            fromBlock: 0 ,
+            toBlock: 'latest'
+        }, function(error, events){ console.log(events); })
+        .then(function(events){
+            console.log(events.length) // same results as the optional callback above
+            // remaining some bug in some case ( if recodrNum > events.length)
+            for (let i = events.length  - recordNum; i < events.length; i++) {
+                var element = events[i];
+                var returnValue = element['returnValues'];
+                var blockNumber = element['blockNumber'];
+                //price.push([blockNumber,returnValue['value']/1e18]);
+                var newElement = [blockNumber,returnValue['value']/1e18];
+                //console.log(newElement)
+                setPrice( price => [...price,newElement] );
+
+            }
+        }));
+   
+
+    
+    
+ 
+    },[])
+      
+
+    useEffect(async() =>{
+        if(timeData.length >= 10)
+        {
+            console.log(timeData);
+            setChartData(timeData);
+        }
+    },[timeData])
+
     const links = [
         "https://google.com",
         "https://youtube.com",
@@ -21,20 +126,12 @@ const LaunchpadComponent = () => {
         "https://www.linkedin.com/company/acy-finance/"
     ];
 
-    const chartData = {
-        price: [
-            ['20:00', 5000],
-            ['20:05', 6500],
-            ['20:10', 7800],
-            ['20:15', 15000],
-            ['20:20', 23000],
-            ['20:25', 42000],
-            ['20:30', 51000],
-            ['20:35', 58000],
-            ['20:40', 65000]
-        ],
-    }
 
+    const testdata = [
+        ['999991',1],
+        ['9999992',2],
+        ['99999999993',3]
+    ]
     const tableColumns = [
         {
             title: 'Round',
@@ -182,8 +279,8 @@ const LaunchpadComponent = () => {
         setSelectedTab(2);
     };
 
-    return(
-      <PageHeaderWrapper>
+        return(
+            <PageHeaderWrapper>
         <div className={styles.topContainer}>
             <div className={styles.tokenContainer}> 
                 <div className={styles.snsBox1}>
@@ -221,8 +318,10 @@ const LaunchpadComponent = () => {
             
             <div className={styles.chartWrapper}>
                 <AcyLineChart
-                    data={chartData.price}
+                    
+                    data={chardData}
                     showXAxis={true}
+                    showYAxis={true}
                     showGradient={true}
                     lineColor="#e29227"
                     bgColor="#2f313500"
@@ -333,8 +432,8 @@ const LaunchpadComponent = () => {
         <div className={styles.dateTableBox}>
             <Table style={{marginTop:'20px', textAlign:'center'}} columns={tableColumns} dataSource={tableData} />
         </div>
-      </PageHeaderWrapper>
-    );
+            </PageHeaderWrapper>
+        );
 }
 
 export default LaunchpadComponent
