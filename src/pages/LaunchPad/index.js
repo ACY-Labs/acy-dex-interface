@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-indent */
-import React, {useState} from 'react';
 import {Button, Menu, Dropdown, Icon, Progress, Tag, Table} from 'antd';
 import FollowTelegram from "./FollowTelegram";
 import ToggleButton from "./ToggleButton";
@@ -9,8 +8,116 @@ import AcyIcon from '@/assets/icon_acy.svg';
 import hashtagIcon from '@/assets/icon_hashtag.png';
 import telegramIcon from '@/assets/icon_telegram_black.png';
 import styles from './styles.less';
+import { useWeb3React } from '@web3-react/core';
+import { InjectedConnector } from '@web3-react/injected-connector';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import ERC20ABI from '@/abis/ERC20.json';
+import WETHABI from '@/abis/WETH.json';
+import Eth from "web3-eth";
+import Utils from "web3-utils";
+var Contract = require('web3-eth-contract');
+// set provider for all later instances to use
+var eth = new Eth('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
+Contract.setProvider('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
+
+function getTIMESTAMP(time) {
+    var date = new Date(time);
+    var year = date.getFullYear(time);
+    var month = ("0" + (date.getMonth(time) + 1)).substr(-2);
+    var day = ("0" + date.getDate(time)).substr(-2);
+    var hour = ("0" + date.getHours(time)).substr(-2);
+    var minutes = ("0" + date.getMinutes(time)).substr(-2);
+    var seconds = ("0" + date.getSeconds(time)).substr(-2);
+  
+    //return year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + seconds;
+    return year + "-" + month + "-" + day;
+
+  }
+  
+
+const ACY_PRICE = 0.2  // acy per usdc
 
 const LaunchpadComponent = () => {
+
+    //let price = [];
+    const recordNum = 10;
+    const [price,setPrice] = useState([]);
+    const [chardData,setChartData] = useState([]);
+    const [timeData,setTimeData] = useState([]);
+    const [pendingEnd,setPending]= useState(false);
+    const [fetchEnd,setFetchEnd] = useState(false);
+
+    const getTime = async (blockNumber) => {
+
+        const result = await eth.getBlock(blockNumber).then(function(events){
+
+        const timeStamp = events['timestamp'];
+       // const time = new Date(timeStamp * 1000).toISOString().slice(0, 19).replace('T', ' ')
+        //console.log(time);
+        const time = getTIMESTAMP(timeStamp*1000);
+
+        return time;
+        })
+        
+        return result;
+        }                
+
+    useEffect(async() =>{
+         // price = [[blockNumber,value]]
+        //calculate the time then finally get  Time:value array
+
+        var index = price.length-1;
+        if(price[index] != undefined)
+        {
+        getTime(price[index][0]).then(function(result){
+            var newElement = [result,price[index][1]];
+            setTimeData( timeData => [...timeData,newElement]);
+        })
+        }
+
+
+    }
+    ,[price])
+    useEffect( async () => {
+        // set provider for all later instances to use    
+        const contract = new Contract(ERC20ABI, '0xaf9db9e362e306688af48c4acb9618c06db38ac3');
+            console.log("test");
+
+
+        const result = (contract.getPastEvents("Transfer", {
+            fromBlock: 0 ,
+            toBlock: 'latest'
+        }, function(error, events){ console.log(events); })
+        .then(function(events){
+            console.log(events.length) // same results as the optional callback above
+            // remaining some bug in some case ( if recodrNum > events.length)
+            for (let i = events.length  - recordNum; i < events.length; i++) {
+                var element = events[i];
+                var returnValue = element['returnValues'];
+                var blockNumber = element['blockNumber'];
+                //price.push([blockNumber,returnValue['value']/1e18]);
+                var newElement = [blockNumber,returnValue['value']/1e18];
+                //console.log(newElement)
+                setPrice( price => [...price,newElement] );
+
+            }
+        }));
+   
+
+    
+    
+ 
+    },[])
+      
+
+    useEffect(async() =>{
+        if(timeData.length >= 10)
+        {
+            console.log(timeData);
+            setChartData(timeData);
+        }
+    },[timeData])
+
     const links = [
         "https://google.com",
         "https://youtube.com",
@@ -21,20 +128,12 @@ const LaunchpadComponent = () => {
         "https://www.linkedin.com/company/acy-finance/"
     ];
 
-    const chartData = {
-        price: [
-            ['20:00', 5000],
-            ['20:05', 6500],
-            ['20:10', 7800],
-            ['20:15', 15000],
-            ['20:20', 23000],
-            ['20:25', 42000],
-            ['20:30', 51000],
-            ['20:35', 58000],
-            ['20:40', 65000]
-        ],
-    }
 
+    const testdata = [
+        ['999991',1],
+        ['9999992',2],
+        ['99999999993',3]
+    ]
     const tableColumns = [
         {
             title: 'Round',
@@ -56,14 +155,14 @@ const LaunchpadComponent = () => {
             align: 'center'
         },
         {
-            title: 'Raise Size',
-            dataIndex: 'raiseSize',
+            title: 'Max Winning',
+            dataIndex: 'maxWinning',
             width: 100,
             align: 'center'
         },
         {
-            title: 'Quantities',
-            dataIndex: 'quantities',
+            title: 'Quantity',
+            dataIndex: 'quantity',
             width: 75,
             align: 'center'
         },
@@ -102,48 +201,54 @@ const LaunchpadComponent = () => {
     const tableData = [
         {
           round: "Round 1",
-          openDate: "10-10-2021",
-          closeDate: "10-10-2021",
-          price: '0.05 USDC',
-          raiseSize: "1000000 ACY",
-          quantities: "25M",
-          marketCap:"10M",
-          maxAllocation: "10M",
+          openDate: "2021-10-30",
+          closeDate: "2021-11-01",
+          price: ACY_PRICE.toString() + ' USDC',
+          maxWinning: "1000000 ACY",
+          quantity: 2500,
+          marketCap:"$10M",
           filled: "1379%",
           status: "Filled",
           yieldPer:"+223%",
           totalTickets: "82795 Tickets",
           perWinTicket: "100 USDC",
+          get maxAllocation() {
+              return this.quantity * ACY_PRICE;
+          }
         },
         {
           round: "Round 2",
-          openDate: "17-10-2021",
-          closeDate: "17-11-2021",
-          price: '0.10 USDC',
-          raiseSize: "1000000 ACY",
-          quantities: "25M",
-          marketCap:"20M",
-          maxAllocation: "10M",
+          openDate: "2021-10-13",
+          closeDate: "2021-10-20",
+          price: ACY_PRICE.toString() + ' USDC',
+          maxWinning: "1000000 ACY",
+          quantity: 3000,
+          marketCap:"$20M",
           filled: "1579%",
           status: "Filled",
           yieldPer:"+203%",
           totalTickets: "82700 Tickets",
           perWinTicket: "110 USDC",
+          get maxAllocation() {
+            return this.quantity * ACY_PRICE;
+        }
         },
         {
           round: "Round 3",
-          openDate: "28-10-2021",
-          closeDate: "28-11-2021",
-          price: '0.15 USDC',
-          raiseSize: "1000000 ACY",
-          quantities: "25M",
-          marketCap:"30M",
-          maxAllocation: "10M",
+          openDate: "2021-10-28",
+          closeDate: "2021-11-03",
+          price: ACY_PRICE.toString() + ' USDC',
+          maxWinning: "1000000 ACY",
+          quantity: 5000,
+          marketCap:"$30M",
           filled: "1379%",
           status: "Upcoming",
           yieldPer:"-",
           totalTickets: "82790 Tickets",
           perWinTicket: "111 USDC",
+          get maxAllocation() {
+            return this.quantity * ACY_PRICE;
+        }
         },
       ];
 
@@ -202,8 +307,8 @@ const LaunchpadComponent = () => {
         setSelectedTab(2);
     };
 
-    return(
-      <PageHeaderWrapper>
+        return(
+            <PageHeaderWrapper>
         <div className={styles.topContainer}>
             <div className={styles.tokenContainer}> 
                 <div className={styles.snsBox1}>
@@ -241,8 +346,10 @@ const LaunchpadComponent = () => {
             
             <div className={styles.chartWrapper}>
                 <AcyLineChart
-                    data={chartData.price}
+                    
+                    data={chardData}
                     showXAxis={true}
+                    showYAxis={true}
                     showGradient={true}
                     lineColor="#e29227"
                     bgColor="#2f313500"
@@ -253,15 +360,15 @@ const LaunchpadComponent = () => {
         <div className={styles.midContainer}>
             <div className={styles.tokenInfoBox}>
                 <div className={styles.tokenInfoContainer }>
-                    <h2 style={{fontWeight:'bold',color:'#eb5c20'}}>{selectedTableRow.round}</h2>
+                    <h2 style={{fontWeight:'bold'}}>{selectedTableRow.round}</h2>
                     <div className={styles.tokenInfoBoxTop}>
                         <div className={styles.tokenSym}>
                             <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
                             <h2 style={{color:'#eb5c20'}} className={styles.tokenName}> ACY </h2>
                         </div>
                         <div className={styles.tokenIDODate}>
-                            <h4 style={{color:'#fff'}}>Open: {selectedTableRow.openDate}</h4>
-                            <h4 style={{color:'#fff'}}>Close: {selectedTableRow.closeDate}</h4>
+                            <h4 style={{color:'#fff'}}>Open: {selectedTableRow.openDate} 10:00 UST</h4>
+                            <h4 style={{color:'#fff'}}>Close: {selectedTableRow.closeDate} 10:00 UST</h4>
                         </div>
                         <div className={styles.tokenIDOStatus}>
                             <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', textAlign:'center', fontSize:'18px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
@@ -272,17 +379,18 @@ const LaunchpadComponent = () => {
                     <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={90} status='active' />
                 </div>
                 <div className={styles.tokenDetails}>
-                    <div className={styles.tokenTotalRaise}>                   
-                        <p style={token}>Raise Size</p>
-                        <h3 style={tokenContent}>{selectedTableRow.raiseSize}</h3>
-                    </div>
+                    
                     <div className={styles.tokenPrice}>                    
                         <p style={token}>Per ACY</p>
                         <h3 style={tokenContent}>{selectedTableRow.price}</h3>
                     </div>
                     <div className={styles.ticketAllocation}>    
-                        <p style={token}>Quantities</p>
-                        <h3 style={tokenContent}>{selectedTableRow.quantities}</h3> 
+                        <p style={token}>Quantity</p>
+                        <h3 style={tokenContent}>{selectedTableRow.quantity}</h3> 
+                    </div>
+                    <div className={styles.tokenTotalRaise}>                   
+                        <p style={token}>Max Winning</p>
+                        <h3 style={tokenContent}>{selectedTableRow.maxWinning}</h3>
                     </div>
                     <div className={styles.tokenMarketCap}>   
                         <p style={token}>Market Cap</p>
@@ -291,22 +399,18 @@ const LaunchpadComponent = () => {
                 </div>
                 <span className={styles.line}> </span>
                 <div className={styles.tokenMoreInfo}>
-                    <div className={styles.tokenRaiseSize}>                
-                        <p style={token}>Raise Size</p>
-                        <h3 style={tokenContent}>{selectedTableRow.raiseSize}</h3>
+                    <div className={styles.totalTickets}>                   
+                        <p style={token}>Allocation Per Winning Ticket</p>
+                        <h3 style={tokenContent}>{selectedTableRow.perWinTicket}</h3>
                     </div>
                     <div className={styles.tokenAmount}>                    
                         <p style={token}>Total Tickets Deposited</p>
                         <h3 style={tokenContent}>{selectedTableRow.totalTickets}</h3>
                     </div>
-                    <div className={styles.totalTickets}>                   
-                    <p style={token}>Allocation Per Winning Ticket</p>
-                        <h3 style={tokenContent}>{selectedTableRow.perWinTicket}</h3>
-                    </div>
                     <div className={styles.tokenMaxAllo}>              
                         <p style={token}>Max Allocation</p>
                         <h3 style={tokenContent}>{selectedTableRow.maxAllocation}</h3>
-                    </div>
+                    </div> 
                 </div>
             </div>
             
@@ -357,8 +461,8 @@ const LaunchpadComponent = () => {
                 }}
             />
         </div>
-      </PageHeaderWrapper>
-    );
+            </PageHeaderWrapper>
+        );
 }
 
 export default LaunchpadComponent

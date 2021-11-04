@@ -1,3 +1,5 @@
+@import '~antd/lib/style/themes/default.less';
+
 @cardColor: #2f313583;
 @mainColor: #c4c4c4;
 
@@ -142,35 +144,52 @@
     display: flex;
     padding: 15px 0;
     justify-content: left;
-    .tokenTotalRaise{
-        margin-left: 47px;
-    }
     .tokenPrice{
         margin-left: 47px;
+        width: 220px;
+    }
+    .tokenTotalRaise{
+        width: 180px;
     }
     .ticketAllocation{
-        margin-left: 108px;
+        width: 180px;
     }
     .tokenMarketCap{
-        margin-left: 150px;
+        width: auto;
     }
 }
 
 .tokenMoreInfo{
+    // width: 100%;
+    // max-height: 700px;
+    // padding: 15px 0;
+    // box-sizing: border-box;
+    // overflow: hidden;
+    // position: relative;
+    // margin-top: 10px;
+    // display: flex;
+    // justify-content: left;
     width: 100%;
-    max-height: 700px;
-    padding: 20px 0;
-    box-sizing: border-box;
-    overflow: hidden;
-    position: relative;
-    margin-top: 10px;
+    height: 700px;
     display: flex;
-    justify-content: space-evenly;
-    .tokenRaiseSize .tokenAmount .totalTickets .tokenMaxAllo .tokenShowPrice{
-        width: auto;
-        padding: 15px;
-        height: auto;
+    padding: 15px 0;
+    justify-content: left;
+    margin-top: 15px;
+    .totalTickets {
+        margin-left: 47px;
+        width: 220px;
     }
+    .tokenRaiseSize {
+        width: 180px;
+    } 
+    .tokenAmount {
+        width: 180px;
+    }
+    
+    .tokenMaxAllo {
+        width: auto;
+    }
+    
 }
 
 .leftToggleButton {
@@ -442,6 +461,177 @@
     align-items: center;
 }
 
+<<<<<<< HEAD
 #nextPage:hover{
     cursor: pointer;
 }
+=======
+//tan
+.swapContainer{
+    width: 100%;
+    height: auto;
+    padding: 50px 50px;
+}
+.acycuarrencycard{
+  display: flex;
+  flex-flow: column nowrap;
+//   position: relative;
+  border-radius: 20px;
+  background-color: rgb(44, 47, 54);
+  width: initial;
+//   z-index: 1;
+
+
+  .cua_title{
+    font-size: 14px;
+    font-weight: 400;
+    color: #f3f3fc;
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .cua_body{
+    border-radius: 10px;
+    // border: 1px solid rgb(44, 47, 54);
+    background-color: #191B20;
+    width: initial;
+    height: 80px;
+    position: relative;
+  }
+.coinContainer {
+    padding-left: 30px;
+    padding-right: 15px;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+    width: 100%;
+}
+
+  .cua_group{
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    .switchcoin{
+      align-items: center;
+      font-size: 18px;
+      font-weight: 500;
+      color: rgb(255, 255, 255);
+      border-radius: 10px;
+      outline: none;
+      cursor: pointer;
+      user-select: none;
+      border: none;
+      // height: 2.4rem;
+      width: initial;
+      justify-content: space-between;
+      line-height: inherit;
+      .wrap{
+        display: flex;
+        // padding: 5px;
+        text-align: center;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        box-sizing: border-box;
+        .coin{
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: left;
+         
+        }
+      }
+    }
+    :global{
+      input:focus{
+        outline:medium !important;
+      }
+    }
+    .input{
+      color: rgb(255, 255, 255);
+      width: auto;
+      font-weight: 500;
+      outline: none;
+      border: none;
+      flex: 1 1 auto;
+      height: unset;
+      border: 0;
+      border-radius: 0;
+      background-color: #191B20;
+      font-size: 22px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      appearance: textfield;
+      text-align: right;
+    }
+  }
+  .cua_blanace{
+    //   background-color: #e29228;
+      text-align: right;
+      font-weight: 400;
+      font-size: 14px;
+      color: rgb(195, 197, 203);
+  }
+  .cua_light{
+    border: 1px solid #e29228;
+    &:hover{
+      cursor: pointer;
+      border: 1px solid #e29228;
+    }
+  }
+}
+
+.swap_button {
+    position: relative;
+    width: 100%;
+    padding: 15px;
+    font-size: 20px;
+    font-family: PingFang SC;
+    font-weight: 600;
+    color: #ffffff;
+    background: #7A2A2A;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 25px;
+    &:active {
+      background-color: #862e2e;
+    }
+  }
+.double_arrow {
+    margin: 12px auto;
+    text-align: center;
+    width: 25px;
+    height: auto;
+}
+
+.dropdown {
+    width: 100%;
+    position: relative;
+    z-index: 10;
+    border: 1px solid #e29228;
+    background-color: #191B20;
+    border-radius: 10px;
+    // box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14);
+    .token {
+        // cursor: pointer;
+        // background-color: rgb(44, 47, 54);
+        padding: 7px 10px;
+        border-radius: 10px;
+        &:hover{
+            cursor: pointer;
+            background-color: rgb(44, 47, 54);
+        }
+    }
+    
+  }
+.searchModalDivider {
+    background-color: #666666;
+    border-bottom: 2px solid black;
+    display: block;
+    margin: 0 8px 0 8px;
+    
+}
+//style={{ width: '100%', position: 'relative', zIndex: 10, padding: '10px'}}
+>>>>>>> 0335a68174ee9d8238df76cab21395491d3c7b3c
