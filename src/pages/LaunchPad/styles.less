@@ -96,12 +96,12 @@
 }
 
 .tokenInfoBox{
-    width: 59%;
-    height: 450px;
+    width: 60%;
+    height: auto;
     // padding: 20px 30px ;
-    background-color: @cardColor;
+    background-color: #1b1b1c;
     box-sizing: border-box;
-    border-radius: 10px;
+    border-radius: 10px 0 0 10px;
     overflow: hidden;
     position: relative;
     display: inline-block;
@@ -119,12 +119,13 @@
 .tokenInfoContainer {
     width: 100%;
     height: auto;
-    padding: 20px 30px ;
+    padding: 20px 30px 0 30px ;
+    margin-bottom: 10px;
     justify-content: left;
 }
 
 .line{
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid #2e3032;
     display: block;
     margin: 0 8px 0 8px;
 }
@@ -224,7 +225,7 @@
   width: 10em;
   height: 40px;
   color: #fff;
-  margin-top: 20px;
+  margin: 30px 0px 20px 30px;
   padding: 0.25rem 1.25rem;
   // border-radius: 0.25rem 0 0 0.25rem;
   margin-right: 0;
@@ -243,7 +244,7 @@
 .tokenProgress{
     width: 100%;
     height: auto;
-    padding: 15px;
+    padding: 0 15px 15px 15px;
     display: inline-block;
     :global{
         .ant-progress-text{
@@ -254,10 +255,10 @@
 
 .ticketBox{
     width: 40%;
-    height: 450px;
-    background-color: @cardColor;
+    height: auto;
+    background-color: #0e0304;
     box-sizing: border-box;
-    border-radius: 10px;
+    border-radius: 0 10px 10px 0;
     display: flex;
     flex-direction: column;
 }
@@ -315,12 +316,31 @@
 }
 
 .dateTableBox{
-    width: 100%;
-    height: auto;
-    
-    :global {
+    :global{
+        .ant-table-placeholder{
+        background: transparent !important;
+        }
+        .ant-table-thead > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-tbody > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-thead > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-tbody > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td {
+        // background:  transparent !important;
+        cursor: pointer;
+        }
+        .ant-table-thead > tr{
+        background:  transparent !important;
+        }
+        .ant-table-tbody > tr{
+        background:  transparent !important;
+        }
         .ant-table-thead > tr > th:not(.leftAlignTableHeader){
-            text-align: center !important;
+        text-align: center !important;
+        background:  transparent !important;
+        }
+        .ant-table-footer{
+        background:  transparent !important;
+        }
+        .ant-table-tbody > tr{
+        &:active{
+            background: #2f3135  !important;
+        }
         }
     }
 }
@@ -341,25 +361,34 @@
     .emailBox{
         width: 100%;
         height: auto;
-        padding: 20px;
-        margin-top: 5em;
         display: flex;
-        flex-direction: column;
-        justify-content: center;
+        justify-content: space-around;
     }
-    
+}
+.emailButtonBox{
+    width:100%;
+    height: auto;
+    display: inline-block;
+    .emailPreviousButton{
+        min-width: 60px;
+        max-width: 60px;
+        margin: 0 120px;
+        transform: rotate(-180deg);
+    }
+    .emailPreviousButton:hover{
+        cursor: pointer;
+        opacity: 80%;
+    }
     .emailSubmitButton{
         min-width: 60px;
         max-width: 60px;
-        margin-left: 40px;
+        margin-left: 35px;
     }
-    
     .emailSubmitButton:hover{
         cursor: pointer;
         opacity: 80%;
     }
 }
-
 
 
 // telegram box
@@ -369,6 +398,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    border-radius: 0 10px 10px 0;
 }
 
 .telegramContainer{
@@ -389,12 +419,13 @@
     }
 }
 
-
-
 .extraContainer{
     float: right ;
 }
 
+.loginForm{
+    max-width: 200px;
+}
 #themeBox{
     width: 50px;
     color: white;
@@ -409,4 +440,8 @@
     width: 100%;
     display: inline-block;
     align-items: center;
+}
+
+#nextPage:hover{
+    cursor: pointer;
 }
