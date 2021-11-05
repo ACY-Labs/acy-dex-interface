@@ -4,6 +4,8 @@ import { Button, Icon, Row } from 'antd';
 import SwapTicket from "./swapTicket";
 import styles from "./styles.less";
 import AntCollapse from './CustomCollapse';
+import stepComponent from"./stepComponent";
+
 
 const FollowTelegram = () => {
   const [clicked, setClicked] = useState(true);  

@@ -15,6 +15,9 @@ import ERC20ABI from '@/abis/ERC20.json';
 import WETHABI from '@/abis/WETH.json';
 import Eth from "web3-eth";
 import Utils from "web3-utils";
+import SwapTicket from "./swapTicket";
+import StepBar from './stepComponent';
+
 var Contract = require('web3-eth-contract');
 // set provider for all later instances to use
 var eth = new Eth('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
@@ -42,7 +45,7 @@ const LaunchpadComponent = () => {
     //let price = [];
     const recordNum = 10;
     const [price,setPrice] = useState([]);
-    const [chardData,setChartData] = useState([]);
+    const [chartData,setChartData] = useState([]);
     const [timeData,setTimeData] = useState([]);
     const [pendingEnd,setPending]= useState(false);
     const [fetchEnd,setFetchEnd] = useState(false);
@@ -309,6 +312,7 @@ const LaunchpadComponent = () => {
 
         return(
             <PageHeaderWrapper>
+                
         <div className={styles.topContainer}>
             <div className={styles.tokenContainer}> 
                 <div className={styles.snsBox1}>
@@ -344,17 +348,11 @@ const LaunchpadComponent = () => {
             </div>
             
             
-            <div className={styles.chartWrapper}>
-                <AcyLineChart
-                    
-                    data={chardData}
-                    showXAxis={true}
-                    showYAxis={true}
-                    showGradient={true}
-                    lineColor="#e29227"
-                    bgColor="#2f313500"
-                />
+            
+            <div >
+            <StepBar chartData = {chartData}/>
             </div>
+
             
         </div>
         <div className={styles.midContainer}>
@@ -461,7 +459,9 @@ const LaunchpadComponent = () => {
                 }}
             />
         </div>
+     
             </PageHeaderWrapper>
+            
         );
 }
 
