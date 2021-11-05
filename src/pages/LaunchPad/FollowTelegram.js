@@ -4,11 +4,6 @@ import InputEmail from "./inputEmail";
 import styled from "styled-components";
 import SwapTicket from "./swapTicket";
 import styles from "./styles.less";
-<<<<<<< HEAD
-import AntCollapse from './CustomCollapse';
-import stepComponent from"./stepComponent";
-
-=======
 import prevIcon from '@/assets/icon_prevpage.svg';
 import nextIcon from '@/assets/icon_nextpage.svg';
 import AntCollapse from "./CustomCollapse";
@@ -29,7 +24,6 @@ const StyledInput = styled.input`
     filter: brightness(2);
   }
 `;
->>>>>>> f5269c391248614135a710cc5afbfec012e477a5
 
 const FollowTelegram = () => {
   const panelIdx = ["1","2","3","4", "5", "6"]
