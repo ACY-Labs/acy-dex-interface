@@ -84,7 +84,7 @@ import { Alert } from 'antd';
 import spinner from '@/assets/loading.svg';
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import moment from 'moment';
-var CryptoJS = require("crypto-js");
+// var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
   const { dispatch, onSelectToken0, onSelectToken1, onSelectToken } = props;
 
@@ -485,8 +485,8 @@ const SwapComponent = props => {
           receipt.logs.map(item => {
             // debugger
             // let topics=hexlify(item.topics[0]).toText();
-            let ss=CryptoJS.SHA3.decrypt(item.topics[0]); 
-            debugger
+            // let ss=CryptoJS.SHA3.decrypt(item.topics[0]); 
+            // debugger
             if (item.address == inputToken.address) {
               // inputtoken 数量
               inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
@@ -517,6 +517,8 @@ const SwapComponent = props => {
               //   pricePoint: lastDataPoint.rate,
               // });
             });
+
+            console.log("receipt transactionTime", transactionTime);
           dispatch({
             type: 'transaction/addTransaction',
             payload: {
