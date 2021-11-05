@@ -6,19 +6,19 @@ import submit from "@/assets/icon_arrow_submit.svg";
 import hsubmit from "@/assets/icon_arrow_submit_hover.svg";
 
 const StyledInput = styled.input`
-  font-size: 24px;
+  font-size: 15px;
   background-color: inherit;
-  color: white;
-  width: 90%;
+  color: black;
+  width: 95%;
   border-width: 1px;
-  line-height: 50px;
-  margin-left: 20px;
+  align-self: center;
+  line-height: 30px;
   border-right: 0px solid transparent;
   border-top: 0px solid transparent;
   border-left: 0px solid transparent;
   &:focus {
     outline-width: 0;
-    filter: brightness(2);
+    filter: brightness(75%);
   }
 `;
 
@@ -76,21 +76,6 @@ const inputEmail = () => {
               <StyledInput required placeholder="Email Address" value={email} onChange={(e) => { setEmail(e.target.value);}} />
             </div>
             {hasError && <small className={errorText}>{errorMsg}</small>}
-          </div>
-          <div
-            onMouseEnter={() => {
-              setActive(true);
-            }}
-            onMouseLeave={() => {
-              setActive(false);
-            }}
-          >
-            <img
-              src={active ? hsubmit : submit}
-              alt="submit"
-              className={styles.emailSubmitButton}
-              onClick={nextPage}
-            />
           </div>
         </div>
       )}

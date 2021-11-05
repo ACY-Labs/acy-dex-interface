@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-indent */
 import {Button, Menu, Dropdown, Icon, Progress, Tag, Table} from 'antd';
-import InputEmail from "./inputEmail";
+import FollowTelegram from "./FollowTelegram";
 import ToggleButton from "./ToggleButton";
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { AcyLineChart } from '@/components/Acy';
@@ -442,7 +442,7 @@ const LaunchpadComponent = () => {
                     </div>
                 </div>
                 ) : (
-                    <InputEmail />
+                    <FollowTelegram />
                 )}
             </div>
             

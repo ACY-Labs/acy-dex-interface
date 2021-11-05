@@ -1,40 +1,54 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Collapse as AntCollapse } from "antd";
 import styled from "styled-components";
 import styles from "./styles.less";
 import arrowDownIcon from "@/assets/icon_arrow_down.svg";
+import rewardIcon from "@/assets/icon_reward.svg";
 import tickIcon from "@/assets/icon_tick.svg";
 
 const StyledCollapse = styled(AntCollapse)`
   &&& {
     border: none;
-    border-radius: 0px;
-    background-color: #f7f7f7;
-    box-shadow: none;   
+    border-radius: 0px 10px 10px 0;
+    box-shadow: none;  
+    background-color: #0e0304;
+    .ant-collapse-content {
+      background-color: #0e0304;
+      color: #b5b5b6;
+    }
+    
+    .ant-collapse-header {
+      color: #b5b5b6;
+    }
   }
-  .ant-collapse-content {
-    background: #f7f7f7;
-  }
-  .ant-collapse-header {
-      fontSize: 25px;
-  }
+  
 `;
 
 const CustomCollapse = (props) => {
-  const [followed, setFollowed] = useState(false);
   const [opened, setOpen] = useState(false);
-  const [key, setKey] = useState([props.keys]);
+  const [key, setKey] = useState([]);
 
-  useEffect(() => {
-    setFollowed(props.isFollowed)
-  }, [props.isFollowed])
+  const addPanelID = (num) => {
+    if(key.length === 0)
+      setKey(state => [...state, num])
+    else
+      setKey([])
+  }
 
-  const handlePanel= () => setOpen(prev => !prev);
-  const handlePanelClose = () => props.setShow(prev => !prev);
+  /* const handlePanel= () => {
+    setOpen(prev => !prev)
+  } */
 
-  const combineFunc = () =>{
-    handlePanel();
-    handlePanelClose();
+  const handleShowPanel = (id) => {
+    const val = !props.show
+    props.setShow(prev => ({...prev, [key[id]]: false}))
+    props.setShow(prev => ({...prev, [id] : val}))
+  }  
+
+  const combineFunc = () => {
+    //handlePanel()
+    addPanelID(props.panelID)
+    handleShowPanel(props.panelID)
   }
 
   return (
@@ -44,18 +58,19 @@ const CustomCollapse = (props) => {
         header={props.header}
         showArrow={false}
         bordered={false}
-        key={props.keys}
+        disabled={props.isFollowed}
+        key={props.panelID}
         extra={
           <span>
-            <span style={{float: 'right'}}>
-              {followed ? <img src={tickIcon} alt="" style={{height:'1.2em', marginLRight:'10px', width:'auto', objectFit:'contain'}} /> :  ""}
-            </span>
             <div className={styles.extraContainer}>
               {
-                !opened && !followed && <div id={styles.themeBox}><p>+10</p></div>  // show this box
+                !props.show && !props.isFollowed && props.panelID !== "1" && <img src={rewardIcon} alt="" style={{height:'1.2em', marginLRight:'10px', width:'auto', objectFit:'contain'}} />  // show this box
               }
               {
-                opened && !followed && <img src={arrowDownIcon} alt="" style={{height:'1.2em', marginLRight:'10px', width:'auto', objectFit:'contain'}} />  // show this icon
+                props.show && !props.isFollowed && <img src={arrowDownIcon} alt="" style={{height:'1.2em', marginRight:'10px', width:'auto', objectFit:'contain'}} />  // show this icon
+              }
+              {
+                props.isFollowed ? <img src={tickIcon} alt="" style={{height:'1.2em', marginLRight:'10px', width:'auto', objectFit:'contain'}} /> :  ""
               }
             </div>
           </span>
