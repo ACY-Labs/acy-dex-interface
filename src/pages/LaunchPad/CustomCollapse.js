@@ -41,7 +41,7 @@ const CustomCollapse = (props) => {
 
   const handleShowPanel = (id) => {
     const val = !props.show
-    props.setShow(prev => ({...prev, [key[0]]: false}))
+    props.setShow(prev => ({...prev, [key[id]]: false}))
     props.setShow(prev => ({...prev, [id] : val}))
   }  
 
