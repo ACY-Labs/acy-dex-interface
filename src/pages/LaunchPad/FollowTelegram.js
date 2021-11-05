@@ -31,12 +31,12 @@ const FollowTelegram = () => {
   const [showInput, setShowInput] = React.useState(false)
   const [showForm, setShowForm] = useState(false)
   const [clicked, setClicked] = useState({
-    1 : false,
-    2 : false,
-    3 : false,
-    4 : false,
-    5 : false,
-    6 : false
+    1 : true,
+    2 : true,
+    3 : true,
+    4 : true,
+    5 : true,
+    6 : true
   })
   const [show, setShow] = useState({
     1 : false,
@@ -57,7 +57,10 @@ const FollowTelegram = () => {
   
   const onClick = () => setShowInput(true)
 
-  const onLinkClick = () => setClicked(false)
+  const onLinkClick = (n) => {
+    const val = !clicked[n]
+    setClicked(prev => ({...prev, [n] : val}))
+  }
 
   const handleFollow = (idx) => {
     const val = !followed[idx]
@@ -110,7 +113,7 @@ const FollowTelegram = () => {
             </AntCollapse>
             <AntCollapse isFollowed={followed[2]} show={show[2]} panelID={panelIdx[1]} setShow={setShow} disabled={followed[2]} header="Follow ACY Finance on Telegram">
               <Row type='flex' align='middle' justify='center'>
-                <Button href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick();}}>
+                <Button href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(1);}}>
                   <Icon type="link" style={{ color: '#fff' }} theme="outlined" />
                   Subscribe
                 </Button>
@@ -118,14 +121,14 @@ const FollowTelegram = () => {
               <span className={styles.greyLine}> </span>
               <Row type='flex' align='middle' justify='center'>
                 <Tooltip title="Visit the link above to continue">
-                  <Button onClick={() => {handleFollow(2); handleShow(2); }} style={buttonStyle2} disabled={clicked}>Continue</Button> 
+                  <Button onClick={() => {handleFollow(2); handleShow(2); }} style={buttonStyle2} disabled={clicked[1]}>Continue</Button> 
                 </Tooltip>
                 <Button onClick={() => {handleShow(2); }} type='text' style={{color:'#EB7B59', border:'#f7f7f7', background:'#f7f7f7',height: "2em", fontSize:'16px', margin:'10px 0 0 10px'}}>Cancel</Button>
               </Row>
             </AntCollapse>
             <AntCollapse isFollowed={followed[3]} show={show[3]} panelID={panelIdx[2]} setShow={setShow} disabled={followed[3]} header="Follow ACY Finance on Telegram Announcement Channel">
               <Row type='flex' align='middle' justify='center'>
-                <Button href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(); onClick();}}>
+                <Button href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(2); onClick();}}>
                   <Icon type="link" style={{ color: '#fff' }} theme="outlined" />
                   Subscribe
                 </Button>
@@ -134,14 +137,14 @@ const FollowTelegram = () => {
               { showInput ? <userInput /> : null }
               <Row type='flex' align='middle' justify='center'>
                 <Tooltip title="Visit the link above to continue">
-                  <Button onClick={() => {handleFollow(3); handleShow(3); }} style={buttonStyle2} disabled={clicked}>Continue</Button> 
+                  <Button onClick={() => {handleFollow(3); handleShow(3); }} style={buttonStyle2} disabled={clicked[2]}>Continue</Button> 
                 </Tooltip>
                 <Button onClick={() => {handleShow(3); }} type='text' style={{color:'#EB7B59', border:'#f7f7f7', background:'#f7f7f7',height: "2em", fontSize:'16px', margin:'10px 0 0 10px'}}>Cancel</Button>
               </Row>
             </AntCollapse>
             <AntCollapse isFollowed={followed[4]} show={show[4]} panelID={panelIdx[3]} setShow={setShow} disabled={followed[4]} header="Follow ACY Finance on Twitter">
               <Row type='flex' align='middle' justify='center'>
-                <Button href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick();}}>
+                <Button href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(3);}}>
                   <Icon type="link" style={{ color: '#fff' }} theme="outlined" />
                   Subscribe
                 </Button>
@@ -149,14 +152,14 @@ const FollowTelegram = () => {
               <span className={styles.greyLine}> </span>
               <Row type='flex' align='middle' justify='center'>
                 <Tooltip title="Visit the link above to continue">
-                  <Button onClick={() => {handleFollow(4); handleShow(4);}} style={buttonStyle2} disabled={clicked}>Continue</Button> 
+                  <Button onClick={() => {handleFollow(4); handleShow(4);}} style={buttonStyle2} disabled={clicked[3]}>Continue</Button> 
                 </Tooltip>
                 <Button onClick={() => {handleShow(4); }} type='text' style={{color:'#EB7B59', border:'#f7f7f7', background:'#f7f7f7',height: "2em", fontSize:'16px', margin:'10px 0 0 10px'}}>Cancel</Button>
               </Row>
             </AntCollapse>
             <AntCollapse isFollowed={followed[5]} show={show[5]} panelID={panelIdx[4]} setShow={setShow} disabled={followed[5]} header="Retweet ACY Finance on Twitter">
               <Row type='flex' align='middle' justify='center'>
-                <Button href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick();}}>
+                <Button href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(4);}}>
                   <Icon type="link" style={{ color: '#fff' }} theme="outlined" />
                   Subscribe
                 </Button>
@@ -164,7 +167,7 @@ const FollowTelegram = () => {
               <span className={styles.greyLine}> </span>
               <Row type='flex' align='middle' justify='center'>
                 <Tooltip title="Visit the link above to continue">
-                  <Button onClick={() => {handleFollow(5); handleShow(5); }} style={buttonStyle2} disabled={clicked}>Continue</Button> 
+                  <Button onClick={() => {handleFollow(5); handleShow(5); }} style={buttonStyle2} disabled={clicked[4]}>Continue</Button> 
                 </Tooltip>
                 <Button onClick={() => {handleShow(5); }} type='text' style={{color:'#EB7B59', border:'#f7f7f7', background:'#f7f7f7',height: "2em", fontSize:'16px', margin:'10px 0 0 10px'}}>Cancel</Button>
               </Row>
