@@ -17,17 +17,8 @@ const stepComponent = (props) => {
 
   return (
     <div  className = {styles.stepBar} >
-              <AcyLineChart 
-                  
-                  data={props.chartData}
-                  showXAxis={true}
-                  showYAxis={true}
-                  showGradient={true}
-                  lineColor="#e29227"
-                  bgColor="#2f313500"
-              />
               <div className = {styles.stepColor} id = "steps">
-              <Steps direction="vertical" current={current}>
+              <Steps direction="horinzontal" current={current}>
                 <Step title="Preparation" description="This project is in preparation phase.Stay tuned." />
                 <Step title="Whitelist" description="You can now whitelist yourself for the lottery." />
                 <Step title="Lottery" description="See if you have any winning lottery tickets." />

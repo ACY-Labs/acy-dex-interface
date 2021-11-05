@@ -346,16 +346,26 @@ const LaunchpadComponent = () => {
                     <span style={hashtagText}>DeFi Market, AMM, DEX</span>
                 </div>
             </div>
+            <div className = {styles.chartWrapper}>
             
-            
-            
-            <div >
-            <StepBar chartData = {chartData}/>
+            <AcyLineChart  
+                  
+                  //data={}
+                  showXAxis={true}
+                  showYAxis={true}
+                  showGradient={true}
+                  lineColor="#e29227"
+                  bgColor="#2f313500"
+              />
             </div>
+          
 
             
         </div>
         <div className={styles.midContainer}>
+        <div >
+            <StepBar chartData = {chartData}/>
+            </div>
             <div className={styles.tokenInfoBox}>
                 <div className={styles.tokenInfoContainer }>
                     <h2 style={{fontWeight:'bold'}}>{selectedTableRow.round}</h2>
@@ -459,7 +469,7 @@ const LaunchpadComponent = () => {
                 }}
             />
         </div>
-     
+        
             </PageHeaderWrapper>
             
         );
