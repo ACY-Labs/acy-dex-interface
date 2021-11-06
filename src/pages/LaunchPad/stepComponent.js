@@ -1,4 +1,4 @@
-import { Steps } from 'antd';
+import { Steps,Divider } from 'antd';
 import React, { useState, useEffect } from "react";
 import SwapInput from './SwapInput';
 import styles from './styles.less';
@@ -17,14 +17,17 @@ const stepComponent = (props) => {
 
   return (
     <div  className = {styles.stepBar} >
-              <div className = {styles.stepColor} id = "steps">
-              <Steps direction="horinzontal" current={current}>
-                <Step title="Preparation" description="This project is in preparation phase.Stay tuned." />
-                <Step title="Whitelist" description="You can now whitelist yourself for the lottery." />
-                <Step title="Lottery" description="See if you have any winning lottery tickets." />
-                <Step title="Sale" description="Winner can participate in the token sale." />
-                <Step title="Distribution" description="The tokens get distributed to Sale participants" />
+              <div className = {styles.stepColor} 
+              id = "steps">
+              <Steps size = "small" labelPlacement="vertical" current={current}>
+                <Step description ="Preparation" />
+                <Step description="Whitelist"  />
+                <Step description="Lottery"  />
+                <Step description="Sale"  />
+                <Step description="Distribution"  />
               </Steps>
+              {/* <Divider /> */}
+            
               </div>
               
       </div>  

@@ -358,7 +358,7 @@ const LaunchpadComponent = () => {
 
         return(
             <PageHeaderWrapper>
-
+                
         <div className={styles.tableHeaderButtonContainer}>
             <div className={styles.tableHeaderToggleButtonContainer}>
                 <button type="button" 
@@ -438,11 +438,10 @@ const LaunchpadComponent = () => {
                     </div>
                 )}
             </div>
+            
         </div>
         <div className={styles.midContainer}>
-        <div >
-            <StepBar chartData = {chartData}/>
-            </div>
+    
             <div className={styles.tokenInfoBox}>
                 <div className={styles.tokenInfoContainer }>
                     <h2 style={{fontWeight:'bold'}}>{selectedTableRow.round}</h2>
@@ -451,13 +450,16 @@ const LaunchpadComponent = () => {
                             <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
                             <h2 style={{color:'#eb5c20'}} className={styles.tokenName}> ACY </h2>
                         </div>
-                        <div className={styles.tokenIDODate}>
+                        {/* <div className={styles.tokenIDODate}>
                             <h4 style={{color:'#fff'}}>Open: {selectedTableRow.openDate} 10:00 UST</h4>
                             <h4 style={{color:'#fff'}}>Close: {selectedTableRow.closeDate} 10:00 UST</h4>
-                        </div>
-                        <div className={styles.tokenIDOStatus}>
+                        </div> */}
+                        <div >
+                            <StepBar chartData = {chartData}/>
+                         </div>
+                        {/* <div className={styles.tokenIDOStatus}>
                             <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', textAlign:'center', fontSize:'18px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
                 <div className={styles.tokenProgress}>
