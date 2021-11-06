@@ -38,6 +38,58 @@
     overflow: hidden;
 }
 
+.stepBar {
+    // width: 100%;
+    // height: 100%;
+    // //padding: 20px 30px ;
+    // box-sizing: border-box;
+    // border-radius: 10px;
+    // margin: mid;
+}
+
+.stepColor {
+
+        :global{
+        .ant-steps-item-title{
+            color: #b5b5b6  !important;
+          //  background-color: red;
+        }
+        .ant-steps-item-description{
+            color:#b5b5b6 !important}
+            .ant-steps-item-tail{
+                width: 0% !important;
+                border-style: dotted none none ;
+                margin-left: 90px !important;
+                margin-top: 4px !important;
+                padding: 11.5px 27px !important;
+                color: #eb5c20;
+                
+            }
+            .ant-steps{
+                display: contents;
+            }
+            .ant-steps-item-finish { .ant-steps-item-icon {
+                background-color: #0e0304 !important;
+                border-color: #0e0304;
+            }}
+            .ant-steps-item-wait .ant-steps-item-icon {
+                background-color: #0e0304 !important;
+                border-color: #0e0304;
+            }
+            .ant-steps-item-icon > .ant-steps-icon {
+                color: #b5b5b6 !important;
+            }
+        
+            }
+    
+
+}
+
+
+.textcolor{
+
+    color: red;
+}
 .hashtagBox{
     width: 100%;
     height: auto;
@@ -632,4 +684,81 @@
     margin: 0 8px 0 8px;
     
 }
-//style={{ width: '100%', position: 'relative', zIndex: 10, padding: '10px'}}
+.smallIcon {
+    margin: 8px;
+    width: 18px;
+}
+
+
+
+.transferTable{
+
+    :global{
+        
+    .ant-table-placeholder{
+        background: transparent !important;
+    }
+    .ant-table-thead > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-tbody > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-thead > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-tbody > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td {
+    // background:  transparent !important;
+        cursor: pointer;
+    }
+    .ant-table-thead > tr{
+        background:  transparent !important;
+    }
+    .ant-table-tbody > tr{
+        background:  transparent !important;
+    }
+    .ant-table-thead > tr > th:not(.leftAlignTableHeader){
+        text-align: center !important;
+        background:  transparent !important;
+    }
+    .ant-table-footer{
+        background:  transparent !important;
+    }
+    .ant-table-tbody > tr{
+        &:active{
+            background: #2f3135  !important;
+        }
+    }
+    .ant-table {
+        
+        font-size: 12px;
+        }
+        /* row data */
+        .ant-table-tbody > tr > td {
+            height: 4px;
+            padding: 4px;
+        }
+        /* row tags */
+        .ant-table-thead > tr > th {
+            height: 2px;
+            padding: 4px;
+        }
+    }
+}
+
+.tableHeaderButtonContainer {
+    display: flex; 
+    justify-content: flex-end;
+    .tableHeaderToggleButtonContainer {
+      .activeToggleButton,
+      .endedToggleButton {
+        border: none;
+        background-color: #29292c;
+        padding: 0.25rem 1rem;
+        &:hover {
+          border: 1px solid  #1e5d91;
+          cursor: pointer;
+        }
+      }
+      .activeToggleButton {
+          width: 70px;
+        border-radius: 9999px 0 0 9999px;
+      }
+      .endedToggleButton {
+        width: 70px;
+        border-left: 1px solid #29292c;
+        border-radius: 0 9999px 9999px 0;
+      }
+    }
+  }
