@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from "react";
+import FollowTelegram from "./FollowTelegram";
 import styled from "styled-components";
 import styles from "./styles.less";
 import submit from "@/assets/icon_arrow_submit.svg";

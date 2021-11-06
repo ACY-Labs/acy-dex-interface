@@ -1,11 +1,9 @@
 import React, { useState, useCallback } from "react";
 import { Form, Tooltip, Button, Icon, Row } from 'antd';
-import styled from "styled-components";
 import InputEmail from "./inputEmail";
+import styled from "styled-components";
 import SwapTicket from "./swapTicket";
 import styles from "./styles.less";
-import telegramIcon from '@/assets/icon_follow_telegram.svg';
-import twitterIcon from '@/assets/icon_follow_twitter.svg';
 import prevIcon from '@/assets/icon_prevpage.svg';
 import nextIcon from '@/assets/icon_nextpage.svg';
 import AntCollapse from "./CustomCollapse";
@@ -74,7 +72,7 @@ const FollowTelegram = () => {
     setShow(prev => ({...prev, [panelId] : val}))
   }
 
-  const links = "http://www.youtube.com/"
+  const links = "https://www.youtube.com/"
 
   const buttonStyle1 = {
     background: "#3498DB", 
@@ -115,11 +113,10 @@ const FollowTelegram = () => {
             </AntCollapse>
             <AntCollapse isFollowed={followed[2]} show={show[2]} panelID={panelIdx[1]} setShow={setShow} disabled={followed[2]} header="Follow ACY Finance on Telegram">
               <Row type='flex' align='middle' justify='center'>
-                <a href="https://twitter.com/intent/follow?screen_name=ACYFinance" className={styles.twitterbtn} target="_blank" rel="noreferrer" data-show-count="false" onClick={() => {onLinkClick(1);}}>
-                  <img src={twitterIcon} alt="" style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '25px 0', float:'right'}} />
-                  Follow ACYFinance
-                </a>
-                <script async src="https://platform.twitter.com/widgets.js" charset="utf-8" />
+                <Button href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(1);}}>
+                  <Icon type="link" style={{ color: '#fff' }} theme="outlined" />
+                  Subscribe
+                </Button>
               </Row>
               <span className={styles.greyLine}> </span>
               <Row type='flex' align='middle' justify='center'>
@@ -160,18 +157,12 @@ const FollowTelegram = () => {
                 <Button onClick={() => {handleShow(4); }} type='text' style={{color:'#EB7B59', border:'#f7f7f7', background:'#f7f7f7',height: "2em", fontSize:'16px', margin:'10px 0 0 10px'}}>Cancel</Button>
               </Row>
             </AntCollapse>
-            <AntCollapse isFollowed={followed[5]} show={show[5]} panelID={panelIdx[4]} setShow={setShow} disabled={followed[5]} header="Tweet ACY Finance's IDO on Twitter">
+            <AntCollapse isFollowed={followed[5]} show={show[5]} panelID={panelIdx[4]} setShow={setShow} disabled={followed[5]} header="Retweet ACY Finance on Twitter">
               <Row type='flex' align='middle' justify='center'>
-                <a 
-                  className={styles.twitterbtn}
-                  href="https://twitter.com/intent/tweet?text=ACY%20Finance%20First%20IDO%20Comming%20Soon&url=https%3A%2F%2Ftest.acy.finance%2F%23%launchpad"
-                  target="_blank" 
-                  rel="noreferrer"
-                  onClick={() => {onLinkClick(4);}}
-                  data-size="large"
-                >
-                  Tweet ACYFinance
-                </a>
+                <Button href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(4);}}>
+                  <Icon type="link" style={{ color: '#fff' }} theme="outlined" />
+                  Subscribe
+                </Button>
               </Row>
               <span className={styles.greyLine}> </span>
               <Row type='flex' align='middle' justify='center'>

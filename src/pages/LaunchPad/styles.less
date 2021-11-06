@@ -4,7 +4,7 @@
 @mainColor: #c4c4c4;
 
 .topContainer{
-    width: 95%;
+    width: 100%;
     flex-direction: row;
     display: flex;
     flex-wrap: wrap;
@@ -87,11 +87,10 @@
 }
 
 .midContainer{
-    width: 95%;
+    width: 100%;
     padding: 0%;
     margin: 0%;
     flex-direction: row;
-    flex-wrap: nowrap;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -336,7 +335,6 @@
 }
 
 .dateTableBox{
-    width: 95%;
     :global{
         .ant-table-placeholder{
         background: transparent !important;
@@ -425,17 +423,18 @@
 .telegramContainer{
     width: 100%;
     height: auto;
-    display: flex;
-    flex-direction: row;
-    .logoCol{
-        width: 50px;
-        display: flex;
-        flex-direction: column;
-        justify-content: left;
-    }  
+    .telegramText{
+        width: 100%;    
+        display: inline-block;
+        text-align: center;
+        padding: 15px;
+        color: @mainColor;
+    }
+    
     .telegramLinks{
         width: 100%;
         position: relative;
+        display: inline-block;
     }
 }
 
@@ -464,35 +463,6 @@
 
 #nextPage:hover{
     cursor: pointer;
-}
-
-.twitterbtn{
-    font: normal normal normal 13px/26px 'Helvetica Neue',Arial,sans-serif;
-	height: 28px;
-	border-radius: 4px;
-	max-width: 100%;
-	box-sizing: border-box;
-	position: relative;
-	background-color: #F8F8F8;
-	border: #CCC solid 1px;
-	color: #333;
-	font-weight: bold;
-	text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-o-user-select: none;
-	user-select: none;
-	cursor: pointer;
-	overflow: hidden;
-	display: inline-block;
-	vertical-align: top;
-	zoom: 1;
-	text-decoration: none;
-}
- 
-.twitterbtn:hover{
-    cursor: pointer;
-    opacity: 90%;
 }
 
 //tan
