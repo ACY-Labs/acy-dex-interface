@@ -359,8 +359,8 @@ const LaunchpadComponent = () => {
         </div>
         <div className={styles.midContainer}>
             <div className={styles.tokenInfoBox}>
-                <div className={styles.tokenInfoContainer }>
-                    <h2 style={{fontWeight:'bold'}}>{selectedTableRow.round}</h2>
+                <div className={styles.tokenInfoContainer}>
+                    <h2 style={{fontWeight:'bold', color:'#fff'}}>{selectedTableRow.round}</h2>
                     <div className={styles.tokenInfoBoxTop}>
                         <div className={styles.tokenSym}>
                             <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />

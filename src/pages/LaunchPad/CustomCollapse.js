@@ -5,11 +5,13 @@ import styles from "./styles.less";
 import arrowDownIcon from "@/assets/icon_arrow_down.svg";
 import rewardIcon from "@/assets/icon_reward.svg";
 import tickIcon from "@/assets/icon_tick.svg";
+import telegramIcon from '@/assets/icon_follow_telegram.svg';
+import twitterIcon from '@/assets/icon_follow_twitter.svg';
 
 const StyledCollapse = styled(AntCollapse)`
   &&& {
     border: none;
-    border-radius: 0px 10px 10px 0;
+    border-radius: 0 10px 0 0;
     box-shadow: none;  
     background-color: #0e0304;
     .ant-collapse-content {
@@ -35,10 +37,6 @@ const CustomCollapse = (props) => {
       setKey([])
   }
 
-  /* const handlePanel= () => {
-    setOpen(prev => !prev)
-  } */
-
   const handleShowPanel = (id) => {
     const val = !props.show
     props.setShow(prev => ({...prev, [key[id]]: false}))
@@ -46,13 +44,17 @@ const CustomCollapse = (props) => {
   }  
 
   const combineFunc = () => {
-    //handlePanel()
     addPanelID(props.panelID)
     handleShowPanel(props.panelID)
   }
 
   return (
-    <StyledCollapse accordian activeKey={props.show ? key : []} onChange={combineFunc}> 
+    <StyledCollapse 
+      accordian 
+      expandIcon={telegramIcon}
+      activeKey={props.show ? key : []} 
+      onChange={combineFunc}
+    > 
       <AntCollapse.Panel
         {...props}
         header={props.header}
