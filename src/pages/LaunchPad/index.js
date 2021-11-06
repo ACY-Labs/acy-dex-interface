@@ -361,17 +361,24 @@ const LaunchpadComponent = () => {
                 
         <div className={styles.tableHeaderButtonContainer}>
             <div className={styles.tableHeaderToggleButtonContainer}>
-                <button type="button" 
+            <button type="button" 
                     className={styles.activeToggleButton}
                     style={{ backgroundColor: selectedGraph === 0 ? "#174163" : "#2e3032", color: selectedGraph === 0 ? "white": ""}}
                     onClick = { () => setSelectedGraph(0)}
+                >
+                    Progress
+                </button>
+                <button type="button" 
+                    className={styles.activeToggleButton}
+                    style={{ backgroundColor: selectedGraph === 1 ? "#174163" : "#2e3032", color: selectedGraph === 1 ? "white": ""}}
+                    onClick = { () => setSelectedGraph(1)}
                 >
                     Graph
                 </button>
                 <button type="button" 
                     className={styles.endedToggleButton}
-                    style={{ backgroundColor: selectedGraph === 1 ? "#174163" : "#2e3032", color: selectedGraph === 1 ? "white": ""}}
-                    onClick = { () => setSelectedGraph(1)}
+                    style={{ backgroundColor: selectedGraph === 2 ? "#174163" : "#2e3032", color: selectedGraph === 2 ? "white": ""}}
+                    onClick = { () => setSelectedGraph(2)}
                 >List</button>
             </div>
         </div>
@@ -411,6 +418,11 @@ const LaunchpadComponent = () => {
             </div>
             <div className = {styles.chartWrapper}>
                 { selectedGraph === 0 && (
+                    <div >
+                    <StepBar chartData = {chartData}/>
+                 </div>
+                )}
+                { selectedGraph === 1 && (
                     <AcyLineChart  
                     
                     //data=}{
@@ -421,7 +433,7 @@ const LaunchpadComponent = () => {
                     bgColor="#2f313500"
                     />
                 )}
-                { selectedGraph === 1 && (
+                { selectedGraph === 2 && (
                     <div className={styles.transferTable}>
                         <Table style={{marginTop:'20px', textAlign:'center'}} 
                             pagination={{ pageSize: 5 }}
@@ -450,16 +462,13 @@ const LaunchpadComponent = () => {
                             <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
                             <h2 style={{color:'#eb5c20'}} className={styles.tokenName}> ACY </h2>
                         </div>
-                        {/* <div className={styles.tokenIDODate}>
+                        <div className={styles.tokenIDODate}>
                             <h4 style={{color:'#fff'}}>Open: {selectedTableRow.openDate} 10:00 UST</h4>
                             <h4 style={{color:'#fff'}}>Close: {selectedTableRow.closeDate} 10:00 UST</h4>
-                        </div> */}
-                        <div >
-                            <StepBar chartData = {chartData}/>
-                         </div>
-                        {/* <div className={styles.tokenIDOStatus}>
+                        </div>
+                        <div className={styles.tokenIDOStatus}>
                             <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', textAlign:'center', fontSize:'18px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
-                        </div> */}
+                        </div>
                     </div>
                 </div>
                 <div className={styles.tokenProgress}>
