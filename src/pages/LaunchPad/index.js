@@ -52,7 +52,7 @@ const LaunchpadComponent = () => {
     const [pendingEnd,setPending]= useState(false);
     const [fetchEnd,setFetchEnd] = useState(false);
     const [transferData,setTransferData] = useState([]);
-    const [selectedGraph,setSelectedGraph] = useState(0);
+    const [selectedGraph,setSelectedGraph] = useState(1);
 
     const getTime = async (blockNumber) => {
 
@@ -116,19 +116,20 @@ const LaunchpadComponent = () => {
  
     },[])
       
-    useEffect( async() =>{
-        const result = await getTransferData();
-        console.log('getTransferData',result);
-        setTransferData(result.reverse());
+    useEffect(async () =>{
+        getTransferData().then((events) => {
+            console.log('getTransferData',events,events.length);
+            // const chartData = [];
+            // events.forEach( (element) => {
+            //     chartData.push([element.dateTime.substr(0,11),element.price]);
+            // });
+            // console.log('chartData:',chartData);
+            setTransferData(events[0]);
+            setChartData(events[1])
+        });
+        
     },[])
 
-    useEffect(async() =>{
-        if(timeData.length >= 10)
-        {
-            console.log(timeData);
-            setChartData(timeData);
-        }
-    },[timeData])
 
     const links = [
         "https://google.com",
@@ -209,27 +210,35 @@ const LaunchpadComponent = () => {
             align: 'center'
         },
     ];
+    const testData = [
+        {
+            dateTime:"2018-12-01",
+            participant: "0x253584",
+            quantity:'9999',
+            token:'acy'
+        }
+    ]
     const transferTableHeader = [
+        {
+            title: 'Date Time(UTC)',
+            dataIndex: 'dateTime',
+            className: 'column-date',
+            width: 70,
+            align: 'left'
+        },
         {
             title: 'Participants',
             dataIndex: 'participant',
             width: 60,
             align: 'center',
-            ellipsis: true,
+            ellipsis: true
         },
-        {
-            title: 'Date Time(UTC)',
-            dataIndex: 'dateTime',
-            className: 'column-date',
-            width: 100,
-            align: 'center'
-        },
-        
         {
             title: 'Quantity',
             dataIndex: 'quantity',
             width: 60,
-            align: 'center'
+            align: 'center',
+            ellipsis: true
         },
         {
             title: 'Token',
@@ -343,7 +352,8 @@ const LaunchpadComponent = () => {
         </Menu>
     );
 
-    const [showForm, setShowForm] = useState(false)
+    const [showForm, setShowForm] = useState(false);
+    const [selectedForm, setSelectedForm] = useState(0)
     const [selectedTab, setSelectedTab] = useState(0);
     const [selectedTableRow, setSelectedTableRow] = useState(tableData[0]);
 
@@ -362,24 +372,25 @@ const LaunchpadComponent = () => {
         <div className={styles.tableHeaderButtonContainer}>
             <div className={styles.tableHeaderToggleButtonContainer}>
             <button type="button" 
-                    className={styles.activeToggleButton}
+                    className={styles.progressToggleButton}
                     style={{ backgroundColor: selectedGraph === 0 ? "#174163" : "#2e3032", color: selectedGraph === 0 ? "white": ""}}
                     onClick = { () => setSelectedGraph(0)}
                 >
                     Progress
                 </button>
                 <button type="button" 
-                    className={styles.activeToggleButton}
+                    className={styles.graphToggleButton}
                     style={{ backgroundColor: selectedGraph === 1 ? "#174163" : "#2e3032", color: selectedGraph === 1 ? "white": ""}}
                     onClick = { () => setSelectedGraph(1)}
                 >
                     Graph
                 </button>
                 <button type="button" 
-                    className={styles.endedToggleButton}
+                    className={styles.listToggleButton}
                     style={{ backgroundColor: selectedGraph === 2 ? "#174163" : "#2e3032", color: selectedGraph === 2 ? "white": ""}}
                     onClick = { () => setSelectedGraph(2)}
-                >List</button>
+                >List
+                </button>
             </div>
         </div>
 
@@ -424,30 +435,24 @@ const LaunchpadComponent = () => {
                 )}
                 { selectedGraph === 1 && (
                     <AcyLineChart  
-                    
-                    //data=}{
-                    showXAxis={true}
-                    showYAxis={true}
-                    showGradient={true}
-                    lineColor="#e29227"
-                    bgColor="#2f313500"
+                        data={timeData}
+                        showXAxis={true}
+                        showYAxis={true}
+                        showGradient={true}
+                        lineColor="#e29227"
+                        bgColor="#2f313500"
                     />
                 )}
                 { selectedGraph === 2 && (
                     <div className={styles.transferTable}>
-                        <Table style={{marginTop:'20px', textAlign:'center'}} 
-                            pagination={{ pageSize: 5 }}
+                        <Table style={{marginTop:'20px',textAlign:'center'}}
+                            id="transferTable"
                             columns={transferTableHeader} dataSource={transferData}
-                            onRow={(record, rowIndex) => {
-                                return {
-                                    onClick: event => {
-                                        // setSelectedTableRow(record);
-                                    }, // click row
-                                };
-                            }}
-                        >   
-                        </Table>
-                    </div>
+                            pagination={false}
+                            scroll={{ y: 250 }}
+                            rowClassName={(record, index) => styles.rowExpanded}
+                        />   
+                    </div> 
                 )}
             </div>
             
@@ -511,7 +516,7 @@ const LaunchpadComponent = () => {
             </div>
             
             <div className={styles.ticketBox}>
-                { !showForm ? (
+                { selectedForm === 0 && (
                 <div className={styles.showTicketContainer}>
                     <div className={styles.showTicketBox}>
                         <div className={styles.showTicketBox1}>
@@ -536,11 +541,18 @@ const LaunchpadComponent = () => {
                         </div>
                     </div>
                     <div className={styles.whitelistBox}>
-                        <Button className={styles.whiteListToggleButton} shape="round" onClick={() => setShowForm(() => true)}>Whitelist</Button>
+                        <Button className={styles.whiteListToggleButton} shape="round" onClick={() => setSelectedForm(1)}>Whitelist</Button>
                     </div>
                 </div>
-                ) : (
-                    <FollowTelegram />
+                
+                )}
+                {selectedForm === 1 && (
+                    <FollowTelegram 
+                        setSelectedForm={setSelectedForm}
+                    />
+                )}
+                { selectedForm === 2 && (
+                    <SwapTicket />
                 )}
             </div>
             

@@ -238,4 +238,75 @@ leftAlignTableHeader .leftAlign {
     background: #4d4d4d; 
     border-radius: 5px;
   }
+  #transferTable {
+    .ant-table-tbody > tr > td {
+      overflow-wrap: break-word;
+    }
+    .ant-table-expanded-row-level-1 > td {
+      padding: 8px 0 !important;
+    }
+    .ant-table-fixed-header .ant-table-scroll .ant-table-header::-webkit-scrollbar {
+      border: 0;
+    }
+    .ant-table-header, .ant-table-body {
+      background-color: transparent;
+    }
+    .ant-table-header {
+      overflow: hidden!important;
+      padding-bottom: 20px!important;
+    }
+    .ant-table-body {
+      // the max-height will only work when AcyLiquidityPositions.js scroll: {y: ??} is set 
+      // and overwrite its max-height by "!important"
+      // the mentioned setting in source file will move table header and table body into separate div,
+      // max-height will be set to the div containing tbody.
+
+      // auto-hiding scroll bar will work by having overflow:hidden and both .ant-table-body and #liquidityPositionTable
+      // hover set to overflow-Y: overlay
+      max-height: 250px!important;
+      overflow: hidden!important;
+      &:hover {
+        overflow-y: overlay!important;
+      }
+    }
+    &:hover {
+      overflow-y: overlay!important;  // as mentioned above, this is necessary
+    }
+    .ant-table-row.ant-table-row-level-0 {
+      // background-color: transparent!important;
+    }
+    .centerAlignTableHeader {
+      text-align: center!important;
+      white-space: nowrap;
+    }
+    tr.ant-table-expanded-row, tr.ant-table-expanded-row:hover {
+      background-color: #29292c;
+    }
+
+    // dash line on expanded row
+    .ant-table-expanded-row.ant-table-row-level-0 > td {
+      border-bottom: dashed 2px #75757933 !important;
+    }
+    .ant-table-thead > tr, .ant-table-thead > tr > th {
+      background-color: transparent;
+      font-weight: normal;
+    }
+    .ant-table-thead > tr > th.ant-table-column-sort {
+      background: transparent;
+    }
+    .ant-table-footer {
+      background: transparent !important;
+    }
+    .ant-table-placeholder{
+      background: transparent !important;
+    }
+    .ant-table-tbody > tr{
+      background:  transparent !important;
+    }
+    .ant-table-thead > tr > th:not(.leftAlignTableHeader){
+      text-align: center !important;
+      background:  transparent !important;
+    }
+    
+  }
 }

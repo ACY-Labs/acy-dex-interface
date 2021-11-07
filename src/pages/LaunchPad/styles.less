@@ -403,15 +403,16 @@
         }
         .ant-table-thead > tr > th:not(.leftAlignTableHeader){
         text-align: center !important;
-        background:  transparent !important;
+        // background:  transparent !important;
+        background-color: #0e0304;
         }
         .ant-table-footer{
         background:  transparent !important;
         }
         .ant-table-tbody > tr{
-        &:active{
+            &:active{
             background: #2f3135  !important;
-        }
+            }
         }
     }
 }
@@ -692,73 +693,58 @@
 
 
 .transferTable{
-
+    // background-color: #862e2e;
+    // background: transparent !important;
     :global{
-        
-    .ant-table-placeholder{
-        background: transparent !important;
-    }
-    .ant-table-thead > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-tbody > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-thead > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-tbody > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td {
-    // background:  transparent !important;
-        cursor: pointer;
-    }
-    .ant-table-thead > tr{
-        background:  transparent !important;
-    }
-    .ant-table-tbody > tr{
-        background:  transparent !important;
-    }
-    .ant-table-thead > tr > th:not(.leftAlignTableHeader){
-        text-align: center !important;
-        background:  transparent !important;
-    }
-    .ant-table-footer{
-        background:  transparent !important;
-    }
-    .ant-table-tbody > tr{
-        &:active{
-            background: #2f3135  !important;
-        }
-    }
     .ant-table {
-        
+        background:  transparent !important;
         font-size: 12px;
         }
         /* row data */
         .ant-table-tbody > tr > td {
+            // background:  transparent !important;
             height: 4px;
             padding: 4px;
         }
         /* row tags */
         .ant-table-thead > tr > th {
+            // background:  transparent !important;
             height: 2px;
             padding: 4px;
         }
     }
+    
 }
 
 .tableHeaderButtonContainer {
     display: flex; 
     justify-content: flex-end;
+    height: 40px;
     .tableHeaderToggleButtonContainer {
-      .activeToggleButton,
-      .endedToggleButton {
-        border: none;
-        background-color: #29292c;
-        padding: 0.25rem 1rem;
-        &:hover {
-          border: 1px solid  #1e5d91;
-          cursor: pointer;
+        .progressToggleButton,
+        .graphToggleButton,
+        .listToggleButton{
+            border: none;
+            background-color: #29292c;
+            padding: 0.25rem 1rem;
+            &:hover {
+            border: 1px solid  #1e5d91;
+            cursor: pointer;
+            }
         }
-      }
-      .activeToggleButton {
-          width: 70px;
-        border-radius: 9999px 0 0 9999px;
-      }
-      .endedToggleButton {
-        width: 70px;
-        border-left: 1px solid #29292c;
-        border-radius: 0 9999px 9999px 0;
-      }
+        .progressToggleButton {
+            width: 85px;
+            border-left: 1px solid #29292c;
+            border-radius: 9999px 0 0 9999px;
+        }
+        .graphToggleButton{
+            border-left: 1px solid #29292c;
+            width: 85px;
+        }
+        .listToggleButton {
+            width: 85px;
+            border-left: 1px solid #29292c;
+            border-radius: 0 9999px 9999px 0;
+        }
     }
   }
