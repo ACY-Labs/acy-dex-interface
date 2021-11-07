@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { connect } from 'umi';
 import { Button } from 'antd';
+import { useWeb3React } from '@web3-react/core';
 import {
   AcyCard,
   AcyIcon,
@@ -13,28 +14,25 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
+import StakeHistoryTable from '../Swap/components/StakeHistoryTable';
 import AddComponent from '@/components/AddComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
 
 const { AcyTabPane } = AcyTabs;
 
-@connect(({ profile, loading }) => ({
-  profile,
-  loading: loading.effects['profile/fetchBasic'],
-}))
-class BasicProfile extends Component {
-  state = {
-    visible: false,
-    visibleConfirmOrder: false,
-    visibleLoading: false,
-    tabIndex: 1,
-    loggedIn: false,
-  };
+const BasicProfile = (props) => {
 
-  componentDidMount() { }
+  const [visible, setVisible] = useState(false);
+  const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
+  const [visibleLoading, setVisibleLoading] = useState(false);
+  const [tabIndex, setTabIndex] = useState(1);
+  const [loggedIn, setLoggedIn] = useState(false);
 
-  lineTitleRender = () => [
+  const { account, chainId, library, activate } = useWeb3React();
+  console.log("account", account);
+
+  const lineTitleRender = () => [
     <div>
       <div className={styles.maintitle}>
         <span className={styles.lighttitle}>ETH</span>/BTC
@@ -52,59 +50,91 @@ class BasicProfile extends Component {
   ];
 
   // 时间段选择
-  onhandPeriodTimeChoose = pt => {
+  const onhandPeriodTimeChoose = pt => {
     console.log(pt);
   };
 
   // 选择Coin
-  onClickCoin = () => {
-    this.setState({
-      visible: true,
-    });
+  const onClickCoin = () => {
+    setVisible(true)
   };
 
-  onCancel = () => {
-    this.setState({
-      visible: false,
-    });
+  const onCancel = () => {
+      setVisible(false);
   };
 
-  onHandModalConfirmOrder = falg => {
-    this.setState({
-      visibleConfirmOrder: !!falg,
-    });
+  const onHandModalConfirmOrder = falg => {
+      setVisibleConfirmOrder(!!falg);
   };
 
-  onChangeTabs = e => {
-    this.setState({
-      tabIndex: e,
-    });
+  const onChangeTabs = e => {
+      setTabIndex(e);
   };
 
-  onLoggedIn = () => {
-    this.setState({
-      loggedIn: true,
-    });
+  const onLoggedIn = () => {
+      setLoggedIn(true);
   };
 
-  render() {
-    const { visible, visibleConfirmOrder, visibleLoading, tabIndex, loggedIn } = this.state;
-    let token = null;
-    if(this.props.location.state){
-      token = this.props.location.state;
-      console.log(token)
+  function getTransactionsByAccount(myaccount, startBlockNumber, endBlockNumber) {
+    if (endBlockNumber == null) {
+      endBlockNumber = web3.eth.blockNumber;
+      console.log("Using endBlockNumber: " + endBlockNumber);
     }
+    if (startBlockNumber == null) {
+      startBlockNumber = endBlockNumber - 1000;
+      console.log("Using startBlockNumber: " + startBlockNumber);
+    }
+    console.log("Searching for transactions to/from account \"" + myaccount + "\" within blocks "  + startBlockNumber + " and " + endBlockNumber);
+  
+    for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+      if (i % 1000 == 0) {
+        console.log("Searching block " + i);
+      }
+      var block = eth.getBlock(i, true);
+      if (block != null && block.transactions != null) {
+        block.transactions.forEach( function(e) {
+          if (myaccount == "*" || myaccount == e.from || myaccount == e.to) {
+            console.log("  tx hash          : " + e.hash + "\n"
+              + "   nonce           : " + e.nonce + "\n"
+              + "   blockHash       : " + e.blockHash + "\n"
+              + "   blockNumber     : " + e.blockNumber + "\n"
+              + "   transactionIndex: " + e.transactionIndex + "\n"
+              + "   from            : " + e.from + "\n" 
+              + "   to              : " + e.to + "\n"
+              + "   value           : " + e.value + "\n"
+              + "   time            : " + block.timestamp + " " + new Date(block.timestamp * 1000).toGMTString() + "\n"
+              + "   gasPrice        : " + e.gasPrice + "\n"
+              + "   gas             : " + e.gas + "\n"
+              + "   input           : " + e.input);
+          }
+        })
+      }
+    }
+  }
 
-    return (
-      <PageHeaderWrapper>
-        <div className={loggedIn ? styles.main : styles.main_notLoggedIn}>
-          <div>{loggedIn && <AcyLiquidityPositions />}</div>
-          <div>
-            <AddComponent onLoggedIn={this.onLoggedIn} />
-          </div>
+  const getHistoryTransaction = () => {
+    console.log("getting transaction");
+    // this.state.web3ReactContext.
+  }
+
+  let token = null;
+  if (props.location.state) {
+    token = props.location.state;
+    console.log(token)
+  }
+  // const {activate} = this.state.web3ReactContext;
+  // console.log("web3react", activate);
+
+  return (
+    <PageHeaderWrapper>
+      <div className={loggedIn ? styles.main : styles.main_notLoggedIn}>
+        <div>{loggedIn && <AcyLiquidityPositions />}</div>
+        <div>
+          <AddComponent onLoggedIn={onLoggedIn} />
         </div>
+      </div>
 
-        <AcyModal onCancel={this.onCancel} width={600} visible={visible}>
+      {/* <AcyModal onCancel={this.onCancel} width={600} visible={visible}>
           <div className={styles.title}>
             <AcyIcon name="back" /> Select a token
           </div>
@@ -127,9 +157,9 @@ class BasicProfile extends Component {
               <AcyTabPane tab="Synth" key="4" />
             </AcyTabs>
           </div>
-        </AcyModal>
+        </AcyModal> */}
 
-        <AcyConfirm
+      {/* <AcyConfirm
           onCancel={this.onHandModalConfirmOrder}
           title="Comfirm Order"
           visible={visibleConfirmOrder}
@@ -146,15 +176,31 @@ class BasicProfile extends Component {
               Confirm
             </Button>
           </div>
-        </AcyConfirm>
+        </AcyConfirm> */}
 
-        <AcyApprove
+      {/* <AcyApprove
           onCancel={() => this.setState({ visibleLoading: false })}
           visible={visibleLoading}
-        />
-      </PageHeaderWrapper>
-    );
-  }
+        /> */}
+
+      <StakeHistoryTable
+        isMobile={props.isMobile}
+        dataSource={[
+          {
+            "hash": "0x9bd8646e8bb6942cc3ae38f2a8a2be7eaeeeae5f12fe76c988ec02361c0cc41c",
+            "inputTokenNum": 1.157920892373162e+59,
+            "inputTokenSymbol": "ACY",
+            "outTokenNum": 0.9717145322649389,
+            "outTokenSymbol": "UNI",
+            "transactionTime": "2021-10-16 19:34:30"
+          }
+        ]}
+      />
+    </PageHeaderWrapper>
+  );
 }
 
-export default BasicProfile;
+export default connect(({ profile, loading }) => ({
+  profile,
+  loading: loading.effects['profile/fetchBasic'],
+}))(BasicProfile);
