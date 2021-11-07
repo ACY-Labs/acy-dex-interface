@@ -429,9 +429,9 @@ const LaunchpadComponent = () => {
             </div>
             <div className = {styles.chartWrapper}>
                 { selectedGraph === 0 && (
-                    <div >
+                    <div className ={styles.stepBlock} id = "block">
                     <StepBar chartData = {chartData}/>
-                 </div>
+                    </div>
                 )}
                 { selectedGraph === 1 && (
                     <AcyLineChart  
