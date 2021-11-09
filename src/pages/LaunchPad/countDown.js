@@ -1,8 +1,7 @@
-import { Steps,Divider,Statistic, Row, Col } from 'antd';
 import React, { useState, useEffect } from "react";
 import SwapInput from './SwapInput';
 import styles from './styles.less';
-import { Card, Icon, Input, Row, Col } from 'antd';
+import { Card, Icon, Input, Row, Col, Steps,Divider,Statistic } from 'antd';
 import AcyIcon from '@/assets/icon_double_down.svg';
 import AcyButton from '@/components/AcyButton';
 import { AcyLineChart } from '@/components/Acy';
@@ -22,5 +21,38 @@ function onFinish() {
 
   const countDown = (props) => {
 
-    
+
+    return(
+      <div className={styles.countDown}>
+      <div className={styles.cntdwn}>
+        <div className = {styles.number} id = "b">
+        <div classNmae = {styles.countnumber}>0</div>
+        <div>DAYS</div>
+        </div>
+        <div className = {styles.seperator}>:</div>
+        <div className = {styles.number}id = "b">
+
+        <div classNmae = {styles.countnumber}>0</div>
+        <div>HOURS</div>
+        </div>
+        <div className = {styles.seperator}>:</div>
+        <div  className = {styles.number}id = "b">
+
+        <div classNmae = {styles.countnumber}>0</div>
+        <div>MIN</div>
+        </div>
+        <div className = {styles.seperator}>:</div>
+        <div className = {styles.number}id = "b">
+
+        <div classNmae = {styles.countnumber} >0</div>
+        <div>SEC</div>
+        </div>
+
+
+      </div>
+      <div className={styles.countLabel}>ROUND 1</div>
+
+    </div>
+    )
   }
+  export default countDown;
