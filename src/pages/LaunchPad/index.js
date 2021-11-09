@@ -173,8 +173,8 @@ const LaunchpadComponent = () => {
             align: 'center'
         },
         {
-            title: 'Amount',
-            dataIndex: 'amount',
+            title: 'Quantity',
+            dataIndex: 'quantity',
             width: 75,
             align: 'center'
         },
@@ -193,19 +193,19 @@ const LaunchpadComponent = () => {
         {
             title: 'Max Winners',
             dataIndex: 'maxWinners',
-            width: 100,
+            width: 75,
             align: 'center'
         },
         {
             title: 'Filled',
             dataIndex: 'filled',
-            width: 100,
+            width: 60,
             align: 'center'
         },
         {
             title: 'Yield',
             dataIndex: 'yieldPer',
-            width: 100,
+            width: 60,
             align: 'center'
         },
     ];
@@ -235,7 +235,7 @@ const LaunchpadComponent = () => {
         {
             title: 'Quantity',
             dataIndex: 'quantity',
-            width: 60,
+            width: 65,
             align: 'center',
             ellipsis: true
         },
@@ -261,7 +261,7 @@ const LaunchpadComponent = () => {
           closeDate: "2021-11-01",
           price: ACY_PRICE.toString() + ' USDC',
           raiseSize: "1000000 ACY",
-          amount: 2500,
+          quantity: 2500,
           marketCap:"$10M",
           filled: "1379%",
           maxWinners: "10000",
@@ -269,7 +269,7 @@ const LaunchpadComponent = () => {
           totalTickets: "82795 Tickets",
           perWinTicket: "100 USDC",
           get maxAllocation() {
-              return this.quantity * ACY_PRICE;
+            return this.quantity * ACY_PRICE;
           }
         },
         {
@@ -278,7 +278,7 @@ const LaunchpadComponent = () => {
           closeDate: "2021-10-20",
           price: ACY_PRICE.toString() + ' USDC',
           raiseSize: "1000000 ACY",
-          amount: 3000,
+          quantity: 3000,
           marketCap:"$20M",
           filled: "1579%",
           maxWinners: "10000",
@@ -287,7 +287,7 @@ const LaunchpadComponent = () => {
           perWinTicket: "110 USDC",
           get maxAllocation() {
             return this.quantity * ACY_PRICE;
-        }
+          }
         },
         {
           round: "Round 3",
@@ -295,7 +295,7 @@ const LaunchpadComponent = () => {
           closeDate: "2021-11-03",
           price: ACY_PRICE.toString() + ' USDC',
           raiseSize: "1000000 ACY",
-          amount: 5000,
+          quantity: 5000,
           marketCap:"$30M",
           filled: "1379%",
           maxWinners: "20000",
@@ -304,7 +304,7 @@ const LaunchpadComponent = () => {
           perWinTicket: "120 USDC",
           get maxAllocation() {
             return this.quantity * ACY_PRICE;
-        }
+          }
         },
       ];
 
@@ -353,7 +353,7 @@ const LaunchpadComponent = () => {
     );
 
     const [showForm, setShowForm] = useState(false);
-    const [selectedForm, setSelectedForm] = useState(0)
+    const [selectedForm, setSelectedForm] = useState(2)
     const [selectedTab, setSelectedTab] = useState(0);
     const [selectedTableRow, setSelectedTableRow] = useState(tableData[0]);
     
@@ -532,7 +532,7 @@ const LaunchpadComponent = () => {
                                 </div>
                             </div>
                             <div className={styles.whitelistBox}>
-                                <Button className={styles.whiteListToggleButton} shape="round" onClick={() => setShowForm(() => true)}>Whitelist</Button>
+                                <Button className={styles.whiteListToggleButton} shape="round" onClick={() => setSelectedForm(1)}>Whitelist</Button>
                             </div>
                         </div>
                         )}
