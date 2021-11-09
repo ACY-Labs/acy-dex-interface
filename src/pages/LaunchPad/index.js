@@ -416,7 +416,7 @@ const LaunchpadComponent = () => {
             
             <div className={styles.contentStyle} >
 
-            <Carousel dot = "true" autoplay>
+            <Carousel dot = "true" autoplay >
             <div>
                     <div id = "cntBlock">
                         <CountDown/>
@@ -427,7 +427,7 @@ const LaunchpadComponent = () => {
                     
                     
             </div>
-            <div className = {styles.chartWrapper} >
+            <div className = {styles.chartWrapper} id = "chartdata" >
                     <AcyLineChart  
                         data={timeData}
                         showXAxis={true}
