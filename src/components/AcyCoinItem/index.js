@@ -115,7 +115,7 @@ const AcyCoinItem = ({
       <div hidden={hideFavButton} className={styles.favButtonContainer} onClick={setAsFav}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          style={{ minWidth: '0.25rem', minHeight: '1.25rem' }}
+          style={{ height: '1.25rem' }}
           className={styles.favButton}
           viewBox="0 0 20 20"
           fill={ isFav?"#EB5C20":"currentColor"}
