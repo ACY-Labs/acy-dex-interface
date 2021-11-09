@@ -3,40 +3,84 @@
 @cardColor: #2f313583;
 @mainColor: #c4c4c4;
 
+.launchRoot{
+    width: 90%;
+    max-width: 1000px;
+    margin: auto;
+    z-index: 0;
+    margin-bottom: 20px;
+    font-weight: 400;
+}
+
 .topContainer{
     width: 100%;
-    flex-direction: row;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    margin-bottom: 15px;
 }
 
 .tokenContainer{
-    width: 48%;
+    width: 50%;
+    min-height: 20vh;
     max-height: 700px;
-    height: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-    position: relative;
-    display: inline-block;
-    .snsBox1{
-        margin: 2.5em 0.5em 0 0.5em;
+    overflow: visible;
+    border-radius: 0 15px 15px 15px 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    //position: relative;
+    //display: inline-block;
+}
+
+.moreInfoContainer{
+    width: 50%;
+    min-height: 35vh;
+    max-height: 700px;
+    border-radius: 0 15px 15px 15px 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    z-index: 11;
+    .tableHeaderButtonContainer {
+        width: 100%;
+        display: flex; 
+        justify-content: flex-end;
+        margin-bottom: 20px;
+        .tableHeaderToggleButtonContainer {
+          .activeToggleButton,
+          .endedToggleButton {
+            border: none;
+            background-color: #29292c;
+            padding: 0.25rem 1rem;
+            &:hover {
+              border: 1px solid  #1e5d91;
+              cursor: pointer;
+            }
+          }
+          .activeToggleButton {
+              width: 70px;
+            border-radius: 9999px 0 0 9999px;
+          }
+          .endedToggleButton {
+            width: 70px;
+            border-left: 1px solid #29292c;
+            border-radius: 0 9999px 9999px 0;
+          }
+        }
     }
-    .snsBox2{
-        margin: 1em 0.5em 0 0.5em;
-    }
-    .snsBox3{
-        margin: 1em 0.5em 0 0.5em;
+    .chartWrapper {
+        height: 90%;
     }
 }
 
-.chartWrapper{
+
+
+/* .chartWrapper{
     width: 49%;
-    height: 315px;
+    height: 30vh;
     max-height: 700px;
     float: right;
     overflow: hidden;
-}
+} */
 
 .stepBar {
     // width: 100%;
@@ -48,46 +92,40 @@
 }
 
 .stepColor {
-
-        :global{
-        .ant-steps-item-title{
-            color: #b5b5b6  !important;
-          //  background-color: red;
+    :global{
+    .ant-steps-item-title{
+        color: #b5b5b6  !important;
+        //  background-color: red;
+    }
+    .ant-steps-item-description{
+        color:#b5b5b6 !important}
+        .ant-steps-item-tail{
+            width: 0% !important;
+            border-style: dotted none none ;
+            margin-left: 90px !important;
+            margin-top: 4px !important;
+            padding: 11.5px 27px !important;
+            color: #eb5c20;
+            
         }
-        .ant-steps-item-description{
-            color:#b5b5b6 !important}
-            .ant-steps-item-tail{
-                width: 0% !important;
-                border-style: dotted none none ;
-                margin-left: 90px !important;
-                margin-top: 4px !important;
-                padding: 11.5px 27px !important;
-                color: #eb5c20;
-                
-            }
-            .ant-steps{
-                display: contents;
-            }
-            .ant-steps-item-finish { .ant-steps-item-icon {
-                background-color: #0e0304 !important;
-                border-color: #0e0304;
-            }}
-            .ant-steps-item-wait .ant-steps-item-icon {
-                background-color: #0e0304 !important;
-                border-color: #0e0304;
-            }
-            .ant-steps-item-icon > .ant-steps-icon {
-                color: #b5b5b6 !important;
-            }
-        
-            }
-    
-
+        .ant-steps{
+            display: contents;
+        }
+        .ant-steps-item-finish { .ant-steps-item-icon {
+            background-color: #0e0304 !important;
+            border-color: #0e0304;
+        }}
+        .ant-steps-item-wait .ant-steps-item-icon {
+            background-color: #0e0304 !important;
+            border-color: #0e0304;
+        }
+        .ant-steps-item-icon > .ant-steps-icon {
+            color: #b5b5b6 !important;
+        }
+    }
 }
 
-
 .textcolor{
-
     color: red;
 }
 .hashtagBox{
@@ -140,25 +178,20 @@
 
 .midContainer{
     width: 100%;
-    padding: 0%;
-    margin: 0%;
-    flex-direction: row;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .tokenInfoBox{
-    width: 60%;
-    height: auto;
+    width: 58%;
+    flex: 1 1 25rem;
+    flex-grow: 1;
+    max-height: 700px;
     // padding: 20px 30px ;
     background-color: #1b1b1c;
-    box-sizing: border-box;
     border-radius: 10px 0 0 10px;
-    overflow: hidden;
-    position: relative;
-    display: inline-block;
 }
 
 .tokenInfoBoxTop{
@@ -166,14 +199,23 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    .tokenSym{
+        display: flex;
+        flex-wrap: wrap;
+        width: 30%;
+    }
     .tokenIDODate{
-        margin-right: 30%;
+        margin-right: 25%;
+    }
+    .tokenIDOStatus{
+        position: relative;
+        margin-top: 8px;
     }
 }
 .tokenInfoContainer {
     width: 100%;
     height: auto;
-    padding: 20px 30px 0 30px ;
+    padding: 10px 20px 0 20px ;
     margin-bottom: 10px;
     justify-content: left;
 }
@@ -191,13 +233,11 @@
 }
 
 .tokenDetails{
-    width: 100%;
-    height: auto;
     display: flex;
     padding: 15px 0;
     justify-content: left;
     .tokenPrice{
-        margin-left: 47px;
+        margin-left: 15px;
         width: 220px;
     }
     .tokenTotalRaise{
@@ -221,14 +261,12 @@
     // margin-top: 10px;
     // display: flex;
     // justify-content: left;
-    width: 100%;
-    height: auto;
     display: flex;
+    justify-content: flex-start;
+    position:sticky;
     padding: 15px 0;
-    justify-content: left;
-    margin-top: 15px;
     .totalTickets {
-        margin-left: 47px;
+        margin-left: 15px;
         width: 220px;
     }
     .tokenRaiseSize {
@@ -239,9 +277,11 @@
     }
     
     .tokenMaxAllo {
+        width: 180px;
+    }
+    .tokenMaxWinners {
         width: auto;
     }
-    
 }
 
 .leftToggleButton {
@@ -291,7 +331,7 @@
 }
 
 .swapToggleButton{
-    border: 1px solid transparent;
+  border: 1px solid transparent;
   background-color: #c6224e;
   width: 10em;
   height: 40px;
@@ -325,8 +365,10 @@
 }
 
 .ticketBox{
-    width: 40%;
-    height: auto;
+    width: 42%;
+    flex: 1 1 8 rem;
+    flex-grow: 1;
+    max-height: 700px;
     background-color: #0e0304;
     box-sizing: border-box;
     border-radius: 0 10px 10px 0;
@@ -387,6 +429,8 @@
 }
 
 .dateTableBox{
+    display: block;
+    width: 100%;
     :global{
         .ant-table-placeholder{
         background: transparent !important;
@@ -515,6 +559,29 @@
 
 #nextPage:hover{
     cursor: pointer;
+}
+
+.twitterbtn {
+    font: normal normal normal 13px/26px 'Helvetica Neue',Arial,sans-serif;
+    height: 28px;
+    border-radius: 4px;
+    max-width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    border: #CCC solid 1px;
+    background-color: #b5b5b6;
+    color: #333;
+    font-weight: normal;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: top;
+    zoom: 1;
+    text-decoration: none;
 }
 
 //tan
@@ -692,9 +759,7 @@
 
 
 .transferTable{
-
     :global{
-        
     .ant-table-placeholder{
         background: transparent !important;
     }
@@ -737,28 +802,12 @@
     }
 }
 
-.tableHeaderButtonContainer {
-    display: flex; 
-    justify-content: flex-end;
-    .tableHeaderToggleButtonContainer {
-      .activeToggleButton,
-      .endedToggleButton {
-        border: none;
-        background-color: #29292c;
-        padding: 0.25rem 1rem;
-        &:hover {
-          border: 1px solid  #1e5d91;
-          cursor: pointer;
-        }
-      }
-      .activeToggleButton {
-          width: 70px;
-        border-radius: 9999px 0 0 9999px;
-      }
-      .endedToggleButton {
-        width: 70px;
-        border-left: 1px solid #29292c;
-        border-radius: 0 9999px 9999px 0;
-      }
+//mobile screen responsive
+@media screen and (max-width: 1060px) {
+    .midContainer {
+        flex-direction: row;
     }
-  }
+    .tokenContainer, .tokenInfoBox, .moreInfoContainer, .ticketBox{ 
+        width: 100%;
+    }
+}
