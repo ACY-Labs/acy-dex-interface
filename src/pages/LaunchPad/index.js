@@ -55,9 +55,13 @@ const LaunchpadComponent = () => {
     const [pendingEnd,setPending]= useState(false);
     const [fetchEnd,setFetchEnd] = useState(false);
     const [transferData,setTransferData] = useState([]);
+<<<<<<< HEAD
     const [selectedGraph,setSelectedGraph] = useState(0);
     const [showForm, setShowForm] = useState(false)
     
+=======
+    const [selectedGraph,setSelectedGraph] = useState(1);
+>>>>>>> cf2347f823906e677c6cf9a058b9c901331ba183
 
     const getTime = async (blockNumber) => {
         const result = await eth.getBlock(blockNumber).then(function(events){
@@ -118,19 +122,20 @@ const LaunchpadComponent = () => {
  
     },[])
       
-    useEffect( async() =>{
-        const result = await getTransferData();
-        console.log('getTransferData',result);
-        setTransferData(result.reverse());
+    useEffect(async () =>{
+        getTransferData().then((events) => {
+            console.log('getTransferData',events,events.length);
+            // const chartData = [];
+            // events.forEach( (element) => {
+            //     chartData.push([element.dateTime.substr(0,11),element.price]);
+            // });
+            // console.log('chartData:',chartData);
+            setTransferData(events[0]);
+            setChartData(events[1])
+        });
+        
     },[])
 
-    useEffect(async() =>{
-        if(timeData.length >= 10)
-        {
-            console.log(timeData);
-            setChartData(timeData);
-        }
-    },[timeData])
 
     const links = [
         "https://google.com",
@@ -211,26 +216,35 @@ const LaunchpadComponent = () => {
             align: 'center'
         },
     ];
+    const testData = [
+        {
+            dateTime:"2018-12-01",
+            participant: "0x253584",
+            quantity:'9999',
+            token:'acy'
+        }
+    ]
     const transferTableHeader = [
+        {
+            title: 'Date Time(UTC)',
+            dataIndex: 'dateTime',
+            className: 'column-date',
+            width: 70,
+            align: 'left'
+        },
         {
             title: 'Participants',
             dataIndex: 'participant',
             width: 60,
             align: 'center',
-            ellipsis: true,
-        },
-        {
-            title: 'Date Time(UTC)',
-            dataIndex: 'dateTime',
-            className: 'column-date',
-            width: 100,
-            align: 'center'
+            ellipsis: true
         },
         {
             title: 'Quantity',
             dataIndex: 'quantity',
             width: 60,
-            align: 'center'
+            align: 'center',
+            ellipsis: true
         },
         {
             title: 'Token',
@@ -345,9 +359,16 @@ const LaunchpadComponent = () => {
         </Menu>
     );
 
+<<<<<<< HEAD
+=======
+    const [showForm, setShowForm] = useState(false);
+    const [selectedForm, setSelectedForm] = useState(0)
+    const [selectedTab, setSelectedTab] = useState(0);
+>>>>>>> cf2347f823906e677c6cf9a058b9c901331ba183
     const [selectedTableRow, setSelectedTableRow] = useState(tableData[0]);
     
         return(
+<<<<<<< HEAD
             <div className={styles.launchRoot}>
                 <div className={styles.topContainer}>
                     <div className={styles.tokenContainer}> 
@@ -457,6 +478,107 @@ const LaunchpadComponent = () => {
                                     <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', textAlign:"center", fontSize:'16px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
                                 </div>
                             </div>
+=======
+            <PageHeaderWrapper>
+                
+        <div className={styles.tableHeaderButtonContainer}>
+            <div className={styles.tableHeaderToggleButtonContainer}>
+            <button type="button" 
+                    className={styles.progressToggleButton}
+                    style={{ backgroundColor: selectedGraph === 0 ? "#174163" : "#2e3032", color: selectedGraph === 0 ? "white": ""}}
+                    onClick = { () => setSelectedGraph(0)}
+                >
+                    Progress
+                </button>
+                <button type="button" 
+                    className={styles.graphToggleButton}
+                    style={{ backgroundColor: selectedGraph === 1 ? "#174163" : "#2e3032", color: selectedGraph === 1 ? "white": ""}}
+                    onClick = { () => setSelectedGraph(1)}
+                >
+                    Graph
+                </button>
+                <button type="button" 
+                    className={styles.listToggleButton}
+                    style={{ backgroundColor: selectedGraph === 2 ? "#174163" : "#2e3032", color: selectedGraph === 2 ? "white": ""}}
+                    onClick = { () => setSelectedGraph(2)}
+                >List
+                </button>
+            </div>
+        </div>
+
+        <div className={styles.topContainer}>
+            <div className={styles.tokenContainer}> 
+                <div className={styles.snsBox1}>
+                    <Button type="primary" href={links[0]} target="_blank" style={{background: "#C4C4C4", border: "#eb5c20", color: 'black', height: "2em"}} icon="link">Website</Button>
+                    <Button type="link" href={links[1]} target="_blank" style={buttonCustomStyle} icon="file">Whitepaper</Button>
+                    <Button type="link" href={links[2]} target="_blank" style={buttonCustomStyle}>
+                        <img src={telegramIcon} alt="" style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '8px 8px 0 0', float:'left'}} /> Telegram
+                    </Button>             
+                    <Button type="link" href={links[3]} target="_blank" style={buttonCustomStyle} icon="twitter">Twitter</Button>
+                </div>
+                <div className={styles.snsBox2}>
+                    <Button type="link" href={links[4]} target="_blank" style={{background: "#C4C4C4", border: "#eb5c20", color: 'black', height: "2em"}} icon="medium">Medium</Button>
+                    <Button type="link" href={links[6]} target="_blank" style={buttonCustomStyle} icon="linkedin">LinkedIn</Button>             
+                    <Button type="link" href={links[4]} target="_blank" style={buttonCustomStyle} icon="message">Forum</Button> 
+                    <Button type="link" href={links[5]} target="_blank" style={buttonCustomStyle} icon="github">Github</Button>
+                </div>
+                <div className={styles.snsBox3}>
+                    <Button type="link" href={links[4]} target="_blank" style={{background: "#C4C4C4", border: "#eb5c20", color: 'black', height: "2em"}} icon="file-ppt">Deck</Button>
+                    <Button type="link" href={links[1]} target="_blank" style={buttonCustomStyle}>
+                        <Icon type="youtube" theme="filled" />
+                            YouTube
+                    </Button>
+                    <Dropdown overlay={menu} trigger={['click']}>
+                        <Button onClick={e => e.preventDefault()} style={buttonCustomStyle}>
+                            Explorer <Icon type="down" />
+                        </Button>
+                    </Dropdown>
+                </div>
+                <div className={styles.hashtagBox}>
+                    <img src={hashtagIcon} alt="" className={styles.hashtagImage} />
+                    <span style={hashtagText}>DeFi Market, AMM, DEX</span>
+                </div>
+            </div>
+            <div className = {styles.chartWrapper}>
+                { selectedGraph === 0 && (
+                    <div className ={styles.stepBlock} id = "block">
+                    <StepBar chartData = {chartData}/>
+                    </div>
+                )}
+                { selectedGraph === 1 && (
+                    <AcyLineChart  
+                        data={timeData}
+                        showXAxis={true}
+                        showYAxis={true}
+                        showGradient={true}
+                        lineColor="#e29227"
+                        bgColor="#2f313500"
+                    />
+                )}
+                { selectedGraph === 2 && (
+                    <div className={styles.transferTable}>
+                        <Table style={{marginTop:'20px',textAlign:'center'}}
+                            id="transferTable"
+                            columns={transferTableHeader} dataSource={transferData}
+                            pagination={false}
+                            scroll={{ y: 250 }}
+                            rowClassName={(record, index) => styles.rowExpanded}
+                        />   
+                    </div> 
+                )}
+            </div>
+            
+        </div>
+        <div className={styles.midContainer}>
+    
+            <div className={styles.tokenInfoBox}>
+                <div className={styles.tokenInfoContainer }>
+                    <h2 style={{fontWeight:'bold'}}>{selectedTableRow.round}</h2>
+                    <div className={styles.tokenInfoBoxTop}>
+                        <div className={styles.tokenSym}>
+                            <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
+                            <h2 style={{color:'#eb5c20'}} className={styles.tokenName}> ACY </h2>
+>>>>>>> cf2347f823906e677c6cf9a058b9c901331ba183
                         </div>
                         <div className={styles.tokenProgress}>
                             <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={90} status='active' />
@@ -479,11 +601,63 @@ const LaunchpadComponent = () => {
                                 <h3 style={tokenContent}>{selectedTableRow.marketCap}</h3>             
                             </div>
                         </div>
+<<<<<<< HEAD
                         <span className={styles.line}> </span>
                         <div className={styles.tokenMoreInfo}>
                             <div className={styles.totalTickets}>                   
                                 <p style={token}>Allocation/Winning Ticket</p>
                                 <h3 style={tokenContent}>{selectedTableRow.perWinTicket}</h3>
+=======
+                    </div>
+                </div>
+                <div className={styles.tokenProgress}>
+                    <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={90} status='active' />
+                </div>
+                <div className={styles.tokenDetails}>
+                    
+                    <div className={styles.tokenPrice}>                    
+                        <p style={token}>Per ACY</p>
+                        <h3 style={tokenContent}>{selectedTableRow.price}</h3>
+                    </div>
+                    <div className={styles.ticketAllocation}>    
+                        <p style={token}>Quantity</p>
+                        <h3 style={tokenContent}>{selectedTableRow.quantity}</h3> 
+                    </div>
+                    <div className={styles.tokenTotalRaise}>                   
+                        <p style={token}>Max Winning</p>
+                        <h3 style={tokenContent}>{selectedTableRow.maxWinning}</h3>
+                    </div>
+                    <div className={styles.tokenMarketCap}>   
+                        <p style={token}>Market Cap</p>
+                        <h3 style={tokenContent}>{selectedTableRow.marketCap}</h3>             
+                    </div>
+                </div>
+                <span className={styles.line}> </span>
+                <div className={styles.tokenMoreInfo}>
+                    <div className={styles.totalTickets}>                   
+                        <p style={token}>Allocation Per Winning Ticket</p>
+                        <h3 style={tokenContent}>{selectedTableRow.perWinTicket}</h3>
+                    </div>
+                    <div className={styles.tokenAmount}>                    
+                        <p style={token}>Total Tickets Deposited</p>
+                        <h3 style={tokenContent}>{selectedTableRow.totalTickets}</h3>
+                    </div>
+                    <div className={styles.tokenMaxAllo}>              
+                        <p style={token}>Max Allocation</p>
+                        <h3 style={tokenContent}>{selectedTableRow.maxAllocation}</h3>
+                    </div> 
+                </div>
+            </div>
+            
+            <div className={styles.ticketBox}>
+                { selectedForm === 0 && (
+                <div className={styles.showTicketContainer}>
+                    <div className={styles.showTicketBox}>
+                        <div className={styles.showTicketBox1}>
+                            <div className={styles.userEligibleTickets}>
+                                <p>Your Eligible Tickets</p>
+                                <h3 style={tokenContent}>0 Ticket(s)</h3>
+>>>>>>> cf2347f823906e677c6cf9a058b9c901331ba183
                             </div>
                             <div className={styles.tokenAmount}>                    
                                 <p style={token}>Total Tickets Deposited</p>
@@ -533,6 +707,7 @@ const LaunchpadComponent = () => {
                             <FollowTelegram />
                         )}
                     </div>
+<<<<<<< HEAD
                 </div>
                 <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', width: '100%', flexWrap:'wrap' }}>
                     <div className={styles.dateTableBox}>
@@ -550,6 +725,22 @@ const LaunchpadComponent = () => {
                         />
                     </div>
                 </div>
+=======
+                    <div className={styles.whitelistBox}>
+                        <Button className={styles.whiteListToggleButton} shape="round" onClick={() => setSelectedForm(1)}>Whitelist</Button>
+                    </div>
+                </div>
+                
+                )}
+                {selectedForm === 1 && (
+                    <FollowTelegram 
+                        setSelectedForm={setSelectedForm}
+                    />
+                )}
+                { selectedForm === 2 && (
+                    <SwapTicket />
+                )}
+>>>>>>> cf2347f823906e677c6cf9a058b9c901331ba183
             </div>
         );
 }

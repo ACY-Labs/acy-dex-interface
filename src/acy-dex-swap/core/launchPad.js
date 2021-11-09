@@ -23,22 +23,25 @@ const getBlockTime = async (blockNumber) => {
 const getTransferData = async () =>
 {
     const transferData = [];
+    const chartData = [];
     const contract = new Contract(ERC20ABI, ACY_ADDRESS);
-    const result = (contract.getPastEvents("Transfer", {
+    const result = await contract.getPastEvents("Transfer", {
         fromBlock: 0 ,
         toBlock: 'latest'
     }).then(function(events){
-        events.forEach(async (element) => {
+        events.forEach( async (element) => {
             const blockData = {
                 dateTime: await getBlockTime(element['blockNumber']),
+                // dateTime: "2021-02-02",
                 participant: element['returnValues']['to'],
                 quantity: element['returnValues']['value']/1e18,
                 token: "ACY",
             };
             transferData.push(blockData);
+            chartData.push([blockData.dateTime.substring(0,11),blockData.quantity])
         });
-    }));
-    return transferData;
+    });
+    return [transferData,chartData];
 };
 
 export {getTransferData};

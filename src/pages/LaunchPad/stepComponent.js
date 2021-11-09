@@ -19,12 +19,12 @@ const stepComponent = (props) => {
     <div  className = {styles.stepBar} >
               <div className = {styles.stepColor} 
               id = "steps">
-              <Steps size = "small" labelPlacement="vertical" current={current}>
-                <Step description ="Preparation" />
-                <Step description="Whitelist"  />
-                <Step description="Lottery"  />
-                <Step description="Sale"  />
-                <Step description="Distribution"  />
+              <Steps size = "small" direction ="vertical" labelPlacement= "vertical" current={current} >
+                <Step title ="Preparation" />
+                <Step title="Whitelist"  />
+                <Step title="Lottery"  />
+                <Step title="Sale"  />
+                <Step title="Distribution"  />
               </Steps>
               {/* <Divider /> */}
             

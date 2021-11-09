@@ -82,14 +82,18 @@
     overflow: hidden;
 } */
 
-.stepBar {
-    // width: 100%;
-    // height: 100%;
-    // //padding: 20px 30px ;
+.stepBlock {
+    width: auto;
+    height: auto;
+    position: relative;
+    // padding: 46px 300px ;
     // box-sizing: border-box;
     // border-radius: 10px;
-    // margin: mid;
+    margin: mid;
+    top: 65px;
+    left: 500px;
 }
+
 
 .stepColor {
     :global{
@@ -108,6 +112,7 @@
             color: #eb5c20;
             
         }
+<<<<<<< HEAD
         .ant-steps{
             display: contents;
         }
@@ -123,6 +128,40 @@
             color: #b5b5b6 !important;
         }
     }
+=======
+        .ant-steps-item-description{
+            color:#b5b5b6 !important}
+            // .ant-steps-item-tail{
+            //     width: 0% !important;
+            //     border-style: dotted none none ;
+            //     margin-left: 90px !important;
+            //     margin-top: 4px !important;
+            //     padding: 11.5px 27px !important;
+            //     color: #eb5c20;
+                
+            // }
+            .ant-steps{
+                display: contents;
+            }
+            .ant-steps-item-finish { .ant-steps-item-icon {
+                background-color: #0e0304 !important;
+                border-color: #0e0304;
+            }}
+            .ant-steps-item-wait .ant-steps-item-icon {
+                background-color: #0e0304 !important;
+                border-color: #0e0304;
+            }
+            .ant-steps-item-icon > .ant-steps-icon {
+                color: #b5b5b6 !important;
+            }
+            .ant-steps-item-tail {
+                height: 5px;
+            }
+        
+            }
+    
+
+>>>>>>> cf2347f823906e677c6cf9a058b9c901331ba183
 }
 
 .textcolor{
@@ -447,15 +486,16 @@
         }
         .ant-table-thead > tr > th:not(.leftAlignTableHeader){
         text-align: center !important;
-        background:  transparent !important;
+        // background:  transparent !important;
+        background-color: #0e0304;
         }
         .ant-table-footer{
         background:  transparent !important;
         }
         .ant-table-tbody > tr{
-        &:active{
+            &:active{
             background: #2f3135  !important;
-        }
+            }
         }
     }
 }
@@ -759,6 +799,7 @@
 
 
 .transferTable{
+<<<<<<< HEAD
     :global{
     .ant-table-placeholder{
         background: transparent !important;
@@ -785,27 +826,68 @@
             background: #2f3135  !important;
         }
     }
+=======
+    // background-color: #862e2e;
+    // background: transparent !important;
+    :global{
+>>>>>>> cf2347f823906e677c6cf9a058b9c901331ba183
     .ant-table {
-        
+        background:  transparent !important;
         font-size: 12px;
         }
         /* row data */
         .ant-table-tbody > tr > td {
+            // background:  transparent !important;
             height: 4px;
             padding: 4px;
         }
         /* row tags */
         .ant-table-thead > tr > th {
+            // background:  transparent !important;
             height: 2px;
             padding: 4px;
         }
     }
+    
 }
 
+<<<<<<< HEAD
 //mobile screen responsive
 @media screen and (max-width: 1060px) {
     .midContainer {
         flex-direction: row;
+=======
+.tableHeaderButtonContainer {
+    display: flex; 
+    justify-content: flex-end;
+    height: 40px;
+    .tableHeaderToggleButtonContainer {
+        .progressToggleButton,
+        .graphToggleButton,
+        .listToggleButton{
+            border: none;
+            background-color: #29292c;
+            padding: 0.25rem 1rem;
+            &:hover {
+            border: 1px solid  #1e5d91;
+            cursor: pointer;
+            }
+        }
+        .progressToggleButton {
+            width: 85px;
+            border-left: 1px solid #29292c;
+            border-radius: 9999px 0 0 9999px;
+        }
+        .graphToggleButton{
+            border-left: 1px solid #29292c;
+            width: 85px;
+        }
+        .listToggleButton {
+            width: 85px;
+            border-left: 1px solid #29292c;
+            border-radius: 0 9999px 9999px 0;
+        }
+>>>>>>> cf2347f823906e677c6cf9a058b9c901331ba183
     }
     .tokenContainer, .tokenInfoBox, .moreInfoContainer, .ticketBox{ 
         width: 100%;
