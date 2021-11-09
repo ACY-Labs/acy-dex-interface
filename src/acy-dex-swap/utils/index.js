@@ -14,6 +14,8 @@ export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
 export const ROUTER_ADDRESS = '0x9c040CC3CE4B2C135452370Eed152A72ce5d5b18';
 export const FARMS_ADDRESS  = '0xf132Fdd642Afa79FDF6C1B77e787865C652eC824';
+//old address 0xf132Fdd642Afa79FDF6C1B77e787865C652eC824
+//new address 0x8800909a9aB007C8126ab51cA254E6398E6022AC
 
 // a custom error class for custom error text and handling
 export class CustomError {

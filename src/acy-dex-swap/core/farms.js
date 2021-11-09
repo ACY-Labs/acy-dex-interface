@@ -135,21 +135,25 @@ const getAllPools = async (library, account) => {
         const userPositions = (await contract.getUserPositions(account, i)).map(positionHex =>
           positionHex.toNumber()
         );
+        const stakeData = [];
         if(userPositions.length > 0)
         {
-          // console.log('-----------------------userPosition-----------------------',userPositions);
           for(var a in userPositions)
           {
-            // var timestampe = await contract
-            //   .stakingPosition(i,a)
-            //   .then(x => console.log(x))
-            //   ;
-            // var totalReward = await contract.getTotalReward(i,a,0x0100000000000000000000000000000000000000000000000000000000000000);
-            // console.log('-----------------------stakingPosition-----------------------',timestampe);
-            // console.log('-----------------------totalReward-----------------------',totalReward);
+            stakeData.push(await contract
+              .stakingPosition(i,a)
+              .then(x => {
+                [ parseInt(x.stakeTimestamp), parseInt(x.lockDuration)]
+                const expiredTime = parseInt(x.stakeTimestamp)+parseInt(x.lockDuration);
+                const expiredDate = new Date(expiredTime * 1000).toLocaleDateString("en-US")
+                const dayNum = (expiredTime - Date.now()/1000) / (1000 * 60 * 60 * 24);
+                return [dayNum > 0? parseInt(dayNum):0,expiredDate];
+              }
+                
+            ))
           }
         }
-        const allTokenTotalRewardAmount = await getPoolTotalPendingReward(
+        const PendingReward = await getPoolTotalPendingReward(
           rewardTokens,
           rewardTokensAddresses,
           userPositions,
@@ -158,20 +162,24 @@ const getAllPools = async (library, account) => {
           library,
           account
         );
-
+        console.log('stakeData:',stakeData);
+        const allTokenTotalRewardAmount = PendingReward[0];
+        const rewards = PendingReward[1];
         return {
           poolId: i,
           lpTokenAddress: poolInfo[0],
           token0Symbol,
           token1Symbol,
-          lockDuration: poolInfo[1].toNumber(),
-          lpBalance: poolInfo[2],
+          // lockDuration: 120,
+          lpBalance: poolInfo[1],
           lastUpdateBlock: poolInfo[3].toNumber(),
           rewardTokens,
           rewardTokensAddresses,
           rewardTokensSymbols,
           rewardTokensAmount: allTokenTotalRewardAmount,
           hasUserPosition: userPositions.length !== 0,
+          rewards: rewards,
+          stakeData: stakeData
         };
       })()
     );
@@ -216,6 +224,7 @@ const deposit = async (lpTokenAddr, amount, poolId, library, account, setButtonT
     const options = {};
     let result = await contract.estimateGas['deposit'](...args, options)
       .then(gasEstimate => {
+        console.log('gasEstimate:',gasEstimate);
         return contract['deposit'](...args, {
           gasLimit: calculateGasMargin(gasEstimate),
           ...options,

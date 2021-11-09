@@ -368,7 +368,7 @@ const LaunchpadComponent = () => {
 
         return(
             <PageHeaderWrapper>
-                
+        
         <div className={styles.tableHeaderButtonContainer}>
             <div className={styles.tableHeaderToggleButtonContainer}>
             <button type="button" 
