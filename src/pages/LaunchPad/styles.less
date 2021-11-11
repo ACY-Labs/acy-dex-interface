@@ -25,16 +25,15 @@
     min-height: 20vh;
     max-height: 700px;
     overflow: visible;
-    border-radius: 0 15px 15px 15px 15px;
     margin-bottom: 20px;
-    padding: 15px;
+    padding: 0 15px;
     //position: relative;
     //display: inline-block;
 }
 
 .moreInfoContainer{
     width: 50%;
-    min-height: 35vh;
+    min-height: 30vh;
     max-height: 700px;
     border-radius: 0 15px 15px 15px 15px;
     margin-bottom: 20px;
@@ -302,7 +301,7 @@
 }
 
 .tokenName{
-    margin-top: 8px;
+    margin-top: 10px;
     font-size: 28px;
     display: inline-block;
     width: auto;
@@ -318,11 +317,12 @@
 
 .tokenInfoBox{
     width: 58%;
+    min-height: 20vh;
     flex: 1 1 25rem;
     flex-grow: 1;
     max-height: 700px;
     // padding: 20px 30px ;
-    background-color: #1b1b1c;
+    background-color: #0e0304;
     border-radius: 10px 0 0 10px;
 }
 
@@ -334,14 +334,14 @@
     .tokenSym{
         display: flex;
         flex-wrap: wrap;
-        width: 30%;
+        width: 50%;
     }
     .tokenIDODate{
         margin-right: 25%;
     }
     .tokenIDOStatus{
         position: relative;
-        margin-top: 8px;
+        margin-top: 25px;
     }
 }
 .tokenInfoContainer {
@@ -353,7 +353,7 @@
 }
 
 .line{
-    border-bottom: 2px solid #2e3032;
+    border-bottom: 2px solid #757579;
     display: block;
     margin: 0 8px 0 8px;
 }
@@ -366,20 +366,20 @@
 
 .tokenDetails{
     display: flex;
-    padding: 15px 0;
+    padding: 15px 0 0 0;
     justify-content: left;
     .tokenPrice{
         margin-left: 15px;
-        width: 220px;
-    }
-    .tokenTotalRaise{
-        width: 180px;
+        width: 200px;
     }
     .ticketAllocation{
         width: 180px;
     }
+    .tokenTotalRaise{
+        width: 160px;
+    }
     .tokenMarketCap{
-        width: auto;
+        width: 100px;
     }
 }
 
@@ -396,10 +396,10 @@
     display: flex;
     justify-content: flex-start;
     position:sticky;
-    padding: 15px 0;
+    padding: 15px 0 0 0;
     .totalTickets {
         margin-left: 15px;
-        width: 220px;
+        width: 200px;
     }
     .tokenRaiseSize {
         width: 180px;
@@ -409,10 +409,10 @@
     }
     
     .tokenMaxAllo {
-        width: 180px;
+        width: 160px;
     }
     .tokenMaxWinners {
-        width: auto;
+        width: 100px;
     }
 }
 
@@ -487,11 +487,24 @@
 .tokenProgress{
     width: 100%;
     height: auto;
-    padding: 0 15px 15px 15px;
-    display: inline-block;
+    padding: 0 15px;
+    display: block;
     :global{
         .ant-progress-text{
+            display: inline-flex;
+            justify-content: end;
             color: @mainColor;
+            width: 100%;
+            padding-right: 10px;
+        }
+        .ant-progress-outer{
+            width: 100%;
+        }
+        .ant-progress-inner{
+            width: 100%;
+        }
+        .ant-progress-show-info .ant-progress-outer{
+            padding-right: 0;
         }
     }
 }
@@ -500,8 +513,10 @@
     width: 42%;
     flex: 1 1 8 rem;
     flex-grow: 1;
+    min-height: 20vh;
+    color: black;
     max-height: 700px;
-    background-color: #0e0304;
+    background-color: #CCCFD8;
     box-sizing: border-box;
     border-radius: 0 10px 10px 0;
     display: flex;
@@ -530,8 +545,8 @@
     width: 100%;
     display: flex;
     justify-content: space-around;
-    padding: 20px;
-    margin-top: 6em;
+    padding: 20px 20px 0 20px;
+    margin-top: 1.5em;
     .showTicketBox1{
         width: auto;
         height: auto;
@@ -558,6 +573,7 @@
     width: 100%;
     display: flex;
     justify-content: center;
+    margin-bottom: 1em;
 }
 
 .dateTableBox{
@@ -571,16 +587,23 @@
         // background:  transparent !important;
         cursor: pointer;
         }
+        .ant-table-thead{
+            text-decoration: underline !important;
+        }
+
         .ant-table-thead > tr{
         background:  transparent !important;
+        
+        
         }
         .ant-table-tbody > tr{
         background:  transparent !important;
         }
         .ant-table-thead > tr > th:not(.leftAlignTableHeader){
-        text-align: center !important;
-        // background:  transparent !important;
-        background-color: #0e0304;
+            text-align: center !important;
+            // background:  transparent !important;
+            background-color: transparent;
+            text-decoration: underline;
         }
         .ant-table-footer{
         background:  transparent !important;
@@ -674,14 +697,16 @@
 .loginForm{
     max-width: 200px;
 }
-#themeBox{
-    width: 50px;
-    color: white;
-    height: 25px;
-    display: inline-flex;
+
+.themeBox{
+    width: 32px;
+    color: #c6224e;
+    height: 21px;
+    display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #c6224e;
+    text-align: center;
+    border: 2px solid #29292c;
 }
 
 .telegramPanel1{
@@ -695,26 +720,26 @@
 }
 
 .twitterbtn {
-    font: normal normal normal 13px/26px 'Helvetica Neue',Arial,sans-serif;
-    height: 28px;
+    font-size: 15px;
+    height: 2em;
+    width: 13em;
     border-radius: 4px;
     max-width: 100%;
     box-sizing: border-box;
     position: relative;
-    border: #CCC solid 1px;
-    background-color: #b5b5b6;
-    color: #333;
+    background-color: #c6224e;
+    color: #fff;
     font-weight: normal;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -o-user-select: none;
     user-select: none;
     cursor: pointer;
     overflow: hidden;
-    display: inline-block;
-    vertical-align: top;
-    zoom: 1;
-    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.twitterbtn:hover{
+    color: #fff;
 }
 
 //tan
@@ -917,7 +942,7 @@
     }
     .ant-table-tbody > tr{
         &:active{
-            background: #2f3135  !important;
+            background: #2f3135 !important;
         }
     }
     // background-color: #862e2e;
@@ -945,9 +970,9 @@
 @media screen and (max-width: 1060px) {
     .midContainer {
         flex-direction: row;
-        .tokenContainer, .tokenInfoBox, .moreInfoContainer, .ticketBox{ 
-            width: 100%;
-        }
+    }
+    .tokenContainer, .tokenInfoBox, .moreInfoContainer, .ticketBox{ 
+        width: 100%;
     }
 }
 

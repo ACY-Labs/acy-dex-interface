@@ -6,29 +6,17 @@ import SwapTicket from "./swapTicket";
 import styles from "./styles.less";
 import prevIcon from '@/assets/icon_prevpage.svg';
 import nextIcon from '@/assets/icon_nextpage.svg';
+import userIcon from '@/assets/icon_user.svg';
+import telegramIcon from '@/assets/icon_telegram_black.svg';
+import twitterBIcon from '@/assets/icon_twitter_black.svg';
+import twitterWIcon from '@/assets/icon_twitter_white.svg';
 import AntCollapse from "./CustomCollapse";
-
-const StyledInput = styled.input`
-  font-size: 24px;
-  background-color: inherit;
-  color: white;
-  width: 90%;
-  border-width: 1px;
-  line-height: 50px;
-  margin-left: 20px;
-  border-right: 0px solid transparent;
-  border-top: 0px solid transparent;
-  border-left: 0px solid transparent;
-  &:focus {
-    outline-width: 0;
-    filter: brightness(2);
-  }
-`;
 
 const FollowTelegram = ({
   setSelectedForm
 }) => {
   const panelIdx = ["1","2","3","4", "5", "6"]
+  const rewardsArr = ['+5', '+10', '+15']
   const [name, setName] = useState("")
   const [showInput, setShowInput] = React.useState(false)
   const [showForm, setShowForm] = useState(false)
@@ -77,16 +65,14 @@ const FollowTelegram = ({
   const links = "https://www.youtube.com/"
 
   const buttonStyle1 = {
-    background: "#3498DB", 
-    border:"#3498DB",
-    width: '140px', 
+    backgroundColor: "#c6224e", 
+    width: 'auto', 
     color: 'white', 
     height: "2em", 
-    fontSize:'20px', 
+    fontSize:'15px', 
     display:'flex', 
     justifyContent:'center', 
     alignItems:'center',
-    boxShadow:"0.5px 0.8px #228CDB"
   }
 
   const buttonStyle2 = {
@@ -106,45 +92,90 @@ const FollowTelegram = ({
     <div className={styles.telegramBox}>
       <div className={styles.telegramContainer}>
         <div className={styles.telegramLinks}>
-          <AntCollapse isFollowed={followed[1]} show={show[1]} panelID={panelIdx[0]} setShow={setShow} disabled={followed[1]} header="Enter your Username and Email">
+          <AntCollapse 
+            isFollowed={followed[1]} 
+            show={show[1]} 
+            panelID={panelIdx[0]} 
+            rewards={rewardsArr[0]}
+            setShow={setShow} 
+            disabled={followed[1]} 
+            header={
+              <div style={{width:'85%', display:'inline-flex', alignItems:'left'}}>
+                <img src={userIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
+                <span>Enter your Username and Email</span>
+              </div>
+            }
+          >
             <InputEmail />
             <Row type='flex' align='middle' justify='center'>
-              <Button onClick={() => {handleShow(1); }} style={buttonStyle2} disabled={clicked}>Submit</Button> 
+              <Button onClick={() => {handleShow(1); }} style={buttonStyle1} disabled={clicked}>Submit</Button> 
             </Row>
           </AntCollapse>
-          <AntCollapse isFollowed={followed[2]} show={show[2]} panelID={panelIdx[1]} setShow={setShow} disabled={followed[2]} header="Follow ACY Finance on Telegram">
-            <Row type='flex' align='middle' justify='center'>
-              <Button href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(1); onClick();}}>
+          <AntCollapse 
+            isFollowed={followed[2]} 
+            show={show[2]} 
+            panelID={panelIdx[1]} 
+            rewards={rewardsArr[1]}
+            setShow={setShow} 
+            disabled={followed[2]} 
+            header={
+              <div style={{width:'85%', display:'inline-flex', alignItems:'left'}}>
+                <img src={telegramIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
+                <span>Join ACY Telegram</span>
+              </div>
+              }
+          >
+            <Row type='flex' align='middle' justify='space-around'>
+              <Button id='linkbtn' href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(1); onClick();}}>
                 <Icon type="link" style={{ color: '#fff' }} theme="outlined" />
                 Subscribe
               </Button>
-            </Row>
-            <span className={styles.greyLine}> </span>
-            <Row type='flex' align='middle' justify='center'>
-              <Tooltip title="Visit the link above to continue">
-                <Button onClick={() => {handleFollow(2); handleShow(2); }} style={buttonStyle2} disabled={clicked[1]}>Continue</Button> 
+              <Tooltip title="Visit the link to continue">
+                <Button onClick={() => {handleFollow(2); handleShow(2); }} style={buttonStyle1} disabled={clicked[1]}>Continue</Button> 
               </Tooltip>
-              <Button onClick={() => {handleShow(2); }} type='text' style={{color:'#EB7B59', border:'#f7f7f7', background:'#f7f7f7',height: "2em", fontSize:'16px', margin:'10px 0 0 10px'}}>Cancel</Button>
             </Row>
           </AntCollapse>
-          <AntCollapse isFollowed={followed[3]} show={show[3]} panelID={panelIdx[2]} setShow={setShow} disabled={followed[3]} header="Follow ACY Finance on Telegram Announcement Channel">
-            <Row type='flex' align='middle' justify='center'>
+          <AntCollapse 
+            isFollowed={followed[3]} 
+            show={show[3]} 
+            panelID={panelIdx[2]} 
+            rewards={rewardsArr[1]}
+            setShow={setShow} 
+            disabled={followed[3]} 
+            header={
+              <div style={{width:'85%', display:'inline-flex', alignItems:'left'}}>
+                <img src={telegramIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
+                <span>Join ACY Telegram Channel</span>
+              </div>
+            }
+          >
+            <Row type='flex' align='middle' justify='space-around'>
               <Button href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(2); onClick();}}>
                 <Icon type="link" style={{ color: '#fff' }} theme="outlined" />
                 Subscribe
               </Button>
+              <Tooltip title="Visit the link to continue">
+                <Button onClick={() => {handleFollow(3); handleShow(3); }} style={buttonStyle1} disabled={clicked[2]}>Continue</Button> 
+              </Tooltip>
             </Row>
             <span className={styles.greyLine}> </span>
             { showInput ? <userInput /> : null }
-            <Row type='flex' align='middle' justify='center'>
-              <Tooltip title="Visit the link above to continue">
-                <Button onClick={() => {handleFollow(3); handleShow(3); }} style={buttonStyle2} disabled={clicked[2]}>Continue</Button> 
-              </Tooltip>
-              <Button onClick={() => {handleShow(3); }} type='text' style={{color:'#EB7B59', border:'#f7f7f7', background:'#f7f7f7',height: "2em", fontSize:'16px', margin:'10px 0 0 10px'}}>Cancel</Button>
-            </Row>
           </AntCollapse>
-          <AntCollapse isFollowed={followed[4]} show={show[4]} panelID={panelIdx[3]} setShow={setShow} disabled={followed[4]} header="Follow ACY Finance on Twitter">
-            <Row type='flex' align='middle' justify='center'>
+          <AntCollapse 
+            isFollowed={followed[4]} 
+            show={show[4]} 
+            panelID={panelIdx[3]} 
+            rewards={rewardsArr[1]}
+            setShow={setShow} 
+            disabled={followed[4]} 
+            header={
+              <div style={{width:'55%', display:'inline-flex', alignItems:'left'}}>
+                <img src={twitterBIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
+                <span>Follow ACY Twitter</span>
+              </div>
+            }
+          >
+            <Row type='flex' align='middle' justify='space-around'>
               <a 
                 href="https://twitter.com/intent/follow?https://twitter.com/acyfinance?lang=en&screen_name=ACYFinance" 
                 target="_blank"
@@ -155,20 +186,30 @@ const FollowTelegram = ({
                 data-lang="en" 
                 data-show-count="false"
               >
+                <img src={twitterWIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
                 Follow @ACYFinance
               </a>
               <script async src="https://platform.twitter.com/widgets.js" charset="utf-8" />
-            </Row>
-            <span className={styles.greyLine}> </span>
-            <Row type='flex' align='middle' justify='center'>
               <Tooltip title="Visit the link above to continue">
-                <Button onClick={() => {handleFollow(4); handleShow(4);}} style={buttonStyle2} disabled={clicked[3]}>Continue</Button> 
+                <Button onClick={() => {handleFollow(4); handleShow(4);}} style={buttonStyle1} disabled={clicked[3]}>Continue</Button> 
               </Tooltip>
-              <Button onClick={() => {handleShow(4); }} type='text' style={{color:'#EB7B59', border:'#f7f7f7', background:'#f7f7f7',height: "2em", fontSize:'16px', margin:'10px 0 0 10px'}}>Cancel</Button>
             </Row>
           </AntCollapse>
-          <AntCollapse isFollowed={followed[5]} show={show[5]} panelID={panelIdx[4]} setShow={setShow} disabled={followed[5]} header="Retweet ACY Finance on Twitter">
-            <Row type='flex' align='middle' justify='center'>
+          <AntCollapse 
+            isFollowed={followed[5]} 
+            show={show[5]} 
+            panelID={panelIdx[4]} 
+            rewards={rewardsArr[1]}
+            setShow={setShow} 
+            disabled={followed[5]} 
+            header={
+              <div style={{width:'60%', display:'inline-flex', alignItems:'left'}}>
+                <img src={twitterBIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
+                <span>Retweet ACY Twitter</span>
+              </div>
+            }
+          >
+            <Row type='flex' align='middle' justify='space-around'>
               <a 
                 className={styles.twitterbtn}
                 href="https://twitter.com/intent/tweet?hashtags=ACY%2CDeFi&screen_name=ACYFinance&text=ACY%20Finance%20First%20IDO&url=https%3A%2F%2Ftest.acy.finance%2F&via=ACYFinance"
@@ -177,29 +218,27 @@ const FollowTelegram = ({
                 onClick={() => {onLinkClick(4);}}
                 data-size="large"
               >
+                <img src={twitterWIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
                 Tweet to @ACYFinance
               </a>
-            </Row>
-            <span className={styles.greyLine}> </span>
-            <Row type='flex' align='middle' justify='center'>
               <Tooltip title="Visit the link above to continue">
-                <Button onClick={() => {handleFollow(5); handleShow(5); }} style={buttonStyle2} disabled={clicked[4]}>Continue</Button> 
+                <Button onClick={() => {handleFollow(5); handleShow(5); }} style={buttonStyle1} disabled={clicked[4]}>Continue</Button> 
               </Tooltip>
-              <Button onClick={() => {handleShow(5); }} type='text' style={{color:'#EB7B59', border:'#f7f7f7', background:'#f7f7f7',height: "2em", fontSize:'16px', margin:'10px 0 0 10px'}}>Cancel</Button>
             </Row>
           </AntCollapse>
           <Row type='flex' align='middle' justify='space-around'>
             <img 
               src={prevIcon} 
+              id={styles.nextPage} 
               alt="" 
-              style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '25px 0', float:'left'}}
+              style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '15px 0', float:'left'}}
               onClick={() => {setSelectedForm(0)}}  
             />
             <img 
               src={nextIcon} 
               id={styles.nextPage} 
               alt="" 
-              style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '25px 0', float:'right'}} 
+              style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '15px 0', float:'right'}} 
               onClick={() => {setSelectedForm(2)}}  
             />
           </Row>

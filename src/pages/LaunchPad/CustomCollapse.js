@@ -3,30 +3,28 @@ import { Collapse as AntCollapse } from "antd";
 import styled from "styled-components";
 import styles from "./styles.less";
 import arrowDownIcon from "@/assets/icon_arrow_down.svg";
-import rewardIcon from "@/assets/icon_reward.svg";
 import tickIcon from "@/assets/icon_tick.svg";
 
 const StyledCollapse = styled(AntCollapse)`
   &&& {
     border: none;
-    border-radius: 0px 10px 10px 0;
+    border-radius: 0px;
     box-shadow: none;  
-    background-color: #0e0304;
+    background-color: #CCCFD8;
     .ant-collapse-content {
-      background-color: #0e0304;
-      color: #b5b5b6;
+      background-color: #CCCFD8;
+      color: #000000;
     }
-    
     .ant-collapse-header {
-      color: #b5b5b6;
+      color: #000000;
     }
   }
-  
 `;
 
+
 const CustomCollapse = (props) => {
-  const [opened, setOpen] = useState(false);
-  const [key, setKey] = useState([]);
+  const [opened, setOpen] = useState(false)
+  const [key, setKey] = useState([])
 
   const addPanelID = (num) => {
     if(key.length === 0)
@@ -52,7 +50,7 @@ const CustomCollapse = (props) => {
   }
 
   return (
-    <StyledCollapse accordian activeKey={props.show ? key : []} onChange={combineFunc}> 
+    <StyledCollapse activeKey={props.show ? key : []} onChange={combineFunc}> 
       <AntCollapse.Panel
         {...props}
         header={props.header}
@@ -64,7 +62,7 @@ const CustomCollapse = (props) => {
           <span>
             <div className={styles.extraContainer}>
               {
-                !props.show && !props.isFollowed && props.panelID !== "1" && <img src={rewardIcon} alt="" style={{height:'1.2em', marginLRight:'10px', width:'auto', objectFit:'contain'}} />  // show this box
+                !props.show && !props.isFollowed && <div className={styles.themeBox}> <span style={{color:'#29292c', fontWeight: '500'}}>{props.rewards}</span> </div>
               }
               {
                 props.show && !props.isFollowed && <img src={arrowDownIcon} alt="" style={{height:'1.2em', marginRight:'10px', width:'auto', objectFit:'contain'}} />  // show this icon

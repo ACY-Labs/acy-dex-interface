@@ -16,6 +16,7 @@ const StyledInput = styled.input`
   border-right: 0px solid transparent;
   border-top: 0px solid transparent;
   border-left: 0px solid transparent;
+  margin-bottom: 10px;
   &:focus {
     outline-width: 0;
     filter: brightness(75%);

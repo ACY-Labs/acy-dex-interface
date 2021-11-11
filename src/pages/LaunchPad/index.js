@@ -1,6 +1,10 @@
 /* eslint-disable react/jsx-indent */
 import { getTransferData } from '@/acy-dex-swap/core/launchPad';
+<<<<<<< Updated upstream
 import {Button, Menu, Dropdown, Icon, Progress, Tag, Table, Carousel} from 'antd';
+=======
+import {Button, Menu, Dropdown, Icon, Progress, Tag, Table} from 'antd';
+>>>>>>> Stashed changes
 import FollowTelegram from "./FollowTelegram";
 import ToggleButton from "./ToggleButton";
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -184,8 +188,8 @@ const LaunchpadComponent = () => {
             align: 'center'
         },
         {
-            title: 'Quantity',
-            dataIndex: 'quantity',
+            title: 'Amount',
+            dataIndex: 'amount',
             width: 75,
             align: 'center'
         },
@@ -271,8 +275,13 @@ const LaunchpadComponent = () => {
           openDate: "2021-10-30",
           closeDate: "2021-11-01",
           price: ACY_PRICE.toString() + ' USDC',
+<<<<<<< Updated upstream
           maxWinning: "1000000 ACY",
           quantity: 2500,
+=======
+          raiseSize: "1000000 ACY",
+          amount: 2500,
+>>>>>>> Stashed changes
           marketCap:"$10M",
           filled: "1379%",
           status: "Filled",
@@ -288,8 +297,13 @@ const LaunchpadComponent = () => {
           openDate: "2021-10-13",
           closeDate: "2021-10-20",
           price: ACY_PRICE.toString() + ' USDC',
+<<<<<<< Updated upstream
           maxWinning: "1000000 ACY",
           quantity: 3000,
+=======
+          raiseSize: "1000000 ACY",
+          amount: 3000,
+>>>>>>> Stashed changes
           marketCap:"$20M",
           filled: "1579%",
           status: "Filled",
@@ -305,8 +319,13 @@ const LaunchpadComponent = () => {
           openDate: "2021-10-28",
           closeDate: "2021-11-03",
           price: ACY_PRICE.toString() + ' USDC',
+<<<<<<< Updated upstream
           maxWinning: "1000000 ACY",
           quantity: 5000,
+=======
+          raiseSize: "1000000 ACY",
+          amount: 5000,
+>>>>>>> Stashed changes
           marketCap:"$30M",
           filled: "1379%",
           status: "Upcoming",
@@ -328,7 +347,13 @@ const LaunchpadComponent = () => {
     const tokenContent = {
         fontWeight:'bold', 
         textAlign:'left', 
-        color:'#FFF'
+        color:'#fff'
+    }
+
+    const tokenContent1 = {
+        fontWeight:'bold', 
+        textAlign:'left', 
+        color:'#000'
     }
 
     const hashtagText = {
@@ -350,12 +375,12 @@ const LaunchpadComponent = () => {
     const menu = (
         <Menu>
             <Menu.Item>
-                <a target="_blank" rel="noopener noreferrer" href="https://etherscan.io/token/0x4E15361FD6b4BB609Fa63C81A2be19d873717870">
+                <a target="_blank" rel="noopener noreferrer" href="https://etherscan.io/token/0x4E15361FD6b4BB609Fa63C81A2be19d873717870" style={{color:'#000'}}>
                     Etherscan.io
                 </a>
             </Menu.Item>
             <Menu.Item>
-                <a target="_blank" rel="noopener noreferrer" href="https://ethplorer.io/address/0x4e15361fd6b4bb609fa63c81a2be19d873717870#chart=candlestick">
+                <a target="_blank" rel="noopener noreferrer" href="https://ethplorer.io/address/0x4e15361fd6b4bb609fa63c81a2be19d873717870#chart=candlestick" style={{color:'#000'}}>
                     Ethplorer.io
                 </a>
             </Menu.Item>
@@ -463,15 +488,47 @@ const LaunchpadComponent = () => {
                             <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
                             <h2 style={{color:'#eb5c20'}} className={styles.tokenName}> ACY </h2>
                         </div>
+<<<<<<< Updated upstream
                         <div className={styles.tokenIDODate}>
                             <h4 style={{color:'#fff'}}>Open: {selectedTableRow.openDate} 10:00 UST</h4>
                             <h4 style={{color:'#fff'}}>Close: {selectedTableRow.closeDate} 10:00 UST</h4>
                         </div>
                         <div className={styles.tokenIDOStatus}>
                             <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', textAlign:'center', fontSize:'18px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
+=======
+                        { selectedGraph === 0 && (
+                        <div className={styles.stepBlock} id="block">
+                            <StepBar chartData={chartData} />
+                        </div>
+                        )}
+                        { selectedGraph === 1 && (
+                            <div className={styles.chartWrapper}>
+                                <AcyLineChart  
+                                  data={timeData}
+                                  showXAxis={true}
+                                  showYAxis={true}
+                                  showGradient={true}
+                                  lineColor="#e29227"
+                                  bgColor="#2f313500"
+                                />
+                            </div>
+                        )}
+                        { selectedGraph === 2 && (
+                        <div className={styles.transferTable}>
+                            <Table 
+                              style={{marginTop:'20px',textAlign:'center'}}
+                              id="transferTable"
+                              columns={transferTableHeader} 
+                              dataSource={transferData}
+                              pagination={false}
+                              scroll={{ y: 250 }}
+                              rowClassName={(record, index) => styles.rowExpanded}
+                            /> 
+>>>>>>> Stashed changes
                         </div>
                     </div>
                 </div>
+<<<<<<< Updated upstream
                 <div className={styles.tokenProgress}>
                     <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={90} status='active' />
                 </div>
@@ -519,16 +576,86 @@ const LaunchpadComponent = () => {
                             <div className={styles.userEligibleTickets}>
                                 <p>Your Eligible Tickets</p>
                                 <h3 style={tokenContent}>0 Ticket(s)</h3>
+=======
+                <div className={styles.midContainer}>
+                    <div className={styles.tokenInfoBox}>
+                        <div className={styles.tokenInfoContainer}>
+                            <div className={styles.tokenInfoBoxTop}>
+                                <div className={styles.tokenSym}>
+                                    <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
+                                    <h2 style={{color:'#eb5c20'}} className={styles.tokenName}> ACY </h2>
+                                </div>
+                                <div className={styles.tokenIDOStatus}>
+                                    <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', textAlign:"center", fontSize:'16px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={styles.tokenProgress}>
+                            <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={90} status='active' />
+                        </div>
+                        <div className={styles.tokenDetails}>
+                            <div className={styles.tokenPrice}>                    
+                                <p style={token}>Per ACY</p>
+                                <h3 style={tokenContent}>{selectedTableRow.price}</h3>
+                            </div>
+                            <div className={styles.ticketAllocation}>    
+                                <p style={token}>Raise Size</p>
+                                <h3 style={tokenContent}>{selectedTableRow.raiseSize}</h3> 
+                            </div>
+                            <div className={styles.tokenTotalRaise}>                   
+                                <p style={token}>Amount</p>
+                                <h3 style={tokenContent}>{selectedTableRow.amount}</h3>
+                            </div>
+                            <div className={styles.tokenMarketCap}>   
+                                <p style={token}>Market Cap</p>
+                                <h3 style={tokenContent}>{selectedTableRow.marketCap}</h3>             
+                            </div>
+                        </div>
+                        <span className={styles.line}> </span>
+                        <div className={styles.tokenMoreInfo}>
+                            <div className={styles.totalTickets}>                   
+                                <p style={token}>Allocation/Winning Ticket</p>
+                                <h3 style={tokenContent}>{selectedTableRow.perWinTicket}</h3>
+>>>>>>> Stashed changes
                             </div>
                             <div className={styles.userDepositedTickets}>
                                 <p>Your Deposited Tickets</p>
                                 <h3 style={tokenContent}>0 Ticket(s)</h3>
                             </div>
                         </div>
+<<<<<<< Updated upstream
                         <div className={styles.showTicketBox2}>
                             <div className={styles.userWinningTickets}>
                                 <p>Your Winning Tickets</p>
                                 <h3 style={tokenContent}>0 Ticket(s)</h3>
+=======
+                    </div>
+                
+                    <div className={styles.ticketBox}>
+                        { selectedForm === 0 && (
+                        <div className={styles.showTicketContainer}>
+                            <div className={styles.showTicketBox}>
+                                <div className={styles.showTicketBox1}>
+                                    <div className={styles.userEligibleTickets}>
+                                        <p>Your Eligible Tickets</p>
+                                        <h3 style={tokenContent1}>0 Ticket(s)</h3>
+                                    </div>
+                                    <div className={styles.userDepositedTickets}>
+                                        <p>Your Eligible Amount</p>
+                                        <h3 style={tokenContent1}>10 USDT</h3>
+                                    </div>
+                                </div>
+                                <div className={styles.showTicketBox2}>
+                                    <div className={styles.userWinningTickets}>
+                                        <p>Your Winning Tickets</p>
+                                        <h3 style={tokenContent1}>0 Ticket(s)</h3>
+                                    </div>
+                                    <div className={styles.userTicketsAllo}>
+                                        <p>Your Allocation</p>
+                                        <h3 style={tokenContent1}>0 ACY</h3>
+                                    </div>
+                                </div>
+>>>>>>> Stashed changes
                             </div>
                             <div className={styles.userTicketsAllo}>
                                 <p>Your Allocation</p>
@@ -536,8 +663,26 @@ const LaunchpadComponent = () => {
                             </div>
                         </div>
                     </div>
+<<<<<<< Updated upstream
                     <div className={styles.whitelistBox}>
                         <Button className={styles.whiteListToggleButton} shape="round" onClick={() => setSelectedForm(1)}>Whitelist</Button>
+=======
+                </div>
+                <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', width: '100%', flexWrap:'wrap' }}>
+                    <div className={styles.dateTableBox}>
+                        <Table 
+                          style={{marginTop:'20px', textAlign:'center'}} 
+                          columns={tableColumns} 
+                          dataSource={tableData}
+                          onRow={(record, rowIndex) => {
+                            return {
+                                onClick: () => {
+                                setSelectedTableRow(record);
+                                }, // click row
+                            };
+                        }}
+                        />
+>>>>>>> Stashed changes
                     </div>
                 </div>
                 
