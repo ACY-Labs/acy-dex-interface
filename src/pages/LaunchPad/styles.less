@@ -3,6 +3,15 @@
 @cardColor: #2f313583;
 @mainColor: #c4c4c4;
 
+.acycard {
+    margin-bottom: 20px;
+    border: 1px solid #707070;
+    .card_header {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+
 .launchRoot{
     width: 90%;
     max-width: 1000px;
@@ -17,7 +26,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    margin-bottom: 15px;
+    margin-bottom: 32px;
 }
 
 .tokenContainer{
@@ -29,6 +38,8 @@
     padding: 0 15px;
     //position: relative;
     //display: inline-block;
+    position: relative;
+    top: 10vh;
 }
 
 .moreInfoContainer{
@@ -72,8 +83,10 @@
 }
 
  .chartWrapper{
-    width: 50%;
+    width: 50vw;
     height: 35vh;
+    // width: inherit;
+    // height: inherit;
     max-height: 500px;
     float: right;
     overflow: hidden;
@@ -84,16 +97,26 @@
     justify-content: space-between;
     align-items: center;
     position: relative;
-    left: 492px;
+    left: 370px;
     top: -41px;
 }
 
 .contentStyle{
-    width: 50%;
-    height: 50%;
+    width: 26vw;
+    min-height: 30vh;
     position: relative;
-    left: -9px;
-    top: 21px;
+    left: 40px;
+    top: 32px;
+    :global{
+        .ant-carousel .slick-dots li button
+        {
+            height: 5px;
+            width: 20px;
+        }
+        .ant-carousel .slick-dots li.slick-active button{
+            width: 30px !important;
+        }
+    }
     
 }
 
@@ -915,6 +938,8 @@
 
 
 .transferTable{
+    width: inherit;
+    height: inherit;
     :global{
     .ant-table-placeholder{
         background: transparent !important;
@@ -967,7 +992,7 @@
     .midContainer {
         flex-direction: row;
     }
-    .tokenContainer, .tokenInfoBox, .moreInfoContainer, .ticketBox{ 
+    .tokenContainer, .tokenInfoBox, .contentStyle, .ticketBox{ 
         width: 100%;
     }
 }

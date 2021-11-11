@@ -20,6 +20,7 @@ import SwapTicket from "./swapTicket";
 import StepBar from './stepComponent';
 import ReactDOM from 'react-dom';
 import CountDown from "./countDown";
+import LaunchChart from "./launchChart"
 
 var Contract = require('web3-eth-contract');
 // set provider for all later instances to use
@@ -251,17 +252,11 @@ const LaunchpadComponent = () => {
             ellipsis: true
         },
         {
-            title: 'Token',
-            dataIndex: 'token',
+            title: 'Amount',
+            dataIndex: 'Amount',
             width: 40,
             align: 'center',
-            render: token => (
-                <div>
-                    <img src={AcyIcon} alt="ACY Token" className={styles.smallIcon} />
-                    
-                    {token}
-                </div>
-            )
+            ellipsis: true
         },
     ];
 
@@ -410,17 +405,18 @@ const LaunchpadComponent = () => {
             </div>
             
             <div className={styles.contentStyle}>
-            <Carousel dot="true" autoplay>
+
+            <Carousel dot="true" autoplay="true" effect = "fade" autoplaySpeed = {6000} >
                 <div>
                     <div id="cntBlock">
                         <CountDown />
                     </div>
                     <div className={styles.stepBlock} id="block">
-                        <StepBar chartData={chartData} />
+                    <StepBar />
                     </div>
                 </div>
                 <div className={styles.chartWrapper} id="chartdata">
-                        <AcyLineChart  
+                        <LaunchChart  
                           data={timeData}
                           showXAxis
                           showYAxis
