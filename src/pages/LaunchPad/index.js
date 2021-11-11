@@ -404,43 +404,42 @@ const LaunchpadComponent = () => {
                 </div>
             </div>
             
-            <div className={styles.contentStyle}>
-
-            <Carousel dot="true" autoplay="true" effect = "fade" autoplaySpeed = {6000} >
-                <div>
-                    <div id="cntBlock">
-                        <CountDown />
-                    </div>
-                    <div className={styles.stepBlock} id="block">
-                    <StepBar />
-                    </div>
+            <div className={styles.moreInfoContainer}>
+                <div className={styles.contentStyle}>
+                    <Carousel dot="true" autoplay="true" effect="fade" autoplaySpeed={6000}>
+                        <div>
+                            <div id="cntBlock">
+                                <CountDown />
+                            </div>
+                            <div className={styles.stepBlock} id="block">
+                            <StepBar />
+                            </div>
+                        </div>
+                        <div className={styles.chartWrapper} id="chartdata">
+                            <LaunchChart  
+                              data={timeData}
+                              showXAxis
+                              showYAxis
+                              showGradient
+                              lineColor="#e29227"
+                              bgColor="#2f313500"
+                            />
+                        </div>
+                        <div>
+                            <div className={styles.transferTable}>
+                                <Table 
+                                  style={{marginTop:'20px',textAlign:'center'}}
+                                  id="transferTable"
+                                  columns={transferTableHeader} 
+                                  dataSource={transferData}
+                                  pagination={false}
+                                  scroll={{ y: 250 }}
+                                  rowClassName={(record, index) => styles.rowExpanded}
+                                />   
+                            </div> 
+                        </div>
+                    </Carousel>
                 </div>
-                <div className={styles.chartWrapper} id="chartdata">
-                        <LaunchChart  
-                          data={timeData}
-                          showXAxis
-                          showYAxis
-                          showGradient
-                          lineColor="#e29227"
-                          bgColor="#2f313500"
-                        />
-                </div>
-                <div>
-                    <div className={styles.transferTable}>
-                        <Table 
-                          style={{marginTop:'20px',textAlign:'center'}}
-                          id="transferTable"
-                          columns={transferTableHeader} 
-                          dataSource={transferData}
-                          pagination={false}
-                          scroll={{ y: 250 }}
-                          rowClassName={(record, index) => styles.rowExpanded}
-                        />   
-                    </div> 
-                </div>
-            </Carousel>
-
-
             </div>
             </div>
             <div className={styles.midContainer}>

@@ -39,7 +39,7 @@
     //position: relative;
     //display: inline-block;
     position: relative;
-    top: 10vh;
+    top: 4vh;
 }
 
 .moreInfoContainer{
@@ -50,37 +50,54 @@
     margin-bottom: 20px;
     padding: 15px;
     z-index: 11;
-    .tableHeaderButtonContainer {
-        width: 100%;
-        display: flex; 
-        justify-content: flex-end;
-        margin-bottom: 20px;
-        .tableHeaderToggleButtonContainer {
-          .activeToggleButton,
-          .endedToggleButton {
-            border: none;
-            background-color: #29292c;
-            padding: 0.25rem 1rem;
-            &:hover {
-              border: 1px solid  #1e5d91;
-              cursor: pointer;
+    .contentStyle{
+        //width: 26vw;
+        //min-height: 30vh;
+        position: relative;
+        //left: 40px;
+        //top: 32px;
+        :global{
+            .ant-carousel .slick-dots li button{
+                height: 5px;
+                width: 20px;
             }
-          }
-          .activeToggleButton {
-              width: 70px;
-            border-radius: 9999px 0 0 9999px;
-          }
-          .endedToggleButton {
-            width: 70px;
-            border-left: 1px solid #29292c;
-            border-radius: 0 9999px 9999px 0;
-          }
+            .ant-carousel .slick-dots li.slick-active button{
+                width: 30px !important;
+            }
         }
     }
-    // .chartWrapper {
-    //     height: 90%;
-    // }
 }
+
+/* .tableHeaderButtonContainer {
+    width: 100%;
+    display: flex; 
+    justify-content: flex-end;
+    margin-bottom: 20px;
+    .tableHeaderToggleButtonContainer {
+      .activeToggleButton,
+      .endedToggleButton {
+        border: none;
+        background-color: #29292c;
+        padding: 0.25rem 1rem;
+        &:hover {
+          border: 1px solid  #1e5d91;
+          cursor: pointer;
+        }
+      }
+      .activeToggleButton {
+          width: 70px;
+        border-radius: 9999px 0 0 9999px;
+      }
+      .endedToggleButton {
+        width: 70px;
+        border-left: 1px solid #29292c;
+        border-radius: 0 9999px 9999px 0;
+      }
+    }
+} */
+// .chartWrapper {
+//     height: 90%;
+// }
 
  .chartWrapper{
     width: 50vw;
@@ -97,29 +114,9 @@
     justify-content: space-between;
     align-items: center;
     position: relative;
-    left: 370px;
+    left: 24vh;
     top: -41px;
 }
-
-.contentStyle{
-    width: 26vw;
-    min-height: 30vh;
-    position: relative;
-    left: 40px;
-    top: 32px;
-    :global{
-        .ant-carousel .slick-dots li button
-        {
-            height: 5px;
-            width: 20px;
-        }
-        .ant-carousel .slick-dots li.slick-active button{
-            width: 30px !important;
-        }
-    }
-    
-}
-
 
 .countDown{
     width: fit-content;
@@ -992,7 +989,7 @@
     .midContainer {
         flex-direction: row;
     }
-    .tokenContainer, .tokenInfoBox, .contentStyle, .ticketBox{ 
+    .tokenContainer, .tokenInfoBox, .moreInfoContainer, .ticketBox{ 
         width: 100%;
     }
 }
