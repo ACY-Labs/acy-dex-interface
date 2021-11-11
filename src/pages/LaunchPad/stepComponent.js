@@ -35,4 +35,4 @@ const stepComponent = (props) => {
   )
 }
 
-export default stepComponent;1
+export default stepComponent;
