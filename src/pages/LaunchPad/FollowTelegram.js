@@ -10,7 +10,9 @@ import userIcon from '@/assets/icon_user.svg';
 import telegramIcon from '@/assets/icon_telegram_black.svg';
 import twitterBIcon from '@/assets/icon_twitter_black.svg';
 import twitterWIcon from '@/assets/icon_twitter_white.svg';
+import invFriendsIcon from '@/assets/icon_invite_friends.svg';
 import AntCollapse from "./CustomCollapse";
+
 
 const FollowTelegram = ({
   setSelectedForm
@@ -224,6 +226,24 @@ const FollowTelegram = ({
               <Tooltip title="Visit the link above to continue">
                 <Button onClick={() => {handleFollow(5); handleShow(5); }} style={buttonStyle1} disabled={clicked[4]}>Continue</Button> 
               </Tooltip>
+            </Row>
+          </AntCollapse>
+          <AntCollapse 
+            isFollowed={followed[6]} 
+            show={show[6]} 
+            panelID={panelIdx[5]} 
+            rewards={rewardsArr[2]}
+            setShow={setShow} 
+            disabled={followed[6]} 
+            header={
+              <div style={{width:'55%', display:'inline-flex', alignItems:'left'}}>
+                <img src={invFriendsIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
+                <span>Invite Friends to Join ACY IDO</span>
+              </div>
+            }
+          >
+            <Row type='flex' align='middle' justify='space-around'>
+              <Button type="primary" href={links[0]} target="_blank" style={buttonStyle1} icon="link">Share Your Link To Your Friends</Button>
             </Row>
           </AntCollapse>
           <Row type='flex' align='middle' justify='space-around'>

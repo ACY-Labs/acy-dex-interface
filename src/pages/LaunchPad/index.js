@@ -410,7 +410,6 @@ const LaunchpadComponent = () => {
             </div>
             
             <div className={styles.contentStyle}>
-
             <Carousel dot="true" autoplay>
                 <div>
                     <div id="cntBlock">
