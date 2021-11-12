@@ -15,20 +15,20 @@ const stepComponent = (props) => {
   const [current, setCurrent] = useState(1);
   const [status, setStatus] = useState('process');
 
- 
+
   return (
-              <div className = {styles.stepColor} 
-              id = "steps">
-              <Steps size = "small" direction ="vertical" labelPlacement= "vertical" current={current} >
-                <Step title ="Preparation" />
-                <Step title="Whitelist"/>
-                <Step title="Lottery Ticket" />
-                <Step title="Sale"/>
-                <Step title="Distribution"/>
-              </Steps>
-              {/* <Divider /> */}
-            
-              </div>
+    <div 
+      className={styles.stepColor} 
+      id="steps"
+    >
+      <Steps size="small" direction="vertical" labelPlacement="vertical" current={current}>
+        <Step title="Preparation" />
+        <Step title="Whitelist" />
+        <Step title="Lottery Ticket" />
+        <Step title="Sale" />
+        <Step title="Distribution" />
+      </Steps>
+    </div>
               
   )
 }

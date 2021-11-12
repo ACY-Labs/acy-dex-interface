@@ -1,5 +1,4 @@
 @import '~antd/lib/style/themes/default.less';
-
 @cardColor: #2f313583;
 @mainColor: #c4c4c4;
 
@@ -37,8 +36,6 @@
     overflow: visible;
     margin-bottom: 20px;
     padding: 15px;
-    //position: relative;
-    //display: inline-block;
     position: relative;
     .snsBox1{
         margin-top: 4vh;
@@ -53,7 +50,6 @@
     margin-bottom: 20px;
     padding: 15px;
     z-index: 11;
-
 }
 
 .contentStyle{
@@ -63,7 +59,6 @@
     /* top: -10vh; */
     /* left: 1vw; */
     padding: 0px 0px 98px 0px;
-
     :global{
         .ant-carousel .slick-dots li button{
             height: 5px;
@@ -74,37 +69,6 @@
         }
     }
 }
-
-/* .tableHeaderButtonContainer {
-    width: 100%;
-    display: flex; 
-    justify-content: flex-end;
-    margin-bottom: 20px;
-    .tableHeaderToggleButtonContainer {
-      .activeToggleButton,
-      .endedToggleButton {
-        border: none;
-        background-color: #29292c;
-        padding: 0.25rem 1rem;
-        &:hover {
-          border: 1px solid  #1e5d91;
-          cursor: pointer;
-        }
-      }
-      .activeToggleButton {
-          width: 70px;
-        border-radius: 9999px 0 0 9999px;
-      }
-      .endedToggleButton {
-        width: 70px;
-        border-left: 1px solid #29292c;
-        border-radius: 0 9999px 9999px 0;
-      }
-    }
-} */
-// .chartWrapper {
-//     height: 90%;
-// }
 
  .chartWrapper{
     width: 50vw;
@@ -123,31 +87,28 @@
     max-height: 700px;
     top:2vh;
     left:2vw;
-  
 }
 .carouselBlock{
     position: relative;
     min-height: 20vh;
     max-height: 700px;
-    
-
 }
+
 .countDown{
     position: relative;
     color: #b5b5b6;
-    
     :global{
         .ant-statistic-content{
             color: #b5b5b6;
         }
     }
-    
 }
 
 .labelBlock{
     display: flex;
     flex-direction: row;
 }
+
 .countLabel {
     font-size: 15px;
     TEXT-ALIGN: center;
@@ -155,11 +116,13 @@
     position: relative;
     padding: 20px 5px 0px;
 }
+
 .cntBlock{
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
+
 .tokenIDODate{
         position: relative;
         display: flex;
@@ -167,53 +130,51 @@
 
     }
 
-
 .cntdwn{
     justify-content: center;
     display: flex;
-
-
 }
+
 .number{
     :global{
-    div:first-child{
-    flex-direction:row;
-
-    color: #b5b5b6;
-    color: var(--accent-color,white);
-    width: 50px;
-    height: 50px;
-    border-radius: 5px;
-    background-color: hsla(0,0%,82.7%,.3);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 22px;
-    font-weight: 700;
-    padding: 24px;
+        div:first-child{
+            flex-direction:row;
+            color: #b5b5b6;
+            color: var(--accent-color,white);
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            background-color: hsla(0,0%,82.7%,.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 22px;
+            font-weight: 700;
+            padding: 24px;
+        }
+        div:nth-child(2) {
+            display: flex;
+            justify-content: center;
+            font-size: 11px;
+        }
     }
-    div:nth-child(2) {
-        display: flex;
-        justify-content: center;
-        font-size: 11px;
-    }
-    }
-
 }
+
 .seperator {
     margin: 5pX;
     font-size: 22px;
     color:#eb5c20;
 }
+
 .box{
     display: flex;
     justify-content: space-between;
     position: relative;
     left: 81px;
 }
+
 .arrow{
     position: relative;
-
 }
 
 .swaparrow {
@@ -238,88 +199,111 @@
     width: 100px;
     height: 100px;
 }
+
 .stepColor {
-    display: flex;
+    width: 100%;
     flex-direction: column;
     flex-basis: 241px;
     padding: 0px 33px 0px;
     /* overflow: scroll; */
-        :global{
-        .ant-steps-item-title{
-            color: #b5b5b6  !important;
-            //  background-color: red;
+    :global{
+    .ant-steps-item-title{
+        color: #b5b5b6  !important;
+        //  background-color: red;
+    }
+    .ant-steps-item-description{
+        color:#b5b5b6 !important}
+        // .ant-steps-item-tail{
+        //     width: 0% !important;
+        //     border-style: dotted none none ;
+        //     margin-left: 90px !important;
+        //     margin-top: 4px !important;
+        //     padding: 11.5px 27px !important;
+        //     color: #eb5c20;
+            
+        // }
+        .ant-steps{
+            display: contents;
         }
-        .ant-steps-item-description{
-            color:#b5b5b6 !important}
-            // .ant-steps-item-tail{
-            //     width: 0% !important;
-            //     border-style: dotted none none ;
-            //     margin-left: 90px !important;
-            //     margin-top: 4px !important;
-            //     padding: 11.5px 27px !important;
-            //     color: #eb5c20;
-                
-            // }
-            .ant-steps{
-                display: contents;
+        .ant-steps-item-finish { 
+            .ant-steps-item-icon {
+            background-color: #b5b5b6 !important;
+            border-color: #0e0304;
             }
-            .ant-steps-item-finish { .ant-steps-item-icon {
-                background-color: #b5b5b6 !important;
-                border-color: #0e0304;
-            }}
+        }
+        .ant-steps-item-finish{
+            width: fit-content;
+        }
+        .ant-steps-item-process{
+            width: fit-content;
+        }
+        .ant-steps-item-wait{
+            width: fit-content;
+        }   
 
-            //icon taile color
-            .ant-steps-item-finish > .ant-steps-item-container > .ant-steps-item-tail::after{
-                background-color: #757579 !important;
-            }
-            .ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-tail::after{
-                background-color: #757579 !important;
-            }
-            .ant-steps-item-wait > .ant-steps-item-container > .ant-steps-item-tail::after{
-                background-color: #757579 !important;
-            }
+        //icon taile color
+        .ant-steps-item-finish > .ant-steps-item-container > .ant-steps-item-tail::after{
+            background-color: #757579 !important;
+        }
+        .ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-tail::after{
+            background-color: #757579 !important;
+        }
+        .ant-steps-item-wait > .ant-steps-item-container > .ant-steps-item-tail::after{
+            background-color: #757579 !important;
+        }
 
-            // icon tail size
-            .ant-steps-vertical > .ant-steps-item > .ant-steps-item-container > .ant-steps-item-tail::after {
-                width: 0.08px;
-                height: 100%;
-            }
-            .ant-steps-item-wait .ant-steps-item-icon {
-                background-color: #b5b5b6 !important;
-                border-color: #0e0304;
-            }
-            .ant-steps-item-icon > .ant-steps-icon {
-                color: #0e0304 !important;
-            }
-            .ant-steps-item-icon > .ant-steps-icon {
-                color: #0e0304 !important;
-            }
+        //content
+        .ant-steps-item-finish > .ant-steps-item-container > .ant-steps-item-content{
+            width: fit-content;
+        }
+        .ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-content{
+            width: fit-content;
+        }
+        .ant-steps-item-wait > .ant-steps-item-container > .ant-steps-item-content{
+            width: fit-content;
+        }
 
-            // the process icon text color
-            
-            .ant-steps-item-process .ant-steps-item-icon > .ant-steps-icon{
-                color:white !important;
-            }
-            
-            .ant-steps-item-process { .ant-steps-item-icon {
-                background-color: #c6224e;
-                border-color: #c6224e;
-            }}
-    
-            .ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-title{
-                color: white !important;
-            }
-            
-            }
-       
+        // icon tail size
+        .ant-steps-vertical > .ant-steps-item > .ant-steps-item-container > .ant-steps-item-tail::after {
+            width: 0.08px;
+            height: 100%;
+        }
         .ant-steps-item-wait .ant-steps-item-icon {
-            background-color: #0e0304 !important;
+            background-color: #b5b5b6 !important;
             border-color: #0e0304;
         }
         .ant-steps-item-icon > .ant-steps-icon {
-            color: #b5b5b6 !important;
+            color: #0e0304 !important;
         }
-    } 
+        .ant-steps-item-icon > .ant-steps-icon {
+            color: #0e0304 !important;
+        }
+
+        // the process icon text color
+        
+        .ant-steps-item-process .ant-steps-item-icon > .ant-steps-icon{
+            color:white !important;
+        }
+        
+        .ant-steps-item-process { .ant-steps-item-icon {
+            background-color: #c6224e;
+            border-color: #c6224e;
+        }}
+
+        .ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-title{
+            color: white !important;
+        }
+        
+        }
+    
+    .ant-steps-item-wait .ant-steps-item-icon {
+        background-color: #0e0304 !important;
+        border-color: #0e0304;
+    }
+    .ant-steps-item-icon > .ant-steps-icon {
+        color: #b5b5b6 !important;
+    }
+} 
 
 
 
@@ -519,7 +503,7 @@
   cursor: pointer;
   background: #c6224e;
   color: #fff;
-  border-color: #c6224e;
+  border-color: #c6224e; 
   opacity: 90%;
 }
 
@@ -1040,25 +1024,19 @@
         flex-direction: row;
     }
     .tokenContainer, .tokenInfoBox, .moreInfoContainer, .ticketBox{ 
-        width: 50%;
+        width: 100%;
     }
     .contentStyle{
         max-width: 100%;
     }
-}
-
-@media screen and (min-width: 1060px) {
-    .midContainer {
-        flex-direction: row;
+    .stepBlock{
+        flex-direction:column;
+        width: 100%;
     }
-    .tokenContainer, .tokenInfoBox, .moreInfoContainer, .ticketBox{ 
-        width: 50%;
-    }
-    .contentStyle{
-        max-width: 100%;
+    .stepColor{
+        left: 5rem;
     }
 }
-
 
 .tableHeaderButtonContainer {
     display: flex; 

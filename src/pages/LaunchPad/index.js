@@ -187,7 +187,7 @@ const LaunchpadComponent = () => {
         {
             title: 'Amount',
             dataIndex: 'amount',
-            width: 80,
+            width: 85,
             align: 'center'
         },
         {
@@ -408,24 +408,19 @@ const LaunchpadComponent = () => {
             <div className={styles.moreInfoContainer}>
                 <div className={styles.contentStyle}>
                     <Carousel dot="true" autoplay="true" effect="fade" autoplaySpeed={6000}>
-                        <div className = {styles.carouselBlock}>
-                            
-                            
+                        <div className={styles.carouselBlock}>
                             <div className={styles.stepBlock} id="block">
-                            <div className={styles.cntBlock}>
-                                <CountDown />
-                                <div className = {styles.labelBlock}>
-                                    <div className={styles.countLabel}>ROUND 1</div>
-                                    <div className={styles.tokenIDODate}>
-                                        <h4 style={{color:'#fff', fontSize:"13px", marginTop:"8px"}}>Open: {selectedTableRow.openDate} 10:00 UST</h4>
-                                        <h4 style={{color:'#fff', fontSize:"13px"}}>Close: {selectedTableRow.closeDate} 10:00 UST</h4>
+                                <div className={styles.cntBlock}>
+                                    <CountDown />
+                                    <div className={styles.labelBlock}>
+                                        <div className={styles.countLabel}>ROUND 1</div>
+                                            <div className={styles.tokenIDODate}>
+                                                <h4 style={{color:'#fff', fontSize:"13px", marginTop:"8px"}}>Open: {selectedTableRow.openDate} 10:00 UST</h4>
+                                                <h4 style={{color:'#fff', fontSize:"13px"}}>Close: {selectedTableRow.closeDate} 10:00 UST</h4>
+                                            </div>
                                     </div>
                                 </div>
-                            </div>
-
-                        
-
-                            <StepBar />
+                                <StepBar />
                             </div>
                         </div>
                         <div className={styles.chartWrapper} id="chartdata">
@@ -549,14 +544,14 @@ const LaunchpadComponent = () => {
             </div>
             <div className={styles.dateTableBox}>
                 <Table 
-                    style={{marginTop:'20px', textAlign:'center'}} // position: 'relative', display: 'flex', justifyContent: 'space-between', width: '100%', flexWrap:'wrap'
-                    columns={tableColumns} 
-                    dataSource={tableData}
-                    onRow={(record, rowIndex) => {
-                    return {
-                        onClick: event => {
-                            setSelectedTableRow(record);
-                        }, // click row
+                  style={{marginTop:'20px', textAlign:'center'}} // position: 'relative', display: 'flex', justifyContent: 'space-between', width: '100%', flexWrap:'wrap'
+                  columns={tableColumns} 
+                  dataSource={tableData}
+                  onRow={(record, rowIndex) => {
+                  return {
+                    onClick: event => {
+                        setSelectedTableRow(record);
+                    }, // click row
                     };
                     }}
                 />
