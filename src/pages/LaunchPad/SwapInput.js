@@ -4,6 +4,8 @@ import AcyIcon from '@/components/AcyIcon';
 import styles from './styles.less';
 import Pattern from '@/utils/pattern';
 import AcyLogoIcon from '@/assets/icon_acy.svg';
+import ticketIcon from '@/assets/icon_swap_ticket.svg';
+
 
 const SwapInput = ({
   title,
@@ -45,24 +47,24 @@ const SwapInput = ({
         <div className={styles.coinContainer}>
           <div className={styles.cua_group}>
             <div className={styles.switchcoin}>
-                <div className={styles.wrap}>
-                    <div className={styles.coin}>
-                      {  isInput && (
-                        <div>
-                          <img src='https://storageapi.fleek.co/chwizdo-team-bucket/ACY%20Token%20List/USDT.svg' style={{ width: '24px'}} />
-                          <span style={{ margin: '0px 0.25rem' }}>{title}</span>
-                        </div>
-                      )}
+              <div className={styles.wrap}>
+                <div className={styles.coin}>
+                  {  isInput && (
+                  <div style={{display: 'flex', justifyContent:'center', alignItems:'center'}}>
+                    <img src='https://storageapi.fleek.co/chwizdo-team-bucket/ACY%20Token%20List/USDT.svg' alt="" style={{ width: '24px', marginTop:'2px'}} />
+                    <span style={{ margin: '0 0.35rem' }}>{title}</span>
+                  </div>
+                  )}
 
-                      {  !isInput && (
-                        <div>
-                          <div style={{ width: '24px', marginRight: '0.5rem' }}></div>
-                          <span style={{ margin: '0px 0.85rem' }}>{title}</span>
-                        </div>
-                      )}
+                  {  !isInput && (
+                    <div style={{ display: 'flex', justifyContent:'center', alignItems:'center'}}>
+                      <img src={ticketIcon} alt="" style={{ width: '24px', marginTop:'2px'}} />
+                      <span style={{ margin: '0px 0.35rem' }}>{title}</span>
                     </div>
-                </div>            
-              </div>
+                  )}
+                </div>
+              </div>            
+            </div>
             
             <input
               ref={inputRef}

@@ -8,7 +8,7 @@ import tickIcon from "@/assets/icon_tick.svg";
 const StyledCollapse = styled(AntCollapse)`
   &&& {
     border: none;
-    border-radius: 0px;
+    border-radius: 10px;
     box-shadow: none;  
     background-color: #CCCFD8;
     .ant-collapse-content {

@@ -10,6 +10,7 @@ import userIcon from '@/assets/icon_user.svg';
 import telegramIcon from '@/assets/icon_telegram_black.svg';
 import twitterBIcon from '@/assets/icon_twitter_black.svg';
 import twitterWIcon from '@/assets/icon_twitter_white.svg';
+import twitterRetweetIcon from '@/assets/icon_twitter_retweet.svg';
 import invFriendsIcon from '@/assets/icon_invite_friends.svg';
 import AntCollapse from "./CustomCollapse";
 
@@ -64,7 +65,10 @@ const FollowTelegram = ({
     setShow(prev => ({...prev, [panelId] : val}))
   }
 
-  const links = "https://www.youtube.com/"
+  const links = [
+                  "https://t.me/acyfinance", 
+                  "https://t.me/ACYFinanceChannel"
+                ]
 
   const buttonStyle1 = {
     backgroundColor: "#c6224e", 
@@ -123,14 +127,14 @@ const FollowTelegram = ({
             header={
               <div style={{width:'85%', display:'inline-flex', alignItems:'left'}}>
                 <img src={telegramIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
-                <span>Join ACY Telegram</span>
+                <span>Join ACY Telegram Group</span>
               </div>
               }
           >
             <Row type='flex' align='middle' justify='space-around'>
-              <Button id='linkbtn' href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(1); onClick();}}>
+              <Button id='linkbtn' href={links[0]} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(1); onClick();}}>
                 <Icon type="link" style={{ color: '#fff' }} theme="outlined" />
-                Subscribe
+                Join
               </Button>
               <Tooltip title="Visit the link to continue">
                 <Button onClick={() => {handleFollow(2); handleShow(2); }} style={buttonStyle1} disabled={clicked[1]}>Continue</Button> 
@@ -152,7 +156,7 @@ const FollowTelegram = ({
             }
           >
             <Row type='flex' align='middle' justify='space-around'>
-              <Button href={links} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(2); onClick();}}>
+              <Button href={links[1]} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(2); onClick();}}>
                 <Icon type="link" style={{ color: '#fff' }} theme="outlined" />
                 Subscribe
               </Button>
@@ -189,7 +193,7 @@ const FollowTelegram = ({
                 data-show-count="false"
               >
                 <img src={twitterWIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
-                Follow @ACYFinance
+                <span style={{marginRight:'5px'}}>Follow @ACYFinance</span>
               </a>
               <script async src="https://platform.twitter.com/widgets.js" charset="utf-8" />
               <Tooltip title="Visit the link above to continue">
@@ -214,14 +218,14 @@ const FollowTelegram = ({
             <Row type='flex' align='middle' justify='space-around'>
               <a 
                 className={styles.twitterbtn}
-                href="https://twitter.com/intent/tweet?hashtags=ACY%2CDeFi&screen_name=ACYFinance&text=ACY%20Finance%20First%20IDO&url=https%3A%2F%2Ftest.acy.finance%2F&via=ACYFinance"
+                href="https://twitter.com/intent/retweet?tweet_id=1458721380027928582"
                 target="_blank"
                 rel="noreferrer"
                 onClick={() => {onLinkClick(4);}}
                 data-size="large"
               >
-                <img src={twitterWIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
-                Tweet to @ACYFinance
+                <img src={twitterRetweetIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
+                <span style={{marginRight:'5px'}}>Retweet</span>
               </a>
               <Tooltip title="Visit the link above to continue">
                 <Button onClick={() => {handleFollow(5); handleShow(5); }} style={buttonStyle1} disabled={clicked[4]}>Continue</Button> 

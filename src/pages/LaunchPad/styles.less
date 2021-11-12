@@ -195,6 +195,25 @@
     position: relative;
 
 }
+
+.swaparrow {
+    padding: 4px;
+    border-radius: 100%;
+    height: 32px;
+    width: 32px;
+    position: relative;
+    margin-top: -14px;
+    margin-bottom: -14px;
+    left: calc(50% - 16px);
+    background-color: rgb(33, 36, 41);
+    border: 4px solid rgb(25, 27, 31);
+    z-index: 2;
+    &:hover {
+      cursor: pointer;
+      opacity: 0.9;
+    }
+}
+
 .arrowbox{
     width: 100px;
     height: 100px;
@@ -742,7 +761,7 @@
 .twitterbtn {
     font-size: 15px;
     height: 2em;
-    width: 13em;
+    width: auto;
     border-radius: 4px;
     max-width: 100%;
     box-sizing: border-box;
@@ -760,6 +779,7 @@
 
 .twitterbtn:hover{
     color: #fff;
+    filter: brightness(85%);
 }
 
 //tan
@@ -767,13 +787,15 @@
     width: 100%;
     height: auto;
     padding: 50px 50px;
+    border-radius: 0 10px 10px 0;
+    background-color: #0E0304;
 }
 .acycuarrencycard{
   display: flex;
   flex-flow: column nowrap;
 //   position: relative;
   border-radius: 20px;
-  background-color: rgb(44, 47, 54);
+  background-color: #29292C; //rgb(44, 47, 54);
   width: initial;
 //   z-index: 1;
 
@@ -790,7 +812,7 @@
   .cua_body{
     border-radius: 10px;
     // border: 1px solid rgb(44, 47, 54);
-    background-color: #191B20;
+    background-color: #29292c;
     width: initial;
     height: 80px;
     position: relative;
@@ -812,13 +834,14 @@
       align-items: center;
       font-size: 18px;
       font-weight: 500;
+      background-color: #1b1b1c;
       color: rgb(255, 255, 255);
       border-radius: 10px;
       outline: none;
       cursor: pointer;
       user-select: none;
       border: none;
-      // height: 2.4rem;
+      height: 1.8rem;
       width: initial;
       justify-content: space-between;
       line-height: inherit;
@@ -835,7 +858,7 @@
           align-items: center;
           justify-content: center;
           text-align: left;
-         
+          align-items: center;
         }
       }
     }
@@ -855,7 +878,7 @@
       height: unset;
       border: 0;
       border-radius: 0;
-      background-color: #191B20;
+      background-color: #29292c; //#191B20;
       font-size: 22px;
       white-space: nowrap;
       text-overflow: ellipsis;
