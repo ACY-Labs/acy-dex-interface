@@ -133,7 +133,7 @@ const BasicProfile = (props) => {
           <AddComponent onLoggedIn={onLoggedIn} />
         </div>
       </div>
-
+      
       {/* <AcyModal onCancel={this.onCancel} width={600} visible={visible}>
           <div className={styles.title}>
             <AcyIcon name="back" /> Select a token
@@ -182,20 +182,27 @@ const BasicProfile = (props) => {
           onCancel={() => this.setState({ visibleLoading: false })}
           visible={visibleLoading}
         /> */}
-
-      <StakeHistoryTable
-        isMobile={props.isMobile}
-        dataSource={[
-          {
-            "hash": "0x9bd8646e8bb6942cc3ae38f2a8a2be7eaeeeae5f12fe76c988ec02361c0cc41c",
-            "inputTokenNum": 1.157920892373162e+59,
-            "inputTokenSymbol": "ACY",
-            "outTokenNum": 0.9717145322649389,
-            "outTokenSymbol": "UNI",
-            "transactionTime": "2021-10-16 19:34:30"
-          }
-        ]}
-      />
+      <div className={styles.operationBottomWrapper}>
+        <div className={styles.operationItem}>
+          <h3>
+            <AcyIcon.MyIcon width={30} type="arrow" />
+            <span className={styles.span}>HISTORY OPERATION</span>
+          </h3>
+          <StakeHistoryTable 
+            isMobile={props.isMobile}
+            dataSource={[
+              {
+                "hash": "0x9bd8646e8bb6942cc3ae38f2a8a2be7eaeeeae5f12fe76c988ec02361c0cc41c",
+                "inputTokenNum": 1.157920892373162e+59,
+                "inputTokenSymbol": "ACY",
+                "outTokenNum": 0.9717145322649389,
+                "outTokenSymbol": "UNI",
+                "transactionTime": "2021-10-16 19:34:30"
+              }
+            ]}
+            />
+        </div>
+      </div>
     </PageHeaderWrapper>
   );
 }
