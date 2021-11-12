@@ -27,6 +27,33 @@
   align-items: center;
   justify-content: flex-end;
 }
+.operationBottomWrapper {
+  width: 65%;
+  display: flex;
+  padding-right: 40px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: stretch;
+}
+.operationBottomWrapper{
+  .operationItem{
+    width: 100%;
+    padding: 48px 0;
+    h3{
+      font-size: 20px;
+      margin-top: 0px;
+      display: flex;
+      &:hover{
+        color: #eb5c20;
+        transform: translate(10px,0);
+        transition-duration: 0.5s;
+      }
+      .span{
+        transform: translate(0,3px);
+      }
+    }
+  }
+}
 .trade {
   padding-top: 25px;
 }
