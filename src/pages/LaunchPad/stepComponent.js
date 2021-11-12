@@ -17,7 +17,6 @@ const stepComponent = (props) => {
 
  
   return (
-    <div  className = {styles.stepBar} >
               <div className = {styles.stepColor} 
               id = "steps">
               <Steps size = "small" direction ="vertical" labelPlacement= "vertical" current={current} >
@@ -31,7 +30,6 @@ const stepComponent = (props) => {
             
               </div>
               
-      </div>  
   )
 }
 
