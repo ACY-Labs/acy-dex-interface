@@ -374,6 +374,7 @@ const LaunchpadComponent = () => {
     
     return(
         <div className={styles.launchRoot}>
+            
             <div className={styles.topContainer}>
             <div className={styles.tokenContainer}> 
                 <div className={styles.snsBox1}>
@@ -407,11 +408,23 @@ const LaunchpadComponent = () => {
             <div className={styles.moreInfoContainer}>
                 <div className={styles.contentStyle}>
                     <Carousel dot="true" autoplay="true" effect="fade" autoplaySpeed={6000}>
-                        <div>
-                            <div id="cntBlock">
-                                <CountDown />
-                            </div>
+                        <div className = {styles.carouselBlock}>
+                            
+                            
                             <div className={styles.stepBlock} id="block">
+                            <div className={styles.cntBlock}>
+                                <CountDown />
+                                <div className = {styles.labelBlock}>
+                                    <div className={styles.countLabel}>ROUND 1</div>
+                                    <div className={styles.tokenIDODate}>
+                                        <h4 style={{color:'#fff', fontSize:"13px", marginTop:"8px"}}>Open: {selectedTableRow.openDate} 10:00 UST</h4>
+                                        <h4 style={{color:'#fff', fontSize:"13px"}}>Close: {selectedTableRow.closeDate} 10:00 UST</h4>
+                                    </div>
+                                </div>
+                            </div>
+
+                        
+
                             <StepBar />
                             </div>
                         </div>
@@ -425,7 +438,6 @@ const LaunchpadComponent = () => {
                               bgColor="#2f313500"
                             />
                         </div>
-                        <div>
                             <div className={styles.transferTable}>
                                 <Table 
                                   style={{marginTop:'20px',textAlign:'center'}}
@@ -437,7 +449,6 @@ const LaunchpadComponent = () => {
                                   rowClassName={(record, index) => styles.rowExpanded}
                                 />   
                             </div> 
-                        </div>
                     </Carousel>
                 </div>
             </div>

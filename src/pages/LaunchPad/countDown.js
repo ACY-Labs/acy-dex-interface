@@ -86,10 +86,7 @@ const { Countdown } = Statistic;
         <div>SEC</div>
         </div>
 
-
       </div>
-      <div className={styles.countLabel}>ROUND 1</div>
-
     </div>
     )
   }

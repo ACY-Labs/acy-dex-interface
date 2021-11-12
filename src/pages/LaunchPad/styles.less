@@ -19,6 +19,7 @@
     z-index: 0;
     margin-bottom: 20px;
     font-weight: 400;
+    overflow: visible;
 }
 
 .topContainer{
@@ -26,7 +27,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: -127px;
 }
 
 .tokenContainer{
@@ -46,21 +47,23 @@
 
 .moreInfoContainer{
     width: 50%;
-    //min-height: 20vh;
-    //max-height: 700px;
+    min-height: 20vh;
+    max-height: 700px;
     border-radius: 0 15px 15px 15px 15px;
     margin-bottom: 20px;
     padding: 15px;
     z-index: 11;
+
 }
 
 .contentStyle{
-    //width: 26vw;
     min-height: 10vh;
-    max-height: 700px;
-    position: relative;
-    //left: 40px;
-    //top: 32px;
+    max-height: 1500px;
+    /* position: relative; */
+    /* top: -10vh; */
+    /* left: 1vw; */
+    padding: 0px 0px 98px 0px;
+
     :global{
         .ant-carousel .slick-dots li button{
             height: 5px;
@@ -106,31 +109,32 @@
  .chartWrapper{
     width: 50vw;
     height: 35vh;
-    // width: inherit;
-    // height: inherit;
     max-height: 500px;
     float: right;
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
+    top: 0vh;
 } 
 
 .stepBlock  {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
     position: relative;
-    left: 24vh;
-    top: -41px;
+    min-height: 20vh;
+    max-height: 700px;
+    top:2vh;
+    left:2vw;
+  
 }
-
-.countDown{
-    width: fit-content;
-    height: fit-content;
+.carouselBlock{
     position: relative;
-    margin: auto;
-    color: #b5b5b6;
-    top: 110px;
-    left: -79px;
+    min-height: 20vh;
+    max-height: 700px;
+    
 
+}
+.countDown{
+    position: relative;
+    color: #b5b5b6;
     
     :global{
         .ant-statistic-content{
@@ -139,15 +143,31 @@
     }
     
 }
-.countLabel {
-    font-size: 14px;
-    opacity: .8;
-    padding-bottom: 4px;
-    TEXT-ALIGN: center;
-    color: #b5b5b6;
 
-
+.labelBlock{
+    display: flex;
+    flex-direction: row;
 }
+.countLabel {
+    font-size: 15px;
+    TEXT-ALIGN: center;
+    color: white;
+    position: relative;
+    padding: 20px 5px 0px;
+}
+.cntBlock{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.tokenIDODate{
+        position: relative;
+        display: flex;
+        flex-direction: column;
+
+    }
+
+
 .cntdwn{
     justify-content: center;
     display: flex;
@@ -219,8 +239,11 @@
     height: 100px;
 }
 .stepColor {
-        display: flex;
-        flex-direction: column;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 241px;
+    padding: 0px 33px 0px;
+    /* overflow: scroll; */
         :global{
         .ant-steps-item-title{
             color: #b5b5b6  !important;
@@ -280,6 +303,7 @@
             
             .ant-steps-item-process { .ant-steps-item-icon {
                 background-color: #c6224e;
+                border-color: #c6224e;
             }}
     
             .ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-title{
@@ -379,14 +403,12 @@
         flex-wrap: wrap;
         width: 50%;
     }
-    .tokenIDODate{
-        margin-right: 25%;
-    }
     .tokenIDOStatus{
         position: relative;
         margin-top: 25px;
     }
 }
+
 .tokenInfoContainer {
     width: 100%;
     height: auto;
@@ -964,6 +986,7 @@
 .transferTable{
     width: inherit;
     height: inherit;
+    position: relative;
     :global{
     .ant-table-placeholder{
         background: transparent !important;
@@ -1017,9 +1040,25 @@
         flex-direction: row;
     }
     .tokenContainer, .tokenInfoBox, .moreInfoContainer, .ticketBox{ 
-        width: 100%;
+        width: 50%;
+    }
+    .contentStyle{
+        max-width: 100%;
     }
 }
+
+@media screen and (min-width: 1060px) {
+    .midContainer {
+        flex-direction: row;
+    }
+    .tokenContainer, .tokenInfoBox, .moreInfoContainer, .ticketBox{ 
+        width: 50%;
+    }
+    .contentStyle{
+        max-width: 100%;
+    }
+}
+
 
 .tableHeaderButtonContainer {
     display: flex; 
