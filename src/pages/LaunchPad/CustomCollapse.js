@@ -6,21 +6,21 @@ import arrowDownIcon from "@/assets/icon_arrow_down.svg";
 import tickIcon from "@/assets/icon_tick.svg";
 
 const StyledCollapse = styled(AntCollapse)`
-  &&& {
+  {
     border: none;
-    border-radius: 0 10px 10px 0;
+    border-radius: 0 10px 0 0;
     box-shadow: none;  
-    background: hsl(0, 0%, 82.7%);
-    opacity: 0.3;
-    filter: brightness(82.7%);
+    background: #cccfd8;
     .ant-collapse-content {
-      background-color: #b5b5b6;
-      opacity: 0.3;
-      filter: brightness(82.7%);
+      border-top: 1px solid #000;
+      background: #cccfd8;
       color: #000000;
     }
     .ant-collapse-header {
       color: #000000;
+    }
+    .ant-collapse > .ant-collapse-item{
+      border-bottom: 1px solid #000;
     }
   }
 `;

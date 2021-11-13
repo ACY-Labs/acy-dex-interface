@@ -448,11 +448,13 @@ const LaunchpadComponent = () => {
                                 <div className={styles.cntBlock}>
                                     <CountDown />
                                     <div className={styles.labelBlock}>
-                                        <div className={styles.countLabel}>ROUND 1</div>
-                                            <div className={styles.tokenIDODate}>
-                                                <h4 style={{color:'#fff', fontSize:"13px", marginTop:"8px"}}>Open: {selectedTableRow.openDate} 10:00 UST</h4>
-                                                <h4 style={{color:'#fff', fontSize:"13px"}}>Close: {selectedTableRow.closeDate} 10:00 UST</h4>
-                                            </div>
+                                        <div className={styles.countLabel}>
+                                            ROUND 1
+                                        </div>
+                                        <div className={styles.tokenIDODate}>
+                                            <h4 style={{color:'#fff', fontSize:"13px", marginTop:"8px"}}>Open: {selectedTableRow.openDate} 10:00 UST</h4>
+                                            <h4 style={{color:'#fff', fontSize:"13px"}}>Close: {selectedTableRow.closeDate} 10:00 UST</h4>
+                                        </div>
                                     </div>
                                 </div>
                                 <StepBar />
@@ -491,9 +493,11 @@ const LaunchpadComponent = () => {
                                 <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
                                 <h2 style={{color:'#eb5c20'}} className={styles.tokenName}> ACY </h2>
                             </div>
+                            { selectedForm === 2 && (
                             <div className={styles.tokenIDOStatus}>
-                                <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'70px', height:'auto', textAlign:"center", fontSize:'16px', fontFamily:'Inter, sans-serif'}}>Ended</Tag>
+                                <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'auto', height:'auto', textAlign:"center", fontSize:'16px', fontFamily:'Inter, sans-serif'}}>Your Max Allocation : 100 USDT</Tag>
                             </div>
+                            )}
                         </div>
                     </div>
                     <div className={styles.tokenProgress}>

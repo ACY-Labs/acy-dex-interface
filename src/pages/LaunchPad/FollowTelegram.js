@@ -82,16 +82,15 @@ const FollowTelegram = ({
   }
 
   const buttonStyle2 = {
-    background: "#1ABC9C", 
-    border:"#1ABC9C",
-    width: '80px', 
+    backgroundColor: "#c6224e", 
+    width: 'auto', 
     color: 'white', 
     height: "2em", 
-    fontSize:'16px', 
+    fontSize:'15px', 
     display:'flex', 
     justifyContent:'center', 
     alignItems:'center',
-    marginTop:'10px'
+    margin:'10px 0'
   }
 
   return (
@@ -114,7 +113,7 @@ const FollowTelegram = ({
           >
             <InputEmail />
             <Row type='flex' align='middle' justify='center'>
-              <Button onClick={() => {handleShow(1); }} style={buttonStyle1} disabled={clicked}>Submit</Button> 
+              <Button onClick={() => {handleShow(1); handleShow(1);}} style={buttonStyle1} disabled={clicked}>Submit</Button> 
             </Row>
           </AntCollapse>
           <AntCollapse 
@@ -129,7 +128,7 @@ const FollowTelegram = ({
                 <img src={telegramIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
                 <span>Join ACY Telegram Group</span>
               </div>
-              }
+            }
           >
             <Row type='flex' align='middle' justify='space-around'>
               <Button id='linkbtn' href={links[0]} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(1); onClick();}}>
@@ -251,7 +250,7 @@ const FollowTelegram = ({
             </Row>
           </AntCollapse>
           <Row type='flex' align='middle' justify='space-around'>
-            <img 
+            {/* <img 
               src={prevIcon} 
               id={styles.nextPage} 
               alt="" 
@@ -264,7 +263,8 @@ const FollowTelegram = ({
               alt="" 
               style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '15px 0', float:'right'}} 
               onClick={() => {setSelectedForm(2)}}  
-            />
+            /> */}
+            <Button style={buttonStyle2} onClick={() => {setSelectedForm(2)}}>Enter the Whitelist</Button>
           </Row>
         </div>
       </div>
