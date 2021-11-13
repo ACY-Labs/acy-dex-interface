@@ -4,7 +4,7 @@ import AcyIcon from '@/components/AcyIcon';
 import styles from './styles.less';
 import Pattern from '@/utils/pattern';
 import AcyLogoIcon from '@/assets/icon_acy.svg';
-import ticketIcon from '@/assets/icon_swap_ticket.svg';
+import ticketIcon from '@/assets/icon_swap_ticket1.svg';
 
 
 const SwapInput = ({
