@@ -235,27 +235,27 @@ const LaunchpadComponent = () => {
             title: 'Date Time(UTC)',
             dataIndex: 'dateTime',
             className: 'column-date',
-            width: 70,
+            width: 150,
             align: 'left'
         },
         {
             title: 'Participants',
             dataIndex: 'participant',
-            width: 60,
+            width: 80,
             align: 'center',
             ellipsis: true
         },
         {
             title: 'Quantity',
             dataIndex: 'quantity',
-            width: 60,
+            width: 80,
             align: 'center',
             ellipsis: true
         },
         {
             title: 'Amount',
             dataIndex: 'Amount',
-            width: 40,
+            width: 80,
             align: 'center',
             ellipsis: true
         },
@@ -445,17 +445,22 @@ const LaunchpadComponent = () => {
                     <Carousel dot="true" autoplay="true" effect="fade" autoplaySpeed={6000}>
                         <div className={styles.carouselBlock}>
                             <div className={styles.stepBlock} id="block">
+                                
                                 <div className={styles.cntBlock}>
-                                    <CountDown />
-                                    <div className={styles.labelBlock}>
+                                <div className={styles.labelBlock}>
+                                        <div className={styles.countLabelBlock}>
                                         <div className={styles.countLabel}>ROUND 1</div>
+                                        </div>
                                             <div className={styles.tokenIDODate}>
-                                                <h4 style={{color:'#fff', fontSize:"13px", marginTop:"8px"}}>Open: {selectedTableRow.openDate} 10:00 UST</h4>
-                                                <h4 style={{color:'#fff', fontSize:"13px"}}>Close: {selectedTableRow.closeDate} 10:00 UST</h4>
+                                                <p style={{color:'#b5b5b6', fontSize:"13px"}}>Open: {selectedTableRow.openDate} 10:00 UST</p>
+                                                <p style={{color:'#b5b5b6', fontSize:"13px"}}>Close: {selectedTableRow.closeDate} 10:00 UST</p>
                                             </div>
                                     </div>
+                                    
+                                    <CountDown />
+                                    <StepBar />
+
                                 </div>
-                                <StepBar />
                             </div>
                         </div>
                         <div className={styles.chartWrapper} id="chartdata">
