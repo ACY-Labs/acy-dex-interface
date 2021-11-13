@@ -37,10 +37,20 @@
     margin-bottom: 20px;
     padding: 15px;
     position: relative;
+}
+
+.snsContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
     .snsBox1{
-        margin-top: 4vh;
+        margin-top: 1.2vh;
+    }
+    .snsBox2{
+        margin-top: 1.2vh;
     }
 }
+
 
 .moreInfoContainer{
     width: 50%;
@@ -566,7 +576,7 @@
     min-height: 20vh;
     color: black;
     max-height: 700px;
-    background-color: #CCCFD8;
+    background-color: #cccfd8;
     box-sizing: border-box;
     border-radius: 0 10px 10px 0;
     display: flex;
@@ -797,8 +807,8 @@
 .swapContainer{
     width: 100%;
     height: auto;
-    padding: 50px 50px;
-    border-radius: 0 10px 10px 0;
+    padding: 25px 50px;
+    border-radius: 0 9px 9px 0;
     background-color: #0E0304;
 }
 .acycuarrencycard{
@@ -852,13 +862,14 @@
       cursor: pointer;
       user-select: none;
       border: none;
-      height: 1.8rem;
+      height: 2.3rem;
       width: initial;
       justify-content: space-between;
       line-height: inherit;
       .wrap{
         display: flex;
         // padding: 5px;
+        padding-top: 2px;
         text-align: center;
         align-items: center;
         justify-content: space-between;
@@ -870,6 +881,7 @@
           justify-content: center;
           text-align: left;
           align-items: center;
+          margin: 2px 10px 0;
         }
       }
     }
@@ -975,29 +987,32 @@
     height: 30vh;
     position: relative;
     :global{
-    .ant-table-placeholder{
-        background: transparent !important;
-    }
-    .ant-table-thead > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-tbody > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-thead > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-tbody > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td {
-    // background:  transparent !important;
-        cursor: pointer;
-    }
-    .ant-table-thead > tr{
-        background:  transparent !important;
-    }
-    .ant-table-tbody > tr{
-        background:  transparent !important;
-    }
-    .ant-table-thead > tr > th:not(.leftAlignTableHeader){
-        text-align: center !important;
-        background:  transparent !important;
-    }
-    .ant-table-footer{
-        background:  transparent !important;
-    }
-    .ant-table-tbody > tr{
-        &:active{
-            background: #2f3135 !important;
+        .ant-table-wrapper{
+            height: 100%;
+        }
+        .ant-table-placeholder{
+            background: transparent !important;
+        }
+        .ant-table-thead > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-tbody > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-thead > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-tbody > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td {
+        // background:  transparent !important;
+            cursor: pointer;
+        }
+        .ant-table-thead > tr{
+            background:  transparent !important;
+        }
+        .ant-table-tbody > tr{
+            background:  transparent !important;
+        }
+        .ant-table-thead > tr > th:not(.leftAlignTableHeader){
+            text-align: center !important;
+            background:  transparent !important;
+        }
+        .ant-table-footer{
+            background:  transparent !important;
+        }
+        .ant-table-tbody > tr{
+            &:active{
+                background: #2f3135 !important;
         }
     }
     // background-color: #862e2e;
@@ -1029,6 +1044,11 @@
     .tokenContainer, .tokenInfoBox, .moreInfoContainer, .ticketBox{ 
         width: 100%;
     }
+    .snsContainer{
+        .snsBox1, .snsBox2{
+            margin-top: 0;
+        }
+    }
     .contentStyle{
         max-width: 100%;
     }
@@ -1040,7 +1060,7 @@
         left: 5rem;
     }
     .chartWrapper{
-        top: 4.5vh;
+        top: -2.5vh;
         height: 45vh;
     }
     .transferTable{
@@ -1051,7 +1071,6 @@
                 height: 100%;
             }
         }
-        
     }
     .labelBlock{
         padding: 15px;

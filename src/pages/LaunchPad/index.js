@@ -8,6 +8,7 @@ import { AcyLineChart,AcyPriceChart } from '@/components/Acy';
 import AcyIcon from '@/assets/icon_acy.svg';
 import hashtagIcon from '@/assets/icon_hashtag.png';
 import telegramIcon from '@/assets/icon_telegram_black.png';
+import telegramWIcon from '@/assets/icon_telegram_white.svg';
 import styles from './styles.less';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
@@ -344,24 +345,46 @@ const LaunchpadComponent = () => {
     }
 
     const buttonCustomStyle = {
-        background: '#C4C4C4',
         border: '#eb5c20', 
-        color: 'black', 
+        color: 'white', 
         height: "2em", 
         marginRight:"0.8em",
+        marginTop:"0.8em"
+    }
+
+    const buttonCustomStyle1 = {
+        background: 'transparent',
+        border: '#eb5c20', 
+        color: 'white', 
+        height: "2em", 
+        marginRight:"0.8em",
+        marginTop:"0.8em"
+    }
+
+    const buttonCustomStyle2 = {
+        background: 'transparent',
+        border: '#eb5c20', 
+        color: 'white', 
+        height: "2em", 
+        marginLeft:"0.2em",
         marginTop:"0.8em"
     }
 
     const menu = (
         <Menu>
             <Menu.Item>
-                <a target="_blank" rel="noopener noreferrer" href="https://etherscan.io/token/0x4E15361FD6b4BB609Fa63C81A2be19d873717870" style={{color:'#000'}}>
+                <a target="_blank" rel="noopener noreferrer" href="https://cn.etherscan.com/token/0xaf9db9e362e306688af48c4acb9618c06db38ac3" style={{color:'#000'}}>
                     Etherscan.io
                 </a>
             </Menu.Item>
             <Menu.Item>
-                <a target="_blank" rel="noopener noreferrer" href="https://ethplorer.io/address/0x4e15361fd6b4bb609fa63c81a2be19d873717870#chart=candlestick" style={{color:'#000'}}>
-                    Ethplorer.io
+                <a target="_blank" rel="noopener noreferrer" href="https://polygonscan.com/token/0x8b1f836491903743fe51acd13f2cc8ab95b270f6" style={{color:'#000'}}>
+                    Polygonscan
+                </a>
+            </Menu.Item>
+            <Menu.Item>
+                <a target="_blank" rel="noopener noreferrer" href="https://confluxscan.io/token/cfx:accyf3j7s23x5j62hwt619k01un9bzn9u2mc6gavzb" style={{color:'#000'}}>
+                    Conflux.io
                 </a>
             </Menu.Item>
         </Menu>
@@ -374,30 +397,42 @@ const LaunchpadComponent = () => {
     
     return(
         <div className={styles.launchRoot}>
-            
             <div className={styles.topContainer}>
             <div className={styles.tokenContainer}> 
+                <div className={styles.snsContainer}>
                 <div className={styles.snsBox1}>
-                    <Button type="primary" href={links[0]} target="_blank" style={buttonCustomStyle} icon="link">Website</Button>
-                    <Button type="link" href={links[1]} target="_blank" style={buttonCustomStyle} icon="file">Whitepaper</Button>
+                    <Button type="link" href={links[0]} target="_blank" style={buttonCustomStyle2} icon="link">Website</Button>
+                    <br />
+                    <Button type="link" href={links[4]} target="_blank" style={buttonCustomStyle2} icon="file-ppt">Deck</Button>
+                    <br />
                     <Button type="link" href={links[2]} target="_blank" style={buttonCustomStyle}>
-                        <img src={telegramIcon} alt="" style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '8px 8px 0 0', float:'left'}} /> Telegram
-                    </Button>             
+                        <img src={telegramWIcon} alt="" style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '8px 8px 0 0', float:'left'}} /> Telegram
+                    </Button>  
+                    <br />
+                    <Button type="link" href={links[4]} target="_blank" style={buttonCustomStyle2} icon="medium">Medium</Button>
+                    <br />
+                    <Button type="link" href={links[4]} target="_blank" style={buttonCustomStyle2} icon="message">Forum</Button> 
+                    <br />
+                    <Dropdown overlay={menu} trigger={['click']}>
+                        <Button onClick={e => e.preventDefault()} style={buttonCustomStyle1}>
+                            More <Icon type="down" />
+                        </Button>
+                    </Dropdown>
+                </div>
+                <div className={styles.snsBox2}>
+                    <Button type="link" href={links[1]} target="_blank" style={buttonCustomStyle} icon="file">Whitepaper</Button>
+                    <br />
                     <Button type="link" href={links[3]} target="_blank" style={buttonCustomStyle} icon="twitter">Twitter</Button>
-                    <Button type="link" href={links[4]} target="_blank" style={buttonCustomStyle} icon="medium">Medium</Button>
+                    <br />
                     <Button type="link" href={links[6]} target="_blank" style={buttonCustomStyle} icon="linkedin">LinkedIn</Button>             
-                    <Button type="link" href={links[4]} target="_blank" style={buttonCustomStyle} icon="message">Forum</Button> 
+                    <br />
                     <Button type="link" href={links[5]} target="_blank" style={buttonCustomStyle} icon="github">Github</Button>
-                    <Button type="link" href={links[4]} target="_blank" style={buttonCustomStyle} icon="file-ppt">Deck</Button>
+                    <br />
                     <Button type="link" href={links[1]} target="_blank" style={buttonCustomStyle}>
                         <Icon type="youtube" theme="filled" />
                             YouTube
                     </Button>
-                    <Dropdown overlay={menu} trigger={['click']}>
-                        <Button onClick={e => e.preventDefault()} style={buttonCustomStyle}>
-                            Explorer <Icon type="down" />
-                        </Button>
-                    </Dropdown>
+                </div>
                 </div>
                 <div className={styles.hashtagBox}>
                     <img src={hashtagIcon} alt="" className={styles.hashtagImage} />
@@ -528,7 +563,7 @@ const LaunchpadComponent = () => {
                             </div>
                         </div>
                         <div className={styles.whitelistBox}>
-                            <Button className={styles.whiteListToggleButton} shape="round" onClick={() => setSelectedForm(1)}>Whitelist</Button>
+                            <Button className={styles.whiteListToggleButton} shape="round" onClick={() => setSelectedForm(1)}>Participate</Button>
                         </div>
                     </div>
                 )}
