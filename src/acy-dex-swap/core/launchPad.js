@@ -35,7 +35,7 @@ const getTransferData = async () =>
                 // dateTime: "2021-02-02",
                 participant: element['returnValues']['to'],
                 quantity: element['returnValues']['value']/1e18,
-                token: "ACY",
+                Amount: element['returnValues']['value']/1e18
             };
             transferData.push(blockData);
             chartData.push([blockData.dateTime.substring(0,11),blockData.quantity])
