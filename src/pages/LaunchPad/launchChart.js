@@ -113,12 +113,6 @@ class launchChart extends Component {
     let component = this;
 
     let options = {
-      grid: {
-        left: '2%',
-        right: '2%',
-        // bottom: '3%',
-        top: 'top',
-      },
       title: {
         text: this.props.title,
         left: 'center',
@@ -128,19 +122,23 @@ class launchChart extends Component {
       },
       tooltip: {
         trigger: 'axis',
-        alwaysShowContent: true,
-        backgroundColor: null,
-        borderWidth: 0,
-        borderRadius: 0,
+        axisPointer: {
+          type: 'cross',
+          axis: 'x',
+          label: {
+            backgroundColor: 'black',
+          },
+        },
         formatter: this.renderTooltip,
       },
       xAxis: {
         show: showXAxis,
-        splitNumber: 5,
-        boundaryGap: false,
-        data: dateList.map(function(item) {
-          return item.slice(item.length - 2, item.length);
-        }),
+       splitNumber: 5,
+       boundaryGap: false,
+        data: dateList,
+        // .map(function(item) {
+        //   return item.slice(item.length - 2, item.length);
+        // }),
         axisTick: { show: false }, // 刻度
         axisLine: { show: false }, // 轴线
         splitLine: {
@@ -148,20 +146,17 @@ class launchChart extends Component {
         },
       },
       yAxis: {
-        show: true,
-        type: 'value',
-        position: "right",
-        splitLine: {
-          show: true,
-        },
+        tyle: 'value',
+        position:'right',
         axisTick: { show: false }, // 刻度
         axisLine: { show: false }, // 轴线
         splitLine: {
           show: false,
         },
-        axisLabel: {
-          formatter: ' ml'
-        }      },
+        axisLabel:{
+          align: 'center'
+        }
+             },
       series: [
         {
           data: valueList,
@@ -204,7 +199,7 @@ class launchChart extends Component {
     };
     return (
       <ReactEcharts
-        style={{ height: '100%' }}
+        style={{ height: '100%' , padding: '0px 0px 0px'}}
         option={this.getOption()}
         notMerge
         lazyUpdate={false}

@@ -4,7 +4,7 @@ import {Button, Menu, Dropdown, Icon, Progress, Tag, Table, Carousel} from 'antd
 import FollowTelegram from "./FollowTelegram";
 import ToggleButton from "./ToggleButton";
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { AcyLineChart } from '@/components/Acy';
+import { AcyLineChart,AcyPriceChart } from '@/components/Acy';
 import AcyIcon from '@/assets/icon_acy.svg';
 import hashtagIcon from '@/assets/icon_hashtag.png';
 import telegramIcon from '@/assets/icon_telegram_black.png';
