@@ -7,7 +7,7 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { AcyLineChart,AcyPriceChart } from '@/components/Acy';
 import AcyIcon from '@/assets/icon_acy.svg';
 import hashtagIcon from '@/assets/icon_hashtag.png';
-import telegramIcon from '@/assets/icon_telegram_black.png';
+import telegramBIcon from '@/assets/icon_telegram_black.svg';
 import telegramWIcon from '@/assets/icon_telegram_white.svg';
 import styles from './styles.less';
 import { useWeb3React } from '@web3-react/core';
