@@ -30,8 +30,8 @@
 }
 
 .tokenContainer{
-    width: 50%;
-    min-height: 20vh;
+    width: 20%;
+    min-height: 40vh;
     max-height: 700px;
     overflow: visible;
     margin-bottom: 20px;
@@ -53,13 +53,15 @@
 
 
 .moreInfoContainer{
-    width: 50%;
+    width: 70%;
     min-height: 20vh;
     max-height: 700px;
     border-radius: 0 15px 15px 15px 15px;
     margin-bottom: 20px;
     padding: 15px;
     z-index: 11;
+    display: flex;
+    flex-direction: column;
 }
 
 .contentStyle{
@@ -94,8 +96,8 @@
     position: relative;
     min-height: 20vh;
     max-height: 700px;
-    top:2vh;
-    left:2vw;
+    top:0vh;
+    left:0vw;
 }
 .carouselBlock{
     position: relative;
@@ -117,20 +119,34 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
+    flex-basis: 80px;
 }
-
+.countLabelBlock{
+    padding: 11px 10px 0px 0px;}
 .countLabel {
-    font-size: 15px;
-    TEXT-ALIGN: center;
+    flex-direction: row;
+    color: #b5b5b6;
     color: white;
-    position: relative;
-    padding: 20px 5px 0px;
+    color: var(--accent-color, white);
+    width: 74px;
+    height: 17px;
+    border-radius: 5px;
+    background-color: hsla(0, 0%, 82.7%, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 5px;
+    font-weight: 700px;
+    padding: 0px;
 }
 
 .cntBlock{
     display: flex;
     flex-direction: column;
     justify-content: center;
+    position: relative;
+    min-width: 500px;
+    min-height: 200px;
 }
 
 .cntBox{
@@ -151,21 +167,24 @@
 }
 
 .number{
+
+    flex-basis: 70px;
+    justify-content: center;
     :global{
         div:first-child{
-            flex-direction:row;
+            flex-direction: row;
             color: #b5b5b6;
-            color: var(--accent-color,white);
+            color: white;
+            color: var(--accent-color, white);
             width: 50px;
             height: 50px;
             border-radius: 5px;
-            background-color: hsla(0,0%,82.7%,.3);
+            background-color: hsla(0, 0%, 82.7%, 0.3);
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 22px;
-            font-weight: 700;
-            padding: 24px;
+            margin: 0px 0px 0px 10px;
         }
         div:nth-child(2) {
             display: flex;
@@ -217,9 +236,10 @@
 
 .stepColor {
     width: 100%;
-    flex-direction: column;
-    flex-basis: 32vh;
-    padding: 0px 33px 0px;
+    flex-basis: 0vh;
+    padding: 30px;
+    /* overflow: scroll; */
+    justify-content: center;
     /* overflow: scroll; */
     :global{
     .ant-steps-item-title{
@@ -279,8 +299,7 @@
         }
 
         // icon tail size
-        .ant-steps-vertical > .ant-steps-item > .ant-steps-item-container > .ant-steps-item-tail::after {
-            width: 0.08px;
+        .ant-steps-vertical > .ant-steps-item > .ant-steps-item-container > .ant-steps-item-tail {
             height: 100%;
         }
         .ant-steps-item-wait .ant-steps-item-icon {

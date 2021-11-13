@@ -21,7 +21,7 @@ const stepComponent = (props) => {
       className={styles.stepColor} 
       id="steps"
     >
-      <Steps size="small" direction="vertical" labelPlacement="vertical" current={current}>
+      <Steps size="small"  current={current}>
         <Step title="Preparation" />
         <Step title="Whitelist" />
         <Step title="Lottery Ticket" />
