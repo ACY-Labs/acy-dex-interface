@@ -71,9 +71,8 @@
 }
 
  .chartWrapper{
-    width: 50vw;
-    height: 35vh;
-    max-height: 500px;
+    height: 30vh;
+    max-height: 700px;
     float: right;
     overflow: visible;
     position: relative;
@@ -107,6 +106,7 @@
 .labelBlock{
     display: flex;
     flex-direction: row;
+    justify-content: center;
 }
 
 .countLabel {
@@ -120,6 +120,11 @@
 .cntBlock{
     display: flex;
     flex-direction: column;
+    justify-content: center;
+}
+
+.cntBox{
+    display: flex;
     justify-content: center;
 }
 
@@ -203,7 +208,7 @@
 .stepColor {
     width: 100%;
     flex-direction: column;
-    flex-basis: 241px;
+    flex-basis: 32vh;
     padding: 0px 33px 0px;
     /* overflow: scroll; */
     :global{
@@ -965,11 +970,9 @@
     width: 18px;
 }
 
-
-
 .transferTable{
     width: inherit;
-    height: inherit;
+    height: 30vh;
     position: relative;
     :global{
     .ant-table-placeholder{
@@ -1035,6 +1038,23 @@
     }
     .stepColor{
         left: 5rem;
+    }
+    .chartWrapper{
+        top: 4.5vh;
+        height: 45vh;
+    }
+    .transferTable{
+        height: 45vh;
+        overflow: auto;
+        :global{
+            .ant-table-wrapper{
+                height: 100%;
+            }
+        }
+        
+    }
+    .labelBlock{
+        padding: 15px;
     }
 }
 
