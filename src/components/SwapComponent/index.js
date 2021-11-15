@@ -479,6 +479,7 @@ const SwapComponent = props => {
           let inputTokenNum;
           let outTokenNum;
           let totalToken;
+          let transferHash = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
           await library.getBlock(receipt.logs[0].blockNumber).then(data => {
             transactionTime = moment(parseInt(data.timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
           });
@@ -487,15 +488,17 @@ const SwapComponent = props => {
             // let topics=hexlify(item.topics[0]).toText();
             // let ss=CryptoJS.SHA3.decrypt(item.topics[0]); 
             // debugger
-            if (item.address == inputToken.address) {
+            if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == inputToken.address ) {
               // inputtoken 数量
               inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
               inputTokenNum = item.data / Math.pow(10, inputToken.decimals).toString();
+              // console.log('inputTokenNum',inputTokenNum)
             }
-            if (item.address == outToken.address) {
+            if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == outToken.address) {
               // outtoken 数量
               // outTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0", outToken.decimals))).toString();
               outTokenNum = item.data / Math.pow(10, outToken.decimals).toString();
+              // console.log('outputTokenNum',outTokenNum)
             }
           });
           // 获取美元价值
