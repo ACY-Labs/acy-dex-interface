@@ -19,7 +19,7 @@ const StyledCollapse = styled(AntCollapse)`
     .ant-collapse-header {
       color: #000000;
     }
-    .ant-collapse > .ant-collapse-item{
+    .ant-collapse-item{
       border-bottom: 1px solid #000;
     }
   }
