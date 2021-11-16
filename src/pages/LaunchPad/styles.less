@@ -53,7 +53,7 @@
 
 
 .moreInfoContainer{
-    width: 70%;
+    width: 60%;
     min-height: 20vh;
     max-height: 700px;
     border-radius: 0 15px 15px 15px 15px;
@@ -72,7 +72,7 @@
     /* position: relative; */
     /* top: -10vh; */
     /* left: 1vw; */
-    padding: 40px 0px 120px 75px;
+    padding: 37px 0px 0px 75px;
     :global{
         .ant-carousel .slick-dots li button{
             height: 5px;
@@ -80,6 +80,9 @@
         }
         .ant-carousel .slick-dots li.slick-active button{
             width: 30px !important;
+        }
+        .ant-carousel .slick-dots-bottom {
+            bottom: 0px;
         }
     }
 }
@@ -92,6 +95,12 @@
     position: relative;
     top: 0vh;
 } 
+
+.chartStyle{
+    height: 320px !important;
+    padding: 0px 0px 0px 0px;
+    margin-top: -6.5vh;
+}
 
 .stepBlock  {
     display: flex;
@@ -241,14 +250,20 @@
 .stepColor {
     width: 100%;
     flex-basis: 30px;
-    padding: 0px 30px 0px;
-    /* overflow: scroll; */
-    justify-content: flex-end;
-    /* overflow: scroll; */
+    padding: 0px 10px 0px;
+    display: flex;
     :global{
     .ant-steps-item-title{
         color: #b5b5b6  !important;
         //  background-color: red;
+    }
+    .ant-steps-item-container{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .ant-steps-item-icon{
+        margin: 0 !important;
     }
     .ant-steps-item-description{
         color:#b5b5b6 !important}
@@ -303,8 +318,17 @@
         }
 
         // icon tail size
+        .ant-steps-item-tail {
+            position: absolute;
+            top: 12px;
+            left: 0;
+            width: 0;
+            padding: 0 10px;
+        }
+
         .ant-steps-vertical > .ant-steps-item > .ant-steps-item-container > .ant-steps-item-tail {
             height: 100%;
+            width: 0;
         }
         .ant-steps-item-wait .ant-steps-item-icon {
             background-color: #b5b5b6 !important;
@@ -1069,7 +1093,12 @@
         }
     }
 }
-
+@media screen and (min-width: 1060px) {
+    .moreInfoContainer{
+        min-width: 60%;
+        max-width: 100%;
+    }
+}
 //mobile screen responsive
 @media screen and (max-width: 1060px) {
     .midContainer {
@@ -1092,6 +1121,7 @@
     }
     .stepColor{
         left: 5rem;
+        flex-direction: column;
     }
     .chartWrapper{
         top: -2.5vh;
