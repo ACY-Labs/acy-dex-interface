@@ -8,7 +8,7 @@ import TableControl from './TableControl';
 import SampleStakeHistoryData from './SampleDaoData';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { getAllPools } from '@/acy-dex-swap/core/farms';
+import { getAllPools, getHarvestHistory } from '@/acy-dex-swap/core/farms';
 import supportedTokens from '@/constants/TokenList';
 
 const Farms = () => {
@@ -37,6 +37,7 @@ const Farms = () => {
   const [walletConnected, setWalletConnected] = useState(false);
   const [farmsContent, setFarmsContent] = useState([]);
   const [isMyFarms, setIsMyFarms] = useState(false);
+  const [harvestAcy, setHarvestAcy] = useState();
 
   // method to activate metamask wallet.
   // calling this method for the first time will cause metamask to pop up,
@@ -54,9 +55,20 @@ const Farms = () => {
     }
     return 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg';
   }
+  const getDateYDM = (date) => {
+    return date.getFullYear(date)  + "-" + ("0"+(date.getMonth(date)+1)).slice(-2) + "-" + ("0" + date.getDate(date)).slice(-2)
+  }
+  // useEffect( async () => {
+    
+  // },[])
+  const initHarvestHistiry = async () => {
+    const harvest = await getHarvestHistory(account);
+    console.log('getHarvestHistiry:',harvest);
+    setHarvestAcy(harvest);
+  }
 
   useEffect(
-    () => {
+     () => {
       // automatically connect to wallet at the start of the application.
       connectWallet();
 
@@ -82,6 +94,8 @@ const Farms = () => {
             tvl: 144542966,
             hasUserPosition: pool.hasUserPosition,
             hidden: true,
+            userRewards: pool.rewards,
+            stakeData: pool.stakeData
           };
           //if user has farm, direct to myfarm
           if(newFarmsContent.hasUserPosition) {
@@ -101,12 +115,16 @@ const Farms = () => {
         }
         
       };
-
       // account will be returned if wallet is connected.
       // so if account is present, retrieve the farms contract.
       if (account) {
         setWalletConnected(true);
         getPools(library, account);
+        initHarvestHistiry();
+        
+      } else if(library) {
+        setWalletConnected(false);
+        getPools(library, "0x1954F985F1086caBDc0Ea5FCC2a55732e7e43DD5");
       } else {
         setWalletConnected(false);
       }
@@ -127,6 +145,7 @@ const Farms = () => {
     setTableSubtitle('Stake your LP tokens and earn token rewards');
     setRowNumber(10);
     setHideDao(true);
+    setIsMyFarms(false);
   };
 
   const onAcyToggleButtonClick = () => {
@@ -294,7 +313,7 @@ const Farms = () => {
             setIsMyFarms={setIsMyFarms}
           />
         </div>
-        {selectedTable !== 4 && (
+        {selectedTable !== 4 && harvestAcy &&(
           <FarmsTable
             tableRow={tableRow}
             onRowClick={onRowClick}
@@ -312,6 +331,7 @@ const Farms = () => {
             library={library}
             chainId={chainId}
             isMyFarms={isMyFarms}
+            harvestAcy={harvestAcy}
           />
         )}
         {selectedTable === 4 && <DaoTable dataSource={daoDataSource} />}
