@@ -15,6 +15,16 @@ import SampleStakeHistoryData, {
 } from '../sample_data/SampleStakeHistoryData';
 import styles from './StakeHistoryTable.less';
 
+function sortTableTime(table, key, isReverse) {
+  return table.sort((a, b) => {
+    if (isReverse) {
+      return new Date(b[key]).getTime() - new Date(a[key]).getTime();
+    } else {
+      return new Date(a[key]).getTime() - new Date(b[key]).getTime();
+    }
+  });
+}
+
 const StakeHistoryTable = props => {
   const [stakeDisplayNumber, setStakeDisplayNumber] = useState(5);
   const { dataSource, isMobile } = props;
@@ -22,7 +32,7 @@ const StakeHistoryTable = props => {
     <div className={styles.nobgTable}>
       <Table
         columns={isMobile&&sampleStakeHistoryMobileColumns||sampleStakeHistoryColumns}
-        dataSource={dataSource.slice(0,stakeDisplayNumber+1)}
+        dataSource={sortTableTime(dataSource,'transactionTime',true).slice(0,stakeDisplayNumber+1)}
         className={styles.tableStyle}
         pagination={false}
         onRow={record => {
@@ -30,7 +40,6 @@ const StakeHistoryTable = props => {
             onClick: event => {
               // 跳转到eths
               window.open(`#/transaction/${record.hash}`);
-              
             }, // 点击行
           };
         }}

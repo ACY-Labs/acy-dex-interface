@@ -47,6 +47,17 @@ const OperationHistoryMobileColumns = [
     key: 'transactionTime'
   },
 ]
+
+function sortTableTime(table, key, isReverse) {
+  return table.sort((a, b) => {
+    if (isReverse) {
+      return new Date(b[key]).getTime() - new Date(a[key]).getTime();
+    } else {
+      return new Date(a[key]).getTime() - new Date(b[key]).getTime();
+    }
+  });
+}
+
 const OperationHistoryTable = props => {
   const [OperationDisplayNumber, setOperationDisplayNumber] = useState(5);
   const { dataSource, isMobile } = props;
@@ -54,7 +65,7 @@ const OperationHistoryTable = props => {
     <div className={styles.nobgTable}>
       <Table
         columns={isMobile&&OperationHistoryMobileColumns||OperationHistoryColumns}
-        dataSource={dataSource.slice(0,OperationDisplayNumber+1)}
+        dataSource={sortTableTime(dataSource,'transactionTime',true).slice(0,OperationDisplayNumber+1)}
         className={styles.tableStyle}
         pagination={false}
         onRow={record => {
