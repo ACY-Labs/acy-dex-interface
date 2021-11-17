@@ -22,7 +22,7 @@ const StakeHistoryTable = props => {
     <div className={styles.nobgTable}>
       <Table
         columns={isMobile&&sampleStakeHistoryMobileColumns||sampleStakeHistoryColumns}
-        dataSource={dataSource}
+        dataSource={dataSource.slice(0,stakeDisplayNumber+1)}
         className={styles.tableStyle}
         pagination={false}
         onRow={record => {
