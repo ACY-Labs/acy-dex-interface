@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'umi';
 import { Button } from 'antd';
 import { useWeb3React } from '@web3-react/core';
+import { InjectedConnector } from '@web3-react/injected-connector';
+import {
+  fetchGeneralPoolInfoDay,
+  fetchGeneralTokenInfo,
+  fetchGlobalTransaction,
+  fetchMarketData,
+  marketClient,
+} from '../Market/Data/index.js';
 import {
   AcyCard,
   AcyIcon,
@@ -14,7 +22,7 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
-import StakeHistoryTable from '../Swap/components/StakeHistoryTable';
+import OperationHistoryTable from './components/OperationHistoryTable';
 import AddComponent from '@/components/AddComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
@@ -28,9 +36,13 @@ const BasicProfile = (props) => {
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [tabIndex, setTabIndex] = useState(1);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [upToDate, setUptoDate] = useState(false);
 
   const { account, chainId, library, activate } = useWeb3React();
-  console.log("account", account);
+
+  const injected = new InjectedConnector({
+    supportedChainIds: [1, 3, 4, 5, 42, 80001],
+  });
 
   const lineTitleRender = () => [
     <div>
@@ -75,41 +87,128 @@ const BasicProfile = (props) => {
       setLoggedIn(true);
   };
 
-  function getTransactionsByAccount(myaccount, startBlockNumber, endBlockNumber) {
-    if (endBlockNumber == null) {
-      endBlockNumber = web3.eth.blockNumber;
-      console.log("Using endBlockNumber: " + endBlockNumber);
-    }
-    if (startBlockNumber == null) {
-      startBlockNumber = endBlockNumber - 1000;
-      console.log("Using startBlockNumber: " + startBlockNumber);
-    }
-    console.log("Searching for transactions to/from account \"" + myaccount + "\" within blocks "  + startBlockNumber + " and " + endBlockNumber);
-  
-    for (var i = startBlockNumber; i <= endBlockNumber; i++) {
-      if (i % 1000 == 0) {
-        console.log("Searching block " + i);
+  useEffect(() => {
+    activate(injected);
+  }, []);
+
+  function getTransactionsByAccount(myaccount) {
+
+    // fetchGlobalTransaction(marketClient).then(globalTransactions =>{
+    //   console.log('transactions : ', globalTransactions);
+    // })
+    // if(library && myaccount ){
+    //   let endBlockNumber;
+    //   library.getBlockNumber().then(async endBlockNumber =>{
+    //     console.log('endBlockNumber' + endBlockNumber);
+    //     let startBlockNumber = endBlockNumber - 1000;
+    //     console.log("Using startBlockNumber: " + startBlockNumber);
+
+    //     console.log("Searching for transactions to/from account \"" + myaccount + "\" within blocks "  + startBlockNumber + " and " + endBlockNumber);
+      
+    //     for (var i = startBlockNumber; i <= endBlockNumber; i++) {
+    //       if (i % 1000 == 0) {
+    //         console.log("Searching block " + i);
+    //       }
+    //       var block = library.getBlock(i, true);
+    //       if (block != null && block.transactions != null) {
+    //         block.transactions.forEach( function(e) {
+    //           if (myaccount == "*" || myaccount == e.from || myaccount == e.to) {
+    //             console.log("  tx hash          : " + e.hash + "\n"
+    //               + "   nonce           : " + e.nonce + "\n"
+    //               + "   blockHash       : " + e.blockHash + "\n"
+    //               + "   blockNumber     : " + e.blockNumber + "\n"
+    //               + "   transactionIndex: " + e.transactionIndex + "\n"
+    //               + "   from            : " + e.from + "\n" 
+    //               + "   to              : " + e.to + "\n"
+    //               + "   value           : " + e.value + "\n"
+    //               + "   time            : " + block.timestamp + " " + new Date(block.timestamp * 1000).toGMTString() + "\n"
+    //               + "   gasPrice        : " + e.gasPrice + "\n"
+    //               + "   gas             : " + e.gas + "\n"
+    //               + "   input           : " + e.input);
+    //           }
+    //         })
+    //       }
+    //     }
+    //   }) 
+    // }
+    return [
+      {
+        "hash": "0x9bd8646e8bb6942cc3ae38f2a8a2be7eaeeeae5f12fe76c988ec02361c0cc41c",
+        "inputTokenNum": 1.157920892373162,
+        "inputTokenSymbol": "ACY",
+        "outTokenNum": 0.9717145322649389,
+        "outTokenSymbol": "UNI",
+        "transactionTime": "2021-10-16 19:34:30"
       }
-      var block = eth.getBlock(i, true);
-      if (block != null && block.transactions != null) {
-        block.transactions.forEach( function(e) {
-          if (myaccount == "*" || myaccount == e.from || myaccount == e.to) {
-            console.log("  tx hash          : " + e.hash + "\n"
-              + "   nonce           : " + e.nonce + "\n"
-              + "   blockHash       : " + e.blockHash + "\n"
-              + "   blockNumber     : " + e.blockNumber + "\n"
-              + "   transactionIndex: " + e.transactionIndex + "\n"
-              + "   from            : " + e.from + "\n" 
-              + "   to              : " + e.to + "\n"
-              + "   value           : " + e.value + "\n"
-              + "   time            : " + block.timestamp + " " + new Date(block.timestamp * 1000).toGMTString() + "\n"
-              + "   gasPrice        : " + e.gasPrice + "\n"
-              + "   gas             : " + e.gas + "\n"
-              + "   input           : " + e.input);
-          }
-        })
-      }
+    ];
+  }
+
+  const getTransactionByUser = async (library, account) => {
+    if(library && account && !upToDate){
+      setUptoDate(true);
+
+
+      // const endBlockNumber = await library.getBlockNumber().then(response => response);
+      // const startBlockNumber = endBlockNumber - 1000;
+
+      // for(var i = startBlockNumber ; i <= endBlockNumber ; i++){
+      //       if(i % 1000 == 0){
+      //         console.log("fetching blocks");
+      //       }
+      //       const transactions = await library.getBlock(i,true).then( block => block.transactions);
+      //         // console.log("found block", block);
+      //       transactions.forEach(function (e){
+      //         // console.log("trying to fetch transaction: ", e);
+      //         const transaction = library.getTransactionReceipt(e).then( transaction=> transaction);
+      //           // console.log("found transaction : ",transaction);
+      //           if(myaccount == "*" || myaccount == transaction.from || myaccount == transaction.to){
+      //              console.log("found one log" , transaction.hash);
+      //         }
+      //         })
+          
+      // }
+      console.log("At least entered here");
+      const endBlockNumber = await library.getBlockNumber();
+      const startBlockNumber = endBlockNumber - 100;
+      console.log("Searching for transactions to/from account \"" + account + "\" within blocks "  + startBlockNumber + " and " + endBlockNumber);
+
+      // library.getBlockNumber().then(async endBlockNumber => {
+      //   let startBlockNumber = endBlockNumber - 100;
+        
+      //   for(var i = startBlockNumber ; i <= endBlockNumber ; i++){
+      //     let block;
+      //     library.getBlock(i,true).then(async block =>{
+      //       block.transactions.forEach(function (e){
+      //         // console.log("trying to fetch transaction: ", e);
+      //         library.getTransaction(e).then(async transaction=>{
+      //           // console.log("found transaction : ",transaction);
+      //           if(myaccount == "*" || myaccount == transaction.from || myaccount == transaction.to){
+      //             console.log("found one log" , transaction.hash);
+      //         }
+      //         })
+      //       })
+      //     });
+      //   }
+      // })
+      // console.log('finished search');
+
+      // let transHash = "0xaa90f02a3422ed32d8ef72f36fc78367cb7862cdbec2a5aba34cd5dd3eeb10bf";
+      // console.log('trying to fetch transaction');
+      // library.getTransactionReceipt(transHash).then(async receipt=>{
+      //   console.log('receipt : ', receipt);
+      // });
+      
     }
+    return [
+      {
+        "hash": "0x9bd8646e8bb6942cc3ae38f2a8a2be7eaeeeae5f12fe76c988ec02361c0cc41c",
+        "inputTokenNum": 1.157920892373162,
+        "inputTokenSymbol": "ACY",
+        "outTokenNum": 0.9717145322649389,
+        "outTokenSymbol": "UNI",
+        "transactionTime": "2021-10-16 19:34:30"
+      }
+    ];
   }
 
   const getHistoryTransaction = () => {
@@ -186,22 +285,13 @@ const BasicProfile = (props) => {
         <div className={styles.operationItem}>
           <h3>
             <AcyIcon.MyIcon width={30} type="arrow" />
-            <span className={styles.span}>HISTORY OPERATION</span>
+            <span className={styles.span}>OPERATION HISTORY</span>
           </h3>
-          <StakeHistoryTable 
+          <OperationHistoryTable 
             isMobile={props.isMobile}
-            dataSource={[
-              {
-                "hash": "0x9bd8646e8bb6942cc3ae38f2a8a2be7eaeeeae5f12fe76c988ec02361c0cc41c",
-                "inputTokenNum": 1.157920892373162e+59,
-                "inputTokenSymbol": "ACY",
-                "outTokenNum": 0.9717145322649389,
-                "outTokenSymbol": "UNI",
-                "transactionTime": "2021-10-16 19:34:30"
-              }
-            ]}
+            dataSource={getTransactionsByAccount(account)}
             />
-        </div>
+        </div> 
       </div>
     </PageHeaderWrapper>
   );
