@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Form, Tooltip, Button, Icon, Row } from 'antd';
 import InputEmail from "./inputEmail";
 import styled from "styled-components";
@@ -13,6 +13,7 @@ import twitterWIcon from '@/assets/icon_twitter_white.svg';
 import twitterRetweetIcon from '@/assets/icon_twitter_retweet.svg';
 import invFriendsIcon from '@/assets/icon_invite_friends.svg';
 import AntCollapse from "./CustomCollapse";
+import axios from "axios";
 
 const FollowTelegram = ({
     setSelectedForm
@@ -64,8 +65,9 @@ const FollowTelegram = ({
   }
 
   const handleShow = (panelId) => {
-    const val = !show[panelId]
-    setShow(prev => ({...prev, [panelId] : val}))
+    //const val = !show[panelId]
+    //setShow(prev => ({...prev, [panelId] : val}))
+    setShow(prev => Object.fromEntries(Object.entries(prev).map(([k, v]) => Number(k) !== panelId ? [k, !v] : [k, false])))
   }
 
   useEffect(() => {
@@ -100,7 +102,6 @@ const FollowTelegram = ({
     margin:'10px 0'
   }
 
- 
 
   return (
     <div className={styles.telegramBox}>

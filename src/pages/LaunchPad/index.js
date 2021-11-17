@@ -101,6 +101,7 @@ const LaunchpadComponent = () => {
 
     }
     ,[price])
+
     useEffect( async () => {
         // set provider for all later instances to use    
         const contract = new Contract(ERC20ABI, '0xaf9db9e362e306688af48c4acb9618c06db38ac3');
@@ -152,12 +153,6 @@ const LaunchpadComponent = () => {
         "https://www.linkedin.com/company/acy-finance/"
     ];
 
-
-    const testdata = [
-        ['999991',1],
-        ['9999992',2],
-        ['99999999993',3]
-    ]
     const tableColumns = [
         {
             title: 'Round',
@@ -378,52 +373,77 @@ const LaunchpadComponent = () => {
         marginTop:"0.8em"
     }
 
-
     const menu = (
         <Menu>
-            <Menu.Item className = {styles.dropdownItem} id="drop1">
+            <Menu.Item className={styles.dropdownItem} id="drop1">
                 <img src={ethIcon} alt="" style={{height:'25px', width:'10.8px', objectFit:'contain', margin: '0px 8px 0 0', float:'left'}} />  
-                <a target="_blank" rel="noopener noreferrer" href="https://cn.etherscan.com/token/0xaf9db9e362e306688af48c4acb9618c06db38ac3" style={{
-                    color:'#000',display:'flex',flexDirection: "column"}} >
+                <a 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  href="https://cn.etherscan.com/token/0xaf9db9e362e306688af48c4acb9618c06db38ac3" 
+                  style={{
+                    color:'#000',
+                    display:'flex',
+                    flexDirection: "column"
+                  }} 
+                >
                 <span>Etherscan.io</span>
-                <span style = {{color: 'rgba(16, 112, 224, 0.85)'}}>0xaf9d...db38ac3</span>
+                <span style={{color: 'rgba(16, 112, 224, 0.85)'}}>0xaf9d...db38ac3</span>
                 </a>
-                <Button style={copyButton} onClick={ ()=> {
+                <Button 
+                  style={copyButton} 
+                  onClick={()=> {
                     navigator.clipboard.writeText("https://cn.etherscan.com/token/0xaf9db9e362e306688af48c4acb9618c06db38ac3");
                     alert('Address copied');
-
-                }}>
+                  }}
+                >
                 <Icon type='copy' />
                 </Button>
             </Menu.Item>
-            <Menu.Item className = {styles.dropdownItem} id="drop2">
+            <Menu.Item className={styles.dropdownItem} id="drop2">
                 <img src={polygonIcon} alt="" style={{height:'25px', width:'10.8px', objectFit:'contain', margin: '0px 8px 0 0', float:'left'}} />   
-                <a target="_blank" rel="noopener noreferrer" href="https://polygonscan.com/token/0x8b1f836491903743fe51acd13f2cc8ab95b270f6" style={{
-                    color:'#000',display:'flex',flexDirection: "column"}}>
+                <a 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  href="https://polygonscan.com/token/0x8b1f836491903743fe51acd13f2cc8ab95b270f6" 
+                  style={{
+                    color:'#000',display:'flex',flexDirection: "column"
+                  }}
+                >
                 <span>Polygonscan</span>
-                <span style = {{color: 'rgba(16, 112, 224, 0.85)'}} >0xaf9d...db38ac3</span>
+                <span style={{color: 'rgba(16, 112, 224, 0.85)'}}>0xaf9d...db38ac3</span>
                 </a>
-                <Button style={copyButton} onClick={ ()=> {
+                <Button 
+                  style={copyButton} 
+                  onClick={()=> {
                     navigator.clipboard.writeText("https://polygonscan.com/token/0x8b1f836491903743fe51acd13f2cc8ab95b270f6");
                     alert('Address copied');
-
-                }} >
+                  }} 
+                >
                 <Icon type='copy' />
                 </Button>
             </Menu.Item>
-            <Menu.Item className = {styles.dropdownItem} id="drop3">
+            <Menu.Item className={styles.dropdownItem} id="drop3">
                 <img src={confluxIcon} alt="" style={{height:'25px', width:'10.8px', objectFit:'contain', margin: '0px 8px 0 0', float:'left'}} />  
-                <a target="_blank" rel="noopener noreferrer" href="https://confluxscan.io/token/cfx:accyf3j7s23x5j62hwt619k01un9bzn9u2mc6gavzb" style={{
-                    color:'#000',display:'flex',flexDirection: "column"}}>
-                <span>  Conflux.io</span>
-                <span style = {{color: 'rgba(16, 112, 224, 0.85)'}} >0xaf9d...db38ac3</span>
-
+                <a 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  href="https://confluxscan.io/token/cfx:accyf3j7s23x5j62hwt619k01un9bzn9u2mc6gavzb" 
+                  style={{
+                    color:'#000',
+                    display:'flex',
+                    flexDirection: "column"}}
+                >
+                <span>Conflux.io</span>
+                <span style={{color: 'rgba(16, 112, 224, 0.85)'}}>0xaf9d...db38ac3</span>
                 </a>
-                <Button style={copyButton} onClick={ ()=> {
+                <Button 
+                  style={copyButton} 
+                  onClick={()=> {
                     navigator.clipboard.writeText("https://confluxscan.io/token/cfx:accyf3j7s23x5j62hwt619k01un9bzn9u2mc6gavzb");
                     alert('Address copied');
-
-                }} >
+                  }} 
+                >
                 <Icon type='copy' />
                 </Button>
             </Menu.Item>
@@ -455,7 +475,7 @@ const LaunchpadComponent = () => {
                     <br />
                     <Dropdown overlay={menu} trigger={['click']}>
                         <Button onClick={e => e.preventDefault()} style={buttonCustomStyle1} icon="profile">
-                        Address <Icon type="down" />
+                            Address <Icon type="down" />
                         </Button>
                     </Dropdown>
                 </div>
@@ -485,7 +505,6 @@ const LaunchpadComponent = () => {
                     <Carousel dot="true" autoplay="true" effect="fade" autoplaySpeed={100000}>
                         <div className={styles.carouselBlock}>
                             <div className={styles.stepBlock} id="block">
-                                
                                 <div className={styles.cntBlock}>
                                 <div className={styles.labelBlock}>
                                     <div className={styles.countLabelBlock}>

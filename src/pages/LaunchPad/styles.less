@@ -31,14 +31,9 @@
 
 .tokenContainer{
     width: 20%;
-<<<<<<< HEAD
-    min-height: 25vh;
-=======
     min-height: 0vh;
->>>>>>> 9f61d676ab0affe9b177e555f3d7688d3c90839d
     max-height: 700px;
     overflow: visible;
-    margin-bottom: 20px;
     padding: 15px;
     position: relative;
 }
@@ -55,10 +50,9 @@
     }
 }
 
-
 .moreInfoContainer{
     width: 60%;
-    min-height: 20vh;
+    min-height: 25vh;
     max-height: 700px;
     border-radius: 0 15px 15px 15px 15px;
     margin-bottom: 20px;
@@ -76,7 +70,7 @@
     /* position: relative; */
     /* top: -10vh; */
     /* left: 1vw; */
-    padding: 37px 0px 0px 75px;
+    padding: 2vh 0 0 6vh;
     :global{
         .ant-carousel .slick-dots li button{
             height: 5px;
@@ -86,18 +80,18 @@
             width: 30px !important;
         }
         .ant-carousel .slick-dots-bottom {
-            bottom: 0px;
+            bottom: 0.5vh;
         }
     }
 }
 
- .chartWrapper{
-    height: 30vh;
+.chartWrapper{
+    height: 20vh;
     max-height: 700px;
     float: right;
     overflow: visible;
     position: relative;
-    top: 0vh;
+    top: 3vh;
 } 
 
 .chartStyle{
@@ -116,7 +110,7 @@
 }
 .carouselBlock{
     position: relative;
-    min-height: 20vh;
+    min-height: 15vh;
     max-height: 700px;
 }
 
@@ -134,7 +128,7 @@
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    padding: 0px  27px 40px;
+    padding: 0 2vh 2vh;
 }
 .countLabelBlock{
     padding: 11px 10px 0px 0px;}
@@ -179,7 +173,7 @@
 .cntdwn{
     justify-content: flex-start;
     display: flex;
-    padding: 0px 18px 40px;
+    padding: 0 1.3vh 1.5vh;
 
 }
 
@@ -255,7 +249,7 @@
     width: 100%;
     flex-basis: 30px;
     padding: 0px 10px 0px;
-    display: flex;
+    display: inline-flex;
     :global{
     .ant-steps-item-title{
         color: #b5b5b6  !important;
@@ -1046,8 +1040,8 @@
 
 .transferTable{
     width: inherit;
-    height: 30vh;
-    position: relative;
+    height: 18.5vh;
+    overflow: hidden;
     :global{
         .ant-table-wrapper{
             height: 100%;
@@ -1097,13 +1091,15 @@
         }
     }
 }
+
+//mobile screen responsive
 @media screen and (min-width: 1060px) {
     .moreInfoContainer{
         min-width: 60%;
         max-width: 100%;
     }
 }
-//mobile screen responsive
+
 @media screen and (max-width: 1060px) {
     .midContainer {
         flex-direction: row;
@@ -1118,6 +1114,7 @@
     }
     .contentStyle{
         max-width: 100%;
+        padding: 0;
     }
     .stepBlock{
         flex-direction:column;
@@ -1125,14 +1122,25 @@
     }
     .stepColor{
         left: 5rem;
-        flex-direction: column;
+        width: fit-content;
+        padding-top: 2vh;
+        :global{
+            .ant-steps-label-vertical .ant-steps-item{
+                padding: 0.5vh;
+            }
+        }
+    }
+    .labelBlock{
+        margin-left: 0.6vh;
+    }
+    .countDown{
+        padding-top: 2vh;
     }
     .chartWrapper{
-        top: -2.5vh;
-        height: 45vh;
+        height: 30vh;
     }
     .transferTable{
-        height: 45vh;
+        height: 35vh;
         overflow: auto;
         :global{
             .ant-table-wrapper{
