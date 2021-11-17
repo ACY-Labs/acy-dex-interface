@@ -1,3 +1,5 @@
+import { useWeb3React } from '@web3-react/core';
+import { InjectedConnector } from '@web3-react/injected-connector';
 import React, { Component, useState, useEffect } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { connect } from 'umi';
@@ -83,6 +85,16 @@ const Swap = props => {
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
+
+  const { account, chainId, library, activate } = useWeb3React();
+
+  // connect to provider, listen for wallet to connect
+  const injected = new InjectedConnector({
+    supportedChainIds: [1, 3, 4, 5, 42, 80001],
+  });
+  useEffect(() => {
+    activate(injected);
+  }, []);
 
   // 时间段选择
   const onhandPeriodTimeChoose = periodTimeName => {
@@ -436,7 +448,7 @@ const Swap = props => {
         <div className={styles.exchangeItem}>
           <h3>
             <AcyIcon.MyIcon width={30} type="arrow" />
-            <span className={styles.span}>HISTORY TRANSACTION</span>
+            <span className={styles.span}>TRANSACTION HISTORY</span>
           </h3>
           <StakeHistoryTable
             isMobile={isMobile}
