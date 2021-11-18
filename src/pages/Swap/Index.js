@@ -22,6 +22,7 @@ import AcyRoutingChart from '@/components/AcyRoutingChart';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import { uniqueFun } from '@/utils/utils';
+import {getTransactionsByAccount} from '@/utils/txData';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import { fetchGeneralTokenInfo, marketClient, fetchTokenDaySimple } from '../Market/Data/index.js';
 import SwapComponent from '@/components/SwapComponent';
@@ -29,8 +30,10 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import axios from 'axios';
 import supportedTokens from '@/constants/TokenList';
 import moment from 'moment';
+import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import StakeHistoryTable from './components/StakeHistoryTable';
 import styles from './styles.less';
+import { columnsPool } from '../Dao/Util.js';
 
 const { AcyTabPane } = AcyTabs;
 
@@ -85,7 +88,10 @@ const Swap = props => {
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
-
+  const [transactionList, setTransactionList] = useState([]);
+  const [upToDate, setUpToDate] = useState(false);
+  const [tableLoading, setTableLoading] = useState(true);
+  const [transactionNum, setTransactionNum] =useState(0);
   const { account, chainId, library, activate } = useWeb3React();
 
   // connect to provider, listen for wallet to connect
@@ -96,6 +102,18 @@ const Swap = props => {
     activate(injected);
   }, []);
 
+  useEffect(() => {
+    if(transactionNum > 0) setTableLoading(false);
+  }, [transactionNum]);
+ 
+ useEffect(() => {
+    getTransactionsByAccount(account,library,'SWAP').then(data =>{
+      setTransactionList(data);
+      setTransactionNum(data.length);
+    })
+  }, [account]);
+
+  
   // 时间段选择
   const onhandPeriodTimeChoose = periodTimeName => {
     let pt;
@@ -222,6 +240,8 @@ const Swap = props => {
       setActiveToken0(activeToken1);
       setActiveToken1(tempSwapToken);
     }
+    //parse input data from transaction list
+    
 
     return [
       <div>
@@ -341,6 +361,7 @@ const Swap = props => {
     swap: {token0, token1},
     dispatch
   } = props;
+ 
   return (
     <PageHeaderWrapper>
       <div className={styles.main}>
@@ -450,10 +471,14 @@ const Swap = props => {
             <AcyIcon.MyIcon width={30} type="arrow" />
             <span className={styles.span}>TRANSACTION HISTORY</span>
           </h3>
+          { account&&tableLoading ? (
+          <h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>
+          ) : (
           <StakeHistoryTable
             isMobile={isMobile}
-            dataSource={transactions.filter(item => item.inputTokenNum != undefined)}
+            dataSource={transactionList}
           />
+          )}
         </div>
       </div>
 
