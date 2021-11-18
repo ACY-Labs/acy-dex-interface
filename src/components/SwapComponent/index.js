@@ -490,7 +490,7 @@ const SwapComponent = props => {
             // debugger
             if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == inputToken.address ) {
               // inputtoken 数量
-              inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
+              // inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
               inputTokenNum = item.data / Math.pow(10, inputToken.decimals).toString();
               // console.log('inputTokenNum',inputTokenNum)
             }
