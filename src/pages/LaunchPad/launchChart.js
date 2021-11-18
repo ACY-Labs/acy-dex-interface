@@ -4,7 +4,7 @@ import * as echarts from 'echarts'; //渐变色
 import 'echarts/lib/chart/line';
 import 'echarts/lib/component/tooltip';
 import 'echarts/lib/component/title'; // 此处是按需引入
-import style from './styles.less';
+import styles from './styles.less';
 
 let defaultData = [
   ['2000-06-05', 116],
@@ -198,8 +198,8 @@ class launchChart extends Component {
       click: this.onChartClick,
     };
     return (
-      <ReactEcharts
-        style={{ height: '100%' , padding: '0px 0px 0px'}}
+      <ReactEcharts id="chart1"
+        className={styles.chartStyle}
         option={this.getOption()}
         notMerge
         lazyUpdate={false}

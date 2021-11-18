@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Form, Tooltip, Button, Icon, Row } from 'antd';
 import InputEmail from "./inputEmail";
 import styled from "styled-components";
@@ -13,16 +13,17 @@ import twitterWIcon from '@/assets/icon_twitter_white.svg';
 import twitterRetweetIcon from '@/assets/icon_twitter_retweet.svg';
 import invFriendsIcon from '@/assets/icon_invite_friends.svg';
 import AntCollapse from "./CustomCollapse";
-
+import axios from "axios";
 
 const FollowTelegram = ({
-  setSelectedForm
-}) => {
+    setSelectedForm
+  }) => {
   const panelIdx = ["1","2","3","4", "5", "6"]
   const rewardsArr = ['+5', '+10', '+15']
   const [name, setName] = useState("")
   const [showInput, setShowInput] = React.useState(false)
   const [showForm, setShowForm] = useState(false)
+  const [allowNext, setAllowNext] = useState(true)
   const [clicked, setClicked] = useState({
     1 : true,
     2 : true,
@@ -47,7 +48,9 @@ const FollowTelegram = ({
     5 : false,
     6 : false
   })
-  
+
+  let count = 0;
+
   const onClick = () => setShowInput(true)
 
   const onLinkClick = (n) => {
@@ -58,17 +61,23 @@ const FollowTelegram = ({
   const handleFollow = (idx) => {
     const val = !followed[idx]
     setFollowed(prev => ({...prev, [idx] : val}))
+    count += 1
   }
 
   const handleShow = (panelId) => {
-    const val = !show[panelId]
-    setShow(prev => ({...prev, [panelId] : val}))
+    //const val = !show[panelId]
+    //setShow(prev => ({...prev, [panelId] : val}))
+    setShow(prev => Object.fromEntries(Object.entries(prev).map(([k, v]) => Number(k) !== panelId ? [k, !v] : [k, false])))
   }
 
+  useEffect(() => {
+    if(count >= 3) setAllowNext(false)
+  }, [count]);
+  
   const links = [
-                  "https://t.me/acyfinance", 
-                  "https://t.me/ACYFinanceChannel"
-                ]
+    "https://t.me/acyfinance", 
+    "https://t.me/ACYFinanceChannel"
+  ]
 
   const buttonStyle1 = {
     backgroundColor: "#c6224e", 
@@ -92,6 +101,7 @@ const FollowTelegram = ({
     alignItems:'center',
     margin:'10px 0'
   }
+
 
   return (
     <div className={styles.telegramBox}>
@@ -163,7 +173,6 @@ const FollowTelegram = ({
                 <Button onClick={() => {handleFollow(3); handleShow(3); }} style={buttonStyle1} disabled={clicked[2]}>Continue</Button> 
               </Tooltip>
             </Row>
-            <span className={styles.greyLine}> </span>
             { showInput ? <userInput /> : null }
           </AntCollapse>
           <AntCollapse 
@@ -182,11 +191,11 @@ const FollowTelegram = ({
           >
             <Row type='flex' align='middle' justify='space-around'>
               <a 
-                href="https://twitter.com/intent/follow?https://twitter.com/acyfinance?lang=en&screen_name=ACYFinance" 
+                href="https://twitter.com/intent/follow?https://twitter.com/CycanNetwork&screen_name=CycanNetwork" 
                 target="_blank"
                 rel="noreferrer"
                 className={styles.twitterbtn}
-                onClick={() => {onLinkClick(1);}}
+                onClick={() => {onLinkClick(3); onClick();}}
                 data-size="large" 
                 data-lang="en" 
                 data-show-count="false"
@@ -220,7 +229,7 @@ const FollowTelegram = ({
                 href="https://twitter.com/intent/retweet?tweet_id=1458721380027928582"
                 target="_blank"
                 rel="noreferrer"
-                onClick={() => {onLinkClick(4);}}
+                onClick={() => {onLinkClick(4); onClick();}}
                 data-size="large"
               >
                 <img src={twitterRetweetIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
@@ -264,7 +273,7 @@ const FollowTelegram = ({
               style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '15px 0', float:'right'}} 
               onClick={() => {setSelectedForm(2)}}  
             /> */}
-            <Button style={buttonStyle2} onClick={() => {setSelectedForm(2)}}>Enter the Whitelist</Button>
+            <Button style={buttonStyle2} disabled={allowNext} onClick={() => {setSelectedForm(2)}}>Enter the Whitelist</Button>
           </Row>
         </div>
       </div>

@@ -5,10 +5,14 @@ import FollowTelegram from "./FollowTelegram";
 import ToggleButton from "./ToggleButton";
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { AcyLineChart,AcyPriceChart } from '@/components/Acy';
+import { ProfileOutlined } from '@ant-design/icons';
 import AcyIcon from '@/assets/icon_acy.svg';
 import hashtagIcon from '@/assets/icon_hashtag.png';
 import telegramBIcon from '@/assets/icon_telegram_black.svg';
 import telegramWIcon from '@/assets/icon_telegram_white.svg';
+import ethIcon from '@/assets/ethereum-eth-logo.svg';
+import polygonIcon from '@/assets/polygon-matic-logo.svg';
+import confluxIcon from '@/assets/icon_conflux.png';
 import styles from './styles.less';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
@@ -97,6 +101,7 @@ const LaunchpadComponent = () => {
 
     }
     ,[price])
+
     useEffect( async () => {
         // set provider for all later instances to use    
         const contract = new Contract(ERC20ABI, '0xaf9db9e362e306688af48c4acb9618c06db38ac3');
@@ -148,12 +153,6 @@ const LaunchpadComponent = () => {
         "https://www.linkedin.com/company/acy-finance/"
     ];
 
-
-    const testdata = [
-        ['999991',1],
-        ['9999992',2],
-        ['99999999993',3]
-    ]
     const tableColumns = [
         {
             title: 'Round',
@@ -230,7 +229,7 @@ const LaunchpadComponent = () => {
             title: 'Date Time(UTC)',
             dataIndex: 'dateTime',
             className: 'column-date',
-            width: 150,
+            width: 80,
             align: 'left'
         },
         {
@@ -243,14 +242,14 @@ const LaunchpadComponent = () => {
         {
             title: 'Quantity',
             dataIndex: 'quantity',
-            width: 80,
+            width: 60,
             align: 'center',
             ellipsis: true
         },
         {
             title: 'Amount',
             dataIndex: 'Amount',
-            width: 80,
+            width: 60,
             align: 'center',
             ellipsis: true
         },
@@ -365,22 +364,88 @@ const LaunchpadComponent = () => {
         marginTop:"0.8em"
     }
 
+    const copyButton = {
+        background: 'transparent',
+        border: '#eb5c20', 
+        color: 'var(--color-light-neutral-5)', 
+        height: "2em", 
+        marginLeft:"0.2em",
+        marginTop:"0.8em"
+    }
+
     const menu = (
         <Menu>
-            <Menu.Item>
-                <a target="_blank" rel="noopener noreferrer" href="https://cn.etherscan.com/token/0xaf9db9e362e306688af48c4acb9618c06db38ac3" style={{color:'#000'}}>
-                    Etherscan.io
+            <Menu.Item className={styles.dropdownItem} id="drop1">
+                <img src={ethIcon} alt="" style={{height:'25px', width:'10.8px', objectFit:'contain', margin: '0px 8px 0 0', float:'left'}} />  
+                <a 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  href="https://cn.etherscan.com/token/0xaf9db9e362e306688af48c4acb9618c06db38ac3" 
+                  style={{
+                    color:'#000',
+                    display:'flex',
+                    flexDirection: "column"
+                  }} 
+                >
+                <span>Etherscan.io</span>
+                <span style={{color: 'rgba(16, 112, 224, 0.85)'}}>0xaf9d...db38ac3</span>
                 </a>
+                <Button 
+                  style={copyButton} 
+                  onClick={()=> {
+                    navigator.clipboard.writeText("https://cn.etherscan.com/token/0xaf9db9e362e306688af48c4acb9618c06db38ac3");
+                    alert('Address copied');
+                  }}
+                >
+                <Icon type='copy' />
+                </Button>
             </Menu.Item>
-            <Menu.Item>
-                <a target="_blank" rel="noopener noreferrer" href="https://polygonscan.com/token/0x8b1f836491903743fe51acd13f2cc8ab95b270f6" style={{color:'#000'}}>
-                    Polygonscan
+            <Menu.Item className={styles.dropdownItem} id="drop2">
+                <img src={polygonIcon} alt="" style={{height:'25px', width:'10.8px', objectFit:'contain', margin: '0px 8px 0 0', float:'left'}} />   
+                <a 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  href="https://polygonscan.com/token/0x8b1f836491903743fe51acd13f2cc8ab95b270f6" 
+                  style={{
+                    color:'#000',display:'flex',flexDirection: "column"
+                  }}
+                >
+                <span>Polygonscan</span>
+                <span style={{color: 'rgba(16, 112, 224, 0.85)'}}>0xaf9d...db38ac3</span>
                 </a>
+                <Button 
+                  style={copyButton} 
+                  onClick={()=> {
+                    navigator.clipboard.writeText("https://polygonscan.com/token/0x8b1f836491903743fe51acd13f2cc8ab95b270f6");
+                    alert('Address copied');
+                  }} 
+                >
+                <Icon type='copy' />
+                </Button>
             </Menu.Item>
-            <Menu.Item>
-                <a target="_blank" rel="noopener noreferrer" href="https://confluxscan.io/token/cfx:accyf3j7s23x5j62hwt619k01un9bzn9u2mc6gavzb" style={{color:'#000'}}>
-                    Conflux.io
+            <Menu.Item className={styles.dropdownItem} id="drop3">
+                <img src={confluxIcon} alt="" style={{height:'25px', width:'10.8px', objectFit:'contain', margin: '0px 8px 0 0', float:'left'}} />  
+                <a 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  href="https://confluxscan.io/token/cfx:accyf3j7s23x5j62hwt619k01un9bzn9u2mc6gavzb" 
+                  style={{
+                    color:'#000',
+                    display:'flex',
+                    flexDirection: "column"}}
+                >
+                <span>Conflux.io</span>
+                <span style={{color: 'rgba(16, 112, 224, 0.85)'}}>0xaf9d...db38ac3</span>
                 </a>
+                <Button 
+                  style={copyButton} 
+                  onClick={()=> {
+                    navigator.clipboard.writeText("https://confluxscan.io/token/cfx:accyf3j7s23x5j62hwt619k01un9bzn9u2mc6gavzb");
+                    alert('Address copied');
+                  }} 
+                >
+                <Icon type='copy' />
+                </Button>
             </Menu.Item>
         </Menu>
     );
@@ -409,8 +474,8 @@ const LaunchpadComponent = () => {
                     <Button type="link" href={links[4]} target="_blank" style={buttonCustomStyle2} icon="message">Forum</Button> 
                     <br />
                     <Dropdown overlay={menu} trigger={['click']}>
-                        <Button onClick={e => e.preventDefault()} style={buttonCustomStyle1}>
-                            More <Icon type="down" />
+                        <Button onClick={e => e.preventDefault()} style={buttonCustomStyle1} icon="profile">
+                            Address <Icon type="down" />
                         </Button>
                     </Dropdown>
                 </div>
@@ -431,16 +496,15 @@ const LaunchpadComponent = () => {
                 </div>
                 <div className={styles.hashtagBox}>
                     <img src={hashtagIcon} alt="" className={styles.hashtagImage} />
-                    <span style={hashtagText}>DeFi Market, AMM, DEX</span>
+                    <span style={hashtagText}>DeFi, AMM, DEX</span>
                 </div>
             </div>
             
             <div className={styles.moreInfoContainer}>
                 <div className={styles.contentStyle}>
-                    <Carousel dot="true" autoplay="true" effect="fade" autoplaySpeed={6000}>
+                    <Carousel dot="true" autoplay="true" effect="fade" autoplaySpeed={100000}>
                         <div className={styles.carouselBlock}>
                             <div className={styles.stepBlock} id="block">
-                                
                                 <div className={styles.cntBlock}>
                                 <div className={styles.labelBlock}>
                                     <div className={styles.countLabelBlock}>
@@ -470,7 +534,7 @@ const LaunchpadComponent = () => {
                         </div>
                             <div className={styles.transferTable}>
                                 <Table 
-                                  style={{marginTop:'20px',textAlign:'center'}}
+                                  style={{marginBottom:'20px',textAlign:'center'}}
                                   id="transferTable"
                                   columns={transferTableHeader} 
                                   dataSource={transferData}

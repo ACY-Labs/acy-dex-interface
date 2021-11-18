@@ -18,7 +18,7 @@ const ToggleButtonGroup = (
         className={styles.firstToggleButton}
         style={{ backgroundColor: selectedTable === 0 && !isMyFarms ? "#174163" : "#2e3032", color: selectedTable === 0 && !isMyFarms? "white": ""}}
         onClick={onAllToggleButtonClick}
-        disabled={isMyFarms}
+        // disabled={isMyFarms}
       >
         All
       </button>

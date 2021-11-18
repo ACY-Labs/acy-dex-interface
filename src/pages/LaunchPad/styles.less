@@ -31,10 +31,9 @@
 
 .tokenContainer{
     width: 20%;
-    min-height: 40vh;
+    min-height: 0vh;
     max-height: 700px;
     overflow: visible;
-    margin-bottom: 20px;
     padding: 15px;
     position: relative;
 }
@@ -51,26 +50,27 @@
     }
 }
 
-
 .moreInfoContainer{
-    width: 70%;
-    min-height: 20vh;
+    width: 60%;
+    min-height: 25vh;
     max-height: 700px;
     border-radius: 0 15px 15px 15px 15px;
     margin-bottom: 20px;
-    padding: 15px;
+    // padding: 15px;
     z-index: 11;
     display: flex;
     flex-direction: column;
 }
 
 .contentStyle{
+    display: flex;
+    flex-direction: column;
     min-height: 10vh;
     max-height: 1500px;
     /* position: relative; */
     /* top: -10vh; */
     /* left: 1vw; */
-    //padding: 0px 0px 98px 0px;
+    padding: 2vh 0 0 6vh;
     :global{
         .ant-carousel .slick-dots li button{
             height: 5px;
@@ -79,17 +79,26 @@
         .ant-carousel .slick-dots li.slick-active button{
             width: 30px !important;
         }
+        .ant-carousel .slick-dots-bottom {
+            bottom: 0.5vh;
+        }
     }
 }
 
- .chartWrapper{
-    height: 30vh;
+.chartWrapper{
+    height: 20vh;
     max-height: 700px;
     float: right;
     overflow: visible;
     position: relative;
-    top: 0vh;
+    top: 3vh;
 } 
+
+.chartStyle{
+    height: 320px !important;
+    padding: 0px 0px 0px 0px;
+    margin-top: -6.5vh;
+}
 
 .stepBlock  {
     display: flex;
@@ -101,7 +110,7 @@
 }
 .carouselBlock{
     position: relative;
-    min-height: 20vh;
+    min-height: 15vh;
     max-height: 700px;
 }
 
@@ -118,8 +127,8 @@
 .labelBlock{
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    flex-basis: 80px;
+    justify-content: flex-start;
+    padding: 0 2vh 2vh;
 }
 .countLabelBlock{
     padding: 11px 10px 0px 0px;}
@@ -162,8 +171,10 @@
     }
 
 .cntdwn{
-    justify-content: center;
+    justify-content: flex-start;
     display: flex;
+    padding: 0 1.3vh 1.5vh;
+
 }
 
 .number{
@@ -236,15 +247,21 @@
 
 .stepColor {
     width: 100%;
-    flex-basis: 0vh;
-    padding: 30px;
-    /* overflow: scroll; */
-    justify-content: center;
-    /* overflow: scroll; */
+    flex-basis: 30px;
+    padding: 0px 10px 0px;
+    display: inline-flex;
     :global{
     .ant-steps-item-title{
         color: #b5b5b6  !important;
         //  background-color: red;
+    }
+    .ant-steps-item-container{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .ant-steps-item-icon{
+        margin: 0 !important;
     }
     .ant-steps-item-description{
         color:#b5b5b6 !important}
@@ -299,8 +316,17 @@
         }
 
         // icon tail size
+        .ant-steps-item-tail {
+            position: absolute;
+            top: 12px;
+            left: 0;
+            width: 0;
+            padding: 0 10px;
+        }
+
         .ant-steps-vertical > .ant-steps-item > .ant-steps-item-container > .ant-steps-item-tail {
             height: 100%;
+            width: 0;
         }
         .ant-steps-item-wait .ant-steps-item-icon {
             background-color: #b5b5b6 !important;
@@ -344,7 +370,18 @@
 .textcolor{
     color: red;
 }
-
+.dropdownItem{
+    color: var(--color-primary-black);
+    border-radius: 8px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
+    padding: 8px;
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+}
 .hashtagBox{
     width: 100%;
     height: auto;
@@ -1003,8 +1040,8 @@
 
 .transferTable{
     width: inherit;
-    height: 30vh;
-    position: relative;
+    height: 18.5vh;
+    overflow: hidden;
     :global{
         .ant-table-wrapper{
             height: 100%;
@@ -1056,6 +1093,13 @@
 }
 
 //mobile screen responsive
+@media screen and (min-width: 1060px) {
+    .moreInfoContainer{
+        min-width: 60%;
+        max-width: 100%;
+    }
+}
+
 @media screen and (max-width: 1060px) {
     .midContainer {
         flex-direction: row;
@@ -1070,6 +1114,7 @@
     }
     .contentStyle{
         max-width: 100%;
+        padding: 0;
     }
     .stepBlock{
         flex-direction:column;
@@ -1077,13 +1122,25 @@
     }
     .stepColor{
         left: 5rem;
+        width: fit-content;
+        padding-top: 2vh;
+        :global{
+            .ant-steps-label-vertical .ant-steps-item{
+                padding: 0.5vh;
+            }
+        }
+    }
+    .labelBlock{
+        margin-left: 0.6vh;
+    }
+    .countDown{
+        padding-top: 2vh;
     }
     .chartWrapper{
-        top: -2.5vh;
-        height: 45vh;
+        height: 30vh;
     }
     .transferTable{
-        height: 45vh;
+        height: 35vh;
         overflow: auto;
         :global{
             .ant-table-wrapper{
