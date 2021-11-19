@@ -70,7 +70,7 @@
     /* position: relative; */
     /* top: -10vh; */
     /* left: 1vw; */
-    padding: 2vh 0 0 6vh;
+    padding: 20px 0px 0px 75px;
     :global{
         .ant-carousel .slick-dots li button{
             height: 5px;
@@ -80,7 +80,14 @@
             width: 30px !important;
         }
         .ant-carousel .slick-dots-bottom {
-            bottom: 0.5vh;
+            bottom: -25px;
+        }
+        .ant-carousel .slick-slide {
+            // display: none;
+            // float: left;
+            // height: 100%;
+            min-height: 1px;
+            max-height: 250px;
         }
     }
 }
@@ -95,7 +102,7 @@
 } 
 
 .chartStyle{
-    height: 320px !important;
+    height: 340px !important;
     padding: 0px 0px 0px 0px;
     margin-top: -6.5vh;
 }
@@ -128,7 +135,7 @@
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    padding: 0 2vh 2vh;
+    padding: 13px 17px 0px;
 }
 .countLabelBlock{
     padding: 11px 10px 0px 0px;}
@@ -173,7 +180,7 @@
 .cntdwn{
     justify-content: flex-start;
     display: flex;
-    padding: 0 1.3vh 1.5vh;
+    padding: 30px 8px 30px;
 
 }
 
@@ -248,7 +255,7 @@
 .stepColor {
     width: 100%;
     flex-basis: 30px;
-    padding: 0px 10px 0px;
+    // padding: 0px 10px 0px;
     display: inline-flex;
     :global{
     .ant-steps-item-title{
@@ -1062,12 +1069,14 @@
 
 .transferTable{
     width: inherit;
-    //height: 18.5vh;
-    overflow: hidden;
+
+    height: 250px;
+    position: relative;
     :global{
         .ant-table-wrapper{
             height: 100%;
         }
+     
         .ant-table-placeholder{
             background: transparent !important;
         }
@@ -1092,6 +1101,10 @@
             &:active{
                 background: #2f3135 !important;
         }
+        .ant-table{
+            line-height: 2.5;
+        }
+      
     }
     // background-color: #862e2e;
     // background: transparent !important;
