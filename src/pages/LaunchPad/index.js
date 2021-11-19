@@ -502,7 +502,7 @@ const LaunchpadComponent = () => {
             
             <div className={styles.moreInfoContainer}>
                 <div className={styles.contentStyle}>
-                    <Carousel dot="true" autoplay="true" effect="fade" autoplaySpeed={100000}>
+                    <Carousel dot="true" autoplay="true" effect="fade" autoplaySpeed={6000}>
                         <div className={styles.carouselBlock}>
                             <div className={styles.stepBlock} id="block">
                                 <div className={styles.cntBlock}>
