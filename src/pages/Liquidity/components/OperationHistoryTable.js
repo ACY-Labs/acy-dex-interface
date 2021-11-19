@@ -8,7 +8,7 @@ const OperationHistoryColumns = [
   {
     title: 'Swap',
     key: 'fromforto',
-    render: record =>`Swap ${record.inputTokenSymbol} for ${record.outTokenSymbol}`
+    render: record =>`${record.action} ${record.token1Symbol} and ${record.token2Symbol}`
   },
   {
     title: 'Total Value',
@@ -18,15 +18,15 @@ const OperationHistoryColumns = [
   },
   {
     title: 'Token Amount',
-    dataIndex: 'inputTokenNum',
+    dataIndex: 'token1Number',
     key: 'inputTokenNum',
-    render: (text,record) =><Tooltip title={text}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.inputTokenSymbol}</Tooltip>
+    render: (text,record) =><Tooltip title={text}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.token1Symbol}</Tooltip>
   },
   {
     title: 'Token Amount',
-    dataIndex: 'outTokenNum',
+    dataIndex: 'token2Number',
     key: 'outTokenNum',
-    render: (text,record) =><Tooltip title={text}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.outTokenSymbol}</Tooltip>
+    render: (text,record) =><Tooltip title={text}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.token2Symbol}</Tooltip>
   },
   {
     title: 'Time',
@@ -38,7 +38,7 @@ const OperationHistoryMobileColumns = [
   {
     title: 'Swap',
     key: 'fromforto',
-    render: record =>`Swap ${record.inputTokenSymbol} for ${record.outTokenSymbol}`
+    render: record =>`${record.action} ${record.token1Symbol} and ${record.token2Symbol}`
   },
   
   {
