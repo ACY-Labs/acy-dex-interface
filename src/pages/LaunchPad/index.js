@@ -532,9 +532,9 @@ const LaunchpadComponent = () => {
                               bgColor="#2f313500"
                             />
                         </div>
-                            <div className={styles.transferTable}>
+                        <div className={styles.transferTable}>
                                 <Table 
-                                  style={{marginBottom:'20px',textAlign:'center'}}
+                                  style={{marginBottom:'20px',textAlign:'center', height: '250px'}}
                                   id="transferTable"
                                   columns={transferTableHeader} 
                                   dataSource={transferData}
@@ -542,7 +542,7 @@ const LaunchpadComponent = () => {
                                   scroll={{ y: 250 }}
                                   rowClassName={(record, index) => styles.rowExpanded}
                                 />   
-                            </div> 
+                        </div> 
                     </Carousel>
                 </div>
             </div>
