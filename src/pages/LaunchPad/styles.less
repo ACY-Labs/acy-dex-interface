@@ -65,7 +65,7 @@
 .contentStyle{
     display: flex;
     flex-direction: column;
-    min-height: 10vh;
+    min-height: 25vh;   
     max-height: 1500px;
     /* position: relative; */
     /* top: -10vh; */
@@ -835,6 +835,25 @@
     cursor: pointer;
 }
 
+.myCollapse{
+    border: none;
+    border-radius: 0 10px 0 0;
+    box-shadow: none;  
+    background-color: #cccfd8;
+    :global{
+        .ant-collapse-content {
+            background-color: #cccfd8;
+            color: #000000;
+        }
+        .ant-collapse-header {
+            color: #000000;
+        }
+        .ant-collapse-item{
+            border-bottom: 1px solid #000;
+        }
+    }
+}
+
 .twitterbtn {
     font-size: 15px;
     height: 2em;
@@ -1040,7 +1059,7 @@
 
 .transferTable{
     width: inherit;
-    height: 18.5vh;
+    //height: 18.5vh;
     overflow: hidden;
     :global{
         .ant-table-wrapper{

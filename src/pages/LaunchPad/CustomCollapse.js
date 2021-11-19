@@ -10,11 +10,9 @@ const StyledCollapse = styled(AntCollapse)`
     border: none;
     border-radius: 0 10px 0 0;
     box-shadow: none;  
-    background: rgb(204,207,216); 
-    opacity: 0.9;
-    
+    background: rgba(204,207,216, 0.7); 
     .ant-collapse-content {
-      background: rgba(204,207,216, 0.4);
+      background: rgba(204,207,216, 0.7);
       color: #000000;
     }
     .ant-collapse-header {
@@ -42,10 +40,12 @@ const CustomCollapse = (props) => {
 
   const handleShowPanel = (id) => {
     const val = !props.show
-    // props.setShow(prev => ({...prev, [key[0].charCodeAt(0)]: false}))
     props.setShow(prev => ({...prev, [id] : val}))
     // props.setShow(prev => Object.fromEntries(Object.entries(prev).map(([k, v]) => Number(k) !== id ? [k, !v] : [k, false])))
-  }  
+    // props.setShowId(showId => showId === id ? null : id);
+  }
+
+  console.log(props.show)
 
   const combineFunc = () => {
     // handlePanel()
@@ -53,10 +53,8 @@ const CustomCollapse = (props) => {
     handleShowPanel(props.panelID)
   }
 
-  console.log(key)
-
   return (
-    <StyledCollapse accordian activeKey={props.show ? key : []} onChange={combineFunc}> 
+    <StyledCollapse activeKey={props.show ? key : []} onChange={combineFunc}> 
       <AntCollapse.Panel
         {...props}
         header={props.header}

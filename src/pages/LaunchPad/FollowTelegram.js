@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Form, Tooltip, Button, Icon, Row } from 'antd';
+import { Collapse, Tooltip, Button, Icon, Row } from 'antd';
 import InputEmail from "./inputEmail";
 import styled from "styled-components";
 import SwapTicket from "./swapTicket";
@@ -20,7 +20,6 @@ const FollowTelegram = ({
   }) => {
   const panelIdx = ["1","2","3","4", "5", "6"]
   const rewardsArr = ['+5', '+10', '+15']
-  const [name, setName] = useState("")
   const [showInput, setShowInput] = React.useState(false)
   const [showForm, setShowForm] = useState(false)
   const [allowNext, setAllowNext] = useState(true)
@@ -39,7 +38,7 @@ const FollowTelegram = ({
     4 : false,
     5 : false,
     6 : false
-  })
+  }) 
   const [followed, setFollowed] = useState({
     1 : false,
     2 : false,
@@ -65,9 +64,11 @@ const FollowTelegram = ({
   }
 
   const handleShow = (panelId) => {
-    //const val = !show[panelId]
-    //setShow(prev => ({...prev, [panelId] : val}))
-    setShow(prev => Object.fromEntries(Object.entries(prev).map(([k, v]) => Number(k) !== panelId ? [k, !v] : [k, false])))
+    const val = !show[panelId]
+    // setShow(prev => ({...prev, [panelId] : val}))
+    // setShow(prev => Object.fromEntries(Object.entries(prev).map(([k, v]) => Number(k) !== panelId ? [k, !v] : [k, false])))
+    Object.fromEntries(Object.keys(show).map((k) => [k, false]))
+    setShow(prev => ({...prev, [panelId] : val}))
   }
 
   useEffect(() => {
@@ -102,179 +103,106 @@ const FollowTelegram = ({
     margin:'10px 0'
   }
 
+  const StyledInput = styled.input`
+  font-size: 15px;
+  background-color: inherit;
+  color: lighten(#000000, 100%);
+  width: 95%;
+  border-width: 1px;
+  align-self: center;
+  line-height: 30px;
+  border-right: 0px solid transparent;
+  border-top: 0px solid transparent;
+  border-left: 0px solid transparent;
+  margin-bottom: 10px;
+  &:focus {
+    outline-width: 0;
+    filter: brightness(75%);
+  }
+`;
+
+  const errorText = {
+    color:'#e53e3e',
+    fontFamily:'Inter, sans-serif'
+  }
+
+  const { Panel } = Collapse;
+
+  // api
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [hasError, setHasError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("An error occured");
+  const [success, setSuccess] = useState(false);
+  let subscribe = useCallback(() => {
+    setHasError(false);
+    console.log("Subscribe!");
+    if (!name.length || !email.length) {
+      setHasError(true);
+      setErrorMsg("Fields cannot be empty");
+      return;
+    }
+    // eslint-disable-next-line no-undef
+    axios
+      .post("/api/subscribe/add", {
+        name,
+        email,
+      })
+      .then((res) => {
+        setHasError(false);
+        setSuccess(true);
+      })
+      .catch((e) => {
+        setHasError(true);
+        setErrorMsg(e.response.data || "Error");
+      });
+  }, [name, email]);
 
   return (
     <div className={styles.telegramBox}>
       <div className={styles.telegramContainer}>
         <div className={styles.telegramLinks}>
-          <AntCollapse 
-            isFollowed={followed[1]} 
-            show={show[1]} 
-            panelID={panelIdx[0]} 
-            rewards={rewardsArr[0]}
-            setShow={setShow} 
-            disabled={followed[1]} 
-            header={
-              <div style={{width:'85%', display:'inline-flex', alignItems:'left'}}>
-                <img src={userIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
-                <span>Enter your Username and Email</span>
-              </div>
-            }
+          <Collapse 
+            className={styles.myCollapse} 
+            ghost 
+            accordion 
+            bordered={false} 
+            expandIconPosition='right'
           >
-            <InputEmail />
-            <Row type='flex' align='middle' justify='center'>
-              <Button onClick={() => {handleShow(1); handleShow(1);}} style={buttonStyle1} disabled={clicked}>Submit</Button> 
-            </Row>
-          </AntCollapse>
-          <AntCollapse 
-            isFollowed={followed[2]} 
-            show={show[2]} 
-            panelID={panelIdx[1]} 
-            rewards={rewardsArr[1]}
-            setShow={setShow} 
-            disabled={followed[2]} 
-            header={
-              <div style={{width:'85%', display:'inline-flex', alignItems:'left'}}>
-                <img src={telegramIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
-                <span>Join ACY Telegram Group</span>
+            <Panel 
+              header={
+                <div style={{width:'85%', display:'inline-flex', alignItems:'left'}}>
+                  <img src={userIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
+                  <span>Enter your Username and Email</span>
+                </div>
+              }
+              key="1"
+            >
+              <div className={styles.emailContainer}>
+                <div>
+                  <div className={styles.emailBox}>
+                    <div>
+                      <StyledInput 
+                        value={name} 
+                        required 
+                        placeholder="Full Name" 
+                        onChange={(e) => { setName(e.target.value);}} 
+                      />
+                    </div>
+                    <div>
+                      <StyledInput 
+                        required 
+                        placeholder="Email Address" 
+                        value={email} 
+                        onChange={(e) => { setEmail(e.target.value);}} 
+                      />
+                    </div>
+                    {hasError && <small className={errorText}>{errorMsg}</small>}
+                  </div>
+                </div>
               </div>
-            }
-          >
-            <Row type='flex' align='middle' justify='space-around'>
-              <Button id='linkbtn' href={links[0]} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(1); onClick();}}>
-                <Icon type="link" style={{ color: '#fff' }} theme="outlined" />
-                Join
-              </Button>
-              <Tooltip title="Visit the link to continue">
-                <Button onClick={() => {handleFollow(2); handleShow(2); }} style={buttonStyle1} disabled={clicked[1]}>Continue</Button> 
-              </Tooltip>
-            </Row>
-          </AntCollapse>
-          <AntCollapse 
-            isFollowed={followed[3]} 
-            show={show[3]} 
-            panelID={panelIdx[2]} 
-            rewards={rewardsArr[1]}
-            setShow={setShow} 
-            disabled={followed[3]} 
-            header={
-              <div style={{width:'85%', display:'inline-flex', alignItems:'left'}}>
-                <img src={telegramIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
-                <span>Join ACY Telegram Channel</span>
-              </div>
-            }
-          >
-            <Row type='flex' align='middle' justify='space-around'>
-              <Button href={links[1]} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(2); onClick();}}>
-                <Icon type="link" style={{ color: '#fff' }} theme="outlined" />
-                Subscribe
-              </Button>
-              <Tooltip title="Visit the link to continue">
-                <Button onClick={() => {handleFollow(3); handleShow(3); }} style={buttonStyle1} disabled={clicked[2]}>Continue</Button> 
-              </Tooltip>
-            </Row>
-            { showInput ? <userInput /> : null }
-          </AntCollapse>
-          <AntCollapse 
-            isFollowed={followed[4]} 
-            show={show[4]} 
-            panelID={panelIdx[3]} 
-            rewards={rewardsArr[1]}
-            setShow={setShow} 
-            disabled={followed[4]} 
-            header={
-              <div style={{width:'55%', display:'inline-flex', alignItems:'left'}}>
-                <img src={twitterBIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
-                <span>Follow ACY Twitter</span>
-              </div>
-            }
-          >
-            <Row type='flex' align='middle' justify='space-around'>
-              <a 
-                href="https://twitter.com/intent/follow?https://twitter.com/CycanNetwork&screen_name=CycanNetwork" 
-                target="_blank"
-                rel="noreferrer"
-                className={styles.twitterbtn}
-                onClick={() => {onLinkClick(3); onClick();}}
-                data-size="large" 
-                data-lang="en" 
-                data-show-count="false"
-              >
-                <img src={twitterWIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
-                <span style={{marginRight:'5px'}}>Follow @ACYFinance</span>
-              </a>
-              <script async src="https://platform.twitter.com/widgets.js" charset="utf-8" />
-              <Tooltip title="Visit the link above to continue">
-                <Button onClick={() => {handleFollow(4); handleShow(4);}} style={buttonStyle1} disabled={clicked[3]}>Continue</Button> 
-              </Tooltip>
-            </Row>
-          </AntCollapse>
-          <AntCollapse 
-            isFollowed={followed[5]} 
-            show={show[5]} 
-            panelID={panelIdx[4]} 
-            rewards={rewardsArr[1]}
-            setShow={setShow} 
-            disabled={followed[5]} 
-            header={
-              <div style={{width:'60%', display:'inline-flex', alignItems:'left'}}>
-                <img src={twitterBIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
-                <span>Retweet ACY Twitter</span>
-              </div>
-            }
-          >
-            <Row type='flex' align='middle' justify='space-around'>
-              <a 
-                className={styles.twitterbtn}
-                href="https://twitter.com/intent/retweet?tweet_id=1458721380027928582"
-                target="_blank"
-                rel="noreferrer"
-                onClick={() => {onLinkClick(4); onClick();}}
-                data-size="large"
-              >
-                <img src={twitterRetweetIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
-                <span style={{marginRight:'5px'}}>Retweet</span>
-              </a>
-              <Tooltip title="Visit the link above to continue">
-                <Button onClick={() => {handleFollow(5); handleShow(5); }} style={buttonStyle1} disabled={clicked[4]}>Continue</Button> 
-              </Tooltip>
-            </Row>
-          </AntCollapse>
-          <AntCollapse 
-            isFollowed={followed[6]} 
-            show={show[6]} 
-            panelID={panelIdx[5]} 
-            rewards={rewardsArr[2]}
-            setShow={setShow} 
-            disabled={followed[6]} 
-            header={
-              <div style={{width:'55%', display:'inline-flex', alignItems:'left'}}>
-                <img src={invFriendsIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
-                <span>Invite Friends to Join ACY IDO</span>
-              </div>
-            }
-          >
-            <Row type='flex' align='middle' justify='space-around'>
-              <Button type="primary" href={links[0]} target="_blank" style={buttonStyle1} icon="link">Share Your Link To Your Friends</Button>
-            </Row>
-          </AntCollapse>
-          <Row type='flex' align='middle' justify='space-around'>
-            {/* <img 
-              src={prevIcon} 
-              id={styles.nextPage} 
-              alt="" 
-              style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '15px 0', float:'left'}}
-              onClick={() => {setSelectedForm(0)}}  
-            />
-            <img 
-              src={nextIcon} 
-              id={styles.nextPage} 
-              alt="" 
-              style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '15px 0', float:'right'}} 
-              onClick={() => {setSelectedForm(2)}}  
-            /> */}
-            <Button style={buttonStyle2} disabled={allowNext} onClick={() => {setSelectedForm(2)}}>Enter the Whitelist</Button>
-          </Row>
+            </Panel>
+          </Collapse>
         </div>
       </div>
     </div>
