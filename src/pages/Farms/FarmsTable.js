@@ -24,34 +24,47 @@ const FarmsTable = ({
   account,
   chainId,
   isMyFarms,
+  harvestAcy,
 }) => {
   const [myChartId, setMyChartId] = useState(0);
   const [totalChartId, setTotalChartId] = useState(0);
-  const [myChartData, setMyChartData] = useState(graphSampleData);
-  const [totalChartData, setTotalChartData] = useState(graphSampleData);
+  const [myChartData, setMyChartData] = useState(harvestAcy.myAcy);
+  const [totalChartData, setTotalChartData] = useState(harvestAcy.totalAcy);
 
   const changeGraphData = (id = 0, chartSetter) => {
     if (id === 0) chartSetter(graphSampleData);
     else chartSetter(graphSampleData2);
   };
+  useEffect(
+    ()=>{
+      console.log('harvestAcy:',harvestAcy);
+      setMyChartData(harvestAcy.myAcy);
+      setTotalChartData(harvestAcy.totalAcy);
+    },[account]
+  )
 
   const selectTopChart = pt => {
     const functionDict = {
       'My ACY': () => {
         changeGraphData(0, setMyChartData);
         setMyChartId(0);
+        setMyChartData(harvestAcy.myAcy);
       },
       'My Reward': () => {
         changeGraphData(1, setMyChartData);
         setMyChartId(1);
+        setMyChartData(harvestAcy.myAll);
       },
       'Total ACY': () => {
         changeGraphData(0, setTotalChartData);
         setTotalChartId(0);
+        setTotalChartData(harvestAcy.totalAcy);
+
       },
       'Total Reward': () => {
         changeGraphData(1, setTotalChartData);
         setTotalChartId(1);
+        setTotalChartData(harvestAcy.totalAll);
       },
     };
     functionDict[pt]();
@@ -105,6 +118,9 @@ const FarmsTable = ({
                 library={library}
                 chainId={chainId}
                 isMyFarms={isMyFarms}
+                userRewards={content.userRewards}
+                stakeData={content.stakeData}
+                harvestHistory={harvestAcy}
               />
             );
           })}
@@ -124,6 +140,7 @@ const FarmsTable = ({
             connectWallet={connectWallet}
             isMyFarms={isMyFarms}
             hideArrow
+            harvestHistory={harvestAcy}
           />
           <div>
             <div className={styles.stakeSectionMain}>

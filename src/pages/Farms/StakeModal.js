@@ -6,6 +6,8 @@ import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 import { useWeb3React } from '@web3-react/core';
 import { deposit } from '@/acy-dex-swap/core/farms';
 import { white } from '@umijs/deps/compiled/chalk';
+import { now } from 'moment';
+
 
 const StakeModal = ({
   onCancel,
@@ -26,6 +28,12 @@ const StakeModal = ({
   const [aprList, setAprList] = useState([[12.23,false],[14.53,false],[16.27,false],[18.13,false],[19.63,false],[22.83,false]])
   const [pickingDate,setPickingDate] = useState(false);
   const [aprCounted, serAprCounted] = useState(13.2);
+
+  const getLockDuration = () => {
+    const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+    const diffDays = Math.abs((date.getTime() - Date.now()) / (oneDay));
+    return Math.ceil(diffDays) * 86400;// 24*60*60
+  };
 
   const updateStake = newStake => {
     let newStakeInt = newStake !== '' ? parseFloat(newStake, 10) : '';
@@ -84,7 +92,7 @@ const StakeModal = ({
       width={400}
       bodyStyle={{
         padding: '21px',
-        background: '#2F3032',
+        background: '#0e0304',
         borderRadius: '.5rem',
       }}
       visible={isModalVisible}
@@ -174,7 +182,8 @@ const StakeModal = ({
           type="button"
           className={styles.stakeSubmitButton}
           onClick={async () => {
-            deposit(stakedTokenAddr, stake, poolId, library, account, setButtonText);
+            console.log("newDate:",getLockDuration());
+            deposit(stakedTokenAddr, stake, poolId, getLockDuration(), library, account, setButtonText);
           }}
         >
           {buttonText}

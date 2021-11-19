@@ -13,23 +13,28 @@ import { graphSampleData, graphSampleData2 } from './sample_data/SampleData';
 import styles from './styles.less';
 import stakeInfoStyles from './styles2.less';
 
-export class Dao extends Component {
-  state = {
-    activeGraphData: graphSampleData,
-    activeStakeInfoPanel: 1,
-    activeGraphId: 0,
-  };
+const Dao = ({
+  acy_history
+}) => {
 
-  componentDidMount() {}
+  const [activeGraphData,setActiveGraphData] = useState(graphSampleData);
+  const [activeStakeInfoPanel,setActiveStakeInfoPanel] = useState(1);
+  const [activeGraphId,setActiveGraphId] = useState(0);
+  // state = {
+  //   activeGraphData: graphSampleData,
+  //   activeStakeInfoPanel: 1,
+  //   activeGraphId: 0,
+  // };
+  
 
-  changeGraphData(id = 0) {
+  const changeGraphData = (id = 0) =>{
     let activeGraphData = null;
     if (id === 0) activeGraphData = graphSampleData;
     else activeGraphData = graphSampleData2;
     this.setState({ activeGraphData });
-  }
+  };
 
-  selectTopChart = (pt) => {
+  const selectTopChart = (pt) => {
     let functionDict = {
         'ACY': () => {
           this.changeGraphData(0);
@@ -42,9 +47,9 @@ export class Dao extends Component {
         }
     }
     functionDict[pt]();
-  }
+  };
 
-  selectGraph = (pt) => {
+  const selectGraph = (pt) => {
     let functionDict = {
       'Volume' : () => this.setState({ activeStakeInfoPanel: 0 }),
       'TVL' : ()=> this.setState({ activeStakeInfoPanel: 1 }),
@@ -53,100 +58,80 @@ export class Dao extends Component {
 
     functionDict[pt]();
 
-  }
-
-  render() {
-    const { activeGraphData, activeStakeInfoPanel, activeGraphId } = this.state;
-
-    return (
-      <PageHeaderWrapper>
-        <div className={styles.createProposalContainer}>
-          <button type="button" className={styles.createProposalButton}>
-            Proposal
-          </button>
-        </div>
-        <div className={styles.stakeSectionMain}>
-          <div className={styles.chartSection}>
-            <AcyPeriodTime
-              onhandPeriodTimeChoose={this.selectTopChart}
-              times={['ACY', 'Reward']}
-              className={styles.switchChartsSelector}
+  };
+  return (
+    <PageHeaderWrapper>
+      <div className={styles.createProposalContainer}>
+        <button type="button" className={styles.createProposalButton}>
+          Proposal
+        </button>
+      </div>
+      <div className={styles.stakeSectionMain}>
+        <div className={styles.chartSection}>
+          <AcyPeriodTime
+            onhandPeriodTimeChoose={this.selectTopChart}
+            times={['ACY', 'Reward']}
+            className={styles.switchChartsSelector}
+          />
+          {activeGraphId === 0 ? (
+            <AcyBarChart data={activeGraphData} showXAxis/>
+          ) : (
+            <AcyLineChart
+              backData={activeGraphData}
+              data={activeGraphData}
+              showXAxis
+              showGradient
+              showTooltip
+              lineColor="#e29227"
+              bgColor="#29292c"
             />
-            {activeGraphId === 0 ? (
-              <AcyBarChart data={activeGraphData} showXAxis/>
-            ) : (
+          )}
+        </div>
+        <StakeSection />
+      </div>
+      <div className={styles.tableChartContainer}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <StakeHistoryTable />
+        </div>
+        <div className={styles.chartContainer}>
+          <AcyPeriodTime
+              onhandPeriodTimeChoose={this.selectGraph}
+              times={['TVL', 'Price']}
+              className={styles.contentChartsSelector}
+          />
+          {this.state.activeStakeInfoPanel === 1 && (
+            <div className={stakeInfoStyles.stakeInfoTab}>
               <AcyLineChart
-                backData={activeGraphData}
-                data={activeGraphData}
+                title="Total stake"
+                backData={graphSampleData}
+                data={graphSampleData}
                 showXAxis
                 showGradient
-                showTooltip
+                showTootip
                 lineColor="#e29227"
                 bgColor="#29292c"
               />
-            )}
-          </div>
-          <StakeSection />
-        </div>
-        <div className={styles.tableChartContainer}>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <StakeHistoryTable />
-          </div>
-          <div className={styles.chartContainer}>
-            <AcyPeriodTime
-                onhandPeriodTimeChoose={this.selectGraph}
-                times={['TVL', 'Price']}
-                className={styles.contentChartsSelector}
-            />
-            {/* <AcySmallButtonGroup
-              activeButton={activeStakeInfoPanel}
-              buttonList={[
-                ['Volume', () => this.setState({ activeStakeInfoPanel: 0 })],
-                ['TVL', () => this.setState({ activeStakeInfoPanel: 1 })],
-                ['Price', () => this.setState({ activeStakeInfoPanel: 2 })],
-              ]}
-              containerClass={styles.contentChartsSelector}
-              theme="#eb5c20"
-            /> */}
-            {/* {this.state.activeStakeInfoPanel === 0 && (
-              <div className={stakeInfoStyles.stakeInfoTab}>
-                <AcyPieChart />
-              </div>
-            )} */}
-            {this.state.activeStakeInfoPanel === 1 && (
-              <div className={stakeInfoStyles.stakeInfoTab}>
-                <AcyLineChart
-                  title="Total stake"
-                  backData={graphSampleData}
-                  data={graphSampleData}
-                  showXAxis
-                  showGradient
-                  showTootip
-                  lineColor="#e29227"
-                  bgColor="#29292c"
-                />
-              </div>
-            )}
+            </div>
+          )}
 
-            {this.state.activeStakeInfoPanel === 2 && (
-              <div className={stakeInfoStyles.stakeInfoTab}>
-                <AcyLineChart
-                  title="Reward"
-                  backData={graphSampleData2}
-                  data={graphSampleData2}
-                  showXAxis
-                  showTootip
-                  showGradient
-                  lineColor="#e29227"
-                  bgColor="#29292c"
-                />
-              </div>
-            )}
-          </div>
+          {this.state.activeStakeInfoPanel === 2 && (
+            <div className={stakeInfoStyles.stakeInfoTab}>
+              <AcyLineChart
+                title="Reward"
+                backData={graphSampleData2}
+                data={graphSampleData2}
+                showXAxis
+                showTootip
+                showGradient
+                lineColor="#e29227"
+                bgColor="#29292c"
+              />
+            </div>
+          )}
         </div>
-      </PageHeaderWrapper>
-    );
-  }
+      </div>
+    </PageHeaderWrapper>
+  );
 }
 
 export default Dao;
