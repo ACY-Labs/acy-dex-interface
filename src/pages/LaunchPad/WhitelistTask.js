@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Collapse, Tooltip, Button, Icon, Row } from 'antd';
 import styled from "styled-components";
 import axios from "axios";
-import SwapTicket from "./swapTicket";
 import styles from "./styles.less";
 import userIcon from '@/assets/icon_user.svg';
 import telegramIcon from '@/assets/icon_telegram_black.svg';
@@ -34,8 +33,7 @@ const FollowTelegram = ({
     5 : false,
   })
   const [open, setOpen] = useState([]);
-
-  let count = 0;
+  const [count, setCount] = useState(0);
 
   const onClick = () => setShowInput(true)
 
@@ -51,7 +49,7 @@ const FollowTelegram = ({
   const handleFollow = (idx) => {
     const val = !followed[idx]
     setFollowed(prev => ({...prev, [idx] : val}))
-    count += 1
+    setCount(prev => prev + 1)
   }
 
   useEffect(() => {

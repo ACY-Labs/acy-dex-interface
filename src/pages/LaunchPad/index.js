@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-indent */
 import { getTransferData } from '@/acy-dex-swap/core/launchPad';
 import {Button, Menu, Dropdown, Icon, Progress, Tag, Table, Carousel} from 'antd';
-import FollowTelegram from "./FollowTelegram";
+import WhitelistTask from "./WhitelistTask";
 import ToggleButton from "./ToggleButton";
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { AcyLineChart,AcyPriceChart } from '@/components/Acy';
@@ -634,7 +634,7 @@ const LaunchpadComponent = () => {
                     </div>
                 )}
                 {selectedForm === 1 && (
-                    <FollowTelegram 
+                    <WhitelistTask
                       setSelectedForm={setSelectedForm}
                     />
                 )}
