@@ -56,8 +56,6 @@ const inputEmail = () => {
       });
   }, [name, email]);
 
-  let nextPage = () => setSuccess(() => true)
-
   const errorText = {
     color:'#e53e3e',
     fontFamily:'Inter, sans-serif'
@@ -65,21 +63,27 @@ const inputEmail = () => {
 
   return (
     <div className={styles.emailContainer}>
-      {success ? (
-        <FollowTelegram />
-      ) : (
-        <div>
-          <div className={styles.emailBox}>
-            <div>
-              <StyledInput value={name} required placeholder="Full Name" onChange={(e) => { setName(e.target.value);}} />
-            </div>
-            <div>
-              <StyledInput required placeholder="Email Address" value={email} onChange={(e) => { setEmail(e.target.value);}} />
-            </div>
-            {hasError && <small className={errorText}>{errorMsg}</small>}
+      <div>
+        <div className={styles.emailBox}>
+          <div>
+            <StyledInput 
+              value={name} 
+              required 
+              placeholder="Full Name" 
+              onChange={(e) => { setName(e.target.value);}} 
+            />
           </div>
+          <div>
+            <StyledInput 
+              required 
+              placeholder="Email Address" 
+              value={email} 
+              onChange={(e) => { setEmail(e.target.value);}} 
+            />
+          </div>
+          {hasError && <small className={errorText}>{errorMsg}</small>}
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-indent */
 import { getTransferData } from '@/acy-dex-swap/core/launchPad';
 import {Button, Menu, Dropdown, Icon, Progress, Tag, Table, Carousel} from 'antd';
-import FollowTelegram from "./FollowTelegram";
+import WhitelistTask from "./WhitelistTask";
 import ToggleButton from "./ToggleButton";
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { AcyLineChart,AcyPriceChart } from '@/components/Acy';
@@ -502,7 +502,7 @@ const LaunchpadComponent = () => {
             
             <div className={styles.moreInfoContainer}>
                 <div className={styles.contentStyle}>
-                    <Carousel dot="true" autoplay="true" effect="fade" autoplaySpeed={100000}>
+                    <Carousel dot="true" autoplay="true" effect="fade" autoplaySpeed={6000}>
                         <div className={styles.carouselBlock}>
                             <div className={styles.stepBlock} id="block">
                                 <div className={styles.cntBlock}>
@@ -532,9 +532,9 @@ const LaunchpadComponent = () => {
                               bgColor="#2f313500"
                             />
                         </div>
-                            <div className={styles.transferTable}>
+                        <div className={styles.transferTable}>
                                 <Table 
-                                  style={{marginBottom:'20px',textAlign:'center'}}
+                                  style={{marginBottom:'20px',textAlign:'center', height: '250px'}}
                                   id="transferTable"
                                   columns={transferTableHeader} 
                                   dataSource={transferData}
@@ -542,7 +542,7 @@ const LaunchpadComponent = () => {
                                   scroll={{ y: 250 }}
                                   rowClassName={(record, index) => styles.rowExpanded}
                                 />   
-                            </div> 
+                        </div> 
                     </Carousel>
                 </div>
             </div>
@@ -634,7 +634,7 @@ const LaunchpadComponent = () => {
                     </div>
                 )}
                 {selectedForm === 1 && (
-                    <FollowTelegram 
+                    <WhitelistTask
                       setSelectedForm={setSelectedForm}
                     />
                 )}
