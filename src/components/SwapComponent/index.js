@@ -603,6 +603,8 @@ const SwapComponent = props => {
         yuan="566.228"
         dollar={`${token1Balance}`}
         token={token1Amount}
+        inputColor="#565a69"
+        additional="AMM Output"
         onChoseToken={() => {
           onClickCoin();
           setBefore(false);
@@ -615,8 +617,6 @@ const SwapComponent = props => {
       />
 
       <AcyDescriptions>
-        {swapBreakdown && (
-          <>
             <div className={styles.breakdownTopContainer}>
               <div className={styles.slippageContainer}>
                 <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
@@ -675,25 +675,20 @@ const SwapComponent = props => {
                 </div>
               </div>
             </div>
-            <div className={styles.acyDescriptionContainer}>
-              <AcyDescriptions.Item>
-                {/* <div className={styles.acyDescriptionTitle}>
-                  Swap Breakdown
-                </div> */}
-              </AcyDescriptions.Item>
+            {/* <div className={styles.acyDescriptionContainer}>
               {swapBreakdown.map(info => (
                 <AcyDescriptions.Item>
                   <div className={styles.acyDescriptionItem}>{info}</div>
                 </AcyDescriptions.Item>
               ))}
-            </div>
-          </>
-        )}
+            </div> */}
       </AcyDescriptions>
 
-      {/* {needApprove == true && (
-        <div>
+      {needApprove 
+        ? <div>
           <AcyButton
+            style={{ marginTop: '25px' }}
+            disabled={!approveButtonStatus}
             onClick={async () => {
               setShowSpinner(true);
               setApproveButtonStatus(false);
@@ -705,64 +700,60 @@ const SwapComponent = props => {
                 setSwapButtonState(true);
                 setSwapButtonContent('Swap');
                 setApproveButtonStatus(false);
+                setNeedApprove(false);
+                console.log("test needApprove false")
               }
             }}
-            disabled={!approveButtonStatus}
           >
-            approve{' '}
-            {showSpinner && (
-              <img
-                style={{ width: 30, height: 30 }}
-                src={spinner}
-                className={styles.spinner}
-                alt="spinner"
-              />
-            )}
+            Approve{' '}
+            {showSpinner && <Icon type="loading" />}
           </AcyButton>{' '}
         </div>
-      )} */}
 
-        <AcyButton
-          style={{ marginTop: '25px' }}
-          disabled={!swapButtonState}
-          onClick={() => {
-            if (account == undefined) {
-              activate(injected);
-            } else {
-              setSwapButtonState(false);
-              setSwapButtonContent(<>Processing <Icon type="loading" /></>)
-              swap(
-                {
-                  ...token0,
-                  amount: token0Amount,
-                },
-                {
-                  ...token1,
-                  amount: token1Amount,
-                },
-                slippageTolerance * 100,
-                exactIn,
-                chainId,
-                library,
-                account,
-                pair,
-                route,
-                trade,
-                slippageAdjustedAmount,
-                minAmountOut,
-                maxAmountIn,
-                wethContract,
-                wrappedAmount,
-                deadline,
-                setSwapStatus,
-                setSwapButtonContent,
-                swapCallback
-              );
-            }
-          }}
-        >
-          {swapButtonContent}
-        </AcyButton>
+        : <AcyButton
+        style={{ marginTop: '25px' }}
+        disabled={!swapButtonState}
+        onClick={() => {
+          if (account == undefined) {
+            activate(injected);
+          } else {
+            setSwapButtonState(false);
+            setSwapButtonContent(<>Processing <Icon type="loading" /></>)
+            swap(
+              {
+                ...token0,
+                amount: token0Amount,
+              },
+              {
+                ...token1,
+                amount: token1Amount,
+              },
+              slippageTolerance * 100,
+              exactIn,
+              chainId,
+              library,
+              account,
+              pair,
+              route,
+              trade,
+              slippageAdjustedAmount,
+              minAmountOut,
+              maxAmountIn,
+              wethContract,
+              wrappedAmount,
+              deadline,
+              setSwapStatus,
+              setSwapButtonContent,
+              swapCallback
+            );
+          }
+        }}
+      >
+        {swapButtonContent}
+      </AcyButton>
+      }
+
+        
 
       <AcyDescriptions>
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}

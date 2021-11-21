@@ -13,6 +13,7 @@ const AcyCuarrencyCard = ({
   onChoseToken,
   onChangeToken,
   token,
+  inputColor,
   ...rest
 }) => {
   const [light, setLight] = useState(false);
@@ -52,13 +53,17 @@ const AcyCuarrencyCard = ({
           <input
             ref={inputRef}
             className={styles.input}
+            style={{color: inputColor}}
             placeholder="0.0"
             bordered={false}
             value={token}
             onChange={onChange}
           />
         </div>
-        <div className={styles.cua_blanace}>{title || ''}</div>
+        <div className={styles.cua_bottomContainer}>
+          <div className={styles.cua_blanace}>{title || ''}</div>
+          <div>{rest.additional}</div>
+        </div>
       </div>
     </div>
   );
