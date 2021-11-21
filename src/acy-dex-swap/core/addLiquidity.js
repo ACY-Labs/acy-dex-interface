@@ -370,8 +370,7 @@ export async function getEstimated(
         library,
         account
       );
-      console.log('token 0 approved?');
-      console.log(token0approval);
+      console.log('token 0 approved?', token0approval);
 
       if (!token0approval) {
         console.log('Not enough allowance');
@@ -389,8 +388,7 @@ export async function getEstimated(
         library,
         account
       );
-      console.log('token 1 approved?');
-      console.log(token1approval);
+      console.log('token 1 approved?', token1approval);
 
       if (!token1approval) {
         console.log('Not enough allowance for token1');

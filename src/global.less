@@ -195,7 +195,7 @@ leftAlignTableHeader .leftAlign {
 
       // auto-hiding scroll bar will work by having overflow:hidden and both .ant-table-body and #liquidityPositionTable
       // hover set to overflow-Y: overlay
-      max-height: 50vh!important;
+      max-height: 350px!important;
       overflow: hidden!important;
       &:hover {
         overflow-y: overlay!important;
@@ -204,7 +204,9 @@ leftAlignTableHeader .leftAlign {
     &:hover {
       overflow-y: overlay!important;  // as mentioned above, this is necessary
     }
-    .ant-table-row.ant-table-row-level-0 {
+
+    .ant-table-row {
+      cursor: pointer;
       // background-color: transparent!important;
     }
     .centerAlignTableHeader {
@@ -220,6 +222,7 @@ leftAlignTableHeader .leftAlign {
       border-bottom: dashed 2px #75757933 !important;
     }
     .ant-table-thead > tr, .ant-table-thead > tr > th {
+      padding: 0 16px 16px;
       background-color: transparent;
       font-weight: normal;
     }

@@ -25,7 +25,7 @@ import {
 import OperationHistoryTable from './components/OperationHistoryTable';
 import AddComponent from '@/components/AddComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import {getTransactionsByAccount} from '@/utils/txData';
+import { getTransactionsByAccount } from '@/utils/txData';
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import styles from './styles.less';
 
@@ -54,13 +54,13 @@ const BasicProfile = (props) => {
   // useEffect(() => {
   //   if(transactionNum > 0) setTableLoading(false);
   // }, [transactionNum]);
- 
- useEffect(() => {
-    getTransactionsByAccount(account,library,'LIQUIDITY').then(data =>{
-      setTransactionList(data);
-      if(account) setTableLoading(false);
-    })
-  }, [account]);
+
+  //  useEffect(() => {
+  //     getTransactionsByAccount(account,library,'LIQUIDITY').then(data =>{
+  //       setTransactionList(data);
+  //       if(account) setTableLoading(false);
+  //     })
+  //   }, [account]);
 
   const lineTitleRender = () => [
     <div>
@@ -90,19 +90,19 @@ const BasicProfile = (props) => {
   };
 
   const onCancel = () => {
-      setVisible(false);
+    setVisible(false);
   };
 
   const onHandModalConfirmOrder = falg => {
-      setVisibleConfirmOrder(!!falg);
+    setVisibleConfirmOrder(!!falg);
   };
 
   const onChangeTabs = e => {
-      setTabIndex(e);
+    setTabIndex(e);
   };
 
   const onLoggedIn = () => {
-      setLoggedIn(true);
+    setLoggedIn(true);
   };
 
 
@@ -116,13 +116,41 @@ const BasicProfile = (props) => {
 
   return (
     <PageHeaderWrapper>
+      {/* liquidity table and addLiquidityComponent */}
       <div className={loggedIn ? styles.main : styles.main_notLoggedIn}>
-        <div>{loggedIn && <AcyLiquidityPositions />}</div>
-        <div>
-          <AddComponent onLoggedIn={onLoggedIn} />
+        <div className={styles.rowFlexContainer} >
+          {loggedIn &&
+            <div style={{ flex: 2 }}>
+              <AcyLiquidityPositions />
+            </div>
+          }
+          <div style={{ flex: 1, width: "50vw", minWidth: loggedIn ? null : "340px", maxWidth: loggedIn ? null : "420px" }}>
+            <AddComponent onLoggedIn={onLoggedIn} />
+          </div>
         </div>
+
+        {/* operation history table */}
+        {loggedIn && (
+          <div className={styles.operationBottomWrapper}>
+            <div className={styles.operationItem}>
+              <h3>
+                <AcyIcon.MyIcon width={30} type="arrow" />
+                <span className={styles.span}>OPERATION HISTORY</span>
+              </h3>
+              {account && tableLoading ? (
+                <h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>
+              ) : (
+                <OperationHistoryTable
+                  isMobile={props.isMobile}
+                  dataSource={transactionList}
+                />
+              )}
+            </div>
+          </div>
+        )}
+
       </div>
-      
+
       {/* <AcyModal onCancel={this.onCancel} width={600} visible={visible}>
           <div className={styles.title}>
             <AcyIcon name="back" /> Select a token
@@ -171,22 +199,7 @@ const BasicProfile = (props) => {
           onCancel={() => this.setState({ visibleLoading: false })}
           visible={visibleLoading}
         /> */}
-      <div className={styles.operationBottomWrapper}>
-        <div className={styles.operationItem}>
-          <h3>
-            <AcyIcon.MyIcon width={30} type="arrow" />
-            <span className={styles.span}>OPERATION HISTORY</span>
-          </h3>
-          { account&&tableLoading ? (
-          <h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>
-          ) : (
-          <OperationHistoryTable
-            isMobile={props.isMobile}
-            dataSource={transactionList}
-          />
-          )}
-        </div> 
-      </div>
+
     </PageHeaderWrapper>
   );
 }
