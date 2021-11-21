@@ -3,7 +3,7 @@ import { InjectedConnector } from '@web3-react/injected-connector';
 import React, { Component, useState, useEffect } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { connect } from 'umi';
-import { Button, Row, Col, Icon, Skeleton } from 'antd';
+import { Button, Row, Col, Icon, Skeleton, Card } from 'antd';
 import {
   AcyCard,
   AcyIcon,
@@ -34,6 +34,7 @@ import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import StakeHistoryTable from './components/StakeHistoryTable';
 import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
+import styled from "styled-components";
 
 const { AcyTabPane } = AcyTabs;
 
@@ -69,6 +70,18 @@ function abbrNumber(number) {
 
   return result;
 }
+
+const StyledCard = styled(AcyCard)`
+  background: transparent;
+
+  .ant-card-bordered {
+    border: none;
+  }
+  .ant-card-head-title {
+    padding: 0;
+  }
+    
+`;
 
 const Swap = props => {
 
@@ -243,7 +256,7 @@ const Swap = props => {
     
 
     return [
-      <div>
+      <div style={{width: "100%"}}>
         <div className={styles.maintitle}>
           <div className={styles.lighttitle} style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }} onClick={swapTokenPosition}>
             <img
@@ -259,13 +272,21 @@ const Swap = props => {
             <span>
               {activeToken0.symbol}&nbsp;/&nbsp;{activeToken1.symbol}
             </span>
-            
+
           </div>
 
         </div>
-        <div className={styles.secondarytitle}>
-          <span className={styles.lighttitle}>{activeRate}</span>{' '}
-          <span className={styles.percentage}>{activeAbsoluteChange}</span>
+        <div style={{display: "flex", justifyContent: "space-between"}}>
+          <div className={styles.secondarytitle}>
+            <span className={styles.lighttitle}>{activeRate}</span>{' '}
+            <span className={styles.percentage}>{activeAbsoluteChange}</span>
+          </div>
+          <AcyPeriodTime
+            onhandPeriodTimeChoose={onhandPeriodTimeChoose}
+            className={styles.pt}
+            // times={['1D', '1W', '1M']}
+            times={['24h', 'Max']}
+          />
         </div>
       </div>,
     ];
@@ -284,7 +305,7 @@ const Swap = props => {
     dateSwitchFunctions[pt]();
   };
 
-  
+
 
   // 选择Coin
   const onClickCoin = () => {
@@ -314,7 +335,7 @@ const Swap = props => {
 
     const { inTokenAddr, amount, outTokenAddr, nonZeroToken, nonZeroTokenAmount } = receipt;
     let newRouteData = [];
-    
+
     // let routeDataEntry = {
     //   from: await getTokenSymbol(inTokenAddr, library, account),
     //   to: await getTokenSymbol(outTokenAddr, library, account),
@@ -326,7 +347,7 @@ const Swap = props => {
     for (let i = 0; i < nonZeroToken.length; i++) {
       // token
       newRouteData.push({
-        from:await getTokenSymbol(inTokenAddr, library, account),
+        from: await getTokenSymbol(inTokenAddr, library, account),
         middle: await getTokenSymbol(nonZeroToken[i], library, account),
         to: await getTokenSymbol(outTokenAddr, library, account),
         value:
@@ -336,8 +357,8 @@ const Swap = props => {
       // console.log('swaptokenDayData',tokenDayData);
       // token amount
     }
-    
-    
+
+
     // get eth addresses
     let token0EthAddress = supportedTokens.filter(
       item => item.address.toLowerCase() == inTokenAddr.toLowerCase()
@@ -352,77 +373,55 @@ const Swap = props => {
     console.log("end of operation")
     setIsReceiptObtained(true);
     setRouteData(newRouteData);
-    
+
   };
   const {
     isMobile,
     transaction: { transactions },
-    swap: {token0, token1},
+    swap: { token0, token1 },
     dispatch
   } = props;
  
   return (
     <PageHeaderWrapper>
       <div className={styles.main}>
-        {isMobile && (
-          <div>
-            <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
-              <div className={styles.trade}>
-                <SwapComponent
-                  onSelectToken0={token => {
-                    setActiveToken0(token);
-                  }}
-                  onSelectToken1={token => {
-                    setActiveToken1(token);
-                  }}
-                  onGetReceipt={onGetReceipt}
-                />
-              </div>
-            </AcyCard>
-          </div>
-        )}
-        <div>
-          <AcyCard style={{ background: 'transparent' }} title={lineTitleRender()}>
-            <div
-              style={{
-                // width: '100%',
-                marginRight: "30px"
-              }}
-            >
+        <div className={styles.rowFlexContainer}>
+          <div className={`${styles.colItem} ${styles.priceChart}`}>
+            <StyledCard title={lineTitleRender()}>
               <div
                 style={{
-                  height: '480px',
+                  // width: '100%',
+                  // marginRight: "30px"
                 }}
-                className={styles.showPeriodOnHover}
               >
-                <AcyPeriodTime
-                  onhandPeriodTimeChoose={onhandPeriodTimeChoose}
-                  className={styles.pt}
-                  // times={['1D', '1W', '1M']}
-                  times={['24h', 'Max']}
-                />
-                <AcyPriceChart
-                  data={chartData}
-                  format={format}
-                  showXAxis
-                  // showGradient
-                  lineColor="#e29227"
-                  range={range}
-                  onHover={(data, dataIndex) => {
-                    const prevData = dataIndex === 0 ? 0 : chartData[dataIndex - 1][1];
-                    const absoluteChange = (dataIndex === 0 ? 0 : data - prevData).toFixed(3);
-                    const formattedAbsChange = absoluteChange > 0 ? "+"+absoluteChange : absoluteChange;
-                    setActiveRate(data);
-                    setActiveAbsoluteChange(formattedAbsChange);
+                <div
+                  style={{
+                    height: '400px',
                   }}
-                />
-                
+                  className={styles.showPeriodOnHover}
+                >
+                  <AcyPriceChart
+                    data={chartData}
+                    format={format}
+                    showXAxis
+                    // showGradient
+                    lineColor="#e29227"
+                    range={range}
+                    onHover={(data, dataIndex) => {
+                      const prevData = dataIndex === 0 ? 0 : chartData[dataIndex - 1][1];
+                      const absoluteChange = (dataIndex === 0 ? 0 : data - prevData).toFixed(3);
+                      const formattedAbsChange = absoluteChange > 0 ? "+" + absoluteChange : absoluteChange;
+                      setActiveRate(data);
+                      setActiveAbsoluteChange(formattedAbsChange);
+                    }}
+                  />
+
+                </div>
               </div>
-            </div>
-          </AcyCard>
-        </div>
-        {!isMobile && (
-          <div>
+            </StyledCard>
+          </div>
+
+          <div className={`${styles.colItem} ${styles.swapComponent}`} >
             <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
               <div className={styles.trade}>
                 <SwapComponent
@@ -438,10 +437,11 @@ const Swap = props => {
               </div>
             </AcyCard>
           </div>
-        )}
-      </div>
-      <div className={styles.exchangeBottomWrapper}>
-        {/* {isReceiptObtained && (
+
+        </div>
+
+        <div className={styles.exchangeBottomWrapper}>
+          {/* {isReceiptObtained && (
           <div className={styles.exchangeItem}>
             <h3>
               <AcyIcon.MyIcon width={30} type="arrow" />
@@ -529,6 +529,8 @@ const Swap = props => {
         onCancel={() => setVisibleLoading(false)}
         visible={visibleLoading}
       />
+      
+      </div>
     </PageHeaderWrapper>
   );
 }
