@@ -102,13 +102,9 @@ const Swap = props => {
   }, []);
 
   useEffect(() => {
-    if(transactionNum > 0) setTableLoading(false);
-  }, [transactionNum]);
- 
- useEffect(() => {
     getTransactionsByAccount(account,library,'SWAP').then(data =>{
       setTransactionList(data);
-      setTransactionNum(data.length);
+      if(account) setTableLoading(false);
     })
   }, [account]);
 
