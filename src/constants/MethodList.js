@@ -20,9 +20,9 @@ export const methodList = {
                 },
 
     addLiquidityEth : {
-        name: 'addLiquidityETH',
-        id: '0xf305d719'
-    },
+                    name: 'addLiquidityETH',
+                    id: '0xf305d719'
+                },
     
     removeLiquidity : {
                     name: 'removeLiquidityWithPermit',
