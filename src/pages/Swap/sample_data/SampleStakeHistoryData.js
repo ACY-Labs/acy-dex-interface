@@ -190,28 +190,59 @@ const sampleStakeHistoryColumns = [
     render: record =>`Swap ${record.inputTokenSymbol} for ${record.outTokenSymbol}`
   },
   {
-    title: 'Total Value',
+    title: (
+      <div className={styles.tableData}>
+        Total Amount
+      </div>
+    ),
     dataIndex: 'totalToken',
     key: 'totalToken',
-    render: text =><Tooltip title={text}>{text && text.toString().replace(/([0-9]+.[0-9]{2})[0-9]*/,"$1")}</Tooltip>
+    render: (text,record) => {
+      return <div className={styles.tableData}>{text}</div>;
+    }
   },
   {
-    title: 'Token Amount',
-    dataIndex: 'inputTokenNum',
+    title: (
+      <div
+        className={styles.tableData}
+      >
+        Token Amount
+      </div>
+    ),
+    dataIndex: 'token1Number',
     key: 'inputTokenNum',
-    render: (text,record) =><Tooltip title={text}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.inputTokenSymbol}</Tooltip>
+    render: (text,record) => {
+      return <div className={styles.tableData}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.token1Symbol}</div>;
+    }
   },
   {
-    title: 'Token Amount',
-    dataIndex: 'outTokenNum',
+    title: (
+      <div
+        className={styles.tableData}
+      >
+        Token Amount
+      </div>
+    ),
+    dataIndex: 'token2Number',
     key: 'outTokenNum',
-    render: (text,record) =><Tooltip title={text}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.outTokenSymbol}</Tooltip>
+    render: (text,record) => {
+      return <div className={styles.tableData}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.token2Symbol}</div>;
+    }
   },
   {
-    title: 'Time',
+    title: (
+      <div
+        className={styles.tableData}
+      >
+        Time
+      </div>
+    ),
     dataIndex: 'transactionTime',
-    key: 'transactionTime'
-  },
+    key: 'transactionTime',
+    render: (text,record) => {
+      return <div className={styles.tableData}>{record.}</div>;
+    }
+  }
 ]
 const sampleStakeHistoryMobileColumns = [
   {
