@@ -1,45 +1,30 @@
 /* eslint-disable react/jsx-indent */
-import { getTransferData } from '@/acy-dex-swap/core/launchPad';
+import React, { useState, useEffect } from 'react';
 import {Button, Menu, Dropdown, Icon, Progress, Tag, Table, Carousel} from 'antd';
+import Eth from "web3-eth";
+import Utils from "web3-utils";
+import { useWeb3React } from '@web3-react/core';
+import { InjectedConnector } from '@web3-react/injected-connector';
+import WETHABI from '@/abis/WETH.json';
+import { getTransferData } from '@/acy-dex-swap/core/launchPad';
 import WhitelistTask from "./WhitelistTask";
-import ToggleButton from "./ToggleButton";
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { AcyLineChart,AcyPriceChart } from '@/components/Acy';
-import { ProfileOutlined } from '@ant-design/icons';
 import AcyIcon from '@/assets/icon_acy.svg';
 import hashtagIcon from '@/assets/icon_hashtag.png';
-import telegramBIcon from '@/assets/icon_telegram_black.svg';
 import telegramWIcon from '@/assets/icon_telegram_white.svg';
 import ethIcon from '@/assets/ethereum-eth-logo.svg';
 import polygonIcon from '@/assets/polygon-matic-logo.svg';
 import confluxIcon from '@/assets/icon_conflux.png';
 import styles from './styles.less';
-import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
-import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ERC20ABI from '@/abis/ERC20.json';
-import WETHABI from '@/abis/WETH.json';
-import Eth from "web3-eth";
-import Utils from "web3-utils";
 import SwapTicket from "./swapTicket";
 import StepBar from './stepComponent';
-import ReactDOM from 'react-dom';
 import CountDown from "./countDown";
 import LaunchChart from "./launchChart"
 
-var Contract = require('web3-eth-contract');
+const Contract = require('web3-eth-contract');
 // set provider for all later instances to use
-var eth = new Eth('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
+const eth = new Eth('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
 Contract.setProvider('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
-
-const contentStyle = {
-    height: '160px',
-    color: '#fff',
-    lineHeight: '160px',
-    textAlign: 'center',
-    background: '#364d79',
-  };
-
 
 function getTIMESTAMP(time) {
     var date = new Date(time);
@@ -50,8 +35,8 @@ function getTIMESTAMP(time) {
     var minutes = ("0" + date.getMinutes(time)).substr(-2);
     var seconds = ("0" + date.getSeconds(time)).substr(-2);
   
-    //return year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + seconds;
-    return year + "-" + month + "-" + day;
+    // return year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + seconds;
+    return `${year}-${month}-${day}`;
 
   }
   
@@ -60,7 +45,7 @@ const ACY_PRICE = 0.2  // acy per usdc
 
 const LaunchpadComponent = () => {
 
-    //let price = [];
+    // let price = [];
     const recordNum = 10;
     const [price,setPrice] = useState([]);
     const [chartData,setChartData] = useState([]);
@@ -68,7 +53,6 @@ const LaunchpadComponent = () => {
     const [pendingEnd,setPending]= useState(false);
     const [fetchEnd,setFetchEnd] = useState(false);
     const [transferData,setTransferData] = useState([]);
-    const [selectedGraph,setSelectedGraph] = useState(1);
 
     const getTime = async (blockNumber) => {
 
@@ -90,7 +74,7 @@ const LaunchpadComponent = () => {
         //calculate the time then finally get  Time:value array
 
         var index = price.length-1;
-        if(price[index] != undefined)
+        if(price[index] !== undefined)
         {
         getTime(price[index][0]).then(function(result){
             var newElement = [result,price[index][1]];
@@ -130,7 +114,7 @@ const LaunchpadComponent = () => {
       
     useEffect(async () =>{
         getTransferData().then((events) => {
-            console.log('getTransferData',events,events.length);
+            console.log('getTransferData',events,events[0],events[1],events.length);
             // const chartData = [];
             // events.forEach( (element) => {
             //     chartData.push([element.dateTime.substr(0,11),element.price]);
