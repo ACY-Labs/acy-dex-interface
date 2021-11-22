@@ -97,7 +97,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
         return newData;
     }
     else if (filter == 'LIQUIDITY') {
-        console.log("Debugging luquidity");
+        // console.log("Debugging luquidity");
         let FROM_HASH = account.toString().toLowerCase().slice(2);
         let TO_HASH ;
         let filteredData = fetchedData.filter(item => item.input.startsWith(methodList.addLiquidity.id));
@@ -112,6 +112,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             for(let log of outLogs){
                 tokensOut.add(log.address);
             }
+            
             tokensOut = Array.from(tokensOut);
 
             let logsToken1 = outLogs.filter(log => log.address==tokensOut[0]);
@@ -219,6 +220,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 export async function getTransactionsByAccount (account,library,filter){
     let newData = [];
     if(account){
+        try{
         let address =  account.toString();
         let apikey = 'Y6H9S7521BGREFMGSETVA72F1HT74FE3M5';
         let URL = 'https://api-rinkeby.etherscan.io/api?module=account&action=txlist';
@@ -235,6 +237,11 @@ export async function getTransactionsByAccount (account,library,filter){
         let newData = await parseTransactionData(data.result,account,library,filter);
         
         return newData;
+        }
+        catch(e) {
+            console.log(e);
+            return [];
+        }
         
     }
     return [];
