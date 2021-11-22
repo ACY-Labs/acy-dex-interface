@@ -51,10 +51,7 @@ const BasicProfile = (props) => {
     activate(injected);
   }, []);
 
-  // useEffect(() => {
-  //   if(transactionNum > 0) setTableLoading(false);
-  // }, [transactionNum]);
- 
+
  useEffect(() => {
     getTransactionsByAccount(account,library,'LIQUIDITY').then(data =>{
       setTransactionList(data);
