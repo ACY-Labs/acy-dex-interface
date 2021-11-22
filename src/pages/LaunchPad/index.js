@@ -486,7 +486,7 @@ const LaunchpadComponent = () => {
             
             <div className={styles.moreInfoContainer}>
                 <div className={styles.contentStyle}>
-                    <Carousel dot="true" autoplay="true" effect="fade" autoplaySpeed={100000}>
+                    <Carousel dot="true" autoplay="true" effect="fade" autoplaySpeed={6000}>
                         <div className={styles.carouselBlock}>
                             <div className={styles.stepBlock} id="block">
                                 <div className={styles.cntBlock}>
@@ -516,9 +516,9 @@ const LaunchpadComponent = () => {
                               bgColor="#2f313500"
                             />
                         </div>
-                            <div className={styles.transferTable}>
+                        <div className={styles.transferTable}>
                                 <Table 
-                                  style={{marginBottom:'20px',textAlign:'center'}}
+                                  style={{marginBottom:'20px',textAlign:'center', height: '250px'}}
                                   id="transferTable"
                                   columns={transferTableHeader} 
                                   dataSource={transferData}
@@ -526,7 +526,7 @@ const LaunchpadComponent = () => {
                                   scroll={{ y: 250 }}
                                   rowClassName={(record, index) => styles.rowExpanded}
                                 />   
-                            </div> 
+                        </div> 
                     </Carousel>
                 </div>
             </div>

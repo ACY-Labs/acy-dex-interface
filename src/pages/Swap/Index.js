@@ -89,9 +89,8 @@ const Swap = props => {
   const [visible, setVisible] = useState(false);
   const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
   const [transactionList, setTransactionList] = useState([]);
-  const [upToDate, setUpToDate] = useState(false);
   const [tableLoading, setTableLoading] = useState(true);
-  const [transactionNum, setTransactionNum] =useState(0);
+  const [transactionNum, setTransactionNum] = useState(0);
   const { account, chainId, library, activate } = useWeb3React();
 
   // connect to provider, listen for wallet to connect

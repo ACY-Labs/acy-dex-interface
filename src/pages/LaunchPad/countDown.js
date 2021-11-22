@@ -7,7 +7,8 @@ import AcyButton from '@/components/AcyButton';
 import { AcyLineChart } from '@/components/Acy';
 
 const { Countdown } = Statistic;
-
+console.log('style')
+console.log(styles);
   function getRemainTime(now) {
     var ddl = '2022/11/11 19:22:21';
     //var now = Date.now()
@@ -67,6 +68,8 @@ const { Countdown } = Statistic;
         <div className = {styles.countnumber} >{countTime.days}</div>
         <div>DAYS</div>
         </div>
+
+
         <div className = {styles.seperator}>:</div>
         <div className = {styles.number}id = "b">
 
