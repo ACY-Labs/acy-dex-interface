@@ -8,10 +8,11 @@ import TableControl from './TableControl';
 import SampleStakeHistoryData from './SampleDaoData';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { getAllPools, getHarvestHistory } from '@/acy-dex-swap/core/farms';
+import { getAllPools, getHarvestHistory, getPool } from '@/acy-dex-swap/core/farms';
 import supportedTokens from '@/constants/TokenList';
+import PageLoading from '@/components/PageLoading';
 
-const Farms = () => {
+const Farms = (props) => {
   // useWeb3React hook will listen to wallet connection.
   // if wallet is connected, account, chainId, library, and activate will not be not be undefined.
   const { account, chainId, library, activate } = useWeb3React();
@@ -39,6 +40,10 @@ const Farms = () => {
   const [isMyFarms, setIsMyFarms] = useState(false);
   const [harvestAcy, setHarvestAcy] = useState();
 
+  const [refreshPooldId, setRefreshPooldId] = useState();
+  const [isLoadingPool, setIsLoadingPool] = useState(true);
+  const [isLoadingHarvest, setIsLoadingHarvest] = useState(true);
+
   // method to activate metamask wallet.
   // calling this method for the first time will cause metamask to pop up,
   // and require user to approve this connection.
@@ -55,6 +60,21 @@ const Farms = () => {
     }
     return 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg';
   }
+  function getTokenDetail(symbol) {
+    for (let j = 0; j < supportedTokens.length; j++) {
+      if (symbol === supportedTokens[j].symbol) {
+        return supportedTokens[j];
+      }
+    }
+    return {
+      name: symbol,
+      symbol: symbol,
+      address:      '0x0000000000000000000000000000000000000000',
+      addressOnEth: '0x0000000000000000000000000000000000000000',
+      decimals: 18,
+      logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg'
+    };
+  }
   const getDateYDM = (date) => {
     return date.getFullYear(date)  + "-" + ("0"+(date.getMonth(date)+1)).slice(-2) + "-" + ("0" + date.getDate(date)).slice(-2)
   }
@@ -65,6 +85,13 @@ const Farms = () => {
     const harvest = await getHarvestHistory(account);
     console.log('getHarvestHistiry:',harvest);
     setHarvestAcy(harvest);
+    setIsLoadingHarvest(false);
+  }
+  const refreshHarvestHistory = async () => {
+    const harvest = await getHarvestHistory(account);
+    console.log('refreshHarvestHistory:',harvest);
+    setHarvestAcy(harvest);
+    setIsLoadingHarvest(false);
   }
 
   useEffect(
@@ -74,8 +101,6 @@ const Farms = () => {
 
       const getPools = async (library, account) => {
         const pools = await getAllPools(library, account);
-        console.log('getAllPools OK');
-        console.log(pools);
         const newFarmsContents = [];
         let ismyfarm = false;
         pools.forEach(pool => {
@@ -108,12 +133,14 @@ const Farms = () => {
         setCurrentTableRow(newFarmsContents);
         if(ismyfarm) {
           // setCurrentTableRow(newFarmsContents.filter(tableData => tableData.hasUserPosition));
-          setTableRow(newFarmsContents.filter(tableData => tableData.hasUserPosition));
+          // setTableRow(newFarmsContents.filter(tableData => tableData.hasUserPosition));
+          setTableRow(newFarmsContents);
         } else {
           // setCurrentTableRow(newFarmsContents);
           setTableRow(newFarmsContents);
         }
-        
+        console.log('finished getPools');
+        setIsLoadingPool(false);
       };
       // account will be returned if wallet is connected.
       // so if account is present, retrieve the farms contract.
@@ -131,6 +158,37 @@ const Farms = () => {
     },
     [account]
   );
+  useEffect(
+    async () =>{
+      if(refreshPooldId) {
+        const pool = await getPool(library, account, refreshPooldId);
+        const newFarmsContent = {
+          poolId: pool.poolId,
+          lpTokens: pool.lpTokenAddress,
+          token1: pool.token0Symbol,
+          token1Logo: getLogoURIWithSymbol(pool.token0Symbol),
+          token2: pool.token1Symbol,
+          token2Logo: getLogoURIWithSymbol(pool.token1Symbol),
+          pendingReward: pool.rewardTokensSymbols.map((token, index) => ({
+            token,
+            amount: pool.rewardTokensAmount[index],
+          })),
+          totalApr: 89.02,
+          tvl: 144542966,
+          hasUserPosition: pool.hasUserPosition,
+          hidden: true,
+          userRewards: pool.rewards,
+          stakeData: pool.stakeData
+        };
+        setFarmsContent(prevState =>{
+          const prevFarmContent = [...prevState];
+          prevFarmContent[refreshPooldId] = newFarmsContent;
+          return prevFarmContent;
+        })
+      }
+      
+    },[refreshPooldId]
+  );
 
   const onRowClick = index =>
     setTableRow(prevState => {
@@ -140,6 +198,8 @@ const Farms = () => {
     });
 
   const onAllToggleButtonClick = () => {
+    console.log('currentTableRow:',currentTableRow)
+    console.log('farm content:',farmsContent);
     setSelectedTable(0);
     setTableTitle('All Farms');
     setTableSubtitle('Stake your LP tokens and earn token rewards');
@@ -149,6 +209,8 @@ const Farms = () => {
   };
 
   const onAcyToggleButtonClick = () => {
+    console.log('currentTableRow:',currentTableRow)
+    console.log('farm content:',farmsContent);
     setSelectedTable(1);
     setTableTitle('ACY Farms');
     setTableSubtitle('Stake your LP tokens and earn ACY token rewards');
@@ -157,6 +219,8 @@ const Farms = () => {
   };
 
   const onDaoToggleButtonClick = () => {
+    console.log('currentTableRow:',currentTableRow)
+    console.log('farm content:',farmsContent);
     setSelectedTable(3);
     setHideDao(false);
     setTableTitle('DAO Farms');
@@ -164,6 +228,8 @@ const Farms = () => {
   };
 
   const onPremierToggleButtonClick = () => {
+    console.log('currentTableRow:',currentTableRow)
+    console.log('farm content:',farmsContent);
     setSelectedTable(2);
     setTableTitle('Premier Farms');
     setTableSubtitle('Stake your LP tokens and earn project/other token rewards');
@@ -172,6 +238,8 @@ const Farms = () => {
   };
 
   const onMyFarmsButtonClick = () => {
+    console.log('currentTableRow:',currentTableRow)
+    console.log('farm content:',farmsContent);
     setSelectedTable(4);
   };
 
@@ -196,8 +264,8 @@ const Farms = () => {
         if (isMyFarms){
           setTableTitle('My Farms');
           // setTableRow(currentTableRowCopy.filter(tableData => tableData.hasUserPosition));
-          setTableRow(currentTableRowCopy.filter(tableData => tableData.hasUserPosition));
-          // setTableRow(currentTableRowCopy);
+          // setTableRow(currentTableRowCopy.filter(tableData => tableData.hasUserPosition));
+          setTableRow(currentTableRowCopy);
           
         }
         else if (selectedTable === 0){
@@ -293,8 +361,15 @@ const Farms = () => {
     [selectedTable, tokenFilter, farmsContent]
   );
 
+
+
   return (
     <PageHeaderWrapper>
+      { (isLoadingHarvest || isLoadingPool)? (
+        <div>
+          <PageLoading/>
+        </div>
+      ) : (
       <div className={styles.farmsContainer}>
         <div className={styles.tableControlButtonContainer}>
           <ToggleButtonGroup
@@ -332,10 +407,13 @@ const Farms = () => {
             chainId={chainId}
             isMyFarms={isMyFarms}
             harvestAcy={harvestAcy}
+            setRefreshPooldId={setRefreshPooldId}
+            refreshHarvestHistory={refreshHarvestHistory}
           />
         )}
         {selectedTable === 4 && <DaoTable dataSource={daoDataSource} />}
       </div>
+      )}
     </PageHeaderWrapper>
   );
 };
