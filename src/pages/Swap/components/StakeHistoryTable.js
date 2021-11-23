@@ -38,7 +38,11 @@ const StakeHistoryTable = props => {
       dataIndex: '',
       key: 'fromforto',
       render: (text, record) => {
-          return <div className={styles.tableDataFirstColumn}>Swap {record.inputTokenSymbol} for {record.outTokenSymbol}</div>;
+          return (
+          <div className={styles.tableDataFirstColumn}>
+            Swap {record.inputTokenSymbol} for {record.outTokenSymbol}
+            </div>
+          );  
       }
     },
     {
