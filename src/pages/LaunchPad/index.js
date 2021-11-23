@@ -120,6 +120,17 @@ const LaunchpadComponent = () => {
             //     chartData.push([element.dateTime.substr(0,11),element.price]);
             // });
             // console.log('chartData:',chartData);
+            
+            //participant data progress
+            // console.log('test2');
+            // console.log(events[0][0]);
+            // for (let index = 0; index < events[0].length; index++) {
+            //     const element = events[0][index];
+            //     console.log('1111111111111111111111');
+            //     console.log(element.slice(5, element.length - 8));
+            // }
+
+
             setTransferData(events[0]);
             setChartData(events[1])
         });
