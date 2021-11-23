@@ -70,7 +70,7 @@
     /* position: relative; */
     /* top: -10vh; */
     /* left: 1vw; */
-    padding: 20px 0px 0px 75px;
+    padding: 2vh 0 0 6vh;
     :global{
         .ant-carousel .slick-dots li button{
             height: 5px;
@@ -80,7 +80,7 @@
             width: 30px !important;
         }
         .ant-carousel .slick-dots-bottom {
-            bottom: -25px;
+            bottom: 0.5vh;
         }
         .ant-carousel .slick-slide {
             // display: none;
@@ -98,10 +98,11 @@
     float: right;
     overflow: visible;
     position: relative;
+    top: 3vh;
 } 
 
 .chartStyle{
-    height: 340px !important;
+    height: 320px !important;
     padding: 0px 0px 0px 0px;
     margin-top: -6.5vh;
 }
@@ -134,7 +135,7 @@
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    padding: 13px 17px 0px;
+    padding: 0 2vh 2vh;
 }
 .countLabelBlock{
     padding: 11px 10px 0px 0px;}
@@ -179,7 +180,7 @@
 .cntdwn{
     justify-content: flex-start;
     display: flex;
-    padding: 30px 8px 30px;
+    padding: 0 1.3vh 1.5vh;
 
 }
 
@@ -254,7 +255,7 @@
 .stepColor {
     width: 100%;
     flex-basis: 30px;
-    // padding: 0px 10px 0px;
+    padding: 0px 10px 0px;
     display: inline-flex;
     :global{
     .ant-steps-item-title{
@@ -725,7 +726,7 @@
             text-align: center !important;
             // background:  transparent !important;
             background-color: transparent;
-            text-decoration: underline;
+            border-bottom: 2px solid #b5b5b6 !important;
         }
         .ant-table-footer{
         background:  transparent !important;
@@ -822,9 +823,9 @@
 
 .themeBox{
     width: 32px;
-    color: #c6224e;
+    color: #c6224e !important;
     height: 21px;
-    display: flex;
+    display: flex !important;
     justify-content: center;
     align-items: center;
     text-align: center;
@@ -856,6 +857,7 @@
             padding: 9px 16px !important;
             padding-right: 40px;
             color: #000000;
+            border-top-right-radius: 10px;
         }
         .ant-collapse-item{
             border-bottom: 1px solid #000;
@@ -885,6 +887,12 @@
 .twitterbtn:hover{
     color: #fff;
     filter: brightness(85%);
+}
+
+.taskBtn:hover{
+    color: #fff;
+    filter: brightness(85%);
+    border-color: transparent;
 }
 
 //tan
@@ -1068,14 +1076,12 @@
 
 .transferTable{
     width: inherit;
-
-    height: 250px;
-    position: relative;
+    //height: 18.5vh;
+    overflow: hidden;
     :global{
         .ant-table-wrapper{
             height: 100%;
         }
-     
         .ant-table-placeholder{
             background: transparent !important;
         }
@@ -1100,10 +1106,6 @@
             &:active{
                 background: #2f3135 !important;
         }
-        .ant-table{
-            line-height: 2.5;
-        }
-      
     }
     // background-color: #862e2e;
     // background: transparent !important;
