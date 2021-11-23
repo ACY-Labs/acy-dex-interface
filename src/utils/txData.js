@@ -1,6 +1,8 @@
 import moment from 'moment';
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import {methodList, actionList} from '@/constants/MethodList';
+import liquidity from '@/pages/Liquidity/models/liquidity';
+
 export async function parseTransactionData (fetchedData,account,library,filter) {
     if(filter == 'SWAP'){
 
@@ -245,4 +247,107 @@ export async function getTransactionsByAccount (account,library,filter){
         
     }
     return [];
+}
+function getChartData (data){
+    let amm = data.liquidity1 * data.liquidity2;
+    amm = amm / (data.totalOut + data.liquidity1);
+    amm = data.liquidity2 - amm;
+    let revenue = data.totalIn - amm;
+
+    return{
+        "acy_output" : data.totalIn,
+        "amm_output" : amm,
+        "flash_revenue" : revenue,
+        "liquidity_provider" : revenue * 0.4,
+        "farms_standard" : revenue * 0.1,
+        "farms_acydao" : revenue * 0.1,
+        "farms_premier" :  revenue * 0.1,
+        "ecosystem_dao" : revenue * 0.1,
+        "trading_fee" : 0,
+
+    }
+}
+
+export async function fetchTransactionData(address,library){
+
+    try{
+
+        let apikey = 'Y6H9S7521BGREFMGSETVA72F1HT74FE3M5';
+
+        let response = await library.getTransactionReceipt(address.toString());
+        console.log("Response: ",response);
+        let logs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]==actionList.transfer.hash);
+        let gasFee = (response.effectiveGasPrice.toNumber() / (Math.pow(10,18)) )* response.gasUsed.toNumber()
+        console.log("gas fee: ",gasFee);
+        // console.log("cumulativegasused",response.cumulativeGasUsed.toNumber());
+        console.log("gasprice",response.effectiveGasPrice.toNumber());
+        // console.log("gasused",response.gasUsed.toNumber());
+        let routes = [];
+        let totalIn = 0;
+        let totalOut = 0;
+        let newData = {};
+        let token1;
+        let token2;
+        let token3;
+        for (let i=0;i<logs.length;i+=3){
+            token1 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
+            let ammount1 = (logs[i].data / Math.pow(10, token1.decimals)); 
+            token2 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i+1].address);
+            let ammount2 = (logs[i+1].data / Math.pow(10, token2.decimals)); 
+            token3 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i+2].address);
+            let ammount3 = (logs[i+2].data / Math.pow(10, token3.decimals));
+            
+            routes.push({
+                "token1" : token1.symbol,
+                "token2" : token2.symbol,
+                "token3" : token3.symbol,
+                "token1Num" : ammount1,
+                "token2Num" : ammount2,
+                "token3Num" : ammount3,
+                "logoURI" : token2.logoURI
+            })
+
+            totalIn += ammount3;
+            totalOut += ammount1;
+        }
+        //fetch liquidity pools for 2 ending points
+        let requestLiquidity1 = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress='+token1.addressOnEth+'&apikey='+apikey;
+        let responseLiquidity1 = await fetch(requestLiquidity1);
+        let liquidity1 = await responseLiquidity1.json();
+        liquidity1 = parseInt(liquidity1.result)/Math.pow(10,token1.decimals);
+
+        let requestLiquidity2 = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress='+token3.addressOnEth+'&apikey='+apikey;
+        let responseLiquidity2 = await fetch(requestLiquidity2);
+        let liquidity2 = await responseLiquidity2.json();
+        liquidity2 = parseInt(liquidity2.result)/Math.pow(10,token3.decimals);
+        
+        //get ether last price
+
+        let requestPrice = 'https://api.etherscan.io/api?module=stats&action=ethprice&apikey='+apikey;
+        let responsePrice = await fetch(requestPrice);
+        let ethPrice = await responsePrice.json();
+        ethPrice = parseFloat(ethPrice.result.ethusd);
+
+        console.log("fetching ethprice",ethPrice);
+
+        newData = {
+            "routes" : routes,
+            "totalIn" : totalIn,
+            "totalOut" : totalOut,
+            "gasFee" : gasFee,
+            "token1" : token1.symbol,
+            "token2" : token2.symbol,
+            "liquidity1" : liquidity1,
+            "liquidity2" : liquidity2,
+            "ethPrice" : ethPrice
+        }
+
+        let chartData = getChartData(newData);
+        newData.chartData = chartData;
+        return newData;
+
+    } catch (e){
+        console.log(e);
+    }
+    return {};
 }
