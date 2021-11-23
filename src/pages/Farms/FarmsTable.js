@@ -25,6 +25,9 @@ const FarmsTable = ({
   chainId,
   isMyFarms,
   harvestAcy,
+  setRefreshPooldId,
+  refreshHarvestHistory
+
 }) => {
   const [myChartId, setMyChartId] = useState(0);
   const [totalChartId, setTotalChartId] = useState(0);
@@ -83,6 +86,16 @@ const FarmsTable = ({
   //   },
   //   [library, account]
   // );
+  const daoContent = {
+    token1:"ACY",
+    token1Logo:AcyIcon,
+    token2: null,
+    token2Logo:null,
+    totalApr:"12345",
+    tvl:'12345',
+    pendingReward:[{ token: 'ACY', amount: 0 }],
+    hasUserPosition:true,
+  }
 
   return (
     <div className={styles.tableContainer}>
@@ -100,6 +113,18 @@ const FarmsTable = ({
               <FarmsTableRow
                 key={index}
                 index={index}
+                // rowClickHandler={() => onRowClick(index)}
+                walletConnected={walletConnected}
+                connectWallet={connectWallet}
+                selectedTable={selectedTable}
+                account={account}
+                library={library}
+                chainId={chainId}
+                isMyFarms={isMyFarms}
+                harvestHistory={harvestAcy}
+                setRefreshPooldId={setRefreshPooldId}
+
+                content={content}
                 poolId={content.poolId}
                 stakedTokenAddr={content.lpTokens}
                 token1={content.token1}
@@ -109,18 +134,12 @@ const FarmsTable = ({
                 totalApr={content.totalApr}
                 tvl={content.tvl}
                 hidden={content.hidden}
-                rowClickHandler={() => onRowClick(index)}
                 pendingReward={content.pendingReward}
-                walletConnected={walletConnected}
-                connectWallet={connectWallet}
-                selectedTable={selectedTable}
-                account={account}
-                library={library}
-                chainId={chainId}
-                isMyFarms={isMyFarms}
                 userRewards={content.userRewards}
                 stakeData={content.stakeData}
-                harvestHistory={harvestAcy}
+                hasUserPosition={content.hasUserPosition}
+                refreshHarvestHistory={refreshHarvestHistory}
+                
               />
             );
           })}
@@ -128,19 +147,21 @@ const FarmsTable = ({
       ) : (
         <div className={styles.tableBodyContainer}>
           <FarmsTableRow
+            content={daoContent}
             token1="ACY"
             token1Logo={AcyIcon}
             token2={null}
             token2Logo={null}
             totalApr="12345"
             tvl="12345"
-            hidden={false}
             pendingReward={[{ token: 'ACY', amount: 0 }]}
             walletConnected={walletConnected}
             connectWallet={connectWallet}
             isMyFarms={isMyFarms}
             hideArrow
             harvestHistory={harvestAcy}
+            setRefreshPooldId={setRefreshPooldId}
+            refreshHarvestHistory={refreshHarvestHistory}
           />
           <div>
             <div className={styles.stakeSectionMain}>
@@ -163,7 +184,7 @@ const FarmsTable = ({
       <div
         className={styles.tableFooterContainer}
         onClick={() => setRowNumber(rowNumber + 5)}
-        hidden={!hideDao}
+        hidden={!hideDao || rowNumber > tableRow.length}
       >
         More
       </div>

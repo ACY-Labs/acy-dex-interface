@@ -2,6 +2,7 @@ import { AcyModal } from '@/components/Acy';
 import { StylesContext } from '@material-ui/styles';
 import {useEffect} from 'react';
 import styles from './index.less';
+import classNames from 'classnames';
 
 const AcyActionModal = ({
     children,
@@ -12,6 +13,7 @@ const AcyActionModal = ({
     title,
     content,
     visible,
+    disabled,
 }) => {
 
     return (
@@ -34,11 +36,12 @@ const AcyActionModal = ({
             </div>
             <div className={styles.buttonContainer}>
                 <div className={styles.buttonPadding}>
-                    <div className={styles.button}
+                    <button 
+                        className={(disabled && classNames(styles.button,styles.buttonDisabled)) || styles.button}
                         onClick={onConfirm}
                     >
                         {confirmText? confirmText : 'OK'}
-                    </div>
+                    </button>
                 </div>
             </div>
         </AcyModal>

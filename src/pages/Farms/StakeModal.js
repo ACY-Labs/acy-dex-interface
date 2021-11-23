@@ -4,35 +4,50 @@ import styles from '@/pages/Farms/Farms.less';
 import DatePicker from 'react-datepicker';
 import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 import { useWeb3React } from '@web3-react/core';
-import { deposit } from '@/acy-dex-swap/core/farms';
+import { deposit, approveLpToken } from '@/acy-dex-swap/core/farms';
 import { white } from '@umijs/deps/compiled/chalk';
+import { Icon} from 'antd';
 import { now } from 'moment';
+import { connect } from 'umi';
+import moment from 'moment';
+import classNames from 'classnames';
 
 
-const StakeModal = ({
-  onCancel,
-  isModalVisible,
-  token1,
-  token2,
-  balance,
-  stakedTokenAddr,
-  poolId,
-}) => {
+const StakeModal = props => {
+  const {
+    onCancel,
+    isModalVisible,
+    token1,
+    token2,
+    balance,
+    stakedTokenAddr,
+    poolId,
+    dispatch,
+    refreshPoolInfo,
+    chainId,
+    account,
+    library,
+  } = props;
   const [date, setDate] = useState(new Date());
   const [selectedPresetDate, setSelectedPresetDate] = useState(null);
   const [showStake, setShowStake] = useState(0);
   const [stake, setStake] = useState(0);
   const [balancePercentage, setBalancePercentage] = useState(0);
   const [buttonText, setButtonText] = useState('Stake');
-  const { account, chainId, library, activate } = useWeb3React();
   const [aprList, setAprList] = useState([[12.23,false],[14.53,false],[16.27,false],[18.13,false],[19.63,false],[22.83,false]])
   const [pickingDate,setPickingDate] = useState(false);
   const [aprCounted, serAprCounted] = useState(13.2);
+  const [buttonStatus, setButtonStatus] = useState(true);
+  const [modalVisible, setModalVisible] = useState(true);
+  const [is4Years, setIs4Years] = useState(false);
 
+  
   const getLockDuration = () => {
+    if(is4Years) return 126144000;
     const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-    const diffDays = Math.abs((date.getTime() - Date.now()) / (oneDay));
-    return Math.ceil(diffDays) * 86400;// 24*60*60
+    const diffDays = Math.abs((date.getTime() - Date.now()) / (oneDay)); 
+    const result = Math.ceil(diffDays) * 86400;
+    return result>126144000?126144000:result;// 24*60*60  31536000
   };
 
   const updateStake = newStake => {
@@ -44,7 +59,7 @@ const StakeModal = ({
     } 
     setBalancePercentage(Math.floor((newStakeInt / balance) * 100));
   };
-
+  
   const updateBalancePercentage = percentage => {
     const percentageInt = percentage === '' ? 0 : parseInt(percentage, 10);
     if (Number.isNaN(percentageInt)) return;
@@ -52,6 +67,10 @@ const StakeModal = ({
     setStake(parseFloat((balance * percentageInt) / 100));
     setBalancePercentage(percentageInt);
   };
+
+  useEffect( () =>{
+    setIs4Years(false);
+  },[isModalVisible]);
 
   const updateDate = (type, value, index) => {
     const newDate = new Date();
@@ -67,6 +86,11 @@ const StakeModal = ({
     setDate(newDate);
     setSelectedPresetDate(index);
     setPickingDate(false);
+    if(value == 4){
+      setIs4Years(true);
+    } else {
+      setIs4Years(false);
+    }
   };
 
   const datePickerChangeHandler = newDate => {
@@ -85,6 +109,150 @@ const StakeModal = ({
     </button>
   ));
 
+  const stakeCallback = status => {
+    const transactions = props.transaction.transactions;
+    const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
+    //trigger loading spin on top right
+    if (isCurrentTransactionDispatched == 0) {
+      dispatch({
+        type: "transaction/addTransaction",
+        payload: {
+          transactions: [...transactions, { hash: status.hash }]
+        }
+      })
+    }
+
+    const checkStatusAndFinish = async () => {
+      await library.getTransactionReceipt(status.hash).then(async receipt => {
+        console.log("receipt ", receipt);
+
+        if (!receipt) {
+          setTimeout(checkStatusAndFinish, 500);
+        } else {
+          let transactionTime;
+          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
+            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
+            console.log("test transactionTime: ", transactionTime)
+          });
+
+          // update backend userPool record
+          // console.log("test pair to add on server", pairToAddOnServer);
+          // if (pairToAddOnServer) {
+          //   const { token0, token1 } = pairToAddOnServer;
+          //   axios.post(
+          //     // fetch valid pool list from remote
+          //     `https://api.acy.finance/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
+          //     // `http://localhost:3001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
+          //   ).then(res => {
+          //     console.log("add to server return: ", res);
+
+          //   }).catch(e => console.log("error: ", e));
+          // }
+          //refresh poold info
+          await refreshPoolInfo();
+          // clear top right loading spin
+          const newData = transactions.filter(item => item.hash != status.hash);
+          dispatch({
+            type: "transaction/addTransaction",
+            payload: {
+              transactions: [
+                ...newData,
+                { hash: status.hash, transactionTime }
+              ]
+            }
+          });
+
+          // refresh the table
+          // dispatch({
+          //   type: "liquidity/setRefreshTable",
+          //   payload: true,
+          // });
+
+          // disable button after each transaction on default, enable it after re-entering amount to add
+          setButtonText("Done");
+          setButtonStatus(true);
+          onCancel();
+          // store to localStorage
+        }
+      })
+    };
+    // const sti = setInterval(, 500);
+    checkStatusAndFinish();
+  };
+
+  const approveCallback = status => {
+    console.log("test status:", status);
+    const transactions = props.transaction.transactions;
+    const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
+    console.log("is current dispatched? ", isCurrentTransactionDispatched);
+    //trigger loading spin on top right
+    if (isCurrentTransactionDispatched == 0) {
+      dispatch({
+        type: "transaction/addTransaction",
+        payload: {
+          transactions: [...transactions, { hash: status.hash }]
+        }
+      })
+    }
+
+    console.log("test test see how many times setInterval is called");
+    const checkStatusAndFinish = async () => {
+      await library.getTransactionReceipt(status.hash).then(async receipt => {
+        console.log("receipt ", receipt);
+
+        if (!receipt) {
+          setTimeout(checkStatusAndFinish, 500);
+        } else {
+          let transactionTime;
+          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
+            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
+            console.log("test transactionTime: ", transactionTime)
+          });
+
+          // update backend userPool record
+          // console.log("test pair to add on server", pairToAddOnServer);
+          // if (pairToAddOnServer) {
+          //   const { token0, token1 } = pairToAddOnServer;
+          //   axios.post(
+          //     // fetch valid pool list from remote
+          //     `https://api.acy.finance/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
+          //     // `http://localhost:3001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
+          //   ).then(res => {
+          //     console.log("add to server return: ", res);
+
+          //   }).catch(e => console.log("error: ", e));
+          // }
+          //refresh pool info 
+          
+          // clear top right loading spin
+          const newData = transactions.filter(item => item.hash != status.hash);
+          dispatch({
+            type: "transaction/addTransaction",
+            payload: {
+              transactions: [
+                ...newData,
+                { hash: status.hash, transactionTime }
+              ]
+            }
+          });
+
+          // refresh the table
+          // dispatch({
+          //   type: "liquidity/setRefreshTable",
+          //   payload: true,
+          // });
+
+          // disable button after each transaction on default, enable it after re-entering amount to add
+          setButtonText("Stake");
+          setButtonStatus(true);
+          // store to localStorage
+        }
+      })
+    };
+    // const sti = setInterval(, 500);
+    checkStatusAndFinish();
+  };
+
   return (
     <AcyModal
       key={`${token1}${token2}`}
@@ -95,18 +263,18 @@ const StakeModal = ({
         background: '#0e0304',
         borderRadius: '.5rem',
       }}
-      visible={isModalVisible}
+      visible={isModalVisible && modalVisible}
       destroyOnClose
     >
       <div className={styles.amountRowContainer}>
         <div className={styles.amountRowInputContainer}>
           <input type="text" value={showStake} onChange={e => updateStake(e.target.value)} />
         </div>
-        <span className={styles.suffix}>{token1}-{token2}</span>
+        <span className={styles.suffix}>{token1}-{token2} LP</span>
       </div>
       <div className={styles.balanceAmountContainer}>
         <div className={styles.balanceAmount}>
-          Balance: {(parseFloat(balance)).toFixed(6)} {token1}-{token2}
+          Balance: {(parseFloat(balance)).toFixed(6)} {token1}-{token2} LP
         </div>
         <div className={styles.balanceAmountInputContainer}>
           <input
@@ -180,10 +348,22 @@ const StakeModal = ({
       <div>
         <button
           type="button"
-          className={styles.stakeSubmitButton}
+          // className={(!withdrawButtonStatus && classNames(styles.button,styles.buttonDisabled)) || styles.button}
+          // className={styles.stakeSubmitButton}
+          className={(!buttonStatus && classNames(styles.stakeSubmitButton,styles.buttonDisabled)) || styles.stakeSubmitButton}
+          disabled={!buttonStatus}
           onClick={async () => {
-            console.log("newDate:",getLockDuration());
-            deposit(stakedTokenAddr, stake, poolId, getLockDuration(), library, account, setButtonText);
+            if(buttonText != "Done") {
+              if(buttonText !== 'Approval required') {
+                setButtonText(<>Processing <Icon type="loading" /></>);
+                setButtonStatus(false);
+                deposit(stakedTokenAddr, stake, poolId, getLockDuration(), library, account, setButtonText, stakeCallback, setButtonStatus);
+              } else {
+                setButtonText(<>Approving <Icon type="loading" /></>);
+                setButtonStatus(false);
+                approveLpToken(stakedTokenAddr, library, account, setButtonText, approveCallback);
+              }
+            }
           }}
         >
           {buttonText}
@@ -193,4 +373,9 @@ const StakeModal = ({
   );
 };
 
-export default StakeModal;
+// export default StakeModal;
+export default connect(({ global, transaction, loading }) => ({
+  global,
+  transaction,
+  loading: loading.global,
+}))(StakeModal);

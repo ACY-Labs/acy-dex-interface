@@ -53,7 +53,7 @@ const FollowTelegram = ({
   }
 
   useEffect(() => {
-    if(count >= 3) setAllowNext(false)
+    if(count >= 2) setAllowNext(false)
   }, [count]);
   
   const links = [
@@ -156,7 +156,7 @@ const FollowTelegram = ({
                       <Icon type="down" /> 
                       :
                       <div className={styles.themeBox}>
-                        <span style={{color:'#29292c', fontWeight: '500', marginTop:'3px'}}>{panelKey === "1" ? rewardsArr[0] : (panelKey === "6" ? rewardsArr[2] : rewardsArr[1])}</span>
+                        <span style={{color:'#29292c', fontWeight: '500'}}>{panelKey === "1" ? rewardsArr[0] : (panelKey === "6" ? rewardsArr[2] : rewardsArr[1])}</span>
                       </div>
                     )
                   :
@@ -196,7 +196,7 @@ const FollowTelegram = ({
                     {hasError && <small className={errorText}>{errorMsg}</small>}
                   </div>
                   <div style={{display:'flex', justifyContent:'center'}}>
-                    <Button onClick={subscribe} style={buttonStyle1}>Submit</Button> 
+                    <Button className={styles.taskBtn} onClick={subscribe} style={buttonStyle1}>Submit</Button> 
                   </div>
                 </div>
               </div>
@@ -213,12 +213,12 @@ const FollowTelegram = ({
               disabled={followed[2]}
             >
               <Row type='flex' align='middle' justify='space-around'>
-                <Button id='linkbtn' href={links[0]} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(1); onClick();}}>
+                <Button className={styles.taskBtn} href={links[0]} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(1); onClick();}}>
                   <Icon type="link" style={{ color: '#fff' }} theme="outlined" />
                   Join
                 </Button>
                 <Tooltip title="Visit the link to continue">
-                  <Button onClick={() => {handleFollow(2); handlePanelClose();}} style={buttonStyle1} disabled={clicked[1]}>Continue</Button> 
+                  <Button className={styles.taskBtn} onClick={() => {handleFollow(2); handlePanelClose();}} style={buttonStyle1} disabled={clicked[1]}>Continue</Button> 
                 </Tooltip>
               </Row>
             </Panel>
@@ -234,12 +234,12 @@ const FollowTelegram = ({
               disabled={followed[3]}
             >
               <Row type='flex' align='middle' justify='space-around'>
-                <Button href={links[1]} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(2); onClick();}}>
+                <Button className={styles.taskBtn} href={links[1]} target="_blank" style={buttonStyle1} onClick={() => {onLinkClick(2); onClick();}}>
                   <Icon type="link" style={{ color: '#fff' }} theme="outlined" />
                   Subscribe
                 </Button>
                 <Tooltip title="Visit the link to continue">
-                  <Button onClick={() => {handleFollow(3); handlePanelClose();}} style={buttonStyle1} disabled={clicked[2]}>Continue</Button> 
+                  <Button className={styles.taskBtn} onClick={() => {handleFollow(3); handlePanelClose();}} style={buttonStyle1} disabled={clicked[2]}>Continue</Button> 
                 </Tooltip>
               </Row>
             </Panel>
@@ -270,7 +270,7 @@ const FollowTelegram = ({
                 </a>
                 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8" />
                 <Tooltip title="Visit the link above to continue">
-                  <Button onClick={() => {handleFollow(4); handlePanelClose();}} style={buttonStyle1} disabled={clicked[3]}>Continue</Button> 
+                  <Button className={styles.taskBtn} onClick={() => {handleFollow(4); handlePanelClose();}} style={buttonStyle1} disabled={clicked[3]}>Continue</Button> 
                 </Tooltip>
               </Row>
             </Panel>
@@ -298,7 +298,7 @@ const FollowTelegram = ({
                   <span style={{marginRight:'5px'}}>Retweet</span>
                 </a>
                 <Tooltip title="Visit the link above to continue">
-                  <Button onClick={() => {handleFollow(5); handlePanelClose();}} style={buttonStyle1} disabled={clicked[4]}>Continue</Button> 
+                  <Button className={styles.taskBtn} onClick={() => {handleFollow(5); handlePanelClose();}} style={buttonStyle1} disabled={clicked[4]}>Continue</Button> 
                 </Tooltip>
               </Row>
             </Panel>
@@ -313,7 +313,7 @@ const FollowTelegram = ({
               disabled={followed[6]}
             >
               <Row type='flex' align='middle' justify='space-around'>
-                <Button type="primary" href={links[0]} target="_blank" style={buttonStyle1} icon="link">Share Your Link To Your Friends</Button>
+                <Button className={styles.taskBtn} type="primary" href={links[0]} target="_blank" style={buttonStyle1} icon="link">Share Your Link To Your Friends</Button>
               </Row>
             </Panel>
           </Collapse>

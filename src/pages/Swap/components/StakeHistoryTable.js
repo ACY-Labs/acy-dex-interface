@@ -8,13 +8,10 @@
  * jianqiang
  */
 import React, { useState } from 'react';
-import { Table } from 'antd';
-import SampleStakeHistoryData, {
-  sampleStakeHistoryColumns,
-  sampleStakeHistoryMobileColumns,
-} from '../sample_data/SampleStakeHistoryData';
+import {  Divider, Icon, Input, Table  } from 'antd';
 import styles from './StakeHistoryTable.less';
-
+import numeral from 'numeral';
+import formatNumber from 'accounting-js/lib/formatNumber.js';
 function sortTableTime(table, key, isReverse) {
   return table.sort((a, b) => {
     if (isReverse) {
@@ -28,6 +25,96 @@ function sortTableTime(table, key, isReverse) {
 const StakeHistoryTable = props => {
   const [stakeDisplayNumber, setStakeDisplayNumber] = useState(5);
   const { dataSource, isMobile } = props;
+
+  const sampleStakeHistoryColumns = [
+    {
+      title: (
+        <div
+          className={styles.tableDataFirstColumn}
+        >
+          Swap
+        </div>
+      ),
+      dataIndex: '',
+      key: 'fromforto',
+      render: (text, record) => {
+          return (
+          <div className={styles.tableDataFirstColumn}>
+            Swap {record.inputTokenSymbol} for {record.outTokenSymbol}
+            </div>
+          );  
+      }
+    },
+    {
+      title: (
+        <div
+          className={styles.tableData}
+        >
+          Total Amount
+        </div>
+      ),
+      dataIndex: 'totalToken',
+      key: 'totalToken',
+      render: (text,record) => {
+        return <div className={styles.tableData}>{text}</div>;
+      }
+    },
+    {
+      title: (
+        <div
+          className={styles.tableData}
+        >
+          Token Amount
+        </div>
+      ),
+      dataIndex: 'inputTokenNum',
+      key: 'inputTokenNum',
+      render: (text,record) => {
+        return <div className={styles.tableData}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.inputTokenSymbol}</div>;
+      }
+    },
+    {
+      title: (
+        <div
+          className={styles.tableData}
+        >
+          Token Amount
+        </div>
+      ),
+      dataIndex: 'outTokenNum',
+      key: 'outTokenNum',
+      render: (text,record) => {
+        return <div className={styles.tableData}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.outTokenSymbol}</div>;
+      }
+    },
+    {
+      title: (
+        <div
+          className={styles.tableData}
+        >
+          Time
+        </div>
+      ),
+      dataIndex: 'transactionTime',
+      key: 'transactionTime',
+      render: (text,record) => {
+        return <div className={styles.tableData}>{text}</div>;
+      }
+    },
+  ]
+  const sampleStakeHistoryMobileColumns = [
+    {
+      title: 'Swap',
+      key: 'fromforto',
+      render: record =>`${record.action} ${record.token1Symbol} and ${record.token2Symbol}`
+    },
+    
+    {
+      title: 'Time',
+      dataIndex: 'transactionTime',
+      key: 'transactionTime'
+    },
+  ]
   return (
     <div className={styles.nobgTable}>
       <Table

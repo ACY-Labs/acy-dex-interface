@@ -83,7 +83,7 @@ import moment from 'moment';
 const { AcyTabPane } = AcyTabs;
 
 const AddLiquidityComponent = props => {
-  const { dispatch, token, onLoggedIn } = props;
+  const { dispatch, token, onLoggedIn, isFarm = false } = props;
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
   // 选择货币前置和后置
@@ -544,6 +544,7 @@ const AddLiquidityComponent = props => {
                 setExactIn(true);
                 setToken0Amount(e);
               }}
+              isFarm = {isFarm}
             />
             <div style={{ margin: '12px auto', textAlign: 'center' }}>
               <AcyIcon width={21.5} name="plus_light" />
@@ -565,6 +566,7 @@ const AddLiquidityComponent = props => {
                 setExactIn(false);
                 setToken1Amount(e);
               }}
+              isFarm = {isFarm}
             />
 
             <AcyDescriptions>
