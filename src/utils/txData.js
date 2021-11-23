@@ -124,10 +124,14 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             let token2 =  INITIAL_TOKEN_LIST.find(token => token.address==logsToken2[0].address);
 
             let token1Number = 0;
-            for(let log of logsToken1){token1Number = token1Number + (log.data / Math.pow(10, token1.decimals))};
+            for(let log of logsToken1){
+                if(log.address == token1.address) token1Number = token1Number + (log.data / Math.pow(10, token1.decimals))
+            };
             token1Number = token1Number.toString();
             let token2Number = 0;
-            for(let log of logsToken2){token2Number += (log.data / Math.pow(10, token2.decimals))};
+            for(let log of logsToken2){
+                if(log.address == token2.address) token2Number += (log.data / Math.pow(10, token2.decimals))
+            };
             token2Number = token2Number.toString();
 
             let transactionTime = moment(parseInt(item.timeStamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
@@ -201,6 +205,45 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             let token2Number = 0;
             for(let log of logsToken2){token2Number += (log.data / Math.pow(10, token2.decimals))};
             token2Number = token2Number.toString();
+
+            let transactionTime = moment(parseInt(item.timeStamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
+            newData.push({
+            "hash": item.hash,
+            "action":'Remove',
+            "totalToken": 0,
+            "token1Number": token1Number,
+            "token1Symbol": token1.symbol,
+            "token2Number": token2Number,
+            "token2Symbol": token2.symbol,
+            "transactionTime": transactionTime
+            })
+        }
+
+        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.removeLiquidityETH.id));
+
+        for (let item of filteredData) {
+            
+            let response = await library.getTransactionReceipt(item.hash);
+            TO_HASH = response.to.toLowerCase().slice(2);
+            let logsToken1 = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
+            let logsToken2 = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(TO_HASH));
+
+            let token1 = INITIAL_TOKEN_LIST.find(token => token.address==logsToken1[0].address);
+            let token2 =  INITIAL_TOKEN_LIST.find(token => token.address==logsToken2[0].address);
+
+            let token1Number = 0;
+            for(let log of logsToken1){
+                if(log.address == token1.address) token1Number = token1Number + (log.data / Math.pow(10, token1.decimals))
+            };
+            token1Number = token1Number.toString();
+            let token2Number = 0;
+            for(let log of logsToken2){
+                if(log.address == token2.address) token2Number += (log.data / Math.pow(10, token2.decimals))
+            };
+            token2Number = token2Number.toString();
+
+            console.log('printing logs of token1 ', logsToken1);
+            console.log('prinitng logs of token2 ',logsToken2)
 
             let transactionTime = moment(parseInt(item.timeStamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
             newData.push({
