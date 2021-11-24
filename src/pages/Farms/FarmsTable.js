@@ -9,7 +9,6 @@ import { approveTokenWithSpender, disapproveTokenWithSpender } from '@/acy-dex-s
 
 const FarmsTable = ({
   tableRow,
-  onRowClick,
   tableTitle,
   tableSubtitle,
   rowNumber,
@@ -25,49 +24,37 @@ const FarmsTable = ({
   chainId,
   isMyFarms,
   harvestAcy,
-  setRefreshPooldId,
-  refreshHarvestHistory
+  refreshHarvestHistory,
+  searchInput,
+  // refreshPool
 
 }) => {
   const [myChartId, setMyChartId] = useState(0);
   const [totalChartId, setTotalChartId] = useState(0);
-  const [myChartData, setMyChartData] = useState(harvestAcy.myAcy);
   const [totalChartData, setTotalChartData] = useState(harvestAcy.totalAcy);
 
-  const changeGraphData = (id = 0, chartSetter) => {
-    if (id === 0) chartSetter(graphSampleData);
-    else chartSetter(graphSampleData2);
-  };
-  useEffect(
-    ()=>{
-      console.log('harvestAcy:',harvestAcy);
-      setMyChartData(harvestAcy.myAcy);
-      setTotalChartData(harvestAcy.totalAcy);
-    },[account]
-  )
+  const getMyChart = () => {
+    if(myChartId == 0) return harvestAcy.myAcy;
+    return harvestAcy.myAll;
+  }
+  const getTotalChart = () =>{
+    if(totalChartId==0) return harvestAcy.totalAcy;
+    return harvestAcy.totalAll
+  }
 
   const selectTopChart = pt => {
     const functionDict = {
       'My ACY': () => {
-        changeGraphData(0, setMyChartData);
         setMyChartId(0);
-        setMyChartData(harvestAcy.myAcy);
       },
       'My Reward': () => {
-        changeGraphData(1, setMyChartData);
         setMyChartId(1);
-        setMyChartData(harvestAcy.myAll);
       },
       'Total ACY': () => {
-        changeGraphData(0, setTotalChartData);
         setTotalChartId(0);
-        setTotalChartData(harvestAcy.totalAcy);
-
       },
       'Total Reward': () => {
-        changeGraphData(1, setTotalChartData);
         setTotalChartId(1);
-        setTotalChartData(harvestAcy.totalAll);
       },
     };
     functionDict[pt]();
@@ -113,7 +100,6 @@ const FarmsTable = ({
               <FarmsTableRow
                 key={index}
                 index={index}
-                // rowClickHandler={() => onRowClick(index)}
                 walletConnected={walletConnected}
                 connectWallet={connectWallet}
                 selectedTable={selectedTable}
@@ -122,8 +108,6 @@ const FarmsTable = ({
                 chainId={chainId}
                 isMyFarms={isMyFarms}
                 harvestHistory={harvestAcy}
-                setRefreshPooldId={setRefreshPooldId}
-
                 content={content}
                 poolId={content.poolId}
                 stakedTokenAddr={content.lpTokens}
@@ -139,7 +123,10 @@ const FarmsTable = ({
                 stakeData={content.stakeData}
                 hasUserPosition={content.hasUserPosition}
                 refreshHarvestHistory={refreshHarvestHistory}
-                
+                searchInput={searchInput}
+                selectedTable={selectedTable}
+                tokenFilter={tokenFilter}
+                // refreshPool={refreshPool}
               />
             );
           })}
@@ -160,20 +147,23 @@ const FarmsTable = ({
             isMyFarms={isMyFarms}
             hideArrow
             harvestHistory={harvestAcy}
-            setRefreshPooldId={setRefreshPooldId}
             refreshHarvestHistory={refreshHarvestHistory}
+            searchInput={searchInput}
+            selectedTable={selectedTable}
+            tokenFilter={tokenFilter}
+            dao={!hideDao}
           />
           <div>
             <div className={styles.stakeSectionMain}>
               <DaoChart
                 activeGraphId={myChartId}
-                activeGraphData={myChartData}
+                activeGraphData={getMyChart()}
                 selectTopChart={selectTopChart}
                 selection={['My ACY', 'My Reward']}
               />
               <DaoChart
                 activeGraphId={totalChartId}
-                activeGraphData={totalChartData}
+                activeGraphData={getTotalChart()}
                 selectTopChart={selectTopChart}
                 selection={['Total ACY', 'Total Reward']}
               />
