@@ -461,6 +461,12 @@ const AddLiquidityComponent = props => {
             ).then(res => {
               console.log("add to server return: ", res);
 
+              // refresh the table
+              dispatch({
+                type: "liquidity/setRefreshTable",
+                payload: true,
+              });
+
             }).catch(e => console.log("error: ", e));
           }
 
@@ -474,12 +480,6 @@ const AddLiquidityComponent = props => {
                 { hash: status.hash, transactionTime }
               ]
             }
-          });
-
-          // refresh the table
-          dispatch({
-            type: "liquidity/setRefreshTable",
-            payload: true,
           });
 
           // disable button after each transaction on default, enable it after re-entering amount to add
@@ -544,7 +544,7 @@ const AddLiquidityComponent = props => {
                 setExactIn(true);
                 setToken0Amount(e);
               }}
-              isFarm = {isFarm}
+              isFarm={isFarm}
             />
             <div style={{ margin: '12px auto', textAlign: 'center' }}>
               <AcyIcon width={21.5} name="plus_light" />
@@ -566,7 +566,7 @@ const AddLiquidityComponent = props => {
                 setExactIn(false);
                 setToken1Amount(e);
               }}
-              isFarm = {isFarm}
+              isFarm={isFarm}
             />
 
             <AcyDescriptions>
