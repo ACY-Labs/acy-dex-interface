@@ -370,8 +370,7 @@ export async function getEstimated(
         library,
         account
       );
-      console.log('token 0 approved?');
-      console.log(token0approval);
+      console.log('token 0 approved?', token0approval);
 
       if (!token0approval) {
         console.log('Not enough allowance');
@@ -389,8 +388,7 @@ export async function getEstimated(
         library,
         account
       );
-      console.log('token 1 approved?');
-      console.log(token1approval);
+      console.log('token 1 approved?', token1approval);
 
       if (!token1approval) {
         console.log('Not enough allowance for token1');
@@ -428,6 +426,9 @@ export async function getEstimated(
     console.log(parsedToken1Amount.raw);
     console.log('slippage');
     console.log(allowedSlippage);
+    // FIXME: slippage in utils/index calculateSlippageAmount() is represented by a fraction with 10000 as denominator
+    // 0.5% slippage should become 500/10000. We should handle this explicitly. Do it more elegantly in future fix.
+    allowedSlippage = allowedSlippage * 100;
 
     let estimate;
     let method;

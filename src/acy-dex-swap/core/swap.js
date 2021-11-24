@@ -437,8 +437,7 @@ export async function swapGetEstimated(
         account
       );
 
-      console.log(`Current allowance for ${trade.inputAmount.currency.symbol}:`);
-      console.log(allowance);
+      console.log(`Current allowance for ${trade.inputAmount.currency.symbol}: ${allowance}`);
       let token0AmountToApprove = exactIn ? inputAmount.raw.toString() : slippageAdjustedAmount;
       let token0approval = await checkTokenIsApproved(
         inToken0Address,
@@ -456,10 +455,15 @@ export async function swapGetEstimated(
         setSwapButtonState(false);
         setSwapButtonContent('Need approval');
         return 'approve is ok';
+      } else {
+        setNeedApprove(false);
       }
       setSwapButtonContent('Swap');
       setSwapButtonState(true);
       return 'swap is ok';
+    } else {
+      console.log("ETH does not need approve")
+      setNeedApprove(false);
     }
     setSwapButtonContent('Swap');
     setSwapButtonState(true);
