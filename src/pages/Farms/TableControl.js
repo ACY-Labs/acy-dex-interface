@@ -22,12 +22,13 @@ const useStyles = makeStyles({
 
 
 
-const TableControl = ({ searchInput, setSearchInput, isMyFarms, setIsMyFarms }) => {
+const TableControl = ({ searchInput, setSearchInput, isMyFarms, setIsMyFarms, walletConnected }) => {
   const isMobile = window.innerWidth <= 768
   const classes = useStyles();
   return (
     <div className={styles.tableHeaderButtonContainer}>
-      <div className={styles.tableHeaderRadioButtonContainer}>
+      { walletConnected && (
+        <div className={styles.tableHeaderRadioButtonContainer}>
         <Switch name="checkedA"  size="small"  id="stake-switch" onChange={(e) => setIsMyFarms(e.target.checked)} checked={isMyFarms} 
          classes={{
           root: classes.root,
@@ -38,7 +39,8 @@ const TableControl = ({ searchInput, setSearchInput, isMyFarms, setIsMyFarms }) 
         }}/>
         <label style={{ color: isMyFarms?"#eb5c20":""}} htmlFor="stake-switch" >My Farms</label>
       </div>
-
+      )}
+      
       <div className={styles.tableHeaderSearchInputContainer}>
         <input
           type="text"

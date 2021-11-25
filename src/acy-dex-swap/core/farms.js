@@ -17,7 +17,8 @@ import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import Eth from "web3-eth";
 import Utils from "web3-utils";
 import { Icon } from 'antd';
-
+import { Web3Provider } from "@ethersproject/providers";
+import { injected } from '@/connectors';
 
 const ACY_TOKEN  = "0x0200000000000000000000000000000000000000000000000000000000000000";
 const USDC_TOKEN = "0x0100000000000000000000000000000000000000000000000000000000000000";
@@ -34,17 +35,7 @@ const getTokenDecimal = async (address, library, account) => {
   return tokenContract.decimals();
 };
 
-const getPoolTotalReward = async (
-  rewardTokens,
-  rewardTokensAddresses,
-  userPositions,
-  farmContract,
-  poolIndex,
-  library,
-  account
-) => {
 
-}
 
 const getPoolTotalPendingReward = async (
   rewardTokens,
@@ -264,7 +255,10 @@ const getPool = async (library, account, poolId)=> {
               lpAmount: formatUnits(x.lpAmount,18),
               dueDate: dueDate,
               positionId: userPositions[j],
-              reward: rewards[j],
+              reward: rewardTokensSymbols.map((token, index) => ({
+                token,
+                amount: rewards[j][index],
+              })),
               remaining: days.toString() + 'd:' + hrs.toString() + 'h:' + min.toString() +'m',
               locked: diff>0
             }
@@ -293,6 +287,28 @@ const getPool = async (library, account, poolId)=> {
     stakeData: stakeData
   };
 }
+
+// const getAllPools = async () => {
+//   var Contract = require('web3-eth-contract');
+//   Contract.setProvider('https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
+//   var eth = new Eth('https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
+//   const farmContract = new Contract(FarmsABI,FARMS_ADDRESS);
+//   const numPoolHex = await farmContract.methods.numPools().call();
+//   const numPool = numPoolHex.toNumber();
+//   const poolInfoRequests = [];
+//   for (let i = 0; i < numPool; i++) {
+//     poolInfoRequests.push(
+//       (async () => {
+//         const poolInfo = await contract.poolInfo(i).call();
+//         const rewardTokens = await contract.getPoolRewardTokens(i).call();
+//         const rewardTokensAddresses = await contract.getPoolRewardTokenAddresses(i).get();
+
+
+//       })()
+//     );
+//   }
+
+// };
 const getAllPools = async (library, account) => {
   const contract = getFarmsContract(library, account);
   const numPoolHex = await contract.numPools();
@@ -356,7 +372,6 @@ const getAllPools = async (library, account) => {
           allTokenTotalRewardAmount = PendingReward[0];
           rewards = PendingReward[1];
           stakeData = [];
-  
           if(userPositions.length > 0)
           {
             for(var j=0; j != userPositions.length; j++)
@@ -382,7 +397,10 @@ const getAllPools = async (library, account) => {
                     lpAmount: formatUnits(x.lpAmount,18),
                     dueDate: dueDate,
                     positionId: userPositions[j],
-                    reward: rewards[j],
+                    reward: rewardTokensSymbols.map((token, index) => ({
+                      token,
+                      amount: rewards[j][index],
+                    })),
                     remaining: days.toString() + 'd:' + hrs.toString() + 'h:' + min.toString() +'m',
                     locked: diff>0
                   }
@@ -574,20 +592,25 @@ const getDateYDM = (date) => {
   return date.getFullYear(date)  + "-" + ("0"+(date.getMonth(date)+1)).slice(-2) + "-" + ("0" + date.getDate(date)).slice(-2)
 }
 
-const getHarvestHistory = async (account = null) => {
+const getHarvestHistory = async (library,account = null) => {
   
   //init date
-  var Contract = require('web3-eth-contract');
-  Contract.setProvider('https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
+  // var Contract = require('web3-eth-contract');
+  // Contract.setProvider('https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
   var eth = new Eth('https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
-  const farmContract = new Contract(FarmsABI,FARMS_ADDRESS);
+  // const farmContract = new Contract(FarmsABI,FARMS_ADDRESS);
+  // console.log(await farmContract.methods.numPools().call());
 
-  const result = await farmContract.getPastEvents("Harvest", {
-    fromBlock: 0 ,
-    toBlock: 'latest'
-  }, function(error, events){ console.log(events); })
-  .then(async function(events){
+    //test 
+  // const library = new Web3Provider(eth.givenProvider);
+  const farmContract = getFarmsContract(library, account);
+  // console.log('farmContract2:',await farmContract2.numPools());
+  // farmContract2.queryFilter("Harvest", 0).then(function(events)  {console.log(events)});
 
+  const result = await farmContract.queryFilter("Harvest", 0, 
+  // function(error, events){ console.log(events); }
+  ).then(async function(events){
+    console.log(events);
     var date = new Date();
     var today = new Date(date);
     const date_array = {};
@@ -614,20 +637,20 @@ const getHarvestHistory = async (account = null) => {
       const str_date = getDateYDM(date);
       if(date_array.hasOwnProperty(str_date)){
         var value = 0;
-        if(events[i]['returnValues']['token'] == USDC_TOKEN || events[i]['returnValues']['token'] == USDT_TOKEN) {
-          value =  events[i]['returnValues']['amount']/1e6;
-        } else if(events[i]['returnValues']['token'] == ACY_TOKEN) {
-          value =  events[i]['returnValues']['amount']/1e18;
+        if(events[i]['args']['token'] == USDC_TOKEN || events[i]['args']['token'] == USDT_TOKEN) {
+          value =  events[i]['args']['amount']/1e6;
+        } else if(events[i]['args']['token'] == ACY_TOKEN) {
+          value =  events[i]['args']['amount']/1e18;
           total_acy[str_date] += value;
         }
         total_all[str_date] += value;
-        if(events[i]['returnValues']['user'] == account){
+        if(events[i]['args']['user'] == account){
           my_all[str_date] += value;
-          if(events[i]['returnValues']['token'] == ACY_TOKEN) {
+          if(events[i]['args']['token'] == ACY_TOKEN) {
             my_acy[str_date] += value;
           }
         }
-        date_array[str_date] += events[i]['returnValues']['amount']/1e18;
+        date_array[str_date] += events[i]['args']['amount']/1e18;
       } else {
         break;
       }
@@ -711,5 +734,5 @@ export {
   approveLpToken, 
   getPool, 
   getPoolAccmulateReward, 
-  checkTokenIsApproved }
-  ;
+  checkTokenIsApproved 
+};

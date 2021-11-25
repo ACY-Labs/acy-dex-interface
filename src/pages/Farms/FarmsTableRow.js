@@ -14,6 +14,7 @@ import moment from 'moment';
 import classNames from 'classnames';
 import { getPool, getPoolAccmulateReward} from '@/acy-dex-swap/core/farms';
 import supportedTokens from '@/constants/TokenList';
+import StakeRow from './StakeRow';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
   const handleInputChange = (e) => {
@@ -49,9 +50,7 @@ const FarmsTableRow = props => {
   const {
     index,
     lpTokens,
-    
     rowClickHandler,
-    
     walletConnected,
     connectWallet,
     hideArrow = false,
@@ -61,7 +60,6 @@ const FarmsTableRow = props => {
     isMyFarms,
     harvestHistory,
     dispatch,
-    setRefreshPooldId,
     content,
     poolId,
     stakedTokenAddr,
@@ -76,11 +74,13 @@ const FarmsTableRow = props => {
     stakeData,
     hasUserPosition,
     refreshHarvestHistory,
+    searchInput,
+    selectedTable,
+    tokenFilter,
+    dao
   } = props;
 
   const [poolInfo, setPoolInfo] = useState(content);
-  const [statePendingReward, setStatePendingReward] = useState(pendingReward);
-  const [stateStakeData, setStateStakeData] = useState(stakeData);
   const [hidden, setHidden] = useState(true);
 
   const [balance, setBalance] = useState(12345);
@@ -95,7 +95,6 @@ const FarmsTableRow = props => {
   const hideWithdrawModal = () => setWithdrawModal(false);
   const showWithdrawModal = () => setWithdrawModal(true);
   const [selectedRowData, setSelectedRowData] = useState(null);
-  const [selectedRowIndex, setSelectedRowIndex] = useState(0);
 
   const [harvestModal,setHarvestModal] = useState(false);
   const [harvestButtonText, setHarvestButtonText] = useState('Harvest');
@@ -112,7 +111,6 @@ const FarmsTableRow = props => {
   const [withdrawButtonStatus,setWithdrawButtonStatus] = useState(true);
   const [percent,setPercent] = useState(50);
   const [withdrawAmount, setWithdrawAmount] = useState(0);
-
   
 
   const ACY_LOGO = "https://acy.finance/static/media/logo.78c0179c.svg";
@@ -126,18 +124,11 @@ const FarmsTableRow = props => {
     }
     return 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg';
   }
-
   useEffect(
     () => {
-      setStatePendingReward(pendingReward);
+      setPoolInfo(content);
     },
-    [pendingReward]
-  );
-  useEffect(
-    () => {
-      setStateStakeData(stakeData);
-    },
-    [stakeData]
+    [content]
   );
   
 
@@ -175,11 +166,6 @@ const FarmsTableRow = props => {
   );
   
   let history = useHistory();
-  
-  const refreshStakeData = async () => {
-    const newPool = await getPool(library, account, poolId);
-    setStateStakeData(newPool.stakeData);
-  };
 
   const refreshPoolInfo = async () => {
     console.log('refresh pool info:');
@@ -191,9 +177,9 @@ const FarmsTableRow = props => {
       token1Logo: getLogoURIWithSymbol(newPool.token0Symbol),
       token2: newPool.token1Symbol,
       token2Logo: getLogoURIWithSymbol(newPool.token1Symbol),
-      pendingReward: newPool.rewardTokensSymbols.map((token, index) => ({
+      pendingReward: newPool.rewardTokensSymbols.map((token, idx) => ({
         token,
-        amount: newPool.rewardTokensAmount[index],
+        amount: newPool.rewardTokensAmount[idx],
       })),
       totalApr: 89.02,
       tvl: 144542966,
@@ -265,8 +251,8 @@ const FarmsTableRow = props => {
 
           //   }).catch(e => console.log("error: ", e));
           // }
-          await refreshPoolInfo();
-          await refreshHarvestHistory();
+          await refreshPool(poolInfo.poolId,poolInfo.index);
+          await refreshHarvestHistory(library, account);
           // clear top right loading spin
           const newData = transactions.filter(item => item.hash != status.hash);
           dispatch({
@@ -375,9 +361,42 @@ const FarmsTableRow = props => {
     // const sti = setInterval(, 500);
     checkStatusAndFinish();
   };
+  const searchFilter = () => {
+    if(token1.toLowerCase().includes(searchInput.toLowerCase()) || token2.toLowerCase().includes(searchInput.toLowerCase())) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const tableFilter = () => {
+    if(selectedTable === 0) {
+      return true;
+    } else if(selectedTable === 1) {
+      return (poolInfo.pendingReward.length === 1 && poolInfo.pendingReward[0].token) === "ACY"
+    } else if(selectedTable === 2) {
+      const table4 = poolInfo.pendingReward.length !== 1  ||
+        (poolInfo.pendingReward.length === 1 && poolInfo.pendingReward[0].token) !== "ACY"
+      if(tokenFilter) {
+        let isBtcEth = false;
+        poolInfo.pendingReward.forEach(({ token }) => {
+          if (token === 'BTC' || token === 'ETH' || token === 'USDC' || token === 'USDT') {
+            isBtcEth = true;
+          }
+        });
+        return isBtcEth && table4;
+      }
+      return table4;
+    }
+  }
+
+  const getFilter = () =>{
+    if(dao) return false;
+    return !tableFilter() || !searchFilter();
+  }
 
   return ( poolInfo && (!isMyFarms || poolInfo.hasUserPosition) && (
-    <div className={styles.tableBodyRowContainer}>
+    <div className={styles.tableBodyRowContainer} hidden={getFilter()}>
       {/* Table Content */}
       <div className={styles.tableBodyRowContentContainer} onClick={()=> setHidden(prevState => !prevState)}>
         {/* Token Title Row */}
@@ -415,7 +434,7 @@ const FarmsTableRow = props => {
           </div>
           {poolInfo.pendingReward && poolInfo.pendingReward.map((reward,idx) => (
             <div className={styles.pendingReward1ContentContainer}>
-              {`${reward.amount?reward.amount:0} ${reward.token}`}
+              {`${reward.amount?reward.amount.slice(0,8):0} ${reward.token}`}
             </div>
           ))}
         </div>
@@ -498,11 +517,24 @@ const FarmsTableRow = props => {
           </div>
         </div>
       )}
-      { isMyFarms && poolInfo.stakeData && poolInfo.stakeData.map((data,id) => {
+      { poolInfo.stakeData && poolInfo.stakeData.map((data,id) => {
         return (
-          <div className={styles.tableBodyDrawerContainer} hidden={hidden}>
-          {/* Farm Column */}
-            { id == Math.ceil(poolInfo.stakeData.length/2) - 1 ? (
+        <div hidden={hidden||!isMyFarms}>
+          {/* Farm Column */}   
+          <StakeRow 
+            data={data}
+            library={library}
+            account={account}
+            harvestHistory={harvestHistory}
+            poolId={poolId}
+            refreshHarvestHistory={refreshHarvestHistory}
+            token1={poolInfo.token1}
+            token1Logo={poolInfo.token1Logo}
+            token2={poolInfo.token2}
+            token2Logo={poolInfo.token2Logo}
+            refreshPoolInfo={refreshPoolInfo}
+          >
+              { id == Math.ceil(poolInfo.stakeData.length/2) - 1 ? (
             <div className={styles.tableBodyDrawerFarmContainer}>
               <div>
                 <div className={styles.tableBodyDrawerWalletTitle}>Start Farming</div>
@@ -531,9 +563,9 @@ const FarmsTableRow = props => {
               <div className={styles.index0tableBodyDrawerFarmContainer}>
                 {/* lp Amount {stakeData[id].lpAmount} */}
               </div>
-            )}          
-          {/* Withdraw */}
-          <div className={styles.tableBodyDrawerWithdrawContainer}>
+            )}      
+          </StakeRow>
+          {/* <div className={styles.tableBodyDrawerWithdrawContainer}>
             <div className={styles.tableBodyDrawerWithdrawTitle}>Remaining</div>
             <div className={styles.tableBodyDrawerWithdrawContent}>
               <div className={styles.tableBodyDrawerWithdrawDaysDateContainer}>
@@ -550,7 +582,6 @@ const FarmsTableRow = props => {
                 className={styles.tableBodyDrawerWithdrawButton}
                 onClick={() =>{
                   setSelectedRowData(data);
-                  setSelectedRowIndex(id);
                   setWithdrawModal(true);
                 }}
               >
@@ -558,26 +589,22 @@ const FarmsTableRow = props => {
               </button>
             </div>
           </div>
-          {/* Harvest Reward Column */}
           <div className={styles.tableBodyDrawerWithdrawContainer}>
             <div className={styles.tableBodyDrawerWithdrawTitle}>Pending Reward</div>
             <div className={styles.tableBodyDrawerWithdrawContent}>
               <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
-                {poolInfo.pendingReward && poolInfo.pendingReward.map((reward,idx) => (
+                {data.reward.map((reward,idx) => (
                   <div className={styles.tableBodyDrawerWithdrawDateContainer}>
-                    {`${data.reward[idx]} ${reward.token}`}
+                    {`${reward.amount} ${reward.token}`}
                   </div>
                 ))}
               </div>
               <button
                 type="button"
-                // className={styles.tableBodyDrawerWithdrawButton}
                 className={styles.tableBodyDrawerWithdrawButton}
                 style={isHarvestDisabled ? { cursor: 'not-allowed' } : {}}
-                // onClick={() => harvest(poolId, data.positionId, library, account)}
                 onClick={async () => {
                   setSelectedRowData(data);
-                  setSelectedRowIndex(id)
                   showHarvestModal();
                 }}
                 disabled={isHarvestDisabled}
@@ -585,7 +612,7 @@ const FarmsTableRow = props => {
                 Harvest
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
         );
       })}
@@ -608,19 +635,18 @@ const FarmsTableRow = props => {
           
           <div className={styles.withdrawDetailContainer}>
             Rewards:
-            {poolInfo.pendingReward && poolInfo.pendingReward.map((reward,idx) => (
+            {selectedRowData && selectedRowData.reward.map((reward,idx) => (
               <div className={styles.withdrawDetailContainer2}>
                 <div className={styles.amountContainer}>
-                  {selectedRowData?selectedRowData.reward[idx]:null}
+                  {reward.amount}
                 </div>
                 <div className={styles.tokenContainer}>
                   <div className={styles.tokenLogoContainer}>
-                    {
-                      reward.token == "ACY" ? (
+                    { reward.token == "ACY" ? (
                         <img src={ACY_LOGO}/>
                       ) : (
                         <img src={'https://storageapi.fleek.co/chwizdo-team-bucket/ACY%20Token%20List/'+reward.token+'.svg'}/>
-                      ) 
+                      )
                     }
                   </div>
                   <div className={styles.token}>

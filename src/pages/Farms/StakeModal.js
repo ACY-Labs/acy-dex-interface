@@ -270,11 +270,18 @@ const StakeModal = props => {
         <div className={styles.amountRowInputContainer}>
           <input type="text" value={showStake} onChange={e => updateStake(e.target.value)} />
         </div>
-        <span className={styles.suffix}>{token1}-{token2} LP</span>
+        <span className={styles.suffix}>
+          {token1 && token2 && `${token1}-${token2} LP`}
+          {token1 && !token2 && `${token1}s`}
+          {token2 && !token1 && `${token2}s`}
+        </span>
       </div>
       <div className={styles.balanceAmountContainer}>
         <div className={styles.balanceAmount}>
-          Balance: {(parseFloat(balance)).toFixed(6)} {token1}-{token2} LP
+          Balance: {(parseFloat(balance)).toFixed(6)} 
+          {token1 && token2 && ` ${token1}-${token2} LP`}
+          {token1 && !token2 && ` ${token1}s`}
+          {token2 && !token1 && ` ${token2}s`}
         </div>
         <div className={styles.balanceAmountInputContainer}>
           <input
