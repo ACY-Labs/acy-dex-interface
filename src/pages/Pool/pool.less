@@ -5,7 +5,6 @@
 
 .Container {
 
-    color: wheat;
     width: 100%;
     padding-right: 15px;
     padding-left: 15px;
@@ -13,6 +12,8 @@
     margin-left: auto;
     padding: 15px;
     margin-bottom: 1.5rem!important;
+
+    max-width: 1160px;
 }
 
 .Selector {
@@ -145,4 +146,126 @@
     flex-wrap: wrap;
     margin-right: -15px;
     margin-left: -15px;
+}
+
+.CardBlock {
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+
+    padding-top: 1.5rem!important;
+    padding-bottom: 1.5rem!important;
+
+    flex: 0 0 33.3333333333%;
+    max-width: 33.3333333333%;
+}
+
+.Card{
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: 1rem;
+
+    transition-property: background-color,border-color,color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter!important;
+    transition-property: background-color,border-color,color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter!important;
+    transition-property: background-color,border-color,color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter!important;
+    transition-timing-function: cubic-bezier(.4,0,.2,1)!important;
+    transition-duration: .15s!important;
+
+    --tw-bg-opacity: 1!important;
+    background-color: rgba(18,17,46,var(--tw-bg-opacity))!important;
+
+    border-color: rgba(82,54,117,var(--tw-border-opacity))!important;
+    overflow: hidden!important;
+    transform: var(--tw-transform)!important;
+    height: 100%!important;
+    position: relative!important;
+
+    :global{
+
+        .ant-card-body{
+            flex: 1 1 auto;
+            min-height: 1px;
+            padding: 1.25rem;
+
+            justify-content: space-between!important;
+            flex-direction: column!important;
+
+            display: flex!important;
+        }
+
+    }
+
+    .CardHead{
+        justify-content: space-between !important;
+        display: flex !important;
+    }
+
+    .CardImg{
+
+        height: 60px;
+        width: 60px!important;
+        vertical-align: middle;
+        border-style: none;
+    }
+
+    .ConnectBar{
+        color: rgba(186,132,255,var(--tw-text-opacity))!important;
+        --tw-text-opacity: 1!important;
+        font-size: 1.25rem!important;
+        line-height: 1.75rem!important;
+        align-items: center!important;
+        flex-wrap: wrap!important;
+        display: flex !important;
+        z-index: 20!important;
+        position: relative !important;
+
+        // list-style: none;
+        margin-top: 20px;
+        margin-bottom: 50px;
+        // // padding: 0;
+    }
+
+    .Label0{
+        font-weight: 600!important;
+        font-size: 1.25rem!important;
+        line-height: 1.75rem!important;
+    }
+
+    .Label1{
+        color: rgba(163,163,163,var(--tw-text-opacity))!important;
+        --tw-text-opacity: 1!important;
+        line-height: 1!important;
+    }
+}
+
+.smalltext0{
+    font-size: .875rem!important;
+    line-height: 1.25rem!important;
+    opacity: .7!important;
+
+}
+
+.smalltext{
+    font-size: .875rem!important;
+    line-height: 1.25rem!important;
+    opacity: 1;
+    margin-top: 10px;
+
+}
+
+.maintext{
+    color: rgba(186,132,255,var(--tw-text-opacity))!important;
+    --tw-text-opacity: 1!important;
+}
+
+.iconbar{
+    margin: 0.25em;
 }
