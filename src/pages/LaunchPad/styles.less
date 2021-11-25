@@ -34,6 +34,7 @@
     min-height: 0vh;
     max-height: 700px;
     overflow: visible;
+    margin-bottom: 20px;
     padding: 15px;
     position: relative;
 }
@@ -50,9 +51,10 @@
     }
 }
 
+
 .moreInfoContainer{
     width: 60%;
-    min-height: 25vh;
+    min-height: 20vh;
     max-height: 700px;
     border-radius: 0 15px 15px 15px 15px;
     margin-bottom: 20px;
@@ -65,12 +67,12 @@
 .contentStyle{
     display: flex;
     flex-direction: column;
-    min-height: 25vh;   
+    min-height: 10vh;
     max-height: 1500px;
     /* position: relative; */
     /* top: -10vh; */
     /* left: 1vw; */
-    padding: 2vh 0 0 6vh;
+    padding: 20px 0px 0px 75px;
     :global{
         .ant-carousel .slick-dots li button{
             height: 5px;
@@ -80,31 +82,24 @@
             width: 30px !important;
         }
         .ant-carousel .slick-dots-bottom {
-            bottom: -27px;
-        }
-        .ant-carousel .slick-slide {
-            // display: none;
-            // float: left;
-            // height: 100%;
-            min-height: 1px;
-            max-height: 250px;
+            bottom: -25px;
         }
     }
 }
 
-.chartWrapper{
-    height: 20vh;
+ .chartWrapper{
+    height: 30vh;
     max-height: 700px;
     float: right;
     overflow: visible;
     position: relative;
-    top: 3vh;
+    top: 0vh;
 } 
 
 .chartStyle{
-    height: 320px !important;
+    height: 340px !important;
     padding: 0px 0px 0px 0px;
-    margin-top: -53px;
+    margin-top: -6.5vh;
 }
 
 .stepBlock  {
@@ -117,7 +112,7 @@
 }
 .carouselBlock{
     position: relative;
-    min-height: 15vh;
+    min-height: 20vh;
     max-height: 700px;
 }
 
@@ -135,7 +130,7 @@
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
-    padding: 0 2vh 2vh;
+    padding: 0px  27px 40px;
 }
 .countLabelBlock{
     padding: 11px 10px 0px 0px;}
@@ -180,7 +175,7 @@
 .cntdwn{
     justify-content: flex-start;
     display: flex;
-    padding: 0 1.3vh 1.5vh;
+    padding: 0px 18px 40px;
 
 }
 
@@ -256,7 +251,7 @@
     width: 100%;
     flex-basis: 30px;
     padding: 0px 10px 0px;
-    display: inline-flex;
+    display: flex;
     :global{
     .ant-steps-item-title{
         color: #b5b5b6  !important;
@@ -726,7 +721,7 @@
             text-align: center !important;
             // background:  transparent !important;
             background-color: transparent;
-            border-bottom: 2px solid #b5b5b6 !important;
+            text-decoration: underline;
         }
         .ant-table-footer{
         background:  transparent !important;
@@ -823,9 +818,9 @@
 
 .themeBox{
     width: 32px;
-    color: #c6224e !important;
+    color: #c6224e;
     height: 21px;
-    display: flex !important;
+    display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
@@ -840,29 +835,6 @@
 
 #nextPage:hover{
     cursor: pointer;
-}
-
-.myCollapse{
-    border: none;
-    border-radius: 0 10px 0 0;
-    box-shadow: none;  
-    background-color: #cccfd8;
-    :global{
-        .ant-collapse-content {
-            background-color: #cccfd8;
-            color: #000000;
-        }
-        .ant-collapse-header {
-            background-color: #cccfd8;
-            padding: 9px 16px !important;
-            padding-right: 40px;
-            color: #000000;
-            border-top-right-radius: 10px;
-        }
-        .ant-collapse-item{
-            border-bottom: 1px solid #000;
-        }
-    }
 }
 
 .twitterbtn {
@@ -887,12 +859,6 @@
 .twitterbtn:hover{
     color: #fff;
     filter: brightness(85%);
-}
-
-.taskBtn:hover{
-    color: #fff;
-    filter: brightness(85%);
-    border-color: transparent;
 }
 
 //tan
@@ -1076,12 +1042,13 @@
 
 .transferTable{
     width: inherit;
-    //height: 18.5vh;
-    overflow: hidden;
+    height: 250px;
+    position: relative;
     :global{
         .ant-table-wrapper{
             height: 100%;
         }
+     
         .ant-table-placeholder{
             background: transparent !important;
         }
@@ -1106,6 +1073,10 @@
             &:active{
                 background: #2f3135 !important;
         }
+        .ant-table{
+            line-height: 2.5;
+        }
+      
     }
     // background-color: #862e2e;
     // background: transparent !important;
@@ -1127,15 +1098,13 @@
         }
     }
 }
-
-//mobile screen responsive
 @media screen and (min-width: 1060px) {
     .moreInfoContainer{
         min-width: 60%;
         max-width: 100%;
     }
 }
-
+//mobile screen responsive
 @media screen and (max-width: 1060px) {
     .midContainer {
         flex-direction: row;
@@ -1150,7 +1119,6 @@
     }
     .contentStyle{
         max-width: 100%;
-        padding: 0;
     }
     .stepBlock{
         flex-direction:column;
@@ -1158,25 +1126,14 @@
     }
     .stepColor{
         left: 5rem;
-        width: fit-content;
-        padding-top: 2vh;
-        :global{
-            .ant-steps-label-vertical .ant-steps-item{
-                padding: 0.5vh;
-            }
-        }
-    }
-    .labelBlock{
-        margin-left: 0.6vh;
-    }
-    .countDown{
-        padding-top: 2vh;
+        flex-direction: column;
     }
     .chartWrapper{
-        height: 30vh;
+        top: -2.5vh;
+        height: 45vh;
     }
     .transferTable{
-        height: 35vh;
+        height: 45vh;
         overflow: auto;
         :global{
             .ant-table-wrapper{
