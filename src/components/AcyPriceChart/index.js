@@ -175,9 +175,9 @@ const AcyPriceChart = (props) => {
         },
       ],
       grid: {
-        // left: 0,
+        left: 0,
         right: 10,
-        // top: 0,
+        top: 10,
         // bottom: 0,
       }
     };
@@ -197,7 +197,10 @@ const AcyPriceChart = (props) => {
 
     return (
       <ReactEcharts
-        style={{ height: '100%', marginLeft: "-40px" }}
+        style={{
+          height: '100%',
+          // marginLeft: "-40px"
+        }}
         option={{}} // it will be override by useEffect
         notMerge
         lazyUpdate={true}

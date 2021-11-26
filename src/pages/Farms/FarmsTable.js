@@ -9,7 +9,6 @@ import { approveTokenWithSpender, disapproveTokenWithSpender } from '@/acy-dex-s
 
 const FarmsTable = ({
   tableRow,
-  onRowClick,
   tableTitle,
   tableSubtitle,
   rowNumber,
@@ -25,46 +24,37 @@ const FarmsTable = ({
   chainId,
   isMyFarms,
   harvestAcy,
+  refreshHarvestHistory,
+  searchInput,
+  // refreshPool
+
 }) => {
   const [myChartId, setMyChartId] = useState(0);
   const [totalChartId, setTotalChartId] = useState(0);
-  const [myChartData, setMyChartData] = useState(harvestAcy.myAcy);
   const [totalChartData, setTotalChartData] = useState(harvestAcy.totalAcy);
 
-  const changeGraphData = (id = 0, chartSetter) => {
-    if (id === 0) chartSetter(graphSampleData);
-    else chartSetter(graphSampleData2);
-  };
-  useEffect(
-    ()=>{
-      console.log('harvestAcy:',harvestAcy);
-      setMyChartData(harvestAcy.myAcy);
-      setTotalChartData(harvestAcy.totalAcy);
-    },[account]
-  )
+  const getMyChart = () => {
+    if(myChartId == 0) return harvestAcy.myAcy;
+    return harvestAcy.myAll;
+  }
+  const getTotalChart = () =>{
+    if(totalChartId==0) return harvestAcy.totalAcy;
+    return harvestAcy.totalAll
+  }
 
   const selectTopChart = pt => {
     const functionDict = {
       'My ACY': () => {
-        changeGraphData(0, setMyChartData);
         setMyChartId(0);
-        setMyChartData(harvestAcy.myAcy);
       },
       'My Reward': () => {
-        changeGraphData(1, setMyChartData);
         setMyChartId(1);
-        setMyChartData(harvestAcy.myAll);
       },
       'Total ACY': () => {
-        changeGraphData(0, setTotalChartData);
         setTotalChartId(0);
-        setTotalChartData(harvestAcy.totalAcy);
-
       },
       'Total Reward': () => {
-        changeGraphData(1, setTotalChartData);
         setTotalChartId(1);
-        setTotalChartData(harvestAcy.totalAll);
       },
     };
     functionDict[pt]();
@@ -83,6 +73,16 @@ const FarmsTable = ({
   //   },
   //   [library, account]
   // );
+  const daoContent = {
+    token1:"ACY",
+    token1Logo:AcyIcon,
+    token2: null,
+    token2Logo:null,
+    totalApr:"12345",
+    tvl:'12345',
+    pendingReward:[{ token: 'ACY', amount: 0 }],
+    hasUserPosition:true,
+  }
 
   return (
     <div className={styles.tableContainer}>
@@ -100,6 +100,15 @@ const FarmsTable = ({
               <FarmsTableRow
                 key={index}
                 index={index}
+                walletConnected={walletConnected}
+                connectWallet={connectWallet}
+                selectedTable={selectedTable}
+                account={account}
+                library={library}
+                chainId={chainId}
+                isMyFarms={isMyFarms}
+                harvestHistory={harvestAcy}
+                content={content}
                 poolId={content.poolId}
                 stakedTokenAddr={content.lpTokens}
                 token1={content.token1}
@@ -109,18 +118,15 @@ const FarmsTable = ({
                 totalApr={content.totalApr}
                 tvl={content.tvl}
                 hidden={content.hidden}
-                rowClickHandler={() => onRowClick(index)}
                 pendingReward={content.pendingReward}
-                walletConnected={walletConnected}
-                connectWallet={connectWallet}
-                selectedTable={selectedTable}
-                account={account}
-                library={library}
-                chainId={chainId}
-                isMyFarms={isMyFarms}
                 userRewards={content.userRewards}
                 stakeData={content.stakeData}
-                harvestHistory={harvestAcy}
+                hasUserPosition={content.hasUserPosition}
+                refreshHarvestHistory={refreshHarvestHistory}
+                searchInput={searchInput}
+                selectedTable={selectedTable}
+                tokenFilter={tokenFilter}
+                // refreshPool={refreshPool}
               />
             );
           })}
@@ -128,31 +134,36 @@ const FarmsTable = ({
       ) : (
         <div className={styles.tableBodyContainer}>
           <FarmsTableRow
+            content={daoContent}
             token1="ACY"
             token1Logo={AcyIcon}
             token2={null}
             token2Logo={null}
             totalApr="12345"
             tvl="12345"
-            hidden={false}
             pendingReward={[{ token: 'ACY', amount: 0 }]}
             walletConnected={walletConnected}
             connectWallet={connectWallet}
             isMyFarms={isMyFarms}
             hideArrow
             harvestHistory={harvestAcy}
+            refreshHarvestHistory={refreshHarvestHistory}
+            searchInput={searchInput}
+            selectedTable={selectedTable}
+            tokenFilter={tokenFilter}
+            dao={!hideDao}
           />
           <div>
             <div className={styles.stakeSectionMain}>
               <DaoChart
                 activeGraphId={myChartId}
-                activeGraphData={myChartData}
+                activeGraphData={getMyChart()}
                 selectTopChart={selectTopChart}
                 selection={['My ACY', 'My Reward']}
               />
               <DaoChart
                 activeGraphId={totalChartId}
-                activeGraphData={totalChartData}
+                activeGraphData={getTotalChart()}
                 selectTopChart={selectTopChart}
                 selection={['Total ACY', 'Total Reward']}
               />
@@ -163,7 +174,7 @@ const FarmsTable = ({
       <div
         className={styles.tableFooterContainer}
         onClick={() => setRowNumber(rowNumber + 5)}
-        hidden={!hideDao}
+        hidden={!hideDao || rowNumber > tableRow.length}
       >
         More
       </div>

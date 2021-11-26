@@ -47,10 +47,10 @@ const FarmsTableHeader = ({ tableTitle, tableSubtitle, selectedTable, tokenFilte
             <Switch name="checkedA"  size="small"  id="stake-switch" 
               onChange={(e) => {
                 console.log(e.target.checked);
-                setTokenFilter({...tokenFilter, btcEthToken: e.target.checked});
+                setTokenFilter(e.target.checked);
                 // setIsMyFarms(e.target.checked)
               }}
-              checked={tokenFilter.btcEthToken} 
+              checked={tokenFilter} 
               classes={{
                 root: classes.root,
                 switchBase: classes.switchBase,

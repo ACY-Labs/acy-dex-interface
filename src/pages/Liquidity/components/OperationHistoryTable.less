@@ -25,6 +25,18 @@
   }
 }
 
+.tableData {
+  text-align: right;
+}
+.tableDataFirstColumn {
+  text-align: left;
+  align-items: center;
+}
+.tableHeader,
+.tableHeaderFirst {
+  cursor: pointer;
+}
+
 .nobgTable{
   :global{
     .ant-table-placeholder{
@@ -41,7 +53,7 @@
       background:  transparent !important;
     }
     .ant-table-thead > tr > th:not(.leftAlignTableHeader){
-      text-align: left !important;
+      text-align: right;
       background:  transparent !important;
     }
     .ant-table-footer{

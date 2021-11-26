@@ -83,22 +83,22 @@ import moment from 'moment';
 const { AcyTabPane } = AcyTabs;
 
 const AddLiquidityComponent = props => {
-  const { dispatch, token, onLoggedIn } = props;
+  const { dispatch, token, onLoggedIn, isFarm = false } = props;
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
   // 选择货币前置和后置
   const [before, setBefore] = useState(true);
 
-  
+
   let token0pass = INITIAL_TOKEN_LIST[0];
   let token1pass = INITIAL_TOKEN_LIST[1];
 
   // Check if token is passed from Farm
-  for(var i = 0; i<INITIAL_TOKEN_LIST.length; i++){
-    if(INITIAL_TOKEN_LIST[i].symbol == token?.token1){
+  for (var i = 0; i < INITIAL_TOKEN_LIST.length; i++) {
+    if (INITIAL_TOKEN_LIST[i].symbol == token?.token1) {
       token0pass = INITIAL_TOKEN_LIST[i];
     }
-    if(INITIAL_TOKEN_LIST[i].symbol == token?.token2){
+    if (INITIAL_TOKEN_LIST[i].symbol == token?.token2) {
       token1pass = INITIAL_TOKEN_LIST[i];
     }
   }
@@ -461,6 +461,12 @@ const AddLiquidityComponent = props => {
             ).then(res => {
               console.log("add to server return: ", res);
 
+              // refresh the table
+              dispatch({
+                type: "liquidity/setRefreshTable",
+                payload: true,
+              });
+
             }).catch(e => console.log("error: ", e));
           }
 
@@ -474,12 +480,6 @@ const AddLiquidityComponent = props => {
                 { hash: status.hash, transactionTime }
               ]
             }
-          });
-
-          // refresh the table
-          dispatch({
-            type: "liquidity/setRefreshTable",
-            payload: true,
           });
 
           // disable button after each transaction on default, enable it after re-entering amount to add
@@ -544,6 +544,7 @@ const AddLiquidityComponent = props => {
                 setExactIn(true);
                 setToken0Amount(e);
               }}
+              isFarm={isFarm}
             />
             <div style={{ margin: '12px auto', textAlign: 'center' }}>
               <AcyIcon width={21.5} name="plus_light" />
@@ -565,6 +566,7 @@ const AddLiquidityComponent = props => {
                 setExactIn(false);
                 setToken1Amount(e);
               }}
+              isFarm={isFarm}
             />
 
             <AcyDescriptions>
@@ -624,190 +626,198 @@ const AddLiquidityComponent = props => {
                 </>
               )}
             </AcyDescriptions>
+            <div>
 
-            {/* {approveToken0ButtonShow == true && (
-        <div>
-          <AcyButton
-            variant="warning"
-            onClick={async () => {
-              setShowSpinner0(true);
-              setNeedApproveToken0(false);
-              let state = await approve(token0.address, approveAmountToken0, library, account);
-              setNeedApproveToken0(true);
-              setShowSpinner0(false);
+              <div style={{ display: "flex" }}>
+                {(approveToken1ButtonShow || approveToken0ButtonShow) ?
+                  (
+                    <>
+                      <AcyButton
+                        variant="warning"
+                        onClick={async () => {
+                          setShowSpinner0(true);
+                          setNeedApproveToken0(false);
+                          let state = await approve(token0.address, approveAmountToken0, library, account);
+                          setNeedApproveToken0(true);
+                          setShowSpinner0(false);
 
-              if (state == true) {
-                setNeedApproveToken0(false);
+                          if (state == true) {
+                            setNeedApproveToken0(false);
 
-                await getEstimated(
-                  {
-                    ...token0,
-                    amount: token0Amount,
-                  },
-                  {
-                    ...token1,
-                    amount: token1Amount,
-                  },
-                  slippageTolerance * 100,
-                  exactIn,
-                  chainId,
-                  library,
-                  account,
-                  setToken0Amount,
-                  setToken1Amount,
-                  setNeedApproveToken0,
-                  setNeedApproveToken1,
-                  setApproveAmountToken0,
-                  setApproveAmountToken1,
-                  setApproveToken0ButtonShow,
-                  setApproveToken1ButtonShow,
-                  setLiquidityBreakdown,
-                  setButtonContent,
-                  setButtonStatus,
-                  setLiquidityStatus,
-                  setPair,
-                  setNoLiquidity,
-                  setPairToAddOnServer,
-                  setParsedToken0Amount,
-                  setParsedToken1Amount,
-                  setArgs,
-                  setValue
-                );
+                            await getEstimated(
+                              {
+                                ...token0,
+                                amount: token0Amount,
+                              },
+                              {
+                                ...token1,
+                                amount: token1Amount,
+                              },
+                              slippageTolerance * 100,
+                              exactIn,
+                              chainId,
+                              library,
+                              account,
+                              setToken0Amount,
+                              setToken1Amount,
+                              setNeedApproveToken0,
+                              setNeedApproveToken1,
+                              setApproveAmountToken0,
+                              setApproveAmountToken1,
+                              setApproveToken0ButtonShow,
+                              setApproveToken1ButtonShow,
+                              setLiquidityBreakdown,
+                              setButtonContent,
+                              setButtonStatus,
+                              setLiquidityStatus,
+                              setPair,
+                              setNoLiquidity,
+                              setPairToAddOnServer,
+                              setParsedToken0Amount,
+                              setParsedToken1Amount,
+                              setArgs,
+                              setValue
+                            );
 
-                if (needApproveToken1 == false) {
-                  if (!noLiquidity) setButtonContent('Add liquidity');
-                  else setButtonStatus('Create new pool');
-                  setButtonStatus(true);
+                            if (needApproveToken1 == false) {
+                              if (!noLiquidity) setButtonContent('Add liquidity');
+                              else setButtonStatus('Create new pool');
+                              setButtonStatus(true);
+                            }
+                          }
+                        }}
+                        disabled={!needApproveToken0}
+                      >
+                        Approve {token0 && token0.symbol}
+                        {showSpinner0 && (
+                          <img
+                            style={{ width: 30, height: 30, marginLeft: '1%' }}
+                            src={spinner}
+                            className={styles.spinner}
+                            alt="spinner"
+                          />
+                        )}
+                      </AcyButton>
+
+                      <div style={{ width: "1rem" }} />
+
+                      <AcyButton
+                        variant="warning"
+                        onClick={async () => {
+                          setShowSpinner1(true);
+                          setNeedApproveToken1(false);
+                          let state = await approve(token1.address, approveAmountToken1, library, account);
+                          setNeedApproveToken1(true);
+                          setShowSpinner1(false);
+
+                          if (state == true) {
+                            setNeedApproveToken1(false);
+                            await getEstimated(
+                              {
+                                ...token0,
+                                amount: token0Amount,
+                              },
+                              {
+                                ...token1,
+                                amount: token1Amount,
+                              },
+                              slippageTolerance,
+                              exactIn,
+                              chainId,
+                              library,
+                              account,
+                              setToken0Amount,
+                              setToken1Amount,
+                              setNeedApproveToken0,
+                              setNeedApproveToken1,
+                              setApproveAmountToken0,
+                              setApproveAmountToken1,
+                              setApproveToken0ButtonShow,
+                              setApproveToken1ButtonShow,
+                              setLiquidityBreakdown,
+                              setButtonContent,
+                              setButtonStatus,
+                              setLiquidityStatus,
+                              setPair,
+                              setNoLiquidity,
+                              setPairToAddOnServer,
+                              setParsedToken0Amount,
+                              setParsedToken1Amount,
+                              setArgs,
+                              setValue
+                            );
+
+                            if (needApproveToken0 == false) {
+                              if (!noLiquidity) setButtonContent('Add liquidity');
+                              else setButtonStatus('Create new pool');
+                              setButtonStatus(true);
+                            }
+                          }
+                        }}
+                        disabled={!needApproveToken1}
+                      >
+                        Approve {token1 && token1.symbol}
+                        {showSpinner1 && (
+                          <img
+                            style={{ width: 30, height: 30, marginLeft: '1%' }}
+                            src={spinner}
+                            className={styles.spinner}
+                            alt="spinner"
+                          />
+                        )}
+                      </AcyButton>
+                    </>
+                  ) :
+
+                  <AcyButton
+                    variant="success"
+                    disabled={!buttonStatus}
+                    onClick={async () => {
+                      if (account == undefined) {
+                        activate(injected);
+                        setButtonContent('Choose tokens and amount');
+                        setButtonStatus(false);
+                      } else {
+                        setButtonStatus(false);
+                        setButtonContent(<>Processing <Icon type="loading" /></>);
+                        await addLiquidity(
+                          {
+                            ...token0,
+                            amount: token0Amount,
+                          },
+                          {
+                            ...token1,
+                            amount: token1Amount,
+                          },
+                          100 * slippageTolerance,
+                          exactIn,
+                          chainId,
+                          library,
+                          account,
+                          pair,
+                          noLiquidity,
+                          parsedToken0Amount,
+                          parsedToken1Amount,
+                          args,
+                          value,
+                          setLiquidityStatus,
+                          setButtonContent,
+                          addLiquidityCallback
+                        );
+                      }
+                    }}
+                  >
+                    {buttonContent}
+                  </AcyButton>
                 }
-              }
-            }}
-            disabled={!needApproveToken0}
-          >
-            Approve {token0 && token0.symbol}
-            {showSpinner0 && (
-              <img
-                style={{ width: 30, height: 30, marginLeft: '1%' }}
-                src={spinner}
-                className={styles.spinner}
-                alt="spinner"
-              />
-            )}
-          </AcyButton>{' '}
-        </div>
-      )} */}
-            {/* {approveToken1ButtonShow == true && (
-        <div>
-          <AcyButton
-            variant="warning"
-            onClick={async () => {
-              setShowSpinner1(true);
-              setNeedApproveToken1(false);
-              let state = await approve(token1.address, approveAmountToken1, library, account);
-              setNeedApproveToken1(true);
-              setShowSpinner1(false);
 
-              if (state == true) {
-                setNeedApproveToken1(false);
-                await getEstimated(
-                  {
-                    ...token0,
-                    amount: token0Amount,
-                  },
-                  {
-                    ...token1,
-                    amount: token1Amount,
-                  },
-                  slippageTolerance,
-                  exactIn,
-                  chainId,
-                  library,
-                  account,
-                  setToken0Amount,
-                  setToken1Amount,
-                  setNeedApproveToken0,
-                  setNeedApproveToken1,
-                  setApproveAmountToken0,
-                  setApproveAmountToken1,
-                  setApproveToken0ButtonShow,
-                  setApproveToken1ButtonShow,
-                  setLiquidityBreakdown,
-                  setButtonContent,
-                  setButtonStatus,
-                  setLiquidityStatus,
-                  setPair,
-                  setNoLiquidity,
-                  setPairToAddOnServer,
-                  setParsedToken0Amount,
-                  setParsedToken1Amount,
-                  setArgs,
-                  setValue
-                );
+              </div>
 
-                if (needApproveToken0 == false) {
-                  if (!noLiquidity) setButtonContent('Add liquidity');
-                  else setButtonStatus('Create new pool');
-                  setButtonStatus(true);
-                }
-              }
-            }}
-            disabled={!needApproveToken1}
-          >
-            Approve {token1 && token1.symbol}
-            {showSpinner1 && (
-              <img
-                style={{ width: 30, height: 30, marginLeft: '1%' }}
-                src={spinner}
-                className={styles.spinner}
-                alt="spinner"
-              />
-            )}
-          </AcyButton>
-        </div>
-      )} */}
+              <AcyDescriptions>
+                {liquidityStatus && <AcyDescriptions.Item>{liquidityStatus}</AcyDescriptions.Item>}
+              </AcyDescriptions>
 
-            <AcyButton
-              variant="success"
-              disabled={!buttonStatus}
-              onClick={async () => {
-                if (account == undefined) {
-                  activate(injected);
-                  setButtonContent('Choose tokens and amount');
-                  setButtonStatus(false);
-                } else {
-                  setButtonStatus(false);
-                  setButtonContent(<>Processing <Icon type="loading" /></>);
-                  await addLiquidity(
-                    {
-                      ...token0,
-                      amount: token0Amount,
-                    },
-                    {
-                      ...token1,
-                      amount: token1Amount,
-                    },
-                    100 * slippageTolerance,
-                    exactIn,
-                    chainId,
-                    library,
-                    account,
-                    pair,
-                    noLiquidity,
-                    parsedToken0Amount,
-                    parsedToken1Amount,
-                    args,
-                    value,
-                    setLiquidityStatus,
-                    setButtonContent,
-                    addLiquidityCallback
-                  );
-                }
-              }}
-            >
-              {buttonContent}
-            </AcyButton>
-            <AcyDescriptions>
-              {liquidityStatus && <AcyDescriptions.Item>{liquidityStatus}</AcyDescriptions.Item>}
-            </AcyDescriptions>
+            </div>
 
             <AcyModal onCancel={onCancel} width={400} visible={visible}>
               <div className={styles.title}>Select a token</div>

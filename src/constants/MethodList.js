@@ -20,13 +20,17 @@ export const methodList = {
                 },
 
     addLiquidityEth : {
-        name: 'addLiquidityETH',
-        id: '0xf305d719'
-    },
+                    name: 'addLiquidityETH',
+                    id: '0xf305d719'
+                },
     
     removeLiquidity : {
                     name: 'removeLiquidityWithPermit',
                     id: '0x2195995c'
+                },
+    removeLiquidityETH : {
+                    name : 'removeLiquidityETHWithPermit',
+                    id : '0xded9382a'
                 }
 
 }
@@ -35,6 +39,10 @@ export const actionList = {
     transfer :    {
                     name: 'Transfer',
                     hash: '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+                },
+    sync :     {
+                    name: 'Sync',
+                    hash: '0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1'
                 }
 
 }

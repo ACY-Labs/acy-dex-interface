@@ -61,31 +61,64 @@ const OperationHistoryTable = props => {
         </div>
       ),
       key: 'fromforto',
-      render: record =>`${record.action} ${record.token1Symbol} and ${record.token2Symbol}`
+      render: record => {
+          return <div className={styles.tableDataFirstColumn}>{record.action} {record.token1Symbol} and {record.token2Symbol}</div>;
+      }
     },
     {
-      title: 'Total Value',
+      title: (
+        <div className={styles.tableData}>
+          Total Amount
+        </div>
+      ),
       dataIndex: 'totalToken',
       key: 'totalToken',
-      render: text =><Tooltip title={text}>{text && text.toString().replace(/([0-9]+.[0-9]{2})[0-9]*/,"$1")}</Tooltip>
+      render: (text,record) => {
+        return <div className={styles.tableData}>{text}</div>;
+      }
     },
     {
-      title: 'Token Amount',
+      title: (
+        <div
+          className={styles.tableData}
+        >
+          Token Amount
+        </div>
+      ),
       dataIndex: 'token1Number',
       key: 'inputTokenNum',
-      render: (text,record) =><Tooltip title={text}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.token1Symbol}</Tooltip>
+      render: (text,record) => {
+        return <div className={styles.tableData}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.token1Symbol}</div>;
+      }
     },
     {
-      title: 'Token Amount',
+      title: (
+        <div
+          className={styles.tableData}
+        >
+          Token Amount
+        </div>
+      ),
       dataIndex: 'token2Number',
       key: 'outTokenNum',
-      render: (text,record) =><Tooltip title={text}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.token2Symbol}</Tooltip>
+      render: (text,record) => {
+        return <div className={styles.tableData}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.token2Symbol}</div>;
+      }
     },
     {
-      title: 'Time',
+      title: (
+        <div
+          className={styles.tableData}
+        >
+          Time
+        </div>
+      ),
       dataIndex: 'transactionTime',
-      key: 'transactionTime'
-    },
+      key: 'transactionTime',
+      render: (text,record) => {
+        return <div className={styles.tableData}>{text}</div>;
+      }
+    }
   ]
   const OperationHistoryMobileColumns = [
     {
