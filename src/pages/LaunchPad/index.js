@@ -39,7 +39,6 @@ function getTIMESTAMP(time) {
     return `${year}-${month}-${day}`;
 
   }
-  
 
 const ACY_PRICE = 0.2  // acy per usdc
 
@@ -76,15 +75,13 @@ const LaunchpadComponent = () => {
         var index = price.length-1;
         if(price[index] !== undefined)
         {
-        getTime(price[index][0]).then(function(result){
-            var newElement = [result,price[index][1]];
-            setTimeData( timeData => [...timeData,newElement]);
-        })
+            getTime(price[index][0]).then(function(result){
+                var newElement = [result,price[index][1]];
+                setTimeData( timeData => [...timeData,newElement]);
+            })
         }
-
-
     }
-    ,[price])
+    , [price])
 
     useEffect( async () => {
         // set provider for all later instances to use    

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Collapse, Tooltip, Button, Icon, Row } from 'antd';
 import styled from "styled-components";
-import axios from "axios";
+import InputEmail from "./inputEmail";
 import styles from "./styles.less";
 import userIcon from '@/assets/icon_user.svg';
 import telegramIcon from '@/assets/icon_telegram_black.svg';
@@ -9,6 +9,7 @@ import twitterBIcon from '@/assets/icon_twitter_black.svg';
 import twitterWIcon from '@/assets/icon_twitter_white.svg';
 import twitterRetweetIcon from '@/assets/icon_twitter_retweet.svg';
 import invFriendsIcon from '@/assets/icon_invite_friends.svg';
+import TwitterComponent from "./twitterComponent";
 
 
 const FollowTelegram = ({
@@ -115,6 +116,7 @@ const FollowTelegram = ({
   const [hasError, setHasError] = useState(false);
   const [errorMsg, setErrorMsg] = useState("An error occured");
   const [success, setSuccess] = useState(false);
+
   let subscribe = useCallback(() => {
     setHasError(false);
     console.log("Subscribe!");
@@ -176,28 +178,7 @@ const FollowTelegram = ({
             >
               <div className={styles.emailContainer}>
                 <div>
-                  <div className={styles.emailBox}>
-                    <div>
-                      <StyledInput 
-                        value={name} 
-                        required 
-                        placeholder="Full Name" 
-                        onChange={(e) => { setName(e.target.value);}} 
-                      />
-                    </div>
-                    <div>
-                      <StyledInput 
-                        required 
-                        placeholder="Email Address" 
-                        value={email} 
-                        onChange={(e) => { setEmail(e.target.value);}} 
-                      />
-                    </div>
-                    {hasError && <small className={errorText}>{errorMsg}</small>}
-                  </div>
-                  <div style={{display:'flex', justifyContent:'center'}}>
-                    <Button className={styles.taskBtn} onClick={subscribe} style={buttonStyle1}>Submit</Button> 
-                  </div>
+                  <InputEmail />
                 </div>
               </div>
             </Panel>
@@ -268,7 +249,7 @@ const FollowTelegram = ({
                   <img src={twitterWIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
                   <span style={{marginRight:'5px'}}>Follow @ACYFinance</span>
                 </a>
-                <script async src="https://platform.twitter.com/widgets.js" charset="utf-8" />
+                <script async src="https://platform.twitter.com/widgets.js" charset="utf-8" /> 
                 <Tooltip title="Visit the link above to continue">
                   <Button className={styles.taskBtn} onClick={() => {handleFollow(4); handlePanelClose();}} style={buttonStyle1} disabled={clicked[3]}>Continue</Button> 
                 </Tooltip>
@@ -286,7 +267,7 @@ const FollowTelegram = ({
               disabled={followed[5]}
             >
               <Row type='flex' align='middle' justify='space-around'>
-                <a 
+                {/* <a 
                   className={styles.twitterbtn}
                   href="https://twitter.com/intent/retweet?tweet_id=1458721380027928582"
                   target="_blank"
@@ -296,7 +277,8 @@ const FollowTelegram = ({
                 >
                   <img src={twitterRetweetIcon} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
                   <span style={{marginRight:'5px'}}>Retweet</span>
-                </a>
+                </a> */}
+                <TwitterComponent />
                 <Tooltip title="Visit the link above to continue">
                   <Button className={styles.taskBtn} onClick={() => {handleFollow(5); handlePanelClose();}} style={buttonStyle1} disabled={clicked[4]}>Continue</Button> 
                 </Tooltip>

@@ -1,5 +1,7 @@
+/* eslint-disable jsx-a11y/accessible-emoji */
 import React, { useState, useCallback } from "react";
-import FollowTelegram from "./FollowTelegram";
+import axios from "axios";
+import { Button } from 'antd';
 import styled from "styled-components";
 import styles from "./styles.less";
 import submit from "@/assets/icon_arrow_submit.svg";
@@ -61,29 +63,47 @@ const inputEmail = () => {
     fontFamily:'Inter, sans-serif'
   }
 
+  const buttonStyle1 = {
+    backgroundColor: "#c6224e", 
+    width: 'auto', 
+    color: 'white', 
+    height: "2em", 
+    fontSize:'15px', 
+    display:'flex', 
+    justifyContent:'center', 
+    alignItems:'center',
+  }
+
   return (
     <div className={styles.emailContainer}>
-      <div>
-        <div className={styles.emailBox}>
-          <div>
-            <StyledInput 
-              value={name} 
-              required 
-              placeholder="Full Name" 
-              onChange={(e) => { setName(e.target.value);}} 
-            />
+      {success ? (
+        <span> Thank you for signing up!</span>
+      ): (
+        <div>
+          <div className={styles.emailBox}>
+            <div>
+              <StyledInput 
+                value={name} 
+                required 
+                placeholder="Full Name" 
+                onChange={(e) => { setName(e.target.value);}} 
+              />
+            </div>
+            <div>
+              <StyledInput 
+                required 
+                placeholder="Email Address" 
+                value={email} 
+                onChange={(e) => { setEmail(e.target.value);}} 
+              />
+            </div>
+            {hasError && <small className={errorText}>{errorMsg}</small>}
           </div>
-          <div>
-            <StyledInput 
-              required 
-              placeholder="Email Address" 
-              value={email} 
-              onChange={(e) => { setEmail(e.target.value);}} 
-            />
+          <div style={{display:'flex', justifyContent:'center'}}>
+            <Button className={styles.taskBtn} onClick={subscribe} style={buttonStyle1}>Submit</Button> 
           </div>
-          {hasError && <small className={errorText}>{errorMsg}</small>}
         </div>
-      </div>
+      )}
     </div>
   );
 };
