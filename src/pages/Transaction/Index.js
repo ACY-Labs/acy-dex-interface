@@ -208,13 +208,14 @@ const Transaction = props => {
           <h1><AcyIcon.MyIcon width={30} type="arrow" />Trader Receive</h1>
           <table style={{width:'500px'}}>
             <tr>
-              <td>USDC</td>
+              <td><span>{data.token2.symbol}</span>
+              <img src={data.token2.logoURI} style={{ width: '22px', margin:'0.5rem'}} /></td>
               <td>3,303,788.77</td>
             </tr>
-            <tr>
+            {/* <tr>
               <td>ACY</td>
               <td>2,519,015.51</td>
-            </tr>
+            </tr> */}
           </table>
         </div>
       </div> ) : (<h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>)
