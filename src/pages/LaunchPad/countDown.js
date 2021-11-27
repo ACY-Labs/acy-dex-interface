@@ -10,7 +10,7 @@ const { Countdown } = Statistic;
 console.log('style')
 console.log(styles);
   function getRemainTime(now) {
-    var ddl = '2022/11/11 19:22:21';
+    var ddl = '2021/12/11 00:00:00';
     //var now = Date.now()
     var date1 = new Date(now);
     var date2 = new Date(ddl);
