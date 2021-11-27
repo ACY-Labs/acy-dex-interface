@@ -2,6 +2,8 @@ import moment from 'moment';
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import {methodList, actionList} from '@/constants/MethodList';
 import liquidity from '@/pages/Liquidity/models/liquidity';
+import {getContract} from '@/acy-dex-swap/utils'
+import { abi as IUniswapV2Router02ABI } from '@/abis/IUniswapV2Router02.json';
 
 export async function parseTransactionData (fetchedData,account,library,filter) {
     if(filter == 'SWAP'){
@@ -292,8 +294,11 @@ export async function getTransactionsByAccount (account,library,filter){
     return [];
 }
 function getChartData (data){
-    let amm = data.liquidity1 * data.liquidity2;
-    amm = amm / (data.totalOut + data.liquidity1);
+    let amm = data.liquidity1 / (data.totalOut + data.liquidity1) ;
+    console.log('liquidity 1： ',data.liquidity1);
+    console.log('liquidity 2： ',data.liquidity2);
+
+    amm = amm * data.liquidity2;
     amm = data.liquidity2 - amm;
     let revenue = data.totalIn - amm;
 
@@ -311,83 +316,274 @@ function getChartData (data){
     }
 }
 
-export async function fetchTransactionData(address,library){
+export async function fetchTransactionData(address,library, account){
 
     try{
-
         let apikey = 'Y6H9S7521BGREFMGSETVA72F1HT74FE3M5';
 
-        let response = await library.getTransactionReceipt(address.toString());
-        console.log("Response: ",response);
-        let logs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]==actionList.transfer.hash);
-        let gasFee = (response.effectiveGasPrice.toNumber() / (Math.pow(10,18)) )* response.gasUsed.toNumber()
-        console.log("gas fee: ",gasFee);
-        // console.log("cumulativegasused",response.cumulativeGasUsed.toNumber());
-        console.log("gasprice",response.effectiveGasPrice.toNumber());
-        // console.log("gasused",response.gasUsed.toNumber());
-        let routes = [];
-        let totalIn = 0;
-        let totalOut = 0;
-        let newData = {};
-        let token1;
-        let token2;
-        let token3;
-        for (let i=0;i<logs.length;i+=3){
-            token1 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
-            let ammount1 = (logs[i].data / Math.pow(10, token1.decimals)); 
-            token2 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i+1].address);
-            let ammount2 = (logs[i+1].data / Math.pow(10, token2.decimals)); 
-            token3 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i+2].address);
-            let ammount3 = (logs[i+2].data / Math.pow(10, token3.decimals));
+        let transactionData = await library.getTransaction(address.toString());
+
+        if (transactionData.data.startsWith(methodList.tokenToToken.id)) {
+
+            let response = await library.getTransactionReceipt(address.toString());
+            console.log("Response: ",response);
+            let logs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]==actionList.transfer.hash);
+            let gasFee = (response.effectiveGasPrice.toNumber() / (Math.pow(10,18)) )* response.gasUsed.toNumber()
+            console.log("gas fee: ",gasFee);
+            // console.log("cumulativegasused",response.cumulativeGasUsed.toNumber());
+            console.log("gasprice",response.effectiveGasPrice.toNumber());
+            // console.log("gasused",response.gasUsed.toNumber());
+            let routes = [];
+            let totalIn = 0;
+            let totalOut = 0;
+            let newData = {};
+            let token1;
+            let token2;
+            let token3;
+            for (let i=0;i<logs.length;i+=3){
+                token1 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
+                let ammount1 = (logs[i].data / Math.pow(10, token1.decimals)); 
+                token2 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i+1].address);
+                let ammount2 = (logs[i+1].data / Math.pow(10, token2.decimals)); 
+                token3 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i+2].address);
+                let ammount3 = (logs[i+2].data / Math.pow(10, token3.decimals));
+                
+                routes.push({
+                    "token1" : token1.symbol,
+                    "token2" : token2.symbol,
+                    "token3" : token3.symbol,
+                    "token1Num" : ammount1,
+                    "token2Num" : ammount2,
+                    "token3Num" : ammount3,
+                    "logoURI" : token2.logoURI
+                })
+
+                totalIn += ammount3;
+                totalOut += ammount1;
+            }
+            //fetch liquidity pools for 2 ending points
+            let requestLiquidity1 = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress='+token1.addressOnEth+'&apikey='+apikey;
+            let responseLiquidity1 = await fetch(requestLiquidity1);
+            let liquidity1 = await responseLiquidity1.json();
+            liquidity1 = parseInt(liquidity1.result)/Math.pow(10,token1.decimals);
+
+            let requestLiquidity2 = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress='+token3.addressOnEth+'&apikey='+apikey;
+            let responseLiquidity2 = await fetch(requestLiquidity2);
+            let liquidity2 = await responseLiquidity2.json();
+            liquidity2 = parseInt(liquidity2.result)/Math.pow(10,token3.decimals);
             
-            routes.push({
-                "token1" : token1.symbol,
-                "token2" : token2.symbol,
-                "token3" : token3.symbol,
-                "token1Num" : ammount1,
-                "token2Num" : ammount2,
-                "token3Num" : ammount3,
-                "logoURI" : token2.logoURI
-            })
+            //get amm output 
+            // var contract = getContract('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',IUniswapV2Router02ABI,library,account);
+            // let addressPath = [token1.addressOnEth,token2.addressOnEth];
+            // var liquidityOut = contract.getAmountsIn(1079,addressPath);
+            // console.log('testing :: ', liquidityOut);
+            
+            //get ether last price
 
-            totalIn += ammount3;
-            totalOut += ammount1;
+            let requestPrice = 'https://api.etherscan.io/api?module=stats&action=ethprice&apikey='+apikey;
+            let responsePrice = await fetch(requestPrice);
+            let ethPrice = await responsePrice.json();
+            ethPrice = parseFloat(ethPrice.result.ethusd);
+
+            console.log("fetching ethprice",ethPrice);
+
+            newData = {
+                "routes" : routes,
+                "totalIn" : totalIn,
+                "totalOut" : totalOut,
+                "gasFee" : gasFee,
+                "token1" : token1,
+                "token2" : token3,
+                "liquidity1" : liquidity1,
+                "liquidity2" : liquidity2,
+                "ethPrice" : ethPrice
+            }
+
+            let chartData = getChartData(newData);
+            newData.chartData = chartData;
+            return newData;
         }
-        //fetch liquidity pools for 2 ending points
-        let requestLiquidity1 = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress='+token1.addressOnEth+'&apikey='+apikey;
-        let responseLiquidity1 = await fetch(requestLiquidity1);
-        let liquidity1 = await responseLiquidity1.json();
-        liquidity1 = parseInt(liquidity1.result)/Math.pow(10,token1.decimals);
+        else if (transactionData.data.startsWith(methodList.tokenToEth.id)){
+            let response = await library.getTransactionReceipt(address.toString());
+            console.log("Response: ",response);
+            let FROM_HASH = account.toString().toLowerCase().slice(2);
+            let TO_HASH = response.to.toLowerCase().slice(2);
+            let logs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]==actionList.transfer.hash);
+            let gasFee = (response.effectiveGasPrice.toNumber() / (Math.pow(10,18)) )* response.gasUsed.toNumber()
+            console.log("gas fee: ",gasFee);
+            // console.log("cumulativegasused",response.cumulativeGasUsed.toNumber());
+            console.log("gasprice",response.effectiveGasPrice.toNumber());
+            // console.log("gasused",response.gasUsed.toNumber());
+            let routes = [];
+            let totalIn = 0;
+            let totalOut = 0;
+            let newData = {};
+            let token1;
+            let token2;
+            let token3;
+            for (let i=0;i<logs.length;){
+                token1 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
+                let ammount1 = (logs[i].data / Math.pow(10, token1.decimals)); 
+                i++;
 
-        let requestLiquidity2 = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress='+token3.addressOnEth+'&apikey='+apikey;
-        let responseLiquidity2 = await fetch(requestLiquidity2);
-        let liquidity2 = await responseLiquidity2.json();
-        liquidity2 = parseInt(liquidity2.result)/Math.pow(10,token3.decimals);
-        
-        //get ether last price
+                let ammount2 = 0;
 
-        let requestPrice = 'https://api.etherscan.io/api?module=stats&action=ethprice&apikey='+apikey;
-        let responsePrice = await fetch(requestPrice);
-        let ethPrice = await responsePrice.json();
-        ethPrice = parseFloat(ethPrice.result.ethusd);
+                if(!logs[i].topics[2].includes(TO_HASH)){
+                    token2 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
+                    ammount2 = (logs[i].data / Math.pow(10, token2.decimals)); 
+                    i++;
+                }else{
+                    token2 = null;
+                }
+                token3 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
+                let ammount3 = (logs[i].data / Math.pow(10, token3.decimals));
+                i++;
+                
+                routes.push({
+                    "token1" : token1.symbol,
+                    "token2" : token2 ? token2.symbol : null,
+                    "token3" : token3.symbol,
+                    "token1Num" : ammount1,
+                    "token2Num" : token2 ? ammount2 : null,
+                    "token3Num" : ammount3,
+                    "logoURI" : token2 ? token2.logoURI : null
+                })
 
-        console.log("fetching ethprice",ethPrice);
+                totalIn += ammount3;
+                totalOut += ammount1;
+            }
+            //fetch liquidity pools for 2 ending points
+            let requestLiquidity1 = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress='+token1.addressOnEth+'&apikey='+apikey;
+            let responseLiquidity1 = await fetch(requestLiquidity1);
+            let liquidity1 = await responseLiquidity1.json();
+            liquidity1 = parseInt(liquidity1.result)/Math.pow(10,token1.decimals);
 
-        newData = {
-            "routes" : routes,
-            "totalIn" : totalIn,
-            "totalOut" : totalOut,
-            "gasFee" : gasFee,
-            "token1" : token1.symbol,
-            "token2" : token2.symbol,
-            "liquidity1" : liquidity1,
-            "liquidity2" : liquidity2,
-            "ethPrice" : ethPrice
+            let requestLiquidity2 = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress='+token3.addressOnEth+'&apikey='+apikey;
+            let responseLiquidity2 = await fetch(requestLiquidity2);
+            let liquidity2 = await responseLiquidity2.json();
+            liquidity2 = parseInt(liquidity2.result)/Math.pow(10,token3.decimals);
+            
+            //get amm output 
+            // var contract = getContract('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',IUniswapV2Router02ABI,library,account);
+            // let addressPath = [token1.addressOnEth,token2.addressOnEth];
+            // var liquidityOut = contract.getAmountsIn(1079,addressPath);
+            // console.log('testing :: ', liquidityOut);
+            
+            //get ether last price
+
+            let requestPrice = 'https://api.etherscan.io/api?module=stats&action=ethprice&apikey='+apikey;
+            let responsePrice = await fetch(requestPrice);
+            let ethPrice = await responsePrice.json();
+            ethPrice = parseFloat(ethPrice.result.ethusd);
+
+            console.log("fetching ethprice",ethPrice);
+
+            newData = {
+                "routes" : routes,
+                "totalIn" : totalIn,
+                "totalOut" : totalOut,
+                "gasFee" : gasFee,
+                "token1" : token1,
+                "token2" : token3,
+                "liquidity1" : liquidity1,
+                "liquidity2" : liquidity2,
+                "ethPrice" : ethPrice
+            }
+
+            let chartData = getChartData(newData);
+            newData.chartData = chartData;
+            return newData;
+        }else{
+            let response = await library.getTransactionReceipt(address.toString());
+            console.log("Response: ",response);
+            let FROM_HASH = account.toString().toLowerCase().slice(2);
+            let TO_HASH = response.to.toLowerCase().slice(2);
+            let logs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]==actionList.transfer.hash);
+            let gasFee = (response.effectiveGasPrice.toNumber() / (Math.pow(10,18)) )* response.gasUsed.toNumber()
+            console.log("gas fee: ",gasFee);
+            // console.log("cumulativegasused",response.cumulativeGasUsed.toNumber());
+            console.log("gasprice",response.effectiveGasPrice.toNumber());
+            // console.log("gasused",response.gasUsed.toNumber());
+            let routes = [];
+            let totalIn = 0;
+            let totalOut = 0;
+            let newData = {};
+            let token1;
+            let token2;
+            let token3;
+            for (let i=0;i<logs.length;){
+                token1 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
+                let ammount1 = (logs[i].data / Math.pow(10, token1.decimals)); 
+                i++;
+
+                let ammount2 = 0;
+
+                if(!logs[i].topics[2].includes(FROM_HASH)){
+                    token2 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
+                    ammount2 = (logs[i].data / Math.pow(10, token2.decimals)); 
+                    i++;
+                }else{
+                    token2 = null;
+                }
+                token3 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
+                let ammount3 = (logs[i].data / Math.pow(10, token3.decimals));
+                i++;
+                
+                routes.push({
+                    "token1" : token1.symbol,
+                    "token2" : token2 ? token2.symbol : null,
+                    "token3" : token3.symbol,
+                    "token1Num" : ammount1,
+                    "token2Num" : token2 ? ammount2 : null,
+                    "token3Num" : ammount3,
+                    "logoURI" : token2 ? token2.logoURI : null
+                })
+
+                totalIn += ammount3;
+                totalOut += ammount1;
+            }
+            //fetch liquidity pools for 2 ending points
+            let requestLiquidity1 = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress='+token1.addressOnEth+'&apikey='+apikey;
+            let responseLiquidity1 = await fetch(requestLiquidity1);
+            let liquidity1 = await responseLiquidity1.json();
+            liquidity1 = parseInt(liquidity1.result)/Math.pow(10,token1.decimals);
+
+            let requestLiquidity2 = 'https://api.etherscan.io/api?module=stats&action=tokensupply&contractaddress='+token3.addressOnEth+'&apikey='+apikey;
+            let responseLiquidity2 = await fetch(requestLiquidity2);
+            let liquidity2 = await responseLiquidity2.json();
+            liquidity2 = parseInt(liquidity2.result)/Math.pow(10,token3.decimals);
+            
+            //get amm output 
+            // var contract = getContract('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',IUniswapV2Router02ABI,library,account);
+            // let addressPath = [token1.addressOnEth,token2.addressOnEth];
+            // var liquidityOut = contract.getAmountsIn(1079,addressPath);
+            // console.log('testing :: ', liquidityOut);
+            
+            //get ether last price
+
+            let requestPrice = 'https://api.etherscan.io/api?module=stats&action=ethprice&apikey='+apikey;
+            let responsePrice = await fetch(requestPrice);
+            let ethPrice = await responsePrice.json();
+            ethPrice = parseFloat(ethPrice.result.ethusd);
+
+            console.log("fetching ethprice",ethPrice);
+
+            newData = {
+                "routes" : routes,
+                "totalIn" : totalIn,
+                "totalOut" : totalOut,
+                "gasFee" : gasFee,
+                "token1" : token1,
+                "token2" : token3,
+                "liquidity1" : liquidity1,
+                "liquidity2" : liquidity2,
+                "ethPrice" : ethPrice
+            }
+
+            let chartData = getChartData(newData);
+            newData.chartData = chartData;
+            return newData;
         }
-
-        let chartData = getChartData(newData);
-        newData.chartData = chartData;
-        return newData;
 
     } catch (e){
         console.log(e);
