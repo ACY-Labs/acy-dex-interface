@@ -867,6 +867,10 @@ const AddLiquidityComponent = props => {
                   </AcyTabPane>
                 </AcyTabs>
               </div>
+
+              <div className={styles.title}>
+                Manage Token Lists
+              </div>
             </AcyModal>
           </div>
         </div>

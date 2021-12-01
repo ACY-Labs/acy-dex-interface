@@ -13,6 +13,7 @@ const AcyCoinItem = ({
   data,
   selectToken,
   setAsFav,
+  hideBalance = false,
   hideFavButton = false,
   customIcon = true,
   isFav = false,
@@ -23,6 +24,7 @@ const AcyCoinItem = ({
 
   useEffect(
     () => {
+      if (hideBalance) return;
       if (!library || !account || !chainId) return;
       function processString(bal) {
         let decimals = bal.split('.')[0];
@@ -106,7 +108,7 @@ const AcyCoinItem = ({
           <div style={{ minWidth: "20%", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>{data.name}</div>
 
           {/* token balance container. */}
-          <div style={{ textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>{balance}</div>
+          <div hidden={hideBalance} style={{ textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>{balance}</div>
         </div>
       </div>
 
