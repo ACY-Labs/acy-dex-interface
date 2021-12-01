@@ -141,13 +141,13 @@ const OperationHistoryTable = props => {
         dataSource={sortTableTime(filterTable(dataSource,transactionFilter),'transactionTime',true).slice(0,OperationDisplayNumber+1)}
         className={styles.tableStyle}
         pagination={false}
-        onRow={record => {
-          return {
-            onClick: event => {
-              window.open(`#/transaction/${record.hash}`);
-            }, 
-          };
-        }}
+        // onRow={record => {
+        //   return {
+        //     onClick: event => {
+        //       window.open(`#/transaction/${record.hash}`);
+        //     }, 
+        //   };
+        // }}
         footer={() => (
           <div className={styles.tableSeeMoreWrapper}>
             <a
