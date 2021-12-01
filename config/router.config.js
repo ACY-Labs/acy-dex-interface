@@ -75,11 +75,6 @@ export default [
         hideInMenu:true,
         component: './Transaction/',
       },
-      {
-        path: '/pool',
-        name: 'Pool',
-        component: './Pool/Index',
-      }
     ],
   },
 ];
