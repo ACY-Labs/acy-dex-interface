@@ -55,13 +55,30 @@ const TokenListManager = ({ onBack }) => {
     //     getTokenList();
     // }, []);
 
+    // load custom token list from localStorage
+    useEffect(() => {
+        const localTokenList = JSON.parse(localStorage.getItem('customTokenList')) || [];
+        setCustomTokenList(localTokenList);
+      }, [])
+
     const getTokenInfo = async () => {
         console.log("start to fetch")
         // const list = await axios.get("https://api.coingecko.com/api/v3/coins/list");
-        axios.get(`https://api.coingecko.com/api/v3/coins/ethereum/contract/${searchAddr}`).then(res => {
-            console.log("test returned data", res)
-            const { name, symbol, image } = res.data;
-            setSearchResult({ name: name.charAt(0).toUpperCase() + name.slice(1), symbol: symbol.toUpperCase(), logoURI: image.small });
+        // axios.get(`https://api.coingecko.com/api/v3/coins/ethereum/contract/${searchAddr}`).then(res => {
+        axios.post(`https://eth-mainnet.alchemyapi.io/v2/18lHSAeZttzI4wJvHpXlJGHK4ZDNCTCP`
+        , {
+            "jsonrpc": "2.0",
+            "id": 0,
+            "method": "alchemy_getTokenMetadata",
+            "params": [
+              searchAddr
+            ]
+          }
+        
+        ).then(res => {
+            console.log("test returned data", res.data)
+            const { name, symbol, logo, decimals } = res.data.result;
+            setSearchResult({ name: name.charAt(0).toUpperCase() + name.slice(1), symbol: symbol.toUpperCase(), logoURI: logo, decimals });
         }).catch(error => { console.log("error happened", error) })
     }
     useEffect(() => {
@@ -71,6 +88,28 @@ const TokenListManager = ({ onBack }) => {
             setSearchResult(null);
     }, [searchAddr]);
 
+    const addToTokenList = (data) => {
+        if (customTokenList.find(t => t.symbol == data.symbol)) {
+            console.log("token to add already exists.");
+            return;
+        }
+
+        const newCustomTokenList = [...customTokenList, data];
+        console.log("test", data, searchResult, customTokenList, newCustomTokenList)
+        setCustomTokenList(newCustomTokenList);
+        localStorage.setItem("customTokenList", JSON.stringify(newCustomTokenList))
+        console.log("added token list to local storage")
+    }
+
+    const removeFromTokenList = (idx) => {
+        const newCustomTokenList = [...customTokenList];
+        newCustomTokenList.splice(idx, 1);
+    
+        console.log("test after removing:", newCustomTokenList);
+        setCustomTokenList(newCustomTokenList);
+        localStorage.setItem("customTokenList", JSON.stringify(newCustomTokenList))
+    }
+
     return (
         <StyledPageHeader
             onBack={() => onBack()}
@@ -78,7 +117,6 @@ const TokenListManager = ({ onBack }) => {
         // subTitle="This is a subtitle"
         >
             {/* <div className={styles.title}> a token</div> */}
-            <div>can test with 0x1f9840a85d5af5bf1d1762f925bdaddc4201f984</div>
             <div className={styles.search}>
                 <Input
                     size="large"
@@ -96,10 +134,8 @@ const TokenListManager = ({ onBack }) => {
                 {searchResult ? <AcyCoinItem
                     data={searchResult}
                     customIcon={false}
-                    setAsFav={() => null}
-                    selectToken={() => setCustomTokenList(prev => [...prev, searchResult])}
+                    selectToken={addToTokenList}
                     hideBalance
-                    hideFavButton
                 />
                     : <div className={styles.textCenter}>
                         {searchAddr ? "No matching token found" : "Please search a token"}
@@ -115,10 +151,9 @@ const TokenListManager = ({ onBack }) => {
                             data={token}
                             key={idx}
                             customIcon={false}
-                            setAsFav={() => null}
-                            selectToken={() => null}
+                            clickCallback={() => removeFromTokenList(idx)}
+                            actionIcon="delete"
                             hideBalance
-                            hideFavButton
                         />
                     ))}
                 </div>

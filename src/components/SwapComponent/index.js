@@ -23,7 +23,7 @@ import {
   AcyDescriptions,
   AcySmallButton,
 } from '@/components/Acy';
-import TokenListManager from "@/components/TokenListManager";
+import TokenSelectorModal from "@/components/TokenSelectorModal";
 
 import { connect } from 'umi';
 import styles from './styles.less';
@@ -89,8 +89,6 @@ import moment from 'moment';
 const SwapComponent = props => {
   const { dispatch, onSelectToken0, onSelectToken1, onSelectToken } = props;
 
-  const [currentPanel, setCurrentPanel] = useState("selectToken");
-
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
 
@@ -147,24 +145,12 @@ const SwapComponent = props => {
   const [wrappedAmount, setWrappedAmount] = useState();
   const [showSpinner, setShowSpinner] = useState(false);
 
-  const [tokenSearchInput, setTokenSearchInput] = useState('');
-  const [tokenList, setTokenList] = useState(INITIAL_TOKEN_LIST);
-
   // connect to page model, reflect changes of pair ratio in this component
   useEffect(() => {
     const { swap: { token0: modelToken0, token1: modelToken1 } } = props;
     setToken0(modelToken0);
     setToken1(modelToken1);
   }, [props.swap]);
-
-  // method to update the value of token search input field,
-  // and filter the token list based on the comparison of the value of search input field and token symbol.
-  const onTokenSearchChange = e => {
-    setTokenSearchInput(e.target.value);
-    setTokenList(
-      INITIAL_TOKEN_LIST.filter(token => token.symbol.includes(e.target.value.toUpperCase()))
-    );
-  };
 
   const individualFieldPlaceholder = 'Enter amount';
   const dependentFieldPlaceholder = 'Estimated value';
@@ -180,17 +166,6 @@ const SwapComponent = props => {
   // 监听钱包的连接
   useEffect(() => {
     activate(injected);
-
-    //read the fav tokens code in storage
-    var tokens_symbol = JSON.parse(localStorage.getItem('tokens_symbol'));
-    //set to fav token
-    if (tokens_symbol != null) {
-      setFavTokenList(
-        INITIAL_TOKEN_LIST.filter(token => tokens_symbol.includes(token.symbol))
-      );
-    }
-
-
   }, []);
 
   useEffect(
@@ -212,24 +187,6 @@ const SwapComponent = props => {
     [account, chainId, library]
   );
 
-  const [favTokenList, setFavTokenList] = useState([]);
-
-  const setTokenAsFav = token => {
-    setFavTokenList(prevState => {
-      const prevFavTokenList = [...prevState];
-      if (prevFavTokenList.includes(token)) {
-        var tokens = prevFavTokenList.filter(value => value != token);
-        localStorage.setItem('token', JSON.stringify(tokens.map(e => e.addressOnEth)));
-        localStorage.setItem('tokens_symbol', JSON.stringify(tokens.map(e => e.symbol)));
-        return tokens
-      }
-      prevFavTokenList.push(token);
-      localStorage.setItem('token', JSON.stringify(prevFavTokenList.map(e => e.addressOnEth)));
-      localStorage.setItem('tokens_symbol', JSON.stringify(prevFavTokenList.map(e => e.symbol)));
-
-      return prevFavTokenList;
-    });
-  };
 
   // token1Amount is changed according to token0Amount
   const t0Changed = useCallback(
@@ -402,19 +359,7 @@ const SwapComponent = props => {
     }
   };
 
-  useEffect(
-    () => {
-      // focus search input every time token modal is opened.
-      // setTimeout is used as a workaround as document.getElementById always return null without  some delay.
-      const focusSearchInput = () =>
-        document.getElementById('liquidity-token-search-input').focus();
-      if (visible === true) setTimeout(focusSearchInput, 100);
-    },
-    [visible]
-  );
-
   const onClickCoin = () => {
-    setCurrentPanel("selectToken");
     setVisible(true);
   };
   const onCancel = () => {
@@ -761,70 +706,9 @@ const SwapComponent = props => {
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
-      <AcyModal onCancel={onCancel} width={400} visible={visible}>
-        {currentPanel == "selectToken" ? (
-          <>
-            <div className={styles.title}>Select a token</div>
-            <div className={styles.search}>
-              <Input
-                size="large"
-                style={{
-                  backgroundColor: '#373739',
-                  borderRadius: '40px',
-                }}
-                placeholder="Enter the token symbol or address"
-                value={tokenSearchInput}
-                onChange={onTokenSearchChange}
-                id="liquidity-token-search-input"
-              />
-            </div>
-
-            <div className={styles.coinList}>
-              <AcyTabs>
-                <AcyTabPane tab="All" key="1">
-                  {tokenList.length ? tokenList.map((token, index) => {
-                    return (
-                      <AcyCoinItem
-                        data={token}
-                        key={index}
-                        customIcon={false}
-                        setAsFav={() => setTokenAsFav(token)}
-                        // setAsFav={() => console.log('token:',token)}
-                        selectToken={() => {
-                          onCoinClick(token);
-                        }}
-                        isFav={favTokenList.includes(token)}
-                      />
-                    );
-                  })
-                : <div className={styles.textCenter} >No matching result</div>}
-                </AcyTabPane>
-                <AcyTabPane tab="Favorite" key="2">
-                  {favTokenList.length ? favTokenList.map((supToken, index) => (
-                    <AcyCoinItem
-                      data={supToken}
-                      key={index}
-                      selectToken={() => {
-                        onCoinClick(supToken);
-                      }}
-                      customIcon={false}
-                      index={index}
-                      setAsFav={() => setTokenAsFav(supToken)}
-                      hideFavButton
-                      isFav={favTokenList.includes(supToken)}
-                    />
-                  ))
-                : <div className={styles.textCenter} >No matching result</div>}
-                </AcyTabPane>
-              </AcyTabs>
-            </div>
-
-            <div className={styles.manageCoinList} onClick={() => { setCurrentPanel("manageTokenList") }}>
-              <Icon type="form" style={{ marginRight: "1rem" }} /> Manage Token Lists
-            </div>
-          </>
-        ) : <TokenListManager onBack={() => setCurrentPanel("selectToken")}/>}
-      </AcyModal>
+      <TokenSelectorModal
+        onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick}
+      />
     </div>
   );
 };

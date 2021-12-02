@@ -22,6 +22,7 @@ import {
   AcyButton,
   AcyDescriptions,
 } from '@/components/Acy';
+import TokenSelectorModal from "@/components/TokenSelectorModal";
 
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 
@@ -819,59 +820,9 @@ const AddLiquidityComponent = props => {
 
             </div>
 
-            <AcyModal onCancel={onCancel} width={400} visible={visible}>
-              <div className={styles.title}>Select a token</div>
-              <div className={styles.search}>
-                <Input
-                  size="large"
-                  style={{
-                    backgroundColor: '#373739',
-                    borderRadius: '40px',
-                  }}
-                  placeholder="Enter the token symbol or address"
-                  value={tokenSearchInput}
-                  onChange={onTokenSearchChange}
-                  id="liquidity-token-search-input"
-                />
-              </div>
-
-              <div className={styles.coinList}>
-                <AcyTabs>
-                  <AcyTabPane tab="All" key="1">
-                    {tokenList.map((token, index) => (
-                      <AcyCoinItem
-                        data={token}
-                        key={index}
-                        customIcon={false}
-                        setAsFav={() => setTokenAsFav(token)}
-                        selectToken={() => {
-                          onTokenClick(token);
-                        }}
-                        isFav={favTokenList.includes(token)}
-                      />
-                    ))}
-                  </AcyTabPane>
-                  <AcyTabPane tab="Favorite" key="2">
-                    {favTokenList.map((supToken, index) => (
-                      <AcyCoinItem
-                        data={supToken}
-                        key={index}
-                        selectToken={() => setTokenAsFav(index)}
-                        customIcon={false}
-                        index={index}
-                        setAsFav={() => setTokenAsFav(token)}
-                        hideFavButton
-                        isFav={favTokenList.includes(supToken)}
-                      />
-                    ))}
-                  </AcyTabPane>
-                </AcyTabs>
-              </div>
-
-              <div className={styles.title}>
-                Manage Token Lists
-              </div>
-            </AcyModal>
+            <TokenSelectorModal
+              onCancel={onCancel} width={400} visible={visible} onCoinClick={onTokenClick}
+            />
           </div>
         </div>
       </AcyCard>
