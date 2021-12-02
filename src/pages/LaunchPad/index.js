@@ -204,7 +204,7 @@ const Pool = (props)=> {
               </p>
               <div className={styles.buttonContainer}>
                 <div>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSer-PUjhMDG5fmasXYkmvY3EgpTC-yaI4up5by6Hx5g_9wZaw/viewform" className={styles.btnApply}>
+                  <a href="https://www.google.com" className={styles.btnApply} target="_blank" rel="noreferrer">
                     <Icon type="rocket" style={{fontSize: '2em', margin: '0 10px 0 0'}} />
                     Apply As A Project
                   </a>
