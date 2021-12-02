@@ -13,7 +13,8 @@ const { Meta } = Card;
 
 const Pool = (props)=> {
     const [page, setPage] = useState(0);
-    const [view, setView] = useState('grid');
+    const [view, setView] = useState('list');
+    const [projectStatus, setProjectStatus] = useState('inProgress');
     const [navPage, setnavPage] = useState(0);
     const [nextPage, setnextPage] = useState(0);
 
@@ -61,19 +62,19 @@ const Pool = (props)=> {
     }
 
     const onClick = () => setnextPage(1)
+    const switchProject = (str) => setProjectStatus(str)
+    const goToPos = () => {
+      const ele = document.getElementById('projectBoxes')
+      ele.scrollIntoView()
+    }
 
     function CardBlock(props) {
       return (
-        <div className={styles.CardBlock}>
+        <div className={styles.CardBlock} onClick={() => {onClick();}}>
           <Card className={styles.Card}>
             <div id='space 1'>
               <div className={styles.projectBoxHeader}>
                 <span>December 10, 2021</span>
-                <div className={styles.moreWrapper}>
-                  <button className={styles.projectBtnMore} type="button" onClick={() => {onClick();}}>
-                    <img src={moreBtn} alt="" style={{height:'1.2em', width:'auto', objectFit:'contain', fontSize: '1.5em', margin: '0 10px 0 0'}} />
-                  </button>
-                </div>
               </div>
               <div className={styles.CardHead}>
                 <div>
@@ -122,7 +123,7 @@ const Pool = (props)=> {
                 <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={90} status='active' /> 
               </div>
               <span className={styles.lineSeperator} />
-              <div className={styles.daysLeft} style={{color: 'black'}}>
+              <div className={styles.daysLeft}>
                 2 Days Left
               </div>
             </div>
@@ -133,17 +134,17 @@ const Pool = (props)=> {
 
   function ListCard(props){
     return (
-      <div className={styles.projectBoxWrapper}>
+      <div className={styles.projectBoxWrapper} onClick={() => {onClick();}}>
         <div className={styles.projectContainer}>
           <div className={styles.projectBox1}>
-            <span style={{display: 'inline-flex', justifyContent: 'center'}}>December 10, 2020</span>
+            <span style={{display: 'inline-flex', justifyContent: 'center', color: '#fff'}}>December 10, 2020</span>
             <div style={{width: '100%', height: '100%', padding: '2rem 0', justifyContent: 'center', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '0.5rem'}}>
               <div>
                 <img src={AcyIcon} alt="" style={{height: '60px', width: '60px', verticalAlign: 'middle', borderStyle: 'none'}} />
               </div>
               <div style={{display: 'flex', justifyContent: 'center', flexDirection: 'column', paddingLeft: '0.5rem'}}>
-                <p style={{fontWeight: '600', fontSize: '1.25em', color: '#000'}}> ACY </p>
-                <p style={{display: 'inline-flex', justifyContent: 'center', lineHeight: '1', color: '#000'}}> $ACY </p>
+                <p style={{fontWeight: '600', fontSize: '1.25em', color: '#fff'}}> ACY </p>
+                <p style={{display: 'inline-flex', justifyContent: 'center', lineHeight: '1', color: '#fff'}}> $ACY </p>
               </div>
             </div>
           </div>
@@ -167,8 +168,8 @@ const Pool = (props)=> {
               </li>
             </ul>
             <div style={{paddingTop: '0.5rem'}}>
-              <span style={{color: 'black'}}>Price: 1 ACY = 100 BTC</span>
-              <span style={{color: 'black', marginLeft: '4em'}}>Start: 25 Nov, 11:00 UTC</span>
+              <span style={{color: 'white'}}>Price: 1 ACY = 100 BTC</span>
+              <span style={{color: 'white', marginLeft: '4em'}}>Start: 25 Nov, 11:00 UTC</span>
             </div>
             <div className={styles.boxProgressWrapper}>
               <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={90} status='active' /> 
@@ -176,9 +177,6 @@ const Pool = (props)=> {
           </div>
           <div className={styles.projectBox3}>
             <div className={styles.twoInfos}>
-              <button className={styles.listprojectBtnMore} type="button" onClick={() => {onClick();}}>
-                <img src={moreBtn} alt="" style={{height:'1.2em', width:'auto', objectFit:'contain', fontSize: '1.5em'}} />
-              </button>
               <span className={styles.listdaysLeft}>
                 2 Days Left
               </span>
@@ -246,53 +244,118 @@ const Pool = (props)=> {
                   <div className={styles.projectsSection}>
                     <div className={styles.projectsSectionLine}>
                       <div className={styles.projectsStatus}>
-                        <div className={styles.itemStatus}>
+                        <div className={styles.itemStatus} onClick={() => {switchProject('inProgress');}}>
                           <span className={styles.statusNumber}>45</span>
                           <span className={styles.statusType}>In Progress</span>
                         </div>
-                        <div className={styles.itemStatus}>
+                        <div className={styles.itemStatus} onClick={() => {switchProject('upcoming');}}>
                           <span className={styles.statusNumber}>24</span>
                           <span className={styles.statusType}>Upcoming</span>
                         </div>
-                        <div className={styles.itemStatus}>
+                        <div className={styles.itemStatus} onClick={() => {switchProject('ended');}}>
+                          <span className={styles.statusNumber}>10</span>
+                          <span className={styles.statusType}>Ended</span>
+                        </div>
+                        <div className={styles.itemStatus} onClick={() => {switchProject('allProjects');}}>
                           <span className={styles.statusNumber}>62</span>
                           <span className={styles.statusType}>Total Projects</span>
                         </div>
                       </div>
                       <div className={styles.viewActions}>
                         <button className={styles.viewBtn} onClick={() => setView('list')} type="button" title="List View">
-                          <img src={listView} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
+                          <img src={listView} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain'}} />
                         </button>
                         <button className={styles.viewBtn} onClick={() => setView('grid')} type="button" title="Grid View">
-                          <img src={gridView} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain', margin: '0 7px 0 0', float:'left'}} />
+                          <img src={gridView} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain'}} />
                         </button>
                       </div>
                     </div>
                     <div>
                       {view === 'list' &&
                         <div className={styles.projectBoxes}>
-                          <ListCard />
-                          <ListCard />
-                          <ListCard />
-                          <ListCard />
-                          <ListCard />
-                          <ListCard />
-                          <ListCard />
-                          <ListCard />
-                          <ListCard />
+                          {projectStatus === 'inProgress' &&
+                            <div>
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                            </div>
+                          }
+                          {projectStatus === 'upcoming' &&
+                            <div>
+                              <ListCard />
+                              <ListCard />
+                            </div>
+                          }
+                          {projectStatus === 'ended' &&
+                            <div>
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                            </div>
+                          }
+                          {projectStatus === 'allProjects' &&
+                            <div>
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                              <ListCard />
+                            </div>
+                          }
                         </div>
                       }
                       {view === 'grid' &&
                         <div className={styles.projectBoxes}>
-                          <CardBlock />
-                          <CardBlock />
-                          <CardBlock />
-                          <CardBlock />
-                          <CardBlock />
-                          <CardBlock />
-                          <CardBlock />
-                          <CardBlock />
-                          <CardBlock />
+                          {projectStatus === 'inProgress' &&
+                            <div className={styles.projectBoxes}>
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                            </div>
+                          }
+                          {projectStatus === 'upcoming' &&
+                            <div className={styles.projectBoxes}>
+                              <CardBlock />
+                              <CardBlock />
+                            </div>
+                          }
+                          {projectStatus === 'ended' &&
+                            <div className={styles.projectBoxes}>
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                            </div>
+                          }
+                          {projectStatus === 'allProjects' &&
+                            <div className={styles.projectBoxes}>
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                              <CardBlock />
+                            </div>
+                          }
                         </div>
                       }
                     </div>

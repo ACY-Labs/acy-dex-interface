@@ -1456,7 +1456,8 @@
     justify-content: center;
     padding: 0.75rem 1.5rem;
     box-shadow: 0 0 24px 0 rgb(133 60 210 / 50%);
-    background: linear-gradient(90deg,#25e7d0,#5893b8);
+    //background: linear-gradient(90deg,#25e7d0,#5893b8);
+    background: linear-gradient(120deg,#c6224e,#1e5d91);
     transition: .2s;
     border-radius: 0.5rem;
     color: #fff;
@@ -1469,7 +1470,8 @@
     align-items: center;
     box-shadow: 0 0 24px 0 rgb(133 60 210 / 50%);
     transition: .2s;
-    background: linear-gradient(90deg,#6825e7,#aa58b8);
+    background: linear-gradient(120deg,#c6224e,#1e5d91);
+    //background-color: #c6224e;
     color: #fff;
     text-decoration: none;
     --tw-space-x-reverse: 0 !important;
@@ -1548,6 +1550,7 @@
     padding-top: 1rem;
     background: transparent;
     padding-bottom: 1rem;
+    font-size: 1rem;
     /* outline: 2px solid transparent;
     outline-offset: 2px; */
     margin-bottom: -1px;
@@ -1620,15 +1623,18 @@
     max-width: 33.3333333333%;
 }
 
+.CardBlock:hover{
+    cursor: pointer;
+}
+
 .Card{
     position: relative;
     display: flex;
     flex-direction: column;
     min-width: 0;
     word-wrap: break-word;
-    background-color: #fff;
     background-clip: border-box;
-    border: 1px solid rgba(0,0,0,.125);
+    //border: 1px solid rgba(0,0,0,.125);
     border-radius: 1rem;
 
     transition-property: background-color,border-color,color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter!important;
@@ -1638,9 +1644,9 @@
     transition-duration: .15s!important;
 
     --tw-bg-opacity: 1!important;
-    background-color: #fff !important;
+    background-color: #1f1a1d !important;
 
-    border-color: rgba(82,54,117,var(--tw-border-opacity))!important;
+    //border-color: rgba(82,54,117,var(--tw-border-opacity))!important;
     overflow: hidden!important;
     transform: var(--tw-transform)!important;
     height: 100%!important;
@@ -1702,7 +1708,7 @@
         font-weight: 600 !important;
         font-size: 1.25em !important;
         //margin-top: 0.5em;
-        color: #000;
+        color: #fff;
     }
 
     .Label1{
@@ -1711,7 +1717,7 @@
         justify-content: center;
         --tw-text-opacity: 1!important;
         line-height: 1!important;
-        color: #000;
+        color: #fff;
     }
 }
 
@@ -1720,7 +1726,7 @@
     line-height: 1.25rem!important;
     opacity: .7!important;
     padding-top: 1em;
-    color: #000;
+    color: #fff;
 }
 
 .smalltext{
@@ -1728,11 +1734,11 @@
     line-height: 1.25rem!important;
     opacity: 1;
     margin-top: 10px;
-    color: #000;
+    color: #fff;
 }
 
 .maintext{
-    color: #000 !important;
+    color: #fff !important;
     --tw-text-opacity: 1!important;
     width: fit-content;
 }
@@ -1758,7 +1764,7 @@
       display: flex;
       flex-direction: column;
       height: 100%;
-      background-color: #111827;
+      background-color: transparent;
       transition: .2s;
       max-width: 1800px;
       
@@ -1779,7 +1785,7 @@
       justify-content: start;
       align-items: center;
       width: 100%;
-      padding: 16px 24px;
+      padding: 16px 0;
       position: relative;
       
       &Left{
@@ -1793,7 +1799,7 @@
 
 .searchWrapper {
     border-radius: 20px;
-    background-color: #1f2937;
+    background-color: #2e3032;
     padding-right: 12px;
     height: 40px;
     display: flex;
@@ -1826,7 +1832,7 @@
 
 .projectsSection{
     flex: 2;
-    background-color: #1f2937;
+    background-color: #0e0304;
     border-radius: 32px;
     padding: 32px 32px 0 32px;
     overflow: hidden;
@@ -1844,13 +1850,18 @@
 
 .projectsStatus {
     display: flex;
+    justify-content: space-between;
+    width: 35%;
 }
 
 .itemStatus {
     display: flex;
+    justify-content: center;
+    align-items: center;
     flex-direction: column;
-    margin-right: 16px;
-    
+    margin-right: 1rem;
+    border-radius: 15px;
+    transition: .2s;
     &:not(:last-child) .status-type:after {
       content: '';
       position: absolute;
@@ -1864,17 +1875,24 @@
     }
 }
 
+.itemStatus:hover{
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
 .statusNumber {
     font-size: 24px;
     line-height: 32px;
     font-weight: 700;
+    padding: 0.2em;
     color: #FFF;
 }
   
 .statusType {
-    position: relative;
-    padding-right: 24px;
+    display: flex;
+    justify-content: center;
     color: #D2D4D7;
+    padding: 0.05em;
 }
 
 .viewActions {
@@ -1914,9 +1932,13 @@
 .projectBoxWrapper{
     width: 100%;
     transition: 0.2s;
-    background-color: #fff;
+    background-color: #2e3032;
     border-radius: 15px;
     margin-bottom: 1rem;
+}
+
+.projectBoxWrapper:hover{
+    cursor: pointer;
 }
 
 .projectContainer{
@@ -1946,7 +1968,7 @@
         font-size: .875rem !important;
         line-height: 1.25rem !important;
         opacity: .7 !important;
-        color: #000;
+        color: #fff;
     }
 }
 
@@ -1995,7 +2017,7 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 16px;
-    color: #807971;
+    color: #fff;
 }
 
 .projectBtnMore{
@@ -2021,7 +2043,7 @@
         .ant-progress-text{
             display: inline-flex;
             justify-content: end;
-            color: black;
+            color: white;
             width: 100%;
             padding-right: 10px;
         }
@@ -2039,11 +2061,11 @@
 
 .daysLeft{
     width: 100%;
-    background-color: rgba(255,255,255,0.6);
+    //background-color: rgba(255,255,255,0.6);
     font-size: 12px;
     border-radius: 20px;
+    color: white;
     flex-shrink: 0;
-    padding: 6px 0;
     font-weight: 600;
     display: inline-flex;
     justify-content: end;
@@ -2054,9 +2076,8 @@
     font-size: 1rem;
     border-radius: 20px;
     flex-shrink: 0;
-    padding: 1.2rem 0.7rem 1.2rem 1.2rem;
     font-weight: 600;
-    color: black;
+    color: white;
     display: inline-flex;
     justify-content: end;
 }

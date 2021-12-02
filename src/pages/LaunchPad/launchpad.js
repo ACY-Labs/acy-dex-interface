@@ -498,7 +498,7 @@ const LaunchpadComponent = () => {
                         <div className={styles.carouselBlock}>
                             <div className={styles.stepBlock} id="block">
                                 <div className={styles.cntBlock}>
-                                <div className={styles.labelBlock}>
+{/*                               <div className={styles.labelBlock}>
                                     <div className={styles.countLabelBlock}>
                                         <div className={styles.countLabel}>
                                             ROUND 1
@@ -508,7 +508,7 @@ const LaunchpadComponent = () => {
                                         <p style={{color:'#b5b5b6', fontSize:"13px"}}>Open: {selectedTableRow.openDate} 10:00 UST</p>
                                         <p style={{color:'#b5b5b6', fontSize:"13px"}}>Close: {selectedTableRow.closeDate} 10:00 UST</p>
                                     </div>
-                                </div>
+                                </div> */}
                                 <CountDown />
                                 <StepBar />
                                 </div>
