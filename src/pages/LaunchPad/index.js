@@ -210,13 +210,13 @@ const Pool = (props)=> {
                   </a>
                 </div>
                 <div>
-                  <a href="https://t.me/TrustPad" className={styles.btnTelegram} target="_blank" rel="noreferrer">
+                  <a href="https://t.me/acyfinance" className={styles.btnTelegram} target="_blank" rel="noreferrer">
                     <img src={telegramWIcon} alt="" style={{height:'1.4em', width:'1.5em', objectFit:'contain', fontSize: '1.5em', margin: '0 10px 0 0'}} />
                     Telegram
                   </a>
                 </div>
                 <div>
-                  <a href="https://t.me/TrustPadAnn" className={styles.btnTelegram} target="_blank" rel="noreferrer">
+                  <a href="https://t.me/ACYFinanceChannel" className={styles.btnTelegram} target="_blank" rel="noreferrer">
                     <img src={announcementIcon} alt="" style={{height:'1.4em', width:'1.5em', objectFit:'contain', fontSize: '1.5em', margin: '0 10px 0 0'}} />
                     Announcements
                   </a>
