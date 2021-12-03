@@ -39,10 +39,9 @@ const StyledPageHeader = styled(AcyPageHeader)`
     }
 `;
 
-const TokenListManager = ({ onBack }) => {
+const TokenListManager = ({ onBack, customTokenList, setCustomTokenList }) => {
     const [searchAddr, setSearchAddr] = useState(null);
     const [searchResult, setSearchResult] = useState(null);
-    const [customTokenList, setCustomTokenList] = useState([]);
 
     // // FIXME: device a faster way of token lookup
     // const [tokenList, setTokenList] = useState([]);
@@ -55,31 +54,44 @@ const TokenListManager = ({ onBack }) => {
     //     getTokenList();
     // }, []);
 
-    // load custom token list from localStorage
-    useEffect(() => {
-        const localTokenList = JSON.parse(localStorage.getItem('customTokenList')) || [];
-        setCustomTokenList(localTokenList);
-      }, [])
-
     const getTokenInfo = async () => {
         console.log("start to fetch")
         // const list = await axios.get("https://api.coingecko.com/api/v3/coins/list");
         // axios.get(`https://api.coingecko.com/api/v3/coins/ethereum/contract/${searchAddr}`).then(res => {
-        axios.post(`https://eth-mainnet.alchemyapi.io/v2/18lHSAeZttzI4wJvHpXlJGHK4ZDNCTCP`
-        , {
-            "jsonrpc": "2.0",
-            "id": 0,
-            "method": "alchemy_getTokenMetadata",
-            "params": [
-              searchAddr
-            ]
-          }
-        
-        ).then(res => {
-            console.log("test returned data", res.data)
-            const { name, symbol, logo, decimals } = res.data.result;
-            setSearchResult({ name: name.charAt(0).toUpperCase() + name.slice(1), symbol: symbol.toUpperCase(), logoURI: logo, decimals });
-        }).catch(error => { console.log("error happened", error) })
+
+        // axios.post(`https://eth-mainnet.alchemyapi.io/v2/18lHSAeZttzI4wJvHpXlJGHK4ZDNCTCP`
+        // , {
+        //     "jsonrpc": "2.0",
+        //     "id": 0,
+        //     "method": "alchemy_getTokenMetadata",
+        //     "params": [
+        //       searchAddr
+        //     ]
+        //   }
+
+        // ).then(res => {
+        //     console.log("test returned data", res.data)
+        //     const { name, symbol, logo, decimals } = res.data.result;
+        //     setSearchResult({
+        //         address: searchAddr,
+        //         name: name.charAt(0).toUpperCase() + name.slice(1),
+        //         symbol: symbol.toUpperCase(),
+        //         logoURI: logo,
+        //         decimals
+        //     });
+        // }).catch(error => { console.log("error happened", error) })
+
+        // // only suitable for mainnet
+        // axios.get("https://tokens.coingecko.com/uniswap/all.json").then(res => {
+        //     const tokenList = res.data.tokens;
+        //     const result = tokenList.find(t => t.address == searchAddr);
+        //     setSearchResult(result);
+        // })
+        axios.get("https://gist.githubusercontent.com/ykchong45/f201e0a1ba0a81f2d4eff2eae1277560/raw/9686c031a6073d2e4a36f5930457294a9c7a1fd3/rinkebyTokenList.json").then(res => {
+            const tokenList = res.data;
+            const result = tokenList.find(t => t.address == searchAddr);
+            setSearchResult(result);
+        })
     }
     useEffect(() => {
         if (utils.isAddress(searchAddr))
@@ -104,7 +116,7 @@ const TokenListManager = ({ onBack }) => {
     const removeFromTokenList = (idx) => {
         const newCustomTokenList = [...customTokenList];
         newCustomTokenList.splice(idx, 1);
-    
+
         console.log("test after removing:", newCustomTokenList);
         setCustomTokenList(newCustomTokenList);
         localStorage.setItem("customTokenList", JSON.stringify(newCustomTokenList))
@@ -117,6 +129,12 @@ const TokenListManager = ({ onBack }) => {
         // subTitle="This is a subtitle"
         >
             {/* <div className={styles.title}> a token</div> */}
+                <div className={styles.textCenter}>
+                    Current &nbsp;
+                    <a target="_blank" href="https://gist.githubusercontent.com/ykchong45/f201e0a1ba0a81f2d4eff2eae1277560/raw/9686c031a6073d2e4a36f5930457294a9c7a1fd3/rinkebyTokenList.json" >
+                        lookup list
+                    </a>
+                </div>
             <div className={styles.search}>
                 <Input
                     size="large"
@@ -136,6 +154,8 @@ const TokenListManager = ({ onBack }) => {
                     customIcon={false}
                     selectToken={addToTokenList}
                     hideBalance
+                    // check if token is already added
+                    style={{ opacity: customTokenList.find(t => t.address == searchResult.address) ? 0.2 : 1}}
                 />
                     : <div className={styles.textCenter}>
                         {searchAddr ? "No matching token found" : "Please search a token"}
