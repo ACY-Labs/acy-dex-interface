@@ -36,7 +36,9 @@ const SearchField = ({ setKeyword, showSearch, setShowSearch }) => {
     renderComponent = <div style={{ display: "flex", alignItems: "center", backgroundColor: "#191b20", margin: "0 -16px 0 0", borderRadius: "4px" }}>
       <input
         ref={inputRef}
+        autoFocus
         style={{ display: showSearch ? "block" : "none", width: "100%", backgroundColor: "transparent", border: "1px solid #1c9965", borderRadius: "30px", outline: 0, paddingLeft: "0.4rem" }}
+        onChange={e => { setKeyword(e.target.value) } }
         onKeyPress={e => { if (e.key === "Enter") setKeyword(e.target.value); inputRef.current.value = e.target.value }}
       />
       <Icon type="close"
@@ -374,7 +376,7 @@ const AcyLiquidityPositions = (props) => {
         const token1 = new Token(chainId, token1Address, token1Decimal, token1Symbol);
 
         // queue get pair task
-        const pair = await Fetcher.fetchPairData(token0, token1, library);
+        const pair = Fetcher.fetchPairData(token0, token1, library);
         fetchTask.push(pair);
         console.log("adding task to array")
       }
@@ -413,7 +415,9 @@ const AcyLiquidityPositions = (props) => {
   useEffect(() => {
     let filtered = userLPData;
     if (keyword !== "" && filtered) {
-      filtered = filtered.filter(item => item.pool.toLowerCase().includes(keyword.toLowerCase()));
+      const conditions = keyword.toLowerCase().split(/[\s\/,]+/);
+      console.log("splitting result", conditions);
+      filtered = filtered.filter(item => conditions.every(condition => item.pool.toLowerCase().includes(condition)));
     }
     setFilteredData(filtered);
   }, [userLPData, keyword]);
@@ -609,13 +613,13 @@ const AcyLiquidityPositions = (props) => {
     console.log("test done setAddTokens from table")
   }
 
-  // auto scroll to newly loaded data
-  useEffect(() => {
-    if (filteredData.length) {
-      document.querySelector(`#liquidityPositionTable > div > div >div.ant-table-body > table > tbody > tr:last-child`).scrollIntoView({ behavior: "smooth" });
-      console.log(`scroll last row of table into view`);
-    }
-  }, [filteredData]);
+  // // auto scroll to newly loaded data
+  // useEffect(() => {
+  //   if (filteredData.length) {
+  //     document.querySelector(`#liquidityPositionTable > div > div >div.ant-table-body > table > tbody > tr:last-child`).scrollIntoView({ behavior: "smooth" });
+  //     console.log(`scroll last row of table into view`);
+  //   }
+  // }, [filteredData]);
 
   // first time loading
   useEffect(() => {
