@@ -621,7 +621,7 @@ const LaunchpadComponent = () => {
                             </div>
                         </div>
                         <div className={styles.whitelistBox}>
-                            <Button className={styles.whiteListToggleButton} shape="round" onClick={() => setSelectedForm(1)}>Participate</Button>
+                            <Button className={styles.whiteListToggleButton} shape="round" onClick={() => setSelectedForm(2)}>Participate</Button>
                         </div>
                     </div>
                 )}
