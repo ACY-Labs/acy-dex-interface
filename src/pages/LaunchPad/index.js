@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useHistory } from 'react-router-dom';
 import {Card, Icon, Progress} from 'antd';
 import LaunchPad from './launchpad';
 import styles from './styles.less';
@@ -61,17 +62,21 @@ const Pool = (props)=> {
       document.getElementById('bigTitle').style.backgroundPosition = traX + "%" + traY + "%";
     }
 
-    const onClick = () => setnextPage(1)
+    const history = useHistory();
+    const onClick = () => {
+      history.push("/launchpad/project")
+    }
+
     const switchProject = (str) => setProjectStatus(str)
+    const myPos = useRef();
     const goToPos = () => {
-      const ele = document.getElementById('projectBoxes')
-      ele.scrollIntoView()
+      myPos.current.scrollIntoView();
     }
 
     function CardBlock(props) {
       return (
-        <div className={styles.CardBlock} onClick={() => {onClick();}}>
-          <Card className={styles.Card}>
+        <div className={styles.CardBlock}>
+          <Card className={styles.Card} onClick={() => {onClick();}}>
             <div id='space 1'>
               <div className={styles.projectBoxHeader}>
                 <span>December 10, 2021</span>
@@ -189,185 +194,178 @@ const Pool = (props)=> {
 
     return(
       <div className={styles.launchRoot}>
-        {nextPage === 0 &&
-          <div>
-            <div className={styles.pooltopContainer}>
-              <div className={styles.bigTitle} id='bigTitle' onMouseMove={mouseMove}>
-                THE BEST <br />IDO PROJECTS
-              </div>
+        <div className={styles.pooltopContainer}>
+          <div className={styles.bigTitle} id='bigTitle' onMouseMove={mouseMove}>
+            THE BEST <br />IDO PROJECTS
+          </div>
+        </div>
+        <div className={styles.bottomContainer}>
+          <p className={styles.titleDesc}>
+            Launching hand-picked high-quality projects on the Blockchain.
+          </p>
+          <div className={styles.buttonContainer}>
+            <div>
+              <a href="https://www.google.com" className={styles.btnApply} target="_blank" rel="noreferrer">
+                <Icon type="rocket" style={{fontSize: '2em', margin: '0 10px 0 0'}} />
+                Apply As A Project
+              </a>
             </div>
-            <div className={styles.bottomContainer}>
-              <p className={styles.titleDesc}>
-                Launching hand-picked high-quality projects on the Blockchain.
-              </p>
-              <div className={styles.buttonContainer}>
-                <div>
-                  <a href="https://www.google.com" className={styles.btnApply} target="_blank" rel="noreferrer">
-                    <Icon type="rocket" style={{fontSize: '2em', margin: '0 10px 0 0'}} />
-                    Apply As A Project
-                  </a>
-                </div>
-                <div>
-                  <a href="https://t.me/acyfinance" className={styles.btnTelegram} target="_blank" rel="noreferrer">
-                    <img src={telegramWIcon} alt="" style={{height:'1.4em', width:'1.5em', objectFit:'contain', fontSize: '1.5em', margin: '0 10px 0 0'}} />
-                    Telegram
-                  </a>
-                </div>
-                <div>
-                  <a href="https://t.me/ACYFinanceChannel" className={styles.btnTelegram} target="_blank" rel="noreferrer">
-                    <img src={announcementIcon} alt="" style={{height:'1.4em', width:'1.5em', objectFit:'contain', fontSize: '1.5em', margin: '0 10px 0 0'}} />
-                    Announcements
-                  </a>
-                </div>
-              </div>
+            <div>
+              <a href="https://t.me/acyfinance" className={styles.btnTelegram} target="_blank" rel="noreferrer">
+                <img src={telegramWIcon} alt="" style={{height:'1.4em', width:'1.5em', objectFit:'contain', fontSize: '1.5em', margin: '0 10px 0 0'}} />
+                Telegram
+              </a>
             </div>
-            <div className={styles.btmContent}>
-              <div className={styles.darkbg}>
-                <div className={styles.navContainer}>
-                  <div className={styles.nav} role="tablist">
-                    <div className={styles.navItem}>
-                      <SelectednavBtn text='Pools 🔥' />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <section>
-                <div className={styles.appContainer}>
-                  <div className={styles.appHeader}>
-                    <div className={styles.appHeaderLeft}>
-                      <div className={styles.searchWrapper}>
-                        <input className={styles.searchInput} type="text" placeholder="Search IDO Projects" />
-                        <Icon type="search" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className={styles.projectsSection}>
-                    <div className={styles.projectsSectionLine}>
-                      <div className={styles.projectsStatus}>
-                        <div className={styles.itemStatus} onClick={() => {switchProject('inProgress');}}>
-                          <span className={styles.statusNumber}>45</span>
-                          <span className={styles.statusType}>In Progress</span>
-                        </div>
-                        <div className={styles.itemStatus} onClick={() => {switchProject('upcoming');}}>
-                          <span className={styles.statusNumber}>24</span>
-                          <span className={styles.statusType}>Upcoming</span>
-                        </div>
-                        <div className={styles.itemStatus} onClick={() => {switchProject('ended');}}>
-                          <span className={styles.statusNumber}>10</span>
-                          <span className={styles.statusType}>Ended</span>
-                        </div>
-                        <div className={styles.itemStatus} onClick={() => {switchProject('allProjects');}}>
-                          <span className={styles.statusNumber}>62</span>
-                          <span className={styles.statusType}>Total Projects</span>
-                        </div>
-                      </div>
-                      <div className={styles.viewActions}>
-                        <button className={styles.viewBtn} onClick={() => setView('list')} type="button" title="List View">
-                          <img src={listView} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain'}} />
-                        </button>
-                        <button className={styles.viewBtn} onClick={() => setView('grid')} type="button" title="Grid View">
-                          <img src={gridView} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain'}} />
-                        </button>
-                      </div>
-                    </div>
-                    <div>
-                      {view === 'list' &&
-                        <div className={styles.projectBoxes}>
-                          {projectStatus === 'inProgress' &&
-                            <div>
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                            </div>
-                          }
-                          {projectStatus === 'upcoming' &&
-                            <div>
-                              <ListCard />
-                              <ListCard />
-                            </div>
-                          }
-                          {projectStatus === 'ended' &&
-                            <div>
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                            </div>
-                          }
-                          {projectStatus === 'allProjects' &&
-                            <div>
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                              <ListCard />
-                            </div>
-                          }
-                        </div>
-                      }
-                      {view === 'grid' &&
-                        <div className={styles.projectBoxes}>
-                          {projectStatus === 'inProgress' &&
-                            <div className={styles.projectBoxes}>
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                            </div>
-                          }
-                          {projectStatus === 'upcoming' &&
-                            <div className={styles.projectBoxes}>
-                              <CardBlock />
-                              <CardBlock />
-                            </div>
-                          }
-                          {projectStatus === 'ended' &&
-                            <div className={styles.projectBoxes}>
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                            </div>
-                          }
-                          {projectStatus === 'allProjects' &&
-                            <div className={styles.projectBoxes}>
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                              <CardBlock />
-                            </div>
-                          }
-                        </div>
-                      }
-                    </div>
-                  </div>
-                </div>
-              </section>
+            <div>
+              <a href="https://t.me/ACYFinanceChannel" className={styles.btnTelegram} target="_blank" rel="noreferrer">
+                <img src={announcementIcon} alt="" style={{height:'1.4em', width:'1.5em', objectFit:'contain', fontSize: '1.5em', margin: '0 10px 0 0'}} />
+                Announcements
+              </a>
             </div>
           </div>
-        }
-        {nextPage === 1 &&
-          <LaunchPad />
-        }
+        </div>
+        <div className={styles.btmContent}>
+          <div className={styles.darkbg}>
+            <div className={styles.navContainer}>
+              <div className={styles.nav} role="tablist">
+                <div className={styles.navItem}>
+                  <SelectednavBtn text='Pools 🔥' />
+                </div>
+              </div>
+            </div>
+          </div>
+          <section>
+            <div className={styles.appContainer}>
+              <div className={styles.appHeader}>
+                <div className={styles.appHeaderLeft}>
+                  <div className={styles.searchWrapper}>
+                    <input className={styles.searchInput} type="text" placeholder="Search IDO Projects" />
+                    <Icon type="search" />
+                  </div>
+                </div>
+              </div>
+              <div className={styles.projectsSection}>
+                <div className={styles.projectsSectionLine}>
+                  <div className={styles.projectsStatus}>
+                    <div className={styles.itemStatus} onClick={() => {switchProject('inProgress'); goToPos();}}>
+                      <span className={styles.statusNumber}>45</span>
+                      <span className={styles.statusType}>In Progress</span>
+                    </div>
+                    <div className={styles.itemStatus} onClick={() => {switchProject('upcoming');}}>
+                      <span className={styles.statusNumber}>24</span>
+                      <span className={styles.statusType}>Upcoming</span>
+                    </div>
+                    <div className={styles.itemStatus} onClick={() => {switchProject('ended');}}>
+                      <span className={styles.statusNumber}>10</span>
+                      <span className={styles.statusType}>Ended</span>
+                    </div>
+                    <div className={styles.itemStatus} onClick={() => {switchProject('allProjects'); goToPos();}}>
+                      <span className={styles.statusNumber}>62</span>
+                      <span className={styles.statusType}>Total Projects</span>
+                    </div>
+                  </div>
+                  <div className={styles.viewActions}>
+                    <button className={styles.viewBtn} onClick={() => setView('list')} type="button" title="List View">
+                      <img src={listView} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain'}} />
+                    </button>
+                    <button className={styles.viewBtn} onClick={() => setView('grid')} type="button" title="Grid View">
+                      <img src={gridView} alt="" style={{height:'1.5em', width:'auto', objectFit:'contain'}} />
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  {view === 'list' &&
+                    <div className={styles.projectBoxes} ref={myPos}>
+                      {projectStatus === 'inProgress' &&
+                        <div>
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                        </div>
+                      }
+                      {projectStatus === 'upcoming' &&
+                        <div>
+                          <ListCard />
+                          <ListCard />
+                        </div>
+                      }
+                      {projectStatus === 'ended' &&
+                        <div>
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                        </div>
+                      }
+                      {projectStatus === 'allProjects' &&
+                        <div>
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                          <ListCard />
+                        </div>
+                      }
+                    </div>
+                  }
+                  {view === 'grid' &&
+                    <div className={styles.projectBoxes} ref={myPos}>
+                      {projectStatus === 'inProgress' &&
+                        <div className={styles.projectBoxes}>
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                        </div>
+                      }
+                      {projectStatus === 'upcoming' &&
+                        <div className={styles.projectBoxes}>
+                          <CardBlock />
+                          <CardBlock />
+                        </div>
+                      }
+                      {projectStatus === 'ended' &&
+                        <div className={styles.projectBoxes}>
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                        </div>
+                      }
+                      {projectStatus === 'allProjects' &&
+                        <div className={styles.projectBoxes}>
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                          <CardBlock />
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
     )
 };
