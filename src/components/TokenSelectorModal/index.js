@@ -12,17 +12,24 @@ import styles from "./styles.less";
 const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
     const [currentPanel, setCurrentPanel] = useState("selectToken");
 
+    const [initTokenList, setInitTokenList] = useState(INITIAL_TOKEN_LIST);
+    const [customTokenList, setCustomTokenList] = useState([]);
+    const [renderTokenList, setRenderTokenList] = useState([]); // actual token list rendered 
     const [tokenSearchInput, setTokenSearchInput] = useState('');
-    const [tokenList, setTokenList] = useState(INITIAL_TOKEN_LIST);
     const [favTokenList, setFavTokenList] = useState([]);
 
     useEffect(() => {
+        //read customTokenList from storage
+        const localTokenList = JSON.parse(localStorage.getItem('customTokenList')) || [];
+        setCustomTokenList(localTokenList);
+        //combine initTokenList and customTokenList
+        setRenderTokenList([...localTokenList, ...initTokenList]);
         //read the fav tokens code in storage
-        var tokens_symbol = JSON.parse(localStorage.getItem('tokens_symbol'));
+        var favTokenSymbol = JSON.parse(localStorage.getItem('tokens_symbol'));
         //set to fav token
-        if (tokens_symbol != null) {
+        if (favTokenSymbol != null) {
             setFavTokenList(
-                INITIAL_TOKEN_LIST.filter(token => tokens_symbol.includes(token.symbol))
+                renderTokenList.filter(token => favTokenSymbol.includes(token.symbol))
             );
         }
     }, []);
@@ -31,7 +38,7 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
         // reset back to selectToken after closing modal
         if (visible === false)
             setCurrentPanel("selectToken");
-    }, [visible])
+    }, [visible]);
 
     useEffect(() => {
         // focus search input every time token modal is opened.
@@ -45,8 +52,8 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
     // and filter the token list based on the comparison of the value of search input field and token symbol.
     const onTokenSearchChange = e => {
         setTokenSearchInput(e.target.value);
-        setTokenList(
-            INITIAL_TOKEN_LIST.filter(token => token.symbol.includes(e.target.value.toUpperCase()))
+        setInitTokenList(
+            renderTokenList.filter(token => token.symbol.includes(e.target.value.toUpperCase()))
         );
     };
 
@@ -90,7 +97,22 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
                     <div className={styles.coinList}>
                         <AcyTabs>
                             <AcyTabPane tab="All" key="1">
-                                {tokenList.length ? tokenList.map((token, index) => {
+                                {customTokenList.length ? customTokenList.map((token, index) => {
+                                    return (
+                                        <AcyCoinItem
+                                            data={token}
+                                            key={index}
+                                            customIcon={false}
+                                            clickCallback={() => setTokenAsFav(token)}
+                                            selectToken={() => {
+                                                onCoinClick(token);
+                                            }}
+                                            isFav={favTokenList.includes(token)}
+                                        />
+                                    );
+                                }) : null}
+
+                                {initTokenList.length ? initTokenList.map((token, index) => {
                                     return (
                                         <AcyCoinItem
                                             data={token}
@@ -130,7 +152,12 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
                         <Icon type="form" style={{ marginRight: "1rem" }} /> Manage Token Lists
                     </div>
                 </>
-            ) : <TokenListManager onBack={() => setCurrentPanel("selectToken")} />}
+            )
+                : <TokenListManager
+                    customTokenList={customTokenList}
+                    setCustomTokenList={setCustomTokenList}
+                    onBack={() => setCurrentPanel("selectToken")}
+                />}
         </AcyModal>
     )
 }
