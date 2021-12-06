@@ -10,6 +10,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
         let FROM_HASH = account.toString().toLowerCase().slice(2);
         let TO_HASH ;
+        fetchedData = fetchedData.filter(item => item.txreceipt_status == 1);
         let filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToToken.id));
         let newData = [];
 
@@ -101,11 +102,10 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
         return newData;
     }
     else if (filter == 'LIQUIDITY') {
-        // console.log("Debugging luquidity");
         let FROM_HASH = account.toString().toLowerCase().slice(2);
         let TO_HASH ;
+        fetchedData = fetchedData.filter(item => item.txreceipt_status == 1);
         let filteredData = fetchedData.filter(item => item.input.startsWith(methodList.addLiquidity.id));
-        
         let newData = [];
 
         for (let item of filteredData) {
@@ -148,7 +148,6 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             "transactionTime": transactionTime
             })
         }
-
         filteredData = fetchedData.filter(item => item.input.startsWith(methodList.addLiquidityEth.id));
 
         for (let item of filteredData) {
@@ -294,12 +293,16 @@ export async function getTransactionsByAccount (account,library,filter){
     return [];
 }
 function getChartData (data){
-    let amm = data.liquidity1 / (data.totalOut + data.liquidity1) ;
-    console.log('liquidity 1： ',data.liquidity1);
-    console.log('liquidity 2： ',data.liquidity2);
+    // let amm = data.liquidity1 / (data.totalOut + data.liquidity1) ;
+    // console.log('liquidity 1： ',data.liquidity1);
+    // console.log('liquidity 2： ',data.liquidity2);
 
-    amm = amm * data.liquidity2;
-    amm = data.liquidity2 - amm;
+    // amm = amm * data.liquidity2;
+    // amm = data.liquidity2 - amm;
+
+    //TODO getting amm output, not implemented yet.
+
+    let amm = data.totalIn * 0.3;
     let revenue = data.totalIn - amm;
 
     return{
