@@ -233,7 +233,7 @@ const Transaction = props => {
             </tr>
           </table>
           
-          <h1><AcyIcon.MyIcon width={30} type="arrow" />Trader Receive</h1>
+          <h1><AcyIcon.MyIcon width={30} type="arrow" />Trader Receives</h1>
           <table style={{width:'500px'}}>
             <tr>
               <td className={styles.tableFirstCol} ><span>{data.token2.symbol}</span>
