@@ -67,7 +67,17 @@ export default [
       {
         path: '/launchpad',
         name: 'Launch',
-        component: './LaunchPad/Index',
+        hideChildrenInMenu: true,
+        routes: [
+          {
+            path: '/launchpad',
+            component: './LaunchPad/Index',
+          },
+          {
+            path: '/launchpad/project',
+            component: './LaunchPad/launchpad',
+          },
+        ],
       },
       {
         path: '/transaction/:id?',
@@ -75,11 +85,6 @@ export default [
         hideInMenu:true,
         component: './Transaction/',
       },
-      {
-        path: '/pool',
-        name: 'Pool',
-        component: './Pool/Index',
-      }
     ],
   },
 ];

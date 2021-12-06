@@ -23,6 +23,7 @@ import {
   AcyDescriptions,
   AcySmallButton,
 } from '@/components/Acy';
+import TokenSelectorModal from "@/components/TokenSelectorModal";
 
 import { connect } from 'umi';
 import styles from './styles.less';
@@ -75,8 +76,8 @@ import {
 
 import { MaxUint256 } from '@ethersproject/constants';
 import { BigNumber } from '@ethersproject/bignumber';
-import { parseUnits  } from '@ethersproject/units';
-import { hexlify  } from '@ethersproject/bytes';
+import { parseUnits } from '@ethersproject/units';
+import { hexlify } from '@ethersproject/bytes';
 
 const { AcyTabPane } = AcyTabs;
 import { Row, Col, Button, Input, Icon } from 'antd';
@@ -144,24 +145,12 @@ const SwapComponent = props => {
   const [wrappedAmount, setWrappedAmount] = useState();
   const [showSpinner, setShowSpinner] = useState(false);
 
-  const [tokenSearchInput, setTokenSearchInput] = useState('');
-  const [tokenList, setTokenList] = useState(INITIAL_TOKEN_LIST);
-
   // connect to page model, reflect changes of pair ratio in this component
   useEffect(() => {
-    const { swap: {token0: modelToken0, token1: modelToken1} } = props;
+    const { swap: { token0: modelToken0, token1: modelToken1 } } = props;
     setToken0(modelToken0);
     setToken1(modelToken1);
   }, [props.swap]);
-
-  // method to update the value of token search input field,
-  // and filter the token list based on the comparison of the value of search input field and token symbol.
-  const onTokenSearchChange = e => {
-    setTokenSearchInput(e.target.value);
-    setTokenList(
-      INITIAL_TOKEN_LIST.filter(token => token.symbol.includes(e.target.value.toUpperCase()))
-    );
-  };
 
   const individualFieldPlaceholder = 'Enter amount';
   const dependentFieldPlaceholder = 'Estimated value';
@@ -177,18 +166,6 @@ const SwapComponent = props => {
   // 监听钱包的连接
   useEffect(() => {
     activate(injected);
-
-    //read the fav tokens code in storage
-    var tokens_symbol = JSON.parse(localStorage.getItem('tokens_symbol'));
-    //set to fav token
-    if(tokens_symbol != null)
-    {
-      setFavTokenList(
-        INITIAL_TOKEN_LIST.filter(token => tokens_symbol.includes(token.symbol))
-      );
-    }
-    
-
   }, []);
 
   useEffect(
@@ -210,24 +187,6 @@ const SwapComponent = props => {
     [account, chainId, library]
   );
 
-  const [favTokenList, setFavTokenList] = useState([]);
-
-  const setTokenAsFav = token => {  
-    setFavTokenList(prevState => {
-      const prevFavTokenList = [...prevState];
-      if(prevFavTokenList.includes(token)) {
-        var tokens = prevFavTokenList.filter(value => value != token);
-        localStorage.setItem('token', JSON.stringify(tokens.map(e => e.addressOnEth)));
-        localStorage.setItem('tokens_symbol', JSON.stringify(tokens.map(e => e.symbol)));
-        return tokens
-      }
-      prevFavTokenList.push(token);
-      localStorage.setItem('token', JSON.stringify(prevFavTokenList.map(e => e.addressOnEth)));
-      localStorage.setItem('tokens_symbol', JSON.stringify(prevFavTokenList.map(e => e.symbol)));
-
-      return prevFavTokenList;
-    });
-  };
 
   // token1Amount is changed according to token0Amount
   const t0Changed = useCallback(
@@ -400,17 +359,6 @@ const SwapComponent = props => {
     }
   };
 
-  useEffect(
-    () => {
-      // focus search input every time token modal is opened.
-      // setTimeout is used as a workaround as document.getElementById always return null without  some delay.
-      const focusSearchInput = () =>
-        document.getElementById('liquidity-token-search-input').focus();
-      if (visible === true) setTimeout(focusSearchInput, 100);
-    },
-    [visible]
-  );
-
   const onClickCoin = () => {
     setVisible(true);
   };
@@ -488,7 +436,7 @@ const SwapComponent = props => {
             // let topics=hexlify(item.topics[0]).toText();
             // let ss=CryptoJS.SHA3.decrypt(item.topics[0]); 
             // debugger
-            if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == inputToken.address ) {
+            if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == inputToken.address) {
               // inputtoken 数量
               // inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
               inputTokenNum = item.data / Math.pow(10, inputToken.decimals).toString();
@@ -504,8 +452,7 @@ const SwapComponent = props => {
           // 获取美元价值
           await axios
             .post(
-              `https://api.acy.finance/api/chart/swap?token0=${inputToken.addressOnEth}&token1=${
-                outToken.addressOnEth
+              `https://api.acy.finance/api/chart/swap?token0=${inputToken.addressOnEth}&token1=${outToken.addressOnEth
               }&range=1D`
             )
             .then(data => {
@@ -521,7 +468,7 @@ const SwapComponent = props => {
               // });
             });
 
-            console.log("receipt transactionTime", transactionTime);
+          console.log("receipt transactionTime", transactionTime);
           dispatch({
             type: 'transaction/addTransaction',
             payload: {
@@ -617,11 +564,11 @@ const SwapComponent = props => {
       />
 
       <AcyDescriptions>
-            <div className={styles.breakdownTopContainer}>
-              <div className={styles.slippageContainer}>
-                <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '7px' }}>
-                  {/* <Button
+        <div className={styles.breakdownTopContainer}>
+          <div className={styles.slippageContainer}>
+            <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '7px' }}>
+              {/* <Button
                     type="link"
                     style={{ marginRight: '5px' }}
                     onClick={() => {
@@ -631,51 +578,51 @@ const SwapComponent = props => {
                   >
                     Auto
                   </Button> */}
-                  <Input
-                    value={inputSlippageTol || ''}
-                    onChange={e => {
-                      setInputSlippageTol(e.target.value);
-                    }}
-                    suffix={<strong>%</strong>}
-                  />
-                  <Button
-                    type="primary"
-                    style={{
-                      marginLeft: '10px',
-                      background: '#2e3032',
-                      borderColor: 'transparent',
-                    }}
-                    onClick={() => {
-                      if (isNaN(inputSlippageTol)) {
-                        setSlippageError('Please input valid slippage value!');
-                      } else {
-                        setSlippageError('');
-                        setSlippageTolerance(parseFloat(inputSlippageTol));
-                      }
-                    }}
-                  >
-                    Set
-                  </Button>
-                </div>
-                {slippageError.length > 0 && (
-                  <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
-                )}
-              </div>
-              <div className={styles.slippageContainer}>
-                <span style={{ fontWeight: 600, marginBottom: '10px' }}>Transaction deadline</span>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    width: '50%',
-                    marginTop: '7px',
-                  }}
-                >
-                  <Input type="number" value={Number(deadline).toString()} onChange={e => setDeadline(e.target.valueAsNumber || 0)} placeholder={30} suffix={<strong>minutes</strong>} />
-                </div>
-              </div>
+              <Input
+                value={inputSlippageTol || ''}
+                onChange={e => {
+                  setInputSlippageTol(e.target.value);
+                }}
+                suffix={<strong>%</strong>}
+              />
+              <Button
+                type="primary"
+                style={{
+                  marginLeft: '10px',
+                  background: '#2e3032',
+                  borderColor: 'transparent',
+                }}
+                onClick={() => {
+                  if (isNaN(inputSlippageTol)) {
+                    setSlippageError('Please input valid slippage value!');
+                  } else {
+                    setSlippageError('');
+                    setSlippageTolerance(parseFloat(inputSlippageTol));
+                  }
+                }}
+              >
+                Set
+              </Button>
             </div>
-            {/* <div className={styles.acyDescriptionContainer}>
+            {slippageError.length > 0 && (
+              <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
+            )}
+          </div>
+          <div className={styles.slippageContainer}>
+            <span style={{ fontWeight: 600, marginBottom: '10px' }}>Transaction deadline</span>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '50%',
+                marginTop: '7px',
+              }}
+            >
+              <Input type="number" value={Number(deadline).toString()} onChange={e => setDeadline(e.target.valueAsNumber || 0)} placeholder={30} suffix={<strong>minutes</strong>} />
+            </div>
+          </div>
+        </div>
+        {/* <div className={styles.acyDescriptionContainer}>
               {swapBreakdown.map(info => (
                 <AcyDescriptions.Item>
                   <div className={styles.acyDescriptionItem}>{info}</div>
@@ -684,7 +631,7 @@ const SwapComponent = props => {
             </div> */}
       </AcyDescriptions>
 
-      {needApprove 
+      {needApprove
         ? <div>
           <AcyButton
             style={{ marginTop: '25px' }}
@@ -711,108 +658,57 @@ const SwapComponent = props => {
         </div>
 
         : <AcyButton
-        style={{ marginTop: '25px' }}
-        disabled={!swapButtonState}
-        onClick={() => {
-          if (account == undefined) {
-            activate(injected);
-          } else {
-            setSwapButtonState(false);
-            setSwapButtonContent(<>Processing <Icon type="loading" /></>)
-            swap(
-              {
-                ...token0,
-                amount: token0Amount,
-              },
-              {
-                ...token1,
-                amount: token1Amount,
-              },
-              slippageTolerance * 100,
-              exactIn,
-              chainId,
-              library,
-              account,
-              pair,
-              route,
-              trade,
-              slippageAdjustedAmount,
-              minAmountOut,
-              maxAmountIn,
-              wethContract,
-              wrappedAmount,
-              deadline,
-              setSwapStatus,
-              setSwapButtonContent,
-              swapCallback
-            );
-          }
-        }}
-      >
-        {swapButtonContent}
-      </AcyButton>
+          style={{ marginTop: '25px' }}
+          disabled={!swapButtonState}
+          onClick={() => {
+            if (account == undefined) {
+              activate(injected);
+            } else {
+              setSwapButtonState(false);
+              setSwapButtonContent(<>Processing <Icon type="loading" /></>)
+              swap(
+                {
+                  ...token0,
+                  amount: token0Amount,
+                },
+                {
+                  ...token1,
+                  amount: token1Amount,
+                },
+                slippageTolerance * 100,
+                exactIn,
+                chainId,
+                library,
+                account,
+                pair,
+                route,
+                trade,
+                slippageAdjustedAmount,
+                minAmountOut,
+                maxAmountIn,
+                wethContract,
+                wrappedAmount,
+                deadline,
+                setSwapStatus,
+                setSwapButtonContent,
+                swapCallback
+              );
+            }
+          }}
+        >
+          {swapButtonContent}
+        </AcyButton>
       }
 
-        
+
 
       <AcyDescriptions>
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
-      <AcyModal onCancel={onCancel} width={400} visible={visible}>
-        <div className={styles.title}>Select a token</div>
-        <div className={styles.search}>
-          <Input
-            size="large"
-            style={{
-              backgroundColor: '#373739',
-              borderRadius: '40px',
-            }}
-            placeholder="Enter the token symbol or address"
-            value={tokenSearchInput}
-            onChange={onTokenSearchChange}
-            id="liquidity-token-search-input"
-          />
-        </div>
-
-        <div className={styles.coinList}>
-          <AcyTabs>
-            <AcyTabPane tab="All" key="1">
-              {tokenList.map((token, index) => {
-                return (
-                  <AcyCoinItem
-                    data={token}
-                    key={index}
-                    customIcon={false}
-                    setAsFav={() => setTokenAsFav(token)}
-                    // setAsFav={() => console.log('token:',token)}
-                    selectToken={() => {
-                      onCoinClick(token);
-                    }}
-                    isFav={favTokenList.includes(token)}
-                  />
-                );
-              })}
-            </AcyTabPane>
-            <AcyTabPane tab="Favorite" key="2">
-              {favTokenList.map((supToken, index) => (
-                <AcyCoinItem
-                  data={supToken}
-                  key={index}
-                  selectToken={() => {
-                    onCoinClick(supToken);
-                  }}
-                  customIcon={false}
-                  index={index}
-                  setAsFav={() => setTokenAsFav(supToken)}
-                  hideFavButton
-                  isFav={favTokenList.includes(supToken)}
-                />
-              ))}
-            </AcyTabPane>
-          </AcyTabs>
-        </div>
-      </AcyModal>
+      <TokenSelectorModal
+        onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick}
+      />
     </div>
   );
 };
