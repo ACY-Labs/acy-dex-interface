@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import styles from '@/pages/Farms/Farms.less';
 import { isMobile } from 'react-device-detect';
 import { harvestAll, harvest, withdraw } from '@/acy-dex-swap/core/farms';
-import { getUserTokenBalanceWithAddress } from '@/acy-dex-swap/utils';
+import { getUserTokenBalanceWithAddress, getUserTokenBalance } from '@/acy-dex-swap/utils';
 import StakeModal from './StakeModal';
 import { addLiquidity } from '@/acy-dex-swap/core/addLiquidity';
 import { AcyActionModal, AcyModal, AcyButton, AcyBarChart, AcyCard } from '@/components/Acy';
@@ -15,6 +15,8 @@ import classNames from 'classnames';
 import { getPool, getPoolAccmulateReward} from '@/acy-dex-swap/core/farms';
 import supportedTokens from '@/constants/TokenList';
 import StakeRow from './StakeRow';
+import { useWeb3React } from '@web3-react/core';
+import { BigNumber } from '@ethersproject/bignumber';
 import SwapComponent from '@/components/SwapComponent';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
@@ -47,7 +49,7 @@ const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
 };
 
 
-const FarmsTableRow = props => {
+const DaoTableRow = props => {
   const {
     index,
     lpTokens,
@@ -55,9 +57,6 @@ const FarmsTableRow = props => {
     walletConnected,
     connectWallet,
     hideArrow = false,
-    chainId,
-    account,
-    library,
     isMyFarms,
     harvestHistory,
     dispatch,
@@ -78,9 +77,7 @@ const FarmsTableRow = props => {
     searchInput,
     selectedTable,
     tokenFilter,
-    dao,
-    isLoading,
-    activeEnded
+    dao
   } = props;
 
   const [poolInfo, setPoolInfo] = useState(content);
@@ -118,8 +115,63 @@ const FarmsTableRow = props => {
 
   const ACY_LOGO = "https://acy.finance/static/media/logo.78c0179c.svg";
 
+  const [AcyBalance, setBal] = useState(0);
+  const { account, chainId, library, activate } = useWeb3React();
   
+  useEffect(
+    () => {
+        console.log("ACY supportedTokens:", supportedTokens.find( token => token.name == "ACY"));
+        console.log("library account chainId:", library, account, chainId );
+      if (!library || !account || !chainId) return;
+      function processString(bal) {
+        let decimals = bal.split('.')[0];
+        let fraction = bal.split('.')[1] || '0';
+        // console.log(`decimals: ${decimals} fraction:${fraction}`);
+        const million = BigNumber.from('1000000');
+        const billion = BigNumber.from('1000000000');
+        const trillion = BigNumber.from('1000000000000');
 
+        const decimalBN = BigNumber.from(decimals);
+        let unit = '';
+        if (decimalBN.gt(trillion)) {
+          decimals = `${decimalBN.div(trillion)}`;
+          unit = 'T';
+        } else if (decimalBN.gt(billion)) {
+          decimals = `${decimalBN.div(billion)}`;
+          unit = 'B';
+        } else if (decimalBN.gt(million)) {
+          decimals = `${decimalBN.div(million)}`;
+          unit = 'M';
+        }
+        decimals = decimals.toString();
+
+        const fractionBN = BigNumber.from(fraction);
+        if (fractionBN.gt(trillion)) fraction = `${fractionBN.div(trillion)}`;
+        else if (fractionBN.gt(billion)) fraction = `${fractionBN.div(billion)}`;
+        else if (fractionBN.gt(million)) fraction = `${fractionBN.div(million)}`;
+        fraction = fraction.toString();
+
+        console.log(`decimals: ${decimals}`);
+        console.log(fractionBN);
+        return `${decimals}${!fractionBN.isZero() ? `.${fraction}` : ''}${unit}`;
+      }
+      async function getThisTokenBalance() {
+        const { address, symbol, decimals } = supportedTokens.find( token => token.name == "ACY");
+        
+        const bal = await getUserTokenBalance(
+          { address, symbol, decimals },
+          chainId,
+          account,
+          library
+        );
+        console.log(bal);
+        setBal(processString(bal));
+      }
+      console.log("getThisTokenBalance:");
+      getThisTokenBalance();
+    },
+    [library, account, chainId]
+  );
 
   //function to get logo URI
   function getLogoURIWithSymbol(symbol) {
@@ -128,13 +180,13 @@ const FarmsTableRow = props => {
         return supportedTokens[j].logoURI;
       }
     }
-    return null;
+    return 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg';
   }
   useEffect(
     () => {
       setPoolInfo(content);
     },
-    [isLoading]
+    [content]
   );
   
 
@@ -172,25 +224,10 @@ const FarmsTableRow = props => {
   );
   
   let history = useHistory();
-  const BLOCKS_PER_SEC = 15;
-  const getDHM = (sec) => {
-    if(sec<0) return '00d:00h:00m';
-    var diff = sec;
-    var days = 0, hrs = 0, min = 0, leftSec = 0;
-    diff = Math.floor(diff);
-    days = Math.floor(diff/(24*60*60));
-    leftSec = diff - days * 24*60*60;
-    hrs = Math.floor(leftSec/(60*60));
-    leftSec = leftSec - hrs * 60*60;
-    min = Math.floor(leftSec/(60));
-    return days.toString() + 'd:' + hrs.toString() + 'h:' + min.toString() +'m';
-
-  }
 
   const refreshPoolInfo = async () => {
     console.log('refresh pool info:');
     const newPool = await getPool(library, account, poolId);
-    const block = await library.getBlockNumber();
     const newFarmsContent = {
       poolId: newPool.poolId,
       lpTokens: newPool.lpTokenAddress,
@@ -207,10 +244,7 @@ const FarmsTableRow = props => {
       hasUserPosition: newPool.hasUserPosition,
       userRewards: newPool.rewards,
       stakeData: newPool.stakeData,
-      poolLpScore: newPool.lpScore,
-      poolLpBalance: newPool.lpBalance,
-      endsIn: getDHM((newPool.endBlock - block) *BLOCKS_PER_SEC),
-      status: newPool.endBlock - block > 0 
+      poolLpScore: newPool.lpScore
     };
     setPoolInfo(newFarmsContent);
   };
@@ -395,9 +429,6 @@ const FarmsTableRow = props => {
   };
 
   const tableFilter = () => {
-    if(dao) {
-      return true;
-    }
     if(selectedTable === 0) {
       return true;
     } else if(selectedTable === 1) {
@@ -419,27 +450,14 @@ const FarmsTableRow = props => {
   }
 
   const getFilter = () =>{
-    console.log("Filter:",!tableFilter(), !searchFilter(), !daoFilter());
-    return !tableFilter() || !searchFilter() || !daoFilter() || activeEndedFilter();
-  }
-
-  const daoFilter = () => {
-    return !dao || (poolInfo.token1 && !poolInfo.token2);
-  }
-  const activeEndedFilter = () => {
-    return poolInfo.status != activeEnded;
+    if(dao) return false;
+    return !tableFilter() || !searchFilter();
   }
 
   return ( poolInfo && (!isMyFarms || poolInfo.hasUserPosition) && (
     <div className={styles.tableBodyRowContainer} hidden={getFilter()}>
       {/* Table Content */}
-      <div className={styles.tableBodyRowContentContainer} 
-        onClick={()=> {
-          if(poolInfo.status)
-            setHidden(prevState => !prevState)
-          }
-        }
-        >
+      <div className={styles.tableBodyRowContentContainer}>
         {/* Token Title Row */}
         <div className={styles.tableBodyTitleColContainer}>
           {poolInfo.token1Logo && (
@@ -459,8 +477,8 @@ const FarmsTableRow = props => {
           {/* only display token 1 symbol if token 2 is undefined or null. */}
           <div className={styles.tokenTitleContainer}>
             {poolInfo.token1 && poolInfo.token2 && `${poolInfo.token1}-${poolInfo.token2}`}
-            {poolInfo.token1 && !poolInfo.token2 && `s${poolInfo.token1}`}
-            {poolInfo.token2 && !poolInfo.token1 && `s${poolInfo.token2}`}
+            {poolInfo.token1 && !poolInfo.token2 && `${poolInfo.token1}s`}
+            {poolInfo.token2 && !poolInfo.token1 && `${poolInfo.token2}s`}
             {!isMobile ? poolInfo.token1 && poolInfo.token2 && <span style={{ opacity: '0.5' }}> LP</span> : ''}
           </div>
         </div>
@@ -468,35 +486,49 @@ const FarmsTableRow = props => {
         {/* Pending Reward Column */}
         <div className={styles.tableBodyRewardColContainer}>
           <div className={styles.pendingRewardTitleContainer}>
-            {(isMyFarms && !isMobile ) ? 'Accumulated Reward' : ''}
-            {(!isMyFarms && !isMobile ) ? 'Accumulated Reward' : ''}
+            {(isMyFarms && !isMobile ) ? 'My Acy' : ''}
+            {(!isMyFarms && !isMobile ) ? 'My Acy' : ''}
             {(isMobile) ? 'Reward' : ''}
             {isMobile}
           </div>
-          {poolInfo.pendingReward && poolInfo.pendingReward.map((reward,idx) => (
+       
             <div className={styles.pendingReward1ContentContainer}>
-              {`${reward.amount?reward.amount.slice(0,8):0} ${reward.token}`}
+              {`${AcyBalance}`}
             </div>
-          ))}
         </div>
 
         {/* Total APR Column */}
         <div className={styles.tableBodyAprColContainer}>
-          <div className={styles.totalAprTitleContainer}>APR</div>
+          <div className={styles.totalAprTitleContainer}>My Reward</div>
           <div className={styles.totalAprContentContainer}>{totalApr}%</div>
         </div>
+
+
 
         {/* TVL Column */}
         {!isMobile && (
           <div className={styles.tableBodyTvlColContainer}>
-            <div className={styles.tvlTitleContainer}>TVL</div>
-            <div className={styles.tvlContentContainer}>$ {poolInfo.poolLpBalance.toFixed(2)}</div>
-          </div>
-        )}
-        {!isMobile && (
-          <div className={styles.tableBodyTvlColContainer}>
-            <div className={styles.tvlTitleContainer}>Ends in</div>
-            <div className={styles.tvlContentContainer}>{poolInfo.endsIn}</div>
+            {/* <div className={styles.tvlTitleContainer}>TVL</div>
+            <div className={styles.tvlContentContainer}>${tvl}</div> */}
+                <div>
+                {walletConnected ? (
+                    <button
+                    type="button"
+                    className={styles.daoButton}
+                    onClick={() => {setShowAddLiquidity(true)}}
+                    >
+                    DAO
+                    </button>
+                ) : (
+                    <button
+                    type="button"
+                    className={styles.daoButton}
+                    onClick={connectWallet}
+                    >
+                    Connect Wallet
+                    </button>
+                )}
+            </div>
           </div>
         )}
 
@@ -515,212 +547,8 @@ const FarmsTableRow = props => {
           </div>
         )}
       </div>
-
-      {/* Table Drawer */}
-      {!isMyFarms && (
-        <div className={styles.tableBodyDrawerContainer} hidden={hidden}>
-        {/* Staking Propotion */}
-        {!isMyFarms && (
-          <div className={styles.tableBodyDrawerStakingPropotionContainer}>
-            <div className={styles.tableBodyDrawerStakingPropotionTitle}>20%</div>
-            {/* <div className={styles.tableBodyDrawerStakingPropotionEquation}> {token1}-{token2} LP </div> */}
-          </div>
-        )}
-        {/* Add Liquidity */}
-        {!isMyFarms && poolInfo.token1 && !poolInfo.token2 ?(
-          <div className={styles.tableBodyDrawerAddLiquidityContainer}>
-            <div className={styles.tableBodyDrawerAddLiquidityTitle}>Buy ACY</div>
-              <button
-                type="button"
-                className={styles.tableBodyDrawerAddLiquidityButton}
-                onClick={()=> setShowAddLiquidity(true)}
-              >
-                Buy
-              </button>
-          </div>
-        ) : (
-          <div className={styles.tableBodyDrawerAddLiquidityContainer}>
-            <div className={styles.tableBodyDrawerAddLiquidityTitle}>Add Liquidity</div>
-              <button
-                type="button"
-                className={styles.tableBodyDrawerAddLiquidityButton}
-                onClick={()=> setShowAddLiquidity(true)}
-              >
-                Add
-              </button>
-          </div>
-        )
-        }
-        {/* Farm Column */}
-        <div className={styles.tableBodyDrawerFarmContainer}>
-          <div className={styles.tableBodyDrawerWalletTitle}>Start Farming</div>
-            <div>
-              {walletConnected ? (
-                <button
-                  type="button"
-                  className={styles.tableBodyDrawerWalletButton}
-                  onClick={showModal}
-                >
-                  Stake LP
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className={styles.tableBodyDrawerWalletButton}
-                  onClick={connectWallet}
-                >
-                  Connect Wallet
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-      { poolInfo.stakeData && poolInfo.stakeData.map((data,id) => {
-        return (
-        <div hidden={hidden||!isMyFarms}>
-          {/* Farm Column */}   
-          <StakeRow 
-            data={data}
-            library={library}
-            account={account}
-            harvestHistory={harvestHistory}
-            poolId={poolId}
-            refreshHarvestHistory={refreshHarvestHistory}
-            token1={poolInfo.token1}
-            token1Logo={poolInfo.token1Logo}
-            token2={poolInfo.token2}
-            token2Logo={poolInfo.token2Logo}
-            refreshPoolInfo={refreshPoolInfo}
-          >
-              { id == Math.ceil(poolInfo.stakeData.length/2) - 1 ? (
-            <div className={styles.tableBodyDrawerFarmContainer}>
-              <div>
-                <div className={styles.tableBodyDrawerWalletTitle}>Start Farming</div>
-                <div>
-                  {walletConnected ? (
-                    <button
-                      type="button"
-                      className={styles.tableBodyDrawerWalletButton}
-                      onClick={showModal}
-                    >
-                      Stake LP
-                    </button>
-                      ) : (
-                    <button
-                      type="button"
-                      className={styles.tableBodyDrawerWalletButton}
-                      onClick={connectWallet}
-                    >
-                      Connect Wallet
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-            ) : (
-              <div className={styles.index0tableBodyDrawerFarmContainer}>
-                {/* lp Amount {stakeData[id].lpAmount} */}
-              </div>
-            )}      
-          </StakeRow>
-          {/* <div className={styles.tableBodyDrawerWithdrawContainer}>
-            <div className={styles.tableBodyDrawerWithdrawTitle}>Remaining</div>
-            <div className={styles.tableBodyDrawerWithdrawContent}>
-              <div className={styles.tableBodyDrawerWithdrawDaysDateContainer}>
-                <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
-                  {data.remaining}
-                </div>
-                <div className={styles.tableBodyDrawerWithdrawDateContainer}>
-                  {data.dueDate}
-                </div>
-              </div>
-              
-              <button
-                type="button"
-                className={styles.tableBodyDrawerWithdrawButton}
-                onClick={() =>{
-                  setSelectedRowData(data);
-                  setWithdrawModal(true);
-                }}
-              >
-                Withdraw
-              </button>
-            </div>
-          </div>
-          <div className={styles.tableBodyDrawerWithdrawContainer}>
-            <div className={styles.tableBodyDrawerWithdrawTitle}>Pending Reward</div>
-            <div className={styles.tableBodyDrawerWithdrawContent}>
-              <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
-                {data.reward.map((reward,idx) => (
-                  <div className={styles.tableBodyDrawerWithdrawDateContainer}>
-                    {`${reward.amount} ${reward.token}`}
-                  </div>
-                ))}
-              </div>
-              <button
-                type="button"
-                className={styles.tableBodyDrawerWithdrawButton}
-                style={isHarvestDisabled ? { cursor: 'not-allowed' } : {}}
-                onClick={async () => {
-                  setSelectedRowData(data);
-                  showHarvestModal();
-                }}
-                disabled={isHarvestDisabled}
-              >
-                Harvest
-              </button>
-            </div>
-          </div> */}
-        </div>
-        );
-      })}
       
-      <AcyActionModal
-        visible={harvestModal}
-        onCancel={hideHarvestModal}
-        confirmText={harvestButtonText}
-        onConfirm={()=>{
-          if(harvestButtonStatus) {
-            setHarvestButtonText(<>Processing <Icon type="loading" /></>);
-            setHarvestButtonStatus(false);
-            harvest(poolId, selectedRowData.positionId, setHarvestButtonText, harvestCallback,library, account)
-          }
-
-        }}
-        disabled={!harvestButtonStatus}
-      >
-        <div> 
-          
-          <div className={styles.withdrawDetailContainer}>
-            Rewards:
-            {selectedRowData && selectedRowData.reward.map((reward,idx) => (
-              <div className={styles.withdrawDetailContainer2}>
-                <div className={styles.amountContainer}>
-                  {reward.amount}
-                </div>
-                <div className={styles.tokenContainer}>
-                  <div className={styles.tokenLogoContainer}>
-                    { reward.token == "ACY" ? (
-                        <img src={ACY_LOGO}/>
-                      ) : (
-                        <img src={'https://storageapi.fleek.co/chwizdo-team-bucket/ACY%20Token%20List/'+reward.token+'.svg'}/>
-                      )
-                    }
-                  </div>
-                  <div className={styles.token}>
-                    {reward.token}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className={styles.harvestChart} >
-            <AcyBarChart data={harvestHistory.myAll.slice(-14)} showXAxis barColor="#1d5e91" />
-          </div>
-        </div>
-      </AcyActionModal>
-      <AcyModal
+    <AcyModal
         visible={showAddLiquidity}
         onCancel={()=> setShowAddLiquidity(false)}
         width={400}
@@ -731,135 +559,25 @@ const FarmsTableRow = props => {
           borderRadius: '1.5rem',
         }}
       >
-        <div>{ poolInfo.token1 && !poolInfo.token2 ? (
-          <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
-            <div className={styles.trade}>
-              <SwapComponent
-                onSelectToken0={token => {
-                  setActiveToken0(token);
-                }}
-                onSelectToken1={token => {
-                  setActiveToken1(token);
-
-                }}
-                onGetReceipt={null}
-              />
-            </div>
-         </AcyCard>
-        ) : (
-          <AddLiquidityComponent 
-            onLoggedIn={()=>setLoggedIn(true)} 
-            isFarm={true}
-            token={{
-              token1: poolInfo.token1,
-              token2: poolInfo.token2
-            }}
-          />
-        )}
-        </div>
-      </AcyModal>
-      
-      <StakeModal
-        onCancel={hideModal}
-        isModalVisible={isModalVisible}
-        token1={poolInfo.token1}
-        token2={poolInfo.token2}
-        balance={balance}
-        poolId={poolInfo.poolId}
-        stakedTokenAddr={poolInfo.lpTokens}
-        refreshPoolInfo={refreshPoolInfo}
-        account={account}
-        library={library}
-        chainId={chainId}
-        poolLpScore={poolInfo.poolLpScore}
-      />
-      {/* withdraw modal */}
-      <AcyModal 
-        backgroundColor="#0e0304" width={400} 
-        visible={withdrawModal} 
-        onCancel={hideWithdrawModal}>
-        <div className={styles.removeAmountContainer}>
-          <div>Withdraw Amount</div>
-          <div className={styles.amountText}>
-            <AutoResizingInput value={percent} onChange={setPercent} />%
-          </div>
-          <div className={styles.sliderContainer}>
-            <input
-              value={percent}
-              type="range"
-              className={styles.sliderInput}
-              onChange={e => {
-                setPercent(parseInt(e.target.value));
-              }}
-            />
-          </div>
-        </div>
-        <div className={styles.tokenAmountContainer}>
-          <div className={styles.tokenAmountContent}>
-            <div className={styles.tokenAmount}>
-              Amount
-            </div>
-            <div className={styles.tokenDetailContainer}>
-              <div className={styles.tokenSymbol}>
-                {selectedRowData && selectedRowData.lpAmount * percent / 100}
-              </div>
-            </div>
-          </div>
-          <div className={styles.tokenAmountContent}>
-            <div className={styles.tokenAmount}>
-              LP Token
-            </div>
-            <div className={styles.tokenDetailContainer}>
-              <div>
-                {poolInfo.token1Logo && (
-                    <img src={poolInfo.token1Logo} alt="token" className={styles.tokenImg}/>
-                )}
-                {poolInfo.token2Logo && (
-                    <img src={poolInfo.token2Logo} alt="token" className={styles.tokenImg}/>
-                )}
-              </div>
-              <div className={styles.tokenSymbol}>
-                
-                {poolInfo.token1 && poolInfo.token2 && `${poolInfo.token1}-${poolInfo.token2}`}
-                {poolInfo.token1 && !poolInfo.token2 && `${token1}`}
-                {poolInfo.token2 && !poolInfo.token1 && `${poolInfo.token2}`}
-                <span>&nbsp;LP</span>
-              </div>
-              
-            </div>
-          </div>
-          <div className={styles.tokenAmountContent}>
-            <div className={styles.tokenAmount}>
-              Remaining
-            </div>
-            <div className={styles.tokenDetailContainer}>
-              <div className={styles.tokenSymbol}>
-                  {selectedRowData && selectedRowData.remaining }
-              </div>
-            </div>
-          </div>
-          
-        </div>
-        {/* <div className={styles.buttonContainer}> */}
- 
-        <div className={styles.modalButtonContainer}>
-          <div className={styles.buttonPadding}>
-              <button 
-                  className={(!withdrawButtonStatus && classNames(styles.button,styles.buttonDisabled)) || styles.button}
-                  // className={styles.button}
-                  onClick={async () => {
-                    if(!selectedRowData.locked && selectedRowData.lpAmount * percent / 100 != 0 && withdrawButtonStatus){
-                      withdrawClicked();
-                    }
+        {/* <div className={`${styles.colItem} ${styles.swapComponent}`} > */}
+            <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
+              <div className={styles.trade}>
+                <SwapComponent
+                  onSelectToken0={token => {
+                    setActiveToken0(token);
                   }}
-              >
-                  {selectedRowData && selectedRowData.locked? "Locked":withdrawButtonText}
-              </button>
-          </div>
-        </div>
-      {/* </div> */}
+                  onSelectToken1={token => {
+                    setActiveToken1(token);
+
+                  }}
+                  onGetReceipt={null}
+                />
+              </div>
+            </AcyCard>
+          {/* </div> */}
       </AcyModal>
     </div>
+    
   )
     
   );
@@ -868,6 +586,6 @@ export default connect(({ global, transaction, loading }) => ({
   global,
   transaction,
   loading: loading.global,
-}))(FarmsTableRow);
+}))(DaoTableRow);
 
 // export default FarmsTableRow;

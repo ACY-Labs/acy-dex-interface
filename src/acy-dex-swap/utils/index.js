@@ -13,9 +13,10 @@ import ERC20ABI from '../abis/ERC20.json';
 export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
 export const ROUTER_ADDRESS = '0x9c040CC3CE4B2C135452370Eed152A72ce5d5b18';
-export const FARMS_ADDRESS  = '0x96c13313aB386BCB16168Dee3D2d86823A990770';
+export const FARMS_ADDRESS  = '0x11B64a91fA3eedfe0977a64D908BB8B8faf903a4';4
 //old farm address 0xf132Fdd642Afa79FDF6C1B77e787865C652eC824
-//new farm address 0x8800909a9aB007C8126ab51cA254E6398E6022AC
+//new farm address 0x96c13313aB386BCB16168Dee3D2d86823A990770
+//latest address   0x11B64a91fA3eedfe0977a64D908BB8B8faf903a4
 
 // a custom error class for custom error text and handling
 export class CustomError {
@@ -193,6 +194,8 @@ export async function getUserTokenBalanceRaw(token, account, library) {
     return library.getBalance(account);
   }
   const contractToCheckForBalance = getContract(token.address, ERC20ABI, library, account);
+  // 9753573
+  // console.log("contractToCheckForBalance:",)
   return contractToCheckForBalance.balanceOf(account);
 }
 
@@ -333,6 +336,7 @@ export async function approveTokenWithSpender(tokenAddress, spender, library, ac
   const res = await tokenContract.approve(spender, MaxUint256, {
     gasLimit: calculateGasMargin(estimatedGas),
   });
+  return res;
 }
 
 export async function disapproveTokenWithSpender(tokenAddress, spender, library, account) {

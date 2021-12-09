@@ -238,6 +238,30 @@
       .tvlContentContainer {
         font-size: 1rem;
       }
+      .tableBodyDrawerFarmContainer {
+        flex: 1;
+        border: 1px solid #29292c;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        margin-right: 0.5rem;
+    
+        .tableBodyDrawerWalletTitle {
+          margin-bottom: 0.5rem;
+        }
+    
+        .tableBodyDrawerWalletButton {
+          border: 1px solid #1e5d91;
+          background-color: #1b1b1c;
+          padding: 0.25rem 0.5rem;
+          border-radius: 0.25rem;
+          width: 100%;
+    
+          &:hover {
+            background-color: #29292c;
+            cursor: pointer;
+          }
+        }
+      }
     }
 
     .tableBodyArrowColContainer {
@@ -508,7 +532,33 @@
     .tvlContentContainer {
       font-size: 0.75rem !important;
     }
+    .tableBodyDrawerFarmContainer {
+      flex: 1;
+      border: 1px solid #29292c;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      margin-right: 0.5rem;
+  
+      .tableBodyDrawerWalletTitle {
+        margin-bottom: 0.5rem;
+      }
+  
+      .tableBodyDrawerWalletButton {
+        border: 1px solid #1e5d91;
+        background-color: #1b1b1c;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        width: 100%;
+  
+        &:hover {
+          background-color: #29292c;
+          cursor: pointer;
+        }
+      }
+    }
+    
   }
+
 }
 
 // Toggle Button
@@ -519,6 +569,14 @@
   padding: 0.25rem 1.25rem;
   border-radius: 15px;
   margin-right: 0.5rem;
+  font-size: 1rem;
+}
+.daoButton {
+  border: 1px solid transparent;
+  background-color: #174163;
+  padding: 0.25rem 1.25rem;
+  border-radius: 15px;
+  margin-left: auto;
   font-size: 1rem;
 }
 
@@ -566,6 +624,7 @@
 }
 
 .firstToggleButton:hover,
+.daoButton:hover,
 .leftToggleButton:hover,
 .middleToggleButton:hover,
 .rightToggleButton:hover,
@@ -578,6 +637,12 @@
   .firstToggleButton {
     padding: 0.25rem 0.5rem;
     margin-right: 0;
+    font-size: 0.75rem;
+    border-radius: 15px 0 0 15px;
+  }
+  .daoButton {
+    padding: 0.25rem 0.5rem;
+    margin-left: auto;
     font-size: 0.75rem;
     border-radius: 15px 0 0 15px;
   }
@@ -712,7 +777,7 @@
     -webkit-appearance: none;
     appearance: none;
     height: 3px; /* Specified height */
-    background: black; /* Grey background */
+    background: #1B1B1C; /* Grey background */
     outline: none; /* Remove outline */
     opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
     -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
@@ -1180,4 +1245,39 @@ input[type=number] {
 }
 .stakeRow {
   display: flex;
+}
+
+.colItem {
+  margin: 0 0.5rem;
+  width: 100%;
+}
+
+.chartSectionMain {
+  width: 49%;
+  height: 40vh;
+  max-height: 700px;
+  background-color: #2f313583;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  padding: 15px;
+  overflow: hidden;
+  .graphStats {
+    padding: 0;
+    margin-bottom: 5px;
+  }
+  .statName {
+    font-size: 13pt;
+    line-height: 14pt;
+    color: #757579;
+    font-weight: 600;
+  }
+  .statValue {
+    font-size: 24pt;
+    line-height: 25pt;
+    font-weight: bold;
+    color: white;
+  }
+  .chartWrapper {
+    height: 90%;
+  }
 }
