@@ -593,7 +593,8 @@ const FarmsTableRow = props => {
             token2Logo={poolInfo.token2Logo}
             refreshPoolInfo={refreshPoolInfo}
           >
-              { id == Math.ceil(poolInfo.stakeData.length/2) - 1 ? (
+              { (id == Math.ceil(poolInfo.stakeData.length/2) - 1 && !isMobile) || 
+              (id == 0 && isMobile) ?  (
             <div className={styles.tableBodyDrawerFarmContainer}>
               <div>
                 <div className={styles.tableBodyDrawerWalletTitle}>Start Farming</div>

@@ -219,7 +219,16 @@ const StakeRow = props => {
       <div className={styles.tableBodyDrawerContainer} >
         {children}
         <div className={styles.tableBodyDrawerWithdrawContainer}>
-          <div className={styles.tableBodyDrawerWithdrawTitle}>Remaining</div>
+        <div className={styles.tableBodyDrawerWithdrawContent}>
+            <div className={styles.tableBodyDrawerWithdrawDaysDateContainer}>
+              <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
+                Remaining
+              </div>
+              <div className={styles.tableBodyDrawerWithdrawDateContainer}>
+                Expired Date
+              </div>
+            </div>
+          </div>
           <div className={styles.tableBodyDrawerWithdrawContent}>
             <div className={styles.tableBodyDrawerWithdrawDaysDateContainer}>
               <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
