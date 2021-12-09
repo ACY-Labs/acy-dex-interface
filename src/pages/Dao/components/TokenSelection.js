@@ -49,12 +49,12 @@ const TokenSelection = (
           <AcyTabs>
             <AcyTabPane tab="All" key="1">
               {tokenList.map((supToken, index) => (
-                <AcyCoinItem data={supToken} key={index} selectToken={selectToken} customIcon={false} index={index} setAsFav={() => setTokenAsFav(index)} />
+                <AcyCoinItem data={supToken} key={index} selectToken={selectToken} customIcon={false} index={index} clickCallback={() => setTokenAsFav(index)} />
               ))}
             </AcyTabPane>
             <AcyTabPane tab="Favorite" key="2">
               {favTokenList.map((supToken, index) => (
-                <AcyCoinItem data={supToken} key={index} selectToken={selectToken} customIcon={false} index={index} setAsFav={() => setTokenAsFav(index)} hideFavButton />
+                <AcyCoinItem data={supToken} key={index} selectToken={selectToken} customIcon={false} index={index} clickCallback={() => setTokenAsFav(index)} />
               ))}
             </AcyTabPane>
           </AcyTabs>
