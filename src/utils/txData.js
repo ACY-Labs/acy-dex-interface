@@ -496,7 +496,7 @@ export async function fetchTransactionData(address,library, account){
             let chartData = getChartData(newData);
             newData.chartData = chartData;
             return newData;
-        }else{
+        }else if (transactionData.data.startsWith(methodList.ethToToken.id)){
             let response = await library.getTransactionReceipt(address.toString());
             console.log("Response: ",response);
             let FROM_HASH = account.toString().toLowerCase().slice(2);
@@ -586,6 +586,16 @@ export async function fetchTransactionData(address,library, account){
             let chartData = getChartData(newData);
             newData.chartData = chartData;
             return newData;
+        }else if(transactionData.data.startsWith(methodList.addLiquidity.id)){
+
+        }else if(transactionData.data.startsWith(methodList.addLiquidityEth.id)){
+
+        }else if(transactionData.data.startsWith(methodList.removeLiquidity.id)){
+
+        }else if(transactionData.data.startsWith(methodList.removeLiquidityETH.id)){
+
+        }else {
+            console.log("Transaction not parseable");
         }
 
     } catch (e){
