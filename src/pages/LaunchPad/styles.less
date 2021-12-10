@@ -94,7 +94,7 @@
 
 .chartWrapper{
     width: 49%;
-    height: 20vh;
+    height: 30vh;
     max-height: 700px;
     float: right;
     overflow: visible;
@@ -103,7 +103,7 @@
 } 
 
 .chartStyle{
-    height: 320px !important;
+    height: 420px !important;
     padding: 0px 0px 0px 0px;
     margin-top: -53px;
 }
@@ -448,6 +448,7 @@
 
 .bottomContainer{
     width: 100%;
+    height: 30vh;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -504,7 +505,7 @@
 
 .tokenDetails{
     display: flex;
-    padding: 15px 0 0 0;
+    padding: 16px 0;
     justify-content: left;
     .tokenPrice{
         margin-left: 15px;
@@ -534,7 +535,7 @@
     display: flex;
     justify-content: flex-start;
     position:sticky;
-    padding: 15px 0 0 0;
+    padding: 15px 0;
     .totalTickets {
         margin-left: 15px;
         width: 200px;
@@ -581,7 +582,7 @@
   width: 10em;
   height: 40px;
   color: #fff;
-  margin-top: 15px;
+  margin-top: 1.5em;
   padding: 0.25rem 1.25rem;
   // border-radius: 0.25rem 0 0 0.25rem;
   margin-right: 0;
@@ -593,7 +594,7 @@
   background: #c6224e;
   color: #fff;
   border-color: #c6224e; 
-  opacity: 90%;
+  opacity: 0.9;
 }
 
 .swapToggleButton{
@@ -680,27 +681,45 @@
     display: flex;
     justify-content: space-around;
     padding: 20px 20px 0 20px;
-    margin-top: 1.5em;
+    margin-top: 2em;
     .showTicketBox1{
         width: auto;
         height: auto;
-        display: inline-block;
     }
     
     .showTicketBox2{
         width: auto;
         height:auto;
-        position: relative;
-        display: inline-block;
     }
 }
 
 .showTicketBox1 .userEligibleTickets{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
     margin-bottom: 50px;
+    p{
+        align-self: center;
+    }
 }
 
 .showTicketBox2 .userWinningTickets{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
     margin-bottom: 50px;
+    p{
+        align-self: center;
+    }
+}
+
+.showTicketBox2 .userTicketsAllo{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    p{
+        align-self: center;
+    }
 }
 
 .whitelistBox{
@@ -1087,7 +1106,7 @@
 
 .transferTable{
     width: 49%;
-    //height: 18.5vh;
+    height: 30vh;
     overflow: hidden;
     :global{
         .ant-table-wrapper{
@@ -1140,17 +1159,14 @@
 }
 
 //mobile screen responsive
-@media screen and (min-width: 1060px) {
-    .moreInfoContainer{
-        min-width: 60%;
-        max-width: 100%;
-    }
-}
-
 @media screen and (max-width: 1060px) {
     .midContainer {
         flex-direction: row;
         margin-top: 2em;
+    }
+    .moreInfoContainer{
+        min-width: 60%;
+        max-width: 100%;
     }
     .tokenContainer, .tokenInfoBox, .moreInfoContainer, .ticketBox{ 
         width: 100%;
@@ -1186,9 +1202,12 @@
     }
     .chartWrapper{
         height: 30vh;
+        width: 100%;
     }
     .transferTable{
         height: 35vh;
+        width: 100%;
+        margin-top: 9em;
         overflow: hidden;
         :global{
             .ant-table-wrapper{
@@ -1787,7 +1806,7 @@
       background-color: transparent;
       transition: .2s;
       max-width: 1800px;
-      
+      padding-bottom: 2.5em;
       button, input, optgroup, select, textarea {
         font-family: 'DM Sans', sans-serif;
       }
@@ -2103,7 +2122,6 @@
 }
 
 .projectBoxes{
-    margin: 0 -8px;
     width: 100%;
     overflow-y: auto;
     display: flex;

@@ -232,14 +232,14 @@ const LaunchpadComponent = () => {
             ellipsis: true
         },
         {
-            title: 'Quantity',
+            title: 'USDT',
             dataIndex: 'quantity',
             width: 60,
             align: 'center',
             ellipsis: true
         },
         {
-            title: 'Amount',
+            title: 'Ticket',
             dataIndex: 'Amount',
             width: 60,
             align: 'center',
@@ -318,7 +318,7 @@ const LaunchpadComponent = () => {
 
     const tokenContent1 = {
         fontWeight:'bold', 
-        textAlign:'left', 
+        textAlign:'center', 
         color:'#000'
     }
 
@@ -459,7 +459,7 @@ const LaunchpadComponent = () => {
                     <br />
                     <Button type="link" href={links[2]} target="_blank" style={buttonCustomStyle}>
                         <img src={telegramWIcon} alt="" style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '8px 8px 0 0', float:'left'}} /> Telegram
-                    </Button>  
+                    </Button>
                     <br />
                     <Button type="link" href={links[4]} target="_blank" style={buttonCustomStyle2} icon="medium">Medium</Button>
                     <br />
@@ -524,11 +524,11 @@ const LaunchpadComponent = () => {
                                 <img src={AcyIcon} alt="ACY Token" className={styles.mainImage} />
                                 <h2 style={{color:'#eb5c20'}} className={styles.tokenName}> ACY </h2>
                             </div>
-                            { selectedForm === 2 && (
+                            {/* { selectedForm === 2 && (
                             <div className={styles.tokenIDOStatus}>
                                 <Tag style={{float:'right', backgroundColor: '#C4C4C4', color: 'black', borderRadius:'10px', width:'auto', height:'auto', textAlign:"center", fontSize:'16px', fontFamily:'Inter, sans-serif'}}>Your Max Allocation : 100 USDT</Tag>
                             </div>
-                            )}
+                            )} */}
                         </div>
                     </div>
                     <div className={styles.tokenProgress}>
@@ -639,12 +639,12 @@ const LaunchpadComponent = () => {
                 </div>
                 <div className={styles.transferTable}>
                     <Table 
-                      style={{marginBottom:'20px',textAlign:'center', height: '250px'}}
+                      style={{marginTop:'20px',textAlign:'center', height: '425px'}}
                       id="transferTable"
                       columns={transferTableHeader} 
                       dataSource={transferData}
                       pagination={false}
-                      scroll={{ y: 250 }}
+                      scroll={{ y: 425 }}
                       rowClassName={(record, index) => styles.rowExpanded}
                     />   
                 </div> 
