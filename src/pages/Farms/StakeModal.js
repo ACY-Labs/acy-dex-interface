@@ -27,12 +27,13 @@ const StakeModal = props => {
     chainId,
     account,
     library,
+    poolLpScore
   } = props;
   const [date, setDate] = useState(new Date());
   const [selectedPresetDate, setSelectedPresetDate] = useState(null);
   const [showStake, setShowStake] = useState(0);
   const [stake, setStake] = useState(0);
-  const [balancePercentage, setBalancePercentage] = useState(0);
+  const [balancePercentage, setBalancePercentage] = useState(50);
   const [buttonText, setButtonText] = useState('Stake');
   const [aprList, setAprList] = useState([[12.23,false],[14.53,false],[16.27,false],[18.13,false],[19.63,false],[22.83,false]])
   const [pickingDate,setPickingDate] = useState(false);
@@ -64,13 +65,60 @@ const StakeModal = props => {
     const percentageInt = percentage === '' ? 0 : parseInt(percentage, 10);
     if (Number.isNaN(percentageInt)) return;
     setShowStake((parseFloat((balance * percentageInt) / 100)).toFixed(6));
-    setStake(parseFloat((balance * percentageInt) / 100));
     setBalancePercentage(percentageInt);
   };
 
   useEffect( () =>{
+    setStake(parseFloat((balance * balancePercentage) / 100));
+  },[balancePercentage, balance]);
+
+  useEffect( () =>{
+    let newArr = [...aprList];
+    const day1W = getDayNum("week",1);
+    const day1M = getDayNum("month",1);
+    const day3M = getDayNum("month",3);
+    const day6M = getDayNum("month",6);
+    const day1Y = getDayNum("year",1);
+    const day4Y = getDayNum("year",4);
+    const day_num = [day1W, day1M, day3M, day6M, day1Y, day4Y];
+
+    var totalScore = poolLpScore / 1e34;
+    for(let i=0 ; i<6 ; i++) {
+      var weight =  stake * Math.sqrt(day_num[i]);
+      newArr[i][0] = (weight / (totalScore + weight) * 100).toFixed(2);
+    }
+    console.log("stake : ",totalScore,stake,newArr);
+    setAprList(newArr);
+    
+  
+  },[stake]); 
+
+  useEffect( () =>{
     setIs4Years(false);
   },[isModalVisible]);
+
+  useEffect(() => {
+    //cal days for 1w 1m 3m ......
+    const day1W = getDayNum("week",1);
+    const day1M = getDayNum("month",1);
+    const day3M = getDayNum("month",3);
+    const day6M = getDayNum("month",6);
+    const day1Y = getDayNum("year",1);
+    const day4Y = getDayNum("year",4);
+    const day_num = [day1W, day1M, day3M, day6M, day1Y, day4Y];
+    console.log(day_num);
+
+  },[]);
+
+  const getDayNum = (type, value) => {
+    const nowDate = new Date();
+    const nowDate2 = new Date();
+    if (type === 'week')nowDate.setHours(nowDate.getHours() + 24 * 7 * value);
+    else if (type === 'month') nowDate.setMonth(nowDate.getMonth() + value);
+    else if (type === 'year') nowDate.setFullYear(nowDate.getFullYear() + value);
+    return Math.ceil((nowDate - nowDate2) / (1000 * 60 * 60 * 24));
+
+  }
 
   const updateDate = (type, value, index) => {
     const newDate = new Date();
@@ -181,7 +229,7 @@ const StakeModal = props => {
   };
 
   const approveCallback = status => {
-    console.log("test status:", status);
+    console.log("approveCallback test status:", status);
     const transactions = props.transaction.transactions;
     const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
     console.log("is current dispatched? ", isCurrentTransactionDispatched);
@@ -268,7 +316,7 @@ const StakeModal = props => {
     >
       <div className={styles.amountRowContainer}>
         <div className={styles.amountRowInputContainer}>
-          <input type="text" value={showStake} onChange={e => updateStake(e.target.value)} />
+          <input type="text" defaultValue={stake} value={showStake} onChange={e => updateStake(e.target.value)} />
         </div>
         <span className={styles.suffix}>
           {token1 && token2 && `${token1}-${token2} LP`}

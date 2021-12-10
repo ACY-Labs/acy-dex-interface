@@ -25,21 +25,22 @@ const ToggleButtonGroup = (
       <button
         type="button"
         className={`${isMyFarms ? styles.tableToggleButtonMyFarm : styles.leftToggleButton}`}
-        style={{ backgroundColor: selectedTable === 1 && !isMyFarms ? "#174163" : "#2e3032", color: selectedTable === 1 && !isMyFarms? "white": ""}}
-        onClick={onAcyToggleButtonClick}
-        disabled={isMyFarms}
-      >
-        Standard
-      </button>
-      <button
-        type="button"
-        className={`${isMyFarms ? styles.tableToggleButtonMyFarm : styles.middleToggleButton}`}
         style={{ backgroundColor: selectedTable === 3 && !isMyFarms ? "#174163" : "#2e3032", color: selectedTable === 3 && !isMyFarms? "white": ""}}
         onClick={onDaoToggleButtonClick}
         disabled={isMyFarms}
       >
         DAO
       </button>
+      <button
+        type="button"
+        className={`${isMyFarms ? styles.tableToggleButtonMyFarm : styles.middleToggleButton}`}
+        style={{ backgroundColor: selectedTable === 1 && !isMyFarms ? "#174163" : "#2e3032", color: selectedTable === 1 && !isMyFarms? "white": ""}}
+        onClick={onAcyToggleButtonClick}
+        disabled={isMyFarms}
+      >
+        Standard
+      </button>
+      
       <button
         type="button"
         className={`${isMyFarms ? styles.tableToggleButtonMyFarm : styles.rightToggleButton}`}

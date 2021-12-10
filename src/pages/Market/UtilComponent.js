@@ -471,7 +471,7 @@ export function PoolTable(props) {
             {index + 1}
           </div>
         ),
-        width: '3rem',
+        width: '6rem',
         visible: isDesktop()
       },
       {
@@ -497,7 +497,7 @@ export function PoolTable(props) {
         className: 'leftAlignTableHeader',
         render: (text, entry) => {
           return (
-            <div className={styles.tableDataFirstColumn}>
+            <div className={styles.tableHeader}>
               <AcyTokenIcon symbol={entry.coin1} />
               <AcyTokenIcon symbol={entry.coin2} />
               <Link
@@ -569,31 +569,31 @@ export function PoolTable(props) {
         },
         visible: true,
       },
-      {
-        title: (
-          <div
-            className={styles.tableHeader}
-            onClick={() => {
-              setCurrentKey('volume7d');
-              onSortChange();
-            }}
-          >
-            Volume 7D
-            {currentKey == 'volume7d' && (
-              <Icon
-                type={!isAscending ? 'arrow-up' : 'arrow-down'}
-                style={{ fontSize: '14px', marginLeft: '4px' }}
-              />
-            )}
-          </div>
-        ),
-        dataIndex: 'volume7d',
-        key: 'volume7d',
-        render: (text, entry) => {
-          return <div className={styles.tableData}>$ {abbrNumber(entry.volume7d)}</div>;
-        },
-        visible: isDesktop(),
-      },
+      // {
+      //   title: (
+      //     <div
+      //       className={styles.tableHeader}
+      //       onClick={() => {
+      //         setCurrentKey('volume7d');
+      //         onSortChange();
+      //       }}
+      //     >
+      //       Volume 7D
+      //       {currentKey == 'volume7d' && (
+      //         <Icon
+      //           type={!isAscending ? 'arrow-up' : 'arrow-down'}
+      //           style={{ fontSize: '14px', marginLeft: '4px' }}
+      //         />
+      //       )}
+      //     </div>
+      //   ),
+      //   dataIndex: 'volume7d',
+      //   key: 'volume7d',
+      //   render: (text, entry) => {
+      //     return <div className={styles.tableData}>$ {abbrNumber(entry.volume7d)}</div>;
+      //   },
+      //   visible: isDesktop(),
+      // },
     ];
   }
 
