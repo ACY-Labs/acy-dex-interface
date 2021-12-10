@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
+import axios from 'axios';
 import {Card, Icon, Progress, Button} from 'antd';
 import LaunchPad from './launchpad';
 import styles from './styles.less';
@@ -27,11 +28,9 @@ const Pool = (props)=> {
       setFilter(e.target.value)
     }
 
-    let dataSearch = 
-
     useEffect(() => {
-
-    },[page]);
+      axios.get(`https://api.acy.finance/api/projects`).then()
+    },[]);
 
     function SelectedBtn(props) {
       return(
