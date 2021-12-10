@@ -98,6 +98,7 @@ export async function fetchGeneralPoolInfoDay() {
     let data = await response.json();
     return parsePoolData(data.data);
   }catch (e){
+    return [];
     console.log('service not available yet');
   }
 }
