@@ -93,6 +93,7 @@
 }
 
 .chartWrapper{
+    width: 49%;
     height: 20vh;
     max-height: 700px;
     float: right;
@@ -442,8 +443,17 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    margin-bottom: 3.5em;
+}
+
+.bottomContainer{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
     margin-bottom: 15px;
 }
+
 
 .tokenInfoBox{
     width: 58%;
@@ -1076,7 +1086,7 @@
 }
 
 .transferTable{
-    width: inherit;
+    width: 49%;
     //height: 18.5vh;
     overflow: hidden;
     :global{
@@ -1430,6 +1440,7 @@
 }
 
 .titleDesc{
+    width: 100%;
     text-align: center;
     font-size: 1.875rem;
     line-height: 2.25rem;
@@ -1439,6 +1450,7 @@
 }
 
 .buttonContainer{
+    width: 100%;
     display: flex;
     justify-content: center !important;
     align-items: center !important;
@@ -1679,6 +1691,7 @@
     }
 
     .ConnectBar{
+        width: 100%;
         color: #000 !important;
         --tw-text-opacity: 1!important;
         font-size: 1.25rem!important;
@@ -1688,7 +1701,7 @@
         display: flex !important;
         z-index: 20!important;
         position: relative !important;
-
+        justify-content: start;
         // list-style: none;
         margin-top: 10px;
         // // padding: 0;
@@ -1717,6 +1730,17 @@
     }
 }
 
+.buttonCustomStyle{
+    background: transparent;
+    border: #e29227;
+    height: 2em;
+    :global{
+        .ant-btn{
+            padding: 0;
+        }
+    } 
+}
+
 .smalltext0{
     font-size: .875rem!important;
     line-height: 1.25rem!important;
@@ -1740,7 +1764,7 @@
 }
 
 .iconbar{
-    margin: 0.25em;
+    width: fit-content;
 }
 
 .cntdwnBox{

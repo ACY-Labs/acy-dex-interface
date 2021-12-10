@@ -22,7 +22,7 @@ const useStyles = makeStyles({
 
 
 
-const TableControl = ({ searchInput, setSearchInput, isMyFarms, setIsMyFarms, walletConnected }) => {
+const TableControl = ({ searchInput, setSearchInput, isMyFarms, setIsMyFarms, walletConnected, activeEnded, setActiveEnded }) => {
   const isMobile = window.innerWidth <= 768
   const classes = useStyles();
   return (
@@ -51,8 +51,24 @@ const TableControl = ({ searchInput, setSearchInput, isMyFarms, setIsMyFarms, wa
         />
       </div>
       <div className={styles.tableHeaderToggleButtonContainer}>
-        <button type="button" className={styles.activeToggleButton}>Active</button>
-        <button type="button" className={styles.endedToggleButton}>Ended</button>
+        <button 
+          type="button" 
+          style={{ backgroundColor: activeEnded ? "#174163" : "#2e3032", color: activeEnded? "white": ""}}
+          onClick={()=>{
+            setActiveEnded(true);
+          }}
+          className={styles.activeToggleButton}>
+            Active
+        </button>
+        <button 
+          type="button" 
+          style={{ backgroundColor: !activeEnded ? "#174163" : "#2e3032", color: !activeEnded? "white": ""}}
+          onClick={()=>{
+            setActiveEnded(false);
+          }}
+          className={styles.endedToggleButton}>
+            Ended
+        </button>
       </div>
     </div>
   )

@@ -391,7 +391,9 @@ const AcyLiquidityPositions = (props) => {
   }
   const userLPData = useMemo(() => {
     const userPools = [];
+    console.log("fetched pairs userLPHandlers", userLPHandlers);
     for (let pair of userLPHandlers) {
+      console.log("fetched pairs pari reserve:",pair.tokenAmounts[0].toExact(6), pair.reserve1)
       userPools.push({
         token0: pair.token0,
         token1: pair.token1,

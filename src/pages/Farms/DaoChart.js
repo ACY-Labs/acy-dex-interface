@@ -11,13 +11,18 @@ const DaoChart = ({ activeGraphId, activeGraphData, selectTopChart, selection })
         className={styles.switchChartsSelector}
       />
       {activeGraphId === 0 ? (
-        <AcyBarChart data={activeGraphData} showXAxis barColor="#1d5e91" />
+        <>
+        <AcyBarChart 
+        data={activeGraphData} 
+        showXAxis={true}
+        barColor="#1d5e91" />
+        </>
       ) : (
         <AcyLineChart
           backData={activeGraphData}
           data={activeGraphData}
-          showXAxis
-          showGradient
+          showXAxis={true}
+          showGradient={true}
           showTooltip
           lineColor="#1d5e91"
           bgColor="#29292c"

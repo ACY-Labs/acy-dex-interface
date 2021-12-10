@@ -494,48 +494,25 @@ const LaunchpadComponent = () => {
             
             <div className={styles.moreInfoContainer}>
                 <div className={styles.contentStyle}>
-                    <Carousel dot="true" autoplay="true" effect="fade" autoplaySpeed={6000}>
-                        <div className={styles.carouselBlock}>
-                            <div className={styles.stepBlock} id="block">
-                                <div className={styles.cntBlock}>
+                    <div className={styles.carouselBlock}>
+                        <div className={styles.stepBlock} id="block">
+                            <div className={styles.cntBlock}>
 {/*                               <div className={styles.labelBlock}>
-                                    <div className={styles.countLabelBlock}>
-                                        <div className={styles.countLabel}>
-                                            ROUND 1
-                                        </div>
+                                <div className={styles.countLabelBlock}>
+                                    <div className={styles.countLabel}>
+                                        ROUND 1
                                     </div>
-                                    <div className={styles.tokenIDODate}>
-                                        <p style={{color:'#b5b5b6', fontSize:"13px"}}>Open: {selectedTableRow.openDate} 10:00 UST</p>
-                                        <p style={{color:'#b5b5b6', fontSize:"13px"}}>Close: {selectedTableRow.closeDate} 10:00 UST</p>
-                                    </div>
-                                </div> */}
-                                <CountDown />
-                                <StepBar />
                                 </div>
+                                <div className={styles.tokenIDODate}>
+                                    <p style={{color:'#b5b5b6', fontSize:"13px"}}>Open: {selectedTableRow.openDate} 10:00 UST</p>
+                                    <p style={{color:'#b5b5b6', fontSize:"13px"}}>Close: {selectedTableRow.closeDate} 10:00 UST</p>
+                                </div>
+                            </div> */}
+                            <CountDown />
+                            <StepBar />
                             </div>
                         </div>
-                        <div className={styles.chartWrapper} id="chartdata">
-                            <LaunchChart  
-                              data={timeData}
-                              showXAxis
-                              showYAxis
-                              showGradient
-                              lineColor="#e29227"
-                              bgColor="#2f313500"
-                            />
-                        </div>
-                        <div className={styles.transferTable}>
-                            <Table 
-                              style={{marginBottom:'20px',textAlign:'center', height: '250px'}}
-                              id="transferTable"
-                              columns={transferTableHeader} 
-                              dataSource={transferData}
-                              pagination={false}
-                              scroll={{ y: 250 }}
-                              rowClassName={(record, index) => styles.rowExpanded}
-                            />   
-                        </div> 
-                    </Carousel>
+                    </div>
                 </div>
             </div>
             </div>
@@ -560,38 +537,38 @@ const LaunchpadComponent = () => {
                     <div className={styles.tokenDetails}>
                         <div className={styles.tokenPrice}>                    
                             <p style={token}>Per ACY</p>
-                            <h3 style={tokenContent}>{selectedTableRow.price}</h3>
+                            <h3 style={tokenContent}>0.2 USDT</h3>
                         </div>
                         <div className={styles.ticketAllocation}>    
                             <p style={token}>Raise Size</p>
-                            <h3 style={tokenContent}>{selectedTableRow.raiseSize}</h3> 
+                            <h3 style={tokenContent}>1000000 ACY</h3> 
                         </div>
                         <div className={styles.tokenTotalRaise}>                   
                             <p style={token}>Amount</p>
-                            <h3 style={tokenContent}>{selectedTableRow.amount}</h3>
+                            <h3 style={tokenContent}>200000</h3>
                         </div>
                         <div className={styles.tokenMarketCap}>   
                             <p style={token}>Market Cap</p>
-                            <h3 style={tokenContent}>{selectedTableRow.marketCap}</h3>             
+                            <h3 style={tokenContent}>$5M</h3>             
                         </div>
                     </div>
                     <span className={styles.line} />
                     <div className={styles.tokenMoreInfo}>
                         <div className={styles.totalTickets}>                   
                             <p style={token}>Allocation/Winning Ticket</p>
-                            <h3 style={tokenContent}>{selectedTableRow.perWinTicket}</h3>
+                            <h3 style={tokenContent}>120 USDT</h3>
                         </div>
                         <div className={styles.totalTicketsDeposited}>
                             <p>Total Tickets Deposited</p>
-                            <h3 style={tokenContent}>{selectedTableRow.totalTickets}</h3>
+                            <h3 style={tokenContent}>20000 Tickets</h3>
                         </div>
                         <div className={styles.tokenMaxAllo}>
                             <p>Max Allocation</p>
-                            <h3 style={tokenContent}>{selectedTableRow.maxAllocations}</h3>
+                            <h3 style={tokenContent}>20000</h3>
                         </div>
                         <div className={styles.tokenMaxWinners}>
                             <p>Max Winners</p>
-                            <h3 style={tokenContent}>{selectedTableRow.maxWinners}</h3>
+                            <h3 style={tokenContent}>10000</h3>
                         </div>
                     </div>
                 </div>
@@ -635,7 +612,7 @@ const LaunchpadComponent = () => {
                 )}
                 </div>
             </div>
-            <div className={styles.dateTableBox}>
+            {/* <div className={styles.dateTableBox}>
                 <Table 
                   style={{marginTop:'20px', textAlign:'center'}} // position: 'relative', display: 'flex', justifyContent: 'space-between', width: '100%', flexWrap:'wrap'
                   columns={tableColumns} 
@@ -648,9 +625,31 @@ const LaunchpadComponent = () => {
                     };
                     }}
                 />
+            </div> */}
+            <div className={styles.bottomContainer}>
+                <div className={styles.chartWrapper} id="chartdata">
+                    <LaunchChart  
+                      data={timeData}
+                      showXAxis
+                      showYAxis
+                      showGradient
+                      lineColor="#e29227"
+                      bgColor="#2f313500"
+                    />
+                </div>
+                <div className={styles.transferTable}>
+                    <Table 
+                      style={{marginBottom:'20px',textAlign:'center', height: '250px'}}
+                      id="transferTable"
+                      columns={transferTableHeader} 
+                      dataSource={transferData}
+                      pagination={false}
+                      scroll={{ y: 250 }}
+                      rowClassName={(record, index) => styles.rowExpanded}
+                    />   
+                </div> 
             </div>
         </div>
-        
     );
 }
 
