@@ -90,11 +90,16 @@ function parsePoolData (data){
 }
 
 export async function fetchGeneralPoolInfoDay() {
-  let request = 'http://localhost:3001/api/poolchart/all';
-  let response = await fetch(request);
-  let data = await response.json();
-  console.log('found this data::::',data);
-  return parsePoolData(data.data);
+
+  // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
+  try{
+    let request = 'https://api.acy.finance/api/poolchart/all';
+    let response = await fetch(request);
+    let data = await response.json();
+    return parsePoolData(data.data);
+  }catch (e){
+    console.log('service not available yet');
+  }
 }
 
 // get pools from string (search)
