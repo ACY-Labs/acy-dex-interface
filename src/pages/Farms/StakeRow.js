@@ -218,27 +218,43 @@ const StakeRow = props => {
     <div>
       <div className={styles.tableBodyDrawerContainer} >
         {children}
-        <div className={styles.tableBodyDrawerWithdrawContainer}>
+        {/* <div className={styles.tableBodyDrawerWithdrawContainer}>
         <div className={styles.tableBodyDrawerWithdrawContent}>
             <div className={styles.tableBodyDrawerWithdrawDaysDateContainer}>
               <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
                 Remaining
-              </div>
-              <div className={styles.tableBodyDrawerWithdrawDateContainer}>
+              </div> */}
+              {/* <div className={styles.tableBodyDrawerWithdrawDateContainer}>
                 Expired Date
-              </div>
-            </div>
+              </div> */}
+            {/* </div>
           </div>
           <div className={styles.tableBodyDrawerWithdrawContent}>
             <div className={styles.tableBodyDrawerWithdrawDaysDateContainer}>
               <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
                 {data.remaining}
               </div>
-              <div className={styles.tableBodyDrawerWithdrawDateContainer}>
-                {data.dueDate}
-              </div>
             </div>
             
+            <button
+              type="button"
+              className={styles.tableBodyDrawerWithdrawButton}
+              onClick={() =>{
+                setWithdrawModal(true);
+              }}
+            >
+              {withdrawButtonText}
+            </button>
+          </div>
+        </div> */}
+        <div className={styles.tableBodyDrawerWithdrawContainer}>
+          <div className={styles.tableBodyDrawerWithdrawTitle}>Remaining</div>
+          <div className={styles.tableBodyDrawerWithdrawContent}>
+            <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
+              <div className={styles.tableBodyDrawerWithdrawDateContainer}>
+                {data.remaining}
+              </div>
+            </div>
             <button
               type="button"
               className={styles.tableBodyDrawerWithdrawButton}
@@ -321,7 +337,13 @@ const StakeRow = props => {
       </AcyActionModal>
       {/* withdraw modal */}
       <AcyModal 
-        backgroundColor="#0e0304" width={400} 
+        // backgroundColor="#0e0304" width={400} 
+        width={400}
+        bodyStyle={{
+          padding: '21px',
+          background: '#0e0304',
+          borderRadius: '.5rem',
+      }}
         visible={withdrawModal} 
         onCancel={hideWithdrawModal}>
         <div className={styles.removeAmountContainer}>
@@ -347,13 +369,14 @@ const StakeRow = props => {
             </div>
             <div className={styles.tokenDetailContainer}>
               <div className={styles.tokenSymbol}>
-                {data && data.lpAmount * percent / 100}
+                {data && (data.lpAmount * percent / 100).toFixed(6)}
               </div>
             </div>
           </div>
           <div className={styles.tokenAmountContent}>
             <div className={styles.tokenAmount}>
-              LP Token
+            {token1 && token2 && `LP Token`}
+            {token1 && !token2 && `Token`}
             </div>
             <div className={styles.tokenDetailContainer}>
               <div>
@@ -366,10 +389,9 @@ const StakeRow = props => {
               </div>
               <div className={styles.tokenSymbol}>
                 
-                {token1 && token2 && `${token1}-${token2}`}
-                {token1 && !token2 && `${token1}`}
+                {token1 && token2 && `${token1}-${token2} LP`}
+                {token1 && !token2 && `s${token1}`}
                 {token2 && !token1 && `${token2}`}
-                <span>&nbsp;LP</span>
               </div>
               
             </div>

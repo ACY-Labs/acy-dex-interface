@@ -13,7 +13,7 @@ const AcyCuarrencyCard = ({
   onChoseToken,
   onChangeToken,
   token,
-  isFarm,
+  isLocked,
   inputColor,
   ...rest
 }) => {
@@ -42,13 +42,13 @@ const AcyCuarrencyCard = ({
     >
       <div className={`${styles.cua_body} ${light && styles.cua_light}`}>
         <div className={styles.cua_group}>
-          <button className={styles.switchcoin} onClick={onChoseToken} disabled={isFarm}>
+          <button className={styles.switchcoin} onClick={onChoseToken} disabled={isLocked}>
             <span className={styles.wrap}>
               <div className={styles.coin}>
                 <img src={logoURI} style={{ width: '24px', marginRight: '0.5rem' }} />
                 <span style={{ margin: '0px 0.25rem' }}>{coin}</span>
               </div>
-              { !isFarm &&(
+              { !isLocked &&(
                 <AcyIcon.MyIcon type="triangleGray" width={10} />
               )}
             </span>

@@ -545,7 +545,7 @@ const AddLiquidityComponent = props => {
                 setExactIn(true);
                 setToken0Amount(e);
               }}
-              isFarm={isFarm}
+              isLocked={isFarm}
             />
             <div style={{ margin: '12px auto', textAlign: 'center' }}>
               <AcyIcon width={21.5} name="plus_light" />
@@ -567,7 +567,7 @@ const AddLiquidityComponent = props => {
                 setExactIn(false);
                 setToken1Amount(e);
               }}
-              isFarm={isFarm}
+              isLocked={isFarm}
             />
 
             <AcyDescriptions>

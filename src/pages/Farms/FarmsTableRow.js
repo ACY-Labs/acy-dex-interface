@@ -522,7 +522,7 @@ const FarmsTableRow = props => {
         {/* Staking Propotion */}
         {!isMyFarms && (
           <div className={styles.tableBodyDrawerStakingPropotionContainer}>
-            <div className={styles.tableBodyDrawerStakingPropotionTitle}>20%</div>
+            <div className={styles.tableBodyDrawerStakingPropotionTitle}>*20%</div>
             {/* <div className={styles.tableBodyDrawerStakingPropotionEquation}> {token1}-{token2} LP </div> */}
           </div>
         )}
@@ -625,102 +625,10 @@ const FarmsTableRow = props => {
               </div>
             )}      
           </StakeRow>
-          {/* <div className={styles.tableBodyDrawerWithdrawContainer}>
-            <div className={styles.tableBodyDrawerWithdrawTitle}>Remaining</div>
-            <div className={styles.tableBodyDrawerWithdrawContent}>
-              <div className={styles.tableBodyDrawerWithdrawDaysDateContainer}>
-                <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
-                  {data.remaining}
-                </div>
-                <div className={styles.tableBodyDrawerWithdrawDateContainer}>
-                  {data.dueDate}
-                </div>
-              </div>
-              
-              <button
-                type="button"
-                className={styles.tableBodyDrawerWithdrawButton}
-                onClick={() =>{
-                  setSelectedRowData(data);
-                  setWithdrawModal(true);
-                }}
-              >
-                Withdraw
-              </button>
-            </div>
-          </div>
-          <div className={styles.tableBodyDrawerWithdrawContainer}>
-            <div className={styles.tableBodyDrawerWithdrawTitle}>Pending Reward</div>
-            <div className={styles.tableBodyDrawerWithdrawContent}>
-              <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
-                {data.reward.map((reward,idx) => (
-                  <div className={styles.tableBodyDrawerWithdrawDateContainer}>
-                    {`${reward.amount} ${reward.token}`}
-                  </div>
-                ))}
-              </div>
-              <button
-                type="button"
-                className={styles.tableBodyDrawerWithdrawButton}
-                style={isHarvestDisabled ? { cursor: 'not-allowed' } : {}}
-                onClick={async () => {
-                  setSelectedRowData(data);
-                  showHarvestModal();
-                }}
-                disabled={isHarvestDisabled}
-              >
-                Harvest
-              </button>
-            </div>
-          </div> */}
         </div>
         );
       })}
       
-      <AcyActionModal
-        visible={harvestModal}
-        onCancel={hideHarvestModal}
-        confirmText={harvestButtonText}
-        onConfirm={()=>{
-          if(harvestButtonStatus) {
-            setHarvestButtonText(<>Processing <Icon type="loading" /></>);
-            setHarvestButtonStatus(false);
-            harvest(poolId, selectedRowData.positionId, setHarvestButtonText, harvestCallback,library, account)
-          }
-
-        }}
-        disabled={!harvestButtonStatus}
-      >
-        <div> 
-          
-          <div className={styles.withdrawDetailContainer}>
-            Rewards:
-            {selectedRowData && selectedRowData.reward.map((reward,idx) => (
-              <div className={styles.withdrawDetailContainer2}>
-                <div className={styles.amountContainer}>
-                  {reward.amount}
-                </div>
-                <div className={styles.tokenContainer}>
-                  <div className={styles.tokenLogoContainer}>
-                    { reward.token == "ACY" ? (
-                        <img src={ACY_LOGO}/>
-                      ) : (
-                        <img src={'https://storageapi.fleek.co/chwizdo-team-bucket/ACY%20Token%20List/'+reward.token+'.svg'}/>
-                      )
-                    }
-                  </div>
-                  <div className={styles.token}>
-                    {reward.token}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className={styles.harvestChart} >
-            <AcyBarChart data={harvestHistory.myAll.slice(-14)} showXAxis barColor="#1d5e91" />
-          </div>
-        </div>
-      </AcyActionModal>
       <AcyModal
         visible={showAddLiquidity}
         onCancel={()=> setShowAddLiquidity(false)}
@@ -737,13 +645,20 @@ const FarmsTableRow = props => {
             <div className={styles.trade}>
               <SwapComponent
                 onSelectToken0={token => {
-                  setActiveToken0(token);
+                  // setActiveToken0(token);
+                  console.log("onSelectToken0:",token);
                 }}
                 onSelectToken1={token => {
-                  setActiveToken1(token);
+                  // setActiveToken1(token);
+                  console.log("onSelectToken1:",token);
 
                 }}
                 onGetReceipt={null}
+                token={{
+                  token0: supportedTokens.find(token => token.symbol == "USDC"),
+                  token1: supportedTokens.find(token => token.symbol == poolInfo.token1)
+                }}
+                isLockedToken1={true}
               />
             </div>
          </AcyCard>
@@ -774,92 +689,6 @@ const FarmsTableRow = props => {
         chainId={chainId}
         poolLpScore={poolInfo.poolLpScore}
       />
-      {/* withdraw modal */}
-      <AcyModal 
-        backgroundColor="#0e0304" width={400} 
-        visible={withdrawModal} 
-        onCancel={hideWithdrawModal}>
-        <div className={styles.removeAmountContainer}>
-          <div>Withdraw Amount</div>
-          <div className={styles.amountText}>
-            <AutoResizingInput value={percent} onChange={setPercent} />%
-          </div>
-          <div className={styles.sliderContainer}>
-            <input
-              value={percent}
-              type="range"
-              className={styles.sliderInput}
-              onChange={e => {
-                setPercent(parseInt(e.target.value));
-              }}
-            />
-          </div>
-        </div>
-        <div className={styles.tokenAmountContainer}>
-          <div className={styles.tokenAmountContent}>
-            <div className={styles.tokenAmount}>
-              Amount
-            </div>
-            <div className={styles.tokenDetailContainer}>
-              <div className={styles.tokenSymbol}>
-                {selectedRowData && selectedRowData.lpAmount * percent / 100}
-              </div>
-            </div>
-          </div>
-          <div className={styles.tokenAmountContent}>
-            <div className={styles.tokenAmount}>
-              LP Token
-            </div>
-            <div className={styles.tokenDetailContainer}>
-              <div>
-                {poolInfo.token1Logo && (
-                    <img src={poolInfo.token1Logo} alt="token" className={styles.tokenImg}/>
-                )}
-                {poolInfo.token2Logo && (
-                    <img src={poolInfo.token2Logo} alt="token" className={styles.tokenImg}/>
-                )}
-              </div>
-              <div className={styles.tokenSymbol}>
-                
-                {poolInfo.token1 && poolInfo.token2 && `${poolInfo.token1}-${poolInfo.token2}`}
-                {poolInfo.token1 && !poolInfo.token2 && `${token1}`}
-                {poolInfo.token2 && !poolInfo.token1 && `${poolInfo.token2}`}
-                <span>&nbsp;LP</span>
-              </div>
-              
-            </div>
-          </div>
-          <div className={styles.tokenAmountContent}>
-            <div className={styles.tokenAmount}>
-              Remaining
-            </div>
-            <div className={styles.tokenDetailContainer}>
-              <div className={styles.tokenSymbol}>
-                  {selectedRowData && selectedRowData.remaining }
-              </div>
-            </div>
-          </div>
-          
-        </div>
-        {/* <div className={styles.buttonContainer}> */}
- 
-        <div className={styles.modalButtonContainer}>
-          <div className={styles.buttonPadding}>
-              <button 
-                  className={(!withdrawButtonStatus && classNames(styles.button,styles.buttonDisabled)) || styles.button}
-                  // className={styles.button}
-                  onClick={async () => {
-                    if(!selectedRowData.locked && selectedRowData.lpAmount * percent / 100 != 0 && withdrawButtonStatus){
-                      withdrawClicked();
-                    }
-                  }}
-              >
-                  {selectedRowData && selectedRowData.locked? "Locked":withdrawButtonText}
-              </button>
-          </div>
-        </div>
-      {/* </div> */}
-      </AcyModal>
     </div>
   )
     

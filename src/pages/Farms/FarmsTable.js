@@ -35,6 +35,8 @@ const FarmsTable = ({
 }) => {
   const [myChartId, setMyChartId] = useState(0);
   const [totalChartId, setTotalChartId] = useState(0);
+  const [myChartData, setMyChartData] = useState(balanceAcy.myAcy);
+  const [allChartData, setAllChartData] = useState(balanceAcy.totalAcy);
 
   const getMyChart = () => {
     if(myChartId == 0) return balanceAcy.myAcy;
@@ -44,20 +46,25 @@ const FarmsTable = ({
     if(totalChartId==0) return balanceAcy.totalAcy;
     return harvestAcy.totalAll
   }
+   
 
   const selectTopChart = pt => {
     const functionDict = {
       'My ACY': () => {
         setMyChartId(0);
+        setMyChartData(balanceAcy.myAcy);
       },
       'My Reward': () => {
         setMyChartId(1);
+        setMyChartData(harvestAcy.myAll);
       },
       'Total ACY': () => {
         setTotalChartId(0);
+        setAllChartData(balanceAcy.totalAcy);
       },
       'Total Reward': () => {
         setTotalChartId(1);
+        setAllChartData(harvestAcy.totalAll);
       },
     };
     functionDict[pt]();
@@ -135,65 +142,24 @@ const FarmsTable = ({
               />
             );
           })}
-          { !hideDao && (
+
              <div>
-              <div className={styles.stakeSectionMain}>
+              <div className={styles.stakeSectionMain} hidden={hideDao}>
                 <DaoChart
                   activeGraphId={myChartId}
-                  activeGraphData={getMyChart()}
+                  activeGraphData={myChartData}
                   selectTopChart={selectTopChart}
                   selection={['My ACY', 'My Reward']}
                 />
                 <DaoChart
                   activeGraphId={totalChartId}
-                  activeGraphData={getTotalChart()}
+                  activeGraphData={allChartData}
                   selectTopChart={selectTopChart}
                   selection={['Total ACY', 'Total Reward']}
                 />
               </div>
            </div>
-          )}
         </div>
-      {/* ) : ( */}
-        {/* <div className={styles.tableBodyContainer}>
-          <DaoTableRow
-            content={daoContent}
-            token1="ACY"
-            token1Logo={AcyIcon}
-            token2={null}
-            token2Logo={null}
-            totalApr="12345"
-            tvl="12345"
-            pendingReward={[{ token: 'ACY', amount: 0 }]}
-            walletConnected={walletConnected}
-            connectWallet={connectWallet}
-            isMyFarms={isMyFarms}
-            hideArrow
-            harvestHistory={harvestAcy}
-            refreshHarvestHistory={refreshHarvestHistory}
-            searchInput={searchInput}
-            selectedTable={selectedTable}
-            tokenFilter={tokenFilter}
-            dao={!hideDao}
-          />
-          <div>
-            <div className={styles.stakeSectionMain}>
-              <DaoChart
-                activeGraphId={myChartId}
-                activeGraphData={getMyChart()}
-                selectTopChart={selectTopChart}
-                selection={['My ACY', 'My Reward']}
-              />
-              <DaoChart
-                activeGraphId={totalChartId}
-                activeGraphData={getTotalChart()}
-                selectTopChart={selectTopChart}
-                selection={['Total ACY', 'Total Reward']}
-              />
-            </div>
-          </div>
-        </div> */}
-      {/* )} */}
       <div
         className={styles.tableFooterContainer}
         onClick={() => setRowNumber(rowNumber + 5)}
