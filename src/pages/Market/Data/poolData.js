@@ -9,6 +9,9 @@ import {
 import { convertPoolForList } from './util';
 import { getBlockFromTimestamp } from './blocks';
 import { sortTable } from '../Util';
+import axios from 'axios';
+import { parseTransactionData } from '@/utils/txData';
+import supportedTokens from '@/constants/TokenList';
 
 export async function fetchPoolInfo(client, address, timestamp) {
   const block = await getBlockFromTimestamp(timestamp);
@@ -46,42 +49,52 @@ export async function fetchPoolDayData(client, address, timespan) {
 
 // fetch general pool info
 // top 10, etc
-export async function fetchGeneralPoolInfoDay(client) {
-  let todayDateObj = new Date();
-  let todayTime = Math.floor(todayDateObj.getTime() / 1000 / 86400) * 86400;
+// FOLLOWING 2 FUNCTIONS GET DATA FROM API
+/*
+data is an array of items with following format : 
+{
+  token0 : String,
+  token1 : string,
+  lastReserves : formatted number,
+  lastVolumes : formatted number
+}
 
-  const { loading, error, data } = await client.query({
-    query: GET_TOP_POOL,
-    variables: {
-      date: todayTime,
-      poolAmount: 50,
-    },
-  });
+we want : 
+  address: "0x21b8065d10f73ee2e260e5b47d3344d3ced7596e"
+  coin1: "WISE"
+  coin2: "WETH"
+  percent: 0
+  price: 0
+  tvl: 396257257.00010574
+  volume7d: 940097.9591566627
+  volume24h: 86149.02125578691
+*/
+//::::TODO fetch price of tokens in USDC
+function translateToUSD (token0, token1, amount0, amount1){
+  return amount0 + amount1; 
+}
 
-  if (loading) return null;
-  if (error) return `Error! ${error}`;
-
-  let rawPoolList = data.pairDayDatas;
-  let poolLength = rawPoolList.length;
-  let poolListProcessed = [];
-  for (let i = 0; i < poolLength; i++) {
-    try {
-      const rawWeekDatas = await fetchPoolDayData(client, rawPoolList[i].pairAddress, 7);
-      let weekDatas = rawWeekDatas;
-      let weekDataLength = weekDatas.length;
-      let volume7d = 0;
-
-      for (let i = 0; i < weekDataLength; i++) {
-        volume7d += parseFloat(weekDatas[i].dailyVolumeUSD);
-      }
-
-      poolListProcessed.push(convertPoolForList(rawPoolList[i], volume7d));
-    } catch (err) {
-      console.log(err);
+function parsePoolData (data){
+  let _data = data.map((item)=>{
+    let _tvl = translateToUSD (item.token0,item.token1,item.lastReserves.token0,item.lastReserves.token1);
+    let _volume24h = translateToUSD (item.token0,item.token1,item.lastVolume.token0,item.lastVolume.token1);
+    return {
+      coin1 : supportedTokens.find(token=>token.addressOnEth.toLowerCase() == item.token0.toLowerCase()).symbol,
+      coin2 : supportedTokens.find(token=>token.addressOnEth.toLowerCase() == item.token1.toLowerCase()).symbol,
+      tvl : _tvl ,
+      volume24h : _volume24h,
+      volume7d : 0
     }
-  }
+  });
+  return _data;
+}
 
-  return poolListProcessed;
+export async function fetchGeneralPoolInfoDay() {
+  let request = 'http://localhost:3001/api/poolchart/all';
+  let response = await fetch(request);
+  let data = await response.json();
+  console.log('found this data::::',data);
+  return parsePoolData(data.data);
 }
 
 // get pools from string (search)
