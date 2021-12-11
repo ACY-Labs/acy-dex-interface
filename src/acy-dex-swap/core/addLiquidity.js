@@ -93,8 +93,11 @@ export async function getEstimated(
     if (!exactIn && isNaN(parseFloat(inToken1Amount)))
       return new CustomError('Please enter amount');
 
-    let token0IsETH = inToken0Symbol === 'ETH';
-    let token1IsETH = inToken1Symbol === 'ETH';
+    // let token0IsETH = inToken0Symbol === 'ETH';
+    // let token1IsETH = inToken1Symbol === 'ETH';
+
+    let token0IsETH = inToken0Symbol === 'BNB';
+    let token1IsETH = inToken1Symbol === 'BNB';
 
     console.log(inputToken0);
     console.log(inputToken1);
