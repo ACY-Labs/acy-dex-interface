@@ -55,7 +55,9 @@ const BasicProfile = (props) => {
 
   useEffect(() => {
     // activate(injected)
-    activate(bscConnector);
+    if(!account){
+      activate(bscConnector);
+    }
   }, []);
 
 

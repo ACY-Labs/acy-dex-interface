@@ -188,7 +188,10 @@ const AddLiquidityComponent = props => {
   useEffect(
     () => {
       // activate(injected);
-      activate(bscConnector);
+      if(!account){
+        activate(bscConnector);
+      }
+      
       //read the fav tokens code in storage
       var tokens_symbol = JSON.parse(localStorage.getItem('tokens_symbol'));
       //set to fav token
