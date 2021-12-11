@@ -177,6 +177,15 @@ const GlobalHeaderRight = props => {
       },
     },
   ];
+  const BinanceWallet = [
+    {
+      name: 'Binance Wallet',
+      icon: 'Binance',
+      onClick:()=>{
+        selectWallet('binance');
+      },
+    },
+  ];
 
   const walletList = [
     {
@@ -344,6 +353,14 @@ const GlobalHeaderRight = props => {
               )}
               <span>{item.name}</span>
             </AcyCardList.Thin>
+          ))}
+          {BinanceWallet.map(item =>(
+            <AcyCardList.Thin onClick={()=>item.onClick()}>
+              {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
+              <AcyIcon.MyIcon width={32} type={item.icon} />
+            )}
+            <span>{item.name}</span>
+          </AcyCardList.Thin>
           ))}
         </AcyCardList>
 
