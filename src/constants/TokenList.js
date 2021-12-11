@@ -1,9 +1,17 @@
 // verify at etherscan with optimization on and compiler version v0.6.7
 export default [
+  // {
+  //   name: 'Ether',
+  //   symbol: 'ETH',
+  //   address: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
+  //   addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+  //   decimals: 18,
+  //   logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
+  // },
   {
-    name: 'Ether',
-    symbol: 'ETH',
-    address: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
+    name: 'Binance',
+    symbol: 'BNB',
+    address: '0xae13d989dac2f0debff460ac112a837c89baa7cd',
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
@@ -11,15 +19,23 @@ export default [
   {
     name: 'USD Coin',
     symbol: 'USDC',
-    address: '0xA6983722023c67Ff6938FF2adc1d7fC61B5966f3',
+    address: '0xE971616d94335dec2E54939118AdFcB68E6dCAd6',
     addressOnEth: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     decimals: 6,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
   },
+  // {
+  //   name: 'Wrapped Ether',
+  //   symbol: 'WETH',
+  //   address: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
+  //   addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+  //   decimals: 18,
+  //   logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
+  // },
   {
-    name: 'Wrapped Ether',
-    symbol: 'WETH',
-    address: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
+    name: 'Wrapped Binance',
+    symbol: 'WBNB',
+    address: '0xae13d989dac2f0debff460ac112a837c89baa7cd',
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',

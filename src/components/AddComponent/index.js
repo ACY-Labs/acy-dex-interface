@@ -35,6 +35,7 @@ import { sortAddress } from '@/utils/utils';
 
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
+import { BscConnector } from '@binance-chain/bsc-connector'
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import {
@@ -179,10 +180,15 @@ const AddLiquidityComponent = props => {
     supportedChainIds: [1, 3, 4, 5, 42, 80001],
   });
 
+  const bscConnector = new BscConnector({ 
+    supportedChainIds: [56, 97],
+  });
+
   // 初始化函数时连接钱包
   useEffect(
     () => {
-      activate(injected);
+      // activate(injected);
+      activate(bscConnector);
       //read the fav tokens code in storage
       var tokens_symbol = JSON.parse(localStorage.getItem('tokens_symbol'));
       //set to fav token
@@ -364,7 +370,8 @@ const AddLiquidityComponent = props => {
   };
 
   const ConnectWallet = () => {
-    activate(injected);
+    // activate(injected);
+    activate(bscConnector);
   };
 
   useEffect(
@@ -775,7 +782,8 @@ const AddLiquidityComponent = props => {
                     disabled={!buttonStatus}
                     onClick={async () => {
                       if (account == undefined) {
-                        activate(injected);
+                        // activate(injected);
+                        activate(bscConnector);
                         setButtonContent('Choose tokens and amount');
                         setButtonStatus(false);
                       } else {

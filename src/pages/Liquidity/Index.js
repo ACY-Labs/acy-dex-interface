@@ -3,6 +3,7 @@ import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton } from 'antd';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
+import { BscConnector } from '@binance-chain/bsc-connector'
 import Data, {
   fetchGeneralPoolInfoDay,
   fetchGeneralTokenInfo,
@@ -29,6 +30,7 @@ import { getTransactionsByAccount } from '@/utils/txData';
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import styles from './styles.less';
 
+
 const { AcyTabPane } = AcyTabs;
 
 const BasicProfile = (props) => {
@@ -47,8 +49,13 @@ const BasicProfile = (props) => {
     supportedChainIds: [1, 3, 4, 5, 42, 80001],
   });
 
+  const bscConnector = new BscConnector({ 
+    supportedChainIds: [56, 97],
+  });
+
   useEffect(() => {
-    activate(injected);
+    // activate(injected)
+    activate(bscConnector);
   }, []);
 
 

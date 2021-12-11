@@ -36,6 +36,7 @@
     "@antv/data-set": "^0.10.0",
     "@apollo/client": "^3.4.11",
     "@babel/runtime": "^7.2.0",
+    "@binance-chain/bsc-connector": "^1.0.0",
     "@ethersproject/abi": "^5.4.1",
     "@ethersproject/address": "^5.4.0",
     "@ethersproject/bignumber": "^5.4.0",
