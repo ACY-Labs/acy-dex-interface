@@ -6,6 +6,7 @@ import { PortisConnector } from '@web3-react/portis-connector';
 import { TorusConnector } from '@web3-react/torus-connector';
 import { LedgerConnector } from '@web3-react/ledger-connector';
 import { TrezorConnector } from '@web3-react/trezor-connector';
+import { BscConnector } from '@binance-chain/bsc-connector';
 
 const RPC_URLS = {
   1: 'https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
@@ -44,5 +45,9 @@ const trezor = new TrezorConnector({
   chainId: 4,
   url: RPC_URLS[4],
 });
+// 这边增加对应的钱包地址 明天问问看 先用injected替代
+const binance = new BscConnector({
+  supportedChainIds: [56, 97] // later on 1 ethereum mainnet and 3 ethereum ropsten will be supported
+})
 
-export { injected, walletconnect, walletlink, fortmatic, portis, torus, ledger, trezor };
+export { injected, walletconnect, walletlink, fortmatic, portis, torus, ledger, trezor, binance };

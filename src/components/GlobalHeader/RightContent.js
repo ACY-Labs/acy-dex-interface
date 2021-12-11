@@ -23,6 +23,7 @@ import {
   torus,
   trezor,
   ledger,
+  binance,
 } from '@/connectors';
 
 import styles from './index.less';
@@ -114,6 +115,9 @@ const GlobalHeaderRight = props => {
       activate(trezor);
     } else if (walletName === 'ledger') {
       activate(ledger);
+    }// 增加BSC
+    else if(walletName === 'binance'){
+      activate(binance);
     }
     setVisibleMetaMask(false);
   };
@@ -174,7 +178,16 @@ const GlobalHeaderRight = props => {
       },
     },
   ];
+
   const walletList = [
+    {
+      // 新增BSC
+      name: 'Binance Wallet',
+      icon: 'Binance',
+      onClick:()=>{
+        selectWallet('binance');
+      },
+    },
     {
       name: 'Coinbase Wallet',
       icon: 'Coinbase',
@@ -324,6 +337,7 @@ const GlobalHeaderRight = props => {
             .
           </AcyCardList.Agree>
         </AcyCardList>
+
         <AcyCardList>
           {MetaMask.map(item => (
             <AcyCardList.Thin onClick={() => item.onClick()}>
@@ -334,6 +348,7 @@ const GlobalHeaderRight = props => {
             </AcyCardList.Thin>
           ))}
         </AcyCardList>
+
         <AcyCardList>
           {walletList.map((item, index) => {
             if (only && index > -1) {
