@@ -115,8 +115,7 @@ const GlobalHeaderRight = props => {
       activate(trezor);
     } else if (walletName === 'ledger') {
       activate(ledger);
-    }// 增加BSC
-    else if(walletName === 'binance'){
+    } else if(walletName === 'binance'){
       activate(binance);
     }
     setVisibleMetaMask(false);
@@ -181,7 +180,6 @@ const GlobalHeaderRight = props => {
 
   const walletList = [
     {
-      // 新增BSC
       name: 'Binance Wallet',
       icon: 'Binance',
       onClick:()=>{

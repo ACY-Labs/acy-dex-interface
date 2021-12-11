@@ -45,9 +45,9 @@ const trezor = new TrezorConnector({
   chainId: 4,
   url: RPC_URLS[4],
 });
-// 这边增加对应的钱包地址 明天问问看 先用injected替代
+
 const binance = new BscConnector({
-  supportedChainIds: [56, 97] // later on 1 ethereum mainnet and 3 ethereum ropsten will be supported
-})
+  supportedChainIds: [56, 97],
+});
 
 export { injected, walletconnect, walletlink, fortmatic, portis, torus, ledger, trezor, binance };
