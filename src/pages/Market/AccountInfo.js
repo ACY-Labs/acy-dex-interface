@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Breadcrumb, Button, Table, Icon, Dropdown, Menu } from 'antd';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { AcyIcon, AcyTokenIcon, AcyPeriodTime, AcyAccountChart } from '@/components/Acy';
-import FarmsTable from '@/pages/Farms/FarmsTable';
+// import FarmsTable from '@/pages/Farms/FarmsTable';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAllPools } from '@/acy-dex-swap/core/farms';
@@ -278,7 +278,7 @@ function AccountInfo(props) {
   const [activePosition, setActivePosition] = useState(null);
 
   const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
+    supportedChainIds: [1, 3, 4, 5, 42, 56, 97, 80001],
   });
   const { address } = useParams();
 
@@ -401,7 +401,7 @@ function AccountInfo(props) {
         style={{ display: 'flex', justifyContent: 'space-between' }}
       >
         <div>
-          <div style={{ fontSize: '26px', fontWeight: 'bold' }}>{abbrHash(address)}</div>
+          {/* <div style={{ fontSize: '26px', fontWeight: 'bold' }}>{address}</div> */}
           <a
             onClick={() => openInNewTab(`https://etherscan.io/address/${address}`)}
             style={{ color: '#e29227', fontWeight: 600 }}
@@ -425,11 +425,33 @@ function AccountInfo(props) {
         />
       </div>
 
+      {/* wallet stats */}
+      <div className={styles.accountPageRow}>
+        <h2>Wallet Stats</h2>
+        <div style={{ display: 'flex' }} className={styles.walletStatCard}>
+          <div className={styles.walletStatEntry}>
+            <div className={styles.walletStatValue}>$999.99m</div>
+            <div className={styles.walletStatIndicator}>Total Value Swapped</div>
+          </div>
+          <div style={{ width: 20 }} />
+          <div className={styles.walletStatEntry}>
+            <div className={styles.walletStatValue}>$999.99m</div>
+            <div className={styles.walletStatIndicator}>Total Fees Paid</div>
+          </div>
+          <div style={{ width: 20 }} />
+          <div className={styles.walletStatEntry}>
+            <div className={styles.walletStatValue}>99.99k</div>
+            <div className={styles.walletStatIndicator}>Total Transactions</div>
+          </div>
+        </div>
+      </div>
+
       {/* liquidity and fees earned */}
       <div className={styles.accountPageRow}>
         <div style={{ display: 'flex' }} className={styles.walletStatCard}>
           <div className={styles.walletStatEntry}>
             <div className={styles.walletStatIndicator}>Liquidity (including fees)</div>
+
             <div className={styles.walletStatValue}>
               {positionValue
                 ? formattedNum(positionValue, true)
@@ -470,7 +492,7 @@ function AccountInfo(props) {
       {/* Farms */}
       <div className={styles.accountPageRow}>
         <h2>Farms</h2>
-        <FarmsTable
+        {/* <FarmsTable
           tableRow={tableRow}
           onRowClick={onRowClick}
           tableTitle="User Farms"
@@ -486,34 +508,13 @@ function AccountInfo(props) {
           account={account}
           library={library}
           chainId={chainId}
-        />
+        /> */}
       </div>
 
       {/* transaction table */}
       <div className={styles.accountPageRow}>
         <h2>Transactions</h2>
         <TransactionTable dataSourceTransaction={dataSourceTransaction} />
-      </div>
-
-      {/* wallet stats */}
-      <div className={styles.accountPageRow}>
-        <h2>Wallet Stats</h2>
-        <div style={{ display: 'flex' }} className={styles.walletStatCard}>
-          <div className={styles.walletStatEntry}>
-            <div className={styles.walletStatValue}>$999.99m</div>
-            <div className={styles.walletStatIndicator}>Total Value Swapped</div>
-          </div>
-          <div style={{ width: 20 }} />
-          <div className={styles.walletStatEntry}>
-            <div className={styles.walletStatValue}>$999.99m</div>
-            <div className={styles.walletStatIndicator}>Total Fees Paid</div>
-          </div>
-          <div style={{ width: 20 }} />
-          <div className={styles.walletStatEntry}>
-            <div className={styles.walletStatValue}>99.99k</div>
-            <div className={styles.walletStatIndicator}>Total Transactions</div>
-          </div>
-        </div>
       </div>
 
       <div style={{ height: 20 }} />
