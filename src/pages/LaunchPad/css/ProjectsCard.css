@@ -1,0 +1,83 @@
+.projects-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 33%;
+  height: auto;
+  background-color: #242425;
+  padding: 10px;
+  border-radius: 5px 1px 5px 5px;
+}
+
+.logo-countdown-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.projects-card .logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 20px;
+}
+.projects-card .logo {
+  height: 60px;
+  width: 60px;
+  vertical-align: middle;
+  border-style: none;
+  margin-bottom: 5px;
+}
+
+.projects-card .countdown-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.projects-card .detail-text {
+}
+
+/* Countdown */
+.countDown-container {
+  margin-bottom: 10px;
+}
+.countDown-box {
+  justify-content: center;
+  display: flex;
+  align-items: center;
+}
+
+.countDown-number {
+  justify-content: center;
+}
+
+.countDown-number-1 {
+  flex-direction: row;
+  color: #b5b5b6;
+  color: white;
+  color: white;
+  color: var(--accent-color, white);
+  width: 35px;
+  height: 35px;
+  border-radius: 5px;
+  background-color: hsla(0, 0%, 82.7%, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  margin: 5px 5px 0px 5px;
+}
+
+.countDown-number-2 {
+  display: flex;
+  justify-content: center;
+  font-size: 10px;
+  padding-top: 5px;
+}
+
+.seperator {
+  margin: 0px 1px 10px 1px;
+  font-size: 20px;
+  color: #eb5c20;
+}
