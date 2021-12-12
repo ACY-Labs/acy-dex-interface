@@ -322,7 +322,7 @@ const AcyLiquidityPositions = (props) => {
       visible: true,
     },
     {
-      title: "24H Fee",
+      title: "APR",
       dataIndex: 'token0Amount',
       key: 'token0Amount',
       className: 'centerAlignTableHeader',
@@ -410,13 +410,24 @@ const AcyLiquidityPositions = (props) => {
     console.log("test elapsed time", new Date());
     return userPools;
   }, [userLPHandlers]);
+  // const userLPOverview = useMemo(() => {
+  //   const lpOverview = [];
+  //   for (let pair of userLPHandlers) {
+  //     const volume = 100;
+  //     const feeRate = 0.17;
+  //     lpOverview.push({
+  //       poolAddress: `${pair.liquidityToken.address}`,
+  //       volume,
+  //       apr: volume * feeRate / 100
+  //     })
+  //   }
+  // }, [userLPHandlers]);
 
   // search input component update
   useEffect(() => {
     let filtered = userLPData;
     if (keyword !== "" && filtered) {
       const conditions = keyword.toLowerCase().split(/[\s\/,]+/);
-      console.log("splitting result", conditions);
       filtered = filtered.filter(item => conditions.every(condition => item.pool.toLowerCase().includes(condition)));
     }
     setFilteredData(filtered);
