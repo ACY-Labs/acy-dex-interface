@@ -10,6 +10,26 @@ var eth = new Eth('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2
 Contract.setProvider('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
 const ACY_ADDRESS = '0xaf9db9e362e306688af48c4acb9618c06db38ac3';
 
+// enable async foreach, callback should be a Promise
+const asyncForEach = (arr, callback) => {
+    let resultArr = [];
+    let promiseArr = [];
+    const O = Object(arr);
+    for (let i = 0; i < arr.length; i++) {
+        let p = new Promise((resolve, reject) => {
+            callback(O[i], i, O).then((result) => {
+                // console.log('Promise: ', result);
+                resultArr.push(result);
+                resolve();
+            })
+        })
+        promiseArr.push(p);
+    }
+    return Promise.all(promiseArr).then(res => {
+        return resultArr;
+    })
+}
+
 const getBlockTime = async (blockNumber) => {
     const timeStamp = await eth.getBlock(blockNumber).then(function(events){
         const timeStamp = events['timestamp'];
@@ -20,27 +40,36 @@ const getBlockTime = async (blockNumber) => {
     return date.getFullYear(timeStamp)  + "-" + ("0"+(date.getMonth(timeStamp)+1)).slice(-2) + "-" + ("0" + date.getDate(timeStamp)).slice(-2)
                  + " " + ("0" + date.getHours(timeStamp)).slice(-2) + ":" + ("0" + date.getMinutes(timeStamp)).slice(-2) + ":"  + ("0" + date.getSeconds(timeStamp)).slice(-2);
 }
+
 const getTransferData = async () =>
 {
     const transferData = [];
     const chartData = [];
     const contract = new Contract(ERC20ABI, ACY_ADDRESS);
-    const result = await contract.getPastEvents("Transfer", {
+    const events = await contract.getPastEvents("Transfer", {
         fromBlock: 0 ,
         toBlock: 'latest'
-    }).then(function(events){
-        events.forEach( async (element) => {
-            const blockData = {
-                dateTime: await getBlockTime(element['blockNumber']),
-                // dateTime: "2021-02-02",
-                participant: element['returnValues']['to'],
-                quantity: element['returnValues']['value']/1e18,
-                Amount: element['returnValues']['value']/1e18
-            };
-            transferData.push(blockData);
-            chartData.push([blockData.dateTime.substring(0,11),blockData.quantity])
-        });
-    });
+    })
+
+    await asyncForEach(events, async(element, index) => {
+        const blockData = {
+            dateTime: await getBlockTime(element['blockNumber']),
+            participant: element['returnValues']['to'],
+            quantity: element['returnValues']['value']/1e18,
+            Amount: element['returnValues']['value']/1e18
+        };
+        transferData.push(blockData);
+        chartData.push([blockData.dateTime.substring(0,10),blockData.quantity])
+    })
+
+    transferData.sort((a, b) => {
+        return b['dateTime'] < a['dateTime'] ? -1 : 1
+    })
+
+    chartData.sort((a, b) => {
+        return b[0] > a[0] ? -1 : 1
+    })
+
     return [transferData,chartData];
 };
 

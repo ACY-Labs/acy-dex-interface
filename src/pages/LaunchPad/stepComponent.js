@@ -12,7 +12,7 @@ const { Step } = Steps;
 const stepComponent = (props) => {
   
   const [percent, setPercentage] = useState(0);
-  const [current, setCurrent] = useState(1);
+  const [current, setCurrent] = useState(2);
   const [status, setStatus] = useState('process');
 
 
