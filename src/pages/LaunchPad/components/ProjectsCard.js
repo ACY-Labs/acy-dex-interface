@@ -16,7 +16,7 @@ const ProjectsCard = ({ ddl, raise, sales, rate }) => {
           <div className="logo">
             <img src={AcyIcon} alt="" />
           </div>
-          <div>ACY Finance</div>
+          <div className="logo-text">ACY Finance</div>
         </div>
         <div className="countdown-container">
           <div>
