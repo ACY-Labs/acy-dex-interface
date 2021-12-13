@@ -50,7 +50,7 @@ const IncomingProjects = ({ data }) => {
           zIndex: 1,
           display: 'flex',
           flexWrap: 'wrap',
-          gap: '10px',
+          gap: '40px',
           justifyContent: 'center',
         }}
       >

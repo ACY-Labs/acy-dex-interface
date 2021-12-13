@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600;700&display=swap');
+
 .projects-container {
   display: flex;
   flex-direction: column;
@@ -5,13 +7,15 @@
   width: 300px;
   height: 200px;
   background-color: #1b1b1c;
-  padding: 10px 0px 10px 10px;
+  padding: 15px 5px 10px 10px;
   /* border-radius: 5px 1px 5px 5px; */
   border-radius: 3px;
+  font-family: "Karla";
 }
 
 .logo-text {
-  font-size: 10px;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .logo-countdown-container {
@@ -32,7 +36,7 @@
   width: 50px;
   vertical-align: middle;
   border-style: none;
-  margin-bottom: 5px;
+  margin-bottom: 12px;
 }
 
 .projects-card .countdown-container {
@@ -46,7 +50,8 @@
 
 /* Countdown */
 .countDown-container {
-  margin-bottom: 10px;
+  margin-top: 2px;
+  margin-bottom: 8px;
 }
 .countDown-box {
   justify-content: center;
@@ -89,6 +94,12 @@
 }
 
 /* incoming projects */
+.incoming-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .expanding-card {
   display: flex;
   flex-direction: row;
@@ -235,56 +246,10 @@
 }
 
 /* see more incoming */
-/* .incoming-container {
-  position: relative;
-  overflow: hidden;
-  height: calc(189px * 3 + 100px);
-}
-
-.incoming-container.active {
-  height: auto;
-}
-
-.incoming-container.active .expanding-card::before {
-  display: none;
-}
-
-.expanding-card::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 189px;
-  background: linear-gradient(transparent, #000000);
-  z-index: 1;
-}
-
-.see-more-incoming {
-  position: relative;
-  padding: 10px 15px;
-  background: #333a45;
-  margin-top: 15px;
-  display: inline-block;
-  cursor: pointer;
-  text-transform: uppercase;
-  color: #fff;
-  font-weight: 500;
-  letter-spacing: 2px;
-  font-size: 14px;
-}
-
-.see-more-incoming::before {
-  content: 'See More';
-}
-
-.incoming-container.active ~ .see-more-incoming::before {
-  content: 'See Less';
-} */
 
 .incoming-container .expanding-card {
   position: relative;
-  height: calc(2 * 189px + 20px);
+  height: calc(2 * (200px + 40px));
   overflow: hidden;
 }
 
@@ -299,7 +264,7 @@
   left: 0;
   width: 100%;
   height: 189px;
-  background: linear-gradient(transparent, #000000);
+  background: linear-gradient(transparent, #0E0304);
   z-index: 1;
 }
 
@@ -316,9 +281,12 @@
   cursor: pointer;
   text-transform: uppercase;
   color: #fff;
-  font-weight: 500;
   letter-spacing: 2px;
   font-size: 14px;
+  width: fit-content;
+  height: auto;
+  font-family: "Karla";
+  font-weight: 600;
 }
 
 .see-more-incoming::before {
@@ -330,6 +298,11 @@
 }
 
 /* ended projects */
+.ended-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .expanding-card2 {
   display: flex;
   flex-direction: row;
@@ -478,7 +451,7 @@
 /* see more ended */
 .ended-container .expanding-card2 {
   position: relative;
-  height: calc(189px * 3 + 30px);
+  height: calc( 3*(200px + 40px));
   overflow: hidden;
 }
 
@@ -499,9 +472,12 @@
   cursor: pointer;
   text-transform: uppercase;
   color: #fff;
-  font-weight: 500;
   letter-spacing: 2px;
   font-size: 14px;
+  width: fit-content;
+  height: auto;
+  font-family: "Karla";
+  font-weight: 600;
 }
 
 .see-more-ended::before {

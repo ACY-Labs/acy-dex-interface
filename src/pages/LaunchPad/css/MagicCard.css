@@ -24,8 +24,8 @@
 
 .magic-card-before {
   content: '';
-  width: 319px;
-  height: 194px;
+  width: 304px;
+  height: 204px;
   border-radius: 3px;
   background-image: linear-gradient(var(--rotate), #5ddcff, #3c67e3 43%, #4e00c2);
   position: absolute;
