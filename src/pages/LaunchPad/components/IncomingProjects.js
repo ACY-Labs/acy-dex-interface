@@ -41,64 +41,70 @@ const IncomingProjects = ({ data }) => {
     });
   }, []);
   return (
-    <div className="expanding-card" style={{ zIndex: 1, display: 'flex', gap: '10px' }}>
-      <div className="cards">
-        <div className=" card [ is-collapsed ]">
-          <div className="card__inner [ js-expander ]">
-            <div className="">
-              <ProjectsCard
-                ddl="2021/12/17 00:00:00"
-                raise="250,000 USDT"
-                sales="1,000,000 ACY"
-                rate="1ACY = 0.2USDT"
-              />
+    <div>
+      <div
+        className="expanding-card"
+        style={{ zIndex: 1, display: 'flex', flexWrap: 'wrap', gap: '5px' }}
+      >
+        <div className="cards">
+          <div className=" card [ is-collapsed ]">
+            <div className="card__inner [ js-expander ]">
+              <div className="">
+                <ProjectsCard
+                  ddl="2021/12/17 00:00:00"
+                  raise="250,000 USDT"
+                  sales="1,000,000 ACY"
+                  rate="1ACY = 0.2USDT"
+                />
+              </div>
+              {/* <i className="fa fa-folder-o" /> */}
             </div>
-            {/* <i className="fa fa-folder-o" /> */}
+            <div className="card__expander">
+              <i className="fa fa-close [ js-collapser ]" />
+              Expander
+            </div>
           </div>
-          <div className="card__expander">
-            <i className="fa fa-close [ js-collapser ]" />
-            Expander
+        </div>
+        <div className="cards">
+          <div className=" card [ is-collapsed ]">
+            <div className="card__inner [ js-expander ] ">
+              <div className="">
+                <ProjectsCard
+                  ddl="2021/12/17 00:00:00"
+                  raise="250,000 USDT"
+                  sales="1,000,000 ACY"
+                  rate="1ACY = 0.2USDT"
+                />
+              </div>
+              {/* <i className="fa fa-folder-o" /> */}
+            </div>
+            <div className="card__expander card-middle">
+              {/* <i className="fa fa-close [ js-collapser ]" /> */}
+              Expander
+            </div>
+          </div>
+        </div>
+        <div className="cards">
+          <div className=" card [ is-collapsed ] ">
+            <div className="card__inner [ js-expander ]">
+              <div className="">
+                <ProjectsCard
+                  ddl="2021/12/17 00:00:00"
+                  raise="250,000 USDT"
+                  sales="1,000,000 ACY"
+                  rate="1ACY = 0.2USDT"
+                />
+              </div>
+              {/* <i className="fa fa-folder-o" /> */}
+            </div>
+            <div className="card__expander">
+              <i className="fa fa-close [ js-collapser ]" />
+              Expander
+            </div>
           </div>
         </div>
       </div>
-      <div className="cards">
-        <div className=" card [ is-collapsed ]">
-          <div className="card__inner [ js-expander ] ">
-            <div className="">
-              <ProjectsCard
-                ddl="2021/12/17 00:00:00"
-                raise="250,000 USDT"
-                sales="1,000,000 ACY"
-                rate="1ACY = 0.2USDT"
-              />
-            </div>
-            {/* <i className="fa fa-folder-o" /> */}
-          </div>
-          <div className="card__expander card-middle">
-            {/* <i className="fa fa-close [ js-collapser ]" /> */}
-            Expander
-          </div>
-        </div>
-      </div>
-      <div className="cards">
-        <div className=" card [ is-collapsed ] ">
-          <div className="card__inner [ js-expander ]">
-            <div className="">
-              <ProjectsCard
-                ddl="2021/12/17 00:00:00"
-                raise="250,000 USDT"
-                sales="1,000,000 ACY"
-                rate="1ACY = 0.2USDT"
-              />
-            </div>
-            {/* <i className="fa fa-folder-o" /> */}
-          </div>
-          <div className="card__expander">
-            <i className="fa fa-close [ js-collapser ]" />
-            Expander
-          </div>
-        </div>
-      </div>
+      <div className="see-more">See More</div>
     </div>
   );
 };

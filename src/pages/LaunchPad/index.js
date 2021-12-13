@@ -381,7 +381,7 @@ const Pool = (props)=> {
         </div>
         <div className='ongoing-projects'>
           <div className='title'>Ongoing Projects</div>
-          <div class='ongoing-projects-container' style={{ zIndex: 1, display: "flex", gap: "10px"}}>
+          <div class='ongoing-projects-container' style={{ zIndex: 1, display: "flex", gap: "5px"}}>
             <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT"/>
             <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT"/>
             <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT"/>
@@ -392,7 +392,8 @@ const Pool = (props)=> {
           <div className='title'>Incoming Projects</div>
           <div className=''>
             {/* <IncomingProjects />  */}
-            <ExpandingCard data={null}/>
+            <IncomingProjects data={null} />
+            
           </div>
         </div>
         <div className='ended-projects'>

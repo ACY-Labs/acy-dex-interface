@@ -11,13 +11,10 @@
 
 .magic-card-body {
   position: relative;
-  /* width:  33%; */
   height: auto;
 }
 .magic-card {
-  background: #191c29;
-  width: 100%;
-  height: 100%;
+  /* background: #191c29; */
   position: relative;
   border-radius: 6px;
   cursor: pointer;
@@ -35,8 +32,11 @@
   animation: spin 2.5s linear infinite;
   top: -1%;
   left: -1%;
+  display: none;
 }
-
+.magic-card:hover ~ .magic-card-before {
+  display: block;
+}
 .magic-card-after {
   position: absolute;
   content: '';
@@ -53,6 +53,11 @@
   opacity: 1;
   transition: opacity 0.5s;
   animation: spin 2.5s linear infinite;
+  display: none;
+}
+
+.magic-card:hover ~ .magic-card-after {
+  display: block;
 }
 
 @keyframes spin {
