@@ -16,8 +16,6 @@ import IncomingProjects from "./components/IncomingProjects.js"
 const { Meta } = Card;
 
 const Pool = (props)=> {
-    const [page, setPage] = useState(0);
-    const [view, setView] = useState('grid');
     const [projectStatus, setProjectStatus] = useState('inProgress');
     const [navPage, setnavPage] = useState(0);
     const [filter, setFilter] = useState('');
@@ -27,13 +25,11 @@ const Pool = (props)=> {
     }
 
     // project variables
-    const [projectCount, setProjectCount] = useState(0);
     useEffect(() => {
       axios.get(`http://localhost:3001/api/launch/projects`).then(res => {
         // see if get request is successful
         console.log(res)
         // get all project count
-        setProjectCount(res.data.length)
       }).catch(e => console.log("error: ", e));
     },[]);
 
@@ -75,7 +71,7 @@ const Pool = (props)=> {
         </div>
         <div className={styles.launchbottomContainer}>
           <p className={styles.titleDesc}>
-            Launching profitable projects on Multichain.
+            Launching Profitable Projects on Multichain.
           </p>
           <div className={styles.buttonContainer}>
             <div>
