@@ -90,6 +90,10 @@ function parsePoolData (data){
 }
 
 export async function fetchGeneralPoolInfoDay() {
+  // FIXME: the next line is just a quick rescue to page not showing up.
+  // Basically backend service is not up now so the real logic isn't returning an array,
+  // thus causing big troubles.
+  return [];
 
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   try{
