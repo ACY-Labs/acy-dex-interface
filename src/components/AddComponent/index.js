@@ -34,8 +34,6 @@ import styles from './styles.less';
 import { sortAddress } from '@/utils/utils';
 
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
-import { BscConnector } from '@binance-chain/bsc-connector'
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import {
@@ -81,6 +79,10 @@ import { getEstimated, addLiquidity } from '@/acy-dex-swap/core/addLiquidity';
 import spinner from '@/assets/loading.svg';
 import { Icon } from "antd";
 import moment from 'moment';
+
+import {
+  binance,
+} from '@/connectors';
 
 const { AcyTabPane } = AcyTabs;
 
@@ -175,22 +177,13 @@ const AddLiquidityComponent = props => {
 
   // 连接钱包函数
   const { account, chainId, library, activate } = useWeb3React();
-  // 连接钱包时支持的货币id
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
-  });
-
-  const bscConnector = new BscConnector({ 
-    supportedChainIds: [56, 97],
-  });
 
   // 初始化函数时连接钱包
   useEffect(
     () => {
-      // activate(injected);
-      if(!account){
-        activate(bscConnector);
-      }
+      // if(!account){
+      //   activate(binance);
+      // }
       
       //read the fav tokens code in storage
       var tokens_symbol = JSON.parse(localStorage.getItem('tokens_symbol'));
@@ -373,8 +366,7 @@ const AddLiquidityComponent = props => {
   };
 
   const ConnectWallet = () => {
-    // activate(injected);
-    activate(bscConnector);
+    activate(binance);
   };
 
   useEffect(
@@ -785,8 +777,7 @@ const AddLiquidityComponent = props => {
                     disabled={!buttonStatus}
                     onClick={async () => {
                       if (account == undefined) {
-                        // activate(injected);
-                        activate(bscConnector);
+                        // activate(binance);
                         setButtonContent('Choose tokens and amount');
                         setButtonStatus(false);
                       } else {

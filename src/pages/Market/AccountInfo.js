@@ -4,7 +4,6 @@ import { Link, useHistory, useParams } from 'react-router-dom';
 import { AcyIcon, AcyTokenIcon, AcyPeriodTime, AcyAccountChart } from '@/components/Acy';
 import FarmsTable from '@/pages/Farms/FarmsTable';
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAllPools } from '@/acy-dex-swap/core/farms';
 import styles from './styles.less';
 import { abbrNumber, abbrHash, isDesktop, sortTable, openInNewTab, formattedNum } from './Util';
@@ -17,6 +16,7 @@ import {
 } from './SampleData.js';
 import { marketClient, fetchPoolsFromAccount } from './Data';
 import { WatchlistManager } from './WatchlistManager.js';
+import { binance } from '@/connectors';
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -277,9 +277,6 @@ function AccountInfo(props) {
   const [liquidityPositions, setLiquidityPositions] = useState([]);
   const [activePosition, setActivePosition] = useState(null);
 
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
-  });
   const { address } = useParams();
 
   // method to hide/unhidden table row.
@@ -291,7 +288,7 @@ function AccountInfo(props) {
     });
 
   // method to prompt metamask extension for user to connect their wallet.
-  const connectWallet = () => activate(injected);
+  const connectWallet = () => activate(binance);
 
   useEffect(
     () => {

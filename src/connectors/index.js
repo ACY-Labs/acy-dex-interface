@@ -11,7 +11,7 @@ import { BscConnector } from '@binance-chain/bsc-connector';
 const RPC_URLS = {
   1: 'https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
   4: 'https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
-  // 97: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+  97: 'https://data-seed-prebsc-1-s1.binance.org:8545',
 };
 const POLLING_INTERVAL = 12000;
 
