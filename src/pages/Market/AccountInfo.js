@@ -2,10 +2,10 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Breadcrumb, Button, Table, Icon, Dropdown, Menu } from 'antd';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { AcyIcon, AcyTokenIcon, AcyPeriodTime, AcyAccountChart } from '@/components/Acy';
-import FarmsTable from '@/pages/Farms/FarmsTable';
+// import FarmsTable from '@/pages/Farms/FarmsTable';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { getAllPools } from '@/acy-dex-swap/core/farms';
+import { getAllPools, getDaoStakeRecord, getHarvestHistory } from '@/acy-dex-swap/core/farms';
 import styles from './styles.less';
 import { abbrNumber, abbrHash, isDesktop, sortTable, openInNewTab, formattedNum } from './Util';
 import { MarketSearchBar, TransactionTable } from './UtilComponent';
@@ -17,6 +17,8 @@ import {
 } from './SampleData.js';
 import { marketClient, fetchPoolsFromAccount } from './Data';
 import { WatchlistManager } from './WatchlistManager.js';
+import supportedTokens from '@/constants/TokenList';
+import PageLoading from '@/components/PageLoading';
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -42,6 +44,28 @@ let samplePositionData = [
     fees1: 44444444444,
   },
 ];
+function getLogoURIWithSymbol(symbol) {
+  for (let j = 0; j < supportedTokens.length; j++) {
+    if (symbol === supportedTokens[j].symbol) {
+      return supportedTokens[j].logoURI;
+    }
+  }
+  return null;
+}
+const BLOCKS_PER_SEC = 14;
+const getDHM = (sec) => {
+  if(sec<0) return '00d:00h:00m';
+  var diff = sec;
+  var days = 0, hrs = 0, min = 0, leftSec = 0;
+  diff = Math.floor(diff);
+  days = Math.floor(diff/(24*60*60));
+  leftSec = diff - days * 24*60*60;
+  hrs = Math.floor(leftSec/(60*60));
+  leftSec = leftSec - hrs * 60*60;
+  min = Math.floor(leftSec/(60));
+  return days.toString() + 'd:' + hrs.toString() + 'h:' + min.toString() +'m';
+
+}
 
 function PositionTable({ data }) {
   const [displayNumber, setDisplayNumber] = useState(10);
@@ -268,6 +292,7 @@ function PositionDropdown({ positions, onPositionClick }) {
 }
 
 function AccountInfo(props) {
+
   const INITIAL_ROW_NUMBER = 5;
   const [isWatchlist, setIsWatchlist] = useState(false);
   const [tableRow, setTableRow] = useState([]);
@@ -277,8 +302,18 @@ function AccountInfo(props) {
   const [liquidityPositions, setLiquidityPositions] = useState([]);
   const [activePosition, setActivePosition] = useState(null);
 
+  const [isMyFarms, setIsMyFarms] = useState(false);
+  const [harvestAcy, setHarvestAcy] = useState();
+  const [balanceAcy, setBalanceAcy] = useState();
+  const [daoStakeRecord, setDaoStakeRecord] = useState();
+  const [stakeACY, setStakeACY] = useState();
+
+  const [isLoadingPool, setIsLoadingPool] = useState(true);
+  const [isLoadingHarvest, setIsLoadingHarvest] = useState(true);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(true);
+
   const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
+    supportedChainIds: [1, 3, 4, 5, 42, 56, 97, 80001],
   });
   const { address } = useParams();
 
@@ -292,11 +327,47 @@ function AccountInfo(props) {
 
   // method to prompt metamask extension for user to connect their wallet.
   const connectWallet = () => activate(injected);
-
+  useEffect(
+    () => {
+      
+      if(!daoStakeRecord || !stakeACY) return;
+      let len = daoStakeRecord.myAcy.length;
+      var resultMy = [...daoStakeRecord.myAcy];
+      var resultTotal = [...daoStakeRecord.totalAcy];
+      resultMy[len-1][1] += stakeACY.myAcy;
+      resultTotal[len-1][1] += stakeACY.totalAcy;
+      for(var i=len-2; i!=-1 ; i--){
+        resultMy[i][1] += resultMy[i+1][1];
+        resultTotal[i][1] += resultTotal[i+1][1];
+      }
+      for(var i=0; i!=len-1 ; i++){
+        resultMy[i][1]    = parseFloat(resultMy[i+1][1].toFixed(1));
+        resultTotal[i][1] = parseFloat(resultTotal[i+1][1].toFixed(1));
+      }
+      resultMy[len-1][1]    = parseFloat(stakeACY.myAcy.toFixed(1));
+      resultTotal[len-1][1] = parseFloat(stakeACY.totalAcy.toFixed(1));
+      setBalanceAcy({
+        myAcy: resultMy,
+        totalAcy: resultTotal
+      });
+      setIsLoadingBalance(false);
+   },
+   [daoStakeRecord, stakeACY]
+ );
+  const initHarvestHistiry = async (library, account) => {
+    const harvest = await getHarvestHistory(library, account);
+    setHarvestAcy(harvest);
+    setIsLoadingHarvest(false);
+  }
+  const initDao = async (library, account) => {
+    const dao = await getDaoStakeRecord(library, account);
+    setDaoStakeRecord(dao);
+  }
   useEffect(
     () => {
       // automatically connect to wallet at the start of the application.
       connectWallet();
+      console.log("TEST HERE ADDRESS:",address);
 
       fetchPoolsFromAccount(marketClient, address).then(data => {
         setLiquidityPositions(data);
@@ -308,28 +379,51 @@ function AccountInfo(props) {
         // todo: needs to be change to the user in this webpage.
         const pools = (await getAllPools(library, account)).filter(pool => pool.hasUserPosition);
         const newFarmsContents = [];
-
+        const block = await library.getBlockNumber();
         // format pools data to the required format that the table can read.
         pools.forEach(pool => {
           const newFarmsContent = {
+            index: 0,
+            poolId: pool.poolId,
             lpTokens: pool.lpTokenAddress,
             token1: pool.token0Symbol,
-            token1Logo: null,
+            token1Logo: getLogoURIWithSymbol(pool.token0Symbol),
             token2: pool.token1Symbol,
-            token2Logo: null,
+            token2Logo: getLogoURIWithSymbol(pool.token1Symbol),
             pendingReward: pool.rewardTokensSymbols.map((token, index) => ({
               token,
               amount: pool.rewardTokensAmount[index],
             })),
-            totalApr: 89.02,
-            tvl: 144542966,
+            totalApr: pool.apr.toFixed(2),
+            tvl: pool.tvl.toFixed(2),
             hasUserPosition: pool.hasUserPosition,
             hidden: true,
+            userRewards: pool.rewards,
+            stakeData: pool.stakeData,
+            poolLpScore: pool.lpScore,
+            poolLpBalance: pool.lpBalance,
+            endsIn: getDHM((pool.endBlock - block) * BLOCKS_PER_SEC),
+            status: pool.endBlock - block > 0 
           };
+          if(newFarmsContent.poolId == 0) {
+            // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));
+            if(newFarmsContent.stakeData){
+              const myStakeAcy = newFarmsContent.stakeData.reduce((total, currentAmount) => total + parseFloat(currentAmount.lpAmount), 0);
+              setStakeACY({
+                myAcy: myStakeAcy,
+                totalAcy: newFarmsContent.poolLpBalance
+              });
+            } else {
+              setStakeACY({
+                myAcy: 0,
+                totalAcy: newFarmsContent.poolLpBalance
+              });
+            }
+          }
           newFarmsContents.push(newFarmsContent);
         });
-
         setTableRow(newFarmsContents);
+        setIsLoadingPool(false);
       };
 
       // account will be returned if wallet is connected.
@@ -337,6 +431,8 @@ function AccountInfo(props) {
       if (account) {
         setWalletConnected(true);
         getPools(library, account);
+        initHarvestHistiry(library, account);
+        initDao(library, account);
       } else {
         setWalletConnected(false);
       }
@@ -368,8 +464,11 @@ function AccountInfo(props) {
   );
 
   return (
+
     <div className={styles.marketRoot}>
-      <MarketSearchBar
+      { address == account ? (
+        <div>
+          <MarketSearchBar
         dataSourceCoin={dataSourceCoin}
         dataSourcePool={dataSourcePool}
         // refreshWatchlist={refreshWatchlist}
@@ -401,7 +500,7 @@ function AccountInfo(props) {
         style={{ display: 'flex', justifyContent: 'space-between' }}
       >
         <div>
-          <div style={{ fontSize: '26px', fontWeight: 'bold' }}>{abbrHash(address)}</div>
+          {/* <div style={{ fontSize: '26px', fontWeight: 'bold' }}>{address}</div> */}
           <a
             onClick={() => openInNewTab(`https://etherscan.io/address/${address}`)}
             style={{ color: '#e29227', fontWeight: 600 }}
@@ -425,11 +524,33 @@ function AccountInfo(props) {
         />
       </div>
 
+      {/* wallet stats */}
+      <div className={styles.accountPageRow}>
+        <h2>Wallet Stats</h2>
+        <div style={{ display: 'flex' }} className={styles.walletStatCard}>
+          <div className={styles.walletStatEntry}>
+            <div className={styles.walletStatValue}>$999.99m</div>
+            <div className={styles.walletStatIndicator}>Total Value Swapped</div>
+          </div>
+          <div style={{ width: 20 }} />
+          <div className={styles.walletStatEntry}>
+            <div className={styles.walletStatValue}>$999.99m</div>
+            <div className={styles.walletStatIndicator}>Total Fees Paid</div>
+          </div>
+          <div style={{ width: 20 }} />
+          <div className={styles.walletStatEntry}>
+            <div className={styles.walletStatValue}>99.99k</div>
+            <div className={styles.walletStatIndicator}>Total Transactions</div>
+          </div>
+        </div>
+      </div>
+
       {/* liquidity and fees earned */}
       <div className={styles.accountPageRow}>
         <div style={{ display: 'flex' }} className={styles.walletStatCard}>
           <div className={styles.walletStatEntry}>
             <div className={styles.walletStatIndicator}>Liquidity (including fees)</div>
+
             <div className={styles.walletStatValue}>
               {positionValue
                 ? formattedNum(positionValue, true)
@@ -470,23 +591,37 @@ function AccountInfo(props) {
       {/* Farms */}
       <div className={styles.accountPageRow}>
         <h2>Farms</h2>
+        { (isLoadingHarvest || isLoadingPool || isLoadingBalance)? (
+        <div>
+          <PageLoading/>
+        </div>
+      ) : (
         <FarmsTable
           tableRow={tableRow}
-          onRowClick={onRowClick}
+          // onRowClick={onRowClick}
           tableTitle="User Farms"
           tableSubtitle="Stake your LP tokens and earn token rewards"
           rowNumber={rowNumber}
           setRowNumber={setRowNumber}
-          hideDao
+          hideDao={true}
           selectedTable={0}
-          tokenFilter={{ liquidityToken: true, btcEthToken: true }}
+          tokenFilter={false}
           setTokenFilter={() => {}}
           walletConnected={walletConnected}
           connectWallet={connectWallet}
           account={account}
           library={library}
           chainId={chainId}
+
+          isMyFarms={true}
+          harvestAcy={harvestAcy}
+          balanceAcy={balanceAcy}
+          refreshHarvestHistory={()=>{}}
+          searchInput={''}
+          isLoading={false}
+          activeEnded={true}
         />
+      )}
       </div>
 
       {/* transaction table */}
@@ -495,28 +630,15 @@ function AccountInfo(props) {
         <TransactionTable dataSourceTransaction={dataSourceTransaction} />
       </div>
 
-      {/* wallet stats */}
-      <div className={styles.accountPageRow}>
-        <h2>Wallet Stats</h2>
-        <div style={{ display: 'flex' }} className={styles.walletStatCard}>
-          <div className={styles.walletStatEntry}>
-            <div className={styles.walletStatValue}>$999.99m</div>
-            <div className={styles.walletStatIndicator}>Total Value Swapped</div>
-          </div>
-          <div style={{ width: 20 }} />
-          <div className={styles.walletStatEntry}>
-            <div className={styles.walletStatValue}>$999.99m</div>
-            <div className={styles.walletStatIndicator}>Total Fees Paid</div>
-          </div>
-          <div style={{ width: 20 }} />
-          <div className={styles.walletStatEntry}>
-            <div className={styles.walletStatValue}>99.99k</div>
-            <div className={styles.walletStatIndicator}>Total Transactions</div>
-          </div>
-        </div>
-      </div>
-
       <div style={{ height: 20 }} />
+        </div>
+      ): (
+        <div>
+          Address dose not matched with the connected account
+        </div>
+      )
+      }
+      
     </div>
   );
 }

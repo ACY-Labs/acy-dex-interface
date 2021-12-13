@@ -11,8 +11,10 @@ import {
   approveTokenWithSpender,
   FARMS_ADDRESS,
   CustomError,
+  getTokenTotalSupply,
+  getAllSuportedTokensPrice
 } from '@/acy-dex-swap/utils';
-import { Fetcher} from '@acyswap/sdk';
+import { Fetcher, Token, TokenAmount, Pair} from '@acyswap/sdk';
 import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import Eth from "web3-eth";
 import Utils from "web3-utils";
@@ -20,6 +22,8 @@ import { Icon } from 'antd';
 import { Web3Provider } from "@ethersproject/providers";
 import { injected } from '@/connectors';
 import supportedTokens from '@/constants/TokenList';
+import axios from 'axios';
+
 
 const ACY_TOKEN  = "0x0100000000000000000000000000000000000000000000000000000000000000";
 const USDC_TOKEN = "0x0200000000000000000000000000000000000000000000000000000000000000";
@@ -56,13 +60,27 @@ const getPoolTotalPendingReward = async (
 
   const poolPositons = await farmContract.getPoolPositions(poolIndex);
 
+  const poolTokenRewardInfoPromise = []; 
+  for(var i=0; i<rewardTokens.length ; i++){
+    poolTokenRewardInfoPromise.push(farmContract.getPoolTokenRewardInfo(poolIndex,rewardTokens[i]));
+  }
+  const BLOCKS_PER_YEAR = 60*60*24*365/14;
+  //HERE
+  const poolRewardsPerYear = await Promise.all(poolTokenRewardInfoPromise).then(result => {
+    console.log("TEST poolTokenRewardInfo promise:",result);
+    return result.map((info,index) => info[3]/(10**rewardTokenDecimals[index]) * BLOCKS_PER_YEAR);
+  });
+  console.log("TEST poolTokenRewardInfo:",poolRewardsPerYear,poolIndex);
+
   if(poolPositons.length === 0 ){
     const totalPendingRewards = [];
     for (let tX = 0; tX < rewardTokens.length; tX++) {
       totalPendingRewards.push(0);
     }
-    return [totalPendingRewards, totalPendingRewards];
+    return [totalPendingRewards, totalPendingRewards, totalPendingRewards];
   }
+
+
   const amountCol = [];
   for(var i=0; i<rewardTokens.length ; i++){
     const amountRow = [];
@@ -72,13 +90,13 @@ const getPoolTotalPendingReward = async (
     amountCol.push(amountRow)
   }
 
+  
+    
+  
+  
+
   let allTokenAmount = [];
   for(var i=0; i<rewardTokens.length ; i++){
-    // const amountHex = [];
-    // for(var j=0; j<poolPositons.length; j++){
-    //   const amount = await farmContract.getTotalRewards(poolIndex, poolPositons[j], rewardTokens[i]);
-    //   amountHex.push(amount);
-    // }
     const amountHex = await Promise.all(amountCol[i]).then(re => re);
     allTokenAmount.push(
       amountHex.reduce((total, currentAmount) => total.add(currentAmount))
@@ -94,7 +112,7 @@ const getPoolTotalPendingReward = async (
     for (let tX = 0; tX < rewardTokens.length; tX++) {
       totalPendingRewards.push(0);
     }
-    return [allTokenAmount, totalPendingRewards];
+    return [allTokenAmount, totalPendingRewards, poolRewardsPerYear];
   }
 
   // collect and gather user pending reward of the tokens in the pool of this iteration.
@@ -150,7 +168,7 @@ const getPoolTotalPendingReward = async (
   
 
   // return [allTokenTotalRewardAmount, rewards];
-  return [allTokenAmount, rewards];
+  return [allTokenAmount, rewards, poolRewardsPerYear];
 };
 
 const getPoolAccmulateReward = async (library, account, poolId) => {
@@ -188,6 +206,7 @@ const getPool = async (library, account, poolId)=> {
   const poolInfo = await contract.poolInfo(poolId);
   const rewardTokens = await contract.getPoolRewardTokens(poolId);
   const rewardTokensAddresses = await contract.getPoolRewardTokenAddresses(poolId);
+  const tokenPrice = await getAllSuportedTokensPrice();
 
   // retrieve reward tokens symbol.
   const rewardTokensSymbolsRequests = [];
@@ -201,10 +220,12 @@ const getPool = async (library, account, poolId)=> {
   // retrieve lp tokens symbol.
   let token0;
   let token1;
+  let lpDecimals = 18;
   try {
     const lpTokenContract = await getPairContract(poolInfo[0], library, account);
     token0 = await lpTokenContract.token0();
     token1 = await lpTokenContract.token1();
+    lpDecimals = await lpTokenContract.decimals();
   } catch (e) {
     // not a lp token, maybe a single token?
     token0 = poolInfo[0];
@@ -214,11 +235,52 @@ const getPool = async (library, account, poolId)=> {
   const token0Symbol = await getTokenSymbol(token0, library, account);
   const token1Symbol = token1 === null ? '' : await getTokenSymbol(token1, library, account);
 
+  var token0Amount = 0;
+  var token1Amount = 0;
+  if(token1) {
+    //get pool token amount 
+    const pair_contract = await getPairContract(poolInfo[0], library, account);
+    const reserves = await pair_contract.getReserves();
+    const token0Address = await pair_contract.token0();
+    const token0Contract =  getTokenContract(token0Address, library, account);
+    // const token0Symbol = await token0Contract.symbol();
+    const token0Decimal = await token0Contract.decimals()
+    const token_0 = new Token(null, token0Address,token0Decimal, token0Symbol);
+
+    const token1Address = await pair_contract.token1();
+    const token1Contract =  getTokenContract(token1Address, library, account);
+    // const token1Symbol = await token1Contract.symbol();
+    const token1Decimal = await token1Contract.decimals()
+    const token_1 = new Token(null, token1Address,token1Decimal, token1Symbol);
+
+    console.log("TEST Fetch pair:",reserves,token0Address,token1Address);
+    const pair = await Fetcher.fetchPairData(token_0, token_1, library);
+    console.log("TEST FETCH PAIR:",pair);
+    const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
+
+    const token0Deposited = pair.getLiquidityValue(
+      pair.token0,
+      totalSupply,
+      new TokenAmount(pair.liquidityToken, poolInfo[1]),
+      false
+    );
+    const token1Deposited = pair.getLiquidityValue(
+      pair.token1,
+      totalSupply,
+      new TokenAmount(pair.liquidityToken, poolInfo[1]),
+      false
+    );
+    token0Amount = token0Deposited.toSignificant(4);
+    token1Amount = token1Deposited.toSignificant(4);
+    console.log(`TEST TOKEN AMOUNT:${token0Symbol}:${token0Amount} ${token1Symbol}:${token1Amount}`);
+  }
   // account data
   var allTokenTotalRewardAmount = null;
   var userPositions= null;
   var rewards = null;
   var stakeData = null;
+  var rewardsPerYear = null;
+  var totalRewardPerYear = 1;
   // first store all the positions that the user staked in the pool in this iteration.
   // positions returned from getUserPositions are in the base of hex,
   // hence it has to be converted to decimals for use.
@@ -239,6 +301,12 @@ const getPool = async (library, account, poolId)=> {
     allTokenTotalRewardAmount = PendingReward[0];
     rewards = PendingReward[1];
     stakeData = [];
+    rewardsPerYear = PendingReward[2];
+      
+    totalRewardPerYear = rewardsPerYear.reduce((total,reward,index) =>
+      total += tokenPrice[rewardTokensSymbols[index]] * reward
+    );
+    console.log("TEST totalRewardPerYear:",totalRewardPerYear);
 
     if(userPositions.length > 0)
     {
@@ -286,6 +354,8 @@ const getPool = async (library, account, poolId)=> {
           
     } 
   }
+  const tvl = token1 ? token0Amount * tokenPrice[token0Symbol] + token1Amount * tokenPrice[token1Symbol]
+          : poolInfo[1]/lpDecimals * tokenPrice[token0Symbol];
   return {
     poolId: poolId,
     lpTokenAddress: poolInfo[0],
@@ -302,36 +372,23 @@ const getPool = async (library, account, poolId)=> {
     rewards: rewards,
     stakeData: stakeData,
     startBlock: poolInfo[4],
-    endBlock: poolInfo[5]
+    endBlock: poolInfo[5],
+    tvl: tvl,
+    apr: totalRewardPerYear/(tvl==0?1:tvl)*100,
   };
 }
 
-// const getAllPools = async () => {
-//   var Contract = require('web3-eth-contract');
-//   Contract.setProvider('https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
-//   var eth = new Eth('https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
-//   const farmContract = new Contract(FarmsABI,FARMS_ADDRESS);
-//   const numPoolHex = await farmContract.methods.numPools().call();
-//   const numPool = numPoolHex.toNumber();
-//   const poolInfoRequests = [];
-//   for (let i = 0; i < numPool; i++) {
-//     poolInfoRequests.push(
-//       (async () => {
-//         const poolInfo = await contract.poolInfo(i).call();
-//         const rewardTokens = await contract.getPoolRewardTokens(i).call();
-//         const rewardTokensAddresses = await contract.getPoolRewardTokenAddresses(i).get();
-
-
-//       })()
-//     );
-//   }
-
-// };
 const getAllPools = async (library, account) => {
+
+  // return await axios.get(
+  //   // fetch valid pool list from remote
+  //   `http://localhost:3001/api/farm/getAllPools?account=${account}`
+  // ).then(res => res.data);
   const contract = getFarmsContract(library, account);
   const numPoolHex = await contract.numPools();
   const numPool = numPoolHex.toNumber();
   const poolInfoRequests = [];
+  const tokenPrice = await getAllSuportedTokensPrice();
 
   for (let i = 0; i < numPool; i++) {
     poolInfoRequests.push(
@@ -352,24 +409,70 @@ const getAllPools = async (library, account) => {
         // retrieve lp tokens symbol.
         let token0;
         let token1;
+        let lpDecimals = 1e18;
         try {
           const lpTokenContract = await getPairContract(poolInfo[0], library, account);
           token0 = await lpTokenContract.token0();
           token1 = await lpTokenContract.token1();
+          lpDecimals = await lpTokenContract.decimals();
         } catch (e) {
           // not a lp token, maybe a single token?
           token0 = poolInfo[0];
           token1 = null;
         }
+
+        
         
         const token0Symbol = await getTokenSymbol(token0, library, account);
         const token1Symbol = token1 === null ? '' : await getTokenSymbol(token1, library, account);
+        
+        var token0Amount = 0;
+        var token1Amount = 0;
+        if(token1) {
+          //get pool token amount 
+          const pair_contract = await getPairContract(poolInfo[0], library, account);
+          const reserves = await pair_contract.getReserves();
+          const token0Address = await pair_contract.token0();
+          const token0Contract =  getTokenContract(token0Address, library, account);
+          // const token0Symbol = await token0Contract.symbol();
+          const token0Decimal = await token0Contract.decimals()
+          const token_0 = new Token(null, token0Address,token0Decimal, token0Symbol);
+
+          const token1Address = await pair_contract.token1();
+          const token1Contract =  getTokenContract(token1Address, library, account);
+          // const token1Symbol = await token1Contract.symbol();
+          const token1Decimal = await token1Contract.decimals()
+          const token_1 = new Token(null, token1Address,token1Decimal, token1Symbol);
+
+          console.log("TEST Fetch pair:",reserves,token0Address,token1Address);
+          const pair = await Fetcher.fetchPairData(token_0, token_1, library);
+          console.log("TEST FETCH PAIR:",pair);
+          const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
+
+          const token0Deposited = pair.getLiquidityValue(
+            pair.token0,
+            totalSupply,
+            new TokenAmount(pair.liquidityToken, poolInfo[1]),
+            false
+          );
+          const token1Deposited = pair.getLiquidityValue(
+            pair.token1,
+            totalSupply,
+            new TokenAmount(pair.liquidityToken, poolInfo[1]),
+            false
+          );
+          token0Amount = token0Deposited.toSignificant(4);
+          token1Amount = token1Deposited.toSignificant(4);
+          console.log(`TEST TOKEN AMOUNT:${token0Symbol}:${token0Amount} ${token1Symbol}:${token1Amount}`);
+        }
 
         // account data
         var allTokenTotalRewardAmount = null;
         var userPositions= null;
         var rewards = null;
         var stakeData = null;
+        var rewardsPerYear = null;
+        var totalRewardPerYear = 1;
         // first store all the positions that the user staked in the pool in this iteration.
         // positions returned from getUserPositions are in the base of hex,
         // hence it has to be converted to decimals for use.
@@ -377,7 +480,7 @@ const getAllPools = async (library, account) => {
           userPositions = (await contract.getUserPositions(account, i)).map(positionHex =>
             positionHex.toNumber()
           );
-          
+          console.log("get PendingReward:",i);
           const PendingReward = await getPoolTotalPendingReward(
             rewardTokens,
             rewardTokensAddresses,
@@ -389,16 +492,23 @@ const getAllPools = async (library, account) => {
           );
           allTokenTotalRewardAmount = PendingReward[0];
           rewards = PendingReward[1];
-          
+          rewardsPerYear = PendingReward[2];
+          console.log("end get PendingReward:",i);
+            
+          totalRewardPerYear = rewardsPerYear.reduce((total,reward,index) =>
+            total += tokenPrice[rewardTokensSymbols[index]] * reward,0
+          );
+          console.log("TEST totalRewardPerYear:",totalRewardPerYear);
           
           if(userPositions.length > 0)
           {
+            console.log("get stakePosition:",i);
             const stakingPromise = [];
             for(var j=0; j != userPositions.length; j++)
             {
               stakingPromise.push(contract.stakingPosition(i,userPositions[j]));
             }
-            stakeData = await Promise.all(stakingPromise).then(x =>{
+            stakeData =  await Promise.all(stakingPromise).then(x =>{
               const stakeDataPromise = [];
               for(var j=0; j != userPositions.length; j++){
                 // [ parseInt(x.stakeTimestamp), parseInt(x.lockDuration)]
@@ -434,15 +544,21 @@ const getAllPools = async (library, account) => {
               }
               return stakeDataPromise;
             });
+            console.log("end get stakePosition:",i);
+            
           }
         }
+        const tvl = token1 ? token0Amount * tokenPrice[token0Symbol] + token1Amount * tokenPrice[token1Symbol]
+          : poolInfo[1]/lpDecimals * tokenPrice[token0Symbol];
+        console.log("finished get pool:",i);
+        
         return {
           poolId: i,
           lpTokenAddress: poolInfo[0],
           token0Symbol,
           token1Symbol,
           lpScore: poolInfo[2],
-          lpBalance: poolInfo[1]/1e18,
+          lpBalance: poolInfo[1]/lpDecimals,
           lastUpdateBlock: poolInfo[3].toNumber(),
           rewardTokens,
           rewardTokensAddresses,
@@ -452,7 +568,9 @@ const getAllPools = async (library, account) => {
           rewards: rewards,
           stakeData: stakeData,
           startBlock: poolInfo[4],
-          endBlock: poolInfo[5]
+          endBlock: poolInfo[5],
+          tvl: tvl,
+          apr: totalRewardPerYear/(tvl==0?1:tvl)*100,
         };
       })()
     );
@@ -634,11 +752,13 @@ const getHarvestHistory = async (library,account = null) => {
   // farmContract2.queryFilter("Harvest", 0).then(function(events)  {console.log(events)});
   const currentBlock = await eth.getBlockNumber();
   const BLOCKS_PER_MONTH = 5760 * 31; // average 5760 per day
+  const filter = farmContract.filters.Harvest(null,0);
   const result = await farmContract.queryFilter(
-    "Harvest", 
+    filter, 
     currentBlock - BLOCKS_PER_MONTH, 
   // function(error, events){ console.log(events); }
   ).then(async function(events){
+    console.log("TEST HARVEST events:",events);
     var date = new Date();
     var today = new Date(date);
     const date_array = {};
@@ -922,64 +1042,48 @@ const getDaoStakeRecord = async (library, account) =>{
       totalAcy: resultTotal
     };
   });
+  
   return proimse;
 }
 
-const getUserStakeInfo = async (poolId, account) =>{
-  userPositions = (await contract.getUserPositions(account, poolId)).map(positionHex =>
-    positionHex.toNumber()
-  );
-  const PendingReward = await getPoolTotalPendingReward(
-    rewardTokens,
-    rewardTokensAddresses,
-    userPositions,
-    contract,
-    i,
-    library,
-    account
-  );
-  rewards = PendingReward[1];
-  stakeData = [];
+const getPair = async (pairAdress, library, account, chainId) => {
+  return ;
+  const pair_contract = getPairContract(pairAdress,library,account);
+  const reserves = await pair_contract.getReserves();
 
-  if(userPositions.length > 0)
-  {
-    for(var j=0; j != userPositions.length; j++)
-    {
-      const result = await contract.stakingPosition(i,userPositions[j])
-        .then(x => {
-          // [ parseInt(x.stakeTimestamp), parseInt(x.lockDuration)]
-          const expiredTime = parseInt(x.stakeTimestamp)+parseInt(x.lockDuration);
-          const dueDate = new Date(expiredTime * 1000).toLocaleDateString("en-US")
-          const nowDate = Date.now()/1000;
-          var diff = expiredTime - nowDate;
-          var days = 0, hrs = 0, min = 0, leftSec = 0;
+  const token0Address = await pair_contract.token0();
+  const token0Contract =  getTokenContract(token0Address, library, account);
+  const token0Symbol = await token0Contract.symbol();
+  const token0Decimal = await token0Contract.decimals()
+  const token0 = new Token(null, token0Address,token0Decimal, token0Symbol);
 
-          if(diff>0) {
-            diff = Math.floor(diff);
-            days = Math.floor(diff/(24*60*60));
-            leftSec = diff - days * 24*60*60;
-            hrs = Math.floor(leftSec/(60*60));
-            leftSec = leftSec - hrs * 60*60;
-            min = Math.floor(leftSec/(60));
-          }
-          return {
-            lpAmount: formatUnits(x.lpAmount,18),
-            dueDate: dueDate,
-            positionId: userPositions[j],
-            reward: rewards[j],
-            remaining: days.toString() + 'd:' + hrs.toString() + 'h:' + min.toString() +'m',
-            locked: diff>0
-          }
-        }
-      );
-      if(result.reward !=0 || result.lpAmount != 0 ){
-        stakeData.push(result);
-      }
-    } 
-  }
+  const token1Address = await pair_contract.token1();
+  const token1Contract =  getTokenContract(token1Address, library, account);
+  const token1Symbol = await token1Contract.symbol();
+  const token1Decimal = await token1Contract.decimals()
+  const token1 = new Token(null, token1Address,token1Decimal, token1Symbol);
+
+  console.log("TEST Fetch pair:",reserves,token0Address,token1Address);
+  const pair = await Fetcher.fetchPairData(token0, token1, library);
+  console.log("TEST FETCH PAIR:",pair);
+  const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
+  // let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
+  // userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
+  const token0Deposited = pair.getLiquidityValue(
+    pair.token0,
+    totalSupply,
+    new TokenAmount(pair.liquidityToken, parseUnits("1000",token0.decimal)),
+    false
+  );
+  const token1Deposited = pair.getLiquidityValue(
+    pair.token1,
+    totalSupply,
+    new TokenAmount(pair.liquidityToken, parseUnits("1000",token1.decimal)),
+    false
+  );
+  console.log("TEST TOKEN AMOUNT:",token0Deposited.toSignificant(4), token1Deposited.toSignificant(4));
+  // return pair;
 }
-
-
 export { 
   getAllPools, 
   deposit, 
@@ -992,5 +1096,6 @@ export {
   getPoolAccmulateReward, 
   checkTokenIsApproved,
   getBalanceRecord,
-  getDaoStakeRecord
+  getDaoStakeRecord,
+  getPair
 };
