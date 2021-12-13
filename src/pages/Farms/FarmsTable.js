@@ -46,11 +46,18 @@ const FarmsTable = ({
     if(totalChartId==0) return balanceAcy.totalAcy;
     return harvestAcy.totalAll
   }
+  useEffect(
+    () => {
+      setMyChartId(0);
+      setTotalChartId(0);
+   },
+   [hideDao]
+ );
    
 
   const selectTopChart = pt => {
     const functionDict = {
-      'My ACY': () => {
+      'My sACY': () => {
         setMyChartId(0);
         setMyChartData(balanceAcy.myAcy);
       },
@@ -58,7 +65,7 @@ const FarmsTable = ({
         setMyChartId(1);
         setMyChartData(harvestAcy.myAll);
       },
-      'Total ACY': () => {
+      'Total sACY': () => {
         setTotalChartId(0);
         setAllChartData(balanceAcy.totalAcy);
       },
@@ -142,23 +149,23 @@ const FarmsTable = ({
               />
             );
           })}
-
-             <div>
-              <div className={styles.stakeSectionMain} hidden={hideDao}>
-                <DaoChart
-                  activeGraphId={myChartId}
-                  activeGraphData={myChartData}
-                  selectTopChart={selectTopChart}
-                  selection={['My ACY', 'My Reward']}
-                />
-                <DaoChart
-                  activeGraphId={totalChartId}
-                  activeGraphData={allChartData}
-                  selectTopChart={selectTopChart}
-                  selection={['Total ACY', 'Total Reward']}
-                />
-              </div>
-           </div>
+          { !hideDao &&(
+            <div className={styles.stakeSectionMain} hidden={hideDao}>
+              <DaoChart
+                activeGraphId={myChartId}
+                activeGraphData={getMyChart()}
+                selectTopChart={selectTopChart}
+                selection={['My sACY', 'My Reward']}
+              />
+              <DaoChart
+                activeGraphId={totalChartId}
+                activeGraphData={getTotalChart()}
+                selectTopChart={selectTopChart}
+                selection={['Total sACY', 'Total Reward']}
+              />
+            </div>
+          )}
+              
         </div>
       <div
         className={styles.tableFooterContainer}

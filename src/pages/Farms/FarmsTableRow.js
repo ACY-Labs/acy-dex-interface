@@ -419,7 +419,6 @@ const FarmsTableRow = props => {
   }
 
   const getFilter = () =>{
-    console.log("Filter:",!tableFilter(), !searchFilter(), !daoFilter());
     return !tableFilter() || !searchFilter() || !daoFilter() || activeEndedFilter();
   }
 
@@ -490,18 +489,18 @@ const FarmsTableRow = props => {
         {!isMobile && (
           <div className={styles.tableBodyTvlColContainer}>
             <div className={styles.tvlTitleContainer}>TVL</div>
-            <div className={styles.tvlContentContainer}>$ {poolInfo.poolLpBalance.toFixed(2)}</div>
+            <div className={styles.tvlContentContainer}>$ {poolInfo.tvl}</div>
           </div>
         )}
         {!isMobile && (
           <div className={styles.tableBodyTvlColContainer}>
-            <div className={styles.tvlTitleContainer}>Ends in</div>
+            <div className={styles.tvlTitleContainer}>End</div>
             <div className={styles.tvlContentContainer}>{poolInfo.endsIn}</div>
           </div>
         )}
 
         {/* Arrow Icon Column */}
-        {!hideArrow && (
+        {!hideArrow && !dao && (
           <div className={styles.tableBodyArrowColContainer}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -518,11 +517,13 @@ const FarmsTableRow = props => {
 
       {/* Table Drawer */}
       {!isMyFarms && (
-        <div className={styles.tableBodyDrawerContainer} hidden={hidden}>
+        <div className={styles.tableBodyDrawerContainer} hidden={hidden && !dao}>
         {/* Staking Propotion */}
         {!isMyFarms && (
-          <div className={styles.tableBodyDrawerStakingPropotionContainer}>
-            <div className={styles.tableBodyDrawerStakingPropotionTitle}>*20%</div>
+          <div className={styles.index0tableBodyDrawerFarmContainer}>
+            <div className={styles.tableBodyDrawerStakingPropotionTitle}>
+              {/* *20% */}
+            </div>
             {/* <div className={styles.tableBodyDrawerStakingPropotionEquation}> {token1}-{token2} LP </div> */}
           </div>
         )}
