@@ -407,7 +407,7 @@ const Pool = (props)=> {
         </div>
         <div className='incoming-projects'>
         <div className='title'>Incoming Projects</div>
-            <div className='expanding-card'>
+            <div className=''>
             {/* <IncomingProjects />  */}
             <ExpandingCard data={null}/>
             </div>
