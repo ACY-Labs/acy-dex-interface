@@ -26,7 +26,7 @@
   content: '';
   width: 304px;
   height: 204px;
-  border-radius: 3px;
+  border-radius: 5px;
   background-image: linear-gradient(var(--rotate), #5ddcff, #3c67e3 43%, #4e00c2);
   position: absolute;
   z-index: 0;

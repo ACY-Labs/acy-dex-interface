@@ -14,6 +14,7 @@ import OngoingProjects from "./components/OngoingProjects.js"
 import IncomingProjects from "./components/IncomingProjects.js"
 import ExpandingCard from "./components/ExpandingCard.js"
 import EndedProjects from "./components/EndedProjects.js"
+import BubblyButton from "./components/BubblyButton.js"
 import $ from 'jquery';
 
 const { Meta } = Card;
@@ -81,6 +82,9 @@ const Pool = (props)=> {
             Launching profitable projects on Multichain.
           </p>
           <div className={styles.buttonContainer}>
+            {/* <div>
+              <BubblyButton />
+            </div> */}
             <div>
               <a href="https://forms.gle/gsLNsgDy2BXHNZda9" className={styles.btnApply} target="_blank" rel="noreferrer">
                 <Icon type="rocket" style={{fontSize: '2em', margin: '0 10px 0 0'}} />
