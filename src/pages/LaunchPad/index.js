@@ -17,6 +17,7 @@ import data from './projectdata';
 import OngoingProjects from "./components/OngoingProjects.js"
 import IncomingProjects from "./components/IncomingProjects.js"
 import ExpandingCard from "./components/ExpandingCard.js"
+import EndedProjects from "./components/EndedProjects.js"
 import $ from 'jquery';
 
 const { Meta } = Card;
@@ -408,11 +409,18 @@ const Pool = (props)=> {
   
         </div>
         <div className='incoming-projects'>
-        <div className='title'>Incoming Projects</div>
-            <div className=''>
+          <div className='title'>Incoming Projects</div>
+          <div className=''>
             {/* <IncomingProjects />  */}
             <ExpandingCard data={null}/>
-            </div>
+          </div>
+        </div>
+        <div className='ended-projects'>
+        <div className='title'>Ended Projects</div>
+          <div className=''>
+            <EndedProjects data={null}/> 
+            {/* <ExpandingCard data={null}/> */}
+          </div>
         </div>
         
       </div>
