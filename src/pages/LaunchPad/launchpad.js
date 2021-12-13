@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-indent */
 import React, { useState, useEffect } from 'react';
-import {Button, Menu, Dropdown, Icon, Progress, Tag, Table, Carousel} from 'antd';
+import {Button, Menu, Dropdown, Icon, Progress, Alert, Table} from 'antd';
 import Eth from "web3-eth";
 import Utils from "web3-utils";
 import { useWeb3React } from '@web3-react/core';
@@ -133,7 +133,6 @@ const LaunchpadComponent = () => {
         });
         
     },[])
-
 
     const links = [
         "https://google.com",
@@ -365,6 +364,15 @@ const LaunchpadComponent = () => {
         marginTop:"0.8em"
     }
 
+    const [showCopied, setShowCopied] = useState(false);
+    useEffect(() => {
+        let timeout
+        if (showCopied) {
+          timeout = setTimeout(() => setShowCopied(false), 1000);
+        }
+        return () => clearTimeout(timeout);
+    }, [showCopied]);
+
     const menu = (
         <Menu>
             <Menu.Item className={styles.dropdownItem} id="drop1">
@@ -386,7 +394,7 @@ const LaunchpadComponent = () => {
                   style={copyButton} 
                   onClick={()=> {
                     navigator.clipboard.writeText("https://cn.etherscan.com/token/0xaf9db9e362e306688af48c4acb9618c06db38ac3");
-                    alert('Address copied');
+                    setShowCopied(true);
                   }}
                 >
                 <Icon type='copy' />
@@ -409,7 +417,7 @@ const LaunchpadComponent = () => {
                   style={copyButton} 
                   onClick={()=> {
                     navigator.clipboard.writeText("https://polygonscan.com/token/0x8b1f836491903743fe51acd13f2cc8ab95b270f6");
-                    alert('Address copied');
+                    setShowCopied(true);
                   }} 
                 >
                 <Icon type='copy' />
@@ -430,10 +438,10 @@ const LaunchpadComponent = () => {
                 <span style={{color: 'rgba(16, 112, 224, 0.85)'}}>0xaf9d...db38ac3</span>
                 </a>
                 <Button 
-                  style={copyButton} 
+                  style={copyButton}
                   onClick={()=> {
                     navigator.clipboard.writeText("https://confluxscan.io/token/cfx:accyf3j7s23x5j62hwt619k01un9bzn9u2mc6gavzb");
-                    alert('Address copied');
+                    setShowCopied(true);
                   }} 
                 >
                 <Icon type='copy' />
@@ -444,11 +452,15 @@ const LaunchpadComponent = () => {
 
     const [showForm, setShowForm] = useState(false);
     const [selectedForm, setSelectedForm] = useState(0)
-    const [selectedTab, setSelectedTab] = useState(0);
-    const [selectedTableRow, setSelectedTableRow] = useState(tableData[0]);
+    const [selectedTab, setSelectedTab] = useState(0)
+    const [selectedTableRow, setSelectedTableRow] = useState(tableData[0])
+    const [showButton, setShowButton] = useState(false)
     
     return(
         <div className={styles.launchRoot}>
+            <div className={styles.alertBanner}>
+                {showCopied ? <Alert message="Address Copied To Clipboard" type="success" showIcon banner /> : ""}
+            </div>
             <div className={styles.topContainer}>
             <div className={styles.tokenContainer}> 
                 <div className={styles.snsContainer}>
@@ -461,7 +473,7 @@ const LaunchpadComponent = () => {
                         <img src={telegramWIcon} alt="" style={{height:'1.2em', width:'auto', objectFit:'contain', margin: '8px 8px 0 0', float:'left'}} /> Telegram
                     </Button>
                     <br />
-                    <Button type="link" href={links[4]} target="_blank" style={buttonCustomStyle2} icon="medium">Medium</Button>
+                    <Button type="link" href={links[4]} target="_blank" style={buttonCustomStyle2} icon="medium">Medium</Button> 
                     <br />
                     <Button type="link" href={links[4]} target="_blank" style={buttonCustomStyle2} icon="message">Forum</Button> 
                     <br />
