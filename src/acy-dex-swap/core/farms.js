@@ -22,6 +22,7 @@ import { Icon } from 'antd';
 import { Web3Provider } from "@ethersproject/providers";
 import { injected } from '@/connectors';
 import supportedTokens from '@/constants/TokenList';
+import axios from 'axios';
 
 
 const ACY_TOKEN  = "0x0100000000000000000000000000000000000000000000000000000000000000";
@@ -59,15 +60,26 @@ const getPoolTotalPendingReward = async (
 
   const poolPositons = await farmContract.getPoolPositions(poolIndex);
 
+  const poolTokenRewardInfoPromise = []; 
+  for(var i=0; i<rewardTokens.length ; i++){
+    poolTokenRewardInfoPromise.push(farmContract.getPoolTokenRewardInfo(poolIndex,rewardTokens[i]));
+  }
+  const BLOCKS_PER_YEAR = 60*60*24*365/14;
+  //HERE
+  const poolRewardsPerYear = await Promise.all(poolTokenRewardInfoPromise).then(result => {
+    console.log("TEST poolTokenRewardInfo promise:",result);
+    return result.map((info,index) => info[3]/(10**rewardTokenDecimals[index]) * BLOCKS_PER_YEAR);
+  });
+  console.log("TEST poolTokenRewardInfo:",poolRewardsPerYear,poolIndex);
+
   if(poolPositons.length === 0 ){
     const totalPendingRewards = [];
     for (let tX = 0; tX < rewardTokens.length; tX++) {
       totalPendingRewards.push(0);
     }
-    return [totalPendingRewards, totalPendingRewards];
+    return [totalPendingRewards, totalPendingRewards, totalPendingRewards];
   }
 
-  const poolTokenRewardInfoPromise = []; 
 
   const amountCol = [];
   for(var i=0; i<rewardTokens.length ; i++){
@@ -75,19 +87,13 @@ const getPoolTotalPendingReward = async (
     for(var j=0; j<poolPositons.length; j++){
       amountRow.push(farmContract.getTotalRewards(poolIndex, poolPositons[j], rewardTokens[i]));
     }
-    poolTokenRewardInfoPromise.push(farmContract.getPoolTokenRewardInfo(poolIndex,rewardTokens[i]));
     amountCol.push(amountRow)
   }
 
-  const BLOCKS_PER_YEAR = 60*60*24*365/14;
-  //HERE
-  const poolRewardsPerYear = await Promise.all(poolTokenRewardInfoPromise).then(result => {
-    console.log("TEST poolTokenRewardInfo promise:",result);
-    return result.map((info,index) => info[3]/(10**rewardTokenDecimals[index]) * BLOCKS_PER_YEAR);
-  }
+  
     
-  );
-  console.log("TEST poolTokenRewardInfo:",poolRewardsPerYear,poolIndex);
+  
+  
 
   let allTokenAmount = [];
   for(var i=0; i<rewardTokens.length ; i++){
@@ -106,7 +112,7 @@ const getPoolTotalPendingReward = async (
     for (let tX = 0; tX < rewardTokens.length; tX++) {
       totalPendingRewards.push(0);
     }
-    return [allTokenAmount, totalPendingRewards];
+    return [allTokenAmount, totalPendingRewards, poolRewardsPerYear];
   }
 
   // collect and gather user pending reward of the tokens in the pool of this iteration.
@@ -368,11 +374,16 @@ const getPool = async (library, account, poolId)=> {
     startBlock: poolInfo[4],
     endBlock: poolInfo[5],
     tvl: tvl,
-    apr: totalRewardPerYear/tvl*100,
+    apr: totalRewardPerYear/(tvl==0?1:tvl)*100,
   };
 }
 
 const getAllPools = async (library, account) => {
+
+  // return await axios.get(
+  //   // fetch valid pool list from remote
+  //   `http://localhost:3001/api/farm/getAllPools?account=${account}`
+  // ).then(res => res.data);
   const contract = getFarmsContract(library, account);
   const numPoolHex = await contract.numPools();
   const numPool = numPoolHex.toNumber();
@@ -485,7 +496,7 @@ const getAllPools = async (library, account) => {
           console.log("end get PendingReward:",i);
             
           totalRewardPerYear = rewardsPerYear.reduce((total,reward,index) =>
-            total += tokenPrice[rewardTokensSymbols[index]] * reward
+            total += tokenPrice[rewardTokensSymbols[index]] * reward,0
           );
           console.log("TEST totalRewardPerYear:",totalRewardPerYear);
           
@@ -559,7 +570,7 @@ const getAllPools = async (library, account) => {
           startBlock: poolInfo[4],
           endBlock: poolInfo[5],
           tvl: tvl,
-          apr: totalRewardPerYear/tvl*100,
+          apr: totalRewardPerYear/(tvl==0?1:tvl)*100,
         };
       })()
     );
