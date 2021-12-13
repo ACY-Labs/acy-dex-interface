@@ -21,7 +21,7 @@ const injected = new InjectedConnector({
 });
 
 const walletconnect = new WalletConnectConnector({
-  rpc: { 1: RPC_URLS['1'], 4: RPC_URLS['4'], },
+  rpc: { 1: RPC_URLS['1'], 4: RPC_URLS['4'], 97: RPC_URLS['97']},
   qrcode: true,
 });
 const walletlink = new WalletLinkConnector({
@@ -31,17 +31,28 @@ const walletlink = new WalletLinkConnector({
 });
 const fortmatic = new FortmaticConnector({ 
   apiKey: 'pk_test_1897AD5B792BA339', 
-  chainId: 4 
+  //rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/', 
+  chainId: 4
 });
+
+const portisToBinanceTest = { //useless
+  nodeUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+  chainId: 97,
+};
 const portis = new PortisConnector({
   dAppId: 'c474625b-8239-4ce8-ab42-bd16489873c3',
   networks: [4], // uses mainet by default
 });
 // const torus = new TorusConnector({ chainId: 4, initOptions: { network: { host: 'rinkeby' } } });
 
-const torus = new TorusConnector({ chainId: 97, initOptions:{network: {host: 'rinkeby', chainId: 97}}});
+const torus = new TorusConnector({ chainId: 97, initOptions: { network: { host: 'https://data-seed-prebsc-1-s1.binance.org:8545', chainId: 97, networkName: 'Binance Smart Chain Testnet' } } });
+//const torus = new TorusConnector({ chainId: 56 , initOptions: { network: { host: 'rinkeby' } } })
+const binance = new BscConnector({
+  supportedChainIds: [56, 97],
+});
 
 
+// 硬件钱包
 const ledger = new LedgerConnector({
   chainId: 4,
   url: RPC_URLS[4],
@@ -51,10 +62,6 @@ const ledger = new LedgerConnector({
 const trezor = new TrezorConnector({
   chainId: 4,
   url: RPC_URLS[4],
-});
-
-const binance = new BscConnector({
-  supportedChainIds: [56, 97],
 });
 
 export { injected, walletconnect, walletlink, fortmatic, portis, torus, ledger, trezor, binance };

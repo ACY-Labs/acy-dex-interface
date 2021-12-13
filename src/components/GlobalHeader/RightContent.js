@@ -189,13 +189,6 @@ const GlobalHeaderRight = props => {
 
   const walletList = [
     {
-      name: 'Binance Wallet',
-      icon: 'Binance',
-      onClick:()=>{
-        selectWallet('binance');
-      },
-    },
-    {
       name: 'Coinbase Wallet',
       icon: 'Coinbase',
       onClick: () => {
