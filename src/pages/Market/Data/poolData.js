@@ -90,7 +90,6 @@ function parsePoolData (data){
 }
 
 export async function fetchGeneralPoolInfoDay() {
-
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   try{
     let request = 'https://api.acy.finance/api/poolchart/all';
@@ -99,6 +98,7 @@ export async function fetchGeneralPoolInfoDay() {
     return parsePoolData(data.data);
   }catch (e){
     console.log('service not available yet');
+    return [];
   }
 }
 
