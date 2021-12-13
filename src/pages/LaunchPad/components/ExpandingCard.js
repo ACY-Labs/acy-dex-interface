@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import $ from 'jquery';
 import ProjectsCard from './ProjectsCard.js';
 
-const ExpandingCard = ({data}) => {
+const ExpandingCard = ({ data }) => {
   useEffect(() => {
     var $cell = $('.card');
 
@@ -41,13 +41,17 @@ const ExpandingCard = ({data}) => {
     });
   }, []);
   return (
-    <div className="expanding-card">
+    <div className="expanding-card" style={{ zIndex: 1, display: 'flex', gap: '10px' }}>
       <div className="cards">
         <div className=" card [ is-collapsed ]">
           <div className="card__inner [ js-expander ]">
-            <div className=''>
-
-            <ProjectsCard ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT"/>
+            <div className="">
+              <ProjectsCard
+                ddl="2021/12/17 00:00:00"
+                raise="250,000 USDT"
+                sales="1,000,000 ACY"
+                rate="1ACY = 0.2USDT"
+              />
             </div>
             {/* <i className="fa fa-folder-o" /> */}
           </div>
@@ -58,13 +62,20 @@ const ExpandingCard = ({data}) => {
         </div>
       </div>
       <div className="cards">
-        <div className=" card [ is-collapsed ] ">
-          <div className="card__inner [ js-expander ]">
-            <span>Card</span>
+        <div className=" card [ is-collapsed ]">
+          <div className="card__inner [ js-expander ] ">
+            <div className="">
+              <ProjectsCard
+                ddl="2021/12/17 00:00:00"
+                raise="250,000 USDT"
+                sales="1,000,000 ACY"
+                rate="1ACY = 0.2USDT"
+              />
+            </div>
             {/* <i className="fa fa-folder-o" /> */}
           </div>
-          <div className="card__expander">
-            <i className="fa fa-close [ js-collapser ]" />
+          <div className="card__expander card-middle">
+            {/* <i className="fa fa-close [ js-collapser ]" /> */}
             Expander
           </div>
         </div>
@@ -72,7 +83,14 @@ const ExpandingCard = ({data}) => {
       <div className="cards">
         <div className=" card [ is-collapsed ] ">
           <div className="card__inner [ js-expander ]">
-            <span>Card</span>
+            <div className="">
+              <ProjectsCard
+                ddl="2021/12/17 00:00:00"
+                raise="250,000 USDT"
+                sales="1,000,000 ACY"
+                rate="1ACY = 0.2USDT"
+              />
+            </div>
             {/* <i className="fa fa-folder-o" /> */}
           </div>
           <div className="card__expander">

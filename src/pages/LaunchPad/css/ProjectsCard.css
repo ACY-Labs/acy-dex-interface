@@ -213,7 +213,7 @@
     clear: left;
   }
   .expanding-card .card__expander {
-    width: calc(300% + 60px);
+    /* width: calc(300% + 60px); */
   }
 }
 @media screen and (min-width: 768px) and (max-width: 991px) {
@@ -226,4 +226,8 @@
   .expanding-card .card__expander {
     width: calc(200% + 30px);
   }
+}
+
+/* test */
+.card-middle {
 }
