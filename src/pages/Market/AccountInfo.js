@@ -292,6 +292,7 @@ function PositionDropdown({ positions, onPositionClick }) {
 }
 
 function AccountInfo(props) {
+
   const INITIAL_ROW_NUMBER = 5;
   const [isWatchlist, setIsWatchlist] = useState(false);
   const [tableRow, setTableRow] = useState([]);
@@ -345,13 +346,11 @@ function AccountInfo(props) {
       }
       resultMy[len-1][1]    = parseFloat(stakeACY.myAcy.toFixed(1));
       resultTotal[len-1][1] = parseFloat(stakeACY.totalAcy.toFixed(1));
-      console.log("start setBalanceAcy");
       setBalanceAcy({
         myAcy: resultMy,
         totalAcy: resultTotal
       });
       setIsLoadingBalance(false);
-      console.log("end getBalanceRecord");
    },
    [daoStakeRecord, stakeACY]
  );
@@ -359,17 +358,16 @@ function AccountInfo(props) {
     const harvest = await getHarvestHistory(library, account);
     setHarvestAcy(harvest);
     setIsLoadingHarvest(false);
-    console.log("end initHarvestHistiry");
   }
   const initDao = async (library, account) => {
     const dao = await getDaoStakeRecord(library, account);
-    console.log("end initDao:")
     setDaoStakeRecord(dao);
   }
   useEffect(
     () => {
       // automatically connect to wallet at the start of the application.
       connectWallet();
+      console.log("TEST HERE ADDRESS:",address);
 
       fetchPoolsFromAccount(marketClient, address).then(data => {
         setLiquidityPositions(data);
@@ -466,8 +464,11 @@ function AccountInfo(props) {
   );
 
   return (
+
     <div className={styles.marketRoot}>
-      <MarketSearchBar
+      { address == account ? (
+        <div>
+          <MarketSearchBar
         dataSourceCoin={dataSourceCoin}
         dataSourcePool={dataSourcePool}
         // refreshWatchlist={refreshWatchlist}
@@ -629,6 +630,14 @@ function AccountInfo(props) {
       </div>
 
       <div style={{ height: 20 }} />
+        </div>
+      ): (
+        <div>
+          Address dose not matched with the connected account
+        </div>
+      )
+      }
+      
     </div>
   );
 }
