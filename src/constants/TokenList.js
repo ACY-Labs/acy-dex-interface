@@ -7,6 +7,7 @@ export default [
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
+    idOnCoingecko: "ethereum",
   },
   {
     name: 'USD Coin',
@@ -15,6 +16,7 @@ export default [
     addressOnEth: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     decimals: 6,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
+    idOnCoingecko: "usd-coin",
   },
   {
     name: 'Wrapped Ether',
@@ -23,6 +25,7 @@ export default [
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
+    idOnCoingecko: "ethereum",
   },
   {
     name: 'ACY',
@@ -31,6 +34,7 @@ export default [
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
     logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
+    idOnCoingecko: "usd-coin",
   },
 
   {
@@ -40,6 +44,7 @@ export default [
     addressOnEth: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/UNI.svg',
+    idOnCoingecko: "unicorn-token",
   },
   {
     name: 'Dai Stablecoin',
@@ -48,6 +53,7 @@ export default [
     addressOnEth: '0x6b175474e89094c44da98b954eedeac495271d0f',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg',
+    idOnCoingecko: "dai",
   },
   {
     name: 'Compound Dai',
@@ -56,6 +62,7 @@ export default [
     addressOnEth: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
     decimals: 8,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg',
+    idOnCoingecko: "cdai",
   },
   {
     name: 'Wrapped BTC',
@@ -64,6 +71,7 @@ export default [
     addressOnEth: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
     decimals: 8,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/WBTC.svg',
+    idOnCoingecko: "wrapped-bitcoin",
   },
   {
     name: 'Aave',
@@ -72,6 +80,7 @@ export default [
     addressOnEth: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/AAVE.svg',
+    idOnCoingecko: "aave",
   },
   // token not exist in testnet
   // {
@@ -89,6 +98,7 @@ export default [
     addressOnEth: '0x960b236A07cf122663c4303350609A66A7B288C0',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ANT.svg',
+    idOnCoingecko: "aragon",
   },
   // balancer token address in testnet is not verified
   // address is chosen based on highest transactions
@@ -99,6 +109,7 @@ export default [
     addressOnEth: '0xba100000625a3754423978a60c9317c58a424e3D',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/BAL.svg',
+    idOnCoingecko: "balancer",
   },
   // band protocol token address in testnet is not verified
   // address is chosen based on highest transactions
@@ -109,6 +120,7 @@ export default [
     addressOnEth: '0xBA11D00c5f74255f56a5E366F4F77f5A186d7f55',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/BAND.svg',
+    idOnCoingecko: "band-protocol",
   },
   // bancor network token address in testnet is not verified
   // address is chosen based on highest transactions
@@ -119,6 +131,7 @@ export default [
     addressOnEth: '0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/BNT.svg',
+    idOnCoingecko: "bancor",
   },
   // compound token address in testnet is not verified
   // address is chosen based on highest transactions
@@ -129,6 +142,7 @@ export default [
     addressOnEth: '0xc00e94Cb662C3520282E6f5717214004A7f26888',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/COMP.svg',
+    idOnCoingecko: "compound-coin",
   },
   {
     name: 'Curve DAO Token',
@@ -137,6 +151,7 @@ export default [
     addressOnEth: '0xD533a949740bb3306d119CC777fa900bA034cd52',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/CRV.svg',
+    idOnCoingecko: "curve-dao-token",
   },
   {
     name: 'Civic',
@@ -145,6 +160,7 @@ export default [
     addressOnEth: '0x41e5560054824eA6B0732E656E3Ad64E20e94E45',
     decimals: 8,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/CVC.svg',
+    idOnCoingecko: "civic",
   },
   {
     name: 'district0x',
@@ -153,6 +169,7 @@ export default [
     addressOnEth: '0x0AbdAce70D3790235af448C88547603b945604ea',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DNT.svg',
+    idOnCoingecko: "district0x",
   },
   // gnosis token address in testnet is not verified
   // address is chosen based on highest transactions
@@ -163,6 +180,7 @@ export default [
     addressOnEth: '0x6810e776880C02933D47DB1b9fc05908e5386b96',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/GNO.svg',
+    idOnCoingecko: "gnosis",
   },
   // the graph token address in testnet is not verified
   // address is chosen based on highest transactions
@@ -173,6 +191,7 @@ export default [
     addressOnEth: '0xc944E90C64B2c07662A292be6244BDf05Cda44a7',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/GRT.svg',
+    idOnCoingecko: "the-graph",
   },
   // keep network token address in testnet is not verified
   // address is chosen based on highest transactions
@@ -183,6 +202,7 @@ export default [
     addressOnEth: '0x85Eee30c52B0b379b046Fb0F85F4f3Dc3009aFEC',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/KEEP.svg',
+    idOnCoingecko: "keep-network",
   },
   // kyber network crystal token address in testnet is not verified
   // address is chosen based on highest transactions
@@ -193,6 +213,7 @@ export default [
     addressOnEth: '0xdd974D5C2e2928deA5F71b9825b8b646686BD200',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/KNC.svg',
+    idOnCoingecko: "kyber-network-crystal",
   },
   {
     name: 'ChainLink Token',
@@ -201,6 +222,7 @@ export default [
     addressOnEth: '0x514910771AF9Ca656af840dff83E8264EcF986CA',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/LINK.svg',
+    idOnCoingecko: "chainlink",
   },
   {
     name: 'Loom Network',
@@ -209,6 +231,7 @@ export default [
     addressOnEth: '0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/LOOM.svg',
+    idOnCoingecko: "loom-network-new",
   },
   {
     name: 'LoopringCoin V2',
@@ -217,6 +240,7 @@ export default [
     addressOnEth: '0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/LRC.svg',
+    idOnCoingecko: "loopring",
   },
   {
     name: 'Decentraland',
@@ -225,6 +249,7 @@ export default [
     addressOnEth: '0x0F5D2fB29fb7d3CFeE444a200298f468908cC942',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/MANA.svg',
+    idOnCoingecko: "decentraland",
   },
   {
     name: 'Melon',
@@ -233,6 +258,7 @@ export default [
     addressOnEth: '0xec67005c4E498Ec7f55E092bd1d35cbC47C91892',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/MLN.svg',
+    idOnCoingecko: "melon",
   },
   // numeraire token address in testnet is not verified
   // address is chosen based on highest transactions
@@ -243,6 +269,7 @@ export default [
     addressOnEth: '0xec67005c4E498Ec7f55E092bd1d35cbC47C91892',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/NMR.svg',
+    idOnCoingecko: "numeraire",
   },
   // nucypher token address in testnet is not verified
   // address is chosen based on highest transactions
@@ -253,6 +280,7 @@ export default [
     addressOnEth: '0x4fE83213D56308330EC302a8BD641f1d0113A4Cc',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/NU.svg',
+    idOnCoingecko: "nucypher",
   },
   // orchid token address in testnet is not verified
   // address is chosen based on highest transactions
@@ -263,6 +291,7 @@ export default [
     addressOnEth: '0x4575f41308EC1483f3d399aa9a2826d74Da13Deb',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/OXT.svg',
+    idOnCoingecko: "orchid-protocol",
   },
   // republic token address in testnet is not verified
   // address is chosen based on highest transactions
@@ -273,6 +302,7 @@ export default [
     addressOnEth: '0x408e41876cCCDC0F92210600ef50372656052a38',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/REN.svg',
+    idOnCoingecko: "republic-protocol",
   },
   {
     name: 'Reputation Augur v1',
@@ -281,6 +311,7 @@ export default [
     addressOnEth: '0x1985365e9f78359a9B6AD760e32412f4a445E862',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/REP.svg',
+    idOnCoingecko: "augur",
   },
   {
     name: 'Reputation Augur v2',
@@ -289,6 +320,7 @@ export default [
     addressOnEth: '0x221657776846890989a759BA2973e427DfF5C9bB',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/REPv2.svg',
+    idOnCoingecko: "augur",
   },
   {
     name: 'Synthetix Network Token',
@@ -297,6 +329,7 @@ export default [
     addressOnEth: '0xC011a73ee8576Fb46F5E1c5751cA3B9Fe0af2a6F',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/SNX.svg',
+    idOnCoingecko: "havven",
   },
   {
     name: 'Storj Token',
@@ -305,6 +338,7 @@ export default [
     addressOnEth: '0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC',
     decimals: 8,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/STORJ.svg',
+    idOnCoingecko: "storj",
   },
   {
     name: 'tBTC',
@@ -313,6 +347,7 @@ export default [
     addressOnEth: '0x8dAEBADE922dF735c38C80C7eBD708Af50815fAa',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/TBTC.png',
+    idOnCoingecko: "t-bitcoin",
   },
   // republic token address in testnet is not verified
   // address is chosen based on highest transactions
@@ -323,6 +358,7 @@ export default [
     addressOnEth: '0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/UMA.svg',
+    idOnCoingecko: "uma",
   },
   {
     name: 'Tether USD',
@@ -331,6 +367,7 @@ export default [
     addressOnEth: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
     decimals: 6,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg',
+    idOnCoingecko: "tether",
   },
   {
     name: 'yearn finance',
@@ -339,6 +376,7 @@ export default [
     addressOnEth: '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/YFI.svg',
+    idOnCoingecko: "yearn-finance",
   },
   // zrx token address in testnet is not verified
   // address is chosen based on highest transactions
@@ -349,5 +387,6 @@ export default [
     addressOnEth: '0xE41d2489571d322189246DaFA5ebDe1F4699F498',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ZRX.svg',
+    idOnCoingecko: "0x",
   },
 ];

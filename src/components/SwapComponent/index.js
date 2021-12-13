@@ -87,7 +87,7 @@ import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import moment from 'moment';
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
-  const { dispatch, onSelectToken0, onSelectToken1, onSelectToken } = props;
+  const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1=false } = props;
 
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
@@ -151,6 +151,15 @@ const SwapComponent = props => {
     setToken0(modelToken0);
     setToken1(modelToken1);
   }, [props.swap]);
+
+  useEffect(() => {
+    if(token) {
+      setToken0(token.token0);
+      setToken1(token.token1);
+    }
+  }, [token]);
+
+  
 
   const individualFieldPlaceholder = 'Enter amount';
   const dependentFieldPlaceholder = 'Estimated value';
@@ -561,6 +570,7 @@ const SwapComponent = props => {
           setToken1Amount(e);
           setExactIn(false);
         }}
+        isLocked={isLockedToken1}
       />
 
       <AcyDescriptions>
