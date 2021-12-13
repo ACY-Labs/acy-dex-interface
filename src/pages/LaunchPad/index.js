@@ -24,7 +24,7 @@ const { Meta } = Card;
 
 const Pool = (props)=> {
     const [page, setPage] = useState(0);
-    const [view, setView] = useState('list');
+    const [view, setView] = useState('grid');
     const [projectStatus, setProjectStatus] = useState('inProgress');
     const [navPage, setnavPage] = useState(0);
     const [filter, setFilter] = useState('');
@@ -33,38 +33,16 @@ const Pool = (props)=> {
       setFilter(e.target.value)
     }
 
+    // project variables
+    const [projectCount, setProjectCount] = useState(0);
     useEffect(() => {
-      axios.get(`https://api.acy.finance/api/projects`).then()
+      axios.get(`http://localhost:3001/api/launch/projects`).then(res => {
+        // see if get request is successful
+        console.log(res)
+        // get all project count
+        setProjectCount(res.data.length)
+      }).catch(e => console.log("error: ", e));
     },[]);
-
-    function SelectedBtn(props) {
-      return(
-        props.page === props.id ? 
-          <button className={styles.Btn} onClick={() => setPage(props.id)}>
-            {props.text}
-          </button>
-          : 
-          <button className={styles.bg_none } onClick={() => setPage(props.id)}>
-            {props.text}
-          </button>
-      );
-    }
-
-    function SelectednavBtn(props) {
-      return(
-        props.navPage === props.id ? 
-          <button className={styles.navLink_active} onClick={() => setnavPage(props.id)}>
-            {props.text}
-          </button>
-          : 
-          <button className={styles.navLink} onClick={() => setnavPage(props.id)}>
-            {props.text}
-          </button>
-      );
-    }
-
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
 
     const mouseMove = (e) => {
       let mouseX, mouseY;
@@ -156,7 +134,7 @@ const Pool = (props)=> {
                   </span>
                 </div>
                 <div className={styles.boxProgressWrapper}>
-                  <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={90} status='active' /> 
+                  <Progress strokeColor={{'0%': '#eb5c20','100%': '#c6224e'}} percent={0} status='active' /> 
                 </div>
                 <span className={styles.lineSeperator} />
                 <div className={styles.daysLeft}>
@@ -175,7 +153,7 @@ const Pool = (props)=> {
         <div className={styles.projectContainer}>
           <div className={styles.projectBox1}>
             <span style={{display: 'inline-flex', justifyContent: 'center', color: '#fff'}}>December 10, 2020</span>
-            <div style={{width: '100%', height: '100%', padding: '2rem 0', justifyContent: 'center', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '0.5rem'}}>
+            <div style={{width: '80%', height: '100%', padding: '2rem 0', justifyContent: 'space-between', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '0.5rem'}}>
               <div>
                 <img src={AcyIcon} alt="" style={{height: '60px', width: '60px', verticalAlign: 'middle', borderStyle: 'none'}} />
               </div>
@@ -232,7 +210,7 @@ const Pool = (props)=> {
             THE BEST <br />IDO PROJECTS
           </div>
         </div>
-        <div className={styles.bottomContainer}>
+        <div className={styles.launchbottomContainer}>
           <p className={styles.titleDesc}>
             Launching profitable projects on Multichain.
           </p>
@@ -262,7 +240,9 @@ const Pool = (props)=> {
             <div className={styles.navContainer}>
               <div className={styles.nav} role="tablist">
                 <div className={styles.navItem}>
-                  <SelectednavBtn text='Pools 🔥' />
+                  <span style={{color:'white', fontSize:'1.5rem'}}>Pools  
+                    <span role="img" aria-label="fire">🔥</span> 
+                  </span>
                 </div>
               </div>
             </div>
@@ -282,7 +262,7 @@ const Pool = (props)=> {
                   <div className={styles.projectsStatus}>
                     <div className={styles.itemStatus} onClick={() => {switchProject('inProgress'); goToPos();}}>
                       <span className={styles.statusNumber}>45</span>
-                      <span className={styles.statusType}>In Progress</span>
+                      <span className={styles.statusType}>Live</span>
                     </div>
                     <div className={styles.itemStatus} onClick={() => {switchProject('upcoming');}}>
                       <span className={styles.statusNumber}>24</span>
@@ -293,7 +273,7 @@ const Pool = (props)=> {
                       <span className={styles.statusType}>Ended</span>
                     </div>
                     <div className={styles.itemStatus} onClick={() => {switchProject('allProjects'); goToPos();}}>
-                      <span className={styles.statusNumber}>62</span>
+                      <span className={styles.statusNumber}>{projectCount}</span>
                       <span className={styles.statusType}>Total Projects</span>
                     </div>
                   </div>

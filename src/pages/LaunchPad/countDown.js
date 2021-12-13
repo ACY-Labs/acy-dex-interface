@@ -63,34 +63,36 @@ console.log(styles);
     return(
       
       <div className={styles.countDown}>
-      <div className={styles.cntdwn}>
-        <div className = {styles.number} id = "b">
-        <div className = {styles.countnumber} >{countTime.days}</div>
-        <div>DAYS</div>
+        <div className={styles.cntdwn}>
+          <div className={styles.number}>
+            <div className={styles.countnumber}>
+              {countTime.days}
+            </div>
+            <div>DAYS</div>
+          </div>
+          <div className={styles.seperator}>:</div>
+          <div className={styles.number}>
+            <div className={styles.countnumber}>
+              {countTime.hours}
+            </div>
+            <div>HOURS</div>
+          </div>
+          <div className={styles.seperator}>:</div>
+          <div className={styles.number}>
+            <div className={styles.countnumber}>
+              {countTime.min}
+            </div>
+            <div>MIN</div>
+          </div>
+          <div className={styles.seperator}>:</div>
+          <div className={styles.number}>
+            <div className={styles.countnumber}>
+              {countTime.sec}
+            </div>
+            <div>SEC</div>
+          </div>
         </div>
-
-
-        <div className = {styles.seperator}>:</div>
-        <div className = {styles.number}id = "b">
-
-        <div className = {styles.countnumber} >{countTime.hours}</div>
-        <div>HOURS</div>
-        </div>
-        <div className = {styles.seperator}>:</div>
-        <div  className = {styles.number}id = "b">
-
-        <div className = {styles.countnumber} >{countTime.min}</div>
-        <div>MIN</div>
-        </div>
-        <div className = {styles.seperator}>:</div>
-        <div className = {styles.number}id = "b">
-
-        <div className = {styles.countnumber} >{countTime.sec}</div>
-        <div>SEC</div>
-        </div>
-
       </div>
-    </div>
     )
   }
   export default countDown;
