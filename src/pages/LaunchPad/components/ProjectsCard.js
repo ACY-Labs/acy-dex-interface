@@ -23,7 +23,7 @@ const ProjectsCard = ({ ddl, raise, sales, rate }) => {
             <CountDown ddl={ddl} />
           </div>
           <div>
-            <p style={{ fontSize: '10px' }}>Sale ends: {ddl}</p>
+            <p style={{ fontSize: '10px', color: '#C6224E' }}>Sale ends: {ddl}</p>
           </div>
         </div>
       </div>
