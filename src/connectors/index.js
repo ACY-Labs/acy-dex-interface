@@ -11,6 +11,7 @@ import { BscConnector } from '@binance-chain/bsc-connector';
 const RPC_URLS = {
   1: 'https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
   4: 'https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
+  56: 'https://bsc-dataseed.binance.org/',
   97: 'https://data-seed-prebsc-1-s1.binance.org:8545',
 };
 const POLLING_INTERVAL = 12000;
@@ -21,7 +22,7 @@ const injected = new InjectedConnector({
 });
 
 const walletconnect = new WalletConnectConnector({
-  rpc: { 1: RPC_URLS['1'], 4: RPC_URLS['4'], 97: RPC_URLS['97']},
+  rpc: { 1: RPC_URLS['1'], 56: RPC_URLS['56'], 97: RPC_URLS['97'] },
   qrcode: true,
 });
 const walletlink = new WalletLinkConnector({
