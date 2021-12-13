@@ -45,11 +45,12 @@ const Farms = (props) => {
   const [harvestAcy, setHarvestAcy] = useState();
   const [balanceAcy, setBalanceAcy] = useState();
   const [daoStakeRecord, setDaoStakeRecord] = useState();
+  const [stakeACY, setStakeACY] = useState();
 
   const [isLoadingPool, setIsLoadingPool] = useState(true);
   const [isLoadingHarvest, setIsLoadingHarvest] = useState(true);
   const [isLoadingBalance, setIsLoadingBalance] = useState(true);
-  const [stakeACY, setStakeACY] = useState();
+  
   const [isConnected, setIsConnected] = useState(false); // set this after run activate
   const [activeEnded, setActiveEnded] = useState(true);
   // method to activate metamask wallet.
@@ -142,7 +143,6 @@ const Farms = (props) => {
   }
   const initDao = async (library, account) => {
     const dao = await getDaoStakeRecord(library, account);
-   
     console.log("end initDao:")
     setDaoStakeRecord(dao);
   }
