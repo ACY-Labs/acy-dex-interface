@@ -4,7 +4,7 @@ import ProjectCard from './ProjectsCard.js';
 
 const OngoingProjects = ({ ddl, raise, sales, rate }) => {
   return (
-    <div style={{ width: '33%' }}>
+    <div>
       <div className="">
         <MagicCard ddl={ddl} raise={raise} sales={sales} rate={rate} />
       </div>

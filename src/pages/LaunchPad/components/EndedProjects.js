@@ -1,7 +1,7 @@
 import React from 'react';
 import ExpandingCard from './ExpandingCard.js';
 import '../css/ProjectsCard.css';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import $ from 'jquery';
 import ProjectsCard from './ProjectsCard.js';
 
@@ -40,78 +40,184 @@ const EndedProjects = ({ data }) => {
       $cell.not($thisCell).removeClass('is-inactive2');
     });
   }, []);
+
+  const [isActiveEnded, setisActiveEnded] = useState(false);
   return (
     <div>
-      <div
-        className="expanding-card2"
-        style={{ zIndex: 1, display: 'flex', flexWrap: 'wrap', gap: '5px' }}
-      >
-        <div className="cards2">
-          <div className=" card2 [ is-collapsed2 ]">
-            <div className="card2__inner2 [ js-expander2 ]">
-              <div className="">
-                <ProjectsCard
-                  ddl="2021/12/17 00:00:00"
-                  raise="250,000 USDT"
-                  sales="1,000,000 ACY"
-                  rate="1ACY = 0.2USDT"
-                />
+      <div className={isActiveEnded ? 'ended-container active' : 'ended-container'}>
+        <div
+          className="expanding-card2"
+          style={{
+            zIndex: 1,
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '10px',
+            justifyContent: 'center',
+          }}
+        >
+          <div className="cards2">
+            <div className=" card2 [ is-collapsed2 ]">
+              <div className="card2__inner2 [ js-expander2 ]">
+                <div className="">
+                  <ProjectsCard
+                    ddl="2021/12/17 00:00:00"
+                    raise="250,000 USDT"
+                    sales="1,000,000 ACY"
+                    rate="1ACY = 0.2USDT"
+                  />
+                </div>
+                {/* <i className="fa fa-folder-o" /> */}
               </div>
-              {/* <i className="fa fa-folder-o" /> */}
+              <div className="card2__expander2">Expander</div>
             </div>
-            <div className="card2__expander2">Expander</div>
+          </div>
+          <div className="cards2">
+            <div className=" card2 [ is-collapsed2 ]">
+              <div className="card2__inner2 [ js-expander2 ]">
+                <div className="">
+                  <ProjectsCard
+                    ddl="2021/12/17 00:00:00"
+                    raise="250,000 USDT"
+                    sales="1,000,000 ACY"
+                    rate="1ACY = 0.2USDT"
+                  />
+                </div>
+                {/* <i className="fa fa-folder-o" /> */}
+              </div>
+              <div className="card2__expander2">Expander</div>
+            </div>
+          </div>
+          <div className="cards2">
+            <div className=" card2 [ is-collapsed2 ]">
+              <div className="card2__inner2 [ js-expander2 ]">
+                <div className="">
+                  <ProjectsCard
+                    ddl="2021/12/17 00:00:00"
+                    raise="250,000 USDT"
+                    sales="1,000,000 ACY"
+                    rate="1ACY = 0.2USDT"
+                  />
+                </div>
+                {/* <i className="fa fa-folder-o" /> */}
+              </div>
+              <div className="card2__expander2">Expander</div>
+            </div>
+          </div>
+          <div className="cards2">
+            <div className=" card2 [ is-collapsed2 ]">
+              <div className="card2__inner2 [ js-expander2 ]">
+                <div className="">
+                  <ProjectsCard
+                    ddl="2021/12/17 00:00:00"
+                    raise="250,000 USDT"
+                    sales="1,000,000 ACY"
+                    rate="1ACY = 0.2USDT"
+                  />
+                </div>
+                {/* <i className="fa fa-folder-o" /> */}
+              </div>
+              <div className="card2__expander2">Expander</div>
+            </div>
+          </div>
+          <div className="cards2">
+            <div className=" card2 [ is-collapsed2 ]">
+              <div className="card2__inner2 [ js-expander2 ]">
+                <div className="">
+                  <ProjectsCard
+                    ddl="2021/12/17 00:00:00"
+                    raise="250,000 USDT"
+                    sales="1,000,000 ACY"
+                    rate="1ACY = 0.2USDT"
+                  />
+                </div>
+                {/* <i className="fa fa-folder-o" /> */}
+              </div>
+              <div className="card2__expander2">Expander</div>
+            </div>
+          </div>
+          <div className="cards2">
+            <div className=" card2 [ is-collapsed2 ]">
+              <div className="card2__inner2 [ js-expander2 ]">
+                <div className="">
+                  <ProjectsCard
+                    ddl="2021/12/17 00:00:00"
+                    raise="250,000 USDT"
+                    sales="1,000,000 ACY"
+                    rate="1ACY = 0.2USDT"
+                  />
+                </div>
+                {/* <i className="fa fa-folder-o" /> */}
+              </div>
+              <div className="card2__expander2">Expander</div>
+            </div>
+          </div>
+          <div className="cards2">
+            <div className=" card2 [ is-collapsed2 ]">
+              <div className="card2__inner2 [ js-expander2 ]">
+                <div className="">
+                  <ProjectsCard
+                    ddl="2021/12/17 00:00:00"
+                    raise="250,000 USDT"
+                    sales="1,000,000 ACY"
+                    rate="1ACY = 0.2USDT"
+                  />
+                </div>
+                {/* <i className="fa fa-folder-o" /> */}
+              </div>
+              <div className="card2__expander2">Expander</div>
+            </div>
+          </div>
+          <div className="cards2">
+            <div className=" card2 [ is-collapsed2 ]">
+              <div className="card2__inner2 [ js-expander2 ]">
+                <div className="">
+                  <ProjectsCard
+                    ddl="2021/12/17 00:00:00"
+                    raise="250,000 USDT"
+                    sales="1,000,000 ACY"
+                    rate="1ACY = 0.2USDT"
+                  />
+                </div>
+                {/* <i className="fa fa-folder-o" /> */}
+              </div>
+              <div className="card2__expander2">Expander</div>
+            </div>
+          </div>
+          <div className="cards2">
+            <div className=" card2 [ is-collapsed2 ]">
+              <div className="card2__inner2 [ js-expander2 ]">
+                <div className="">
+                  <ProjectsCard
+                    ddl="2021/12/17 00:00:00"
+                    raise="250,000 USDT"
+                    sales="1,000,000 ACY"
+                    rate="1ACY = 0.2USDT"
+                  />
+                </div>
+                {/* <i className="fa fa-folder-o" /> */}
+              </div>
+              <div className="card2__expander2">Expander</div>
+            </div>
+          </div>
+          <div className="cards2">
+            <div className=" card2 [ is-collapsed2 ]">
+              <div className="card2__inner2 [ js-expander2 ]">
+                <div className="">
+                  <ProjectsCard
+                    ddl="2021/12/17 00:00:00"
+                    raise="250,000 USDT"
+                    sales="1,000,000 ACY"
+                    rate="1ACY = 0.2USDT"
+                  />
+                </div>
+                {/* <i className="fa fa-folder-o" /> */}
+              </div>
+              <div className="card2__expander2">Expander</div>
+            </div>
           </div>
         </div>
-        <div className="cards2">
-          <div className=" card2 [ is-collapsed2 ]">
-            <div className="card2__inner2 [ js-expander2 ]">
-              <div className="">
-                <ProjectsCard
-                  ddl="2021/12/17 00:00:00"
-                  raise="250,000 USDT"
-                  sales="1,000,000 ACY"
-                  rate="1ACY = 0.2USDT"
-                />
-              </div>
-              {/* <i className="fa fa-folder-o" /> */}
-            </div>
-            <div className="card2__expander2">Expander</div>
-          </div>
-        </div>
-        <div className="cards2">
-          <div className=" card2 [ is-collapsed2 ]">
-            <div className="card2__inner2 [ js-expander2 ]">
-              <div className="">
-                <ProjectsCard
-                  ddl="2021/12/17 00:00:00"
-                  raise="250,000 USDT"
-                  sales="1,000,000 ACY"
-                  rate="1ACY = 0.2USDT"
-                />
-              </div>
-              {/* <i className="fa fa-folder-o" /> */}
-            </div>
-            <div className="card2__expander2">Expander</div>
-          </div>
-        </div>
-        <div className="cards2">
-          <div className=" card2 [ is-collapsed2 ]">
-            <div className="card2__inner2 [ js-expander2 ]">
-              <div className="">
-                <ProjectsCard
-                  ddl="2021/12/17 00:00:00"
-                  raise="250,000 USDT"
-                  sales="1,000,000 ACY"
-                  rate="1ACY = 0.2USDT"
-                />
-              </div>
-              {/* <i className="fa fa-folder-o" /> */}
-            </div>
-            <div className="card2__expander2">Expander</div>
-          </div>
-        </div>
+        <a className="see-more-ended" onClick={() => setisActiveEnded(!isActiveEnded)} />
       </div>
-      <div className="see-more">See More</div>
     </div>
   );
 };

@@ -1476,7 +1476,6 @@
 
 .buttonContainer{
     width: 100%;
-    height: 5vh;
     display: flex;
     padding: 2em 0 0 ;
     justify-content: center !important;
@@ -1497,7 +1496,7 @@
     padding: 0.75rem 1.5rem;
     box-shadow: 0 0 24px 0 rgb(133 60 210 / 50%);
     //background: linear-gradient(90deg,#25e7d0,#5893b8);
-    background: linear-gradient(120deg,#c6224e,#1e5d91);
+    background: #c6224e;
     transition: .2s;
     border-radius: 0.5rem;
     color: #fff;
@@ -1508,9 +1507,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 0 24px 0 rgb(133 60 210 / 50%);
     transition: .2s;
-    background: linear-gradient(120deg,#c6224e,#1e5d91);
+    background: #c6224e;
     //background-color: #c6224e;
     color: #fff;
     text-decoration: none;
@@ -2099,13 +2097,53 @@
 
 .projectBoxes{
     width: 100%;
-    overflow-y: auto;
+    //overflow-y: auto;
     display: flex;
     flex-wrap: wrap;
+    flex-direction: column;
+}
+
+.projectsContainer{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row !important;
+    justify-content: center;
+    padding: 2em 0;
+    z-index: 1;
+    gap :10px;
+}
+
+.titleBlock{
+    width: 100%;
+    display: inline-flex;
+    flex-direction: row;
+}
+
+.titleBlockLine{
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.anyStatusTitle{
+    width: 45%;
+    height: fit-content;
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: normal;
+    font-family: 'Roboto', sans-serif;
+    font-family: 'Source Sans 3', sans-serif;
 }
 
 .lineSeperator{
-    border-bottom: 1px solid #bbbbc0;
+    width: 100%;
+    align-self: center;
+    height: fit-content;
+    margin-top: 5px;
+    border-bottom: 1px solid #b5b5b6;
     display: block;
-    margin: 0.3em 0;
 }
