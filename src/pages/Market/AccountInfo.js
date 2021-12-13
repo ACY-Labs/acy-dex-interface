@@ -5,7 +5,7 @@ import { AcyIcon, AcyTokenIcon, AcyPeriodTime, AcyAccountChart } from '@/compone
 // import FarmsTable from '@/pages/Farms/FarmsTable';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { getAllPools } from '@/acy-dex-swap/core/farms';
+import { getAllPools, getDaoStakeRecord, getHarvestHistory } from '@/acy-dex-swap/core/farms';
 import styles from './styles.less';
 import { abbrNumber, abbrHash, isDesktop, sortTable, openInNewTab, formattedNum } from './Util';
 import { MarketSearchBar, TransactionTable } from './UtilComponent';
@@ -18,6 +18,7 @@ import {
 import { marketClient, fetchPoolsFromAccount } from './Data';
 import { WatchlistManager } from './WatchlistManager.js';
 import supportedTokens from '@/constants/TokenList';
+import PageLoading from '@/components/PageLoading';
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -291,6 +292,7 @@ function PositionDropdown({ positions, onPositionClick }) {
 }
 
 function AccountInfo(props) {
+
   const INITIAL_ROW_NUMBER = 5;
   const [isWatchlist, setIsWatchlist] = useState(false);
   const [tableRow, setTableRow] = useState([]);
@@ -299,6 +301,16 @@ function AccountInfo(props) {
   const { account, chainId, library, activate } = useWeb3React();
   const [liquidityPositions, setLiquidityPositions] = useState([]);
   const [activePosition, setActivePosition] = useState(null);
+
+  const [isMyFarms, setIsMyFarms] = useState(false);
+  const [harvestAcy, setHarvestAcy] = useState();
+  const [balanceAcy, setBalanceAcy] = useState();
+  const [daoStakeRecord, setDaoStakeRecord] = useState();
+  const [stakeACY, setStakeACY] = useState();
+
+  const [isLoadingPool, setIsLoadingPool] = useState(true);
+  const [isLoadingHarvest, setIsLoadingHarvest] = useState(true);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(true);
 
   const injected = new InjectedConnector({
     supportedChainIds: [1, 3, 4, 5, 42, 56, 97, 80001],
@@ -315,11 +327,47 @@ function AccountInfo(props) {
 
   // method to prompt metamask extension for user to connect their wallet.
   const connectWallet = () => activate(injected);
-
+  useEffect(
+    () => {
+      
+      if(!daoStakeRecord || !stakeACY) return;
+      let len = daoStakeRecord.myAcy.length;
+      var resultMy = [...daoStakeRecord.myAcy];
+      var resultTotal = [...daoStakeRecord.totalAcy];
+      resultMy[len-1][1] += stakeACY.myAcy;
+      resultTotal[len-1][1] += stakeACY.totalAcy;
+      for(var i=len-2; i!=-1 ; i--){
+        resultMy[i][1] += resultMy[i+1][1];
+        resultTotal[i][1] += resultTotal[i+1][1];
+      }
+      for(var i=0; i!=len-1 ; i++){
+        resultMy[i][1]    = parseFloat(resultMy[i+1][1].toFixed(1));
+        resultTotal[i][1] = parseFloat(resultTotal[i+1][1].toFixed(1));
+      }
+      resultMy[len-1][1]    = parseFloat(stakeACY.myAcy.toFixed(1));
+      resultTotal[len-1][1] = parseFloat(stakeACY.totalAcy.toFixed(1));
+      setBalanceAcy({
+        myAcy: resultMy,
+        totalAcy: resultTotal
+      });
+      setIsLoadingBalance(false);
+   },
+   [daoStakeRecord, stakeACY]
+ );
+  const initHarvestHistiry = async (library, account) => {
+    const harvest = await getHarvestHistory(library, account);
+    setHarvestAcy(harvest);
+    setIsLoadingHarvest(false);
+  }
+  const initDao = async (library, account) => {
+    const dao = await getDaoStakeRecord(library, account);
+    setDaoStakeRecord(dao);
+  }
   useEffect(
     () => {
       // automatically connect to wallet at the start of the application.
       connectWallet();
+      console.log("TEST HERE ADDRESS:",address);
 
       fetchPoolsFromAccount(marketClient, address).then(data => {
         setLiquidityPositions(data);
@@ -357,9 +405,25 @@ function AccountInfo(props) {
             endsIn: getDHM((pool.endBlock - block) * BLOCKS_PER_SEC),
             status: pool.endBlock - block > 0 
           };
+          if(newFarmsContent.poolId == 0) {
+            // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));
+            if(newFarmsContent.stakeData){
+              const myStakeAcy = newFarmsContent.stakeData.reduce((total, currentAmount) => total + parseFloat(currentAmount.lpAmount), 0);
+              setStakeACY({
+                myAcy: myStakeAcy,
+                totalAcy: newFarmsContent.poolLpBalance
+              });
+            } else {
+              setStakeACY({
+                myAcy: 0,
+                totalAcy: newFarmsContent.poolLpBalance
+              });
+            }
+          }
           newFarmsContents.push(newFarmsContent);
         });
         setTableRow(newFarmsContents);
+        setIsLoadingPool(false);
       };
 
       // account will be returned if wallet is connected.
@@ -367,6 +431,8 @@ function AccountInfo(props) {
       if (account) {
         setWalletConnected(true);
         getPools(library, account);
+        initHarvestHistiry(library, account);
+        initDao(library, account);
       } else {
         setWalletConnected(false);
       }
@@ -398,8 +464,11 @@ function AccountInfo(props) {
   );
 
   return (
+
     <div className={styles.marketRoot}>
-      <MarketSearchBar
+      { address == account ? (
+        <div>
+          <MarketSearchBar
         dataSourceCoin={dataSourceCoin}
         dataSourcePool={dataSourcePool}
         // refreshWatchlist={refreshWatchlist}
@@ -522,6 +591,11 @@ function AccountInfo(props) {
       {/* Farms */}
       <div className={styles.accountPageRow}>
         <h2>Farms</h2>
+        { (isLoadingHarvest || isLoadingPool || isLoadingBalance)? (
+        <div>
+          <PageLoading/>
+        </div>
+      ) : (
         <FarmsTable
           tableRow={tableRow}
           // onRowClick={onRowClick}
@@ -540,13 +614,14 @@ function AccountInfo(props) {
           chainId={chainId}
 
           isMyFarms={true}
-          harvestAcy={{myAll:[['0',0]],totalAll:[['0',0]]}}
-          balanceAcy={{myAcy:[['0',0]],totalAcy:[['0',0]]}}
+          harvestAcy={harvestAcy}
+          balanceAcy={balanceAcy}
           refreshHarvestHistory={()=>{}}
           searchInput={''}
           isLoading={false}
           activeEnded={true}
         />
+      )}
       </div>
 
       {/* transaction table */}
@@ -556,6 +631,14 @@ function AccountInfo(props) {
       </div>
 
       <div style={{ height: 20 }} />
+        </div>
+      ): (
+        <div>
+          Address dose not matched with the connected account
+        </div>
+      )
+      }
+      
     </div>
   );
 }
