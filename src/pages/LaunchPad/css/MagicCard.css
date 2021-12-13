@@ -11,7 +11,7 @@
 
 .magic-card-body{
   position: relative;
-  width:  33%;
+  width:  fit-content;
   height: auto;
 }
 .magic-card {
