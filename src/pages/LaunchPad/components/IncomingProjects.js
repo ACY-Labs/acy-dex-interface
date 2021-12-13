@@ -1,10 +1,10 @@
 import React from 'react';
 import ExpandingCard from './ExpandingCard.js';
 
-const IncomingProjects = () => {
+const IncomingProjects = ({ data }) => {
   return (
     <div>
-      <ExpandingCard />
+      <ExpandingCard data={data}/>
     </div>
   );
 };

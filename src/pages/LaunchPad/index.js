@@ -16,6 +16,8 @@ import moreBtn from '@/assets/icon_more.svg';
 import data from './projectdata';
 import OngoingProjects from "./components/OngoingProjects.js"
 import IncomingProjects from "./components/IncomingProjects.js"
+import ExpandingCard from "./components/ExpandingCard.js"
+import $ from 'jquery';
 
 const { Meta } = Card;
 
@@ -220,6 +222,7 @@ const Pool = (props)=> {
       </div>
     );
   }
+  
 
     return(
       <div className={styles.launchRoot}>
@@ -404,8 +407,9 @@ const Pool = (props)=> {
         </div>
         <div className='incoming-projects'>
         <div className='title'>Incoming Projects</div>
-            <div>
-              <IncomingProjects /> 
+            <div className='expanding-card'>
+            {/* <IncomingProjects />  */}
+            <ExpandingCard data={null}/>
             </div>
         </div>
         
