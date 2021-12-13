@@ -67,10 +67,8 @@ const getPoolTotalPendingReward = async (
   const BLOCKS_PER_YEAR = 60*60*24*365/14;
   //HERE
   const poolRewardsPerYear = await Promise.all(poolTokenRewardInfoPromise).then(result => {
-    console.log("TEST poolTokenRewardInfo promise:",result);
     return result.map((info,index) => info[3]/(10**rewardTokenDecimals[index]) * BLOCKS_PER_YEAR);
   });
-  console.log("TEST poolTokenRewardInfo:",poolRewardsPerYear,poolIndex);
 
   if(poolPositons.length === 0 ){
     const totalPendingRewards = [];
@@ -253,9 +251,7 @@ const getPool = async (library, account, poolId)=> {
     const token1Decimal = await token1Contract.decimals()
     const token_1 = new Token(null, token1Address,token1Decimal, token1Symbol);
 
-    console.log("TEST Fetch pair:",reserves,token0Address,token1Address);
     const pair = await Fetcher.fetchPairData(token_0, token_1, library);
-    console.log("TEST FETCH PAIR:",pair);
     const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
 
     const token0Deposited = pair.getLiquidityValue(
@@ -272,7 +268,6 @@ const getPool = async (library, account, poolId)=> {
     );
     token0Amount = token0Deposited.toSignificant(4);
     token1Amount = token1Deposited.toSignificant(4);
-    console.log(`TEST TOKEN AMOUNT:${token0Symbol}:${token0Amount} ${token1Symbol}:${token1Amount}`);
   }
   // account data
   var allTokenTotalRewardAmount = null;
@@ -306,7 +301,6 @@ const getPool = async (library, account, poolId)=> {
     totalRewardPerYear = rewardsPerYear.reduce((total,reward,index) =>
       total += tokenPrice[rewardTokensSymbols[index]] * reward
     );
-    console.log("TEST totalRewardPerYear:",totalRewardPerYear);
 
     if(userPositions.length > 0)
     {
@@ -380,10 +374,10 @@ const getPool = async (library, account, poolId)=> {
 
 const getAllPools = async (library, account) => {
 
-  // return await axios.get(
-  //   // fetch valid pool list from remote
-  //   `http://localhost:3001/api/farm/getAllPools?account=${account}`
-  // ).then(res => res.data);
+  return await axios.get(
+    // fetch valid pool list from remote
+    `https://api.acy.finance/api/farm/getAllPools?account=${account}`
+  ).then(res => res.data).catch(e => console.log("error: ", e));
   const contract = getFarmsContract(library, account);
   const numPoolHex = await contract.numPools();
   const numPool = numPoolHex.toNumber();
