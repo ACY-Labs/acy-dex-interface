@@ -15,6 +15,9 @@ import gridView from '@/assets/icon_grid.svg';
 import moreBtn from '@/assets/icon_more.svg';
 import data from './projectdata';
 import ProjectsCard from "./components/ProjectsCard.js"
+import OngoingProjects from "./components/OngoingProjects.js"
+import MagicCard from "./components/MagicCard.js"
+import "./css/MagicCard.css"
 
 const { Meta } = Card;
 
@@ -396,10 +399,14 @@ const Pool = (props)=> {
         </div>
         <div className='ongoing-projects'>
           <div className='title'>Ongoing Projects</div>
-          <div>
-            <ProjectsCard ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT"/>
+          <div class='' style={{ zIndex: 1 }}>
+            <OngoingProjects />
+
+            {/* <ProjectsCard ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT"/> */}
           </div>
+  
         </div>
+        
       </div>
     )
 };
