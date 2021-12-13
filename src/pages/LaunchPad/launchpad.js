@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-indent */
 import React, { useState, useEffect } from 'react';
-import {Button, Menu, Dropdown, Icon, Progress, Alert, Table} from 'antd';
+import {Button, Menu, Dropdown, Icon, Progress, Tag, Table, Alert, Carousel} from 'antd';
+import * as moment from "moment";
 import Eth from "web3-eth";
 import Utils from "web3-utils";
 import { useWeb3React } from '@web3-react/core';
@@ -38,101 +39,46 @@ function getTIMESTAMP(time) {
     // return year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + seconds;
     return `${year}-${month}-${day}`;
 
-  }
+}
+
+const formatTIMESTAMP = (timestamp) => {
+    return moment(timestamp).format('YYYY-MM-DD hh:mm:ss');
+}
 
 const ACY_PRICE = 0.2  // acy per usdc
 
 const LaunchpadComponent = () => {
 
-    // let price = [];
     const recordNum = 10;
-    const [price,setPrice] = useState([]);
     const [chartData,setChartData] = useState([]);
-    const [timeData,setTimeData] = useState([]);
     const [pendingEnd,setPending]= useState(false);
     const [fetchEnd,setFetchEnd] = useState(false);
     const [transferData,setTransferData] = useState([]);
 
-    const getTime = async (blockNumber) => {
-
-        const result = await eth.getBlock(blockNumber).then(function(events){
-
-        const timeStamp = events['timestamp'];
-       // const time = new Date(timeStamp * 1000).toISOString().slice(0, 19).replace('T', ' ')
-        //console.log(time);
-        const time = getTIMESTAMP(timeStamp*1000);
-
-        return time;
-        })
-        
-        return result;
-        }                
-
-    useEffect(async() =>{
-         // price = [[blockNumber,value]]
-        //calculate the time then finally get  Time:value array
-
-        var index = price.length-1;
-        if(price[index] !== undefined)
-        {
-            getTime(price[index][0]).then(function(result){
-                var newElement = [result,price[index][1]];
-                setTimeData( timeData => [...timeData,newElement]);
-            })
+    const ellipsisCenter = (str, preLength=6, endLength=4, skipStr='...') => {
+        const totalLength = preLength + skipStr.length + endLength;
+        if (str.length > totalLength) {
+          return str.substr(0, preLength) + skipStr + str.substr(str.length-endLength, str.length);
         }
+        return str;
     }
-    , [price])
-
-    useEffect( async () => {
-        // set provider for all later instances to use    
-        const contract = new Contract(ERC20ABI, '0xaf9db9e362e306688af48c4acb9618c06db38ac3');
-            console.log("test");
-
-
-        const result = (contract.getPastEvents("Transfer", {
-            fromBlock: 0 ,
-            toBlock: 'latest'
-        }, function(error, events){ console.log(events); })
-        .then(function(events){
-            console.log(events.length) // same results as the optional callback above
-            // remaining some bug in some case ( if recodrNum > events.length)
-            for (let i = events.length  - recordNum; i < events.length; i++) {
-                var element = events[i];
-                var returnValue = element['returnValues'];
-                var blockNumber = element['blockNumber'];
-                //price.push([blockNumber,returnValue['value']/1e18]);
-                var newElement = [blockNumber,returnValue['value']/1e18];
-                //console.log(newElement)
-                setPrice( price => [...price,newElement] );
-
-            }
-        }));
-    },[])
       
-    useEffect(async () =>{
-        getTransferData().then((events) => {
-            console.log('getTransferData',events,events[0],events[1],events.length);
-            // const chartData = [];
-            // events.forEach( (element) => {
-            //     chartData.push([element.dateTime.substr(0,11),element.price]);
-            // });
-            // console.log('chartData:',chartData);
-            
-            //participant data progress
-            // console.log('test2');
-            // console.log(events[0][0]);
-            // for (let index = 0; index < events[0].length; index++) {
-            //     const element = events[0][index];
-            //     console.log('1111111111111111111111');
-            //     console.log(element.slice(5, element.length - 8));
-            // }
-
-
-            setTransferData(events[0]);
-            setChartData(events[1])
-        });
+    useEffect(async () => {      
+        const [newTransferData, newChartData] = await getTransferData();
         
-    },[])
+        // ellipsis center address
+        newTransferData.forEach(data => {
+            data['participant'] = ellipsisCenter(data['participant']);
+        })
+
+        // console.log('NewTransferData', newTransferData);
+        // console.log('NewChartData', newChartData);
+
+        newChartData.splice(0, newChartData.length - recordNum);
+        console.log(newChartData);
+        setTransferData(newTransferData);
+        setChartData(newChartData);
+    }, [])
 
     const links = [
         "https://google.com",
@@ -641,7 +587,7 @@ const LaunchpadComponent = () => {
             <div className={styles.bottomContainer}>
                 <div className={styles.chartWrapper} id="chartdata">
                     <LaunchChart  
-                      data={timeData}
+                      data={chartData}
                       showXAxis
                       showYAxis
                       showGradient
