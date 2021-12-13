@@ -119,7 +119,7 @@ const Farms = (props) => {
   const getDateYDM = (date) => {
     return date.getFullYear(date)  + "-" + ("0"+(date.getMonth(date)+1)).slice(-2) + "-" + ("0" + date.getDate(date)).slice(-2)
   }
-  const BLOCKS_PER_SEC = 15;
+  const BLOCKS_PER_SEC = 14;
   const getDHM = (sec) => {
     if(sec<0) return '00d:00h:00m';
     var diff = sec;
@@ -535,7 +535,6 @@ const Farms = (props) => {
             refreshHarvestHistory={refreshHarvestHistory}
             searchInput={searchInput}
             selectedTable={selectedTable}
-            tokenFilter={tokenFilter}
             isLoading={isLoadingPool || isLoadingBalance || isLoadingHarvest}
             activeEnded={activeEnded}
             // refreshPool={refreshPool}

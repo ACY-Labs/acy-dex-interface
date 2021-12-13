@@ -17,6 +17,7 @@ import {
 } from './SampleData.js';
 import { marketClient, fetchPoolsFromAccount } from './Data';
 import { WatchlistManager } from './WatchlistManager.js';
+import supportedTokens from '@/constants/TokenList';
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -42,6 +43,28 @@ let samplePositionData = [
     fees1: 44444444444,
   },
 ];
+function getLogoURIWithSymbol(symbol) {
+  for (let j = 0; j < supportedTokens.length; j++) {
+    if (symbol === supportedTokens[j].symbol) {
+      return supportedTokens[j].logoURI;
+    }
+  }
+  return null;
+}
+const BLOCKS_PER_SEC = 14;
+const getDHM = (sec) => {
+  if(sec<0) return '00d:00h:00m';
+  var diff = sec;
+  var days = 0, hrs = 0, min = 0, leftSec = 0;
+  diff = Math.floor(diff);
+  days = Math.floor(diff/(24*60*60));
+  leftSec = diff - days * 24*60*60;
+  hrs = Math.floor(leftSec/(60*60));
+  leftSec = leftSec - hrs * 60*60;
+  min = Math.floor(leftSec/(60));
+  return days.toString() + 'd:' + hrs.toString() + 'h:' + min.toString() +'m';
+
+}
 
 function PositionTable({ data }) {
   const [displayNumber, setDisplayNumber] = useState(10);
@@ -308,27 +331,34 @@ function AccountInfo(props) {
         // todo: needs to be change to the user in this webpage.
         const pools = (await getAllPools(library, account)).filter(pool => pool.hasUserPosition);
         const newFarmsContents = [];
-
+        const block = await library.getBlockNumber();
         // format pools data to the required format that the table can read.
         pools.forEach(pool => {
           const newFarmsContent = {
+            index: 0,
+            poolId: pool.poolId,
             lpTokens: pool.lpTokenAddress,
             token1: pool.token0Symbol,
-            token1Logo: null,
+            token1Logo: getLogoURIWithSymbol(pool.token0Symbol),
             token2: pool.token1Symbol,
-            token2Logo: null,
+            token2Logo: getLogoURIWithSymbol(pool.token1Symbol),
             pendingReward: pool.rewardTokensSymbols.map((token, index) => ({
               token,
               amount: pool.rewardTokensAmount[index],
             })),
-            totalApr: 89.02,
-            tvl: 144542966,
+            totalApr: pool.apr.toFixed(2),
+            tvl: pool.tvl.toFixed(2),
             hasUserPosition: pool.hasUserPosition,
             hidden: true,
+            userRewards: pool.rewards,
+            stakeData: pool.stakeData,
+            poolLpScore: pool.lpScore,
+            poolLpBalance: pool.lpBalance,
+            endsIn: getDHM((pool.endBlock - block) * BLOCKS_PER_SEC),
+            status: pool.endBlock - block > 0 
           };
           newFarmsContents.push(newFarmsContent);
         });
-
         setTableRow(newFarmsContents);
       };
 
@@ -472,20 +502,28 @@ function AccountInfo(props) {
         <h2>Farms</h2>
         <FarmsTable
           tableRow={tableRow}
-          onRowClick={onRowClick}
+          // onRowClick={onRowClick}
           tableTitle="User Farms"
           tableSubtitle="Stake your LP tokens and earn token rewards"
           rowNumber={rowNumber}
           setRowNumber={setRowNumber}
-          hideDao
+          hideDao={true}
           selectedTable={0}
-          tokenFilter={{ liquidityToken: true, btcEthToken: true }}
+          tokenFilter={false}
           setTokenFilter={() => {}}
           walletConnected={walletConnected}
           connectWallet={connectWallet}
           account={account}
           library={library}
           chainId={chainId}
+
+          isMyFarms={true}
+          harvestAcy={{myAll:[['0',0]],totalAll:[['0',0]]}}
+          balanceAcy={{myAcy:[['0',0]],totalAcy:[['0',0]]}}
+          refreshHarvestHistory={()=>{}}
+          searchInput={''}
+          isLoading={false}
+          activeEnded={true}
         />
       </div>
 
