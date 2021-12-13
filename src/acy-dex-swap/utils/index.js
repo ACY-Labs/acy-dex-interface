@@ -9,7 +9,8 @@ import { JSBI, Token, TokenAmount, Percent, ETHER, CurrencyAmount } from '@acysw
 import { abi as IUniswapV2Router02ABI } from '../abis/IUniswapV2Router02.json';
 import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import ERC20ABI from '../abis/ERC20.json';
-
+import tokenList from '@/constants/TokenList';
+import axios from 'axios';
 export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
 export const ROUTER_ADDRESS = '0x9c040CC3CE4B2C135452370Eed152A72ce5d5b18';
@@ -404,4 +405,28 @@ export function parseArbitrageLog({ data, topics }) {
     nonZeroToken,
     nonZeroTokenAmount,
   };
+}
+// pass token symbol
+export function getTokenPrice(symbol) {
+  const token = tokenList.find(token => token.symbol == symbol);
+  if(!token) return 0;
+  axios.get("https://api.coingecko.com/api/v3/simple/price?ids=shiba-inu&vs_currencies=usd")
+}
+export async function getAllSuportedTokensPrice() {
+  const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
+  const searchIds = searchIdsArray.join('%2C');
+  const tokensPrice = await axios.get(
+    `https://api.coingecko.com/api/v3/simple/price?ids=${searchIds}&vs_currencies=usd`
+    ).then(result =>{
+      console.log("tokensPrice search price result:",result.data)
+      const data = result.data;
+      const tokensPrice = {};
+      tokenList.forEach(token =>{
+        tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
+      })
+      tokensPrice['ACY'] = 1;//dont know acy price now;
+      console.log("tokensPrice:",tokensPrice);
+      return tokensPrice;
+    });
+  return tokensPrice;
 }

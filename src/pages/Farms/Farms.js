@@ -8,14 +8,14 @@ import TableControl from './TableControl';
 import SampleStakeHistoryData from './SampleDaoData';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { getAllPools, getHarvestHistory, getPool, getBalanceRecord, getDaoStakeRecord } from '@/acy-dex-swap/core/farms';
+import { getAllPools, getHarvestHistory, getPool, getBalanceRecord, getDaoStakeRecord, getPair } from '@/acy-dex-swap/core/farms';
 import supportedTokens from '@/constants/TokenList';
 import PageLoading from '@/components/PageLoading';
 import Eth from "web3-eth";
 import { Web3Provider } from "@ethersproject/providers";
 import {getTokenContract} from '@/acy-dex-swap/utils';
 import { parse } from 'path-to-regexp';
-
+import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils';
 const Farms = (props) => {
   // useWeb3React hook will listen to wallet connection.
   // if wallet is connected, account, chainId, library, and activate will not be not be undefined.
@@ -142,7 +142,8 @@ const Farms = (props) => {
   }
   const initDao = async (library, account) => {
     const dao = await getDaoStakeRecord(library, account);
-    console.log("getDaoStakeRecord:",dao)
+   
+    console.log("end initDao:")
     setDaoStakeRecord(dao);
   }
   // const initBalanceRecord = async (library, account) => {
@@ -159,6 +160,7 @@ const Farms = (props) => {
 
   const getPools = async (library, account) => {
     const pools = await getAllPools(library, account);
+    console.log("end get pools");
     const block = await library.getBlockNumber();
     const newFarmsContents = [];
     let ismyfarm = false;
@@ -175,8 +177,8 @@ const Farms = (props) => {
           token,
           amount: pool.rewardTokensAmount[index],
         })),
-        totalApr: 89.02,
-        tvl: 144542966,
+        totalApr: pool.apr.toFixed(2),
+        tvl: pool.tvl.toFixed(2),
         hasUserPosition: pool.hasUserPosition,
         hidden: true,
         userRewards: pool.rewards,
@@ -236,11 +238,11 @@ const Farms = (props) => {
         resultTotal[i][1] += resultTotal[i+1][1];
       }
       for(var i=0; i!=len-1 ; i++){
-        resultMy[i][1]    = resultMy[i+1][1];
-        resultTotal[i][1] = resultTotal[i+1][1];
+        resultMy[i][1]    = parseFloat(resultMy[i+1][1].toFixed(1));
+        resultTotal[i][1] = parseFloat(resultTotal[i+1][1].toFixed(1));
       }
-      resultMy[len-1][1]    = stakeACY.myAcy;
-      resultTotal[len-1][1] = stakeACY.totalAcy;
+      resultMy[len-1][1]    = parseFloat(stakeACY.myAcy.toFixed(1));
+      resultTotal[len-1][1] = parseFloat(stakeACY.totalAcy.toFixed(1));
       console.log("start setBalanceAcy");
       setBalanceAcy({
         myAcy: resultMy,
@@ -270,10 +272,13 @@ const Farms = (props) => {
      async () => {
       // automatically connect to wallet at the start of the application.
       connectWallet();
+      getAllSuportedTokensPrice();
       // account will be returned if wallet is connected.
       // so if account is present, retrieve the farms contract.
       if (account) {
         setWalletConnected(true);
+        const TEST_PAIR_ADDRESS = "0xB6b49d3Fbffc56F4a5721B13CE723aEf056A2286";
+        getPair(TEST_PAIR_ADDRESS,library,account,chainId);
         // console.log("start getPools");
         // getPools(library, account);
         // console.log("start initHarvestHistiry");
