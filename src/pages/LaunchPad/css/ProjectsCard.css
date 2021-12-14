@@ -506,13 +506,15 @@
     display: inline-block;
 	  font-size: 1em;
 	 padding: 1em 2em;
-   margin-right: 3em;
+   margin-right: 1em;
+   margin-bottom: 1em;
+   width: 200px;
 	 -webkit-appearance: none;
 	 appearance: none;
-	 background-color: #ff0081;
+	 background-color: none;
 	 color: #fff;
 	 border-radius: 4px;
-	 border: none;
+	 border: 2px solid #ef6eae;
 	 cursor: pointer;
 	 position: relative;
 	 transition: transform ease-in 0.1s, box-shadow ease-in 0.25s;
@@ -542,19 +544,19 @@
 .bubbly-button.animate::before {
   display: block;
   top: -75%;
-  background-image: radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, transparent 20%, #ff0081 20%, transparent 30%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, transparent 10%, #ff0081 15%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%);
+  background-image: radial-gradient(circle, #ef6eae 20%, transparent 20%), radial-gradient(circle, transparent 20%, #ff0081 20%, transparent 30%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, transparent 10%, #ff0081 15%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%);
   background-size: 10% 10%, 20% 20%, 15% 15%, 20% 20%, 18% 18%, 10% 10%, 15% 15%, 10% 10%, 18% 18%;
 }
 .bubbly-button.animate::after {
   display: block;
   bottom: -75%;
-  background-image: radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, transparent 10%, #ff0081 15%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%);
+  background-image: radial-gradient(circle, #ef6eae 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, transparent 10%, #ff0081 15%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%);
   background-size: 15% 15%, 20% 20%, 18% 18%, 20% 20%, 15% 15%, 10% 10%, 20% 20%;
   animation: bottomBubbles ease-in-out 0.75s infinite;
 }
 .bubbly-button:hover {
   transform: scale(0.9);
-  background-color: #e60074;
+  /* background-color: #e60074; */
   box-shadow: 0 2px 25px rgba(255, 0, 130, 0.2);
 }
 .bubbly-button.animate::before {
@@ -602,29 +604,44 @@
 	 font-size: 1em;
 	 padding: 1em 2em;
    margin-right: 1em;
+   margin-bottom: 1em;
 	 -webkit-appearance: none;
 	 appearance: none;
-	 background-color: #C6224E;
+	 background-color: none;
+   border: 2px solid #ef6eae;
 	 color: #fff;
 	 border-radius: 4px;
-	 border: none;
 	 cursor: pointer;
 	 position: relative;
 	 transition: transform ease-in 0.1s, box-shadow ease-in 0.25s;
-	 /* box-shadow: 0 2px 25px rgba(255, 0, 130, 0.5); */
+	 box-shadow: 0 2px 25px rgba(255, 0, 130, 0.5);
+   width: 180px;
 }
 
 .raise-button .inner-text{
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
 }
-
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 #ef6eae;
+ }
+}
 .raise-button .raise:hover,
 .raise-button .raise:focus {
-  box-shadow: 0 0.5em 1.5em -0.4em #C6224E;
-  transform: translateY(-0.4em);
+    transform: scale(0.9);
+    animation: pulse 1s;
+    border-radius: 0px;
+    box-shadow: 0 0 0 1.5em rgba(255, 255, 255, 0);
 }
+
+.inner-text{
+  justify-content: center;
+}
+
+
 
 /* Responsive */
 @media (max-width: 640px) {
