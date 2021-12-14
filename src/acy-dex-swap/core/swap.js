@@ -16,7 +16,7 @@ import {
 } from '@acyswap/sdk';
 
 import { BigNumber } from '@ethersproject/bignumber';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits, formatUnits } from '@ethersproject/units';
 import WETHABI from '../abis/WETH.json';
 import {
   CustomError,
@@ -30,6 +30,8 @@ import {
   INITIAL_ALLOWED_SLIPPAGE,
   isZero,
   ROUTER_ADDRESS,
+  withExactInEstimateOutAmount,
+  withExactOutEstimateInAmount
 } from '../utils';
 
 // get the estimated amount  of the other token required when swapping, in readable string.
@@ -271,15 +273,52 @@ export async function swapGetEstimated(
       setSwapButtonContent('tokens are same');
       return new CustomError('tokens are same');
     }
+    try {
+      if (exactIn) {
+
+        // update UI with estimated output token amount
+        const inToken0DecimalAmount = parseUnits(inToken0Amount, inToken0Decimal).toString()
+        let estimatedOutputAmount = await withExactInEstimateOutAmount(
+          inToken0DecimalAmount,
+          inToken0Address,
+          inToken1Address,
+          15,
+          library,
+          account)
+        estimatedOutputAmount = formatUnits(estimatedOutputAmount.allPathAmountOut, inToken1Decimal)
+
+        setToken1Amount(estimatedOutputAmount);
+      } else {
+        const inToken1DecimalAmount = parseUnits(inToken1Amount, inToken1Decimal).toString()
+        let estimatedInputAmount = await withExactOutEstimateInAmount(
+          inToken1DecimalAmount,
+          inToken0Address,
+          inToken1Address,
+          15,
+          library,
+          account).allPathAmountOut
+
+        estimatedInputAmount = formatUnits(estimatedInputAmount.allPathAmountOut, inToken0Decimal)
+
+        setToken0Amount(estimatedInputAmount);
+      }
+    }
+    catch (e) {
+      setSwapButtonState(false);
+      setSwapButtonContent("Cannot find arbitrage path");
+    }
+
+
     // get pair using our own provider
     const pair = await Fetcher.fetchPairData(token0, token1, library).catch(e => {
+
       return new CustomError(
-        `${token0.symbol} - ${token1.symbol} pool does not exist. Create one?`
+        `Swap w/ arbitrage`
       );
     });
     if (pair instanceof CustomError) {
-      setSwapButtonState(false);
-      setSwapButtonContent("pool doesn't exist");
+      setSwapButtonState(true);
+      setSwapButtonContent(pair.getErrorText());
       return pair;
     }
 
@@ -373,15 +412,42 @@ export async function swapGetEstimated(
       minAmountOut = trade.minimumAmountOut(allowedSlippage);
       slippageAdjustedAmount = minAmountOut.raw.toString();
 
+
+
       // update UI with estimated output token amount
-      setToken1Amount(trade.outputAmount.toFixed(6));
-      console.log(`Minimum received: ${slippageAdjustedAmount}`);
+      const inToken0DecimalAmount = parseUnits(inToken0Amount, inToken0Decimal).toString()
+      console.log("withExactInEstimateOutAmount")
+      let estimatedOutputAmount = await withExactInEstimateOutAmount(
+        inToken0DecimalAmount,
+        inToken0Address,
+        inToken1Address,
+        15,
+        library,
+        account)
+      console.log("estimatedOutputAmount")
+      console.log(estimatedOutputAmount)
+      estimatedOutputAmount = formatUnits(estimatedOutputAmount.allPathAmountOut, inToken1Decimal)
+
+      setToken1Amount(estimatedOutputAmount);
     } else {
       console.log(`By algorithm, expected to get: ${trade.inputAmount.toExact()}`);
       maxAmountIn = trade.maximumAmountIn(allowedSlippage);
       slippageAdjustedAmount = maxAmountIn.raw.toString();
-      setToken0Amount(trade.inputAmount.toFixed(6));
-      console.log(`Maximum pay: ${slippageAdjustedAmount}`);
+
+
+
+      const inToken1DecimalAmount = parseUnits(inToken1Amount, inToken1Decimal).toString()
+      let estimatedInputAmount = await withExactOutEstimateInAmount(
+        inToken1DecimalAmount,
+        inToken0Address,
+        inToken1Address,
+        15,
+        library,
+        account).allPathAmountOut
+
+      estimatedInputAmount = formatUnits(estimatedInputAmount.allPathAmountOut, inToken0Decimal)
+
+      setToken0Amount(estimatedInputAmount);
     }
 
     setSlippageAdjustedAmount(slippageAdjustedAmount);
@@ -419,8 +485,7 @@ export async function swapGetEstimated(
       // `Slippage tolerance : ${slippage}%`,
       `Price impact : ${priceImpactWithoutFee.toFixed(2)}%`,
       // `LP FEE : ${realizedLPFee?.toSignificant(6)} ${trade.inputAmount.currency.symbol}`,
-      `${exactIn ? 'Min received:' : 'Max sold'} : ${
-        exactIn ? minAmountOut.toSignificant(4) : maxAmountIn.toSignificant(4)
+      `${exactIn ? 'Min received:' : 'Max sold'} : ${exactIn ? minAmountOut.toSignificant(4) : maxAmountIn.toSignificant(4)
       } ${exactIn ? trade.outputAmount.currency.symbol : trade.inputAmount.currency.symbol}`,
     ];
 
