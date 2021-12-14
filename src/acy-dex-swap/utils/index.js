@@ -418,14 +418,12 @@ export async function getAllSuportedTokensPrice() {
   const tokensPrice = await axios.get(
     `https://api.coingecko.com/api/v3/simple/price?ids=${searchIds}&vs_currencies=usd`
     ).then(result =>{
-      console.log("tokensPrice search price result:",result.data)
       const data = result.data;
       const tokensPrice = {};
       tokenList.forEach(token =>{
         tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
       })
       tokensPrice['ACY'] = 1;//dont know acy price now;
-      console.log("tokensPrice:",tokensPrice);
       return tokensPrice;
     });
   return tokensPrice;

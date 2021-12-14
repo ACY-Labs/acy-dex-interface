@@ -11,6 +11,7 @@ import { now } from 'moment';
 import { connect } from 'umi';
 import moment from 'moment';
 import classNames from 'classnames';
+import axios from 'axios';
 
 
 const StakeModal = props => {
@@ -181,6 +182,13 @@ const StakeModal = props => {
           //   }).catch(e => console.log("error: ", e));
           // }
           //refresh poold info
+          axios.get(
+            // fetch valid pool list from remote
+            `https://api.acy.finance/api/farm/updatePool?poolId=${poolId}`
+          ).then(res => {
+            console.log("update pool on server return: ", res);
+          }).catch(e => console.log("error: ", e));
+
           await refreshPoolInfo();
           // clear top right loading spin
           const newData = transactions.filter(item => item.hash != status.hash);
