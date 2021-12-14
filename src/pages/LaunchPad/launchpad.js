@@ -396,11 +396,7 @@ const LaunchpadComponent = () => {
         </Menu>
     );
 
-    const [showForm, setShowForm] = useState(false);
     const [selectedForm, setSelectedForm] = useState(0)
-    const [selectedTab, setSelectedTab] = useState(0)
-    const [selectedTableRow, setSelectedTableRow] = useState(tableData[0])
-    const [showButton, setShowButton] = useState(false)
     
     return(
         <div className={styles.launchRoot}>
