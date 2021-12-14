@@ -51,7 +51,7 @@ const EndedProjects = ({ data }) => {
             zIndex: 1,
             display: 'flex',
             flexWrap: 'wrap',
-            gap: '40px',
+            gap: '20px',
             justifyContent: 'center',
           }}
         >
