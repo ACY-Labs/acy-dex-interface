@@ -98,9 +98,9 @@ const Pool = (props)=> {
                 <div className={styles.lineSeperator} />
               </div>
               <div className={styles.projectsContainer}>
-                <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT" />
-                <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT" />
-                <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT" />
+                <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT" isOngoing={true}/>
+                <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT" isOngoing={true}/>
+                <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT" isOngoing={true}/>
               </div>
             </div>
             <div className={styles.projectBoxes}>

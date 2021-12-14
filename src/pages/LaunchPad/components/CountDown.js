@@ -57,6 +57,13 @@ const CountDown = ({ ddl }) => {
     };
   }, []);
 
+  if (ddl == null) {
+    countTime.days = 0;
+    countTime.hours = 0;
+    countTime.min = 0;
+    countTime.sec = 0;
+  }
+
   return (
     <div className="countDown-container">
       <div className="countDown-box">
