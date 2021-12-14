@@ -266,44 +266,41 @@ const ChartCard = () => {
     );
 }
 
-const AllocationCard = ({ index, Component, select}) => {
-
-    const onMouseEnter = (event) => (event.currentTarget.style["z-index"] = 10);
-    const onMouseLeave = (event) => {
-      const target = event.currentTarget;
-      // Add a delay to leave enough time for the door to close
-      setTimeout(() => {
-        target.style["z-index"] = 1;
-      }, 1000);
-    };
-
-    return (
-        <div
-            className="allocationCard"
-            // onClick={() => select(index)}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-            style={{
-                background: 'rgba(255, 255, 255, 0.65)',
-                width: '64px',
-                height: '64px'
-            }}
-        >
-            <div class="cover"></div>
-            <Component size="0.6" />
-        </div>
-    )
-}
-
-const BaseCard = () => {
-    return (
-        <div style={{
-            background: 'white'
-        }}></div>
-    );
-}
-
 const AllocationPurchase = () => {
+
+    const BaseCard = () => {
+        return (
+            <div style={{
+                background: 'white'
+            }}></div>
+        );
+    }
+
+    const AllocationCard = ({ index, Component, select}) => {
+        
+        const [coverOpenState, setCoverOpenState] = useState(false);
+
+
+        const computeCoverClass = () => {
+            let classString = 'cover';
+            if(coverOpenState) {
+                classString += ' openCover';
+            }
+            return classString;
+        }
+
+        return (
+            <div
+                className="allocationCard"
+                onClick={() => {
+                    setCoverOpenState(true)
+                }}
+            >
+                <div class={computeCoverClass()}></div>
+                <Component size="0.6" />
+            </div>
+        )
+    }
 
     const allocationCards = () => {
         const cards = [];
@@ -330,9 +327,12 @@ const AllocationPurchase = () => {
             <div className="centerTitle">
                 <h2 style={{
                     textAlign: 'center',
-                    color: '#FFFFFF'
+                    color: '#FFFFFF',
+                    marginTop: '1.5rem'
                 }}>Purchase</h2>
             </div>
+
+
         </div>
     );
 }
