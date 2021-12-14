@@ -503,8 +503,9 @@
 .bubbly-button{
     text-align: center;
     display: inline-block;
-	 font-size: 1em;
+	  font-size: 1em;
 	 padding: 1em 2em;
+   margin-right: 4em;
 	 -webkit-appearance: none;
 	 appearance: none;
 	 background-color: #ff0081;
@@ -592,4 +593,34 @@
     background-position: 0% 90%, 20% 90%, 45% 70%, 60% 110%, 75% 80%, 95% 70%, 110% 10%;
     background-size: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
  }
+}
+/* Raise button */
+.raise-button .raise{
+  text-align: center;
+  display: inline-block;
+	 font-size: 1em;
+	 padding: 1em 2em;
+   margin-right: 1em;
+	 -webkit-appearance: none;
+	 appearance: none;
+	 background-color: #C6224E;
+	 color: #fff;
+	 border-radius: 4px;
+	 border: none;
+	 cursor: pointer;
+	 position: relative;
+	 transition: transform ease-in 0.1s, box-shadow ease-in 0.25s;
+	 /* box-shadow: 0 2px 25px rgba(255, 0, 130, 0.5); */
+}
+
+.raise-button .inner-text{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.raise-button .raise:hover,
+.raise-button .raise:focus {
+  box-shadow: 0 0.5em 1.5em -0.4em #C6224E;
+  transform: translateY(-0.4em);
 }
