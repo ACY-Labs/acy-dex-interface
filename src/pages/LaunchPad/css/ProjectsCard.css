@@ -526,7 +526,7 @@
 .bubbly-button:focus {
   outline: 0;
 }
-.bubbly-button:before, .bubbly-button:after {
+.bubbly-button::before, .bubbly-button::after {
   position: absolute;
   content: '';
   display: block;
@@ -537,31 +537,38 @@
   transition: all ease-in-out 0.5s;
   background-repeat: no-repeat;
 }
-.bubbly-button:before {
-  display: none;
+.bubbly-button.animate::before {
+  display: block;
   top: -75%;
   background-image: radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, transparent 20%, #ff0081 20%, transparent 30%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, transparent 10%, #ff0081 15%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%);
   background-size: 10% 10%, 20% 20%, 15% 15%, 20% 20%, 18% 18%, 10% 10%, 15% 15%, 10% 10%, 18% 18%;
 }
-.bubbly-button:after {
-  display: none;
+.bubbly-button.animate::after {
+  display: block;
   bottom: -75%;
   background-image: radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, transparent 10%, #ff0081 15%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%), radial-gradient(circle, #ff0081 20%, transparent 20%);
   background-size: 15% 15%, 20% 20%, 18% 18%, 20% 20%, 15% 15%, 10% 10%, 20% 20%;
+  animation: bottomBubbles ease-in-out 0.75s infinite;
 }
-.bubbly-button:active {
+.bubbly-button:hover {
   transform: scale(0.9);
   background-color: #e60074;
   box-shadow: 0 2px 25px rgba(255, 0, 130, 0.2);
 }
-.bubbly-button.animate:before {
+.bubbly-button.animate::before {
   display: block;
-  animation: topBubbles ease-in-out 0.75s forwards;
+  animation: topBubbles ease-in-out 0.75s infinite;
 }
-.bubbly-button.animate:after {
+.bubbly-button.animate::after {
   display: block;
-  animation: bottomBubbles ease-in-out 0.75s forwards;
+  animation: bottomBubbles ease-in-out 0.75s infinite;
 }
+
+.bubbly-button:hover{
+  color: white;
+}
+
+
 @keyframes topBubbles {
   0% {
     background-position: 5% 90%, 10% 90%, 10% 90%, 15% 90%, 25% 90%, 25% 90%, 40% 90%, 55% 90%, 70% 90%;

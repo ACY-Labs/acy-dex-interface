@@ -82,15 +82,15 @@ const Pool = (props)=> {
             Launching profitable projects on Multichain.
           </p>
           <div className={styles.buttonContainer}>
-            {/* <div>
-              <BubblyButton />
-            </div> */}
             <div>
+              <BubblyButton href={"https://forms.gle/gsLNsgDy2BXHNZda9"} className={styles.btnApply }/>
+            </div>
+            {/* <div>
               <a href="https://forms.gle/gsLNsgDy2BXHNZda9" className={styles.btnApply} target="_blank" rel="noreferrer">
                 <Icon type="rocket" style={{fontSize: '2em', margin: '0 10px 0 0'}} />
                 Apply for IDO
               </a>
-            </div>
+            </div> */}
             <div>
               <a href="https://t.me/acyfinance" className={styles.btnTelegram} target="_blank" rel="noreferrer">
                 <img src={telegramWIcon} alt="" style={{height:'1.4em', width:'1.5em', objectFit:'contain', fontSize: '1.5em', margin: '0 10px 0 0'}} />
