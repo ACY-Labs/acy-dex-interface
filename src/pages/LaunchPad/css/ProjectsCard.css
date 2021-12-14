@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600;700;800&display=swap');
 
 .projects-container {
   display: flex;
@@ -292,7 +292,7 @@
   font-size: 14px;
   width: fit-content;
   height: auto;
-  font-family: "Karla";
+  font-family: "Karla", sans-serif;
   font-weight: 600;
 }
 
@@ -487,7 +487,7 @@
   font-size: 14px;
   width: fit-content;
   height: auto;
-  font-family: "Karla";
+  font-family: "Karla", sans-serif;
   font-weight: 600;
 }
 
@@ -535,6 +535,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  font-family: "Karla", sans-serif;
 }
 
 .bubbly-button:focus {
@@ -626,6 +627,7 @@
 	 transition: transform ease-in 0.1s, box-shadow ease-in 0.25s;
 	 box-shadow: 0 2px 25px rgba(255, 0, 130, 0.5);
    width: 180px;
+   font-family: "Karla", sans-serif;
 }
 
 .raise-button .inner-text{
