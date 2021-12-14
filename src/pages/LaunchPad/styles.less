@@ -1499,6 +1499,13 @@
     align-items: center !important;
     flex-wrap: wrap !important;
 }
+@media (max-width: 640px) {
+    .buttonContainer{
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
 
 .btnApply{
     display: inline-flex;
@@ -2157,6 +2164,13 @@
     font-family: 'Source Sans 3', sans-serif;
 }
 
+@media (max-width: 640px) {
+    .anyStatusTitle{
+        width: 50%;
+        font-size: 1.125rem;
+    }
+}
+
 .lineSeperator{
     width: 100%;
     align-self: center;
@@ -2164,4 +2178,9 @@
     margin-top: 5px;
     border-bottom: 1px solid #b5b5b6;
     display: block;
+}
+@media (max-width: 640px) {
+    .lineSeperator{
+        width: 100%;
+    }
 }

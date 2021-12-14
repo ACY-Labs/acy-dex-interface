@@ -625,3 +625,19 @@
   box-shadow: 0 0.5em 1.5em -0.4em #C6224E;
   transform: translateY(-0.4em);
 }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .bubbly-button{
+      margin-right: 0;
+      width: 200px;
+      text-align: center;
+  }
+  .inner-text{
+    justify-content: center;
+  }
+  .raise-button .raise{
+    margin-right: 0;
+    width: 200px;
+  }
+}
