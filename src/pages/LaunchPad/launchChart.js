@@ -133,8 +133,8 @@ class launchChart extends Component {
       },
       xAxis: {
         show: showXAxis,
-       splitNumber: 5,
-       boundaryGap: false,
+        splitNumber: 5,
+        boundaryGap: false,
         data: dateList,
         // .map(function(item) {
         //   return item.slice(item.length - 2, item.length);
@@ -162,7 +162,7 @@ class launchChart extends Component {
           data: valueList,
           type: 'line',
           // symbol: 'none', //去掉折线图中的节点
-          smooth: true, //true 为平滑曲线，false为直线
+          smooth: false, //true 为平滑曲线，false为直线
           showSymbol: false, //是否默认展示圆点
           // symbol: 'image://data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7',     //设定为实心点
           // symbolSize: 2,   //设定实心点的大小

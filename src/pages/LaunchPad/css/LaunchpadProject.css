@@ -1,0 +1,199 @@
+.mainContainer {
+    width: 100%;
+    margin-inline: auto;
+    max-width: 1024px;
+    padding-inline: 1rem;
+    margin-top: 2.5px;
+    margin-bottom: 2.5px;
+    color:rgba(255, 255, 255, 0.96)
+}
+
+.flexContainer {
+    display: flex;
+    margin-top: 2.5rem;
+}
+
+.gridContainer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 1.25rem;
+}
+
+.leftGrid {
+    grid-column: span 1 / span 1;
+}
+
+.rightGrid {
+    grid-column: span 2 / span 2;
+}
+
+.circleBorderCard {
+    border-radius: 1rem;
+    background-color: #1a1d1c;
+    margin-top: 2rem;
+}
+
+.cardContent {
+    padding-inline-start: 2.25rem;
+    padding-inline-end: 2.25rem;
+    padding-top: 2rem;
+    padding-bottom: 2.5rem;
+}
+
+.tokenBanner {
+    width: 100%;
+    object-fit: cover;
+    object-position: center center;
+    height: auto;
+    border-radius: 16px;
+}
+
+.tokenLogo {
+    display: block;
+    width: 84px;
+    height: 84px;
+    border-radius: 2rem;
+    max-width: 100%;
+}
+
+.tokenInfo {
+    margin-left: 1.25rem;
+    overflow-wrap: break-word;
+}
+
+.tokenTitle {
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 2.25rem;
+    line-height: 1.2;
+    font-family: "Karla", sans-serif;
+    font-weight: 500;
+}
+
+.tokenLabelBar {
+    row-gap: 0.5rem;
+}
+
+.tokenLabel {
+    display: inline-flex;
+    vertical-align: top;
+    -webkit-box-align: center;
+    align-items: center;
+    max-width: 100%;
+    font-weight: 500;
+    line-height: 1.2;
+    outline: transparent solid 2px;
+    outline-offset: 2px;
+    min-height: 1.5rem;
+    min-width: 1.5rem;
+    font-size: 0.75rem;
+    border-radius: 20px;
+    padding-inline-start: 0.75rem;
+    padding-inline-end: 0.75rem;
+    background-color: #4b4f4e;
+    color: #ffffff;
+    margin: 0.25rem;
+}
+
+.procedure {
+    display: flex;
+    gap: 1rem;
+    position: relative;
+    overflow-wrap: break-word;
+}
+
+.verticalDivideLine {
+    opacity: 0.8;
+    border-image: initial;
+    border-color: inherit;
+    border-style: solid;
+    height: calc(100% + 30px);
+    top: 0px;
+    color: #eb5c1f;
+    width: 1px;
+    position: absolute;
+    left: 11px;
+}
+
+.procedureNumber {
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    flex-shrink: 0;
+    -webkit-box-flex: 0;
+    flex-grow: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 10000px;
+    background-color: #eb5c1f;
+    z-index: 1;
+    color: #010101;
+}
+
+.shortText {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.progressHeader {
+    display: flex;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
+}
+
+.progressBar {
+    overflow: hidden;
+    position: relative;
+    height: 0.5rem;
+    border-radius: 10000px;
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.progressBarLight {
+    height: 100%;
+    background-color: #eb5c1f;
+    border-radius: 10000px;
+}
+
+.progressAmount {
+    display: flex;
+    -webkit-box-pack: end;
+    justify-content: flex-end;
+}
+
+.keyinfoRow {
+    display: flex;
+    -webkit-box-pack: justify;
+    justify-content: space-between;
+}
+
+.keyinfoName {
+    opacity: 0.5;
+    font-size: 0.875rem;
+}
+
+.projectDescription {
+    opacity: 0.75;
+    line-height: 1.5rem;
+    margin-top: 2rem;
+}
+
+.allocationContainer {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    row-gap: 24px;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+@media screen and (max-width: 1060px) {
+    .gridContainer {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+    }
+}

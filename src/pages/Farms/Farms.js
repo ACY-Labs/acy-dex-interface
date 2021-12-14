@@ -160,6 +160,7 @@ const Farms = (props) => {
 
   const getPools = async (library, account) => {
     const pools = await getAllPools(library, account);
+    console.log("TEST getAllPools",pools);
     console.log("end get pools");
     const block = await library.getBlockNumber();
     const newFarmsContents = [];
@@ -175,7 +176,7 @@ const Farms = (props) => {
         token2Logo: getLogoURIWithSymbol(pool.token1Symbol),
         pendingReward: pool.rewardTokensSymbols.map((token, index) => ({
           token,
-          amount: pool.rewardTokensAmount[index],
+          amount: pool.rewardTokensAmount[index].toString(),
         })),
         totalApr: pool.apr.toFixed(2),
         tvl: pool.tvl.toFixed(2),

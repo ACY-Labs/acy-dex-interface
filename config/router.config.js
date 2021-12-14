@@ -77,6 +77,10 @@ export default [
             path: '/launchpad/project',
             component: './LaunchPad/launchpad',
           },
+          {
+            path: '/launchpad/newproject',
+            component: './LaunchPad/LaunchpadProject'
+          }
         ],
       },
       {
