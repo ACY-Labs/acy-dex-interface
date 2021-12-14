@@ -42,10 +42,12 @@ const IncomingProjects = ({ data }) => {
   }, []);
 
   const [isActiveUpcoming, setIsActiveUpcoming] = useState(false);
+  const [isIncomingExpanded, setisIncomingExpanded] = useState(false);
+
   return (
     <div className={isActiveUpcoming ? 'incoming-container active' : 'incoming-container'}>
       <div
-        className="expanding-card"
+        className={isIncomingExpanded ? "expanded expanding-card" : "expanding-card" }
         style={{
           zIndex: 1,
           display: 'flex',
@@ -53,10 +55,11 @@ const IncomingProjects = ({ data }) => {
           gap: '20px',
           justifyContent: 'center',
         }}
+        
       >
         <div className="cards">
           <div className=" card [ is-collapsed ]">
-            <div className="card__inner [ js-expander ]">
+            <div className="card__inner [ js-expander ]" onClick={() => setisIncomingExpanded(!isIncomingExpanded)}>
               <div className="">
                 <ProjectsCard
                   ddl="2021/12/17 00:00:00"
@@ -75,26 +78,7 @@ const IncomingProjects = ({ data }) => {
         </div>
         <div className="cards">
           <div className=" card [ is-collapsed ]">
-            <div className="card__inner [ js-expander ] ">
-              <div className="">
-                <ProjectsCard
-                  ddl="2021/12/17 00:00:00"
-                  raise="250,000 USDT"
-                  sales="1,000,000 ACY"
-                  rate="1ACY = 0.2USDT"
-                />
-              </div>
-              {/* <i className="fa fa-folder-o" /> */}
-            </div>
-            <div className="card__expander card-middle">
-              {/* <i className="fa fa-close [ js-collapser ]" /> */}
-              Expander
-            </div>
-          </div>
-        </div>
-        <div className="cards">
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ]">
+            <div className="card__inner [ js-expander ]" onClick={() => setisIncomingExpanded(!isIncomingExpanded)}>
               <div className="">
                 <ProjectsCard
                   ddl="2021/12/17 00:00:00"
@@ -112,8 +96,8 @@ const IncomingProjects = ({ data }) => {
           </div>
         </div>
         <div className="cards">
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ]">
+          <div className=" card [ is-collapsed ]">
+            <div className="card__inner [ js-expander ]" onClick={() => setisIncomingExpanded(!isIncomingExpanded)}>
               <div className="">
                 <ProjectsCard
                   ddl="2021/12/17 00:00:00"
@@ -131,8 +115,8 @@ const IncomingProjects = ({ data }) => {
           </div>
         </div>
         <div className="cards">
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ]">
+          <div className=" card [ is-collapsed ]">
+            <div className="card__inner [ js-expander ]" onClick={() => setisIncomingExpanded(!isIncomingExpanded)}>
               <div className="">
                 <ProjectsCard
                   ddl="2021/12/17 00:00:00"
@@ -150,8 +134,8 @@ const IncomingProjects = ({ data }) => {
           </div>
         </div>
         <div className="cards">
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ]">
+          <div className=" card [ is-collapsed ]">
+            <div className="card__inner [ js-expander ]" onClick={() => setisIncomingExpanded(!isIncomingExpanded)}>
               <div className="">
                 <ProjectsCard
                   ddl="2021/12/17 00:00:00"
@@ -169,8 +153,8 @@ const IncomingProjects = ({ data }) => {
           </div>
         </div>
         <div className="cards">
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ]">
+          <div className=" card [ is-collapsed ]">
+            <div className="card__inner [ js-expander ]" onClick={() => setisIncomingExpanded(!isIncomingExpanded)}>
               <div className="">
                 <ProjectsCard
                   ddl="2021/12/17 00:00:00"
@@ -188,8 +172,8 @@ const IncomingProjects = ({ data }) => {
           </div>
         </div>
         <div className="cards">
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ]">
+          <div className=" card [ is-collapsed ]">
+            <div className="card__inner [ js-expander ]" onClick={() => setisIncomingExpanded(!isIncomingExpanded)}>
               <div className="">
                 <ProjectsCard
                   ddl="2021/12/17 00:00:00"
@@ -207,8 +191,8 @@ const IncomingProjects = ({ data }) => {
           </div>
         </div>
         <div className="cards">
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ]">
+          <div className=" card [ is-collapsed ]">
+            <div className="card__inner [ js-expander ]" onClick={() => setisIncomingExpanded(!isIncomingExpanded)}>
               <div className="">
                 <ProjectsCard
                   ddl="2021/12/17 00:00:00"
@@ -225,6 +209,26 @@ const IncomingProjects = ({ data }) => {
             </div>
           </div>
         </div>
+        <div className="cards">
+          <div className=" card [ is-collapsed ]">
+            <div className="card__inner [ js-expander ]" onClick={() => setisIncomingExpanded(!isIncomingExpanded)}>
+              <div className="">
+                <ProjectsCard
+                  ddl="2021/12/17 00:00:00"
+                  raise="250,000 USDT"
+                  sales="1,000,000 ACY"
+                  rate="1ACY = 0.2USDT"
+                />
+              </div>
+              {/* <i className="fa fa-folder-o" /> */}
+            </div>
+            <div className="card__expander">
+              <i className="fa fa-close [ js-collapser ]" />
+              Expander
+            </div>
+          </div>
+        </div>
+        
       </div>
       <a className="see-more-incoming" onClick={() => setIsActiveUpcoming(!isActiveUpcoming)} />
     </div>

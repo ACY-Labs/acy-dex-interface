@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from '../css/ExpandingCard.css';
 import '../css/ProjectsCard.css';
 import { useEffect } from 'react';
 import $ from 'jquery';
@@ -40,10 +39,12 @@ const ExpandingCard = ({ data }) => {
       $cell.not($thisCell).removeClass('is-inactive');
     });
   }, []);
+  const [isIncomingExpanded, setisIncomingExpanded] = useState(false)
+
   return (
-    <div className="expanding-card" style={{ zIndex: 1, display: 'flex', flexWrap: "wrap", gap: '5px' }}>
+    <div className={isIncomingExpanded ? "expanding-card" : "expanding-card expanded" } style={{ zIndex: 1, display: 'flex', flexWrap: "wrap", gap: '5px' }}>
       <div className="cards">
-        <div className=" card [ is-collapsed ]">
+        <div className=" card [ is-collapsed ]" onClick={setisIncomingExpanded(!isIncomingExpanded)}>
           <div className="card__inner [ js-expander ]">
             <div className="">
               <ProjectsCard
