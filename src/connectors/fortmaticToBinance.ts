@@ -4,8 +4,7 @@
 import { ConnectorUpdate } from '@web3-react/types'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import invariant from 'tiny-invariant'
-import Fortmatic from 'fortmatic';
-import Web3 from 'web3';
+
 
 const BSCOptions_main = {
   /* Smart Chain mainnet RPC URL */
