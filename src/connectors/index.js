@@ -8,6 +8,9 @@ import { LedgerConnector } from '@web3-react/ledger-connector';
 import { TrezorConnector } from '@web3-react/trezor-connector';
 import { BscConnector } from '@binance-chain/bsc-connector';
 
+import { FortmaticConnector_test} from './fortmaticToBinance'
+import { PortisConnector_test} from './portisToBinance'
+
 const RPC_URLS = {
   1: 'https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
   4: 'https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
@@ -30,20 +33,32 @@ const walletlink = new WalletLinkConnector({
   appName: 'ACY swap',
   supportedChainIds: [1, 3, 4, 5, 42, 10, 137, 69, 420, 80001, 56, 97],
 });
-const fortmatic = new FortmaticConnector({ 
+/*const fortmatic = new FortmaticConnector({ 
   apiKey: 'pk_test_1897AD5B792BA339', 
   //rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/', 
-  chainId: 4
+  chainId: 4,
+});*/
+
+const fortmatic = new FortmaticConnector_test({ 
+  apiKey: 'pk_test_1897AD5B792BA339', 
+  //rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/', 
+  chainId: 97,
 });
 
 const portisToBinanceTest = { //useless
   nodeUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545',
-  chainId: 97,
+  chainId: 4,
 };
-const portis = new PortisConnector({
+/*const portis = new PortisConnector({
   dAppId: 'c474625b-8239-4ce8-ab42-bd16489873c3',
   networks: [4], // uses mainet by default
+});*/
+
+const portis = new PortisConnector_test({
+  dAppId: 'c474625b-8239-4ce8-ab42-bd16489873c3',
+  networks: [97], // uses mainet by default
 });
+
 // const torus = new TorusConnector({ chainId: 4, initOptions: { network: { host: 'rinkeby' } } });
 
 const torus = new TorusConnector({ chainId: 97, initOptions: { network: { host: 'https://data-seed-prebsc-1-s1.binance.org:8545', chainId: 97, networkName: 'Binance Smart Chain Testnet' } } });
