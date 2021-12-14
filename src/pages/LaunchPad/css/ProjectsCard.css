@@ -252,7 +252,7 @@
 
 .incoming-container .expanding-card {
   position: relative;
-  height: calc(2 * (200px + 20px));
+  height: calc(2 * (220px + 20px));
   overflow: hidden;
 }
 
