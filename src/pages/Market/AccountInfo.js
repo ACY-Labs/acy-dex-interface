@@ -19,6 +19,15 @@ import { marketClient, fetchPoolsFromAccount } from './Data';
 import { WatchlistManager } from './WatchlistManager.js';
 import supportedTokens from '@/constants/TokenList';
 import PageLoading from '@/components/PageLoading';
+import axios from "axios";
+import {
+  getTokenContract,
+  getUserTokenBalanceRaw,
+  getTokenTotalSupply,
+  approveTokenWithSpender,
+  getAllSuportedTokensPrice,
+} from '@/acy-dex-swap/utils/index';
+import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -312,6 +321,16 @@ function AccountInfo(props) {
   const [isLoadingHarvest, setIsLoadingHarvest] = useState(true);
   const [isLoadingBalance, setIsLoadingBalance] = useState(true);
 
+
+  //Wallet State Value Store
+  const [userLiquidityOwn,setOwn] = useState(0);
+  const [userLiquidityEarn,setEarn] = useState(0);
+
+  const [userLPHandlers, setUserLPHandlers] = useState([]);
+  // const [userLPData, setUserLPData] = useState([]); // fetch a list of valid pool from backend
+  const [userLPShares, setUserLPShares] = useState([]);
+
+
   const injected = new InjectedConnector({
     supportedChainIds: [1, 3, 4, 5, 42, 56, 97, 80001],
   });
@@ -463,6 +482,153 @@ function AccountInfo(props) {
     [dynamicPositions]
   );
 
+  // calculate the UserLiquidityOwn --------------------------------------------------------------------------------------------------------------
+  const getValidPoolList = (account) => {
+    // setLoading(true);
+ 
+
+
+    console.log("fetching user pool list");
+    axios.get(
+      // fetch valid pool list from remote
+      // `https://api.acy.finance/api/pool?chainId=${chainId}`
+      // `https://api.acy.finance/api/userpool?walletId=${account}`
+      `http://localhost:3001/api/userpool?walletId=${account}`
+    ).then(async res => {
+      console.log("fetch pool data");
+      console.log(res.data);
+
+      const tokens = supportedTokens;
+
+      // construct pool list locally
+      const pools = res.data.pools;
+      const fetchTask = [];
+      for (let pairAddr of pools) {
+        const token0addr = supportedTokens.findIndex(item => item.address === pairAddr.token0);
+        const token1addr = supportedTokens.findIndex(item => item.address === pairAddr.token1);
+
+        const { address: token0Address, symbol: token0Symbol, decimals: token0Decimal } = tokens[token0addr];
+        const { address: token1Address, symbol: token1Symbol, decimals: token1Decimal } = tokens[token1addr];
+        const token0 = new Token(chainId, token0Address, token0Decimal, token0Symbol);
+        const token1 = new Token(chainId, token1Address, token1Decimal, token1Symbol);
+
+        // queue get pair task
+        const pair = Fetcher.fetchPairData(token0, token1, library);
+        fetchTask.push(pair);
+        console.log("adding task to array")
+      }
+      const pairs = await Promise.allSettled(fetchTask);
+      console.log("fetched pairs", pairs);
+
+      const LPHandlers = pairs.map(pair => pair.value);
+      setUserLPHandlers(LPHandlers);
+      console.log("userLPHandlers is updated with length", LPHandlers.length);      
+
+    }).catch(e => console.log("error: ", e));
+  }
+
+  async function getUserPoolShare() {
+
+    const fetchPoolShare = async (pair) => {
+      console.log("poolToken,", pair.liquidityToken)
+      let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
+      if (userPoolBalance.isZero()) {
+        console.log("zero balance, discard");
+        return {};
+      }
+
+      userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
+
+      const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
+
+      const tokenPrice = await getAllSuportedTokensPrice();
+
+      // console.log(tokenPrice['ETH']);
+      const token0Deposited = pair.getLiquidityValue(
+        pair.token0,
+        totalSupply,
+        userPoolBalance,
+        false
+      );
+      const token1Deposited = pair.getLiquidityValue(
+        pair.token1,
+        totalSupply,
+        userPoolBalance,
+        false
+      );
+
+      const poolTokenPercentage = new Percent(userPoolBalance.raw, totalSupply.raw).toFixed(4);
+
+      const newData = {
+        token0Amount: `${token0Deposited.toSignificant(4)}`,
+        token0Symbol: `${pair.token0.symbol}`,
+        token1Amount: `${token1Deposited.toSignificant(4)}`,
+        token1Symbol: `${pair.token1.symbol}`,
+
+        share: `${poolTokenPercentage}%`,
+      };
+      // console.log(tokenPrice[newData.token0Symbol]);
+      //calculate user own in the same time
+      // const token0value = tokenPrice[newData.token0Symbol] * newData.token0Amount;
+      // const token1value = tokenPrice[newData.token1Symbol] * newData.token1Amount;
+      console.log("new data value:");
+      const valueSum = tokenPrice[newData.token0Symbol] * newData.token0Amount +   tokenPrice[newData.token1Symbol] * newData.token1Amount;
+      setOwn(prev => (prev + valueSum));
+
+
+      console.log("userLPShares is updated: ", newData);
+
+      setUserLPShares(prev => ({ ...prev, [pair.liquidityToken.address]: newData }));
+      console.log("UserLP infomation:");
+    }
+
+    (async () => { for (let pair of userLPHandlers) fetchPoolShare(pair); })();
+
+  }
+
+  useEffect(async () => {
+    const token0list = [];
+    const token1list = [];
+    console.log("fetching the poolvalume data");
+    // axios.get(
+    //   // fetch valid pool list from remote
+    //   // `https://api.acy.finance/api/pool?chainId=${chainId}`
+    //   // `https://api.acy.finance/api/poolchart/all`
+    //   `http://localhost:3001/api/poolchart/all`
+    // ).then(async res => {
+    //   console.log(res);
+    //   console.log("test=====");
+    //   console.log(res.data);
+    //   for (let index = 0; index < array.length; index++) {
+    //     const element = array[index];
+        
+    //   }
+    // }).catch( err => {
+    //   console.log(err);
+    // });
+  }, [])
+
+  useEffect(async () => {
+    connectWallet();
+    console.log("the user address is :" + account);    
+    console.log("fetching the user pairs information");
+
+    getValidPoolList(account);
+      
+  
+    
+  },[account]);
+
+  useEffect(
+    async () => {
+      if (!chainId || !library || !account || !userLPHandlers) return;
+      console.log("getting user liquidity")
+      await getUserPoolShare();
+    },
+    [chainId, library, account, userLPHandlers]
+  );
+
+
   return (
 
     <div className={styles.marketRoot}>
@@ -555,7 +721,7 @@ function AccountInfo(props) {
               {positionValue
                 ? formattedNum(positionValue, true)
                 : positionValue === 0
-                ? formattedNum(0, true)
+                ? formattedNum(userLiquidityOwn, true)
                 : '-'}
             </div>
           </div>
@@ -563,7 +729,7 @@ function AccountInfo(props) {
           <div className={styles.walletStatEntry}>
             <div className={styles.walletStatIndicator}>Fees earned (cumulative)</div>
             <div className={styles.walletStatValue} style={{ color: 'greenyellow' }}>
-              {aggregateFees ? formattedNum(aggregateFees, true, true) : '-'}
+              {aggregateFees ? formattedNum(aggregateFees, true, true) : userLiquidityEarn}
             </div>
           </div>
         </div>

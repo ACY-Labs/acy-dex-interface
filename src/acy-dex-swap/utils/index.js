@@ -425,7 +425,7 @@ export async function getAllSuportedTokensPrice() {
         tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
       })
       tokensPrice['ACY'] = 1;//dont know acy price now;
-      console.log("tokensPrice:",tokensPrice);
+      // console.log("tokensPrice:",tokensPrice);
       return tokensPrice;
     });
   return tokensPrice;
