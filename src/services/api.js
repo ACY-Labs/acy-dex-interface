@@ -1,5 +1,6 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
+import r from 'umi-request';
 
 export async function queryProjectNotice() {
   return request('/api/project/notice');
@@ -123,4 +124,30 @@ export async function queryNotices(params = {}) {
 
 export async function getFakeCaptcha(mobile) {
   return request(`/api/captcha?mobile=${mobile}`);
+}
+
+export async function requireAllocation(walletId, projectToken) {
+  return r.get(`/api/launch/allocation/require`, {
+    params: {
+      walletId: walletId,
+      projectToken: projectToken
+    }
+  })
+}
+
+export async function getAllocationInfo(walletId, projectToken) {
+  return r.get(`/api/launch/allocation`, {
+    params: {
+      walletId: walletId,
+      projectToken: projectToken
+    }
+  })
+}
+
+export async function getProjects() {
+  return r.get(`/api/launch/projects`)
+}
+
+export async function getProjectInfo(projectId) {
+  return r.get(`/api/launch/projects/${projectId}`)
 }
