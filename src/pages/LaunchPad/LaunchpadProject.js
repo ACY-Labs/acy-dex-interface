@@ -34,7 +34,7 @@ const props= {
     ]
 }
 
-const TokenBanner = (posterSource) => {
+const TokenBanner = () => {
     return (
         <video 
             autoplay="" 
@@ -110,33 +110,30 @@ const TokenProcedure = () => {
     const Progress = ({salePercentage, alreadySale, totalSale, projectToken}) => {
         
         const progressStyle = {
-            width: props.salePercentage + '%'
+            width: {salePercentage} + '%'
         }
 
         return (
             <>
-                <div className="cardContent" style={{
-                    background: '#0f0f0f',
-                    borderRadius: '0rem 0rem 1rem 1rem'
-                }}>
+                <div className="cardContent" style={{background: '#0f0f0f', borderRadius: '0rem 0rem 1rem 1rem'}}>
                     <div className="progressHeader">
                         <p>Sale Progress</p>
-                        <p style={{
-                            color: '#eb5c1f'
-                        }}>{props.salePercentage}%</p>
+                        <p style={{color: '#eb5c1f'}}>
+                            {salePercentage}%
+                        </p>
                     </div>
                     <div className="progressBar">
                         <div 
-                            className="progressBarLight"
-                            aria-aria-valuemin="0"
-                            aria-valuemax="100"
-                            aria-valuenow={props.salePercentage}
-                            role="progressbar"
-                            style={progressStyle}
+                          className="progressBarLight"
+                          aria-aria-valuemin="0"
+                          aria-valuemax="100"
+                          aria-valuenow={salePercentage}
+                          role="progressbar"
+                          style={progressStyle}
                         />
                     </div>
                     <div className="progressAmount">
-                        <div>{`${props.alreadySale} / ${props.totalSale} ${props.projectToken}`}</div>
+                        <div>{`${alreadySale} / ${totalSale} ${projectToken}`}</div>
                     </div>
                 </div>
             </>
@@ -162,7 +159,7 @@ const KeyInformation = (projectToken, totalSale, tokenPrice) => {
             </div>
 
             <div className="keyinfoRow" style={{marginTop: '1rem'}}>
-                <div className="keyinfoName">Total Raises</div>
+                <div className="keyinfoName">Total Raise</div>
                 <div>{totalSale} {projectToken}</div>
             </div>
 
@@ -174,7 +171,7 @@ const KeyInformation = (projectToken, totalSale, tokenPrice) => {
     );
 }
 
-const ProjectDescription = (projectDescription) => {
+const ProjectDescription = () => {
 
     return (
         <div className="circleBorderCard cardContent">
@@ -256,20 +253,20 @@ const ChartCard = () => {
     return (
         <div className="circleBorderCard cardContent">
             <LaunchChart  
-                data={chartData}
-                showXAxis
-                showYAxis
-                showGradient
-                lineColor="#e29227"
-                bgColor="#2f313500"
+              data={chartData}
+              showXAxis
+              showYAxis
+              showGradient
+              lineColor="#e29227"
+              bgColor="#2f313500"
             />
             <Table
-                style={{marginTop:'20px',textAlign:'center', height: '400px'}}
-                id="transferTable"
-                columns={transferTableHeader} 
-                dataSource={transferData}
-                pagination={false}
-                scroll={{ y: 400 }}
+              style={{ marginTop:'20px',textAlign:'center', height: '400px' }}
+              id="transferTable"
+              columns={transferTableHeader} 
+              dataSource={transferData}
+              pagination={false}
+              scroll={{ y: 400 }}
             />  
         </div>
     );
@@ -313,10 +310,7 @@ const AllocationCard = ({
     }
 
     return (
-        <div
-            className="allocationCard"
-            onClick={clickCover}
-        >
+        <div className="allocationCard" onClick={clickCover}>
             <div class={computeCoverClass()}>{index+1}</div>
             <Component />
         </div>
@@ -342,9 +336,7 @@ const Allocation = ({walletId, projectToken}) => {
     // TODO: replace with 24 icon
     const BaseCard = () => {
         return (
-            <div style={{
-                background: 'white'
-            }}></div>
+            <div style={{background: 'white' }} />
         );
     }
 
@@ -354,12 +346,12 @@ const Allocation = ({walletId, projectToken}) => {
         for(let i = 0; i < 24; i++) {
             cards.push(
                 <AllocationCard 
-                    index={i} 
-                    Component={BaseCard} 
-                    allocationAmount={allocationAmount}
-                    setAllocationAmount={setAllocationAmount}
-                    walletId={walletId}
-                    projectToken={project}
+                  index={i} 
+                  Component={BaseCard} 
+                  allocationAmount={allocationAmount}
+                  setAllocationAmount={setAllocationAmount}
+                  walletId={walletId}
+                  projectToken={project}
                 />
             )
         }
@@ -369,10 +361,9 @@ const Allocation = ({walletId, projectToken}) => {
     return (
         <div className="cardContent">
             <div className="centerTitle">
-                <h2 style={{
-                    textAlign: 'center',
-                    color: '#FFFFFF'
-                }}>Allocation</h2>
+                <h2 style={{ textAlign: 'center',color: '#FFFFFF'}}>
+                    Allocation
+                </h2>
             </div>
             <div className="allocationContainer">
                 {allocationCards()}
@@ -386,11 +377,11 @@ const CardArea = () => {
         <div className="gridContainer">
             <div className="leftGrid">
                 <TokenProcedure />
-                <KeyInformation />
+                <KeyInformation projectToken={props.projectToken} totalSale={props.totalSale} tokenPrice={props.tokenPrice} />
             </div>
             <div className="rightGrid">
                 <div className="circleBorderCard">
-                    <Allocation walletId="1234" projectToken="ACY"/>
+                    <Allocation walletId="1234" projectToken="ACY" />
                 </div>
                 <ProjectDescription />
                 <ChartCard />
@@ -438,7 +429,7 @@ const LaunchpadProject = () => {
     return(
         <div className="mainContainer">
             <TokenBanner />
-            <TokenLogoLabel />
+            <TokenLogoLabel title={props.title} />
             <CardArea />
         </div>
     );
