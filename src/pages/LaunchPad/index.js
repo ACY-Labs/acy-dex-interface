@@ -16,7 +16,10 @@ import ExpandingCard from "./components/ExpandingCard.js"
 import EndedProjects from "./components/EndedProjects.js"
 import BubblyButton from "./components/BubblyButton.js"
 import RaiseButton from "./components/RaiseButton.js"
+import AlocationIcon from "./components/AllocationIcon"
+import apple from "@/assets/lottie/apple.json"
 import $ from 'jquery';
+import AllocationIcon from './components/AllocationIcon';
 
 const { Meta } = Card;
 
@@ -122,6 +125,9 @@ const Pool = (props)=> {
               </div>
             </div>
           </section>
+          <div style={{width: "100px", height: "100px", backgroundColor: "white"}}>
+            <AllocationIcon play={true} url={ apple} id="apple"/>
+          </div>
         </div>
         
       </div>
