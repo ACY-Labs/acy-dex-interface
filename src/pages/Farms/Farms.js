@@ -165,6 +165,7 @@ const Farms = (props) => {
     const block = await library.getBlockNumber();
     const newFarmsContents = [];
     let ismyfarm = false;
+    console.log("GETALLPOOLS:",pools);
     pools.forEach((pool,idx) => {
       const newFarmsContent = {
         index: idx,
@@ -187,7 +188,9 @@ const Farms = (props) => {
         poolLpScore: pool.lpScore,
         poolLpBalance: pool.lpBalance,
         endsIn: getDHM((pool.endBlock - block) * BLOCKS_PER_SEC),
-        status: pool.endBlock - block > 0 
+        status: pool.endBlock - block > 0,
+        ratio: pool.ratio,
+        endAfter: (pool.endBlock - block) * BLOCKS_PER_SEC,
       };
       if(newFarmsContent.poolId == 0) {
         // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));
