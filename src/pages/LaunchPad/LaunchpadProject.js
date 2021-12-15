@@ -40,16 +40,17 @@ const TokenBanner = () => {
     )
 }
 
-const TokenLogoLabel = () => {
+const TokenLogoLabel = ({title}) => {
     return (
         <div className="flexContainer">
             <img 
-                className="tokenLogo"
-                src="https://files.krystal.app/krystalGo/acy-avatar.svg" 
-                loading="eager" 
+              className="tokenLogo"
+              alt=""
+              src="https://files.krystal.app/krystalGo/acy-avatar.svg" 
+              loading="eager" 
             />
             <div className="tokenInfo">
-                <h2 className="tokenTitle">{props.title}</h2>
+                <h2 className="tokenTitle">{title}</h2>
                 <div className="tokenLabelBar">
                     {
                         props.tokenLabels.map((label) => 
@@ -98,7 +99,7 @@ const TokenProcedure = () => {
         );
     }
 
-    const Progress = () => {
+    const Progress = ({salePercentage, alreadySale, totalSale, projectToken}) => {
         
         const progressStyle = {
             width: props.salePercentage + '%'
@@ -139,33 +140,33 @@ const TokenProcedure = () => {
             padding: 0
         }}>
             <Procedure />
-            <Progress />
+            <Progress salePercentage={props.salePercentage} alreadySale={props.alreadySale} totalSale={props.totalSale} projectToken={props.projectToken} />
         </div>
     )
 }
 
-const KeyInformation = () => {
+const KeyInformation = (projectToken, totalSale, tokenPrice) => {
     return (
         <div className="circleBorderCard cardContent">
             <div className="keyinfoRow">
                 <div className="keyinfoName">Total Sales</div>
-                <div>{props.totalSale} {props.projectToken}</div>
+                <div>{totalSale} {projectToken}</div>
             </div>
 
             <div className="keyinfoRow" style={{marginTop: '1rem'}}>
                 <div className="keyinfoName">Total Raises</div>
-                <div>{props.totalSale} {props.projectToken}</div>
+                <div>{totalSale} {projectToken}</div>
             </div>
 
             <div className="keyinfoRow" style={{marginTop: '1rem'}}>
                 <div className="keyinfoName">Rate</div>
-                <div>1 {props.projectToken} = {props.tokenPrice} USDT</div>
+                <div>1 {projectToken} = {tokenPrice} USDT</div>
             </div>
         </div>
     );
 }
 
-const ProjectDescription = () => {
+const ProjectDescription = (projectDescription) => {
 
     return (
         <div className="circleBorderCard cardContent">

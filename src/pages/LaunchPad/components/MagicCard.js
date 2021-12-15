@@ -6,7 +6,7 @@ const MagicCard = ({ ddl, raise, sales, rate, isOngoing}) => {
   return (
     <div className="magic-card-body">
       <div className="magic-card">
-        <ProjectsCard ddl={ddl} raise={raise} sales={sales} rate={rate} isOngoing={isOngoing}/>
+        <ProjectsCard ddl={ddl} raise={raise} sales={sales} rate={rate} isOngoing={isOngoing} />
       </div>
       <div className="magic-card-before" />
       <div className="magic-card-after" />
