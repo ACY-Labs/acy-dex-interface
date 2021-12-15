@@ -83,13 +83,13 @@ const Pool = (props)=> {
           </p>
           <div className={styles.buttonContainer}>
             <div>
-              <BubblyButton href={"https://forms.gle/gsLNsgDy2BXHNZda9"} className={styles.btnApply }/>
+              <BubblyButton href="https://forms.gle/gsLNsgDy2BXHNZda9" className={styles.btnApply} />
             </div>
             <div>
-              <RaiseButton href={"https://t.me/acyfinance"} className={styles.btnApply} src={telegramWIcon} text={"Telegram"}/>
+              <RaiseButton href="https://t.me/acyfinance" className={styles.btnApply} src={telegramWIcon} text="Telegram" />
             </div>
             <div>
-              <RaiseButton href={"https://t.me/ACYFinanceChannel"} className={styles.btnApply} src={announcementIcon} text={"Announcements"}/>
+              <RaiseButton href="https://t.me/ACYFinanceChannel" className={styles.btnApply} src={announcementIcon} text="Announcements" />
             </div>
           </div>
         </div>

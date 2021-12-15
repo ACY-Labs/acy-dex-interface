@@ -6,7 +6,7 @@ const OngoingProjects = ({ ddl, raise, sales, rate, isOngoing}) => {
   return (
     <div>
       <div className="">
-        <MagicCard ddl={ddl} raise={raise} sales={sales} rate={rate} isOngoing={isOngoing}/>
+        <MagicCard ddl={ddl} raise={raise} sales={sales} rate={rate} isOngoing={isOngoing} />
       </div>
     </div>
   );
