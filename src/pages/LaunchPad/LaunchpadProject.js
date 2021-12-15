@@ -12,7 +12,8 @@ import {
 } from '@/services/api';
 import './css/LaunchpadProject.css';
 import project from '@/models/project';
-
+import AllocationIcon from "./components/AllocationIcon"
+import apple from "@/assets/lottie/apple.json"
 
 const props= {
     'title': 'ACY Finance',
@@ -334,9 +335,11 @@ const Allocation = ({walletId, projectToken}) => {
     }, [])
 
     // TODO: replace with 24 icon
-    const BaseCard = () => {
+    const BaseCard = ({url}) => {
         return (
-            <div style={{background: 'white' }} />
+            <div style={{ background: 'white', height:"64px", width: "64px", borderRadius: "8px" }}>
+                <AllocationIcon play={true} url={apple} id="apple"/>
+            </div>
         );
     }
 

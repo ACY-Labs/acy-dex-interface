@@ -117,7 +117,7 @@
   /* width: calc((100% / 3) - 30px); */
   transition: all 0.2s ease-in-out;
 }
-@media screen and (max-width: 991px) {
+/* @media screen and (max-width: 991px) {
   .expanding-card .card {
     width: calc((100% / 2) - 30px);
   }
@@ -126,7 +126,7 @@
   .expanding-card .card {
     width: 100%;
   }
-}
+} */
 .expanding-card .card:hover .card__inner {
   /* background-color: #1abc9c; */
   transform: scale(1.02);
@@ -222,7 +222,7 @@
   /* background-color: #949fb0; */
   transform: scale(1);
 }
-@media screen and (min-width: 992px) {
+/* @media screen and (min-width: 992px) {
   .expanding-card .card:nth-of-type(3n + 2) .card__expander {
     margin-left: calc(-100% - 30px);
   }
@@ -246,7 +246,7 @@
   .expanding-card .card__expander {
     width: calc(200% + 30px);
   }
-}
+} */
 
 /* see more incoming */
 
