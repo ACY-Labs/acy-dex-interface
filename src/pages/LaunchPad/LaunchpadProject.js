@@ -150,7 +150,7 @@ const TokenProcedure = () => {
     )
 }
 
-const KeyInformation = (projectToken, totalSale, tokenPrice) => {
+const KeyInformation = ({projectToken, totalSale, tokenPrice}) => {
     return (
         <div className="circleBorderCard cardContent">
             <div className="keyinfoRow">
