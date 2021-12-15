@@ -403,7 +403,9 @@ function AccountInfo(props) {
             poolLpScore: pool.lpScore,
             poolLpBalance: pool.lpBalance,
             endsIn: getDHM((pool.endBlock - block) * BLOCKS_PER_SEC),
-            status: pool.endBlock - block > 0 
+            status: pool.endBlock - block > 0,
+            ratio: pool.ratio,
+            endAfter: (pool.endBlock - block) * BLOCKS_PER_SEC,
           };
           if(newFarmsContent.poolId == 0) {
             // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));
