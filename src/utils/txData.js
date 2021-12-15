@@ -5,6 +5,11 @@ import liquidity from '@/pages/Liquidity/models/liquidity';
 import {getContract} from '@/acy-dex-swap/utils'
 import { abi as IUniswapV2Router02ABI } from '@/abis/IUniswapV2Router02.json';
 
+
+function findTokenInList(item){
+    return INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.address.toLowerCase() || token.addressOnEth.toLowerCase()==item.address.toLowerCase());
+}
+
 export async function parseTransactionData (fetchedData,account,library,filter) {
     if(filter == 'SWAP'){
 
@@ -19,13 +24,14 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(FROM_HASH));
             let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
 
-            let inToken = INITIAL_TOKEN_LIST.find(token => token.address==inLogs[0].address);
-            let outToken =  INITIAL_TOKEN_LIST.find(token => token.address==outLogs[0].address);
+            let inToken = findTokenInList(inLogs[0]);
+            let outToken =  findTokenInList(outLogs[0]);
 
             let inTokenNumber = 0;
+            let outTokenNumber = 0;
+
             for(let log of inLogs){inTokenNumber = inTokenNumber + (log.data / Math.pow(10, inToken.decimals))};
             inTokenNumber = inTokenNumber.toString();
-            let outTokenNumber = 0;
             for(let log of outLogs){outTokenNumber += (log.data / Math.pow(10, outToken.decimals))};
             outTokenNumber = outTokenNumber.toString();
 
@@ -48,15 +54,17 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             TO_HASH = response.to.toLowerCase().slice(2);
             let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(TO_HASH));
             let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
-            let inToken = INITIAL_TOKEN_LIST.find(token => token.address==inLogs[0].address);
-            let outToken =  INITIAL_TOKEN_LIST.find(token => token.address==outLogs[0].address);
+            
+            let inToken = findTokenInList(inLogs[0]);
+            let outToken =  findTokenInList(outLogs[0]);
 
             let inTokenNumber = 0;
+            let outTokenNumber = 0;
+
             for(let log of inLogs){inTokenNumber = inTokenNumber + (log.data / Math.pow(10, inToken.decimals))};
             inTokenNumber = inTokenNumber.toString();
-            let outTokenNumber = 0;
             for(let log of outLogs){outTokenNumber += (log.data / Math.pow(10, outToken.decimals))};
-            outTokenNumber = outTokenNumber.toString();
+            outTokenNumber = outTokenNumber.toString();         
 
             let transactionTime = moment(parseInt(item.timeStamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
             newData.push({
@@ -77,15 +85,16 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             TO_HASH = response.to.toLowerCase().slice(2);
             let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(FROM_HASH));
             let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(TO_HASH));
-            let inToken = INITIAL_TOKEN_LIST.find(token => token.address==inLogs[0].address);
-            let outToken =  INITIAL_TOKEN_LIST.find(token => token.address==outLogs[0].address);
-
+            let inToken = findTokenInList(inLogs[0]);
+            let outToken =  findTokenInList(outLogs[0]);
             let inTokenNumber = 0;
+            let outTokenNumber = 0;
+
             for(let log of inLogs){inTokenNumber = inTokenNumber + (log.data / Math.pow(10, inToken.decimals))};
             inTokenNumber = inTokenNumber.toString();
-            let outTokenNumber = 0;
             for(let log of outLogs){outTokenNumber += (log.data / Math.pow(10, outToken.decimals))};
             outTokenNumber = outTokenNumber.toString();
+
 
             let transactionTime = moment(parseInt(item.timeStamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
             newData.push({
@@ -122,8 +131,8 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             let logsToken1 = outLogs.filter(log => log.address==tokensOut[0]);
             let logsToken2 = outLogs.filter(log => log.address==tokensOut[1]);
 
-            let token1 = INITIAL_TOKEN_LIST.find(token => token.address==logsToken1[0].address);
-            let token2 =  INITIAL_TOKEN_LIST.find(token => token.address==logsToken2[0].address);
+            let token1 = findTokenInList(logsToken1[0]);
+            let token2 =  findTokenInList(logsToken2[0]);
 
             let token1Number = 0;
             for(let log of logsToken1){
@@ -157,8 +166,8 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             let logsToken1 = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(FROM_HASH));
             let logsToken2 = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(TO_HASH));
 
-            let token1 = INITIAL_TOKEN_LIST.find(token => token.address==logsToken1[0].address);
-            let token2 =  INITIAL_TOKEN_LIST.find(token => token.address==logsToken2[0].address);
+            let token1 = findTokenInList(logsToken1[0]);
+            let token2 =  findTokenInList(logsToken2[0]);
 
             let token1Number = 0;
             for(let log of logsToken1){token1Number = token1Number + (log.data / Math.pow(10, token1.decimals))};
@@ -197,8 +206,8 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             let logsToken1 = inLogs.filter(log => log.address==tokensIn[0]);
             let logsToken2 = inLogs.filter(log => log.address==tokensIn[1]);
 
-            let token1 = INITIAL_TOKEN_LIST.find(token => token.address==logsToken1[0].address);
-            let token2 =  INITIAL_TOKEN_LIST.find(token => token.address==logsToken2[0].address);
+            let token1 = findTokenInList(logsToken1[0]);
+            let token2 =  findTokenInList(logsToken2[0]);
 
             let token1Number = 0;
             for(let log of logsToken1){token1Number = token1Number + (log.data / Math.pow(10, token1.decimals))};
@@ -229,8 +238,8 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             let logsToken1 = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
             let logsToken2 = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(TO_HASH));
 
-            let token1 = INITIAL_TOKEN_LIST.find(token => token.address==logsToken1[0].address);
-            let token2 =  INITIAL_TOKEN_LIST.find(token => token.address==logsToken2[0].address);
+            let token1 = findTokenInList(logsToken1[0]);
+            let token2 =  findTokenInList(logsToken2[0]);
 
             let token1Number = 0;
             for(let log of logsToken1){
@@ -273,12 +282,13 @@ export async function getTransactionsByAccount (account,library,filter){
         let startBlock = '0';
         let endBlock = '99999999';
         let page = '1';
-        let offset='10';
+        let offset='250'; // NUMBER OF RESULTS FETCHED FROM ETHERSCAN
         let sort='asc';
-        let request = 'https://api-rinkeby.etherscan.io/api?module=account&action=txlist&address='+address+'&startblock=0&endblock=99999999&page=1&offset=50&sort=desc&apikey='+apikey;
+        let request = 'https://api-rinkeby.etherscan.io/api?module=account&action=txlist&address='+address+'&startblock=0&endblock=99999999&page=1&offset='+offset+'&sort=desc&apikey='+apikey;
 
         let response = await fetch(request);
         let data = await response.json();
+
 
         let newData = await parseTransactionData(data.result,account,library,filter);
         

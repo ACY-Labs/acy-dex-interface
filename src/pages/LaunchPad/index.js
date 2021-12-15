@@ -14,13 +14,15 @@ import OngoingProjects from "./components/OngoingProjects.js"
 import IncomingProjects from "./components/IncomingProjects.js"
 import ExpandingCard from "./components/ExpandingCard.js"
 import EndedProjects from "./components/EndedProjects.js"
+import BubblyButton from "./components/BubblyButton.js"
+import RaiseButton from "./components/RaiseButton.js"
+import AlocationIcon from "./components/AllocationIcon"
+import apple from "@/assets/lottie/apple.json"
 import $ from 'jquery';
 
 const { Meta } = Card;
 
 const Pool = (props)=> {
-    const [page, setPage] = useState(0);
-    const [view, setView] = useState('grid');
     const [projectStatus, setProjectStatus] = useState('inProgress');
     const [navPage, setnavPage] = useState(0);
     const [filter, setFilter] = useState('');
@@ -30,13 +32,11 @@ const Pool = (props)=> {
     }
 
     // project variables
-    const [projectCount, setProjectCount] = useState(0);
     useEffect(() => {
       axios.get(`http://localhost:3001/api/launch/projects`).then(res => {
         // see if get request is successful
         console.log(res)
         // get all project count
-        setProjectCount(res.data.length)
       }).catch(e => console.log("error: ", e));
     },[]);
 
@@ -78,26 +78,17 @@ const Pool = (props)=> {
         </div>
         <div className={styles.launchbottomContainer}>
           <p className={styles.titleDesc}>
-            Launching profitable projects on Multichain.
+            Launching Profitable Projects on Multichain.
           </p>
           <div className={styles.buttonContainer}>
             <div>
-              <a href="https://forms.gle/gsLNsgDy2BXHNZda9" className={styles.btnApply} target="_blank" rel="noreferrer">
-                <Icon type="rocket" style={{fontSize: '2em', margin: '0 10px 0 0'}} />
-                Apply for IDO
-              </a>
+              <BubblyButton href="https://forms.gle/gsLNsgDy2BXHNZda9" className={styles.btnApply} />
             </div>
             <div>
-              <a href="https://t.me/acyfinance" className={styles.btnTelegram} target="_blank" rel="noreferrer">
-                <img src={telegramWIcon} alt="" style={{height:'1.4em', width:'1.5em', objectFit:'contain', fontSize: '1.5em', margin: '0 10px 0 0'}} />
-                Telegram
-              </a>
+              <RaiseButton href="https://t.me/acyfinance" className={styles.btnApply} src={telegramWIcon} text="Telegram" />
             </div>
             <div>
-              <a href="https://t.me/ACYFinanceChannel" className={styles.btnTelegram} target="_blank" rel="noreferrer">
-                <img src={announcementIcon} alt="" style={{height:'1.4em', width:'1.5em', objectFit:'contain', fontSize: '1.5em', margin: '0 10px 0 0'}} />
-                Announcements
-              </a>
+              <RaiseButton href="https://t.me/ACYFinanceChannel" className={styles.btnApply} src={announcementIcon} text="Announcements" />
             </div>
           </div>
         </div>
@@ -109,9 +100,9 @@ const Pool = (props)=> {
                 <div className={styles.lineSeperator} />
               </div>
               <div className={styles.projectsContainer}>
-                <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT" />
-                <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT" />
-                <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT" />
+                <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT" isOngoing={true}/>
+                <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT" isOngoing={true}/>
+                <OngoingProjects ddl="2021/12/17 00:00:00" raise="250,000 USDT" sales="1,000,000 ACY" rate="1ACY = 0.2USDT" isOngoing={true}/>
               </div>
             </div>
             <div className={styles.projectBoxes}>
@@ -133,6 +124,9 @@ const Pool = (props)=> {
               </div>
             </div>
           </section>
+          {/* <div style={{width: "100px", height: "100px", backgroundColor: "white"}}>
+            <AllocationIcon play={true} url={ apple} id="apple"/>
+          </div> */}
         </div>
         
       </div>

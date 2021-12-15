@@ -14,6 +14,7 @@ import moment from 'moment';
 import classNames from 'classnames';
 import { getPool, getPoolAccmulateReward} from '@/acy-dex-swap/core/farms';
 import supportedTokens from '@/constants/TokenList';
+import axios from 'axios';
 
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
@@ -203,6 +204,12 @@ const StakeRow = props => {
               ]
             }
           });
+          axios.get(
+            // fetch valid pool list from remote
+            `https://api.acy.finance/api/farm/updatePool?poolId=${poolId}`
+          ).then(res => {
+            console.log("update pool on server return: ", res);
+          }).catch(e => console.log("error: ", e));
           // disable button after each transaction on default, enable it after re-entering amount to add
           setWithdrawButtonText("Withdraw");
           setWithdrawButtonStatus(false);

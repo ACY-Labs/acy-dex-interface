@@ -876,6 +876,13 @@
         padding-left: .2rem;
         padding-right: .2rem;
       }
+      .APRDisabled{
+        font-size: .7rem;
+        background-color: #000000;
+        border-radius: .2rem;
+        padding-left: .2rem;
+        padding-right: .2rem;
+      }
     }
     .presetDurationContainer {
       border-radius: 0rem !important;
@@ -918,9 +925,19 @@
   width: 100%;
   background-color: #1E5D91;
   border: none;
-  border-radius: .5rem;
+  border-radius: 15px;
   font-size: 1.5rem;
-  padding: 0 1rem;
+  padding: 15px;
+  text-align: center;
+  font-size: 20px;
+  font-family: PingFang SC;
+  font-weight: 600;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  &:hover {
+    background-color: #184a72;
+    cursor: pointer;
+  }
 }
 
 .stakeSubmitButton:hover {
@@ -1224,18 +1241,23 @@ input[type=number] {
       // padding-top: 0.50rem ;
   }
   .button {
-      color: white;
-      width: 100%;
-      background-color: #1E5D91;
-      border: none;
-      border-radius: .5rem;
-      font-size: 1.5rem;
-      padding: 0 1rem;
-      text-align: center;
-      &:hover {
-          background-color: #184a72;
-          cursor: pointer;
-        }
+    color: white;
+    width: 100%;
+    background-color: #1E5D91;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.5rem;
+    padding: 15px;
+    text-align: center;
+    font-size: 20px;
+    font-family: PingFang SC;
+    font-weight: 600;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    &:hover {
+      background-color: #184a72;
+      cursor: pointer;
+    }
   }
 }
 

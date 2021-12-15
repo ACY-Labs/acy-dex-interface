@@ -11,6 +11,7 @@ import { now } from 'moment';
 import { connect } from 'umi';
 import moment from 'moment';
 import classNames from 'classnames';
+import axios from 'axios';
 
 
 const StakeModal = props => {
@@ -27,7 +28,9 @@ const StakeModal = props => {
     chainId,
     account,
     library,
-    poolLpScore
+    poolLpScore,
+    endAfter,
+    ratio // USD/lpToken
   } = props;
   const [date, setDate] = useState(new Date());
   const [selectedPresetDate, setSelectedPresetDate] = useState(null);
@@ -41,6 +44,7 @@ const StakeModal = props => {
   const [buttonStatus, setButtonStatus] = useState(true);
   const [modalVisible, setModalVisible] = useState(true);
   const [is4Years, setIs4Years] = useState(false);
+  const [daysNum, setDaysNum] = useState([])
 
   
   const getLockDuration = () => {
@@ -81,14 +85,14 @@ const StakeModal = props => {
     const day1Y = getDayNum("year",1);
     const day4Y = getDayNum("year",4);
     const day_num = [day1W, day1M, day3M, day6M, day1Y, day4Y];
-
     var totalScore = poolLpScore / 1e34;
     for(let i=0 ; i<6 ; i++) {
       var weight =  stake * Math.sqrt(day_num[i]);
       if(totalScore + weight == 0) newArr[i][0] = 0;
       else newArr[i][0] = (weight / (totalScore + weight) * 100).toFixed(2);
     }
-    setAprList(newArr);
+    setAprList(aprList);
+    setDaysNum(day_num);
   },[stake]); 
 
   useEffect( () =>{
@@ -181,6 +185,13 @@ const StakeModal = props => {
           //   }).catch(e => console.log("error: ", e));
           // }
           //refresh poold info
+          axios.get(
+            // fetch valid pool list from remote
+            `https://api.acy.finance/api/farm/updatePool?poolId=${poolId}`
+          ).then(res => {
+            console.log("update pool on server return: ", res);
+          }).catch(e => console.log("error: ", e));
+
           await refreshPoolInfo();
           // clear top right loading spin
           const newData = transactions.filter(item => item.hash != status.hash);
@@ -284,6 +295,9 @@ const StakeModal = props => {
     // const sti = setInterval(, 500);
     checkStatusAndFinish();
   };
+  const checkIfDisabled = (i) => {
+    return daysNum[i]*60*60*24>endAfter
+  };
 
   return (
     <AcyModal
@@ -354,7 +368,10 @@ const StakeModal = props => {
           <div className={styles.APRRow}>
             {aprList.map(([text, selected], index) => {
               let APRstyle = ''
-              if (selected){
+              if(checkIfDisabled(index)) {
+                APRstyle = styles.APRDisabled
+              }
+              else if (selected){
                 APRstyle = styles.APRBoxSelected
               }
               else{
@@ -371,12 +388,12 @@ const StakeModal = props => {
             <AcySmallButtonGroup
               activeButton={selectedPresetDate}
               buttonList={[
-                ['1W', () => updateDate('week', 1, 0)],
-                ['1M', () => updateDate('month', 1, 1)],
-                ['3M', () => updateDate('month', 3, 2)],
-                ['6M', () => updateDate('month', 6, 3)],
-                ['1Y', () => updateDate('year', 1, 4)],
-                ['4Y', () => updateDate('year', 4, 5)],
+                ['1W', () => updateDate('week', 1, 0), checkIfDisabled(0)],
+                ['1M', () => updateDate('month', 1, 1), checkIfDisabled(1)],
+                ['3M', () => updateDate('month', 3, 2), checkIfDisabled(2)],
+                ['6M', () => updateDate('month', 6, 3), checkIfDisabled(3)],
+                ['1Y', () => updateDate('year', 1, 4), checkIfDisabled(4)],
+                ['4Y', () => updateDate('year', 4, 5), checkIfDisabled(5)],
               ]}
               containerClass={styles.presetDurationSelection}
               theme="#eb5c20"

@@ -160,10 +160,12 @@ const Farms = (props) => {
 
   const getPools = async (library, account) => {
     const pools = await getAllPools(library, account);
+    console.log("TEST getAllPools",pools);
     console.log("end get pools");
     const block = await library.getBlockNumber();
     const newFarmsContents = [];
     let ismyfarm = false;
+    console.log("GETALLPOOLS:",pools);
     pools.forEach((pool,idx) => {
       const newFarmsContent = {
         index: idx,
@@ -175,7 +177,7 @@ const Farms = (props) => {
         token2Logo: getLogoURIWithSymbol(pool.token1Symbol),
         pendingReward: pool.rewardTokensSymbols.map((token, index) => ({
           token,
-          amount: pool.rewardTokensAmount[index],
+          amount: pool.rewardTokensAmount[index].toString(),
         })),
         totalApr: pool.apr.toFixed(2),
         tvl: pool.tvl.toFixed(2),
@@ -186,7 +188,9 @@ const Farms = (props) => {
         poolLpScore: pool.lpScore,
         poolLpBalance: pool.lpBalance,
         endsIn: getDHM((pool.endBlock - block) * BLOCKS_PER_SEC),
-        status: pool.endBlock - block > 0 
+        status: pool.endBlock - block > 0,
+        ratio: pool.ratio,
+        endAfter: (pool.endBlock - block) * BLOCKS_PER_SEC,
       };
       if(newFarmsContent.poolId == 0) {
         // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));
