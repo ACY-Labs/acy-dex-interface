@@ -279,7 +279,8 @@ const AllocationCard = ({
     allocationAmount, 
     setAllocationAmount, 
     walletId, 
-    projectToken 
+    projectToken,
+    url
 }) => {
     
     const [coverOpenState, setCoverOpenState] = useState(false);
@@ -296,24 +297,25 @@ const AllocationCard = ({
     const clickCover = async (e) => {
         console.log('click cover', allocationAmount);
         const oldAllocationAmount = allocationAmount;
-        if (oldAllocationAmount === 0) {
-            requireAllocation(walletId, projectToken).then(res => {
-                if(res && res.allocationAmount) {
-                    setAllocationAmount(res.allocationAmount);
-                    setCoverOpenState(true);
-                }
-                console.log('allocation get', res.allocationAmount);
-            }).catch(e => {
-                console.error(e);
-            })
-        }
+        // if (oldAllocationAmount === 0) {
+        //     requireAllocation(walletId, projectToken).then(res => {
+        //         if(res && res.allocationAmount) {
+        //             setAllocationAmount(res.allocationAmount);
+                    
+        //         }
+        //         console.log('allocation get', res.allocationAmount);
+        //     }).catch(e => {
+        //         console.error(e);
+        //     })
+        // }
+        setCoverOpenState(true);
         e.preventDefault();
     }
 
     return (
         <div className="allocationCard" onClick={clickCover}>
             <div class={computeCoverClass()}>{index+1}</div>
-            <Component />
+            <Component url={url}/>
         </div>
     )
 }
@@ -338,7 +340,7 @@ const Allocation = ({walletId, projectToken}) => {
     const BaseCard = ({url}) => {
         return (
             <div style={{ background: 'white', height:"64px", width: "64px", borderRadius: "8px" }}>
-                <AllocationIcon play={true} url={apple} id="apple"/>
+                <AllocationIcon play={true} url={url} id="apple"/>
             </div>
         );
     }
@@ -346,11 +348,13 @@ const Allocation = ({walletId, projectToken}) => {
     // TODO: assign each icon to allocation card
     const allocationCards = () => {
         const cards = [];
+        let url = [apple];
         for(let i = 0; i < 24; i++) {
             cards.push(
                 <AllocationCard 
                   index={i} 
-                  Component={BaseCard} 
+                  Component={BaseCard}
+                  url = {url[0]}
                   allocationAmount={allocationAmount}
                   setAllocationAmount={setAllocationAmount}
                   walletId={walletId}

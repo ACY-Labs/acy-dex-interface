@@ -76,7 +76,7 @@ const IncomingProjects = ({ data }) => {
                   isUpcoming={true}
                 />
               </div>
-              <button className='[ js-expander ] '>Hello</button>
+              {/* <button className='[ js-expander ] '>Hello</button> */}
               {/* <i className="fa fa-folder-o" /> */}
             </div>
             <div className="card__expander">
