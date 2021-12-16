@@ -684,53 +684,63 @@
     border-color: #1e5d91;
   }
 }
-
-.amountRowContainer {
-  display: flex;
-  position: relative;
-
-  .amountRowInputContainer {
-    flex: 1;
+  .amountContainerWrap{
+    background-color: #1B1B1C;
+    border: 1px solid #40444f99;
+    border-radius: .5rem;
     margin-bottom: 0.5rem;
-
-    input {
-      width: 100%;
-      background-color: #1B1B1C;
-      border: 1px solid #40444f99;
-      border-radius: .5rem;
-      font-size: 1rem;
-      padding: 0 1rem;
-      -moz-appearance: textfield;
-      box-shadow: 0 0 0 0.5px transparent;
-      margin-bottom: 0.25rem;
-      height: 2rem;
-
-      &:hover {
-        border: 1px solid #40444fff;
-      }
+    &:hover {
+      border: 1px solid #40444fff;
     }
-
-    input:focus {
+    &:focus {
       outline: none;
       box-shadow: 0 0 0 0.5px #1e5d91;
       transition: .1s;
     }
-
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
+    .amountRowContainer {
+      display: flex;
+      position: relative;
+      .amountRowInputContainer {
+        flex: 1;
+        input {
+          width: 100%;
+          border: 0;
+          background: transparent;
+          font-size: 1rem;
+          padding: 0 1rem;
+          -moz-appearance: textfield;
+          box-shadow: 0 0 0 0.5px transparent;
+          height: 2rem;
+        }  
+        input:focus {
+          outline: none;
+        }  
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+      }
+    
+      .suffix {
+        font-size: 1rem;
+        position: absolute;
+        right: 1.25rem;
+        top: 0.25rem;
+        .swapImg{
+          width: 20px;
+          margin-left: 5px;
+          transform: translateY(10px);
+          cursor: pointer;
+        }
+      }
+    }
+    .backupCoin{
+      font-size: 0.8rem;
+      text-align: right;
+      margin-right: 2.8rem;
     }
   }
-
-  .suffix {
-    font-size: 1rem;
-    position: absolute;
-    right: 1.25rem;
-    top: 0.25rem;
-  }
-}
-
 .balanceAmountContainer {
   margin-bottom: 1rem;
   display: flex;
