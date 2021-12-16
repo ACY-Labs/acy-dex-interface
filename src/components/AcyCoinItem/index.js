@@ -67,14 +67,20 @@ const AcyCoinItem = ({
       }
       async function getThisTokenBalance() {
         const { address, symbol, decimals } = data;
-        const bal = await getUserTokenBalance(
-          { address, symbol, decimals },
-          chainId,
-          account,
-          library
-        );
-        console.log(bal);
-        setBal(processString(bal));
+        try {
+          const bal = await getUserTokenBalance(
+            { address, symbol, decimals },
+            chainId,
+            account,
+            library
+          );
+          console.log("test symbol: ", symbol)
+          console.log(bal);
+          setBal(processString(bal));
+
+        } catch (err) {
+          console.log("error param: ", address, symbol, decimals, err)
+        }
       }
       getThisTokenBalance();
     },
