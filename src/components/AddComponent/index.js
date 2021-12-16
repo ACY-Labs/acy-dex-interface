@@ -475,13 +475,11 @@ const AddLiquidityComponent = props => {
 
           // clear top right loading spin
           const newData = transactions.filter(item => item.hash != status.hash);
+
           dispatch({
             type: "transaction/addTransaction",
             payload: {
-              transactions: [
-                ...newData,
-                { hash: status.hash, transactionTime }
-              ]
+              transactions: newData
             }
           });
 

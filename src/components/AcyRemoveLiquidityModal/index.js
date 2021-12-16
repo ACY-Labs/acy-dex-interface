@@ -236,10 +236,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
           dispatch({
             type: "transaction/addTransaction",
             payload: {
-              transactions: [
-                ...newData,
-                { hash: status.hash, transactionTime }
-              ]
+              transactions: newData
             }
           });
 

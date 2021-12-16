@@ -725,7 +725,7 @@ const AcyLiquidityPositions = (props) => {
                     <tr>
                       <td>My liquidity</td>
                       <td>Pool share</td>
-                      <td>APR</td>
+                      <td></td>
                       {/* the following height is randomly set to 10px,
                       it's only useful for its div children to get full height info */}
                       <td rowSpan="2" style={{height: "10px"}}> 
@@ -767,7 +767,7 @@ const AcyLiquidityPositions = (props) => {
                         <p>{data?.share || "loading..."}</p>
                       </td>
                       <td>
-                        <p>No data</p>
+                        <p></p>
                       </td>
                     </tr>
                     </tbody>

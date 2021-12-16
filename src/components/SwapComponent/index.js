@@ -403,7 +403,7 @@ const SwapComponent = props => {
       dispatch({
         type: 'transaction/addTransaction',
         payload: {
-          transactions: [...transactions, { hash: status.hash }],
+          transactions: [...transactions, status.hash],
         },
       });
     }
@@ -417,108 +417,33 @@ const SwapComponent = props => {
     // }];
 
     // FIXME: implement the following logic with setTimeout(). refer to AddComponent.js checkStatusAndFinish()
-    const sti = setInterval(() => {
-      library.getTransactionReceipt(status.hash).then(async receipt => {
-        console.log('receiptreceipt', receipt);
+
+    const sti = async (hash) => {
+      library.getTransactionReceipt(hash).then(async receipt => {
+        console.log(`receiptreceipt for ${hash}: `, receipt);
         // receipt is not null when transaction is done
-        if (receipt) {
-          clearInterval(sti);
-          const { logs } = receipt;
-          console.log("logs: ", logs);
-          const decodedLog = parseArbitrageLog(logs[logs.length - 1]);
-          console.log('receipt OK, these are logs');
-          console.log("decodedLog", decodedLog);
-
-          props.onGetReceipt(decodedLog, library, account);
-          let newData = transactions.filter(item => item.hash != status.hash);
-          let transactionTime = '';
-          let inputTokenNum;
-          let outTokenNum;
-          let totalToken;
-          let transferHash = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
-          await library.getBlock(receipt.logs[0].blockNumber).then(data => {
-            transactionTime = moment(parseInt(data.timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
-          });
-          receipt.logs.map(item => {
-            // debugger
-            // let topics=hexlify(item.topics[0]).toText();
-            // let ss=CryptoJS.SHA3.decrypt(item.topics[0]); 
-            // debugger
-            if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == inputToken.address) {
-              // inputtoken 数量
-              // inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
-              inputTokenNum = item.data / Math.pow(10, inputToken.decimals).toString();
-              // console.log('inputTokenNum',inputTokenNum)
-            }
-            if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == outToken.address) {
-              // outtoken 数量
-              // outTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0", outToken.decimals))).toString();
-              outTokenNum = item.data / Math.pow(10, outToken.decimals).toString();
-              // console.log('outputTokenNum',outTokenNum)
-            }
-          });
-          // 获取美元价值
-          await axios
-            .post(
-              `https://api.acy.finance/api/chart/swap?token0=${inputToken.addressOnEth}&token1=${outToken.addressOnEth
-              }&range=1D`
-            )
-            .then(data => {
-              // totalToken = abbrNumber(
-              //   inputTokenNum * data.data.data.swaps[data.data.data.swaps.length - 1].rate
-              // );
-
-              // const { swaps } = data.data.data;
-              // const lastDataPoint = swaps[swaps.length - 1];
-              // console.log('ROUTE PRICE POINT', lastDataPoint);
-              // this.setState({
-              //   pricePoint: lastDataPoint.rate,
-              // });
-            });
-
-          console.log("receipt transactionTime", transactionTime);
+        if (!receipt)
+          setTimeout(sti(hash), 500);
+        else {
+          let newData = transactions.filter(item => item.hash != hash);
           dispatch({
             type: 'transaction/addTransaction',
             payload: {
-              transactions: [
-                ...newData,
-                {
-                  hash: status.hash,
-                  inputTokenNum,
-                  inputTokenSymbol: inputToken.symbol,
-                  outTokenNum,
-                  outTokenSymbol: outToken.symbol,
-                  totalToken,
-                  transactionTime,
-                },
-              ],
+              transactions: newData
             },
           });
-          // 保存到loac
-          localStorage.setItem(
-            'transactions',
-            JSON.stringify([
-              ...newData,
-              {
-                hash: status.hash,
-                inputTokenNum,
-                inputTokenSymbol: inputToken.symbol,
-                outTokenNum,
-                outTokenSymbol: outToken.symbol,
-                totalToken,
-                transactionTime,
-              },
-            ])
-          );
 
-          // set button to done and disabled on default
           setSwapButtonContent("Done");
-
-          // 读取数据：localStorage.getItem(key);
         }
       });
-    }, 500);
+    }
+
+    sti(status.hash);
   };
+
+  useEffect(() => {
+    console.log("transactions changed", props.transaction.transactions)
+  }, [props.transaction.transactions]);
 
   useEffect(() => console.log("test slippage: ", slippageTolerance), [slippageTolerance]);
   return (

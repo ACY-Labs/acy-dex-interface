@@ -266,7 +266,7 @@ const GlobalHeaderRight = props => {
         value={account}
         onClick={onhandMetaMask}
         pendingLength={
-          props.transaction.transactions.filter(item => item.transactionTime == undefined).length
+          props.transaction.transactions.length
         }
       />
       {false && (
