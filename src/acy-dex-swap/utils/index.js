@@ -194,6 +194,7 @@ export async function getUserTokenBalanceRaw(token, account, library) {
   if (token === ETHER) {
     return library.getBalance(account);
   }
+
   const contractToCheckForBalance = getContract(token.address, ERC20ABI, library, account);
   // 9753573
   // console.log("contractToCheckForBalance:",)
@@ -205,7 +206,8 @@ export async function getUserTokenBalance(token, chainId, account, library) {
   let { address, symbol, decimals } = token;
 
   if (!token) return;
-  let tokenIsETH = symbol === 'ETH';
+  // let tokenIsETH = symbol === 'ETH';
+  let tokenIsETH = symbol === 'BNB';
 
   return formatUnits(
     await getUserTokenBalanceRaw(

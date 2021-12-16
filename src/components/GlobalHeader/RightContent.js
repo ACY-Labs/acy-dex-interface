@@ -23,6 +23,7 @@ import {
   torus,
   trezor,
   ledger,
+  binance,
 } from '@/connectors';
 
 import styles from './index.less';
@@ -114,6 +115,8 @@ const GlobalHeaderRight = props => {
       activate(trezor);
     } else if (walletName === 'ledger') {
       activate(ledger);
+    } else if(walletName === 'binance'){
+      activate(binance);
     }
     setVisibleMetaMask(false);
   };
@@ -174,6 +177,16 @@ const GlobalHeaderRight = props => {
       },
     },
   ];
+  const BinanceWallet = [
+    {
+      name: 'Binance Wallet',
+      icon: 'Binance',
+      onClick:()=>{
+        selectWallet('binance');
+      },
+    },
+  ];
+
   const walletList = [
     {
       name: 'Coinbase Wallet',
@@ -324,6 +337,7 @@ const GlobalHeaderRight = props => {
             .
           </AcyCardList.Agree>
         </AcyCardList>
+
         <AcyCardList>
           {MetaMask.map(item => (
             <AcyCardList.Thin onClick={() => item.onClick()}>
@@ -333,7 +347,16 @@ const GlobalHeaderRight = props => {
               <span>{item.name}</span>
             </AcyCardList.Thin>
           ))}
+          {BinanceWallet.map(item =>(
+            <AcyCardList.Thin onClick={()=>item.onClick()}>
+              {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
+              <AcyIcon.MyIcon width={32} type={item.icon} />
+            )}
+            <span>{item.name}</span>
+          </AcyCardList.Thin>
+          ))}
         </AcyCardList>
+
         <AcyCardList>
           {walletList.map((item, index) => {
             if (only && index > -1) {

@@ -31,7 +31,7 @@ import { sortAddress, abbrNumber } from '@/utils/utils';
 import axios from 'axios';
 
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
+import { binance } from '@/connectors';
 import React, { useState, useEffect, useCallback } from 'react';
 
 import {
@@ -167,14 +167,13 @@ const SwapComponent = props => {
 
   const { account, chainId, library, activate } = useWeb3React();
 
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
-  });
 
   // setSwapButtonContent
   // 监听钱包的连接
   useEffect(() => {
-    activate(injected);
+    if (! account){
+      activate(binance);
+    }
   }, []);
 
   useEffect(
@@ -390,7 +389,7 @@ const SwapComponent = props => {
   };
 
   const ConnectWallet = () => {
-    activate(injected);
+    activate(binance);
   };
   // swap的交易状态
   const swapCallback = async (status, inputToken, outToken) => {
@@ -672,7 +671,7 @@ const SwapComponent = props => {
           disabled={!swapButtonState}
           onClick={() => {
             if (account == undefined) {
-              activate(injected);
+              activate(binance);
             } else {
               setSwapButtonState(false);
               setSwapButtonContent(<>Processing <Icon type="loading" /></>)

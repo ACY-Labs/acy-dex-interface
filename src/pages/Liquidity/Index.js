@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton } from 'antd';
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
+import { BscConnector } from '@binance-chain/bsc-connector'
+import { binance } from '@/connectors';
 import Data, {
   fetchGeneralPoolInfoDay,
   fetchGeneralTokenInfo,
@@ -29,6 +30,7 @@ import { getTransactionsByAccount } from '@/utils/txData';
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import styles from './styles.less';
 
+
 const { AcyTabPane } = AcyTabs;
 
 const BasicProfile = (props) => {
@@ -43,12 +45,10 @@ const BasicProfile = (props) => {
   const [transactionNum, setTransactionNum] = useState(0);
   const { account, chainId, library, activate } = useWeb3React();
 
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
-  });
-
   useEffect(() => {
-    activate(injected);
+    if(!account){
+      activate(binance);
+    }
   }, []);
 
 

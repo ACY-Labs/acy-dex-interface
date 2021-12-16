@@ -4,6 +4,18 @@ import { sortAddress } from '@/utils/utils';
 import { Button,Icon } from 'antd';
 const AcyConnectWallet = props => {
   const { value, onClick, isMobile, chainId,pendingLength, ...rest } = props;
+  let chainName = 'BNB'
+  switch (chainId) {
+    case 97:
+      chainName = 'BNB'
+      break;
+    case 4:
+      chainName = 'Ethereum'
+      break;
+    default:
+      chainName = 'other'
+      break;
+  }
   return (
     (isMobile && (
       <div {...rest} className={styles.connect}>
@@ -22,7 +34,7 @@ const AcyConnectWallet = props => {
     )) || (
       <div {...rest} className={styles.connect}>
         <div className={styles.wrap}>
-          Ethereum ( {chainId || 'disconnected'} )
+          {chainName} ( {chainId || 'disconnected'} )
           {/* pending */}
           {pendingLength
             &&

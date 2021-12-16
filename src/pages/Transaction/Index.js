@@ -9,7 +9,7 @@
  */
 import React, { Component, useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
+import { binance } from '@/connectors';
 import Media from 'react-media';
 import { connect } from 'umi';
 import { Link, useParams, useHistory } from 'react-router-dom';
@@ -31,14 +31,11 @@ const Transaction = props => {
   const [ chartData, setChartData] = useState({});
   // const [ url, setUrl] = useState('');
 
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
-  });
 
   let {id} = useParams();
 
   useEffect(() => {
-    activate(injected);
+    activate(binance);
   }, []);
 
 

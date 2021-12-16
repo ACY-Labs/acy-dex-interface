@@ -1,16 +1,13 @@
 
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
+import { binance } from '@/connectors';
 import React, { useEffect, useState } from 'react';
 
 
 const ConnectWallet = () => {
     const { account, chainId, library, activate } = useWeb3React();
-    const injected = new InjectedConnector({
-        supportedChainIds: [1, 3, 4, 5, 42, 80001],
-    });
     const connectWallet = () => {
-        activate(injected);
+        activate(binance);
     };
 
     useEffect(() => {

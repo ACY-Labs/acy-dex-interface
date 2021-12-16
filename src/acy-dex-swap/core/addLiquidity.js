@@ -93,8 +93,11 @@ export async function getEstimated(
     if (!exactIn && isNaN(parseFloat(inToken1Amount)))
       return new CustomError('Please enter amount');
 
-    let token0IsETH = inToken0Symbol === 'ETH';
-    let token1IsETH = inToken1Symbol === 'ETH';
+    // let token0IsETH = inToken0Symbol === 'ETH';
+    // let token1IsETH = inToken1Symbol === 'ETH';
+
+    let token0IsETH = inToken0Symbol === 'BNB';
+    let token1IsETH = inToken1Symbol === 'BNB';
 
     console.log(inputToken0);
     console.log(inputToken1);
@@ -120,6 +123,7 @@ export async function getEstimated(
     const token1 = token1IsETH
       ? WETH[chainId]
       : new Token(chainId, inToken1Address, inToken1Decimal, inToken1Symbol);
+
 
     if (token0.equals(token1)) {
       setButtonContent('Equal tokens');
@@ -546,8 +550,10 @@ export async function addLiquidity(
       amount: inToken1Amount,
     } = inputToken1;
 
-    let token0IsETH = inToken0Symbol === 'ETH';
-    let token1IsETH = inToken1Symbol === 'ETH';
+    // let token0IsETH = inToken0Symbol === 'ETH';
+    // let token1IsETH = inToken1Symbol === 'ETH';
+    let token0IsETH = inToken0Symbol === 'BNB';
+    let token1IsETH = inToken1Symbol === 'BNB';
 
     console.log('------------------ RECEIVED TOKEN ------------------');
     console.log('token0');
@@ -557,7 +563,8 @@ export async function addLiquidity(
 
     if (token0IsETH && token1IsETH) return new CustomError("Doesn't support ETH to ETH");
 
-    if ((token0IsETH && inToken1Symbol === 'WETH') || (inToken0Symbol === 'WETH' && token1IsETH)) {
+    // if ((token0IsETH && inToken1Symbol === 'WETH') || (inToken0Symbol === 'WETH' && token1IsETH)) {
+    if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
       // UI should sync value of ETH and WETH
       return new CustomError('Invalid pair WETH/ETH');
     }

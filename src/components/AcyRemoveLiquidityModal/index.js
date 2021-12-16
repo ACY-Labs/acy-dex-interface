@@ -8,6 +8,9 @@ import { getEstimated, signOrApprove, removeLiquidity } from '@/acy-dex-swap/cor
 import { Icon, Button, Input } from "antd";
 import moment from 'moment';
 import styles from './AcyRemoveLiquidityModal.less';
+import {
+  binance,
+} from '@/connectors';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
   const handleInputChange = (e) => {
@@ -422,7 +425,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
               );
             } else if (buttonStatus) {
               if (account == undefined) {
-                activate(injected);
+                activate(binance);
               } else {
                 console.log(buttonStatus);
                 setButtonContent(<>Processing <Icon type="loading" /></>);

@@ -17,6 +17,7 @@ import {
 } from './SampleData.js';
 import { marketClient, fetchPoolsFromAccount } from './Data';
 import { WatchlistManager } from './WatchlistManager.js';
+import {scanUrlPrefix} from '@/constants/configs';
 import supportedTokens from '@/constants/TokenList';
 import PageLoading from '@/components/PageLoading';
 import axios from "axios";
@@ -28,6 +29,7 @@ import {
   getAllSuportedTokensPrice,
 } from '@/acy-dex-swap/utils/index';
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
+import { binance } from '@/connectors';
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -346,6 +348,7 @@ function AccountInfo(props) {
 
   // method to prompt metamask extension for user to connect their wallet.
   const connectWallet = () => activate(injected);
+  // const connectWallet = () => activate(binance);
   useEffect(
     () => {
       
@@ -382,6 +385,7 @@ function AccountInfo(props) {
     const dao = await getDaoStakeRecord(library, account);
     setDaoStakeRecord(dao);
   }
+
   useEffect(
     () => {
       // automatically connect to wallet at the start of the application.
@@ -670,7 +674,7 @@ function AccountInfo(props) {
         <div>
           {/* <div style={{ fontSize: '26px', fontWeight: 'bold' }}>{address}</div> */}
           <a
-            onClick={() => openInNewTab(`https://etherscan.io/address/${address}`)}
+            onClick={() => openInNewTab(`${scanUrlPrefix}/address/${address}`)}
             style={{ color: '#e29227', fontWeight: 600 }}
           >
             View on etherscan

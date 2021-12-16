@@ -9,6 +9,7 @@ import SampleStakeHistoryData from './SampleDaoData';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAllPools, getHarvestHistory, getPool, getBalanceRecord, getDaoStakeRecord, getPair } from '@/acy-dex-swap/core/farms';
+import { binance } from '@/connectors';
 import supportedTokens from '@/constants/TokenList';
 import PageLoading from '@/components/PageLoading';
 import Eth from "web3-eth";
@@ -21,10 +22,6 @@ const Farms = (props) => {
   // if wallet is connected, account, chainId, library, and activate will not be not be undefined.
   const { account, chainId, library, activate, active } = useWeb3React();
   // const [account, setAccount] = useState();
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
-  });
-
   const INITIAL_ROW_NUMBER = 20;
 
   const [farmsContent, setFarmsContent] = useState([]);
@@ -57,7 +54,7 @@ const Farms = (props) => {
   // calling this method for the first time will cause metamask to pop up,
   // and require user to approve this connection.
   const connectWallet = async () =>  {
-    await activate(injected);
+    await activate(binance);
     setIsConnected(true);
   };
 
