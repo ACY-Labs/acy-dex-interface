@@ -180,7 +180,14 @@
 .projectDescription {
     opacity: 0.75;
     line-height: 1.5rem;
-    margin-top: 2rem;
+    /* margin-top: 2rem; */
+}
+
+.lineSeperator{
+    width: 100%;
+    margin: 1rem 0;
+    border-bottom: 1px solid #b5b5b6;
+    display: block;
 }
 
 .allocationContainer {

@@ -17,6 +17,7 @@
 .logo-text {
   font-size: 12px;
   font-weight: 700;
+  align-self: center;
 }
 
 .logo-countdown-container {
@@ -28,6 +29,7 @@
 }
 .projects-card .logo-container {
   display: flex;
+  justify-content: center;
   flex-direction: column;
   align-items: center;
   margin-right: 30px;
