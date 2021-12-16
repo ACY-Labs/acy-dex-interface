@@ -14,6 +14,8 @@ import './css/LaunchpadProject.css';
 import project from '@/models/project';
 import AllocationIcon from "./components/AllocationIcon"
 import Lottie from "@/assets/lottie";
+import * as moment from 'moment';
+import context from 'react-bootstrap/esm/AccordionContext';
 
 const { apple, banana, brezel, burger, carrot, cheese, cherry, chocolateBar, corn, donut, eggs, frenchFries, honey, iceCream,
         lemon,meat,peach,pineapple,pizza,popcorn,raspberry,steak,strawberry,watermelon } = Lottie
@@ -21,19 +23,14 @@ const { apple, banana, brezel, burger, carrot, cheese, cherry, chocolateBar, cor
 const LaunchpadProject = () => {
     const { projectId } = useParams();
     const [receivedData, setReceivedData] = useState({})
-
-    const props= {
-        'salePercentage': '57',
-        'alreadySale': '573,024',
-    }
     
-    const TokenBanner = () => {
+    const TokenBanner = ({posterUrl}) => {
         return (
             <video 
               autoplay="" 
               loop="" 
               playsinline="" 
-              poster="https://files.krystal.app/krystalGo/acy-cover.png" 
+              poster="https://files.krystal.app/krystalGo/acy-cover.png"
               className="tokenBanner"
             >
                 {/* <source src="https://files.krystal.app/krystalGo/acy-cover.png" /> */}
@@ -126,7 +123,7 @@ const LaunchpadProject = () => {
                             />
                         </div>
                         <div className="progressAmount">
-                            <div>{`${alreadySale} / ${totalSale} ${receivedData.projectToken}`}</div>
+                            <div>{`${receivedData.alreadySale} / ${receivedData.totalSale} ${receivedData.projectToken}`}</div>
                         </div>
                     </div>
                 </>
@@ -138,7 +135,12 @@ const LaunchpadProject = () => {
                 padding: 0
             }}>
                 <Procedure />
-                <Progress salePercentage={props.salePercentage} alreadySale={props.alreadySale} totalSale={props.totalSale} projectToken={receivedData.projectToken} />
+                <Progress 
+                    salePercentage={receivedData.salePercentage} 
+                    alreadySale={receivedData.alreadySale} 
+                    totalSale={receivedData.totalSale} 
+                    projectToken={receivedData.projectToken} 
+                />
             </div>
         )
     }
@@ -387,7 +389,7 @@ const LaunchpadProject = () => {
             const stateFunction = [setIsHoverApple, setIsHoverBanana, setIsHoverBrezel, setIsHoverBurger, setIsHoverCarrot, setIsHoverCheese, setIsHoverCherry, setIsHoverChocolateBar,
                 setIsHoverCorn, setIsHoverDonut, setIsHoverEggs, setIsHoverFrenchFries, setIsHoverHoney, setIsHoverIceCream, setIsHoverLemon, setIsHoverMeat, setIsHoverPeach, setIsHoverPineapple,
                 setIsHoverPizza, setIsHoverPopcorn, setIsHoverRaspberry, setIsHoverSteak, setIsHoverStrawberry, setIsHoverWatermelon]
-            for(let i = 0; i < 24; i++) {
+            for(let i = 0; i < 12; i++) {
                 cards.push(
                     <AllocationCard 
                       index={i} 
@@ -413,7 +415,10 @@ const LaunchpadProject = () => {
                         Allocation
                     </h2>
                 </div>
-                <div className="allocationContainer">
+                <div className="allocationContainer" style={{
+                    paddingLeft: '64px',
+                    paddingRight: '64px'
+                }}>
                     {allocationCards()}
                 </div>
             </div>
@@ -438,41 +443,44 @@ const LaunchpadProject = () => {
         )
     }
 
+    const format_time = (timeZone) => {
+        return moment(timeZone).local().format("MM/DD/YYYY HH:mm:ss");
+    } 
+
     useEffect(() => {
         getProjectInfo(projectId).then(res => {
             if(res) {
                 // extract data from string
-                const dataNeeded = res.contextData.split('|')
-                const data1 = dataNeeded[0].trim().split(" ")
-                const data2 = dataNeeded[1].trim().split("%")
+                const contextData = JSON.parse(res.contextData);
+                res["tokenLabels"] = contextData["tokenLabels"];
+                res["projectDescription"] = contextData["projectDescription"];
+                res["alreadySale"] = contextData["alreadySale"]
+                res["salePercentage"] = contextData["salePercentage"]
 
-                const d1 = new Date(res.regStart);
-                const d2 = new Date(res.regEnd);
-                const d3 = new Date(res.saleStart);
-                const d4 = new Date(res.saleEnd);
+                res["regStart"] = format_time(res.regStart);
+                res["regEnd"] = format_time(res.regEnd);
+                res["saleStart"] = format_time(res.saleStart);
+                res["saleEnd"] = format_time(res.saleEnd);
 
-                const dateTime1 = d1.toLocaleDateString() + ' ' + d1.toTimeString().substring(0, d1.toTimeString().indexOf("GMT"));
-                const dateTime2 = d2.toLocaleDateString() + ' ' + d2.toTimeString().substring(0, d2.toTimeString().indexOf("GMT"));
-                const dateTime3 = d3.toLocaleDateString() + ' ' + d3.toTimeString().substring(0, d3.toTimeString().indexOf("GMT"));
-                const dateTime4 = d4.toLocaleDateString() + ' ' + d4.toTimeString().substring(0, d4.toTimeString().indexOf("GMT"));
+                res["totalSale"] = res.totalSale
+                res["totalRaise"] = res.totalRaise
+                res["projectUrl"] = res.projectUrl
+                res["projectName"] = res.projectName
 
-                res["regStart"] = dateTime1;
-                res["regEnd"] = dateTime2;
-                res["saleStart"] = dateTime3;
-                res["saleEnd"] = dateTime4;
-                res["tokenLabels"] = data1
-                res["projectDescription"] = data2
                 setReceivedData(res);
             } else {
                 console.log('redirect to list page');
                 history.push('/launchpad');
             }
-        }).catch(e => console.error(e));
+        }).catch(e => {
+            console.error(e);
+            history.push('/launchpad');
+        });
     }, [])
 
     return(
         <div className="mainContainer">
-            <TokenBanner />
+            <TokenBanner posterUrl={receivedData.posterUrl}/>
             <TokenLogoLabel projectName={receivedData.projectName} />
             <CardArea />
         </div>

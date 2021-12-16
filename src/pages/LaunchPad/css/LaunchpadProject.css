@@ -192,8 +192,7 @@
 
 .allocationContainer {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 64px);
-    /* grid-template-rows: repeat(4, 1fr); */
+    grid-template-columns: repeat(4, 64px);
     gap: 24px 24px;
     margin-top: 0.75rem;
     justify-content: space-between;
