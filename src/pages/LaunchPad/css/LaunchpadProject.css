@@ -207,6 +207,17 @@
     perspective: 500px;
 }
 
+.allocationCard .allocationCard-inner{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.allocationCard .inner-text{
+    font-size: 8px;
+}
+
 .allocationCard .cover {
     position: absolute;
     top: 0;
