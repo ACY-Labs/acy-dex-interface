@@ -4,6 +4,7 @@ import '../css/ProjectsCard.css';
 import { useEffect, useState } from 'react';
 import $ from 'jquery';
 import ProjectsCard from './ProjectsCard.js';
+import ExpandedContent from "./ExpandedContent.js"
 
 const EndedProjects = ({ data }) => {
   useEffect(() => {

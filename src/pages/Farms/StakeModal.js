@@ -6,10 +6,11 @@ import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 import { useWeb3React } from '@web3-react/core';
 import { deposit, approveLpToken } from '@/acy-dex-swap/core/farms';
 import { white } from '@umijs/deps/compiled/chalk';
-import { Icon} from 'antd';
+import { Icon } from 'antd';
 import { now } from 'moment';
 import { connect } from 'umi';
 import moment from 'moment';
+import SwapIcon from "@/assets/icon_swap.png";
 import classNames from 'classnames';
 import axios from 'axios';
 
@@ -38,33 +39,34 @@ const StakeModal = props => {
   const [stake, setStake] = useState(0);
   const [balancePercentage, setBalancePercentage] = useState(0);
   const [buttonText, setButtonText] = useState('Stake');
-  const [aprList, setAprList] = useState([[12.23,false],[14.53,false],[16.27,false],[18.13,false],[19.63,false],[22.83,false]])
-  const [pickingDate,setPickingDate] = useState(false);
+  const [aprList, setAprList] = useState([[12.23, false], [14.53, false], [16.27, false], [18.13, false], [19.63, false], [22.83, false]])
+  const [pickingDate, setPickingDate] = useState(false);
   const [aprCounted, serAprCounted] = useState(13.2);
   const [buttonStatus, setButtonStatus] = useState(true);
   const [modalVisible, setModalVisible] = useState(true);
   const [is4Years, setIs4Years] = useState(false);
-  const [daysNum, setDaysNum] = useState([])
+  const [daysNum, setDaysNum] = useState([]);
+  const [lpTokenShow, setLpTokenShow] = useState(true);// true:lpToken false:USD
 
-  
+
   const getLockDuration = () => {
-    if(is4Years) return 126144000;
+    if (is4Years) return 126144000;
     const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-    const diffDays = Math.abs((date.getTime() - Date.now()) / (oneDay)); 
+    const diffDays = Math.abs((date.getTime() - Date.now()) / (oneDay));
     const result = Math.ceil(diffDays) * 86400;
-    return result>126144000?126144000:result;// 24*60*60  31536000
+    return result > 126144000 ? 126144000 : result;// 24*60*60  31536000
   };
 
   const updateStake = newStake => {
     let newStakeInt = newStake !== '' ? parseFloat(newStake, 10) : '';
     newStakeInt = newStakeInt > balance ? balance : newStakeInt;
-    if (newStakeInt === '' || !Number.isNaN(newStakeInt)){
+    if (newStakeInt === '' || !Number.isNaN(newStakeInt)) {
       setShowStake(newStakeInt);
       setStake(newStakeInt);
-    } 
+    }
     setBalancePercentage(Math.floor((newStakeInt / balance) * 100));
   };
-  
+
   const updateBalancePercentage = percentage => {
     const percentageInt = percentage === '' ? 0 : parseInt(percentage, 10);
     if (Number.isNaN(percentageInt)) return;
@@ -72,37 +74,37 @@ const StakeModal = props => {
     setBalancePercentage(percentageInt);
   };
 
-  useEffect( () =>{
+  useEffect(() => {
     setStake(parseFloat((balance * balancePercentage) / 100));
-  },[balancePercentage, balance]);
+  }, [balancePercentage, balance]);
 
-  useEffect( () =>{
+  useEffect(() => {
     let newArr = [...aprList];
-    const day1W = getDayNum("week",1);
-    const day1M = getDayNum("month",1);
-    const day3M = getDayNum("month",3);
-    const day6M = getDayNum("month",6);
-    const day1Y = getDayNum("year",1);
-    const day4Y = getDayNum("year",4);
+    const day1W = getDayNum("week", 1);
+    const day1M = getDayNum("month", 1);
+    const day3M = getDayNum("month", 3);
+    const day6M = getDayNum("month", 6);
+    const day1Y = getDayNum("year", 1);
+    const day4Y = getDayNum("year", 4);
     const day_num = [day1W, day1M, day3M, day6M, day1Y, day4Y];
     var totalScore = poolLpScore / 1e34;
-    for(let i=0 ; i<6 ; i++) {
-      var weight =  stake * Math.sqrt(day_num[i]);
-      if(totalScore + weight == 0) newArr[i][0] = 0;
+    for (let i = 0; i < 6; i++) {
+      var weight = stake * Math.sqrt(day_num[i]);
+      if (totalScore + weight == 0) newArr[i][0] = 0;
       else newArr[i][0] = (weight / (totalScore + weight) * 100).toFixed(2);
     }
     setAprList(aprList);
     setDaysNum(day_num);
-  },[stake]); 
+  }, [stake]);
 
-  useEffect( () =>{
+  useEffect(() => {
     setIs4Years(false);
-  },[isModalVisible]);
+  }, [isModalVisible]);
 
   const getDayNum = (type, value) => {
     const nowDate = new Date();
     const nowDate2 = new Date();
-    if (type === 'week')nowDate.setHours(nowDate.getHours() + 24 * 7 * value);
+    if (type === 'week') nowDate.setHours(nowDate.getHours() + 24 * 7 * value);
     else if (type === 'month') nowDate.setMonth(nowDate.getMonth() + value);
     else if (type === 'year') nowDate.setFullYear(nowDate.getFullYear() + value);
     return Math.ceil((nowDate - nowDate2) / (1000 * 60 * 60 * 24));
@@ -110,19 +112,19 @@ const StakeModal = props => {
 
   const updateDate = (type, value, index) => {
     const newDate = new Date();
-    if (type === 'week')newDate.setHours(newDate.getHours() + 24 * 7 * value);
+    if (type === 'week') newDate.setHours(newDate.getHours() + 24 * 7 * value);
     else if (type === 'month') newDate.setMonth(newDate.getMonth() + value);
     else if (type === 'year') newDate.setFullYear(newDate.getFullYear() + value);
     else return;
 
-    let newArr = [...aprList]; 
+    let newArr = [...aprList];
     for (let i = 0; i < 6; i++) newArr[i][1] = false;
-    newArr[index][1] = true; 
-    setAprList(newArr);   
+    newArr[index][1] = true;
+    setAprList(newArr);
     setDate(newDate);
     setSelectedPresetDate(index);
     setPickingDate(false);
-    if(value == 4){
+    if (value == 4) {
       setIs4Years(true);
     } else {
       setIs4Years(false);
@@ -133,14 +135,14 @@ const StakeModal = props => {
     setDate(newDate);
     setSelectedPresetDate(null);
 
-    let newArr = [...aprList]; 
+    let newArr = [...aprList];
     for (let i = 0; i < 6; i++) newArr[i][1] = false;
-    setAprList(newArr);  
+    setAprList(newArr);
     setPickingDate(true);
   };
 
   const CustomDatePickerInput = forwardRef(({ value, onClick }, ref) => (
-    <button type="button" className={` ${styles.datePickerInput} ${pickingDate ? styles.pickingDate : '' }`} onClick={onClick} ref={ref}>
+    <button type="button" className={` ${styles.datePickerInput} ${pickingDate ? styles.pickingDate : ''}`} onClick={onClick} ref={ref}>
       {value}
     </button>
   ));
@@ -266,7 +268,7 @@ const StakeModal = props => {
           //   }).catch(e => console.log("error: ", e));
           // }
           //refresh pool info 
-          
+
           // clear top right loading spin
           const newData = transactions.filter(item => item.hash != status.hash);
           dispatch({
@@ -296,9 +298,13 @@ const StakeModal = props => {
     checkStatusAndFinish();
   };
   const checkIfDisabled = (i) => {
-    return daysNum[i]*60*60*24>endAfter
+    return daysNum[i] * 60 * 60 * 24 > endAfter
   };
-
+  const renderLpOrUsd = (flag) => flag&&<>
+    {token1 && token2 && `${token1}-${token2} LP`}
+    {token1 && !token2 && `${token1}s`}
+    {token2 && !token1 && `${token2}s`}
+  </>||'USD';
   return (
     <AcyModal
       key={`${token1}${token2}`}
@@ -312,19 +318,24 @@ const StakeModal = props => {
       visible={isModalVisible && modalVisible}
       destroyOnClose
     >
-      <div className={styles.amountRowContainer}>
-        <div className={styles.amountRowInputContainer}>
-          <input type="text" defaultValue={stake} value={showStake} onChange={e => updateStake(e.target.value)} />
+      <div className={styles.amountContainerWrap}>
+        <div className={styles.amountRowContainer}>
+          <div className={styles.amountRowInputContainer}>
+            <input type="text" defaultValue={!lpTokenShow && stake||stake * ratio} value={!lpTokenShow && showStake||showStake * ratio} onChange={e => updateStake(e.target.value)} />
+          </div>
+          <span className={styles.suffix}>
+            {renderLpOrUsd(lpTokenShow)}
+            <img onClick={()=>setLpTokenShow(!lpTokenShow)} className={styles.swapImg} src={SwapIcon} />
+          </span>
         </div>
-        <span className={styles.suffix}>
-          {token1 && token2 && `${token1}-${token2} LP`}
-          {token1 && !token2 && `${token1}s`}
-          {token2 && !token1 && `${token2}s`}
-        </span>
+        <div className={styles.backupCoin}>
+          <span>{!lpTokenShow && stake||stake * ratio}</span> {renderLpOrUsd(!lpTokenShow)}
+        </div>
       </div>
+
       <div className={styles.balanceAmountContainer}>
         <div className={styles.balanceAmount}>
-          Balance: {(parseFloat(balance)).toFixed(6)} 
+          Balance: {(parseFloat(balance)).toFixed(6)}
           {token1 && token2 && ` ${token1}-${token2} LP`}
           {token1 && !token2 && ` ${token1}s`}
           {token2 && !token1 && ` ${token2}s`}
@@ -356,9 +367,9 @@ const StakeModal = props => {
               wrapperClassName={styles.datePickerWrapper}
               selected={date}
               onChange={datePickerChangeHandler}
-              customInput={<CustomDatePickerInput /> }
+              customInput={<CustomDatePickerInput />}
             />
-            {pickingDate ? 
+            {pickingDate ?
               <div className={styles.APRBox1}>
                 {aprCounted}%
               </div> : ''
@@ -368,13 +379,13 @@ const StakeModal = props => {
           <div className={styles.APRRow}>
             {aprList.map(([text, selected], index) => {
               let APRstyle = ''
-              if(checkIfDisabled(index)) {
+              if (checkIfDisabled(index)) {
                 APRstyle = styles.APRDisabled
               }
-              else if (selected){
+              else if (selected) {
                 APRstyle = styles.APRBoxSelected
               }
-              else{
+              else {
                 APRstyle = styles.APRBox
               }
               return (
@@ -406,11 +417,11 @@ const StakeModal = props => {
           type="button"
           // className={(!withdrawButtonStatus && classNames(styles.button,styles.buttonDisabled)) || styles.button}
           // className={styles.stakeSubmitButton}
-          className={(!buttonStatus && classNames(styles.stakeSubmitButton,styles.buttonDisabled)) || styles.stakeSubmitButton}
+          className={(!buttonStatus && classNames(styles.stakeSubmitButton, styles.buttonDisabled)) || styles.stakeSubmitButton}
           disabled={!buttonStatus}
           onClick={async () => {
-            if(buttonText != "Done") {
-              if(buttonText !== 'Approval required') {
+            if (buttonText != "Done") {
+              if (buttonText !== 'Approval required') {
                 setButtonText(<>Processing <Icon type="loading" /></>);
                 setButtonStatus(false);
                 deposit(stakedTokenAddr, stake, poolId, getLockDuration(), library, account, setButtonText, stakeCallback, setButtonStatus);

@@ -7,10 +7,12 @@ import ProjectsCard from './ProjectsCard.js';
 
 const IncomingProjects = ({ data }) => {
   useEffect(() => {
+    // var cell = document.querySelectorAll(".card")
+    // console.log(cell)
     var $cell = $('.card');
 
-    //open and close card when clicked on card
-    $cell.find('.js-expander').click(function() {
+    //open and close card when hovered on card
+    $cell.find('.js-expander').hover(function() {
       var $thisCell = $(this).closest('.card');
 
       if ($thisCell.hasClass('is-collapsed')) {
@@ -33,16 +35,21 @@ const IncomingProjects = ({ data }) => {
     });
 
     //close card when click on cross
-    $cell.find('.js-collapser').click(function() {
-      var $thisCell = $(this).closest('.card');
+    // $cell.find('.js-collapser').hover(function() {
+    //   var $thisCell = $(this).closest('.card');
 
-      $thisCell.removeClass('is-expanded').addClass('is-collapsed');
-      $cell.not($thisCell).removeClass('is-inactive');
-    });
+    //   $thisCell.removeClass('is-expanded').addClass('is-collapsed');
+    //   $cell.not($thisCell).removeClass('is-inactive');
+    // });
   }, []);
 
   const [isActiveUpcoming, setIsActiveUpcoming] = useState(false);
   const [isIncomingExpanded, setisIncomingExpanded] = useState(false);
+
+  const toggleExpanded = (event) => {
+    console.log(this)
+    setisIncomingExpanded(!isIncomingExpanded)
+  }
 
   return (
     <div className={isActiveUpcoming ? 'incoming-container active' : 'incoming-container'}>
