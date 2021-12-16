@@ -484,7 +484,7 @@ const SwapComponent = props => {
         dollar={`${token1Balance}`}
         token={token1Amount}
         inputColor="#565a69"
-        additional="AMM Output"
+        // additional="AMM Output"
         onChoseToken={() => {
           onClickCoin();
           setBefore(false);
