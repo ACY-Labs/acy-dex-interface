@@ -6,7 +6,7 @@ import $ from 'jquery';
 import ProjectsCard from './ProjectsCard.js';
 import ExpandedContent from "./ExpandedContent.js"
 
-const EndedProjects = ({ data }) => {
+const EndedProjects = ({ data, openProject }) => {
   useEffect(() => {
     var $cell = $('.card2');
 
@@ -64,6 +64,7 @@ const EndedProjects = ({ data }) => {
                   <div className="card2__inner2 [ js-expander2 ]" onClick={()=>setisEndedExpanded(!isEndedExpanded)}>
                     <div className="">
                       <ProjectsCard
+                        projectID={obj.projectID}
                         ddl={obj.saleEnd}
                         raise={obj.totalRaise.toString() + " USDT"}
                         sales={obj.totalSale.toString() + ' ' + obj.projectToken}

@@ -2,11 +2,17 @@ import React from 'react';
 import '../css/ProjectsCard.css';
 import AcyIcon from '@/assets/icon_acy.svg';
 import CountDown from './CountDown.js';
+import { history } from 'umi';
 
-const ProjectsCard = ({ ddl, raise, sales, rate, title, isOngoing, isUpcoming, openProject}) => {
+const ProjectsCard = ({ projectID, ddl, raise, sales, rate, title, isOngoing, isUpcoming }) => {
   let saleString = isOngoing ? ("Sale ends: " + ddl ): (isUpcoming ? ("Sale starts: " + ddl) : ("Sale ended: " + ddl))
+
+  const onOpenProjectDetail = () => {
+    history.push(`/launchpad/project/${projectID}`)
+  }
+
   return (
-    <div className="projects-card projects-container" onClick={openProject}>
+    <div className="projects-card projects-container">
       <div className="logo-countdown-container">
         <div className="logo-container">
           <div className="logo">
@@ -26,7 +32,7 @@ const ProjectsCard = ({ ddl, raise, sales, rate, title, isOngoing, isUpcoming, o
         </div>
       </div>
 
-      <div className="details-container detail-text" onClick={openProject}>
+      <div className="details-container detail-text" onClick={onOpenProjectDetail}>
         <div style={{width: "100%", display:"inline-flex", justifyContent:"space-between", padding: "0 20px 0 10px"}}>
           <span>Raise</span>
           <span>{raise}</span>

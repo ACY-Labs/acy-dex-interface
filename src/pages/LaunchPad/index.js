@@ -22,11 +22,10 @@ const Pool = (props)=> {
     const [upcomingData, setUpcomingData] = useState([]);
     const [endedData, setEndedData] = useState([]);
 
-
     const history = useHistory();
-    const onClick = (e) => {
-    console.log(e)
-    history.push("/launchpad/project/"+ e)
+    const onClickProject = (projectID) => {
+      console.log('ProjectID: ', projectID);
+      history.push(`/launchpad/project/${projectID}`);
     }
 
     // project variables
@@ -102,20 +101,7 @@ const Pool = (props)=> {
                 <div className={styles.lineSeperator} />
               </div>
               <div className={styles.projectsContainer}>
-                {
-                  ongoingData && ongoingData.map((obj) =>
-                    <OngoingProjects 
-                      ddl={obj.saleEnd} 
-                      raise={obj.totalRaise.toString() + " USDT"} 
-                      sales={obj.totalRaise.toString()+ ' ' + obj.projectToken} 
-                      rate={"1 " + obj.projectToken + " = " + obj.tokenPrice.toString() + " USDT"} 
-                      title={obj.projectName} 
-                      isOngoing
-                      openProject={() => onClick(obj.projectID.toString())}
-                    />
-                  )
-                }
-                
+                <OngoingProjects data={ongoingData} />
               </div>
             </div>
             <div className={styles.projectBoxes}>
@@ -124,7 +110,7 @@ const Pool = (props)=> {
                 <div className={styles.lineSeperator} />
               </div>
               <div className={styles.projectsContainer}>
-                <IncomingProjects data={upcomingData} />
+                <IncomingProjects data={upcomingData}/>
               </div>
             </div>
             <div className={styles.projectBoxes}>

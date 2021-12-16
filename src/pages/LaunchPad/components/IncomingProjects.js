@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import $ from 'jquery';
 import ProjectsCard from './ProjectsCard.js';
 
-const IncomingProjects = ({ data }) => {
+const IncomingProjects = ({ data, openProject }) => {
   useEffect(() => {
     // var cell = document.querySelectorAll(".card")
     // console.log(cell)
@@ -70,12 +70,14 @@ const IncomingProjects = ({ data }) => {
                 <div className="card__inner [ js-expander ]" onClick={() => setisIncomingExpanded(!isIncomingExpanded)}>
                   <div className="">
                     <ProjectsCard
+                      projectID={obj.projectID}
                       ddl={obj.saleEnd}
                       raise={obj.totalRaise.toString() + " USDT"}
                       sales={obj.totalSale.toString() + ' ' + obj.projectToken}
                       rate={"1 " + obj.projectToken + " = " + obj.tokenPrice.toString() + " USDT"}
                       title={obj.projectName}
                       isUpcoming={true}
+                      openProject={openProject}
                     />
                   </div>
                   {/* <i className="fa fa-folder-o" /> */}
