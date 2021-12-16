@@ -145,6 +145,11 @@ const SwapComponent = props => {
   const [wrappedAmount, setWrappedAmount] = useState();
   const [showSpinner, setShowSpinner] = useState(false);
 
+  const [methodName, setMethodName] = useState();
+  const [isUseArb, setIsUseArb] = useState(false);
+  const [midTokenAddress, setMidTokenAddress] = useState();
+  const [poolExist, setPoolExist] = useState(true);
+
   // connect to page model, reflect changes of pair ratio in this component
   useEffect(() => {
     const { swap: { token0: modelToken0, token1: modelToken1 } } = props;
@@ -232,7 +237,11 @@ const SwapComponent = props => {
         setMinAmountOut,
         setMaxAmountIn,
         setWethContract,
-        setWrappedAmount
+        setWrappedAmount,
+        setMethodName,
+        setIsUseArb,
+        setMidTokenAddress,
+        setPoolExist
       );
     },
     [
@@ -282,7 +291,11 @@ const SwapComponent = props => {
         setMinAmountOut,
         setMaxAmountIn,
         setWethContract,
-        setWrappedAmount
+        setWrappedAmount,
+        setMethodName,
+        setIsUseArb,
+        setMidTokenAddress,
+        setPoolExist
       );
     },
     [
@@ -701,7 +714,11 @@ const SwapComponent = props => {
                 deadline,
                 setSwapStatus,
                 setSwapButtonContent,
-                swapCallback
+                swapCallback,
+                methodName,
+                isUseArb,
+                midTokenAddress,
+                poolExist
               );
             }
           }}
