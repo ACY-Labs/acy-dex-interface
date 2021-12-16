@@ -1,3 +1,4 @@
+import {scanUrlPrefix} from "@/constants/configs";
 import {
   CurrencyAmount,
   ETHER,
@@ -630,7 +631,7 @@ export async function swap(
   } else {
     console.log(status);
 
-    const url = `https://rinkeby.etherscan.io/tx/${status.hash}`;
+    const url = `${scanUrlPrefix}/tx/${status.hash}`;
     swapCallback(status, inputToken0, inputToken1);
     setSwapStatus(
       <div>

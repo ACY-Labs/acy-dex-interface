@@ -12,6 +12,7 @@ import {
 } from '@/acy-dex-swap/utils/index';
 
 import { Icon } from "antd";
+import {scanUrlPrefix} from '@/constants/configs';
 import supportedTokens from '@/constants/TokenList';
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import AcyRemoveLiquidityModal from '@/components/AcyRemoveLiquidityModal';
@@ -299,7 +300,7 @@ const AcyLiquidityPositions = (props) => {
               }} >
                 {record.pool}
               </p>
-              <a target="_blank" href={`https://rinkeby.etherscan.io/address/${record.poolAddress}`} >
+              <a target="_blank" href={`${scanUrlPrefix}/address/${record.poolAddress}`} >
                 <p className={styles.value}>
                   {`${record.poolAddress.slice(0, 5)}...${record.poolAddress.slice(
                     addressLength - 5,

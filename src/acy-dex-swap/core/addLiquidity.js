@@ -1,3 +1,4 @@
+import {scanUrlPrefix} from "@/constants/configs";
 import {
   CurrencyAmount,
   ETHER,
@@ -636,7 +637,7 @@ export async function addLiquidity(
   } else {
     console.log('status');
     console.log(status);
-    let url = 'https://rinkeby.etherscan.io/tx/' + status.hash;
+    let url = scanUrlPrefix + '/tx/' + status.hash;
     addLiquidityCallback(status);
     setLiquidityStatus(
       <a href={url} target={'_blank'}>

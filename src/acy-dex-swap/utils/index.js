@@ -13,8 +13,8 @@ import tokenList from '@/constants/TokenList';
 import axios from 'axios';
 export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
-export const ROUTER_ADDRESS = '0x9c040CC3CE4B2C135452370Eed152A72ce5d5b18';
-export const FARMS_ADDRESS  = '0x11B64a91fA3eedfe0977a64D908BB8B8faf903a4';4
+export const ROUTER_ADDRESS = '0x3c841A0298247C50b195e17af6Ab72B2e4cff5E1';
+export const FARMS_ADDRESS  = '0x11B64a91fA3eedfe0977a64D908BB8B8faf903a4';
 //old farm address 0xf132Fdd642Afa79FDF6C1B77e787865C652eC824
 //new farm address 0x96c13313aB386BCB16168Dee3D2d86823A990770
 //latest address   0x11B64a91fA3eedfe0977a64D908BB8B8faf903a4

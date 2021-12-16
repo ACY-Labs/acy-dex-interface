@@ -853,7 +853,7 @@ export async function removeLiquidity(
     
     removeLiquidityCallback(status, percent);
 
-    const url = `https://rinkeby.etherscan.io/tx/${status.hash}`;
+    const url = `${scanUrlPrefix}/tx/${status.hash}`;
     setRemoveStatus(
       <a href={url} target="_blank" rel="noreferrer">
         view it on etherscan
