@@ -4,6 +4,7 @@ import '../css/ProjectsCard.css';
 import { useEffect, useState } from 'react';
 import $ from 'jquery';
 import ProjectsCard from './ProjectsCard.js';
+import ExpandedContent from "./ExpandedContent.js"
 
 const EndedProjects = ({ data }) => {
   useEffect(() => {
@@ -85,7 +86,9 @@ const EndedProjects = ({ data }) => {
                 </div>
                 {/* <i className="fa fa-folder-o" /> */}
               </div>
-              <div className="card2__expander2">Expander</div>
+              <div className="card2__expander2">
+                <ExpandedContent />
+              </div>
             </div>
           </div>
           <div className="cards2">
