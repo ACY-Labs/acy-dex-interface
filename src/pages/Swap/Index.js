@@ -1,7 +1,7 @@
 import { useWeb3React } from '@web3-react/core';
 import { binance } from '@/connectors';
-import React, { Component, useState, useEffect } from 'react';
-// eslint-disable-next-line import/no-extraneous-dependencies
+import { InjectedConnector } from '@web3-react/injected-connector';
+import React, { Component, useState, useEffect, useRef } from 'react';
 import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton, Card } from 'antd';
 import {
@@ -22,7 +22,7 @@ import AcyRoutingChart from '@/components/AcyRoutingChart';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import { uniqueFun } from '@/utils/utils';
-import {getTransactionsByAccount} from '@/utils/txData';
+import {getTransactionsByAccount,appendNewSwapTx} from '@/utils/txData';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import { fetchGeneralTokenInfo, marketClient, fetchTokenDaySimple } from '../Market/Data/index.js';
 import SwapComponent from '@/components/SwapComponent';
@@ -105,6 +105,9 @@ const Swap = props => {
   const [tableLoading, setTableLoading] = useState(true);
   const [transactionNum, setTransactionNum] = useState(0);
   const { account, chainId, library, activate } = useWeb3React();
+
+  const refContainer = useRef();
+  refContainer.current = transactionList;
 
   // connect to provider, listen for wallet to connect
 
@@ -324,8 +327,21 @@ const Swap = props => {
     return tokenContract.decimals();
   };
 
+  const updateTransactionList = async (receipt) => {
+    setTableLoading(true);
+    console.log("updating list");
+    appendNewSwapTx(refContainer.current,receipt,account,library).then((data) => {
+      setTransactionList(data);
+      setTableLoading(false);
+    })
+    
+  }
+
+
   const onGetReceipt = async (receipt, library, account) => {
     console.log('RECEIPT', receipt);
+    updateTransactionList(receipt);
+
 
     const { inTokenAddr, amount, outTokenAddr, nonZeroToken, nonZeroTokenAmount } = receipt;
     let newRouteData = [];
