@@ -626,6 +626,7 @@ const SwapComponent = props => {
                 deadline,
                 setSwapStatus,
                 setSwapButtonContent,
+                setSwapButtonState,
                 swapCallback,
                 methodName,
                 isUseArb,
