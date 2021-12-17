@@ -45,12 +45,6 @@ const BasicProfile = (props) => {
   const [transactionNum, setTransactionNum] = useState(0);
   const { account, chainId, library, activate } = useWeb3React();
 
-  useEffect(() => {
-    if(!account){
-      activate(binance);
-    }
-  }, []);
-
 
  useEffect(() => {
     getTransactionsByAccount(account,library,'LIQUIDITY').then(data =>{

@@ -35,11 +35,6 @@ const Transaction = props => {
   let {id} = useParams();
 
   useEffect(() => {
-    activate(binance);
-  }, []);
-
-
-  useEffect(() => {
     console.log(id);
     fetchTransactionData(id,library,account).then(response => {
       setData(response);

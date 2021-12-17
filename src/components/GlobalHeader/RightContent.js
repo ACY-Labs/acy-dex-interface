@@ -36,7 +36,20 @@ const GlobalHeaderRight = props => {
   const [visibleMetaMask, setVisibleMetaMask] = useState(false);
   const [visibleSetting, setVisibleSetting] = useState(false);
   // 连接钱包函数
-  const { account, chainId, library, activate, deactivate } = useWeb3React();
+  const { account, chainId, library, activate, deactivate, active } = useWeb3React();
+
+  useEffect(() => {
+    if (!account)
+      activate(binance);
+  }, []);
+
+  useEffect(() => {
+    console.log('test current active', active)
+    if (!active)
+      deactivate();
+  }, [active])
+
+  useEffect(() => console.log("test current ", account), [account]);
 
   const getNoticeData = () => {
     const { notices = [] } = props;

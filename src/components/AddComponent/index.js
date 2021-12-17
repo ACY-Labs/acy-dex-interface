@@ -180,11 +180,7 @@ const AddLiquidityComponent = props => {
 
   // 初始化函数时连接钱包
   useEffect(
-    () => {
-      // if(!account){
-      //   activate(binance);
-      // }
-      
+    () => {   
       //read the fav tokens code in storage
       var tokens_symbol = JSON.parse(localStorage.getItem('tokens_symbol'));
       //set to fav token

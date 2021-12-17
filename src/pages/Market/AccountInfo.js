@@ -347,11 +347,10 @@ function AccountInfo(props) {
     });
 
   // method to prompt metamask extension for user to connect their wallet.
-  const connectWallet = () => activate(injected);
-  // const connectWallet = () => activate(binance);
+  // const connectWallet = () => activate(injected);
+  const connectWallet = () => activate(binance);
   useEffect(
     () => {
-      
       if(!daoStakeRecord || !stakeACY) return;
       let len = daoStakeRecord.myAcy.length;
       var resultMy = [...daoStakeRecord.myAcy];
@@ -388,8 +387,6 @@ function AccountInfo(props) {
 
   useEffect(
     () => {
-      // automatically connect to wallet at the start of the application.
-      connectWallet();
       console.log("TEST HERE ADDRESS:",address);
 
       fetchPoolsFromAccount(marketClient, address).then(data => {
@@ -615,7 +612,6 @@ function AccountInfo(props) {
   }, [])
 
   useEffect(async () => {
-    connectWallet();
     console.log("the user address is :" + account);    
     console.log("fetching the user pairs information");
 

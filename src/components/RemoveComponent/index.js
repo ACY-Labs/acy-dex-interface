@@ -94,13 +94,6 @@ const MyComponent = props => {
   // 连接钱包函数
   const { account, chainId, library, activate } = useWeb3React();
 
-  // 初始化函数时连接钱包
-  useEffect(() => {
-    if(!account){
-      activate(binance);
-    }
-  }, []);
-
   useEffect(
     () => {
       async function getUserRemoveLiquidityPositions() {
@@ -200,7 +193,7 @@ const MyComponent = props => {
   };
 
   const ConnectWallet = () => {
-    activate(injected);
+    activate(binance);
   };
 
   return (

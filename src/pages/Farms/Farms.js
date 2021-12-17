@@ -271,8 +271,6 @@ const Farms = (props) => {
  );
   useEffect(
      async () => {
-      // automatically connect to wallet at the start of the application.
-      connectWallet();
       getAllSuportedTokensPrice();
       // account will be returned if wallet is connected.
       // so if account is present, retrieve the farms contract.

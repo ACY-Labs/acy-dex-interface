@@ -109,8 +109,8 @@ const Swap = props => {
   // connect to provider, listen for wallet to connect
 
   useEffect(() => {
-    activate(binance);
-  }, []);
+    console.log("parent page account", account)
+  }, [account])
 
   useEffect(() => {
     getTransactionsByAccount(account,library,'SWAP').then(data =>{
