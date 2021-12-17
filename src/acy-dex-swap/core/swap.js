@@ -34,6 +34,7 @@ import {
   withExactInEstimateOutAmount,
   withExactOutEstimateInAmount
 } from '../utils';
+import axios from 'axios';
 
 // get the estimated amount  of the other token required when swapping, in readable string.
 export async function swapGetEstimated(
@@ -969,6 +970,31 @@ export async function swap(
 
     const url = `${scanUrlPrefix}/tx/${status.hash}`;
     swapCallback(status, inputToken0, inputToken1);
+
+    // Pass swap rate to backend
+    var rate = (parseFloat(inToken0Amount) / parseFloat(inToken1Amount));
+    var tempDate = new Date();
+    var time = tempDate.getTime();
+    if(inToken0Symbol > inToken1Symbol ){
+      var temp = inToken0Symbol;
+      inToken0Symbol = inToken1Symbol;
+      inToken1Symbol = temp;
+      rate = 1/rate;
+    }
+    console.log("rate", rate)
+    axios.post( 
+      `https://api.acy.finance/api/chart/add?token0=${inToken0Symbol}&token1=${inToken1Symbol
+      }&rate=${rate}&time=${time}`
+      // `http://localhost:3001/api/chart/add?token0=${inToken0Symbol}&token1=${inToken1Symbol
+      // }&rate=${rate}&time=${time}`
+    )
+    .then(data => {
+      console.log(data);
+    })
+    .catch(e => {
+      console.log(e);
+    });
+    
     setSwapStatus(
       <div>
         <a href={url} target="_blank" rel="noreferrer">
