@@ -9,7 +9,7 @@ import { requireAllocation, getAllocationInfo, getProjectInfo} from '@/services/
 import './css/LaunchpadProject.css';
 import project from '@/models/project';
 import AllocationIcon from "./components/AllocationIcon"
-import Lottie from "@/assets/lottie";
+import Lottie from "@/assets/lottie/json";
 import * as moment from 'moment';
 import context from 'react-bootstrap/esm/AccordionContext';
 import { CaretDownOutlined } from "@ant-design/icons"

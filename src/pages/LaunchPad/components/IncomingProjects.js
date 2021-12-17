@@ -4,6 +4,7 @@ import '../css/ProjectsCard.css';
 import { useState, useEffect } from 'react';
 import $ from 'jquery';
 import ProjectsCard from './ProjectsCard.js';
+import ExpandedContent from './ExpandedContent.js';
 
 const IncomingProjects = ({ data, openProject }) => {
   useEffect(() => {
@@ -11,8 +12,8 @@ const IncomingProjects = ({ data, openProject }) => {
     // console.log(cell)
     var $cell = $('.card');
 
-    //open and close card when hovered on card
-    $cell.find('.js-expander').hover(function() {
+    //open and close card when clicked on card
+    $cell.find('.js-expander').click(function() {
       var $thisCell = $(this).closest('.card');
 
       if ($thisCell.hasClass('is-collapsed')) {
@@ -46,15 +47,15 @@ const IncomingProjects = ({ data, openProject }) => {
   const [isActiveUpcoming, setIsActiveUpcoming] = useState(false);
   const [isIncomingExpanded, setisIncomingExpanded] = useState(false);
 
-  const toggleExpanded = (event) => {
-    console.log(this)
-    setisIncomingExpanded(!isIncomingExpanded)
-  }
+  const toggleExpanded = event => {
+    console.log(this);
+    setisIncomingExpanded(!isIncomingExpanded);
+  };
 
   return (
     <div className={isActiveUpcoming ? 'incoming-container active' : 'incoming-container'}>
       <div
-        className={isIncomingExpanded ? "expanded expanding-card" : "expanding-card"}
+        className={isIncomingExpanded ? 'expanded expanding-card' : 'expanding-card'}
         style={{
           zIndex: 1,
           display: 'flex',
@@ -63,18 +64,21 @@ const IncomingProjects = ({ data, openProject }) => {
           justifyContent: 'center',
         }}
       >
-        {
-          data && data.map((obj) =>
+        {data &&
+          data.map(obj => (
             <div className="cards">
               <div className=" card [ is-collapsed ]">
-                <div className="card__inner [ js-expander ]" onClick={() => setisIncomingExpanded(!isIncomingExpanded)}>
+                <div
+                  className="card__inner [ js-expander ]"
+                  onClick={() => setisIncomingExpanded(!isIncomingExpanded)}
+                >
                   <div className="">
                     <ProjectsCard
                       projectID={obj.projectID}
                       ddl={obj.saleEnd}
-                      raise={obj.totalRaise.toString() + " USDT"}
+                      raise={obj.totalRaise.toString() + ' USDT'}
                       sales={obj.totalSale.toString() + ' ' + obj.projectToken}
-                      rate={"1 " + obj.projectToken + " = " + obj.tokenPrice.toString() + " USDT"}
+                      rate={'1 ' + obj.projectToken + ' = ' + obj.tokenPrice.toString() + ' USDT'}
                       title={obj.projectName}
                       isUpcoming={true}
                       openProject={openProject}
@@ -88,13 +92,38 @@ const IncomingProjects = ({ data, openProject }) => {
                 </div>
               </div>
             </div>
-          )
-        }
+          ))}
+        <div className="cards">
+          <div className=" card [ is-collapsed ]">
+            <div
+              className="card__inner [ js-expander ]"
+              onClick={() => setisIncomingExpanded(!isIncomingExpanded)}
+            >
+              <div className="">
+                <ProjectsCard
+                  projectID={1}
+                  ddl={'2021/12/11 00:00:00'}
+                  raise={'1'}
+                  sales={'222'}
+                  rate={'test'}
+                  title={'test'}
+                  isUpcoming={true}
+                  openProject={openProject}
+                />
+              </div>
+              {/* <i className="fa fa-folder-o" /> */}
+            </div>
+            <div className="card__expander">
+              <ExpandedContent />
+            </div>
+          </div>
+        </div>
       </div>
-      {
-        data.length > 3 ? <a className="see-more-incoming" onClick={() => setIsActiveUpcoming(!isActiveUpcoming)} /> : ""
-      }
-      
+      {data.length > 3 ? (
+        <a className="see-more-incoming" onClick={() => setIsActiveUpcoming(!isActiveUpcoming)} />
+      ) : (
+        ''
+      )}
     </div>
   );
 };
