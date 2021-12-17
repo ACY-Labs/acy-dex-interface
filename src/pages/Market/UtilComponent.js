@@ -243,7 +243,7 @@ export function TokenTable(props) {
           </div>
           ),
         key: 'index',
-        width: '3rem',
+        width: '6rem',
         render:  (text, record, index) => (
           <div className={className(styles.tableDataFirstColumn,styles.tableIndex)}>
             {index + 1}
@@ -274,7 +274,7 @@ export function TokenTable(props) {
         className: 'leftAlignTableHeader',
         render: (text, entry) => {
           return (
-            <div className={styles.tableDataFirstColumn}>
+            <div className={styles.tableHeader}>
               <AcyTokenIcon symbol={entry.short} />
               <Link
                 style={{ color: 'white' }}
@@ -284,7 +284,6 @@ export function TokenTable(props) {
               >
                 {entry.short}
               </Link>
-              <div style={{width:5}}></div>
               <span className={styles.coinShort}> ({entry.name})</span>
             </div>
           );
@@ -316,41 +315,41 @@ export function TokenTable(props) {
         },
         visible: isDesktop(),
       },
-      {
-        title: (
-          <div
-            className={styles.tableHeader}
-            onClick={() => {
-              setCurrentKey('priceChange');
-              onSortChange();
-            }}
-          >
-            Price Change
-            {currentKey == 'priceChange' && (
-              <Icon
-                type={!isAscending ? 'arrow-up' : 'arrow-down'}
-                style={{ fontSize: '14px', marginLeft: '4px' }}
-              />
-            )}
-          </div>
-        ),
-        dataIndex: 'priceChange',
-        key: 'priceChange',
-        render: priceChange => {
-          return (
-            <div className={styles.tableData}>
-              <span className={priceChange < 0 ? styles.priceChangeDown : styles.priceChangeUp}>
-                {Math.abs(priceChange) > 0.01 && Math.abs(priceChange) > 0
-                  ? `${priceChange.toFixed(2)} %`
-                  : priceChange >= 0
-                  ? '<0.01 %'
-                  : '- <0.01%'}
-              </span>
-            </div>
-          );
-        },
-        visible: isDesktop(),
-      },
+      // {
+      //   title: (
+      //     <div
+      //       className={styles.tableHeader}
+      //       onClick={() => {
+      //         setCurrentKey('priceChange');
+      //         onSortChange();
+      //       }}
+      //     >
+      //       Price Change
+      //       {currentKey == 'priceChange' && (
+      //         <Icon
+      //           type={!isAscending ? 'arrow-up' : 'arrow-down'}
+      //           style={{ fontSize: '14px', marginLeft: '4px' }}
+      //         />
+      //       )}
+      //     </div>
+      //   ),
+      //   dataIndex: 'priceChange',
+      //   key: 'priceChange',
+      //   render: priceChange => {
+      //     return (
+      //       <div className={styles.tableData}>
+      //         <span className={priceChange < 0 ? styles.priceChangeDown : styles.priceChangeUp}>
+      //           {Math.abs(priceChange) > 0.01 && Math.abs(priceChange) > 0
+      //             ? `${priceChange.toFixed(2)} %`
+      //             : priceChange >= 0
+      //             ? '<0.01 %'
+      //             : '- <0.01%'}
+      //         </span>
+      //       </div>
+      //     );
+      //   },
+      //   visible: isDesktop(),
+      // },
       {
         title: (
           <div
@@ -700,7 +699,7 @@ export function TransactionTable(props) {
               style={{ fontWeight: 600 }}
               onClick={() => openInNewTab(`https://etherscan.io/tx/${entry.transactionID}`)}
             >
-              {entry.type} {entry.coin1} {entry.type == TransactionType.SWAP ? 'for' : 'and'}{' '}
+              {entry.type} {entry.coin1} {entry.action == TransactionType.SWAP ? 'for' : 'and'}{' '}
               {entry.coin2}
             </div>
           );

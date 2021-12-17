@@ -1,6 +1,9 @@
 import { GET_GLOBAL_TRANSACTIONS , FILTERED_TRANSACTIONS } from './query';
 import { TransactionType, sortTable } from '../Util';
 import { convertTx } from './util';
+import axios from 'axios';
+import {getTransactionsByAccount} from '@/utils/txData'
+import { getLibrary } from '../ConnectWallet';
 
 // SAMPLE TRANSACTION DATA
 // {
@@ -18,47 +21,103 @@ import { convertTx } from './util';
 const TRANSACTION_AMOUNT = 250;
 const FILTERED_AMOUNT = 50;
 
-// get all transactions
-export async function fetchGlobalTransaction(client) {
-  const { loading, error, data } = await client.query({
-    query: GET_GLOBAL_TRANSACTIONS,
-    variables: {
-      txAmount: TRANSACTION_AMOUNT,
-    },
-  });
+async function parseGlobalTransaction(userList,library){
+   let txList = [];
+   let finalTxList = [];
 
-  if (loading) return null;
-  if (error) return `Error! ${error}`;
+   for( const user of userList){
+     const userSwapTx = await getTransactionsByAccount(user,library,'SWAP');
+     const _swaptx = userSwapTx.map((item) => {
+       return {
+        account: user,
+        coin1: item.inputTokenSymbol,
+        coin1Amount: item.inputTokenNum,
+        coin2: item.outTokenSymbol,
+        coin2Amount: item.outTokenNum,
+        time: item.transactionTime,
+        totalValue: item.totalToken,
+        transactionID: item.hash,
+        type: "Swap"
+       }
+     })
+     const userLiquidityTx = await getTransactionsByAccount(user,library, 'LIQUIDITY');
 
-  let globalTransactions = [];
-  let mints = data.mints
-  let burns = data.burns
-  let swaps = data.swaps
+     const _liquiditytx = userLiquidityTx.map((item) => {
+      return {
+       account: user,
+       coin1: item.token1Symbol,
+       coin1Amount: item.token1Number,
+       coin2: item.token2Symbol,
+       coin2Amount: item.token2Number,
+       time: item.transactionTime,
+       totalValue: item.totalToken,
+       transactionID: item.hash,
+       type: item.action
+      }
+    })
 
+     txList.push(..._swaptx);
+     txList.push(..._liquiditytx);
+   }
 
-  // get all burns
-  for (let j = 0; j < burns.length; j++) {
-    globalTransactions.push(
-      convertTx(burns[j], burns[j].transaction.id, burns[j].transaction.timestamp, TransactionType.REMOVE)
-    );
-  }
-
-  // get all mints
-  for (let j = 0; j < mints.length; j++) {
-    globalTransactions.push(
-      convertTx(mints[j], mints[j].transaction.id, mints[j].transaction.timestamp, TransactionType.ADD)
-    );
-  }
-
-  // get all swaps
-  for (let j = 0; j < swaps.length; j++) {
-    globalTransactions.push(
-      convertTx(swaps[j], swaps[j].transaction.id, swaps[j].transaction.timestamp, TransactionType.SWAP)
-    );
-  }
-
-  return sortTable(globalTransactions, "time", true);
+   return sortTable(txList, "time", true);
 }
+
+export async function fetchGlobalTransaction(library){
+  try{
+    let request = 'https://api.acy.finance/api/users/all';
+    // let request = 'http://localhost:3001/api/users/all';
+    let response = await fetch(request);
+    let data = await response.json();
+    console.log(data.data);
+    let globalTransactions = await parseGlobalTransaction(data.data,library);
+    return globalTransactions;
+  }catch (e){
+    console.log('service not available yet',e);
+    return [];
+  }
+}
+// get all transactions
+// export async function fetchGlobalTransaction(client) {
+//   const { loading, error, data } = await client.query({
+//     query: GET_GLOBAL_TRANSACTIONS,
+//     variables: {
+//       txAmount: TRANSACTION_AMOUNT,
+//     },
+//   });
+
+//   if (loading) return null;
+//   if (error) return `Error! ${error}`;
+
+//   let globalTransactions = [];
+//   let mints = data.mints
+//   let burns = data.burns
+//   let swaps = data.swaps
+
+
+//   // get all burns
+//   for (let j = 0; j < burns.length; j++) {
+//     globalTransactions.push(
+//       convertTx(burns[j], burns[j].transaction.id, burns[j].transaction.timestamp, TransactionType.REMOVE)
+//     );
+//   }
+
+//   // get all mints
+//   for (let j = 0; j < mints.length; j++) {
+//     globalTransactions.push(
+//       convertTx(mints[j], mints[j].transaction.id, mints[j].transaction.timestamp, TransactionType.ADD)
+//     );
+//   }
+
+//   // get all swaps
+//   for (let j = 0; j < swaps.length; j++) {
+//     globalTransactions.push(
+//       convertTx(swaps[j], swaps[j].transaction.id, swaps[j].transaction.timestamp, TransactionType.SWAP)
+//     );
+//   }
+
+//   return sortTable(globalTransactions, "time", true);
+// }
 
 // get transaction from pool
 export async function fetchFilteredTransaction(client, pairAddresses) {

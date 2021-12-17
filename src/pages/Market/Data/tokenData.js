@@ -10,6 +10,12 @@ import { convertTokenForList } from './util';
 import { sortTable } from '../Util';
 import { getBlockFromTimestamp } from './blocks';
 
+import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
+import {findTokenWithAddress} from '@/utils/txData';
+import {totalInUSD} from '@/utils/utils';
+import uniqueTokens from '@/constants/uniqueTokens';
+import { symbol } from 'prop-types';
+
 export async function fetchTokenInfo(client, tokenAddress, timestamp) {
   const block = await getBlockFromTimestamp(timestamp);
 
@@ -63,34 +69,88 @@ export async function fetchTokenDaySimple(client, tokenId) {
 
 // fetch general token info
 // top 10, etc
-export async function fetchGeneralTokenInfo(client) {
-  let todayDateObj = new Date();
-  let todayTime = Math.floor(todayDateObj.getTime() / 1000 / 86400) * 86400;
 
-  const { loading, error, data } = await client.query({
-    query: GET_TOKEN_LIST,
-    variables: {
-      date: todayTime,
-      tokenAmount: 50,
-    },
+/* I WANT SOMETHING LIKE THIS
+address: "0x72e5390edb7727e3d4e3436451dadaff675dbcc0"
+name: "Hanu Yokia"
+price: 0.0000040829740792660185
+priceChange: -1.3222036097103693
+short: "HANU"
+tvl: 2017258489.0114584
+volume24h: 10312.741117738939
+*/
+
+var tokensPriceUSD ;
+
+function parseTokenData (data){
+
+  //INIT TOKEN LIST;
+  let newData = [];
+
+  uniqueTokens.forEach(element => {
+    newData.push({
+      address : element.address,
+      addressOnEth : element.addressOnEth,
+      name : element.name,
+      price : tokensPriceUSD[element.symbol],
+      priceChange : -0,
+      short : element.symbol,
+      tvl : 0,
+      volume24h : 0
+
+    })
   });
 
-  if (loading) return null;
-  if (error) return `Error! ${error}`;
+  data.forEach(element => {
+      let index0 = newData.findIndex(item => item.address.toLowerCase() == element.token0.toLowerCase() || item.addressOnEth.toLowerCase() == element.token0.toLowerCase());
+      let index1 = newData.findIndex(item => item.address.toLowerCase() == element.token1.toLowerCase() || item.addressOnEth.toLowerCase() == element.token1.toLowerCase());
+      newData[index0].tvl += totalInUSD([
+        {
+          token : newData[index0].short,
+          amount : element.lastReserves.token0
+        }
+      ],tokensPriceUSD);
 
-  let rawTopToken = data.tokenDayDatas;
-  let rawTopTokenLength = rawTopToken.length;
-  let topTokens = [];
-  for (let i = 0; i < rawTopTokenLength; i++) {
-    try {
-      const tokenDayData = await fetchTokenDaySimple(client, rawTopToken[i].token.id);
-      topTokens.push(convertTokenForList(rawTopToken[i], tokenDayData.tokenDayDatas[1]));
-    } catch (err) {
-      console.log(err);
-    }
+      newData[index0].volume24h += totalInUSD([
+        {
+          token : newData[index0].short,
+          amount : element.lastVolume.token0
+        }
+      ],tokensPriceUSD);
+
+      newData[index1].tvl += totalInUSD([
+        {
+          token : newData[index1].short,
+          amount : element.lastReserves.token1
+        }
+      ],tokensPriceUSD);
+
+      newData[index1].volume24h += totalInUSD([
+        {
+          token : newData[index1].short,
+          amount : element.lastVolume.token1
+        }
+      ],tokensPriceUSD);
+
+  });
+
+  return sortTable(newData,'volume24h',true);
+  
+}
+
+export async function fetchGeneralTokenInfo(client) {
+  // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
+  tokensPriceUSD = await getAllSuportedTokensPrice();
+  try{
+    let request = 'https://api.acy.finance/api/poolchart/all';
+    // let request = 'http://localhost:3001/api/poolchart/all';
+    let response = await fetch(request);
+    let data = await response.json();
+    return parseTokenData(data.data);
+  }catch (e){
+    console.log('service not available yet',e);
+    return [];
   }
-
-  return topTokens;
 }
 
 // fetch individual token from string (search)
