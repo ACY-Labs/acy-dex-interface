@@ -103,20 +103,20 @@ export async function swapGetEstimated(
     console.log(`token0Amount: ${inToken0Amount}`);
     console.log(`token1Amount: ${inToken1Amount}`);
 
-    let token0IsETH = inToken0Symbol === 'ETH';
-    let token1IsETH = inToken1Symbol === 'ETH';
+    let token0IsETH = inToken0Symbol === 'BNB';
+    let token1IsETH = inToken1Symbol === 'BNB';
 
     console.log(inputToken0);
     console.log(inputToken1);
 
     if (token0IsETH && token1IsETH) {
       setSwapButtonState(false);
-      setSwapButtonContent("don't support ETH to ETH");
-      return new CustomError("don't support ETH to ETH");
+      setSwapButtonContent("don't support BNB to BNB");
+      return new CustomError("don't support BNB to BNB");
     }
     // if one is ETH and other WETH, use WETH contract's deposit and withdraw
     // wrap ETH into WETH
-    if (token0IsETH && inToken1Symbol === 'WETH') {
+    if (token0IsETH && inToken1Symbol === 'WBNB') {
       // UI should sync value of ETH and WETH
       if (exactIn) {
         setToken1Amount(inToken0Amount);
@@ -182,7 +182,7 @@ export async function swapGetEstimated(
 
       return 'Wrap is ok';
     }
-    if (inToken0Symbol === 'WETH' && token1IsETH) {
+    if (inToken0Symbol === 'WBNB' && token1IsETH) {
       console.log('UNWRAP');
       if (exactIn) {
         setToken1Amount(inToken0Amount);
@@ -339,7 +339,8 @@ export async function swapGetEstimated(
     try {
       if (exactIn) {
         // update UI with estimated output token amount
-        const inToken0DecimalAmount = parseUnits(inToken0Amount, inToken0Decimal).toString()
+        const inToken0DecimalAmount = parseUnits(inToken0Amount, inToken0Decimal).toString();
+        console.log("TEST estimatedOutputAmount in");
         let estimatedOutputAmount = await withExactInEstimateOutAmount(
           inToken0DecimalAmount,
           inToken0Address,
@@ -348,6 +349,7 @@ export async function swapGetEstimated(
           library,
           account
         );
+        console.log("TEST estimatedOutputAmount out");
         hasArb = true;
         midTokenAddress = estimatedOutputAmount[0];
         ammOutput = estimatedOutputAmount.AMMOutput;
@@ -385,6 +387,7 @@ export async function swapGetEstimated(
         // setSlippageAdjustedAmount(minAmountOut);
       } else {
         const inToken1DecimalAmount = parseUnits(inToken1Amount, inToken1Decimal).toString()
+        console.log("TEST estimatedInputAmount in");
         let estimatedInputAmount = await withExactOutEstimateInAmount(
           inToken1DecimalAmount,
           inToken0Address,
@@ -393,6 +396,7 @@ export async function swapGetEstimated(
           library,
           account
         );
+        console.log("TEST estimatedInputAmount out");
         hasArb = true;
         midTokenAddress = estimatedInputAmount[0];
         ammOutput = estimatedInputAmount.AMMOutput;
@@ -433,8 +437,10 @@ export async function swapGetEstimated(
     catch (e) {
       console.log("TEST ERROR HERE:",e);
       setSwapButtonState(false);
-      setSwapButtonContent("Cannot find arbitrage path");
-      return "Cannot find arbitrage path";
+      // setSwapButtonContent("Cannot find arbitrage path");
+      if(!poolExist) {
+        return new CustomError('Pool is not exist!');
+      }
     }
     if(poolExist && !isUseArb) {
       // if(exactIn) {
@@ -543,8 +549,8 @@ export async function swapGetEstimated(
     if(!poolExist || isUseArb){
       setSwapButtonContent("Swap by arbitrage")
       if (exactIn) {
-        if(inToken0Symbol == 'WETH' ||inToken0Symbol == 'ETH' ) methodsName = isUseArb?"swapExactETHForTokensByArb":"swapExactETHForTokens";
-        else if(inToken1Symbol == 'ETH' ||inToken1Symbol == 'ETH') methodsName = isUseArb?"swapExactTokensForETHByArb":"swapExactTokensForETH";
+        if(inToken0Symbol == 'WBNB' ||inToken0Symbol == 'BNB' ) methodsName = isUseArb?"swapExactETHForTokensByArb":"swapExactETHForTokens";
+        else if(inToken1Symbol == 'WBNB' ||inToken1Symbol == 'BNB') methodsName = isUseArb?"swapExactTokensForETHByArb":"swapExactTokensForETH";
         else methodsName = isUseArb?"swapExactTokensForTokensByArb":"swapExactTokensForTokens";
         
         if(allPathAmountOut > ammOutput) {
@@ -567,8 +573,8 @@ export async function swapGetEstimated(
         setMinAmountOut(minAmountOut);
         setSlippageAdjustedAmount(minAmountOut);
       } else {
-        if(inToken0Symbol == 'WETH' ||inToken0Symbol == 'ETH' ) methodsName = isUseArb?"swapETHForExactTokensByArb":"swapETHForExactTokens";
-        else if(inToken1Symbol == 'ETH' ||inToken1Symbol == 'ETH') methodsName = isUseArb?"swapTokensForExactETHByArb":"swapTokensForExactETH";
+        if(inToken0Symbol == 'WBNB' || inToken0Symbol == 'BNB' ) methodsName = isUseArb?"swapETHForExactTokensByArb":"swapETHForExactTokens";
+        else if(inToken1Symbol == 'WBNB' || inToken1Symbol == 'BNB') methodsName = isUseArb?"swapTokensForExactETHByArb":"swapTokensForExactETH";
         else methodsName = isUseArb?"swapTokensForExactTokensByArb":"swapTokensForExactTokens";
 
         if(allPathAmountOut < ammOutput) {
@@ -652,7 +658,7 @@ export async function swapGetEstimated(
       setSwapButtonState(true);
       return 'swap is ok';
     } else {
-      console.log("ETH does not need approve")
+      console.log("BNB does not need approve")
       setNeedApprove(false);
     }
     setSwapButtonContent('Swap');
@@ -716,17 +722,17 @@ export async function swap(
     console.log(`token0Amount: ${inToken0Amount}`);
     console.log(`token1Amount: ${inToken1Amount}`);
 
-    const token0IsETH = inToken0Symbol === 'ETH';
-    const token1IsETH = inToken1Symbol === 'ETH';
+    const token0IsETH = inToken0Symbol === 'BNB';
+    const token1IsETH = inToken1Symbol === 'BNB';
 
     console.log(inputToken0);
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support ETH to ETH");
+    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support BNB to BNB");
     console.log('------------------ WRAP OR SWAP  ------------------');
     // if one is ETH and other WETH, use WETH contract's deposit and withdraw
     // wrap ETH into WETH
-    if (token0IsETH && inToken1Symbol === 'WETH') {
+    if (token0IsETH && inToken1Symbol === 'WBNB') {
       console.log('WRAP');
       // UI should sync value of ETH and WETH
       // if (exactIn) setToken1Amount(token0Amount);
@@ -737,13 +743,13 @@ export async function swap(
         })
         .catch(e => {
           console.log(e);
-          return new CustomError('WETH Deposit failed');
+          return new CustomError('WBNB Deposit failed');
         });
 
       return result;
     }
     // unwrap WETH into ETH
-    if (inToken0Symbol === 'WETH' && token1IsETH) {
+    if (inToken0Symbol === 'WBNB' && token1IsETH) {
       console.log('UNWRAP');
 
       // UI should sync value of ETH and WETH
