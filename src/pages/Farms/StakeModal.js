@@ -189,7 +189,7 @@ const StakeModal = props => {
           //refresh poold info
           axios.get(
             // fetch valid pool list from remote
-            `http://3.143.250.42:6001/api/farm/updatePool?poolId=${poolId}`
+            `https://api.acy.finance/api/farm/updatePool?poolId=${poolId}`
           ).then(res => {
             console.log("update pool on server return: ", res);
           }).catch(e => console.log("error: ", e));

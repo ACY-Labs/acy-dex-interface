@@ -979,9 +979,24 @@ export async function swap(
       setSwapStatus(text);
       setSwapButtonContent("Please try again");
     } else {
-      console.log(status);
+
+      setSwapStatus(
+        <div>
+          <a href={url} target="_blank" rel="noreferrer">
+            View it on BSC Scan
+          </a>
+        </div>
+      );
+
+      console.log("this is swap data: ", status);
       const url = `${scanUrlPrefix}/tx/${status.hash}`;
-      swapCallback(status, inputToken0, inputToken1);
+
+      try {
+
+        swapCallback(status, inputToken0, inputToken1);
+      } catch (err) {
+        console.log("error caught",  err)
+      }
 
       // Pass swap rate to backend
       var tempToken0 = inToken0Symbol
@@ -997,6 +1012,7 @@ export async function swap(
         rate = 1/rate;
       }
       console.log("rate", rate)
+
       axios.post( 
         `https://api.acy.finance/api/chart/add?token0=${tempToken0}&token1=${tempToken1
         }&rate=${rate}&time=${time}`
@@ -1010,13 +1026,7 @@ export async function swap(
         console.log(e);
       });
       
-      setSwapStatus(
-        <div>
-          <a href={url} target="_blank" rel="noreferrer">
-            View it on BSC Scan
-          </a>
-        </div>
-      );
+      
     } 
   }
 }

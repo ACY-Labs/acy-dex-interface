@@ -215,20 +215,20 @@ const GlobalHeaderRight = props => {
         selectWallet('walletconnect');
       },
     },
-    {
-      name: 'Trezor',
-      icon: 'Trezor',
-      onClick: () => {
-        selectWallet('trezor');
-      },
-    },
-    {
-      name: 'Ledger',
-      icon: 'Ledger',
-      onClick: () => {
-        selectWallet('ledger');
-      },
-    },
+    // {
+    //   name: 'Trezor',
+    //   icon: 'Trezor',
+    //   onClick: () => {
+    //     selectWallet('trezor');
+    //   },
+    // },
+    // {
+    //   name: 'Ledger',
+    //   icon: 'Ledger',
+    //   onClick: () => {
+    //     selectWallet('ledger');
+    //   },
+    // },
     {
       name: 'Fortmatic',
       icon: 'Fortmatic',
@@ -391,7 +391,7 @@ const GlobalHeaderRight = props => {
             See More...
           </p>
         )}
-        {account && (
+        {/* {account && (
           <AcyCardList>
             <div
               style={{
@@ -421,7 +421,7 @@ const GlobalHeaderRight = props => {
               </div>
             </div>
           </AcyCardList>
-        )}
+        )} */}
       </AcyModal>
     </div>
   );

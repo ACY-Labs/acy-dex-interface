@@ -357,7 +357,7 @@ const AcyLiquidityPositions = (props) => {
     axios.get(
       // fetch valid pool list from remote
       // `https://api.acy.finance/api/pool?chainId=${chainId}`
-      `http://3.143.250.42:6001/api/userpool?walletId=${account}`
+      `https://api.acy.finance/api/userpool?walletId=${account}`
       // `http://localhost:3001/api/userpool?walletId=${account}`
     ).then(async res => {
       console.log(res);

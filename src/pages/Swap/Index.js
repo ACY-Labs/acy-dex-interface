@@ -187,7 +187,7 @@ const Swap = props => {
   const getRoutePrice = (token0Address, token1Address) => {
     axios
       .post(
-        `http://3.143.250.42:6001/api/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
+        `https://api.acy.finance/api/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
       )
       .then(data => {
         console.log(data);
@@ -204,7 +204,7 @@ const Swap = props => {
   const getPrice = () => {
     // FIXME: current api doesn't take token0/1 sequence into consideration, always return ratio based on alphabetical order of token symbol
     axios.post(
-      `http://3.143.250.42:6001/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${activeToken1.addressOnEth
+      `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${activeToken1.addressOnEth
       }&range=${range}`
     )
       .then(data => {

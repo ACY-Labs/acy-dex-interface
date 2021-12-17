@@ -455,7 +455,7 @@ const AddLiquidityComponent = props => {
             const { token0, token1 } = pairToAddOnServer;
             axios.post(
               // fetch valid pool list from remote
-              `http://3.143.250.42:6001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
+              `https://api.acy.finance/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
               // `http://localhost:3001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
             ).then(res => {
               console.log("add to server return: ", res);

@@ -7,6 +7,7 @@ const AcyConnectWallet = props => {
   let chainName = 'BNB'
   switch (chainId) {
     case 97:
+    case 56:
       chainName = 'BNB'
       break;
     case 4:
