@@ -18,6 +18,7 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
     margin-top: 1.25rem;
+    margin-bottom: 100px;
 }
 
 .leftGrid {
@@ -179,17 +180,72 @@
 .projectDescription {
     opacity: 0.75;
     line-height: 1.5rem;
-    margin-top: 2rem;
+    /* margin-top: 2rem; */
+}
+
+.lineSeperator{
+    width: 100%;
+    margin: 1rem 0;
+    border-bottom: 1px solid #b5b5b6;
+    display: block;
 }
 
 .allocationContainer {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-    row-gap: 24px;
-    gap: 0.5rem;
+    grid-template-columns: repeat(4, 64px);
+    gap: 24px 24px;
     margin-top: 0.75rem;
+    justify-content: space-between;
 }
+
+.allocationCard {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    cursor: pointer;
+
+    background: white;
+    border-radius: 10px;
+    perspective: 500px;
+}
+
+.allocationCard .allocationCard-inner{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.allocationCard .inner-text{
+    font-size: 8px;
+}
+
+.allocationCard .cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 64px;
+    width: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Fredoka One", cursive;
+    font-size: 3em;
+    transform-origin: left top;
+    transition: 1s ease-in-out;
+    z-index: 100;
+    background: #353535;
+    border-radius: 8px;
+}
+
+.allocationCard .openCover {
+    transform: rotateY(-110deg);
+}
+  
 
 @media screen and (max-width: 1060px) {
     .gridContainer {

@@ -9,6 +9,9 @@ const { Countdown } = Statistic;
 
 const CountDown = ({ ddl }) => {
   // initial logic
+  let today = new Date();
+  let pDate = new Date(ddl);
+
   function getRemainTime(now) {
     // var ddl = "2021/12/11 00:00:00";
     //var now = Date.now()
@@ -29,13 +32,13 @@ const CountDown = ({ ddl }) => {
 
     return { day: day, hour: hour, min: min, sec: sec };
   }
-  let [currentTime, setTime] = useState(Date.now());
+  const [currentTime, setTime] = useState(Date.now());
 
-  let [countTime, setCount] = useState({ days: 0, hours: 0, min: 0, sec: 0 });
+  const [countTime, setCount] = useState({ days: 0, hours: 0, min: 0, sec: 0 });
 
   let { day, hour, min, sec } = getRemainTime(currentTime);
 
-  //figure out remain time
+  // figure out remain time
 
   useEffect(
     async () => {
@@ -57,29 +60,60 @@ const CountDown = ({ ddl }) => {
     };
   }, []);
 
+  if (ddl == null) {
+    countTime.days = 0;
+    countTime.hours = 0;
+    countTime.min = 0;
+    countTime.sec = 0;
+  }
+
   return (
     <div className="countDown-container">
-      <div className="countDown-box">
-        <div className="countDown-number" id="b">
-          <div className="countDown-number-1">{countTime.days}</div>
-          <div className="countDown-number-2">DAYS</div>
+      { today < pDate ? 
+        <div className="countDown-box">
+          <div className="countDown-number" id="b">
+            <div className="countDown-number-1">{countTime.days}</div>
+            <div className="countDown-number-2">DAYS</div>
+          </div>
+          <div className="seperator">:</div>
+          <div className="countDown-number" id="b">
+            <div className="countDown-number-1">{countTime.hours}</div>
+            <div className="countDown-number-2">HOURS</div>
+          </div>
+          <div className="seperator">:</div>
+          <div className="countDown-number" id="b">
+            <div className="countDown-number-1">{countTime.min}</div>
+            <div className="countDown-number-2">MIN</div>
+          </div>
+          <div className="seperator">:</div>
+          <div className="countDown-number" id="b">
+            <div className="countDown-number-1">{countTime.sec}</div>
+            <div className="countDown-number-2">SEC</div>
+          </div>
         </div>
-        <div className="seperator">:</div>
-        <div className="countDown-number" id="b">
-          <div className="countDown-number-1">{countTime.hours}</div>
-          <div className="countDown-number-2">HOURS</div>
+      : 
+        <div className="countDown-box">
+          <div className="countDown-number" id="b">
+            <div className="countDown-number-1">-</div>
+            <div className="countDown-number-2">DAYS</div>
+          </div>
+          <div className="seperator">:</div>
+          <div className="countDown-number" id="b">
+            <div className="countDown-number-1">-</div>
+            <div className="countDown-number-2">HOURS</div>
+          </div>
+          <div className="seperator">:</div>
+          <div className="countDown-number" id="b">
+            <div className="countDown-number-1">-</div>
+            <div className="countDown-number-2">MIN</div>
+          </div>
+          <div className="seperator">:</div>
+          <div className="countDown-number" id="b">
+            <div className="countDown-number-1">-</div>
+            <div className="countDown-number-2">SEC</div>
+          </div>
         </div>
-        <div className="seperator">:</div>
-        <div className="countDown-number" id="b">
-          <div className="countDown-number-1">{countTime.min}</div>
-          <div className="countDown-number-2">MIN</div>
-        </div>
-        <div className="seperator">:</div>
-        <div className="countDown-number" id="b">
-          <div className="countDown-number-1">{countTime.sec}</div>
-          <div className="countDown-number-2">SEC</div>
-        </div>
-      </div>
+      }
     </div>
   );
 };

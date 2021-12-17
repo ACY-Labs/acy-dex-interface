@@ -79,6 +79,7 @@
     "jquery": "^3.6.0",
     "lodash": "^4.17.10",
     "lodash-decorators": "^6.0.0",
+    "lottie-web": "^5.8.1",
     "math.js": "^1.1.46",
     "memoize-one": "^5.0.0",
     "moment": "^2.22.2",
@@ -154,9 +155,6 @@
     "tslint-config-prettier": "^1.10.0",
     "tslint-react": "^3.6.0",
     "umi": "^3.0.0"
-  },
-  "optionalDependencies": {
-    "puppeteer": "^1.10.0"
   },
   "engines": {
     "node": ">=8.0.0"

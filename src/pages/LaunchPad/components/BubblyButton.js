@@ -3,11 +3,11 @@ import { Card, Icon, Progress, Button } from 'antd';
 import "../css/ProjectsCard.css"
 import { useEffect, useState } from "react"; 
 
-const BubblyButton = () => {
+const BubblyButton = ({href, className}) => {
     const [isButtonActive, setIsButtonActive] = useState(false);
     // this.buttonRef = React.createRef();
-    useEffect(() => {
-        var animateButton = function(e) {
+    
+        const animateButton = function(e) {
 
             e.preventDefault;
             //reset animation
@@ -19,22 +19,16 @@ const BubblyButton = () => {
             },700);
           };
           
-          var bubblyButtons = document.getElementsByClassName("bubbly-button");
           
-          for (var i = 0; i < bubblyButtons.length; i++) {
-            bubblyButtons[i].addEventListener('click', animateButton, false);
-        }
-        
-    }, [isButtonActive])
+    
     return (
         <div>
-            <button className="bubbly-button" onClick={() => setIsButtonActive(!isButtonActive)}>
-
+            <a className="bubbly-button animate" href="https://forms.gle/gsLNsgDy2BXHNZda9" target="_blank" rel="noreferrer">
                 <div className='inner-text'>
                     <Icon type="rocket" style={{fontSize: '2em', margin: '0 10px 0 0'}} />
                     <p>Apply for IDO</p>
                 </div>
-            </button>
+            </a>
         </div>
     )
 }

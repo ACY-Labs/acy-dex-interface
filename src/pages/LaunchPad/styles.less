@@ -1,4 +1,5 @@
 @import '~antd/lib/style/themes/default.less';
+@import (css) url('https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600;700;800&display=swap');
 @cardColor: #2f313583;
 @mainColor: #c4c4c4;
 
@@ -1425,7 +1426,8 @@
 }
 
 .bigTitle{
-  font-weight: 700;
+  font-family: "Karla", sans-serif;
+  font-weight: 800;
   color: transparent;
   font-size: 120px;
   background: url("https://phandroid.s3.amazonaws.com/wp-content/uploads/2014/05/rainbow-nebula.jpg") repeat;
@@ -1435,6 +1437,31 @@
   text-align:center;
   line-height: 120px;
   letter-spacing: -8px;
+}
+
+@media (max-width: 640px) {
+    .bigTitle{
+        font-size: 70px;
+        line-height: 80px;
+        font-weight: 700;
+        letter-spacing: -4px;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 996px){
+    .bigTitle{
+        font-size: 80px;
+        line-height: 80px;
+        font-weight: 800;
+        letter-spacing: -3px;
+    }
+}
+@media (min-width: 997px) and (max-width: 1280px){
+    .bigTitle{
+        font-size: 100px;
+        line-height: 100px;
+        letter-spacing: -3px;
+    }
 }
 
 .bigTitle span{
@@ -1463,15 +1490,35 @@
     width: 100%;
     margin-left: auto !important;
     margin-right: auto !important;
+    margin-bottom: 3rem;
 }
 
 .titleDesc{
+    font-family: "Karla", sans-serif;
     width: 100%;
     text-align: center;
     font-size: 1.875rem;
     line-height: 2.25rem;
     padding: 2em 5em 0;
-    font-family: Gill Sans,sans-serif;
+}
+
+@media (max-width: 640px) {
+    .titleDesc{
+        font-size: 1rem;
+        line-height: 1.75rem;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 996px){
+    .titleDesc{
+        font-size: 1.25rem;
+    }
+}
+
+@media (min-width: 997px) and (max-width: 1280px){
+    .titleDesc{
+        font-size: 1.5rem;
+    }
 }
 
 .buttonContainer{
@@ -1481,6 +1528,12 @@
     justify-content: center !important;
     align-items: center !important;
     flex-wrap: wrap !important;
+}
+@media (max-width: 640px) {
+    .buttonContainer{
+        flex-direction: column;
+        gap: 15px;
+    }
 }
 
 .btnApply{
@@ -2111,7 +2164,7 @@
     justify-content: center;
     padding: 2em 0;
     z-index: 1;
-    gap :40px;
+    gap :20px;
     margin-bottom: 30px;
 }
 
@@ -2136,10 +2189,29 @@
     color: #fff;
     font-size: 2.5rem;
     font-weight: normal;
-    font-family: 'Roboto', sans-serif;
-    font-family: 'Source Sans 3', sans-serif;
+    font-family: "Karla", sans-serif;
 }
 
+@media (max-width: 640px) {
+    .anyStatusTitle{
+        width: 50%;
+        font-size: 1.125rem;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 996px){
+    .anyStatusTitle{
+        width: 50%;
+        font-size: 1.625rem;
+    }
+}
+
+@media (min-width: 997px) and (max-width: 1280px){
+    .anyStatusTitle{
+        width: 50%;
+        font-size: 2rem;
+    }
+}
 .lineSeperator{
     width: 100%;
     align-self: center;
@@ -2147,4 +2219,9 @@
     margin-top: 5px;
     border-bottom: 1px solid #b5b5b6;
     display: block;
+}
+@media (max-width: 640px) {
+    .lineSeperator{
+        width: 100%;
+    }
 }

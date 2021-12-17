@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import styles from './styles.less';
 
 const AcySmallButton = (
   { children, onClick, disabled, color, textColor, borderColor, borderRadius, padding }
@@ -7,10 +8,10 @@ const AcySmallButton = (
     type="button"
     style={{
       flex: '1',
-      background: String(color),
+      background: disabled?"#000000":String(color),
       color: { textColor },
       fontWeight: '600',
-      border: `solid 1px ${borderColor}`,
+      border: `solid 1px ${disabled?"#000000":borderColor}`,
       borderRadius: String(borderRadius),
       paddingTop: String(padding),
       paddingBottom: String(padding),
@@ -19,6 +20,7 @@ const AcySmallButton = (
       cursor: 'pointer',
     }}
     onClick={onClick}
+    disabled={disabled}
   >
     {children}
   </button>
@@ -33,7 +35,7 @@ const AcySmallButtonGroup = ({ activeButton, buttonList, containerClass, theme }
 
   return (
     <div className={containerClass}>
-      {buttonList.map(([text, onClick], index) => {
+      {buttonList.map(([text, onClick, disabled], index) => {
         let borderRadius = '0 0 0 0'
         if (index === 0) {
           borderRadius = '.5rem 0 0 .5rem'
@@ -49,6 +51,7 @@ const AcySmallButtonGroup = ({ activeButton, buttonList, containerClass, theme }
             padding="5px"
             onClick={onClick}
             id={index}
+            disabled={disabled}
           >
             {text}
           </AcySmallButton>

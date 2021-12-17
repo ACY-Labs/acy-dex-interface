@@ -210,7 +210,9 @@ const FarmsTableRow = props => {
       poolLpScore: newPool.lpScore,
       poolLpBalance: newPool.lpBalance,
       endsIn: getDHM((newPool.endBlock - block) *BLOCKS_PER_SEC),
-      status: newPool.endBlock - block > 0 
+      status: newPool.endBlock - block > 0,
+      endAfter: (newPool.endBlock - block) * BLOCKS_PER_SEC,
+      ratio: newPool.ratio
     };
     setPoolInfo(newFarmsContent);
   };
@@ -434,7 +436,7 @@ const FarmsTableRow = props => {
       {/* Table Content */}
       <div className={styles.tableBodyRowContentContainer} 
         onClick={()=> {
-          if(poolInfo.status)
+          // if(poolInfo.status)
             setHidden(prevState => !prevState)
           }
         }
@@ -689,6 +691,8 @@ const FarmsTableRow = props => {
         library={library}
         chainId={chainId}
         poolLpScore={poolInfo.poolLpScore}
+        endAfter={poolInfo.endAfter}
+        ratio={poolInfo.ratio}
       />
     </div>
   )
