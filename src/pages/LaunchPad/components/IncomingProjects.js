@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import $ from 'jquery';
 import ProjectsCard from './ProjectsCard.js';
 
-const IncomingProjects = ({ data }) => {
+const IncomingProjects = ({ data, openProject }) => {
   useEffect(() => {
     // var cell = document.querySelectorAll(".card")
     // console.log(cell)
@@ -54,7 +54,7 @@ const IncomingProjects = ({ data }) => {
   return (
     <div className={isActiveUpcoming ? 'incoming-container active' : 'incoming-container'}>
       <div
-        className={isIncomingExpanded ? "expanded expanding-card" : "expanding-card" }
+        className={isIncomingExpanded ? "expanded expanding-card" : "expanding-card"}
         style={{
           zIndex: 1,
           display: 'flex',
@@ -62,192 +62,39 @@ const IncomingProjects = ({ data }) => {
           gap: '20px',
           justifyContent: 'center',
         }}
-        
       >
-        <div className="cards" >
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner " onMouseEnter={toggleExpanded} onMouseLeave={() => setisIncomingExpanded(!isIncomingExpanded)} > 
-              <div className="">
-                <ProjectsCard
-                  ddl="2021/12/17 00:00:00"
-                  raise="250,000 USDT"
-                  sales="1,000,000 ACY"
-                  rate="1ACY = 0.2USDT"
-                  isUpcoming={true}
-                />
+        {
+          data && data.map((obj) =>
+            <div className="cards">
+              <div className=" card [ is-collapsed ]">
+                <div className="card__inner [ js-expander ]" onClick={() => setisIncomingExpanded(!isIncomingExpanded)}>
+                  <div className="">
+                    <ProjectsCard
+                      projectID={obj.projectID}
+                      ddl={obj.saleEnd}
+                      raise={obj.totalRaise.toString() + " USDT"}
+                      sales={obj.totalSale.toString() + ' ' + obj.projectToken}
+                      rate={"1 " + obj.projectToken + " = " + obj.tokenPrice.toString() + " USDT"}
+                      title={obj.projectName}
+                      isUpcoming={true}
+                      openProject={openProject}
+                    />
+                  </div>
+                  {/* <i className="fa fa-folder-o" /> */}
+                </div>
+                <div className="card__expander">
+                  <i className="fa fa-close [ js-collapser ]" />
+                  Expander
+                </div>
               </div>
-              {/* <button className='[ js-expander ] '>Hello</button> */}
-              {/* <i className="fa fa-folder-o" /> */}
             </div>
-            <div className="card__expander">
-              <i className="fa fa-close [ js-collapser ]" />
-              Expander
-            </div>
-          </div>
-        </div>
-        <div className="cards" >
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ] " onMouseEnter={toggleExpanded} onMouseLeave={() => setisIncomingExpanded(!isIncomingExpanded)} > 
-              <div className="">
-                <ProjectsCard
-                  ddl="2021/12/17 00:00:00"
-                  raise="250,000 USDT"
-                  sales="1,000,000 ACY"
-                  rate="1ACY = 0.2USDT"
-                  isUpcoming={true}
-                />
-              </div>
-              {/* <i className="fa fa-folder-o" /> */}
-            </div>
-            <div className="card__expander">
-              <i className="fa fa-close [ js-collapser ]" />
-              Expander
-            </div>
-          </div>
-        </div>
-        <div className="cards" >
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ] " onMouseEnter={toggleExpanded} onMouseLeave={() => setisIncomingExpanded(!isIncomingExpanded)} > 
-              <div className="">
-                <ProjectsCard
-                  ddl="2021/12/17 00:00:00"
-                  raise="250,000 USDT"
-                  sales="1,000,000 ACY"
-                  rate="1ACY = 0.2USDT"
-                  isUpcoming={true}
-                />
-              </div>
-              {/* <i className="fa fa-folder-o" /> */}
-            </div>
-            <div className="card__expander">
-              <i className="fa fa-close [ js-collapser ]" />
-              Expander
-            </div>
-          </div>
-        </div>
-        <div className="cards" >
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ] " onMouseEnter={toggleExpanded} onMouseLeave={() => setisIncomingExpanded(!isIncomingExpanded)} > 
-              <div className="">
-                <ProjectsCard
-                  ddl="2021/12/17 00:00:00"
-                  raise="250,000 USDT"
-                  sales="1,000,000 ACY"
-                  rate="1ACY = 0.2USDT"
-                  isUpcoming={true}
-                />
-              </div>
-              {/* <i className="fa fa-folder-o" /> */}
-            </div>
-            <div className="card__expander">
-              <i className="fa fa-close [ js-collapser ]" />
-              Expander
-            </div>
-          </div>
-        </div>
-        <div className="cards" >
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ] " onMouseEnter={toggleExpanded} onMouseLeave={() => setisIncomingExpanded(!isIncomingExpanded)} > 
-              <div className="">
-                <ProjectsCard
-                  ddl="2021/12/17 00:00:00"
-                  raise="250,000 USDT"
-                  sales="1,000,000 ACY"
-                  rate="1ACY = 0.2USDT"
-                  isUpcoming={true}
-                />
-              </div>
-              {/* <i className="fa fa-folder-o" /> */}
-            </div>
-            <div className="card__expander">
-              <i className="fa fa-close [ js-collapser ]" />
-              Expander
-            </div>
-          </div>
-        </div>
-        <div className="cards" >
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ] " onMouseEnter={toggleExpanded} onMouseLeave={() => setisIncomingExpanded(!isIncomingExpanded)} > 
-              <div className="">
-                <ProjectsCard
-                  ddl="2021/12/17 00:00:00"
-                  raise="250,000 USDT"
-                  sales="1,000,000 ACY"
-                  rate="1ACY = 0.2USDT"
-                  isUpcoming={true}
-                />
-              </div>
-              {/* <i className="fa fa-folder-o" /> */}
-            </div>
-            <div className="card__expander">
-              <i className="fa fa-close [ js-collapser ]" />
-              Expander
-            </div>
-          </div>
-        </div>
-        <div className="cards" >
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ] " onMouseEnter={toggleExpanded} onMouseLeave={() => setisIncomingExpanded(!isIncomingExpanded)} > 
-              <div className="">
-                <ProjectsCard
-                  ddl="2021/12/17 00:00:00"
-                  raise="250,000 USDT"
-                  sales="1,000,000 ACY"
-                  rate="1ACY = 0.2USDT"
-                  isUpcoming={true}
-                />
-              </div>
-              {/* <i className="fa fa-folder-o" /> */}
-            </div>
-            <div className="card__expander">
-              <i className="fa fa-close [ js-collapser ]" />
-              Expander
-            </div>
-          </div>
-        </div>
-        <div className="cards" >
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ] " onMouseEnter={toggleExpanded} onMouseLeave={() => setisIncomingExpanded(!isIncomingExpanded)} > 
-              <div className="">
-                <ProjectsCard
-                  ddl="2021/12/17 00:00:00"
-                  raise="250,000 USDT"
-                  sales="1,000,000 ACY"
-                  rate="1ACY = 0.2USDT"
-                  isUpcoming={true}
-                />
-              </div>
-              {/* <i className="fa fa-folder-o" /> */}
-            </div>
-            <div className="card__expander">
-              <i className="fa fa-close [ js-collapser ]" />
-              Expander
-            </div>
-          </div>
-        </div>
-        <div className="cards" >
-          <div className=" card [ is-collapsed ] ">
-            <div className="card__inner [ js-expander ] " onMouseEnter={toggleExpanded} onMouseLeave={() => setisIncomingExpanded(!isIncomingExpanded)} > 
-              <div className="">
-                <ProjectsCard
-                  ddl="2021/12/17 00:00:00"
-                  raise="250,000 USDT"
-                  sales="1,000,000 ACY"
-                  rate="1ACY = 0.2USDT"
-                  isUpcoming={true}
-                />
-                
-              </div>
-              {/* <i className="fa fa-folder-o" /> */}
-            </div>
-            <div className="card__expander">
-              <i className="fa fa-close [ js-collapser ]" />
-              Expander
-            </div>
-          </div>
-        </div>
+          )
+        }
       </div>
-      <a className="see-more-incoming" onClick={() => setIsActiveUpcoming(!isActiveUpcoming)} />
+      {
+        data.length > 3 ? <a className="see-more-incoming" onClick={() => setIsActiveUpcoming(!isActiveUpcoming)} /> : ""
+      }
+      
     </div>
   );
 };

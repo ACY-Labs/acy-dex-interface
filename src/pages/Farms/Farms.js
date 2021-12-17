@@ -166,7 +166,7 @@ const Farms = (props) => {
     const newFarmsContents = [];
     let ismyfarm = false;
     console.log("GETALLPOOLS:",pools);
-    pools.forEach((pool,idx) => {
+    pools&&pools.forEach((pool,idx) => {
       const newFarmsContent = {
         index: idx,
         poolId: pool.poolId,

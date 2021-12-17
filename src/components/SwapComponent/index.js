@@ -429,6 +429,7 @@ const SwapComponent = props => {
           const decodedLog = parseArbitrageLog(logs[logs.length - 1]);
           console.log('receipt OK, these are logs');
           console.log("decodedLog", decodedLog);
+          decodedLog['transactionHash'] = receipt.transactionHash;
 
           props.onGetReceipt(decodedLog, library, account);
           let newData = transactions.filter(item => item.hash != status.hash);
@@ -458,6 +459,9 @@ const SwapComponent = props => {
               // console.log('outputTokenNum',outTokenNum)
             }
           });
+
+          setSwapButtonContent("Done");
+          
           // 获取美元价值
           await axios
             .post(
@@ -513,7 +517,7 @@ const SwapComponent = props => {
           );
 
           // set button to done and disabled on default
-          setSwapButtonContent("Done");
+          
 
           // 读取数据：localStorage.getItem(key);
         }

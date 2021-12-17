@@ -110,10 +110,25 @@
     border-style: solid;
     height: calc(100% + 30px);
     top: 0px;
+    background: #eb5c1f;
     color: #eb5c1f;
     width: 1px;
     position: absolute;
     left: 11px;
+    display: block;
+}
+
+.verticalDivideLine_NotActive {
+    opacity: 0.8;
+    border-image: initial;
+    border-color: inherit;
+    border-style: solid;
+    height: calc(100% + 30px);
+    top: 0px;
+    width: 1px;
+    position: absolute;
+    left: 11px;
+    display: block;
 }
 
 .procedureNumber {
@@ -131,6 +146,23 @@
     background-color: #eb5c1f;
     z-index: 1;
     color: #010101;
+}
+
+.procedureNumber_NotActive {
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    flex-shrink: 0;
+    -webkit-box-flex: 0;
+    flex-grow: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 10000px;
+    background-color: #4b4f4e;
+    z-index: 1;
+    color: #000;
 }
 
 .shortText {
@@ -180,22 +212,28 @@
 .projectDescription {
     opacity: 0.75;
     line-height: 1.5rem;
-    margin-top: 2rem;
+    /* margin-top: 2rem; */
+}
+
+.lineSeperator{
+    width: 100%;
+    margin: 1rem 0;
+    border-bottom: 1px solid #b5b5b6;
+    display: block;
 }
 
 .allocationContainer {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 64px);
-    /* grid-template-rows: repeat(4, 1fr); */
+    grid-template-columns: repeat(4, 100px);
     gap: 24px 24px;
     margin-top: 0.75rem;
-    justify-content: space-between;
+    justify-content: center;
 }
 
 .allocationCard {
     position: relative;
-    width: 64px;
-    height: 64px;
+    width: 100px;
+    height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -222,8 +260,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    height: 64px;
-    width: 64px;
+    height: 100px;
+    width: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -247,3 +285,57 @@
         grid-template-columns: repeat(1, 1fr);
     }
 }
+ /*Sales, vesting */
+ .sales-container{
+     display: flex;
+     flex-direction: row;
+     justify-content: space-between;
+     align-items: center;
+ }
+
+ .vesting-container{
+     display: flex;
+     flex-direction: row;
+     justify-content: space-between;
+     align-items: center;
+     position: relative;
+
+ }
+
+ .text-line-container{
+     flex-grow: 1;
+     text-align: center;
+     padding: 0px 20px;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+ }
+ .vesting-line{
+    width: 100%;
+    margin: 10px 0;
+    border-bottom: 1px solid #b5b5b6;
+    display: block; 
+ }
+
+ .arrow-down-container{
+     width: 40px;
+     height: 40px;
+     font-size: 40px;
+     text-align: center;
+     margin-bottom: 10px;
+ }
+
+ .vesting-schedule{
+    position: absolute;
+    visibility: hidden;
+    width: 200px;
+    top: -100px;
+    background-color: #4b4f4e;
+    transition: transform 0.1s linear;
+ }
+
+ .text-line-container .active{
+    top: 50px;
+    visibility: visible;
+    transform: translateY(5px);
+ }
