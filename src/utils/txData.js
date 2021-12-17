@@ -1,16 +1,235 @@
 import moment from 'moment';
+import axios from 'axios';
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import {methodList, actionList} from '@/constants/MethodList';
 import liquidity from '@/pages/Liquidity/models/liquidity';
 import {getContract} from '@/acy-dex-swap/utils'
+import {totalInUSD} from '@/utils/utils';
+
+import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import { abi as IUniswapV2Router02ABI } from '@/abis/IUniswapV2Router02.json';
 
-
-function findTokenInList(item){
+// THIS FUNCTIONS RETURN TOKEN 
+export function findTokenInList(item){ // token has address attribute
     return INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.address.toLowerCase() || token.addressOnEth.toLowerCase()==item.address.toLowerCase());
+}
+export function findTokenWithAddress(item){// input is an address 
+    return INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.toLowerCase() || token.addressOnEth.toLowerCase()==item.toLowerCase());
+}
+
+export function findTokenWithSymbol(item){
+    return INITIAL_TOKEN_LIST.find(token => token.symbol==item);
+}
+
+// TODO :: translate to USD
+
+
+function saveTxInDB(data){
+
+    let tokenPriceUSD = getAllSuportedTokensPrice();
+
+    let valueSwapped = totalInUSD([
+        {
+            token : data.inputTokenSymbol,
+            amount : parseFloat(data.inputTokenNum)
+        },
+        {
+            token : data.outTokenSymbol,
+            amount : parseFloat(data.outTokenNum)
+        }
+    ],tokenPriceUSD);
+
+    let feesPaid = totalInUSD([
+        {
+            token : 'ETH',
+            amount : data.gasFee
+        }
+    ],tokenPriceUSD);
+
+    console.log("calculated total value and fees paid");
+    console.log(valueSwapped,feesPaid);
+
+    try{
+        axios
+        .post(
+          `http://localhost:3001/api/users/swap?address=${data.address}&hash=${data.hash}&valueSwapped=${valueSwapped}&feesPaid=${feesPaid}`
+        )
+        .then(response => {
+          console.log(response.response);
+        });
+    }catch(e){
+        console.log("service not working...")
+    }
+
+}
+
+async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, library){
+
+    let response = await library.getTransactionReceipt(hash);
+
+    if(!response.status) return {};
+
+    let TO_HASH = response.to.toLowerCase().slice(2);
+    let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(TO_HASH));
+    let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
+
+
+            
+    let inToken = findTokenInList(inLogs[0]);
+    let outToken =  findTokenInList(outLogs[0]);
+
+    let inTokenNumber = 0;
+    let outTokenNumber = 0;
+
+    for(let log of inLogs){inTokenNumber = inTokenNumber + (log.data / Math.pow(10, inToken.decimals))};
+    inTokenNumber = inTokenNumber.toString();
+    for(let log of outLogs){outTokenNumber += (log.data / Math.pow(10, outToken.decimals))};
+    outTokenNumber = outTokenNumber.toString();         
+
+    let now = Date.now();
+    let transactionTime ;
+    if(timestamp) transactionTime = moment(parseInt(timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
+    else transactionTime = moment(now).format('YYYY-MM-DD HH:mm:ss');
+
+    let gasFee = (response.effectiveGasPrice.toNumber() / (Math.pow(10,18)) )* response.gasUsed.toNumber()
+
+    return {
+        "address" : account.toString(),
+        "hash": hash,
+        "action" : 'Swap',
+         "totalToken": 0,
+        "inputTokenNum": inTokenNumber,
+        "inputTokenSymbol": inToken.symbol,
+        "outTokenNum": outTokenNumber,
+        "outTokenSymbol": outToken.symbol,
+        "transactionTime": transactionTime,
+        "gasFee" : gasFee
+    };
+}
+
+async function fetchUniqueTokenToETH(account, hash, timestamp, FROM_HASH, library){
+    let response = await library.getTransactionReceipt(hash);
+    if(!response.status) return {};
+    let TO_HASH = response.to.toLowerCase().slice(2);
+    let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(FROM_HASH));
+    let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(TO_HASH));
+    let inToken = findTokenInList(inLogs[0]);
+    let outToken =  findTokenInList(outLogs[0]);
+    let inTokenNumber = 0;
+    let outTokenNumber = 0;
+
+    for(let log of inLogs){inTokenNumber = inTokenNumber + (log.data / Math.pow(10, inToken.decimals))};
+    inTokenNumber = inTokenNumber.toString();
+    for(let log of outLogs){outTokenNumber += (log.data / Math.pow(10, outToken.decimals))};
+    outTokenNumber = outTokenNumber.toString();
+
+    let now = Date.now();
+    let transactionTime ;
+    if(timestamp) transactionTime = moment(parseInt(timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
+    else transactionTime = moment(now).format('YYYY-MM-DD HH:mm:ss');
+
+    let gasFee = (response.effectiveGasPrice.toNumber() / (Math.pow(10,18)) )* response.gasUsed.toNumber()
+
+    return  {
+        "address" : account.toString(),
+        "action" : 'Swap',
+        "hash": hash,
+        "totalToken": 0,
+        "inputTokenNum": inTokenNumber,
+        "inputTokenSymbol": inToken.symbol,
+        "outTokenNum": outTokenNumber,
+        "outTokenSymbol": outToken.symbol,
+        "transactionTime": transactionTime,
+        "gasFee" : gasFee
+    };
+}
+
+async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, library){
+    let response = await library.getTransactionReceipt(hash);
+    if(!response.status) return {};
+    let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(FROM_HASH));
+    let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
+
+    let inToken = findTokenInList(inLogs[0]);
+    let outToken =  findTokenInList(outLogs[0]);
+
+    let inTokenNumber = 0;
+    let outTokenNumber = 0;
+
+    for(let log of inLogs){inTokenNumber = inTokenNumber + (log.data / Math.pow(10, inToken.decimals))};
+    inTokenNumber = inTokenNumber.toString();
+    for(let log of outLogs){outTokenNumber += (log.data / Math.pow(10, outToken.decimals))};
+    outTokenNumber = outTokenNumber.toString();
+
+    let now = Date.now();
+    let transactionTime ;
+    if(timestamp) transactionTime = moment(parseInt(timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
+    else transactionTime = moment(now).format('YYYY-MM-DD HH:mm:ss');
+
+    let gasFee = (response.effectiveGasPrice.toNumber() / (Math.pow(10,18)) )* response.gasUsed.toNumber()
+
+    return {
+        "address" : account.toString(),
+        "hash": hash,
+        "action" : 'Swap',
+        "totalToken": 0,
+        "inputTokenNum": inTokenNumber,
+        "inputTokenSymbol": inToken.symbol,
+        "outTokenNum": outTokenNumber,
+        "outTokenSymbol": outToken.symbol,
+        "transactionTime": transactionTime,
+        "gasFee" : gasFee
+    }
+}
+
+export async function appendNewSwapTx(currList,receipt,account,library){
+
+    console.log("printing curr...", currList);
+
+    if(currList.length > 0 && currList[0].hash.toLowerCase() == receipt.transactionHash.toLowerCase()) return currList;
+
+    let FROM_HASH = account.toString().toLowerCase().slice(2);
+    let TO_HASH;
+
+    let newData;
+    
+    // let tokenin = findTokenWithAddress(receipt.inTokenAddr);
+    // let tokenout = findTokenWithAddress(receipt.outTokenAddr);
+    // console.log(tokenin);
+    // console.log(tokenout);
+    
+    if(findTokenWithAddress(receipt.inTokenAddr).address.toLowerCase() == INITIAL_TOKEN_LIST.find(item => item.symbol == 'ETH').address.toLowerCase()){
+
+        console.log("adding eth to token");
+        newData = await fetchUniqueETHToToken(account, receipt.transactionHash,null,FROM_HASH, library);
+        
+
+    }else if(findTokenWithAddress(receipt.outTokenAddr).address.toLowerCase() == INITIAL_TOKEN_LIST.find(item => item.symbol == 'ETH').address.toLowerCase()){
+        console.log("adding token to eth");
+        newData  = await fetchUniqueTokenToETH(account, receipt.transactionHash,null,FROM_HASH, library);
+        
+    }else{
+        console.log("addding normal token to token");
+        newData = await fetchUniqueTokenToToken(account, receipt.transactionHash,null,FROM_HASH, library);
+    }
+
+    saveTxInDB(
+        {
+            ...newData
+
+        }
+    );
+
+    let temp = [];
+    temp.push(newData);
+    temp.push(...currList);
+
+    return temp;
+
 }
 
 export async function parseTransactionData (fetchedData,account,library,filter) {
+
     if(filter == 'SWAP'){
 
         let FROM_HASH = account.toString().toLowerCase().slice(2);
@@ -20,92 +239,22 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
         let newData = [];
 
         for (let item of filteredData) {
-            let response = await library.getTransactionReceipt(item.hash);
-            let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(FROM_HASH));
-            let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
-
-            let inToken = findTokenInList(inLogs[0]);
-            let outToken =  findTokenInList(outLogs[0]);
-
-            let inTokenNumber = 0;
-            let outTokenNumber = 0;
-
-            for(let log of inLogs){inTokenNumber = inTokenNumber + (log.data / Math.pow(10, inToken.decimals))};
-            inTokenNumber = inTokenNumber.toString();
-            for(let log of outLogs){outTokenNumber += (log.data / Math.pow(10, outToken.decimals))};
-            outTokenNumber = outTokenNumber.toString();
-
-            let transactionTime = moment(parseInt(item.timeStamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
-            newData.push({
-            "hash": item.hash,
-            "totalToken": 0,
-            "inputTokenNum": inTokenNumber,
-            "inputTokenSymbol": inToken.symbol,
-            "outTokenNum": outTokenNumber,
-            "outTokenSymbol": outToken.symbol,
-            "transactionTime": transactionTime
-            })
+            let fetchedItem = await fetchUniqueTokenToToken(account, item.hash,item.timeStamp,FROM_HASH, library);
+            newData.push(fetchedItem);
         }
 
         filteredData = fetchedData.filter(item => item.input.startsWith(methodList.ethToToken.id));
 
         for (let item of filteredData) {
-            let response = await library.getTransactionReceipt(item.hash);
-            TO_HASH = response.to.toLowerCase().slice(2);
-            let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(TO_HASH));
-            let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
-            
-            let inToken = findTokenInList(inLogs[0]);
-            let outToken =  findTokenInList(outLogs[0]);
-
-            let inTokenNumber = 0;
-            let outTokenNumber = 0;
-
-            for(let log of inLogs){inTokenNumber = inTokenNumber + (log.data / Math.pow(10, inToken.decimals))};
-            inTokenNumber = inTokenNumber.toString();
-            for(let log of outLogs){outTokenNumber += (log.data / Math.pow(10, outToken.decimals))};
-            outTokenNumber = outTokenNumber.toString();         
-
-            let transactionTime = moment(parseInt(item.timeStamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
-            newData.push({
-            "hash": item.hash,
-            "totalToken": 0,
-            "inputTokenNum": inTokenNumber,
-            "inputTokenSymbol": inToken.symbol,
-            "outTokenNum": outTokenNumber,
-            "outTokenSymbol": outToken.symbol,
-            "transactionTime": transactionTime
-            })
+            let fetchedItem = await fetchUniqueETHToToken(account, item.hash,item.timeStamp,FROM_HASH, library);
+            newData.push(fetchedItem);
         }
 
         filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToEth.id));
 
         for (let item of filteredData) {
-            let response = await library.getTransactionReceipt(item.hash);
-            TO_HASH = response.to.toLowerCase().slice(2);
-            let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(FROM_HASH));
-            let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(TO_HASH));
-            let inToken = findTokenInList(inLogs[0]);
-            let outToken =  findTokenInList(outLogs[0]);
-            let inTokenNumber = 0;
-            let outTokenNumber = 0;
-
-            for(let log of inLogs){inTokenNumber = inTokenNumber + (log.data / Math.pow(10, inToken.decimals))};
-            inTokenNumber = inTokenNumber.toString();
-            for(let log of outLogs){outTokenNumber += (log.data / Math.pow(10, outToken.decimals))};
-            outTokenNumber = outTokenNumber.toString();
-
-
-            let transactionTime = moment(parseInt(item.timeStamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
-            newData.push({
-            "hash": item.hash,
-            "totalToken": 0,
-            "inputTokenNum": inTokenNumber,
-            "inputTokenSymbol": inToken.symbol,
-            "outTokenNum": outTokenNumber,
-            "outTokenSymbol": outToken.symbol,
-            "transactionTime": transactionTime
-            })
+            let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library);
+            newData.push(fetchedItem);
         }
         
         return newData;
@@ -147,6 +296,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
             let transactionTime = moment(parseInt(item.timeStamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
             newData.push({
+            "address" : account.toString(),
             "hash": item.hash,
             "action":'Add',
             "totalToken": 0,
@@ -178,6 +328,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
             let transactionTime = moment(parseInt(item.timeStamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
             newData.push({
+            "address" : account.toString(),
             "hash": item.hash,
             "action":'Add',
             "totalToken": 0,
@@ -218,6 +369,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
             let transactionTime = moment(parseInt(item.timeStamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
             newData.push({
+            "address" : account.toString(),
             "hash": item.hash,
             "action":'Remove',
             "totalToken": 0,
@@ -257,6 +409,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
             let transactionTime = moment(parseInt(item.timeStamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
             newData.push({
+            "address" : account.toString(),
             "hash": item.hash,
             "action":'Remove',
             "totalToken": 0,
@@ -275,6 +428,8 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 export async function getTransactionsByAccount (account,library,filter){
     let newData = [];
     if(account){
+        console.log("fetchinf transactions for account ", filter,account);
+        console.log("library", library);
         try{
         let address =  account.toString();
         let apikey = 'Y6H9S7521BGREFMGSETVA72F1HT74FE3M5';
@@ -282,7 +437,7 @@ export async function getTransactionsByAccount (account,library,filter){
         let startBlock = '0';
         let endBlock = '99999999';
         let page = '1';
-        let offset='250'; // NUMBER OF RESULTS FETCHED FROM ETHERSCAN
+        let offset='50'; // NUMBER OF RESULTS FETCHED FROM ETHERSCAN
         let sort='asc';
         let request = 'https://api-rinkeby.etherscan.io/api?module=account&action=txlist&address='+address+'&startblock=0&endblock=99999999&page=1&offset='+offset+'&sort=desc&apikey='+apikey;
 
