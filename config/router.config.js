@@ -71,7 +71,8 @@ export default [
         routes: [
           {
             path: '/launchpad',
-            component: './LaunchPad/Index',
+            // component: './LaunchPad/Index',
+            component: './LaunchPad/LaunchpadProject'
           },
           {
             path: '/launchpad/newproject',
