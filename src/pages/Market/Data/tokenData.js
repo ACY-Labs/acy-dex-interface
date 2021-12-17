@@ -92,7 +92,7 @@ function parseTokenData (data){
       address : element.address,
       addressOnEth : element.addressOnEth,
       name : element.name,
-      price : tokensPriceUSD[element.symbol],
+      price : tokensPriceUSD[element.symbol] ? tokensPriceUSD[element.symbol] : 1,
       priceChange : -0,
       short : element.symbol,
       tvl : 0,
@@ -134,11 +134,13 @@ function parseTokenData (data){
 
   });
 
+  console.log("token data",newData);
+
   return sortTable(newData,'volume24h',true);
   
 }
 
-export async function fetchGeneralTokenInfo(client) {
+export async function fetchGeneralTokenInfo() {
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{

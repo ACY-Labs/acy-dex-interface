@@ -81,7 +81,7 @@ function parsePoolData (data){
 
   let _data = data.map((item)=>{
 
-
+    console.log("mapping....",item.token0,item.token1);
     let _token0 = findTokenWithAddress(item.token0).symbol;
     let _token1 = findTokenWithAddress(item.token1).symbol;
 
