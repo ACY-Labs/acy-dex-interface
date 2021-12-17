@@ -31,7 +31,7 @@
     "docker:push": "npm run docker-hub:build && npm run docker:tag && docker push antdesign/ant-design-pro"
   },
   "dependencies": {
-    "@acyswap/sdk": "*",
+    "@acyswap/sdk": "^1.0.10",
     "@ant-design/icons": "^4.7.0",
     "@antv/data-set": "^0.10.0",
     "@apollo/client": "^3.4.11",
