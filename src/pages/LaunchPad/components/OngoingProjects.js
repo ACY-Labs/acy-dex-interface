@@ -24,7 +24,6 @@ const OngoingProjects = ({ data }) => {
                 rate={"1 " + obj.projectToken + " = " + obj.tokenPrice.toString() + " USDT"}
                 title={obj.projectName} 
                 isOngoing
-                openProject={() => onOpenProjectDetail(obj.projectID.toString())}
               />
             </div>
           </div>
