@@ -2,6 +2,7 @@ import { useWeb3React } from '@web3-react/core';
 import { binance } from '@/connectors';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import React, { Component, useState, useEffect, useRef } from 'react';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton, Card } from 'antd';
 import {
