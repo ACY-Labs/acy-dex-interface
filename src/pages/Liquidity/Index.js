@@ -112,8 +112,8 @@ const BasicProfile = (props) => {
         <div className={styles.rowFlexContainer} >
           {loggedIn &&
             <div style={{ flex: 2 }}>
-              {/* <AcyLiquidityPositions /> */}
-              <div>Table hidden for now, waiting for dedicated database for BSC data to avoid error on this page.</div>
+              <AcyLiquidityPositions />
+              {/* <div>Table hidden for now, waiting for dedicated database for BSC data to avoid error on this page.</div> */}
             </div>
           }
           <div style={{ flex: 1, width: "50vw", minWidth: loggedIn ? null : "340px", maxWidth: loggedIn ? null : "420px" }}>
