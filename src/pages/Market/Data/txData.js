@@ -74,7 +74,7 @@ export async function fetchGlobalTransaction(library){
     return globalTransactions;
   }catch (e){
     console.log('service not available yet',e);
-    return [];
+    return null;
   }
 }
 // get all transactions

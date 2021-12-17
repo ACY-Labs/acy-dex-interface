@@ -64,22 +64,24 @@ const MarketIndex = props => {
     // fetch transaction data
     if(library)fetchGlobalTransaction(library).then(globalTransactions => {
       console.log(globalTransactions);
-      settransactions(globalTransactions);
+      if(globalTransactions) settransactions(globalTransactions);
     });
   }, [library]);
 
   useEffect(() => {
     fetchGeneralPoolInfoDay().then(poolInfo => {
-      setpoolInfo ( poolInfo );
+      if(poolInfo) setpoolInfo ( poolInfo );
     });
 
     // fetch token info
     fetchGeneralTokenInfo().then(tokenInfo => {
-      settokenInfo(tokenInfo);
+      if(tokenInfo) settokenInfo(tokenInfo);
     });
 
     // fetch market data
     fetchMarketData().then(dataDict => {
+
+      if(dataDict){
       let volumeChange =
         (dataDict.volume24h[dataDict.tvl.length - 1][1] -
           dataDict.volume24h[dataDict.tvl.length - 2][1]) /
@@ -100,7 +102,7 @@ const MarketIndex = props => {
       setselectedIndexLine(dataDict.tvl.length - 1);
       setselectedDataLine(abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]));
       setselectedIndexBar(dataDict.volume24h.length - 1);
-      setselectedDataBar(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));
+      setselectedDataBar(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));}
     });
   }, []);
 

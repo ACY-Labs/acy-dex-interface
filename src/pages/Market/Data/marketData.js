@@ -109,6 +109,6 @@ export async  function fetchMarketData () {
     return parseMarketData(data.data);
   }catch (e){
     console.log('service not available yet',e);
-    return [];
+    return null;
   }
 }

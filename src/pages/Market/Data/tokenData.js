@@ -149,7 +149,7 @@ export async function fetchGeneralTokenInfo(client) {
     return parseTokenData(data.data);
   }catch (e){
     console.log('service not available yet',e);
-    return [];
+    return null;
   }
 }
 

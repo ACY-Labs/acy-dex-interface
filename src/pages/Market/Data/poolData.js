@@ -137,7 +137,7 @@ export async function fetchGeneralPoolInfoDay() {
     return parsePoolData(data.data);
   }catch (e){
     console.log('service not available yet',e);
-    return [];
+    return null;
   }
 }
 
