@@ -773,7 +773,7 @@ const AddLiquidityComponent = props => {
                     disabled={!buttonStatus}
                     onClick={async () => {
                       if (account == undefined) {
-                        // activate(binance);
+                        activate(binance);
                         setButtonContent('Choose tokens and amount');
                         setButtonStatus(false);
                       } else {
