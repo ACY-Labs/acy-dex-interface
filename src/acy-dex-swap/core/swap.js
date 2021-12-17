@@ -972,20 +972,23 @@ export async function swap(
     swapCallback(status, inputToken0, inputToken1);
 
     // Pass swap rate to backend
-    var rate = (parseFloat(inToken0Amount) / parseFloat(inToken1Amount));
+    var tempToken0 = inToken0Symbol
+    var tempToken1 = inToken1Symbol
+
+    var rate = (parseFloat(Token0Amount) / parseFloat(inToken1Amount));
     var tempDate = new Date();
     var time = tempDate.getTime();
-    if(inToken0Symbol > inToken1Symbol ){
-      var temp = inToken0Symbol;
-      inToken0Symbol = inToken1Symbol;
-      inToken1Symbol = temp;
+    if(tempToken0 > tempToken1 ){
+      var temp = tempToken0;
+      tempToken0 = tempToken1;
+      tempToken1 = temp;
       rate = 1/rate;
     }
     console.log("rate", rate)
     axios.post( 
-      `https://api.acy.finance/api/chart/add?token0=${inToken0Symbol}&token1=${inToken1Symbol
+      `https://api.acy.finance/api/chart/add?token0=${tempToken0}&token1=${tempToken1
       }&rate=${rate}&time=${time}`
-      // `http://localhost:3001/api/chart/add?token0=${inToken0Symbol}&token1=${inToken1Symbol
+      // `http://localhost:3001/api/chart/add?token0=${tempToken0}&token1=${tempToken1
       // }&rate=${rate}&time=${time}`
     )
     .then(data => {
