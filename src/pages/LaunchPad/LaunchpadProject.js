@@ -409,6 +409,8 @@ const LaunchpadProject = () => {
             }
             return cards;
         }
+
+        const [isClickedVesting, setIsClickedVesting] = useState(false);
     
         return (
             <div className="cardContent">
@@ -424,7 +426,7 @@ const LaunchpadProject = () => {
                 
                 <form className='sales-container'>
                     <label for="sale-number" className='sale-title'>Sale</label>
-                    <input placeholder='' className='ant-input' type="number" />
+                    <input placeholder='type' className='antd-input' type="number" />
                     <input type="submit" value="Buy"/>
                 </form>
                 
@@ -433,13 +435,11 @@ const LaunchpadProject = () => {
                     <div className='text-line-container'>
                         <p>Unlock 30% TGE, then vested 23.3% every month for 3 months</p>
                         <span className="vesting-line"></span>
-                        <VestingSchedule />
+                        <div className={isClickedVesting ? "vesting-schedule active" : "vesting-schedule"}>
+                            <VestingSchedule />
+                        </div>
                     </div>
-                    <div className='arrow-down-container'><CaretDownOutlined /></div>
-                </div>
-
-                <div>
-
+                    <div className='arrow-down-container'><CaretDownOutlined onClick={()=>setIsClickedVesting(!isClickedVesting)}/></div>
                 </div>
             </div>
         );
