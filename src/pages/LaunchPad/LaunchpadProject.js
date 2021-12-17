@@ -12,6 +12,8 @@ import AllocationIcon from "./components/AllocationIcon"
 import Lottie from "@/assets/lottie";
 import * as moment from 'moment';
 import context from 'react-bootstrap/esm/AccordionContext';
+import { CaretDownOutlined } from "@ant-design/icons"
+import VestingSchedule from "./VestingSchedule"
 
 const { apple, banana, brezel, burger, carrot, cheese, cherry, chocolateBar, corn, donut, eggs, frenchFries, honey, iceCream,
         lemon,meat,peach,pineapple,pizza,popcorn,raspberry,steak,strawberry,watermelon } = Lottie
@@ -311,7 +313,7 @@ const LaunchpadProject = () => {
             <div className="allocationCard" onClick={clickCover}>
                 <div class={computeCoverClass()}>
                     <div className='allocationCard-inner' onMouseEnter={()=>setIsHoverLottie(true)} onMouseLeave={()=>setIsHoverLottie(false)}>
-                        <div className='' style={{width: "54px", height: "54px"}}>
+                        <div className='' style={{width: "70px", height: "70px"}}>
                             <AllocationIcon play={isHoverLottie} url={url} id={lottieId} />
                         </div>
                         <p className='inner-text'>{index + 1}</p>
@@ -341,7 +343,7 @@ const LaunchpadProject = () => {
         // TODO: replace with 24 icon
         const BaseCard = ({url}) => {
             return (
-                <div style={{ background: 'white', height:"64px", width: "64px", borderRadius: "8px" }}>
+                <div style={{ background: 'white', height:"80px", width: "80px", borderRadius: "8px" }}>
                     {/* <AllocationIcon play={true} url={url} id="apple"/> */}
                 </div>
             );
@@ -404,6 +406,8 @@ const LaunchpadProject = () => {
             }
             return cards;
         }
+
+        const [isClickedVesting, setIsClickedVesting] = useState(false);
     
         return (
             <div className="cardContent">
@@ -412,8 +416,26 @@ const LaunchpadProject = () => {
                         Allocation
                     </h2>
                 </div>
-                <div className="allocationContainer" style={{paddingLeft: '64px', paddingRight: '64px'}}>
+                <div className="allocationContainer">
                     {allocationCards()}
+                </div>
+                
+                <form className='sales-container'>
+                    <label for="sale-number" className='sale-title'>Sale</label>
+                    <input placeholder='type' className='antd-input' type="number" />
+                    <input type="submit" value="Buy"/>
+                </form>
+                
+                <div className="vesting-container">
+                    <p>Vesting</p>
+                    <div className='text-line-container'>
+                        <p>Unlock 30% TGE, then vested 23.3% every month for 3 months</p>
+                        <span className="vesting-line"></span>
+                        <div className={isClickedVesting ? "vesting-schedule active" : "vesting-schedule"}>
+                            <VestingSchedule />
+                        </div>
+                    </div>
+                    <div className='arrow-down-container'><CaretDownOutlined onClick={()=>setIsClickedVesting(!isClickedVesting)}/></div>
                 </div>
             </div>
         );
