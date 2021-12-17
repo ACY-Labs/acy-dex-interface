@@ -699,7 +699,7 @@ export function TransactionTable(props) {
               style={{ fontWeight: 600 }}
               onClick={() => openInNewTab(`https://etherscan.io/tx/${entry.transactionID}`)}
             >
-              {entry.type} {entry.coin1} {entry.type == TransactionType.SWAP ? 'for' : 'and'}{' '}
+              {entry.type} {entry.coin1} {entry.action == TransactionType.SWAP ? 'for' : 'and'}{' '}
               {entry.coin2}
             </div>
           );

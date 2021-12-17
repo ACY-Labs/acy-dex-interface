@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Table } from 'antd';
 import styles from './OperationHistoryTable.less';
 import { Tooltip } from 'antd';
+import  { abbrNumber } from '../../Market/Util.js';
 import formatNumber from 'accounting-js/lib/formatNumber.js';
 
 
@@ -74,7 +75,7 @@ const OperationHistoryTable = props => {
       dataIndex: 'totalToken',
       key: 'totalToken',
       render: (text,record) => {
-        return <div className={styles.tableData}>{text}</div>;
+        return <div className={styles.tableData}> $ {abbrNumber(text)}</div>;
       }
     },
     {
@@ -88,7 +89,7 @@ const OperationHistoryTable = props => {
       dataIndex: 'token1Number',
       key: 'inputTokenNum',
       render: (text,record) => {
-        return <div className={styles.tableData}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.token1Symbol}</div>;
+        return <div className={styles.tableData}>{abbrNumber(text)} {record.token1Symbol}</div>;
       }
     },
     {
@@ -102,7 +103,7 @@ const OperationHistoryTable = props => {
       dataIndex: 'token2Number',
       key: 'outTokenNum',
       render: (text,record) => {
-        return <div className={styles.tableData}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.token2Symbol}</div>;
+        return <div className={styles.tableData}>{abbrNumber(text)} {record.token2Symbol}</div>;
       }
     },
     {

@@ -31,9 +31,9 @@ async function parseGlobalTransaction(userList,library){
        return {
         account: user,
         coin1: item.inputTokenSymbol,
-        coin1Amount: parseFloat(item.inputTokenNum),
+        coin1Amount: item.inputTokenNum,
         coin2: item.outTokenSymbol,
-        coin2Amount: parseFloat(item.outTokenNum),
+        coin2Amount: item.outTokenNum,
         time: item.transactionTime,
         totalValue: item.totalToken,
         transactionID: item.hash,
@@ -46,9 +46,9 @@ async function parseGlobalTransaction(userList,library){
       return {
        account: user,
        coin1: item.token1Symbol,
-       coin1Amount: parseFloat(item.token1Number),
+       coin1Amount: item.token1Number,
        coin2: item.token2Symbol,
-       coin2Amount: parseFloat(item.token2Number),
+       coin2Amount: item.token2Number,
        time: item.transactionTime,
        totalValue: item.totalToken,
        transactionID: item.hash,
@@ -65,8 +65,8 @@ async function parseGlobalTransaction(userList,library){
 
 export async function fetchGlobalTransaction(library){
   try{
-    // let request = 'https://api.acy.finance/api/users/all';
-    let request = 'http://localhost:3001/api/users/all';
+    let request = 'https://api.acy.finance/api/users/all';
+    // let request = 'http://localhost:3001/api/users/all';
     let response = await fetch(request);
     let data = await response.json();
     console.log(data.data);
