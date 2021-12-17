@@ -7,7 +7,7 @@ export default [
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
-    idOnCoingecko: "ethereum",
+    idOnCoingecko: "binancecoin",
   },
   {
     name: 'USD Coin',
@@ -21,11 +21,11 @@ export default [
   {
     name: 'Wrapped Binance',
     symbol: 'WBNB',
-    address: '0xae13d989dac2f0debff460ac112a837c89baa7cd',
+    address: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
-    idOnCoingecko: "ethereum",
+    idOnCoingecko: "binancecoin",
   },
   {
     name: 'ACY',

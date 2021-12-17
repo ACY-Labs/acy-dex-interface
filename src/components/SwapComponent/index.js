@@ -504,7 +504,6 @@ const SwapComponent = props => {
         yuan="566.228"
         dollar={`${token1Balance}`}
         token={token1Amount}
-        inputColor="#565a69"
         showBalance={token1BalanceShow}
         onChoseToken={() => {
           onClickCoin();

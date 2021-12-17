@@ -14,7 +14,7 @@ import tokenList from '@/constants/TokenList';
 import axios from 'axios';
 export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
-export const ROUTER_ADDRESS = '0x3c841A0298247C50b195e17af6Ab72B2e4cff5E1';
+export const ROUTER_ADDRESS = '0xFc54693d805F5CFe81fd3B6Cbfe6B06dA4e88003';
 export const FARMS_ADDRESS  = '0x11B64a91fA3eedfe0977a64D908BB8B8faf903a4';
 export const FLASH_ARBITRAGE_ADDRESS = '0x1836DcE7B2016cDE80f241F5ed60D8eE69eAF0C8';
 //old farm address 0xf132Fdd642Afa79FDF6C1B77e787865C652eC824
@@ -423,6 +423,7 @@ export async function getAllSuportedTokensPrice() {
     `https://api.coingecko.com/api/v3/simple/price?ids=${searchIds}&vs_currencies=usd`
   ).then(result => {
     const data = result.data;
+    console.log("tokensPrice:",data);
     const tokensPrice = {};
     tokenList.forEach(token => {
       tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
