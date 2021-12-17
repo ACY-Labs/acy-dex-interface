@@ -6,7 +6,8 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import { Interface } from '@ethersproject/abi';
 import { JSBI, Token, TokenAmount, Percent, ETHER, CurrencyAmount } from '@acyswap/sdk';
-import { abi as IUniswapV2Router02ABI } from '../abis/IUniswapV2Router02.json';
+import ACYRouterABI from '../abis/AcyV1Router02.json';
+import FlashArbitrageABI from '../abis/AcyV1FlashArbitrage.json';
 import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import ERC20ABI from '../abis/ERC20.json';
 import tokenList from '@/constants/TokenList';
@@ -15,6 +16,7 @@ export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
 export const ROUTER_ADDRESS = '0x3c841A0298247C50b195e17af6Ab72B2e4cff5E1';
 export const FARMS_ADDRESS  = '0x11B64a91fA3eedfe0977a64D908BB8B8faf903a4';
+export const FLASH_ARBITRAGE_ADDRESS = '0x1836DcE7B2016cDE80f241F5ed60D8eE69eAF0C8';
 //old farm address 0xf132Fdd642Afa79FDF6C1B77e787865C652eC824
 //new farm address 0x96c13313aB386BCB16168Dee3D2d86823A990770
 //latest address   0x11B64a91fA3eedfe0977a64D908BB8B8faf903a4
@@ -111,7 +113,7 @@ export function getContract(address, ABI, library, account) {
 }
 
 export function getRouterContract(library, account) {
-  return getContract(ROUTER_ADDRESS, IUniswapV2Router02ABI, library, account);
+  return getContract(ROUTER_ADDRESS, ACYRouterABI, library, account);
 }
 
 export function getFarmsContract(library, account) {
@@ -154,11 +156,11 @@ export function computeTradePriceBreakdown(trade) {
   const realizedLPFee = !trade
     ? undefined
     : ONE_HUNDRED_PERCENT.subtract(
-        trade.route.pairs.reduce(
-          currentFee => currentFee.multiply(INPUT_FRACTION_AFTER_FEE),
-          ONE_HUNDRED_PERCENT
-        )
-      );
+      trade.route.pairs.reduce(
+        currentFee => currentFee.multiply(INPUT_FRACTION_AFTER_FEE),
+        ONE_HUNDRED_PERCENT
+      )
+    );
 
   // remove lp fees from price impact
   const priceImpactWithoutFeeFraction =
@@ -167,9 +169,9 @@ export function computeTradePriceBreakdown(trade) {
   // the x*y=k impact
   const priceImpactWithoutFeePercent = priceImpactWithoutFeeFraction
     ? new Percent(
-        priceImpactWithoutFeeFraction?.numerator,
-        priceImpactWithoutFeeFraction?.denominator
-      )
+      priceImpactWithoutFeeFraction?.numerator,
+      priceImpactWithoutFeeFraction?.denominator
+    )
     : undefined;
 
   // the amount of the input that accrues to LPs
@@ -178,9 +180,9 @@ export function computeTradePriceBreakdown(trade) {
     trade &&
     (trade.inputAmount instanceof TokenAmount
       ? new TokenAmount(
-          trade.inputAmount.token,
-          realizedLPFee.multiply(trade.inputAmount.raw).quotient
-        )
+        trade.inputAmount.token,
+        realizedLPFee.multiply(trade.inputAmount.raw).quotient
+      )
       : CurrencyAmount.ether(realizedLPFee.multiply(trade.inputAmount.raw).quotient));
 
   return {
@@ -411,7 +413,7 @@ export function parseArbitrageLog({ data, topics }) {
 // pass token symbol
 export function getTokenPrice(symbol) {
   const token = tokenList.find(token => token.symbol == symbol);
-  if(!token) return 0;
+  if (!token) return 0;
   axios.get("https://api.coingecko.com/api/v3/simple/price?ids=shiba-inu&vs_currencies=usd")
 }
 export async function getAllSuportedTokensPrice() {
@@ -419,16 +421,29 @@ export async function getAllSuportedTokensPrice() {
   const searchIds = searchIdsArray.join('%2C');
   const tokensPrice = await axios.get(
     `https://api.coingecko.com/api/v3/simple/price?ids=${searchIds}&vs_currencies=usd`
-    ).then(result =>{
-      const data = result.data;
-      const tokensPrice = {};
-      tokenList.forEach(token =>{
-        tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
-      })
-      tokensPrice['ACY'] = 1;//dont know acy price now;
-
-      // console.log("tokensPrice:",tokensPrice);
-      return tokensPrice;
-    });
+  ).then(result => {
+    const data = result.data;
+    const tokensPrice = {};
+    tokenList.forEach(token => {
+      tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
+    })
+    tokensPrice['ACY'] = 1;//dont know acy price now;
+    return tokensPrice;
+  });
   return tokensPrice;
+}
+
+// return output field amount for swap component
+export async function withExactInEstimateOutAmount(deltaX, xTokenAddress, yTokenAddress, maxPathNum = 15, library, account) {
+  const flashArbitrageContract = getContract(FLASH_ARBITRAGE_ADDRESS, FlashArbitrageABI, library, account)
+  console.log(deltaX, xTokenAddress, yTokenAddress, maxPathNum)
+  const estimateOutputAmount = await flashArbitrageContract.calXiOutput(deltaX, xTokenAddress, yTokenAddress, maxPathNum);
+  return estimateOutputAmount;
+}
+
+// return output field amount for swap component
+export async function withExactOutEstimateInAmount(deltaY, xTokenAddress, yTokenAddress, maxPathNum = 15, library, account) {
+  const flashArbitrageContract = getContract(FLASH_ARBITRAGE_ADDRESS, FlashArbitrageABI, library, account)
+  const estimateInputAmount = await flashArbitrageContract.calYiOutput(deltaY, xTokenAddress, yTokenAddress, maxPathNum);
+  return estimateInputAmount;
 }

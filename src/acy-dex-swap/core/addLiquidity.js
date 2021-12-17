@@ -163,8 +163,8 @@ export async function getEstimated(
     //   setPairToAddOnServer(null);
     //   console.log("test do not add")
     // }
-    setPairToAddOnServer({"token0": inToken0Address, "token1": inToken1Address});
-    console.log("test add to server", {"token0": inToken0Address, "token1": inToken1Address})
+    setPairToAddOnServer({ "token0": inToken0Address, "token1": inToken1Address });
+    console.log("test add to server", { "token0": inToken0Address, "token1": inToken1Address })
 
     console.log('------------------ PARSE AMOUNT ------------------');
     // convert typed in amount to BigNumber using ethers.js's parseUnits,
@@ -345,8 +345,7 @@ export async function getEstimated(
 
         setLiquidityBreakdown([
           // `Slippage tolerance : ${slippage}%`,
-          `Pool reserve: ${pair.reserve0.toFixed(3)} ${
-            pair.token0.symbol
+          `Pool reserve: ${pair.reserve0.toFixed(3)} ${pair.token0.symbol
           } + ${pair.reserve1.toFixed(3)} ${pair.token1.symbol}`,
           `Pool share: ${poolTokenPercentage}%`,
         ]);
@@ -408,10 +407,9 @@ export async function getEstimated(
       setButtonContent('Need approval');
 
       return new CustomError(
-        `Need approve ${
-          approveStatus === 1
-            ? inToken0Symbol
-            : approveStatus === 2
+        `Need approve ${approveStatus === 1
+          ? inToken0Symbol
+          : approveStatus === 2
             ? inToken1Symbol
             : `${inToken0Symbol} and ${inToken1Symbol}`
         }`
@@ -449,13 +447,13 @@ export async function getEstimated(
 
       let minETH = token0IsETH
         ? calculateSlippageAmount(
-            parsedToken0Amount,
-            noLiquidity ? 0 : allowedSlippage
-          )[0].toString()
+          parsedToken0Amount,
+          noLiquidity ? 0 : allowedSlippage
+        )[0].toString()
         : calculateSlippageAmount(
-            parsedToken1Amount,
-            noLiquidity ? 0 : allowedSlippage
-          )[0].toString();
+          parsedToken1Amount,
+          noLiquidity ? 0 : allowedSlippage
+        )[0].toString();
 
       args = [
         nonETHToken.address,
@@ -471,7 +469,10 @@ export async function getEstimated(
       value = BigNumber.from(
         (token1IsETH ? parsedToken1Amount : parsedToken0Amount).raw.toString()
       );
-      console.log(value);
+      console.log("addLiquidityETH args")
+      console.log(args);
+      console.log("addLiquidityETH payable amount")
+      console.log(value)
     } else {
       estimate = router.estimateGas.addLiquidity;
       method = router.addLiquidity;
