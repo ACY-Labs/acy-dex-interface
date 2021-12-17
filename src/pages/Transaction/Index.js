@@ -34,13 +34,20 @@ const Transaction = props => {
 
   let {id} = useParams();
 
+  // connect to provider, listen for wallet to connect
+
   useEffect(() => {
-    console.log(id);
+    console.log("parent page account", account)
+  }, [account])
+
+  useEffect(() => {
     fetchTransactionData(id,library,account).then(response => {
       setData(response);
       console.log(response);
     });
   }, [account]);
+
+  
   function drawRoutes (){
     let routes = data.routes;
     let totalOut = formatNumber(data.totalOut*1,{ precision: 3, thousand: " " });

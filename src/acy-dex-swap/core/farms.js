@@ -376,7 +376,7 @@ const getAllPools = async (library, account) => {
 
   return await axios.get(
     // fetch valid pool list from remote
-    `https://api.acy.finance/api/farm/getAllPools?account=${account}`
+    `http://3.143.250.42:6001/api/farm/getAllPools?account=${account}`
   ).then(res => res.data).catch(e => console.log("error: ", e));
   const contract = getFarmsContract(library, account);
   const numPoolHex = await contract.numPools();

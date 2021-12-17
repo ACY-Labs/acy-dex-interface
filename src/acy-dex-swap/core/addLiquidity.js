@@ -132,6 +132,7 @@ export async function getEstimated(
       return new CustomError('Equal tokens!');
     }
     // get pair using our own provider
+    console.log("TEST TOKEN0 TOKEN1:",token0, token1);
     const pair = await Fetcher.fetchPairData(token0, token1, library)
       .then(pair => {
         console.log(pair.reserve0.raw.toString());

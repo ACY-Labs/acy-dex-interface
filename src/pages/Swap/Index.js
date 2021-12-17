@@ -1,6 +1,7 @@
 import { useWeb3React } from '@web3-react/core';
 import { binance } from '@/connectors';
-import React, { Component, useState, useEffect } from 'react';
+import { InjectedConnector } from '@web3-react/injected-connector';
+import React, { Component, useState, useEffect, useRef } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton, Card } from 'antd';
@@ -22,7 +23,7 @@ import AcyRoutingChart from '@/components/AcyRoutingChart';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import { uniqueFun } from '@/utils/utils';
-import {getTransactionsByAccount} from '@/utils/txData';
+import {getTransactionsByAccount,appendNewSwapTx} from '@/utils/txData';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import { fetchGeneralTokenInfo, marketClient, fetchTokenDaySimple } from '../Market/Data/index.js';
 import SwapComponent from '@/components/SwapComponent';
@@ -106,6 +107,9 @@ const Swap = props => {
   const [transactionNum, setTransactionNum] = useState(0);
   const { account, chainId, library, activate } = useWeb3React();
 
+  const refContainer = useRef();
+  refContainer.current = transactionList;
+
   // connect to provider, listen for wallet to connect
 
   useEffect(() => {
@@ -183,7 +187,7 @@ const Swap = props => {
   const getRoutePrice = (token0Address, token1Address) => {
     axios
       .post(
-        `https://api.acy.finance/api/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
+        `http://3.143.250.42:6001/api/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
       )
       .then(data => {
         console.log(data);
@@ -200,7 +204,7 @@ const Swap = props => {
   const getPrice = () => {
     // FIXME: current api doesn't take token0/1 sequence into consideration, always return ratio based on alphabetical order of token symbol
     axios.post(
-      `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${activeToken1.addressOnEth
+      `http://3.143.250.42:6001/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${activeToken1.addressOnEth
       }&range=${range}`
     )
       .then(data => {
@@ -324,8 +328,21 @@ const Swap = props => {
     return tokenContract.decimals();
   };
 
+  const updateTransactionList = async (receipt) => {
+    setTableLoading(true);
+    console.log("updating list");
+    appendNewSwapTx(refContainer.current,receipt,account,library).then((data) => {
+      setTransactionList(data);
+      setTableLoading(false);
+    })
+    
+  }
+
+
   const onGetReceipt = async (receipt, library, account) => {
     console.log('RECEIPT', receipt);
+    updateTransactionList(receipt);
+
 
     const { inTokenAddr, amount, outTokenAddr, nonZeroToken, nonZeroTokenAmount } = receipt;
     let newRouteData = [];

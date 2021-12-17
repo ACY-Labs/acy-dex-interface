@@ -34,6 +34,7 @@ import {
   withExactInEstimateOutAmount,
   withExactOutEstimateInAmount
 } from '../utils';
+import axios from 'axios';
 
 // get the estimated amount  of the other token required when swapping, in readable string.
 export async function swapGetEstimated(
@@ -660,7 +661,12 @@ export async function swapGetEstimated(
       console.log("BNB does not need approve")
       setNeedApprove(false);
     }
-    setSwapButtonContent('Swap');
+    if(isUseArb) {
+      setSwapButtonContent('Swap w/ arbitrage');
+    } else {
+      setSwapButtonContent('Swap');
+    }
+    
     setSwapButtonState(true);
 
     return 'swap is ok';
@@ -692,6 +698,7 @@ export async function swap(
   deadline,
   setSwapStatus,
   setSwapButtonContent,
+  setSwapButtonState,
   swapCallback,
   methodName,
   isUseArb,
@@ -954,27 +961,62 @@ export async function swap(
 
   if (status instanceof CustomError) {
     let text = status.getErrorText();
-    console.log("getErrorText:",status);
-    if(text.includes("INSUFFICIENT_OUTPUT_AMOUNT")) {
-      if(exactIn) {
-        text = "The amount of the output token is less than your slippage tolerance rate, please set more slippage tolerance if you want to exchange!"
-      } else {
-        text = "The amount of the input token is over than your slippage tolerance rate, please set more slippage tolerance if you want to exchange!"
-      }
-    }
-    setSwapStatus("Error");
+    setSwapStatus(text);
     setSwapButtonContent("Please try again");
   } else {
+    console.log("TEST status:");
     console.log(status);
+    if(status.code && status.code == 4001) {
+      setSwapButtonContent("Swap");
+      setSwapButtonState(true);
+    }else if(status.code && status.code == -32603) {
+      let text = null;
+      if(exactIn) {
+        text = "The amount of the output token is less than your slippage tolerance rate, please set more slippage tolerance if you want to continue!"
+      } else {
+        text = "The amount of the input token is over than your slippage tolerance rate, please set more slippage tolerance if you want to continue!"
+      }
+      setSwapStatus(text);
+      setSwapButtonContent("Please try again");
+    } else {
+      console.log(status);
+      const url = `${scanUrlPrefix}/tx/${status.hash}`;
+      swapCallback(status, inputToken0, inputToken1);
 
-    const url = `${scanUrlPrefix}/tx/${status.hash}`;
-    swapCallback(status, inputToken0, inputToken1);
-    setSwapStatus(
-      <div>
-        <a href={url} target="_blank" rel="noreferrer">
-          View it on etherscan
-        </a>
-      </div>
-    );
+      // Pass swap rate to backend
+      var tempToken0 = inToken0Symbol
+      var tempToken1 = inToken1Symbol
+
+      var rate = (parseFloat(Token0Amount) / parseFloat(inToken1Amount));
+      var tempDate = new Date();
+      var time = tempDate.getTime();
+      if(tempToken0 > tempToken1 ){
+        var temp = tempToken0;
+        tempToken0 = tempToken1;
+        tempToken1 = temp;
+        rate = 1/rate;
+      }
+      console.log("rate", rate)
+      axios.post( 
+        `https://api.acy.finance/api/chart/add?token0=${tempToken0}&token1=${tempToken1
+        }&rate=${rate}&time=${time}`
+        // `http://localhost:3001/api/chart/add?token0=${tempToken0}&token1=${tempToken1
+        // }&rate=${rate}&time=${time}`
+      )
+      .then(data => {
+        console.log(data);
+      })
+      .catch(e => {
+        console.log(e);
+      });
+      
+      setSwapStatus(
+        <div>
+          <a href={url} target="_blank" rel="noreferrer">
+            View it on etherscan
+          </a>
+        </div>
+      );
+    } 
   }
 }
