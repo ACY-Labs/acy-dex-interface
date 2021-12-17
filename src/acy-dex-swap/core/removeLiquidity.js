@@ -318,7 +318,7 @@ export async function getEstimated(
   if (!liquidityApproval) {
     setNeedApprove(true);
     setButtonStatus(true);
-    setButtonContent('Need approve');
+    setButtonContent('Need sign');
     return;
   }
 
@@ -857,7 +857,7 @@ export async function removeLiquidity(
     const url = `${scanUrlPrefix}/tx/${status.hash}`;
     setRemoveStatus(
       <a href={url} target="_blank" rel="noreferrer">
-        view it on etherscan
+        view it on BSC Scan
       </a>
     );
   }

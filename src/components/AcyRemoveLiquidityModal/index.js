@@ -403,7 +403,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
 
             setButtonStatus(false);
             if (needApprove) {
-              setButtonContent(<>Approving <Icon type="loading" /></>);
+              setButtonContent(<>Signing <Icon type="loading" /></>);
               await signOrApprove(
                 { ...token0 },
                 { ...token1 },

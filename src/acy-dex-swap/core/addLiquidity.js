@@ -643,7 +643,7 @@ export async function addLiquidity(
     addLiquidityCallback(status);
     setLiquidityStatus(
       <a href={url} target={'_blank'}>
-        View it on etherscan
+        View it on BSC Scan
       </a>
     );
   }

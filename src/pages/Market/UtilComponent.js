@@ -1,3 +1,4 @@
+import {scanUrlPrefix} from "@/constants/configs"
 import { AcyIcon, AcyTabs, AcyTokenIcon } from '@/components/Acy';
 import className from 'classnames';
 import { Divider, Icon, Input, Table } from 'antd';
@@ -697,7 +698,7 @@ export function TransactionTable(props) {
             <div
               className={className(styles.tableDataFirstColumn, styles.transactionLink)}
               style={{ fontWeight: 600 }}
-              onClick={() => openInNewTab(`https://etherscan.io/tx/${entry.transactionID}`)}
+              onClick={() => openInNewTab(`${scanUrlPrefix}/tx/${entry.transactionID}`)}
             >
               {entry.type} {entry.coin1} {entry.action == TransactionType.SWAP ? 'for' : 'and'}{' '}
               {entry.coin2}
@@ -812,7 +813,7 @@ export function TransactionTable(props) {
         render: (text, entry) => {
           return (
             <div
-              onClick={() => openInNewTab(`https://etherscan.io/address/${entry.account}`)}
+              onClick={() => openInNewTab(`${scanUrlPrefix}/address/${entry.account}`)}
               className={className(styles.tableData, styles.transactionLink)}
               style={{ textOverflow: 'ellipsis' }}
             >

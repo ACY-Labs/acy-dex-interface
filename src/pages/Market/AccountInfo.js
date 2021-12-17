@@ -673,7 +673,7 @@ function AccountInfo(props) {
             onClick={() => openInNewTab(`${scanUrlPrefix}/address/${address}`)}
             style={{ color: '#e29227', fontWeight: 600 }}
           >
-            View on etherscan
+            View on BSC Scan
           </a>
         </div>
         <AcyIcon

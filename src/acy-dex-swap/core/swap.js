@@ -1013,7 +1013,7 @@ export async function swap(
       setSwapStatus(
         <div>
           <a href={url} target="_blank" rel="noreferrer">
-            View it on etherscan
+            View it on BSC Scan
           </a>
         </div>
       );
