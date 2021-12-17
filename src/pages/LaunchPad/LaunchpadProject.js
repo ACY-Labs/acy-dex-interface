@@ -343,7 +343,7 @@ const LaunchpadProject = () => {
         // TODO: replace with 24 icon
         const BaseCard = ({url}) => {
             return (
-                <div style={{ background: 'white', height:"80px", width: "80px", borderRadius: "8px" }}>
+                <div style={{ background: 'white', height:"80px", width: "80px", borderRadius: "4px" }}>
                     {/* <AllocationIcon play={true} url={url} id="apple"/> */}
                 </div>
             );
@@ -421,13 +421,13 @@ const LaunchpadProject = () => {
                 </div>
                 
                 <form className='sales-container'>
-                    <label for="sale-number" className='sale-title'>Sale</label>
-                    <input placeholder='type' className='antd-input' type="number" />
-                    <input type="submit" value="Buy"/>
+                    <label for="sale-number" className='sale-vesting-title'>Sale</label>
+                    <input placeholder='' className='antd-input' type="number" />
+                    <input type="submit" className="sales-submit" value="Buy"/>
                 </form>
                 
                 <div className="vesting-container">
-                    <p>Vesting</p>
+                    <p className='sale-vesting-title vesting'>Vesting</p>
                     <div className='text-line-container'>
                         <p>Unlock 30% TGE, then vested 23.3% every month for 3 months</p>
                         <span className="vesting-line"></span>
