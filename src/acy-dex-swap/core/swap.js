@@ -439,7 +439,7 @@ export async function swapGetEstimated(
       setSwapButtonState(false);
       // setSwapButtonContent("Cannot find arbitrage path");
       if(!poolExist) {
-        return new CustomError('Pool is not exist!');
+        return new CustomError('Pool dose not exist!');
       }
     }
     if(poolExist && !isUseArb) {
@@ -634,7 +634,6 @@ export async function swapGetEstimated(
 
       console.log(`Current allowance for ${inToken0Symbol}: ${allowance}`);
       let token0AmountToApprove = exactIn ? inputAmount.raw.toString() : slippageAdjustedAmount;
-      console.log("TEST HERE:",token0AmountToApprove);
       let token0approval = await checkTokenIsApproved(
         inToken0Address,
         token0AmountToApprove,
@@ -804,7 +803,6 @@ export async function swap(
     let expiredTime = Math.round(date/1000) + deadline * 60
     let finalMethodName, args, value, options = null;
     options = {};
-    console.log("TEST HERE:",isUseArb, poolExist)
     if(!isUseArb) {
       if(poolExist) {
         const param = Router.swapCallParameters(trade, {
@@ -948,14 +946,15 @@ export async function swap(
         })
       )
       .catch(e => {
-        console.log("TEST2");
-        return new CustomError(`${finalMethodName} failed with error ${e}`)
+
+        return e;
       });
     return result;
   })();
 
   if (status instanceof CustomError) {
     let text = status.getErrorText();
+    console.log("getErrorText:",status);
     if(text.includes("INSUFFICIENT_OUTPUT_AMOUNT")) {
       if(exactIn) {
         text = "The amount of the output token is less than your slippage tolerance rate, please set more slippage tolerance if you want to exchange!"
@@ -963,7 +962,7 @@ export async function swap(
         text = "The amount of the input token is over than your slippage tolerance rate, please set more slippage tolerance if you want to exchange!"
       }
     }
-    setSwapStatus(text);
+    setSwapStatus("Error");
     setSwapButtonContent("Please try again");
   } else {
     console.log(status);
