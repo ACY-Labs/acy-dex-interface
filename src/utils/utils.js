@@ -3,6 +3,26 @@ import React from 'react';
 import nzh from 'nzh/cn';
 import { parse, stringify } from 'qs';
 
+export function TranslateToUSD(symbol,amount,priceList){
+  if(!priceList[symbol]){
+    console.log("not found");
+    return amount;
+  } 
+  else{
+    let result = amount * priceList[symbol];
+    return result;
+  }
+}
+
+export function totalInUSD (arr,priceList){
+  console.log(priceList);
+  let total = 0;
+  arr.forEach(element => {
+     total = total + (TranslateToUSD(element.token,element.amount,priceList));
+  });
+  return total
+}
+
 export function fixedZero(val) {
   return val * 1 < 10 ? `0${val}` : val;
 }

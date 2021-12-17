@@ -34,6 +34,7 @@ import {
   withExactInEstimateOutAmount,
   withExactOutEstimateInAmount
 } from '../utils';
+import axios from 'axios';
 
 // get the estimated amount  of the other token required when swapping, in readable string.
 export async function swapGetEstimated(
@@ -978,8 +979,37 @@ export async function swap(
       setSwapStatus(text);
       setSwapButtonContent("Please try again");
     } else {
+      console.log(status);
       const url = `${scanUrlPrefix}/tx/${status.hash}`;
       swapCallback(status, inputToken0, inputToken1);
+
+      // Pass swap rate to backend
+      var tempToken0 = inToken0Symbol
+      var tempToken1 = inToken1Symbol
+
+      var rate = (parseFloat(Token0Amount) / parseFloat(inToken1Amount));
+      var tempDate = new Date();
+      var time = tempDate.getTime();
+      if(tempToken0 > tempToken1 ){
+        var temp = tempToken0;
+        tempToken0 = tempToken1;
+        tempToken1 = temp;
+        rate = 1/rate;
+      }
+      console.log("rate", rate)
+      axios.post( 
+        `https://api.acy.finance/api/chart/add?token0=${tempToken0}&token1=${tempToken1
+        }&rate=${rate}&time=${time}`
+        // `http://localhost:3001/api/chart/add?token0=${tempToken0}&token1=${tempToken1
+        // }&rate=${rate}&time=${time}`
+      )
+      .then(data => {
+        console.log(data);
+      })
+      .catch(e => {
+        console.log(e);
+      });
+      
       setSwapStatus(
         <div>
           <a href={url} target="_blank" rel="noreferrer">
@@ -987,6 +1017,58 @@ export async function swap(
           </a>
         </div>
       );
-    }
-  }
+    //   const url = `${scanUrlPrefix}/tx/${status.hash}`;
+    //   swapCallback(status, inputToken0, inputToken1);
+    //   setSwapStatus(
+    //     <div>
+    //       <a href={url} target="_blank" rel="noreferrer">
+    //         View it on etherscan
+    //       </a>
+    //     </div>
+    //   );
+    // }
+    // setSwapStatus("Error");
+    // setSwapButtonContent("Please try again");
+  } 
+  // else {
+  //   console.log(status);
+
+  //   const url = `${scanUrlPrefix}/tx/${status.hash}`;
+  //   swapCallback(status, inputToken0, inputToken1);
+
+  //   // Pass swap rate to backend
+  //   var tempToken0 = inToken0Symbol
+  //   var tempToken1 = inToken1Symbol
+
+  //   var rate = (parseFloat(Token0Amount) / parseFloat(inToken1Amount));
+  //   var tempDate = new Date();
+  //   var time = tempDate.getTime();
+  //   if(tempToken0 > tempToken1 ){
+  //     var temp = tempToken0;
+  //     tempToken0 = tempToken1;
+  //     tempToken1 = temp;
+  //     rate = 1/rate;
+  //   }
+  //   console.log("rate", rate)
+  //   axios.post( 
+  //     `https://api.acy.finance/api/chart/add?token0=${tempToken0}&token1=${tempToken1
+  //     }&rate=${rate}&time=${time}`
+  //     // `http://localhost:3001/api/chart/add?token0=${tempToken0}&token1=${tempToken1
+  //     // }&rate=${rate}&time=${time}`
+  //   )
+  //   .then(data => {
+  //     console.log(data);
+  //   })
+  //   .catch(e => {
+  //     console.log(e);
+  //   });
+    
+  //   setSwapStatus(
+  //     <div>
+  //       <a href={url} target="_blank" rel="noreferrer">
+  //         View it on etherscan
+  //       </a>
+  //     </div>
+  //   );
+  // }
 }

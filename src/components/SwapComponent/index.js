@@ -427,18 +427,36 @@ const SwapComponent = props => {
           setTimeout(sti(hash), 500);
         else {
           let newData = transactions.filter(item => item.hash != hash);
-          dispatch({
-            type: 'transaction/addTransaction',
-            payload: {
-              transactions: newData
-            },
-          });
+          // 保存到loac
+          const { logs } = receipt;
+          console.log("logs: ", logs);
+          const decodedLog = parseArbitrageLog(logs[logs.length - 1]);
+          console.log('receipt OK, these are logs');
+          console.log("decodedLog", decodedLog);
+          decodedLog['transactionHash'] = receipt.transactionHash;
 
+          props.onGetReceipt(decodedLog, library, account);          
+          localStorage.setItem(
+            'transactions',
+            JSON.stringify([
+              ...newData,
+              {
+                hash: status.hash,
+                inputTokenNum,
+                inputTokenSymbol: inputToken.symbol,
+                outTokenNum,
+                outTokenSymbol: outToken.symbol,
+                totalToken,
+                transactionTime,
+              },
+            ])
+          );
+
+          // set button to done and disabled on default
           setSwapButtonContent("Done");
         }
       });
     }
-
     sti(status.hash);
   };
 
@@ -660,3 +678,72 @@ export default connect(({ global, transaction, swap, loading }) => ({
   swap,
   loading: loading.global,
 }))(SwapComponent);
+
+
+// if (receipt) {
+//   clearInterval(sti);
+//   const { logs } = receipt;
+//   console.log("logs: ", logs);
+//   const decodedLog = parseArbitrageLog(logs[logs.length - 1]);
+//   console.log('receipt OK, these are logs');
+//   console.log("decodedLog", decodedLog);
+//   decodedLog['transactionHash'] = receipt.transactionHash;
+
+//   props.onGetReceipt(decodedLog, library, account);
+//   let newData = transactions.filter(item => item.hash != status.hash);
+//   let transactionTime = '';
+//   let inputTokenNum;
+//   let outTokenNum;
+//   let totalToken;
+//   let transferHash = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
+//   await library.getBlock(receipt.logs[0].blockNumber).then(data => {
+//     transactionTime = moment(parseInt(data.timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
+//   });
+//   receipt.logs.map(item => {
+//     // debugger
+//     // let topics=hexlify(item.topics[0]).toText();
+//     // let ss=CryptoJS.SHA3.decrypt(item.topics[0]); 
+//     // debugger
+//     if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == inputToken.address) {
+//       // inputtoken 数量
+//       // inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
+//       inputTokenNum = item.data / Math.pow(10, inputToken.decimals).toString();
+//       // console.log('inputTokenNum',inputTokenNum)
+//     }
+//     if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == outToken.address) {
+//       // outtoken 数量
+//       // outTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0", outToken.decimals))).toString();
+//       outTokenNum = item.data / Math.pow(10, outToken.decimals).toString();
+//       // console.log('outputTokenNum',outTokenNum)
+//     }
+//   });
+
+//   setSwapButtonContent("Done");
+  
+//   // 获取美元价值
+//   await axios
+//     .post(
+//       `https://api.acy.finance/api/chart/swap?token0=${inputToken.addressOnEth}&token1=${outToken.addressOnEth
+//       }&range=1D`
+//     )
+//     .then(data => {
+//       // totalToken = abbrNumber(
+//       //   inputTokenNum * data.data.data.swaps[data.data.data.swaps.length - 1].rate
+//       // );
+
+//       // const { swaps } = data.data.data;
+//       // const lastDataPoint = swaps[swaps.length - 1];
+//       // console.log('ROUTE PRICE POINT', lastDataPoint);
+//       // this.setState({
+//       //   pricePoint: lastDataPoint.rate,
+//       // });
+//     });
+
+//   console.log("receipt transactionTime", transactionTime);
+// >>>>>>> e0b545d... (wip) : migration to bsc
+//   dispatch({
+//     type: 'transaction/addTransaction',
+//     payload: {
+//       transactions: newData
+//     },
+//   });
