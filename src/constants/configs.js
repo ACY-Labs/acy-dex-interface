@@ -1,1 +1,1 @@
-export const scanUrlPrefix = "https://testnet.bscscan.com";
+export const scanUrlPrefix = "https://www.bscscan.com";

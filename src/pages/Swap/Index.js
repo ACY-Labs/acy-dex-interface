@@ -397,7 +397,7 @@ const Swap = props => {
     <PageHeaderWrapper>
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
-          <div className={`${styles.colItem} ${styles.priceChart}`}>
+          {/* <div className={`${styles.colItem} ${styles.priceChart}`}>
             <StyledCard title={lineTitleRender()}>
               <div
                 style={{
@@ -430,7 +430,7 @@ const Swap = props => {
                 </div>
               </div>
             </StyledCard>
-          </div>
+          </div> */}
 
           <div className={`${styles.colItem} ${styles.swapComponent}`} >
             <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
