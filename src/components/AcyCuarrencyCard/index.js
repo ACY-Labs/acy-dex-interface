@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Icon, Input, Row, Col } from 'antd';
 import AcyIcon from '@/components/AcyIcon';
 import styles from './index.less';
 import Pattern from '@/utils/pattern';
+import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils';
+
 const AcyCuarrencyCard = ({
   title,
   logoURI,
@@ -31,6 +33,22 @@ const AcyCuarrencyCard = ({
     setLight(true);
     inputRef.current.focus();
   };
+
+  const [usdValue, setUsdValue] = useState(null);
+  useEffect(async () => {
+    if (token == 0)
+      setUsdValue(0);
+    else if (!token)
+      setUsdValue(null);
+
+    const tokenPriceList = await getAllSuportedTokensPrice();
+    const tokenPrice = tokenPriceList[coin];
+    const tokenAmountUSD = tokenPrice * token;
+    setUsdValue(tokenAmountUSD.toFixed(2));
+    console.log("tokenprice, token", tokenPrice,token)
+    console.log("test token price: ", coin, tokenPrice);
+  }, [coin, token])
+  
   const inputRef = React.createRef();
   return (
     <div
@@ -65,7 +83,7 @@ const AcyCuarrencyCard = ({
         </div>
         <div className={styles.cua_bottomContainer}>
           <div className={styles.cua_blanace}>{title || ''}</div>
-          <div>{rest.additional}</div>
+          <div>{rest.showBalance && !isNaN(usdValue) ? `$ ${usdValue}` : null}</div>
         </div>
       </div>
     </div>

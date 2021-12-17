@@ -532,6 +532,7 @@ const AddLiquidityComponent = props => {
               yuan="566.228"
               dollar={`${token0Balance}`}
               token={token0Amount}
+              showBalance={token1BalanceShow}
               onChoseToken={async () => {
                 onClickCoin();
                 setBefore(true);
@@ -555,6 +556,7 @@ const AddLiquidityComponent = props => {
               yuan="566.228"
               dollar={`${token1Balance}`}
               token={token1Amount}
+              showBalance={token1BalanceShow}
               onChoseToken={async () => {
                 onClickCoin();
                 setBefore(false);

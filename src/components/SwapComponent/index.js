@@ -391,7 +391,7 @@ const SwapComponent = props => {
     setToken0Amount(tempAmount);
     setToken0Balance(tempBalance);
   };
-  
+
   // swap的交易状态
   const swapCallback = async (status, inputToken, outToken) => {
     // 循环获取交易结果
@@ -457,6 +457,7 @@ const SwapComponent = props => {
         yuan="566.228"
         dollar={`${token0Balance}`}
         token={token0Amount}
+        showBalance={token1BalanceShow}
         onChoseToken={() => {
           onClickCoin();
           setBefore(true);
@@ -485,7 +486,7 @@ const SwapComponent = props => {
         dollar={`${token1Balance}`}
         token={token1Amount}
         inputColor="#565a69"
-        // additional="AMM Output"
+        showBalance={token1BalanceShow}
         onChoseToken={() => {
           onClickCoin();
           setBefore(false);
