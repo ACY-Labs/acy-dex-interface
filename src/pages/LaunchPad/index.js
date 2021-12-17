@@ -110,7 +110,7 @@ const Pool = (props)=> {
                 <div className={styles.lineSeperator} />
               </div>
               <div className={styles.projectsContainer}>
-                <IncomingProjects data={upcomingData}/>
+                <IncomingProjects data={upcomingData} />
               </div>
             </div>
             <div className={styles.projectBoxes}>

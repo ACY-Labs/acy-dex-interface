@@ -12,6 +12,11 @@ import { sortTable } from '../Util';
 import axios from 'axios';
 import { parseTransactionData } from '@/utils/txData';
 import supportedTokens from '@/constants/TokenList';
+import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
+
+import {findTokenWithAddress} from '@/utils/txData';
+
+import {totalInUSD} from '@/utils/utils'
 
 export async function fetchPoolInfo(client, address, timestamp) {
   const block = await getBlockFromTimestamp(timestamp);
@@ -69,36 +74,69 @@ we want :
   volume7d: 940097.9591566627
   volume24h: 86149.02125578691
 */
-//::::TODO fetch price of tokens in USDC
-function translateToUSD (token0, token1, amount0, amount1){
-  return amount0 + amount1; 
-}
+
+var tokensPriceUSD ;
 
 function parsePoolData (data){
+
   let _data = data.map((item)=>{
-    let _tvl = translateToUSD (item.token0,item.token1,item.lastReserves.token0,item.lastReserves.token1);
-    let _volume24h = translateToUSD (item.token0,item.token1,item.lastVolume.token0,item.lastVolume.token1);
+
+
+    let _token0 = findTokenWithAddress(item.token0).symbol;
+    let _token1 = findTokenWithAddress(item.token1).symbol;
+
+
+    let _tvl = totalInUSD ( [
+      {
+        token : _token0,
+        amount : item.lastReserves.token0
+      },
+      {
+        token : _token1,
+        amount : item.lastReserves.token1
+      }
+    ],tokensPriceUSD);
+
+    let _volume24h = totalInUSD ( [
+      {
+        token : _token0,
+        amount : item.lastVolume.token0
+      },
+      {
+        token : _token1,
+        amount : item.lastVolume.token1
+      }
+    ],tokensPriceUSD);
+
     return {
-      coin1 : supportedTokens.find(token=>token.addressOnEth.toLowerCase() == item.token0.toLowerCase()).symbol,
-      coin2 : supportedTokens.find(token=>token.addressOnEth.toLowerCase() == item.token1.toLowerCase()).symbol,
+      coin1 : _token0,
+      coin2 : _token1,
       tvl : _tvl ,
       volume24h : _volume24h,
       volume7d : 0
     }
   });
-  return _data;
+  let allsums = 0;
+  let allvolumes = 0;
+  _data.forEach(element => {
+    allsums += element.tvl;
+    allvolumes += element.volume24h;
+  });
+
+  return sortTable(_data,'volume24h',true);
 }
 
 export async function fetchGeneralPoolInfoDay() {
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
+  tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
-    let request = 'https://api.acy.finance/api/poolchart/all';
+    // let request = 'https://api.acy.finance/api/poolchart/all';
+    let request = 'http://localhost:3001/api/poolchart/all';
     let response = await fetch(request);
     let data = await response.json();
     return parsePoolData(data.data);
   }catch (e){
-    return [];
-    console.log('service not available yet');
+    console.log('service not available yet',e);
     return [];
   }
 }

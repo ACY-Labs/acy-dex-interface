@@ -110,10 +110,25 @@
     border-style: solid;
     height: calc(100% + 30px);
     top: 0px;
+    background: #eb5c1f;
     color: #eb5c1f;
     width: 1px;
     position: absolute;
     left: 11px;
+    display: block;
+}
+
+.verticalDivideLine_NotActive {
+    opacity: 0.8;
+    border-image: initial;
+    border-color: inherit;
+    border-style: solid;
+    height: calc(100% + 30px);
+    top: 0px;
+    width: 1px;
+    position: absolute;
+    left: 11px;
+    display: block;
 }
 
 .procedureNumber {
@@ -131,6 +146,23 @@
     background-color: #eb5c1f;
     z-index: 1;
     color: #010101;
+}
+
+.procedureNumber_NotActive {
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    flex-shrink: 0;
+    -webkit-box-flex: 0;
+    flex-grow: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 10000px;
+    background-color: #4b4f4e;
+    z-index: 1;
+    color: #000;
 }
 
 .shortText {

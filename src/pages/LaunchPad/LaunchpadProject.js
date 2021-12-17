@@ -5,11 +5,7 @@ import { history } from 'umi';
 import { Table } from 'antd';
 import LaunchChart from "./launchChart";
 import { getTransferData } from '@/acy-dex-swap/core/launchPad';
-import { 
-    requireAllocation, 
-    getAllocationInfo,
-    getProjectInfo
-} from '@/services/api';
+import { requireAllocation, getAllocationInfo, getProjectInfo} from '@/services/api';
 import './css/LaunchpadProject.css';
 import project from '@/models/project';
 import AllocationIcon from "./components/AllocationIcon"
@@ -23,8 +19,10 @@ const { apple, banana, brezel, burger, carrot, cheese, cherry, chocolateBar, cor
         lemon,meat,peach,pineapple,pizza,popcorn,raspberry,steak,strawberry,watermelon } = Lottie
 
 const LaunchpadProject = () => {
-    const { projectId } = useParams();
+    const { projectId } = useParams()
     const [receivedData, setReceivedData] = useState({})
+    const [comparesaleDate, setComparesaleDate] = useState(false)
+    const [comparevestDate, setComparevestDate] = useState(false)
     
     const TokenBanner = ({posterUrl}) => {
         return (
@@ -70,31 +68,30 @@ const LaunchpadProject = () => {
                 <div className="cardContent">
                     <div className="procedure">
                         <hr aria-orientation="vertical" className="verticalDivideLine"></hr>
-                        <div className="procedureNumber">1</div>
+                        <div className="procedureNumber">1</div> 
                         <div>
                             <p>Allocation</p>
-                            <p className="shortText">{receivedData.regStart}</p>
-                            <p className="shortText">{receivedData.regEnd}</p>
+                            <p className="shortText">From : {receivedData.regStart}</p>
+                            <p className="shortText">To : {receivedData.regEnd}</p>
                         </div>
                     </div>
     
                     <div className="procedure" style={{ marginTop: '24px' }}>
-                        <hr aria-orientation="vertical" className="verticalDivideLine"></hr>
-                        <div className="procedureNumber">2</div>
+                        <hr aria-orientation="vertical" className={comparesaleDate ? "verticalDivideLine" : "verticalDivideLine_NotActive"}></hr>
+                        <div className={comparesaleDate ? "procedureNumber" : "procedureNumber_NotActive"}>2</div>
                         <div>
                             <p>Sale</p>
-                            <p className="shortText">{receivedData.saleStart}</p>
-                            <p className="shortText">{receivedData.saleEnd}</p>
+                            <p className="shortText">From : {receivedData.saleStart}</p>
+                            <p className="shortText">To : {receivedData.saleEnd}</p>
                         </div>
                     </div>
     
                     <div className="procedure" style={{ marginTop: '24px' }}>
-                        <div className="procedureNumber">3</div>
+                        <div className={comparevestDate ? "procedureNumber" : "procedureNumber_NotActive"}>3</div>
                         <div>
                             <p>Vesting</p>
                         </div>
                     </div>
-                    
                 </div>
             );
         }
@@ -125,7 +122,7 @@ const LaunchpadProject = () => {
                             />
                         </div>
                         <div className="progressAmount">
-                            <div>{`${receivedData.alreadySale} / ${receivedData.totalSale} ${receivedData.projectToken}`}</div>
+                            <div>{`${alreadySale} / ${totalSale} ${projectToken}`}</div>
                         </div>
                     </div>
                 </>
@@ -138,10 +135,10 @@ const LaunchpadProject = () => {
             }}>
                 <Procedure />
                 <Progress 
-                    salePercentage={receivedData.salePercentage} 
-                    alreadySale={receivedData.alreadySale} 
-                    totalSale={receivedData.totalSale} 
-                    projectToken={receivedData.projectToken} 
+                  salePercentage={receivedData.salePercentage} 
+                  alreadySale={receivedData.alreadySale} 
+                  totalSale={receivedData.totalSale} 
+                  projectToken={receivedData.projectToken} 
                 />
             </div>
         )
@@ -419,8 +416,7 @@ const LaunchpadProject = () => {
                         Allocation
                     </h2>
                 </div>
-                <div className="allocationContainer" style={{
-                }}>
+                <div className="allocationContainer">
                     {allocationCards()}
                 </div>
                 
@@ -471,22 +467,28 @@ const LaunchpadProject = () => {
         getProjectInfo(projectId).then(res => {
             if(res) {
                 // extract data from string
-                const contextData = JSON.parse(res.contextData);
-                res["tokenLabels"] = contextData["tokenLabels"];
+                const contextData = JSON.parse(res.contextData)
+                
+                const today = new Date() 
+                if(today > res.saleStart) setComparesaleDate(true)
+                if(today > res.saleEnd) setComparevestDate(true)
+
+                res["tokenLabels"] = contextData["tokenLabels"]
                 res["projectDescription"] = contextData["projectDescription"];
                 res["alreadySale"] = contextData["alreadySale"]
                 res["salePercentage"] = contextData["salePercentage"]
 
-                res["regStart"] = format_time(res.regStart);
-                res["regEnd"] = format_time(res.regEnd);
-                res["saleStart"] = format_time(res.saleStart);
-                res["saleEnd"] = format_time(res.saleEnd);
+                res["regStart"] = format_time(res.regStart)
+                res["regEnd"] = format_time(res.regEnd)
+                res["saleStart"] = format_time(res.saleStart)
+                res["saleEnd"] = format_time(res.saleEnd)
 
                 res["totalSale"] = res.totalSale
                 res["totalRaise"] = res.totalRaise
                 res["projectUrl"] = res.projectUrl
                 res["projectName"] = res.projectName
 
+                
                 setReceivedData(res);
             } else {
                 console.log('redirect to list page');
@@ -500,7 +502,7 @@ const LaunchpadProject = () => {
 
     return(
         <div className="mainContainer">
-            <TokenBanner posterUrl={receivedData.posterUrl}/>
+            <TokenBanner posterUrl={receivedData.posterUrl} />
             <TokenLogoLabel projectName={receivedData.projectName} />
             <CardArea />
         </div>
