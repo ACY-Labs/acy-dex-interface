@@ -69,8 +69,8 @@ const LaunchpadProject = () => {
                         <div className="procedureNumber">1</div> 
                         <div>
                             <p>Allocation</p>
-                            <p className="shortText">From : {receivedData.regStart}</p>
-                            <p className="shortText">To : {receivedData.regEnd}</p>
+                            <p className="shortText">Start : {receivedData.regStart}</p>
+                            <p className="shortText">End : {receivedData.regEnd}</p>
                         </div>
                     </div>
     
@@ -79,8 +79,8 @@ const LaunchpadProject = () => {
                         <div className={comparesaleDate ? "procedureNumber" : "procedureNumber_NotActive"}>2</div>
                         <div>
                             <p>Sale</p>
-                            <p className="shortText">From : {receivedData.saleStart}</p>
-                            <p className="shortText">To : {receivedData.saleEnd}</p>
+                            <p className="shortText">Start : {receivedData.saleStart}</p>
+                            <p className="shortText">End : {receivedData.saleEnd}</p>
                         </div>
                     </div>
     
