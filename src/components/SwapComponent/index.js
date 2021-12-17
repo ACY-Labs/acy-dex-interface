@@ -172,15 +172,6 @@ const SwapComponent = props => {
 
   const { account, chainId, library, activate } = useWeb3React();
 
-
-  // setSwapButtonContent
-  // 监听钱包的连接
-  useEffect(() => {
-    if (! account){
-      activate(binance);
-    }
-  }, []);
-
   useEffect(
     () => {
       if (!account || !chainId || !library) {
@@ -400,10 +391,7 @@ const SwapComponent = props => {
     setToken0Amount(tempAmount);
     setToken0Balance(tempBalance);
   };
-
-  const ConnectWallet = () => {
-    activate(binance);
-  };
+  
   // swap的交易状态
   const swapCallback = async (status, inputToken, outToken) => {
     // 循环获取交易结果
