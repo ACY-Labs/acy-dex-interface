@@ -93,31 +93,6 @@ const IncomingProjects = ({ data, openProject }) => {
               </div>
             </div>
           ))}
-        <div className="cards">
-          <div className=" card [ is-collapsed ]">
-            <div
-              className="card__inner [ js-expander ]"
-              onClick={() => setisIncomingExpanded(!isIncomingExpanded)}
-            >
-              <div className="">
-                <ProjectsCard
-                  projectID={1}
-                  ddl={'2021/12/11 00:00:00'}
-                  raise={'1'}
-                  sales={'222'}
-                  rate={'test'}
-                  title={'test'}
-                  isUpcoming={true}
-                  openProject={openProject}
-                />
-              </div>
-              {/* <i className="fa fa-folder-o" /> */}
-            </div>
-            <div className="card__expander">
-              <ExpandedContent />
-            </div>
-          </div>
-        </div>
       </div>
       {data.length > 3 ? (
         <a className="see-more-incoming" onClick={() => setIsActiveUpcoming(!isActiveUpcoming)} />
