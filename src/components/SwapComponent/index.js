@@ -457,7 +457,6 @@ const SwapComponent = props => {
         }
       });
     }
-
     sti(status.hash);
   };
 
