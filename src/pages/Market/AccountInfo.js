@@ -802,7 +802,7 @@ function AccountInfo(props) {
         </div>
       ): (
         <div>
-          Address dose not matched with the connected account
+          Address does not matched with the connected account
         </div>
       )
       }
