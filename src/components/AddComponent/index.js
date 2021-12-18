@@ -444,6 +444,8 @@ const AddLiquidityComponent = props => {
           setTimeout(checkStatusAndFinish, 500);
         } else {
           let transactionTime;
+          console.log("got receipt here");
+          props.onGetReceipt(receipt.transactionHash);
           await library.getBlock(receipt.logs[0].blockNumber).then(res => {
             transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
             console.log("test transactionTime: ", transactionTime)

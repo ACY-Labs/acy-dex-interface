@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton } from 'antd';
 import { useWeb3React } from '@web3-react/core';
@@ -26,7 +26,7 @@ import {
 import OperationHistoryTable from './components/OperationHistoryTable';
 import AddComponent from '@/components/AddComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { getTransactionsByAccount } from '@/utils/txData';
+import { getTransactionsByAccount,appendNewLiquidityTx } from '@/utils/txData';
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import styles from './styles.less';
 
@@ -44,6 +44,9 @@ const BasicProfile = (props) => {
   const [tableLoading, setTableLoading] = useState(true);
   const [transactionNum, setTransactionNum] = useState(0);
   const { account, chainId, library, activate } = useWeb3React();
+
+  const refContainer = useRef();
+  refContainer.current = transactionList;
 
 
  useEffect(() => {
@@ -96,6 +99,19 @@ const BasicProfile = (props) => {
     setLoggedIn(true);
   };
 
+  const updateTransactionList = (receiptHash) => {
+    setTableLoading(true);
+    console.log("updating list");
+    appendNewLiquidityTx(refContainer.current,receiptHash,account,library).then((data) => {
+      if(data && data.length > 0)setTransactionList(data);
+      setTableLoading(false);
+    })
+  }
+
+  const onGetReceipt = async (receipt) => {
+    updateTransactionList(receipt);
+  };
+
 
   let token = null;
   if (props.location.state) {
@@ -117,7 +133,7 @@ const BasicProfile = (props) => {
             </div>
           }
           <div style={{ flex: 1, width: "50vw", minWidth: loggedIn ? null : "340px", maxWidth: loggedIn ? null : "420px" }}>
-            <AddComponent onLoggedIn={onLoggedIn} />
+            <AddComponent onLoggedIn={onLoggedIn} onGetReceipt={onGetReceipt} />
           </div>
         </div>
 
