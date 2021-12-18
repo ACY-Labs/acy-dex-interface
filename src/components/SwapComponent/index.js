@@ -423,11 +423,14 @@ const SwapComponent = props => {
       library.getTransactionReceipt(hash).then(async receipt => {
         console.log(`receiptreceipt for ${hash}: `, receipt);
         // receipt is not null when transaction is done
-        if (!receipt)
+        if (!receipt) 
           setTimeout(sti(hash), 500);
         else {
           
           const newData = transactions.filter(item => item.hash != hash);
+
+          props.onGetReceipt(receipt.transactionHash, library, account);
+
           dispatch({
             type: 'transaction/addTransaction',
             payload: {
@@ -665,12 +668,12 @@ export default connect(({ global, transaction, swap, loading }) => ({
 
 // if (receipt) {
 //   clearInterval(sti);
-//   const { logs } = receipt;
-//   console.log("logs: ", logs);
-//   const decodedLog = parseArbitrageLog(logs[logs.length - 1]);
-//   console.log('receipt OK, these are logs');
-//   console.log("decodedLog", decodedLog);
-//   decodedLog['transactionHash'] = receipt.transactionHash;
+  // const { logs } = receipt;
+  // console.log("logs: ", logs);
+  // const decodedLog = parseArbitrageLog(logs[logs.length - 1]);
+  // console.log('receipt OK, these are logs');
+  // console.log("decodedLog", decodedLog);
+  // decodedLog['transactionHash'] = receipt.transactionHash;
 
 //   props.onGetReceipt(decodedLog, library, account);
 //   let newData = transactions.filter(item => item.hash != status.hash);

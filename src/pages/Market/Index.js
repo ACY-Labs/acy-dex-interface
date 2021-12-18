@@ -240,10 +240,10 @@ const MarketIndex = props => {
       )}
 
       <h2>Transactions</h2>
-      {transactions.length > 0 ? (
-        <TransactionTable dataSourceTransaction={transactions} />
-      ) : (
+      {account && transactions.length <= 0 ? (
         <Icon type="loading" />
+      ) : (
+        <TransactionTable dataSourceTransaction={transactions} />
       )}
       <div style={{ height: '20px' }} />
     </div>

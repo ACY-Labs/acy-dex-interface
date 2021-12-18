@@ -885,6 +885,7 @@ export function TransactionTable(props) {
         }
       ).filter(item => item.visible == true)}
       pagination={false}
+      locale={{ emptyText:'Data will show after you have logged in with a BSC account'}}
       style={{
         marginBottom: '20px',
       }}
