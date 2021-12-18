@@ -573,7 +573,9 @@ const LaunchpadProject = () => {
           </div>
           <div className="arrow-down-container">
             <CaretDownOutlined
-              className={isClickedVesting ? 'arrow-down-active' : 'arrow-down'}
+              className={
+                isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
+              }
               onClick={() => setIsClickedVesting(!isClickedVesting)}
             />
           </div>

@@ -12,6 +12,7 @@ import BubblyButton from './components/BubblyButton.js';
 import RaiseButton from './components/RaiseButton.js';
 import $ from 'jquery';
 import { getProjects } from '@/services/api';
+import ExpandingContent from './components/ExpandedContent';
 
 const { Meta } = Card;
 

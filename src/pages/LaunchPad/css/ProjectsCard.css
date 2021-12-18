@@ -687,7 +687,7 @@
   place-items: center;
   width: 54px;
   height: 54px;
-  background-color: #757579;
+  background-color: #353535;
   border-radius: 4px;
 }
 
@@ -704,4 +704,5 @@
 .expanded-content-text {
   font-size: 8px;
   margin-bottom: 2px;
+  color: #ffffff;
 }
