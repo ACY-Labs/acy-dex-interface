@@ -74,22 +74,22 @@ export async function getEstimated(
   setButtonContent('loading...');
   setRemoveStatus('');
 
-  let token0IsETH = inToken0Symbol === 'ETH';
-  let token1IsETH = inToken1Symbol === 'ETH';
+  let token0IsETH = inToken0Symbol === 'BNB';
+  let token1IsETH = inToken1Symbol === 'BNB';
   if (token0IsETH && token1IsETH) {
     setToken0Amount('0');
     setToken1Amount('0');
     setNeedApprove(false);
     setButtonStatus(false);
-    setButtonContent('Both tokens are ETH');
+    setButtonContent('Both tokens are BNB');
     return;
   }
-  if ((token0IsETH && inToken1Symbol === 'WETH') || (inToken0Symbol === 'WETH' && token1IsETH)) {
+  if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
     setToken0Amount('0');
     setToken1Amount('0');
     setNeedApprove(false);
     setButtonStatus(false);
-    setButtonContent('Invalid pair of ETH/WETH');
+    setButtonContent('Invalid pair of BNB/WBNB');
     return;
   }
   // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
@@ -360,8 +360,8 @@ export async function signOrApprove(
       decimals: inToken1Decimal,
     } = inputToken1;
 
-    const token0IsETH = inToken0Symbol === 'ETH';
-    const token1IsETH = inToken1Symbol === 'ETH';
+    const token0IsETH = inToken0Symbol === 'BNB';
+    const token1IsETH = inToken1Symbol === 'BNB';
 
     if (!inputToken0.symbol || !inputToken1.symbol)
       return new CustomError('One or more token input is missing');
@@ -372,10 +372,10 @@ export async function signOrApprove(
     console.log('token1');
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support ETH to ETH");
+    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support BNB to BNB");
 
-    if ((token0IsETH && inToken1Symbol === 'WETH') || (inToken0Symbol === 'WETH' && token1IsETH)) {
-      return new CustomError('Invalid pair WETH/ETH');
+    if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
+      return new CustomError('Invalid pair WBNB/BNB');
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 
@@ -593,8 +593,8 @@ export async function removeLiquidity(
     token1Address = getAddress(token1Address);
     console.log(token1Address);
 
-    let token0IsETH = token0Symbol === 'ETH';
-    let token1IsETH = token1Symbol === 'ETH';
+    let token0IsETH = token0Symbol === 'BNB';
+    let token1IsETH = token1Symbol === 'BNB';
 
     if (!inputToken0.symbol || !inputToken1.symbol)
       return new CustomError('One or more token input is missing');
@@ -612,10 +612,10 @@ export async function removeLiquidity(
     console.log('token1');
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support ETH to ETH");
+    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support BNB to BNB");
 
-    if ((token0IsETH && token1Symbol === 'WETH') || (token0Symbol === 'WETH' && token1IsETH)) {
-      return new CustomError('Invalid pair WETH/ETH');
+    if ((token0IsETH && token1Symbol === 'WBNB') || (token0Symbol === 'WBNB' && token1IsETH)) {
+      return new CustomError('Invalid pair WBNB/BNB');
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 
