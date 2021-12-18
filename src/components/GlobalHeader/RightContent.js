@@ -215,6 +215,13 @@ const GlobalHeaderRight = props => {
         selectWallet('walletconnect');
       },
     },
+    {
+      name: 'TrustWallet',
+      icon: 'TrustWallet',
+      onClick: () => {
+        selectWallet('walletconnect');
+      },
+    },
     // {
     //   name: 'Trezor',
     //   icon: 'Trezor',

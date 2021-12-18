@@ -22,10 +22,13 @@ const POLLING_INTERVAL = 12000;
 // 连接钱包时支持的货币id
 const injected = new InjectedConnector({
   supportedChainIds: [1, 3, 4, 5, 42, 56, 97, 80001],
+  //supportedChainIds: [56, 97],
 });
 
+
+
 const walletconnect = new WalletConnectConnector({
-  rpc: { 1: RPC_URLS['1'], 56: RPC_URLS['56'], 97: RPC_URLS['97'] },
+  rpc: { 56: RPC_URLS['56'], 97: RPC_URLS['97'] },
   qrcode: true,
 });
 const walletlink = new WalletLinkConnector({
@@ -61,7 +64,7 @@ const portis = new PortisConnector_test({
 
 // const torus = new TorusConnector({ chainId: 4, initOptions: { network: { host: 'rinkeby' } } });
 
-const torus = new TorusConnector({ chainId: 97, initOptions: { network: { host: 'https://data-seed-prebsc-1-s1.binance.org:8545', chainId: 97, networkName: 'Binance Smart Chain Testnet' } } });
+const torus = new TorusConnector({ chainId: 56, initOptions: { network: { host: 'https://bsc-dataseed.binance.org/', chainId: 56, networkName: 'Binance Smart Chain' } } });
 //const torus = new TorusConnector({ chainId: 56 , initOptions: { network: { host: 'rinkeby' } } })
 const binance = new BscConnector({
   supportedChainIds: [56, 97],
