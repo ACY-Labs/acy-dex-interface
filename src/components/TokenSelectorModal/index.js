@@ -6,6 +6,7 @@ import { Input, Icon } from "antd";
 import { useWeb3React } from '@web3-react/core';
 import { getUserTokenBalance } from '@/acy-dex-swap/utils';
 import { asyncForEach } from "@/utils/asynctools";
+import { processString } from "@/components/AcyCoinItem";
 
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import styles from "./styles.less";
@@ -78,8 +79,10 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
                 newTokenBalanceDict[token.symbol] = 0;
                 console.log("Failed to load balance, error param: ", address, symbol, decimals, err);
             })
-            newTokenBalanceDict[token.symbol] = bal;
-            return bal;
+
+            const balString = processString(bal);
+            newTokenBalanceDict[token.symbol] = balString;
+            return balString;
         })
         setTokenBalanceDict(newTokenBalanceDict);
     }

@@ -8,7 +8,7 @@ import { useWeb3React } from '@web3-react/core';
 import { BigNumber } from '@ethersproject/bignumber';
 
 
-function processString(bal) {
+export function processString(bal) {
   let decimals = bal.split('.')[0];
   let fraction = bal.split('.')[1] || '0';
   // console.log(`decimals: ${decimals} fraction:${fraction}`);
