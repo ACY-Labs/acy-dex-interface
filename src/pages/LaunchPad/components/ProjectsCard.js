@@ -5,15 +5,19 @@ import AcyIcon from '@/assets/icon_acy.svg';
 import CountDown from './CountDown.js';
 
 const ProjectsCard = ({ projectID, ddl, raise, sales, rate, title, isOngoing, isUpcoming }) => {
-  let saleString = isOngoing ? ("Sale ends: " + ddl ): (isUpcoming ? ("Sale starts: " + ddl) : ("Sale ended: " + ddl))
+  let saleString = isOngoing
+    ? 'Sale ends: ' + ddl
+    : isUpcoming
+    ? 'Sale starts: ' + ddl
+    : 'Sale ended: ' + ddl;
 
-  const history = useHistory()
+  const history = useHistory();
   const onOpenProjectDetail = () => {
-    history.push(`/launchpad/project/${projectID}`)
-  }
+    history.push(`/launchpad/project/${projectID}`);
+  };
 
   return (
-    <div className="projects-card projects-container" >
+    <div className="projects-card projects-container">
       <div className="logo-countdown-container">
         <div className="logo-container">
           <div className="logo">
@@ -22,27 +26,44 @@ const ProjectsCard = ({ projectID, ddl, raise, sales, rate, title, isOngoing, is
           <div className="logo-text">{title}</div>
         </div>
         <div className="countdown-container">
+          <div>{isOngoing || isUpcoming ? <CountDown ddl={ddl} /> : <CountDown ddl={null} />}</div>
           <div>
-            {(isOngoing || isUpcoming) ? <CountDown ddl={ddl} />:<CountDown ddl={null} />}
-          </div>
-          <div>
-            <p style={{ fontSize: '10px' }}>
-              {saleString}
-            </p>
+            <p style={{ fontSize: '10px' }}>{saleString}</p>
           </div>
         </div>
       </div>
 
       <div className="details-container detail-text">
-        <div style={{width: "100%", display:"inline-flex", justifyContent:"space-between", padding: "0 20px 0 10px"}}>
+        <div
+          style={{
+            width: '100%',
+            display: 'inline-flex',
+            justifyContent: 'space-between',
+            padding: '0 20px 0 10px',
+          }}
+        >
           <span>Raise</span>
           <span>{raise}</span>
         </div>
-        <div style={{width: "100%", display:"inline-flex", justifyContent:"space-between", padding: "0 20px 0 10px"}}>
+        <div
+          style={{
+            width: '100%',
+            display: 'inline-flex',
+            justifyContent: 'space-between',
+            padding: '0 20px 0 10px',
+          }}
+        >
           <span>Sales</span>
           <span>{sales}</span>
         </div>
-        <div style={{width: "100%", display:"inline-flex", justifyContent:"space-between", padding: "0 20px 0 10px"}}>
+        <div
+          style={{
+            width: '100%',
+            display: 'inline-flex',
+            justifyContent: 'space-between',
+            padding: '0 20px 0 10px',
+          }}
+        >
           <span>Rate</span>
           <span>{rate}</span>
         </div>

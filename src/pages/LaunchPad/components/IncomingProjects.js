@@ -15,7 +15,6 @@ const IncomingProjects = ({ data, openProject }) => {
     var $container = $(this).closest('.expanding-card');
 
     if ($thisCell.hasClass('is-collapsed')) {
-      console.log('hello');
       $cell
         .not($thisCell)
         .removeClass('is-expanded')
@@ -30,7 +29,6 @@ const IncomingProjects = ({ data, openProject }) => {
   });
 
   var $seeMore = $('.incoming-container');
-  console.log($seeMore);
   $seeMore.find('.see-more-incoming').click(function() {
     var $incomingContainer = $(this).closest('.incoming-container');
     if ($incomingContainer.hasClass('incoming-container-inactive')) {
@@ -44,21 +42,8 @@ const IncomingProjects = ({ data, openProject }) => {
     }
   });
 
-  //close card when click on cross
-  $cell.find('.js-collapser').click(function() {
-    var $thisCell = $(this).closest('.card');
-
-    $thisCell.removeClass('is-expanded').addClass('is-collapsed');
-    $cell.not($thisCell).removeClass('is-inactive');
-  });
-
   const [isActiveUpcoming, setIsActiveUpcoming] = useState(false);
   const [isIncomingExpanded, setisIncomingExpanded] = useState(false);
-
-  const toggleExpanded = event => {
-    console.log(this);
-    setisIncomingExpanded(!isIncomingExpanded);
-  };
 
   return (
     <div className="incoming-container incoming-container-inactive">
