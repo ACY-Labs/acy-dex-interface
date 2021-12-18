@@ -3,7 +3,7 @@
  * @Date: 2021-09-29 22:07:58
  * @LastEditTime: 2021-10-18 18:30:54
  * @LastEditors: Doctor
- * @Description: 
+ * @Description:
  * @FilePath: \acy-dex-interface\config\router.config.js
  * jianqiang
  */
@@ -71,22 +71,23 @@ export default [
         routes: [
           {
             path: '/launchpad',
-            component: './LaunchPad/Index',
+            // component: './LaunchPad/Index',
+            component: './LaunchPad/LaunchpadProject',
           },
           {
             path: '/launchpad/newproject',
-            component: './LaunchPad/LaunchpadProject'
+            component: './LaunchPad/LaunchpadProject',
           },
           {
             path: '/launchpad/project/:projectId',
-            component: './LaunchPad/LaunchpadProject'
-          }
+            component: './LaunchPad/LaunchpadProject',
+          },
         ],
       },
       {
         path: '/transaction/:id?',
         name: 'Transaction',
-        hideInMenu:true,
+        hideInMenu: true,
         component: './Transaction/',
       },
     ],
