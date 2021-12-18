@@ -1,10 +1,9 @@
-// verify at etherscan with optimization on and compiler version v0.6.7
+// BSC MAINNET TOKEN
 export default [
   {
     name: 'USD Tether',
     symbol: 'USDT',
     address: '0x55d398326f99059ff775485246999027b3197955',
-    addressOnEth: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
     decimals: 18,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg',
     idOnCoingecko: "tether",
@@ -13,7 +12,6 @@ export default [
     name: 'ACY',
     symbol: 'ACY',
     address: '0xc94595b56e301f3ffedb8ccc2d672882d623e53a',
-    addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
     logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
     idOnCoingecko: "usd-coin",
@@ -22,7 +20,6 @@ export default [
     name: 'Binance',
     symbol: 'BNB',
     address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
-    addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
     logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
     idOnCoingecko: "binancecoin",
@@ -31,7 +28,6 @@ export default [
     name: 'Binance USD',
     symbol: 'BUSD',
     address: '0xe9e7cea3dedca5984780bafc599bd69add087d56',
-    addressOnEth: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
     decimals: 18,
     logoURI: 'https://cryptologos.cc/logos/binance-usd-busd-logo.svg?v=014',
     idOnCoingecko: "tether",
@@ -40,9 +36,25 @@ export default [
     name: 'Wrapped Binance',
     symbol: 'WBNB',
     address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
-    addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
     logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
     idOnCoingecko: "binancecoin",
+  },
+
+  {
+    name: 'Ethereum',
+    symbol: 'ETH',
+    address: '0x2170Ed0880ac9A755fd29B2688956BD959F933F8',
+    decimals: 18,
+    logoURI: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=014',
+    idOnCoingecko: "ethereum",
+  },
+  {
+    name: 'Binance Bitcoin',
+    symbol: 'BTCB',
+    address: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+    decimals: 18,
+    logoURI: 'https://cryptologos.cc/logos/bitcoin-btc-logo.svg?v=014',
+    idOnCoingecko: "binance-bitcoin",
   },
 ];
