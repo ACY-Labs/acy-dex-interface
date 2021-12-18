@@ -37,7 +37,19 @@ import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
 
 const { AcyTabPane } = AcyTabs;
+function getTIMESTAMP(time) {
+    var date = new Date(time);
+    var year = date.getFullYear(time);
+    var month = ("0" + (date.getMonth(time) + 1)).substr(-2);
+    var day = ("0" + date.getDate(time)).substr(-2);
+    var hour = ("0" + date.getHours(time)).substr(-2);
+    var minutes = ("0" + date.getMinutes(time)).substr(-2);
+    var seconds = ("0" + date.getSeconds(time)).substr(-2);
+  
+    return hour + ":" + minutes + ":" + seconds;
+    // return `${year}-${month}-${day}`;
 
+}
 function abbrNumber(number) {
   const THOUSAND = 0;
   const MILLION = 1;
@@ -70,7 +82,13 @@ function abbrNumber(number) {
 
   return result;
 }
-
+const defaultData = [
+  ['2000-06-05', 116],
+  ['2000-06-06', 129],
+  ['2000-06-07', 135],
+  
+  
+];
 const StyledCard = styled(AcyCard)`
   background: transparent;
 
@@ -151,38 +169,118 @@ const Swap = props => {
     setFormat(_format);
   };
 
-  useEffect(() => {
-    getPrice();
-    // 还原存储的交易信息
-    const {
-      transaction: { transactions },
-      dispatch,
-    } = props;
-    let newData = [...transactions];
-    if (localStorage.getItem('transactions')) {
-      newData.push(...JSON.parse(localStorage.getItem('transactions')));
-    }
-    // 更新数据
-    dispatch({
-      type: 'transaction/addTransaction',
-      payload: {
-        transactions: [...uniqueFun(newData, 'hash')],
-      },
-    });
-  }, [])
+  // useEffect(() => {
+  //   getPrice();
+  //   // 还原存储的交易信息
+  //   const {
+  //     transaction: { transactions },
+  //     dispatch,
+  //   } = props;
+  //   let newData = [...transactions];
+  //   if (localStorage.getItem('transactions')) {
+  //     newData.push(...JSON.parse(localStorage.getItem('transactions')));
+  //   }
+  //   // 更新数据
+  //   dispatch({
+  //     type: 'transaction/addTransaction',
+  //     payload: {
+  //       transactions: [...uniqueFun(newData, 'hash')],
+  //     },
+  //   });
+  // }, [])
 
   // connect to page model, changes will be reflected in SwapComponent
-  useEffect(() => {
-    dispatch({
-      type: "swap/updateTokens",
-      payload: {
-        token0: activeToken0,
-        token1: activeToken1
-      }
-    });
-    getPrice();
-  }, [activeToken0, activeToken1, format]);
+  // useEffect(() => {
+  //   dispatch({
+  //     type: "swap/updateTokens",
+  //     payload: {
+  //       token0: activeToken0,
+  //       token1: activeToken1
+  //     }
+  //   });
+  //   getPrice();
+  // }, [activeToken0, activeToken1, format]);
 
+  //get chart data the interval is 5 min
+
+  useEffect(() => {
+    const dayLength = 24*60/5;
+    // const dayLength = 5;
+    let reverseFlag = false;
+    let timeMark = 0;
+    let timeData = [];
+    let A = activeToken0.symbol;
+    let B = activeToken1.symbol;
+    if(A>B)
+    {
+      let temp = B;
+      B = A;
+      A = temp;
+      reverseFlag = true;
+    }
+    console.log(A,B);
+    console.log("fetching the swap Rate data!!!!!!!!!!!!!!!!");
+    axios.get(
+      "http://localhost:3001/api/chart/getRate", {params : {token0 : A , token1 : B}}
+    ).then(res => {
+      console.log(res.data);
+      if(res.data){
+      const historyData = res.data.History;
+      timeMark = historyData[historyData.length-1].time;
+
+      let date = new Date(timeMark*60*1000);
+      var options = { weekday: 'long'};
+      setActiveRate(new Intl.DateTimeFormat('en-US', options).format(date));
+
+      for (let i = historyData.length - 5 ; i < historyData.length; i++) {
+  
+        while(i < 0) i++;
+        const element = historyData[i];
+        // timeData.push(element.time);
+        timeData.push(element);
+        // var time = element.time*60*1000
+        // var date = new Date(time);
+        // var dateString = date.toString();
+        // console.log("Time : " + date);
+        
+      };
+        
+      //add 0 to the chartdata array
+      const addData = []
+      for (let i = timeMark - 24*60; i < timeMark - timeData.length*5; i = i+5) {
+        let temp2 = [(i*60*1000),  0 ] ;
+        addData.push(temp2);
+      } 
+      console.log("addData",addData);
+
+
+      // drawing chart
+          console.log("timeData",timeData);
+          const tempChart = [];
+          for (let a = 0; a < timeData.length; a++) {
+            const time = timeData[a].time*60*1000;
+            let date = new Date(time);
+            let dateString = date.getMinutes();
+            let temp;
+            if(reverseFlag)
+            temp = [time, 1.0/timeData[a].exchangeRate ] ;
+            else
+            temp = [time,timeData[a].exchangeRate ] ;
+            tempChart.push(temp);
+            
+          }
+          console.log("CHARTING!!!!!!!!!!!",tempChart);
+
+          setChartData( addData.concat(tempChart));
+    };
+
+    })
+     
+
+      console.log("chartdata");
+      console.log(timeData);
+   
+  }, [activeToken0,activeToken1]);
   // workaround way to get USD price (put token1 as USDC)
   // NEEDS ETHEREUM ADDRESS, RINKEBY DOES NOT WORK HERE
   const getRoutePrice = (token0Address, token1Address) => {
@@ -202,36 +300,37 @@ const Swap = props => {
       });
   }
 
-  const getPrice = () => {
-    // FIXME: current api doesn't take token0/1 sequence into consideration, always return ratio based on alphabetical order of token symbol
-    axios.post(
-      `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${activeToken1.addressOnEth
-      }&range=${range}`
-    )
-      .then(data => {
-        let { swaps } = data.data.data;
-        // invert the nominator and denominator when toggled on the token image (top right of the page)
-        if (activeToken1.symbol < activeToken0.symbol) {
-          console.log("swapping token position")
-          swaps = Array.from(swaps, o => ({ ...o, "rate": 1 / o.rate }))
-        }
-        console.log(activeToken0.symbol, activeToken1.symbol)
-        console.log(swaps)
-        const lastDataPointIndex = swaps.length - 1;
+  // const getPrice = () => {
+  //   // FIXME: current api doesn't take token0/1 sequence into consideration, always return ratio based on alphabetical order of token symbol
+  //   axios.post(
+  //     `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${activeToken1.addressOnEth}&range=${range}`
+  //     // `https://localhost:3001/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${activeToken1.addressOnEth}&range=${range}`
 
-        let precisionedData = swaps.map(item => [item.time, item.rate.toFixed(3)])
-        // add precision if the ratio is close to zero
-        if (Math.max(...precisionedData.map(item => item[1])) === 0) {
-          precisionedData = swaps.map(item => [item.time, item.rate.toFixed(6)])
-        }
-        setChartData(precisionedData);
-        setActiveRate(precisionedData[lastDataPointIndex][1]);
-      })
-      .catch(e => {
-        setChartData([]);
-        setActiveRate('No data');
-      });
-  }
+  //   )
+  //     .then(data => {
+  //       let { swaps } = data.data.data;
+  //       // invert the nominator and denominator when toggled on the token image (top right of the page)
+  //       if (activeToken1.symbol < activeToken0.symbol) {
+  //         console.log("swapping token position")
+  //         swaps = Array.from(swaps, o => ({ ...o, "rate": 1 / o.rate }))
+  //       }
+  //       console.log(activeToken0.symbol, activeToken1.symbol)
+  //       console.log(swaps)
+  //       const lastDataPointIndex = swaps.length - 1;
+
+  //       let precisionedData = swaps.map(item => [item.time, item.rate.toFixed(3)])
+  //       // add precision if the ratio is close to zero
+  //       if (Math.max(...precisionedData.map(item => item[1])) === 0) {
+  //         precisionedData = swaps.map(item => [item.time, item.rate.toFixed(6)])
+  //       }
+  //       setChartData(precisionedData);
+  //       setActiveRate(precisionedData[lastDataPointIndex][1]);
+  //     })
+  //     .catch(e => {
+  //       setChartData([]);
+  //       setActiveRate('No data');
+  //     });
+  // }
 
   const lineTitleRender = () => {
 
@@ -284,7 +383,9 @@ const Swap = props => {
             onhandPeriodTimeChoose={onhandPeriodTimeChoose}
             className={styles.pt}
             // times={['1D', '1W', '1M']}
-            times={['24h', 'Max']}
+            // times={['24h', 'Max']}
+            times={['24h']}
+
           />
         </div>
       </div>,
@@ -412,18 +513,19 @@ const Swap = props => {
                   }}
                   className={styles.showPeriodOnHover}
                 >
-                  <AcyPriceChart
+                  <AcyPriceChart 
                     data={chartData}
                     format={format}
                     showXAxis
                     // showGradient
                     lineColor="#e29227"
                     range={range}
+                    showTooltip={true}
                     onHover={(data, dataIndex) => {
                       const prevData = dataIndex === 0 ? 0 : chartData[dataIndex - 1][1];
                       const absoluteChange = (dataIndex === 0 ? 0 : data - prevData).toFixed(3);
                       const formattedAbsChange = absoluteChange > 0 ? "+" + absoluteChange : absoluteChange;
-                      setActiveRate(data);
+                      // setActiveRate(data);
                       setActiveAbsoluteChange(formattedAbsChange);
                     }}
                   />

@@ -5,6 +5,9 @@ import { AcyIcon, AcyTokenIcon, AcyPeriodTime, AcyAccountChart } from '@/compone
 // import FarmsTable from '@/pages/Farms/FarmsTable';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
+
+
+
 import { getAllPools, getDaoStakeRecord, getHarvestHistory } from '@/acy-dex-swap/core/farms';
 import styles from './styles.less';
 import { abbrNumber, abbrHash, isDesktop, sortTable, openInNewTab, formattedNum } from './Util';
@@ -346,6 +349,7 @@ function AccountInfo(props) {
 
   // method to prompt metamask extension for user to connect their wallet.
   const connectWallet = () => activate(injected);
+  
   useEffect(
     () => {
       
@@ -494,8 +498,8 @@ function AccountInfo(props) {
     axios.get(
       // fetch valid pool list from remote
       // `https://api.acy.finance/api/pool?chainId=${chainId}`
-      // `https://api.acy.finance/api/userpool?walletId=${account}`
-      `http://localhost:3001/api/userpool?walletId=${account}`
+      `https://api.acy.finance/api/userpool?walletId=${account}`
+      // `http://localhost:3001/api/userpool?walletId=${account}`
     ).then(async res => {
       console.log("fetch pool data");
       console.log(res.data);
@@ -588,27 +592,28 @@ function AccountInfo(props) {
 
   }
 
-  useEffect(async () => {
-    const token0list = [];
-    const token1list = [];
-    console.log("fetching the poolvalume data");
-    // axios.get(
-    //   // fetch valid pool list from remote
-    //   // `https://api.acy.finance/api/pool?chainId=${chainId}`
-    //   // `https://api.acy.finance/api/poolchart/all`
-    //   `http://localhost:3001/api/poolchart/all`
-    // ).then(async res => {
-    //   console.log(res);
-    //   console.log("test=====");
-    //   console.log(res.data);
-    //   for (let index = 0; index < array.length; index++) {
-    //     const element = array[index];
+  // no need to fetch the pool valume at here 
+  // useEffect(async () => {
+  //   const token0list = [];
+  //   const token1list = [];
+  //   console.log("fetching the poolvalume data");
+  //   // axios.get(
+  //   //   // fetch valid pool list from remote
+  //   //   // `https://api.acy.finance/api/pool?chainId=${chainId}`
+  //   //   // `https://api.acy.finance/api/poolchart/all`
+  //   //   `http://localhost:3001/api/poolchart/all`
+  //   // ).then(async res => {
+  //   //   console.log(res);
+  //   //   console.log("test=====");
+  //   //   console.log(res.data);
+  //   //   for (let index = 0; index < array.length; index++) {
+  //   //     const element = array[index];
         
-    //   }
-    // }).catch( err => {
-    //   console.log(err);
-    // });
-  }, [])
+  //   //   }
+  //   // }).catch( err => {
+  //   //   console.log(err);
+  //   // });
+  // }, [])
 
   useEffect(async () => {
     connectWallet();
