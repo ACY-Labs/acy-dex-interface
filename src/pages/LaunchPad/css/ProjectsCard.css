@@ -506,34 +506,34 @@
 .bubbly-button.animate::before {
   display: block;
   top: -75%;
-  background-image: radial-gradient(circle, #ef6eae 20%, transparent 20%),
-    radial-gradient(circle, transparent 20%, #ff0081 20%, transparent 30%),
-    radial-gradient(circle, #ff0081 20%, transparent 20%),
-    radial-gradient(circle, #ff0081 20%, transparent 20%),
-    radial-gradient(circle, transparent 10%, #ff0081 15%, transparent 20%),
-    radial-gradient(circle, #ff0081 20%, transparent 20%),
-    radial-gradient(circle, #ff0081 20%, transparent 20%),
-    radial-gradient(circle, #ff0081 20%, transparent 20%),
-    radial-gradient(circle, #ff0081 20%, transparent 20%);
+  background-image: radial-gradient(circle, #b5b5b6 20%, transparent 20%),
+    radial-gradient(circle, transparent 20%, #b5b5b6 20%, transparent 30%),
+    radial-gradient(circle, #b5b5b6 20%, transparent 20%),
+    radial-gradient(circle, #b5b5b6 20%, transparent 20%),
+    radial-gradient(circle, transparent 10%, #b5b5b6 15%, transparent 20%),
+    radial-gradient(circle, #b5b5b6 20%, transparent 20%),
+    radial-gradient(circle, #b5b5b6 20%, transparent 20%),
+    radial-gradient(circle, #b5b5b6 20%, transparent 20%),
+    radial-gradient(circle, #b5b5b6 20%, transparent 20%);
   background-size: 10% 10%, 20% 20%, 15% 15%, 20% 20%, 18% 18%, 10% 10%, 15% 15%, 10% 10%, 18% 18%;
 }
 .bubbly-button.animate::after {
   display: block;
   bottom: -75%;
-  background-image: radial-gradient(circle, #ef6eae 20%, transparent 20%),
-    radial-gradient(circle, #ff0081 20%, transparent 20%),
-    radial-gradient(circle, transparent 10%, #ff0081 15%, transparent 20%),
-    radial-gradient(circle, #ff0081 20%, transparent 20%),
-    radial-gradient(circle, #ff0081 20%, transparent 20%),
-    radial-gradient(circle, #ff0081 20%, transparent 20%),
-    radial-gradient(circle, #ff0081 20%, transparent 20%);
+  background-image: radial-gradient(circle, #b5b5b6 20%, transparent 20%),
+    radial-gradient(circle, #b5b5b6 20%, transparent 20%),
+    radial-gradient(circle, transparent 10%, #b5b5b6 15%, transparent 20%),
+    radial-gradient(circle, #b5b5b6 20%, transparent 20%),
+    radial-gradient(circle, #b5b5b6 20%, transparent 20%),
+    radial-gradient(circle, #b5b5b6 20%, transparent 20%),
+    radial-gradient(circle, #b5b5b6 20%, transparent 20%);
   background-size: 15% 15%, 20% 20%, 18% 18%, 20% 20%, 15% 15%, 10% 10%, 20% 20%;
   animation: bottomBubbles ease-in-out 0.75s infinite;
 }
 .bubbly-button:hover {
   transform: scale(0.9);
   /* background-color: #e60074; */
-  box-shadow: 0 2px 25px rgba(255, 0, 130, 0.2);
+  box-shadow: 0 2px 10px #b5b5b6;
 }
 .bubbly-button.animate::before {
   display: block;
@@ -613,7 +613,7 @@
   transform: scale(0.9);
   animation: pulse 1s;
   border-radius: 0px;
-  box-shadow: 0 0 0 1.5em rgba(255, 255, 255, 0);
+  box-shadow: 0 0 0 1em rgba(255, 255, 255, 0);
 }
 
 .inner-text {
