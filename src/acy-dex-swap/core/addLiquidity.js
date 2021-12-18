@@ -103,14 +103,14 @@ export async function getEstimated(
     console.log(inputToken0);
     console.log(inputToken1);
     if (token0IsETH && token1IsETH) {
-      setButtonContent("Doesn't support ETH to ETH");
+      setButtonContent("Doesn't support BNB to BNB");
       setButtonStatus(false);
-      return new CustomError("Doesn't support ETH to ETH");
+      return new CustomError("Doesn't support BNB to BNB");
     }
-    if ((token0IsETH && inToken1Symbol === 'WETH') || (inToken0Symbol === 'WETH' && token1IsETH)) {
-      setButtonContent('Invalid pair WETH/ETH');
+    if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
+      setButtonContent('Invalid pair WBNB/BNB');
       setButtonStatus(false);
-      return new CustomError('Invalid pair WETH/ETH');
+      return new CustomError('Invalid pair WBNB/BNB');
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 
@@ -124,7 +124,6 @@ export async function getEstimated(
     const token1 = token1IsETH
       ? WETH[chainId]
       : new Token(chainId, inToken1Address, inToken1Decimal, inToken1Symbol);
-
 
     if (token0.equals(token1)) {
       setButtonContent('Equal tokens');
@@ -346,8 +345,8 @@ export async function getEstimated(
 
         setLiquidityBreakdown([
           // `Slippage tolerance : ${slippage}%`,
-          `Pool reserve: ${pair.reserve0.toFixed(3)} ${pair.token0.symbol
-          } + ${pair.reserve1.toFixed(3)} ${pair.token1.symbol}`,
+          `Pool reserve: ${pair.reserve0.toFixed(3)} ${pair.token0.symbol == "WETH" ? "WBNB" : pair.token0.symbol
+          } + ${pair.reserve1.toFixed(3)} ${pair.token1.symbol == "WETH" ? "WBNB" : pair.token1.symbol}`,
           `Pool share: ${poolTokenPercentage}%`,
         ]);
       } catch (e) {
@@ -564,12 +563,12 @@ export async function addLiquidity(
     console.log('token1');
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support ETH to ETH");
+    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support BNB to BNB");
 
     // if ((token0IsETH && inToken1Symbol === 'WETH') || (inToken0Symbol === 'WETH' && token1IsETH)) {
     if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
       // UI should sync value of ETH and WETH
-      return new CustomError('Invalid pair WETH/ETH');
+      return new CustomError('Invalid pair WBNB/BNB');
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 
