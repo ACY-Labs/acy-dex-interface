@@ -59,6 +59,21 @@ const defaultData = [
   ['2000-07-23', 55],
   ['2000-07-24', 60],
 ];
+
+function getTIMESTAMP(time) {
+  var date = new Date(time);
+  var year = date.getFullYear(time);
+  var month = ("0" + (date.getMonth(time) + 1)).substr(-2);
+  var day = ("0" + date.getDate(time)).substr(-2);
+  var hour = ("0" + date.getHours(time)).substr(-2);
+  var minutes = ("0" + date.getMinutes(time)).substr(-2);
+  var seconds = ("0" + date.getSeconds(time)).substr(-2);
+
+  return hour + ":" + minutes + ":" + seconds;
+  // return `${year}-${month}-${day}`;
+
+}
+
 const AcyPriceChart = (props) => {
 
   const echartsElement = useRef();
@@ -90,11 +105,18 @@ const AcyPriceChart = (props) => {
 
   const renderTooltip = v => {
     const { onHover, showTooltip } = props;
+    console.log("V",v);
     if (onHover) onHover(v[0].data, v[0].dataIndex);
 
-    if (showTooltip) return `<span style="color:#b5b5b6"> $ ${v[0].data} </span>`;
+    if (showTooltip) return `
+    
+    <div className = "flew-row ">
+    <div style="color:black"> Time : ${v[0].axisValue}</div>
+    <div style="color:black"> Price : $ ${v[0].data} </div>
+    </div>
+    `;
   };
-
+ 
   const getOption = (chartData) => {
     const { showXAxis, title, lineColor, showGradient, bgColor, range, format } = props;
 
@@ -125,16 +147,15 @@ const AcyPriceChart = (props) => {
         axisLabel: {
           fontSize: 15,
         },
-        show: showXAxis,
+        show: true,
         splitNumber: 5,
         boundaryGap: false,
-        data: dateList.map((item, index) =>
-          index !== 0 && index !== dateList.length - 1 ? moment(item)
-            .locale('en')
-            .local()
-            .format(format)
-            : ""
-        ),
+        data: dateList
+        .map
+        ((item, index) =>
+         item = getTIMESTAMP(item)
+        )
+        ,
         axisTick: { show: false }, // 刻度
         axisLine: { show: false }, // 轴线
         splitLine: {
