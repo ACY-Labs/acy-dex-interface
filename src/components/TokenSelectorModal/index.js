@@ -91,6 +91,7 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
                             value={tokenSearchInput}
                             onChange={onTokenSearchChange}
                             id="liquidity-token-search-input"
+                            autoComplete="off"
                         />
                     </div>
 
@@ -148,9 +149,9 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
                         </AcyTabs>
                     </div>
 
-                    <div className={styles.manageCoinList} onClick={() => { setCurrentPanel("manageTokenList") }}>
+                    {/* <div className={styles.manageCoinList} onClick={() => { setCurrentPanel("manageTokenList") }}>
                         <Icon type="form" style={{ marginRight: "1rem" }} /> Manage Token Lists
-                    </div>
+                    </div> */}
                 </>
             )
                 : <TokenListManager
