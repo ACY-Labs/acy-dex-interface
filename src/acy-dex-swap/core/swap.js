@@ -440,7 +440,7 @@ export async function swapGetEstimated(
       setSwapButtonState(false);
       // setSwapButtonContent("Cannot find arbitrage path");
       if(!poolExist) {
-        return new CustomError('Pool dose not exist!');
+        return new CustomError('Pool does not exist!');
       }
     }
     if(poolExist && !isUseArb) {

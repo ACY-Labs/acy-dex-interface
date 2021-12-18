@@ -191,7 +191,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
 
   const removeLiquidityCallback = (status, percent) => {
     console.log("test status:", status);
-    const {dispatch, transaction: {transactions}} = props;
+    const { dispatch, transaction: { transactions } } = props;
     // const transactions = props.transaction.transactions;
     const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
     console.log("is current dispatched? ", isCurrentTransactionDispatched);
@@ -227,6 +227,12 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
               // `http://localhost:3001/api/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
             ).then(res => {
               console.log("remove to server return: ", res);
+
+              // refresh the table
+              dispatch({
+                type: "liquidity/setRefreshTable",
+                payload: true,
+              });
 
             }).catch(e => console.log("error: ", e));
           }
@@ -445,7 +451,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
                   setButtonContent,
                   setRemoveStatus,
                   removeLiquidityCallback
-                );                
+                );
               }
             }
           }}
