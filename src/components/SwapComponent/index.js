@@ -426,31 +426,14 @@ const SwapComponent = props => {
         if (!receipt)
           setTimeout(sti(hash), 500);
         else {
-          let newData = transactions.filter(item => item.hash != hash);
-          // 保存到loac
-          const { logs } = receipt;
-          console.log("logs: ", logs);
-          const decodedLog = parseArbitrageLog(logs[logs.length - 1]);
-          console.log('receipt OK, these are logs');
-          console.log("decodedLog", decodedLog);
-          decodedLog['transactionHash'] = receipt.transactionHash;
-
-          props.onGetReceipt(decodedLog, library, account);          
-          localStorage.setItem(
-            'transactions',
-            JSON.stringify([
-              ...newData,
-              {
-                hash: status.hash,
-                inputTokenNum,
-                inputTokenSymbol: inputToken.symbol,
-                outTokenNum,
-                outTokenSymbol: outToken.symbol,
-                totalToken,
-                transactionTime,
-              },
-            ])
-          );
+          
+          const newData = transactions.filter(item => item.hash != hash);
+          dispatch({
+            type: 'transaction/addTransaction',
+            payload: {
+              transactions: newData
+            },
+          });
 
           // set button to done and disabled on default
           setSwapButtonContent("Done");
