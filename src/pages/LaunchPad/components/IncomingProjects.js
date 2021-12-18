@@ -9,39 +9,48 @@ import ExpandedContent from './ExpandedContent.js';
 const IncomingProjects = ({ data, openProject }) => {
   var $cell = $('.card');
 
-//open and close card when clicked on card
+  //open and close card when clicked on card
   $cell.find('.js-expander').click(function() {
-    
     var $thisCell = $(this).closest('.card');
-    var $container = $(this).closest('.expanding-card')
+    var $container = $(this).closest('.expanding-card');
 
     if ($thisCell.hasClass('is-collapsed')) {
-      console.log("hello")
-      $cell.not($thisCell).removeClass('is-expanded').addClass('is-collapsed')
+      console.log('hello');
+      $cell
+        .not($thisCell)
+        .removeClass('is-expanded')
+        .addClass('is-collapsed');
       $thisCell.removeClass('is-collapsed').addClass('is-expanded');
-      $container.addClass('expanded')
-    
-
-
+      $container.addClass('expanded');
     } else {
-    $thisCell.removeClass('is-expanded').addClass('is-collapsed');
+      $thisCell.removeClass('is-expanded').addClass('is-collapsed');
 
-      $container.removeClass('expanded')
-      
-      
+      $container.removeClass('expanded');
     }
-  
-});
+  });
 
-//close card when click on cross
-$cell.find('.js-collapser').click(function() {
+  var $seeMore = $('.incoming-container');
+  console.log($seeMore);
+  $seeMore.find('.see-more-incoming').click(function() {
+    var $incomingContainer = $(this).closest('.incoming-container');
+    if ($incomingContainer.hasClass('incoming-container-inactive')) {
+      $incomingContainer
+        .removeClass('incoming-container-inactive')
+        .addClass('incoming-container-active');
+    } else {
+      $incomingContainer
+        .removeClass('incoming-container-active')
+        .addClass('incoming-container-inactive');
+    }
+  });
 
-  var $thisCell = $(this).closest('.card');
+  //close card when click on cross
+  $cell.find('.js-collapser').click(function() {
+    var $thisCell = $(this).closest('.card');
 
-  $thisCell.removeClass('is-expanded').addClass('is-collapsed');
-  $cell.not($thisCell).removeClass('is-inactive');
-
-});
+    $thisCell.removeClass('is-expanded').addClass('is-collapsed');
+    $cell.not($thisCell).removeClass('is-inactive');
+  });
 
   const [isActiveUpcoming, setIsActiveUpcoming] = useState(false);
   const [isIncomingExpanded, setisIncomingExpanded] = useState(false);
@@ -52,9 +61,9 @@ $cell.find('.js-collapser').click(function() {
   };
 
   return (
-    <div className={isActiveUpcoming ? 'incoming-container incoming-container-active' : 'incoming-container'}>
+    <div className="incoming-container incoming-container-inactive">
       <div
-        className='expanding-card'
+        className="expanding-card"
         style={{
           zIndex: 1,
           display: 'flex',
@@ -93,11 +102,7 @@ $cell.find('.js-collapser').click(function() {
             </div>
           ))}
       </div>
-      {data.length > 3 ? (
-        <a className="see-more-incoming" onClick={() => setIsActiveUpcoming(!isActiveUpcoming)} />
-      ) : (
-        ''
-      )}
+      {data.length > 3 ? <a className="see-more-incoming" /> : ''}
     </div>
   );
 };

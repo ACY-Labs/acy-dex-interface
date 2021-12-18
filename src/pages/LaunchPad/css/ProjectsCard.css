@@ -255,7 +255,7 @@
   height: calc(2 * (220px + 40px) + 240px);
 }
 
-.incoming-container-active .expanding-card {
+.incoming-container.active .expanding-card {
   height: auto;
 }
 
@@ -295,7 +295,7 @@
   content: 'See More';
 }
 
-.incoming-container.active .see-more-incoming::before {
+.incoming-container-active .see-more-incoming::before {
   content: 'See Less';
 }
 
