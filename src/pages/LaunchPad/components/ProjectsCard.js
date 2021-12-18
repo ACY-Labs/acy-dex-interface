@@ -13,7 +13,7 @@ const ProjectsCard = ({ projectID, ddl, raise, sales, rate, title, isOngoing, is
   }
 
   return (
-    <div className="projects-card projects-container" onClick={onOpenProjectDetail}>
+    <div className="projects-card projects-container" >
       <div className="logo-countdown-container">
         <div className="logo-container">
           <div className="logo">

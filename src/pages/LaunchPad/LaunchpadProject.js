@@ -542,7 +542,7 @@ const LaunchpadProject = () => {
         className={
           isClickedVesting
             ? 'cardContent allocation-content allocation-content-active'
-            : 'cardContent allocation-content'
+            : 'cardContent allocation-content allocation-content-inactive'
         }
       >
         <div className="centerTitle">
@@ -552,13 +552,13 @@ const LaunchpadProject = () => {
 
         <form className="sales-container">
           <label for="sale-number" className="sale-vesting-title">
-            Sale
+            Purchases
           </label>
-          <input placeholder="" className="antd-input" type="number" />
+          <input placeholder="" className="sales-input" type="number" />
           <input type="submit" className="sales-submit" value="Buy" />
         </form>
 
-        <div className="vesting-container">
+        <div className="vesting-container" onClick={() => setIsClickedVesting(!isClickedVesting)}>
           <p className="sale-vesting-title vesting">Vesting</p>
           <div className="text-line-container">
             <p>Unlock 30% TGE, then vested 23.3% every month for 3 months</p>
@@ -576,7 +576,6 @@ const LaunchpadProject = () => {
               className={
                 isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
               }
-              onClick={() => setIsClickedVesting(!isClickedVesting)}
             />
           </div>
         </div>

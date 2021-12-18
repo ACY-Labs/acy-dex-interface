@@ -7,42 +7,41 @@ import ProjectsCard from './ProjectsCard.js';
 import ExpandedContent from './ExpandedContent.js';
 
 const IncomingProjects = ({ data, openProject }) => {
-  useEffect(() => {
-    // var cell = document.querySelectorAll(".card")
-    // console.log(cell)
-    var $cell = $('.card');
+  var $cell = $('.card');
 
-    //open and close card when clicked on card
-    $cell.find('.js-expander').click(function() {
-      var $thisCell = $(this).closest('.card');
+//open and close card when clicked on card
+  $cell.find('.js-expander').click(function() {
+    
+    var $thisCell = $(this).closest('.card');
+    var $container = $(this).closest('.expanding-card')
 
-      if ($thisCell.hasClass('is-collapsed')) {
-        $cell
-          .not($thisCell)
-          .removeClass('is-expanded')
-          .addClass('is-collapsed')
-          .addClass('is-inactive');
-        $thisCell.removeClass('is-collapsed').addClass('is-expanded');
+    if ($thisCell.hasClass('is-collapsed')) {
+      console.log("hello")
+      $cell.not($thisCell).removeClass('is-expanded').addClass('is-collapsed')
+      $thisCell.removeClass('is-collapsed').addClass('is-expanded');
+      $container.addClass('expanded')
+    
 
-        if ($cell.not($thisCell).hasClass('is-inactive')) {
-          //do nothing
-        } else {
-          $cell.not($thisCell).addClass('is-inactive');
-        }
-      } else {
-        $thisCell.removeClass('is-expanded').addClass('is-collapsed');
-        $cell.not($thisCell).removeClass('is-inactive');
-      }
-    });
 
-    //close card when click on cross
-    // $cell.find('.js-collapser').hover(function() {
-    //   var $thisCell = $(this).closest('.card');
+    } else {
+    $thisCell.removeClass('is-expanded').addClass('is-collapsed');
 
-    //   $thisCell.removeClass('is-expanded').addClass('is-collapsed');
-    //   $cell.not($thisCell).removeClass('is-inactive');
-    // });
-  }, []);
+      $container.removeClass('expanded')
+      
+      
+    }
+  
+});
+
+//close card when click on cross
+$cell.find('.js-collapser').click(function() {
+
+  var $thisCell = $(this).closest('.card');
+
+  $thisCell.removeClass('is-expanded').addClass('is-collapsed');
+  $cell.not($thisCell).removeClass('is-inactive');
+
+});
 
   const [isActiveUpcoming, setIsActiveUpcoming] = useState(false);
   const [isIncomingExpanded, setisIncomingExpanded] = useState(false);
@@ -53,9 +52,9 @@ const IncomingProjects = ({ data, openProject }) => {
   };
 
   return (
-    <div className={isActiveUpcoming ? 'incoming-container active' : 'incoming-container'}>
+    <div className={isActiveUpcoming ? 'incoming-container incoming-container-active' : 'incoming-container'}>
       <div
-        className={isIncomingExpanded ? 'expanded expanding-card' : 'expanding-card'}
+        className='expanding-card'
         style={{
           zIndex: 1,
           display: 'flex',
@@ -70,7 +69,7 @@ const IncomingProjects = ({ data, openProject }) => {
               <div className=" card [ is-collapsed ]">
                 <div
                   className="card__inner [ js-expander ]"
-                  onClick={() => setisIncomingExpanded(!isIncomingExpanded)}
+                  // onClick={() => setisIncomingExpanded(!isIncomingExpanded)}
                 >
                   <div className="">
                     <ProjectsCard
@@ -88,7 +87,7 @@ const IncomingProjects = ({ data, openProject }) => {
                 </div>
                 <div className="card__expander">
                   <i className="fa fa-close [ js-collapser ]" />
-                  Expander
+                  <ExpandedContent />
                 </div>
               </div>
             </div>

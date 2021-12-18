@@ -252,10 +252,10 @@
 }
 
 .incoming-container .expanded {
-  height: calc(2 * (220px + 20px) + 220px);
+  height: calc(2 * (220px + 40px) + 240px);
 }
 
-.incoming-container.active .expanding-card {
+.incoming-container-active .expanding-card {
   height: auto;
 }
 
@@ -270,7 +270,7 @@
   z-index: 1;
 }
 
-.incoming-container.active .expanding-card::before {
+.incoming-container-active .expanding-card::before {
   display: none;
 }
 
