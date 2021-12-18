@@ -638,7 +638,7 @@ const AcyLiquidityPositions = (props) => {
   // first time loading
   useEffect(() => {
     getValidPoolList();
-  }, []);
+  }, [account]);
   // refresh table data on add/remove liquidity
   useEffect(() => {
     if (liquidity.refreshTable) {
