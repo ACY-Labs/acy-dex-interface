@@ -82,8 +82,14 @@ function parsePoolData (data){
   let _data = data.map((item)=>{
 
     console.log("mapping....",item.token0,item.token1);
-    let _token0 = findTokenWithAddress(item.token0).symbol;
-    let _token1 = findTokenWithAddress(item.token1).symbol;
+    let _token0 = findTokenWithAddress(item.token0);
+    let _token1 = findTokenWithAddress(item.token1);
+
+    let _logoURL1 = _token0.logoURI;
+    let _logoURL2 = _token1.logoURI;
+
+    _token0 = _token0.symbol;
+    _token1 = _token1.symbol;
 
 
     let _tvl = totalInUSD ( [
@@ -111,6 +117,8 @@ function parsePoolData (data){
     return {
       coin1 : _token0,
       coin2 : _token1,
+      logoURL1 : _logoURL1,
+      logoURL2 : _logoURL2,
       tvl : _tvl ,
       volume24h : _volume24h,
       volume7d : 0

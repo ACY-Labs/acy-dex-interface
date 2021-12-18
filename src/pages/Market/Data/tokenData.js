@@ -13,7 +13,7 @@ import { getBlockFromTimestamp } from './blocks';
 import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import {findTokenWithAddress} from '@/utils/txData';
 import {totalInUSD} from '@/utils/utils';
-import uniqueTokens from '@/constants/uniqueTokens';
+import uniqueTokens from '@/constants/TokenList';
 import { symbol } from 'prop-types';
 
 export async function fetchTokenInfo(client, tokenAddress, timestamp) {
@@ -90,11 +90,11 @@ function parseTokenData (data){
   uniqueTokens.forEach(element => {
     newData.push({
       address : element.address,
-      addressOnEth : element.addressOnEth,
       name : element.name,
       price : tokensPriceUSD[element.symbol] ? tokensPriceUSD[element.symbol] : 1,
       priceChange : -0,
       short : element.symbol,
+      logoURL : element.logoURI,
       tvl : 0,
       volume24h : 0
 
@@ -102,8 +102,8 @@ function parseTokenData (data){
   });
 
   data.forEach(element => {
-      let index0 = newData.findIndex(item => item.address.toLowerCase() == element.token0.toLowerCase() || item.addressOnEth.toLowerCase() == element.token0.toLowerCase());
-      let index1 = newData.findIndex(item => item.address.toLowerCase() == element.token1.toLowerCase() || item.addressOnEth.toLowerCase() == element.token1.toLowerCase());
+      let index0 = newData.findIndex(item => item.address.toLowerCase() == element.token0.toLowerCase() );
+      let index1 = newData.findIndex(item => item.address.toLowerCase() == element.token1.toLowerCase() );
       newData[index0].tvl += totalInUSD([
         {
           token : newData[index0].short,
