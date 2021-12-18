@@ -1,7 +1,8 @@
 import moment from 'moment';
 import axios from 'axios';
 // import INITIAL_TOKEN_LIST from '@/constants/uniqueTokens';
-import INITIAL_TOKEN_LIST from '@/constants/TokenList';
+import INITIAL_TOKEN_LIST from '@/constants/_TokenList';
+import INITIAL_TOKEN_LIST_ from '@/constants/TokenList';
 import {methodList, actionList} from '@/constants/MethodList';
 import liquidity from '@/pages/Liquidity/models/liquidity';
 import {getContract} from '@/acy-dex-swap/utils'
@@ -12,14 +13,20 @@ import { abi as IUniswapV2Router02ABI } from '@/abis/IUniswapV2Router02.json';
 
 // THIS FUNCTIONS RETURN TOKEN 
 export function findTokenInList(item){ // token has address attribute
-    return INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.address.toLowerCase() || token.addressOnEth.toLowerCase()==item.address.toLowerCase());
+    let token = INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.address.toLowerCase() || token.addressOnEth.toLowerCase()==item.address.toLowerCase());
+    if(token) return token;
+    else return INITIAL_TOKEN_LIST_.find(token => token.address.toLowerCase()==item.address.toLowerCase() || token.addressOnEth.toLowerCase()==item.address.toLowerCase());
 }
 export function findTokenWithAddress(item){// input is an address 
-    return INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.toLowerCase() || token.addressOnEth.toLowerCase()==item.toLowerCase());
+    let token = INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.toLowerCase() || token.addressOnEth.toLowerCase()==item.toLowerCase());
+    if(token) return token;
+    else return INITIAL_TOKEN_LIST_.find(token => token.address.toLowerCase()==item.toLowerCase() || token.addressOnEth.toLowerCase()==item.toLowerCase());
 }
 
 export function findTokenWithSymbol(item){
-    return INITIAL_TOKEN_LIST.find(token => token.symbol==item);
+    let token = INITIAL_TOKEN_LIST.find(token => token.symbol==item);
+    if(token) return token;
+    else INITIAL_TOKEN_LIST_.find(token => token.symbol==item);
 }
 
 // TODO :: translate to USD
@@ -73,8 +80,9 @@ async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, libra
     let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(TO_HASH));
     let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
 
-
-            
+    console.log("pringting logs ", inLogs);
+    console.log(outLogs);
+    console.log()
     let inToken = findTokenInList(inLogs[0]);
     let outToken =  findTokenInList(outLogs[0]);
 
@@ -222,6 +230,7 @@ async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, libr
 
 export async function appendNewSwapTx(currList,receipt,account,library){
 
+
     console.log("printing curr...", currList);
 
     if(currList.length > 0 && currList[0].hash.toLowerCase() == receipt.transactionHash.toLowerCase()) return currList;
@@ -231,13 +240,13 @@ export async function appendNewSwapTx(currList,receipt,account,library){
 
     let newData;
     
-    if(findTokenWithAddress(receipt.inTokenAddr).address.toLowerCase() == INITIAL_TOKEN_LIST.find(item => item.symbol == 'ETH').address.toLowerCase()){
+    if(findTokenWithAddress(receipt.inTokenAddr).address.toLowerCase() == INITIAL_TOKEN_LIST.find(item => item.symbol == 'BNB').address.toLowerCase()){
 
         console.log("adding eth to token");
         newData = await fetchUniqueETHToToken(account, receipt.transactionHash,null,FROM_HASH, library);
         
 
-    }else if(findTokenWithAddress(receipt.outTokenAddr).address.toLowerCase() == INITIAL_TOKEN_LIST.find(item => item.symbol == 'ETH').address.toLowerCase()){
+    }else if(findTokenWithAddress(receipt.outTokenAddr).address.toLowerCase() == INITIAL_TOKEN_LIST.find(item => item.symbol == 'BNB').address.toLowerCase()){
         console.log("adding token to eth");
         newData  = await fetchUniqueTokenToETH(account, receipt.transactionHash,null,FROM_HASH, library);
         
@@ -526,7 +535,7 @@ export async function getTransactionsByAccount (account,library,filter){
         let page = '1';
         let offset='50'; // NUMBER OF RESULTS FETCHED FROM ETHERSCAN
         let sort='asc';
-        let request = 'https://api-testnet.bscscan.com/api?module=account&action=txlist&address='+address+'&startblock=0&endblock=99999999&page=1&offset='+offset+'&sort=desc&apikey='+apikey;
+        let request = 'https://api.bscscan.com/api?module=account&action=txlist&address='+address+'&startblock=0&endblock=99999999&page=1&offset='+offset+'&sort=desc&apikey='+apikey;
 
         let response = await fetch(request);
         let data = await response.json();
@@ -625,7 +634,7 @@ export async function fetchTransactionData(address,library, account){
             }
 
 
-            let requestPrice = 'https://api-testnet.bscscan.com/api?module=stats&action=bnbprice&apikey='+apikey;
+            let requestPrice = 'https://api.bscscan.com/api?module=stats&action=bnbprice&apikey='+apikey;
             let responsePrice = await fetch(requestPrice);
             let ethPrice = await responsePrice.json();
             ethPrice = parseFloat(ethPrice.result.ethusd);
@@ -701,7 +710,7 @@ export async function fetchTransactionData(address,library, account){
             // console.log('testing :: ', liquidityOut);
             
             //get ether last price
-            let requestPrice = 'https://api-testnet.bscscan.com/api?module=stats&action=bnbprice&apikey='+apikey;
+            let requestPrice = 'https://api.bscscan.com/api?module=stats&action=bnbprice&apikey='+apikey;
             let responsePrice = await fetch(requestPrice);
             let ethPrice = await responsePrice.json();
             ethPrice = parseFloat(ethPrice.result.ethusd);
@@ -774,7 +783,7 @@ export async function fetchTransactionData(address,library, account){
             // console.log('testing :: ', liquidityOut);
             
             //get ether last price
-            let requestPrice = 'https://api-testnet.bscscan.com/api?module=stats&action=bnbprice&apikey='+apikey;
+            let requestPrice = 'https://api.bscscan.com/api?module=stats&action=bnbprice&apikey='+apikey;
             let responsePrice = await fetch(requestPrice);
             let ethPrice = await responsePrice.json();
             ethPrice = parseFloat(ethPrice.result.ethusd);
