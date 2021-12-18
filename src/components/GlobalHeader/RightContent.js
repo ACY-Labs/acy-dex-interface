@@ -402,23 +402,6 @@ const GlobalHeaderRight = props => {
                 padding: 10,
               }}
             >
-              <Link to={`/market/accounts/${account}`} style={{ color: '#eb5c20' }}>
-                See My Account
-              </Link>
-              <div style={{ marginTop: 5 }}>
-                <div className={styles.descLine}>
-                  <div style={{fontWeight: "bold"}}>My Liquidity</div>
-                  <div>$999.99</div>
-                </div>
-                <div className={styles.descLine}>
-                  <div style={{fontWeight: "bold"}}>My Volume</div>
-                  <div>$999.99</div>
-                </div>
-                <div className={styles.descLine}>
-                  <div style={{fontWeight: "bold"}}>My Farms</div>
-                  <div>$999.99</div>
-                </div>
-              </div>
             </div>
           </AcyCardList>
         )}
