@@ -7,6 +7,7 @@ import {methodList, actionList} from '@/constants/MethodList';
 import liquidity from '@/pages/Liquidity/models/liquidity';
 import {getContract} from '@/acy-dex-swap/utils'
 import {totalInUSD} from '@/utils/utils';
+import { BigNumber } from '@ethersproject/bignumber';
 
 import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import { abi as IUniswapV2Router02ABI } from '@/abis/IUniswapV2Router02.json';
@@ -29,6 +30,7 @@ export function findTokenWithSymbol(item){
     else INITIAL_TOKEN_LIST_.find(token => token.symbol==item);
 }
 
+var API = 'https://api.bscscan.com/api';
 // TODO :: translate to USD
 
 var tokenPriceUSD;
@@ -46,20 +48,18 @@ function saveTxInDB(data){
         }
     ],tokenPriceUSD);
 
+
     let feesPaid = totalInUSD([
         {
-            token : 'ETH',
+            token : 'BNB',
             amount : data.gasFee
         }
     ],tokenPriceUSD);
 
-    console.log("calculated total value and fees paid");
-    console.log(valueSwapped,feesPaid);
-
     try{
         axios
         .post(
-          `http://localhost:3001/api/users/swap?address=${data.address}&hash=${data.hash}&valueSwapped=${valueSwapped}&feesPaid=${feesPaid}`
+          `https://api.acy.finance/api/users/swap?address=${data.address}&hash=${data.hash}&valueSwapped=${valueSwapped}&feesPaid=${feesPaid}`
         )
         .then(response => {
           console.log(response.response);
@@ -70,9 +70,11 @@ function saveTxInDB(data){
 
 }
 
-async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, library){
+async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, library, gasPrice){
 
     let response = await library.getTransactionReceipt(hash);
+    // console.log("pringting data of tx::::::",response);
+    
 
     if(!response.status) return {};
 
@@ -99,7 +101,7 @@ async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, libra
     if(timestamp) transactionTime = moment(parseInt(timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
     else transactionTime = moment(now).format('YYYY-MM-DD HH:mm:ss');
 
-    // let gasFee = (response.effectiveGasPrice.toNumber() / (Math.pow(10,18)) )* response.gasUsed.toNumber()
+    let gasFee = (gasPrice / (Math.pow(10,18)) )* response.gasUsed.toNumber();
 
     let totalAmount = totalInUSD([
         {
@@ -113,6 +115,8 @@ async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, libra
 
     ],tokenPriceUSD);
 
+    // console.log(response);
+
     return {
         "address" : account.toString(),
         "hash": hash,
@@ -123,11 +127,11 @@ async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, libra
         "outTokenNum": outTokenNumber,
         "outTokenSymbol": outToken.symbol,
         "transactionTime": transactionTime,
-        // "gasFee" : gasFee
+        "gasFee" : gasFee
     };
 }
 
-async function fetchUniqueTokenToETH(account, hash, timestamp, FROM_HASH, library){
+async function fetchUniqueTokenToETH(account, hash, timestamp, FROM_HASH, library, gasPrice){
 
     let response = await library.getTransactionReceipt(hash);
     if(!response.status) return {};
@@ -144,13 +148,12 @@ async function fetchUniqueTokenToETH(account, hash, timestamp, FROM_HASH, librar
     // inTokenNumber = inTokenNumber.toString();
     for(let log of outLogs){outTokenNumber += (log.data / Math.pow(10, outToken.decimals))};
     // outTokenNumber = outTokenNumber.toString();
-
     let now = Date.now();
     let transactionTime ;
     if(timestamp) transactionTime = moment(parseInt(timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
     else transactionTime = moment(now).format('YYYY-MM-DD HH:mm:ss');
 
-    // let gasFee = (response.effectiveGasPrice.toNumber() / (Math.pow(10,18)) )* response.gasUsed.toNumber()
+    let gasFee = (gasPrice / (Math.pow(10,18)) )* response.gasUsed.toNumber();
 
     let totalAmount = totalInUSD([
         {
@@ -174,11 +177,11 @@ async function fetchUniqueTokenToETH(account, hash, timestamp, FROM_HASH, librar
         "outTokenNum": outTokenNumber,
         "outTokenSymbol": outToken.symbol,
         "transactionTime": transactionTime,
-        // "gasFee" : gasFee
+        "gasFee" : gasFee
     };
 }
 
-async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, library){
+async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, library, gasPrice){
     let response = await library.getTransactionReceipt(hash);
     if(!response.status) return {};
     let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]==actionList.transfer.hash && log.topics[1].includes(FROM_HASH));
@@ -200,7 +203,7 @@ async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, libr
     if(timestamp) transactionTime = moment(parseInt(timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
     else transactionTime = moment(now).format('YYYY-MM-DD HH:mm:ss');
 
-    // let gasFee = (response.effectiveGasPrice.toNumber() / (Math.pow(10,18)) )* response.gasUsed.toNumber()
+    let gasFee = (gasPrice / (Math.pow(10,18)) )* response.gasUsed.toNumber();
 
     let totalAmount = totalInUSD([
         {
@@ -224,35 +227,39 @@ async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, libr
         "outTokenNum": outTokenNumber,
         "outTokenSymbol": outToken.symbol,
         "transactionTime": transactionTime,
-        // "gasFee" : gasFee
+        "gasFee" : gasFee
     }
 }
 
-export async function appendNewSwapTx(currList,receipt,account,library){
+export async function appendNewSwapTx(currList,receiptHash,account,library){
 
 
-    console.log("printing curr...", currList);
+    // console.log("printing curr...", currList);
 
-    if(currList.length > 0 && currList[0].hash.toLowerCase() == receipt.transactionHash.toLowerCase()) return currList;
+    if(currList.length > 0 && currList[0].hash.toLowerCase() == receiptHash.toLowerCase()) return currList;
 
     let FROM_HASH = account.toString().toLowerCase().slice(2);
     let TO_HASH;
 
+    let transaction = await library.getTransaction(receiptHash);
+    let gasPrice = transaction.gasPrice.toNumber();
+
+
     let newData;
     
-    if(findTokenWithAddress(receipt.inTokenAddr).address.toLowerCase() == INITIAL_TOKEN_LIST.find(item => item.symbol == 'BNB').address.toLowerCase()){
+    if(transaction.data.startsWith(methodList.ethToToken.id)){
 
         console.log("adding eth to token");
-        newData = await fetchUniqueETHToToken(account, receipt.transactionHash,null,FROM_HASH, library);
+        newData = await fetchUniqueETHToToken(account, receiptHash,null,FROM_HASH, library, gasPrice);
         
 
-    }else if(findTokenWithAddress(receipt.outTokenAddr).address.toLowerCase() == INITIAL_TOKEN_LIST.find(item => item.symbol == 'BNB').address.toLowerCase()){
+    }else if(transaction.data.startsWith(methodList.tokenToEth.id)){
         console.log("adding token to eth");
-        newData  = await fetchUniqueTokenToETH(account, receipt.transactionHash,null,FROM_HASH, library);
+        newData  = await fetchUniqueTokenToETH(account, receiptHash,null,FROM_HASH, library, gasPrice);
         
     }else{
         console.log("addding normal token to token");
-        newData = await fetchUniqueTokenToToken(account, receipt.transactionHash,null,FROM_HASH, library);
+        newData = await fetchUniqueTokenToToken(account,receiptHash,null,FROM_HASH, library, gasPrice);
     }
 
     saveTxInDB(
@@ -278,7 +285,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
         let FROM_HASH = account.toString().toLowerCase().slice(2);
         let TO_HASH ;
         fetchedData = fetchedData.filter(item => item.txreceipt_status == 1);
-        let filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToToken.id));
+        let filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToToken.id,0));
         let newData = [];
 
         for (let item of filteredData) {
@@ -286,17 +293,17 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             newData.push(fetchedItem);
         }
 
-        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.ethToToken.id));
+        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.ethToToken.id,0));
 
         for (let item of filteredData) {
-            let fetchedItem = await fetchUniqueETHToToken(account, item.hash,item.timeStamp,FROM_HASH, library);
+            let fetchedItem = await fetchUniqueETHToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
             newData.push(fetchedItem);
         }
 
         filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToEth.id));
 
         for (let item of filteredData) {
-            let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library);
+            let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library,0);
             newData.push(fetchedItem);
         }
         
@@ -479,15 +486,11 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             for(let log of logsToken1){
                 if(log.address == token1.address) token1Number = token1Number + (log.data / Math.pow(10, token1.decimals))
             };
-            // token1Number = token1Number.toString();
+
             let token2Number = 0;
             for(let log of logsToken2){
                 if(log.address == token2.address) token2Number += (log.data / Math.pow(10, token2.decimals))
             };
-            // token2Number = token2Number.toString();
-
-            console.log('printing logs of token1 ', logsToken1);
-            console.log('prinitng logs of token2 ',logsToken2)
 
             let transactionTime = moment(parseInt(item.timeStamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
 
@@ -524,8 +527,6 @@ export async function getTransactionsByAccount (account,library,filter){
     let newData = [];
     if(account){
         tokenPriceUSD = await getAllSuportedTokensPrice();
-        console.log("fetching transactions for account ", filter,account);
-        console.log("library", library);
         try{
         let address =  account.toString();
         let apikey = 'H2W1JHHRFB5H7V735N79N75UVG86E9HFH2';
@@ -535,7 +536,7 @@ export async function getTransactionsByAccount (account,library,filter){
         let page = '1';
         let offset='50'; // NUMBER OF RESULTS FETCHED FROM ETHERSCAN
         let sort='asc';
-        let request = 'https://api.bscscan.com/api?module=account&action=txlist&address='+address+'&startblock=0&endblock=99999999&page=1&offset='+offset+'&sort=desc&apikey='+apikey;
+        let request = API+'?module=account&action=txlist&address='+address+'&startblock=0&endblock=99999999&page=1&offset='+offset+'&sort=desc&apikey='+apikey;
 
         let response = await fetch(request);
         let data = await response.json();
@@ -556,14 +557,6 @@ export async function getTransactionsByAccount (account,library,filter){
     return [];
 }
 function getChartData (data){
-    // let amm = data.liquidity1 / (data.totalOut + data.liquidity1) ;
-    // console.log('liquidity 1： ',data.liquidity1);
-    // console.log('liquidity 2： ',data.liquidity2);
-
-    // amm = amm * data.liquidity2;
-    // amm = data.liquidity2 - amm;
-
-    //TODO getting amm output, not implemented yet.
 
     let amm = data.totalIn * 0.3;
     let revenue = data.totalIn - amm;
@@ -634,7 +627,7 @@ export async function fetchTransactionData(address,library, account){
             }
 
 
-            let requestPrice = 'https://api.bscscan.com/api?module=stats&action=bnbprice&apikey='+apikey;
+            let requestPrice = API+'?module=stats&action=bnbprice&apikey='+apikey;
             let responsePrice = await fetch(requestPrice);
             let ethPrice = await responsePrice.json();
             ethPrice = parseFloat(ethPrice.result.ethusd);
@@ -710,7 +703,7 @@ export async function fetchTransactionData(address,library, account){
             // console.log('testing :: ', liquidityOut);
             
             //get ether last price
-            let requestPrice = 'https://api.bscscan.com/api?module=stats&action=bnbprice&apikey='+apikey;
+            let requestPrice = API+'?module=stats&action=bnbprice&apikey='+apikey;
             let responsePrice = await fetch(requestPrice);
             let ethPrice = await responsePrice.json();
             ethPrice = parseFloat(ethPrice.result.ethusd);
@@ -783,7 +776,7 @@ export async function fetchTransactionData(address,library, account){
             // console.log('testing :: ', liquidityOut);
             
             //get ether last price
-            let requestPrice = 'https://api.bscscan.com/api?module=stats&action=bnbprice&apikey='+apikey;
+            let requestPrice = API+'?module=stats&action=bnbprice&apikey='+apikey;
             let responsePrice = await fetch(requestPrice);
             let ethPrice = await responsePrice.json();
             ethPrice = parseFloat(ethPrice.result.ethusd);
