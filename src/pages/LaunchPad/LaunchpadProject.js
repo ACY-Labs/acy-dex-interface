@@ -9,7 +9,7 @@ import { requireAllocation, getAllocationInfo, getProjectInfo} from '@/services/
 import './css/LaunchpadProject.css';
 import project from '@/models/project';
 import AllocationIcon from "./components/AllocationIcon"
-import Lottie from "@/assets/lottie";
+import Lottie from "@/assets/lottie/json";
 import * as moment from 'moment';
 import context from 'react-bootstrap/esm/AccordionContext';
 import { CaretDownOutlined } from "@ant-design/icons"
@@ -71,8 +71,8 @@ const LaunchpadProject = () => {
                         <div className="procedureNumber">1</div> 
                         <div>
                             <p>Allocation</p>
-                            <p className="shortText">From : {receivedData.regStart}</p>
-                            <p className="shortText">To : {receivedData.regEnd}</p>
+                            <p className="shortText">Start : {receivedData.regStart}</p>
+                            <p className="shortText">End : {receivedData.regEnd}</p>
                         </div>
                     </div>
     
@@ -81,8 +81,8 @@ const LaunchpadProject = () => {
                         <div className={comparesaleDate ? "procedureNumber" : "procedureNumber_NotActive"}>2</div>
                         <div>
                             <p>Sale</p>
-                            <p className="shortText">From : {receivedData.saleStart}</p>
-                            <p className="shortText">To : {receivedData.saleEnd}</p>
+                            <p className="shortText">Start : {receivedData.saleStart}</p>
+                            <p className="shortText">End : {receivedData.saleEnd}</p>
                         </div>
                     </div>
     
@@ -343,7 +343,7 @@ const LaunchpadProject = () => {
         // TODO: replace with 24 icon
         const BaseCard = ({url}) => {
             return (
-                <div style={{ background: 'white', height:"80px", width: "80px", borderRadius: "8px" }}>
+                <div style={{ background: 'white', height:"80px", width: "80px", borderRadius: "4px" }}>
                     {/* <AllocationIcon play={true} url={url} id="apple"/> */}
                 </div>
             );
@@ -421,13 +421,13 @@ const LaunchpadProject = () => {
                 </div>
                 
                 <form className='sales-container'>
-                    <label for="sale-number" className='sale-title'>Sale</label>
-                    <input placeholder='type' className='antd-input' type="number" />
-                    <input type="submit" value="Buy"/>
+                    <label for="sale-number" className='sale-vesting-title'>Sale</label>
+                    <input placeholder='' className='antd-input' type="number" />
+                    <input type="submit" className="sales-submit" value="Buy"/>
                 </form>
                 
                 <div className="vesting-container">
-                    <p>Vesting</p>
+                    <p className='sale-vesting-title vesting'>Vesting</p>
                     <div className='text-line-container'>
                         <p>Unlock 30% TGE, then vested 23.3% every month for 3 months</p>
                         <span className="vesting-line"></span>
