@@ -343,7 +343,7 @@ const SwapComponent = props => {
         setSwapButtonContent('Choose tokens and amount');
       }
     },
-    [account,swapButtonContent]
+    [account]
   );
 
   const onCoinClick = async token => {
