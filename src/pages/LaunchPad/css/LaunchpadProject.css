@@ -254,7 +254,7 @@
   justify-content: center;
   flex-direction: column;
   cursor: pointer;
-  background: white;
+  background: #757579;
   border-radius: 5px;
   perspective: 500px;
 }
@@ -284,7 +284,8 @@
   transform-origin: left top;
   transition: 1s ease-in-out;
   z-index: 100;
-  background: #353535;
+  background-color: #b73a3b;
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='70' height='70' viewBox='0 0 100 100'><path d='M 0 25 L 25 0 M 0 50 L 50 0 M 0 75 L 75 0 M 0 100 L 100 0 M 0 125 L 125 0 M 0 150 L 150 0 M 0 175 L 175 0' stroke='%239B2D2B' stroke-width='6' /></svg>");
   border-radius: 4px;
 }
 

@@ -327,19 +327,18 @@ const LaunchpadProject = () => {
     const clickCover = async e => {
       console.log('click cover', allocationAmount);
       const oldAllocationAmount = allocationAmount;
-      if (oldAllocationAmount === 0) {
-        requireAllocation(walletId, projectToken)
-          .then(res => {
-            if (res && res.allocationAmount) {
-              setAllocationAmount(res.allocationAmount);
-              setCoverOpenState(true);
-            }
-            console.log('allocation get', res.allocationAmount);
-          })
-          .catch(e => {
-            console.error(e);
-          });
-      }
+      // if (oldAllocationAmount === 0) {
+      //     requireAllocation(walletId, projectToken).then(res => {
+      //         if(res && res.allocationAmount) {
+      //             setAllocationAmount(res.allocationAmount);
+
+      //         }
+      //         console.log('allocation get', res.allocationAmount);
+      //     }).catch(e => {
+      //         console.error(e);
+      //     })
+      // }
+      setCoverOpenState(true);
       e.preventDefault();
     };
 
