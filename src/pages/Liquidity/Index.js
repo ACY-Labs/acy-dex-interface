@@ -50,6 +50,9 @@ const BasicProfile = (props) => {
 
 
  useEffect(() => {
+   if(!account){
+    activate(binance);
+   }
     getTransactionsByAccount(account,library,'LIQUIDITY').then(data =>{
       setTransactionList(data);
       if(account) setTableLoading(false);
@@ -120,6 +123,7 @@ const BasicProfile = (props) => {
   }
   // const {activate} = this.state.web3ReactContext;
   // console.log("web3react", activate);
+
 
   return (
     <PageHeaderWrapper>

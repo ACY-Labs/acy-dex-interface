@@ -3,7 +3,7 @@ import { Col, Icon, Row } from 'antd';
 import React, { Component, useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
+import { binance } from '@/connectors';
 import {
   fetchGeneralPoolInfoDay,
   fetchGeneralTokenInfo,
@@ -53,11 +53,11 @@ const MarketIndex = props => {
   const { account, chainId, library, activate } = useWeb3React();
 
   // connect to provider, listen for wallet to connect
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
-  });
+ 
   useEffect(() => {
-    activate(injected);
+    if(!account){
+      activate(binance);
+    }
   }, []);
 
   useEffect(() => {

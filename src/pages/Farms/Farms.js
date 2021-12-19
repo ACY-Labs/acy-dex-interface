@@ -265,7 +265,9 @@ const Farms = (props) => {
       // initHarvestHistiry(library, account);
       // console.log("start getBalanceRecord");
       // initDao(library, account);
-      // connectWallet();
+      if(!account){
+      connectWallet();
+      }
    },
    []
  );
