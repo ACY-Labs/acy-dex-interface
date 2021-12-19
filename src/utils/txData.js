@@ -288,7 +288,7 @@ async function fetchUniqueAddLiquidity(account, hash, timestamp, FROM_HASH, libr
 
         let response = await library.getTransactionReceipt(hash);
         let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(FROM_HASH));
-        const tokensOut = new Set();
+        let tokensOut = new Set();
         for(let log of outLogs){
             tokensOut.add(log.address);
         }
@@ -551,7 +551,11 @@ export async function appendNewSwapTx(currList,receiptHash,account,library){
         console.log("adding token to eth");
         newData  = await fetchUniqueTokenToETH(account, receiptHash,null,FROM_HASH, library, gasPrice);
         
-    }else{
+    }else if(transaction.data.startsWith(methodList.tokenToToken.id)){
+        console.log("addding normal token to token");
+        newData = await fetchUniqueTokenToToken(account,receiptHash,null,FROM_HASH, library, gasPrice);
+        
+    }else if(transaction.data.startsWith(methodList.tokenToTokenAbr.id)){
         console.log("addding normal token to token");
         newData = await fetchUniqueTokenToToken(account,receiptHash,null,FROM_HASH, library, gasPrice);
     }
@@ -638,6 +642,13 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library,0);
+            if(fetchedItem) newData.push(fetchedItem);
+        }
+
+        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToTokenAbr.id));
+
+        for (let item of filteredData) {
+            let fetchedItem = await fetchUniqueTokenToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
             if(fetchedItem) newData.push(fetchedItem);
         }
         
