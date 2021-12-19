@@ -357,7 +357,7 @@
 .vesting-schedule {
   width: 270px;
   top: 40px;
-  background-color: #0f0f0f;
+  background-color: none;
   position: absolute;
   padding: 10px;
   opacity: 0;
