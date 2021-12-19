@@ -127,7 +127,9 @@
     "antd-pro-merge-less": "^1.0.0",
     "antd-theme-webpack-plugin": "^1.1.8",
     "babel-eslint": "^10.0.1",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "check-prettier": "^1.0.1",
+    "compression-webpack-plugin": "5.0.1",
     "cross-env": "^5.1.1",
     "cross-port-killer": "^1.0.1",
     "enzyme": "3.7.0",
@@ -157,9 +159,6 @@
     "tslint-config-prettier": "^1.10.0",
     "tslint-react": "^3.6.0",
     "umi": "^3.0.0"
-  },
-  "optionalDependencies": {
-    "puppeteer": "^1.10.0"
   },
   "engines": {
     "node": ">=8.0.0"

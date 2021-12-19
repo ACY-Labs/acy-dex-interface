@@ -6,7 +6,7 @@
     "lib": ["es6", "dom"],
     "sourceMap": true,
     "baseUrl": ".",
-    "jsx": "react",
+    "jsx": "react-jsx",
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "rootDirs": ["/src", "/test", "/mock", "./typings"],
