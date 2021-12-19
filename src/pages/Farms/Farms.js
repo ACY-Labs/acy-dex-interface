@@ -57,11 +57,9 @@ const Farms = (props) => {
   // method to activate metamask wallet.
   // calling this method for the first time will cause metamask to pop up,
   // and require user to approve this connection.
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 56, 97, 80001],
-  });
+
   const connectWallet = async () =>  {
-    activate(injected);
+    activate(binance);
   };
 
   //function to get logo URI
@@ -222,9 +220,11 @@ const Farms = (props) => {
    },
    [daoStakeRecord, stakeACY]
  );
-
   useEffect(
      async () => {
+      if(!account){
+        connectWallet();
+      }
       getAllSuportedTokensPrice();
       // account will be returned if wallet is connected.
       // so if account is present, retrieve the farms contract.

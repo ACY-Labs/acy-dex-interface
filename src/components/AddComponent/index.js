@@ -139,7 +139,7 @@ const AddLiquidityComponent = props => {
 
   let [liquidityBreakdown, setLiquidityBreakdown] = useState();
   let [buttonContent, setButtonContent] = useState('Connect to wallet');
-  let [buttonStatus, setButtonStatus] = useState(true);
+  let [buttonStatus, setButtonStatus] = useState(false);
   let [liquidityStatus, setLiquidityStatus] = useState();
 
   let [pair, setPair] = useState();
@@ -331,7 +331,7 @@ const AddLiquidityComponent = props => {
   useEffect(
     () => {
       if (account == undefined) {
-        setButtonStatus(true);
+        setButtonStatus(false);
         setButtonContent('Connect to Wallet');
       } else {
         setButtonContent('Choose tokens and amount');
