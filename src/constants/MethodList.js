@@ -18,6 +18,12 @@ export const methodList = {
                     name: 'swapExactTokensForTokensbyAbr',
                     id:'0x38f0b154'
     },
+
+    tokenToEthAbr :    {
+                    name: 'swapExactTokensForETH',
+                    id: '0x00423e88'
+    },
+
     addLiquidity : {
                     name: 'addLiquidity',
                     id: '0xe8e33700'

@@ -124,11 +124,6 @@ async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, libra
                 token : inToken.symbol,
                 amount : parseFloat(inTokenNumber)
             },
-            {
-                token : outToken.symbol,
-                amount : parseFloat(outTokenNumber)
-            },
-
         ],tokenPriceUSD);
 
         // console.log(response);
@@ -190,11 +185,6 @@ async function fetchUniqueTokenToETH(account, hash, timestamp, FROM_HASH, librar
                 token : inToken.symbol,
                 amount : parseFloat(inTokenNumber)
             },
-            {
-                token : outToken.symbol,
-                amount : parseFloat(outTokenNumber)
-            },
-
         ],tokenPriceUSD);
 
         return  {
@@ -256,11 +246,6 @@ async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, libr
                 token : inToken.symbol,
                 amount : parseFloat(inTokenNumber)
             },
-            {
-                token : outToken.symbol,
-                amount : parseFloat(outTokenNumber)
-            },
-    
         ],tokenPriceUSD);
     
         return {
@@ -321,11 +306,6 @@ async function fetchUniqueAddLiquidity(account, hash, timestamp, FROM_HASH, libr
                 token : token1.symbol,
                 amount : parseFloat(token1Number)
             },
-            {
-                token : token2.symbol,
-                amount : parseFloat(token2Number)
-            },
-
         ],tokenPriceUSD);
 
         return ({
@@ -389,11 +369,6 @@ export async function fetchUniqueRemoveLiquidity(account, hash, timestamp, FROM_
                 token : token1.symbol,
                 amount : parseFloat(token1Number)
             },
-            {
-                token : token2.symbol,
-                amount : parseFloat(token2Number)
-            },
-
         ],tokenPriceUSD);
 
         return ({
@@ -443,11 +418,6 @@ export async function fetchUniqueAddLiquidityEth(account, hash, timestamp, FROM_
                 token : token1.symbol,
                 amount : parseFloat(token1Number)
             },
-            {
-                token : token2.symbol,
-                amount : parseFloat(token2Number)
-            },
-    
         ],tokenPriceUSD);
     
         return ({
@@ -501,11 +471,6 @@ export async function fetchUniqueRemoveLiquidityEth(account, hash, timestamp, FR
                 token : token1.symbol,
                 amount : parseFloat(token1Number)
             },
-            {
-                token : token2.symbol,
-                amount : parseFloat(token2Number)
-            },
-
         ],tokenPriceUSD);
 
         return ({
@@ -554,13 +519,18 @@ export async function appendNewSwapTx(currList,receiptHash,account,library){
     }else if(transaction.data.startsWith(methodList.tokenToToken.id)){
         console.log("addding normal token to token");
         newData = await fetchUniqueTokenToToken(account,receiptHash,null,FROM_HASH, library, gasPrice);
-        
+
     }else if(transaction.data.startsWith(methodList.tokenToTokenAbr.id)){
         console.log("addding normal token to token");
         newData = await fetchUniqueTokenToToken(account,receiptHash,null,FROM_HASH, library, gasPrice);
+    }else if(transaction.data.startsWith(methodList.tokenToEthAbr.id)){
+        console.log("addding normal token to token");
+        newData = await fetchUniqueTokenToETH(account,receiptHash,null,FROM_HASH, library, gasPrice);
+    }else {
+        console.log("addding normal token to token");
+        newData = await fetchUniqueETHToToken(account,receiptHash,null,FROM_HASH, library, gasPrice);
     }
-
-    saveTxInDB(
+    if(newData.address) saveTxInDB(
         {
             ...newData
 
@@ -606,7 +576,7 @@ export async function appendNewLiquidityTx(currList,receiptHash,account,library)
         newData = await fetchUniqueAddLiquidityEth(account, receiptHash,null,FROM_HASH, library);
     }
 
-    addUserToDB(account.toString());
+    if(account) addUserToDB(account.toString());
 
     let temp = [];
     if(newData)temp.push(newData);
@@ -649,6 +619,13 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueTokenToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
+            if(fetchedItem) newData.push(fetchedItem);
+        }
+
+        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToEthAbr.id));
+
+        for (let item of filteredData) {
+            let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library,0);
             if(fetchedItem) newData.push(fetchedItem);
         }
         
