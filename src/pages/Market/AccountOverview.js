@@ -4,6 +4,7 @@ import { MarketSearchBar } from './UtilComponent.js';
 import { Input, Button, Divider, Icon, Table } from 'antd';
 import styles from './styles.less';
 import { Link, useHistory } from 'react-router-dom';
+import { useWeb3React } from '@web3-react/core';
 import className from 'classnames';
 import {
   abbrHash,
@@ -25,7 +26,11 @@ import {
   fetchTopExchangeVolumes,
   marketClient,
 } from './Data/index.js';
+import {
+  fetchGlobalTransaction,
+} from './Data/index.js';
 import { WatchlistManager } from './WatchlistManager.js';
+import { TransactionTable } from './UtilComponent.js';
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -355,6 +360,20 @@ function AccountOverview(props) {
   const [inputError, setInputError] = useState('');
   const [topEV, setTopEV] = useState([]);
 
+  const [transactions, settransactions] = useState([]);
+
+  const { account, chainId, library, activate } = useWeb3React();
+
+  useEffect(() => {
+    // fetch transaction data
+    if(library) {
+      fetchGlobalTransaction(library).then(globalTransactions => {
+        console.log('globaltransaction', globalTransactions);
+        if(globalTransactions) settransactions(globalTransactions);
+      });
+    }
+  }, [library]);
+  
   useEffect(() => {
     // fetch the watchlist
     setWatchlist(watchlistManager.getData());
@@ -484,8 +503,12 @@ function AccountOverview(props) {
       {topLP.length > 0 ? <AccountsTable dataSourceAccounts={topLP} /> : <Icon type="loading" />}
 
       <h2>Top Exchange Volume</h2>
-      {/* NOTE: THIS TABLE DATA IS STILL PARTIALLY INCORRECT, NEED TO SORT BY THE BIGGEST VOLUME */}
-      {topEV.length > 0 ? <VolumesTable dataSourceAccounts={topEV} /> : <Icon type="loading" />}
+      {account && transactions.length <= 0 ? (
+        <Icon type="loading" />
+      ) : (
+        <TransactionTable dataSourceTransaction={transactions} />
+      )}
+      <div style={{ height: '20px' }} />
     </div>
   );
 }

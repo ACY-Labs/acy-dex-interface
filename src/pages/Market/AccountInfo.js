@@ -720,25 +720,26 @@ function AccountInfo(props) {
             <div className={styles.walletStatIndicator}>Liquidity (including fees)</div>
 
             <div className={styles.walletStatValue}>
-              {positionValue
+              {/* {positionValue
                 ? formattedNum(positionValue, true)
                 : positionValue === 0
                 ? formattedNum(userLiquidityOwn, true)
-                : '-'}
+                : '-'} */}
+                $10
             </div>
           </div>
           <div style={{ width: 20 }} />
-          <div className={styles.walletStatEntry}>
+          {/* <div className={styles.walletStatEntry}>
             <div className={styles.walletStatIndicator}>Fees earned (cumulative)</div>
             <div className={styles.walletStatValue} style={{ color: 'greenyellow' }}>
               {aggregateFees ? formattedNum(aggregateFees, true, true) : userLiquidityEarn}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
       {/* graphs */}
-      <div className={styles.accountPageRow}>
+      {/* <div className={styles.accountPageRow}>
         <div className={styles.accountGraphCard}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <AcyPeriodTime onhandPeriodTimeChoose={() => {}} times={['Liquidity', 'Fees']} />
@@ -748,7 +749,7 @@ function AccountInfo(props) {
             <AcyAccountChart lineColor="#1e5d91" />
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* positions table */}
       <div className={styles.accountPageRow}>
@@ -757,7 +758,7 @@ function AccountInfo(props) {
       </div>
 
       {/* Farms */}
-      <div className={styles.accountPageRow}>
+      {/* <div className={styles.accountPageRow}>
         <h2>Farms</h2>
         { (isLoadingHarvest || isLoadingPool || isLoadingBalance)? (
         <div>
@@ -790,7 +791,7 @@ function AccountInfo(props) {
           activeEnded={true}
         />
       )}
-      </div>
+      </div> */}
 
       {/* transaction table */}
       <div className={styles.accountPageRow}>
