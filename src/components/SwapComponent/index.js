@@ -109,6 +109,9 @@ const SwapComponent = props => {
   const [token0Amount, setToken0Amount] = useState();
   // 交易对后置货币兑换量
   const [token1Amount, setToken1Amount] = useState();
+  // 交易中用户使用Flash Arbitrage的额外获利
+  const [bonus0, setBonus0] = useState(null);
+  const [bonus1, setBonus1] = useState(null);
 
   const [token0BalanceShow, setToken0BalanceShow] = useState(false);
   const [token1BalanceShow, setToken1BalanceShow] = useState(false);
@@ -213,6 +216,8 @@ const SwapComponent = props => {
         account,
         setToken0Amount,
         setToken1Amount,
+        setBonus0,
+        setBonus1,
         setNeedApprove,
         setApproveAmount,
         setApproveButtonStatus,
@@ -267,6 +272,8 @@ const SwapComponent = props => {
         account,
         setToken0Amount,
         setToken1Amount,
+        setBonus0,
+        setBonus1,
         setNeedApprove,
         setApproveAmount,
         setApproveButtonStatus,
@@ -461,6 +468,7 @@ const SwapComponent = props => {
         yuan="566.228"
         dollar={`${token0Balance}`}
         token={token0Amount}
+        bonus={!exactIn && bonus0}
         showBalance={token1BalanceShow}
         onChoseToken={() => {
           onClickCoin();
@@ -489,6 +497,7 @@ const SwapComponent = props => {
         yuan="566.228"
         dollar={`${token1Balance}`}
         token={token1Amount}
+        bonus={exactIn && bonus1}
         showBalance={token1BalanceShow}
         onChoseToken={() => {
           onClickCoin();
@@ -498,6 +507,7 @@ const SwapComponent = props => {
           // setToken1ApproxAmount(e);
           setToken1Amount(e);
           setExactIn(false);
+          console.log("test exactin and bonus1", exactIn, bonus0)
         }}
         isLocked={isLockedToken1}
       />
