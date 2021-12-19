@@ -31,7 +31,7 @@ import { sortAddress, abbrNumber } from '@/utils/utils';
 import axios from 'axios';
 
 import { useWeb3React } from '@web3-react/core';
-import { binance } from '@/connectors';
+import { binance,injected } from '@/connectors';
 import React, { useState, useEffect, useCallback } from 'react';
 
 import {
@@ -131,7 +131,7 @@ const SwapComponent = props => {
 
   // let [estimatedStatus,setEstimatedStatus]=useState();
   const [swapBreakdown, setSwapBreakdown] = useState();
-  const [swapButtonState, setSwapButtonState] = useState(true);
+  const [swapButtonState, setSwapButtonState] = useState(false);
   const [swapButtonContent, setSwapButtonContent] = useState('Connect to Wallet');
   const [swapStatus, setSwapStatus] = useState();
 
@@ -336,14 +336,14 @@ const SwapComponent = props => {
   useEffect(
     () => {
       if (account == undefined) {
-        setSwapButtonState(true);
+        setSwapButtonState(false);
         setSwapButtonContent('Connect to Wallet');
       } else {
         setSwapButtonState(false);
         setSwapButtonContent('Choose tokens and amount');
       }
     },
-    [account]
+    [account,swapButtonContent]
   );
 
   const onCoinClick = async token => {
@@ -601,7 +601,8 @@ const SwapComponent = props => {
           disabled={!swapButtonState}
           onClick={() => {
             if (account == undefined) {
-              activate(binance);
+              // activate(binance);
+              activate(injected);
             } else {
               setSwapButtonState(false);
               setSwapButtonContent(<>Processing <Icon type="loading" /></>)
