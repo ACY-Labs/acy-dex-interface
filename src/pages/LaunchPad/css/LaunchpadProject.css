@@ -16,7 +16,7 @@
 .gridContainer {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+  gap: 1.25rem;
   margin-top: 1.25rem;
   margin-bottom: 100px;
 }
@@ -32,7 +32,7 @@
 .circleBorderCard {
   border-radius: 1rem;
   background-color: #1a1d1c;
-  margin-top: 2rem;
+  margin-top: 1.25rem;
 }
 
 .cardContent {
