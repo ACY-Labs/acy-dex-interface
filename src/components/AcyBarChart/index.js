@@ -177,7 +177,7 @@ class AcyBarChart extends Component {
     return options;
   };
   onChartClick = (param, echarts) => {
-    alert(1);
+    // alert(1);
     console.log(param);
   };
   render() {
