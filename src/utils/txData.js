@@ -554,13 +554,18 @@ export async function appendNewSwapTx(currList,receiptHash,account,library){
     }else if(transaction.data.startsWith(methodList.tokenToToken.id)){
         console.log("addding normal token to token");
         newData = await fetchUniqueTokenToToken(account,receiptHash,null,FROM_HASH, library, gasPrice);
-        
+
     }else if(transaction.data.startsWith(methodList.tokenToTokenAbr.id)){
         console.log("addding normal token to token");
         newData = await fetchUniqueTokenToToken(account,receiptHash,null,FROM_HASH, library, gasPrice);
+    }else if(transaction.data.startsWith(methodList.tokenToEthAbr.id)){
+        console.log("addding normal token to token");
+        newData = await fetchUniqueTokenToETH(account,receiptHash,null,FROM_HASH, library, gasPrice);
+    }else {
+        console.log("addding normal token to token");
+        newData = await fetchUniqueETHToToken(account,receiptHash,null,FROM_HASH, library, gasPrice);
     }
-
-    saveTxInDB(
+    if(newData.address) saveTxInDB(
         {
             ...newData
 
@@ -606,7 +611,7 @@ export async function appendNewLiquidityTx(currList,receiptHash,account,library)
         newData = await fetchUniqueAddLiquidityEth(account, receiptHash,null,FROM_HASH, library);
     }
 
-    addUserToDB(account.toString());
+    if(account) addUserToDB(account.toString());
 
     let temp = [];
     if(newData)temp.push(newData);
@@ -649,6 +654,13 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueTokenToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
+            if(fetchedItem) newData.push(fetchedItem);
+        }
+
+        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToEthAbr.id));
+
+        for (let item of filteredData) {
+            let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library,0);
             if(fetchedItem) newData.push(fetchedItem);
         }
         
