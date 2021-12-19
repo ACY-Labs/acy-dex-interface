@@ -35,8 +35,10 @@ const FarmsTable = ({
 }) => {
   const [myChartId, setMyChartId] = useState(0);
   const [totalChartId, setTotalChartId] = useState(0);
-  const [myChartData, setMyChartData] = useState(balanceAcy.myAcy);
-  const [allChartData, setAllChartData] = useState(balanceAcy.totalAcy);
+  // const [myChartData, setMyChartData] = useState(balanceAcy.myAcy);
+  // const [allChartData, setAllChartData] = useState(balanceAcy.totalAcy);
+  const [myChartData, setMyChartData] = useState();
+  const [allChartData, setAllChartData] = useState();
 
   const getMyChart = () => {
     if(myChartId == 0) return balanceAcy.myAcy;
@@ -77,19 +79,12 @@ const FarmsTable = ({
     functionDict[pt]();
   };
 
-  // useEffect(
-  //   () => {
-  //     if (!account || !library) return;
-  //     console.log(library, account);
-  //     disapproveTokenWithSpender(
-  //       '0xa6983722023c67ff6938ff2adc1d7fc61b5966f3',
-  //       '0xd9145CCE52D386f254917e481eB44e9943F39138',
-  //       library,
-  //       account
-  //     );
-  //   },
-  //   [library, account]
-  // );
+  useEffect(
+    () => {
+      console.log("TEST tableRow:",tableRow);
+    },
+    [tableRow]
+  );
   const daoContent = {
     token1:"ACY",
     token1Logo:AcyIcon,
@@ -151,7 +146,8 @@ const FarmsTable = ({
           })}
           { !hideDao &&(
             <div className={styles.stakeSectionMain} hidden={hideDao}>
-              <DaoChart
+              Not available
+              {/* <DaoChart
                 activeGraphId={myChartId}
                 activeGraphData={getMyChart()}
                 selectTopChart={selectTopChart}
@@ -162,7 +158,7 @@ const FarmsTable = ({
                 activeGraphData={getTotalChart()}
                 selectTopChart={selectTopChart}
                 selection={['Total sACY', 'Total Reward']}
-              />
+              /> */}
             </div>
           )}
               

@@ -338,7 +338,7 @@ const StakeRow = props => {
             ))}
           </div>
           <div className={styles.harvestChart} >
-            <AcyBarChart data={harvestHistory.myAll.slice(-14)} showXAxis barColor="#1d5e91" />
+            {/* <AcyBarChart data={harvestHistory.myAll.slice(-14)} showXAxis barColor="#1d5e91" /> */}
           </div>
         </div>
       </AcyActionModal>

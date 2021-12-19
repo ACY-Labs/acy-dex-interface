@@ -16,6 +16,7 @@ import { getPool, getPoolAccmulateReward} from '@/acy-dex-swap/core/farms';
 import supportedTokens from '@/constants/TokenList';
 import StakeRow from './StakeRow';
 import SwapComponent from '@/components/SwapComponent';
+import { BLOCK_TIME } from '@/acy-dex-swap/utils';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
   const handleInputChange = (e) => {
@@ -172,7 +173,6 @@ const FarmsTableRow = props => {
   );
   
   let history = useHistory();
-  const BLOCKS_PER_SEC = 15;
   const getDHM = (sec) => {
     if(sec<0) return '00d:00h:00m';
     var diff = sec;
@@ -209,9 +209,9 @@ const FarmsTableRow = props => {
       stakeData: newPool.stakeData,
       poolLpScore: newPool.lpScore,
       poolLpBalance: newPool.lpBalance,
-      endsIn: getDHM((newPool.endBlock - block) *BLOCKS_PER_SEC),
+      endsIn: getDHM((newPool.endBlock - block) *BLOCK_TIME),
       status: newPool.endBlock - block > 0,
-      endAfter: (newPool.endBlock - block) * BLOCKS_PER_SEC,
+      endAfter: (newPool.endBlock - block) * BLOCK_TIME,
       ratio: newPool.ratio
     };
     setPoolInfo(newFarmsContent);

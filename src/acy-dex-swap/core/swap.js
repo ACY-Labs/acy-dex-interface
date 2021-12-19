@@ -705,6 +705,18 @@ export async function swap(
   midTokenAddress,
   poolExist,
 ) {
+  const {
+    address: inToken0Address,
+    symbol: inToken0Symbol,
+    decimals: inToken0Decimal,
+    amount: inToken0Amount,
+  } = inputToken0;
+  const {
+    address: inToken1Address,
+    symbol: inToken1Symbol,
+    decimals: inToken1Decimal,
+    amount: inToken1Amount,
+  } = inputToken1;
   const status = await (async () => {
     // check uniswap
     console.log(FACTORY_ADDRESS);
@@ -712,18 +724,6 @@ export async function swap(
     allowedSlippage = new Percent(allowedSlippage, 10000);
 
     const contract = getRouterContract(library, account);
-    const {
-      address: inToken0Address,
-      symbol: inToken0Symbol,
-      decimals: inToken0Decimal,
-      amount: inToken0Amount,
-    } = inputToken0;
-    const {
-      address: inToken1Address,
-      symbol: inToken1Symbol,
-      decimals: inToken1Decimal,
-      amount: inToken1Amount,
-    } = inputToken1;
 
     console.log(`token0Amount: ${inToken0Amount}`);
     console.log(`token1Amount: ${inToken1Amount}`);
@@ -987,7 +987,7 @@ export async function swap(
       var tempToken0 = inToken0Symbol
       var tempToken1 = inToken1Symbol
 
-      var rate = (parseFloat(Token0Amount) / parseFloat(inToken1Amount));
+      var rate = (parseFloat(inToken0Amount) / parseFloat(inToken1Amount));
       var tempDate = new Date();
       var time = tempDate.getTime();
       if(tempToken0 > tempToken1 ){

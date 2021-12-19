@@ -8,15 +8,20 @@ import { Interface } from '@ethersproject/abi';
 import { JSBI, Token, TokenAmount, Percent, ETHER, CurrencyAmount } from '@acyswap/sdk';
 import ACYRouterABI from '../abis/AcyV1Router02.json';
 import FlashArbitrageABI from '../abis/AcyV1FlashArbitrage.json';
-import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
+// import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import ERC20ABI from '../abis/ERC20.json';
 import tokenList from '@/constants/TokenList';
 import axios from 'axios';
+import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
 export const ROUTER_ADDRESS = '0xFc54693d805F5CFe81fd3B6Cbfe6B06dA4e88003';
-export const FARMS_ADDRESS  = '0x11B64a91fA3eedfe0977a64D908BB8B8faf903a4';
+export const FARMS_ADDRESS  = '0x6ef448Ecb7f650c3A1157acF37CA19AE86DeE8Da';
 export const FLASH_ARBITRAGE_ADDRESS = '0x1836DcE7B2016cDE80f241F5ed60D8eE69eAF0C8';
+export const BLOCK_TIME = 3;
+export const BLOCKS_PER_YEAR = 60*60*24*365/BLOCK_TIME;
+export const BLOCKS_PER_MONTH = 60*60*24*31/BLOCK_TIME; 
+export const RPC_URL = "https://data-seed-prebsc-1-s1.binance.org:8545/"
 //old farm address 0xf132Fdd642Afa79FDF6C1B77e787865C652eC824
 //new farm address 0x96c13313aB386BCB16168Dee3D2d86823A990770
 //latest address   0x11B64a91fA3eedfe0977a64D908BB8B8faf903a4
