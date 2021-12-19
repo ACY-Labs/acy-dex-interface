@@ -631,7 +631,7 @@ const FarmsTableRow = props => {
                 }}
                 onGetReceipt={null}
                 token={{
-                  token0: supportedTokens.find(token => token.symbol == "USDC"),
+                  token0: supportedTokens.find(token => token.symbol == "USDT"),
                   token1: supportedTokens.find(token => token.symbol == poolInfo.token1)
                 }}
                 isLockedToken1={true}
