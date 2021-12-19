@@ -124,11 +124,6 @@ async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, libra
                 token : inToken.symbol,
                 amount : parseFloat(inTokenNumber)
             },
-            {
-                token : outToken.symbol,
-                amount : parseFloat(outTokenNumber)
-            },
-
         ],tokenPriceUSD);
 
         // console.log(response);
@@ -186,11 +181,6 @@ async function fetchUniqueTokenToETH(account, hash, timestamp, FROM_HASH, librar
                 token : inToken.symbol,
                 amount : parseFloat(inTokenNumber)
             },
-            {
-                token : outToken.symbol,
-                amount : parseFloat(outTokenNumber)
-            },
-
         ],tokenPriceUSD);
 
         return  {
@@ -248,11 +238,6 @@ async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, libr
                 token : inToken.symbol,
                 amount : parseFloat(inTokenNumber)
             },
-            {
-                token : outToken.symbol,
-                amount : parseFloat(outTokenNumber)
-            },
-    
         ],tokenPriceUSD);
     
         return {
@@ -316,11 +301,6 @@ async function fetchUniqueAddLiquidity(account, hash, timestamp, FROM_HASH, libr
                 token : token1.symbol,
                 amount : parseFloat(token1Number)
             },
-            {
-                token : token2.symbol,
-                amount : parseFloat(token2Number)
-            },
-
         ],tokenPriceUSD);
 
         return ({
@@ -385,11 +365,6 @@ export async function fetchUniqueRemoveLiquidity(account, hash, timestamp, FROM_
                 token : token1.symbol,
                 amount : parseFloat(token1Number)
             },
-            {
-                token : token2.symbol,
-                amount : parseFloat(token2Number)
-            },
-
         ],tokenPriceUSD);
 
         return ({
@@ -440,11 +415,6 @@ export async function fetchUniqueAddLiquidityEth(account, hash, timestamp, FROM_
                 token : token1.symbol,
                 amount : parseFloat(token1Number)
             },
-            {
-                token : token2.symbol,
-                amount : parseFloat(token2Number)
-            },
-    
         ],tokenPriceUSD);
     
         return ({
@@ -500,11 +470,6 @@ export async function fetchUniqueRemoveLiquidityEth(account, hash, timestamp, FR
                 token : token1.symbol,
                 amount : parseFloat(token1Number)
             },
-            {
-                token : token2.symbol,
-                amount : parseFloat(token2Number)
-            },
-
         ],tokenPriceUSD);
 
         return ({

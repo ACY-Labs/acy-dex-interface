@@ -206,7 +206,7 @@ const StakeRow = props => {
           });
           axios.get(
             // fetch valid pool list from remote
-            `https://api.acy.finance/api/farm/updatePool?poolId=${poolId}`
+            `http://3.143.250.42:6001/api/farm/updatePool?poolId=${poolId}`
           ).then(res => {
             console.log("update pool on server return: ", res);
           }).catch(e => console.log("error: ", e));
@@ -338,7 +338,7 @@ const StakeRow = props => {
             ))}
           </div>
           <div className={styles.harvestChart} >
-            <AcyBarChart data={harvestHistory.myAll.slice(-14)} showXAxis barColor="#1d5e91" />
+            {/* <AcyBarChart data={harvestHistory.myAll.slice(-14)} showXAxis barColor="#1d5e91" /> */}
           </div>
         </div>
       </AcyActionModal>
