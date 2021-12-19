@@ -383,15 +383,19 @@
   margin-bottom: 20px;
 }
 
+.sales-input-container {
+  position: relative;
+}
+
 .sales-input {
   background-color: #010101;
   border: unset;
   border-radius: 12px;
   width: 100%;
   min-width: 0px;
-  height: 35px;
+  height: 40px;
   font-size: 16px;
-  padding: 0px 10px 5px 10px;
+  padding: 0px 20px 0px 10px;
   margin: 0 20px;
 }
 
@@ -401,6 +405,12 @@
 
 .sales-input:solid {
   outline: #eb5c20 solid 2px;
+}
+
+.max-btn {
+  position: absolute;
+  top: 5px;
+  right: 0;
 }
 
 .sales-submit {

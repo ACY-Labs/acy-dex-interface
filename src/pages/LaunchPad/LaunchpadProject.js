@@ -557,7 +557,10 @@ const LaunchpadProject = () => {
           <label for="sale-number" className="sale-vesting-title">
             Purchases
           </label>
-          <input placeholder="" className="sales-input" type="number" />
+          <div className="sales-input-container">
+            <input placeholder="" className="sales-input" type="number" />
+            <button className="max-btn">MAX</button>
+          </div>
           <input type="submit" className="sales-submit" value="Buy" />
         </form>
 
