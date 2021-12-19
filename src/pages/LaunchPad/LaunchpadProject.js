@@ -14,6 +14,7 @@ import * as moment from 'moment';
 import context from 'react-bootstrap/esm/AccordionContext';
 import { CaretDownOutlined } from '@ant-design/icons';
 import VestingSchedule from './VestingSchedule';
+import $ from 'jquery';
 
 const {
   apple,
@@ -43,6 +44,8 @@ const {
 } = Lottie;
 
 const LaunchpadProject = () => {
+  console.log($(document).height());
+
   const { projectId } = useParams();
   const [receivedData, setReceivedData] = useState({});
   const [comparesaleDate, setComparesaleDate] = useState(false);
@@ -650,10 +653,12 @@ const LaunchpadProject = () => {
   }, []);
 
   return (
-    <div className="mainContainer">
-      <TokenBanner posterUrl={receivedData.posterUrl} />
-      <TokenLogoLabel projectName={receivedData.projectName} />
-      <CardArea />
+    <div>
+      <div className="mainContainer">
+        <TokenBanner posterUrl={receivedData.posterUrl} />
+        <TokenLogoLabel projectName={receivedData.projectName} />
+        <CardArea />
+      </div>
     </div>
   );
 };

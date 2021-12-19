@@ -1,5 +1,4 @@
 import React from 'react';
-import ExpandingCard from './ExpandingCard.js';
 import '../css/ProjectsCard.css';
 import { useState, useEffect } from 'react';
 import $ from 'jquery';
@@ -7,26 +6,26 @@ import ProjectsCard from './ProjectsCard.js';
 import ExpandedContent from './ExpandedContent.js';
 
 const IncomingProjects = ({ data, openProject }) => {
-  var $cell = $('.card');
+  // var $cell = $('.card');
 
-  //open and close card when clicked on card
-  $cell.find('.js-expander').click(function() {
-    var $thisCell = $(this).closest('.card');
-    var $container = $(this).closest('.expanding-card');
+  // //open and close card when clicked on card
+  // $cell.find('.js-expander').click(function() {
+  //   var $thisCell = $(this).closest('.card');
+  //   var $container = $(this).closest('.expanding-card');
 
-    if ($thisCell.hasClass('is-collapsed')) {
-      $cell
-        .not($thisCell)
-        .removeClass('is-expanded')
-        .addClass('is-collapsed');
-      $thisCell.removeClass('is-collapsed').addClass('is-expanded');
-      $container.addClass('expanded');
-    } else {
-      $thisCell.removeClass('is-expanded').addClass('is-collapsed');
+  //   if ($thisCell.hasClass('is-collapsed')) {
+  //     $cell
+  //       .not($thisCell)
+  //       .removeClass('is-expanded')
+  //       .addClass('is-collapsed');
+  //     $thisCell.removeClass('is-collapsed').addClass('is-expanded');
+  //     $container.addClass('expanded');
+  //   } else {
+  //     $thisCell.removeClass('is-expanded').addClass('is-collapsed');
 
-      $container.removeClass('expanded');
-    }
-  });
+  //     $container.removeClass('expanded');
+  //   }
+  // });
 
   var $seeMore = $('.incoming-container');
   $seeMore.find('.see-more-incoming').click(function() {

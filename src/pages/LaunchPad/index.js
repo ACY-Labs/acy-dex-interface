@@ -6,7 +6,6 @@ import telegramWIcon from '@/assets/icon_telegram_white.svg';
 import announcementIcon from '@/assets/icon_announcement.svg';
 import OngoingProjects from './components/OngoingProjects.js';
 import IncomingProjects from './components/IncomingProjects.js';
-import ExpandingCard from './components/ExpandingCard.js';
 import EndedProjects from './components/EndedProjects.js';
 import BubblyButton from './components/BubblyButton.js';
 import RaiseButton from './components/RaiseButton.js';

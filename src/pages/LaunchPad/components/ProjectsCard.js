@@ -5,6 +5,7 @@ import AcyIcon from '@/assets/icon_acy.svg';
 import CountDown from './CountDown.js';
 
 const ProjectsCard = ({ projectID, ddl, raise, sales, rate, title, isOngoing, isUpcoming }) => {
+  console.log(ddl);
   let saleString = isOngoing
     ? 'Sale ends: ' + ddl
     : isUpcoming
@@ -13,11 +14,14 @@ const ProjectsCard = ({ projectID, ddl, raise, sales, rate, title, isOngoing, is
 
   const history = useHistory();
   const onOpenProjectDetail = () => {
+    if (!isOngoing) {
+      return;
+    }
     history.push(`/launchpad/project/${projectID}`);
   };
 
   return (
-    <div className="projects-card projects-container">
+    <div className="projects-card projects-container" onClick={() => onOpenProjectDetail()}>
       <div className="logo-countdown-container">
         <div className="logo-container">
           <div className="logo">

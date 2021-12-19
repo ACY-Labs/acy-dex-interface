@@ -69,7 +69,7 @@ const CountDown = ({ ddl }) => {
 
   return (
     <div className="countDown-container">
-      { today < pDate ? 
+      {today < pDate ? (
         <div className="countDown-box">
           <div className="countDown-number" id="b">
             <div className="countDown-number-1">{countTime.days}</div>
@@ -91,7 +91,7 @@ const CountDown = ({ ddl }) => {
             <div className="countDown-number-2">SEC</div>
           </div>
         </div>
-      : 
+      ) : (
         <div className="countDown-box">
           <div className="countDown-number" id="b">
             <div className="countDown-number-1">-</div>
@@ -113,7 +113,7 @@ const CountDown = ({ ddl }) => {
             <div className="countDown-number-2">SEC</div>
           </div>
         </div>
-      }
+      )}
     </div>
   );
 };

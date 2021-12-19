@@ -1,5 +1,4 @@
 import React from 'react';
-import ExpandingCard from './ExpandingCard.js';
 import '../css/ProjectsCard.css';
 import { useEffect, useState } from 'react';
 import $ from 'jquery';
@@ -7,26 +6,26 @@ import ProjectsCard from './ProjectsCard.js';
 import ExpandedContent from './ExpandedContent.js';
 
 const EndedProjects = ({ data, openProject }) => {
-  var $cell = $('.card2');
+  // var $cell = $('.card2');
 
-  console.log($cell);
-  //open and close card when clicked on card
-  $cell.find('.js-expander2').click(function() {
-    var $thisCell = $(this).closest('.card2');
-    var $container = $(this).closest('.expanding-card2');
+  // console.log($cell);
+  // //open and close card when clicked on card
+  // $cell.find('.js-expander2').click(function() {
+  //   var $thisCell = $(this).closest('.card2');
+  //   var $container = $(this).closest('.expanding-card2');
 
-    if ($thisCell.hasClass('is-collapsed2')) {
-      $cell
-        .not($thisCell)
-        .removeClass('is-expanded2')
-        .addClass('is-collapsed2');
-      $thisCell.removeClass('is-collapsed2').addClass('is-expanded2');
-      $container.addClass('expanded');
-    } else {
-      $thisCell.removeClass('is-expanded2').addClass('is-collapsed2');
-      $container.removeClass('expanded');
-    }
-  });
+  //   if ($thisCell.hasClass('is-collapsed2')) {
+  //     $cell
+  //       .not($thisCell)
+  //       .removeClass('is-expanded2')
+  //       .addClass('is-collapsed2');
+  //     $thisCell.removeClass('is-collapsed2').addClass('is-expanded2');
+  //     $container.addClass('expanded');
+  //   } else {
+  //     $thisCell.removeClass('is-expanded2').addClass('is-collapsed2');
+  //     $container.removeClass('expanded');
+  //   }
+  // });
 
   const [isActiveEnded, setisActiveEnded] = useState(false);
   const [isEndedExpanded, setisEndedExpanded] = useState(false);
@@ -67,7 +66,7 @@ const EndedProjects = ({ data, openProject }) => {
             </div>
           ))}
       </div>
-      {data.length > 3 ? (
+      {data.length > 6 ? (
         <a className="see-more-ended" onClick={() => setisActiveEnded(!isActiveEnded)} />
       ) : (
         ''
