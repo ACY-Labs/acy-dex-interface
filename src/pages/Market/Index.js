@@ -62,10 +62,12 @@ const MarketIndex = props => {
 
   useEffect(() => {
     // fetch transaction data
-    if(library)fetchGlobalTransaction(library).then(globalTransactions => {
-      console.log(globalTransactions);
-      if(globalTransactions) settransactions(globalTransactions);
-    });
+    if(library) {
+      fetchGlobalTransaction(library).then(globalTransactions => {
+        console.log('globaltransaction', globalTransactions);
+        if(globalTransactions) settransactions(globalTransactions);
+      });
+    }
   }, [library]);
 
   useEffect(() => {

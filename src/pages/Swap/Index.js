@@ -291,13 +291,14 @@ const Swap = props => {
   // workaround way to get USD price (put token1 as USDC)
   // NEEDS ETHEREUM ADDRESS, RINKEBY DOES NOT WORK HERE
   const getRoutePrice = (token0Address, token1Address) => {
+    if(!token0Address || !token1Address) return;    
+
     axios
       .post(
         `https://api.acy.finance/api/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
       )
       .then(data => {
         console.log(data);
-
         // const { swaps } = data.data.data;
         // const lastDataPoint = swaps[swaps.length - 1];
         // console.log('ROUTE PRICE POINT', lastDataPoint);

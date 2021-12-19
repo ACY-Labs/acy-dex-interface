@@ -189,7 +189,10 @@ class AcyLineChart extends Component {
     return options;
   };
   onChartClick = (param, echarts) => {
+<<<<<<< HEAD
     // alert(1);
+=======
+>>>>>>> f4bd33b892fd612939768083fe1cf7869f9cd518
     console.log(param);
   };
   render() {
