@@ -418,9 +418,9 @@ export function TokenTable(props) {
         marginBottom: '20px',
         cursor: isHover ? 'pointer' : 'default',
       }}
-      onRowClick={(record, index, event) => {
-        navHistory.push(`/market/info/token/${record.address}`);
-      }}
+      // onRowClick={(record, index, event) => {
+      //   navHistory.push(`/market/info/token/${record.address}`);
+      // }}
       onRowMouseEnter={() => setIsHover(true)}
       onRowMouseLeave={() => setIsHover(false)}
       footer={() => (
@@ -609,9 +609,9 @@ export function PoolTable(props) {
       pagination={false}
       onRowMouseEnter={() => setIsHover(true)}
       onRowMouseLeave={() => setIsHover(false)}
-      onRowClick={(record, index, event) => {
-        navHistory.push(`/market/info/pool/${record.address}`);
-      }}
+      // onRowClick={(record, index, event) => {
+      //   navHistory.push(`/market/info/pool/${record.address}`);
+      // }}
       style={{
         marginBottom: '20px',
         cursor: isHover ? 'pointer' : 'default',

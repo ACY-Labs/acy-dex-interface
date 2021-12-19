@@ -165,10 +165,6 @@ async function fetchUniqueTokenToETH(account, hash, timestamp, FROM_HASH, librar
         let inTokenNumber = 0;
         let outTokenNumber = 0;
 
-        console.log("pringting data of tx::::::",response,inLogs,outLogs);
-        console.log(inToken,outToken);
-        console.log("debug finished");
-
         for(let log of inLogs){inTokenNumber = inTokenNumber + (log.data / Math.pow(10, inToken.decimals))};
         // inTokenNumber = inTokenNumber.toString();
         for(let log of outLogs){outTokenNumber += (log.data / Math.pow(10, outToken.decimals))};
@@ -224,10 +220,6 @@ async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, libr
     
         let inTokenNumber = 0;
         let outTokenNumber = 0;
-
-        console.log("pringting data of tx::::::",response,inLogs,outLogs);
-        console.log(inToken,outToken);
-        console.log("debug finished");
     
         for(let log of inLogs){inTokenNumber = inTokenNumber + (log.data / Math.pow(10, inToken.decimals))};
         // inTokenNumber = inTokenNumber.toString();
@@ -269,6 +261,8 @@ async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, libr
 
 async function fetchUniqueAddLiquidity(account, hash, timestamp, FROM_HASH, library){
 
+    console.log("fetchUniqueAddLiquidity",hash);
+
     try {
 
         let response = await library.getTransactionReceipt(hash);
@@ -288,12 +282,13 @@ async function fetchUniqueAddLiquidity(account, hash, timestamp, FROM_HASH, libr
 
         let token1Number = 0;
         for(let log of logsToken1){
-            if(log.address == token1.address) token1Number = token1Number + (log.data / Math.pow(10, token1.decimals))
+            if(log.address.toLowerCase() == token1.address.toLowerCase()) token1Number = token1Number + (log.data / Math.pow(10, token1.decimals))
         };
+        // console.log(token1Number);
         // token1Number = token1Number.toString();
         let token2Number = 0;
         for(let log of logsToken2){
-            if(log.address == token2.address) token2Number += (log.data / Math.pow(10, token2.decimals))
+            if(log.address.toLowerCase() == token2.address.toLowerCase()) token2Number += (log.data / Math.pow(10, token2.decimals))
         };
         // token2Number = token2Number.toString();
         let now = Date.now();
@@ -306,6 +301,10 @@ async function fetchUniqueAddLiquidity(account, hash, timestamp, FROM_HASH, libr
                 token : token1.symbol,
                 amount : parseFloat(token1Number)
             },
+            {
+                token : token2.symbol,
+                amount : parseFloat(token2Number)
+            }
         ],tokenPriceUSD);
 
         return ({
@@ -331,8 +330,9 @@ async function fetchUniqueAddLiquidity(account, hash, timestamp, FROM_HASH, libr
         
 export async function fetchUniqueRemoveLiquidity(account, hash, timestamp, FROM_HASH, library){
 
+    console.log("fetchUniqueRemoveLiquidity",hash);
+
     try {
-        console.log("fetching tx ", hash);
 
         let response = await library.getTransactionReceipt(hash);
         // console.log('filtered data',response);
@@ -342,9 +342,9 @@ export async function fetchUniqueRemoveLiquidity(account, hash, timestamp, FROM_
         for(let log of inLogs){
             tokensIn.add(log.address);
         }
-        console.log(tokensIn);
+        // console.log(tokensIn);
         tokensIn = Array.from(tokensIn);
-        console.log('set',tokensIn);
+        // console.log('set',tokensIn);
 
         let logsToken1 = inLogs.filter(log => log.address==tokensIn[0]);
         let logsToken2 = inLogs.filter(log => log.address==tokensIn[1]);
@@ -369,6 +369,10 @@ export async function fetchUniqueRemoveLiquidity(account, hash, timestamp, FROM_
                 token : token1.symbol,
                 amount : parseFloat(token1Number)
             },
+            {
+                token : token2.symbol,
+                amount : parseFloat(token2Number)
+            }
         ],tokenPriceUSD);
 
         return ({
@@ -390,6 +394,7 @@ export async function fetchUniqueRemoveLiquidity(account, hash, timestamp, FROM_
 }
 
 export async function fetchUniqueAddLiquidityEth(account, hash, timestamp, FROM_HASH, library){
+    console.log("fetchUniqueAddLiquidityEth",hash);
 
     try{
 
@@ -418,6 +423,10 @@ export async function fetchUniqueAddLiquidityEth(account, hash, timestamp, FROM_
                 token : token1.symbol,
                 amount : parseFloat(token1Number)
             },
+            {
+                token : token2.symbol,
+                amount : parseFloat(token2Number)
+            }
         ],tokenPriceUSD);
     
         return ({
@@ -441,6 +450,8 @@ export async function fetchUniqueAddLiquidityEth(account, hash, timestamp, FROM_
 
 export async function fetchUniqueRemoveLiquidityEth(account, hash, timestamp, FROM_HASH, library){
 
+    console.log("fetchUniqueRemoveLiquidityEth",hash);
+
     try {
 
         let response = await library.getTransactionReceipt(hash);
@@ -453,12 +464,12 @@ export async function fetchUniqueRemoveLiquidityEth(account, hash, timestamp, FR
 
         let token1Number = 0;
         for(let log of logsToken1){
-            if(log.address == token1.address) token1Number = token1Number + (log.data / Math.pow(10, token1.decimals))
+            if(log.address.toLowerCase() == token1.address.toLowerCase()) token1Number = token1Number + (log.data / Math.pow(10, token1.decimals))
         };
 
         let token2Number = 0;
         for(let log of logsToken2){
-            if(log.address == token2.address) token2Number += (log.data / Math.pow(10, token2.decimals))
+            if(log.address.toLowerCase() == token2.address.toLowerCase()) token2Number += (log.data / Math.pow(10, token2.decimals))
         };
 
         let now = Date.now();
@@ -471,6 +482,10 @@ export async function fetchUniqueRemoveLiquidityEth(account, hash, timestamp, FR
                 token : token1.symbol,
                 amount : parseFloat(token1Number)
             },
+            {
+                token : token2.symbol,
+                amount : parseFloat(token2Number)
+            }
         ],tokenPriceUSD);
 
         return ({
