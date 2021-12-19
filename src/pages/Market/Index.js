@@ -177,7 +177,7 @@ const MarketIndex = props => {
       {overallVolume !== -1 && overallTvl !== -1 && !isMobile ? (
         <Row className={styles.marketOverview} justify="space-around">
           <Col span={8}>
-            Volume 24H <strong style={{color: "white"}}>$ {overallVolume}</strong>{' '}
+            VOLUME 24H <strong style={{color: "white"}}>$ {overallVolume}</strong>{' '}
             <span
               className={
                 ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
@@ -379,7 +379,7 @@ const MarketIndex = props => {
 //         {this.state.overallVolume !== -1 && this.state.overallTvl !== -1 && !isMobile ? (
 //           <Row className={styles.marketOverview} justify="space-around">
 //             <Col span={8}>
-//               Volume 24H <strong style={{color: "white"}}>$ {this.state.overallVolume}</strong>{' '}
+//               VOLUME 24H <strong style={{color: "white"}}>$ {this.state.overallVolume}</strong>{' '}
 //               <span
 //                 className={
 //                   this.state.ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
