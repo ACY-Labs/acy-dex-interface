@@ -14,9 +14,6 @@ const ProjectsCard = ({ projectID, ddl, raise, sales, rate, title, isOngoing, is
 
   const history = useHistory();
   const onOpenProjectDetail = () => {
-    if (!isOngoing) {
-      return;
-    }
     history.push(`/launchpad/project/${projectID}`);
   };
 
