@@ -59,7 +59,6 @@ class AcyPieChart extends Component {
     };
   };
   onChartClick = (param, echarts) => {
-    alert(1);
     console.log(param);
   };
   render() {

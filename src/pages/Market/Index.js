@@ -62,10 +62,12 @@ const MarketIndex = props => {
 
   useEffect(() => {
     // fetch transaction data
-    if(library)fetchGlobalTransaction(library).then(globalTransactions => {
-      console.log(globalTransactions);
-      if(globalTransactions) settransactions(globalTransactions);
-    });
+    if(library) {
+      fetchGlobalTransaction(library).then(globalTransactions => {
+        console.log('globaltransaction', globalTransactions);
+        if(globalTransactions) settransactions(globalTransactions);
+      });
+    }
   }, [library]);
 
   useEffect(() => {
@@ -177,7 +179,7 @@ const MarketIndex = props => {
       {overallVolume !== -1 && overallTvl !== -1 && !isMobile ? (
         <Row className={styles.marketOverview} justify="space-around">
           <Col span={8}>
-            VOLUME 24H <strong style={{color: "white"}}>$ {overallVolume}</strong>{' '}
+            Volume 24H <strong style={{color: "white"}}>$ {overallVolume}</strong>{' '}
             <span
               className={
                 ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
@@ -213,7 +215,7 @@ const MarketIndex = props => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <h2>Top Tokens</h2>
         <h3>
-          <Link style={{ color: '#b5b5b6' }} to="/market/list/token">
+          <Link style={{ color: '#b5b5b6' }} /*to="/market/list/token"*/>
             Explore
           </Link>
         </h3>
@@ -227,7 +229,7 @@ const MarketIndex = props => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <h2>Top Pools</h2>
         <h3>
-          <Link style={{ color: '#b5b5b6' }} to="/market/list/pool">
+          <Link style={{ color: '#b5b5b6' }} /*to="/market/list/pool"*/>
             Explore
           </Link>
         </h3>
@@ -379,7 +381,7 @@ const MarketIndex = props => {
 //         {this.state.overallVolume !== -1 && this.state.overallTvl !== -1 && !isMobile ? (
 //           <Row className={styles.marketOverview} justify="space-around">
 //             <Col span={8}>
-//               VOLUME 24H <strong style={{color: "white"}}>$ {this.state.overallVolume}</strong>{' '}
+//               Volume 24H <strong style={{color: "white"}}>$ {this.state.overallVolume}</strong>{' '}
 //               <span
 //                 className={
 //                   this.state.ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown

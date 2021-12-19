@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import styles from '@/pages/Farms/Farms.less';
 import { isMobile } from 'react-device-detect';
 import { harvestAll, harvest, withdraw } from '@/acy-dex-swap/core/farms';
-import { getUserTokenBalanceWithAddress } from '@/acy-dex-swap/utils';
+import { getUserTokenBalanceWithAddress, API_URL } from '@/acy-dex-swap/utils';
 import StakeModal from './StakeModal';
 import { addLiquidity } from '@/acy-dex-swap/core/addLiquidity';
 import { AcyActionModal, AcyModal, AcyButton, AcyBarChart, AcyCard } from '@/components/Acy';
@@ -16,6 +16,7 @@ import { getPool, getPoolAccmulateReward} from '@/acy-dex-swap/core/farms';
 import supportedTokens from '@/constants/TokenList';
 import StakeRow from './StakeRow';
 import SwapComponent from '@/components/SwapComponent';
+import { BLOCK_TIME } from '@/acy-dex-swap/utils';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
   const handleInputChange = (e) => {
@@ -172,7 +173,6 @@ const FarmsTableRow = props => {
   );
   
   let history = useHistory();
-  const BLOCKS_PER_SEC = 15;
   const getDHM = (sec) => {
     if(sec<0) return '00d:00h:00m';
     var diff = sec;
@@ -209,9 +209,9 @@ const FarmsTableRow = props => {
       stakeData: newPool.stakeData,
       poolLpScore: newPool.lpScore,
       poolLpBalance: newPool.lpBalance,
-      endsIn: getDHM((newPool.endBlock - block) *BLOCKS_PER_SEC),
+      endsIn: getDHM((newPool.endBlock - block) *BLOCK_TIME),
       status: newPool.endBlock - block > 0,
-      endAfter: (newPool.endBlock - block) * BLOCKS_PER_SEC,
+      endAfter: (newPool.endBlock - block) * BLOCK_TIME,
       ratio: newPool.ratio
     };
     setPoolInfo(newFarmsContent);
@@ -265,19 +265,6 @@ const FarmsTableRow = props => {
             transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
           });
 
-          // update backend userPool record
-          // console.log("test pair to add on server", pairToAddOnServer);
-          // if (pairToAddOnServer) {
-          //   const { token0, token1 } = pairToAddOnServer;
-          //   axios.post(
-          //     // fetch valid pool list from remote
-          //     `https://api.acy.finance/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
-          //     // `http://localhost:3001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
-          //   ).then(res => {
-          //     console.log("add to server return: ", res);
-
-          //   }).catch(e => console.log("error: ", e));
-          // }
           await refreshPool(poolInfo.poolId,poolInfo.index);
           await refreshHarvestHistory(library, account);
           // clear top right loading spin
@@ -341,20 +328,6 @@ const FarmsTableRow = props => {
           await library.getBlock(receipt.logs[0].blockNumber).then(res => {
             transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
           });
-
-          // update backend userPool record
-          // console.log("test pair to add on server", pairToAddOnServer);
-          // if (pairToAddOnServer) {
-          //   const { token0, token1 } = pairToAddOnServer;
-          //   axios.post(
-          //     // fetch valid pool list from remote
-          //     `https://api.acy.finance/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
-          //     // `http://localhost:3001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
-          //   ).then(res => {
-          //     console.log("add to server return: ", res);
-
-          //   }).catch(e => console.log("error: ", e));
-          // }
           //refresh talbe
           await refreshPoolInfo();
           // clear top right loading spin
@@ -476,7 +449,7 @@ const FarmsTableRow = props => {
           </div>
           {poolInfo.pendingReward && poolInfo.pendingReward.map((reward,idx) => (
             <div className={styles.pendingReward1ContentContainer}>
-              {`${reward.amount?reward.amount.slice(0,8):0} ${reward.token}`}
+              {`${reward.amount?reward.amount:0} ${reward.token}`}
             </div>
           ))}
         </div>
@@ -658,7 +631,7 @@ const FarmsTableRow = props => {
                 }}
                 onGetReceipt={null}
                 token={{
-                  token0: supportedTokens.find(token => token.symbol == "USDC"),
+                  token0: supportedTokens.find(token => token.symbol == "USDT"),
                   token1: supportedTokens.find(token => token.symbol == poolInfo.token1)
                 }}
                 isLockedToken1={true}
