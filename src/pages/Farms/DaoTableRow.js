@@ -374,19 +374,6 @@ const DaoTableRow = props => {
             transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
           });
 
-          // update backend userPool record
-          // console.log("test pair to add on server", pairToAddOnServer);
-          // if (pairToAddOnServer) {
-          //   const { token0, token1 } = pairToAddOnServer;
-          //   axios.post(
-          //     // fetch valid pool list from remote
-          //     `https://api.acy.finance/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
-          //     // `http://localhost:3001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
-          //   ).then(res => {
-          //     console.log("add to server return: ", res);
-
-          //   }).catch(e => console.log("error: ", e));
-          // }
           //refresh talbe
           await refreshPoolInfo();
           // clear top right loading spin

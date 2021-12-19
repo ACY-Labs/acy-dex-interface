@@ -27,6 +27,7 @@ import {
   getTokenTotalSupply,
   approveTokenWithSpender,
   getAllSuportedTokensPrice,
+  BLOCK_TIME
 } from '@/acy-dex-swap/utils/index';
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import { binance } from '@/connectors';
@@ -63,7 +64,6 @@ function getLogoURIWithSymbol(symbol) {
   }
   return null;
 }
-const BLOCKS_PER_SEC = 14;
 const getDHM = (sec) => {
   if(sec<0) return '00d:00h:00m';
   var diff = sec;
@@ -422,10 +422,10 @@ function AccountInfo(props) {
             stakeData: pool.stakeData,
             poolLpScore: pool.lpScore,
             poolLpBalance: pool.lpBalance,
-            endsIn: getDHM((pool.endBlock - block) * BLOCKS_PER_SEC),
+            endsIn: getDHM((pool.endBlock - block) * BLOCK_TIME),
             status: pool.endBlock - block > 0,
             ratio: pool.ratio,
-            endAfter: (pool.endBlock - block) * BLOCKS_PER_SEC,
+            endAfter: (pool.endBlock - block) * BLOCK_TIME,
           };
           if(newFarmsContent.poolId == 0) {
             // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));

@@ -102,7 +102,7 @@ export class SmallTable extends React.Component {
     if (this.state.mode == 'token') {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyTokenIcon symbol={entry.short} width={20} />
+          <AcyTokenIcon logoURL={entry.logoURL} width={20} />
           <Link
             style={{ color: 'white' }}
             className={styles.coinName}
@@ -276,7 +276,7 @@ export function TokenTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableHeader}>
-              <AcyTokenIcon symbol={entry.short} />
+              <AcyTokenIcon symbol={entry.logoURL} />
               <Link
                 style={{ color: 'white' }}
                 className={styles.coinName}
@@ -418,9 +418,9 @@ export function TokenTable(props) {
         marginBottom: '20px',
         cursor: isHover ? 'pointer' : 'default',
       }}
-      onRowClick={(record, index, event) => {
-        navHistory.push(`/market/info/token/${record.address}`);
-      }}
+      // onRowClick={(record, index, event) => {
+      //   navHistory.push(`/market/info/token/${record.address}`);
+      // }}
       onRowMouseEnter={() => setIsHover(true)}
       onRowMouseLeave={() => setIsHover(false)}
       footer={() => (
@@ -498,8 +498,8 @@ export function PoolTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableHeader}>
-              <AcyTokenIcon symbol={entry.coin1} />
-              <AcyTokenIcon symbol={entry.coin2} />
+              <AcyTokenIcon symbol={entry.logoURL1} />
+              <AcyTokenIcon symbol={entry.logoURL2} />
               <Link
                 style={{ color: 'white' }}
                 to={`/market/info/pool/${entry.address}`}
@@ -609,9 +609,9 @@ export function PoolTable(props) {
       pagination={false}
       onRowMouseEnter={() => setIsHover(true)}
       onRowMouseLeave={() => setIsHover(false)}
-      onRowClick={(record, index, event) => {
-        navHistory.push(`/market/info/pool/${record.address}`);
-      }}
+      // onRowClick={(record, index, event) => {
+      //   navHistory.push(`/market/info/pool/${record.address}`);
+      // }}
       style={{
         marginBottom: '20px',
         cursor: isHover ? 'pointer' : 'default',

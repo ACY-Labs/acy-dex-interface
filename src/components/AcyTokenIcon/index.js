@@ -17,9 +17,7 @@ function AcyTokenIcon(props) {
     <>
       {!isError ? (
         <img
-          src={`https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/${
-            props.symbol === 'WETH' ? 'ETH' : props.symbol
-          }.svg`}
+          src={props.symbol}
           style={{
             width: props.width || 20,
             height: props.width || 20,

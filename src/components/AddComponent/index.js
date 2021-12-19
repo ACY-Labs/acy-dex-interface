@@ -139,7 +139,7 @@ const AddLiquidityComponent = props => {
 
   let [liquidityBreakdown, setLiquidityBreakdown] = useState();
   let [buttonContent, setButtonContent] = useState('Connect to wallet');
-  let [buttonStatus, setButtonStatus] = useState(true);
+  let [buttonStatus, setButtonStatus] = useState(false);
   let [liquidityStatus, setLiquidityStatus] = useState();
 
   let [pair, setPair] = useState();
@@ -331,7 +331,7 @@ const AddLiquidityComponent = props => {
   useEffect(
     () => {
       if (account == undefined) {
-        setButtonStatus(true);
+        setButtonStatus(false);
         setButtonContent('Connect to Wallet');
       } else {
         setButtonContent('Choose tokens and amount');
@@ -444,6 +444,8 @@ const AddLiquidityComponent = props => {
           setTimeout(checkStatusAndFinish, 500);
         } else {
           let transactionTime;
+          console.log("got receipt here");
+          props.onGetReceipt(receipt.transactionHash);
           await library.getBlock(receipt.logs[0].blockNumber).then(res => {
             transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
             console.log("test transactionTime: ", transactionTime)

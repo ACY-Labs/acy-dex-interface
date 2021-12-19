@@ -215,6 +215,13 @@ const GlobalHeaderRight = props => {
         selectWallet('walletconnect');
       },
     },
+    {
+      name: 'TrustWallet',
+      icon: 'TrustWallet',
+      onClick: () => {
+        selectWallet('walletconnect');
+      },
+    },
     // {
     //   name: 'Trezor',
     //   icon: 'Trezor',
@@ -229,13 +236,13 @@ const GlobalHeaderRight = props => {
     //     selectWallet('ledger');
     //   },
     // },
-    {
-      name: 'Fortmatic',
-      icon: 'Fortmatic',
-      onClick: () => {
-        selectWallet('fortmatic');
-      },
-    },
+    // {
+    //   name: 'Fortmatic',
+    //   icon: 'Fortmatic',
+    //   onClick: () => {
+    //     selectWallet('fortmatic');
+    //   },
+    // },
     {
       name: 'Portis',
       icon: 'Portis',
@@ -341,7 +348,7 @@ const GlobalHeaderRight = props => {
           <span style={{ marginLeft: '10px' }}>Select a Wallet</span>
           {/* <AcyIcon onClick={this.onhandCancel} name="close" /> */}
         </div>
-        <AcyCardList style={{ marginTop: '10px' }}>
+        {/* <AcyCardList style={{ marginTop: '10px' }}>
           <AcyCardList.Agree>
             By connecting a wallet, you agree to ACY{' '}
             <a target="_blank" href="https://acy.finance/terms-of-use">
@@ -349,7 +356,7 @@ const GlobalHeaderRight = props => {
             </a>{' '}
             .
           </AcyCardList.Agree>
-        </AcyCardList>
+        </AcyCardList> */}
 
         <AcyCardList>
           {MetaMask.map(item => (
