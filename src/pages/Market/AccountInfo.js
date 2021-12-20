@@ -332,6 +332,11 @@ function AccountInfo(props) {
   // Fetch Account Transactions
   const [userTransactions, setUserTransactions] = useState([])
 
+  // 3 wallet details
+  const [totalNoOfTransactions, setTotalNoOfTransactions] = useState(0)
+  const [totalValueSwapped, setTotalValueSwapped] = useState(0)
+  const [totalFeesPaid, setTotalFeesPaid] = useState(0)
+
   const [userLPHandlers, setUserLPHandlers] = useState([]);
   // const [userLPData, setUserLPData] = useState([]); // fetch a list of valid pool from backend
   const [userLPShares, setUserLPShares] = useState([]);
@@ -347,7 +352,30 @@ function AccountInfo(props) {
     if(library) {
       fetchAccountTransaction(account, library).then(accountTransactions => {
         console.log('accountTransactions', accountTransactions);
-        if(accountTransactions) setUserTransactions(accountTransactions);
+        if (accountTransactions) {
+          setUserTransactions(accountTransactions);
+          console.log(accountTransactions);
+
+          // set total value swapped
+          let totalValueSwappedUser = 0;
+          for (const transaction of accountTransactions) {
+            totalValueSwappedUser += transaction.totalValue
+          }
+          if (totalValueSwappedUser >= 1000000) {
+            setTotalValueSwapped(`$${(totalValueSwappedUser / 1000000).toFixed(2)}mil`);
+          } else if (totalValueSwappedUser >= 1000) {
+            setTotalValueSwapped(`$${(totalValueSwappedUser / 1000).toFixed(2)}k`);          
+          } else {
+            setTotalValueSwapped(`$${totalValueSwappedUser.toFixed(2)}`);
+          }
+        };
+
+        // set total transactions
+        if (accountTransactions.length >= 1000) {
+          setTotalNoOfTransactions(`${(accountTransactions.length / 1000).toFixed(2)}k`);
+        } else {
+          setTotalNoOfTransactions(accountTransactions.length);
+        }
       });
     }
   }, [library]);
@@ -710,7 +738,7 @@ function AccountInfo(props) {
         <h2>Wallet Stats</h2>
         <div style={{ display: 'flex' }} className={styles.walletStatCard}>
           <div className={styles.walletStatEntry}>
-            <div className={styles.walletStatValue}>$999.99m</div>
+                <div className={styles.walletStatValue}>{totalValueSwapped}</div>
             <div className={styles.walletStatIndicator}>Total Value Swapped</div>
           </div>
           <div style={{ width: 20 }} />
@@ -720,7 +748,7 @@ function AccountInfo(props) {
           </div>
           <div style={{ width: 20 }} />
           <div className={styles.walletStatEntry}>
-            <div className={styles.walletStatValue}>99.99k</div>
+            <div className={styles.walletStatValue}>{totalNoOfTransactions}</div>
             <div className={styles.walletStatIndicator}>Total Transactions</div>
           </div>
         </div>
@@ -738,7 +766,7 @@ function AccountInfo(props) {
                 : positionValue === 0
                 ? formattedNum(userLiquidityOwn, true)
                 : '-'} */}
-                $10
+                $0
             </div>
           </div>
           <div style={{ width: 20 }} />
