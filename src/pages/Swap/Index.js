@@ -112,7 +112,7 @@ const Swap = props => {
   const [activeToken1, setActiveToken1] = useState(supportedTokens[1]);
   const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
   const [activeAbsoluteChange, setActiveAbsoluteChange] = useState('+0.00');
-  const [activeRate, setActiveRate] = useState('Loading...');
+  const [activeRate, setActiveRate] = useState('N/A');
   const [range, setRange] = useState('1D');
   const [chartData, setChartData] = useState([]);
   const [alphaTable, setAlphaTable] = useState('Line');

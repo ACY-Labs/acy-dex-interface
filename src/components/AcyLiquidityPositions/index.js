@@ -1,4 +1,5 @@
 /* eslint-disable react/react-in-jsx-scope */
+import {getAllSuportedTokensPrice} from "@/acy-dex-swap/utils";
 import { useState, useEffect, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { connect } from 'umi';
@@ -176,6 +177,9 @@ const AcyLiquidityPositions = (props) => {
   const [readListPointer, setReadListPointer] = useState(0);  // last processed read position of "validPoolPairs"
   const displayCountIncrement = 5;
 
+  // fullTableData = userLPData + volume/APR
+  const [fullTableData, setFullTableData] = useState([])
+
   // search component
   const [filteredData, setFilteredData] = useState([]);
   const [keyword, setKeyword] = useState("");
@@ -316,22 +320,27 @@ const AcyLiquidityPositions = (props) => {
     },
     {
       title: "7D Volume",
-      dataIndex: 'share',
+      dataIndex: 'volume',
       className: 'centerAlignTableHeader',
-      key: 'share',
-      render: (text, record, index) => <div>{record.share}</div>,
+      key: 'volume',
+      render: (text, record, index) => {
+        return (<div>$ {(record.volume * 7).toFixed(2)}</div>)
+      },
       visible: true,
     },
     {
       title: "APR",
-      dataIndex: 'token0Amount',
-      key: 'token0Amount',
+      dataIndex: 'apr',
+      key: 'apr',
       className: 'centerAlignTableHeader',
-      render: (text, record, index) => (
-        <div>
-          <p></p>
-        </div>
-      ),
+      render: (text, record, index) => {
+        // const pairOverviewData = userLPOverview[record.poolAddress];
+        // if (!pairOverviewData) return;
+        // const aprPercentage = pairOverviewData.apr * 100;
+        return (
+          <div>{(record.apr*100).toFixed(1)}%</div>
+        )
+    },
       visible: !isMobile,
     },
     {
@@ -390,6 +399,7 @@ const AcyLiquidityPositions = (props) => {
 
     }).catch(e => console.log("error: ", e));
   }
+
   const userLPData = useMemo(() => {
     const userPools = [];
     console.log("fetched pairs userLPHandlers", userLPHandlers);
@@ -416,13 +426,13 @@ const AcyLiquidityPositions = (props) => {
 
   // search input component update
   useEffect(() => {
-    let filtered = userLPData;
+    let filtered = fullTableData;
     if (keyword !== "" && filtered) {
       const conditions = keyword.toLowerCase().split(/[\s\/,]+/);
       filtered = filtered.filter(item => conditions.every(condition => item.pool.toLowerCase().includes(condition)));
     }
     setFilteredData(filtered);
-  }, [userLPData, keyword]);
+  }, [fullTableData, keyword]);
 
   // fetch user shares in above pools
   async function getUserPoolShare() {
@@ -468,6 +478,67 @@ const AcyLiquidityPositions = (props) => {
     (async () => { for (let pair of userLPHandlers) fetchPoolShare(pair); })()
 
   }
+
+  const getFullTableData = async () => {
+    console.log("this is userLPData", userLPData);
+    const poolOverview = {};
+
+    const asyncTasks = [];
+
+    const calculateVolAndApr = async (pair) => {
+      const token0 = pair.token0;
+      const token1 = pair.token1;
+      console.log("this is", token0, token1)
+      return await axios.get(`https://api.acy.finance/api/poolchart/pair?token0=${token0.address}&token1=${token1.address}`).then(async (res) => {
+        // calculate volume in USD
+        console.log("this is return data", res.data)
+        const {token0: token0Vol, token1: token1Vol} = res.data.data.lastVolume;
+        const currentPriceDict = await getAllSuportedTokensPrice();
+        const vol0Usd = currentPriceDict[token0.symbol] * token0Vol;
+        const vol1Usd = currentPriceDict[token1.symbol] * token1Vol;
+        const poolVolumeInUsd = vol0Usd + vol1Usd;
+
+        // calculate reserve in USD
+        const {token0: token0Reserve, token1: token1Reserve} = res.data.data.lastReserves;
+        const reserve0Usd = currentPriceDict[token0.symbol] * token0Reserve;
+        const reserve1Usd = currentPriceDict[token1.symbol] * token1Reserve;
+        const poolReserveInUsd = reserve0Usd + reserve1Usd;
+
+        console.log("this is test1", currentPriceDict, poolReserveInUsd, poolVolumeInUsd)
+
+        // calculate APR
+        const apr = poolVolumeInUsd * 0.3/1000 * 365 / poolReserveInUsd;
+
+        const data = {
+          volume: poolVolumeInUsd,
+          apr
+        }
+        poolOverview[pair.poolAddress] = data;
+
+      }).catch(e => {
+        console.log("fetching pair volume error", e)
+      })
+    }
+
+    for (const pair of userLPData) {
+      asyncTasks.push(calculateVolAndApr(pair));
+    }
+    const resolved = await Promise.allSettled(asyncTasks)
+
+    console.log("here", poolOverview)
+    const completeTableData = userLPData.map(d => {
+      const overviewData = poolOverview[d.poolAddress]
+      let temp = d;
+      if (overviewData)
+        temp = {...d, ...overviewData}
+      return temp
+    })
+    return completeTableData
+  }
+  useEffect(async () => {
+    const data = await getFullTableData();
+    setFullTableData(data);
+  }, [userLPData])
 
   // link liquidity position table and add component together
   const { dispatch, liquidity } = props;
