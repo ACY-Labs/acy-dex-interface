@@ -22,7 +22,7 @@ const POLLING_INTERVAL = 12000;
 // 连接钱包时支持的货币id
 const injected = new InjectedConnector({
   supportedChainIds: [1, 3, 4, 5, 42, 56, 97, 80001],
-  //supportedChainIds: [56, 97],
+  // supportedChainIds: [56, 97],
 });
 
 

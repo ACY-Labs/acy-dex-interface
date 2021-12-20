@@ -57,6 +57,5 @@ export default defineConfig({
   extraBabelPlugins: [
     IS_PROD ? 'transform-remove-console': ""
   ],
-  fastRefresh: {},
-  exportStatic: {}
+  fastRefresh: {}
 });

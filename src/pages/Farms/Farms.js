@@ -57,11 +57,9 @@ const Farms = (props) => {
   // method to activate metamask wallet.
   // calling this method for the first time will cause metamask to pop up,
   // and require user to approve this connection.
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 56, 97, 80001],
-  });
+
   const connectWallet = async () =>  {
-    activate(injected);
+    activate(binance);
   };
 
   //function to get logo URI
@@ -144,7 +142,7 @@ const Farms = (props) => {
         token2Logo: getLogoURIWithSymbol(pool.token1Symbol),
         pendingReward: pool.rewardTokensSymbols.map((token, index) => ({
           token,
-          amount: pool.rewardTokensAmount[index] == 0?0 : pool.rewardTokensAmount[index].toString(),
+          amount: pool.rewardTokensAmount[index] == 0?0 : pool.rewardTokensAmount[index],
         })),
         totalApr: pool.apr.toFixed(2),
         tvl: pool.tvl.toFixed(2),
@@ -158,6 +156,9 @@ const Farms = (props) => {
         status: pool.endBlock - block > 0,
         ratio: pool.ratio,
         endAfter: (pool.endBlock - block) * BLOCK_TIME,
+        token1Ratio: pool.token1Ratio,
+        token2Ratio: pool.token2Ratio,
+        poolRewardPerYear: pool.poolRewardPerYear
       };
       if(newFarmsContent.poolId == 0) {
         // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));
@@ -181,9 +182,10 @@ const Farms = (props) => {
       }
       newFarmsContents.push(newFarmsContent);
     });
-    console.log("TEST newFarmsContents:",newFarmsContents);
+    
     if(account != "0x0000000000000000000000000000000000000000") {
       setFarmsContent(newFarmsContents);
+      console.log("TEST newFarmsContents:",newFarmsContents);
     } else {
       setNotLogginFarmContent(newFarmsContents);
     }
@@ -222,9 +224,11 @@ const Farms = (props) => {
    },
    [daoStakeRecord, stakeACY]
  );
-
   useEffect(
      async () => {
+      if(!account){
+        connectWallet();
+      }
       getAllSuportedTokensPrice();
       // account will be returned if wallet is connected.
       // so if account is present, retrieve the farms contract.
@@ -273,7 +277,7 @@ const Farms = (props) => {
   const onPremierToggleButtonClick = () => {
     setSelectedTable(2);
     setTableTitle('Premier Farms');
-    setTableSubtitle('Stake your LP tokens and earn project/other token rewards');
+    setTableSubtitle('Stake your LP tokens and earn project/mainstream token rewards');
     setRowNumber(INITIAL_ROW_NUMBER);
     setHideDao(true);
   };
@@ -317,8 +321,8 @@ const Farms = (props) => {
           console.log('All Farms');
         } 
         else if (selectedTable === 1){
-          setTableTitle('ACY Farms');
-          console.log('ACY Farms');
+          setTableTitle('Standard Farms');
+          console.log('Standard Farms');
         } 
         else if (selectedTable === 2){
           setTableTitle('Premier Farms');

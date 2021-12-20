@@ -1,6 +1,5 @@
 import { useWeb3React } from '@web3-react/core';
 import { binance } from '@/connectors';
-import { InjectedConnector } from '@web3-react/injected-connector';
 import React, { Component, useState, useEffect, useRef } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { connect } from 'umi';
@@ -113,7 +112,7 @@ const Swap = props => {
   const [activeToken1, setActiveToken1] = useState(supportedTokens[1]);
   const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
   const [activeAbsoluteChange, setActiveAbsoluteChange] = useState('+0.00');
-  const [activeRate, setActiveRate] = useState('Loading...');
+  const [activeRate, setActiveRate] = useState('N/A');
   const [range, setRange] = useState('1D');
   const [chartData, setChartData] = useState([]);
   const [alphaTable, setAlphaTable] = useState('Line');
@@ -131,6 +130,9 @@ const Swap = props => {
   // connect to provider, listen for wallet to connect
 
   useEffect(() => {
+    if(!account){
+      activate(binance);
+    }
     console.log("parent page account", account)
   }, [account])
 
@@ -239,7 +241,7 @@ const Swap = props => {
       var options = { weekday: 'long'};
       setActiveRate(new Intl.DateTimeFormat('en-US', options).format(date));
 
-      for (let i = historyData.length; i < historyData.length; i++) {
+      for (let i = 0; i < historyData.length; i++) {
   
         while(i < 0) i++;
         const element = historyData[i];

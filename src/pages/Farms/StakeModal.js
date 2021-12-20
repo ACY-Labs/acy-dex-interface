@@ -14,6 +14,7 @@ import SwapIcon from "@/assets/icon_swap.png";
 import classNames from 'classnames';
 import axios from 'axios';
 import { API_URL } from '@/acy-dex-swap/utils';
+import Pattern from '@/utils/pattern';
 
 
 const StakeModal = props => {
@@ -22,6 +23,8 @@ const StakeModal = props => {
     isModalVisible,
     token1,
     token2,
+    token1Logo,
+    token2Logo,
     balance,
     stakedTokenAddr,
     poolId,
@@ -32,7 +35,10 @@ const StakeModal = props => {
     library,
     poolLpScore,
     endAfter,
-    ratio // USD/lpToken
+    ratio, // USD/lpToken
+    token1Ratio,
+    token2Ratio,
+    poolRewardPerYear,
   } = props;
   const [date, setDate] = useState(new Date());
   const [selectedPresetDate, setSelectedPresetDate] = useState(null);
@@ -40,7 +46,7 @@ const StakeModal = props => {
   const [stake, setStake] = useState();
   const [balancePercentage, setBalancePercentage] = useState(0);
   const [buttonText, setButtonText] = useState('Stake');
-  const [aprList, setAprList] = useState([[12.23, false], [14.53, false], [16.27, false], [18.13, false], [19.63, false], [22.83, false]])
+  const [aprList, setAprList] = useState([[12.23, false], [14.53, false], [16.27, false], [18.13, false], [22.83, false]])
   const [pickingDate, setPickingDate] = useState(false);
   const [aprCounted, serAprCounted] = useState(13.2);
   const [buttonStatus, setButtonStatus] = useState(true);
@@ -51,7 +57,10 @@ const StakeModal = props => {
 
   const [lpValue, setLpValue] = useState(0);
   const [USDValue, setUSDValue] = useState(0);
-
+  const [totalUSDBalance, setTotalUSDBalance] = useState(0);
+  
+  const maxDay = Math.floor(endAfter/(60*60*24)).toString();
+  const maxDayStr = `MAX ${maxDay}D`;
 
   const getLockDuration = () => {
     if (is4Years) return 126144000;
@@ -61,21 +70,42 @@ const StakeModal = props => {
     return result > 126144000 ? 126144000 : result;// 24*60*60  31536000
   };
 
-  const updateStake = newStake => {
-    console.log("TEST HERE INPUT:",newStake);
-    let newStakeInt = newStake !== '' ? parseFloat(newStake, 10) : '';
-    newStakeInt = newStakeInt > balance ? balance : newStakeInt;
-    if (newStakeInt === '' || !Number.isNaN(newStakeInt)) {
-      setShowStake(newStakeInt);
+  const updateStake = e => {
+
+    const check = Pattern.coinNum.test(e.target.value);
+    if (check) {
+      const value = parseFloat(e.target.value?e.target.value:0);
+      console.log("TEST totalUSDBalance:",totalUSDBalance);
+      if(value > totalUSDBalance) {
+        setButtonStatus(false);
+        setButtonText("Insufficient balance");
+        setShowStake(e.target.value);
+        setBalancePercentage(100);
+      } else {
+        setButtonStatus(true);
+        setButtonText("Stake");
+        setShowStake(e.target.value);
+        setBalancePercentage(Math.round(value/totalUSDBalance*100));
+      }
     }
-    console.log("TEST HERE:",newStakeInt,balance, (newStakeInt / balance * 100));
+
+
+    // console.log("TEST HERE INPUT:",newStake);
+    // let newStakeInt = newStake !== '' ? parseFloat(newStake, 10) : '';
+    // newStakeInt = newStakeInt > balance ? balance : newStakeInt;
+    // if (newStakeInt === '' || !Number.isNaN(newStakeInt)) {
+    //   setShowStake(newStakeInt);
+    // }
+    // console.log("TEST HERE:",newStakeInt,balance, (newStakeInt / balance * 100));
     
   };
 
   const updateBalancePercentage = percentage => {
+
+    
     const percentageInt = percentage === '' ? 0 : parseInt(percentage, 10);
     if (Number.isNaN(percentageInt)) return;
-    setShowStake((parseFloat((balance * percentageInt) / 100)).toFixed(6));
+    setShowStake((parseFloat((totalUSDBalance * percentageInt) / 100)).toFixed(6));
     // setStake(parseFloat((balance * balancePercentage) / 100));
     setBalancePercentage(percentageInt);
   };
@@ -90,42 +120,31 @@ const StakeModal = props => {
     const day1M = getDayNum("month", 1);
     const day3M = getDayNum("month", 3);
     const day6M = getDayNum("month", 6);
-    const day1Y = getDayNum("year", 1);
+    // const day1Y = getDayNum("year", 1);
     const day4Y = getDayNum("year", 4);
-    const day_num = [day1W, day1M, day3M, day6M, day1Y, day4Y];
+    const day_num = [day1W, day1M, day3M, day6M, day4Y];
     var totalScore = poolLpScore / 1e34;
-    for (let i = 0; i < 6; i++) {
-      var weight = showStake * Math.sqrt(day_num[i]);
+    var lp = showStake/ratio;
+    for (let i = 0; i < 5; i++) {
+      var weight = lp * Math.sqrt(day_num[i]);
+      console.log("weight 1:",lp,Math.sqrt(day_num[i]),weight);
+      // console.log("TEST1234:",i,weight / (totalScore + weight),poolRewardPerYear);
       if (totalScore + weight == 0) newArr[i][0] = 0;
-      else newArr[i][0] = (weight / (totalScore + weight) * 100).toFixed(2);
+      else newArr[i][0] = (weight / (totalScore + weight) * poolRewardPerYear / showStake ).toFixed(2);
     }
     setAprList(aprList);
     setDaysNum(day_num);
   }, [showStake]);
 
-  useEffect(() => {
-    if(lpTokenShow) {
-      setLpValue(showStake);
-      setUSDValue(showStake * ratio);
-      setBalancePercentage(Math.floor((showStake / balance) * 100 ));
-    } else {
-      setLpValue(showStake/ratio);
-      setUSDValue(showStake);
-      setBalancePercentage(Math.floor((showStake / balance) * 100 ));
-    }
-  }, [showStake]);
 
-  useEffect(() => {
-    if(lpTokenShow) {
-      setShowStake(lpValue);
-    } else {
-      setShowStake(USDValue);
-    }
-  }, [lpTokenShow]);
 
   useEffect(() => {
     setIs4Years(false);
   }, [isModalVisible]);
+
+  useEffect(() => {
+    setTotalUSDBalance(balance*ratio);
+  }, [balance, ratio]);
 
   const getDayNum = (type, value) => {
     const nowDate = new Date();
@@ -144,7 +163,7 @@ const StakeModal = props => {
     else return;
 
     let newArr = [...aprList];
-    for (let i = 0; i < 6; i++) newArr[i][1] = false;
+    for (let i = 0; i < 5; i++) newArr[i][1] = false;
     newArr[index][1] = true;
     setAprList(newArr);
     setDate(newDate);
@@ -156,14 +175,27 @@ const StakeModal = props => {
       setIs4Years(false);
     }
   };
+  const updateMaxDay = (dayNum) => {
+    let newArr = [...aprList];
+    for (let i = 0; i < 5; i++) newArr[i][1] = false;
+    newArr[4][1] = true;
+
+  }
 
   const datePickerChangeHandler = newDate => {
+    console.log("datePickerChangeHandler:",newDate/1000);
+    const date = new Date();
+    const dif = newDate - date;
+    const dayNum = Math.ceil(dif/(60*60*24*1000));
+
     setDate(newDate);
     setSelectedPresetDate(null);
-
-    let newArr = [...aprList];
-    for (let i = 0; i < 6; i++) newArr[i][1] = false;
-    setAprList(newArr);
+    var lp = showStake/ratio;
+    var weight = lp * Math.sqrt(dayNum);
+    console.log("weight 7:",lp,Math.sqrt(dayNum),weight);
+    var totalScore = poolLpScore / 1e34;
+    const apr = (weight / (totalScore + weight) * poolRewardPerYear / showStake ).toFixed(2);
+    serAprCounted(apr);
     setPickingDate(true);
   };
 
@@ -199,9 +231,9 @@ const StakeModal = props => {
             console.log("test transactionTime: ", transactionTime)
           });
           //refresh poold info
-          axios.get(
+          await axios.get(
             // fetch valid pool list from remote
-            `${API_URL}/updatePool?poolId=${poolId}`
+            `${API_URL}/farm/updatePool?poolId=${poolId}`
             //change to to production
             //`http://api.acy.finance/api/updatePool?poolId=${poolId}`
           ).then(res => {
@@ -320,24 +352,18 @@ const StakeModal = props => {
       <div className={styles.amountContainerWrap}>
         <div className={styles.amountRowContainer}>
           <div className={styles.amountRowInputContainer}>
-            <input type="text"  value={ showStake} onChange={e => updateStake(e.target.value)} />
-          </div>
-          <span className={styles.suffix}>
-            {renderLpOrUsd(lpTokenShow)}
-            <img onClick={()=>setLpTokenShow(!lpTokenShow)} className={styles.swapImg} src={SwapIcon} />
+          <span className={styles.prefix}>
+              $
           </span>
-        </div>
-        <div className={styles.backupCoin}>
-          <span>{!lpTokenShow && lpValue || USDValue}</span> {renderLpOrUsd(!lpTokenShow)}
+            <input type="text"  value={ showStake} onChange={updateStake} />
+          </div>
+
         </div>
       </div>
 
       <div className={styles.balanceAmountContainer}>
         <div className={styles.balanceAmount}>
-          Balance: {(parseFloat(balance)).toFixed(6)}
-          {token1 && token2 && ` ${token1}-${token2} LP`}
-          {token1 && !token2 && ` ${token1}s`}
-          {token2 && !token1 && ` ${token2}s`}
+          Balance: ${(parseFloat(totalUSDBalance)).toFixed(6)}
         </div>
         <div className={styles.balanceAmountInputContainer}>
           <input
@@ -348,6 +374,10 @@ const StakeModal = props => {
           <span className={styles.balanceAmountSuffix}>%</span>
         </div>
       </div>
+      <div className={styles.balanceAmountContainer2}>
+          LP Token: {(parseFloat(totalUSDBalance)).toFixed(6)} {token2? `${token1+"-"+token2} LP`  : `s${token1}`}
+      </div>
+     
       <div className={styles.sliderWrapper}>
         <input
           type="range"
@@ -358,7 +388,44 @@ const StakeModal = props => {
           onChange={e => updateBalancePercentage(e.target.value)}
         />
       </div>
+      <div className={styles.tokenAmountContent}>
+        <div className={styles.tokenAmount}>
+        {(token1Ratio*showStake/ratio).toFixed(4)}
+        </div>
+        <div className={styles.tokenDetailContainer}>
+          <div>
+            {token1Logo && (
+                <img src={token1Logo} alt="token" className={styles.tokenImg}/>
+            )}
 
+          </div>
+          <div className={styles.tokenSymbol}>
+            
+            {token1}
+
+          </div>
+          
+        </div>
+      </div>
+      { token2 && (
+        <div className={styles.tokenAmountContent}>
+        <div className={styles.tokenAmount}>
+        {(token2Ratio*showStake/ratio).toFixed(4)}
+        </div>
+        <div className={styles.tokenDetailContainer}>
+          <div>
+            {token2Logo && (
+                <img src={token2Logo} alt="token" className={styles.tokenImg}/>
+            )}
+
+          </div>
+          <div className={styles.tokenSymbol}>
+            {token2}
+          </div>
+        </div>
+      </div>
+      )}
+      
       <div className={styles.lockTimeRow}>
         <div className={styles.dateSelectionContainer}>
           <div className={styles.datePickerContainer}>
@@ -368,17 +435,17 @@ const StakeModal = props => {
               onChange={datePickerChangeHandler}
               customInput={<CustomDatePickerInput />}
             />
-            {pickingDate ?
+            {/* {pickingDate ?
               <div className={styles.APRBox1}>
                 {aprCounted}%
               </div> : ''
-            }
+            } */}
 
           </div>
-          <div className={styles.APRRow}>
+          {/* <div className={styles.APRRow}>
             {aprList.map(([text, selected], index) => {
               let APRstyle = ''
-              if (checkIfDisabled(index)) {
+              if (false) {
                 APRstyle = styles.APRDisabled
               }
               else if (selected) {
@@ -393,17 +460,17 @@ const StakeModal = props => {
                 </div>
               )
             })}
-          </div>
+          </div> */}
           <div className={styles.presetDurationContainer}>
             <AcySmallButtonGroup
               activeButton={selectedPresetDate}
               buttonList={[
-                ['1W', () => updateDate('week', 1, 0), checkIfDisabled(0)],
-                ['1M', () => updateDate('month', 1, 1), checkIfDisabled(1)],
-                ['3M', () => updateDate('month', 3, 2), checkIfDisabled(2)],
-                ['6M', () => updateDate('month', 6, 3), checkIfDisabled(3)],
-                ['1Y', () => updateDate('year', 1, 4), checkIfDisabled(4)],
-                ['4Y', () => updateDate('year', 4, 5), checkIfDisabled(5)],
+                ['1W', () => updateDate('week', 1, 0)],
+                ['1M', () => updateDate('month', 1, 1)],
+                ['3M', () => updateDate('month', 3, 2)],
+                ['6M', () => updateDate('month', 6, 3)],
+                // ['1Y', () => updateDate('year', 1, 4), checkIfDisabled(4)],
+                [maxDayStr, () => updateDate('year', 4, 4)],
               ]}
               containerClass={styles.presetDurationSelection}
               theme="#eb5c20"
@@ -423,7 +490,7 @@ const StakeModal = props => {
               if (buttonText !== 'Approval required') {
                 setButtonText(<>Processing <Icon type="loading" /></>);
                 setButtonStatus(false);
-                deposit(stakedTokenAddr, lpValue, poolId, getLockDuration(), library, account, setButtonText, stakeCallback, setButtonStatus);
+                deposit(stakedTokenAddr, balance*balancePercentage/100, poolId, getLockDuration(), library, account, setButtonText, stakeCallback, setButtonStatus);
               } else {
                 setButtonText(<>Approving <Icon type="loading" /></>);
                 setButtonStatus(false);

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styles from './styles.less';
 
 const AcySmallButton = (
-  { children, onClick, disabled, color, textColor, borderColor, borderRadius, padding }
+  { children, onClick, disabled, color, textColor, borderColor, borderRadius, padding, width }
 ) => (
   <button
     type="button"
@@ -52,6 +52,7 @@ const AcySmallButtonGroup = ({ activeButton, buttonList, containerClass, theme }
             onClick={onClick}
             id={index}
             disabled={disabled}
+            width={index==4? '10%' : '20'}
           >
             {text}
           </AcySmallButton>
