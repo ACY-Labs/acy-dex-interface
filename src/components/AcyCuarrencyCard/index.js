@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Card, Icon, Input, Row, Col } from 'antd';
 import AcyIcon from '@/components/AcyIcon';
 import styles from './index.less';
+import classname from 'classnames';
 import Pattern from '@/utils/pattern';
-import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils';
+import { getAllSuportedTokensPrice } from '@/acy-dex-swap/utils';
 
 const AcyCuarrencyCard = ({
   title,
@@ -45,10 +46,10 @@ const AcyCuarrencyCard = ({
     const tokenPrice = tokenPriceList[coin];
     const tokenAmountUSD = tokenPrice * token;
     setUsdValue(tokenAmountUSD.toFixed(2));
-    console.log("tokenprice, token", tokenPrice,token)
+    console.log("tokenprice, token", tokenPrice, token)
     console.log("test token price: ", coin, tokenPrice);
   }, [coin, token])
-  
+
   const inputRef = React.createRef();
   return (
     <div
@@ -66,7 +67,7 @@ const AcyCuarrencyCard = ({
                 <img src={logoURI} style={{ width: '24px', marginRight: '0.5rem' }} />
                 <span style={{ margin: '0px 0.25rem' }}>{coin}</span>
               </div>
-              { !isLocked &&(
+              {!isLocked && (
                 <AcyIcon.MyIcon type="triangleGray" width={10} />
               )}
             </span>
@@ -74,13 +75,16 @@ const AcyCuarrencyCard = ({
           <input
             ref={inputRef}
             className={styles.input}
-            style={{color: inputColor}}
+            style={{ color: inputColor }}
             placeholder="0.0"
             bordered={false}
             value={token}
             onChange={onChange}
           />
         </div>
+          {rest.bonus && rest.bonus != 0
+          ? <div className={classname(styles.cua_group, styles.bonus)}>{rest.bonus > 0 ? "+" + rest.bonus : rest.bonus}</div>
+          : null}
         <div className={styles.cua_bottomContainer}>
           <div className={styles.cua_blanace}>{title || ''}</div>
           <div>{rest.showBalance && !isNaN(usdValue) ? `$ ${usdValue}` : null}</div>

@@ -25,8 +25,6 @@ import {
   fetchGeneralPoolInfoDay,
   fetchTopExchangeVolumes,
   marketClient,
-} from './Data/index.js';
-import {
   fetchGlobalTransaction,
 } from './Data/index.js';
 import { WatchlistManager } from './WatchlistManager.js';
@@ -361,7 +359,7 @@ function AccountOverview(props) {
   const [topEV, setTopEV] = useState([]);
 
   const [transactions, settransactions] = useState([]);
-
+  
   const { account, chainId, library, activate } = useWeb3React();
 
   useEffect(() => {

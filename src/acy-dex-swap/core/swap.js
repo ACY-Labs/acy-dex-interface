@@ -27,6 +27,7 @@ import {
   getAllowance,
   getContract,
   getRouterContract,
+  getUserTokenBalance,
   getUserTokenBalanceRaw,
   INITIAL_ALLOWED_SLIPPAGE,
   isZero,
@@ -35,6 +36,10 @@ import {
   withExactOutEstimateInAmount
 } from '../utils';
 import axios from 'axios';
+
+function toFixed4(floatInString) {
+  return parseFloat(floatInString).toFixed(4);
+}
 
 // get the estimated amount  of the other token required when swapping, in readable string.
 export async function swapGetEstimated(
@@ -47,6 +52,8 @@ export async function swapGetEstimated(
   account,
   setToken0Amount,
   setToken1Amount,
+  setBonus0,
+  setBonus1,
   setNeedApprove,
   setApproveAmount,
   setApproveButtonStatus,
@@ -67,6 +74,7 @@ export async function swapGetEstimated(
   setMidTokenAddress,
   setPoolExist
 ) {
+  console.log("getestimate", inputToken0.amount)
   const status = await (async () => {
     // check uniswap
     console.log('SWAP GET ESTIMATED');
@@ -93,13 +101,13 @@ export async function swapGetEstimated(
     } = inputToken1;
 
     if (!account) return new CustomError('Connect to wallet');
-    if (!inputToken0.symbol || !inputToken1.symbol) return new CustomError('please choose tokens');
-    if (exactIn && inToken0Amount == '0') return new CustomError('Enter an amount');
-    if (!exactIn && inToken1Amount == '0') return new CustomError('Enter an amount');
+    else if (!inputToken0.symbol || !inputToken1.symbol) return new CustomError('please choose tokens');
+    if (exactIn && parseFloat(inToken0Amount) == '0') return new CustomError('Enter an amount');
+    else if (!exactIn && parseFloat(inToken1Amount) == '0') return new CustomError('Enter an amount');
     if (exactIn && inToken0Amount == '') return new CustomError('Enter an amount');
-    if (!exactIn && inToken1Amount == '') return new CustomError('Enter an amount');
-    if (exactIn && isNaN(parseFloat(inToken0Amount))) return new CustomError('Enter an amount');
-    if (!exactIn && isNaN(parseFloat(inToken1Amount))) return new CustomError('Enter an amount');
+    else if (!exactIn && inToken1Amount == '') return new CustomError('Enter an amount');
+    // if (exactIn && isNaN(parseFloat(inToken0Amount))) return new CustomError('Enter an amount');
+    // else if (!exactIn && isNaN(parseFloat(inToken1Amount))) return new CustomError('Enter an amount3');
 
     console.log(`token0Amount: ${inToken0Amount}`);
     console.log(`token1Amount: ${inToken1Amount}`);
@@ -120,10 +128,10 @@ export async function swapGetEstimated(
     if (token0IsETH && inToken1Symbol === 'WBNB') {
       // UI should sync value of ETH and WETH
       if (exactIn) {
-        setToken1Amount(inToken0Amount);
+        setToken1Amount(toFixed4(inToken0Amount));
         inToken1Amount = inToken0Amount;
       } else {
-        setToken0Amount(inToken1Amount);
+        setToken0Amount(toFixed4(inToken1Amount));
         inToken0Amount = inToken1Amount;
       }
       console.log('------------------ CHECK BALANCE ------------------');
@@ -150,11 +158,13 @@ export async function swapGetEstimated(
       console.log(userToken0Balance);
       console.log('token0Amount');
       console.log(inToken0Amount);
-
+      console.log("test sufficient balance", userHasSufficientBalance)
       // quit if user doesn't have enough balance, otherwise this will cause error
       if (!userHasSufficientBalance) {
         setSwapButtonState(false);
         setSwapButtonContent('Not enough balance');
+        setBonus0(null);
+        setBonus1(null);
         return new CustomError('Not enough balance');
       }
       // setEstimatedStatus("change ETH to WETH");
@@ -186,10 +196,10 @@ export async function swapGetEstimated(
     if (inToken0Symbol === 'WBNB' && token1IsETH) {
       console.log('UNWRAP');
       if (exactIn) {
-        setToken1Amount(inToken0Amount);
+        setToken1Amount(toFixed4(inToken0Amount));
         inToken1Amount = inToken0Amount;
       } else {
-        setToken0Amount(inToken1Amount);
+        setToken0Amount(toFixed4(inToken1Amount));
         inToken0Amount = inToken1Amount;
       }
 
@@ -220,6 +230,8 @@ export async function swapGetEstimated(
       if (!userHasSufficientBalance) {
         setSwapButtonState(false);
         setSwapButtonContent('Not enough balance');
+        setBonus0(null);
+        setBonus1(null);
         return new CustomError('Not enough balance');
       }
 
@@ -301,8 +313,8 @@ export async function swapGetEstimated(
     let slippageAdjustedAmount;
     let minAmountOut;
     let maxAmountIn;
-    let token0Amount = 0;
-    let token1Amount = 0;
+    let token0Amount = inToken0Amount;
+    let token1Amount = inToken1Amount;
     let isUseArb = false;
     let hasArb = true;
     
@@ -337,10 +349,42 @@ export async function swapGetEstimated(
     }
     setPoolExist(poolExist);
 
+    // const checkBalanceToken = exactIn ? inputToken0 : inputToken1;
+    // const checkBalanceTokenIsEth = exactIn ? token0IsETH : token1IsETH;
+    // console.log("test exact in token", exactIn, checkBalanceToken)
+
+    // let selectedTokenBalance = await getUserTokenBalanceRaw(
+    //   checkBalanceTokenIsEth ? ETHER : new Token(chainId, inputToken0.address, inputToken0.decimals, inputToken0.symbol),
+    //   account,
+    //   library
+    // );
+    // console.log("test exact in token balance", selectedTokenBalance,selectedTokenBalance.toString())
+
+    // let userHasSufficientBalance;
+    // try {
+    //   userHasSufficientBalance = selectedTokenBalance.gte(parseUnits(inputToken0.amount, inputToken0.decimals));
+    // } catch (e) {
+    //   console.log('wrappedAmount!!!');
+    //   console.log(e);
+    //   setSwapButtonState(false);
+    //   setSwapButtonContent(e.fault);
+    //   return new CustomError(e.fault);
+    // }
+
+    // // quit if user doesn't have enough balance, otherwise this will cause error
+    // if (!userHasSufficientBalance) {
+    //   setSwapButtonState(false);
+    //   setSwapButtonContent('Not Enough balance3');
+    //   setBonus0(null);
+    //   setBonus1(null);
+    //   return;
+    // }
+
+    // Determine to use FlashArbitrage or AMM
     try {
       if (exactIn) {
         // update UI with estimated output token amount
-        const inToken0DecimalAmount = parseUnits(inToken0Amount, inToken0Decimal).toString();
+        const inToken0DecimalAmount = parseUnits(token0Amount, inToken0Decimal).toString();
         console.log("TEST estimatedOutputAmount in");
         let estimatedOutputAmount = await withExactInEstimateOutAmount(
           inToken0DecimalAmount,
@@ -387,7 +431,7 @@ export async function swapGetEstimated(
         // setMinAmountOut(minAmountOut);
         // setSlippageAdjustedAmount(minAmountOut);
       } else {
-        const inToken1DecimalAmount = parseUnits(inToken1Amount, inToken1Decimal).toString()
+        const inToken1DecimalAmount = parseUnits(token1Amount, inToken1Decimal).toString()
         console.log("TEST estimatedInputAmount in");
         let estimatedInputAmount = await withExactOutEstimateInAmount(
           inToken1DecimalAmount,
@@ -443,6 +487,7 @@ export async function swapGetEstimated(
         return new CustomError('Pool does not exist!');
       }
     }
+    // AMM
     if(poolExist && !isUseArb) {
       // if(exactIn) {
       //   if(allPathAmountOut > ammOutput) {
@@ -493,12 +538,16 @@ export async function swapGetEstimated(
             setSwapButtonState(false);
             setSwapButtonContent('Insufficient liquidity for this trade');
             console.log('Insufficient reserve!');
+            setBonus0(null);
+            setBonus1(null);
             return new CustomError('Insufficient reserve!');
           }
           setSwapButtonState(false);
           setSwapButtonContent('Unhandled exception!');
           console.log('Unhandled exception!');
           console.log(e);
+          setBonus0(null);
+          setBonus1(null);
           return new CustomError('Unhandled exception!');
         }
 
@@ -520,15 +569,20 @@ export async function swapGetEstimated(
           slippageAdjustedAmount = minAmountOut.raw.toString();
 
           // update UI with estimated output token amount
-          setToken1Amount(trade.outputAmount.toFixed(6));
+          setToken1Amount(trade.outputAmount.toFixed(4));
           console.log(`Minimum received: ${slippageAdjustedAmount}`);
         } else {
           console.log(`By algorithm, expected to get: ${trade.inputAmount.toExact()}`);
           maxAmountIn = trade.maximumAmountIn(allowedSlippage);
           slippageAdjustedAmount = maxAmountIn.raw.toString();
-          setToken0Amount(trade.inputAmount.toFixed(6));
+          setToken0Amount(trade.inputAmount.toFixed(4));
           console.log(`Maximum pay: ${slippageAdjustedAmount}`);
+          // set token0Amount for later balance checking
+          token0Amount = trade.inputAmount.toExact();
         }
+        
+        setBonus0(null);
+        setBonus1(null);
 
         setSlippageAdjustedAmount(slippageAdjustedAmount);
         setMinAmountOut(minAmountOut);
@@ -547,6 +601,9 @@ export async function swapGetEstimated(
         setSwapBreakdown(breakdownInfo);
       }  
     }
+    // FA, or fall back to AMM
+    let bonus0 = null;
+    let bonus1 = null;
     if(!poolExist || isUseArb){
       setSwapButtonContent("Swap by arbitrage")
       if (exactIn) {
@@ -555,20 +612,31 @@ export async function swapGetEstimated(
         else methodsName = isUseArb?"swapExactTokensForTokensByArb":"swapExactTokensForTokens";
         
         if(allPathAmountOut > ammOutput) {
+          // show basic AMM output in UI, with (FA-AMM)*40% as additional bonus
+          // note that here trade.outputAmount is the same as formatUnits(ammOutput, inToken1Decimal)
+          // console.log("test exact in, no arb: inputAmount, trade.output, FA, AMM", inputAmount.toExact(), trade.outputAmount.toExact(), formatUnits(allPathAmountOut, inToken1Decimal), formatUnits(ammOutput, inToken1Decimal))
+
+          const FAfloat = parseFloat(formatUnits(allPathAmountOut, inToken1Decimal));
+          const AMMfloat = parseFloat(formatUnits(ammOutput, inToken1Decimal));
+          bonus1 = ((FAfloat - AMMfloat) * 0.4);
+          console.log("test +bonus", bonus1)
+          
+
           isUseArb = true;
-          token1Amount = formatUnits(allPathAmountOut, inToken1Decimal);
+          token1Amount = formatUnits(ammOutput, inToken1Decimal);
           minAmountOut = Math.ceil(allPathAmountOut * (1 - slippage/100));
           minAmountOut = `0x${minAmountOut.toString(16)}`;
           slippageAdjustedAmount = minAmountOut;
         } else {
           isUseArb = false;
+          setBonus1(null);
           token1Amount = formatUnits(ammOutput, inToken1Decimal);
           minAmountOut = Math.ceil(ammOutput * (1 - slippage/100));
           minAmountOut = `0x${minAmountOut.toString(16)}`;
           slippageAdjustedAmount = minAmountOut;
         }
         setMethodName(methodsName);
-        setToken1Amount(token1Amount);
+        setToken1Amount(toFixed4(token1Amount));
         setMidTokenAddress(midTokenAddress);
         setIsUseArb(isUseArb);
         setMinAmountOut(minAmountOut);
@@ -578,14 +646,24 @@ export async function swapGetEstimated(
         else if(inToken1Symbol == 'WBNB' || inToken1Symbol == 'BNB') methodsName = isUseArb?"swapTokensForExactETHByArb":"swapTokensForExactETH";
         else methodsName = isUseArb?"swapTokensForExactTokensByArb":"swapTokensForExactTokens";
 
+        console.log("bonus FAout vs ammOutput", allPathAmountOut, ammOutput)
         if(allPathAmountOut < ammOutput) {
+          // show basic AMM output in UI, with (FA-AMM)*40% as additional bonus
+          // note that here trade.outputAmount is the same as formatUnits(ammOutput, inToken1Decimal)
+
+          const FAfloat = parseFloat(formatUnits(allPathAmountOut, inToken1Decimal));
+          const AMMfloat = parseFloat(formatUnits(ammOutput, inToken1Decimal));
+          bonus0 = ((FAfloat - AMMfloat) * 0.4);
+          console.log("test -bonus, should be negative", bonus0)
+
           isUseArb = true;
-          token0Amount = formatUnits(allPathAmountOut, inToken0Decimal);
+          token0Amount = formatUnits(ammOutput, inToken0Decimal);
           maxAmountIn = Math.floor(allPathAmountOut * (1 + slippage/100));
           maxAmountIn = `0x${maxAmountIn.toString(16)}`;
           slippageAdjustedAmount = maxAmountIn;
         } else {
           isUseArb = false;
+          setBonus0(null);
           token0Amount = formatUnits(ammOutput, inToken0Decimal);
           maxAmountIn = Math.floor(ammOutput * (1 + slippage/100));
           maxAmountIn = `0x${maxAmountIn.toString(16)}`;
@@ -593,22 +671,24 @@ export async function swapGetEstimated(
         }
 
         setMethodName(methodsName);
-        setToken0Amount(token0Amount);
+        setToken0Amount(toFixed4(token0Amount));
         setMidTokenAddress(midTokenAddress);
         setIsUseArb(isUseArb);
         setMaxAmountIn(maxAmountIn);
         setSlippageAdjustedAmount(maxAmountIn);
       }
     }
+
     let userToken0Balance = await getUserTokenBalanceRaw(
       token0IsETH ? ETHER : new Token(chainId, inToken0Address, inToken0Decimal, inToken0Symbol),
       account,
       library
     );
+    console.log("test white button", userToken0Balance.toString(), inToken0Amount, inToken1Amount)
 
     let userHasSufficientBalance;
     try {
-      userHasSufficientBalance = userToken0Balance.gte(parseUnits(inToken0Amount, inToken0Decimal));
+      userHasSufficientBalance = userToken0Balance.gte(parseUnits(token0Amount, inToken0Decimal));
     } catch (e) {
       console.log('wrappedAmount!!!');
       console.log(e);
@@ -617,14 +697,28 @@ export async function swapGetEstimated(
       return new CustomError(e.fault);
     }
 
+    console.log("comparison", userHasSufficientBalance, token0Amount)
+
     // quit if user doesn't have enough balance, otherwise this will cause error
     if (!userHasSufficientBalance) {
+      setBonus0(null);
+      setBonus1(null);
       setSwapButtonState(false);
       setSwapButtonContent('Not Enough balance');
-      return;
+      console.log("to exit")
+      return new CustomError('Not enough balance');
+      console.log("test show?")
     }
+    console.log("user has sufficient balance")
+    if (bonus0 != null)
+      setBonus0(bonus0.toFixed(4));
+    if (bonus1 != null)
+      setBonus1(bonus1.toFixed(4));
+
+
     console.log('------------------ ALLOWANCE ------------------');
     if (!token0IsETH) {
+      console.log("before getAllowance")
       let allowance = await getAllowance(
         inToken0Address,
         account,
@@ -662,7 +756,7 @@ export async function swapGetEstimated(
       setNeedApprove(false);
     }
     if(isUseArb) {
-      setSwapButtonContent('Swap w/ arbitrage');
+      setSwapButtonContent('Swap');
     } else {
       setSwapButtonContent('Swap');
     }
@@ -973,6 +1067,7 @@ export async function swap(
       setSwapButtonContent("Swap");
       setSwapButtonState(true);
     }else if(status.code && status.code == -32603) {
+      console.log("error status -32603", status)
       let text = null;
       if(exactIn) {
         text = "The amount of the output token is less than your slippage tolerance rate, please set more slippage tolerance if you want to continue!"
