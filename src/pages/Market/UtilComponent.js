@@ -356,31 +356,6 @@ export function TokenTable(props) {
           <div
             className={styles.tableHeader}
             onClick={() => {
-              setCurrentKey('volume24h');
-              onSortChange();
-            }}
-          >
-            Volume 24H
-            {currentKey == 'volume24h' && (
-              <Icon
-                type={!isAscending ? 'arrow-up' : 'arrow-down'}
-                style={{ fontSize: '14px', marginLeft: '4px' }}
-              />
-            )}
-          </div>
-        ),
-        dataIndex: 'volume24h',
-        key: 'volume24h',
-        render: (text, entry) => {
-          return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
-        },
-        visible: true,
-      },
-      {
-        title: (
-          <div
-            className={styles.tableHeader}
-            onClick={() => {
               setCurrentKey('tvl');
               onSortChange();
             }}
@@ -400,6 +375,31 @@ export function TokenTable(props) {
           return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
         },
         visible: isDesktop(),
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('volume24h');
+              onSortChange();
+            }}
+          >
+            Volume 24H
+            {currentKey == 'volume24h' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
+        dataIndex: 'volume24h',
+        key: 'volume24h',
+        render: (text, entry) => {
+          return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
+        },
+        visible: true,
       },
     ];
   }
@@ -518,6 +518,10 @@ export function PoolTable(props) {
           );
         },
         visible: true,
+      },
+      {
+        title: (<div style={{marginLeft: "100px"}}></div>),
+        visible: isDesktop(),
       },
       {
         title: (
@@ -700,7 +704,7 @@ export function TransactionTable(props) {
               style={{ fontWeight: 600 }}
               onClick={() => openInNewTab(`${scanUrlPrefix}/tx/${entry.transactionID}`)}
             >
-              {entry.type} {entry.coin1} {entry.action == TransactionType.SWAP ? 'for' : 'and'}{' '}
+              {entry.type} {entry.coin1} {entry.action == TransactionType.SWAP ? 'for' : 'for'}{' '}
               {entry.coin2}
             </div>
           );

@@ -180,7 +180,7 @@ const AddLiquidityComponent = props => {
 
   // 初始化函数时连接钱包
   useEffect(
-    () => {   
+    () => {
       //read the fav tokens code in storage
       var tokens_symbol = JSON.parse(localStorage.getItem('tokens_symbol'));
       //set to fav token
@@ -421,76 +421,76 @@ const AddLiquidityComponent = props => {
   };
 
   const addLiquidityCallback = status => {
-    console.log("test status:", status);
-    const transactions = props.transaction.transactions;
-    const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
-    console.log("is current dispatched? ", isCurrentTransactionDispatched);
-    // trigger loading spin on top right
-    if (isCurrentTransactionDispatched == 0) {
-      dispatch({
-        type: "transaction/addTransaction",
-        payload: {
-          transactions: [...transactions, status.hash]
-        }
-      })
-    }
+    try {
+      console.log("test status:", status);
+      const transactions = props.transaction.transactions;
+      const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
+      console.log("is current dispatched? ", isCurrentTransactionDispatched);
+      // // trigger loading spin on top right
+      // if (isCurrentTransactionDispatched == 0) {
+      //   dispatch({
+      //     type: "transaction/addTransaction",
+      //     payload: {
+      //       transactions: [...transactions, status.hash]
+      //     }
+      //   })
+      // }
 
-    console.log("test test see how many times setInterval is called");
-    const checkStatusAndFinish = async () => {
-      await library.getTransactionReceipt(status.hash).then(async receipt => {
-        console.log("receipt ", receipt);
+      // const pastTransaction = JSON.parse(localStorage.getItem("transactions"));
+      // pastTransaction.push(status.hash);
+      // localStorage.setItem("transactions", JSON.stringify(pastTransaction));
 
-        if (!receipt) {
-          setTimeout(checkStatusAndFinish, 500);
-        } else {
-          let transactionTime;
-          console.log("got receipt here");
-          props.onGetReceipt(receipt.transactionHash);
-          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
-            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
-            console.log("test transactionTime: ", transactionTime)
-          });
+      console.log("test test see how many times setInterval is called");
+      const checkStatusAndFinish = async () => {
+        await library.getTransactionReceipt(status.hash).then(async receipt => {
+          console.log("receipt ", receipt);
 
-          // update backend userPool record
-          console.log("test pair to add on server", pairToAddOnServer);
-          if (pairToAddOnServer) {
-            const { token0, token1 } = pairToAddOnServer;
-            axios.post(
-              // fetch valid pool list from remote
-              `https://api.acy.finance/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
-              // `http://localhost:3001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
-            ).then(res => {
-              console.log("add to server return: ", res);
+          if (!receipt) {
+            setTimeout(checkStatusAndFinish, 500);
+          } else {
+            // update backend userPool record
+            console.log("test pair to add on server", pairToAddOnServer);
+            if (pairToAddOnServer) {
+              const { token0, token1 } = pairToAddOnServer;
+              axios.post(
+                // fetch valid pool list from remote
+                `https://api.acy.finance/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
+                // `http://localhost:3001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
+              ).then(res => {
+                console.log("add to server return: ", res);
 
-              // refresh the table
-              dispatch({
-                type: "liquidity/setRefreshTable",
-                payload: true,
-              });
+                // refresh the table
+                dispatch({
+                  type: "liquidity/setRefreshTable",
+                  payload: true,
+                });
 
-            }).catch(e => console.log("error: ", e));
-          }
-
-          // clear top right loading spin
-          const newData = transactions.filter(item => item.hash != status.hash);
-
-          dispatch({
-            type: "transaction/addTransaction",
-            payload: {
-              transactions: newData
+              }).catch(e => console.log("error: ", e));
             }
-          });
 
-          // disable button after each transaction on default, enable it after re-entering amount to add
-          console.log(buttonContent);
-          setButtonContent("Done");
+            // clear top right loading spin
+            const newData = transactions.filter(item => item.hash != status.hash);
 
-          // store to localStorage
-        }
-      })
-    };
-    // const sti = setInterval(, 500);
-    checkStatusAndFinish();
+            dispatch({
+              type: "transaction/addTransaction",
+              payload: {
+                transactions: newData
+              }
+            });
+
+            // disable button after each transaction on default, enable it after re-entering amount to add
+            console.log(buttonContent);
+            setButtonContent("Done");
+
+            // store to localStorage
+          }
+        })
+      };
+      // const sti = setInterval(, 500);
+      checkStatusAndFinish();
+    } catch (e) {
+      console.log("swap callback error", e)
+    }
   };
 
   // link to liquidity position table
