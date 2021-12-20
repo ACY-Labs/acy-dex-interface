@@ -106,9 +106,9 @@ const SwapComponent = props => {
   const [token1Balance, setToken1Balance] = useState('0');
 
   // 交易对前置货币兑换量
-  const [token0Amount, setToken0Amount] = useState();
+  const [token0Amount, setToken0Amount] = useState('');
   // 交易对后置货币兑换量
-  const [token1Amount, setToken1Amount] = useState();
+  const [token1Amount, setToken1Amount] = useState('');
   // 交易中用户使用Flash Arbitrage的额外获利
   const [bonus0, setBonus0] = useState(null);
   const [bonus1, setBonus1] = useState(null);
@@ -153,6 +153,8 @@ const SwapComponent = props => {
   const [midTokenAddress, setMidTokenAddress] = useState();
   const [poolExist, setPoolExist] = useState(true);
 
+  const [showDescription, setShowDescription] = useState(false);
+
   // connect to page model, reflect changes of pair ratio in this component
   useEffect(() => {
     const { swap: { token0: modelToken0, token1: modelToken1 } } = props;
@@ -196,14 +198,15 @@ const SwapComponent = props => {
 
 
   // token1Amount is changed according to token0Amount
-  const t0Changed = useCallback(
-    async () => {
+  const t0Changed = 
+    async (e) => {
       if (!token0 || !token1) return;
       if (!exactIn) return;
+      console.log("passed in t0 amount", e)
       await swapGetEstimated(
         {
           ...token0,
-          amount: token0Amount,
+          amount: e,
         },
         {
           ...token1,
@@ -238,24 +241,15 @@ const SwapComponent = props => {
         setMidTokenAddress,
         setPoolExist
       );
-    },
-    [
-      token0,
-      token1,
-      token0Amount,
-      token1Amount,
-      slippageTolerance,
-      exactIn,
-      chainId,
-      library,
-      account,
-    ]
-  );
+    }
+
   // token0Amount is changed according to token1Amount
-  const t1Changed = useCallback(
-    async () => {
+  const t1Changed = 
+    async (e) => {
+      console.log("t1changed")
       if (!token0 || !token1) return;
       if (exactIn) return;
+      console.log("t1changed entered", token0Amount, token1Amount)
       await swapGetEstimated(
         {
           ...token0,
@@ -263,7 +257,7 @@ const SwapComponent = props => {
         },
         {
           ...token1,
-          amount: token1Amount,
+          amount: e,
         },
         slippageTolerance * 100,
         exactIn,
@@ -294,12 +288,15 @@ const SwapComponent = props => {
         setMidTokenAddress,
         setPoolExist
       );
+    }
+
+  useEffect(
+    async () => {
+      await t0Changed(token0Amount);
     },
     [
       token0,
       token1,
-      token0Amount,
-      token1Amount,
       slippageTolerance,
       exactIn,
       chainId,
@@ -308,30 +305,12 @@ const SwapComponent = props => {
     ]
   );
   useEffect(
-    () => {
-      t0Changed();
+    async () => {
+      await t1Changed(token1Amount);
     },
     [
       token0,
       token1,
-      token0Amount,
-      token1Amount,
-      slippageTolerance,
-      exactIn,
-      chainId,
-      library,
-      account,
-    ]
-  );
-  useEffect(
-    () => {
-      t1Changed();
-    },
-    [
-      token0,
-      token1,
-      token0Amount,
-      token1Amount,
       slippageTolerance,
       exactIn,
       chainId,
@@ -345,9 +324,6 @@ const SwapComponent = props => {
       if (account == undefined) {
         setSwapButtonState(false);
         setSwapButtonContent('Connect to Wallet');
-      } else {
-        setSwapButtonState(false);
-        setSwapButtonContent('Choose tokens and amount');
       }
     },
     [account]
@@ -458,6 +434,7 @@ const SwapComponent = props => {
   }, [props.transaction.transactions]);
 
   useEffect(() => console.log("test slippage: ", slippageTolerance), [slippageTolerance]);
+
   return (
     <div className={styles.sc}>
       <AcyCuarrencyCard
@@ -475,8 +452,11 @@ const SwapComponent = props => {
           setBefore(true);
         }}
         onChangeToken={e => {
+          setShowDescription(true);
           setToken0Amount(e);
           setExactIn(true);
+          console.log("current t0 amount", e)
+          t0Changed(e);
         }}
       />
 
@@ -505,14 +485,17 @@ const SwapComponent = props => {
         }}
         onChangeToken={e => {
           // setToken1ApproxAmount(e);
+          setShowDescription(true)
           setToken1Amount(e);
           setExactIn(false);
           console.log("test exactin and bonus1", exactIn, bonus0)
+          console.log("current token1amount", e)
+          t1Changed(e);
         }}
         isLocked={isLockedToken1}
       />
 
-      <AcyDescriptions>
+      {showDescription ? <AcyDescriptions>
         <div className={styles.breakdownTopContainer}>
           <div className={styles.slippageContainer}>
             <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
@@ -579,6 +562,7 @@ const SwapComponent = props => {
               ))}
             </div> */}
       </AcyDescriptions>
+      : null}
 
       {needApprove
         ? <div>
