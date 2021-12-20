@@ -5,6 +5,11 @@ export async function fetchTotalValueSwapped(account){
       let request = `https://api.acy.finance/api/users/stats?address=${account}`;
       let response = await fetch(request);
       let data = await response.json();
+    
+      // user does not exist
+      if (data.data === null) {
+        return "$0"
+      }
 
       // get totalValueSwapped
       let totalValueSwapped = data.data.totalswappedvalue; 
@@ -29,6 +34,10 @@ export async function fetchTotalFeesPaid(account){
       let response = await fetch(request);
       let data = await response.json();
 
+      if (data.data === null) {
+        return "$0"
+      }
+    
       // get totalFeesPaid 
       let totalFeesPaid = data.data.totalfeespaid; 
       let totalFeesPaidStr;
@@ -52,6 +61,10 @@ export async function fetchTotalTransactions(account){
       let response = await fetch(request);
       let data = await response.json();
 
+      if (data.data === null) {
+        return "0"
+      }
+    
       // get totalTransactions (dummy data)
       let totalFeesPaid = data.data.totaltransactions; 
       let totalTransactionsStr;
@@ -76,6 +89,10 @@ export async function fetchLiqudityIncludingFees(account) {
     let response = await fetch(request);
     let data = await response.json();
 
+    if (data.data === null) {
+      return "$0"
+    }
+    
     // get liquidityIncludingFees (dummy data)
     let liquidityIncludingFees = 0; 
     let liquidityIncludingFeesStr;
