@@ -5,14 +5,14 @@ export async function fetchTotalValueSwapped(account){
       let request = `https://api.acy.finance/api/users/stats?address=${account}`;
       let response = await fetch(request);
       let data = await response.json();
-    
+      console.log(data.data)
       // user does not exist
       if (data.data === null) {
         return "$0"
       }
 
       // get totalValueSwapped
-      let totalValueSwapped = data.data.totalswappedvalue; 
+      let totalValueSwapped = data.data.totalSwappedValue; 
       let totalValueSwappedStr;
       if (totalValueSwapped >= 1000000) {
         totalValueSwappedStr = `$${(totalValueSwapped / 1000000).toFixed(2)}mil`;
@@ -39,7 +39,7 @@ export async function fetchTotalFeesPaid(account){
       }
     
       // get totalFeesPaid 
-      let totalFeesPaid = data.data.totalfeespaid; 
+      let totalFeesPaid = data.data.totalFeesPaid; 
       let totalFeesPaidStr;
       if (totalFeesPaid >= 1000000) {
         totalFeesPaidStr = `$${(totalFeesPaid / 1000000).toFixed(2)}mil`;
@@ -64,16 +64,15 @@ export async function fetchTotalTransactions(account){
       if (data.data === null) {
         return "0"
       }
-    
       // get totalTransactions (dummy data)
-      let totalFeesPaid = data.data.totaltransactions; 
+      let totalTransactions = data.data.totalTransactions; 
       let totalTransactionsStr;
       if (totalTransactions >= 1000000) {
-        totalTransactionsStr = `$${(totalTransactions / 1000000).toFixed(2)}mil`;
+        totalTransactionsStr = `${(totalTransactions / 1000000).toFixed(2)}mil`;
       } else if (totalTransactions >= 1000) {
-        totalTransactionsStr = `$${(totalTransactions / 1000).toFixed(2)}k`;
+        totalTransactionsStr = `${(totalTransactions / 1000).toFixed(2)}k`;
       } else {
-        totalTransactionsStr = `$${(totalTransactions).toFixed(2)}`;
+        totalTransactionsStr = `${(totalTransactions)}`;
       }
       return totalTransactionsStr;
     }catch (e){

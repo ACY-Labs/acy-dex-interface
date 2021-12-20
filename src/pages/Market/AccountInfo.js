@@ -630,7 +630,6 @@ function AccountInfo(props) {
       const valueSum = tokenPrice[newData.token0Symbol] * newData.token0Amount +   tokenPrice[newData.token1Symbol] * newData.token1Amount;
       setOwn(prev => (prev + valueSum));
 
-
       console.log("userLPShares is updated: ", newData);
 
       setUserLPShares(prev => ({ ...prev, [pair.liquidityToken.address]: newData }));
@@ -681,6 +680,19 @@ function AccountInfo(props) {
     },
     [chainId, library, account, userLPHandlers]
   );
+
+  // Formatter for liquidity including fees
+  const formatString = (value) => {
+    let formattedStr;
+    if (value >= 1000000) {
+      formattedStr = `$${(value / 1000000).toFixed(2)}mil`;
+    } else if (value >= 1000) {
+      formattedStr = `$${(value / 1000).toFixed(2)}k`;
+    } else {
+      formattedStr = `$${(value).toFixed(2)}`;
+    }
+    return formattedStr;
+  }
 
   return (
 
@@ -776,7 +788,7 @@ function AccountInfo(props) {
                 : positionValue === 0
                 ? formattedNum(userLiquidityOwn, true)
                 : '-'} */}
-                {liquidityIncludingFees}
+                {formatString(userLiquidityOwn)}
             </div>
           </div>
           <div style={{ width: 20 }} />
