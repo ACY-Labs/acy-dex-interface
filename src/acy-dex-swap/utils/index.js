@@ -5,13 +5,14 @@ import { AddressZero, MaxUint256 } from '@ethersproject/constants';
 import { BigNumber } from '@ethersproject/bignumber';
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import { Interface } from '@ethersproject/abi';
-import { JSBI, Token, TokenAmount, Percent, ETHER, CurrencyAmount } from '@acyswap/sdk';
+import { JSBI, Token, TokenAmount, Percent, ETHER, CurrencyAmount, Fetcher, Pair } from '@acyswap/sdk';
 import ACYRouterABI from '../abis/AcyV1Router02.json';
 import FlashArbitrageABI from '../abis/AcyV1FlashArbitrage.json';
 import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import ERC20ABI from '../abis/ERC20.json';
 import tokenList from '@/constants/TokenList';
 import axios from 'axios';
+
 export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
 export const ROUTER_ADDRESS = '0x4DCa8E42634abdE1925ebB7f82AC29Ea00d34bA2';
@@ -423,12 +424,12 @@ export function getTokenPrice(symbol) {
   if (!token) return 0;
   axios.get("https://api.coingecko.com/api/v3/simple/price?ids=shiba-inu&vs_currencies=usd")
 }
-export async function getAllSuportedTokensPrice() {
+export async function getAllSuportedTokensPrice(library) {
   const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
   const searchIds = searchIdsArray.join('%2C');
   const tokensPrice = await axios.get(
     `https://api.coingecko.com/api/v3/simple/price?ids=${searchIds}&vs_currencies=usd`
-  ).then(result => {
+  ).then(async (result) => {
     const data = result.data;
     console.log("tokensPrice:",data);
     const tokensPrice = {};
@@ -436,6 +437,39 @@ export async function getAllSuportedTokensPrice() {
       tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
     })
     tokensPrice['ACY'] = 0.2;//dont know acy price now;
+    const pair = await Fetcher.fetchPairData(tokenList.find(token => token.symbol == "ACY").address, tokenList.find(token => token.symbol == "USDT").address, library).catch(e => {
+      return new CustomError(
+        `POOL NOT EXIST`
+      );
+    });
+    if (pair instanceof CustomError) {
+      tokensPrice['ACY'] = 0.2;//
+    } else {
+      const pair_contract = getPairContract(pair.liquidityToken.address, library, account)
+      const totalSupply = await pair_contract.totalSupply();
+      const totalAmount = new TokenAmount(pair.liquidityToken, totalSupply.toString());
+      const allToken0 = pair.getLiquidityValue(
+          pair.token0,
+          totalAmount,
+          totalAmount,
+          false
+      );
+      const allToken1 = pair.getLiquidityValue(
+          pair.token1,
+          totalAmount,
+          totalAmount,
+          false
+      );
+      const allToken0Amount = parseFloat(allToken0.toExact());
+      const allToken1Amount = parseFloat(allToken1.toExact());
+      if(pair.token0.symbol == "ACY") {
+        tokensPrice['ACY'] = allToken1Amount / allToken0Amount ;
+      } else {
+        tokensPrice['ACY'] = allToken0Amount / allToken1Amount ;
+      }
+    }
+    
+
     return tokensPrice;
   });
   return tokensPrice;

@@ -249,19 +249,19 @@ const FarmsTableRow = props => {
   };
 
   const harvestCallback = status => {
-    const {
-      transaction: { transactions },
-    } = props;
-    // 检查是否已经包含此交易
-    const transLength = transactions.filter(item => item.hash == status.hash).length;
-    if (transLength == 0) {
-      dispatch({
-        type: 'transaction/addTransaction',
-        payload: {
-          transactions: [...transactions, status.hash],
-        },
-      });
-    }
+    // const {
+    //   transaction: { transactions },
+    // } = props;
+    // // 检查是否已经包含此交易
+    // const transLength = transactions.filter(item => item.hash == status.hash).length;
+    // if (transLength == 0) {
+    //   dispatch({
+    //     type: 'transaction/addTransaction',
+    //     payload: {
+    //       transactions: [...transactions, status.hash],
+    //     },
+    //   });
+    // }
     const sti = async (hash) => {
       library.getTransactionReceipt(hash).then(async receipt => {
         console.log(`receiptreceipt for ${hash}: `, receipt);
@@ -270,20 +270,28 @@ const FarmsTableRow = props => {
           setTimeout(sti(hash), 500);
         else {
           
-          const newData = transactions.filter(item => item.hash != hash);
+          // const newData = transactions.filter(item => item.hash != hash);
 
-          props.onGetReceipt(receipt.transactionHash, library, account);
+          // props.onGetReceipt(receipt.transactionHash, library, account);
 
-          dispatch({
-            type: 'transaction/addTransaction',
-            payload: {
-              transactions: newData
-            },
-          });
-          await refreshPool(poolInfo.poolId,poolInfo.index);
+          // dispatch({
+          //   type: 'transaction/addTransaction',
+          //   payload: {
+          //     transactions: newData
+          //   },
+          // });
+          await axios.get(
+            // fetch valid pool list from remote
+            `${API_URL}/farm/updatePool?poolId=${poolInfo.poolId}`
+            //change to to production
+            //`http://api.acy.finance/api/updatePool?poolId=${poolId}`
+          ).then( async (res) => {
+            await refreshPoolInfo();
+            setHarvestButtonText("Done");
+            hideHarvestModal();
+          }).catch(e => console.log("error: ", e));
           // set button to done and disabled on default
-          setHarvestButtonText("Done");
-          hideHarvestModal();
+          
         }
       });
     }
@@ -292,42 +300,50 @@ const FarmsTableRow = props => {
 
   const withdrawCallback = status => {
 
-    const {
-      transaction: { transactions },
-    } = props;
-    // 检查是否已经包含此交易
-    const transLength = transactions.filter(item => item.hash == status.hash).length;
-    if (transLength == 0) {
-      dispatch({
-        type: 'transaction/addTransaction',
-        payload: {
-          transactions: [...transactions, status.hash],
-        },
-      });
-    }
+    // const {
+    //   transaction: { transactions },
+    // } = props;
+    // // 检查是否已经包含此交易
+    // const transLength = transactions.filter(item => item.hash == status.hash).length;
+    // if (transLength == 0) {
+    //   dispatch({
+    //     type: 'transaction/addTransaction',
+    //     payload: {
+    //       transactions: [...transactions, status.hash],
+    //     },
+    //   });
+    // }
     const sti = async (hash) => {
       library.getTransactionReceipt(hash).then(async receipt => {
-        console.log(`receiptreceipt for ${hash}: `, receipt);
+        // console.log(`receiptreceipt for ${hash}: `, receipt);
         // receipt is not null when transaction is done
         if (!receipt) 
           setTimeout(sti(hash), 500);
         else {
           
-          const newData = transactions.filter(item => item.hash != hash);
+          // const newData = transactions.filter(item => item.hash != hash);
 
-          props.onGetReceipt(receipt.transactionHash, library, account);
+          // props.onGetReceipt(receipt.transactionHash, library, account);
 
-          dispatch({
-            type: 'transaction/addTransaction',
-            payload: {
-              transactions: newData
-            },
-          });
+          // dispatch({
+          //   type: 'transaction/addTransaction',
+          //   payload: {
+          //     transactions: newData
+          //   },
+          // });
           // await refreshPoolInfo();
-          await refreshPool(poolInfo.poolId,poolInfo.index);
+          await axios.get(
+            // fetch valid pool list from remote
+            `${API_URL}/farm/updatePool?poolId=${poolInfo.poolId}`
+            //change to to production
+            //`http://api.acy.finance/api/updatePool?poolId=${poolId}`
+          ).then(async (res) => {
+            await refreshPoolInfo();
+            setWithdrawButtonText("Done");
+            hideWithdrawModal();
+          }).catch(e => console.log("error: ", e));
           // set button to done and disabled on default
-          setWithdrawButtonText("Done");
-          hideWithdrawModal();
+          
         }
       });
     }

@@ -177,7 +177,7 @@ const getPool = async (library, account, poolId)=> {
   const poolInfo = await contract.poolInfo(poolId);
   const rewardTokens = await contract.getPoolRewardTokens(poolId);
   const rewardTokensAddresses = await contract.getPoolRewardTokenAddresses(poolId);
-  const tokenPrice = await getAllSuportedTokensPrice();
+  const tokenPrice = await getAllSuportedTokensPrice(library);
 
   // retrieve reward tokens symbol.
   const rewardTokensSymbolsRequests = [];
@@ -355,7 +355,7 @@ const newGetPoolByFarm = async (farm, library, account) => {
     const farmContract = getFarmsContract(library, account);
     const numPools = await farmContract.numPools();
     console.log("HERE TEST:",numPools);
-    const tokenPrice = await getAllSuportedTokensPrice();
+    const tokenPrice = await getAllSuportedTokensPrice(library);
     
     const poolTokenRewardInfoPromise = []; 
     const amountCol = [];

@@ -586,7 +586,7 @@ function AccountInfo(props) {
 
       const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
 
-      const tokenPrice = await getAllSuportedTokensPrice();
+      const tokenPrice = await getAllSuportedTokensPrice(library);
 
       // console.log(tokenPrice['ETH']);
       const token0Deposited = pair.getLiquidityValue(

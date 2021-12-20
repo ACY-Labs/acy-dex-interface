@@ -206,17 +206,17 @@ const StakeModal = props => {
   ));
 
   const stakeCallback = status => {
-    const transactions = props.transaction.transactions;
-    const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
-    //trigger loading spin on top right
-    if (isCurrentTransactionDispatched == 0) {
-      dispatch({
-        type: "transaction/addTransaction",
-        payload: {
-          transactions: [...transactions, { hash: status.hash }]
-        }
-      })
-    }
+    // const transactions = props.transaction.transactions;
+    // const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
+    // //trigger loading spin on top right
+    // if (isCurrentTransactionDispatched == 0) {
+    //   dispatch({
+    //     type: "transaction/addTransaction",
+    //     payload: {
+    //       transactions: [...transactions, { hash: status.hash }]
+    //     }
+    //   })
+    // }
 
     const checkStatusAndFinish = async () => {
       await library.getTransactionReceipt(status.hash).then(async receipt => {
@@ -225,33 +225,36 @@ const StakeModal = props => {
         if (!receipt) {
           setTimeout(checkStatusAndFinish, 500);
         } else {
-          let transactionTime;
-          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
-            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
-            console.log("test transactionTime: ", transactionTime)
-          });
+          // let transactionTime;
+          // await library.getBlock(receipt.logs[0].blockNumber).then(res => {
+          //   transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
+          //   console.log("test transactionTime: ", transactionTime)
+          // });
           //refresh poold info
           await axios.get(
             // fetch valid pool list from remote
             `${API_URL}/farm/updatePool?poolId=${poolId}`
             //change to to production
             //`http://api.acy.finance/api/updatePool?poolId=${poolId}`
-          ).then(res => {
-            console.log("update pool on server return: ", res);
+          ).then( async (res) => {
+            await refreshPoolInfo();
+            setButtonText("Done");
+            setButtonStatus(true);
+            onCancel();
           }).catch(e => console.log("error: ", e));
 
-          await refreshPoolInfo();
+          
           // clear top right loading spin
-          const newData = transactions.filter(item => item.hash != status.hash);
-          dispatch({
-            type: "transaction/addTransaction",
-            payload: {
-              transactions: [
-                ...newData,
-                { hash: status.hash, transactionTime }
-              ]
-            }
-          });
+          // const newData = transactions.filter(item => item.hash != status.hash);
+          // dispatch({
+          //   type: "transaction/addTransaction",
+          //   payload: {
+          //     transactions: [
+          //       ...newData,
+          //       { hash: status.hash, transactionTime }
+          //     ]
+          //   }
+          // });
 
           // refresh the table
           // dispatch({
@@ -260,9 +263,7 @@ const StakeModal = props => {
           // });
 
           // disable button after each transaction on default, enable it after re-entering amount to add
-          setButtonText("Done");
-          setButtonStatus(true);
-          onCancel();
+          
           // store to localStorage
         }
       })
@@ -272,19 +273,19 @@ const StakeModal = props => {
   };
 
   const approveCallback = status => {
-    console.log("approveCallback test status:", status);
-    const transactions = props.transaction.transactions;
-    const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
-    console.log("is current dispatched? ", isCurrentTransactionDispatched);
-    //trigger loading spin on top right
-    if (isCurrentTransactionDispatched == 0) {
-      dispatch({
-        type: "transaction/addTransaction",
-        payload: {
-          transactions: [...transactions, { hash: status.hash }]
-        }
-      })
-    }
+    // console.log("approveCallback test status:", status);
+    // const transactions = props.transaction.transactions;
+    // const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
+    // console.log("is current dispatched? ", isCurrentTransactionDispatched);
+    // //trigger loading spin on top right
+    // if (isCurrentTransactionDispatched == 0) {
+    //   dispatch({
+    //     type: "transaction/addTransaction",
+    //     payload: {
+    //       transactions: [...transactions, { hash: status.hash }]
+    //     }
+    //   })
+    // }
 
     console.log("test test see how many times setInterval is called");
     const checkStatusAndFinish = async () => {
@@ -294,23 +295,23 @@ const StakeModal = props => {
         if (!receipt) {
           setTimeout(checkStatusAndFinish, 500);
         } else {
-          let transactionTime;
-          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
-            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
-            console.log("test transactionTime: ", transactionTime)
-          });
+          // let transactionTime;
+          // await library.getBlock(receipt.logs[0].blockNumber).then(res => {
+          //   transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
+          //   console.log("test transactionTime: ", transactionTime)
+          // });
 
           // clear top right loading spin
-          const newData = transactions.filter(item => item.hash != status.hash);
-          dispatch({
-            type: "transaction/addTransaction",
-            payload: {
-              transactions: [
-                ...newData,
-                { hash: status.hash, transactionTime }
-              ]
-            }
-          });
+          // const newData = transactions.filter(item => item.hash != status.hash);
+          // dispatch({
+          //   type: "transaction/addTransaction",
+          //   payload: {
+          //     transactions: [
+          //       ...newData,
+          //       { hash: status.hash, transactionTime }
+          //     ]
+          //   }
+          // });
 
           // refresh the table
           // dispatch({
