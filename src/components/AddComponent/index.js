@@ -34,7 +34,6 @@ import styles from './styles.less';
 import { sortAddress } from '@/utils/utils';
 
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import {
@@ -80,6 +79,10 @@ import { getEstimated, addLiquidity } from '@/acy-dex-swap/core/addLiquidity';
 import spinner from '@/assets/loading.svg';
 import { Icon } from "antd";
 import moment from 'moment';
+
+import {
+  binance,
+} from '@/connectors';
 
 const { AcyTabPane } = AcyTabs;
 
@@ -136,7 +139,7 @@ const AddLiquidityComponent = props => {
 
   let [liquidityBreakdown, setLiquidityBreakdown] = useState();
   let [buttonContent, setButtonContent] = useState('Connect to wallet');
-  let [buttonStatus, setButtonStatus] = useState(true);
+  let [buttonStatus, setButtonStatus] = useState(false);
   let [liquidityStatus, setLiquidityStatus] = useState();
 
   let [pair, setPair] = useState();
@@ -174,15 +177,10 @@ const AddLiquidityComponent = props => {
 
   // 连接钱包函数
   const { account, chainId, library, activate } = useWeb3React();
-  // 连接钱包时支持的货币id
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
-  });
 
   // 初始化函数时连接钱包
   useEffect(
-    () => {
-      activate(injected);
+    () => {   
       //read the fav tokens code in storage
       var tokens_symbol = JSON.parse(localStorage.getItem('tokens_symbol'));
       //set to fav token
@@ -333,7 +331,7 @@ const AddLiquidityComponent = props => {
   useEffect(
     () => {
       if (account == undefined) {
-        setButtonStatus(true);
+        setButtonStatus(false);
         setButtonContent('Connect to Wallet');
       } else {
         setButtonContent('Choose tokens and amount');
@@ -364,7 +362,7 @@ const AddLiquidityComponent = props => {
   };
 
   const ConnectWallet = () => {
-    activate(injected);
+    activate(binance);
   };
 
   useEffect(
@@ -446,6 +444,8 @@ const AddLiquidityComponent = props => {
           setTimeout(checkStatusAndFinish, 500);
         } else {
           let transactionTime;
+          console.log("got receipt here");
+          props.onGetReceipt(receipt.transactionHash);
           await library.getBlock(receipt.logs[0].blockNumber).then(res => {
             transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
             console.log("test transactionTime: ", transactionTime)
@@ -473,13 +473,11 @@ const AddLiquidityComponent = props => {
 
           // clear top right loading spin
           const newData = transactions.filter(item => item.hash != status.hash);
+
           dispatch({
             type: "transaction/addTransaction",
             payload: {
-              transactions: [
-                ...newData,
-                { hash: status.hash, transactionTime }
-              ]
+              transactions: newData
             }
           });
 
@@ -536,6 +534,7 @@ const AddLiquidityComponent = props => {
               yuan="566.228"
               dollar={`${token0Balance}`}
               token={token0Amount}
+              showBalance={token1BalanceShow}
               onChoseToken={async () => {
                 onClickCoin();
                 setBefore(true);
@@ -559,6 +558,7 @@ const AddLiquidityComponent = props => {
               yuan="566.228"
               dollar={`${token1Balance}`}
               token={token1Amount}
+              showBalance={token1BalanceShow}
               onChoseToken={async () => {
                 onClickCoin();
                 setBefore(false);
@@ -775,7 +775,7 @@ const AddLiquidityComponent = props => {
                     disabled={!buttonStatus}
                     onClick={async () => {
                       if (account == undefined) {
-                        activate(injected);
+                        activate(binance);
                         setButtonContent('Choose tokens and amount');
                         setButtonStatus(false);
                       } else {

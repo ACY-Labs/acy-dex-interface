@@ -3,7 +3,7 @@ import { Col, Icon, Row } from 'antd';
 import React, { Component, useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
+import { binance } from '@/connectors';
 import {
   fetchGeneralPoolInfoDay,
   fetchGeneralTokenInfo,
@@ -53,33 +53,37 @@ const MarketIndex = props => {
   const { account, chainId, library, activate } = useWeb3React();
 
   // connect to provider, listen for wallet to connect
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
-  });
+ 
   useEffect(() => {
-    activate(injected);
+    if(!account){
+      activate(binance);
+    }
   }, []);
 
   useEffect(() => {
     // fetch transaction data
-    if(library)fetchGlobalTransaction(library).then(globalTransactions => {
-      console.log(globalTransactions);
-      settransactions(globalTransactions);
-    });
+    if(library) {
+      fetchGlobalTransaction(library).then(globalTransactions => {
+        console.log('globaltransaction', globalTransactions);
+        if(globalTransactions) settransactions(globalTransactions);
+      });
+    }
   }, [library]);
 
   useEffect(() => {
     fetchGeneralPoolInfoDay().then(poolInfo => {
-      setpoolInfo ( poolInfo );
+      if(poolInfo) setpoolInfo ( poolInfo );
     });
 
     // fetch token info
     fetchGeneralTokenInfo().then(tokenInfo => {
-      settokenInfo(tokenInfo);
+      if(tokenInfo) settokenInfo(tokenInfo);
     });
 
     // fetch market data
     fetchMarketData().then(dataDict => {
+
+      if(dataDict){
       let volumeChange =
         (dataDict.volume24h[dataDict.tvl.length - 1][1] -
           dataDict.volume24h[dataDict.tvl.length - 2][1]) /
@@ -100,7 +104,7 @@ const MarketIndex = props => {
       setselectedIndexLine(dataDict.tvl.length - 1);
       setselectedDataLine(abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]));
       setselectedIndexBar(dataDict.volume24h.length - 1);
-      setselectedDataBar(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));
+      setselectedDataBar(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));}
     });
   }, []);
 
@@ -211,7 +215,7 @@ const MarketIndex = props => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <h2>Top Tokens</h2>
         <h3>
-          <Link style={{ color: '#b5b5b6' }} to="/market/list/token">
+          <Link style={{ color: '#b5b5b6' }} /*to="/market/list/token"*/>
             Explore
           </Link>
         </h3>
@@ -225,7 +229,7 @@ const MarketIndex = props => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <h2>Top Pools</h2>
         <h3>
-          <Link style={{ color: '#b5b5b6' }} to="/market/list/pool">
+          <Link style={{ color: '#b5b5b6' }} /*to="/market/list/pool"*/>
             Explore
           </Link>
         </h3>
@@ -238,10 +242,10 @@ const MarketIndex = props => {
       )}
 
       <h2>Transactions</h2>
-      {transactions.length > 0 ? (
-        <TransactionTable dataSourceTransaction={transactions} />
-      ) : (
+      {account && transactions.length <= 0 ? (
         <Icon type="loading" />
+      ) : (
+        <TransactionTable dataSourceTransaction={transactions} />
       )}
       <div style={{ height: '20px' }} />
     </div>

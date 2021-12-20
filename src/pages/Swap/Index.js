@@ -1,5 +1,5 @@
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
+import { binance } from '@/connectors';
 import React, { Component, useState, useEffect, useRef } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { connect } from 'umi';
@@ -128,15 +128,17 @@ const Swap = props => {
   refContainer.current = transactionList;
 
   // connect to provider, listen for wallet to connect
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
-  });
+
   useEffect(() => {
-    activate(injected);
-  }, []);
+    if(!account){
+      activate(binance);
+    }
+    console.log("parent page account", account)
+  }, [account])
 
   useEffect(() => {
     getTransactionsByAccount(account,library,'SWAP').then(data =>{
+      console.log("found this tx dataa::::::", data);
       setTransactionList(data);
       if(account) setTableLoading(false);
     })
@@ -204,6 +206,13 @@ const Swap = props => {
   //get chart data the interval is 5 min
 
   useEffect(() => {
+    dispatch({
+      type: "swap/updateTokens",
+      payload: {
+        token0: activeToken0,
+        token1: activeToken1
+      }
+    });
     const dayLength = 24*60/5;
     // const dayLength = 5;
     let reverseFlag = false;
@@ -221,7 +230,7 @@ const Swap = props => {
     console.log(A,B);
     console.log("fetching the swap Rate data!!!!!!!!!!!!!!!!");
     axios.get(
-      "http://localhost:3001/api/chart/getRate", {params : {token0 : A , token1 : B}}
+      "https://api.acy.finance/api/chart/getRate", {params : {token0 : A , token1 : B}}
     ).then(res => {
       console.log(res.data);
       if(res.data){
@@ -232,7 +241,7 @@ const Swap = props => {
       var options = { weekday: 'long'};
       setActiveRate(new Intl.DateTimeFormat('en-US', options).format(date));
 
-      for (let i = historyData.length - 5 ; i < historyData.length; i++) {
+      for (let i = 0; i < historyData.length; i++) {
   
         while(i < 0) i++;
         const element = historyData[i];
@@ -284,13 +293,14 @@ const Swap = props => {
   // workaround way to get USD price (put token1 as USDC)
   // NEEDS ETHEREUM ADDRESS, RINKEBY DOES NOT WORK HERE
   const getRoutePrice = (token0Address, token1Address) => {
+    if(!token0Address || !token1Address) return;    
+
     axios
       .post(
         `https://api.acy.finance/api/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
       )
       .then(data => {
         console.log(data);
-
         // const { swaps } = data.data.data;
         // const lastDataPoint = swaps[swaps.length - 1];
         // console.log('ROUTE PRICE POINT', lastDataPoint);
@@ -532,8 +542,8 @@ const Swap = props => {
 
                 </div>
               </div>
-            </StyledCard>
-          </div>
+            </StyledCard> 
+          </div> 
 
           <div className={`${styles.colItem} ${styles.swapComponent}`} >
             <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>

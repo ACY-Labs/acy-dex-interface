@@ -1,3 +1,4 @@
+import {scanUrlPrefix} from "@/constants/configs"
 import { AcyIcon, AcyTabs, AcyTokenIcon } from '@/components/Acy';
 import className from 'classnames';
 import { Divider, Icon, Input, Table } from 'antd';
@@ -101,7 +102,7 @@ export class SmallTable extends React.Component {
     if (this.state.mode == 'token') {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyTokenIcon symbol={entry.short} width={20} />
+          <AcyTokenIcon logoURL={entry.logoURL} width={20} />
           <Link
             style={{ color: 'white' }}
             className={styles.coinName}
@@ -275,7 +276,7 @@ export function TokenTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableHeader}>
-              <AcyTokenIcon symbol={entry.short} />
+              <AcyTokenIcon symbol={entry.logoURL} />
               <Link
                 style={{ color: 'white' }}
                 className={styles.coinName}
@@ -417,9 +418,9 @@ export function TokenTable(props) {
         marginBottom: '20px',
         cursor: isHover ? 'pointer' : 'default',
       }}
-      onRowClick={(record, index, event) => {
-        navHistory.push(`/market/info/token/${record.address}`);
-      }}
+      // onRowClick={(record, index, event) => {
+      //   navHistory.push(`/market/info/token/${record.address}`);
+      // }}
       onRowMouseEnter={() => setIsHover(true)}
       onRowMouseLeave={() => setIsHover(false)}
       footer={() => (
@@ -497,8 +498,8 @@ export function PoolTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableHeader}>
-              <AcyTokenIcon symbol={entry.coin1} />
-              <AcyTokenIcon symbol={entry.coin2} />
+              <AcyTokenIcon symbol={entry.logoURL1} />
+              <AcyTokenIcon symbol={entry.logoURL2} />
               <Link
                 style={{ color: 'white' }}
                 to={`/market/info/pool/${entry.address}`}
@@ -608,9 +609,9 @@ export function PoolTable(props) {
       pagination={false}
       onRowMouseEnter={() => setIsHover(true)}
       onRowMouseLeave={() => setIsHover(false)}
-      onRowClick={(record, index, event) => {
-        navHistory.push(`/market/info/pool/${record.address}`);
-      }}
+      // onRowClick={(record, index, event) => {
+      //   navHistory.push(`/market/info/pool/${record.address}`);
+      // }}
       style={{
         marginBottom: '20px',
         cursor: isHover ? 'pointer' : 'default',
@@ -697,9 +698,9 @@ export function TransactionTable(props) {
             <div
               className={className(styles.tableDataFirstColumn, styles.transactionLink)}
               style={{ fontWeight: 600 }}
-              onClick={() => openInNewTab(`https://etherscan.io/tx/${entry.transactionID}`)}
+              onClick={() => openInNewTab(`${scanUrlPrefix}/tx/${entry.transactionID}`)}
             >
-              {entry.type} {entry.coin1} {entry.type == TransactionType.SWAP ? 'for' : 'and'}{' '}
+              {entry.type} {entry.coin1} {entry.action == TransactionType.SWAP ? 'for' : 'and'}{' '}
               {entry.coin2}
             </div>
           );
@@ -812,7 +813,7 @@ export function TransactionTable(props) {
         render: (text, entry) => {
           return (
             <div
-              onClick={() => openInNewTab(`https://etherscan.io/address/${entry.account}`)}
+              onClick={() => openInNewTab(`${scanUrlPrefix}/address/${entry.account}`)}
               className={className(styles.tableData, styles.transactionLink)}
               style={{ textOverflow: 'ellipsis' }}
             >
@@ -884,6 +885,7 @@ export function TransactionTable(props) {
         }
       ).filter(item => item.visible == true)}
       pagination={false}
+      locale={{ emptyText:'Data will show after you have logged in with a BSC account'}}
       style={{
         marginBottom: '20px',
       }}

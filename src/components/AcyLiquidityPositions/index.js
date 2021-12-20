@@ -12,6 +12,7 @@ import {
 } from '@/acy-dex-swap/utils/index';
 
 import { Icon } from "antd";
+import {scanUrlPrefix} from '@/constants/configs';
 import supportedTokens from '@/constants/TokenList';
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import AcyRemoveLiquidityModal from '@/components/AcyRemoveLiquidityModal';
@@ -299,7 +300,7 @@ const AcyLiquidityPositions = (props) => {
               }} >
                 {record.pool}
               </p>
-              <a target="_blank" href={`https://rinkeby.etherscan.io/address/${record.poolAddress}`} >
+              <a target="_blank" href={`${scanUrlPrefix}/address/${record.poolAddress}`} >
                 <p className={styles.value}>
                   {`${record.poolAddress.slice(0, 5)}...${record.poolAddress.slice(
                     addressLength - 5,
@@ -412,18 +413,6 @@ const AcyLiquidityPositions = (props) => {
     console.log("test elapsed time", new Date());
     return userPools;
   }, [userLPHandlers]);
-  // const userLPOverview = useMemo(() => {
-  //   const lpOverview = [];
-  //   for (let pair of userLPHandlers) {
-  //     const volume = 100;
-  //     const feeRate = 0.17;
-  //     lpOverview.push({
-  //       poolAddress: `${pair.liquidityToken.address}`,
-  //       volume,
-  //       apr: volume * feeRate / 100
-  //     })
-  //   }
-  // }, [userLPHandlers]);
 
   // search input component update
   useEffect(() => {
@@ -476,140 +465,7 @@ const AcyLiquidityPositions = (props) => {
       setUserLPShares(prev => ({ ...prev, [pair.liquidityToken.address]: newData }));
     }
 
-    (async () => { for (let pair of userLPHandlers) fetchPoolShare(pair); })();
-
-    // setUserLPShares([...userLPShares, ...userShares]);
-    // lpHandlers.splice(0, userShares.length);
-    // // setUserLPHandlers(lpHandlers);
-    // console.log("done 5 updates");
-
-    // if (lpHandlers.length)
-    // await getUserPoolShare();
-
-    // while (readIdx < userLiquidityPools.length) {
-
-    //   const [token0Idx, token1Idx] = userLiquidityPools[readIdx];
-    //   readIdx++;
-
-    //   const { address: token0Address, symbol: token0Symbol, decimals: token0Decimal } = tokens[token0Idx];
-    //   const { address: token1Address, symbol: token1Symbol, decimals: token1Decimal } = tokens[token1Idx];
-    //   const token0 = new Token(chainId, token0Address, token0Decimal, token0Symbol);
-    //   const token1 = new Token(chainId, token1Address, token1Decimal, token1Symbol);
-
-    //   // almost impossible: quit if the two tokens are equivalent, i.e. have the same chainId and address
-    //   if (token0.equals(token1)) continue;
-
-    //   // queue get pair task
-    //   const pair = await Fetcher.fetchPairData(token0, token1, library);
-    //   console.log("fetched pair: ", pair);
-
-    //   // check if user has share in this pool
-    //   let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
-    //   if (userPoolBalance.isZero()) {
-    //     console.log("zero balance, discard");
-    //     continue;
-    //   }
-
-    //   console.log(">> added pair");
-
-    //   userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
-
-    //   const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
-
-    //   const token0Deposited = pair.getLiquidityValue(
-    //     pair.token0,
-    //     totalSupply,
-    //     userPoolBalance,
-    //     false
-    //   );
-    //   const token1Deposited = pair.getLiquidityValue(
-    //     pair.token1,
-    //     totalSupply,
-    //     userPoolBalance,
-    //     false
-    //   );
-
-    //   const poolTokenPercentage = new Percent(userPoolBalance.raw, totalSupply.raw).toFixed(4);
-
-    //   userNonZeroLiquidityPositions.push({
-    //     token0: pair.token0,
-    //     token1: pair.token1,
-    //     token0LogoURI: getLogoURIWithSymbol(pair.token0.symbol),
-    //     token1LogoURI: getLogoURIWithSymbol(pair.token1.symbol),
-    //     token0Symbol: pair.token0.symbol,
-    //     token1Symbol: pair.token1.symbol,
-    //     pool: `${pair.token0.symbol}/${pair.token1.symbol}`,
-    //     poolAddress: `${pair.liquidityToken.address}`,
-    //     token0Amount: `${token0Deposited.toSignificant(4)} ${pair.token0.symbol}`,
-    //     token1Amount: `${token1Deposited.toSignificant(4)} ${pair.token1.symbol}`,
-    //     token0Reserve: `${pair.reserve0.toExact(2)} ${pair.token0.symbol}`,
-    //     token1Reserve: `${pair.reserve1.toExact(2)} ${pair.token1.symbol}`,
-    //     share: `${poolTokenPercentage}%`,
-    //   });
-
-    //   newPoolCount++;
-    //   console.log(`validPoolPairs.length: ${userLiquidityPools.length}. break the loop? ${newPoolCount} <=> ${displayCountIncrement}`);
-    //   if (newPoolCount == displayCountIncrement)
-    //     break;
-    // }
-
-    // // write readpoolpointer to state
-    // setReadListPointer(readIdx);
-
-    ///////////////////////////////////////////
-
-    // const validPairs = await Promise.allSettled(checkLiquidityPositionTasks);
-
-    // console.log(validPairs)
-
-    // // now we process the pairs
-    // // eslint-disable-next-line no-restricted-syntax
-    // const userNonZeroLiquidityPositions = [];
-    // for (let pair of validPairs) {
-    //   pair = pair.value;
-
-    //   let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
-    //   if (userPoolBalance.isZero()) continue;
-
-    //   userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
-
-    //   const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
-
-    //   const token0Deposited = pair.getLiquidityValue(
-    //     pair.token0,
-    //     totalSupply,
-    //     userPoolBalance,
-    //     false
-    //   );
-    //   const token1Deposited = pair.getLiquidityValue(
-    //     pair.token1,
-    //     totalSupply,
-    //     userPoolBalance,
-    //     false
-    //   );
-
-    //   const poolTokenPercentage = new Percent(userPoolBalance.raw, totalSupply.raw).toFixed(4);
-
-    //   userNonZeroLiquidityPositions.push({
-    //     token0: pair.token0,
-    //     token1: pair.token1,
-    //     token0LogoURI: getLogoURIWithSymbol(pair.token0.symbol),
-    //     token1LogoURI: getLogoURIWithSymbol(pair.token1.symbol),
-    //     token0Symbol: pair.token0.symbol,
-    //     token1Symbol: pair.token1.symbol,
-    //     pool: `${pair.token0.symbol}/${pair.token1.symbol}`,
-    //     poolAddress: `${pair.liquidityToken.address}`,
-    //     token0Amount: `${token0Deposited.toSignificant(4)} ${pair.token0.symbol}`,
-    //     token1Amount: `${token1Deposited.toSignificant(4)} ${pair.token1.symbol}`,
-    //     token0Reserve: `${pair.reserve0.toExact(2)} ${pair.token0.symbol}`,
-    //     token1Reserve: `${pair.reserve1.toExact(2)} ${pair.token1.symbol}`,
-    //     share: `${poolTokenPercentage}%`,
-    //   });
-    // }
-    // console.log("test length2: ", userNonZeroLiquidityPositions.length);
-    // console.log("nonZeroPositions: ", userNonZeroLiquidityPositions);
-
-    // return userShares;
+    (async () => { for (let pair of userLPHandlers) fetchPoolShare(pair); })()
 
   }
 
@@ -637,7 +493,7 @@ const AcyLiquidityPositions = (props) => {
   // first time loading
   useEffect(() => {
     getValidPoolList();
-  }, []);
+  }, [account]);
   // refresh table data on add/remove liquidity
   useEffect(() => {
     if (liquidity.refreshTable) {
@@ -724,7 +580,7 @@ const AcyLiquidityPositions = (props) => {
                     <tr>
                       <td>My liquidity</td>
                       <td>Pool share</td>
-                      <td>APR</td>
+                      <td></td>
                       {/* the following height is randomly set to 10px,
                       it's only useful for its div children to get full height info */}
                       <td rowSpan="2" style={{height: "10px"}}> 
@@ -766,7 +622,7 @@ const AcyLiquidityPositions = (props) => {
                         <p>{data?.share || "loading..."}</p>
                       </td>
                       <td>
-                        <p>No data</p>
+                        <p></p>
                       </td>
                     </tr>
                     </tbody>

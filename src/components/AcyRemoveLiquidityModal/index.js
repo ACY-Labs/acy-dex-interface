@@ -8,6 +8,9 @@ import { getEstimated, signOrApprove, removeLiquidity } from '@/acy-dex-swap/cor
 import { Icon, Button, Input } from "antd";
 import moment from 'moment';
 import styles from './AcyRemoveLiquidityModal.less';
+import {
+  binance,
+} from '@/connectors';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
   const handleInputChange = (e) => {
@@ -188,7 +191,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
 
   const removeLiquidityCallback = (status, percent) => {
     console.log("test status:", status);
-    const {dispatch, transaction: {transactions}} = props;
+    const { dispatch, transaction: { transactions } } = props;
     // const transactions = props.transaction.transactions;
     const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
     console.log("is current dispatched? ", isCurrentTransactionDispatched);
@@ -225,6 +228,12 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
             ).then(res => {
               console.log("remove to server return: ", res);
 
+              // refresh the table
+              dispatch({
+                type: "liquidity/setRefreshTable",
+                payload: true,
+              });
+
             }).catch(e => console.log("error: ", e));
           }
 
@@ -233,10 +242,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
           dispatch({
             type: "transaction/addTransaction",
             payload: {
-              transactions: [
-                ...newData,
-                { hash: status.hash, transactionTime }
-              ]
+              transactions: newData
             }
           });
 
@@ -403,7 +409,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
 
             setButtonStatus(false);
             if (needApprove) {
-              setButtonContent(<>Approving <Icon type="loading" /></>);
+              setButtonContent(<>Signing <Icon type="loading" /></>);
               await signOrApprove(
                 { ...token0 },
                 { ...token1 },
@@ -422,7 +428,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
               );
             } else if (buttonStatus) {
               if (account == undefined) {
-                activate(injected);
+                activate(binance);
               } else {
                 console.log(buttonStatus);
                 setButtonContent(<>Processing <Icon type="loading" /></>);
@@ -445,7 +451,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
                   setButtonContent,
                   setRemoveStatus,
                   removeLiquidityCallback
-                );                
+                );
               }
             }
           }}

@@ -30,7 +30,7 @@ import styles from './styles.less';
 import { sortAddress } from '@/utils/utils';
 
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
+import { binance } from '@/connectors';
 import { useState, useEffect, useCallback } from 'react';
 
 import {
@@ -93,15 +93,6 @@ const MyComponent = props => {
 
   // 连接钱包函数
   const { account, chainId, library, activate } = useWeb3React();
-  // 连接钱包时支持的货币id
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
-  });
-
-  // 初始化函数时连接钱包
-  useEffect(() => {
-    // activate(injected);
-  }, []);
 
   useEffect(
     () => {
@@ -202,7 +193,7 @@ const MyComponent = props => {
   };
 
   const ConnectWallet = () => {
-    activate(injected);
+    activate(binance);
   };
 
   return (

@@ -11,12 +11,15 @@
 .rowFlexContainer {
   display: flex;
   width: 100%;
+  margin: auto;
   flex-wrap: wrap;
   justify-content: space-between;
 }
 
 @media screen and (min-width: 1024px) {
   .rowFlexContainer {
+    // width: 30%;
+    min-width: 310px;
     flex-wrap: nowrap;
   }
   .priceChart {

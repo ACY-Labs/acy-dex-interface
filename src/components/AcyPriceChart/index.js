@@ -107,7 +107,7 @@ const AcyPriceChart = (props) => {
     const { onHover, showTooltip } = props;
     console.log("V",v);
     if (onHover) onHover(v[0].data, v[0].dataIndex);
-
+    console.log("V",v);
     if (showTooltip) return `
     
     <div className = "flew-row ">

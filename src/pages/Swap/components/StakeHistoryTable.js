@@ -12,6 +12,7 @@ import {  Divider, Icon, Input, Table  } from 'antd';
 import styles from './StakeHistoryTable.less';
 import numeral from 'numeral';
 import formatNumber from 'accounting-js/lib/formatNumber.js';
+import  { abbrNumber } from '../../Market/Util.js';
 function sortTableTime(table, key, isReverse) {
   return table.sort((a, b) => {
     if (isReverse) {
@@ -56,7 +57,7 @@ const StakeHistoryTable = props => {
       dataIndex: 'totalToken',
       key: 'totalToken',
       render: (text,record) => {
-        return <div className={styles.tableData}>{text}</div>;
+        return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
       }
     },
     {
@@ -70,7 +71,7 @@ const StakeHistoryTable = props => {
       dataIndex: 'inputTokenNum',
       key: 'inputTokenNum',
       render: (text,record) => {
-        return <div className={styles.tableData}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.inputTokenSymbol}</div>;
+        return <div className={styles.tableData}>{abbrNumber(text)} {record.inputTokenSymbol}</div>;
       }
     },
     {
@@ -84,7 +85,7 @@ const StakeHistoryTable = props => {
       dataIndex: 'outTokenNum',
       key: 'outTokenNum',
       render: (text,record) => {
-        return <div className={styles.tableData}>{text && formatNumber(text*1,{ precision: 3, thousand: " " })} {record.outTokenSymbol}</div>;
+        return <div className={styles.tableData}>{abbrNumber(text)} {record.outTokenSymbol}</div>;
       }
     },
     {

@@ -23,6 +23,7 @@ import {
   torus,
   trezor,
   ledger,
+  binance,
 } from '@/connectors';
 
 import styles from './index.less';
@@ -35,7 +36,20 @@ const GlobalHeaderRight = props => {
   const [visibleMetaMask, setVisibleMetaMask] = useState(false);
   const [visibleSetting, setVisibleSetting] = useState(false);
   // 连接钱包函数
-  const { account, chainId, library, activate, deactivate } = useWeb3React();
+  const { account, chainId, library, activate, deactivate, active } = useWeb3React();
+
+  useEffect(() => {
+    if (!account)
+      activate(binance);
+  }, []);
+
+  useEffect(() => {
+    console.log('test current active', active)
+    if (!active)
+      deactivate();
+  }, [active])
+
+  useEffect(() => console.log("test current ", account), [account]);
 
   const getNoticeData = () => {
     const { notices = [] } = props;
@@ -114,6 +128,8 @@ const GlobalHeaderRight = props => {
       activate(trezor);
     } else if (walletName === 'ledger') {
       activate(ledger);
+    } else if(walletName === 'binance'){
+      activate(binance);
     }
     setVisibleMetaMask(false);
   };
@@ -174,6 +190,16 @@ const GlobalHeaderRight = props => {
       },
     },
   ];
+  const BinanceWallet = [
+    {
+      name: 'Binance Wallet',
+      icon: 'Binance',
+      onClick:()=>{
+        selectWallet('binance');
+      },
+    },
+  ];
+
   const walletList = [
     {
       name: 'Coinbase Wallet',
@@ -190,26 +216,33 @@ const GlobalHeaderRight = props => {
       },
     },
     {
-      name: 'Trezor',
-      icon: 'Trezor',
+      name: 'TrustWallet',
+      icon: 'TrustWallet',
       onClick: () => {
-        selectWallet('trezor');
+        selectWallet('walletconnect');
       },
     },
-    {
-      name: 'Ledger',
-      icon: 'Ledger',
-      onClick: () => {
-        selectWallet('ledger');
-      },
-    },
-    {
-      name: 'Fortmatic',
-      icon: 'Fortmatic',
-      onClick: () => {
-        selectWallet('fortmatic');
-      },
-    },
+    // {
+    //   name: 'Trezor',
+    //   icon: 'Trezor',
+    //   onClick: () => {
+    //     selectWallet('trezor');
+    //   },
+    // },
+    // {
+    //   name: 'Ledger',
+    //   icon: 'Ledger',
+    //   onClick: () => {
+    //     selectWallet('ledger');
+    //   },
+    // },
+    // {
+    //   name: 'Fortmatic',
+    //   icon: 'Fortmatic',
+    //   onClick: () => {
+    //     selectWallet('fortmatic');
+    //   },
+    // },
     {
       name: 'Portis',
       icon: 'Portis',
@@ -253,7 +286,7 @@ const GlobalHeaderRight = props => {
         value={account}
         onClick={onhandMetaMask}
         pendingLength={
-          props.transaction.transactions.filter(item => item.transactionTime == undefined).length
+          props.transaction.transactions.length
         }
       />
       {false && (
@@ -315,7 +348,7 @@ const GlobalHeaderRight = props => {
           <span style={{ marginLeft: '10px' }}>Select a Wallet</span>
           {/* <AcyIcon onClick={this.onhandCancel} name="close" /> */}
         </div>
-        <AcyCardList style={{ marginTop: '10px' }}>
+        {/* <AcyCardList style={{ marginTop: '10px' }}>
           <AcyCardList.Agree>
             By connecting a wallet, you agree to ACY{' '}
             <a target="_blank" href="https://acy.finance/terms-of-use">
@@ -323,7 +356,8 @@ const GlobalHeaderRight = props => {
             </a>{' '}
             .
           </AcyCardList.Agree>
-        </AcyCardList>
+        </AcyCardList> */}
+
         <AcyCardList>
           {MetaMask.map(item => (
             <AcyCardList.Thin onClick={() => item.onClick()}>
@@ -333,7 +367,16 @@ const GlobalHeaderRight = props => {
               <span>{item.name}</span>
             </AcyCardList.Thin>
           ))}
+          {BinanceWallet.map(item =>(
+            <AcyCardList.Thin onClick={()=>item.onClick()}>
+              {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
+              <AcyIcon.MyIcon width={32} type={item.icon} />
+            )}
+            <span>{item.name}</span>
+          </AcyCardList.Thin>
+          ))}
         </AcyCardList>
+
         <AcyCardList>
           {walletList.map((item, index) => {
             if (only && index > -1) {
@@ -355,7 +398,7 @@ const GlobalHeaderRight = props => {
             See More...
           </p>
         )}
-        {account && (
+        {/* {account && (
           <AcyCardList>
             <div
               style={{
@@ -385,7 +428,7 @@ const GlobalHeaderRight = props => {
               </div>
             </div>
           </AcyCardList>
-        )}
+        )} */}
       </AcyModal>
     </div>
   );

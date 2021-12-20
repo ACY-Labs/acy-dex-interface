@@ -28,6 +28,7 @@ import { convertPoolForList } from './Data/util.js';
 import { MarketSearchBar, PoolTable, TransactionTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
 import ConnectWallet from './ConnectWallet';
+import {scanUrlPrefix} from '@/constants/configs';
 
 const watchlistManagerToken = new WatchlistManager('token');
 
@@ -323,7 +324,7 @@ function MarketTokenInfo(props) {
                 style={{ marginLeft: '10px' }}
                 width={16}
                 onClick={() => {
-                  openInNewTab(`https://etherscan.io/token/${tokenData.address}`);
+                  openInNewTab(`${scanUrlPrefix}/token/${tokenData.address}`);
                 }}
               />
             </>

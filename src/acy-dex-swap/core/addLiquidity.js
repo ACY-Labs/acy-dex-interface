@@ -1,3 +1,4 @@
+import {scanUrlPrefix} from "@/constants/configs";
 import {
   CurrencyAmount,
   ETHER,
@@ -93,20 +94,23 @@ export async function getEstimated(
     if (!exactIn && isNaN(parseFloat(inToken1Amount)))
       return new CustomError('Please enter amount');
 
-    let token0IsETH = inToken0Symbol === 'ETH';
-    let token1IsETH = inToken1Symbol === 'ETH';
+    // let token0IsETH = inToken0Symbol === 'ETH';
+    // let token1IsETH = inToken1Symbol === 'ETH';
+
+    let token0IsETH = inToken0Symbol === 'BNB';
+    let token1IsETH = inToken1Symbol === 'BNB';
 
     console.log(inputToken0);
     console.log(inputToken1);
     if (token0IsETH && token1IsETH) {
-      setButtonContent("Doesn't support ETH to ETH");
+      setButtonContent("Doesn't support BNB to BNB");
       setButtonStatus(false);
-      return new CustomError("Doesn't support ETH to ETH");
+      return new CustomError("Doesn't support BNB to BNB");
     }
-    if ((token0IsETH && inToken1Symbol === 'WETH') || (inToken0Symbol === 'WETH' && token1IsETH)) {
-      setButtonContent('Invalid pair WETH/ETH');
+    if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
+      setButtonContent('Invalid pair WBNB/BNB');
       setButtonStatus(false);
-      return new CustomError('Invalid pair WETH/ETH');
+      return new CustomError('Invalid pair WBNB/BNB');
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 
@@ -127,6 +131,7 @@ export async function getEstimated(
       return new CustomError('Equal tokens!');
     }
     // get pair using our own provider
+    console.log("TEST TOKEN0 TOKEN1:",token0, token1);
     const pair = await Fetcher.fetchPairData(token0, token1, library)
       .then(pair => {
         console.log(pair.reserve0.raw.toString());
@@ -158,8 +163,8 @@ export async function getEstimated(
     //   setPairToAddOnServer(null);
     //   console.log("test do not add")
     // }
-    setPairToAddOnServer({"token0": inToken0Address, "token1": inToken1Address});
-    console.log("test add to server", {"token0": inToken0Address, "token1": inToken1Address})
+    setPairToAddOnServer({ "token0": inToken0Address, "token1": inToken1Address });
+    console.log("test add to server", { "token0": inToken0Address, "token1": inToken1Address })
 
     console.log('------------------ PARSE AMOUNT ------------------');
     // convert typed in amount to BigNumber using ethers.js's parseUnits,
@@ -340,9 +345,8 @@ export async function getEstimated(
 
         setLiquidityBreakdown([
           // `Slippage tolerance : ${slippage}%`,
-          `Pool reserve: ${pair.reserve0.toFixed(3)} ${
-            pair.token0.symbol
-          } + ${pair.reserve1.toFixed(3)} ${pair.token1.symbol}`,
+          `Pool reserve: ${pair.reserve0.toFixed(3)} ${pair.token0.symbol == "WETH" ? "WBNB" : pair.token0.symbol
+          } + ${pair.reserve1.toFixed(3)} ${pair.token1.symbol == "WETH" ? "WBNB" : pair.token1.symbol}`,
           `Pool share: ${poolTokenPercentage}%`,
         ]);
       } catch (e) {
@@ -403,10 +407,9 @@ export async function getEstimated(
       setButtonContent('Need approval');
 
       return new CustomError(
-        `Need approve ${
-          approveStatus === 1
-            ? inToken0Symbol
-            : approveStatus === 2
+        `Need approve ${approveStatus === 1
+          ? inToken0Symbol
+          : approveStatus === 2
             ? inToken1Symbol
             : `${inToken0Symbol} and ${inToken1Symbol}`
         }`
@@ -444,13 +447,13 @@ export async function getEstimated(
 
       let minETH = token0IsETH
         ? calculateSlippageAmount(
-            parsedToken0Amount,
-            noLiquidity ? 0 : allowedSlippage
-          )[0].toString()
+          parsedToken0Amount,
+          noLiquidity ? 0 : allowedSlippage
+        )[0].toString()
         : calculateSlippageAmount(
-            parsedToken1Amount,
-            noLiquidity ? 0 : allowedSlippage
-          )[0].toString();
+          parsedToken1Amount,
+          noLiquidity ? 0 : allowedSlippage
+        )[0].toString();
 
       args = [
         nonETHToken.address,
@@ -466,7 +469,10 @@ export async function getEstimated(
       value = BigNumber.from(
         (token1IsETH ? parsedToken1Amount : parsedToken0Amount).raw.toString()
       );
-      console.log(value);
+      console.log("addLiquidityETH args")
+      console.log(args);
+      console.log("addLiquidityETH payable amount")
+      console.log(value)
     } else {
       estimate = router.estimateGas.addLiquidity;
       method = router.addLiquidity;
@@ -546,8 +552,10 @@ export async function addLiquidity(
       amount: inToken1Amount,
     } = inputToken1;
 
-    let token0IsETH = inToken0Symbol === 'ETH';
-    let token1IsETH = inToken1Symbol === 'ETH';
+    // let token0IsETH = inToken0Symbol === 'ETH';
+    // let token1IsETH = inToken1Symbol === 'ETH';
+    let token0IsETH = inToken0Symbol === 'BNB';
+    let token1IsETH = inToken1Symbol === 'BNB';
 
     console.log('------------------ RECEIVED TOKEN ------------------');
     console.log('token0');
@@ -555,11 +563,12 @@ export async function addLiquidity(
     console.log('token1');
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support ETH to ETH");
+    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support BNB to BNB");
 
-    if ((token0IsETH && inToken1Symbol === 'WETH') || (inToken0Symbol === 'WETH' && token1IsETH)) {
+    // if ((token0IsETH && inToken1Symbol === 'WETH') || (inToken0Symbol === 'WETH' && token1IsETH)) {
+    if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
       // UI should sync value of ETH and WETH
-      return new CustomError('Invalid pair WETH/ETH');
+      return new CustomError('Invalid pair WBNB/BNB');
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 
@@ -629,11 +638,11 @@ export async function addLiquidity(
   } else {
     console.log('status');
     console.log(status);
-    let url = 'https://rinkeby.etherscan.io/tx/' + status.hash;
+    let url = scanUrlPrefix + '/tx/' + status.hash;
     addLiquidityCallback(status);
     setLiquidityStatus(
       <a href={url} target={'_blank'}>
-        View it on etherscan
+        View it on BSC Scan
       </a>
     );
   }

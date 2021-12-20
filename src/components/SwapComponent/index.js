@@ -31,7 +31,7 @@ import { sortAddress, abbrNumber } from '@/utils/utils';
 import axios from 'axios';
 
 import { useWeb3React } from '@web3-react/core';
-import { InjectedConnector } from '@web3-react/injected-connector';
+import { binance,injected } from '@/connectors';
 import React, { useState, useEffect, useCallback } from 'react';
 
 import {
@@ -131,7 +131,7 @@ const SwapComponent = props => {
 
   // let [estimatedStatus,setEstimatedStatus]=useState();
   const [swapBreakdown, setSwapBreakdown] = useState();
-  const [swapButtonState, setSwapButtonState] = useState(true);
+  const [swapButtonState, setSwapButtonState] = useState(false);
   const [swapButtonContent, setSwapButtonContent] = useState('Connect to Wallet');
   const [swapStatus, setSwapStatus] = useState();
 
@@ -144,6 +144,11 @@ const SwapComponent = props => {
   const [wethContract, setWethContract] = useState();
   const [wrappedAmount, setWrappedAmount] = useState();
   const [showSpinner, setShowSpinner] = useState(false);
+
+  const [methodName, setMethodName] = useState();
+  const [isUseArb, setIsUseArb] = useState(false);
+  const [midTokenAddress, setMidTokenAddress] = useState();
+  const [poolExist, setPoolExist] = useState(true);
 
   // connect to page model, reflect changes of pair ratio in this component
   useEffect(() => {
@@ -166,16 +171,6 @@ const SwapComponent = props => {
   const slippageTolerancePlaceholder = 'Please input a number from 1.00 to 100.00';
 
   const { account, chainId, library, activate } = useWeb3React();
-
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
-  });
-
-  // setSwapButtonContent
-  // 监听钱包的连接
-  useEffect(() => {
-    activate(injected);
-  }, []);
 
   useEffect(
     () => {
@@ -232,7 +227,11 @@ const SwapComponent = props => {
         setMinAmountOut,
         setMaxAmountIn,
         setWethContract,
-        setWrappedAmount
+        setWrappedAmount,
+        setMethodName,
+        setIsUseArb,
+        setMidTokenAddress,
+        setPoolExist
       );
     },
     [
@@ -282,7 +281,11 @@ const SwapComponent = props => {
         setMinAmountOut,
         setMaxAmountIn,
         setWethContract,
-        setWrappedAmount
+        setWrappedAmount,
+        setMethodName,
+        setIsUseArb,
+        setMidTokenAddress,
+        setPoolExist
       );
     },
     [
@@ -333,14 +336,14 @@ const SwapComponent = props => {
   useEffect(
     () => {
       if (account == undefined) {
-        setSwapButtonState(true);
+        setSwapButtonState(false);
         setSwapButtonContent('Connect to Wallet');
       } else {
         setSwapButtonState(false);
         setSwapButtonContent('Choose tokens and amount');
       }
     },
-    [account]
+    [account,swapButtonContent]
   );
 
   const onCoinClick = async token => {
@@ -389,9 +392,6 @@ const SwapComponent = props => {
     setToken0Balance(tempBalance);
   };
 
-  const ConnectWallet = () => {
-    activate(injected);
-  };
   // swap的交易状态
   const swapCallback = async (status, inputToken, outToken) => {
     // 循环获取交易结果
@@ -404,7 +404,7 @@ const SwapComponent = props => {
       dispatch({
         type: 'transaction/addTransaction',
         payload: {
-          transactions: [...transactions, { hash: status.hash }],
+          transactions: [...transactions, status.hash],
         },
       });
     }
@@ -418,112 +418,37 @@ const SwapComponent = props => {
     // }];
 
     // FIXME: implement the following logic with setTimeout(). refer to AddComponent.js checkStatusAndFinish()
-    const sti = setInterval(() => {
-      library.getTransactionReceipt(status.hash).then(async receipt => {
-        console.log('receiptreceipt', receipt);
+
+    const sti = async (hash) => {
+      library.getTransactionReceipt(hash).then(async receipt => {
+        console.log(`receiptreceipt for ${hash}: `, receipt);
         // receipt is not null when transaction is done
-        if (receipt) {
-          clearInterval(sti);
-          const { logs } = receipt;
-          console.log("logs: ", logs);
-          const decodedLog = parseArbitrageLog(logs[logs.length - 1]);
-          console.log('receipt OK, these are logs');
-          console.log("decodedLog", decodedLog);
-          decodedLog['transactionHash'] = receipt.transactionHash;
-
-          props.onGetReceipt(decodedLog, library, account);
-          let newData = transactions.filter(item => item.hash != status.hash);
-          let transactionTime = '';
-          let inputTokenNum;
-          let outTokenNum;
-          let totalToken;
-          let transferHash = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
-          await library.getBlock(receipt.logs[0].blockNumber).then(data => {
-            transactionTime = moment(parseInt(data.timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
-          });
-          receipt.logs.map(item => {
-            // debugger
-            // let topics=hexlify(item.topics[0]).toText();
-            // let ss=CryptoJS.SHA3.decrypt(item.topics[0]); 
-            // debugger
-            if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == inputToken.address) {
-              // inputtoken 数量
-              // inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
-              inputTokenNum = item.data / Math.pow(10, inputToken.decimals).toString();
-              // console.log('inputTokenNum',inputTokenNum)
-            }
-            if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == outToken.address) {
-              // outtoken 数量
-              // outTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0", outToken.decimals))).toString();
-              outTokenNum = item.data / Math.pow(10, outToken.decimals).toString();
-              // console.log('outputTokenNum',outTokenNum)
-            }
-          });
-
-          setSwapButtonContent("Done");
+        if (!receipt) 
+          setTimeout(sti(hash), 500);
+        else {
           
-          // 获取美元价值
-          await axios
-            .post(
-              `https://api.acy.finance/api/chart/swap?token0=${inputToken.addressOnEth}&token1=${outToken.addressOnEth
-              }&range=1D`
-            )
-            .then(data => {
-              // totalToken = abbrNumber(
-              //   inputTokenNum * data.data.data.swaps[data.data.data.swaps.length - 1].rate
-              // );
+          const newData = transactions.filter(item => item.hash != hash);
 
-              // const { swaps } = data.data.data;
-              // const lastDataPoint = swaps[swaps.length - 1];
-              // console.log('ROUTE PRICE POINT', lastDataPoint);
-              // this.setState({
-              //   pricePoint: lastDataPoint.rate,
-              // });
-            });
+          props.onGetReceipt(receipt.transactionHash, library, account);
 
-          console.log("receipt transactionTime", transactionTime);
           dispatch({
             type: 'transaction/addTransaction',
             payload: {
-              transactions: [
-                ...newData,
-                {
-                  hash: status.hash,
-                  inputTokenNum,
-                  inputTokenSymbol: inputToken.symbol,
-                  outTokenNum,
-                  outTokenSymbol: outToken.symbol,
-                  totalToken,
-                  transactionTime,
-                },
-              ],
+              transactions: newData
             },
           });
-          // 保存到loac
-          localStorage.setItem(
-            'transactions',
-            JSON.stringify([
-              ...newData,
-              {
-                hash: status.hash,
-                inputTokenNum,
-                inputTokenSymbol: inputToken.symbol,
-                outTokenNum,
-                outTokenSymbol: outToken.symbol,
-                totalToken,
-                transactionTime,
-              },
-            ])
-          );
 
           // set button to done and disabled on default
-          
-
-          // 读取数据：localStorage.getItem(key);
+          setSwapButtonContent("Done");
         }
       });
-    }, 500);
+    }
+    sti(status.hash);
   };
+
+  useEffect(() => {
+    console.log("transactions changed", props.transaction.transactions)
+  }, [props.transaction.transactions]);
 
   useEffect(() => console.log("test slippage: ", slippageTolerance), [slippageTolerance]);
   return (
@@ -536,6 +461,7 @@ const SwapComponent = props => {
         yuan="566.228"
         dollar={`${token0Balance}`}
         token={token0Amount}
+        showBalance={token1BalanceShow}
         onChoseToken={() => {
           onClickCoin();
           setBefore(true);
@@ -563,8 +489,7 @@ const SwapComponent = props => {
         yuan="566.228"
         dollar={`${token1Balance}`}
         token={token1Amount}
-        inputColor="#565a69"
-        additional="AMM Output"
+        showBalance={token1BalanceShow}
         onChoseToken={() => {
           onClickCoin();
           setBefore(false);
@@ -676,6 +601,7 @@ const SwapComponent = props => {
           disabled={!swapButtonState}
           onClick={() => {
             if (account == undefined) {
+              // activate(binance);
               activate(injected);
             } else {
               setSwapButtonState(false);
@@ -705,7 +631,12 @@ const SwapComponent = props => {
                 deadline,
                 setSwapStatus,
                 setSwapButtonContent,
-                swapCallback
+                setSwapButtonState,
+                swapCallback,
+                methodName,
+                isUseArb,
+                midTokenAddress,
+                poolExist
               );
             }
           }}
@@ -734,3 +665,72 @@ export default connect(({ global, transaction, swap, loading }) => ({
   swap,
   loading: loading.global,
 }))(SwapComponent);
+
+
+// if (receipt) {
+//   clearInterval(sti);
+  // const { logs } = receipt;
+  // console.log("logs: ", logs);
+  // const decodedLog = parseArbitrageLog(logs[logs.length - 1]);
+  // console.log('receipt OK, these are logs');
+  // console.log("decodedLog", decodedLog);
+  // decodedLog['transactionHash'] = receipt.transactionHash;
+
+//   props.onGetReceipt(decodedLog, library, account);
+//   let newData = transactions.filter(item => item.hash != status.hash);
+//   let transactionTime = '';
+//   let inputTokenNum;
+//   let outTokenNum;
+//   let totalToken;
+//   let transferHash = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
+//   await library.getBlock(receipt.logs[0].blockNumber).then(data => {
+//     transactionTime = moment(parseInt(data.timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
+//   });
+//   receipt.logs.map(item => {
+//     // debugger
+//     // let topics=hexlify(item.topics[0]).toText();
+//     // let ss=CryptoJS.SHA3.decrypt(item.topics[0]); 
+//     // debugger
+//     if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == inputToken.address) {
+//       // inputtoken 数量
+//       // inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
+//       inputTokenNum = item.data / Math.pow(10, inputToken.decimals).toString();
+//       // console.log('inputTokenNum',inputTokenNum)
+//     }
+//     if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == outToken.address) {
+//       // outtoken 数量
+//       // outTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0", outToken.decimals))).toString();
+//       outTokenNum = item.data / Math.pow(10, outToken.decimals).toString();
+//       // console.log('outputTokenNum',outTokenNum)
+//     }
+//   });
+
+//   setSwapButtonContent("Done");
+  
+//   // 获取美元价值
+//   await axios
+//     .post(
+//       `https://api.acy.finance/api/chart/swap?token0=${inputToken.addressOnEth}&token1=${outToken.addressOnEth
+//       }&range=1D`
+//     )
+//     .then(data => {
+//       // totalToken = abbrNumber(
+//       //   inputTokenNum * data.data.data.swaps[data.data.data.swaps.length - 1].rate
+//       // );
+
+//       // const { swaps } = data.data.data;
+//       // const lastDataPoint = swaps[swaps.length - 1];
+//       // console.log('ROUTE PRICE POINT', lastDataPoint);
+//       // this.setState({
+//       //   pricePoint: lastDataPoint.rate,
+//       // });
+//     });
+
+//   console.log("receipt transactionTime", transactionTime);
+// >>>>>>> e0b545d... (wip) : migration to bsc
+//   dispatch({
+//     type: 'transaction/addTransaction',
+//     payload: {
+//       transactions: newData
+//     },
+//   });

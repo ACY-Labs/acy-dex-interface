@@ -13,7 +13,7 @@ import { getBlockFromTimestamp } from './blocks';
 import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import {findTokenWithAddress} from '@/utils/txData';
 import {totalInUSD} from '@/utils/utils';
-import uniqueTokens from '@/constants/uniqueTokens';
+import uniqueTokens from '@/constants/TokenList';
 import { symbol } from 'prop-types';
 
 export async function fetchTokenInfo(client, tokenAddress, timestamp) {
@@ -90,11 +90,11 @@ function parseTokenData (data){
   uniqueTokens.forEach(element => {
     newData.push({
       address : element.address,
-      addressOnEth : element.addressOnEth,
       name : element.name,
-      price : tokensPriceUSD[element.symbol],
+      price : tokensPriceUSD[element.symbol] ? tokensPriceUSD[element.symbol] : 1,
       priceChange : -0,
       short : element.symbol,
+      logoURL : element.logoURI,
       tvl : 0,
       volume24h : 0
 
@@ -102,8 +102,8 @@ function parseTokenData (data){
   });
 
   data.forEach(element => {
-      let index0 = newData.findIndex(item => item.address.toLowerCase() == element.token0.toLowerCase() || item.addressOnEth.toLowerCase() == element.token0.toLowerCase());
-      let index1 = newData.findIndex(item => item.address.toLowerCase() == element.token1.toLowerCase() || item.addressOnEth.toLowerCase() == element.token1.toLowerCase());
+      let index0 = newData.findIndex(item => item.address.toLowerCase() == element.token0.toLowerCase() );
+      let index1 = newData.findIndex(item => item.address.toLowerCase() == element.token1.toLowerCase() );
       newData[index0].tvl += totalInUSD([
         {
           token : newData[index0].short,
@@ -134,22 +134,24 @@ function parseTokenData (data){
 
   });
 
+  console.log("token data",newData);
+
   return sortTable(newData,'volume24h',true);
   
 }
 
-export async function fetchGeneralTokenInfo(client) {
+export async function fetchGeneralTokenInfo() {
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
-    // let request = 'https://api.acy.finance/api/poolchart/all';
-    let request = 'http://localhost:3001/api/poolchart/all';
+    let request = 'https://api.acy.finance/api/poolchart/all';
+    // let request = 'http://localhost:3001/api/poolchart/all';
     let response = await fetch(request);
     let data = await response.json();
     return parseTokenData(data.data);
   }catch (e){
     console.log('service not available yet',e);
-    return [];
+    return null;
   }
 }
 

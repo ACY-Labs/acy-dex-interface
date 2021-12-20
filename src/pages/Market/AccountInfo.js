@@ -20,6 +20,7 @@ import {
 } from './SampleData.js';
 import { marketClient, fetchPoolsFromAccount } from './Data';
 import { WatchlistManager } from './WatchlistManager.js';
+import {scanUrlPrefix} from '@/constants/configs';
 import supportedTokens from '@/constants/TokenList';
 import PageLoading from '@/components/PageLoading';
 import axios from "axios";
@@ -29,8 +30,10 @@ import {
   getTokenTotalSupply,
   approveTokenWithSpender,
   getAllSuportedTokensPrice,
+  BLOCK_TIME
 } from '@/acy-dex-swap/utils/index';
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
+import { binance } from '@/connectors';
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -64,7 +67,6 @@ function getLogoURIWithSymbol(symbol) {
   }
   return null;
 }
-const BLOCKS_PER_SEC = 14;
 const getDHM = (sec) => {
   if(sec<0) return '00d:00h:00m';
   var diff = sec;
@@ -348,11 +350,10 @@ function AccountInfo(props) {
     });
 
   // method to prompt metamask extension for user to connect their wallet.
-  const connectWallet = () => activate(injected);
-  
+  // const connectWallet = () => activate(injected);
+  const connectWallet = () => activate(binance);
   useEffect(
     () => {
-      
       if(!daoStakeRecord || !stakeACY) return;
       let len = daoStakeRecord.myAcy.length;
       var resultMy = [...daoStakeRecord.myAcy];
@@ -386,10 +387,9 @@ function AccountInfo(props) {
     const dao = await getDaoStakeRecord(library, account);
     setDaoStakeRecord(dao);
   }
+
   useEffect(
     () => {
-      // automatically connect to wallet at the start of the application.
-      connectWallet();
       console.log("TEST HERE ADDRESS:",address);
 
       fetchPoolsFromAccount(marketClient, address).then(data => {
@@ -425,10 +425,10 @@ function AccountInfo(props) {
             stakeData: pool.stakeData,
             poolLpScore: pool.lpScore,
             poolLpBalance: pool.lpBalance,
-            endsIn: getDHM((pool.endBlock - block) * BLOCKS_PER_SEC),
+            endsIn: getDHM((pool.endBlock - block) * BLOCK_TIME),
             status: pool.endBlock - block > 0,
             ratio: pool.ratio,
-            endAfter: (pool.endBlock - block) * BLOCKS_PER_SEC,
+            endAfter: (pool.endBlock - block) * BLOCK_TIME,
           };
           if(newFarmsContent.poolId == 0) {
             // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));
@@ -616,7 +616,6 @@ function AccountInfo(props) {
   // }, [])
 
   useEffect(async () => {
-    connectWallet();
     console.log("the user address is :" + account);    
     console.log("fetching the user pairs information");
 
@@ -675,10 +674,10 @@ function AccountInfo(props) {
         <div>
           {/* <div style={{ fontSize: '26px', fontWeight: 'bold' }}>{address}</div> */}
           <a
-            onClick={() => openInNewTab(`https://etherscan.io/address/${address}`)}
+            onClick={() => openInNewTab(`${scanUrlPrefix}/address/${address}`)}
             style={{ color: '#e29227', fontWeight: 600 }}
           >
-            View on etherscan
+            View on BSC Scan
           </a>
         </div>
         <AcyIcon

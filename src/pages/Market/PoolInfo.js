@@ -1,3 +1,4 @@
+import {scanUrlPrefix} from "@/constants/configs"
 import {
   AcyBarChart,
   AcyIcon,
@@ -243,7 +244,7 @@ function MarketPoolInfo(props) {
                 style={{ marginLeft: '10px' }}
                 width={16}
                 onClick={() => {
-                  openInNewTab(`https://etherscan.io/token/${poolData.address}`);
+                  openInNewTab(`${scanUrlPrefix}token/${poolData.address}`);
                 }}
               />
             </>

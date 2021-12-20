@@ -8,23 +8,20 @@ import TableControl from './TableControl';
 import SampleStakeHistoryData from './SampleDaoData';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { getAllPools, getHarvestHistory, getPool, getBalanceRecord, getDaoStakeRecord, getPair } from '@/acy-dex-swap/core/farms';
+import { getAllPools, getHarvestHistory, getPool, getBalanceRecord, getDaoStakeRecord, getPair, testFarmFunction, newGetAllPools } from '@/acy-dex-swap/core/farms';
+import { binance } from '@/connectors';
 import supportedTokens from '@/constants/TokenList';
 import PageLoading from '@/components/PageLoading';
 import Eth from "web3-eth";
 import { Web3Provider } from "@ethersproject/providers";
 import {getTokenContract} from '@/acy-dex-swap/utils';
 import { parse } from 'path-to-regexp';
-import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils';
+import {getAllSuportedTokensPrice, BLOCK_TIME, RPC_URL} from '@/acy-dex-swap/utils';
 const Farms = (props) => {
   // useWeb3React hook will listen to wallet connection.
   // if wallet is connected, account, chainId, library, and activate will not be not be undefined.
   const { account, chainId, library, activate, active } = useWeb3React();
   // const [account, setAccount] = useState();
-  const injected = new InjectedConnector({
-    supportedChainIds: [1, 3, 4, 5, 42, 80001],
-  });
-
   const INITIAL_ROW_NUMBER = 20;
 
   const [farmsContent, setFarmsContent] = useState([]);
@@ -53,44 +50,17 @@ const Farms = (props) => {
   
   const [isConnected, setIsConnected] = useState(false); // set this after run activate
   const [activeEnded, setActiveEnded] = useState(true);
+
+  const [notLogginFarmContent, setNotLogginFarmContent] = useState();
+
+
   // method to activate metamask wallet.
   // calling this method for the first time will cause metamask to pop up,
   // and require user to approve this connection.
+
   const connectWallet = async () =>  {
-    await activate(injected);
-    setIsConnected(true);
+    activate(binance);
   };
-
-  useEffect(
-    () => {
-      if(!isConnected) return;
-      console.log("isConnected account:",account);
-      if (account) {
-        setWalletConnected(true);
-        console.log("start getPools");
-        getPools(library, account);
-        console.log("start initHarvestHistiry");
-        initHarvestHistiry(library, account);
-        console.log("start getBalanceRecord");
-        // initBalanceRecord(library, account);
-        initDao(library, account);
-      } else {
-        var eth = new Eth('https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
-        const library = new Web3Provider(eth.givenProvider);
-        const account = "0x0000000000000000000000000000000000000000";
-        console.log("start getPools");
-        getPools(library, account);
-        console.log("start initHarvestHistiry");
-        initHarvestHistiry(library, account);
-        console.log("start getBalanceRecord");
-        initDao(library, account);
-        setWalletConnected(false);
-      }
-   },
-   [isConnected]
- );
-
-
 
   //function to get logo URI
   function getLogoURIWithSymbol(symbol) {
@@ -120,7 +90,6 @@ const Farms = (props) => {
   const getDateYDM = (date) => {
     return date.getFullYear(date)  + "-" + ("0"+(date.getMonth(date)+1)).slice(-2) + "-" + ("0" + date.getDate(date)).slice(-2)
   }
-  const BLOCKS_PER_SEC = 14;
   const getDHM = (sec) => {
     if(sec<0) return '00d:00h:00m';
     var diff = sec;
@@ -146,12 +115,7 @@ const Farms = (props) => {
     console.log("end initDao:")
     setDaoStakeRecord(dao);
   }
-  // const initBalanceRecord = async (library, account) => {
-  //   const balance = await getBalanceRecord(library, account);
-  //   setBalanceAcy(balance);
-  //   setIsLoadingBalance(false);
-  //   console.log("end getBalanceRecord");
-  // }
+
   const refreshHarvestHistory = async (library, account) => {
     const harvest = await getHarvestHistory(library, account);
     setHarvestAcy(harvest);
@@ -159,6 +123,7 @@ const Farms = (props) => {
   }
 
   const getPools = async (library, account) => {
+    setIsLoadingPool(true);
     const pools = await getAllPools(library, account);
     console.log("TEST getAllPools",pools);
     console.log("end get pools");
@@ -177,7 +142,7 @@ const Farms = (props) => {
         token2Logo: getLogoURIWithSymbol(pool.token1Symbol),
         pendingReward: pool.rewardTokensSymbols.map((token, index) => ({
           token,
-          amount: pool.rewardTokensAmount[index].toString(),
+          amount: pool.rewardTokensAmount[index] == 0?0 : pool.rewardTokensAmount[index].toString(),
         })),
         totalApr: pool.apr.toFixed(2),
         tvl: pool.tvl.toFixed(2),
@@ -187,43 +152,41 @@ const Farms = (props) => {
         stakeData: pool.stakeData,
         poolLpScore: pool.lpScore,
         poolLpBalance: pool.lpBalance,
-        endsIn: getDHM((pool.endBlock - block) * BLOCKS_PER_SEC),
+        endsIn: getDHM((pool.endBlock - block) * BLOCK_TIME),
         status: pool.endBlock - block > 0,
         ratio: pool.ratio,
-        endAfter: (pool.endBlock - block) * BLOCKS_PER_SEC,
+        endAfter: (pool.endBlock - block) * BLOCK_TIME,
       };
       if(newFarmsContent.poolId == 0) {
         // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));
-        if(newFarmsContent.stakeData){
-          const myStakeAcy = newFarmsContent.stakeData.reduce((total, currentAmount) => total + parseFloat(currentAmount.lpAmount), 0);
-          setStakeACY({
-            myAcy: myStakeAcy,
-            totalAcy: newFarmsContent.poolLpBalance
-          });
-        } else {
-          setStakeACY({
-            myAcy: 0,
-            totalAcy: newFarmsContent.poolLpBalance
-          });
-        }
-        
+        // if(newFarmsContent.stakeData){
+        //   const myStakeAcy = newFarmsContent.stakeData.reduce((total, currentAmount) => total + parseFloat(currentAmount.lpAmount), 0);
+        //   setStakeACY({
+        //     myAcy: myStakeAcy,
+        //     totalAcy: newFarmsContent.poolLpBalance
+        //   });
+        // } else {
+        //   setStakeACY({
+        //     myAcy: 0,
+        //     totalAcy: newFarmsContent.poolLpBalance
+        //   });
+        // }
       }
       //if user has farm, direct to myfarm
-      if(newFarmsContent.hasUserPosition) {
+      if(newFarmsContent.hasUserPosition && account) {
         setIsMyFarms(true);
         ismyfarm = true;
       }
       newFarmsContents.push(newFarmsContent);
     });
-    setFarmsContent(newFarmsContents);
-    setCurrentTableRow(newFarmsContents);
-    if(ismyfarm) {
-      // setCurrentTableRow(newFarmsContents.filter(tableData => tableData.hasUserPosition));
-      // setTableRow(newFarmsContents.filter(tableData => tableData.hasUserPosition));
-      setTableRow(newFarmsContents);
+    console.log("TEST newFarmsContents:",newFarmsContents);
+    if(account != "0x0000000000000000000000000000000000000000") {
+      setFarmsContent(newFarmsContents);
     } else {
-      // setCurrentTableRow(newFarmsContents);
-      setTableRow(newFarmsContents);
+      setNotLogginFarmContent(newFarmsContents);
+    }
+    if(pools){
+      setFarmsContent(newFarmsContents);
     }
     setIsLoadingPool(false);
     console.log("end getPools");
@@ -258,40 +221,24 @@ const Farms = (props) => {
    [daoStakeRecord, stakeACY]
  );
   useEffect(
-    () => {
-      // var eth = new Eth('https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
-      // const library = new Web3Provider(eth.givenProvider);
-      // const account = "0x0000000000000000000000000000000000000000";
-      // console.log("start getPools");
-      // getPools(library, account);
-      // console.log("start initHarvestHistiry");
-      // initHarvestHistiry(library, account);
-      // console.log("start getBalanceRecord");
-      // initDao(library, account);
-      // connectWallet();
-   },
-   []
- );
-  useEffect(
      async () => {
-      // automatically connect to wallet at the start of the application.
-      connectWallet();
+      if(!account){
+        connectWallet();
+      }
       getAllSuportedTokensPrice();
       // account will be returned if wallet is connected.
       // so if account is present, retrieve the farms contract.
       if (account) {
         setWalletConnected(true);
-        const TEST_PAIR_ADDRESS = "0xB6b49d3Fbffc56F4a5721B13CE723aEf056A2286";
-        getPair(TEST_PAIR_ADDRESS,library,account,chainId);
-        // console.log("start getPools");
-        // getPools(library, account);
-        // console.log("start initHarvestHistiry");
-        // initHarvestHistiry(library, account);
-        // console.log("start getBalanceRecord");
-        // initBalanceRecord(library, account);
-        // initDao(library, account);
+        console.log("start getPools");
+        getPools(library, account);
+        
       } else {
+        var eth = new Eth(RPC_URL);
+        const library = new Web3Provider(eth.givenProvider);
+        const account = "0x0000000000000000000000000000000000000000";
         setWalletConnected(false);
+        getPools(library, account);
       }
     },
     [account]
@@ -386,114 +333,13 @@ const Farms = (props) => {
     [searchInput, selectedTable, isMyFarms]
   );
 
-  // watch changes of the index of selected table and checkbox filter in premier tab.
-  // basic filter when selected table is all, standard, and dao.
-  // when premier is selected, basic filter out acy tokens only reward,
-  // and advance filter again for bth/eth only or others or both.
-  // useEffect(
-  //   () => {
-  //     setSearchInput('');
-  //     // setIsMyFarms(false);
-
-  //     // when selected table is all,
-  //     // display all data.
-  //     if (farmsContent && selectedTable === 0) {
-  //       const filteredTableData = farmsContent;
-  //       setTableRow(filteredTableData);
-  //       setCurrentTableRow(filteredTableData);
-  //     }
-  //     // when selected table is standard,
-  //     // display acy token only rewards.
-  //     else if (farmsContent && selectedTable === 1) {
-  //       const filteredTableData = farmsContent.filter(
-  //         tableData =>
-  //           (tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) === 'ACY'
-  //       );
-  //       setTableRow(filteredTableData);
-  //       setCurrentTableRow(filteredTableData);
-  //       // when selected table is premier,
-  //       // filter out all acy tokens only rewards,
-  //       // and filter again based on bth/eth and liquidity checkboxes.
-  //     } else if (farmsContent && selectedTable === 2) {
-  //       const tableDataTemp = farmsContent.filter(
-  //         tableData =>
-  //           (tableData.pendingReward.length === 1 && tableData.pendingReward[0].token) !== 'ACY' ||
-  //           tableData.pendingReward.length !== 1
-  //       );
-  //       // advance filter based on bth/eth and liquidity checkboxes.
-  //       if (tokenFilter.btcEthToken && tokenFilter.liquidityToken) {
-  //         const filteredTableData = tableDataTemp;
-  //         setTableRow(filteredTableData);
-  //         setCurrentTableRow(filteredTableData);
-  //       } else if (tokenFilter.btcEthToken && !tokenFilter.liquidityToken) {
-  //         const filteredTableData = tableDataTemp.filter(tableData => {
-  //           let isBtcEth = false;
-  //           tableData.pendingReward.forEach(({ token }) => {
-  //             if (token === 'BTC' || token === 'ETH' || token === 'USDC' || token === 'USDT') {
-  //               isBtcEth = true;
-  //             }
-  //           });
-  //           return isBtcEth;
-  //         });
-  //         setTableRow(filteredTableData);
-  //         setCurrentTableRow(filteredTableData);
-  //       } else if (!tokenFilter.btcEthToken && tokenFilter.liquidityToken) {
-  //         const filteredTableData = tableDataTemp.filter(tableData => {
-  //           let isLiquidity = false;
-  //           tableData.pendingReward.forEach(({ token }) => {
-  //             if (token !== 'BTC' && token !== 'ETH' && token !== 'USDC' && token !== 'USDT') {
-  //               isLiquidity = true;
-  //             }
-  //           });
-  //           return isLiquidity;
-  //         });
-  //         setTableRow(filteredTableData);
-  //         setCurrentTableRow(filteredTableData);
-  //       } 
-  //       else {
-  //         setTableRow([]);
-  //         setCurrentTableRow([]);
-  //       }
-  //     }
-  //   },
-  //   [selectedTable, tokenFilter, farmsContent]
-  // );
-
-  // const refreshPool = async (poolId, idx) => {
-  //   console.log('refresh pool info:');
-  //   const newPool = await getPool(library, account, poolId);
-  //   const newFarmsContent = {
-  //     index:idx,
-  //     poolId: newPool.poolId,
-  //     lpTokens: newPool.lpTokenAddress,
-  //     token1: newPool.token0Symbol,
-  //     token1Logo: getLogoURIWithSymbol(newPool.token0Symbol),
-  //     token2: newPool.token1Symbol,
-  //     token2Logo: getLogoURIWithSymbol(newPool.token1Symbol),
-  //     pendingReward: newPool.rewardTokensSymbols.map((token, idx) => ({
-  //       token,
-  //       amount: newPool.rewardTokensAmount[idx],
-  //     })),
-  //     totalApr: 89.02,
-  //     tvl: 144542966,
-  //     hasUserPosition: newPool.hasUserPosition,
-  //     userRewards: newPool.rewards,
-  //     stakeData: newPool.stakeData
-  //   };
-  //   setFarmsContent( prevState => {
-  //     const prevData = [...prevState];
-  //     prevData[idx] = newFarmsContent;
-  //     return prevData;
-  //   })
-  // };
-
-
 
   return (
     <PageHeaderWrapper>
-      { (isLoadingHarvest || isLoadingPool || isLoadingBalance)? (
+      { isLoadingPool? (
         <div>
           <PageLoading/>
+          {/* Farm is not available not! */}
         </div>
       ) : (
       <div className={styles.farmsContainer}>
@@ -517,9 +363,9 @@ const Farms = (props) => {
             setActiveEnded={setActiveEnded}
           />
         </div>
-        {selectedTable !== 4 && harvestAcy &&(
+        {selectedTable !== 4 && (
           <FarmsTable
-            tableRow={farmsContent}
+            tableRow={walletConnected?farmsContent:notLogginFarmContent}
             tableTitle={tableTitle}
             tableSubtitle={tableSubtitle}
             rowNumber={rowNumber}
