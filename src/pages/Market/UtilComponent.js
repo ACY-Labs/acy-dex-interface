@@ -1245,7 +1245,7 @@ export const MarketSearchBar = props => {
                           </>
                         )}
                       </AcyTabPane>
-                      <AcyTabPane tab="Watchlist" key="2">
+                      {/* <AcyTabPane tab="Watchlist" key="2">
                         {watchlistToken.length > 0 ? (
                           <SmallTable
                             mode="token"
@@ -1273,7 +1273,7 @@ export const MarketSearchBar = props => {
                             Add items by clicking on the star
                           </span>
                         )}
-                      </AcyTabPane>
+                      </AcyTabPane> */}
                     </AcyTabs>
                   </div>
                 )}
