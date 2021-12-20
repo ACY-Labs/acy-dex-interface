@@ -129,14 +129,17 @@ const Swap = props => {
 
   // connect to provider, listen for wallet to connect
 
+  // useEffect(() => {
+  //   if(!account){
+  //     activate(binance);
+  //   }
+  //   console.log("parent page account", account)
+  // }, [account])
+
   useEffect(() => {
     if(!account){
       activate(binance);
-    }
-    console.log("parent page account", account)
-  }, [account])
-
-  useEffect(() => {
+     }
     getTransactionsByAccount(account,library,'SWAP').then(data =>{
       console.log("found this tx dataa::::::", data);
       setTransactionList(data);
@@ -444,7 +447,7 @@ const Swap = props => {
     setTableLoading(true);
     console.log("updating list");
     appendNewSwapTx(refContainer.current,receipt,account,library).then((data) => {
-      setTransactionList(data);
+      if(data && data.length > 0) setTransactionList(data);
       setTableLoading(false);
     })
     
@@ -454,49 +457,6 @@ const Swap = props => {
   const onGetReceipt = async (receipt, library, account) => {
     console.log('RECEIPT', receipt);
     updateTransactionList(receipt);
-
-
-    const { inTokenAddr, amount, outTokenAddr, nonZeroToken, nonZeroTokenAmount } = receipt;
-    let newRouteData = [];
-
-    // let routeDataEntry = {
-    //   from: await getTokenSymbol(inTokenAddr, library, account),
-    //   to: await getTokenSymbol(outTokenAddr, library, account),
-    //   value:
-    //     parseInt(amount.toString().replace('0x', ''), 16) /
-    //     Math.pow(10, await getTokenDecimal(inTokenAddr, library, account)),
-    // };
-    // newRouteData.push(routeDataEntry);
-    for (let i = 0; i < nonZeroToken.length; i++) {
-      // token
-      newRouteData.push({
-        from: await getTokenSymbol(inTokenAddr, library, account),
-        middle: await getTokenSymbol(nonZeroToken[i], library, account),
-        to: await getTokenSymbol(outTokenAddr, library, account),
-        value:
-          parseInt(nonZeroTokenAmount[i].toString().replace('0x', ''), 16)
-      });
-      const tokenDayData = await fetchTokenDaySimple(marketClient, inTokenAddr);
-      // console.log('swaptokenDayData',tokenDayData);
-      // token amount
-    }
-
-
-    // get eth addresses
-    let token0EthAddress = supportedTokens.filter(
-      item => item.address.toLowerCase() == inTokenAddr.toLowerCase()
-    )[0].addressOnEth;
-    // if token is USDC, set price point to the same value
-    // this check is needed because the swap History API cannot support same coins
-    if (token0EthAddress.toLowerCase() == '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48') {
-      console.log('usdc as token 0');
-      setPricePoint(1);
-    } else getRoutePrice(token0EthAddress, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48');
-    setPastToken0(activeToken0.symbol);
-    console.log("end of operation")
-    setIsReceiptObtained(true);
-    setRouteData(newRouteData);
-
   };
   const {
     isMobile,
