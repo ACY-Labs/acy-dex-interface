@@ -1,5 +1,5 @@
 import { fetchMarketData } from './marketData';
-import { fetchGlobalTransaction, fetchFilteredTransaction, fetchAccountTransaction } from './txData';
+import { fetchGlobalTransaction, fetchFilteredTransaction, fetchAccountTransaction, fetchTopExchangeVolume } from './txData';
 import {
   fetchGeneralTokenInfo,
   fetchTokenDayData,
@@ -47,6 +47,7 @@ const DataFetch = {
   fetchUserSnapshot,
   fetchEthPrice,
   fetchTopExchangeVolumes,
+  fetchTopExchangeVolume,
   fetchAccountTransaction,
   fetchTotalFeesPaid,
   fetchLiqudityIncludingFees,
@@ -77,6 +78,7 @@ export {
   fetchEthPrice,
   fetchTopExchangeVolumes,
   fetchAccountTransaction,
+  fetchTopExchangeVolume,
   fetchTotalFeesPaid,
   fetchLiqudityIncludingFees,
   fetchTotalValueSwapped,
