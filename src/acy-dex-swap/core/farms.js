@@ -605,7 +605,7 @@ const deposit = async (lpTokenAddr, amount, poolId, lockDuration, library, accou
     // if (!hasBalance) return new CustomErrveor(`Insufficient balance`);
 
     const tokenDecimals = await depositTokenContract.decimals();
-    const depositAmount = parseUnits(amount.toFixed(tokenDecimals).toString(), tokenDecimals).toString();
+    const depositAmount = parseUnits(amount, tokenDecimals).toString();
     const approved = await checkTokenIsApprovedWithSpender(
       lpTokenAddr,
       FARMS_ADDRESS,
@@ -623,6 +623,7 @@ const deposit = async (lpTokenAddr, amount, poolId, lockDuration, library, accou
     let args = [poolId, depositAmount, lockDuration];
 
     const options = {};
+    console.log("TEST DEPOSIT:",args);
     let result = await contract.estimateGas['deposit'](...args, options)
       .then(gasEstimate => {
         return contract['deposit'](...args, {
