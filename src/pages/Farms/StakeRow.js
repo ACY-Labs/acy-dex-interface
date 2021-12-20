@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import styles from '@/pages/Farms/Farms.less';
 import { isMobile } from 'react-device-detect';
 import { harvestAll, harvest, withdraw } from '@/acy-dex-swap/core/farms';
-import { getUserTokenBalanceWithAddress } from '@/acy-dex-swap/utils';
+import { getUserTokenBalanceWithAddress, API_URL } from '@/acy-dex-swap/utils';
 import StakeModal from './StakeModal';
 import { addLiquidity } from '@/acy-dex-swap/core/addLiquidity';
 import { AcyActionModal, AcyModal, AcyButton, AcyBarChart } from '@/components/Acy';
@@ -157,7 +157,6 @@ const StakeRow = props => {
             }
           });
           // disable button after each transaction on default, enable it after re-entering amount to add
-          
           setHarvestButtonText("Harvest");
           setHarvestButtonStatus(true);
           hideHarvestModal();
@@ -206,7 +205,7 @@ const StakeRow = props => {
           });
           axios.get(
             // fetch valid pool list from remote
-            `http://3.143.250.42:6001/api/farm/updatePool?poolId=${poolId}`
+            `${API_URL}/farm/updatePool?poolId=${poolId}`
           ).then(res => {
             console.log("update pool on server return: ", res);
           }).catch(e => console.log("error: ", e));

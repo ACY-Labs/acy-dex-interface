@@ -474,8 +474,12 @@ const SwapComponent = props => {
 
       <div
         className={styles.arrow}
+        disabled={isLockedToken1}
         onClick={() => {
-          onSwitchCoinCard();
+          if(!isLockedToken1){
+            onSwitchCoinCard();
+          }
+          
         }}
       >
         <Icon style={{ fontSize: '16px' }} type="arrow-down" />

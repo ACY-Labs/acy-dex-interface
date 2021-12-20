@@ -20,7 +20,7 @@ export const FLASH_ARBITRAGE_ADDRESS = '0x4a4783Cf89593127180FD216d1302EE11f72D0
 export const BLOCK_TIME = 3;
 export const BLOCKS_PER_YEAR = 60*60*24*365/BLOCK_TIME;
 export const BLOCKS_PER_MONTH = 60*60*24*31/BLOCK_TIME; 
-export const RPC_URL = "https://data-seed-prebsc-1-s1.binance.org:8545/";
+export const RPC_URL = "https://bsc-dataseed.binance.org/";
 export const API_URL = "https://api.acy.finance/api";
 // export const API_URL = "http://localhost:3001/api";
 
