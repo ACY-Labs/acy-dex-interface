@@ -120,17 +120,17 @@ const StakeRow = props => {
   };
 
   const harvestCallback = status => {
-    const transactions = props.transaction.transactions;
-    const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
+    // const transactions = props.transaction.transactions;
+    // const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
     // trigger loading spin on top right
-    if (isCurrentTransactionDispatched == 0) {
-      dispatch({
-        type: "transaction/addTransaction",
-        payload: {
-          transactions: [...transactions, { hash: status.hash }]
-        }
-      })
-    }
+    // if (isCurrentTransactionDispatched == 0) {
+    //   dispatch({
+    //     type: "transaction/addTransaction",
+    //     payload: {
+    //       transactions: [...transactions, { hash: status.hash }]
+    //     }
+    //   })
+    // }
 
     const checkStatusAndFinish = async () => {
       await library.getTransactionReceipt(status.hash).then(async receipt => {
@@ -138,24 +138,24 @@ const StakeRow = props => {
         if (!receipt) {
           setTimeout(checkStatusAndFinish, 500);
         } else {
-          let transactionTime;
-          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
-            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
-          });
+          // let transactionTime;
+          // await library.getBlock(receipt.logs[0].blockNumber).then(res => {
+          //   transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
+          // });
 
           await refreshPoolInfo();
           refreshHarvestHistory(library, account);
           // clear top right loading spin
-          const newData = transactions.filter(item => item.hash != status.hash);
-          dispatch({
-            type: "transaction/addTransaction",
-            payload: {
-              transactions: [
-                ...newData,
-                { hash: status.hash, transactionTime }
-              ]
-            }
-          });
+          // const newData = transactions.filter(item => item.hash != status.hash);
+          // dispatch({
+          //   type: "transaction/addTransaction",
+          //   payload: {
+          //     transactions: [
+          //       ...newData,
+          //       { hash: status.hash, transactionTime }
+          //     ]
+          //   }
+          // });
           // disable button after each transaction on default, enable it after re-entering amount to add
           setHarvestButtonText("Harvest");
           setHarvestButtonStatus(true);
@@ -168,17 +168,17 @@ const StakeRow = props => {
   }
 
   const withdrawCallback = status => {
-    const transactions = props.transaction.transactions;
-    const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
+    // const transactions = props.transaction.transactions;
+    // const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
     //trigger loading spin on top right
-    if (isCurrentTransactionDispatched == 0) {
-      dispatch({
-        type: "transaction/addTransaction",
-        payload: {
-          transactions: [...transactions, { hash: status.hash }]
-        }
-      })
-    }
+    // if (isCurrentTransactionDispatched == 0) {
+    //   dispatch({
+    //     type: "transaction/addTransaction",
+    //     payload: {
+    //       transactions: [...transactions, { hash: status.hash }]
+    //     }
+    //   })
+    // }
 
     const checkStatusAndFinish = async () => {
       await library.getTransactionReceipt(status.hash).then(async receipt => {
@@ -186,24 +186,24 @@ const StakeRow = props => {
         if (!receipt) {
           setTimeout(checkStatusAndFinish, 500);
         } else {
-          let transactionTime;
-          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
-            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
-          });
+          // let transactionTime;
+          // await library.getBlock(receipt.logs[0].blockNumber).then(res => {
+          //   transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
+          // });
           //refresh talbe
           await refreshPoolInfo();
           // clear top right loading spin
-          const newData = transactions.filter(item => item.hash != status.hash);
-          dispatch({
-            type: "transaction/addTransaction",
-            payload: {
-              transactions: [
-                ...newData,
-                { hash: status.hash, transactionTime }
-              ]
-            }
-          });
-          axios.get(
+          // const newData = transactions.filter(item => item.hash != status.hash);
+          // dispatch({
+          //   type: "transaction/addTransaction",
+          //   payload: {
+          //     transactions: [
+          //       ...newData,
+          //       { hash: status.hash, transactionTime }
+          //     ]
+          //   }
+          // });
+          await axios.get(
             // fetch valid pool list from remote
             `${API_URL}/farm/updatePool?poolId=${poolId}`
           ).then(res => {
