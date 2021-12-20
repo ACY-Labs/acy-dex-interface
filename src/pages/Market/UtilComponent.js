@@ -1134,11 +1134,11 @@ export const MarketSearchBar = props => {
             Pools
           </Link>
         </div>
-        <div className={styles.marketNavbarButton}>
+        {/* <div className={styles.marketNavbarButton}>
           <Link style={{ color: '#b5b5b6', fontWeight: '600' }} to="/market/accounts">
             Account
           </Link>
-        </div>
+        </div> */}
       </div>
       <div className={styles.marketNavbarRight}>
         {/* <div className={styles.marketDropdownWrapper} ref={outsideClickRefNetwork}>
@@ -1184,7 +1184,7 @@ export const MarketSearchBar = props => {
                 width: '100%',
               }}
             >
-              <div className={styles.searchWrapper}>
+              {/* <div className={styles.searchWrapper}>
                 <div className={styles.searchInnerWrapper}>
                   <Input
                     placeholder="Search"
@@ -1199,9 +1199,9 @@ export const MarketSearchBar = props => {
                     value={'' || searchQuery}
                   />
                 </div>
-              </div>
+              </div> */}
               {/* Search modal */}
-              <div style={{ width: '100%', position: 'relative', zIndex: 10 }}>
+              {/* <div style={{ width: '100%', position: 'relative', zIndex: 10 }}>
                 {visibleSearchBar && (
                   <div
                     className={styles.searchModal}
@@ -1249,7 +1249,7 @@ export const MarketSearchBar = props => {
                           </>
                         )}
                       </AcyTabPane>
-                      {/* <AcyTabPane tab="Watchlist" key="2">
+                      <AcyTabPane tab="Watchlist" key="2">
                         {watchlistToken.length > 0 ? (
                           <SmallTable
                             mode="token"
@@ -1277,11 +1277,11 @@ export const MarketSearchBar = props => {
                             Add items by clicking on the star
                           </span>
                         )}
-                      </AcyTabPane> */}
+                      </AcyTabPane>
                     </AcyTabs>
                   </div>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
