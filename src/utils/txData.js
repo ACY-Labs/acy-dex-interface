@@ -86,6 +86,7 @@ function addUserToDB(address){
 
 async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, library, gasPrice){
     console.log("fetchUniqueETHToToken",hash);
+    console.log("Debugging hereeeeeeee:::::::::::")
 
     try{
 
@@ -96,13 +97,16 @@ async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, libra
         let TO_HASH = response.to.toLowerCase().slice(2);
         let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(TO_HASH));
         let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
-        // console.log("pringting data of tx::::::",response,inLogs,outLogs);
+        console.log("pringting data of tx::::::",response,inLogs,outLogs);
         let inToken = findTokenInList(inLogs[0]);
         let outToken =  findTokenInList(outLogs[0]);
 
+        inLogs = inLogs.filter(log => log.address.toLowerCase() == inToken.address.toLowerCase());
+        outLogs = outLogs.filter(log => log.address.toLowerCase() == outToken.address.toLowerCase());
+
         
-        // console.log(inToken,outToken);
-        // console.log("debug finished");
+        console.log(inToken,outToken);
+        console.log("debug finished");
 
         let inTokenNumber = 0;
         let outTokenNumber = 0;
@@ -165,6 +169,9 @@ async function fetchUniqueTokenToETH(account, hash, timestamp, FROM_HASH, librar
         let inTokenNumber = 0;
         let outTokenNumber = 0;
 
+        inLogs = inLogs.filter(log => log.address.toLowerCase() == inToken.address.toLowerCase());
+        outLogs = outLogs.filter(log => log.address.toLowerCase() == outToken.address.toLowerCase());
+
         for(let log of inLogs){inTokenNumber = inTokenNumber + (log.data / Math.pow(10, inToken.decimals))};
         // inTokenNumber = inTokenNumber.toString();
         for(let log of outLogs){outTokenNumber += (log.data / Math.pow(10, outToken.decimals))};
@@ -220,6 +227,9 @@ async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, libr
     
         let inTokenNumber = 0;
         let outTokenNumber = 0;
+
+        inLogs = inLogs.filter(log => log.address.toLowerCase() == inToken.address.toLowerCase());
+        outLogs = outLogs.filter(log => log.address.toLowerCase() == outToken.address.toLowerCase());
     
         for(let log of inLogs){inTokenNumber = inTokenNumber + (log.data / Math.pow(10, inToken.decimals))};
         // inTokenNumber = inTokenNumber.toString();
@@ -643,6 +653,14 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library,0);
             if(fetchedItem) newData.push(fetchedItem);
         }
+
+        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.ethToTokenAbr.id));
+
+        for (let item of filteredData) {
+            let fetchedItem = await fetchUniqueETHToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
+            if(fetchedItem) newData.push(fetchedItem);
+        }
+
         
         return newData;
     }
@@ -791,7 +809,6 @@ export async function fetchTransactionData(address,library, account){
                 totalOut += ammount1;
             }
 
-
             let requestPrice = API+'?module=stats&action=bnbprice&apikey='+apikey;
             let responsePrice = await fetch(requestPrice);
             let ethPrice = await responsePrice.json();
@@ -888,6 +905,7 @@ export async function fetchTransactionData(address,library, account){
             let chartData = getChartData(newData);
             newData.chartData = chartData;
             return newData;
+            
         }else if (transactionData.data.startsWith(methodList.ethToToken.id)){
             let response = await library.getTransactionReceipt(address.toString());
             console.log("Response: ",response);

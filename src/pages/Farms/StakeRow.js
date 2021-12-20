@@ -143,8 +143,16 @@ const StakeRow = props => {
           //   transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
           // });
 
-          await refreshPoolInfo();
-          refreshHarvestHistory(library, account);
+          await axios.get(
+            // fetch valid pool list from remote
+            `${API_URL}/farm/updatePool?poolId=${poolId}`
+          ).then( async (res) => {
+            await refreshPoolInfo();
+            setHarvestButtonText("Harvest");
+            setHarvestButtonStatus(true);
+            hideHarvestModal();
+            console.log("update pool on server return: ", res);
+          }).catch(e => console.log("error: ", e));
           // clear top right loading spin
           // const newData = transactions.filter(item => item.hash != status.hash);
           // dispatch({
@@ -157,9 +165,7 @@ const StakeRow = props => {
           //   }
           // });
           // disable button after each transaction on default, enable it after re-entering amount to add
-          setHarvestButtonText("Harvest");
-          setHarvestButtonStatus(true);
-          hideHarvestModal();
+          
           
         }
       })
@@ -191,7 +197,6 @@ const StakeRow = props => {
           //   transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
           // });
           //refresh talbe
-          await refreshPoolInfo();
           // clear top right loading spin
           // const newData = transactions.filter(item => item.hash != status.hash);
           // dispatch({
@@ -206,13 +211,15 @@ const StakeRow = props => {
           await axios.get(
             // fetch valid pool list from remote
             `${API_URL}/farm/updatePool?poolId=${poolId}`
-          ).then(res => {
+          ).then( async (res) => {
+            await refreshPoolInfo();
+            setWithdrawButtonText("Withdraw");
+            setWithdrawButtonStatus(false);
+            hideWithdrawModal();
             console.log("update pool on server return: ", res);
           }).catch(e => console.log("error: ", e));
           // disable button after each transaction on default, enable it after re-entering amount to add
-          setWithdrawButtonText("Withdraw");
-          setWithdrawButtonStatus(false);
-          hideWithdrawModal();
+          
       
         }
       })

@@ -1,6 +1,7 @@
 import ERC20ABI from '@/abis/ERC20.json';
 import WETHABI from '@/abis/WETH.json';
 import { get } from '@umijs/deps/compiled/got';
+import { asyncForEach } from "@/utils/asynctools";
 import Eth from "web3-eth";
 import Utils from "web3-utils";
 var Contract = require('web3-eth-contract');
@@ -9,26 +10,6 @@ var Contract = require('web3-eth-contract');
 var eth = new Eth('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
 Contract.setProvider('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
 const ACY_ADDRESS = '0xaf9db9e362e306688af48c4acb9618c06db38ac3';
-
-// enable async foreach, callback should be a Promise
-const asyncForEach = (arr, callback) => {
-    let resultArr = [];
-    let promiseArr = [];
-    const O = Object(arr);
-    for (let i = 0; i < arr.length; i++) {
-        let p = new Promise((resolve, reject) => {
-            callback(O[i], i, O).then((result) => {
-                // console.log('Promise: ', result);
-                resultArr.push(result);
-                resolve();
-            })
-        })
-        promiseArr.push(p);
-    }
-    return Promise.all(promiseArr).then(res => {
-        return resultArr;
-    })
-}
 
 const getBlockTime = async (blockNumber) => {
     const timeStamp = await eth.getBlock(blockNumber).then(function(events){

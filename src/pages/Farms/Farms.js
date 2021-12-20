@@ -183,15 +183,16 @@ const Farms = (props) => {
       newFarmsContents.push(newFarmsContent);
     });
     
-    if(account != "0x0000000000000000000000000000000000000000") {
-      setFarmsContent(newFarmsContents);
-      console.log("TEST newFarmsContents:",newFarmsContents);
-    } else {
-      setNotLogginFarmContent(newFarmsContents);
-    }
-    if(pools){
-      setFarmsContent(newFarmsContents);
-    }
+      if(account != "0x0000000000000000000000000000000000000000") {
+          console.log("TEST newFarmsContents 0:",account,farmsContent,walletConnected)
+          setFarmsContent(newFarmsContents);
+          console.log("TEST newFarmsContents 1:",newFarmsContents);
+      } else {
+          console.log("TEST newFarmsContents 2:",account,farmsContent,walletConnected)
+          setNotLogginFarmContent(newFarmsContents);
+        
+        console.log("TEST newFarmsContents 2:",newFarmsContents);
+      }
     setIsLoadingPool(false);
     console.log("end getPools");
   };
@@ -229,7 +230,6 @@ const Farms = (props) => {
       if(!account){
         connectWallet();
       }
-      getAllSuportedTokensPrice();
       // account will be returned if wallet is connected.
       // so if account is present, retrieve the farms contract.
       if (account) {

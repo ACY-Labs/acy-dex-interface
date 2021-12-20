@@ -7,6 +7,40 @@ import { getUserTokenBalance } from '@/acy-dex-swap/utils';
 import { useWeb3React } from '@web3-react/core';
 import { BigNumber } from '@ethersproject/bignumber';
 
+
+function processString(bal) {
+  let decimals = bal.split('.')[0];
+  let fraction = bal.split('.')[1] || '0';
+  // console.log(`decimals: ${decimals} fraction:${fraction}`);
+  const million = BigNumber.from('1000000');
+  const billion = BigNumber.from('1000000000');
+  const trillion = BigNumber.from('1000000000000');
+
+  const decimalBN = BigNumber.from(decimals);
+  let unit = '';
+  if (decimalBN.gt(trillion)) {
+    decimals = `${decimalBN.div(trillion)}`;
+    unit = 'T';
+  } else if (decimalBN.gt(billion)) {
+    decimals = `${decimalBN.div(billion)}`;
+    unit = 'B';
+  } else if (decimalBN.gt(million)) {
+    decimals = `${decimalBN.div(million)}`;
+    unit = 'M';
+  }
+  decimals = decimals.toString();
+
+  const fractionBN = BigNumber.from(fraction);
+  if (fractionBN.gt(trillion)) fraction = `${fractionBN.div(trillion)}`;
+  else if (fractionBN.gt(billion)) fraction = `${fractionBN.div(billion)}`;
+  else if (fractionBN.gt(million)) fraction = `${fractionBN.div(million)}`;
+  fraction = fraction.toString();
+
+  // console.log(`decimals: ${decimals}`);
+  // console.log(fractionBN);
+  return `${decimals}${!fractionBN.isZero() ? `.${fraction}` : ''}${unit}`;
+}
+
 // data refer to the token object that contains properties such as symbol, name, and logoURI.
 // selectToken is the function to execute when the token row is clicked.
 // setAsFav is the function to execute when the star icon is clicked.
@@ -18,71 +52,38 @@ const AcyCoinItem = ({
   hideBalance = false,
   customIcon = true,
   isFav = false,
+  constBal,
   ...rest
 }) => {
   const [balance, setBal] = useState(0);
   const { account, chainId, library, activate } = useWeb3React();
   const [showActionButton, setShowActionButton] = useState(false);
   useEffect(() => {
-    console.log("test click callback", clickCallback)
     if (clickCallback !== undefined) setShowActionButton(true);
     else setShowActionButton(false);
   }, [clickCallback])
 
+  // loading balance if constBal is not given
+  // request balance multiple time have a high cost
   useEffect(
     () => {
       if (hideBalance) return;
       if (!library || !account || !chainId) return;
-      function processString(bal) {
-        let decimals = bal.split('.')[0];
-        let fraction = bal.split('.')[1] || '0';
-        // console.log(`decimals: ${decimals} fraction:${fraction}`);
-        const million = BigNumber.from('1000000');
-        const billion = BigNumber.from('1000000000');
-        const trillion = BigNumber.from('1000000000000');
 
-        const decimalBN = BigNumber.from(decimals);
-        let unit = '';
-        if (decimalBN.gt(trillion)) {
-          decimals = `${decimalBN.div(trillion)}`;
-          unit = 'T';
-        } else if (decimalBN.gt(billion)) {
-          decimals = `${decimalBN.div(billion)}`;
-          unit = 'B';
-        } else if (decimalBN.gt(million)) {
-          decimals = `${decimalBN.div(million)}`;
-          unit = 'M';
-        }
-        decimals = decimals.toString();
-
-        const fractionBN = BigNumber.from(fraction);
-        if (fractionBN.gt(trillion)) fraction = `${fractionBN.div(trillion)}`;
-        else if (fractionBN.gt(billion)) fraction = `${fractionBN.div(billion)}`;
-        else if (fractionBN.gt(million)) fraction = `${fractionBN.div(million)}`;
-        fraction = fraction.toString();
-
-        console.log(`decimals: ${decimals}`);
-        console.log(fractionBN);
-        return `${decimals}${!fractionBN.isZero() ? `.${fraction}` : ''}${unit}`;
-      }
-      async function getThisTokenBalance() {
-        const { address, symbol, decimals } = data;
-        try {
-          const bal = await getUserTokenBalance(
-            { address, symbol, decimals },
-            chainId,
-            account,
-            library
-          );
-          console.log("test symbol: ", symbol)
-          console.log(bal);
+      if (!constBal) {
+        const { address, symbol, decimals } = data; 
+        getUserTokenBalance(
+          { address, symbol, decimals },
+          chainId,
+          account,
+          library
+        ).then((bal) => {
           setBal(processString(bal));
-
-        } catch (err) {
-          console.log("error param: ", address, symbol, decimals, err)
-        }
+          console.log('made request', data, bal);
+        }).catch(err => {
+          console.log("Failed to load balance, error param: ", address, symbol, decimals, err);
+        })
       }
-      getThisTokenBalance();
     },
     [library, account, chainId]
   );
@@ -121,7 +122,7 @@ const AcyCoinItem = ({
           <div style={{ minWidth: "20%", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>{data.name}</div>
 
           {/* token balance container. */}
-          <div hidden={hideBalance} style={{ textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>{balance}</div>
+          <div hidden={hideBalance} style={{ textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>{constBal ? constBal : balance}</div>
         </div>
       </div>
 
