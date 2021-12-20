@@ -3,9 +3,12 @@ import { AcyModal, AcyTabs, AcyCoinItem } from "@/components/Acy";
 const { AcyTabPane } = AcyTabs;
 import TokenListManager from "./TokenListManager";
 import { Input, Icon } from "antd";
+import { useWeb3React } from '@web3-react/core';
+import { getUserTokenBalance } from '@/acy-dex-swap/utils';
+import { asyncForEach } from "@/utils/asynctools";
+import { processString } from "@/components/AcyCoinItem";
 
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
-
 import styles from "./styles.less";
 
 
@@ -17,13 +20,16 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
     const [renderTokenList, setRenderTokenList] = useState([]); // actual token list rendered 
     const [tokenSearchInput, setTokenSearchInput] = useState('');
     const [favTokenList, setFavTokenList] = useState([]);
+    const { account, chainId, library, activate } = useWeb3React();
+    const [tokenBalanceDict, setTokenBalanceDict] = useState({});
 
     useEffect(() => {
         //read customTokenList from storage
         const localTokenList = JSON.parse(localStorage.getItem('customTokenList')) || [];
         setCustomTokenList(localTokenList);
         //combine initTokenList and customTokenList
-        setRenderTokenList([...localTokenList, ...initTokenList]);
+        const totalTokenList = [...localTokenList, ...initTokenList];
+        setRenderTokenList(totalTokenList);
         //read the fav tokens code in storage
         var favTokenSymbol = JSON.parse(localStorage.getItem('tokens_symbol'));
         //set to fav token
@@ -52,10 +58,45 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
     // and filter the token list based on the comparison of the value of search input field and token symbol.
     const onTokenSearchChange = e => {
         setTokenSearchInput(e.target.value);
+        setInitTokenList([]);
         setInitTokenList(
             renderTokenList.filter(token => token.symbol.includes(e.target.value.toUpperCase()))
         );
     };
+
+    const initTokenBalanceDict = (tokenList) => {
+        console.log('Init Token Balance!!!!');        
+        const newTokenBalanceDict = {};
+        asyncForEach(tokenList, async(element, index) => {
+            const token = element;
+            var { address, symbol, decimals } = token; 
+            const bal = await getUserTokenBalance(
+                { address, symbol, decimals },
+                chainId,
+                account,
+                library
+            ).catch(err => {
+                newTokenBalanceDict[token.symbol] = 0;
+                console.log("Failed to load balance, error param: ", address, symbol, decimals, err);
+            })
+
+            const balString = processString(bal);
+            newTokenBalanceDict[token.symbol] = balString;
+            return balString;
+        })
+        setTokenBalanceDict(newTokenBalanceDict);
+    }
+
+    useEffect(() => {
+        if (!library || !account || !chainId) return;
+        if(renderTokenList) {
+            initTokenBalanceDict(renderTokenList);
+        }
+    }, [library, account, chainId, renderTokenList])
+
+    useEffect(() => {
+        console.log('tokenbalancedict', tokenBalanceDict);
+    }, [tokenBalanceDict])
 
 
     const setTokenAsFav = token => {
@@ -91,7 +132,6 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
                             value={tokenSearchInput}
                             onChange={onTokenSearchChange}
                             id="liquidity-token-search-input"
-                            autoComplete="off"
                         />
                     </div>
 
@@ -109,6 +149,7 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
                                                 onCoinClick(token);
                                             }}
                                             isFav={favTokenList.includes(token)}
+                                            constBal={ token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null }
                                         />
                                     );
                                 }) : null}
@@ -125,11 +166,14 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
                                                 onCoinClick(token);
                                             }}
                                             isFav={favTokenList.includes(token)}
+                                            constBal={ token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null }
                                         />
                                     );
                                 })
                                     : <div className={styles.textCenter} >No matching result</div>}
                             </AcyTabPane>
+
+
                             <AcyTabPane tab="Favorite" key="2">
                                 {favTokenList.length ? favTokenList.map((supToken, index) => (
                                     <AcyCoinItem
@@ -149,9 +193,9 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
                         </AcyTabs>
                     </div>
 
-                    {/* <div className={styles.manageCoinList} onClick={() => { setCurrentPanel("manageTokenList") }}>
+                    <div className={styles.manageCoinList} onClick={() => { setCurrentPanel("manageTokenList") }}>
                         <Icon type="form" style={{ marginRight: "1rem" }} /> Manage Token Lists
-                    </div> */}
+                    </div>
                 </>
             )
                 : <TokenListManager
