@@ -586,6 +586,7 @@ export async function swapGetEstimated(
 
         setSlippageAdjustedAmount(slippageAdjustedAmount);
         setMinAmountOut(minAmountOut);
+        //setMinAmountOut(slippageAdjustedAmount);
         setMaxAmountIn(maxAmountIn);
 
         console.log('------------------ BREAKDOWN ------------------');
@@ -1042,6 +1043,7 @@ export async function swap(
     //   return result;
     // } catch(e)  {new CustomError(`${methodName} failed with error ${e}`)};
     // return "ERROR";
+
     const result = await contract.estimateGas[finalMethodName](...args, options)
       .then(gasEstimate =>
         contract[finalMethodName](...args, {
@@ -1050,7 +1052,7 @@ export async function swap(
         })
       )
       .catch(e => {
-
+        //return new CustomError('Cannot estimate gas, maybe price impact is too large for the current slippage tolerance settings.');
         return e;
       });
     return result;
@@ -1062,11 +1064,11 @@ export async function swap(
     setSwapButtonContent("Please try again");
   } else {
     console.log("TEST status:");
-    console.log(status);
-    if(status.code && status.code == 4001) {
+    console.log(status.error.code);
+    if(status.error.code && status.error.code == 4001) {
       setSwapButtonContent("Swap");
       setSwapButtonState(true);
-    }else if(status.code && status.code == -32603) {
+    }else if(status.error.code && status.error.code == -32603) {
       console.log("error status -32603", status)
       let text = null;
       if(exactIn) {
