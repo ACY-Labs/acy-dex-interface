@@ -437,37 +437,37 @@ export async function getAllSuportedTokensPrice(library) {
       tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
     })
     tokensPrice['ACY'] = 0.2;//dont know acy price now;
-    const pair = await Fetcher.fetchPairData(tokenList.find(token => token.symbol == "ACY").address, tokenList.find(token => token.symbol == "USDT").address, library).catch(e => {
-      return new CustomError(
-        `POOL NOT EXIST`
-      );
-    });
-    if (pair instanceof CustomError) {
-      tokensPrice['ACY'] = 0.2;//
-    } else {
-      const pair_contract = getPairContract(pair.liquidityToken.address, library, account)
-      const totalSupply = await pair_contract.totalSupply();
-      const totalAmount = new TokenAmount(pair.liquidityToken, totalSupply.toString());
-      const allToken0 = pair.getLiquidityValue(
-          pair.token0,
-          totalAmount,
-          totalAmount,
-          false
-      );
-      const allToken1 = pair.getLiquidityValue(
-          pair.token1,
-          totalAmount,
-          totalAmount,
-          false
-      );
-      const allToken0Amount = parseFloat(allToken0.toExact());
-      const allToken1Amount = parseFloat(allToken1.toExact());
-      if(pair.token0.symbol == "ACY") {
-        tokensPrice['ACY'] = allToken1Amount / allToken0Amount ;
-      } else {
-        tokensPrice['ACY'] = allToken0Amount / allToken1Amount ;
-      }
-    }
+    // const pair = await Fetcher.fetchPairData(tokenList.find(token => token.symbol == "ACY").address, tokenList.find(token => token.symbol == "USDT").address, library).catch(e => {
+    //   return new CustomError(
+    //     `POOL NOT EXIST`
+    //   );
+    // });
+    // if (pair instanceof CustomError) {
+    //   tokensPrice['ACY'] = 0.2;//
+    // } else {
+    //   const pair_contract = getPairContract(pair.liquidityToken.address, library, account)
+    //   const totalSupply = await pair_contract.totalSupply();
+    //   const totalAmount = new TokenAmount(pair.liquidityToken, totalSupply.toString());
+    //   const allToken0 = pair.getLiquidityValue(
+    //       pair.token0,
+    //       totalAmount,
+    //       totalAmount,
+    //       false
+    //   );
+    //   const allToken1 = pair.getLiquidityValue(
+    //       pair.token1,
+    //       totalAmount,
+    //       totalAmount,
+    //       false
+    //   );
+    //   const allToken0Amount = parseFloat(allToken0.toExact());
+    //   const allToken1Amount = parseFloat(allToken1.toExact());
+    //   if(pair.token0.symbol == "ACY") {
+    //     tokensPrice['ACY'] = allToken1Amount / allToken0Amount ;
+    //   } else {
+    //     tokensPrice['ACY'] = allToken0Amount / allToken1Amount ;
+    //   }
+    // }
     
 
     return tokensPrice;
