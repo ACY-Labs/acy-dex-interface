@@ -426,15 +426,15 @@ const AddLiquidityComponent = props => {
       const transactions = props.transaction.transactions;
       const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
       console.log("is current dispatched? ", isCurrentTransactionDispatched);
-      // trigger loading spin on top right
-      if (isCurrentTransactionDispatched == 0) {
-        dispatch({
-          type: "transaction/addTransaction",
-          payload: {
-            transactions: [...transactions, status.hash]
-          }
-        })
-      }
+      // // trigger loading spin on top right
+      // if (isCurrentTransactionDispatched == 0) {
+      //   dispatch({
+      //     type: "transaction/addTransaction",
+      //     payload: {
+      //       transactions: [...transactions, status.hash]
+      //     }
+      //   })
+      // }
 
       // const pastTransaction = JSON.parse(localStorage.getItem("transactions"));
       // pastTransaction.push(status.hash);
