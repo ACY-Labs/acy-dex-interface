@@ -497,8 +497,8 @@ function AccountOverview(props) {
         }}
       />
 
-      <h2>Top Liquidity Positions</h2>
-      {topLP.length > 0 ? <AccountsTable dataSourceAccounts={topLP} /> : <Icon type="loading" />}
+      {/* <h2>Top Liquidity Positions</h2>
+      {topLP.length > 0 ? <AccountsTable dataSourceAccounts={topLP} /> : <Icon type="loading" />} */}
 
       <h2>Top Exchange Volume</h2>
       {account && transactions.length <= 0 ? (

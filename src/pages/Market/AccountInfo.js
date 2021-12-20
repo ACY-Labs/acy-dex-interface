@@ -803,10 +803,10 @@ function AccountInfo(props) {
       </div> */}
 
       {/* positions table */}
-      <div className={styles.accountPageRow}>
+      {/* <div className={styles.accountPageRow}>
         <h2>Positions</h2>
         <PositionTable data={samplePositionData} />
-      </div>
+      </div> */}
 
       {/* Farms */}
       {/* <div className={styles.accountPageRow}>
