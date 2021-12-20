@@ -38,7 +38,7 @@ import {
   fetchTotalTransactions
 } from './Data/walletStats'
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
-import { binance } from '@/connectors';
+import { binance, injected } from '@/connectors';
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -400,7 +400,10 @@ function AccountInfo(props) {
 
   // method to prompt metamask extension for user to connect their wallet.
   // const connectWallet = () => activate(injected);
-  const connectWallet = () => activate(binance);
+  const connectWallet = () => {
+    activate(binance);
+    activate(injected);
+  }
   useEffect(
     () => {
       if(!daoStakeRecord || !stakeACY) return;

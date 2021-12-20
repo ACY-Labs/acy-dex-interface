@@ -9,7 +9,7 @@ import SampleStakeHistoryData from './SampleDaoData';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAllPools, getHarvestHistory, getPool, getBalanceRecord, getDaoStakeRecord, getPair, testFarmFunction, newGetAllPools } from '@/acy-dex-swap/core/farms';
-import { binance } from '@/connectors';
+import { binance, injected } from '@/connectors';
 import supportedTokens from '@/constants/TokenList';
 import PageLoading from '@/components/PageLoading';
 import Eth from "web3-eth";
@@ -60,6 +60,7 @@ const Farms = (props) => {
 
   const connectWallet = async () =>  {
     activate(binance);
+    activate(injected);
   };
 
   //function to get logo URI

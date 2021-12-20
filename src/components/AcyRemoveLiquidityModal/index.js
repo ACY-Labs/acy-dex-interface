@@ -10,6 +10,7 @@ import moment from 'moment';
 import styles from './AcyRemoveLiquidityModal.less';
 import {
   binance,
+  injected,
 } from '@/connectors';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
@@ -429,6 +430,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
             } else if (buttonStatus) {
               if (account == undefined) {
                 activate(binance);
+                activate(injected);
               } else {
                 console.log(buttonStatus);
                 setButtonContent(<>Processing <Icon type="loading" /></>);

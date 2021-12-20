@@ -600,6 +600,7 @@ const SwapComponent = props => {
           onClick={() => {
             if (account == undefined) {
               // activate(binance);
+              activate(binance);
               activate(injected);
             } else {
               setSwapButtonState(false);

@@ -3,7 +3,7 @@ import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton } from 'antd';
 import { useWeb3React } from '@web3-react/core';
 import { BscConnector } from '@binance-chain/bsc-connector'
-import { binance } from '@/connectors';
+import { binance, injected } from '@/connectors';
 import Data, {
   fetchGeneralPoolInfoDay,
   fetchGeneralTokenInfo,
@@ -51,6 +51,7 @@ const BasicProfile = (props) => {
 
  useEffect(() => {
    if(!account){
+    activate(injected);
     activate(binance);
    }
     getTransactionsByAccount(account,library,'LIQUIDITY').then(data =>{

@@ -1,5 +1,5 @@
 import { useWeb3React } from '@web3-react/core';
-import { binance } from '@/connectors';
+import { binance, injected } from '@/connectors';
 import React, { Component, useState, useEffect, useRef } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { connect } from 'umi';
@@ -139,6 +139,7 @@ const Swap = props => {
   useEffect(() => {
     if(!account){
       activate(binance);
+      activate(injected);
      }
     getTransactionsByAccount(account,library,'SWAP').then(data =>{
       console.log("found this tx dataa::::::", data);

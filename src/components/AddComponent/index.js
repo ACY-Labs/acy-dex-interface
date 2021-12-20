@@ -82,6 +82,7 @@ import moment from 'moment';
 
 import {
   binance,
+  injected,
 } from '@/connectors';
 
 const { AcyTabPane } = AcyTabs;
@@ -363,6 +364,7 @@ const AddLiquidityComponent = props => {
 
   const ConnectWallet = () => {
     activate(binance);
+    activate(injected);
   };
 
   useEffect(
@@ -776,6 +778,7 @@ const AddLiquidityComponent = props => {
                     onClick={async () => {
                       if (account == undefined) {
                         activate(binance);
+                        activate(injected);
                         setButtonContent('Choose tokens and amount');
                         setButtonStatus(false);
                       } else {

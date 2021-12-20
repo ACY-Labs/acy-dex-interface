@@ -39,8 +39,10 @@ const GlobalHeaderRight = props => {
   const { account, chainId, library, activate, deactivate, active } = useWeb3React();
 
   useEffect(() => {
-    if (!account)
+    if (!account){
       activate(binance);
+      activate(injected);
+    }
   }, []);
 
   useEffect(() => {
