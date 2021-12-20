@@ -119,6 +119,16 @@ async function parseAccountTransaction(user,library){
   return sortTable(txList, "time", true);
 }
 
+export async function fetchAccountTransaction(account, library) {
+  try{
+    let accountTransactions = await parseAccountTransaction(account, library);
+    return accountTransactions;
+  }catch (e){
+    console.log('service not available yet',e);
+    return null;
+  }
+}
+
 
 async function parseTopExchangeVolume(userList,library){
   let txList = [];

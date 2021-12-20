@@ -2,13 +2,12 @@ import axios from 'axios';
 
 export async function fetchTotalValueSwapped(account){
   try {
-      // TODO: api for totalValueSwapped
-      let request = 'https://api.acy.finance/api/users/all';
+      let request = `https://api.acy.finance/api/users/stats?address=${account}`;
       let response = await fetch(request);
       let data = await response.json();
 
-      // get totalValueSwapped (dummy data)
-      let totalValueSwapped = 10000; 
+      // get totalValueSwapped
+      let totalValueSwapped = data.data.totalswappedvalue; 
       let totalValueSwappedStr;
       if (totalValueSwapped >= 1000000) {
         totalValueSwappedStr = `$${(totalValueSwapped / 1000000).toFixed(2)}mil`;
@@ -26,13 +25,12 @@ export async function fetchTotalValueSwapped(account){
 
 export async function fetchTotalFeesPaid(account){
   try {
-      // TODO: api for totalFeesPaid
-      let request = 'https://api.acy.finance/api/users/all';
+      let request = `https://api.acy.finance/api/users/stats?address=${account}`;
       let response = await fetch(request);
       let data = await response.json();
 
-      // get totalFeesPaid (dummy data)
-      let totalFeesPaid = 10; 
+      // get totalFeesPaid 
+      let totalFeesPaid = data.data.totalfeespaid; 
       let totalFeesPaidStr;
       if (totalFeesPaid >= 1000000) {
         totalFeesPaidStr = `$${(totalFeesPaid / 1000000).toFixed(2)}mil`;
@@ -50,13 +48,12 @@ export async function fetchTotalFeesPaid(account){
 
 export async function fetchTotalTransactions(account){
   try {
-      // TODO: api for totalTransactions
-      let request = 'https://api.acy.finance/api/users/all';
+      let request = `https://api.acy.finance/api/users/stats?address=${account}`;
       let response = await fetch(request);
       let data = await response.json();
 
       // get totalTransactions (dummy data)
-      let totalTransactions = 10000; 
+      let totalFeesPaid = data.data.totaltransactions; 
       let totalTransactionsStr;
       if (totalTransactions >= 1000000) {
         totalTransactionsStr = `$${(totalTransactions / 1000000).toFixed(2)}mil`;
@@ -75,13 +72,12 @@ export async function fetchTotalTransactions(account){
 export async function fetchLiqudityIncludingFees(account) {
   console.log(account)
   try {
-    // TODO: api for liquidityIncludingFees
-    let request = 'https://api.acy.finance/api/users/all';
+    let request = `https://api.acy.finance/api/users/stats?address=${account}`;
     let response = await fetch(request);
     let data = await response.json();
 
     // get liquidityIncludingFees (dummy data)
-    let liquidityIncludingFees = 10; 
+    let liquidityIncludingFees = 0; 
     let liquidityIncludingFeesStr;
     if (liquidityIncludingFees >= 1000000) {
       liquidityIncludingFeesStr = `$${(liquidityIncludingFees / 1000000).toFixed(2)}mil`;
