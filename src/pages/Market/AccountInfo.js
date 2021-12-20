@@ -31,6 +31,12 @@ import {
   getAllSuportedTokensPrice,
   BLOCK_TIME
 } from '@/acy-dex-swap/utils/index';
+import {
+  fetchTotalFeesPaid,
+  fetchLiqudityIncludingFees,
+  fetchTotalValueSwapped,
+  fetchTotalTransactions
+} from './Data/walletStats'
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import { binance } from '@/connectors';
 
@@ -332,10 +338,11 @@ function AccountInfo(props) {
   // Fetch Account Transactions
   const [userTransactions, setUserTransactions] = useState([])
 
-  // 3 wallet details
+  // wallet analytics
   const [totalNoOfTransactions, setTotalNoOfTransactions] = useState(0)
   const [totalValueSwapped, setTotalValueSwapped] = useState(0)
   const [totalFeesPaid, setTotalFeesPaid] = useState(0)
+  const [liquidityIncludingFees, setLiquidityIncludingFees] = useState(0)
 
   const [userLPHandlers, setUserLPHandlers] = useState([]);
   // const [userLPData, setUserLPData] = useState([]); // fetch a list of valid pool from backend
@@ -355,30 +362,33 @@ function AccountInfo(props) {
         if (accountTransactions) {
           setUserTransactions(accountTransactions);
           console.log(accountTransactions);
-
-          // set total value swapped
-          let totalValueSwappedUser = 0;
-          for (const transaction of accountTransactions) {
-            totalValueSwappedUser += transaction.totalValue
-          }
-          if (totalValueSwappedUser >= 1000000) {
-            setTotalValueSwapped(`$${(totalValueSwappedUser / 1000000).toFixed(2)}mil`);
-          } else if (totalValueSwappedUser >= 1000) {
-            setTotalValueSwapped(`$${(totalValueSwappedUser / 1000).toFixed(2)}k`);          
-          } else {
-            setTotalValueSwapped(`$${totalValueSwappedUser.toFixed(2)}`);
-          }
         };
-
-        // set total transactions
-        if (accountTransactions.length >= 1000) {
-          setTotalNoOfTransactions(`${(accountTransactions.length / 1000).toFixed(2)}k`);
-        } else {
-          setTotalNoOfTransactions(accountTransactions.length);
-        }
       });
     }
   }, [library]);
+
+  useEffect(() => {
+    if (library) {
+      // fetch total value swapped
+      fetchTotalValueSwapped(account).then(valueSwapped => {
+        setTotalValueSwapped(valueSwapped);
+      })
+      // fetch total fees paid
+      fetchTotalFeesPaid(account).then(feesPaid => {
+        setTotalFeesPaid(feesPaid);
+      })
+
+      // fetch total transactions
+      fetchTotalTransactions(account).then(noOfTransactions => {
+        setTotalNoOfTransactions(noOfTransactions);
+      })
+
+      // fetch liquidity including fees
+      fetchLiqudityIncludingFees(account).then(liquidityFees => {
+        setLiquidityIncludingFees(liquidityFees);
+      })
+    }
+  }, [library])
 
   // method to hide/unhidden table row.
   const onRowClick = index =>
@@ -743,7 +753,7 @@ function AccountInfo(props) {
           </div>
           <div style={{ width: 20 }} />
           <div className={styles.walletStatEntry}>
-            <div className={styles.walletStatValue}>$999.99m</div>
+            <div className={styles.walletStatValue}>{totalFeesPaid}</div>
             <div className={styles.walletStatIndicator}>Total Fees Paid</div>
           </div>
           <div style={{ width: 20 }} />
@@ -766,7 +776,7 @@ function AccountInfo(props) {
                 : positionValue === 0
                 ? formattedNum(userLiquidityOwn, true)
                 : '-'} */}
-                $0
+                {liquidityIncludingFees}
             </div>
           </div>
           <div style={{ width: 20 }} />
@@ -793,10 +803,10 @@ function AccountInfo(props) {
       </div> */}
 
       {/* positions table */}
-      <div className={styles.accountPageRow}>
+      {/* <div className={styles.accountPageRow}>
         <h2>Positions</h2>
         <PositionTable data={samplePositionData} />
-      </div>
+      </div> */}
 
       {/* Farms */}
       {/* <div className={styles.accountPageRow}>

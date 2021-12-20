@@ -26,6 +26,7 @@ import {
   fetchTopExchangeVolumes,
   marketClient,
   fetchGlobalTransaction,
+  fetchTopExchangeVolume
 } from './Data/index.js';
 import { WatchlistManager } from './WatchlistManager.js';
 import { TransactionTable } from './UtilComponent.js';
@@ -358,16 +359,16 @@ function AccountOverview(props) {
   const [inputError, setInputError] = useState('');
   const [topEV, setTopEV] = useState([]);
 
-  const [transactions, settransactions] = useState([]);
+  const [topExchangeVolume, settopExchangeVolume] = useState([]);
   
   const { account, chainId, library, activate } = useWeb3React();
 
   useEffect(() => {
-    // fetch transaction data
+    // fetch data
     if(library) {
-      fetchGlobalTransaction(library).then(globalTransactions => {
-        console.log('globaltransaction', globalTransactions);
-        if(globalTransactions) settransactions(globalTransactions);
+      fetchTopExchangeVolume(library).then(topExchangeVolume => {
+        console.log('topExchangeVolume', topExchangeVolume);
+        if(topExchangeVolume) settopExchangeVolume(topExchangeVolume);
       });
     }
   }, [library]);
@@ -497,14 +498,14 @@ function AccountOverview(props) {
         }}
       />
 
-      <h2>Top Liquidity Positions</h2>
-      {topLP.length > 0 ? <AccountsTable dataSourceAccounts={topLP} /> : <Icon type="loading" />}
+      {/* <h2>Top Liquidity Positions</h2>
+      {topLP.length > 0 ? <AccountsTable dataSourceAccounts={topLP} /> : <Icon type="loading" />} */}
 
       <h2>Top Exchange Volume</h2>
-      {account && transactions.length <= 0 ? (
+      {account && topExchangeVolume.length <= 0 ? (
         <Icon type="loading" />
       ) : (
-        <TransactionTable dataSourceTransaction={transactions} />
+        <TransactionTable dataSourceTransaction={topExchangeVolume} />
       )}
       <div style={{ height: '20px' }} />
     </div>
