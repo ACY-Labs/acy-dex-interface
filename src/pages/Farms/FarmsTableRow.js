@@ -60,7 +60,6 @@ const FarmsTableRow = props => {
     account,
     library,
     isMyFarms,
-    harvestHistory,
     dispatch,
     content,
     poolId,
@@ -75,7 +74,6 @@ const FarmsTableRow = props => {
     userRewards,
     stakeData,
     hasUserPosition,
-    refreshHarvestHistory,
     searchInput,
     selectedTable,
     tokenFilter,
@@ -548,9 +546,7 @@ const FarmsTableRow = props => {
             data={data}
             library={library}
             account={account}
-            harvestHistory={harvestHistory}
             poolId={poolId}
-            refreshHarvestHistory={refreshHarvestHistory}
             token1={poolInfo.token1}
             token1Logo={poolInfo.token1Logo}
             token2={poolInfo.token2}

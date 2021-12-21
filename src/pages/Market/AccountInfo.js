@@ -5,7 +5,7 @@ import { AcyIcon, AcyTokenIcon, AcyPeriodTime, AcyAccountChart } from '@/compone
 // import FarmsTable from '@/pages/Farms/FarmsTable';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { getAllPools, getDaoStakeRecord, getHarvestHistory } from '@/acy-dex-swap/core/farms';
+import { getAllPools } from '@/acy-dex-swap/core/farms';
 import styles from './styles.less';
 import { abbrNumber, abbrHash, isDesktop, sortTable, openInNewTab, formattedNum } from './Util';
 import { MarketSearchBar, TransactionTable } from './UtilComponent';
@@ -324,7 +324,6 @@ function AccountInfo(props) {
   const [isMyFarms, setIsMyFarms] = useState(false);
   const [harvestAcy, setHarvestAcy] = useState();
   const [balanceAcy, setBalanceAcy] = useState();
-  const [daoStakeRecord, setDaoStakeRecord] = useState();
   const [stakeACY, setStakeACY] = useState();
 
   const [isLoadingPool, setIsLoadingPool] = useState(true);
@@ -404,41 +403,6 @@ function AccountInfo(props) {
     activate(binance);
     activate(injected);
   }
-  useEffect(
-    () => {
-      if(!daoStakeRecord || !stakeACY) return;
-      let len = daoStakeRecord.myAcy.length;
-      var resultMy = [...daoStakeRecord.myAcy];
-      var resultTotal = [...daoStakeRecord.totalAcy];
-      resultMy[len-1][1] += stakeACY.myAcy;
-      resultTotal[len-1][1] += stakeACY.totalAcy;
-      for(var i=len-2; i!=-1 ; i--){
-        resultMy[i][1] += resultMy[i+1][1];
-        resultTotal[i][1] += resultTotal[i+1][1];
-      }
-      for(var i=0; i!=len-1 ; i++){
-        resultMy[i][1]    = parseFloat(resultMy[i+1][1].toFixed(1));
-        resultTotal[i][1] = parseFloat(resultTotal[i+1][1].toFixed(1));
-      }
-      resultMy[len-1][1]    = parseFloat(stakeACY.myAcy.toFixed(1));
-      resultTotal[len-1][1] = parseFloat(stakeACY.totalAcy.toFixed(1));
-      setBalanceAcy({
-        myAcy: resultMy,
-        totalAcy: resultTotal
-      });
-      setIsLoadingBalance(false);
-   },
-   [daoStakeRecord, stakeACY]
- );
-  const initHarvestHistiry = async (library, account) => {
-    const harvest = await getHarvestHistory(library, account);
-    setHarvestAcy(harvest);
-    setIsLoadingHarvest(false);
-  }
-  const initDao = async (library, account) => {
-    const dao = await getDaoStakeRecord(library, account);
-    setDaoStakeRecord(dao);
-  }
 
   useEffect(
     () => {
@@ -508,7 +472,6 @@ function AccountInfo(props) {
       if (account) {
         setWalletConnected(true);
         getPools(library, account);
-        initHarvestHistiry(library, account);
         initDao(library, account);
       } else {
         setWalletConnected(false);

@@ -466,9 +466,10 @@ export async function getACYPrice(library){
     const result = await getTokenPriceByPair(acyUsdtPair, ACY.symbol, library);
     return result;
   } else {
-    const acyToUsdtPrice =  await getTokenPriceByPair(acyUsdtPair, ACY.symbol, library);
-    const acyToBusdPrice =  await getTokenPriceByPair(acyBusdPair, ACY.symbol, library);
-    const result = (acyToUsdtPrice+acyToBusdPrice)/2;
+    const acyToUsdtPrice =  getTokenPriceByPair(acyUsdtPair, ACY.symbol, library);
+    const acyToBusdPrice =  getTokenPriceByPair(acyBusdPair, ACY.symbol, library);
+    let [result1, result2] = await Promise.all([acyToUsdtPrice, acyToBusdPrice]);
+    const result = (result1+result2)/2;
     return result;
   }
 }
