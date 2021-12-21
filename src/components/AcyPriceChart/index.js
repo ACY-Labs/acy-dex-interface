@@ -99,14 +99,14 @@ const AcyPriceChart = (props) => {
     if (echartInstance) {
       console.log("cleared and set option");
       echartInstance.clear();
-      echartInstance.setOption(options);
+      setTimeout(echartInstance.setOption(options),500);
     }
   }, [props.data, echartInstance]);
 
   const renderTooltip = v => {
     const { onHover, showTooltip } = props;
     if (onHover) onHover(v[0].data, v[0].dataIndex);
-    console.log("V",v);
+    // console.log("V",v);
     if (showTooltip) return `
     
     <div className = "flew-row ">
