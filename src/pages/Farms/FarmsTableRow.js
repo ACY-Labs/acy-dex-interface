@@ -60,7 +60,6 @@ const FarmsTableRow = props => {
     account,
     library,
     isMyFarms,
-    harvestHistory,
     dispatch,
     content,
     poolId,
@@ -75,7 +74,6 @@ const FarmsTableRow = props => {
     userRewards,
     stakeData,
     hasUserPosition,
-    refreshHarvestHistory,
     searchInput,
     selectedTable,
     tokenFilter,
@@ -421,8 +419,8 @@ const FarmsTableRow = props => {
           {/* only display token 1 symbol if token 2 is undefined or null. */}
           <div className={styles.tokenTitleContainer}>
             {poolInfo.token1 && poolInfo.token2 && `${poolInfo.token1}-${poolInfo.token2}`}
-            {poolInfo.token1 && !poolInfo.token2 && `s${poolInfo.token1}`}
-            {poolInfo.token2 && !poolInfo.token1 && `s${poolInfo.token2}`}
+            {poolInfo.token1 && !poolInfo.token2 && `${poolInfo.token1}`}
+            {poolInfo.token2 && !poolInfo.token1 && `${poolInfo.token2}`}
             {!isMobile ? poolInfo.token1 && poolInfo.token2 && <span style={{ opacity: '0.5' }}> LP</span> : ''}
           </div>
         </div>
@@ -548,9 +546,7 @@ const FarmsTableRow = props => {
             data={data}
             library={library}
             account={account}
-            harvestHistory={harvestHistory}
             poolId={poolId}
-            refreshHarvestHistory={refreshHarvestHistory}
             token1={poolInfo.token1}
             token1Logo={poolInfo.token1Logo}
             token2={poolInfo.token2}

@@ -383,14 +383,14 @@ const SwapComponent = props => {
     } = props;
     // 检查是否已经包含此交易
     const transLength = transactions.filter(item => item.hash == status.hash).length;
-    if (transLength == 0) {
-      dispatch({
-        type: 'transaction/addTransaction',
-        payload: {
-          transactions: [...transactions, status.hash],
-        },
-      });
-    }
+    // if (transLength == 0) {
+    //   dispatch({
+    //     type: 'transaction/addTransaction',
+    //     payload: {
+    //       transactions: [...transactions, status.hash],
+    //     },
+    //   });
+    // }
     // let lists=[{
     //   hash:status.hash,
     //   receipt
@@ -458,6 +458,7 @@ const SwapComponent = props => {
           console.log("current t0 amount", e)
           t0Changed(e);
         }}
+        library={library}
       />
 
       <div
@@ -497,6 +498,7 @@ const SwapComponent = props => {
           t1Changed(e);
         }}
         isLocked={isLockedToken1}
+        library={library}
       />
 
       {showDescription ? <AcyDescriptions>
@@ -600,6 +602,7 @@ const SwapComponent = props => {
           onClick={() => {
             if (account == undefined) {
               // activate(binance);
+              activate(binance);
               activate(injected);
             } else {
               setSwapButtonState(false);

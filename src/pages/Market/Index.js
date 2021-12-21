@@ -3,7 +3,7 @@ import { Col, Icon, Row } from 'antd';
 import React, { Component, useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useWeb3React } from '@web3-react/core';
-import { binance } from '@/connectors';
+import { binance, injected } from '@/connectors';
 import {
   fetchGeneralPoolInfoDay,
   fetchGeneralTokenInfo,
@@ -56,7 +56,9 @@ const MarketIndex = props => {
  
   useEffect(() => {
     if(!account){
+      console.log("Market_________________");
       activate(binance);
+      activate(injected);
     }
   }, []);
 

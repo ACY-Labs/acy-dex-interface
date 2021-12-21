@@ -82,6 +82,7 @@ import moment from 'moment';
 
 import {
   binance,
+  injected,
 } from '@/connectors';
 
 const { AcyTabPane } = AcyTabs;
@@ -363,6 +364,7 @@ const AddLiquidityComponent = props => {
 
   const ConnectWallet = () => {
     activate(binance);
+    activate(injected);
   };
 
   useEffect(
@@ -426,15 +428,15 @@ const AddLiquidityComponent = props => {
       const transactions = props.transaction.transactions;
       const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
       console.log("is current dispatched? ", isCurrentTransactionDispatched);
-      // trigger loading spin on top right
-      if (isCurrentTransactionDispatched == 0) {
-        dispatch({
-          type: "transaction/addTransaction",
-          payload: {
-            transactions: [...transactions, status.hash]
-          }
-        })
-      }
+      // // trigger loading spin on top right
+      // if (isCurrentTransactionDispatched == 0) {
+      //   dispatch({
+      //     type: "transaction/addTransaction",
+      //     payload: {
+      //       transactions: [...transactions, status.hash]
+      //     }
+      //   })
+      // }
 
       // const pastTransaction = JSON.parse(localStorage.getItem("transactions"));
       // pastTransaction.push(status.hash);
@@ -545,6 +547,7 @@ const AddLiquidityComponent = props => {
                 setToken0Amount(e);
               }}
               isLocked={isFarm}
+              library={library}
             />
             <div style={{ margin: '12px auto', textAlign: 'center' }}>
               <AcyIcon width={21.5} name="plus_light" />
@@ -568,6 +571,7 @@ const AddLiquidityComponent = props => {
                 setToken1Amount(e);
               }}
               isLocked={isFarm}
+              library={library}
             />
 
             <AcyDescriptions>
@@ -776,6 +780,7 @@ const AddLiquidityComponent = props => {
                     onClick={async () => {
                       if (account == undefined) {
                         activate(binance);
+                        activate(injected);
                         setButtonContent('Choose tokens and amount');
                         setButtonStatus(false);
                       } else {

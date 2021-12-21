@@ -237,7 +237,8 @@ const StakeModal = props => {
             //change to to production
             //`http://api.acy.finance/api/updatePool?poolId=${poolId}`
           ).then( async (res) => {
-            await refreshPoolInfo();
+            console.log("poolId:",poolId)
+            await refreshPoolInfo(poolId);
             setButtonText("Done");
             setButtonStatus(true);
             onCancel();
@@ -376,7 +377,7 @@ const StakeModal = props => {
         </div>
       </div>
       <div className={styles.balanceAmountContainer2}>
-          LP Token: {(parseFloat(totalUSDBalance)).toFixed(6)} {token2? `${token1+"-"+token2} LP`  : `s${token1}`}
+          {token2? 'LP Token':'Token'}: {(parseFloat(totalUSDBalance)).toFixed(6)} {token2? `${token1+"-"+token2} LP`  : `${token1}`}
       </div>
      
       <div className={styles.sliderWrapper}>
@@ -490,8 +491,14 @@ const StakeModal = props => {
             if (buttonText != "Done") {
               if (buttonText !== 'Approval required') {
                 setButtonText(<>Processing <Icon type="loading" /></>);
+                console.log("TEST DEPOSIT:", balance, parseFloat(balance), (balance*(balancePercentage/100)),(balance*(balancePercentage/100)));
                 setButtonStatus(false);
-                deposit(stakedTokenAddr, balance*balancePercentage/100, poolId, getLockDuration(), library, account, setButtonText, stakeCallback, setButtonStatus);
+                if(balancePercentage < 100) {
+                  deposit(stakedTokenAddr, (balance*(balancePercentage/100)).toFixed(18), poolId, getLockDuration(), library, account, setButtonText, stakeCallback, setButtonStatus);
+                } else {
+                  deposit(stakedTokenAddr, balance, poolId, getLockDuration(), library, account, setButtonText, stakeCallback, setButtonStatus);
+                }
+                
               } else {
                 setButtonText(<>Approving <Icon type="loading" /></>);
                 setButtonStatus(false);

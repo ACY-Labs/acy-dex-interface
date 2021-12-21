@@ -1,5 +1,5 @@
 import { useWeb3React } from '@web3-react/core';
-import { binance } from '@/connectors';
+import { binance, injected } from '@/connectors';
 import React, { Component, useState, useEffect, useRef } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { connect } from 'umi';
@@ -139,6 +139,7 @@ const Swap = props => {
   useEffect(() => {
     if(!account){
       activate(binance);
+      activate(injected);
      }
     getTransactionsByAccount(account,library,'SWAP').then(data =>{
       console.log("found this tx dataa::::::", data);
@@ -235,7 +236,7 @@ const Swap = props => {
     axios.get(
       "https://api.acy.finance/api/chart/getRate", {params : {token0 : A , token1 : B}}
     ).then(res => {
-      console.log(res.data);
+      console.log("response",res.data);
       if(res.data){
       const historyData = res.data.History;
       timeMark = historyData[historyData.length-1].time;
@@ -284,7 +285,10 @@ const Swap = props => {
           console.log("CHARTING!!!!!!!!!!!",tempChart);
 
           setChartData( addData.concat(tempChart));
-    };
+    }
+      else{
+        setActiveRate("No this pair data yet");
+      }
 
     })
      

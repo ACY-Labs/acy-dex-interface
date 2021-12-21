@@ -53,10 +53,8 @@ const StakeRow = props => {
     data,
     account,
     library,
-    harvestHistory,
     dispatch,
     poolId,
-    refreshHarvestHistory,
     token1,
     token1Logo,
     token2,
@@ -403,7 +401,7 @@ const StakeRow = props => {
               <div className={styles.tokenSymbol}>
                 
                 {token1 && token2 && `${token1}-${token2} LP`}
-                {token1 && !token2 && `s${token1}`}
+                {token1 && !token2 && `${token1}`}
                 {token2 && !token1 && `${token2}`}
               </div>
               

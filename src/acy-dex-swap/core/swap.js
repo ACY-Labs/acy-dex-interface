@@ -328,7 +328,7 @@ export async function swapGetEstimated(
     // get pair using our own provider
     const pair = await Fetcher.fetchPairData(token0, token1, library).catch(e => {
       return new CustomError(
-        `Swap w/ arbitrage`
+        `Swap`
       );
     });
     if (pair instanceof CustomError) {
@@ -1064,7 +1064,10 @@ export async function swap(
     setSwapButtonContent("Please try again");
   } else {
     console.log("TEST status:");
+<<<<<<< HEAD
     // console.log(status.error.code);
+=======
+>>>>>>> dda09e9b13988ed83dade9bd776ecc9be34a0ac7
     if(status.error && status.error.code == 4001) {
       setSwapButtonContent("Swap");
       setSwapButtonState(true);
