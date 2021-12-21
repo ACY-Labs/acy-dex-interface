@@ -18,6 +18,7 @@ const AcyCuarrencyCard = ({
   token,
   isLocked,
   inputColor,
+  library,
   ...rest
 }) => {
   const [light, setLight] = useState(false);
@@ -42,7 +43,7 @@ const AcyCuarrencyCard = ({
     else if (!token)
       setUsdValue(null);
 
-    const tokenPriceList = await getAllSuportedTokensPrice();
+    const tokenPriceList = await getAllSuportedTokensPrice(library);
     const tokenPrice = tokenPriceList[coin];
     const tokenAmountUSD = tokenPrice * token;
     setUsdValue(tokenAmountUSD.toFixed(2));

@@ -458,6 +458,7 @@ const SwapComponent = props => {
           console.log("current t0 amount", e)
           t0Changed(e);
         }}
+        library={library}
       />
 
       <div
@@ -497,6 +498,7 @@ const SwapComponent = props => {
           t1Changed(e);
         }}
         isLocked={isLockedToken1}
+        library={library}
       />
 
       {showDescription ? <AcyDescriptions>

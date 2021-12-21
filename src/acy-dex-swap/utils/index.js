@@ -436,43 +436,75 @@ export async function getAllSuportedTokensPrice(library) {
     tokenList.forEach(token => {
       tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
     })
-    tokensPrice['ACY'] = 0.2;//dont know acy price now;
-    // const pair = await Fetcher.fetchPairData(tokenList.find(token => token.symbol == "ACY").address, tokenList.find(token => token.symbol == "USDT").address, library).catch(e => {
-    //   return new CustomError(
-    //     `POOL NOT EXIST`
-    //   );
-    // });
-    // if (pair instanceof CustomError) {
-    //   tokensPrice['ACY'] = 0.2;//
-    // } else {
-    //   const pair_contract = getPairContract(pair.liquidityToken.address, library, account)
-    //   const totalSupply = await pair_contract.totalSupply();
-    //   const totalAmount = new TokenAmount(pair.liquidityToken, totalSupply.toString());
-    //   const allToken0 = pair.getLiquidityValue(
-    //       pair.token0,
-    //       totalAmount,
-    //       totalAmount,
-    //       false
-    //   );
-    //   const allToken1 = pair.getLiquidityValue(
-    //       pair.token1,
-    //       totalAmount,
-    //       totalAmount,
-    //       false
-    //   );
-    //   const allToken0Amount = parseFloat(allToken0.toExact());
-    //   const allToken1Amount = parseFloat(allToken1.toExact());
-    //   if(pair.token0.symbol == "ACY") {
-    //     tokensPrice['ACY'] = allToken1Amount / allToken0Amount ;
-    //   } else {
-    //     tokensPrice['ACY'] = allToken0Amount / allToken1Amount ;
-    //   }
-    // }
-    
+    tokensPrice['ACY'] = await getACYPrice(library);//dont know acy price now;
 
     return tokensPrice;
   });
   return tokensPrice;
+}
+
+export async function getACYPrice(library){
+  const ACY  = tokenList.find(token => token.symbol == "ACY");
+  const BUSD = tokenList.find(token => token.symbol == "BUSD");
+  const USDT = tokenList.find(token => token.symbol == "USDT");
+  console.log("getPrice",ACY,BUSD,USDT);
+
+  const acyToken  = new Token(56, "0xc94595b56e301f3ffedb8ccc2d672882d623e53a", 18, "ACY");
+  const usdToken  = new Token(56, "0x55d398326f99059ff775485246999027b3197955", 18, "USDT");
+  const busdToken = new Token(56, "0xe9e7cea3dedca5984780bafc599bd69add087d56", 18, "BUSD");
+  console.log("getPrice ACY PRICE USDT BSUD: 0");
+  const acyUsdtPair = await Fetcher.fetchPairData(acyToken, usdToken, library).catch(e => {
+    console.log("getPrice ACY PRICE USDT ERROR: 0");
+    return false
+  });
+  const acyBusdPair = await Fetcher.fetchPairData(acyToken, busdToken, library).catch(e => {
+    console.log("getPrice ACY PRICE BSUD ERROR: 0");
+    return false
+  });
+  console.log("getPrice ACY PRICE USDT BSUD HERE: 0", acyUsdtPair, acyBusdPair);
+  if(!acyUsdtPair && !acyBusdPair) {
+    return 0;
+  } else if(!acyUsdtPair) {
+    const result = await getTokenPriceByPair(acyBusdPair, ACY.symbol, library);
+    console.log("getPrice ACY PRICE BSUD:", result);
+    return result;
+  } else if(!acyBusdPair) {
+    const result = await getTokenPriceByPair(acyUsdtPair, ACY.symbol, library);
+    console.log("getPrice ACY PRICE USDT:", result);
+    return result;
+  } else {
+    const acyToUsdtPrice =  await getTokenPriceByPair(acyUsdtPair, ACY.symbol, library);
+    const acyToBusdPrice =  await getTokenPriceByPair(acyBusdPair, ACY.symbol, library);
+    const result = (acyToUsdtPrice+acyToBusdPrice)/2;
+    console.log("getPrice ACY PRICE USDT BSUD:", result);
+    return result;
+  }
+}
+
+export async function getTokenPriceByPair(pair, symbol, library) {
+  const pair_contract = getPairContract(pair.liquidityToken.address, library)
+  const totalSupply = await pair_contract.totalSupply();
+  const totalAmount = new TokenAmount(pair.liquidityToken, totalSupply.toString());
+  const allToken0 = pair.getLiquidityValue(
+      pair.token0,
+      totalAmount,
+      totalAmount,
+      false
+  );
+  const allToken1 = pair.getLiquidityValue(
+      pair.token1,
+      totalAmount,
+      totalAmount,
+      false
+  );
+  const allToken0Amount = parseFloat(allToken0.toExact());
+  const allToken1Amount = parseFloat(allToken1.toExact());
+  if(pair.token0.symbol == symbol) {
+    return allToken1Amount / allToken0Amount ;
+  } else {
+    return allToken0Amount / allToken1Amount ;
+  }
+  return 0;
 }
 
 // return output field amount for swap component
