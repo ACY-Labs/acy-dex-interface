@@ -447,36 +447,28 @@ export async function getACYPrice(library){
   const ACY  = tokenList.find(token => token.symbol == "ACY");
   const BUSD = tokenList.find(token => token.symbol == "BUSD");
   const USDT = tokenList.find(token => token.symbol == "USDT");
-  console.log("getPrice",ACY,BUSD,USDT);
 
   const acyToken  = new Token(56, "0xc94595b56e301f3ffedb8ccc2d672882d623e53a", 18, "ACY");
   const usdToken  = new Token(56, "0x55d398326f99059ff775485246999027b3197955", 18, "USDT");
   const busdToken = new Token(56, "0xe9e7cea3dedca5984780bafc599bd69add087d56", 18, "BUSD");
-  console.log("getPrice ACY PRICE USDT BSUD: 0");
   const acyUsdtPair = await Fetcher.fetchPairData(acyToken, usdToken, library).catch(e => {
-    console.log("getPrice ACY PRICE USDT ERROR: 0");
     return false
   });
   const acyBusdPair = await Fetcher.fetchPairData(acyToken, busdToken, library).catch(e => {
-    console.log("getPrice ACY PRICE BSUD ERROR: 0");
     return false
   });
-  console.log("getPrice ACY PRICE USDT BSUD HERE: 0", acyUsdtPair, acyBusdPair);
   if(!acyUsdtPair && !acyBusdPair) {
     return 0;
   } else if(!acyUsdtPair) {
     const result = await getTokenPriceByPair(acyBusdPair, ACY.symbol, library);
-    console.log("getPrice ACY PRICE BSUD:", result);
     return result;
   } else if(!acyBusdPair) {
     const result = await getTokenPriceByPair(acyUsdtPair, ACY.symbol, library);
-    console.log("getPrice ACY PRICE USDT:", result);
     return result;
   } else {
     const acyToUsdtPrice =  await getTokenPriceByPair(acyUsdtPair, ACY.symbol, library);
     const acyToBusdPrice =  await getTokenPriceByPair(acyBusdPair, ACY.symbol, library);
     const result = (acyToUsdtPrice+acyToBusdPrice)/2;
-    console.log("getPrice ACY PRICE USDT BSUD:", result);
     return result;
   }
 }
