@@ -5,7 +5,7 @@ import axios from 'axios';
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import {methodList, actionList} from '@/constants/MethodList';
 import liquidity from '@/pages/Liquidity/models/liquidity';
-import {getContract} from '@/acy-dex-swap/utils'
+import {getContract, supportedTokens} from '@/acy-dex-swap/utils'
 import {totalInUSD} from '@/utils/utils';
 import { BigNumber } from '@ethersproject/bignumber';
 
@@ -470,7 +470,10 @@ export async function fetchUniqueRemoveLiquidityEth(account, hash, timestamp, FR
         let logsToken2 = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(TO_HASH));
 
         let token1 = findTokenInList(logsToken1[0]);
-        let token2 =  findTokenInList(logsToken2[0]);
+        let token2 =  findTokenWithSymbol('BNB');
+
+
+        console.log(token1,token2,logsToken1,logsToken2);
 
         let token1Number = 0;
         for(let log of logsToken1){
@@ -531,30 +534,24 @@ export async function appendNewSwapTx(currList,receiptHash,account,library){
 
     let newData;
     
-    if(transaction.data.startsWith(methodList.ethToToken.id)){
+    if(transaction.data.startsWith(methodList.ethToToken.id) || transaction.data.startsWith(methodList.ethToExactToken.id) || transaction.data.startsWith(methodList.ethToTokenAbr.id) || transaction.data.startsWith(methodList.ethToExactTokenAbr.id)){
 
         console.log("adding eth to token");
         newData = await fetchUniqueETHToToken(account, receiptHash,null,FROM_HASH, library, gasPrice);
         
 
-    }else if(transaction.data.startsWith(methodList.tokenToEth.id)){
+    }else if(transaction.data.startsWith(methodList.tokenToEth.id) || transaction.data.startsWith(methodList.tokenToEthAbr.id) || transaction.data.startsWith(methodList.tokenToExactEth.id) || transaction.data.startsWith(methodList.tokenToExactEthAbr.id)){
         console.log("adding token to eth");
         newData  = await fetchUniqueTokenToETH(account, receiptHash,null,FROM_HASH, library, gasPrice);
         
-    }else if(transaction.data.startsWith(methodList.tokenToToken.id)){
+    }else if(transaction.data.startsWith(methodList.tokenToToken.id) || transaction.data.startsWith(methodList.tokenToTokenAbr.id) || transaction.data.startsWith(methodList.tokenToExactTokenAbr.id) || transaction.data.startsWith(methodList.tokenToExactToken.id)){
         console.log("addding normal token to token");
         newData = await fetchUniqueTokenToToken(account,receiptHash,null,FROM_HASH, library, gasPrice);
-
-    }else if(transaction.data.startsWith(methodList.tokenToTokenAbr.id)){
-        console.log("addding normal token to token");
-        newData = await fetchUniqueTokenToToken(account,receiptHash,null,FROM_HASH, library, gasPrice);
-    }else if(transaction.data.startsWith(methodList.tokenToEthAbr.id)){
-        console.log("addding normal token to token");
-        newData = await fetchUniqueTokenToETH(account,receiptHash,null,FROM_HASH, library, gasPrice);
-    }else {
-        console.log("addding normal token to token");
-        newData = await fetchUniqueETHToToken(account,receiptHash,null,FROM_HASH, library, gasPrice);
     }
+    else {
+        return currList;
+    }
+
     if(newData.address) saveTxInDB(
         {
             ...newData
@@ -618,7 +615,8 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
         let FROM_HASH = account.toString().toLowerCase().slice(2);
         let TO_HASH ;
         fetchedData = fetchedData.filter(item => item.txreceipt_status == 1);
-        let filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToToken.id));
+
+        let filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToToken.id) || item.input.startsWith(methodList.tokenToTokenAbr.id) || item.input.startsWith(methodList.tokenToExactToken.id) || item.input.startsWith(methodList.tokenToExactTokenAbr.id));
         let newData = [];
 
         for (let item of filteredData) {
@@ -626,40 +624,40 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             if(fetchedItem) newData.push(fetchedItem);
         }
 
-        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.ethToToken.id,0));
+        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.ethToToken.id) || item.input.startsWith(methodList.ethToExactToken.id) || item.input.startsWith(methodList.ethToTokenAbr.id) || item.input.startsWith(methodList.ethToExactTokenAbr.id));
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueETHToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
             if(fetchedItem) newData.push(fetchedItem);
         }
 
-        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToEth.id));
+        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToEth.id) || item.input.startsWith(methodList.tokenToEthAbr.id) || item.input.startsWith(methodList.tokenToExactEth.id) || item.input.startsWith(methodList.tokenToExactEthAbr.id));
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library,0);
             if(fetchedItem) newData.push(fetchedItem);
         }
 
-        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToTokenAbr.id));
+        // filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToTokenAbr.id));
 
-        for (let item of filteredData) {
-            let fetchedItem = await fetchUniqueTokenToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
-            if(fetchedItem) newData.push(fetchedItem);
-        }
+        // for (let item of filteredData) {
+        //     let fetchedItem = await fetchUniqueTokenToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
+        //     if(fetchedItem) newData.push(fetchedItem);
+        // }
 
-        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToEthAbr.id));
+        // filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToEthAbr.id));
 
-        for (let item of filteredData) {
-            let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library,0);
-            if(fetchedItem) newData.push(fetchedItem);
-        }
+        // for (let item of filteredData) {
+        //     let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library,0);
+        //     if(fetchedItem) newData.push(fetchedItem);
+        // }
 
-        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.ethToTokenAbr.id));
+        // filteredData = fetchedData.filter(item => item.input.startsWith(methodList.ethToTokenAbr.id));
 
-        for (let item of filteredData) {
-            let fetchedItem = await fetchUniqueETHToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
-            if(fetchedItem) newData.push(fetchedItem);
-        }
+        // for (let item of filteredData) {
+        //     let fetchedItem = await fetchUniqueETHToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
+        //     if(fetchedItem) newData.push(fetchedItem);
+        // }
 
         
         return newData;
@@ -686,14 +684,14 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
         }
 
-        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.removeLiquidity.id));
+        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.removeLiquidity.id) || item.input.startsWith(methodList.removeLiquidityWithPermit.id));
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueRemoveLiquidity(account, item.hash,item.timeStamp,FROM_HASH, library);
             if(fetchedItem) newData.push(fetchedItem);
             
         }
 
-        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.removeLiquidityETH.id));
+        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.removeLiquidityETHwithPermit.id) || item.input.startsWith(methodList.removeLiquidityETH.id));
 
         for (let item of filteredData) {
 
