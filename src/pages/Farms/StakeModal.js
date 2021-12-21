@@ -377,7 +377,7 @@ const StakeModal = props => {
         </div>
       </div>
       <div className={styles.balanceAmountContainer2}>
-          {token2? 'LP Token':'Token'}: {(parseFloat(totalUSDBalance)).toFixed(6)} {token2? `${token1+"-"+token2} LP`  : `s${token1}`}
+          {token2? 'LP Token':'Token'}: {(parseFloat(totalUSDBalance)).toFixed(6)} {token2? `${token1+"-"+token2} LP`  : `${token1}`}
       </div>
      
       <div className={styles.sliderWrapper}>

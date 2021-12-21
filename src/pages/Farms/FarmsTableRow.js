@@ -419,8 +419,8 @@ const FarmsTableRow = props => {
           {/* only display token 1 symbol if token 2 is undefined or null. */}
           <div className={styles.tokenTitleContainer}>
             {poolInfo.token1 && poolInfo.token2 && `${poolInfo.token1}-${poolInfo.token2}`}
-            {poolInfo.token1 && !poolInfo.token2 && `s${poolInfo.token1}`}
-            {poolInfo.token2 && !poolInfo.token1 && `s${poolInfo.token2}`}
+            {poolInfo.token1 && !poolInfo.token2 && `${poolInfo.token1}`}
+            {poolInfo.token2 && !poolInfo.token1 && `${poolInfo.token2}`}
             {!isMobile ? poolInfo.token1 && poolInfo.token2 && <span style={{ opacity: '0.5' }}> LP</span> : ''}
           </div>
         </div>
