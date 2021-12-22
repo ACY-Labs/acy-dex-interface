@@ -250,7 +250,7 @@ const MarketIndex = props => {
       )}
 
       <h2>Transactions</h2>
-      {account && transactions.length <= 0 ? (
+      {transactions.length <= 0 ? (
         <Icon type="loading" />
       ) : (
         <TransactionTable dataSourceTransaction={transactions} />
