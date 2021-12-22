@@ -25,7 +25,7 @@ async function parseGlobalTransaction(address,library){
 
     let txList = [];
 
-    const userSwapTx = await getTransactionsByAccount(address,library,'SWAP');
+    const [userSwapTx,userLiquidityTx] = await getTransactionsByAccount(address,library,'ALL');
     const _swaptx = userSwapTx.map((item) => {
       return {
       account: item.address,
@@ -39,7 +39,6 @@ async function parseGlobalTransaction(address,library){
       type: "Swap"
       }
     })
-    const userLiquidityTx = await getTransactionsByAccount(address,library, 'LIQUIDITY');
 
     const _liquiditytx = userLiquidityTx.map((item) => {
     return {
