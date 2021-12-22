@@ -12,6 +12,7 @@ import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import ERC20ABI from '../abis/ERC20.json';
 import tokenList from '@/constants/TokenList';
 import axios from 'axios';
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
@@ -424,7 +425,8 @@ export function getTokenPrice(symbol) {
   if (!token) return 0;
   axios.get("https://api.coingecko.com/api/v3/simple/price?ids=shiba-inu&vs_currencies=usd")
 }
-export async function getAllSuportedTokensPrice(library) {
+export async function getAllSuportedTokensPrice() {
+  const library = new JsonRpcProvider(RPC_URL, 56);
   const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
   const searchIds = searchIdsArray.join('%2C');
   const tokensPrice = await axios.get(
@@ -440,6 +442,7 @@ export async function getAllSuportedTokensPrice(library) {
 
     return tokensPrice;
   });
+  console.log("TOKEN PRICE1:", tokensPrice, library);
   return tokensPrice;
 }
 
@@ -458,7 +461,7 @@ export async function getACYPrice(library){
     return false
   });
   if(!acyUsdtPair && !acyBusdPair) {
-    return 0;
+    return 0.2;
   } else if(!acyUsdtPair) {
     const result = await getTokenPriceByPair(acyBusdPair, ACY.symbol, library);
     return result;

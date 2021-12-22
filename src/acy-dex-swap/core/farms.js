@@ -177,7 +177,7 @@ const getPool = async (library, account, poolId)=> {
   const poolInfo = await contract.poolInfo(poolId);
   const rewardTokens = await contract.getPoolRewardTokens(poolId);
   const rewardTokensAddresses = await contract.getPoolRewardTokenAddresses(poolId);
-  const tokenPrice = await getAllSuportedTokensPrice(library);
+  const tokenPrice = await getAllSuportedTokensPrice();
 
   // retrieve reward tokens symbol.
   const rewardTokensSymbolsRequests = [];
@@ -407,43 +407,44 @@ const newGetPoolByFarm = async (farm, tokenPrice, library, account) => {
       rewards[id].push(formatUnits(reward, rewardTokens[index].decimals));
     }});
   });
+  // front
   const stakeData = await Promise.all(stakingPromise).then(x =>{
-  const stakeDataPromise = [];
-  var counter = 0;
-  for(var j=0; j != poolPositons.length; j++){
-    if(poolPositons[j].address.toLowerCase() == account.toLowerCase() ) {
-      const expiredTime = parseInt(x[counter].stakeTimestamp)+parseInt(x[counter].lockDuration);
-      const dueDate = new Date(expiredTime * 1000).toLocaleDateString("en-US")
-      const nowDate = Date.now()/1000;
-      var diff = expiredTime - nowDate;
-      var days = 0, hrs = 0, min = 0, leftSec = 0;
-      if(diff>0) {
-        diff = Math.floor(diff);
-        days = Math.floor(diff/(24*60*60));
-        leftSec = diff - days * 24*60*60;
-        hrs = Math.floor(leftSec/(60*60));
-        leftSec = leftSec - hrs * 60*60;
-        min = Math.floor(leftSec/(60));
+    const stakeDataPromise = [];
+    var counter = 0;
+    for(var j=0; j != poolPositons.length; j++){
+      if(poolPositons[j].address.toLowerCase() == account.toLowerCase() ) {
+        const expiredTime = parseInt(x[counter].stakeTimestamp)+parseInt(x[counter].lockDuration);
+        const dueDate = new Date(expiredTime * 1000).toLocaleDateString("en-US")
+        const nowDate = Date.now()/1000;
+        var diff = expiredTime - nowDate;
+        var days = 0, hrs = 0, min = 0, leftSec = 0;
+        if(diff>0) {
+          diff = Math.floor(diff);
+          days = Math.floor(diff/(24*60*60));
+          leftSec = diff - days * 24*60*60;
+          hrs = Math.floor(leftSec/(60*60));
+          leftSec = leftSec - hrs * 60*60;
+          min = Math.floor(leftSec/(60));
+        }
+        const result = {
+          lpAmount: formatUnits(x[counter].lpAmount,18),
+          dueDate: dueDate,
+          positionId: poolPositons[j].positionId,
+          reward: rewardTokens.map((token, index) => ({
+            token: token.symbol,
+            amount: rewards[counter][index],
+          })),
+          remaining: days.toString() + 'd:' + hrs.toString() + 'h:' + min.toString() +'m',
+          locked: diff>0
+        }
+        const total = rewards[counter].reduce((total, currentAmount) => total.add(parseInt(currentAmount),0));
+        if(total != 0 || parseInt(result.lpAmount) != 0 ){
+          stakeDataPromise.push(result);
+        }
+        counter++;
       }
-      const result = {
-        lpAmount: formatUnits(x[counter].lpAmount,18),
-        dueDate: dueDate,
-        positionId: poolPositons[j].positionId,
-        reward: rewardTokens.map((token, index) => ({
-          token: token.symbol,
-          amount: rewards[counter][index],
-        })),
-        remaining: days.toString() + 'd:' + hrs.toString() + 'h:' + min.toString() +'m',
-        locked: diff>0
-      }
-      const total = rewards[counter].reduce((total, currentAmount) => total.add(parseInt(currentAmount),0));
-      if(total != 0 || parseInt(result.lpAmount) != 0 ){
-        stakeDataPromise.push(result);
-      }
-      counter++;
     }
-  }
-  return stakeDataPromise;
+    return stakeDataPromise;
   });
   const tokens = farm.tokens;
   let ratio = tokenPrice[tokens[0].symbol];
@@ -506,7 +507,7 @@ const newGetPoolByFarm = async (farm, tokenPrice, library, account) => {
 }
 
 const newGetAllPools = async (library, account) => {
-  const tokenPrice = await getAllSuportedTokensPrice(library);
+  const tokenPrice = await getAllSuportedTokensPrice();
   const allFarm = await axios.get(
     `${API_URL}/farm/getAllPools`
   ).then(res => res.data).catch(e => console.log("error: ", e));
@@ -522,7 +523,7 @@ const newGetAllPools = async (library, account) => {
 }
 
 const newGetPool = async (poolId, library, account) => {
-  const tokenPrice = await getAllSuportedTokensPrice(library);
+  const tokenPrice = await getAllSuportedTokensPrice();
   //bug, only get on pool not working, may fix this later
   const allFarm = await axios.get(
     `${API_URL}/farm/getAllPools`

@@ -16,7 +16,7 @@ import Eth from "web3-eth";
 import { Web3Provider, JsonRpcProvider } from "@ethersproject/providers";
 import {getTokenContract} from '@/acy-dex-swap/utils';
 import { parse } from 'path-to-regexp';
-import {getAllSuportedTokensPrice, BLOCK_TIME, RPC_URL} from '@/acy-dex-swap/utils';
+import {BLOCK_TIME, RPC_URL} from '@/acy-dex-swap/utils';
 const Farms = (props) => {
   // useWeb3React hook will listen to wallet connection.
   // if wallet is connected, account, chainId, library, and activate will not be not be undefined.
@@ -127,7 +127,7 @@ const Farms = (props) => {
           amount: pool.rewardTokensAmount[index] == 0?0 : pool.rewardTokensAmount[index],
         })),
         totalApr: pool.apr.toFixed(2),
-        tvl: pool.tvl.toFixed(2),
+        tvl: pool.tvl,
         hasUserPosition: pool.hasUserPosition,
         hidden: true,
         userRewards: pool.rewards,
@@ -189,7 +189,6 @@ const Farms = (props) => {
         getPools(library, account);
         
       } else {
-        var eth = new Eth(RPC_URL);
         const provider = new JsonRpcProvider(RPC_URL, 56);
         const account = "0x0000000000000000000000000000000000000000";
         setWalletConnected(false);
