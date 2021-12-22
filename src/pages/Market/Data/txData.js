@@ -21,57 +21,55 @@ import { getLibrary } from '../ConnectWallet';
 const TRANSACTION_AMOUNT = 250;
 const FILTERED_AMOUNT = 50;
 
-async function parseGlobalTransaction(userList,library){
-   let txList = [];
-   let finalTxList = [];
+async function parseGlobalTransaction(address,library){
 
-  for (const user of userList) {
-     console.log(user)
-     const userSwapTx = await getTransactionsByAccount(user,library,'SWAP');
-     const _swaptx = userSwapTx.map((item) => {
-       return {
-        account: user,
-        coin1: item.inputTokenSymbol,
-        coin1Amount: item.inputTokenNum,
-        coin2: item.outTokenSymbol,
-        coin2Amount: item.outTokenNum,
-        time: item.transactionTime,
-        totalValue: item.totalToken,
-        transactionID: item.hash,
-        type: "Swap"
-       }
-     })
-     const userLiquidityTx = await getTransactionsByAccount(user,library, 'LIQUIDITY');
+    let txList = [];
 
-     const _liquiditytx = userLiquidityTx.map((item) => {
+    const userSwapTx = await getTransactionsByAccount(address,library,'SWAP');
+    const _swaptx = userSwapTx.map((item) => {
       return {
-       account: user,
-       coin1: item.token1Symbol,
-       coin1Amount: item.token1Number,
-       coin2: item.token2Symbol,
-       coin2Amount: item.token2Number,
-       time: item.transactionTime,
-       totalValue: item.totalToken,
-       transactionID: item.hash,
-       type: item.action
+      account: item.address,
+      coin1: item.inputTokenSymbol,
+      coin1Amount: item.inputTokenNum,
+      coin2: item.outTokenSymbol,
+      coin2Amount: item.outTokenNum,
+      time: item.transactionTime,
+      totalValue: item.totalToken,
+      transactionID: item.hash,
+      type: "Swap"
       }
+    })
+    const userLiquidityTx = await getTransactionsByAccount(address,library, 'LIQUIDITY');
+
+    const _liquiditytx = userLiquidityTx.map((item) => {
+    return {
+      account: item.address,
+      coin1: item.token1Symbol,
+      coin1Amount: item.token1Number,
+      coin2: item.token2Symbol,
+      coin2Amount: item.token2Number,
+      time: item.transactionTime,
+      totalValue: item.totalToken,
+      transactionID: item.hash,
+      type: item.action
+    }
     })
 
      txList.push(..._swaptx);
      txList.push(..._liquiditytx);
-   }
 
    return sortTable(txList, "time", true);
 }
 
 export async function fetchGlobalTransaction(library){
   try{
-    let request = 'https://api.acy.finance/api/users/all';
+    // let request = 'https://api.acy.finance/api/users/all';
     // let request = 'http://localhost:3001/api/users/all';
-    let response = await fetch(request);
-    let data = await response.json();
-    console.log(data.data);
-    let globalTransactions = await parseGlobalTransaction(data.data,library);
+    // let response = await fetch(request);
+    let ACY_ROUTER = "0x4DCa8E42634abdE1925ebB7f82AC29Ea00d34bA2";
+    // let data = await response.json();
+    // console.log(data.data);
+    let globalTransactions = await parseGlobalTransaction(ACY_ROUTER,library);
     return globalTransactions;
   }catch (e){
     console.log('service not available yet',e);

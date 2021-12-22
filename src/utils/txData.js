@@ -93,7 +93,7 @@ async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, libra
         let response = await library.getTransactionReceipt(hash);
         
         if(!response.status) return {};
-
+        FROM_HASH = response.from.toLowerCase().slice(2);
         let TO_HASH = response.to.toLowerCase().slice(2);
         let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(TO_HASH));
         let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
@@ -133,7 +133,7 @@ async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, libra
         // console.log(response);
 
         return {
-            "address" : account.toString(),
+            "address" : response.from,
             "hash": hash,
             "action" : 'Swap',
             "totalToken": totalAmount,
@@ -161,6 +161,7 @@ async function fetchUniqueTokenToETH(account, hash, timestamp, FROM_HASH, librar
         let response = await library.getTransactionReceipt(hash);
         
         if(!response.status) return {};
+        FROM_HASH = response.from.toLowerCase().slice(2);
         let TO_HASH = response.to.toLowerCase().slice(2);
         let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(FROM_HASH));
         let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(TO_HASH));
@@ -191,7 +192,7 @@ async function fetchUniqueTokenToETH(account, hash, timestamp, FROM_HASH, librar
         ],tokenPriceUSD);
 
         return  {
-            "address" : account.toString(),
+            "address" : response.from,
             "action" : 'Swap',
             "hash": hash,
             "totalToken": totalAmount,
@@ -218,6 +219,7 @@ async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, libr
     try{
     
         let response = await library.getTransactionReceipt(hash);
+        FROM_HASH = response.from.toLowerCase().slice(2);
         if(!response.status) return {};
         let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]==actionList.transfer.hash && log.topics[1].includes(FROM_HASH));
         let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]==actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
@@ -251,7 +253,7 @@ async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, libr
         ],tokenPriceUSD);
     
         return {
-            "address" : account.toString(),
+            "address" : response.from,
             "hash": hash,
             "action" : 'Swap',
             "totalToken": totalAmount,
@@ -276,6 +278,7 @@ async function fetchUniqueAddLiquidity(account, hash, timestamp, FROM_HASH, libr
     try {
 
         let response = await library.getTransactionReceipt(hash);
+        FROM_HASH = response.from.toLowerCase().slice(2);
         let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(FROM_HASH));
         let tokensOut = new Set();
         for(let log of outLogs){
@@ -318,7 +321,7 @@ async function fetchUniqueAddLiquidity(account, hash, timestamp, FROM_HASH, libr
         ],tokenPriceUSD);
 
         return ({
-        "address" : account.toString(),
+        "address" : response.from,
         "hash": hash,
         "action":'Add',
         "totalToken": totalAmount,
@@ -345,6 +348,7 @@ export async function fetchUniqueRemoveLiquidity(account, hash, timestamp, FROM_
     try {
 
         let response = await library.getTransactionReceipt(hash);
+        FROM_HASH = response.from.toLowerCase().slice(2);
         // console.log('filtered data',response);
         let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
         // console.log('filtered logs',outLogs);
@@ -386,7 +390,7 @@ export async function fetchUniqueRemoveLiquidity(account, hash, timestamp, FROM_
         ],tokenPriceUSD);
 
         return ({
-        "address" : account.toString(),
+        "address" : response.from,
         "hash": hash,
         "action":'Remove',
         "totalToken": totalAmount,
@@ -410,6 +414,7 @@ export async function fetchUniqueAddLiquidityEth(account, hash, timestamp, FROM_
 
         let response = await library.getTransactionReceipt(hash);
         let TO_HASH = response.to.toLowerCase().slice(2);
+        FROM_HASH = response.from.toLowerCase().slice(2);
         let logsToken1 = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(FROM_HASH));
         let logsToken2 = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(TO_HASH));
     
@@ -440,7 +445,7 @@ export async function fetchUniqueAddLiquidityEth(account, hash, timestamp, FROM_
         ],tokenPriceUSD);
     
         return ({
-        "address" : account.toString(),
+        "address" : response.from,
         "hash": hash,
         "action":'Add',
         "totalToken": totalAmount,
@@ -466,6 +471,7 @@ export async function fetchUniqueRemoveLiquidityEth(account, hash, timestamp, FR
 
         let response = await library.getTransactionReceipt(hash);
         let TO_HASH = response.to.toLowerCase().slice(2);
+        FROM_HASH = response.from.toLowerCase().slice(2);
         let logsToken1 = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
         let logsToken2 = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(TO_HASH));
 
@@ -502,7 +508,7 @@ export async function fetchUniqueRemoveLiquidityEth(account, hash, timestamp, FR
         ],tokenPriceUSD);
 
         return ({
-        "address" : account.toString(),
+        "address" : response.from,
         "hash": hash,
         "action":'Remove',
         "totalToken": totalAmount,
@@ -638,27 +644,6 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             if(fetchedItem) newData.push(fetchedItem);
         }
 
-        // filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToTokenAbr.id));
-
-        // for (let item of filteredData) {
-        //     let fetchedItem = await fetchUniqueTokenToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
-        //     if(fetchedItem) newData.push(fetchedItem);
-        // }
-
-        // filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToEthAbr.id));
-
-        // for (let item of filteredData) {
-        //     let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library,0);
-        //     if(fetchedItem) newData.push(fetchedItem);
-        // }
-
-        // filteredData = fetchedData.filter(item => item.input.startsWith(methodList.ethToTokenAbr.id));
-
-        // for (let item of filteredData) {
-        //     let fetchedItem = await fetchUniqueETHToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
-        //     if(fetchedItem) newData.push(fetchedItem);
-        // }
-
         
         return newData;
     }
@@ -715,7 +700,7 @@ export async function getTransactionsByAccount (account,library,filter){
         let startBlock = '0';
         let endBlock = '99999999';
         let page = '1';
-        let offset='50'; // NUMBER OF RESULTS FETCHED FROM ETHERSCAN
+        let offset='30'; // NUMBER OF RESULTS FETCHED FROM ETHERSCAN
         let sort='asc';
         let request = API+'?module=account&action=txlist&address='+address+'&startblock=0&endblock=99999999&page=1&offset='+offset+'&sort=desc&apikey='+apikey;
 
