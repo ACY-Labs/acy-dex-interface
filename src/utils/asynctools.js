@@ -1,4 +1,5 @@
-export const asyncForEach = (arr, callback) => {
+// enable async foreach, callback should be a Promise
+export function asyncForEach(arr, callback) {
     let resultArr = [];
     let promiseArr = [];
     const O = Object(arr);

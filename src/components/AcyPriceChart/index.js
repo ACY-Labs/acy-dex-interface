@@ -105,7 +105,6 @@ const AcyPriceChart = (props) => {
 
   const renderTooltip = v => {
     const { onHover, showTooltip } = props;
-    console.log("V",v);
     if (onHover) onHover(v[0].data, v[0].dataIndex);
     // console.log("V",v);
     if (showTooltip) return `
@@ -116,7 +115,7 @@ const AcyPriceChart = (props) => {
     </div>
     `;
   };
- 
+
   const getOption = (chartData) => {
     const { showXAxis, title, lineColor, showGradient, bgColor, range, format } = props;
 

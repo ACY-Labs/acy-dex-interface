@@ -9,6 +9,7 @@ import { asyncForEach } from "@/utils/asynctools";
 import { processString } from "@/components/AcyCoinItem";
 
 import INITIAL_TOKEN_LIST from '@/constants/TokenList';
+
 import styles from "./styles.less";
 
 
@@ -58,7 +59,6 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
     // and filter the token list based on the comparison of the value of search input field and token symbol.
     const onTokenSearchChange = e => {
         setTokenSearchInput(e.target.value);
-        setInitTokenList([]);
         setInitTokenList(
             renderTokenList.filter(token => token.symbol.includes(e.target.value.toUpperCase()))
         );

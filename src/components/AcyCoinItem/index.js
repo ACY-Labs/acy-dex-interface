@@ -9,6 +9,11 @@ import { BigNumber } from '@ethersproject/bignumber';
 
 
 export function processString(bal) {
+
+  console.log('bal:', bal);
+
+  if(!bal) return '0';
+
   let decimals = bal.split('.')[0];
   let fraction = bal.split('.')[1] || '0';
   // console.log(`decimals: ${decimals} fraction:${fraction}`);

@@ -137,6 +137,7 @@ const StakeModal = props => {
   }, [showStake]);
 
 
+
   useEffect(() => {
     setIs4Years(false);
   }, [isModalVisible]);

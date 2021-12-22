@@ -24,10 +24,28 @@ import strawberry from "@/assets/lottie/json/strawberry.json"
 import watermelon from "@/assets/lottie/json/watermelon.json"
 
 export default {
-    apple, banana, brezel, burger, 
-    carrot, cheese, cherry, chocolateBar, 
-    corn, donut, eggs, frenchFries,
-    honey, iceCream, lemon, meat,
-    peach, pineapple, pizza, popcorn,
-    raspberry, steak, strawberry, watermelon
-}
+  apple,
+  banana,
+  brezel,
+  burger,
+  carrot,
+  cheese,
+  cherry,
+  chocolateBar,
+  corn,
+  donut,
+  eggs,
+  frenchFries,
+  honey,
+  iceCream,
+  lemon,
+  meat,
+  peach,
+  pineapple,
+  pizza,
+  popcorn,
+  raspberry,
+  steak,
+  strawberry,
+  watermelon,
+};
