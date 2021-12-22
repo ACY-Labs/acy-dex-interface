@@ -6,6 +6,7 @@ import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 import onlyLastPromise, { DiscardSignal } from 'only-last-promise';
+import tokenList from '@/constants/TokenList';
 import ReactDOM from 'react-dom';
 import { Link, useHistory } from 'react-router-dom';
 import styles from './styles.less';
@@ -102,7 +103,7 @@ export class SmallTable extends React.Component {
     if (this.state.mode == 'token') {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyTokenIcon logoURL={entry.logoURL} width={20} />
+          <AcyTokenIcon symbol={entry.logoURL} width={20} />
           <Link
             style={{ color: 'white' }}
             className={styles.coinName}
@@ -992,8 +993,8 @@ export const MarketSearchBar = props => {
     lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
       console.log('token info:',data);
       setSearchCoinReturns(
-        data.map(item => {
-          return { address: item.id, name: item.name, short: item.symbol };
+        tokenList.map(item => {
+          return { logoURL: item.logoURI, address: item.address, name: item.name, short: item.symbol };
         })
       );
       lastPromiseWrapper(
@@ -1091,9 +1092,10 @@ export const MarketSearchBar = props => {
      })
 
     lastPromiseWrapper(fetchTokenSearch(marketClient, '')).then(data => {
+      console.log("FETCHING TOKENS FROM SEARCH BAR", data)
       setSearchCoinReturns(
-        data.map(item => {
-          return { address: item.id, name: item.name, short: item.symbol };
+        tokenList.map(item => {
+          return { logoURL: item.logoURI, address: item.address, name: item.name, short: item.symbol };
         })
       );
 
