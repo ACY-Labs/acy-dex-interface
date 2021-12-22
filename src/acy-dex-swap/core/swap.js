@@ -800,7 +800,6 @@ export async function swap(
   midTokenAddress,
   poolExist,
 ) {
-
   const {
     address: inToken0Address,
     symbol: inToken0Symbol,
@@ -813,7 +812,6 @@ export async function swap(
     decimals: inToken1Decimal,
     amount: inToken1Amount,
   } = inputToken1;
-
   const status = await (async () => {
     // check uniswap
     console.log(FACTORY_ADDRESS);

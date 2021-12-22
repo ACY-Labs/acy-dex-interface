@@ -138,8 +138,7 @@ export async function fetchGeneralPoolInfoDay() {
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
-    // let request = 'https://api.acy.finance/api/poolchart/all';
-    let request = 'http://localhost:3001/api/poolchart/all';
+    let request = 'https://api.acy.finance/api/poolchart/all';
     let response = await fetch(request);
     let data = await response.json();
     return parsePoolData(data.data);
