@@ -385,6 +385,8 @@
 
 .sales-input-container {
   position: relative;
+  width: 100%;
+  margin: 0 20px;
 }
 
 .sales-input {
@@ -393,10 +395,9 @@
   border-radius: 12px;
   width: 100%;
   min-width: 0px;
-  height: 40px;
+  height: 45px;
   font-size: 16px;
   padding: 0px 20px 0px 10px;
-  margin: 0 20px;
 }
 
 .sales-input:hover {
@@ -409,8 +410,11 @@
 
 .max-btn {
   position: absolute;
-  top: 5px;
-  right: 0;
+  top: 10px;
+  right: 15px;
+  background-color: #eb5c20;
+  border: unset;
+  padding: 2px 10px 4px 10px;
 }
 
 .sales-submit {
@@ -421,7 +425,6 @@
   border-radius: 16px;
   width: 120px;
   height: 35px;
-  margin-left: 10px;
 }
 
 .vesting-percentage {
