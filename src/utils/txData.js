@@ -700,7 +700,7 @@ export async function getTransactionsByAccount (account,library,filter){
         let startBlock = '0';
         let endBlock = '99999999';
         let page = '1';
-        let offset='30'; // NUMBER OF RESULTS FETCHED FROM ETHERSCAN
+        let offset='50'; // NUMBER OF RESULTS FETCHED FROM ETHERSCAN
         let sort='asc';
         let request = API+'?module=account&action=txlist&address='+address+'&startblock=0&endblock=99999999&page=1&offset='+offset+'&sort=desc&apikey='+apikey;
 
