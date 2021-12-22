@@ -3,7 +3,7 @@ import { Col, Icon, Row } from 'antd';
 import React, { Component, useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useWeb3React } from '@web3-react/core';
-import { binance } from '@/connectors';
+import { binance, injected } from '@/connectors';
 import {
   fetchGeneralPoolInfoDay,
   fetchGeneralTokenInfo,
@@ -15,6 +15,7 @@ import { dataSourceCoin, dataSourcePool } from './SampleData.js';
 import styles from './styles.less';
 import { abbrNumber, FEE_PERCENT } from './Util.js';
 import { MarketSearchBar, PoolTable, TokenTable, TransactionTable } from './UtilComponent.js';
+import { JsonRpcProvider } from "@ethersproject/providers"; 
 import { isMobile } from 'react-device-detect';
 import ConnectWallet from './ConnectWallet';
 
@@ -52,25 +53,32 @@ const MarketIndex = props => {
 
   const { account, chainId, library, activate } = useWeb3React();
 
+  const libraryOut = new JsonRpcProvider('https://bsc-dataseed1.defibit.io/');
+
   // connect to provider, listen for wallet to connect
  
   useEffect(() => {
     if(!account){
+      console.log("Market_________________");
       activate(binance);
+      activate(injected);
     }
   }, []);
 
-  useEffect(() => {
-    // fetch transaction data
-    if(library) {
-      fetchGlobalTransaction(library).then(globalTransactions => {
-        console.log('globaltransaction', globalTransactions);
-        if(globalTransactions) settransactions(globalTransactions);
-      });
-    }
-  }, [library]);
+  // useEffect(() => {
+  //   // fetch transaction data
+  //   if(library) {
+      
+  //   }
+  // }, [library]);
 
   useEffect(() => {
+
+    fetchGlobalTransaction(libraryOut).then(globalTransactions => {
+        console.log('globaltransaction', globalTransactions);
+        if(globalTransactions) settransactions(globalTransactions);
+    });
+    
     fetchGeneralPoolInfoDay().then(poolInfo => {
       if(poolInfo) setpoolInfo ( poolInfo );
     });
@@ -242,7 +250,7 @@ const MarketIndex = props => {
       )}
 
       <h2>Transactions</h2>
-      {account && transactions.length <= 0 ? (
+      {transactions.length <= 0 ? (
         <Icon type="loading" />
       ) : (
         <TransactionTable dataSourceTransaction={transactions} />

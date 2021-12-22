@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import styles from '@/pages/Farms/Farms.less';
 import { isMobile } from 'react-device-detect';
 import { harvestAll, harvest, withdraw } from '@/acy-dex-swap/core/farms';
-import { getUserTokenBalanceWithAddress } from '@/acy-dex-swap/utils';
+import { getUserTokenBalanceWithAddress, API_URL } from '@/acy-dex-swap/utils';
 import StakeModal from './StakeModal';
 import { addLiquidity } from '@/acy-dex-swap/core/addLiquidity';
 import { AcyActionModal, AcyModal, AcyButton, AcyBarChart } from '@/components/Acy';
@@ -53,10 +53,8 @@ const StakeRow = props => {
     data,
     account,
     library,
-    harvestHistory,
     dispatch,
     poolId,
-    refreshHarvestHistory,
     token1,
     token1Logo,
     token2,
@@ -120,17 +118,17 @@ const StakeRow = props => {
   };
 
   const harvestCallback = status => {
-    const transactions = props.transaction.transactions;
-    const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
+    // const transactions = props.transaction.transactions;
+    // const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
     // trigger loading spin on top right
-    if (isCurrentTransactionDispatched == 0) {
-      dispatch({
-        type: "transaction/addTransaction",
-        payload: {
-          transactions: [...transactions, { hash: status.hash }]
-        }
-      })
-    }
+    // if (isCurrentTransactionDispatched == 0) {
+    //   dispatch({
+    //     type: "transaction/addTransaction",
+    //     payload: {
+    //       transactions: [...transactions, { hash: status.hash }]
+    //     }
+    //   })
+    // }
 
     const checkStatusAndFinish = async () => {
       await library.getTransactionReceipt(status.hash).then(async receipt => {
@@ -138,29 +136,34 @@ const StakeRow = props => {
         if (!receipt) {
           setTimeout(checkStatusAndFinish, 500);
         } else {
-          let transactionTime;
-          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
-            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
-          });
+          // let transactionTime;
+          // await library.getBlock(receipt.logs[0].blockNumber).then(res => {
+          //   transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
+          // });
 
-          await refreshPoolInfo();
-          refreshHarvestHistory(library, account);
+          await axios.get(
+            // fetch valid pool list from remote
+            `${API_URL}/farm/updatePool?poolId=${poolId}`
+          ).then( async (res) => {
+            await refreshPoolInfo();
+            setHarvestButtonText("Harvest");
+            setHarvestButtonStatus(true);
+            hideHarvestModal();
+            console.log("update pool on server return: ", res);
+          }).catch(e => console.log("error: ", e));
           // clear top right loading spin
-          const newData = transactions.filter(item => item.hash != status.hash);
-          dispatch({
-            type: "transaction/addTransaction",
-            payload: {
-              transactions: [
-                ...newData,
-                { hash: status.hash, transactionTime }
-              ]
-            }
-          });
+          // const newData = transactions.filter(item => item.hash != status.hash);
+          // dispatch({
+          //   type: "transaction/addTransaction",
+          //   payload: {
+          //     transactions: [
+          //       ...newData,
+          //       { hash: status.hash, transactionTime }
+          //     ]
+          //   }
+          // });
           // disable button after each transaction on default, enable it after re-entering amount to add
           
-          setHarvestButtonText("Harvest");
-          setHarvestButtonStatus(true);
-          hideHarvestModal();
           
         }
       })
@@ -169,17 +172,17 @@ const StakeRow = props => {
   }
 
   const withdrawCallback = status => {
-    const transactions = props.transaction.transactions;
-    const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
+    // const transactions = props.transaction.transactions;
+    // const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
     //trigger loading spin on top right
-    if (isCurrentTransactionDispatched == 0) {
-      dispatch({
-        type: "transaction/addTransaction",
-        payload: {
-          transactions: [...transactions, { hash: status.hash }]
-        }
-      })
-    }
+    // if (isCurrentTransactionDispatched == 0) {
+    //   dispatch({
+    //     type: "transaction/addTransaction",
+    //     payload: {
+    //       transactions: [...transactions, { hash: status.hash }]
+    //     }
+    //   })
+    // }
 
     const checkStatusAndFinish = async () => {
       await library.getTransactionReceipt(status.hash).then(async receipt => {
@@ -187,33 +190,34 @@ const StakeRow = props => {
         if (!receipt) {
           setTimeout(checkStatusAndFinish, 500);
         } else {
-          let transactionTime;
-          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
-            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
-          });
+          // let transactionTime;
+          // await library.getBlock(receipt.logs[0].blockNumber).then(res => {
+          //   transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
+          // });
           //refresh talbe
-          await refreshPoolInfo();
           // clear top right loading spin
-          const newData = transactions.filter(item => item.hash != status.hash);
-          dispatch({
-            type: "transaction/addTransaction",
-            payload: {
-              transactions: [
-                ...newData,
-                { hash: status.hash, transactionTime }
-              ]
-            }
-          });
-          axios.get(
+          // const newData = transactions.filter(item => item.hash != status.hash);
+          // dispatch({
+          //   type: "transaction/addTransaction",
+          //   payload: {
+          //     transactions: [
+          //       ...newData,
+          //       { hash: status.hash, transactionTime }
+          //     ]
+          //   }
+          // });
+          await axios.get(
             // fetch valid pool list from remote
-            `http://3.143.250.42:6001/api/farm/updatePool?poolId=${poolId}`
-          ).then(res => {
+            `${API_URL}/farm/updatePool?poolId=${poolId}`
+          ).then( async (res) => {
+            await refreshPoolInfo();
+            setWithdrawButtonText("Withdraw");
+            setWithdrawButtonStatus(false);
+            hideWithdrawModal();
             console.log("update pool on server return: ", res);
           }).catch(e => console.log("error: ", e));
           // disable button after each transaction on default, enable it after re-entering amount to add
-          setWithdrawButtonText("Withdraw");
-          setWithdrawButtonStatus(false);
-          hideWithdrawModal();
+          
       
         }
       })
@@ -397,7 +401,7 @@ const StakeRow = props => {
               <div className={styles.tokenSymbol}>
                 
                 {token1 && token2 && `${token1}-${token2} LP`}
-                {token1 && !token2 && `s${token1}`}
+                {token1 && !token2 && `${token1}`}
                 {token2 && !token1 && `${token2}`}
               </div>
               

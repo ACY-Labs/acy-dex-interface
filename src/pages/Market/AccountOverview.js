@@ -4,6 +4,7 @@ import { MarketSearchBar } from './UtilComponent.js';
 import { Input, Button, Divider, Icon, Table } from 'antd';
 import styles from './styles.less';
 import { Link, useHistory } from 'react-router-dom';
+import { useWeb3React } from '@web3-react/core';
 import className from 'classnames';
 import {
   abbrHash,
@@ -24,8 +25,11 @@ import {
   fetchGeneralPoolInfoDay,
   fetchTopExchangeVolumes,
   marketClient,
+  fetchGlobalTransaction,
+  fetchTopExchangeVolume
 } from './Data/index.js';
 import { WatchlistManager } from './WatchlistManager.js';
+import { TransactionTable } from './UtilComponent.js';
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -355,6 +359,20 @@ function AccountOverview(props) {
   const [inputError, setInputError] = useState('');
   const [topEV, setTopEV] = useState([]);
 
+  const [topExchangeVolume, settopExchangeVolume] = useState([]);
+  
+  const { account, chainId, library, activate } = useWeb3React();
+
+  useEffect(() => {
+    // fetch data
+    if(library) {
+      fetchTopExchangeVolume(library).then(topExchangeVolume => {
+        console.log('topExchangeVolume', topExchangeVolume);
+        if(topExchangeVolume) settopExchangeVolume(topExchangeVolume);
+      });
+    }
+  }, [library]);
+  
   useEffect(() => {
     // fetch the watchlist
     setWatchlist(watchlistManager.getData());
@@ -480,12 +498,16 @@ function AccountOverview(props) {
         }}
       />
 
-      <h2>Top Liquidity Positions</h2>
-      {topLP.length > 0 ? <AccountsTable dataSourceAccounts={topLP} /> : <Icon type="loading" />}
+      {/* <h2>Top Liquidity Positions</h2>
+      {topLP.length > 0 ? <AccountsTable dataSourceAccounts={topLP} /> : <Icon type="loading" />} */}
 
       <h2>Top Exchange Volume</h2>
-      {/* NOTE: THIS TABLE DATA IS STILL PARTIALLY INCORRECT, NEED TO SORT BY THE BIGGEST VOLUME */}
-      {topEV.length > 0 ? <VolumesTable dataSourceAccounts={topEV} /> : <Icon type="loading" />}
+      {account && topExchangeVolume.length <= 0 ? (
+        <Icon type="loading" />
+      ) : (
+        <TransactionTable dataSourceTransaction={topExchangeVolume} />
+      )}
+      <div style={{ height: '20px' }} />
     </div>
   );
 }

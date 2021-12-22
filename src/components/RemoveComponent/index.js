@@ -30,7 +30,7 @@ import styles from './styles.less';
 import { sortAddress } from '@/utils/utils';
 
 import { useWeb3React } from '@web3-react/core';
-import { binance } from '@/connectors';
+import { binance, injected } from '@/connectors';
 import { useState, useEffect, useCallback } from 'react';
 
 import {
@@ -194,6 +194,7 @@ const MyComponent = props => {
 
   const ConnectWallet = () => {
     activate(binance);
+    activate(injected);
   };
 
   return (

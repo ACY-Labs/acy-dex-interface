@@ -6,6 +6,7 @@ import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 import onlyLastPromise, { DiscardSignal } from 'only-last-promise';
+import tokenList from '@/constants/TokenList';
 import ReactDOM from 'react-dom';
 import { Link, useHistory } from 'react-router-dom';
 import styles from './styles.less';
@@ -102,7 +103,7 @@ export class SmallTable extends React.Component {
     if (this.state.mode == 'token') {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyTokenIcon logoURL={entry.logoURL} width={20} />
+          <AcyTokenIcon symbol={entry.logoURL} width={20} />
           <Link
             style={{ color: 'white' }}
             className={styles.coinName}
@@ -356,31 +357,6 @@ export function TokenTable(props) {
           <div
             className={styles.tableHeader}
             onClick={() => {
-              setCurrentKey('volume24h');
-              onSortChange();
-            }}
-          >
-            Volume 24H
-            {currentKey == 'volume24h' && (
-              <Icon
-                type={!isAscending ? 'arrow-up' : 'arrow-down'}
-                style={{ fontSize: '14px', marginLeft: '4px' }}
-              />
-            )}
-          </div>
-        ),
-        dataIndex: 'volume24h',
-        key: 'volume24h',
-        render: (text, entry) => {
-          return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
-        },
-        visible: true,
-      },
-      {
-        title: (
-          <div
-            className={styles.tableHeader}
-            onClick={() => {
               setCurrentKey('tvl');
               onSortChange();
             }}
@@ -400,6 +376,31 @@ export function TokenTable(props) {
           return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
         },
         visible: isDesktop(),
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('volume24h');
+              onSortChange();
+            }}
+          >
+            Volume 24H
+            {currentKey == 'volume24h' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
+        dataIndex: 'volume24h',
+        key: 'volume24h',
+        render: (text, entry) => {
+          return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
+        },
+        visible: true,
       },
     ];
   }
@@ -518,6 +519,10 @@ export function PoolTable(props) {
           );
         },
         visible: true,
+      },
+      {
+        title: (<div style={{marginLeft: "100px"}}></div>),
+        visible: isDesktop(),
       },
       {
         title: (
@@ -845,7 +850,7 @@ export function TransactionTable(props) {
         key: 'time',
         render: (text, entry) => {
           function getRelTime(timeString) {
-            let a = moment(new Date(timeString)).locale('en');
+            let a = moment(new Date(timeString.replace(/-/g, "/"))).locale('en');
             return a.fromNow();
           }
 
@@ -885,7 +890,7 @@ export function TransactionTable(props) {
         }
       ).filter(item => item.visible == true)}
       pagination={false}
-      locale={{ emptyText:'Data will show after you have logged in with a BSC account'}}
+      locale={{ emptyText:'Failed to fetch data'}}
       style={{
         marginBottom: '20px',
       }}
@@ -988,8 +993,8 @@ export const MarketSearchBar = props => {
     lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
       console.log('token info:',data);
       setSearchCoinReturns(
-        data.map(item => {
-          return { address: item.id, name: item.name, short: item.symbol };
+        tokenList.map(item => {
+          return { logoURL: item.logoURI, address: item.address, name: item.name, short: item.symbol };
         })
       );
       lastPromiseWrapper(
@@ -1087,9 +1092,10 @@ export const MarketSearchBar = props => {
      })
 
     lastPromiseWrapper(fetchTokenSearch(marketClient, '')).then(data => {
+      console.log("FETCHING TOKENS FROM SEARCH BAR", data)
       setSearchCoinReturns(
-        data.map(item => {
-          return { address: item.id, name: item.name, short: item.symbol };
+        tokenList.map(item => {
+          return { logoURL: item.logoURI, address: item.address, name: item.name, short: item.symbol };
         })
       );
 
@@ -1130,11 +1136,11 @@ export const MarketSearchBar = props => {
             Pools
           </Link>
         </div>
-        <div className={styles.marketNavbarButton}>
+        {/* <div className={styles.marketNavbarButton}>
           <Link style={{ color: '#b5b5b6', fontWeight: '600' }} to="/market/accounts">
             Account
           </Link>
-        </div>
+        </div> */}
       </div>
       <div className={styles.marketNavbarRight}>
         {/* <div className={styles.marketDropdownWrapper} ref={outsideClickRefNetwork}>
@@ -1180,7 +1186,7 @@ export const MarketSearchBar = props => {
                 width: '100%',
               }}
             >
-              <div className={styles.searchWrapper}>
+              {/* <div className={styles.searchWrapper}>
                 <div className={styles.searchInnerWrapper}>
                   <Input
                     placeholder="Search"
@@ -1195,9 +1201,9 @@ export const MarketSearchBar = props => {
                     value={'' || searchQuery}
                   />
                 </div>
-              </div>
+              </div> */}
               {/* Search modal */}
-              <div style={{ width: '100%', position: 'relative', zIndex: 10 }}>
+              {/* <div style={{ width: '100%', position: 'relative', zIndex: 10 }}>
                 {visibleSearchBar && (
                   <div
                     className={styles.searchModal}
@@ -1277,7 +1283,7 @@ export const MarketSearchBar = props => {
                     </AcyTabs>
                   </div>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

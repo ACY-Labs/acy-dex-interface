@@ -1,5 +1,5 @@
 import { fetchMarketData } from './marketData';
-import { fetchGlobalTransaction, fetchFilteredTransaction } from './txData';
+import { fetchGlobalTransaction, fetchFilteredTransaction, fetchAccountTransaction, fetchTopExchangeVolume } from './txData';
 import {
   fetchGeneralTokenInfo,
   fetchTokenDayData,
@@ -24,6 +24,7 @@ import {
 import { getBlocksFromTimestamps } from './blocks';
 import { marketClient } from './client';
 import { fetchEthPrice } from './eth';
+import { fetchTotalFeesPaid, fetchLiqudityIncludingFees, fetchTotalValueSwapped, fetchTotalTransactions} from './walletStats';
 
 const DataFetch = {
   marketClient,
@@ -46,6 +47,12 @@ const DataFetch = {
   fetchUserSnapshot,
   fetchEthPrice,
   fetchTopExchangeVolumes,
+  fetchTopExchangeVolume,
+  fetchAccountTransaction,
+  fetchTotalFeesPaid,
+  fetchLiqudityIncludingFees,
+  fetchTotalValueSwapped,
+  fetchTotalTransactions,
 };
 
 export {
@@ -70,4 +77,10 @@ export {
   fetchUserSnapshot,
   fetchEthPrice,
   fetchTopExchangeVolumes,
+  fetchAccountTransaction,
+  fetchTopExchangeVolume,
+  fetchTotalFeesPaid,
+  fetchLiqudityIncludingFees,
+  fetchTotalValueSwapped,
+  fetchTotalTransactions,
 };

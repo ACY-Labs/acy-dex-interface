@@ -734,6 +734,12 @@
           cursor: pointer;
         }
       }
+      .prefix {
+        font-size: 1rem;
+        position: absolute;
+        left: 0.25rem;
+        top: 0.25rem;
+      }
     }
     .backupCoin{
       font-size: 0.8rem;
@@ -742,6 +748,42 @@
     }
   }
 .balanceAmountContainer {
+  // margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .balanceAmount{
+    font-size: .8rem;
+  }
+  .balanceAmountInputContainer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    position: relative;
+
+    .balanceAmountInput {
+      background-color: #1B1B1C;
+      border: none;
+      border-radius: .5rem;
+      box-shadow: 0 0 0 0.5px transparent;
+      padding: 1px 1.5rem 1px 0.75rem;
+      text-align: right;
+      width: 4rem;
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.5px #1e5d91;
+      }
+    }
+
+    .balanceAmountSuffix {
+      position: absolute;
+      top: 1px;
+      right: 0.5rem;
+    }
+  }
+}
+.balanceAmountContainer2 {
   margin-bottom: 1rem;
   display: flex;
   justify-content: space-between;
@@ -780,7 +822,7 @@
 
 .sliderWrapper {
   display: flex;
-  margin-bottom: 3rem;
+  margin-bottom: 1.0rem;
 
   .slider {
     flex: 1;
@@ -827,6 +869,7 @@
 }
 
 .lockTimeRow {
+  margin-top: 1.0rem;
   margin-bottom: 1rem;
 
   .lockTimeRowTitleContainer {

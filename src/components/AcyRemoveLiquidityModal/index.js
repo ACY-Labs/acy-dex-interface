@@ -10,6 +10,7 @@ import moment from 'moment';
 import styles from './AcyRemoveLiquidityModal.less';
 import {
   binance,
+  injected,
 } from '@/connectors';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
@@ -195,15 +196,15 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
     // const transactions = props.transaction.transactions;
     const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
     console.log("is current dispatched? ", isCurrentTransactionDispatched);
-    // trigger loading spin on top right
-    if (isCurrentTransactionDispatched == 0) {
-      dispatch({
-        type: "transaction/addTransaction",
-        payload: {
-          transactions: [...transactions, { hash: status.hash }]
-        }
-      })
-    }
+    // // trigger loading spin on top right
+    // if (isCurrentTransactionDispatched == 0) {
+    //   dispatch({
+    //     type: "transaction/addTransaction",
+    //     payload: {
+    //       transactions: [...transactions, status.hash]
+    //     }
+    //   })
+    // }
 
     // timeout loop
     const checkStatusAndFinish = async () => {
@@ -429,6 +430,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
             } else if (buttonStatus) {
               if (account == undefined) {
                 activate(binance);
+                activate(injected);
               } else {
                 console.log(buttonStatus);
                 setButtonContent(<>Processing <Icon type="loading" /></>);

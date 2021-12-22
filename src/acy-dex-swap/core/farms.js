@@ -172,36 +172,6 @@ const getPoolTotalPendingReward = async (
   return [allTokenAmount, rewards, poolRewardsPerYear];
 };
 
-const getPoolAccmulateReward = async (library, account, poolId) => {
-  const contract     = getFarmsContract(library, account);
-  const poolPositons = await contract.getPoolPositions(poolId);
-  const poolInfo     = await contract.poolInfo(poolId);
-  const rewardTokens = await contract.getPoolRewardTokens(poolId);
-  const rewardTokensAddresses = await contract.getPoolRewardTokenAddresses(poolId);
-  // retrieve reward tokens symbol.
-  const rewardTokensSymbolsRequests = [];
-  rewardTokensAddresses.forEach(address => {
-    rewardTokensSymbolsRequests.push(getTokenSymbol(address, library, account));
-  });
-  const rewardTokensSymbols = await Promise.all(rewardTokensSymbolsRequests).then(
-    symbols => symbols
-  );
-  const acRewards = [];
-  // console.log('rewardTokensSymbols:',rewardTokensSymbols);
-  // const amount = await contract.getTotalRewards(poolId, poolPositons[0], rewardTokens[0]);
-  // console.log(amount);
-  for(var i=0; i<rewardTokens.length ; i++){
-    var sum = 0;
-    const decimal = getTokenDecimal(rewardTokensAddresses[i], library, account)
-    for(var j=0; j<poolPositons.length; j++){
-      const amount = await contract.getTotalRewards(poolId, poolPositons[j], rewardTokens[i]);
-      sum += parseInt(amount);
-    }
-    acRewards.push({token:rewardTokensSymbols[i], amount:formatUnits(sum, )});
-  }
-  return acRewards;
-};
-
 const getPool = async (library, account, poolId)=> {
   const contract = getFarmsContract(library, account);
   const poolInfo = await contract.poolInfo(poolId);
@@ -377,183 +347,201 @@ const getPool = async (library, account, poolId)=> {
 const getSupportedTokenSymbol = (address) => {
   return supportedTokens.find(token => token.address.toLowerCase() == address.toLowerCase()).symbol;
 }
-const newGetPoolByFarm = async (farm, library, account) => {
-    console.log("HERE TEST:");
-    const poolId = farm.poolId;
-    const poolPositons = farm.positions;
-    const rewardTokens = farm.rewardTokens;
-    const farmContract = getFarmsContract(library, account);
-    const numPools = await farmContract.numPools();
-    console.log("HERE TEST:",numPools);
-    const tokenPrice = await getAllSuportedTokensPrice();
+const newGetPoolByFarm = async (farm, tokenPrice, library, account) => {
+  const poolId = farm.poolId;
+  const poolPositons = farm.positions;
+  const rewardTokens = farm.rewardTokens;
+  const farmContract = getFarmsContract(library, account);
+  
+  const poolTokenRewardInfoPromise = []; 
+  const amountCol = [];
+  for(var i=0; i< rewardTokens.length ; i++){
+    const amountRow = [];
+    for(var j=0; j< poolPositons.length; j++){
+      amountRow.push(farmContract.getTotalRewards(poolId, poolPositons[j].positionId, rewardTokens[i].farmToken));
+    }
+    poolTokenRewardInfoPromise.push(farmContract.getPoolTokenRewardInfo(poolId,rewardTokens[i].farmToken));
+    amountCol.push(amountRow)
+  }
+  const BLOCKS_PER_YEAR = 60*60*24*365/BLOCK_TIME;
+  const poolRewardsPerYear = await Promise.all(poolTokenRewardInfoPromise).then(result => {
+      return result.map((info,index) => info[3]/(10**rewardTokens[index].decimals) * BLOCKS_PER_YEAR);
+  });
+  const totalRewardPerYear = poolRewardsPerYear.reduce((total,reward,index) =>
+      total += tokenPrice[rewardTokens[index].symbol] * reward
+  );
+  let allTokenAmount = [];
+  for(var i=0; i<rewardTokens.length ; i++){
+    const amountHex = await Promise.all(amountCol[i]).then(re => re);
+    allTokenAmount.push(
+    amountHex.reduce((total, currentAmount) => total += parseInt(currentAmount),0 )
+  );
+}
+  const allTokenRewardPromises = [];
+  const stakingPromise = [];
+  for (let rewardIndex = 0; rewardIndex < rewardTokens.length; rewardIndex++) {
+    const tokenRewardPromise = [];
+    for (let positionIndex = 0; positionIndex < poolPositons.length; positionIndex++) {
+      if(poolPositons[positionIndex].address.toLowerCase() == account.toLowerCase()){
+        tokenRewardPromise.push(
+          farmContract.pending(poolId, poolPositons[positionIndex].positionId, rewardTokens[rewardIndex].farmToken)
+        );
+        stakingPromise.push(
+          farmContract.stakingPosition(poolId, poolPositons[positionIndex].positionId)
+        );
+      }  
+    }
+    allTokenRewardPromises.push(tokenRewardPromise);
+  }
+  const allTokenRewardList = [];
+  for (let promiseIndex = 0; promiseIndex < allTokenRewardPromises.length; promiseIndex++) {
+    allTokenRewardList.push(Promise.all(allTokenRewardPromises[promiseIndex]));
+  }
+  const allTokenRewardAmountHex = await Promise.all(allTokenRewardList);
+  const rewards = [];
+  allTokenRewardAmountHex.forEach((rewardList,index) => {
+    rewardList.forEach((reward,id)=> {
+    if(index == 0) {
+      rewards.push([formatUnits(reward, rewardTokens[index].decimals)]);
+    } else {
+      rewards[id].push(formatUnits(reward, rewardTokens[index].decimals));
+    }});
+  });
+  // front
+  const stakeData = await Promise.all(stakingPromise).then(x =>{
+    const stakeDataPromise = [];
+    var counter = 0;
+    for(var j=0; j != poolPositons.length; j++){
+      if(poolPositons[j].address.toLowerCase() == account.toLowerCase() ) {
+        const expiredTime = parseInt(x[counter].stakeTimestamp)+parseInt(x[counter].lockDuration);
+        const dueDate = new Date(expiredTime * 1000).toLocaleDateString("en-US")
+        const nowDate = Date.now()/1000;
+        var diff = expiredTime - nowDate;
+        var days = 0, hrs = 0, min = 0, leftSec = 0;
+        if(diff>0) {
+          diff = Math.floor(diff);
+          days = Math.floor(diff/(24*60*60));
+          leftSec = diff - days * 24*60*60;
+          hrs = Math.floor(leftSec/(60*60));
+          leftSec = leftSec - hrs * 60*60;
+          min = Math.floor(leftSec/(60));
+        }
+        const result = {
+          lpAmount: formatUnits(x[counter].lpAmount,18),
+          dueDate: dueDate,
+          positionId: poolPositons[j].positionId,
+          reward: rewardTokens.map((token, index) => ({
+            token: token.symbol,
+            amount: rewards[counter][index],
+          })),
+          remaining: days.toString() + 'd:' + hrs.toString() + 'h:' + min.toString() +'m',
+          locked: diff>0
+        }
+        const total = rewards[counter].reduce((total, currentAmount) => total.add(parseInt(currentAmount),0));
+        if(total != 0 || parseInt(result.lpAmount) != 0 ){
+          stakeDataPromise.push(result);
+        }
+        counter++;
+      }
+    }
+    return stakeDataPromise;
+  });
+  const tokens = farm.tokens;
+  let ratio = tokenPrice[tokens[0].symbol];
+  let token1Ratio = 1, token2Ratio = 1;
+  if(tokens.length > 1) {
+    const token0 = new Token(null, tokens[0].address, tokens[0].decimals, tokens[0].symbol);
+    const token1 = new Token(null, tokens[1].address, tokens[1].decimals, tokens[1].symbol);
+    const pair = await Fetcher.fetchPairData(token0, token1, library);
+
+    const pair_contract = getPairContract(pair.liquidityToken.address, library, account)
+    const totalSupply = await pair_contract.totalSupply();
     
-    const poolTokenRewardInfoPromise = []; 
-    const amountCol = [];
-    for(var i=0; i< rewardTokens.length ; i++){
-        const amountRow = [];
-        for(var j=0; j< poolPositons.length; j++){
-            console.log("TEST2 getTotalRewards:",poolId, poolPositons[j].positionId, rewardTokens[i].farmToken);
-            amountRow.push(farmContract.getTotalRewards(poolId, poolPositons[j].positionId, rewardTokens[i].farmToken));
-        }
-        poolTokenRewardInfoPromise.push(farmContract.getPoolTokenRewardInfo(poolId,rewardTokens[i].farmToken));
-        amountCol.push(amountRow)
-    }
-    console.log("HERE TEST2:");
-    const BLOCKS_PER_YEAR = 60*60*24*365/BLOCK_TIME;
-    const poolRewardsPerYear = await Promise.all(poolTokenRewardInfoPromise).then(result => {
-        return result.map((info,index) => info[3]/(10**rewardTokens[index].decimals) * BLOCKS_PER_YEAR);
-    });
-    console.log("HERE TEST4:");
-    const totalRewardPerYear = poolRewardsPerYear.reduce((total,reward,index) =>
-        total += tokenPrice[rewardTokens[index].symbol] * reward
+    const totalAmount = new TokenAmount(pair.liquidityToken, totalSupply.toString());
+
+    // 
+    const allToken0 = pair.getLiquidityValue(
+        pair.token0,
+        totalAmount,
+        totalAmount,
+        false
     );
-    let allTokenAmount = [];
-    for(var i=0; i<rewardTokens.length ; i++){
-        const amountHex = await Promise.all(amountCol[i]).then(re => re);
-        allTokenAmount.push(
-            amountHex.reduce((total, currentAmount) => total += parseInt(currentAmount),0 )
-        );
-    }
-    console.log("HERE TEST3:");
-    const allTokenRewardPromises = [];
-    const stakingPromise = [];
-    for (let rewardIndex = 0; rewardIndex < rewardTokens.length; rewardIndex++) {
-        const tokenRewardPromise = [];
-        for (let positionIndex = 0; positionIndex < poolPositons.length; positionIndex++) {
-            if(poolPositons[positionIndex].address.toLowerCase() == account.toLowerCase()){
-                tokenRewardPromise.push(
-                    farmContract.pending(poolId, poolPositons[positionIndex].positionId, rewardTokens[rewardIndex].farmToken)
-                );
-                stakingPromise.push(
-                    farmContract.stakingPosition(poolId, poolPositons[positionIndex].positionId)
-                );
-            }  
-        }
-        allTokenRewardPromises.push(tokenRewardPromise);
-    }
-    console.log("HERE TEST4:");
-    const allTokenRewardList = [];
-    for (let promiseIndex = 0; promiseIndex < allTokenRewardPromises.length; promiseIndex++) {
-        allTokenRewardList.push(Promise.all(allTokenRewardPromises[promiseIndex]));
-    }
-    const allTokenRewardAmountHex = await Promise.all(allTokenRewardList);
-    const rewards = [];
-    allTokenRewardAmountHex.forEach((rewardList,index) => {
-        rewardList.forEach((reward,id)=> {
-        if(index == 0) {
-            rewards.push([formatUnits(reward, rewardTokens[index].decimals)]);
-        } else {
-            rewards[id].push(formatUnits(reward, rewardTokens[index].decimals));
-        }
-        });
-    });
-    const stakeData = await Promise.all(stakingPromise).then(x =>{
-        const stakeDataPromise = [];
-        var counter = 0;
-        for(var j=0; j != poolPositons.length; j++){
-            if(poolPositons[j].address.toLowerCase() == account.toLowerCase() ) {
-                const expiredTime = parseInt(x[counter].stakeTimestamp)+parseInt(x[counter].lockDuration);
-                const dueDate = new Date(expiredTime * 1000).toLocaleDateString("en-US")
-                const nowDate = Date.now()/1000;
-                var diff = expiredTime - nowDate;
-                var days = 0, hrs = 0, min = 0, leftSec = 0;
-                if(diff>0) {
-                    diff = Math.floor(diff);
-                    days = Math.floor(diff/(24*60*60));
-                    leftSec = diff - days * 24*60*60;
-                    hrs = Math.floor(leftSec/(60*60));
-                    leftSec = leftSec - hrs * 60*60;
-                    min = Math.floor(leftSec/(60));
-                }
-                const result = {
-                    lpAmount: formatUnits(x[counter].lpAmount,18),
-                    dueDate: dueDate,
-                    positionId: poolPositons[j].positionId,
-                    reward: rewardTokens.map((token, index) => ({
-                        token: token.symbol,
-                        amount: rewards[counter][index],
-                })),
-                remaining: days.toString() + 'd:' + hrs.toString() + 'h:' + min.toString() +'m',
-                locked: diff>0
-                }
-                const total = rewards[counter].reduce((total, currentAmount) => total.add(parseInt(currentAmount),0));
-                if(total != 0 || parseInt(result.lpAmount) != 0 ){
-                    stakeDataPromise.push(result);
-                }
-                counter++;
-            }
-        }
-        return stakeDataPromise;
-    });
-    const tokens = farm.tokens;
-    let ratio = tokenPrice[tokens[0].symbol];
-    if(tokens.length > 1) {
-        const token0 = new Token(null, tokens[0].address, tokens[0].decimals, tokens[0].symbol);
-        const token1 = new Token(null, tokens[1].address, tokens[1].decimals, tokens[1].symbol);
-        const pair = await Fetcher.fetchPairData(token0, token1, library);
-
-        const pair_contract = getPairContract(pair.liquidityToken.address, library, account)
-        const totalSupply = await pair_contract.totalSupply();
-        const totalAmount = new TokenAmount(pair.liquidityToken, totalSupply.toString());
-
-        // 
-        const allToken0 = pair.getLiquidityValue(
-            pair.token0,
-            totalAmount,
-            totalAmount,
-            false
-        );
-        const allToken1 = pair.getLiquidityValue(
-            pair.token1,
-            totalAmount,
-            totalAmount,
-            false
-        );
-        const allToken0Amount = parseFloat(allToken0.toExact());
-        const allToken1Amount = parseFloat(allToken1.toExact());
-        ratio = (allToken0Amount * tokenPrice[tokens[0].symbol] + allToken1Amount * tokenPrice[tokens[1].symbol]) / parseFloat(totalAmount.toExact());
-    }
-    const tvl = ratio * farm.lpToken.lpBalance/10**farm.lpToken.decimals;
-    console.log("TEST rewardTokens:",rewardTokens);
-    return {
-        poolId: poolId,
-        lpTokenAddress: farm.lpToken.address,
-        token0Symbol: tokens[0].symbol,
-        token1Symbol: tokens[1]? tokens[1].symbol: "",
-        lpScore: farm.lpToken.lpScore,
-        lpBalance: farm.lpToken.lpBalance/10**farm.lpToken.decimals,
-        lastUpdateBlock: 0,
-        rewardTokens: rewardTokens.map(token => token.farmToken),
-        rewardTokensAddresses: rewardTokens.map(token => token.address),
-        rewardTokensSymbols: rewardTokens.map(token => token.symbol),
-        rewardTokensAmount: allTokenAmount.map((reward,index) => reward / 10**rewardTokens[index].decimals),
-        hasUserPosition: stakeData.length !== 0,
-        rewards: rewards,
-        stakeData: stakeData,
-        startBlock: farm.startBlock,
-        endBlock: farm.endBlock,
-        tvl: tvl,
-        apr: (totalRewardPerYear/(tvl==0?1:tvl))*100,
-        ratio: ratio
-    };
-
+    const allToken1 = pair.getLiquidityValue(
+        pair.token1,
+        totalAmount,
+        totalAmount,
+        false
+    );
+    const allToken0Amount = parseFloat(allToken0.toExact());
+    const allToken1Amount = parseFloat(allToken1.toExact());
+    const totallLP = parseFloat(totalAmount.toExact());
+    token1Ratio = allToken0Amount/totallLP;
+    token2Ratio = allToken1Amount/totallLP;
+    ratio = (allToken0Amount * tokenPrice[tokens[0].symbol] + allToken1Amount * tokenPrice[tokens[1].symbol]) / parseFloat(totalAmount.toExact());
+  }
+  const tvl = ratio * farm.lpToken.lpBalance/10**farm.lpToken.decimals;
+  return {
+    poolId: poolId,
+    lpTokenAddress: farm.lpToken.address,
+    token0Symbol: tokens[0].symbol,
+    token1Symbol: tokens[1]? tokens[1].symbol: "",
+    lpScore: farm.lpToken.lpScore,
+    lpBalance: farm.lpToken.lpBalance/10**farm.lpToken.decimals,
+    lastUpdateBlock: 0,
+    rewardTokens: rewardTokens.map(token => token.farmToken),
+    rewardTokensAddresses: rewardTokens.map(token => token.address),
+    rewardTokensSymbols: rewardTokens.map(token => token.symbol),
+    rewardTokensAmount: allTokenAmount.map((reward,index) => reward / 10**rewardTokens[index].decimals),
+    hasUserPosition: stakeData.length !== 0,
+    rewards: rewards,
+    stakeData: stakeData,
+    startBlock: farm.startBlock,
+    endBlock: farm.endBlock,
+    tvl: tvl,
+    apr: (totalRewardPerYear/(tvl==0?1:tvl))*100,
+    ratio: ratio,
+    token1Ratio: token1Ratio,
+    token2Ratio: token2Ratio,
+    poolRewardPerYear: totalRewardPerYear
+  };
 }
 
 const newGetAllPools = async (library, account) => {
+  const tokenPrice = await getAllSuportedTokensPrice();
   const allFarm = await axios.get(
-    // fetch valid pool list from remote
     `${API_URL}/farm/getAllPools`
   ).then(res => res.data).catch(e => console.log("error: ", e));
-  console.log("allFarm:",allFarm);
-  const allPoolsPromise = [];
-  for(var i=0 ; i< allFarm.length ; i++) {
-    allPoolsPromise.push(newGetPoolByFarm(allFarm[i], library, account));
+  if(allFarm.length) {
+    const allPoolsPromise = [];
+    for(var i=0 ; i< allFarm.length ; i++) {
+      allPoolsPromise.push(newGetPoolByFarm(allFarm[i], tokenPrice, library, account));
+    }
+    const result = await Promise.all(allPoolsPromise);
+    return result;
   }
-  const result = await Promise.all(allPoolsPromise);
-  return
+  return null;
+}
+
+const newGetPool = async (poolId, library, account) => {
+  const tokenPrice = await getAllSuportedTokensPrice();
+  //bug, only get on pool not working, may fix this later
+  const allFarm = await axios.get(
+    `${API_URL}/farm/getAllPools`
+  ).then(res => res.data).catch(e => console.log("error: ", e));
+  if(allFarm.length) {
+    const allPoolsPromise = [];
+    for(var i=0 ; i< allFarm.length ; i++) {
+      if(allFarm[i].poolId == poolId) { 
+        return await newGetPoolByFarm(allFarm[i], tokenPrice, library, account);
+      }
+    }
+    return result;
+  }
+  return null;
 }
 
 const getAllPools = async (library, account) => {
+  console.log("KUY1",account);
   const allFarm = await axios.get(
     `${API_URL}/farm/getAllPools`
   ).then(res => res.data).catch(e => console.log("error: ", e));
@@ -566,7 +554,6 @@ const getAllPools = async (library, account) => {
     return result;
   }
   return null;
-  
 };
 
 
@@ -600,6 +587,7 @@ const checkTokenIsApproved = async (lpTokenAddr, amount, library, account) => {
 
 const deposit = async (lpTokenAddr, amount, poolId, lockDuration, library, account, setButtonText, stakeCallback, setButtonStatus) => {
   let status = await (async () => {
+    console.log("TEST DEPOSIT:",amount);
     const contract = getFarmsContract(library, account);
     const depositTokenContract = getTokenContract(lpTokenAddr, library, account);
     // const hasBalance = checkUserHasSufficientLPBalance(lpTokenAddr, amount, library, account);
@@ -607,7 +595,7 @@ const deposit = async (lpTokenAddr, amount, poolId, lockDuration, library, accou
     // if (!hasBalance) return new CustomErrveor(`Insufficient balance`);
 
     const tokenDecimals = await depositTokenContract.decimals();
-    const depositAmount = parseUnits(amount.toFixed(tokenDecimals).toString(), tokenDecimals).toString();
+    const depositAmount = parseUnits(amount, tokenDecimals).toString();
     const approved = await checkTokenIsApprovedWithSpender(
       lpTokenAddr,
       FARMS_ADDRESS,
@@ -625,6 +613,7 @@ const deposit = async (lpTokenAddr, amount, poolId, lockDuration, library, accou
     let args = [poolId, depositAmount, lockDuration];
 
     const options = {};
+    console.log("TEST DEPOSIT:",args);
     let result = await contract.estimateGas['deposit'](...args, options)
       .then(gasEstimate => {
         return contract['deposit'](...args, {
@@ -680,11 +669,7 @@ const harvest = async (poolId, positionId, setButtonText, harvestCallback, libra
   } else {
     // setButtonText('Done');
     harvestCallback(status);
-    // setButtonStatus(false);
-    // withdrawCallback(status);
   }
-  // const farmContract = getFarmsContract(library, account);
-  // const response = await farmContract.harvest(poolId, positionId, false, false);
 };
 
 const withdraw = async (poolId, positionId, amount, setButtonText, setButtonStatus, withdrawCallback, library, account) => {
@@ -724,375 +709,15 @@ const getDateYDM = (date) => {
   return date.getFullYear(date)  + "-" + ("0"+(date.getMonth(date)+1)).slice(-2) + "-" + ("0" + date.getDate(date)).slice(-2)
 }
 
-const getHarvestHistory = async (library,account = null) => {
-  
-  //init date
-  // var Contract = require('web3-eth-contract');
-  // Contract.setProvider('https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
-  var eth = new Eth(RPC_URL);
-  // const farmContract = new Contract(FarmsABI,FARMS_ADDRESS);
-  // console.log(await farmContract.methods.numPools().call());
-
-    //test 
-  // const library = new Web3Provider(eth.givenProvider);
-  const farmContract = getFarmsContract(library, account);
-  // console.log('farmContract2:',await farmContract2.numPools());
-  // farmContract2.queryFilter("Harvest", 0).then(function(events)  {console.log(events)});
-  console.log("HERE TEST:",123);
-  const currentBlock = await eth.getBlockNumber();
-  console.log("HERE TEST2:",currentBlock);
-  const BLOCKS_PER_MONTH = 60*60*24*31/BLOCK_TIME; // average 5760 per day
-  const filter = farmContract.filters.Harvest(null,0);
-  console.log("HERE TEST3:",currentBlock);
-  const result = await farmContract.queryFilter(
-    filter, 
-    currentBlock - BLOCKS_PER_MONTH, 
-  ).then(async function(events){
-    console.log("TEST HARVEST events:",events);
-    var date = new Date();
-    var today = new Date(date);
-    const date_array = {};
-    date.setMonth(date.getMonth() - 1);
-    
-    date_array[getDateYDM(date)] = 0;
-    date.setDate(date.getDate() + 1);
-    for(var i=0; i<40 ; i++){
-      date_array[getDateYDM(date)] = 0;
-      if(date.getDate() === today.getDate()) break;
-      date.setDate(date.getDate() + 1);
-    }
-
-    const blockTimestamps = [];
-    for(var i=0 ; i < events.length ; i++) {
-      blockTimestamps.push(eth.getBlock(events[i]['blockNumber']));
-    }
-    const result2 = Promise.all(blockTimestamps).then(block => {
-      const my_acy = {...date_array};
-      const my_all = {...date_array};
-      const total_acy = {...date_array};
-      const total_all = {...date_array};
-      for(var i=events.length-1; i >=0 ; i--) {
-        const date = new Date(block[i].timestamp * 1000);
-        const str_date = getDateYDM(date);
-        if(date_array.hasOwnProperty(str_date)){
-          var value = 0;
-          if(events[i]['args']['token'] == USDC_TOKEN || events[i]['args']['token'] == USDT_TOKEN) {
-            value =  events[i]['args']['amount']/1e6;
-          } else if(events[i]['args']['token'] == ACY_TOKEN) {
-            value =  events[i]['args']['amount']/1e18;
-            total_acy[str_date] += value;
-          }
-          total_all[str_date] += value;
-          if(events[i]['args']['user'] == account){
-            my_all[str_date] += value;
-            if(events[i]['args']['token'] == ACY_TOKEN) {
-              my_acy[str_date] += value;
-            }
-          }
-          date_array[str_date] += events[i]['args']['amount']/1e18;
-        } else {
-          break;
-        }
-      }
-      return {
-        myAcy: Object.entries(my_acy),
-        myAll: Object.entries(my_all),
-        totalAcy: Object.entries(total_acy),
-        totalAll: Object.entries(total_all)
-      };
-
-    })
-    console.log("HERE END HARVEST:");
-    return result2;
-  });
-  return result;
-}
-const getBalanceRecord = async (library,account = null) => {
-  //init date
-  // var Contract = require('web3-eth-contract');
-  // Contract.setProvider('https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
-  var eth = new Eth(RPC_URL);
-  // const farmContract = new Contract(FarmsABI,FARMS_ADDRESS);
-  // console.log(await farmContract.methods.numPools().call());
-
-    //test 
-  // const library = new Web3Provider(eth.givenProvider);
-  const ACY = supportedTokens.find(item => item.symbol === "ACY");
-  const contract = getTokenContract(ACY.address, library, account);
-  // console.log('farmContract2:',await farmContract2.numPools());
-  // farmContract2.queryFilter("Harvest", 0).then(function(events)  {console.log(events)});
-  
-  const currentBlock = await eth.getBlockNumber();
-  var myCurrentAcy = await contract.balanceOf(account)/1e18;
-  const BLOCKS_PER_MONTH = 60*60*24*31/BLOCK_TIME; // average 5760 per day
-  const result = await contract.queryFilter(
-    "Transfer", 
-    currentBlock - BLOCKS_PER_MONTH, 
-  // function(error, events){ console.log(events); }
-  ).then(async function(events){
-    var date = new Date();
-    var today = new Date(date);
-    const date_array = {};
-    const dateArray = [];
-    date.setMonth(date.getMonth() - 1);
-    
-    date_array[getDateYDM(date)] = 0;
-    dateArray.push(getDateYDM(date));
-    date.setDate(date.getDate() + 1);
-    for(var i=0; i<40 ; i++){
-      date_array[getDateYDM(date)] = 0;
-      dateArray.push(getDateYDM(date));
-      if(date.getDate() === today.getDate()) {
-        date_array[getDateYDM(date)] = myCurrentAcy;
-        break;
-      }
-      date.setDate(date.getDate() + 1);
-    }
-
-    const blockTimestamps = [];
-    for(var i=0 ; i < events.length ; i++) {
-      blockTimestamps.push(eth.getBlock(events[i]['blockNumber']));
-    }
-    const result2 = Promise.all(blockTimestamps).then(block => {
-      const my_acy = {...date_array};
-      const total_acy = {...date_array};
-      var current_index = 0;
-      var last_index = dateArray.length - 1;
-      for(var i=events.length-1; i >=0 ; i--) {
-        const date = new Date(block[i].timestamp * 1000);
-        const str_date = getDateYDM(date);
-        //
-        current_index = dateArray.indexOf(str_date);
-        if(last_index - current_index > 1) {
-          for(var j = current_index + 1; j < last_index ; j++) {
-            my_acy[dateArray[j]] = myCurrentAcy;
-          }
-        }
-        last_index = current_index ;
-
-        if(dateArray.includes(str_date)){
-          var value = events[i]['args']['value']/1e18;
-          if(my_acy[str_date] == 0) my_acy[str_date] = myCurrentAcy;
-          if(events[i]['args']['from'] == account) {
-            myCurrentAcy += value;
-          } else if(events[i]['args']['to'] == account) {
-            myCurrentAcy -=  value;
-          }
-        } else {
-          break;
-        }
-      }
-      const myAcy = Object.entries(my_acy);
-      return {
-        myAcy: myAcy,
-        totalAcy: myAcy,
-      };
-    });
-    return result2;
-  });
-  return result;
-}
-
-const getDepositRecord = async (library,account = null) => {
-  //init date
-  var eth = new Eth(RPC_URL);
-  const farmContract = getFarmsContract(library, account);
-  const currentBlock = await eth.getBlockNumber();
-  const filter = farmContract.filters.Deposit(null,0);
-  const BLOCKS_PER_MONTH = 60*60*24*31/BLOCK_TIME; // average 5760 per day
-  const result = await farmContract.queryFilter(
-    filter, 
-    currentBlock - BLOCKS_PER_MONTH, 
-  ).then(async function(events){
-    var date = new Date();
-    var today = new Date(date);
-    const date_array = {};
-    const dateArray = [];
-    date.setMonth(date.getMonth() - 1);
-    
-    date_array[getDateYDM(date)] = 0;
-    dateArray.push(getDateYDM(date));
-    date.setDate(date.getDate() + 1);
-    for(var i=0; i<40 ; i++){
-      date_array[getDateYDM(date)] = 0;
-      dateArray.push(getDateYDM(date));
-      if(date.getDate() === today.getDate()) {
-        date_array[getDateYDM(date)] = 0;
-        break;
-      }
-      date.setDate(date.getDate() + 1);
-    }
-
-    const blockTimestamps = [];
-    for(var i=0 ; i < events.length ; i++) {
-      blockTimestamps.push(eth.getBlock(events[i]['blockNumber']));
-    }
-    const result2 = Promise.all(blockTimestamps).then(block => {
-      const my_acy = {...date_array};
-      const total_acy = {...date_array};
-
-      for(var i=events.length-1; i >=0 ; i--) {
-        const date = new Date(block[i].timestamp * 1000);
-        const str_date = getDateYDM(date);
-
-        if(dateArray.includes(str_date)){
-          if(events[i]['args']['user'] == account) {
-            my_acy[str_date] -= events[i]['args']['amount']/1e18;
-          }
-          total_acy[str_date] -= events[i]['args']['amount']/1e18;
-        } else {
-          break;
-        }
-      }
-      return {
-        myAcy: Object.entries(my_acy),
-        totalAcy: Object.entries(total_acy),
-      };
-    });
-    return result2;
-  });
-  return result;
-}
-const getWithdrawRecord = async (library,account = null) => {
-  //init date
-  var eth = new Eth(RPC_URL);
-  const farmContract = getFarmsContract(library, account);
-  const currentBlock = await eth.getBlockNumber();
-  const filter = farmContract.filters.Withdraw(null,0);
-  const BLOCKS_PER_MONTH = 60*60*24*31/BLOCK_TIME; // average 5760 per day
-  const result = await farmContract.queryFilter(
-    filter, 
-    currentBlock - BLOCKS_PER_MONTH, 
-  ).then(async function(events){
-    var date = new Date();
-    var today = new Date(date);
-    const date_array = {};
-    const dateArray = [];
-    date.setMonth(date.getMonth() - 1);
-    
-    date_array[getDateYDM(date)] = 0;
-    dateArray.push(getDateYDM(date));
-    date.setDate(date.getDate() + 1);
-    for(var i=0; i<40 ; i++){
-      date_array[getDateYDM(date)] = 0;
-      dateArray.push(getDateYDM(date));
-      if(date.getDate() === today.getDate()) {
-        date_array[getDateYDM(date)] = 0;
-        break;
-      }
-      date.setDate(date.getDate() + 1);
-    }
-
-    const blockTimestamps = [];
-    for(var i=0 ; i < events.length ; i++) {
-      blockTimestamps.push(eth.getBlock(events[i]['blockNumber']));
-    }
-    const result2 = Promise.all(blockTimestamps).then(block => {
-      const my_acy = {...date_array};
-      const total_acy = {...date_array};
-      var current_index = 0;
-      var last_index = dateArray.length - 1;
-      for(var i=events.length-1; i >=0 ; i--) {
-        const date = new Date(block[i].timestamp * 1000);
-        const str_date = getDateYDM(date);
-
-        if(dateArray.includes(str_date)){
-          if(events[i]['args']['user'] == account) {
-            my_acy[str_date] += events[i]['args']['amount']/1e18;
-          }
-          total_acy[str_date] += events[i]['args']['amount']/1e18;
-        } else {
-          break;
-        }
-      }
-      return {
-        myAcy: Object.entries(my_acy),
-        totalAcy: Object.entries(total_acy),
-      };
-    });
-    return result2;
-  });
-  return result;
-}
-const getDaoStakeRecord = async (library, account) =>{
-  const withdraw = getWithdrawRecord(library, account);
-  const deposit = getDepositRecord(library, account);
-  const proimse = await Promise.all([withdraw,deposit]).then( array => {
-    const withdrawMy = array[0].myAcy;
-    const withdrawTotal = array[0].totalAcy;
-    let len = withdrawMy.length;
-    var resultMy = [...array[1].myAcy];
-    var resultTotal = [...array[1].totalAcy];
-    for(var i=0; i < len ; i++) 
-    {
-      resultMy[i][1] += withdrawMy[i][1];
-      resultTotal[i][1] += withdrawTotal[i][1];
-    }
-    return {
-      myAcy: resultMy,
-      totalAcy: resultTotal
-    };
-  });
-  
-  return proimse;
-}
-
-const testFarmFunction = async (library, account) => {
-  return true;
-}
-
-const getPair = async (pairAdress, library, account, chainId) => {
-  return ;
-  const pair_contract = getPairContract(pairAdress,library,account);
-  const reserves = await pair_contract.getReserves();
-
-  const token0Address = await pair_contract.token0();
-  const token0Contract =  getTokenContract(token0Address, library, account);
-  const token0Symbol = await token0Contract.symbol();
-  const token0Decimal = await token0Contract.decimals()
-  const token0 = new Token(null, token0Address,token0Decimal, token0Symbol);
-
-  const token1Address = await pair_contract.token1();
-  const token1Contract =  getTokenContract(token1Address, library, account);
-  const token1Symbol = await token1Contract.symbol();
-  const token1Decimal = await token1Contract.decimals()
-  const token1 = new Token(null, token1Address,token1Decimal, token1Symbol);
-
-  console.log("TEST Fetch pair:",reserves,token0Address,token1Address);
-  const pair = await Fetcher.fetchPairData(token0, token1, library);
-  console.log("TEST FETCH PAIR:",pair);
-  const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
-  // let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
-  // userPoolBalance = new TokenAmount(pair.liquidityToken, userPoolBalance);
-  const token0Deposited = pair.getLiquidityValue(
-    pair.token0,
-    totalSupply,
-    new TokenAmount(pair.liquidityToken, parseUnits("1000",token0.decimal)),
-    false
-  );
-  const token1Deposited = pair.getLiquidityValue(
-    pair.token1,
-    totalSupply,
-    new TokenAmount(pair.liquidityToken, parseUnits("1000",token1.decimal)),
-    false
-  );
-  console.log("TEST TOKEN AMOUNT:",token0Deposited.toSignificant(4), token1Deposited.toSignificant(4));
-  // return pair;
-}
 export { 
   getAllPools, 
   deposit, 
   harvestAll, 
   harvest, 
   withdraw, 
-  getHarvestHistory, 
   approveLpToken, 
   getPool, 
-  getPoolAccmulateReward, 
   checkTokenIsApproved,
-  getBalanceRecord,
-  getDaoStakeRecord,
-  getPair,
   newGetAllPools,
-  testFarmFunction
+  newGetPool
 };

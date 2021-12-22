@@ -5,13 +5,15 @@ import { AddressZero, MaxUint256 } from '@ethersproject/constants';
 import { BigNumber } from '@ethersproject/bignumber';
 import { formatUnits, parseUnits } from '@ethersproject/units';
 import { Interface } from '@ethersproject/abi';
-import { JSBI, Token, TokenAmount, Percent, ETHER, CurrencyAmount } from '@acyswap/sdk';
+import { JSBI, Token, TokenAmount, Percent, ETHER, CurrencyAmount, Fetcher, Pair } from '@acyswap/sdk';
 import ACYRouterABI from '../abis/AcyV1Router02.json';
 import FlashArbitrageABI from '../abis/AcyV1FlashArbitrage.json';
 import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import ERC20ABI from '../abis/ERC20.json';
 import tokenList from '@/constants/TokenList';
 import axios from 'axios';
+import { JsonRpcProvider } from "@ethersproject/providers";
+
 export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
 export const ROUTER_ADDRESS = '0x4DCa8E42634abdE1925ebB7f82AC29Ea00d34bA2';
@@ -20,7 +22,7 @@ export const FLASH_ARBITRAGE_ADDRESS = '0x4a4783Cf89593127180FD216d1302EE11f72D0
 export const BLOCK_TIME = 3;
 export const BLOCKS_PER_YEAR = 60*60*24*365/BLOCK_TIME;
 export const BLOCKS_PER_MONTH = 60*60*24*31/BLOCK_TIME; 
-export const RPC_URL = "https://data-seed-prebsc-1-s1.binance.org:8545/";
+export const RPC_URL = "https://bsc-dataseed.binance.org/";
 export const API_URL = "https://api.acy.finance/api";
 // export const API_URL = "http://localhost:3001/api";
 
@@ -424,21 +426,81 @@ export function getTokenPrice(symbol) {
   axios.get("https://api.coingecko.com/api/v3/simple/price?ids=shiba-inu&vs_currencies=usd")
 }
 export async function getAllSuportedTokensPrice() {
+  const library = new JsonRpcProvider(RPC_URL, 56);
   const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
   const searchIds = searchIdsArray.join('%2C');
   const tokensPrice = await axios.get(
     `https://api.coingecko.com/api/v3/simple/price?ids=${searchIds}&vs_currencies=usd`
-  ).then(result => {
+  ).then(async (result) => {
     const data = result.data;
     console.log("tokensPrice:",data);
     const tokensPrice = {};
     tokenList.forEach(token => {
       tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
     })
-    tokensPrice['ACY'] = 0.2;//dont know acy price now;
+    tokensPrice['ACY'] = await getACYPrice(library);//dont know acy price now;
+
     return tokensPrice;
   });
+  console.log("TOKEN PRICE1:", tokensPrice, library);
   return tokensPrice;
+}
+
+export async function getACYPrice(library){
+  const ACY  = tokenList.find(token => token.symbol == "ACY");
+  const BUSD = tokenList.find(token => token.symbol == "BUSD");
+  const USDT = tokenList.find(token => token.symbol == "USDT");
+
+  const acyToken  = new Token(56, "0xc94595b56e301f3ffedb8ccc2d672882d623e53a", 18, "ACY");
+  const usdToken  = new Token(56, "0x55d398326f99059ff775485246999027b3197955", 18, "USDT");
+  const busdToken = new Token(56, "0xe9e7cea3dedca5984780bafc599bd69add087d56", 18, "BUSD");
+  const acyUsdtPair = await Fetcher.fetchPairData(acyToken, usdToken, library).catch(e => {
+    return false
+  });
+  const acyBusdPair = await Fetcher.fetchPairData(acyToken, busdToken, library).catch(e => {
+    return false
+  });
+  if(!acyUsdtPair && !acyBusdPair) {
+    return 0.2;
+  } else if(!acyUsdtPair) {
+    const result = await getTokenPriceByPair(acyBusdPair, ACY.symbol, library);
+    return result;
+  } else if(!acyBusdPair) {
+    const result = await getTokenPriceByPair(acyUsdtPair, ACY.symbol, library);
+    return result;
+  } else {
+    const acyToUsdtPrice =  getTokenPriceByPair(acyUsdtPair, ACY.symbol, library);
+    const acyToBusdPrice =  getTokenPriceByPair(acyBusdPair, ACY.symbol, library);
+    let [result1, result2] = await Promise.all([acyToUsdtPrice, acyToBusdPrice]);
+    const result = (result1+result2)/2;
+    return result;
+  }
+}
+
+export async function getTokenPriceByPair(pair, symbol, library) {
+  const pair_contract = getPairContract(pair.liquidityToken.address, library)
+  const totalSupply = await pair_contract.totalSupply();
+  const totalAmount = new TokenAmount(pair.liquidityToken, totalSupply.toString());
+  const allToken0 = pair.getLiquidityValue(
+      pair.token0,
+      totalAmount,
+      totalAmount,
+      false
+  );
+  const allToken1 = pair.getLiquidityValue(
+      pair.token1,
+      totalAmount,
+      totalAmount,
+      false
+  );
+  const allToken0Amount = parseFloat(allToken0.toExact());
+  const allToken1Amount = parseFloat(allToken1.toExact());
+  if(pair.token0.symbol == symbol) {
+    return allToken1Amount / allToken0Amount ;
+  } else {
+    return allToken0Amount / allToken1Amount ;
+  }
+  return 0;
 }
 
 // return output field amount for swap component

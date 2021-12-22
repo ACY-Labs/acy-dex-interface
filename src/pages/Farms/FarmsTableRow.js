@@ -12,7 +12,7 @@ import { Modal, Icon, Divider } from 'antd';
 import { connect } from 'umi';
 import moment from 'moment';
 import classNames from 'classnames';
-import { getPool, getPoolAccmulateReward} from '@/acy-dex-swap/core/farms';
+import { getPool, getPoolAccmulateReward, newGetPool} from '@/acy-dex-swap/core/farms';
 import supportedTokens from '@/constants/TokenList';
 import StakeRow from './StakeRow';
 import SwapComponent from '@/components/SwapComponent';
@@ -60,7 +60,6 @@ const FarmsTableRow = props => {
     account,
     library,
     isMyFarms,
-    harvestHistory,
     dispatch,
     content,
     poolId,
@@ -75,7 +74,6 @@ const FarmsTableRow = props => {
     userRewards,
     stakeData,
     hasUserPosition,
-    refreshHarvestHistory,
     searchInput,
     selectedTable,
     tokenFilter,
@@ -189,31 +187,38 @@ const FarmsTableRow = props => {
 
   const refreshPoolInfo = async () => {
     console.log('refresh pool info:');
-    const newPool = await getPool(library, account, poolId);
+    const pool = await newGetPool(poolInfo.poolId, library, account);
     const block = await library.getBlockNumber();
+    console.log("TEST HERE:",pool,account);
     const newFarmsContent = {
-      poolId: newPool.poolId,
-      lpTokens: newPool.lpTokenAddress,
-      token1: newPool.token0Symbol,
-      token1Logo: getLogoURIWithSymbol(newPool.token0Symbol),
-      token2: newPool.token1Symbol,
-      token2Logo: getLogoURIWithSymbol(newPool.token1Symbol),
-      pendingReward: newPool.rewardTokensSymbols.map((token, idx) => ({
+      index: pool.poolId,
+      poolId: pool.poolId,
+      lpTokens: pool.lpTokenAddress,
+      token1: pool.token0Symbol,
+      token1Logo: getLogoURIWithSymbol(pool.token0Symbol),
+      token2: pool.token1Symbol,
+      token2Logo: getLogoURIWithSymbol(pool.token1Symbol),
+      pendingReward: pool.rewardTokensSymbols.map((token, index) => ({
         token,
-        amount: newPool.rewardTokensAmount[idx],
+        amount: pool.rewardTokensAmount[index] == 0?0 : pool.rewardTokensAmount[index],
       })),
-      totalApr: 89.02,
-      tvl: 144542966,
-      hasUserPosition: newPool.hasUserPosition,
-      userRewards: newPool.rewards,
-      stakeData: newPool.stakeData,
-      poolLpScore: newPool.lpScore,
-      poolLpBalance: newPool.lpBalance,
-      endsIn: getDHM((newPool.endBlock - block) *BLOCK_TIME),
-      status: newPool.endBlock - block > 0,
-      endAfter: (newPool.endBlock - block) * BLOCK_TIME,
-      ratio: newPool.ratio
+      totalApr: pool.apr.toFixed(2),
+      tvl: pool.tvl,
+      hasUserPosition: pool.hasUserPosition,
+      hidden: true,
+      userRewards: pool.rewards,
+      stakeData: pool.stakeData,
+      poolLpScore: pool.lpScore,
+      poolLpBalance: pool.lpBalance,
+      endsIn: getDHM((pool.endBlock - block) * BLOCK_TIME),
+      status: pool.endBlock - block > 0,
+      ratio: pool.ratio,
+      endAfter: (pool.endBlock - block) * BLOCK_TIME,
+      token1Ratio: pool.token1Ratio,
+      token2Ratio: pool.token2Ratio,
+      poolRewardPerYear: pool.poolRewardPerYear
     };
+    console.log("TEST HERE:",newFarmsContent);
     setPoolInfo(newFarmsContent);
   };
 
@@ -241,125 +246,120 @@ const FarmsTableRow = props => {
     }
   };
 
-  const harvestCallback = status => {
-    const transactions = props.transaction.transactions;
-    const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
-    // trigger loading spin on top right
-    if (isCurrentTransactionDispatched == 0) {
-      dispatch({
-        type: "transaction/addTransaction",
-        payload: {
-          transactions: [...transactions, { hash: status.hash }]
-        }
-      })
+  const formatString = (value) => {
+    let formattedStr;
+    if (value >= 1000000000) {
+      formattedStr = `$ ${(value / 1000000000).toFixed(2)}b`;
+    }else if (value >= 1000000) {
+      formattedStr = `$ ${(value / 1000000).toFixed(2)}m`;
+    } else if (value >= 1000) {
+      formattedStr = `$ ${(value / 1000).toFixed(2)}k`;
+    } else {
+      formattedStr = `$ ${(value).toFixed(2)}`;
     }
+    return formattedStr;
+  }
 
-    const checkStatusAndFinish = async () => {
-      await library.getTransactionReceipt(status.hash).then(async receipt => {
+  const harvestCallback = status => {
+    // const {
+    //   transaction: { transactions },
+    // } = props;
+    // // 检查是否已经包含此交易
+    // const transLength = transactions.filter(item => item.hash == status.hash).length;
+    // if (transLength == 0) {
+    //   dispatch({
+    //     type: 'transaction/addTransaction',
+    //     payload: {
+    //       transactions: [...transactions, status.hash],
+    //     },
+    //   });
+    // }
+    const sti = async (hash) => {
+      library.getTransactionReceipt(hash).then(async receipt => {
+        console.log(`receiptreceipt for ${hash}: `, receipt);
+        // receipt is not null when transaction is done
+        if (!receipt) 
+          setTimeout(sti(hash), 500);
+        else {
+          
+          // const newData = transactions.filter(item => item.hash != hash);
 
-        if (!receipt) {
-          setTimeout(checkStatusAndFinish, 500);
-        } else {
-          let transactionTime;
-          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
-            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
-          });
+          // props.onGetReceipt(receipt.transactionHash, library, account);
 
-          await refreshPool(poolInfo.poolId,poolInfo.index);
-          await refreshHarvestHistory(library, account);
-          // clear top right loading spin
-          const newData = transactions.filter(item => item.hash != status.hash);
-          dispatch({
-            type: "transaction/addTransaction",
-            payload: {
-              transactions: [
-                ...newData,
-                { hash: status.hash, transactionTime }
-              ]
-            }
-          });
-
-          // refresh the table
           // dispatch({
-          //   type: "liquidity/setRefreshTable",
-          //   payload: true,
+          //   type: 'transaction/addTransaction',
+          //   payload: {
+          //     transactions: newData
+          //   },
           // });
-
-          // disable button after each transaction on default, enable it after re-entering amount to add
+          await axios.get(
+            // fetch valid pool list from remote
+            `${API_URL}/farm/updatePool?poolId=${poolInfo.poolId}`
+            //change to to production
+            //`http://api.acy.finance/api/updatePool?poolId=${poolId}`
+          ).then( async (res) => {
+            await refreshPoolInfo();
+            setHarvestButtonText("Done");
+            hideHarvestModal();
+          }).catch(e => console.log("error: ", e));
+          // set button to done and disabled on default
           
-          setHarvestButtonText("Done");
-          hideHarvestModal();
-          
-          // setStateStakeData(prevState => {
-          //   const prevStakeData = [...prevState];
-          //   prevStakeData[selectedRowIndex].reward = prevStakeData[selectedRowIndex].reward.fill(0);;
-          //   return prevStakeData;
-          // });
-          
-
-          // store to localStorage
         }
-      })
-    };
-    // const sti = setInterval(, 500);
-    checkStatusAndFinish();
+      });
+    }
+    sti(status.hash);
   }
 
   const withdrawCallback = status => {
-    const transactions = props.transaction.transactions;
-    const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
-    //trigger loading spin on top right
-    if (isCurrentTransactionDispatched == 0) {
-      dispatch({
-        type: "transaction/addTransaction",
-        payload: {
-          transactions: [...transactions, { hash: status.hash }]
-        }
-      })
-    }
 
-    const checkStatusAndFinish = async () => {
-      await library.getTransactionReceipt(status.hash).then(async receipt => {
+    // const {
+    //   transaction: { transactions },
+    // } = props;
+    // // 检查是否已经包含此交易
+    // const transLength = transactions.filter(item => item.hash == status.hash).length;
+    // if (transLength == 0) {
+    //   dispatch({
+    //     type: 'transaction/addTransaction',
+    //     payload: {
+    //       transactions: [...transactions, status.hash],
+    //     },
+    //   });
+    // }
+    const sti = async (hash) => {
+      library.getTransactionReceipt(hash).then(async receipt => {
+        // console.log(`receiptreceipt for ${hash}: `, receipt);
+        // receipt is not null when transaction is done
+        if (!receipt) 
+          setTimeout(sti(hash), 500);
+        else {
+          
+          // const newData = transactions.filter(item => item.hash != hash);
 
-        if (!receipt) {
-          setTimeout(checkStatusAndFinish, 500);
-        } else {
-          let transactionTime;
-          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
-            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
-          });
-          //refresh talbe
-          await refreshPoolInfo();
-          // clear top right loading spin
-          const newData = transactions.filter(item => item.hash != status.hash);
-          dispatch({
-            type: "transaction/addTransaction",
-            payload: {
-              transactions: [
-                ...newData,
-                { hash: status.hash, transactionTime }
-              ]
-            }
-          });
+          // props.onGetReceipt(receipt.transactionHash, library, account);
 
-          // refresh the table
           // dispatch({
-          //   type: "liquidity/setRefreshTable",
-          //   payload: true,
+          //   type: 'transaction/addTransaction',
+          //   payload: {
+          //     transactions: newData
+          //   },
           // });
-
-          // disable button after each transaction on default, enable it after re-entering amount to add
-          setWithdrawButtonText("Done");
-          hideWithdrawModal();
-
-          // store to localStorage
-          //selectedRowData.positionId
+          // await refreshPoolInfo();
+          await axios.get(
+            // fetch valid pool list from remote
+            `${API_URL}/farm/updatePool?poolId=${poolInfo.poolId}`
+            //change to to production
+            //`http://api.acy.finance/api/updatePool?poolId=${poolId}`
+          ).then(async (res) => {
+            await refreshPoolInfo();
+            setWithdrawButtonText("Done");
+            hideWithdrawModal();
+          }).catch(e => console.log("error: ", e));
+          // set button to done and disabled on default
           
         }
-      })
-    };
-    // const sti = setInterval(, 500);
-    checkStatusAndFinish();
+      });
+    }
+    sti(status.hash);
   };
   const searchFilter = () => {
     if(token1.toLowerCase().includes(searchInput.toLowerCase()) || token2.toLowerCase().includes(searchInput.toLowerCase())) {
@@ -376,7 +376,7 @@ const FarmsTableRow = props => {
     if(selectedTable === 0) {
       return true;
     } else if(selectedTable === 1) {
-      return (poolInfo.pendingReward.length === 1 && poolInfo.pendingReward[0].token) === "ACY"
+      return (poolInfo.pendingReward.length === 1 && poolInfo.pendingReward[0].token) === "ACY" && !(poolInfo.token1 && !poolInfo.token2);
     } else if(selectedTable === 2) {
       const table4 = poolInfo.pendingReward.length !== 1  ||
         (poolInfo.pendingReward.length === 1 && poolInfo.pendingReward[0].token) !== "ACY"
@@ -433,8 +433,8 @@ const FarmsTableRow = props => {
           {/* only display token 1 symbol if token 2 is undefined or null. */}
           <div className={styles.tokenTitleContainer}>
             {poolInfo.token1 && poolInfo.token2 && `${poolInfo.token1}-${poolInfo.token2}`}
-            {poolInfo.token1 && !poolInfo.token2 && `s${poolInfo.token1}`}
-            {poolInfo.token2 && !poolInfo.token1 && `s${poolInfo.token2}`}
+            {poolInfo.token1 && !poolInfo.token2 && `${poolInfo.token1}`}
+            {poolInfo.token2 && !poolInfo.token1 && `${poolInfo.token2}`}
             {!isMobile ? poolInfo.token1 && poolInfo.token2 && <span style={{ opacity: '0.5' }}> LP</span> : ''}
           </div>
         </div>
@@ -449,7 +449,7 @@ const FarmsTableRow = props => {
           </div>
           {poolInfo.pendingReward && poolInfo.pendingReward.map((reward,idx) => (
             <div className={styles.pendingReward1ContentContainer}>
-              {`${reward.amount?reward.amount:0} ${reward.token}`}
+              {`${reward.amount.toFixed(2)} ${reward.token}`}
             </div>
           ))}
         </div>
@@ -464,7 +464,7 @@ const FarmsTableRow = props => {
         {!isMobile && (
           <div className={styles.tableBodyTvlColContainer}>
             <div className={styles.tvlTitleContainer}>TVL</div>
-            <div className={styles.tvlContentContainer}>$ {poolInfo.tvl}</div>
+            <div className={styles.tvlContentContainer}>{formatString(poolInfo.tvl)}</div>
           </div>
         )}
         {!isMobile && (
@@ -560,9 +560,7 @@ const FarmsTableRow = props => {
             data={data}
             library={library}
             account={account}
-            harvestHistory={harvestHistory}
             poolId={poolId}
-            refreshHarvestHistory={refreshHarvestHistory}
             token1={poolInfo.token1}
             token1Logo={poolInfo.token1Logo}
             token2={poolInfo.token2}
@@ -666,6 +664,11 @@ const FarmsTableRow = props => {
         poolLpScore={poolInfo.poolLpScore}
         endAfter={poolInfo.endAfter}
         ratio={poolInfo.ratio}
+        token1Logo={poolInfo.token1Logo}
+        token2Logo={poolInfo.token2Logo}
+        token1Ratio={poolInfo.token1Ratio}
+        token2Ratio={poolInfo.token2Ratio}
+        poolRewardPerYear={poolInfo.poolRewardPerYear}
       />
     </div>
   )

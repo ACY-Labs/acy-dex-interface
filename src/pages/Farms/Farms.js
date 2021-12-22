@@ -8,15 +8,15 @@ import TableControl from './TableControl';
 import SampleStakeHistoryData from './SampleDaoData';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { getAllPools, getHarvestHistory, getPool, getBalanceRecord, getDaoStakeRecord, getPair, testFarmFunction, newGetAllPools } from '@/acy-dex-swap/core/farms';
-import { binance } from '@/connectors';
+import { getAllPools, getPool, newGetAllPools } from '@/acy-dex-swap/core/farms';
+import { binance, injected } from '@/connectors';
 import supportedTokens from '@/constants/TokenList';
 import PageLoading from '@/components/PageLoading';
 import Eth from "web3-eth";
-import { Web3Provider } from "@ethersproject/providers";
+import { Web3Provider, JsonRpcProvider } from "@ethersproject/providers";
 import {getTokenContract} from '@/acy-dex-swap/utils';
 import { parse } from 'path-to-regexp';
-import {getAllSuportedTokensPrice, BLOCK_TIME, RPC_URL} from '@/acy-dex-swap/utils';
+import {BLOCK_TIME, RPC_URL} from '@/acy-dex-swap/utils';
 const Farms = (props) => {
   // useWeb3React hook will listen to wallet connection.
   // if wallet is connected, account, chainId, library, and activate will not be not be undefined.
@@ -41,7 +41,6 @@ const Farms = (props) => {
   const [isMyFarms, setIsMyFarms] = useState(false);
   const [harvestAcy, setHarvestAcy] = useState();
   const [balanceAcy, setBalanceAcy] = useState();
-  const [daoStakeRecord, setDaoStakeRecord] = useState();
   const [stakeACY, setStakeACY] = useState();
 
   const [isLoadingPool, setIsLoadingPool] = useState(true);
@@ -60,6 +59,7 @@ const Farms = (props) => {
 
   const connectWallet = async () =>  {
     activate(binance);
+    activate(injected);
   };
 
   //function to get logo URI
@@ -104,27 +104,9 @@ const Farms = (props) => {
 
   }
 
-  const initHarvestHistiry = async (library, account) => {
-    const harvest = await getHarvestHistory(library, account);
-    setHarvestAcy(harvest);
-    setIsLoadingHarvest(false);
-    console.log("end initHarvestHistiry");
-  }
-  const initDao = async (library, account) => {
-    const dao = await getDaoStakeRecord(library, account);
-    console.log("end initDao:")
-    setDaoStakeRecord(dao);
-  }
-
-  const refreshHarvestHistory = async (library, account) => {
-    const harvest = await getHarvestHistory(library, account);
-    setHarvestAcy(harvest);
-    setIsLoadingHarvest(false);
-  }
-
   const getPools = async (library, account) => {
     setIsLoadingPool(true);
-    const pools = await getAllPools(library, account);
+    const pools = await newGetAllPools(library, account);
     console.log("TEST getAllPools",pools);
     console.log("end get pools");
     const block = await library.getBlockNumber();
@@ -142,10 +124,10 @@ const Farms = (props) => {
         token2Logo: getLogoURIWithSymbol(pool.token1Symbol),
         pendingReward: pool.rewardTokensSymbols.map((token, index) => ({
           token,
-          amount: pool.rewardTokensAmount[index] == 0?0 : pool.rewardTokensAmount[index].toString(),
+          amount: pool.rewardTokensAmount[index] == 0?0 : pool.rewardTokensAmount[index],
         })),
         totalApr: pool.apr.toFixed(2),
-        tvl: pool.tvl.toFixed(2),
+        tvl: pool.tvl,
         hasUserPosition: pool.hasUserPosition,
         hidden: true,
         userRewards: pool.rewards,
@@ -156,6 +138,9 @@ const Farms = (props) => {
         status: pool.endBlock - block > 0,
         ratio: pool.ratio,
         endAfter: (pool.endBlock - block) * BLOCK_TIME,
+        token1Ratio: pool.token1Ratio,
+        token2Ratio: pool.token2Ratio,
+        poolRewardPerYear: pool.poolRewardPerYear
       };
       if(newFarmsContent.poolId == 0) {
         // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));
@@ -179,66 +164,35 @@ const Farms = (props) => {
       }
       newFarmsContents.push(newFarmsContent);
     });
-    console.log("TEST newFarmsContents:",newFarmsContents);
-    if(account != "0x0000000000000000000000000000000000000000") {
-      setFarmsContent(newFarmsContents);
-    } else {
-      setNotLogginFarmContent(newFarmsContents);
-    }
-    if(pools){
-      setFarmsContent(newFarmsContents);
-    }
+    
+      if(account != "0x0000000000000000000000000000000000000000") {
+          console.log("TEST newFarmsContents 0:",account,farmsContent,walletConnected)
+          setFarmsContent(newFarmsContents);
+          console.log("TEST newFarmsContents 1:",newFarmsContents);
+      } else {
+          console.log("TEST newFarmsContents 2:",account,farmsContent,walletConnected)
+          setNotLogginFarmContent(newFarmsContents);
+        
+        console.log("TEST newFarmsContents 2:",newFarmsContents);
+      }
     setIsLoadingPool(false);
     console.log("end getPools");
   };
-  useEffect(
-    () => {
-      
-      if(!daoStakeRecord || !stakeACY) return;
-      let len = daoStakeRecord.myAcy.length;
-      var resultMy = [...daoStakeRecord.myAcy];
-      var resultTotal = [...daoStakeRecord.totalAcy];
-      resultMy[len-1][1] += stakeACY.myAcy;
-      resultTotal[len-1][1] += stakeACY.totalAcy;
-      for(var i=len-2; i!=-1 ; i--){
-        resultMy[i][1] += resultMy[i+1][1];
-        resultTotal[i][1] += resultTotal[i+1][1];
-      }
-      for(var i=0; i!=len-1 ; i++){
-        resultMy[i][1]    = parseFloat(resultMy[i+1][1].toFixed(1));
-        resultTotal[i][1] = parseFloat(resultTotal[i+1][1].toFixed(1));
-      }
-      resultMy[len-1][1]    = parseFloat(stakeACY.myAcy.toFixed(1));
-      resultTotal[len-1][1] = parseFloat(stakeACY.totalAcy.toFixed(1));
-      console.log("start setBalanceAcy");
-      setBalanceAcy({
-        myAcy: resultMy,
-        totalAcy: resultTotal
-      });
-      setIsLoadingBalance(false);
-      console.log("end getBalanceRecord");
-   },
-   [daoStakeRecord, stakeACY]
- );
   useEffect(
      async () => {
       if(!account){
         connectWallet();
       }
-      getAllSuportedTokensPrice();
-      // account will be returned if wallet is connected.
-      // so if account is present, retrieve the farms contract.
       if (account) {
         setWalletConnected(true);
         console.log("start getPools");
         getPools(library, account);
         
       } else {
-        var eth = new Eth(RPC_URL);
-        const library = new Web3Provider(eth.givenProvider);
+        const provider = new JsonRpcProvider(RPC_URL, 56);
         const account = "0x0000000000000000000000000000000000000000";
         setWalletConnected(false);
-        getPools(library, account);
+        getPools(provider, account);
       }
     },
     [account]
@@ -273,7 +227,7 @@ const Farms = (props) => {
   const onPremierToggleButtonClick = () => {
     setSelectedTable(2);
     setTableTitle('Premier Farms');
-    setTableSubtitle('Stake your LP tokens and earn project/other token rewards');
+    setTableSubtitle('Stake your LP tokens and earn project/mainstream token rewards');
     setRowNumber(INITIAL_ROW_NUMBER);
     setHideDao(true);
   };
@@ -317,8 +271,8 @@ const Farms = (props) => {
           console.log('All Farms');
         } 
         else if (selectedTable === 1){
-          setTableTitle('ACY Farms');
-          console.log('ACY Farms');
+          setTableTitle('Standard Farms');
+          console.log('Standard Farms');
         } 
         else if (selectedTable === 2){
           setTableTitle('Premier Farms');
@@ -382,7 +336,6 @@ const Farms = (props) => {
             isMyFarms={isMyFarms}
             harvestAcy={harvestAcy}
             balanceAcy={balanceAcy}
-            refreshHarvestHistory={refreshHarvestHistory}
             searchInput={searchInput}
             selectedTable={selectedTable}
             isLoading={isLoadingPool || isLoadingBalance || isLoadingHarvest}
