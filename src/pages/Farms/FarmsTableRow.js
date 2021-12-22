@@ -203,7 +203,7 @@ const FarmsTableRow = props => {
         amount: pool.rewardTokensAmount[index] == 0?0 : pool.rewardTokensAmount[index],
       })),
       totalApr: pool.apr.toFixed(2),
-      tvl: pool.tvl.toFixed(2),
+      tvl: pool.tvl,
       hasUserPosition: pool.hasUserPosition,
       hidden: true,
       userRewards: pool.rewards,
@@ -245,6 +245,20 @@ const FarmsTableRow = props => {
       withdraw(poolId, selectedRowData.positionId, (selectedRowData.lpAmount * percent / 100).toString(), setWithdrawButtonText, setWithdrawButtonStatus, withdrawCallback, library, account);
     }
   };
+
+  const formatString = (value) => {
+    let formattedStr;
+    if (value >= 1000000000) {
+      formattedStr = `$ ${(value / 1000000000).toFixed(2)}b`;
+    }else if (value >= 1000000) {
+      formattedStr = `$ ${(value / 1000000).toFixed(2)}m`;
+    } else if (value >= 1000) {
+      formattedStr = `$ ${(value / 1000).toFixed(2)}k`;
+    } else {
+      formattedStr = `$ ${(value).toFixed(2)}`;
+    }
+    return formattedStr;
+  }
 
   const harvestCallback = status => {
     // const {
@@ -419,8 +433,8 @@ const FarmsTableRow = props => {
           {/* only display token 1 symbol if token 2 is undefined or null. */}
           <div className={styles.tokenTitleContainer}>
             {poolInfo.token1 && poolInfo.token2 && `${poolInfo.token1}-${poolInfo.token2}`}
-            {poolInfo.token1 && !poolInfo.token2 && `s${poolInfo.token1}`}
-            {poolInfo.token2 && !poolInfo.token1 && `s${poolInfo.token2}`}
+            {poolInfo.token1 && !poolInfo.token2 && `${poolInfo.token1}`}
+            {poolInfo.token2 && !poolInfo.token1 && `${poolInfo.token2}`}
             {!isMobile ? poolInfo.token1 && poolInfo.token2 && <span style={{ opacity: '0.5' }}> LP</span> : ''}
           </div>
         </div>
@@ -450,7 +464,7 @@ const FarmsTableRow = props => {
         {!isMobile && (
           <div className={styles.tableBodyTvlColContainer}>
             <div className={styles.tvlTitleContainer}>TVL</div>
-            <div className={styles.tvlContentContainer}>$ {poolInfo.tvl}</div>
+            <div className={styles.tvlContentContainer}>{formatString(poolInfo.tvl)}</div>
           </div>
         )}
         {!isMobile && (

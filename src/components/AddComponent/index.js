@@ -452,6 +452,7 @@ const AddLiquidityComponent = props => {
           } else {
             // update backend userPool record
             console.log("test pair to add on server", pairToAddOnServer);
+            props.onGetReceipt(receipt.transactionHash);
             if (pairToAddOnServer) {
               const { token0, token1 } = pairToAddOnServer;
               axios.post(

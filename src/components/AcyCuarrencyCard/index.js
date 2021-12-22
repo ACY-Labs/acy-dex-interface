@@ -43,7 +43,7 @@ const AcyCuarrencyCard = ({
     else if (!token)
       setUsdValue(null);
 
-    const tokenPriceList = await getAllSuportedTokensPrice(library);
+    const tokenPriceList = await getAllSuportedTokensPrice();
     const tokenPrice = tokenPriceList[coin];
     const tokenAmountUSD = tokenPrice * token;
     setUsdValue(tokenAmountUSD.toFixed(2));

@@ -1064,11 +1064,10 @@ export async function swap(
     setSwapButtonContent("Please try again");
   } else {
     console.log("TEST status:");
-    console.log(status.error.code);
-    if(status.error.code && status.error.code == 4001) {
+    if(status.error && status.error.code == 4001) {
       setSwapButtonContent("Swap");
       setSwapButtonState(true);
-    }else if(status.error.code && status.error.code == -32603) {
+    }else if(status.error && status.error.code == -32603) {
       console.log("error status -32603", status)
       let text = null;
       if(exactIn) {
