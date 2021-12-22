@@ -472,7 +472,7 @@ function AccountInfo(props) {
       if (account) {
         setWalletConnected(true);
         getPools(library, account);
-        initDao(library, account);
+        // initDao(library, account);
       } else {
         setWalletConnected(false);
       }
@@ -513,8 +513,8 @@ function AccountInfo(props) {
     axios.get(
       // fetch valid pool list from remote
       // `https://api.acy.finance/api/pool?chainId=${chainId}`
-      // `https://api.acy.finance/api/userpool?walletId=${account}`
-      `http://localhost:3001/api/userpool?walletId=${account}`
+      `https://api.acy.finance/api/userpool?walletId=${account}`
+      // `http://localhost:3001/api/userpool?walletId=${account}`
     ).then(async res => {
       console.log("fetch pool data");
       console.log(res.data);
