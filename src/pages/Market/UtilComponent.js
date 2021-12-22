@@ -705,7 +705,7 @@ export function TransactionTable(props) {
               style={{ fontWeight: 600 }}
               onClick={() => openInNewTab(`${scanUrlPrefix}/tx/${entry.transactionID}`)}
             >
-              {entry.type} {entry.coin1} {entry.action == TransactionType.SWAP ? 'for' : 'for'}{' '}
+              {entry.type} {entry.coin1} {entry.action == TransactionType.SWAP ? 'for' : 'and'}{' '}
               {entry.coin2}
             </div>
           );
@@ -850,7 +850,7 @@ export function TransactionTable(props) {
         key: 'time',
         render: (text, entry) => {
           function getRelTime(timeString) {
-            let a = moment(new Date(timeString)).locale('en');
+            let a = moment(new Date(timeString.replace(/-/g, "/"))).locale('en');
             return a.fromNow();
           }
 
@@ -890,7 +890,7 @@ export function TransactionTable(props) {
         }
       ).filter(item => item.visible == true)}
       pagination={false}
-      locale={{ emptyText:'Data will show after you have logged in with a BSC account'}}
+      locale={{ emptyText:'Failed to fetch data'}}
       style={{
         marginBottom: '20px',
       }}
