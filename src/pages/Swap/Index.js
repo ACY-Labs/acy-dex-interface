@@ -220,7 +220,10 @@ const Swap = props => {
     const dayLength = 24*60/5;
     // const dayLength = 5;
     let reverseFlag = false;
+    // timeMark one record the latest transaction time
+    // timeMark two recort the oldest transaction time
     let timeMark = 0;
+    let timeMark2 = 0;
     let timeData = [];
     let A = activeToken0.symbol;
     let B = activeToken1.symbol;
@@ -240,6 +243,7 @@ const Swap = props => {
       if(res.data){
       const historyData = res.data.History;
       timeMark = historyData[historyData.length-1].time;
+      timeMark2 = historyData[0].time
 
       let date = new Date(timeMark*60*1000);
       var options = { weekday: 'long'};
@@ -260,10 +264,11 @@ const Swap = props => {
         
       //add 0 to the chartdata array
       const addData = []
-      for (let i = timeMark - 24*60; i < timeMark - timeData.length*5; i = i+5) {
+      for (let i = timeMark - 24*60; i < timeMark2; i = i+5) {
         let temp2 = [(i*60*1000),  0 ] ;
         addData.push(temp2);
       } 
+      console.log("timemark",timeMark - 24*60,timeMark2);
       console.log("addData",addData);
 
 
