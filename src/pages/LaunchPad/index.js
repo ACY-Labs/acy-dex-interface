@@ -12,6 +12,7 @@ import RaiseButton from './components/RaiseButton.js';
 import $ from 'jquery';
 import { getProjects } from '@/services/api';
 import ExpandingContent from './components/ExpandedContent';
+import ConstantLoader from '@/constants';
 
 const { Meta } = Card;
 
@@ -28,6 +29,8 @@ const Pool = props => {
 
   // project variables
   useEffect(() => {
+    let message = ConstantLoader('abc');
+
     getProjects()
       .then(res => {
         if (res) {

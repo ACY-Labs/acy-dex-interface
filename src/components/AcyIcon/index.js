@@ -1,6 +1,6 @@
 import styles from './index.less';
 import {Icon} from 'antd';
-import iconjs from './iconfont.js';
+// import iconjs from './iconfont.js';
 import { ReactComponent as Opera }  from './Opera.svg'; //
 
 import classnames from 'classnames';
@@ -17,7 +17,7 @@ const AcyIcon = props => {
 };
 // 自定义图标
 const MyIcon =Icon.createFromIconfontCN({
-  scriptUrl: iconjs, // 在 iconfont.cn 上生成
+  scriptUrl: './iconfont.js', // 在 iconfont.cn 上生成
 });
 const MyIconSvg =(props)=><Icon {...props}/>
 
