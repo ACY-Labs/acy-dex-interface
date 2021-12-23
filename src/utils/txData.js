@@ -11,6 +11,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 
 import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import { abi as IUniswapV2Router02ABI } from '@/abis/IUniswapV2Router02.json';
+import ACYV1ROUTER02_ABI from '@/acy-dex-swap/abis/AcyV1Router02';
 
 // THIS FUNCTIONS RETURN TOKEN 
 export function findTokenInList(item){ // token has address attribute
@@ -30,7 +31,11 @@ export function findTokenWithSymbol(item){
     else return INITIAL_TOKEN_LIST[0];
 }
 
-var API = 'https://api.bscscan.com/api';
+var Web3 = require('web3');
+const API = 'https://api.bscscan.com/api';
+const BSC_MAINNET_RPC = "https://bsc-dataseed.binance.org/";
+var web3 = new Web3(BSC_MAINNET_RPC);
+const FlashArbitrageResultLogs_ABI = ACYV1ROUTER02_ABI[1];
 // TODO :: translate to USD
 
 var tokenPriceUSD;
@@ -748,19 +753,37 @@ export async function fetchTransactionData(address,library, account){
 
     tokenPriceUSD = await getAllSuportedTokensPrice();
 
+    // eth to token: 0x529c18b7eed512c24ab3755eb18316f7ea764907b51924eceab4c31e72300d01
+    // token to token: 0x19bf42a261ccf0d64c4c6ca3112e3ac24b54272fb6ad622a1c622a47d64d4fea
+    // token to eth: 0xedffbb4fc760c3133d8d66483f0dc6fc80ce109ab1286b0f3eb46ea67083c47b
+
     try{
         let apikey = 'H2W1JHHRFB5H7V735N79N75UVG86E9HFH2';
 
         let transactionData = await library.getTransaction(address.toString());
-        console.log(transactionData);
+        // console.log("transactionData");
+        // console.log(transactionData);
 
-        if (transactionData.data.startsWith(methodList.tokenToToken.id)) {
+        // this code is used to get METHOD ID
+        // for (let i = 0; i < ACYV1ROUTER02_ABI.length; i ++) {
+        //     console.log(ACYV1ROUTER02_ABI[i]["name"]);
+        //     console.log(web3.eth.abi.encodeFunctionSignature(ACYV1ROUTER02_ABI[i]));
+        // }
 
+        // token to token
+        if (transactionData.data.startsWith(methodList.swapExactTokensForTokensByArb.id)
+            || transactionData.data.startsWith(methodList.swapTokensForExactTokensByArb.id)) {
+            
+
+            console.log("A token to token transaction");
             let response = await library.getTransactionReceipt(address.toString());
             console.log("Response: ",response);
             let logs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]==actionList.transfer.hash);
             let gasFee = (transactionData.gasPrice.toNumber() / (Math.pow(10,18)) )* response.gasUsed.toNumber()
             console.log("gas fee: ",gasFee);
+            console.log(logs);
+
+            web3.eth.abi.decodeLog(logs[logs.length-1])
 
             let routes = [];
             let totalIn = 0;
@@ -769,12 +792,15 @@ export async function fetchTransactionData(address,library, account){
             let token1;
             let token2;
             let token3;
-            for (let i=0;i<logs.length;i+=3){
-                token1 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
+            for (let i=0;i<logs.length-2;i+=3){
+                console.log(logs[i]);
+                console.log(logs[i].address)
+                token1 = INITIAL_TOKEN_LIST.find(item => item.address.toLowerCase() == logs[i].address.toLowerCase());
+                console.log(token1);
                 let ammount1 = (logs[i].data / Math.pow(10, token1.decimals)); 
-                token2 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i+1].address);
+                token2 = INITIAL_TOKEN_LIST.find(item => item.address.toLowerCase() == logs[i + 1].address.toLowerCase());
                 let ammount2 = (logs[i+1].data / Math.pow(10, token2.decimals)); 
-                token3 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i+2].address);
+                token3 = INITIAL_TOKEN_LIST.find(item => item.address.toLowerCase() == logs[i + 2].address.toLowerCase());
                 let ammount3 = (logs[i+2].data / Math.pow(10, token3.decimals));
                 
                 routes.push({
@@ -790,6 +816,8 @@ export async function fetchTransactionData(address,library, account){
                 totalIn += ammount3;
                 totalOut += ammount1;
             }
+            console.log("done routing")
+            console.log(routes)
 
 
             let requestPrice = API+'?module=stats&action=bnbprice&apikey='+apikey;
@@ -813,7 +841,11 @@ export async function fetchTransactionData(address,library, account){
             newData.chartData = chartData;
             return newData;
         }
-        else if (transactionData.data.startsWith(methodList.tokenToEth.id)){
+        // token to eth
+        else if (transactionData.data.startsWith(methodList.swapExactTokensForETHByArb.id)
+            || transactionData.data.startsWith(methodList.swapTokensForExactETHByArb.id)) {
+            
+            console.log("A token to eth transaction");
             let response = await library.getTransactionReceipt(address.toString());
             console.log("Response: ",response);
             let FROM_HASH = account.toString().toLowerCase().slice(2);
@@ -882,13 +914,19 @@ export async function fetchTransactionData(address,library, account){
                 "gasFee" : gasFee,
                 "token1" : token1,
                 "token2" : token3,
-                "ethPrice" : ethPrice
+                "ethPrice" : ethPrice,
+                "AMMOutput": 0,
             }
 
             let chartData = getChartData(newData);
             newData.chartData = chartData;
             return newData;
-        }else if (transactionData.data.startsWith(methodList.ethToToken.id)){
+        }
+        // eth to token
+        else if (transactionData.data.startsWith(methodList.swapETHForExactTokensByArb.id)
+            || transactionData.data.startsWith(methodList.swapExactETHForTokensByArb.id)) {
+            
+            console.log("A eth to token transaction");
             let response = await library.getTransactionReceipt(address.toString());
             console.log("Response: ",response);
             let FROM_HASH = account.toString().toLowerCase().slice(2);

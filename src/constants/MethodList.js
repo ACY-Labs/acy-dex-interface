@@ -19,6 +19,36 @@ export const methodList = {
                     id:'0x38f0b154'
     },
 
+    swapETHForExactTokensByArb: {
+        name: 'swapETHForExactTokensByArb',
+        id: '0x357252ac'
+    },
+
+    swapExactETHForTokensByArb: {
+        name: 'swapExactETHForTokensByArb',
+        id: '0xf4ff4e22'
+    },
+
+    swapExactTokensForETHByArb: {
+        name: 'swapExactTokensForETHByArb',
+        id: '0x00423e88'
+    },
+
+    swapExactTokensForTokensByArb: {
+        name: 'swapExactTokensForTokensByArb',
+        id: '0x38f0b154'
+    },
+
+    swapTokensForExactETHByArb: {
+        name: 'swapTokensForExactETHByArb',
+        id: '0xdc1892da'
+    },
+
+    swapTokensForExactTokensByArb: {
+        name: 'swapTokensForExactTokensByArb',
+        id: '0xad5639fe'
+    },
+
     tokenToEthAbr :    {
                     name: 'swapExactTokensForETH',
                     id: '0x00423e88'
