@@ -56,33 +56,70 @@ export const methodList = {
                     id : '0x8803dbee'
     },
 
+    
+    tokenToEthAbr :    {
+        name: 'swapExactTokensForETH',
+        id: '0x00423e88'
+    },
+    
     addLiquidity : {
-                    name: 'addLiquidity',
-                    id: '0xe8e33700'
-                },
-
+        name: 'addLiquidity',
+        id: '0xe8e33700'
+    },
+    
     addLiquidityEth : {
-                    name: 'addLiquidityETH',
-                    id: '0xf305d719'
-                },
+        name: 'addLiquidityETH',
+        id: '0xf305d719'
+    },
     
     removeLiquidityWithPermit : {
-                    name: 'removeLiquidityWithPermit',
-                    id: '0x2195995c'
-                },
+        name: 'removeLiquidityWithPermit',
+        id: '0x2195995c'
+    },
     removeLiquidity : {
-                    name: 'removeLiquidity',
-                    id: '0xbaa2abde'
-                },
+        name: 'removeLiquidity',
+        id: '0xbaa2abde'
+    },
     removeLiquidityETHwithPermit : {
-                    name : 'removeLiquidityETHWithPermit',
-                    id : '0xded9382a'
-                },
+        name : 'removeLiquidityETHWithPermit',
+        id : '0xded9382a'
+    },
     removeLiquidityETH : {
-                    name : 'removeLiquidityETH',
-                    id : '0x02751cec'
-    }
+        name : 'removeLiquidityETH',
+        id : '0x02751cec'
+    },
+    
+    bsc: {
+        swapETHForExactTokensByArb: {
+            name: 'swapETHForExactTokensByArb',
+            id: '0x357252ac'
+        },
 
+        swapExactETHForTokensByArb: {
+            name: 'swapExactETHForTokensByArb',
+            id: '0xf4ff4e22'
+        },
+
+        swapExactTokensForETHByArb: {
+            name: 'swapExactTokensForETHByArb',
+            id: '0x00423e88'
+        },
+
+        swapExactTokensForTokensByArb: {
+            name: 'swapExactTokensForTokensByArb',
+            id: '0x38f0b154'
+        },
+
+        swapTokensForExactETHByArb: {
+            name: 'swapTokensForExactETHByArb',
+            id: '0xdc1892da'
+        },
+
+        swapTokensForExactTokensByArb: {
+            name: 'swapTokensForExactTokensByArb',
+            id: '0xad5639fe'
+        },
+    }
 }
 export const actionList = {
 

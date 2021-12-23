@@ -54,7 +54,7 @@ const Transaction = props => {
     let totalIn = formatNumber(data.totalIn*1,{ precision: 3, thousand: " " });
     let token1 = data.token1;
     let token2 = data.token2;
-    data.link = `https://rinkeby.etherscan.io/tx/${id}`;
+    data.link = `https://www.bscscan.com/tx/${id}`;
 
     // setUrl(`https://rinkeby.etherscan.io/tx/${id}`);
 
@@ -115,7 +115,7 @@ const Transaction = props => {
           {drawRoutes()}
           <div>
             <a href={data.link} target="_blank" rel="noreferrer">
-                  View it on etherscan
+                  View it on bscscan
             </a>
           </div>
           <h1>
@@ -133,7 +133,7 @@ const Transaction = props => {
             </tr>
             <tr>
               <td className={styles.tableFirstCol}>AMM Output</td>
-              <td>{data.chartData.amm_output.toFixed(2)}</td>
+              <td>{data['AMMOutput'].toFixed(2)}</td>
               <td>
                 <span>{data.token2.symbol}</span>
                 <img src={data.token2.logoURI} />
