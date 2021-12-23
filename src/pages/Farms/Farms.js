@@ -130,7 +130,6 @@ const Farms = (props) => {
         tvl: pool.tvl,
         hasUserPosition: pool.hasUserPosition,
         hidden: true,
-        userRewards: pool.rewards,
         stakeData: pool.stakeData,
         poolLpScore: pool.lpScore,
         poolLpBalance: pool.lpBalance,

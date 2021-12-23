@@ -70,7 +70,6 @@ const DaoTableRow = props => {
     totalApr,
     tvl,
     pendingReward,
-    userRewards,
     stakeData,
     hasUserPosition,
     refreshHarvestHistory,
@@ -242,7 +241,6 @@ const DaoTableRow = props => {
       totalApr: 89.02,
       tvl: 144542966,
       hasUserPosition: newPool.hasUserPosition,
-      userRewards: newPool.rewards,
       stakeData: newPool.stakeData,
       poolLpScore: newPool.lpScore
     };
