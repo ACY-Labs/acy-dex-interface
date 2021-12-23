@@ -163,7 +163,7 @@ const AcyPriceChart = (props) => {
         axisLabel: { color: "#b5b5b6"}
       },
       yAxis: {
-        // show: false,
+        show: true,
         type: 'value',
         splitLine: {
           show: true,
@@ -195,19 +195,19 @@ const AcyPriceChart = (props) => {
         },
       ],
       grid: {
-        left: 0,
-        right: 10,
-        top: 10,
+        // left: 0,
+        // right: 10,
+        // top: 10,
         // bottom: 0,
       }
     };
 
     if (showGradient == true) {
       options.series[0].areaStyle = {
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: lineColor || '#c6224e' },
-          { offset: 1, color: bgColor || '#29292c' },
-        ]),
+        // color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+        //   { offset: 0, color: lineColor || '#c6224e' },
+        //   { offset: 1, color: bgColor || '#29292c' },
+        // ]),
       };
     }
 
@@ -220,6 +220,7 @@ const AcyPriceChart = (props) => {
         style={{
           height: '100%',
           // marginLeft: "-40px"
+          color:'black',
         }}
         option={{}} // it will be override by useEffect
         notMerge

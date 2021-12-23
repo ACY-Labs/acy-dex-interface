@@ -246,8 +246,8 @@ const Swap = props => {
       timeMark2 = historyData[0].time
 
       let date = new Date(timeMark*60*1000);
-      var options = { weekday: 'long'};
-      setActiveRate(new Intl.DateTimeFormat('en-US', options).format(date));
+      // var options = { weekday: 'long'};
+      // setActiveRate(new Intl.DateTimeFormat('en-US', options).format(date));
 
       for (let i = 0; i < historyData.length; i++) {
   
@@ -276,6 +276,7 @@ const Swap = props => {
           console.log("timeData",timeData);
           const tempChart = [];
           for (let a = 0; a < timeData.length; a++) {
+            if(timeData[a].time > timeMark - 24*60){
             const time = timeData[a].time*60*1000;
             let date = new Date(time);
             let dateString = date.getMinutes();
@@ -287,6 +288,7 @@ const Swap = props => {
             tempChart.push(temp);
             
           }
+        }
           console.log("CHARTING!!!!!!!!!!!",tempChart);
 
           setChartData( addData.concat(tempChart));
@@ -504,7 +506,7 @@ const Swap = props => {
                       const prevData = dataIndex === 0 ? 0 : chartData[dataIndex - 1][1];
                       const absoluteChange = (dataIndex === 0 ? 0 : data - prevData).toFixed(3);
                       const formattedAbsChange = absoluteChange > 0 ? "+" + absoluteChange : absoluteChange;
-                      // setActiveRate(data);
+                      setActiveRate(data.toFixed(3));
                       setActiveAbsoluteChange(formattedAbsChange);
                     }}
                   />
