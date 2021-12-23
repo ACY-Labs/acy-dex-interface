@@ -130,7 +130,6 @@ const FarmsTable = ({
                 tvl={content.tvl}
                 hidden={content.hidden}
                 pendingReward={content.pendingReward}
-                userRewards={content.userRewards}
                 stakeData={content.stakeData}
                 hasUserPosition={content.hasUserPosition}
                 refreshHarvestHistory={refreshHarvestHistory}

@@ -231,18 +231,20 @@ const StakeModal = props => {
           //   console.log("test transactionTime: ", transactionTime)
           // });
           //refresh poold info
-          await axios.get(
-            // fetch valid pool list from remote
-            `${API_URL}/farm/updatePool?poolId=${poolId}`
-            //change to to production
-            //`http://api.acy.finance/api/updatePool?poolId=${poolId}`
-          ).then( async (res) => {
-            console.log("poolId:",poolId)
-            await refreshPoolInfo(poolId);
-            setButtonText("Done");
-            setButtonStatus(true);
-            onCancel();
-          }).catch(e => console.log("error: ", e));
+          // await axios.get(
+          //   // fetch valid pool list from remote
+          //   `${API_URL}/farm/updatePool?poolId=${poolId}`
+          //   //change to to production
+          //   //`http://api.acy.finance/api/updatePool?poolId=${poolId}`
+          // ).then( async (res) => {
+          //   console.log("poolId:",poolId)
+            
+          // }).catch(e => console.log("error: ", e));
+
+          await refreshPoolInfo(poolId);
+          setButtonText("Done");
+          setButtonStatus(true);
+          onCancel();
 
           
           // clear top right loading spin

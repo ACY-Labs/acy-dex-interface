@@ -141,16 +141,18 @@ const StakeRow = props => {
           //   transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
           // });
 
-          await axios.get(
-            // fetch valid pool list from remote
-            `${API_URL}/farm/updatePool?poolId=${poolId}`
-          ).then( async (res) => {
-            await refreshPoolInfo();
-            setHarvestButtonText("Harvest");
-            setHarvestButtonStatus(true);
-            hideHarvestModal();
-            console.log("update pool on server return: ", res);
-          }).catch(e => console.log("error: ", e));
+          // await axios.get(
+          //   // fetch valid pool list from remote
+          //   `${API_URL}/farm/updatePool?poolId=${poolId}`
+          // ).then( async (res) => {
+            
+          //   console.log("update pool on server return: ", res);
+          // }).catch(e => console.log("error: ", e));
+
+          await refreshPoolInfo();
+          setHarvestButtonText("Harvest");
+          setHarvestButtonStatus(true);
+          hideHarvestModal();
           // clear top right loading spin
           // const newData = transactions.filter(item => item.hash != status.hash);
           // dispatch({
@@ -206,16 +208,18 @@ const StakeRow = props => {
           //     ]
           //   }
           // });
-          await axios.get(
-            // fetch valid pool list from remote
-            `${API_URL}/farm/updatePool?poolId=${poolId}`
-          ).then( async (res) => {
-            await refreshPoolInfo();
-            setWithdrawButtonText("Withdraw");
-            setWithdrawButtonStatus(false);
-            hideWithdrawModal();
-            console.log("update pool on server return: ", res);
-          }).catch(e => console.log("error: ", e));
+          // await axios.get(
+          //   // fetch valid pool list from remote
+          //   `${API_URL}/farm/updatePool?poolId=${poolId}`
+          // ).then( async (res) => {
+            
+          //   console.log("update pool on server return: ", res);
+          // }).catch(e => console.log("error: ", e));
+
+          await refreshPoolInfo();
+          setWithdrawButtonText("Withdraw");
+          setWithdrawButtonStatus(false);
+          hideWithdrawModal();
           // disable button after each transaction on default, enable it after re-entering amount to add
           
       
@@ -224,6 +228,19 @@ const StakeRow = props => {
     };
     checkStatusAndFinish();
   };
+  const formatString = (value) => {
+    let formattedStr;
+    if (value >= 1000000000) {
+      formattedStr = `$ ${(value / 1000000000).toFixed(2)}b`;
+    }else if (value >= 1000000) {
+      formattedStr = `$ ${(value / 1000000).toFixed(2)}m`;
+    } else if (value >= 1000) {
+      formattedStr = `$ ${(value / 1000).toFixed(2)}k`;
+    } else {
+      formattedStr = `$ ${(value).toFixed(2)}`;
+    }
+    return formattedStr;
+  }
 
   return ( 
     <div>
@@ -283,7 +300,7 @@ const StakeRow = props => {
             <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
               {data.reward.map((reward,idx) => (
                 <div className={styles.tableBodyDrawerWithdrawDateContainer}>
-                  {`${reward.amount.slice(0,8)} ${reward.token}`}
+                  {`${formatString(reward.amount)} ${reward.token}`}
                 </div>
               ))}
             </div>
@@ -323,7 +340,7 @@ const StakeRow = props => {
             {data && data.reward.map((reward,idx) => (
               <div className={styles.withdrawDetailContainer2}>
                 <div className={styles.amountContainer}>
-                  {reward.amount.slice(0,8)}
+                  {formatString(reward.amount)}
                 </div>
                 <div className={styles.tokenContainer}>
                   <div className={styles.tokenLogoContainer}>

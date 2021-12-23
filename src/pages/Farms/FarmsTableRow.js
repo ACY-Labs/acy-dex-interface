@@ -71,7 +71,6 @@ const FarmsTableRow = props => {
     totalApr,
     tvl,
     pendingReward,
-    userRewards,
     stakeData,
     hasUserPosition,
     searchInput,
@@ -206,7 +205,6 @@ const FarmsTableRow = props => {
       tvl: pool.tvl,
       hasUserPosition: pool.hasUserPosition,
       hidden: true,
-      userRewards: pool.rewards,
       stakeData: pool.stakeData,
       poolLpScore: pool.lpScore,
       poolLpBalance: pool.lpBalance,
@@ -292,17 +290,18 @@ const FarmsTableRow = props => {
           //     transactions: newData
           //   },
           // });
-          await axios.get(
-            // fetch valid pool list from remote
-            `${API_URL}/farm/updatePool?poolId=${poolInfo.poolId}`
-            //change to to production
-            //`http://api.acy.finance/api/updatePool?poolId=${poolId}`
-          ).then( async (res) => {
-            await refreshPoolInfo();
-            setHarvestButtonText("Done");
-            hideHarvestModal();
-          }).catch(e => console.log("error: ", e));
+          // await axios.get(
+          //   // fetch valid pool list from remote
+          //   `${API_URL}/farm/updatePool?poolId=${poolInfo.poolId}`
+          //   //change to to production
+          //   //`http://api.acy.finance/api/updatePool?poolId=${poolId}`
+          // ).then( async (res) => {
+            
+          // }).catch(e => console.log("error: ", e));
           // set button to done and disabled on default
+          await refreshPoolInfo();
+          setHarvestButtonText("Done");
+          hideHarvestModal();
           
         }
       });
@@ -344,17 +343,20 @@ const FarmsTableRow = props => {
           //   },
           // });
           // await refreshPoolInfo();
-          await axios.get(
-            // fetch valid pool list from remote
-            `${API_URL}/farm/updatePool?poolId=${poolInfo.poolId}`
-            //change to to production
-            //`http://api.acy.finance/api/updatePool?poolId=${poolId}`
-          ).then(async (res) => {
-            await refreshPoolInfo();
-            setWithdrawButtonText("Done");
-            hideWithdrawModal();
-          }).catch(e => console.log("error: ", e));
+          // await axios.get(
+          //   // fetch valid pool list from remote
+          //   `${API_URL}/farm/updatePool?poolId=${poolInfo.poolId}`
+          //   //change to to production
+          //   //`http://api.acy.finance/api/updatePool?poolId=${poolId}`
+          // ).then(async (res) => {
+          //   await refreshPoolInfo();
+          //   setWithdrawButtonText("Done");
+          //   hideWithdrawModal();
+          // }).catch(e => console.log("error: ", e));
           // set button to done and disabled on default
+          await refreshPoolInfo();
+          setWithdrawButtonText("Done");
+          hideWithdrawModal();
           
         }
       });
