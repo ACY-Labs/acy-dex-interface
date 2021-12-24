@@ -1,8 +1,8 @@
-const scanUrlSelector = (arg: string) => {
+const ScanUrlSelector = (arg: string) => {
     return {
         'BscMainNet': "https://www.bscscan.com",
         'BscTestNet': "https://testnet.bscscan.com"
     }[arg];
 }
 
-export default scanUrlSelector;
+export default ScanUrlSelector;
