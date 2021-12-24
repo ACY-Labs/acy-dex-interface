@@ -1,5 +1,5 @@
 import { AcyModal } from '@/components/Acy';
-import React, { useState, useEffect, forwardRef } from 'react';
+import React, { useState, useEffect, forwardRef, useRef } from 'react';
 import styles from '@/pages/Farms/Farms.less';
 import DatePicker from 'react-datepicker';
 import { AcySmallButtonGroup } from '@/components/AcySmallButton';
@@ -16,6 +16,38 @@ import axios from 'axios';
 import { API_URL } from '@/acy-dex-swap/utils';
 import Pattern from '@/utils/pattern';
 
+const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
+  const handleInputChange = (e) => {
+    const check = Pattern.coinNum.test(e.target.value);
+    // newVal = newVal > 100 ? 100 : (newVal < 0 ? 0 : newVal);  // set newVal in range of 0~100
+    if(check) {
+      const value = parseFloat(e.target.value?e.target.value:0);
+      setInputValue(e.target.value);
+    }
+    
+  };
+
+  const inputRef = useRef();
+  useEffect(() => {
+    const newSize = inputValue?.toString().length>8?8:inputValue?.toString().length + 0.5;
+    inputRef.current.style.width = newSize + "ch";
+  }, [inputValue]);
+
+  useEffect(() => {
+    setInputValue(inputValue);
+  }, [setInputValue, inputValue]);
+
+  return (
+    <input
+      ref={inputRef}
+      type="text"
+      className={styles.amountInput}
+      value={inputValue}
+      onChange={handleInputChange}
+      autoFocus
+    />
+  );
+};
 
 const StakeModal = props => {
   const {
@@ -40,19 +72,20 @@ const StakeModal = props => {
     token2Ratio,
     poolRewardPerYear,
   } = props;
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState();
   const [selectedPresetDate, setSelectedPresetDate] = useState(null);
-  const [showStake, setShowStake] = useState(0);
+  const [showStake, setShowStake] = useState();
   const [stake, setStake] = useState();
   const [balancePercentage, setBalancePercentage] = useState(0);
   const [buttonText, setButtonText] = useState('Stake');
   const [aprList, setAprList] = useState([[12.23, false], [14.53, false], [16.27, false], [18.13, false], [22.83, false]])
   const [pickingDate, setPickingDate] = useState(false);
   const [aprCounted, serAprCounted] = useState(13.2);
-  const [buttonStatus, setButtonStatus] = useState(true);
+  const [buttonStatus, setButtonStatus] = useState(false);
   const [modalVisible, setModalVisible] = useState(true);
   const [is4Years, setIs4Years] = useState(false);
   const [daysNum, setDaysNum] = useState([]);
+  const [selectedDayNum, setSelectedDayNum] = useState();
   const [lpTokenShow, setLpTokenShow] = useState(false);// true:lpToken false:USD
 
   const [lpValue, setLpValue] = useState(0);
@@ -75,7 +108,6 @@ const StakeModal = props => {
     const check = Pattern.coinNum.test(e.target.value);
     if (check) {
       const value = parseFloat(e.target.value?e.target.value:0);
-      console.log("TEST totalUSDBalance:",totalUSDBalance);
       if(value > totalUSDBalance) {
         setButtonStatus(false);
         setButtonText("Insufficient balance");
@@ -100,15 +132,26 @@ const StakeModal = props => {
     
   };
 
-  const updateBalancePercentage = percentage => {
+  const updateBalancePercentage = e => {
 
     
-    const percentageInt = percentage === '' ? 0 : parseInt(percentage, 10);
-    if (Number.isNaN(percentageInt)) return;
-    setShowStake((parseFloat((totalUSDBalance * percentageInt) / 100)).toFixed(6));
-    // setStake(parseFloat((balance * balancePercentage) / 100));
-    setBalancePercentage(percentageInt);
+    // const percentageInt = percentage === '' ? 0 : parseInt(percentage, 10);
+    // if (Number.isNaN(percentageInt)) return;
+    const check = Pattern.coinNum.test(e.target.value);
+    if(!check) return;
+    // const value = parseFloat(e.target.value);
+    if(e.target.value > 100) {
+      setShowStake((parseFloat(totalUSDBalance).toFixed(4)));
+      setBalancePercentage(100);
+    } else{
+      setShowStake((parseFloat((totalUSDBalance * (e.target.value)) / 100)).toFixed(4));
+      setBalancePercentage(e.target.value);
+    }
+    
   };
+  useEffect(() => {
+    setTotalUSDBalance(balance*ratio);
+  }, [balance, ratio]);
 
   // useEffect(() => {
   //   setStake(parseFloat((balance * balancePercentage) / 100));
@@ -121,7 +164,8 @@ const StakeModal = props => {
     const day3M = getDayNum("month", 3);
     const day6M = getDayNum("month", 6);
     // const day1Y = getDayNum("year", 1);
-    const day4Y = getDayNum("year", 4);
+    console.log("TEST KUY6");
+    const day4Y = getDayNum("day", Math.floor(endAfter/(60*60*24)));
     const day_num = [day1W, day1M, day3M, day6M, day4Y];
     var totalScore = poolLpScore / 1e34;
     var lp = showStake/ratio;
@@ -134,22 +178,74 @@ const StakeModal = props => {
     }
     setAprList(aprList);
     setDaysNum(day_num);
+    const now = new Date()
+    const dif = date - now;
+
+    if(showStake > totalUSDBalance && showStake != totalUSDBalance.toFixed(4)) {
+      setButtonStatus(false);
+      setButtonText("Insufficient balance");
+      setBalancePercentage(100);
+    } else {
+      setBalancePercentage(Math.round((showStake||0)/(totalUSDBalance||1)*100));
+      if(!showStake || showStake == 0) {
+        setButtonStatus(false);
+      } else {
+        if(!date){
+          setButtonStatus(false);
+        }
+        else if(dif/1000 > endAfter || dif<0) {
+          setButtonText("Invalid date");
+          setButtonStatus(false);
+        } else {
+          console.log("TEST SET HERE1 TRUE");
+          setButtonStatus(true);
+          setButtonText("Stake");
+        }
+      }
+      
+    }
+
   }, [showStake]);
-
-
 
   useEffect(() => {
     setIs4Years(false);
   }, [isModalVisible]);
 
   useEffect(() => {
-    setTotalUSDBalance(balance*ratio);
-  }, [balance, ratio]);
+    const now = new Date();
+    console.log("TEST KUY4");
+    const dif = date - now;
+    console.log("TEST KUY5");
+    if(parseInt(dif/1000) < endAfter && dif>0) {
+      if(showStake > totalUSDBalance && showStake != totalUSDBalance.toFixed(4)) {
+        setButtonStatus(false);
+        setButtonText("Insufficient balance");
+      } else {
+        setButtonText("Stake");
+        if(showStake && showStake !=0) {
+          setButtonStatus(true);
+        } else {
+          setButtonStatus(false);
+        }
+        
+      }
+    } else {
+      if(!date) {
+        setButtonStatus(false);
+      } else {
+        setButtonText("Invalid date");
+        setButtonStatus(false);
+      }
+    }
+  }, [date]);
+
+  
 
   const getDayNum = (type, value) => {
     const nowDate = new Date();
     const nowDate2 = new Date();
-    if (type === 'week') nowDate.setHours(nowDate.getHours() + 24 * 7 * value);
+    if( type === 'day') nowDate.setDate(nowDate.getDate() + value);
+    else if (type === 'week') nowDate.setHours(nowDate.getHours() + 24 * 7 * value);
     else if (type === 'month') nowDate.setMonth(nowDate.getMonth() + value);
     else if (type === 'year') nowDate.setFullYear(nowDate.getFullYear() + value);
     return Math.ceil((nowDate - nowDate2) / (1000 * 60 * 60 * 24));
@@ -157,11 +253,11 @@ const StakeModal = props => {
 
   const updateDate = (type, value, index) => {
     const newDate = new Date();
-    if (type === 'week') newDate.setHours(newDate.getHours() + 24 * 7 * value);
+    if( type === 'day') newDate.setDate(newDate.getDate() + value);
+    else if (type === 'week') newDate.setHours(newDate.getHours() + 24 * 7 * value);
     else if (type === 'month') newDate.setMonth(newDate.getMonth() + value);
     else if (type === 'year') newDate.setFullYear(newDate.getFullYear() + value);
     else return;
-
     let newArr = [...aprList];
     for (let i = 0; i < 5; i++) newArr[i][1] = false;
     newArr[index][1] = true;
@@ -181,11 +277,23 @@ const StakeModal = props => {
     newArr[4][1] = true;
 
   }
+  const validateInput = () => {
+    if(showStake > totalUSDBalance && showStake != totalUSDBalance.toFixed(4)) {
+      setButtonStatus(false);
+      setButtonText("Insufficient balance");
+      setBalancePercentage(100);
+    } else {
+      setButtonStatus(true);
+      setButtonText("Stake");
+      setBalancePercentage(Math.round(showStake/(totalUSDBalance || 1)*100));
+    }
+  }
 
   const datePickerChangeHandler = newDate => {
     console.log("datePickerChangeHandler:",newDate/1000);
     const date = new Date();
     const dif = newDate - date;
+
     const dayNum = Math.ceil(dif/(60*60*24*1000));
 
     setDate(newDate);
@@ -353,7 +461,7 @@ const StakeModal = props => {
       visible={isModalVisible && modalVisible}
       destroyOnClose
     >
-      <div className={styles.amountContainerWrap}>
+      {/* <div className={styles.amountContainerWrap}>
         <div className={styles.amountRowContainer}>
           <div className={styles.amountRowInputContainer}>
           <span className={styles.prefix}>
@@ -363,68 +471,66 @@ const StakeModal = props => {
           </div>
 
         </div>
-      </div>
-
-      <div className={styles.balanceAmountContainer}>
-        <div className={styles.balanceAmount}>
-          Balance: ${(parseFloat(totalUSDBalance)).toFixed(6)}
+      </div> */}
+      <div className={styles.removeAmountContainer}>
+        <div className={styles.balanceAmountContainer}>
+          <div className={styles.balanceAmount}>
+            {`Stake amount = ${((showStake||0)/ratio).toFixed(4)}  ${token2?`${token1}-${token2} LP`: `${token1}`}`}
+          </div>
+          <div className={styles.balanceAmountInputContainer}>
+            <input
+              className={styles.balanceAmountInput}
+              value={balancePercentage}
+              onChange={e => updateBalancePercentage(e)}
+            />
+            <span className={styles.balanceAmountSuffix}>%</span>
+          </div>
         </div>
-        <div className={styles.balanceAmountInputContainer}>
+        <div className={styles.amountText}>
+          $ <AutoResizingInput value={showStake} onChange={setShowStake} />
+        </div>
+        <div className={styles.sliderContainer}>
           <input
-            className={styles.balanceAmountInput}
-            value={balancePercentage}
-            onChange={e => updateBalancePercentage(e.target.value)}
+            value={balancePercentage||0}
+            type="range"
+            className={styles.sliderInput}
+            onChange={e => {
+              updateBalancePercentage(e);
+            }}
           />
-          <span className={styles.balanceAmountSuffix}>%</span>
-        </div>
+          </div>
       </div>
       <div className={styles.balanceAmountContainer2}>
-          {token2? 'LP Token':'Token'}: {(parseFloat(totalUSDBalance)).toFixed(6)} {token2? `${token1+"-"+token2} LP`  : `${token1}`}
-      </div>
-     
-      <div className={styles.sliderWrapper}>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          className={styles.slider}
-          value={balancePercentage}
-          onChange={e => updateBalancePercentage(e.target.value)}
-        />
+          {token2? 'Your LP Token':'Token'}: {(parseFloat(balance)).toFixed(4)} ≈ ${(parseFloat(totalUSDBalance)).toFixed(4)}
       </div>
       <div className={styles.tokenAmountContent}>
         <div className={styles.tokenAmount}>
-        {(token1Ratio*showStake/ratio).toFixed(4)}
+        {((token1Ratio*showStake || 0)/ratio).toFixed(4)}
         </div>
         <div className={styles.tokenDetailContainer}>
+        <div className={styles.tokenSymbol}>
+            {`${token1} `}
+          </div>
           <div>
             {token1Logo && (
                 <img src={token1Logo} alt="token" className={styles.tokenImg}/>
             )}
-
           </div>
-          <div className={styles.tokenSymbol}>
-            
-            {token1}
-
-          </div>
-          
         </div>
       </div>
       { token2 && (
         <div className={styles.tokenAmountContent}>
         <div className={styles.tokenAmount}>
-        {(token2Ratio*showStake/ratio).toFixed(4)}
+        {((token2Ratio*showStake || 0)/ratio).toFixed(4)}
         </div>
         <div className={styles.tokenDetailContainer}>
+          <div className={styles.tokenSymbol}>
+            {`${token2} `}
+          </div>
           <div>
             {token2Logo && (
                 <img src={token2Logo} alt="token" className={styles.tokenImg}/>
             )}
-
-          </div>
-          <div className={styles.tokenSymbol}>
-            {token2}
           </div>
         </div>
       </div>
@@ -474,7 +580,7 @@ const StakeModal = props => {
                 ['3M', () => updateDate('month', 3, 2)],
                 ['6M', () => updateDate('month', 6, 3)],
                 // ['1Y', () => updateDate('year', 1, 4), checkIfDisabled(4)],
-                [maxDayStr, () => updateDate('year', 4, 4)],
+                [maxDayStr, () => updateDate('day', Math.floor(endAfter/(60*60*24)), 4)],
               ]}
               containerClass={styles.presetDurationSelection}
               theme="#eb5c20"
@@ -482,6 +588,23 @@ const StakeModal = props => {
           </div>
         </div>
       </div>
+      {/* <div className={styles.removeAmountContainer}>
+        <div className={styles.balanceAmountContainer}>
+          <div className={styles.balanceAmount}>
+            Rewards at current rates
+          </div>
+
+        </div>
+        <div className={styles.amountText}>
+          $1234
+        </div>
+        <div className={styles.balanceAmountContainer}>
+          <div className={styles.balanceAmount}>
+            ~ 123 ACY (50.59%)
+          </div>
+
+        </div>
+      </div> */}
       <div>
         <button
           type="button"
@@ -495,12 +618,13 @@ const StakeModal = props => {
                 setButtonText(<>Processing <Icon type="loading" /></>);
                 console.log("TEST DEPOSIT:", balance, parseFloat(balance), (balance*(balancePercentage/100)),(balance*(balancePercentage/100)));
                 setButtonStatus(false);
-                if(balancePercentage < 100) {
-                  deposit(stakedTokenAddr, (balance*(balancePercentage/100)).toFixed(18), poolId, getLockDuration(), library, account, setButtonText, stakeCallback, setButtonStatus);
-                } else {
-                  deposit(stakedTokenAddr, balance, poolId, getLockDuration(), library, account, setButtonText, stakeCallback, setButtonStatus);
+                if(balancePercentage && balancePercentage != 0) {
+                  if(balancePercentage < 100) {
+                    deposit(stakedTokenAddr, (balance*(balancePercentage/100)).toFixed(18), poolId, getLockDuration(), library, account, setButtonText, stakeCallback, setButtonStatus);
+                  } else {
+                    deposit(stakedTokenAddr, balance, poolId, getLockDuration(), library, account, setButtonText, stakeCallback, setButtonStatus);
+                  }
                 }
-                
               } else {
                 setButtonText(<>Approving <Icon type="loading" /></>);
                 setButtonStatus(false);
