@@ -926,13 +926,15 @@ export const MarketSearchBar = props => {
   const [visibleNetwork, setVisibleNetwork] = useState(false);
   const [activeNetwork, setActiveNetwork] = useState('Ethereum');
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchCoinReturns, setSearchCoinReturns] = useState([...props.dataSourceCoin]);
+  const [searchCoinReturns, setSearchCoinReturns] = useState([]);
   const [searchPoolReturns, setSearchPoolReturns] = useState([...props.dataSourcePool]);
   const [displayNumber, setDisplayNumber] = useState(3);
   const [watchlistToken, setWatchlistToken] = useState([]);
   const [watchlistPool, setWatchlistPool] = useState([]);
   const [, update] = useState();
   const [isLoading, setIsLoading] = useState(false);
+
+  // fetch searchcoinresults
 
   const networkOptions = [
     {
@@ -1082,18 +1084,19 @@ export const MarketSearchBar = props => {
 
 
     // get data corresponding to the watchlist
-    fetchTokensFromId(marketClient, watchlistManagerToken.getData()).then(data => {
-      setWatchlistToken(
-        data.tokens.map(item => ({ address: item.id, name: item.name, short: item.symbol }))
-      );
-    });
+    // fetchTokensFromId(marketClient, watchlistManagerToken.getData()).then(data => {
+    //   setWatchlistToken(
+    //     data.tokens.map(item => ({ address: item.id, name: item.name, short: item.symbol }))
+    //   );
+    // });
 
-    fetchPoolsFromId(marketClient, watchlistManagerPool.getData()).then(data => {
-      setWatchlistPool(
-        data.pairs.map(item => ({ address: item.id, coin1: item.token0.symbol, coin2: item.token1.symbol, percent: 0 }))
-      );
-     })
+    // fetchPoolsFromId(marketClient, watchlistManagerPool.getData()).then(data => {
+    //   setWatchlistPool(
+    //     data.pairs.map(item => ({ address: item.id, coin1: item.token0.symbol, coin2: item.token1.symbol, percent: 0 }))
+    //   );
+    //  })
     
+    // fetch search coin returns
     // TODO: sort by different keys
     // const key = 'volume24h'
     fetchSearchCoinReturns().then(data => {
@@ -1107,6 +1110,9 @@ export const MarketSearchBar = props => {
         )
         setIsLoading(false);
       }
+    }).catch(error => {
+      console.log("Error in fetch search coin returns:", error);
+      setIsLoading(false);
     })
     
     // lastPromiseWrapper(fetchSearchCoinReturns()).then(data => {
@@ -1124,7 +1130,7 @@ export const MarketSearchBar = props => {
     //   );
     // });
 
-    refreshWatchlist();
+    // refreshWatchlist();
 
     return function cleanup() {
       contentRoot.removeEventListener('scroll', onScroll);
