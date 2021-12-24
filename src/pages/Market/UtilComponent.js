@@ -1,4 +1,3 @@
-import {scanUrlPrefix} from "@/constants/configs"
 import { AcyIcon, AcyTabs, AcyTokenIcon } from '@/components/Acy';
 import className from 'classnames';
 import { Divider, Icon, Input, Table } from 'antd';
@@ -6,7 +5,6 @@ import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 import onlyLastPromise, { DiscardSignal } from 'only-last-promise';
-import tokenList from '@/constants/TokenList';
 import ReactDOM from 'react-dom';
 import { Link, useHistory } from 'react-router-dom';
 import styles from './styles.less';
@@ -26,6 +24,9 @@ import {
   fetchTokensFromId,
   fetchPoolsFromId,
 } from './Data';
+import ConstantLoader from '@/constants';
+const tokenList = ConstantLoader().tokenList;
+const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
 
 const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');

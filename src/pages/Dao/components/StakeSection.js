@@ -3,9 +3,10 @@ import DatePicker from 'react-datepicker';
 import styles from './StakeSection.less';
 import SampleToken from '@/pages/Dao/sample_data/SampleToken';
 import TokenSelection from '@/pages/Dao/components/TokenSelection';
-import tokenList from '@/constants/TokenList';
 import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 import { AcyPeriodTime } from '@/components/Acy';
+import ConstantLoader from '@/constants';
+const tokenList = ConstantLoader().tokenList;
 
 const StakeSection = () => {
   const [stake, setStake] = useState(0);

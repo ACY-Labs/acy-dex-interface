@@ -26,9 +26,9 @@ import Utils from "web3-utils";
 import { Icon } from 'antd';
 import { Web3Provider } from "@ethersproject/providers";
 import { injected } from '@/connectors';
-import supportedTokens from '@/constants/TokenList';
 import axios from 'axios';
-
+import ConstantLoader from '@/constants';
+const supportedTokens = ConstantLoader().tokenList;
 
 const ACY_TOKEN  = "0x0100000000000000000000000000000000000000000000000000000000000000";
 const USDC_TOKEN = "0x0200000000000000000000000000000000000000000000000000000000000000";

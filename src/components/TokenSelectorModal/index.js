@@ -7,10 +7,9 @@ import { useWeb3React } from '@web3-react/core';
 import { getUserTokenBalance } from '@/acy-dex-swap/utils';
 import { asyncForEach } from "@/utils/asynctools";
 import { processString } from "@/components/AcyCoinItem";
-
-import INITIAL_TOKEN_LIST from '@/constants/TokenList';
-
 import styles from "./styles.less";
+import ConstantLoader from '@/constants';
+const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
 
 
 const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {

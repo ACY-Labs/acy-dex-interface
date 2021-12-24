@@ -13,10 +13,12 @@ import { connect } from 'umi';
 import moment from 'moment';
 import classNames from 'classnames';
 import { getPool, getPoolAccmulateReward, newGetPool} from '@/acy-dex-swap/core/farms';
-import supportedTokens from '@/constants/TokenList';
 import StakeRow from './StakeRow';
 import SwapComponent from '@/components/SwapComponent';
 import { BLOCK_TIME } from '@/acy-dex-swap/utils';
+import ConstantLoader from '@/constants';
+const supportedTokens = ConstantLoader().tokenList;
+
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
   const handleInputChange = (e) => {

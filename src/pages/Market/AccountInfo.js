@@ -19,8 +19,6 @@ import {
 import { marketClient, fetchPoolsFromAccount } from './Data';
 import { fetchAccountTransaction } from "./Data/index.js";
 import { WatchlistManager } from './WatchlistManager.js';
-import {scanUrlPrefix} from '@/constants/configs';
-import supportedTokens from '@/constants/TokenList';
 import PageLoading from '@/components/PageLoading';
 import axios from "axios";
 import {
@@ -39,6 +37,9 @@ import {
 } from './Data/walletStats'
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import { binance, injected } from '@/connectors';
+import ConstantLoader from '@/constants';
+const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
+const supportedTokens = ConstantLoader().tokenList;
 
 const watchlistManager = new WatchlistManager('account');
 

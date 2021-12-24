@@ -11,9 +11,10 @@ import FlashArbitrageABI from '../abis/AcyV1FlashArbitrage.json';
 // import abi as FarmsABI from '../abis/ACYMultiFarm.json';
 import FarmsABI from '../abis/ACYMultiFarm.json';
 import ERC20ABI from '../abis/ERC20.json';
-import tokenList from '@/constants/TokenList';
 import axios from 'axios';
 import { JsonRpcProvider } from "@ethersproject/providers";
+import ConstantLoader from '@/constants';
+const tokenList = ConstantLoader().tokenList;
 
 export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
 
