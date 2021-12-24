@@ -112,14 +112,15 @@ export class SmallTable extends React.Component {
           </Link>
           <div style={{width:5}}></div>
           <span className={styles.coinShort}> ({entry.name})</span>
-          <AcyIcon
+          {/* Watchlist star */}
+          {/* <AcyIcon
             name={watchlistManagerToken.getData().includes(entry.address) ? 'star_active' : 'star'}
             width={14}
             style={{ marginLeft: '0.5rem' }}
             onClick={() => {
               this.toggleWatchlist('token', entry.address, entry.short);
             }}
-          />
+          /> */}
         </div>
       );
     } else {
@@ -141,7 +142,8 @@ export class SmallTable extends React.Component {
           >
             {entry.percent} %
           </div> */}
-          <AcyIcon
+          {/* Watchlist star */}
+          {/* <AcyIcon
             name={
               watchlistManagerPool
                 .getData()
@@ -155,7 +157,7 @@ export class SmallTable extends React.Component {
             onClick={() => {
               this.toggleWatchlist('pool', entry.address);
             }}
-          />
+          /> */}
         </div>
       );
     }
@@ -1184,7 +1186,7 @@ export const MarketSearchBar = props => {
                 width: '100%',
               }}
             >
-              {/* <div className={styles.searchWrapper}>
+              <div className={styles.searchWrapper}>
                 <div className={styles.searchInnerWrapper}>
                   <Input
                     placeholder="Search"
@@ -1199,9 +1201,9 @@ export const MarketSearchBar = props => {
                     value={'' || searchQuery}
                   />
                 </div>
-              </div> */}
+              </div>
               {/* Search modal */}
-              {/* <div style={{ width: '100%', position: 'relative', zIndex: 10 }}>
+              <div style={{ width: '100%', position: 'relative', zIndex: 10 }}>
                 {visibleSearchBar && (
                   <div
                     className={styles.searchModal}
@@ -1249,7 +1251,7 @@ export const MarketSearchBar = props => {
                           </>
                         )}
                       </AcyTabPane>
-                      <AcyTabPane tab="Watchlist" key="2">
+                      {/* <AcyTabPane tab="Watchlist" key="2">
                         {watchlistToken.length > 0 ? (
                           <SmallTable
                             mode="token"
@@ -1277,11 +1279,11 @@ export const MarketSearchBar = props => {
                             Add items by clicking on the star
                           </span>
                         )}
-                      </AcyTabPane>
+                      </AcyTabPane> */}
                     </AcyTabs>
                   </div>
                 )}
-              </div> */}
+              </div>
             </div>
           </div>
         </div>
