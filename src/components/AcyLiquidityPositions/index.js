@@ -13,12 +13,14 @@ import {
 } from '@/acy-dex-swap/utils/index';
 
 import { Icon } from "antd";
-import {scanUrlPrefix} from '@/constants/configs';
-import supportedTokens from '@/constants/TokenList';
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import AcyRemoveLiquidityModal from '@/components/AcyRemoveLiquidityModal';
 import { isMobile } from 'react-device-detect';
 import styles from './styles.less';
+import ConstantLoader from '@/constants';
+const supportedTokens = ConstantLoader().tokenList;
+const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
+
 
 function getLogoURIWithSymbol(symbol) {
   for (let j = 0; j < supportedTokens.length; j++) {

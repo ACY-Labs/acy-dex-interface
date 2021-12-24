@@ -1,1 +1,0 @@
-export const scanUrlPrefix = "https://www.bscscan.com";

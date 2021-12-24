@@ -4,7 +4,8 @@ import { get } from '@umijs/deps/compiled/got';
 import { asyncForEach } from "@/utils/asynctools";
 import Eth from "web3-eth";
 import Utils from "web3-utils";
-var Contract = require('web3-eth-contract');
+// var Contract = require('web3-eth-contract');
+import Contract from 'web3-eth-contract';
 // set provider for all later instances to use
 
 var eth = new Eth('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');

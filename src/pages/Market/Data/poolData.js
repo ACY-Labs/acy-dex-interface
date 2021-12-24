@@ -11,12 +11,13 @@ import { getBlockFromTimestamp } from './blocks';
 import { sortTable } from '../Util';
 import axios from 'axios';
 import { parseTransactionData } from '@/utils/txData';
-import supportedTokens from '@/constants/TokenList';
 import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 
 import {findTokenWithAddress} from '@/utils/txData';
 
 import {totalInUSD} from '@/utils/utils'
+import ConstantLoader from '@/constants';
+const supportedTokens = ConstantLoader().tokenList;
 
 export async function fetchPoolInfo(client, address, timestamp) {
   const block = await getBlockFromTimestamp(timestamp);
