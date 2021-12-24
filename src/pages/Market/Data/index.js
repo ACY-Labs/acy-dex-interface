@@ -7,6 +7,7 @@ import {
   fetchTokenSearch,
   fetchTokensFromId,
   fetchTokenDaySimple,
+  fetchSearchCoinReturns,
 } from './tokenData';
 import {
   fetchGeneralPoolInfoDay,
@@ -53,6 +54,7 @@ const DataFetch = {
   fetchLiqudityIncludingFees,
   fetchTotalValueSwapped,
   fetchTotalTransactions,
+  fetchSearchCoinReturns,
 };
 
 export {
@@ -83,4 +85,5 @@ export {
   fetchLiqudityIncludingFees,
   fetchTotalValueSwapped,
   fetchTotalTransactions,
+  fetchSearchCoinReturns,
 };

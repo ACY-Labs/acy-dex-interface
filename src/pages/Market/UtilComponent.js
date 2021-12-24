@@ -6,6 +6,7 @@ import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 import onlyLastPromise, { DiscardSignal } from 'only-last-promise';
+import tokenList from '@/constants/TokenList';
 import ReactDOM from 'react-dom';
 import { Link, useHistory } from 'react-router-dom';
 import styles from './styles.less';
@@ -24,6 +25,7 @@ import {
   fetchPoolSearch,
   fetchTokensFromId,
   fetchPoolsFromId,
+  fetchSearchCoinReturns,
 } from './Data';
 
 const { AcyTabPane } = AcyTabs;
@@ -102,7 +104,7 @@ export class SmallTable extends React.Component {
     if (this.state.mode == 'token') {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyTokenIcon logoURL={entry.logoURL} width={20} />
+          <AcyTokenIcon symbol={entry.logoURL} width={20} />
           <Link
             style={{ color: 'white' }}
             className={styles.coinName}
@@ -993,11 +995,11 @@ export const MarketSearchBar = props => {
 
     lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
       console.log('token info:',data);
-      setSearchCoinReturns(
-        data.map(item => {
-          return { address: item.id, name: item.name, short: item.symbol };
-        })
-      );
+      // setSearchCoinReturns(
+      //   data.map(item => {
+      //     return { address: item.id, name: item.name, short: item.symbol };
+      //   })
+      // );
       lastPromiseWrapper(
         fetchPoolSearch(marketClient, e.target.value, data.map(item => item.id))
       ).then(pooldata => {
@@ -1091,25 +1093,36 @@ export const MarketSearchBar = props => {
         data.pairs.map(item => ({ address: item.id, coin1: item.token0.symbol, coin2: item.token1.symbol, percent: 0 }))
       );
      })
+    
+    // TODO: sort by different keys
+    // const key = 'volume24h'
+    fetchSearchCoinReturns().then(data => {
+      console.log(data);
+      if (data) {
+        setSearchCoinReturns(
+          // Sort data by volume 24h 
+          data.map(item => {
+            return { logoURL: item.logoURL, address: item.address, name: item.name, short: item.short };
+          })
+        )
+        setIsLoading(false);
+      }
+    })
+    
+    // lastPromiseWrapper(fetchSearchCoinReturns()).then(data => {
 
-    lastPromiseWrapper(fetchTokenSearch(marketClient, '')).then(data => {
-      setSearchCoinReturns(
-        data.map(item => {
-          return { address: item.id, name: item.name, short: item.symbol };
-        })
-      );
 
-      lastPromiseWrapper(fetchPoolSearch(marketClient, '', data.map(item => item.id))).then(
-        pooldata => {
-          setSearchPoolReturns(
-            pooldata.map(item => {
-              return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
-            })
-          );
-          setIsLoading(false);
-        }
-      );
-    });
+    //   lastPromiseWrapper(fetchPoolSearch(marketClient, '', data.map(item => item.id))).then(
+    //     pooldata => {
+    //       setSearchPoolReturns(
+    //         pooldata.map(item => {
+    //           return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
+    //         })
+    //       );
+    //       setIsLoading(false);
+    //     }
+    //   );
+    // });
 
     refreshWatchlist();
 
