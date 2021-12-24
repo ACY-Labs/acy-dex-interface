@@ -16,6 +16,7 @@ import ConstantLoader from '@/constants';
 const tokenList = ConstantLoader().tokenList;
 const farmSetting = ConstantLoader().farmSetting;
 
+export const INITIAL_ALLOWED_SLIPPAGE = farmSetting.INITIAL_ALLOWED_SLIPPAGE;
 export const ROUTER_ADDRESS = farmSetting.ROUTER_ADDRESS;
 export const FARMS_ADDRESS  = farmSetting.FARMS_ADDRESS;
 export const FLASH_ARBITRAGE_ADDRESS = farmSetting.FLASH_ARBITRAGE_ADDRESS;
