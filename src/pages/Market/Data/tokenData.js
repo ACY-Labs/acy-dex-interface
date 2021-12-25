@@ -199,4 +199,24 @@ export async function fetchTokensFromId(client, id){
 
 }
 
+// fetch tokens for search
+export async function fetchSearchCoinReturns() {
+  tokensPriceUSD = await getAllSuportedTokensPrice();
+  try{
+    let request = 'https://api.acy.finance/api/poolchart/all';
+    // let request = 'http://localhost:3001/api/poolchart/all';
+    let response = await fetch(request);
+    let data = await response.json(); 
+    console.log(data)
+    let parsed = parseTokenData(data.data);
+    console.log(parsed);
+    return parsed;
+  }catch (e){
+    console.log('service not available yet',e);
+    return null;
+  }
+}
+
+
+
 // fetch individual token history
