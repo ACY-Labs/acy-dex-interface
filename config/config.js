@@ -30,7 +30,7 @@ export default defineConfig({
   },
   proxy: {
     '/api': {
-      target: 'http://localhost:3001',
+      target: 'http://api.acy.finance',
       changeOrigin: true
     }
   },

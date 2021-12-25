@@ -18,6 +18,8 @@ import SocialMedia from './SocialMedia'
 import telegramWIcon from '@/assets/icon_telegram_white.svg';
 import telegramOIcon from '@/assets/icon_telegram_orange.svg';
 import twitterWIcon from '@/assets/icon_twitter_white.svg';
+import linkWIcon from '@/assets/icon_link_white.svg';
+import fileWIcon from '@/assets/icon_file_white.svg';
 import announcementIcon from '@/assets/icon_announcement.svg';
 import announcementFIcon from '@/assets/icon_announcement_fill.svg';
 import $ from 'jquery';
@@ -60,11 +62,15 @@ const {
 
 const LaunchpadProject = () => {
   console.log($(document).height());
+  
 
   const { projectId } = useParams();
   const [receivedData, setReceivedData] = useState({});
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
+
+  console.log("--------------RECEIVEDDATA---------------")
+  console.log(receivedData);
 
   const TokenBanner = ({ posterUrl }) => {
     return (
@@ -219,6 +225,13 @@ const LaunchpadProject = () => {
     );
   };
 
+  const logoObj = {
+    "telegram": telegramWIcon,
+    "twitter": twitterWIcon,
+    "website": linkWIcon,
+    "whitepaper": fileWIcon
+  }
+
   const ProjectDescription = () => {
     return (
       <div className="circleBorderCard cardContent">
@@ -226,12 +239,13 @@ const LaunchpadProject = () => {
           <div className='projecttitle-socials-container'>
             <h3 className='projecttitle'>Project Description</h3>
             <div className='social-container'>
-              {/* TODO: pass links to each icon */}
-              <SocialMedia url={ telegramWIcon } link=""/>
-              <SocialMedia url={ announcementFIcon } link=""/>
-              <SocialMedia url={ twitterWIcon } link=""/>
-              <Icon className="antd-icon-container" type="link" />
-              <Icon className="antd-icon-container" type="file" theme="filled" />
+              {receivedData.social && receivedData.social[0]!==null &&
+                <div>
+                  { Object.entries(receivedData.social[0]).forEach((item) =>
+                      item[1] !== null ? <SocialMedia url={logoObj.item[0]} link={item[1]} /> : ""
+                  )}
+                </div>
+              }
             </div>
           </div>
           
