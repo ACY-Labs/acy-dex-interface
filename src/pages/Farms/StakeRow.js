@@ -236,13 +236,13 @@ const StakeRow = props => {
   const formatString = (value) => {
     let formattedStr;
     if (value >= 1000000000) {
-      formattedStr = `$ ${(value / 1000000000).toFixed(2)}b`;
+      formattedStr = `${(value / 1000000000).toFixed(2)}b`;
     }else if (value >= 1000000) {
-      formattedStr = `$ ${(value / 1000000).toFixed(2)}m`;
+      formattedStr = `${(value / 1000000).toFixed(2)}m`;
     } else if (value >= 1000) {
-      formattedStr = `$ ${(value / 1000).toFixed(2)}k`;
+      formattedStr = `${(value / 1000).toFixed(2)}k`;
     } else {
-      formattedStr = `$ ${(value).toFixed(4)}`;
+      formattedStr = `${(value).toFixed(4)}`;
     }
     return formattedStr;
   }
