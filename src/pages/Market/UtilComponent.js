@@ -5,7 +5,6 @@ import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 import onlyLastPromise, { DiscardSignal } from 'only-last-promise';
-import tokenList from '@/constants/TokenList';
 import ReactDOM from 'react-dom';
 import { Link, useHistory } from 'react-router-dom';
 import styles from './styles.less';
