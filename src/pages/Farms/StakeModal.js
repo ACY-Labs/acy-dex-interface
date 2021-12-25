@@ -13,7 +13,7 @@ import moment from 'moment';
 import SwapIcon from "@/assets/icon_swap.png";
 import classNames from 'classnames';
 import axios from 'axios';
-import { API_URL } from '@/acy-dex-swap/utils';
+import { API_URL, BLOCK_TIME } from '@/acy-dex-swap/utils';
 import Pattern from '@/utils/pattern';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
@@ -29,7 +29,7 @@ const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
 
   const inputRef = useRef();
   useEffect(() => {
-    const newSize = inputValue?.toString().length>8?8:inputValue?.toString().length + 0.5;
+    const newSize = 8 + 0.5;
     inputRef.current.style.width = newSize + "ch";
   }, [inputValue]);
 
@@ -71,6 +71,7 @@ const StakeModal = props => {
     token1Ratio,
     token2Ratio,
     poolRewardPerYear,
+    tokensRewardPerBlock
   } = props;
   const [date, setDate] = useState();
   const [selectedPresetDate, setSelectedPresetDate] = useState(null);
@@ -94,6 +95,7 @@ const StakeModal = props => {
   
   const maxDay = Math.floor(endAfter/(60*60*24)).toString();
   const maxDayStr = `MAX ${maxDay}D`;
+  const [roi, setRoi] = useState();
 
   const getLockDuration = () => {
     if (is4Years) return 126144000;
@@ -141,10 +143,10 @@ const StakeModal = props => {
     if(!check) return;
     // const value = parseFloat(e.target.value);
     if(e.target.value > 100) {
-      setShowStake((parseFloat(totalUSDBalance).toFixed(4)));
+      setShowStake((parseFloat(totalUSDBalance).toFixed(2)));
       setBalancePercentage(100);
     } else{
-      setShowStake((parseFloat((totalUSDBalance * (e.target.value)) / 100)).toFixed(4));
+      setShowStake((parseFloat((totalUSDBalance * (e.target.value)) / 100)).toFixed(2));
       setBalancePercentage(e.target.value);
     }
     
@@ -178,10 +180,19 @@ const StakeModal = props => {
     }
     setAprList(aprList);
     setDaysNum(day_num);
-    const now = new Date()
+
+    const now = new Date();
     const dif = date - now;
 
-    if(showStake > totalUSDBalance && showStake != totalUSDBalance.toFixed(4)) {
+    const dayNum = dif / (1000*60*60*24);
+    console.log("TEST DAYNUM:",dayNum, tokensRewardPerBlock);
+    var weight = lp * Math.sqrt(dayNum);
+    var share = weight / (totalScore + weight);
+    var _roi = dayNum*60*60*24/BLOCK_TIME * tokensRewardPerBlock[0].rewardPerBlock * share;
+    console.log("TEST ROI:",_roi);
+    setRoi(_roi);
+
+    if(showStake > totalUSDBalance && showStake != totalUSDBalance.toFixed(2)) {
       setButtonStatus(false);
       setButtonText("Insufficient balance");
       setBalancePercentage(100);
@@ -208,6 +219,12 @@ const StakeModal = props => {
   }, [showStake]);
 
   useEffect(() => {
+    const now = new Date();
+    setDate(now.setDate(now.getDate() + 1));
+    setPickingDate(true);
+  }, []);
+
+  useEffect(() => {
     setIs4Years(false);
   }, [isModalVisible]);
 
@@ -217,7 +234,7 @@ const StakeModal = props => {
     const dif = date - now;
     console.log("TEST KUY5");
     if(parseInt(dif/1000) < endAfter && dif>0) {
-      if(showStake > totalUSDBalance && showStake != totalUSDBalance.toFixed(4)) {
+      if(showStake > totalUSDBalance && showStake != totalUSDBalance.toFixed(2)) {
         setButtonStatus(false);
         setButtonText("Insufficient balance");
       } else {
@@ -237,6 +254,16 @@ const StakeModal = props => {
         setButtonStatus(false);
       }
     }
+    
+    var totalScore = poolLpScore / 1e34;
+    var lp = showStake/ratio;
+    const dayNum = dif / (1000*60*60*24);
+    console.log("TEST DAYNUM:",dayNum, tokensRewardPerBlock);
+    var weight = lp * Math.sqrt(dayNum);
+    var share = weight / (totalScore + weight);
+    var _roi = dayNum*60*60*24/BLOCK_TIME * tokensRewardPerBlock[0].rewardPerBlock * share;
+    console.log("TEST ROI:",_roi);
+    setRoi(_roi);
   }, [date]);
 
   
@@ -278,7 +305,7 @@ const StakeModal = props => {
 
   }
   const validateInput = () => {
-    if(showStake > totalUSDBalance && showStake != totalUSDBalance.toFixed(4)) {
+    if(showStake > totalUSDBalance && showStake != totalUSDBalance.toFixed(2)) {
       setButtonStatus(false);
       setButtonText("Insufficient balance");
       setBalancePercentage(100);
@@ -475,7 +502,7 @@ const StakeModal = props => {
       <div className={styles.removeAmountContainer}>
         <div className={styles.balanceAmountContainer}>
           <div className={styles.balanceAmount}>
-            {`Stake amount = ${((showStake||0)/ratio).toFixed(4)}  ${token2?`${token1}-${token2} LP`: `${token1}`}`}
+            {`Stake ${token2?` LP`: ``} amount: ${(showStake>totalUSDBalance&&showStake!=totalUSDBalance.toFixed(2)?showStake/ratio:balance*balancePercentage/100).toFixed(10)}  ${token2?` LP`: `${token1}`}`}
           </div>
           <div className={styles.balanceAmountInputContainer}>
             <input
@@ -486,6 +513,7 @@ const StakeModal = props => {
             <span className={styles.balanceAmountSuffix}>%</span>
           </div>
         </div>
+        
         <div className={styles.amountText}>
           $ <AutoResizingInput value={showStake} onChange={setShowStake} />
         </div>
@@ -501,7 +529,8 @@ const StakeModal = props => {
           </div>
       </div>
       <div className={styles.balanceAmountContainer2}>
-          {token2? 'Your LP Token':'Token'}: {(parseFloat(balance)).toFixed(4)} ≈ ${(parseFloat(totalUSDBalance)).toFixed(4)}
+        <div>Total: {`${(parseFloat(balance)).toFixed(10)} ${token2?`${token1}-${token2} LP`: `${token1}`}`} </div>
+        <div>~ ${(parseFloat(totalUSDBalance)).toFixed(2)}</div>
       </div>
       <div className={styles.tokenAmountContent}>
         <div className={styles.tokenAmount}>
@@ -588,23 +617,23 @@ const StakeModal = props => {
           </div>
         </div>
       </div>
-      {/* <div className={styles.removeAmountContainer}>
+      <div className={styles.removeAmountContainer}>
         <div className={styles.balanceAmountContainer}>
           <div className={styles.balanceAmount}>
-            Rewards at current rates
+            Total rewards at current rates
           </div>
 
         </div>
         <div className={styles.amountText}>
-          $1234
+          {`$${(roi * tokensRewardPerBlock[0].rate || 0).toFixed(2)}`}
         </div>
         <div className={styles.balanceAmountContainer}>
           <div className={styles.balanceAmount}>
-            ~ 123 ACY (50.59%)
+            ~ {`${(roi || 0).toFixed(0)} ${tokensRewardPerBlock[0].token} (${(((roi*tokensRewardPerBlock[0].rate)/showStake*100||0)).toFixed(2)}%)`}
           </div>
 
         </div>
-      </div> */}
+      </div>
       <div>
         <button
           type="button"
