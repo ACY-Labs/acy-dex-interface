@@ -239,13 +239,17 @@ const LaunchpadProject = () => {
           <div className='projecttitle-socials-container'>
             <h3 className='projecttitle'>Project Description</h3>
             <div className='social-container'>
-              {receivedData.social && receivedData.social[0]!==null &&
-                <div>
-                  { Object.entries(receivedData.social[0]).forEach((item) =>
-                      item[1] !== null ? <SocialMedia url={logoObj.item[0]} link={item[1]} /> : ""
-                  )}
-                </div>
-              }
+              {receivedData.social && receivedData.social[0] &&
+                <div id='social container'>
+                  { Object.entries(receivedData.social[0]).map((item)=>{
+                    if(item[1] !== null ){
+                      console.log(item)
+                      return (
+                      <SocialMedia url={logoObj[item[0]]} link={item[1]} />)
+                    }
+                  })}
+                </div>}
+              
             </div>
           </div>
           
@@ -665,6 +669,7 @@ const LaunchpadProject = () => {
       .then(res => {
         if (res) {
           // extract data from string
+          console.log("RECeiveddata",res);
           const contextData = JSON.parse(res.contextData);
 
           const today = new Date();
