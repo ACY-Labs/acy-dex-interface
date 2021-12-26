@@ -27,8 +27,9 @@ import OperationHistoryTable from './components/OperationHistoryTable';
 import AddComponent from '@/components/AddComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { getTransactionsByAccount,appendNewLiquidityTx } from '@/utils/txData';
-import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import styles from './styles.less';
+import ConstantLoader from '@/constants';
+const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
 
 
 const { AcyTabPane } = AcyTabs;

@@ -13,9 +13,9 @@ import { connect } from 'umi';
 import moment from 'moment';
 import classNames from 'classnames';
 import { getPool, getPoolAccmulateReward} from '@/acy-dex-swap/core/farms';
-import supportedTokens from '@/constants/TokenList';
 import axios from 'axios';
-
+import ConstantLoader from '@/constants';
+const supportedTokens = ConstantLoader().tokenList;
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
   const handleInputChange = (e) => {
@@ -113,7 +113,12 @@ const StakeRow = props => {
     } else {
       setWithdrawButtonStatus(false);
       setWithdrawButtonText(<>Processing <Icon type="loading" /></>);
-      withdraw(poolId, data.positionId, (data.lpAmount * percent / 100).toString(), setWithdrawButtonText, setWithdrawButtonStatus, withdrawCallback, library, account);
+      if(percent < 100 ) {
+        withdraw(poolId, data.positionId, (data.lpAmount * percent / 100).toString(), setWithdrawButtonText, setWithdrawButtonStatus, withdrawCallback, library, account);
+      } else {
+        withdraw(poolId, data.positionId, data.lpAmount.toString(), setWithdrawButtonText, setWithdrawButtonStatus, withdrawCallback, library, account);
+      }
+      
     }
   };
 
@@ -237,7 +242,7 @@ const StakeRow = props => {
     } else if (value >= 1000) {
       formattedStr = `$ ${(value / 1000).toFixed(2)}k`;
     } else {
-      formattedStr = `$ ${(value).toFixed(2)}`;
+      formattedStr = `$ ${(value).toFixed(4)}`;
     }
     return formattedStr;
   }
@@ -462,5 +467,3 @@ export default connect(({ global, transaction, loading }) => ({
   transaction,
   loading: loading.global,
 }))(StakeRow);
-
-// export default FarmsTableRow;

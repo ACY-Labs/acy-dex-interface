@@ -35,7 +35,7 @@
     "@ant-design/icons": "^4.7.0",
     "@antv/data-set": "^0.10.0",
     "@apollo/client": "^3.4.11",
-    "@babel/runtime": "^7.2.0",
+    "@babel/runtime": "^7.16.0",
     "@binance-chain/bsc-connector": "^1.0.0",
     "@ethersproject/abi": "^5.4.1",
     "@ethersproject/address": "^5.4.0",
@@ -158,7 +158,7 @@
     "tslint": "^5.10.0",
     "tslint-config-prettier": "^1.10.0",
     "tslint-react": "^3.6.0",
-    "umi": "^3.0.0"
+    "umi": "^3.5.0"
   },
   "engines": {
     "node": ">=8.0.0"
