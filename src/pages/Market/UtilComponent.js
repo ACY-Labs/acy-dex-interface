@@ -26,6 +26,7 @@ import {
   fetchTokensFromId,
   fetchPoolsFromId,
   fetchSearchCoinReturns,
+  fetchSearchPoolReturns,
 } from './Data';
 
 const { AcyTabPane } = AcyTabs;
@@ -128,8 +129,8 @@ export class SmallTable extends React.Component {
     } else {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyTokenIcon symbol={entry.coin1} width={20} />
-          <AcyTokenIcon symbol={entry.coin2} width={20} />
+          <AcyTokenIcon symbol={entry.logoURL1} width={20} />
+          <AcyTokenIcon symbol={entry.logoURL2} width={20} />
           <Link
             style={{ color: 'white' }}
             to={`/market/info/pool/${entry.address}`}
@@ -453,7 +454,6 @@ export function PoolTable(props) {
   const [, update] = useState(0);
 
   const navHistory = useHistory();
-
   useEffect(
     () => {
       update(1);
@@ -995,24 +995,24 @@ export const MarketSearchBar = props => {
     setIsLoading(false);
     setSearchQuery(e.target.value);
 
-    lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
-      console.log('token info:',data);
-      // setSearchCoinReturns(
-      //   data.map(item => {
-      //     return { address: item.id, name: item.name, short: item.symbol };
-      //   })
-      // );
-      lastPromiseWrapper(
-        fetchPoolSearch(marketClient, e.target.value, data.map(item => item.id))
-      ).then(pooldata => {
-        setSearchPoolReturns(
-          pooldata.map(item => {
-            return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
-          })
-        );
-        setIsLoading(false);
-      });
-    });
+    // lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
+    //   console.log('token info:',data);
+    //   setSearchCoinReturns(
+    //     data.map(item => {
+    //       return { address: item.id, name: item.name, short: item.symbol };
+    //     })
+    //   );
+    //   lastPromiseWrapper(
+    //     fetchPoolSearch(marketClient, e.target.value, data.map(item => item.id))
+    //   ).then(pooldata => {
+    //     setSearchPoolReturns(
+    //       pooldata.map(item => {
+    //         return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
+    //       })
+    //     );
+    //     setIsLoading(false);
+    //   });
+    // });
 
     // let query = e.target.value.toLowerCase();
 
@@ -1097,24 +1097,40 @@ export const MarketSearchBar = props => {
     //  })
     
     // fetch search coin returns
-    // TODO: sort by different keys
-    // const key = 'volume24h'
-    fetchSearchCoinReturns().then(data => {
+    // key = ["volume24h", "tvl"]
+    const key = 'volume24h'
+    fetchSearchCoinReturns(key).then(data => {
       console.log(data);
       if (data) {
         setSearchCoinReturns(
-          // Sort data by volume 24h 
           data.map(item => {
             return { logoURL: item.logoURL, address: item.address, name: item.name, short: item.short };
           })
         )
-        setIsLoading(false);
       }
     }).catch(error => {
       console.log("Error in fetch search coin returns:", error);
       setIsLoading(false);
     })
-    
+
+    // fetch search pool returns
+    fetchSearchPoolReturns(key).then(data => {
+      if (data) {
+        setSearchPoolReturns(
+          data.map(item => {
+            return { coin1: item.coin1, coin2: item.coin2, logoURL1: item.logoURL1, logoURL2: item.logoURL2 };
+          })
+        )
+      }
+    }).catch(error => {
+      console.log("Error in fetch search pool returns:", error);
+      setIsLoading(false);
+    })
+
+    setIsLoading(false);
+
+
+
     // lastPromiseWrapper(fetchSearchCoinReturns()).then(data => {
 
 

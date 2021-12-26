@@ -141,7 +141,9 @@ export async function fetchGeneralPoolInfoDay() {
     let request = 'https://api.acy.finance/api/poolchart/all';
     let response = await fetch(request);
     let data = await response.json();
-    return parsePoolData(data.data);
+    let parsed = parsePoolData(data.data);
+    console.log(parsed);
+    return parsed;
   }catch (e){
     console.log('service not available yet',e);
     return null;
@@ -189,6 +191,86 @@ export async function fetchPoolsFromId(client, id) {
 
   return data;
 }
+
+function parseSearchPoolReturns(data, key){
+
+  let _data = data.map((item)=>{
+
+    console.log("mapping....",item.token0,item.token1);
+    let _token0 = findTokenWithAddress(item.token0);
+    let _token1 = findTokenWithAddress(item.token1);
+
+    let _logoURL1 = _token0.logoURI;
+    let _logoURL2 = _token1.logoURI;
+
+    _token0 = _token0.symbol;
+    _token1 = _token1.symbol;
+
+
+    let _tvl = totalInUSD ( [
+      {
+        token : _token0,
+        amount : item.lastReserves.token0
+      },
+      {
+        token : _token1,
+        amount : item.lastReserves.token1
+      }
+    ],tokensPriceUSD);
+
+    let _volume24h = totalInUSD ( [
+      {
+        token : _token0,
+        amount : item.lastVolume.token0
+      },
+      {
+        token : _token1,
+        amount : item.lastVolume.token1
+      }
+    ],tokensPriceUSD);
+
+    return {
+      coin1 : _token0,
+      coin2 : _token1,
+      logoURL1 : _logoURL1,
+      logoURL2 : _logoURL2,
+      tvl : _tvl ,
+      volume24h : _volume24h,
+      volume7d : 0
+    }
+  });
+  let allsums = 0;
+  let allvolumes = 0;
+  _data.forEach(element => {
+    allsums += element.tvl;
+    allvolumes += element.volume24h;
+  });
+
+  return sortTable(_data, key ,true);
+}
+
+// fetch search pool returns
+export async function fetchSearchPoolReturns(key) {
+  // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
+  tokensPriceUSD = await getAllSuportedTokensPrice();
+  try{
+    let request = 'https://api.acy.finance/api/poolchart/all';
+    let response = await fetch(request);
+    let data = await response.json();
+    let parsed = parseSearchPoolReturns(data.data, key);
+    let searchPoolReturns = parsed.map(tokenList => ({
+      coin1: tokenList.coin1,
+      coin2: tokenList.coin2,
+      logoURL1: tokenList.logoURL1,
+      logoURL2: tokenList.logoURL2,
+    }))
+    return searchPoolReturns;
+  }catch (e){
+    console.log('service not available yet',e);
+    return null;
+  }
+}
+
 
 // get individual pool info from token
 

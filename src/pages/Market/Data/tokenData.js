@@ -198,18 +198,77 @@ export async function fetchTokensFromId(client, id){
 
 }
 
+function parseSearchCoinReturns (data, key){
+  //INIT TOKEN LIST;
+  let newData = [];
+
+  uniqueTokens.forEach(element => {
+    newData.push({
+      address : element.address,
+      name : element.name,
+      price : tokensPriceUSD[element.symbol] ? tokensPriceUSD[element.symbol] : 1,
+      priceChange : -0,
+      short : element.symbol,
+      logoURL : element.logoURI,
+      tvl : 0,
+      volume24h : 0
+
+    })
+  });
+
+  data.forEach(element => {
+      let index0 = newData.findIndex(item => item.address.toLowerCase() == element.token0.toLowerCase() );
+      let index1 = newData.findIndex(item => item.address.toLowerCase() == element.token1.toLowerCase() );
+      newData[index0].tvl += totalInUSD([
+        {
+          token : newData[index0].short,
+          amount : element.lastReserves.token0
+        }
+      ],tokensPriceUSD);
+
+      newData[index0].volume24h += totalInUSD([
+        {
+          token : newData[index0].short,
+          amount : element.lastVolume.token0
+        }
+      ],tokensPriceUSD);
+
+      newData[index1].tvl += totalInUSD([
+        {
+          token : newData[index1].short,
+          amount : element.lastReserves.token1
+        }
+      ],tokensPriceUSD);
+
+      newData[index1].volume24h += totalInUSD([
+        {
+          token : newData[index1].short,
+          amount : element.lastVolume.token1
+        }
+      ],tokensPriceUSD);
+
+  });
+
+  return sortTable(newData, key, true);
+  
+}
+
 // fetch tokens for search
-export async function fetchSearchCoinReturns() {
+export async function fetchSearchCoinReturns(key) {
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
     let request = 'https://api.acy.finance/api/poolchart/all';
     // let request = 'http://localhost:3001/api/poolchart/all';
     let response = await fetch(request);
     let data = await response.json(); 
-    console.log(data)
-    let parsed = parseTokenData(data.data);
-    console.log(parsed);
-    return parsed;
+    let parsed = parseSearchCoinReturns(data.data, key);
+    let searchCoinReturns = parsed.map(tokenList => ({
+      logoURL: tokenList.logoURL,
+      address: tokenList.address,
+      name: tokenList.name,
+      short: tokenList.short,
+    }))
+    return searchCoinReturns;
   }catch (e){
     console.log('service not available yet',e);
     return null;
