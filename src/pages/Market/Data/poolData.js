@@ -11,12 +11,13 @@ import { getBlockFromTimestamp } from './blocks';
 import { sortTable } from '../Util';
 import axios from 'axios';
 import { parseTransactionData } from '@/utils/txData';
-import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
+import {getAllSuportedTokensPrice, getPairAddress} from '@/acy-dex-swap/utils/index';
 
 import {findTokenWithAddress} from '@/utils/txData';
 
 import {totalInUSD} from '@/utils/utils'
 import ConstantLoader from '@/constants';
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 const supportedTokens = ConstantLoader().tokenList;
 
 export async function fetchPoolInfo(client, address, timestamp) {
@@ -38,19 +39,48 @@ export async function fetchPoolInfo(client, address, timestamp) {
   return data.pairs[0];
 }
 
-export async function fetchPoolDayData(client, address, timespan) {
-  const { loading, error, data } = await client.query({
-    query: GET_POOL_DAY_DATA,
-    variables: {
-      timespan: timespan,
-      pairAddress: address,
-    },
-  });
+export async function fetchPoolDayData(address) {
+  // let newPair = {
+    //           coin1: pairs0[i].token0.symbol,
+    //           coin2: pairs0[i].token1.symbol,
+    //           address: pairs0[i].id,
+    //           percent: 0,
+    //           tvl: parseFloat(pair0DayData[0].reserveUSD),
+    //           volume24h: parseFloat(pair0DayData[0].dailyVolumeUSD),
+    //           volume7d: p0VolumeWeek,
+    //           price: 0,
+    //         };
+  return await axios.get(`${apiUrlPrefix}/poolchart/all`).then(async res => {
+    const data = res.data.data;
+    const tokenPool = data.filter(p => p.token0 == address || p.token1 == address);
 
-  if (loading) return null;
-  if (error) return `Error! ${error}`;
+    const priceDict = await getAllSuportedTokensPrice();
+    
+    const parsedPairData = [];
+    for (const pool of tokenPool) {
+      const token0 = supportedTokens.find(t => t.address.toLowerCase() == pool.token0.toLowerCase());
+      const token1 = supportedTokens.find(t => t.address.toLowerCase() == pool.token1.toLowerCase())
+      const token0Symbol = token0.symbol;
+      const token1Symbol = token1.symbol
+      const tvl = pool.lastReserves.token0 * 2 * priceDict[token0Symbol];
+      const volume24h = pool.lastVolume.token0 * priceDict[token0Symbol] + pool.lastVolume.token1 * priceDict[token1Symbol];
+      const newPair = {
+              coin1: token0Symbol,
+              coin2: token1Symbol,
+              logoURL1: token0.logoURI,
+              logoURL2: token1.logoURI,
+              address: getPairAddress(pool.token0, pool.token1),
+              percent: 0,
+              tvl,
+              volume24h,
+              // volume7d: p0VolumeWeek,
+              // price: 0,
+            };
+      parsedPairData.push(newPair);
+    }
+    return parsedPairData;
+  })
 
-  return data.pairDayDatas;
 }
 
 // fetch general pool info

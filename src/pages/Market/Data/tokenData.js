@@ -14,8 +14,11 @@ import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import {findTokenWithAddress} from '@/utils/txData';
 import {totalInUSD} from '@/utils/utils';
 import { symbol } from 'prop-types';
+import axios from "axios";
 import ConstantLoader from '@/constants';
+import { getAddress } from '@ethersproject/address';
 const uniqueTokens = ConstantLoader().tokenList;
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 
 export async function fetchTokenInfo(client, tokenAddress, timestamp) {
   const block = await getBlockFromTimestamp(timestamp);
@@ -38,20 +41,102 @@ export async function fetchTokenInfo(client, tokenAddress, timestamp) {
   return data.tokens[0];
 }
 
-export async function fetchTokenDayData(client, tokenId) {
-  const { loading, error, data } = await client.query({
-    query: GET_TOKEN_DAY_DATA,
-    variables: {
-      tokenId: tokenId,
-    },
-  });
+export async function fetchTokenDayData(tokenId) {
+  
+  // get USDT address for calculating historical price
+  const USDTaddr = getAddress(uniqueTokens.find(t => t.symbol == "USDT").address);
+  const tokenIsUSDT = tokenId == USDTaddr;
 
-  if (loading) return null;
-  if (error) return `Error! ${error}`;
+  const getTokenUSDPrice = (data) => {
+    
+    if (tokenIsUSDT) {
+      return [];
+    }
+    
+    const tokenPairWithUSD = data.find(p => (p.token0 == tokenId && p.token1 == USDTaddr) || (p.token1 == tokenId && p.token0 == USDTaddr))
+    console.log("tokenPairWithUSD", tokenPairWithUSD)
+    const token0IsUSD = tokenPairWithUSD.token0 == USDTaddr;
+    // calculate price of token
+    const tokenUSDPriceDict = {}
+    for (const h of tokenPairWithUSD.historicalData) {
+      const usdtReserve = token0IsUSD ? h.reserves.token0 : h.reserves.token1;
+      const tokenReserve = token0IsUSD ? h.reserves.token1 : h.reserves.token0;
+      tokenUSDPriceDict[h.date] = usdtReserve / tokenReserve;
+    }
+    
+    return tokenUSDPriceDict;
+  }
 
-  console.log(data);
+  // filter out pools with tokenId token, (could be token0 or token1 of pool)
+  // flatten the pool's history into an array of object, containing daily volume and reserves
+  // sums up in a json and return
+  const aggregateStats = (data, fieldName, tokenPrice, outputStats) => {
+    const pair = data.filter(d => d[fieldName] == tokenId);
 
-  return [data.tokenDayDatas, data.pairs0, data.pairs1];
+    const pairHistoryFlat = pair.reduce((prev,cur) => [...prev, ...cur.historicalData], []);
+    console.log("flat history", pairHistoryFlat)
+    
+    for (const pdata of pairHistoryFlat) {
+      console.log()
+      const parsedPdata = {
+        date: pdata.date, 
+        dailyVolumeUSD: tokenIsUSDT ? pdata.volume24h[fieldName] : pdata.volume24h[fieldName] * tokenPrice[pdata.date] || 0, 
+        totalLiquidityUSD: tokenIsUSDT ? pdata.reserves[fieldName] : pdata.reserves[fieldName] * tokenPrice[pdata.date] || 0
+      }
+      console.log("parsedPdata", pdata, tokenPrice[pdata.date], parsedPdata)
+      console.log("check if data for date exists", outputStats[parsedPdata.date])
+      if (!outputStats[parsedPdata.date]) {
+        outputStats[parsedPdata.date] = parsedPdata;
+        continue;
+      }
+
+      outputStats[parsedPdata.date].dailyVolumeUSD += parsedPdata.dailyVolumeUSD;
+      outputStats[parsedPdata.date].totalLiquidityUSD += parsedPdata.totalLiquidityUSD;
+    }
+    return outputStats
+  }
+
+  return await axios.get(`${apiUrlPrefix}/poolchart/historical`).then(res => {
+    const data = res.data.data;
+    console.log("tokenData return data from server", data)
+
+    const tokenPriceDict = getTokenUSDPrice(data);
+    console.log("token price dict", tokenPriceDict)
+    
+    let aggregatedTokenStats = {};
+    aggregatedTokenStats = aggregateStats(data, "token0", tokenPriceDict, aggregatedTokenStats);
+    aggregatedTokenStats = aggregateStats(data, "token1", tokenPriceDict, aggregatedTokenStats);
+    
+    console.log("final aggregatedTokenStats", aggregatedTokenStats);
+
+    const parsedTokenStats = Object.keys(aggregatedTokenStats).map(key => ({
+      date: new Date(aggregatedTokenStats[key].date).getTime()/1000,
+      priceUSD: tokenPriceDict[aggregatedTokenStats[key].date],
+      dailyVolumeUSD: aggregatedTokenStats[key].dailyVolumeUSD,
+      totalLiquidityUSD: aggregatedTokenStats[key].totalLiquidityUSD
+    }))
+    console.log("final parsedTokenStats", parsedTokenStats)
+    
+    return parsedTokenStats
+  })
+
+  // data
+        // dailyVolumeToken: "336153.802688237119753424"
+        // dailyVolumeUSD: "5610888.377159581473889737524083496"
+        // date: 1640217600
+        // id: "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984-18984"
+        // mostLiquidPairs: []
+        // priceUSD: "17.29920828219531842792396080605194"
+        // token: {__typename: 'Token', id: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', symbol: 'UNI', name: 'Uniswap'}
+        // totalLiquidityToken: "1693735.720308796254431288"
+        // totalLiquidityUSD: "29300287.00061598156031768802958171"
+        // __typename: "TokenDayData"
+  
+  // pairs0, pairs1
+        // id: "0xd3d2e2692501a5c9ca623199d38826e513033a17"
+        // token0: {__typename: 'Token', symbol: 'UNI'}
+        // token1: {__typename: 'Token', symbol: 'WETH'}
+        // __typename: "Pair"
 }
 
 export async function fetchTokenDaySimple(client, tokenId) {

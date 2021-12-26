@@ -137,6 +137,28 @@ export function getPairContract(pairAddress, library, account) {
   return getContract(pairAddress, IUniswapV2PairABI, library, account);
 }
 
+import { getCreate2Address } from "@ethersproject/address";
+import { pack, keccak256 } from "@ethersproject/solidity";
+export const getPairAddress = (token0Addr, token1Addr) => {
+    // // eth hashes
+    // const FACTORY_ADDRESS = "0xb43DD1c50377b6dbaEBa3DcBB2232a3964b22440";
+    // const INIT_CODE_HASH = "0xfbf3b88d6f337be529b00f1dc9bff44bb43fa3c6b5b7d58a2149e59ac5e0c4a8";
+
+    // bsc hashes
+    const FACTORY_ADDRESS = farmSetting.FACTORY_ADDRESS;
+    const INIT_CODE_HASH = farmSetting.INIT_CODE_HASH;
+    const [_token0, _token1] =
+        token0Addr.toLowerCase() < token1Addr.toLowerCase()
+            ? [token0Addr, token1Addr]
+            : [token1Addr, token0Addr];
+    const pairAddress = getCreate2Address(
+        FACTORY_ADDRESS,
+        keccak256(["bytes"], [pack(["address", "address"], [_token0, _token1])]),
+        INIT_CODE_HASH
+    );
+    return pairAddress;
+}
+
 // return gas with 10% added margin in BigNumber
 export function calculateGasMargin(value) {
   return value.mul(BigNumber.from(10000).add(BigNumber.from(1000))).div(BigNumber.from(10000));
@@ -219,6 +241,12 @@ export async function getUserTokenBalance(token, chainId, account, library) {
   if (!token) return;
   // let tokenIsETH = symbol === 'ETH';
   let tokenIsETH = symbol === 'BNB';
+  
+  const balance = await getUserTokenBalanceRaw(
+    tokenIsETH ? ETHER : new Token(chainId, address, decimals, symbol),
+    account,
+    library
+  )
 
   return formatUnits(
     await getUserTokenBalanceRaw(
@@ -419,12 +447,12 @@ export function parseArbitrageLog({ data, topics }) {
     nonZeroTokenAmount,
   };
 }
-// pass token symbol
-export function getTokenPrice(symbol) {
-  const token = tokenList.find(token => token.symbol == symbol);
-  if (!token) return 0;
-  axios.get("https://api.coingecko.com/api/v3/simple/price?ids=shiba-inu&vs_currencies=usd")
-}
+// // pass token symbol
+// export function getTokenPrice(symbol) {
+//   const token = tokenList.find(token => token.symbol == symbol);
+//   if (!token) return 0;
+//   axios.get("https://api.coingecko.com/api/v3/simple/price?ids=shiba-inu&vs_currencies=usd")
+// }
 export async function getAllSuportedTokensPrice() {
   const library = new JsonRpcProvider(RPC_URL, 56);
   const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
