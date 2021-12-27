@@ -13,8 +13,9 @@ import { getBlockFromTimestamp } from './blocks';
 import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import {findTokenWithAddress} from '@/utils/txData';
 import {totalInUSD} from '@/utils/utils';
-import uniqueTokens from '@/constants/TokenList';
 import { symbol } from 'prop-types';
+import ConstantLoader from '@/constants';
+const uniqueTokens = ConstantLoader().tokenList;
 
 export async function fetchTokenInfo(client, tokenAddress, timestamp) {
   const block = await getBlockFromTimestamp(timestamp);

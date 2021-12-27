@@ -371,7 +371,7 @@ const LaunchpadProject = () => {
     const clickCover = async e => {
       console.log('click cover', allocationAmount);
       const oldAllocationAmount = allocationAmount;
-      if (oldAllocationAmount === 0) {
+      if (oldAllocationAmount !== 0) {
           requireAllocation(walletId, projectToken).then(res => {
               if(res && res.allocationAmount) {
                   setAllocationAmount(res.allocationAmount);

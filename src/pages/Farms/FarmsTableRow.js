@@ -13,10 +13,12 @@ import { connect } from 'umi';
 import moment from 'moment';
 import classNames from 'classnames';
 import { getPool, getPoolAccmulateReward, newGetPool} from '@/acy-dex-swap/core/farms';
-import supportedTokens from '@/constants/TokenList';
 import StakeRow from './StakeRow';
 import SwapComponent from '@/components/SwapComponent';
 import { BLOCK_TIME } from '@/acy-dex-swap/utils';
+import ConstantLoader from '@/constants';
+const supportedTokens = ConstantLoader().tokenList;
+
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
   const handleInputChange = (e) => {
@@ -214,7 +216,8 @@ const FarmsTableRow = props => {
       endAfter: (pool.endBlock - block) * BLOCK_TIME,
       token1Ratio: pool.token1Ratio,
       token2Ratio: pool.token2Ratio,
-      poolRewardPerYear: pool.poolRewardPerYear
+      poolRewardPerYear: pool.poolRewardPerYear,
+      tokensRewardPerBlock: pool.tokensRewardPerBlock
     };
     console.log("TEST HERE:",newFarmsContent);
     setPoolInfo(newFarmsContent);
@@ -671,6 +674,7 @@ const FarmsTableRow = props => {
         token1Ratio={poolInfo.token1Ratio}
         token2Ratio={poolInfo.token2Ratio}
         poolRewardPerYear={poolInfo.poolRewardPerYear}
+        tokensRewardPerBlock={poolInfo.tokensRewardPerBlock}
       />
     </div>
   )
