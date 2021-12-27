@@ -20,6 +20,7 @@ import styles from './styles.less';
 import ConstantLoader from '@/constants';
 const supportedTokens = ConstantLoader().tokenList;
 const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 
 
 function getLogoURIWithSymbol(symbol) {
@@ -367,8 +368,8 @@ const AcyLiquidityPositions = (props) => {
     console.log("fetching user pool list");
     axios.get(
       // fetch valid pool list from remote
-      // `https://api.acy.finance/api/pool?chainId=${chainId}`
-      `https://api.acy.finance/api/userpool?walletId=${account}`
+      // `${apiUrlPrefix}/pool?chainId=${chainId}`
+      `${apiUrlPrefix}/userpool?walletId=${account}`
       // `http://localhost:3001/api/userpool?walletId=${account}`
     ).then(async res => {
       console.log(res);
@@ -491,7 +492,7 @@ const AcyLiquidityPositions = (props) => {
       const token0 = pair.token0;
       const token1 = pair.token1;
       console.log("this is", token0, token1)
-      return await axios.get(`https://api.acy.finance/api/poolchart/pair?token0=${token0.address}&token1=${token1.address}`).then(async (res) => {
+      return await axios.get(`${apiUrlPrefix}/poolchart/pair?token0=${token0.address}&token1=${token1.address}`).then(async (res) => {
         // calculate volume in USD
         console.log("this is return data", res.data)
         const {token0: token0Vol, token1: token1Vol} = res.data.data.lastVolume;
