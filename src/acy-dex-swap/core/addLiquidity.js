@@ -1,4 +1,3 @@
-import {scanUrlPrefix} from "@/constants/configs";
 import {
   CurrencyAmount,
   ETHER,
@@ -22,6 +21,9 @@ import {
   getUserTokenBalanceRaw,
   INITIAL_ALLOWED_SLIPPAGE,
 } from '../utils';
+import ConstantLoader from "@/constants";
+const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
+
 // get the estimated amount of the other token required when adding liquidity, in readable string.
 export async function getEstimated(
   inputToken0,

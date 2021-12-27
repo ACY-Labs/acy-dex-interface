@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Icon, Input } from 'antd';
 import styles from '@/pages/Dao/components/StakeSection.less';
 import { AcyCoinItem, AcyIcon, AcyModal, AcyTabs } from '@/components/Acy';
-import tokenList from '@/constants/TokenList';
 import placeholder from '../placeholder-round.png';
+import ConstantLoader from '@/constants';
+const tokenList = ConstantLoader().tokenList;
 
 const { AcyTabPane } = AcyTabs
 

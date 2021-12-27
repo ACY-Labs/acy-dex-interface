@@ -28,7 +28,8 @@ import { convertPoolForList } from './Data/util.js';
 import { MarketSearchBar, PoolTable, TransactionTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
 import ConnectWallet from './ConnectWallet';
-import {scanUrlPrefix} from '@/constants/configs';
+import ConstantLoader from '@/constants';
+const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
 
 const watchlistManagerToken = new WatchlistManager('token');
 

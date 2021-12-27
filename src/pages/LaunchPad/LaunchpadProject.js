@@ -18,9 +18,14 @@ import SocialMedia from './SocialMedia'
 import telegramWIcon from '@/assets/icon_telegram_white.svg';
 import telegramOIcon from '@/assets/icon_telegram_orange.svg';
 import twitterWIcon from '@/assets/icon_twitter_white.svg';
+import linkWIcon from '@/assets/icon_link_white.svg';
+import fileWIcon from '@/assets/icon_file_white.svg';
 import announcementIcon from '@/assets/icon_announcement.svg';
 import announcementFIcon from '@/assets/icon_announcement_fill.svg';
 import $ from 'jquery';
+import { getContract } from "../../acy-dex-swap/utils/index.js"
+import { useWeb3React } from '@web3-react/core';
+import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
 
 const {
   apple,
@@ -59,10 +64,18 @@ const {
 // ]
 
 const LaunchpadProject = () => {
+  console.log($(document).height());
+  
+  const { account, chainId, library, activate } = useWeb3React();
+
   const { projectId } = useParams();
   const [receivedData, setReceivedData] = useState({});
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
+  const [investorNum,setinvestorNum] = useState(0);
+
+  console.log("--------------RECEIVEDDATA---------------")
+  console.log(receivedData);
 
   const TokenBanner = ({ posterUrl }) => {
     return (
@@ -217,19 +230,31 @@ const LaunchpadProject = () => {
     );
   };
 
+  const logoObj = {
+    "telegram": telegramWIcon,
+    "twitter": twitterWIcon,
+    "website": linkWIcon,
+    "whitepaper": fileWIcon
+  }
+
   const ProjectDescription = () => {
     return (
       <div className="circleBorderCard cardContent">
         <div style={{ display: 'block' }}>
           <div className='projecttitle-socials-container'>
             <h3 className='projecttitle'>Project Description</h3>
-            <div className='social-container'>
-              {/* TODO: pass links to each icon */}
-              <SocialMedia url={ telegramWIcon } link=""/>
-              <SocialMedia url={ announcementFIcon } link=""/>
-              <SocialMedia url={ twitterWIcon } link=""/>
-              <Icon className="antd-icon-container" type="link" />
-              <Icon className="antd-icon-container" type="file" theme="filled" />
+            <div className=''>
+              {receivedData.social && receivedData.social[0] &&
+                <div id='social container' className='social-container'>
+                  { Object.entries(receivedData.social[0]).map((item)=>{
+                    if(item[1] !== null ){
+                      console.log(item)
+                      return (
+                      <SocialMedia url={logoObj[item[0]]} link={item[1]} />)
+                    }
+                  })}
+                </div>}
+              
             </div>
           </div>
           
@@ -351,7 +376,7 @@ const LaunchpadProject = () => {
     const clickCover = async e => {
       console.log('click cover', allocationAmount);
       const oldAllocationAmount = allocationAmount;
-      if (oldAllocationAmount === 0) {
+      if (oldAllocationAmount !== 0) {
           requireAllocation(walletId, projectToken).then(res => {
               if(res && res.allocationAmount) {
                   setAllocationAmount(res.allocationAmount);
@@ -650,6 +675,7 @@ const LaunchpadProject = () => {
       .then(res => {
         if (res) {
           // extract data from string
+          console.log("RECeiveddata",res);
           const contextData = JSON.parse(res.contextData);
 
           const today = new Date();
@@ -683,6 +709,15 @@ const LaunchpadProject = () => {
       });
   }, []);
 
+  // fetching data from Smart Contract
+  useEffect(async () => {
+    const poolContract = getContract("0xBfb1894743F200f0386B06Eb426DDE915Ce22846", POOLABI, library, account);
+
+    const poolNum = await poolContract.GetInvestorNum(111).then((res)=>{
+      console.log("res",res);
+    }).catch(e => console.log('CustomError in transaction',e))
+    ;
+  }, [])
   return (
     <div>
       <div className="mainContainer">

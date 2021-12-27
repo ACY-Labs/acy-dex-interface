@@ -1,4 +1,17 @@
-export const methodList = {
+interface ContractMethod {
+    name: string,
+    id: string
+}
+
+interface ContractAction {
+    name: string,
+    hash: string
+}
+
+
+const methodMap: {
+    [key: string]: ContractMethod
+} = {
     ethToToken :    {
                     name: 'swapExactETHForTokens',
                     id: '0x7ff36ab5'
@@ -84,7 +97,10 @@ export const methodList = {
     }
 
 }
-export const actionList = {
+
+const actionMap: {
+    [key: string]: ContractAction
+} = {
 
     transfer :    {
                     name: 'Transfer',
@@ -94,5 +110,13 @@ export const actionList = {
                     name: 'Sync',
                     hash: '0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1'
                 }
-
 }
+
+const MethodActionSelector = (arg: string) => {
+    return {
+      'method': methodMap,
+      'action': actionMap
+    }[arg];
+  }
+  
+export default MethodActionSelector;

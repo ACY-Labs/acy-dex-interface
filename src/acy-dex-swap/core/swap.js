@@ -1,4 +1,3 @@
-import {scanUrlPrefix} from "@/constants/configs";
 import {
   CurrencyAmount,
   ETHER,
@@ -36,6 +35,8 @@ import {
   withExactOutEstimateInAmount
 } from '../utils';
 import axios from 'axios';
+import ConstantLoader from '@/constants';
+const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
 
 function toFixed4(floatInString) {
   return parseFloat(floatInString).toFixed(4);

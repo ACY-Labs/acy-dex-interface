@@ -31,7 +31,7 @@ export async function fetchTopLP(client, pairId) {
  * Each snapshot is a moment when an LP position was created or updated.
  * @param {*} account
  */
-export async function fetchUserSnapshots(client, account) {
+export async function fetchUserSnapshot(client, account) {
   let skip = 0;
   let allResults = [];
   let found = false;
@@ -175,7 +175,7 @@ export async function fetchPoolsFromAccount(client, account) {
 
   // add some extra info to positions.
   if (data.liquidityPositions) {
-    const snapshots = await fetchUserSnapshots(client, account);
+    const snapshots = await fetchUserSnapshot(client, account);
     const [ethPrice] = await fetchEthPrice(client);
     const formattedPositions = await Promise.all(
       data.liquidityPositions.map(async positionData => {

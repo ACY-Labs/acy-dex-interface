@@ -28,13 +28,14 @@ import { fetchGeneralTokenInfo, marketClient, fetchTokenDaySimple } from '../Mar
 import SwapComponent from '@/components/SwapComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import axios from 'axios';
-import supportedTokens from '@/constants/TokenList';
 import moment from 'moment';
-import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import StakeHistoryTable from './components/StakeHistoryTable';
 import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
+import ConstantLoader from '@/constants';
+const supportedTokens = ConstantLoader().tokenList;
+const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
 
 const { AcyTabPane } = AcyTabs;
 function getTIMESTAMP(time) {
