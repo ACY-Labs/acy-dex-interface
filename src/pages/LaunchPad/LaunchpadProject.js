@@ -23,6 +23,9 @@ import fileWIcon from '@/assets/icon_file_white.svg';
 import announcementIcon from '@/assets/icon_announcement.svg';
 import announcementFIcon from '@/assets/icon_announcement_fill.svg';
 import $ from 'jquery';
+import { getContract } from "../../acy-dex-swap/utils/index.js"
+import { useWeb3React } from '@web3-react/core';
+import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
 
 const {
   apple,
@@ -63,11 +66,13 @@ const {
 const LaunchpadProject = () => {
   console.log($(document).height());
   
+  const { account, chainId, library, activate } = useWeb3React();
 
   const { projectId } = useParams();
   const [receivedData, setReceivedData] = useState({});
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
+  const [investorNum,setinvestorNum] = useState(0);
 
   console.log("--------------RECEIVEDDATA---------------")
   console.log(receivedData);
@@ -703,6 +708,15 @@ const LaunchpadProject = () => {
       });
   }, []);
 
+  // fetching data from Smart Contract
+  useEffect(async () => {
+    const poolContract = getContract("0xBfb1894743F200f0386B06Eb426DDE915Ce22846", POOLABI, library, account);
+
+    const poolNum = await poolContract.GetInvestorNum(111).then((res)=>{
+      console.log("res",res);
+    }).catch(e => console.log('CustomError in transaction',e))
+    ;
+  }, [])
   return (
     <div>
       <div className="mainContainer">
