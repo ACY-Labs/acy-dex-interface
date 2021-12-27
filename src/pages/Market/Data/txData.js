@@ -4,19 +4,9 @@ import { convertTx } from './util';
 import axios from 'axios';
 import {getTransactionsByAccount} from '@/utils/txData'
 import { getLibrary } from '../ConnectWallet';
-
-// SAMPLE TRANSACTION DATA
-// {
-//     coin1: 'USDC',
-//     coin2: 'WBTC',
-//     type: TransactionType.SWAP,
-//     totalValue: 57385063.19,
-//     coin1Amount: 63.52037022,
-//     coin2Amount: 93.65125987,
-//     account: '0x8e4806c17347a9fc6f52b25e73c5e772973b4e3605ddc3cea30742ec8c53d13f',
-//     time: '2021-09-01T04:02:39Z',
-//     transactionID: ''
-// }
+import {getAllSuportedTokensPrice} from "@/acy-dex-swap/utils"
+import ConstantLoader from "@/constants";
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 
 const TRANSACTION_AMOUNT = 250;
 const FILTERED_AMOUNT = 50;
@@ -183,88 +173,52 @@ export async function fetchTopExchangeVolume(library){
    return null;
  }
 }
-
-// get all transactions
-// export async function fetchGlobalTransaction(client) {
-//   const { loading, error, data } = await client.query({
-//     query: GET_GLOBAL_TRANSACTIONS,
-//     variables: {
-//       txAmount: TRANSACTION_AMOUNT,
-//     },
-//   });
-
-//   if (loading) return null;
-//   if (error) return `Error! ${error}`;
-
-//   let globalTransactions = [];
-//   let mints = data.mints
-//   let burns = data.burns
-//   let swaps = data.swaps
-
-
-//   // get all burns
-//   for (let j = 0; j < burns.length; j++) {
-//     globalTransactions.push(
-//       convertTx(burns[j], burns[j].transaction.id, burns[j].transaction.timestamp, TransactionType.REMOVE)
-//     );
-//   }
-
-//   // get all mints
-//   for (let j = 0; j < mints.length; j++) {
-//     globalTransactions.push(
-//       convertTx(mints[j], mints[j].transaction.id, mints[j].transaction.timestamp, TransactionType.ADD)
-//     );
-//   }
-
-//   // get all swaps
-//   for (let j = 0; j < swaps.length; j++) {
-//     globalTransactions.push(
-//       convertTx(swaps[j], swaps[j].transaction.id, swaps[j].transaction.timestamp, TransactionType.SWAP)
-//     );
-//   }
-
-//   return sortTable(globalTransactions, "time", true);
-// }
-
 // get transaction from pool
-export async function fetchFilteredTransaction(client, pairAddresses) {
-  const { loading, error, data } = await client.query({
-    query: FILTERED_TRANSACTIONS,
-    variables: {
-      txAmount: FILTERED_AMOUNT,
-      allPairs: pairAddresses
-    },
-  });
+export async function fetchFilteredTransaction(symbol) {
+  const range = 50;
+  return await axios.get(`${apiUrlPrefix}/txlist/token?symbol=${symbol}&range=${range}`).then(async res => {
+    // SAMPLE TRANSACTION DATA
+// {
+//     coin1: 'USDC',
+//     coin2: 'WBTC',
+//     type: TransactionType.SWAP,
+//     totalValue: 57385063.19,
+//     coin1Amount: 63.52037022,
+//     coin2Amount: 93.65125987,
+//     account: '0x8e4806c17347a9fc6f52b25e73c5e772973b4e3605ddc3cea30742ec8c53d13f',
+//     time: '2021-09-01T04:02:39Z',
+//     transactionID: ''
+// }
+        const data = res.data.data;
+        // FIXME: now using current token price to calculate
+        const priceDict = await getAllSuportedTokensPrice();
 
-  if (loading) return null;
-  if (error) return `Error! ${error}`;
+        const formattedTransactions = data.map(tx => {
+          const {
+            address: account, 
+            hash: transactionID, 
+            token1Number: coin1Amount, 
+            token1Symbol: coin1, 
+            token2Number: coin2Amount, 
+            token2Symbol: coin2, 
+            transactionTime: time, 
+            action: type
+          } = tx;
+          
+          let typeEnum;
+          switch (type) {
+            case "Swap": typeEnum = TransactionType.SWAP; break;
+            case "Add": typeEnum = TransactionType.ADD; break;
+            case "Remove": typeEnum = TransactionType.REMOVE; break;
+            default: typeEnum = TransactionType.ALL; break;
+          }
+          
+          const totalValue = priceDict[coin2] * coin2Amount;
+          return {account, transactionID, coin1Amount, coin1, coin2Amount, coin2, time, type: typeEnum}
+        })
+        
+        return formattedTransactions;
+      })
 
-  let globalTransactions = [];
-  let mints = data.mints
-  let burns = data.burns
-  let swaps = data.swaps
-
-
-  // get all burns
-  for (let j = 0; j < burns.length; j++) {
-    globalTransactions.push(
-      convertTx(burns[j], burns[j].transaction.id, burns[j].transaction.timestamp, TransactionType.REMOVE)
-    );
-  }
-
-  // get all mints
-  for (let j = 0; j < mints.length; j++) {
-    globalTransactions.push(
-      convertTx(mints[j], mints[j].transaction.id, mints[j].transaction.timestamp, TransactionType.ADD)
-    );
-  }
-
-  // get all swaps
-  for (let j = 0; j < swaps.length; j++) {
-    globalTransactions.push(
-      convertTx(swaps[j], swaps[j].transaction.id, swaps[j].transaction.timestamp, TransactionType.SWAP)
-    );
-  }
-
-  return sortTable(globalTransactions, "time", true);
+  
 }

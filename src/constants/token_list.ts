@@ -26,7 +26,7 @@ const BscMainNetTokenList: Array<TokenInfo> = [
     idOnCoingecko: "usd-coin",
   },
   {
-    name: 'Binance',
+    name: 'Binance Coin',
     symbol: 'BNB',
     address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
     decimals: 18,
