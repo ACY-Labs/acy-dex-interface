@@ -59,8 +59,6 @@ const {
 // ]
 
 const LaunchpadProject = () => {
-  console.log($(document).height());
-
   const { projectId } = useParams();
   const [receivedData, setReceivedData] = useState({});
   const [comparesaleDate, setComparesaleDate] = useState(false);
@@ -382,7 +380,7 @@ const LaunchpadProject = () => {
     );
   };
 
-  const Allocation = ({ walletId, projectToken }) => {
+  const Allocation = ({ walletId, projectToken, maxSalesAmount=1000 }) => {
     const [allocationAmount, setAllocationAmount] = useState(0);
 
     useEffect(async () => {
@@ -561,6 +559,7 @@ const LaunchpadProject = () => {
     };
 
     const [isClickedVesting, setIsClickedVesting] = useState(false);
+    const [salesValue, setSalesValue] = useState(0);
 
     return (
       <div
@@ -585,10 +584,10 @@ const LaunchpadProject = () => {
             Sale
           </label>
           <div className="sales-input-container">
-            <input placeholder="" className="sales-input" type="number" />
-            {/* <button className="max-btn">MAX</button> */}
+            <input placeholder="" className="sales-input" type="number" value={salesValue} onChange={e => setSalesValue(e.target.value)}/>
+            <button className="max-btn" onClick={() => setSalesValue(maxSalesAmount)}>MAX</button>
           </div>
-          <input type="submit" className="sales-submit" value="Buy" />
+          <input type="submit" className="sales-submit" value="Buy" onClick={() => console.log("buy")}/>
         </form>
 
         <div className="vesting-container" >
