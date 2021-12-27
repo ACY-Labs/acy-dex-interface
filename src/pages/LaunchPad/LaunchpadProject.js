@@ -559,7 +559,7 @@ const LaunchpadProject = () => {
     };
 
     const [isClickedVesting, setIsClickedVesting] = useState(false);
-    const [salesValue, setSalesValue] = useState(0);
+    const [salesValue, setSalesValue] = useState();
 
     return (
       <div
@@ -584,7 +584,7 @@ const LaunchpadProject = () => {
             Sale
           </label>
           <div className="sales-input-container">
-            <input placeholder="" className="sales-input" type="number" value={salesValue} onChange={e => setSalesValue(e.target.value)}/>
+            <input placeholder="Enter amount" className="sales-input" type="number" value={salesValue} onChange={e => setSalesValue(e.target.value)}/>
             <button className="max-btn" onClick={() => setSalesValue(maxSalesAmount)}>MAX</button>
           </div>
           <input type="submit" className="sales-submit" value="Buy" onClick={() => console.log("buy")}/>
@@ -600,7 +600,7 @@ const LaunchpadProject = () => {
                 isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'
               }
             >
-              <VestingSchedule />
+              <VestingSchedule startDate={"28 Dec 2021 00:00:00 +0800"}/>
             </div>
           </div>
           <div className="arrow-down-container">
