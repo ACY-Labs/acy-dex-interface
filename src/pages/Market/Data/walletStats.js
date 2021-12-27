@@ -1,8 +1,11 @@
 import axios from 'axios';
+import { getAddress } from '@ethersproject/address';
+import ConstantLoader from "@/constants";
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 
 export async function fetchTotalValueSwapped(account){
   try {
-      let request = `https://api.acy.finance/api/users/stats?address=${account}`;
+      let request = `${apiUrlPrefix}/users/stats?address=${account}`;
       let response = await fetch(request);
       let data = await response.json();
       console.log(data.data)
@@ -30,7 +33,7 @@ export async function fetchTotalValueSwapped(account){
 
 export async function fetchTotalFeesPaid(account){
   try {
-      let request = `https://api.acy.finance/api/users/stats?address=${account}`;
+      let request = `${apiUrlPrefix}/users/stats?address=${account}`;
       let response = await fetch(request);
       let data = await response.json();
 
@@ -57,7 +60,7 @@ export async function fetchTotalFeesPaid(account){
 
 export async function fetchTotalTransactions(account){
   try {
-      let request = `https://api.acy.finance/api/users/stats?address=${account}`;
+      let request = `${apiUrlPrefix}/users/stats?address=${account}`;
       let response = await fetch(request);
       let data = await response.json();
 
@@ -84,7 +87,7 @@ export async function fetchTotalTransactions(account){
 export async function fetchLiqudityIncludingFees(account) {
   console.log(account)
   try {
-    let request = `https://api.acy.finance/api/users/stats?address=${account}`;
+    let request = `${apiUrlPrefix}/users/stats?address=${account}`;
     let response = await fetch(request);
     let data = await response.json();
 
