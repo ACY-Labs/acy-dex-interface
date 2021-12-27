@@ -924,6 +924,7 @@ export const MarketSearchBar = props => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchCoinReturns, setSearchCoinReturns] = useState([...props.dataSourceCoin]);
   const [searchPoolReturns, setSearchPoolReturns] = useState([...props.dataSourcePool]);
+  const [account, setAccount] = useState();
   const [displayNumber, setDisplayNumber] = useState(3);
   const [watchlistToken, setWatchlistToken] = useState([]);
   const [watchlistPool, setWatchlistPool] = useState([]);
@@ -1134,11 +1135,11 @@ export const MarketSearchBar = props => {
             Pools
           </Link>
         </div>
-        {/* <div className={styles.marketNavbarButton}>
-          <Link style={{ color: '#b5b5b6', fontWeight: '600' }} to="/market/accounts">
+        {props.account && (<div className={styles.marketNavbarButton}>
+          <Link style={{ color: '#b5b5b6', fontWeight: '600' }} to={"/market/accounts/"+props.account.toString()}>
             Account
           </Link>
-        </div> */}
+        </div>)}
       </div>
       <div className={styles.marketNavbarRight}>
         {/* <div className={styles.marketDropdownWrapper} ref={outsideClickRefNetwork}>

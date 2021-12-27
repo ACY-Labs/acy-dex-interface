@@ -132,6 +132,7 @@ const MarketIndex = props => {
       <MarketSearchBar
         dataSourceCoin={dataSourceCoin}
         dataSourcePool={dataSourcePool}
+        account={account}
         visible={true}
       />
       <div className={styles.chartsMain}>
