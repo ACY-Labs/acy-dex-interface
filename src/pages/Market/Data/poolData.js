@@ -260,11 +260,9 @@ function parseSearchPoolReturns(data, key){
       }
     ], tokensPriceUSD);
     
-    // TODO: Find pair addr
-    // item.token1, item.token2
-    let pairAddr = "";
-
-
+    // Find pair addr
+    let pairAddr = getPairAddress(item.token0, item.token1);
+  
     return {
       coin1 : _token0,
       coin2: _token1,
@@ -301,6 +299,7 @@ export async function fetchSearchPoolReturns(key) {
       logoURL2: tokenList.logoURL2,
       address: tokenList.pairAddr,
     }))
+    console.log(searchPoolReturns)
     return searchPoolReturns;
   }catch (e){
     console.log('service not available yet',e);
