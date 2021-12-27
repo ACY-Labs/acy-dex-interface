@@ -1,16 +1,15 @@
 import moment from 'moment';
 import axios from 'axios';
-// import INITIAL_TOKEN_LIST from '@/constants/uniqueTokens';
-// import INITIAL_TOKEN_LIST from '@/constants/_TokenList';
-import INITIAL_TOKEN_LIST from '@/constants/TokenList';
-import {methodList, actionList} from '@/constants/MethodList';
 import liquidity from '@/pages/Liquidity/models/liquidity';
 import {getContract, supportedTokens} from '@/acy-dex-swap/utils'
 import {totalInUSD} from '@/utils/utils';
 import { BigNumber } from '@ethersproject/bignumber';
-
 import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import { abi as IUniswapV2Router02ABI } from '@/abis/IUniswapV2Router02.json';
+import ConstantLoader from '@/constants';
+const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
+const methodList = ConstantLoader().methodMap;
+const actionList = ConstantLoader().actionMap;
 
 // THIS FUNCTIONS RETURN TOKEN 
 export function findTokenInList(item){ // token has address attribute

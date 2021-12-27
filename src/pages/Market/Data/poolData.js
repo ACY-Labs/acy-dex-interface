@@ -11,13 +11,14 @@ import { getBlockFromTimestamp } from './blocks';
 import { sortTable } from '../Util';
 import axios from 'axios';
 import { parseTransactionData } from '@/utils/txData';
-import supportedTokens from '@/constants/TokenList';
-import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
+import {getAllSuportedTokensPrice, getPairAddress} from '@/acy-dex-swap/utils/index';
 
 import {findTokenWithAddress} from '@/utils/txData';
 
 import {totalInUSD} from '@/utils/utils'
-import { ACY_API } from '@/constants/configs';
+import ConstantLoader from '@/constants';
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+const supportedTokens = ConstantLoader().tokenList;
 
 
 var tokensPriceUSD ;
@@ -104,6 +105,48 @@ function parsePoolInfo(data){
       untrackedVolumeUSD: "0",
       volumeUSD: _volume24h.toString()
     }
+
+export async function fetchPoolDayData(address) {
+  // let newPair = {
+    //           coin1: pairs0[i].token0.symbol,
+    //           coin2: pairs0[i].token1.symbol,
+    //           address: pairs0[i].id,
+    //           percent: 0,
+    //           tvl: parseFloat(pair0DayData[0].reserveUSD),
+    //           volume24h: parseFloat(pair0DayData[0].dailyVolumeUSD),
+    //           volume7d: p0VolumeWeek,
+    //           price: 0,
+    //         };
+  return await axios.get(`${apiUrlPrefix}/poolchart/all`).then(async res => {
+    const data = res.data.data;
+    const tokenPool = data.filter(p => p.token0 == address || p.token1 == address);
+
+    const priceDict = await getAllSuportedTokensPrice();
+    
+    const parsedPairData = [];
+    for (const pool of tokenPool) {
+      const token0 = supportedTokens.find(t => t.address.toLowerCase() == pool.token0.toLowerCase());
+      const token1 = supportedTokens.find(t => t.address.toLowerCase() == pool.token1.toLowerCase())
+      const token0Symbol = token0.symbol;
+      const token1Symbol = token1.symbol
+      const tvl = pool.lastReserves.token0 * 2 * priceDict[token0Symbol];
+      const volume24h = pool.lastVolume.token0 * priceDict[token0Symbol] + pool.lastVolume.token1 * priceDict[token1Symbol];
+      const newPair = {
+              coin1: token0Symbol,
+              coin2: token1Symbol,
+              logoURL1: token0.logoURI,
+              logoURL2: token1.logoURI,
+              address: getPairAddress(pool.token0, pool.token1),
+              percent: 0,
+              tvl,
+              volume24h,
+              // volume7d: p0VolumeWeek,
+              // price: 0,
+            };
+      parsedPairData.push(newPair);
+    }
+    return parsedPairData;
+  })
 
 }
 
@@ -277,7 +320,9 @@ export async function fetchGeneralPoolInfoDay(address) {
     let request = ACY_API+'/poolchart/all';
     let response = await fetch(request);
     let data = await response.json();
-    return parsePoolData(data.data);
+    let parsed = parsePoolData(data.data);
+    console.log(parsed);
+    return parsed;
   }catch (e){
     console.log('service not available yet',e);
     return null;
@@ -326,6 +371,90 @@ export async function fetchPoolsFromId(client, id) {
   return data;
 }
 
-// get individual pool info from token
+function parseSearchPoolReturns(data, key){
 
-// pool history
+  let _data = data.map((item)=>{
+
+    console.log("mapping....",item.token0,item.token1);
+    let _token0 = findTokenWithAddress(item.token0);
+    let _token1 = findTokenWithAddress(item.token1);
+
+    let _logoURL1 = _token0.logoURI;
+    let _logoURL2 = _token1.logoURI;
+
+    _token0 = _token0.symbol;
+    _token1 = _token1.symbol;
+
+
+    let _tvl = totalInUSD ( [
+      {
+        token : _token0,
+        amount : item.lastReserves.token0
+      },
+      {
+        token : _token1,
+        amount : item.lastReserves.token1
+      }
+    ],tokensPriceUSD);
+
+    let _volume24h = totalInUSD ( [
+      {
+        token : _token0,
+        amount : item.lastVolume.token0
+      },
+      {
+        token : _token1,
+        amount : item.lastVolume.token1
+      }
+    ], tokensPriceUSD);
+    
+    // Find pair addr
+    let pairAddr = getPairAddress(item.token0, item.token1);
+  
+    return {
+      coin1 : _token0,
+      coin2: _token1,
+      pairAddr: pairAddr,
+      logoURL1 : _logoURL1,
+      logoURL2 : _logoURL2,
+      tvl : _tvl ,
+      volume24h : _volume24h,
+      volume7d : 0
+    }
+  });
+  let allsums = 0;
+  let allvolumes = 0;
+  _data.forEach(element => {
+    allsums += element.tvl;
+    allvolumes += element.volume24h;
+  });
+
+  return sortTable(_data, key ,true);
+}
+
+// fetch search pool returns
+export async function fetchSearchPoolReturns(key) {
+  tokensPriceUSD = await getAllSuportedTokensPrice();
+  try{
+    let request = 'https://api.acy.finance/api/poolchart/all';
+    let response = await fetch(request);
+    let data = await response.json();
+    let parsed = parseSearchPoolReturns(data.data, key);
+    let searchPoolReturns = parsed.map(tokenList => ({
+      coin1: tokenList.coin1,
+      coin2: tokenList.coin2,
+      logoURL1: tokenList.logoURL1,
+      logoURL2: tokenList.logoURL2,
+      address: tokenList.pairAddr,
+    }))
+    console.log(searchPoolReturns)
+    return searchPoolReturns;
+  }catch (e){
+    console.log('service not available yet',e);
+    return null;
+  }
+}
+
+
+// get individual pool info from token
+}

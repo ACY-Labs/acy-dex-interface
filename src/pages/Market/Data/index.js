@@ -7,6 +7,7 @@ import {
   fetchTokenSearch,
   fetchTokensFromId,
   fetchTokenDaySimple,
+  fetchSearchCoinReturns,
 } from './tokenData';
 import {
   fetchGeneralPoolInfoDay,
@@ -14,6 +15,7 @@ import {
   fetchPoolInfo,
   fetchPoolSearch,
   fetchPoolsFromId,
+  fetchSearchPoolReturns,
 } from './poolData';
 import {
   fetchTopLP,
@@ -24,7 +26,12 @@ import {
 import { getBlocksFromTimestamps } from './blocks';
 import { marketClient } from './client';
 import { fetchEthPrice } from './eth';
-import { fetchTotalFeesPaid, fetchLiqudityIncludingFees, fetchTotalValueSwapped, fetchTotalTransactions} from './walletStats';
+import {
+  fetchTotalFeesPaid,
+  fetchLiqudityIncludingFees,
+  fetchTotalValueSwapped,
+  fetchTotalTransactions
+} from './walletStats';
 
 const DataFetch = {
   marketClient,
@@ -53,6 +60,8 @@ const DataFetch = {
   fetchLiqudityIncludingFees,
   fetchTotalValueSwapped,
   fetchTotalTransactions,
+  fetchSearchCoinReturns,
+  fetchSearchPoolReturns,
 };
 
 export {
@@ -83,4 +92,6 @@ export {
   fetchLiqudityIncludingFees,
   fetchTotalValueSwapped,
   fetchTotalTransactions,
+  fetchSearchCoinReturns,
+  fetchSearchPoolReturns,
 };

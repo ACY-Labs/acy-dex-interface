@@ -1,4 +1,3 @@
-import {scanUrlPrefix} from "@/constants/configs"
 import {
   AcyBarChart,
   AcyIcon,
@@ -26,6 +25,8 @@ import {
   fetchTransactionsForPair,
   marketClient,
 } from './Data/index.js';
+import ConstantLoader from '@/constants';
+const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
 
 const watchlistManagerPool = new WatchlistManager('pool');
 

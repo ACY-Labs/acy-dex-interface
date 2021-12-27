@@ -83,8 +83,11 @@ const { AcyTabPane } = AcyTabs;
 import { Row, Col, Button, Input, Icon } from 'antd';
 import { Alert } from 'antd';
 import spinner from '@/assets/loading.svg';
-import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import moment from 'moment';
+import ConstantLoader from '@/constants';
+const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
+
+
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
   const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1=false } = props;

@@ -24,7 +24,8 @@ import {
 } from '@/components/Acy';
 import TokenSelectorModal from "@/components/TokenSelectorModal";
 
-import INITIAL_TOKEN_LIST from '@/constants/TokenList';
+import ConstantLoader from '@/constants';
+const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
 
 //^mark
 import { connect } from 'umi';

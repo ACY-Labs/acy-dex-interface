@@ -106,7 +106,7 @@ const FarmsTable = ({
       />
       {/* {hideDao ? ( */}
         <div className={styles.tableBodyContainer}>
-          {tableRow.slice(0, rowNumber).map((content, index) => {
+          {tableRow.map((content, index) => {
             return (
               <FarmsTableRow
                 key={index}

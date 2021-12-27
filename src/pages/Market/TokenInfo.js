@@ -7,7 +7,7 @@ import {
   AcyTokenIcon,
 } from '@/components/Acy';
 import { Breadcrumb, Icon, Spin } from 'antd';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import {
   fetchTokenDayData,
@@ -20,36 +20,37 @@ import {
   dataSourceCoin,
   dataSourcePool,
   dataSourceTransaction,
-  graphSampleData,
+  // graphSampleData,
 } from './SampleData.js';
 import styles from './styles.less';
 import { abbrNumber, openInNewTab, sortTable, calcPercentChange, FEE_PERCENT } from './Util.js';
+import { TranslateToUSD } from "@/utils/utils";
 import { convertPoolForList } from './Data/util.js';
-import { MarketSearchBar, PoolTable, TransactionTable } from './UtilComponent.js';
+import { MarketSearchBar, PoolTable } from './UtilComponent.js';
+// import { MarketSearchBar, PoolTable, TransactionTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
 import ConnectWallet from './ConnectWallet';
-import {scanUrlPrefix} from '@/constants/configs';
+import ConstantLoader from '@/constants';
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
+const tokenList = ConstantLoader().tokenList;
 
 const watchlistManagerToken = new WatchlistManager('token');
 
 function MarketTokenInfo(props) {
   let { address } = useParams();
+  const symbol = useMemo(() => tokenList.find(t => t.address.toLowerCase() == address.toLowerCase()).symbol, [address])
 
+  const [graphSampleData, setGraphSampleData] = useState(0);
   const [tokenData, setTokenData] = useState({});
   const [graphTabIndex, setGraphTabIndex] = useState(0);
   const [isWatchlist, setIsWatchlist] = useState(false);
-  const [selectChartDataVol, setSelectChartDataVol] = useState(
-    graphSampleData[graphSampleData.length - 1][1]
-  );
-  const [selectChartIndexVol, setSelectChartIndexVol] = useState(graphSampleData.length - 1);
-  const [selectChartDataTvl, setSelectChartDataTvl] = useState(
-    graphSampleData[graphSampleData.length - 1][1]
-  );
-  const [selectChartIndexTvl, setSelectChartIndexTvl] = useState(graphSampleData.length - 1);
-  const [selectChartDataPrice, setSelectChartDataPrice] = useState(
-    graphSampleData[graphSampleData.length - 1][1]
-  );
-  const [selectChartIndexPrice, setSelectChartIndexPrice] = useState(graphSampleData.length - 1);
+  const [selectChartDataVol, setSelectChartDataVol] = useState("");
+  const [selectChartIndexVol, setSelectChartIndexVol] = useState(0);
+  const [selectChartDataTvl, setSelectChartDataTvl] = useState("");
+  const [selectChartIndexTvl, setSelectChartIndexTvl] = useState(0);
+  const [selectChartDataPrice, setSelectChartDataPrice] = useState("");
+  const [selectChartIndexPrice, setSelectChartIndexPrice] = useState(0);
 
   // additional datas
   const [volume24h, setVolume24h] = useState(0);
@@ -93,16 +94,14 @@ function MarketTokenInfo(props) {
   useEffect(() => {
     let todayTimestamp = Math.floor(Date.now() / 1000);
     let volumeChange = [0, 0, 0, 0];
-    let txChange = [0,0,0]
+    let txChange = [0, 0, 0]
     let tokenAddress = address
 
 
-    
-
     // request the token info
-    fetchTokenDayData(marketClient, address).then(([data, pairs0, pairs1]) => {
-      let newData = [...data].reverse();
-      data = newData;
+    fetchTokenDayData(address).then((data) => {
+      // let newData = data.reverse();
+      // data = newData;
 
       let length = data.length;
 
@@ -144,130 +143,73 @@ function MarketTokenInfo(props) {
       setSelectChartDataPrice(abbrNumber(priceGraphData[length - 1][1]));
 
       setTvl(parseFloat(tvlGraphData[length - 1][1]));
-      setTvlChange(calcPercentChange(tvlGraphData[length - 1][1],tvlGraphData[length - 2][1]))
+      setTvlChange(calcPercentChange(tvlGraphData[length - 1][1], tvlGraphData[length - 2][1]))
 
-      // process and set pool data
-      let pairLen0 = pairs0.length;
-      let pairLen1 = pairs1.length;
-      let pairAddresses = [...pairs0.map(item => item.id), ...pairs1.map(item => item.id)];
-      let pairData = [];
-      let pairPromises = [];
-      for (let i = 0; i < pairLen0; i++) {
-        pairPromises.push(
-          fetchPoolDayData(marketClient, pairs0[i].id, 7).then(pair0DayData => {
-            if (pair0DayData.length > 0) {
-              // calculate volume 7d
-              let dayDataLen0 = pair0DayData.length;
-              let p0VolumeWeek = 0;
-              for (let j = 0; j < dayDataLen0; j++) {
-                p0VolumeWeek += parseFloat(pair0DayData[j].dailyVolumeUSD);
-              }
 
-              // push to list
-              let newPair = {
-                coin1: pairs0[i].token0.symbol,
-                coin2: pairs0[i].token1.symbol,
-                address: pairs0[i].id,
-                percent: 0,
-                tvl: parseFloat(pair0DayData[0].reserveUSD),
-                volume24h: parseFloat(pair0DayData[0].dailyVolumeUSD),
-                volume7d: p0VolumeWeek,
-                price: 0,
-              };
-              pairData.push(newPair);
-            }
-          })
-        );
-      }
+      // fetchFilteredTransaction(marketClient, pairAddresses).then(transactions => {
+      //   console.log('TOIKEN TRANSAC', transactions);
+      //   setTx(transactions);
+      // });
 
-      for (let i = 0; i < pairLen1; i++) {
-        pairPromises.push(
-          fetchPoolDayData(marketClient, pairs1[i].id, 7).then(pair1DayData => {
-            if (pair1DayData.length > 0) {
-              // calculate volume 7d
-              let dayDataLen1 = pair1DayData.length;
-              let p1VolumeWeek = 0;
-              for (let j = 0; j < dayDataLen1; j++) {
-                p1VolumeWeek += parseFloat(pair1DayData[j].dailyVolumeUSD);
-              }
+      // transactions format
+      //
+      // account: "0x1111111254fb6c44bac0bed2854e76f90643097d"
+      // coin1: "UNI"
+      // coin1Amount: 25
+      // coin2: "WETH"
+      // coin2Amount: 0.1087164206682329
+      // time: "2021-12-25T02:11:37.000Z"
+      // totalValue: 440.34388977032756
+      // transactionID: "0x76b933eb95fd4d32752cae0b4f58c7c120d2d095a18eb39e673eae1430e6ec13"
+      // type: "Swap"
 
-              // push to list
-              let newPair = {
-                coin1: pairs1[i].token0.symbol,
-                coin2: pairs1[i].token1.symbol,
-                address: pairs1[i].id,
-                percent: 0,
-                tvl: parseFloat(pair1DayData[0].reserveUSD),
-                volume24h: parseFloat(pair1DayData[0].dailyVolumeUSD),
-                volume7d: p1VolumeWeek,
-                price: 0,
-              };
-
-              pairData.push(newPair);
-            }
-          })
-        );
-      }
-
-      // wait untill all pool requests are finished then update UI
-      Promise.all(pairPromises).then(() => {
-        pairData = sortTable(pairData, 'tvl', true);
-        setPoolData(pairData);
-      });
-
-      fetchFilteredTransaction(marketClient, pairAddresses).then(transactions => {
-        console.log('TOIKEN TRANSAC', transactions);
-        setTx(transactions);
-      });
+      // axios.get(`${apiUrlPrefix}/txlist/token?symbol=${symbol}&range=${range}`).then(res => {
+      //   const data = res.data.data;
+      //   const formattedTransactions = data.map(tx => {
+      //     const {address: account, hash: transactionID, token1Number: coin1Amount, token1Symbol: coin1, token2Number: coin2Amount, token2Symbol: coin2, transactionTime: time, action: type} = tx
+      //     const totalValue = TranslateToUSD(symbol, coin2Amount);
+      //     return {account, transactionID, coin1Amount, coin1, coin2Amount, coin2, time, type}
+      //   })
+      //   setTx(formattedTransactions);
+      // })
 
       // set token data last
+
+      const token = tokenList.find(t => t.address == address);
+      console.log("address", address, token)
       setTokenData({
-        name: data[length - 1].token.name,
-        short: data[length - 1].token.symbol,
+        name: token.name,
+        short: token.symbol,
         address: address,
+        logoURI: token.logoURI,
         price: parseFloat(data[length - 1].priceUSD),
         priceChange: priceChange,
         volume24h: parseFloat(data[length - 1].dailyVolumeUSD),
         tvl: parseFloat(data[length - 1].totalLiquidityUSD),
       });
-    });
 
-    // get volume and tvl
-    let snapshotsPromise = [];
-    snapshotsPromise.push(
-      fetchTokenInfo(marketClient, tokenAddress, todayTimestamp).then(tokenInfoPresent => {
-        volumeChange[0] = parseFloat(tokenInfoPresent.tradeVolumeUSD);
-        txChange[0] = parseInt(tokenInfoPresent.txCount)
-      })
-    );
-    snapshotsPromise.push(
-      fetchTokenInfo(marketClient, tokenAddress, todayTimestamp - 86400).then(tokenInfo24h => {
-        volumeChange[1] = parseFloat(tokenInfo24h.tradeVolumeUSD);
-        txChange[1] = parseInt(tokenInfo24h.txCount)
-      })
-    );
-    snapshotsPromise.push(
-      fetchTokenInfo(marketClient, tokenAddress, todayTimestamp - (86400 * 2)).then(tokenInfo48h => {
-        volumeChange[2] = parseFloat(tokenInfo48h.tradeVolumeUSD);
-        txChange[2] = parseInt(tokenInfo48h.txCount)
-      })
-    );
-    snapshotsPromise.push(
-      fetchTokenInfo(marketClient, tokenAddress, todayTimestamp - (86400 * 7)).then(tokenInfo7d => {
-        volumeChange[3] = parseFloat(tokenInfo7d.tradeVolumeUSD);
-      })
-    );
-
-    Promise.all(snapshotsPromise).then(() => {
-      setVolume24h(volumeChange[0] - volumeChange[1]);
+      setVolume24h(volumeGraphData[volumeGraphData.length - 1][1] - volumeGraphData[volumeGraphData.length - 2][1]);
       setVol24Change(
-        calcPercentChange(volumeChange[0] - volumeChange[1], volumeChange[1] - volumeChange[2])
+        calcPercentChange(volumeGraphData[volumeGraphData.length - 1][1] - volumeGraphData[volumeGraphData.length - 2][1], volumeGraphData[volumeGraphData.length - 2][1] - volumeGraphData[volumeGraphData.length - 3][1])
       );
-
-      // setVolume7d(volumeChange[0] - volumeChange[3]);
-
-      setTxCount(txChange[0] - txChange[1])
     });
+
+    fetchPoolDayData(address).then(parsedPairData => {
+      // // process and set pool data
+      parsedPairData = sortTable(parsedPairData, 'tvl', true);
+      console.log("parsedPairData", parsedPairData)
+      setPoolData(parsedPairData)
+    })
+
+    fetchFilteredTransaction(symbol).then(transactions => {
+      transactions = sortTable(transactions, "time", true);
+      console.log("print transactions", transactions)
+      setTx(transactions);
+    });
+
+    //   // this is not yet added to backend
+    //   // setTxCount(txChange[0] - txChange[1])
+    // });
 
     // set the watchlists
     updateWatchlistStatus();
@@ -280,7 +222,7 @@ function MarketTokenInfo(props) {
 
   return (
     <div className={styles.marketRoot}>
-      <ConnectWallet/>
+      <ConnectWallet />
       <MarketSearchBar
         dataSourceCoin={dataSourceCoin}
         dataSourcePool={dataSourcePool}
@@ -348,11 +290,11 @@ function MarketTokenInfo(props) {
           >
             <div className={styles.contentInfo}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <AcyTokenIcon symbol={tokenData.short} width={36} />
+                <AcyTokenIcon symbol={tokenData.logoURI} width={36} />
                 <span style={{ fontSize: '26px', fontWeight: 'bold', marginLeft: '10px', color: "white" }}>
                   {tokenData.short}
                 </span>
-                <div style={{width:5}}></div>
+                <div style={{ width: 5 }}></div>
                 <span style={{ fontSize: '26px', fontWeight: 'thin', marginLeft: '10px' }}>
                   ({tokenData.name})
                 </span>
@@ -406,7 +348,7 @@ function MarketTokenInfo(props) {
                   className={styles.statEntryChange}
                   style={{ color: tvlChange >= 0 ? 'greenyellow' : 'red' }}
                 >
-                  {`${vol24Change.toFixed(2)} %`}
+                  {`${tvlChange.toFixed(2)} %`}
                 </div>
               </div>
               <div className={styles.statEntry}>
@@ -467,39 +409,6 @@ function MarketTokenInfo(props) {
                     onhandPeriodTimeChoose={selectGraph}
                     times={['Volume', 'TVL', 'Price']}
                   />
-                  {/* <AcySmallButton
-                color={graphTabIndex == 0 ? '#1b1b1c' : '#757579'}
-                textColor="white"
-                borderColor="#757579"
-                borderRadius="15px 0 0 15px"
-                padding="2px 5px"
-                onClick={() => switchChart(0)}
-                id="0"
-              >
-                Volume
-              </AcySmallButton>
-              <AcySmallButton
-                color={graphTabIndex == 1 ? '#1b1b1c' : '#757579'}
-                textColor="white"
-                borderColor="#757579"
-                borderRadius="0 0 0 0"
-                padding="2px 5px"
-                onClick={() => switchChart(1)}
-                id="1"
-              >
-                TVL
-              </AcySmallButton>
-              <AcySmallButton
-                color={graphTabIndex == 2 ? '#1b1b1c' : '#757579'}
-                textColor="white"
-                borderColor="#757579"
-                borderRadius="0 15px 15px 0"
-                padding="2px 5px"
-                onClick={() => switchChart(2)}
-                id="2"
-              >
-                Price
-              </AcySmallButton> */}
                 </div>
               </div>
               <div className={styles.contentChartsBody}>
@@ -554,11 +463,11 @@ function MarketTokenInfo(props) {
           {poolData.length > 0 ? <PoolTable dataSourcePool={poolData} /> : <Icon type="loading" />}
 
           <h2>Transactions</h2>
-          {tx.length > 0 ? (
+          {/* {tx.length > 0 ? (
             <TransactionTable dataSourceTransaction={tx} />
           ) : (
             <Icon type="loading" />
-          )}
+          )} */}
         </>
       )}
 

@@ -28,6 +28,7 @@ const Pool = props => {
 
   // project variables
   useEffect(() => {
+
     getProjects()
       .then(res => {
         if (res) {

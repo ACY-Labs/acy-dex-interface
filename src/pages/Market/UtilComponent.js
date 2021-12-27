@@ -1,4 +1,3 @@
-import {scanUrlPrefix} from "@/constants/configs"
 import { AcyIcon, AcyTabs, AcyTokenIcon } from '@/components/Acy';
 import className from 'classnames';
 import { Divider, Icon, Input, Table } from 'antd';
@@ -24,7 +23,12 @@ import {
   fetchPoolSearch,
   fetchTokensFromId,
   fetchPoolsFromId,
+  fetchSearchCoinReturns,
+  fetchSearchPoolReturns,
 } from './Data';
+import ConstantLoader from '@/constants';
+const tokenList = ConstantLoader().tokenList;
+const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
 
 const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');
@@ -102,7 +106,7 @@ export class SmallTable extends React.Component {
     if (this.state.mode == 'token') {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyTokenIcon logoURL={entry.logoURL} width={20} />
+          <AcyTokenIcon symbol={entry.logoURL} width={20} />
           <Link
             style={{ color: 'white' }}
             className={styles.coinName}
@@ -112,21 +116,22 @@ export class SmallTable extends React.Component {
           </Link>
           <div style={{width:5}}></div>
           <span className={styles.coinShort}> ({entry.name})</span>
-          <AcyIcon
+          {/* Watchlist star */}
+          {/* <AcyIcon
             name={watchlistManagerToken.getData().includes(entry.address) ? 'star_active' : 'star'}
             width={14}
             style={{ marginLeft: '0.5rem' }}
             onClick={() => {
               this.toggleWatchlist('token', entry.address, entry.short);
             }}
-          />
+          /> */}
         </div>
       );
     } else {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyTokenIcon symbol={entry.coin1} width={20} />
-          <AcyTokenIcon symbol={entry.coin2} width={20} />
+          <AcyTokenIcon symbol={entry.logoURL1} width={20} />
+          <AcyTokenIcon symbol={entry.logoURL2} width={20} />
           <Link
             style={{ color: 'white' }}
             to={`/market/info/pool/${entry.address}`}
@@ -141,7 +146,8 @@ export class SmallTable extends React.Component {
           >
             {entry.percent} %
           </div> */}
-          <AcyIcon
+          {/* Watchlist star */}
+          {/* <AcyIcon
             name={
               watchlistManagerPool
                 .getData()
@@ -155,7 +161,7 @@ export class SmallTable extends React.Component {
             onClick={() => {
               this.toggleWatchlist('pool', entry.address);
             }}
-          />
+          /> */}
         </div>
       );
     }
@@ -449,7 +455,6 @@ export function PoolTable(props) {
   const [, update] = useState(0);
 
   const navHistory = useHistory();
-
   useEffect(
     () => {
       update(1);
@@ -922,14 +927,21 @@ export const MarketSearchBar = props => {
   const [visibleNetwork, setVisibleNetwork] = useState(false);
   const [activeNetwork, setActiveNetwork] = useState('Ethereum');
   const [searchQuery, setSearchQuery] = useState('');
+<<<<<<< HEAD
   const [searchCoinReturns, setSearchCoinReturns] = useState([...props.dataSourceCoin]);
   const [searchPoolReturns, setSearchPoolReturns] = useState([...props.dataSourcePool]);
   const [account, setAccount] = useState();
+=======
+  const [searchCoinReturns, setSearchCoinReturns] = useState([]);
+  const [searchPoolReturns, setSearchPoolReturns] = useState([]);
+>>>>>>> f9d38c32acfe1ca45d94e0537411097ed1eda576
   const [displayNumber, setDisplayNumber] = useState(3);
   const [watchlistToken, setWatchlistToken] = useState([]);
   const [watchlistPool, setWatchlistPool] = useState([]);
   const [, update] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // fetch searchcoinresults
 
   const networkOptions = [
     {
@@ -987,27 +999,27 @@ export const MarketSearchBar = props => {
   });
 
   const onInput = useCallback(e => {
-    setIsLoading(false);
-    setSearchQuery(e.target.value);
+    // setIsLoading(false);
+    // setSearchQuery(e.target.value);
 
-    lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
-      console.log('token info:',data);
-      setSearchCoinReturns(
-        data.map(item => {
-          return { address: item.id, name: item.name, short: item.symbol };
-        })
-      );
-      lastPromiseWrapper(
-        fetchPoolSearch(marketClient, e.target.value, data.map(item => item.id))
-      ).then(pooldata => {
-        setSearchPoolReturns(
-          pooldata.map(item => {
-            return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
-          })
-        );
-        setIsLoading(false);
-      });
-    });
+    // lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
+    //   console.log('token info:',data);
+    //   setSearchCoinReturns(
+    //     data.map(item => {
+    //       return { address: item.id, name: item.name, short: item.symbol };
+    //     })
+    //   );
+    //   lastPromiseWrapper(
+    //     fetchPoolSearch(marketClient, e.target.value, data.map(item => item.id))
+    //   ).then(pooldata => {
+    //     setSearchPoolReturns(
+    //       pooldata.map(item => {
+    //         return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
+    //       })
+    //     );
+    //     setIsLoading(false);
+    //   });
+    // });
 
     // let query = e.target.value.toLowerCase();
 
@@ -1077,40 +1089,55 @@ export const MarketSearchBar = props => {
 
     setIsLoading(true);
 
+    const isLoadingSearchCoin = true;
+    const isLoadingSearchPool = true;
 
-    // get data corresponding to the watchlist
-    fetchTokensFromId(marketClient, watchlistManagerToken.getData()).then(data => {
-      setWatchlistToken(
-        data.tokens.map(item => ({ address: item.id, name: item.name, short: item.symbol }))
-      );
-    });
+    // fetch search coin returns
+    // possible keys = ["volume24h", "tvl"]
+    const key = 'volume24h'
+    fetchSearchCoinReturns(key).then(data => {
+      console.log(data);
+      if (data) {
+        setSearchCoinReturns(
+          data.map(item => {
+            return { logoURL: item.logoURL, address: item.address, name: item.name, short: item.short };
+          })
+        )
+      }
+    }).catch(error => {
+      console.log("Error in fetch search coin returns:", error);
+    })
 
-    fetchPoolsFromId(marketClient, watchlistManagerPool.getData()).then(data => {
-      setWatchlistPool(
-        data.pairs.map(item => ({ address: item.id, coin1: item.token0.symbol, coin2: item.token1.symbol, percent: 0 }))
-      );
-     })
+    // fetch search pool returns
+    fetchSearchPoolReturns(key).then(data => {
+      if (data) {
+        setSearchPoolReturns(
+          data.map(item => {
+            return { coin1: item.coin1, coin2: item.coin2, logoURL1: item.logoURL1, logoURL2: item.logoURL2, address: item.address };
+          })
+        )
+      }
+      setIsLoading(false);
+    }).catch(error => {
+      console.log("Error in fetch search pool returns:", error);
+    })
 
-    lastPromiseWrapper(fetchTokenSearch(marketClient, '')).then(data => {
-      setSearchCoinReturns(
-        data.map(item => {
-          return { address: item.id, name: item.name, short: item.symbol };
-        })
-      );
+    // lastPromiseWrapper(fetchSearchCoinReturns()).then(data => {
 
-      lastPromiseWrapper(fetchPoolSearch(marketClient, '', data.map(item => item.id))).then(
-        pooldata => {
-          setSearchPoolReturns(
-            pooldata.map(item => {
-              return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
-            })
-          );
-          setIsLoading(false);
-        }
-      );
-    });
 
-    refreshWatchlist();
+    //   lastPromiseWrapper(fetchPoolSearch(marketClient, '', data.map(item => item.id))).then(
+    //     pooldata => {
+    //       setSearchPoolReturns(
+    //         pooldata.map(item => {
+    //           return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
+    //         })
+    //       );
+    //       setIsLoading(false);
+    //     }
+    //   );
+    // });
+
+    // refreshWatchlist();
 
     return function cleanup() {
       contentRoot.removeEventListener('scroll', onScroll);
@@ -1250,7 +1277,7 @@ export const MarketSearchBar = props => {
                           </>
                         )}
                       </AcyTabPane>
-                      <AcyTabPane tab="Watchlist" key="2">
+                      {/* <AcyTabPane tab="Watchlist" key="2">
                         {watchlistToken.length > 0 ? (
                           <SmallTable
                             mode="token"
@@ -1278,7 +1305,7 @@ export const MarketSearchBar = props => {
                             Add items by clicking on the star
                           </span>
                         )}
-                      </AcyTabPane>
+                      </AcyTabPane> */}
                     </AcyTabs>
                   </div>
                 )}
