@@ -438,7 +438,7 @@ function MarketPoolInfo(props) {
                     <div className={styles.contentChartsIndicator}>
                       <div className={styles.chartIndicatorValue}>$ {selectChartDataVol}</div>
                       <div className={styles.chartIndicatorTime}>
-                        {dayDatas && dayDatas.volumeDayData[selectChartIndexVol][0]}
+                        {dayDatas.length && (dayDatas.volumeDayData[dayDatas.length-1][0])}
                       </div>
                     </div>
                   )}
@@ -446,7 +446,7 @@ function MarketPoolInfo(props) {
                     <div className={styles.contentChartsIndicator}>
                       <div className={styles.chartIndicatorValue}>$ {selectChartDataTvl}</div>
                       <div className={styles.chartIndicatorTime}>
-                        {dayDatas && dayDatas.tvlDayData[selectChartIndexTvl][0]}
+                        {dayDatas.length && (dayDatas.tvlDayData[dayDatas.length-1][0])}
                       </div>
                     </div>
                   )}
