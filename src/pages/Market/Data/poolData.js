@@ -228,11 +228,17 @@ function parseSearchPoolReturns(data, key){
         token : _token1,
         amount : item.lastVolume.token1
       }
-    ],tokensPriceUSD);
+    ], tokensPriceUSD);
+    
+    // TODO: Find pair addr
+    // item.token1, item.token2
+    let pairAddr = "";
+
 
     return {
       coin1 : _token0,
-      coin2 : _token1,
+      coin2: _token1,
+      pairAddr: pairAddr,
       logoURL1 : _logoURL1,
       logoURL2 : _logoURL2,
       tvl : _tvl ,
@@ -252,7 +258,6 @@ function parseSearchPoolReturns(data, key){
 
 // fetch search pool returns
 export async function fetchSearchPoolReturns(key) {
-  // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
     let request = 'https://api.acy.finance/api/poolchart/all';
@@ -264,6 +269,7 @@ export async function fetchSearchPoolReturns(key) {
       coin2: tokenList.coin2,
       logoURL1: tokenList.logoURL1,
       logoURL2: tokenList.logoURL2,
+      address: tokenList.pairAddr,
     }))
     return searchPoolReturns;
   }catch (e){
