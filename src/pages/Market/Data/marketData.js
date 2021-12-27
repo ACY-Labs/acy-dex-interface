@@ -5,6 +5,7 @@ import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 
 import {findTokenWithAddress} from '@/utils/txData';
 import {totalInUSD} from '@/utils/utils'
+import { ACY_API, DAYS_TRACKED_CHART } from '@/constants/configs';
 
 
 
@@ -51,7 +52,7 @@ function parseMarketData (data){
     let volArr = []
     var d = new Date();
     d.setDate(d.getDate()-19);
-    for (let i=0;i<20;i++){
+    for (let i=0;i<DAYS_TRACKED_CHART;i++){
         tvlArr.push([d.toISOString().substring(0, 10),0]);
         volArr.push([d.toISOString().substring(0, 10),0]);
         d.setDate(d.getDate()+1);
@@ -102,7 +103,7 @@ export async  function fetchMarketData () {
     // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
-    let request = 'https://api.acy.finance/api/poolchart/historical';
+    let request = ACY_API+'poolchart/historical/all';
     // let request = 'http://localhost:3001/api/poolchart/historical';
     let response = await fetch(request);
     let data = await response.json();

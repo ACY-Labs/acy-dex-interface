@@ -613,9 +613,9 @@ export function PoolTable(props) {
       pagination={false}
       onRowMouseEnter={() => setIsHover(true)}
       onRowMouseLeave={() => setIsHover(false)}
-      // onRowClick={(record, index, event) => {
-      //   navHistory.push(`/market/info/pool/${record.address}`);
-      // }}
+      onRowClick={(record, index, event) => {
+        navHistory.push(`/market/info/pool/${record.pairAddr}`);
+      }}
       style={{
         marginBottom: '20px',
         cursor: isHover ? 'pointer' : 'default',
@@ -1184,7 +1184,7 @@ export const MarketSearchBar = props => {
                 width: '100%',
               }}
             >
-              {/* <div className={styles.searchWrapper}>
+              <div className={styles.searchWrapper}>
                 <div className={styles.searchInnerWrapper}>
                   <Input
                     placeholder="Search"
@@ -1199,9 +1199,9 @@ export const MarketSearchBar = props => {
                     value={'' || searchQuery}
                   />
                 </div>
-              </div> */}
+              </div>
               {/* Search modal */}
-              {/* <div style={{ width: '100%', position: 'relative', zIndex: 10 }}>
+              <div style={{ width: '100%', position: 'relative', zIndex: 10 }}>
                 {visibleSearchBar && (
                   <div
                     className={styles.searchModal}
@@ -1281,7 +1281,7 @@ export const MarketSearchBar = props => {
                     </AcyTabs>
                   </div>
                 )}
-              </div> */}
+              </div>
             </div>
           </div>
         </div>
