@@ -462,6 +462,26 @@
   padding: 2px 0;
 }
 
+.vesting-percentage-claim-container{
+  display: flex;
+  justify-content: space-between;
+}
+
+.vesting-percentage-claim-container .claim-btn{
+  background-color: #eb5c20;
+  border: unset;
+  font-size: 12px;
+  border-radius: 8px;
+}
+
+.claim-btn-inactive{
+  cursor: not-allowed;
+}
+
+.claim-btn-active{
+  cursor: pointer;
+}
+
 .vesting-tick-icon{
   width: 18px;
 }
