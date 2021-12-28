@@ -114,7 +114,7 @@ export async function getEstimated(
   }
 
   // get pair using our own provider
-  let pair = await Fetcher.fetchPairData(token0, token1, library)
+  let pair = await Fetcher.fetchPairData(token0, token1, library, chainId)
     .then(pair => {
       console.log(pair.reserve0.raw.toString());
       console.log(pair.reserve1.raw.toString());
@@ -397,7 +397,7 @@ export async function signOrApprove(
     console.log('------------------ CONSTRUCT PAIR ------------------');
     console.log('FETCH');
     // if an error occurs, because pair doesn't exists
-    const pair = await Fetcher.fetchPairData(token0, token1, library).catch(e => {
+    const pair = await Fetcher.fetchPairData(token0, token1, library, chainId).catch(e => {
       console.log(e);
       return new CustomError(`${token0.symbol} - ${token1.symbol} pool does not exist.`);
     });
@@ -635,7 +635,7 @@ export async function removeLiquidity(
     console.log('------------------ CONSTRUCT PAIR ------------------');
     console.log('FETCH');
     // if an error occurs, because pair doesn't exists
-    const pair = await Fetcher.fetchPairData(token0, token1, library).catch(e => {
+    const pair = await Fetcher.fetchPairData(token0, token1, library, chainId).catch(e => {
       console.log(e);
       return new CustomError(`${token0.symbol} - ${token1.symbol} pool does not exist.`);
     });

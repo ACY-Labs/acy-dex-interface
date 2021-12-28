@@ -328,7 +328,7 @@ export async function swapGetEstimated(
     let estimatedInputAmount  = null;
 
     // get pair using our own provider
-    const pair = await Fetcher.fetchPairData(token0, token1, library).catch(e => {
+    const pair = await Fetcher.fetchPairData(token0, token1, library, chainId).catch(e => {
       return new CustomError(
         `Swap`
       );
@@ -533,7 +533,8 @@ export async function swapGetEstimated(
           trade = new Trade(
             route,
             inputAmount,
-            exactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
+            exactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT,
+            chainId
           );
         } catch (e) {
           if (e instanceof InsufficientReservesError) {

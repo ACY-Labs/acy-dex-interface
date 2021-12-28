@@ -224,7 +224,7 @@ const getPool = async (library, account, poolId)=> {
     const token1Decimal = await token1Contract.decimals()
     const token_1 = new Token(null, token1Address,token1Decimal, token1Symbol);
 
-    const pair = await Fetcher.fetchPairData(token_0, token_1, library);
+    const pair = await Fetcher.fetchPairData(token_0, token_1, library, 56);
     const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
 
     const token0Deposited = pair.getLiquidityValue(
@@ -347,7 +347,7 @@ const getPool = async (library, account, poolId)=> {
 const getSupportedTokenSymbol = (address) => {
   return supportedTokens.find(token => token.address.toLowerCase() == address.toLowerCase()).symbol;
 }
-const newGetPoolByFarm = async (farm, tokenPrice, library, account) => {
+const newGetPoolByFarm = async (farm, tokenPrice, library, account, chainId) => {
   const poolId = farm.poolId;
   const poolPositons = farm.positions;
   const rewardTokens = farm.rewardTokens;
@@ -410,7 +410,7 @@ const newGetPoolByFarm = async (farm, tokenPrice, library, account) => {
   let token1Ratio = 1, token2Ratio = 1;
   if(tokens.length > 1) {
     
-    const pair = await Fetcher.fetchPairData(token0, token1, library);
+    const pair = await Fetcher.fetchPairData(token0, token1, library, chainId);
 
     const pair_contract = getPairContract(pair.liquidityToken.address, library, account)
     const totalSupply = await pair_contract.totalSupply();
@@ -543,7 +543,7 @@ const getExpiredTime = (timestamp, lockDuration) => {
   return [dueDate, `${days}d:${hrs}h:${min}m`, diff>0 ];
 }
 
-const newGetAllPools = async (library, account) => {
+const newGetAllPools = async (library, account, chainId) => {
   const tokenPrice = await getAllSuportedTokensPrice();
   const allFarm = await axios.get(
     `${API_URL}/farm/getAllPools`
@@ -551,7 +551,7 @@ const newGetAllPools = async (library, account) => {
   if(allFarm.length) {
     const allPoolsPromise = [];
     for(var i=0 ; i< allFarm.length ; i++) {
-      allPoolsPromise.push(newGetPoolByFarm(allFarm[i], tokenPrice, library, account));
+      allPoolsPromise.push(newGetPoolByFarm(allFarm[i], tokenPrice, library, account, chainId));
     }
     const result = await Promise.all(allPoolsPromise);
     return result.sort((a,b) => a.tvl > b.tvl && -1 || 1);
@@ -588,14 +588,14 @@ const calculateVolAndApr = async (token0, token1, tokenPrices) => {
   })
 }
 
-const newGetPool = async (poolId, library, account) => {
+const newGetPool = async (poolId, library, account, chainId) => {
   const tokenPrice = await getAllSuportedTokensPrice();
   //bug, only get on pool not working, may fix this later
   const farm = await axios.get(
     `${API_URL}/farm/getPool?poolId=${poolId}`
   ).then(res => res.data).catch(e => console.log("error: ", e));
   if(farm) {
-    return await newGetPoolByFarm(farm, tokenPrice, library, account);
+    return await newGetPoolByFarm(farm, tokenPrice, library, account, chainId);
   }
   return null;
 }

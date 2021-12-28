@@ -106,9 +106,9 @@ const Farms = (props) => {
 
   }
 
-  const getPools = async (library, account) => {
+  const getPools = async (library, account, chainId) => {
     setIsLoadingPool(true);
-    const pools = await newGetAllPools(library, account);
+    const pools = await newGetAllPools(library, account, chainId);
     console.log("TEST getAllPools",pools);
     console.log("end get pools");
     const block = await library.getBlockNumber();
@@ -188,13 +188,13 @@ const Farms = (props) => {
       if (account) {
         setWalletConnected(true);
         console.log("start getPools");
-        getPools(library, account);
+        getPools(library, account, chainId);
         
       } else {
         const provider = new JsonRpcProvider(RPC_URL, 56);
         const account = "0x0000000000000000000000000000000000000000";
         setWalletConnected(false);
-        getPools(provider, account);
+        getPools(provider, account, 56);
       }
     },
     [account]

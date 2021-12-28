@@ -414,11 +414,11 @@ function AccountInfo(props) {
         setLiquidityPositions(data);
       });
 
-      const getPools = async (library, account) => {
+      const getPools = async (library, account, chainId) => {
         // get all pools from the farm contract.
         // todo: currently account refers to the current user viewing this webpage,
         // todo: needs to be change to the user in this webpage.
-        const pools = (await getAllPools(library, account)).filter(pool => pool.hasUserPosition);
+        const pools = (await getAllPools(library, account, chainId)).filter(pool => pool.hasUserPosition);
         const newFarmsContents = [];
         const block = await library.getBlockNumber();
         // format pools data to the required format that the table can read.
@@ -473,7 +473,7 @@ function AccountInfo(props) {
       // so if account is present, retrieve the farms contract.
       if (account) {
         setWalletConnected(true);
-        getPools(library, account);
+        getPools(library, account, chainId);
         // initDao(library, account);
       } else {
         setWalletConnected(false);
@@ -536,7 +536,7 @@ function AccountInfo(props) {
         const token1 = new Token(chainId, token1Address, token1Decimal, token1Symbol);
 
         // queue get pair task
-        const pair = Fetcher.fetchPairData(token0, token1, library);
+        const pair = Fetcher.fetchPairData(token0, token1, library, chainId);
         fetchTask.push(pair);
         console.log("adding task to array")
       }

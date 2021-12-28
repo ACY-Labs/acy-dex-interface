@@ -389,7 +389,7 @@ const AcyLiquidityPositions = (props) => {
         const token1 = new Token(chainId, token1Address, token1Decimal, token1Symbol);
 
         // queue get pair task
-        const pair = Fetcher.fetchPairData(token0, token1, library);
+        const pair = Fetcher.fetchPairData(token0, token1, library, chainId);
         fetchTask.push(pair);
         console.log("adding task to array")
       }

@@ -134,7 +134,7 @@ export async function getEstimated(
     }
     // get pair using our own provider
     console.log("TEST TOKEN0 TOKEN1:",token0, token1);
-    const pair = await Fetcher.fetchPairData(token0, token1, library)
+    const pair = await Fetcher.fetchPairData(token0, token1, library, chainId)
       .then(pair => {
         console.log(pair.reserve0.raw.toString());
         console.log(pair.reserve1.raw.toString());

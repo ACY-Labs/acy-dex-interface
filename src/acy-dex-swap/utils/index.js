@@ -454,10 +454,10 @@ export async function getACYPrice(library){
   const acyToken  = new Token(56, "0xc94595b56e301f3ffedb8ccc2d672882d623e53a", 18, "ACY");
   const usdToken  = new Token(56, "0x55d398326f99059ff775485246999027b3197955", 18, "USDT");
   const busdToken = new Token(56, "0xe9e7cea3dedca5984780bafc599bd69add087d56", 18, "BUSD");
-  const acyUsdtPair = await Fetcher.fetchPairData(acyToken, usdToken, library).catch(e => {
+  const acyUsdtPair = await Fetcher.fetchPairData(acyToken, usdToken, library, 56).catch(e => {
     return false
   });
-  const acyBusdPair = await Fetcher.fetchPairData(acyToken, busdToken, library).catch(e => {
+  const acyBusdPair = await Fetcher.fetchPairData(acyToken, busdToken, library, 56).catch(e => {
     return false
   });
   if(!acyUsdtPair && !acyBusdPair) {

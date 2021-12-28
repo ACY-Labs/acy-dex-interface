@@ -188,7 +188,7 @@ const FarmsTableRow = props => {
 
   const refreshPoolInfo = async () => {
     console.log('refresh pool info:');
-    const pool = await newGetPool(poolInfo.poolId, library, account);
+    const pool = await newGetPool(poolInfo.poolId, library, account, chainId);
     const block = await library.getBlockNumber();
     console.log("TEST HERE:",pool,account);
     const newFarmsContent = {
