@@ -28,13 +28,15 @@ import { fetchGeneralTokenInfo, marketClient, fetchTokenDaySimple } from '../Mar
 import SwapComponent from '@/components/SwapComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import axios from 'axios';
-import supportedTokens from '@/constants/TokenList';
 import moment from 'moment';
-import INITIAL_TOKEN_LIST from '@/constants/TokenList';
 import StakeHistoryTable from './components/StakeHistoryTable';
 import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
+import ConstantLoader from '@/constants';
+const supportedTokens = ConstantLoader().tokenList;
+const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 
 const { AcyTabPane } = AcyTabs;
 function getTIMESTAMP(time) {
@@ -237,7 +239,7 @@ const Swap = props => {
     console.log(A,B);
     console.log("fetching the swap Rate data!!!!!!!!!!!!!!!!");
     axios.get(
-      "https://api.acy.finance/api/chart/getRate", {params : {token0 : A , token1 : B}}
+      `${apiUrlPrefix}/chart/getRate`, {params : {token0 : A , token1 : B}}
     ).then(res => {
       console.log("response",res.data);
       if(res.data){
@@ -311,7 +313,7 @@ const Swap = props => {
 
     axios
       .post(
-        `https://api.acy.finance/api/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
+        `${apiUrlPrefix}/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
       )
       .then(data => {
         console.log(data);
@@ -327,7 +329,7 @@ const Swap = props => {
   // const getPrice = () => {
   //   // FIXME: current api doesn't take token0/1 sequence into consideration, always return ratio based on alphabetical order of token symbol
   //   axios.post(
-  //     `https://api.acy.finance/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${activeToken1.addressOnEth}&range=${range}`
+  //     `${apiUrlPrefix}/chart/swap?token0=${activeToken0.addressOnEth}&token1=${activeToken1.addressOnEth}&range=${range}`
   //     // `https://localhost:3001/api/chart/swap?token0=${activeToken0.addressOnEth}&token1=${activeToken1.addressOnEth}&range=${range}`
 
   //   )

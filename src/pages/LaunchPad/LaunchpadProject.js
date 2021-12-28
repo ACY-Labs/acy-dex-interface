@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { history } from 'umi';
-import { Table } from 'antd';
+import { Icon, Table } from 'antd';
 import LaunchChart from './launchChart';
 import { getTransferData } from '@/acy-dex-swap/core/launchPad';
 import { requireAllocation, getAllocationInfo, getProjectInfo } from '@/services/api';
@@ -14,6 +14,14 @@ import * as moment from 'moment';
 import context from 'react-bootstrap/esm/AccordionContext';
 import { CaretDownOutlined } from '@ant-design/icons';
 import VestingSchedule from './VestingSchedule';
+import SocialMedia from './SocialMedia'
+import telegramWIcon from '@/assets/icon_telegram_white.svg';
+import telegramOIcon from '@/assets/icon_telegram_orange.svg';
+import twitterWIcon from '@/assets/icon_twitter_white.svg';
+import linkWIcon from '@/assets/icon_link_white.svg';
+import fileWIcon from '@/assets/icon_file_white.svg';
+import announcementIcon from '@/assets/icon_announcement.svg';
+import announcementFIcon from '@/assets/icon_announcement_fill.svg';
 import $ from 'jquery';
 
 const {
@@ -43,13 +51,26 @@ const {
   watermelon,
 } = Lottie;
 
+// Example links for social medias
+// const links = [
+//   'https://t.me/acyfinance',
+//   'https://t.me/ACYFinanceChannel',
+//   'https://twitter.com/ACYFinance',
+//   'https://acy.finance/',
+//   'https://github.com/ACY-Labs/ACY-Finance-Whitepaper'
+// ]
+
 const LaunchpadProject = () => {
   console.log($(document).height());
+  
 
   const { projectId } = useParams();
   const [receivedData, setReceivedData] = useState({});
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
+
+  console.log("--------------RECEIVEDDATA---------------")
+  console.log(receivedData);
 
   const TokenBanner = ({ posterUrl }) => {
     return (
@@ -94,8 +115,8 @@ const LaunchpadProject = () => {
             <div className="procedureNumber">1</div>
             <div>
               <p>Allocation</p>
-              <p className="shortText">Start : {receivedData.regStart}</p>
-              <p className="shortText">End : {receivedData.regEnd}</p>
+              {/* <p className="shortText">Start : {receivedData.regStart}</p>
+              <p className="shortText">End : {receivedData.regEnd}</p> */}
             </div>
           </div>
 
@@ -109,8 +130,8 @@ const LaunchpadProject = () => {
             </div>
             <div>
               <p>Sale</p>
-              <p className="shortText">Start : {receivedData.saleStart}</p>
-              <p className="shortText">End : {receivedData.saleEnd}</p>
+              <p className="shortText">From : {receivedData.saleStart}</p>
+              <p className="shortText">To : {receivedData.saleEnd}</p>
             </div>
           </div>
 
@@ -204,11 +225,34 @@ const LaunchpadProject = () => {
     );
   };
 
+  const logoObj = {
+    "telegram": telegramWIcon,
+    "twitter": twitterWIcon,
+    "website": linkWIcon,
+    "whitepaper": fileWIcon
+  }
+
   const ProjectDescription = () => {
     return (
       <div className="circleBorderCard cardContent">
         <div style={{ display: 'block' }}>
-          <h3>Project Description</h3>
+          <div className='projecttitle-socials-container'>
+            <h3 className='projecttitle'>Project Description</h3>
+            <div className='social-container'>
+              {receivedData.social && receivedData.social[0] &&
+                <div id='social container'>
+                  { Object.entries(receivedData.social[0]).map((item)=>{
+                    if(item[1] !== null ){
+                      console.log(item)
+                      return (
+                      <SocialMedia url={logoObj[item[0]]} link={item[1]} />)
+                    }
+                  })}
+                </div>}
+              
+            </div>
+          </div>
+          
           <span className="lineSeperator" />
           <div className="projectDescription">
             {receivedData.projectDescription && <p>{receivedData.projectDescription[0]}</p>}
@@ -327,18 +371,17 @@ const LaunchpadProject = () => {
     const clickCover = async e => {
       console.log('click cover', allocationAmount);
       const oldAllocationAmount = allocationAmount;
-      // if (oldAllocationAmount === 0) {
-      //     requireAllocation(walletId, projectToken).then(res => {
-      //         if(res && res.allocationAmount) {
-      //             setAllocationAmount(res.allocationAmount);
-
-      //         }
-      //         console.log('allocation get', res.allocationAmount);
-      //     }).catch(e => {
-      //         console.error(e);
-      //     })
-      // }
-      setCoverOpenState(true);
+      if (oldAllocationAmount !== 0) {
+          requireAllocation(walletId, projectToken).then(res => {
+              if(res && res.allocationAmount) {
+                  setAllocationAmount(res.allocationAmount);
+                  setCoverOpenState(true);
+              }
+              console.log('allocation get', res.allocationAmount);
+          }).catch(e => {
+              console.error(e);
+          })
+      }
       e.preventDefault();
     };
 
@@ -350,9 +393,6 @@ const LaunchpadProject = () => {
             onMouseEnter={() => setIsHoverLottie(true)}
             onMouseLeave={() => setIsHoverLottie(false)}
           >
-            <div className="" style={{ width: '70px', height: '70px' }}>
-              <AllocationIcon play={isHoverLottie} url={url} id={lottieId} />
-            </div>
             <p className="inner-text">{index + 1}</p>
           </div>
         </div>
@@ -519,7 +559,7 @@ const LaunchpadProject = () => {
         setIsHoverStrawberry,
         setIsHoverWatermelon,
       ];
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 10; i++) {
         cards.push(
           <AllocationCard
             index={i}
@@ -548,23 +588,28 @@ const LaunchpadProject = () => {
             : 'cardContent allocation-content allocation-content-inactive'
         }
       >
-        <div className="centerTitle">
-          <h2 style={{ textAlign: 'center', color: '#FFFFFF' }}>Allocation</h2>
+        <div className="allocation-title-container">
+          <p className="allocation-title">Allocation</p>
+          <div className='allocation-cards'>
+            <div className="allocationContainer">{allocationCards()}</div>
+          </div>
+          <div style={{"width": "120px"}}>
+
+          </div>
         </div>
-        <div className="allocationContainer">{allocationCards()}</div>
 
         <form className="sales-container">
           <label for="sale-number" className="sale-vesting-title">
-            Purchases
+            Sale
           </label>
           <div className="sales-input-container">
             <input placeholder="" className="sales-input" type="number" />
-            <button className="max-btn">MAX</button>
+            {/* <button className="max-btn">MAX</button> */}
           </div>
           <input type="submit" className="sales-submit" value="Buy" />
         </form>
 
-        <div className="vesting-container" onClick={() => setIsClickedVesting(!isClickedVesting)}>
+        <div className="vesting-container" >
           <p className="sale-vesting-title vesting">Vesting</p>
           <div className="text-line-container">
             <p>Unlock 30% TGE, then vested 23.3% every month for 3 months</p>
@@ -583,6 +628,8 @@ const LaunchpadProject = () => {
                 isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
               }
             />
+          </div>
+          <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}>
           </div>
         </div>
       </div>
@@ -622,6 +669,7 @@ const LaunchpadProject = () => {
       .then(res => {
         if (res) {
           // extract data from string
+          console.log("RECeiveddata",res);
           const contextData = JSON.parse(res.contextData);
 
           const today = new Date();

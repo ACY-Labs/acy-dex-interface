@@ -6,6 +6,7 @@
   margin-top: 2.5px;
   margin-bottom: 2.5px;
   color: rgba(255, 255, 255, 0.96);
+  font-family: "Karla";
 }
 
 .flexContainer {
@@ -47,12 +48,12 @@
 }
 
 .allocation-content-inactive {
-  height: 520px;
+  height: 360px;
   transition: height 0.1s linear;
 }
 
 .allocation-content-active {
-  height: 820px;
+  height: 700px;
   transition: height 0.1s linear;
 }
 
@@ -238,25 +239,26 @@
 
 .allocationContainer {
   display: grid;
-  grid-template-columns: repeat(4, 80px);
-  gap: 20px;
-  margin-top: 0.75rem;
-  justify-content: center;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(5, 50px);
+  gap: 10px;
 }
 
 .allocationCard {
   position: relative;
-  width: 80px;
-  height: 80px;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   cursor: pointer;
   background: #757579;
-  border-radius: 5px;
+  border-radius: 50%;
   perspective: 500px;
+}
+
+.allocationCard:hover{
+  transform: scale(1.05);
 }
 
 .allocationCard .allocationCard-inner {
@@ -267,15 +269,16 @@
 }
 
 .allocationCard .inner-text {
-  font-size: 8px;
+  font-size: 20px;
+  color: #CBCFD7;
 }
 
 .allocationCard .cover {
   position: absolute;
   top: 0;
   left: 0;
-  height: 80px;
-  width: 80px;
+  height: 50px;
+  width: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -284,9 +287,8 @@
   transform-origin: left top;
   transition: 1s ease-in-out;
   z-index: 100;
-  background-color: #b73a3b;
-  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='70' height='70' viewBox='0 0 100 100'><path d='M 0 25 L 25 0 M 0 50 L 50 0 M 0 75 L 75 0 M 0 100 L 100 0 M 0 125 L 125 0 M 0 150 L 150 0 M 0 175 L 175 0' stroke='%239B2D2B' stroke-width='6' /></svg>");
-  border-radius: 4px;
+  background-color: #2E3032;
+  border-radius: 50%;
 }
 
 .allocationCard .openCover {
@@ -298,6 +300,27 @@
     display: grid;
     grid-template-columns: repeat(1, 1fr);
   }
+}
+
+/* Allocation */
+.allocation-title-container{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 50px;
+}
+
+.allocation-cards{
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  align-self: center;
+}
+
+.allocation-title{
+  font-size: 16px;
+  width: 100px;
+  margin-right: 10px;
 }
 
 /*Sales, vesting */
@@ -314,7 +337,6 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
-  cursor: pointer;
 }
 
 .text-line-container {
@@ -361,6 +383,7 @@
   position: absolute;
   padding: 10px;
   opacity: 0;
+  display: none;
 }
 
 .vesting-schedule-active {
@@ -380,7 +403,7 @@
 }
 
 .sales-container {
-  margin-bottom: 20px;
+  margin-bottom: 50px;
 }
 
 .sales-input-container {
@@ -397,20 +420,20 @@
   min-width: 0px;
   height: 45px;
   font-size: 16px;
-  padding: 0px 20px 0px 10px;
+  padding: 0px 20px 0px 20px;
 }
 
 .sales-input:hover {
   outline: #eb5c20 solid 2px;
 }
 
-.sales-input:solid {
+.sales-input:focus {
   outline: #eb5c20 solid 2px;
 }
 
 .max-btn {
   position: absolute;
-  top: 10px;
+  top: 9px;
   right: 15px;
   background-color: #eb5c20;
   border: unset;
@@ -435,14 +458,18 @@
   padding: 2px 0;
 }
 
+.vesting-tick-icon{
+  width: 18px;
+}
+
 .vesting-text {
   text-align: left;
   font-size: 12px;
-  margin: 10px 0 15px 0;
+  margin: 5px 0 15px 0;
 }
 
 .claimable-text {
-  color: #606060;
+  color: #757579;
 }
 
 .vesting-procedure .procedureNumber {
@@ -465,4 +492,43 @@
 .vesting-schedule-line {
   height: calc(100% + 10px);
   width: 1px;
+}
+
+.vesting-trigger-container{
+  position: absolute;
+  width: 100%;
+  height: 30px;
+  cursor: pointer;
+}
+
+/* Social Medias */
+.social-container{
+  display: flex;
+}
+.icon-container{
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+.antd-icon-container{
+  width: 40px;
+  height: 40px;
+  font-size: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.projecttitle{
+  /* Reset h3 properties */
+  margin-bottom: 0; 
+}
+
+.projecttitle-socials-container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }

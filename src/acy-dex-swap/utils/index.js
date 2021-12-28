@@ -10,21 +10,21 @@ import ACYRouterABI from '../abis/AcyV1Router02.json';
 import FlashArbitrageABI from '../abis/AcyV1FlashArbitrage.json';
 import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import ERC20ABI from '../abis/ERC20.json';
-import tokenList from '@/constants/TokenList';
 import axios from 'axios';
 import { JsonRpcProvider } from "@ethersproject/providers";
+import ConstantLoader from '@/constants';
+const tokenList = ConstantLoader().tokenList;
+const farmSetting = ConstantLoader().farmSetting;
 
-export const INITIAL_ALLOWED_SLIPPAGE = 50; // bips
-
-export const ROUTER_ADDRESS = '0x4DCa8E42634abdE1925ebB7f82AC29Ea00d34bA2';
-export const FARMS_ADDRESS  = '0xcd0b5136d2e9972077cd769714ade9c3506fb5d6';
-export const FLASH_ARBITRAGE_ADDRESS = '0x4a4783Cf89593127180FD216d1302EE11f72D085';
-export const BLOCK_TIME = 3;
-export const BLOCKS_PER_YEAR = 60*60*24*365/BLOCK_TIME;
-export const BLOCKS_PER_MONTH = 60*60*24*31/BLOCK_TIME; 
-export const RPC_URL = "https://bsc-dataseed.binance.org/";
-export const API_URL = "https://api.acy.finance/api";
-// export const API_URL = "http://localhost:3001/api";
+export const INITIAL_ALLOWED_SLIPPAGE = farmSetting.INITIAL_ALLOWED_SLIPPAGE;
+export const ROUTER_ADDRESS = farmSetting.ROUTER_ADDRESS;
+export const FARMS_ADDRESS  = farmSetting.FARMS_ADDRESS;
+export const FLASH_ARBITRAGE_ADDRESS = farmSetting.FLASH_ARBITRAGE_ADDRESS;
+export const BLOCK_TIME = farmSetting.BLOCK_TIME;
+export const BLOCKS_PER_YEAR = farmSetting.BLOCKS_PER_YEAR;
+export const BLOCKS_PER_MONTH = farmSetting.BLOCKS_PER_MONTH; 
+export const RPC_URL = farmSetting.RPC_URL;
+export const API_URL = farmSetting.API_URL;
 
 //old farm address 0xf132Fdd642Afa79FDF6C1B77e787865C652eC824
 //new farm address 0x96c13313aB386BCB16168Dee3D2d86823A990770
@@ -137,6 +137,28 @@ export function getPairContract(pairAddress, library, account) {
   return getContract(pairAddress, IUniswapV2PairABI, library, account);
 }
 
+import { getCreate2Address } from "@ethersproject/address";
+import { pack, keccak256 } from "@ethersproject/solidity";
+export const getPairAddress = (token0Addr, token1Addr) => {
+    // // eth hashes
+    // const FACTORY_ADDRESS = "0xb43DD1c50377b6dbaEBa3DcBB2232a3964b22440";
+    // const INIT_CODE_HASH = "0xfbf3b88d6f337be529b00f1dc9bff44bb43fa3c6b5b7d58a2149e59ac5e0c4a8";
+
+    // bsc hashes
+    const FACTORY_ADDRESS = farmSetting.FACTORY_ADDRESS;
+    const INIT_CODE_HASH = farmSetting.INIT_CODE_HASH;
+    const [_token0, _token1] =
+        token0Addr.toLowerCase() < token1Addr.toLowerCase()
+            ? [token0Addr, token1Addr]
+            : [token1Addr, token0Addr];
+    const pairAddress = getCreate2Address(
+        FACTORY_ADDRESS,
+        keccak256(["bytes"], [pack(["address", "address"], [_token0, _token1])]),
+        INIT_CODE_HASH
+    );
+    return pairAddress;
+}
+
 // return gas with 10% added margin in BigNumber
 export function calculateGasMargin(value) {
   return value.mul(BigNumber.from(10000).add(BigNumber.from(1000))).div(BigNumber.from(10000));
@@ -219,6 +241,12 @@ export async function getUserTokenBalance(token, chainId, account, library) {
   if (!token) return;
   // let tokenIsETH = symbol === 'ETH';
   let tokenIsETH = symbol === 'BNB';
+  
+  const balance = await getUserTokenBalanceRaw(
+    tokenIsETH ? ETHER : new Token(chainId, address, decimals, symbol),
+    account,
+    library
+  )
 
   return formatUnits(
     await getUserTokenBalanceRaw(
@@ -419,12 +447,12 @@ export function parseArbitrageLog({ data, topics }) {
     nonZeroTokenAmount,
   };
 }
-// pass token symbol
-export function getTokenPrice(symbol) {
-  const token = tokenList.find(token => token.symbol == symbol);
-  if (!token) return 0;
-  axios.get("https://api.coingecko.com/api/v3/simple/price?ids=shiba-inu&vs_currencies=usd")
-}
+// // pass token symbol
+// export function getTokenPrice(symbol) {
+//   const token = tokenList.find(token => token.symbol == symbol);
+//   if (!token) return 0;
+//   axios.get("https://api.coingecko.com/api/v3/simple/price?ids=shiba-inu&vs_currencies=usd")
+// }
 export async function getAllSuportedTokensPrice() {
   const library = new JsonRpcProvider(RPC_URL, 56);
   const searchIdsArray = tokenList.map(token => token.idOnCoingecko);

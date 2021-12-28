@@ -1,14 +1,14 @@
 // https://umijs.org/config/
-import os from 'os';
 import pageRoutes from './router.config';
 import webpackPlugin from './plugin.config';
+import constantConfig from './constant.config';
 import defaultSettings from '../src/defaultSettings';
-import { defineConfig } from 'umi';
+import { defineConfig, IConfig }from 'umi';
 
 const IS_PROD = ["production", "prod"].includes(process.env.NODE_ENV);
 const IS_DEV = ["development", "dev"].includes(process.env.NODE_ENV);
 
-export default defineConfig({
+const config: IConfig = {
   theme: {
     'primary-color': defaultSettings.primaryColor,
     'layout-header-height': '64px',
@@ -30,7 +30,7 @@ export default defineConfig({
   },
   proxy: {
     '/api': {
-      target: 'http://localhost:3001',
+      target: 'https://api.acy.finance',
       changeOrigin: true
     }
   },
@@ -38,9 +38,7 @@ export default defineConfig({
   dva: {
     hmr: true,
   },
-  define: {
-    APP_TYPE: process.env.APP_TYPE || '',
-  },
+  define: constantConfig,
   // 路由配置
   routes: pageRoutes,
   locale: {
@@ -58,4 +56,6 @@ export default defineConfig({
     IS_PROD ? 'transform-remove-console': ""
   ],
   fastRefresh: {}
-});
+}
+
+export default defineConfig(config);

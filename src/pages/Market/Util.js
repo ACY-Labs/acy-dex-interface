@@ -9,8 +9,8 @@ export const FEE_PERCENT = 0.003;
 
 export function abbrHash(hash) {
   let len = hash.length;
-  let first = hash.slice(0, 6);
-  let last = hash.slice(len - 4, len - 1);
+  let first = hash.slice(0, 5);
+  let last = hash.slice(len - 4, len);
 
   return first + '...' + last;
 }

@@ -1,4 +1,3 @@
-import {scanUrlPrefix} from '@/constants/configs'
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAddress } from '@ethersproject/address';
@@ -24,6 +23,8 @@ import {
   ROUTER_ADDRESS,
   supportedTokens,
 } from '../utils';
+import ConstantLoader from '@/constants';
+const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
 
 export async function getEstimated(
   inputToken0,

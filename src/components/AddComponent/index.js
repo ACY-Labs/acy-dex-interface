@@ -24,7 +24,9 @@ import {
 } from '@/components/Acy';
 import TokenSelectorModal from "@/components/TokenSelectorModal";
 
-import INITIAL_TOKEN_LIST from '@/constants/TokenList';
+import ConstantLoader from '@/constants';
+const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 
 //^mark
 import { connect } from 'umi';
@@ -457,7 +459,7 @@ const AddLiquidityComponent = props => {
               const { token0, token1 } = pairToAddOnServer;
               axios.post(
                 // fetch valid pool list from remote
-                `https://api.acy.finance/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
+                `${apiUrlPrefix}/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
                 // `http://localhost:3001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
               ).then(res => {
                 console.log("add to server return: ", res);

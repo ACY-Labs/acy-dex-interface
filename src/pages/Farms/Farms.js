@@ -10,13 +10,15 @@ import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAllPools, getPool, newGetAllPools } from '@/acy-dex-swap/core/farms';
 import { binance, injected } from '@/connectors';
-import supportedTokens from '@/constants/TokenList';
 import PageLoading from '@/components/PageLoading';
 import Eth from "web3-eth";
 import { Web3Provider, JsonRpcProvider } from "@ethersproject/providers";
 import {getTokenContract} from '@/acy-dex-swap/utils';
 import { parse } from 'path-to-regexp';
 import {BLOCK_TIME, RPC_URL} from '@/acy-dex-swap/utils';
+import ConstantLoader from '@/constants';
+const supportedTokens = ConstantLoader().tokenList;
+
 const Farms = (props) => {
   // useWeb3React hook will listen to wallet connection.
   // if wallet is connected, account, chainId, library, and activate will not be not be undefined.
@@ -139,7 +141,8 @@ const Farms = (props) => {
         endAfter: (pool.endBlock - block) * BLOCK_TIME,
         token1Ratio: pool.token1Ratio,
         token2Ratio: pool.token2Ratio,
-        poolRewardPerYear: pool.poolRewardPerYear
+        poolRewardPerYear: pool.poolRewardPerYear, // usd price
+        tokensRewardPerBlock: pool.tokensRewardPerBlock
       };
       if(newFarmsContent.poolId == 0) {
         // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));

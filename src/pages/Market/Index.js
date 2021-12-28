@@ -74,7 +74,7 @@ const MarketIndex = props => {
 
   useEffect(() => {
 
-    fetchGlobalTransaction(libraryOut).then(globalTransactions => {
+    fetchGlobalTransaction().then(globalTransactions => {
         console.log('globaltransaction', globalTransactions);
         if(globalTransactions) settransactions(globalTransactions);
     });
@@ -132,6 +132,7 @@ const MarketIndex = props => {
       <MarketSearchBar
         dataSourceCoin={dataSourceCoin}
         dataSourcePool={dataSourcePool}
+        account={account}
         visible={true}
       />
       <div className={styles.chartsMain}>

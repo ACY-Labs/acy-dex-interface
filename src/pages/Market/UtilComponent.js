@@ -1,4 +1,3 @@
-import {scanUrlPrefix} from "@/constants/configs"
 import { AcyIcon, AcyTabs, AcyTokenIcon } from '@/components/Acy';
 import className from 'classnames';
 import { Divider, Icon, Input, Table } from 'antd';
@@ -6,7 +5,6 @@ import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 import onlyLastPromise, { DiscardSignal } from 'only-last-promise';
-import tokenList from '@/constants/TokenList';
 import ReactDOM from 'react-dom';
 import { Link, useHistory } from 'react-router-dom';
 import styles from './styles.less';
@@ -25,7 +23,12 @@ import {
   fetchPoolSearch,
   fetchTokensFromId,
   fetchPoolsFromId,
+  fetchSearchCoinReturns,
+  fetchSearchPoolReturns,
 } from './Data';
+import ConstantLoader from '@/constants';
+const tokenList = ConstantLoader().tokenList;
+const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
 
 const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');
@@ -113,21 +116,22 @@ export class SmallTable extends React.Component {
           </Link>
           <div style={{width:5}}></div>
           <span className={styles.coinShort}> ({entry.name})</span>
-          <AcyIcon
+          {/* Watchlist star */}
+          {/* <AcyIcon
             name={watchlistManagerToken.getData().includes(entry.address) ? 'star_active' : 'star'}
             width={14}
             style={{ marginLeft: '0.5rem' }}
             onClick={() => {
               this.toggleWatchlist('token', entry.address, entry.short);
             }}
-          />
+          /> */}
         </div>
       );
     } else {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyTokenIcon symbol={entry.coin1} width={20} />
-          <AcyTokenIcon symbol={entry.coin2} width={20} />
+          <AcyTokenIcon symbol={entry.logoURL1} width={20} />
+          <AcyTokenIcon symbol={entry.logoURL2} width={20} />
           <Link
             style={{ color: 'white' }}
             to={`/market/info/pool/${entry.address}`}
@@ -142,7 +146,8 @@ export class SmallTable extends React.Component {
           >
             {entry.percent} %
           </div> */}
-          <AcyIcon
+          {/* Watchlist star */}
+          {/* <AcyIcon
             name={
               watchlistManagerPool
                 .getData()
@@ -156,7 +161,7 @@ export class SmallTable extends React.Component {
             onClick={() => {
               this.toggleWatchlist('pool', entry.address);
             }}
-          />
+          /> */}
         </div>
       );
     }
@@ -419,9 +424,9 @@ export function TokenTable(props) {
         marginBottom: '20px',
         cursor: isHover ? 'pointer' : 'default',
       }}
-      // onRowClick={(record, index, event) => {
-      //   navHistory.push(`/market/info/token/${record.address}`);
-      // }}
+      onRowClick={(record, index, event) => {
+        navHistory.push(`/market/info/token/${record.address}`);
+      }}
       onRowMouseEnter={() => setIsHover(true)}
       onRowMouseLeave={() => setIsHover(false)}
       footer={() => (
@@ -450,7 +455,6 @@ export function PoolTable(props) {
   const [, update] = useState(0);
 
   const navHistory = useHistory();
-
   useEffect(
     () => {
       update(1);
@@ -614,9 +618,9 @@ export function PoolTable(props) {
       pagination={false}
       onRowMouseEnter={() => setIsHover(true)}
       onRowMouseLeave={() => setIsHover(false)}
-      // onRowClick={(record, index, event) => {
-      //   navHistory.push(`/market/info/pool/${record.address}`);
-      // }}
+      onRowClick={(record, index, event) => {
+        navHistory.push(`/market/info/pool/${record.pairAddr}`);
+      }}
       style={{
         marginBottom: '20px',
         cursor: isHover ? 'pointer' : 'default',
@@ -705,7 +709,7 @@ export function TransactionTable(props) {
               style={{ fontWeight: 600 }}
               onClick={() => openInNewTab(`${scanUrlPrefix}/tx/${entry.transactionID}`)}
             >
-              {entry.type} {entry.coin1} {entry.action == TransactionType.SWAP ? 'for' : 'and'}{' '}
+              {entry.type} {entry.coin1} {entry.type == TransactionType.SWAP ? 'for' : 'and'}{' '}
               {entry.coin2}
             </div>
           );
@@ -923,13 +927,15 @@ export const MarketSearchBar = props => {
   const [visibleNetwork, setVisibleNetwork] = useState(false);
   const [activeNetwork, setActiveNetwork] = useState('Ethereum');
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchCoinReturns, setSearchCoinReturns] = useState([...props.dataSourceCoin]);
-  const [searchPoolReturns, setSearchPoolReturns] = useState([...props.dataSourcePool]);
+  const [searchCoinReturns, setSearchCoinReturns] = useState([]);
+  const [searchPoolReturns, setSearchPoolReturns] = useState([]);
   const [displayNumber, setDisplayNumber] = useState(3);
   const [watchlistToken, setWatchlistToken] = useState([]);
   const [watchlistPool, setWatchlistPool] = useState([]);
   const [, update] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // fetch searchcoinresults
 
   const networkOptions = [
     {
@@ -987,27 +993,27 @@ export const MarketSearchBar = props => {
   });
 
   const onInput = useCallback(e => {
-    setIsLoading(false);
-    setSearchQuery(e.target.value);
+    // setIsLoading(false);
+    // setSearchQuery(e.target.value);
 
-    lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
-      console.log('token info:',data);
-      setSearchCoinReturns(
-        tokenList.map(item => {
-          return { logoURL: item.logoURI, address: item.address, name: item.name, short: item.symbol };
-        })
-      );
-      lastPromiseWrapper(
-        fetchPoolSearch(marketClient, e.target.value, data.map(item => item.id))
-      ).then(pooldata => {
-        setSearchPoolReturns(
-          pooldata.map(item => {
-            return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
-          })
-        );
-        setIsLoading(false);
-      });
-    });
+    // lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
+    //   console.log('token info:',data);
+    //   setSearchCoinReturns(
+    //     data.map(item => {
+    //       return { address: item.id, name: item.name, short: item.symbol };
+    //     })
+    //   );
+    //   lastPromiseWrapper(
+    //     fetchPoolSearch(marketClient, e.target.value, data.map(item => item.id))
+    //   ).then(pooldata => {
+    //     setSearchPoolReturns(
+    //       pooldata.map(item => {
+    //         return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
+    //       })
+    //     );
+    //     setIsLoading(false);
+    //   });
+    // });
 
     // let query = e.target.value.toLowerCase();
 
@@ -1077,41 +1083,55 @@ export const MarketSearchBar = props => {
 
     setIsLoading(true);
 
+    const isLoadingSearchCoin = true;
+    const isLoadingSearchPool = true;
 
-    // get data corresponding to the watchlist
-    fetchTokensFromId(marketClient, watchlistManagerToken.getData()).then(data => {
-      setWatchlistToken(
-        data.tokens.map(item => ({ address: item.id, name: item.name, short: item.symbol }))
-      );
-    });
+    // fetch search coin returns
+    // possible keys = ["volume24h", "tvl"]
+    const key = 'volume24h'
+    fetchSearchCoinReturns(key).then(data => {
+      console.log(data);
+      if (data) {
+        setSearchCoinReturns(
+          data.map(item => {
+            return { logoURL: item.logoURL, address: item.address, name: item.name, short: item.short };
+          })
+        )
+      }
+    }).catch(error => {
+      console.log("Error in fetch search coin returns:", error);
+    })
 
-    fetchPoolsFromId(marketClient, watchlistManagerPool.getData()).then(data => {
-      setWatchlistPool(
-        data.pairs.map(item => ({ address: item.id, coin1: item.token0.symbol, coin2: item.token1.symbol, percent: 0 }))
-      );
-     })
+    // fetch search pool returns
+    fetchSearchPoolReturns(key).then(data => {
+      if (data) {
+        setSearchPoolReturns(
+          data.map(item => {
+            return { coin1: item.coin1, coin2: item.coin2, logoURL1: item.logoURL1, logoURL2: item.logoURL2, address: item.address };
+          })
+        )
+      }
+      setIsLoading(false);
+    }).catch(error => {
+      console.log("Error in fetch search pool returns:", error);
+    })
 
-    lastPromiseWrapper(fetchTokenSearch(marketClient, '')).then(data => {
-      console.log("FETCHING TOKENS FROM SEARCH BAR", data)
-      setSearchCoinReturns(
-        tokenList.map(item => {
-          return { logoURL: item.logoURI, address: item.address, name: item.name, short: item.symbol };
-        })
-      );
+    // lastPromiseWrapper(fetchSearchCoinReturns()).then(data => {
 
-      lastPromiseWrapper(fetchPoolSearch(marketClient, '', data.map(item => item.id))).then(
-        pooldata => {
-          setSearchPoolReturns(
-            pooldata.map(item => {
-              return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
-            })
-          );
-          setIsLoading(false);
-        }
-      );
-    });
 
-    refreshWatchlist();
+    //   lastPromiseWrapper(fetchPoolSearch(marketClient, '', data.map(item => item.id))).then(
+    //     pooldata => {
+    //       setSearchPoolReturns(
+    //         pooldata.map(item => {
+    //           return { address: item.id, coin1: item.token0, coin2: item.token1, percent: 0 };
+    //         })
+    //       );
+    //       setIsLoading(false);
+    //     }
+    //   );
+    // });
+
+    // refreshWatchlist();
 
     return function cleanup() {
       contentRoot.removeEventListener('scroll', onScroll);
@@ -1136,11 +1156,11 @@ export const MarketSearchBar = props => {
             Pools
           </Link>
         </div>
-        {/* <div className={styles.marketNavbarButton}>
-          <Link style={{ color: '#b5b5b6', fontWeight: '600' }} to="/market/accounts">
+        {props.account && (<div className={styles.marketNavbarButton}>
+          <Link style={{ color: '#b5b5b6', fontWeight: '600' }} to={"/market/accounts/"+props.account.toString()}>
             Account
           </Link>
-        </div> */}
+        </div>)}
       </div>
       <div className={styles.marketNavbarRight}>
         {/* <div className={styles.marketDropdownWrapper} ref={outsideClickRefNetwork}>
@@ -1186,7 +1206,7 @@ export const MarketSearchBar = props => {
                 width: '100%',
               }}
             >
-              {/* <div className={styles.searchWrapper}>
+              <div className={styles.searchWrapper}>
                 <div className={styles.searchInnerWrapper}>
                   <Input
                     placeholder="Search"
@@ -1201,9 +1221,9 @@ export const MarketSearchBar = props => {
                     value={'' || searchQuery}
                   />
                 </div>
-              </div> */}
+              </div>
               {/* Search modal */}
-              {/* <div style={{ width: '100%', position: 'relative', zIndex: 10 }}>
+              <div style={{ width: '100%', position: 'relative', zIndex: 10 }}>
                 {visibleSearchBar && (
                   <div
                     className={styles.searchModal}
@@ -1251,7 +1271,7 @@ export const MarketSearchBar = props => {
                           </>
                         )}
                       </AcyTabPane>
-                      <AcyTabPane tab="Watchlist" key="2">
+                      {/* <AcyTabPane tab="Watchlist" key="2">
                         {watchlistToken.length > 0 ? (
                           <SmallTable
                             mode="token"
@@ -1279,11 +1299,11 @@ export const MarketSearchBar = props => {
                             Add items by clicking on the star
                           </span>
                         )}
-                      </AcyTabPane>
+                      </AcyTabPane> */}
                     </AcyTabs>
                   </div>
                 )}
-              </div> */}
+              </div>
             </div>
           </div>
         </div>

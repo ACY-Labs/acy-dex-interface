@@ -13,12 +13,12 @@ const ProjectsCard = ({ projectID, ddl, raise, sales, rate, title, isOngoing, is
     : 'Sale ended: ' + ddl;
 
   const history = useHistory();
-  const onOpenProjectDetail = () => {
-    history.push(`/launchpad/project/${projectID}`);
+  const onOpenProjectDetail = (p) => {
+    history.push(`/launchpad/project/${p}`);
   };
 
   return (
-    <div className="projects-card projects-container" onClick={() => onOpenProjectDetail()}>
+    <div className="projects-card projects-container" onClick={(e) => isOngoing ? onOpenProjectDetail(projectID) : e.preventDefault()}>
       <div className="logo-countdown-container">
         <div className="logo-container">
           <div className="logo">
