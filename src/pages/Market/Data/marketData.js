@@ -103,7 +103,7 @@ export async  function fetchMarketData () {
     // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
-    let request = `${apiUrlPrefix}/poolchart/historical`;
+    let request = `${apiUrlPrefix}/poolchart/historical/all`;
     // let request = 'http://localhost:3001/api/poolchart/historical';
     let response = await fetch(request);
     let data = await response.json();
