@@ -270,6 +270,64 @@ const GlobalHeaderRight = props => {
     },
   ];
   const [only, setOnly] = useState(true);
+
+  const networkParams = {
+    "0x38": {
+      chainId: '0x38',
+      chainName: 'Binance Smart Chain Netwaok',
+      nativeCurrency: {
+        name: 'Binance',
+        symbol: 'BNB', // 2-6 characters long
+        decimals: 18
+      },
+      blockExplorerUrls: ['https://bscscan.com'],
+      rpcUrls: ['https://bsc-dataseed.binance.org/'],
+    },
+    "0x61": {
+      chainId: '0x61',
+      chainName: 'Binance Smart Chain Testnet',
+      nativeCurrency: {
+        name: 'Binance',
+        symbol: 'BNB', // 2-6 characters long
+        decimals: 18
+      },
+      blockExplorerUrls: ['https://testnet.bscscan.com'],
+      rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
+    },
+    "0x89": {
+      chainId: '0x89',
+      chainName: 'Polygin',
+      nativeCurrency: {
+        name: 'Matic',
+        symbol: 'MATIC', // 2-6 characters long
+        decimals: 18
+      },
+      blockExplorerUrls: ['https://polygonscan.com/'],
+      rpcUrls: ['https://polygon-rpc.com/'],
+    },
+  };
+
+ const switchEthereumChain = async (chainId) => {
+  try {
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: chainId }],
+    });
+  } catch (e) {
+    if (e.code === 4902) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            networkParams[chainId]
+          ],
+        });
+      } catch (addError) {
+        console.error(addError);
+      }
+    }
+  }
+}
   const showMore = () => {
     setOnly(!only);
   };
@@ -283,19 +341,27 @@ const GlobalHeaderRight = props => {
   const [networkListIndex, setNetworkListIndex] = useState(0);
   const networkList = [
     {
-      name: 'main network',
+      name: 'BSC mainnet',
       icon: 'Binance',
-      onClick: () => {
-        console.log("main network select");
+      onClick: async () => {
+        await switchEthereumChain("0x38");
         setNetworkListIndex(0);
       },
     },
     {
-      name: 'test network',
+      name: 'BSC testnet',
       icon: 'Binance',
-      onClick: () => {
-        console.log("test network select");
+      onClick: async () => {
+        await switchEthereumChain("0x61");
         setNetworkListIndex(1);
+      },
+    },
+    {
+      name: 'Polygon',
+      icon: 'Binance',
+      onClick: async () => {
+        await switchEthereumChain("0x89");
+        setNetworkListIndex(2);
       },
     }
   ];
