@@ -252,7 +252,7 @@
   justify-content: center;
   flex-direction: column;
   cursor: pointer;
-  background: #757579;
+  background: #010101;
   border-radius: 50%;
   perspective: 500px;
 }
@@ -269,8 +269,14 @@
 }
 
 .allocationCard .inner-text {
-  font-size: 20px;
+  font-size: 15px;
   color: #CBCFD7;
+}
+
+.allocationCard .inner-text-amount {
+  font-size: 15px;
+  font-weight: 600;
+  color: #eb5c20;
 }
 
 .allocationCard .cover {
@@ -504,10 +510,17 @@
 /* Social Medias */
 .social-container{
   display: flex;
+  flex-direction: row;
 }
+
+#socialContainer {
+  display: flex;
+  flex-direction: row;
+}
+
 .icon-container{
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   cursor: pointer;
   padding: 0 5px;
 }

@@ -16,7 +16,12 @@ import { CaretDownOutlined } from '@ant-design/icons';
 import VestingSchedule from './VestingSchedule';
 import SocialMedia from './SocialMedia'
 import telegramWIcon from '@/assets/icon_telegram_white.svg';
-import telegramOIcon from '@/assets/icon_telegram_orange.svg';
+import etherIcon from '@/assets/icon_etherscan.svg';
+import polyIcon from '@/assets/icon_polyscan.svg';
+import linkedinIcon from '@/assets/icon_linkedin.svg';
+import mediumIcon from '@/assets/icon_medium.svg';
+import youtubeIcon from '@/assets/icon_youtube.svg';
+import githubIcon from '@/assets/icon_github.svg';
 import twitterWIcon from '@/assets/icon_twitter_white.svg';
 import linkWIcon from '@/assets/icon_link_white.svg';
 import fileWIcon from '@/assets/icon_file_white.svg';
@@ -229,7 +234,13 @@ const LaunchpadProject = () => {
     "telegram": telegramWIcon,
     "twitter": twitterWIcon,
     "website": linkWIcon,
-    "whitepaper": fileWIcon
+    "whitepaper": fileWIcon,
+    "linkedin": linkedinIcon,
+    "medium": mediumIcon,
+    "youtube": youtubeIcon,
+    "github": githubIcon,
+    "etheraddress": etherIcon,
+    "polyaddress": polyIcon,
   }
 
   const ProjectDescription = () => {
@@ -240,7 +251,7 @@ const LaunchpadProject = () => {
             <h3 className='projecttitle'>Project Description</h3>
             <div className='social-container'>
               {receivedData.social && receivedData.social[0] &&
-                <div id='social container'>
+                <div id='socialContainer'>
                   { Object.entries(receivedData.social[0]).map((item)=>{
                     if(item[1] !== null ){
                       console.log(item)
@@ -387,6 +398,7 @@ const LaunchpadProject = () => {
 
     return (
       <div className="allocationCard" onClick={clickCover}>
+        
         <div class={computeCoverClass()}>
           <div
             className="allocationCard-inner"
@@ -396,6 +408,7 @@ const LaunchpadProject = () => {
             <p className="inner-text">{index + 1}</p>
           </div>
         </div>
+        <p className="inner-text-amount">${allocationAmount}</p>
       </div>
     );
   };
