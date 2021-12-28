@@ -52,7 +52,7 @@ function parseMarketData (data){
     let volArr = []
     var d = new Date();
     d.setDate(d.getDate()-19);
-    for (let i=0;i<DAYS_TRACKED_CHART;i++){
+    for (let i=0;i<20;i++){
         tvlArr.push([d.toISOString().substring(0, 10),0]);
         volArr.push([d.toISOString().substring(0, 10),0]);
         d.setDate(d.getDate()+1);

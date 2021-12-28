@@ -22,6 +22,7 @@ import { WatchlistManager } from './WatchlistManager.js';
 import {
   fetchPoolInfo,
   fetchPoolDayData,
+  fetchPoolDayDataForPair,
   fetchTransactionsForPair,
   marketClient,
 } from './Data/index.js';
@@ -98,7 +99,7 @@ function MarketPoolInfo(props) {
 
   useEffect(() => {
     // extract the pool day datas
-    fetchPoolDayData(address).then(data => {
+    fetchPoolDayDataForPair(address).then(data => {
 
       console.log("fetching pool day INFO", data);
       let newData = [...data].reverse();

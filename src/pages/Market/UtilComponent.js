@@ -424,9 +424,9 @@ export function TokenTable(props) {
         marginBottom: '20px',
         cursor: isHover ? 'pointer' : 'default',
       }}
-      // onRowClick={(record, index, event) => {
-      //   navHistory.push(`/market/info/token/${record.address}`);
-      // }}
+      onRowClick={(record, index, event) => {
+        navHistory.push(`/market/info/token/${record.address}`);
+      }}
       onRowMouseEnter={() => setIsHover(true)}
       onRowMouseLeave={() => setIsHover(false)}
       footer={() => (
@@ -927,14 +927,8 @@ export const MarketSearchBar = props => {
   const [visibleNetwork, setVisibleNetwork] = useState(false);
   const [activeNetwork, setActiveNetwork] = useState('Ethereum');
   const [searchQuery, setSearchQuery] = useState('');
-<<<<<<< HEAD
-  const [searchCoinReturns, setSearchCoinReturns] = useState([...props.dataSourceCoin]);
-  const [searchPoolReturns, setSearchPoolReturns] = useState([...props.dataSourcePool]);
-  const [account, setAccount] = useState();
-=======
   const [searchCoinReturns, setSearchCoinReturns] = useState([]);
   const [searchPoolReturns, setSearchPoolReturns] = useState([]);
->>>>>>> f9d38c32acfe1ca45d94e0537411097ed1eda576
   const [displayNumber, setDisplayNumber] = useState(3);
   const [watchlistToken, setWatchlistToken] = useState([]);
   const [watchlistPool, setWatchlistPool] = useState([]);

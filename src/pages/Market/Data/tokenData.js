@@ -45,6 +45,7 @@ export async function fetchTokenDayData(tokenId) {
   
   // get USDT address for calculating historical price
   const USDTaddr = getAddress(uniqueTokens.find(t => t.symbol == "USDT").address);
+  tokenId = getAddress(tokenId);
   const tokenIsUSDT = tokenId == USDTaddr;
 
   const getTokenUSDPrice = (data) => {
@@ -52,6 +53,8 @@ export async function fetchTokenDayData(tokenId) {
     if (tokenIsUSDT) {
       return [];
     }
+
+    console.log(USDTaddr,tokenId);
     
     const tokenPairWithUSD = data.find(p => (p.token0 == tokenId && p.token1 == USDTaddr) || (p.token1 == tokenId && p.token0 == USDTaddr))
     console.log("tokenPairWithUSD", tokenPairWithUSD)
@@ -96,7 +99,7 @@ export async function fetchTokenDayData(tokenId) {
     return outputStats
   }
 
-  return await axios.get(`${apiUrlPrefix}/poolchart/historical`).then(res => {
+  return await axios.get(`${apiUrlPrefix}/poolchart/historical/all`).then(res => {
     const data = res.data.data;
     console.log("tokenData return data from server", data)
 

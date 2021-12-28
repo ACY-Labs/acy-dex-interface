@@ -14,7 +14,7 @@ import {
   fetchPoolDayData,
   marketClient,
   fetchTokenInfo,
-  fetchFilteredTransaction,
+  fetchTransactionsForToken,
 } from './Data/index.js';
 import {
   dataSourceCoin,
@@ -26,8 +26,7 @@ import styles from './styles.less';
 import { abbrNumber, openInNewTab, sortTable, calcPercentChange, FEE_PERCENT } from './Util.js';
 import { TranslateToUSD } from "@/utils/utils";
 import { convertPoolForList } from './Data/util.js';
-import { MarketSearchBar, PoolTable } from './UtilComponent.js';
-// import { MarketSearchBar, PoolTable, TransactionTable } from './UtilComponent.js';
+import { MarketSearchBar, PoolTable, TransactionTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
 import ConnectWallet from './ConnectWallet';
 import ConstantLoader from '@/constants';
@@ -201,7 +200,7 @@ function MarketTokenInfo(props) {
       setPoolData(parsedPairData)
     })
 
-    fetchFilteredTransaction(symbol).then(transactions => {
+    fetchTransactionsForToken(symbol).then(transactions => {
       transactions = sortTable(transactions, "time", true);
       console.log("print transactions", transactions)
       setTx(transactions);
@@ -463,11 +462,11 @@ function MarketTokenInfo(props) {
           {poolData.length > 0 ? <PoolTable dataSourcePool={poolData} /> : <Icon type="loading" />}
 
           <h2>Transactions</h2>
-          {/* {tx.length > 0 ? (
+          {tx.length > 0 ? (
             <TransactionTable dataSourceTransaction={tx} />
           ) : (
             <Icon type="loading" />
-          )} */}
+          )}
         </>
       )}
 

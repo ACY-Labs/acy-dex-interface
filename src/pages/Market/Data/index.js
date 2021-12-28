@@ -1,5 +1,5 @@
 import { fetchMarketData } from './marketData';
-import { fetchGlobalTransaction, fetchTransactionsForPair, fetchAccountTransaction, fetchTopExchangeVolume } from './txData';
+import { fetchGlobalTransaction, fetchTransactionsForPair,fetchTransactionsForToken, fetchAccountTransaction, fetchTopExchangeVolume } from './txData';
 import {
   fetchGeneralTokenInfo,
   fetchTokenDayData,
@@ -12,6 +12,7 @@ import {
 import {
   fetchGeneralPoolInfoDay,
   fetchPoolDayData,
+  fetchPoolDayDataForPair,
   fetchPoolInfo,
   fetchPoolSearch,
   fetchPoolsFromId,
@@ -41,7 +42,9 @@ const DataFetch = {
   fetchGeneralPoolInfoDay,
   fetchTokenDayData,
   fetchPoolDayData,
+  fetchPoolDayDataForPair,
   fetchTransactionsForPair,
+  fetchTransactionsForToken,
   fetchPoolInfo,
   fetchTokenInfo,
   fetchTokenSearch,
@@ -73,7 +76,9 @@ export {
   fetchGeneralPoolInfoDay,
   fetchTokenDayData,
   fetchPoolDayData,
+  fetchPoolDayDataForPair,
   fetchTransactionsForPair,
+  fetchTransactionsForToken,
   fetchPoolInfo,
   fetchTokenInfo,
   fetchTokenSearch,

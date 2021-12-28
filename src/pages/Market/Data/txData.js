@@ -6,15 +6,25 @@ import {getTransactionsByAccount} from '@/utils/txData'
 import { getLibrary } from '../ConnectWallet';
 import {getAllSuportedTokensPrice} from "@/acy-dex-swap/utils"
 import ConstantLoader from "@/constants";
+import { totalInUSD } from '@/utils/utils';
 const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 
 const TRANSACTION_AMOUNT = 250;
 const FILTERED_AMOUNT = 50;
 
 //function to parse tx list to fit in datasource
-function parseTransactionList(data){
+async function parseTransactionList(data){
+
+
+  const tokensPriceUSD = await getAllSuportedTokensPrice();
+
+  // const _txList = data.filter(item=>item.token1Number.toString()!="")
     
   const _txList = data.map((item) => {
+    let totalValue = totalInUSD([{
+      token : item.token1Symbol,
+      amount : item.token1Number
+    }],tokensPriceUSD);
     return {
       account: item.address,
       coin1: item.token1Symbol,
@@ -22,25 +32,26 @@ function parseTransactionList(data){
       coin2: item.token2Symbol,
       coin2Amount: item.token2Number,
       time: item.transactionTime,
-      totalValue: 0,
+      totalValue: totalValue,
       transactionID: item.hash,
       type: item.action
     }
   })
 
-  return _txList;
+  return _txList.filter(item => item.coin1Amount !=0 );
 }
 
 
 
 export async function fetchGlobalTransaction(){
   try{
-    let request = ACY_API+'txlist/all?'+'range=50';
+    console.log("trying to parse tx list....", apiUrlPrefix);
+    let request = apiUrlPrefix+'/txlist/all?'+'range=50';
     // let request = 'http://localhost:3001/api/users/all';
     let response = await fetch(request);
     let data = await response.json();
     // console.log(data.data);
-    return parseTransactionList(data.data);
+    return await parseTransactionList(data.data);
   }catch (e){
     console.log('service not available yet',e);
     return null;
@@ -158,12 +169,27 @@ export async function fetchTopExchangeVolume(library){
 export async function fetchTransactionsForPair(token1,token2){
   console.log("fetching txlist for tokens ", token1, token2);
   try{
-    let request = ACY_API+'txlist/pair?'+'token1='+token1+'&&token2='+token2+'&&range=50';
+    let request = apiUrlPrefix+'/txlist/pair?'+'token1='+token1+'&&token2='+token2+'&&range=50';
     // let request = 'http://localhost:3001/api/users/all';
     let response = await fetch(request);
     let data = await response.json();
     // console.log(data.data);
-    return parseTransactionList(data.data);
+    return await parseTransactionList(data.data);
+  }catch (e){
+    console.log('service not available yet',e);
+    return null;
+  }
+}
+
+export async function fetchTransactionsForToken(token){
+  console.log("fetching txlist for tokens ", token);
+  try{
+    let request = apiUrlPrefix+'/txlist/token?'+'symbol='+token+'&&range=50';
+    // let request = 'http://localhost:3001/api/users/all';
+    let response = await fetch(request);
+    let data = await response.json();
+    // console.log(data.data);
+    return await parseTransactionList(data.data);
   }catch (e){
     console.log('service not available yet',e);
     return null;

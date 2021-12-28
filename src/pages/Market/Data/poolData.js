@@ -22,6 +22,7 @@ const supportedTokens = ConstantLoader().tokenList;
 
 
 var tokensPriceUSD ;
+// var ACY_API='http://localhost:3001/api/';
 
 // export async function fetchPoolInfo(client, address, timestamp) {
 //   const block = await getBlockFromTimestamp(timestamp);
@@ -105,6 +106,7 @@ function parsePoolInfo(data){
       untrackedVolumeUSD: "0",
       volumeUSD: _volume24h.toString()
     }
+}
 
 export async function fetchPoolDayData(address) {
   // let newPair = {
@@ -117,9 +119,10 @@ export async function fetchPoolDayData(address) {
     //           volume7d: p0VolumeWeek,
     //           price: 0,
     //         };
+    // apiUrlPrefix = 'http://localhost:3001/api';
   return await axios.get(`${apiUrlPrefix}/poolchart/all`).then(async res => {
     const data = res.data.data;
-    const tokenPool = data.filter(p => p.token0 == address || p.token1 == address);
+    const tokenPool = data.filter(p => p.token0.toLowerCase() == address.toLowerCase() || p.token1.toLowerCase() == address.toLowerCase());
 
     const priceDict = await getAllSuportedTokensPrice();
     
@@ -288,7 +291,7 @@ export async function fetchPoolInfo(address){
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
-    let request = ACY_API +'poolchart/pair?pairAddr='+address;
+    let request = apiUrlPrefix +'/poolchart/pair?pairAddr='+address;
     let response = await fetch(request);
     let data = await response.json();
     console.log("requesting pool info from backend",data.data);
@@ -299,11 +302,11 @@ export async function fetchPoolInfo(address){
   }
 }
 
-export async function fetchPoolDayData(address) {
+export async function fetchPoolDayDataForPair(address) {
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
-    let request = ACY_API +'poolchart/historical/pair?pairAddr='+address;
+    let request = apiUrlPrefix +'/poolchart/historical/pair?pairAddr='+address;
     let response = await fetch(request);
     let data = await response.json();
     return parsePoolDayInfoData(data.data);
@@ -317,7 +320,7 @@ export async function fetchGeneralPoolInfoDay(address) {
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
-    let request = ACY_API+'/poolchart/all';
+    let request = apiUrlPrefix+'/poolchart/all';
     let response = await fetch(request);
     let data = await response.json();
     let parsed = parsePoolData(data.data);
@@ -457,4 +460,3 @@ export async function fetchSearchPoolReturns(key) {
 
 
 // get individual pool info from token
-}
