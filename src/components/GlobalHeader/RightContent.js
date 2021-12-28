@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, connect } from 'umi';
-import { Spin, Tag, Menu, Icon, Dropdown } from 'antd';
+import { Spin, Tag, Menu, Icon, Dropdown, Button, Space } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
 import { Link } from 'react-router-dom';
@@ -28,6 +28,7 @@ import {
 
 import styles from './index.less';
 import { ReactComponent as Opera } from './Opera.svg';
+import styled from "styled-components";
 
 const GlobalHeaderRight = props => {
   const { global } = props;
@@ -39,7 +40,7 @@ const GlobalHeaderRight = props => {
   const { account, chainId, library, activate, deactivate, active } = useWeb3React();
 
   useEffect(() => {
-    if (!account){
+    if (!account) {
       activate(binance);
       activate(injected);
     }
@@ -109,7 +110,7 @@ const GlobalHeaderRight = props => {
   const onhandSetting = flag => {
     setVisibleSetting(!!flag);
   };
-  const handleVisibleChange = () => {};
+  const handleVisibleChange = () => { };
 
   // 选择钱包
   const selectWallet = walletName => {
@@ -130,7 +131,7 @@ const GlobalHeaderRight = props => {
       activate(trezor);
     } else if (walletName === 'ledger') {
       activate(ledger);
-    } else if(walletName === 'binance'){
+    } else if (walletName === 'binance') {
       activate(binance);
     }
     setVisibleMetaMask(false);
@@ -196,7 +197,7 @@ const GlobalHeaderRight = props => {
     {
       name: 'Binance Wallet',
       icon: 'Binance',
-      onClick:()=>{
+      onClick: () => {
         selectWallet('binance');
       },
     },
@@ -278,7 +279,43 @@ const GlobalHeaderRight = props => {
   if (theme === 'dark') {
     className = `${styles.right}  ${styles.dark}`;
   }
-
+  // 网络列表
+  const [networkListIndex, setNetworkListIndex] = useState(0);
+  const networkList = [
+    {
+      name: 'main network',
+      icon: 'Binance',
+      onClick: () => {
+        console.log("main network select");
+        setNetworkListIndex(0);
+      },
+    },
+    {
+      name: 'test network',
+      icon: 'Binance',
+      onClick: () => {
+        console.log("test network select");
+        setNetworkListIndex(1);
+      },
+    }
+  ];
+  const networkListInCardList = (
+    <div className={styles.networkListBlock}>
+    <AcyCardList>
+          {networkList.map((item) => {
+              return (
+                <AcyCardList.Thin className={styles.networkListLayout} onClick={() => item.onClick()}>
+                  {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
+                    <AcyIcon.MyIcon width={32} type={item.icon} />
+                  )}
+                  <span>{item.name}</span>
+                </AcyCardList.Thin>
+              );
+            }
+          )}
+        </AcyCardList>
+        </div>
+  );
   return (
     <div className={className}>
       {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
@@ -344,7 +381,31 @@ const GlobalHeaderRight = props => {
           />
         </Dropdown>
       )}
+
       <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}>
+        
+        {/* 此处增加简单ui */}
+        <div className={styles.walltitle}>
+          <span style={{ marginLeft: '10px' }}>Select Network</span>
+        </div>
+        <Dropdown
+          overlay={networkListInCardList}
+          trigger={['click']}
+          placement="bottomLeft"
+          >
+            <AcyCardList>
+          {[networkList[networkListIndex]].map(item => (
+            <AcyCardList.Thin className={styles.networkListLayout}>
+              {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
+                <AcyIcon.MyIcon width={32} type={item.icon} />
+              )}
+              <span>{item.name}</span>
+            </AcyCardList.Thin>
+          ))}
+        </AcyCardList>
+        </Dropdown>
+        { /* 此处增加简单ui 结束 */}
+
         <div className={styles.walltitle}>
           {/* <AcyIcon.MyIcon width={20} type="Wallet" />{' '} */}
           <span style={{ marginLeft: '10px' }}>Select a Wallet</span>
@@ -369,17 +430,18 @@ const GlobalHeaderRight = props => {
               <span>{item.name}</span>
             </AcyCardList.Thin>
           ))}
-          {BinanceWallet.map(item =>(
-            <AcyCardList.Thin onClick={()=>item.onClick()}>
+          {BinanceWallet.map(item => (
+            <AcyCardList.Thin onClick={() => item.onClick()}>
               {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
-              <AcyIcon.MyIcon width={32} type={item.icon} />
-            )}
-            <span>{item.name}</span>
-          </AcyCardList.Thin>
+                <AcyIcon.MyIcon width={32} type={item.icon} />
+              )}
+              <span>{item.name}</span>
+            </AcyCardList.Thin>
           ))}
         </AcyCardList>
 
         <AcyCardList>
+
           {walletList.map((item, index) => {
             if (only && index > -1) {
               return;
