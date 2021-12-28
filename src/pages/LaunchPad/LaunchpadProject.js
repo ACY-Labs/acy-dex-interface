@@ -28,6 +28,9 @@ import fileWIcon from '@/assets/icon_file_white.svg';
 import announcementIcon from '@/assets/icon_announcement.svg';
 import announcementFIcon from '@/assets/icon_announcement_fill.svg';
 import $ from 'jquery';
+import { getContract } from "../../acy-dex-swap/utils/index.js"
+import { useWeb3React } from '@web3-react/core';
+import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
 
 const {
   apple,
@@ -68,11 +71,13 @@ const {
 const LaunchpadProject = () => {
   console.log($(document).height());
   
+  const { account, chainId, library, activate } = useWeb3React();
 
   const { projectId } = useParams();
   const [receivedData, setReceivedData] = useState({});
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
+  const [investorNum,setinvestorNum] = useState(0);
 
   console.log("--------------RECEIVEDDATA---------------")
   console.log(receivedData);
@@ -249,9 +254,9 @@ const LaunchpadProject = () => {
         <div style={{ display: 'block' }}>
           <div className='projecttitle-socials-container'>
             <h3 className='projecttitle'>Project Description</h3>
-            <div className='social-container'>
+            <div className=''>
               {receivedData.social && receivedData.social[0] &&
-                <div id='socialContainer'>
+                <div id='social container' className='social-container'>
                   { Object.entries(receivedData.social[0]).map((item)=>{
                     if(item[1] !== null ){
                       console.log(item)
@@ -413,7 +418,7 @@ const LaunchpadProject = () => {
     );
   };
 
-  const Allocation = ({ walletId, projectToken }) => {
+  const Allocation = ({ walletId, projectToken, maxSalesAmount=1000 }) => {
     const [allocationAmount, setAllocationAmount] = useState(0);
 
     useEffect(async () => {
@@ -592,6 +597,7 @@ const LaunchpadProject = () => {
     };
 
     const [isClickedVesting, setIsClickedVesting] = useState(false);
+    const [salesValue, setSalesValue] = useState();
 
     return (
       <div
@@ -616,10 +622,10 @@ const LaunchpadProject = () => {
             Sale
           </label>
           <div className="sales-input-container">
-            <input placeholder="" className="sales-input" type="number" />
-            {/* <button className="max-btn">MAX</button> */}
+            <input placeholder="Enter amount" className="sales-input" type="number" value={salesValue} onChange={e => setSalesValue(e.target.value)}/>
+            <button className="max-btn" onClick={() => setSalesValue(maxSalesAmount)}>MAX</button>
           </div>
-          <input type="submit" className="sales-submit" value="Buy" />
+          <input type="submit" className="sales-submit" value="Buy" onClick={() => console.log("buy")}/>
         </form>
 
         <div className="vesting-container" >
@@ -632,7 +638,7 @@ const LaunchpadProject = () => {
                 isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'
               }
             >
-              <VestingSchedule />
+              <VestingSchedule startDate={"28 Dec 2021 00:00:00 +0800"}/>
             </div>
           </div>
           <div className="arrow-down-container">
@@ -716,6 +722,15 @@ const LaunchpadProject = () => {
       });
   }, []);
 
+  // fetching data from Smart Contract
+  useEffect(async () => {
+    const poolContract = getContract("0xBfb1894743F200f0386B06Eb426DDE915Ce22846", POOLABI, library, account);
+
+    const poolNum = await poolContract.GetInvestorNum(111).then((res)=>{
+      console.log("res",res);
+    }).catch(e => console.log('CustomError in transaction',e))
+    ;
+  }, [])
   return (
     <div>
       <div className="mainContainer">

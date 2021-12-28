@@ -53,7 +53,7 @@
 }
 
 .allocation-content-active {
-  height: 700px;
+  height: 670px;
   transition: height 0.1s linear;
 }
 
@@ -441,9 +441,12 @@
   position: absolute;
   top: 9px;
   right: 15px;
-  background-color: #eb5c20;
+  background-color: unset;
+  color: #eb5c20;
   border: unset;
   padding: 2px 10px 4px 10px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .sales-submit {
@@ -454,6 +457,7 @@
   border-radius: 16px;
   width: 120px;
   height: 35px;
+  cursor: pointer;
 }
 
 .vesting-percentage {
@@ -462,6 +466,26 @@
   border-radius: 12px;
   background-color: #363636;
   padding: 2px 0;
+}
+
+.vesting-percentage-claim-container{
+  display: flex;
+  justify-content: space-between;
+}
+
+.vesting-percentage-claim-container .claim-btn{
+  background-color: #eb5c20;
+  border: unset;
+  font-size: 12px;
+  border-radius: 8px;
+}
+
+.claim-btn-inactive{
+  cursor: not-allowed;
+}
+
+.claim-btn-active{
+  cursor: pointer;
 }
 
 .vesting-tick-icon{
