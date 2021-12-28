@@ -94,8 +94,8 @@ const Transaction = props => {
 
   
   function drawRoutes (){
-    console.log("data", data);//, "token1", token1, "token2", token2);
-    console.log("routes", routes);
+    // console.log("data", data);//, "token1", token1, "token2", token2);
+    // console.log("routes", routes);
     let totalOut = formatNumber(data.totalOut*1,{ precision: 3, thousand: " " });
     let totalIn = formatNumber(data.totalIn*1,{ precision: 3, thousand: " " });
     data.link = `https://www.bscscan.com/tx/${id}`;
@@ -197,13 +197,22 @@ const Transaction = props => {
             <tr>
               <td className={styles.tableFirstCol}>Trader</td>
               <td>40%</td>
-              <td>{data.chartData.flash_revenue.toFixed(2)}</td>
+              <td>{data.userDistributionAmount.toFixed(2)}</td>
               <td>
                 <span>{data.token2.symbol}</span>
                 <img src={data.token2.logoURI}/>
               </td>
             </tr>
             <tr>
+              <td className={styles.tableFirstCol}>ACY Treasury</td>
+              <td>60%</td>
+              <td>{data.chartData.acy_treasury.toFixed(2)}</td>
+              <td>
+                <span>{data.token2.symbol}</span>
+                <img src={data.token2.logoURI} />
+              </td>
+            </tr>
+            {/* <tr>
               <td className={styles.tableFirstCol}>Liquidity Provider</td>
               <td>20%</td>
               <td>{data.chartData.liquidity_provider.toFixed(2)}</td>
@@ -249,10 +258,10 @@ const Transaction = props => {
                 <span>{data.token2.symbol}</span>
                 <img src={data.token2.logoURI}/>
               </td>
-            </tr>
+            </tr> */}
           </table>
           
-          <h1><AcyIcon.MyIcon width={30} type="arrow" />Basic Fee</h1>
+          {/* <h1><AcyIcon.MyIcon width={30} type="arrow" />Basic Fee</h1>
           <table style={{width:'500px'}}>
             <tr>
               <td className={styles.tableFirstCol}>Gas Fee</td>
@@ -274,14 +283,14 @@ const Transaction = props => {
               <td className={styles.tableFirstCol}>ACYDAO</td>
               <td>{data.chartData.trading_fee.toFixed(2)}</td>
             </tr>
-          </table>
+          </table> */}
           
           <h1><AcyIcon.MyIcon width={30} type="arrow" />Trader Receives</h1>
           <table style={{width:'500px'}}>
             <tr>
               <td className={styles.tableFirstCol} ><span>{data.token2.symbol}</span>
               <img src={data.token2.logoURI} /></td>
-              <td>3,303,788.77</td>
+              <td>{data.userDistributionAmount.toFixed(2)}</td>
             </tr>
             {/* <tr>
               <td>ACY</td>

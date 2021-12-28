@@ -801,13 +801,8 @@ function getChartData (data){
         "acy_output" : data.FAOutput,
         "amm_output" : amm,
         "flash_revenue" : revenue,
-        "liquidity_provider" : revenue * 0.4,
-        "farms_standard" : revenue * 0.1,
-        "farms_acydao" : revenue * 0.1,
-        "farms_premier" :  revenue * 0.1,
-        "ecosystem_dao" : revenue * 0.1,
+        "acy_treasury": revenue * 0.6,
         "trading_fee" : 0,
-
     }
 }
 
@@ -827,7 +822,7 @@ function getTransferLogPath(transferLogs, pathList, fromAddress, destAddress) {
 
 export async function fetchTransactionData(address,library, account){
 
-    // console.log("fetching tx" , address);
+    console.log("fetching tx" , address);
 
     // console.log("before get All Supported Tokens Price");
     tokenPriceUSD = await getAllSuportedTokensPrice();
@@ -842,7 +837,7 @@ export async function fetchTransactionData(address,library, account){
         const transactionData = await library.getTransaction(address.toString());
         const sourceAddress = (transactionData.from).toLowerCase();
         const destAddress = (transactionData.to).toLowerCase();
-        // console.log("transactionData", transactionData);
+        console.log("transactionData", transactionData);
         // console.log(sourceAddress, destAddress);
 
         // this code is used to get METHOD ID
@@ -858,7 +853,7 @@ export async function fetchTransactionData(address,library, account){
             const methodUsedABI = ACYV1ROUTER02_ABI.find(item => item.name == methodUsed)
             const parsedInputData = "0x" + transactionData.data.substring(10, transactionData.data.length);
             const txnDataDecoded = web3.eth.abi.decodeParameters(methodUsedABI.inputs, parsedInputData);
-            // console.log("txnDataDecoded")
+            console.log("txnDataDecoded", txnDataDecoded);
             const fromTokenAddress = txnDataDecoded.path[0];
             const toTokenAddress = txnDataDecoded.path[1];
             
@@ -873,14 +868,14 @@ export async function fetchTransactionData(address,library, account){
                 FlashArbitrageResult_Log.data, 
                 FlashArbitrageResult_Log.topics
                 )
-            // console.log("txnReceiptDecoded", txnReceiptDecoded);
+            console.log("txnReceiptDecoded", txnReceiptDecoded);
             
             /**
              * Parse transfer logs
              * 1. find all the routes from sourceAddress to destAddress
              * */
             const transferLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0] == actionList.transfer.hash);
-            // console.log("transferLogs", transferLogs);
+            console.log("transferLogs", transferLogs);
             const routes_loglists = [];
             for (let i = 0; i < transferLogs.length; i ++) {
                 let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
@@ -891,7 +886,7 @@ export async function fetchTransactionData(address,library, account){
                     routes_loglists.push(path);
                 }
             } 
-            // console.log("routes_loglists", routes_loglists);
+            console.log("routes_loglists", routes_loglists);
 
             /**
              * Parse the routes_loglists into frontend readable data
@@ -962,9 +957,9 @@ export async function fetchTransactionData(address,library, account){
                 "token1" : token1,
                 "token2" : token3,
                 "ethPrice" : ethPrice,
-                "AMMOutput": Math.floor(txnReceiptDecoded.AMMOutput), // this number is actually too large for integer, so it doesnt convert the string to int completely, but its enough for frontend showcase, wont be effecting the result.
-                "FAOutput": Math.floor(txnReceiptDecoded.FAOutput),
-                "userDistributionAmount": Math.floor(txnReceiptDecoded.userDistributionAmount)
+                "AMMOutput": (Math.floor(txnReceiptDecoded.AMMOutput) / Math.pow(10, token3.decimals)), // this number is actually too large for integer, so it doesnt convert the string to int completely, but its enough for frontend showcase, wont be effecting the result.
+                "FAOutput": (Math.floor(txnReceiptDecoded.FAOutput) / Math.pow(10, token3.decimals)),
+                "userDistributionAmount": (Math.floor(txnReceiptDecoded.userDistributionAmount) / Math.pow(10, token3.decimals))
             }
             console.log("newData", newData);
 
