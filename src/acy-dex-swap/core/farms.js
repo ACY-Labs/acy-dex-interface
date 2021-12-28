@@ -29,6 +29,7 @@ import { injected } from '@/connectors';
 import axios from 'axios';
 import ConstantLoader from '@/constants';
 const supportedTokens = ConstantLoader().tokenList;
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 const getTokenSymbol = async (address, library, account) => {
   const tokenContract = getTokenContract(address, library, account);
   return tokenContract.symbol();
@@ -359,17 +360,17 @@ const newGetPoolByFarm = async (farm, tokenPrice, library, account) => {
 
   const positions = await farmContract.getUserPositions(account, poolId);
 
-  const [stakePosition, pendingReward, rewardsPerYear, liquidityApr] = await Promise.all([
+  const [stakePosition, pendingReward, rewardsPerBlock, liquidityApr] = await Promise.all([
     getUserStakePosition(poolId, positions, lpToken.decimals, farmContract),
     getUserPending(poolId, positions, rewardTokens, farmContract),
-    getPoolRewardsPerYear(poolId, rewardTokens, farmContract, tokenPrice),
+    getPoolRewardsPerBlock(poolId, rewardTokens, farmContract, tokenPrice),
     calculateVolAndApr(token0, token1, tokenPrice)
   ]);
-  console.log("totalRewardPerYear:",rewardsPerYear);
+  console.log("totalRewardPerYear:",rewardsPerBlock);
 
   var totalRewardPerYear = 0;
-  rewardsPerYear.forEach((reward,index) => {
-    totalRewardPerYear += reward * tokenPrice[rewardTokens[index].symbol];
+  rewardsPerBlock.forEach((reward,index) => {
+    totalRewardPerYear += reward * tokenPrice[rewardTokens[index].symbol] * BLOCKS_PER_YEAR  / 10 ** rewardTokens[index].decimals;
   });
   const stakeData = [];
   for(var index = 0; index < stakePosition.length ; index++) {
@@ -458,7 +459,12 @@ const newGetPoolByFarm = async (farm, tokenPrice, library, account) => {
     ratio: ratio,
     token1Ratio: token1Ratio,
     token2Ratio: token2Ratio,
-    poolRewardPerYear: totalRewardPerYear
+    poolRewardPerYear: totalRewardPerYear,
+    tokensRewardPerBlock: rewardsPerBlock.map((reward, index)=> ({
+      token: rewardTokens[index].symbol,
+      rewardPerBlock: reward / 10 ** rewardTokens[index].decimals,
+      rate: tokenPrice[rewardTokens[index].symbol] 
+    }))
   };
 }
 
@@ -471,10 +477,10 @@ const getPoolAccumulateRewards = async (poolId, rewardTokens, poolPositons, cont
       return rewards.map(reward => reward.reduce((total, currentAmount) => total += parseInt(currentAmount),0));
   });
 }
-const getPoolRewardsPerYear = async (poolId, rewardTokens, contract) => {
+const getPoolRewardsPerBlock = async (poolId, rewardTokens, contract) => {
   const poolTokenRewardInfoPromise = rewardTokens.map(rewardToken => 
       contract.getPoolTokenRewardInfo(poolId,rewardToken.farmToken).then( info =>
-        info[3] * BLOCKS_PER_YEAR  / 10 ** rewardToken.decimals
+        info[3] 
       )
   );
   return Promise.all(poolTokenRewardInfoPromise);
@@ -556,7 +562,7 @@ const calculateVolAndApr = async (token0, token1, tokenPrices) => {
 
   console.log("this is", token0, token1)
   if(!token1) return 0;
-  return await axios.get(`https://api.acy.finance/api/poolchart/pair?token0=${token0.address}&token1=${token1.address}`).then(async (res) => {
+  return await axios.get(`${apiUrlPrefix}/poolchart/pair?token0=${token0.address}&token1=${token1.address}`).then(async (res) => {
     // calculate volume in USD
     console.log("this is return data", res.data)
     const {token0: token0Vol, token1: token1Vol} = res.data.data.lastVolume;
@@ -682,8 +688,12 @@ const deposit = async (lpTokenAddr, amount, poolId, lockDuration, library, accou
   })();
   if (status instanceof CustomError) {
     // setButtonText(status.getErrorText());
-    // setButtonText(status.getErrorText());
-    setButtonText("Error, Try again");
+    if(status.getErrorText()  == `Approval required` ) {
+      setButtonText(status.getErrorText());
+    } else {
+      setButtonText("Error, Try again");
+    }
+
   } else {
     stakeCallback(status);
   }

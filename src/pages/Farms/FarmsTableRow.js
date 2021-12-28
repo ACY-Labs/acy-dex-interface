@@ -216,7 +216,8 @@ const FarmsTableRow = props => {
       endAfter: (pool.endBlock - block) * BLOCK_TIME,
       token1Ratio: pool.token1Ratio,
       token2Ratio: pool.token2Ratio,
-      poolRewardPerYear: pool.poolRewardPerYear
+      poolRewardPerYear: pool.poolRewardPerYear,
+      tokensRewardPerBlock: pool.tokensRewardPerBlock
     };
     console.log("TEST HERE:",newFarmsContent);
     setPoolInfo(newFarmsContent);
@@ -673,6 +674,7 @@ const FarmsTableRow = props => {
         token1Ratio={poolInfo.token1Ratio}
         token2Ratio={poolInfo.token2Ratio}
         poolRewardPerYear={poolInfo.poolRewardPerYear}
+        tokensRewardPerBlock={poolInfo.tokensRewardPerBlock}
       />
     </div>
   )

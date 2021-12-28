@@ -30,7 +30,7 @@ const config: IConfig = {
   },
   proxy: {
     '/api': {
-      target: 'http://localhost:3001',
+      target: 'https://api.acy.finance',
       changeOrigin: true
     }
   },

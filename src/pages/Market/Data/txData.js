@@ -154,7 +154,7 @@ async function parseTopExchangeVolume(userList,library){
 
 export async function fetchTopExchangeVolume(library){
  try{
-   let request = 'https://api.acy.finance/api/users/all';
+   let request = `${apiUrlPrefix}/users/all`;
    let response = await fetch(request);
    let data = await response.json();
    console.log(data.data);

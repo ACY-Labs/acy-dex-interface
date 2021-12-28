@@ -12,6 +12,8 @@ import {
   binance,
   injected,
 } from '@/connectors';
+import ConstantLoader from '@/constants';
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
   const handleInputChange = (e) => {
@@ -224,7 +226,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
           if (percent === 100) {
             axios.post(
               // fetch valid pool list from remote
-              `https://api.acy.finance/api/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
+              `${apiUrlPrefix}/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
               // `http://localhost:3001/api/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
             ).then(res => {
               console.log("remove to server return: ", res);

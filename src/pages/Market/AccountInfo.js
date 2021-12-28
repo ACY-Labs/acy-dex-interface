@@ -40,6 +40,7 @@ import { binance, injected } from '@/connectors';
 import ConstantLoader from '@/constants';
 const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
 const supportedTokens = ConstantLoader().tokenList;
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -513,8 +514,8 @@ function AccountInfo(props) {
     console.log("fetching user pool list");
     axios.get(
       // fetch valid pool list from remote
-      // `https://api.acy.finance/api/pool?chainId=${chainId}`
-      `https://api.acy.finance/api/userpool?walletId=${account}`
+      // `${apiUrlPrefix}/pool?chainId=${chainId}`
+      `${apiUrlPrefix}/userpool?walletId=${account}`
       // `http://localhost:3001/api/userpool?walletId=${account}`
     ).then(async res => {
       console.log("fetch pool data");

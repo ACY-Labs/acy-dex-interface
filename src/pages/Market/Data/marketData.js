@@ -5,8 +5,13 @@ import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 
 import {findTokenWithAddress} from '@/utils/txData';
 import {totalInUSD} from '@/utils/utils'
+<<<<<<< HEAD
 import { ACY_API, DAYS_TRACKED_CHART } from '@/constants/configs';
 
+=======
+import ConstantLoader from '@/constants';
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+>>>>>>> master
 
 
 // get market info snapshot
@@ -103,7 +108,11 @@ export async  function fetchMarketData () {
     // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
+<<<<<<< HEAD
     let request = ACY_API+'poolchart/historical/all';
+=======
+    let request = `${apiUrlPrefix}/poolchart/historical`;
+>>>>>>> master
     // let request = 'http://localhost:3001/api/poolchart/historical';
     let response = await fetch(request);
     let data = await response.json();

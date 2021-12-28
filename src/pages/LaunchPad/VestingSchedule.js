@@ -1,6 +1,6 @@
 import React from 'react';
 import './css/LaunchpadProject.css';
-import tick from '@/assets/tick-launchpad.svg';
+import tick from '@/assets/icon-tick-white.svg';
 
 const VestingSchedule = () => {
   return (
@@ -8,7 +8,7 @@ const VestingSchedule = () => {
       <div className="procedure vesting-procedure">
         <hr aria-orientation="vertical" className="verticalDivideLine vesting-schedule-line" />
         <div className="procedureNumber">
-          <img src={tick} alt="tick-icon" />
+          <img src={tick} alt="tick-icon" className="vesting-tick-icon"/>
         </div>
         <div className="vesting-schedule-text">
           <p className="vesting-percentage">30%</p>
@@ -23,7 +23,7 @@ const VestingSchedule = () => {
       <div className="procedure vesting-procedure">
         <hr aria-orientation="vertical" className="verticalDivideLine vesting-schedule-line" />
         <div className="procedureNumber">
-          <img src={tick} alt="tick-icon" />
+          <img src={tick} alt="tick-icon" className="vesting-tick-icon"/>
         </div>
         <div className="vesting-schedule-text">
           <p className="vesting-percentage">23.3%</p>
@@ -37,7 +37,7 @@ const VestingSchedule = () => {
       <div className="procedure vesting-procedure">
         <hr aria-orientation="vertical" className="verticalDivideLine vesting-schedule-line" />
         <div className="procedureNumber">
-          <img src={tick} alt="tick-icon" />
+          <img src={tick} alt="tick-icon" className="vesting-tick-icon"/>
         </div>
         <div className="vesting-schedule-text">
           <p className="vesting-percentage">23.3%</p>
@@ -50,7 +50,7 @@ const VestingSchedule = () => {
 
       <div className="procedure vesting-procedure">
         <div className="procedureNumber">
-          <img src={tick} alt="tick-icon" />
+          <img src={tick} alt="tick-icon" className="vesting-tick-icon"/>
         </div>
         <div className="vesting-schedule-text">
           <p className="vesting-percentage">23.4%</p>

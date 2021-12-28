@@ -141,7 +141,8 @@ const Farms = (props) => {
         endAfter: (pool.endBlock - block) * BLOCK_TIME,
         token1Ratio: pool.token1Ratio,
         token2Ratio: pool.token2Ratio,
-        poolRewardPerYear: pool.poolRewardPerYear
+        poolRewardPerYear: pool.poolRewardPerYear, // usd price
+        tokensRewardPerBlock: pool.tokensRewardPerBlock
       };
       if(newFarmsContent.poolId == 0) {
         // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));
