@@ -914,9 +914,9 @@ export async function fetchTransactionData(address,library, account){
                     amount3 = (transferLogs[path[1]].data / Math.pow(10, token3.decimals)); 
                     // console.log(token1, token3);
                     routes.push({
-                        "token1": token1,
+                        "token1": token1.symbol,
                         "token2": null,
-                        "token3": token3,
+                        "token3": token3.symbol,
                         "token1Num": amount1,
                         "token2Num": null,
                         "token3Num": amount3,
@@ -931,9 +931,9 @@ export async function fetchTransactionData(address,library, account){
                     amount3 = (transferLogs[path[2]].data / Math.pow(10, token3.decimals)); 
                     // console.log(token1, token2, token3);
                     routes.push({
-                        "token1": token1,
-                        "token2": token2,
-                        "token3": token3,
+                        "token1": token1.symbol,
+                        "token2": token2.symbol,
+                        "token3": token3.symbol,
                         "token1Num": amount1,
                         "token2Num": amount2,
                         "token3Num": amount3,
@@ -964,7 +964,7 @@ export async function fetchTransactionData(address,library, account){
                 "ethPrice" : ethPrice,
                 "AMMOutput": Math.floor(txnReceiptDecoded.AMMOutput), // this number is actually too large for integer, so it doesnt convert the string to int completely, but its enough for frontend showcase, wont be effecting the result.
                 "FAOutput": Math.floor(txnReceiptDecoded.FAOutput),
-                "userDistributionAmount": txnReceiptDecoded.userDistributionAmount
+                "userDistributionAmount": Math.floor(txnReceiptDecoded.userDistributionAmount)
             }
             console.log("newData", newData);
 
