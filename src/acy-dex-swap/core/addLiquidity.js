@@ -21,8 +21,7 @@ import {
   getUserTokenBalanceRaw,
   INITIAL_ALLOWED_SLIPPAGE,
 } from '../utils';
-import ConstantLoader from "@/constants";
-const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
+import { constantInstance } from "@/constants";
 
 // get the estimated amount of the other token required when adding liquidity, in readable string.
 export async function getEstimated(
@@ -640,6 +639,7 @@ export async function addLiquidity(
   } else {
     console.log('status');
     console.log(status);
+    const scanUrlPrefix = constantInstance.scanUrlPrefix;
     let url = scanUrlPrefix + '/tx/' + status.hash;
     addLiquidityCallback(status);
     setLiquidityStatus(

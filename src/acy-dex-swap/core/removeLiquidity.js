@@ -23,8 +23,7 @@ import {
   ROUTER_ADDRESS,
   supportedTokens,
 } from '../utils';
-import ConstantLoader from '@/constants';
-const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
+import {constantInstance} from '@/constants';
 
 export async function getEstimated(
   inputToken0,
@@ -856,6 +855,7 @@ export async function removeLiquidity(
     
     removeLiquidityCallback(status, percent);
 
+    const scanUrlPrefix = constantInstance.scanUrlPrefix;
     const url = `${scanUrlPrefix}/tx/${status.hash}`;
     setRemoveStatus(
       <a href={url} target="_blank" rel="noreferrer">
