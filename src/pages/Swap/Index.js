@@ -33,10 +33,7 @@ import StakeHistoryTable from './components/StakeHistoryTable';
 import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
-import ConstantLoader from '@/constants';
-const supportedTokens = ConstantLoader().tokenList;
-const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+import { useConstantLoader } from '@/constants';
 
 const { AcyTabPane } = AcyTabs;
 function getTIMESTAMP(time) {
@@ -104,6 +101,8 @@ const StyledCard = styled(AcyCard)`
 `;
 
 const Swap = props => {
+  const {account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix}} = useConstantLoader();
+  console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
   const [pricePoint, setPricePoint] = useState(0);
   const [pastToken1, setPastToken1] = useState('ETH');
@@ -124,7 +123,33 @@ const Swap = props => {
   const [transactionList, setTransactionList] = useState([]);
   const [tableLoading, setTableLoading] = useState(true);
   const [transactionNum, setTransactionNum] = useState(0);
-  const { account, chainId, library, activate } = useWeb3React();
+  const { activate } = useWeb3React();
+
+  useEffect(() => {
+    if (!supportedTokens) return
+
+    console.log("resetting page states")
+    // reset on chainId change => supportedTokens change
+    setPricePoint(0);
+    setPastToken1('ETH');
+    setPastToken0('USDC');
+    setIsReceiptObtained(false);
+    setRouteData([]);
+    setFormat('h:mm:ss a');
+    setActiveToken1(supportedTokens[1]);
+    setActiveToken0(supportedTokens[0]);
+    setActiveAbsoluteChange('+0.00');
+    setActiveRate('N/A');
+    setRange('1D');
+    setChartData([]);
+    setAlphaTable('Line');
+    setVisibleLoading(false);
+    setVisible(false);
+    setVisibleConfirmOrder(false);
+    setTransactionList([]);
+    setTableLoading(true);
+    setTransactionNum(0);
+  }, [chainId])
 
   const refContainer = useRef();
   refContainer.current = transactionList;

@@ -45,9 +45,7 @@ import {
   getRouterContract,
   getUserTokenBalance,
   getUserTokenBalanceRaw,
-  INITIAL_ALLOWED_SLIPPAGE,
   isZero,
-  ROUTER_ADDRESS,
   supportedTokens,
   parseArbitrageLog,
 } from '@/acy-dex-swap/utils/index';
@@ -84,12 +82,12 @@ import { Row, Col, Button, Input, Icon } from 'antd';
 import { Alert } from 'antd';
 import spinner from '@/assets/loading.svg';
 import moment from 'moment';
-import ConstantLoader from '@/constants';
-const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
+import {useConstantLoader} from '@/constants';
 
 
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
+  const { account, library, chainId, tokenList: INITIAL_TOKEN_LIST, farmSetting: {INITIAL_ALLOWED_SLIPPAGE}} = useConstantLoader(props);
   const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1=false } = props;
 
   // 选择货币的弹窗
@@ -158,6 +156,59 @@ const SwapComponent = props => {
 
   const [showDescription, setShowDescription] = useState(false);
 
+  useEffect(() => {
+    if (!INITIAL_TOKEN_LIST) return
+    console.log("resetting page states, new swapComponent token0, token1", INITIAL_TOKEN_LIST[0], INITIAL_TOKEN_LIST[1])
+    setVisible(null);
+      // 选择货币前置和后置
+    setBefore(true);
+      // 交易对前置货币
+    setToken0(INITIAL_TOKEN_LIST[0]);
+      // 交易对后置货币
+    setToken1(INITIAL_TOKEN_LIST[1]);
+      // 交易对前置货币余额
+    setToken0Balance('0');
+      // 交易对后置货币余额
+    setToken1Balance('0');
+      // 交易对前置货币兑换量
+    setToken0Amount('');
+      // 交易对后置货币兑换量
+    setToken1Amount('');
+      // 交易中用户使用Flash Arbitrage的额外获利
+    setBonus0(null);
+    setBonus1(null);
+    setToken0BalanceShow(false);
+    setToken1BalanceShow(false);
+    setSlippageTolerance(INITIAL_ALLOWED_SLIPPAGE / 100);
+    setInputSlippageTol(INITIAL_ALLOWED_SLIPPAGE / 100);
+    setSlippageError('');
+    setDeadline();
+    setExactIn(true);
+    setNeedApprove(false);
+    setApproveAmount('0');
+    setApproveButtonStatus(true);
+      // Breakdown shows the estimated information for swap
+      // let [estimatedStatus,setEstimatedStatus]=useState();
+    setSwapBreakdown();
+    setSwapButtonState(false);
+    setSwapButtonContent('Connect to Wallet');
+    setSwapStatus();
+    setPair();
+    setRoute();
+    setTrade();
+    setSlippageAdjustedAmount();
+    setMinAmountOut();
+    setMaxAmountIn();
+    setWethContract();
+    setWrappedAmount();
+    setShowSpinner(false);
+    setMethodName();
+    setIsUseArb(false);
+    setMidTokenAddress();
+    setPoolExist(true);
+    setShowDescription(false);
+  }, [chainId])
+
   // connect to page model, reflect changes of pair ratio in this component
   useEffect(() => {
     const { swap: { token0: modelToken0, token1: modelToken1 } } = props;
@@ -178,25 +229,35 @@ const SwapComponent = props => {
   const dependentFieldPlaceholder = 'Estimated value';
   const slippageTolerancePlaceholder = 'Please input a number from 1.00 to 100.00';
 
-  const { account, chainId, library, activate } = useWeb3React();
+  const { activate } = useWeb3React();
 
   useEffect(
     () => {
+      console.log("swapComp 239", account, chainId, library)
       if (!account || !chainId || !library) {
         setToken0BalanceShow(false);
         setToken1BalanceShow(false);
         return;
       }
+      console.log("try to refresh balance", INITIAL_TOKEN_LIST, token0, token1)
+
+      const _token0 = INITIAL_TOKEN_LIST[0];
+      const _token1 = INITIAL_TOKEN_LIST[1];
+      setToken0(_token0);
+      setToken1(_token1);
       async function refreshBalances() {
-        setToken0Balance(await getUserTokenBalance(token0, chainId, account, library));
+        setToken0Balance(await getUserTokenBalance(_token0, chainId, account, library).catch(e => console.log("refrersh balances error", e)));
         setToken0BalanceShow(true);
-        setToken1Balance(await getUserTokenBalance(token1, chainId, account, library));
+        setToken1Balance(await getUserTokenBalance(_token1, chainId, account, library).catch(e => console.log("refrersh balances error", e)));
         setToken1BalanceShow(true);
       }
-
-      refreshBalances();
+      try {
+        refreshBalances();
+      } catch {
+        e => console.log("refrersh balances error", e)
+      }
     },
-    [account, chainId, library]
+    [account, INITIAL_TOKEN_LIST]
   );
 
 
@@ -648,8 +709,6 @@ const SwapComponent = props => {
           {swapButtonContent}
         </AcyButton>
       }
-
-
 
       <AcyDescriptions>
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}

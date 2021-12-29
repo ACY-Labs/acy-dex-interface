@@ -12,19 +12,17 @@ import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import ERC20ABI from '../abis/ERC20.json';
 import axios from 'axios';
 import { JsonRpcProvider } from "@ethersproject/providers";
-import ConstantLoader from '@/constants';
-const tokenList = ConstantLoader().tokenList;
-const farmSetting = ConstantLoader().farmSetting;
+import {constantInstance} from "@/constants";
 
-export const INITIAL_ALLOWED_SLIPPAGE = farmSetting.INITIAL_ALLOWED_SLIPPAGE;
-export const ROUTER_ADDRESS = farmSetting.ROUTER_ADDRESS;
-export const FARMS_ADDRESS  = farmSetting.FARMS_ADDRESS;
-export const FLASH_ARBITRAGE_ADDRESS = farmSetting.FLASH_ARBITRAGE_ADDRESS;
-export const BLOCK_TIME = farmSetting.BLOCK_TIME;
-export const BLOCKS_PER_YEAR = farmSetting.BLOCKS_PER_YEAR;
-export const BLOCKS_PER_MONTH = farmSetting.BLOCKS_PER_MONTH; 
-export const RPC_URL = farmSetting.RPC_URL;
-export const API_URL = farmSetting.API_URL;
+export const INITIAL_ALLOWED_SLIPPAGE = () => constantInstance.farmSetting.INITIAL_ALLOWED_SLIPPAGE;
+export const ROUTER_ADDRESS = () => constantInstance.farmSetting.ROUTER_ADDRESS;
+export const FARMS_ADDRESS = () => constantInstance.farmSetting.FARMS_ADDRESS;
+export const FLASH_ARBITRAGE_ADDRESS = () => constantInstance.farmSetting.FLASH_ARBITRAGE_ADDRESS;
+export const BLOCK_TIME = () => constantInstance.farmSetting.BLOCK_TIME;
+export const BLOCKS_PER_YEAR = () => constantInstance.farmSetting.BLOCKS_PER_YEAR;
+export const BLOCKS_PER_MONTH = () => constantInstance.farmSetting.BLOCKS_PER_MONTH; 
+export const RPC_URL = () => constantInstance.farmSetting.RPC_URL;
+export const API_URL = () => constantInstance.farmSetting.API_URL;
 
 //old farm address 0xf132Fdd642Afa79FDF6C1B77e787865C652eC824
 //new farm address 0x96c13313aB386BCB16168Dee3D2d86823A990770
@@ -122,11 +120,11 @@ export function getContract(address, ABI, library, account) {
 }
 
 export function getRouterContract(library, account) {
-  return getContract(ROUTER_ADDRESS, ACYRouterABI, library, account);
+  return getContract(ROUTER_ADDRESS(), ACYRouterABI, library, account);
 }
 
 export function getFarmsContract(library, account) {
-  return getContract(FARMS_ADDRESS, FarmsABI, library, account);
+  return getContract(FARMS_ADDRESS(), FarmsABI, library, account);
 }
 
 export function getTokenContract(tokenAddress, library, account) {
@@ -214,6 +212,8 @@ export async function getUserTokenBalanceRaw(token, account, library) {
 
 // get user token balance in readable string foramt
 export async function getUserTokenBalance(token, chainId, account, library) {
+  console.log("test print constantInstance", constantInstance, API_URL())
+  // const chainId = constantInstance.chainId;
   let { address, symbol, decimals } = token;
 
   if (!token) return;
@@ -258,7 +258,7 @@ export async function approve(tokenAddress, requiredAmount, library, account) {
   let allowance = await getAllowance(
     tokenAddress,
     account, // owner
-    ROUTER_ADDRESS, //spender
+    ROUTER_ADDRESS(), //spender
     library, // provider
     account // active account
   );
@@ -267,12 +267,12 @@ export async function approve(tokenAddress, requiredAmount, library, account) {
     let tokenContract = getContract(tokenAddress, ERC20ABI, library, account);
     let useExact = false;
     // try to get max allowance
-    let estimatedGas = await tokenContract.estimateGas['approve'](ROUTER_ADDRESS, MaxUint256).catch(
+    let estimatedGas = await tokenContract.estimateGas['approve'](ROUTER_ADDRESS(), MaxUint256).catch(
       async () => {
         // general fallback for tokens who restrict approval amounts
         useExact = true;
         let result = await tokenContract.estimateGas.approve(
-          ROUTER_ADDRESS,
+          ROUTER_ADDRESS(),
           requiredAmount.raw.toString()
         );
         return result;
@@ -281,7 +281,7 @@ export async function approve(tokenAddress, requiredAmount, library, account) {
 
     console.log(`Exact? ${useExact}`);
     let res = await tokenContract
-      .approve(ROUTER_ADDRESS, useExact ? requiredAmount.raw.toString() : MaxUint256, {
+      .approve(ROUTER_ADDRESS(), useExact ? requiredAmount.raw.toString() : MaxUint256, {
         gasLimit: calculateGasMargin(estimatedGas),
       })
       .catch(() => {
@@ -300,7 +300,7 @@ export async function approve(tokenAddress, requiredAmount, library, account) {
       let newAllowance = await getAllowance(
         tokenAddress,
         account, // owner
-        ROUTER_ADDRESS, //spender
+        ROUTER_ADDRESS(), //spender
         library, // provider
         account // active account
       );
@@ -322,7 +322,7 @@ export async function checkTokenIsApproved(tokenAddress, requiredAmount, library
   let allowance = await getAllowance(
     tokenAddress,
     account, // owner
-    ROUTER_ADDRESS, // spender
+    ROUTER_ADDRESS(), // spender
     library, // provider
     account // active account
   );
@@ -419,14 +419,10 @@ export function parseArbitrageLog({ data, topics }) {
     nonZeroTokenAmount,
   };
 }
-// pass token symbol
-export function getTokenPrice(symbol) {
-  const token = tokenList.find(token => token.symbol == symbol);
-  if (!token) return 0;
-  axios.get("https://api.coingecko.com/api/v3/simple/price?ids=shiba-inu&vs_currencies=usd")
-}
 export async function getAllSuportedTokensPrice() {
-  const library = new JsonRpcProvider(RPC_URL, 56);
+  const chainId = constantInstance.chainId;
+  const library = new JsonRpcProvider(RPC_URL(), chainId);
+  const tokenList = constantInstance.tokenList;
   const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
   const searchIds = searchIdsArray.join('%2C');
   const tokensPrice = await axios.get(
@@ -447,17 +443,20 @@ export async function getAllSuportedTokensPrice() {
 }
 
 export async function getACYPrice(library){
+  const tokenList = constantInstance.tokenList;
+  const chainId = constantInstance.chainId;
+
   const ACY  = tokenList.find(token => token.symbol == "ACY");
   const BUSD = tokenList.find(token => token.symbol == "BUSD");
   const USDT = tokenList.find(token => token.symbol == "USDT");
 
-  const acyToken  = new Token(56, "0xc94595b56e301f3ffedb8ccc2d672882d623e53a", 18, "ACY");
-  const usdToken  = new Token(56, "0x55d398326f99059ff775485246999027b3197955", 18, "USDT");
-  const busdToken = new Token(56, "0xe9e7cea3dedca5984780bafc599bd69add087d56", 18, "BUSD");
-  const acyUsdtPair = await Fetcher.fetchPairData(acyToken, usdToken, library, 56).catch(e => {
+  const acyToken  = new Token(chainId, "0xc94595b56e301f3ffedb8ccc2d672882d623e53a", 18, "ACY");
+  const usdToken  = new Token(chainId, "0x55d398326f99059ff775485246999027b3197955", 18, "USDT");
+  const busdToken = new Token(chainId, "0xe9e7cea3dedca5984780bafc599bd69add087d56", 18, "BUSD");
+  const acyUsdtPair = await Fetcher.fetchPairData(acyToken, usdToken, library, chainId).catch(e => {
     return false
   });
-  const acyBusdPair = await Fetcher.fetchPairData(acyToken, busdToken, library, 56).catch(e => {
+  const acyBusdPair = await Fetcher.fetchPairData(acyToken, busdToken, library, chainId).catch(e => {
     return false
   });
   if(!acyUsdtPair && !acyBusdPair) {
@@ -505,7 +504,7 @@ export async function getTokenPriceByPair(pair, symbol, library) {
 
 // return output field amount for swap component
 export async function withExactInEstimateOutAmount(deltaX, xTokenAddress, yTokenAddress, maxPathNum = 15, library, account) {
-  const flashArbitrageContract = getContract(FLASH_ARBITRAGE_ADDRESS, FlashArbitrageABI, library, account)
+  const flashArbitrageContract = getContract(FLASH_ARBITRAGE_ADDRESS(), FlashArbitrageABI, library, account)
   console.log(deltaX, xTokenAddress, yTokenAddress, maxPathNum)
   const estimateOutputAmount = await flashArbitrageContract.calXiOutput(deltaX, xTokenAddress, yTokenAddress, maxPathNum);
   return estimateOutputAmount;
@@ -513,7 +512,7 @@ export async function withExactInEstimateOutAmount(deltaX, xTokenAddress, yToken
 
 // return output field amount for swap component
 export async function withExactOutEstimateInAmount(deltaY, xTokenAddress, yTokenAddress, maxPathNum = 15, library, account) {
-  const flashArbitrageContract = getContract(FLASH_ARBITRAGE_ADDRESS, FlashArbitrageABI, library, account)
+  const flashArbitrageContract = getContract(FLASH_ARBITRAGE_ADDRESS(), FlashArbitrageABI, library, account)
   const estimateInputAmount = await flashArbitrageContract.calYiOutput(deltaY, xTokenAddress, yTokenAddress, maxPathNum);
   return estimateInputAmount;
 }

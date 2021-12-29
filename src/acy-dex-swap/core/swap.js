@@ -47,7 +47,7 @@ function toFixed4(floatInString) {
 export async function swapGetEstimated(
   inputToken0,
   inputToken1,
-  allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
+  allowedSlippage,
   exactIn = true,
   chainId,
   library,
@@ -726,7 +726,7 @@ export async function swapGetEstimated(
       let allowance = await getAllowance(
         inToken0Address,
         account,
-        ROUTER_ADDRESS,
+        ROUTER_ADDRESS(),
         library,
         account
       );
@@ -780,7 +780,7 @@ export async function swapGetEstimated(
 export async function swap(
   inputToken0,
   inputToken1,
-  allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
+  allowedSlippage,
   exactIn = true,
   chainId,
   library,

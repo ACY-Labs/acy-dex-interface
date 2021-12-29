@@ -53,8 +53,8 @@ const BscTestNetFarmSetting: FarmSetting = {
 
 const FarmSettingSelector = (arg: string) => {
     return {
-        'BscMainNet': BscMainNetFarmSetting,
-        'BscTestNet': BscTestNetFarmSetting
+        56: BscMainNetFarmSetting,
+        97: BscTestNetFarmSetting
     }[arg];
 }
 

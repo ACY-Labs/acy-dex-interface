@@ -1,7 +1,7 @@
 const ScanUrlSelector = (arg: string) => {
     return {
-        'BscMainNet': "https://www.bscscan.com",
-        'BscTestNet': "https://testnet.bscscan.com"
+        56: "https://www.bscscan.com",
+        97: "https://testnet.bscscan.com"
     }[arg];
 }
 
