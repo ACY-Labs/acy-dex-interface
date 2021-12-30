@@ -450,7 +450,7 @@
   cursor: pointer;
 }
 
-.sales-submit {
+.sales-container .sales-submit {
   background-color: unset;
   background-color: #eb5c20;
   border: unset;
@@ -459,6 +459,11 @@
   width: 120px;
   height: 35px;
   cursor: pointer;
+}
+
+.sales-container .invalid{
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .vesting-percentage {
@@ -483,6 +488,7 @@
 
 
 .claim-btn-inactive{
+  opacity: 0.5;
   cursor: not-allowed;
 }
 

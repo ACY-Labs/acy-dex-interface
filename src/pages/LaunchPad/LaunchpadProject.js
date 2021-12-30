@@ -370,6 +370,8 @@ const LaunchpadProject = () => {
     setAllocationAmount,
     walletId,
     projectToken,
+    isClickedAllocation,
+    setIsClickedAllocation
   }) => {
     const [coverOpenState, setCoverOpenState] = useState(false);
     const computeCoverClass = () => {
@@ -419,7 +421,7 @@ const LaunchpadProject = () => {
     );
   };
 
-  const Allocation = ({ walletId, projectToken, maxSalesAmount=1000 }) => {
+  const Allocation = ({ walletId, projectToken}) => {
     const [allocationAmount, setAllocationAmount] = useState(0);
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
 
@@ -459,6 +461,8 @@ const LaunchpadProject = () => {
             setAllocationAmount={setAllocationAmount}
             walletId={walletId}
             projectToken={project}
+            isClickedAllocation={isClickedAllocation}
+            setIsClickedAllocation = {setIsClickedAllocation}
           />
         );
       }
@@ -467,6 +471,15 @@ const LaunchpadProject = () => {
 
     const [isClickedVesting, setIsClickedVesting] = useState(false);
     const [salesValue, setSalesValue] = useState();
+    const [isValidSalesPrice, setIsValidSalesPrice] = useState(true);
+
+    useEffect(() => {
+      if (salesValue > allocationAmount) {
+        setIsValidSalesPrice(false);
+      } else {
+        setIsValidSalesPrice(true);
+      }
+    }, [salesValue])
 
     return (
       <div
@@ -491,10 +504,10 @@ const LaunchpadProject = () => {
             Sale
           </label>
           <div className="sales-input-container">
-            <input placeholder="Enter amount" className="sales-input" type="number" value={salesValue} onChange={e => setSalesValue(e.target.value)}/>
-            <button className="max-btn" onClick={() => setSalesValue(maxSalesAmount)}>MAX</button>
+            <input placeholder="Enter amount" className="sales-input" type="number" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
+            <button className="max-btn" onClick={() => setSalesValue(allocationAmount)}>MAX</button>
           </div>
-          <input type="submit" className="sales-submit" value="Buy" onClick={() => console.log("buy")} />
+          <input type="submit" className={isValidSalesPrice ? "sales-submit" : "sales-submit invalid"} value="Buy" onClick={() => console.log("buy")} />
         </form>
 
         { (poolDistributionDate && poolDistributionStage) &&
@@ -546,7 +559,7 @@ const LaunchpadProject = () => {
             <Allocation walletId="1234" projectToken="ACY" />
           </div>
           <ProjectDescription />
-          <ChartCard />
+          <ChartCard className="launchpad-chart"/>
         </div>
       </div>
     );
