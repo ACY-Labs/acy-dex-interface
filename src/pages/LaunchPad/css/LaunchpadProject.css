@@ -571,3 +571,7 @@
   align-items: center;
   justify-content: space-between;
 }
+
+.ant-table-row-cell-ellipsis, .ant-table-row-cell-ellipsis .ant-table-column-title{
+  text-align: right !important;
+}
