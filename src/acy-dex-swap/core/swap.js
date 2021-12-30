@@ -1,7 +1,6 @@
 import {
   CurrencyAmount,
   ETHER,
-  FACTORY_ADDRESS,
   Fetcher,
   InsufficientReservesError,
   Pair,
@@ -28,16 +27,12 @@ import {
   getRouterContract,
   getUserTokenBalance,
   getUserTokenBalanceRaw,
-  INITIAL_ALLOWED_SLIPPAGE,
   isZero,
-  ROUTER_ADDRESS,
   withExactInEstimateOutAmount,
   withExactOutEstimateInAmount
 } from '../utils';
 import axios from 'axios';
-import ConstantLoader from '@/constants';
-const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+import {SCAN_URL_PREFIX, SCAN_NAME, API_URL, ROUTER_ADDRESS} from '@/constants';
 
 function toFixed4(floatInString) {
   return parseFloat(floatInString).toFixed(4);
@@ -818,8 +813,6 @@ export async function swap(
   } = inputToken1;
 
   const status = await (async () => {
-    // check uniswap
-    console.log(FACTORY_ADDRESS);
     // change slippage from bips (0.01%) into percentage
     allowedSlippage = new Percent(allowedSlippage, 10000);
 
@@ -1084,12 +1077,14 @@ export async function swap(
 
       
       console.log("this is swap data: ", status);
+      
+      const scanUrlPrefix = SCAN_URL_PREFIX();
       const url = `${scanUrlPrefix}/tx/${status.hash}`;
       
       setSwapStatus(
         <div>
           <a href={url} target="_blank" rel="noreferrer">
-            View it on BSC Scan
+            View it on {SCAN_NAME()}
           </a>
         </div>
       );
@@ -1116,6 +1111,7 @@ export async function swap(
       }
       console.log("rate", rate)
 
+      const apiUrlPrefix = API_URL();
       axios.post( 
         `${apiUrlPrefix}/chart/add?token0=${tempToken0}&token1=${tempToken1
         }&rate=${rate}&time=${time}`

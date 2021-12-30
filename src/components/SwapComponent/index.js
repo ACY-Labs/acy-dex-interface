@@ -69,7 +69,6 @@ import {
   ETHER,
   CurrencyAmount,
   InsufficientReservesError,
-  FACTORY_ADDRESS,
 } from '@acyswap/sdk';
 
 import { MaxUint256 } from '@ethersproject/constants';

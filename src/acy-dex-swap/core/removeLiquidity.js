@@ -1,4 +1,3 @@
-import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAddress } from '@ethersproject/address';
 import { useCallback, useEffect, useState } from 'react';
@@ -19,11 +18,9 @@ import {
   getRouterContract,
   getTokenTotalSupply,
   getUserTokenBalanceRaw,
-  INITIAL_ALLOWED_SLIPPAGE,
-  ROUTER_ADDRESS,
   supportedTokens,
 } from '../utils';
-import {constantInstance} from '@/constants';
+import {constantInstance, ROUTER_ADDRESS} from '@/constants';
 
 export async function getEstimated(
   inputToken0,
@@ -457,9 +454,6 @@ export async function signOrApprove(
       verifyingContract: pair.liquidityToken.address,
     };
 
-    console.log('Router address');
-    console.log(ROUTER_ADDRESS);
-
     console.log('pair.liquidityToken.address');
     console.log(pair.liquidityToken.address);
 
@@ -479,7 +473,7 @@ export async function signOrApprove(
 
     const message = {
       owner: account,
-      spender: ROUTER_ADDRESS,
+      spender: ROUTER_ADDRESS(),
       value: liquidityAmount.raw.toString(),
       nonce: nonce.toHexString(),
       deadline: deadlineTime,
@@ -522,7 +516,7 @@ export async function signOrApprove(
           // approveCallback();
           // const [approval, approveCallback] = useApproveCallback(
           //     liquidityAmount,
-          //     ROUTER_ADDRESS,
+          //     ROUTER_ADDRESS(),
           //     library,
           //     account);
           // export async function approve(tokenAddress, requiredAmount, library, account) {
@@ -566,7 +560,7 @@ export async function removeLiquidity(
   index,
   percent,
   amount,
-  allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
+  allowedSlippage,
   chainId,
   library,
   account,
@@ -855,11 +849,11 @@ export async function removeLiquidity(
     
     removeLiquidityCallback(status, percent);
 
-    const scanUrlPrefix = constantInstance.scanUrlPrefix;
+    const scanUrlPrefix = constantInstance.scanUrlPrefix.scanUrl;
     const url = `${scanUrlPrefix}/tx/${status.hash}`;
     setRemoveStatus(
       <a href={url} target="_blank" rel="noreferrer">
-        view it on BSC Scan
+        view it on {constantInstance.scanUrlPrefix.scanName}
       </a>
     );
   }

@@ -1,7 +1,6 @@
 import {
   CurrencyAmount,
   ETHER,
-  FACTORY_ADDRESS,
   Fetcher,
   InsufficientReservesError,
   Percent,
@@ -19,7 +18,6 @@ import {
   getRouterContract,
   getTokenTotalSupply,
   getUserTokenBalanceRaw,
-  INITIAL_ALLOWED_SLIPPAGE,
 } from '../utils';
 import { constantInstance } from "@/constants";
 
@@ -27,7 +25,7 @@ import { constantInstance } from "@/constants";
 export async function getEstimated(
   inputToken0,
   inputToken1,
-  allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
+  allowedSlippage,
   exactIn = true,
   chainId,
   library,
@@ -63,8 +61,6 @@ export async function getEstimated(
     setButtonContent('Loading...');
     setButtonStatus(false);
     setLiquidityStatus('');
-
-    console.log(FACTORY_ADDRESS);
 
     let router = getRouterContract(library, account);
     let slippage = allowedSlippage * 0.01;
@@ -520,7 +516,7 @@ export async function getEstimated(
 export async function addLiquidity(
   inputToken0,
   inputToken1,
-  allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
+  allowedSlippage,
   exactIn = true,
   chainId,
   library,
@@ -537,7 +533,6 @@ export async function addLiquidity(
 ) {
   let status = await (async () => {
     // check uniswap
-    console.log(FACTORY_ADDRESS);
     let router = getRouterContract(library, account);
 
     const {
@@ -639,12 +634,12 @@ export async function addLiquidity(
   } else {
     console.log('status');
     console.log(status);
-    const scanUrlPrefix = constantInstance.scanUrlPrefix;
+    const scanUrlPrefix = constantInstance.scanUrlPrefix.scanUrl;
     let url = scanUrlPrefix + '/tx/' + status.hash;
     addLiquidityCallback(status);
     setLiquidityStatus(
       <a href={url} target={'_blank'}>
-        View it on BSC Scan
+        View it on {constantInstance.scanUrlPrefix.scanName}
       </a>
     );
   }
