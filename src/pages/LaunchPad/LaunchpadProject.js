@@ -2,14 +2,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { history } from 'umi';
-import { Icon, Table } from 'antd';
+import styles from "./styles.less"
+import { Progress, Table } from 'antd';
 import LaunchChart from './launchChart';
 import { getTransferData } from '@/acy-dex-swap/core/launchPad';
 import { requireAllocation, getAllocationInfo, getProjectInfo } from '@/services/api';
+import { BigNumber } from '@ethersproject/bignumber';
+import ERC20ABI from '@/abis/ERC20.json';
+import { binance, injected } from '@/connectors';
+import { Web3Provider, JsonRpcProvider } from "@ethersproject/providers";
 import './css/LaunchpadProject.css';
 import project from '@/models/project';
 import AllocationIcon from './components/AllocationIcon';
-import Lottie from '@/assets/lottie/json';
 import * as moment from 'moment';
 import context from 'react-bootstrap/esm/AccordionContext';
 import { CaretDownOutlined } from '@ant-design/icons';
@@ -25,39 +29,11 @@ import githubIcon from '@/assets/icon_github.svg';
 import twitterWIcon from '@/assets/icon_twitter_white.svg';
 import linkWIcon from '@/assets/icon_link_white.svg';
 import fileWIcon from '@/assets/icon_file_white.svg';
-import announcementIcon from '@/assets/icon_announcement.svg';
 import announcementFIcon from '@/assets/icon_announcement_fill.svg';
 import $ from 'jquery';
 import { getContract } from "../../acy-dex-swap/utils/index.js"
 import { useWeb3React } from '@web3-react/core';
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
-
-const {
-  apple,
-  banana,
-  brezel,
-  burger,
-  carrot,
-  cheese,
-  cherry,
-  chocolateBar,
-  corn,
-  donut,
-  eggs,
-  frenchFries,
-  honey,
-  iceCream,
-  lemon,
-  meat,
-  peach,
-  pineapple,
-  pizza,
-  popcorn,
-  raspberry,
-  steak,
-  strawberry,
-  watermelon,
-} = Lottie;
 
 // Example links for social medias
 // const links = [
@@ -71,16 +47,26 @@ const {
 const LaunchpadProject = () => {
   console.log($(document).height());
   
-  const { account, chainId, library, activate } = useWeb3React();
+  const { account, chainId, library, activate, active } = useWeb3React();
+  const connectWallet = async () =>  {
+    activate(binance);
+    activate(injected);
+  };
 
   const { projectId } = useParams();
   const [receivedData, setReceivedData] = useState({});
+  const [poolBaseData, setPoolBaseData] = useState(null);
+  const [poolDistributionDate, setDistributionDate] = useState(null);
+  const [poolDistributionStage, setpoolDistributionStage] = useState(null);
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
-  const [investorNum,setinvestorNum] = useState(0);
+  // const [investorNum,setinvestorNum] = useState(0);
 
-  console.log("--------------RECEIVEDDATA---------------")
-  console.log(receivedData);
+  console.log("--------------poolDistributionDate---------------")
+  console.log(poolDistributionDate);
+
+  console.log("--------------poolDistributionStage---------------")
+  console.log(poolDistributionStage);
 
   const TokenBanner = ({ posterUrl }) => {
     return (
@@ -118,6 +104,8 @@ const LaunchpadProject = () => {
 
   const TokenProcedure = () => {
     const Procedure = () => {
+      
+      
       return (
         <div className="cardContent">
           <div className="procedure">
@@ -138,11 +126,13 @@ const LaunchpadProject = () => {
             <div className={comparesaleDate ? 'procedureNumber' : 'procedureNumber_NotActive'}>
               2
             </div>
-            <div>
-              <p>Sale</p>
-              <p className="shortText">From : {receivedData.saleStart}</p>
-              <p className="shortText">To : {receivedData.saleEnd}</p>
-            </div>
+            {poolBaseData &&
+              <div>
+                <p>Sale</p>
+                <p className="shortText">From : {poolBaseData[2]}</p>
+                <p className="shortText">To : {poolBaseData[3]}</p>
+              </div>
+            }
           </div>
 
           <div className="procedure" style={{ marginTop: '24px' }}>
@@ -157,7 +147,8 @@ const LaunchpadProject = () => {
       );
     };
 
-    const Progress = ({ salePercentage, alreadySale, totalSale, projectToken }) => {
+    const ProgressBar = ({ alreadySale, totalSale, projectToken }) => {
+      const salePercentage = Number(alreadySale) / Number(totalSale)
       const progressStyle = {
         width: { salePercentage } + '%',
       };
@@ -166,13 +157,13 @@ const LaunchpadProject = () => {
         <>
           <div
             className="cardContent"
-            style={{ background: '#0f0f0f', borderRadius: '0rem 0rem 1rem 1rem' }}
+            style={{ background: '#1a1d1c', borderRadius: '0rem 0rem 1rem 1rem' }}
           >
             <div className="progressHeader">
               <p>Sale Progress</p>
               <p style={{ color: '#eb5c1f' }}>{salePercentage}%</p>
             </div>
-            <div className="progressBar">
+            {/* <div className="progressBar">
               <div
                 className="progressBarLight"
                 aria-aria-valuemin="0"
@@ -180,6 +171,16 @@ const LaunchpadProject = () => {
                 aria-valuenow={salePercentage}
                 role="progressbar"
                 style={progressStyle}
+              />
+            </div> */}
+            <div className={styles.tokenProgress}>
+              <Progress
+                strokeColor={{
+                  from: '#c6224e',
+                  to: '#eb6c20',
+                }}
+                percent={salePercentage}
+                status={salePercentage === 0 ? "normal" : salePercentage !== 100 ? "active" :"success"}
               />
             </div>
             <div className="progressAmount">
@@ -198,12 +199,13 @@ const LaunchpadProject = () => {
         }}
       >
         <Procedure />
-        <Progress
-          salePercentage={receivedData.salePercentage}
-          alreadySale={receivedData.alreadySale}
-          totalSale={receivedData.totalSale}
-          projectToken={receivedData.projectToken}
-        />
+        {poolBaseData &&
+          <ProgressBar
+            alreadySale={poolBaseData[1]}
+            totalSale={poolBaseData[0]}
+            projectToken={receivedData.projectToken}
+          />
+        }
       </div>
     );
   };
@@ -221,7 +223,7 @@ const LaunchpadProject = () => {
         <div className="keyinfoRow" style={{ marginTop: '1rem' }}>
           <div className="keyinfoName">Total Raise</div>
           <div>
-            {totalSale} {projectToken}
+            {receivedData.totalSale} USDT
           </div>
         </div>
 
@@ -368,10 +370,6 @@ const LaunchpadProject = () => {
     setAllocationAmount,
     walletId,
     projectToken,
-    url,
-    lottieId,
-    isHoverLottie,
-    setIsHoverLottie,
   }) => {
     const [coverOpenState, setCoverOpenState] = useState(false);
     const computeCoverClass = () => {
@@ -407,8 +405,6 @@ const LaunchpadProject = () => {
         <div class={computeCoverClass()}>
           <div
             className="allocationCard-inner"
-            onMouseEnter={() => setIsHoverLottie(true)}
-            onMouseLeave={() => setIsHoverLottie(false)}
           >
             <p className="inner-text">{index + 1}</p>
           </div>
@@ -447,145 +443,12 @@ const LaunchpadProject = () => {
     // TODO: assign each icon to allocation card
     const allocationCards = () => {
       const cards = [];
-      // ALL 24 States
-      const [isHoverApple, setIsHoverApple] = useState(false);
-      const [isHoverBanana, setIsHoverBanana] = useState(false);
-      const [isHoverBrezel, setIsHoverBrezel] = useState(false);
-      const [isHoverBurger, setIsHoverBurger] = useState(false);
-      const [isHoverCarrot, setIsHoverCarrot] = useState(false);
-      const [isHoverCheese, setIsHoverCheese] = useState(false);
-      const [isHoverCherry, setIsHoverCherry] = useState(false);
-      const [isHoverChocolateBar, setIsHoverChocolateBar] = useState(false);
-      const [isHoverCorn, setIsHoverCorn] = useState(false);
-      const [isHoverDonut, setIsHoverDonut] = useState(false);
-      const [isHoverEggs, setIsHoverEggs] = useState(false);
-      const [isHoverFrenchFries, setIsHoverFrenchFries] = useState(false);
-      const [isHoverHoney, setIsHoverHoney] = useState(false);
-      const [isHoverIceCream, setIsHoverIceCream] = useState(false);
-      const [isHoverLemon, setIsHoverLemon] = useState(false);
-      const [isHoverMeat, setIsHoverMeat] = useState(false);
-      const [isHoverPeach, setIsHoverPeach] = useState(false);
-      const [isHoverPineapple, setIsHoverPineapple] = useState(false);
-      const [isHoverPizza, setIsHoverPizza] = useState(false);
-      const [isHoverPopcorn, setIsHoverPopcorn] = useState(false);
-      const [isHoverRaspberry, setIsHoverRaspberry] = useState(false);
-      const [isHoverSteak, setIsHoverSteak] = useState(false);
-      const [isHoverStrawberry, setIsHoverStrawberry] = useState(false);
-      const [isHoverWatermelon, setIsHoverWatermelon] = useState(false);
 
-      const url = [
-        apple,
-        banana,
-        brezel,
-        burger,
-        carrot,
-        cheese,
-        cherry,
-        chocolateBar,
-        corn,
-        donut,
-        eggs,
-        frenchFries,
-        honey,
-        iceCream,
-        lemon,
-        meat,
-        peach,
-        pineapple,
-        pizza,
-        popcorn,
-        raspberry,
-        steak,
-        strawberry,
-        watermelon,
-      ];
-      const lottieId = [
-        'apple',
-        'banana',
-        'brezel',
-        'burger',
-        'carrot',
-        'cheese',
-        'cherry',
-        'chocolateBar',
-        'corn',
-        'donut',
-        'eggs',
-        'frenchFries',
-        'honey',
-        'iceCream',
-        'lemon',
-        'meat',
-        'peach',
-        'pineapple',
-        'pizza',
-        'popcorn',
-        'raspberry',
-        'steak',
-        'strawberry',
-        'watermelon',
-      ];
-      const states = [
-        isHoverApple,
-        isHoverBanana,
-        isHoverBrezel,
-        isHoverBurger,
-        isHoverCarrot,
-        isHoverCheese,
-        isHoverCherry,
-        isHoverChocolateBar,
-        isHoverCorn,
-        isHoverDonut,
-        isHoverEggs,
-        isHoverFrenchFries,
-        isHoverHoney,
-        isHoverIceCream,
-        isHoverLemon,
-        isHoverMeat,
-        isHoverPeach,
-        isHoverPineapple,
-        isHoverPizza,
-        isHoverPopcorn,
-        isHoverRaspberry,
-        isHoverSteak,
-        isHoverStrawberry,
-        isHoverWatermelon,
-      ];
-      const stateFunction = [
-        setIsHoverApple,
-        setIsHoverBanana,
-        setIsHoverBrezel,
-        setIsHoverBurger,
-        setIsHoverCarrot,
-        setIsHoverCheese,
-        setIsHoverCherry,
-        setIsHoverChocolateBar,
-        setIsHoverCorn,
-        setIsHoverDonut,
-        setIsHoverEggs,
-        setIsHoverFrenchFries,
-        setIsHoverHoney,
-        setIsHoverIceCream,
-        setIsHoverLemon,
-        setIsHoverMeat,
-        setIsHoverPeach,
-        setIsHoverPineapple,
-        setIsHoverPizza,
-        setIsHoverPopcorn,
-        setIsHoverRaspberry,
-        setIsHoverSteak,
-        setIsHoverStrawberry,
-        setIsHoverWatermelon,
-      ];
       for (let i = 0; i < 10; i++) {
         cards.push(
           <AllocationCard
             index={i}
             Component={BaseCard}
-            url={url[i]}
-            lottieId={lottieId[i]}
-            isHoverLottie={states[i]}
-            setIsHoverLottie={stateFunction[i]}
             allocationAmount={allocationAmount}
             setAllocationAmount={setAllocationAmount}
             walletId={walletId}
@@ -625,32 +488,35 @@ const LaunchpadProject = () => {
             <input placeholder="Enter amount" className="sales-input" type="number" value={salesValue} onChange={e => setSalesValue(e.target.value)}/>
             <button className="max-btn" onClick={() => setSalesValue(maxSalesAmount)}>MAX</button>
           </div>
-          <input type="submit" className="sales-submit" value="Buy" onClick={() => console.log("buy")}/>
+          <input type="submit" className="sales-submit" value="Buy" onClick={() => console.log("buy")} />
         </form>
 
-        <div className="vesting-container" >
-          <p className="sale-vesting-title vesting">Vesting</p>
-          <div className="text-line-container">
-            <p>Unlock 30% TGE, then vested 23.3% every month for 3 months</p>
-            <span className="vesting-line" />
-            <div
-              className={
-                isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'
-              }
-            >
-              <VestingSchedule startDate={"28 Dec 2021 00:00:00 +0800"}/>
+        { (poolDistributionDate && poolDistributionStage) &&
+          <div className="vesting-container">
+            <p className="sale-vesting-title vesting">Vesting</p>
+            <div className="text-line-container">
+              <p>Unlock {poolDistributionStage[1]}% TGE, then vested the rest every month for {poolDistributionStage[0]} months</p>
+              <span className="vesting-line" />
+              <div
+                className={
+                  isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'
+                }
+              >
+                  <VestingSchedule startDate={poolDistributionDate[0]} />
+                
+              </div>
+            </div>
+            <div className="arrow-down-container">
+              <CaretDownOutlined
+                className={
+                  isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
+                }
+              />
+            </div>
+            <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}>
             </div>
           </div>
-          <div className="arrow-down-container">
-            <CaretDownOutlined
-              className={
-                isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
-              }
-            />
-          </div>
-          <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}>
-          </div>
-        </div>
+        }
       </div>
     );
   };
@@ -660,11 +526,14 @@ const LaunchpadProject = () => {
       <div className="gridContainer">
         <div className="leftGrid">
           <TokenProcedure />
-          <KeyInformation
-            projectToken={receivedData.projectToken}
-            totalSale={receivedData.totalSale}
-            tokenPrice={receivedData.tokenPrice}
-          />
+          {poolBaseData &&
+            <KeyInformation
+              projectToken={receivedData.projectToken}
+              totalSale={poolBaseData[0]}
+              tokenPrice={receivedData.tokenPrice}
+            />
+          }
+          
         </div>
         <div className="rightGrid">
           <div className="circleBorderCard">
@@ -690,10 +559,6 @@ const LaunchpadProject = () => {
           // extract data from string
           console.log("RECeiveddata",res);
           const contextData = JSON.parse(res.contextData);
-
-          const today = new Date();
-          if (today > res.saleStart) setComparesaleDate(true);
-          if (today > res.saleEnd) setComparevestDate(true);
 
           res['tokenLabels'] = contextData['tokenLabels'];
           res['projectDescription'] = contextData['projectDescription'];
@@ -722,15 +587,64 @@ const LaunchpadProject = () => {
       });
   }, []);
 
+  const convertUnixTime = unixTime => {
+    const data = new Date((Number(unixTime)) * 1000)
+    const res = data.toLocaleString()
+    return res
+  }
+
+  const getPoolData = async (lib, acc) => {
+    const poolContract = getContract("0x6e0EC29eA8afaD2348C6795Afb9f82e25F196436", POOLABI, lib, acc);
+    const pool = []
+    const distributionRes = []
+    const distributionStage = []
+
+    // 合约函数调用
+    const baseData = await poolContract.GetPoolBaseData(3)
+    const distributionData = await poolContract.GetPoolDistributionData(3)
+    // getpoolbasedata 数据解析
+    const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
+    const token1decimal = await token1contract.decimals()
+    // 不解析时间戳
+    const res1 = BigNumber.from(baseData[2]).toBigInt().toString().slice(0,-(token1decimal)) // 获取销售的token的总数
+    const res2 = BigNumber.from(baseData[3]).toBigInt().toString().slice(0,-(token1decimal)) // 已销售的token的数量
+    const res3 = BigNumber.from(baseData[4]).toBigInt()
+    const res4 = BigNumber.from(baseData[5]).toBigInt()
+    // 获取当前阶段
+    const d = Math.round(new Date().getTime()/1000)
+    if(d > res3) setComparesaleDate(true)
+    if(d > res4) setComparevestDate(true)
+    const saleStartDate = convertUnixTime(res3)
+    const saleEndDate = convertUnixTime(res4)
+    // 存放数据
+    pool.push(res1, res2, saleStartDate, saleEndDate)
+
+    // getpooldistributiondata 数据解析以及存放
+    distributionStage.push(Number(BigNumber.from(distributionData[0]).toBigInt())) // vesting阶段的次数
+    distributionData[1].map(uTime => distributionRes.push(convertUnixTime(uTime)))
+    distributionData[2].map(vestingRate => distributionStage.push(BigNumber.from(vestingRate).toBigInt().toString()))
+
+    // set数据
+    setPoolBaseData(pool)
+    setDistributionDate(distributionRes)
+    setpoolDistributionStage(distributionStage)
+  }
+
   // fetching data from Smart Contract
   useEffect(async () => {
-    const poolContract = getContract("0xBfb1894743F200f0386B06Eb426DDE915Ce22846", POOLABI, library, account);
+    if(!account){
+      connectWallet();
+    }
+    if (account || library){
+      console.log("start getPoolBaseData")
+      getPoolData(library, account)
+    } else {
+      const provider = new JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545/", 97);  // different RPC for mainnet
+      const accnt = "0x0000000000000000000000000000000000000000";
+      getPoolData(provider, accnt)
+    }
+  }, [library, account])
 
-    const poolNum = await poolContract.GetInvestorNum(111).then((res)=>{
-      console.log("res",res);
-    }).catch(e => console.log('CustomError in transaction',e))
-    ;
-  }, [])
   return (
     <div>
       <div className="mainContainer">
