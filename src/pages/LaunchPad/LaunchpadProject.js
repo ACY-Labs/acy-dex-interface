@@ -1,9 +1,9 @@
 /* eslint-disable react/jsx-indent */
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { Progress, Button, Table } from 'antd';
 import { history } from 'umi';
 import styles from "./styles.less"
-import { Progress, Table } from 'antd';
 import LaunchChart from './launchChart';
 import { getTransferData } from '@/acy-dex-swap/core/launchPad';
 import { requireAllocation, getAllocationInfo, getProjectInfo } from '@/services/api';
@@ -58,41 +58,42 @@ const LaunchpadProject = () => {
   const [poolBaseData, setPoolBaseData] = useState(null);
   const [poolDistributionDate, setDistributionDate] = useState(null);
   const [poolDistributionStage, setpoolDistributionStage] = useState(null);
+  const [poolStageCount, setpoolStageCount] = useState(0);
+  const [isVesting, setIsVesting] = useState(false);
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
   // const [investorNum,setinvestorNum] = useState(0);
 
-  console.log("--------------poolDistributionDate---------------")
-  console.log(poolDistributionDate);
-
-  console.log("--------------poolDistributionStage---------------")
-  console.log(poolDistributionStage);
+  console.log("-------POSTERURL---------")
+  console.log(receivedData.posterUrl)
 
   const TokenBanner = ({ posterUrl }) => {
     return (
-      <video
-        autoplay=""
-        loop=""
-        playsinline=""
-        poster="https://files.krystal.app/krystalGo/acy-cover.png"
+      <img
         className="tokenBanner"
-      >
-        {/* <source src="https://files.krystal.app/krystalGo/acy-cover.png" /> */}
-      </video>
+        src={posterUrl}
+        alt=""
+      />
     );
   };
 
-  const TokenLogoLabel = ({ projectName }) => {
+  const clickToWebsite = () => {
+    const newWindow = window.open(receivedData.website, '_blank', 'noopener,noreferrer');
+    if (newWindow) newWindow.opener = null;
+  }
+
+  const TokenLogoLabel = ({ projectName, tokenLogo}) => {
     return (
       <div className="flexContainer">
         <img
           className="tokenLogo"
           alt=""
-          src="https://files.krystal.app/krystalGo/acy-avatar.svg"
+          src={tokenLogo}
           loading="eager"
+          onClick={() => clickToWebsite()}
         />
         <div className="tokenInfo">
-          <span className="tokenTitle">{projectName}</span>
+          <span className="tokenTitle" onClick={() => clickToWebsite()}>{projectName}</span>
           <div className="tokenLabelBar">
             {receivedData.tokenLabels &&
               receivedData.tokenLabels.map(label => <span className="tokenLabel">{label}</span>)}
@@ -104,8 +105,6 @@ const LaunchpadProject = () => {
 
   const TokenProcedure = () => {
     const Procedure = () => {
-      
-      
       return (
         <div className="cardContent">
           <div className="procedure">
@@ -294,28 +293,28 @@ const LaunchpadProject = () => {
         title: 'Date Time(UTC)',
         dataIndex: 'dateTime',
         className: 'column-date',
-        width: 120,
+        width: 80,
         align: 'left',
       },
       {
         title: 'Participants',
         dataIndex: 'participant',
-        width: 80,
-        align: 'center',
+        width: 60,
+        align: 'left',
         ellipsis: true,
       },
       {
         title: 'USDT',
         dataIndex: 'quantity',
         width: 60,
-        align: 'center',
+        align: 'left',
         ellipsis: true,
       },
       {
-        title: 'Ticket',
+        title: 'Token',
         dataIndex: 'Amount',
         width: 60,
-        align: 'center',
+        align: 'left',
         ellipsis: true,
       },
     ];
@@ -352,7 +351,6 @@ const LaunchpadProject = () => {
           bgColor="#2f313500"
         />
         <Table
-          style={{ marginTop: '20px', textAlign: 'center', height: '400px' }}
           id="transferTable"
           columns={transferTableHeader}
           dataSource={transferData}
@@ -463,60 +461,74 @@ const LaunchpadProject = () => {
     const [salesValue, setSalesValue] = useState();
 
     return (
-      <div
-        className={
-          isClickedVesting
-            ? 'cardContent allocation-content allocation-content-active'
-            : 'cardContent allocation-content allocation-content-inactive'
-        }
-      >
-        <div className="allocation-title-container">
-          <p className="allocation-title">Allocation</p>
-          <div className='allocation-cards'>
-            <div className="allocationContainer">{allocationCards()}</div>
-          </div>
-          <div style={{"width": "120px"}}>
+      <div>
+      { !isVesting ? 
+        <div
+          className={
+            isClickedVesting
+              ? 'cardContent allocation-content allocation-content-active'
+              : 'cardContent allocation-content allocation-content-inactive'
+          }
+        >
+          <div className="allocation-title-container">
+            <p className="allocation-title">Allocation</p>
+            <div className='allocation-cards'>
+              <div className="allocationContainer">{allocationCards()}</div>
+            </div>
+            <div style={{"width": "120px"}}>
 
+            </div>
           </div>
-        </div>
 
-        <form className="sales-container">
-          <label for="sale-number" className="sale-vesting-title">
-            Sale
-          </label>
-          <div className="sales-input-container">
-            <input placeholder="Enter amount" className="sales-input" type="number" value={salesValue} onChange={e => setSalesValue(e.target.value)}/>
-            <button className="max-btn" onClick={() => setSalesValue(maxSalesAmount)}>MAX</button>
-          </div>
-          <input type="submit" className="sales-submit" value="Buy" onClick={() => console.log("buy")} />
-        </form>
+          <form className="sales-container">
+            <label for="sale-number" className="sale-vesting-title">
+              Sale
+            </label>
+            <div className="sales-input-container">
+              <input placeholder="Enter amount" className="sales-input" type="number" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
+              <Button className="max-btn" onClick={() => setSalesValue(allocationAmount)}>MAX</Button>
+            </div>
+            <Button className="sales-submit" onClick={() => console.log("buy")} disabled={!comparesaleDate}> Buy </Button>
+          </form>
 
-        { (poolDistributionDate && poolDistributionStage) &&
-          <div className="vesting-container">
-            <p className="sale-vesting-title vesting">Vesting</p>
-            <div className="text-line-container">
-              <p>Unlock {poolDistributionStage[1]}% TGE, then vested the rest every month for {poolDistributionStage[0]} months</p>
-              <span className="vesting-line" />
-              <div
-                className={
-                  isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'
-                }
-              >
-                  <VestingSchedule startDate={poolDistributionDate[0]} />
-                
+          { (poolDistributionDate && poolDistributionStage) &&
+            <div className="vesting-container">
+              <p className="sale-vesting-title vesting">Vesting</p>
+              <div className="text-line-container">
+                <p>{poolStageCount} stages of vesting : Unlock {poolDistributionStage[0]}% TGE</p>
+                <span className="vesting-line" />
+                <div
+                  className={
+                    isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'
+                  }
+                >
+                    <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} />
+                </div>
+              </div>
+              <div className="arrow-down-container">
+                <CaretDownOutlined
+                  className={
+                    isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
+                  }
+                />
+              </div>
+              <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}>
               </div>
             </div>
-            <div className="arrow-down-container">
-              <CaretDownOutlined
-                className={
-                  isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
-                }
-              />
-            </div>
-            <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}>
+          }
+        </div>
+      :
+        <div className="vesting-container">
+          <p className="sale-vesting-title vesting">Vesting</p>
+          <div className="text-line-container">
+            <p>Vesting is divided into {poolStageCount} stages, unlock {poolDistributionStage[0]}% TGE</p>
+            <span className="vesting-line" />
+            <div className='vesting-schedule'>
+              <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} />
             </div>
           </div>
-        }
+        </div>
+      }
       </div>
     );
   };
@@ -557,13 +569,14 @@ const LaunchpadProject = () => {
       .then(res => {
         if (res) {
           // extract data from string
-          console.log("RECeiveddata",res);
           const contextData = JSON.parse(res.contextData);
 
           res['tokenLabels'] = contextData['tokenLabels'];
           res['projectDescription'] = contextData['projectDescription'];
           res['alreadySale'] = contextData['alreadySale'];
           res['salePercentage'] = contextData['salePercentage'];
+          res['posterUrl'] = contextData['posterUrl']
+          res['tokenLogoUrl'] = contextData['tokenLogoUrl']
 
           res['regStart'] = format_time(res.regStart);
           res['regEnd'] = format_time(res.regEnd);
@@ -620,13 +633,16 @@ const LaunchpadProject = () => {
     pool.push(res1, res2, saleStartDate, saleEndDate)
 
     // getpooldistributiondata 数据解析以及存放
-    distributionStage.push(Number(BigNumber.from(distributionData[0]).toBigInt())) // vesting阶段的次数
     distributionData[1].map(uTime => distributionRes.push(convertUnixTime(uTime)))
     distributionData[2].map(vestingRate => distributionStage.push(BigNumber.from(vestingRate).toBigInt().toString()))
 
+    // 判断当前是否是vesting阶段
+    const tempArr = distributionData[1]
+    if(d > tempArr[0]) setIsVesting(true)
     // set数据
     setPoolBaseData(pool)
     setDistributionDate(distributionRes)
+    setpoolStageCount(Number(BigNumber.from(distributionData[0]).toBigInt())) // vesting阶段的次数
     setpoolDistributionStage(distributionStage)
   }
 
@@ -649,7 +665,7 @@ const LaunchpadProject = () => {
     <div>
       <div className="mainContainer">
         <TokenBanner posterUrl={receivedData.posterUrl} />
-        <TokenLogoLabel projectName={receivedData.projectName} />
+        <TokenLogoLabel projectName={receivedData.projectName} tokenLogo={receivedData.tokenLogoUrl} />
         <CardArea />
       </div>
     </div>

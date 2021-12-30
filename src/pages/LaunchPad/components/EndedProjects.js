@@ -30,7 +30,7 @@ const EndedProjects = ({ data, openProject }) => {
   const [isActiveEnded, setisActiveEnded] = useState(false);
   const [isEndedExpanded, setisEndedExpanded] = useState(false);
   return (
-    <div className={isActiveEnded ? 'ended-container active' : 'ended-container'}>
+    <div className='ended-container active'>
       <div
         className="expanding-card2"
         style={{
@@ -44,33 +44,21 @@ const EndedProjects = ({ data, openProject }) => {
         {data &&
           data.map(obj => (
             <div className="cards2">
-              <div className=" card2 [ is-collapsed2 ]">
-                <div className="card2__inner2 [ js-expander2 ]">
-                  <div className="">
-                    <ProjectsCard
-                      projectID={obj.projectID}
-                      ddl={obj.saleEnd}
-                      raise={obj.totalRaise.toString() + ' USDT'}
-                      sales={obj.totalSale.toString() + ' ' + obj.projectToken}
-                      rate={'1 ' + obj.projectToken + ' = ' + obj.tokenPrice.toString() + ' USDT'}
-                      title={obj.projectName}
-                      isEnded={true}
-                    />
-                  </div>
-                  {/* <i className="fa fa-folder-o" /> */}
-                </div>
-                <div className="card2__expander2">
-                  <ExpandedContent />
-                </div>
+              <div className="">
+                <ProjectsCard
+                  projectID={obj.projectID}
+                  ddl={obj.saleEnd}
+                  raise={obj.totalRaise.toString() + ' USDT'}
+                  sales={obj.totalSale.toString() + ' ' + obj.projectToken}
+                  rate={'1 ' + obj.projectToken + ' = ' + obj.tokenPrice.toString() + ' USDT'}
+                  title={obj.projectName}
+                  isEnded={true}
+                />
               </div>
+              {/* <i className="fa fa-folder-o" /> */}
             </div>
           ))}
       </div>
-      {data.length > 6 ? (
-        <a className="see-more-ended" onClick={() => setisActiveEnded(!isActiveEnded)} />
-      ) : (
-        ''
-      )}
     </div>
   );
 };
