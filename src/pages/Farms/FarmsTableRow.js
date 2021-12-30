@@ -16,8 +16,8 @@ import { getPool, getPoolAccmulateReward, newGetPool} from '@/acy-dex-swap/core/
 import StakeRow from './StakeRow';
 import SwapComponent from '@/components/SwapComponent';
 import { BLOCK_TIME } from '@/acy-dex-swap/utils';
-import ConstantLoader from '@/constants';
-const supportedTokens = ConstantLoader().tokenList;
+import {constantInstance} from "@/constants";
+const supportedTokens = constantInstance.tokenList;
 
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
@@ -170,6 +170,12 @@ const FarmsTableRow = props => {
       setHarvestButtonStatus(true);
     },[harvestModal]
   );
+
+   useEffect(
+    () => {
+      console.log("TEST HERE supportedTokens:", supportedTokens);
+    },[]
+  );
   
   let history = useHistory();
   const getDHM = (sec) => {
@@ -210,10 +216,10 @@ const FarmsTableRow = props => {
       stakeData: pool.stakeData,
       poolLpScore: pool.lpScore,
       poolLpBalance: pool.lpBalance,
-      endsIn: getDHM((pool.endBlock - block) * BLOCK_TIME),
+      endsIn: getDHM((pool.endBlock - block) * BLOCK_TIME()),
       status: pool.endBlock - block > 0,
       ratio: pool.ratio,
-      endAfter: (pool.endBlock - block) * BLOCK_TIME,
+      endAfter: (pool.endBlock - block) * BLOCK_TIME(),
       token1Ratio: pool.token1Ratio,
       token2Ratio: pool.token2Ratio,
       poolRewardPerYear: pool.poolRewardPerYear,
@@ -408,6 +414,8 @@ const FarmsTableRow = props => {
   const activeEndedFilter = () => {
     return poolInfo.status != activeEnded;
   }
+
+  
 
   return ( poolInfo && (!isMyFarms || poolInfo.hasUserPosition) && (
     <div className={styles.tableBodyRowContainer} hidden={getFilter()}>

@@ -28,8 +28,10 @@ import { Web3Provider } from "@ethersproject/providers";
 import { injected } from '@/connectors';
 import axios from 'axios';
 import ConstantLoader from '@/constants';
-const supportedTokens = ConstantLoader().tokenList;
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+import {constantInstance} from "@/constants";
+
+const supportedTokens = constantInstance.tokenList;
+
 const getTokenSymbol = async (address, library, account) => {
   const tokenContract = getTokenContract(address, library, account);
   return tokenContract.symbol();
@@ -66,7 +68,7 @@ const getPoolTotalPendingReward = async (
   }
   //HERE
   const poolRewardsPerYear = await Promise.all(poolTokenRewardInfoPromise).then(result => {
-    return result.map((info,index) => info[3]/(10**rewardTokenDecimals[index]) * BLOCKS_PER_YEAR);
+    return result.map((info,index) => info[3]/(10**rewardTokenDecimals[index]) * BLOCKS_PER_YEAR());
   });
 
   if(poolPositons.length === 0 ){
@@ -370,7 +372,7 @@ const newGetPoolByFarm = async (farm, tokenPrice, library, account, chainId) => 
 
   var totalRewardPerYear = 0;
   rewardsPerBlock.forEach((reward,index) => {
-    totalRewardPerYear += reward * tokenPrice[rewardTokens[index].symbol] * BLOCKS_PER_YEAR  / 10 ** rewardTokens[index].decimals;
+    totalRewardPerYear += reward * tokenPrice[rewardTokens[index].symbol] * BLOCKS_PER_YEAR()  / 10 ** rewardTokens[index].decimals;
   });
   const stakeData = [];
   for(var index = 0; index < stakePosition.length ; index++) {
@@ -546,7 +548,7 @@ const getExpiredTime = (timestamp, lockDuration) => {
 const newGetAllPools = async (library, account, chainId) => {
   const tokenPrice = await getAllSuportedTokensPrice();
   const allFarm = await axios.get(
-    `${API_URL}/farm/getAllPools`
+    `${API_URL()}/farm/getAllPools`
   ).then(res => res.data).catch(e => console.log("error: ", e));
   if(allFarm.length) {
     const allPoolsPromise = [];
@@ -562,7 +564,7 @@ const calculateVolAndApr = async (token0, token1, tokenPrices) => {
 
   console.log("this is", token0, token1)
   if(!token1) return 0;
-  return await axios.get(`${apiUrlPrefix}/poolchart/pair?token0=${token0.address}&token1=${token1.address}`).then(async (res) => {
+  return await axios.get(`${API_URL()}/poolchart/pair?token0=${token0.address}&token1=${token1.address}`).then(async (res) => {
     // calculate volume in USD
     console.log("this is return data", res.data)
     const {token0: token0Vol, token1: token1Vol} = res.data.data.lastVolume;
@@ -592,7 +594,7 @@ const newGetPool = async (poolId, library, account, chainId) => {
   const tokenPrice = await getAllSuportedTokensPrice();
   //bug, only get on pool not working, may fix this later
   const farm = await axios.get(
-    `${API_URL}/farm/getPool?poolId=${poolId}`
+    `${API_URL()}/farm/getPool?poolId=${poolId}`
   ).then(res => res.data).catch(e => console.log("error: ", e));
   if(farm) {
     return await newGetPoolByFarm(farm, tokenPrice, library, account, chainId);
@@ -603,7 +605,7 @@ const newGetPool = async (poolId, library, account, chainId) => {
 const getAllPools = async (library, account) => {
   console.log("KUY1",account);
   const allFarm = await axios.get(
-    `${API_URL}/farm/getAllPools`
+    `${API_URL()}/farm/getAllPools`
   ).then(res => res.data).catch(e => console.log("error: ", e));
   if(allFarm.length) {
     const allPoolsPromise = [];
@@ -618,7 +620,7 @@ const getAllPools = async (library, account) => {
 
 
 const approveLpToken = async (lpTokenAddr, library, account, setButtonText, approveCallback) => {
-  let status = await approveTokenWithSpender(lpTokenAddr, FARMS_ADDRESS, library, account);
+  let status = await approveTokenWithSpender(lpTokenAddr, FARMS_ADDRESS(), library, account);
   if (status instanceof CustomError) {
     setButtonText(status.getErrorText());
   } else {
@@ -637,7 +639,7 @@ const checkTokenIsApproved = async (lpTokenAddr, amount, library, account) => {
   const depositAmount = parseUnits(amount.toString(), tokenDecimals).toString();
   const approved = await checkTokenIsApprovedWithSpender(
     lpTokenAddr,
-    FARMS_ADDRESS,
+    FARMS_ADDRESS(),
     depositAmount,
     library,
     account
@@ -658,7 +660,7 @@ const deposit = async (lpTokenAddr, amount, poolId, lockDuration, library, accou
     const depositAmount = parseUnits(amount, tokenDecimals).toString();
     const approved = await checkTokenIsApprovedWithSpender(
       lpTokenAddr,
-      FARMS_ADDRESS,
+      FARMS_ADDRESS(),
       depositAmount,
       library,
       account

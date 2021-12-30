@@ -45,7 +45,7 @@ const BscTestNetFarmSetting: FarmSetting = {
     WETH: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
     ETH_NAME: "BNB",
     ROUTER_ADDRESS: '0xFc54693d805F5CFe81fd3B6Cbfe6B06dA4e88003',
-    FARMS_ADDRESS : '0xcd0b5136d2e9972077cd769714ade9c3506fb5d6',   // not yet changed
+    FARMS_ADDRESS : '0x6ef448ecb7f650c3a1157acf37ca19ae86dee8da',   // not yet changed
     FLASH_ARBITRAGE_ADDRESS: '0x1836DcE7B2016cDE80f241F5ed60D8eE69eAF0C8',
     BLOCK_TIME: 3,
     BLOCKS_PER_YEAR: calcBlocksPerPeriod('year', 3),
