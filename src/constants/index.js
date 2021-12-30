@@ -10,28 +10,28 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 
 const library = new JsonRpcProvider('https://bsc-dataseed1.defibit.io/');
 // loading all constants needed in app
-const ConstantLoader = (networkName) => {
-    // const params = useParams();
-    // networkName = params.chainId;
-    // console.log("new chainId", networkName)
+// const ConstantLoader = (networkName) => {
+//     // const params = useParams();
+//     // networkName = params.chainId;
+//     // console.log("new chainId", networkName)
 
-    // global variable NETWORK_NAME is loaded by umi
-    // configure it in /config/constant.config.ts
+//     // global variable NETWORK_NAME is loaded by umi
+//     // configure it in /config/constant.config.ts
 
-    // wrap constants in this variable
-    const constants = {
-        'tokenList': TokenListSelector(networkName ? networkName : NETWORK_NAME),
-        'methodMap': MethodActionSelector('method'),
-        'actionMap': MethodActionSelector('action'),
-        'scanUrlPrefix': ScanUrlSelector(networkName ? networkName : NETWORK_NAME),
-        'farmSetting': FarmSettingSelector(networkName ? networkName : NETWORK_NAME),
-        'sdkSetting': SDK_SETTING
-    }
+//     // wrap constants in this variable
+//     const constants = {
+//         'tokenList': TokenListSelector(networkName ? networkName : NETWORK_NAME),
+//         'methodMap': MethodActionSelector('method'),
+//         'actionMap': MethodActionSelector('action'),
+//         'scanUrlPrefix': ScanUrlSelector(networkName ? networkName : NETWORK_NAME),
+//         'farmSetting': FarmSettingSelector(networkName ? networkName : NETWORK_NAME),
+//         'sdkSetting': SDK_SETTING
+//     }
 
-    // make constants readonly
-    Object.freeze(constants);
-    return constants;
-}
+//     // make constants readonly
+//     Object.freeze(constants);
+//     return constants;
+// }
 
 // import constant to normal js file
 export let constantInstance = {
@@ -102,5 +102,3 @@ export const useConstantLoader = () => {
 
     return {...constant};
 }
-
-export default ConstantLoader;

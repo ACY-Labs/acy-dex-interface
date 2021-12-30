@@ -195,7 +195,7 @@ const Farms = (props) => {
         getPools(library, account, chainId);
         
       } else {
-        const provider = new JsonRpcProvider(RPC_URL(), 56);
+        const provider = new JsonRpcProvider(RPC_URL(), chainId);
         const account = "0x0000000000000000000000000000000000000000";
         setWalletConnected(false);
         getPools(provider, account, 56);

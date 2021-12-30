@@ -27,7 +27,6 @@ import { Icon } from 'antd';
 import { Web3Provider } from "@ethersproject/providers";
 import { injected } from '@/connectors';
 import axios from 'axios';
-import ConstantLoader from '@/constants';
 import {constantInstance} from "@/constants";
 
 const supportedTokens = constantInstance.tokenList;
