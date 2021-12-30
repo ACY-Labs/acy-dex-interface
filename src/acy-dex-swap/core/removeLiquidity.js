@@ -20,7 +20,7 @@ import {
   getUserTokenBalanceRaw,
   supportedTokens,
 } from '../utils';
-import {constantInstance, ROUTER_ADDRESS} from '@/constants';
+import {constantInstance, ROUTER_ADDRESS, NATIVE_CURRENCY} from '@/constants';
 
 export async function getEstimated(
   inputToken0,
@@ -71,22 +71,25 @@ export async function getEstimated(
   setButtonContent('loading...');
   setRemoveStatus('');
 
-  let token0IsETH = inToken0Symbol === 'BNB';
-  let token1IsETH = inToken1Symbol === 'BNB';
+  const nativeCurrencySymbol = NATIVE_CURRENCY();
+  const wrappedCurrencySymbol = `W${nativeCurrencySymbol}`;
+
+  let token0IsETH = inToken0Symbol === nativeCurrencySymbol;
+  let token1IsETH = inToken1Symbol === nativeCurrencySymbol;
   if (token0IsETH && token1IsETH) {
     setToken0Amount('0');
     setToken1Amount('0');
     setNeedApprove(false);
     setButtonStatus(false);
-    setButtonContent('Both tokens are BNB');
+    setButtonContent(`Both tokens are ${nativeCurrencySymbol}`);
     return;
   }
-  if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
+  if ((token0IsETH && inToken1Symbol === wrappedCurrencySymbol) || (inToken0Symbol === wrappedCurrencySymbol && token1IsETH)) {
     setToken0Amount('0');
     setToken1Amount('0');
     setNeedApprove(false);
     setButtonStatus(false);
-    setButtonContent('Invalid pair of BNB/WBNB');
+    setButtonContent(`Invalid pair of ${nativeCurrencySymbol}/${wrappedCurrencySymbol}`);
     return;
   }
   // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
@@ -357,8 +360,11 @@ export async function signOrApprove(
       decimals: inToken1Decimal,
     } = inputToken1;
 
-    const token0IsETH = inToken0Symbol === 'BNB';
-    const token1IsETH = inToken1Symbol === 'BNB';
+    const nativeCurrencySymbol = NATIVE_CURRENCY();
+    const wrappedCurrencySymbol = `W${nativeCurrencySymbol}`;
+
+    const token0IsETH = inToken0Symbol === nativeCurrencySymbol;
+    const token1IsETH = inToken1Symbol === nativeCurrencySymbol;
 
     if (!inputToken0.symbol || !inputToken1.symbol)
       return new CustomError('One or more token input is missing');
@@ -369,10 +375,10 @@ export async function signOrApprove(
     console.log('token1');
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support BNB to BNB");
+    if (token0IsETH && token1IsETH) return new CustomError(`Doesn't support ${nativeCurrencySymbol} to ${nativeCurrencySymbol}`);
 
-    if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
-      return new CustomError('Invalid pair WBNB/BNB');
+    if ((token0IsETH && inToken1Symbol === wrappedCurrencySymbol) || (inToken0Symbol === wrappedCurrencySymbol && token1IsETH)) {
+      return new CustomError(`Invalid pair ${wrappedCurrencySymbol}/${nativeCurrencySymbol}`);
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 
@@ -587,8 +593,11 @@ export async function removeLiquidity(
     token1Address = getAddress(token1Address);
     console.log(token1Address);
 
-    let token0IsETH = token0Symbol === 'BNB';
-    let token1IsETH = token1Symbol === 'BNB';
+    const nativeCurrencySymbol = NATIVE_CURRENCY();
+    const wrappedCurrencySymbol = `W${nativeCurrencySymbol}`;
+
+    let token0IsETH = token0Symbol === nativeCurrencySymbol;
+    let token1IsETH = token1Symbol === nativeCurrencySymbol;
 
     if (!inputToken0.symbol || !inputToken1.symbol)
       return new CustomError('One or more token input is missing');
@@ -606,10 +615,10 @@ export async function removeLiquidity(
     console.log('token1');
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support BNB to BNB");
+    if (token0IsETH && token1IsETH) return new CustomError(`Doesn't support ${nativeCurrencySymbol} to ${nativeCurrencySymbol}`);
 
-    if ((token0IsETH && token1Symbol === 'WBNB') || (token0Symbol === 'WBNB' && token1IsETH)) {
-      return new CustomError('Invalid pair WBNB/BNB');
+    if ((token0IsETH && token1Symbol === wrappedCurrencySymbol) || (token0Symbol === wrappedCurrencySymbol && token1IsETH)) {
+      return new CustomError(`Invalid pair ${wrappedCurrencySymbol}/${nativeCurrencySymbol}`);
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 

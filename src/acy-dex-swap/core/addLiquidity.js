@@ -19,7 +19,7 @@ import {
   getTokenTotalSupply,
   getUserTokenBalanceRaw,
 } from '../utils';
-import { constantInstance } from "@/constants";
+import { constantInstance, NATIVE_CURRENCY } from "@/constants";
 
 // get the estimated amount of the other token required when adding liquidity, in readable string.
 export async function getEstimated(
@@ -94,20 +94,23 @@ export async function getEstimated(
     // let token0IsETH = inToken0Symbol === 'ETH';
     // let token1IsETH = inToken1Symbol === 'ETH';
 
-    let token0IsETH = inToken0Symbol === 'BNB';
-    let token1IsETH = inToken1Symbol === 'BNB';
+    const nativeCurrencySymbol = NATIVE_CURRENCY();
+    const wrappedCurrencySymbol = `W${nativeCurrencySymbol}`;
+
+    let token0IsETH = inToken0Symbol === nativeCurrencySymbol;
+    let token1IsETH = inToken1Symbol === nativeCurrencySymbol;
 
     console.log(inputToken0);
     console.log(inputToken1);
     if (token0IsETH && token1IsETH) {
-      setButtonContent("Doesn't support BNB to BNB");
+      setButtonContent(`Doesn't support ${nativeCurrencySymbol} to ${nativeCurrencySymbol}`);
       setButtonStatus(false);
-      return new CustomError("Doesn't support BNB to BNB");
+      return new CustomError(`Doesn't support ${nativeCurrencySymbol} to ${nativeCurrencySymbol}`);
     }
-    if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
-      setButtonContent('Invalid pair WBNB/BNB');
+    if ((token0IsETH && inToken1Symbol === wrappedCurrencySymbol) || (inToken0Symbol === wrappedCurrencySymbol && token1IsETH)) {
+      setButtonContent(`Invalid pair ${wrappedCurrencySymbol}/${nativeCurrencySymbol}`);
       setButtonStatus(false);
-      return new CustomError('Invalid pair WBNB/BNB');
+      return new CustomError(`Invalid pair ${wrappedCurrencySymbol}/${nativeCurrencySymbol}`);
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 
@@ -342,8 +345,8 @@ export async function getEstimated(
 
         setLiquidityBreakdown([
           // `Slippage tolerance : ${slippage}%`,
-          `Pool reserve: ${pair.reserve0.toFixed(3)} ${pair.token0.symbol == "WETH" ? "WBNB" : pair.token0.symbol
-          } + ${pair.reserve1.toFixed(3)} ${pair.token1.symbol == "WETH" ? "WBNB" : pair.token1.symbol}`,
+          `Pool reserve: ${pair.reserve0.toFixed(3)} ${pair.token0.symbol == "WETH" ? wrappedCurrencySymbol : pair.token0.symbol
+          } + ${pair.reserve1.toFixed(3)} ${pair.token1.symbol == "WETH" ? wrappedCurrencySymbol : pair.token1.symbol}`,
           `Pool share: ${poolTokenPercentage}%`,
         ]);
       } catch (e) {
@@ -550,8 +553,10 @@ export async function addLiquidity(
 
     // let token0IsETH = inToken0Symbol === 'ETH';
     // let token1IsETH = inToken1Symbol === 'ETH';
-    let token0IsETH = inToken0Symbol === 'BNB';
-    let token1IsETH = inToken1Symbol === 'BNB';
+    const nativeCurrencySymbol = NATIVE_CURRENCY();
+    const wrappedCurrencySymbol = `W${nativeCurrencySymbol}`;
+    let token0IsETH = inToken0Symbol === nativeCurrencySymbol;
+    let token1IsETH = inToken1Symbol === nativeCurrencySymbol;
 
     console.log('------------------ RECEIVED TOKEN ------------------');
     console.log('token0');
@@ -559,12 +564,12 @@ export async function addLiquidity(
     console.log('token1');
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support BNB to BNB");
+    if (token0IsETH && token1IsETH) return new CustomError(`Doesn't support ${nativeCurrencySymbol} to ${nativeCurrencySymbol}`);
 
     // if ((token0IsETH && inToken1Symbol === 'WETH') || (inToken0Symbol === 'WETH' && token1IsETH)) {
-    if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
+    if ((token0IsETH && inToken1Symbol === wrappedCurrencySymbol) || (inToken0Symbol === wrappedCurrencySymbol && token1IsETH)) {
       // UI should sync value of ETH and WETH
-      return new CustomError('Invalid pair WBNB/BNB');
+      return new CustomError(`Invalid pair ${wrappedCurrencySymbol}/${nativeCurrencySymbol}`);
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 

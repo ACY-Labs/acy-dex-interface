@@ -56,7 +56,7 @@ export const INITIAL_ALLOWED_SLIPPAGE = () => constantInstance.farmSetting.INITI
 export const FACTORY_ADDRESS = () => constantInstance.farmSetting.FACTORY_ADDRESS
 export const INIT_CODE_HASH = () => constantInstance.farmSetting.INIT_CODE_HASH
 export const WETH = () => constantInstance.farmSetting.WETH
-export const ETH_NAME = () => constantInstance.farmSetting.ETH_NAME
+export const NATIVE_CURRENCY = () => constantInstance.farmSetting.NATIVE_CURRENCY
 export const ROUTER_ADDRESS = () => constantInstance.farmSetting.ROUTER_ADDRESS
 export const FARMS_ADDRESS  = () => constantInstance.farmSetting.FARMS_ADDRESS 
 export const FLASH_ARBITRAGE_ADDRESS = () => constantInstance.farmSetting.FLASH_ARBITRAGE_ADDRESS
