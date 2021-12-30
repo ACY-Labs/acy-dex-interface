@@ -239,14 +239,15 @@
 
 .allocationContainer {
   display: grid;
-  grid-template-columns: repeat(5, 60px);
-  gap: 10px;
+  grid-template-columns: repeat(5, 55px);
+  column-gap: 25px;
+  row-gap: 10px;
 }
 
 .allocationCard {
   position: relative;
-  width: 50px;
-  height: 50px;
+  width: 55px;
+  height: 55px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -283,8 +284,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  height: 50px;
-  width: 50px;
+  height: 55px;
+  width: 55px;
   display: flex;
   align-items: center;
   justify-content: center;
