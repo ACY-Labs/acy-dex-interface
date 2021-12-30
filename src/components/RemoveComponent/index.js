@@ -194,7 +194,7 @@ const MyComponent = props => {
   };
 
   const ConnectWallet = () => {
-    activate(binance);
+    //activate(binance);
     activate(injected);
   };
 

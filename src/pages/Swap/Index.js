@@ -165,7 +165,7 @@ const Swap = props => {
 
   useEffect(() => {
     if(!account){
-      activate(binance);
+      //activate(binance);
       activate(injected);
      }
     getTransactionsByAccount(account,library,'SWAP').then(data =>{

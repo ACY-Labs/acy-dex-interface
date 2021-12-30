@@ -63,7 +63,7 @@ const Farms = (props) => {
   // and require user to approve this connection.
 
   const connectWallet = async () =>  {
-    activate(binance);
+    //activate(binance);
     activate(injected);
   };
 

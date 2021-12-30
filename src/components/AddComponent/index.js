@@ -362,7 +362,7 @@ const AddLiquidityComponent = props => {
   };
 
   const ConnectWallet = () => {
-    activate(binance);
+    //activate(binance);
     activate(injected);
   };
 
@@ -785,7 +785,7 @@ const AddLiquidityComponent = props => {
                     disabled={!buttonStatus}
                     onClick={async () => {
                       if (account == undefined) {
-                        activate(binance);
+                        //activate(binance);
                         activate(injected);
                         setButtonContent('Choose tokens and amount');
                         setButtonStatus(false);

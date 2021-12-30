@@ -51,7 +51,7 @@ const BasicProfile = (props) => {
  useEffect(() => {
    if(!account){
     activate(injected);
-    activate(binance);
+    //activate(binance);
    }
     getTransactionsByAccount(account,library,'LIQUIDITY').then(data =>{
       setTransactionList(data);

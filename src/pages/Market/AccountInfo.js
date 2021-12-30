@@ -406,7 +406,7 @@ function AccountInfo(props) {
   // method to prompt metamask extension for user to connect their wallet.
   // const connectWallet = () => activate(injected);
   const connectWallet = () => {
-    activate(binance);
+    //activate(binance);
     activate(injected);
   }
 

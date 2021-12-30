@@ -62,7 +62,7 @@ const MarketIndex = props => {
   useEffect(() => {
     if(!account){
       console.log("Market_________________");
-      activate(binance);
+      //activate(binance);
       activate(injected);
     }
   }, []);

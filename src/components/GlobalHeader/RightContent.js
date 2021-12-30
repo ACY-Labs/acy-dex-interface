@@ -41,7 +41,7 @@ const GlobalHeaderRight = props => {
 
   useEffect(() => {
     if (!account) {
-      activate(binance);
+      //activate(binance);
       activate(injected);
     }
   }, []);
