@@ -37,13 +37,9 @@ import {
 } from './Data/walletStats'
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import { binance, injected } from '@/connectors';
-// import ConstantLoader from '@/constants';
-import {constantInstance} from "@/constants";
+import { API_URL, SCAN_NAME, SCAN_URL_PREFIX, TOKENLIST} from "@/constants";
 import { useConstantLoader } from '@/constants';
 
-const supportedTokens = constantInstance.tokenList;
-const scanUrlPrefix = constantInstance.scanUrlPrefix;
-const apiUrlPrefix = constantInstance.farmSetting.API_URL;
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -70,6 +66,7 @@ let samplePositionData = [
   },
 ];
 function getLogoURIWithSymbol(symbol) {
+  const supportedTokens = TOKENLIST();
   for (let j = 0; j < supportedTokens.length; j++) {
     if (symbol === supportedTokens[j].symbol) {
       return supportedTokens[j].logoURI;
@@ -516,18 +513,17 @@ function AccountInfo(props) {
   const getValidPoolList = (account) => {
     // setLoading(true);
  
-
+    const apiUrlPrefix = API_URL();
 
     console.log("fetching user pool list");
     axios.get(
       // fetch valid pool list from remote
-      // `${apiUrlPrefix}/pool?chainId=${chainId}`
       `${apiUrlPrefix}/userpool?walletId=${account}`
-      // `http://localhost:3001/api/userpool?walletId=${account}`
     ).then(async res => {
       console.log("fetch pool data");
       console.log(res.data);
 
+      const supportedTokens = TOKENLIST();
       const tokens = supportedTokens;
 
       // construct pool list locally
@@ -709,10 +705,10 @@ function AccountInfo(props) {
         <div>
           {/* <div style={{ fontSize: '26px', fontWeight: 'bold' }}>{address}</div> */}
           <a
-            onClick={() => openInNewTab(`${scanUrlPrefix}/address/${address}`)}
+            onClick={() => openInNewTab(`${SCAN_URL_PREFIX()}/address/${address}`)}
             style={{ color: '#e29227', fontWeight: 600 }}
           >
-            View on BSC Scan
+            View on {SCAN_NAME}
           </a>
         </div>
         <AcyIcon
