@@ -384,6 +384,11 @@ const LaunchpadProject = () => {
     // otherwise, require an allocation from server
     const clickCover = async e => {
       console.log('click cover', allocationAmount);
+      console.log(isClickedAllocation);
+      if (isClickedAllocation) {
+        return;
+      }
+      setIsClickedAllocation(true);
       const oldAllocationAmount = allocationAmount;
       if (oldAllocationAmount !== 0) {
           requireAllocation(walletId, projectToken).then(res => {
@@ -416,6 +421,7 @@ const LaunchpadProject = () => {
 
   const Allocation = ({ walletId, projectToken, maxSalesAmount=1000 }) => {
     const [allocationAmount, setAllocationAmount] = useState(0);
+    const [isClickedAllocation, setIsClickedAllocation] = useState(false);
 
     useEffect(async () => {
       // get allocation status from backend at begining

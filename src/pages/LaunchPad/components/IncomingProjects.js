@@ -27,25 +27,27 @@ const IncomingProjects = ({ data, openProject }) => {
   //   }
   // });
 
-  var $seeMore = $('.incoming-container');
-  $seeMore.find('.see-more-incoming').click(function() {
-    var $incomingContainer = $(this).closest('.incoming-container');
-    if ($incomingContainer.hasClass('incoming-container-inactive')) {
-      $incomingContainer
-        .removeClass('incoming-container-inactive')
-        .addClass('incoming-container-active');
-    } else {
-      $incomingContainer
-        .removeClass('incoming-container-active')
-        .addClass('incoming-container-inactive');
-    }
-  });
+  // var $seeMore = $('.incoming-container');
+  // $seeMore.find('.see-more-incoming').click(function() {
+  //   var $incomingContainer = $(this).closest('.incoming-container');
+  //   if ($incomingContainer.hasClass('incoming-container-inactive')) {
+  //     $incomingContainer
+  //       .removeClass('incoming-container-inactive')
+  //       .addClass('incoming-container-active');
+  //   } else {
+  //     $incomingContainer
+  //       .removeClass('incoming-container-active')
+  //       .addClass('incoming-container-inactive');
+  //   }
+  // });
 
   const [isActiveUpcoming, setIsActiveUpcoming] = useState(false);
   const [isIncomingExpanded, setisIncomingExpanded] = useState(false);
 
+  const [manyDataIncoming, setManyDataIncoming] = useState(data.length > 3);
+
   return (
-    <div className="incoming-container incoming-container-inactive">
+    <div className={isActiveUpcoming || !manyDataIncoming ? 'incoming-container active' : 'incoming-container'}>
       <div
         className="expanding-card"
         style={{
@@ -86,7 +88,7 @@ const IncomingProjects = ({ data, openProject }) => {
             </div>
           ))}
       </div>
-      {data.length > 3 ? <a className="see-more-incoming" /> : ''}
+      {manyDataIncoming ? <a className="see-more-incoming" onClick={() => setIsActiveUpcoming(!isActiveUpcoming)}/> : ''}
     </div>
   );
 };

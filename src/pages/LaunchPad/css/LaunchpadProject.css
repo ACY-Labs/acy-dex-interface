@@ -53,7 +53,7 @@
 }
 
 .allocation-content-active {
-  height: 670px;
+  height: 690px;
   transition: height 0.1s linear;
 }
 
@@ -481,6 +481,7 @@
   border-radius: 8px;
 }
 
+
 .claim-btn-inactive{
   cursor: not-allowed;
 }
@@ -495,7 +496,7 @@
 
 .vesting-text {
   text-align: left;
-  font-size: 12px;
+  font-size: 14px;
   margin: 5px 0 15px 0;
 }
 

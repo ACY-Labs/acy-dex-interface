@@ -29,8 +29,11 @@ const EndedProjects = ({ data, openProject }) => {
 
   const [isActiveEnded, setisActiveEnded] = useState(false);
   const [isEndedExpanded, setisEndedExpanded] = useState(false);
+
+  const [manyDataEnded, setManyDataEnded] = useState(data.length > 6);
+
   return (
-    <div className={isActiveEnded ? 'ended-container active' : 'ended-container'}>
+    <div className={isActiveEnded || !manyDataEnded ? 'ended-container active' : 'ended-container'}>
       <div
         className="expanding-card2"
         style={{
@@ -66,7 +69,7 @@ const EndedProjects = ({ data, openProject }) => {
             </div>
           ))}
       </div>
-      {data.length > 6 ? (
+      {manyDataEnded ? (
         <a className="see-more-ended" onClick={() => setisActiveEnded(!isActiveEnded)} />
       ) : (
         ''
