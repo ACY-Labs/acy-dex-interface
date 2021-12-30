@@ -40,6 +40,7 @@ import { binance, injected } from '@/connectors';
 import ConstantLoader from '@/constants';
 const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
 const supportedTokens = ConstantLoader().tokenList;
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -336,7 +337,7 @@ function AccountInfo(props) {
   const [userLiquidityEarn, setEarn] = useState(0);
   
   // Fetch Account Transactions
-  const [userTransactions, setUserTransactions] = useState([])
+  const [userTransactions, setUserTransactions] = useState(null)
 
   // wallet analytics
   const [totalNoOfTransactions, setTotalNoOfTransactions] = useState(0)
@@ -407,72 +408,72 @@ function AccountInfo(props) {
 
   useEffect(
     () => {
-      console.log("TEST HERE ADDRESS:",address);
+      // console.log("TEST HERE ADDRESS:",address);
 
-      fetchPoolsFromAccount(marketClient, address).then(data => {
-        setLiquidityPositions(data);
-      });
+      // fetchPoolsFromAccount(marketClient, address).then(data => {
+      //   setLiquidityPositions(data);
+      // });
 
-      const getPools = async (library, account) => {
-        // get all pools from the farm contract.
-        // todo: currently account refers to the current user viewing this webpage,
-        // todo: needs to be change to the user in this webpage.
-        const pools = (await getAllPools(library, account)).filter(pool => pool.hasUserPosition);
-        const newFarmsContents = [];
-        const block = await library.getBlockNumber();
-        // format pools data to the required format that the table can read.
-        pools.forEach(pool => {
-          const newFarmsContent = {
-            index: 0,
-            poolId: pool.poolId,
-            lpTokens: pool.lpTokenAddress,
-            token1: pool.token0Symbol,
-            token1Logo: getLogoURIWithSymbol(pool.token0Symbol),
-            token2: pool.token1Symbol,
-            token2Logo: getLogoURIWithSymbol(pool.token1Symbol),
-            pendingReward: pool.rewardTokensSymbols.map((token, index) => ({
-              token,
-              amount: pool.rewardTokensAmount[index],
-            })),
-            totalApr: pool.apr.toFixed(2),
-            tvl: pool.tvl.toFixed(2),
-            hasUserPosition: pool.hasUserPosition,
-            hidden: true,
-            userRewards: pool.rewards,
-            stakeData: pool.stakeData,
-            poolLpScore: pool.lpScore,
-            poolLpBalance: pool.lpBalance,
-            endsIn: getDHM((pool.endBlock - block) * BLOCK_TIME),
-            status: pool.endBlock - block > 0,
-            ratio: pool.ratio,
-            endAfter: (pool.endBlock - block) * BLOCK_TIME,
-          };
-          if(newFarmsContent.poolId == 0) {
-            // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));
-            if(newFarmsContent.stakeData){
-              const myStakeAcy = newFarmsContent.stakeData.reduce((total, currentAmount) => total + parseFloat(currentAmount.lpAmount), 0);
-              setStakeACY({
-                myAcy: myStakeAcy,
-                totalAcy: newFarmsContent.poolLpBalance
-              });
-            } else {
-              setStakeACY({
-                myAcy: 0,
-                totalAcy: newFarmsContent.poolLpBalance
-              });
-            }
-          }
-          newFarmsContents.push(newFarmsContent);
-        });
-        setTableRow(newFarmsContents);
-        setIsLoadingPool(false);
-      };
+      // const getPools = async (library, account) => {
+      //   // get all pools from the farm contract.
+      //   // todo: currently account refers to the current user viewing this webpage,
+      //   // todo: needs to be change to the user in this webpage.
+      //   const pools = (await getAllPools(library, account)).filter(pool => pool.hasUserPosition);
+      //   const newFarmsContents = [];
+      //   const block = await library.getBlockNumber();
+      //   // format pools data to the required format that the table can read.
+      //   pools.forEach(pool => {
+      //     const newFarmsContent = {
+      //       index: 0,
+      //       poolId: pool.poolId,
+      //       lpTokens: pool.lpTokenAddress,
+      //       token1: pool.token0Symbol,
+      //       token1Logo: getLogoURIWithSymbol(pool.token0Symbol),
+      //       token2: pool.token1Symbol,
+      //       token2Logo: getLogoURIWithSymbol(pool.token1Symbol),
+      //       pendingReward: pool.rewardTokensSymbols.map((token, index) => ({
+      //         token,
+      //         amount: pool.rewardTokensAmount[index],
+      //       })),
+      //       totalApr: pool.apr.toFixed(2),
+      //       tvl: pool.tvl.toFixed(2),
+      //       hasUserPosition: pool.hasUserPosition,
+      //       hidden: true,
+      //       userRewards: pool.rewards,
+      //       stakeData: pool.stakeData,
+      //       poolLpScore: pool.lpScore,
+      //       poolLpBalance: pool.lpBalance,
+      //       endsIn: getDHM((pool.endBlock - block) * BLOCK_TIME),
+      //       status: pool.endBlock - block > 0,
+      //       ratio: pool.ratio,
+      //       endAfter: (pool.endBlock - block) * BLOCK_TIME,
+      //     };
+      //     if(newFarmsContent.poolId == 0) {
+      //       // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));
+      //       if(newFarmsContent.stakeData){
+      //         const myStakeAcy = newFarmsContent.stakeData.reduce((total, currentAmount) => total + parseFloat(currentAmount.lpAmount), 0);
+      //         setStakeACY({
+      //           myAcy: myStakeAcy,
+      //           totalAcy: newFarmsContent.poolLpBalance
+      //         });
+      //       } else {
+      //         setStakeACY({
+      //           myAcy: 0,
+      //           totalAcy: newFarmsContent.poolLpBalance
+      //         });
+      //       }
+      //     }
+      //     newFarmsContents.push(newFarmsContent);
+      //   });
+      //   setTableRow(newFarmsContents);
+      //   setIsLoadingPool(false);
+      // };
 
       // account will be returned if wallet is connected.
       // so if account is present, retrieve the farms contract.
       if (account) {
         setWalletConnected(true);
-        getPools(library, account);
+        // getPools(library, account);
         // initDao(library, account);
       } else {
         setWalletConnected(false);
@@ -513,8 +514,8 @@ function AccountInfo(props) {
     console.log("fetching user pool list");
     axios.get(
       // fetch valid pool list from remote
-      // `https://api.acy.finance/api/pool?chainId=${chainId}`
-      `https://api.acy.finance/api/userpool?walletId=${account}`
+      // `${apiUrlPrefix}/pool?chainId=${chainId}`
+      `${apiUrlPrefix}/userpool?walletId=${account}`
       // `http://localhost:3001/api/userpool?walletId=${account}`
     ).then(async res => {
       console.log("fetch pool data");
@@ -826,8 +827,16 @@ function AccountInfo(props) {
 
       {/* transaction table */}
       <div className={styles.accountPageRow}>
-        <h2>Transactions</h2>
-        <TransactionTable dataSourceTransaction={userTransactions} />
+      <h2>Transactions</h2>
+      { !userTransactions ? (
+          <h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>
+          ) : (
+          <TransactionTable
+            dataSourceTransaction={userTransactions}
+          />
+          )}
+       
+        {/* <TransactionTable dataSourceTransaction={userTransactions} /> */}
       </div>
 
       <div style={{ height: 20 }} />
