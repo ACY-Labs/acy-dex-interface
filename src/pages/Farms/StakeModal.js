@@ -188,7 +188,7 @@ const StakeModal = props => {
     console.log("TEST DAYNUM:",dayNum, tokensRewardPerBlock);
     var weight = lp * Math.sqrt(dayNum);
     var share = weight / (totalScore + weight);
-    var _roi = dayNum*60*60*24/BLOCK_TIME * tokensRewardPerBlock[0].rewardPerBlock * share;
+    var _roi = dayNum*60*60*24/BLOCK_TIME() * tokensRewardPerBlock[0].rewardPerBlock * share;
     console.log("TEST ROI:",_roi);
     setRoi(_roi);
 
@@ -261,7 +261,7 @@ const StakeModal = props => {
     console.log("TEST DAYNUM:",dayNum, tokensRewardPerBlock);
     var weight = lp * Math.sqrt(dayNum);
     var share = weight / (totalScore + weight);
-    var _roi = dayNum*60*60*24/BLOCK_TIME * tokensRewardPerBlock[0].rewardPerBlock * share;
+    var _roi = dayNum*60*60*24/BLOCK_TIME() * tokensRewardPerBlock[0].rewardPerBlock * share;
     console.log("TEST ROI:",_roi);
     setRoi(_roi);
   }, [date]);

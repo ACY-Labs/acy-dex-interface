@@ -17,13 +17,11 @@ import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import AcyRemoveLiquidityModal from '@/components/AcyRemoveLiquidityModal';
 import { isMobile } from 'react-device-detect';
 import styles from './styles.less';
-import ConstantLoader from '@/constants';
-const supportedTokens = ConstantLoader().tokenList;
-const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+import {useConstantLoader, TOKENLIST} from '@/constants';
 
 
 function getLogoURIWithSymbol(symbol) {
+  const supportedTokens = TOKENLIST();
   for (let j = 0; j < supportedTokens.length; j++) {
     if (symbol === supportedTokens[j].symbol) {
       return supportedTokens[j].logoURI;
@@ -169,7 +167,8 @@ const SearchField = ({ setKeyword, showSearch, setShowSearch }) => {
 
 const AcyLiquidityPositions = (props) => {
   // const [userLiquidityPools, setUserLiquidityPools] = useState([]); // list of pools that user has share
-  const { account, chainId, library, activate } = useWeb3React();
+  const { account, chainId, library, tokenList: supportedTokens, scanUrlPrefix: {scanUrl: scanUrlPrefix}, farmSetting: {API_URL: apiUrlPrefix} } = useConstantLoader();
+  const { activate } = useWeb3React();
 
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -365,7 +364,7 @@ const AcyLiquidityPositions = (props) => {
   // fetch lists of valid pool
   const getValidPoolList = () => {
     setLoading(true);
-    console.log("fetching user pool list");
+    console.log("fetching user pool list, urlPrefix", apiUrlPrefix);
     axios.get(
       // fetch valid pool list from remote
       // `${apiUrlPrefix}/pool?chainId=${chainId}`
@@ -389,7 +388,7 @@ const AcyLiquidityPositions = (props) => {
         const token1 = new Token(chainId, token1Address, token1Decimal, token1Symbol);
 
         // queue get pair task
-        const pair = Fetcher.fetchPairData(token0, token1, library);
+        const pair = Fetcher.fetchPairData(token0, token1, library, chainId);
         fetchTask.push(pair);
         console.log("adding task to array")
       }

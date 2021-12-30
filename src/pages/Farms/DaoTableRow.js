@@ -17,8 +17,7 @@ import StakeRow from './StakeRow';
 import { useWeb3React } from '@web3-react/core';
 import { BigNumber } from '@ethersproject/bignumber';
 import SwapComponent from '@/components/SwapComponent';
-import ConstantLoader from '@/constants';
-const supportedTokens = ConstantLoader().tokenList;
+import { useConstantLoader } from '@/constants';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
   const handleInputChange = (e) => {
@@ -79,6 +78,8 @@ const DaoTableRow = props => {
     tokenFilter,
     dao
   } = props;
+
+  const {tokenList: supportedTokens} = useConstantLoader();
 
   const [poolInfo, setPoolInfo] = useState(content);
   const [hidden, setHidden] = useState(true);

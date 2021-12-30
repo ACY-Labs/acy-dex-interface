@@ -24,9 +24,7 @@ import {
 } from '@/components/Acy';
 import TokenSelectorModal from "@/components/TokenSelectorModal";
 
-import ConstantLoader from '@/constants';
-const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+import {useConstantLoader} from '@/constants';
 
 //^mark
 import { connect } from 'umi';
@@ -49,7 +47,6 @@ import {
   getUserTokenBalanceRaw,
   getUserTokenBalance,
   calculateSlippageAmount,
-  INITIAL_ALLOWED_SLIPPAGE,
 } from '@/acy-dex-swap/utils/index';
 
 import ERC20ABI from '@/abis/ERC20.json';
@@ -69,7 +66,6 @@ import {
   ETHER,
   CurrencyAmount,
   InsufficientReservesError,
-  FACTORY_ADDRESS,
 } from '@acyswap/sdk';
 
 import { MaxUint256 } from '@ethersproject/constants';
@@ -90,6 +86,7 @@ import {
 const { AcyTabPane } = AcyTabs;
 
 const AddLiquidityComponent = props => {
+  const { account, chainId, library, tokenList: INITIAL_TOKEN_LIST, farmSetting: {API_URL: apiUrlPrefix}, farmSetting: {INITIAL_ALLOWED_SLIPPAGE}} = useConstantLoader();
   const { dispatch, token, onLoggedIn, isFarm = false } = props;
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
@@ -179,7 +176,7 @@ const AddLiquidityComponent = props => {
   const slippageTolerancePlaceholder = 'please input a number from 1.00 to 100.00';
 
   // 连接钱包函数
-  const { account, chainId, library, activate } = useWeb3React();
+  const { activate } = useWeb3React();
 
   // 初始化函数时连接钱包
   useEffect(
@@ -373,15 +370,21 @@ const AddLiquidityComponent = props => {
     () => {
       if (!account || !chainId || !library) return;
       console.log('get balances in liquidity');
+      const _token0 = INITIAL_TOKEN_LIST[0];
+      const _token1 = INITIAL_TOKEN_LIST[1];
+      setToken0(_token0);
+      setToken1(_token1);
+      setTokenList(INITIAL_TOKEN_LIST)
+
       async function getTokenBalances() {
         setToken0BalanceShow(true);
         setToken1BalanceShow(true);
-        setToken0Balance(await getUserTokenBalance(token0, chainId, account, library));
-        setToken1Balance(await getUserTokenBalance(token1, chainId, account, library));
+        setToken0Balance(await getUserTokenBalance(_token0, chainId, account, library).catch(e => console.log("useEffect getUserTokenBalance error", e)));
+        setToken1Balance(await getUserTokenBalance(_token1, chainId, account, library).catch(e => console.log("useEffect getUserTokenBalance error", e)));
       }
       getTokenBalances();
     },
-    [account, chainId, library, token0, token1]
+    [account, chainId, library]
   );
 
   const onTokenClick = async token => {
@@ -512,8 +515,8 @@ const AddLiquidityComponent = props => {
       setTimeout(() => setShake(false), 1000);
 
       // fetch the token data structure 
-      modelToken0 = tokenList.filter(item => item.symbol === modelToken0.symbol)[0]
-      modelToken1 = tokenList.filter(item => item.symbol === modelToken1.symbol)[0]
+      modelToken0 = INITIAL_TOKEN_LIST.filter(item => item.symbol === modelToken0.symbol)[0]
+      modelToken1 = INITIAL_TOKEN_LIST.filter(item => item.symbol === modelToken1.symbol)[0]
       console.log("fetched token ds", modelToken0, modelToken1)
 
       setToken0(modelToken0);
@@ -729,7 +732,7 @@ const AddLiquidityComponent = props => {
                                 ...token1,
                                 amount: token1Amount,
                               },
-                              slippageTolerance,
+                              slippageTolerance * 100,
                               exactIn,
                               chainId,
                               library,

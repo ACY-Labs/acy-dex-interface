@@ -25,8 +25,10 @@ import {
   fetchFilteredTransaction,
   marketClient,
 } from './Data/index.js';
-import ConstantLoader from '@/constants';
-const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
+
+import {constantInstance} from "@/constants";
+
+const scanUrlPrefix = constantInstance.scanUrlPrefix;
 
 const watchlistManagerPool = new WatchlistManager('pool');
 

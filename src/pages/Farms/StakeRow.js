@@ -14,8 +14,8 @@ import moment from 'moment';
 import classNames from 'classnames';
 import { getPool, getPoolAccmulateReward} from '@/acy-dex-swap/core/farms';
 import axios from 'axios';
-import ConstantLoader from '@/constants';
-const supportedTokens = ConstantLoader().tokenList;
+import {constantInstance} from "@/constants";
+const supportedTokens = constantInstance.tokenList;
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
   const handleInputChange = (e) => {

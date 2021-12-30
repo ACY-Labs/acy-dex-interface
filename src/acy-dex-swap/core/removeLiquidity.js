@@ -1,4 +1,3 @@
-import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAddress } from '@ethersproject/address';
 import { useCallback, useEffect, useState } from 'react';
@@ -19,12 +18,9 @@ import {
   getRouterContract,
   getTokenTotalSupply,
   getUserTokenBalanceRaw,
-  INITIAL_ALLOWED_SLIPPAGE,
-  ROUTER_ADDRESS,
   supportedTokens,
 } from '../utils';
-import ConstantLoader from '@/constants';
-const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
+import {constantInstance, ROUTER_ADDRESS, NATIVE_CURRENCY} from '@/constants';
 
 export async function getEstimated(
   inputToken0,
@@ -75,22 +71,25 @@ export async function getEstimated(
   setButtonContent('loading...');
   setRemoveStatus('');
 
-  let token0IsETH = inToken0Symbol === 'BNB';
-  let token1IsETH = inToken1Symbol === 'BNB';
+  const nativeCurrencySymbol = NATIVE_CURRENCY();
+  const wrappedCurrencySymbol = `W${nativeCurrencySymbol}`;
+
+  let token0IsETH = inToken0Symbol === nativeCurrencySymbol;
+  let token1IsETH = inToken1Symbol === nativeCurrencySymbol;
   if (token0IsETH && token1IsETH) {
     setToken0Amount('0');
     setToken1Amount('0');
     setNeedApprove(false);
     setButtonStatus(false);
-    setButtonContent('Both tokens are BNB');
+    setButtonContent(`Both tokens are ${nativeCurrencySymbol}`);
     return;
   }
-  if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
+  if ((token0IsETH && inToken1Symbol === wrappedCurrencySymbol) || (inToken0Symbol === wrappedCurrencySymbol && token1IsETH)) {
     setToken0Amount('0');
     setToken1Amount('0');
     setNeedApprove(false);
     setButtonStatus(false);
-    setButtonContent('Invalid pair of BNB/WBNB');
+    setButtonContent(`Invalid pair of ${nativeCurrencySymbol}/${wrappedCurrencySymbol}`);
     return;
   }
   // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
@@ -114,7 +113,7 @@ export async function getEstimated(
   }
 
   // get pair using our own provider
-  let pair = await Fetcher.fetchPairData(token0, token1, library)
+  let pair = await Fetcher.fetchPairData(token0, token1, library, chainId)
     .then(pair => {
       console.log(pair.reserve0.raw.toString());
       console.log(pair.reserve1.raw.toString());
@@ -361,8 +360,11 @@ export async function signOrApprove(
       decimals: inToken1Decimal,
     } = inputToken1;
 
-    const token0IsETH = inToken0Symbol === 'BNB';
-    const token1IsETH = inToken1Symbol === 'BNB';
+    const nativeCurrencySymbol = NATIVE_CURRENCY();
+    const wrappedCurrencySymbol = `W${nativeCurrencySymbol}`;
+
+    const token0IsETH = inToken0Symbol === nativeCurrencySymbol;
+    const token1IsETH = inToken1Symbol === nativeCurrencySymbol;
 
     if (!inputToken0.symbol || !inputToken1.symbol)
       return new CustomError('One or more token input is missing');
@@ -373,10 +375,10 @@ export async function signOrApprove(
     console.log('token1');
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support BNB to BNB");
+    if (token0IsETH && token1IsETH) return new CustomError(`Doesn't support ${nativeCurrencySymbol} to ${nativeCurrencySymbol}`);
 
-    if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
-      return new CustomError('Invalid pair WBNB/BNB');
+    if ((token0IsETH && inToken1Symbol === wrappedCurrencySymbol) || (inToken0Symbol === wrappedCurrencySymbol && token1IsETH)) {
+      return new CustomError(`Invalid pair ${wrappedCurrencySymbol}/${nativeCurrencySymbol}`);
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 
@@ -397,7 +399,7 @@ export async function signOrApprove(
     console.log('------------------ CONSTRUCT PAIR ------------------');
     console.log('FETCH');
     // if an error occurs, because pair doesn't exists
-    const pair = await Fetcher.fetchPairData(token0, token1, library).catch(e => {
+    const pair = await Fetcher.fetchPairData(token0, token1, library, chainId).catch(e => {
       console.log(e);
       return new CustomError(`${token0.symbol} - ${token1.symbol} pool does not exist.`);
     });
@@ -458,9 +460,6 @@ export async function signOrApprove(
       verifyingContract: pair.liquidityToken.address,
     };
 
-    console.log('Router address');
-    console.log(ROUTER_ADDRESS);
-
     console.log('pair.liquidityToken.address');
     console.log(pair.liquidityToken.address);
 
@@ -480,7 +479,7 @@ export async function signOrApprove(
 
     const message = {
       owner: account,
-      spender: ROUTER_ADDRESS,
+      spender: ROUTER_ADDRESS(),
       value: liquidityAmount.raw.toString(),
       nonce: nonce.toHexString(),
       deadline: deadlineTime,
@@ -523,7 +522,7 @@ export async function signOrApprove(
           // approveCallback();
           // const [approval, approveCallback] = useApproveCallback(
           //     liquidityAmount,
-          //     ROUTER_ADDRESS,
+          //     ROUTER_ADDRESS(),
           //     library,
           //     account);
           // export async function approve(tokenAddress, requiredAmount, library, account) {
@@ -567,7 +566,7 @@ export async function removeLiquidity(
   index,
   percent,
   amount,
-  allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
+  allowedSlippage,
   chainId,
   library,
   account,
@@ -594,8 +593,11 @@ export async function removeLiquidity(
     token1Address = getAddress(token1Address);
     console.log(token1Address);
 
-    let token0IsETH = token0Symbol === 'BNB';
-    let token1IsETH = token1Symbol === 'BNB';
+    const nativeCurrencySymbol = NATIVE_CURRENCY();
+    const wrappedCurrencySymbol = `W${nativeCurrencySymbol}`;
+
+    let token0IsETH = token0Symbol === nativeCurrencySymbol;
+    let token1IsETH = token1Symbol === nativeCurrencySymbol;
 
     if (!inputToken0.symbol || !inputToken1.symbol)
       return new CustomError('One or more token input is missing');
@@ -613,10 +615,10 @@ export async function removeLiquidity(
     console.log('token1');
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support BNB to BNB");
+    if (token0IsETH && token1IsETH) return new CustomError(`Doesn't support ${nativeCurrencySymbol} to ${nativeCurrencySymbol}`);
 
-    if ((token0IsETH && token1Symbol === 'WBNB') || (token0Symbol === 'WBNB' && token1IsETH)) {
-      return new CustomError('Invalid pair WBNB/BNB');
+    if ((token0IsETH && token1Symbol === wrappedCurrencySymbol) || (token0Symbol === wrappedCurrencySymbol && token1IsETH)) {
+      return new CustomError(`Invalid pair ${wrappedCurrencySymbol}/${nativeCurrencySymbol}`);
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 
@@ -635,7 +637,7 @@ export async function removeLiquidity(
     console.log('------------------ CONSTRUCT PAIR ------------------');
     console.log('FETCH');
     // if an error occurs, because pair doesn't exists
-    const pair = await Fetcher.fetchPairData(token0, token1, library).catch(e => {
+    const pair = await Fetcher.fetchPairData(token0, token1, library, chainId).catch(e => {
       console.log(e);
       return new CustomError(`${token0.symbol} - ${token1.symbol} pool does not exist.`);
     });
@@ -856,10 +858,11 @@ export async function removeLiquidity(
     
     removeLiquidityCallback(status, percent);
 
+    const scanUrlPrefix = constantInstance.scanUrlPrefix.scanUrl;
     const url = `${scanUrlPrefix}/tx/${status.hash}`;
     setRemoveStatus(
       <a href={url} target="_blank" rel="noreferrer">
-        view it on BSC Scan
+        view it on {constantInstance.scanUrlPrefix.scanName}
       </a>
     );
   }

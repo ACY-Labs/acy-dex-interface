@@ -24,9 +24,10 @@ import {
   fetchTokensFromId,
   fetchPoolsFromId,
 } from './Data';
-import ConstantLoader from '@/constants';
-const tokenList = ConstantLoader().tokenList;
-const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
+import {constantInstance} from "@/constants";
+
+const tokenList = constantInstance.tokenList;
+const scanUrlPrefix = constantInstance.scanUrlPrefix;
 
 const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');

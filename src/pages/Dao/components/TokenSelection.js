@@ -3,8 +3,7 @@ import { Icon, Input } from 'antd';
 import styles from '@/pages/Dao/components/StakeSection.less';
 import { AcyCoinItem, AcyIcon, AcyModal, AcyTabs } from '@/components/Acy';
 import placeholder from '../placeholder-round.png';
-import ConstantLoader from '@/constants';
-const tokenList = ConstantLoader().tokenList;
+import {useConstantLoader} from '@/constants';
 
 const { AcyTabPane } = AcyTabs
 
@@ -21,6 +20,7 @@ const TokenSelection = (
     setTokenAsFav
   }
 ) => {
+  const {tokenList} = useConstantLoader();
   return (
     <div className={styles.tokenSelection}>
       <div className={styles.tokenDropdown} onClick={showModal}>

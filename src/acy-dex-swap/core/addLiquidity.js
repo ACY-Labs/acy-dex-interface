@@ -1,7 +1,6 @@
 import {
   CurrencyAmount,
   ETHER,
-  FACTORY_ADDRESS,
   Fetcher,
   InsufficientReservesError,
   Percent,
@@ -19,16 +18,14 @@ import {
   getRouterContract,
   getTokenTotalSupply,
   getUserTokenBalanceRaw,
-  INITIAL_ALLOWED_SLIPPAGE,
 } from '../utils';
-import ConstantLoader from "@/constants";
-const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
+import { constantInstance, NATIVE_CURRENCY } from "@/constants";
 
 // get the estimated amount of the other token required when adding liquidity, in readable string.
 export async function getEstimated(
   inputToken0,
   inputToken1,
-  allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
+  allowedSlippage,
   exactIn = true,
   chainId,
   library,
@@ -65,8 +62,6 @@ export async function getEstimated(
     setButtonStatus(false);
     setLiquidityStatus('');
 
-    console.log(FACTORY_ADDRESS);
-
     let router = getRouterContract(library, account);
     let slippage = allowedSlippage * 0.01;
     let {
@@ -99,20 +94,23 @@ export async function getEstimated(
     // let token0IsETH = inToken0Symbol === 'ETH';
     // let token1IsETH = inToken1Symbol === 'ETH';
 
-    let token0IsETH = inToken0Symbol === 'BNB';
-    let token1IsETH = inToken1Symbol === 'BNB';
+    const nativeCurrencySymbol = NATIVE_CURRENCY();
+    const wrappedCurrencySymbol = `W${nativeCurrencySymbol}`;
+
+    let token0IsETH = inToken0Symbol === nativeCurrencySymbol;
+    let token1IsETH = inToken1Symbol === nativeCurrencySymbol;
 
     console.log(inputToken0);
     console.log(inputToken1);
     if (token0IsETH && token1IsETH) {
-      setButtonContent("Doesn't support BNB to BNB");
+      setButtonContent(`Doesn't support ${nativeCurrencySymbol} to ${nativeCurrencySymbol}`);
       setButtonStatus(false);
-      return new CustomError("Doesn't support BNB to BNB");
+      return new CustomError(`Doesn't support ${nativeCurrencySymbol} to ${nativeCurrencySymbol}`);
     }
-    if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
-      setButtonContent('Invalid pair WBNB/BNB');
+    if ((token0IsETH && inToken1Symbol === wrappedCurrencySymbol) || (inToken0Symbol === wrappedCurrencySymbol && token1IsETH)) {
+      setButtonContent(`Invalid pair ${wrappedCurrencySymbol}/${nativeCurrencySymbol}`);
       setButtonStatus(false);
-      return new CustomError('Invalid pair WBNB/BNB');
+      return new CustomError(`Invalid pair ${wrappedCurrencySymbol}/${nativeCurrencySymbol}`);
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 
@@ -134,7 +132,7 @@ export async function getEstimated(
     }
     // get pair using our own provider
     console.log("TEST TOKEN0 TOKEN1:",token0, token1);
-    const pair = await Fetcher.fetchPairData(token0, token1, library)
+    const pair = await Fetcher.fetchPairData(token0, token1, library, chainId)
       .then(pair => {
         console.log(pair.reserve0.raw.toString());
         console.log(pair.reserve1.raw.toString());
@@ -347,8 +345,8 @@ export async function getEstimated(
 
         setLiquidityBreakdown([
           // `Slippage tolerance : ${slippage}%`,
-          `Pool reserve: ${pair.reserve0.toFixed(3)} ${pair.token0.symbol == "WETH" ? "WBNB" : pair.token0.symbol
-          } + ${pair.reserve1.toFixed(3)} ${pair.token1.symbol == "WETH" ? "WBNB" : pair.token1.symbol}`,
+          `Pool reserve: ${pair.reserve0.toFixed(3)} ${pair.token0.symbol == "WETH" ? wrappedCurrencySymbol : pair.token0.symbol
+          } + ${pair.reserve1.toFixed(3)} ${pair.token1.symbol == "WETH" ? wrappedCurrencySymbol : pair.token1.symbol}`,
           `Pool share: ${poolTokenPercentage}%`,
         ]);
       } catch (e) {
@@ -521,7 +519,7 @@ export async function getEstimated(
 export async function addLiquidity(
   inputToken0,
   inputToken1,
-  allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
+  allowedSlippage,
   exactIn = true,
   chainId,
   library,
@@ -538,7 +536,6 @@ export async function addLiquidity(
 ) {
   let status = await (async () => {
     // check uniswap
-    console.log(FACTORY_ADDRESS);
     let router = getRouterContract(library, account);
 
     const {
@@ -556,8 +553,10 @@ export async function addLiquidity(
 
     // let token0IsETH = inToken0Symbol === 'ETH';
     // let token1IsETH = inToken1Symbol === 'ETH';
-    let token0IsETH = inToken0Symbol === 'BNB';
-    let token1IsETH = inToken1Symbol === 'BNB';
+    const nativeCurrencySymbol = NATIVE_CURRENCY();
+    const wrappedCurrencySymbol = `W${nativeCurrencySymbol}`;
+    let token0IsETH = inToken0Symbol === nativeCurrencySymbol;
+    let token1IsETH = inToken1Symbol === nativeCurrencySymbol;
 
     console.log('------------------ RECEIVED TOKEN ------------------');
     console.log('token0');
@@ -565,12 +564,12 @@ export async function addLiquidity(
     console.log('token1');
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support BNB to BNB");
+    if (token0IsETH && token1IsETH) return new CustomError(`Doesn't support ${nativeCurrencySymbol} to ${nativeCurrencySymbol}`);
 
     // if ((token0IsETH && inToken1Symbol === 'WETH') || (inToken0Symbol === 'WETH' && token1IsETH)) {
-    if ((token0IsETH && inToken1Symbol === 'WBNB') || (inToken0Symbol === 'WBNB' && token1IsETH)) {
+    if ((token0IsETH && inToken1Symbol === wrappedCurrencySymbol) || (inToken0Symbol === wrappedCurrencySymbol && token1IsETH)) {
       // UI should sync value of ETH and WETH
-      return new CustomError('Invalid pair WBNB/BNB');
+      return new CustomError(`Invalid pair ${wrappedCurrencySymbol}/${nativeCurrencySymbol}`);
     }
     // ETH <-> Non-WETH ERC20     OR     Non-WETH ERC20 <-> Non-WETH ERC20
 
@@ -640,11 +639,12 @@ export async function addLiquidity(
   } else {
     console.log('status');
     console.log(status);
+    const scanUrlPrefix = constantInstance.scanUrlPrefix.scanUrl;
     let url = scanUrlPrefix + '/tx/' + status.hash;
     addLiquidityCallback(status);
     setLiquidityStatus(
       <a href={url} target={'_blank'}>
-        View it on BSC Scan
+        View it on {constantInstance.scanUrlPrefix.scanName}
       </a>
     );
   }

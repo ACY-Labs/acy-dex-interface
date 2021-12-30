@@ -16,13 +16,16 @@ import { Web3Provider, JsonRpcProvider } from "@ethersproject/providers";
 import {getTokenContract} from '@/acy-dex-swap/utils';
 import { parse } from 'path-to-regexp';
 import {BLOCK_TIME, RPC_URL} from '@/acy-dex-swap/utils';
-import ConstantLoader from '@/constants';
-const supportedTokens = ConstantLoader().tokenList;
+// import {constantInstance} from "@/constants";
+import { useConstantLoader } from '@/constants';
+// const supportedTokens = constantInstance.farm_setting.TOKENLIST();
 
 const Farms = (props) => {
   // useWeb3React hook will listen to wallet connection.
   // if wallet is connected, account, chainId, library, and activate will not be not be undefined.
-  const { account, chainId, library, activate, active } = useWeb3React();
+  // const { account, chainId, library, activate, active } = useWeb3React();
+  const {account, library, chainId, tokenList: supportedTokens} = useConstantLoader();
+  const { activate } = useWeb3React();
   // const [account, setAccount] = useState();
   const INITIAL_ROW_NUMBER = 20;
 
@@ -106,9 +109,9 @@ const Farms = (props) => {
 
   }
 
-  const getPools = async (library, account) => {
+  const getPools = async (library, account, chainId) => {
     setIsLoadingPool(true);
-    const pools = await newGetAllPools(library, account);
+    const pools = await newGetAllPools(library, account, chainId);
     console.log("TEST getAllPools",pools);
     console.log("end get pools");
     const block = await library.getBlockNumber();
@@ -135,10 +138,10 @@ const Farms = (props) => {
         stakeData: pool.stakeData,
         poolLpScore: pool.lpScore,
         poolLpBalance: pool.lpBalance,
-        endsIn: getDHM((pool.endBlock - block) * BLOCK_TIME),
+        endsIn: getDHM((pool.endBlock - block) * BLOCK_TIME()),
         status: pool.endBlock - block > 0,
         ratio: pool.ratio,
-        endAfter: (pool.endBlock - block) * BLOCK_TIME,
+        endAfter: (pool.endBlock - block) * BLOCK_TIME(),
         token1Ratio: pool.token1Ratio,
         token2Ratio: pool.token2Ratio,
         poolRewardPerYear: pool.poolRewardPerYear, // usd price
@@ -181,23 +184,24 @@ const Farms = (props) => {
     console.log("end getPools");
   };
   useEffect(
-     async () => {
+    () => {
+       console.log("HERE TEST:",account);
       if(!account){
         connectWallet();
       }
       if (account) {
         setWalletConnected(true);
         console.log("start getPools");
-        getPools(library, account);
+        getPools(library, account, chainId);
         
       } else {
-        const provider = new JsonRpcProvider(RPC_URL, 56);
+        const provider = new JsonRpcProvider(RPC_URL(), chainId);
         const account = "0x0000000000000000000000000000000000000000";
         setWalletConnected(false);
-        getPools(provider, account);
+        getPools(provider, account, 56);
       }
     },
-    [account]
+    [account, chainId]
   );
 
 

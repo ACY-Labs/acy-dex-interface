@@ -297,8 +297,8 @@ const BscTestNetTokenList: Array<TokenInfo> = [
 
 const TokenListSelector = (arg: string) => {
   return {
-    'BscMainNet': BscMainNetTokenList,
-    'BscTestNet': BscTestNetTokenList
+    56: BscMainNetTokenList,
+    97: BscTestNetTokenList
   }[arg];
 }
 
