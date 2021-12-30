@@ -37,10 +37,13 @@ import {
 } from './Data/walletStats'
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import { binance, injected } from '@/connectors';
-import ConstantLoader from '@/constants';
-const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
-const supportedTokens = ConstantLoader().tokenList;
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+// import ConstantLoader from '@/constants';
+import {constantInstance} from "@/constants";
+import { useConstantLoader } from '@/constants';
+
+const supportedTokens = constantInstance.tokenList;
+const scanUrlPrefix = constantInstance.scanUrlPrefix;
+const apiUrlPrefix = constantInstance.farmSetting.API_URL;
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -319,7 +322,11 @@ function AccountInfo(props) {
   const [tableRow, setTableRow] = useState([]);
   const [rowNumber, setRowNumber] = useState(INITIAL_ROW_NUMBER);
   const [walletConnected, setWalletConnected] = useState(false);
-  const { account, chainId, library, activate } = useWeb3React();
+
+  const { activate } = useWeb3React();
+  const {account, library, chainId} = useConstantLoader();
+
+
   const [liquidityPositions, setLiquidityPositions] = useState([]);
   const [activePosition, setActivePosition] = useState(null);
 
@@ -443,10 +450,10 @@ function AccountInfo(props) {
             stakeData: pool.stakeData,
             poolLpScore: pool.lpScore,
             poolLpBalance: pool.lpBalance,
-            endsIn: getDHM((pool.endBlock - block) * BLOCK_TIME),
+            endsIn: getDHM((pool.endBlock - block) * BLOCK_TIME()),
             status: pool.endBlock - block > 0,
             ratio: pool.ratio,
-            endAfter: (pool.endBlock - block) * BLOCK_TIME,
+            endAfter: (pool.endBlock - block) * BLOCK_TIME(),
           };
           if(newFarmsContent.poolId == 0) {
             // const total = rewards[j].reduce((total, currentAmount) => total.add(parseInt(currentAmount)));

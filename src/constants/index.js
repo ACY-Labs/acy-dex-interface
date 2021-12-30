@@ -6,6 +6,9 @@ import MethodActionSelector from './contract_method_list';
 import ScanUrlSelector from './scan_url';
 import FarmSettingSelector from './farm_setting';
 import SDK_SETTING from './sdk_setting';
+import { JsonRpcProvider } from "@ethersproject/providers"; 
+
+const library = new JsonRpcProvider('https://bsc-dataseed1.defibit.io/');
 // loading all constants needed in app
 const ConstantLoader = (networkName) => {
     // const params = useParams();
@@ -34,7 +37,7 @@ const ConstantLoader = (networkName) => {
 export let constantInstance = {
     'account': undefined,
     'chainId': 56,
-    'library': undefined,
+    'library': library,
     'tokenList': TokenListSelector(56),
     'methodMap': MethodActionSelector('method'),
     'actionMap': MethodActionSelector('action'),

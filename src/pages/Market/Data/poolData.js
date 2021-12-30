@@ -16,8 +16,10 @@ import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import {findTokenWithAddress} from '@/utils/txData';
 
 import {totalInUSD} from '@/utils/utils'
-import ConstantLoader from '@/constants';
-const supportedTokens = ConstantLoader().tokenList;
+import {constantInstance} from '@/constants';
+
+const supportedTokens = constantInstance.tokenList;
+const apiUrlPrefix = constantInstance.farmSetting.API_URL;
 
 export async function fetchPoolInfo(client, address, timestamp) {
   const block = await getBlockFromTimestamp(timestamp);

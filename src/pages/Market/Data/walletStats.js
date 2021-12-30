@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getAddress } from '@ethersproject/address';
-import ConstantLoader from "@/constants";
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+import {constantInstance} from "@/constants";
+const apiUrlPrefix = constantInstance.farmSetting.API_URL;
 
 export async function fetchTotalValueSwapped(account){
   try {

@@ -1,10 +1,11 @@
 import { GET_GLOBAL_TRANSACTIONS , FILTERED_TRANSACTIONS } from './query';
 import { TransactionType, sortTable } from '../Util';
-import { convertTx } from './util';
+import { convertTx, ACY_ROUTER } from './util';
 import axios from 'axios';
 import {getTransactionsByAccount} from '@/utils/txData'
 import { getLibrary } from '../ConnectWallet';
-
+import {constantInstance} from '@/constants';
+const apiUrlPrefix = constantInstance.farmSetting.API_URL;
 // SAMPLE TRANSACTION DATA
 // {
 //     coin1: 'USDC',
@@ -65,7 +66,7 @@ export async function fetchGlobalTransaction(library){
     // let request = 'https://api.acy.finance/api/users/all';
     // let request = 'http://localhost:3001/api/users/all';
     // let response = await fetch(request);
-    let ACY_ROUTER = "0x4DCa8E42634abdE1925ebB7f82AC29Ea00d34bA2";
+    let ACY_ROUTER = ROUTER_ADDRESS();
     // let data = await response.json();
     // console.log(data.data);
     let globalTransactions = await parseGlobalTransaction(ACY_ROUTER,library);
