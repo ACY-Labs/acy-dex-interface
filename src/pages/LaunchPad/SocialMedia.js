@@ -2,8 +2,8 @@ import React from 'react';
 import './css/LaunchpadProject.css';
 
 const SocialMedia = ({ url, link }) => {
-  const openInNewTab = url => {
-    const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+  const openInNewTab = u => {
+    const newWindow = window.open(u, '_blank', 'noopener,noreferrer');
     if (newWindow) newWindow.opener = null;
   };
 
@@ -11,6 +11,7 @@ const SocialMedia = ({ url, link }) => {
     <div>
       <img
         className="icon-container"
+        alt=""
         src={url}
         onClick={() => {
           openInNewTab(link);
