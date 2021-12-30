@@ -14,6 +14,9 @@ const AcyConnectWallet = props => {
     case 1:
       chainName = 'Ethereum'
       break;
+    case 137:
+      chainName = 'Polygon'
+      break;
     default:
       chainName = 'other'
       break;

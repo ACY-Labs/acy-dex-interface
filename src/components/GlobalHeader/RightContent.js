@@ -143,7 +143,15 @@ const GlobalHeaderRight = props => {
       console.log(account);
       setVisibleMetaMask(false);
     }
-  }, account);
+    ethereum.on('networkChanged', function (chainId) {
+      console.log("networkChanged:", chainId)
+      if (chainId!=56 && chainId!=97 && chainId!=137 ){
+        console.log("ERROR: unsupport NetWork");
+        
+        switchEthereumChain("0x38");
+      }
+    })
+  }, account, chainId);
   const {
     currentUser,
     fetchingMoreNotices,
@@ -307,27 +315,27 @@ const GlobalHeaderRight = props => {
     },
   };
 
- const switchEthereumChain = async (chainId) => {
-  try {
-    await window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: chainId }],
-    });
-  } catch (e) {
-    if (e.code === 4902) {
-      try {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [
-            networkParams[chainId]
-          ],
-        });
-      } catch (addError) {
-        console.error(addError);
+  const switchEthereumChain = async (chainId) => {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: chainId }],
+      });
+    } catch (e) {
+      if (e.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              networkParams[chainId]
+            ],
+          });
+        } catch (addError) {
+          console.error(addError);
+        }
       }
     }
   }
-}
   const showMore = () => {
     setOnly(!only);
   };
@@ -367,20 +375,20 @@ const GlobalHeaderRight = props => {
   ];
   const networkListInCardList = (
     <div className={styles.networkListBlock}>
-    <AcyCardList>
-          {networkList.map((item) => {
-              return (
-                <AcyCardList.Thin className={styles.networkListLayout} onClick={() => item.onClick()}>
-                  {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
-                    <AcyIcon.MyIcon width={32} type={item.icon} />
-                  )}
-                  <span>{item.name}</span>
-                </AcyCardList.Thin>
-              );
-            }
-          )}
-        </AcyCardList>
-        </div>
+      <AcyCardList>
+        {networkList.map((item) => {
+          return (
+            <AcyCardList.Thin className={styles.networkListLayout} onClick={() => item.onClick()}>
+              {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
+                <AcyIcon.MyIcon width={32} type={item.icon} />
+              )}
+              <span>{item.name}</span>
+            </AcyCardList.Thin>
+          );
+        }
+        )}
+      </AcyCardList>
+    </div>
   );
   return (
     <div className={className}>
@@ -449,7 +457,7 @@ const GlobalHeaderRight = props => {
       )}
 
       <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}>
-        
+
         {/* 此处增加简单ui */}
         <div className={styles.walltitle}>
           <span style={{ marginLeft: '10px' }}>Select Network</span>
@@ -458,17 +466,17 @@ const GlobalHeaderRight = props => {
           overlay={networkListInCardList}
           trigger={['click']}
           placement="bottomLeft"
-          >
-            <AcyCardList>
-          {[networkList[networkListIndex]].map(item => (
-            <AcyCardList.Thin className={styles.networkListLayout}>
-              {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
-                <AcyIcon.MyIcon width={32} type={item.icon} />
-              )}
-              <span>{item.name}</span>
-            </AcyCardList.Thin>
-          ))}
-        </AcyCardList>
+        >
+          <AcyCardList>
+            {[networkList[networkListIndex]].map(item => (
+              <AcyCardList.Thin className={styles.networkListLayout}>
+                {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
+                  <AcyIcon.MyIcon width={32} type={item.icon} />
+                )}
+                <span>{item.name}</span>
+              </AcyCardList.Thin>
+            ))}
+          </AcyCardList>
         </Dropdown>
         { /* 此处增加简单ui 结束 */}
 
