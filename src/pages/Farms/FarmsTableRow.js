@@ -16,8 +16,8 @@ import { getPool, getPoolAccmulateReward, newGetPool} from '@/acy-dex-swap/core/
 import StakeRow from './StakeRow';
 import SwapComponent from '@/components/SwapComponent';
 import { BLOCK_TIME } from '@/acy-dex-swap/utils';
-import ConstantLoader from '@/constants';
-const supportedTokens = ConstantLoader().tokenList;
+import {TOKENLIST} from "@/constants";
+// const supportedTokens = TOKENLIST();
 
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
@@ -123,6 +123,7 @@ const FarmsTableRow = props => {
 
   //function to get logo URI
   function getLogoURIWithSymbol(symbol) {
+    const supportedTokens = TOKENLIST();
     for (let j = 0; j < supportedTokens.length; j++) {
       if (symbol === supportedTokens[j].symbol) {
         return supportedTokens[j].logoURI;
@@ -143,7 +144,6 @@ const FarmsTableRow = props => {
       
       if (!poolInfo.lpTokens || !chainId || !account || !library) return;
       async function getFarmTokenUserBalance() {
-        console.log("getFarmTokenUserBalance in");
         const bal = await getUserTokenBalanceWithAddress(
           poolInfo.lpTokens,
           chainId,
@@ -170,6 +170,7 @@ const FarmsTableRow = props => {
       setHarvestButtonStatus(true);
     },[harvestModal]
   );
+
   
   let history = useHistory();
   const getDHM = (sec) => {
@@ -187,10 +188,8 @@ const FarmsTableRow = props => {
   }
 
   const refreshPoolInfo = async () => {
-    console.log('refresh pool info:');
-    const pool = await newGetPool(poolInfo.poolId, library, account);
+    const pool = await newGetPool(poolInfo.poolId, library, account, chainId);
     const block = await library.getBlockNumber();
-    console.log("TEST HERE:",pool,account);
     const newFarmsContent = {
       index: pool.poolId,
       poolId: pool.poolId,
@@ -210,16 +209,15 @@ const FarmsTableRow = props => {
       stakeData: pool.stakeData,
       poolLpScore: pool.lpScore,
       poolLpBalance: pool.lpBalance,
-      endsIn: getDHM((pool.endBlock - block) * BLOCK_TIME),
+      endsIn: getDHM((pool.endBlock - block) * BLOCK_TIME()),
       status: pool.endBlock - block > 0,
       ratio: pool.ratio,
-      endAfter: (pool.endBlock - block) * BLOCK_TIME,
+      endAfter: (pool.endBlock - block) * BLOCK_TIME(),
       token1Ratio: pool.token1Ratio,
       token2Ratio: pool.token2Ratio,
       poolRewardPerYear: pool.poolRewardPerYear,
       tokensRewardPerBlock: pool.tokensRewardPerBlock
     };
-    console.log("TEST HERE:",newFarmsContent);
     setPoolInfo(newFarmsContent);
   };
 
@@ -277,7 +275,6 @@ const FarmsTableRow = props => {
     // }
     const sti = async (hash) => {
       library.getTransactionReceipt(hash).then(async receipt => {
-        console.log(`receiptreceipt for ${hash}: `, receipt);
         // receipt is not null when transaction is done
         if (!receipt) 
           setTimeout(sti(hash), 500);
@@ -408,6 +405,8 @@ const FarmsTableRow = props => {
   const activeEndedFilter = () => {
     return poolInfo.status != activeEnded;
   }
+
+  
 
   return ( poolInfo && (!isMyFarms || poolInfo.hasUserPosition) && (
     <div className={styles.tableBodyRowContainer} hidden={getFilter()}>
@@ -625,17 +624,15 @@ const FarmsTableRow = props => {
               <SwapComponent
                 onSelectToken0={token => {
                   // setActiveToken0(token);
-                  console.log("onSelectToken0:",token);
                 }}
                 onSelectToken1={token => {
                   // setActiveToken1(token);
-                  console.log("onSelectToken1:",token);
 
                 }}
                 onGetReceipt={null}
                 token={{
-                  token0: supportedTokens.find(token => token.symbol == "USDT"),
-                  token1: supportedTokens.find(token => token.symbol == poolInfo.token1)
+                  token0: TOKENLIST().find(token => token.symbol == "USDT"),
+                  token1: TOKENLIST().find(token => token.symbol == poolInfo.token1)
                 }}
                 isLockedToken1={true}
               />

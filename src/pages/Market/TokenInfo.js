@@ -29,16 +29,15 @@ import { convertPoolForList } from './Data/util.js';
 import { MarketSearchBar, PoolTable, TransactionTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
 import ConnectWallet from './ConnectWallet';
-import ConstantLoader from '@/constants';
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
-const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
-const tokenList = ConstantLoader().tokenList;
+import {TOKENLIST, SCAN_URL_PREFIX} from "@/constants";
+
 
 const watchlistManagerToken = new WatchlistManager('token');
 
 function MarketTokenInfo(props) {
   let { address } = useParams();
-  const symbol = useMemo(() => tokenList.find(t => t.address.toLowerCase() == address.toLowerCase()).symbol, [address])
+
+  const symbol = useMemo(() => TOKENLIST().find(t => t.address.toLowerCase() == address.toLowerCase()).symbol, [address])
 
   const [graphSampleData, setGraphSampleData] = useState(0);
   const [tokenData, setTokenData] = useState({});
@@ -174,7 +173,7 @@ function MarketTokenInfo(props) {
 
       // set token data last
 
-      const token = tokenList.find(t => t.address == address);
+      const token = TOKENLIST().find(t => t.address == address);
       console.log("address", address, token)
       setTokenData({
         name: token.name,
@@ -265,7 +264,7 @@ function MarketTokenInfo(props) {
                 style={{ marginLeft: '10px' }}
                 width={16}
                 onClick={() => {
-                  openInNewTab(`${scanUrlPrefix}/token/${tokenData.address}`);
+                  openInNewTab(`${SCAN_URL_PREFIX()}/token/${tokenData.address}`);
                 }}
               />
             </>
