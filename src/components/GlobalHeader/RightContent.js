@@ -283,9 +283,8 @@ const GlobalHeaderRight = props => {
     <div className={className}>
       {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
       <AcyConnectWallet
-        chainId={chainId}
+        chainId={chainId} // this is the chainId from useWeb3React
         isMobile={isMobile}
-        value={account}
         onClick={onhandMetaMask}
         pendingLength={
           props.transaction.transactions.length

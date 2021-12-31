@@ -6,25 +6,27 @@ import {totalInUSD} from '@/utils/utils';
 import { BigNumber } from '@ethersproject/bignumber';
 import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import { abi as IUniswapV2Router02ABI } from '@/abis/IUniswapV2Router02.json';
-import ConstantLoader from '@/constants';
-const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
-const methodList = ConstantLoader().methodMap;
-const actionList = ConstantLoader().actionMap;
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+import { constantInstance, TOKENLIST } from '@/constants';
+const INITIAL_TOKEN_LIST = constantInstance.tokenList;
+const methodList = constantInstance.methodMap;
+const actionList = constantInstance.actionMap;
 
 // THIS FUNCTIONS RETURN TOKEN 
 export function findTokenInList(item){ // token has address attribute
+    const INITIAL_TOKEN_LIST = TOKENLIST();
     let token =  INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.address.toLowerCase());
     if(token) return token;
     else return INITIAL_TOKEN_LIST[0];
 }
 export function findTokenWithAddress(item){// input is an address 
+    const INITIAL_TOKEN_LIST = TOKENLIST();
     let token = INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.toLowerCase() );
     if(token) return token;
     else return INITIAL_TOKEN_LIST[0]
 }
 
 export function findTokenWithSymbol(item){
+    const INITIAL_TOKEN_LIST = TOKENLIST();
     let token = INITIAL_TOKEN_LIST.find(token => token.symbol==item);
     if(token) return token;
     else return INITIAL_TOKEN_LIST[0];
@@ -57,6 +59,7 @@ function saveTxInDB(data){
     ],tokenPriceUSD);
 
     try{
+        const apiUrlPrefix = constantInstance.farmSetting.API_URL;
         axios
         .post(
           `${apiUrlPrefix}/users/swap?address=${data.address}&hash=${data.hash}&valueSwapped=${valueSwapped}&feesPaid=${feesPaid}`
@@ -71,9 +74,9 @@ function saveTxInDB(data){
 }
 function addUserToDB(address){
     try{
+        const apiUrlPrefix = constantInstance.farmSetting.API_URL;
         axios
         .post(
-            // `http://localhost:3001/api/users/adduser?address=${address}`
           `${apiUrlPrefix}/users/adduser?address=${address}`
         )
         .then(response => {
@@ -818,6 +821,8 @@ export async function fetchTransactionData(address,library, account){
 
         let transactionData = await library.getTransaction(address.toString());
         console.log(transactionData);
+
+        const INITIAL_TOKEN_LIST = TOKENLIST();
 
         if (transactionData.data.startsWith(methodList.tokenToToken.id)) {
 

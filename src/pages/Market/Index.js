@@ -18,6 +18,7 @@ import { MarketSearchBar, PoolTable, TokenTable, TransactionTable } from './Util
 import { JsonRpcProvider } from "@ethersproject/providers"; 
 import { isMobile } from 'react-device-detect';
 import ConnectWallet from './ConnectWallet';
+import { useConstantLoader } from '@/constants';
 
 const MarketIndex = props => {
   const [visible,setVisible] = useState(true);
@@ -51,7 +52,8 @@ const MarketIndex = props => {
   const [lineChartError,setlineChartError] = useState('');
   const [overviewError,setoverviewError] = useState('');
 
-  const { account, chainId, library, activate } = useWeb3React();
+  const {activate } = useWeb3React();
+  const {account, library, chainId} = useConstantLoader();
 
   const libraryOut = new JsonRpcProvider('https://bsc-dataseed1.defibit.io/');
 
@@ -89,8 +91,9 @@ const MarketIndex = props => {
     });
 
     // fetch market data
+    console.log("BUG HERE:");
     fetchMarketData().then(dataDict => {
-
+      console.log("BUG HERE2:", dataDict);
       if(dataDict){
       let volumeChange =
         (dataDict.volume24h[dataDict.tvl.length - 1][1] -
