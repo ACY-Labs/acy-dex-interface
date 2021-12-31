@@ -357,6 +357,8 @@ const LaunchpadProject = () => {
     setAllocationAmount,
     walletId,
     projectToken,
+    isClickedAllocation,
+    setIsClickedAllocation
   }) => {
     const [coverOpenState, setCoverOpenState] = useState(false);
     const computeCoverClass = () => {
@@ -371,6 +373,11 @@ const LaunchpadProject = () => {
     // otherwise, require an allocation from server
     const clickCover = async e => {
       console.log('click cover', allocationAmount);
+      console.log(isClickedAllocation);
+      if (isClickedAllocation) {
+        return;
+      }
+      setIsClickedAllocation(true);
       const oldAllocationAmount = allocationAmount;
       if (oldAllocationAmount !== 0) {
           requireAllocation(walletId, projectToken).then(res => {
@@ -401,8 +408,9 @@ const LaunchpadProject = () => {
     );
   };
 
-  const Allocation = ({ walletId, projectToken, maxSalesAmount=1000 }) => {
+  const Allocation = ({ walletId, projectToken}) => {
     const [allocationAmount, setAllocationAmount] = useState(0);
+    const [isClickedAllocation, setIsClickedAllocation] = useState(false);
 
     useEffect(async () => {
       // get allocation status from backend at begining
@@ -440,6 +448,8 @@ const LaunchpadProject = () => {
             setAllocationAmount={setAllocationAmount}
             walletId={walletId}
             projectToken={project}
+            isClickedAllocation={isClickedAllocation}
+            setIsClickedAllocation = {setIsClickedAllocation}
           />
         );
       }
@@ -449,6 +459,15 @@ const LaunchpadProject = () => {
     const [isClickedVesting, setIsClickedVesting] = useState(false);
     const [isClickedMax, setIsClickedMax] = useState(false);
     const [salesValue, setSalesValue] = useState();
+    const [isValidSalesPrice, setIsValidSalesPrice] = useState(true);
+
+    useEffect(() => {
+      if (salesValue > allocationAmount) {
+        setIsValidSalesPrice(false);
+      } else {
+        setIsValidSalesPrice(true);
+      }
+    }, [salesValue])
 
     const maxClick = () => {
       setSalesValue(allocationAmount)
@@ -488,7 +507,7 @@ const LaunchpadProject = () => {
                 {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
               </InputGroup>
             </div>
-            <Button className="sales-submit" onClick={() => console.log("buy")} disabled={!comparesaleDate}> Buy </Button>
+            <Button className={isValidSalesPrice ? "sales-submit" : "sales-submit invalid"} onClick={() => console.log("buy")} disabled={!comparesaleDate || !isValidSalesPrice}> Buy </Button>
           </form>
 
           { (poolDistributionDate && poolDistributionStage) &&
@@ -552,7 +571,7 @@ const LaunchpadProject = () => {
             <Allocation walletId="1234" projectToken="ACY" />
           </div>
           <ProjectDescription />
-          <ChartCard />
+          <ChartCard className="launchpad-chart"/>
         </div>
       </div>
     );

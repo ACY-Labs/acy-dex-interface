@@ -10,6 +10,7 @@ import ConstantLoader from '@/constants';
 const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
 const methodList = ConstantLoader().methodMap;
 const actionList = ConstantLoader().actionMap;
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 
 // THIS FUNCTIONS RETURN TOKEN 
 export function findTokenInList(item){ // token has address attribute
@@ -58,7 +59,7 @@ function saveTxInDB(data){
     try{
         axios
         .post(
-          `https://api.acy.finance/api/users/swap?address=${data.address}&hash=${data.hash}&valueSwapped=${valueSwapped}&feesPaid=${feesPaid}`
+          `${apiUrlPrefix}/users/swap?address=${data.address}&hash=${data.hash}&valueSwapped=${valueSwapped}&feesPaid=${feesPaid}`
         )
         .then(response => {
           console.log(response.response);
@@ -73,7 +74,7 @@ function addUserToDB(address){
         axios
         .post(
             // `http://localhost:3001/api/users/adduser?address=${address}`
-          `https://api.acy.finance/api/users/adduser?address=${address}`
+          `${apiUrlPrefix}/users/adduser?address=${address}`
         )
         .then(response => {
           console.log(response.response);

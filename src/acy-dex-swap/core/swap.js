@@ -37,6 +37,7 @@ import {
 import axios from 'axios';
 import ConstantLoader from '@/constants';
 const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 
 function toFixed4(floatInString) {
   return parseFloat(floatInString).toFixed(4);
@@ -1115,7 +1116,7 @@ export async function swap(
       console.log("rate", rate)
 
       axios.post( 
-        `https://api.acy.finance/api/chart/add?token0=${tempToken0}&token1=${tempToken1
+        `${apiUrlPrefix}/chart/add?token0=${tempToken0}&token1=${tempToken1
         }&rate=${rate}&time=${time}`
         // `http://localhost:3001/api/chart/add?token0=${tempToken0}&token1=${tempToken1
         // }&rate=${rate}&time=${time}`

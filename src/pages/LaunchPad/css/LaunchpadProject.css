@@ -53,7 +53,7 @@
 }
 
 .allocation-content-active {
-  height: 670px;
+  height: 610px;
   transition: height 0.1s linear;
 }
 
@@ -239,14 +239,15 @@
 
 .allocationContainer {
   display: grid;
-  grid-template-columns: repeat(5, 60px);
-  gap: 10px;
+  grid-template-columns: repeat(5, 55px);
+  column-gap: 25px;
+  row-gap: 10px;
 }
 
 .allocationCard {
   position: relative;
-  width: 50px;
-  height: 50px;
+  width: 55px;
+  height: 55px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -283,8 +284,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  height: 50px;
-  width: 50px;
+  height: 55px;
+  width: 55px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -473,7 +474,7 @@
   color: #eb5c20;
 }
 
-.sales-submit {
+.sales-container .sales-submit {
   background-color: #eb5c20;
   color: white;
   border: unset;
@@ -482,6 +483,11 @@
   width: 120px;
   height: 35px;
   cursor: pointer;
+}
+
+.sales-container .invalid{
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .vesting-percentage {
@@ -504,7 +510,9 @@
   border-radius: 8px;
 }
 
+
 .claim-btn-inactive{
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
@@ -518,7 +526,7 @@
 
 .vesting-text {
   text-align: left;
-  font-size: 12px;
+  font-size: 14px;
   margin: 5px 0 15px 0;
 }
 
@@ -605,4 +613,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.ant-table-row-cell-ellipsis, .ant-table-row-cell-ellipsis .ant-table-column-title{
+  text-align: right !important;
 }

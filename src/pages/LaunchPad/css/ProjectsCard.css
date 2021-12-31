@@ -296,7 +296,7 @@
   content: 'See More';
 }
 
-.incoming-container-active .see-more-incoming::before {
+.incoming-container.active .see-more-incoming::before {
   content: 'See Less';
 }
 
@@ -409,7 +409,6 @@
 /* see more ended */
 .ended-container .expanding-card2 {
   position: relative;
-  height: calc(3 * (220px + 20px));
   overflow: hidden;
 }
 

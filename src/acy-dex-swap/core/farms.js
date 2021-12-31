@@ -29,6 +29,7 @@ import { injected } from '@/connectors';
 import axios from 'axios';
 import ConstantLoader from '@/constants';
 const supportedTokens = ConstantLoader().tokenList;
+const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
 const getTokenSymbol = async (address, library, account) => {
   const tokenContract = getTokenContract(address, library, account);
   return tokenContract.symbol();
@@ -561,7 +562,7 @@ const calculateVolAndApr = async (token0, token1, tokenPrices) => {
 
   console.log("this is", token0, token1)
   if(!token1) return 0;
-  return await axios.get(`https://api.acy.finance/api/poolchart/pair?token0=${token0.address}&token1=${token1.address}`).then(async (res) => {
+  return await axios.get(`${apiUrlPrefix}/poolchart/pair?token0=${token0.address}&token1=${token1.address}`).then(async (res) => {
     // calculate volume in USD
     console.log("this is return data", res.data)
     const {token0: token0Vol, token1: token1Vol} = res.data.data.lastVolume;
