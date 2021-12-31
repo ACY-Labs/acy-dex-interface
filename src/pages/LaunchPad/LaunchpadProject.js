@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-indent */
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Progress, Button, Table } from 'antd';
+import { Progress, Button, Table, Input, Tooltip } from 'antd';
 import { history } from 'umi';
 import styles from "./styles.less"
 import LaunchChart from './launchChart';
@@ -35,18 +35,10 @@ import { getContract } from "../../acy-dex-swap/utils/index.js"
 import { useWeb3React } from '@web3-react/core';
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
 
-// Example links for social medias
-// const links = [
-//   'https://t.me/acyfinance',
-//   'https://t.me/ACYFinanceChannel',
-//   'https://twitter.com/ACYFinance',
-//   'https://acy.finance/',
-//   'https://github.com/ACY-Labs/ACY-Finance-Whitepaper'
-// ]
-
 const LaunchpadProject = () => {
   console.log($(document).height());
   
+  const InputGroup = Input.Group;
   const { account, chainId, library, activate, active } = useWeb3React();
   const connectWallet = async () =>  {
     activate(binance);
@@ -63,9 +55,6 @@ const LaunchpadProject = () => {
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
   // const [investorNum,setinvestorNum] = useState(0);
-
-  console.log("-------POSTERURL---------")
-  console.log(receivedData.posterUrl)
 
   const TokenBanner = ({ posterUrl }) => {
     return (
@@ -458,8 +447,15 @@ const LaunchpadProject = () => {
     };
 
     const [isClickedVesting, setIsClickedVesting] = useState(false);
+    const [isClickedMax, setIsClickedMax] = useState(false);
     const [salesValue, setSalesValue] = useState();
 
+    const maxClick = () => {
+      setSalesValue(allocationAmount)
+      setIsClickedMax(true)
+    }
+    const tooltipTitle = `1.Increase your trading volume 
+                          2.Increase your liquidity`
     return (
       <div>
       { !isVesting ? 
@@ -475,8 +471,10 @@ const LaunchpadProject = () => {
             <div className='allocation-cards'>
               <div className="allocationContainer">{allocationCards()}</div>
             </div>
-            <div style={{"width": "120px"}}>
-
+            <div style={{"width": "100%"}}>
+            <Tooltip title={tooltipTitle}>
+              <span style={{cursor: 'help'}}>Increase Your Allocation Amount</span>
+            </Tooltip>
             </div>
           </div>
 
@@ -485,8 +483,10 @@ const LaunchpadProject = () => {
               Sale
             </label>
             <div className="sales-input-container">
-              <input placeholder="Enter amount" className="sales-input" type="number" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
-              <Button className="max-btn" onClick={() => setSalesValue(allocationAmount)}>MAX</Button>
+              <InputGroup compact>
+                <Input className="sales-input" style={{ width: 'calc(100% - 80px)' }} defaultValue="0" onChange={e => setSalesValue(e.target.value)} />
+                {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
+              </InputGroup>
             </div>
             <Button className="sales-submit" onClick={() => console.log("buy")} disabled={!comparesaleDate}> Buy </Button>
           </form>
