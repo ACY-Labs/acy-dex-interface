@@ -3,6 +3,7 @@ import './css/LaunchpadProject.css';
 import tick from '@/assets/icon-tick-white.svg';
 import moment from 'moment'
 import { useState } from "react";
+import { Button} from 'antd';
 
 const VestingSchedule = ({ vestingDate, stageData }) => {
   const vestingStartDate = moment(vestingDate[0]);
@@ -20,7 +21,7 @@ const VestingSchedule = ({ vestingDate, stageData }) => {
               <div className="vesting-schedule-text">
                 <div className='vesting-percentage-claim-container'>
                   <p className="vesting-percentage">{stageData[index]}%</p>
-                  <button className={moment(vestingDate[index]).isBefore() ? "claim-btn claim-btn-active" : "claim-btn claim-btn-inactive"} id="claim-btn">Claim</button>
+                  <Button className={moment(vestingDate[index]).isBefore() ? "claim-btn claim-btn-active" : "claim-btn claim-btn-inactive"} id="claim-btn" disabled={!moment(vestingDate[index]).isBefore()}>Claim</Button>
                 </div>
                 <p className="vesting-text">
                   <span className="claimable-text">Claimable at</span>

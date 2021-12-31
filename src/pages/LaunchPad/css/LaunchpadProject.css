@@ -53,7 +53,7 @@
 }
 
 .allocation-content-active {
-  height: 610px;
+  height: 620px;
   transition: height 0.1s linear;
 }
 
@@ -495,7 +495,7 @@
   /* border: 1px solid white; */
   border-radius: 12px;
   background-color: #363636;
-  padding: 2px 0;
+  padding: 5px 0;
 }
 
 .vesting-percentage-claim-container{
@@ -508,6 +508,7 @@
   border: unset;
   font-size: 12px;
   border-radius: 8px;
+  color: white;
 }
 
 
