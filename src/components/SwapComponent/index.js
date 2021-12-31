@@ -664,9 +664,7 @@ const SwapComponent = props => {
           disabled={!swapButtonState}
           onClick={() => {
             if (account == undefined) {
-              // activate(binance);
-              //activate(binance);
-              activate(injected);
+              selectWallet(localStorage.getItem("wallet"));
             } else {
               setSwapButtonState(false);
               setSwapButtonContent(<>Processing <Icon type="loading" /></>)

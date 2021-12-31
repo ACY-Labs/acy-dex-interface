@@ -3,7 +3,17 @@ import { Col, Icon, Row } from 'antd';
 import React, { Component, useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useWeb3React } from '@web3-react/core';
-import { binance, injected } from '@/connectors';
+import {
+  injected,
+  walletconnect,
+  walletlink,
+  fortmatic,
+  portis,
+  torus,
+  trezor,
+  ledger,
+  binance,
+} from '@/connectors';
 import {
   fetchGeneralPoolInfoDay,
   fetchGeneralTokenInfo,
@@ -58,12 +68,37 @@ const MarketIndex = props => {
   const libraryOut = new JsonRpcProvider('https://bsc-dataseed1.defibit.io/');
 
   // connect to provider, listen for wallet to connect
+  const selectWallet=(walletName)=>{
+    if (walletName === 'metamask' || walletName === 'opera') {
+        activate(injected);
+    } else if (walletName === 'walletconnect') {
+        activate(walletconnect);
+    } else if (walletName === 'coinbase') {
+        activate(walletlink);
+    } else if (walletName === 'fortmatic') {
+        activate(fortmatic);
+    } else if (walletName === 'portis') {
+        activate(portis);
+    } else if (walletName === 'torus') {
+        activate(torus);
+    } else if (walletName === 'trezor') {
+        activate(trezor);
+    } else if (walletName === 'ledger') {
+        activate(ledger);
+    } else if (walletName === 'binance') {
+        activate(binance);
+    } else {
+        console.log("wallet ERROR");
+        activate(injected);
+    }
+  }
  
   useEffect(() => {
     if(!account){
       console.log("Market_________________");
       //activate(binance);
-      activate(injected);
+      //activate(injected);
+      selectWallet(localStorage.getItem("wallet"))
     }
   }, []);
 

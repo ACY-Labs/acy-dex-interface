@@ -9,7 +9,17 @@ import SampleStakeHistoryData from './SampleDaoData';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAllPools, getPool, newGetAllPools } from '@/acy-dex-swap/core/farms';
-import { binance, injected } from '@/connectors';
+import {
+  injected,
+  walletconnect,
+  walletlink,
+  fortmatic,
+  portis,
+  torus,
+  trezor,
+  ledger,
+  binance,
+} from '@/connectors';
 import PageLoading from '@/components/PageLoading';
 import Eth from "web3-eth";
 import { Web3Provider, JsonRpcProvider } from "@ethersproject/providers";
@@ -61,10 +71,32 @@ const Farms = (props) => {
   // method to activate metamask wallet.
   // calling this method for the first time will cause metamask to pop up,
   // and require user to approve this connection.
-
+  const selectWallet=(walletName)=>{
+    if (walletName === 'metamask' || walletName === 'opera') {
+        activate(injected);
+    } else if (walletName === 'walletconnect') {
+        activate(walletconnect);
+    } else if (walletName === 'coinbase') {
+        activate(walletlink);
+    } else if (walletName === 'fortmatic') {
+        activate(fortmatic);
+    } else if (walletName === 'portis') {
+        activate(portis);
+    } else if (walletName === 'torus') {
+        activate(torus);
+    } else if (walletName === 'trezor') {
+        activate(trezor);
+    } else if (walletName === 'ledger') {
+        activate(ledger);
+    } else if (walletName === 'binance') {
+        activate(binance);
+    } else {
+        console.log("wallet ERROR");
+        activate(injected);
+    }
+  }
   const connectWallet = async () =>  {
-    //activate(binance);
-    activate(injected);
+    selectWallet(localStorage.getItem("wallet"))
   };
 
   //function to get logo URI
@@ -183,6 +215,7 @@ const Farms = (props) => {
     setIsLoadingPool(false);
     console.log("end getPools");
   };
+  
   useEffect(
     () => {
        console.log("HERE TEST:",account);

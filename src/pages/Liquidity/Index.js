@@ -3,7 +3,17 @@ import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton } from 'antd';
 import { useWeb3React } from '@web3-react/core';
 import { BscConnector } from '@binance-chain/bsc-connector'
-import { binance, injected } from '@/connectors';
+import {
+  injected,
+  walletconnect,
+  walletlink,
+  fortmatic,
+  portis,
+  torus,
+  trezor,
+  ledger,
+  binance,
+} from '@/connectors';
 import Data, {
   fetchGeneralPoolInfoDay,
   fetchGeneralTokenInfo,
@@ -26,7 +36,7 @@ import {
 import OperationHistoryTable from './components/OperationHistoryTable';
 import AddComponent from '@/components/AddComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { getTransactionsByAccount,appendNewLiquidityTx } from '@/utils/txData';
+import { getTransactionsByAccount, appendNewLiquidityTx } from '@/utils/txData';
 import styles from './styles.less';
 
 
@@ -46,16 +56,38 @@ const BasicProfile = (props) => {
 
   const refContainer = useRef();
   refContainer.current = transactionList;
-
-
- useEffect(() => {
-   if(!account){
-    activate(injected);
-    //activate(binance);
-   }
-    getTransactionsByAccount(account,library,'LIQUIDITY').then(data =>{
+  const selectWallet=(walletName)=>{
+    if (walletName === 'metamask' || walletName === 'opera') {
+        activate(injected);
+    } else if (walletName === 'walletconnect') {
+        activate(walletconnect);
+    } else if (walletName === 'coinbase') {
+        activate(walletlink);
+    } else if (walletName === 'fortmatic') {
+        activate(fortmatic);
+    } else if (walletName === 'portis') {
+        activate(portis);
+    } else if (walletName === 'torus') {
+        activate(torus);
+    } else if (walletName === 'trezor') {
+        activate(trezor);
+    } else if (walletName === 'ledger') {
+        activate(ledger);
+    } else if (walletName === 'binance') {
+        activate(binance);
+    } else {
+        console.log("wallet ERROR");
+        activate(injected);
+    }
+  }
+  
+  useEffect(() => {
+    if (!account) {
+      selectWallet(localStorage.getItem("wallet"))
+    }
+    getTransactionsByAccount(account, library, 'LIQUIDITY').then(data => {
       setTransactionList(data);
-      if(account) setTableLoading(false);
+      if (account) setTableLoading(false);
     })
   }, [account]);
 
@@ -105,8 +137,8 @@ const BasicProfile = (props) => {
   const updateTransactionList = (receiptHash) => {
     setTableLoading(true);
     console.log("updating list");
-    appendNewLiquidityTx(refContainer.current,receiptHash,account,library).then((data) => {
-      if(data && data.length > 0)setTransactionList(data);
+    appendNewLiquidityTx(refContainer.current, receiptHash, account, library).then((data) => {
+      if (data && data.length > 0) setTransactionList(data);
       setTableLoading(false);
     })
   }

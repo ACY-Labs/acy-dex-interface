@@ -13,7 +13,7 @@ import {
   AcySeting,
 } from '@/components/Acy';
 import { useWeb3React } from '@web3-react/core';
-
+import { useConstantLoader } from '@/constants'
 import {
   injected,
   walletconnect,
@@ -36,15 +36,25 @@ const GlobalHeaderRight = props => {
   const [visible, setVisible] = useState(false);
   const [visibleMetaMask, setVisibleMetaMask] = useState(false);
   const [visibleSetting, setVisibleSetting] = useState(false);
+  const [only, setOnly] = useState(true);
   // 连接钱包函数
   const { account, chainId, library, activate, deactivate, active } = useWeb3React();
+  //const { activate, deactivate, active } = useWeb3React();
+  //const { account, library, chainId } = useConstantLoader();
+  //const { tokenList: supportedTokensd } = useConstantLoader();
+  const [wallet, setWallet] = useState(localStorage.getItem("wallet"));
 
+  // 连接钱包 根据localStorage
   useEffect(() => {
+    setWallet(localStorage.getItem("wallet"))
     if (!account) {
-      //activate(binance);
-      activate(injected);
+      if(!wallet){
+        console.log("localStroage dosen't exist");
+        activate(binance);
+        localStorage.setItem('wallet', 'binance');
+      }
     }
-  }, []);
+  }, [account]);
 
   useEffect(() => {
     console.log('test current active', active)
@@ -114,7 +124,7 @@ const GlobalHeaderRight = props => {
 
   // 选择钱包
   const selectWallet = walletName => {
-    console.log('selecting wallet');
+    console.log('selecting wallet', walletName);
     if (walletName === 'metamask' || walletName === 'opera') {
       activate(injected);
     } else if (walletName === 'walletconnect') {
@@ -133,7 +143,10 @@ const GlobalHeaderRight = props => {
       activate(ledger);
     } else if (walletName === 'binance') {
       activate(binance);
+    } else{
+      console.log("wallet ERROR");
     }
+    localStorage.setItem('wallet', walletName);
     setVisibleMetaMask(false);
   };
   // 通知钱包连接成功
@@ -145,9 +158,9 @@ const GlobalHeaderRight = props => {
     }
     ethereum.on('networkChanged', function (chainId) {
       console.log("networkChanged:", chainId)
-      if (chainId!=56 && chainId!=97 && chainId!=137 ){
+      if (chainId != 56 && chainId != 97 && chainId != 137) {
         console.log("ERROR: unsupport NetWork");
-        
+
         switchEthereumChain("0x38");
       }
     })
@@ -277,7 +290,6 @@ const GlobalHeaderRight = props => {
       },
     },
   ];
-  const [only, setOnly] = useState(true);
 
   const networkParams = {
     "0x38": {
