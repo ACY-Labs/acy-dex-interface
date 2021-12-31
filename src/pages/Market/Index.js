@@ -4,17 +4,6 @@ import React, { Component, useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useWeb3React } from '@web3-react/core';
 import {
-  injected,
-  walletconnect,
-  walletlink,
-  fortmatic,
-  portis,
-  torus,
-  trezor,
-  ledger,
-  binance,
-} from '@/connectors';
-import {
   fetchGeneralPoolInfoDay,
   fetchGeneralTokenInfo,
   fetchGlobalTransaction,
@@ -29,6 +18,7 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { isMobile } from 'react-device-detect';
 import ConnectWallet from './ConnectWallet';
 import { useConstantLoader } from '@/constants';
+import {useConnectWallet} from '@/components/ConnectWallet';
 
 const MarketIndex = props => {
   const [visible,setVisible] = useState(true);
@@ -68,46 +58,13 @@ const MarketIndex = props => {
   const libraryOut = new JsonRpcProvider('https://bsc-dataseed1.defibit.io/');
 
   // connect to provider, listen for wallet to connect
-  const selectWallet=(walletName)=>{
-    if (walletName === 'metamask' || walletName === 'opera') {
-        activate(injected);
-    } else if (walletName === 'walletconnect') {
-        activate(walletconnect);
-    } else if (walletName === 'coinbase') {
-        activate(walletlink);
-    } else if (walletName === 'fortmatic') {
-        activate(fortmatic);
-    } else if (walletName === 'portis') {
-        activate(portis);
-    } else if (walletName === 'torus') {
-        activate(torus);
-    } else if (walletName === 'trezor') {
-        activate(trezor);
-    } else if (walletName === 'ledger') {
-        activate(ledger);
-    } else if (walletName === 'binance') {
-        activate(binance);
-    } else {
-        console.log("wallet ERROR");
-        activate(injected);
-    }
-  }
+  const connectWalletByLocalStorage = useConnectWallet();
  
   useEffect(() => {
     if(!account){
-      console.log("Market_________________");
-      //activate(binance);
-      //activate(injected);
-      selectWallet(localStorage.getItem("wallet"))
+      connectWalletByLocalStorage();
     }
   }, []);
-
-  // useEffect(() => {
-  //   // fetch transaction data
-  //   if(library) {
-      
-  //   }
-  // }, [library]);
 
   useEffect(() => {
     console.log("LIBRARY:", library);

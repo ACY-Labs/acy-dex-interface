@@ -82,6 +82,7 @@ import { Alert } from 'antd';
 import spinner from '@/assets/loading.svg';
 import moment from 'moment';
 import {useConstantLoader} from '@/constants';
+import {useConnectWallet} from '@/components/ConnectWallet';
 
 
 // var CryptoJS = require("crypto-js");
@@ -154,6 +155,7 @@ const SwapComponent = props => {
   const [poolExist, setPoolExist] = useState(true);
 
   const [showDescription, setShowDescription] = useState(false);
+  const connectWalletByLocalStorage = useConnectWallet();
 
   useEffect(() => {
     if (!INITIAL_TOKEN_LIST) return
@@ -664,7 +666,7 @@ const SwapComponent = props => {
           disabled={!swapButtonState}
           onClick={() => {
             if (account == undefined) {
-              selectWallet(localStorage.getItem("wallet"));
+              connectWalletByLocalStorage();
             } else {
               setSwapButtonState(false);
               setSwapButtonContent(<>Processing <Icon type="loading" /></>)

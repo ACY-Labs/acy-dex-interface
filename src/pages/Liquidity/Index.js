@@ -3,17 +3,6 @@ import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton } from 'antd';
 import { useWeb3React } from '@web3-react/core';
 import { BscConnector } from '@binance-chain/bsc-connector'
-import {
-  injected,
-  walletconnect,
-  walletlink,
-  fortmatic,
-  portis,
-  torus,
-  trezor,
-  ledger,
-  binance,
-} from '@/connectors';
 import Data, {
   fetchGeneralPoolInfoDay,
   fetchGeneralTokenInfo,
@@ -38,6 +27,7 @@ import AddComponent from '@/components/AddComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { getTransactionsByAccount, appendNewLiquidityTx } from '@/utils/txData';
 import styles from './styles.less';
+import {useConnectWallet} from '@/components/ConnectWallet';
 
 
 const { AcyTabPane } = AcyTabs;
@@ -56,34 +46,10 @@ const BasicProfile = (props) => {
 
   const refContainer = useRef();
   refContainer.current = transactionList;
-  const selectWallet=(walletName)=>{
-    if (walletName === 'metamask' || walletName === 'opera') {
-        activate(injected);
-    } else if (walletName === 'walletconnect') {
-        activate(walletconnect);
-    } else if (walletName === 'coinbase') {
-        activate(walletlink);
-    } else if (walletName === 'fortmatic') {
-        activate(fortmatic);
-    } else if (walletName === 'portis') {
-        activate(portis);
-    } else if (walletName === 'torus') {
-        activate(torus);
-    } else if (walletName === 'trezor') {
-        activate(trezor);
-    } else if (walletName === 'ledger') {
-        activate(ledger);
-    } else if (walletName === 'binance') {
-        activate(binance);
-    } else {
-        console.log("wallet ERROR");
-        activate(injected);
-    }
-  }
-  
+  const connectWalletByLocalStorage = useConnectWallet();
   useEffect(() => {
     if (!account) {
-      selectWallet(localStorage.getItem("wallet"))
+      connectWalletByLocalStorage();
     }
     getTransactionsByAccount(account, library, 'LIQUIDITY').then(data => {
       setTransactionList(data);

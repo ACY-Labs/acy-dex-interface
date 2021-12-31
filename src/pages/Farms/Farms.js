@@ -28,6 +28,7 @@ import { parse } from 'path-to-regexp';
 import {BLOCK_TIME, RPC_URL} from '@/acy-dex-swap/utils';
 // import {constantInstance} from "@/constants";
 import { useConstantLoader } from '@/constants';
+import {useConnectWallet} from "@/components/ConnectWallet"
 // const supportedTokens = constantInstance.farm_setting.TOKENLIST();
 
 const Farms = (props) => {
@@ -71,32 +72,9 @@ const Farms = (props) => {
   // method to activate metamask wallet.
   // calling this method for the first time will cause metamask to pop up,
   // and require user to approve this connection.
-  const selectWallet=(walletName)=>{
-    if (walletName === 'metamask' || walletName === 'opera') {
-        activate(injected);
-    } else if (walletName === 'walletconnect') {
-        activate(walletconnect);
-    } else if (walletName === 'coinbase') {
-        activate(walletlink);
-    } else if (walletName === 'fortmatic') {
-        activate(fortmatic);
-    } else if (walletName === 'portis') {
-        activate(portis);
-    } else if (walletName === 'torus') {
-        activate(torus);
-    } else if (walletName === 'trezor') {
-        activate(trezor);
-    } else if (walletName === 'ledger') {
-        activate(ledger);
-    } else if (walletName === 'binance') {
-        activate(binance);
-    } else {
-        console.log("wallet ERROR");
-        activate(injected);
-    }
-  }
+  const connectWalletByLocalStorage = useConnectWallet();
   const connectWallet = async () =>  {
-    selectWallet(localStorage.getItem("wallet"))
+    connectWalletByLocalStorage();
   };
 
   //function to get logo URI

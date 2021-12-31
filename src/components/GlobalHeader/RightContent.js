@@ -50,7 +50,6 @@ const GlobalHeaderRight = props => {
     if (!account) {
       if(!wallet){
         console.log("localStroage dosen't exist");
-        activate(binance);
         localStorage.setItem('wallet', 'binance');
       }
     }
