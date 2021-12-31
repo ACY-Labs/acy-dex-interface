@@ -361,6 +361,7 @@ const LaunchpadProject = () => {
     setIsClickedAllocation
   }) => {
     const [coverOpenState, setCoverOpenState] = useState(false);
+    const [coverRevealState, setCoverRevealState] = useState(false);
     const computeCoverClass = () => {
       let classString = 'cover';
       if (coverOpenState) {
@@ -377,21 +378,24 @@ const LaunchpadProject = () => {
       if (isClickedAllocation) {
         return;
       }
+
+      setCoverOpenState(true);
       setIsClickedAllocation(true);
-      const oldAllocationAmount = allocationAmount;
-      if (oldAllocationAmount !== 0) {
-          requireAllocation(walletId, projectToken).then(res => {
-              if(res && res.allocationAmount) {
-                  setAllocationAmount(res.allocationAmount);
-                  setCoverOpenState(true);
-              }
-              console.log('allocation get', res.allocationAmount);
-          }).catch(e => {
-              console.error(e);
-          })
-      }
+      // const oldAllocationAmount = allocationAmount;
+      // if (oldAllocationAmount !== 0) {
+      //   requireAllocation(walletId, projectToken).then(res => {
+      //     if(res && res.allocationAmount) {
+      //       setAllocationAmount(res.allocationAmount);
+      //       setCoverOpenState(true);
+      //     }
+      //     console.log('allocation get', res.allocationAmount);
+      //   }).catch(e => {
+      //     console.error(e);
+      //   })
+      // }
       e.preventDefault();
     };
+
 
     return (
       <div className="allocationCard" onClick={clickCover}>
@@ -408,13 +412,14 @@ const LaunchpadProject = () => {
     );
   };
 
-  const Allocation = ({ walletId, projectToken}) => {
+  const Allocation = ({ walletId="1234", projectToken}) => {
     const [allocationAmount, setAllocationAmount] = useState(0);
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
 
     useEffect(async () => {
       // get allocation status from backend at begining
-      await getAllocationInfo(walletId, projectToken)
+      console.log(walletId);
+      getAllocationInfo(walletId, projectToken)
         .then(res => {
           if (res && res.allocationAmount) {
             setAllocationAmount(res.allocationAmount);
@@ -425,6 +430,7 @@ const LaunchpadProject = () => {
           console.error(e);
         });
     }, []);
+
 
     // TODO: replace with 24 icon
     const BaseCard = ({ url }) => {
@@ -503,7 +509,7 @@ const LaunchpadProject = () => {
             </label>
             <div className="sales-input-container">
               <InputGroup compact>
-                <Input className="sales-input" style={{ width: 'calc(100% - 80px)' }} defaultValue="0" onChange={e => setSalesValue(e.target.value)} />
+                  <Input className="sales-input" style={{ width: 'calc(100% - 80px)' }} defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
                 {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
               </InputGroup>
             </div>
@@ -521,7 +527,7 @@ const LaunchpadProject = () => {
                     isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'
                   }
                 >
-                    <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} />
+                    <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} walletId={walletId}/>
                 </div>
               </div>
               <div className="arrow-down-container">
@@ -543,7 +549,7 @@ const LaunchpadProject = () => {
             <p>Vesting is divided into {poolStageCount} stages, unlock {poolDistributionStage[0]}% TGE</p>
             <span className="vesting-line" />
             <div className='vesting-schedule'>
-              <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} />
+                <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} walletId={walletId}/>
             </div>
           </div>
         </div>
@@ -552,7 +558,7 @@ const LaunchpadProject = () => {
     );
   };
 
-  const CardArea = () => {
+  const CardArea = ({walletId}) => {
     return (
       <div className="gridContainer">
         <div className="leftGrid">
@@ -568,7 +574,7 @@ const LaunchpadProject = () => {
         </div>
         <div className="rightGrid">
           <div className="circleBorderCard">
-            <Allocation walletId="1234" projectToken="ACY" />
+            <Allocation walletId={walletId} projectToken={receivedData.projectToken} />
           </div>
           <ProjectDescription />
           <ChartCard className="launchpad-chart"/>
@@ -685,7 +691,7 @@ const LaunchpadProject = () => {
       <div className="mainContainer">
         <TokenBanner posterUrl={receivedData.posterUrl} />
         <TokenLogoLabel projectName={receivedData.projectName} tokenLogo={receivedData.tokenLogoUrl} />
-        <CardArea />
+        <CardArea walletId={account}/>
       </div>
     </div>
   );

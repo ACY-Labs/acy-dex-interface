@@ -5,9 +5,8 @@ import moment from 'moment'
 import { useState } from "react";
 import { Button} from 'antd';
 
-const VestingSchedule = ({ vestingDate, stageData }) => {
-  const vestingStartDate = moment(vestingDate[0]);
-  const len = vestingDate.length
+const VestingSchedule = ({ vestingDate, stageData, walletId }) => {
+  const len = vestingDate.length; 
   return (
     <div>
       {
@@ -21,7 +20,14 @@ const VestingSchedule = ({ vestingDate, stageData }) => {
               <div className="vesting-schedule-text">
                 <div className='vesting-percentage-claim-container'>
                   <p className="vesting-percentage">{stageData[index]}%</p>
-                  <Button className={moment(vestingDate[index]).isBefore() ? "claim-btn claim-btn-active" : "claim-btn claim-btn-inactive"} id="claim-btn" disabled={!moment(vestingDate[index]).isBefore()}>Claim</Button>
+                  <Button
+                    className={moment(vestingDate[index]).isBefore() ? "claim-btn claim-btn-active" : "claim-btn claim-btn-inactive"}
+                    id="claim-btn"
+                    disabled={!moment(vestingDate[index]).isBefore()}
+                    onClick={()=>console.log("claim")}
+                  >
+                    Claim
+                  </Button>
                 </div>
                 <p className="vesting-text">
                   <span className="claimable-text">Claimable at</span>
