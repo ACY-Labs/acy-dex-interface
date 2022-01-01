@@ -26,8 +26,10 @@ import {
   fetchTransactionsForPair,
   marketClient,
 } from './Data/index.js';
-import ConstantLoader from '@/constants';
-const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
+
+import {SCAN_URL_PREFIX} from "@/constants";
+
+// const scanUrlPrefix = SCAN_URL_PREFIX();
 
 const watchlistManagerPool = new WatchlistManager('pool');
 
@@ -283,7 +285,7 @@ function MarketPoolInfo(props) {
                 style={{ marginLeft: '10px' }}
                 width={16}
                 onClick={() => {
-                  openInNewTab(`${scanUrlPrefix}token/${poolData.address}`);
+                  openInNewTab(`${SCAN_URL_PREFIX()}token/${poolData.address}`);
                 }}
               />
             </>

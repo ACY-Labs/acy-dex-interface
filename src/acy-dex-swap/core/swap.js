@@ -1,7 +1,6 @@
 import {
   CurrencyAmount,
   ETHER,
-  FACTORY_ADDRESS,
   Fetcher,
   InsufficientReservesError,
   Pair,
@@ -28,16 +27,12 @@ import {
   getRouterContract,
   getUserTokenBalance,
   getUserTokenBalanceRaw,
-  INITIAL_ALLOWED_SLIPPAGE,
   isZero,
-  ROUTER_ADDRESS,
   withExactInEstimateOutAmount,
   withExactOutEstimateInAmount
 } from '../utils';
 import axios from 'axios';
-import ConstantLoader from '@/constants';
-const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+import {NATIVE_CURRENCY, SCAN_URL_PREFIX, SCAN_NAME, API_URL, ROUTER_ADDRESS} from '@/constants';
 
 function toFixed4(floatInString) {
   return parseFloat(floatInString).toFixed(4);
@@ -47,7 +42,7 @@ function toFixed4(floatInString) {
 export async function swapGetEstimated(
   inputToken0,
   inputToken1,
-  allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
+  allowedSlippage,
   exactIn = true,
   chainId,
   library,
@@ -114,20 +109,22 @@ export async function swapGetEstimated(
     console.log(`token0Amount: ${inToken0Amount}`);
     console.log(`token1Amount: ${inToken1Amount}`);
 
-    let token0IsETH = inToken0Symbol === 'BNB';
-    let token1IsETH = inToken1Symbol === 'BNB';
+    const nativeCurrencySymbol = NATIVE_CURRENCY();
+    const wrappedCurrencySymbol = `W${nativeCurrencySymbol}`
+    let token0IsETH = inToken0Symbol === nativeCurrencySymbol;
+    let token1IsETH = inToken1Symbol === nativeCurrencySymbol;
 
     console.log(inputToken0);
     console.log(inputToken1);
 
     if (token0IsETH && token1IsETH) {
       setSwapButtonState(false);
-      setSwapButtonContent("don't support BNB to BNB");
-      return new CustomError("don't support BNB to BNB");
+      setSwapButtonContent(`don't support ${nativeCurrencySymbol} to ${nativeCurrencySymbol}`);
+      return new CustomError(`don't support ${nativeCurrencySymbol} to ${nativeCurrencySymbol}`);
     }
     // if one is ETH and other WETH, use WETH contract's deposit and withdraw
     // wrap ETH into WETH
-    if (token0IsETH && inToken1Symbol === 'WBNB') {
+    if (token0IsETH && inToken1Symbol === wrappedCurrencySymbol) {
       // UI should sync value of ETH and WETH
       if (exactIn) {
         setToken1Amount(toFixed4(inToken0Amount));
@@ -195,7 +192,7 @@ export async function swapGetEstimated(
 
       return 'Wrap is ok';
     }
-    if (inToken0Symbol === 'WBNB' && token1IsETH) {
+    if (inToken0Symbol === wrappedCurrencySymbol && token1IsETH) {
       console.log('UNWRAP');
       if (exactIn) {
         setToken1Amount(toFixed4(inToken0Amount));
@@ -328,7 +325,7 @@ export async function swapGetEstimated(
     let estimatedInputAmount  = null;
 
     // get pair using our own provider
-    const pair = await Fetcher.fetchPairData(token0, token1, library).catch(e => {
+    const pair = await Fetcher.fetchPairData(token0, token1, library, chainId).catch(e => {
       return new CustomError(
         `Swap`
       );
@@ -533,7 +530,8 @@ export async function swapGetEstimated(
           trade = new Trade(
             route,
             inputAmount,
-            exactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
+            exactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT,
+            chainId
           );
         } catch (e) {
           if (e instanceof InsufficientReservesError) {
@@ -610,8 +608,8 @@ export async function swapGetEstimated(
     if(!poolExist || isUseArb){
       setSwapButtonContent("Swap by arbitrage")
       if (exactIn) {
-        if(inToken0Symbol == 'WBNB' ||inToken0Symbol == 'BNB' ) methodsName = isUseArb?"swapExactETHForTokensByArb":"swapExactETHForTokens";
-        else if(inToken1Symbol == 'WBNB' ||inToken1Symbol == 'BNB') methodsName = isUseArb?"swapExactTokensForETHByArb":"swapExactTokensForETH";
+        if(inToken0Symbol == wrappedCurrencySymbol ||inToken0Symbol == nativeCurrencySymbol ) methodsName = isUseArb?"swapExactETHForTokensByArb":"swapExactETHForTokens";
+        else if(inToken1Symbol == wrappedCurrencySymbol ||inToken1Symbol == nativeCurrencySymbol) methodsName = isUseArb?"swapExactTokensForETHByArb":"swapExactTokensForETH";
         else methodsName = isUseArb?"swapExactTokensForTokensByArb":"swapExactTokensForTokens";
         
         if(allPathAmountOut > ammOutput) {
@@ -645,8 +643,8 @@ export async function swapGetEstimated(
         setMinAmountOut(minAmountOut);
         setSlippageAdjustedAmount(minAmountOut);
       } else {
-        if(inToken0Symbol == 'WBNB' || inToken0Symbol == 'BNB' ) methodsName = isUseArb?"swapETHForExactTokensByArb":"swapETHForExactTokens";
-        else if(inToken1Symbol == 'WBNB' || inToken1Symbol == 'BNB') methodsName = isUseArb?"swapTokensForExactETHByArb":"swapTokensForExactETH";
+        if(inToken0Symbol == wrappedCurrencySymbol || inToken0Symbol == nativeCurrencySymbol ) methodsName = isUseArb?"swapETHForExactTokensByArb":"swapETHForExactTokens";
+        else if(inToken1Symbol == wrappedCurrencySymbol || inToken1Symbol == nativeCurrencySymbol) methodsName = isUseArb?"swapTokensForExactETHByArb":"swapTokensForExactETH";
         else methodsName = isUseArb?"swapTokensForExactTokensByArb":"swapTokensForExactTokens";
 
         console.log("bonus FAout vs ammOutput", allPathAmountOut, ammOutput)
@@ -725,7 +723,7 @@ export async function swapGetEstimated(
       let allowance = await getAllowance(
         inToken0Address,
         account,
-        ROUTER_ADDRESS,
+        ROUTER_ADDRESS(),
         library,
         account
       );
@@ -755,7 +753,7 @@ export async function swapGetEstimated(
       setSwapButtonState(true);
       return 'swap is ok';
     } else {
-      console.log("BNB does not need approve")
+      console.log(`${nativeCurrencySymbol} does not need approve`)
       setNeedApprove(false);
     }
     if(isUseArb) {
@@ -779,7 +777,7 @@ export async function swapGetEstimated(
 export async function swap(
   inputToken0,
   inputToken1,
-  allowedSlippage = INITIAL_ALLOWED_SLIPPAGE,
+  allowedSlippage,
   exactIn = true,
   chainId,
   library,
@@ -817,8 +815,6 @@ export async function swap(
   } = inputToken1;
 
   const status = await (async () => {
-    // check uniswap
-    console.log(FACTORY_ADDRESS);
     // change slippage from bips (0.01%) into percentage
     allowedSlippage = new Percent(allowedSlippage, 10000);
 
@@ -828,17 +824,20 @@ export async function swap(
     console.log(`token0Amount: ${inToken0Amount}`);
     console.log(`token1Amount: ${inToken1Amount}`);
 
-    const token0IsETH = inToken0Symbol === 'BNB';
-    const token1IsETH = inToken1Symbol === 'BNB';
+    const nativeCurrencySymbol = NATIVE_CURRENCY();
+    const wrappedCurrencySymbol = `W${nativeCurrencySymbol}`;
+
+    const token0IsETH = inToken0Symbol === nativeCurrencySymbol;
+    const token1IsETH = inToken1Symbol === nativeCurrencySymbol;
 
     console.log(inputToken0);
     console.log(inputToken1);
 
-    if (token0IsETH && token1IsETH) return new CustomError("Doesn't support BNB to BNB");
+    if (token0IsETH && token1IsETH) return new CustomError(`Doesn't support ${nativeCurrencySymbol} to ${nativeCurrencySymbol}`);
     console.log('------------------ WRAP OR SWAP  ------------------');
     // if one is ETH and other WETH, use WETH contract's deposit and withdraw
     // wrap ETH into WETH
-    if (token0IsETH && inToken1Symbol === 'WBNB') {
+    if (token0IsETH && inToken1Symbol === wrappedCurrencySymbol) {
       console.log('WRAP');
       // UI should sync value of ETH and WETH
       // if (exactIn) setToken1Amount(token0Amount);
@@ -849,13 +848,13 @@ export async function swap(
         })
         .catch(e => {
           console.log(e);
-          return new CustomError('WBNB Deposit failed');
+          return new CustomError(`${wrappedCurrencySymbol} Deposit failed`);
         });
 
       return result;
     }
     // unwrap WETH into ETH
-    if (inToken0Symbol === 'WBNB' && token1IsETH) {
+    if (inToken0Symbol === wrappedCurrencySymbol && token1IsETH) {
       console.log('UNWRAP');
 
       // UI should sync value of ETH and WETH
@@ -1054,8 +1053,8 @@ export async function swap(
         })
       )
       .catch(e => {
-        //return new CustomError('Cannot estimate gas, maybe price impact is too large for the current slippage tolerance settings.');
-        return e;
+
+        return new CustomError('CustomError in transaction');
       });
     return result;
   })();
@@ -1066,13 +1065,14 @@ export async function swap(
     setSwapButtonContent("Please try again");
   } else {
     console.log("TEST status:");
-    if(status.error && status.error.code == 4001) {
+    if((status.error && status.error.code == 4001) || status.code == 4001) {
       setSwapButtonContent("Swap");
       setSwapButtonState(true);
-    }else if(status.error && status.error.code == -32603) {
+    }else if((status.error && status.error.code == -32603) || status.code == -32603) {
       console.log("error status -32603", status)
       let text = null;
       if(exactIn) {
+        // "The actual output might be less than your acceptable slippage tolerance setting, please adjust slippage to continue!"
         text = "The amount of the output token is less than your slippage tolerance rate, please set more slippage tolerance if you want to continue!"
       } else {
         text = "The amount of the input token is over than your slippage tolerance rate, please set more slippage tolerance if you want to continue!"
@@ -1083,12 +1083,14 @@ export async function swap(
 
       
       console.log("this is swap data: ", status);
+      
+      const scanUrlPrefix = SCAN_URL_PREFIX();
       const url = `${scanUrlPrefix}/tx/${status.hash}`;
       
       setSwapStatus(
         <div>
           <a href={url} target="_blank" rel="noreferrer">
-            View it on BSC Scan
+            View it on {SCAN_NAME()}
           </a>
         </div>
       );
@@ -1115,6 +1117,7 @@ export async function swap(
       }
       console.log("rate", rate)
 
+      const apiUrlPrefix = API_URL();
       axios.post( 
         `${apiUrlPrefix}/chart/add?token0=${tempToken0}&token1=${tempToken1
         }&rate=${rate}&time=${time}`

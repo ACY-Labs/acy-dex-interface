@@ -70,12 +70,12 @@ const BscMainNetTokenList: Array<TokenInfo> = [
 
 const BscTestNetTokenList: Array<TokenInfo> = [
   {
-    name: 'Binance',
+    name: 'Binance Coin',
     symbol: 'BNB',
     address: '0xae13d989dac2f0debff460ac112a837c89baa7cd',
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
+    logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
     idOnCoingecko: "binancecoin",
   },
   {
@@ -93,7 +93,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     address: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
+    logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
     idOnCoingecko: "binancecoin",
   },
   {
@@ -297,8 +297,8 @@ const BscTestNetTokenList: Array<TokenInfo> = [
 
 const TokenListSelector = (arg: string) => {
   return {
-    'BscMainNet': BscMainNetTokenList,
-    'BscTestNet': BscTestNetTokenList
+    56: BscMainNetTokenList,
+    97: BscTestNetTokenList
   }[arg];
 }
 

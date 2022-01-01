@@ -5,10 +5,11 @@ import SampleToken from '@/pages/Dao/sample_data/SampleToken';
 import TokenSelection from '@/pages/Dao/components/TokenSelection';
 import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 import { AcyPeriodTime } from '@/components/Acy';
-import ConstantLoader from '@/constants';
-const tokenList = ConstantLoader().tokenList;
+import { useConstantLoader } from '@/constants';
 
 const StakeSection = () => {
+  const {tokenList} = useConstantLoader()
+
   const [stake, setStake] = useState(0);
   const [balance, setBalance] = useState(12345);
   const [balancePercentage, setBalancePercentage] = useState(0);

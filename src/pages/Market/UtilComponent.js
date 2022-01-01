@@ -26,9 +26,8 @@ import {
   fetchSearchCoinReturns,
   fetchSearchPoolReturns,
 } from './Data';
-import ConstantLoader from '@/constants';
-const tokenList = ConstantLoader().tokenList;
-const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
+import {SCAN_URL_PREFIX} from "@/constants";
+
 
 const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');
@@ -707,7 +706,7 @@ export function TransactionTable(props) {
             <div
               className={className(styles.tableDataFirstColumn, styles.transactionLink)}
               style={{ fontWeight: 600 }}
-              onClick={() => openInNewTab(`${scanUrlPrefix}/tx/${entry.transactionID}`)}
+              onClick={() => openInNewTab(`${SCAN_URL_PREFIX()}/tx/${entry.transactionID}`)}
             >
               {entry.type} {entry.coin1} {entry.type == TransactionType.SWAP ? 'for' : 'and'}{' '}
               {entry.coin2}
@@ -822,7 +821,7 @@ export function TransactionTable(props) {
         render: (text, entry) => {
           return (
             <div
-              onClick={() => openInNewTab(`${scanUrlPrefix}/address/${entry.account}`)}
+              onClick={() => openInNewTab(`${SCAN_URL_PREFIX()}/address/${entry.account}`)}
               className={className(styles.tableData, styles.transactionLink)}
               style={{ textOverflow: 'ellipsis' }}
             >
