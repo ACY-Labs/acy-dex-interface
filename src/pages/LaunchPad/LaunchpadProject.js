@@ -378,20 +378,14 @@ const LaunchpadProject = () => {
 
     // if allocation is done, cover cannot be opened
     // otherwise, require an allocation from server
-<<<<<<< Updated upstream
-    const clickCover = (e) => {
-      console.log('click cover', allocationAmount);
-=======
     const clickCover = async e => {
       console.log(`click allocation card cover`, allocationAmount);
       console.log(isClickedAllocation);
->>>>>>> Stashed changes
       if (isClickedAllocation) {
         return;
       }
       setCoverOpenState(true);
       setIsClickedAllocation(true);
-<<<<<<< Updated upstream
       let cards = document.querySelectorAll(".cover");
       console.log(e.target.parentElement)
       cards.forEach(node => {
@@ -409,19 +403,6 @@ const LaunchpadProject = () => {
         originalElementParent.style.color = "#EB5C20"
       } catch (err) {
         console.log(err);
-=======
-      const oldAllocationAmount = allocationAmount;
-      if (oldAllocationAmount !== 0) {
-          requireAllocation(walletId, projectToken).then(res => {
-            if(res && res.allocationAmount) {
-              setAllocationAmount(res.allocationAmount);
-              setCoverOpenState(true);
-            }
-            console.log('allocation get', res.allocationAmount);
-          }).catch(e => {
-            console.error(e);
-          })
->>>>>>> Stashed changes
       }
       // originalElementParent.textContent = allocationAmount;
 
@@ -444,13 +425,9 @@ const LaunchpadProject = () => {
     return (
       <div className="allocationCard" onClick={clickCover}>
         <div class={computeCoverClass()}>
-<<<<<<< Updated upstream
           {/* <div
             className="allocationCard-inner"
           >
-=======
-          <div className="allocationCard-inner">
->>>>>>> Stashed changes
             <p className="inner-text">{index + 1}</p>
           </div> */}
         </div>
@@ -490,12 +467,8 @@ const LaunchpadProject = () => {
 
     const allocationCards = () => {
       const cards = [];
-<<<<<<< Updated upstream
 
       for (let i = 0; i < 5; i++) {
-=======
-      for (let i = 0; i < 10; i++) {
->>>>>>> Stashed changes
         cards.push(
           <AllocationCard
             id={i}
@@ -575,11 +548,7 @@ const LaunchpadProject = () => {
             </label>
             <div className="sales-input-container">
               <InputGroup compact>
-<<<<<<< Updated upstream
                   <Input className="sales-input" style={{ width: 'calc(100% - 80px)' }} defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
-=======
-                <Input className="sales-input" style={{ width: 'calc(100% - 55px)' }} defaultValue="0" onChange={e => setSalesValue(e.target.value)} value={salesValue} />
->>>>>>> Stashed changes
                 {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
               </InputGroup>
             </div>
@@ -618,13 +587,9 @@ const LaunchpadProject = () => {
           <div className="text-line-container-open">
             <p>Vesting is divided into {poolStageCount} stages, unlock {poolDistributionStage[0]}% TGE</p>
             <span className="vesting-line" />
-<<<<<<< Updated upstream
             <div className='vesting-schedule'>
                 <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} walletId={walletId}/>
             </div>
-=======
-            <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} />
->>>>>>> Stashed changes
           </div>
         </div>
       }
