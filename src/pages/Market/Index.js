@@ -88,6 +88,7 @@ const MarketIndex = props => {
     // fetch token info
     fetchGeneralTokenInfo().then(tokenInfo => {
       if(tokenInfo) settokenInfo(tokenInfo);
+      console.log("token to render", tokenInfo)
     });
 
     // fetch market data
@@ -117,7 +118,7 @@ const MarketIndex = props => {
       setselectedIndexBar(dataDict.volume24h.length - 1);
       setselectedDataBar(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));}
     });
-  }, []);
+  }, [chainId]);
 
   const onLineGraphHover = (newData, newIndex) => {
     setselectedDataLine(abbrNumber(newData));
