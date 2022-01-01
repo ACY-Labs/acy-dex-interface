@@ -5,6 +5,7 @@ import TokenListSelector from './token_list';
 import MethodActionSelector from './contract_method_list';
 import ScanUrlSelector from './scan_url';
 import FarmSettingSelector from './farm_setting';
+import LaunchpadSettingSelector from './launchpad_setting';
 import SDK_SETTING from './sdk_setting';
 import { JsonRpcProvider } from "@ethersproject/providers"; 
 
@@ -21,6 +22,7 @@ export let constantInstance = {
     'actionMap': MethodActionSelector('action'),
     'scanUrlPrefix': ScanUrlSelector(56),
     'farmSetting': FarmSettingSelector(56),
+    'launchpadSetting': LaunchpadSettingSelector(56),
     'sdkSetting': SDK_SETTING
 };
 
@@ -43,6 +45,8 @@ export const BLOCKS_PER_YEAR = () => constantInstance.farmSetting.BLOCKS_PER_YEA
 export const BLOCKS_PER_MONTH = () => constantInstance.farmSetting.BLOCKS_PER_MONTH
 export const RPC_URL = () => constantInstance.farmSetting.RPC_URL
 export const API_URL = () => constantInstance.farmSetting.API_URL
+export const LAUNCHPAD_ADDRESS = () => constantInstance.launchpadSetting.ADDRESS
+export const LAUNCH_RPC_URL = () => constantInstance.launchpadSetting.RPC_URL
 
 
 // import constant to react component
@@ -54,9 +58,10 @@ export const useConstantLoader = () => {
         console.log("@/constant: current chain , account", chainId, account);
         
         console.log("do our site support this chain?", chainId, supportedChainIds.indexOf(chainId))
-        const chainSupported = supportedChainIds.indexOf(chainId) != -1;
+        const chainSupported = (supportedChainIds.indexOf(chainId) != -1);
         const fallbackChainId = chainSupported ? chainId : 56;    // redirect unsupported chainId and undefined to 56
 
+        // TODO (Gary): incorporate farmSetting and launchSetting
         const currentConstant = {
             'account': chainSupported ? account : undefined,
             'chainId': fallbackChainId,
@@ -66,6 +71,7 @@ export const useConstantLoader = () => {
             'actionMap': MethodActionSelector('action'),
             'scanUrlPrefix': ScanUrlSelector(fallbackChainId),
             'farmSetting': FarmSettingSelector(fallbackChainId),
+            'launchpadSetting': LaunchpadSettingSelector(fallbackChainId),
             'sdkSetting': SDK_SETTING
         }
 

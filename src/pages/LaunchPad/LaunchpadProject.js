@@ -34,6 +34,7 @@ import $ from 'jquery';
 import { getContract } from "../../acy-dex-swap/utils/index.js"
 import { useWeb3React } from '@web3-react/core';
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
+import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL } from "@/constants";
 
 const LaunchpadProject = () => {
   console.log($(document).height());
@@ -670,8 +671,12 @@ const LaunchpadProject = () => {
     return res
   }
 
+  // const { launchSetting: { CHAINID, ADDRESS } } = useConstantLoader();
+
   const getPoolData = async (lib, acc) => {
-    const poolContract = getContract("0x6e0EC29eA8afaD2348C6795Afb9f82e25F196436", POOLABI, lib, acc);
+    // FIXME: add contract 56
+    console.log(LAUNCHPAD_ADDRESS(), lib);
+    const poolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, lib, acc);
     const pool = []
     const distributionRes = []
     const distributionStage = []
@@ -717,11 +722,11 @@ const LaunchpadProject = () => {
     if(!account){
       connectWallet();
     }
-    if (account || library){
+    else if (account || library){
       console.log("start getPoolBaseData")
       getPoolData(library, account)
     } else {
-      const provider = new JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545/", 97);  // different RPC for mainnet
+      const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID);  // different RPC for mainnet
       const accnt = "0x0000000000000000000000000000000000000000";
       getPoolData(provider, accnt)
     }
