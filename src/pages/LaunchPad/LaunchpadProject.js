@@ -372,15 +372,33 @@ const LaunchpadProject = () => {
 
     // if allocation is done, cover cannot be opened
     // otherwise, require an allocation from server
-    const clickCover = async e => {
+    const clickCover = (e) => {
       console.log('click cover', allocationAmount);
-      console.log(isClickedAllocation);
       if (isClickedAllocation) {
         return;
       }
-
       setCoverOpenState(true);
       setIsClickedAllocation(true);
+      let cards = document.querySelectorAll(".cover");
+      console.log(e.target.parentElement)
+      cards.forEach(node => {
+        node.classList.remove("inner-text")
+        node.classList.remove("cover");
+        let innerText = node.parentElement.querySelector(".inner-text-amount");
+        // let innerNumber = node.parentElement.querySelector(".inner-text");
+        // innerNumber.textContent = "";
+        innerText.textContent = `$${Math.floor(allocationAmount * (Math.random() * (10 - 0.1) + 0.1))}`;
+        innerText.style.color = "#757579"
+      })
+      try {
+        let originalElementParent = e.target.parentElement.querySelector(".inner-text-amount");
+        originalElementParent.textContent = `$${allocationAmount}`;
+        originalElementParent.style.color = "#EB5C20"
+      } catch (err) {
+        console.log(err);
+      }
+      // originalElementParent.textContent = allocationAmount;
+
       // const oldAllocationAmount = allocationAmount;
       // if (oldAllocationAmount !== 0) {
       //   requireAllocation(walletId, projectToken).then(res => {
@@ -401,11 +419,11 @@ const LaunchpadProject = () => {
       <div className="allocationCard" onClick={clickCover}>
         
         <div class={computeCoverClass()}>
-          <div
+          {/* <div
             className="allocationCard-inner"
           >
             <p className="inner-text">{index + 1}</p>
-          </div>
+          </div> */}
         </div>
         <p className="inner-text-amount">${allocationAmount}</p>
       </div>
@@ -416,7 +434,7 @@ const LaunchpadProject = () => {
     const [allocationAmount, setAllocationAmount] = useState(0);
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
 
-    useEffect(async () => {
+    useEffect(() => {
       // get allocation status from backend at begining
       console.log(walletId);
       getAllocationInfo(walletId, projectToken)
@@ -445,7 +463,7 @@ const LaunchpadProject = () => {
     const allocationCards = () => {
       const cards = [];
 
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 5; i++) {
         cards.push(
           <AllocationCard
             index={i}
@@ -558,7 +576,7 @@ const LaunchpadProject = () => {
     );
   };
 
-  const CardArea = ({walletId}) => {
+  const CardArea = ({ walletId }) => {
     return (
       <div className="gridContainer">
         <div className="leftGrid">
@@ -685,6 +703,8 @@ const LaunchpadProject = () => {
       getPoolData(provider, accnt)
     }
   }, [library, account])
+
+  // allocation amount
 
   return (
     <div>
