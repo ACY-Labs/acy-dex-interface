@@ -84,7 +84,7 @@ export default [
         path: '/transaction/:id?',
         name: 'Transaction',
         hideInMenu: true,
-        component: './Transaction/',
+        component: './Transaction/Index',
       },
     ],
   },
