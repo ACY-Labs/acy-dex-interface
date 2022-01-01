@@ -355,6 +355,17 @@
   align-items: center;
   margin: 0px 20px 0px 0px;
 }
+
+.text-line-container-open {
+  flex-grow: 1;
+  text-align: center;
+  padding: 2em 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0px 20px 0px 0px;
+}
+
 .vesting-line {
   width: 100%;
   margin: 10px 0;
@@ -399,6 +410,16 @@
   transition: opacity 0.2s ease-in-out;
 }
 
+.vesting-schedule-open {
+  display: block;
+  width: 270px;
+  top: 40px;
+  background-color: none;
+  position: absolute;
+  padding: 10px;
+  opacity: 0;
+}
+
 .sale-vesting-title {
   font-size: 16px;
   width: 100px;
@@ -416,7 +437,7 @@
 .sales-input-container {
   display: block;
   width: 100%;
-  margin: 0 2em 0 3.7em;
+  margin: 0 2em 0 2.4em;
 }
 
 .sales-input-max{
@@ -430,7 +451,7 @@
 
 .sales-input-max-text{
   display: flex;
-  width: 4.3em;
+  width: 4em;
   justify-content: center;
   align-items: center;
   font-weight: 500;
@@ -480,7 +501,7 @@
   border: unset;
   /* border: 1px solid white; */
   border-radius: 16px;
-  width: 120px;
+  width: 95px;
   height: 35px;
   cursor: pointer;
 }

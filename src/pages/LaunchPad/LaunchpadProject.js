@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-indent */
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Progress, Button, Table, Input, Tooltip } from 'antd';
+import { Progress, Button, Table, Input, Tooltip, Icon } from 'antd';
 import { history } from 'umi';
 import styles from "./styles.less"
 import LaunchChart from './launchChart';
@@ -40,6 +40,7 @@ const LaunchpadProject = () => {
   
   const InputGroup = Input.Group;
   const { account, chainId, library, activate, active } = useWeb3React();
+
   const connectWallet = async () =>  {
     activate(binance);
     activate(injected);
@@ -51,10 +52,14 @@ const LaunchpadProject = () => {
   const [poolDistributionDate, setDistributionDate] = useState(null);
   const [poolDistributionStage, setpoolDistributionStage] = useState(null);
   const [poolStageCount, setpoolStageCount] = useState(0);
+  const [poolStatus, setPoolStatus] = useState(0);
   const [isVesting, setIsVesting] = useState(false);
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
   // const [investorNum,setinvestorNum] = useState(0);
+
+  console.log("---------STATUS---------")
+  console.log(poolStatus)
 
   const TokenBanner = ({ posterUrl }) => {
     return (
@@ -168,11 +173,11 @@ const LaunchpadProject = () => {
                   to: '#eb6c20',
                 }}
                 percent={salePercentage}
-                status={salePercentage === 0 ? "normal" : salePercentage !== 100 ? "active" :"success"}
+                status={salePercentage === 0 ? "normal" : salePercentage !== 100 ? "active" : "success"}
               />
             </div>
             <div className="progressAmount">
-              <div>{`${alreadySale} / ${totalSale} ${projectToken}`}</div>
+              <div>{`${ alreadySale} / ${totalSale} ${projectToken}`}</div>
             </div>
           </div>
         </>
@@ -351,6 +356,7 @@ const LaunchpadProject = () => {
   };
 
   const AllocationCard = ({
+    id,
     index,
     Component,
     allocationAmount,
@@ -372,13 +378,20 @@ const LaunchpadProject = () => {
 
     // if allocation is done, cover cannot be opened
     // otherwise, require an allocation from server
+<<<<<<< Updated upstream
     const clickCover = (e) => {
       console.log('click cover', allocationAmount);
+=======
+    const clickCover = async e => {
+      console.log(`click allocation card cover`, allocationAmount);
+      console.log(isClickedAllocation);
+>>>>>>> Stashed changes
       if (isClickedAllocation) {
         return;
       }
       setCoverOpenState(true);
       setIsClickedAllocation(true);
+<<<<<<< Updated upstream
       let cards = document.querySelectorAll(".cover");
       console.log(e.target.parentElement)
       cards.forEach(node => {
@@ -396,6 +409,19 @@ const LaunchpadProject = () => {
         originalElementParent.style.color = "#EB5C20"
       } catch (err) {
         console.log(err);
+=======
+      const oldAllocationAmount = allocationAmount;
+      if (oldAllocationAmount !== 0) {
+          requireAllocation(walletId, projectToken).then(res => {
+            if(res && res.allocationAmount) {
+              setAllocationAmount(res.allocationAmount);
+              setCoverOpenState(true);
+            }
+            console.log('allocation get', res.allocationAmount);
+          }).catch(e => {
+            console.error(e);
+          })
+>>>>>>> Stashed changes
       }
       // originalElementParent.textContent = allocationAmount;
 
@@ -417,11 +443,14 @@ const LaunchpadProject = () => {
 
     return (
       <div className="allocationCard" onClick={clickCover}>
-        
         <div class={computeCoverClass()}>
+<<<<<<< Updated upstream
           {/* <div
             className="allocationCard-inner"
           >
+=======
+          <div className="allocationCard-inner">
+>>>>>>> Stashed changes
             <p className="inner-text">{index + 1}</p>
           </div> */}
         </div>
@@ -459,13 +488,17 @@ const LaunchpadProject = () => {
       );
     };
 
-    // TODO: assign each icon to allocation card
     const allocationCards = () => {
       const cards = [];
+<<<<<<< Updated upstream
 
       for (let i = 0; i < 5; i++) {
+=======
+      for (let i = 0; i < 10; i++) {
+>>>>>>> Stashed changes
         cards.push(
           <AllocationCard
+            id={i}
             index={i}
             Component={BaseCard}
             allocationAmount={allocationAmount}
@@ -473,7 +506,7 @@ const LaunchpadProject = () => {
             walletId={walletId}
             projectToken={project}
             isClickedAllocation={isClickedAllocation}
-            setIsClickedAllocation = {setIsClickedAllocation}
+            setIsClickedAllocation={setIsClickedAllocation}
           />
         );
       }
@@ -482,7 +515,7 @@ const LaunchpadProject = () => {
 
     const [isClickedVesting, setIsClickedVesting] = useState(false);
     const [isClickedMax, setIsClickedMax] = useState(false);
-    const [salesValue, setSalesValue] = useState();
+    const [salesValue, setSalesValue] = useState(0);
     const [isValidSalesPrice, setIsValidSalesPrice] = useState(true);
 
     useEffect(() => {
@@ -497,8 +530,22 @@ const LaunchpadProject = () => {
       setSalesValue(allocationAmount)
       setIsClickedMax(true)
     }
-    const tooltipTitle = `1.Increase your trading volume 
-                          2.Increase your liquidity`
+
+    const tooltipTitle = () => {
+      return(
+      <div>
+        <span>Increase Your Allocation Amount:</span>
+        <br />
+        <span>
+          1.Increase your trading volume @ <a href="app.acy.finance/#/exchange" target="_blank">Exchange</a>
+        </span>
+        <br />
+        <span>
+          2.Increase your liquidity @ <a href="app.acy.finance/#/liquidity" target="_blank">Liquidity</a>
+        </span>
+      </div>
+    )}
+
     return (
       <div>
       { !isVesting ? 
@@ -511,13 +558,14 @@ const LaunchpadProject = () => {
         >
           <div className="allocation-title-container">
             <p className="allocation-title">Allocation</p>
+            <Tooltip title={tooltipTitle} mouseEnterDelay={0.5} mouseLeaveDelay={1.5}>
+              <Icon type="info-circle" />
+            </Tooltip>
             <div className='allocation-cards'>
               <div className="allocationContainer">{allocationCards()}</div>
             </div>
-            <div style={{"width": "100%"}}>
-            <Tooltip title={tooltipTitle}>
-              <span style={{cursor: 'help'}}>Increase Your Allocation Amount</span>
-            </Tooltip>
+            <div style={{"width": "120px"}}>
+            
             </div>
           </div>
 
@@ -527,7 +575,11 @@ const LaunchpadProject = () => {
             </label>
             <div className="sales-input-container">
               <InputGroup compact>
+<<<<<<< Updated upstream
                   <Input className="sales-input" style={{ width: 'calc(100% - 80px)' }} defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
+=======
+                <Input className="sales-input" style={{ width: 'calc(100% - 55px)' }} defaultValue="0" onChange={e => setSalesValue(e.target.value)} value={salesValue} />
+>>>>>>> Stashed changes
                 {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
               </InputGroup>
             </div>
@@ -553,7 +605,7 @@ const LaunchpadProject = () => {
                   className={
                     isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
                   }
-                />
+                />  
               </div>
               <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}>
               </div>
@@ -563,12 +615,16 @@ const LaunchpadProject = () => {
       :
         <div className="vesting-container">
           <p className="sale-vesting-title vesting">Vesting</p>
-          <div className="text-line-container">
+          <div className="text-line-container-open">
             <p>Vesting is divided into {poolStageCount} stages, unlock {poolDistributionStage[0]}% TGE</p>
             <span className="vesting-line" />
+<<<<<<< Updated upstream
             <div className='vesting-schedule'>
                 <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} walletId={walletId}/>
             </div>
+=======
+            <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} />
+>>>>>>> Stashed changes
           </div>
         </div>
       }
@@ -595,7 +651,7 @@ const LaunchpadProject = () => {
             <Allocation walletId={walletId} projectToken={receivedData.projectToken} />
           </div>
           <ProjectDescription />
-          <ChartCard className="launchpad-chart"/>
+          <ChartCard className="launchpad-chart" />
         </div>
       </div>
     );
@@ -658,6 +714,7 @@ const LaunchpadProject = () => {
     // 合约函数调用
     const baseData = await poolContract.GetPoolBaseData(3)
     const distributionData = await poolContract.GetPoolDistributionData(3)
+    const status = await poolContract.GetPoolStatus(3)
     // getpoolbasedata 数据解析
     const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
     const token1decimal = await token1contract.decimals()
@@ -687,6 +744,7 @@ const LaunchpadProject = () => {
     setDistributionDate(distributionRes)
     setpoolStageCount(Number(BigNumber.from(distributionData[0]).toBigInt())) // vesting阶段的次数
     setpoolDistributionStage(distributionStage)
+    setPoolStatus(Number(BigNumber.from(status).toBigInt()))
   }
 
   // fetching data from Smart Contract

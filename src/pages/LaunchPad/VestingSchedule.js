@@ -5,16 +5,22 @@ import moment from 'moment'
 import { useState } from "react";
 import { Button} from 'antd';
 
+<<<<<<< Updated upstream
 const VestingSchedule = ({ vestingDate, stageData, walletId }) => {
   const len = vestingDate.length; 
+=======
+const VestingSchedule = ({ vestingDate, stageData, vestContract }) => {
+  const len = vestingDate.length
+
+>>>>>>> Stashed changes
   return (
     <div>
       {
         [...Array(len)].map((_1, index) => {
           return (
             <div className="procedure vesting-procedure">
-              {index === len - 1 ? "" : <hr aria-orientation="vertical" className={moment(vestingDate[index]).isBefore() ? "verticalDivideLineColored vesting-schedule-line" : "verticalDivideLine vesting-schedule-line"} />}
-              <div className={moment(vestingDate[index]).isBefore() ? "procedureNumberColored" : "procedureNumber"}>
+              {index === len - 1 ? "" : <hr aria-orientation="vertical" className={moment(vestingDate[index]).isBefore() ? "verticalDivideLine vesting-schedule-line" : "verticalDivideLine_NotActive vesting-schedule-line"} />}
+              <div className={moment(vestingDate[index]).isBefore() ? "procedureNumber_NotActive" : "procedureNumber"}>
                 <img src={tick} alt="tick-icon" className="vesting-tick-icon" />
               </div>
               <div className="vesting-schedule-text">
@@ -42,6 +48,5 @@ const VestingSchedule = ({ vestingDate, stageData, walletId }) => {
     </div>
   );
 }; 
-
 
 export default VestingSchedule;
