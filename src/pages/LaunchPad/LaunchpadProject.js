@@ -394,7 +394,9 @@ const LaunchpadProject = () => {
         let innerText = node.parentElement.querySelector(".inner-text-amount");
         // let innerNumber = node.parentElement.querySelector(".inner-text");
         // innerNumber.textContent = "";
-        innerText.textContent = `$${Math.floor(allocationAmount * (Math.random() * (10 - 0.1) + 0.1))}`;
+        let minPercent = 0.1;
+        let maxPercent = 5;
+        innerText.textContent = `$${Math.floor(allocationAmount * (Math.random() * (maxPercent - minPercent) + minPercent))}`;
         innerText.style.color = "#757579"
       })
       try {
@@ -423,21 +425,24 @@ const LaunchpadProject = () => {
 
 
     return (
-      <div className="allocationCard" onClick={clickCover}>
-        <div class={computeCoverClass()}>
-          {/* <div
-            className="allocationCard-inner"
-          >
-            <p className="inner-text">{index + 1}</p>
-          </div> */}
+      <div className='allocationCard-container'>
+        <div className="allocationCard" onClick={clickCover}>
+          <div class={computeCoverClass()}>
+            {/* <div
+              className="allocationCard-inner"
+            >
+              <p className="inner-text">{index + 1}</p>
+            </div> */}
+          </div>
+          <p className="inner-text-amount">${allocationAmount}</p>
         </div>
-        <p className="inner-text-amount">${allocationAmount}</p>
+        <div className='allocationCard-before'></div>
+        <div className='allocationCard-after'></div>
       </div>
     );
   };
 
-  const Allocation = ({ walletId="1234", projectToken}) => {
-    const [allocationAmount, setAllocationAmount] = useState(0);
+  const Allocation = ({ walletId="1234", projectToken, allocationAmount, setAllocationAmount}) => {
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
 
     useEffect(() => {
@@ -597,7 +602,7 @@ const LaunchpadProject = () => {
     );
   };
 
-  const CardArea = ({ walletId }) => {
+  const CardArea = ({ walletId, allocationAmount, setAllocationAmount }) => {
     return (
       <div className="gridContainer">
         <div className="leftGrid">
@@ -613,7 +618,11 @@ const LaunchpadProject = () => {
         </div>
         <div className="rightGrid">
           <div className="circleBorderCard">
-            <Allocation walletId={walletId} projectToken={receivedData.projectToken} />
+            <Allocation walletId={walletId}
+              projectToken={receivedData.projectToken}
+              allocationAmount={allocationAmount}
+              setAllocationAmount={setAllocationAmount}
+            />
           </div>
           <ProjectDescription />
           <ChartCard className="launchpad-chart" />
@@ -728,13 +737,14 @@ const LaunchpadProject = () => {
   }, [library, account])
 
   // allocation amount
+  const [allocationAmount, setAllocationAmount] = useState(0);
 
   return (
     <div>
       <div className="mainContainer">
         <TokenBanner posterUrl={receivedData.posterUrl} />
         <TokenLogoLabel projectName={receivedData.projectName} tokenLogo={receivedData.tokenLogoUrl} />
-        <CardArea walletId={account}/>
+        <CardArea walletId={account} allocationAmount={allocationAmount} setAllocationAmount={setAllocationAmount}/>
       </div>
     </div>
   );

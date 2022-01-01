@@ -48,12 +48,12 @@
 }
 
 .allocation-content-inactive {
-  height: 360px;
+  height: 320px;
   transition: height 0.1s linear;
 }
 
 .allocation-content-active {
-  height: 620px;
+  height: 580px;
   transition: height 0.1s linear;
 }
 
@@ -240,7 +240,7 @@
 .allocationContainer {
   display: grid;
   grid-template-columns: repeat(5, 55px);
-  column-gap: 25px;
+  column-gap: 18px;
   row-gap: 10px;
 }
 
@@ -256,10 +256,64 @@
   background: #010101;
   border-radius: 50%;
   perspective: 500px;
+  z-index: 1;
 }
 
-.allocationCard:hover{
-  transform: scale(1.05);
+.allocationCard-container{
+  position: relative;
+}
+
+.allocationCard-before{
+  content: "";
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background-image: linear-gradient(var(--rotate), #C6224E, #EB5C20 43%, #E29227);
+  position: absolute;
+  z-index: 0;
+  animation: spin 2.5s linear infinite;
+  top: -1.5px;
+  left: -1.5px;
+  display: none;
+}
+
+.allocationCard-after{
+  position: absolute;
+  content: '';
+  top: calc(58px / 6);
+  left: 0;
+  top: 0;
+  z-index: 0;
+  width: 58px;
+  height: 58px;
+  margin: 0 auto;
+  transform: scale(0.8);
+  filter: blur(calc(58px / 6));
+  background-image: linear-gradient(var(--rotate), #C6224E, #EB5C20 43%, #E29227);
+  opacity: 1;
+  transition: opacity 0.5s;
+  animation: spin 2.5s linear infinite;
+  display: none;
+}
+
+@property --rotate {
+  syntax: '<angle>';
+  initial-value: 132deg;
+  inherits: false;
+}
+
+@keyframes spin {
+  0% {
+    --rotate: 0deg;
+  }
+  100% {
+    --rotate: 360deg;
+  }
+}
+
+.allocationCard-container:hover .allocationCard-before,
+.allocationCard-container:hover .allocationCard-after{
+  display: block;
 }
 
 .allocationCard .allocationCard-inner {
@@ -318,10 +372,8 @@
 }
 
 .allocation-cards{
-  display: flex;
-  justify-content: center;
   width: 100%;
-  align-self: center;
+  margin-left: 2.25em;
 }
 
 .allocation-title{
@@ -437,7 +489,7 @@
 .sales-input-container {
   display: block;
   width: 100%;
-  margin: 0 2em 0 2.4em;
+  margin: 0 1.25em 0 4em;
 }
 
 .sales-input-max{
