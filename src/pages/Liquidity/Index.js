@@ -30,6 +30,7 @@ import styles from './styles.less';
 import {useConnectWallet} from '@/components/ConnectWallet';
 
 
+
 const { AcyTabPane } = AcyTabs;
 
 const BasicProfile = (props) => {

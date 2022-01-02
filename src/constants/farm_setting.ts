@@ -50,7 +50,7 @@ const BscTestNetFarmSetting: FarmSetting = {
     BLOCK_TIME: 3,
     BLOCKS_PER_YEAR: calcBlocksPerPeriod('year', 3),
     BLOCKS_PER_MONTH: calcBlocksPerPeriod('month', 3),
-    RPC_URL: "https://data-seed-prebsc-2-s1.binance.org:8545/",
+    RPC_URL: "https://data-seed-prebsc-1-s1.binance.org:8545/",
     API_URL: "http://localhost:3001/api"
 }
 

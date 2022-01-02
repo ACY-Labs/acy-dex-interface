@@ -7,7 +7,7 @@ import {
   AcyTokenIcon,
 } from '@/components/Acy';
 import { Breadcrumb, Icon, Spin } from 'antd';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import {
   dataSourceCoin,
@@ -22,13 +22,13 @@ import { WatchlistManager } from './WatchlistManager.js';
 import {
   fetchPoolInfo,
   fetchPoolDayData,
-  fetchFilteredTransaction,
+  fetchPoolDayDataForPair,
+  fetchTransactionsForPair,
   marketClient,
 } from './Data/index.js';
+import {SCAN_URL_PREFIX} from "@/constants";
+// const scanUrlPrefix = SCAN_URL_PREFIX();
 
-import {constantInstance} from "@/constants";
-
-const scanUrlPrefix = constantInstance.scanUrlPrefix;
 
 const watchlistManagerPool = new WatchlistManager('pool');
 
@@ -69,6 +69,10 @@ function MarketPoolInfo(props) {
   const [tx, setTx] = useState([]);
   const [token0Address, setToken0Address] = useState('');
   const [token1Address, setToken1Address] = useState('');
+  const [pairArray,setPairArray] = useState({});
+
+  // const refContainer = useRef();
+  // refContainer.current = data;
 
   const navHistory = useHistory();
 
@@ -96,8 +100,11 @@ function MarketPoolInfo(props) {
 
   useEffect(() => {
     // extract the pool day datas
-    fetchPoolDayData(marketClient, address, 150).then(data => {
+    fetchPoolDayDataForPair(address).then(data => {
+
+      console.log("fetching pool day INFO", data);
       let newData = [...data].reverse();
+      console.log("printing", newData);
       data = newData;
 
       // extract graph datas
@@ -127,6 +134,14 @@ function MarketPoolInfo(props) {
       setSelectChartIndexVol(length - 1);
       setSelectChartDataTvl(abbrNumber(tvlGraphData[length - 1][1]));
       setSelectChartIndexTvl(length - 1);
+
+
+      setVolume24h(parseFloat(data[data.length-1].dailyVolumeUSD));
+      // console.log("printing last day reserves ")
+      setTvl(parseFloat(data[data.length-1].reserveUSD));
+      setTvlChange(calcPercentChange(parseFloat(data[data.length-1].reserveUSD),parseFloat(data[data.length-2].reserveUSD)));
+      // console.log("Debugging",)
+      setVolChange(calcPercentChange(parseFloat(data[data.length-1].dailyVolumeUSD),parseFloat(data[data.length-2].dailyVolumeUSD)));
     });
 
     let snapshotPromise = [];
@@ -136,10 +151,15 @@ function MarketPoolInfo(props) {
 
     // extract the pair data
     snapshotPromise.push(
-      fetchPoolInfo(marketClient, address, todayTimestamp).then(pairInfo => {
+      fetchPoolInfo(address).then(pairInfo => {
+        console.log("fetching pool INFOO: ", pairInfo);
+
+        if(pairInfo){
         setPoolData({
           coin1: pairInfo.token0.symbol,
           coin2: pairInfo.token1.symbol,
+          logoURI1 : pairInfo.token0.logoURI,
+          logoURI2 : pairInfo.token1.logoURI,
           address: address,
           percent: 0,
           tvl: 0,
@@ -147,6 +167,11 @@ function MarketPoolInfo(props) {
           volume7d: 0,
           price: 0,
         });
+
+        setPairArray({
+          token0 : pairInfo.token0.symbol,
+          token0 : pairInfo.token1.symbol
+        })
 
         volumeChanges[0] = parseFloat(pairInfo.untrackedVolumeUSD);
         reserveChanges[0] = parseFloat(pairInfo.reserveUSD);
@@ -157,44 +182,56 @@ function MarketPoolInfo(props) {
         setToken1Address(pairInfo.token1.id);
         setReserve0(parseFloat(pairInfo.reserve0));
         setReserve1(parseFloat(pairInfo.reserve1));
-      })
+      }
+      }
+      )
+      
     );
 
     // extract snapshot form a day ago
-    snapshotPromise.push(
-      fetchPoolInfo(marketClient, address, todayTimestamp - 86400).then(pairInfo => {
-        volumeChanges[1] = parseFloat(pairInfo.untrackedVolumeUSD);
-        reserveChanges[1] = parseFloat(pairInfo.reserveUSD);
-      })
-    );
+    // snapshotPromise.push(
+    //   fetchPoolInfo(address).then(pairInfo => {
+    //     if(pairInfo){
+    //     volumeChanges[1] = parseFloat(pairInfo.untrackedVolumeUSD);
+    //     reserveChanges[1] = parseFloat(pairInfo.reserveUSD);
+    //     }
+    //   })
+    // );
 
-    snapshotPromise.push(
-      fetchPoolInfo(marketClient, address, todayTimestamp - 86400 * 2).then(pairInfo => {
-        volumeChanges[2] = parseFloat(pairInfo.untrackedVolumeUSD);
-      })
-    );
+    // snapshotPromise.push(
+    //   fetchPoolInfo(address).then(pairInfo => {
+    //     volumeChanges[2] = parseFloat(pairInfo.untrackedVolumeUSD);
+    //   })
+    // );
 
-    Promise.all(snapshotPromise).then(() => {
-      setVolume24h(volumeChanges[0] - volumeChanges[1]);
-      setVolChange(
-        calcPercentChange(volumeChanges[0] - volumeChanges[1], volumeChanges[1] - volumeChanges[2])
-      );
+    // Promise.all(snapshotPromise).then(() => {
+    //   setVolume24h(volumeChanges[0] - volumeChanges[1]);
+    //   setVolChange(
+    //     calcPercentChange(volumeChanges[0] - volumeChanges[1], volumeChanges[1] - volumeChanges[2])
+    //   );
 
-      setTvl(reserveChanges[0]);
-      setTvlChange(calcPercentChange(reserveChanges[0], reserveChanges[1]));
-    });
+    //   setTvl(reserveChanges[0]);
+    //   setTvlChange(calcPercentChange(reserveChanges[0], reserveChanges[1]));
+    // });
 
     // fetch transactions for this pool
-    let pairArray = [address];
-    console.log(pairArray);
-    fetchFilteredTransaction(marketClient, pairArray).then(transactions => {
-      console.log('Pool TRANSAC', transactions);
-      setTx(transactions);
-    });
+    // console.log(pairArray);
+    
 
     // set the watchlists
     updateWatchlistStatus();
   }, []);
+
+  useEffect(() => {
+
+    if(poolData.coin1 && poolData.coin2){
+      fetchTransactionsForPair(poolData.coin1, poolData.coin2).then(transactions => {
+        // console.log('Pool TRANSAC', transactions);
+        setTx(transactions);
+      });
+    }
+
+  },[poolData]);
 
   const selectGraph = pt => {
     let index = ['Volume', 'TVL', 'Liquidity'].indexOf(pt);
@@ -247,7 +284,7 @@ function MarketPoolInfo(props) {
                 style={{ marginLeft: '10px' }}
                 width={16}
                 onClick={() => {
-                  openInNewTab(`${scanUrlPrefix}token/${poolData.address}`);
+                  openInNewTab(`${SCAN_URL_PREFIX()}token/${poolData.address}`);
                 }}
               />
             </>
@@ -274,8 +311,8 @@ function MarketPoolInfo(props) {
           >
             <div className={styles.contentInfo}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <AcyTokenIcon symbol={poolData.coin1} width={36} height={36} />
-                <AcyTokenIcon symbol={poolData.coin2} width={36} height={36} />
+                <AcyTokenIcon symbol={poolData.logoURI1} width={36} height={36} />
+                <AcyTokenIcon symbol={poolData.logoURI2} width={36} height={36} />
                 <span
                   style={{ fontSize: '26px', fontWeight: 'bold', marginLeft: '10px', color: "white" }}
                   className={styles.coinName}
@@ -297,9 +334,9 @@ function MarketPoolInfo(props) {
                 className={styles.exchangeValueCard}
                 onClick={() => redirectToToken(token0Address)}
               >
-                <AcyTokenIcon symbol={poolData.coin1} width={18} />
+                <AcyTokenIcon symbol={poolData.logoURI1} width={18} />
                 <strong style={{ marginLeft: '7px' }}>
-                  1 {poolData.coin1} = {abbrNumber(token1Price)} {poolData.coin2}
+                  1 {poolData.coin1} = {abbrNumber(token0Price/token1Price)} {poolData.coin2}
                 </strong>
               </div>
               <div className={styles.exchangeValueRight}>
@@ -312,9 +349,9 @@ function MarketPoolInfo(props) {
                   }}
                   onClick={() => redirectToToken(token1Address)}
                 >
-                  <AcyTokenIcon symbol={poolData.coin2} width={18} />
+                  <AcyTokenIcon symbol={poolData.logoURI2} width={18} />
                   <strong style={{ marginLeft: '7px' }}>
-                    1 {poolData.coin2} = {abbrNumber(token0Price)} {poolData.coin1}
+                    1 {poolData.coin2} = {abbrNumber(token1Price/token0Price)} {poolData.coin1}
                   </strong>
                 </div>
                 <div className={styles.contentCta}>
@@ -352,7 +389,7 @@ function MarketPoolInfo(props) {
                 <div className={styles.tokenLockEntry}>
                   <div className={styles.tokenLockName}>
                     {/* change data later */}
-                    <AcyTokenIcon symbol={poolData.coin1} width={18} />
+                    <AcyTokenIcon symbol={poolData.logoURI1} width={18} />
                     <div style={{ marginLeft: 10 }}>{poolData.coin1}</div>
                   </div>
                   <div>{abbrNumber(reserve0)}</div>
@@ -360,7 +397,7 @@ function MarketPoolInfo(props) {
                 <div className={styles.tokenLockEntry}>
                   <div className={styles.tokenLockName}>
                     {/* change data later */}
-                    <AcyTokenIcon symbol={poolData.coin2} width={18} />
+                    <AcyTokenIcon symbol={poolData.logoURI2} width={18} />
                     <div style={{ marginLeft: 10 }}>{poolData.coin2}</div>
                   </div>
                   <div>{abbrNumber(reserve1)}</div>
@@ -404,7 +441,7 @@ function MarketPoolInfo(props) {
                     <div className={styles.contentChartsIndicator}>
                       <div className={styles.chartIndicatorValue}>$ {selectChartDataVol}</div>
                       <div className={styles.chartIndicatorTime}>
-                        {dayDatas.volumeDayData[selectChartIndexVol][0]}
+                        {dayDatas.length && (dayDatas.volumeDayData[dayDatas.length-1][0])}
                       </div>
                     </div>
                   )}
@@ -412,7 +449,7 @@ function MarketPoolInfo(props) {
                     <div className={styles.contentChartsIndicator}>
                       <div className={styles.chartIndicatorValue}>$ {selectChartDataTvl}</div>
                       <div className={styles.chartIndicatorTime}>
-                        {dayDatas.tvlDayData[selectChartIndexTvl][0]}
+                        {dayDatas.length && (dayDatas.tvlDayData[dayDatas.length-1][0])}
                       </div>
                     </div>
                   )}

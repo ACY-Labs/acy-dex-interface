@@ -46,7 +46,6 @@ const FarmsTableHeader = ({ tableTitle, tableSubtitle, selectedTable, tokenFilte
             </Checkbox> */}
             <Switch name="checkedA"  size="small"  id="stake-switch" 
               onChange={(e) => {
-                console.log(e.target.checked);
                 setTokenFilter(e.target.checked);
                 // setIsMyFarms(e.target.checked)
               }}

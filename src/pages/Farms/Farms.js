@@ -29,6 +29,7 @@ import {BLOCK_TIME, RPC_URL} from '@/acy-dex-swap/utils';
 // import {constantInstance} from "@/constants";
 import { useConstantLoader } from '@/constants';
 import {useConnectWallet} from "@/components/ConnectWallet"
+
 // const supportedTokens = constantInstance.farm_setting.TOKENLIST();
 
 const Farms = (props) => {
@@ -121,13 +122,17 @@ const Farms = (props) => {
 
   const getPools = async (library, account, chainId) => {
     setIsLoadingPool(true);
-    const pools = await newGetAllPools(library, account, chainId);
-    console.log("TEST getAllPools",pools);
-    console.log("end get pools");
     const block = await library.getBlockNumber();
+    var pools;
+    try {
+      pools = await newGetAllPools(library, account, chainId);
+    } catch(e) {
+      console.log("getPools error: ",account,chainId,library);
+      return;
+    }
+    // const pools = await newGetAllPools(library, account, chainId);
     const newFarmsContents = [];
     let ismyfarm = false;
-    console.log("GETALLPOOLS:",pools);
     pools&&pools.forEach((pool,idx) => {
       const newFarmsContent = {
         index: idx,
@@ -200,16 +205,18 @@ const Farms = (props) => {
       if(!account){
         connectWallet();
       }
+      setIsMyFarms(false);
       if (account) {
         setWalletConnected(true);
-        console.log("start getPools");
+        console.log("start getPools",library,chainId);
         getPools(library, account, chainId);
-        
+
       } else {
         const provider = new JsonRpcProvider(RPC_URL(), chainId);
         const account = "0x0000000000000000000000000000000000000000";
         setWalletConnected(false);
-        getPools(provider, account, 56);
+        getPools(provider, account, chainId);
+
       }
     },
     [account, chainId]

@@ -1053,8 +1053,8 @@ export async function swap(
         })
       )
       .catch(e => {
-        //return new CustomError('Cannot estimate gas, maybe price impact is too large for the current slippage tolerance settings.');
-        return e;
+
+        return new CustomError('CustomError in transaction');
       });
     return result;
   })();
@@ -1065,13 +1065,14 @@ export async function swap(
     setSwapButtonContent("Please try again");
   } else {
     console.log("TEST status:");
-    if(status.error && status.error.code == 4001) {
+    if((status.error && status.error.code == 4001) || status.code == 4001) {
       setSwapButtonContent("Swap");
       setSwapButtonState(true);
-    }else if(status.error && status.error.code == -32603) {
+    }else if((status.error && status.error.code == -32603) || status.code == -32603) {
       console.log("error status -32603", status)
       let text = null;
       if(exactIn) {
+        // "The actual output might be less than your acceptable slippage tolerance setting, please adjust slippage to continue!"
         text = "The amount of the output token is less than your slippage tolerance rate, please set more slippage tolerance if you want to continue!"
       } else {
         text = "The amount of the input token is over than your slippage tolerance rate, please set more slippage tolerance if you want to continue!"

@@ -166,14 +166,12 @@ const StakeModal = props => {
     const day3M = getDayNum("month", 3);
     const day6M = getDayNum("month", 6);
     // const day1Y = getDayNum("year", 1);
-    console.log("TEST KUY6");
     const day4Y = getDayNum("day", Math.floor(endAfter/(60*60*24)));
     const day_num = [day1W, day1M, day3M, day6M, day4Y];
     var totalScore = poolLpScore / 1e34;
     var lp = showStake/ratio;
     for (let i = 0; i < 5; i++) {
       var weight = lp * Math.sqrt(day_num[i]);
-      console.log("weight 1:",lp,Math.sqrt(day_num[i]),weight);
       // console.log("TEST1234:",i,weight / (totalScore + weight),poolRewardPerYear);
       if (totalScore + weight == 0) newArr[i][0] = 0;
       else newArr[i][0] = (weight / (totalScore + weight) * poolRewardPerYear / showStake ).toFixed(2);
@@ -185,11 +183,9 @@ const StakeModal = props => {
     const dif = date - now;
 
     const dayNum = dif / (1000*60*60*24);
-    console.log("TEST DAYNUM:",dayNum, tokensRewardPerBlock);
     var weight = lp * Math.sqrt(dayNum);
     var share = weight / (totalScore + weight);
     var _roi = dayNum*60*60*24/BLOCK_TIME() * tokensRewardPerBlock[0].rewardPerBlock * share;
-    console.log("TEST ROI:",_roi);
     setRoi(_roi);
 
     if(showStake > totalUSDBalance && showStake != totalUSDBalance.toFixed(2)) {
@@ -208,7 +204,6 @@ const StakeModal = props => {
           setButtonText("Invalid date");
           setButtonStatus(false);
         } else {
-          console.log("TEST SET HERE1 TRUE");
           setButtonStatus(true);
           setButtonText("Stake");
         }
@@ -230,9 +225,7 @@ const StakeModal = props => {
 
   useEffect(() => {
     const now = new Date();
-    console.log("TEST KUY4");
     const dif = date - now;
-    console.log("TEST KUY5");
     if(parseInt(dif/1000) < endAfter && dif>0) {
       if(showStake > totalUSDBalance && showStake != totalUSDBalance.toFixed(2)) {
         setButtonStatus(false);
@@ -258,11 +251,9 @@ const StakeModal = props => {
     var totalScore = poolLpScore / 1e34;
     var lp = showStake/ratio;
     const dayNum = dif / (1000*60*60*24);
-    console.log("TEST DAYNUM:",dayNum, tokensRewardPerBlock);
     var weight = lp * Math.sqrt(dayNum);
     var share = weight / (totalScore + weight);
     var _roi = dayNum*60*60*24/BLOCK_TIME() * tokensRewardPerBlock[0].rewardPerBlock * share;
-    console.log("TEST ROI:",_roi);
     setRoi(_roi);
   }, [date]);
 
@@ -317,7 +308,6 @@ const StakeModal = props => {
   }
 
   const datePickerChangeHandler = newDate => {
-    console.log("datePickerChangeHandler:",newDate/1000);
     const date = new Date();
     const dif = newDate - date;
 
@@ -327,7 +317,6 @@ const StakeModal = props => {
     setSelectedPresetDate(null);
     var lp = showStake/ratio;
     var weight = lp * Math.sqrt(dayNum);
-    console.log("weight 7:",lp,Math.sqrt(dayNum),weight);
     var totalScore = poolLpScore / 1e34;
     const apr = (weight / (totalScore + weight) * poolRewardPerYear / showStake ).toFixed(2);
     serAprCounted(apr);
@@ -355,7 +344,6 @@ const StakeModal = props => {
 
     const checkStatusAndFinish = async () => {
       await library.getTransactionReceipt(status.hash).then(async receipt => {
-        console.log("receipt ", receipt);
 
         if (!receipt) {
           setTimeout(checkStatusAndFinish, 500);
@@ -425,10 +413,8 @@ const StakeModal = props => {
     //   })
     // }
 
-    console.log("test test see how many times setInterval is called");
     const checkStatusAndFinish = async () => {
       await library.getTransactionReceipt(status.hash).then(async receipt => {
-        console.log("receipt ", receipt);
 
         if (!receipt) {
           setTimeout(checkStatusAndFinish, 500);
@@ -645,7 +631,6 @@ const StakeModal = props => {
             if (buttonText != "Done") {
               if (buttonText !== 'Approval required') {
                 setButtonText(<>Processing <Icon type="loading" /></>);
-                console.log("TEST DEPOSIT:", balance, parseFloat(balance), (balance*(balancePercentage/100)),(balance*(balancePercentage/100)));
                 setButtonStatus(false);
                 if(balancePercentage && balancePercentage != 0) {
                   if(balancePercentage < 100) {

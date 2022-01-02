@@ -27,9 +27,9 @@ import { Icon } from 'antd';
 import { Web3Provider } from "@ethersproject/providers";
 import { injected } from '@/connectors';
 import axios from 'axios';
-import {constantInstance} from "@/constants";
 
-const supportedTokens = constantInstance.tokenList;
+import {TOKENLIST} from "@/constants";
+
 
 const getTokenSymbol = async (address, library, account) => {
   const tokenContract = getTokenContract(address, library, account);
@@ -346,7 +346,8 @@ const getPool = async (library, account, poolId)=> {
   };
 }
 const getSupportedTokenSymbol = (address) => {
-  return supportedTokens.find(token => token.address.toLowerCase() == address.toLowerCase()).symbol;
+  const tokenList = TOKENLIST();
+  return tokenList().find(token => token.address.toLowerCase() == address.toLowerCase()).symbol;
 }
 const newGetPoolByFarm = async (farm, tokenPrice, library, account, chainId) => {
   const poolId = farm.poolId;
@@ -358,7 +359,7 @@ const newGetPoolByFarm = async (farm, tokenPrice, library, account, chainId) => 
   
   const token0 = new Token(null, tokens[0].address, tokens[0].decimals, tokens[0].symbol);
   const token1 = tokens[1]?new Token(null, tokens[1].address, tokens[1].decimals, tokens[1].symbol):null;
-
+  console.log("GET USERPOST:",account, poolId, chainId, library)
   const positions = await farmContract.getUserPositions(account, poolId);
 
   const [stakePosition, pendingReward, rewardsPerBlock, liquidityApr] = await Promise.all([

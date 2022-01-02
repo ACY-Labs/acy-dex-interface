@@ -34,6 +34,7 @@ import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
 import { useConstantLoader } from '@/constants';
 import {useConnectWallet} from '@/components/ConnectWallet';
+
 const { AcyTabPane } = AcyTabs;
 function getTIMESTAMP(time) {
     var date = new Date(time);
@@ -123,7 +124,7 @@ const Swap = props => {
   const [tableLoading, setTableLoading] = useState(true);
   const [transactionNum, setTransactionNum] = useState(0);
   const { activate } = useWeb3React();
-  
+
 
   useEffect(() => {
     if (!supportedTokens) return

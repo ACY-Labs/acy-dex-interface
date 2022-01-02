@@ -8,36 +8,15 @@ import FarmSettingSelector from './farm_setting';
 import SDK_SETTING from './sdk_setting';
 import { JsonRpcProvider } from "@ethersproject/providers"; 
 
-const library = new JsonRpcProvider('https://bsc-dataseed1.defibit.io/');
-// loading all constants needed in app
-// const ConstantLoader = (networkName) => {
-//     // const params = useParams();
-//     // networkName = params.chainId;
-//     // console.log("new chainId", networkName)
 
-//     // global variable NETWORK_NAME is loaded by umi
-//     // configure it in /config/constant.config.ts
-
-//     // wrap constants in this variable
-//     const constants = {
-//         'tokenList': TokenListSelector(networkName ? networkName : NETWORK_NAME),
-//         'methodMap': MethodActionSelector('method'),
-//         'actionMap': MethodActionSelector('action'),
-//         'scanUrlPrefix': ScanUrlSelector(networkName ? networkName : NETWORK_NAME),
-//         'farmSetting': FarmSettingSelector(networkName ? networkName : NETWORK_NAME),
-//         'sdkSetting': SDK_SETTING
-//     }
-
-//     // make constants readonly
-//     Object.freeze(constants);
-//     return constants;
-// }
+const supportedChainIds = [56, 97, 137];
+const defaultLibrary = new JsonRpcProvider('https://bsc-dataseed1.defibit.io/');
 
 // import constant to normal js file
 export let constantInstance = {
     'account': undefined,
     'chainId': 56,
-    'library': library,
+    'library': defaultLibrary,
     'tokenList': TokenListSelector(56),
     'methodMap': MethodActionSelector('method'),
     'actionMap': MethodActionSelector('action'),
@@ -69,24 +48,28 @@ export const API_URL = () => constantInstance.farmSetting.API_URL
 
 // import constant to react component
 export const useConstantLoader = () => {
-    const { account, chainId, library, activate } = useWeb3React();
+    const { account, chainId, library } = useWeb3React();
     const [constant, setConstant] = useState(constantInstance);
     
     useEffect(() => {
-        console.log("@/constant: current chain , account", chainId, account);
+        console.log("@/constant: current chain , account", chainId, account); 
+        console.log("do our site support this chain?", chainId, supportedChainIds.indexOf(chainId))
+        const chainSupported = supportedChainIds.indexOf(chainId) != -1;
+        const fallbackChainId = chainSupported ? chainId : 56;    // redirect unsupported chainId and undefined to 56
+
         const currentConstant = {
-            'account': account,
-            'chainId': chainId ? chainId : 56,
-            'library': library,
-            'tokenList': TokenListSelector(chainId ? chainId : 56),
+            'account': chainSupported ? account : undefined,
+            'chainId': fallbackChainId,
+            'library': chainSupported ? library : defaultLibrary,
+            'tokenList': TokenListSelector(fallbackChainId),
             'methodMap': MethodActionSelector('method'),
             'actionMap': MethodActionSelector('action'),
-            'scanUrlPrefix': ScanUrlSelector(chainId ? chainId : 56),
-            'farmSetting': FarmSettingSelector(chainId ? chainId : 56),
+            'scanUrlPrefix': ScanUrlSelector(fallbackChainId),
+            'farmSetting': FarmSettingSelector(fallbackChainId),
             'sdkSetting': SDK_SETTING
         }
 
-        console.log("@/constant: current constant", currentConstant)
+        console.log("@/constant: current constant", chainId, currentConstant)
         
         constantInstance = currentConstant;
         setConstant(currentConstant);

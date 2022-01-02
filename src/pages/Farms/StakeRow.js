@@ -14,8 +14,9 @@ import moment from 'moment';
 import classNames from 'classnames';
 import { getPool, getPoolAccmulateReward} from '@/acy-dex-swap/core/farms';
 import axios from 'axios';
-import {constantInstance} from "@/constants";
-const supportedTokens = constantInstance.tokenList;
+import {TOKENLIST} from "@/constants";
+// const supportedTokens = TOKENLIST();
+
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
   const handleInputChange = (e) => {
@@ -83,6 +84,7 @@ const StakeRow = props => {
 
   //function to get logo URI
   function getLogoURIWithSymbol(symbol) {
+    const supportedTokens = TOKENLIST();
     for (let j = 0; j < supportedTokens.length; j++) {
       if (symbol === supportedTokens[j].symbol) {
         return supportedTokens[j].logoURI;

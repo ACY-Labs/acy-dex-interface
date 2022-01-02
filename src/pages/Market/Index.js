@@ -18,7 +18,9 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { isMobile } from 'react-device-detect';
 import ConnectWallet from './ConnectWallet';
 import { useConstantLoader } from '@/constants';
+
 import {useConnectWallet} from '@/components/ConnectWallet';
+
 
 const MarketIndex = props => {
   const [visible,setVisible] = useState(true);
@@ -67,8 +69,7 @@ const MarketIndex = props => {
   }, []);
 
   useEffect(() => {
-    console.log("LIBRARY:", library);
-    fetchGlobalTransaction(library).then(globalTransactions => {
+    fetchGlobalTransaction().then(globalTransactions => {
         console.log('globaltransaction', globalTransactions);
         if(globalTransactions) settransactions(globalTransactions);
     });
@@ -127,6 +128,7 @@ const MarketIndex = props => {
       <MarketSearchBar
         dataSourceCoin={dataSourceCoin}
         dataSourcePool={dataSourcePool}
+        account={account}
         visible={true}
       />
       <div className={styles.chartsMain}>

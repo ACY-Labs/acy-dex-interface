@@ -15,7 +15,7 @@ export function TranslateToUSD(symbol,amount,priceList){
 }
 
 export function totalInUSD (arr,priceList){
-  console.log(priceList);
+  // console.log(priceList);
   let total = 0;
   arr.forEach(element => {
      total = total + (TranslateToUSD(element.token,element.amount,priceList));

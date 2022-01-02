@@ -4,8 +4,11 @@ import { convertTx, ACY_ROUTER } from './util';
 import axios from 'axios';
 import {getTransactionsByAccount} from '@/utils/txData'
 import { getLibrary } from '../ConnectWallet';
-import {constantInstance} from '@/constants';
-const apiUrlPrefix = constantInstance.farmSetting.API_URL;
+
+import {getAllSuportedTokensPrice} from "@/acy-dex-swap/utils"
+import { totalInUSD } from '@/utils/utils';
+import {API_URL} from '@/constants';
+// const apiUrlPrefix = API_URL();    
 // SAMPLE TRANSACTION DATA
 // {
 //     coin1: 'USDC',
@@ -22,26 +25,19 @@ const apiUrlPrefix = constantInstance.farmSetting.API_URL;
 const TRANSACTION_AMOUNT = 250;
 const FILTERED_AMOUNT = 50;
 
-async function parseGlobalTransaction(address,library){
+//function to parse tx list to fit in datasource
+async function parseTransactionList(data){
 
-    let txList = [];
 
-    const [userSwapTx,userLiquidityTx] = await getTransactionsByAccount(address,library,'ALL');
-    const _swaptx = userSwapTx.map((item) => {
-      return {
-      account: item.address,
-      coin1: item.inputTokenSymbol,
-      coin1Amount: item.inputTokenNum,
-      coin2: item.outTokenSymbol,
-      coin2Amount: item.outTokenNum,
-      time: item.transactionTime,
-      totalValue: item.totalToken,
-      transactionID: item.hash,
-      type: "Swap"
-      }
-    })
+  const tokensPriceUSD = await getAllSuportedTokensPrice();
 
-    const _liquiditytx = userLiquidityTx.map((item) => {
+  // const _txList = data.filter(item=>item.token1Number.toString()!="")
+    
+  const _txList = data.map((item) => {
+    let totalValue = totalInUSD([{
+      token : item.token1Symbol,
+      amount : item.token1Number
+    }],tokensPriceUSD);
     return {
       account: item.address,
       coin1: item.token1Symbol,
@@ -49,28 +45,27 @@ async function parseGlobalTransaction(address,library){
       coin2: item.token2Symbol,
       coin2Amount: item.token2Number,
       time: item.transactionTime,
-      totalValue: item.totalToken,
+      totalValue: totalValue,
       transactionID: item.hash,
       type: item.action
     }
-    })
+  })
 
-     txList.push(..._swaptx);
-     txList.push(..._liquiditytx);
-
-   return sortTable(txList, "time", true);
+  return _txList.filter(item => item.coin1Amount !=0 );
 }
 
-export async function fetchGlobalTransaction(library){
+
+
+export async function fetchGlobalTransaction(){
   try{
-    // let request = 'https://api.acy.finance/api/users/all';
+    let request = API_URL()+'/txlist/all?'+'range=50';
     // let request = 'http://localhost:3001/api/users/all';
-    // let response = await fetch(request);
-    let ACY_ROUTER = ROUTER_ADDRESS();
-    // let data = await response.json();
+
+    let response = await fetch(request);
+    let data = await response.json();
+
     // console.log(data.data);
-    let globalTransactions = await parseGlobalTransaction(ACY_ROUTER,library);
-    return globalTransactions;
+    return await parseTransactionList(data.data);
   }catch (e){
     console.log('service not available yet',e);
     return null;
@@ -173,7 +168,7 @@ async function parseTopExchangeVolume(userList,library){
 
 export async function fetchTopExchangeVolume(library){
  try{
-   let request = `${apiUrlPrefix}/users/all`;
+   let request = `${API_URL()}/users/all`;
    let response = await fetch(request);
    let data = await response.json();
    console.log(data.data);
@@ -184,88 +179,33 @@ export async function fetchTopExchangeVolume(library){
    return null;
  }
 }
-
-// get all transactions
-// export async function fetchGlobalTransaction(client) {
-//   const { loading, error, data } = await client.query({
-//     query: GET_GLOBAL_TRANSACTIONS,
-//     variables: {
-//       txAmount: TRANSACTION_AMOUNT,
-//     },
-//   });
-
-//   if (loading) return null;
-//   if (error) return `Error! ${error}`;
-
-//   let globalTransactions = [];
-//   let mints = data.mints
-//   let burns = data.burns
-//   let swaps = data.swaps
-
-
-//   // get all burns
-//   for (let j = 0; j < burns.length; j++) {
-//     globalTransactions.push(
-//       convertTx(burns[j], burns[j].transaction.id, burns[j].transaction.timestamp, TransactionType.REMOVE)
-//     );
-//   }
-
-//   // get all mints
-//   for (let j = 0; j < mints.length; j++) {
-//     globalTransactions.push(
-//       convertTx(mints[j], mints[j].transaction.id, mints[j].transaction.timestamp, TransactionType.ADD)
-//     );
-//   }
-
-//   // get all swaps
-//   for (let j = 0; j < swaps.length; j++) {
-//     globalTransactions.push(
-//       convertTx(swaps[j], swaps[j].transaction.id, swaps[j].transaction.timestamp, TransactionType.SWAP)
-//     );
-//   }
-
-//   return sortTable(globalTransactions, "time", true);
-// }
-
 // get transaction from pool
-export async function fetchFilteredTransaction(client, pairAddresses) {
-  const { loading, error, data } = await client.query({
-    query: FILTERED_TRANSACTIONS,
-    variables: {
-      txAmount: FILTERED_AMOUNT,
-      allPairs: pairAddresses
-    },
-  });
-
-  if (loading) return null;
-  if (error) return `Error! ${error}`;
-
-  let globalTransactions = [];
-  let mints = data.mints
-  let burns = data.burns
-  let swaps = data.swaps
-
-
-  // get all burns
-  for (let j = 0; j < burns.length; j++) {
-    globalTransactions.push(
-      convertTx(burns[j], burns[j].transaction.id, burns[j].transaction.timestamp, TransactionType.REMOVE)
-    );
+export async function fetchTransactionsForPair(token1,token2){
+  console.log("fetching txlist for tokens ", token1, token2);
+  try{
+    let request = API_URL()+'/txlist/pair?'+'token1='+token1+'&&token2='+token2+'&&range=50';
+    // let request = 'http://localhost:3001/api/users/all';
+    let response = await fetch(request);
+    let data = await response.json();
+    // console.log(data.data);
+    return await parseTransactionList(data.data);
+  }catch (e){
+    console.log('service not available yet',e);
+    return null;
   }
+}
 
-  // get all mints
-  for (let j = 0; j < mints.length; j++) {
-    globalTransactions.push(
-      convertTx(mints[j], mints[j].transaction.id, mints[j].transaction.timestamp, TransactionType.ADD)
-    );
+export async function fetchTransactionsForToken(token){
+  console.log("fetching txlist for tokens ", token);
+  try{
+    let request = API_URL()+'/txlist/token?'+'symbol='+token+'&&range=50';
+    // let request = 'http://localhost:3001/api/users/all';
+    let response = await fetch(request);
+    let data = await response.json();
+    // console.log(data.data);
+    return await parseTransactionList(data.data);
+  }catch (e){
+    console.log('service not available yet',e);
+    return null;
   }
-
-  // get all swaps
-  for (let j = 0; j < swaps.length; j++) {
-    globalTransactions.push(
-      convertTx(swaps[j], swaps[j].transaction.id, swaps[j].transaction.timestamp, TransactionType.SWAP)
-    );
-  }
-
-  return sortTable(globalTransactions, "time", true);
 }

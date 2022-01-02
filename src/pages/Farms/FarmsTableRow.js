@@ -16,8 +16,10 @@ import { getPool, getPoolAccmulateReward, newGetPool} from '@/acy-dex-swap/core/
 import StakeRow from './StakeRow';
 import SwapComponent from '@/components/SwapComponent';
 import { BLOCK_TIME } from '@/acy-dex-swap/utils';
-import {constantInstance} from "@/constants";
-const supportedTokens = constantInstance.tokenList;
+
+import {TOKENLIST} from "@/constants";
+// const supportedTokens = TOKENLIST();
+
 
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
@@ -123,6 +125,7 @@ const FarmsTableRow = props => {
 
   //function to get logo URI
   function getLogoURIWithSymbol(symbol) {
+    const supportedTokens = TOKENLIST();
     for (let j = 0; j < supportedTokens.length; j++) {
       if (symbol === supportedTokens[j].symbol) {
         return supportedTokens[j].logoURI;
@@ -143,7 +146,6 @@ const FarmsTableRow = props => {
       
       if (!poolInfo.lpTokens || !chainId || !account || !library) return;
       async function getFarmTokenUserBalance() {
-        console.log("getFarmTokenUserBalance in");
         const bal = await getUserTokenBalanceWithAddress(
           poolInfo.lpTokens,
           chainId,
@@ -171,12 +173,6 @@ const FarmsTableRow = props => {
     },[harvestModal]
   );
 
-   useEffect(
-    () => {
-      console.log("TEST HERE supportedTokens:", supportedTokens);
-    },[]
-  );
-  
   let history = useHistory();
   const getDHM = (sec) => {
     if(sec<0) return '00d:00h:00m';
@@ -193,10 +189,8 @@ const FarmsTableRow = props => {
   }
 
   const refreshPoolInfo = async () => {
-    console.log('refresh pool info:');
     const pool = await newGetPool(poolInfo.poolId, library, account, chainId);
     const block = await library.getBlockNumber();
-    console.log("TEST HERE:",pool,account);
     const newFarmsContent = {
       index: pool.poolId,
       poolId: pool.poolId,
@@ -225,7 +219,6 @@ const FarmsTableRow = props => {
       poolRewardPerYear: pool.poolRewardPerYear,
       tokensRewardPerBlock: pool.tokensRewardPerBlock
     };
-    console.log("TEST HERE:",newFarmsContent);
     setPoolInfo(newFarmsContent);
   };
 
@@ -283,7 +276,6 @@ const FarmsTableRow = props => {
     // }
     const sti = async (hash) => {
       library.getTransactionReceipt(hash).then(async receipt => {
-        console.log(`receiptreceipt for ${hash}: `, receipt);
         // receipt is not null when transaction is done
         if (!receipt) 
           setTimeout(sti(hash), 500);
@@ -633,17 +625,15 @@ const FarmsTableRow = props => {
               <SwapComponent
                 onSelectToken0={token => {
                   // setActiveToken0(token);
-                  console.log("onSelectToken0:",token);
                 }}
                 onSelectToken1={token => {
                   // setActiveToken1(token);
-                  console.log("onSelectToken1:",token);
 
                 }}
                 onGetReceipt={null}
                 token={{
-                  token0: supportedTokens.find(token => token.symbol == "USDT"),
-                  token1: supportedTokens.find(token => token.symbol == poolInfo.token1)
+                  token0: TOKENLIST().find(token => token.symbol == "USDT"),
+                  token1: TOKENLIST().find(token => token.symbol == poolInfo.token1)
                 }}
                 isLockedToken1={true}
               />
