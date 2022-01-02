@@ -16,8 +16,10 @@ import { getPool, getPoolAccmulateReward, newGetPool} from '@/acy-dex-swap/core/
 import StakeRow from './StakeRow';
 import SwapComponent from '@/components/SwapComponent';
 import { BLOCK_TIME } from '@/acy-dex-swap/utils';
+
 import {TOKENLIST} from "@/constants";
 // const supportedTokens = TOKENLIST();
+
 
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
@@ -171,7 +173,6 @@ const FarmsTableRow = props => {
     },[harvestModal]
   );
 
-  
   let history = useHistory();
   const getDHM = (sec) => {
     if(sec<0) return '00d:00h:00m';

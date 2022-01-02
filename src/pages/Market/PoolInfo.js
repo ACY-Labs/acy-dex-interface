@@ -26,10 +26,9 @@ import {
   fetchTransactionsForPair,
   marketClient,
 } from './Data/index.js';
-
 import {SCAN_URL_PREFIX} from "@/constants";
-
 // const scanUrlPrefix = SCAN_URL_PREFIX();
+
 
 const watchlistManagerPool = new WatchlistManager('pool');
 
