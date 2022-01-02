@@ -806,15 +806,27 @@ function getChartData (data){
     }
 }
 
+// check if the transaction is for routing or one way
+function checkIfItsRoute(transferLogs, address) {
+    const transferLog = transferLogs.find(item => address == (web3.eth.abi.decodeParameter("address", item.topics[1])).toLowerCase());
+    return transferLog
+}
+
 // Pass in start of the path.
 function getTransferLogPath(transferLogs, pathList, fromAddress, destAddress) {
     const transferLog = transferLogs.find(item => fromAddress == (web3.eth.abi.decodeParameter("address", item.topics[1])).toLowerCase());
+    if (transferLog == null) {
+        return null
+    }
     const transferToAddress = (web3.eth.abi.decodeParameter("address", transferLog.topics[2])).toLowerCase();
     pathList.push(transferLogs.indexOf(transferLog));
     if (transferToAddress == destAddress) {
         return pathList;
+    } else {
+        console.log("transferLog", transferLog);
     }
     pathList = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
+    console.log("pathList:", pathList);
     return pathList;
 }
 
@@ -826,10 +838,6 @@ export async function fetchTransactionData(address,library, account){
 
     // console.log("before get All Supported Tokens Price");
     tokenPriceUSD = await getAllSuportedTokensPrice();
-
-    // eth to token: 0x529c18b7eed512c24ab3755eb18316f7ea764907b51924eceab4c31e72300d01
-    // token to token: 0x19bf42a261ccf0d64c4c6ca3112e3ac24b54272fb6ad622a1c622a47d64d4fea
-    // token to eth: 0xedffbb4fc760c3133d8d66483f0dc6fc80ce109ab1286b0f3eb46ea67083c47b
 
     try{
         const apikey = 'H2W1JHHRFB5H7V735N79N75UVG86E9HFH2';
@@ -877,15 +885,45 @@ export async function fetchTransactionData(address,library, account){
             const transferLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0] == actionList.transfer.hash);
             console.log("transferLogs", transferLogs);
             const routes_loglists = [];
-            for (let i = 0; i < transferLogs.length; i ++) {
-                let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
-                let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
-                if (transferFromAddress == sourceAddress) {
-                    let pathList = [i];
-                    let path = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
-                    routes_loglists.push(path);
-                }
-            } 
+            if (methodUsed === methodList.bsc.swapExactTokensForTokensByArb.name) {
+                console.log("method: swapExactTokensForTokensByArb")
+                for (let i = 0; i < transferLogs.length; i ++) {
+                    let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
+                    let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
+                    if (transferFromAddress == sourceAddress) {
+                        let pathList = [i];
+                        let path = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
+                        routes_loglists.push(path);
+                    }
+                } 
+            } else if (methodUsed === methodList.bsc.swapExactETHForTokensByArb.name) {
+                console.log("method: swapExactETHForTokensByArb")
+                for (let i = 0; i < transferLogs.length; i++) {
+                    let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
+                    let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
+                    if (transferFromAddress == destAddress) {
+                        let pathList = [i];
+                        let path = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
+                        if (path != null) {
+                            routes_loglists.push(path);
+                        }
+                    }
+                } 
+            } else if (methodUsed === methodList.bsc.swapExactTokensForETHByArb.name) {
+                console.log("method: swapExactTokensForETHByArb")
+
+            } else if (methodUsed === methodList.bsc.swapTokensForExactTokensByArb.name) {
+                console.log("method: swapTokensForExactTokensByArb")
+
+            } else if (methodUsed === methodList.bsc.swapETHForExactTokensByArb.name) {
+                console.log("method: swapETHForExactTokensByArb")
+
+            } else if (methodUsed === methodList.bsc.swapTokensForExactETHByArb.name) {
+                console.log("method: swapTokensForExactETHByArb")
+
+            }
+
+
             console.log("routes_loglists", routes_loglists);
 
             /**
