@@ -933,7 +933,17 @@ export async function fetchTransactionData(address,library, account){
                 }
             } else if (methodUsed === methodList.bsc.swapETHForExactTokensByArb.name) {
                 console.log("method: swapETHForExactTokensByArb")
-
+                for (let i = 0; i < transferLogs.length; i++) {
+                    let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
+                    let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
+                    if (transferFromAddress == destAddress) {
+                        let pathList = [i];
+                        let path = getTransferLogPath(transferLogs, pathList, transferToAddress, sourceAddress);
+                        if (path != null) {
+                            routes_loglists.push(path);
+                        }
+                    }
+                }
             } else if (methodUsed === methodList.bsc.swapTokensForExactETHByArb.name) {
                 console.log("method: swapTokensForExactETHByArb")
 
