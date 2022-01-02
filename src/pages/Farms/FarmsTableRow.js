@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import styles from '@/pages/Farms/Farms.less';
 import { isMobile } from 'react-device-detect';
 import { harvestAll, harvest, withdraw } from '@/acy-dex-swap/core/farms';
-import { getUserTokenBalanceWithAddress, API_URL } from '@/acy-dex-swap/utils';
+import { getUserTokenBalanceWithAddress} from '@/acy-dex-swap/utils';
 import StakeModal from './StakeModal';
 import { addLiquidity } from '@/acy-dex-swap/core/addLiquidity';
 import { AcyActionModal, AcyModal, AcyButton, AcyBarChart, AcyCard } from '@/components/Acy';
@@ -15,9 +15,9 @@ import classNames from 'classnames';
 import { getPool, getPoolAccmulateReward, newGetPool} from '@/acy-dex-swap/core/farms';
 import StakeRow from './StakeRow';
 import SwapComponent from '@/components/SwapComponent';
-import { BLOCK_TIME } from '@/acy-dex-swap/utils';
+// import { BLOCK_TIME } from '@/acy-dex-swap/utils';
 
-import {TOKENLIST} from "@/constants";
+import {TOKENLIST, API_URL, BLOCK_TIME } from "@/constants";
 // const supportedTokens = TOKENLIST();
 
 

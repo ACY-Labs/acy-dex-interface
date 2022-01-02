@@ -25,9 +25,8 @@ import Eth from "web3-eth";
 import { Web3Provider, JsonRpcProvider } from "@ethersproject/providers";
 import {getTokenContract} from '@/acy-dex-swap/utils';
 import { parse } from 'path-to-regexp';
-import {BLOCK_TIME, RPC_URL} from '@/acy-dex-swap/utils';
 // import {constantInstance} from "@/constants";
-import { useConstantLoader } from '@/constants';
+import { useConstantLoader,BLOCK_TIME, RPC_URL} from '@/constants';
 import {useConnectWallet} from "@/components/ConnectWallet"
 
 // const supportedTokens = constantInstance.farm_setting.TOKENLIST();
@@ -127,7 +126,7 @@ const Farms = (props) => {
     try {
       pools = await newGetAllPools(library, account, chainId);
     } catch(e) {
-      console.log("getPools error: ",account,chainId,library);
+      console.log("getPools error: ",account,chainId,library,pools);
       return;
     }
     // const pools = await newGetAllPools(library, account, chainId);
