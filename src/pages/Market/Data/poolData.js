@@ -139,7 +139,7 @@ export async function fetchPoolDayData(address) {
               coin2: token1Symbol,
               logoURL1: token0.logoURI,
               logoURL2: token1.logoURI,
-              address: getPairAddress(pool.token0, pool.token1),
+              pairAddr: getPairAddress(pool.token0, pool.token1),
               percent: 0,
               tvl,
               volume24h,
