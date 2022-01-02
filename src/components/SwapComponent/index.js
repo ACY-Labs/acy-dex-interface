@@ -82,6 +82,8 @@ import { Alert } from 'antd';
 import spinner from '@/assets/loading.svg';
 import moment from 'moment';
 import {useConstantLoader} from '@/constants';
+import {useConnectWallet} from '@/components/ConnectWallet';
+
 
 
 // var CryptoJS = require("crypto-js");
@@ -154,6 +156,60 @@ const SwapComponent = props => {
   const [poolExist, setPoolExist] = useState(true);
 
   const [showDescription, setShowDescription] = useState(false);
+  const connectWalletByLocalStorage = useConnectWallet();
+
+  useEffect(() => {
+    if (!INITIAL_TOKEN_LIST) return
+    console.log("resetting page states, new swapComponent token0, token1", INITIAL_TOKEN_LIST[0], INITIAL_TOKEN_LIST[1])
+    setVisible(null);
+      // 选择货币前置和后置
+    setBefore(true);
+      // 交易对前置货币
+    setToken0(INITIAL_TOKEN_LIST[0]);
+      // 交易对后置货币
+    setToken1(INITIAL_TOKEN_LIST[1]);
+      // 交易对前置货币余额
+    setToken0Balance('0');
+      // 交易对后置货币余额
+    setToken1Balance('0');
+      // 交易对前置货币兑换量
+    setToken0Amount('');
+      // 交易对后置货币兑换量
+    setToken1Amount('');
+      // 交易中用户使用Flash Arbitrage的额外获利
+    setBonus0(null);
+    setBonus1(null);
+    setToken0BalanceShow(false);
+    setToken1BalanceShow(false);
+    setSlippageTolerance(INITIAL_ALLOWED_SLIPPAGE / 100);
+    setInputSlippageTol(INITIAL_ALLOWED_SLIPPAGE / 100);
+    setSlippageError('');
+    setDeadline();
+    setExactIn(true);
+    setNeedApprove(false);
+    setApproveAmount('0');
+    setApproveButtonStatus(true);
+      // Breakdown shows the estimated information for swap
+      // let [estimatedStatus,setEstimatedStatus]=useState();
+    setSwapBreakdown();
+    setSwapButtonState(false);
+    setSwapButtonContent('Connect to Wallet');
+    setSwapStatus();
+    setPair();
+    setRoute();
+    setTrade();
+    setSlippageAdjustedAmount();
+    setMinAmountOut();
+    setMaxAmountIn();
+    setWethContract();
+    setWrappedAmount();
+    setShowSpinner(false);
+    setMethodName();
+    setIsUseArb(false);
+    setMidTokenAddress();
+    setPoolExist(true);
+    setShowDescription(false);
+  }, [chainId])
 
   useEffect(() => {
     if (!INITIAL_TOKEN_LIST) return
@@ -664,9 +720,7 @@ const SwapComponent = props => {
           disabled={!swapButtonState}
           onClick={() => {
             if (account == undefined) {
-              // activate(binance);
-              activate(binance);
-              activate(injected);
+              connectWalletByLocalStorage();
             } else {
               setSwapButtonState(false);
               setSwapButtonContent(<>Processing <Icon type="loading" /></>)

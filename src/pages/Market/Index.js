@@ -3,7 +3,6 @@ import { Col, Icon, Row } from 'antd';
 import React, { Component, useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useWeb3React } from '@web3-react/core';
-import { binance, injected } from '@/connectors';
 import {
   fetchGeneralPoolInfoDay,
   fetchGeneralTokenInfo,
@@ -19,6 +18,9 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 import { isMobile } from 'react-device-detect';
 import ConnectWallet from './ConnectWallet';
 import { useConstantLoader } from '@/constants';
+
+import {useConnectWallet} from '@/components/ConnectWallet';
+
 
 const MarketIndex = props => {
   const [visible,setVisible] = useState(true);
@@ -58,24 +60,15 @@ const MarketIndex = props => {
   const libraryOut = new JsonRpcProvider('https://bsc-dataseed1.defibit.io/');
 
   // connect to provider, listen for wallet to connect
+  const connectWalletByLocalStorage = useConnectWallet();
  
   useEffect(() => {
     if(!account){
-      console.log("Market_________________");
-      activate(binance);
-      activate(injected);
+      connectWalletByLocalStorage();
     }
   }, []);
 
-  // useEffect(() => {
-  //   // fetch transaction data
-  //   if(library) {
-      
-  //   }
-  // }, [library]);
-
   useEffect(() => {
-
     fetchGlobalTransaction().then(globalTransactions => {
         console.log('globaltransaction', globalTransactions);
         if(globalTransactions) settransactions(globalTransactions);

@@ -35,7 +35,8 @@ const BscMainNetFarmSetting: FarmSetting = {
     BLOCKS_PER_YEAR: calcBlocksPerPeriod('year', 3),
     BLOCKS_PER_MONTH: calcBlocksPerPeriod('month', 3),
     RPC_URL: "https://bsc-dataseed.binance.org/",
-    API_URL: "https://api.acy.finance/api"
+    API_URL: "https://api.acy.finance/bsc-main/api"
+    // API_URL: "http://localhost:3001/bsc-main/api"    // when testing with local backend
 }
 
 const BscTestNetFarmSetting: FarmSetting = {
@@ -51,7 +52,7 @@ const BscTestNetFarmSetting: FarmSetting = {
     BLOCKS_PER_YEAR: calcBlocksPerPeriod('year', 3),
     BLOCKS_PER_MONTH: calcBlocksPerPeriod('month', 3),
     RPC_URL: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-    API_URL: "http://localhost:3001/api"
+    API_URL: "http://localhost:3001/bsc-test/api"
 }
 
 const FarmSettingSelector = (arg: string) => {

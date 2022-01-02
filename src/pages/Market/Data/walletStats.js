@@ -1,7 +1,9 @@
 import axios from 'axios';
 import { getAddress } from '@ethersproject/address';
+
 import {API_URL} from "@/constants";
 // const apiUrlPrefix = API_URL();
+
 
 export async function fetchTotalValueSwapped(account){
   try {

@@ -9,6 +9,7 @@ import LaunchpadSettingSelector from './launchpad_setting';
 import SDK_SETTING from './sdk_setting';
 import { JsonRpcProvider } from "@ethersproject/providers"; 
 
+
 const supportedChainIds = [56, 97, 137];
 const defaultLibrary = new JsonRpcProvider('https://bsc-dataseed1.defibit.io/');
 
@@ -55,8 +56,7 @@ export const useConstantLoader = () => {
     const [constant, setConstant] = useState(constantInstance);
     
     useEffect(() => {
-        console.log("@/constant: current chain , account", chainId, account);
-        
+        console.log("@/constant: current chain , account", chainId, account); 
         console.log("do our site support this chain?", chainId, supportedChainIds.indexOf(chainId))
         const chainSupported = (supportedChainIds.indexOf(chainId) != -1);
         const fallbackChainId = chainSupported ? chainId : 56;    // redirect unsupported chainId and undefined to 56

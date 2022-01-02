@@ -6,6 +6,7 @@ import { useConstantLoader } from "@/constants";
 
 import { Button,Icon } from 'antd';
 const AcyConnectWallet = props => {
+
   const { onClick, isMobile, chainId: walletChainId, pendingLength, ...rest } = props;
   const {account, chainId: fallbackChainId} = useConstantLoader();
   console.log("web3 and constant chainId", walletChainId, fallbackChainId)
