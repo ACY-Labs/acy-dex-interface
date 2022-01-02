@@ -212,11 +212,12 @@ function MarketTokenInfo(props) {
       transactions = sortTable(transactions, "time", true);
       console.log("print transactions", transactions)
       setTx(transactions);
-    });
 
-    //   // this is not yet added to backend
-    //   // setTxCount(txChange[0] - txChange[1])
-    // });
+      const oneDayAgo = new Date().getTime() - 86400000;
+      const txCount = transactions.filter(t => new Date(t.time).getTime() > oneDayAgo).length;
+      console.log("txCount", txCount)
+      setTxCount(txCount == 50 ? "50 +" : txCount);
+    });
 
     // set the watchlists
     updateWatchlistStatus();
@@ -378,7 +379,7 @@ function MarketTokenInfo(props) {
               </div>
               <div className={styles.statEntry}>
                 <div className={styles.statEntryName}>24h Transactions</div>
-                <div className={styles.statEntryValue}>{abbrNumber(txCount)}</div>
+                <div className={styles.statEntryValue}>{txCount}</div>
                 <div className={styles.statEntryChange} style={{ visibility: 'hidden' }}>
                   00{' '}
                 </div>
