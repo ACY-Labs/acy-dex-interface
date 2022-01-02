@@ -506,7 +506,7 @@ export function PoolTable(props) {
               <AcyTokenIcon symbol={entry.logoURL2} />
               <Link
                 style={{ color: 'white' }}
-                to={`/market/info/pool/${entry.address}`}
+                to={`/market/info/pool/${entry.pairAddr}`}
               >
                 <span className={styles.coinName}>
                   {entry.coin1}{' '}/{' '}{entry.coin2}
