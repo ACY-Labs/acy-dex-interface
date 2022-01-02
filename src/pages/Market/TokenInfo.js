@@ -186,7 +186,7 @@ function MarketTokenInfo(props) {
         tvl: parseFloat(data[length - 1].totalLiquidityUSD),
       });
 
-      setVolume24h(volumeGraphData[volumeGraphData.length - 1][1] - volumeGraphData[volumeGraphData.length - 2][1]);
+      setVolume24h(volumeGraphData[volumeGraphData.length - 1][1]);
       setVol24Change(
         calcPercentChange(volumeGraphData[volumeGraphData.length - 1][1] - volumeGraphData[volumeGraphData.length - 2][1], volumeGraphData[volumeGraphData.length - 2][1] - volumeGraphData[volumeGraphData.length - 3][1])
       );
