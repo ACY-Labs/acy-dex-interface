@@ -19,8 +19,7 @@ import {totalInUSD} from '@/utils/utils'
 import {TOKENLIST, API_URL} from '@/constants';
 
 
-
-
+// this variable is assigned with price data when calling functions e.g. fetchPoolInfo()
 var tokensPriceUSD ;
 // var ACY_API='http://localhost:3001/api/';
 
@@ -53,7 +52,6 @@ function parsePoolInfo(data){
 
     _token0 = _token0.symbol;
     _token1 = _token1.symbol;
-
 
     let _tvl = totalInUSD ( [
       {
@@ -91,7 +89,7 @@ function parsePoolInfo(data){
       }
     ],tokensPriceUSD)
 
-    return {
+    const parsed = {
       reserve0: data.lastReserves.token0.toString(),
       reserve1: data.lastReserves.token1.toString(),
       reserveUSD: _tvl.toString(),
@@ -106,6 +104,7 @@ function parsePoolInfo(data){
       untrackedVolumeUSD: "0",
       volumeUSD: _volume24h.toString()
     }
+    return parsed
 }
 
 export async function fetchPoolDayData(address) {
@@ -295,8 +294,8 @@ export async function fetchPoolInfo(address){
     let request = `${API_URL()}/poolchart/all`;
     let response = await fetch(request);
     let data = await response.json();
-    console.log("requesting pool info from backend",data.data);
-    return parsePoolInfo(data.data);
+    const pairData = data.data.find(p => p.pairAddr.toLowerCase() == address.toLowerCase())
+    return parsePoolInfo(pairData);
   }catch (e){
     console.log('service not available yet',e);
     return null;
