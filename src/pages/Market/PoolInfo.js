@@ -137,11 +137,11 @@ function MarketPoolInfo(props) {
 
 
       setVolume24h(parseFloat(data[data.length-1].dailyVolumeUSD));
-      // console.log("printing last day reserves ")
       setTvl(parseFloat(data[data.length-1].reserveUSD));
-      setTvlChange(calcPercentChange(parseFloat(data[data.length-1].reserveUSD),parseFloat(data[data.length-2].reserveUSD)));
-      // console.log("Debugging",)
-      setVolChange(calcPercentChange(parseFloat(data[data.length-1].dailyVolumeUSD),parseFloat(data[data.length-2].dailyVolumeUSD)));
+      if (data.length > 1) {
+        setTvlChange(calcPercentChange(parseFloat(data[data.length-1].reserveUSD),parseFloat(data[data.length-2].reserveUSD)));
+        setVolChange(calcPercentChange(parseFloat(data[data.length-1].dailyVolumeUSD),parseFloat(data[data.length-2].dailyVolumeUSD)));
+      }
     });
 
     let snapshotPromise = [];

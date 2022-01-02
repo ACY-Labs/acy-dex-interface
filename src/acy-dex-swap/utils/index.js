@@ -12,17 +12,9 @@ import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import ERC20ABI from '../abis/ERC20.json';
 import axios from 'axios';
 import { JsonRpcProvider } from "@ethersproject/providers";
-import {constantInstance} from "@/constants";
+import {ROUTER_ADDRESS, FARMS_ADDRESS, FLASH_ARBITRAGE_ADDRESS, FACTORY_ADDRESS, INIT_CODE_HASH, RPC_URL, CHAINID, TOKENLIST} from "@/constants";
 
-export const INITIAL_ALLOWED_SLIPPAGE = () => constantInstance.farmSetting.INITIAL_ALLOWED_SLIPPAGE;
-export const ROUTER_ADDRESS = () => constantInstance.farmSetting.ROUTER_ADDRESS;
-export const FARMS_ADDRESS = () => constantInstance.farmSetting.FARMS_ADDRESS;
-export const FLASH_ARBITRAGE_ADDRESS = () => constantInstance.farmSetting.FLASH_ARBITRAGE_ADDRESS;
-export const BLOCK_TIME = () => constantInstance.farmSetting.BLOCK_TIME;
-export const BLOCKS_PER_YEAR = () => constantInstance.farmSetting.BLOCKS_PER_YEAR;
-export const BLOCKS_PER_MONTH = () => constantInstance.farmSetting.BLOCKS_PER_MONTH; 
-export const RPC_URL = () => constantInstance.farmSetting.RPC_URL;
-export const API_URL = () => constantInstance.farmSetting.API_URL;
+export {ROUTER_ADDRESS, FARMS_ADDRESS, FLASH_ARBITRAGE_ADDRESS, FACTORY_ADDRESS, INIT_CODE_HASH, RPC_URL, CHAINID, TOKENLIST}
 
 //old farm address 0xf132Fdd642Afa79FDF6C1B77e787865C652eC824
 //new farm address 0x96c13313aB386BCB16168Dee3D2d86823A990770
@@ -142,17 +134,14 @@ export const getPairAddress = (token0Addr, token1Addr) => {
     // const FACTORY_ADDRESS = "0xb43DD1c50377b6dbaEBa3DcBB2232a3964b22440";
     // const INIT_CODE_HASH = "0xfbf3b88d6f337be529b00f1dc9bff44bb43fa3c6b5b7d58a2149e59ac5e0c4a8";
 
-    // bsc hashes
-    const FACTORY_ADDRESS = farmSetting.FACTORY_ADDRESS;
-    const INIT_CODE_HASH = farmSetting.INIT_CODE_HASH;
     const [_token0, _token1] =
         token0Addr.toLowerCase() < token1Addr.toLowerCase()
             ? [token0Addr, token1Addr]
             : [token1Addr, token0Addr];
     const pairAddress = getCreate2Address(
-        FACTORY_ADDRESS,
+        FACTORY_ADDRESS(),
         keccak256(["bytes"], [pack(["address", "address"], [_token0, _token1])]),
-        INIT_CODE_HASH
+        INIT_CODE_HASH()
     );
     return pairAddress;
 }
@@ -234,8 +223,6 @@ export async function getUserTokenBalanceRaw(token, account, library) {
 
 // get user token balance in readable string foramt
 export async function getUserTokenBalance(token, chainId, account, library) {
-  console.log("test print constantInstance", constantInstance, API_URL())
-  // const chainId = constantInstance.chainId;
   let { address, symbol, decimals } = token;
 
   if (!token) return;
@@ -448,9 +435,9 @@ export function parseArbitrageLog({ data, topics }) {
   };
 }
 export async function getAllSuportedTokensPrice() {
-  const chainId = constantInstance.chainId;
+  const chainId = CHAINID();
   const library = new JsonRpcProvider(RPC_URL(), chainId);
-  const tokenList = constantInstance.tokenList;
+  const tokenList = TOKENLIST();
   const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
   const searchIds = searchIdsArray.join('%2C');
   const tokensPrice = await axios.get(
@@ -471,8 +458,8 @@ export async function getAllSuportedTokensPrice() {
 }
 
 export async function getACYPrice(library){
-  const tokenList = constantInstance.tokenList;
-  const chainId = constantInstance.chainId;
+  const tokenList = TOKENLIST();
+  const chainId = CHAINID();
 
   const ACY  = tokenList.find(token => token.symbol == "ACY");
   const BUSD = tokenList.find(token => token.symbol == "BUSD");

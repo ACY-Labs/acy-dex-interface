@@ -104,15 +104,20 @@ function MarketTokenInfo(props) {
       let length = data.length;
 
       let priceToday = parseFloat(data[length - 1].priceUSD);
-      let pricePrev = parseFloat(data[length - 2].priceUSD);
-      let priceChange = ((priceToday - pricePrev) / pricePrev) * 100;
+      let priceChange = 0;
+      if (data.length > 1) {
+        const pricePrev = parseFloat(data[length - 2].priceUSD);
+        priceChange = ((priceToday - pricePrev) / pricePrev) * 100;
+      }
 
       // calculate volume 7d and set
       let volume7d = 0;
-      for (let i = 1; i <= 7; i++) {
-        volume7d += parseFloat(data[length - i].dailyVolumeUSD);
+      if (data.length >= 7) {
+        for (let i = 1; i <= 7; i++) {
+          volume7d += parseFloat(data[length - i].dailyVolumeUSD);
+        }
+        setVolume7d(volume7d);
       }
-      setVolume7d(volume7d);
 
       // extract graph datas
       let volumeGraphData = [];
@@ -141,8 +146,9 @@ function MarketTokenInfo(props) {
       setSelectChartDataPrice(abbrNumber(priceGraphData[length - 1][1]));
 
       setTvl(parseFloat(tvlGraphData[length - 1][1]));
-      setTvlChange(calcPercentChange(tvlGraphData[length - 1][1], tvlGraphData[length - 2][1]))
-
+      if (tvlGraphData.length > 1) {
+        setTvlChange(calcPercentChange(tvlGraphData[length - 1][1], tvlGraphData[length - 2][1]))
+      }
 
       // fetchFilteredTransaction(marketClient, pairAddresses).then(transactions => {
       //   console.log('TOIKEN TRANSAC', transactions);
@@ -186,10 +192,13 @@ function MarketTokenInfo(props) {
         tvl: parseFloat(data[length - 1].totalLiquidityUSD),
       });
 
-      setVolume24h(volumeGraphData[volumeGraphData.length - 1][1] - volumeGraphData[volumeGraphData.length - 2][1]);
-      setVol24Change(
-        calcPercentChange(volumeGraphData[volumeGraphData.length - 1][1] - volumeGraphData[volumeGraphData.length - 2][1], volumeGraphData[volumeGraphData.length - 2][1] - volumeGraphData[volumeGraphData.length - 3][1])
-      );
+      setVolume24h(volumeGraphData[volumeGraphData.length - 1][1]);
+      
+      if (volumeGraphData.length > 1) {
+        setVol24Change(
+          calcPercentChange(volumeGraphData[volumeGraphData.length - 1][1] - volumeGraphData[volumeGraphData.length - 2][1], volumeGraphData[volumeGraphData.length - 2][1] - volumeGraphData[volumeGraphData.length - 3][1])
+        );
+      }
     });
 
     fetchPoolDayData(address).then(parsedPairData => {
@@ -203,11 +212,12 @@ function MarketTokenInfo(props) {
       transactions = sortTable(transactions, "time", true);
       console.log("print transactions", transactions)
       setTx(transactions);
-    });
 
-    //   // this is not yet added to backend
-    //   // setTxCount(txChange[0] - txChange[1])
-    // });
+      const oneDayAgo = new Date().getTime() - 86400000;
+      const txCount = transactions.filter(t => new Date(t.time).getTime() > oneDayAgo).length;
+      console.log("txCount", txCount)
+      setTxCount(txCount == 50 ? "50 +" : txCount);
+    });
 
     // set the watchlists
     updateWatchlistStatus();
@@ -369,7 +379,7 @@ function MarketTokenInfo(props) {
               </div>
               <div className={styles.statEntry}>
                 <div className={styles.statEntryName}>24h Transactions</div>
-                <div className={styles.statEntryValue}>{abbrNumber(txCount)}</div>
+                <div className={styles.statEntryValue}>{txCount}</div>
                 <div className={styles.statEntryChange} style={{ visibility: 'hidden' }}>
                   00{' '}
                 </div>
