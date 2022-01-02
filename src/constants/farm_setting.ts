@@ -55,10 +55,27 @@ const BscTestNetFarmSetting: FarmSetting = {
     API_URL: "http://localhost:3001/bsc-test/api"
 }
 
+const PolygonMainNetFarmSetting: FarmSetting = {
+    INITIAL_ALLOWED_SLIPPAGE: 50,
+    FACTORY_ADDRESS: "0x3d077c05c3AbCE52257E453607209f81D9db01fC",
+    INIT_CODE_HASH: "0xfbf3b88d6f337be529b00f1dc9bff44bb43fa3c6b5b7d58a2149e59ac5e0c4a8",
+    WETH: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+    NATIVE_CURRENCY: "MATIC",
+    ROUTER_ADDRESS: "0x4DCa8E42634abdE1925ebB7f82AC29Ea00d34bA2",
+    FARMS_ADDRESS: '0x6ef448ecb7f650c3a1157acf37ca19ae86dee8da', // not yet changed
+    FLASH_ARBITRAGE_ADDRESS: "0x4a4783Cf89593127180FD216d1302EE11f72D085",
+    BLOCK_TIME: 2,
+    BLOCKS_PER_YEAR: calcBlocksPerPeriod('year', 2),
+    BLOCKS_PER_MONTH: calcBlocksPerPeriod('month', 2),
+    RPC_URL: "https://polygon-rpc.com",
+    API_URL: "http://localhost:3001/polygon-main/api"
+}
+
 const FarmSettingSelector = (arg: string) => {
     return {
         56: BscMainNetFarmSetting,
-        97: BscTestNetFarmSetting
+        97: BscTestNetFarmSetting,
+        137: PolygonMainNetFarmSetting
     }[arg];
 }
 
