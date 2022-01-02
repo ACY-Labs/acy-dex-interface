@@ -441,7 +441,7 @@ const AcyLiquidityPositions = (props) => {
 
     const fetchPoolShare = async (pair) => {
       console.log("poolToken,", pair.liquidityToken)
-      let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library);
+      let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library).catch(e => console.log("fetchPoolShare error", e));
       if (userPoolBalance.isZero()) {
         console.log("zero balance, discard");
         return {};
@@ -566,7 +566,7 @@ const AcyLiquidityPositions = (props) => {
   // first time loading
   useEffect(() => {
     getValidPoolList();
-  }, [account]);
+  }, [account, chainId]);
   // refresh table data on add/remove liquidity
   useEffect(() => {
     if (liquidity.refreshTable) {
@@ -597,10 +597,10 @@ const AcyLiquidityPositions = (props) => {
   useEffect(
     async () => {
       if (!chainId || !library || !account || !userLPHandlers) return;
-      console.log("getting user liquidity")
+      console.log("getting user liquidity on chainId, userLPHandlers", chainId, userLPHandlers)
       await getUserPoolShare();
     },
-    [chainId, library, account, userLPHandlers]
+    [userLPHandlers]
   );
 
 
