@@ -141,9 +141,6 @@ function MarketPoolInfo(props) {
       if (data.length > 1) {
         setTvlChange(calcPercentChange(parseFloat(data[data.length-1].reserveUSD),parseFloat(data[data.length-2].reserveUSD)));
         setVolChange(calcPercentChange(parseFloat(data[data.length-1].dailyVolumeUSD),parseFloat(data[data.length-2].dailyVolumeUSD)));
-      } else {
-        setTvlChange(0);
-        setVolChange(0);
       }
     });
 

@@ -104,15 +104,20 @@ function MarketTokenInfo(props) {
       let length = data.length;
 
       let priceToday = parseFloat(data[length - 1].priceUSD);
-      let pricePrev = parseFloat(data[length - 2].priceUSD);
-      let priceChange = ((priceToday - pricePrev) / pricePrev) * 100;
+      let priceChange = 0;
+      if (data.length > 1) {
+        const pricePrev = parseFloat(data[length - 2].priceUSD);
+        priceChange = ((priceToday - pricePrev) / pricePrev) * 100;
+      }
 
       // calculate volume 7d and set
       let volume7d = 0;
-      for (let i = 1; i <= 7; i++) {
-        volume7d += parseFloat(data[length - i].dailyVolumeUSD);
+      if (data.length >= 7) {
+        for (let i = 1; i <= 7; i++) {
+          volume7d += parseFloat(data[length - i].dailyVolumeUSD);
+        }
+        setVolume7d(volume7d);
       }
-      setVolume7d(volume7d);
 
       // extract graph datas
       let volumeGraphData = [];
@@ -141,8 +146,9 @@ function MarketTokenInfo(props) {
       setSelectChartDataPrice(abbrNumber(priceGraphData[length - 1][1]));
 
       setTvl(parseFloat(tvlGraphData[length - 1][1]));
-      setTvlChange(calcPercentChange(tvlGraphData[length - 1][1], tvlGraphData[length - 2][1]))
-
+      if (tvlGraphData.length > 1) {
+        setTvlChange(calcPercentChange(tvlGraphData[length - 1][1], tvlGraphData[length - 2][1]))
+      }
 
       // fetchFilteredTransaction(marketClient, pairAddresses).then(transactions => {
       //   console.log('TOIKEN TRANSAC', transactions);
@@ -187,9 +193,12 @@ function MarketTokenInfo(props) {
       });
 
       setVolume24h(volumeGraphData[volumeGraphData.length - 1][1]);
-      setVol24Change(
-        calcPercentChange(volumeGraphData[volumeGraphData.length - 1][1] - volumeGraphData[volumeGraphData.length - 2][1], volumeGraphData[volumeGraphData.length - 2][1] - volumeGraphData[volumeGraphData.length - 3][1])
-      );
+      
+      if (volumeGraphData.length > 1) {
+        setVol24Change(
+          calcPercentChange(volumeGraphData[volumeGraphData.length - 1][1] - volumeGraphData[volumeGraphData.length - 2][1], volumeGraphData[volumeGraphData.length - 2][1] - volumeGraphData[volumeGraphData.length - 3][1])
+        );
+      }
     });
 
     fetchPoolDayData(address).then(parsedPairData => {
