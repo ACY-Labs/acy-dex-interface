@@ -82,7 +82,7 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
     };
 
     const initTokenBalanceDict = (tokenList) => {
-        console.log('Init Token Balance!!!! with TokenList', tokenList);        
+        console.log('Init Token Balance!!!! with chainId, TokenList', chainId, tokenList);        
         const newTokenBalanceDict = {};
         asyncForEach(tokenList, async(element, index) => {
             console.log("dispatched async", element)
@@ -158,7 +158,7 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
                     <div className={styles.coinList}>
                         <AcyTabs>
                             <AcyTabPane tab="All" key="1">
-                                {customTokenList.length ? customTokenList.map((token, index) => {
+                                {/* {customTokenList.length ? customTokenList.map((token, index) => {
                                     return (
                                         <AcyCoinItem
                                             data={token}
@@ -172,7 +172,7 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
                                             constBal={ token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null }
                                         />
                                     );
-                                }) : null}
+                                }) : null} */}
 
                                 {initTokenList.length ? initTokenList.map((token, index) => {
                                     return (

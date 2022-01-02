@@ -86,6 +86,7 @@ import {
 const { AcyTabPane } = AcyTabs;
 
 const AddLiquidityComponent = props => {
+
   const { account, chainId, library, tokenList: INITIAL_TOKEN_LIST, farmSetting: {API_URL: apiUrlPrefix, INITIAL_ALLOWED_SLIPPAGE}} = useConstantLoader();
 
   const { dispatch, token, onLoggedIn, isFarm = false } = props;
@@ -363,7 +364,7 @@ const AddLiquidityComponent = props => {
   };
 
   const ConnectWallet = () => {
-    activate(binance);
+    //activate(binance);
     activate(injected);
   };
 
@@ -395,7 +396,7 @@ const AddLiquidityComponent = props => {
         alert('Please connect to your account');
       } else {
         setToken0(token);
-        setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
+        setToken0Balance(await getUserTokenBalance(token, chainId, account, library).catch(e => console.log("addComponent onTokenClick error", e)));
         setToken0BalanceShow(true);
       }
     } else {
@@ -403,7 +404,7 @@ const AddLiquidityComponent = props => {
         alert('Please connect to your account');
       } else {
         setToken1(token);
-        setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
+        setToken1Balance(await getUserTokenBalance(token, chainId, account, library).catch(e => console.log("addComponent onTokenClick error", e)));
         setToken1BalanceShow(true);
       }
     }
@@ -521,10 +522,10 @@ const AddLiquidityComponent = props => {
       console.log("fetched token ds", modelToken0, modelToken1)
 
       setToken0(modelToken0);
-      setToken0Balance(await getUserTokenBalance(modelToken0, chainId, account, library));
+      setToken0Balance(await getUserTokenBalance(modelToken0, chainId, account, library).catch(e => console.log("addComponent liquidity update dispatch error", e)));
       setToken0BalanceShow(true);
       setToken1(modelToken1);
-      setToken1Balance(await getUserTokenBalance(modelToken1, chainId, account, library));
+      setToken1Balance(await getUserTokenBalance(modelToken1, chainId, account, library).catch(e => console.log("addComponent liquidity update dispatch error", e)));
       setToken1BalanceShow(true);
 
     }
@@ -786,7 +787,7 @@ const AddLiquidityComponent = props => {
                     disabled={!buttonStatus}
                     onClick={async () => {
                       if (account == undefined) {
-                        activate(binance);
+                        //activate(binance);
                         activate(injected);
                         setButtonContent('Choose tokens and amount');
                         setButtonStatus(false);

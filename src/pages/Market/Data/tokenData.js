@@ -14,9 +14,11 @@ import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import {findTokenWithAddress} from '@/utils/txData';
 import {totalInUSD} from '@/utils/utils';
 import { symbol } from 'prop-types';
+
 import axios from "axios";
 import { getAddress } from '@ethersproject/address';
 import { API_URL, TOKENLIST} from '@/constants';
+
 
 export async function fetchTokenInfo(client, tokenAddress, timestamp) {
   const block = await getBlockFromTimestamp(timestamp);

@@ -4,10 +4,11 @@ import { convertTx, ACY_ROUTER } from './util';
 import axios from 'axios';
 import {getTransactionsByAccount} from '@/utils/txData'
 import { getLibrary } from '../ConnectWallet';
+
 import {getAllSuportedTokensPrice} from "@/acy-dex-swap/utils"
 import { totalInUSD } from '@/utils/utils';
 import {API_URL} from '@/constants';
-// const apiUrlPrefix = API_URL();
+// const apiUrlPrefix = API_URL();    
 // SAMPLE TRANSACTION DATA
 // {
 //     coin1: 'USDC',
@@ -59,8 +60,10 @@ export async function fetchGlobalTransaction(){
   try{
     let request = API_URL()+'/txlist/all?'+'range=50';
     // let request = 'http://localhost:3001/api/users/all';
+
     let response = await fetch(request);
     let data = await response.json();
+
     // console.log(data.data);
     return await parseTransactionList(data.data);
   }catch (e){

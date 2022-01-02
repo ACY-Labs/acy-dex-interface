@@ -1,5 +1,4 @@
 import { useWeb3React } from '@web3-react/core';
-import { binance, injected } from '@/connectors';
 import React, { Component, useState, useEffect, useRef } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { connect } from 'umi';
@@ -34,6 +33,7 @@ import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
 import { useConstantLoader } from '@/constants';
+import {useConnectWallet} from '@/components/ConnectWallet';
 
 const { AcyTabPane } = AcyTabs;
 function getTIMESTAMP(time) {
@@ -125,6 +125,7 @@ const Swap = props => {
   const [transactionNum, setTransactionNum] = useState(0);
   const { activate } = useWeb3React();
 
+
   useEffect(() => {
     if (!supportedTokens) return
 
@@ -155,18 +156,10 @@ const Swap = props => {
   refContainer.current = transactionList;
 
   // connect to provider, listen for wallet to connect
-
-  // useEffect(() => {
-  //   if(!account){
-  //     activate(binance);
-  //   }
-  //   console.log("parent page account", account)
-  // }, [account])
-
+  const connectWalletByLocalStorage = useConnectWallet();
   useEffect(() => {
     if(!account){
-      activate(binance);
-      activate(injected);
+      connectWalletByLocalStorage()
      }
     getTransactionsByAccount(account,library,'SWAP').then(data =>{
       console.log("found this tx dataa::::::", data);

@@ -9,7 +9,17 @@ import SampleStakeHistoryData from './SampleDaoData';
 import { useWeb3React } from '@web3-react/core';
 import { InjectedConnector } from '@web3-react/injected-connector';
 import { getAllPools, getPool, newGetAllPools } from '@/acy-dex-swap/core/farms';
-import { binance, injected } from '@/connectors';
+import {
+  injected,
+  walletconnect,
+  walletlink,
+  fortmatic,
+  portis,
+  torus,
+  trezor,
+  ledger,
+  binance,
+} from '@/connectors';
 import PageLoading from '@/components/PageLoading';
 import Eth from "web3-eth";
 import { Web3Provider, JsonRpcProvider } from "@ethersproject/providers";
@@ -18,6 +28,8 @@ import { parse } from 'path-to-regexp';
 import {BLOCK_TIME, RPC_URL} from '@/acy-dex-swap/utils';
 // import {constantInstance} from "@/constants";
 import { useConstantLoader } from '@/constants';
+import {useConnectWallet} from "@/components/ConnectWallet"
+
 // const supportedTokens = constantInstance.farm_setting.TOKENLIST();
 
 const Farms = (props) => {
@@ -61,10 +73,9 @@ const Farms = (props) => {
   // method to activate metamask wallet.
   // calling this method for the first time will cause metamask to pop up,
   // and require user to approve this connection.
-
+  const connectWalletByLocalStorage = useConnectWallet();
   const connectWallet = async () =>  {
-    activate(binance);
-    activate(injected);
+    connectWalletByLocalStorage();
   };
 
   //function to get logo URI
@@ -187,6 +198,7 @@ const Farms = (props) => {
     setIsLoadingPool(false);
     console.log("end getPools");
   };
+  
   useEffect(
     () => {
        console.log("HERE TEST:",account);
@@ -198,11 +210,13 @@ const Farms = (props) => {
         setWalletConnected(true);
         console.log("start getPools",library,chainId);
         getPools(library, account, chainId);
+
       } else {
         const provider = new JsonRpcProvider(RPC_URL(), chainId);
         const account = "0x0000000000000000000000000000000000000000";
         setWalletConnected(false);
         getPools(provider, account, chainId);
+
       }
     },
     [account, chainId]

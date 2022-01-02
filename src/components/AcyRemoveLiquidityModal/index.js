@@ -430,7 +430,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
               );
             } else if (buttonStatus) {
               if (account == undefined) {
-                activate(binance);
+                //activate(binance);
                 activate(injected);
               } else {
                 console.log(buttonStatus);

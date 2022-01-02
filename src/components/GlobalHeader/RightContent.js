@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, connect } from 'umi';
-import { Spin, Tag, Menu, Icon, Dropdown } from 'antd';
+import { Spin, Tag, Menu, Icon, Dropdown, Button, Space, Modal } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
 import { Link } from 'react-router-dom';
@@ -13,7 +13,7 @@ import {
   AcySeting,
 } from '@/components/Acy';
 import { useWeb3React } from '@web3-react/core';
-
+import { useConstantLoader } from '@/constants'
 import {
   injected,
   walletconnect,
@@ -28,6 +28,7 @@ import {
 
 import styles from './index.less';
 import { ReactComponent as Opera } from './Opera.svg';
+import styled from "styled-components";
 
 const GlobalHeaderRight = props => {
   const { global } = props;
@@ -35,15 +36,24 @@ const GlobalHeaderRight = props => {
   const [visible, setVisible] = useState(false);
   const [visibleMetaMask, setVisibleMetaMask] = useState(false);
   const [visibleSetting, setVisibleSetting] = useState(false);
+  const [only, setOnly] = useState(true);
   // 连接钱包函数
   const { account, chainId, library, activate, deactivate, active } = useWeb3React();
+  //const { activate, deactivate, active } = useWeb3React();
+  //const { account, library, chainId } = useConstantLoader();
+  //const { tokenList: supportedTokensd } = useConstantLoader();
+  const [wallet, setWallet] = useState(localStorage.getItem("wallet"));
 
+  // 连接钱包 根据localStorage
   useEffect(() => {
-    if (!account){
-      activate(binance);
-      activate(injected);
+    setWallet(localStorage.getItem("wallet"))
+    if (!account) {
+      if(!wallet){
+        console.log("localStroage dosen't exist");
+        localStorage.setItem('wallet', 'binance');
+      }
     }
-  }, []);
+  }, [account]);
 
   useEffect(() => {
     console.log('test current active', active)
@@ -102,6 +112,7 @@ const GlobalHeaderRight = props => {
   };
   const onhandMetaMask = () => {
     setVisibleMetaMask(true);
+    setNetworkListIndex(n_index(chainId));
   };
   const onhandCancelMetaMask = () => {
     setVisibleMetaMask(false);
@@ -109,11 +120,17 @@ const GlobalHeaderRight = props => {
   const onhandSetting = flag => {
     setVisibleSetting(!!flag);
   };
-  const handleVisibleChange = () => {};
+  const handleVisibleChange = () => { }
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
 
   // 选择钱包
   const selectWallet = walletName => {
-    console.log('selecting wallet');
+    console.log('selecting wallet', walletName);
     if (walletName === 'metamask' || walletName === 'opera') {
       activate(injected);
     } else if (walletName === 'walletconnect') {
@@ -130,11 +147,27 @@ const GlobalHeaderRight = props => {
       activate(trezor);
     } else if (walletName === 'ledger') {
       activate(ledger);
-    } else if(walletName === 'binance'){
+    } else if (walletName === 'binance') {
       activate(binance);
+    } else{
+      console.log("wallet ERROR");
     }
+    localStorage.setItem('wallet', walletName);
     setVisibleMetaMask(false);
   };
+  // 初始网络显示
+  const n_index = chainId=> {
+    if (chainId == 56) {
+      return 0
+    }
+    if (chainId == 97) {
+      return 1
+    }
+    if (chainId == 137) {
+      return 2
+    }
+    return 0
+  }
   // 通知钱包连接成功
   useEffect(() => {
     // todo....
@@ -142,7 +175,19 @@ const GlobalHeaderRight = props => {
       console.log(account);
       setVisibleMetaMask(false);
     }
-  }, account);
+    // 监听钱包网络变化 metamask
+    ethereum.on('networkChanged', function (chainId) {
+      console.log("networkChanged:", chainId)
+      if (chainId != 56 && chainId != 97 && chainId != 137) {
+        console.log("ERROR: unsupport NetWork");
+        setIsModalVisible(true);
+        switchEthereumChain("0x38"); //返回默认56链
+      }else{
+        setIsModalVisible(false);
+        setVisibleMetaMask(false);
+      }
+    })
+  }, account, chainId);
   const {
     currentUser,
     fetchingMoreNotices,
@@ -196,7 +241,7 @@ const GlobalHeaderRight = props => {
     {
       name: 'Binance Wallet',
       icon: 'Binance',
-      onClick:()=>{
+      onClick: () => {
         selectWallet('binance');
       },
     },
@@ -268,7 +313,64 @@ const GlobalHeaderRight = props => {
       },
     },
   ];
-  const [only, setOnly] = useState(true);
+
+  const networkParams = {
+    "0x38": {
+      chainId: '0x38',
+      chainName: 'Binance Smart Chain Netwaok',
+      nativeCurrency: {
+        name: 'Binance',
+        symbol: 'BNB', // 2-6 characters long
+        decimals: 18
+      },
+      blockExplorerUrls: ['https://bscscan.com'],
+      rpcUrls: ['https://bsc-dataseed.binance.org/'],
+    },
+    "0x61": {
+      chainId: '0x61',
+      chainName: 'Binance Smart Chain Testnet',
+      nativeCurrency: {
+        name: 'Binance',
+        symbol: 'BNB', // 2-6 characters long
+        decimals: 18
+      },
+      blockExplorerUrls: ['https://testnet.bscscan.com'],
+      rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
+    },
+    "0x89": {
+      chainId: '0x89',
+      chainName: 'Polygin',
+      nativeCurrency: {
+        name: 'Matic',
+        symbol: 'MATIC', // 2-6 characters long
+        decimals: 18
+      },
+      blockExplorerUrls: ['https://polygonscan.com/'],
+      rpcUrls: ['https://polygon-rpc.com/'],
+    },
+  };
+
+  const switchEthereumChain = async (chainId) => {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: chainId }],
+      });
+    } catch (e) {
+      if (e.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              networkParams[chainId]
+            ],
+          });
+        } catch (addError) {
+          console.error(addError);
+        }
+      }
+    }
+  }
   const showMore = () => {
     setOnly(!only);
   };
@@ -278,7 +380,51 @@ const GlobalHeaderRight = props => {
   if (theme === 'dark') {
     className = `${styles.right}  ${styles.dark}`;
   }
-
+  // 网络列表
+  const [networkListIndex, setNetworkListIndex] = useState(0);
+  const networkList = [
+    {
+      name: 'BSC mainnet',
+      icon: 'Binance',
+      onClick: async () => {
+        await switchEthereumChain("0x38");
+        setVisibleMetaMask(false);
+      },
+    },
+    {
+      name: 'BSC testnet',
+      icon: 'Binance',
+      onClick: async () => {
+        await switchEthereumChain("0x61");
+        setVisibleMetaMask(false);
+      },
+    },
+    {
+      name: 'Polygon',
+      icon: 'Polygon',
+      onClick: async () => {
+        await switchEthereumChain("0x89");
+        setVisibleMetaMask(false);
+      },
+    }
+  ];
+  const networkListInCardList = (
+    <div className={styles.networkListBlock}>
+      <AcyCardList>
+        {networkList.map((item) => {
+          return (
+            <AcyCardList.Thin className={styles.networkListLayout} onClick={() => item.onClick()}>
+              {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
+                <AcyIcon.MyIcon width={32} type={item.icon} />
+              )}
+              <span>{item.name}</span>
+            </AcyCardList.Thin>
+          );
+        }
+        )}
+      </AcyCardList>
+    </div>
+  );
   return (
     <div className={className}>
       {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
@@ -343,7 +489,31 @@ const GlobalHeaderRight = props => {
           />
         </Dropdown>
       )}
+
       <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}>
+
+        {/* 此处增加简单ui */}
+        <div className={styles.walltitle}>
+          <span style={{ marginLeft: '10px' }}>Select Network</span>
+        </div>
+        <Dropdown
+          overlay={networkListInCardList}
+          trigger={['click']}
+          placement="bottomLeft"
+        >
+          <AcyCardList>
+            {[networkList[networkListIndex]].map(item => (
+              <AcyCardList.Thin className={styles.networkListLayout}>
+                {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
+                  <AcyIcon.MyIcon width={32} type={item.icon} />
+                )}
+                <span>{item.name}</span>
+              </AcyCardList.Thin>
+            ))}
+          </AcyCardList>
+        </Dropdown>
+        { /* 此处增加简单ui 结束 */}
+
         <div className={styles.walltitle}>
           {/* <AcyIcon.MyIcon width={20} type="Wallet" />{' '} */}
           <span style={{ marginLeft: '10px' }}>Select a Wallet</span>
@@ -368,17 +538,18 @@ const GlobalHeaderRight = props => {
               <span>{item.name}</span>
             </AcyCardList.Thin>
           ))}
-          {BinanceWallet.map(item =>(
-            <AcyCardList.Thin onClick={()=>item.onClick()}>
+          {BinanceWallet.map(item => (
+            <AcyCardList.Thin onClick={() => item.onClick()}>
               {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
-              <AcyIcon.MyIcon width={32} type={item.icon} />
-            )}
-            <span>{item.name}</span>
-          </AcyCardList.Thin>
+                <AcyIcon.MyIcon width={32} type={item.icon} />
+              )}
+              <span>{item.name}</span>
+            </AcyCardList.Thin>
           ))}
         </AcyCardList>
 
         <AcyCardList>
+
           {walletList.map((item, index) => {
             if (only && index > -1) {
               return;
@@ -431,6 +602,12 @@ const GlobalHeaderRight = props => {
           </AcyCardList>
         )} */}
       </AcyModal>
+        {/* 错误弹窗*/}
+      <AcyModal width={420} visible={isModalVisible}>
+      <p>ERROR: UNSUPPORT NETWORKS</p>
+      <p>We are not ready for this networks, please change your networks!</p>
+      </AcyModal>
+      
     </div>
   );
 };

@@ -26,6 +26,7 @@ import {
   fetchSearchCoinReturns,
   fetchSearchPoolReturns,
 } from './Data';
+
 import {SCAN_URL_PREFIX} from "@/constants";
 
 

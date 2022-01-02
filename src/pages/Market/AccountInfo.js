@@ -404,12 +404,6 @@ function AccountInfo(props) {
     });
 
   // method to prompt metamask extension for user to connect their wallet.
-  // const connectWallet = () => activate(injected);
-  const connectWallet = () => {
-    activate(binance);
-    activate(injected);
-  }
-
   useEffect(
     () => {
       // console.log("TEST HERE ADDRESS:",address);
@@ -417,6 +411,7 @@ function AccountInfo(props) {
       // fetchPoolsFromAccount(marketClient, address).then(data => {
       //   setLiquidityPositions(data);
       // });
+
 
       // const getPools = async (library, account) => {
       //   // get all pools from the farm contract.
@@ -472,6 +467,7 @@ function AccountInfo(props) {
       //   setTableRow(newFarmsContents);
       //   setIsLoadingPool(false);
       // };
+
 
       // account will be returned if wallet is connected.
       // so if account is present, retrieve the farms contract.
