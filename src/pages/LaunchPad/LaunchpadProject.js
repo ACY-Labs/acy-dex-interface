@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-indent */
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Progress, Button, Table, Input, Tooltip, Icon } from 'antd';
+import { Progress, Button, Table, Input, Tooltip, Icon, Alert } from 'antd';
 import { history } from 'umi';
 import styles from "./styles.less"
 import LaunchChart from './launchChart';
@@ -41,6 +41,7 @@ const LaunchpadProject = () => {
   
   const InputGroup = Input.Group;
   const { account, chainId, library, activate, active } = useWeb3React();
+  const PoolContract = getContract("0x6e0EC29eA8afaD2348C6795Afb9f82e25F196436", POOLABI, library, account);
 
   const connectWallet = async () =>  {
     activate(binance);
@@ -53,7 +54,10 @@ const LaunchpadProject = () => {
   const [poolDistributionDate, setDistributionDate] = useState(null);
   const [poolDistributionStage, setpoolDistributionStage] = useState(null);
   const [poolStageCount, setpoolStageCount] = useState(0);
+  const [poolInvestorData, setPoolInvestorData] = useState(null);
   const [poolStatus, setPoolStatus] = useState(0);
+  const [isError, setIsError] = useState(false);
+  const [hasCollected, setHasCollected] = useState(false);
   const [isVesting, setIsVesting] = useState(false);
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
@@ -525,6 +529,23 @@ const LaunchpadProject = () => {
       </div>
     )}
 
+    useEffect(() => {
+      let timeout
+      if (isError) {
+        timeout = setTimeout(() => setIsError(false), 1000);
+      }
+      if (hasCollected){
+        timeout = setTimeout(() => setHasCollected(false), 1000);
+      }
+      return () => clearTimeout(timeout);
+  }, [isError, hasCollected]);
+
+    const vestingClaimClicked = () => {
+      const res = []
+      if (!account) setIsError(true)
+
+    }
+
     return (
       <div>
       { !isVesting ? 
@@ -689,11 +710,13 @@ const LaunchpadProject = () => {
     const pool = []
     const distributionRes = []
     const distributionStage = []
+    const investorRes = []
 
     // 合约函数调用
     const baseData = await poolContract.GetPoolBaseData(3)
     const distributionData = await poolContract.GetPoolDistributionData(3)
     const status = await poolContract.GetPoolStatus(3)
+    const investorData = PoolContract.GetInvestmentData(3, account)
     // getpoolbasedata 数据解析
     const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
     const token1decimal = await token1contract.decimals()
@@ -715,6 +738,9 @@ const LaunchpadProject = () => {
     distributionData[1].map(uTime => distributionRes.push(convertUnixTime(uTime)))
     distributionData[2].map(vestingRate => distributionStage.push(BigNumber.from(vestingRate).toBigInt().toString()))
 
+    // getinvestmentdata 数据解析以及存放
+    investorData.map(data => investorRes.push(Number(BigNumber.from(data).toBigInt())))
+
     // 判断当前是否是vesting阶段
     const tempArr = distributionData[1]
     if(d > tempArr[0]) setIsVesting(true)
@@ -724,6 +750,7 @@ const LaunchpadProject = () => {
     setpoolStageCount(Number(BigNumber.from(distributionData[0]).toBigInt())) // vesting阶段的次数
     setpoolDistributionStage(distributionStage)
     setPoolStatus(Number(BigNumber.from(status).toBigInt()))
+    setPoolInvestorData(investorRes)
   }
 
   // fetching data from Smart Contract
@@ -747,6 +774,8 @@ const LaunchpadProject = () => {
   return (
     <div>
       <div className="mainContainer">
+        {isError ? <Alert message="Please connect to your wallet." type="error" showIcon /> : ""}
+        {hasCollected ? <Alert message="You have collected token for current vesting stage." type="info" showIcon /> : ""}
         <TokenBanner posterUrl={receivedData.posterUrl} />
         <TokenLogoLabel projectName={receivedData.projectName} tokenLogo={receivedData.tokenLogoUrl} />
         <CardArea walletId={account} allocationAmount={allocationAmount} setAllocationAmount={setAllocationAmount}/>
