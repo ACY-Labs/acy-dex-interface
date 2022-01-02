@@ -806,12 +806,6 @@ function getChartData (data){
     }
 }
 
-// check if the transaction is for routing or one way
-function checkIfItsRoute(transferLogs, address) {
-    const transferLog = transferLogs.find(item => address == (web3.eth.abi.decodeParameter("address", item.topics[1])).toLowerCase());
-    return transferLog
-}
-
 // Pass in start of the path.
 function getTransferLogPath(transferLogs, pathList, fromAddress, destAddress) {
     const transferLog = transferLogs.find(item => fromAddress == (web3.eth.abi.decodeParameter("address", item.topics[1])).toLowerCase());
@@ -893,7 +887,9 @@ export async function fetchTransactionData(address,library, account){
                     if (transferFromAddress == sourceAddress) {
                         let pathList = [i];
                         let path = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
-                        routes_loglists.push(path);
+                        if (path != null) {
+                            routes_loglists.push(path);
+                        }
                     }
                 } 
             } else if (methodUsed === methodList.bsc.swapExactETHForTokensByArb.name) {
@@ -917,13 +913,24 @@ export async function fetchTransactionData(address,library, account){
                     if (transferFromAddress == sourceAddress) {
                         let pathList = [i];
                         let path = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
-                        routes_loglists.push(path);
+                        if (path != null) {
+                            routes_loglists.push(path);
+                        }
                     }
-                } 
-
+                }
             } else if (methodUsed === methodList.bsc.swapTokensForExactTokensByArb.name) {
                 console.log("method: swapTokensForExactTokensByArb")
-
+                for (let i = 0; i < transferLogs.length; i++) {
+                    let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
+                    let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
+                    if (transferFromAddress == sourceAddress) {
+                        let pathList = [i];
+                        let path = getTransferLogPath(transferLogs, pathList, transferToAddress, sourceAddress);
+                        if (path != null) {
+                            routes_loglists.push(path);
+                        }
+                    }
+                }
             } else if (methodUsed === methodList.bsc.swapETHForExactTokensByArb.name) {
                 console.log("method: swapETHForExactTokensByArb")
 
