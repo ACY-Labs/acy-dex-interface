@@ -692,3 +692,11 @@
 .ant-table-row-cell-ellipsis, .ant-table-row-cell-ellipsis .ant-table-column-title{
   text-align: right !important;
 }
+
+.tool-tip-content{
+  font-size: 0.75rem;
+}
+
+.tool-tip-icon{
+  cursor: pointer;
+}

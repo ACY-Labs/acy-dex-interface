@@ -409,6 +409,8 @@ const LaunchpadProject = () => {
         originalElementParent.textContent = `$${allocationAmount}`;
         originalElementParent.style.color = "#EB5C20"
       } catch (err) {
+        // set all values to $0 due to error
+        innerText.textContent = "$0";
         console.log(err);
       }
       // originalElementParent.textContent = allocationAmount;
@@ -519,11 +521,11 @@ const LaunchpadProject = () => {
       <div>
         <span>Increase Your Allocation Amount:</span>
         <br />
-        <span>
+        <span className='tool-tip-content'>
           1.Increase your trading volume @ <a href="app.acy.finance/#/exchange" target="_blank">Exchange</a>
         </span>
         <br />
-        <span>
+        <span className='tool-tip-content'>
           2.Increase your liquidity @ <a href="app.acy.finance/#/liquidity" target="_blank">Liquidity</a>
         </span>
       </div>
@@ -558,8 +560,8 @@ const LaunchpadProject = () => {
         >
           <div className="allocation-title-container">
             <p className="allocation-title">Allocation</p>
-            <Tooltip title={tooltipTitle} mouseEnterDelay={0.5} mouseLeaveDelay={1.5}>
-              <Icon type="info-circle" />
+            <Tooltip title={tooltipTitle} mouseEnterDelay={0} mouseLeaveDelay={0.25}>
+              <Icon type="info-circle" className='tool-tip-icon' />
             </Tooltip>
             <div className='allocation-cards'>
               <div className="allocationContainer">{allocationCards()}</div>
