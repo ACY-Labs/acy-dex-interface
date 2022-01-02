@@ -16,6 +16,7 @@ const RPC_URLS = {
   4: 'https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
   56: 'https://bsc-dataseed.binance.org/',
   97: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+  137: 'https://polygon-rpc.com'
 };
 const POLLING_INTERVAL = 12000;
 

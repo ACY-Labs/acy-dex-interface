@@ -23,7 +23,7 @@ const BscMainNetTokenList: Array<TokenInfo> = [
     address: '0xc94595b56e301f3ffedb8ccc2d672882d623e53a',
     decimals: 18,
     logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
-    idOnCoingecko: "usd-coin",
+    idOnCoingecko: "acy-finance",
   },
   {
     name: 'Binance Coin',
@@ -103,7 +103,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
     logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
-    idOnCoingecko: "usd-coin",
+    idOnCoingecko: "acy-finance",
   },
 
   {
@@ -295,10 +295,70 @@ const BscTestNetTokenList: Array<TokenInfo> = [
   },
 ];
 
+const PolygonMainNetTokenList: Array<TokenInfo> = [
+  {
+    name: 'USD Tether',
+    symbol: 'USDT',
+    address: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
+    decimals: 18,
+    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg', // not changed
+    idOnCoingecko: "tether",
+  },
+  {
+    name: 'ACY',
+    symbol: 'ACY',
+    address: '0x8b1f836491903743fe51acd13f2cc8ab95b270f6',
+    decimals: 18,
+    logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
+    idOnCoingecko: "acy-finance",
+  },
+  {
+    name: 'Binance Coin',
+    symbol: 'BNB',
+    address: '0x3BA4c387f786bFEE076A58914F5Bd38d668B42c3',
+    decimals: 18,
+    logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
+    idOnCoingecko: "binancecoin",
+  },
+  {
+    name: 'USD Coin',
+    symbol: 'USDC',
+    address: '0xe9e7cea3dedca5984780bafc599bd69add087d56',
+    decimals: 6,
+    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
+    idOnCoingecko: "usd-coin",
+  },
+  {
+    name: 'WETH',
+    symbol: 'WETH',
+    address: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
+    decimals: 18,
+    logoURI: 'https://dapp.ptokens.io/assets/svg/pETH.svg',
+    idOnCoingecko: "weth",
+  },
+  {
+    name: 'pTokens Bitcoin',
+    symbol: 'pBTC',
+    address: '0xd7ecf95cf7ef5256990beaf4ac895cd9e64cb947',
+    decimals: 18,
+    logoURI: 'https://dapp.ptokens.io/assets/svg/pBTC.svg',
+    idOnCoingecko: "ptokens-btc",
+  },
+  {
+    name: 'Wrapped Bitcoin',
+    symbol: 'WBTC',
+    address: '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6',
+    decimals: 8,
+    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/WBTC.svg',
+    idOnCoingecko: "wrapped-bitcoin",
+  },
+];
+
 const TokenListSelector = (arg: string) => {
   return {
     56: BscMainNetTokenList,
-    97: BscTestNetTokenList
+    97: BscTestNetTokenList,
+    137: PolygonMainNetTokenList
   }[arg];
 }
 

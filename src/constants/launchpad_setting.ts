@@ -35,10 +35,16 @@ const PolygonMainNetLaunchpadSetting: LaunchpadSetting = {
     RPC_URL: "https://polygon-rpc.com"
 }
 
-// TODO: add Polygon net
+// NOTE (Gary): ETH is not supported now (2022.1.2)
+// const EthereumMainNetLaunchpadSetting: LaunchpadSetting = {
+//     CHAIN_ID: 1,
+//     ADDRESS: "",
+//     RPC_URL: "https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2"
+// }
 
 const LaunchpadSettingSelector = (arg: string) => {
     return {
+        // 1: EthereumMainNetLaunchpadSetting,
         97: BscTestNetLaunchpadSetting,
         56: BscMainNetLaunchpadSetting, 
         137: PolygonMainNetLaunchpadSetting

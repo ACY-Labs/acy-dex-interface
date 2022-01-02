@@ -339,7 +339,7 @@ const GlobalHeaderRight = props => {
     },
     "0x89": {
       chainId: '0x89',
-      chainName: 'Polygin',
+      chainName: 'Polygon',
       nativeCurrency: {
         name: 'Matic',
         symbol: 'MATIC', // 2-6 characters long
@@ -384,7 +384,7 @@ const GlobalHeaderRight = props => {
   const [networkListIndex, setNetworkListIndex] = useState(0);
   const networkList = [
     {
-      name: 'BSC mainnet',
+      name: 'BSC Mainnet',
       icon: 'Binance',
       onClick: async () => {
         await switchEthereumChain("0x38");
@@ -392,7 +392,7 @@ const GlobalHeaderRight = props => {
       },
     },
     {
-      name: 'BSC testnet',
+      name: 'BSC Testnet',
       icon: 'Binance',
       onClick: async () => {
         await switchEthereumChain("0x61");

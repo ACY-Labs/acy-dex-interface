@@ -27,6 +27,8 @@ export let constantInstance = {
     'sdkSetting': SDK_SETTING
 };
 
+// export web3 wallet status
+export const CHAINID = () => constantInstance.chainId
 // export tokenList
 export const TOKENLIST = () => constantInstance.tokenList
 // export scanUrlPrefix
