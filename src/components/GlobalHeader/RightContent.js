@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, connect } from 'umi';
-import { Spin, Tag, Menu, Icon, Dropdown, Button, Space } from 'antd';
+import { Spin, Tag, Menu, Icon, Dropdown, Button, Space, Modal } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
 import { Link } from 'react-router-dom';
@@ -119,7 +119,21 @@ const GlobalHeaderRight = props => {
   const onhandSetting = flag => {
     setVisibleSetting(!!flag);
   };
-  const handleVisibleChange = () => { };
+  const handleVisibleChange = () => { }
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
 
   // 选择钱包
   const selectWallet = walletName => {
@@ -159,7 +173,7 @@ const GlobalHeaderRight = props => {
       console.log("networkChanged:", chainId)
       if (chainId != 56 && chainId != 97 && chainId != 137) {
         console.log("ERROR: unsupport NetWork");
-
+        setIsModalVisible(true);
         switchEthereumChain("0x38");
       }
     })
@@ -579,6 +593,12 @@ const GlobalHeaderRight = props => {
           </AcyCardList>
         )} */}
       </AcyModal>
+        {/* 错误弹窗*/}
+      <AcyModal width={420} visible={isModalVisible}  onOk={handleOk} onCancel={handleCancel}>
+      <p>ERROR: UNSUPPORT NETWORKS</p>
+      <p>We are not ready for this networks, please change your networks!</p>
+      </AcyModal>
+      
     </div>
   );
 };
