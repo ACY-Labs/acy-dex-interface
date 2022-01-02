@@ -816,11 +816,12 @@ function getTransferLogPath(transferLogs, pathList, fromAddress, destAddress) {
     pathList.push(transferLogs.indexOf(transferLog));
     if (transferToAddress == destAddress) {
         return pathList;
-    } else {
-        console.log("transferLog", transferLog);
-    }
+    } 
+    // else {
+    //     console.log("transferLog", transferLog);
+    // }
     pathList = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
-    console.log("pathList:", pathList);
+    // console.log("pathList:", pathList);
     return pathList;
 }
 
@@ -839,7 +840,7 @@ export async function fetchTransactionData(address,library, account){
         const transactionData = await library.getTransaction(address.toString());
         const sourceAddress = (transactionData.from).toLowerCase();
         const destAddress = (transactionData.to).toLowerCase();
-        console.log("transactionData", transactionData);
+        // console.log("transactionData", transactionData);
         // console.log(sourceAddress, destAddress);
 
         // this code is used to get METHOD ID
@@ -855,7 +856,7 @@ export async function fetchTransactionData(address,library, account){
             const methodUsedABI = ACYV1ROUTER02_ABI.find(item => item.name == methodUsed)
             const parsedInputData = "0x" + transactionData.data.substring(10, transactionData.data.length);
             const txnDataDecoded = web3.eth.abi.decodeParameters(methodUsedABI.inputs, parsedInputData);
-            console.log("txnDataDecoded", txnDataDecoded);
+            // console.log("txnDataDecoded", txnDataDecoded);
             const fromTokenAddress = txnDataDecoded.path[0];
             const toTokenAddress = txnDataDecoded.path[1];
             
@@ -870,17 +871,17 @@ export async function fetchTransactionData(address,library, account){
                 FlashArbitrageResult_Log.data, 
                 FlashArbitrageResult_Log.topics
                 )
-            console.log("txnReceiptDecoded", txnReceiptDecoded);
+            // console.log("txnReceiptDecoded", txnReceiptDecoded);
             
             /**
              * Parse transfer logs
              * 1. find all the routes from sourceAddress to destAddress
              * */
             const transferLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0] == actionList.transfer.hash);
-            console.log("transferLogs", transferLogs);
+            // console.log("transferLogs", transferLogs);
             const routes_loglists = [];
             if (methodUsed === methodList.bsc.swapExactTokensForTokensByArb.name) {
-                console.log("method: swapExactTokensForTokensByArb")
+                // console.log("method: swapExactTokensForTokensByArb")
                 for (let i = 0; i < transferLogs.length; i ++) {
                     let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
                     let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
@@ -893,7 +894,7 @@ export async function fetchTransactionData(address,library, account){
                     }
                 } 
             } else if (methodUsed === methodList.bsc.swapExactETHForTokensByArb.name) {
-                console.log("method: swapExactETHForTokensByArb")
+                // console.log("method: swapExactETHForTokensByArb")
                 for (let i = 0; i < transferLogs.length; i++) {
                     let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
                     let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
@@ -906,7 +907,7 @@ export async function fetchTransactionData(address,library, account){
                     }
                 } 
             } else if (methodUsed === methodList.bsc.swapExactTokensForETHByArb.name) {
-                console.log("method: swapExactTokensForETHByArb")
+                // console.log("method: swapExactTokensForETHByArb")
                 for (let i = 0; i < transferLogs.length; i++) {
                     let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
                     let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
@@ -919,7 +920,7 @@ export async function fetchTransactionData(address,library, account){
                     }
                 }
             } else if (methodUsed === methodList.bsc.swapTokensForExactTokensByArb.name) {
-                console.log("method: swapTokensForExactTokensByArb")
+                // console.log("method: swapTokensForExactTokensByArb")
                 for (let i = 0; i < transferLogs.length; i++) {
                     let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
                     let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
@@ -932,7 +933,7 @@ export async function fetchTransactionData(address,library, account){
                     }
                 }
             } else if (methodUsed === methodList.bsc.swapETHForExactTokensByArb.name) {
-                console.log("method: swapETHForExactTokensByArb")
+                // console.log("method: swapETHForExactTokensByArb")
                 for (let i = 0; i < transferLogs.length; i++) {
                     let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
                     let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
@@ -945,7 +946,7 @@ export async function fetchTransactionData(address,library, account){
                     }
                 }
             } else if (methodUsed === methodList.bsc.swapTokensForExactETHByArb.name) {
-                console.log("method: swapTokensForExactETHByArb")
+                // console.log("method: swapTokensForExactETHByArb")
                 for (let i = 0; i < transferLogs.length; i++) {
                     let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
                     let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
@@ -960,7 +961,7 @@ export async function fetchTransactionData(address,library, account){
             }
 
 
-            console.log("routes_loglists", routes_loglists);
+            // console.log("routes_loglists", routes_loglists);
 
             /**
              * Parse the routes_loglists into frontend readable data
@@ -1035,180 +1036,20 @@ export async function fetchTransactionData(address,library, account){
                 "FAOutput": (Math.floor(txnReceiptDecoded.FAOutput) / Math.pow(10, token3.decimals)),
                 "userDistributionAmount": (Math.floor(txnReceiptDecoded.userDistributionAmount) / Math.pow(10, token3.decimals))
             }
-            console.log("newData", newData);
+            // console.log("newData", newData);
 
             let chartData = getChartData(newData);
             newData.chartData = chartData;
             return newData;
-        }
-        // // token to eth
-        // else if (transactionData.data.startsWith(methodList.bsc.swapExactTokensForETHByArb.id)
-        //     || transactionData.data.startsWith(methodList.bsc.swapTokensForExactETHByArb.id)) {
-            
-        //     console.log("A token to eth transaction");
-        //     let response = await library.getTransactionReceipt(address.toString());
-        //     console.log("Response: ",response);
-        //     let FROM_HASH = account.toString().toLowerCase().slice(2);
-        //     let TO_HASH = response.to.toLowerCase().slice(2);
-        //     let logs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]==actionList.transfer.hash);
-        //     let gasFee = (transactionData.gasPrice.toNumber() / (Math.pow(10,18)) )* response.gasUsed.toNumber()
-        //     console.log("gas fee: ",gasFee);
+        } else if(transactionData.data.startsWith(methodList.addLiquidity.id)){
 
-        //     let routes = [];
-        //     let totalIn = 0;
-        //     let totalOut = 0;
-        //     let newData = {};
-        //     let token1;
-        //     let token2;
-        //     let token3;
-        //     for (let i=0;i<logs.length;){
-        //         token1 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
-        //         let ammount1 = (logs[i].data / Math.pow(10, token1.decimals)); 
-        //         i++;
+        } else if(transactionData.data.startsWith(methodList.addLiquidityEth.id)){
 
-        //         let ammount2 = 0;
+        } else if(transactionData.data.startsWith(methodList.removeLiquidity.id)){
 
-        //         if(!logs[i].topics[2].includes(TO_HASH)){
-        //             token2 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
-        //             ammount2 = (logs[i].data / Math.pow(10, token2.decimals)); 
-        //             i++;
-        //         }else{
-        //             token2 = null;
-        //         }
-        //         token3 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
-        //         let ammount3 = (logs[i].data / Math.pow(10, token3.decimals));
-        //         i++;
-                
-        //         routes.push({
-        //             "token1" : token1.symbol,
-        //             "token2" : token2 ? token2.symbol : null,
-        //             "token3" : token3.symbol,
-        //             "token1Num" : ammount1,
-        //             "token2Num" : token2 ? ammount2 : null,
-        //             "token3Num" : ammount3,
-        //             "logoURI" : token2 ? token2.logoURI : null
-        //         })
+        } else if(transactionData.data.startsWith(methodList.removeLiquidityETH.id)){
 
-        //         totalIn += ammount3;
-        //         totalOut += ammount1;
-        //     }
-            
-        //     //get amm output 
-        //     // var contract = getContract('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',IUniswapV2Router02ABI,library,account);
-        //     // let addressPath = [token1.addressOnEth,token2.addressOnEth];
-        //     // var liquidityOut = contract.getAmountsIn(1079,addressPath);
-        //     // console.log('testing :: ', liquidityOut);
-            
-        //     //get ether last price
-        //     let requestPrice = API+'?module=stats&action=bnbprice&apikey='+apikey;
-        //     let responsePrice = await fetch(requestPrice);
-        //     let ethPrice = await responsePrice.json();
-        //     ethPrice = parseFloat(ethPrice.result.ethusd);
-
-        //     console.log("fetching ethprice",ethPrice);
-
-        //     newData = {
-        //         "routes" : routes,
-        //         "totalIn" : totalIn,
-        //         "totalOut" : totalOut,
-        //         "gasFee" : gasFee,
-        //         "token1" : token1,
-        //         "token2" : token3,
-        //         "ethPrice" : ethPrice,
-        //         "AMMOutput": 0,
-        //     }
-
-        //     let chartData = getChartData(newData);
-        //     newData.chartData = chartData;
-        //     return newData;
-        // }
-        // // eth to token
-        // else if (transactionData.data.startsWith(methodList.bsc.swapETHForExactTokensByArb.id)
-        //     || transactionData.data.startsWith(methodList.bsc.swapExactETHForTokensByArb.id)) {
-            
-        //     console.log("A eth to token transaction");
-        //     let response = await library.getTransactionReceipt(address.toString());
-        //     console.log("Response: ",response);
-        //     let FROM_HASH = account.toString().toLowerCase().slice(2);
-        //     let TO_HASH = response.to.toLowerCase().slice(2);
-        //     let logs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]==actionList.transfer.hash);
-        //     let gasFee = (transactionData.gasPrice.toNumber() / (Math.pow(10,18)) )* response.gasUsed.toNumber()
-        //     console.log("gas fee: ",gasFee);
-        //     let routes = [];
-        //     let totalIn = 0;
-        //     let totalOut = 0;
-        //     let newData = {};
-        //     let token1;
-        //     let token2;
-        //     let token3;
-        //     for (let i=0;i<logs.length;){
-        //         token1 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
-        //         let ammount1 = (logs[i].data / Math.pow(10, token1.decimals)); 
-        //         i++;
-
-        //         let ammount2 = 0;
-
-        //         if(!logs[i].topics[2].includes(FROM_HASH)){
-        //             token2 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
-        //             ammount2 = (logs[i].data / Math.pow(10, token2.decimals)); 
-        //             i++;
-        //         }else{
-        //             token2 = null;
-        //         }
-        //         token3 = INITIAL_TOKEN_LIST.find(item => item.address == logs[i].address);
-        //         let ammount3 = (logs[i].data / Math.pow(10, token3.decimals));
-        //         i++;
-                
-        //         routes.push({
-        //             "token1" : token1.symbol,
-        //             "token2" : token2 ? token2.symbol : null,
-        //             "token3" : token3.symbol,
-        //             "token1Num" : ammount1,
-        //             "token2Num" : token2 ? ammount2 : null,
-        //             "token3Num" : ammount3,
-        //             "logoURI" : token2 ? token2.logoURI : null
-        //         })
-
-        //         totalIn += ammount3;
-        //         totalOut += ammount1;
-        //     }
-        //     //get amm output 
-        //     // var contract = getContract('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',IUniswapV2Router02ABI,library,account);
-        //     // let addressPath = [token1.addressOnEth,token2.addressOnEth];
-        //     // var liquidityOut = contract.getAmountsIn(1079,addressPath);
-        //     // console.log('testing :: ', liquidityOut);
-            
-        //     //get ether last price
-        //     let requestPrice = API+'?module=stats&action=bnbprice&apikey='+apikey;
-        //     let responsePrice = await fetch(requestPrice);
-        //     let ethPrice = await responsePrice.json();
-        //     ethPrice = parseFloat(ethPrice.result.ethusd);
-
-        //     console.log("fetching ethprice",ethPrice);
-
-        //     newData = {
-        //         "routes" : routes,
-        //         "totalIn" : totalIn,
-        //         "totalOut" : totalOut,
-        //         "gasFee" : gasFee,
-        //         "token1" : token1,
-        //         "token2" : token3,
-        //         "ethPrice" : ethPrice
-        //     }
-
-        //     let chartData = getChartData(newData);
-        //     newData.chartData = chartData;
-        //     return newData;
-        // }
-        else if(transactionData.data.startsWith(methodList.addLiquidity.id)){
-
-        }else if(transactionData.data.startsWith(methodList.addLiquidityEth.id)){
-
-        }else if(transactionData.data.startsWith(methodList.removeLiquidity.id)){
-
-        }else if(transactionData.data.startsWith(methodList.removeLiquidityETH.id)){
-
-        }else {
+        } else {
             console.log("Transaction not parseable");
         }
 
