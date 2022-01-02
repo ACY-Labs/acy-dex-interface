@@ -29,6 +29,8 @@ import githubIcon from '@/assets/icon_github.svg';
 import twitterWIcon from '@/assets/icon_twitter_white.svg';
 import linkWIcon from '@/assets/icon_link_white.svg';
 import fileWIcon from '@/assets/icon_file_white.svg';
+import paycerBanner from '@/assets/paycer_banner.svg';
+import PaycerIcon from '@/assets/icon_paycer_logo.svg';
 import announcementFIcon from '@/assets/icon_announcement_fill.svg';
 import $ from 'jquery';
 import { getContract } from "../../acy-dex-swap/utils/index.js"
@@ -58,6 +60,9 @@ const LaunchpadProject = () => {
   const [poolStatus, setPoolStatus] = useState(0);
   const [isError, setIsError] = useState(false);
   const [hasCollected, setHasCollected] = useState(false);
+  const [successCollect, setSuccessCollect] = useState(false);
+  const [notVesting, setNotVesting] = useState(false);
+  const [vestingStage, setVestingStage] = useState(0);
   const [isVesting, setIsVesting] = useState(false);
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
@@ -66,6 +71,7 @@ const LaunchpadProject = () => {
   console.log("---------STATUS---------")
   console.log(poolStatus)
 
+  // change to URL
   const TokenBanner = ({ posterUrl }) => {
     return (
       <img
@@ -147,6 +153,14 @@ const LaunchpadProject = () => {
 
     const ProgressBar = ({ alreadySale, totalSale, projectToken }) => {
       const salePercentage = Number(alreadySale) / Number(totalSale)
+      let tokenNum
+      console.log("--------ALREADY SALE----------")
+      console.log(alreadySale)
+      if(alreadySale === null){
+        tokenNum = 0
+      } else {
+        tokenNum = alreadySale
+      }
       const progressStyle = {
         width: { salePercentage } + '%',
       };
@@ -182,7 +196,7 @@ const LaunchpadProject = () => {
               />
             </div>
             <div className="progressAmount">
-              <div>{`${ alreadySale} / ${totalSale} ${projectToken}`}</div>
+              <div>{`${ tokenNum} / ${totalSale} ${projectToken}`}</div>
             </div>
           </div>
         </>
@@ -221,7 +235,7 @@ const LaunchpadProject = () => {
         <div className="keyinfoRow" style={{ marginTop: '1rem' }}>
           <div className="keyinfoName">Total Raise</div>
           <div>
-            {receivedData.totalSale} USDT
+            {receivedData.totalRaise} USDT
           </div>
         </div>
 
@@ -537,13 +551,92 @@ const LaunchpadProject = () => {
       if (hasCollected){
         timeout = setTimeout(() => setHasCollected(false), 1000);
       }
+      if (notVesting){
+        timeout = setTimeout(() => setNotVesting(false), 1000);
+      }
+      if (successCollect){
+        timeout = setTimeout(() => setSuccessCollect(false), 1000);
+      }
       return () => clearTimeout(timeout);
   }, [isError, hasCollected]);
 
-    const vestingClaimClicked = () => {
-      const res = []
-      if (!account) setIsError(true)
 
+  const vestCallback = async (status) => {
+    const sti = async (hash) => {
+      library.getTransactionReceipt(hash).then(async receipt => {
+        console.log(`receiptreceipt for ${hash}: `, receipt);
+        // receipt is not null when transaction is done
+        if (!receipt) 
+          setTimeout(sti(hash), 500);
+        else {
+          setSuccessCollect(true);
+        }
+      });
+    }
+    sti(status.hash);
+  };
+
+    const vestingClaimClicked = async () => {
+      if(!isVesting){
+        setNotVesting(true)
+      } else {
+        if (!account) {
+          setIsError(true)
+          connectWallet()
+        }
+
+        const status = await (async () => {
+          const result = await PoolContract.WithdrawERC20ToCreator(account, 3)
+            .catch(e => {
+              return new CustomError('CustomError while withdrawing token');
+            });
+          return result;
+        })();
+        const tokenAllocated = poolInvestorData[2]
+        const tokenClaimed = poolInvestorData[3].toFixed(2)
+        const curDate = new Date()
+        const stageOne = (tokenAllocated / 100 * poolDistributionStage[0]).toFixed(2)
+        const stageTwo = (tokenAllocated / 100 * poolDistributionStage[1]).toFixed(2)
+        const stageThree = (tokenAllocated / 100 * poolDistributionStage[2]).toFixed(2)
+
+        if(curDate > poolDistributionDate[0] && curDate < poolDistributionDate[1]){
+          setVestingStage(1)
+          if(tokenClaimed === stageOne){
+            setHasCollected(true)
+          } else {
+            try {
+              vestCallback(status);
+            } catch (err) {
+              console.log("Error while claiming vesting token", err)
+            }
+          }
+        }
+        if(curDate > poolDistributionDate[1] && curDate < poolDistributionDate[2]){
+          setVestingStage(2)
+          if(tokenClaimed === stageTwo) {
+            setHasCollected(true)
+          } else {
+            try {
+              vestCallback(status);
+            } catch (err) {
+              console.log("Error while claiming vesting token", err)
+            }
+          }
+        }
+        if(curDate > poolDistributionDate[2]){
+          setVestingStage(3)
+          if(tokenClaimed === stageThree){
+            setHasCollected(true)
+          } else {
+            try {
+              vestCallback(status);
+            } catch (err) {
+              console.log("Error while claiming vesting token", err)
+            }
+          }
+        }
+      }
+      
     }
 
     return (
@@ -593,7 +686,7 @@ const LaunchpadProject = () => {
                     isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'
                   }
                 >
-                    <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} walletId={walletId}/>
+                    <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} walletId={walletId} vestingClick={vestingClaimClicked} />
                 </div>
               </div>
               <div className="arrow-down-container">
@@ -713,10 +806,11 @@ const LaunchpadProject = () => {
     const investorRes = []
 
     // 合约函数调用
-    const baseData = await poolContract.GetPoolBaseData(3)
-    const distributionData = await poolContract.GetPoolDistributionData(3)
-    const status = await poolContract.GetPoolStatus(3)
-    const investorData = PoolContract.GetInvestmentData(3, account)
+    const baseData = await poolContract.GetPoolBaseData(9)
+    const distributionData = await poolContract.GetPoolDistributionData(9)
+    const status = await poolContract.GetPoolStatus(9)
+    const investorData = PoolContract.GetInvestmentData(9, account)
+
     // getpoolbasedata 数据解析
     const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
     const token1decimal = await token1contract.decimals()
@@ -739,17 +833,20 @@ const LaunchpadProject = () => {
     distributionData[2].map(vestingRate => distributionStage.push(BigNumber.from(vestingRate).toBigInt().toString()))
 
     // getinvestmentdata 数据解析以及存放
-    investorData.map(data => investorRes.push(Number(BigNumber.from(data).toBigInt())))
-
+    /* if(investorData.length !== 0){
+      investorData.map(data => investorRes.push(Number(BigNumber.from(data).toBigInt())))
+    } */
+      
     // 判断当前是否是vesting阶段
-    const tempArr = distributionData[1]
-    if(d > tempArr[0]) setIsVesting(true)
+    const curPoolStatus = Number(BigNumber.from(status).toBigInt())
+    if(curPoolStatus === 4) setIsVesting(true)
+
     // set数据
     setPoolBaseData(pool)
     setDistributionDate(distributionRes)
     setpoolStageCount(Number(BigNumber.from(distributionData[0]).toBigInt())) // vesting阶段的次数
     setpoolDistributionStage(distributionStage)
-    setPoolStatus(Number(BigNumber.from(status).toBigInt()))
+    setPoolStatus(curPoolStatus)
     setPoolInvestorData(investorRes)
   }
 
@@ -774,11 +871,11 @@ const LaunchpadProject = () => {
   return (
     <div>
       <div className="mainContainer">
-        {isError ? <Alert message="Please connect to your wallet." type="error" showIcon /> : ""}
+        {isError ? <Alert message="Wallet is not connected." type="error" showIcon /> : ""}
         {hasCollected ? <Alert message="You have collected token for current vesting stage." type="info" showIcon /> : ""}
-        <TokenBanner posterUrl={receivedData.posterUrl} />
-        <TokenLogoLabel projectName={receivedData.projectName} tokenLogo={receivedData.tokenLogoUrl} />
-        <CardArea walletId={account} allocationAmount={allocationAmount} setAllocationAmount={setAllocationAmount}/>
+        <TokenBanner posterUrl={receivedData.projectToken === "PCR" ? paycerBanner : receivedData.posterUrl} />
+        <TokenLogoLabel projectName={receivedData.projectName} tokenLogo={receivedData.projectToken === "PCR" ? PaycerIcon : receivedData.tokenLogoUrl} />
+        <CardArea walletId={account} allocationAmount={allocationAmount} setAllocationAmount={setAllocationAmount} />
       </div>
     </div>
   );

@@ -2,15 +2,12 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import '../css/ProjectsCard.css';
 import AcyIcon from '@/assets/icon_acy.svg';
+import PaycerIcon from '@/assets/icon_paycer_logo.svg';
 import CountDown from './CountDown.js';
 
-const ProjectsCard = ({ projectID, ddl, raise, sales, rate, title, isOngoing, isUpcoming }) => {
+const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngoing, isUpcoming, tokenLogoUrl }) => {
   console.log(ddl);
-  let saleString = isOngoing
-    ? 'Sale ends: ' + ddl
-    : isUpcoming
-    ? 'Sale starts: ' + ddl
-    : 'Sale ended: ' + ddl;
+  let saleString = 'IDO Date: ' + start
 
   const history = useHistory();
   const onOpenProjectDetail = (p) => {
@@ -22,12 +19,12 @@ const ProjectsCard = ({ projectID, ddl, raise, sales, rate, title, isOngoing, is
       <div className="logo-countdown-container">
         <div className="logo-container">
           <div className="logo">
-            <img src={AcyIcon} alt="" />
+            <img src={projectID === 1 ? PaycerIcon : AcyIcon} alt="" />
           </div>
           <div className="logo-text">{title}</div>
         </div>
         <div className="countdown-container">
-          <div>{isOngoing || isUpcoming ? <CountDown ddl={ddl} /> : <CountDown ddl={null} />}</div>
+          <div>{isOngoing || isUpcoming ? <CountDown ddl={start} /> : <CountDown ddl={null} />}</div>
           <div>
             <p style={{ fontSize: '10px' }}>{saleString}</p>
           </div>

@@ -18,6 +18,7 @@ const OngoingProjects = ({ data }) => {
             <div class="">
               <MagicCard
                 projectID={obj.projectID}
+                start={obj.saleStart}
                 ddl={obj.saleEnd}
                 raise={obj.totalRaise.toString() + " USDT"} 
                 sales={obj.totalRaise.toString()+ ' ' + obj.projectToken} 

@@ -5,7 +5,7 @@ import moment from 'moment'
 import { useState } from "react";
 import { Button} from 'antd';
 
-const VestingSchedule = ({ vestingDate, stageData, vestContract }) => {
+const VestingSchedule = ({ vestingDate, stageData, vestingClick }) => {
   const len = vestingDate.length
 
   return (
@@ -25,7 +25,7 @@ const VestingSchedule = ({ vestingDate, stageData, vestContract }) => {
                     className={moment(vestingDate[index]).isBefore() ? "claim-btn claim-btn-active" : "claim-btn claim-btn-inactive"}
                     id="claim-btn"
                     disabled={!moment(vestingDate[index]).isBefore()}
-                    onClick={()=>console.log("claim")}
+                    onClick={vestingClick}
                   >
                     Claim
                   </Button>

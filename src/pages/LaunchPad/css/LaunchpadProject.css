@@ -44,7 +44,7 @@
 }
 
 .allocation-content {
-  height: 520px;
+  height: fit-content;
 }
 
 .allocation-content-inactive {
@@ -53,7 +53,7 @@
 }
 
 .allocation-content-active {
-  height: 580px;
+  height: 850px;
   transition: height 0.1s linear;
 }
 
