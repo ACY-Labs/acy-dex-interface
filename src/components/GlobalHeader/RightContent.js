@@ -112,6 +112,7 @@ const GlobalHeaderRight = props => {
   };
   const onhandMetaMask = () => {
     setVisibleMetaMask(true);
+    setNetworkListIndex(n_index(chainId));
   };
   const onhandCancelMetaMask = () => {
     setVisibleMetaMask(false);
@@ -125,14 +126,6 @@ const GlobalHeaderRight = props => {
 
   const showModal = () => {
     setIsModalVisible(true);
-  };
-
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
   };
 
   // 选择钱包
@@ -162,6 +155,19 @@ const GlobalHeaderRight = props => {
     localStorage.setItem('wallet', walletName);
     setVisibleMetaMask(false);
   };
+  // 初始网络显示
+  const n_index = chainId=> {
+    if (chainId == 56) {
+      return 0
+    }
+    if (chainId == 97) {
+      return 1
+    }
+    if (chainId == 137) {
+      return 2
+    }
+    return 0
+  }
   // 通知钱包连接成功
   useEffect(() => {
     // todo....
@@ -169,12 +175,16 @@ const GlobalHeaderRight = props => {
       console.log(account);
       setVisibleMetaMask(false);
     }
+    // 监听钱包网络变化 metamask
     ethereum.on('networkChanged', function (chainId) {
       console.log("networkChanged:", chainId)
       if (chainId != 56 && chainId != 97 && chainId != 137) {
         console.log("ERROR: unsupport NetWork");
         setIsModalVisible(true);
-        switchEthereumChain("0x38");
+        switchEthereumChain("0x38"); //返回默认56链
+      }else{
+        setIsModalVisible(false);
+        setVisibleMetaMask(false);
       }
     })
   }, account, chainId);
@@ -378,7 +388,7 @@ const GlobalHeaderRight = props => {
       icon: 'Binance',
       onClick: async () => {
         await switchEthereumChain("0x38");
-        setNetworkListIndex(0);
+        setVisibleMetaMask(false);
       },
     },
     {
@@ -386,15 +396,15 @@ const GlobalHeaderRight = props => {
       icon: 'Binance',
       onClick: async () => {
         await switchEthereumChain("0x61");
-        setNetworkListIndex(1);
+        setVisibleMetaMask(false);
       },
     },
     {
       name: 'Polygon',
-      icon: 'Binance',
+      icon: 'Polygon',
       onClick: async () => {
         await switchEthereumChain("0x89");
-        setNetworkListIndex(2);
+        setVisibleMetaMask(false);
       },
     }
   ];
@@ -593,7 +603,7 @@ const GlobalHeaderRight = props => {
         )} */}
       </AcyModal>
         {/* 错误弹窗*/}
-      <AcyModal width={420} visible={isModalVisible}  onOk={handleOk} onCancel={handleCancel}>
+      <AcyModal width={420} visible={isModalVisible}>
       <p>ERROR: UNSUPPORT NETWORKS</p>
       <p>We are not ready for this networks, please change your networks!</p>
       </AcyModal>
