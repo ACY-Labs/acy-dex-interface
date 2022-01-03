@@ -4,9 +4,11 @@ import { useWeb3React } from '@web3-react/core';
 import TokenListSelector from './token_list';
 import MethodActionSelector from './contract_method_list';
 import ScanUrlSelector from './scan_url';
+import ScanAPIUrlSelector from './scan_api_url';
 import FarmSettingSelector from './farm_setting';
 import LaunchpadSettingSelector from './launchpad_setting';
 import SDK_SETTING from './sdk_setting';
+import GAS_TOKEN_SYMBOL from "./gas_token";
 import { JsonRpcProvider } from "@ethersproject/providers"; 
 
 
@@ -22,9 +24,11 @@ export let constantInstance = {
     'methodMap': MethodActionSelector('method'),
     'actionMap': MethodActionSelector('action'),
     'scanUrlPrefix': ScanUrlSelector(56),
+    'scanAPIPrefix': ScanAPIUrlSelector(56),
     'farmSetting': FarmSettingSelector(56),
     'launchpadSetting': LaunchpadSettingSelector(56),
-    'sdkSetting': SDK_SETTING
+    'sdkSetting': SDK_SETTING,
+    'gasTokenSymbol' : GAS_TOKEN_SYMBOL[56],
 };
 
 // export web3 wallet status
@@ -50,6 +54,8 @@ export const RPC_URL = () => constantInstance.farmSetting.RPC_URL
 export const API_URL = () => constantInstance.farmSetting.API_URL
 export const LAUNCHPAD_ADDRESS = () => constantInstance.launchpadSetting.ADDRESS
 export const LAUNCH_RPC_URL = () => constantInstance.launchpadSetting.RPC_URL
+export const METHOD_LIST = () => constantInstance.methodMap
+export const ACTION_LIST = () => constantInstance.actionMap
 
 
 // import constant to react component
@@ -72,13 +78,14 @@ export const useConstantLoader = () => {
             'methodMap': MethodActionSelector('method'),
             'actionMap': MethodActionSelector('action'),
             'scanUrlPrefix': ScanUrlSelector(fallbackChainId),
+            'scanAPIPrefix': ScanAPIUrlSelector(fallbackChainId),
             'farmSetting': FarmSettingSelector(fallbackChainId),
             'launchpadSetting': LaunchpadSettingSelector(fallbackChainId),
-            'sdkSetting': SDK_SETTING
+            'sdkSetting': SDK_SETTING,
+            'gasTokenSymbol' : GAS_TOKEN_SYMBOL[fallbackChainId]
         }
 
         console.log("@/constant: current constant", chainId, currentConstant)
-        
         constantInstance = currentConstant;
         setConstant(currentConstant);
     }, [account, chainId]);

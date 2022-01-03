@@ -12,90 +12,79 @@ interface ContractAction {
 const methodMap: {
     [key: string]: ContractMethod
 } = {
-    ethToToken :    {
-                    name: 'swapExactETHForTokens',
-                    id: '0x7ff36ab5'
-                },
-    ethToExactToken : {
-                    name : 'swapETHForExactTokens',
-                    id : '0xfb3bdb41'
+    ethToToken: {
+        name: 'swapExactETHForTokens',
+        id: '0x7ff36ab5'
     },
-
-    ethToTokenAbr :    {
-        name: 'swapExactTokensForETH',
+    ethToTokenArb: {
+        name: 'swapExactETHForTokensByArb',
         id: '0xf4ff4e22'
     },
-
-    ethToExactTokenAbr :    {
-        name: 'swapExactTokensForETH',
+    ethToExactToken: {
+        name : 'swapETHForExactTokens',
+        id : '0xfb3bdb41'
+    },
+    ethToExactTokenArb: {
+        name: 'swapETHForExactTokensByArb',
         id: '0x357252ac'
     },
-
-    tokenToEth :    {
-                    name: 'swapExactTokensForETH',
-                    id: '0x18cbafe5'
-                },
-
-    tokenToEthAbr :    {
-                    name: 'swapExactTokensForETH',
-                    id: '0x00423e88'
+    tokenToEth: {
+        name: 'swapExactTokensForETH',
+        id: '0x18cbafe5'
     },
-                
-    tokenToExactEthAbr :    {
-                    name: 'swapTokensForExactETH',
-                    id: '0xdc1892da'
-                }, 
-    tokenToExactEth :    {
-                    name: 'swapTokensForExactETH',
-                    id: '0x4a25d94a'
-                }, 
-
-    tokenToToken :  {
-                    name: 'swapExactTokensForTokens',
-                    id: '0x38ed1739'
-                },
+    tokenToEthArb: {
+        name: 'swapExactTokensForETHByArb',
+        id: '0x00423e88'
+    },            
+    tokenToExactEth: {
+        name: 'swapTokensForExactETH',
+        id: '0x4a25d94a'
+    }, 
+    tokenToExactEthArb: {
+        name: 'swapTokensForExactETHByArb',
+        id: '0xdc1892da'
+    }, 
+    tokenToToken: {
+        name: 'swapExactTokensForTokens',
+        id: '0x38ed1739'
+    },
+    tokenToTokenArb: {
+        name: 'swapExactTokensForTokensByArb',
+        id:'0x38f0b154'
+    },
+    tokenToExactToken: {
+        name : 'swapTokensForExactTokens',
+        id : '0x8803dbee'
+    },
+    tokenToExactTokenArb:  {
+        name: 'swapTokensForExactTokensByArb',
+        id: '0xad5639fe'
+    },
     
-    tokenToExactTokenAbr :  {
-                    name: 'swapExactTokensForExactTokens',
-                    id: '0xad5639fe'
-                },
-    
-    tokenToTokenAbr : {
-                    name: 'swapExactTokensForTokensbyAbr',
-                    id:'0x38f0b154'
-    },
-    tokenToExactToken : {
-                    name : 'swapExactTokensForTokensbyAbr',
-                    id : '0x8803dbee'
-    },
-
     addLiquidity : {
-                    name: 'addLiquidity',
-                    id: '0xe8e33700'
-                },
-
+        name: 'addLiquidity',
+        id: '0xe8e33700'
+    },
     addLiquidityEth : {
-                    name: 'addLiquidityETH',
-                    id: '0xf305d719'
-                },
-    
+        name: 'addLiquidityETH',
+        id: '0xf305d719'
+    },
     removeLiquidityWithPermit : {
-                    name: 'removeLiquidityWithPermit',
-                    id: '0x2195995c'
-                },
+        name: 'removeLiquidityWithPermit',
+        id: '0x2195995c'
+    },
     removeLiquidity : {
-                    name: 'removeLiquidity',
-                    id: '0xbaa2abde'
-                },
+        name: 'removeLiquidity',
+        id: '0xbaa2abde'
+    },
     removeLiquidityETHwithPermit : {
-                    name : 'removeLiquidityETHWithPermit',
-                    id : '0xded9382a'
-                },
+        name : 'removeLiquidityETHWithPermit',
+        id : '0xded9382a'
+    },
     removeLiquidityETH : {
-                    name : 'removeLiquidityETH',
-                    id : '0x02751cec'
-    }
-
+        name : 'removeLiquidityETH',
+        id : '0x02751cec'
+    },
 }
 
 const actionMap: {

@@ -37,6 +37,8 @@ const BscMainNetFarmSetting: FarmSetting = {
     RPC_URL: "https://bsc-dataseed.binance.org/",
     // API_URL: "https://api.acy.finance/bsc-main/api"
     API_URL: "http://localhost:3001/bsc-main/api"    // when testing with local backend
+    // API_URL: "https://api.acy.finance/api"
+    // API_URL: "http://localhost:3001/bsc-main/api"    // when testing with local backend
 }
 
 const BscTestNetFarmSetting: FarmSetting = {

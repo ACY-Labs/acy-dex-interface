@@ -740,8 +740,8 @@ export async function removeLiquidity(
           args = [
             token1IsETH ? token0Address : token1Address,
             liquidityAmount.raw.toString(),
-            amountsMin[token0IsETH ? 'CURRENCY_A' : 'CURRENCY_B'].toString(),
-            amountsMin[token1IsETH ? 'CURRENCY_B' : 'CURRENCY_A'].toString(),
+            amountsMin[token0IsETH ? 'CURRENCY_B' : 'CURRENCY_A'].toString(),
+            amountsMin[token1IsETH ? 'CURRENCY_A' : 'CURRENCY_B'].toString(),
             // amountsMin[currencyBIsETH ? Field.CURRENCY_A : Field.CURRENCY_B].toString(),
             // amountsMin[currencyBIsETH ? Field.CURRENCY_B : Field.CURRENCY_A].toString(),
             account,
