@@ -4,46 +4,44 @@ import {Icon} from "antd";
 import styles from './style.less';
 import placeholder from '@/pages/Dao/placeholder-round.png';
 import { getUserTokenBalance } from '@/acy-dex-swap/utils';
-import { useWeb3React } from '@web3-react/core';
+import { useConstantLoader } from '@/constants';
 import { BigNumber } from '@ethersproject/bignumber';
 
-
+// parse number with shortform T,B,M, or return itself.
 export function processString(bal) {
-
   console.log('bal:', bal);
-
+  
   if(!bal) return '0';
-
-  let decimals = bal.split('.')[0];
-  let fraction = bal.split('.')[1] || '0';
-  // console.log(`decimals: ${decimals} fraction:${fraction}`);
-  const million = BigNumber.from('1000000');
-  const billion = BigNumber.from('1000000000');
-  const trillion = BigNumber.from('1000000000000');
-
-  const decimalBN = BigNumber.from(decimals);
+  
+  let decimals = Number.parseInt(bal.split('.')[0]);
+  const million = 1000000
+  const billion = 1000000000
+  const trillion = 1000000000000
+  
+  let decimalNum;
+  let decimalFractionNum;
   let unit = '';
-  if (decimalBN.gt(trillion)) {
-    decimals = `${decimalBN.div(trillion)}`;
+  let decimalFractionBN = 0;
+  if (decimalNum > trillion) {
+    decimalNum = decimals / trillion
+    decimalFractionNum = decimals % trillion / trillion;
     unit = 'T';
-  } else if (decimalBN.gt(billion)) {
-    decimals = `${decimalBN.div(billion)}`;
+  } else if (decimalNum > billion) {
+    decimalNum = decimals / billion
+    decimalFractionNum = decimals % billion / billion;
     unit = 'B';
-  } else if (decimalBN.gt(million)) {
-    decimals = `${decimalBN.div(million)}`;
+  } else if (decimalNum > million) {
+    decimalNum = decimals / million
+    decimalFractionNum = decimals % million / million;
     unit = 'M';
+  } else {
+    decimalNum = decimals
+    decimalFractionNum = 0;
   }
-  decimals = decimals.toString();
 
-  const fractionBN = BigNumber.from(fraction);
-  if (fractionBN.gt(trillion)) fraction = `${fractionBN.div(trillion)}`;
-  else if (fractionBN.gt(billion)) fraction = `${fractionBN.div(billion)}`;
-  else if (fractionBN.gt(million)) fraction = `${fractionBN.div(million)}`;
-  fraction = fraction.toString();
+  decimalFractionNum = decimalFractionNum.toPrecision(2);
 
-  // console.log(`decimals: ${decimals}`);
-  // console.log(fractionBN);
-  return `${decimals}${!fractionBN.isZero() ? `.${fraction}` : ''}${unit}`;
+  return unit ? `${decimalNum}${!decimalFractionNum ? `.${decimalFractionNum}` : ''}${unit}` : `${Number.parseFloat(bal).toPrecision(3)}`;
 }
 
 // data refer to the token object that contains properties such as symbol, name, and logoURI.
@@ -61,7 +59,7 @@ const AcyCoinItem = ({
   ...rest
 }) => {
   const [balance, setBal] = useState(0);
-  const { account, chainId, library, activate } = useWeb3React();
+  const { account, chainId, library } = useConstantLoader();
   const [showActionButton, setShowActionButton] = useState(false);
   useEffect(() => {
     if (clickCallback !== undefined) setShowActionButton(true);

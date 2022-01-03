@@ -12,6 +12,8 @@ import RaiseButton from './components/RaiseButton.js';
 import $ from 'jquery';
 import { getProjects } from '@/services/api';
 import ExpandingContent from './components/ExpandedContent';
+import {useConnectWallet} from '@/components/ConnectWallet';
+import { useWeb3React } from '@web3-react/core';
 
 const { Meta } = Card;
 
@@ -25,6 +27,18 @@ const Pool = props => {
     console.log('ProjectID: ', projectID);
     history.push(`/launchpad/project/${projectID}`);
   };
+
+  // wallet connect
+  const { account, chainId, library, activate } = useWeb3React();
+  const connectWalletByLocalStorage = useConnectWallet();
+  
+  useEffect(() => {
+    if (!account) {
+      connectWalletByLocalStorage();
+    }
+  }, [account]);
+
+  
 
   // project variables
   useEffect(() => {

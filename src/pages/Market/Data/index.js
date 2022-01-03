@@ -1,5 +1,5 @@
 import { fetchMarketData } from './marketData';
-import { fetchGlobalTransaction, fetchFilteredTransaction, fetchAccountTransaction, fetchTopExchangeVolume } from './txData';
+import { fetchGlobalTransaction, fetchTransactionsForPair,fetchTransactionsForToken, fetchAccountTransaction, fetchTopExchangeVolume } from './txData';
 import {
   fetchGeneralTokenInfo,
   fetchTokenDayData,
@@ -7,13 +7,16 @@ import {
   fetchTokenSearch,
   fetchTokensFromId,
   fetchTokenDaySimple,
+  fetchSearchCoinReturns,
 } from './tokenData';
 import {
   fetchGeneralPoolInfoDay,
   fetchPoolDayData,
+  fetchPoolDayDataForPair,
   fetchPoolInfo,
   fetchPoolSearch,
   fetchPoolsFromId,
+  fetchSearchPoolReturns,
 } from './poolData';
 import {
   fetchTopLP,
@@ -24,7 +27,12 @@ import {
 import { getBlocksFromTimestamps } from './blocks';
 import { marketClient } from './client';
 import { fetchEthPrice } from './eth';
-import { fetchTotalFeesPaid, fetchLiqudityIncludingFees, fetchTotalValueSwapped, fetchTotalTransactions} from './walletStats';
+import {
+  fetchTotalFeesPaid,
+  fetchLiqudityIncludingFees,
+  fetchTotalValueSwapped,
+  fetchTotalTransactions
+} from './walletStats';
 
 const DataFetch = {
   marketClient,
@@ -34,7 +42,9 @@ const DataFetch = {
   fetchGeneralPoolInfoDay,
   fetchTokenDayData,
   fetchPoolDayData,
-  fetchFilteredTransaction,
+  fetchPoolDayDataForPair,
+  fetchTransactionsForPair,
+  fetchTransactionsForToken,
   fetchPoolInfo,
   fetchTokenInfo,
   fetchTokenSearch,
@@ -53,6 +63,8 @@ const DataFetch = {
   fetchLiqudityIncludingFees,
   fetchTotalValueSwapped,
   fetchTotalTransactions,
+  fetchSearchCoinReturns,
+  fetchSearchPoolReturns,
 };
 
 export {
@@ -64,7 +76,9 @@ export {
   fetchGeneralPoolInfoDay,
   fetchTokenDayData,
   fetchPoolDayData,
-  fetchFilteredTransaction,
+  fetchPoolDayDataForPair,
+  fetchTransactionsForPair,
+  fetchTransactionsForToken,
   fetchPoolInfo,
   fetchTokenInfo,
   fetchTokenSearch,
@@ -83,4 +97,6 @@ export {
   fetchLiqudityIncludingFees,
   fetchTotalValueSwapped,
   fetchTotalTransactions,
+  fetchSearchCoinReturns,
+  fetchSearchPoolReturns,
 };
