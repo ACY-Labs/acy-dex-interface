@@ -8,13 +8,10 @@ import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import { abi as IUniswapV2Router02ABI } from '@/abis/IUniswapV2Router02.json';
 import ACYV1ROUTER02_ABI from '@/acy-dex-swap/abis/AcyV1Router02';
 import transaction from '@/models/transaction';
-import { useConstantLoader, TOKENLIST, METHOD_LIST, ACTION_LIST } from '@/constants';
+import { useConstantLoader, TOKENLIST, METHOD_LIST, ACTION_LIST, RPC_URL, API_URL } from '@/constants';
 import { constantInstance } from '@/constants';
 
 var Web3 = require('web3');
-const API = 'https://api.bscscan.com/api';
-const BSC_MAINNET_RPC = "https://bsc-dataseed.binance.org/";
-var web3 = new Web3(BSC_MAINNET_RPC);
 const FlashArbitrageResultLogs_ABI = ACYV1ROUTER02_ABI[1];
 // TODO :: translate to USD
 
@@ -824,6 +821,7 @@ function getChartData (data){
 
 // Pass in start of the path.
 function getTransferLogPath(transferLogs, pathList, fromAddress, destAddress) {
+    const web3 = new Web3(RPC_URL());
     const transferLog = transferLogs.find(item => fromAddress == (web3.eth.abi.decodeParameter("address", item.topics[1])).toLowerCase());
     if (transferLog == null) {
         return null
@@ -845,6 +843,7 @@ function getTransferLogPath(transferLogs, pathList, fromAddress, destAddress) {
 
 export async function fetchTransactionData(address,library, account){
     // console.log("here in fetch Transaction Data")
+    const web3 = new Web3(RPC_URL());
     const actionList = ACTION_LIST();
     const methodList = METHOD_LIST();
 
@@ -1036,7 +1035,7 @@ export async function fetchTransactionData(address,library, account){
                 totalOut += amount1;
             }
 
-            let requestPrice = API+'?module=stats&action=bnbprice&apikey='+apikey;
+            let requestPrice = API()+'?module=stats&action=bnbprice&apikey='+apikey;
             let responsePrice = await fetch(requestPrice);
             let ethPrice = await responsePrice.json();
             ethPrice = parseFloat(ethPrice.result.ethusd);
