@@ -36,7 +36,7 @@ import $ from 'jquery';
 import { getContract } from "../../acy-dex-swap/utils/index.js"
 import { useWeb3React } from '@web3-react/core';
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
-import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL } from "@/constants";
+import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID } from "@/constants";
 
 const LaunchpadProject = () => {
   console.log($(document).height());
@@ -859,7 +859,7 @@ const LaunchpadProject = () => {
       console.log("start getPoolBaseData")
       getPoolData(library, account)
     } else {
-      const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID);  // different RPC for mainnet
+      const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
       const accnt = "0x0000000000000000000000000000000000000000";
       getPoolData(provider, accnt)
     }
