@@ -42,7 +42,7 @@ const StakeHistoryTable = props => {
       render: (text, record) => {
           return (
           <div className={styles.tableDataFirstColumn}>
-            Swap {record.inputTokenSymbol} for {record.outTokenSymbol} {record.FA ? "FA" : ""}
+            Swap {record.inputTokenSymbol} for {record.outTokenSymbol} {record.FA ? " (FA)" : ""}
             </div>
           );  
       }

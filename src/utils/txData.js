@@ -487,7 +487,7 @@ export async function fetchUniqueRemoveLiquidityEth(account, hash, timestamp, FR
         let logsToken2 = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(TO_HASH));
 
         let token1 = findTokenInList(logsToken1[0]);
-        let token2 =  findTokenWithSymbol(GAS_TOKEN_SYMBOL);
+        let token2 =  findTokenWithSymbol(constantInstance.gasTokenSymbol);
 
 
         console.log(token1,token2,logsToken1,logsToken2);

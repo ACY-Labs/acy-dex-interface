@@ -191,7 +191,7 @@ export async function fetchTransactionsForPair(token1,token2){
     return await parseTransactionList(data.data);
   }catch (e){
     console.log('service not available yet',e);
-    return null;
+    return [];
   }
 }
 
@@ -206,6 +206,6 @@ export async function fetchTransactionsForToken(token){
     return await parseTransactionList(data.data);
   }catch (e){
     console.log('service not available yet',e);
-    return null;
+    return [];
   }
 }
