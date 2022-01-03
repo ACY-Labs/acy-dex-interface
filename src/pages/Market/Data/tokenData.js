@@ -14,11 +14,11 @@ import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import {findTokenWithAddress} from '@/utils/txData';
 import {totalInUSD} from '@/utils/utils';
 import { symbol } from 'prop-types';
+
 import axios from "axios";
-import ConstantLoader from '@/constants';
 import { getAddress } from '@ethersproject/address';
-const uniqueTokens = ConstantLoader().tokenList;
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+import { API_URL, TOKENLIST} from '@/constants';
+
 
 export async function fetchTokenInfo(client, tokenAddress, timestamp) {
   const block = await getBlockFromTimestamp(timestamp);
@@ -42,7 +42,7 @@ export async function fetchTokenInfo(client, tokenAddress, timestamp) {
 }
 
 export async function fetchTokenDayData(tokenId) {
-  
+  const uniqueTokens = TOKENLIST();
   // get USDT address for calculating historical price
   const USDTaddr = getAddress(uniqueTokens.find(t => t.symbol == "USDT").address);
   tokenId = getAddress(tokenId);
@@ -99,7 +99,7 @@ export async function fetchTokenDayData(tokenId) {
     return outputStats
   }
 
-  return await axios.get(`${apiUrlPrefix}/poolchart/historical/all`).then(res => {
+  return await axios.get(`${API_URL()}/poolchart/historical/all`).then(res => {
     const data = res.data.data;
     console.log("tokenData return data from server", data)
 
@@ -176,7 +176,7 @@ function parseTokenData (data){
   //INIT TOKEN LIST;
   let newData = [];
 
-  uniqueTokens.forEach(element => {
+  TOKENLIST().forEach(element => {
     newData.push({
       address : element.address,
       name : element.name,
@@ -233,7 +233,7 @@ export async function fetchGeneralTokenInfo() {
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
-    let request = `${apiUrlPrefix}/poolchart/all`;
+    let request = `${API_URL()}/poolchart/all`;
     // let request = 'http://localhost:3001/api/poolchart/all';
     let response = await fetch(request);
     let data = await response.json();
@@ -290,7 +290,7 @@ export async function fetchTokensFromId(client, id){
 function parseSearchCoinReturns (data, key){
   //INIT TOKEN LIST;
   let newData = [];
-
+  const uniqueTokens = TOKENLIST();
   uniqueTokens.forEach(element => {
     newData.push({
       address : element.address,

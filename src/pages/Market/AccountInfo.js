@@ -37,10 +37,9 @@ import {
 } from './Data/walletStats'
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import { binance, injected } from '@/connectors';
-import ConstantLoader from '@/constants';
-const scanUrlPrefix = ConstantLoader().scanUrlPrefix;
-const supportedTokens = ConstantLoader().tokenList;
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+import { API_URL, SCAN_NAME, SCAN_URL_PREFIX, TOKENLIST} from "@/constants";
+import { useConstantLoader } from '@/constants';
+
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -67,6 +66,7 @@ let samplePositionData = [
   },
 ];
 function getLogoURIWithSymbol(symbol) {
+  const supportedTokens = TOKENLIST();
   for (let j = 0; j < supportedTokens.length; j++) {
     if (symbol === supportedTokens[j].symbol) {
       return supportedTokens[j].logoURI;
@@ -319,7 +319,11 @@ function AccountInfo(props) {
   const [tableRow, setTableRow] = useState([]);
   const [rowNumber, setRowNumber] = useState(INITIAL_ROW_NUMBER);
   const [walletConnected, setWalletConnected] = useState(false);
-  const { account, chainId, library, activate } = useWeb3React();
+
+  const { activate } = useWeb3React();
+  const {account, library, chainId} = useConstantLoader();
+
+
   const [liquidityPositions, setLiquidityPositions] = useState([]);
   const [activePosition, setActivePosition] = useState(null);
 
@@ -400,12 +404,6 @@ function AccountInfo(props) {
     });
 
   // method to prompt metamask extension for user to connect their wallet.
-  // const connectWallet = () => activate(injected);
-  const connectWallet = () => {
-    activate(binance);
-    activate(injected);
-  }
-
   useEffect(
     () => {
       // console.log("TEST HERE ADDRESS:",address);
@@ -413,6 +411,7 @@ function AccountInfo(props) {
       // fetchPoolsFromAccount(marketClient, address).then(data => {
       //   setLiquidityPositions(data);
       // });
+
 
       // const getPools = async (library, account) => {
       //   // get all pools from the farm contract.
@@ -469,6 +468,7 @@ function AccountInfo(props) {
       //   setIsLoadingPool(false);
       // };
 
+
       // account will be returned if wallet is connected.
       // so if account is present, retrieve the farms contract.
       if (account) {
@@ -509,18 +509,17 @@ function AccountInfo(props) {
   const getValidPoolList = (account) => {
     // setLoading(true);
  
-
+    const apiUrlPrefix = API_URL();
 
     console.log("fetching user pool list");
     axios.get(
       // fetch valid pool list from remote
-      // `${apiUrlPrefix}/pool?chainId=${chainId}`
       `${apiUrlPrefix}/userpool?walletId=${account}`
-      // `http://localhost:3001/api/userpool?walletId=${account}`
     ).then(async res => {
       console.log("fetch pool data");
       console.log(res.data);
 
+      const supportedTokens = TOKENLIST();
       const tokens = supportedTokens;
 
       // construct pool list locally
@@ -536,7 +535,7 @@ function AccountInfo(props) {
         const token1 = new Token(chainId, token1Address, token1Decimal, token1Symbol);
 
         // queue get pair task
-        const pair = Fetcher.fetchPairData(token0, token1, library);
+        const pair = Fetcher.fetchPairData(token0, token1, library, chainId);
         fetchTask.push(pair);
         console.log("adding task to array")
       }
@@ -702,10 +701,10 @@ function AccountInfo(props) {
         <div>
           {/* <div style={{ fontSize: '26px', fontWeight: 'bold' }}>{address}</div> */}
           <a
-            onClick={() => openInNewTab(`${scanUrlPrefix}/address/${address}`)}
+            onClick={() => openInNewTab(`${SCAN_URL_PREFIX()}/address/${address}`)}
             style={{ color: '#e29227', fontWeight: 600 }}
           >
-            View on BSC Scan
+            View on {SCAN_NAME}
           </a>
         </div>
         <AcyIcon

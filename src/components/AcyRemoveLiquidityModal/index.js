@@ -3,7 +3,6 @@ import axios from 'axios';
 import { connect } from 'umi';
 import { AcyModal, AcyDescriptions, AcyButton } from '@/components/Acy';
 import { useWeb3React } from '@web3-react/core';
-import { INITIAL_ALLOWED_SLIPPAGE } from '@/acy-dex-swap/utils/index';
 import { getEstimated, signOrApprove, removeLiquidity } from '@/acy-dex-swap/core/removeLiquidity';
 import { Icon, Button, Input } from "antd";
 import moment from 'moment';
@@ -12,8 +11,7 @@ import {
   binance,
   injected,
 } from '@/connectors';
-import ConstantLoader from '@/constants';
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+import {useConstantLoader} from '@/constants';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
   const handleInputChange = (e) => {
@@ -49,6 +47,7 @@ const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
 
 // FIXME: use state machine to rewrite the logic (needApprove, approving, removeLiquidity, processing, done).
 const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCancel, ...props }) => {
+  const { account, chainId, library, farmSetting: {API_URL: apiUrlPrefix}, farmSetting: {INITIAL_ALLOWED_SLIPPAGE} } = useConstantLoader()
   const [token0, setToken0] = useState(null);
   const [token1, setToken1] = useState(null);
   const [token0Amount, setToken0Amount] = useState('0');
@@ -80,7 +79,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
   const [removeOK, setRemoveOK] = useState(false);
   const slippageTolerancePlaceholder = 'please input a number from 1.00 to 100.00';
 
-  const { account, chainId, library, activate } = useWeb3React();
+  const { activate } = useWeb3React();
 
 
   useEffect(
@@ -431,7 +430,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
               );
             } else if (buttonStatus) {
               if (account == undefined) {
-                activate(binance);
+                //activate(binance);
                 activate(injected);
               } else {
                 console.log(buttonStatus);

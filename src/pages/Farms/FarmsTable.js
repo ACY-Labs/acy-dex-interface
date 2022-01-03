@@ -79,12 +79,6 @@ const FarmsTable = ({
     functionDict[pt]();
   };
 
-  useEffect(
-    () => {
-      console.log("TEST tableRow:",tableRow);
-    },
-    [tableRow]
-  );
   const daoContent = {
     token1:"ACY",
     token1Logo:AcyIcon,

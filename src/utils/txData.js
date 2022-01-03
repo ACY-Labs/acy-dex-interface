@@ -8,29 +8,7 @@ import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import { abi as IUniswapV2Router02ABI } from '@/abis/IUniswapV2Router02.json';
 import ACYV1ROUTER02_ABI from '@/acy-dex-swap/abis/AcyV1Router02';
 import transaction from '@/models/transaction';
-import ConstantLoader from '@/constants';
-const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
-const methodList = ConstantLoader().methodMap;
-const actionList = ConstantLoader().actionMap;
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
-
-// THIS FUNCTIONS RETURN TOKEN 
-export function findTokenInList(item){ // token has address attribute
-    let token =  INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.address.toLowerCase());
-    if(token) return token;
-    else return INITIAL_TOKEN_LIST[0];
-}
-export function findTokenWithAddress(item){// input is an address 
-    let token = INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.toLowerCase() );
-    if(token) return token;
-    else return INITIAL_TOKEN_LIST[0]
-}
-
-export function findTokenWithSymbol(item){
-    let token = INITIAL_TOKEN_LIST.find(token => token.symbol==item);
-    if(token) return token;
-    else return INITIAL_TOKEN_LIST[0];
-}
+import { useConstantLoader, TOKENLIST, METHOD_LIST, ACTION_LIST } from '@/constants';
 
 var Web3 = require('web3');
 const API = 'https://api.bscscan.com/api';
@@ -41,7 +19,29 @@ const FlashArbitrageResultLogs_ABI = ACYV1ROUTER02_ABI[1];
 
 var tokenPriceUSD;
 
+// THIS FUNCTIONS RETURN TOKEN 
+export function findTokenInList(item){ // token has address attribute
+    const INITIAL_TOKEN_LIST = TOKENLIST();
+    let token =  INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.address.toLowerCase());
+    if(token) return token;
+    else return INITIAL_TOKEN_LIST[0];
+}
+export function findTokenWithAddress(item){// input is an address 
+    const INITIAL_TOKEN_LIST = TOKENLIST();
+    let token = INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.toLowerCase() );
+    if(token) return token;
+    else return INITIAL_TOKEN_LIST[0]
+}
+export function findTokenWithSymbol(item){
+    const INITIAL_TOKEN_LIST = TOKENLIST();
+    let token = INITIAL_TOKEN_LIST.find(token => token.symbol==item);
+    if(token) return token;
+    else return INITIAL_TOKEN_LIST[0];
+}
+
 function saveTxInDB(data){
+
+    const { farmSetting } = useConstantLoader();
 
     let valueSwapped = totalInUSD([
         {
@@ -65,7 +65,7 @@ function saveTxInDB(data){
     try{
         axios
         .post(
-          `${apiUrlPrefix}/users/swap?address=${data.address}&hash=${data.hash}&valueSwapped=${valueSwapped}&feesPaid=${feesPaid}`
+            `${farmSetting.API_URL}/users/swap?address=${data.address}&hash=${data.hash}&valueSwapped=${valueSwapped}&feesPaid=${feesPaid}`
         )
         .then(response => {
           console.log(response.response);
@@ -79,8 +79,7 @@ function addUserToDB(address){
     try{
         axios
         .post(
-            // `http://localhost:3001/api/users/adduser?address=${address}`
-          `${apiUrlPrefix}/users/adduser?address=${address}`
+            `${farmSetting.API_URL}/users/adduser?address=${address}`
         )
         .then(response => {
           console.log(response.response);
@@ -92,7 +91,9 @@ function addUserToDB(address){
 
 async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, library, gasPrice){
     console.log("fetchUniqueETHToToken",hash);
-    console.log("Debugging hereeeeeeee:::::::::::")
+
+    const { actionMap } = useConstantLoader();
+    const actionList = actionMap;
 
     try{
 
@@ -103,7 +104,7 @@ async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, libra
         let TO_HASH = response.to.toLowerCase().slice(2);
         let inLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[1].includes(TO_HASH));
         let outLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(FROM_HASH));
-        console.log("pringting data of tx::::::",response,inLogs,outLogs);
+        // console.log("pringting data of tx::::::",response,inLogs,outLogs);
         let inToken = findTokenInList(inLogs[0]);
         let outToken =  findTokenInList(outLogs[0]);
 
@@ -111,8 +112,8 @@ async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, libra
         outLogs = outLogs.filter(log => log.address.toLowerCase() == outToken.address.toLowerCase());
 
         
-        console.log(inToken,outToken);
-        console.log("debug finished");
+        // console.log(inToken,outToken);
+        // console.log("debug finished");
 
         let inTokenNumber = 0;
         let outTokenNumber = 0;
@@ -161,6 +162,9 @@ async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, libra
 async function fetchUniqueTokenToETH(account, hash, timestamp, FROM_HASH, library, gasPrice){
 
     console.log("fetchUniqueTokenToETH",hash);
+
+    const { actionMap } = useConstantLoader();
+    const actionList = actionMap;
 
     try {
 
@@ -222,6 +226,9 @@ async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, libr
 
     console.log("fetchUniqueTokenToToken",hash);
 
+    const { actionMap } = useConstantLoader();
+    const actionList = actionMap;
+
     try{
     
         let response = await library.getTransactionReceipt(hash);
@@ -280,6 +287,9 @@ async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, libr
 async function fetchUniqueAddLiquidity(account, hash, timestamp, FROM_HASH, library){
 
     console.log("fetchUniqueAddLiquidity",hash);
+
+    const { actionMap } = useConstantLoader();
+    const actionList = actionMap;
 
     try {
 
@@ -351,6 +361,9 @@ export async function fetchUniqueRemoveLiquidity(account, hash, timestamp, FROM_
 
     console.log("fetchUniqueRemoveLiquidity",hash);
 
+    const { actionMap } = useConstantLoader();
+    const actionList = actionMap;
+
     try {
 
         let response = await library.getTransactionReceipt(hash);
@@ -416,6 +429,9 @@ export async function fetchUniqueRemoveLiquidity(account, hash, timestamp, FROM_
 export async function fetchUniqueAddLiquidityEth(account, hash, timestamp, FROM_HASH, library){
     console.log("fetchUniqueAddLiquidityEth",hash);
 
+    const { actionMap } = useConstantLoader();
+    const actionList = actionMap;
+
     try{
 
         let response = await library.getTransactionReceipt(hash);
@@ -472,6 +488,9 @@ export async function fetchUniqueAddLiquidityEth(account, hash, timestamp, FROM_
 export async function fetchUniqueRemoveLiquidityEth(account, hash, timestamp, FROM_HASH, library){
 
     console.log("fetchUniqueRemoveLiquidityEth",hash);
+
+    const { actionMap } = useConstantLoader();
+    const actionList = actionMap;
 
     try {
 
@@ -532,6 +551,9 @@ export async function fetchUniqueRemoveLiquidityEth(account, hash, timestamp, FR
 }
 export async function appendNewSwapTx(currList,receiptHash,account,library){
 
+    const { methodMap } = useConstantLoader();
+    const methodList = methodMap;
+
 
     // console.log("printing curr...", currList);
 
@@ -546,17 +568,17 @@ export async function appendNewSwapTx(currList,receiptHash,account,library){
 
     let newData;
     
-    if(transaction.data.startsWith(methodList.ethToToken.id) || transaction.data.startsWith(methodList.ethToExactToken.id) || transaction.data.startsWith(methodList.ethToTokenAbr.id) || transaction.data.startsWith(methodList.ethToExactTokenAbr.id)){
+    if(transaction.data.startsWith(methodList.ethToToken.id) || transaction.data.startsWith(methodList.ethToExactToken.id) || transaction.data.startsWith(methodList.ethToTokenArb.id) || transaction.data.startsWith(methodList.ethToExactTokenArb.id)){
 
         console.log("adding eth to token");
         newData = await fetchUniqueETHToToken(account, receiptHash,null,FROM_HASH, library, gasPrice);
         
 
-    }else if(transaction.data.startsWith(methodList.tokenToEth.id) || transaction.data.startsWith(methodList.tokenToEthAbr.id) || transaction.data.startsWith(methodList.tokenToExactEth.id) || transaction.data.startsWith(methodList.tokenToExactEthAbr.id)){
+    }else if(transaction.data.startsWith(methodList.tokenToEth.id) || transaction.data.startsWith(methodList.tokenToEthArb.id) || transaction.data.startsWith(methodList.tokenToExactEth.id) || transaction.data.startsWith(methodList.tokenToExactEthArb.id)){
         console.log("adding token to eth");
         newData  = await fetchUniqueTokenToETH(account, receiptHash,null,FROM_HASH, library, gasPrice);
         
-    }else if(transaction.data.startsWith(methodList.tokenToToken.id) || transaction.data.startsWith(methodList.tokenToTokenAbr.id) || transaction.data.startsWith(methodList.tokenToExactTokenAbr.id) || transaction.data.startsWith(methodList.tokenToExactToken.id)){
+    }else if(transaction.data.startsWith(methodList.tokenToToken.id) || transaction.data.startsWith(methodList.tokenToTokenArb.id) || transaction.data.startsWith(methodList.tokenToExactTokenArb.id) || transaction.data.startsWith(methodList.tokenToExactToken.id)){
         console.log("addding normal token to token");
         newData = await fetchUniqueTokenToToken(account,receiptHash,null,FROM_HASH, library, gasPrice);
     }
@@ -580,6 +602,9 @@ export async function appendNewSwapTx(currList,receiptHash,account,library){
 }
 
 export async function appendNewLiquidityTx(currList,receiptHash,account,library){
+
+    const { methodMap } = useConstantLoader();
+    const methodList = methodMap;
     // console.log("printing curr...", currList);
 
     if(currList.length > 0 && currList[0].hash.toLowerCase() == receiptHash.toLowerCase()) return currList;
@@ -618,8 +643,10 @@ export async function appendNewLiquidityTx(currList,receiptHash,account,library)
 
     return temp;
 }
-
 export async function parseTransactionData (fetchedData,account,library,filter) {
+
+    const { methodMap } = useConstantLoader();
+    const methodList = methodMap;
 
     if(filter == 'SWAP'){
 
@@ -628,7 +655,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
         let TO_HASH ;
         fetchedData = fetchedData.filter(item => item.txreceipt_status == 1);
 
-        let filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToToken.id) || item.input.startsWith(methodList.tokenToTokenAbr.id) || item.input.startsWith(methodList.tokenToExactToken.id) || item.input.startsWith(methodList.tokenToExactTokenAbr.id));
+        let filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToToken.id) || item.input.startsWith(methodList.tokenToTokenArb.id) || item.input.startsWith(methodList.tokenToExactToken.id) || item.input.startsWith(methodList.tokenToExactTokenArb.id));
         let newData = [];
 
         for (let item of filteredData) {
@@ -636,14 +663,14 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             if(fetchedItem) newData.push(fetchedItem);
         }
 
-        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.ethToToken.id) || item.input.startsWith(methodList.ethToExactToken.id) || item.input.startsWith(methodList.ethToTokenAbr.id) || item.input.startsWith(methodList.ethToExactTokenAbr.id));
+        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.ethToToken.id) || item.input.startsWith(methodList.ethToExactToken.id) || item.input.startsWith(methodList.ethToTokenArb.id) || item.input.startsWith(methodList.ethToExactTokenArb.id));
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueETHToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
             if(fetchedItem) newData.push(fetchedItem);
         }
 
-        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToEth.id) || item.input.startsWith(methodList.tokenToEthAbr.id) || item.input.startsWith(methodList.tokenToExactEth.id) || item.input.startsWith(methodList.tokenToExactEthAbr.id));
+        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToEth.id) || item.input.startsWith(methodList.tokenToEthArb.id) || item.input.startsWith(methodList.tokenToExactEth.id) || item.input.startsWith(methodList.tokenToExactEthArb.id));
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library,0);
@@ -698,7 +725,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
         let TO_HASH ;
         fetchedData = fetchedData.filter(item => item.txreceipt_status == 1);
 
-        let filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToToken.id) || item.input.startsWith(methodList.tokenToTokenAbr.id) || item.input.startsWith(methodList.tokenToExactToken.id) || item.input.startsWith(methodList.tokenToExactTokenAbr.id));
+        let filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToToken.id) || item.input.startsWith(methodList.tokenToTokenArb.id) || item.input.startsWith(methodList.tokenToExactToken.id) || item.input.startsWith(methodList.tokenToExactTokenArb.id));
         let swapData = [];
         let liquidityData =[];
 
@@ -707,14 +734,14 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
             if(fetchedItem) swapData.push(fetchedItem);
         }
 
-        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.ethToToken.id) || item.input.startsWith(methodList.ethToExactToken.id) || item.input.startsWith(methodList.ethToTokenAbr.id) || item.input.startsWith(methodList.ethToExactTokenAbr.id));
+        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.ethToToken.id) || item.input.startsWith(methodList.ethToExactToken.id) || item.input.startsWith(methodList.ethToTokenArb.id) || item.input.startsWith(methodList.ethToExactTokenArb.id));
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueETHToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
             if(fetchedItem) swapData.push(fetchedItem);
         }
 
-        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToEth.id) || item.input.startsWith(methodList.tokenToEthAbr.id) || item.input.startsWith(methodList.tokenToExactEth.id) || item.input.startsWith(methodList.tokenToExactEthAbr.id));
+        filteredData = fetchedData.filter(item => item.input.startsWith(methodList.tokenToEth.id) || item.input.startsWith(methodList.tokenToEthArb.id) || item.input.startsWith(methodList.tokenToExactEth.id) || item.input.startsWith(methodList.tokenToExactEthArb.id));
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library,0);
@@ -777,7 +804,7 @@ export async function getTransactionsByAccount (account,library,filter){
         let response = await fetch(request);
         let data = await response.json();
 
-        console.log("got this tx data", data.result);
+        // console.log("got this tx data", data.result);
 
 
         let newData = await parseTransactionData(data.result,account,library,filter);
@@ -828,8 +855,11 @@ function getTransferLogPath(transferLogs, pathList, fromAddress, destAddress) {
 //below code is used for transaction detail page
 
 export async function fetchTransactionData(address,library, account){
+    // console.log("here in fetch Transaction Data")
+    const actionList = ACTION_LIST();
+    const methodList = METHOD_LIST();
 
-    console.log("fetching tx" , address);
+    // console.log("fetching tx" , address);
 
     // console.log("before get All Supported Tokens Price");
     tokenPriceUSD = await getAllSuportedTokensPrice();
@@ -849,11 +879,11 @@ export async function fetchTransactionData(address,library, account){
         //     console.log(web3.eth.abi.encodeFunctionSignature(ACYV1ROUTER02_ABI[i]));
         // }
 
-        const methodUsed = Object.keys(methodList.bsc).find(key => transactionData.data.startsWith(methodList.bsc[key].id));
+        const methodUsed = Object.keys(methodList).find(key => transactionData.data.startsWith(methodList[key].id));
         // console.log("methodUsed", methodUsed);
         
-        if (Object.keys(methodList.bsc).includes(methodUsed)) {
-            const methodUsedABI = ACYV1ROUTER02_ABI.find(item => item.name == methodUsed)
+        if (Object.keys(methodList).includes(methodUsed)) {
+            const methodUsedABI = ACYV1ROUTER02_ABI.find(item => item.name == methodList[methodUsed].name)
             const parsedInputData = "0x" + transactionData.data.substring(10, transactionData.data.length);
             const txnDataDecoded = web3.eth.abi.decodeParameters(methodUsedABI.inputs, parsedInputData);
             // console.log("txnDataDecoded", txnDataDecoded);
@@ -880,7 +910,7 @@ export async function fetchTransactionData(address,library, account){
             const transferLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0] == actionList.transfer.hash);
             // console.log("transferLogs", transferLogs);
             const routes_loglists = [];
-            if (methodUsed === methodList.bsc.swapExactTokensForTokensByArb.name) {
+            if (methodList[methodUsed].name === methodList.tokenToTokenArb.name) {
                 // console.log("method: swapExactTokensForTokensByArb")
                 for (let i = 0; i < transferLogs.length; i ++) {
                     let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
@@ -893,7 +923,7 @@ export async function fetchTransactionData(address,library, account){
                         }
                     }
                 } 
-            } else if (methodUsed === methodList.bsc.swapExactETHForTokensByArb.name) {
+            } else if (methodList[methodUsed].name === methodList.ethToTokenArb.name) {
                 // console.log("method: swapExactETHForTokensByArb")
                 for (let i = 0; i < transferLogs.length; i++) {
                     let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
@@ -906,7 +936,7 @@ export async function fetchTransactionData(address,library, account){
                         }
                     }
                 } 
-            } else if (methodUsed === methodList.bsc.swapExactTokensForETHByArb.name) {
+            } else if (methodList[methodUsed].name === methodList.tokenToEthArb.name) {
                 // console.log("method: swapExactTokensForETHByArb")
                 for (let i = 0; i < transferLogs.length; i++) {
                     let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
@@ -919,7 +949,7 @@ export async function fetchTransactionData(address,library, account){
                         }
                     }
                 }
-            } else if (methodUsed === methodList.bsc.swapTokensForExactTokensByArb.name) {
+            } else if (methodList[methodUsed].name === methodList.tokenToExactTokenArb.name) {
                 // console.log("method: swapTokensForExactTokensByArb")
                 for (let i = 0; i < transferLogs.length; i++) {
                     let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
@@ -932,7 +962,7 @@ export async function fetchTransactionData(address,library, account){
                         }
                     }
                 }
-            } else if (methodUsed === methodList.bsc.swapETHForExactTokensByArb.name) {
+            } else if (methodList[methodUsed].name === methodList.ethToExactTokenArb.name) {
                 // console.log("method: swapETHForExactTokensByArb")
                 for (let i = 0; i < transferLogs.length; i++) {
                     let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
@@ -945,7 +975,7 @@ export async function fetchTransactionData(address,library, account){
                         }
                     }
                 }
-            } else if (methodUsed === methodList.bsc.swapTokensForExactETHByArb.name) {
+            } else if (methodList[methodUsed].name === methodList.tokenToExactEthArb.name) {
                 // console.log("method: swapTokensForExactETHByArb")
                 for (let i = 0; i < transferLogs.length; i++) {
                     let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
@@ -958,6 +988,8 @@ export async function fetchTransactionData(address,library, account){
                         }
                     }
                 }
+            } else {
+                console.log("no method matched")
             }
 
 
@@ -972,6 +1004,7 @@ export async function fetchTransactionData(address,library, account){
             let token1 = null;
             let token2 = null;
             let token3 = null;
+            const INITIAL_TOKEN_LIST = TOKENLIST();
             for (const path of routes_loglists) {
                 token1 = INITIAL_TOKEN_LIST.find(item => item.address.toLowerCase() == transferLogs[path[0]].address.toLowerCase());
                 token2 = null;

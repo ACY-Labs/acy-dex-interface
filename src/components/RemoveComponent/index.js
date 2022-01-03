@@ -1,3 +1,5 @@
+// FIXME: This component seems to be obsoleted. 
+
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
@@ -49,7 +51,6 @@ import {
   calculateSlippageAmount,
   INITIAL_ALLOWED_SLIPPAGE,
   usePairContract,
-  ROUTER_ADDRESS,
 } from '@/acy-dex-swap/utils/index';
 
 import { processInput, signOrApprove, removeLiquidity } from '@/acy-dex-swap/core/removeLiquidity';
@@ -80,7 +81,7 @@ const MyComponent = props => {
   const [token1Balance, setToken1Balance] = useState('0');
   // 交易对后置货币兑换量
   const [token1Amount, setToken1Amount] = useState('0');
-  let [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
+  let [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE() / 100);
   let [liquidityBreakdown, setLiquidityBreakdown] = useState();
   let [liquidityStatus, setLiquidityStatus] = useState();
   let [exactIn, setExactIn] = useState(true);
@@ -193,7 +194,7 @@ const MyComponent = props => {
   };
 
   const ConnectWallet = () => {
-    activate(binance);
+    //activate(binance);
     activate(injected);
   };
 

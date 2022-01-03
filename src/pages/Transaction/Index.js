@@ -21,6 +21,7 @@ import {
   AcyIcon
 } from '@/components/Acy';
 import styles from './styles.less';
+import { useConstantLoader } from '@/constants';
 
 const Transaction = props => {
 
@@ -30,22 +31,18 @@ const Transaction = props => {
   const [ shouldRender, setShouldRender] = useState(false);
   const [ token1, setToken1 ] = useState({});
   const [ token2, setToken2 ] = useState({});
-  const { account, chainId, library, activate } = useWeb3React();
+  const { account, chainId, library } = useConstantLoader();
+  // const { account, chainId, library, activate } = useWeb3React();
   // const [ url, setUrl] = useState('');
-
 
   let {id} = useParams();
 
   // connect to provider, listen for wallet to connect
-
-  useEffect(() => {
-    console.log("parent page account", account)
-  }, [account])
-
+  // console.log("before fetch transaction data", account);
   useEffect(() => {
     fetchTransactionData(id,library,account)
     .then(response => {
-      console.log("response: ", response, typeof(response));
+      // console.log("response: ", response, typeof(response));
       if (!(Object.keys(response).length === 0 && response.constructor === Object)){
         setData({
           ...data,
@@ -87,11 +84,15 @@ const Transaction = props => {
           }
           return new_route;
         }));
-        setShouldRender(true);
       }
-    });
-  }, [account]);
-
+    })
+    .then(() => {
+      setShouldRender(true);
+    })
+    .catch(() => {
+      console.log("response error")
+    })
+  }, [account, chainId]);
   
   function drawRoutes (){
     // console.log("data", data);//, "token1", token1, "token2", token2);

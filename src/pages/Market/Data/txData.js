@@ -1,13 +1,26 @@
 import { GET_GLOBAL_TRANSACTIONS , FILTERED_TRANSACTIONS } from './query';
 import { TransactionType, sortTable } from '../Util';
-import { convertTx } from './util';
+import { convertTx, ACY_ROUTER } from './util';
 import axios from 'axios';
 import {getTransactionsByAccount} from '@/utils/txData'
 import { getLibrary } from '../ConnectWallet';
+
 import {getAllSuportedTokensPrice} from "@/acy-dex-swap/utils"
-import ConstantLoader from "@/constants";
 import { totalInUSD } from '@/utils/utils';
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
+import {API_URL} from '@/constants';
+// const apiUrlPrefix = API_URL();    
+// SAMPLE TRANSACTION DATA
+// {
+//     coin1: 'USDC',
+//     coin2: 'WBTC',
+//     type: TransactionType.SWAP,
+//     totalValue: 57385063.19,
+//     coin1Amount: 63.52037022,
+//     coin2Amount: 93.65125987,
+//     account: '0x8e4806c17347a9fc6f52b25e73c5e772973b4e3605ddc3cea30742ec8c53d13f',
+//     time: '2021-09-01T04:02:39Z',
+//     transactionID: ''
+// }
 
 const TRANSACTION_AMOUNT = 250;
 const FILTERED_AMOUNT = 50;
@@ -45,11 +58,12 @@ async function parseTransactionList(data){
 
 export async function fetchGlobalTransaction(){
   try{
-    console.log("trying to parse tx list....", apiUrlPrefix);
-    let request = apiUrlPrefix+'/txlist/all?'+'range=50';
+    let request = API_URL()+'/txlist/all?'+'range=50';
     // let request = 'http://localhost:3001/api/users/all';
+
     let response = await fetch(request);
     let data = await response.json();
+
     // console.log(data.data);
     return await parseTransactionList(data.data);
   }catch (e){
@@ -154,7 +168,7 @@ async function parseTopExchangeVolume(userList,library){
 
 export async function fetchTopExchangeVolume(library){
  try{
-   let request = `${apiUrlPrefix}/users/all`;
+   let request = `${API_URL()}/users/all`;
    let response = await fetch(request);
    let data = await response.json();
    console.log(data.data);
@@ -169,7 +183,7 @@ export async function fetchTopExchangeVolume(library){
 export async function fetchTransactionsForPair(token1,token2){
   console.log("fetching txlist for tokens ", token1, token2);
   try{
-    let request = apiUrlPrefix+'/txlist/pair?'+'token1='+token1+'&&token2='+token2+'&&range=50';
+    let request = API_URL()+'/txlist/pair?'+'token1='+token1+'&&token2='+token2+'&&range=50';
     // let request = 'http://localhost:3001/api/users/all';
     let response = await fetch(request);
     let data = await response.json();
@@ -184,7 +198,7 @@ export async function fetchTransactionsForPair(token1,token2){
 export async function fetchTransactionsForToken(token){
   console.log("fetching txlist for tokens ", token);
   try{
-    let request = apiUrlPrefix+'/txlist/token?'+'symbol='+token+'&&range=50';
+    let request = API_URL()+'/txlist/token?'+'symbol='+token+'&&range=50';
     // let request = 'http://localhost:3001/api/users/all';
     let response = await fetch(request);
     let data = await response.json();

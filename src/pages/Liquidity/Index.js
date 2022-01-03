@@ -3,7 +3,6 @@ import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton } from 'antd';
 import { useWeb3React } from '@web3-react/core';
 import { BscConnector } from '@binance-chain/bsc-connector'
-import { binance, injected } from '@/connectors';
 import Data, {
   fetchGeneralPoolInfoDay,
   fetchGeneralTokenInfo,
@@ -26,10 +25,10 @@ import {
 import OperationHistoryTable from './components/OperationHistoryTable';
 import AddComponent from '@/components/AddComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import { getTransactionsByAccount,appendNewLiquidityTx } from '@/utils/txData';
+import { getTransactionsByAccount, appendNewLiquidityTx } from '@/utils/txData';
 import styles from './styles.less';
-import ConstantLoader from '@/constants';
-const INITIAL_TOKEN_LIST = ConstantLoader().tokenList;
+import {useConnectWallet} from '@/components/ConnectWallet';
+
 
 
 const { AcyTabPane } = AcyTabs;
@@ -48,16 +47,14 @@ const BasicProfile = (props) => {
 
   const refContainer = useRef();
   refContainer.current = transactionList;
-
-
- useEffect(() => {
-   if(!account){
-    activate(injected);
-    activate(binance);
-   }
-    getTransactionsByAccount(account,library,'LIQUIDITY').then(data =>{
+  const connectWalletByLocalStorage = useConnectWallet();
+  useEffect(() => {
+    if (!account) {
+      connectWalletByLocalStorage();
+    }
+    getTransactionsByAccount(account, library, 'LIQUIDITY').then(data => {
       setTransactionList(data);
-      if(account) setTableLoading(false);
+      if (account) setTableLoading(false);
     })
   }, [account]);
 
@@ -107,8 +104,8 @@ const BasicProfile = (props) => {
   const updateTransactionList = (receiptHash) => {
     setTableLoading(true);
     console.log("updating list");
-    appendNewLiquidityTx(refContainer.current,receiptHash,account,library).then((data) => {
-      if(data && data.length > 0)setTransactionList(data);
+    appendNewLiquidityTx(refContainer.current, receiptHash, account, library).then((data) => {
+      if (data && data.length > 0) setTransactionList(data);
       setTableLoading(false);
     })
   }

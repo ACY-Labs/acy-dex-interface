@@ -16,11 +16,10 @@ import {getAllSuportedTokensPrice, getPairAddress} from '@/acy-dex-swap/utils/in
 import {findTokenWithAddress} from '@/utils/txData';
 
 import {totalInUSD} from '@/utils/utils'
-import ConstantLoader from '@/constants';
-const apiUrlPrefix = ConstantLoader().farmSetting.API_URL;
-const supportedTokens = ConstantLoader().tokenList;
+import {TOKENLIST, API_URL} from '@/constants';
 
 
+// this variable is assigned with price data when calling functions e.g. fetchPoolInfo()
 var tokensPriceUSD ;
 // var ACY_API='http://localhost:3001/api/';
 
@@ -53,7 +52,6 @@ function parsePoolInfo(data){
 
     _token0 = _token0.symbol;
     _token1 = _token1.symbol;
-
 
     let _tvl = totalInUSD ( [
       {
@@ -91,7 +89,7 @@ function parsePoolInfo(data){
       }
     ],tokensPriceUSD)
 
-    return {
+    const parsed = {
       reserve0: data.lastReserves.token0.toString(),
       reserve1: data.lastReserves.token1.toString(),
       reserveUSD: _tvl.toString(),
@@ -106,6 +104,7 @@ function parsePoolInfo(data){
       untrackedVolumeUSD: "0",
       volumeUSD: _volume24h.toString()
     }
+    return parsed
 }
 
 export async function fetchPoolDayData(address) {
@@ -120,12 +119,13 @@ export async function fetchPoolDayData(address) {
     //           price: 0,
     //         };
     // apiUrlPrefix = 'http://localhost:3001/api';
-  return await axios.get(`${apiUrlPrefix}/poolchart/all`).then(async res => {
+  return await axios.get(`${API_URL()}/poolchart/all`).then(async res => {
     const data = res.data.data;
     const tokenPool = data.filter(p => p.token0.toLowerCase() == address.toLowerCase() || p.token1.toLowerCase() == address.toLowerCase());
 
     const priceDict = await getAllSuportedTokensPrice();
     
+    const supportedTokens = TOKENLIST();
     const parsedPairData = [];
     for (const pool of tokenPool) {
       const token0 = supportedTokens.find(t => t.address.toLowerCase() == pool.token0.toLowerCase());
@@ -139,7 +139,7 @@ export async function fetchPoolDayData(address) {
               coin2: token1Symbol,
               logoURL1: token0.logoURI,
               logoURL2: token1.logoURI,
-              address: getPairAddress(pool.token0, pool.token1),
+              pairAddr: getPairAddress(pool.token0, pool.token1),
               percent: 0,
               tvl,
               volume24h,
@@ -291,11 +291,11 @@ export async function fetchPoolInfo(address){
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
-    let request = apiUrlPrefix +'/poolchart/pair?pairAddr='+address;
+    let request = `${API_URL()}/poolchart/all`;
     let response = await fetch(request);
     let data = await response.json();
-    console.log("requesting pool info from backend",data.data);
-    return parsePoolInfo(data.data);
+    const pairData = data.data.find(p => p.pairAddr.toLowerCase() == address.toLowerCase())
+    return parsePoolInfo(pairData);
   }catch (e){
     console.log('service not available yet',e);
     return null;
@@ -306,7 +306,7 @@ export async function fetchPoolDayDataForPair(address) {
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
-    let request = apiUrlPrefix +'/poolchart/historical/pair?pairAddr='+address;
+    let request = API_URL() +'/poolchart/historical/pair?pairAddr='+address;
     let response = await fetch(request);
     let data = await response.json();
     return parsePoolDayInfoData(data.data);
@@ -320,7 +320,7 @@ export async function fetchGeneralPoolInfoDay(address) {
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
-    let request = apiUrlPrefix+'/poolchart/all';
+    let request = API_URL()+'/poolchart/all';
     let response = await fetch(request);
     let data = await response.json();
     let parsed = parsePoolData(data.data);

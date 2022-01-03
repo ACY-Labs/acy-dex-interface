@@ -30,6 +30,8 @@ import {
 } from './Data/index.js';
 import { WatchlistManager } from './WatchlistManager.js';
 import { TransactionTable } from './UtilComponent.js';
+import { useConstantLoader } from '@/constants';
+
 
 const watchlistManager = new WatchlistManager('account');
 
@@ -361,7 +363,8 @@ function AccountOverview(props) {
 
   const [topExchangeVolume, settopExchangeVolume] = useState([]);
   
-  const { account, chainId, library, activate } = useWeb3React();
+  const { activate } = useWeb3React();
+  const { account, library, chainId} = useConstantLoader();
 
   useEffect(() => {
     // fetch data
