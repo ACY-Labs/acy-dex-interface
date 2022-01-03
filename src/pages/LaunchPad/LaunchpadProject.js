@@ -463,7 +463,7 @@ const LaunchpadProject = () => {
     );
   };
 
-  const Allocation = ({ walletId = '1234', projectToken, allocationAmount, setAllocationAmount}) => {
+  const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount}) => {
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
     // const { account: walletId } = useWeb3React();
 
