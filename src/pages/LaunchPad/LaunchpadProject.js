@@ -453,7 +453,7 @@ const LaunchpadProject = () => {
             <div className="allocationCard-inner">
               <p className="inner-text">{index + 1}</p>
             </div>
-            {/* <p className="inner-text-amount">${allocationAmount}</p> */ <p className="inner-text-amount">${0}</p>}
+            {/* <p className="inner-text-amount">${allocationAmount}</p> */}
           </div>
           <div className='allocationCard-before'></div>
           <div className='allocationCard-after'></div>
