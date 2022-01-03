@@ -47,17 +47,13 @@ function saveTxInDB(data){
         {
             token : data.inputTokenSymbol,
             amount : parseFloat(data.inputTokenNum)
-        },
-        {
-            token : data.outTokenSymbol,
-            amount : parseFloat(data.outTokenNum)
         }
     ],tokenPriceUSD);
 
 
     let feesPaid = totalInUSD([
         {
-            token : 'BNB',
+            token : GAS_TOKEN_SYMBOL,
             amount : data.gasFee
         }
     ],tokenPriceUSD);
@@ -501,7 +497,7 @@ export async function fetchUniqueRemoveLiquidityEth(account, hash, timestamp, FR
         let logsToken2 = response.logs.filter(log => log.topics.length > 2 && log.topics[0]===actionList.transfer.hash && log.topics[2].includes(TO_HASH));
 
         let token1 = findTokenInList(logsToken1[0]);
-        let token2 =  findTokenWithSymbol('BNB');
+        let token2 =  findTokenWithSymbol(GAS_TOKEN_SYMBOL);
 
 
         console.log(token1,token2,logsToken1,logsToken2);
@@ -788,18 +784,18 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
   }
 export async function getTransactionsByAccount (account,library,filter){
     let newData = [];
+    console.log(constantInstance);
     if(account){
         tokenPriceUSD = await getAllSuportedTokensPrice();
         try{
         let address =  account.toString();
-        let apikey = 'H2W1JHHRFB5H7V735N79N75UVG86E9HFH2';
-        let URL = 'https://api-testnet.bscscan.com/api?module=account&action=txlist';
-        let startBlock = '0';
-        let endBlock = '99999999';
-        let page = '1';
-        let offset=filter=='ALL'? '30':'50'; // NUMBER OF RESULTS FETCHED FROM ETHERSCAN
-        let sort='asc';
-        let request = API+'?module=account&action=txlist&address='+address+'&startblock=0&endblock=99999999&page=1&offset='+offset+'&sort=desc&apikey='+apikey;
+        // let apikey = 'H2W1JHHRFB5H7V735N79N75UVG86E9HFH2';
+        let offset=filter=='ALL'? '50':'50'; // NUMBER OF RESULTS FETCHED FROM ETHERSCAN
+        const SCAN_API = constantInstance.scanAPIPrefix.scanUrl;
+        console.log("printing API endpoint", SCAN_API);
+        console.log("printing gas token symbol", GAS_TOKEN_SYMBOL);
+        let request = `${SCAN_API}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=${offset}&sort=desc`;
+        console.log("trying to fethc data for:", request);
 
         let response = await fetch(request);
         let data = await response.json();

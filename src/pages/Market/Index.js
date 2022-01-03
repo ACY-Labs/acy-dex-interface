@@ -57,7 +57,6 @@ const MarketIndex = props => {
   const {activate } = useWeb3React();
   const {account, library, chainId} = useConstantLoader();
 
-  const libraryOut = new JsonRpcProvider('https://bsc-dataseed1.defibit.io/');
 
   // connect to provider, listen for wallet to connect
   const connectWalletByLocalStorage = useConnectWallet();

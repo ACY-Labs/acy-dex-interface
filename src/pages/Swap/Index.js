@@ -113,7 +113,7 @@ const Swap = props => {
   const [activeToken1, setActiveToken1] = useState(supportedTokens[1]);
   const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
   const [activeAbsoluteChange, setActiveAbsoluteChange] = useState('+0.00');
-  const [activeRate, setActiveRate] = useState('N/A');
+  const [activeRate, setActiveRate] = useState('Not available');
   const [range, setRange] = useState('1D');
   const [chartData, setChartData] = useState([]);
   const [alphaTable, setAlphaTable] = useState('Line');
@@ -140,7 +140,7 @@ const Swap = props => {
     setActiveToken1(supportedTokens[1]);
     setActiveToken0(supportedTokens[0]);
     setActiveAbsoluteChange('+0.00');
-    setActiveRate('N/A');
+    setActiveRate('Not available');
     setRange('1D');
     setChartData([]);
     setAlphaTable('Line');
@@ -311,10 +311,13 @@ const Swap = props => {
         }
           console.log("CHARTING!!!!!!!!!!!",tempChart);
 
-          setChartData( addData.concat(tempChart));
+          const finalChartData = addData.concat(tempChart);
+          console.log("finalChartData", finalChartData);
+          setChartData(finalChartData);
     }
       else{
         setActiveRate("No this pair data yet");
+        setChartData([]);
       }
 
     })
@@ -323,7 +326,7 @@ const Swap = props => {
       console.log("chartdata");
       console.log(timeData);
    
-  }, [activeToken0,activeToken1]);
+  }, [activeToken0, activeToken1]);
   // workaround way to get USD price (put token1 as USDC)
   // NEEDS ETHEREUM ADDRESS, RINKEBY DOES NOT WORK HERE
   const getRoutePrice = (token0Address, token1Address) => {
@@ -495,6 +498,21 @@ const Swap = props => {
     swap: { token0, token1 },
     dispatch
   } = props;
+
+  const updateActiveChartData = (data, dataIndex) => {
+    const prevData = dataIndex === 0 ? 0 : chartData[dataIndex - 1][1];
+    const absoluteChange = (dataIndex === 0 ? 0 : data - prevData).toFixed(3);
+    const formattedAbsChange = absoluteChange > 0 ? "+" + absoluteChange : absoluteChange;
+    setActiveRate(data.toFixed(3));
+    setActiveAbsoluteChange(formattedAbsChange);
+  }
+
+  useEffect(() => {
+    if (!chartData.length)
+      return;
+    const lastDataIndex = chartData.length-1;
+    updateActiveChartData(chartData[lastDataIndex][1], lastDataIndex);
+  }, [chartData])
  
   return (
     <PageHeaderWrapper>
@@ -522,13 +540,7 @@ const Swap = props => {
                     lineColor="#e29227"
                     range={range}
                     showTooltip={true}
-                    onHover={(data, dataIndex) => {
-                      const prevData = dataIndex === 0 ? 0 : chartData[dataIndex - 1][1];
-                      const absoluteChange = (dataIndex === 0 ? 0 : data - prevData).toFixed(3);
-                      const formattedAbsChange = absoluteChange > 0 ? "+" + absoluteChange : absoluteChange;
-                      setActiveRate(data.toFixed(3));
-                      setActiveAbsoluteChange(formattedAbsChange);
-                    }}
+                    onHover={(data, dataIndex) => updateActiveChartData(data, dataIndex)}
                   />
 
                 </div>
