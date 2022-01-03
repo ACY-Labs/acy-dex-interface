@@ -50,6 +50,8 @@ export const BLOCKS_PER_YEAR = () => constantInstance.farmSetting.BLOCKS_PER_YEA
 export const BLOCKS_PER_MONTH = () => constantInstance.farmSetting.BLOCKS_PER_MONTH
 export const RPC_URL = () => constantInstance.farmSetting.RPC_URL
 export const API_URL = () => constantInstance.farmSetting.API_URL
+export const METHOD_LIST = () => constantInstance.methodMap
+export const ACTION_LIST = () => constantInstance.actionMap
 
 
 // import constant to react component
@@ -78,7 +80,6 @@ export const useConstantLoader = () => {
         }
 
         console.log("@/constant: current constant", chainId, currentConstant)
-        
         constantInstance = currentConstant;
         setConstant(currentConstant);
     }, [account, chainId]);
