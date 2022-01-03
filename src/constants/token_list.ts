@@ -23,7 +23,7 @@ const BscMainNetTokenList: Array<TokenInfo> = [
     address: '0xc94595b56e301f3ffedb8ccc2d672882d623e53a',
     decimals: 18,
     logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
-    idOnCoingecko: "acy-finance",
+    idOnCoingecko: "usd-coin",
   },
   {
     name: 'Binance Coin',
@@ -103,7 +103,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
     logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
-    idOnCoingecko: "acy-finance",
+    idOnCoingecko: "usd-coin",
   },
 
   {
@@ -310,7 +310,7 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     address: '0x8b1f836491903743fe51acd13f2cc8ab95b270f6',
     decimals: 18,
     logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
-    idOnCoingecko: "acy-finance",
+    idOnCoingecko: "usd-coin",
   },
   {
     name: 'Binance Coin',
@@ -351,6 +351,14 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     decimals: 8,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/WBTC.svg',
     idOnCoingecko: "wrapped-bitcoin",
+  },
+  {
+    name: 'Polygon',
+    symbol: 'MATIC',
+    address: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
+    decimals: 18,
+    logoURI: 'https://cryptologos.cc/logos/polygon-matic-logo.svg?v=014',
+    idOnCoingecko: "matic-network",
   },
 ];
 

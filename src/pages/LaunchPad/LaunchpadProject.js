@@ -427,18 +427,18 @@ const LaunchpadProject = () => {
       }
       // originalElementParent.textContent = allocationAmount;
 
-      // const oldAllocationAmount = allocationAmount;
-      // if (oldAllocationAmount !== 0) {
-      //   requireAllocation(walletId, projectToken).then(res => {
-      //     if(res && res.allocationAmount) {
-      //       setAllocationAmount(res.allocationAmount);
-      //       setCoverOpenState(true);
-      //     }
-      //     console.log('allocation get', res.allocationAmount);
-      //   }).catch(e => {
-      //     console.error(e);
-      //   })
-      // }
+      const oldAllocationAmount = allocationAmount;
+      if (oldAllocationAmount === 0) {
+        requireAllocation(walletId, projectToken).then(res => {
+          if(res && res.allocationAmount) {
+            setAllocationAmount(res.allocationAmount);
+            setCoverOpenState(true);
+          }
+          console.log('allocation get', res.allocationAmount);
+        }).catch(e => {
+          console.error(e);
+        })
+      }
       e.preventDefault();
     };
 
@@ -461,24 +461,31 @@ const LaunchpadProject = () => {
     );
   };
 
-  const Allocation = ({ walletId="1234", projectToken, allocationAmount, setAllocationAmount}) => {
+  const Allocation = ({ walletId = '1234', projectToken, allocationAmount, setAllocationAmount}) => {
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
+    // const { account: walletId } = useWeb3React();
 
     useEffect(() => {
+      if (!walletId || !projectToken) {
+        return
+      }
       // get allocation status from backend at begining
-      console.log(walletId);
+      console.log("line470", walletId, projectToken);
       getAllocationInfo(walletId, projectToken)
         .then(res => {
+          console.log("res, res.allocationAmount", res, res.allocationAmount)
           if (res && res.allocationAmount) {
             setAllocationAmount(res.allocationAmount);
             console.log('allocation amount', res.allocationAmount);
           }
+          // else {
+          //   requireAllocation(walletId, projectToken)
+          // }
         })
         .catch(e => {
           console.error(e);
         });
-    }, []);
-
+    }, [walletId, projectToken]);
 
     // TODO: replace with 24 icon
     const BaseCard = ({ url }) => {
@@ -717,7 +724,8 @@ const LaunchpadProject = () => {
     );
   };
 
-  const CardArea = ({ walletId, allocationAmount, setAllocationAmount }) => {
+  const CardArea = ({ walletId,  allocationAmount, setAllocationAmount }) => {
+    // const { account: walletId } = useWeb3React();
     return (
       <div className="gridContainer">
         <div className="leftGrid">
