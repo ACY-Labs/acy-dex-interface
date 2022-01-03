@@ -44,7 +44,7 @@
 }
 
 .allocation-content {
-  height: fit-content;
+  position: relative;
 }
 
 .allocation-content-inactive {
