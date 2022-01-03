@@ -43,8 +43,8 @@ export async function fetchTokenInfo(client, tokenAddress, timestamp) {
 
 export async function fetchTokenDayData(tokenId) {
   const uniqueTokens = TOKENLIST();
-  // get USDT address for calculating historical price
-  const USDTaddr = getAddress(uniqueTokens.find(t => t.symbol == "USDT").address);
+  // get USDT/USDC address for calculating historical price
+  const USDTaddr = getAddress(uniqueTokens.find(t => t.symbol == "USDT" || t.symbol == "USDC").address);
   tokenId = getAddress(tokenId);
   const tokenIsUSDT = tokenId == USDTaddr;
 
@@ -346,8 +346,7 @@ function parseSearchCoinReturns (data, key){
 export async function fetchSearchCoinReturns(key) {
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
-    let request = 'https://api.acy.finance/api/poolchart/all';
-    // let request = 'http://localhost:3001/api/poolchart/all';
+    let request = `${API_URL()}/poolchart/all`;
     let response = await fetch(request);
     let data = await response.json(); 
     let parsed = parseSearchCoinReturns(data.data, key);
