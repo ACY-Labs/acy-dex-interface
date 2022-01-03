@@ -32,9 +32,6 @@ export function findTokenWithSymbol(item){
     else return INITIAL_TOKEN_LIST[0];
 }
 
-var API = 'https://api.bscscan.com/api';
-// TODO :: translate to USD
-
 var tokenPriceUSD;
 
 function saveTxInDB(data){
@@ -43,10 +40,6 @@ function saveTxInDB(data){
         {
             token : data.inputTokenSymbol,
             amount : parseFloat(data.inputTokenNum)
-        },
-        {
-            token : data.outTokenSymbol,
-            amount : parseFloat(data.outTokenNum)
         }
     ],tokenPriceUSD);
 
