@@ -13,7 +13,7 @@ import moment from 'moment';
 import SwapIcon from "@/assets/icon_swap.png";
 import classNames from 'classnames';
 import axios from 'axios';
-import { API_URL, BLOCK_TIME } from '@/acy-dex-swap/utils';
+import { API_URL, BLOCK_TIME } from '@/constants';
 import Pattern from '@/utils/pattern';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
