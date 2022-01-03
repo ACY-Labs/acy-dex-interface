@@ -429,7 +429,7 @@ const LaunchpadProject = () => {
       // originalElementParent.textContent = allocationAmount;
 
       const oldAllocationAmount = allocationAmount;
-      if (oldAllocationAmount !== 0) {
+      if (oldAllocationAmount === 0) {
           requireAllocation(walletId, projectToken).then(res => {
             if(res && res.allocationAmount) {
               setAllocationAmount(res.allocationAmount);
