@@ -13,6 +13,7 @@ import styles from './StakeHistoryTable.less';
 import numeral from 'numeral';
 import formatNumber from 'accounting-js/lib/formatNumber.js';
 import  { abbrNumber } from '../../Market/Util.js';
+import { constantInstance } from '@/constants';
 function sortTableTime(table, key, isReverse) {
   return table.sort((a, b) => {
     if (isReverse) {
@@ -41,7 +42,7 @@ const StakeHistoryTable = props => {
       render: (text, record) => {
           return (
           <div className={styles.tableDataFirstColumn}>
-            Swap {record.inputTokenSymbol} for {record.outTokenSymbol}
+            Swap {record.inputTokenSymbol} for {record.outTokenSymbol} {record.FA ? "FA" : ""}
             </div>
           );  
       }
@@ -124,12 +125,22 @@ const StakeHistoryTable = props => {
         className={styles.tableStyle}
         pagination={false}
         onRow={record => {
-          return {
-            onClick: event => {
-              // 跳转到eths
-              window.open(`#/transaction/${record.hash}`);
-            }, // 点击行
-          };
+          if(record.FA){
+            return {
+              onClick: event => {
+                // 跳转到eths
+                window.open(`#/transaction/${record.hash}`);
+              }, // 点击行
+            };
+          }else{
+            return {
+              onClick: event => {
+                // 跳转到eths
+                window.open(`${constantInstance.scanUrlPrefix.scanUrl}/tx/${record.hash}`);
+              }, // 点击行
+            };
+          }
+          
         }}
         footer={() => (
           <div className={styles.tableSeeMoreWrapper}>

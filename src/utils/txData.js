@@ -9,6 +9,7 @@ import { abi as IUniswapV2Router02ABI } from '@/abis/IUniswapV2Router02.json';
 import ACYV1ROUTER02_ABI from '@/acy-dex-swap/abis/AcyV1Router02';
 import transaction from '@/models/transaction';
 import { useConstantLoader, TOKENLIST, METHOD_LIST, ACTION_LIST } from '@/constants';
+import { constantInstance } from '@/constants';
 
 var Web3 = require('web3');
 const API = 'https://api.bscscan.com/api';
@@ -41,7 +42,6 @@ export function findTokenWithSymbol(item){
 
 function saveTxInDB(data){
 
-    const { farmSetting } = useConstantLoader();
 
     let valueSwapped = totalInUSD([
         {
@@ -53,7 +53,7 @@ function saveTxInDB(data){
 
     let feesPaid = totalInUSD([
         {
-            token : GAS_TOKEN_SYMBOL,
+            token : constantInstance.gasTokenSymbol,
             amount : data.gasFee
         }
     ],tokenPriceUSD);
@@ -88,8 +88,7 @@ function addUserToDB(address){
 async function fetchUniqueETHToToken (account, hash, timestamp, FROM_HASH, library, gasPrice){
     console.log("fetchUniqueETHToToken",hash);
 
-    const { actionMap } = useConstantLoader();
-    const actionList = actionMap;
+    const actionList = ACTION_LIST();
 
     try{
 
@@ -159,8 +158,7 @@ async function fetchUniqueTokenToETH(account, hash, timestamp, FROM_HASH, librar
 
     console.log("fetchUniqueTokenToETH",hash);
 
-    const { actionMap } = useConstantLoader();
-    const actionList = actionMap;
+    const actionList = ACTION_LIST();
 
     try {
 
@@ -222,8 +220,7 @@ async function fetchUniqueTokenToToken(account, hash, timestamp, FROM_HASH, libr
 
     console.log("fetchUniqueTokenToToken",hash);
 
-    const { actionMap } = useConstantLoader();
-    const actionList = actionMap;
+    const actionList = ACTION_LIST();
 
     try{
     
@@ -284,8 +281,7 @@ async function fetchUniqueAddLiquidity(account, hash, timestamp, FROM_HASH, libr
 
     console.log("fetchUniqueAddLiquidity",hash);
 
-    const { actionMap } = useConstantLoader();
-    const actionList = actionMap;
+    const actionList = ACTION_LIST();
 
     try {
 
@@ -357,8 +353,7 @@ export async function fetchUniqueRemoveLiquidity(account, hash, timestamp, FROM_
 
     console.log("fetchUniqueRemoveLiquidity",hash);
 
-    const { actionMap } = useConstantLoader();
-    const actionList = actionMap;
+    const actionList = ACTION_LIST();
 
     try {
 
@@ -425,8 +420,7 @@ export async function fetchUniqueRemoveLiquidity(account, hash, timestamp, FROM_
 export async function fetchUniqueAddLiquidityEth(account, hash, timestamp, FROM_HASH, library){
     console.log("fetchUniqueAddLiquidityEth",hash);
 
-    const { actionMap } = useConstantLoader();
-    const actionList = actionMap;
+    const actionList = ACTION_LIST();
 
     try{
 
@@ -485,8 +479,7 @@ export async function fetchUniqueRemoveLiquidityEth(account, hash, timestamp, FR
 
     console.log("fetchUniqueRemoveLiquidityEth",hash);
 
-    const { actionMap } = useConstantLoader();
-    const actionList = actionMap;
+    const actionList = ACTION_LIST();
 
     try {
 
@@ -547,8 +540,7 @@ export async function fetchUniqueRemoveLiquidityEth(account, hash, timestamp, FR
 }
 export async function appendNewSwapTx(currList,receiptHash,account,library){
 
-    const { methodMap } = useConstantLoader();
-    const methodList = methodMap;
+    const methodList = METHOD_LIST();
 
 
     // console.log("printing curr...", currList);
@@ -599,9 +591,7 @@ export async function appendNewSwapTx(currList,receiptHash,account,library){
 
 export async function appendNewLiquidityTx(currList,receiptHash,account,library){
 
-    const { methodMap } = useConstantLoader();
-    const methodList = methodMap;
-    // console.log("printing curr...", currList);
+    const methodList = METHOD_LIST();
 
     if(currList.length > 0 && currList[0].hash.toLowerCase() == receiptHash.toLowerCase()) return currList;
 
@@ -641,8 +631,7 @@ export async function appendNewLiquidityTx(currList,receiptHash,account,library)
 }
 export async function parseTransactionData (fetchedData,account,library,filter) {
 
-    const { methodMap } = useConstantLoader();
-    const methodList = methodMap;
+    const methodList = METHOD_LIST();
 
     if(filter == 'SWAP'){
 
@@ -656,6 +645,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueTokenToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
+            if(item.input.startsWith(methodList.tokenToTokenArb.id) || item.input.startsWith(methodList.tokenToExactTokenArb.id)) fetchedItem['FA']=true;
             if(fetchedItem) newData.push(fetchedItem);
         }
 
@@ -663,6 +653,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueETHToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
+            if(item.input.startsWith(methodList.ethToTokenArb.id) || item.input.startsWith(methodList.ethToExactTokenArb.id)) fetchedItem['FA']=true;
             if(fetchedItem) newData.push(fetchedItem);
         }
 
@@ -670,6 +661,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library,0);
+            if(item.input.startsWith(methodList.tokenToEthArb.id) || item.input.startsWith(methodList.tokenToExactEthArb.id)) fetchedItem['FA']=true;
             if(fetchedItem) newData.push(fetchedItem);
         }
 
@@ -784,16 +776,17 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
   }
 export async function getTransactionsByAccount (account,library,filter){
     let newData = [];
-    console.log(constantInstance);
+    let SCAN_API = constantInstance.scanAPIPrefix;
+    console.log("printing constant instance,,,, ",constantInstance);
     if(account){
         tokenPriceUSD = await getAllSuportedTokensPrice();
         try{
         let address =  account.toString();
         // let apikey = 'H2W1JHHRFB5H7V735N79N75UVG86E9HFH2';
         let offset=filter=='ALL'? '50':'50'; // NUMBER OF RESULTS FETCHED FROM ETHERSCAN
-        const SCAN_API = constantInstance.scanAPIPrefix.scanUrl;
+        SCAN_API = SCAN_API.scanUrl;
         console.log("printing API endpoint", SCAN_API);
-        console.log("printing gas token symbol", GAS_TOKEN_SYMBOL);
+        console.log("printing gas token symbol", constantInstance.gasTokenSymbol);
         let request = `${SCAN_API}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=${offset}&sort=desc`;
         console.log("trying to fethc data for:", request);
 
