@@ -544,9 +544,12 @@ function MarketPoolInfo(props) {
               </div>
             )}
           </div>
-
           <h2>Transactions</h2>
-          <TransactionTable dataSourceTransaction={tx} />
+          {tx.length <= 0 ? (
+         <Icon type="loading" />
+           ) : (
+           <TransactionTable dataSourceTransaction={tx} />
+            )}
         </>
       )}
 
