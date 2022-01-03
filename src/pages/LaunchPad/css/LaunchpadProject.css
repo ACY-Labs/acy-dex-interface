@@ -356,12 +356,7 @@
   transform: rotateY(-110deg);
 }
 
-@media screen and (max-width: 1060px) {
-  .gridContainer {
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-  }
-}
+
 
 /* Allocation */
 .allocation-title-container{
@@ -378,7 +373,6 @@
 
 .allocation-title{
   font-size: 16px;
-  width: 100px;
   margin-right: 10px;
 }
 
@@ -693,10 +687,121 @@
   text-align: right !important;
 }
 
+.title-tooltip-container{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 .tool-tip-content{
   font-size: 0.75rem;
 }
 
 .tool-tip-icon{
   cursor: pointer;
+}
+
+/* Responsive */
+/* Mobile Phones */
+@media (max-width: 426px) {
+  :root{
+    --allocation-card-size: 40px;
+  }
+
+  .tokenLogo{
+    width: 42px;
+    height: 42px;
+  }
+
+  .tokenTitle{
+    font-size: 1.5rem;
+  }
+
+  .tokenLabel{
+    font-size: 0.5rem;
+    min-width: 1rem;
+    min-height: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .cardContent{
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .sales-input-container{
+    margin: 0;
+  }
+
+  .allocation-title{
+    font-size: 14px;
+  }
+
+  .sale-vesting-title{
+    font-size: 14px;
+  }
+
+  .allocationCard .cover{
+    height: var(--allocation-card-size);
+    width: var(--allocation-card-size);
+  }
+
+  .allocationCard{
+    height: var(--allocation-card-size);
+    width: var(--allocation-card-size);
+  } 
+
+  .allocationContainer{
+    grid-template-columns: repeat(auto-fill, minmax(var(--allocation-card-size), 1fr));
+  }
+
+  .allocationCard-before{
+    width: calc(var(--allocation-card-size) + 3px);
+    height: calc(var(--allocation-card-size) + 3px);
+  }
+
+  .allocationCard-after{
+    width: calc(var(--allocation-card-size) + 3px);
+    height: calc(var(--allocation-card-size) + 3px);
+  }
+  
+  .allocationCard .inner-text-amount{
+    font-size: 10px;
+  }
+  .title-tooltip-container{
+    margin-bottom: 14px;
+  }
+  .allocation-title-container{
+    flex-direction: column;
+    column-gap: 10px;
+  }
+
+}
+/* Tablets */
+@media (max-width: 1060px) {
+  .leftGrid{
+    grid-column: span 2 / span 2;
+  }
+  .gridContainer {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .flexContainer{
+    padding-left: 1em;
+  }
+
+  .mainContainer{
+    padding-left: 2em;
+    padding-right: 2em;
+  }
+
+  .allocation-cards{
+    margin-left: 0;
+  }
+
+  .allocationContainer{
+    justify-content: center;
+  }
 }

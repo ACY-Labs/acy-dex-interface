@@ -659,10 +659,13 @@ const LaunchpadProject = () => {
           }
         >
           <div className="allocation-title-container">
-            <p className="allocation-title">Allocation</p>
-            <Tooltip title={tooltipTitle} mouseEnterDelay={0} mouseLeaveDelay={0.25}>
-              <Icon type="info-circle" className='tool-tip-icon' />
-            </Tooltip>
+            <div className='title-tooltip-container'>
+                <p className="allocation-title">Allocation</p>
+                <Tooltip title={tooltipTitle} mouseEnterDelay={0} mouseLeaveDelay={0.25}>
+                  <Icon type="info-circle" className='tool-tip-icon' />
+                </Tooltip>
+            </div>
+            
             <div className='allocation-cards'>
               <div className="allocationContainer">{allocationCards()}</div>
             </div>
