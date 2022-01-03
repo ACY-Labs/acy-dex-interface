@@ -113,7 +113,7 @@ const Swap = props => {
   const [activeToken1, setActiveToken1] = useState(supportedTokens[1]);
   const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
   const [activeAbsoluteChange, setActiveAbsoluteChange] = useState('+0.00');
-  const [activeRate, setActiveRate] = useState('N/A');
+  const [activeRate, setActiveRate] = useState('Not available');
   const [range, setRange] = useState('1D');
   const [chartData, setChartData] = useState([]);
   const [alphaTable, setAlphaTable] = useState('Line');
@@ -140,7 +140,7 @@ const Swap = props => {
     setActiveToken1(supportedTokens[1]);
     setActiveToken0(supportedTokens[0]);
     setActiveAbsoluteChange('+0.00');
-    setActiveRate('N/A');
+    setActiveRate('Not available');
     setRange('1D');
     setChartData([]);
     setAlphaTable('Line');
@@ -317,6 +317,7 @@ const Swap = props => {
     }
       else{
         setActiveRate("No this pair data yet");
+        setChartData([]);
       }
 
     })
@@ -325,7 +326,7 @@ const Swap = props => {
       console.log("chartdata");
       console.log(timeData);
    
-  }, [activeToken0,activeToken1]);
+  }, [activeToken0, activeToken1]);
   // workaround way to get USD price (put token1 as USDC)
   // NEEDS ETHEREUM ADDRESS, RINKEBY DOES NOT WORK HERE
   const getRoutePrice = (token0Address, token1Address) => {
