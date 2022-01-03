@@ -411,11 +411,11 @@ const LaunchpadProject = () => {
         node.classList.remove("inner-text")
         node.classList.remove("cover");
         let innerText = node.parentElement.querySelector(".inner-text-amount");
-        // let innerNumber = node.parentElement.querySelector(".inner-text");
-        // innerNumber.textContent = "";
-        let minPercent = 0.1;
-        let maxPercent = 5;
-        innerText.textContent = `$${Math.floor(allocationAmount * (Math.random() * (maxPercent - minPercent) + minPercent))}`;
+        const offsets = [0.1, 0.5, 0.75, 1, 1.5, 2, 3, 5];
+        const offsetPercentage = offsets[Math.floor((Math.random() * offsets.length))]
+
+        // get 4 random values for other allocation values
+        innerText.textContent = `$${Math.floor(allocationAmount * offsetPercentage)}`;
         innerText.style.color = "#757579"
       })
       try {
