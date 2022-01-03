@@ -294,7 +294,7 @@ const LaunchpadProject = () => {
       </div>
     );
   };
-
+  /*
   const ChartCard = () => {
     const [chartData, setChartData] = useState([]);
     const [transferData, setTransferData] = useState([]);
@@ -372,6 +372,7 @@ const LaunchpadProject = () => {
       </div>
     );
   };
+  */
 
   const AllocationCard = ({
     id,
@@ -399,6 +400,7 @@ const LaunchpadProject = () => {
     const clickCover = async e => {
       console.log(`click allocation card cover`, allocationAmount);
       console.log(isClickedAllocation);
+      return;
       if (isClickedAllocation) {
         return;
       }
@@ -451,7 +453,7 @@ const LaunchpadProject = () => {
             <div className="allocationCard-inner">
               <p className="inner-text">{index + 1}</p>
             </div>
-            <p className="inner-text-amount">${allocationAmount}</p>
+            {/* <p className="inner-text-amount">${allocationAmount}</p> */ <p className="inner-text-amount">${0}</p>}
           </div>
           <div className='allocationCard-before'></div>
           <div className='allocationCard-after'></div>
@@ -464,27 +466,27 @@ const LaunchpadProject = () => {
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
     // const { account: walletId } = useWeb3React();
 
-    useEffect(() => {
-      if (!walletId || !projectToken) {
-        return
-      }
-      // get allocation status from backend at begining
-      console.log("line470", walletId, projectToken);
-      getAllocationInfo(walletId, projectToken)
-        .then(res => {
-          console.log("res, res.allocationAmount", res, res.allocationAmount)
-          if (res && res.allocationAmount) {
-            setAllocationAmount(res.allocationAmount);
-            console.log('allocation amount', res.allocationAmount);
-          }
-          // else {
-          //   requireAllocation(walletId, projectToken)
-          // }
-        })
-        .catch(e => {
-          console.error(e);
-        });
-    }, [walletId, projectToken]);
+    // useEffect(() => {
+    //   if (!walletId || !projectToken) {
+    //     return
+    //   }
+    //   // get allocation status from backend at begining
+    //   console.log("line470", walletId, projectToken);
+    //   getAllocationInfo(walletId, projectToken)
+    //     .then(res => {
+    //       console.log("res, res.allocationAmount", res, res.allocationAmount)
+    //       if (res && res.allocationAmount) {
+    //         setAllocationAmount(res.allocationAmount);
+    //         console.log('allocation amount', res.allocationAmount);
+    //       }
+    //       // else {
+    //       //   requireAllocation(walletId, projectToken)
+    //       // }
+    //     })
+    //     .catch(e => {
+    //       console.error(e);
+    //     });
+    // }, [walletId, projectToken]);
 
     // TODO: replace with 24 icon
     const BaseCard = ({ url }) => {
@@ -504,7 +506,8 @@ const LaunchpadProject = () => {
             id={i}
             index={i}
             Component={BaseCard}
-            allocationAmount={allocationAmount}
+            // allocationAmount={allocationAmount}
+            allocationAmount={0}
             setAllocationAmount={setAllocationAmount}
             walletId={walletId}
             projectToken={project}
@@ -751,7 +754,7 @@ const LaunchpadProject = () => {
             />
           </div>
           <ProjectDescription />
-          <ChartCard className="launchpad-chart" />
+          {/* <ChartCard className="launchpad-chart" /> */}
         </div>
       </div>
     );
