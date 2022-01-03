@@ -3,7 +3,7 @@ import pageRoutes from './router.config';
 import webpackPlugin from './plugin.config';
 import constantConfig from './constant.config';
 import defaultSettings from '../src/defaultSettings';
-import { defineConfig, IConfig }from 'umi';
+import { defineConfig, IConfig } from 'umi';
 
 const IS_PROD = ["production", "prod"].includes(process.env.NODE_ENV);
 const IS_DEV = ["development", "dev"].includes(process.env.NODE_ENV);
@@ -31,6 +31,7 @@ const config: IConfig = {
   proxy: {
     '/api': {
       target: 'https://api.acy.finance',
+      // target: 'http://localhost:3001/bsc-test',
       changeOrigin: true
     }
   },

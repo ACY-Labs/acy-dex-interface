@@ -21,50 +21,95 @@ import {
   AcyIcon
 } from '@/components/Acy';
 import styles from './styles.less';
+import { useConstantLoader } from '@/constants';
 
 const Transaction = props => {
 
 
-  const [data, setData] = useState({});
-  const { account, chainId, library, activate } = useWeb3React();
-  const [ ammOutput, setAmmOutput] = useState(0);
-  const [ chartData, setChartData] = useState({});
+  const [ data, setData ] = useState({});
+  const [ routes, setRoutes ] = useState([]);
+  const [ shouldRender, setShouldRender] = useState(false);
+  const [ token1, setToken1 ] = useState({});
+  const [ token2, setToken2 ] = useState({});
+  const { account, chainId, library } = useConstantLoader();
+  // const { account, chainId, library, activate } = useWeb3React();
   // const [ url, setUrl] = useState('');
-
 
   let {id} = useParams();
 
   // connect to provider, listen for wallet to connect
-
+  // console.log("before fetch transaction data", account);
   useEffect(() => {
-    console.log("parent page account", account)
-  }, [account])
-
-  useEffect(() => {
-    fetchTransactionData(id,library,account).then(response => {
-      setData(response);
-      console.log(response);
-    });
-  }, [account]);
-
+    fetchTransactionData(id,library,account)
+    .then(response => {
+      // console.log("response: ", response, typeof(response));
+      if (!(Object.keys(response).length === 0 && response.constructor === Object)){
+        setData({
+          ...data,
+          ammOutput: response.AMMOutput,
+          faOutput: response.FAOutput,
+          chartData: response.chartData,
+          ethPrice: response.ethPrice,
+          gasFee: response.gasFee,
+          link: response.link,
+          totalIn: response.totalIn,
+          totalOut: response.totalOut,
+          userDistributionAmount: response.userDistributionAmount,
+          token1: {
+            name: response.token1.name,
+            symbol: response.token1.symbol,
+            address: response.token1.address,
+            decimals: response.token1.decimals,
+            logoURI: response.token1.logoURI,
+            idOnCoingecko: response.token1.idOnCoingecko
+          },
+          token2: {
+            name: response.token2.name,
+            symbol: response.token2.symbol,
+            address: response.token2.address,
+            decimals: response.token2.decimals,
+            logoURI: response.token2.logoURI,
+            idOnCoingecko: response.token2.idOnCoingecko
+          }
+        });
+        setRoutes(response.routes.map(route => {
+          let new_route = {
+            token1: route.token1,
+            token2: route.token2,
+            token3: route.token3,
+            token1Num: route.token1Num,
+            token2Num: route.token2Num,
+            token3Num: route.token3Num,
+            logoURI: route.logoURI
+          }
+          return new_route;
+        }));
+      }
+    })
+    .then(() => {
+      setShouldRender(true);
+    })
+    .catch(() => {
+      console.log("response error")
+    })
+  }, [account, chainId]);
   
   function drawRoutes (){
-    let routes = data.routes;
+    // console.log("data", data);//, "token1", token1, "token2", token2);
+    // console.log("routes", routes);
     let totalOut = formatNumber(data.totalOut*1,{ precision: 3, thousand: " " });
     let totalIn = formatNumber(data.totalIn*1,{ precision: 3, thousand: " " });
-    let token1 = data.token1;
-    let token2 = data.token2;
-    data.link = `https://rinkeby.etherscan.io/tx/${id}`;
+    data.link = `https://www.bscscan.com/tx/${id}`;
 
     // setUrl(`https://rinkeby.etherscan.io/tx/${id}`);
 
-    if(data.routes){
+    if(shouldRender){
     return(
       <div className={styles.routers}>
             <div>
               <div className={styles.block}>
-                <span>Swap {totalOut} {token1.symbol}</span>
-                <img src={token1.logoURI} />
+                <span>Swap {totalOut} {data.token1.symbol}</span>
+                <img src={data.token1.logoURI} />
               </div>
                 {routes.map(function(route, i){
                   return <div className={styles.smallblock}>
@@ -90,8 +135,8 @@ const Transaction = props => {
             <div className={styles.arrow}><AcyIcon.MyIcon width={20} type="rightArrow" /></div>
             <div>
               <div className={styles.block}>
-                <span>For {totalIn} {token2.symbol}</span>
-                <img src={token2.logoURI} style={{ width: '22px'}} />
+                <span>For {totalIn} {data.token2.symbol}</span>
+                <img src={data.token2.logoURI} style={{ width: '22px'}} />
               </div>
 
                 {routes.map(function(route, i){
@@ -107,7 +152,7 @@ const Transaction = props => {
   }
 
   return <PageHeaderWrapper>
-    { data.routes ? (
+    { shouldRender ? (
       <div className={styles.transaction}>
         <div>
           <h1 style={{marginTop: '0'}}><AcyIcon.MyIcon width={30} type="arrow" />FLASH ROUTES</h1>
@@ -115,7 +160,7 @@ const Transaction = props => {
           {drawRoutes()}
           <div>
             <a href={data.link} target="_blank" rel="noreferrer">
-                  View it on etherscan
+                  View it on bscscan
             </a>
           </div>
           <h1>
@@ -133,7 +178,7 @@ const Transaction = props => {
             </tr>
             <tr>
               <td className={styles.tableFirstCol}>AMM Output</td>
-              <td>{data.chartData.amm_output.toFixed(2)}</td>
+              <td>{data.ammOutput.toFixed(2)}</td>
               <td>
                 <span>{data.token2.symbol}</span>
                 <img src={data.token2.logoURI} />
@@ -153,13 +198,22 @@ const Transaction = props => {
             <tr>
               <td className={styles.tableFirstCol}>Trader</td>
               <td>40%</td>
-              <td>{data.chartData.flash_revenue.toFixed(2)}</td>
+              <td>{data.userDistributionAmount.toFixed(2)}</td>
               <td>
                 <span>{data.token2.symbol}</span>
                 <img src={data.token2.logoURI}/>
               </td>
             </tr>
             <tr>
+              <td className={styles.tableFirstCol}>ACY Treasury</td>
+              <td>60%</td>
+              <td>{data.chartData.acy_treasury.toFixed(2)}</td>
+              <td>
+                <span>{data.token2.symbol}</span>
+                <img src={data.token2.logoURI} />
+              </td>
+            </tr>
+            {/* <tr>
               <td className={styles.tableFirstCol}>Liquidity Provider</td>
               <td>20%</td>
               <td>{data.chartData.liquidity_provider.toFixed(2)}</td>
@@ -205,10 +259,10 @@ const Transaction = props => {
                 <span>{data.token2.symbol}</span>
                 <img src={data.token2.logoURI}/>
               </td>
-            </tr>
+            </tr> */}
           </table>
           
-          <h1><AcyIcon.MyIcon width={30} type="arrow" />Basic Fee</h1>
+          {/* <h1><AcyIcon.MyIcon width={30} type="arrow" />Basic Fee</h1>
           <table style={{width:'500px'}}>
             <tr>
               <td className={styles.tableFirstCol}>Gas Fee</td>
@@ -230,14 +284,14 @@ const Transaction = props => {
               <td className={styles.tableFirstCol}>ACYDAO</td>
               <td>{data.chartData.trading_fee.toFixed(2)}</td>
             </tr>
-          </table>
+          </table> */}
           
           <h1><AcyIcon.MyIcon width={30} type="arrow" />Trader Receives</h1>
           <table style={{width:'500px'}}>
             <tr>
               <td className={styles.tableFirstCol} ><span>{data.token2.symbol}</span>
               <img src={data.token2.logoURI} /></td>
-              <td>3,303,788.77</td>
+              <td>{data.userDistributionAmount.toFixed(2)}</td>
             </tr>
             {/* <tr>
               <td>ACY</td>
