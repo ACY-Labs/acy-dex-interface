@@ -8,7 +8,6 @@ import CountDown from './CountDown.js';
 const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngoing, isUpcoming, tokenLogoUrl }) => {
   console.log(ddl);
   let saleString = 'IDO Date: ' + start
-
   const history = useHistory();
   const onOpenProjectDetail = (p) => {
     history.push(`/launchpad/project/${p}`);

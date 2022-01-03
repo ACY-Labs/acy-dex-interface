@@ -733,7 +733,8 @@ const LaunchpadProject = () => {
         </div>
         <div className="rightGrid">
           <div className="circleBorderCard">
-            <Allocation walletId={walletId}
+            <Allocation 
+              walletId={walletId}
               projectToken={receivedData.projectToken}
               allocationAmount={allocationAmount}
               setAllocationAmount={setAllocationAmount}
