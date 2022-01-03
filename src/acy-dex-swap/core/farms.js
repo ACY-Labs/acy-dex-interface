@@ -13,11 +13,6 @@ import {
   CustomError,
   getTokenTotalSupply,
   getAllSuportedTokensPrice,
-  BLOCK_TIME,
-  BLOCKS_PER_YEAR,
-  BLOCKS_PER_MONTH,
-  RPC_URL,
-  API_URL
 } from '@/acy-dex-swap/utils';
 import { Fetcher, Token, TokenAmount, Pair} from '@acyswap/sdk';
 import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
@@ -28,7 +23,7 @@ import { Web3Provider } from "@ethersproject/providers";
 import { injected } from '@/connectors';
 import axios from 'axios';
 
-import {TOKENLIST} from "@/constants";
+import {TOKENLIST, BLOCK_TIME, BLOCKS_PER_YEAR, BLOCKS_PER_MONTH, RPC_URL, API_URL} from "@/constants";
 
 
 const getTokenSymbol = async (address, library, account) => {
@@ -547,9 +542,12 @@ const getExpiredTime = (timestamp, lockDuration) => {
 
 const newGetAllPools = async (library, account, chainId) => {
   const tokenPrice = await getAllSuportedTokensPrice();
+  console.log("tokenPrice:",tokenPrice);
+  console.log(`${API_URL()}/farm/getAllPools`);
   const allFarm = await axios.get(
     `${API_URL()}/farm/getAllPools`
   ).then(res => res.data).catch(e => console.log("error: ", e));
+  console.log("GET ALL FARM:",allFarm);
   if(allFarm.length) {
     const allPoolsPromise = [];
     for(var i=0 ; i< allFarm.length ; i++) {
@@ -566,7 +564,6 @@ const calculateVolAndApr = async (token0, token1, tokenPrices) => {
   if(!token1) return 0;
   return await axios.get(`${API_URL()}/poolchart/pair?token0=${token0.address}&token1=${token1.address}`).then(async (res) => {
     // calculate volume in USD
-    console.log("this is return data", res.data)
     const {token0: token0Vol, token1: token1Vol} = res.data.data.lastVolume;
     const vol0Usd = tokenPrices[token0.symbol] * token0Vol;
     const vol1Usd = tokenPrices[token1.symbol] * token1Vol;

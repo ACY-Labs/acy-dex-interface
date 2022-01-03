@@ -29,16 +29,26 @@ import { convertPoolForList } from './Data/util.js';
 import { MarketSearchBar, PoolTable, TransactionTable } from './UtilComponent.js';
 import { WatchlistManager } from './WatchlistManager.js';
 import ConnectWallet from './ConnectWallet';
-import {TOKENLIST, SCAN_URL_PREFIX} from "@/constants";
+import {useConstantLoader, SCAN_URL_PREFIX} from "@/constants";
 
 
 const watchlistManagerToken = new WatchlistManager('token');
 
 function MarketTokenInfo(props) {
   let { address } = useParams();
+  const {chainId, tokenList} = useConstantLoader();
 
-  const symbol = useMemo(() => TOKENLIST().find(t => t.address.toLowerCase() == address.toLowerCase()).symbol, [address])
-
+  const token = useMemo(() => {
+    if (!address || !chainId) 
+      return;
+    
+    console.log("address nd chainId of this page", address, chainId)
+    const token = tokenList.find(t => t.address.toLowerCase() == address.toLowerCase())
+    console.log("page token", token)
+    if (token)
+      return token;
+    }, [address, chainId])
+  
   const [graphSampleData, setGraphSampleData] = useState(0);
   const [tokenData, setTokenData] = useState({});
   const [graphTabIndex, setGraphTabIndex] = useState(0);
@@ -90,6 +100,9 @@ function MarketTokenInfo(props) {
   };
 
   useEffect(() => {
+    if (!token)
+      return;
+    console.log("entering useEffect")
     let todayTimestamp = Math.floor(Date.now() / 1000);
     let volumeChange = [0, 0, 0, 0];
     let txChange = [0, 0, 0]
@@ -179,8 +192,6 @@ function MarketTokenInfo(props) {
 
       // set token data last
 
-      const token = TOKENLIST().find(t => t.address == address);
-      console.log("address", address, token)
       setTokenData({
         name: token.name,
         short: token.symbol,
@@ -208,7 +219,7 @@ function MarketTokenInfo(props) {
       setPoolData(parsedPairData)
     })
 
-    fetchTransactionsForToken(symbol).then(transactions => {
+    fetchTransactionsForToken(token.symbol).then(transactions => {
       transactions = sortTable(transactions, "time", true);
       console.log("print transactions", transactions)
       setTx(transactions);
@@ -221,7 +232,7 @@ function MarketTokenInfo(props) {
 
     // set the watchlists
     updateWatchlistStatus();
-  }, []);
+  }, [token]);
 
   const selectGraph = pt => {
     let index = ['Volume', 'TVL', 'Price'].indexOf(pt);
