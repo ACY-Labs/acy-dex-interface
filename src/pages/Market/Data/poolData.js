@@ -306,8 +306,10 @@ export async function fetchPoolDayDataForPair(address) {
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
+    console.log(">>> start to send")
     let request = API_URL() +'/poolchart/historical/pair?pairAddr='+address;
     let response = await fetch(request);
+    console.log(">>> done send", response)
     let data = await response.json();
     return parsePoolDayInfoData(data.data);
   }catch (e){
@@ -439,7 +441,7 @@ function parseSearchPoolReturns(data, key){
 export async function fetchSearchPoolReturns(key) {
   tokensPriceUSD = await getAllSuportedTokensPrice();
   try{
-    let request = 'https://api.acy.finance/api/poolchart/all';
+    let request = `${API_URL()}/poolchart/all`;
     let response = await fetch(request);
     let data = await response.json();
     let parsed = parseSearchPoolReturns(data.data, key);

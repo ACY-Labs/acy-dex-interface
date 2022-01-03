@@ -28,6 +28,7 @@ import {
 } from './Data';
 
 import {SCAN_URL_PREFIX} from "@/constants";
+import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 
 const { AcyTabPane } = AcyTabs;
@@ -853,8 +854,12 @@ export function TransactionTable(props) {
         dataIndex: 'time',
         key: 'time',
         render: (text, entry) => {
-          function getRelTime(timeString) {
-            let a = moment(new Date(timeString.replace(/-/g, "/"))).locale('en');
+          function getRelTime(timestamp) {
+            let tx_time;
+            tx_time = moment(parseInt(timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
+            // console.log("printing time....",tx_time);
+            if(tx_time == 'Invalid date') tx_time = timestamp;  
+            let a = moment(new Date(tx_time.replace(/-/g, "/"))).locale('en');
             return a.fromNow();
           }
 
@@ -894,7 +899,7 @@ export function TransactionTable(props) {
         }
       ).filter(item => item.visible == true)}
       pagination={false}
-      locale={{ emptyText:'Failed to fetch data'}}
+      locale={{ emptyText:'No Data'}}
       style={{
         marginBottom: '20px',
       }}

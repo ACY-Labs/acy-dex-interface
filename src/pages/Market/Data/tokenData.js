@@ -114,7 +114,7 @@ export async function fetchTokenDayData(tokenId) {
 
     const parsedTokenStats = Object.keys(aggregatedTokenStats).map(key => ({
       date: new Date(aggregatedTokenStats[key].date).getTime()/1000,
-      priceUSD: tokenPriceDict[aggregatedTokenStats[key].date],
+      priceUSD: tokenIsUSDT ? 1 : tokenPriceDict[aggregatedTokenStats[key].date],
       dailyVolumeUSD: aggregatedTokenStats[key].dailyVolumeUSD,
       totalLiquidityUSD: aggregatedTokenStats[key].totalLiquidityUSD
     }))

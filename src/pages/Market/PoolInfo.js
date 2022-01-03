@@ -27,6 +27,8 @@ import {
   marketClient,
 } from './Data/index.js';
 import {SCAN_URL_PREFIX} from "@/constants";
+import { useWeb3React } from '@web3-react/core';
+import {useConnectWallet} from "@/components/ConnectWallet";
 // const scanUrlPrefix = SCAN_URL_PREFIX();
 
 
@@ -36,6 +38,14 @@ let poolData = dataSourcePool[0];
 
 function MarketPoolInfo(props) {
   let { address } = useParams();
+  const { chainId: walletChainId } = useWeb3React();
+
+  const connectWalletByLocalStorage = useConnectWallet();
+  useEffect(() => {
+    if(!walletChainId){
+      connectWalletByLocalStorage();
+    }
+  }, []);
 
   const [poolData, setPoolData] = useState({});
   const [graphTabIndex, setGraphTabIndex] = useState(0);
@@ -99,6 +109,9 @@ function MarketPoolInfo(props) {
   };
 
   useEffect(() => {
+    if (!address || !walletChainId) return;
+    console.log(">>> start fetching data")
+
     // extract the pool day datas
     fetchPoolDayDataForPair(address).then(data => {
 
@@ -220,7 +233,7 @@ function MarketPoolInfo(props) {
 
     // set the watchlists
     updateWatchlistStatus();
-  }, []);
+  }, [walletChainId]);
 
   useEffect(() => {
 
@@ -544,9 +557,12 @@ function MarketPoolInfo(props) {
               </div>
             )}
           </div>
-
           <h2>Transactions</h2>
-          <TransactionTable dataSourceTransaction={tx} />
+          {tx.length <= 0 ? (
+         <Icon type="loading" />
+           ) : (
+           <TransactionTable dataSourceTransaction={tx} />
+            )}
         </>
       )}
 
