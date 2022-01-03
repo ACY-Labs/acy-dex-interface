@@ -429,16 +429,16 @@ const LaunchpadProject = () => {
       // originalElementParent.textContent = allocationAmount;
 
       const oldAllocationAmount = allocationAmount;
-      if (oldAllocationAmount === 0) {
-        requireAllocation(walletId, projectToken).then(res => {
-          if(res && res.allocationAmount) {
-            setAllocationAmount(res.allocationAmount);
-            setCoverOpenState(true);
-          }
-          console.log('allocation get', res.allocationAmount);
-        }).catch(e => {
-          console.error(e);
-        })
+      if (oldAllocationAmount !== 0) {
+          requireAllocation(walletId, projectToken).then(res => {
+            if(res && res.allocationAmount) {
+              setAllocationAmount(res.allocationAmount);
+              setCoverOpenState(true);
+            }
+            console.log('allocation get', res.allocationAmount);
+          }).catch(e => {
+            console.error(e);
+          })
       }
       e.preventDefault();
     };
@@ -448,16 +448,14 @@ const LaunchpadProject = () => {
       <div className='allocationCard-container'>
         <div className="allocationCard" onClick={clickCover}>
           <div class={computeCoverClass()}>
-            {/* <div
-              className="allocationCard-inner"
-            >
+            <div className="allocationCard-inner">
               <p className="inner-text">{index + 1}</p>
-            </div> */}
+            </div>
+            <p className="inner-text-amount">${allocationAmount}</p>
           </div>
-          <p className="inner-text-amount">${allocationAmount}</p>
+          <div className='allocationCard-before'></div>
+          <div className='allocationCard-after'></div>
         </div>
-        <div className='allocationCard-before'></div>
-        <div className='allocationCard-after'></div>
       </div>
     );
   };
@@ -538,17 +536,17 @@ const LaunchpadProject = () => {
 
     const tooltipTitle = () => {
       return(
-      <div>
-        <span>Increase Your Allocation Amount:</span>
-        <br />
-        <span className='tool-tip-content'>
-          1.Increase your trading volume @ <a href="app.acy.finance/#/exchange" target="_blank">Exchange</a>
-        </span>
-        <br />
-        <span className='tool-tip-content'>
-          2.Increase your liquidity @ <a href="app.acy.finance/#/liquidity" target="_blank">Liquidity</a>
-        </span>
-      </div>
+        <div>
+          <span>Increase Your Allocation Amount:</span>
+          <br />
+          <span className='tool-tip-content'>
+            1.Increase your trading volume @ <a href="app.acy.finance/#/exchange" target="_blank">Exchange</a>
+          </span>
+          <br />
+          <span className='tool-tip-content'>
+            2.Increase your liquidity @ <a href="app.acy.finance/#/liquidity" target="_blank">Liquidity</a>
+          </span>
+        </div>
     )}
 
     useEffect(() => {
@@ -861,6 +859,7 @@ const LaunchpadProject = () => {
     setpoolDistributionStage(distributionStage)
     setPoolStatus(curPoolStatus)
     setPoolInvestorData(investorRes)
+    setPoolStatus(Number(BigNumber.from(status).toBigInt()))
   }
 
   // fetching data from Smart Contract

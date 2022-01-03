@@ -5,7 +5,7 @@ import moment from 'moment'
 import { useState } from "react";
 import { Button} from 'antd';
 
-const VestingSchedule = ({ vestingDate, stageData, vestContract }) => {
+const VestingSchedule = ({ vestingDate, stageData, vestingClick }) => {
   const len = vestingDate.length
 
   return (
