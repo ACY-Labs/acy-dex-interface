@@ -784,7 +784,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
   }
 export async function getTransactionsByAccount (account,library,filter){
     let newData = [];
-    console.log(constantInstance);
+    // console.log(constantInstance);
     if(account){
         tokenPriceUSD = await getAllSuportedTokensPrice();
         try{

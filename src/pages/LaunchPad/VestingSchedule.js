@@ -5,11 +5,7 @@ import moment from 'moment'
 import { useState } from "react";
 import { Button} from 'antd';
 
-<<<<<<< Updated upstream
-const VestingSchedule = ({ vestingDate, stageData, vestingClick }) => {
-=======
 const VestingSchedule = ({ vestingDate, stageData, vestContract }) => {
->>>>>>> Stashed changes
   const len = vestingDate.length
 
   return (
