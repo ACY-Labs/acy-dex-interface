@@ -68,6 +68,8 @@ const MarketIndex = props => {
   }, []);
 
   useEffect(() => {
+    if (!account || !chainId) return;
+
     fetchGlobalTransaction().then(globalTransactions => {
         console.log('globaltransaction', globalTransactions);
         if(globalTransactions) settransactions(globalTransactions);
