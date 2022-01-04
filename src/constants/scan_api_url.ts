@@ -13,11 +13,17 @@ const PlygonMainNetAPI = {
     "scanName": "Polygon Scan API"
 }
 
+const PlygonTestNetAPI = {
+    "scanUrl": "https://api-testnet.polygonscan.com/api",
+    "scanName": "Polygon Test Scan API"
+}
+
 const ScanAPIUrlSelector = (arg: string) => {
     return {
         56: BscMainNetAPI,
         97: BscTestNetAPI,
-        137: PlygonMainNetAPI
+        137: PlygonMainNetAPI,
+        80001: PlygonTestNetAPI
     }[arg];
 }
 

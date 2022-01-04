@@ -362,11 +362,39 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
   },
 ];
 
+const PolygonTestNetTokenList: Array<TokenInfo> = [
+  {
+    name: 'MATIC',
+    symbol: 'MATIC',
+    address: '0x0000000000000000000000000000000000001010',
+    decimals: 18,
+    logoURI: 'https://cryptologos.cc/logos/polygon-matic-logo.svg?v=017', 
+    idOnCoingecko: "tether",
+  },
+  {
+    name: 'Test Token',
+    symbol: 'TST',
+    address: '0x2d7882bedcbfddce29ba99965dd3cdf7fcb10a1e',
+    decimals: 18,
+    logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
+    idOnCoingecko: "acy-finance",
+  },
+  {
+    name: 'Dummy Token',
+    symbol: 'DMY',
+    address: '0xfe4f5145f6e09952a5ba9e956ed0c25e3fa4c7f1',
+    decimals: 18,
+    logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
+    idOnCoingecko: "binancecoin",
+  }
+];
+
 const TokenListSelector = (arg: string) => {
   return {
     56: BscMainNetTokenList,
     97: BscTestNetTokenList,
-    137: PolygonMainNetTokenList
+    137: PolygonMainNetTokenList,
+    80001: PolygonTestNetTokenList
   }[arg];
 }
 

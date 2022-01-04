@@ -12,7 +12,7 @@ import GAS_TOKEN_SYMBOL from "./gas_token";
 import { JsonRpcProvider } from "@ethersproject/providers"; 
 
 
-const supportedChainIds = [56, 97, 137];
+export const supportedChainIds = [56, 97, 137, 80001];
 const defaultLibrary = new JsonRpcProvider('https://bsc-dataseed1.defibit.io/');
 
 // import constant to normal js file
