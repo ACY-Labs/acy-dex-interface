@@ -472,6 +472,9 @@ const LaunchpadProject = () => {
     const clickCover = async e => {
       console.log(`click allocation card cover`, allocationAmount);
       console.log(isClickedAllocation);
+      if (!walletId && !projectToken) {
+        return;
+      }
       if (!isAllocated) {
         console.log("Allocation ammount is not ready!");
         return;
