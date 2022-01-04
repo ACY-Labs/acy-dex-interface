@@ -470,7 +470,8 @@ const LaunchpadProject = () => {
       setCoverOpenState(true);
       setIsClickedAllocation(true);
       let cards = document.querySelectorAll(".cover");
-      console.log(e.target.parentElement)
+      console.log(e.target.parentElement);
+      console.log(e.target);
       cards.forEach(node => {
         node.classList.remove("inner-text")
         node.classList.remove("cover");
@@ -480,7 +481,7 @@ const LaunchpadProject = () => {
 
         // get 4 random values for other allocation values
         innerText.textContent = `$${Math.floor(allocationAmount * offsetPercentage)}`;
-        innerText.style.color = "#757579"
+        innerText.style.color = "#757579";
       })
       try {
         let originalElementParent = e.target.parentElement.querySelector(".inner-text-amount");
@@ -513,14 +514,14 @@ const LaunchpadProject = () => {
       <div className='allocationCard-container'>
         <div className="allocationCard" onClick={clickCover}>
           <div class={computeCoverClass()}>
-            <div className="allocationCard-inner">
+            {/* <div className="allocationCard-inner">
               <p className="inner-text">{index + 1}</p>
-            </div>
-              <p className="inner-text-amount">${allocationAmount}</p> 
+            </div> */}
           </div>
-          <div className='allocationCard-before'></div>
-          <div className='allocationCard-after'></div>
+          <p className="inner-text-amount"></p> 
         </div>
+        <div className='allocationCard-before'></div>
+        <div className='allocationCard-after'></div>
       </div>
     );
   };
