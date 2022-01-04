@@ -233,7 +233,7 @@ const LaunchpadProject = () => {
       let tokenNum
       console.log("--------ALREADY SALE----------")
       console.log(alreadySale)
-      if(alreadySale === null){
+      if(!alreadySale){
         tokenNum = 0
       } else {
         tokenNum = alreadySale
@@ -821,7 +821,6 @@ const LaunchpadProject = () => {
   };
 
   const getPoolData = async (lib, acc) => {
-    // FIXME: add contract 56
     console.log(LAUNCHPAD_ADDRESS(), lib);
     const poolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, lib, acc);
     const pool = []
@@ -830,10 +829,10 @@ const LaunchpadProject = () => {
     const investorRes = []
 
     // 合约函数调用
-    const baseData = await poolContract.GetPoolBaseData(9)
-    const distributionData = await poolContract.GetPoolDistributionData(9)
-    const status = await poolContract.GetPoolStatus(9)
-    const investorData = PoolContract.GetInvestmentData(9, account)
+    const baseData = await poolContract.GetPoolBaseData(10)
+    const distributionData = await poolContract.GetPoolDistributionData(10)
+    const status = await poolContract.GetPoolStatus(10)
+    const investorData = PoolContract.GetInvestmentData(10, account)
 
     // getpoolbasedata 数据解析
     const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
