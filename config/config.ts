@@ -36,15 +36,18 @@ const config: IConfig = {
     // }
     // TODO: 更好的解决方法
     '/bsc-main': {
-      target: 'http://147.182.251.92:3001',
+      // target: 'http://147.182.251.92:3001',
+      target: 'http://localhost:3001',
       changeOrigin: true
     },
     '/bsc-test': {
-      target: 'http://147.182.251.92:3001',
+      // target: 'http://147.182.251.92:3001',
+      target: 'http://localhost:3001',
       changeOrigin: true
     },
     '/polygon-main': {
-      target: 'http://147.182.251.92:3001',
+      // target: 'http://147.182.251.92:3001',
+      target: 'http://localhost:3001',
       changeOrigin: true
     }
   },
