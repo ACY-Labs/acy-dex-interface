@@ -39,7 +39,7 @@ const MarketIndex = props => {
   const [ovrVolChange,setovrVolChange] = useState(0.0);
   const [ovrTvlChange,setovrTvlChange] = useState(0.0);
   const [ovrFeeChange,setovrFeeChange] = useState(0.0);
-  const [transactions,settransactions] = useState([]);
+  const [transactions,settransactions] = useState(null);
   const [tokenInfo,settokenInfo] = useState([]);
 
   const [poolInfo,setpoolInfo] = useState([]);
@@ -68,6 +68,8 @@ const MarketIndex = props => {
   }, []);
 
   useEffect(() => {
+    if (!account || !chainId) return;
+
     fetchGlobalTransaction().then(globalTransactions => {
         console.log('globaltransaction', globalTransactions);
         if(globalTransactions) settransactions(globalTransactions);
@@ -247,7 +249,7 @@ const MarketIndex = props => {
       )}
 
       <h2>Transactions</h2>
-      {transactions.length <= 0 ? (
+      {!transactions ? (
         <Icon type="loading" />
       ) : (
         <TransactionTable dataSourceTransaction={transactions} />

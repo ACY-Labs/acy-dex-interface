@@ -160,11 +160,8 @@ const GlobalHeaderRight = props => {
     if (chainId == 56) {
       return 0
     }
-    if (chainId == 97) {
-      return 1
-    }
     if (chainId == 137) {
-      return 2
+      return 1
     }
     return 0
   }
@@ -183,9 +180,16 @@ const GlobalHeaderRight = props => {
         console.log("ERROR: unsupport NetWork");
         setIsModalVisible(true);
         switchEthereumChain("0x38"); //返回默认56链
-      }else{
+      }
+      else if(chainId == 97){
+        // 测试网 不显示给用户
+        switchEthereumChain("0x61");
+        setNetworkListIndex(0)
+      }      
+      else{
         setIsModalVisible(false);
         setVisibleMetaMask(false);
+        setNetworkListIndex(n_index(chainId))
       }
     })
   }, account, chainId, supportedChainIds);
@@ -385,18 +389,10 @@ const GlobalHeaderRight = props => {
   const [networkListIndex, setNetworkListIndex] = useState(0);
   const networkList = [
     {
-      name: 'BSC Mainnet',
+      name: 'BSC',
       icon: 'Binance',
       onClick: async () => {
         await switchEthereumChain("0x38");
-        setVisibleMetaMask(false);
-      },
-    },
-    {
-      name: 'BSC Testnet',
-      icon: 'Binance',
-      onClick: async () => {
-        await switchEthereumChain("0x61");
         setVisibleMetaMask(false);
       },
     },
@@ -407,7 +403,7 @@ const GlobalHeaderRight = props => {
         await switchEthereumChain("0x89");
         setVisibleMetaMask(false);
       },
-    }
+    },
   ];
   const networkListInCardList = (
     <div className={styles.networkListBlock}>
@@ -426,8 +422,22 @@ const GlobalHeaderRight = props => {
       </AcyCardList>
     </div>
   );
+
   return (
     <div className={className}>
+    <Dropdown
+          overlay={networkListInCardList}
+          trigger={['click']}
+          placement="bottomCenter"
+          //className={styles.networkButton}
+        >
+          <Button type="primary" shape="round" className={styles.networkButton}>
+            {[networkList[networkListIndex]].map(item => (
+                <div>{item.name}</div>
+            ))}
+            </Button>
+        </Dropdown>
+
       {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
       <AcyConnectWallet
         chainId={chainId} // this is the chainId from useWeb3React
@@ -437,6 +447,8 @@ const GlobalHeaderRight = props => {
           props.transaction.transactions.length
         }
       />
+      
+
       {false && (
         <Dropdown
           overlay={
@@ -490,11 +502,12 @@ const GlobalHeaderRight = props => {
           />
         </Dropdown>
       )}
+      
+      
 
       <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}>
 
-        {/* 此处增加简单ui */}
-        <div className={styles.walltitle}>
+        {/* <div className={styles.walltitle}>
           <span style={{ marginLeft: '10px' }}>Select Network</span>
         </div>
         <Dropdown
@@ -512,8 +525,8 @@ const GlobalHeaderRight = props => {
               </AcyCardList.Thin>
             ))}
           </AcyCardList>
-        </Dropdown>
-        { /* 此处增加简单ui 结束 */}
+        </Dropdown> */}
+
 
         <div className={styles.walltitle}>
           {/* <AcyIcon.MyIcon width={20} type="Wallet" />{' '} */}
