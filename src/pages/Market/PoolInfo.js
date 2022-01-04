@@ -76,7 +76,7 @@ function MarketPoolInfo(props) {
   const [tvl, setTvl] = useState(0);
   const [volChange, setVolChange] = useState(0);
   const [tvlChange, setTvlChange] = useState(0);
-  const [tx, setTx] = useState([]);
+  const [tx, setTx] = useState(null);
   const [token0Address, setToken0Address] = useState('');
   const [token1Address, setToken1Address] = useState('');
   const [pairArray,setPairArray] = useState({});
@@ -239,7 +239,7 @@ function MarketPoolInfo(props) {
 
     if(poolData.coin1 && poolData.coin2){
       fetchTransactionsForPair(poolData.coin1, poolData.coin2).then(transactions => {
-        // console.log('Pool TRANSAC', transactions);
+        console.log('Pool TRANSAC', transactions);
         setTx(transactions);
       });
     }
@@ -558,7 +558,7 @@ function MarketPoolInfo(props) {
             )}
           </div>
           <h2>Transactions</h2>
-          {tx.length <= 0 ? (
+          {!tx? (
          <Icon type="loading" />
            ) : (
            <TransactionTable dataSourceTransaction={tx} />

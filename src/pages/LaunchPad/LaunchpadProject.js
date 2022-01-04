@@ -37,6 +37,7 @@ import { getContract } from "../../acy-dex-swap/utils/index.js"
 import { useWeb3React } from '@web3-react/core';
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
 import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID } from "@/constants";
+import { CustomError } from "@/acy-dex-swap/utils"
 
 const LaunchpadProject = () => {  
   // STATES
@@ -49,6 +50,7 @@ const LaunchpadProject = () => {
   const [poolStageCount, setpoolStageCount] = useState(0);
   const [poolInvestorData, setPoolInvestorData] = useState(null);
   const [poolStatus, setPoolStatus] = useState(0);
+  const [poolDecimals, setPoolDecimals] = useState(0); // Gary: decimal initialize to 0
   const [isError, setIsError] = useState(false);
   const [hasCollected, setHasCollected] = useState(false);
   const [successCollect, setSuccessCollect] = useState(false);
@@ -59,6 +61,10 @@ const LaunchpadProject = () => {
   const [comparevestDate, setComparevestDate] = useState(false);
   // const [investorNum,setinvestorNum] = useState(0);
   const [allocationAmount, setAllocationAmount] = useState(0);
+  const [isInvesting, setIsInvesting] = useState(false);
+
+  // NOTE: change poolId
+  const PoolId = 11
 
   // CONSTANTS
   const InputGroup = Input.Group;
@@ -489,7 +495,7 @@ const LaunchpadProject = () => {
         originalElementParent.style.color = "#EB5C20"
       } catch (err) {
         // set all values to $0 due to error
-        innerText.textContent = "$0";
+        // innerText.textContent = "$0";
         console.log(err);
       }
       // originalElementParent.textContent = allocationAmount;
@@ -542,9 +548,6 @@ const LaunchpadProject = () => {
             setAllocationAmount(res.allocationAmount);
             console.log('allocation amount', res.allocationAmount);
           }
-          else {
-            requireAllocation(walletId, projectToken)
-          }
         })
         .catch(e => {
           console.error(e);
@@ -570,7 +573,6 @@ const LaunchpadProject = () => {
             index={i}
             Component={BaseCard}
             allocationAmount={allocationAmount}
-            // allocationAmount={0}
             setAllocationAmount={setAllocationAmount}
             walletId={walletId}
             projectToken={project}
@@ -630,23 +632,23 @@ const LaunchpadProject = () => {
         timeout = setTimeout(() => setSuccessCollect(false), 1000);
       }
       return () => clearTimeout(timeout);
-  }, [isError, hasCollected]);
+    }, [isError, hasCollected]);
 
 
-  const vestCallback = async (status) => {
-    const sti = async (hash) => {
-      library.getTransactionReceipt(hash).then(async receipt => {
-        console.log(`receiptreceipt for ${hash}: `, receipt);
-        // receipt is not null when transaction is done
-        if (!receipt) 
-          setTimeout(sti(hash), 500);
-        else {
-          setSuccessCollect(true);
-        }
-      });
-    }
-    sti(status.hash);
-  };
+    const vestCallback = async (status) => {
+      const sti = async (hash) => {
+        library.getTransactionReceipt(hash).then(async receipt => {
+          console.log(`receiptreceipt for ${hash}: `, receipt);
+          // receipt is not null when transaction is done
+          if (!receipt) 
+            setTimeout(sti(hash), 500);
+          else {
+            setSuccessCollect(true);
+          }
+        });
+      }
+      sti(status.hash);
+    };
 
     const vestingClaimClicked = async () => {
       if(!isVesting){
@@ -711,6 +713,29 @@ const LaunchpadProject = () => {
       
     }
 
+    const investClicked = async(poolId, amount) => {
+      if (poolStatus !== 2) {// cannot buy
+        setIsVesting(false);
+        
+      } else 
+      {
+        setIsVesting(true);
+        if (!account) {
+          setIsError(true)
+          connectWallet()
+        }
+        const status = await (async () => {
+          const result = await PoolContract.InvestERC20(poolId , amount)
+            .catch(e => {
+              console.log(e)
+              return new CustomError('CustomError while buying token');
+            });
+          return result;
+        })();
+        console.log("buy contract", status)
+      }
+    }
+
     return (
       <div>
       { !isVesting ? 
@@ -745,7 +770,7 @@ const LaunchpadProject = () => {
                 {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
               </InputGroup>
             </div>
-            <Button className={isValidSalesPrice ? "sales-submit" : "sales-submit invalid"} onClick={() => console.log("buy")} disabled={!comparesaleDate || !isValidSalesPrice}> Buy </Button>
+            <Button className={"sales-submit"} onClick={() => {console.log("buy"); investClicked(PoolId, salesValue); }} disabled={!comparesaleDate || !isValidSalesPrice}> Buy </Button>
           </form>
 
           { (poolDistributionDate && poolDistributionStage) &&
@@ -830,19 +855,28 @@ const LaunchpadProject = () => {
     const investorRes = []
 
     // 合约函数调用
-    const baseData = await poolContract.GetPoolBaseData(10)
-    const distributionData = await poolContract.GetPoolDistributionData(10)
-    const status = await poolContract.GetPoolStatus(10)
-    const investorData = PoolContract.GetInvestmentData(10, account)
+    const baseData = await poolContract.GetPoolBaseData(PoolId)
+    const distributionData = await poolContract.GetPoolDistributionData(PoolId)
+    const status = await poolContract.GetPoolStatus(PoolId)
+    const investorData = poolContract.GetInvestmentData(PoolId, account)
+
+    console.log("tx data: ", baseData, distributionData, status, investorData)
+
 
     // getpoolbasedata 数据解析
     const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
+
+    console.log("token1contract", token1contract)
+
     const token1decimal = await token1contract.decimals()
     // 不解析时间戳
     const res1 = BigNumber.from(baseData[2]).toBigInt().toString().slice(0,-(token1decimal)) // 获取销售的token的总数
     const res2 = BigNumber.from(baseData[3]).toBigInt().toString().slice(0,-(token1decimal)) // 已销售的token的数量
     const res3 = BigNumber.from(baseData[4]).toBigInt()
     const res4 = BigNumber.from(baseData[5]).toBigInt()
+
+    console.log("res: ", res1, res2, res3, res4)
+
     // 获取当前阶段
     const d = Math.round(new Date().getTime()/1000)
     if(d > res3) setComparesaleDate(true)

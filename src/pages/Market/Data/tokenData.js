@@ -193,33 +193,41 @@ function parseTokenData (data){
   data.forEach(element => {
       let index0 = newData.findIndex(item => item.address.toLowerCase() == element.token0.toLowerCase() );
       let index1 = newData.findIndex(item => item.address.toLowerCase() == element.token1.toLowerCase() );
-      newData[index0].tvl += totalInUSD([
-        {
-          token : newData[index0].short,
-          amount : element.lastReserves.token0
-        }
-      ],tokensPriceUSD);
 
-      newData[index0].volume24h += totalInUSD([
-        {
-          token : newData[index0].short,
-          amount : element.lastVolume.token0
-        }
-      ],tokensPriceUSD);
+      if(index0>=0 && index0<newData.length){
 
-      newData[index1].tvl += totalInUSD([
-        {
-          token : newData[index1].short,
-          amount : element.lastReserves.token1
-        }
-      ],tokensPriceUSD);
+          newData[index0].tvl += totalInUSD([
+            {
+              token : newData[index0].short,
+              amount : element.lastReserves.token0
+            }
+          ],tokensPriceUSD);
+    
+          newData[index0].volume24h += totalInUSD([
+            {
+              token : newData[index0].short,
+              amount : element.lastVolume.token0
+            }
+          ],tokensPriceUSD);
 
-      newData[index1].volume24h += totalInUSD([
-        {
-          token : newData[index1].short,
-          amount : element.lastVolume.token1
-        }
-      ],tokensPriceUSD);
+      }
+
+      if(index1>=0 && index1<newData.length){
+          newData[index1].tvl += totalInUSD([
+            {
+              token : newData[index1].short,
+              amount : element.lastReserves.token1
+            }
+          ],tokensPriceUSD);
+    
+          newData[index1].volume24h += totalInUSD([
+            {
+              token : newData[index1].short,
+              amount : element.lastVolume.token1
+            }
+          ],tokensPriceUSD);
+      }
+
 
   });
 
@@ -257,13 +265,25 @@ export async function fetchTokenSearch(client, searchQuery) {
   if (loading) return null;
   if (error) return `Error! ${error}`;
 
+  // return sortTable(
+  //   [...data.asAddress, ...data.asSymbol, ...data.asName]
+  //     .filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)
+  //     .map(item => ({
+  //       id: item.id,
+  //       name: item.name,
+  //       symbol: item.symbol,
+  //       txCount: parseInt(item.txCount)
+  //     })),
+  //   'txCount',
+  //   true
+  // );
   return sortTable(
     [...data.asAddress, ...data.asSymbol, ...data.asName]
       .filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)
       .map(item => ({
-        id: item.id,
-        name: item.name,
-        symbol: item.symbol,
+        id: "1223",
+        name: "abcusd",
+        symbol: "BNB",
         txCount: parseInt(item.txCount)
       })),
     'txCount',
