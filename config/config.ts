@@ -29,24 +29,21 @@ const config: IConfig = {
     'table-border-radius-base': '10px',
   },
   proxy: {
-    // '/api': {
-    //   // target: 'https://api.acy.finance',
-    //   target: 'http://localhost:3001',
-    //   changeOrigin: true
-    // }
+     /* '/api': {
+       target: 'https://api.acy.finance',
+       //target: 'http://localhost:3001',
+       changeOrigin: true
+     } */
     // TODO: 更好的解决方法
     '/bsc-main': {
-      // target: 'http://147.182.251.92:3001',
       target: 'http://localhost:3001',
       changeOrigin: true
     },
     '/bsc-test': {
-      // target: 'http://147.182.251.92:3001',
       target: 'http://localhost:3001',
       changeOrigin: true
     },
     '/polygon-main': {
-      // target: 'http://147.182.251.92:3001',
       target: 'http://localhost:3001',
       changeOrigin: true
     }

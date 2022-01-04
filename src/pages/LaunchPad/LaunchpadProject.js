@@ -517,7 +517,7 @@ const LaunchpadProject = () => {
             <div className="allocationCard-inner">
               <p className="inner-text">{index + 1}</p>
             </div>
-            {/* <p className="inner-text-amount">${allocationAmount}</p> */}
+              <p className="inner-text-amount">${allocationAmount}</p> 
           </div>
           <div className='allocationCard-before'></div>
           <div className='allocationCard-after'></div>
@@ -528,29 +528,29 @@ const LaunchpadProject = () => {
 
   const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount}) => {
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
-    // const { account: walletId } = useWeb3React();
+    const { account: walletId } = useWeb3React();
 
-    // useEffect(() => {
-    //   if (!walletId || !projectToken) {
-    //     return
-    //   }
-    //   // get allocation status from backend at begining
-    //   console.log("line470", walletId, projectToken);
-    //   getAllocationInfo(walletId, projectToken)
-    //     .then(res => {
-    //       console.log("res, res.allocationAmount", res, res.allocationAmount)
-    //       if (res && res.allocationAmount) {
-    //         setAllocationAmount(res.allocationAmount);
-    //         console.log('allocation amount', res.allocationAmount);
-    //       }
-    //       // else {
-    //       //   requireAllocation(walletId, projectToken)
-    //       // }
-    //     })
-    //     .catch(e => {
-    //       console.error(e);
-    //     });
-    // }, [walletId, projectToken]);
+    useEffect(() => {
+      if (!walletId || !projectToken) {
+        return
+      }
+      // get allocation status from backend at begining
+      console.log("line470", walletId, projectToken);
+      getAllocationInfo(walletId, projectToken)
+        .then(res => {
+          console.log("res, res.allocationAmount", res, res.allocationAmount)
+          if (res && res.allocationAmount) {
+            setAllocationAmount(res.allocationAmount);
+            console.log('allocation amount', res.allocationAmount);
+          }
+          else {
+            requireAllocation(walletId, projectToken)
+          }
+        })
+        .catch(e => {
+          console.error(e);
+        });
+    }, [walletId, projectToken]);
 
     // TODO: replace with 24 icon
     const BaseCard = ({ url }) => {
@@ -818,7 +818,7 @@ const LaunchpadProject = () => {
             />
           </div>
           <ProjectDescription />
-          {/* <ChartCard className="launchpad-chart" /> */}
+          <ChartCard className="launchpad-chart" /> 
         </div>
       </div>
     );
