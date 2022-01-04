@@ -193,33 +193,41 @@ function parseTokenData (data){
   data.forEach(element => {
       let index0 = newData.findIndex(item => item.address.toLowerCase() == element.token0.toLowerCase() );
       let index1 = newData.findIndex(item => item.address.toLowerCase() == element.token1.toLowerCase() );
-      newData[index0].tvl += totalInUSD([
-        {
-          token : newData[index0].short,
-          amount : element.lastReserves.token0
-        }
-      ],tokensPriceUSD);
 
-      newData[index0].volume24h += totalInUSD([
-        {
-          token : newData[index0].short,
-          amount : element.lastVolume.token0
-        }
-      ],tokensPriceUSD);
+      if(index0>=0 && index0<newData.length){
 
-      newData[index1].tvl += totalInUSD([
-        {
-          token : newData[index1].short,
-          amount : element.lastReserves.token1
-        }
-      ],tokensPriceUSD);
+          newData[index0].tvl += totalInUSD([
+            {
+              token : newData[index0].short,
+              amount : element.lastReserves.token0
+            }
+          ],tokensPriceUSD);
+    
+          newData[index0].volume24h += totalInUSD([
+            {
+              token : newData[index0].short,
+              amount : element.lastVolume.token0
+            }
+          ],tokensPriceUSD);
 
-      newData[index1].volume24h += totalInUSD([
-        {
-          token : newData[index1].short,
-          amount : element.lastVolume.token1
-        }
-      ],tokensPriceUSD);
+      }
+
+      if(index1>=0 && index1<newData.length){
+          newData[index1].tvl += totalInUSD([
+            {
+              token : newData[index1].short,
+              amount : element.lastReserves.token1
+            }
+          ],tokensPriceUSD);
+    
+          newData[index1].volume24h += totalInUSD([
+            {
+              token : newData[index1].short,
+              amount : element.lastVolume.token1
+            }
+          ],tokensPriceUSD);
+      }
+
 
   });
 
