@@ -62,6 +62,7 @@ const LaunchpadProject = () => {
   // const [investorNum,setinvestorNum] = useState(0);
   const [allocationAmount, setAllocationAmount] = useState(0);
   const [isInvesting, setIsInvesting] = useState(false);
+  const [isAllocated, setIsAllocated] = useState(false);
 
   // NOTE: change poolId
   const PoolId = 11
@@ -453,7 +454,8 @@ const LaunchpadProject = () => {
     walletId,
     projectToken,
     isClickedAllocation,
-    setIsClickedAllocation
+    setIsClickedAllocation,
+    isAllocated,
   }) => {
     const [coverOpenState, setCoverOpenState] = useState(false);
     const [coverRevealState, setCoverRevealState] = useState(false);
@@ -470,14 +472,16 @@ const LaunchpadProject = () => {
     const clickCover = async e => {
       console.log(`click allocation card cover`, allocationAmount);
       console.log(isClickedAllocation);
+      if (!isAllocated) {
+        console.log("Allocation ammount is not ready!");
+        return;
+      }
       if (isClickedAllocation) {
         return;
       }
       setCoverOpenState(true);
       setIsClickedAllocation(true);
       let cards = document.querySelectorAll(".cover");
-      console.log(e.target.parentElement);
-      console.log(e.target);
       cards.forEach(node => {
         node.classList.remove("inner-text")
         node.classList.remove("cover");
@@ -500,18 +504,8 @@ const LaunchpadProject = () => {
       }
       // originalElementParent.textContent = allocationAmount;
 
-      const oldAllocationAmount = allocationAmount;
-      if (oldAllocationAmount === 0) {
-          requireAllocation('bsc-main', walletId, projectToken).then(res => {
-            if(res && res.allocationAmount) {
-              setAllocationAmount(res.allocationAmount);
-              setCoverOpenState(true);
-            }
-            console.log('allocation get', res.allocationAmount);
-          }).catch(e => {
-            console.error(e);
-          })
-      }
+      
+      setCoverOpenState(true);
       e.preventDefault();
     };
 
@@ -532,26 +526,39 @@ const LaunchpadProject = () => {
     );
   };
 
-  const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount}) => {
+  const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount, isAllocated, setIsAllocated}) => {
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
-
     useEffect(() => {
       if (!walletId || !projectToken) {
         return
       }
       // get allocation status from backend at begining
-      console.log("line470", walletId, projectToken);
-      getAllocationInfo(walletId, projectToken)
-        .then(res => {
-          console.log("res, res.allocationAmount", res, res.allocationAmount)
-          if (res && res.allocationAmount) {
-            setAllocationAmount(res.allocationAmount);
-            console.log('allocation amount', res.allocationAmount);
-          }
-        })
-        .catch(e => {
-          console.error(e);
-        });
+      // console.log("line470", walletId, projectToken);
+      // getAllocationInfo(walletId, projectToken)
+      //   .then(res => {
+      //     console.log("res, res.allocationAmount", res, res.allocationAmount)
+      //     if (res && res.allocationAmount) {
+      //       setAllocationAmount(res.allocationAmount);
+      //       console.log('allocation amount', res.allocationAmount);
+      //     }
+      //   })
+      //   .catch(e => {
+      //     console.error(e);
+      //   });
+      
+      const oldAllocationAmount = allocationAmount;
+      if (oldAllocationAmount === 0) {
+          requireAllocation('bsc-main', walletId, projectToken).then(res => {
+            if(res && res.allocationAmount) {
+              setAllocationAmount(res.allocationAmount);
+              setIsAllocated(true);
+              // setCoverOpenState(true);
+            }
+            console.log('allocation get', res.allocationAmount);
+          }).catch(e => {
+            console.error(e);
+          })
+      }
     }, [walletId, projectToken]);
 
     // TODO: replace with 24 icon
@@ -578,6 +585,7 @@ const LaunchpadProject = () => {
             projectToken={project}
             isClickedAllocation={isClickedAllocation}
             setIsClickedAllocation={setIsClickedAllocation}
+            isAllocated={isAllocated}
           />
         );
       }
@@ -815,7 +823,7 @@ const LaunchpadProject = () => {
     );
   };
 
-  const CardArea = ({ walletId,  allocationAmount, setAllocationAmount }) => {
+  const CardArea = ({ walletId,  allocationAmount, setAllocationAmount, isAllocated, setIsAllocated }) => {
     // const { account: walletId } = useWeb3React();
     return (
       <div className="gridContainer">
@@ -837,6 +845,8 @@ const LaunchpadProject = () => {
               projectToken={receivedData.projectToken}
               allocationAmount={allocationAmount}
               setAllocationAmount={setAllocationAmount}
+              isAllocated={isAllocated}
+              setIsAllocated = {setIsAllocated}
             />
           </div>
           <ProjectDescription />
@@ -916,7 +926,7 @@ const LaunchpadProject = () => {
         {hasCollected ? <Alert message="You have collected token for current vesting stage." type="info" showIcon /> : ""}
         <TokenBanner posterUrl={receivedData.projectToken === "PCR" ? paycerBanner : receivedData.posterUrl} />
         <TokenLogoLabel projectName={receivedData.projectName} tokenLogo={receivedData.projectToken === "PCR" ? PaycerIcon : receivedData.tokenLogoUrl} />
-        <CardArea walletId={account} allocationAmount={allocationAmount} setAllocationAmount={setAllocationAmount} />
+        <CardArea walletId={account} allocationAmount={allocationAmount} setAllocationAmount={setAllocationAmount} isAllocated={isAllocated} setIsAllocated={setIsAllocated}/>
       </div>
     </div>
   );
