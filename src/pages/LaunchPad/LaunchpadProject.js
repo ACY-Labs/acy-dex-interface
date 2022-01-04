@@ -38,17 +38,9 @@ import { useWeb3React } from '@web3-react/core';
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
 import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID } from "@/constants";
 
-const LaunchpadProject = () => {
-  console.log($(document).height());
-  
-  const InputGroup = Input.Group;
+const LaunchpadProject = () => {  
+  // STATES
   const { account, chainId, library, activate, active } = useWeb3React();
-  const PoolContract = getContract("0x6e0EC29eA8afaD2348C6795Afb9f82e25F196436", POOLABI, library, account);
-  const connectWallet = async () =>  {
-    activate(binance);
-    activate(injected);
-  };
-
   const { projectId } = useParams();
   const [receivedData, setReceivedData] = useState({});
   const [poolBaseData, setPoolBaseData] = useState(null);
@@ -66,10 +58,101 @@ const LaunchpadProject = () => {
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
   // const [investorNum,setinvestorNum] = useState(0);
+  const [allocationAmount, setAllocationAmount] = useState(0);
 
-  console.log("---------STATUS---------")
-  console.log(poolStatus)
+  // CONSTANTS
+  const InputGroup = Input.Group;
+  const logoObj = {
+    "telegram": telegramWIcon,
+    "twitter": twitterWIcon,
+    "website": linkWIcon,
+    "whitepaper": fileWIcon,
+    "linkedin": linkedinIcon,
+    "medium": mediumIcon,
+    "youtube": youtubeIcon,
+    "github": githubIcon,
+    "etheraddress": etherIcon,
+    "polyaddress": polyIcon,
+  }
+  const PoolContract = getContract("0x6e0EC29eA8afaD2348C6795Afb9f82e25F196436", POOLABI, library, account);
 
+  // HOOKS
+  useEffect(() => {
+    getProjectInfo('bsc-main', projectId)
+      .then(res => {
+        if (res) {
+          // extract data from string
+          const contextData = JSON.parse(res.contextData);
+
+          res['tokenLabels'] = contextData['tokenLabels'];
+          res['projectDescription'] = contextData['projectDescription'];
+          res['alreadySale'] = contextData['alreadySale'];
+          res['salePercentage'] = contextData['salePercentage'];
+          res['posterUrl'] = contextData['posterUrl']
+          res['tokenLogoUrl'] = contextData['tokenLogoUrl']
+
+          res['regStart'] = format_time(res.regStart);
+          res['regEnd'] = format_time(res.regEnd);
+          res['saleStart'] = format_time(res.saleStart);
+          res['saleEnd'] = format_time(res.saleEnd);
+
+          res['totalSale'] = res.totalSale;
+          res['totalRaise'] = res.totalRaise;
+          res['projectUrl'] = res.projectUrl;
+          res['projectName'] = res.projectName;
+
+          setReceivedData(res);
+        } else {
+          console.log('redirect to list page');
+          history.push('/launchpad');
+        }
+      })
+      .catch(e => {
+        console.error(e);
+        history.push('/launchpad');
+      });
+  }, []);
+
+  // fetching data from Smart Contract
+  useEffect(async () => {
+    if(!account){
+      connectWallet();
+    }
+    else if (account || library){
+      console.log("start getPoolBaseData")
+      getPoolData(library, account)
+    } else {
+      const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
+      const accnt = "0x0000000000000000000000000000000000000000";
+      getPoolData(provider, accnt)
+    }
+  }, [library, account])
+
+
+  // FUNCTIONS
+  const connectWallet = async () =>  {
+    activate(binance);
+    activate(injected);
+  };
+
+  const clickToWebsite = () => {
+    const newWindow = window.open(receivedData.website, '_blank', 'noopener,noreferrer');
+    if (newWindow) newWindow.opener = null;
+  }
+
+  const format_time = timeZone => {
+    return moment(timeZone)
+      .local()
+      .format('MM/DD/YYYY HH:mm:ss');
+  };
+
+  const convertUnixTime = unixTime => {
+    const data = new Date((Number(unixTime)) * 1000)
+    const res = data.toLocaleString()
+    return res
+  }
+
+  // COMPONENTS
   // change to URL
   const TokenBanner = ({ posterUrl }) => {
     return (
@@ -80,11 +163,6 @@ const LaunchpadProject = () => {
       />
     );
   };
-
-  const clickToWebsite = () => {
-    const newWindow = window.open(receivedData.website, '_blank', 'noopener,noreferrer');
-    if (newWindow) newWindow.opener = null;
-  }
 
   const TokenLogoLabel = ({ projectName, tokenLogo}) => {
     return (
@@ -248,19 +326,6 @@ const LaunchpadProject = () => {
     );
   };
 
-  const logoObj = {
-    "telegram": telegramWIcon,
-    "twitter": twitterWIcon,
-    "website": linkWIcon,
-    "whitepaper": fileWIcon,
-    "linkedin": linkedinIcon,
-    "medium": mediumIcon,
-    "youtube": youtubeIcon,
-    "github": githubIcon,
-    "etheraddress": etherIcon,
-    "polyaddress": polyIcon,
-  }
-
   const ProjectDescription = () => {
     return (
       <div className="circleBorderCard cardContent">
@@ -294,7 +359,7 @@ const LaunchpadProject = () => {
       </div>
     );
   };
-  /*
+  
   const ChartCard = () => {
     const [chartData, setChartData] = useState([]);
     const [transferData, setTransferData] = useState([]);
@@ -372,7 +437,6 @@ const LaunchpadProject = () => {
       </div>
     );
   };
-  */
 
   const AllocationCard = ({
     id,
@@ -400,7 +464,6 @@ const LaunchpadProject = () => {
     const clickCover = async e => {
       console.log(`click allocation card cover`, allocationAmount);
       console.log(isClickedAllocation);
-      return;
       if (isClickedAllocation) {
         return;
       }
@@ -432,7 +495,7 @@ const LaunchpadProject = () => {
 
       const oldAllocationAmount = allocationAmount;
       if (oldAllocationAmount === 0) {
-          requireAllocation(walletId, projectToken).then(res => {
+          requireAllocation('bsc-main', walletId, projectToken).then(res => {
             if(res && res.allocationAmount) {
               setAllocationAmount(res.allocationAmount);
               setCoverOpenState(true);
@@ -453,7 +516,7 @@ const LaunchpadProject = () => {
             <div className="allocationCard-inner">
               <p className="inner-text">{index + 1}</p>
             </div>
-            {/* <p className="inner-text-amount">${allocationAmount}</p> */ <p className="inner-text-amount">${0}</p>}
+              <p className="inner-text-amount">${allocationAmount}</p> 
           </div>
           <div className='allocationCard-before'></div>
           <div className='allocationCard-after'></div>
@@ -464,29 +527,28 @@ const LaunchpadProject = () => {
 
   const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount}) => {
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
-    // const { account: walletId } = useWeb3React();
 
-    // useEffect(() => {
-    //   if (!walletId || !projectToken) {
-    //     return
-    //   }
-    //   // get allocation status from backend at begining
-    //   console.log("line470", walletId, projectToken);
-    //   getAllocationInfo(walletId, projectToken)
-    //     .then(res => {
-    //       console.log("res, res.allocationAmount", res, res.allocationAmount)
-    //       if (res && res.allocationAmount) {
-    //         setAllocationAmount(res.allocationAmount);
-    //         console.log('allocation amount', res.allocationAmount);
-    //       }
-    //       // else {
-    //       //   requireAllocation(walletId, projectToken)
-    //       // }
-    //     })
-    //     .catch(e => {
-    //       console.error(e);
-    //     });
-    // }, [walletId, projectToken]);
+    useEffect(() => {
+      if (!walletId || !projectToken) {
+        return
+      }
+      // get allocation status from backend at begining
+      console.log("line470", walletId, projectToken);
+      getAllocationInfo(walletId, projectToken)
+        .then(res => {
+          console.log("res, res.allocationAmount", res, res.allocationAmount)
+          if (res && res.allocationAmount) {
+            setAllocationAmount(res.allocationAmount);
+            console.log('allocation amount', res.allocationAmount);
+          }
+          else {
+            requireAllocation(walletId, projectToken)
+          }
+        })
+        .catch(e => {
+          console.error(e);
+        });
+    }, [walletId, projectToken]);
 
     // TODO: replace with 24 icon
     const BaseCard = ({ url }) => {
@@ -506,8 +568,8 @@ const LaunchpadProject = () => {
             id={i}
             index={i}
             Component={BaseCard}
-            // allocationAmount={allocationAmount}
-            allocationAmount={0}
+            allocationAmount={allocationAmount}
+            // allocationAmount={0}
             setAllocationAmount={setAllocationAmount}
             walletId={walletId}
             projectToken={project}
@@ -752,61 +814,11 @@ const LaunchpadProject = () => {
             />
           </div>
           <ProjectDescription />
-          {/* <ChartCard className="launchpad-chart" /> */}
+          <ChartCard className="launchpad-chart" /> 
         </div>
       </div>
     );
   };
-
-  const format_time = timeZone => {
-    return moment(timeZone)
-      .local()
-      .format('MM/DD/YYYY HH:mm:ss');
-  };
-
-  useEffect(() => {
-    getProjectInfo(projectId)
-      .then(res => {
-        if (res) {
-          // extract data from string
-          const contextData = JSON.parse(res.contextData);
-
-          res['tokenLabels'] = contextData['tokenLabels'];
-          res['projectDescription'] = contextData['projectDescription'];
-          res['alreadySale'] = contextData['alreadySale'];
-          res['salePercentage'] = contextData['salePercentage'];
-          res['posterUrl'] = contextData['posterUrl']
-          res['tokenLogoUrl'] = contextData['tokenLogoUrl']
-
-          res['regStart'] = format_time(res.regStart);
-          res['regEnd'] = format_time(res.regEnd);
-          res['saleStart'] = format_time(res.saleStart);
-          res['saleEnd'] = format_time(res.saleEnd);
-
-          res['totalSale'] = res.totalSale;
-          res['totalRaise'] = res.totalRaise;
-          res['projectUrl'] = res.projectUrl;
-          res['projectName'] = res.projectName;
-
-          setReceivedData(res);
-        } else {
-          console.log('redirect to list page');
-          history.push('/launchpad');
-        }
-      })
-      .catch(e => {
-        console.error(e);
-        history.push('/launchpad');
-      });
-  }, []);
-
-  const convertUnixTime = unixTime => {
-    const data = new Date((Number(unixTime)) * 1000)
-    const res = data.toLocaleString()
-    return res
-  }
-
-  // const { launchSetting: { CHAINID, ADDRESS } } = useConstantLoader();
 
   const getPoolData = async (lib, acc) => {
     // FIXME: add contract 56
@@ -862,24 +874,6 @@ const LaunchpadProject = () => {
     setPoolInvestorData(investorRes)
     setPoolStatus(Number(BigNumber.from(status).toBigInt()))
   }
-
-  // fetching data from Smart Contract
-  useEffect(async () => {
-    if(!account){
-      connectWallet();
-    }
-    else if (account || library){
-      console.log("start getPoolBaseData")
-      getPoolData(library, account)
-    } else {
-      const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
-      const accnt = "0x0000000000000000000000000000000000000000";
-      getPoolData(provider, accnt)
-    }
-  }, [library, account])
-
-  // allocation amount
-  const [allocationAmount, setAllocationAmount] = useState(0);
 
   return (
     <div>

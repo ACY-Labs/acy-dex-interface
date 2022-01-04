@@ -29,9 +29,22 @@ const config: IConfig = {
     'table-border-radius-base': '10px',
   },
   proxy: {
-    '/api': {
-      target: 'https://api.acy.finance',
-      // target: 'http://localhost:3001/bsc-test',
+     /* '/api': {
+       target: 'https://api.acy.finance',
+       //target: 'http://localhost:3001',
+       changeOrigin: true
+     } */
+    // TODO: 更好的解决方法
+    '/bsc-main': {
+      target: 'http://localhost:3001',
+      changeOrigin: true
+    },
+    '/bsc-test': {
+      target: 'http://localhost:3001',
+      changeOrigin: true
+    },
+    '/polygon-main': {
+      target: 'http://localhost:3001',
       changeOrigin: true
     }
   },
