@@ -435,8 +435,6 @@ export function parseArbitrageLog({ data, topics }) {
   };
 }
 export async function getAllSuportedTokensPrice() {
-  const chainId = CHAINID();
-  const library = new JsonRpcProvider(RPC_URL(), chainId);
   const tokenList = TOKENLIST();
   const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
   const searchIds = searchIdsArray.join('%2C');
@@ -449,74 +447,10 @@ export async function getAllSuportedTokensPrice() {
     tokenList.forEach(token => {
       tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
     })
-    tokensPrice['ACY'] = await getACYPrice(library);//dont know acy price now;
-
     return tokensPrice;
   });
-  console.log("TOKEN PRICE1:", tokensPrice, library);
   return tokensPrice;
 }
-
-export async function getACYPrice(library){
-  const tokenList = TOKENLIST();
-  const chainId = CHAINID();
-
-  const ACY  = tokenList.find(token => token.symbol == "ACY");
-  const BUSD = tokenList.find(token => token.symbol == "BUSD");
-  const USDT = tokenList.find(token => token.symbol == "USDT");
-
-  const acyToken  = new Token(chainId, "0xc94595b56e301f3ffedb8ccc2d672882d623e53a", 18, "ACY");
-  const usdToken  = new Token(chainId, "0x55d398326f99059ff775485246999027b3197955", 18, "USDT");
-  const busdToken = new Token(chainId, "0xe9e7cea3dedca5984780bafc599bd69add087d56", 18, "BUSD");
-  const acyUsdtPair = await Fetcher.fetchPairData(acyToken, usdToken, library, chainId).catch(e => {
-    return false
-  });
-  const acyBusdPair = await Fetcher.fetchPairData(acyToken, busdToken, library, chainId).catch(e => {
-    return false
-  });
-  if(!acyUsdtPair && !acyBusdPair) {
-    return 0.2;
-  } else if(!acyUsdtPair) {
-    const result = await getTokenPriceByPair(acyBusdPair, ACY.symbol, library);
-    return result;
-  } else if(!acyBusdPair) {
-    const result = await getTokenPriceByPair(acyUsdtPair, ACY.symbol, library);
-    return result;
-  } else {
-    const acyToUsdtPrice =  getTokenPriceByPair(acyUsdtPair, ACY.symbol, library);
-    const acyToBusdPrice =  getTokenPriceByPair(acyBusdPair, ACY.symbol, library);
-    let [result1, result2] = await Promise.all([acyToUsdtPrice, acyToBusdPrice]);
-    const result = (result1+result2)/2;
-    return result;
-  }
-}
-
-export async function getTokenPriceByPair(pair, symbol, library) {
-  const pair_contract = getPairContract(pair.liquidityToken.address, library)
-  const totalSupply = await pair_contract.totalSupply();
-  const totalAmount = new TokenAmount(pair.liquidityToken, totalSupply.toString());
-  const allToken0 = pair.getLiquidityValue(
-      pair.token0,
-      totalAmount,
-      totalAmount,
-      false
-  );
-  const allToken1 = pair.getLiquidityValue(
-      pair.token1,
-      totalAmount,
-      totalAmount,
-      false
-  );
-  const allToken0Amount = parseFloat(allToken0.toExact());
-  const allToken1Amount = parseFloat(allToken1.toExact());
-  if(pair.token0.symbol == symbol) {
-    return allToken1Amount / allToken0Amount ;
-  } else {
-    return allToken0Amount / allToken1Amount ;
-  }
-  return 0;
-}
-
 // return output field amount for swap component
 export async function withExactInEstimateOutAmount(deltaX, xTokenAddress, yTokenAddress, maxPathNum = 15, library, account) {
   const flashArbitrageContract = getContract(FLASH_ARBITRAGE_ADDRESS(), FlashArbitrageABI, library, account)
