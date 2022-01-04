@@ -464,7 +464,6 @@ const LaunchpadProject = () => {
     const clickCover = async e => {
       console.log(`click allocation card cover`, allocationAmount);
       console.log(isClickedAllocation);
-      return;
       if (isClickedAllocation) {
         return;
       }
@@ -528,7 +527,6 @@ const LaunchpadProject = () => {
 
   const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount}) => {
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
-    const { account: walletId } = useWeb3React();
 
     useEffect(() => {
       if (!walletId || !projectToken) {
@@ -570,8 +568,8 @@ const LaunchpadProject = () => {
             id={i}
             index={i}
             Component={BaseCard}
-            // allocationAmount={allocationAmount}
-            allocationAmount={0}
+            allocationAmount={allocationAmount}
+            // allocationAmount={0}
             setAllocationAmount={setAllocationAmount}
             walletId={walletId}
             projectToken={project}
