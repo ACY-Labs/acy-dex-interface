@@ -12,9 +12,9 @@ import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import ERC20ABI from '../abis/ERC20.json';
 import axios from 'axios';
 import { JsonRpcProvider } from "@ethersproject/providers";
-import {ROUTER_ADDRESS, FARMS_ADDRESS, FLASH_ARBITRAGE_ADDRESS, FACTORY_ADDRESS, INIT_CODE_HASH, RPC_URL, CHAINID, TOKENLIST, API_URL} from "@/constants";
+import {ROUTER_ADDRESS, FARMS_ADDRESS, FLASH_ARBITRAGE_ADDRESS, FACTORY_ADDRESS, INIT_CODE_HASH, RPC_URL, CHAINID, TOKENLIST, API_URL, NATIVE_CURRENCY} from "@/constants";
 
-export {ROUTER_ADDRESS, FARMS_ADDRESS, FLASH_ARBITRAGE_ADDRESS, FACTORY_ADDRESS, INIT_CODE_HASH, RPC_URL, CHAINID, TOKENLIST, API_URL}
+export {ROUTER_ADDRESS, FARMS_ADDRESS, FLASH_ARBITRAGE_ADDRESS, FACTORY_ADDRESS, INIT_CODE_HASH, RPC_URL, CHAINID, TOKENLIST, API_URL, NATIVE_CURRENCY}
 
 //old farm address 0xf132Fdd642Afa79FDF6C1B77e787865C652eC824
 //new farm address 0x96c13313aB386BCB16168Dee3D2d86823A990770
@@ -159,6 +159,7 @@ export function isZero(hexNumberString) {
 // return token allowance in BigNumber
 export async function getAllowance(tokenAddress, owner, spender, library, account) {
   const tokenContract = getContract(tokenAddress, ERC20ABI, library, account);
+  console.log("TEST HERE:");
   const allowance = await tokenContract.allowance(owner, spender);
   return allowance;
 }
@@ -227,7 +228,7 @@ export async function getUserTokenBalance(token, chainId, account, library) {
 
   if (!token) return;
   // let tokenIsETH = symbol === 'ETH';
-  let tokenIsETH = symbol === 'BNB';
+  let tokenIsETH = symbol === NATIVE_CURRENCY();
   
   const balance = await getUserTokenBalanceRaw(
     tokenIsETH ? ETHER : new Token(chainId, address, decimals, symbol),
@@ -334,6 +335,9 @@ export async function approve(tokenAddress, requiredAmount, library, account) {
 
 // should be used in polling to check status of token approval every n seconds
 export async function checkTokenIsApproved(tokenAddress, requiredAmount, library, account) {
+  console.log("TEST HERE:", tokenAddress);
+  console.log("TEST HERE:", account);
+  console.log("TEST HERE:", ROUTER_ADDRESS());
   let allowance = await getAllowance(
     tokenAddress,
     account, // owner

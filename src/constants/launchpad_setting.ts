@@ -38,7 +38,7 @@ const PolygonMainNetLaunchpadSetting: LaunchpadSetting = {
 const PolygonTestNetLaunchpadSetting: LaunchpadSetting = {
     CHAIN_ID: 80001,
     ADDRESS: "0x24CDE3C1D0aF8695604D2c3bc09A1bF8a47e4eC7",
-    RPC_URL: "https://rpc-mumbai.matic.today"
+    RPC_URL: "https://matic-mumbai.chainstacklabs.com"
 }
 
 // NOTE (Gary): ETH is not supported now (2022.1.2)
