@@ -70,7 +70,7 @@ function MarketTokenInfo(props) {
 
   const [dayDatas, setDayDatas] = useState({});
   const [poolData, setPoolData] = useState([]);
-  const [tx, setTx] = useState([]);
+  const [tx, setTx] = useState(null);
 
   const navHistory = useHistory();
 
@@ -482,7 +482,7 @@ function MarketTokenInfo(props) {
           {poolData.length > 0 ? <PoolTable dataSourcePool={poolData} /> : <Icon type="loading" />}
 
           <h2>Transactions</h2>
-          {tx.length > 0 ? (
+          {tx ? (
             <TransactionTable dataSourceTransaction={tx} />
           ) : (
             <Icon type="loading" />

@@ -31,9 +31,11 @@ async function parseTransactionList(data){
 
   const tokensPriceUSD = await getAllSuportedTokensPrice();
 
-  // const _txList = data.filter(item=>item.token1Number.toString()!="")
+  let _txList = data.filter(item=>item.token1Number!=null);
+
+  console.log("pringting filtered tx",_txList);
     
-  const _txList = data.map((item) => {
+  _txList = _txList.map((item) => {
     let totalValue = totalInUSD([{
       token : item.token1Symbol,
       amount : item.token1Number
@@ -68,7 +70,7 @@ export async function fetchGlobalTransaction(){
     return await parseTransactionList(data.data);
   }catch (e){
     console.log('service not available yet',e);
-    return null;
+    return [];
   }
 }
 
@@ -191,7 +193,7 @@ export async function fetchTransactionsForPair(token1,token2){
     return await parseTransactionList(data.data);
   }catch (e){
     console.log('service not available yet',e);
-    return null;
+    return [];
   }
 }
 
@@ -206,6 +208,6 @@ export async function fetchTransactionsForToken(token){
     return await parseTransactionList(data.data);
   }catch (e){
     console.log('service not available yet',e);
-    return null;
+    return [];
   }
 }
