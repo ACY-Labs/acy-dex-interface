@@ -456,6 +456,8 @@ const LaunchpadProject = () => {
     isClickedAllocation,
     setIsClickedAllocation,
     isAllocated,
+    colorCode,
+    baseColorCode,
   }) => {
     const [coverOpenState, setCoverOpenState] = useState(false);
     const [coverRevealState, setCoverRevealState] = useState(false);
@@ -499,7 +501,7 @@ const LaunchpadProject = () => {
       try {
         let originalElementParent = e.target.parentElement.querySelector(".inner-text-amount");
         originalElementParent.textContent = `$${allocationAmount}`;
-        originalElementParent.style.color = "#EB5C20"
+        originalElementParent.style.color = "#ffffff"
       } catch (err) {
         // set all values to $0 due to error
         // innerText.textContent = "$0";
@@ -512,19 +514,16 @@ const LaunchpadProject = () => {
       e.preventDefault();
     };
 
-
     return (
       <div className='allocationCard-container'>
-        <div className="allocationCard" onClick={clickCover}>
-          <div class={computeCoverClass()}>
+        <div className="allocationCard" onClick={clickCover} style={{backgroundColor: baseColorCode}}>
+          <div className={computeCoverClass()} style={{backgroundColor: colorCode}}>
             {/* <div className="allocationCard-inner">
               <p className="inner-text">{index + 1}</p>
             </div> */}
           </div>
           <p className="inner-text-amount"></p> 
         </div>
-        <div className='allocationCard-before'></div>
-        <div className='allocationCard-after'></div>
       </div>
     );
   };
@@ -575,7 +574,8 @@ const LaunchpadProject = () => {
 
     const allocationCards = () => {
       const cards = [];
-
+      const colorCodes = ["#C6224E", "#E29227", "#1E5D91", "#1C9965", "#70BA33"];
+      const baseColorCodes = ["#631027", "#74490f", "#0f2e48", "#0e4c32", "#375d19"]
       for (let i = 0; i < 5; i++) {
         cards.push(
           <AllocationCard
@@ -589,6 +589,8 @@ const LaunchpadProject = () => {
             isClickedAllocation={isClickedAllocation}
             setIsClickedAllocation={setIsClickedAllocation}
             isAllocated={isAllocated}
+            colorCode={colorCodes[i]}
+            baseColorCode={baseColorCodes[i]}
           />
         );
       }
