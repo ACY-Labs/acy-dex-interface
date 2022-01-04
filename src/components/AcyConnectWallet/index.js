@@ -20,6 +20,7 @@ const AcyConnectWallet = props => {
     let chainName;
     switch (displayedChainId) {
       case 137:
+      case 80001:
         chainName = 'Polygon'; break;
       case 97:
       case 56:

@@ -13,7 +13,7 @@ import {
   AcySeting,
 } from '@/components/Acy';
 import { useWeb3React } from '@web3-react/core';
-import { useConstantLoader } from '@/constants'
+import { useConstantLoader, supportedChainIds } from '@/constants'
 import {
   injected,
   walletconnect,
@@ -178,7 +178,8 @@ const GlobalHeaderRight = props => {
     // 监听钱包网络变化 metamask
     ethereum.on('networkChanged', function (chainId) {
       console.log("networkChanged:", chainId)
-      if (chainId != 56 && chainId != 97 && chainId != 137) {
+      console.log("supported chain?", supportedChainIds, chainId, supportedChainIds.indexOf(chainId) == -1)
+      if (supportedChainIds && supportedChainIds.indexOf(chainId) == -1) {
         console.log("ERROR: unsupport NetWork");
         setIsModalVisible(true);
         switchEthereumChain("0x38"); //返回默认56链
@@ -187,7 +188,7 @@ const GlobalHeaderRight = props => {
         setVisibleMetaMask(false);
       }
     })
-  }, account, chainId);
+  }, account, chainId, supportedChainIds);
   const {
     currentUser,
     fetchingMoreNotices,
