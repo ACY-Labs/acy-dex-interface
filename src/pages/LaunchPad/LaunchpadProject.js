@@ -38,6 +38,7 @@ import { useWeb3React } from '@web3-react/core';
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
 import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID } from "@/constants";
 import { CustomError } from "@/acy-dex-swap/utils"
+import { approveNew, getAllowance } from "@/acy-dex-swap/utils"
 
 const LaunchpadProject = () => {  
   // STATES
@@ -51,6 +52,7 @@ const LaunchpadProject = () => {
   const [poolInvestorData, setPoolInvestorData] = useState(null);
   const [poolStatus, setPoolStatus] = useState(0);
   const [poolDecimals, setPoolDecimals] = useState(0); // Gary: decimal initialize to 0
+  const [poolMainCoinAddress, setPoolMainCoinAddress] = useState(0); // e.g., USDT
   const [isError, setIsError] = useState(false);
   const [hasCollected, setHasCollected] = useState(false);
   const [successCollect, setSuccessCollect] = useState(false);
@@ -64,7 +66,7 @@ const LaunchpadProject = () => {
   const [isInvesting, setIsInvesting] = useState(false);
   const [isAllocated, setIsAllocated] = useState(false);
 
-  // NOTE: change poolId
+  // NOTE (Gary 2022.1.4): change poolId
   const PoolId = 11
 
   // CONSTANTS
@@ -726,19 +728,26 @@ const LaunchpadProject = () => {
       
     }
 
-    const investClicked = async(poolId, amount) => {
+    const investClicked = async(poolAddress, poolId, amount) => {
+      // TODO: test if amount is valid!
+      console.log("test math", Math.round(0.000001 * Math.pow(10, 18)))
       if (poolStatus !== 2) {// cannot buy
         setIsVesting(false);
-        
-      } else 
-      {
+      } else {
         setIsVesting(true);
         if (!account) {
           setIsError(true)
           connectWallet()
         }
         const status = await (async () => {
-          const result = await PoolContract.InvestERC20(poolId , amount)
+          // const approveAmount = amount * Math.pow(10, poolDecimals)
+          const approveAmount = Math.round(amount * Math.pow(10, 6)) // NOTE (Gary): change the decimals HERE!
+          // const approveAmount = 100000
+          console.log("test math", approveAmount)
+          // const state = await getAllowance("0xF82eEeC2C58199cb409788E5D5806727cf549F9f", account, poolAddress, library, account)
+          // console.log(state)
+          const state = await approveNew(poolMainCoinAddress, approveAmount, poolAddress, library, account);
+          const result = await PoolContract.InvestERC20(poolId , approveAmount)
             .catch(e => {
               console.log(e)
               return new CustomError('CustomError while buying token');
@@ -783,7 +792,7 @@ const LaunchpadProject = () => {
                 {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
               </InputGroup>
             </div>
-            <Button className={"sales-submit"} onClick={() => {console.log("buy"); investClicked(PoolId, salesValue); }} disabled={!comparesaleDate || !isValidSalesPrice}> Buy </Button>
+            <Button className={"sales-submit"} onClick={() => {console.log("buy"); console.log("sales value", salesValue); investClicked(LAUNCHPAD_ADDRESS(), PoolId, salesValue); }} disabled={!comparesaleDate || !isValidSalesPrice}> Buy </Button>
           </form>
 
           { (poolDistributionDate && poolDistributionStage) &&
@@ -880,10 +889,14 @@ const LaunchpadProject = () => {
 
     // getpoolbasedata 数据解析
     const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
+    const token2Address = baseData[1]
+    const token2contract = getContract(token2Address, ERC20ABI, lib, acc)
+
 
     console.log("token1contract", token1contract)
 
     const token1decimal = await token1contract.decimals()
+    const token2decimal = await token2contract.decimals()
     // 不解析时间戳
     const res1 = BigNumber.from(baseData[2]).toBigInt().toString().slice(0,-(token1decimal)) // 获取销售的token的总数
     const res2 = BigNumber.from(baseData[3]).toBigInt().toString().slice(0,-(token1decimal)) // 已销售的token的数量
@@ -922,6 +935,8 @@ const LaunchpadProject = () => {
     setPoolStatus(curPoolStatus)
     setPoolInvestorData(investorRes)
     setPoolStatus(Number(BigNumber.from(status).toBigInt()))
+    setPoolMainCoinAddress(token2Address)
+    setPoolDecimals(token2decimal)
   }
 
   return (
