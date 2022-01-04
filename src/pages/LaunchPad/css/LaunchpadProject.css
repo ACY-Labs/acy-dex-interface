@@ -244,6 +244,10 @@
   row-gap: 10px;
 }
 
+.allocation-container-dummy{
+  width: 95px;
+}
+
 .allocationCard {
   position: relative;
   width: 55px;
@@ -368,7 +372,7 @@
 
 .allocation-cards{
   width: 100%;
-  margin-left: 2.25em;
+  margin-left: 1.75em;
 }
 
 .allocation-title{
@@ -509,8 +513,8 @@
 .sales-input {
   background-color: #010101;
   border: unset;
-  border-radius: 12px;
-  width: 100%;
+  border-radius: 4px !important;
+  width: calc(100% - 80px);
   min-width: 0px;
   height: 35px;
   font-size: 16px;
@@ -527,16 +531,27 @@
 
 .max-btn {
   position: absolute;
-  border-radius: 12px;
+  border-radius: 4px !important;
   height: 35px;
   background-color: #010101;
   color: #eb5c20;
   border: unset;
   font-weight: 700;
   cursor: pointer;
+  right: 0;
+  z-index: 1;
 }
 
-.max-btn:hover{
+.sales-input-max-text{
+  position: absolute;
+  border-radius: 4px !important;
+  height: 35px;
+  font-weight: 700;
+  right: 0;
+  z-index: 1;
+}
+
+.max-btn:hover {
   background: #010101;
   color: #eb5c20;
 }
@@ -708,6 +723,23 @@
     --allocation-card-size: 40px;
   }
 
+  .leftGrid{
+    grid-column: span 2 / span 2;
+  }
+  .gridContainer {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .flexContainer{
+    padding-left: 1em;
+  }
+
+  .mainContainer{
+    padding-left: 2em;
+    padding-right: 2em;
+  }
+
   .tokenLogo{
     width: 42px;
     height: 42px;
@@ -735,11 +767,27 @@
   }
 
   .allocation-title{
-    font-size: 14px;
+    font-size: 20px;
   }
 
   .sale-vesting-title{
-    font-size: 14px;
+    font-size: 16px;
+    width: auto;
+    margin-right: 16px;
+  }
+
+  .sales-container .sales-submit{
+    width: 40px;
+    font-size: 10px;
+    margin-left: 16px; 
+    border-radius: 10px;
+  }
+  .allocation-cards{
+    margin: 0px
+  }
+
+  .allocationContainer{
+    justify-content: center;
   }
 
   .allocationCard .cover{
@@ -753,7 +801,9 @@
   } 
 
   .allocationContainer{
-    grid-template-columns: repeat(auto-fill, minmax(var(--allocation-card-size), 1fr));
+    grid-template-columns: repeat(5, var(--allocation-card-size));
+    column-gap: 8px;
+    align-self: center;
   }
 
   .allocationCard-before{
@@ -766,6 +816,7 @@
     height: calc(var(--allocation-card-size) + 3px);
   }
   
+  .allocationCard .inner-text,
   .allocationCard .inner-text-amount{
     font-size: 10px;
   }
@@ -775,11 +826,113 @@
   .allocation-title-container{
     flex-direction: column;
     column-gap: 10px;
+    margin-bottom: 40px;
+    justify-content: center;
+  }
+
+  .projecttitle-socials-container{
+    flex-direction: column;
+  }
+
+  .icon-container{
+    width: 25px;
+    height: 25px;
+  }
+
+  .projecttitle{
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .projectDescription{
+    font-size: 0.75rem;
+  }
+
+  .max-btn,
+  .sales-input-max-text{
+    width: 3.5em;
+    padding: 2px 10px;
+    font-size: 12px;
   }
 
 }
+@media (min-width: 427px) and (max-width: 768px){
+  :root{
+    --allocation-card-size: 60px;
+  }
+
+  .leftGrid{
+    grid-column: span 2 / span 2;
+  }
+  .gridContainer {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .flexContainer{
+    padding-left: 1em;
+  }
+
+  .mainContainer{
+    padding-left: 2em;
+    padding-right: 2em;
+  }
+
+  .allocation-title{
+    font-size: 20px;
+  }
+
+  .allocation-cards{
+    margin: 0px
+  }
+
+  .allocationContainer{
+    justify-content: center;
+  }
+
+  .allocationCard .cover{
+    height: var(--allocation-card-size);
+    width: var(--allocation-card-size);
+  }
+
+  .allocationCard{
+    height: var(--allocation-card-size);
+    width: var(--allocation-card-size);
+  } 
+
+  .allocationContainer{
+    grid-template-columns: repeat(5, var(--allocation-card-size));
+    column-gap: 16px;
+    align-self: center;
+  }
+
+  .allocationCard-before{
+    width: calc(var(--allocation-card-size) + 3px);
+    height: calc(var(--allocation-card-size) + 3px);
+  }
+
+  .allocationCard-after{
+    width: calc(var(--allocation-card-size) + 3px);
+    height: calc(var(--allocation-card-size) + 3px);
+  }
+  
+  .allocationCard .inner-text,
+  .allocationCard .inner-text-amount{
+    font-size: 14px;
+  }
+  .title-tooltip-container{
+    margin-bottom: 14px;
+  }
+  .allocation-title-container{
+    flex-direction: column;
+    column-gap: 10px;
+    margin-bottom: 40px;
+    justify-content: center;
+  }
+  
+}
 /* Tablets */
-@media (max-width: 1060px) {
+@media (min-width: 769px) and (max-width: 1060px) {
   .leftGrid{
     grid-column: span 2 / span 2;
   }
@@ -798,7 +951,7 @@
   }
 
   .allocation-cards{
-    margin-left: 0;
+    margin: 0px 2em 0px 1em;
   }
 
   .allocationContainer{

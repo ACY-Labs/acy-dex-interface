@@ -669,9 +669,7 @@ const LaunchpadProject = () => {
             <div className='allocation-cards'>
               <div className="allocationContainer">{allocationCards()}</div>
             </div>
-            <div style={{"width": "120px"}}>
-            
-            </div>
+            <div className="allocation-container-dummy"></div>
           </div>
 
           <form className="sales-container">
@@ -679,8 +677,8 @@ const LaunchpadProject = () => {
               Sale
             </label>
             <div className="sales-input-container">
-              <InputGroup compact>
-                  <Input className="sales-input" style={{ width: 'calc(100% - 80px)' }} defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
+              <InputGroup>
+                  <Input className="sales-input" defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
                 {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
               </InputGroup>
             </div>
