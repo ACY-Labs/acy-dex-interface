@@ -265,13 +265,25 @@ export async function fetchTokenSearch(client, searchQuery) {
   if (loading) return null;
   if (error) return `Error! ${error}`;
 
+  // return sortTable(
+  //   [...data.asAddress, ...data.asSymbol, ...data.asName]
+  //     .filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)
+  //     .map(item => ({
+  //       id: item.id,
+  //       name: item.name,
+  //       symbol: item.symbol,
+  //       txCount: parseInt(item.txCount)
+  //     })),
+  //   'txCount',
+  //   true
+  // );
   return sortTable(
     [...data.asAddress, ...data.asSymbol, ...data.asName]
       .filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)
       .map(item => ({
-        id: item.id,
-        name: item.name,
-        symbol: item.symbol,
+        id: "1223",
+        name: "abcusd",
+        symbol: "BNB",
         txCount: parseInt(item.txCount)
       })),
     'txCount',
