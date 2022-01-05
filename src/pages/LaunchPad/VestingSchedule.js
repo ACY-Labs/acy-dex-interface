@@ -7,13 +7,7 @@ import tick from '@/assets/icon-tick-white.svg';
 const VestingSchedule = ({ vestingDate, stageData, vestingClick }) => {
   // if (!vestingDate) return;
   const len = vestingDate.length
-  const curDate = moment(new Date())
-  const t = new Date()
-  console.log("TEST DATE")
-  console.log(curDate)
-  console.log(t)
-  console.log(curDate > vestingDate[0])
-  console.log(t > vestingDate[0])
+  const curDate = new Date()
   // setState
   return (
     <div>
@@ -21,8 +15,8 @@ const VestingSchedule = ({ vestingDate, stageData, vestingClick }) => {
         [...Array(len)].map((_1, index) => {
           return (
             <div className="procedure vesting-procedure">
-              {index === len - 1 ? "" : <hr aria-orientation="vertical" className={curDate > vestingDate[index] ? "verticalDivideLine vesting-schedule-line" : "verticalDivideLine_NotActive vesting-schedule-line"} />}
-              <div className={curDate < vestingDate[index]  ? "procedureNumber_NotActive" : "procedureNumber"}>
+              {index === len - 1 ? "" : <hr aria-orientation="vertical" className={curDate > new Date(vestingDate[index]) ? "verticalDivideLine vesting-schedule-line" : "verticalDivideLine_NotActive vesting-schedule-line"} />}
+              <div className={curDate < new Date(vestingDate[index])  ? "procedureNumber_NotActive" : "procedureNumber"}>
                 <img src={tick} alt="tick-icon" className="vesting-tick-icon" />
               </div>
               <div className="vesting-schedule-text">
@@ -31,7 +25,7 @@ const VestingSchedule = ({ vestingDate, stageData, vestingClick }) => {
                   <Button
                     className="claim-btn"
                     id="claim-btn"
-                    disabled={!(curDate > vestingDate[index])}
+                    disabled={!(curDate > new Date(vestingDate[index]))}
                     onClick={vestingClick}
                   >
                     Claim

@@ -52,6 +52,7 @@ const LaunchpadProject = () => {
   const [poolInvestorData, setPoolInvestorData] = useState(null);
   const [poolStatus, setPoolStatus] = useState(0);
   const [poolDecimals, setPoolDecimals] = useState(0); // Gary: decimal initialize to 0
+  const [poolTokenAddress, setPoolTokenAddress] = useState(0);
   const [poolMainCoinAddress, setPoolMainCoinAddress] = useState(0); // e.g., USDT
   const [isError, setIsError] = useState(false);
   const [hasCollected, setHasCollected] = useState(false);
@@ -683,7 +684,7 @@ const LaunchpadProject = () => {
     };
 
     const vestingClaimClicked = async () => {
-      if(!isVesting){
+      if(poolStatus !== 4){
         setNotVesting(true)
       } else {
         if (!account) {
@@ -691,75 +692,45 @@ const LaunchpadProject = () => {
           connectWallet()
         }
         const tokenAllocated = poolInvestorData[2]
-        const tokenClaimed = poolInvestorData[3].toFixed(2)
+        const tokenClaimed = poolInvestorData[3]
         const curDate = new Date()
-        const stageOne = (tokenAllocated / 100 * poolDistributionStage[0]).toFixed(2)
-        const stageTwo = (tokenAllocated / 100 * poolDistributionStage[1]).toFixed(2)
-        const stageThree = (tokenAllocated / 100 * poolDistributionStage[2]).toFixed(2)
-
-        if(curDate > poolDistributionDate[0] && curDate < poolDistributionDate[1]){
-          setVestingStage(1)
-          if(tokenClaimed === stageOne){
-            setHasCollected(true)
-          } else {
-            const status = await (async () => {
-              const result = await PoolContract.WithdrawERC20ToCreator(account, 3)
-                .catch(e => {
-                  return new CustomError('CustomError while withdrawing token');
-                });
-              return result;
-            })();
-            console.log("Vesting claimed: ", status)
+        let tokenAvailable = 0
+        for(let i=0;i<poolDistributionDate.length;i++){
+          const tempDate = new Date(poolDistributionDate[i])
+          if(curDate > tempDate){
+            tokenAvailable += tokenAllocated * 100 / poolDistributionStage[i]   //TO-DO
+          }else {
+            break
           }
         }
-        if(curDate > poolDistributionDate[1] && curDate < poolDistributionDate[2]){
-          setVestingStage(2)
-          if(tokenClaimed === stageTwo) {
-            setHasCollected(true)
-          } else {
-            const status = await (async () => {
-              const result = await PoolContract.WithdrawERC20ToCreator(account, 3)
-                .catch(e => {
-                  return new CustomError('CustomError while withdrawing token');
-                });
-              return result;
-            })();
-            console.log("Vesting claimed: ", status)
-          }
-        }
-        if(curDate > poolDistributionDate[2]){
-          setVestingStage(3)
-          if(tokenClaimed === stageThree){
-            setHasCollected(true)
-          } else {
-            const status = await (async () => {
-              const result = await PoolContract.WithdrawERC20ToCreator(account, 3)
-                .catch(e => {
-                  return new CustomError('CustomError while withdrawing token');
-                });
-              return result;
-            })();
-            console.log("Vesting claimed: ", status)
-          }
-        }
+        if(tokenClaimed === tokenAvailable) setHasCollected(true)
+        const status = await (async () => {
+          const result = await PoolContract.WithdrawERC20ToInvestor(account, PoolId)
+            .catch(e => {
+              console.log(e)
+              return new CustomError('CustomError while withdrawing token');
+            });
+          return result;
+        })();
+        console.log("Vesting claimed: ", status)
       }
-      
     }
-
+    
     const investClicked = async(poolAddress, poolId, amount) => {
-      // TODO: test if amount is valid!
-      console.log("test math", Math.round(0.000001 * Math.pow(10, 18)))
-      if (poolStatus !== 2) {// cannot buy
-        setIsVesting(false);
-      } else {
-        setIsVesting(true);
-        if (!account) {
-          setIsError(true)
-          connectWallet()
-        }
+        // TODO: test if amount is valid!
+        console.log("test math", Math.round(0.000001 * Math.pow(10, 18)))
+        if (poolStatus !== 2) {// cannot buy
+          setIsVesting(false);
+        } else {
+          setIsVesting(true);
+          if (!account) {
+            setIsError(true)
+            connectWallet()
+          }
+          //TO-DO: Request UseAllocation API, process only when UseAllocation returns true
         const status = await (async () => {
           // const approveAmount = amount * Math.pow(10, poolDecimals)
-          const approveAmount = amount * Number(10n ** 18n) // NOTE (Gary): change the decimals HERE!
+          const approveAmount = amount * Math.pow(10, 6) // NOTE (Gary): change the decimals HERE!
           // const approveAmount = 100000
           console.log("test math", approveAmount)
           // const state = await getAllowance("0xF82eEeC2C58199cb409788E5D5806727cf549F9f", account, poolAddress, library, account)
@@ -775,6 +746,7 @@ const LaunchpadProject = () => {
         console.log("buy contract", status)
       }
     }
+
 
     return (
       <div>
@@ -810,11 +782,10 @@ const LaunchpadProject = () => {
                 {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
               </InputGroup>
             </div>
-            <Button className={isValidSalesPrice ? "sales-submit" : "sales-submit invalid"} onClick={() => {console.log("buy"); console.log("sales value", salesValue); investClicked(LAUNCHPAD_ADDRESS(), PoolId, salesValue); }} disabled={!comparesaleDate || !isValidSalesPrice}> Buy </Button>
+            <Button className={isValidSalesPrice ? "sales-submit" : "sales-submit invalid"} onClick={() => {console.log("buy"); console.log("sales value", salesValue); investClicked(LAUNCHPAD_ADDRESS(), PoolId, salesValue); }} > Buy </Button>
           </form>
 
-          
-          { !poolDistributionStage ? (<h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>):
+          { poolDistributionStage && poolDistributionDate && poolInvestorData && 
             <div className="vesting-container">
               <p className="sale-vesting-title vesting">Vesting</p>
               <div className="text-line-container">
@@ -825,7 +796,7 @@ const LaunchpadProject = () => {
                     isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'
                   }
                 >
-                    <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} walletId={walletId} vestingClick={vestingClaimClicked} />
+                  <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} vestingClick={vestingClaimClicked} />
                 </div>
               </div>
               <div className="arrow-down-container">
@@ -841,15 +812,17 @@ const LaunchpadProject = () => {
           }
         </div>
       :
-        <div className="vesting-container">
-          <p className="sale-vesting-title vesting">Vesting</p>
-          <div className="text-line-container-open">
-            <p>Vesting is divided into {poolStageCount} stages, unlock {poolDistributionStage ? poolDistributionStage[0] : "x"}% TGE</p>
-            <span className="vesting-line" />
-            <div className='vesting-schedule'>
-                <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} walletId={walletId}/>
+        <div>
+          { poolDistributionStage && poolDistributionDate && poolInvestorData &&
+            <div className="vesting-container">
+              <p className="sale-vesting-title vesting">Vesting</p>
+              <div className="text-line-container-open">
+                <p>Vesting is divided into {poolStageCount} stages, unlock {poolDistributionStage[0]}% TGE</p>
+                <span className="vesting-line" />
+                <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} vestingClick={vestingClaimClicked} />
+              </div>
             </div>
-          </div>
+          }
         </div>
       }
       </div>
@@ -907,8 +880,9 @@ const LaunchpadProject = () => {
 
 
     // getpoolbasedata 数据解析
-    const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
+    const token1Address = baseData[0]
     const token2Address = baseData[1]
+    const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
     const token2contract = getContract(token2Address, ERC20ABI, lib, acc)
 
 
@@ -937,9 +911,15 @@ const LaunchpadProject = () => {
     distributionData[2].map(vestingRate => distributionStage.push(BigNumber.from(vestingRate).toBigInt().toString()))
 
     // getinvestmentdata 数据解析以及存放
-    /* if(investorData){
-      investorData.map(data => investorRes.push(Number(BigNumber.from(data).toBigInt())))
-    } */
+    if(!investorData){
+      investorData.map(data => investorRes.push(Number(BigNumber.from(data).toBigInt().toString())))
+    }
+
+    
+    console.log("INVESTOR DATA")
+    console.log(distributionRes)
+    console.log(investorData)
+    console.log(investorRes)
 
     // 判断当前是否是vesting阶段
     const curPoolStatus = Number(BigNumber.from(status).toBigInt())
@@ -953,6 +933,7 @@ const LaunchpadProject = () => {
     setPoolStatus(curPoolStatus)
     setPoolInvestorData(investorRes)
     setPoolStatus(Number(BigNumber.from(status).toBigInt()))
+    setPoolTokenAddress(token1Address)
     setPoolMainCoinAddress(token2Address)
     setPoolDecimals(token2decimal)
   }
