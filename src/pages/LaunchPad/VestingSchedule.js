@@ -5,6 +5,7 @@ import { Button} from 'antd';
 import tick from '@/assets/icon-tick-white.svg';
 
 const VestingSchedule = ({ vestingDate, stageData, vestingClick }) => {
+  // if (!vestingDate) return;
   const len = vestingDate.length
   const curDate = moment(new Date())
   const t = new Date()

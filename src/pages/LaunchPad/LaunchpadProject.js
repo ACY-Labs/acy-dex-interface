@@ -46,8 +46,8 @@ const LaunchpadProject = () => {
   const { projectId } = useParams();
   const [receivedData, setReceivedData] = useState({});
   const [poolBaseData, setPoolBaseData] = useState(null);
-  const [poolDistributionDate, setDistributionDate] = useState(null);
-  const [poolDistributionStage, setpoolDistributionStage] = useState(null);
+  const [poolDistributionDate, setDistributionDate] = useState([]);
+  const [poolDistributionStage, setpoolDistributionStage] = useState([]);
   const [poolStageCount, setpoolStageCount] = useState(0);
   const [poolInvestorData, setPoolInvestorData] = useState(null);
   const [poolStatus, setPoolStatus] = useState(0);
@@ -67,7 +67,7 @@ const LaunchpadProject = () => {
   const [isAllocated, setIsAllocated] = useState(false);
 
   // NOTE (Gary 2022.1.4): change poolId
-  const PoolId = 12
+  const PoolId = 11
 
   // CONSTANTS
   const InputGroup = Input.Group;
@@ -130,20 +130,36 @@ const LaunchpadProject = () => {
     else if (account || library){
       console.log("start getPoolBaseData")
       getPoolData(library, account)
+      console.log("poolDistributionDate", poolDistributionDate, poolDistributionStage)
+    } else {
+      const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
+      const accnt = "0x0000000000000000000000000000000000000000";
+      getPoolData(provider, accnt)
+      console.log("poolDistributionDate", poolDistributionDate, poolDistributionStage)
+    }
+  }, [library, account])
+
+  useEffect(async () => {
+    if(!account){
+      connectWallet();
+    }
+    else if (account || library){
+      console.log("start getPoolBaseData")
+      getPoolData(library, account)
     } else {
       const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
       const accnt = "0x0000000000000000000000000000000000000000";
       getPoolData(provider, accnt)
     }
-  }, [library, account])
+  }, [])
 
   useEffect(() => {
     if (!account || !receivedData.projectToken) {
       return
     }
     // get allocation status from backend at begining
-    console.log("line 145", account, projectToken);
-    getAllocationInfo(API_URL(), account, projectToken)
+    console.log("line 145", account, receivedData.projectToken);
+    getAllocationInfo(API_URL(), account, receivedData.projectToken)
       .then(res => {
         console.log("res, res.allocationAmount", res, res.allocationAmount)
         if (res && res.allocationAmount) {
@@ -157,7 +173,7 @@ const LaunchpadProject = () => {
     
     const oldAllocationAmount = allocationAmount;
     if (oldAllocationAmount === 0) {
-        requireAllocation(API_URL(), account, projectToken).then(res => {
+        requireAllocation(API_URL(), account, receivedData.projectToken).then(res => {
           console.log("api url", API_URL())
           if(res && res.allocationAmount) {
             setAllocationAmount(res.allocationAmount);
@@ -787,7 +803,8 @@ const LaunchpadProject = () => {
             <Button className={isValidSalesPrice ? "sales-submit" : "sales-submit invalid"} onClick={() => {console.log("buy"); console.log("sales value", salesValue); investClicked(LAUNCHPAD_ADDRESS(), PoolId, salesValue); }} disabled={!comparesaleDate || !isValidSalesPrice}> Buy </Button>
           </form>
 
-          { poolDistributionStage &&
+          
+          { !poolDistributionStage ? (<h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>):
             <div className="vesting-container">
               <p className="sale-vesting-title vesting">Vesting</p>
               <div className="text-line-container">
@@ -817,7 +834,7 @@ const LaunchpadProject = () => {
         <div className="vesting-container">
           <p className="sale-vesting-title vesting">Vesting</p>
           <div className="text-line-container-open">
-            <p>Vesting is divided into {poolStageCount} stages, unlock {poolDistributionStage[0]}% TGE</p>
+            <p>Vesting is divided into {poolStageCount} stages, unlock {poolDistributionStage ? poolDistributionStage[0] : "x"}% TGE</p>
             <span className="vesting-line" />
             <div className='vesting-schedule'>
                 <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} walletId={walletId}/>
@@ -863,7 +880,7 @@ const LaunchpadProject = () => {
   };
 
   const getPoolData = async (lib, acc) => {
-    console.log(LAUNCHPAD_ADDRESS(), lib);
+    console.log("start get pool data", LAUNCHPAD_ADDRESS(), lib);
     const poolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, lib, acc);
     const pool = []
     const distributionRes = []
@@ -905,7 +922,6 @@ const LaunchpadProject = () => {
     const saleEndDate = convertUnixTime(res4)
     // 存放数据
     pool.push(res1, res2, saleStartDate, saleEndDate)
-
     // getpooldistributiondata 数据解析以及存放
     distributionData[1].map(uTime => distributionRes.push(convertUnixTime(uTime)))
     distributionData[2].map(vestingRate => distributionStage.push(BigNumber.from(vestingRate).toBigInt().toString()))
@@ -918,7 +934,7 @@ const LaunchpadProject = () => {
     // 判断当前是否是vesting阶段
     const curPoolStatus = Number(BigNumber.from(status).toBigInt())
     if(curPoolStatus === 4) setIsVesting(true)
-
+    console.log("getpooldata distributionstage", distributionStage, distributionData)
     // set数据
     setPoolBaseData(pool)
     setDistributionDate(distributionRes)
