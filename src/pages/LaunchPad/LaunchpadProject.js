@@ -515,11 +515,21 @@ const LaunchpadProject = () => {
     const clickCover = async e => {
       console.log(`click allocation card cover`, allocationAmount);
       console.log(isClickedAllocation);
-      if (!walletId && !projectToken) {
+      // requireAllocation(API_URL(), account, projectToken)
+      if (!walletId || !receivedData.projectToken) {
         return;
       }
       if (!isAllocated) {
-        console.log("Allocation ammount is not ready!");
+        console.log("Allocation amount is not ready!");
+        requireAllocation(API_URL(), account, receivedData.projectToken).then(res => {
+          if(res && res.allocationAmount) {
+            setAllocationAmount(res.allocationAmount);
+            setIsAllocated(true);
+          }
+          console.log('allocation get', res.allocationAmount);
+        }).catch(e => {
+          console.error(e);
+        })
         return;
       }
       if (isClickedAllocation) {
