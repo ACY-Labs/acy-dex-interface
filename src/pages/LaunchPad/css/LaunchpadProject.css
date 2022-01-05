@@ -615,15 +615,6 @@
   color: white;
 }
 
-.claim-btn-inactive {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.claim-btn-active {
-  cursor: pointer;
-}
-
 .vesting-tick-icon {
   width: 18px;
 }

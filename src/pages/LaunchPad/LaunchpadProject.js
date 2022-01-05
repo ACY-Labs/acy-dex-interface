@@ -67,7 +67,7 @@ const LaunchpadProject = () => {
   const [isAllocated, setIsAllocated] = useState(false);
 
   // NOTE (Gary 2022.1.4): change poolId
-  const PoolId = 11
+  const PoolId = 12
 
   // CONSTANTS
   const InputGroup = Input.Group;
@@ -137,6 +137,39 @@ const LaunchpadProject = () => {
     }
   }, [library, account])
 
+  useEffect(() => {
+    if (!account || !receivedData.projectToken) {
+      return
+    }
+    // get allocation status from backend at begining
+    console.log("line 145", account, projectToken);
+    getAllocationInfo(API_URL(), account, projectToken)
+      .then(res => {
+        console.log("res, res.allocationAmount", res, res.allocationAmount)
+        if (res && res.allocationAmount) {
+          // setAllocationAmount(res.allocationAmount);
+          console.log('allocation amount', res.allocationAmount);
+        }
+      })
+      .catch(e => {
+        console.error(e);
+      });
+    
+    const oldAllocationAmount = allocationAmount;
+    if (oldAllocationAmount === 0) {
+        requireAllocation(API_URL(), account, projectToken).then(res => {
+          console.log("api url", API_URL())
+          if(res && res.allocationAmount) {
+            setAllocationAmount(res.allocationAmount);
+            setIsAllocated(true);
+            // setCoverOpenState(true);
+          }
+          console.log('allocation get', res.allocationAmount);
+        }).catch(e => {
+          console.error(e);
+        })
+    }
+  }, []);
 
   // FUNCTIONS
   const connectWallet = async () =>  {
@@ -261,16 +294,6 @@ const LaunchpadProject = () => {
               <p>Sale Progress</p>
               <p style={{ color: '#eb5c1f' }}>{salePercentage}%</p>
             </div>
-            {/* <div className="progressBar">
-              <div
-                className="progressBarLight"
-                aria-aria-valuemin="0"
-                aria-valuemax="100"
-                aria-valuenow={salePercentage}
-                role="progressbar"
-                style={progressStyle}
-              />
-            </div> */}
             <div className={styles.tokenProgress}>
               <Progress
                 strokeColor={{
@@ -532,39 +555,6 @@ const LaunchpadProject = () => {
 
   const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount, isAllocated, setIsAllocated}) => {
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
-    useEffect(() => {
-      if (!walletId || !projectToken) {
-        return
-      }
-      // get allocation status from backend at begining
-      console.log("line470", walletId, projectToken);
-      getAllocationInfo(API_URL(), walletId, projectToken)
-        .then(res => {
-          console.log("res, res.allocationAmount", res, res.allocationAmount)
-          if (res && res.allocationAmount) {
-            // setAllocationAmount(res.allocationAmount);
-            console.log('allocation amount', res.allocationAmount);
-          }
-        })
-        .catch(e => {
-          console.error(e);
-        });
-      
-      const oldAllocationAmount = allocationAmount;
-      if (oldAllocationAmount === 0) {
-          requireAllocation(API_URL(), walletId, projectToken).then(res => {
-            console.log("api url", API_URL())
-            if(res && res.allocationAmount) {
-              setAllocationAmount(res.allocationAmount);
-              setIsAllocated(true);
-              // setCoverOpenState(true);
-            }
-            console.log('allocation get', res.allocationAmount);
-          }).catch(e => {
-            console.error(e);
-          })
-      }
-    }, []);
 
     // TODO: replace with 24 icon
     const BaseCard = ({ url }) => {
@@ -624,11 +614,11 @@ const LaunchpadProject = () => {
           <span>Increase Your Allocation Amount:</span>
           <br />
           <span className='tool-tip-content'>
-            1.Increase your trading volume @ <a href="app.acy.finance/#/exchange" target="_blank">Exchange</a>
+            1.Increase your trading volume @ <a href="/#/exchange" target="_blank">Exchange</a>
           </span>
           <br />
           <span className='tool-tip-content'>
-            2.Increase your liquidity @ <a href="app.acy.finance/#/liquidity" target="_blank">Liquidity</a>
+            2.Increase your liquidity @ <a href="/#/liquidity" target="_blank">Liquidity</a>
           </span>
         </div>
     )}
@@ -674,14 +664,6 @@ const LaunchpadProject = () => {
           setIsError(true)
           connectWallet()
         }
-
-        const status = await (async () => {
-          const result = await PoolContract.WithdrawERC20ToCreator(account, 3)
-            .catch(e => {
-              return new CustomError('CustomError while withdrawing token');
-            });
-          return result;
-        })();
         const tokenAllocated = poolInvestorData[2]
         const tokenClaimed = poolInvestorData[3].toFixed(2)
         const curDate = new Date()
@@ -694,11 +676,14 @@ const LaunchpadProject = () => {
           if(tokenClaimed === stageOne){
             setHasCollected(true)
           } else {
-            try {
-              vestCallback(status);
-            } catch (err) {
-              console.log("Error while claiming vesting token", err)
-            }
+            const status = await (async () => {
+              const result = await PoolContract.WithdrawERC20ToCreator(account, 3)
+                .catch(e => {
+                  return new CustomError('CustomError while withdrawing token');
+                });
+              return result;
+            })();
+            console.log("Vesting claimed: ", status)
           }
         }
         if(curDate > poolDistributionDate[1] && curDate < poolDistributionDate[2]){
@@ -706,11 +691,14 @@ const LaunchpadProject = () => {
           if(tokenClaimed === stageTwo) {
             setHasCollected(true)
           } else {
-            try {
-              vestCallback(status);
-            } catch (err) {
-              console.log("Error while claiming vesting token", err)
-            }
+            const status = await (async () => {
+              const result = await PoolContract.WithdrawERC20ToCreator(account, 3)
+                .catch(e => {
+                  return new CustomError('CustomError while withdrawing token');
+                });
+              return result;
+            })();
+            console.log("Vesting claimed: ", status)
           }
         }
         if(curDate > poolDistributionDate[2]){
@@ -718,11 +706,14 @@ const LaunchpadProject = () => {
           if(tokenClaimed === stageThree){
             setHasCollected(true)
           } else {
-            try {
-              vestCallback(status);
-            } catch (err) {
-              console.log("Error while claiming vesting token", err)
-            }
+            const status = await (async () => {
+              const result = await PoolContract.WithdrawERC20ToCreator(account, 3)
+                .catch(e => {
+                  return new CustomError('CustomError while withdrawing token');
+                });
+              return result;
+            })();
+            console.log("Vesting claimed: ", status)
           }
         }
       }
@@ -742,7 +733,7 @@ const LaunchpadProject = () => {
         }
         const status = await (async () => {
           // const approveAmount = amount * Math.pow(10, poolDecimals)
-          const approveAmount = Math.round(amount * Math.pow(10, 6)) // NOTE (Gary): change the decimals HERE!
+          const approveAmount = amount * Number(10n ** 18n) // NOTE (Gary): change the decimals HERE!
           // const approveAmount = 100000
           console.log("test math", approveAmount)
           // const state = await getAllowance("0xF82eEeC2C58199cb409788E5D5806727cf549F9f", account, poolAddress, library, account)
@@ -796,7 +787,7 @@ const LaunchpadProject = () => {
             <Button className={isValidSalesPrice ? "sales-submit" : "sales-submit invalid"} onClick={() => {console.log("buy"); console.log("sales value", salesValue); investClicked(LAUNCHPAD_ADDRESS(), PoolId, salesValue); }} disabled={!comparesaleDate || !isValidSalesPrice}> Buy </Button>
           </form>
 
-          { (poolDistributionDate && poolDistributionStage) &&
+          { poolDistributionStage &&
             <div className="vesting-container">
               <p className="sale-vesting-title vesting">Vesting</p>
               <div className="text-line-container">
@@ -920,10 +911,10 @@ const LaunchpadProject = () => {
     distributionData[2].map(vestingRate => distributionStage.push(BigNumber.from(vestingRate).toBigInt().toString()))
 
     // getinvestmentdata 数据解析以及存放
-    /* if(investorData.length !== 0){
+    /* if(investorData){
       investorData.map(data => investorRes.push(Number(BigNumber.from(data).toBigInt())))
     } */
-      
+
     // 判断当前是否是vesting阶段
     const curPoolStatus = Number(BigNumber.from(status).toBigInt())
     if(curPoolStatus === 4) setIsVesting(true)
