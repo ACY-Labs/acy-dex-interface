@@ -279,7 +279,7 @@ export async function getEstimated(
       token1IsETH ? inToken0Address : inToken1Address,
       liquidityAmount.raw.toString(),
       amountsMin[token0IsETH ? 'CURRENCY_B' : 'CURRENCY_A'].toString(),
-      amountsMin[token1IsETH ? 'CURRENCY_A' : 'CURRENCY_B'].toString(),
+      amountsMin[token0IsETH ? 'CURRENCY_A' : 'CURRENCY_B'].toString(),
       account,
       // deadlineTime, false, signature v, r, s will be added in SignOrApprove
     ];
@@ -741,7 +741,7 @@ export async function removeLiquidity(
             token1IsETH ? token0Address : token1Address,
             liquidityAmount.raw.toString(),
             amountsMin[token0IsETH ? 'CURRENCY_B' : 'CURRENCY_A'].toString(),
-            amountsMin[token1IsETH ? 'CURRENCY_A' : 'CURRENCY_B'].toString(),
+            amountsMin[token0IsETH ? 'CURRENCY_A' : 'CURRENCY_B'].toString(),
             // amountsMin[currencyBIsETH ? Field.CURRENCY_A : Field.CURRENCY_B].toString(),
             // amountsMin[currencyBIsETH ? Field.CURRENCY_B : Field.CURRENCY_A].toString(),
             account,
