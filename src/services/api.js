@@ -127,7 +127,7 @@ export async function getFakeCaptcha(mobile) {
 }
 
 export async function requireAllocation(network, walletId, projectToken) {
-  return r.get(`${network}/api/launch/allocation/require`, {
+  return r.get(`${network}/launch/allocation/require`, {
     params: {
       walletId: walletId,
       projectToken: projectToken
@@ -136,7 +136,7 @@ export async function requireAllocation(network, walletId, projectToken) {
 }
 
 export async function getAllocationInfo(network, walletId, projectToken) {
-  return r.get(`${network}/api/launch/allocation`, {
+  return r.get(`${network}/launch/allocation`, {
     params: {
       walletId: walletId,
       projectToken: projectToken
@@ -145,9 +145,9 @@ export async function getAllocationInfo(network, walletId, projectToken) {
 }
 
 export async function getProjects(network) {
-  return r.get(`${network}/api/launch/projects`)
+  return r.get(`${network}/launch/projects`)
 }
 
 export async function getProjectInfo(network, projectId) {
-  return r.get(`${network}/api/launch/projects/${projectId}`)
+  return r.get(`${network}/launch/projects/${projectId}`)
 }

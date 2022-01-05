@@ -36,7 +36,7 @@ import $ from 'jquery';
 import { getContract } from "../../acy-dex-swap/utils/index.js"
 import { useWeb3React } from '@web3-react/core';
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
-import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID } from "@/constants";
+import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL } from "@/constants";
 import { CustomError } from "@/acy-dex-swap/utils"
 import { approveNew, getAllowance } from "@/acy-dex-swap/utils"
 
@@ -83,11 +83,11 @@ const LaunchpadProject = () => {
     "etheraddress": etherIcon,
     "polyaddress": polyIcon,
   }
-  const PoolContract = getContract("0x6e0EC29eA8afaD2348C6795Afb9f82e25F196436", POOLABI, library, account);
+  const PoolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, library, account);
 
   // HOOKS
   useEffect(() => {
-    getProjectInfo('bsc-main', projectId)
+    getProjectInfo(API_URL(), projectId)
       .then(res => {
         if (res) {
           // extract data from string
@@ -537,22 +537,23 @@ const LaunchpadProject = () => {
         return
       }
       // get allocation status from backend at begining
-      // console.log("line470", walletId, projectToken);
-      // getAllocationInfo(walletId, projectToken)
-      //   .then(res => {
-      //     console.log("res, res.allocationAmount", res, res.allocationAmount)
-      //     if (res && res.allocationAmount) {
-      //       setAllocationAmount(res.allocationAmount);
-      //       console.log('allocation amount', res.allocationAmount);
-      //     }
-      //   })
-      //   .catch(e => {
-      //     console.error(e);
-      //   });
+      console.log("line470", walletId, projectToken);
+      getAllocationInfo(API_URL(), walletId, projectToken)
+        .then(res => {
+          console.log("res, res.allocationAmount", res, res.allocationAmount)
+          if (res && res.allocationAmount) {
+            // setAllocationAmount(res.allocationAmount);
+            console.log('allocation amount', res.allocationAmount);
+          }
+        })
+        .catch(e => {
+          console.error(e);
+        });
       
       const oldAllocationAmount = allocationAmount;
       if (oldAllocationAmount === 0) {
-          requireAllocation('bsc-main', walletId, projectToken).then(res => {
+          requireAllocation(API_URL(), walletId, projectToken).then(res => {
+            console.log("api url", API_URL())
             if(res && res.allocationAmount) {
               setAllocationAmount(res.allocationAmount);
               setIsAllocated(true);
@@ -563,7 +564,7 @@ const LaunchpadProject = () => {
             console.error(e);
           })
       }
-    }, [walletId, projectToken]);
+    }, []);
 
     // TODO: replace with 24 icon
     const BaseCard = ({ url }) => {
@@ -792,7 +793,7 @@ const LaunchpadProject = () => {
                 {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
               </InputGroup>
             </div>
-            <Button className={"sales-submit"} onClick={() => {console.log("buy"); console.log("sales value", salesValue); investClicked(LAUNCHPAD_ADDRESS(), PoolId, salesValue); }} disabled={!comparesaleDate || !isValidSalesPrice}> Buy </Button>
+            <Button className={isValidSalesPrice ? "sales-submit" : "sales-submit invalid"} onClick={() => {console.log("buy"); console.log("sales value", salesValue); investClicked(LAUNCHPAD_ADDRESS(), PoolId, salesValue); }} disabled={!comparesaleDate || !isValidSalesPrice}> Buy </Button>
           </form>
 
           { (poolDistributionDate && poolDistributionStage) &&
