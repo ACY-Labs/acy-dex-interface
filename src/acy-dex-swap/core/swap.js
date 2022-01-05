@@ -679,6 +679,7 @@ export async function swapGetEstimated(
         setSlippageAdjustedAmount(maxAmountIn);
       }
     }
+    setIsUseArb(isUseArb);
 
     let userToken0Balance = await getUserTokenBalanceRaw(
       token0IsETH ? ETHER : new Token(chainId, inToken0Address, inToken0Decimal, inToken0Symbol),
@@ -708,7 +709,6 @@ export async function swapGetEstimated(
       setSwapButtonContent('Not Enough balance');
       console.log("to exit")
       return new CustomError('Not enough balance');
-      console.log("test show?")
     }
     console.log("user has sufficient balance")
     if (bonus0 != null)
@@ -763,7 +763,6 @@ export async function swapGetEstimated(
     }
     
     setSwapButtonState(true);
-
     return 'swap is ok';
   })();
   if (status instanceof CustomError) {
