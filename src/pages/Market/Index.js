@@ -68,7 +68,7 @@ const MarketIndex = props => {
   }, []);
 
   useEffect(() => {
-    if (!account || !chainId) return;
+    if (!account) return;
 
     fetchGlobalTransaction().then(globalTransactions => {
         console.log('globaltransaction', globalTransactions);
@@ -112,7 +112,7 @@ const MarketIndex = props => {
       setselectedIndexBar(dataDict.volume24h.length - 1);
       setselectedDataBar(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));}
     });
-  }, [chainId]);
+  }, [account, chainId]);
 
   const onLineGraphHover = (newData, newIndex) => {
     setselectedDataLine(abbrNumber(newData));
