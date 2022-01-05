@@ -695,7 +695,7 @@ const LaunchpadProject = () => {
         const tokenClaimed = poolInvestorData[3]
         const curDate = new Date()
         let tokenAvailable = 0
-        for(let i=0;i<poolDistributionDate.length;i++){
+        for (let i = 0; i < poolDistributionDate.length; i++) {
           const tempDate = new Date(poolDistributionDate[i])
           if(curDate > tempDate){
             tokenAvailable += tokenAllocated * 100 / poolDistributionStage[i]   //TO-DO
@@ -718,7 +718,6 @@ const LaunchpadProject = () => {
     
     const investClicked = async(poolAddress, poolId, amount) => {
         // TODO: test if amount is valid!
-        console.log("test math", Math.round(0.000001 * Math.pow(10, 18)))
         if (poolStatus !== 2) {// cannot buy
           setIsVesting(false);
         } else {
@@ -729,12 +728,8 @@ const LaunchpadProject = () => {
           }
           //TO-DO: Request UseAllocation API, process only when UseAllocation returns true
         const status = await (async () => {
-          // const approveAmount = amount * Math.pow(10, poolDecimals)
-          const approveAmount = amount * Math.pow(10, 6) // NOTE (Gary): change the decimals HERE!
-          // const approveAmount = 100000
-          console.log("test math", approveAmount)
-          // const state = await getAllowance("0xF82eEeC2C58199cb409788E5D5806727cf549F9f", account, poolAddress, library, account)
-          // console.log(state)
+          // NOTE (gary 2022.1.6): use toString method
+          const approveAmount = (amount * Math.pow(10, poolDecimals)).toString()
           const state = await approveNew(poolMainCoinAddress, approveAmount, poolAddress, library, account);
           const result = await PoolContract.InvestERC20(poolId , approveAmount)
             .catch(e => {
