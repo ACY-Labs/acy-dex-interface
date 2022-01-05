@@ -8,8 +8,10 @@ import Utils from "web3-utils";
 import Contract from 'web3-eth-contract';
 // set provider for all later instances to use
 
-var eth = new Eth('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
-Contract.setProvider('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
+// var eth = new Eth('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
+// Contract.setProvider('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
+var eth = new Eth('https://data-seed-prebsc-1-s1.binance.org:8545');
+Contract.setProvider('https://data-seed-prebsc-1-s1.binance.org:8545');
 const ACY_ADDRESS = '0xaf9db9e362e306688af48c4acb9618c06db38ac3';
 
 const getBlockTime = async (blockNumber) => {

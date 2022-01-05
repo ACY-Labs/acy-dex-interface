@@ -37,18 +37,12 @@ import { getContract } from "../../acy-dex-swap/utils/index.js"
 import { useWeb3React } from '@web3-react/core';
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
 import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID } from "@/constants";
+import { CustomError } from "@/acy-dex-swap/utils"
+import { approveNew, getAllowance } from "@/acy-dex-swap/utils"
 
-const LaunchpadProject = () => {
-  console.log($(document).height());
-  
-  const InputGroup = Input.Group;
+const LaunchpadProject = () => {  
+  // STATES
   const { account, chainId, library, activate, active } = useWeb3React();
-  const PoolContract = getContract("0x6e0EC29eA8afaD2348C6795Afb9f82e25F196436", POOLABI, library, account);
-  const connectWallet = async () =>  {
-    activate(binance);
-    activate(injected);
-  };
-
   const { projectId } = useParams();
   const [receivedData, setReceivedData] = useState({});
   const [poolBaseData, setPoolBaseData] = useState(null);
@@ -57,6 +51,8 @@ const LaunchpadProject = () => {
   const [poolStageCount, setpoolStageCount] = useState(0);
   const [poolInvestorData, setPoolInvestorData] = useState(null);
   const [poolStatus, setPoolStatus] = useState(0);
+  const [poolDecimals, setPoolDecimals] = useState(0); // Gary: decimal initialize to 0
+  const [poolMainCoinAddress, setPoolMainCoinAddress] = useState(0); // e.g., USDT
   const [isError, setIsError] = useState(false);
   const [hasCollected, setHasCollected] = useState(false);
   const [successCollect, setSuccessCollect] = useState(false);
@@ -66,10 +62,106 @@ const LaunchpadProject = () => {
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
   // const [investorNum,setinvestorNum] = useState(0);
+  const [allocationAmount, setAllocationAmount] = useState(0);
+  const [isInvesting, setIsInvesting] = useState(false);
+  const [isAllocated, setIsAllocated] = useState(false);
 
-  console.log("---------STATUS---------")
-  console.log(poolStatus)
+  // NOTE (Gary 2022.1.4): change poolId
+  const PoolId = 11
 
+  // CONSTANTS
+  const InputGroup = Input.Group;
+  const logoObj = {
+    "telegram": telegramWIcon,
+    "twitter": twitterWIcon,
+    "website": linkWIcon,
+    "whitepaper": fileWIcon,
+    "linkedin": linkedinIcon,
+    "medium": mediumIcon,
+    "youtube": youtubeIcon,
+    "github": githubIcon,
+    "etheraddress": etherIcon,
+    "polyaddress": polyIcon,
+  }
+  const PoolContract = getContract("0x6e0EC29eA8afaD2348C6795Afb9f82e25F196436", POOLABI, library, account);
+
+  // HOOKS
+  useEffect(() => {
+    getProjectInfo('bsc-main', projectId)
+      .then(res => {
+        if (res) {
+          // extract data from string
+          const contextData = JSON.parse(res.contextData);
+
+          res['tokenLabels'] = contextData['tokenLabels'];
+          res['projectDescription'] = contextData['projectDescription'];
+          res['alreadySale'] = contextData['alreadySale'];
+          res['salePercentage'] = contextData['salePercentage'];
+          res['posterUrl'] = contextData['posterUrl']
+          res['tokenLogoUrl'] = contextData['tokenLogoUrl']
+
+          res['regStart'] = format_time(res.regStart);
+          res['regEnd'] = format_time(res.regEnd);
+          res['saleStart'] = format_time(res.saleStart);
+          res['saleEnd'] = format_time(res.saleEnd);
+
+          res['totalSale'] = res.totalSale;
+          res['totalRaise'] = res.totalRaise;
+          res['projectUrl'] = res.projectUrl;
+          res['projectName'] = res.projectName;
+
+          setReceivedData(res);
+        } else {
+          console.log('redirect to list page');
+          history.push('/launchpad');
+        }
+      })
+      .catch(e => {
+        console.error(e);
+        history.push('/launchpad');
+      });
+  }, []);
+
+  // fetching data from Smart Contract
+  useEffect(async () => {
+    if(!account){
+      connectWallet();
+    }
+    else if (account || library){
+      console.log("start getPoolBaseData")
+      getPoolData(library, account)
+    } else {
+      const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
+      const accnt = "0x0000000000000000000000000000000000000000";
+      getPoolData(provider, accnt)
+    }
+  }, [library, account])
+
+
+  // FUNCTIONS
+  const connectWallet = async () =>  {
+    activate(binance);
+    activate(injected);
+  };
+
+  const clickToWebsite = () => {
+    const newWindow = window.open(receivedData.website, '_blank', 'noopener,noreferrer');
+    if (newWindow) newWindow.opener = null;
+  }
+
+  const format_time = timeZone => {
+    return moment(timeZone)
+      .local()
+      .format('MM/DD/YYYY HH:mm:ss');
+  };
+
+  const convertUnixTime = unixTime => {
+    const data = new Date((Number(unixTime)) * 1000)
+    const res = data.toLocaleString()
+    return res
+  }
+
+  // COMPONENTS
   // change to URL
   const TokenBanner = ({ posterUrl }) => {
     return (
@@ -80,11 +172,6 @@ const LaunchpadProject = () => {
       />
     );
   };
-
-  const clickToWebsite = () => {
-    const newWindow = window.open(receivedData.website, '_blank', 'noopener,noreferrer');
-    if (newWindow) newWindow.opener = null;
-  }
 
   const TokenLogoLabel = ({ projectName, tokenLogo}) => {
     return (
@@ -155,7 +242,7 @@ const LaunchpadProject = () => {
       let tokenNum
       console.log("--------ALREADY SALE----------")
       console.log(alreadySale)
-      if(alreadySale === null){
+      if(!alreadySale){
         tokenNum = 0
       } else {
         tokenNum = alreadySale
@@ -248,19 +335,6 @@ const LaunchpadProject = () => {
     );
   };
 
-  const logoObj = {
-    "telegram": telegramWIcon,
-    "twitter": twitterWIcon,
-    "website": linkWIcon,
-    "whitepaper": fileWIcon,
-    "linkedin": linkedinIcon,
-    "medium": mediumIcon,
-    "youtube": youtubeIcon,
-    "github": githubIcon,
-    "etheraddress": etherIcon,
-    "polyaddress": polyIcon,
-  }
-
   const ProjectDescription = () => {
     return (
       <div className="circleBorderCard cardContent">
@@ -294,7 +368,7 @@ const LaunchpadProject = () => {
       </div>
     );
   };
-  /*
+  
   const ChartCard = () => {
     const [chartData, setChartData] = useState([]);
     const [transferData, setTransferData] = useState([]);
@@ -372,7 +446,6 @@ const LaunchpadProject = () => {
       </div>
     );
   };
-  */
 
   const AllocationCard = ({
     id,
@@ -383,7 +456,8 @@ const LaunchpadProject = () => {
     walletId,
     projectToken,
     isClickedAllocation,
-    setIsClickedAllocation
+    setIsClickedAllocation,
+    isAllocated,
   }) => {
     const [coverOpenState, setCoverOpenState] = useState(false);
     const [coverRevealState, setCoverRevealState] = useState(false);
@@ -400,14 +474,19 @@ const LaunchpadProject = () => {
     const clickCover = async e => {
       console.log(`click allocation card cover`, allocationAmount);
       console.log(isClickedAllocation);
-      return;
+      if (!walletId && !projectToken) {
+        return;
+      }
+      if (!isAllocated) {
+        console.log("Allocation ammount is not ready!");
+        return;
+      }
       if (isClickedAllocation) {
         return;
       }
       setCoverOpenState(true);
       setIsClickedAllocation(true);
       let cards = document.querySelectorAll(".cover");
-      console.log(e.target.parentElement)
       cards.forEach(node => {
         node.classList.remove("inner-text")
         node.classList.remove("cover");
@@ -417,7 +496,7 @@ const LaunchpadProject = () => {
 
         // get 4 random values for other allocation values
         innerText.textContent = `$${Math.floor(allocationAmount * offsetPercentage)}`;
-        innerText.style.color = "#757579"
+        innerText.style.color = "#757579";
       })
       try {
         let originalElementParent = e.target.parentElement.querySelector(".inner-text-amount");
@@ -425,23 +504,13 @@ const LaunchpadProject = () => {
         originalElementParent.style.color = "#EB5C20"
       } catch (err) {
         // set all values to $0 due to error
-        innerText.textContent = "$0";
+        // innerText.textContent = "$0";
         console.log(err);
       }
       // originalElementParent.textContent = allocationAmount;
 
-      const oldAllocationAmount = allocationAmount;
-      if (oldAllocationAmount === 0) {
-          requireAllocation(walletId, projectToken).then(res => {
-            if(res && res.allocationAmount) {
-              setAllocationAmount(res.allocationAmount);
-              setCoverOpenState(true);
-            }
-            console.log('allocation get', res.allocationAmount);
-          }).catch(e => {
-            console.error(e);
-          })
-      }
+      
+      setCoverOpenState(true);
       e.preventDefault();
     };
 
@@ -450,43 +519,52 @@ const LaunchpadProject = () => {
       <div className='allocationCard-container'>
         <div className="allocationCard" onClick={clickCover}>
           <div class={computeCoverClass()}>
-            <div className="allocationCard-inner">
+            {/* <div className="allocationCard-inner">
               <p className="inner-text">{index + 1}</p>
-            </div>
-            {/* <p className="inner-text-amount">${allocationAmount}</p> */}
+            </div> */}
           </div>
-          <div className='allocationCard-before'></div>
-          <div className='allocationCard-after'></div>
+          <p className="inner-text-amount"></p> 
         </div>
+        <div className='allocationCard-before'></div>
+        <div className='allocationCard-after'></div>
       </div>
     );
   };
 
-  const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount}) => {
+  const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount, isAllocated, setIsAllocated}) => {
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
-    // const { account: walletId } = useWeb3React();
-
-    // useEffect(() => {
-    //   if (!walletId || !projectToken) {
-    //     return
-    //   }
-    //   // get allocation status from backend at begining
-    //   console.log("line470", walletId, projectToken);
-    //   getAllocationInfo(walletId, projectToken)
-    //     .then(res => {
-    //       console.log("res, res.allocationAmount", res, res.allocationAmount)
-    //       if (res && res.allocationAmount) {
-    //         setAllocationAmount(res.allocationAmount);
-    //         console.log('allocation amount', res.allocationAmount);
-    //       }
-    //       // else {
-    //       //   requireAllocation(walletId, projectToken)
-    //       // }
-    //     })
-    //     .catch(e => {
-    //       console.error(e);
-    //     });
-    // }, [walletId, projectToken]);
+    useEffect(() => {
+      if (!walletId || !projectToken) {
+        return
+      }
+      // get allocation status from backend at begining
+      // console.log("line470", walletId, projectToken);
+      // getAllocationInfo(walletId, projectToken)
+      //   .then(res => {
+      //     console.log("res, res.allocationAmount", res, res.allocationAmount)
+      //     if (res && res.allocationAmount) {
+      //       setAllocationAmount(res.allocationAmount);
+      //       console.log('allocation amount', res.allocationAmount);
+      //     }
+      //   })
+      //   .catch(e => {
+      //     console.error(e);
+      //   });
+      
+      const oldAllocationAmount = allocationAmount;
+      if (oldAllocationAmount === 0) {
+          requireAllocation('bsc-main', walletId, projectToken).then(res => {
+            if(res && res.allocationAmount) {
+              setAllocationAmount(res.allocationAmount);
+              setIsAllocated(true);
+              // setCoverOpenState(true);
+            }
+            console.log('allocation get', res.allocationAmount);
+          }).catch(e => {
+            console.error(e);
+          })
+      }
+    }, [walletId, projectToken]);
 
     // TODO: replace with 24 icon
     const BaseCard = ({ url }) => {
@@ -506,13 +584,13 @@ const LaunchpadProject = () => {
             id={i}
             index={i}
             Component={BaseCard}
-            // allocationAmount={allocationAmount}
-            allocationAmount={0}
+            allocationAmount={allocationAmount}
             setAllocationAmount={setAllocationAmount}
             walletId={walletId}
             projectToken={project}
             isClickedAllocation={isClickedAllocation}
             setIsClickedAllocation={setIsClickedAllocation}
+            isAllocated={isAllocated}
           />
         );
       }
@@ -567,23 +645,23 @@ const LaunchpadProject = () => {
         timeout = setTimeout(() => setSuccessCollect(false), 1000);
       }
       return () => clearTimeout(timeout);
-  }, [isError, hasCollected]);
+    }, [isError, hasCollected]);
 
 
-  const vestCallback = async (status) => {
-    const sti = async (hash) => {
-      library.getTransactionReceipt(hash).then(async receipt => {
-        console.log(`receiptreceipt for ${hash}: `, receipt);
-        // receipt is not null when transaction is done
-        if (!receipt) 
-          setTimeout(sti(hash), 500);
-        else {
-          setSuccessCollect(true);
-        }
-      });
-    }
-    sti(status.hash);
-  };
+    const vestCallback = async (status) => {
+      const sti = async (hash) => {
+        library.getTransactionReceipt(hash).then(async receipt => {
+          console.log(`receiptreceipt for ${hash}: `, receipt);
+          // receipt is not null when transaction is done
+          if (!receipt) 
+            setTimeout(sti(hash), 500);
+          else {
+            setSuccessCollect(true);
+          }
+        });
+      }
+      sti(status.hash);
+    };
 
     const vestingClaimClicked = async () => {
       if(!isVesting){
@@ -648,6 +726,36 @@ const LaunchpadProject = () => {
       
     }
 
+    const investClicked = async(poolAddress, poolId, amount) => {
+      // TODO: test if amount is valid!
+      console.log("test math", Math.round(0.000001 * Math.pow(10, 18)))
+      if (poolStatus !== 2) {// cannot buy
+        setIsVesting(false);
+      } else {
+        setIsVesting(true);
+        if (!account) {
+          setIsError(true)
+          connectWallet()
+        }
+        const status = await (async () => {
+          // const approveAmount = amount * Math.pow(10, poolDecimals)
+          const approveAmount = Math.round(amount * Math.pow(10, 6)) // NOTE (Gary): change the decimals HERE!
+          // const approveAmount = 100000
+          console.log("test math", approveAmount)
+          // const state = await getAllowance("0xF82eEeC2C58199cb409788E5D5806727cf549F9f", account, poolAddress, library, account)
+          // console.log(state)
+          const state = await approveNew(poolMainCoinAddress, approveAmount, poolAddress, library, account);
+          const result = await PoolContract.InvestERC20(poolId , approveAmount)
+            .catch(e => {
+              console.log(e)
+              return new CustomError('CustomError while buying token');
+            });
+          return result;
+        })();
+        console.log("buy contract", status)
+      }
+    }
+
     return (
       <div>
       { !isVesting ? 
@@ -669,9 +777,7 @@ const LaunchpadProject = () => {
             <div className='allocation-cards'>
               <div className="allocationContainer">{allocationCards()}</div>
             </div>
-            <div style={{"width": "120px"}}>
-            
-            </div>
+            <div className="allocation-container-dummy"></div>
           </div>
 
           <form className="sales-container">
@@ -679,12 +785,12 @@ const LaunchpadProject = () => {
               Sale
             </label>
             <div className="sales-input-container">
-              <InputGroup compact>
-                  <Input className="sales-input" style={{ width: 'calc(100% - 80px)' }} defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
+              <InputGroup>
+                  <Input className="sales-input" defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
                 {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
               </InputGroup>
             </div>
-            <Button className={isValidSalesPrice ? "sales-submit" : "sales-submit invalid"} onClick={() => console.log("buy")} disabled={!comparesaleDate || !isValidSalesPrice}> Buy </Button>
+            <Button className={"sales-submit"} onClick={() => {console.log("buy"); console.log("sales value", salesValue); investClicked(LAUNCHPAD_ADDRESS(), PoolId, salesValue); }} disabled={!comparesaleDate || !isValidSalesPrice}> Buy </Button>
           </form>
 
           { (poolDistributionDate && poolDistributionStage) &&
@@ -729,7 +835,7 @@ const LaunchpadProject = () => {
     );
   };
 
-  const CardArea = ({ walletId,  allocationAmount, setAllocationAmount }) => {
+  const CardArea = ({ walletId,  allocationAmount, setAllocationAmount, isAllocated, setIsAllocated }) => {
     // const { account: walletId } = useWeb3React();
     return (
       <div className="gridContainer">
@@ -751,67 +857,18 @@ const LaunchpadProject = () => {
               projectToken={receivedData.projectToken}
               allocationAmount={allocationAmount}
               setAllocationAmount={setAllocationAmount}
+              isAllocated={isAllocated}
+              setIsAllocated = {setIsAllocated}
             />
           </div>
           <ProjectDescription />
-          {/* <ChartCard className="launchpad-chart" /> */}
+          <ChartCard className="launchpad-chart" /> 
         </div>
       </div>
     );
   };
 
-  const format_time = timeZone => {
-    return moment(timeZone)
-      .local()
-      .format('MM/DD/YYYY HH:mm:ss');
-  };
-
-  useEffect(() => {
-    getProjectInfo(projectId)
-      .then(res => {
-        if (res) {
-          // extract data from string
-          const contextData = JSON.parse(res.contextData);
-
-          res['tokenLabels'] = contextData['tokenLabels'];
-          res['projectDescription'] = contextData['projectDescription'];
-          res['alreadySale'] = contextData['alreadySale'];
-          res['salePercentage'] = contextData['salePercentage'];
-          res['posterUrl'] = contextData['posterUrl']
-          res['tokenLogoUrl'] = contextData['tokenLogoUrl']
-
-          res['regStart'] = format_time(res.regStart);
-          res['regEnd'] = format_time(res.regEnd);
-          res['saleStart'] = format_time(res.saleStart);
-          res['saleEnd'] = format_time(res.saleEnd);
-
-          res['totalSale'] = res.totalSale;
-          res['totalRaise'] = res.totalRaise;
-          res['projectUrl'] = res.projectUrl;
-          res['projectName'] = res.projectName;
-
-          setReceivedData(res);
-        } else {
-          console.log('redirect to list page');
-          history.push('/launchpad');
-        }
-      })
-      .catch(e => {
-        console.error(e);
-        history.push('/launchpad');
-      });
-  }, []);
-
-  const convertUnixTime = unixTime => {
-    const data = new Date((Number(unixTime)) * 1000)
-    const res = data.toLocaleString()
-    return res
-  }
-
-  // const { launchSetting: { CHAINID, ADDRESS } } = useConstantLoader();
-
   const getPoolData = async (lib, acc) => {
-    // FIXME: add contract 56
     console.log(LAUNCHPAD_ADDRESS(), lib);
     const poolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, lib, acc);
     const pool = []
@@ -820,19 +877,32 @@ const LaunchpadProject = () => {
     const investorRes = []
 
     // 合约函数调用
-    const baseData = await poolContract.GetPoolBaseData(9)
-    const distributionData = await poolContract.GetPoolDistributionData(9)
-    const status = await poolContract.GetPoolStatus(9)
-    const investorData = PoolContract.GetInvestmentData(9, account)
+    const baseData = await poolContract.GetPoolBaseData(PoolId)
+    const distributionData = await poolContract.GetPoolDistributionData(PoolId)
+    const status = await poolContract.GetPoolStatus(PoolId)
+    const investorData = poolContract.GetInvestmentData(PoolId, account)
+
+    console.log("tx data: ", baseData, distributionData, status, investorData)
+
 
     // getpoolbasedata 数据解析
     const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
+    const token2Address = baseData[1]
+    const token2contract = getContract(token2Address, ERC20ABI, lib, acc)
+
+
+    console.log("token1contract", token1contract)
+
     const token1decimal = await token1contract.decimals()
+    const token2decimal = await token2contract.decimals()
     // 不解析时间戳
     const res1 = BigNumber.from(baseData[2]).toBigInt().toString().slice(0,-(token1decimal)) // 获取销售的token的总数
     const res2 = BigNumber.from(baseData[3]).toBigInt().toString().slice(0,-(token1decimal)) // 已销售的token的数量
     const res3 = BigNumber.from(baseData[4]).toBigInt()
     const res4 = BigNumber.from(baseData[5]).toBigInt()
+
+    console.log("res: ", res1, res2, res3, res4)
+
     // 获取当前阶段
     const d = Math.round(new Date().getTime()/1000)
     if(d > res3) setComparesaleDate(true)
@@ -863,25 +933,9 @@ const LaunchpadProject = () => {
     setPoolStatus(curPoolStatus)
     setPoolInvestorData(investorRes)
     setPoolStatus(Number(BigNumber.from(status).toBigInt()))
+    setPoolMainCoinAddress(token2Address)
+    setPoolDecimals(token2decimal)
   }
-
-  // fetching data from Smart Contract
-  useEffect(async () => {
-    if(!account){
-      connectWallet();
-    }
-    else if (account || library){
-      console.log("start getPoolBaseData")
-      getPoolData(library, account)
-    } else {
-      const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
-      const accnt = "0x0000000000000000000000000000000000000000";
-      getPoolData(provider, accnt)
-    }
-  }, [library, account])
-
-  // allocation amount
-  const [allocationAmount, setAllocationAmount] = useState(0);
 
   return (
     <div>
@@ -890,7 +944,7 @@ const LaunchpadProject = () => {
         {hasCollected ? <Alert message="You have collected token for current vesting stage." type="info" showIcon /> : ""}
         <TokenBanner posterUrl={receivedData.projectToken === "PCR" ? paycerBanner : receivedData.posterUrl} />
         <TokenLogoLabel projectName={receivedData.projectName} tokenLogo={receivedData.projectToken === "PCR" ? PaycerIcon : receivedData.tokenLogoUrl} />
-        <CardArea walletId={account} allocationAmount={allocationAmount} setAllocationAmount={setAllocationAmount} />
+        <CardArea walletId={account} allocationAmount={allocationAmount} setAllocationAmount={setAllocationAmount} isAllocated={isAllocated} setIsAllocated={setIsAllocated}/>
       </div>
     </div>
   );

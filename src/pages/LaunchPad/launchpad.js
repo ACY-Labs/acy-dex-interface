@@ -24,8 +24,10 @@ import LaunchChart from "./launchChart"
 
 const Contract = require('web3-eth-contract');
 // set provider for all later instances to use
-const eth = new Eth('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
-Contract.setProvider('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
+// const eth = new Eth('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
+// Contract.setProvider('https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2');
+const eth = new Eth('https://data-seed-prebsc-1-s1.binance.org:8545');
+Contract.setProvider('https://data-seed-prebsc-1-s1.binance.org:8545');
 
 function getTIMESTAMP(time) {
     var date = new Date(time);

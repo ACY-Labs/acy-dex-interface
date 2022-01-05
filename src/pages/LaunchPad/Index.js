@@ -43,7 +43,7 @@ const Pool = props => {
   // project variables
   useEffect(() => {
 
-    getProjects()
+    getProjects('bsc-main')
       .then(res => {
         if (res) {
           console.log(res);
