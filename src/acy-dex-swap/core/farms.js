@@ -400,7 +400,6 @@ const newGetPoolByFarm = async (farm, tokenPrice, library, account, chainId) => 
   //     amount: reward / 10**rewardTokens[i].decimals
   //   }))
   // }));
-  console.log("TEST HERE STAKE DATA:", stakeData);
   
 
   let ratio = tokenPrice[tokens[0].symbol];
