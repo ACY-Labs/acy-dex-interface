@@ -159,7 +159,6 @@ export function isZero(hexNumberString) {
 // return token allowance in BigNumber
 export async function getAllowance(tokenAddress, owner, spender, library, account) {
   const tokenContract = getContract(tokenAddress, ERC20ABI, library, account);
-  console.log("TEST HERE:");
   const allowance = await tokenContract.allowance(owner, spender);
   return allowance;
 }
@@ -335,9 +334,6 @@ export async function approve(tokenAddress, requiredAmount, library, account) {
 
 // should be used in polling to check status of token approval every n seconds
 export async function checkTokenIsApproved(tokenAddress, requiredAmount, library, account) {
-  console.log("TEST HERE:", tokenAddress);
-  console.log("TEST HERE:", account);
-  console.log("TEST HERE:", ROUTER_ADDRESS());
   let allowance = await getAllowance(
     tokenAddress,
     account, // owner
