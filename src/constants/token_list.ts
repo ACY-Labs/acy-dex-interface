@@ -364,20 +364,28 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
 
 const PolygonTestNetTokenList: Array<TokenInfo> = [
   {
-    name: 'MATIC',
+    name: 'Polygon',
     symbol: 'MATIC',
-    address: '0x0000000000000000000000000000000000001010',
+    address: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
     decimals: 18,
     logoURI: 'https://cryptologos.cc/logos/polygon-matic-logo.svg?v=017', 
-    idOnCoingecko: "tether",
+    idOnCoingecko: "matic-network",
   },
   {
-    name: 'Test Token',
-    symbol: 'TST',
-    address: '0x2d7882bedcbfddce29ba99965dd3cdf7fcb10a1e',
+    name: 'ACY',
+    symbol: 'ACY',
+    address: '0x95d4aA0324aABbF595F0C01F786c3bAB2A6a1b5e',
     decimals: 18,
     logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
     idOnCoingecko: "acy-finance",
+  },
+  {
+    name: 'USD Tether',
+    symbol: 'USDT',
+    address: '0x158653b66fd72555F68eDf983736781E471639Cc',
+    decimals: 18,
+    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg',
+    idOnCoingecko: "tether",
   },
   {
     name: 'Dummy Token',

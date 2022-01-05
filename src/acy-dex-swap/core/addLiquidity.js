@@ -386,12 +386,14 @@ export async function getEstimated(
     }
     if (!token1IsETH) {
       console.log(`Inside addLiquidity, amount needed: ${parsedToken1Amount.raw.toString()}`);
+      console.log("TEST1");
       let token1approval = await checkTokenIsApproved(
         inToken1Address,
         parsedToken1Amount.raw.toString(),
         library,
         account
       );
+      console.log("TEST2");
       console.log('token 1 approved?', token1approval);
 
       if (!token1approval) {
@@ -402,6 +404,7 @@ export async function getEstimated(
         approveStatus += 2;
       }
     }
+    console.log("TEST");
     if (approveStatus > 0) {
       setButtonStatus(false);
       setButtonContent('Need approval');
