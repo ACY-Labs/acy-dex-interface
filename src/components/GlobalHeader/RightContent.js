@@ -176,7 +176,7 @@ const GlobalHeaderRight = props => {
     ethereum.on('networkChanged', function (chainId) {
       console.log("networkChanged:", chainId)
       console.log("supported chain?", supportedChainIds, chainId, supportedChainIds.indexOf(chainId) == -1)
-      if (supportedChainIds && supportedChainIds.indexOf(chainId) == -1) {
+      if (supportedChainIds && supportedChainIds.indexOf(Number(chainId)) == -1) {
         console.log("ERROR: unsupport NetWork");
         setIsModalVisible(true);
         switchEthereumChain("0x38"); //返回默认56链
