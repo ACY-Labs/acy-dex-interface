@@ -389,7 +389,7 @@ const PolygonTestNetTokenList: Array<TokenInfo> = [
   },
   {
     name: 'Dummy Token',
-    symbol: 'DMY',
+    symbol: 'BNB',
     address: '0xfe4f5145f6e09952a5ba9e956ed0c25e3fa4c7f1',
     decimals: 18,
     logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
