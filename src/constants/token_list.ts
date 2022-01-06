@@ -300,7 +300,7 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     name: 'USD Tether',
     symbol: 'USDT',
     address: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
-    decimals: 18,
+    decimals: 6,
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg', // not changed
     idOnCoingecko: "tether",
   },
