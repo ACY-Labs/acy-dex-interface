@@ -17,7 +17,7 @@ const AcyConnectWallet = props => {
   const { onClick, isMobile, chainId: walletChainId, pendingLength, ...rest } = props;
   const { account, chainId: fallbackChainId, library } = useConstantLoader();
   const { tokenList: INITIAL_TOKEN_LIST } = useConstantLoader();
-  const [tokenBalanceDict, setTokenBalanceDict] = useState();
+  const [tokenBalanceDict, setTokenBalanceDict] = useState({});
   const [userBalance, setUserBalance]=useState(123);
 
   console.log("web3 and constant chainId", walletChainId, fallbackChainId)
@@ -50,11 +50,11 @@ const AcyConnectWallet = props => {
       const balString = processString(bal);
       newTokenBalanceDict[token.symbol] = balString;
       return balString;
+    }).then(res => {
+      console.log("ymj 1", newTokenBalanceDict);
+      setTokenBalanceDict(newTokenBalanceDict);
+      console.log("ymj 2", tokenBalanceDict);
     })
-    console.log("ymj 1", newTokenBalanceDict);
-    setTokenBalanceDict(newTokenBalanceDict);
-    console.log("ymj 2", tokenBalanceDict);
-    
   }
 
   const newGetAllPools = async (library, account, chainId) => {
@@ -76,10 +76,7 @@ const AcyConnectWallet = props => {
   const Test2 = useEffect(() => {
     console.log('ymj 5', tokenBalanceDict);
     var a = tokenBalanceDict["BNB"];
-    var b = Object.keys(tokenBalanceDict).length === 0 && tokenBalanceDict.constructor === Object
-    var c = Object.getOwnPropertyNames(tokenBalanceDict);
-    console.log("ymj 6", a, b, c); // a显示undefined
-    
+    console.log("ymj 6", a); // a显示undefined
     //return Number(tokenBalanceDict["BNB"])
     //setUserBalance(tokenBalanceDict)
 }, [tokenBalanceDict])
