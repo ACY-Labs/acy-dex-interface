@@ -51,7 +51,8 @@ const AcyConnectWallet = props => {
     )) || (
       <div {...rest} className={styles.connect}>
         <div className={styles.wrap}>
-          {chainName} ( {displayedChainId || 'disconnected'} )
+          {/* {chainName} ( {displayedChainId || 'disconnected'} ) */}
+          {chainName}
           {/* pending */}
           {pendingLength
             &&

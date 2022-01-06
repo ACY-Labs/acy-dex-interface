@@ -25,6 +25,9 @@ import {
   ledger,
   binance,
 } from '@/connectors';
+import {
+  DownOutlined
+} from '@ant-design/icons';
 
 import styles from './index.less';
 import { ReactComponent as Opera } from './Opera.svg';
@@ -432,7 +435,9 @@ const GlobalHeaderRight = props => {
         >
           <Button type="primary" shape="round" className={styles.networkButton}>
             {[networkList[networkListIndex]].map(item => (
-                <div>{item.name}</div>
+                <div>
+                  <AcyIcon.MyIcon type={item.icon} /> {item.name} <DownOutlined /></div>
+                //<Icon><DownOutlined /></Icon>
             ))}
             </Button>
         </Dropdown>
