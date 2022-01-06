@@ -35,6 +35,7 @@ import announcementFIcon from '@/assets/icon_announcement_fill.svg';
 import $ from 'jquery';
 import { getContract } from "../../acy-dex-swap/utils/index.js"
 import { useWeb3React } from '@web3-react/core';
+import {useConnectWallet} from "@/components/ConnectWallet";
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
 import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL } from "@/constants";
 import { CustomError } from "@/acy-dex-swap/utils"
@@ -68,7 +69,13 @@ const LaunchpadProject = () => {
   const [isAllocated, setIsAllocated] = useState(false);
 
   // NOTE (Gary 2022.1.4): change poolId
-  const PoolId = poolID
+  let PoolId
+  if(poolID) {
+     PoolId = poolID
+  } else {
+    PoolId = 12
+  }
+  
 
   // CONSTANTS
   const InputGroup = Input.Group;
@@ -86,6 +93,30 @@ const LaunchpadProject = () => {
   }
   const PoolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, library, account);
 
+
+  // FUNCTIONS
+  const connectWalletByLocalStorage = useConnectWallet();
+  const connectWallet = async () =>  {
+    connectWalletByLocalStorage();
+  };
+
+  const clickToWebsite = () => {
+    const newWindow = window.open(receivedData.website, '_blank', 'noopener,noreferrer');
+    if (newWindow) newWindow.opener = null;
+  }
+
+  const formatTime = timeZone => {
+    return moment(timeZone)
+      .local()
+      .format('MM/DD/YYYY HH:mm:ss');
+  };
+
+  const convertUnixTime = unixTime => {
+    const data = new Date((Number(unixTime)) * 1000)
+    const res = data.toLocaleString()
+    return res
+  }
+
   // HOOKS
   useEffect(() => {
     getProjectInfo(API_URL(), projectId)
@@ -101,10 +132,10 @@ const LaunchpadProject = () => {
           res['posterUrl'] = contextData['posterUrl']
           res['tokenLogoUrl'] = contextData['tokenLogoUrl']
 
-          res['regStart'] = format_time(res.regStart);
-          res['regEnd'] = format_time(res.regEnd);
-          res['saleStart'] = format_time(res.saleStart);
-          res['saleEnd'] = format_time(res.saleEnd);
+          res['regStart'] = formatTime(res.regStart);
+          res['regEnd'] = formatTime(res.regEnd);
+          res['saleStart'] = formatTime(res.saleStart);
+          res['saleEnd'] = formatTime(res.saleEnd);
 
           res['totalSale'] = res.totalSale;
           res['totalRaise'] = res.totalRaise;
@@ -124,12 +155,65 @@ const LaunchpadProject = () => {
       });
   }, []);
 
+  // contract function
+  const getPoolData = async (lib, acc) => {
+    const poolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, lib, acc);
+    const pool = []
+    const distributionRes = []
+    const distributionStage = []
+
+    // 合约函数调用
+    const baseData = await poolContract.GetPoolBaseData(PoolId)
+    const distributionData = await poolContract.GetPoolDistributionData(PoolId)
+    const status = await poolContract.GetPoolStatus(PoolId)
+
+    // getpoolbasedata 数据解析
+    const token2Address = baseData[1]
+    const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
+    const token2contract = getContract(token2Address, ERC20ABI, lib, acc)
+
+    const token1decimal = await token1contract.decimals()
+    const token2decimal = await token2contract.decimals()
+    // 不解析时间戳
+    const res1 = BigNumber.from(baseData[2]).toBigInt().toString().slice(0,-(token1decimal)) // 获取销售的token的总数
+    const res2 = BigNumber.from(baseData[3]).toBigInt().toString().slice(0,-(token1decimal)) // 已销售的token的数量
+    const res3 = BigNumber.from(baseData[4]).toBigInt()
+    const res4 = BigNumber.from(baseData[5]).toBigInt()
+
+    // 获取当前阶段
+    const d = Math.round(new Date().getTime()/1000)
+    if(d > res3) setComparesaleDate(true)
+    if(d > res4) setComparevestDate(true)
+    const saleStartDate = convertUnixTime(res3)
+    const saleEndDate = convertUnixTime(res4)
+    // 存放数据
+    pool.push(res1, res2, saleStartDate, saleEndDate)
+    // getpooldistributiondata 数据解析以及存放
+    distributionData[1].map(uTime => distributionRes.push(convertUnixTime(uTime)))
+    distributionData[2].map(vestingRate => distributionStage.push(BigNumber.from(vestingRate).toBigInt().toString()))
+
+    // 判断当前是否是vesting阶段
+    const curPoolStatus = Number(BigNumber.from(status).toBigInt())
+    if(curPoolStatus === 4) setIsVesting(true)
+
+    // set数据
+    setPoolBaseData(pool)
+    setDistributionDate(distributionRes)
+    setpoolStageCount(Number(BigNumber.from(distributionData[0]).toBigInt())) // vesting阶段的次数
+    setpoolDistributionStage(distributionStage)
+    setPoolStatus(curPoolStatus)
+    setPoolStatus(Number(BigNumber.from(status).toBigInt()))
+    setPoolMainCoinAddress(token2Address)
+    setPoolTokenDecimals(token1decimal)
+    setPoolMainCoinDecimals(token2decimal)
+  }
+
   // fetching data from Smart Contract
   useEffect(async () => {
     if(!account){
       connectWallet();
     }
-    else if (account || library){
+    else if(account || library){
       console.log("start getPoolBaseData")
       getPoolData(library, account)
       console.log("poolDistributionDate", poolDistributionDate, poolDistributionStage)
@@ -138,7 +222,7 @@ const LaunchpadProject = () => {
       const accnt = "0x0000000000000000000000000000000000000000";
       getPoolData(provider, accnt)
       console.log("poolDistributionDate", poolDistributionDate, poolDistributionStage)
-    }
+    } 
   }, [library, account])
 
   useEffect(async () => {
@@ -188,29 +272,6 @@ const LaunchpadProject = () => {
         })
     }
   }, []);
-
-  // FUNCTIONS
-  const connectWallet = async () =>  {
-    activate(binance);
-    activate(injected);
-  };
-
-  const clickToWebsite = () => {
-    const newWindow = window.open(receivedData.website, '_blank', 'noopener,noreferrer');
-    if (newWindow) newWindow.opener = null;
-  }
-
-  const format_time = timeZone => {
-    return moment(timeZone)
-      .local()
-      .format('MM/DD/YYYY HH:mm:ss');
-  };
-
-  const convertUnixTime = unixTime => {
-    const data = new Date((Number(unixTime)) * 1000)
-    const res = data.toLocaleString()
-    return res
-  }
 
   // COMPONENTS
   // change to URL
@@ -267,13 +328,19 @@ const LaunchpadProject = () => {
             <div className={comparesaleDate ? 'procedureNumber' : 'procedureNumber_NotActive'}>
               2
             </div>
-            {poolBaseData &&
+            
               <div>
                 <p>Sale</p>
-                <p className="shortText">From : {poolBaseData[2]}</p>
-                <p className="shortText">To : {poolBaseData[3]}</p>
+                
+                {poolBaseData &&
+                  <div>
+                    <p className="shortText">From : {poolBaseData[2]}</p>
+                    <p className="shortText">To : {poolBaseData[3]}</p>
+                  </div>
+                }
+                
               </div>
-            }
+            
           </div>
 
           <div className="procedure" style={{ marginTop: '24px' }}>
@@ -738,9 +805,6 @@ const LaunchpadProject = () => {
       }
     }
 
-    const curDate = new Date()
-    const compareSaleEnd = new Date(poolBaseData[3])
-
     // TO-DO: TOKEN PURCHASE === ALLOCATIONAMOUNT ? SETISVETING(TRUE)
     return (
       <div>
@@ -778,7 +842,7 @@ const LaunchpadProject = () => {
             </div>
             <Button 
               className={isValidSalesPrice ? "sales-submit" : "sales-submit invalid"} 
-              disabled={curDate > compareSaleEnd}
+              disabled={comparevestDate}
               onClick={() => {console.log("buy"); console.log("sales value", salesValue); investClicked(LAUNCHPAD_ADDRESS(), PoolId, salesValue); }}
             > 
               Buy 
@@ -813,7 +877,7 @@ const LaunchpadProject = () => {
         </div>
       :
         <div>
-          { poolDistributionStage && poolDistributionDate && poolInvestorData &&
+          { poolDistributionStage && poolDistributionDate &&
             <div className="vesting-container">
               <p className="sale-vesting-title vesting">Vesting</p>
               <div className="text-line-container-open">
@@ -861,59 +925,6 @@ const LaunchpadProject = () => {
       </div>
     );
   };
-
-  const getPoolData = async (lib, acc) => {
-    console.log("start get pool data", LAUNCHPAD_ADDRESS(), lib);
-    const poolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, lib, acc);
-    const pool = []
-    const distributionRes = []
-    const distributionStage = []
-
-    // 合约函数调用
-    const baseData = await poolContract.GetPoolBaseData(PoolId)
-    const distributionData = await poolContract.GetPoolDistributionData(PoolId)
-    const status = await poolContract.GetPoolStatus(PoolId)
-
-    // getpoolbasedata 数据解析
-    const token2Address = baseData[1]
-    const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
-    const token2contract = getContract(token2Address, ERC20ABI, lib, acc)
-
-    const token1decimal = await token1contract.decimals()
-    const token2decimal = await token2contract.decimals()
-    // 不解析时间戳
-    const res1 = BigNumber.from(baseData[2]).toBigInt().toString().slice(0,-(token1decimal)) // 获取销售的token的总数
-    const res2 = BigNumber.from(baseData[3]).toBigInt().toString().slice(0,-(token1decimal)) // 已销售的token的数量
-    const res3 = BigNumber.from(baseData[4]).toBigInt()
-    const res4 = BigNumber.from(baseData[5]).toBigInt()
-
-    // 获取当前阶段
-    const d = Math.round(new Date().getTime()/1000)
-    if(d > res3) setComparesaleDate(true)
-    if(d > res4) setComparevestDate(true)
-    const saleStartDate = convertUnixTime(res3)
-    const saleEndDate = convertUnixTime(res4)
-    // 存放数据
-    pool.push(res1, res2, saleStartDate, saleEndDate)
-    // getpooldistributiondata 数据解析以及存放
-    distributionData[1].map(uTime => distributionRes.push(convertUnixTime(uTime)))
-    distributionData[2].map(vestingRate => distributionStage.push(BigNumber.from(vestingRate).toBigInt().toString()))
-
-    // 判断当前是否是vesting阶段
-    const curPoolStatus = Number(BigNumber.from(status).toBigInt())
-    if(curPoolStatus === 4) setIsVesting(true)
-
-    // set数据
-    setPoolBaseData(pool)
-    setDistributionDate(distributionRes)
-    setpoolStageCount(Number(BigNumber.from(distributionData[0]).toBigInt())) // vesting阶段的次数
-    setpoolDistributionStage(distributionStage)
-    setPoolStatus(curPoolStatus)
-    setPoolStatus(Number(BigNumber.from(status).toBigInt()))
-    setPoolMainCoinAddress(token2Address)
-    setPoolTokenDecimals(token1decimal)
-    setPoolMainCoinDecimals(token2decimal)
-  }
 
   return (
     <div>
