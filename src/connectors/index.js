@@ -12,7 +12,8 @@ import { FortmaticConnector_test} from './fortmaticToBinance'
 import { PortisConnector_test} from './portisToBinance'
 
 const RPC_URLS = {
-  1: 'https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
+  1: 'https://data-seed-prebsc-1-s1.binance.org:8545',
+  // 1: 'https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
   4: 'https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
   56: 'https://bsc-dataseed.binance.org/',
   97: 'https://data-seed-prebsc-1-s1.binance.org:8545',

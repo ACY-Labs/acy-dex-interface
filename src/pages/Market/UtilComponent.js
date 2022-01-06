@@ -27,7 +27,7 @@ import {
   fetchSearchPoolReturns,
 } from './Data';
 
-import {SCAN_URL_PREFIX} from "@/constants";
+import { SCAN_URL_PREFIX } from "@/constants";
 import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 
@@ -35,6 +35,8 @@ const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');
 const watchlistManagerPool = new WatchlistManager('pool');
 const lastPromiseWrapper = onlyLastPromise();
+
+
 
 export class SmallTable extends React.Component {
   constructor(props) {
@@ -59,9 +61,9 @@ export class SmallTable extends React.Component {
     if (mode == 'token') {
       let oldArray = watchlistManagerToken.getData();
       let oldSymbolArray = watchlistManagerToken.getTokensSymbol();
-      console.log('oldSymbolArray:',oldSymbolArray);
+      console.log('oldSymbolArray:', oldSymbolArray);
       if (oldArray.includes(address)) {
-        oldArray       = oldArray.filter(item => item != address);
+        oldArray = oldArray.filter(item => item != address);
         oldSymbolArray = oldSymbolArray.filter(item => item != tokenSymbol);
       } else {
         oldArray.push(address);
@@ -115,7 +117,7 @@ export class SmallTable extends React.Component {
           >
             {entry.short}
           </Link>
-          <div style={{width:5}}></div>
+          <div style={{ width: 5 }}></div>
           <span className={styles.coinShort}> ({entry.name})</span>
           {/* Watchlist star */}
           {/* <AcyIcon
@@ -246,14 +248,14 @@ export function TokenTable(props) {
     return [
       {
         title: (
-          <div className={className(styles.tableHeaderFirst,styles.tableIndex)}>
+          <div className={className(styles.tableHeaderFirst, styles.tableIndex)}>
             #
           </div>
-          ),
+        ),
         key: 'index',
         width: '6rem',
-        render:  (text, record, index) => (
-          <div className={className(styles.tableDataFirstColumn,styles.tableIndex)}>
+        render: (text, record, index) => (
+          <div className={className(styles.tableDataFirstColumn, styles.tableIndex)}>
             {index + 1}
           </div>
         ),
@@ -467,13 +469,13 @@ export function PoolTable(props) {
     return [
       {
         title: (
-          <div className={className(styles.tableHeaderFirst,styles.tableIndex)}>
+          <div className={className(styles.tableHeaderFirst, styles.tableIndex)}>
             #
           </div>
-          ),
+        ),
         key: 'index',
-        render:  (text, record, index) => (
-          <div className={className(styles.tableDataFirstColumn,styles.tableIndex)}>
+        render: (text, record, index) => (
+          <div className={className(styles.tableDataFirstColumn, styles.tableIndex)}>
             {index + 1}
           </div>
         ),
@@ -526,7 +528,7 @@ export function PoolTable(props) {
         visible: true,
       },
       {
-        title: (<div style={{marginLeft: "100px"}}></div>),
+        title: (<div style={{ marginLeft: "100px" }}></div>),
         visible: isDesktop(),
       },
       {
@@ -858,7 +860,7 @@ export function TransactionTable(props) {
             let tx_time;
             tx_time = moment(parseInt(timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
             // console.log("printing time....",tx_time);
-            if(tx_time == 'Invalid date') tx_time = timestamp;  
+            if (tx_time == 'Invalid date') tx_time = timestamp;
             let a = moment(new Date(tx_time.replace(/-/g, "/"))).locale('en');
             return a.fromNow();
           }
@@ -899,7 +901,7 @@ export function TransactionTable(props) {
         }
       ).filter(item => item.visible == true)}
       pagination={false}
-      locale={{ emptyText:'No Data'}}
+      locale={{ emptyText: 'No Data' }}
       style={{
         marginBottom: '20px',
       }}
@@ -909,15 +911,15 @@ export function TransactionTable(props) {
             0,
             transactionDisplayNumber + 1
           ).length > transactionDisplayNumber && (
-            <a
-              className={styles.tableSeeMore}
-              onClick={() => {
-                setTransactionDisplayNumber(transactionDisplayNumber + 5);
-              }}
-            >
-              See More...
-            </a>
-          )}
+              <a
+                className={styles.tableSeeMore}
+                onClick={() => {
+                  setTransactionDisplayNumber(transactionDisplayNumber + 5);
+                }}
+              >
+                See More...
+              </a>
+            )}
         </div>
       )}
     />
@@ -940,6 +942,8 @@ export const MarketSearchBar = props => {
   const [, update] = useState();
   const [isLoading, setIsLoading] = useState(true);
 
+  const [localToken, setLocalToken] = useState([]);
+  const [localPool, setLocalPool] = useState([]);
   // fetch searchcoinresults
 
   const networkOptions = [
@@ -998,16 +1002,35 @@ export const MarketSearchBar = props => {
   });
 
   const onInput = useCallback(e => {
-    // setIsLoading(false);
-    // setSearchQuery(e.target.value);
+    setIsLoading(false);
+    setSearchQuery(e.target.value);
+    const key = 'volume24h'
+    setSearchCoinReturns(
+      localToken.filter(
+        token => token.short.includes(e.target.value.toUpperCase())||token.name.toUpperCase().includes(e.target.value.toUpperCase())
+      )
+    );
+    setSearchPoolReturns(
+      localPool.filter(
+        item => item.coin1.includes(e.target.value.toUpperCase())||item.coin2.includes(e.target.value.toUpperCase())
+      )
+    );
+
+    // setSearchPoolReturns(
+    //   localPool.filter(token => token.short.includes(e.target.value.toUpperCase()))
+    // );
 
     // lastPromiseWrapper(fetchTokenSearch(marketClient, e.target.value)).then(data => {
-    //   console.log('token info:',data);
+    //   
     //   setSearchCoinReturns(
-    //     data.map(item => {
-    //       return { address: item.id, name: item.name, short: item.symbol };
+    //     data.slice(0, 5).map(item => {
+    //       //return { address: item.id, name: item.name, short: item.symbol };
+    //       return { logoURL: 'https://acy.finance/static/media/logo.78c0179c.svg', address: item.id, name: item.name, short: item.short };
     //     })
     //   );
+    //   
+    //     
+    //   
     //   lastPromiseWrapper(
     //     fetchPoolSearch(marketClient, e.target.value, data.map(item => item.id))
     //   ).then(pooldata => {
@@ -1022,15 +1045,15 @@ export const MarketSearchBar = props => {
 
     // let query = e.target.value.toLowerCase();
 
-    // // coins return
+    // coins return
     // let newCoin = props.dataSourceCoin.filter(
     //   item => item.name.toLowerCase().includes(query) || item.short.toLowerCase().includes(query)
     // );
-    // // setSearchCoinReturns(newCoin);
+    // setSearchCoinReturns(newCoin);
     // let newPool = props.dataSourcePool.filter(
     //   item => item.coin1.toLowerCase().includes(query) || item.coin2.toLowerCase().includes(query)
     // );
-    // setSearchPoolReturns(newPool);
+    //setSearchPoolReturns(newPool);
   });
 
   const onScroll = e => {
@@ -1056,7 +1079,7 @@ export const MarketSearchBar = props => {
       setWatchlistPool(
         data.pairs.map(item => ({ address: item.id, coin1: item.token0.symbol, coin2: item.token1.symbol, percent: 0 }))
       );
-     })
+    })
 
     // let newWatchlistPool = props.dataSourcePool.filter(item =>
     //   poolWatchlistData.toString().includes([item.coin1, item.coin2, item.percent].toString())
@@ -1095,9 +1118,13 @@ export const MarketSearchBar = props => {
     // possible keys = ["volume24h", "tvl"]
     const key = 'volume24h'
     fetchSearchCoinReturns(key).then(data => {
-      console.log(data);
       if (data) {
         setSearchCoinReturns(
+          data.map(item => {
+            return { logoURL: item.logoURL, address: item.address, name: item.name, short: item.short };
+          })
+        );
+        setLocalToken(
           data.map(item => {
             return { logoURL: item.logoURL, address: item.address, name: item.name, short: item.short };
           })
@@ -1114,7 +1141,12 @@ export const MarketSearchBar = props => {
           data.map(item => {
             return { coin1: item.coin1, coin2: item.coin2, logoURL1: item.logoURL1, logoURL2: item.logoURL2, address: item.address };
           })
-        )
+        );
+        setLocalPool(
+          data.map(item => {
+            return { coin1: item.coin1, coin2: item.coin2, logoURL1: item.logoURL1, logoURL2: item.logoURL2, address: item.address };
+          })
+        );
       }
       setIsLoading(false);
     }).catch(error => {
@@ -1150,7 +1182,7 @@ export const MarketSearchBar = props => {
       style={{ opacity: visible ? 1 : 0, zIndex: visible ? 10 : -1 }}
       ref={rootRef}
     >
-      <div className={styles.marketNavbarMenu}>
+      {/* <div className={styles.marketNavbarMenu}>
         <div className={styles.marketNavbarButton}>
           <Link style={{ color: '#b5b5b6', fontWeight: '600' }} to="/market/list/token">
             Tokens
@@ -1162,11 +1194,11 @@ export const MarketSearchBar = props => {
           </Link>
         </div>
         {props.account && (<div className={styles.marketNavbarButton}>
-          <Link style={{ color: '#b5b5b6', fontWeight: '600' }} to={"/market/accounts/"+props.account.toString()}>
+          <Link style={{ color: '#b5b5b6', fontWeight: '600' }} to={"/market/accounts/" + props.account.toString()}>
             Account
           </Link>
         </div>)}
-      </div>
+      </div> */}
       <div className={styles.marketNavbarRight}>
         {/* <div className={styles.marketDropdownWrapper} ref={outsideClickRefNetwork}>
           <button

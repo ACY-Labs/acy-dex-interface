@@ -332,6 +332,75 @@ export async function approve(tokenAddress, requiredAmount, library, account) {
   }
 }
 
+// approve an ERC-20 token
+export async function approveNew(tokenAddress, requiredAmount, spenderAddress, library, account) {
+  if (requiredAmount === '0') {
+    console.log('Unncessary call to approve');
+    return true;
+  }
+
+  let allowance = await getAllowance(
+    tokenAddress,
+    account, // owner
+    spenderAddress, //spender
+    library, // provider
+    account // active account
+  );
+  console.log(allowance)
+  if (allowance.lt(BigNumber.from(requiredAmount))) {
+    let tokenContract = getContract(tokenAddress, ERC20ABI, library, account);
+    let useExact = false;
+    // try to get max allowance
+    let estimatedGas = await tokenContract.estimateGas['approve'](spenderAddress, MaxUint256).catch(
+      async () => {
+        // general fallback for tokens who restrict approval amounts
+        useExact = true;
+        let result = await tokenContract.estimateGas.approve(
+          spenderAddress,
+          requiredAmount.raw.toString()
+        );
+        return result;
+      }
+    );
+    
+    console.log(`Exact? ${useExact}`);
+    let res = await tokenContract
+      .approve(spenderAddress, useExact ? requiredAmount.raw.toString() : MaxUint256, {
+        gasLimit: calculateGasMargin(estimatedGas),
+      })
+      .catch(() => {
+        console.log('not approve success');
+        return false;
+      });
+    console.log(res);
+
+    if (res == false) {
+      return false;
+    }
+
+    let flag = false;
+
+    while (1) {
+      let newAllowance = await getAllowance(
+        tokenAddress,
+        account, // owner
+        spenderAddress, //spender
+        library, // provider
+        account // active account
+      );
+
+      if (newAllowance.gte(BigNumber.from(requiredAmount))) {
+        flag = true;
+        break;
+      }
+    }
+    if (flag) return true;
+  } else {
+    console.log('Allowance sufficient');
+    return true;
+  }
+}
+
 // should be used in polling to check status of token approval every n seconds
 export async function checkTokenIsApproved(tokenAddress, requiredAmount, library, account) {
   let allowance = await getAllowance(

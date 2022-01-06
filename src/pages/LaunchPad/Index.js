@@ -14,6 +14,7 @@ import { getProjects } from '@/services/api';
 import ExpandingContent from './components/ExpandedContent';
 import {useConnectWallet} from '@/components/ConnectWallet';
 import { useWeb3React } from '@web3-react/core';
+import { API_URL } from '@/constants'
 
 const { Meta } = Card;
 
@@ -43,7 +44,7 @@ const Pool = props => {
   // project variables
   useEffect(() => {
 
-    getProjects()
+    getProjects(API_URL())
       .then(res => {
         if (res) {
           console.log(res);

@@ -53,7 +53,8 @@ const LaunchpadSettingSelector = (arg: string) => {
         // 1: EthereumMainNetLaunchpadSetting,
         97: BscTestNetLaunchpadSetting,
         56: BscMainNetLaunchpadSetting, 
-        137: PolygonMainNetLaunchpadSetting
+        137: PolygonMainNetLaunchpadSetting,
+        80001: PolygonTestNetLaunchpadSetting
     }[arg];
 }
 

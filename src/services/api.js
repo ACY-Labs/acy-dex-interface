@@ -126,8 +126,8 @@ export async function getFakeCaptcha(mobile) {
   return request(`/api/captcha?mobile=${mobile}`);
 }
 
-export async function requireAllocation(walletId, projectToken) {
-  return r.get(`/api/launch/allocation/require`, {
+export async function requireAllocation(network, walletId, projectToken) {
+  return r.get(`${network}/launch/allocation/require`, {
     params: {
       walletId: walletId,
       projectToken: projectToken
@@ -135,8 +135,8 @@ export async function requireAllocation(walletId, projectToken) {
   })
 }
 
-export async function getAllocationInfo(walletId, projectToken) {
-  return r.get(`/api/launch/allocation`, {
+export async function getAllocationInfo(network, walletId, projectToken) {
+  return r.get(`${network}/launch/allocation`, {
     params: {
       walletId: walletId,
       projectToken: projectToken
@@ -144,10 +144,10 @@ export async function getAllocationInfo(walletId, projectToken) {
   })
 }
 
-export async function getProjects() {
-  return r.get(`/api/launch/projects`)
+export async function getProjects(network) {
+  return r.get(`${network}/launch/projects`)
 }
 
-export async function getProjectInfo(projectId) {
-  return r.get(`/api/launch/projects/${projectId}`)
+export async function getProjectInfo(network, projectId) {
+  return r.get(`${network}/launch/projects/${projectId}`)
 }

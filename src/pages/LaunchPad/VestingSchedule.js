@@ -1,30 +1,31 @@
 import React from 'react';
 import './css/LaunchpadProject.css';
-import tick from '@/assets/icon-tick-white.svg';
 import moment from 'moment'
-import { useState } from "react";
 import { Button} from 'antd';
+import tick from '@/assets/icon-tick-white.svg';
 
 const VestingSchedule = ({ vestingDate, stageData, vestingClick }) => {
+  // if (!vestingDate) return;
   const len = vestingDate.length
-
+  const curDate = new Date()
+  // setState
   return (
     <div>
       {
         [...Array(len)].map((_1, index) => {
           return (
             <div className="procedure vesting-procedure">
-              {index === len - 1 ? "" : <hr aria-orientation="vertical" className={moment(vestingDate[index]).isBefore() ? "verticalDivideLine vesting-schedule-line" : "verticalDivideLine_NotActive vesting-schedule-line"} />}
-              <div className={moment(vestingDate[index]).isBefore() ? "procedureNumber_NotActive" : "procedureNumber"}>
+              {index === len - 1 ? "" : <hr aria-orientation="vertical" className={curDate > new Date(vestingDate[index]) ? "verticalDivideLine vesting-schedule-line" : "verticalDivideLine_NotActive vesting-schedule-line"} />}
+              <div className={curDate < new Date(vestingDate[index])  ? "procedureNumber_NotActive" : "procedureNumber"}>
                 <img src={tick} alt="tick-icon" className="vesting-tick-icon" />
               </div>
               <div className="vesting-schedule-text">
                 <div className='vesting-percentage-claim-container'>
                   <p className="vesting-percentage">{stageData[index]}%</p>
                   <Button
-                    className={moment(vestingDate[index]).isBefore() ? "claim-btn claim-btn-active" : "claim-btn claim-btn-inactive"}
+                    className="claim-btn"
                     id="claim-btn"
-                    disabled={!moment(vestingDate[index]).isBefore()}
+                    disabled={!(curDate > new Date(vestingDate[index]))}
                     onClick={vestingClick}
                   >
                     Claim
