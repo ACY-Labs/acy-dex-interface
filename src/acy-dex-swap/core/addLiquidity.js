@@ -464,7 +464,7 @@ export async function getEstimated(
         )[0].toString(),
         minETH,
         account,
-        `0x${(Math.floor(new Date().getTime() / 1000) + 60).toString(16)}`,
+        `0x${(Math.floor(new Date().getTime() / 1000) + 1800).toString(16)}`,
       ];
       value = BigNumber.from(
         (token1IsETH ? parsedToken1Amount : parsedToken0Amount).raw.toString()
@@ -490,7 +490,7 @@ export async function getEstimated(
           noLiquidity ? 0 : allowedSlippage
         )[0].toString(),
         account,
-        `0x${(Math.floor(new Date().getTime() / 1000) + 60).toString(16)}`,
+        `0x${(Math.floor(new Date().getTime() / 1000) + 1800).toString(16)}`,
       ];
       value = null;
     }
