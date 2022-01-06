@@ -325,7 +325,7 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     symbol: 'WETH',
     address: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
     decimals: 18,
-    logoURI: 'https://dapp.ptokens.io/assets/svg/pETH.svg',
+    logoURI: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=014',
     idOnCoingecko: "weth",
   },
   {
