@@ -205,6 +205,8 @@ const LaunchpadProject = () => {
     setPoolMainCoinAddress(token2Address)
     setPoolTokenDecimals(token1decimal)
     setPoolMainCoinDecimals(token2decimal)
+
+    console.log(token2Address)
   }
 
   // fetching data from Smart Contract
@@ -835,7 +837,9 @@ const LaunchpadProject = () => {
             </label>
             <div className="sales-input-container">
                 <InputGroup>
-                  <div className='token-logo'>Hello</div>
+                  <div className="token-logo">
+                    <img src={etherIcon} alt="token-logo" className="token-image"/>
+                  </div>
                   <Input className="sales-input" defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
                 {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
               </InputGroup>
@@ -850,27 +854,29 @@ const LaunchpadProject = () => {
           </form>
 
           { poolDistributionStage && poolDistributionDate && 
-            <div className="vesting-container">
-              <p className="sale-vesting-title vesting">Vesting</p>
-              <div className="text-line-container">
-                <p>{poolStageCount} stages of vesting : Unlock {poolDistributionStage[0]}% TGE</p>
-                <span className="vesting-line" />
-                <div
-                  className={
-                    isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'
-                  }
-                >
-                  <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} vestingClick={vestingClaimClicked} />
+            <div className="vesting-open-container">
+              <div className="vesting-container">
+                <p className="sale-vesting-title vesting">Vesting</p>
+                <div className="text-line-container">
+                  <p>{poolStageCount} stages of vesting : Unlock {poolDistributionStage[0]}% TGE</p>
+                  <span className="vesting-line" />
+                  
                 </div>
+                <div className="arrow-down-container">
+                  <CaretDownOutlined
+                    className={
+                      isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
+                    }
+                  />  
+                </div>
+                <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}></div>
               </div>
-              <div className="arrow-down-container">
-                <CaretDownOutlined
-                  className={
-                    isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
-                  }
-                />  
-              </div>
-              <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}>
+              <div
+                className={
+                  isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'
+                }
+              >
+                <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} vestingClick={vestingClaimClicked} />
               </div>
             </div>
           }

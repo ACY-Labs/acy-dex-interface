@@ -21,7 +21,9 @@ const VestingSchedule = ({ vestingDate, stageData, vestingClick }) => {
               </div>
               <div className="vesting-schedule-text">
                 <div className='vesting-percentage-claim-container'>
-                  <p className="vesting-percentage">{stageData[index]}%</p>
+                  <div className="vesting-percentage-container">
+                    <p className="vesting-percentage">{stageData[index]}%</p>
+                  </div>
                   <Button
                     className="claim-btn"
                     id="claim-btn"
