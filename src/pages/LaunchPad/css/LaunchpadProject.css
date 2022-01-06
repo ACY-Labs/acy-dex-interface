@@ -46,6 +46,7 @@
   padding-inline-end: 2.25rem;
   padding-top: 2rem;
   padding-bottom: 2.5rem;
+  
 }
 
 .allocation-content {
@@ -53,12 +54,14 @@
 }
 
 .allocation-content-inactive {
-  height: 320px;
+  display: none;
+  height: auto;
   transition: height 0.1s linear;
 }
 
 .allocation-content-active {
-  height: 850px;
+  display: block;
+  height: auto;
   transition: height 0.1s linear;
 }
 
