@@ -73,10 +73,9 @@ const LaunchpadProject = () => {
   if(poolID) {
      PoolId = poolID
   } else {
-    PoolId = 12
+    PoolId = 16
   }
   
-
   // CONSTANTS
   const InputGroup = Input.Group;
   const logoObj = {
@@ -95,9 +94,9 @@ const LaunchpadProject = () => {
 
 
   // FUNCTIONS
-  const connectWalletByLocalStorage = useConnectWallet();
   const connectWallet = async () =>  {
-    connectWalletByLocalStorage();
+    activate(binance);
+    activate(injected);
   };
 
   const clickToWebsite = () => {
