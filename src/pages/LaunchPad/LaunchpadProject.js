@@ -76,7 +76,6 @@ const LaunchpadProject = () => {
     PoolId = 16
   }
   
-
   // CONSTANTS
   const InputGroup = Input.Group;
   const logoObj = {
@@ -95,9 +94,9 @@ const LaunchpadProject = () => {
 
 
   // FUNCTIONS
-  const connectWalletByLocalStorage = useConnectWallet();
   const connectWallet = async () =>  {
-    connectWalletByLocalStorage();
+    activate(binance);
+    activate(injected);
   };
 
   const clickToWebsite = () => {

@@ -54,7 +54,6 @@
 }
 
 .allocation-content-inactive {
-  display: none;
   height: auto;
   transition: height 0.1s linear;
 }
