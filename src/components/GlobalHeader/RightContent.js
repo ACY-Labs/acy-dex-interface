@@ -32,6 +32,9 @@ import {
 import styles from './index.less';
 import { ReactComponent as Opera } from './Opera.svg';
 import styled from "styled-components";
+import { asyncForEach } from "@/utils/asynctools";
+import { getUserTokenBalance } from '@/acy-dex-swap/utils';
+import { processString } from "@/components/AcyCoinItem";
 
 const GlobalHeaderRight = props => {
   const { global } = props;
@@ -42,6 +45,7 @@ const GlobalHeaderRight = props => {
   const [only, setOnly] = useState(true);
   // 连接钱包函数
   const { account, chainId, library, activate, deactivate, active } = useWeb3React();
+  const { tokenList: INITIAL_TOKEN_LIST } = useConstantLoader();
   //const { activate, deactivate, active } = useWeb3React();
   //const { account, library, chainId } = useConstantLoader();
   //const { tokenList: supportedTokensd } = useConstantLoader();
@@ -51,7 +55,7 @@ const GlobalHeaderRight = props => {
   useEffect(() => {
     setWallet(localStorage.getItem("wallet"))
     if (!account) {
-      if(!wallet){
+      if (!wallet) {
         console.log("localStroage dosen't exist");
         localStorage.setItem('wallet', 'binance');
       }
@@ -152,14 +156,14 @@ const GlobalHeaderRight = props => {
       activate(ledger);
     } else if (walletName === 'binance') {
       activate(binance);
-    } else{
+    } else {
       console.log("wallet ERROR");
     }
     localStorage.setItem('wallet', walletName);
     setVisibleMetaMask(false);
   };
   // 初始网络显示
-  const n_index = chainId=> {
+  const n_index = chainId => {
     if (chainId == 56) {
       return 0
     }
@@ -181,12 +185,12 @@ const GlobalHeaderRight = props => {
         setIsModalVisible(true);
         switchEthereumChain("0x38"); //返回默认56链
       }
-      else if(chainId == 97){
+      else if (chainId == 97) {
         // 测试网 不显示给用户
         switchEthereumChain("0x61");
         setNetworkListIndex(0)
-      }      
-      else{
+      }
+      else {
         setIsModalVisible(false);
         setVisibleMetaMask(false);
         setNetworkListIndex(n_index(chainId))
@@ -201,12 +205,12 @@ const GlobalHeaderRight = props => {
         setIsModalVisible(true);
         switchEthereumChain("0x38"); //返回默认56链
       }
-      else if(chainId == 97){
+      else if (chainId == 97) {
         // 测试网 不显示给用户
         switchEthereumChain("0x61");
         setNetworkListIndex(0)
-      }      
-      else{
+      }
+      else {
         setIsModalVisible(false);
         setVisibleMetaMask(false);
         setNetworkListIndex(n_index(chainId))
@@ -442,23 +446,56 @@ const GlobalHeaderRight = props => {
       </AcyCardList>
     </div>
   );
+  // ymj 修改 显示余额
+  const initTokenBalanceDict = (tokenList) => {
+    console.log('Init Token Balance!!!! with chainId, TokenList', chainId, tokenList);
+    const newTokenBalanceDict = {};
+    asyncForEach(tokenList, async (element, index) => {
+      console.log("dispatched async", element)
+      const token = element;
+      var { address, symbol, decimals } = token;
+      const bal = await getUserTokenBalance(
+        { address, symbol, decimals },
+        chainId,
+        account,
+        library
+      ).catch(err => {
+        newTokenBalanceDict[token.symbol] = 0;
+        console.log("Failed to load balance, error param: ", address, symbol, decimals, err);
+      })
+
+      const balString = processString(bal);
+      newTokenBalanceDict[token.symbol] = balString;
+      return balString;
+    })
+    //setTokenBalanceDict(newTokenBalanceDict);
+    console.log("ymj 2", newTokenBalanceDict);
+  }
+  
+  const onClickForTest = () => {
+    console.log("ymj 1");
+    if(INITIAL_TOKEN_LIST) {
+      initTokenBalanceDict(INITIAL_TOKEN_LIST);
+  }
+  }
 
   return (
     <div className={className}>
-    <Dropdown
-          overlay={networkListInCardList}
-          trigger={['click']}
-          placement="bottomCenter"
-          //className={styles.networkButton}
-        >
-          <Button type="primary" shape="round" className={styles.networkButton}>
-            {[networkList[networkListIndex]].map(item => (
-                <div>
-                  <AcyIcon.MyIcon type={item.icon} /> {item.name} <DownOutlined /></div>
-                //<Icon><DownOutlined /></Icon>
-            ))}
-            </Button>
-        </Dropdown>
+      <Button onClick={onClickForTest}>123</Button>
+      <Dropdown
+        overlay={networkListInCardList}
+        trigger={['click']}
+        placement="bottomCenter"
+      //className={styles.networkButton}
+      >
+        <Button type="primary" shape="round" className={styles.networkButton}>
+          {[networkList[networkListIndex]].map(item => (
+            <div>
+              <AcyIcon.MyIcon type={item.icon} /> {item.name} <DownOutlined /></div>
+            //<Icon><DownOutlined /></Icon>
+          ))}
+        </Button>
+      </Dropdown>
 
       {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
       <AcyConnectWallet
@@ -469,7 +506,7 @@ const GlobalHeaderRight = props => {
           props.transaction.transactions.length
         }
       />
-      
+
 
       {false && (
         <Dropdown
@@ -524,8 +561,8 @@ const GlobalHeaderRight = props => {
           />
         </Dropdown>
       )}
-      
-      
+
+
 
       <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}>
 
@@ -638,12 +675,12 @@ const GlobalHeaderRight = props => {
           </AcyCardList>
         )} */}
       </AcyModal>
-        {/* 错误弹窗*/}
+      {/* 错误弹窗*/}
       <AcyModal width={420} visible={isModalVisible}>
-      <p>ERROR: UNSUPPORT NETWORKS</p>
-      <p>We are not ready for this networks, please change your networks!</p>
+        <p>ERROR: UNSUPPORT NETWORKS</p>
+        <p>We are not ready for this networks, please change your networks!</p>
       </AcyModal>
-      
+
     </div>
   );
 };
