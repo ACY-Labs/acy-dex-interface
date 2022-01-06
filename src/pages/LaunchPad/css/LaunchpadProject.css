@@ -554,6 +554,10 @@
   outline: #eb5c20 solid 2px;
 }
 
+.token-logo{
+  position: absolute;
+}
+
 .max-btn {
   position: absolute;
   border-radius: 4px !important;

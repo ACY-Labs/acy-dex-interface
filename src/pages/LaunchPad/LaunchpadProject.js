@@ -73,7 +73,7 @@ const LaunchpadProject = () => {
   if(poolID) {
      PoolId = poolID
   } else {
-    PoolId = 12
+    PoolId = 16
   }
   
 
@@ -835,7 +835,8 @@ const LaunchpadProject = () => {
               Sale
             </label>
             <div className="sales-input-container">
-              <InputGroup>
+                <InputGroup>
+                  <div className='token-logo'>Hello</div>
                   <Input className="sales-input" defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
                 {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
               </InputGroup>
