@@ -355,7 +355,12 @@ export async function getEstimated(
           setButtonStatus(false);
           return new CustomError('Insufficient reserve!');
         }
-
+        console.log(">> test unhandled exception", parsedToken0Amount, parsedToken0Amount.toFixed(2))
+        if (parsedToken0Amount.toExact() == 0 || parsedToken1Amount.toExact() == 0) {
+          // setButtonContent('Zero as input');
+          return new CustomError('Zero as input');
+        }
+        console.log("add liquidity unhandled exception", e)
         setButtonContent('Unhandled exception!');
         setButtonStatus(false);
         return new CustomError('Unhandled exception!');
