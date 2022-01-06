@@ -562,6 +562,7 @@
 .token-logo{
   position: absolute;
   z-index: 2;
+  top: 10px
 }
 
 .token-image{
@@ -580,6 +581,7 @@
   cursor: pointer;
   right: 0;
   z-index: 1;
+  top: 5px;
 }
 
 .sales-input-max-text {

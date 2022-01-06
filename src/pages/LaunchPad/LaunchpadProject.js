@@ -838,7 +838,7 @@ const LaunchpadProject = () => {
             <div className="sales-input-container">
                 <InputGroup>
                   <div className="token-logo">
-                    <img src={etherIcon} alt="token-logo" className="token-image"/>
+                    <img  alt="token-logo" className="token-image"/>
                   </div>
                   <Input className="sales-input" defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
                 {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
