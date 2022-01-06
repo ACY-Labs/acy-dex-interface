@@ -175,6 +175,23 @@ const GlobalHeaderRight = props => {
       console.log(account);
       setVisibleMetaMask(false);
     }
+    if (chainId) {
+      if (supportedChainIds && supportedChainIds.indexOf(Number(chainId)) == -1) {
+        console.log("ERROR: unsupport NetWork");
+        setIsModalVisible(true);
+        switchEthereumChain("0x38"); //返回默认56链
+      }
+      else if(chainId == 97){
+        // 测试网 不显示给用户
+        switchEthereumChain("0x61");
+        setNetworkListIndex(0)
+      }      
+      else{
+        setIsModalVisible(false);
+        setVisibleMetaMask(false);
+        setNetworkListIndex(n_index(chainId))
+      }
+    }
     // 监听钱包网络变化 metamask
     ethereum.on('networkChanged', function (chainId) {
       console.log("networkChanged:", chainId)
