@@ -8,6 +8,7 @@ export const TransactionType = {
 export const FEE_PERCENT = 0.003;
 
 export function abbrHash(hash) {
+  if(!hash) return "???";
   let len = hash.length;
   let first = hash.slice(0, 5);
   let last = hash.slice(len - 4, len);
@@ -16,6 +17,8 @@ export function abbrHash(hash) {
 }
 
 export function abbrNumber(number) {
+  if(!number) number = 0;
+
   const THOUSAND = 0;
   const MILLION = 1;
   const BILLION = 2;
@@ -50,7 +53,7 @@ export function abbrNumber(number) {
       result = `${tempNumber.toFixed(2)}b`;
       break;
     default:
-      result = `${number.toFixed(2)}`;
+      result = `${number?number.toFixed(2):0}`;
       break;
   }
 

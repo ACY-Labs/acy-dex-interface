@@ -9,39 +9,26 @@ import { BigNumber } from '@ethersproject/bignumber';
 
 // parse number with shortform T,B,M, or return itself.
 export function processString(bal) {
-  console.log('bal:', bal);
-  
-  if(!bal) return '0';
-  
-  let decimals = Number.parseInt(bal.split('.')[0]);
+  bal = Number.parseFloat(bal);
+
   const million = 1000000
   const billion = 1000000000
   const trillion = 1000000000000
-  
-  let decimalNum;
-  let decimalFractionNum;
-  let unit = '';
-  let decimalFractionBN = 0;
-  if (decimalNum > trillion) {
-    decimalNum = decimals / trillion
-    decimalFractionNum = decimals % trillion / trillion;
-    unit = 'T';
-  } else if (decimalNum > billion) {
-    decimalNum = decimals / billion
-    decimalFractionNum = decimals % billion / billion;
-    unit = 'B';
-  } else if (decimalNum > million) {
-    decimalNum = decimals / million
-    decimalFractionNum = decimals % million / million;
-    unit = 'M';
-  } else {
-    decimalNum = decimals
-    decimalFractionNum = 0;
+
+  let abbrNum = bal.toFixed(2);
+  if (bal.toString().split(".")[1] > 3) {
+      abbrNum = bal.toFixed(3)
   }
-
-  decimalFractionNum = decimalFractionNum.toPrecision(2);
-
-  return unit ? `${decimalNum}${!decimalFractionNum ? `.${decimalFractionNum}` : ''}${unit}` : `${Number.parseFloat(bal).toPrecision(3)}`;
+  if ((bal / million).toFixed(2) > 1) {
+      abbrNum = (bal / million).toFixed(2) + "M"
+  }
+  if ((bal / billion).toFixed(2) > 1) {
+      abbrNum = (bal / billion).toFixed(2) + "B"
+  }
+  if ((bal / trillion).toFixed(2) > 1) {
+      abbrNum = (bal / trillion).toFixed(2) + "T"
+  }
+  return abbrNum
 }
 
 // data refer to the token object that contains properties such as symbol, name, and logoURI.

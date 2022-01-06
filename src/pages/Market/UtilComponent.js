@@ -1182,7 +1182,7 @@ export const MarketSearchBar = props => {
       style={{ opacity: visible ? 1 : 0, zIndex: visible ? 10 : -1 }}
       ref={rootRef}
     >
-      <div className={styles.marketNavbarMenu}>
+      {/* <div className={styles.marketNavbarMenu}>
         <div className={styles.marketNavbarButton}>
           <Link style={{ color: '#b5b5b6', fontWeight: '600' }} to="/market/list/token">
             Tokens
@@ -1198,7 +1198,7 @@ export const MarketSearchBar = props => {
             Account
           </Link>
         </div>)}
-      </div>
+      </div> */}
       <div className={styles.marketNavbarRight}>
         {/* <div className={styles.marketDropdownWrapper} ref={outsideClickRefNetwork}>
           <button

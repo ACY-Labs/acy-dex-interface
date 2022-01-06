@@ -35,6 +35,12 @@ const PolygonMainNetLaunchpadSetting: LaunchpadSetting = {
     RPC_URL: "https://polygon-rpc.com"
 }
 
+const PolygonTestNetLaunchpadSetting: LaunchpadSetting = {
+    CHAIN_ID: 80001,
+    ADDRESS: "0x24CDE3C1D0aF8695604D2c3bc09A1bF8a47e4eC7",
+    RPC_URL: "https://matic-mumbai.chainstacklabs.com"
+}
+
 // NOTE (Gary): ETH is not supported now (2022.1.2)
 // const EthereumMainNetLaunchpadSetting: LaunchpadSetting = {
 //     CHAIN_ID: 1,
@@ -47,7 +53,8 @@ const LaunchpadSettingSelector = (arg: string) => {
         // 1: EthereumMainNetLaunchpadSetting,
         97: BscTestNetLaunchpadSetting,
         56: BscMainNetLaunchpadSetting, 
-        137: PolygonMainNetLaunchpadSetting
+        137: PolygonMainNetLaunchpadSetting,
+        80001: PolygonTestNetLaunchpadSetting
     }[arg];
 }
 

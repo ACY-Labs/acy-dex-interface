@@ -1,3 +1,8 @@
+:root{
+  --blur-size: 16px;
+  --spread-size: 5px;
+}
+
 .mainContainer {
   width: 100%;
   margin-inline: auto;
@@ -257,11 +262,30 @@
   justify-content: center;
   flex-direction: column;
   cursor: pointer;
-  background: #010101;
   border-radius: 50%;
   perspective: 500px;
   z-index: 1;
 }
+
+.allocationContainer > div:nth-of-type(5n+1) > .allocationCard:hover{
+ box-shadow: 0 0 var(--blur-size) var(--spread-size) #631027;
+}
+
+.allocationContainer > div:nth-of-type(5n+2) > .allocationCard:hover{
+  box-shadow: 0 0 var(--blur-size) var(--spread-size) #74490f;
+ }
+
+ .allocationContainer > div:nth-of-type(5n+3) > .allocationCard:hover{
+  box-shadow: 0 0 var(--blur-size) var(--spread-size) #0f2e48;
+ }
+
+ .allocationContainer > div:nth-of-type(5n+4) > .allocationCard:hover{
+  box-shadow: 0 0 var(--blur-size) var(--spread-size) #0e4c32;
+ }
+
+ .allocationContainer > div:nth-of-type(5n+5) > .allocationCard:hover{
+  box-shadow: 0 0 var(--blur-size) var(--spread-size) #375d19;
+ }
 
 .allocationCard-container {
   position: relative;
@@ -589,15 +613,6 @@
   font-size: 12px;
   border-radius: 8px;
   color: white;
-}
-
-.claim-btn-inactive {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.claim-btn-active {
-  cursor: pointer;
 }
 
 .vesting-tick-icon {
