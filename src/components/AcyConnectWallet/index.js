@@ -11,7 +11,7 @@ import { processString } from "@/components/AcyCoinItem";
 import { getAllSuportedTokensPrice } from '@/acy-dex-swap/utils';
 
 
-import { Button, Icon } from 'antd';
+import { Button, Icon, Tooltip } from 'antd';
 const AcyConnectWallet = props => {
 
   const { onClick, isMobile, chainId: walletChainId, pendingLength, ...rest } = props;
@@ -21,6 +21,7 @@ const AcyConnectWallet = props => {
   const [userBalance, setUserBalance] = useState('0');
   const [tokenBalanceDict, setTokenBalanceDict] = useState({});
   const [tokenPriceDict, setTokenPriceDict] = useState({});
+  const [balanceShow, setBalanceShow] = useState('none');
 
   console.log("web3 and constant chainId", walletChainId, fallbackChainId)
 
@@ -98,6 +99,16 @@ const AcyConnectWallet = props => {
     return chainName
   }, [displayedChainId])
 
+  const ymjTest = async()=>{
+    console.log("ymj 123");
+    if (balanceShow == 'none'){
+      setBalanceShow('inline-block')
+    }
+    else setBalanceShow('none')
+    //return false;
+  }
+
+
   return (
     (isMobile && (
       <div {...rest} className={styles.connect}>
@@ -116,11 +127,12 @@ const AcyConnectWallet = props => {
     )) || (
       <div {...rest} className={styles.connect}>
         <div className={styles.wrap}>
-          {/* {chainName} ( {displayedChainId || 'disconnected'} ) */}
-          {chainName}
-          (
-          {userBalance}
-          )
+          {/* {chainName} ( {displayedChainId || 'disconnected'} ) */} 
+          <Tooltip placement='bottomLeft' color={'#b5b5b6'} title="Click to show your balance" mouseEnterDelay={0.5}>
+          <div className={styles.balanceBtn} onClick={ymjTest}>Balance
+          <div className={styles.showBalance} style={{display:balanceShow}}> $ {userBalance}</div>
+          </div> 
+          </Tooltip>
           {/* pending */}
           {pendingLength
             &&

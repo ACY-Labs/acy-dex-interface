@@ -427,6 +427,9 @@ const GlobalHeaderRight = props => {
   ];
   const networkListInCardList = (
     <div className={styles.networkListBlock}>
+      <div className={styles.networkTitle}>
+          <span>Select the Network</span>
+        </div>
       <AcyCardList>
         {networkList.map((item) => {
           return (
@@ -451,13 +454,13 @@ const GlobalHeaderRight = props => {
         placement="bottomCenter"
       //className={styles.networkButton}
       >
-        <Button type="primary" shape="round" className={styles.networkButton}>
+        <div type="primary" shape="round" className={styles.networkButton}>
           {[networkList[networkListIndex]].map(item => (
             <div>
               <AcyIcon.MyIcon type={item.icon} /> {item.name} <DownOutlined /></div>
             //<Icon><DownOutlined /></Icon>
           ))}
-        </Button>
+        </div>
       </Dropdown>
 
       {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
