@@ -32,9 +32,7 @@ import {
 import styles from './index.less';
 import { ReactComponent as Opera } from './Opera.svg';
 import styled from "styled-components";
-import { asyncForEach } from "@/utils/asynctools";
-import { getUserTokenBalance } from '@/acy-dex-swap/utils';
-import { processString } from "@/components/AcyCoinItem";
+
 
 const GlobalHeaderRight = props => {
   const { global } = props;
@@ -45,10 +43,6 @@ const GlobalHeaderRight = props => {
   const [only, setOnly] = useState(true);
   // 连接钱包函数
   const { account, chainId, library, activate, deactivate, active } = useWeb3React();
-  const { tokenList: INITIAL_TOKEN_LIST } = useConstantLoader();
-  //const { activate, deactivate, active } = useWeb3React();
-  //const { account, library, chainId } = useConstantLoader();
-  //const { tokenList: supportedTokensd } = useConstantLoader();
   const [wallet, setWallet] = useState(localStorage.getItem("wallet"));
 
   // 连接钱包 根据localStorage
@@ -446,42 +440,9 @@ const GlobalHeaderRight = props => {
       </AcyCardList>
     </div>
   );
-  // ymj 修改 显示余额
-  const initTokenBalanceDict = (tokenList) => {
-    console.log('Init Token Balance!!!! with chainId, TokenList', chainId, tokenList);
-    const newTokenBalanceDict = {};
-    asyncForEach(tokenList, async (element, index) => {
-      console.log("dispatched async", element)
-      const token = element;
-      var { address, symbol, decimals } = token;
-      const bal = await getUserTokenBalance(
-        { address, symbol, decimals },
-        chainId,
-        account,
-        library
-      ).catch(err => {
-        newTokenBalanceDict[token.symbol] = 0;
-        console.log("Failed to load balance, error param: ", address, symbol, decimals, err);
-      })
-
-      const balString = processString(bal);
-      newTokenBalanceDict[token.symbol] = balString;
-      return balString;
-    })
-    //setTokenBalanceDict(newTokenBalanceDict);
-    console.log("ymj 2", newTokenBalanceDict);
-  }
-  
-  const onClickForTest = () => {
-    console.log("ymj 1");
-    if(INITIAL_TOKEN_LIST) {
-      initTokenBalanceDict(INITIAL_TOKEN_LIST);
-  }
-  }
 
   return (
     <div className={className}>
-      <Button onClick={onClickForTest}>123</Button>
       <Dropdown
         overlay={networkListInCardList}
         trigger={['click']}

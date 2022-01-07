@@ -17,11 +17,13 @@ const AcyConnectWallet = props => {
   const { onClick, isMobile, chainId: walletChainId, pendingLength, ...rest } = props;
   const { account, chainId: fallbackChainId, library } = useConstantLoader();
   const { tokenList: INITIAL_TOKEN_LIST } = useConstantLoader();
+
+  const [userBalance, setUserBalance] = useState('0');
   const [tokenBalanceDict, setTokenBalanceDict] = useState({});
-  const [userBalance, setUserBalance]=useState(123);
+  const [tokenPriceDict, setTokenPriceDict] = useState({});
 
   console.log("web3 and constant chainId", walletChainId, fallbackChainId)
-  
+
 
   const displayedChainId = useMemo(() => {
     // if chainId from useWeb3React and useConstantLoader are different, that means user's wallet is on an unsupported chainId. 
@@ -29,58 +31,54 @@ const AcyConnectWallet = props => {
   }, [walletChainId, fallbackChainId])
 
   // 钱包余额
-  
+
   const initTokenBalanceDict = (tokenList) => {
     console.log('Init Token Balance!!!! with chainId, TokenList', fallbackChainId, tokenList);
     const newTokenBalanceDict = {};
     //const tokenPriceList = {};
-    asyncForEach(tokenList, async (element, index) => {
-      console.log("dispatched async", element)
-      const token = element;
-      var { address, symbol, decimals } = token;
-      const bal = await getUserTokenBalance(
-        { address, symbol, decimals },
-        fallbackChainId,
-        account,
-        library
-      ).catch(err => {
-        newTokenBalanceDict[token.symbol] = 0;
-        console.log("Failed to load balance, error param: ", address, symbol, decimals, err);
+    if (account) {
+      asyncForEach(tokenList, async (element, index) => {
+        console.log("dispatched async", element)
+        const token = element;
+        var { address, symbol, decimals } = token;
+        const bal = await getUserTokenBalance(
+          { address, symbol, decimals },
+          fallbackChainId,
+          account,
+          library
+        ).catch(err => {
+          newTokenBalanceDict[token.symbol] = 0;
+          console.log("Failed to load balance, error param: ", address, symbol, decimals, err);
+        })
+        const balString = processString(bal);
+        newTokenBalanceDict[token.symbol] = balString;
+        return balString;
+      }).then(res => {
+        setTokenBalanceDict(newTokenBalanceDict);
       })
-      const balString = processString(bal);
-      newTokenBalanceDict[token.symbol] = balString;
-      return balString;
-    }).then(res => {
-      console.log("ymj 1", newTokenBalanceDict);
-      setTokenBalanceDict(newTokenBalanceDict);
-      console.log("ymj 2", tokenBalanceDict);
-    })
+    }
   }
 
-  const newGetAllPools = async (library, account, chainId) => {
-    const tokenPriceList = await getAllSuportedTokensPrice();
-    //console.log("ymj 4", tokenPriceList);
+  const getAllPrice = async() => {
+    const tokenPriceList = await getAllSuportedTokensPrice().then(res => {
+      setTokenPriceDict(res);
+    });
   }
-  const Test = useMemo(() => {
-    newGetAllPools(library, account, fallbackChainId);
-    if(INITIAL_TOKEN_LIST){
-      // 在这个函数set State
+  useEffect(() => {
+    getAllPrice(library, account, fallbackChainId);
+    if (INITIAL_TOKEN_LIST) {
       initTokenBalanceDict(INITIAL_TOKEN_LIST);
     }
-    // console.log('ymj 10', tokenBalanceDict)
-    // if (Object.keys(tokenBalanceDict)){
-    //   return tokenBalanceDict["BNB"];
-    // }
-    // return 0;
   }, [account, fallbackChainId])
-  const Test2 = useEffect(() => {
-    console.log('ymj 5', tokenBalanceDict);
-    var a = tokenBalanceDict["BNB"];
-    console.log("ymj 6", a); // a显示undefined
-    //return Number(tokenBalanceDict["BNB"])
-    //setUserBalance(tokenBalanceDict)
-}, [tokenBalanceDict])
-  
+
+  useEffect(() => {
+    var balance = 0;
+    Object.keys(tokenBalanceDict).forEach(ele => {
+      balance = balance + (Number(tokenBalanceDict[ele]) * tokenPriceDict[ele]);
+    })
+    setUserBalance(balance.toFixed(2))
+  }, [tokenBalanceDict])
+
 
   const chainName = useMemo(() => {
     let chainName;
@@ -121,7 +119,7 @@ const AcyConnectWallet = props => {
           {/* {chainName} ( {displayedChainId || 'disconnected'} ) */}
           {chainName}
           (
-          {}
+          {userBalance}
           )
           {/* pending */}
           {pendingLength
