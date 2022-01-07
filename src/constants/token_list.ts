@@ -70,6 +70,15 @@ const BscMainNetTokenList: Array<TokenInfo> = [
 
 const BscTestNetTokenList: Array<TokenInfo> = [
   {
+    name: 'Test Coin',
+    symbol: 'USDT',
+    address: '0xF82eEeC2C58199cb409788E5D5806727cf549F9f',
+    addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    decimals: 18,
+    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg',
+    idOnCoingecko: "usd-coin",
+  },
+  {
     name: 'Binance Coin',
     symbol: 'BNB',
     address: '0xae13d989dac2f0debff460ac112a837c89baa7cd',

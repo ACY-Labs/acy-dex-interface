@@ -37,7 +37,7 @@ import { getContract } from "../../acy-dex-swap/utils/index.js"
 import { useWeb3React } from '@web3-react/core';
 import {useConnectWallet} from "@/components/ConnectWallet";
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
-import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL } from "@/constants";
+import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL, TOKEN_LIST } from "@/constants";
 import { CustomError } from "@/acy-dex-swap/utils"
 import { approveNew, getAllowance } from "@/acy-dex-swap/utils"
 
@@ -55,6 +55,8 @@ const LaunchpadProject = () => {
   const [poolTokenDecimals, setPoolTokenDecimals]  = useState(0); 
   const [poolMainCoinDecimals, setPoolMainCoinDecimals] = useState(0); // Gary: decimal initialize to 0
   const [poolMainCoinAddress, setPoolMainCoinAddress] = useState(0); // e.g., USDT
+  const [poolMainCoinLogoURL, setPoolMainCoinLogoURL] = useState(null);
+  const [poolMainCoinName, setPoolMainCoinName] = useState(null);
   const [isError, setIsError] = useState(false);
   const [hasCollected, setHasCollected] = useState(false);
   const [successCollect, setSuccessCollect] = useState(false);
@@ -168,6 +170,9 @@ const LaunchpadProject = () => {
 
     // getpoolbasedata 数据解析
     const token2Address = baseData[1]
+    const tokenList = TOKEN_LIST()
+    const token2Info = tokenList.find(item => item.address === token2Address)
+
     const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
     const token2contract = getContract(token2Address, ERC20ABI, lib, acc)
 
@@ -203,6 +208,8 @@ const LaunchpadProject = () => {
     setPoolStatus(curPoolStatus)
     setPoolStatus(Number(BigNumber.from(status).toBigInt()))
     setPoolMainCoinAddress(token2Address)
+    setPoolMainCoinLogoURL(token2Info.logoURI)
+    setPoolMainCoinName(token2Info.symbol)
     setPoolTokenDecimals(token1decimal)
     setPoolMainCoinDecimals(token2decimal)
 
@@ -430,14 +437,14 @@ const LaunchpadProject = () => {
         <div className="keyinfoRow" style={{ marginTop: '1rem' }}>
           <div className="keyinfoName">Total Raise</div>
           <div>
-            {receivedData.totalRaise} USDT
+            {receivedData.totalRaise} {poolMainCoinName}
           </div>
         </div>
 
         <div className="keyinfoRow" style={{ marginTop: '1rem' }}>
           <div className="keyinfoName">Rate</div>
           <div>
-            1 {projectToken} = {tokenPrice} USDT
+            1 {projectToken} = {tokenPrice} {poolMainCoinName}
           </div>
         </div>
       </div>
@@ -838,11 +845,11 @@ const LaunchpadProject = () => {
             <div className="sales-input-container">
                 <InputGroup>
                   <div className="token-logo">
-                    <img src={tokenLogoUrl} alt="token-logo" className="token-image"/>
+                    <img src={tokenLogoUrl? tokenLogoUrl:receivedData.tokenLogoUrl} alt="token-logo" className="token-image"/>
                   </div>
                   <Input className="sales-input" defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
                   <div className="unit-max-group">
-                    <div className='unit'>{projectToken}</div>
+                    <div className='unit'>{poolMainCoinName}</div>
                     <Button className="max-btn" onClick={maxClick}>MAX</Button>
                   </div>
               </InputGroup>
@@ -953,7 +960,7 @@ const LaunchpadProject = () => {
           setAllocationAmount={setAllocationAmount}
           isAllocated={isAllocated}
           setIsAllocated={setIsAllocated}
-          tokenLogoUrl={receivedData.projectToken === "PCR" ? PaycerIcon : receivedData.tokenLogoUrl}
+          tokenLogoUrl={poolMainCoinLogoURL}
         />
       </div>
     </div>
