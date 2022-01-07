@@ -313,6 +313,14 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     idOnCoingecko: "acy-finance",
   },
   {
+    name: 'NULS',
+    symbol: 'NULS',
+    address: '0x8b8e48a8cc52389cd16a162e5d8bd514fabf4ba0',
+    decimals: 8,
+    logoURI: 'https://cryptologos.cc/logos/nuls-nuls-logo.svg?v=018',
+    idOnCoingecko: "acy-finance",
+  },
+  {
     name: 'USD Coin',
     symbol: 'USDC',
     address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',//0xe9e7cea3dedca5984780bafc599bd69add087d56
