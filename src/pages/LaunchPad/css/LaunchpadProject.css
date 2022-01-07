@@ -547,7 +547,7 @@
   min-width: 0px;
   height: 45px;
   font-size: 16px;
-  padding: 0px 20px 0px 50px;
+  padding: 0px 20px 0px 60px;
 }
 
 .sales-input:hover {
@@ -562,32 +562,40 @@
 .token-logo{
   position: absolute;
   z-index: 2;
-  top: 10px
+  top: 8px;
+  left: 15px;
 }
 
 .token-image{
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
 }
 
-.max-btn {
+.unit-max-group{
   position: absolute;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  top: 5px;
+}
+
+
+.max-btn {
   border-radius: 4px !important;
-  height: 35px;
   background-color: #010101;
   color: #eb5c20;
   border: unset;
   font-weight: 700;
   cursor: pointer;
-  right: 0;
   z-index: 1;
-  top: 5px;
+  top: 2px; 
+  font-size: 12px;
 }
 
 .sales-input-max-text {
   position: absolute;
   border-radius: 4px !important;
-  height: 35px;
   font-weight: 700;
   right: 0;
   z-index: 1;

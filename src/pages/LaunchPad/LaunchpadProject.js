@@ -616,12 +616,12 @@ const LaunchpadProject = () => {
         const offsetPercentage = offsets[Math.floor((Math.random() * offsets.length))]
 
         // get 4 random values for other allocation values
-        innerText.textContent = `$${Math.floor(allocationAmount * offsetPercentage)}`;
+        innerText.textContent = `${Math.floor(allocationAmount * offsetPercentage)}`;
         innerText.style.color = "#757579";
       })
       try {
         let originalElementParent = e.target.parentElement.querySelector(".inner-text-amount");
-        originalElementParent.textContent = `$${allocationAmount}`;
+        originalElementParent.textContent = `${allocationAmount}`;
         originalElementParent.style.color = "#ffffff"
       } catch (err) {
         // set all values to $0 due to error
@@ -649,7 +649,7 @@ const LaunchpadProject = () => {
     );
   };
 
-  const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount, isAllocated, setIsAllocated}) => {
+  const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount, isAllocated, setIsAllocated, tokenLogoUrl}) => {
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
 
     // TODO: replace with 24 icon
@@ -838,10 +838,13 @@ const LaunchpadProject = () => {
             <div className="sales-input-container">
                 <InputGroup>
                   <div className="token-logo">
-                    <img  alt="token-logo" className="token-image"/>
+                    <img src={tokenLogoUrl} alt="token-logo" className="token-image"/>
                   </div>
                   <Input className="sales-input" defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
-                {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
+                  <div className="unit-max-group">
+                    <div className='unit'>{projectToken}</div>
+                    <Button className="max-btn" onClick={maxClick}>MAX</Button>
+                  </div>
               </InputGroup>
             </div>
             <Button 
@@ -899,7 +902,7 @@ const LaunchpadProject = () => {
     );
   };
 
-  const CardArea = ({ walletId,  allocationAmount, setAllocationAmount, isAllocated, setIsAllocated }) => {
+  const CardArea = ({ walletId,  allocationAmount, setAllocationAmount, isAllocated, setIsAllocated, tokenLogoUrl }) => {
     // const { account: walletId } = useWeb3React();
     return (
       <div className="gridContainer">
@@ -923,6 +926,7 @@ const LaunchpadProject = () => {
               setAllocationAmount={setAllocationAmount}
               isAllocated={isAllocated}
               setIsAllocated={setIsAllocated}
+              tokenLogoUrl={tokenLogoUrl}
             />
           </div>
           <ProjectDescription />
@@ -939,8 +943,18 @@ const LaunchpadProject = () => {
         {isNotInvesting ? <Alert message="Wait until Sale stage to purchase." type="info" showIcon /> : ""}
         {hasCollected ? <Alert message="You have vested token for current vesting stage." type="info" showIcon /> : ""}
         <TokenBanner posterUrl={receivedData.projectToken === "PCR" ? paycerBanner : receivedData.posterUrl} />
-        <TokenLogoLabel projectName={receivedData.projectName} tokenLogo={receivedData.projectToken === "PCR" ? PaycerIcon : receivedData.tokenLogoUrl} />
-        <CardArea walletId={account} allocationAmount={allocationAmount} setAllocationAmount={setAllocationAmount} isAllocated={isAllocated} setIsAllocated={setIsAllocated}/>
+        <TokenLogoLabel
+          projectName={receivedData.projectName}
+          tokenLogo={receivedData.projectToken === "PCR" ? PaycerIcon : receivedData.tokenLogoUrl}
+        />
+        <CardArea
+          walletId={account}
+          allocationAmount={allocationAmount}
+          setAllocationAmount={setAllocationAmount}
+          isAllocated={isAllocated}
+          setIsAllocated={setIsAllocated}
+          tokenLogoUrl={receivedData.projectToken === "PCR" ? PaycerIcon : receivedData.tokenLogoUrl}
+        />
       </div>
     </div>
   );
