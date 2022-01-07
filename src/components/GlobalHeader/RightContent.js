@@ -42,7 +42,8 @@ const GlobalHeaderRight = props => {
   const [visibleSetting, setVisibleSetting] = useState(false);
   const [only, setOnly] = useState(true);
   // 连接钱包函数
-  const { account, chainId, library, activate, deactivate, active } = useWeb3React();
+  const { account, chainId, library } = useConstantLoader();
+  const { activate, deactivate, active } = useWeb3React();
   const [wallet, setWallet] = useState(localStorage.getItem("wallet"));
 
   // 连接钱包 根据localStorage
@@ -210,7 +211,7 @@ const GlobalHeaderRight = props => {
         setNetworkListIndex(n_index(chainId))
       }
     })
-  }, account, chainId, supportedChainIds);
+  }, [account, chainId, supportedChainIds, wallet]);
   const {
     currentUser,
     fetchingMoreNotices,
