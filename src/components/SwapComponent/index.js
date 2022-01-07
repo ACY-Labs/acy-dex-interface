@@ -528,20 +528,25 @@ const SwapComponent = props => {
         if (!receipt) 
           setTimeout(sti(hash), 500);
         else {
+
+          if (!receipt.status) {
+            setSwapButtonContent("Failed");
+          } else {
+
+            props.onGetReceipt(receipt.transactionHash, library, account);
+            
+            // set button to done and disabled on default
+            setSwapButtonContent("Done");
+          }
           
           const newData = transactions.filter(item => item.hash != hash);
-
-          props.onGetReceipt(receipt.transactionHash, library, account);
-
           dispatch({
             type: 'transaction/addTransaction',
             payload: {
               transactions: newData
             },
           });
-
-          // set button to done and disabled on default
-          setSwapButtonContent("Done");
+          
         }
       });
     }

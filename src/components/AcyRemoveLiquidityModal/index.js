@@ -215,30 +215,47 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
         if (!receipt) {
           setTimeout(checkStatusAndFinish, 500);
         } else {
-          let transactionTime;
-          await library.getBlock(receipt.logs[0].blockNumber).then(res => {
-            transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
-            console.log("test transactionTime: ", transactionTime)
-          });
-
-          // remove pair if user has totally withdrawn from pool
-          if (percent === 100) {
-            axios.post(
-              // fetch valid pool list from remote
-              `${apiUrlPrefix}/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
-              // `http://localhost:3001/api/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
-            ).then(res => {
-              console.log("remove to server return: ", res);
-
-              // refresh the table
-              dispatch({
-                type: "liquidity/setRefreshTable",
-                payload: true,
-              });
-
-            }).catch(e => console.log("error: ", e));
+          if (!receipt.status) {
+            setButtonContent("Failed");
+          } else {
+            
+            let transactionTime;
+            await library.getBlock(receipt.logs[0].blockNumber).then(res => {
+              transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
+              console.log("test transactionTime: ", transactionTime)
+            });
+  
+            // remove pair if user has totally withdrawn from pool
+            if (percent === 100) {
+              axios.post(
+                // fetch valid pool list from remote
+                `${apiUrlPrefix}/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
+                // `http://localhost:3001/api/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
+              ).then(res => {
+                console.log("remove to server return: ", res);
+  
+                // refresh the table
+                dispatch({
+                  type: "liquidity/setRefreshTable",
+                  payload: true,
+                });
+  
+              }).catch(e => console.log("error: ", e));
+            }
+            
+            // refresh the table
+            dispatch({
+              type: "liquidity/setRefreshTable",
+              payload: true,
+            });
+            
+            // disable button after each transaction on default, enable it after re-entering amount to add
+            setButtonStatus(true);
+            setButtonContent("Done");
+            
+            // store to localStorage
           }
-
+          
           // clear top right loading spin
           const newData = transactions.filter(item => item.hash != status.hash);
           dispatch({
@@ -247,19 +264,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
               transactions: newData
             }
           });
-
-          // refresh the table
-          dispatch({
-            type: "liquidity/setRefreshTable",
-            payload: true,
-          });
-
-          // disable button after each transaction on default, enable it after re-entering amount to add
-          setButtonStatus(true);
-          setButtonContent("Done");
-
           
-          // store to localStorage
         }
       })
     };

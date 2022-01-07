@@ -457,25 +457,33 @@ const AddLiquidityComponent = props => {
           if (!receipt) {
             setTimeout(checkStatusAndFinish, 500);
           } else {
-            // update backend userPool record
-            console.log("test pair to add on server", pairToAddOnServer);
-            props.onGetReceipt(receipt.transactionHash);
-            if (pairToAddOnServer) {
-              const { token0, token1 } = pairToAddOnServer;
-              axios.post(
-                // fetch valid pool list from remote
-                `${apiUrlPrefix}/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
-                // `http://localhost:3001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
-              ).then(res => {
-                console.log("add to server return: ", res);
-
-                // refresh the table
-                dispatch({
-                  type: "liquidity/setRefreshTable",
-                  payload: true,
-                });
-
-              }).catch(e => console.log("error: ", e));
+            if (!receipt.status) {
+              setButtonContent("Failed");
+            } else {
+              // update backend userPool record
+              console.log("test pair to add on server", pairToAddOnServer);
+              props.onGetReceipt(receipt.transactionHash);
+              if (pairToAddOnServer) {
+                const { token0, token1 } = pairToAddOnServer;
+                axios.post(
+                  // fetch valid pool list from remote
+                  `${apiUrlPrefix}/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
+                  // `http://localhost:3001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
+                ).then(res => {
+                  console.log("add to server return: ", res);
+  
+                  // refresh the table
+                  dispatch({
+                    type: "liquidity/setRefreshTable",
+                    payload: true,
+                  });
+  
+                }).catch(e => console.log("error: ", e));
+              }
+              
+              // disable button after each transaction on default, enable it after re-entering amount to add
+              console.log(buttonContent);
+              setButtonContent("Done");
             }
 
             // clear top right loading spin
@@ -487,12 +495,6 @@ const AddLiquidityComponent = props => {
                 transactions: newData
               }
             });
-
-            // disable button after each transaction on default, enable it after re-entering amount to add
-            console.log(buttonContent);
-            setButtonContent("Done");
-
-            // store to localStorage
           }
         })
       };
