@@ -519,8 +519,8 @@ export async function getAllSuportedTokensPrice() {
 
     // launchpad project token
     // where tokens is not listed on coinGecko
-    if (CHAINID() == 137)
-      tokensPrice["NULS"] = await getTokenPriceFromPool("NULS");
+    // if (CHAINID() == 137)
+    //   tokensPrice["NULS"] = await getTokenPriceFromPool("NULS");
 
     console.log(">>> tokenPriceDict", tokensPrice);
     return tokensPrice;
