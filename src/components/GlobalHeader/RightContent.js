@@ -33,6 +33,7 @@ import styles from './index.less';
 import { ReactComponent as Opera } from './Opera.svg';
 import styled from "styled-components";
 
+
 const GlobalHeaderRight = props => {
   const { global } = props;
   // 选择货币的弹窗
@@ -41,17 +42,16 @@ const GlobalHeaderRight = props => {
   const [visibleSetting, setVisibleSetting] = useState(false);
   const [only, setOnly] = useState(true);
   // 连接钱包函数
-  const { account, chainId, library, activate, deactivate, active } = useWeb3React();
-  //const { activate, deactivate, active } = useWeb3React();
-  //const { account, library, chainId } = useConstantLoader();
-  //const { tokenList: supportedTokensd } = useConstantLoader();
+  const { account, chainId, library } = useConstantLoader();
+  const { activate, deactivate, active } = useWeb3React();
+  
   const [wallet, setWallet] = useState(localStorage.getItem("wallet"));
 
   // 连接钱包 根据localStorage
   useEffect(() => {
     setWallet(localStorage.getItem("wallet"))
     if (!account) {
-      if(!wallet){
+      if (!wallet) {
         console.log("localStroage dosen't exist");
         localStorage.setItem('wallet', 'binance');
       }
@@ -152,14 +152,14 @@ const GlobalHeaderRight = props => {
       activate(ledger);
     } else if (walletName === 'binance') {
       activate(binance);
-    } else{
+    } else {
       console.log("wallet ERROR");
     }
     localStorage.setItem('wallet', walletName);
     setVisibleMetaMask(false);
   };
   // 初始网络显示
-  const n_index = chainId=> {
+  const n_index = chainId => {
     if (chainId == 56) {
       return 0
     }
@@ -181,12 +181,12 @@ const GlobalHeaderRight = props => {
         setIsModalVisible(true);
         switchEthereumChain("0x38"); //返回默认56链
       }
-      else if(chainId == 97){
+      else if (chainId == 97) {
         // 测试网 不显示给用户
         switchEthereumChain("0x61");
         setNetworkListIndex(0)
-      }      
-      else{
+      }
+      else {
         setIsModalVisible(false);
         setVisibleMetaMask(false);
         setNetworkListIndex(n_index(chainId))
@@ -201,18 +201,18 @@ const GlobalHeaderRight = props => {
         setIsModalVisible(true);
         switchEthereumChain("0x38"); //返回默认56链
       }
-      else if(chainId == 97){
+      else if (chainId == 97) {
         // 测试网 不显示给用户
         switchEthereumChain("0x61");
         setNetworkListIndex(0)
-      }      
-      else{
+      }
+      else {
         setIsModalVisible(false);
         setVisibleMetaMask(false);
         setNetworkListIndex(n_index(chainId))
       }
     })
-  }, account, chainId, supportedChainIds);
+  }, [account, chainId, supportedChainIds, wallet]);
   const {
     currentUser,
     fetchingMoreNotices,
@@ -445,20 +445,20 @@ const GlobalHeaderRight = props => {
 
   return (
     <div className={className}>
-    <Dropdown
-          overlay={networkListInCardList}
-          trigger={['click']}
-          placement="bottomCenter"
-          //className={styles.networkButton}
-        >
-          <Button type="primary" shape="round" className={styles.networkButton}>
-            {[networkList[networkListIndex]].map(item => (
-                <div>
-                  <AcyIcon.MyIcon type={item.icon} /> {item.name} <DownOutlined /></div>
-                //<Icon><DownOutlined /></Icon>
-            ))}
-            </Button>
-        </Dropdown>
+      <Dropdown
+        overlay={networkListInCardList}
+        trigger={['click']}
+        placement="bottomCenter"
+      //className={styles.networkButton}
+      >
+        <Button type="primary" shape="round" className={styles.networkButton}>
+          {[networkList[networkListIndex]].map(item => (
+            <div>
+              <AcyIcon.MyIcon type={item.icon} /> {item.name} <DownOutlined /></div>
+            //<Icon><DownOutlined /></Icon>
+          ))}
+        </Button>
+      </Dropdown>
 
       {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
       <AcyConnectWallet
@@ -469,7 +469,7 @@ const GlobalHeaderRight = props => {
           props.transaction.transactions.length
         }
       />
-      
+
 
       {false && (
         <Dropdown
@@ -524,8 +524,8 @@ const GlobalHeaderRight = props => {
           />
         </Dropdown>
       )}
-      
-      
+
+
 
       <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}>
 
@@ -638,12 +638,12 @@ const GlobalHeaderRight = props => {
           </AcyCardList>
         )} */}
       </AcyModal>
-        {/* 错误弹窗*/}
+      {/* 错误弹窗*/}
       <AcyModal width={420} visible={isModalVisible}>
-      <p>ERROR: UNSUPPORT NETWORKS</p>
-      <p>We are not ready for this networks, please change your networks!</p>
+        <p>ERROR: UNSUPPORT NETWORKS</p>
+        <p>We are not ready for this networks, please change your networks!</p>
       </AcyModal>
-      
+
     </div>
   );
 };
