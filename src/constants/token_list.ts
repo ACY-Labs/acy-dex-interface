@@ -42,7 +42,7 @@ const BscMainNetTokenList: Array<TokenInfo> = [
     idOnCoingecko: "tether",
   },
   {
-    name: 'Wrapped Binance',
+    name: 'Wrapped BNB',
     symbol: 'WBNB',
     address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
     decimals: 18,
@@ -88,7 +88,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     idOnCoingecko: "usd-coin",
   },
   {
-    name: 'Wrapped Binance',
+    name: 'Wrapped BNB',
     symbol: 'WBNB',
     address: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
@@ -329,7 +329,7 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     idOnCoingecko: "usd-coin",
   },
   {
-    name: 'WETH',
+    name: 'Wrapped ETH',
     symbol: 'WETH',
     address: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
     decimals: 18,
