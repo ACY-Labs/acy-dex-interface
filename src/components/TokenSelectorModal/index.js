@@ -103,6 +103,7 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
             return balString;
         })
         setTokenBalanceDict(newTokenBalanceDict);
+        //console.log("ymj 2", newTokenBalanceDict);
     }
 
     useEffect(() => {

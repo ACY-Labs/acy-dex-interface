@@ -12,7 +12,7 @@ import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import ERC20ABI from '../abis/ERC20.json';
 import axios from 'axios';
 import { JsonRpcProvider } from "@ethersproject/providers";
-import {ROUTER_ADDRESS, FARMS_ADDRESS, FLASH_ARBITRAGE_ADDRESS, FACTORY_ADDRESS, INIT_CODE_HASH, RPC_URL, CHAINID, TOKENLIST, API_URL, NATIVE_CURRENCY} from "@/constants";
+import {constantInstance, ROUTER_ADDRESS, FARMS_ADDRESS, FLASH_ARBITRAGE_ADDRESS, FACTORY_ADDRESS, INIT_CODE_HASH, RPC_URL, CHAINID, TOKENLIST, API_URL, NATIVE_CURRENCY} from "@/constants";
 
 export {ROUTER_ADDRESS, FARMS_ADDRESS, FLASH_ARBITRAGE_ADDRESS, FACTORY_ADDRESS, INIT_CODE_HASH, RPC_URL, CHAINID, TOKENLIST, API_URL, NATIVE_CURRENCY}
 
@@ -516,6 +516,13 @@ export async function getAllSuportedTokensPrice() {
     tokenList.forEach(token => {
       tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
     })
+
+    // launchpad project token
+    // where tokens is not listed on coinGecko
+    // if (CHAINID() == 137)
+    //   tokensPrice["NULS"] = await getTokenPriceFromPool("NULS");
+
+    console.log(">>> tokenPriceDict", tokensPrice);
     return tokensPrice;
   });
   return tokensPrice;
@@ -533,4 +540,70 @@ export async function withExactOutEstimateInAmount(deltaY, xTokenAddress, yToken
   const flashArbitrageContract = getContract(FLASH_ARBITRAGE_ADDRESS(), FlashArbitrageABI, library, account)
   const estimateInputAmount = await flashArbitrageContract.calYiOutput(deltaY, xTokenAddress, yTokenAddress, maxPathNum);
   return estimateInputAmount;
+}
+
+export async function getTokenPriceFromPool(tokenSymbol){
+  const tokenList = TOKENLIST();
+  const chainId = CHAINID();
+  const library = constantInstance.library;
+
+  const tok  = tokenList.find(token => token.symbol == tokenSymbol);
+  const BUSD = tokenList.find(token => token.symbol == "USDC");
+  const USDT = tokenList.find(token => token.symbol == "USDT");
+
+  const newToken  = new Token(chainId, tok.address, tok.decimals, tokenSymbol);
+
+  const calcPriceTasks = [];
+  if (USDT) {
+    const usdtToken  = new Token(chainId, USDT.address, USDT.decimals, "USDT");
+    const newTokenUsdtPair = await Fetcher.fetchPairData(newToken, usdtToken, library, chainId).catch(e => {
+      return false
+    });
+    if (newTokenUsdtPair)
+      calcPriceTasks.push(getTokenPriceByPair(newTokenUsdtPair, tok.symbol, library))
+  }
+
+  if (BUSD) {
+    const busdToken = new Token(chainId, BUSD.address, BUSD.decimals, "USDC");
+    const newTokenBusdPair = await Fetcher.fetchPairData(newToken, busdToken, library, chainId).catch(e => {
+      return false
+    });
+    if (newTokenBusdPair)
+      calcPriceTasks.push(getTokenPriceByPair(newTokenBusdPair, tok.symbol, library))
+  }
+
+  const res = await Promise.all(calcPriceTasks);
+  console.log(">> debug pool calculated token price res", res)
+
+  if (calcPriceTasks.length) {
+    const average = (array) => array.reduce((a, b) => a + b) / array.length;
+    return average(res);
+  } else {
+    return 0.2;
+  }
+}
+
+export async function getTokenPriceByPair(pair, symbol, library) {
+  const pair_contract = getPairContract(pair.liquidityToken.address, library)
+  const totalSupply = await pair_contract.totalSupply();
+  const totalAmount = new TokenAmount(pair.liquidityToken, totalSupply.toString());
+  const allToken0 = pair.getLiquidityValue(
+      pair.token0,
+      totalAmount,
+      totalAmount,
+      false
+  );
+  const allToken1 = pair.getLiquidityValue(
+      pair.token1,
+      totalAmount,
+      totalAmount,
+      false
+  );
+  const allToken0Amount = parseFloat(allToken0.toExact());
+  const allToken1Amount = parseFloat(allToken1.toExact());
+  if(pair.token0.symbol == symbol) {
+    return allToken1Amount / allToken0Amount ;
+  } else {
+    return allToken0Amount / allToken1Amount ;
+  }
 }

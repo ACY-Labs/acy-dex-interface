@@ -355,7 +355,12 @@ export async function getEstimated(
           setButtonStatus(false);
           return new CustomError('Insufficient reserve!');
         }
-
+        console.log(">> test unhandled exception", parsedToken0Amount, parsedToken0Amount.toFixed(2))
+        if (parsedToken0Amount.toExact() == 0 || parsedToken1Amount.toExact() == 0) {
+          // setButtonContent('Zero as input');
+          return new CustomError('Zero as input');
+        }
+        console.log("add liquidity unhandled exception", e)
         setButtonContent('Unhandled exception!');
         setButtonStatus(false);
         return new CustomError('Unhandled exception!');
@@ -464,7 +469,7 @@ export async function getEstimated(
         )[0].toString(),
         minETH,
         account,
-        `0x${(Math.floor(new Date().getTime() / 1000) + 60).toString(16)}`,
+        `0x${(Math.floor(new Date().getTime() / 1000) + 1800).toString(16)}`,
       ];
       value = BigNumber.from(
         (token1IsETH ? parsedToken1Amount : parsedToken0Amount).raw.toString()
@@ -490,7 +495,7 @@ export async function getEstimated(
           noLiquidity ? 0 : allowedSlippage
         )[0].toString(),
         account,
-        `0x${(Math.floor(new Date().getTime() / 1000) + 60).toString(16)}`,
+        `0x${(Math.floor(new Date().getTime() / 1000) + 1800).toString(16)}`,
       ];
       value = null;
     }

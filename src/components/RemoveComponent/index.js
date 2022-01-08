@@ -225,6 +225,7 @@ const MyComponent = props => {
       {/*  </Col>*/}
 
       {/*</Row>*/}
+      
 
       <AcyCuarrencyCard
         icon="eth"
