@@ -183,7 +183,7 @@ const AcyLiquidityPositions = (props) => {
   const [fullTableData, setFullTableData] = useState([])
 
   // search component
-  const [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState();
   const [keyword, setKeyword] = useState("");
   const [showSearch, setShowSearch] = useState(false);
 
@@ -377,6 +377,11 @@ const AcyLiquidityPositions = (props) => {
 
       // construct pool list locally
       const pools = res.data.pools;
+
+      if (!pools.length) {
+        setLoading(false);
+        return;
+      }
       const fetchTask = [];
       for (let pairAddr of pools) {
         const token0addr = supportedTokens.findIndex(item => item.address === pairAddr.token0);
@@ -423,7 +428,7 @@ const AcyLiquidityPositions = (props) => {
       });
     }
     console.log("userLPData is updated with length", userPools.length);
-    setLoading(false);
+    
     console.log("test elapsed time", new Date());
     return userPools;
   }, [userLPHandlers]);
@@ -435,8 +440,18 @@ const AcyLiquidityPositions = (props) => {
       const conditions = keyword.toLowerCase().split(/[\s\/,]+/);
       filtered = filtered.filter(item => conditions.every(condition => item.pool.toLowerCase().includes(condition)));
     }
+    
     setFilteredData(filtered);
   }, [fullTableData, keyword]);
+  
+  // show loading spinner until the end of loading phase, or 10 seconds has passed.
+  useEffect(() => {
+    if (fullTableData && fullTableData.length)
+      setLoading(false)
+  }, [loading, fullTableData]);
+  useEffect(() => {
+    // setTimeout(() => setLoading(false), 10000)
+  }, [])
 
   // fetch user shares in above pools
   async function getUserPoolShare() {
@@ -615,8 +630,8 @@ const AcyLiquidityPositions = (props) => {
 
   return (
     <div>
-      {!(userLPData.length) && loading ? (
-        <h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>
+      {loading && loading ? (
+        <h2 style={{ textAlign: "center", color: "white", top: "5rem", position: "relative" }}>Loading <Icon type="loading" /></h2>
       ) : (
         <>
           <Table
@@ -626,7 +641,8 @@ const AcyLiquidityPositions = (props) => {
             rowClassName={(record, index) => record.poolAddress === expandedRowKey ? `${styles.rowExpanded} ant-table-expanded-row` : styles.rowNormal}
             expandedRowKeys={expandedRowKey}
             onExpand={(expanded, record) => { expandedRowKey === record.poolAddress ? setExpandedRowKey("") : setExpandedRowKey(record.poolAddress) }}
-            dataSource={filteredData}
+            dataSource={filteredData || []}
+            // loading={{ indicator: <div><Icon type="loading" /></div>, spinning: loading}}
             columns={columns.filter(item => item.visible)}
             pagination={false}
             scroll={{ y: 300 }} // this height is override by global.less #root > .ant-table-body
