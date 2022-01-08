@@ -1,5 +1,5 @@
 /* eslint-disable react/react-in-jsx-scope */
-import {getAllSuportedTokensPrice} from "@/acy-dex-swap/utils";
+import { getAllSuportedTokensPrice } from "@/acy-dex-swap/utils";
 import { useState, useEffect, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { connect } from 'umi';
@@ -17,7 +17,7 @@ import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import AcyRemoveLiquidityModal from '@/components/AcyRemoveLiquidityModal';
 import { isMobile } from 'react-device-detect';
 import styles from './styles.less';
-import {useConstantLoader, TOKENLIST} from '@/constants';
+import { useConstantLoader, TOKENLIST } from '@/constants';
 
 
 function getLogoURIWithSymbol(symbol) {
@@ -41,7 +41,7 @@ const SearchField = ({ setKeyword, showSearch, setShowSearch }) => {
         ref={inputRef}
         autoFocus
         style={{ display: showSearch ? "block" : "none", width: "100%", backgroundColor: "transparent", border: "1px solid #1c9965", borderRadius: "30px", outline: 0, paddingLeft: "0.4rem" }}
-        onChange={e => { setKeyword(e.target.value) } }
+        onChange={e => { setKeyword(e.target.value) }}
         onKeyPress={e => { if (e.key === "Enter") setKeyword(e.target.value); inputRef.current.value = e.target.value }}
       />
       <Icon type="close"
@@ -167,7 +167,7 @@ const SearchField = ({ setKeyword, showSearch, setShowSearch }) => {
 
 const AcyLiquidityPositions = (props) => {
   // const [userLiquidityPools, setUserLiquidityPools] = useState([]); // list of pools that user has share
-  const { account, chainId, library, tokenList: supportedTokens, scanUrlPrefix: {scanUrl: scanUrlPrefix}, farmSetting: {API_URL: apiUrlPrefix} } = useConstantLoader();
+  const { account, chainId, library, tokenList: supportedTokens, scanUrlPrefix: { scanUrl: scanUrlPrefix }, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
   const { activate } = useWeb3React();
 
   const [loading, setLoading] = useState(true);
@@ -340,9 +340,9 @@ const AcyLiquidityPositions = (props) => {
         // if (!pairOverviewData) return;
         // const aprPercentage = pairOverviewData.apr * 100;
         return (
-          <div>{(record.apr*100).toFixed(1)}%</div>
+          <div>{(record.apr * 100).toFixed(1)}%</div>
         )
-    },
+      },
       visible: !isMobile,
     },
     {
@@ -351,7 +351,7 @@ const AcyLiquidityPositions = (props) => {
       dataIndex: 'token0Reserve',
       className: 'centerAlignTableHeader',
       render: (text, record, index) => (
-        <div style={{color: "white"}}>
+        <div style={{ color: "white" }}>
           <p>{record.token0Reserve}</p>
           <p>{record.token1Reserve}</p>
         </div>
@@ -406,7 +406,9 @@ const AcyLiquidityPositions = (props) => {
     const userPools = [];
     console.log("fetched pairs userLPHandlers", userLPHandlers);
     for (let pair of userLPHandlers) {
-      console.log("fetched pairs pari reserve:",pair.tokenAmounts[0].toExact(6), pair.reserve1)
+      if (!pair)
+        continue;
+
       userPools.push({
         token0: pair.token0,
         token1: pair.token1,
@@ -443,7 +445,7 @@ const AcyLiquidityPositions = (props) => {
       console.log("poolToken,", pair.liquidityToken)
       let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library).catch(e => console.log("fetchPoolShare error", e));
       if (userPoolBalance.isZero()) {
-        console.log("zero balance, discard");
+        console.log("zero balance, discard", pair);
         return {};
       }
 
@@ -477,7 +479,13 @@ const AcyLiquidityPositions = (props) => {
       setUserLPShares(prev => ({ ...prev, [pair.liquidityToken.address]: newData }));
     }
 
-    (async () => { for (let pair of userLPHandlers) fetchPoolShare(pair); })()
+    (async () => {
+      for (let pair of userLPHandlers) {
+        if (!pair)
+          continue;
+        fetchPoolShare(pair);
+      }
+    })()
 
   }
 
@@ -494,14 +502,14 @@ const AcyLiquidityPositions = (props) => {
       return await axios.get(`${apiUrlPrefix}/poolchart/pair?token0=${token0.address}&token1=${token1.address}`).then(async (res) => {
         // calculate volume in USD
         console.log("this is return data", res.data)
-        const {token0: token0Vol, token1: token1Vol} = res.data.data.lastVolume;
+        const { token0: token0Vol, token1: token1Vol } = res.data.data.lastVolume;
         const currentPriceDict = await getAllSuportedTokensPrice();
         const vol0Usd = currentPriceDict[token0.symbol] * token0Vol;
         const vol1Usd = currentPriceDict[token1.symbol] * token1Vol;
         const poolVolumeInUsd = vol0Usd + vol1Usd;
 
         // calculate reserve in USD
-        const {token0: token0Reserve, token1: token1Reserve} = res.data.data.lastReserves;
+        const { token0: token0Reserve, token1: token1Reserve } = res.data.data.lastReserves;
         const reserve0Usd = currentPriceDict[token0.symbol] * token0Reserve;
         const reserve1Usd = currentPriceDict[token1.symbol] * token1Reserve;
         const poolReserveInUsd = reserve0Usd + reserve1Usd;
@@ -509,7 +517,7 @@ const AcyLiquidityPositions = (props) => {
         console.log("this is test1", currentPriceDict, poolReserveInUsd, poolVolumeInUsd)
 
         // calculate APR
-        const apr = poolVolumeInUsd * 0.3/1000 * 365 / poolReserveInUsd;
+        const apr = poolVolumeInUsd * 0.3 / 1000 * 365 / poolReserveInUsd;
 
         const data = {
           volume: poolVolumeInUsd,
@@ -532,7 +540,7 @@ const AcyLiquidityPositions = (props) => {
       const overviewData = poolOverview[d.poolAddress]
       let temp = d;
       if (overviewData)
-        temp = {...d, ...overviewData}
+        temp = { ...d, ...overviewData }
       return temp
     })
     return completeTableData
@@ -650,54 +658,54 @@ const AcyLiquidityPositions = (props) => {
                 <div style={{ display: "flex", paddingLeft: "3rem" }}>
                   <table id="expandedRowTable">
                     <tbody>
-                    <tr>
-                      <td>My liquidity</td>
-                      <td>Pool share</td>
-                      <td></td>
-                      {/* the following height is randomly set to 10px,
+                      <tr>
+                        <td>My liquidity</td>
+                        <td>Pool share</td>
+                        <td></td>
+                        {/* the following height is randomly set to 10px,
                       it's only useful for its div children to get full height info */}
-                      <td rowSpan="2" style={{height: "10px"}}> 
-                        <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-around" }} >
-                          <button
-                            className={styles.removeLiquidityButton}
-                            style={{ background: "transparent", border: "1px solid green" }}
-                            type="button"
-                            onClick={() => {
-                              setAddComponentPairs(record.token0, record.token1);
-                            }}
-                          >
-                            Add
-                          </button>
+                        <td rowSpan="2" style={{ height: "10px" }}>
+                          <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-around" }} >
+                            <button
+                              className={styles.removeLiquidityButton}
+                              style={{ background: "transparent", border: "1px solid green" }}
+                              type="button"
+                              onClick={() => {
+                                setAddComponentPairs(record.token0, record.token1);
+                              }}
+                            >
+                              Add
+                            </button>
 
-                          <button
-                            className={styles.removeLiquidityButton}
-                            style={{ background: "transparent", border: "1px solid green" }}
-                            type="button"
-                            onClick={() => {
-                              setIsModalVisible(true);
-                              setRemoveLiquidityPosition(record);
-                              console.log("remove record", record);
-                            }}
-                          >
-                            Remove
-                          </button>
+                            <button
+                              className={styles.removeLiquidityButton}
+                              style={{ background: "transparent", border: "1px solid green" }}
+                              type="button"
+                              onClick={() => {
+                                setIsModalVisible(true);
+                                setRemoveLiquidityPosition(record);
+                                console.log("remove record", record);
+                              }}
+                            >
+                              Remove
+                            </button>
 
-                        </div>
-                      </td>
-                    </tr>
+                          </div>
+                        </td>
+                      </tr>
 
-                    <tr className={styles.whiteTextExpandableRow}>
-                      <td>
-                        <p>{data?.token0Amount || "loading..."}</p>
-                        <p>{data?.token1Amount || "loading..."}</p>
-                      </td>
-                      <td>
-                        <p>{data?.share || "loading..."}</p>
-                      </td>
-                      <td>
-                        <p></p>
-                      </td>
-                    </tr>
+                      <tr className={styles.whiteTextExpandableRow}>
+                        <td>
+                          <p>{data?.token0Amount || "loading..."}</p>
+                          <p>{data?.token1Amount || "loading..."}</p>
+                        </td>
+                        <td>
+                          <p>{data?.share || "loading..."}</p>
+                        </td>
+                        <td>
+                          <p></p>
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
