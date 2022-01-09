@@ -46,6 +46,7 @@
   padding-inline-end: 2.25rem;
   padding-top: 2rem;
   padding-bottom: 2.5rem;
+  
 }
 
 .allocation-content {
@@ -53,12 +54,13 @@
 }
 
 .allocation-content-inactive {
-  height: 320px;
+  height: auto;
   transition: height 0.1s linear;
 }
 
 .allocation-content-active {
-  height: 850px;
+  display: block;
+  height: auto;
   transition: height 0.1s linear;
 }
 
@@ -416,6 +418,7 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
+  width: 100%;
 }
 
 .text-line-container {
@@ -467,19 +470,23 @@
 }
 
 .vesting-schedule {
-  width: 270px;
-  top: 40px;
+  width: auto;
   background-color: none;
-  position: absolute;
   padding: 10px;
   opacity: 0;
   display: none;
 }
 
 .vesting-schedule-active {
-  display: block;
   opacity: 1;
-  transition: opacity 0.2s ease-in-out;
+  display: block;
+  transition: opacity 2s linear;
+}
+
+.vesting-open-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .vesting-schedule-open {
@@ -538,9 +545,9 @@
   border-radius: 4px !important;
   width: calc(100% - 80px);
   min-width: 0px;
-  height: 35px;
+  height: 45px;
   font-size: 16px;
-  padding: 0px 20px 0px 20px;
+  padding: 0px 20px 0px 60px;
 }
 
 .sales-input:hover {
@@ -549,25 +556,46 @@
 
 .sales-input:focus {
   outline: #eb5c20 solid 2px;
+  z-index: 0;
 }
 
-.max-btn {
+.token-logo{
   position: absolute;
+  z-index: 2;
+  top: 8px;
+  left: 15px;
+}
+
+.token-image{
+  width: 25px;
+  height: 25px;
+}
+
+.unit-max-group{
+  position: absolute;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  top: 5px;
+}
+
+
+.max-btn {
   border-radius: 4px !important;
-  height: 35px;
   background-color: #010101;
   color: #eb5c20;
   border: unset;
   font-weight: 700;
   cursor: pointer;
-  right: 0;
   z-index: 1;
+  top: 2px; 
+  font-size: 12px;
 }
 
 .sales-input-max-text {
   position: absolute;
   border-radius: 4px !important;
-  height: 35px;
   font-weight: 700;
   right: 0;
   z-index: 1;
@@ -594,12 +622,14 @@
   cursor: not-allowed;
 }
 
-.vesting-percentage {
-  width: 50px;
-  /* border: 1px solid white; */
-  border-radius: 12px;
+.vesting-percentage-container{
+  border-radius: 8px;
   background-color: #363636;
-  padding: 5px 0;
+  padding: 7px 15px;
+}
+
+.vesting-percentage {
+  font-size: 12px;
 }
 
 .vesting-percentage-claim-container {

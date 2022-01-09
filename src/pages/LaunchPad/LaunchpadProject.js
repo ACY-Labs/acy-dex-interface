@@ -35,8 +35,9 @@ import announcementFIcon from '@/assets/icon_announcement_fill.svg';
 import $ from 'jquery';
 import { getContract } from "../../acy-dex-swap/utils/index.js"
 import { useWeb3React } from '@web3-react/core';
+import {useConnectWallet} from "@/components/ConnectWallet";
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
-import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL } from "@/constants";
+import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL, TOKEN_LIST } from "@/constants";
 import { CustomError } from "@/acy-dex-swap/utils"
 import { approveNew, getAllowance } from "@/acy-dex-swap/utils"
 
@@ -45,31 +46,38 @@ const LaunchpadProject = () => {
   const { account, chainId, library, activate, active } = useWeb3React();
   const { projectId } = useParams();
   const [receivedData, setReceivedData] = useState({});
+  const [poolID, setPoolID] = useState(null);
   const [poolBaseData, setPoolBaseData] = useState(null);
   const [poolDistributionDate, setDistributionDate] = useState([]);
   const [poolDistributionStage, setpoolDistributionStage] = useState([]);
   const [poolStageCount, setpoolStageCount] = useState(0);
-  const [poolInvestorData, setPoolInvestorData] = useState(null);
   const [poolStatus, setPoolStatus] = useState(0);
-  const [poolDecimals, setPoolDecimals] = useState(0); // Gary: decimal initialize to 0
-  const [poolTokenAddress, setPoolTokenAddress] = useState(0);
+  const [poolTokenDecimals, setPoolTokenDecimals]  = useState(0); 
+  const [poolMainCoinDecimals, setPoolMainCoinDecimals] = useState(0); // Gary: decimal initialize to 0
   const [poolMainCoinAddress, setPoolMainCoinAddress] = useState(0); // e.g., USDT
+  const [poolMainCoinLogoURL, setPoolMainCoinLogoURL] = useState(null);
+  const [poolMainCoinName, setPoolMainCoinName] = useState(null);
   const [isError, setIsError] = useState(false);
   const [hasCollected, setHasCollected] = useState(false);
   const [successCollect, setSuccessCollect] = useState(false);
   const [notVesting, setNotVesting] = useState(false);
-  const [vestingStage, setVestingStage] = useState(0);
   const [isVesting, setIsVesting] = useState(false);
+  const [isNotInvesting, setIsNotInvesting] = useState(false);
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
   // const [investorNum,setinvestorNum] = useState(0);
   const [allocationAmount, setAllocationAmount] = useState(0);
-  const [isInvesting, setIsInvesting] = useState(false);
+  // const [isInvesting, setIsInvesting] = useState(false);
   const [isAllocated, setIsAllocated] = useState(false);
 
   // NOTE (Gary 2022.1.4): change poolId
-  const PoolId = 11
-
+  let PoolId
+  if(poolID) {
+     PoolId = poolID
+  } else {
+    PoolId = 16
+  }
+  
   // CONSTANTS
   const InputGroup = Input.Group;
   const logoObj = {
@@ -86,6 +94,30 @@ const LaunchpadProject = () => {
   }
   const PoolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, library, account);
 
+
+  // FUNCTIONS
+  const connectWallet = async () =>  {
+    activate(binance);
+    activate(injected);
+  };
+
+  const clickToWebsite = () => {
+    const newWindow = window.open(receivedData.website, '_blank', 'noopener,noreferrer');
+    if (newWindow) newWindow.opener = null;
+  }
+
+  const formatTime = timeZone => {
+    return moment(timeZone)
+      .local()
+      .format('MM/DD/YYYY HH:mm:ss');
+  };
+
+  const convertUnixTime = unixTime => {
+    const data = new Date((Number(unixTime)) * 1000)
+    const res = data.toLocaleString()
+    return res
+  }
+
   // HOOKS
   useEffect(() => {
     getProjectInfo(API_URL(), projectId)
@@ -101,16 +133,17 @@ const LaunchpadProject = () => {
           res['posterUrl'] = contextData['posterUrl']
           res['tokenLogoUrl'] = contextData['tokenLogoUrl']
 
-          res['regStart'] = format_time(res.regStart);
-          res['regEnd'] = format_time(res.regEnd);
-          res['saleStart'] = format_time(res.saleStart);
-          res['saleEnd'] = format_time(res.saleEnd);
+          res['regStart'] = formatTime(res.regStart);
+          res['regEnd'] = formatTime(res.regEnd);
+          res['saleStart'] = formatTime(res.saleStart);
+          res['saleEnd'] = formatTime(res.saleEnd);
 
           res['totalSale'] = res.totalSale;
           res['totalRaise'] = res.totalRaise;
           res['projectUrl'] = res.projectUrl;
           res['projectName'] = res.projectName;
 
+          setPoolID(res.poolID);
           setReceivedData(res);
         } else {
           console.log('redirect to list page');
@@ -123,12 +156,72 @@ const LaunchpadProject = () => {
       });
   }, []);
 
+  // contract function
+  const getPoolData = async (lib, acc) => {
+    const poolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, lib, acc);
+    const pool = []
+    const distributionRes = []
+    const distributionStage = []
+
+    // 合约函数调用
+    const baseData = await poolContract.GetPoolBaseData(PoolId)
+    const distributionData = await poolContract.GetPoolDistributionData(PoolId)
+    const status = await poolContract.GetPoolStatus(PoolId)
+
+    // getpoolbasedata 数据解析
+    const token2Address = baseData[1]
+    const tokenList = TOKEN_LIST()
+    const token2Info = tokenList.find(item => item.address === token2Address)
+
+    const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
+    const token2contract = getContract(token2Address, ERC20ABI, lib, acc)
+
+    const token1decimal = await token1contract.decimals()
+    const token2decimal = await token2contract.decimals()
+    // 不解析时间戳
+    const res1 = BigNumber.from(baseData[2]).toBigInt().toString().slice(0,-(token1decimal)) // 获取销售的token的总数
+    const res2 = BigNumber.from(baseData[3]).toBigInt().toString().slice(0,-(token1decimal)) // 已销售的token的数量
+    const res3 = BigNumber.from(baseData[4]).toBigInt()
+    const res4 = BigNumber.from(baseData[5]).toBigInt()
+
+    // 获取当前阶段
+    const d = Math.round(new Date().getTime()/1000)
+    if(d > res3) setComparesaleDate(true)
+    if(d > res4) setComparevestDate(true)
+    const saleStartDate = convertUnixTime(res3)
+    const saleEndDate = convertUnixTime(res4)
+    // 存放数据
+    pool.push(res1, res2, saleStartDate, saleEndDate)
+    // getpooldistributiondata 数据解析以及存放
+    distributionData[1].map(uTime => distributionRes.push(convertUnixTime(uTime)))
+    distributionData[2].map(vestingRate => distributionStage.push(BigNumber.from(vestingRate).toBigInt().toString()))
+
+    // 判断当前是否是vesting阶段
+    const curPoolStatus = Number(BigNumber.from(status).toBigInt())
+    if(curPoolStatus === 4) setIsVesting(true)
+
+    // set数据
+    setPoolBaseData(pool)
+    setDistributionDate(distributionRes)
+    setpoolStageCount(Number(BigNumber.from(distributionData[0]).toBigInt())) // vesting阶段的次数
+    setpoolDistributionStage(distributionStage)
+    setPoolStatus(curPoolStatus)
+    setPoolStatus(Number(BigNumber.from(status).toBigInt()))
+    setPoolMainCoinAddress(token2Address)
+    setPoolMainCoinLogoURL(token2Info.logoURI)
+    setPoolMainCoinName(token2Info.symbol)
+    setPoolTokenDecimals(token1decimal)
+    setPoolMainCoinDecimals(token2decimal)
+
+    console.log(token2Address)
+  }
+
   // fetching data from Smart Contract
   useEffect(async () => {
     if(!account){
       connectWallet();
     }
-    else if (account || library){
+    else if(account || library){
       console.log("start getPoolBaseData")
       getPoolData(library, account)
       console.log("poolDistributionDate", poolDistributionDate, poolDistributionStage)
@@ -137,7 +230,7 @@ const LaunchpadProject = () => {
       const accnt = "0x0000000000000000000000000000000000000000";
       getPoolData(provider, accnt)
       console.log("poolDistributionDate", poolDistributionDate, poolDistributionStage)
-    }
+    } 
   }, [library, account])
 
   useEffect(async () => {
@@ -187,29 +280,6 @@ const LaunchpadProject = () => {
         })
     }
   }, []);
-
-  // FUNCTIONS
-  const connectWallet = async () =>  {
-    activate(binance);
-    activate(injected);
-  };
-
-  const clickToWebsite = () => {
-    const newWindow = window.open(receivedData.website, '_blank', 'noopener,noreferrer');
-    if (newWindow) newWindow.opener = null;
-  }
-
-  const format_time = timeZone => {
-    return moment(timeZone)
-      .local()
-      .format('MM/DD/YYYY HH:mm:ss');
-  };
-
-  const convertUnixTime = unixTime => {
-    const data = new Date((Number(unixTime)) * 1000)
-    const res = data.toLocaleString()
-    return res
-  }
 
   // COMPONENTS
   // change to URL
@@ -266,13 +336,19 @@ const LaunchpadProject = () => {
             <div className={comparesaleDate ? 'procedureNumber' : 'procedureNumber_NotActive'}>
               2
             </div>
-            {poolBaseData &&
+            
               <div>
                 <p>Sale</p>
-                <p className="shortText">From : {poolBaseData[2]}</p>
-                <p className="shortText">To : {poolBaseData[3]}</p>
+                
+                {poolBaseData &&
+                  <div>
+                    <p className="shortText">From : {poolBaseData[2]}</p>
+                    <p className="shortText">To : {poolBaseData[3]}</p>
+                  </div>
+                }
+                
               </div>
-            }
+            
           </div>
 
           <div className="procedure" style={{ marginTop: '24px' }}>
@@ -361,14 +437,14 @@ const LaunchpadProject = () => {
         <div className="keyinfoRow" style={{ marginTop: '1rem' }}>
           <div className="keyinfoName">Total Raise</div>
           <div>
-            {receivedData.totalRaise} USDT
+            {receivedData.totalRaise} {poolMainCoinName}
           </div>
         </div>
 
         <div className="keyinfoRow" style={{ marginTop: '1rem' }}>
           <div className="keyinfoName">Rate</div>
           <div>
-            1 {projectToken} = {tokenPrice} USDT
+            1 {projectToken} = {tokenPrice} {poolMainCoinName}
           </div>
         </div>
       </div>
@@ -547,12 +623,12 @@ const LaunchpadProject = () => {
         const offsetPercentage = offsets[Math.floor((Math.random() * offsets.length))]
 
         // get 4 random values for other allocation values
-        innerText.textContent = `$${Math.floor(allocationAmount * offsetPercentage)}`;
+        innerText.textContent = `${Math.floor(allocationAmount * offsetPercentage)}`;
         innerText.style.color = "#757579";
       })
       try {
         let originalElementParent = e.target.parentElement.querySelector(".inner-text-amount");
-        originalElementParent.textContent = `$${allocationAmount}`;
+        originalElementParent.textContent = `${allocationAmount}`;
         originalElementParent.style.color = "#ffffff"
       } catch (err) {
         // set all values to $0 due to error
@@ -580,7 +656,7 @@ const LaunchpadProject = () => {
     );
   };
 
-  const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount, isAllocated, setIsAllocated}) => {
+  const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount, isAllocated, setIsAllocated, tokenLogoUrl}) => {
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
 
     // TODO: replace with 24 icon
@@ -664,24 +740,11 @@ const LaunchpadProject = () => {
       if (successCollect){
         timeout = setTimeout(() => setSuccessCollect(false), 1000);
       }
+      if (isNotInvesting){
+        timeout = setTimeout(() => setNotVesting(false), 1000);
+      }
       return () => clearTimeout(timeout);
     }, [isError, hasCollected]);
-
-
-    const vestCallback = async (status) => {
-      const sti = async (hash) => {
-        library.getTransactionReceipt(hash).then(async receipt => {
-          console.log(`receiptreceipt for ${hash}: `, receipt);
-          // receipt is not null when transaction is done
-          if (!receipt) 
-            setTimeout(sti(hash), 500);
-          else {
-            setSuccessCollect(true);
-          }
-        });
-      }
-      sti(status.hash);
-    };
 
     const vestingClaimClicked = async () => {
       if(poolStatus !== 4){
@@ -691,37 +754,45 @@ const LaunchpadProject = () => {
           setIsError(true)
           connectWallet()
         }
-        const tokenAllocated = poolInvestorData[2]
-        const tokenClaimed = poolInvestorData[3]
+        // Check if users have collected token for current vesting stage
+        const investorData = await PoolContract.GetInvestmentData(PoolId, account)
+        const investorRes = []
+        if(investorData){
+          investorData.map(data => investorRes.push(Number(BigNumber.from(data).toBigInt().toString())))
+        }
+        const tokenAllocated = investorRes[2] / (10 ** poolTokenDecimals)
+        const tokenClaimed = investorRes[3] / (10 ** poolTokenDecimals)
         const curDate = new Date()
         let tokenAvailable = 0
         for (let i = 0; i < poolDistributionDate.length; i++) {
           const tempDate = new Date(poolDistributionDate[i])
-          if(curDate > tempDate){
-            tokenAvailable += tokenAllocated * 100 / poolDistributionStage[i]   //TO-DO
-          }else {
+          if (curDate > tempDate) {
+            tokenAvailable += tokenAllocated / 100 * poolDistributionStage[i] 
+          } else {
             break
           }
         }
-        if(tokenClaimed === tokenAvailable) setHasCollected(true)
-        const status = await (async () => {
-          const result = await PoolContract.WithdrawERC20ToInvestor(account, PoolId)
-            .catch(e => {
-              console.log(e)
-              return new CustomError('CustomError while withdrawing token');
-            });
-          return result;
-        })();
-        console.log("Vesting claimed: ", status)
+        if(tokenClaimed === tokenAvailable) {
+          setHasCollected(true)
+        } else {
+          const status = await (async () => {
+            const result = await PoolContract.WithdrawERC20ToInvestor(PoolId)
+              .catch(e => {
+                console.log(e)
+                return new CustomError('CustomError while withdrawing token');
+              });
+            return result;
+          })();
+          console.log("Vesting claimed: ", status)
+        }
       }
     }
     
     const investClicked = async(poolAddress, poolId, amount) => {
         // TODO: test if amount is valid!
         if (poolStatus !== 2) {// cannot buy
-          setIsVesting(false);
+          setIsNotInvesting(true);
         } else {
-          setIsVesting(true);
           if (!account) {
             setIsError(true)
             connectWallet()
@@ -729,7 +800,7 @@ const LaunchpadProject = () => {
           //TO-DO: Request UseAllocation API, process only when UseAllocation returns true
         const status = await (async () => {
           // NOTE (gary 2022.1.6): use toString method
-          const approveAmount = (amount * Math.pow(10, poolDecimals)).toString()
+          const approveAmount = (amount * Math.pow(10, poolMainCoinDecimals)).toString()
           const state = await approveNew(poolMainCoinAddress, approveAmount, poolAddress, library, account);
           const result = await PoolContract.InvestERC20(poolId , approveAmount)
             .catch(e => {
@@ -742,7 +813,7 @@ const LaunchpadProject = () => {
       }
     }
 
-
+    // TO-DO: TOKEN PURCHASE === ALLOCATIONAMOUNT ? SETISVETING(TRUE)
     return (
       <div>
       { !isVesting ? 
@@ -772,43 +843,57 @@ const LaunchpadProject = () => {
               Sale
             </label>
             <div className="sales-input-container">
-              <InputGroup>
+                <InputGroup>
+                  <div className="token-logo">
+                    <img src={tokenLogoUrl? tokenLogoUrl:receivedData.tokenLogoUrl} alt="token-logo" className="token-image"/>
+                  </div>
                   <Input className="sales-input" defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
-                {isClickedMax ? <div className='sales-input-max'> <span className='sales-input-max-text'>USDT</span> </div> : <Button className="max-btn" onClick={maxClick}>MAX</Button>}
+                  <div className="unit-max-group">
+                    <div className='unit'>{poolMainCoinName}</div>
+                    <Button className="max-btn" onClick={maxClick}>MAX</Button>
+                  </div>
               </InputGroup>
             </div>
-            <Button className={isValidSalesPrice ? "sales-submit" : "sales-submit invalid"} onClick={() => {console.log("buy"); console.log("sales value", salesValue); investClicked(LAUNCHPAD_ADDRESS(), PoolId, salesValue); }} > Buy </Button>
+            <Button 
+              className={isValidSalesPrice ? "sales-submit" : "sales-submit invalid"} 
+              disabled={comparevestDate}
+              onClick={() => {console.log("buy"); console.log("sales value", salesValue); investClicked(LAUNCHPAD_ADDRESS(), PoolId, salesValue); }}
+            > 
+              Buy 
+            </Button>
           </form>
 
-          { poolDistributionStage && poolDistributionDate && poolInvestorData && 
-            <div className="vesting-container">
-              <p className="sale-vesting-title vesting">Vesting</p>
-              <div className="text-line-container">
-                <p>{poolStageCount} stages of vesting : Unlock {poolDistributionStage[0]}% TGE</p>
-                <span className="vesting-line" />
-                <div
-                  className={
-                    isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'
-                  }
-                >
-                  <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} vestingClick={vestingClaimClicked} />
+          { poolDistributionStage && poolDistributionDate && 
+            <div className="vesting-open-container">
+              <div className="vesting-container">
+                <p className="sale-vesting-title vesting">Vesting</p>
+                <div className="text-line-container">
+                  <p>{poolStageCount} stages of vesting : Unlock {poolDistributionStage[0]}% TGE</p>
+                  <span className="vesting-line" />
+                  
                 </div>
+                <div className="arrow-down-container">
+                  <CaretDownOutlined
+                    className={
+                      isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
+                    }
+                  />  
+                </div>
+                <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}></div>
               </div>
-              <div className="arrow-down-container">
-                <CaretDownOutlined
-                  className={
-                    isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
-                  }
-                />  
-              </div>
-              <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}>
+              <div
+                className={
+                  isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'
+                }
+              >
+                <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} vestingClick={vestingClaimClicked} />
               </div>
             </div>
           }
         </div>
       :
         <div>
-          { poolDistributionStage && poolDistributionDate && poolInvestorData &&
+          { poolDistributionStage && poolDistributionDate &&
             <div className="vesting-container">
               <p className="sale-vesting-title vesting">Vesting</p>
               <div className="text-line-container-open">
@@ -824,7 +909,7 @@ const LaunchpadProject = () => {
     );
   };
 
-  const CardArea = ({ walletId,  allocationAmount, setAllocationAmount, isAllocated, setIsAllocated }) => {
+  const CardArea = ({ walletId,  allocationAmount, setAllocationAmount, isAllocated, setIsAllocated, tokenLogoUrl }) => {
     // const { account: walletId } = useWeb3React();
     return (
       <div className="gridContainer">
@@ -847,7 +932,8 @@ const LaunchpadProject = () => {
               allocationAmount={allocationAmount}
               setAllocationAmount={setAllocationAmount}
               isAllocated={isAllocated}
-              setIsAllocated = {setIsAllocated}
+              setIsAllocated={setIsAllocated}
+              tokenLogoUrl={tokenLogoUrl}
             />
           </div>
           <ProjectDescription />
@@ -857,90 +943,25 @@ const LaunchpadProject = () => {
     );
   };
 
-  const getPoolData = async (lib, acc) => {
-    console.log("start get pool data", LAUNCHPAD_ADDRESS(), lib);
-    const poolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, lib, acc);
-    const pool = []
-    const distributionRes = []
-    const distributionStage = []
-    const investorRes = []
-
-    // 合约函数调用
-    const baseData = await poolContract.GetPoolBaseData(PoolId)
-    const distributionData = await poolContract.GetPoolDistributionData(PoolId)
-    const status = await poolContract.GetPoolStatus(PoolId)
-    const investorData = poolContract.GetInvestmentData(PoolId, account)
-
-    console.log("tx data: ", baseData, distributionData, status, investorData)
-
-
-    // getpoolbasedata 数据解析
-    const token1Address = baseData[0]
-    const token2Address = baseData[1]
-    const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
-    const token2contract = getContract(token2Address, ERC20ABI, lib, acc)
-
-
-    console.log("token1contract", token1contract)
-
-    const token1decimal = await token1contract.decimals()
-    const token2decimal = await token2contract.decimals()
-    // 不解析时间戳
-    const res1 = BigNumber.from(baseData[2]).toBigInt().toString().slice(0,-(token1decimal)) // 获取销售的token的总数
-    const res2 = BigNumber.from(baseData[3]).toBigInt().toString().slice(0,-(token1decimal)) // 已销售的token的数量
-    const res3 = BigNumber.from(baseData[4]).toBigInt()
-    const res4 = BigNumber.from(baseData[5]).toBigInt()
-
-    console.log("res: ", res1, res2, res3, res4)
-
-    // 获取当前阶段
-    const d = Math.round(new Date().getTime()/1000)
-    if(d > res3) setComparesaleDate(true)
-    if(d > res4) setComparevestDate(true)
-    const saleStartDate = convertUnixTime(res3)
-    const saleEndDate = convertUnixTime(res4)
-    // 存放数据
-    pool.push(res1, res2, saleStartDate, saleEndDate)
-    // getpooldistributiondata 数据解析以及存放
-    distributionData[1].map(uTime => distributionRes.push(convertUnixTime(uTime)))
-    distributionData[2].map(vestingRate => distributionStage.push(BigNumber.from(vestingRate).toBigInt().toString()))
-
-    // getinvestmentdata 数据解析以及存放
-    if(!investorData){
-      investorData.map(data => investorRes.push(Number(BigNumber.from(data).toBigInt().toString())))
-    }
-
-    
-    console.log("INVESTOR DATA")
-    console.log(distributionRes)
-    console.log(investorData)
-    console.log(investorRes)
-
-    // 判断当前是否是vesting阶段
-    const curPoolStatus = Number(BigNumber.from(status).toBigInt())
-    if(curPoolStatus === 4) setIsVesting(true)
-    console.log("getpooldata distributionstage", distributionStage, distributionData)
-    // set数据
-    setPoolBaseData(pool)
-    setDistributionDate(distributionRes)
-    setpoolStageCount(Number(BigNumber.from(distributionData[0]).toBigInt())) // vesting阶段的次数
-    setpoolDistributionStage(distributionStage)
-    setPoolStatus(curPoolStatus)
-    setPoolInvestorData(investorRes)
-    setPoolStatus(Number(BigNumber.from(status).toBigInt()))
-    setPoolTokenAddress(token1Address)
-    setPoolMainCoinAddress(token2Address)
-    setPoolDecimals(token2decimal)
-  }
-
   return (
     <div>
       <div className="mainContainer">
         {isError ? <Alert message="Wallet is not connected." type="error" showIcon /> : ""}
-        {hasCollected ? <Alert message="You have collected token for current vesting stage." type="info" showIcon /> : ""}
+        {isNotInvesting ? <Alert message="Wait until Sale stage to purchase." type="info" showIcon /> : ""}
+        {hasCollected ? <Alert message="You have vested token for current vesting stage." type="info" showIcon /> : ""}
         <TokenBanner posterUrl={receivedData.projectToken === "PCR" ? paycerBanner : receivedData.posterUrl} />
-        <TokenLogoLabel projectName={receivedData.projectName} tokenLogo={receivedData.projectToken === "PCR" ? PaycerIcon : receivedData.tokenLogoUrl} />
-        <CardArea walletId={account} allocationAmount={allocationAmount} setAllocationAmount={setAllocationAmount} isAllocated={isAllocated} setIsAllocated={setIsAllocated}/>
+        <TokenLogoLabel
+          projectName={receivedData.projectName}
+          tokenLogo={receivedData.projectToken === "PCR" ? PaycerIcon : receivedData.tokenLogoUrl}
+        />
+        <CardArea
+          walletId={account}
+          allocationAmount={allocationAmount}
+          setAllocationAmount={setAllocationAmount}
+          isAllocated={isAllocated}
+          setIsAllocated={setIsAllocated}
+          tokenLogoUrl={poolMainCoinLogoURL}
+        />
       </div>
     </div>
   );

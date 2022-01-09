@@ -56,6 +56,7 @@ export const LAUNCHPAD_ADDRESS = () => constantInstance.launchpadSetting.ADDRESS
 export const LAUNCH_RPC_URL = () => constantInstance.launchpadSetting.RPC_URL
 export const METHOD_LIST = () => constantInstance.methodMap
 export const ACTION_LIST = () => constantInstance.actionMap
+export const TOKEN_LIST = () => constantInstance.tokenList
 
 
 // import constant to react component
