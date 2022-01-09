@@ -95,7 +95,7 @@
 }
 .walltitle {
   font-size: 18px;
-  font-weight: bold;
+  //font-weight: bold;
   color: #b5b5b6;
   display: flex;
   align-items: center;
@@ -247,32 +247,38 @@
 
 // 网络切换部分css
 .networkListBlock{
-  background: #29292C;
+  background: #1b1b1b;
   //width: 50%;
-  width: 200px;
-  border-radius: 20px;
+  width: 180px;
+  border-radius: 10px;
+  padding: 10px
 }
 .networkListLayout{
-    width: 100%;
+    width: 90%;
+    height: 45px;
     display: flex;
     align-items: center;
-    margin: 8px auto;
+    margin: 2px auto;
+    margin-bottom: 8px;
+    margin-top: -5px;
     font-size: 14px;
-    padding: 5px;
-    border:1px solid transparent;
+    padding: 1px;
+    border:1px solid black;
+    background: black;
     border-radius: 5px;
+    font-weight: bold;
     &:hover{
       border:1px solid #e29227;
-      border-radius: 55px;
+      border-radius: 5px;
       transform: all 0.2;
       cursor: pointer;
     }
   }
   .networkButton{
-    background: #29292C;
+    background: #2A2E34;
     color: #EB5C20;
     display: inline-block;
-    padding:0 10px;
+    padding:0 5px;
     border: 2px solid #A34520;
     border-radius: 20px;
     line-height: 30px;
@@ -287,10 +293,15 @@
   }
   .networkTitle {
     font-size: 15px;
-    font-weight: bold;
+    //font-weight: bold;
     color: #b5b5b6;
     display: flex;
     align-items: center;
     padding: 10px;
-    margin-left: 20px;
+    margin-left: 1px;
+    margin-top: -5px;
+    margin-bottom: 2px;
+  }
+  .fontBold{
+    font-weight:bold;
   }

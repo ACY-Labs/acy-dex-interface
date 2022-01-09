@@ -428,14 +428,14 @@ const GlobalHeaderRight = props => {
   const networkListInCardList = (
     <div className={styles.networkListBlock}>
       <div className={styles.networkTitle}>
-          <span>Select the Network</span>
+          <span>Select a Network</span>
         </div>
       <AcyCardList>
         {networkList.map((item) => {
           return (
             <AcyCardList.Thin className={styles.networkListLayout} onClick={() => item.onClick()}>
-              {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
-                <AcyIcon.MyIcon width={32} type={item.icon} />
+              {(item.svgicon && <Opera width={20} style={{ margin: '5px' }} />) || (
+                <AcyIcon.MyIcon width={20} type={item.icon} />
               )}
               <span>{item.name}</span>
             </AcyCardList.Thin>
@@ -451,7 +451,7 @@ const GlobalHeaderRight = props => {
       <Dropdown
         overlay={networkListInCardList}
         trigger={['click']}
-        placement="bottomCenter"
+        placement="bottomLeft"
       //className={styles.networkButton}
       >
         <div type="primary" shape="round" className={styles.networkButton}>
@@ -574,7 +574,7 @@ const GlobalHeaderRight = props => {
               {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
                 <AcyIcon.MyIcon width={32} type={item.icon} />
               )}
-              <span>{item.name}</span>
+              <span className={styles.fontBold}>{item.name}</span>
             </AcyCardList.Thin>
           ))}
           {BinanceWallet.map(item => (
@@ -582,7 +582,7 @@ const GlobalHeaderRight = props => {
               {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
                 <AcyIcon.MyIcon width={32} type={item.icon} />
               )}
-              <span>{item.name}</span>
+              <span className={styles.fontBold}>{item.name}</span>
             </AcyCardList.Thin>
           ))}
         </AcyCardList>
@@ -598,7 +598,7 @@ const GlobalHeaderRight = props => {
                   {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
                     <AcyIcon.MyIcon width={32} type={item.icon} />
                   )}
-                  <span>{item.name}</span>
+                  <span className={styles.fontBold}>{item.name}</span>
                 </AcyCardList.Thin>
               );
             }

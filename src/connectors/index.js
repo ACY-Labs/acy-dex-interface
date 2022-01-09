@@ -31,11 +31,11 @@ const injected = new InjectedConnector({
 
 
 const walletconnect = new WalletConnectConnector({
-  rpc: { 56: RPC_URLS['56'], 97: RPC_URLS['97'] },
+  rpc: { 56: RPC_URLS['56'], 97: RPC_URLS['97'], 137:RPC_URLS['137'] },
   qrcode: true,
 });
 const walletlink = new WalletLinkConnector({
-  url: RPC_URLS['4'],
+  url: RPC_URLS['56'],
   appName: 'ACY swap',
   supportedChainIds: [1, 3, 4, 5, 42, 10, 137, 69, 420, 80001, 56, 97],
 });
@@ -48,12 +48,12 @@ const walletlink = new WalletLinkConnector({
 const fortmatic = new FortmaticConnector_test({ 
   apiKey: 'pk_test_1897AD5B792BA339', 
   //rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/', 
-  chainId: 97,
+  chainId: 56,
 });
 
 const portisToBinanceTest = { //useless
   nodeUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545',
-  chainId: 4,
+  chainId: 56,
 };
 /*const portis = new PortisConnector({
   dAppId: 'c474625b-8239-4ce8-ab42-bd16489873c3',
@@ -62,7 +62,7 @@ const portisToBinanceTest = { //useless
 
 const portis = new PortisConnector_test({
   dAppId: 'c474625b-8239-4ce8-ab42-bd16489873c3',
-  networks: [97], // uses mainet by default
+  networks: [56], // uses mainet by default
 });
 
 // const torus = new TorusConnector({ chainId: 4, initOptions: { network: { host: 'rinkeby' } } });
