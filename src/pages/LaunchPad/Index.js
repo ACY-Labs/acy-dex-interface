@@ -43,7 +43,7 @@ const Pool = props => {
 
   // project variables
   useEffect(() => {
-
+    console.log("api url", API_URL())
     getProjects(API_URL())
       .then(res => {
         if (res) {
@@ -68,7 +68,7 @@ const Pool = props => {
         }
       })
       .catch(e => console.error(e));
-  }, []);
+  }, [account, chainId]);
 
   const mouseMove = e => {
     let mouseX, mouseY;
