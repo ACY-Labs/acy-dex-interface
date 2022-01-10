@@ -103,7 +103,6 @@ const Transaction = props => {
 
     // setUrl(`https://rinkeby.etherscan.io/tx/${id}`);
 
-    if(shouldRender){
     return(
       <div className={styles.routers}>
             <div>
@@ -148,7 +147,6 @@ const Transaction = props => {
             </div>
         </div>
     );
-    }
   }
 
   return <PageHeaderWrapper>
@@ -293,10 +291,6 @@ const Transaction = props => {
               <img src={data.token2.logoURI} /></td>
               <td>{data.userDistributionAmount.toFixed(2)}</td>
             </tr>
-            {/* <tr>
-              <td>ACY</td>
-              <td>2,519,015.51</td>
-            </tr> */}
           </table>
         </div>
       </div> ) : (<h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>)
