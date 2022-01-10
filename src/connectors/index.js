@@ -10,6 +10,7 @@ import { BscConnector } from '@binance-chain/bsc-connector';
 
 import { FortmaticConnector_test} from './fortmaticToBinance'
 import { PortisConnector_test} from './portisToBinance'
+import {NaboxConnector} from './naboxWallet'
 
 const RPC_URLS = {
   1: 'https://data-seed-prebsc-1-s1.binance.org:8545',
@@ -28,6 +29,9 @@ const injected = new InjectedConnector({
   // supportedChainIds: [56, 97],
 });
 
+const nabox = new NaboxConnector({
+  supportedChainIds: [1, 3, 4, 5, 42, 10, 137, 69, 420, 80001, 56, 97],
+})
 
 
 const walletconnect = new WalletConnectConnector({
@@ -86,4 +90,4 @@ const trezor = new TrezorConnector({
   url: RPC_URLS[4],
 });
 
-export { injected, walletconnect, walletlink, fortmatic, portis, torus, ledger, trezor, binance };
+export { injected, walletconnect, walletlink, fortmatic, portis, torus, ledger, trezor, binance, nabox };

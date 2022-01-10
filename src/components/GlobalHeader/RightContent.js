@@ -24,6 +24,7 @@ import {
   trezor,
   ledger,
   binance,
+  nabox,
 } from '@/connectors';
 import {
   DownOutlined
@@ -44,7 +45,7 @@ const GlobalHeaderRight = props => {
   // 连接钱包函数
   const { account, chainId, library } = useConstantLoader();
   const { activate, deactivate, active } = useWeb3React();
-  
+
   const [wallet, setWallet] = useState(localStorage.getItem("wallet"));
 
   // 连接钱包 根据localStorage
@@ -152,65 +153,59 @@ const GlobalHeaderRight = props => {
       activate(ledger);
     } else if (walletName === 'binance') {
       activate(binance);
+    } else if (walletName === 'nabox') {
+      activate(nabox)
     } else {
       console.log("wallet ERROR");
     }
     localStorage.setItem('wallet', walletName);
+    localStorage.setItem("login_status", 'on');
     setVisibleMetaMask(false);
   };
   // 初始网络显示
   const n_index = chainId => {
     if (chainId == 56) {
-      return 0
+      return 1
     }
     if (chainId == 137) {
-      return 1
+      return 2
     }
     return 0
   }
   // 通知钱包连接成功
+  const checkChainNetwork = (chainId) => {
+    console.log("networkChanged:", chainId)
+    console.log("supported chain?", supportedChainIds, chainId, supportedChainIds.indexOf(chainId) == -1)
+    if (supportedChainIds && supportedChainIds.indexOf(Number(chainId)) == -1) {
+      console.log("ERROR: unsupport NetWork");
+      setIsModalVisible(true);
+      switchEthereumChain("0x38"); //返回默认56链
+    }
+    else if (chainId == 97) {
+      // 测试网 不显示给用户
+      switchEthereumChain("0x61");
+      setNetworkListIndex(0)
+    }
+    else {
+      setIsModalVisible(false);
+      setVisibleMetaMask(false);
+      setNetworkListIndex(n_index(chainId))
+    }
+  }
   useEffect(() => {
     // todo....
     if (account) {
       console.log(account);
       setVisibleMetaMask(false);
     }
-    if (chainId) {
-      if (supportedChainIds && supportedChainIds.indexOf(Number(chainId)) == -1) {
-        console.log("ERROR: unsupport NetWork");
-        setIsModalVisible(true);
-        switchEthereumChain("0x38"); //返回默认56链
-      }
-      else if (chainId == 97) {
-        // 测试网 不显示给用户
-        switchEthereumChain("0x61");
-        setNetworkListIndex(0)
-      }
-      else {
-        setIsModalVisible(false);
-        setVisibleMetaMask(false);
-        setNetworkListIndex(n_index(chainId))
-      }
-    }
+    checkChainNetwork(chainId);
     // 监听钱包网络变化 metamask
     ethereum.on('networkChanged', function (chainId) {
-      console.log("networkChanged:", chainId)
-      console.log("supported chain?", supportedChainIds, chainId, supportedChainIds.indexOf(chainId) == -1)
-      if (supportedChainIds && supportedChainIds.indexOf(Number(chainId)) == -1) {
-        console.log("ERROR: unsupport NetWork");
-        setIsModalVisible(true);
-        switchEthereumChain("0x38"); //返回默认56链
-      }
-      else if (chainId == 97) {
-        // 测试网 不显示给用户
-        switchEthereumChain("0x61");
-        setNetworkListIndex(0)
-      }
-      else {
-        setIsModalVisible(false);
-        setVisibleMetaMask(false);
-        setNetworkListIndex(n_index(chainId))
-      }
+      checkChainNetwork(chainId);
+    })
+    // Nabox 监听
+    NaboxWallet.on('networkChanged', function (chainId) {
+      checkChainNetwork(chainId);
     })
   }, [account, chainId, supportedChainIds, wallet]);
   const {
@@ -278,6 +273,13 @@ const GlobalHeaderRight = props => {
       icon: 'Coinbase',
       onClick: () => {
         selectWallet('coinbase');
+      },
+    },
+    {
+      name: 'Nabox Wallet',
+      icon: 'Coinbase',
+      onClick: () => {
+        selectWallet('nabox');
       },
     },
     {
@@ -376,22 +378,45 @@ const GlobalHeaderRight = props => {
   };
 
   const switchEthereumChain = async (chainId) => {
-    try {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: chainId }],
-      });
-    } catch (e) {
-      if (e.code === 4902) {
-        try {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [
-              networkParams[chainId]
-            ],
-          });
-        } catch (addError) {
-          console.error(addError);
+    if (localStorage.getItem("wallet") == "metamask") {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: chainId }],
+        });
+      } catch (e) {
+        if (e.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                networkParams[chainId]
+              ],
+            });
+          } catch (addError) {
+            console.error(addError);
+          }
+        }
+      }
+    }
+    else if (localStorage.getItem("wallet") == "nabox") {
+      try {
+        await window.NaboxWallet.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: chainId }],
+        });
+      } catch (e) {
+        if (e.code === 4902) {
+          try {
+            await window.NaboxWallet.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                networkParams[chainId]
+              ],
+            });
+          } catch (addError) {
+            console.error(addError);
+          }
         }
       }
     }
@@ -408,6 +433,13 @@ const GlobalHeaderRight = props => {
   // 网络列表
   const [networkListIndex, setNetworkListIndex] = useState(0);
   const networkList = [
+    {
+      name: 'Wrong Network',
+      //icon: 'Polygon',
+      onClick: async () => {
+        setVisibleMetaMask(false);
+      },
+    },
     {
       name: 'BSC',
       icon: 'Binance',
@@ -428,15 +460,15 @@ const GlobalHeaderRight = props => {
   const networkListInCardList = (
     <div className={styles.networkListBlock}>
       <div className={styles.networkTitle}>
-          <span>Select a Network</span>
-        </div>
+        <span>Select a Network</span>
+      </div>
       <AcyCardList>
-        {networkList.map((item) => {
+        {networkList.slice(1,).map((item) => {
           return (
             <AcyCardList.Thin className={styles.networkListLayout} onClick={() => item.onClick()}>
-              {(item.svgicon && <Opera width={20} style={{ margin: '5px' }} />) || (
+              {
                 <AcyIcon.MyIcon width={20} type={item.icon} />
-              )}
+              }
               <span>{item.name}</span>
             </AcyCardList.Thin>
           );
@@ -445,6 +477,10 @@ const GlobalHeaderRight = props => {
       </AcyCardList>
     </div>
   );
+  const deactivateTest = () => {
+    deactivate();
+    localStorage.setItem("login_status", 'off')
+  }
 
   return (
     <div className={className}>
