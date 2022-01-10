@@ -15,7 +15,7 @@ import { useWeb3React } from '@web3-react/core';
 import { useState, useCallback } from "react"
 
 export const useConnectWallet = () => {
-    const { activate } = useWeb3React();
+    const { activate, deactivate } = useWeb3React();
     const connectWalletByLocalStorage = useCallback(
         () => {
             const walletName = localStorage.getItem("wallet");

@@ -204,9 +204,13 @@ const GlobalHeaderRight = props => {
       checkChainNetwork(chainId);
     })
     // Nabox 监听
-    NaboxWallet.on('networkChanged', function (chainId) {
-      checkChainNetwork(chainId);
-    })
+    try {
+      window.NaboxWallet.on('networkChanged', function (chainId) {
+        checkChainNetwork(chainId);
+      })
+    } catch (error) {
+      console.log("no nabox plugin");
+    }
   }, [account, chainId, supportedChainIds, wallet]);
   const {
     currentUser,
