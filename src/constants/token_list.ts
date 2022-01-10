@@ -326,7 +326,7 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     symbol: 'NULS',
     address: '0x8b8e48a8cc52389cd16a162e5d8bd514fabf4ba0',
     decimals: 8,
-    logoURI: 'https://storageapi.fleek.co/0f49574a-a2e7-42ef-805c-4607409c1191-bucket/ACY/2021_NULS_ICON-01.svg',
+    logoURI: 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/2021_NULS_ICON-01(1).svg',
     idOnCoingecko: "nuls",
   },
   {
