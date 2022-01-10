@@ -70,9 +70,6 @@ export class NaboxConnector extends AbstractConnector {
         if (!window.NaboxWallet) {
             throw new NoEthereumProviderError()
         }
-        let account
-        console.log("ymj ", window.NaboxWallet);
-        
 
         if (window.NaboxWallet.on) {
             window.NaboxWallet.on('chainChanged', this.handleChainChanged)
@@ -86,14 +83,10 @@ export class NaboxConnector extends AbstractConnector {
         // }
 
         // try to activate + get account via eth_requestAccounts
-
-        if ((window.NaboxWallet as any).isNabox) {
-            console.log("ymj rabox");
-        }
         if ((window.NaboxWallet as any).isMetaMask) {
-            console.log("ymj metamask");
             ; (window.NaboxWallet as any).autoRefreshOnNetworkChange = false
         }
+        let account
         try {
             account = await (window.NaboxWallet.send as Send)('eth_requestAccounts').then(
                 sendReturn => parseSendReturn(sendReturn)[0]
