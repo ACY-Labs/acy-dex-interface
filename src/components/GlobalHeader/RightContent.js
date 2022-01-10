@@ -43,8 +43,8 @@ const GlobalHeaderRight = props => {
   const [visibleSetting, setVisibleSetting] = useState(false);
   const [only, setOnly] = useState(true);
   // 连接钱包函数
-  const { account, library } = useConstantLoader();
-  const { chainId, activate, deactivate, active } = useWeb3React();
+  const { account, chainId, library } = useConstantLoader();
+  const { activate, deactivate, active } = useWeb3React();
 
   const [wallet, setWallet] = useState(localStorage.getItem("wallet"));
 
