@@ -9,6 +9,7 @@ import {
     trezor,
     ledger,
     binance,
+    nabox,
 } from '@/connectors';
 import { useWeb3React } from '@web3-react/core';
 import { useState, useCallback } from "react"
@@ -18,6 +19,10 @@ export const useConnectWallet = () => {
     const connectWalletByLocalStorage = useCallback(
         () => {
             const walletName = localStorage.getItem("wallet");
+            const login_status = localStorage.getItem("login_status");
+            if (login_status == 'off'){
+                return;
+            }
             if (walletName === 'metamask' || walletName === 'opera') {
                 activate(injected);
             } else if (walletName === 'walletconnect') {
@@ -36,10 +41,14 @@ export const useConnectWallet = () => {
                 activate(ledger);
             } else if (walletName === 'binance') {
                 activate(binance);
-            } else {
+            } else if (walletName === 'nabox') {
+                activate(nabox);
+            } 
+            else {
                 console.log("wallet ERROR");
                 activate(injected);
             }
+            localStorage.setItem("status", "on")
         },
         [activate],
     )
