@@ -135,6 +135,7 @@ const GlobalHeaderRight = props => {
   // 选择钱包
   const selectWallet = walletName => {
     console.log('selecting wallet', walletName);
+    deactivate();
     if (walletName === 'metamask' || walletName === 'opera') {
       activate(injected);
     } else if (walletName === 'walletconnect') {
@@ -204,9 +205,13 @@ const GlobalHeaderRight = props => {
       checkChainNetwork(chainId);
     })
     // Nabox 监听
-    NaboxWallet.on('networkChanged', function (chainId) {
-      checkChainNetwork(chainId);
-    })
+    try {
+      window.NaboxWallet.on('networkChanged', function (chainId) {
+        checkChainNetwork(chainId);
+      })
+    } catch (error) {
+      console.log("no nabox plugin");
+    }
   }, [account, chainId, supportedChainIds, wallet]);
   const {
     currentUser,
