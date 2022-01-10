@@ -36,10 +36,23 @@ async function parseTransactionList(data){
   console.log("pringting filtered tx",_txList);
     
   _txList = _txList.map((item) => {
-    let totalValue = totalInUSD([{
+    let totalValue;
+    item.action == 'Swap' ? 
+    
+    totalValue = totalInUSD([{
       token : item.token1Symbol,
       amount : item.token1Number
+    }],tokensPriceUSD) 
+    
+    : totalValue = totalInUSD([{
+      token : item.token1Symbol,
+      amount : item.token1Number}
+      ,
+
+      {token : item.token2Symbol,
+      amount : item.token2Number
     }],tokensPriceUSD);
+
     return {
       account: item.address,
       coin1: item.token1Symbol,

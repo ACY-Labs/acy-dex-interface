@@ -10,6 +10,7 @@ import ACYV1ROUTER02_ABI from '@/acy-dex-swap/abis/AcyV1Router02';
 import transaction from '@/models/transaction';
 import { useConstantLoader, TOKENLIST, METHOD_LIST, ACTION_LIST, RPC_URL, API_URL } from '@/constants';
 import { constantInstance } from '@/constants';
+import { FEE_PERCENT } from '@/pages/Market/Util';
 
 var Web3 = require('web3');
 const FlashArbitrageResultLogs_ABI = ACYV1ROUTER02_ABI[1];
@@ -642,7 +643,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueTokenToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
-            if(item.input.startsWith(methodList.tokenToTokenArb.id) || item.input.startsWith(methodList.tokenToExactTokenArb.id)) fetchedItem['FA']=true;
+            if(item.input.startsWith(methodList.tokenToTokenArb.id)) fetchedItem['FA']=true;
             if(fetchedItem) newData.push(fetchedItem);
         }
 
@@ -650,7 +651,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueETHToToken(account, item.hash,item.timeStamp,FROM_HASH, library,0);
-            if(item.input.startsWith(methodList.ethToTokenArb.id) || item.input.startsWith(methodList.ethToExactTokenArb.id)) fetchedItem['FA']=true;
+            if(item.input.startsWith(methodList.ethToTokenArb.id)) fetchedItem['FA']=true;
             if(fetchedItem) newData.push(fetchedItem);
         }
 
@@ -658,7 +659,7 @@ export async function parseTransactionData (fetchedData,account,library,filter) 
 
         for (let item of filteredData) {
             let fetchedItem = await fetchUniqueTokenToETH(account, item.hash,item.timeStamp,FROM_HASH, library,0);
-            if(item.input.startsWith(methodList.tokenToEthArb.id) || item.input.startsWith(methodList.tokenToExactEthArb.id)) fetchedItem['FA']=true;
+            if(item.input.startsWith(methodList.tokenToEthArb.id)) fetchedItem['FA']=true;
             if(fetchedItem) newData.push(fetchedItem);
         }
 
@@ -839,243 +840,410 @@ function getTransferLogPath(transferLogs, pathList, fromAddress, destAddress) {
     return pathList;
 }
 
+function decodeFinalLog(log, from, to, transferLogs ,input){
+
+    const methodList = METHOD_LIST();
+
+    //settting from and to ::::
+    if(input.startsWith(methodList.tokenToTokenArb.id)){
+        from = from;
+        to = to;
+    } else if(input.startsWith(methodList.tokenToExactTokenArb.id)){
+        from = from;
+        to = from;
+    }else if(input.startsWith(methodList.ethToExactTokenArb.id)){
+        let temp = from;
+        from = to;
+        to = temp;
+    }else if (input.startsWith(methodList.ethToTokenArb.id)){
+        from = to;
+        to = to;
+    }else if (input.startsWith(methodList.tokenToEthArb.id)){
+        from = from;
+        to = to;
+    }
+
+    let i = 0;
+    let length = log.data.length;
+    let data = log.data.slice(2);
+    let inputList = [];
+
+    while(i + 64 <= length){
+        inputList.push( data.substring(i,i+64));
+        i = i+64;
+    }
+
+    let num_path = parseInt(inputList[5],16);
+    let pathTokens = inputList.slice(6,6+num_path);
+    let pathAmmounts = inputList.slice(6+num_path + 1, 6+ 2*num_path + 1);
+
+    from = from.slice(2);
+    to = to.slice(2);
+    let sourceToken = transferLogs.find(item=>item.topics[1].toLowerCase().includes(from.toLowerCase())).address;
+    let destToken = transferLogs.find(item=> item.topics[2].toLowerCase().includes(to.toLowerCase())).address;
+
+    sourceToken = findTokenWithAddress(sourceToken);
+    destToken = findTokenWithAddress(destToken);
+
+    let k = 0;
+
+    let routes = [];
+
+    for(let j = 0 ; j < num_path ; j++){
+        let route = {};
+        route['token1'] = findTokenWithAddress(transferLogs[k].address).symbol;
+        route['token1Num'] = transferLogs[k].data / Math.pow(10, findTokenWithAddress(transferLogs[k].address).decimals);
+
+        k++;
+        
+        if(!pathTokens[j].toLowerCase().includes(destToken.address.toLowerCase().slice(2))){
+            route['token2'] = findTokenWithAddress(transferLogs[k].address).symbol;
+            route['token2Num'] = transferLogs[k].data / Math.pow(10, findTokenWithAddress(transferLogs[k].address).decimals);
+            route['logoURI'] = findTokenWithAddress(transferLogs[k].address).logoURI; 
+            k++;
+        }else{
+
+            route['token2'] = null;
+            route['token2Num'] = null;
+
+        }
+        route['token3'] = findTokenWithAddress(transferLogs[k].address).symbol;
+        route['token3Num'] = transferLogs[k].data / Math.pow(10, findTokenWithAddress(transferLogs[k].address).decimals);
+        k++;
+        console.log(route);
+        routes.push(route);
+    }
+    console.log(routes);
+
+    return [routes, `0x${inputList[3]}` / Math.pow(10, destToken.decimals), `0x${inputList[4]}` / Math.pow(10, destToken.decimals)];
+
+}
+
 //below code is used for transaction detail page
 
-export async function fetchTransactionData(address,library, account){
-    // console.log("here in fetch Transaction Data")
+export async function fetchTransactionData(address,library){
+
+    tokenPriceUSD = await getAllSuportedTokensPrice();
     const web3 = new Web3(RPC_URL());
+    let SCAN_API = constantInstance.scanAPIPrefix.scanUrl;
+    let GAS_TOKEN = constantInstance.gasTokenSymbol;
     const actionList = ACTION_LIST();
     const methodList = METHOD_LIST();
 
-    // console.log("fetching tx" , address);
+    const txReceipt = await library.getTransactionReceipt(address.toString());
+    const transactionData = await library.getTransaction(address.toString());
 
-    // console.log("before get All Supported Tokens Price");
-    tokenPriceUSD = await getAllSuportedTokensPrice();
+    console.log(txReceipt);
+    console.log(transactionData);
 
-    try{
-        const apikey = 'H2W1JHHRFB5H7V735N79N75UVG86E9HFH2';
+    const from = (transactionData.from).toLowerCase();
+    const to = (transactionData.to).toLowerCase();
 
-        const transactionData = await library.getTransaction(address.toString());
-        const sourceAddress = (transactionData.from).toLowerCase();
-        const destAddress = (transactionData.to).toLowerCase();
-        // console.log("transactionData", transactionData);
-        // console.log(sourceAddress, destAddress);
+    //parse ROUTES  and AMM Output
 
-        // this code is used to get METHOD ID
-        // for (let i = 0; i < ACYV1ROUTER02_ABI.length; i ++) {
-        //     console.log(ACYV1ROUTER02_ABI[i]["name"]);
-        //     console.log(web3.eth.abi.encodeFunctionSignature(ACYV1ROUTER02_ABI[i]));
-        // }
+    const [routes,amm_output,dist_output] = decodeFinalLog(
+        txReceipt.logs[txReceipt.logs.length-1],
+        from , 
+        to, 
+        txReceipt.logs.filter(item=>item.topics.length > 2 && item.topics[0].includes(actionList.transfer.hash)),
+        transactionData.data);
+    
+    console.log("found routes", routes);
+    //get GAS PRICE and symbol
+    // let priceRequest = '';
+    // let gasPrice;
+    // if(GAS_TOKEN == 'BNB'){
+    //     priceRequest = SCAN_API + '?module=stats&action=bnbprice';
+    //     priceRequest = await fetch(priceRequest);
+    //     gasPrice = await priceRequest.json();
+    //     gasPrice = gasPrice.result.ethusd;
+    // }else if( GAS_TOKEN == 'MATIC'){
+    //     priceRequest = SCAN_API + '?module=stats&action=maticprice';
+    //     priceRequest = await fetch(priceRequest);
+    //     gasPrice = await priceRequest.json();
+    //     gasPrice = gasPrice.result.maticusd;
+    // }else {
+    //     console.log("GAS NOT DEFINED YET");
+    // }
 
-        const methodUsed = Object.keys(methodList).find(key => transactionData.data.startsWith(methodList[key].id));
-        // console.log("methodUsed", methodUsed);
-        
-        if (Object.keys(methodList).includes(methodUsed)) {
-            const methodUsedABI = ACYV1ROUTER02_ABI.find(item => item.name == methodList[methodUsed].name)
-            const parsedInputData = "0x" + transactionData.data.substring(10, transactionData.data.length);
-            const txnDataDecoded = web3.eth.abi.decodeParameters(methodUsedABI.inputs, parsedInputData);
-            // console.log("txnDataDecoded", txnDataDecoded);
-            const fromTokenAddress = txnDataDecoded.path[0];
-            const toTokenAddress = txnDataDecoded.path[1];
-            
-            // parsing loggings
-            const response = await library.getTransactionReceipt(address.toString());
-            // console.log("Response: ",response);
-            const gasFee = (transactionData.gasPrice.toNumber() / (Math.pow(10,18)) ) * response.gasUsed.toNumber()
-            const FlashArbitrageResult_Log = response.logs[response.logs.length-1];
-            const FlashArbitrageResultLogs_ABI = ACYV1ROUTER02_ABI.find(item => item.name == 'FlashArbitrageResultLogs');
-            const txnReceiptDecoded = web3.eth.abi.decodeLog(
-                FlashArbitrageResultLogs_ABI.inputs, 
-                FlashArbitrageResult_Log.data, 
-                FlashArbitrageResult_Log.topics
-                )
-            // console.log("txnReceiptDecoded", txnReceiptDecoded);
-            
-            /**
-             * Parse transfer logs
-             * 1. find all the routes from sourceAddress to destAddress
-             * */
-            const transferLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0] == actionList.transfer.hash);
-            // console.log("transferLogs", transferLogs);
-            const routes_loglists = [];
-            if (methodList[methodUsed].name === methodList.tokenToTokenArb.name) {
-                // console.log("method: swapExactTokensForTokensByArb")
-                for (let i = 0; i < transferLogs.length; i ++) {
-                    let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
-                    let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
-                    if (transferFromAddress == sourceAddress) {
-                        let pathList = [i];
-                        let path = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
-                        if (path != null) {
-                            routes_loglists.push(path);
-                        }
-                    }
-                } 
-            } else if (methodList[methodUsed].name === methodList.ethToTokenArb.name) {
-                // console.log("method: swapExactETHForTokensByArb")
-                for (let i = 0; i < transferLogs.length; i++) {
-                    let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
-                    let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
-                    if (transferFromAddress == destAddress) {
-                        let pathList = [i];
-                        let path = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
-                        if (path != null) {
-                            routes_loglists.push(path);
-                        }
-                    }
-                } 
-            } else if (methodList[methodUsed].name === methodList.tokenToEthArb.name) {
-                // console.log("method: swapExactTokensForETHByArb")
-                for (let i = 0; i < transferLogs.length; i++) {
-                    let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
-                    let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
-                    if (transferFromAddress == sourceAddress) {
-                        let pathList = [i];
-                        let path = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
-                        if (path != null) {
-                            routes_loglists.push(path);
-                        }
-                    }
-                }
-            } else if (methodList[methodUsed].name === methodList.tokenToExactTokenArb.name) {
-                // console.log("method: swapTokensForExactTokensByArb")
-                for (let i = 0; i < transferLogs.length; i++) {
-                    let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
-                    let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
-                    if (transferFromAddress == sourceAddress) {
-                        let pathList = [i];
-                        let path = getTransferLogPath(transferLogs, pathList, transferToAddress, sourceAddress);
-                        if (path != null) {
-                            routes_loglists.push(path);
-                        }
-                    }
-                }
-            } else if (methodList[methodUsed].name === methodList.ethToExactTokenArb.name) {
-                // console.log("method: swapETHForExactTokensByArb")
-                for (let i = 0; i < transferLogs.length; i++) {
-                    let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
-                    let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
-                    if (transferFromAddress == destAddress) {
-                        let pathList = [i];
-                        let path = getTransferLogPath(transferLogs, pathList, transferToAddress, sourceAddress);
-                        if (path != null) {
-                            routes_loglists.push(path);
-                        }
-                    }
-                }
-            } else if (methodList[methodUsed].name === methodList.tokenToExactEthArb.name) {
-                // console.log("method: swapTokensForExactETHByArb")
-                for (let i = 0; i < transferLogs.length; i++) {
-                    let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
-                    let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
-                    if (transferFromAddress == sourceAddress) {
-                        let pathList = [i];
-                        let path = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
-                        if (path != null) {
-                            routes_loglists.push(path);
-                        }
-                    }
-                }
-            } else {
-                console.log("no method matched")
+    let gasUsed = txReceipt.gasUsed * transactionData.gasPrice.toNumber() / Math.pow(10, findTokenWithSymbol(GAS_TOKEN).decimals) ; //expressed in BNB
+    console.log(gasUsed);
+
+    // calculate total amounts of TX
+
+    let totalIn = 0;
+    routes.forEach(element => {
+        totalIn += element.token1Num;
+    });
+
+    let totalOut = 0;
+    routes.forEach(element => {
+        totalOut += element.token3Num;
+    });
+    
+    let inToken = findTokenWithSymbol(routes[0].token1);
+    let outToken = findTokenWithSymbol(routes[0].token3);
+    // calculate trading fee
+
+    let trading_fee = totalInUSD([
+        {
+            token : inToken.symbol,
+            amount : totalIn * FEE_PERCENT
+        },
+    ],tokenPriceUSD);
+
+    return {
+        'token1' : inToken,
+        'token2' : outToken,
+        'totalIn' : totalIn,
+        'totalOut' : totalOut,
+        'routes' : routes,
+        'gasFee' : gasUsed,
+        'gasFeeUSD' : totalInUSD([
+            {
+                token : GAS_TOKEN,
+                amount : gasUsed
+            },
+        ],tokenPriceUSD),
+        'amm_output': amm_output,
+        'acy_treasury': totalOut - amm_output - dist_output,
+        'trader_treasury': dist_output,
+        'gas_symbol' : GAS_TOKEN,
+        'trading_fee' : trading_fee,
+        'trader_final' : dist_output + amm_output,
+        'trader_finalUSD' : totalInUSD([
+            {
+                token : outToken.symbol,
+                amount : dist_output + amm_output
             }
+        ],tokenPriceUSD)
 
-
-            // console.log("routes_loglists", routes_loglists);
-
-            /**
-             * Parse the routes_loglists into frontend readable data
-             */
-            let routes = []
-            let totalIn = 0;
-            let totalOut = 0;
-            let token1 = null;
-            let token2 = null;
-            let token3 = null;
-            const INITIAL_TOKEN_LIST = TOKENLIST();
-            for (const path of routes_loglists) {
-                token1 = INITIAL_TOKEN_LIST.find(item => item.address.toLowerCase() == transferLogs[path[0]].address.toLowerCase());
-                token2 = null;
-                let amount1 = (transferLogs[path[0]].data / Math.pow(10, token1.decimals)); 
-                let amount2 = null;
-                let amount3 = null;
-                // direct path
-                if (path.length == 2) {
-                    token3 = token3 == null ? INITIAL_TOKEN_LIST.find(item => item.address.toLowerCase() == transferLogs[path[1]].address.toLowerCase()) : token3;
-                    amount3 = (transferLogs[path[1]].data / Math.pow(10, token3.decimals)); 
-                    // console.log(token1, token3);
-                    routes.push({
-                        "token1": token1.symbol,
-                        "token2": null,
-                        "token3": token3.symbol,
-                        "token1Num": amount1,
-                        "token2Num": null,
-                        "token3Num": amount3,
-                        "logoURI": null
-                    })
-                } 
-                // routed path
-                else {
-                    token2 = INITIAL_TOKEN_LIST.find(item => item.address.toLowerCase() == transferLogs[path[1]].address.toLowerCase());
-                    token3 = token3 == null ? INITIAL_TOKEN_LIST.find(item => item.address.toLowerCase() == transferLogs[path[2]].address.toLowerCase()) : token3;
-                    amount2 = (transferLogs[path[1]].data / Math.pow(10, token2.decimals)); 
-                    amount3 = (transferLogs[path[2]].data / Math.pow(10, token3.decimals)); 
-                    // console.log(token1, token2, token3);
-                    routes.push({
-                        "token1": token1.symbol,
-                        "token2": token2.symbol,
-                        "token3": token3.symbol,
-                        "token1Num": amount1,
-                        "token2Num": amount2,
-                        "token3Num": amount3,
-                        "logoURI": token2.logoURI
-                    })
-                }
-                totalIn += amount3;
-                totalOut += amount1;
-            }
-
-            let requestPrice = API()+'?module=stats&action=bnbprice&apikey='+apikey;
-            let responsePrice = await fetch(requestPrice);
-            let ethPrice = await responsePrice.json();
-            ethPrice = parseFloat(ethPrice.result.ethusd);
-
-            // console.log("fetching ethprice",ethPrice);
-            // console.log("txnReceiptDecoded.AMMOutput", txnReceiptDecoded.AMMOutput);
-            // console.log("txnReceiptDecoded.FAOutput", txnReceiptDecoded.FAOutput);
-            // console.log("txnReceiptDecoded.userDistributionAmount", txnReceiptDecoded.userDistributionAmount);
-
-            const newData = {
-                "routes" : routes,
-                "totalIn" : totalIn,
-                "totalOut" : totalOut,
-                "gasFee" : gasFee,
-                "token1" : token1,
-                "token2" : token3,
-                "ethPrice" : ethPrice,
-                "AMMOutput": (Math.floor(txnReceiptDecoded.AMMOutput) / Math.pow(10, token3.decimals)), // this number is actually too large for integer, so it doesnt convert the string to int completely, but its enough for frontend showcase, wont be effecting the result.
-                "FAOutput": (Math.floor(txnReceiptDecoded.FAOutput) / Math.pow(10, token3.decimals)),
-                "userDistributionAmount": (Math.floor(txnReceiptDecoded.userDistributionAmount) / Math.pow(10, token3.decimals))
-            }
-            // console.log("newData", newData);
-
-            let chartData = getChartData(newData);
-            newData.chartData = chartData;
-            return newData;
-        } else if(transactionData.data.startsWith(methodList.addLiquidity.id)){
-
-        } else if(transactionData.data.startsWith(methodList.addLiquidityEth.id)){
-
-        } else if(transactionData.data.startsWith(methodList.removeLiquidity.id)){
-
-        } else if(transactionData.data.startsWith(methodList.removeLiquidityETH.id)){
-
-        } else {
-            console.log("Transaction not parseable");
-        }
-
-    } catch (e){
-        console.log(e);
     }
-    return {};
+
+    // try{
+    //     const apikey = 'H2W1JHHRFB5H7V735N79N75UVG86E9HFH2';
+
+    //     const transactionData = await library.getTransaction(address.toString());
+    //     const sourceAddress = (transactionData.from).toLowerCase();
+    //     const destAddress = (transactionData.to).toLowerCase();
+    //     // console.log("transactionData", transactionData);
+    //     // console.log(sourceAddress, destAddress);
+
+    //     // this code is used to get METHOD ID
+    //     // for (let i = 0; i < ACYV1ROUTER02_ABI.length; i ++) {
+    //     //     console.log(ACYV1ROUTER02_ABI[i]["name"]);
+    //     //     console.log(web3.eth.abi.encodeFunctionSignature(ACYV1ROUTER02_ABI[i]));
+    //     // }
+
+    //     const methodUsed = Object.keys(methodList).find(key => transactionData.data.startsWith(methodList[key].id));
+    //     console.log("methodUsed", methodUsed);
+        
+    //     if (Object.keys(methodList).includes(methodUsed)) {
+    //         const methodUsedABI = ACYV1ROUTER02_ABI.find(item => item.name == methodList[methodUsed].name)
+    //         const parsedInputData = "0x" + transactionData.data.substring(10, transactionData.data.length);
+    //         const txnDataDecoded = web3.eth.abi.decodeParameters(methodUsedABI.inputs, parsedInputData);
+    //         console.log("txnDataDecoded", txnDataDecoded);
+    //         const fromTokenAddress = txnDataDecoded.path[0];
+    //         const toTokenAddress = txnDataDecoded.path[1];
+            
+    //         // parsing loggings
+    //         const response = await library.getTransactionReceipt(address.toString());
+    //         // console.log("Response: ",response);
+    //         const gasFee = (transactionData.gasPrice.toNumber() / (Math.pow(10,18)) ) * response.gasUsed.toNumber()
+    //         const FlashArbitrageResult_Log = response.logs[response.logs.length-1];
+    //         const FlashArbitrageResultLogs_ABI = ACYV1ROUTER02_ABI.find(item => item.name == 'FlashArbitrageResultLogs');
+    //         const txnReceiptDecoded = web3.eth.abi.decodeLog(
+    //             FlashArbitrageResultLogs_ABI.inputs, 
+    //             FlashArbitrageResult_Log.data, 
+    //             FlashArbitrageResult_Log.topics
+    //             )
+    //         // console.log("txnReceiptDecoded", txnReceiptDecoded);
+            
+    //         /**
+    //          * Parse transfer logs
+    //          * 1. find all the routes from sourceAddress to destAddress
+    //          * */
+    //         const transferLogs = response.logs.filter(log => log.topics.length > 2 && log.topics[0] == actionList.transfer.hash);
+    //         // console.log("transferLogs", transferLogs);
+    //         const routes_loglists = [];
+    //         if (methodList[methodUsed].name === methodList.tokenToTokenArb.name) {
+    //             // console.log("method: swapExactTokensForTokensByArb")
+    //             for (let i = 0; i < transferLogs.length; i ++) {
+    //                 let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
+    //                 let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
+    //                 if (transferFromAddress == sourceAddress) {
+    //                     let pathList = [i];
+    //                     let path = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
+    //                     if (path != null) {
+    //                         routes_loglists.push(path);
+    //                     }
+    //                 }
+    //             } 
+    //         } else if (methodList[methodUsed].name === methodList.ethToTokenArb.name) {
+    //             // console.log("method: swapExactETHForTokensByArb")
+    //             for (let i = 0; i < transferLogs.length; i++) {
+    //                 let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
+    //                 let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
+    //                 if (transferFromAddress == destAddress) {
+    //                     let pathList = [i];
+    //                     let path = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
+    //                     if (path != null) {
+    //                         routes_loglists.push(path);
+    //                     }
+    //                 }
+    //             } 
+    //         } else if (methodList[methodUsed].name === methodList.tokenToEthArb.name) {
+    //             // console.log("method: swapExactTokensForETHByArb")
+    //             for (let i = 0; i < transferLogs.length; i++) {
+    //                 let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
+    //                 let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
+    //                 if (transferFromAddress == sourceAddress) {
+    //                     let pathList = [i];
+    //                     let path = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
+    //                     if (path != null) {
+    //                         routes_loglists.push(path);
+    //                     }
+    //                 }
+    //             }
+    //         } else if (methodList[methodUsed].name === methodList.tokenToExactTokenArb.name) {
+    //             // console.log("method: swapTokensForExactTokensByArb")
+    //             for (let i = 0; i < transferLogs.length; i++) {
+    //                 let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
+    //                 let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
+    //                 if (transferFromAddress == sourceAddress) {
+    //                     let pathList = [i];
+    //                     let path = getTransferLogPath(transferLogs, pathList, transferToAddress, sourceAddress);
+    //                     if (path != null) {
+    //                         routes_loglists.push(path);
+    //                     }
+    //                 }
+    //             }
+    //         } else if (methodList[methodUsed].name === methodList.ethToExactTokenArb.name) {
+    //             // console.log("method: swapETHForExactTokensByArb")
+    //             for (let i = 0; i < transferLogs.length; i++) {
+    //                 let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
+    //                 let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
+    //                 if (transferFromAddress == destAddress) {
+    //                     let pathList = [i];
+    //                     let path = getTransferLogPath(transferLogs, pathList, transferToAddress, sourceAddress);
+    //                     if (path != null) {
+    //                         routes_loglists.push(path);
+    //                     }
+    //                 }
+    //             }
+    //         } else if (methodList[methodUsed].name === methodList.tokenToExactEthArb.name) {
+    //             // console.log("method: swapTokensForExactETHByArb")
+    //             for (let i = 0; i < transferLogs.length; i++) {
+    //                 let transferFromAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[1])).toLowerCase();
+    //                 let transferToAddress = (web3.eth.abi.decodeParameter("address", transferLogs[i].topics[2])).toLowerCase();
+    //                 if (transferFromAddress == sourceAddress) {
+    //                     let pathList = [i];
+    //                     let path = getTransferLogPath(transferLogs, pathList, transferToAddress, destAddress);
+    //                     if (path != null) {
+    //                         routes_loglists.push(path);
+    //                     }
+    //                 }
+    //             }
+    //         } else {
+    //             console.log("no method matched")
+    //         }
+
+
+    //         // console.log("routes_loglists", routes_loglists);
+
+    //         /**
+    //          * Parse the routes_loglists into frontend readable data
+    //          */
+    //         let routes = []
+    //         let totalIn = 0;
+    //         let totalOut = 0;
+    //         let token1 = null;
+    //         let token2 = null;
+    //         let token3 = null;
+    //         const INITIAL_TOKEN_LIST = TOKENLIST();
+    //         for (const path of routes_loglists) {
+    //             token1 = INITIAL_TOKEN_LIST.find(item => item.address.toLowerCase() == transferLogs[path[0]].address.toLowerCase());
+    //             token2 = null;
+    //             let amount1 = (transferLogs[path[0]].data / Math.pow(10, token1.decimals)); 
+    //             let amount2 = null;
+    //             let amount3 = null;
+    //             // direct path
+    //             if (path.length == 2) {
+    //                 token3 = token3 == null ? INITIAL_TOKEN_LIST.find(item => item.address.toLowerCase() == transferLogs[path[1]].address.toLowerCase()) : token3;
+    //                 amount3 = (transferLogs[path[1]].data / Math.pow(10, token3.decimals)); 
+    //                 // console.log(token1, token3);
+    //                 routes.push({
+    //                     "token1": token1.symbol,
+    //                     "token2": null,
+    //                     "token3": token3.symbol,
+    //                     "token1Num": amount1,
+    //                     "token2Num": null,
+    //                     "token3Num": amount3,
+    //                     "logoURI": null
+    //                 })
+    //             } 
+    //             // routed path
+    //             else {
+    //                 token2 = INITIAL_TOKEN_LIST.find(item => item.address.toLowerCase() == transferLogs[path[1]].address.toLowerCase());
+    //                 token3 = token3 == null ? INITIAL_TOKEN_LIST.find(item => item.address.toLowerCase() == transferLogs[path[2]].address.toLowerCase()) : token3;
+    //                 amount2 = (transferLogs[path[1]].data / Math.pow(10, token2.decimals)); 
+    //                 amount3 = (transferLogs[path[2]].data / Math.pow(10, token3.decimals)); 
+    //                 // console.log(token1, token2, token3);
+    //                 routes.push({
+    //                     "token1": token1.symbol,
+    //                     "token2": token2.symbol,
+    //                     "token3": token3.symbol,
+    //                     "token1Num": amount1,
+    //                     "token2Num": amount2,
+    //                     "token3Num": amount3,
+    //                     "logoURI": token2.logoURI
+    //                 })
+    //             }
+    //             totalIn += amount3;
+    //             totalOut += amount1;
+    //         }
+
+    //         // let requestPrice = API()+'?module=stats&action=bnbprice&apikey='+apikey;
+    //         // let responsePrice = await fetch(requestPrice);
+    //         // let ethPrice = await responsePrice.json();
+    //         // ethPrice = parseFloat(ethPrice.result.ethusd);
+
+    //         // console.log("fetching ethprice",ethPrice);
+    //         // console.log("txnReceiptDecoded.AMMOutput", txnReceiptDecoded.AMMOutput);
+    //         // console.log("txnReceiptDecoded.FAOutput", txnReceiptDecoded.FAOutput);
+    //         // console.log("txnReceiptDecoded.userDistributionAmount", txnReceiptDecoded.userDistributionAmount);
+
+    //         const newData = {
+    //             "routes" : routes,
+    //             "totalIn" : totalIn,
+    //             "totalOut" : totalOut,
+    //             "gasFee" : gasFee,
+    //             "token1" : token1,
+    //             "token2" : token3,
+    //             "ethPrice" : 0,
+    //             "AMMOutput": (Math.floor(txnReceiptDecoded.AMMOutput) / Math.pow(10, token3.decimals)), // this number is actually too large for integer, so it doesnt convert the string to int completely, but its enough for frontend showcase, wont be effecting the result.
+    //             "FAOutput": (Math.floor(txnReceiptDecoded.FAOutput) / Math.pow(10, token3.decimals)),
+    //             "userDistributionAmount": (Math.floor(txnReceiptDecoded.userDistributionAmount) / Math.pow(10, token3.decimals))
+    //         }
+    //         // console.log("newData", newData);
+
+    //         let chartData = getChartData(newData);
+    //         newData.chartData = chartData;
+    //         return newData;
+    //     } else if(transactionData.data.startsWith(methodList.addLiquidity.id)){
+
+    //     } else if(transactionData.data.startsWith(methodList.addLiquidityEth.id)){
+
+    //     } else if(transactionData.data.startsWith(methodList.removeLiquidity.id)){
+
+    //     } else if(transactionData.data.startsWith(methodList.removeLiquidityETH.id)){
+
+    //     } else {
+    //         console.log("Transaction not parseable");
+    //     }
+
+    // } catch (e){
+    //     console.log(e);
+    // }
+    // return {};
 }
