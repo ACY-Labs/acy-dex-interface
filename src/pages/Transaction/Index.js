@@ -22,15 +22,17 @@ import {
 } from '@/components/Acy';
 import styles from './styles.less';
 import { useConstantLoader } from '@/constants';
+import { NodeCollapseOutlined } from '@ant-design/icons';
 
 const Transaction = props => {
 
 
-  const [ data, setData ] = useState({});
+  const [ data, setData ] = useState(NodeCollapseOutlined);
   const [ routes, setRoutes ] = useState([]);
   const [ shouldRender, setShouldRender] = useState(false);
   const [ token1, setToken1 ] = useState({});
   const [ token2, setToken2 ] = useState({});
+  const [ showDetails, setShowDetails] = useState(false);
   const { account, chainId, library } = useConstantLoader();
   // const { account, chainId, library, activate } = useWeb3React();
   // const [ url, setUrl] = useState('');
@@ -40,38 +42,14 @@ const Transaction = props => {
   // connect to provider, listen for wallet to connect
   // console.log("before fetch transaction data", account);
   useEffect(() => {
-    fetchTransactionData(id,library,account)
+
+    fetchTransactionData(id,library)
     .then(response => {
       // console.log("response: ", response, typeof(response));
       if (!(Object.keys(response).length === 0 && response.constructor === Object)){
-        setData({
-          ...data,
-          ammOutput: response.AMMOutput,
-          faOutput: response.FAOutput,
-          chartData: response.chartData,
-          ethPrice: response.ethPrice,
-          gasFee: response.gasFee,
-          link: response.link,
-          totalIn: response.totalIn,
-          totalOut: response.totalOut,
-          userDistributionAmount: response.userDistributionAmount,
-          token1: {
-            name: response.token1.name,
-            symbol: response.token1.symbol,
-            address: response.token1.address,
-            decimals: response.token1.decimals,
-            logoURI: response.token1.logoURI,
-            idOnCoingecko: response.token1.idOnCoingecko
-          },
-          token2: {
-            name: response.token2.name,
-            symbol: response.token2.symbol,
-            address: response.token2.address,
-            decimals: response.token2.decimals,
-            logoURI: response.token2.logoURI,
-            idOnCoingecko: response.token2.idOnCoingecko
-          }
-        });
+
+        console.log("printing response",response);;
+        setData(response);
         setRoutes(response.routes.map(route => {
           let new_route = {
             token1: route.token1,
@@ -92,7 +70,7 @@ const Transaction = props => {
     .catch(() => {
       console.log("response error")
     })
-  }, [account, chainId]);
+  }, [chainId]);
   
   function drawRoutes (){
     // console.log("data", data);//, "token1", token1, "token2", token2);
@@ -103,17 +81,19 @@ const Transaction = props => {
 
     // setUrl(`https://rinkeby.etherscan.io/tx/${id}`);
 
+    console.log("printing routes for this", routes)
+
     return(
       <div className={styles.routers}>
             <div>
               <div className={styles.block}>
-                <span>Swap {totalOut} {data.token1.symbol}</span>
+                <span>Swap {totalIn} {data.token1.symbol}</span>
                 <img src={data.token1.logoURI} />
               </div>
                 {routes.map(function(route, i){
                   return <div className={styles.smallblock}>
                           <div>{formatNumber(route.token1Num*1,{ precision: 7, thousand: ","})}</div>
-                          <div>{formatNumber((route.token1Num/data.totalOut*100)*1,{ precision: 7, thousand: ","})}%</div>
+                          <div>{formatNumber((route.token1Num/data.totalIn*100)*1,{ precision: 2, thousand: ","})}%</div>
                         </div>;
                 })}
             </div>
@@ -134,14 +114,14 @@ const Transaction = props => {
             <div className={styles.arrow}><AcyIcon.MyIcon width={20} type="rightArrow" /></div>
             <div>
               <div className={styles.block}>
-                <span>For {totalIn} {data.token2.symbol}</span>
+                <span>For {totalOut} {data.token2.symbol}</span>
                 <img src={data.token2.logoURI} style={{ width: '22px'}} />
               </div>
 
                 {routes.map(function(route, i){
                     return <div className={styles.smallblock}>
                             <div>{formatNumber(route.token3Num*1,{ precision: 7, thousand: ","})}</div>
-                            <div>{formatNumber((route.token3Num/data.totalIn*100)*1,{ precision: 7, thousand: ","})}%</div>
+                            <div>{formatNumber((route.token3Num/data.totalOut*100)*1,{ precision: 2, thousand: ","})}%</div>
                           </div>;
                 })}
             </div>
@@ -149,8 +129,10 @@ const Transaction = props => {
     );
   }
 
+  function foo(name) { console.log( 'hello ' + name); }
+
   return <PageHeaderWrapper>
-    { shouldRender ? (
+    { shouldRender && data ? (
       <div className={styles.transaction}>
         <div>
           <h1 style={{marginTop: '0'}}><AcyIcon.MyIcon width={30} type="arrow" />FLASH ROUTES</h1>
@@ -158,7 +140,7 @@ const Transaction = props => {
           {drawRoutes()}
           <div>
             <a href={data.link} target="_blank" rel="noreferrer">
-                  View it on bscscan
+                  View it on scan {(data.gas_symbol=='BNB' ? 'BSC SCAN' : "POLYGON SCAN")}
             </a>
           </div>
           <h1>
@@ -168,7 +150,7 @@ const Transaction = props => {
           <table style={{width:'500px'}}>
             <tr>
               <td className={styles.tableFirstCol}>ACY Output</td>
-              <td>{data.chartData.acy_output.toFixed(2)}</td>
+              <td>{data.totalOut.toFixed(2)}</td>
               <td> 
                 <span>{data.token2.symbol}</span>
                 <img src={data.token2.logoURI} />
@@ -176,7 +158,7 @@ const Transaction = props => {
             </tr>
             <tr>
               <td className={styles.tableFirstCol}>AMM Output</td>
-              <td>{data.ammOutput.toFixed(2)}</td>
+              <td>{data.amm_output.toFixed(2)}</td>
               <td>
                 <span>{data.token2.symbol}</span>
                 <img src={data.token2.logoURI} />
@@ -184,7 +166,7 @@ const Transaction = props => {
             </tr>
             <tr>
               <td className={styles.tableFirstCol}>Flash Arbitrage Revenue</td>
-              <td>{data.chartData.flash_revenue.toFixed(2)}</td>
+              <td>{(data.totalOut-data.amm_output).toFixed(2)}</td>
               <td>
                 <span>{data.token2.symbol}</span>
                 <img src={data.token2.logoURI}/>
@@ -196,79 +178,90 @@ const Transaction = props => {
             <tr>
               <td className={styles.tableFirstCol}>Trader</td>
               <td>40%</td>
-              <td>{data.userDistributionAmount.toFixed(2)}</td>
+              <td>{data.trader_treasury.toFixed(2)}</td>
               <td>
                 <span>{data.token2.symbol}</span>
                 <img src={data.token2.logoURI}/>
               </td>
             </tr>
             <tr>
-              <td className={styles.tableFirstCol}>ACY Treasury</td>
+              <td className={styles.tableSeeMore} onClick={() => setShowDetails(!showDetails)}>ACY Treasury</td>
               <td>60%</td>
-              <td>{data.chartData.acy_treasury.toFixed(2)}</td>
+              <td>{data.acy_treasury.toFixed(2)}</td>
               <td>
                 <span>{data.token2.symbol}</span>
                 <img src={data.token2.logoURI} />
               </td>
+              {/* <td>
+                <a
+                  className={styles.seeDetails}
+                  }
+                >
+                See More...
+                </a>
+              </td> */}
             </tr>
-            {/* <tr>
-              <td className={styles.tableFirstCol}>Liquidity Provider</td>
-              <td>20%</td>
-              <td>{data.chartData.liquidity_provider.toFixed(2)}</td>
-              <td>
-                <span>{data.token2.symbol}</span>
-                <img src={data.token2.logoURI}/>
-              </td>
-            </tr>
-            <tr>
-              <td className={styles.tableFirstCol}>{`Farms-->ACYDAO`}</td>
-              <td>10%</td>
-              <td>{data.chartData.farms_acydao.toFixed(2)}</td>
-              <td>
-               <span>{data.token2.symbol}</span>
-               <img src={data.token2.logoURI}/>
-              </td>
-              
-            </tr>
-            <tr>
-              <td className={styles.tableFirstCol}>{`Farms-->Standard`}</td>
-              <td>10%</td>
-              <td>{data.chartData.farms_standard.toFixed(2)}</td>
-              <td>
-                <span>{data.token2.symbol}</span>
-                <img src={data.token2.logoURI}/>
-              </td>
-            </tr>
-            <tr>
-              <td className={styles.tableFirstCol}>{`Farms-->Premier`}</td>
-              <td>10%</td>
-              <td>{data.chartData.farms_premier.toFixed(2)}</td>
-              <td>
-               <span>{data.token2.symbol}</span>
-                <img src={data.token2.logoURI}/>
-              </td>
-             
-            </tr>
-            <tr>
-              <td className={styles.tableFirstCol}>{`Ecosystem DAO`}</td>
-              <td>10%</td>
-              <td>{data.chartData.ecosystem_dao.toFixed(2)}</td>
-              <td>
-                <span>{data.token2.symbol}</span>
-                <img src={data.token2.logoURI}/>
-              </td>
-            </tr> */}
           </table>
-          
-          {/* <h1><AcyIcon.MyIcon width={30} type="arrow" />Basic Fee</h1>
+            { showDetails ? (
+            <table style={{width:'500px'}}>
+              <tr>
+                <td className={styles.tableFirstCol}>Liquidity Provider</td>
+                <td>20%</td>
+                <td>{(data.acy_treasury * 0.2).toFixed(2)}</td>
+                <td>
+                  <span>{data.token2.symbol}</span>
+                  <img src={data.token2.logoURI}/>
+                </td>
+              </tr>
+              <tr>
+                <td className={styles.tableFirstCol}>{`Farms-->ACYDAO`}</td>
+                <td>10%</td>
+                <td>{(data.acy_treasury * 0.10).toFixed(2)}</td>
+                <td>
+                <span>{data.token2.symbol}</span>
+                <img src={data.token2.logoURI}/>
+                </td>
+                
+              </tr>
+              <tr>
+                <td className={styles.tableFirstCol}>{`Farms-->Standard`}</td>
+                <td>10%</td>
+                <td>{(data.acy_treasury * 0.10).toFixed(2)}</td>
+                <td>
+                  <span>{data.token2.symbol}</span>
+                  <img src={data.token2.logoURI}/>
+                </td>
+              </tr>
+              <tr>
+                <td className={styles.tableFirstCol}>{`Farms-->Premier`}</td>
+                <td>10%</td>
+                <td>{(data.acy_treasury * 0.10).toFixed(2)}</td>
+                <td>
+                <span>{data.token2.symbol}</span>
+                  <img src={data.token2.logoURI}/>
+                </td>
+              
+              </tr>
+              <tr>
+                <td className={styles.tableFirstCol}>{`Ecosystem DAO`}</td>
+                <td>10%</td>
+                <td>{(data.acy_treasury * 0.10).toFixed(2)}</td>
+                <td>
+                  <span>{data.token2.symbol}</span>
+                  <img src={data.token2.logoURI}/>
+                </td>
+              </tr> 
+            </table>
+            ) : (<div></div>) }
+          <h1><AcyIcon.MyIcon width={30} type="arrow" />Basic Fees</h1>
           <table style={{width:'500px'}}>
             <tr>
               <td className={styles.tableFirstCol}>Gas Fee</td>
-              <td>{(data.gasFee * data.ethPrice).toFixed(6)}$ ({data.gasFee.toFixed(6)}ETH)</td>
+              <td>{(data.gasFeeUSD).toFixed(6)}$ ({data.gasFee.toFixed(6)} {data.gas_symbol})</td>
             </tr>
             <tr>
               <td className={styles.tableFirstCol}>Trading Fee</td>
-              <td>{data.chartData.trading_fee.toFixed(2)}</td>
+              <td>{data.trading_fee.toFixed(6)} $</td>
             </tr>
           </table>
           
@@ -276,24 +269,28 @@ const Transaction = props => {
           <table style={{width:'500px'}}>
             <tr>
               <td className={styles.tableFirstCol}>Liquidity Providers</td>
-              <td>{(data.gasFee * data.ethPrice).toFixed(6)}$ ({data.gasFee.toFixed(6)}ETH)</td>
+              <td>{(data.trading_fee * 0.25 / 0.3).toFixed(6)} $</td>
             </tr>
             <tr>
               <td className={styles.tableFirstCol}>ACYDAO</td>
-              <td>{data.chartData.trading_fee.toFixed(2)}</td>
+              <td>{(data.trading_fee * 0.75 / 0.3).toFixed(6)} $</td>
             </tr>
-          </table> */}
+          </table>
           
           <h1><AcyIcon.MyIcon width={30} type="arrow" />Trader Receives</h1>
           <table style={{width:'500px'}}>
             <tr>
               <td className={styles.tableFirstCol} ><span>{data.token2.symbol}</span>
               <img src={data.token2.logoURI} /></td>
-              <td>{data.userDistributionAmount.toFixed(2)}</td>
+              <td>{(data.trader_final).toFixed(3)}</td>
+            </tr>
+            <tr>
+              <td className={styles.tableFirstCol} ><span>USD</span></td>
+              <td>{(data.trader_finalUSD).toFixed(3)} $</td>
             </tr>
           </table>
         </div>
-      </div> ) : (<h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>)
+      </div> ) : (<h2 style={{ textAlign: "center", color: "white" }}> Loading<Icon type="loading" /></h2>)
     }
     </PageHeaderWrapper>
 }
