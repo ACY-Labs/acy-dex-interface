@@ -130,8 +130,8 @@ const LaunchpadProject = () => {
           res['projectDescription'] = contextData['projectDescription'];
           res['alreadySale'] = contextData['alreadySale'];
           res['salePercentage'] = contextData['salePercentage'];
-          res['posterUrl'] = contextData['posterUrl']
-          res['tokenLogoUrl'] = res.basicInfo.projectTokenUrl
+          res['posterUrl'] = contextData['posterUrl'];
+          res['tokenLogoUrl'] = res.basicInfo.projectTokenUrl;
 
           res['regStart'] = formatTime(res.scheduleInfo.regStart);
           res['regEnd'] = formatTime(res.scheduleInfo.regEnd);
@@ -141,7 +141,7 @@ const LaunchpadProject = () => {
           res['totalSale'] = res.saleInfo.totalSale;
           res['totalRaise'] = res.saleInfo.totalRaise;
           res['projectUrl'] = res.saleInfo.projectUrl;
-          res['projectName'] = res.saleInfo.projectName;
+          res['projectName'] = res.basicInfo.projectName;
           res['projectToken'] = res.basicInfo.projectToken;
 
           setPoolID(res.basicInfo.poolID);
