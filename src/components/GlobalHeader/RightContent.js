@@ -135,7 +135,6 @@ const GlobalHeaderRight = props => {
   // 选择钱包
   const selectWallet = walletName => {
     console.log('selecting wallet', walletName);
-    deactivate();
     if (walletName === 'metamask' || walletName === 'opera') {
       activate(injected);
     } else if (walletName === 'walletconnect') {

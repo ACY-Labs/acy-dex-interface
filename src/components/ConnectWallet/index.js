@@ -20,7 +20,6 @@ export const useConnectWallet = () => {
         () => {
             const walletName = localStorage.getItem("wallet");
             const login_status = localStorage.getItem("login_status");
-            deactivate();
             if (login_status == 'off'){
                 return;
             }
