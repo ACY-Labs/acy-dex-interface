@@ -32,7 +32,7 @@ import {
   withExactOutEstimateInAmount
 } from '../utils';
 import axios from 'axios';
-import {NATIVE_CURRENCY, SCAN_URL_PREFIX, SCAN_NAME, API_URL, ROUTER_ADDRESS} from '@/constants';
+import { TOKENLIST, NATIVE_CURRENCY, SCAN_URL_PREFIX, SCAN_NAME, API_URL, ROUTER_ADDRESS } from '@/constants';
 
 function toFixed4(floatInString) {
   return parseFloat(floatInString).toFixed(4);
@@ -103,8 +103,6 @@ export async function swapGetEstimated(
     else if (!exactIn && parseFloat(inToken1Amount) == '0') return new CustomError('Enter an amount');
     if (exactIn && inToken0Amount == '') return new CustomError('Enter an amount');
     else if (!exactIn && inToken1Amount == '') return new CustomError('Enter an amount');
-    // if (exactIn && isNaN(parseFloat(inToken0Amount))) return new CustomError('Enter an amount');
-    // else if (!exactIn && isNaN(parseFloat(inToken1Amount))) return new CustomError('Enter an amount3');
 
     console.log(`token0Amount: ${inToken0Amount}`);
     console.log(`token1Amount: ${inToken1Amount}`);
@@ -166,7 +164,6 @@ export async function swapGetEstimated(
         setBonus1(null);
         return new CustomError('Not enough balance');
       }
-      // setEstimatedStatus("change ETH to WETH");
       setSwapButtonState(true);
       setSwapButtonContent('Wrap');
 
@@ -277,7 +274,7 @@ export async function swapGetEstimated(
     }
 
     console.log('------------------ PARSE AMOUNT ------------------');
-        // convert typed in amount to BigNumbe rusing ethers.js's parseUnits then to string,
+    // convert typed in amount to BigNumbe rusing ethers.js's parseUnits then to string,
     console.log(inToken0Amount);
     console.log(inToken0Decimal);
 
@@ -316,13 +313,13 @@ export async function swapGetEstimated(
     let token1Amount = inToken1Amount;
     let isUseArb = false;
     let hasArb = true;
-    
+
     let midTokenAddress = null;
     let ammOutput = null;
     let allPathAmountOut = null;
 
     let estimatedOutputAmount = null;
-    let estimatedInputAmount  = null;
+    let estimatedInputAmount = null;
 
     // get pair using our own provider
     const pair = await Fetcher.fetchPairData(token0, token1, library, chainId).catch(e => {
@@ -333,51 +330,9 @@ export async function swapGetEstimated(
     if (pair instanceof CustomError) {
       poolExist = false;
       isUseArb = false;
-      // setSwapButtonState(true);
-      // setIsUseArb(false);
-      // setSwapButtonContent(pair.getErrorText());
-      // if(exactIn) {
-      //   if(inToken0Symbol == 'WETH' ||inToken0Symbol == 'ETH' ) methodsName = "swapExactETHForTokens";
-      //   else if(inToken1Symbol == 'ETH' ||inToken1Symbol == 'ETH') methodsName = "swapExactTokensForETH";
-      //   else methodsName = "swapExactTokensForTokens";
-      // } else {
-      //   if(inToken0Symbol == 'WETH' ||inToken0Symbol == 'ETH' ) methodsName = "swapETHForExactTokens";
-      //   else if(inToken1Symbol == 'ETH' ||inToken1Symbol == 'ETH') methodsName = "swapTokensForExactETH";
-      //   else methodsName = "swapTokensForExactTokens";
-      // }
     }
+
     setPoolExist(poolExist);
-
-    // const checkBalanceToken = exactIn ? inputToken0 : inputToken1;
-    // const checkBalanceTokenIsEth = exactIn ? token0IsETH : token1IsETH;
-    // console.log("test exact in token", exactIn, checkBalanceToken)
-
-    // let selectedTokenBalance = await getUserTokenBalanceRaw(
-    //   checkBalanceTokenIsEth ? ETHER : new Token(chainId, inputToken0.address, inputToken0.decimals, inputToken0.symbol),
-    //   account,
-    //   library
-    // );
-    // console.log("test exact in token balance", selectedTokenBalance,selectedTokenBalance.toString())
-
-    // let userHasSufficientBalance;
-    // try {
-    //   userHasSufficientBalance = selectedTokenBalance.gte(parseUnits(inputToken0.amount, inputToken0.decimals));
-    // } catch (e) {
-    //   console.log('wrappedAmount!!!');
-    //   console.log(e);
-    //   setSwapButtonState(false);
-    //   setSwapButtonContent(e.fault);
-    //   return new CustomError(e.fault);
-    // }
-
-    // // quit if user doesn't have enough balance, otherwise this will cause error
-    // if (!userHasSufficientBalance) {
-    //   setSwapButtonState(false);
-    //   setSwapButtonContent('Not Enough balance3');
-    //   setBonus0(null);
-    //   setBonus1(null);
-    //   return;
-    // }
 
     // Determine to use FlashArbitrage or AMM
     try {
@@ -398,37 +353,13 @@ export async function swapGetEstimated(
         midTokenAddress = estimatedOutputAmount[0];
         ammOutput = estimatedOutputAmount.AMMOutput;
         allPathAmountOut = estimatedOutputAmount.allPathAmountOut;
-        console.log("TEST2 estimatedOutputAmount:",estimatedOutputAmount);
-        if(allPathAmountOut > ammOutput) {
+        console.log("TEST2 estimatedOutputAmount:", estimatedOutputAmount);
+        if (allPathAmountOut > ammOutput) {
           console.log("TEST2 TIGGER WHEN USE BY ARB");
           isUseArb = true;
         } else {
           isUseArb = false;
         }
-        
-        // if(inToken0Symbol == 'WETH' ||inToken0Symbol == 'ETH' ) methodsName = "swapExactETHForTokensByArb";
-        // else if(inToken1Symbol == 'ETH' ||inToken1Symbol == 'ETH') methodsName = "swapExactTokensForETHByArb";
-        // else methodsName = "swapExactTokensForTokensByArb";
-        
-        // if(allPathAmountOut > ammOutput) {
-        //   isUseArb = true;
-        //   token0Amount = formatUnits(allPathAmountOut, inToken1Decimal);
-        //   minAmountOut = allPathAmountOut * (1 - slippage/100);
-        //   minAmountOut = minAmountOut.toString(16);
-        // } else {
-        //   isUseArb = false;
-        //   token0Amount = formatUnits(ammOutput, inToken1Decimal);
-        //   console.log("TEST ammOutput:",ammOutput, slippage);
-        //   minAmountOut = ammOutput * (1 - slippage/100);
-        //   console.log("TEST minAmountOut:",minAmountOut);
-        //   minAmountOut = minAmountOut.toString(16);
-        // }
-        // setMethodName(methodsName);
-        // setToken1Amount(outputAmount);
-        // setMidTokenAddress(midTokenAddress);
-        // setIsUseArb(isUseArb);
-        // setMinAmountOut(minAmountOut);
-        // setSlippageAdjustedAmount(minAmountOut);
       } else {
         const inToken1DecimalAmount = parseUnits(token1Amount, inToken1Decimal).toString()
         console.log("TEST estimatedInputAmount in");
@@ -445,174 +376,118 @@ export async function swapGetEstimated(
         midTokenAddress = estimatedInputAmount[0];
         ammOutput = estimatedInputAmount.AMMOutput;
         allPathAmountOut = estimatedInputAmount.allPathAmountOut;
-        console.log("TEST2 estimatedInputAmount:",estimatedInputAmount);
-        if(allPathAmountOut < ammOutput) {
+        console.log("TEST2 estimatedInputAmount:", estimatedInputAmount);
+        if (allPathAmountOut < ammOutput) {
           console.log("TEST2 TIGGER WHEN USE BY ARB");
           isUseArb = true;
         } else {
           isUseArb = false;
         }
-
-        // let methodsName = "";
-        // if(inToken0Symbol == 'WETH' ||inToken0Symbol == 'ETH' ) methodsName = "swapETHForExactTokensByArb";
-        // else if(inToken1Symbol == 'ETH' ||inToken1Symbol == 'ETH') methodsName = "swapTokensForExactETHByArb";
-        // else methodsName = "swapTokensForExactTokensByArb";
-
-        // if(allPathAmountOut < ammOutput) {
-        //   isUseArb = true;
-        //   token1Amount = formatUnits(allPathAmountOut, inToken1Decimal);
-        //   maxAmountIn = allPathAmountOut * (1 + slippage/100);
-        //   maxAmountIn = minAmountOut.toString(16);
-        // } else {
-        //   isUseArb = false;
-        //   token1Amount = formatUnits(ammOutput, inToken1Decimal);
-        //   maxAmountIn = ammOutput * (1 + slippage/100);
-        //   maxAmountIn = maxAmountIn.toString(16);
-        // }
-
-        // setMethodName(methodsName);
-        // setToken0Amount(outputAmount);
-        // setMidTokenAddress(midTokenAddress);
-        // setIsUseArb(isUseArb);
-        // setMaxAmountIn(maxAmountIn);
-        // setSlippageAdjustedAmount(maxAmountIn);
       }
     }
     catch (e) {
-      console.log("TEST ERROR HERE:",e);
+      console.log("TEST ERROR HERE:", e);
       setSwapButtonState(false);
-      // setSwapButtonContent("Cannot find arbitrage path");
-      if(!poolExist) {
+      if (!poolExist) {
         return new CustomError('Pool does not exist!');
       }
     }
     // AMM
-    if(poolExist && !isUseArb) {
-      // if(exactIn) {
-      //   if(allPathAmountOut > ammOutput) {
-      //     isUseArb = true;
-      //   } else {
-      //     isUseArb = false;
-      //   }
-      // } else {
-      //   if(allPathAmountOut < ammOutput) {
-      //     isUseArb = true;
-      //   } else {
-      //     isUseArb = false;
-      //   }
-      // }
+    if (poolExist && !isUseArb) {
 
-      if(!isUseArb) {
-        console.log(pair);
-        setPair(pair);
-        console.log('------------------ CONSTRUCT ROUTE ------------------');
-        // This is where we let Uniswap SDK know we are not using WETH but ETHER
+      console.log(pair);
+      setPair(pair);
+      console.log('------------------ CONSTRUCT ROUTE ------------------');
+      // This is where we let Uniswap SDK know we are not using WETH but ETHER
 
-        const route = new Route([pair], token0IsETH ? ETHER : token0, token1IsETH ? ETHER : token1);
+      const route = new Route([pair], token0IsETH ? ETHER : token0, token1IsETH ? ETHER : token1);
 
-        console.log(route);
+      console.log(route);
 
-        setRoute(route);
-        
-        // console.log('estimated dependent amount');
-        // console.log(pair.priceOf(token0).quote(inputAmount).raw.toString());
-        // let dependentTokenAmount = pair.priceOf(token0).quote(new TokenAmount(token0, inputAmount.raw));
+      setRoute(route);
 
-        // let parsed =
-        //   token1 === ETHER ? CurrencyAmount.ether(dependentTokenAmount.raw) : dependentTokenAmount;
-        // console.log(parsed.toExact());
-
-        //===================================================================================
-
-        console.log('------------------ CONSTRUCT TRADE ------------------');
-        let trade;
-        try {
-          trade = new Trade(
-            route,
-            inputAmount,
-            exactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT,
-            chainId
-          );
-        } catch (e) {
-          if (e instanceof InsufficientReservesError) {
-            setSwapButtonState(false);
-            setSwapButtonContent('Insufficient liquidity for this trade');
-            console.log('Insufficient reserve!');
-            setBonus0(null);
-            setBonus1(null);
-            return new CustomError('Insufficient reserve!');
-          }
+      console.log('------------------ CONSTRUCT TRADE ------------------');
+      let trade;
+      try {
+        trade = new Trade(
+          route,
+          inputAmount,
+          exactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT,
+          chainId
+        );
+      } catch (e) {
+        if (e instanceof InsufficientReservesError) {
           setSwapButtonState(false);
-          setSwapButtonContent('Unhandled exception!');
-          console.log('Unhandled exception!');
-          console.log(e);
+          setSwapButtonContent('Insufficient liquidity for this trade');
+          console.log('Insufficient reserve!');
           setBonus0(null);
           setBonus1(null);
-          return new CustomError('Unhandled exception!');
+          return new CustomError('Insufficient reserve!');
         }
-
-        console.log(trade);
-        setTrade(trade);
-        console.log('------------------ SLIPPAGE CALCULATE ------------------');
-
-        // let slippageAdjustedAmount;
-        // let minAmountOut;
-        // let maxAmountIn;
-
-        // calculate slippage adjusted amount
-        if (exactIn) {
-          // console.log(trade.outputAmount.toExact());
-          // setToken1Amount(trade.outputAmount.toExact());
-          console.log(`By algorithm, expected to get: ${trade.outputAmount.toExact()}`);
-          // if provided exact token in, we want to know min out token amount
-          minAmountOut = trade.minimumAmountOut(allowedSlippage);
-          slippageAdjustedAmount = minAmountOut.raw.toString();
-
-          // update UI with estimated output token amount
-          setToken1Amount(trade.outputAmount.toFixed(4));
-          console.log(`Minimum received: ${slippageAdjustedAmount}`);
-        } else {
-          console.log(`By algorithm, expected to get: ${trade.inputAmount.toExact()}`);
-          maxAmountIn = trade.maximumAmountIn(allowedSlippage);
-          slippageAdjustedAmount = maxAmountIn.raw.toString();
-          setToken0Amount(trade.inputAmount.toFixed(4));
-          console.log(`Maximum pay: ${slippageAdjustedAmount}`);
-          // set token0Amount for later balance checking
-          token0Amount = trade.inputAmount.toExact();
-        }
-        
+        setSwapButtonState(false);
+        setSwapButtonContent('Unhandled exception!');
+        console.log('Unhandled exception!');
+        console.log(e);
         setBonus0(null);
         setBonus1(null);
+        return new CustomError('Unhandled exception!');
+      }
 
-        setSlippageAdjustedAmount(slippageAdjustedAmount);
-        setMinAmountOut(minAmountOut);
-        //setMinAmountOut(slippageAdjustedAmount);
-        setMaxAmountIn(maxAmountIn);
+      console.log(trade, trade.outputAmount.toExact());
+      setTrade(trade);
+      console.log('------------------ SLIPPAGE CALCULATE ------------------');
 
-        console.log('------------------ BREAKDOWN ------------------');
-        let { priceImpactWithoutFee, realizedLPFee } = computeTradePriceBreakdown(trade);
-        let breakdownInfo = [
-          // `Slice Slippage tolerance:` ${allowedSlippage} %`
-          // `Slippage tolerance : ${slippage}%`,
-          `Price impact : ${priceImpactWithoutFee.toFixed(2)}%`,
-          // `LP FEE : ${realizedLPFee?.toSignificant(6)} ${trade.inputAmount.currency.symbol}`,
-          `${exactIn ? 'Min received:' : 'Max sold'} : ${exactIn ? minAmountOut.toSignificant(4) : maxAmountIn.toSignificant(4)
-          } ${exactIn ? trade.outputAmount.currency.symbol : trade.inputAmount.currency.symbol}`,
-        ];
-        setSwapBreakdown(breakdownInfo);
-      }  
+      // calculate slippage adjusted amount
+      if (exactIn) {
+        console.log(`By algorithm, expected to get: ${trade.outputAmount.toExact()}`);
+        // if provided exact token in, we want to know min out token amount
+        minAmountOut = trade.minimumAmountOut(allowedSlippage);
+        slippageAdjustedAmount = minAmountOut.raw.toString();
+
+        // update UI with estimated output token amount
+        setToken1Amount(trade.outputAmount.toFixed(4));
+        console.log(`Minimum received: ${slippageAdjustedAmount}`);
+      } else {
+        console.log(`By algorithm, expected to get: ${trade.inputAmount.toExact()}`);
+        maxAmountIn = trade.maximumAmountIn(allowedSlippage);
+        slippageAdjustedAmount = maxAmountIn.raw.toString();
+        setToken0Amount(trade.inputAmount.toFixed(4));
+        console.log(`Maximum pay: ${slippageAdjustedAmount}`);
+        // set token0Amount for later balance checking
+        token0Amount = trade.inputAmount.toExact();
+      }
+
+      setBonus0(null);
+      setBonus1(null);
+
+      setSlippageAdjustedAmount(slippageAdjustedAmount);
+      setMinAmountOut(minAmountOut);
+      setMaxAmountIn(maxAmountIn);
+
+      console.log('------------------ BREAKDOWN ------------------');
+      let { priceImpactWithoutFee, realizedLPFee } = computeTradePriceBreakdown(trade);
+      let breakdownInfo = [
+        // `Slice Slippage tolerance:` ${allowedSlippage} %`
+        // `Slippage tolerance : ${slippage}%`,
+        `Price impact : ${priceImpactWithoutFee.toFixed(2)}%`,
+        // `LP FEE : ${realizedLPFee?.toSignificant(6)} ${trade.inputAmount.currency.symbol}`,
+        `${exactIn ? 'Min received:' : 'Max sold'} : ${exactIn ? minAmountOut.toSignificant(4) : maxAmountIn.toSignificant(4)
+        } ${exactIn ? trade.outputAmount.currency.symbol : trade.inputAmount.currency.symbol}`,
+      ];
+      setSwapBreakdown(breakdownInfo);
     }
     // FA, or fall back to AMM
     let bonus0 = null;
     let bonus1 = null;
-    if(!poolExist || isUseArb){
+    console.log(">1 pool exists? ", poolExist)
+    if (!poolExist || isUseArb) {
       setSwapButtonContent("Swap by arbitrage")
       if (exactIn) {
-        if(inToken0Symbol == wrappedCurrencySymbol ||inToken0Symbol == nativeCurrencySymbol ) methodsName = isUseArb?"swapExactETHForTokensByArb":"swapExactETHForTokens";
-        else if(inToken1Symbol == wrappedCurrencySymbol ||inToken1Symbol == nativeCurrencySymbol) methodsName = isUseArb?"swapExactTokensForETHByArb":"swapExactTokensForETH";
-        else methodsName = isUseArb?"swapExactTokensForTokensByArb":"swapExactTokensForTokens";
-        
-        if(allPathAmountOut > ammOutput) {
+        if (inToken0Symbol == wrappedCurrencySymbol || inToken0Symbol == nativeCurrencySymbol) methodsName = isUseArb ? "swapExactETHForTokensByArb" : "swapExactETHForTokens";
+        else if (inToken1Symbol == wrappedCurrencySymbol || inToken1Symbol == nativeCurrencySymbol) methodsName = isUseArb ? "swapExactTokensForETHByArb" : "swapExactTokensForETH";
+        else methodsName = isUseArb ? "swapExactTokensForTokensByArb" : "swapExactTokensForTokens";
+
+        if (allPathAmountOut > ammOutput) {
           // show basic AMM output in UI, with (FA-AMM)*40% as additional bonus
           // note that here trade.outputAmount is the same as formatUnits(ammOutput, inToken1Decimal)
           // console.log("test exact in, no arb: inputAmount, trade.output, FA, AMM", inputAmount.toExact(), trade.outputAmount.toExact(), formatUnits(allPathAmountOut, inToken1Decimal), formatUnits(ammOutput, inToken1Decimal))
@@ -620,19 +495,19 @@ export async function swapGetEstimated(
           const FAfloat = parseFloat(formatUnits(allPathAmountOut, inToken1Decimal));
           const AMMfloat = parseFloat(formatUnits(ammOutput, inToken1Decimal));
           bonus1 = ((FAfloat - AMMfloat) * 0.4);
-          console.log("test +bonus", bonus1)
-          
+          console.log("test bonus", bonus1)
+
 
           isUseArb = true;
-          token1Amount = formatUnits(ammOutput, inToken1Decimal);
-          minAmountOut = Math.ceil(allPathAmountOut * (1 - slippage/100));
+          token1Amount = formatUnits(allPathAmountOut, inToken1Decimal);
+          minAmountOut = Math.ceil(allPathAmountOut * (1 - slippage / 100));
           minAmountOut = `0x${minAmountOut.toString(16)}`;
           slippageAdjustedAmount = minAmountOut;
         } else {
           isUseArb = false;
           setBonus1(null);
           token1Amount = formatUnits(ammOutput, inToken1Decimal);
-          minAmountOut = Math.ceil(ammOutput * (1 - slippage/100));
+          minAmountOut = Math.ceil(ammOutput * (1 - slippage / 100));
           minAmountOut = `0x${minAmountOut.toString(16)}`;
           slippageAdjustedAmount = minAmountOut;
         }
@@ -643,30 +518,30 @@ export async function swapGetEstimated(
         setMinAmountOut(minAmountOut);
         setSlippageAdjustedAmount(minAmountOut);
       } else {
-        if(inToken0Symbol == wrappedCurrencySymbol || inToken0Symbol == nativeCurrencySymbol ) methodsName = isUseArb?"swapETHForExactTokensByArb":"swapETHForExactTokens";
-        else if(inToken1Symbol == wrappedCurrencySymbol || inToken1Symbol == nativeCurrencySymbol) methodsName = isUseArb?"swapTokensForExactETHByArb":"swapTokensForExactETH";
-        else methodsName = isUseArb?"swapTokensForExactTokensByArb":"swapTokensForExactTokens";
+        if (inToken0Symbol == wrappedCurrencySymbol || inToken0Symbol == nativeCurrencySymbol) methodsName = isUseArb ? "swapETHForExactTokensByArb" : "swapETHForExactTokens";
+        else if (inToken1Symbol == wrappedCurrencySymbol || inToken1Symbol == nativeCurrencySymbol) methodsName = isUseArb ? "swapTokensForExactETHByArb" : "swapTokensForExactETH";
+        else methodsName = isUseArb ? "swapTokensForExactTokensByArb" : "swapTokensForExactTokens";
 
         console.log("bonus FAout vs ammOutput", allPathAmountOut, ammOutput)
-        if(allPathAmountOut < ammOutput) {
+        if (allPathAmountOut < ammOutput) {
           // show basic AMM output in UI, with (FA-AMM)*40% as additional bonus
           // note that here trade.outputAmount is the same as formatUnits(ammOutput, inToken1Decimal)
 
           const FAfloat = parseFloat(formatUnits(allPathAmountOut, inToken1Decimal));
           const AMMfloat = parseFloat(formatUnits(ammOutput, inToken1Decimal));
           bonus0 = ((FAfloat - AMMfloat) * 0.4);
-          console.log("test -bonus, should be negative", bonus0)
+          console.log("test bonus, should be negative", bonus0)
 
           isUseArb = true;
-          token0Amount = formatUnits(ammOutput, inToken0Decimal);
-          maxAmountIn = Math.floor(allPathAmountOut * (1 + slippage/100));
+          token0Amount = formatUnits(allPathAmountOut, inToken0Decimal);
+          maxAmountIn = Math.floor(allPathAmountOut * (1 + slippage / 100));
           maxAmountIn = `0x${maxAmountIn.toString(16)}`;
           slippageAdjustedAmount = maxAmountIn;
         } else {
           isUseArb = false;
           setBonus0(null);
           token0Amount = formatUnits(ammOutput, inToken0Decimal);
-          maxAmountIn = Math.floor(ammOutput * (1 + slippage/100));
+          maxAmountIn = Math.floor(ammOutput * (1 + slippage / 100));
           maxAmountIn = `0x${maxAmountIn.toString(16)}`;
           slippageAdjustedAmount = maxAmountIn;
         }
@@ -756,12 +631,12 @@ export async function swapGetEstimated(
       console.log(`${nativeCurrencySymbol} does not need approve`)
       setNeedApprove(false);
     }
-    if(isUseArb) {
+    if (isUseArb) {
       setSwapButtonContent('Swap');
     } else {
       setSwapButtonContent('Swap');
     }
-    
+
     setSwapButtonState(true);
     return 'swap is ok';
   })();
@@ -818,7 +693,6 @@ export async function swap(
     allowedSlippage = new Percent(allowedSlippage, 10000);
 
     const contract = getRouterContract(library, account);
-    
 
     console.log(`token0Amount: ${inToken0Amount}`);
     console.log(`token1Amount: ${inToken1Amount}`);
@@ -905,128 +779,128 @@ export async function swap(
     deadline = deadline || 30;
     console.log("deadline", deadline);
     let date = new Date();
-    let expiredTime = Math.round(date/1000) + deadline * 60
+    let expiredTime = Math.round(date / 1000) + deadline * 60
     let finalMethodName, args, value, options = null;
     options = {};
-    if(!isUseArb) {
-      if(poolExist) {
+    if (!isUseArb) {
+      if (poolExist) {
         const param = Router.swapCallParameters(trade, {
           feeOnTransfer: false,
           allowedSlippage,
           recipient: account,
           ttl: deadline * 60,
         });
-        finalMethodName  = param.methodName;
+        finalMethodName = param.methodName;
         args = param.args;
         value = param.value;
         options = !value || isZero(value) ? {} : { value };
       } else {
         finalMethodName = methodName;
-        if(methodName == "swapExactETHForTokens") {
-          options = {value:parseUnits(inToken0Amount.toString(),inToken0Decimal).toHexString()};
+        if (methodName == "swapExactETHForTokens") {
+          options = { value: parseUnits(inToken0Amount.toString(), inToken0Decimal).toHexString() };
           args = [
-            minAmountOut, 
-            [inToken0Address, midTokenAddress, inToken1Address], 
-            account, 
+            minAmountOut,
+            [inToken0Address, midTokenAddress, inToken1Address],
+            account,
             `0x${expiredTime.toString(16)}`
           ]
-        } else if(methodName == "swapExactTokensForETH") {
+        } else if (methodName == "swapExactTokensForETH") {
           args = [
-            parseUnits(inToken0Amount.toString(),inToken0Decimal).toHexString(), 
-            minAmountOut, 
-            [inToken0Address, midTokenAddress, inToken1Address], 
-            account, 
+            parseUnits(inToken0Amount.toString(), inToken0Decimal).toHexString(),
+            minAmountOut,
+            [inToken0Address, midTokenAddress, inToken1Address],
+            account,
             `0x${expiredTime.toString(16)}`
           ]
-        } else if(methodName == "swapExactTokensForTokens") {
+        } else if (methodName == "swapExactTokensForTokens") {
           args = [
-            parseUnits(inToken0Amount.toString(),inToken0Decimal).toHexString(), 
-            minAmountOut, 
-            [inToken0Address, midTokenAddress, inToken1Address], 
-            account, 
+            parseUnits(inToken0Amount.toString(), inToken0Decimal).toHexString(),
+            minAmountOut,
+            [inToken0Address, midTokenAddress, inToken1Address],
+            account,
             `0x${expiredTime.toString(16)}`
           ]
-        } else if(methodName == "swapTokensForExactETH") {
+        } else if (methodName == "swapTokensForExactETH") {
           args = [
-            parseUnits(inToken1Amount.toString(),inToken1Decimal).toHexString(), 
-            maxAmountIn, 
-            [inToken0Address, midTokenAddress, inToken1Address], 
-            account, 
+            parseUnits(inToken1Amount.toString(), inToken1Decimal).toHexString(),
+            maxAmountIn,
+            [inToken0Address, midTokenAddress, inToken1Address],
+            account,
             `0x${expiredTime.toString(16)}`
           ]
-        } else if(methodName == "swapTokensForExactTokens") {
+        } else if (methodName == "swapTokensForExactTokens") {
           args = [
-            parseUnits(inToken1Amount.toString(),inToken1Decimal).toHexString(), 
-            maxAmountIn, 
-            [inToken0Address, midTokenAddress, inToken1Address], 
-            account, 
+            parseUnits(inToken1Amount.toString(), inToken1Decimal).toHexString(),
+            maxAmountIn,
+            [inToken0Address, midTokenAddress, inToken1Address],
+            account,
             `0x${expiredTime.toString(16)}`
           ]
-        } else if(methodName == "swapETHForExactTokens") {
-          options = {value:maxAmountIn};
+        } else if (methodName == "swapETHForExactTokens") {
+          options = { value: maxAmountIn };
           args = [
-            parseUnits(inToken1Amount.toString(),inToken1Decimal).toHexString(), 
-            [inToken0Address, midTokenAddress, inToken1Address], 
-            account, 
+            parseUnits(inToken1Amount.toString(), inToken1Decimal).toHexString(),
+            [inToken0Address, midTokenAddress, inToken1Address],
+            account,
             `0x${expiredTime.toString(16)}`
           ]
         }
       }
-      
+
     } else {
       finalMethodName = methodName;
-      if(methodName == "swapExactETHForTokensByArb") {
-        options = {value:parseUnits(inToken0Amount.toString(),inToken0Decimal).toHexString()};
+      if (methodName == "swapExactETHForTokensByArb") {
+        options = { value: parseUnits(inToken0Amount.toString(), inToken0Decimal).toHexString() };
         args = [
-          minAmountOut, 
-          [inToken0Address, inToken1Address], 
-          account, 
+          minAmountOut,
+          [inToken0Address, inToken1Address],
+          account,
           `0x${expiredTime.toString(16)}`
         ]
-      } else if(methodName == "swapExactTokensForETHByArb") {
+      } else if (methodName == "swapExactTokensForETHByArb") {
         args = [
-          parseUnits(inToken0Amount.toString(),inToken0Decimal).toHexString(), 
-          minAmountOut, 
-          [inToken0Address, inToken1Address], 
-          account, 
+          parseUnits(inToken0Amount.toString(), inToken0Decimal).toHexString(),
+          minAmountOut,
+          [inToken0Address, inToken1Address],
+          account,
           `0x${expiredTime.toString(16)}`
         ]
-      } else if(methodName == "swapExactTokensForTokensByArb") {
+      } else if (methodName == "swapExactTokensForTokensByArb") {
         args = [
-          parseUnits(inToken0Amount.toString(),inToken0Decimal).toHexString(), 
-          minAmountOut, 
-          [inToken0Address, inToken1Address], 
-          account, 
+          parseUnits(inToken0Amount.toString(), inToken0Decimal).toHexString(),
+          minAmountOut,
+          [inToken0Address, inToken1Address],
+          account,
           `0x${expiredTime.toString(16)}`
         ]
-      } else if(methodName == "swapTokensForExactETHByArb") {
+      } else if (methodName == "swapTokensForExactETHByArb") {
         args = [
-          parseUnits(inToken1Amount.toString(),inToken1Decimal).toHexString(), 
-          maxAmountIn, 
-          [inToken0Address, inToken1Address], 
-          account, 
+          parseUnits(inToken1Amount.toString(), inToken1Decimal).toHexString(),
+          maxAmountIn,
+          [inToken0Address, inToken1Address],
+          account,
           `0x${expiredTime.toString(16)}`
         ]
-      } else if(methodName == "swapTokensForExactTokensByArb") {
+      } else if (methodName == "swapTokensForExactTokensByArb") {
         args = [
-          parseUnits(inToken1Amount.toString(),inToken1Decimal).toHexString(), 
-          maxAmountIn, 
-          [inToken0Address, inToken1Address], 
-          account, 
+          parseUnits(inToken1Amount.toString(), inToken1Decimal).toHexString(),
+          maxAmountIn,
+          [inToken0Address, inToken1Address],
+          account,
           `0x${expiredTime.toString(16)}`
         ]
-      } else if(methodName == "swapETHForExactTokensByArb") {
-        options = {value:maxAmountIn};
+      } else if (methodName == "swapETHForExactTokensByArb") {
+        options = { value: maxAmountIn };
         args = [
-          parseUnits(inToken1Amount.toString(),inToken1Decimal).toHexString(), 
-          [inToken0Address, inToken1Address], 
-          account, 
+          parseUnits(inToken1Amount.toString(), inToken1Decimal).toHexString(),
+          [inToken0Address, inToken1Address],
+          account,
           `0x${expiredTime.toString(16)}`
         ]
       }
     }
-    
-    console.log("TEST call swap contract:",finalMethodName,args,options);
+
+    console.log("TEST call swap contract:", finalMethodName, args, options);
     console.log('------------------ ARGUMENTS ------------------');
     console.log(options);
     console.log(args);
@@ -1064,13 +938,13 @@ export async function swap(
     setSwapButtonContent("Please try again");
   } else {
     console.log("TEST status:");
-    if((status.error && status.error.code == 4001) || status.code == 4001) {
+    if ((status.error && status.error.code == 4001) || status.code == 4001) {
       setSwapButtonContent("Swap");
       setSwapButtonState(true);
-    }else if((status.error && status.error.code == -32603) || status.code == -32603) {
+    } else if ((status.error && status.error.code == -32603) || status.code == -32603) {
       console.log("error status -32603", status)
       let text = null;
-      if(exactIn) {
+      if (exactIn) {
         // "The actual output might be less than your acceptable slippage tolerance setting, please adjust slippage to continue!"
         text = "The amount of the output token is less than your slippage tolerance rate, please set more slippage tolerance if you want to continue!"
       } else {
@@ -1080,12 +954,12 @@ export async function swap(
       setSwapButtonContent("Please try again");
     } else {
 
-      
+
       console.log("this is swap data: ", status);
-      
+
       const scanUrlPrefix = SCAN_URL_PREFIX();
       const url = `${scanUrlPrefix}/tx/${status.hash}`;
-      
+
       setSwapStatus(
         <div>
           <a href={url} target="_blank" rel="noreferrer">
@@ -1093,12 +967,12 @@ export async function swap(
           </a>
         </div>
       );
-      
+
       try {
 
         swapCallback(status, inputToken0, inputToken1);
       } catch (err) {
-        console.log("error caught",  err)
+        console.log("error caught", err)
       }
 
       // Pass swap rate to backend
@@ -1108,29 +982,27 @@ export async function swap(
       var rate = (parseFloat(inToken0Amount) / parseFloat(inToken1Amount));
       var tempDate = new Date();
       var time = tempDate.getTime();
-      if(tempToken0 > tempToken1 ){
+      if (tempToken0 > tempToken1) {
         var temp = tempToken0;
         tempToken0 = tempToken1;
         tempToken1 = temp;
-        rate = 1/rate;
+        rate = 1 / rate;
       }
       console.log("rate", rate)
 
       const apiUrlPrefix = API_URL();
-      axios.post( 
+      axios.post(
         `${apiUrlPrefix}/chart/add?token0=${tempToken0}&token1=${tempToken1
         }&rate=${rate}&time=${time}`
-        // `http://localhost:3001/api/chart/add?token0=${tempToken0}&token1=${tempToken1
-        // }&rate=${rate}&time=${time}`
       )
-      .then(data => {
-        console.log(data);
-      })
-      .catch(e => {
-        console.log(e);
-      });
-      
-      
-    } 
+        .then(data => {
+          console.log(data);
+        })
+        .catch(e => {
+          console.log(e);
+        });
+
+
+    }
   }
 }
