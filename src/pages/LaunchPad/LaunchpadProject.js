@@ -131,7 +131,7 @@ const LaunchpadProject = () => {
           res['alreadySale'] = contextData['alreadySale'];
           res['salePercentage'] = contextData['salePercentage'];
           res['posterUrl'] = contextData['posterUrl']
-          res['tokenLogoUrl'] = contextData['tokenLogoUrl']
+          res['tokenLogoUrl'] = res.basicInfo.projectTokenUrl
 
           res['regStart'] = formatTime(res.scheduleInfo.regStart);
           res['regEnd'] = formatTime(res.scheduleInfo.regEnd);
