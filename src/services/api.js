@@ -127,8 +127,8 @@ export async function getFakeCaptcha(mobile) {
 }
 
 // TODO: move this part to constants
-// const urlPrefix = 'https://api.acy.finance/bsc-main';
-const urlPrefix = 'http://localhost:3001/bsc-main';
+const urlPrefix = 'https://api.acy.finance/bsc-main';
+// const urlPrefix = 'http://localhost:3001/bsc-main';
 
 export async function requireAllocation(network, walletId, projectToken) {
   return r.get(`${urlPrefix}/api/launch/allocation/require`, {
