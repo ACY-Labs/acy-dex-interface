@@ -74,7 +74,8 @@ const IncomingProjects = ({ data, openProject }) => {
                       sales={obj.totalSale.toString() + ' ' + obj.projectToken}
                       rate={'1 ' + obj.projectToken + ' = ' + obj.tokenPrice.toString() + ' USDT'}
                       title={obj.projectName}
-                      isUpcoming={true}
+                      isUpcoming
+                      tokenLogoUrl={obj.projectTokenUrl}
                       openProject={openProject}
                     />
                   </div>

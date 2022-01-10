@@ -58,6 +58,24 @@ export const METHOD_LIST = () => constantInstance.methodMap
 export const ACTION_LIST = () => constantInstance.actionMap
 export const TOKEN_LIST = () => constantInstance.tokenList
 
+export const ConstantLoader = (chainId=56) => {
+    const chainSupportedIndex = (supportedChainIds.indexOf(chainId) !== -1);
+    const fallbackChainId = chainSupportedIndex ? chainId : 56;    // redirect unsupported chainId and undefined to 56
+
+    const constants = {
+        'tokenList': TokenListSelector(fallbackChainId),
+        'methodMap': MethodActionSelector('method'),
+        'actionMap': MethodActionSelector('action'),
+        'scanUrlPrefix': ScanUrlSelector(fallbackChainId),
+        'scanAPIPrefix': ScanAPIUrlSelector(fallbackChainId),
+        'farmSetting': FarmSettingSelector(fallbackChainId),
+        'launchpadSetting': LaunchpadSettingSelector(fallbackChainId),
+        'sdkSetting': SDK_SETTING,
+        'gasTokenSymbol' : GAS_TOKEN_SYMBOL[fallbackChainId],
+    };
+
+    return constants;
+}
 
 // import constant to react component
 export const useConstantLoader = () => {
@@ -65,39 +83,19 @@ export const useConstantLoader = () => {
     const [constant, setConstant] = useState(constantInstance);
     
     useEffect(() => {
-        console.log("@/constant: current chain , account", chainId, account); 
-        console.log("do our site support this chain?", chainId, supportedChainIds.indexOf(chainId))
-        const chainSupported = (supportedChainIds.indexOf(chainId) != -1);
-        const fallbackChainId = chainSupported ? chainId : 56;    // redirect unsupported chainId and undefined to 56
+        const chainSupportedIndex = (supportedChainIds.indexOf(chainId) !== -1);
+        const fallbackChainId = chainSupportedIndex ? chainId : 56;    // redirect unsupported chainId and undefined to 56
 
-        // TODO (Gary): incorporate farmSetting and launchSetting
-        const currentConstant = {
-            'account': chainSupported ? account : undefined,
+        const staticConstants = ConstantLoader(fallbackChainId);
+        const constants = Object.assign({
+            'account': chainSupportedIndex ? account : undefined,
             'chainId': fallbackChainId,
-            'library': chainSupported ? library : defaultLibrary,
-            'tokenList': TokenListSelector(fallbackChainId),
-            'methodMap': MethodActionSelector('method'),
-            'actionMap': MethodActionSelector('action'),
-            'scanUrlPrefix': ScanUrlSelector(fallbackChainId),
-            'scanAPIPrefix': ScanAPIUrlSelector(fallbackChainId),
-            'farmSetting': FarmSettingSelector(fallbackChainId),
-            'launchpadSetting': LaunchpadSettingSelector(fallbackChainId),
-            'sdkSetting': SDK_SETTING,
-            'gasTokenSymbol' : GAS_TOKEN_SYMBOL[fallbackChainId]
-        }
+            'library': chainSupportedIndex ? library : defaultLibrary
+        }, staticConstants);
 
-        console.log("@/constant: current constant", chainId, currentConstant)
-        constantInstance = currentConstant;
-        setConstant(currentConstant);
+        constantInstance = constants;
+        setConstant(constants);
     }, [account, chainId]);
 
-    // useEffect(() => {
-    //     if (!chainId) return
-    //     if (chainId != params.chainId) {
-    //         console.log("redirecting to liquidity")
-    //         history.push(`/exchange/${chainId}`)
-    //     }
-    // }, [chainId])
-
-    return {...constant};
+    return constant;
 }
