@@ -42,7 +42,7 @@ const BscMainNetTokenList: Array<TokenInfo> = [
     idOnCoingecko: "tether",
   },
   {
-    name: 'Wrapped Binance',
+    name: 'Wrapped BNB',
     symbol: 'WBNB',
     address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
     decimals: 18,
@@ -70,6 +70,15 @@ const BscMainNetTokenList: Array<TokenInfo> = [
 
 const BscTestNetTokenList: Array<TokenInfo> = [
   {
+    name: 'Test Coin',
+    symbol: 'USDT',
+    address: '0xF82eEeC2C58199cb409788E5D5806727cf549F9f',
+    addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    decimals: 18,
+    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg',
+    idOnCoingecko: "usd-coin",
+  },
+  {
     name: 'Binance Coin',
     symbol: 'BNB',
     address: '0xae13d989dac2f0debff460ac112a837c89baa7cd',
@@ -88,7 +97,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     idOnCoingecko: "usd-coin",
   },
   {
-    name: 'Wrapped Binance',
+    name: 'Wrapped BNB',
     symbol: 'WBNB',
     address: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
@@ -313,6 +322,14 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     idOnCoingecko: "acy-finance",
   },
   {
+    name: 'NULS',
+    symbol: 'NULS',
+    address: '0x8b8e48a8cc52389cd16a162e5d8bd514fabf4ba0',
+    decimals: 8,
+    logoURI: 'https://cryptologos.cc/logos/nuls-nuls-logo.svg?v=018',
+    idOnCoingecko: "nuls",
+  },
+  {
     name: 'USD Coin',
     symbol: 'USDC',
     address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',//0xe9e7cea3dedca5984780bafc599bd69add087d56
@@ -321,7 +338,7 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     idOnCoingecko: "usd-coin",
   },
   {
-    name: 'WETH',
+    name: 'Wrapped ETH',
     symbol: 'WETH',
     address: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
     decimals: 18,
