@@ -133,17 +133,18 @@ const LaunchpadProject = () => {
           res['posterUrl'] = contextData['posterUrl']
           res['tokenLogoUrl'] = contextData['tokenLogoUrl']
 
-          res['regStart'] = formatTime(res.regStart);
-          res['regEnd'] = formatTime(res.regEnd);
-          res['saleStart'] = formatTime(res.saleStart);
-          res['saleEnd'] = formatTime(res.saleEnd);
+          res['regStart'] = formatTime(res.scheduleInfo.regStart);
+          res['regEnd'] = formatTime(res.scheduleInfo.regEnd);
+          res['saleStart'] = formatTime(res.scheduleInfo.saleStart);
+          res['saleEnd'] = formatTime(res.scheduleInfo.saleEnd);
 
-          res['totalSale'] = res.totalSale;
-          res['totalRaise'] = res.totalRaise;
-          res['projectUrl'] = res.projectUrl;
-          res['projectName'] = res.projectName;
+          res['totalSale'] = res.saleInfo.totalSale;
+          res['totalRaise'] = res.saleInfo.totalRaise;
+          res['projectUrl'] = res.saleInfo.projectUrl;
+          res['projectName'] = res.saleInfo.projectName;
+          res['projectToken'] = res.basicInfo.projectToken;
 
-          setPoolID(res.poolID);
+          setPoolID(res.basicInfo.poolID);
           setReceivedData(res);
         } else {
           console.log('redirect to list page');
