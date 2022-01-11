@@ -91,6 +91,7 @@
   line-height: 1.2;
   font-family: 'Karla', sans-serif;
   font-weight: 500;
+  margin-left: 0.2rem;
 }
 
 .tokenLabelBar {
@@ -547,7 +548,7 @@
   min-width: 0px;
   height: 45px;
   font-size: 16px;
-  padding: 0px 20px 0px 60px;
+  padding: 0px 0.5rem 0px 1rem;
 }
 
 .sales-input:hover {
@@ -562,8 +563,8 @@
 .token-logo{
   position: absolute;
   z-index: 2;
-  top: 8px;
-  left: 15px;
+  top: 5px;
+  margin-right: 2rem;
 }
 
 .token-image{
@@ -576,6 +577,7 @@
   right: 0;
   z-index: 1;
   display: flex;
+  flex-direction: row;
   align-items: center;
   top: 5px;
 }
@@ -591,6 +593,7 @@
   z-index: 1;
   top: 2px; 
   font-size: 12px;
+  margin-left: 1rem;
 }
 
 .sales-input-max-text {
@@ -704,6 +707,7 @@
 .social-container {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
 }
 
 #socialContainer {
@@ -712,8 +716,8 @@
 }
 
 .icon-container {
-  width: 30px;
-  height: 30px;
+  width: auto;
+  height: 1.6rem;
   cursor: pointer;
   padding: 0 5px;
 }

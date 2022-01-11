@@ -25,7 +25,7 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
         <div className="countdown-container">
           <div>{isOngoing || isUpcoming ? <CountDown ddl={start} /> : <CountDown ddl={null} />}</div>
           <div>
-            <p style={{ fontSize: '10px' }}>{saleString}</p>
+            <p style={{ fontSize:'12px', color:'#fff' }}>{saleString}</p>
           </div>
         </div>
       </div>
@@ -39,8 +39,8 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
             padding: '0 20px 0 10px',
           }}
         >
-          <span>Raise</span>
-          <span>{raise}</span>
+          <span style={{color:'#fff', marginLeft:'1rem'}}>Raise</span>
+          <span style={{color:'#fff', marginRight:'0.5rem'}}>{raise}</span>
         </div>
         <div
           style={{
@@ -50,8 +50,8 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
             padding: '0 20px 0 10px',
           }}
         >
-          <span>Sales</span>
-          <span>{sales}</span>
+          <span style={{color:'#fff', marginLeft:'1rem'}}>Sales</span>
+          <span style={{color:'#fff', marginRight:'0.5rem'}}>{sales}</span>
         </div>
         <div
           style={{
@@ -61,8 +61,8 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
             padding: '0 20px 0 10px',
           }}
         >
-          <span>Rate</span>
-          <span>{rate}</span>
+          <span style={{color:'#fff', marginLeft:'1rem'}}>Rate</span>
+          <span style={{color:'#fff', marginRight:'0.5rem'}}>{rate}</span>
         </div>
       </div>
     </div>

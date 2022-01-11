@@ -28,10 +28,12 @@ import youtubeIcon from '@/assets/icon_youtube.svg';
 import githubIcon from '@/assets/icon_github.svg';
 import twitterWIcon from '@/assets/icon_twitter_white.svg';
 import linkWIcon from '@/assets/icon_link_white.svg';
-import fileWIcon from '@/assets/icon_file_white.svg';
+import whitepaperIcon from '@/assets/icon_file_white.svg';
+import deckIcon from '@/assets/icon_ppt.svg';
+import tokenEconomicsIcon from '@/assets/icon_googlesheets.svg';
 import paycerBanner from '@/assets/paycer_banner.svg';
 import PaycerIcon from '@/assets/icon_paycer_logo.svg';
-import announcementFIcon from '@/assets/icon_announcement_fill.svg';
+import {findTokenWithSymbol} from '@/utils/txData';
 import $ from 'jquery';
 import { getContract } from "../../acy-dex-swap/utils/index.js"
 import { useWeb3React } from '@web3-react/core';
@@ -46,6 +48,7 @@ const LaunchpadProject = () => {
   const { account, chainId, library, activate, active } = useWeb3React();
   const { projectId } = useParams();
   const [receivedData, setReceivedData] = useState({});
+  const [mainCoinLogoURI, setMainCoinLogoURI] = useState(null);
   const [poolID, setPoolID] = useState(null);
   const [poolBaseData, setPoolBaseData] = useState(null);
   const [poolDistributionDate, setDistributionDate] = useState([]);
@@ -81,16 +84,18 @@ const LaunchpadProject = () => {
   // CONSTANTS
   const InputGroup = Input.Group;
   const logoObj = {
-    "telegram": telegramWIcon,
-    "twitter": twitterWIcon,
-    "website": linkWIcon,
-    "whitepaper": fileWIcon,
-    "linkedin": linkedinIcon,
-    "medium": mediumIcon,
-    "youtube": youtubeIcon,
-    "github": githubIcon,
-    "etheraddress": etherIcon,
-    "polyaddress": polyIcon,
+    "Telegram": telegramWIcon,
+    "Twitter": twitterWIcon,
+    "Website": linkWIcon,
+    "Whitepaper": whitepaperIcon,
+    "Deck": deckIcon,
+    "Linkedin": linkedinIcon,
+    "Medium": mediumIcon,
+    "TokenEconomics": tokenEconomicsIcon,
+    "Youtube": youtubeIcon,
+    "Github": githubIcon,
+    "Etheraddress": etherIcon,
+    "Polyaddress": polyIcon,
   }
   const PoolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, library, account);
 
@@ -118,6 +123,8 @@ const LaunchpadProject = () => {
     return res
   }
 
+  const _token0symbol = "BNB"
+
   // HOOKS
   useEffect(() => {
     getProjectInfo(API_URL(), projectId)
@@ -141,9 +148,14 @@ const LaunchpadProject = () => {
           res['totalSale'] = res.saleInfo.totalSale;
           res['totalRaise'] = res.saleInfo.totalRaise;
           res['projectUrl'] = res.saleInfo.projectUrl;
-          res['projectName'] = res.saleInfo.projectName;
+          res['projectName'] = res.basicInfo.projectName;
           res['projectToken'] = res.basicInfo.projectToken;
+          res['mainCoinSymbol'] = res.basicInfo.mainCoin;
 
+          const resmainCoin = findTokenWithSymbol(res.basicInfo.mainCoin)
+          const resmainCoinURI =  resmainCoin.logoURI
+
+          setMainCoinLogoURI(resmainCoinURI)
           setPoolID(res.basicInfo.poolID);
           setReceivedData(res);
         } else {
@@ -339,7 +351,7 @@ const LaunchpadProject = () => {
             </div>
             
               <div>
-                <p>Sale</p>
+                <p>Sale (FCFS)</p>
                 
                 {poolBaseData &&
                   <div>
@@ -458,28 +470,29 @@ const LaunchpadProject = () => {
         <div style={{ display: 'block' }}>
           <div className='projecttitle-socials-container'>
             <h3 className='projecttitle'>Project Description</h3>
-            <div className=''>
+          </div>
+          
+          <span className="lineSeperator" />
+          <div className="projectDescription">
+            <div className='socialmedia-container'>
               {receivedData.social && receivedData.social[0] &&
                 <div id='social container' className='social-container'>
                   { Object.entries(receivedData.social[0]).map((item)=>{
                     if(item[1] !== null ){
                       console.log(item)
                       return (
-                      <SocialMedia url={logoObj[item[0]]} link={item[1]} />)
+                      <SocialMedia url={logoObj[item[0]]} link={item[1]} socialText={item[0]} />)
                     }
                   })}
                 </div>}
-              
             </div>
-          </div>
-          
-          <span className="lineSeperator" />
-          <div className="projectDescription">
-            {receivedData.projectDescription && <p>{receivedData.projectDescription[0]}</p>}
-            {receivedData.projectDescription &&
-              receivedData.projectDescription
-                .slice(1)
-                .map(desc => <p style={{ paddingTop: '2rem' }}>{desc}</p>)}
+            <div style={{padding:'2.5em 0 0 0'}}>
+              {receivedData.projectDescription && <p>{receivedData.projectDescription[0]}</p>}
+              {receivedData.projectDescription &&
+                receivedData.projectDescription
+                  .slice(1)
+                  .map(desc => <p style={{ paddingTop: '2rem' }}>{desc}</p>)}
+            </div>
           </div>
         </div>
       </div>
@@ -845,13 +858,12 @@ const LaunchpadProject = () => {
             </label>
             <div className="sales-input-container">
                 <InputGroup>
-                  <div className="token-logo">
-                    <img src={tokenLogoUrl? tokenLogoUrl:receivedData.tokenLogoUrl} alt="token-logo" className="token-image"/>
-                  </div>
                   <Input className="sales-input" defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
                   <div className="unit-max-group">
-                    <div className='unit'>{poolMainCoinName}</div>
-                    <Button className="max-btn" onClick={maxClick}>MAX</Button>
+                    <div className="token-logo">
+                      <img src={tokenLogoUrl? tokenLogoUrl:mainCoinLogoURI} alt="token-logo" className="token-image" />
+                    </div>
+                    { isClickedMax ? <span style={{alignSelf:'center', top:'5px'}}>{receivedData.mainCoinSymbol}</span> : <Button className="max-btn" onClick={maxClick}>MAX</Button> }
                   </div>
               </InputGroup>
             </div>
@@ -938,7 +950,7 @@ const LaunchpadProject = () => {
             />
           </div>
           <ProjectDescription />
-          <ChartCard className="launchpad-chart" /> 
+          { !comparesaleDate ? <ChartCard className="launchpad-chart" /> : "" }
         </div>
       </div>
     );
