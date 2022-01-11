@@ -11,7 +11,7 @@ import {
   binance,
   injected,
 } from '@/connectors';
-import {useConstantLoader} from '@/constants';
+import { useConstantLoader } from '@/constants';
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
   const handleInputChange = (e) => {
@@ -47,7 +47,7 @@ const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
 
 // FIXME: use state machine to rewrite the logic (needApprove, approving, removeLiquidity, processing, done).
 const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCancel, ...props }) => {
-  const { account, chainId, library, farmSetting: {API_URL: apiUrlPrefix}, farmSetting: {INITIAL_ALLOWED_SLIPPAGE} } = useConstantLoader()
+  const { account, chainId, library, farmSetting: { API_URL: apiUrlPrefix }, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader()
   const [token0, setToken0] = useState(null);
   const [token1, setToken1] = useState(null);
   const [token0Amount, setToken0Amount] = useState('0');
@@ -189,9 +189,17 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
     setRemoveStatus();
     setSignatureData(null);
     setRemoveOK(false);
+
+    // refresh the table
+    const { dispatch } = props;
+    setTimeout(() =>
+      dispatch({
+        type: "liquidity/setRefreshTable",
+        payload: true,
+      }), 1000);
   }
 
-  const removeLiquidityCallback = (status, percent) => {
+  const removeLiquidityCallback = async (status, percent) => {
     console.log("test status:", status);
     const { dispatch, transaction: { transactions } } = props;
     // const transactions = props.transaction.transactions;
@@ -207,69 +215,53 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
     //   })
     // }
 
-    // timeout loop
-    const checkStatusAndFinish = async () => {
-      await library.getTransactionReceipt(status.hash).then(async receipt => {
-        console.log("receipt ", receipt);
-
-        if (!receipt) {
-          setTimeout(checkStatusAndFinish, 500);
-        } else {
-          if (!receipt.status) {
-            setButtonContent("Failed");
-          } else {
-            
-            let transactionTime;
-            await library.getBlock(receipt.logs[0].blockNumber).then(res => {
-              transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
-              console.log("test transactionTime: ", transactionTime)
-            });
-  
-            // remove pair if user has totally withdrawn from pool
-            if (percent === 100) {
-              axios.post(
-                // fetch valid pool list from remote
-                `${apiUrlPrefix}/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
-                // `http://localhost:3001/api/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}`
-              ).then(res => {
-                console.log("remove to server return: ", res);
-  
-                // refresh the table
-                dispatch({
-                  type: "liquidity/setRefreshTable",
-                  payload: true,
-                });
-  
-              }).catch(e => console.log("error: ", e));
-            }
-            
-            // refresh the table
-            dispatch({
-              type: "liquidity/setRefreshTable",
-              payload: true,
-            });
-            
-            // disable button after each transaction on default, enable it after re-entering amount to add
-            setButtonStatus(true);
-            setButtonContent("Done");
-            
-            // store to localStorage
-          }
-          
-          // clear top right loading spin
-          const newData = transactions.filter(item => item.hash != status.hash);
-          dispatch({
-            type: "transaction/addTransaction",
-            payload: {
-              transactions: newData
-            }
-          });
-          
+    // remove pair if user has totally withdrawn from pool
+    let requestRes;
+    if (percent === 100) {
+      requestRes = await axios.post(
+        // fetch valid pool list from remote
+        `${apiUrlPrefix}/pool/update?walletId=${account}&action=remove&token0=${token0.address}&token1=${token1.address}&txHash=${status.hash}`
+      ).then(res => {
+        console.log("remove to server return: ", res);
+        return res.data;
+      }).catch(e => console.log("error: ", e));
+    } else {
+      let tryCount = 0;
+      let receipt;
+      while (!receipt) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        receipt = await library.getTransactionReceipt(status.hash);
+        console.log("receipt", receipt);
+        if (receipt) {
+          requestRes = receipt.status;
+          break;
         }
-      })
-    };
-    // const sti = setInterval(, 500);
-    checkStatusAndFinish();
+
+        tryCount++;
+        if (tryCount > 60) 
+          requestRes = -1;
+      }
+    }
+
+    // clear top right loading spin
+    const newData = transactions.filter(item => item.hash != status.hash);
+    dispatch({
+      type: "transaction/addTransaction",
+      payload: {
+        transactions: newData
+      }
+    });
+    
+    if (requestRes == -1) {
+      setButtonStatus(false);
+      setButtonContent("Failed");
+    } else {
+      // disable button after each transaction on default, enable it after re-entering amount to add
+      setButtonStatus(true);
+      setButtonContent("Done");
+    }
+
+    // store to localStorage
   }
 
   return (
