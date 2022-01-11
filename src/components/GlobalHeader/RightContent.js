@@ -200,9 +200,13 @@ const GlobalHeaderRight = props => {
     }
     checkChainNetwork(chainId);
     // 监听钱包网络变化 metamask
-    ethereum.on('networkChanged', function (chainId) {
-      checkChainNetwork(chainId);
-    })
+    try {
+      ethereum.on('networkChanged', function (chainId) {
+        checkChainNetwork(chainId);
+      }) 
+    } catch (error) {
+      console.log("no metamask plugin");
+    }
     // Nabox 监听
     try {
       window.NaboxWallet.on('networkChanged', function (chainId) {
@@ -488,6 +492,7 @@ const GlobalHeaderRight = props => {
 
   return (
     <div className={className}>
+      <Button onClick={deactivateTest}>disconnected</Button>
       <Dropdown
         overlay={networkListInCardList}
         trigger={['click']}
