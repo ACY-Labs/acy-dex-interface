@@ -55,6 +55,7 @@ const EndedProjects = ({ data, openProject }) => {
                   sales={obj.totalSale.toString() + ' ' + obj.projectToken}
                   rate={'1 ' + obj.projectToken + ' = ' + obj.tokenPrice.toString() + ' USDT'}
                   title={obj.projectName}
+                  tokenLogoUrl={obj.projectTokenUrl}
                   isEnded={true}
                 />
               </div>

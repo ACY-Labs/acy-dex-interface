@@ -132,20 +132,21 @@ const LaunchpadProject = () => {
           res['projectDescription'] = contextData['projectDescription'];
           res['alreadySale'] = contextData['alreadySale'];
           res['salePercentage'] = contextData['salePercentage'];
-          res['posterUrl'] = contextData['posterUrl']
-          res['tokenLogoUrl'] = contextData['tokenLogoUrl']
+          res['posterUrl'] = contextData['posterUrl'];
+          res['tokenLogoUrl'] = res.basicInfo.projectTokenUrl;
 
-          res['regStart'] = formatTime(res.regStart);
-          res['regEnd'] = formatTime(res.regEnd);
-          res['saleStart'] = formatTime(res.saleStart);
-          res['saleEnd'] = formatTime(res.saleEnd);
+          res['regStart'] = formatTime(res.scheduleInfo.regStart);
+          res['regEnd'] = formatTime(res.scheduleInfo.regEnd);
+          res['saleStart'] = formatTime(res.scheduleInfo.saleStart);
+          res['saleEnd'] = formatTime(res.scheduleInfo.saleEnd);
 
-          res['totalSale'] = res.totalSale;
-          res['totalRaise'] = res.totalRaise;
-          res['projectUrl'] = res.projectUrl;
-          res['projectName'] = res.projectName;
+          res['totalSale'] = res.saleInfo.totalSale;
+          res['totalRaise'] = res.saleInfo.totalRaise;
+          res['projectUrl'] = res.saleInfo.projectUrl;
+          res['projectName'] = res.basicInfo.projectName;
+          res['projectToken'] = res.basicInfo.projectToken;
 
-          setPoolID(res.poolID);
+          setPoolID(res.basicInfo.poolID);
           setReceivedData(res);
         } else {
           console.log('redirect to list page');

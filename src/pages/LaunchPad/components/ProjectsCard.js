@@ -23,7 +23,7 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
       <div className="logo-countdown-container">
         <div className="logo-container">
           <div className="logo">
-            <img src={projectID === 1 ? PaycerIcon : AcyIcon} alt="" />
+            <img src={tokenLogoUrl} alt="" />
           </div>
           <div className="logo-text">{title}</div>
         </div>
