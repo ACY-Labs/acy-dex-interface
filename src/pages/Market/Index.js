@@ -1,5 +1,5 @@
 import { AcyBarChart, AcyLineChart } from '@/components/Acy';
-import { Col, Icon, Row } from 'antd';
+import { Col, Icon, Row, Button } from 'antd';
 import React, { Component, useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useWeb3React } from '@web3-react/core';
@@ -126,6 +126,7 @@ const MarketIndex = props => {
     <div className={styles.marketRoot}>
       <ConnectWallet/>
       <MarketSearchBar
+        className={styles.searchBar}
         dataSourceCoin={dataSourceCoin}
         dataSourcePool={dataSourcePool}
         account={account}

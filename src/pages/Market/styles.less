@@ -514,12 +514,14 @@ h4 {
   .marketNavbarMenu {
     width: 100%;
     margin-bottom: 10px;
+    //border:1px solid #00f;
   }
 
   .marketNavbarRight {
-    width: 100%;
+    width: 70%;
     flex-direction: column;
     align-items: flex-start;
+    //border:1px solid #00f;
   }
 
   .marketDropdownWrapper {
@@ -579,4 +581,69 @@ h4 {
   .exchangeValueCard:nth-child(1) {
     width: 100%;
   }
+}
+
+// network handle css
+.networkHandle{
+  background:#2e3032;
+  color: #ffffff;
+  display: inline-block;
+  padding:5 10px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 5px;
+  line-height: 30px;
+  width: 180px;
+  vertical-align: middle;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  position:relative;
+}
+.networkHandleFont{
+  display: inline-block;
+  position:absolute;
+  right: 5%;
+  top: 30%;
+}
+.networkListLayout{
+  width: 90%;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  margin: 2px auto;
+  margin-bottom: 8px;
+  margin-top: -5px;
+  font-size: 14px;
+  padding: 1px;
+  //border:1px solid black;
+  background: #1b1b1b;
+  border-radius: 5px;
+  font-weight: bold;
+  &:hover{
+    border:1px solid #e29227;
+    border-radius: 5px;
+    transform: all 0.2;
+    cursor: pointer;
+  }
+}
+.networkListBlock{
+  background: black;
+  //width: 50%;
+  width: 180px;
+  border-radius: 10px;
+  padding: 10px
+}
+.networkTitle {
+  font-size: 12px;
+  //font-weight: bold;
+  color: #b5b5b6;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  margin-left: 1px;
+  margin-top: -5px;
+  margin-bottom: 2px;
 }
