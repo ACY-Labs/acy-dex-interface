@@ -492,7 +492,7 @@ const GlobalHeaderRight = props => {
 
   return (
     <div className={className}>
-      <Button onClick={deactivateTest}>disconnected</Button>
+      {/* <Button onClick={deactivateTest}>disconnected</Button> */}
       <Dropdown
         overlay={networkListInCardList}
         trigger={['click']}

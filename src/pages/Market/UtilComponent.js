@@ -1108,7 +1108,6 @@ export const MarketSearchBar = props => {
   const rootRef = React.useRef();
 
   // 网络列表
-  //ymj
   const [networkListIndex, setNetworkListIndex] = useState(0);
   const networkList = [
     {
@@ -1356,7 +1355,6 @@ export const MarketSearchBar = props => {
               <AcyIcon.MyIcon type={item.icon} /> {item.name} Network<DownOutlined className={styles.networkHandleFont}/> </div>
           ))}
         </div>
-        {/* <Button className={styles.networkHandle}>ymj</Button> */}
       </Dropdown>
       </div>
     </div>
