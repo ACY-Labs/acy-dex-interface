@@ -130,12 +130,13 @@ const BasicProfile = (props) => {
       <div className={loggedIn ? styles.main : styles.main_notLoggedIn}>
         <div className={styles.rowFlexContainer} >
           {loggedIn &&
-            <div style={{ flex: 2 }}>
+            <div className={`${styles.colItem} ${styles.leftComponent}`}>
               <AcyLiquidityPositions />
               {/* <div>Table hidden for now, waiting for dedicated database for BSC data to avoid error on this page.</div> */}
             </div>
           }
-          <div style={{ flex: 1, width: "50vw", minWidth: loggedIn ? null : "340px", maxWidth: loggedIn ? null : "420px" }}>
+          {/* <div style={{ flex: 1, width: "50vw", minWidth: loggedIn ? null : "340px", maxWidth: loggedIn ? null : "420px" }}> */}
+          <div className={`${styles.colItem} ${styles.rightComponent}`}>
             <AddComponent onLoggedIn={onLoggedIn} onGetReceipt={onGetReceipt} />
           </div>
         </div>
