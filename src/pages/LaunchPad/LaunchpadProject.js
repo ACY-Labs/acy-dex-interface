@@ -860,14 +860,14 @@ const LaunchpadProject = () => {
               Sale
             </label>
             <div className="sales-input-container">
-                <InputGroup>
-                  <Input className="sales-input" defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
-                  <div className="unit-max-group">
-                    <div className="token-logo">
-                      <img src={tokenLogoUrl? tokenLogoUrl:mainCoinLogoURI} alt="token-logo" className="token-image" />
-                    </div>
-                    { isClickedMax ? <span style={{alignSelf:'center', top:'5px'}}>{receivedData.mainCoinSymbol}</span> : <Button className="max-btn" onClick={maxClick}>MAX</Button> }
+              <InputGroup>
+                <Input className="sales-input" defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
+                <div className="unit-max-group">
+                  <div className="token-logo">
+                    <img src={tokenLogoUrl ? tokenLogoUrl:mainCoinLogoURI} alt="token-logo" className="token-image" />
                   </div>
+                  { isClickedMax ? <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginLeft:'2rem'}}>{receivedData.mainCoinSymbol}</div> : <Button className="max-btn" onClick={maxClick}>MAX</Button> }
+                </div>
               </InputGroup>
             </div>
             <Button 
