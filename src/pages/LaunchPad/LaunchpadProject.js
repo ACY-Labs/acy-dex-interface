@@ -127,18 +127,20 @@ const LaunchpadProject = () => {
 
   // HOOKS
   useEffect(() => {
+    console.log("checkUrl",API_URL)
     getProjectInfo(API_URL(), projectId)
       .then(res => {
         if (res) {
           // extract data from string
+          console.log("fecthing project info ------------111",res.contextData)
           const contextData = JSON.parse(res.contextData);
 
           res['tokenLabels'] = contextData['tokenLabels'];
           res['projectDescription'] = contextData['projectDescription'];
           res['alreadySale'] = contextData['alreadySale'];
           res['salePercentage'] = contextData['salePercentage'];
-          res['posterUrl'] = contextData['posterUrl']
-          res['tokenLogoUrl'] = res.basicInfo.projectTokenUrl
+          res['posterUrl'] = contextData['posterUrl'];
+          res['tokenLogoUrl'] = res.basicInfo.projectTokenUrl;
 
           res['regStart'] = formatTime(res.scheduleInfo.regStart);
           res['regEnd'] = formatTime(res.scheduleInfo.regEnd);
@@ -164,7 +166,8 @@ const LaunchpadProject = () => {
         }
       })
       .catch(e => {
-        console.error(e);
+        console.log("Project Detail check errrrrrrrrrrr",e);
+        // console.error(e);
         history.push('/launchpad');
       });
   }, []);

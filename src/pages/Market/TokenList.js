@@ -56,7 +56,6 @@ function MarketTokenList(props) {
 
   return (
     <div className={styles.marketRoot}>
-      <ConnectWallet/>
       <MarketSearchBar
         dataSourceCoin={dataSourceCoin}
         dataSourcePool={dataSourcePool}

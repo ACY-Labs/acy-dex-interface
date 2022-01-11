@@ -24,7 +24,7 @@ import {
 } from '@/components/Acy';
 import TokenSelectorModal from "@/components/TokenSelectorModal";
 
-import {useConstantLoader} from '@/constants';
+import { useConstantLoader } from '@/constants';
 
 //^mark
 import { connect } from 'umi';
@@ -87,7 +87,7 @@ const { AcyTabPane } = AcyTabs;
 
 const AddLiquidityComponent = props => {
 
-  const { account, chainId, library, tokenList: INITIAL_TOKEN_LIST, farmSetting: {API_URL: apiUrlPrefix, INITIAL_ALLOWED_SLIPPAGE}} = useConstantLoader();
+  const { account, chainId, library, tokenList: INITIAL_TOKEN_LIST, farmSetting: { API_URL: apiUrlPrefix, INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader();
 
   const { dispatch, token, onLoggedIn, isFarm = false } = props;
   // 选择货币的弹窗
@@ -370,21 +370,41 @@ const AddLiquidityComponent = props => {
 
   useEffect(
     () => {
+      
       if (!account || !chainId || !library) return;
-      console.log('get balances in liquidity');
+      console.log('get balances in liquidity', token0, token1);
       const _token0 = INITIAL_TOKEN_LIST[0];
       const _token1 = INITIAL_TOKEN_LIST[1];
       setToken0(_token0);
       setToken1(_token1);
       setTokenList(INITIAL_TOKEN_LIST)
 
-      async function getTokenBalances() {
+      async function getTokenBalances(_token0, _token1) {
         setToken0BalanceShow(true);
         setToken1BalanceShow(true);
         setToken0Balance(await getUserTokenBalance(_token0, chainId, account, library).catch(e => console.log("useEffect getUserTokenBalance error", e)));
         setToken1Balance(await getUserTokenBalance(_token1, chainId, account, library).catch(e => console.log("useEffect getUserTokenBalance error", e)));
       }
-      getTokenBalances();
+      if(!isFarm) {
+        getTokenBalances(_token0, _token1);
+      }
+      //for farm 
+      if(isFarm) {
+        let token0pass = INITIAL_TOKEN_LIST[0];
+        let token1pass = INITIAL_TOKEN_LIST[1];
+        for (var i = 0; i < INITIAL_TOKEN_LIST.length; i++) {
+          if (INITIAL_TOKEN_LIST[i].symbol == token?.token1) {
+            token0pass = INITIAL_TOKEN_LIST[i];
+          }
+          if (INITIAL_TOKEN_LIST[i].symbol == token?.token2) {
+            token1pass = INITIAL_TOKEN_LIST[i];
+          }
+        }
+        console.log("TEST HERE token:",token0pass,token1pass);
+        setToken0(token0pass);
+        setToken1(token1pass);
+        getTokenBalances(token0pass, token1pass);
+      }
     },
     [account, chainId, library]
   );
@@ -450,56 +470,45 @@ const AddLiquidityComponent = props => {
       // localStorage.setItem("transactions", JSON.stringify(pastTransaction));
 
       console.log("test test see how many times setInterval is called");
-      const checkStatusAndFinish = async () => {
-        await library.getTransactionReceipt(status.hash).then(async receipt => {
-          console.log("receipt ", receipt);
 
-          if (!receipt) {
-            setTimeout(checkStatusAndFinish, 500);
-          } else {
-            if (!receipt.status) {
-              setButtonContent("Failed");
-            } else {
-              // update backend userPool record
-              console.log("test pair to add on server", pairToAddOnServer);
-              props.onGetReceipt(receipt.transactionHash);
-              if (pairToAddOnServer) {
-                const { token0, token1 } = pairToAddOnServer;
-                axios.post(
-                  // fetch valid pool list from remote
-                  `${apiUrlPrefix}/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
-                  // `http://localhost:3001/api/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}`
-                ).then(res => {
-                  console.log("add to server return: ", res);
-  
-                  // refresh the table
-                  dispatch({
-                    type: "liquidity/setRefreshTable",
-                    payload: true,
-                  });
-  
-                }).catch(e => console.log("error: ", e));
-              }
-              
-              // disable button after each transaction on default, enable it after re-entering amount to add
-              console.log(buttonContent);
-              setButtonContent("Done");
-            }
+      // update backend userPool record
+      console.log("test pair to add on server", pairToAddOnServer);
+      if (pairToAddOnServer) {
+        const { token0, token1 } = pairToAddOnServer;
+        axios.post(
+          // fetch valid pool list from remote
+          `${apiUrlPrefix}/pool/update?walletId=${account}&action=add&token0=${token0}&token1=${token1}&txHash=${status.hash}`
+        ).then(res => {
+          console.log("add to server return: ", res);
 
-            // clear top right loading spin
-            const newData = transactions.filter(item => item.hash != status.hash);
-
+          // refresh the table
+          setTimeout(() =>
             dispatch({
-              type: "transaction/addTransaction",
-              payload: {
-                transactions: newData
-              }
-            });
+              type: "liquidity/setRefreshTable",
+              payload: true,
+            }), 1000);
+
+          // update top right spinner loading spin
+          const newData = transactions.filter(item => item.hash != status.hash);
+          dispatch({
+            type: "transaction/addTransaction",
+            payload: {
+              transactions: newData
+            }
+          });
+
+          // update button content
+          if (res.data == -1) {
+            setButtonContent("Failed");
+          } else {
+            // disable button after each transaction on default, enable it after re-entering amount to add
+            setButtonContent("Done");
           }
-        })
-      };
-      // const sti = setInterval(, 500);
-      checkStatusAndFinish();
+
+        }).catch(e => console.log("error: ", e));
+
+      }
+
     } catch (e) {
       console.log("swap callback error", e)
     }

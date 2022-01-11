@@ -9,7 +9,7 @@ const ConnectWallet = () => {
     useEffect(() => {
         if(!account){
             //activate(binance);
-            activate(injected);   
+            //activate(injected);   
         }
     },[])
     return null // component does not render anything

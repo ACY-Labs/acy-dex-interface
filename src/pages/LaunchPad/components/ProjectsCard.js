@@ -14,7 +14,12 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
   };
 
   return (
-    <div className="projects-card projects-container" onClick={(e) => isOngoing ? onOpenProjectDetail(projectID) : e.preventDefault()}>
+    <div className="projects-card projects-container" 
+    onClick={(e) => isOngoing || isUpcoming ? onOpenProjectDetail(projectID) : e.preventDefault()}
+    
+    
+    
+    >
       <div className="logo-countdown-container">
         <div className="logo-container">
           <div className="logo">
@@ -23,7 +28,12 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
           <div className="logo-text">{title}</div>
         </div>
         <div className="countdown-container">
-          <div>{isOngoing || isUpcoming ? <CountDown ddl={start} /> : <CountDown ddl={null} />}</div>
+          <div>
+          {/* {isOngoing || isUpcoming ?<CountDown ddl={start} /> : <CountDown ddl={null} /> } */}
+          {           <CountDown ddl={start} />
+}
+           </div>
+
           <div>
             <p style={{ fontSize:'12px', color:'#fff' }}>{saleString}</p>
           </div>

@@ -21,7 +21,9 @@ const AcyConnectWallet = props => {
   const [userBalance, setUserBalance] = useState('0');
   const [tokenBalanceDict, setTokenBalanceDict] = useState({});
   const [tokenPriceDict, setTokenPriceDict] = useState({});
+  const [balanceTitleShow, setBalanceTitleShow] = useState('inline-block');
   const [balanceShow, setBalanceShow] = useState('none');
+
 
   console.log("web3 and constant chainId", walletChainId, fallbackChainId)
 
@@ -99,12 +101,15 @@ const AcyConnectWallet = props => {
     return chainName
   }, [displayedChainId])
 
-  const ymjTest = async()=>{
-    console.log("ymj 123");
+  const balanceHandle = async()=>{
     if (balanceShow == 'none'){
-      setBalanceShow('inline-block')
+      setBalanceShow('inline-block');
+      setBalanceTitleShow('none');
     }
-    else setBalanceShow('none')
+    else {
+      setBalanceShow('none');
+      setBalanceTitleShow('inline-block');
+    }
     //return false;
   }
 
@@ -129,9 +134,11 @@ const AcyConnectWallet = props => {
         <div className={styles.wrap}>
           {/* {chainName} ( {displayedChainId || 'disconnected'} ) */} 
           <Tooltip placement='bottomLeft' color={'#b5b5b6'} title="Click to show your balance" mouseEnterDelay={0.5}>
-          <div className={styles.balanceBtn} onClick={ymjTest}>Balance
-          <div className={styles.showBalance} style={{display:balanceShow}}> $ {userBalance}</div>
-          </div> 
+            
+          <div className={styles.balanceBtn} onClick={balanceHandle}>
+            <p style={{display:balanceTitleShow}}>Balance</p>
+          <div className={styles.showBalance} style={{display:balanceShow}}>$ {userBalance}</div>
+          </div>  
           </Tooltip>
           {/* pending */}
           {pendingLength

@@ -1,5 +1,5 @@
 import { AcyBarChart, AcyLineChart } from '@/components/Acy';
-import { Col, Icon, Row } from 'antd';
+import { Col, Icon, Row, Button } from 'antd';
 import React, { Component, useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useWeb3React } from '@web3-react/core';
@@ -68,8 +68,6 @@ const MarketIndex = props => {
   }, []);
 
   useEffect(() => {
-    if (!account) return;
-
     fetchGlobalTransaction().then(globalTransactions => {
         console.log('globaltransaction', globalTransactions);
         if(globalTransactions) settransactions(globalTransactions);
@@ -112,7 +110,7 @@ const MarketIndex = props => {
       setselectedIndexBar(dataDict.volume24h.length - 1);
       setselectedDataBar(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));}
     });
-  }, [account, chainId]);
+  }, [chainId]);
 
   const onLineGraphHover = (newData, newIndex) => {
     setselectedDataLine(abbrNumber(newData));
@@ -128,6 +126,7 @@ const MarketIndex = props => {
     <div className={styles.marketRoot}>
       <ConnectWallet/>
       <MarketSearchBar
+        className={styles.searchBar}
         dataSourceCoin={dataSourceCoin}
         dataSourcePool={dataSourcePool}
         account={account}
