@@ -707,6 +707,7 @@
 
 /* Social Medias */
 .social-container {
+  width: 55%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;

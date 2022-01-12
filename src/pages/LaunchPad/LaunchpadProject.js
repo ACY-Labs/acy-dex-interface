@@ -491,20 +491,22 @@ const LaunchpadProject = () => {
           <span className="lineSeperator" />
           <div className="projectDescription">
             <div className='socialmedia-container'>
-              {receivedData.social && receivedData.social[0] &&
-                <div id='social container' className='social-container'>
-                  { Object.entries(receivedData.social[0]).map((item)=>{
-                    if(item[1] !== null){
-                      if(item[0] === "Polyaddress" || item[0] === "Etheraddress" || item[0] === "Confluxaddress") return null
-                      if(item[0] === "Website") return (
-                        <a href={item[0]} target="_blank" rel="noreferrer" style={{width:'30%', marginRight:'1rem', alignSelf:'center'}}>{item[1]}</a>
-                      )
-                        return (
-                          <SocialMedia url={logoObj[item[0]]} link={item[1]} socialText={item[0]} />
-                        )
-                    }
-                  })}
-                </div>}
+              {
+                receivedData.social && receivedData.social[0] &&
+                <div style={{display:'flex', flexDirection:'row', justifyContent:'space-between'}}>
+                  <a href={receivedData.social[0].Website} target="_blank" rel="noreferrer" style={{width:'30%', marginRight:'1rem', alignSelf:'center'}}>{receivedData.social[0].Website}</a>
+                  <div id='social container' className='social-container'>
+                    { Object.entries(receivedData.social[0]).map((item)=>{
+                      if(item[1] !== null){
+                        if(item[0] === "Website" || item[0] === "Polyaddress" || item[0] === "Etheraddress" || item[0] === "Confluxaddress") return null
+                          return (
+                            <SocialMedia url={logoObj[item[0]]} link={item[1]} socialText={item[0]} />
+                          )
+                      }
+                    })}
+                  </div>
+                </div>
+              }
             </div>
             <div style={{padding:'2.5em 0 0 0'}}>
               {receivedData.projectDescription && <p>{receivedData.projectDescription[0]}</p>}
@@ -704,7 +706,7 @@ const LaunchpadProject = () => {
 
     const allocationCards = () => {
       const cards = [];
-      const colorCodes = ["#C6224E", "#E29227", "#1E5D91", "#1C9965", "#70BA33"];
+      const colorCodes = ["#C6224E", "#1E5D91", "#E29227", "#1C9965", "#70BA33"];
       const baseColorCodes = ["#631027", "#74490f", "#0f2e48", "#0e4c32", "#375d19"]
       for (let i = 0; i < 5; i++) {
         cards.push(
@@ -882,7 +884,7 @@ const LaunchpadProject = () => {
                   <div className="token-logo">
                     <img src={tokenLogoUrl ? tokenLogoUrl:mainCoinLogoURI} alt="token-logo" className="token-image" />
                   </div>
-                  { isClickedMax ? <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginLeft:'2rem'}}>{receivedData.mainCoinSymbol}</div> : <Button className="max-btn" onClick={maxClick}>MAX</Button> }
+                  { isClickedMax ? <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginLeft:'2rem', fontWeight:'700'}}>{receivedData.mainCoinSymbol}</div> : <Button className="max-btn" onClick={maxClick}>MAX</Button> }
                 </div>
               </InputGroup>
             </div>
