@@ -60,7 +60,7 @@ export const TOKEN_LIST = () => constantInstance.tokenList
 
 export const ConstantLoader = (chainId=56) => {
     const chainSupportedIndex = (supportedChainIds.indexOf(chainId) !== -1);
-    const fallbackChainId = chainSupportedIndex ? chainId : 56;    // redirect unsupported chainId and undefined to 56
+    const fallbackChainId = chainSupportedIndex ? chainId : 97;    // redirect unsupported chainId and undefined to 56
 
     const constants = {
         'tokenList': TokenListSelector(fallbackChainId),
@@ -84,7 +84,7 @@ export const useConstantLoader = () => {
     
     useEffect(() => {
         const chainSupportedIndex = (supportedChainIds.indexOf(chainId) !== -1);
-        const fallbackChainId = chainSupportedIndex ? chainId : 56;    // redirect unsupported chainId and undefined to 56
+        const fallbackChainId = chainSupportedIndex ? chainId : 97;    // redirect unsupported chainId and undefined to 56
 
         const staticConstants = ConstantLoader(fallbackChainId);
         const constants = Object.assign({
