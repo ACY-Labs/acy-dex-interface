@@ -48,10 +48,12 @@ const Pool = props => {
       .then(res => {
         if (res) {
           console.log(res);
-          const newOngoingData = [...ongoingData];
-          const newUpcomingData = [...upcomingData];
-          const newEndedData = [...endedData];
-
+          // const newOngoingData = [...ongoingData];
+          // const newUpcomingData = [...upcomingData];
+          // const newEndedData = [...endedData];
+          const newOngoingData = [];
+          const newUpcomingData = [];
+          const newEndedData = [];
           // get all projects from db
           res.forEach(obj =>
             obj.projectStatus === 'Ongoing'
@@ -60,6 +62,7 @@ const Pool = props => {
               ? newUpcomingData.push(obj)
               : newEndedData.push(obj)
           );
+          console.log(API_URL())
           setOngoingData([...newOngoingData]);
           setUpcomingData([...newUpcomingData]);
           setEndedData([...newEndedData]);

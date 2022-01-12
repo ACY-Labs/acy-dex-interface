@@ -193,6 +193,7 @@ const LaunchpadProject = () => {
     const distributionStage = []
 
     // 合约函数调用
+    console.log("pool id: ", PoolId)
     const baseData = await poolContract.GetPoolBaseData(PoolId)
     const distributionData = await poolContract.GetPoolDistributionData(PoolId)
     const status = await poolContract.GetPoolStatus(PoolId)
@@ -247,32 +248,32 @@ const LaunchpadProject = () => {
 
   // fetching data from Smart Contract
   useEffect(async () => {
-    if(!account){
+    if (!account) {
       connectWallet();
     }
-    else if(account || library){
+    if (account && library) {
       console.log("start getPoolBaseData")
-      getPoolData(library, account)
+      await getPoolData(library, account)
       console.log("poolDistributionDate", poolDistributionDate, poolDistributionStage)
     } else {
       const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
       const accnt = "0x0000000000000000000000000000000000000000";
-      getPoolData(provider, accnt)
+      await getPoolData(provider, accnt)
       console.log("poolDistributionDate", poolDistributionDate, poolDistributionStage)
     } 
   }, [library, account])
 
   useEffect(async () => {
-    if(!account){
+    if (!account) {
       connectWallet();
     }
-    else if (account || library){
+    if (account && library){
       console.log("start getPoolBaseData")
-      getPoolData(library, account)
+      await getPoolData(library, account)
     } else {
       const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
       const accnt = "0x0000000000000000000000000000000000000000";
-      getPoolData(provider, accnt)
+      await getPoolData(provider, accnt)
     }
   }, [])
 
@@ -849,7 +850,7 @@ const LaunchpadProject = () => {
     // TO-DO: TOKEN PURCHASE === ALLOCATIONAMOUNT ? SETISVETING(TRUE)
     return (
       <div>
-      { !isVesting ? 
+      { true ? 
         <div
           className={
             isClickedVesting
