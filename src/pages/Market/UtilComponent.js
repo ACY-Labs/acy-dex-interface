@@ -197,7 +197,8 @@ export class SmallTable extends React.Component {
     );
   };
 
-  render() {
+  
+  render() { 
     return (
       <table className={styles.smallTable}>
         <tbody>
@@ -948,7 +949,6 @@ export const MarketSearchBar = props => {
   const [localToken, setLocalToken] = useState([]);
   const [localPool, setLocalPool] = useState([]);
   // fetch searchcoinresults
-
   const networkOptions = [
     {
       name: 'Ethereum',
@@ -1109,12 +1109,14 @@ export const MarketSearchBar = props => {
 
   // 网络列表
   const [networkListIndex, setNetworkListIndex] = useState(0);
+
   const networkList = [
     {
       name: 'BSC',
       icon: 'Binance',
       onClick: async () => {
         setNetworkListIndex(0);
+        props.getNetwork('BSC')
       },
     },
     {
@@ -1122,9 +1124,11 @@ export const MarketSearchBar = props => {
       icon: 'Polygon',
       onClick: async () => {
         setNetworkListIndex(1);
+        props.getNetwork('Polygon')
       },
     },
-];
+  ];
+  
   const networkListInCardList = (
     <div className={styles.networkListBlock}>
       <div>

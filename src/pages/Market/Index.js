@@ -54,6 +54,8 @@ const MarketIndex = props => {
   const [lineChartError,setlineChartError] = useState('');
   const [overviewError,setoverviewError] = useState('');
 
+  const [marketNetwork,setmarketNetwork] = useState('');
+
   const {activate } = useWeb3React();
   const {account, library, chainId} = useConstantLoader();
 
@@ -121,6 +123,11 @@ const MarketIndex = props => {
     setselectedDataBar(abbrNumber(newData));
     setselectedIndexBar(newIndex);
   };
+  const getNetwork = (index) => {
+    // 输出接收到子组件的参数
+    console.log(index);
+    setmarketNetwork(index);
+  }
 
   return (
     <div className={styles.marketRoot}>
@@ -131,6 +138,7 @@ const MarketIndex = props => {
         dataSourcePool={dataSourcePool}
         account={account}
         visible={true}
+        getNetwork={getNetwork}
       />
       <div className={styles.chartsMain}>
         <div className={styles.chartSectionMain}>
