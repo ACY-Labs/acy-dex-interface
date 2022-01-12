@@ -64,6 +64,7 @@ const LaunchpadProject = () => {
   const [poolMainCoinLogoURL, setPoolMainCoinLogoURL] = useState(null);
   const [poolMainCoinName, setPoolMainCoinName] = useState(null);
   const [isError, setIsError] = useState(false);
+  const [isClickedAllocation, setIsClickedAllocation] = useState(false);
   const [isAllocated, setIsAllocated] = useState(false);
   const [allocationAmount, setAllocationAmount] = useState(0);
   const [hasCollected, setHasCollected] = useState(false);
@@ -162,17 +163,11 @@ const LaunchpadProject = () => {
           res['projectUrl'] = res.saleInfo.projectUrl;
           res['projectName'] = res.basicInfo.projectName;
           res['projectToken'] = res.basicInfo.projectToken;
-          res['mainCoinSymbol'] = res.basicInfo.mainCoin;
-
-          // get maincoin URI
-          const resmainCoin = findTokenWithSymbol(res.basicInfo.mainCoin)
-          const resmainCoinURI =  resmainCoin.logoURI
 
           // get state to hide graph and table
           const curT = new Date()
           if (curT < res.scheduleInfo.saleStart) setCompareAlloDate(true)
 
-          setMainCoinLogoURI(resmainCoinURI)
           setPoolID(res.basicInfo.poolID);
           setReceivedData(res);
         } else {
@@ -203,7 +198,7 @@ const LaunchpadProject = () => {
     // getpoolbasedata 数据解析
     const token2Address = baseData[1]
     const tokenList = TOKEN_LIST()
-    const token2Info = tokenList.find(item => item.address === token2Address)
+    const token2Info = tokenList.find(item => item.address == token2Address)
 
     const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
     const token2contract = getContract(token2Address, ERC20ABI, lib, acc)
@@ -251,7 +246,7 @@ const LaunchpadProject = () => {
     if (!account) {
       connectWallet();
     }
-    if (account && library) {
+    else if (account && library) {
       console.log("start getPoolBaseData")
       await getPoolData(library, account)
       console.log("poolDistributionDate", poolDistributionDate, poolDistributionStage)
@@ -267,7 +262,7 @@ const LaunchpadProject = () => {
     if (!account) {
       connectWallet();
     }
-    if (account && library){
+    else if (account && library){
       console.log("start getPoolBaseData")
       await getPoolData(library, account)
     } else {
@@ -710,7 +705,6 @@ const LaunchpadProject = () => {
   };
 
   const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount, isAllocated, setIsAllocated, tokenLogoUrl}) => {
-    const [isClickedAllocation, setIsClickedAllocation] = useState(false);
     // TODO: replace with 24 icon
     const BaseCard = ({ url }) => {
       return (
@@ -900,7 +894,7 @@ const LaunchpadProject = () => {
                   <div className="token-logo">
                     <img src={tokenLogoUrl ? tokenLogoUrl:mainCoinLogoURI} alt="token-logo" className="token-image" />
                   </div>
-                  { isClickedMax ? <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginLeft:'2rem', fontWeight:'700'}}>{receivedData.mainCoinSymbol}</div> : <Button className="max-btn" onClick={maxClick}>MAX</Button> }
+                  { isClickedMax ? <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginLeft:'2rem', fontWeight:'700'}}>{poolMainCoinName}</div> : <Button className="max-btn" onClick={maxClick}>MAX</Button> }
                 </div>
               </InputGroup>
             </div>
