@@ -328,7 +328,7 @@ const AcyLiquidityPositions = (props) => {
       render: (text, record, index) => {
         return (<div>$ {(record.volume * 7).toFixed(2)}</div>)
       },
-      visible: !isMobile,
+      visible: true,
     },
     {
       title: "APR",
@@ -356,7 +356,7 @@ const AcyLiquidityPositions = (props) => {
           <p>{record.token1Reserve}</p>
         </div>
       ),
-      visible: true,
+      visible: !isMobile,
     },
     // { title: "Expand", key: "expand",  visible: true},
   ]);
@@ -631,7 +631,7 @@ const AcyLiquidityPositions = (props) => {
   return (
     <div>
       {loading && loading ? (
-        <h2 style={{ textAlign: "center", color: "white", top: "1rem", position: "relative" }}>Loading <Icon type="loading" /></h2>
+        <h2 style={{ textAlign: "center", color: "white", top: "5rem", position: "relative" }}>Loading <Icon type="loading" /></h2>
       ) : (
         <>
           <Table
@@ -676,8 +676,8 @@ const AcyLiquidityPositions = (props) => {
                     <tbody>
                       <tr>
                         <td>My liquidity</td>
-                        {!isMobile && <td>Pool share</td>}
-                        {!isMobile && <td></td>}
+                        <td>Pool share</td>
+                        <td></td>
                         {/* the following height is randomly set to 10px,
                       it's only useful for its div children to get full height info */}
                         <td rowSpan="2" style={{ height: "10px" }}>
@@ -715,11 +715,12 @@ const AcyLiquidityPositions = (props) => {
                           <p>{data?.token0Amount || "loading..."}</p>
                           <p>{data?.token1Amount || "loading..."}</p>
                         </td>
-                        {!isMobile && 
-                          <td>
-                            <p>{data?.share || "loading..."}</p>
-                          </td>}
-                        {!isMobile && <td></td>}
+                        <td>
+                          <p>{data?.share || "loading..."}</p>
+                        </td>
+                        <td>
+                          <p></p>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
