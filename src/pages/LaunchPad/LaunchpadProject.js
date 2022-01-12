@@ -22,6 +22,7 @@ import SocialMedia from './SocialMedia'
 import telegramWIcon from '@/assets/icon_telegram_white.svg';
 import etherIcon from '@/assets/icon_etherscan.svg';
 import polyIcon from '@/assets/icon_polyscan.svg';
+import bscIcon from '@/assets/icon_bscscan.svg';
 import linkedinIcon from '@/assets/icon_linkedin.svg';
 import mediumIcon from '@/assets/icon_medium.svg';
 import youtubeIcon from '@/assets/icon_youtube.svg';
@@ -61,17 +62,25 @@ const LaunchpadProject = () => {
   const [poolMainCoinLogoURL, setPoolMainCoinLogoURL] = useState(null);
   const [poolMainCoinName, setPoolMainCoinName] = useState(null);
   const [isError, setIsError] = useState(false);
+  const [isAllocated, setIsAllocated] = useState(false);
+  const [allocationAmount, setAllocationAmount] = useState(0);
   const [hasCollected, setHasCollected] = useState(false);
   const [successCollect, setSuccessCollect] = useState(false);
   const [notVesting, setNotVesting] = useState(false);
   const [isVesting, setIsVesting] = useState(false);
   const [isNotInvesting, setIsNotInvesting] = useState(false);
+  const [compareAlloDate, setCompareAlloDate] = useState(false);
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
+  const [isClickedVesting, setIsClickedVesting] = useState(false);
+  const [isClickedMax, setIsClickedMax] = useState(false);
+  const [salesValue, setSalesValue] = useState(0);
+  const [isValidSalesPrice, setIsValidSalesPrice] = useState(true);
+  
   // const [investorNum,setinvestorNum] = useState(0);
-  const [allocationAmount, setAllocationAmount] = useState(0);
+  
   // const [isInvesting, setIsInvesting] = useState(false);
-  const [isAllocated, setIsAllocated] = useState(false);
+  
 
   // NOTE (Gary 2022.1.4): change poolId
   let PoolId
@@ -96,6 +105,7 @@ const LaunchpadProject = () => {
     "Github": githubIcon,
     "Etheraddress": etherIcon,
     "Polyaddress": polyIcon,
+    "Bscaddress": bscIcon
   }
   const PoolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, library, account);
 
@@ -122,8 +132,6 @@ const LaunchpadProject = () => {
     const res = data.toLocaleString()
     return res
   }
-
-  const _token0symbol = "BNB"
 
   // HOOKS
   useEffect(() => {
@@ -154,8 +162,13 @@ const LaunchpadProject = () => {
           res['projectToken'] = res.basicInfo.projectToken;
           res['mainCoinSymbol'] = res.basicInfo.mainCoin;
 
+          // get maincoin URI
           const resmainCoin = findTokenWithSymbol(res.basicInfo.mainCoin)
           const resmainCoinURI =  resmainCoin.logoURI
+
+          // get state to hide graph and table
+          const curT = new Date()
+          if (curT < res.scheduleInfo.saleStart) setCompareAlloDate(true)
 
           setMainCoinLogoURI(resmainCoinURI)
           setPoolID(res.basicInfo.poolID);
@@ -481,10 +494,14 @@ const LaunchpadProject = () => {
               {receivedData.social && receivedData.social[0] &&
                 <div id='social container' className='social-container'>
                   { Object.entries(receivedData.social[0]).map((item)=>{
-                    if(item[1] !== null ){
-                      console.log(item)
-                      return (
-                      <SocialMedia url={logoObj[item[0]]} link={item[1]} socialText={item[0]} />)
+                    if(item[1] !== null){
+                      if(item[0] === "Polyaddress" || item[0] === "Etheraddress" || item[0] === "Confluxaddress") return null
+                      if(item[0] === "Website") return (
+                        <a href={item[0]} target="_blank" rel="noreferrer" style={{width:'30%', marginRight:'1rem', alignSelf:'center'}}>{item[1]}</a>
+                      )
+                        return (
+                          <SocialMedia url={logoObj[item[0]]} link={item[1]} socialText={item[0]} />
+                        )
                     }
                   })}
                 </div>}
@@ -619,6 +636,7 @@ const LaunchpadProject = () => {
           if(res && res.allocationAmount) {
             setAllocationAmount(res.allocationAmount);
             setIsAllocated(true);
+            setSalesValue(res.allocationAmount);
           }
           console.log('allocation get', res.allocationAmount);
         }).catch(e => {
@@ -675,7 +693,6 @@ const LaunchpadProject = () => {
 
   const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount, isAllocated, setIsAllocated, tokenLogoUrl}) => {
     const [isClickedAllocation, setIsClickedAllocation] = useState(false);
-
     // TODO: replace with 24 icon
     const BaseCard = ({ url }) => {
       return (
@@ -710,11 +727,6 @@ const LaunchpadProject = () => {
       return cards;
     };
 
-    const [isClickedVesting, setIsClickedVesting] = useState(false);
-    const [isClickedMax, setIsClickedMax] = useState(false);
-    const [salesValue, setSalesValue] = useState(0);
-    const [isValidSalesPrice, setIsValidSalesPrice] = useState(true);
-
     useEffect(() => {
       if (salesValue > allocationAmount) {
         setIsValidSalesPrice(false);
@@ -739,6 +751,10 @@ const LaunchpadProject = () => {
           <br />
           <span className='tool-tip-content'>
             2.Increase your liquidity @ <a href="/#/liquidity" target="_blank">Liquidity</a>
+          </span>
+          <br />
+          <span className='tool-tip-content'>
+            3.Buy and hold more $ACY @ <a href="/#/exchange" target="_blank">Exchange</a>
           </span>
         </div>
     )}
@@ -953,7 +969,7 @@ const LaunchpadProject = () => {
             />
           </div>
           <ProjectDescription />
-          { !comparesaleDate ? <ChartCard className="launchpad-chart" /> : "" }
+          { !comparesaleDate || compareAlloDate ? "" : <ChartCard className="launchpad-chart" /> }
         </div>
       </div>
     );
@@ -965,10 +981,10 @@ const LaunchpadProject = () => {
         {isError ? <Alert message="Wallet is not connected." type="error" showIcon /> : ""}
         {isNotInvesting ? <Alert message="Wait until Sale stage to purchase." type="info" showIcon /> : ""}
         {hasCollected ? <Alert message="You have vested token for current vesting stage." type="info" showIcon /> : ""}
-        <TokenBanner posterUrl={receivedData.projectToken === "PCR" ? paycerBanner : receivedData.posterUrl} />
+        <TokenBanner posterUrl={receivedData.posterUrl} />
         <TokenLogoLabel
           projectName={receivedData.projectName}
-          tokenLogo={receivedData.projectToken === "PCR" ? PaycerIcon : receivedData.tokenLogoUrl}
+          tokenLogo={receivedData.tokenLogoUrl}
         />
         <CardArea
           walletId={account}

@@ -17,7 +17,7 @@ const SocialMedia = ({ url, link, socialText }) => {
           openInNewTab(link);
         }}
       />
-      <span style={{alignSelf:'center'}}>{socialText}</span>
+      <span style={{alignSelf:'center', fontSize:'10px'}}>{socialText}</span>
     </div>
   );
 };

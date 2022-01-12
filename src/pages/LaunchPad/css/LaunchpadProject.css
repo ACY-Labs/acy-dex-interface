@@ -275,11 +275,11 @@
 }
 
 .allocationContainer > div:nth-of-type(5n+2) > .allocationCard:hover{
-  box-shadow: 0 0 var(--blur-size) var(--spread-size) #74490f;
+  box-shadow: 0 0 var(--blur-size) var(--spread-size) #0f2e48;
  }
 
  .allocationContainer > div:nth-of-type(5n+3) > .allocationCard:hover{
-  box-shadow: 0 0 var(--blur-size) var(--spread-size) #0f2e48;
+  box-shadow: 0 0 var(--blur-size) var(--spread-size) #74490f;
  }
 
  .allocationContainer > div:nth-of-type(5n+4) > .allocationCard:hover{
@@ -719,7 +719,7 @@
 
 .icon-container {
   width: auto;
-  height: 1.6rem;
+  height: 1.2rem;
   cursor: pointer;
   padding: 0 5px;
 }

@@ -15,7 +15,12 @@
   justify-content: center;
 }
 
+.projects-container:hover{
+  cursor: pointer;
+}
+
 .logo-text {
+  width: fit-content;
   font-size: 15px;
   font-weight: 700;
   text-align: center;
@@ -23,10 +28,11 @@
 }
 
 .logo-countdown-container {
+  height: 65%;
+  width: 95%;
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-bottom: 30px;
   justify-content: space-between;
 }
 .projects-card .logo-container {
