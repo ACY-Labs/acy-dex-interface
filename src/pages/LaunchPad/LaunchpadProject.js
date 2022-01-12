@@ -23,6 +23,8 @@ import telegramWIcon from '@/assets/icon_telegram_white.svg';
 import etherIcon from '@/assets/icon_etherscan.svg';
 import polyIcon from '@/assets/icon_polyscan.svg';
 import bscIcon from '@/assets/icon_bscscan.svg';
+import bscChainIcon from '@/assets/icon_bsc.svg';
+import polygonIcon from '@/assets/icon_polygon.svg';
 import linkedinIcon from '@/assets/icon_linkedin.svg';
 import mediumIcon from '@/assets/icon_medium.svg';
 import youtubeIcon from '@/assets/icon_youtube.svg';
@@ -238,8 +240,6 @@ const LaunchpadProject = () => {
     setPoolStatus(curPoolStatus)
     setPoolStatus(Number(BigNumber.from(status).toBigInt()))
     setPoolMainCoinAddress(token2Address)
-    setPoolMainCoinLogoURL(token2Info.logoURI)
-    setPoolMainCoinName(token2Info.symbol)
     setPoolTokenDecimals(token1decimal)
     setPoolMainCoinDecimals(token2decimal)
 
@@ -337,7 +337,22 @@ const LaunchpadProject = () => {
           <span className="tokenTitle" onClick={() => clickToWebsite()}>{projectName}</span>
           <div className="tokenLabelBar">
             {receivedData.tokenLabels &&
-              receivedData.tokenLabels.map(label => <span className="tokenLabel">{label}</span>)}
+              receivedData.tokenLabels.map((label) => {
+                if(label === "BSC") return( 
+                  <span className="tokenLabel">
+                    <img src={bscChainIcon} alt="" style={{width:'13px', height:'13px', marginRight:'0.2rem'}} />
+                    BSC
+                  </span>
+                )
+                if(label === "Polygon") return (
+                  <span className="tokenLabel">
+                    <img src={polygonIcon} alt="" style={{width:'15px', height:'15px', marginRight:'0.2rem'}} />
+                    Polygon
+                  </span>
+                )
+                return <span className="tokenLabel">{label}</span>
+              })
+            }
           </div>
         </div>
       </div>
