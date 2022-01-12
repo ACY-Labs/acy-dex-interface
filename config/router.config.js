@@ -50,6 +50,11 @@ export default [
         ],
       },
       {
+        path: '/Perpetual',
+        name: 'Perpetual',
+        component: './Perpetual/Index',
+      },
+      {
         path: '/exchange',
         name: 'Exchange',
         component: './Swap/Index',
