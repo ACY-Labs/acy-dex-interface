@@ -74,6 +74,7 @@ const LaunchpadProject = () => {
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
   const [isClickedVesting, setIsClickedVesting] = useState(false);
+  const [isClickedMax, setIsClickedMax] = useState(false);
   // const [investorNum,setinvestorNum] = useState(0);
   // const [isInvesting, setIsInvesting] = useState(false);
 
@@ -104,7 +105,7 @@ const LaunchpadProject = () => {
   };
 
   const clickToWebsite = () => {
-    const newWindow = window.open(receivedData.website, '_blank', 'noopener,noreferrer');
+    const newWindow = window.open(receivedData.social[0].Website, '_blank', 'noopener,noreferrer');
     if (newWindow) newWindow.opener = null;
   }
 
@@ -366,7 +367,7 @@ const LaunchpadProject = () => {
     };
 
     const ProgressBar = ({ alreadySale, totalSale, projectToken }) => {
-      const salePercentage = Number(alreadySale) / Number(totalSale)
+      const salePercentage = (Number(alreadySale) / Number(totalSale)).toFixed(4)
       let tokenNum
       console.log("--------ALREADY SALE----------")
       console.log(alreadySale)
@@ -439,14 +440,14 @@ const LaunchpadProject = () => {
         <div className="keyinfoRow" style={{ marginTop: '1rem' }}>
           <div className="keyinfoName">Total Raise</div>
           <div>
-            {receivedData.totalRaise} {poolMainCoinName}
+            {receivedData.totalRaise} {receivedData.basicInfo.mainCoin}
           </div>
         </div>
 
         <div className="keyinfoRow" style={{ marginTop: '1rem' }}>
           <div className="keyinfoName">Rate</div>
           <div>
-            1 {projectToken} = {tokenPrice} {poolMainCoinName}
+            1 {projectToken} = {tokenPrice} {receivedData.basicInfo.mainCoin}
           </div>
         </div>
       </div>
@@ -672,6 +673,7 @@ const LaunchpadProject = () => {
 
     const maxClick = () => {
       setSalesValue(allocationInfo.allocationLeft);
+      setIsClickedMax(true)
     }
 
     const randomRange = (min, max) => Math.floor(Math.random() * (max - min) + min);
@@ -777,7 +779,7 @@ const LaunchpadProject = () => {
           // NOTE (gary 2022.1.6): use toString method
           const approveAmount = (amount * Math.pow(10, poolMainCoinDecimals)).toString()
           const state = await approveNew(poolMainCoinAddress, approveAmount, poolAddress, library, account);
-          const result = await PoolContract.InvestERC20(poolId , approveAmount)
+          const result = await PoolContract.InvestERC20(poolID , approveAmount)
             .catch(e => {
               console.log(e)
               return new CustomError('CustomError while buying token');
@@ -868,7 +870,7 @@ const LaunchpadProject = () => {
                   <div className="token-logo">
                     <img src={mainCoinLogoURI} alt="token-logo" className="token-image" />
                   </div>
-                  <Button className="max-btn" onClick={maxClick}>MAX</Button> 
+                  { isClickedMax ? <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginLeft:'2rem', fontWeight:'700'}}>{receivedData.basicInfo.mainCoin}</div> : <Button className="max-btn" onClick={maxClick}>MAX</Button> }
                 </div>
               </InputGroup>
             </div>
@@ -923,7 +925,7 @@ const LaunchpadProject = () => {
             <KeyInformation
               projectToken={receivedData.projectToken}
               totalSale={poolBaseData[0]}
-              tokenPrice={receivedData.tokenPrice}
+              tokenPrice={receivedData.saleInfo.tokenPrice}
             />
           }
           
@@ -944,7 +946,6 @@ const LaunchpadProject = () => {
     <div>
       <div className="mainContainer">
         {isError && <Alert message="Wallet is not connected." type="error" showIcon />}
-        {isNotInvesting && <Alert message="Wait until Sale stage to purchase." type="info" showIcon />}
         {hasCollected && <Alert message="You have vested token for current vesting stage." type="info" showIcon />}
         <TokenBanner posterUrl={receivedData.posterUrl} />
         <TokenLogoLabel
