@@ -35,8 +35,8 @@ const BscMainNetFarmSetting: FarmSetting = {
     BLOCKS_PER_YEAR: calcBlocksPerPeriod('year', 3),
     BLOCKS_PER_MONTH: calcBlocksPerPeriod('month', 3),
     RPC_URL: "https://bsc-dataseed.binance.org/",
-    // API_URL: "https://api.acy.finance/bsc-main/api"
-    API_URL: "http://localhost:3001/bsc-main/api"    // when testing with local backend
+    API_URL: "https://api.acy.finance/bsc-main/api"
+    // API_URL: "http://localhost:3001/bsc-main/api"    // when testing with local backend
     // API_URL: "http://147.182.251.92:3001/bsc-main/api"   // testing with test server
 }
 
@@ -53,8 +53,8 @@ const BscTestNetFarmSetting: FarmSetting = {
     BLOCKS_PER_YEAR: calcBlocksPerPeriod('year', 3),
     BLOCKS_PER_MONTH: calcBlocksPerPeriod('month', 3),
     RPC_URL: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-    // API_URL: "https://api.acy.finance/bsc-test/api",
-    API_URL: "http://localhost:3001/bsc-test/api",
+    API_URL: "https://api.acy.finance/bsc-test/api",
+    // API_URL: "http://localhost:3001/bsc-test/api",
     // API_URL: "http://147.182.251.92:3001/bsc-test/api" // testing with test server
 }
 
@@ -71,8 +71,8 @@ const PolygonMainNetFarmSetting: FarmSetting = {
     BLOCKS_PER_YEAR: calcBlocksPerPeriod('year', 2),
     BLOCKS_PER_MONTH: calcBlocksPerPeriod('month', 2),
     RPC_URL: "https://polygon-rpc.com",
-    // API_URL: "https://api.acy.finance/polygon-main/api",
-    API_URL: "http://localhost:3001/polygon-main/api",
+    API_URL: "https://api.acy.finance/polygon-main/api",
+    // API_URL: "http://localhost:3001/polygon-main/api",
     // API_URL: "http://147.182.251.92:3001/polygon-main/api"  // testing with test server
 }
 
@@ -89,8 +89,8 @@ const PolygonTestNetFarmSetting: FarmSetting = {
     BLOCKS_PER_YEAR: calcBlocksPerPeriod('year', 2),
     BLOCKS_PER_MONTH: calcBlocksPerPeriod('month', 2),
     RPC_URL: "https://matic-mumbai.chainstacklabs.com",
-    // API_URL: "https://api.acy.finance/polygon-test/api",
-    API_URL: "http://localhost:3001/polygon-test/api",
+    API_URL: "https://api.acy.finance/polygon-test/api",
+    // API_URL: "http://localhost:3001/polygon-test/api",
     // API_URL: "http://147.182.251.92:3001/polygon-test/api"  // testing with test server
 }
 
