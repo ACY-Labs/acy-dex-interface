@@ -354,13 +354,8 @@
   align-items: center;
 }
 
-.allocationCard .inner-text {
-  font-size: 15px;
-  color: #cbcfd7;
-}
-
 .allocationCard .inner-text-amount {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: #eb5c20;
 }
@@ -385,6 +380,7 @@
 
 .allocationCard .openCover {
   transform: rotateY(-110deg);
+  transition-duration: 2s;
 }
 
 /* Allocation */
@@ -393,6 +389,17 @@
   flex-direction: row;
   align-items: center;
   margin-bottom: 50px;
+}
+
+.allocation-info-container {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  margin-bottom: 50px;
+}
+
+.allocation-info-container div{
+  grid-column: 1 / 1;
+  font-size: 20px;
 }
 
 .allocation-cards {
@@ -865,10 +872,6 @@
     height: calc(var(--allocation-card-size) + 3px);
   }
 
-  .allocationCard .inner-text,
-  .allocationCard .inner-text-amount {
-    font-size: 10px;
-  }
   .title-tooltip-container {
     margin-bottom: 14px;
   }
@@ -964,10 +967,6 @@
     height: calc(var(--allocation-card-size) + 3px);
   }
 
-  .allocationCard .inner-text,
-  .allocationCard .inner-text-amount {
-    font-size: 14px;
-  }
   .title-tooltip-container {
     margin-bottom: 14px;
   }

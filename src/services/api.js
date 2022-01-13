@@ -149,6 +149,16 @@ export async function getAllocationInfo(network, walletId, projectToken) {
   })
 }
 
+export async function useAllocation(network, walletId, projectToken, amount) {
+  return r.get(`${API_URL()}/launch/allocation/use`, {
+    params: {
+      walletId: walletId,
+      projectToken: projectToken,
+      amount: amount
+    }
+  })
+}
+
 export async function getProjects(network) {
   return r.get(`${API_URL()}/launch/projects`)
 }
@@ -157,4 +167,3 @@ export async function getProjectInfo(network, projectId) {
   return r.get(`${API_URL()}/launch/projects/${projectId}`)
 }
 
-// export async function 
