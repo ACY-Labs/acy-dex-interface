@@ -201,12 +201,14 @@ const LaunchpadProject = () => {
           res['saleStart'] = formatTime(res.scheduleInfo.saleStart);
           res['saleEnd'] = formatTime(res.scheduleInfo.saleEnd);
 
+          res['tokenPrice'] = res.saleInfo.tokenPrice
           res['totalSale'] = res.saleInfo.totalSale;
           res['totalRaise'] = res.saleInfo.totalRaise;
           res['projectUrl'] = res.saleInfo.projectUrl;
           res['projectName'] = res.basicInfo.projectName;
           res['projectToken'] = res.basicInfo.projectToken;
           res['mainCoin'] = res.basicInfo.mainCoin
+          
           
 
           // get state to hide graph and table
@@ -238,16 +240,13 @@ const LaunchpadProject = () => {
     if (!poolID) return;
 
     if (account && library) {
-      console.log("start getPoolBaseData")
-      await getPoolData(library, account)
-      console.log("poolDistributionDate", poolDistributionDate, poolDistributionStage)
+      getPoolData(library, account)
     } else {
       const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
       const accnt = "0x0000000000000000000000000000000000000000";
       // await getPoolData(provider, accnt)
-      console.log("poolDistributionDate", poolDistributionDate, poolDistributionStage)
     } 
-  }, [library, account])
+  }, [library, account, poolID])
 
   // fetching allocation data
   useEffect(async () => {
@@ -258,7 +257,6 @@ const LaunchpadProject = () => {
     }
   
     // get allocation status from backend at begining
-    console.log("line 145", account, receivedData.projectToken);
     getAllocationInfo(API_URL(), account, receivedData.projectToken)
       .then(res => {
         if (res) {
@@ -367,7 +365,7 @@ const LaunchpadProject = () => {
     };
 
     const ProgressBar = ({ alreadySale, totalSale, projectToken }) => {
-      const salePercentage = (Number(alreadySale) / Number(totalSale)).toFixed(4)
+      const salePercentage = (100 * Number(alreadySale) / Number(totalSale)).toFixed(4)
       let tokenNum
       console.log("--------ALREADY SALE----------")
       console.log(alreadySale)
@@ -447,7 +445,7 @@ const LaunchpadProject = () => {
         <div className="keyinfoRow" style={{ marginTop: '1rem' }}>
           <div className="keyinfoName">Rate</div>
           <div>
-            1 {projectToken} = {tokenPrice} {receivedData.basicInfo.mainCoin}
+            1 {projectToken} = {tokenPrice} {receivedData.mainCoin}
           </div>
         </div>
       </div>
@@ -673,7 +671,6 @@ const LaunchpadProject = () => {
 
     const maxClick = () => {
       setSalesValue(allocationInfo.allocationLeft);
-      setIsClickedMax(true)
     }
 
     const randomRange = (min, max) => Math.floor(Math.random() * (max - min) + min);
@@ -779,7 +776,7 @@ const LaunchpadProject = () => {
           // NOTE (gary 2022.1.6): use toString method
           const approveAmount = (amount * Math.pow(10, poolMainCoinDecimals)).toString()
           const state = await approveNew(poolMainCoinAddress, approveAmount, poolAddress, library, account);
-          const result = await PoolContract.InvestERC20(poolID , approveAmount)
+          const result = await PoolContract.InvestERC20(poolId, approveAmount)
             .catch(e => {
               console.log(e)
               return new CustomError('CustomError while buying token');
@@ -925,7 +922,7 @@ const LaunchpadProject = () => {
             <KeyInformation
               projectToken={receivedData.projectToken}
               totalSale={poolBaseData[0]}
-              tokenPrice={receivedData.saleInfo.tokenPrice}
+              tokenPrice={receivedData.tokenPrice}
             />
           }
           
@@ -946,6 +943,7 @@ const LaunchpadProject = () => {
     <div>
       <div className="mainContainer">
         {isError && <Alert message="Wallet is not connected." type="error" showIcon />}
+        {isNotInvesting && <Alert message="Wait until Sale stage to purchase." type="info" showIcon />}
         {hasCollected && <Alert message="You have vested token for current vesting stage." type="info" showIcon />}
         <TokenBanner posterUrl={receivedData.posterUrl} />
         <TokenLogoLabel
