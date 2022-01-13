@@ -97,8 +97,11 @@ const BasicProfile = (props) => {
     setTabIndex(e);
   };
 
-  const onLoggedIn = () => {
-    setLoggedIn(true);
+  const onLogInChanged = (account) => {
+    if (!account)
+      setLoggedIn(false);
+    else
+      setLoggedIn(true);
   };
 
   const updateTransactionList = (receiptHash) => {
@@ -137,7 +140,7 @@ const BasicProfile = (props) => {
           }
           {/* <div style={{ flex: 1, width: "50vw", minWidth: loggedIn ? null : "340px", maxWidth: loggedIn ? null : "420px" }}> */}
           <div className={`${styles.colItem} ${styles.rightComponent}`}>
-            <AddComponent onLoggedIn={onLoggedIn} onGetReceipt={onGetReceipt} />
+            <AddComponent onLogInChanged={onLogInChanged} onGetReceipt={onGetReceipt} />
           </div>
         </div>
 

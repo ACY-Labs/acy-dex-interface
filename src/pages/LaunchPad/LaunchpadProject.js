@@ -22,22 +22,29 @@ import SocialMedia from './SocialMedia'
 import telegramWIcon from '@/assets/icon_telegram_white.svg';
 import etherIcon from '@/assets/icon_etherscan.svg';
 import polyIcon from '@/assets/icon_polyscan.svg';
+import bscIcon from '@/assets/icon_bscscan.svg';
+import bscChainIcon from '@/assets/icon_bsc.svg';
+import polygonIcon from '@/assets/icon_polygon.svg';
 import linkedinIcon from '@/assets/icon_linkedin.svg';
 import mediumIcon from '@/assets/icon_medium.svg';
 import youtubeIcon from '@/assets/icon_youtube.svg';
 import githubIcon from '@/assets/icon_github.svg';
 import twitterWIcon from '@/assets/icon_twitter_white.svg';
 import linkWIcon from '@/assets/icon_link_white.svg';
-import fileWIcon from '@/assets/icon_file_white.svg';
+import whitepaperIcon from '@/assets/icon_file_white.svg';
+import deckIcon from '@/assets/icon_ppt.svg';
+import tokenEconomicsIcon from '@/assets/icon_googlesheets.svg';
 import paycerBanner from '@/assets/paycer_banner.svg';
 import PaycerIcon from '@/assets/icon_paycer_logo.svg';
-import announcementFIcon from '@/assets/icon_announcement_fill.svg';
+import {findTokenWithSymbol} from '@/utils/txData';
 import $ from 'jquery';
 import { getContract } from "../../acy-dex-swap/utils/index.js"
 import { useWeb3React } from '@web3-react/core';
 import {useConnectWallet} from "@/components/ConnectWallet";
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
+
 import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL, TOKEN_LIST, MARKET_TOKEN_LIST } from "@/constants";
+
 import { CustomError } from "@/acy-dex-swap/utils"
 import { approveNew, getAllowance } from "@/acy-dex-swap/utils"
 
@@ -46,6 +53,7 @@ const LaunchpadProject = () => {
   const { account, chainId, library, activate, active } = useWeb3React();
   const { projectId } = useParams();
   const [receivedData, setReceivedData] = useState({});
+  const [mainCoinLogoURI, setMainCoinLogoURI] = useState(null);
   const [poolID, setPoolID] = useState(null);
   const [poolBaseData, setPoolBaseData] = useState(null);
   const [poolDistributionDate, setDistributionDate] = useState([]);
@@ -58,17 +66,26 @@ const LaunchpadProject = () => {
   const [poolMainCoinLogoURL, setPoolMainCoinLogoURL] = useState(null);
   const [poolMainCoinName, setPoolMainCoinName] = useState(null);
   const [isError, setIsError] = useState(false);
+  const [isClickedAllocation, setIsClickedAllocation] = useState(false);
+  const [isAllocated, setIsAllocated] = useState(false);
+  const [allocationAmount, setAllocationAmount] = useState(0);
   const [hasCollected, setHasCollected] = useState(false);
   const [successCollect, setSuccessCollect] = useState(false);
   const [notVesting, setNotVesting] = useState(false);
   const [isVesting, setIsVesting] = useState(false);
   const [isNotInvesting, setIsNotInvesting] = useState(false);
+  const [compareAlloDate, setCompareAlloDate] = useState(false);
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
+  const [isClickedVesting, setIsClickedVesting] = useState(false);
+  const [isClickedMax, setIsClickedMax] = useState(false);
+  const [salesValue, setSalesValue] = useState(0);
+  const [isValidSalesPrice, setIsValidSalesPrice] = useState(true);
+  
   // const [investorNum,setinvestorNum] = useState(0);
-  const [allocationAmount, setAllocationAmount] = useState(0);
+  
   // const [isInvesting, setIsInvesting] = useState(false);
-  const [isAllocated, setIsAllocated] = useState(false);
+  
 
   // NOTE (Gary 2022.1.4): change poolId
   let PoolId
@@ -81,16 +98,19 @@ const LaunchpadProject = () => {
   // CONSTANTS
   const InputGroup = Input.Group;
   const logoObj = {
-    "telegram": telegramWIcon,
-    "twitter": twitterWIcon,
-    "website": linkWIcon,
-    "whitepaper": fileWIcon,
-    "linkedin": linkedinIcon,
-    "medium": mediumIcon,
-    "youtube": youtubeIcon,
-    "github": githubIcon,
-    "etheraddress": etherIcon,
-    "polyaddress": polyIcon,
+    "Telegram": telegramWIcon,
+    "Twitter": twitterWIcon,
+    "Website": linkWIcon,
+    "Whitepaper": whitepaperIcon,
+    "Deck": deckIcon,
+    "Linkedin": linkedinIcon,
+    "Medium": mediumIcon,
+    "TokenEconomics": tokenEconomicsIcon,
+    "Youtube": youtubeIcon,
+    "Github": githubIcon,
+    "Etheraddress": etherIcon,
+    "Polyaddress": polyIcon,
+    "Bscaddress": bscIcon
   }
   const PoolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, library, account);
 
@@ -145,7 +165,14 @@ const LaunchpadProject = () => {
           res['projectUrl'] = res.saleInfo.projectUrl;
           res['projectName'] = res.basicInfo.projectName;
           res['projectToken'] = res.basicInfo.projectToken;
+          res['mainCoin'] = res.basicInfo.mainCoin
+          
 
+          // get state to hide graph and table
+          const curT = new Date()
+          if (curT < res.scheduleInfo.saleStart) setCompareAlloDate(true)
+          const mainCoinInfo = TOKEN_LIST().find(item => item.symbol == res.basicInfo.mainCoin)
+          setMainCoinLogoURI(mainCoinInfo.logoURI)
           setPoolID(res.basicInfo.poolID);
           setReceivedData(res);
         } else {
@@ -156,7 +183,7 @@ const LaunchpadProject = () => {
       .catch(e => {
         console.log("Project Detail check errrrrrrrrrrr",e);
         // console.error(e);
-        history.push('/launchpad');
+        // history.push('/launchpad');
       });
   }, []);
 
@@ -168,6 +195,7 @@ const LaunchpadProject = () => {
     const distributionStage = []
 
     // 合约函数调用
+    console.log("pool id: ", PoolId)
     const baseData = await poolContract.GetPoolBaseData(PoolId)
     const distributionData = await poolContract.GetPoolDistributionData(PoolId)
     const status = await poolContract.GetPoolStatus(PoolId)
@@ -175,7 +203,7 @@ const LaunchpadProject = () => {
     // getpoolbasedata 数据解析
     const token2Address = baseData[1]
     const tokenList = TOKEN_LIST()
-    const token2Info = tokenList.find(item => item.address === token2Address)
+    const token2Info = tokenList.find(item => item.address == token2Address)
 
     const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
     const token2contract = getContract(token2Address, ERC20ABI, lib, acc)
@@ -212,42 +240,40 @@ const LaunchpadProject = () => {
     setPoolStatus(curPoolStatus)
     setPoolStatus(Number(BigNumber.from(status).toBigInt()))
     setPoolMainCoinAddress(token2Address)
-    setPoolMainCoinLogoURL(token2Info.logoURI)
-    setPoolMainCoinName(token2Info.symbol)
     setPoolTokenDecimals(token1decimal)
     setPoolMainCoinDecimals(token2decimal)
-
+    // setMainCoinLogoURI(token2Info.logoURI)
     console.log(token2Address)
   }
 
   // fetching data from Smart Contract
   useEffect(async () => {
-    if(!account){
+    if (!account) {
       connectWallet();
     }
-    else if(account || library){
+    else if (account && library) {
       console.log("start getPoolBaseData")
-      getPoolData(library, account)
+      await getPoolData(library, account)
       console.log("poolDistributionDate", poolDistributionDate, poolDistributionStage)
     } else {
       const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
       const accnt = "0x0000000000000000000000000000000000000000";
-      getPoolData(provider, accnt)
+      await getPoolData(provider, accnt)
       console.log("poolDistributionDate", poolDistributionDate, poolDistributionStage)
     } 
   }, [library, account])
 
   useEffect(async () => {
-    if(!account){
+    if (!account) {
       connectWallet();
     }
-    else if (account || library){
+    else if (account && library){
       console.log("start getPoolBaseData")
-      getPoolData(library, account)
+      await getPoolData(library, account)
     } else {
       const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
       const accnt = "0x0000000000000000000000000000000000000000";
-      getPoolData(provider, accnt)
+      await getPoolData(provider, accnt)
     }
   }, [])
 
@@ -311,7 +337,22 @@ const LaunchpadProject = () => {
           <span className="tokenTitle" onClick={() => clickToWebsite()}>{projectName}</span>
           <div className="tokenLabelBar">
             {receivedData.tokenLabels &&
-              receivedData.tokenLabels.map(label => <span className="tokenLabel">{label}</span>)}
+              receivedData.tokenLabels.map((label) => {
+                if(label === "BSC") return( 
+                  <span className="tokenLabel">
+                    <img src={bscChainIcon} alt="" style={{width:'13px', height:'13px', marginRight:'0.2rem'}} />
+                    BSC
+                  </span>
+                )
+                if(label === "Polygon") return (
+                  <span className="tokenLabel">
+                    <img src={polygonIcon} alt="" style={{width:'15px', height:'15px', marginRight:'0.2rem'}} />
+                    Polygon
+                  </span>
+                )
+                return <span className="tokenLabel">{label}</span>
+              })
+            }
           </div>
         </div>
       </div>
@@ -342,7 +383,7 @@ const LaunchpadProject = () => {
             </div>
             
               <div>
-                <p>Sale</p>
+                <p>Sale (FCFS)</p>
                 
                 {poolBaseData &&
                   <div>
@@ -461,28 +502,35 @@ const LaunchpadProject = () => {
         <div style={{ display: 'block' }}>
           <div className='projecttitle-socials-container'>
             <h3 className='projecttitle'>Project Description</h3>
-            <div className=''>
-              {receivedData.social && receivedData.social[0] &&
-                <div id='social container' className='social-container'>
-                  { Object.entries(receivedData.social[0]).map((item)=>{
-                    if(item[1] !== null ){
-                      console.log(item)
-                      return (
-                      <SocialMedia url={logoObj[item[0]]} link={item[1]} />)
-                    }
-                  })}
-                </div>}
-              
-            </div>
           </div>
           
           <span className="lineSeperator" />
           <div className="projectDescription">
-            {receivedData.projectDescription && <p>{receivedData.projectDescription[0]}</p>}
-            {receivedData.projectDescription &&
-              receivedData.projectDescription
-                .slice(1)
-                .map(desc => <p style={{ paddingTop: '2rem' }}>{desc}</p>)}
+            <div className='socialmedia-container'>
+              {
+                receivedData.social && receivedData.social[0] &&
+                <div style={{display:'flex', flexDirection:'row', justifyContent:'space-between'}}>
+                  <a href={receivedData.social[0].Website} target="_blank" rel="noreferrer" style={{width:'30%', marginRight:'1rem', alignSelf:'center'}}>{receivedData.social[0].Website}</a>
+                  <div id='social container' className='social-container'>
+                    { Object.entries(receivedData.social[0]).map((item)=>{
+                      if(item[1] !== null){
+                        if(item[0] === "Website" || item[0] === "Polyaddress" || item[0] === "Etheraddress" || item[0] === "Confluxaddress") return null
+                          return (
+                            <SocialMedia url={logoObj[item[0]]} link={item[1]} socialText={item[0]} />
+                          )
+                      }
+                    })}
+                  </div>
+                </div>
+              }
+            </div>
+            <div style={{padding:'2.5em 0 0 0'}}>
+              {receivedData.projectDescription && <p>{receivedData.projectDescription[0]}</p>}
+              {receivedData.projectDescription &&
+                receivedData.projectDescription
+                  .slice(1)
+                  .map(desc => <p style={{ paddingTop: '2rem' }}>{desc}</p>)}
+            </div>
           </div>
         </div>
       </div>
@@ -606,6 +654,7 @@ const LaunchpadProject = () => {
           if(res && res.allocationAmount) {
             setAllocationAmount(res.allocationAmount);
             setIsAllocated(true);
+            setSalesValue(res.allocationAmount);
           }
           console.log('allocation get', res.allocationAmount);
         }).catch(e => {
@@ -661,8 +710,6 @@ const LaunchpadProject = () => {
   };
 
   const Allocation = ({ walletId, projectToken, allocationAmount, setAllocationAmount, isAllocated, setIsAllocated, tokenLogoUrl}) => {
-    const [isClickedAllocation, setIsClickedAllocation] = useState(false);
-
     // TODO: replace with 24 icon
     const BaseCard = ({ url }) => {
       return (
@@ -674,7 +721,7 @@ const LaunchpadProject = () => {
 
     const allocationCards = () => {
       const cards = [];
-      const colorCodes = ["#C6224E", "#E29227", "#1E5D91", "#1C9965", "#70BA33"];
+      const colorCodes = ["#C6224E", "#1E5D91", "#E29227", "#1C9965", "#70BA33"];
       const baseColorCodes = ["#631027", "#74490f", "#0f2e48", "#0e4c32", "#375d19"]
       for (let i = 0; i < 5; i++) {
         cards.push(
@@ -696,11 +743,6 @@ const LaunchpadProject = () => {
       }
       return cards;
     };
-
-    const [isClickedVesting, setIsClickedVesting] = useState(false);
-    const [isClickedMax, setIsClickedMax] = useState(false);
-    const [salesValue, setSalesValue] = useState(0);
-    const [isValidSalesPrice, setIsValidSalesPrice] = useState(true);
 
     useEffect(() => {
       if (salesValue > allocationAmount) {
@@ -726,6 +768,10 @@ const LaunchpadProject = () => {
           <br />
           <span className='tool-tip-content'>
             2.Increase your liquidity @ <a href="/#/liquidity" target="_blank">Liquidity</a>
+          </span>
+          <br />
+          <span className='tool-tip-content'>
+            3.Buy and hold more $ACY @ <a href="/#/exchange" target="_blank">Exchange</a>
           </span>
         </div>
     )}
@@ -847,15 +893,14 @@ const LaunchpadProject = () => {
               Sale
             </label>
             <div className="sales-input-container">
-                <InputGroup>
+              <InputGroup>
+                <Input className="sales-input" defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
+                <div className="unit-max-group">
                   <div className="token-logo">
-                    <img src={tokenLogoUrl? tokenLogoUrl:receivedData.tokenLogoUrl} alt="token-logo" className="token-image"/>
+                    <img src={mainCoinLogoURI} alt="token-logo" className="token-image" />
                   </div>
-                  <Input className="sales-input" defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
-                  <div className="unit-max-group">
-                    <div className='unit'>{poolMainCoinName}</div>
-                    <Button className="max-btn" onClick={maxClick}>MAX</Button>
-                  </div>
+                  { isClickedMax ? <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginLeft:'2rem', fontWeight:'700'}}>{poolMainCoinName}</div> : <Button className="max-btn" onClick={maxClick}>MAX</Button> }
+                </div>
               </InputGroup>
             </div>
             <Button 
@@ -941,7 +986,7 @@ const LaunchpadProject = () => {
             />
           </div>
           <ProjectDescription />
-          <ChartCard className="launchpad-chart" /> 
+          { !comparesaleDate || compareAlloDate ? "" : <ChartCard className="launchpad-chart" /> }
         </div>
       </div>
     );
@@ -953,10 +998,10 @@ const LaunchpadProject = () => {
         {isError ? <Alert message="Wallet is not connected." type="error" showIcon /> : ""}
         {isNotInvesting ? <Alert message="Wait until Sale stage to purchase." type="info" showIcon /> : ""}
         {hasCollected ? <Alert message="You have vested token for current vesting stage." type="info" showIcon /> : ""}
-        <TokenBanner posterUrl={receivedData.projectToken === "PCR" ? paycerBanner : receivedData.posterUrl} />
+        <TokenBanner posterUrl={receivedData.posterUrl} />
         <TokenLogoLabel
           projectName={receivedData.projectName}
-          tokenLogo={receivedData.projectToken === "PCR" ? PaycerIcon : receivedData.tokenLogoUrl}
+          tokenLogo={receivedData.tokenLogoUrl}
         />
         <CardArea
           walletId={account}

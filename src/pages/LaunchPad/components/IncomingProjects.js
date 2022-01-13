@@ -69,6 +69,7 @@ const IncomingProjects = ({ data, openProject }) => {
                   <div className="">
                     <ProjectsCard
                       projectID={obj.projectID}
+                      start={obj.saleStart}
                       ddl={obj.saleEnd}
                       raise={obj.totalRaise.toString() + ' USDT'}
                       sales={obj.totalSale.toString() + ' ' + obj.projectToken}

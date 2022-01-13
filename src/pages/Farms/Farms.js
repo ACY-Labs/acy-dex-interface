@@ -28,7 +28,7 @@ import { parse } from 'path-to-regexp';
 // import {constantInstance} from "@/constants";
 import { useConstantLoader,BLOCK_TIME, RPC_URL} from '@/constants';
 import {useConnectWallet} from "@/components/ConnectWallet"
-
+import { } from '../Market/Data/index.js';
 // const supportedTokens = constantInstance.farm_setting.TOKENLIST();
 
 const Farms = (props) => {
@@ -101,6 +101,13 @@ const Farms = (props) => {
       logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg'
     };
   }
+
+  const onLogInChanged = (account) => {
+    if (!account)
+    setWalletConnected(false);
+    else
+    setWalletConnected(true);
+  };
   
   const getDateYDM = (date) => {
     return date.getFullYear(date)  + "-" + ("0"+(date.getMonth(date)+1)).slice(-2) + "-" + ("0" + date.getDate(date)).slice(-2)
@@ -207,8 +214,9 @@ const Farms = (props) => {
       setIsMyFarms(false);
       if (account) {
         setWalletConnected(true);
+        const provider = new JsonRpcProvider(RPC_URL(), chainId);
         console.log("start getPools",library,chainId);
-        getPools(library, account, chainId);
+        getPools(provider, account, chainId);
 
       } else {
         const provider = new JsonRpcProvider(RPC_URL(), chainId);
@@ -363,6 +371,7 @@ const Farms = (props) => {
             selectedTable={selectedTable}
             isLoading={isLoadingPool || isLoadingBalance || isLoadingHarvest}
             activeEnded={activeEnded}
+            setWalletConnected={setWalletConnected}
             // refreshPool={refreshPool}
           />
         )}

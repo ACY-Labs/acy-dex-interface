@@ -16,8 +16,8 @@ import { getPool, getPoolAccmulateReward, newGetPool} from '@/acy-dex-swap/core/
 import StakeRow from './StakeRow';
 import SwapComponent from '@/components/SwapComponent';
 // import { BLOCK_TIME } from '@/acy-dex-swap/utils';
-
-import {TOKENLIST, API_URL, BLOCK_TIME } from "@/constants";
+import {TOKENLIST, API_URL, BLOCK_TIME, CHAINID, RPC_URL } from "@/constants";
+import { Web3Provider, JsonRpcProvider } from "@ethersproject/providers";
 // const supportedTokens = TOKENLIST();
 
 
@@ -82,7 +82,8 @@ const FarmsTableRow = props => {
     tokenFilter,
     dao,
     isLoading,
-    activeEnded
+    activeEnded,
+    setWalletConnected
   } = props;
 
   const [poolInfo, setPoolInfo] = useState(content);
@@ -117,6 +118,7 @@ const FarmsTableRow = props => {
   const [percent,setPercent] = useState(50);
   const [withdrawAmount, setWithdrawAmount] = useState(0);
   
+  
 
   const ACY_LOGO = "https://acy.finance/static/media/logo.78c0179c.svg";
 
@@ -139,6 +141,8 @@ const FarmsTableRow = props => {
     },
     [isLoading]
   );
+
+  
   
 
   useEffect(
@@ -189,8 +193,9 @@ const FarmsTableRow = props => {
   }
 
   const refreshPoolInfo = async () => {
-    const pool = await newGetPool(poolInfo.poolId, library, account, chainId);
-    const block = await library.getBlockNumber();
+    const provider = new JsonRpcProvider(RPC_URL(), CHAINID());
+    const pool = await newGetPool(poolInfo.poolId, provider, account, chainId);
+    const block = await provider.getBlockNumber();
     const newFarmsContent = {
       index: pool.poolId,
       poolId: pool.poolId,
@@ -647,6 +652,7 @@ const FarmsTableRow = props => {
               token1: poolInfo.token1,
               token2: poolInfo.token2
             }}
+            onLogInChanged={setWalletConnected}
           />
         )}
         </div>

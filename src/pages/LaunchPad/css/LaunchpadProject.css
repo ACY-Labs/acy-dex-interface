@@ -91,6 +91,7 @@
   line-height: 1.2;
   font-family: 'Karla', sans-serif;
   font-weight: 500;
+  margin-left: 0.2rem;
 }
 
 .tokenLabelBar {
@@ -274,11 +275,11 @@
 }
 
 .allocationContainer > div:nth-of-type(5n+2) > .allocationCard:hover{
-  box-shadow: 0 0 var(--blur-size) var(--spread-size) #74490f;
+  box-shadow: 0 0 var(--blur-size) var(--spread-size) #0f2e48;
  }
 
  .allocationContainer > div:nth-of-type(5n+3) > .allocationCard:hover{
-  box-shadow: 0 0 var(--blur-size) var(--spread-size) #0f2e48;
+  box-shadow: 0 0 var(--blur-size) var(--spread-size) #74490f;
  }
 
  .allocationContainer > div:nth-of-type(5n+4) > .allocationCard:hover{
@@ -547,7 +548,7 @@
   min-width: 0px;
   height: 45px;
   font-size: 16px;
-  padding: 0px 20px 0px 60px;
+  padding: 0px 0.5rem 0px 1rem;
 }
 
 .sales-input:hover {
@@ -562,8 +563,10 @@
 .token-logo{
   position: absolute;
   z-index: 2;
-  top: 8px;
-  left: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 2rem;
 }
 
 .token-image{
@@ -576,8 +579,10 @@
   right: 0;
   z-index: 1;
   display: flex;
+  flex-direction: row;
+  width: 20%;
+  height: 100%;
   align-items: center;
-  top: 5px;
 }
 
 
@@ -589,8 +594,8 @@
   font-weight: 700;
   cursor: pointer;
   z-index: 1;
-  top: 2px; 
   font-size: 12px;
+  margin-left: 1rem;
 }
 
 .sales-input-max-text {
@@ -702,8 +707,10 @@
 
 /* Social Medias */
 .social-container {
+  width: 55%;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
 }
 
 #socialContainer {
@@ -712,8 +719,8 @@
 }
 
 .icon-container {
-  width: 30px;
-  height: 30px;
+  width: auto;
+  height: 1.2rem;
   cursor: pointer;
   padding: 0 5px;
 }

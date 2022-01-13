@@ -75,6 +75,7 @@ const StakeModal = props => {
   } = props;
   const [date, setDate] = useState();
   const [selectedPresetDate, setSelectedPresetDate] = useState(null);
+  const [isSelectedDate, setIsSelectedDate] = useState(false);
   const [showStake, setShowStake] = useState();
   const [stake, setStake] = useState();
   const [balancePercentage, setBalancePercentage] = useState(0);
@@ -283,6 +284,7 @@ const StakeModal = props => {
     setDate(newDate);
     setSelectedPresetDate(index);
     setPickingDate(false);
+    setIsSelectedDate(true);
     if (value == 4) {
       setIs4Years(true);
     } else {
@@ -314,6 +316,7 @@ const StakeModal = props => {
     const dayNum = Math.ceil(dif/(60*60*24*1000));
 
     setDate(newDate);
+    setIsSelectedDate(true);
     setSelectedPresetDate(null);
     var lp = showStake/ratio;
     var weight = lp * Math.sqrt(dayNum);
@@ -419,38 +422,12 @@ const StakeModal = props => {
         if (!receipt) {
           setTimeout(checkStatusAndFinish, 500);
         } else {
-          // let transactionTime;
-          // await library.getBlock(receipt.logs[0].blockNumber).then(res => {
-          //   transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
-          //   console.log("test transactionTime: ", transactionTime)
-          // });
-
-          // clear top right loading spin
-          // const newData = transactions.filter(item => item.hash != status.hash);
-          // dispatch({
-          //   type: "transaction/addTransaction",
-          //   payload: {
-          //     transactions: [
-          //       ...newData,
-          //       { hash: status.hash, transactionTime }
-          //     ]
-          //   }
-          // });
-
-          // refresh the table
-          // dispatch({
-          //   type: "liquidity/setRefreshTable",
-          //   payload: true,
-          // });
-
-          // disable button after each transaction on default, enable it after re-entering amount to add
           setButtonText("Stake");
           setButtonStatus(true);
-          // store to localStorage
         }
       })
     };
-    // const sti = setInterval(, 500);
+
     checkStatusAndFinish();
   };
   const checkIfDisabled = (i) => {
@@ -628,6 +605,11 @@ const StakeModal = props => {
           className={(!buttonStatus && classNames(styles.stakeSubmitButton, styles.buttonDisabled)) || styles.stakeSubmitButton}
           disabled={!buttonStatus}
           onClick={async () => {
+            if(!isSelectedDate) {
+              setButtonStatus(false);
+              setButtonText("Please choose the staking period");
+              return
+            }
             if (buttonText != "Done") {
               if (buttonText !== 'Approval required') {
                 setButtonText(<>Processing <Icon type="loading" /></>);

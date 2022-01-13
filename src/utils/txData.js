@@ -65,7 +65,7 @@ function saveTxInDB(data){
     try{
         axios
         .post(
-            `${farmSetting.API_URL}/users/swap?address=${data.address}&hash=${data.hash}&valueSwapped=${valueSwapped}&feesPaid=${feesPaid}`
+            `${API_URL()}/users/swap?address=${data.address}&hash=${data.hash}&valueSwapped=${valueSwapped}&feesPaid=${feesPaid}`
         )
         .then(response => {
           console.log(response.response);
@@ -73,13 +73,38 @@ function saveTxInDB(data){
     }catch(e){
         console.log("service not working...")
     }
+    // TODO (Gary): Bonus here
+    try{
+        axios
+        .post(
+            `${API_URL()}/launch/allocation/bonus?walletId=${data.address}&T=${valueSwapped}&bonusName=swap`
+        )
+        .then(response => {
+          console.log(response.response);
+        });
+    } catch(e) {
+        console.log("failed to allocate bonus, catching error: ", e)
+    }
+    if (data.outTokenSymbol == 'ACY') {
+        try{
+            axios
+            .post(
+                `${API_URL()}/launch/allocation/bonus?walletId=${data.address}&T=${valueSwapped}&bonusName=swap`
+            )
+            .then(response => {
+              console.log(response.response);
+            });
+        } catch(e) {
+            console.log("failed to allocate bonus, catching error: ", e)
+        }
+    }
 
 }
 function addUserToDB(address){
     try{
         axios
         .post(
-            `${farmSetting.API_URL}/users/adduser?address=${address}`
+            `${API_URL()}/users/adduser?address=${address}`
         )
         .then(response => {
           console.log(response.response);
@@ -788,10 +813,9 @@ export async function getTransactionsByAccount (account,library,filter){
         let address =  account.toString();
         // let apikey = 'H2W1JHHRFB5H7V735N79N75UVG86E9HFH2';
         let offset=filter=='ALL'? '50':'50'; // NUMBER OF RESULTS FETCHED FROM ETHERSCAN
-        SCAN_API = SCAN_API.scanUrl;
         console.log("printing API endpoint", SCAN_API);
         console.log("printing gas token symbol", constantInstance.gasTokenSymbol);
-        let request = `${SCAN_API}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=${offset}&sort=desc`;
+        let request = `${SCAN_API.scanUrl}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=${offset}&sort=desc&apikey=${SCAN_API.APIKey}`;
         console.log("trying to fethc data for:", request);
 
         let response = await fetch(request);
@@ -998,6 +1022,10 @@ export async function fetchTransactionData(address,library){
         },
     ],tokenPriceUSD);
 
+    // temporary fix for dist_output AKA trader output/treasury
+
+    let new_dist = (totalOut - amm_output) * .5;
+
     return {
         'token1' : inToken,
         'token2' : outToken,
@@ -1012,15 +1040,15 @@ export async function fetchTransactionData(address,library){
             },
         ],tokenPriceUSD),
         'amm_output': amm_output,
-        'acy_treasury': totalOut - amm_output - dist_output,
-        'trader_treasury': dist_output,
+        'acy_treasury': totalOut - amm_output - new_dist,
+        'trader_treasury': new_dist,
         'gas_symbol' : GAS_TOKEN,
         'trading_fee' : trading_fee,
-        'trader_final' : dist_output + amm_output,
+        'trader_final' : new_dist + amm_output,
         'trader_finalUSD' : totalInUSD([
             {
                 token : outToken.symbol,
-                amount : dist_output + amm_output
+                amount : new_dist + amm_output
             }
         ],tokenPriceUSD)
 

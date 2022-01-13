@@ -1,6 +1,7 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 import r from 'umi-request';
+import { API_URL } from '@/constants'
 
 export async function queryProjectNotice() {
   return request('/api/project/notice');
@@ -127,11 +128,11 @@ export async function getFakeCaptcha(mobile) {
 }
 
 // TODO: move this part to constants
-const urlPrefix = 'https://api.acy.finance/bsc-main';
-// const urlPrefix = 'http://localhost:3001/bsc-main';
+// const urlPrefix = 'https://api.acy.finance/bsc-main';
+const urlPrefix = 'http://localhost:3001/bsc-test';
 
 export async function requireAllocation(network, walletId, projectToken) {
-  return r.get(`${urlPrefix}/api/launch/allocation/require`, {
+  return r.get(`${API_URL()}/launch/allocation/require`, {
     params: {
       walletId: walletId,
       projectToken: projectToken
@@ -140,7 +141,7 @@ export async function requireAllocation(network, walletId, projectToken) {
 }
 
 export async function getAllocationInfo(network, walletId, projectToken) {
-  return r.get(`${urlPrefix}/api/launch/allocation`, {
+  return r.get(`${API_URL()}/launch/allocation`, {
     params: {
       walletId: walletId,
       projectToken: projectToken
@@ -149,9 +150,11 @@ export async function getAllocationInfo(network, walletId, projectToken) {
 }
 
 export async function getProjects(network) {
-  return r.get(`${urlPrefix}/api/launch/projects`)
+  return r.get(`${API_URL()}/launch/projects`)
 }
 
 export async function getProjectInfo(network, projectId) {
-  return r.get(`${urlPrefix}/api/launch/projects/${projectId}`)
+  return r.get(`${API_URL()}/launch/projects/${projectId}`)
 }
+
+// export async function 

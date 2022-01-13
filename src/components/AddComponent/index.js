@@ -89,7 +89,7 @@ const AddLiquidityComponent = props => {
 
   const { account, chainId, library, tokenList: INITIAL_TOKEN_LIST, farmSetting: { API_URL: apiUrlPrefix, INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader();
 
-  const { dispatch, token, onLoggedIn, isFarm = false } = props;
+  const { dispatch, token, onLogInChanged, isFarm = false } = props;
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
   // 选择货币前置和后置
@@ -332,14 +332,16 @@ const AddLiquidityComponent = props => {
 
   useEffect(
     () => {
+      onLogInChanged(account);
       if (account == undefined) {
+        setToken0BalanceShow(false);
+        setToken1BalanceShow(false);
         setButtonStatus(false);
         setButtonContent('Connect to Wallet');
       } else {
         setButtonContent('Choose tokens and amount');
         setButtonStatus(false);
         // set login state to true
-        onLoggedIn();
       }
     },
     [chainId, library, account]
@@ -370,21 +372,41 @@ const AddLiquidityComponent = props => {
 
   useEffect(
     () => {
+      
       if (!account || !chainId || !library) return;
-      console.log('get balances in liquidity');
+      console.log('get balances in liquidity', token0, token1);
       const _token0 = INITIAL_TOKEN_LIST[0];
       const _token1 = INITIAL_TOKEN_LIST[1];
       setToken0(_token0);
       setToken1(_token1);
       setTokenList(INITIAL_TOKEN_LIST)
 
-      async function getTokenBalances() {
+      async function getTokenBalances(_token0, _token1) {
         setToken0BalanceShow(true);
         setToken1BalanceShow(true);
         setToken0Balance(await getUserTokenBalance(_token0, chainId, account, library).catch(e => console.log("useEffect getUserTokenBalance error", e)));
         setToken1Balance(await getUserTokenBalance(_token1, chainId, account, library).catch(e => console.log("useEffect getUserTokenBalance error", e)));
       }
-      getTokenBalances();
+      if(!isFarm) {
+        getTokenBalances(_token0, _token1);
+      }
+      //for farm 
+      if(isFarm) {
+        let token0pass = INITIAL_TOKEN_LIST[0];
+        let token1pass = INITIAL_TOKEN_LIST[1];
+        for (var i = 0; i < INITIAL_TOKEN_LIST.length; i++) {
+          if (INITIAL_TOKEN_LIST[i].symbol == token?.token1) {
+            token0pass = INITIAL_TOKEN_LIST[i];
+          }
+          if (INITIAL_TOKEN_LIST[i].symbol == token?.token2) {
+            token1pass = INITIAL_TOKEN_LIST[i];
+          }
+        }
+        console.log("TEST HERE token:",token0pass,token1pass);
+        setToken0(token0pass);
+        setToken1(token1pass);
+        getTokenBalances(token0pass, token1pass);
+      }
     },
     [account, chainId, library]
   );
@@ -486,7 +508,8 @@ const AddLiquidityComponent = props => {
           }
 
         }).catch(e => console.log("error: ", e));
-
+        // TODO (Gary): check bonus
+        axios.get(`${apiUrlPrefix}/launch/allocation/bonus?walletId=${account}&bonusName=liquidity&T=1000`)
       }
 
     } catch (e) {
