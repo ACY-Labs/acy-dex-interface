@@ -1152,8 +1152,18 @@ export const MarketSearchBar = props => {
     </div>
   );
 
+  const n_index = () =>{
+    const n = localStorage.getItem("market");
+    if (n == 56){
+      return 0;
+    }else if (n==137){
+      return 1;
+    }else return 0;
+  }
+
   // lifecycle methods
   useEffect(() => {
+    setNetworkListIndex(n_index);
     let contentRoot = ReactDOM.findDOMNode(rootRef.current).parentNode.parentNode;
     contentRoot.addEventListener('scroll', onScroll);
 
@@ -1349,7 +1359,8 @@ export const MarketSearchBar = props => {
 
       {/* network button */}
       <div>
-        <Dropdown
+        {props.networkShow ?
+        (<Dropdown
         overlay={networkListInCardList}
         trigger={['click']}
         placement="bottomLeft"
@@ -1361,8 +1372,9 @@ export const MarketSearchBar = props => {
               <AcyIcon.MyIcon type={item.icon} /> {item.name} Network<DownOutlined className={styles.networkHandleFont}/> </div>
           ))}
         </div>
-      </Dropdown>
+      </Dropdown>):''}
       </div>
+      
     </div>
   );
 };

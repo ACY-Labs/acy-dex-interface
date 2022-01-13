@@ -536,7 +536,7 @@ export async function getAllSuportedTokensPrice_forMarket() {
     `https://api.coingecko.com/api/v3/simple/price?ids=${searchIds}&vs_currencies=usd`
   ).then(async (result) => {
     const data = result.data;
-    console.log("tokensPrice_market ymj:",data);
+    console.log("tokensPrice_market:",data);
     const tokensPrice = {};
     tokenList.forEach(token => {
       tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];

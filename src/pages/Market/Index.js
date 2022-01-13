@@ -140,6 +140,7 @@ const MarketIndex = props => {
         account={account}
         visible={true}
         getNetwork={getNetwork}
+        networkShow = {true}
       />
       {/* ymj 两个图表 */}
       <div className={styles.chartsMain}>
