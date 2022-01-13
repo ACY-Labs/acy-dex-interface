@@ -17,6 +17,7 @@ import { MarketSearchBar, PoolTable, TokenTable, TransactionTable } from './Util
 import { JsonRpcProvider } from "@ethersproject/providers"; 
 import { isMobile } from 'react-device-detect';
 import ConnectWallet from './ConnectWallet';
+
 import { useConstantLoader } from '@/constants';
 
 import {useConnectWallet} from '@/components/ConnectWallet';
@@ -29,7 +30,7 @@ const MarketIndex = props => {
   const [selectedDataLine,setselectedDataLine] = useState(0);
   const [selectedIndexBar,setselectedIndexBar] = useState(0);
   const [selectedDataBar,setselectedDataBar] = useState(0);
-  const [chartData,setchartData] = useState({
+  const [chartData, setchartData] = useState({
     tvl: [],
     volume24h: [],
   });
@@ -112,7 +113,7 @@ const MarketIndex = props => {
       setselectedIndexBar(dataDict.volume24h.length - 1);
       setselectedDataBar(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));}
     });
-  }, [chainId]);
+  }, [chainId, marketNetwork]);
 
   const onLineGraphHover = (newData, newIndex) => {
     setselectedDataLine(abbrNumber(newData));
@@ -140,6 +141,7 @@ const MarketIndex = props => {
         visible={true}
         getNetwork={getNetwork}
       />
+      {/* ymj 两个图表 */}
       <div className={styles.chartsMain}>
         <div className={styles.chartSectionMain}>
           {chartData.tvl.length > 0 ? (
@@ -226,6 +228,7 @@ const MarketIndex = props => {
         !isMobile && <Icon type="loading" />
       )}
 
+      {/* ymj 两个图表 结束 */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <h2>Top Tokens</h2>
         <h3>

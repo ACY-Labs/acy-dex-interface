@@ -5,7 +5,7 @@ import axios from 'axios';
 import {getTransactionsByAccount} from '@/utils/txData'
 import { getLibrary } from '../ConnectWallet';
 
-import {getAllSuportedTokensPrice} from "@/acy-dex-swap/utils"
+import {getAllSuportedTokensPrice, getAllSuportedTokensPrice_forMarket} from "@/acy-dex-swap/utils"
 import { totalInUSD } from '@/utils/utils';
 import {API_URL} from '@/constants';
 // const apiUrlPrefix = API_URL();    
@@ -29,7 +29,7 @@ const FILTERED_AMOUNT = 50;
 async function parseTransactionList(data){
 
 
-  const tokensPriceUSD = await getAllSuportedTokensPrice();
+  const tokensPriceUSD = await getAllSuportedTokensPrice_forMarket();
 
   let _txList = data.filter(item=>item.token1Number!=null);
 
@@ -213,7 +213,8 @@ export async function fetchTransactionsForPair(token1,token2){
 export async function fetchTransactionsForToken(token){
   console.log("fetching txlist for tokens ", token);
   try{
-    let request = API_URL()+'/txlist/token?'+'symbol='+token+'&&range=50';
+    //let request = API_URL()+'/txlist/token?'+'symbol='+token+'&&range=50';
+    let request = MARKET_API_URL()+'/txlist/token?'+'symbol='+token+'&&range=50';
     // let request = 'http://localhost:3001/api/users/all';
     let response = await fetch(request);
     let data = await response.json();

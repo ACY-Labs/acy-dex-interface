@@ -1116,7 +1116,8 @@ export const MarketSearchBar = props => {
       icon: 'Binance',
       onClick: async () => {
         setNetworkListIndex(0);
-        props.getNetwork('BSC')
+        props.getNetwork('BSC');
+        localStorage.setItem("market", 56);
       },
     },
     {
@@ -1124,7 +1125,8 @@ export const MarketSearchBar = props => {
       icon: 'Polygon',
       onClick: async () => {
         setNetworkListIndex(1);
-        props.getNetwork('Polygon')
+        props.getNetwork('Polygon');
+        localStorage.setItem("market", 137);
       },
     },
   ];

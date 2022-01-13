@@ -59,6 +59,7 @@ function MarketTokenInfo(props) {
   const [selectChartIndexTvl, setSelectChartIndexTvl] = useState(0);
   const [selectChartDataPrice, setSelectChartDataPrice] = useState("");
   const [selectChartIndexPrice, setSelectChartIndexPrice] = useState(0);
+  const [marketNetwork,setmarketNetwork] = useState('');
 
   // additional datas
   const [volume24h, setVolume24h] = useState(0);
@@ -98,6 +99,8 @@ function MarketTokenInfo(props) {
     if (data.includes(address)) setIsWatchlist(true);
     else setIsWatchlist(false);
   };
+
+  
 
   useEffect(() => {
     if (!token)
@@ -239,6 +242,12 @@ function MarketTokenInfo(props) {
     switchChart(index);
   };
 
+  const getNetwork = (index) => {
+    // 输出接收到子组件的参数
+    console.log(index);
+    setmarketNetwork(index);
+  }
+
   return (
     <div className={styles.marketRoot}>
       <ConnectWallet />
@@ -248,6 +257,7 @@ function MarketTokenInfo(props) {
         onRefreshWatchlist={() => {
           updateWatchlistStatus();
         }}
+        getNetwork={getNetwork}
       />
       <div className={styles.infoHeader}>
         <Breadcrumb

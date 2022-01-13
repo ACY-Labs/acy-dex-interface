@@ -255,7 +255,7 @@ const GlobalHeaderRight = props => {
     if (localStorage.getItem("wallet") == "nabox") {
       // Nabox 监听
       try {
-        window.NaboxWallet.on('networkChanged', function (chainId) {
+        NaboxWallet.on('networkChanged', function (chainId) {
           checkChainNetwork(chainId);
         })
       } catch (error) {
@@ -264,7 +264,7 @@ const GlobalHeaderRight = props => {
     }
     if (localStorage.getItem("wallet") == "binance") {
       try {
-        window.BinanceChain.on('networkChanged', function (chainId) {
+        BinanceChain.on('networkChanged', function (chainId) {
           checkChainNetwork(chainId);
         })
       } catch (error) {
@@ -444,14 +444,14 @@ const GlobalHeaderRight = props => {
   const switchEthereumChain = async (chainId) => {
     if (localStorage.getItem("wallet") == "metamask") {
       try {
-        await window.ethereum.request({
+        await ethereum.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: chainId }],
         });
       } catch (e) {
         if (e.code === 4902) {
           try {
-            await window.ethereum.request({
+            await ethereum.request({
               method: 'wallet_addEthereumChain',
               params: [
                 networkParams[chainId]
@@ -465,14 +465,14 @@ const GlobalHeaderRight = props => {
     }
     else if (localStorage.getItem("wallet") == "nabox") {
       try {
-        await window.NaboxWallet.request({
+        await NaboxWallet.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: chainId }],
         });
       } catch (e) {
         if (e.code === 4902) {
           try {
-            await window.NaboxWallet.request({
+            await NaboxWallet.request({
               method: 'wallet_addEthereumChain',
               params: [
                 networkParams[chainId]
@@ -486,14 +486,14 @@ const GlobalHeaderRight = props => {
     }
     else if (localStorage.getItem("wallet") == "binance") {
       try {
-        await window.BinanceChain.request({
+        await BinanceChain.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: chainId }],
         });
       } catch (e) {
         if (e.code === 4902) {
           try {
-            await window.BinanceChain.request({
+            await BinanceChain.request({
               method: 'wallet_addEthereumChain',
               params: [
                 networkParams[chainId]
