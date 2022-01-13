@@ -224,9 +224,9 @@ const LaunchpadProject = () => {
       .catch(e => {
         console.log("Project Detail check errrrrrrrrrrr",e);
         // console.error(e);
-        // history.push('/launchpad');
+        history.push('/launchpad');
       });
-  }, []);
+  }, [library, account]);
 
   // fetching data from Smart Contract
   useEffect(async () => {
@@ -576,7 +576,7 @@ const LaunchpadProject = () => {
   const Allocation = () => {
 
     const colorCodes = ["#C6224E", "#1E5D91", "#E29227", "#1C9965", "#70BA33"];
-    const baseColorCodes = ["#631027", "#74490f", "#0f2e48", "#0e4c32", "#375d19"];
+    const baseColorCodes = ["#631027", "#0f2e48", "#74490f", "#0e4c32", "#375d19"];
     const [innerValues, setInnerValues] = useState(new Array(5).fill(0));
     const [coverOpenStates, setCoverOpenStates] = useState(new Array(5).fill(false));
     const [salesValue, setSalesValue] = useState(0);
@@ -876,7 +876,7 @@ const LaunchpadProject = () => {
             </div>
             <Button 
               className="sales-submit"
-              disabled={false}
+              disabled={poolBaseData?(poolBaseData[2] >= new Date() || poolBaseData[3] <= new Date()) : false}
               onClick={onClickBuy}
             >
               Buy
