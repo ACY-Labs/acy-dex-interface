@@ -807,10 +807,9 @@ export async function getTransactionsByAccount (account,library,filter){
         let address =  account.toString();
         // let apikey = 'H2W1JHHRFB5H7V735N79N75UVG86E9HFH2';
         let offset=filter=='ALL'? '50':'50'; // NUMBER OF RESULTS FETCHED FROM ETHERSCAN
-        SCAN_API = SCAN_API.scanUrl;
         console.log("printing API endpoint", SCAN_API);
         console.log("printing gas token symbol", constantInstance.gasTokenSymbol);
-        let request = `${SCAN_API}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=${offset}&sort=desc`;
+        let request = `${SCAN_API.scanUrl}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=${offset}&sort=desc&apikey=${SCAN_API.APIKey}`;
         console.log("trying to fethc data for:", request);
 
         let response = await fetch(request);
