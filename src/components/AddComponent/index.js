@@ -89,7 +89,7 @@ const AddLiquidityComponent = props => {
 
   const { account, chainId, library, tokenList: INITIAL_TOKEN_LIST, farmSetting: { API_URL: apiUrlPrefix, INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader();
 
-  const { dispatch, token, onLoggedIn, isFarm = false } = props;
+  const { dispatch, token, onLogInChanged, isFarm = false } = props;
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
   // 选择货币前置和后置
@@ -332,14 +332,16 @@ const AddLiquidityComponent = props => {
 
   useEffect(
     () => {
+      onLogInChanged(account);
       if (account == undefined) {
+        setToken0BalanceShow(false);
+        setToken1BalanceShow(false);
         setButtonStatus(false);
         setButtonContent('Connect to Wallet');
       } else {
         setButtonContent('Choose tokens and amount');
         setButtonStatus(false);
         // set login state to true
-        onLoggedIn();
       }
     },
     [chainId, library, account]
