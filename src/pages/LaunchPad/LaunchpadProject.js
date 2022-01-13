@@ -730,7 +730,7 @@ const LaunchpadProject = () => {
           connectWallet()
         }
         // Check if users have collected token for current vesting stage
-        const investorData = await PoolContract.GetInvestmentData(PoolId, account)
+        const investorData = await PoolContract.GetInvestmentData(poolID, account)
         const investorRes = []
         if(investorData){
           investorData.map(data => investorRes.push(Number(BigNumber.from(data).toBigInt().toString())))
@@ -751,7 +751,7 @@ const LaunchpadProject = () => {
           setHasCollected(true)
         } else {
           const status = await (async () => {
-            const result = await PoolContract.WithdrawERC20ToInvestor(PoolId)
+            const result = await PoolContract.WithdrawERC20ToInvestor(poolID)
               .catch(e => {
                 console.log(e)
                 return new CustomError('CustomError while withdrawing token');
@@ -874,7 +874,7 @@ const LaunchpadProject = () => {
             </div>
             <Button 
               className="sales-submit"
-              disabled={comparevestDate}
+              disabled={false}
               onClick={onClickBuy}
             >
               Buy
