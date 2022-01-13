@@ -28,7 +28,7 @@ import { parse } from 'path-to-regexp';
 // import {constantInstance} from "@/constants";
 import { useConstantLoader,BLOCK_TIME, RPC_URL} from '@/constants';
 import {useConnectWallet} from "@/components/ConnectWallet"
-
+import { } from '../Market/Data/index.js';
 // const supportedTokens = constantInstance.farm_setting.TOKENLIST();
 
 const Farms = (props) => {
@@ -207,8 +207,9 @@ const Farms = (props) => {
       setIsMyFarms(false);
       if (account) {
         setWalletConnected(true);
+        const provider = new JsonRpcProvider(RPC_URL(), chainId);
         console.log("start getPools",library,chainId);
-        getPools(library, account, chainId);
+        getPools(provider, account, chainId);
 
       } else {
         const provider = new JsonRpcProvider(RPC_URL(), chainId);
