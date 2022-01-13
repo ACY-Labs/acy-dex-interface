@@ -59,7 +59,7 @@ function saveTxInDB(data){
     try{
         axios
         .post(
-            `${farmSetting.API_URL}/users/swap?address=${data.address}&hash=${data.hash}&valueSwapped=${valueSwapped}&feesPaid=${feesPaid}`
+            `${API_URL()}/users/swap?address=${data.address}&hash=${data.hash}&valueSwapped=${valueSwapped}&feesPaid=${feesPaid}`
         )
         .then(response => {
           console.log(response.response);
@@ -67,13 +67,38 @@ function saveTxInDB(data){
     }catch(e){
         console.log("service not working...")
     }
+    // TODO (Gary): Bonus here
+    try{
+        axios
+        .post(
+            `${API_URL()}/launch/allocation/bonus?walletId=${data.address}&T=${valueSwapped}&bonusName=swap`
+        )
+        .then(response => {
+          console.log(response.response);
+        });
+    } catch(e) {
+        console.log("failed to allocate bonus, catching error: ", e)
+    }
+    if (data.outTokenSymbol == 'ACY') {
+        try{
+            axios
+            .post(
+                `${API_URL()}/launch/allocation/bonus?walletId=${data.address}&T=${valueSwapped}&bonusName=swap`
+            )
+            .then(response => {
+              console.log(response.response);
+            });
+        } catch(e) {
+            console.log("failed to allocate bonus, catching error: ", e)
+        }
+    }
 
 }
 function addUserToDB(address){
     try{
         axios
         .post(
-            `${farmSetting.API_URL}/users/adduser?address=${address}`
+            `${API_URL()}/users/adduser?address=${address}`
         )
         .then(response => {
           console.log(response.response);

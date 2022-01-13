@@ -1,14 +1,8 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
-import {Icon} from 'antd';
 import MagicCard from './MagicCard.js';
 import ProjectCard from './ProjectsCard.js';
 
 const OngoingProjects = ({ data }) => {
-  const history = useHistory();
-  const onOpenProjectDetail = (projectId) => {
-    history.push(`/launchpad/project/${projectId}`)
-  }
 
   return (
     <>

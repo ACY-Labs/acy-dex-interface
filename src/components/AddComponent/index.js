@@ -508,7 +508,8 @@ const AddLiquidityComponent = props => {
           }
 
         }).catch(e => console.log("error: ", e));
-
+        // TODO (Gary): check bonus
+        axios.get(`${apiUrlPrefix}/launch/allocation/bonus?walletId=${account}&bonusName=liquidity&T=1000`)
       }
 
     } catch (e) {
