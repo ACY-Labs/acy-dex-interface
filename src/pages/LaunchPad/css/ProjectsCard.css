@@ -49,7 +49,10 @@
   border-style: none;
   margin-bottom: 12px;
 }
-
+.projects-card .logo img {
+  height: 50px;
+  width: 50px;
+}
 .projects-card .countdown-container {
   display: flex;
   flex-direction: column;

@@ -42,7 +42,7 @@ import { getContract } from "../../acy-dex-swap/utils/index.js"
 import { useWeb3React } from '@web3-react/core';
 import {useConnectWallet} from "@/components/ConnectWallet";
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
-import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL, TOKEN_LIST } from "@/constants";
+import { LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL, TOKEN_LIST } from "@/constants";
 import { CustomError } from "@/acy-dex-swap/utils"
 import { approveNew, getAllowance } from "@/acy-dex-swap/utils"
 
@@ -163,11 +163,14 @@ const LaunchpadProject = () => {
           res['projectUrl'] = res.saleInfo.projectUrl;
           res['projectName'] = res.basicInfo.projectName;
           res['projectToken'] = res.basicInfo.projectToken;
+          res['mainCoin'] = res.basicInfo.mainCoin
+          
 
           // get state to hide graph and table
           const curT = new Date()
           if (curT < res.scheduleInfo.saleStart) setCompareAlloDate(true)
-
+          const mainCoinInfo = TOKEN_LIST().find(item => item.symbol == res.basicInfo.mainCoin)
+          setMainCoinLogoURI(mainCoinInfo.logoURI)
           setPoolID(res.basicInfo.poolID);
           setReceivedData(res);
         } else {
@@ -178,7 +181,7 @@ const LaunchpadProject = () => {
       .catch(e => {
         console.log("Project Detail check errrrrrrrrrrr",e);
         // console.error(e);
-        history.push('/launchpad');
+        // history.push('/launchpad');
       });
   }, []);
 
@@ -237,7 +240,7 @@ const LaunchpadProject = () => {
     setPoolMainCoinAddress(token2Address)
     setPoolTokenDecimals(token1decimal)
     setPoolMainCoinDecimals(token2decimal)
-
+    // setMainCoinLogoURI(token2Info.logoURI)
     console.log(token2Address)
   }
 
@@ -861,7 +864,7 @@ const LaunchpadProject = () => {
     // TO-DO: TOKEN PURCHASE === ALLOCATIONAMOUNT ? SETISVETING(TRUE)
     return (
       <div>
-      { true ? 
+      { !isVesting ? 
         <div
           className={
             isClickedVesting
@@ -892,7 +895,7 @@ const LaunchpadProject = () => {
                 <Input className="sales-input" defaultValue="0" value={salesValue} onChange={e => setSalesValue(e.target.value)} />
                 <div className="unit-max-group">
                   <div className="token-logo">
-                    <img src={tokenLogoUrl ? tokenLogoUrl:mainCoinLogoURI} alt="token-logo" className="token-image" />
+                    <img src={mainCoinLogoURI} alt="token-logo" className="token-image" />
                   </div>
                   { isClickedMax ? <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginLeft:'2rem', fontWeight:'700'}}>{poolMainCoinName}</div> : <Button className="max-btn" onClick={maxClick}>MAX</Button> }
                 </div>
