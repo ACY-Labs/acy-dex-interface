@@ -992,6 +992,10 @@ export async function fetchTransactionData(address,library){
         },
     ],tokenPriceUSD);
 
+    // temporary fix for dist_output AKA trader output/treasury
+
+    let new_dist = (totalOut - amm_output) * .5;
+
     return {
         'token1' : inToken,
         'token2' : outToken,
@@ -1006,15 +1010,15 @@ export async function fetchTransactionData(address,library){
             },
         ],tokenPriceUSD),
         'amm_output': amm_output,
-        'acy_treasury': totalOut - amm_output - dist_output,
-        'trader_treasury': dist_output,
+        'acy_treasury': totalOut - amm_output - new_dist,
+        'trader_treasury': new_dist,
         'gas_symbol' : GAS_TOKEN,
         'trading_fee' : trading_fee,
-        'trader_final' : dist_output + amm_output,
+        'trader_final' : new_dist + amm_output,
         'trader_finalUSD' : totalInUSD([
             {
                 token : outToken.symbol,
-                amount : dist_output + amm_output
+                amount : new_dist + amm_output
             }
         ],tokenPriceUSD)
 
