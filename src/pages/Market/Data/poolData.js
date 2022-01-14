@@ -469,28 +469,4 @@ export async function fetchSearchPoolReturns(key) {
 
 // get individual pool info from token
 
-// 集合全部的pool/all 请求 ymj
-export async function fetchPoolDataForm_poolchart_all(key) {
-  tokensPriceUSD = await getAllSuportedTokensPrice_forMarket();
-  try{
-    let request = `${MARKET_API_URL()}/poolchart/all`;
-    let response = await fetch(request);
-    let data = await response.json();
-    const pairData = data.data.find(p => p.pairAddr.toLowerCase() == address.toLowerCase())
-    let parsed1 = parsePoolData(data.data);
-    let parsed2 = parseSearchPoolReturns(data.data, key);
-    let searchPoolReturns = parsed.map(tokenList => ({
-      coin1: tokenList.coin1,
-      coin2: tokenList.coin2,
-      logoURL1: tokenList.logoURL1,
-      logoURL2: tokenList.logoURL2,
-      address: tokenList.pairAddr,
-    }))
-    console.log(searchPoolReturns)
-    return searchPoolReturns;
-  }catch (e){
-    console.log('service not available yet',e);
-    return null;
-  }
-}
  

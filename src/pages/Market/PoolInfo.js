@@ -256,8 +256,6 @@ function MarketPoolInfo(props) {
   const redirectToLiq = useCallback(() => navHistory.push('/liquidity'), [history]);
   const redirectToEx = useCallback(() => navHistory.push('/exchange'), [history]);
   const redirectToToken = tokenAddress => {
-    console.log("ymj", tokenAddress);
-    // 此处有问题 数据库没有返回address-id
     navHistory.push(`/market/info/token/${tokenAddress}`);
   }
 
