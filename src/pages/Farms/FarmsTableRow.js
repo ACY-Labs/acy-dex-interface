@@ -82,7 +82,8 @@ const FarmsTableRow = props => {
     tokenFilter,
     dao,
     isLoading,
-    activeEnded
+    activeEnded,
+    setWalletConnected
   } = props;
 
   const [poolInfo, setPoolInfo] = useState(content);
@@ -140,6 +141,8 @@ const FarmsTableRow = props => {
     },
     [isLoading]
   );
+
+  
   
 
   useEffect(
@@ -649,6 +652,7 @@ const FarmsTableRow = props => {
               token1: poolInfo.token1,
               token2: poolInfo.token2
             }}
+            onLogInChanged={setWalletConnected}
           />
         )}
         </div>

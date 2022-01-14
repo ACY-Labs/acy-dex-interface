@@ -13,10 +13,9 @@ import { PortisConnector_test} from './portisToBinance'
 import {NaboxConnector} from './naboxWallet'
 
 const RPC_URLS = {
-  1: 'https://data-seed-prebsc-1-s1.binance.org:8545',
-  // 1: 'https://mainnet.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
+  1: 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
   4: 'https://rinkeby.infura.io/v3/1e70bbd1ae254ca4a7d583bc92a067a2',
-  56: 'https://bsc-dataseed.binance.org/',
+  56: 'https://bsc-dataseed1.binance.org/',
   97: 'https://data-seed-prebsc-1-s1.binance.org:8545',
   137: 'https://polygon-rpc.com'
 };
@@ -24,8 +23,8 @@ const POLLING_INTERVAL = 12000;
 
 // 连接钱包时支持的货币id
 const injected = new InjectedConnector({
-  //supportedChainIds: [1, 3, 4, 5, 42, 56, 97, 137, 80001],
-  supportedChainIds: [56, 97, 137, 80001],
+  supportedChainIds: [1, 3, 4, 5, 42, 56, 97, 137, 80001],
+  //supportedChainIds: [56, 97, 137, 80001],
   // supportedChainIds: [56, 97],
 });
 
@@ -35,9 +34,12 @@ const nabox = new NaboxConnector({
 
 
 const walletconnect = new WalletConnectConnector({
-  rpc: { 56: RPC_URLS['56'], 97: RPC_URLS['97'], 137:RPC_URLS['137'] },
+  rpc: { 1: RPC_URLS['1'],4: RPC_URLS['4'], 56: RPC_URLS['56'], 97: RPC_URLS['97'], 137:RPC_URLS['137'] },
+  //rpc: { 1: RPC_URLS['1']},
+  bridge: "https://pancakeswap.bridge.walletconnect.org/",
   qrcode: true,
 });
+
 const walletlink = new WalletLinkConnector({
   url: RPC_URLS['56'],
   appName: 'ACY swap',

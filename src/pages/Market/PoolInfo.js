@@ -29,6 +29,7 @@ import {
 import {SCAN_URL_PREFIX} from "@/constants";
 import { useWeb3React } from '@web3-react/core';
 import {useConnectWallet} from "@/components/ConnectWallet";
+import { useConstantLoader } from '@/constants'
 // const scanUrlPrefix = SCAN_URL_PREFIX();
 
 
@@ -38,14 +39,15 @@ let poolData = dataSourcePool[0];
 
 function MarketPoolInfo(props) {
   let { address } = useParams();
-  const { chainId: walletChainId } = useWeb3React();
+  //const { chainId: walletChainId } = useWeb3React();
+  const { account, marketNetwork: walletChainId } = useConstantLoader();
 
   const connectWalletByLocalStorage = useConnectWallet();
   useEffect(() => {
-    if(!walletChainId){
+    if(!account){
       connectWalletByLocalStorage();
     }
-  }, []);
+  }, [account]);
 
   const [poolData, setPoolData] = useState({});
   const [graphTabIndex, setGraphTabIndex] = useState(0);
@@ -253,7 +255,9 @@ function MarketPoolInfo(props) {
 
   const redirectToLiq = useCallback(() => navHistory.push('/liquidity'), [history]);
   const redirectToEx = useCallback(() => navHistory.push('/exchange'), [history]);
-  const redirectToToken = tokenAddress => navHistory.push(`/market/info/token/${tokenAddress}`);
+  const redirectToToken = tokenAddress => {
+    navHistory.push(`/market/info/token/${tokenAddress}`);
+  }
 
   return (
     <div className={styles.marketRoot}>

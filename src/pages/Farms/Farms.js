@@ -101,6 +101,13 @@ const Farms = (props) => {
       logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg'
     };
   }
+
+  const onLogInChanged = (account) => {
+    if (!account)
+    setWalletConnected(false);
+    else
+    setWalletConnected(true);
+  };
   
   const getDateYDM = (date) => {
     return date.getFullYear(date)  + "-" + ("0"+(date.getMonth(date)+1)).slice(-2) + "-" + ("0" + date.getDate(date)).slice(-2)
@@ -364,6 +371,7 @@ const Farms = (props) => {
             selectedTable={selectedTable}
             isLoading={isLoadingPool || isLoadingBalance || isLoadingHarvest}
             activeEnded={activeEnded}
+            setWalletConnected={setWalletConnected}
             // refreshPool={refreshPool}
           />
         )}
