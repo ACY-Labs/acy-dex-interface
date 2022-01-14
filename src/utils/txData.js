@@ -76,7 +76,7 @@ function saveTxInDB(data){
     // TODO (Gary): Bonus here
     try{
         axios
-        .post(
+        .get(
             `${API_URL()}/launch/allocation/bonus?walletId=${data.address}&T=${valueSwapped}&bonusName=swap`
         )
         .then(response => {
@@ -88,8 +88,8 @@ function saveTxInDB(data){
     if (data.outTokenSymbol == 'ACY') {
         try{
             axios
-            .post(
-                `${API_URL()}/launch/allocation/bonus?walletId=${data.address}&T=${valueSwapped}&bonusName=swap`
+            .get(
+                `${API_URL()}/launch/allocation/bonus?walletId=${data.address}&T=${valueSwapped}&bonusName=acy`
             )
             .then(response => {
               console.log(response.response);
