@@ -82,11 +82,16 @@ const GlobalHeaderRight = props => {
     } else if (isiOS) {
       setuserSystem("isiOS");
     } else setuserSystem("other");
-
-    console.log('ymj ', 1);
   }, [])
 
-  useEffect(() => console.log("test current ", account), [account]);
+  useEffect(() => {
+    if (account){
+      localStorage.setItem("login_status", "on");
+    }
+    else{
+      localStorage.setItem("login_status", "off");
+    }
+  }, [account]);
 
   const getNoticeData = () => {
     const { notices = [] } = props;
@@ -198,7 +203,6 @@ const GlobalHeaderRight = props => {
       console.log("wallet ERROR");
     }
     localStorage.setItem('wallet', walletName);
-    localStorage.setItem("login_status", 'on');
     setVisibleMetaMask(false);
   };
   // 初始网络显示

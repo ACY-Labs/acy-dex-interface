@@ -142,7 +142,6 @@ const MarketIndex = props => {
         getNetwork={getNetwork}
         networkShow = {true}
       />
-      {/* ymj 两个图表 */}
       <div className={styles.chartsMain}>
         <div className={styles.chartSectionMain}>
           {chartData.tvl.length > 0 ? (
@@ -229,7 +228,6 @@ const MarketIndex = props => {
         !isMobile && <Icon type="loading" />
       )}
 
-      {/* ymj 两个图表 结束 */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <h2>Top Tokens</h2>
         <h3>
