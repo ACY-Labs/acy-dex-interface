@@ -197,7 +197,8 @@ export class SmallTable extends React.Component {
     );
   };
 
-  render() {
+  
+  render() { 
     return (
       <table className={styles.smallTable}>
         <tbody>
@@ -948,7 +949,6 @@ export const MarketSearchBar = props => {
   const [localToken, setLocalToken] = useState([]);
   const [localPool, setLocalPool] = useState([]);
   // fetch searchcoinresults
-
   const networkOptions = [
     {
       name: 'Ethereum',
@@ -1109,12 +1109,15 @@ export const MarketSearchBar = props => {
 
   // 网络列表
   const [networkListIndex, setNetworkListIndex] = useState(0);
+
   const networkList = [
     {
       name: 'BSC',
       icon: 'Binance',
       onClick: async () => {
         setNetworkListIndex(0);
+        props.getNetwork('BSC');
+        localStorage.setItem("market", 56);
       },
     },
     {
@@ -1122,9 +1125,12 @@ export const MarketSearchBar = props => {
       icon: 'Polygon',
       onClick: async () => {
         setNetworkListIndex(1);
+        props.getNetwork('Polygon');
+        localStorage.setItem("market", 137);
       },
     },
-];
+  ];
+  
   const networkListInCardList = (
     <div className={styles.networkListBlock}>
       <div>
@@ -1146,8 +1152,18 @@ export const MarketSearchBar = props => {
     </div>
   );
 
+  const n_index = () =>{
+    const n = localStorage.getItem("market");
+    if (n == 56){
+      return 0;
+    }else if (n==137){
+      return 1;
+    }else return 0;
+  }
+
   // lifecycle methods
   useEffect(() => {
+    setNetworkListIndex(n_index);
     let contentRoot = ReactDOM.findDOMNode(rootRef.current).parentNode.parentNode;
     contentRoot.addEventListener('scroll', onScroll);
 
@@ -1343,7 +1359,8 @@ export const MarketSearchBar = props => {
 
       {/* network button */}
       <div>
-        <Dropdown
+        {props.networkShow ?
+        (<Dropdown
         overlay={networkListInCardList}
         trigger={['click']}
         placement="bottomLeft"
@@ -1355,8 +1372,9 @@ export const MarketSearchBar = props => {
               <AcyIcon.MyIcon type={item.icon} /> {item.name} Network<DownOutlined className={styles.networkHandleFont}/> </div>
           ))}
         </div>
-      </Dropdown>
+      </Dropdown>):''}
       </div>
+      
     </div>
   );
 };
