@@ -94,11 +94,11 @@ function parsePoolInfo(data){
       reserve1: data.lastReserves.token1.toString(),
       reserveUSD: _tvl.toString(),
       token0: {
-        symbol:  _token0 , logoURI : _logoURL1
+        symbol:  _token0 , logoURI : _logoURL1, id: data.token0
       },
       token0Price: _token0USD.toString(),
       token1: {
-        symbol:  _token1 , logoURI : _logoURL2
+        symbol:  _token1 , logoURI : _logoURL2, id: data.token1
       },
       token1Price: _token1USD.toString(),
       untrackedVolumeUSD: "0",
@@ -470,7 +470,7 @@ export async function fetchSearchPoolReturns(key) {
 // get individual pool info from token
 
 // 集合全部的pool/all 请求 ymj
-export async function fetchDataForm_poolchart_all(key) {
+export async function fetchPoolDataForm_poolchart_all(key) {
   tokensPriceUSD = await getAllSuportedTokensPrice_forMarket();
   try{
     let request = `${MARKET_API_URL()}/poolchart/all`;

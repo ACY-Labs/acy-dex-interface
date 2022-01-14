@@ -608,29 +608,6 @@ function AccountInfo(props) {
 
   }
 
-  // no need to fetch the pool valume at here 
-  // useEffect(async () => {
-  //   const token0list = [];
-  //   const token1list = [];
-  //   console.log("fetching the poolvalume data");
-  //   // axios.get(
-  //   //   // fetch valid pool list from remote
-  //   //   // `https://api.acy.finance/api/pool?chainId=${chainId}`
-  //   //   // `https://api.acy.finance/api/poolchart/all`
-  //   //   `http://localhost:3001/api/poolchart/all`
-  //   // ).then(async res => {
-  //   //   console.log(res);
-  //   //   console.log("test=====");
-  //   //   console.log(res.data);
-  //   //   for (let index = 0; index < array.length; index++) {
-  //   //     const element = array[index];
-        
-  //   //   }
-  //   // }).catch( err => {
-  //   //   console.log(err);
-  //   // });
-  // }, [])
-
   useEffect(async () => {
     console.log("the user address is :" + account);    
     console.log("fetching the user pairs information");

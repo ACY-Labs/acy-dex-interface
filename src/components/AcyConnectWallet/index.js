@@ -73,14 +73,13 @@ const AcyConnectWallet = props => {
       initTokenBalanceDict(INITIAL_TOKEN_LIST);
     }
   }, [account, fallbackChainId])
-  // ymj 任务 NAN数字 && 请求集合
+
   useEffect(() => {
     var balance = 0;
     var balance_k = 0; //3
     var balance_m = 0; //6
     var balance_b = 0; //9
     var balance_t = 0; //12
-    console.log("ymj token price", tokenBalanceDict, tokenPriceDict);
     Object.keys(tokenBalanceDict).forEach(ele => {
       // balance calculate
       let flag = tokenBalanceDict[ele].substr(-1).toUpperCase();
@@ -106,7 +105,6 @@ const AcyConnectWallet = props => {
           break;
       }
     })
-    console.log("ymj", balance, balance_k, balance_m, balance_b, balance_t);
     var finalBalance = 0;
     if(balance_t!=0){
       finalBalance = (balance_t + (balance_b/1000)).toFixed(2).toString() + 'T';
