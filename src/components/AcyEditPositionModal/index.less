@@ -1,0 +1,213 @@
+.removeAmountContainer,
+.tokenAmountContainer {
+  color: white;
+  background-color: #1b1b1c;
+  // background-color: #2e3032;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.amountText {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+}
+
+.amountInput {
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.sliderContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.sliderInput {
+  width: 100%;
+  padding: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px; /* Specified height */
+  background: black; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: 0.2s; /* 0.2 seconds transition on hover */
+  transition: opacity 0.2s;
+}
+
+.sliderInput:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+.sliderInput::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 15px; /* Set a specific slider handle width */
+  height: 15px; /* Slider handle height */
+  border-radius: 50%;
+  background-color: #c4c4c4; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.sliderInput::-moz-range-thumb {
+  width: 15px; /* Set a specific slider handle width */
+  height: 15px; /* Slider handle height */
+  background-color: #c4c4c4; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.tokenAmountContent {
+  display: flex;
+  justify-content: space-between;
+}
+
+.tokenDetailContainer {
+  margin-left: 1em;
+  display: flex;
+  align-items: center;
+}
+
+.tokenAmount {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.transactionSettingHeader {
+  font-weight: bold;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.transactionSettingVal {
+  margin-left: 1em;
+  display: flex;
+  align-items: center;
+}
+.tokenImg {
+  height: 24px;
+}
+
+.tokenSymbol {
+  font-size: 1.25rem;
+  margin-left: 0.5rem;
+  font-weight: bold;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.inactive_button {
+  padding: 15px !important;
+  flex: 1;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  color: white;
+  background-color: #1b1b1c;
+}
+
+.active_button {
+  padding: 15px !important;
+  flex: 1;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  color: white;
+  margin-right: 0.5rem;
+  background-color: #eb5c20;
+}
+
+.active_button:hover {
+  background-color: #e29227;
+  cursor: pointer;
+}
+
+.inactive_button:hover:not([disabled]) {
+  background-color: #29292c;
+  cursor: pointer;
+}
+
+.breakdownLine {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.breakdownContainer {
+  background: #1b1b1c;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.modalTitle{
+    margin-bottom :  .5rem;
+    font-weight: 600;
+    font-size: 150%;
+}
+.editPositionInfo{
+    margin-top: 2rem;
+    padding: 0.5rem;
+    font-weight: 600;
+    align-items: right;
+}
+.infoSmallBox {
+    display : grid;
+    grid-template-columns: auto auto;
+    font-size: .9rem;
+    margin-bottom: 0.3rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+.infoBoxTitle{
+   font-weight: 400;
+    
+}
+.infoBoxValue{
+    font-weight: 800;
+    text-align: right;
+}
+.buttonContainer {
+  display : flex;
+  justify-content: space-between;
+}
+
+.optionBarContainer{
+  display: grid;
+  grid-template-columns: auto auto;
+  font-size: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.optionBar {
+  text-align: center;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  border-radius: .2rem;
+  background-color: rgb(44, 47, 54);
+}
+.optionBarSelected {
+  background-color: #eb5c20;
+  color: white;
+  font-weight: 600;
+}

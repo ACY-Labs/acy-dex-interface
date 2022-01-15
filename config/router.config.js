@@ -50,7 +50,7 @@ export default [
         ],
       },
       {
-        path: '/Perpetual',
+        path: '/perpetual',
         name: 'Perpetual',
         component: './Perpetual/Index',
       },

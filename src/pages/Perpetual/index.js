@@ -118,6 +118,8 @@ const Swap = props => {
   const [transactionList, setTransactionList] = useState([]);
   const [tableLoading, setTableLoading] = useState(true);
   const [transactionNum, setTransactionNum] = useState(0);
+
+  // this are new states for PERPETUAL
   const [showActionTable, setShowActionTable] = useState(false);
   const [positionsData, setPositionsData] = useState([]);
   const { activate } = useWeb3React();
@@ -147,8 +149,41 @@ const Swap = props => {
     setTransactionList([]);
     setTableLoading(true);
     setTransactionNum(0);
+    
+    const samplePositionsData = [
+      {
+        token : {
+          symbol : 'ACY',
+          logoURI : 'https://acy.finance/static/media/logo.78c0179c.svg'
+        },
+        isLong : true,
+        delta : 6.99,
+        netValue : 455.95,
+        PnL : 455.95 - 93.58,
+        totalSize : 3000,
+        collateral : 93.58,
+        markPrice : 94.34,
+        entryPrice : 94.21,
+        liqPrice : 81.09
+      },
+      {
+        token : {
+          symbol : 'ETH',
+          logoURI : 'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=014'
+        },
+        isLong : false,
+        delta : 6.99,
+        netValue : 455.95,
+        PnL : 455.95 - 93.58,
+        totalSize : 3000,
+        collateral : 93.58,
+        markPrice : 94.34,
+        entryPrice : 94.21,
+        liqPrice : 81.09
+      }
+    ]
+    setPositionsData(samplePositionsData);
   }, [chainId])
-
   const refContainer = useRef();
   refContainer.current = transactionList;
 
@@ -501,7 +536,6 @@ const Swap = props => {
         <div className={styles.exchangeItem}>
         </div>
       </div>
-
       <AcyModal onCancel={onCancel} width={600} visible={visible}>
         <div className={styles.title}>
           <AcyIcon name="back" /> Select a token
@@ -526,26 +560,6 @@ const Swap = props => {
           </AcyTabs>
         </div>
       </AcyModal>
-
-      <AcyConfirm
-        onCancel={onHandModalConfirmOrder}
-        title="Comfirm Order"
-        visible={visibleConfirmOrder}
-      >
-        <div className={styles.confirm}>
-          <p>ETH： 566.228</p>
-          <p>BTC：2.669</p>
-          <p>Price：212.123</p>
-          <p>Price Impact：2.232%</p>
-          <p>Liquidity Provide Fee: 0.321%</p>
-          <p>Alpha: 0.371%</p>
-          <p>Maximum sold: 566.221</p>
-          <Button size="large" type="primary">
-            Confirm
-          </Button>
-        </div>
-      </AcyConfirm>
-
       <AcyApprove
         onCancel={() => setVisibleLoading(false)}
         visible={visibleLoading}

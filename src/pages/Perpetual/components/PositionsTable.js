@@ -4,8 +4,10 @@ import {  Divider, Icon, Input, Table  } from 'antd';
 import styles from './PositionsTable.less';
 import numeral from 'numeral';
 import formatNumber from 'accounting-js/lib/formatNumber.js';
-import  { abbrNumber } from '../../Market/Util.js';
 import { constantInstance } from '@/constants';
+import { calcPercent } from '../utils/';
+import AcyEditPositionModal from '@/components/AcyEditPositionModal';
+
 function sortTableTime(table, key, isReverse) {
   return table.sort((a, b) => {
     if (isReverse) {
@@ -19,121 +21,125 @@ function sortTableTime(table, key, isReverse) {
 const StakeHistoryTable = props => {
   const [stakeDisplayNumber, setStakeDisplayNumber] = useState(5);
   const { dataSource, isMobile } = props;
-
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isCloseModalVisible, setIsCloseModalVisible] = useState(false);
+  const [editPosition, setEditPosition] = useState();
+  const [closePosition, setClosePosition] = useState();
+  
+  const onHandleEditModal = (position) =>{
+    setEditPosition(position);
+    setIsEditModalVisible(true);
+  }
+  const onHandleCloseModal = (position) =>{
+    setClosePosition(position);
+    setIsCloseModalVisible(true);
+  }
   const sampleStakeHistoryColumns = [
     {
-      title: (
-        <div
-          className={styles.tableDataFirstColumn}
-        >
-          Positions
-        </div>
-      ),
+      title: 'Positions',
       dataIndex: '',
-      key: 'fromforto',
+      align : 'left',
       render: (text, record) => {
           return (
-          <div className={styles.tableDataFirstColumn}>
-            Swap {record.inputTokenSymbol} for {record.outTokenSymbol} {record.FA ? " (FA)" : ""}
+          <div>
+            <div className={styles.tableEntryBig}>
+              {record.token.symbol}
             </div>
+            <div>
+              <span >
+                {record.delta.toFixed(2)}x
+              </span>
+              {record.isLong ? (
+                <span className={styles.tableEntryGreen}>
+                  Long
+                </span>
+              ) : (
+                <span className={styles.tableEntryRed}>
+                  Short
+                </span>
+              )}
+            </div>
+          </div>
           );  
       }
     },
     {
-      title: (
-        <div
-          className={styles.tableData}
-        >
-          Net Value
-        </div>
-      ),
-      dataIndex: 'totalToken',
-      key: 'totalToken',
+      title: 'Net Value',
+      dataIndex: 'netValue',
+      align : 'left',
       render: (text,record) => {
-        return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
+        
+        return <div>
+          <div className={styles.tableEntryBig}>
+              ${record.netValue}
+            </div>
+            <div>
+              {record.PnL >= 0 ? (
+                <span className={styles.tableEntryGreen}>
+                  +{record.PnL} (+{calcPercent(record.PnL,record.collateral)}%) 
+                </span>
+              ) : (
+                <span className={styles.tableEntryRed}>
+                  {record.PnL}
+                </span>
+              )}
+            </div>
+          </div>;
       }
     },
     {
-        title: (
-          <div
-            className={styles.tableData}
-          >
-            Size
-          </div>
-        ),
-        dataIndex: 'totalToken',
-        key: 'totalToken',
+        title: 'Size',
+        dataIndex: 'totalSize',
+        align : 'left' ,
         render: (text,record) => {
-          return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
+          return <div className={styles.tableEntryBig}>$ {text.toFixed(2)}</div>;
         }
       },
     {
-      title: (
-        <div
-          className={styles.tableData}
-        >
-          Collateral
-        </div>
-      ),
-      dataIndex: 'inputTokenNum',
-      key: 'inputTokenNum',
+      title: 'Collateral',
+      dataIndex: 'collateral',
+      align : 'left',
       render: (text,record) => {
-        return <div className={styles.tableData}>{abbrNumber(text)} {record.inputTokenSymbol}</div>;
+        return <div className={styles.tableEntryBig}>$ {text.toFixed(2)}</div>;
       }
     },
     {
-      title: (
-        <div
-          className={styles.tableData}
-        >
-          Mark Price
-        </div>
-      ),
-      dataIndex: 'outTokenNum',
-      key: 'outTokenNum',
+      title: 'Mark Price',
+      dataIndex: 'markPrice',
+      align : 'left',
       render: (text,record) => {
-        return <div className={styles.tableData}>{abbrNumber(text)} {record.outTokenSymbol}</div>;
+        return <div className={styles.tableEntryBig}>$ {text.toFixed(2)}</div>;
       }
     },
     {
-      title: (
-        <div
-          className={styles.tableData}
-        >
-          Entry Price
-        </div>
-      ),
-      dataIndex: 'transactionTime',
-      key: 'transactionTime',
+      title: 'Entry Price',
+      dataIndex: 'entryPrice',
+      align : 'left',
       render: (text,record) => {
-        return <div className={styles.tableData}>{text}</div>;
+        return <div className={styles.tableEntryBig}>$ {text.toFixed(2)}</div>;
       }
     },
     {
-        title: (
-          <div
-            className={styles.tableData}
-          >
-            Liq. Price
-          </div>
-        ),
-        dataIndex: 'transactionTime',
-        key: 'transactionTime',
+        title: 'Liq. Price',
+        dataIndex: 'liqPrice',
+        align : 'left',
         render: (text,record) => {
-          return <div className={styles.tableData}>{text}</div>;
+          return <div className={styles.tableEntryBig}>$ {text.toFixed(2)}</div>;
         }
       },
       {
-        title: (
-          <div
-            className={styles.tableData}
-          >
-          </div>
-        ),
-        dataIndex: 'transactionTime',
+        dataIndex: '',
         key: 'transactionTime',
+        align : 'left',
         render: (text,record) => {
-          return <div className={styles.tableData}>{text}</div>;
+          return <div>
+            <div className = {styles.rowEditButton} onClick={() =>  onHandleEditModal(record) }>
+              Edit
+            </div>
+            <div className = {styles.rowEditButton} onClick={() => onHandleCloseModal(record) }>
+              Close
+            </div>
+          </div>
         }
       },
     
@@ -151,33 +157,26 @@ const StakeHistoryTable = props => {
       key: 'transactionTime'
     },
   ]
+
   return (
-    <div className={styles.nobgTable}>
-      <Table
-        columns={isMobile&&sampleStakeHistoryMobileColumns||sampleStakeHistoryColumns}
-        dataSource={sortTableTime(dataSource,'transactionTime',true).slice(0,stakeDisplayNumber+1)}
-        className={styles.tableStyle}
-        pagination={false}
-        locale={{ emptyText: 'No Positions Yet' }}
-        onRow={record => {
-          if(record.FA){
-            return {
-              onClick: event => {
-                // 跳转到eths
-                window.open(`#/transaction/${record.hash}`);
-              }, // 点击行
-            };
-          }else{
-            return {
-              onClick: event => {
-                // 跳转到eths
-                window.open(`${constantInstance.scanUrlPrefix.scanUrl}/tx/${record.hash}`);
-              }, // 点击行
-            };
-          }
-          
-        }}
-      />
+    <div>
+      <div className={styles.nobgTable}>
+        <Table
+          columns={isMobile&&sampleStakeHistoryMobileColumns||sampleStakeHistoryColumns}
+          dataSource={sortTableTime(dataSource,'transactionTime',true).slice(0,stakeDisplayNumber+1)}
+          className={styles.tableStyle}
+          pagination={false}
+          locale={{ emptyText: 'No Positions Yet' }}
+        />
+      </div>
+      <AcyEditPositionModal 
+        EditPosition = {editPosition}
+        isModalVisible={isEditModalVisible}
+        onCancel = {() => setIsEditModalVisible(false)}/>
+      {/* <AcyClosePositionModal 
+        EditPosition = {closePosition}
+        isModalVisible={isCloseModalVisible}
+        onCancel = {() => setIsCloseModalVisible(false)}/> */}
     </div>
     
   );
