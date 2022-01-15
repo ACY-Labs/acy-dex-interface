@@ -69,7 +69,7 @@ export const ConstantLoader = (chainId = 56, marketChainId = 56) => {
     const fallbackChainId = chainSupportedIndex ? chainId : 56;    // redirect unsupported chainId and undefined to 56
 
     const marketChainSupportedIndex = (supportedChainIds.indexOf(marketChainId) !== -1);
-    const marketNetwork = marketChainSupportedIndex ? marketNetwork : 56;
+    const marketNetwork = marketChainSupportedIndex ? marketChainId : 56;
 
   
 
@@ -83,8 +83,8 @@ export const ConstantLoader = (chainId = 56, marketChainId = 56) => {
         'launchpadSetting': LaunchpadSettingSelector(fallbackChainId),
         'sdkSetting': SDK_SETTING,
         'gasTokenSymbol': GAS_TOKEN_SYMBOL[fallbackChainId],
-        'marketAPISetting': FarmSettingSelector(marketChainId),
-        'marketTokenList': TokenListSelector(marketChainId),
+        'marketAPISetting': FarmSettingSelector(marketNetwork),
+        'marketTokenList': TokenListSelector(marketNetwork),
     };
 
     return constants;
@@ -94,12 +94,8 @@ export const ConstantLoader = (chainId = 56, marketChainId = 56) => {
 export const useConstantLoader = () => {
     const { account, chainId, library } = useWeb3React();
     const [constant, setConstant] = useState(constantInstance);
-    let marketChainId = 56
-    if (localStorage.getItem("market")){
-        marketChainId = localStorage.getItem("market");
-    } else if(!localStorage.getItem("market")){
-        localStorage.setItem("market", 56);
-    }
+
+    const marketChainId = Number(localStorage.getItem("market"));
 
 
     useEffect(() => {
@@ -107,19 +103,19 @@ export const useConstantLoader = () => {
         const fallbackChainId = chainSupportedIndex ? chainId : 56;    // redirect unsupported chainId and undefined to 56
 
         const marketChainSupportedIndex = (supportedChainIds.indexOf(marketChainId) !== -1);
-        const marketNetwork = marketChainSupportedIndex ? marketNetwork : 56;
+        const marketNetwork = marketChainSupportedIndex ? marketChainId : 56;
 
-        const staticConstants = ConstantLoader(fallbackChainId, marketChainId);
+        const staticConstants = ConstantLoader(fallbackChainId, marketNetwork);
         const constants = Object.assign({
             'account': chainSupportedIndex ? account : undefined,
             'chainId': fallbackChainId,
             'library': chainSupportedIndex ? library : defaultLibrary,
-            'marketNetwork': marketChainId,
+            'marketNetwork': marketNetwork,
         }, staticConstants);
 
         constantInstance = constants;
         setConstant(constants);
-    }, [account, chainId, localStorage.getItem("market")]);
+    }, [account, chainId, marketChainId]);
 
     return constant;
 }
