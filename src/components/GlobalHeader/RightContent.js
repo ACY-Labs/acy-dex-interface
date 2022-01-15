@@ -43,8 +43,8 @@ const GlobalHeaderRight = props => {
   const [visibleSetting, setVisibleSetting] = useState(false);
   const [only, setOnly] = useState(true);
   // 连接钱包函数
-  const { account, library } = useConstantLoader();
-  const { chainId, activate, deactivate, active } = useWeb3React();
+  const { library } = useConstantLoader();
+  const { account, chainId, activate, deactivate, active } = useWeb3React();
 
   const [wallet, setWallet] = useState(localStorage.getItem("wallet"));
 
@@ -89,7 +89,8 @@ const GlobalHeaderRight = props => {
       localStorage.setItem("login_status", "on");
     }
     else{
-      localStorage.setItem("login_status", "off");
+      //localStorage.setItem("login_status", "off");
+      setNetworkListIndex(0)
     }
   }, [account]);
 
@@ -160,6 +161,8 @@ const GlobalHeaderRight = props => {
 
   // 选择钱包
   const selectWallet = walletName => {
+    if (walletName!=localStorage.getItem("wallet"))
+      localStorage.setItem("login_status", "off");
     console.log('selecting wallet', walletName);
     if (walletName === 'metamask' || walletName === 'opera') {
       try {
@@ -167,6 +170,9 @@ const GlobalHeaderRight = props => {
         activate(injected);
       } catch (error) {
         message.info('No provider was found');
+        if(account){
+          localStorage.setItem("login_status", "on");
+        }
         return
       }
     } else if (walletName === 'walletconnect') {
@@ -189,6 +195,9 @@ const GlobalHeaderRight = props => {
         activate(binance);
       } catch (error) {
         message.info('No provider was found');
+        if(account){
+          localStorage.setItem("login_status", "on");
+        }
         return
       }
     } else if (walletName === 'nabox') {
@@ -197,6 +206,9 @@ const GlobalHeaderRight = props => {
         activate(nabox);
       } catch (error) {
         message.info('No provider was found');
+        if(account){
+          localStorage.setItem("login_status", "on");
+        }
         return
       }
     } else {
@@ -207,13 +219,16 @@ const GlobalHeaderRight = props => {
   };
   // 初始网络显示
   const n_index = chainId => {
-    if (chainId == 56) {
-      return 1
-    }
-    if (chainId == 137) {
+    if (chainId == 56 || chainId == 97) {
       return 2
     }
-    return 0
+    if (chainId == 137 || chainId == 80001) {
+      return 3
+    }
+    if (chainId == undefined){
+      return 0
+    }
+    return 1
   }
   // 通知钱包连接成功
   const checkChainNetwork = (chainId) => {
@@ -523,6 +538,13 @@ const GlobalHeaderRight = props => {
   const [networkListIndex, setNetworkListIndex] = useState(0);
   const networkList = [
     {
+      name: 'NO Network',
+      //icon: 'Polygon',
+      onClick: async () => {
+        setVisibleMetaMask(false);
+      },
+    },
+    {
       name: 'Wrong Network',
       //icon: 'Polygon',
       onClick: async () => {
@@ -552,7 +574,7 @@ const GlobalHeaderRight = props => {
         <span>Select a Network</span>
       </div>
       <AcyCardList>
-        {networkList.slice(1,).map((item) => {
+        {networkList.slice(2,).map((item) => {
           return (
             <AcyCardList.Thin className={styles.networkListLayout} onClick={() => item.onClick()}>
               {
