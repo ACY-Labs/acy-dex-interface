@@ -94,8 +94,13 @@ export const ConstantLoader = (chainId = 56, marketChainId = 56) => {
 export const useConstantLoader = () => {
     const { account, chainId, library } = useWeb3React();
     const [constant, setConstant] = useState(constantInstance);
+    let marketChainId = 56
+    if (localStorage.getItem("market")){
+        marketChainId = localStorage.getItem("market");
+    } else if(!localStorage.getItem("market")){
+        localStorage.setItem("market", 56);
+    }
 
-    const marketChainId = localStorage.getItem("market");
 
     useEffect(() => {
         const chainSupportedIndex = (supportedChainIds.indexOf(chainId) !== -1);

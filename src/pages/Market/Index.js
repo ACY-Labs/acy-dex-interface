@@ -65,6 +65,9 @@ const MarketIndex = props => {
   const connectWalletByLocalStorage = useConnectWallet();
  
   useEffect(() => {
+    if(!localStorage.getItem("market")){
+      localStorage.setItem("market", 56);
+    }
     if(!account){
       connectWalletByLocalStorage();
     }
