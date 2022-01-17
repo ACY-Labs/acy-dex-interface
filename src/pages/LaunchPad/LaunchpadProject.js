@@ -340,14 +340,10 @@ const LaunchpadProject = () => {
             
               <div>
                 <p>Sale (FCFS)</p>
-                
-                {poolBaseData &&
                   <div>
-                    <p className="shortText">From : {poolBaseData[2]}</p>
-                    <p className="shortText">To : {poolBaseData[3]}</p>
+                    <p className="shortText">From : {receivedData.saleStart}</p>
+                    <p className="shortText">To : {receivedData.saleEnd}</p>
                   </div>
-                }
-                
               </div>
             
           </div>
@@ -438,7 +434,7 @@ const LaunchpadProject = () => {
         <div className="keyinfoRow" style={{ marginTop: '1rem' }}>
           <div className="keyinfoName">Total Raise</div>
           <div>
-            {receivedData.totalRaise} {receivedData.basicInfo.mainCoin}
+            {receivedData.totalRaise} {receivedData.mainCoin}
           </div>
         </div>
 
@@ -608,6 +604,7 @@ const LaunchpadProject = () => {
             if (res) {
               console.log('resalloc: ', res);
               setAllocationInfo(res);
+              setSalesValue(res);
               updateInnerValues(index);
               updateCoverStates(index);
             }
@@ -671,6 +668,7 @@ const LaunchpadProject = () => {
 
     const maxClick = () => {
       setSalesValue(allocationInfo.allocationLeft);
+      setIsClickedMax(true);
     }
 
     const randomRange = (min, max) => Math.floor(Math.random() * (max - min) + min);
@@ -867,7 +865,7 @@ const LaunchpadProject = () => {
                   <div className="token-logo">
                     <img src={mainCoinLogoURI} alt="token-logo" className="token-image" />
                   </div>
-                  { isClickedMax ? <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginLeft:'2rem', fontWeight:'700'}}>{receivedData.basicInfo.mainCoin}</div> : <Button className="max-btn" onClick={maxClick}>MAX</Button> }
+                  <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginLeft:'2rem', fontWeight:'700'}}>{receivedData.mainCoin}</div>
                 </div>
               </InputGroup>
             </div>
@@ -885,7 +883,7 @@ const LaunchpadProject = () => {
               <div className="vesting-container">
                 <p className="sale-vesting-title vesting">Vesting</p>
                 <div className="text-line-container">
-                  <p>{poolStageCount} stages of vesting : Unlock {poolDistributionStage[0]}% TGE</p>
+                  <p>Unlock {poolDistributionStage[0]}% at TGE, {poolStageCount} stages of vesting : </p>
                   <span className="vesting-line" />
                   
                 </div>
