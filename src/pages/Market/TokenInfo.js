@@ -36,7 +36,8 @@ const watchlistManagerToken = new WatchlistManager('token');
 
 function MarketTokenInfo(props) {
   let { address } = useParams();
-  const {chainId, tokenList} = useConstantLoader();
+  //const {chainId, tokenList} = useConstantLoader();
+  const {marketNetwork:chainId, marketTokenList:tokenList} = useConstantLoader();
 
   const token = useMemo(() => {
     if (!address || !chainId) 
@@ -59,6 +60,7 @@ function MarketTokenInfo(props) {
   const [selectChartIndexTvl, setSelectChartIndexTvl] = useState(0);
   const [selectChartDataPrice, setSelectChartDataPrice] = useState("");
   const [selectChartIndexPrice, setSelectChartIndexPrice] = useState(0);
+  //const [marketNetwork,setmarketNetwork] = useState('');
 
   // additional datas
   const [volume24h, setVolume24h] = useState(0);
@@ -98,6 +100,8 @@ function MarketTokenInfo(props) {
     if (data.includes(address)) setIsWatchlist(true);
     else setIsWatchlist(false);
   };
+
+  
 
   useEffect(() => {
     if (!token)
@@ -239,6 +243,13 @@ function MarketTokenInfo(props) {
     switchChart(index);
   };
 
+  const getNetwork = (index) => {
+    // 输出接收到子组件的参数
+    console.log(index);
+    //setmarketNetwork(index);
+  }
+  const networkShow = false;
+
   return (
     <div className={styles.marketRoot}>
       <ConnectWallet />
@@ -248,6 +259,8 @@ function MarketTokenInfo(props) {
         onRefreshWatchlist={() => {
           updateWatchlistStatus();
         }}
+        getNetwork={getNetwork}
+        networkShow = {networkShow}
       />
       <div className={styles.infoHeader}>
         <Breadcrumb

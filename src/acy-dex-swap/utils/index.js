@@ -12,7 +12,7 @@ import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
 import ERC20ABI from '../abis/ERC20.json';
 import axios from 'axios';
 import { JsonRpcProvider } from "@ethersproject/providers";
-import {constantInstance, ROUTER_ADDRESS, FARMS_ADDRESS, FLASH_ARBITRAGE_ADDRESS, FACTORY_ADDRESS, INIT_CODE_HASH, RPC_URL, CHAINID, TOKENLIST, API_URL, NATIVE_CURRENCY} from "@/constants";
+import {constantInstance, ROUTER_ADDRESS, FARMS_ADDRESS, FLASH_ARBITRAGE_ADDRESS, FACTORY_ADDRESS, INIT_CODE_HASH, RPC_URL, CHAINID, TOKENLIST, API_URL, NATIVE_CURRENCY, MARKET_TOKEN_LIST} from "@/constants";
 
 export {ROUTER_ADDRESS, FARMS_ADDRESS, FLASH_ARBITRAGE_ADDRESS, FACTORY_ADDRESS, INIT_CODE_HASH, RPC_URL, CHAINID, TOKENLIST, API_URL, NATIVE_CURRENCY}
 
@@ -527,6 +527,32 @@ export async function getAllSuportedTokensPrice() {
   });
   return tokensPrice;
 }
+// market 专用
+export async function getAllSuportedTokensPrice_forMarket() {
+  const tokenList = MARKET_TOKEN_LIST();
+  const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
+  const searchIds = searchIdsArray.join('%2C');
+  const tokensPrice = await axios.get(
+    `https://api.coingecko.com/api/v3/simple/price?ids=${searchIds}&vs_currencies=usd`
+  ).then(async (result) => {
+    const data = result.data;
+    console.log("tokensPrice_market:",data);
+    const tokensPrice = {};
+    tokenList.forEach(token => {
+      tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
+    })
+
+    // launchpad project token
+    // where tokens is not listed on coinGecko
+    // if (CHAINID() == 137)
+    //   tokensPrice["NULS"] = await getTokenPriceFromPool("NULS");
+
+    console.log(">>> tokenPriceDict_market", tokensPrice);
+    return tokensPrice;
+  });
+  return tokensPrice;
+}
+
 // return output field amount for swap component
 export async function withExactInEstimateOutAmount(deltaX, xTokenAddress, yTokenAddress, maxPathNum = 15, library, account) {
   const flashArbitrageContract = getContract(FLASH_ARBITRAGE_ADDRESS(), FlashArbitrageABI, library, account)

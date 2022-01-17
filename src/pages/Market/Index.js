@@ -17,6 +17,7 @@ import { MarketSearchBar, PoolTable, TokenTable, TransactionTable } from './Util
 import { JsonRpcProvider } from "@ethersproject/providers"; 
 import { isMobile } from 'react-device-detect';
 import ConnectWallet from './ConnectWallet';
+
 import { useConstantLoader } from '@/constants';
 
 import {useConnectWallet} from '@/components/ConnectWallet';
@@ -29,7 +30,7 @@ const MarketIndex = props => {
   const [selectedDataLine,setselectedDataLine] = useState(0);
   const [selectedIndexBar,setselectedIndexBar] = useState(0);
   const [selectedDataBar,setselectedDataBar] = useState(0);
-  const [chartData,setchartData] = useState({
+  const [chartData, setchartData] = useState({
     tvl: [],
     volume24h: [],
   });
@@ -54,6 +55,8 @@ const MarketIndex = props => {
   const [lineChartError,setlineChartError] = useState('');
   const [overviewError,setoverviewError] = useState('');
 
+  const [marketNetwork,setmarketNetwork] = useState('');
+
   const {activate } = useWeb3React();
   const {account, library, chainId} = useConstantLoader();
 
@@ -62,6 +65,9 @@ const MarketIndex = props => {
   const connectWalletByLocalStorage = useConnectWallet();
  
   useEffect(() => {
+    if(!localStorage.getItem("market")){
+      localStorage.setItem("market", 56);
+    }
     if(!account){
       connectWalletByLocalStorage();
     }
@@ -110,7 +116,7 @@ const MarketIndex = props => {
       setselectedIndexBar(dataDict.volume24h.length - 1);
       setselectedDataBar(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));}
     });
-  }, [chainId]);
+  }, [chainId, marketNetwork]);
 
   const onLineGraphHover = (newData, newIndex) => {
     setselectedDataLine(abbrNumber(newData));
@@ -121,6 +127,11 @@ const MarketIndex = props => {
     setselectedDataBar(abbrNumber(newData));
     setselectedIndexBar(newIndex);
   };
+  const getNetwork = (index) => {
+    // 输出接收到子组件的参数
+    console.log(index);
+    setmarketNetwork(index);
+  }
 
   return (
     <div className={styles.marketRoot}>
@@ -131,6 +142,8 @@ const MarketIndex = props => {
         dataSourcePool={dataSourcePool}
         account={account}
         visible={true}
+        getNetwork={getNetwork}
+        networkShow = {true}
       />
       <div className={styles.chartsMain}>
         <div className={styles.chartSectionMain}>

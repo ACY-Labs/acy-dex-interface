@@ -8,7 +8,7 @@ import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import { abi as IUniswapV2Router02ABI } from '@/abis/IUniswapV2Router02.json';
 import ACYV1ROUTER02_ABI from '@/acy-dex-swap/abis/AcyV1Router02';
 import transaction from '@/models/transaction';
-import { useConstantLoader, TOKENLIST, METHOD_LIST, ACTION_LIST, RPC_URL, API_URL } from '@/constants';
+import { useConstantLoader, TOKENLIST, METHOD_LIST, ACTION_LIST, RPC_URL, API_URL, MARKET_TOKEN_LIST } from '@/constants';
 import { constantInstance } from '@/constants';
 import { FEE_PERCENT } from '@/pages/Market/Util';
 
@@ -27,6 +27,12 @@ export function findTokenInList(item){ // token has address attribute
 }
 export function findTokenWithAddress(item){// input is an address 
     const INITIAL_TOKEN_LIST = TOKENLIST();
+    let token = INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.toLowerCase() );
+    if(token) return token;
+    else return INITIAL_TOKEN_LIST[0]
+}
+export function findTokenWithAddress_market(item){// input is an address 
+    const INITIAL_TOKEN_LIST = MARKET_TOKEN_LIST();
     let token = INITIAL_TOKEN_LIST.find(token => token.address.toLowerCase()==item.toLowerCase() );
     if(token) return token;
     else return INITIAL_TOKEN_LIST[0]
