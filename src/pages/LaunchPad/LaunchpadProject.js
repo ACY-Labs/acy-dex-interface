@@ -574,16 +574,19 @@ const LaunchpadProject = () => {
     const colorCodes = ["#C6224E", "#1E5D91", "#E29227", "#1C9965", "#70BA33"];
     const baseColorCodes = ["#631027", "#0f2e48", "#74490f", "#0e4c32", "#375d19"];
     const [innerValues, setInnerValues] = useState(new Array(5).fill(0));
-    const [coverOpenStates, setCoverOpenStates] = useState(new Array(5).fill(false));
-    const [salesValue, setSalesValue] = useState(0);
+    const [coverOpenStates, setCoverOpenStates] = useState(new Array(5).fill('cover'));
+    const [salesValue, setSalesValue] = useState(allocationInfo ? allocationInfo.allocationLeft : 0);
     const [cardIndexClicked, setCardIndexClicked] = useState(null);
 
-    const AllocationCard = ({index, coverOpenState}) => {  
+    const AllocationCard = ({index}) => {  
 
       const computeCoverClass = () => {
         let classString = 'cover';
-        if (coverOpenState) {
+        let coverOpenState = coverOpenStates[index];
+        if (coverOpenState === 'open') {
           classString += ' openCover';
+        } else if (coverOpenState === 'removed') {
+          classString = 'nocover';
         }
         return classString;
       };
@@ -600,13 +603,33 @@ const LaunchpadProject = () => {
           return;
         }
 
+        // let cards = document.querySelectorAll(".cover");
+        // cards.forEach(node => {
+        //   console.log(node);
+        //   node.classList.remove("inner-text")
+        //   node.classList.remove("cover");
+        //   let innerText = node.parentElement.querySelector(".inner-text-amount");
+        //   // get 4 random values for other allocation values
+        //   console.log(innerText);
+        //   innerText.style.color = "#757579";
+        // })
+        // try {
+        //   let originalElementParent = e.target.parentElement.querySelector(".inner-text-amount");
+        //   originalElementParent.style.color = "#ffffff"
+        // } catch (err) {
+        //   // set all values to $0 due to error
+        //   // innerText.textContent = "$0";
+        //   console.log(err);
+        // }
+        // e.preventDefault();
+
         // first time allocation
         if (!allocationInfo.allocationAmount) {
           requireAllocation(API_URL(), account, receivedData.projectToken).then(res => {
             if (res) {
               console.log('resalloc: ', res);
               setAllocationInfo(res);
-              setSalesValue(res);
+              setSalesValue(res.allocationInfo.allocationLeft);
               updateInnerValues(index);
               updateCoverStates(index);
             }
@@ -617,8 +640,17 @@ const LaunchpadProject = () => {
           console.log('updating');
           updateInnerValues(index);
           updateCoverStates(index);
+          setSalesValue(allocationInfo.allocationLeft);
         }
       };
+
+      const computeTextStyle = () => {
+        if (coverOpenStates[index] === 'removed') {
+          return {
+            color: '#757579'
+          }
+        }
+      }
   
       return (
         <div className='allocationCard-container'>
@@ -628,7 +660,10 @@ const LaunchpadProject = () => {
               style={{backgroundColor: colorCodes[index]}}
             >
             </div>
-            <p className="inner-text-amount">{innerValues[index]}</p> 
+            <p 
+              className="inner-text-amount"
+              style={computeTextStyle()}
+            >{innerValues[index]}</p> 
           </div>
         </div>
       );
@@ -690,15 +725,11 @@ const LaunchpadProject = () => {
     }
 
     const updateCoverStates = (index) => {
-      const newCoverOpenStates = coverOpenStates;
+      const newCoverOpenStates = new Array(5).fill('removed');
       console.log('CoverOpenStates', coverOpenStates);
-      newCoverOpenStates[index] = true;
+      newCoverOpenStates[index] = 'open';
       console.log('newCoverOpenStates', newCoverOpenStates);
       setCoverOpenStates(newCoverOpenStates);
-      
-      setTimeout(() => {
-        setCoverOpenStates(new Array(5).fill(true));
-      }, 3000);
     }
 
     const tooltipTitle = () => {
@@ -838,16 +869,22 @@ const LaunchpadProject = () => {
             </div>
             
             <div className='allocation-cards'>
-              <div className="allocationContainer">{allocationCards()}</div>
+              <div className="allocationContainer">
+                <AllocationCard index={0} />
+                <AllocationCard index={1} />
+                <AllocationCard index={2} />
+                <AllocationCard index={3} />
+                <AllocationCard index={4} />
+              </div>
             </div>
             <div className="allocation-container-dummy"></div>
           </div>
 
           { allocationInfo && allocationInfo.allocationAmount &&
             <div className="allocation-info-container">
-              <div>Allocation Amount: <span>{allocationInfo.allocationAmount}</span></div>
+              {/* <div>Allocation Amount: <span>{allocationInfo.allocationAmount}</span></div>
               <div>Allocation Bonus: <span>{calcAllocBonus(allocationInfo.allocationBonus)}</span></div>
-              <div>Allocation Used: <span>{allocationInfo.allocationUsed}</span></div>
+              <div>Allocation Used: <span>{allocationInfo.allocationUsed}</span></div> */}
               <div>Allocation Left: <span>{allocationInfo.allocationLeft}</span></div>
             </div>
           }
@@ -933,7 +970,7 @@ const LaunchpadProject = () => {
           </div>
           <ProjectDescription />
           {/* { !comparesaleDate || compareAlloDate ? "" : <ChartCard className="launchpad-chart" /> } */}
-          <ChartCard className="launchpad-chart" />
+          {/* <ChartCard className="launchpad-chart" /> */}
         </div>
       </div>
     );

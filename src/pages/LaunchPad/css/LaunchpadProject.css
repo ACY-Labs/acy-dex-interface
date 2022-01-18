@@ -383,6 +383,10 @@
   transition-duration: 2s;
 }
 
+.allocationCard .nocover {
+  display: none;
+}
+
 /* Allocation */
 .allocation-title-container {
   display: flex;
