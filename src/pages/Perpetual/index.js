@@ -175,7 +175,7 @@ const Swap = props => {
         delta : 6.99,
         netValue : 455.95,
         PnL : 455.95 - 93.58,
-        totalSize : 3000,
+        totalSize : 121.12121212,
         collateral : 93.58,
         markPrice : 94.34,
         entryPrice : 94.21,
@@ -521,12 +521,12 @@ const Swap = props => {
                     {
                       !showActionTable ? 
                         (<PositionsTable
-                            isMobile={false}
+                            isMobile={isMobile}
                             dataSource={positionsData}
                         />) 
                         : 
                         (<ActionHistoryTable
-                            isMobile={false}
+                            isMobile={isMobile}
                             dataSource={positionsData}
                         />)
                     }
