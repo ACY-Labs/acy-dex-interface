@@ -7,6 +7,8 @@ import formatNumber from 'accounting-js/lib/formatNumber.js';
 import { constantInstance } from '@/constants';
 import { calcPercent } from '../utils/';
 import AcyEditPositionModal from '@/components/AcyEditPositionModal';
+import AcyClosePositionModal from '@/components/AcyClosePositionModal';
+import { isDesktop } from '@/pages/Market/Util';
 
 function sortTableTime(table, key, isReverse) {
   return table.sort((a, b) => {
@@ -18,23 +20,22 @@ function sortTableTime(table, key, isReverse) {
   });
 }
 
-const StakeHistoryTable = props => {
-  const [stakeDisplayNumber, setStakeDisplayNumber] = useState(5);
+const PositionsTable = props => {
+  const [displayNumber, setDisplayNumber] = useState(5);
   const { dataSource, isMobile } = props;
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isCloseModalVisible, setIsCloseModalVisible] = useState(false);
-  const [editPosition, setEditPosition] = useState();
-  const [closePosition, setClosePosition] = useState();
+  const [selectedPosition, setSelectedPosition] = useState();
   
   const onHandleEditModal = (position) =>{
-    setEditPosition(position);
+    setSelectedPosition(position);
     setIsEditModalVisible(true);
   }
   const onHandleCloseModal = (position) =>{
-    setClosePosition(position);
+    setSelectedPosition(position);
     setIsCloseModalVisible(true);
   }
-  const sampleStakeHistoryColumns = [
+  const positionsTableColumns = [
     {
       title: 'Positions',
       dataIndex: '',
@@ -61,7 +62,8 @@ const StakeHistoryTable = props => {
             </div>
           </div>
           );  
-      }
+      },
+      visible : true
     },
     {
       title: 'Net Value',
@@ -139,22 +141,84 @@ const StakeHistoryTable = props => {
             <div className = {styles.rowEditButton} onClick={() => onHandleCloseModal(record) }>
               Close
             </div>
+            <div className = {styles.rowEditButton} onClick={() => onHandleCloseModal(record) }>
+              Trigger
+            </div>
           </div>
         }
       },
     
   ]
-  const sampleStakeHistoryMobileColumns = [
+  const samplePositionsTableColumns = [
     {
-      title: 'Positions ',
-      key: 'fromforto',
-      render: record =>`${record.action} ${record.token1Symbol} and ${record.token2Symbol}`
+      title: 'Positions',
+      dataIndex: '',
+      align : 'left',
+      render: (text, record) => {
+          return (
+          <div>
+            <div className={styles.tableEntryBig}>
+              {record.token.symbol}
+            </div>
+            <div>
+              <span >
+                {record.delta.toFixed(2)}x
+              </span>
+              {record.isLong ? (
+                <span className={styles.tableEntryGreen}>
+                  Long
+                </span>
+              ) : (
+                <span className={styles.tableEntryRed}>
+                  Short
+                </span>
+              )}
+            </div>
+          </div>
+          );  
+      },
     },
-    
     {
-      title: 'Time',
-      dataIndex: 'transactionTime',
-      key: 'transactionTime'
+      title: 'Net Value',
+      dataIndex: 'netValue',
+      align : 'left',
+      render: (text,record) => {
+        
+        return <div>
+          <div className={styles.tableEntryBig}>
+              ${record.netValue}
+            </div>
+            <div>
+              {record.PnL >= 0 ? (
+                <span className={styles.tableEntryGreen}>
+                  +{record.PnL} (+{calcPercent(record.PnL,record.collateral)}%) 
+                </span>
+              ) : (
+                <span className={styles.tableEntryRed}>
+                  {record.PnL}
+                </span>
+              )}
+            </div>
+          </div>;
+      }
+    },
+    {
+      dataIndex: '',
+      key: 'transactionTime',
+      align : 'left',
+      render: (text,record) => {
+        return <div>
+          <div className = {styles.rowEditButton} onClick={() =>  onHandleEditModal(record) }>
+            Edit
+          </div>
+          <div className = {styles.rowEditButton} onClick={() => onHandleCloseModal(record) }>
+            Close
+          </div>
+          <div className = {styles.rowEditButton} onClick={() => onHandleCloseModal(record) }>
+            Trigger
+          </div>
+        </div>
+      }
     },
   ]
 
@@ -162,24 +226,24 @@ const StakeHistoryTable = props => {
     <div>
       <div className={styles.nobgTable}>
         <Table
-          columns={isMobile&&sampleStakeHistoryMobileColumns||sampleStakeHistoryColumns}
-          dataSource={sortTableTime(dataSource,'transactionTime',true).slice(0,stakeDisplayNumber+1)}
+          columns={isMobile&&samplePositionsTableColumns || positionsTableColumns}
+          dataSource={dataSource}
           className={styles.tableStyle}
           pagination={false}
-          locale={{ emptyText: 'No Positions Yet' }}
+          locale={{ emptyText: 'No Positions Available' }}
         />
       </div>
       <AcyEditPositionModal 
-        EditPosition = {editPosition}
+        Position = {selectedPosition}
         isModalVisible={isEditModalVisible}
         onCancel = {() => setIsEditModalVisible(false)}/>
-      {/* <AcyClosePositionModal 
-        EditPosition = {closePosition}
+      <AcyClosePositionModal 
+        Position = {selectedPosition}
         isModalVisible={isCloseModalVisible}
-        onCancel = {() => setIsCloseModalVisible(false)}/> */}
+        onCancel = {() => setIsCloseModalVisible(false)}/>
     </div>
     
   );
 };
 
-export default StakeHistoryTable;
+export default PositionsTable;
