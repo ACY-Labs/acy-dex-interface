@@ -24,6 +24,7 @@ import {
     AcySmallButton,
   } from '@/components/Acy';
   import TokenSelectorModal from "@/components/TokenSelectorModal";
+  import {PriceBox} from './PriceBox';
   
   import { connect } from 'umi';
   import styles from './styles.less';
@@ -77,12 +78,17 @@ import {
   import { hexlify } from '@ethersproject/bytes';
   
   const { AcyTabPane } = AcyTabs;
-  import { Row, Col, Button, Input, Icon } from 'antd';
+  import { Row, Col, Button, Input, Icon, Radio, Tabs } from 'antd';
+  import { RiseOutlined, FallOutlined } from '@ant-design/icons';
+  const { TabPane } = Tabs;
+
   import { Alert } from 'antd';
   import spinner from '@/assets/loading.svg';
   import moment from 'moment';
   import {useConstantLoader} from '@/constants';
   import {useConnectWallet} from '@/components/ConnectWallet';
+
+  import {AcyRadioButton} from '@/components/AcyRadioButton';
   
   
   
@@ -154,6 +160,9 @@ import {
     const [isUseArb, setIsUseArb] = useState(false);
     const [midTokenAddress, setMidTokenAddress] = useState();
     const [poolExist, setPoolExist] = useState(true);
+
+    const [mode, setMode] = useState('Long');
+    const [type, setType] = useState('Market');
   
     const [showDescription, setShowDescription] = useState(false);
     const connectWalletByLocalStorage = useConnectWallet();
@@ -558,9 +567,33 @@ import {
     }, [props.transaction.transactions]);
   
     useEffect(() => console.log("test slippage: ", slippageTolerance), [slippageTolerance]);
+
+
+    const perpetualMode = ["Long", "Shrot"];
+    const perpetualType = ['Market', 'Limit']
+    const modeSelect =( input )=>{
+      setMode(input.target.value);
+    }
+    const typeSelect = (input) =>{
+      setType(input);
+    }
   
     return (
-      <div className={styles.sc}>
+      <div>
+        <AcyTabs defaultActiveKey="Market" onChange={typeSelect} className={styles.typeSelector}>
+            {perpetualType.map(i => (
+              <AcyTabPane tab={i} key={i} className={styles.typeSubOption}>
+                </AcyTabPane>
+            ))}
+          </AcyTabs>
+          <div>
+            <Radio.Group 
+            defaultValue="Long" buttonStyle="solid" className={styles.modeSelector}
+            onChange={modeSelect}>
+              <Radio.Button value={"Long"} className={styles.modeSubOption}><RiseOutlined />Long</Radio.Button>
+              <Radio.Button value={"Short"} className={styles.modeSubOption}><FallOutlined />Short</Radio.Button>
+            </Radio.Group>
+          </div>
         <AcyCuarrencyCard
           icon="eth"
           title={token0BalanceShow && `Balance: ${parseFloat(token0Balance).toFixed(3)}`}
@@ -624,6 +657,20 @@ import {
           isLocked={isLockedToken1}
           library={library}
         />
+
+        {type==="Limit" &&
+        <div className={styles.priceBox}>
+          <PriceBox inputTest={"123"}/>
+        </div>
+        }
+        <AcyCard className={styles.describeMain}>
+          <div className={styles.describeMainTitle}>{mode} {token1.symbol}</div>
+          <div>
+            <p className={styles.describeTitle}>Entry Price: <span className={styles.describeInfo}>{123} USD</span></p>
+            <p className={styles.describeTitle}>Exit Price:  <span className={styles.describeInfo}>{123} USD</span></p>
+            <p className={styles.describeTitle}>Borrow Fee:  <span className={styles.describeInfo}>{123}%/1h</span></p>
+          </div>
+        </AcyCard>
   
         {showDescription ? <AcyDescriptions>
           <div className={styles.breakdownTopContainer}>
@@ -775,7 +822,7 @@ import {
         <TokenSelectorModal
           onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick}
         />
-      </div>
+        </div>
     );
   };
   

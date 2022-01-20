@@ -492,20 +492,20 @@ const Swap = props => {
             </StyledCard> 
           </div> 
           <div className={`${styles.colItem} ${styles.perpetualComponent}`} >
-            <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
-              <div className={styles.trade}>
-                <PerpetualComponent
-                  onSelectToken0={token => {
-                    setActiveToken0(token);
-                  }}
-                  onSelectToken1={token => {
-                    setActiveToken1(token);
+                <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
+                  <div className={styles.trade}>
+                    <PerpetualComponent
+                      onSelectToken0={token => {
+                        setActiveToken0(token);
+                      }}
+                      onSelectToken1={token => {
+                        setActiveToken1(token);
 
-                  }}
-                  onGetReceipt={onGetReceipt}
-                />
-              </div>
-            </AcyCard>
+                      }}
+                      onGetReceipt={onGetReceipt}
+                    />
+                  </div>
+                </AcyCard>
           </div>
 
         </div>
