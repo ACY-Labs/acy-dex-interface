@@ -14,11 +14,12 @@ import { Web3Provider, JsonRpcProvider } from "@ethersproject/providers";
 import './css/LaunchpadProject.css';
 import project from '@/models/project';
 import AllocationIcon from './components/AllocationIcon';
+import PageLoading from '@/components/PageLoading';
 import * as moment from 'moment';
 import context from 'react-bootstrap/esm/AccordionContext';
 import { CaretDownOutlined } from '@ant-design/icons';
 import VestingSchedule from './VestingSchedule';
-import SocialMedia from './SocialMedia'
+import SocialMedia from './SocialMedia';
 import telegramWIcon from '@/assets/icon_telegram_white.svg';
 import etherIcon from '@/assets/icon_etherscan.svg';
 import polyIcon from '@/assets/icon_polyscan.svg';
@@ -36,11 +37,11 @@ import deckIcon from '@/assets/icon_ppt.svg';
 import tokenEconomicsIcon from '@/assets/icon_googlesheets.svg';
 import paycerBanner from '@/assets/paycer_banner.svg';
 import PaycerIcon from '@/assets/icon_paycer_logo.svg';
-import {findTokenWithSymbol} from '@/utils/txData';
+import { findTokenWithSymbol } from '@/utils/txData';
 import $ from 'jquery';
 import { getContract } from "../../acy-dex-swap/utils/index.js"
 import { useWeb3React } from '@web3-react/core';
-import {useConnectWallet} from "@/components/ConnectWallet";
+import { useConnectWallet } from "@/components/ConnectWallet";
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
 
 import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL, TOKEN_LIST, MARKET_TOKEN_LIST } from "@/constants";
@@ -48,7 +49,7 @@ import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL,
 import { CustomError } from "@/acy-dex-swap/utils"
 import { approveNew, getAllowance } from "@/acy-dex-swap/utils"
 
-const LaunchpadProject = () => {  
+const LaunchpadProject = () => {
   // STATES
   const { account, chainId, library, activate, active } = useWeb3React();
   const { projectId } = useParams();
@@ -60,7 +61,7 @@ const LaunchpadProject = () => {
   const [poolDistributionStage, setpoolDistributionStage] = useState([]);
   const [poolStageCount, setpoolStageCount] = useState(0);
   const [poolStatus, setPoolStatus] = useState(0);
-  const [poolTokenDecimals, setPoolTokenDecimals]  = useState(0); 
+  const [poolTokenDecimals, setPoolTokenDecimals] = useState(0);
   const [poolMainCoinDecimals, setPoolMainCoinDecimals] = useState(0); // Gary: decimal initialize to 0
   const [poolMainCoinAddress, setPoolMainCoinAddress] = useState(0); // e.g., USDT
   const [poolMainCoinLogoURL, setPoolMainCoinLogoURL] = useState(null);
@@ -101,7 +102,7 @@ const LaunchpadProject = () => {
 
 
   // FUNCTIONS
-  const connectWallet = async () =>  {
+  const connectWallet = async () => {
     activate(binance);
     activate(injected);
   };
@@ -146,15 +147,15 @@ const LaunchpadProject = () => {
     const token1decimal = await token1contract.decimals()
     const token2decimal = await token2contract.decimals()
     // 不解析时间戳
-    const res1 = BigNumber.from(baseData[2]).toBigInt().toString().slice(0,-(token1decimal)) // 获取销售的token的总数
-    const res2 = BigNumber.from(baseData[3]).toBigInt().toString().slice(0,-(token1decimal)) // 已销售的token的数量
+    const res1 = BigNumber.from(baseData[2]).toBigInt().toString().slice(0, -(token1decimal)) // 获取销售的token的总数
+    const res2 = BigNumber.from(baseData[3]).toBigInt().toString().slice(0, -(token1decimal)) // 已销售的token的数量
     const res3 = BigNumber.from(baseData[4]).toBigInt()
     const res4 = BigNumber.from(baseData[5]).toBigInt()
 
     // 获取当前阶段
-    const d = Math.round(new Date().getTime()/1000)
-    if(d > res3) setComparesaleDate(true)
-    if(d > res4) setComparevestDate(true)
+    const d = Math.round(new Date().getTime() / 1000)
+    if (d > res3) setComparesaleDate(true)
+    if (d > res4) setComparevestDate(true)
     const saleStartDate = convertUnixTime(res3)
     const saleEndDate = convertUnixTime(res4)
     // 存放数据
@@ -165,7 +166,7 @@ const LaunchpadProject = () => {
 
     // 判断当前是否是vesting阶段
     const curPoolStatus = Number(BigNumber.from(status).toBigInt())
-    if(curPoolStatus === 4) setIsVesting(true)
+    if (curPoolStatus === 4) setIsVesting(true)
 
     // set数据
     setPoolBaseData(pool)
@@ -188,7 +189,7 @@ const LaunchpadProject = () => {
       .then(res => {
         if (res) {
           // extract data from string
-          console.log("fecthing project info ------------111",res.contextData)
+          console.log("fecthing project info ------------111", res.contextData)
           const contextData = JSON.parse(res.contextData);
 
           res['tokenLabels'] = contextData['tokenLabels'];
@@ -210,8 +211,8 @@ const LaunchpadProject = () => {
           res['projectName'] = res.basicInfo.projectName;
           res['projectToken'] = res.basicInfo.projectToken;
           res['mainCoin'] = res.basicInfo.mainCoin
-          
-          
+
+
 
           // get state to hide graph and table
           const curT = new Date()
@@ -226,7 +227,7 @@ const LaunchpadProject = () => {
         }
       })
       .catch(e => {
-        console.log("Project Detail check errrrrrrrrrrr",e);
+        console.log("Project Detail check errrrrrrrrrrr", e);
         // console.error(e);
         history.push('/launchpad');
       });
@@ -247,7 +248,7 @@ const LaunchpadProject = () => {
       const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
       const accnt = "0x0000000000000000000000000000000000000000";
       // await getPoolData(provider, accnt)
-    } 
+    }
   }, [library, account, poolID])
 
   // fetching allocation data
@@ -257,7 +258,7 @@ const LaunchpadProject = () => {
       connectWallet()
       return;
     }
-  
+
     // get allocation status from backend at begining
     getAllocationInfo(API_URL(), account, receivedData.projectToken)
       .then(res => {
@@ -283,7 +284,7 @@ const LaunchpadProject = () => {
     );
   };
 
-  const TokenLogoLabel = ({ projectName, tokenLogo}) => {
+  const TokenLogoLabel = ({ projectName, tokenLogo }) => {
     return (
       <div className="flexContainer">
         <img
@@ -298,15 +299,15 @@ const LaunchpadProject = () => {
           <div className="tokenLabelBar">
             {receivedData.tokenLabels &&
               receivedData.tokenLabels.map((label) => {
-                if(label === "BSC") return( 
+                if (label === "BSC") return (
                   <span className="tokenLabel">
-                    <img src={bscChainIcon} alt="" style={{width:'13px', height:'13px', marginRight:'0.2rem'}} />
+                    <img src={bscChainIcon} alt="" style={{ width: '13px', height: '13px', marginRight: '0.2rem' }} />
                     BSC
                   </span>
                 )
-                if(label === "Polygon") return (
+                if (label === "Polygon") return (
                   <span className="tokenLabel">
-                    <img src={polygonIcon} alt="" style={{width:'15px', height:'15px', marginRight:'0.2rem'}} />
+                    <img src={polygonIcon} alt="" style={{ width: '15px', height: '15px', marginRight: '0.2rem' }} />
                     Polygon
                   </span>
                 )
@@ -339,15 +340,15 @@ const LaunchpadProject = () => {
             <div className={comparesaleDate ? 'procedureNumber' : 'procedureNumber_NotActive'}>
               2
             </div>
-            
+
+            <div>
+              <p>Sale (FCFS)</p>
               <div>
-                <p>Sale (FCFS)</p>
-                  <div>
-                    <p className="shortText">From : {receivedData.saleStart}</p>
-                    <p className="shortText">To : {receivedData.saleEnd}</p>
-                  </div>
+                <p className="shortText">From : {receivedData.saleStart}</p>
+                <p className="shortText">To : {receivedData.saleEnd}</p>
               </div>
-            
+            </div>
+
           </div>
 
           <div className="procedure" style={{ marginTop: '24px' }}>
@@ -367,7 +368,7 @@ const LaunchpadProject = () => {
       let tokenNum
       console.log("--------ALREADY SALE----------")
       console.log(alreadySale)
-      if(!alreadySale){
+      if (!alreadySale) {
         tokenNum = 0
       } else {
         tokenNum = alreadySale
@@ -397,7 +398,7 @@ const LaunchpadProject = () => {
               />
             </div>
             <div className="progressAmount">
-              <div>{`${ tokenNum} / ${totalSale} ${projectToken}`}</div>
+              <div>{`${tokenNum} / ${totalSale} ${projectToken}`}</div>
             </div>
           </div>
         </>
@@ -457,28 +458,28 @@ const LaunchpadProject = () => {
           <div className='projecttitle-socials-container'>
             <h3 className='projecttitle'>Project Description</h3>
           </div>
-          
+
           <span className="lineSeperator" />
           <div className="projectDescription">
             <div className='socialmedia-container'>
               {
                 receivedData.social && receivedData.social[0] &&
-                <div style={{display:'flex', flexDirection:'row', justifyContent:'space-between'}}>
-                  <a href={receivedData.social[0].Website} target="_blank" rel="noreferrer" style={{width:'30%', marginRight:'1rem', alignSelf:'center'}}>{receivedData.social[0].Website}</a>
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <a href={receivedData.social[0].Website} target="_blank" rel="noreferrer" style={{ width: '30%', marginRight: '1rem', alignSelf: 'center' }}>{receivedData.social[0].Website}</a>
                   <div id='social container' className='social-container'>
-                    { Object.entries(receivedData.social[0]).map((item)=>{
-                      if(item[1] !== null){
-                        if(item[0] === "Website" || item[0] === "Polyaddress" || item[0] === "Etheraddress" || item[0] === "Confluxaddress") return null
-                          return (
-                            <SocialMedia url={logoObj[item[0]]} link={item[1]} socialText={item[0]} />
-                          )
+                    {Object.entries(receivedData.social[0]).map((item) => {
+                      if (item[1] !== null) {
+                        if (item[0] === "Website" || item[0] === "Polyaddress" || item[0] === "Etheraddress" || item[0] === "Confluxaddress") return null
+                        return (
+                          <SocialMedia url={logoObj[item[0]]} link={item[1]} socialText={item[0]} />
+                        )
                       }
                     })}
                   </div>
                 </div>
               }
             </div>
-            <div style={{padding:'2.5em 0 0 0'}}>
+            <div style={{ padding: '2.5em 0 0 0' }}>
               {receivedData.projectDescription && <p>{receivedData.projectDescription[0]}</p>}
               {receivedData.projectDescription &&
                 receivedData.projectDescription
@@ -490,7 +491,7 @@ const LaunchpadProject = () => {
       </div>
     );
   };
-  
+
   const ChartCard = () => {
     const [chartData, setChartData] = useState([]);
     const [transferData, setTransferData] = useState([]);
@@ -571,14 +572,15 @@ const LaunchpadProject = () => {
 
   const Allocation = () => {
 
-    const colorCodes = ["#C6224E", "#1E5D91", "#E29227", "#1C9965", "#70BA33"];
-    const baseColorCodes = ["#631027", "#0f2e48", "#74490f", "#0e4c32", "#375d19"];
+    const colorCodes = ["#C6224E", "#1C9965", "#E29227", "#1E5D91", "#70BA33"];
+    const baseColorCodes = ["#631027", "#0e4c32", "#74490f", "#0f2e48", "#375d19"];
     const [innerValues, setInnerValues] = useState(new Array(5).fill(0));
     const [coverOpenStates, setCoverOpenStates] = useState(new Array(5).fill('cover'));
     const [salesValue, setSalesValue] = useState(allocationInfo ? allocationInfo.allocationLeft : 0);
     const [cardIndexClicked, setCardIndexClicked] = useState(null);
+    const [isShowingBonusInstrution, SetIsShowingBonusInstruction] = useState(false);
 
-    const AllocationCard = ({index}) => {  
+    const AllocationCard = ({ index }) => {
 
       const computeCoverClass = () => {
         let classString = 'cover';
@@ -597,7 +599,7 @@ const LaunchpadProject = () => {
         if (cardIndexClicked) return;
         setCardIndexClicked(index);
 
-        console.log(`click allocation card cover`, allocationInfo);      
+        console.log(`click allocation card cover`, allocationInfo);
         if (!account || !receivedData.projectToken) {
           connectWallet();
           return;
@@ -651,19 +653,19 @@ const LaunchpadProject = () => {
           }
         }
       }
-  
+
       return (
         <div className='allocationCard-container'>
-          <div className="allocationCard" onClick={clickCover} style={{backgroundColor: baseColorCodes[index]}}>
-            <div 
-              className={computeCoverClass()} 
-              style={{backgroundColor: colorCodes[index]}}
+          <div className="allocationCard" onClick={clickCover} style={{ backgroundColor: baseColorCodes[index] }}>
+            <div
+              className={computeCoverClass()}
+              style={{ backgroundColor: colorCodes[index] }}
             >
             </div>
-            <p 
+            <p
               className="inner-text-amount"
               style={computeTextStyle()}
-            >{innerValues[index]}</p> 
+            >{innerValues[index]}</p>
           </div>
         </div>
       );
@@ -685,7 +687,7 @@ const LaunchpadProject = () => {
 
     const onChangeSaleValue = (e) => {
       const value = e.target.value;
-      
+
       if (!allocationInfo) setSalesValue(0);
       const allocationLeft = allocationInfo.allocationLeft;
       if (value > allocationLeft) {
@@ -698,8 +700,8 @@ const LaunchpadProject = () => {
     }
 
     const onClickBuy = () => {
-      console.log("buy"); 
-      console.log("sales value", salesValue); 
+      console.log("buy");
+      console.log("sales value", salesValue);
       investClicked(LAUNCHPAD_ADDRESS(), poolID, salesValue);
     }
 
@@ -710,10 +712,10 @@ const LaunchpadProject = () => {
 
     const randomRange = (min, max) => Math.floor(Math.random() * (max - min) + min);
 
-    const updateInnerValues = (index) => {      
+    const updateInnerValues = (index) => {
       const newInnerValues = innerValues;
       const allocationAmount = allocationInfo.allocationAmount;
-      for(let i = 0; i < innerValues.length; i++) {
+      for (let i = 0; i < innerValues.length; i++) {
         if (i === index) {
           newInnerValues[i] = allocationAmount;
         } else {
@@ -733,7 +735,7 @@ const LaunchpadProject = () => {
     }
 
     const tooltipTitle = () => {
-      return(
+      return (
         <div>
           <span>Increase Your Allocation Amount:</span>
           <br />
@@ -749,10 +751,23 @@ const LaunchpadProject = () => {
             3.Buy and hold more $ACY @ <Link to="/#/exchange" target="_blank">Exchange</Link>
           </span>
         </div>
-    )}
+      )
+    }
+
+    const BonusInstruction = () => {
+      return (
+        <div className='bonus-instruction-container'>
+          <ul>
+            <li>Increase your @<Link to="/#/exchange" target="_blank">Exchange</Link> volume</li>
+            <li>Increase your @<Link to="/#/liquidity" target="_blank">Liquidity</Link></li>
+            <li>Buy and hold more <Link to="/#/exchange" target="_blank">$ACY</Link></li>
+          </ul>
+        </div>
+      )
+    }
 
     const vestingClaimClicked = async () => {
-      if(poolStatus !== 4){
+      if (poolStatus !== 4) {
         setNotVesting(true)
       } else {
         if (!account) {
@@ -762,7 +777,7 @@ const LaunchpadProject = () => {
         // Check if users have collected token for current vesting stage
         const investorData = await PoolContract.GetInvestmentData(poolID, account)
         const investorRes = []
-        if(investorData){
+        if (investorData) {
           investorData.map(data => investorRes.push(Number(BigNumber.from(data).toBigInt().toString())))
         }
         const tokenAllocated = investorRes[2] / (10 ** poolTokenDecimals)
@@ -772,12 +787,12 @@ const LaunchpadProject = () => {
         for (let i = 0; i < poolDistributionDate.length; i++) {
           const tempDate = new Date(poolDistributionDate[i])
           if (curDate > tempDate) {
-            tokenAvailable += tokenAllocated / 100 * poolDistributionStage[i] 
+            tokenAvailable += tokenAllocated / 100 * poolDistributionStage[i]
           } else {
             break
           }
         }
-        if(tokenClaimed === tokenAvailable) {
+        if (tokenClaimed === tokenAvailable) {
           setHasCollected(true)
         } else {
           const status = await (async () => {
@@ -792,17 +807,17 @@ const LaunchpadProject = () => {
         }
       }
     }
-    
-    const investClicked = async(poolAddress, poolId, amount) => {
-        // TODO: test if amount is valid!
-        if (poolStatus !== 2) {// cannot buy
-          setIsNotInvesting(true);
-        } else {
-          if (!account) {
-            setIsError(true)
-            connectWallet()
-          }
-          //TO-DO: Request UseAllocation API, process only when UseAllocation returns true
+
+    const investClicked = async (poolAddress, poolId, amount) => {
+      // TODO: test if amount is valid!
+      if (poolStatus !== 2) {// cannot buy
+        setIsNotInvesting(true);
+      } else {
+        if (!account) {
+          setIsError(true)
+          connectWallet()
+        }
+        //TO-DO: Request UseAllocation API, process only when UseAllocation returns true
         const status = await (async () => {
           // NOTE (gary 2022.1.6): use toString method
           const approveAmount = (amount * Math.pow(10, poolMainCoinDecimals)).toString()
@@ -829,8 +844,8 @@ const LaunchpadProject = () => {
 
     const calcAllocBonus = (allocationBonus) => {
       let totalBonus = 0;
-      if(allocationBonus) {
-        for(let i = 0; i < allocationBonus.length; i++) {
+      if (allocationBonus) {
+        for (let i = 0; i < allocationBonus.length; i++) {
           totalBonus += allocationBonus[i].bonusAmount;
         }
       }
@@ -842,16 +857,16 @@ const LaunchpadProject = () => {
       if (isError) {
         timeout = setTimeout(() => setIsError(false), 1000);
       }
-      if (hasCollected){
+      if (hasCollected) {
         timeout = setTimeout(() => setHasCollected(false), 1000);
       }
-      if (notVesting){
+      if (notVesting) {
         timeout = setTimeout(() => setNotVesting(false), 1000);
       }
-      if (successCollect){
+      if (successCollect) {
         timeout = setTimeout(() => setSuccessCollect(false), 1000);
       }
-      if (isNotInvesting){
+      if (isNotInvesting) {
         timeout = setTimeout(() => setNotVesting(false), 1000);
       }
       return () => clearTimeout(timeout);
@@ -862,12 +877,17 @@ const LaunchpadProject = () => {
         <div className='cardContent allocation-content allocation-content-active'>
           <div className="allocation-title-container">
             <div className='title-tooltip-container'>
-                <p className="allocation-title">Allocation</p>
-                <Tooltip title={tooltipTitle} mouseEnterDelay={0} mouseLeaveDelay={0.25}>
-                  <Icon type="info-circle" className='tool-tip-icon' />
-                </Tooltip>
+              <div style={{height: 24}}></div>
+              <div className="allocation-title">Allocation</div>
+              <div className='bonus-instruction-title' onClick={(e) => SetIsShowingBonusInstruction(!isShowingBonusInstrution)}>
+                How to Increase
+              </div>
+
+              {/* <Tooltip title={tooltipTitle} mouseEnterDelay={0} mouseLeaveDelay={0.25}>
+                <Icon type="info-circle" className='tool-tip-icon' />
+              </Tooltip> */}
             </div>
-            
+
             <div className='allocation-cards'>
               <div className="allocationContainer">
                 <AllocationCard index={0} />
@@ -877,17 +897,24 @@ const LaunchpadProject = () => {
                 <AllocationCard index={4} />
               </div>
             </div>
-            <div className="allocation-container-dummy"></div>
+
+            <div style={{width: 100}}></div>
+            {/* Next row */}
+            {isShowingBonusInstrution &&
+              <BonusInstruction></BonusInstruction>
+            }
           </div>
 
-          { allocationInfo && allocationInfo.allocationAmount &&
+          
+
+          {/* {allocationInfo && allocationInfo.allocationAmount &&
             <div className="allocation-info-container">
-              {/* <div>Allocation Amount: <span>{allocationInfo.allocationAmount}</span></div>
+              <div>Allocation Amount: <span>{allocationInfo.allocationAmount}</span></div>
               <div>Allocation Bonus: <span>{calcAllocBonus(allocationInfo.allocationBonus)}</span></div>
-              <div>Allocation Used: <span>{allocationInfo.allocationUsed}</span></div> */}
+              <div>Allocation Used: <span>{allocationInfo.allocationUsed}</span></div>
               <div>Allocation Left: <span>{allocationInfo.allocationLeft}</span></div>
             </div>
-          }
+          } */}
 
           <form className="sales-container">
             <label for="sale-number" className="sale-vesting-title">
@@ -895,43 +922,43 @@ const LaunchpadProject = () => {
             </label>
             <div className="sales-input-container">
               <InputGroup>
-                <Input 
+                <Input
                   className="sales-input"
-                  value={salesValue} 
+                  value={salesValue}
                   onChange={onChangeSaleValue}
                 />
                 <div className="unit-max-group">
                   <div className="token-logo">
                     <img src={mainCoinLogoURI} alt="token-logo" className="token-image" />
                   </div>
-                  <div style={{display:'flex', justifyContent:'center', alignItems:'center', marginLeft:'2rem', fontWeight:'700'}}>{receivedData.mainCoin}</div>
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginLeft: '2rem', fontWeight: '700' }}>{receivedData.mainCoin}</div>
                 </div>
               </InputGroup>
             </div>
-            <Button 
+            <Button
               className="sales-submit"
-              disabled={poolBaseData?(poolBaseData[2] >= new Date() || poolBaseData[3] <= new Date()) : false}
+              disabled={poolBaseData ? (poolBaseData[2] >= new Date() || poolBaseData[3] <= new Date()) : false}
               onClick={onClickBuy}
             >
               Buy
             </Button>
           </form>
 
-          { poolDistributionStage && poolDistributionDate && 
+          {poolDistributionStage && poolDistributionDate &&
             <div className="vesting-open-container">
               <div className="vesting-container">
                 <p className="sale-vesting-title vesting">Vesting</p>
                 <div className="text-line-container">
                   <p>Unlock {poolDistributionStage[0]}% at TGE, {poolStageCount} stages of vesting : </p>
                   <span className="vesting-line" />
-                  
+
                 </div>
                 <div className="arrow-down-container">
                   <CaretDownOutlined
                     className={
                       isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
                     }
-                  />  
+                  />
                 </div>
                 <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}></div>
               </div>
@@ -962,7 +989,7 @@ const LaunchpadProject = () => {
               tokenPrice={receivedData.tokenPrice}
             />
           }
-          
+
         </div>
         <div className="rightGrid">
           <div className="circleBorderCard">
@@ -978,17 +1005,23 @@ const LaunchpadProject = () => {
 
   return (
     <div>
-      <div className="mainContainer">
-        {isError && <Alert message="Wallet is not connected." type="error" showIcon />}
-        {isNotInvesting && <Alert message="Wait until Sale stage to purchase." type="info" showIcon />}
-        {hasCollected && <Alert message="You have vested token for current vesting stage." type="info" showIcon />}
-        <TokenBanner posterUrl={receivedData.posterUrl} />
-        <TokenLogoLabel
-          projectName={receivedData.projectName}
-          tokenLogo={receivedData.tokenLogoUrl}
-        />
-        <CardArea />
-      </div>
+      {!receivedData.posterUrl ? (
+        <div>
+          <PageLoading />
+        </div>
+      ) : (
+        <div className="mainContainer">
+          {isError && <Alert message="Wallet is not connected." type="error" showIcon />}
+          {isNotInvesting && <Alert message="Wait until Sale stage to purchase." type="info" showIcon />}
+          {hasCollected && <Alert message="You have vested token for current vesting stage." type="info" showIcon />}
+          <TokenBanner posterUrl={receivedData.posterUrl} />
+          <TokenLogoLabel
+            projectName={receivedData.projectName}
+            tokenLogo={receivedData.tokenLogoUrl}
+          />
+          <CardArea />
+        </div>
+      )}
     </div>
   );
 };

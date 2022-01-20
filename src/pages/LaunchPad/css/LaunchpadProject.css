@@ -256,6 +256,12 @@
   width: 95px;
 }
 
+.bonus-instruction-title {
+  color:rgb(143, 143, 143);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .allocationCard {
   position: relative;
   width: 55px;
@@ -392,7 +398,8 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-bottom: 50px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
 }
 
 .allocation-info-container {
@@ -407,7 +414,6 @@
 }
 
 .allocation-cards {
-  width: 100%;
   margin-left: 0.75em;
 }
 
@@ -764,8 +770,25 @@
 
 .title-tooltip-container {
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
+  align-items: baseline;
+  width: 150px;
+}
+
+.bonus-instruction-container {
+  width: 100%;
+}
+
+.bonus-instruction-container ul {
+  margin: 10px;
+}
+
+.bonus-instruction-container li {
+  color: rgb(158, 158, 158);
+  list-style-type: disc;
+  /* background-image: url(../../../assets/bullet.png);
+  background-repeat: no-repeat;
+  background-position: left 0.5em; */
 }
 
 .tool-tip-content {
@@ -882,8 +905,9 @@
   .allocation-title-container {
     flex-direction: column;
     column-gap: 10px;
-    margin-bottom: 40px;
+    /* margin-bottom: 40px; */
     justify-content: center;
+    flex-wrap: wrap;
   }
 
   .projecttitle-socials-container {
@@ -979,6 +1003,7 @@
     column-gap: 10px;
     margin-bottom: 40px;
     justify-content: center;
+    flex-wrap: wrap;
   }
 }
 /* Tablets */
