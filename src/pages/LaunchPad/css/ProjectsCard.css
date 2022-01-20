@@ -25,6 +25,7 @@
   font-weight: 700;
   text-align: center;
   color: white;
+  white-space: nowrap;
 }
 
 .logo-countdown-container {

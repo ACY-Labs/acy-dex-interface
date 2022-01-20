@@ -10,7 +10,7 @@
   padding-inline: 1rem;
   margin-top: 2.5px;
   margin-bottom: 2.5px;
-  color: rgba(255, 255, 255, 0.96);
+  color: rgba(255, 255, 255, 1);
   font-family: 'Karla';
 }
 
@@ -190,7 +190,8 @@
 
 .shortText {
   margin-top: 0.5rem;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
+  color: #aeaeb6;
 }
 
 .progressHeader {
@@ -241,7 +242,7 @@
 .lineSeperator {
   width: 100%;
   margin: 1rem 0;
-  border-bottom: 1px solid #b5b5b6;
+  border-bottom: 1px solid #757579;
   display: block;
 }
 
@@ -258,8 +259,8 @@
 
 .bonus-instruction-title {
   color:rgb(143, 143, 143);
-  text-decoration: underline;
   cursor: pointer;
+  font-size: 12px;
 }
 
 .allocationCard {
@@ -462,7 +463,7 @@
 .vesting-line {
   width: 100%;
   margin: 10px 0;
-  border-bottom: 1px solid #b5b5b6;
+  border-bottom: 1px solid #757579;
   display: block;
 }
 
@@ -471,6 +472,7 @@
   font-size: 20px;
   text-align: center;
   top: 0;
+  color: #757579;
 }
 
 .arrow-down-inactive {
@@ -487,10 +489,25 @@
   margin-top: 10px;
 }
 
+.vesting-schedule-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.vesting-procedure-container {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  padding-left: 10%;
+}
+
 .vesting-schedule {
-  width: auto;
+  width: 100%;
   background-color: none;
-  padding: 10px;
+  padding-top: 15px;
   opacity: 0;
   display: none;
 }
@@ -633,8 +650,8 @@
   color: white;
   border: unset;
   /* border: 1px solid white; */
-  border-radius: 16px;
-  width: 95px;
+  border-radius: 999px;
+  width: 100px;
   height: 35px;
   cursor: pointer;
 }
@@ -645,36 +662,48 @@
 }
 
 .vesting-percentage-container{
-  border-radius: 8px;
+  border-radius: 999px;
   background-color: #363636;
   padding: 7px 15px;
 }
 
 .vesting-percentage {
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .vesting-percentage-claim-container {
   display: flex;
   justify-content: space-between;
+  flex-direction: row;
+  margin-bottom: 36px;
 }
 
-.vesting-percentage-claim-container .claim-btn {
+.claim-btn {
   background-color: #eb5c20;
   border: unset;
   font-size: 12px;
-  border-radius: 8px;
+  border-radius: 999px;
   color: white;
+  width: 75px;
+  height: 35px;
 }
 
 .vesting-tick-icon {
   width: 18px;
 }
 
+.vesting-text-container {
+  display: flex;
+  align-items: center;
+}
+
 .vesting-text {
-  text-align: left;
+  text-align: right;
   font-size: 14px;
-  margin: 5px 0 15px 0;
+  margin-left: 15px;
 }
 
 .claimable-text {
@@ -772,7 +801,7 @@
   display: flex;
   flex-direction: column;
   align-items: baseline;
-  width: 150px;
+  width: 100px;
 }
 
 .bonus-instruction-container {
@@ -786,6 +815,7 @@
 .bonus-instruction-container li {
   color: rgb(158, 158, 158);
   list-style-type: disc;
+  font-size: 12px;
   /* background-image: url(../../../assets/bullet.png);
   background-repeat: no-repeat;
   background-position: left 0.5em; */
@@ -855,7 +885,7 @@
 
   .sale-vesting-title {
     font-size: 16px;
-    width: auto;
+    width: 100px;
     margin-right: 16px;
   }
 

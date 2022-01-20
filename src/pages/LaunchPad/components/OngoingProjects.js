@@ -14,8 +14,8 @@ const OngoingProjects = ({ data }) => {
                 projectID={obj.projectID}
                 start={obj.saleStart}
                 ddl={obj.saleEnd}
-                raise={obj.totalRaise.toString() + " USDT"} 
-                sales={obj.totalRaise.toString()+ ' ' + obj.projectToken} 
+                raise={obj.totalRaise.toString() + " USDT"}
+                sales={obj.totalSale.toString()+ ' ' + obj.projectToken}
                 rate={"1 " + obj.projectToken + " = " + obj.tokenPrice.toString() + " USDT"}
                 title={obj.projectName} 
                 projectTokenUrl={obj.projectTokenUrl}

@@ -48,6 +48,7 @@ import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL,
 
 import { CustomError } from "@/acy-dex-swap/utils"
 import { approveNew, getAllowance } from "@/acy-dex-swap/utils"
+import FormatedTime from '@/components/FormatedTime';
 
 const LaunchpadProject = () => {
   // STATES
@@ -59,7 +60,6 @@ const LaunchpadProject = () => {
   const [poolBaseData, setPoolBaseData] = useState(null);
   const [poolDistributionDate, setDistributionDate] = useState([]);
   const [poolDistributionStage, setpoolDistributionStage] = useState([]);
-  const [poolStageCount, setpoolStageCount] = useState(0);
   const [poolStatus, setPoolStatus] = useState(0);
   const [poolTokenDecimals, setPoolTokenDecimals] = useState(0);
   const [poolMainCoinDecimals, setPoolMainCoinDecimals] = useState(0); // Gary: decimal initialize to 0
@@ -76,8 +76,6 @@ const LaunchpadProject = () => {
   const [compareAlloDate, setCompareAlloDate] = useState(false);
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
-  const [isClickedVesting, setIsClickedVesting] = useState(false);
-  const [isClickedMax, setIsClickedMax] = useState(false);
   // const [investorNum,setinvestorNum] = useState(0);
   // const [isInvesting, setIsInvesting] = useState(false);
 
@@ -114,7 +112,8 @@ const LaunchpadProject = () => {
 
   const formatTime = timeZone => {
     return moment(timeZone)
-      .local()
+      // .local()
+      .utc()
       .format('MM/DD/YYYY HH:mm:ss');
   };
 
@@ -170,9 +169,10 @@ const LaunchpadProject = () => {
 
     // set数据
     setPoolBaseData(pool)
-    setDistributionDate(distributionRes)
-    setpoolStageCount(Number(BigNumber.from(distributionData[0]).toBigInt())) // vesting阶段的次数
-    setpoolDistributionStage(distributionStage)
+    // setDistributionDate(distributionRes)
+    // setpoolStageCount(Number(BigNumber.from(distributionData[0]).toBigInt())) // vesting阶段的次数
+    // setpoolDistributionStage(distributionStage) // get distribution schedule from backend
+
     setPoolStatus(curPoolStatus)
     setPoolStatus(Number(BigNumber.from(status).toBigInt()))
     setPoolMainCoinAddress(token2Address)
@@ -199,10 +199,19 @@ const LaunchpadProject = () => {
           res['posterUrl'] = contextData['posterUrl'];
           res['tokenLogoUrl'] = res.basicInfo.projectTokenUrl;
 
-          res['regStart'] = formatTime(res.scheduleInfo.regStart);
-          res['regEnd'] = formatTime(res.scheduleInfo.regEnd);
-          res['saleStart'] = formatTime(res.scheduleInfo.saleStart);
-          res['saleEnd'] = formatTime(res.scheduleInfo.saleEnd);
+          res['regStart'] = res.scheduleInfo.regStart;
+          res['regEnd'] = res.scheduleInfo.regEnd;
+          res['saleStart'] = res.scheduleInfo.saleStart;
+          res['saleEnd'] = res.scheduleInfo.saleEnd;
+
+          if (res.scheduleInfo.distributionData) {
+            const distributionData = res.scheduleInfo.distributionData;
+            const distributionRes = [];
+            const distributionStage = [];
+            distributionData[2].map(vestingRate => distributionStage.push(BigNumber.from(vestingRate).toBigInt().toString()))
+            setDistributionDate([...distributionData[1]]);
+            setpoolDistributionStage(distributionStage);
+          }
 
           res['tokenPrice'] = res.saleInfo.tokenPrice
           res['totalSale'] = res.saleInfo.totalSale;
@@ -210,9 +219,7 @@ const LaunchpadProject = () => {
           res['projectUrl'] = res.saleInfo.projectUrl;
           res['projectName'] = res.basicInfo.projectName;
           res['projectToken'] = res.basicInfo.projectToken;
-          res['mainCoin'] = res.basicInfo.mainCoin
-
-
+          res['mainCoin'] = res.basicInfo.mainCoin;
 
           // get state to hide graph and table
           const curT = new Date()
@@ -220,6 +227,8 @@ const LaunchpadProject = () => {
           const mainCoinInfo = TOKEN_LIST().find(item => item.symbol == res.basicInfo.mainCoin)
           setMainCoinLogoURI(mainCoinInfo.logoURI);
           setPoolID(res.basicInfo.poolID);
+
+          console.log('res', res);
           setReceivedData(res);
         } else {
           console.log('redirect to list page');
@@ -253,11 +262,7 @@ const LaunchpadProject = () => {
 
   // fetching allocation data
   useEffect(async () => {
-    console.log("line 145", account, receivedData.projectToken);
-    if (!account) {
-      connectWallet()
-      return;
-    }
+    if (!account || !receivedData.projectToken) return;
 
     // get allocation status from backend at begining
     getAllocationInfo(API_URL(), account, receivedData.projectToken)
@@ -271,7 +276,7 @@ const LaunchpadProject = () => {
         console.log('Error: ', e);
         throw e;
       });
-  }, [account, library]);
+  }, [account, library, receivedData]);
 
   // COMPONENTS
   const TokenBanner = ({ posterUrl }) => {
@@ -344,8 +349,10 @@ const LaunchpadProject = () => {
             <div>
               <p>Sale (FCFS)</p>
               <div>
-                <p className="shortText">From : {receivedData.saleStart}</p>
-                <p className="shortText">To : {receivedData.saleEnd}</p>
+                <p className="shortText">From : </p>
+                <FormatedTime utc_string={receivedData.saleStart} />
+                <p className="shortText">To : </p>
+                <FormatedTime utc_string={receivedData.saleEnd} />
               </div>
             </div>
 
@@ -579,6 +586,7 @@ const LaunchpadProject = () => {
     const [salesValue, setSalesValue] = useState(allocationInfo ? allocationInfo.allocationLeft : 0);
     const [cardIndexClicked, setCardIndexClicked] = useState(null);
     const [isShowingBonusInstrution, SetIsShowingBonusInstruction] = useState(false);
+    const [isClickedVesting, setIsClickedVesting] = useState(false);
 
     const AllocationCard = ({ index }) => {
 
@@ -877,7 +885,7 @@ const LaunchpadProject = () => {
         <div className='cardContent allocation-content allocation-content-active'>
           <div className="allocation-title-container">
             <div className='title-tooltip-container'>
-              <div style={{height: 24}}></div>
+              <div style={{ height: 24 }}></div>
               <div className="allocation-title">Allocation</div>
               <div className='bonus-instruction-title' onClick={(e) => SetIsShowingBonusInstruction(!isShowingBonusInstrution)}>
                 How to Increase
@@ -898,14 +906,12 @@ const LaunchpadProject = () => {
               </div>
             </div>
 
-            <div style={{width: 100}}></div>
+            <div style={{ width: 75, height: 66 }}></div>
             {/* Next row */}
             {isShowingBonusInstrution &&
               <BonusInstruction></BonusInstruction>
             }
           </div>
-
-          
 
           {/* {allocationInfo && allocationInfo.allocationAmount &&
             <div className="allocation-info-container">
@@ -917,9 +923,12 @@ const LaunchpadProject = () => {
           } */}
 
           <form className="sales-container">
-            <label for="sale-number" className="sale-vesting-title">
-              Sale
-            </label>
+            <div className="sale-vesting-title">
+              <label for="sale-number" >
+                Sale
+              </label>
+            </div>
+
             <div className="sales-input-container">
               <InputGroup>
                 <Input
@@ -944,33 +953,32 @@ const LaunchpadProject = () => {
             </Button>
           </form>
 
-          {poolDistributionStage && poolDistributionDate &&
-            <div className="vesting-open-container">
-              <div className="vesting-container">
-                <p className="sale-vesting-title vesting">Vesting</p>
-                <div className="text-line-container">
-                  <p>Unlock {poolDistributionStage[0]}% at TGE, {poolStageCount} stages of vesting : </p>
-                  <span className="vesting-line" />
+          <div className="vesting-open-container">
+            <div className="vesting-container">
+              <p className="sale-vesting-title vesting">Vesting</p>
+              <div className="text-line-container">
+                <p>Unlock {poolDistributionStage[0]}% at TGE, vesting in {poolDistributionStage.length} stages: </p>
+                <span className="vesting-line" />
 
-                </div>
-                <div className="arrow-down-container">
-                  <CaretDownOutlined
-                    className={
-                      isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
-                    }
-                  />
-                </div>
-                <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}></div>
               </div>
-              <div
-                className={
-                  isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'
-                }
-              >
-                <VestingSchedule vestingDate={poolDistributionDate} stageData={poolDistributionStage} vestingClick={vestingClaimClicked} />
+              <div className="arrow-down-container">
+                <CaretDownOutlined
+                  className={
+                    isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
+                  }
+                />
               </div>
+              <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}></div>
             </div>
-          }
+
+            <div className={isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'}>
+              <VestingSchedule
+                vestingDate={poolDistributionDate}
+                stageData={poolDistributionStage}
+                vestingClick={vestingClaimClicked}
+              />
+            </div>
+          </div>
         </div>
 
       </div>
