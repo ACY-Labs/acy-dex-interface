@@ -71,8 +71,6 @@ export const ConstantLoader = (chainId = 56, marketChainId = 56) => {
     const marketChainSupportedIndex = (supportedChainIds.indexOf(marketChainId) !== -1);
     const marketNetwork = marketChainSupportedIndex ? marketChainId : 56;
 
-  
-
     const constants = {
         'tokenList': TokenListSelector(fallbackChainId),
         'methodMap': MethodActionSelector('method'),

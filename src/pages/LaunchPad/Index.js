@@ -12,7 +12,7 @@ import RaiseButton from './components/RaiseButton.js';
 import $ from 'jquery';
 import { getProjects } from '@/services/api';
 import ExpandingContent from './components/ExpandedContent';
-import {useConnectWallet} from '@/components/ConnectWallet';
+import { useConnectWallet } from '@/components/ConnectWallet';
 import { useWeb3React } from '@web3-react/core';
 import { API_URL } from '@/constants'
 
@@ -32,14 +32,14 @@ const Pool = props => {
   // wallet connect
   const { account, chainId, library, activate } = useWeb3React();
   const connectWalletByLocalStorage = useConnectWallet();
-  
+
   useEffect(() => {
     if (!account) {
       connectWalletByLocalStorage();
     }
   }, [account]);
 
-  
+
 
   // project variables
   useEffect(() => {
@@ -47,20 +47,21 @@ const Pool = props => {
     getProjects(API_URL())
       .then(res => {
         if (res) {
-          console.log(res);
-          // const newOngoingData = [...ongoingData];
-          // const newUpcomingData = [...upcomingData];
-          // const newEndedData = [...endedData];
           const newOngoingData = [];
           const newUpcomingData = [];
           const newEndedData = [];
           // get all projects from db
-          res.forEach(obj =>
-            obj.projectStatus === 'Ongoing'
-              ? newOngoingData.push(obj)
-              : obj.projectStatus === 'Upcoming'
-              ? newUpcomingData.push(obj)
-              : newEndedData.push(obj)
+          res.forEach(obj => {
+            console.log(obj);
+            if (obj.projectStatus === 'Ongoing') newOngoingData.push(obj);
+            else if (obj.projectStatus === 'Upcoming') newUpcomingData.push(obj);
+            else if (obj.projectStatus === 'Ended') newEndedData.push(obj);
+          }
+            // obj.projectStatus === 'Ongoing'
+            //   ? newOngoingData.push(obj)
+            //   : obj.projectStatus === 'Upcoming'
+            //     ? newUpcomingData.push(obj)
+            //     : newEndedData.push(obj)
           );
           console.log(API_URL())
           setOngoingData([...newOngoingData]);

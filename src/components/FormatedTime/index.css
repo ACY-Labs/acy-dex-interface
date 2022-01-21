@@ -1,0 +1,7 @@
+.timezone-symbol {
+    cursor: pointer;
+}
+
+.time-string {
+    white-space: nowrap;
+}
