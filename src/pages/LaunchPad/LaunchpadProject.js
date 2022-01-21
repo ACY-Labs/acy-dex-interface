@@ -44,7 +44,7 @@ import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from "@/components/ConnectWallet";
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
 
-import { useConstantLoader, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL, TOKEN_LIST, MARKET_TOKEN_LIST } from "@/constants";
+import { useConstantLoader, SCAN_URL_PREFIX, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL, TOKEN_LIST, MARKET_TOKEN_LIST } from "@/constants";
 
 import { CustomError } from "@/acy-dex-swap/utils"
 import { approveNew, getAllowance } from "@/acy-dex-swap/utils"
@@ -63,7 +63,8 @@ const LaunchpadProject = () => {
   const [poolStatus, setPoolStatus] = useState(0);
   const [poolTokenDecimals, setPoolTokenDecimals] = useState(0);
   const [poolMainCoinDecimals, setPoolMainCoinDecimals] = useState(0); // Gary: decimal initialize to 0
-  const [poolMainCoinAddress, setPoolMainCoinAddress] = useState(0); // e.g., USDT
+  const [poolMainCoinAddress, setPoolMainCoinAddress] = useState(""); // e.g., USDT
+  const [poolTokenAddress, setPoolTokenAddress] = useState("");
   const [poolMainCoinLogoURL, setPoolMainCoinLogoURL] = useState(null);
   const [poolMainCoinName, setPoolMainCoinName] = useState(null);
   const [isError, setIsError] = useState(false);
@@ -76,6 +77,8 @@ const LaunchpadProject = () => {
   const [compareAlloDate, setCompareAlloDate] = useState(false);
   const [comparesaleDate, setComparesaleDate] = useState(false);
   const [comparevestDate, setComparevestDate] = useState(false);
+  const [isClickedVesting, setIsClickedVesting] = useState(false);
+  const [isClickedMax, setIsClickedMax] = useState(false);
   // const [investorNum,setinvestorNum] = useState(0);
   // const [isInvesting, setIsInvesting] = useState(false);
 
@@ -107,6 +110,12 @@ const LaunchpadProject = () => {
 
   const clickToWebsite = () => {
     const newWindow = window.open(receivedData.social[0].Website, '_blank', 'noopener,noreferrer');
+    if (newWindow) newWindow.opener = null;
+  }
+
+  const clickToScan = (address) => {
+    let link_url = SCAN_URL_PREFIX() + '/address/' + address
+    const newWindow = window.open(link_url, '_blank', 'noopener,noreferrer');
     if (newWindow) newWindow.opener = null;
   }
 
@@ -142,6 +151,7 @@ const LaunchpadProject = () => {
     const token2Address = baseData[1]
     const tokenList = TOKEN_LIST()
     const token2Info = tokenList.find(item => item.address == token2Address)
+    console.log("baseData", baseData)
 
     const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
     const token2contract = getContract(token2Address, ERC20ABI, lib, acc)
@@ -181,6 +191,7 @@ const LaunchpadProject = () => {
     setPoolStatus(curPoolStatus)
     setPoolStatus(Number(BigNumber.from(status).toBigInt()))
     setPoolMainCoinAddress(token2Address)
+    setPoolTokenAddress(baseData[0])
     setPoolTokenDecimals(token1decimal)
     setPoolMainCoinDecimals(token2decimal)
     // setMainCoinLogoURI(token2Info.logoURI)
@@ -444,6 +455,14 @@ const LaunchpadProject = () => {
           <div className="keyinfoName">Total Sales</div>
           <div>
             {totalSale} {projectToken}
+            <img
+                className="link"
+                alt=""
+                src={linkWIcon}
+                loading="eager"
+                style={{ width: '15px', height: '15px', marginLeft: '0.2rem' }}
+                onClick={() => clickToScan(poolTokenAddress)}
+            />
           </div>
         </div>
 
@@ -451,6 +470,14 @@ const LaunchpadProject = () => {
           <div className="keyinfoName">Total Raise</div>
           <div>
             {receivedData.totalRaise} {receivedData.mainCoin}
+            <img
+                className="link"
+                alt=""
+                src={linkWIcon}
+                loading="eager"
+                style={{ width: '15px', height: '15px', marginLeft: '0.2rem' }}
+                onClick={() => clickToScan(poolMainCoinAddress)}
+            />
           </div>
         </div>
 
@@ -701,7 +728,6 @@ const LaunchpadProject = () => {
 
     const onChangeSaleValue = (e) => {
       const value = e.target.value;
-
       if (!allocationInfo) setSalesValue(0);
       const allocationLeft = allocationInfo.allocationLeft;
       if (value > allocationLeft) {
