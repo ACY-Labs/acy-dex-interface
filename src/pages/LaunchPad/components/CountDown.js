@@ -15,13 +15,6 @@ const CountDown = ({ ddl }) => {
   const ddl_moment_utc = moment.utc(ddl);
 
   function getRemainTime(now_moment) {
-    // console.log(Date(Date.parse(ddl).toLocaleString()));
-    // console.log(date2);
-    // var date2 = new Date(Date.parse(ddl).toLocaleString());
-
-    // var s1 = date1.getTime(),
-    //   s2 = date2.getTime();
-    // var total = (s2 - s1) / 1000;
     var total = ddl_moment_utc.diff(now_moment) / 1000;
     var day = parseInt(total / (24 * 60 * 60)); //计算整数天数
     var afterDay = total - day * 24 * 60 * 60; //取得算出天数后剩余的秒数
@@ -38,13 +31,10 @@ const CountDown = ({ ddl }) => {
   let { day, hour, min, sec } = getRemainTime(currentTime);
 
   // figure out remain time
-  useEffect(
-    async () => {
+  useEffect(async () => {
       let { day, hour, min, sec } = getRemainTime(currentTime);
       setCount({ days: day, hours: hour, min: min, sec: sec });
-    },
-    [currentTime]
-  );
+  }, [currentTime]);
 
   // 实时获取当前时间
   useEffect(async () => {

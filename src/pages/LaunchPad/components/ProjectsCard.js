@@ -5,9 +5,9 @@ import AcyIcon from '@/assets/icon_acy.svg';
 import PaycerIcon from '@/assets/icon_paycer_logo.svg';
 import CountDown from './CountDown.js';
 import FormatedTime from '@/components/FormatedTime';
+import moment from 'moment';
 
 const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngoing, isUpcoming, tokenLogoUrl }) => {
-  let saleString = start + '(UTC)';
   const history = useHistory();
   const onOpenProjectDetail = (p) => {
     history.push(`/launchpad/project/${p}`);
@@ -16,6 +16,16 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
   const stripTitle = (title) => {
     let words = title.trim().split(' ');
     return words.slice(0, 2).join(' ');
+  }
+
+  const calcStatus = () => {
+    console.log('calc status');
+    const now_moment_utc = moment.utc();
+    const start_moment_utc = moment.utc(start);
+    const ddl_moment_utc = moment.utc(ddl);
+    if (now_moment_utc < start_moment_utc) return 'upcoming';
+    else if (now_moment_utc < ddl_moment_utc) return 'ongoing';
+    else if (now_moment_utc > ddl_moment_utc) return 'ended';
   }
 
   return (
@@ -30,13 +40,33 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
         <div className="countdown-container">
           <div>
             {/* {isOngoing || isUpcoming ?<CountDown ddl={start} /> : <CountDown ddl={null} /> } */}
-            <CountDown ddl={start} />
+            {calcStatus() === 'upcoming' ?
+              <CountDown ddl={start} />
+              :
+              <CountDown ddl={ddl} />
+            }
           </div>
 
           <div>
-            <p style={{ fontSize: '10px', color: '#fff' }}>
-              <FormatedTime utc_string={start} />
-            </p>
+            {calcStatus() === 'upcoming' ?
+              (
+                <>
+                  <p>Start :</p>
+                  <p style={{ fontSize: '10px', color: '#fff' }}>
+                    <FormatedTime utc_string={start} />
+                  </p>
+                </>
+              )
+              :
+              (
+                <>
+                  <p>End :</p>
+                  <p style={{ fontSize: '10px', color: '#fff' }}>
+                    <FormatedTime utc_string={ddl} />
+                  </p>
+                </>
+              )
+            }
           </div>
         </div>
       </div>
