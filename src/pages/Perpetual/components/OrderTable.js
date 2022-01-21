@@ -1,23 +1,21 @@
 import React, { useState } from 'react';
 import {  Divider, Icon, Input, Table  } from 'antd';
-import styles from './ActionHistoryTable.less';
+import styles from './OrderTable.less';
 import numeral from 'numeral';
 import formatNumber from 'accounting-js/lib/formatNumber.js';
 import  { abbrNumber } from '../../Market/Util.js';
 import { constantInstance } from '@/constants';
-import { sortTableTime } from '../utils'
 
-const StakeHistoryTable = props => {
-  const [stakeDisplayNumber, setStakeDisplayNumber] = useState(5);
+const OrderTable = props => {
   const { dataSource, isMobile } = props;
 
-  const sampleStakeHistoryColumns = [
+  const sampleOrderColumns = [
     {
       title: (
         <div
           className={styles.tableDataFirstColumn}
         >
-          Swap
+          Type
         </div>
       ),
       dataIndex: '',
@@ -25,7 +23,7 @@ const StakeHistoryTable = props => {
       render: (text, record) => {
           return (
           <div className={styles.tableDataFirstColumn}>
-            Swap {record.inputTokenSymbol} for {record.outTokenSymbol} {record.FA ? " (FA)" : ""}
+            {abbrNumber(text)}
             </div>
           );  
       }
@@ -35,11 +33,11 @@ const StakeHistoryTable = props => {
         <div
           className={styles.tableData}
         >
-          Total Amount
+          Order
         </div>
       ),
-      dataIndex: 'totalToken',
-      key: 'totalToken',
+      dataIndex: 'order',
+      key: 'order',
       render: (text,record) => {
         return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
       }
@@ -49,13 +47,13 @@ const StakeHistoryTable = props => {
         <div
           className={styles.tableData}
         >
-          Token Amount
+          Price
         </div>
       ),
-      dataIndex: 'inputTokenNum',
-      key: 'inputTokenNum',
+      dataIndex: 'price',
+      key: 'price',
       render: (text,record) => {
-        return <div className={styles.tableData}>{abbrNumber(text)} {record.inputTokenSymbol}</div>;
+        return <div className={styles.tableData}>{abbrNumber(text)} $</div>;
       }
     },
     {
@@ -63,31 +61,17 @@ const StakeHistoryTable = props => {
         <div
           className={styles.tableData}
         >
-          Token Amount
+          Mark Price
         </div>
       ),
-      dataIndex: 'outTokenNum',
-      key: 'outTokenNum',
+      dataIndex: 'markPrice',
+      key: 'markPrice',
       render: (text,record) => {
-        return <div className={styles.tableData}>{abbrNumber(text)} {record.outTokenSymbol}</div>;
-      }
-    },
-    {
-      title: (
-        <div
-          className={styles.tableData}
-        >
-          Time
-        </div>
-      ),
-      dataIndex: 'transactionTime',
-      key: 'transactionTime',
-      render: (text,record) => {
-        return <div className={styles.tableData}>{text}</div>;
+        return <div className={styles.tableData}>{abbrNumber(text)}$ </div>;
       }
     },
   ]
-  const sampleStakeHistoryMobileColumns = [
+  const sampleOrderMobileColumns = [
     {
       title: 'Swap',
       key: 'fromforto',
@@ -103,10 +87,10 @@ const StakeHistoryTable = props => {
   return (
     <div className={styles.nobgTable}>
       <Table
-        columns={ isMobile&&sampleStakeHistoryMobileColumns || sampleStakeHistoryColumns }
-        dataSource={ sortTableTime(dataSource, 'transactionTime', true).slice(0, stakeDisplayNumber + 1) }
-        className={ styles.tableStyle }
-        pagination={ false }
+        columns={isMobile&&sampleOrderMobileColumns||sampleOrderColumns}
+        dataSource={sortTableTime(dataSource, 'transactionTime', true).slice(0, stakeDisplayNumber+1)}
+        className={styles.tableStyle}
+        pagination={false}
         onRow={record => {
           if(record.FA){
             return {
@@ -139,6 +123,7 @@ const StakeHistoryTable = props => {
     </div>
     
   );
+  
 };
 
-export default StakeHistoryTable;
+export default OrderTable;

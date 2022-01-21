@@ -9,16 +9,7 @@ import { calcPercent } from '../utils/';
 import AcyEditPositionModal from '@/components/AcyEditPositionModal';
 import AcyClosePositionModal from '@/components/AcyClosePositionModal';
 import { isDesktop } from '@/pages/Market/Util';
-
-function sortTableTime(table, key, isReverse) {
-  return table.sort((a, b) => {
-    if (isReverse) {
-      return new Date(b[key]).getTime() - new Date(a[key]).getTime();
-    } else {
-      return new Date(a[key]).getTime() - new Date(b[key]).getTime();
-    }
-  });
-}
+import {sortTableTime} from '../utils'
 
 const PositionsTable = props => {
   const [displayNumber, setDisplayNumber] = useState(5);
