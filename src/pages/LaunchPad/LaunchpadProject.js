@@ -32,6 +32,7 @@ import youtubeIcon from '@/assets/icon_youtube.svg';
 import githubIcon from '@/assets/icon_github.svg';
 import twitterWIcon from '@/assets/icon_twitter_white.svg';
 import linkWIcon from '@/assets/icon_link_white.svg';
+import linkBIcon from '@/assets/icon_open_in_new_window_black.svg'
 import whitepaperIcon from '@/assets/icon_file_white.svg';
 import deckIcon from '@/assets/icon_ppt.svg';
 import tokenEconomicsIcon from '@/assets/icon_googlesheets.svg';
@@ -74,6 +75,23 @@ const TokenBanner = ({ posterUrl }) => {
     />
   );
 };
+
+function nFormatter(num, digits) {
+  const lookup = [
+    { value: 1, symbol: "" },
+    { value: 1e3, symbol: "k" },
+    { value: 1e6, symbol: "M" },
+    { value: 1e9, symbol: "G" },
+    { value: 1e12, symbol: "T" },
+    { value: 1e15, symbol: "P" },
+    { value: 1e18, symbol: "E" }
+  ];
+  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  var item = lookup.slice().reverse().find(function(item) {
+    return num >= item.value;
+  });
+  return item ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0";
+}
 
 const TokenLogoLabel = ({ projectName, tokenLogo, receivedData }) => {
 
@@ -225,15 +243,25 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
 
   const ProgressBar = ({ alreadySale, totalSale, projectToken }) => {
     const salePercentage = (100 * Number(alreadySale) / Number(totalSale)).toFixed(4)
-    let tokenNum;
+    let tokenNum, mainCoinNum;
     if (!alreadySale) {
       tokenNum = 0
+      mainCoinNum = 0
     } else {
       tokenNum = alreadySale
+      mainCoinNum = (receivedData.totalRaise * alreadySale / totalSale).toFixed(0)
     }
     const progressStyle = {
       width: { salePercentage } + '%',
     };
+
+    const clickToScan = (address) => {
+      let link_url = SCAN_URL_PREFIX() + '/address/' + address
+      const newWindow = window.open(link_url, '_blank', 'noopener,noreferrer');
+      if (newWindow) newWindow.opener = null;
+    }
+
+    const [isShowMainCoin, setIsShowMainCoin] = useState(true)
 
     return (
       <>
@@ -242,7 +270,15 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
           style={{ background: '#1a1d1c', borderRadius: '0rem 0rem 1rem 1rem' }}
         >
           <div className="progressHeader">
-            <p>Sale Progress</p>
+            <p>Sale Progress
+              <img
+            className="link"
+            alt=""
+            src={linkBIcon}
+            loading="eager"
+            class="filter-acy-orange"
+            onClick={() => clickToScan(LAUNCHPAD_ADDRESS())}
+          /></p>
             <p style={{ color: '#eb5c1f' }}>{salePercentage}%</p>
           </div>
           <div className={styles.tokenProgress}>
@@ -255,8 +291,13 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
               status={salePercentage === 0 ? "normal" : salePercentage !== 100 ? "active" : "success"}
             />
           </div>
-          <div className="progressAmount">
-            <div>{`${tokenNum} / ${totalSale} ${projectToken}`}</div>
+          <div className="progressAmount" onClick={() => setIsShowMainCoin(!isShowMainCoin)}>
+            {
+              isShowMainCoin?
+              <div>{`${nFormatter(tokenNum, 3)} / ${nFormatter(totalSale, 3)} ${projectToken}`}</div>
+              :
+              <div>{`${nFormatter(mainCoinNum, 3)} / ${nFormatter(receivedData.totalRaise, 3)} ${receivedData.mainCoin}`}</div>
+            }
           </div>
         </div>
       </>
@@ -284,41 +325,27 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
 
 const KeyInformation = ({ projectToken, totalSale, tokenPrice, receivedData, poolTokenAddress, poolMainCoinAddress }) => {
 
-  const clickToScan = (address) => {
-    let link_url = SCAN_URL_PREFIX() + '/address/' + address
-    const newWindow = window.open(link_url, '_blank', 'noopener,noreferrer');
-    if (newWindow) newWindow.opener = null;
-  }
-
   return (
     <div className="circleBorderCard cardContent">
       <div className="keyinfoRow">
         <div className="keyinfoName">Total Sales</div>
         <div>
-          {totalSale} {projectToken}
-          <img
+          {nFormatter(totalSale, 3)} {projectToken}
+          {/* <img
             className="link"
             alt=""
             src={linkWIcon}
             loading="eager"
             style={{ width: '15px', height: '15px', marginLeft: '0.2rem', cursor: 'pointer' }}
             onClick={() => clickToScan(poolTokenAddress)}
-          />
+          /> */}
         </div>
       </div>
 
       <div className="keyinfoRow" style={{ marginTop: '1rem' }}>
         <div className="keyinfoName">Total Raise</div>
         <div>
-          {receivedData.totalRaise} {receivedData.mainCoin}
-          <img
-            className="link"
-            alt=""
-            src={linkWIcon}
-            loading="eager"
-            style={{ width: '15px', height: '15px', marginLeft: '0.2rem', cursor: 'pointer' }}
-            onClick={() => clickToScan(poolMainCoinAddress)}
-          />
+          {nFormatter(receivedData.totalRaise, 3)} {receivedData.mainCoin}
         </div>
       </div>
 

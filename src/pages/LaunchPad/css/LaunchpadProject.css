@@ -645,6 +645,14 @@
   color: #eb5c20;
 }
 
+.filter-acy-orange {
+  filter: invert(59%) sepia(95%) saturate(4288%) hue-rotate(348deg) brightness(95%) contrast(94%);
+  width: 15px;
+  height: 15px;
+  margin-left: 0.2rem;
+  cursor: pointer;
+}
+
 .sales-container .sales-submit {
   background-color: #eb5c20;
   color: white;
