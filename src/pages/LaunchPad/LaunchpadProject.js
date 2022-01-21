@@ -125,6 +125,9 @@ const LaunchpadProject = () => {
 
   // contract function
   const getPoolData = async (lib, acc) => {
+    console.log('getpool');
+    console.log('poolId', poolID, 'contract', poolContract);
+
     const poolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, lib, acc);
     const pool = []
     const distributionRes = []
@@ -166,6 +169,8 @@ const LaunchpadProject = () => {
     // 判断当前是否是vesting阶段
     const curPoolStatus = Number(BigNumber.from(status).toBigInt())
     if (curPoolStatus === 4) setIsVesting(true)
+
+    console.log('pooldate', pool);
 
     // set数据
     setPoolBaseData(pool)
@@ -249,7 +254,8 @@ const LaunchpadProject = () => {
     }
 
     // project must have poolID
-    if (!poolID) return;
+    if (poolID === null) return;
+    console.log('poolID', poolID);
 
     if (account && library) {
       getPoolData(library, account)
@@ -269,7 +275,7 @@ const LaunchpadProject = () => {
       .then(res => {
         if (res) {
           setAllocationInfo(res);
-          console.log('allocation info', res);
+          console.log('allocation info', receivedData.projectToken, res);
         }
       })
       .catch(e => {
@@ -818,6 +824,7 @@ const LaunchpadProject = () => {
 
     const investClicked = async (poolAddress, poolId, amount) => {
       // TODO: test if amount is valid!
+      console.log('investing', amount);
       if (poolStatus !== 2) {// cannot buy
         setIsNotInvesting(true);
       } else {
@@ -831,6 +838,16 @@ const LaunchpadProject = () => {
           const approveAmount = (amount * Math.pow(10, poolMainCoinDecimals)).toString()
           const state = await approveNew(poolMainCoinAddress, approveAmount, poolAddress, library, account);
           const result = await PoolContract.InvestERC20(poolId, approveAmount)
+            .then((res) => {
+              useAllocation(API_URL(), account, receivedData.projectToken, amount)
+                .then(res => {
+                  if (res) {
+                    console.log('use alloc', res);
+                    setAllocationInfo(res);
+                  }
+                })
+                .catch(e => console.log(e));
+            })
             .catch(e => {
               console.log(e)
               return new CustomError('CustomError while buying token');
@@ -838,14 +855,6 @@ const LaunchpadProject = () => {
           return result;
         })();
 
-        useAllocation(API_URL(), account, receivedData.projectToken, amount)
-          .then(res => {
-            if (res) {
-              console.log('use alloc', res);
-              setAllocationInfo(res);
-            }
-          })
-          .catch(e => console.log(e));
         console.log("buy contract", status)
       }
     }
