@@ -56,7 +56,7 @@ const IncomingProjects = ({ data, openProject }) => {
           display: 'flex',
           flexWrap: 'wrap',
           gap: '20px',
-          justifyContent: 'center',
+          justifyContent: 'left',
         }}
       >
         {data &&
