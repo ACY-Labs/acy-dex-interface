@@ -261,7 +261,7 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
       if (newWindow) newWindow.opener = null;
     }
 
-    const [isShowMainCoin, setIsShowMainCoin] = useState(true)
+    const [isShowToken, setIsShowToken] = useState(false)
 
     return (
       <>
@@ -291,9 +291,9 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
               status={salePercentage === 0 ? "normal" : salePercentage !== 100 ? "active" : "success"}
             />
           </div>
-          <div className="progressAmount" onClick={() => setIsShowMainCoin(!isShowMainCoin)}>
+          <div className="progressAmount" onClick={() => setIsShowToken(!isShowToken)}>
             {
-              isShowMainCoin?
+              isShowToken?
               <div>{`${nFormatter(tokenNum, 3)} / ${nFormatter(totalSale, 3)} ${projectToken}`}</div>
               :
               <div>{`${nFormatter(mainCoinNum, 3)} / ${nFormatter(receivedData.totalRaise, 3)} ${receivedData.mainCoin}`}</div>
