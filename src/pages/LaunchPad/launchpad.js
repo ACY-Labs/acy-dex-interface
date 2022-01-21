@@ -21,6 +21,7 @@ import SwapTicket from "./swapTicket";
 import StepBar from './stepComponent';
 import CountDown from "./countDown";
 import LaunchChart from "./launchChart"
+import { nFormatter } from './utils'
 
 const Contract = require('web3-eth-contract');
 // set provider for all later instances to use

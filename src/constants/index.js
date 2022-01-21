@@ -57,6 +57,7 @@ export const RPC_URL = () => constantInstance.farmSetting.RPC_URL
 export const API_URL = () => constantInstance.farmSetting.API_URL
 export const LAUNCHPAD_ADDRESS = () => constantInstance.launchpadSetting.ADDRESS
 export const LAUNCH_RPC_URL = () => constantInstance.launchpadSetting.RPC_URL
+export const LAUNCH_MAIN_TOKEN = () => constantInstance.launchpadSetting.MAIN_TOKEN
 export const METHOD_LIST = () => constantInstance.methodMap
 export const ACTION_LIST = () => constantInstance.actionMap
 export const TOKEN_LIST = () => constantInstance.tokenList

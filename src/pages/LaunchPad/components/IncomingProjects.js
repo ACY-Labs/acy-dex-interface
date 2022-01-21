@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import $ from 'jquery';
 import ProjectsCard from './ProjectsCard.js';
 import ExpandedContent from './ExpandedContent.js';
+import { nFormatter } from '../utils';
 
 const IncomingProjects = ({ data, openProject }) => {
   // var $cell = $('.card');
@@ -71,8 +72,8 @@ const IncomingProjects = ({ data, openProject }) => {
                       projectID={obj.projectID}
                       start={obj.saleStart}
                       ddl={obj.saleEnd}
-                      raise={obj.totalRaise.toString() + ' USDT'}
-                      sales={obj.totalSale.toString() + ' ' + obj.projectToken}
+                      raise={nFormatter(obj.totalRaise, 3) + " USDT"}
+                      sales={nFormatter(obj.totalSale, 3) + ' ' + obj.projectToken}
                       rate={'1 ' + obj.projectToken + ' = ' + obj.tokenPrice.toString() + ' USDT'}
                       title={obj.projectName}
                       isUpcoming

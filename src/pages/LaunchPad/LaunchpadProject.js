@@ -44,10 +44,11 @@ import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from "@/components/ConnectWallet";
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
 import Timer from "@/components/Timer";
-import { useConstantLoader, SCAN_URL_PREFIX, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL, TOKEN_LIST, MARKET_TOKEN_LIST } from "@/constants";
+import { useConstantLoader, SCAN_URL_PREFIX, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL, TOKEN_LIST, MARKET_TOKEN_LIST, LAUNCH_MAIN_TOKEN } from "@/constants";
 import { CustomError } from "@/acy-dex-swap/utils"
 import { approveNew, getAllowance } from "@/acy-dex-swap/utils"
 import FormatedTime from '@/components/FormatedTime';
+import { nFormatter } from './utils'
 
 const InputGroup = Input.Group;
 const logoObj = {
@@ -75,23 +76,6 @@ const TokenBanner = ({ posterUrl }) => {
     />
   );
 };
-
-function nFormatter(num, digits) {
-  const lookup = [
-    { value: 1, symbol: "" },
-    { value: 1e3, symbol: "K" },
-    { value: 1e6, symbol: "M" },
-    { value: 1e9, symbol: "G" },
-    { value: 1e12, symbol: "T" },
-    { value: 1e15, symbol: "P" },
-    { value: 1e18, symbol: "E" }
-  ];
-  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
-  var item = lookup.slice().reverse().find(function(item) {
-    return num >= item.value;
-  });
-  return item ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0";
-}
 
 const TokenLogoLabel = ({ projectName, tokenLogo, receivedData }) => {
 
@@ -256,7 +240,12 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
     };
 
     const clickToScan = (address) => {
-      let link_url = SCAN_URL_PREFIX() + '/address/' + address
+      let link_url
+      if (LAUNCH_MAIN_TOKEN() == receivedData.mainCoin) {
+        link_url = SCAN_URL_PREFIX() + '/address/' + address
+      } else {
+        link_url = SCAN_URL_PREFIX() + '/address/' + address + '#tokentxns'
+      }
       const newWindow = window.open(link_url, '_blank', 'noopener,noreferrer');
       if (newWindow) newWindow.opener = null;
     }
@@ -630,10 +619,14 @@ const Allocation = ({
     const value = e.target.value;
     if (!allocationInfo) setSalesValue(0);
     const allocationLeft = allocationInfo.allocationLeft;
+    if (typeof value !== "number") {
+      setSalesValue(allocationLeft)
+      return
+    }
     if (value > allocationLeft) {
       setSalesValue(allocationLeft);
-    } else if (value < 0) {
-      setSalesValue(0);
+    } else if (value < receivedData.minInvest) {
+      setSalesValue(receivedData.minInvest);
     } else {
       setSalesValue(value);
     }
@@ -846,7 +839,8 @@ const Allocation = ({
               <Input
                 className="sales-input"
                 value={salesValue}
-                onChange={onChangeSaleValue}
+                onChange={(e) => setSalesValue(e.target.value)}
+                onBlur={onChangeSaleValue}
               />
               <div className="unit-max-group">
                 <div className="token-logo">
@@ -1030,6 +1024,7 @@ const LaunchpadProject = () => {
           res['salePercentage'] = contextData['salePercentage'];
           res['posterUrl'] = contextData['posterUrl'];
           res['tokenLogoUrl'] = res.basicInfo.projectTokenUrl;
+          res['minInvest'] = res.allocationInfo.parameters.minInvest
 
           res['regStart'] = res.scheduleInfo.regStart;
           res['regEnd'] = res.scheduleInfo.regEnd;
