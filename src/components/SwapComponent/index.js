@@ -267,8 +267,17 @@ const SwapComponent = props => {
   // connect to page model, reflect changes of pair ratio in this component
   useEffect(() => {
     const { swap: { token0: modelToken0, token1: modelToken1 } } = props;
+    
     setToken0(modelToken0);
     setToken1(modelToken1);
+
+    console.log(">> old new token 0/1 compare", token0 == modelToken1, token1 == modelToken0)
+    if (token0 == modelToken1 && token1 == modelToken0) {
+      const newToken0Balance = token1Balance;
+      const newToken1Balance = token0Balance;
+      setToken0Balance(newToken0Balance);
+      setToken1Balance(newToken1Balance);
+    }
   }, [props.swap]);
 
   useEffect(() => {
