@@ -371,7 +371,7 @@ const AcyLiquidityPositions = (props) => {
       `${apiUrlPrefix}/userpool?walletId=${account}`
       // `http://localhost:3001/api/userpool?walletId=${account}`
     ).then(async res => {
-      console.log(res);
+      console.log(">> received data from backend", res);
 
       const tokens = supportedTokens;
 
@@ -588,6 +588,7 @@ const AcyLiquidityPositions = (props) => {
 
   // first time loading
   useEffect(() => {
+    setUserLPHandlers([]);
     getValidPoolList();
   }, [account, chainId]);
   // refresh table data on add/remove liquidity
