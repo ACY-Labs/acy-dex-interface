@@ -387,7 +387,7 @@
 
 .allocationCard .openCover {
   transform: rotateY(-110deg);
-  transition-duration: 2s;
+  transition-duration: 1s;
 }
 
 .allocationCard .nocover {

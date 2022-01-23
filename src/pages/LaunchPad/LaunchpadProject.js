@@ -261,13 +261,13 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
           <div className="progressHeader">
             <p>Sale Progress
               <img
-            className="link"
-            alt=""
-            src={linkBIcon}
-            loading="eager"
-            class="filter-acy-orange"
-            onClick={() => clickToScan(LAUNCHPAD_ADDRESS())}
-          /></p>
+                className="link"
+                alt=""
+                src={linkBIcon}
+                loading="eager"
+                class="filter-acy-orange"
+                onClick={() => clickToScan(LAUNCHPAD_ADDRESS())}
+              /></p>
             <p style={{ color: '#eb5c1f' }}>{salePercentage}%</p>
           </div>
           <div className={styles.tokenProgress}>
@@ -282,10 +282,10 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
           </div>
           <div className="progressAmount" onClick={() => setIsShowToken(!isShowToken)}>
             {
-              isShowToken?
-              <div>{`${nFormatter(tokenNum, 3)} / ${nFormatter(totalSale, 3)} ${projectToken}`}</div>
-              :
-              <div>{`${nFormatter(mainCoinNum, 3)} / ${nFormatter(receivedData.totalRaise, 3)} ${receivedData.mainCoin}`}</div>
+              isShowToken ?
+                <div>{`${nFormatter(tokenNum, 3)} / ${nFormatter(totalSale, 3)} ${projectToken}`}</div>
+                :
+                <div>{`${nFormatter(mainCoinNum, 3)} / ${nFormatter(receivedData.totalRaise, 3)} ${receivedData.mainCoin}`}</div>
             }
           </div>
         </div>
@@ -467,6 +467,95 @@ const ChartCard = () => {
   );
 };
 
+const AllocationCard = ({
+  index,
+  allocationInfo,
+  innerValues,
+  coverOpenStates,
+  setAllocationInfo,
+  updateInnerValues,
+  updateCoverStates,
+  account,
+  receivedData,
+  setSalesValue
+}) => {
+
+  const colorCodes = ["#C6224E", "#1C9965", "#E29227", "#1E5D91", "#70BA33"];
+  const baseColorCodes = ["#631027", "#0e4c32", "#74490f", "#0f2e48", "#375d19"];
+
+  useEffect(() => {
+    console.log('card', index);
+  }, [])
+
+  const computeCoverClass = () => {
+    let classString = 'cover';
+    let coverOpenState = coverOpenStates[index];
+    if (coverOpenState === 'open') {
+      classString += ' openCover';
+    } else if (coverOpenState === 'removed') {
+      classString = 'nocover';
+    }
+    return classString;
+  };
+
+  // if allocation is done, cover cannot be opened
+  // otherwise, require an allocation from server
+  const clickCover = (e) => {
+    if (coverOpenStates[index] !== 'cover') return;
+
+    console.log(`click allocation card cover`, allocationInfo);
+    if (!account || !receivedData.projectToken) {
+      return;
+    }
+
+    // first time allocation
+    if (!allocationInfo.allocationAmount) {
+      requireAllocation(API_URL(), account, receivedData.projectToken).then(res => {
+        if (res) {
+          console.log('resalloc: ', res);
+          setAllocationInfo(res);
+          setTimeout(() => {
+            setSalesValue(res.allocationLeft);
+            updateInnerValues(index, res);
+            updateCoverStates(index);
+          }, 1000)
+        }
+      }).catch(e => {
+        console.error(e);
+      })
+    } else {
+      console.log('open cover');
+      updateInnerValues(index, allocationInfo);
+      updateCoverStates(index);
+      setSalesValue(allocationInfo.allocationLeft);
+    }
+  };
+
+  const computeTextStyle = () => {
+    if (coverOpenStates[index] === 'removed') {
+      return {
+        color: '#757579'
+      }
+    }
+  }
+
+  return (
+    <div className='allocationCard-container'>
+      <div className="allocationCard" onClick={clickCover} style={{ backgroundColor: baseColorCodes[index] }}>
+        <div
+          className={computeCoverClass()}
+          style={{ backgroundColor: colorCodes[index] }}
+        >
+        </div>
+        <p
+          className="inner-text-amount"
+          style={computeTextStyle()}
+        >{innerValues[index]}</p>
+      </div>
+    </div>
+  );
+};
+
 const Allocation = ({
   account,
   library,
@@ -481,13 +570,10 @@ const Allocation = ({
   poolMainCoinAddress
 }) => {
 
-  const colorCodes = ["#C6224E", "#1C9965", "#E29227", "#1E5D91", "#70BA33"];
-  const baseColorCodes = ["#631027", "#0e4c32", "#74490f", "#0f2e48", "#375d19"];
   const [allocationInfo, setAllocationInfo] = useState({});
-  const [innerValues, setInnerValues] = useState(new Array(5).fill(0));
+  const [innerValues, setInnerValues] = useState([0, 0, 0, 0, 0]);
   const [coverOpenStates, setCoverOpenStates] = useState(new Array(5).fill('cover'));
   const [salesValue, setSalesValue] = useState(0);
-  const [cardIndexClicked, setCardIndexClicked] = useState(null);
   const [isShowingBonusInstrution, SetIsShowingBonusInstruction] = useState(false);
   const [isClickedVesting, setIsClickedVesting] = useState(false);
 
@@ -497,11 +583,11 @@ const Allocation = ({
     // get allocation status from backend at begining
     getAllocationInfo(API_URL(), account, receivedData.projectToken)
       .then(res => {
-        if (res) {
+        if (res && res.allocationAmount) {
           setAllocationInfo(res);
-          if (res.allocationLeft) {
-            setSalesValue(res.allocationLeft);
-          }
+          updateInnerValues(2, res);
+          updateCoverStates(2);
+          setSalesValue(res.allocationLeft);
           console.log('allocation info', receivedData.projectToken, res);
         }
       })
@@ -510,110 +596,6 @@ const Allocation = ({
         throw e;
       });
   }, [account, receivedData]);
-
-  const AllocationCard = ({ index }) => {
-
-    const computeCoverClass = () => {
-      let classString = 'cover';
-      let coverOpenState = coverOpenStates[index];
-      if (coverOpenState === 'open') {
-        classString += ' openCover';
-      } else if (coverOpenState === 'removed') {
-        classString = 'nocover';
-      }
-      return classString;
-    };
-
-    // if allocation is done, cover cannot be opened
-    // otherwise, require an allocation from server
-    const clickCover = (e) => {
-      if (cardIndexClicked) return;
-      setCardIndexClicked(index);
-
-      console.log(`click allocation card cover`, allocationInfo);
-      if (!account || !receivedData.projectToken) {
-        return;
-      }
-
-      // let cards = document.querySelectorAll(".cover");
-      // cards.forEach(node => {
-      //   console.log(node);
-      //   node.classList.remove("inner-text")
-      //   node.classList.remove("cover");
-      //   let innerText = node.parentElement.querySelector(".inner-text-amount");
-      //   // get 4 random values for other allocation values
-      //   console.log(innerText);
-      //   innerText.style.color = "#757579";
-      // })
-      // try {
-      //   let originalElementParent = e.target.parentElement.querySelector(".inner-text-amount");
-      //   originalElementParent.style.color = "#ffffff"
-      // } catch (err) {
-      //   // set all values to $0 due to error
-      //   // innerText.textContent = "$0";
-      //   console.log(err);
-      // }
-      // e.preventDefault();
-
-      // first time allocation
-      if (!allocationInfo.allocationAmount) {
-        requireAllocation(API_URL(), account, receivedData.projectToken).then(res => {
-          if (res) {
-            console.log('resalloc: ', res);
-            setAllocationInfo(res);
-            setSalesValue(res.allocationInfo.allocationLeft);
-            updateInnerValues(index);
-            updateCoverStates(index);
-          }
-        }).catch(e => {
-          console.error(e);
-        })
-      } else {
-        console.log('updating');
-        updateInnerValues(index);
-        updateCoverStates(index);
-        setSalesValue(allocationInfo.allocationLeft);
-      }
-    };
-
-    const computeTextStyle = () => {
-      if (coverOpenStates[index] === 'removed') {
-        return {
-          color: '#757579'
-        }
-      }
-    }
-
-    return (
-      <div className='allocationCard-container'>
-        <div className="allocationCard" onClick={clickCover} style={{ backgroundColor: baseColorCodes[index] }}>
-          <div
-            className={computeCoverClass()}
-            style={{ backgroundColor: colorCodes[index] }}
-          >
-          </div>
-          <p
-            className="inner-text-amount"
-            style={computeTextStyle()}
-          >{innerValues[index]}</p>
-        </div>
-      </div>
-    );
-  };
-
-  const allocationCards = () => {
-    const cards = [];
-    for (let i = 0; i < 5; i++) {
-      cards.push(
-        <AllocationCard
-          index={i}
-          innerValue={innerValues[i]}
-          coverOpenState={coverOpenStates[i]}
-        />
-      );
-    }
-    return cards;
-  };
 
   const onChangeSaleValue = (e) => {
     const value = e.target.value;
@@ -640,8 +622,8 @@ const Allocation = ({
 
   const randomRange = (min, max) => Math.floor(Math.random() * (max - min) + min);
 
-  const updateInnerValues = (index) => {
-    const newInnerValues = innerValues;
+  const updateInnerValues = (index, allocationInfo) => {
+    const newInnerValues = [0, 0, 0, 0, 0];
     const allocationAmount = allocationInfo.allocationAmount;
     for (let i = 0; i < innerValues.length; i++) {
       if (i === index) {
@@ -655,10 +637,8 @@ const Allocation = ({
   }
 
   const updateCoverStates = (index) => {
-    const newCoverOpenStates = new Array(5).fill('removed');
-    console.log('CoverOpenStates', coverOpenStates);
+    const newCoverOpenStates = ['removed', 'removed', 'removed', 'removed', 'removed'];
     newCoverOpenStates[index] = 'open';
-    console.log('newCoverOpenStates', newCoverOpenStates);
     setCoverOpenStates(newCoverOpenStates);
   }
 
@@ -785,6 +765,8 @@ const Allocation = ({
     return totalBonus;
   }
 
+  const card_indexes = [0, 1, 2, 3, 4];
+
   return (
     <div>
       <div className='cardContent allocation-content allocation-content-active'>
@@ -803,11 +785,23 @@ const Allocation = ({
 
           <div className='allocation-cards'>
             <div className="allocationContainer">
-              <AllocationCard index={0} />
-              <AllocationCard index={1} />
-              <AllocationCard index={2} />
-              <AllocationCard index={3} />
-              <AllocationCard index={4} />
+              {
+                card_indexes.map((index) => 
+                  <AllocationCard
+                    key={index}
+                    index={index}
+                    allocationInfo={allocationInfo}
+                    setAllocationInfo={setAllocationInfo}
+                    updateCoverStates={updateCoverStates}
+                    updateInnerValues={updateInnerValues}
+                    coverOpenStates={coverOpenStates}
+                    innerValues={innerValues}
+                    account={account}
+                    receivedData={receivedData}
+                    setSalesValue={setSalesValue}
+                  />
+                )
+              }
             </div>
           </div>
 
@@ -937,8 +931,6 @@ const LaunchpadProject = () => {
 
   // contract function
   const getPoolData = async (lib, acc) => {
-    console.log('getpool');
-    console.log('poolId', poolID, 'contract', poolContract);
 
     const poolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, lib, acc);
     const pool = []
@@ -991,11 +983,9 @@ const LaunchpadProject = () => {
     setPoolTokenAddress(baseData[0])
     setPoolTokenDecimals(token1decimal)
     setPoolMainCoinDecimals(token2decimal)
-    // setMainCoinLogoURI(token2Info.logoURI)
   }
 
   const updatePoolData = async () => {
-    console.log('updating pool data');
     // project must have poolID
     if (poolID === null) return;
 
@@ -1084,7 +1074,7 @@ const LaunchpadProject = () => {
         </div>
       ) : (
         <div className="mainContainer">
-          <Timer callBack={updatePoolData} ms={10000} />
+          <Timer callBack={updatePoolData} ms={30000} />
           <TokenBanner posterUrl={receivedData.posterUrl} />
           <TokenLogoLabel
             projectName={receivedData.projectName}
