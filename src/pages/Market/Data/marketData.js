@@ -1,11 +1,11 @@
 import { useQuery } from '@apollo/client';
 import {GET_MARKET_DATA} from './query';
 import axios from 'axios';
-import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
+import {getAllSuportedTokensPrice, getAllSuportedTokensPrice_forMarket} from '@/acy-dex-swap/utils/index';
 
-import {findTokenWithAddress} from '@/utils/txData';
+import {findTokenWithAddress, findTokenWithAddress_market} from '@/utils/txData';
 import {totalInUSD} from '@/utils/utils'
-import {API_URL} from '@/constants';
+import {API_URL, MARKET_API_URL} from '@/constants';
 
 // get market info snapshot
 export async function fetchMarketInfo(client, timestamp){
@@ -56,8 +56,11 @@ function parseMarketData (data){
         d.setDate(d.getDate()+1);
     }
     data.forEach(element => {
-        let _token0 = findTokenWithAddress(element.token0).symbol;
-        let _token1 = findTokenWithAddress(element.token1).symbol;
+        //let _token0 = findTokenWithAddress(element.token0).symbol;
+        //let _token1 = findTokenWithAddress(element.token1).symbol;
+
+        let _token0 = findTokenWithAddress_market(element.token0).symbol;
+        let _token1 = findTokenWithAddress_market(element.token1).symbol;
 
         element.historicalData.forEach(item => {
             let at = tvlArr.findIndex(index => index[0] == item.date);
@@ -99,9 +102,11 @@ function parseMarketData (data){
 
 export async  function fetchMarketData () {
     // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
-  tokensPriceUSD = await getAllSuportedTokensPrice();
+  //tokensPriceUSD = await getAllSuportedTokensPrice();
+  tokensPriceUSD = await getAllSuportedTokensPrice_forMarket();
   try{
-    const apiUrlPrefix = API_URL();
+    //const apiUrlPrefix = API_URL();
+    const apiUrlPrefix = MARKET_API_URL();
     let request = `${apiUrlPrefix}/poolchart/historical/all`;
     let response = await fetch(request);
     let data = await response.json();
@@ -111,4 +116,15 @@ export async  function fetchMarketData () {
     console.log('service not available yet',e);
     return null;
   }
+}
+
+export async function fetchMarketData_ver2() {
+    tokensPriceUSD = await getAllSuportedTokensPrice();
+    try {
+        
+    } catch (error) {
+        console.log('service not available yet',error);
+        return null;
+    }
+    
 }

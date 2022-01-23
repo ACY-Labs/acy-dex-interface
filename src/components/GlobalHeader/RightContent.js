@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, connect } from 'umi';
-import { Spin, Tag, Menu, Icon, Dropdown, Button, Space, Modal } from 'antd';
+import { Spin, Tag, Menu, Icon, Dropdown, Button, Space, Modal, message } from 'antd';
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
 import { Link } from 'react-router-dom';
@@ -43,8 +43,8 @@ const GlobalHeaderRight = props => {
   const [visibleSetting, setVisibleSetting] = useState(false);
   const [only, setOnly] = useState(true);
   // 连接钱包函数
-  const { account, chainId, library } = useConstantLoader();
-  const { activate, deactivate, active } = useWeb3React();
+  const { library } = useConstantLoader();
+  const { account, chainId, activate, deactivate, active } = useWeb3React();
 
   const [wallet, setWallet] = useState(localStorage.getItem("wallet"));
 
@@ -63,9 +63,36 @@ const GlobalHeaderRight = props => {
     console.log('test current active', active)
     if (!active)
       deactivate();
-  }, [active])
+  }, [active]);
 
-  useEffect(() => console.log("test current ", account), [account]);
+  // 判断设备
+  const [userSystem, setuserSystem] = useState("other");
+
+  useEffect(() => {
+    function fIsMobile() {
+      return /Android|iPhone|iPad|iPod|BlackBerry|webOS|Windows Phone|SymbianOS|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    var u = navigator.userAgent;
+    var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1; //android终端
+    var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+    if (u) {
+      setuserSystem("isPC");
+    } else if (isAndroid) {
+      setuserSystem("isAndroid");
+    } else if (isiOS) {
+      setuserSystem("isiOS");
+    } else setuserSystem("other");
+  }, [])
+
+  useEffect(() => {
+    if (account){
+      localStorage.setItem("login_status", "on");
+    }
+    else{
+      //localStorage.setItem("login_status", "off");
+      setNetworkListIndex(0)
+    }
+  }, [account]);
 
   const getNoticeData = () => {
     const { notices = [] } = props;
@@ -134,9 +161,20 @@ const GlobalHeaderRight = props => {
 
   // 选择钱包
   const selectWallet = walletName => {
+    if (walletName!=localStorage.getItem("wallet"))
+      localStorage.setItem("login_status", "off");
     console.log('selecting wallet', walletName);
     if (walletName === 'metamask' || walletName === 'opera') {
-      activate(injected);
+      try {
+        ethereum;
+        activate(injected);
+      } catch (error) {
+        message.info('No provider was found');
+        if(account){
+          localStorage.setItem("login_status", "on");
+        }
+        return
+      }
     } else if (walletName === 'walletconnect') {
       activate(walletconnect);
     } else if (walletName === 'coinbase') {
@@ -152,28 +190,52 @@ const GlobalHeaderRight = props => {
     } else if (walletName === 'ledger') {
       activate(ledger);
     } else if (walletName === 'binance') {
-      activate(binance);
+      try {
+        BinanceChain
+        activate(binance);
+      } catch (error) {
+        message.info('No provider was found');
+        if(account){
+          localStorage.setItem("login_status", "on");
+        }
+        return
+      }
     } else if (walletName === 'nabox') {
-      activate(nabox)
+      try {
+        NaboxWallet;
+        activate(nabox);
+      } catch (error) {
+        message.info('No provider was found');
+        if(account){
+          localStorage.setItem("login_status", "on");
+        }
+        return
+      }
     } else {
       console.log("wallet ERROR");
     }
     localStorage.setItem('wallet', walletName);
-    localStorage.setItem("login_status", 'on');
     setVisibleMetaMask(false);
   };
   // 初始网络显示
   const n_index = chainId => {
-    if (chainId == 56) {
-      return 1
-    }
-    if (chainId == 137) {
+    if (chainId == 56 || chainId == 97) {
       return 2
     }
-    return 0
+    if (chainId == 137 || chainId == 80001) {
+      return 3
+    }
+    if (chainId == undefined){
+      return 0
+    }
+    return 1
   }
   // 通知钱包连接成功
   const checkChainNetwork = (chainId) => {
+    if (!chainId) {
+      switchEthereumChain("0x38"); //返回默认56链
+      return
+    }
     console.log("networkChanged:", chainId)
     console.log("supported chain?", supportedChainIds, chainId, supportedChainIds.indexOf(chainId) == -1)
     if (supportedChainIds && supportedChainIds.indexOf(Number(chainId)) == -1) {
@@ -200,20 +262,33 @@ const GlobalHeaderRight = props => {
     }
     checkChainNetwork(chainId);
     // 监听钱包网络变化 metamask
-    try {
-      ethereum.on('networkChanged', function (chainId) {
-        checkChainNetwork(chainId);
-      }) 
-    } catch (error) {
-      console.log("no metamask plugin");
+    if (localStorage.getItem("wallet") == "metamask") {
+      try {
+        ethereum.on('networkChanged', function (chainId) {
+          checkChainNetwork(chainId);
+        })
+      } catch (error) {
+        console.log("no metamask plugin");
+      }
     }
-    // Nabox 监听
-    try {
-      window.NaboxWallet.on('networkChanged', function (chainId) {
-        checkChainNetwork(chainId);
-      })
-    } catch (error) {
-      console.log("no nabox plugin");
+    if (localStorage.getItem("wallet") == "nabox") {
+      // Nabox 监听
+      try {
+        NaboxWallet.on('networkChanged', function (chainId) {
+          checkChainNetwork(chainId);
+        })
+      } catch (error) {
+        console.log("no nabox plugin");
+      }
+    }
+    if (localStorage.getItem("wallet") == "binance") {
+      try {
+        BinanceChain.on('networkChanged', function (chainId) {
+          checkChainNetwork(chainId);
+        })
+      } catch (error) {
+        console.log("no binance plugin");
+      }
     }
   }, [account, chainId, supportedChainIds, wallet]);
   const {
@@ -388,14 +463,14 @@ const GlobalHeaderRight = props => {
   const switchEthereumChain = async (chainId) => {
     if (localStorage.getItem("wallet") == "metamask") {
       try {
-        await window.ethereum.request({
+        await ethereum.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: chainId }],
         });
       } catch (e) {
         if (e.code === 4902) {
           try {
-            await window.ethereum.request({
+            await ethereum.request({
               method: 'wallet_addEthereumChain',
               params: [
                 networkParams[chainId]
@@ -409,14 +484,35 @@ const GlobalHeaderRight = props => {
     }
     else if (localStorage.getItem("wallet") == "nabox") {
       try {
-        await window.NaboxWallet.request({
+        await NaboxWallet.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: chainId }],
         });
       } catch (e) {
         if (e.code === 4902) {
           try {
-            await window.NaboxWallet.request({
+            await NaboxWallet.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                networkParams[chainId]
+              ],
+            });
+          } catch (addError) {
+            console.error(addError);
+          }
+        }
+      }
+    }
+    else if (localStorage.getItem("wallet") == "binance") {
+      try {
+        await BinanceChain.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: chainId }],
+        });
+      } catch (e) {
+        if (e.code === 4902) {
+          try {
+            await BinanceChain.request({
               method: 'wallet_addEthereumChain',
               params: [
                 networkParams[chainId]
@@ -441,6 +537,13 @@ const GlobalHeaderRight = props => {
   // 网络列表
   const [networkListIndex, setNetworkListIndex] = useState(0);
   const networkList = [
+    {
+      name: 'NO Network',
+      //icon: 'Polygon',
+      onClick: async () => {
+        setVisibleMetaMask(false);
+      },
+    },
     {
       name: 'Wrong Network',
       //icon: 'Polygon',
@@ -471,7 +574,7 @@ const GlobalHeaderRight = props => {
         <span>Select a Network</span>
       </div>
       <AcyCardList>
-        {networkList.slice(1,).map((item) => {
+        {networkList.slice(2,).map((item) => {
           return (
             <AcyCardList.Thin className={styles.networkListLayout} onClick={() => item.onClick()}>
               {

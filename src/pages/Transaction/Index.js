@@ -101,14 +101,20 @@ const Transaction = props => {
             <div>
               <div className={styles.block}>Pass</div>
               {routes.map(function(route, i){
-                return <div className={styles.smallblock}>
-                        <div>{route.token2Num && formatNumber(route.token2Num*1,{ precision: 7, thousand: ","})}</div>
-                        <div>
-                        <span>{route.token2}</span>
-                        <img src={route.logoURI} style={{ width: '22px'}} />
-                        </div>
-                        
-                      </div>;
+
+                if(route.token2) {
+                  return <div className={styles.smallblock}>
+                          <div>{route.token2Num && formatNumber(route.token2Num*1,{ precision: 7, thousand: ","})}</div>
+                          <div>
+                            <span>{route.token2}</span>
+                            <img src={route.logoURI} style={{ width: '22px'}} />
+                          </div>
+                       </div>;
+                }else{
+                  return <div className={styles.smallblock}>
+                    <div style={{'width' : '100%','text-align': 'center'}}>direct route</div>
+                  </div>;   
+                }
               })}
             </div>
             <div className={styles.arrow}><AcyIcon.MyIcon width={20} type="rightArrow" /></div>
@@ -177,7 +183,7 @@ const Transaction = props => {
           <table style={{width:'500px'}}>
             <tr>
               <td className={styles.tableFirstCol}>Trader</td>
-              <td>40%</td>
+              <td>50%</td>
               <td>{data.trader_treasury.toFixed(2)}</td>
               <td>
                 <span>{data.token2.symbol}</span>
@@ -186,7 +192,7 @@ const Transaction = props => {
             </tr>
             <tr>
               <td className={styles.tableSeeMore} onClick={() => setShowDetails(!showDetails)}>ACY Treasury</td>
-              <td>60%</td>
+              <td>{(!showDetails)? '50%' : '  '}</td>
               <td>{data.acy_treasury.toFixed(2)}</td>
               <td>
                 <span>{data.token2.symbol}</span>
@@ -206,7 +212,7 @@ const Transaction = props => {
             <table style={{width:'500px'}}>
               <tr>
                 <td className={styles.tableFirstCol}>Liquidity Provider</td>
-                <td>20%</td>
+                <td>10%</td>
                 <td>{(data.acy_treasury * 0.2).toFixed(2)}</td>
                 <td>
                   <span>{data.token2.symbol}</span>
@@ -214,9 +220,9 @@ const Transaction = props => {
                 </td>
               </tr>
               <tr>
-                <td className={styles.tableFirstCol}>{`Farms-->ACYDAO`}</td>
+                <td className={styles.tableFirstCol}>{`Protocol Owned Liquidity`}</td>
                 <td>10%</td>
-                <td>{(data.acy_treasury * 0.10).toFixed(2)}</td>
+                <td>{(data.acy_treasury * 0.2).toFixed(2)}</td>
                 <td>
                 <span>{data.token2.symbol}</span>
                 <img src={data.token2.logoURI}/>
@@ -225,8 +231,8 @@ const Transaction = props => {
               </tr>
               <tr>
                 <td className={styles.tableFirstCol}>{`Farms-->Standard`}</td>
-                <td>10%</td>
-                <td>{(data.acy_treasury * 0.10).toFixed(2)}</td>
+                <td>15%</td>
+                <td>{(data.acy_treasury * 0.3).toFixed(2)}</td>
                 <td>
                   <span>{data.token2.symbol}</span>
                   <img src={data.token2.logoURI}/>
@@ -234,8 +240,8 @@ const Transaction = props => {
               </tr>
               <tr>
                 <td className={styles.tableFirstCol}>{`Farms-->Premier`}</td>
-                <td>10%</td>
-                <td>{(data.acy_treasury * 0.10).toFixed(2)}</td>
+                <td>5%</td>
+                <td>{(data.acy_treasury * 0.1).toFixed(2)}</td>
                 <td>
                 <span>{data.token2.symbol}</span>
                   <img src={data.token2.logoURI}/>
@@ -245,7 +251,7 @@ const Transaction = props => {
               <tr>
                 <td className={styles.tableFirstCol}>{`Ecosystem DAO`}</td>
                 <td>10%</td>
-                <td>{(data.acy_treasury * 0.10).toFixed(2)}</td>
+                <td>{(data.acy_treasury * 0.2).toFixed(2)}</td>
                 <td>
                   <span>{data.token2.symbol}</span>
                   <img src={data.token2.logoURI}/>
@@ -269,11 +275,7 @@ const Transaction = props => {
           <table style={{width:'500px'}}>
             <tr>
               <td className={styles.tableFirstCol}>Liquidity Providers</td>
-              <td>{(data.trading_fee * 0.25 / 0.3).toFixed(6)} $</td>
-            </tr>
-            <tr>
-              <td className={styles.tableFirstCol}>ACYDAO</td>
-              <td>{(data.trading_fee * 0.75 / 0.3).toFixed(6)} $</td>
+              <td>{(data.trading_fee).toFixed(6)} $</td>
             </tr>
           </table>
           
@@ -282,11 +284,7 @@ const Transaction = props => {
             <tr>
               <td className={styles.tableFirstCol} ><span>{data.token2.symbol}</span>
               <img src={data.token2.logoURI} /></td>
-              <td>{(data.trader_final).toFixed(3)}</td>
-            </tr>
-            <tr>
-              <td className={styles.tableFirstCol} ><span>USD</span></td>
-              <td>{(data.trader_finalUSD).toFixed(3)} $</td>
+              <td>{(data.trader_final).toFixed(3)} ({(data.trader_finalUSD).toFixed(3)}$)</td>
             </tr>
           </table>
         </div>

@@ -62,7 +62,7 @@ const AcyConnectWallet = props => {
     }
   }
 
-  const getAllPrice = async() => {
+  const getAllPrice = async () => {
     const tokenPriceList = await getAllSuportedTokensPrice().then(res => {
       setTokenPriceDict(res);
     });
@@ -76,10 +76,49 @@ const AcyConnectWallet = props => {
 
   useEffect(() => {
     var balance = 0;
+    var balance_k = 0; //3
+    var balance_m = 0; //6
+    var balance_b = 0; //9
+    var balance_t = 0; //12
     Object.keys(tokenBalanceDict).forEach(ele => {
-      balance = balance + (Number(tokenBalanceDict[ele]) * tokenPriceDict[ele]);
+      // balance calculate
+      let flag = tokenBalanceDict[ele].substr(-1).toUpperCase();
+      switch (flag) {
+        case "K":
+          balance_k = balance_k + (Number(tokenBalanceDict[ele].substr(0, tokenBalanceDict[ele].length - 1)) * tokenPriceDict[ele])
+          //balance = balance + (Number(tokenBalanceDict[ele].substr(0, tokenBalanceDict[ele].length - 1)) * tokenPriceDict[ele] * 1000)
+          break;
+        case "M":
+          balance_m = balance_m + (Number(tokenBalanceDict[ele].substr(0, tokenBalanceDict[ele].length - 1)) * tokenPriceDict[ele])
+          //balance = balance + (Number(tokenBalanceDict[ele].substr(0, tokenBalanceDict[ele].length - 1)) * tokenPriceDict[ele] * 1000000)
+          break;
+        case "B":
+          balance_b = balance_b + (Number(tokenBalanceDict[ele].substr(0, tokenBalanceDict[ele].length - 1)) * tokenPriceDict[ele])
+          //balance = balance + (Number(tokenBalanceDict[ele].substr(0, tokenBalanceDict[ele].length - 1)) * tokenPriceDict[ele] * 1000000000)
+          break;
+        case "T":
+          balance_t = balance_t + (Number(tokenBalanceDict[ele].substr(0, tokenBalanceDict[ele].length - 1)) * tokenPriceDict[ele])
+          //balance = balance + (BigInt(tokenBalanceDict[ele].substr(0, tokenBalanceDict[ele].length - 1)) * tokenPriceDict[ele] * 1000000000000)
+          break;
+        default:
+          balance = balance + (Number(tokenBalanceDict[ele]) * tokenPriceDict[ele]);
+          break;
+      }
     })
-    setUserBalance(balance.toFixed(2))
+    var finalBalance = 0;
+    if(balance_t!=0){
+      finalBalance = (balance_t + (balance_b/1000)).toFixed(2).toString() + 'T';
+    }else if(balance_b!=0){
+      finalBalance = (balance_b + (balance_m/1000)).toFixed(2).toString() + 'B';
+    }else if(balance_m!=0){
+      finalBalance = (balance_m + (balance_k/1000)).toFixed(2).toString() + 'M';
+    }else if(balance_k!=0){
+      finalBalance = (balance_k + (balance/1000)).toFixed(2).toString() + 'K';
+    }else{
+      finalBalance = balance.toFixed(2).toString();
+    }
+
+    setUserBalance(finalBalance)
   }, [tokenBalanceDict])
 
 
@@ -101,8 +140,8 @@ const AcyConnectWallet = props => {
     return chainName
   }, [displayedChainId])
 
-  const balanceHandle = async()=>{
-    if (balanceShow == 'none'){
+  const balanceHandle = async () => {
+    if (balanceShow == 'none') {
       setBalanceShow('inline-block');
       setBalanceTitleShow('none');
     }
@@ -132,13 +171,13 @@ const AcyConnectWallet = props => {
     )) || (
       <div {...rest} className={styles.connect}>
         <div className={styles.wrap}>
-          {/* {chainName} ( {displayedChainId || 'disconnected'} ) */} 
+          {/* {chainName} ( {displayedChainId || 'disconnected'} ) */}
           <Tooltip placement='bottomLeft' color={'#b5b5b6'} title="Click to show your balance" mouseEnterDelay={0.5}>
-            
-          <div className={styles.balanceBtn} onClick={balanceHandle}>
-            <p style={{display:balanceTitleShow}}>Balance</p>
-          <div className={styles.showBalance} style={{display:balanceShow}}>$ {userBalance}</div>
-          </div>  
+
+            <div className={styles.balanceBtn} onClick={balanceHandle}>
+              <p style={{ display: balanceTitleShow }}>Balance</p>
+              <div className={styles.showBalance} style={{ display: balanceShow }}>$ {userBalance}</div>
+            </div>
           </Tooltip>
           {/* pending */}
           {pendingLength

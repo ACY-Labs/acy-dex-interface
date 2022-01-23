@@ -29,7 +29,8 @@ const FarmsTable = ({
   searchInput,
   balanceAcy,
   isLoading,
-  activeEnded
+  activeEnded,
+  setWalletConnected
   // refreshPool
 
 }) => {
@@ -133,6 +134,7 @@ const FarmsTable = ({
                 dao={!hideDao}
                 isLoading={isLoading}
                 activeEnded={activeEnded}
+                setWalletConnected={setWalletConnected}
                 // refreshPool={refreshPool}
               />
             );

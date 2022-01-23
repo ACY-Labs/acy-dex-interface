@@ -37,7 +37,7 @@ import {
 } from './Data/walletStats'
 import { Fetcher, Percent, Token, TokenAmount, Pair } from '@acyswap/sdk';
 import { binance, injected } from '@/connectors';
-import { API_URL, SCAN_NAME, SCAN_URL_PREFIX, TOKENLIST} from "@/constants";
+import { API_URL, SCAN_NAME, SCAN_URL_PREFIX, TOKENLIST, MARKET_API_URL} from "@/constants";
 import { useConstantLoader } from '@/constants';
 
 
@@ -509,7 +509,8 @@ function AccountInfo(props) {
   const getValidPoolList = (account) => {
     // setLoading(true);
  
-    const apiUrlPrefix = API_URL();
+    //const apiUrlPrefix = API_URL();
+    const apiUrlPrefix = MARKET_API_URL();
 
     console.log("fetching user pool list");
     axios.get(
@@ -606,29 +607,6 @@ function AccountInfo(props) {
     (async () => { for (let pair of userLPHandlers) fetchPoolShare(pair); })();
 
   }
-
-  // no need to fetch the pool valume at here 
-  // useEffect(async () => {
-  //   const token0list = [];
-  //   const token1list = [];
-  //   console.log("fetching the poolvalume data");
-  //   // axios.get(
-  //   //   // fetch valid pool list from remote
-  //   //   // `https://api.acy.finance/api/pool?chainId=${chainId}`
-  //   //   // `https://api.acy.finance/api/poolchart/all`
-  //   //   `http://localhost:3001/api/poolchart/all`
-  //   // ).then(async res => {
-  //   //   console.log(res);
-  //   //   console.log("test=====");
-  //   //   console.log(res.data);
-  //   //   for (let index = 0; index < array.length; index++) {
-  //   //     const element = array[index];
-        
-  //   //   }
-  //   // }).catch( err => {
-  //   //   console.log(err);
-  //   // });
-  // }, [])
 
   useEffect(async () => {
     console.log("the user address is :" + account);    
