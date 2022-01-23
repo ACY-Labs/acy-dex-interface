@@ -144,16 +144,14 @@ const CardArea = ({
           comparesaleDate={comparesaleDate}
           comparevestDate={comparevestDate}
         />
-        {poolBaseData &&
-          <KeyInformation
-            projectToken={receivedData.projectToken}
-            totalSale={poolBaseData[0]}
-            tokenPrice={receivedData.tokenPrice}
-            receivedData={receivedData}
-            poolTokenAddress={poolTokenAddress}
-            poolMainCoinAddress={poolMainCoinAddress}
-          />
-        }
+        <KeyInformation
+          projectToken={receivedData.projectToken}
+          totalSale={receivedData.totalSale}
+          tokenPrice={receivedData.tokenPrice}
+          receivedData={receivedData}
+          poolTokenAddress={poolTokenAddress}
+          poolMainCoinAddress={poolMainCoinAddress}
+        />
 
       </div>
       <div className="rightGrid">
@@ -483,10 +481,6 @@ const AllocationCard = ({
   const colorCodes = ["#C6224E", "#1C9965", "#E29227", "#1E5D91", "#70BA33"];
   const baseColorCodes = ["#631027", "#0e4c32", "#74490f", "#0f2e48", "#375d19"];
 
-  useEffect(() => {
-    console.log('card', index);
-  }, [])
-
   const computeCoverClass = () => {
     let classString = 'cover';
     let coverOpenState = coverOpenStates[index];
@@ -511,14 +505,12 @@ const AllocationCard = ({
     // first time allocation
     if (!allocationInfo.allocationAmount) {
       requireAllocation(API_URL(), account, receivedData.projectToken).then(res => {
-        if (res) {
+        if (res && res.allocationAmount) {
           console.log('resalloc: ', res);
           setAllocationInfo(res);
-          setTimeout(() => {
-            setSalesValue(res.allocationLeft);
-            updateInnerValues(index, res);
-            updateCoverStates(index);
-          }, 1000)
+          setSalesValue(res.allocationLeft);
+          updateInnerValues(index, res);
+          updateCoverStates(index);
         }
       }).catch(e => {
         console.error(e);
@@ -680,9 +672,6 @@ const Allocation = ({
     if (poolStatus !== 4) {
       console.log('not vesting');
     } else {
-      if (!account) {
-        connectWallet()
-      }
       // Check if users have collected token for current vesting stage
       const investorData = await PoolContract.GetInvestmentData(poolID, account)
       const investorRes = []
@@ -911,17 +900,6 @@ const LaunchpadProject = () => {
   // CONSTANTS
 
   // FUNCTIONS
-  const connectWallet = async () => {
-    activate(binance);
-    activate(injected);
-  };
-
-  const formatTime = timeZone => {
-    return moment(timeZone)
-      // .local()
-      .utc()
-      .format('MM/DD/YYYY HH:mm:ss');
-  };
 
   const convertUnixTime = unixTime => {
     const data = new Date((Number(unixTime)) * 1000)
@@ -989,6 +967,11 @@ const LaunchpadProject = () => {
     // project must have poolID
     if (poolID === null) return;
 
+    const now_moment_utc = moment.utc();
+    const end_moment_utc = moment.utc(receivedData.saleEnd);
+    const start_moment_utc = moment.utc(receivedData.saleStart);
+    if(now_moment_utc > end_moment_utc || now_moment_utc < start_moment_utc) return;
+
     if (account && library) {
       await getPoolData(library, account);
     } else {
@@ -1014,7 +997,7 @@ const LaunchpadProject = () => {
           res['salePercentage'] = contextData['salePercentage'];
           res['posterUrl'] = contextData['posterUrl'];
           res['tokenLogoUrl'] = res.basicInfo.projectTokenUrl;
-          res['minInvest'] = res.allocationInfo.parameters.minInvest
+          res['minInvest'] = res.allocationInfo.parameters.minInvest;
 
           res['regStart'] = res.scheduleInfo.regStart;
           res['regEnd'] = res.scheduleInfo.regEnd;
@@ -1030,7 +1013,7 @@ const LaunchpadProject = () => {
             setpoolDistributionStage(distributionStage);
           }
 
-          res['tokenPrice'] = res.saleInfo.tokenPrice
+          res['tokenPrice'] = res.saleInfo.tokenPrice;
           res['totalSale'] = res.saleInfo.totalSale;
           res['totalRaise'] = res.saleInfo.totalRaise;
           res['projectUrl'] = res.saleInfo.projectUrl;
