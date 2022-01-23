@@ -775,7 +775,7 @@ const Allocation = ({
           <div className='allocation-cards'>
             <div className="allocationContainer">
               {
-                card_indexes.map((index) => 
+                card_indexes.map((index) =>
                   <AllocationCard
                     key={index}
                     index={index}
@@ -907,6 +907,13 @@ const LaunchpadProject = () => {
     return res
   }
 
+  const connectWalletByLocalStorage = useConnectWallet();
+  useEffect(() => {
+    if (!account) {
+      connectWalletByLocalStorage();
+    }
+  }, [account]);
+
   // contract function
   const getPoolData = async (lib, acc) => {
 
@@ -970,7 +977,7 @@ const LaunchpadProject = () => {
     const now_moment_utc = moment.utc();
     const end_moment_utc = moment.utc(receivedData.saleEnd);
     const start_moment_utc = moment.utc(receivedData.saleStart);
-    if(now_moment_utc > end_moment_utc || now_moment_utc < start_moment_utc) return;
+    if (now_moment_utc > end_moment_utc || now_moment_utc < start_moment_utc) return;
 
     if (account && library) {
       await getPoolData(library, account);
