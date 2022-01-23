@@ -595,13 +595,16 @@ const Allocation = ({
   }, [account, receivedData]);
 
   const onChangeSaleValue = (e) => {
-    const value = e.target.value;
     if (!allocationInfo) setSalesValue(0);
     const allocationLeft = allocationInfo.allocationLeft;
-    if (typeof value !== "number") {
-      setSalesValue(allocationLeft)
-      return
+
+    if(!Number(e.target.value)) {
+      setSalesValue(allocationLeft);
+      return;
     }
+
+    const value = parseInt(e.target.value);
+
     if (value > allocationLeft) {
       setSalesValue(allocationLeft);
     } else if (value < receivedData.minInvest) {
