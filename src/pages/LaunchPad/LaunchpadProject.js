@@ -252,6 +252,17 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
 
     const [isShowToken, setIsShowToken] = useState(false)
 
+    const Image = React.memo(function Image({ src }) {
+      return <img
+        className="link"
+        alt=""
+        src={src}
+        loading="eager"
+        class="filter-acy-orange"
+        onClick={() => clickToScan(LAUNCHPAD_ADDRESS())}
+      />;
+    });
+
     return (
       <>
         <div
@@ -259,15 +270,9 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
           style={{ background: '#1a1d1c', borderRadius: '0rem 0rem 1rem 1rem' }}
         >
           <div className="progressHeader">
-            <p>Sale Progress
-              <img
-            className="link"
-            alt=""
-            src={linkBIcon}
-            loading="eager"
-            class="filter-acy-orange"
-            onClick={() => clickToScan(LAUNCHPAD_ADDRESS())}
-          /></p>
+            <p>Sale ProgressBar<span><Image src={linkBIcon}/></span>
+              
+            </p>
             <p style={{ color: '#eb5c1f' }}>{salePercentage}%</p>
           </div>
           <div className={styles.tokenProgress}>
