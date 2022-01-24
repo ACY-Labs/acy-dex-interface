@@ -39,7 +39,7 @@ const OrderTable = props => {
       dataIndex: 'order',
       align: 'left',
       render: (text, record) => {
-        return <div className={styles.tableData}>$ {abbrNumber(record.order.amountIn)}</div>;
+        return <div className={styles.tableData}>Swap {record.order.fromTokenSymbol} (${abbrNumber(record.order.amountIn)}) for {record.order.toTokenSymbol} (${record.order.amountOut})</div>;
       }
     },
     {
