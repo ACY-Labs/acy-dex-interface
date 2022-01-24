@@ -5,69 +5,67 @@ import numeral from 'numeral';
 import formatNumber from 'accounting-js/lib/formatNumber.js';
 import  { abbrNumber } from '../../Market/Util.js';
 import { constantInstance } from '@/constants';
+import { sortTableTime } from '../utils'
 
 const OrderTable = props => {
   const { dataSource, isMobile } = props;
+  const [ orderDisplayNumber, setOrderDisplayNumber ] = useState(5);
 
   const sampleOrderColumns = [
     {
-      title: (
-        <div
-          className={styles.tableDataFirstColumn}
-        >
-          Type
-        </div>
-      ),
-      dataIndex: '',
-      key: 'fromforto',
+      // title: (
+      //   <div className={styles.tableDataFirstColumn}>
+      //     Type
+      //   </div>
+      // ),
+      title: 'Type',
+      dataIndex: 'type',
+      align: 'left',
       render: (text, record) => {
           return (
-          <div className={styles.tableDataFirstColumn}>
-            {abbrNumber(text)}
+            <div className={styles.tableEntryBig}>
+              {record.type}
             </div>
-          );  
+          );
       }
     },
     {
-      title: (
-        <div
-          className={styles.tableData}
-        >
-          Order
-        </div>
-      ),
+      // title: (
+      //   <div className={styles.tableData}>
+      //     Order
+      //   </div>
+      // ),
+      title: 'Order',
       dataIndex: 'order',
-      key: 'order',
-      render: (text,record) => {
+      align: 'left',
+      render: (text, record) => {
+        return <div className={styles.tableData}>$ {abbrNumber(record.order.amountIn)}</div>;
+      }
+    },
+    {
+      // title: (
+      //   <div className={styles.tableData}>
+      //     Price
+      //   </div>
+      // ),
+      title: 'Price',
+      dataIndex: 'price',
+      align: 'left',
+      render: (text, record) => {
         return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
       }
     },
     {
-      title: (
-        <div
-          className={styles.tableData}
-        >
-          Price
-        </div>
-      ),
-      dataIndex: 'price',
-      key: 'price',
-      render: (text,record) => {
-        return <div className={styles.tableData}>{abbrNumber(text)} $</div>;
-      }
-    },
-    {
-      title: (
-        <div
-          className={styles.tableData}
-        >
-          Mark Price
-        </div>
-      ),
+      // title: (
+      //   <div className={styles.tableData}>
+      //     Mark Price
+      //   </div>
+      // ),
+      title: 'Mark Price',
       dataIndex: 'markPrice',
-      key: 'markPrice',
-      render: (text,record) => {
-        return <div className={styles.tableData}>{abbrNumber(text)}$ </div>;
+      align: 'left',
+      render: (text, record) => {
+        return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
       }
     },
   ]
@@ -88,7 +86,7 @@ const OrderTable = props => {
     <div className={styles.nobgTable}>
       <Table
         columns={isMobile&&sampleOrderMobileColumns||sampleOrderColumns}
-        dataSource={sortTableTime(dataSource, 'transactionTime', true).slice(0, stakeDisplayNumber+1)}
+        dataSource={sortTableTime(dataSource, 'transactionTime', true).slice(0, orderDisplayNumber+1)}
         className={styles.tableStyle}
         pagination={false}
         onRow={record => {
@@ -113,7 +111,7 @@ const OrderTable = props => {
           <div className={styles.tableSeeMoreWrapper}>
             <a
               className={styles.tableSeeMore}
-              onClick={() => setStakeDisplayNumber(prevState => prevState + 5)}
+              onClick={() => setOrderDisplayNumber(prevState => prevState + 5)}
             >
               See More...
             </a>

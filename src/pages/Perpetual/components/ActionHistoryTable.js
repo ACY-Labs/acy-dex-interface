@@ -14,41 +14,35 @@ const StakeHistoryTable = props => {
   const sampleStakeHistoryColumns = [
     {
       title: (
-        <div
-          className={styles.tableDataFirstColumn}
-        >
+        <div className={styles.tableDataFirstColumn}>
           Swap
         </div>
       ),
       dataIndex: '',
       key: 'fromforto',
       render: (text, record) => {
-          return (
-          <div className={styles.tableDataFirstColumn}>
-            Swap {record.inputTokenSymbol} for {record.outTokenSymbol} {record.FA ? " (FA)" : ""}
-            </div>
-          );  
+        return (
+        <div className={styles.tableDataFirstColumn}>
+          Swap {record.inputTokenSymbol} for {record.outTokenSymbol} {record.FA ? " (FA)" : ""}
+          </div>
+        );
       }
     },
     {
       title: (
-        <div
-          className={styles.tableData}
-        >
+        <div className={styles.tableData}>
           Total Amount
         </div>
       ),
       dataIndex: 'totalToken',
       key: 'totalToken',
-      render: (text,record) => {
+      render: (text, record) => {
         return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
       }
     },
     {
       title: (
-        <div
-          className={styles.tableData}
-        >
+        <div className={styles.tableData}>
           Token Amount
         </div>
       ),
@@ -60,29 +54,25 @@ const StakeHistoryTable = props => {
     },
     {
       title: (
-        <div
-          className={styles.tableData}
-        >
+        <div className={styles.tableData}>
           Token Amount
         </div>
       ),
       dataIndex: 'outTokenNum',
       key: 'outTokenNum',
-      render: (text,record) => {
+      render: (text, record) => {
         return <div className={styles.tableData}>{abbrNumber(text)} {record.outTokenSymbol}</div>;
       }
     },
     {
       title: (
-        <div
-          className={styles.tableData}
-        >
+        <div className={styles.tableData}>
           Time
         </div>
       ),
       dataIndex: 'transactionTime',
       key: 'transactionTime',
-      render: (text,record) => {
+      render: (text, record) => {
         return <div className={styles.tableData}>{text}</div>;
       }
     },
@@ -108,7 +98,7 @@ const StakeHistoryTable = props => {
         className={ styles.tableStyle }
         pagination={ false }
         onRow={record => {
-          if(record.FA){
+          if (record.FA) {
             return {
               onClick: event => {
                 // 跳转到eths

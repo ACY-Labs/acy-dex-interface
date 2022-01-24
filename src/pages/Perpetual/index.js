@@ -123,6 +123,7 @@ const Swap = props => {
   // this are new states for PERPETUAL
   const [tableContent, setTableContent] = useState("Positions");
   const [positionsData, setPositionsData] = useState([]);
+  const [ordersData, setOrdersData] = useState([]);
   const { activate } = useWeb3React();
 
 
@@ -184,7 +185,24 @@ const Swap = props => {
       }
     ]
     setPositionsData(samplePositionsData);
+
+    const sampleOrdersData = [
+      {
+        type: "Swap",
+        order: {
+          amountIn: 100,
+          fromTokenSymbol: "USDT",
+          amountOut: 50,
+          toTokenSymbol: "ACY"
+        },
+        price: 100,
+        markPrice: 105,
+      }
+    ]
+    setOrdersData(sampleOrdersData)
+
   }, [chainId])
+
   const refContainer = useRef();
   refContainer.current = transactionList;
 
@@ -406,7 +424,7 @@ const Swap = props => {
       return (
         <OrderTable
           isMobile={isMobile}
-          dataSource={positionsData}
+          dataSource={ordersData}
         />
       )
     }
