@@ -602,10 +602,11 @@ const Allocation = ({
       setSalesValue(allocationLeft)
       return
     }
+    const minInvest = allocationInfo.minInvest ? allocationInfo.minInvest : 100
     if (value > allocationLeft) {
       setSalesValue(allocationLeft);
-    } else if (value < receivedData.minInvest) {
-      setSalesValue(receivedData.minInvest);
+    } else if (value < minInvest) {
+      setSalesValue(minInvest);
     } else {
       setSalesValue(value);
     }
@@ -1009,7 +1010,7 @@ const LaunchpadProject = () => {
           res['salePercentage'] = contextData['salePercentage'];
           res['posterUrl'] = contextData['posterUrl'];
           res['tokenLogoUrl'] = res.basicInfo.projectTokenUrl;
-          res['minInvest'] = res.allocationInfo.parameters.minInvest;
+          // res['minInvest'] = res.allocationInfo.parameters.minInvest;
 
           res['regStart'] = res.scheduleInfo.regStart;
           res['regEnd'] = res.scheduleInfo.regEnd;
