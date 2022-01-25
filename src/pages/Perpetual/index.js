@@ -2,6 +2,7 @@ import { useWeb3React } from '@web3-react/core';
 import React, { Component, useState, useEffect, useRef } from 'react';
 import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton, Card } from 'antd';
+import samplePositionsData from "./SampleData"
 import {
   AcyCard,
   AcyIcon,
@@ -14,9 +15,10 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
+import { getLiquidationPrice } from '@/utils/utils';
 import Media from 'react-media';
 import { uniqueFun } from '@/utils/utils';
-import {getTransactionsByAccount,appendNewSwapTx} from '@/utils/txData';
+import {getTransactionsByAccount,appendNewSwapTx, findTokenWithSymbol} from '@/utils/txData';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import PerpetualComponent from '@/components/PerpetualComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -150,38 +152,40 @@ const Swap = props => {
     setTableLoading(true);
     setTransactionNum(0);
     
-    const samplePositionsData = [
-      {
-        token : {
-          symbol : 'ACY',
-          logoURI : 'https://acy.finance/static/media/logo.78c0179c.svg'
-        },
-        isLong : true,
-        delta : 6.99,
-        netValue : 455.95,
-        PnL : 455.95 - 93.58,
-        totalSize : 3000,
-        collateral : 93.58,
-        markPrice : 94.34,
-        entryPrice : 94.21,
-        liqPrice : 81.09
-      },
-      {
-        token : {
-          symbol : 'ETH',
-          logoURI : 'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=014'
-        },
-        isLong : false,
-        delta : 6.99,
-        netValue : 455.95,
-        PnL : 455.95 - 93.58,
-        totalSize : 121.12121212,
-        collateral : 93.58,
-        markPrice : 94.34,
-        entryPrice : 94.21,
-        liqPrice : 81.09
-      }
-    ]
+    // const samplePositionsData = [
+    //   {
+    //     indexToken : findTokenWithSymbol('ACY'),
+    //     collateralToken : findTokenWithSymbol('USDT'),
+    //     isLong : true,
+    //     delta : 6.99,
+    //     netValue : 455.95,
+    //     PnL : 455.95 - 93.58,
+    //     totalSize : 3000,
+    //     collateral : 93.58,
+    //     markPrice : 94.34,
+    //     entryPrice : 94.21,
+    //     liqPrice : 81.09
+    //   },
+    //   {
+    //     indexToken : findTokenWithSymbol('ETH'),
+    //     collateralToken : findTokenWithSymbol('USDT'),
+    //     isLong : false,
+    //     delta : 6.99,
+    //     netValue : 455.95,
+    //     PnL : 455.95 - 93.58,
+    //     totalSize : 121.12121212,
+    //     collateral : 93.58,
+    //     markPrice : 94.34,
+    //     entryPrice : 94.21,
+    //     liqPrice : 81.09
+    //   }
+    // ]
+    for ( let item of samplePositionsData){
+      item['collateralToken'] = findTokenWithSymbol(item.collateralTokenSymbol);
+      item['indexToken'] = findTokenWithSymbol(item.indexTokenSymbol);
+      item['liqPrice'] = getLiquidationPrice(item);
+    }
+    console.log(samplePositionsData); 
     setPositionsData(samplePositionsData);
   }, [chainId])
   const refContainer = useRef();
@@ -193,11 +197,11 @@ const Swap = props => {
     if(!account){
       connectWalletByLocalStorage()
      }
-    getTransactionsByAccount(account,library,'SWAP').then(data =>{
-      console.log("found this tx dataa::::::", data);
-      setTransactionList(data);
-      if(account) setTableLoading(false);
-    })
+    // getTransactionsByAccount(account,library,'SWAP').then(data =>{
+    //   console.log("found this tx dataa::::::", data);
+    //   setTransactionList(data);
+    //   if(account) setTableLoading(false);
+    // })
   }, [account]);
 
   
