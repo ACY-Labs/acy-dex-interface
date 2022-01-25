@@ -155,7 +155,7 @@ const Transaction = props => {
           </h1>
           <table style={{width:'500px'}}>
             <tr>
-              <td className={styles.tableFirstCol}>ACY Output</td>
+              <td className={styles.tableFirstCol}>Protocol Output</td>
               <td>{data.totalOut.toFixed(2)}</td>
               <td> 
                 <span>{data.token2.symbol}</span>
