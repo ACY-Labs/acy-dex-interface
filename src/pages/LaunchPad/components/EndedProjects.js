@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import $ from 'jquery';
 import ProjectsCard from './ProjectsCard.js';
 import ExpandedContent from './ExpandedContent.js';
+import { nFormatter } from '../utils';
 
 const EndedProjects = ({ data, openProject }) => {
   // var $cell = $('.card2');
@@ -41,7 +42,7 @@ const EndedProjects = ({ data, openProject }) => {
           display: 'flex',
           flexWrap: 'wrap',
           gap: '20px',
-          justifyContent: 'center',
+          justifyContent: 'left',
         }}
       >
         {data &&
@@ -51,8 +52,8 @@ const EndedProjects = ({ data, openProject }) => {
                 <ProjectsCard
                   projectID={obj.projectID}
                   ddl={obj.saleEnd}
-                  raise={obj.totalRaise.toString() + ' USDT'}
-                  sales={obj.totalSale.toString() + ' ' + obj.projectToken}
+                  raise={nFormatter(obj.totalRaise, 3) + " USDT"}
+                  sales={nFormatter(obj.totalSale, 3) + ' ' + obj.projectToken}
                   rate={'1 ' + obj.projectToken + ' = ' + obj.tokenPrice.toString() + ' USDT'}
                   title={obj.projectName}
                   tokenLogoUrl={obj.projectTokenUrl}

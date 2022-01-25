@@ -10,13 +10,13 @@ import { convertPoolForList } from './util';
 import { getBlockFromTimestamp } from './blocks';
 import { sortTable } from '../Util';
 import axios from 'axios';
-import { parseTransactionData } from '@/utils/txData';
-import {getAllSuportedTokensPrice, getPairAddress} from '@/acy-dex-swap/utils/index';
+import { findTokenWithAddress_market, parseTransactionData } from '@/utils/txData';
+import {getAllSuportedTokensPrice, getAllSuportedTokensPrice_forMarket, getPairAddress} from '@/acy-dex-swap/utils/index';
 
 import {findTokenWithAddress} from '@/utils/txData';
 
 import {totalInUSD} from '@/utils/utils'
-import {TOKENLIST, API_URL} from '@/constants';
+import {TOKENLIST, API_URL, MARKET_API_URL, MARKET_TOKEN_LIST} from '@/constants';
 
 
 // this variable is assigned with price data when calling functions e.g. fetchPoolInfo()
@@ -44,8 +44,8 @@ var tokensPriceUSD ;
 
 function parsePoolInfo(data){
 
-    let _token0 = findTokenWithAddress(data.token0);
-    let _token1 = findTokenWithAddress(data.token1);
+    let _token0 = findTokenWithAddress_market(data.token0);
+    let _token1 = findTokenWithAddress_market(data.token1);
 
     let _logoURL1 = _token0.logoURI;
     let _logoURL2 = _token1.logoURI;
@@ -94,11 +94,11 @@ function parsePoolInfo(data){
       reserve1: data.lastReserves.token1.toString(),
       reserveUSD: _tvl.toString(),
       token0: {
-        symbol:  _token0 , logoURI : _logoURL1
+        symbol:  _token0 , logoURI : _logoURL1, id: data.token0
       },
       token0Price: _token0USD.toString(),
       token1: {
-        symbol:  _token1 , logoURI : _logoURL2
+        symbol:  _token1 , logoURI : _logoURL2, id: data.token1
       },
       token1Price: _token1USD.toString(),
       untrackedVolumeUSD: "0",
@@ -119,13 +119,15 @@ export async function fetchPoolDayData(address) {
     //           price: 0,
     //         };
     // apiUrlPrefix = 'http://localhost:3001/api';
-  return await axios.get(`${API_URL()}/poolchart/all`).then(async res => {
+  //return await axios.get(`${API_URL()}/poolchart/all`).then(async res => {
+  return await axios.get(`${MARKET_API_URL()}/poolchart/all`).then(async res => {
     const data = res.data.data;
     const tokenPool = data.filter(p => p.token0.toLowerCase() == address.toLowerCase() || p.token1.toLowerCase() == address.toLowerCase());
 
-    const priceDict = await getAllSuportedTokensPrice();
+    const priceDict = await getAllSuportedTokensPrice_forMarket();
     
-    const supportedTokens = TOKENLIST();
+    //const supportedTokens = TOKENLIST();
+    const supportedTokens = MARKET_TOKEN_LIST();
     const parsedPairData = [];
     for (const pool of tokenPool) {
       const token0 = supportedTokens.find(t => t.address.toLowerCase() == pool.token0.toLowerCase());
@@ -181,8 +183,8 @@ function parsePoolData (data){
   let _data = data.map((item)=>{
 
     // console.log("mapping....",item.token0,item.token1);
-    let _token0 = findTokenWithAddress(item.token0);
-    let _token1 = findTokenWithAddress(item.token1);
+    let _token0 = findTokenWithAddress_market(item.token0);
+    let _token1 = findTokenWithAddress_market(item.token1);
 
     let _logoURL1 = _token0.logoURI;
     let _logoURL2 = _token1.logoURI;
@@ -237,8 +239,8 @@ function parsePoolData (data){
 function parsePoolDayInfoData(data){
 
   let _data = [];
-  let _token0 = findTokenWithAddress(data.token0).symbol;
-  let _token1 = findTokenWithAddress(data.token1).symbol;
+  let _token0 = findTokenWithAddress_market(data.token0).symbol;
+  let _token1 = findTokenWithAddress_market(data.token1).symbol;
 
   data.historicalData.forEach(element => {
 
@@ -289,9 +291,10 @@ function parsePoolDayInfoData(data){
 
 export async function fetchPoolInfo(address){
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
-  tokensPriceUSD = await getAllSuportedTokensPrice();
+  tokensPriceUSD = await getAllSuportedTokensPrice_forMarket();
   try{
-    let request = `${API_URL()}/poolchart/all`;
+    //let request = `${API_URL()}/poolchart/all`;
+    let request = `${MARKET_API_URL()}/poolchart/all`;
     let response = await fetch(request);
     let data = await response.json();
     const pairData = data.data.find(p => p.pairAddr.toLowerCase() == address.toLowerCase())
@@ -304,10 +307,11 @@ export async function fetchPoolInfo(address){
 
 export async function fetchPoolDayDataForPair(address) {
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
-  tokensPriceUSD = await getAllSuportedTokensPrice();
+  tokensPriceUSD = await getAllSuportedTokensPrice_forMarket();
   try{
     console.log(">>> start to send")
-    let request = API_URL() +'/poolchart/historical/pair?pairAddr='+address;
+    //let request = API_URL() +'/poolchart/historical/pair?pairAddr='+address;
+    let request = MARKET_API_URL() +'/poolchart/historical/pair?pairAddr='+address;
     let response = await fetch(request);
     console.log(">>> done send", response)
     let data = await response.json();
@@ -320,9 +324,10 @@ export async function fetchPoolDayDataForPair(address) {
 
 export async function fetchGeneralPoolInfoDay(address) {
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
-  tokensPriceUSD = await getAllSuportedTokensPrice();
+  tokensPriceUSD = await getAllSuportedTokensPrice_forMarket();
   try{
-    let request = API_URL()+'/poolchart/all';
+    //let request = API_URL()+'/poolchart/all';
+    let request = MARKET_API_URL()+'/poolchart/all';
     let response = await fetch(request);
     let data = await response.json();
     let parsed = parsePoolData(data.data);
@@ -381,8 +386,8 @@ function parseSearchPoolReturns(data, key){
   let _data = data.map((item)=>{
 
     console.log("mapping....",item.token0,item.token1);
-    let _token0 = findTokenWithAddress(item.token0);
-    let _token1 = findTokenWithAddress(item.token1);
+    let _token0 = findTokenWithAddress_market(item.token0);
+    let _token1 = findTokenWithAddress_market(item.token1);
 
     let _logoURL1 = _token0.logoURI;
     let _logoURL2 = _token1.logoURI;
@@ -439,9 +444,10 @@ function parseSearchPoolReturns(data, key){
 
 // fetch search pool returns
 export async function fetchSearchPoolReturns(key) {
-  tokensPriceUSD = await getAllSuportedTokensPrice();
+  tokensPriceUSD = await getAllSuportedTokensPrice_forMarket();
   try{
-    let request = `${API_URL()}/poolchart/all`;
+    //let request = `${API_URL()}/poolchart/all`;
+    let request = `${MARKET_API_URL()}/poolchart/all`;
     let response = await fetch(request);
     let data = await response.json();
     let parsed = parseSearchPoolReturns(data.data, key);
@@ -462,3 +468,5 @@ export async function fetchSearchPoolReturns(key) {
 
 
 // get individual pool info from token
+
+ 

@@ -48,7 +48,7 @@ export const useConnectWallet = () => {
                 console.log("wallet ERROR");
                 activate(injected);
             }
-            localStorage.setItem("status", "on")
+            localStorage.setItem("login_status", "on")
         },
         [activate],
     )

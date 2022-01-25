@@ -31,6 +31,7 @@ import { useConstantLoader } from '@/constants';
 import {useConnectWallet} from '@/components/ConnectWallet';
 import PositionsTable from './components/PositionsTable';
 import ActionHistoryTable from './components/ActionHistoryTable';
+import OrderTable from './components/OrderTable'
 
 const { AcyTabPane } = AcyTabs;
 function getTIMESTAMP(time) {
@@ -122,8 +123,9 @@ const Swap = props => {
   const [transactionNum, setTransactionNum] = useState(0);
 
   // this are new states for PERPETUAL
-  const [showActionTable, setShowActionTable] = useState(false);
+  const [tableContent, setTableContent] = useState("Positions");
   const [positionsData, setPositionsData] = useState([]);
+  const [ordersData, setOrdersData] = useState([]);
   const { activate } = useWeb3React();
 
 
@@ -187,7 +189,24 @@ const Swap = props => {
     }
     console.log(samplePositionsData); 
     setPositionsData(samplePositionsData);
+
+    const sampleOrdersData = [
+      {
+        type: "Swap",
+        order: {
+          amountIn: 100,
+          fromTokenSymbol: "USDT",
+          amountOut: 50,
+          toTokenSymbol: "ACY"
+        },
+        price: 100,
+        markPrice: 105,
+      }
+    ]
+    setOrdersData(sampleOrdersData)
+
   }, [chainId])
+
   const refContainer = useRef();
   refContainer.current = transactionList;
 
@@ -389,6 +408,32 @@ const Swap = props => {
     ];
   };
 
+  const RenderTable = () => {
+    console.log("renderTable", tableContent)
+    if (tableContent === "Positions") {
+      return (
+        <PositionsTable
+            isMobile={isMobile}
+            dataSource={positionsData}
+        />
+      )
+    } else if (tableContent === "Actions") {
+      return (
+        <ActionHistoryTable
+            isMobile={isMobile}
+            dataSource={positionsData}
+        />
+      )
+    } else if (tableContent === "Orders") {
+      return (
+        <OrderTable
+          isMobile={isMobile}
+          dataSource={ordersData}
+        />
+      )
+    }
+  }
+
   const selectTime = pt => {
     const dateSwitchFunctions = {
       Line: () => {
@@ -496,45 +541,34 @@ const Swap = props => {
             </StyledCard> 
           </div> 
           <div className={`${styles.colItem} ${styles.perpetualComponent}`} >
-            <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
-              <div className={styles.trade}>
-                <PerpetualComponent
-                  onSelectToken0={token => {
-                    setActiveToken0(token);
-                  }}
-                  onSelectToken1={token => {
-                    setActiveToken1(token);
+                <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
+                  <div className={styles.trade}>
+                    <PerpetualComponent
+                      onSelectToken0={token => {
+                        setActiveToken0(token);
+                      }}
+                      onSelectToken1={token => {
+                        setActiveToken1(token);
 
-                  }}
-                  onGetReceipt={onGetReceipt}
-                />
-              </div>
-            </AcyCard>
+                      }}
+                      onGetReceipt={onGetReceipt}
+                    />
+                  </div>
+                </AcyCard>
           </div>
 
         </div>
         <div className={styles.rowFlexContainer}>
               <div className={`${styles.colItem}`}>
-                  <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setShowActionTable(false)}}>Positions</a>
-                  <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setShowActionTable(true)}}>Actions </a>
+                  <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent("Positions")}}>Positions</a>
+                  <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent("Orders")}}>Orders</a>
+                  <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent("Actions")}}>Actions </a>
               </div>
           </div>
         <div className={styles.rowFlexContainer}>
             <div className={`${styles.colItem} ${styles.priceChart}`}>
                 <div className={styles.Trade}>
-                    {
-                      !showActionTable ? 
-                        (<PositionsTable
-                            isMobile={isMobile}
-                            dataSource={positionsData}
-                        />) 
-                        : 
-                        (<ActionHistoryTable
-                            isMobile={isMobile}
-                            dataSource={positionsData}
-                        />)
-                    }
-                    
+                <RenderTable/>
                 </div>
             </div>
         <div className={styles.exchangeItem}>

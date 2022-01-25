@@ -10,20 +10,7 @@ import AcyEditPositionModal from '@/components/AcyEditPositionModal';
 import AcyClosePositionModal from '@/components/AcyClosePositionModal';
 import AcyCreateOrderModal from '@/components/AcyCreadeOrderModal';
 import { isDesktop } from '@/pages/Market/Util';
-import { BigNumber } from '@ethersproject/bignumber';
-import {getLiquidationPrice, USD_DECIMALS} from  '@/utils/utils';
-import { formatAmount } from '@/utils/utils';
-
-import { ethers } from 'ethers'
-function sortTableTime(table, key, isReverse) {
-  return table.sort((a, b) => {
-    if (isReverse) {
-      return new Date(b[key]).getTime() - new Date(a[key]).getTime();
-    } else {
-      return new Date(a[key]).getTime() - new Date(b[key]).getTime();
-    }
-  });
-}
+import {sortTableTime} from '../utils'
 
 const PositionsTable = props => {
   const [displayNumber, setDisplayNumber] = useState(5);

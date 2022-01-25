@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {  Divider, Icon, Input, Table  } from 'antd';
 import styles from './ActionHistoryTable.less';
@@ -6,15 +5,7 @@ import numeral from 'numeral';
 import formatNumber from 'accounting-js/lib/formatNumber.js';
 import  { abbrNumber } from '../../Market/Util.js';
 import { constantInstance } from '@/constants';
-function sortTableTime(table, key, isReverse) {
-  return table.sort((a, b) => {
-    if (isReverse) {
-      return new Date(b[key]).getTime() - new Date(a[key]).getTime();
-    } else {
-      return new Date(a[key]).getTime() - new Date(b[key]).getTime();
-    }
-  });
-}
+import { sortTableTime } from '../utils'
 
 const StakeHistoryTable = props => {
   const [stakeDisplayNumber, setStakeDisplayNumber] = useState(5);
@@ -23,41 +14,35 @@ const StakeHistoryTable = props => {
   const sampleStakeHistoryColumns = [
     {
       title: (
-        <div
-          className={styles.tableDataFirstColumn}
-        >
+        <div className={styles.tableDataFirstColumn}>
           Swap
         </div>
       ),
       dataIndex: '',
       key: 'fromforto',
       render: (text, record) => {
-          return (
-          <div className={styles.tableDataFirstColumn}>
-            Swap {record.inputTokenSymbol} for {record.outTokenSymbol} {record.FA ? " (FA)" : ""}
-            </div>
-          );  
+        return (
+        <div className={styles.tableDataFirstColumn}>
+          Swap {record.inputTokenSymbol} for {record.outTokenSymbol} {record.FA ? " (FA)" : ""}
+          </div>
+        );
       }
     },
     {
       title: (
-        <div
-          className={styles.tableData}
-        >
+        <div className={styles.tableData}>
           Total Amount
         </div>
       ),
       dataIndex: 'totalToken',
       key: 'totalToken',
-      render: (text,record) => {
+      render: (text, record) => {
         return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
       }
     },
     {
       title: (
-        <div
-          className={styles.tableData}
-        >
+        <div className={styles.tableData}>
           Token Amount
         </div>
       ),
@@ -69,29 +54,25 @@ const StakeHistoryTable = props => {
     },
     {
       title: (
-        <div
-          className={styles.tableData}
-        >
+        <div className={styles.tableData}>
           Token Amount
         </div>
       ),
       dataIndex: 'outTokenNum',
       key: 'outTokenNum',
-      render: (text,record) => {
+      render: (text, record) => {
         return <div className={styles.tableData}>{abbrNumber(text)} {record.outTokenSymbol}</div>;
       }
     },
     {
       title: (
-        <div
-          className={styles.tableData}
-        >
+        <div className={styles.tableData}>
           Time
         </div>
       ),
       dataIndex: 'transactionTime',
       key: 'transactionTime',
-      render: (text,record) => {
+      render: (text, record) => {
         return <div className={styles.tableData}>{text}</div>;
       }
     },
@@ -112,19 +93,19 @@ const StakeHistoryTable = props => {
   return (
     <div className={styles.nobgTable}>
       <Table
-        columns={isMobile&&sampleStakeHistoryMobileColumns||sampleStakeHistoryColumns}
-        dataSource={sortTableTime(dataSource,'transactionTime',true).slice(0,stakeDisplayNumber+1)}
-        className={styles.tableStyle}
-        pagination={false}
+        columns={ isMobile&&sampleStakeHistoryMobileColumns || sampleStakeHistoryColumns }
+        dataSource={ sortTableTime(dataSource, 'transactionTime', true).slice(0, stakeDisplayNumber + 1) }
+        className={ styles.tableStyle }
+        pagination={ false }
         onRow={record => {
-          if(record.FA){
+          if (record.FA) {
             return {
               onClick: event => {
                 // 跳转到eths
                 window.open(`#/transaction/${record.hash}`);
               }, // 点击行
             };
-          }else{
+          } else {
             return {
               onClick: event => {
                 // 跳转到eths

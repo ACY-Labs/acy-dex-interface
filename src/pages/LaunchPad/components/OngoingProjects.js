@@ -1,14 +1,9 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
-import {Icon} from 'antd';
 import MagicCard from './MagicCard.js';
 import ProjectCard from './ProjectsCard.js';
+import { nFormatter } from '../utils/index.js';
 
 const OngoingProjects = ({ data }) => {
-  const history = useHistory();
-  const onOpenProjectDetail = (projectId) => {
-    history.push(`/launchpad/project/${projectId}`)
-  }
 
   return (
     <>
@@ -20,8 +15,8 @@ const OngoingProjects = ({ data }) => {
                 projectID={obj.projectID}
                 start={obj.saleStart}
                 ddl={obj.saleEnd}
-                raise={obj.totalRaise.toString() + " USDT"} 
-                sales={obj.totalRaise.toString()+ ' ' + obj.projectToken} 
+                raise={nFormatter(obj.totalRaise, 3) + " USDT"}
+                sales={nFormatter(obj.totalSale, 3) + ' ' + obj.projectToken}
                 rate={"1 " + obj.projectToken + " = " + obj.tokenPrice.toString() + " USDT"}
                 title={obj.projectName} 
                 projectTokenUrl={obj.projectTokenUrl}
