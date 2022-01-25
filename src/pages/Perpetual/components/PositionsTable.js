@@ -8,8 +8,13 @@ import { constantInstance } from '@/constants';
 import { calcPercent } from '../utils/';
 import AcyEditPositionModal from '@/components/AcyEditPositionModal';
 import AcyClosePositionModal from '@/components/AcyClosePositionModal';
+import AcyCreateOrderModal from '@/components/AcyCreadeOrderModal';
 import { isDesktop } from '@/pages/Market/Util';
+import { BigNumber } from '@ethersproject/bignumber';
+import {getLiquidationPrice, USD_DECIMALS} from  '@/utils/utils';
+import { formatAmount } from '@/utils/utils';
 
+import { ethers } from 'ethers'
 function sortTableTime(table, key, isReverse) {
   return table.sort((a, b) => {
     if (isReverse) {
@@ -25,8 +30,9 @@ const PositionsTable = props => {
   const { dataSource, isMobile } = props;
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isCloseModalVisible, setIsCloseModalVisible] = useState(false);
+  const [isCreateOrderModalVisible, setIsCreateOrderModalVisible] = useState(false);
   const [selectedPosition, setSelectedPosition] = useState();
-  
+
   const onHandleEditModal = (position) =>{
     setSelectedPosition(position);
     setIsEditModalVisible(true);
@@ -34,6 +40,11 @@ const PositionsTable = props => {
   const onHandleCloseModal = (position) =>{
     setSelectedPosition(position);
     setIsCloseModalVisible(true);
+  }
+
+  const onHandleCreateOderModal = (position) => {
+    setSelectedPosition(position);
+    setIsCreateOrderModalVisible(true);
   }
   const positionsTableColumns = [
     {
@@ -44,11 +55,11 @@ const PositionsTable = props => {
           return (
           <div>
             <div className={styles.tableEntryBig}>
-              {record.token.symbol}
+              {record.indexToken.symbol}
             </div>
             <div>
               <span >
-                {record.delta.toFixed(2)}x
+                {formatAmount(record.leverage, 4, 2, null , true)}x
               </span>
               {record.isLong ? (
                 <span className={styles.tableEntryGreen}>
@@ -73,28 +84,22 @@ const PositionsTable = props => {
         
         return <div>
           <div className={styles.tableEntryBig}>
-              ${record.netValue}
+              ${formatAmount(record.netValue, USD_DECIMALS, 2, null , true)}
             </div>
             <div>
-              {record.PnL >= 0 ? (
-                <span className={styles.tableEntryGreen}>
-                  +{record.PnL} (+{calcPercent(record.PnL,record.collateral)}%) 
+                <span className={record.hasProfit && styles.tableEntryGreen ||styles.tableEntryRed}>
+                  {record.deltaStr} ({record.deltaPercentageStr})
                 </span>
-              ) : (
-                <span className={styles.tableEntryRed}>
-                  {record.PnL}
-                </span>
-              )}
             </div>
           </div>;
       }
     },
     {
         title: 'Size',
-        dataIndex: 'totalSize',
+        dataIndex: 'size',
         align : 'left' ,
         render: (text,record) => {
-          return <div className={styles.tableEntryBig}>$ {text.toFixed(2)}</div>;
+          return <div className={styles.tableEntryBig}>$ {formatAmount(text, USD_DECIMALS, 2, null , true)}</div>;
         }
       },
     {
@@ -102,7 +107,7 @@ const PositionsTable = props => {
       dataIndex: 'collateral',
       align : 'left',
       render: (text,record) => {
-        return <div className={styles.tableEntryBig}>$ {text.toFixed(2)}</div>;
+        return <div className={styles.tableEntryBig}>$ {formatAmount(text, USD_DECIMALS, 2, null , true)}</div>;
       }
     },
     {
@@ -110,7 +115,7 @@ const PositionsTable = props => {
       dataIndex: 'markPrice',
       align : 'left',
       render: (text,record) => {
-        return <div className={styles.tableEntryBig}>$ {text.toFixed(2)}</div>;
+        return <div className={styles.tableEntryBig}>$ {formatAmount(text, USD_DECIMALS, 2, null , true)}</div>;
       }
     },
     {
@@ -118,7 +123,7 @@ const PositionsTable = props => {
       dataIndex: 'entryPrice',
       align : 'left',
       render: (text,record) => {
-        return <div className={styles.tableEntryBig}>$ {text.toFixed(2)}</div>;
+        return <div className={styles.tableEntryBig}>$ {formatAmount(text, USD_DECIMALS, 2, null , true)}</div>;
       }
     },
     {
@@ -126,7 +131,7 @@ const PositionsTable = props => {
         dataIndex: 'liqPrice',
         align : 'left',
         render: (text,record) => {
-          return <div className={styles.tableEntryBig}>$ {text.toFixed(2)}</div>;
+          return <div className={styles.tableEntryBig}>$ {formatAmount(text, USD_DECIMALS, 2, null , true)}</div>;
         }
       },
       {
@@ -141,7 +146,7 @@ const PositionsTable = props => {
             <div className = {styles.rowEditButton} onClick={() => onHandleCloseModal(record) }>
               Close
             </div>
-            <div className = {styles.rowEditButton} onClick={() => onHandleCloseModal(record) }>
+            <div className = {styles.rowEditButton} onClick={() => onHandleCreateOderModal(record) }>
               Trigger
             </div>
           </div>
@@ -149,7 +154,7 @@ const PositionsTable = props => {
       },
     
   ]
-  const samplePositionsTableColumns = [
+  const mobilePositionsTableColumns = [
     {
       title: 'Positions',
       dataIndex: '',
@@ -158,11 +163,11 @@ const PositionsTable = props => {
           return (
           <div>
             <div className={styles.tableEntryBig}>
-              {record.token.symbol}
+              {record.indexToken.symbol}
             </div>
             <div>
               <span >
-                {record.delta.toFixed(2)}x
+                {formatAmount(record.leverage, 4, 2, null , true)}x
               </span>
               {record.isLong ? (
                 <span className={styles.tableEntryGreen}>
@@ -177,6 +182,7 @@ const PositionsTable = props => {
           </div>
           );  
       },
+      visible : true
     },
     {
       title: 'Net Value',
@@ -186,18 +192,12 @@ const PositionsTable = props => {
         
         return <div>
           <div className={styles.tableEntryBig}>
-              ${record.netValue}
+              ${formatAmount(record.netValue, USD_DECIMALS, 2, null , true)}
             </div>
             <div>
-              {record.PnL >= 0 ? (
-                <span className={styles.tableEntryGreen}>
-                  +{record.PnL} (+{calcPercent(record.PnL,record.collateral)}%) 
+                <span className={record.hasProfit && styles.tableEntryGreen ||styles.tableEntryRed}>
+                  {record.deltaStr} ({record.deltaPercentageStr})
                 </span>
-              ) : (
-                <span className={styles.tableEntryRed}>
-                  {record.PnL}
-                </span>
-              )}
             </div>
           </div>;
       }
@@ -214,19 +214,19 @@ const PositionsTable = props => {
           <div className = {styles.rowEditButton} onClick={() => onHandleCloseModal(record) }>
             Close
           </div>
-          <div className = {styles.rowEditButton} onClick={() => onHandleCloseModal(record) }>
+          <div className = {styles.rowEditButton} onClick={() => onHandleCreateOderModal(record) }>
             Trigger
           </div>
         </div>
       }
-    },
+    }
   ]
 
   return (
     <div>
       <div className={styles.nobgTable}>
         <Table
-          columns={isMobile&&samplePositionsTableColumns || positionsTableColumns}
+          columns={isMobile&&mobilePositionsTableColumns || positionsTableColumns}
           dataSource={dataSource}
           className={styles.tableStyle}
           pagination={false}
@@ -241,6 +241,10 @@ const PositionsTable = props => {
         Position = {selectedPosition}
         isModalVisible={isCloseModalVisible}
         onCancel = {() => setIsCloseModalVisible(false)}/>
+      <AcyCreateOrderModal 
+        Position = {selectedPosition}
+        isModalVisible={isCreateOrderModalVisible}
+        onCancel = {() => setIsCreateOrderModalVisible(false)}/>
     </div>
     
   );
