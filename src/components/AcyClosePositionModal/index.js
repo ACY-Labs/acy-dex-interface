@@ -50,7 +50,6 @@ const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props })
   
   useEffect(() => {
 
-    console.log("first use effect from acy edit", Position);
    if(Position){
        setFromToken(findTokenWithSymbol('USDT'));
        setEditIsLong(Position.isLong);

@@ -52,11 +52,10 @@ const AcyCreateOrderModal = ({ Position, isModalVisible, onCancel, ...props }) =
   const [buttonIsEnabled, setButtonIsEnabled] = useState(false);
   
   useEffect(() => {
-
-    console.log("first use effect from acy edit", Position);
    if(Position){
        setFromToken(findTokenWithSymbol('USDT'));
        setIndexToken(Position.indexToken);
+       console.log("setting index token : ", Position.indexToken);
        setEditIsLong(Position.isLong);
        setPositionInfo(mapPositionData(Position,'none'));
        setMaxFromAmount(parseFloat(formatAmount(Position.size,USD_DECIMALS,2,null,false)));
@@ -113,8 +112,10 @@ const AcyCreateOrderModal = ({ Position, isModalVisible, onCancel, ...props }) =
 
   const onInputPriceChanged = (input) => {
 
+    if(input == '') return;
+
     if(Position){
-        let inputPrice = parseValue(input);
+        let inputPrice = parseValue(input, USD_DECIMALS);
         if(Position.markPrice.lt(inputPrice))
             setInputPriceIsLess(false);
         else 
@@ -124,6 +125,7 @@ const AcyCreateOrderModal = ({ Position, isModalVisible, onCancel, ...props }) =
 
   const resetParams = () => {
     setFromAmount('');
+    setInputPrice('');
     lockButton(0);
     setKeepLeverage(false);
     setPositionInfo(mapPositionData(Position,'none'));
@@ -195,7 +197,7 @@ const AcyCreateOrderModal = ({ Position, isModalVisible, onCancel, ...props }) =
         </div>
         {inputPrice && indexToken && (
             <div className={styles.newPriceContainer}>
-                {`This order will trigger when price is ${inputPriceIsLess ? 'less' : 'Greater'} than ${formatAmount(Position.markPrice, indexToken.decimals, 2, null , true)}}`}
+                {`trigger when ${inputPriceIsLess ? '<' : '>'} than ${inputPrice}`}
             </div>
         )}
         <hr className={styles.linediv}/>
