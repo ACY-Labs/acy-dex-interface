@@ -11,7 +11,7 @@ import AcyClosePositionModal from '@/components/AcyClosePositionModal';
 import AcyCreateOrderModal from '@/components/AcyCreadeOrderModal';
 import { isDesktop } from '@/pages/Market/Util';
 import {sortTableTime} from '../utils'
-import { formatAmount } from '@/utils/utils';
+import { formatAmount , USD_DECIMALS } from '@/utils/utils';
 
 const PositionsTable = props => {
   const [displayNumber, setDisplayNumber] = useState(5);
