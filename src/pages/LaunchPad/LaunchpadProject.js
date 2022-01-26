@@ -125,6 +125,7 @@ const CardArea = ({
   account,
   library,
   mainCoinLogoURI,
+  poolTokenDecimals,
   poolDistributionStage,
   poolDistributionDate,
   poolID,
@@ -162,6 +163,7 @@ const CardArea = ({
             receivedData={receivedData}
             mainCoinLogoURI={mainCoinLogoURI}
             poolBaseData={poolBaseData}
+            poolTokenDecimals={poolTokenDecimals}
             poolDistributionStage={poolDistributionStage}
             poolDistributionDate={poolDistributionDate}
             poolID={poolID}
@@ -559,6 +561,7 @@ const Allocation = ({
   receivedData,
   mainCoinLogoURI,
   poolBaseData,
+  poolTokenDecimals,
   poolDistributionStage,
   poolDistributionDate,
   poolID,
@@ -684,6 +687,8 @@ const Allocation = ({
       if (investorData) {
         investorData.map(data => investorRes.push(Number(BigNumber.from(data).toBigInt().toString())))
       }
+      console.log('invester res', investorRes);
+
       const tokenAllocated = investorRes[2] / (10 ** poolTokenDecimals)
       const tokenClaimed = investorRes[3] / (10 ** poolTokenDecimals)
       const curDate = new Date()
@@ -693,10 +698,12 @@ const Allocation = ({
         if (curDate > tempDate) {
           tokenAvailable += tokenAllocated / 100 * poolDistributionStage[i]
         } else {
+          console.log('time not arrived');
           break
         }
       }
-      if (tokenClaimed === tokenAvailable) {
+
+      if (tokenClaimed !== tokenAvailable) {
         console.log('has collected');
       } else {
         const status = await (async () => {
@@ -937,7 +944,6 @@ const LaunchpadProject = () => {
     const token2Address = baseData[1]
     const tokenList = TOKEN_LIST()
     const token2Info = tokenList.find(item => item.address == token2Address)
-    console.log("baseData", baseData)
 
     const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
     const token2contract = getContract(token2Address, ERC20ABI, lib, acc)
@@ -964,7 +970,6 @@ const LaunchpadProject = () => {
 
     // 判断当前是否是vesting阶段
     const curPoolStatus = Number(BigNumber.from(status).toBigInt())
-    console.log('pooldate', pool);
 
     // set数据
     setPoolBaseData(pool)
@@ -1092,6 +1097,7 @@ const LaunchpadProject = () => {
             poolMainCoinDecimals={poolMainCoinDecimals}
             poolMainCoinAddress={poolMainCoinAddress}
             poolTokenAddress={poolTokenAddress}
+            poolTokenDecimals={poolTokenDecimals}
           />
         </div>
       )}
