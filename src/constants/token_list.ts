@@ -26,6 +26,14 @@ const BscMainNetTokenList: Array<TokenInfo> = [
     idOnCoingecko: "acy-finance",
   },
   {
+    name: 'Bit Store',
+    symbol: 'STORE',
+    address: '0x65d9033cff96782394dab5dbef17fa771bbe1732',
+    decimals: 18,
+    logoURI: 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/token_STORE.svg',
+    idOnCoingecko: "bit-store-coin",
+  },
+  {
     name: 'Binance Coin',
     symbol: 'BNB',
     address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
