@@ -703,7 +703,7 @@ const Allocation = ({
         }
       }
 
-      if (tokenClaimed !== tokenAvailable) {
+      if (tokenClaimed === tokenAvailable) {
         console.log('has collected');
       } else {
         const status = await (async () => {
