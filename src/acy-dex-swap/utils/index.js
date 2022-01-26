@@ -514,7 +514,7 @@ export async function getAllSuportedTokensPrice() {
     console.log("tokensPrice:",data);
     const tokensPrice = {};
     tokenList.forEach(token => {
-      tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
+      tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'] || 0;
     })
 
     // launchpad project token
