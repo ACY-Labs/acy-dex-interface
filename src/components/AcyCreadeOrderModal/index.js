@@ -34,14 +34,17 @@ const useStyles = makeStyles({
   thumb: {},
 });
 
-const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props }) => {
+const AcyCreateOrderModal = ({ Position, isModalVisible, onCancel, ...props }) => {
   const classes = useStyles();
   const { account, chainId, library, farmSetting: { API_URL: apiUrlPrefix }, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader()
   const [fromToken, setFromToken] = useState({symbol : 'ACY'});
+  const [indexToken, setIndexToken] = useState({symbol : 'ACY'});
   const [editIsLong, setEditIsLong] = useState(false);
   const [positionInfo, setPositionInfo] = useState({});
   const [newPositionInfo, setNewPositionInfo] = useState();
   const [fromAmount, setFromAmount] = useState('');
+  const [inputPrice, setInputPrice] = useState('');
+  const [inputPriceIsLess, setInputPriceIsLess] = useState(true)
   const [fromAmountUSD, setFromAmountUSD] = useState(0);
   const [maxFromAmount, setMaxFromAmount] = useState(0);
   const [keepLeverage, setKeepLeverage] = useState(false);
@@ -49,9 +52,10 @@ const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props })
   const [buttonIsEnabled, setButtonIsEnabled] = useState(false);
   
   useEffect(() => {
-
    if(Position){
        setFromToken(findTokenWithSymbol('USDT'));
+       setIndexToken(Position.indexToken);
+       console.log("setting index token : ", Position.indexToken);
        setEditIsLong(Position.isLong);
        setPositionInfo(mapPositionData(Position,'none'));
        setMaxFromAmount(parseFloat(formatAmount(Position.size,USD_DECIMALS,2,null,false)));
@@ -106,8 +110,22 @@ const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props })
   
   }
 
+  const onInputPriceChanged = (input) => {
+
+    if(input == '') return;
+
+    if(Position){
+        let inputPrice = parseValue(input, USD_DECIMALS);
+        if(Position.markPrice.lt(inputPrice))
+            setInputPriceIsLess(false);
+        else 
+            setInputPriceIsLess(true);
+    }
+  }
+
   const resetParams = () => {
     setFromAmount('');
+    setInputPrice('');
     lockButton(0);
     setKeepLeverage(false);
     setPositionInfo(mapPositionData(Position,'none'));
@@ -120,23 +138,43 @@ const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props })
 
   return (
     <AcyModal backgroundColor="#0e0304" width={400} visible={isModalVisible} onCancel={handleCancel}>
-      <div className={styles.modalTitle} >Close {editIsLong ? 'Long' : 'Short'} {Position && Position.indexToken.symbol}</div>
-      <AcyCuarrencyCard
-              icon={fromToken.symbol}
-              title={`Max ${Position && formatAmount(Position.size, USD_DECIMALS, 2, null , true)}`}
-              logoURI={fromToken.logoURI}
-              coin={fromToken.symbol}
-              yuan="566.228"
-              dollar={`${maxFromAmount}`}
-              token={fromAmount}
-              showBalance={true}
-              onChangeToken={e => {
-                setFromAmount(e);
-                onInputChanged(e, maxFromAmount);
-              }}
-              isLocked={false}
-              library={library}
-            />
+      <div className={styles.modalTitle} >Take Profit / Stop Loss</div>
+      <div className={styles.inputBox}>
+        <AcyCuarrencyCard
+                icon={fromToken.symbol}
+                title={`Max ${Position && formatAmount(Position.size, USD_DECIMALS, 2, null , true)}`}
+                logoURI={fromToken.logoURI}
+                coin={fromToken.symbol}
+                yuan="566.228"
+                dollar={`${maxFromAmount}`}
+                token={fromAmount}
+                showBalance={true}
+                onChangeToken={e => {
+                    setFromAmount(e);
+                    onInputChanged(e,maxFromAmount);
+                }}
+                isLocked={true}
+                library={library}
+                />
+      </div>
+      <div className={styles.inputBox}>
+        <AcyCuarrencyCard
+                icon={indexToken.symbol}
+                title={`Mark Price : ${Position && formatAmount(Position.markPrice, USD_DECIMALS, 2, null , true)}`}
+                logoURI={indexToken.logoURI}
+                coin={`${indexToken.symbol} Price`}
+                yuan="566.228"
+                dollar={`${maxFromAmount}`}
+                token={inputPrice}
+                showBalance={true}
+                onChangeToken={e => {
+                    setInputPrice(e);
+                    onInputPriceChanged(e);
+                }}
+                isLocked={true}
+                library={library}
+                />
+       </div>
         <div className={styles.checkboxContainer}>
         <span>Keep Leverage at {positionInfo.Leverage}x</span>
         <Switch
@@ -157,6 +195,11 @@ const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props })
             }} 
         />
         </div>
+        {inputPrice && indexToken && (
+            <div className={styles.newPriceContainer}>
+                {`trigger when ${inputPriceIsLess ? '<' : '>'} than ${inputPrice}`}
+            </div>
+        )}
         <hr className={styles.linediv}/>
         <AcyDescriptions>
               {Object.keys(positionInfo).map( (key, index) => {
@@ -192,11 +235,11 @@ const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props })
           }}
           >
         {buttonContent}
-        </AcyButton>
+        </AcyButton>    
         </div>
         
     </AcyModal>
   );
 };
 
-export default AcyClosePositionModal
+export default AcyCreateOrderModal
