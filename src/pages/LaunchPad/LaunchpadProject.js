@@ -204,9 +204,9 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
           <div>
             <p>Sale (FCFS)</p>
             <div>
-              <p className="shortText">Start : </p>
+              <p className="shortText">Start: </p>
               <FormatedTime utc_string={receivedData.saleStart} />
-              <p className="shortText">End : </p>
+              <p className="shortText">End: </p>
               <FormatedTime utc_string={receivedData.saleEnd} />
             </div>
           </div>

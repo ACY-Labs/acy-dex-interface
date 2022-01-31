@@ -2,7 +2,7 @@ import moment from 'moment';
 import { useState } from 'react';
 import './index.css';
 
-const FormatedTime = ({ utc_string, utc_second, visible = true, format = "YYYY-MM-DD HH:mm:ss A" }) => {
+const FormatedTime = ({ utc_string, utc_second, visible = true, format = "YYYY-MM-DD HH:mm:ss" }) => {
 
   const utc_moment = moment.utc(utc_second ? Number(utc_second) * 1000 : utc_string).locale('en');
   // const [timeString, setTimeString] = useState()
@@ -28,10 +28,10 @@ const FormatedTime = ({ utc_string, utc_second, visible = true, format = "YYYY-M
   return (
     <>
       {visible &&
-        <p className='time-string'>
+        <span className='time-string'>
           {timeString()}
           <span onClick={onClickTimeZone} className='timezone-symbol'>({timezone})</span>
-        </p>
+        </span>
       }
     </>
   )
