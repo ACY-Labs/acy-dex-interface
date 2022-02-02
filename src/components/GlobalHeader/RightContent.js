@@ -366,6 +366,13 @@ const GlobalHeaderRight = props => {
       },
     },
     {
+      name: 'Bitkeep Wallet',
+      icon: 'Bitkeep',
+      onClick: () => {
+        selectWallet('metamask');
+      },
+    },
+    {
       name: 'WalletConnect',
       icon: 'WalletConnect',
       onClick: () => {
