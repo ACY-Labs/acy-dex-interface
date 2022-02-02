@@ -175,7 +175,22 @@ const GlobalHeaderRight = props => {
         }
         return
       }
-    } else if (walletName === 'walletconnect') {
+    }else if (walletName === 'bitkeep'){
+      try {
+        ethereum;
+        activate(injected);
+        if (!window.isBitKeep){
+          message.info('Wrong wallet, please make sure other wallet extensions has been closed');
+        }
+      } catch (error) {
+        message.info('No provider was found');
+        if(account){
+          localStorage.setItem("login_status", "on");
+        }
+        return
+      }
+    } 
+    else if (walletName === 'walletconnect') {
       activate(walletconnect);
     } else if (walletName === 'coinbase') {
       activate(walletlink);
@@ -369,7 +384,7 @@ const GlobalHeaderRight = props => {
       name: 'Bitkeep Wallet',
       icon: 'Bitkeep',
       onClick: () => {
-        selectWallet('metamask');
+        selectWallet('bitkeep');
       },
     },
     {
