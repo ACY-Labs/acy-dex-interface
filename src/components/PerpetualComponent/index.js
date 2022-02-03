@@ -24,7 +24,12 @@ import {
   AcySmallButton,
 } from '@/components/Acy';
 import TokenSelectorModal from "@/components/TokenSelectorModal";
-import { PriceBox } from './PriceBox';
+// swapBox components start
+import { PriceBox } from './components/PriceBox';
+import { DetalBox } from './components/DetalBox';
+
+import {MARKET, LIMIT, LONG, SHORT} from './constant'
+// swapBox compontent end
 
 import { connect } from 'umi';
 import styles from './styles.less';
@@ -90,7 +95,6 @@ import { useConnectWallet } from '@/components/ConnectWallet';
 
 import { AcyRadioButton } from '@/components/AcyRadioButton';
 
-import {MARKET, LIMIT, LONG, SHORT} from './constant'
 
 
 
@@ -733,13 +737,25 @@ const SwapComponent = props => {
           <div className={styles.slippageContainer}>
             <span style={{ fontWeight: 600 }}>Leverage ymj</span>
             <span className={styles.leverageSlider}>
-              <Slider marks={leverageSlider} defaultValue={leverage} max={30.60} min={1.10} onChange={leverageSliderOnChange} step={0.1} 
+              <Slider marks={leverageSlider} defaultValue={leverage} max={30.51} min={1.10} onChange={leverageSliderOnChange} step={0.1} 
                 style={{color: 'red'}}/>
             </span>
           </div>
         </div>
       </AcyDescriptions>
-      <AcyCard className={styles.describeMain}>
+      <DetalBox
+      leverage={leverage}
+      shortOrLong={mode}
+      marketOrLimit={type}
+      profitsIn={profitsIn}
+      entryPriceLimit={entryPriceLimit}
+      liqPrice={liqPrice}
+      entryPriceMarket={entryPriceMarket}
+      exitPrice={exitPrice}
+      borrowFee={borrowFee}
+      token1Symbol={token1.symbol}
+      />
+      {/* <AcyCard className={styles.describeMain}>
         <div>
           <p className={styles.describeTitle}>Profits In: <span className={styles.describeInfo}>{profitsIn ? profitsIn : '此处需要设置'}</span></p>
           <p className={styles.describeTitle}>Leverage:  <span className={styles.describeInfo}>{Number(leverage).toFixed(2)}x</span></p>
@@ -753,7 +769,8 @@ const SwapComponent = props => {
           <p className={styles.describeTitle}>Exit Price:  <span className={styles.describeInfo}>{exitPrice ? exitPrice : '-'} USD</span></p>
           <p className={styles.describeTitle}>Borrow Fee:  <span className={styles.describeInfo}>{borrowFee ? borrowFee : '-'}%/1h</span></p>
         </div>
-      </AcyCard>
+      </AcyCard> */}
+
 
       {needApprove
         ? <div>

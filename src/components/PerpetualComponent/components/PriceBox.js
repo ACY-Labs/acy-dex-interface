@@ -17,11 +17,10 @@ export const PriceBox = (props) => {
         eLimitPrice,
     } = props;
     useEffect(() => {
-        console.log('ymj inputTest', inputTest)
+        console.log('ymj price box online', inputTest)
     })
 
     const markOnClick=()=>{
-        console.log("ymj 123")
         setMark(marketPrice)
     }
 
