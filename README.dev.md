@@ -20,7 +20,9 @@ acy-dex-interface目前支持bsc（链号56）和polygon（137）网络。在开
 
 ## 项目简介
 
-打个不完全准确的比喻，ACY类似于一家银行。打开[我们项目的网页](https://app.acy.finance/)，目前的核心模块包括以下5个。标题括号对应页面的目录，例如Exchange（pages/swap）表示https://app.acy.finance/#/exchange对应`src/pages/swap`。
+打个不完全准确的比喻，ACY类似于一家银行。打开[我们项目的网页](https://app.acy.finance/)，目前的核心模块包括以下5个。标题括号对应页面的目录，例如：
+
+- Exchange（pages/swap）表示[exchange页面](https://app.acy.finance/#/exchange)的原代码在`src/pages/swap`下。
 
 ### Exchange（pages/swap）
 
