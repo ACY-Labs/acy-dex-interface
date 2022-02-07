@@ -5,14 +5,25 @@ import styles from './styles.less';
 import classname from 'classnames';
 import Pattern from '@/utils/pattern';
 
+
+
 export const PriceBox = (props) => {
+    const [mark, setMark] = useState(0);
+
     const {
         inputTest,
         onChange,
+        marketPrice,
+        eLimitPrice,
     } = props;
     useEffect(() => {
-        console.log('ymj inputTest', inputTest)
+        console.log('ymj price box online', inputTest)
     })
+
+    const markOnClick=()=>{
+        setMark(marketPrice)
+    }
+
 
     return (
         <div className={styles.acycuarrencycard}>
@@ -27,7 +38,7 @@ export const PriceBox = (props) => {
                     />
                 </div>
                 <div className={styles.cua_bottomContainer}>
-          <div className={styles.cua_blanace}>{'Mark'}</div>
+          <div className={styles.cua_blanace} onClick={markOnClick}>{'Mark: '}{mark}</div>
           <div>{'USD $'}</div>
         </div>
             </div>

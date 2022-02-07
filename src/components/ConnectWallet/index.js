@@ -14,12 +14,13 @@ import {
 import { useWeb3React } from '@web3-react/core';
 import { useState, useCallback } from "react"
 
-export const useConnectWallet = () => {
+export const useConnectWallet=()=> {
     const { activate, deactivate } = useWeb3React();
     const connectWalletByLocalStorage = useCallback(
         () => {
             const walletName = localStorage.getItem("wallet");
             const login_status = localStorage.getItem("login_status");
+            console.log('ymj', walletName, login_status);
             if (login_status == 'off'){
                 return;
             }

@@ -1,5 +1,5 @@
 import { useWeb3React } from '@web3-react/core';
-import React, { Component, useState, useEffect, useRef } from 'react';
+import React, { Component, useState, useEffect, useRef, useMemo } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton, Card } from 'antd';
@@ -157,10 +157,12 @@ const Swap = props => {
 
   // connect to provider, listen for wallet to connect
   const connectWalletByLocalStorage = useConnectWallet();
-  useEffect(() => {
+  useMemo(() => {
     if(!account){
-      connectWalletByLocalStorage()
+      console.log('ymj connect');
+      connectWalletByLocalStorage();
      }
+    console.log('ymj connect', account);
     getTransactionsByAccount(account,library,'SWAP').then(data =>{
       console.log("found this tx dataa::::::", data);
       setTransactionList(data);

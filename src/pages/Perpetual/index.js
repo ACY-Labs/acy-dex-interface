@@ -535,6 +535,11 @@ const Swap = props => {
 
                       }}
                       onGetReceipt={onGetReceipt}
+                      profitsIn={'ETH'} 
+                      liqPrice={456}
+                      entryPriceMarket={123}
+                      exitPrice={123}
+                      borrowFee={123}
                     />
                   </div>
                 </AcyCard>
