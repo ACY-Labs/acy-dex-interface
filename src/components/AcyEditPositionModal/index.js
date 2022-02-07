@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { connect } from 'umi';
 // import { getEstimated, signOrApprove, removeLiquidity } from '@/acy-dex-swap/core/removeLiquidity';
 import { Icon, Button, Input } from "antd";
+import { ethers } from 'ethers'
 import styles from './index.less';
 import {
     AcyModal,
@@ -13,13 +14,14 @@ import {
 import { useConstantLoader } from '@/constants';
 import classNames from 'classnames';
 import { findTokenWithSymbol } from '@/utils/txData';
+import { constantInstance } from '@/constants';
 import { getUserTokenBalance } from '@/acy-dex-swap/utils';
-import { mapPositionData, USD_DECIMALS } from '@/utils/utils';
+import { formatAmount, mapPositionData, USD_DECIMALS } from '@/utils/utils';
 import { getAllSuportedTokensPrice } from '@/acy-dex-swap/utils';
 import { parseValue } from '@/utils/utils';
 
 const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) => {
-  const { account, chainId, library, farmSetting: { API_URL: apiUrlPrefix }, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader()
+  const { account, chainId, library, farmSetting: { API_URL: apiUrlPrefix, NATIVE_CURRENCY : nativeToken }, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader()
   const [fromToken, setFromToken] = useState({symbol : 'ACY'});
   const [editIsLong, setEditIsLong] = useState(false);
   const [positionInfo, setPositionInfo] = useState({});
@@ -30,6 +32,8 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
   const [buttonIsEnabled, setButtonIsEnabled] = useState(false);
   const [newPositionInfo, setNewPositionInfo] = useState();
   const [fromAmountUSD, setFromAmountUSD] = useState(0);
+  const { AddressZero } = ethers.constants;
+  const nativeTokenAddress = findTokenWithSymbol(nativeToken).address;
 
   const mode = useRef();
   mode.current = barOption;
@@ -39,10 +43,6 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
       setDepositMode(Position);
 
   },[Position]);
-
-  useEffect( async () => {
-    setMaxFromAmount( parseFloat(await getUserTokenBalance(fromToken, chainId, account, library).catch(e => console.log("Edit position update balance dispatch error",e))));
-  },[fromToken, isModalVisible])
 
   useEffect(async ()=>{
     if(Position){
@@ -73,7 +73,7 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
   const lockButton = (err)=> {
     //err = 0 means normal enter ammount
     //err = 1 means input amount exceeds maxFromAmount , 
-    //err = 2 means ....
+    //err = 2 means PROCESSING...
     if(mode.current == 'Deposit'){
       switch(err){
         case 0 :
@@ -82,6 +82,10 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
           return;
         case 1 :
           setButtonContent('Not Enough Balance');
+          setButtonIsEnabled(false);
+          return;
+        case 2 :
+          setButtonContent(<>Processing <Icon type="loading" /></>);
           setButtonIsEnabled(false);
           return;
       }
@@ -95,6 +99,10 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
           setButtonContent('Not Enough Collateral');
           setButtonIsEnabled(false);
           return;
+        case 2 :
+          setButtonContent(<>Processing <Icon type="loading" /></>);
+          setButtonIsEnabled(false);
+          return;
       }
     }
   }
@@ -103,17 +111,22 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
     setPositionInfo(mapPositionData(Position,'none'));
   }
 
-  const setDepositMode = () => {
+  const setDepositMode = async () => {
     setBarOption('Deposit');
     setFromToken(Position.indexToken);
+    setMaxFromAmount( parseFloat(await getUserTokenBalance(fromToken, chainId, account, library).catch((e) => {
+      console.log("Edit position update balance dispatch error",e);
+      return 0;
+    })));
     lockButton(0);
     setEditIsLong(Position.isLong);
 
     resetParams();
   }
-  const setWithdrawMode = () => {
+  const setWithdrawMode = async () => {
     setBarOption('Withdraw');
-    setFromToken(Position.collateralToken)
+    setFromToken(Position.collateralToken);
+    setMaxFromAmount(parseFloat(formatAmount(Position.collateral,USD_DECIMALS,2,null,false)));
     lockButton(0);
     resetParams();
   }
@@ -149,6 +162,80 @@ const onInputChanged = (input, maxFromAmount) => {
       setBarOption('Deposit');
     }
   },[isModalVisible])
+
+   const onClickMain = async () => {
+    lockButton(2);
+    if(mode.current == 'Deposit'){
+      //perform deposit collateral
+      const tokenAddress0 = Position.collateralToken.address === AddressZero ? nativeTokenAddress : Position.collateralToken.address
+      const path = [tokenAddress0]
+      const indexTokenAddress = Position.indexToken.address === AddressZero ? nativeTokenAddress : Position.indexToken.address
+  
+      const priceBasisPoints = Position.isLong ? 11000 : 9000
+      const priceLimit = Position.indexToken.maxPrice.mul(priceBasisPoints).div(10000)
+
+      //format amount 
+      const amount = parseValue(amount, USD_DECIMALS);
+  
+      let params = [path, indexTokenAddress, fromAmount, 0, 0, position.isLong, priceLimit]
+  
+      let method = "increasePosition"
+      let value = bigNumberify(0)
+      if (collateralTokenAddress === AddressZero) {
+        method = "increasePositionETH"
+        value = fromAmount
+        params = [path, indexTokenAddress, 0, 0, position.isLong, priceLimit]
+      }
+  
+      if (shouldRaiseGasError(getTokenInfo(infoTokens, collateralTokenAddress), fromAmount)) {
+        setIsSwapping(false)
+        helperToast.error(`Leave at least ${formatAmount(DUST_BNB, 18, 3)} ETH for gas`)
+        return
+      }
+  
+      const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner())
+      callContract(chainId, contract, method, params, {
+        value,
+        sentMsg: "Deposit submitted!",
+        successMsg: `Deposited ${formatAmount(fromAmount, position.collateralToken.decimals, 4)} ${position.collateralToken.symbol} into ${position.indexToken.symbol} ${position.isLong ? "Long" : "Short"}`,
+        failMsg: "Deposit failed",
+        setPendingTxns
+      })
+      .then(async (res) => {
+        setFromValue("")
+        setIsVisible(false)
+      })
+      .finally(() => {
+        setIsSwapping(false)
+      })
+
+    }else{
+      //perform withdraw collateral
+      const tokenAddress0 = Position.collateralToken.address === AddressZero ? nativeTokenAddress : Position.collateralToken.address;
+      const path = [tokenAddress0];
+      const priceBasisPoints = Position.isLong ? 9000 : 11000;
+      const priceLimit = Position.indexToken.maxPrice.mul(priceBasisPoints).div(10000); //UNCOMMENT THIS WHEN REAL POSITION READY
+      const amount = parseValue(fromAmount,USD_DECIMALS);
+      console.log("printing constants", path, amount,priceBasisPoints);
+      let params = [tokenAddress0, indexTokenAddress, fromAmount, 0, position.isLong, account, priceLimit];
+      let method = (collateralTokenAddress === AddressZero || collateralTokenAddress === nativeTokenAddress) ? "decreasePositionETH" : "decreasePosition";
+
+      const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner());
+      callContract(chainId, contract, method, params, {
+        sentMsg: "Withdrawal submitted!",
+        successMsg: `Withdrew ${formatAmount(fromAmount, USD_DECIMALS, 2)} USD from ${position.indexToken.symbol} ${position.isLong ? "Long" : "Short"}.`,
+        failMsg: "Withdrawal failed.",
+        setPendingTxns
+      })
+      .then(async (res) => {
+        setFromValue("")
+        setIsVisible(false)
+      })
+      .finally(() => {
+        setIsSwapping(false)
+      })
+    }
+  }
 
 
   return (
@@ -208,7 +295,7 @@ const onInputChanged = (input, maxFromAmount) => {
           variant="sucess"
           disabled={!buttonIsEnabled}
           onClick = {() => {
-            console.log("PERFORM ACTION");
+            onClickMain();
           }}
           >
         {buttonContent}
