@@ -675,45 +675,10 @@ const Allocation = ({
   const vestingClaimClicked = async () => {
     const PoolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, library, account);
 
-    if (poolStatus !== 4) {
-      console.log('not vesting');
-    } else {
-      // Check if users have collected token for current vesting stage
-      const investorData = await PoolContract.GetInvestmentData(poolID, account)
-      const investorRes = []
-      if (investorData) {
-        investorData.map(data => investorRes.push(Number(BigNumber.from(data).toBigInt().toString())))
-      }
-      console.log('invester res', investorRes);
-
-      const tokenAllocated = investorRes[2] / (10 ** poolTokenDecimals)
-      const tokenClaimed = investorRes[3] / (10 ** poolTokenDecimals)
-      const curDate = new Date()
-      let tokenAvailable = 0
-      for (let i = 0; i < poolDistributionDate.length; i++) {
-        const tempDate = new Date(poolDistributionDate[i])
-        if (curDate > tempDate) {
-          tokenAvailable += tokenAllocated / 100 * poolDistributionStage[i]
-        } else {
-          console.log('time not arrived');
-          break
-        }
-      }
-
-      if (tokenClaimed === tokenAvailable) {
-        console.log('has collected');
-      } else {
-        const status = await (async () => {
-          const result = await PoolContract.WithdrawERC20ToInvestor(poolID)
-            .catch(e => {
-              console.log(e)
-              return new CustomError('CustomError while withdrawing token');
-            });
-          return result;
-        })();
-        console.log("Vesting claimed: ", status)
-      }
-    }
+    const result = await PoolContract.WithdrawERC20ToInvestor(poolID)
+      .catch(e => {
+        console.log('claim Error', e);
+      });
   }
 
   const investClicked = async (poolAddress, poolId, amount) => {
