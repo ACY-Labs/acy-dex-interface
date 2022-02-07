@@ -5,6 +5,7 @@ import TokenListSelector from './token_list';
 import MethodActionSelector from './contract_method_list';
 import ScanUrlSelector from './scan_url';
 import ScanAPIUrlSelector from './scan_api_url';
+import GlobalSettingsSelector from './global_settings';
 import FarmSettingSelector from './farm_setting';
 import LaunchpadSettingSelector from './launchpad_setting';
 import SDK_SETTING from './sdk_setting';
@@ -32,6 +33,7 @@ export let constantInstance = {
     'marketNetwork': 56,
     'marketAPISetting': FarmSettingSelector(56),
     'marketTokenList': TokenListSelector(56),
+    'globalSettings' : GlobalSettingsSelector(56)
 };
 
 // export web3 wallet status
@@ -84,6 +86,7 @@ export const ConstantLoader = (chainId = 56, marketChainId = 56) => {
         'gasTokenSymbol': GAS_TOKEN_SYMBOL[fallbackChainId],
         'marketAPISetting': FarmSettingSelector(marketNetwork),
         'marketTokenList': TokenListSelector(marketNetwork),
+        'globalSettings' : GlobalSettingsSelector(fallbackChainId)
     };
 
     return constants;

@@ -99,7 +99,7 @@ const StyledCard = styled(AcyCard)`
 `;
 
 const Swap = props => {
-  const {account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix}} = useConstantLoader();
+  const {account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix}, globalSettings, } = useConstantLoader();
   console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
   const [pricePoint, setPricePoint] = useState(0);
@@ -154,34 +154,6 @@ const Swap = props => {
     setTableLoading(true);
     setTransactionNum(0);
     
-    // const samplePositionsData = [
-    //   {
-    //     indexToken : findTokenWithSymbol('ACY'),
-    //     collateralToken : findTokenWithSymbol('USDT'),
-    //     isLong : true,
-    //     delta : 6.99,
-    //     netValue : 455.95,
-    //     PnL : 455.95 - 93.58,
-    //     totalSize : 3000,
-    //     collateral : 93.58,
-    //     markPrice : 94.34,
-    //     entryPrice : 94.21,
-    //     liqPrice : 81.09
-    //   },
-    //   {
-    //     indexToken : findTokenWithSymbol('ETH'),
-    //     collateralToken : findTokenWithSymbol('USDT'),
-    //     isLong : false,
-    //     delta : 6.99,
-    //     netValue : 455.95,
-    //     PnL : 455.95 - 93.58,
-    //     totalSize : 121.12121212,
-    //     collateral : 93.58,
-    //     markPrice : 94.34,
-    //     entryPrice : 94.21,
-    //     liqPrice : 81.09
-    //   }
-    // ]
     for ( let item of samplePositionsData){
       item['collateralToken'] = findTokenWithSymbol(item.collateralTokenSymbol);
       item['indexToken'] = findTokenWithSymbol(item.indexTokenSymbol);
@@ -206,6 +178,17 @@ const Swap = props => {
     setOrdersData(sampleOrdersData)
 
   }, [chainId])
+
+  useEffect(() => {
+      library.on('block', (blockNum) => {
+        if(blockNum % globalSettings.onBlockUpdateInterval == 0){
+          console.log('updating list in block ', blockNum);
+        }
+      })
+      return () => {
+        library.removeAllListeners('block');
+      }
+  }, [library])
 
   const refContainer = useRef();
   refContainer.current = transactionList;
