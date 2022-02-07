@@ -48,7 +48,7 @@ acy-dex-interface目前支持bsc（链号56）和polygon（137）网络。在开
 
 ## 启动项目与commit
 
-建议把项目安装在SSD上，运行速度快。第一次clone好项目后，记得通过`npm install`安装依赖库。安装过程中可能会遇到冲突，可以咨询技术群；安装好后将会出现一个新的`node_modules`文件夹。
+建议把项目安装在SSD上，运行速度快。第一次clone好项目后，通过`npm install --force`安装依赖库（安装过程中会遇到冲突，--force的方法在2022/02/07测试中仍然有效）。关于安装的问题可以咨询技术群。安装好后将会出现一个新的`node_modules`文件夹。
 
 `npm run start`：启动项目。稍等5分钟后命令行里会有一个localhost的链接，可以在开发中预览当前的网页。
 
