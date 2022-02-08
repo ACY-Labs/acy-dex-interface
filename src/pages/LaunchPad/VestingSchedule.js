@@ -12,8 +12,6 @@ const VestingSchedule = ({ vestingDate, stageData, vestingClick }) => {
 
   const vestingData = [];
 
-  console.log('dist', vestingDate);
-
   // setState
   return (
     <div className='vesting-schedule-container'>

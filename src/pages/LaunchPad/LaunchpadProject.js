@@ -115,6 +115,15 @@ const TokenLogoLabel = ({ projectName, tokenLogo, receivedData }) => {
           }
         </div>
       </div>
+      {receivedData && receivedData.bulletin &&
+        <>
+          <div className="bulletinContainer">
+            <div className="bulletinContent">
+              {receivedData.bulletin}
+            </div>
+          </div>
+        </>
+      }
     </div>
   );
 };
@@ -125,6 +134,7 @@ const CardArea = ({
   account,
   library,
   mainCoinLogoURI,
+  poolTokenDecimals,
   poolDistributionStage,
   poolDistributionDate,
   poolID,
@@ -144,16 +154,14 @@ const CardArea = ({
           comparesaleDate={comparesaleDate}
           comparevestDate={comparevestDate}
         />
-        {poolBaseData &&
-          <KeyInformation
-            projectToken={receivedData.projectToken}
-            totalSale={poolBaseData[0]}
-            tokenPrice={receivedData.tokenPrice}
-            receivedData={receivedData}
-            poolTokenAddress={poolTokenAddress}
-            poolMainCoinAddress={poolMainCoinAddress}
-          />
-        }
+        <KeyInformation
+          projectToken={receivedData.projectToken}
+          totalSale={receivedData.totalSale}
+          tokenPrice={receivedData.tokenPrice}
+          receivedData={receivedData}
+          poolTokenAddress={poolTokenAddress}
+          poolMainCoinAddress={poolMainCoinAddress}
+        />
 
       </div>
       <div className="rightGrid">
@@ -164,6 +172,7 @@ const CardArea = ({
             receivedData={receivedData}
             mainCoinLogoURI={mainCoinLogoURI}
             poolBaseData={poolBaseData}
+            poolTokenDecimals={poolTokenDecimals}
             poolDistributionStage={poolDistributionStage}
             poolDistributionDate={poolDistributionDate}
             poolID={poolID}
@@ -204,9 +213,9 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
           <div>
             <p>Sale (FCFS)</p>
             <div>
-              <p className="shortText">Start : </p>
+              <p className="shortText">Start: </p>
               <FormatedTime utc_string={receivedData.saleStart} />
-              <p className="shortText">End : </p>
+              <p className="shortText">End: </p>
               <FormatedTime utc_string={receivedData.saleEnd} />
             </div>
           </div>
@@ -270,8 +279,8 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
           style={{ background: '#1a1d1c', borderRadius: '0rem 0rem 1rem 1rem' }}
         >
           <div className="progressHeader">
-            <p>Sale ProgressBar<span><Image src={linkBIcon}/></span>
-              
+            <p>Sale ProgressBar<span><Image src={linkBIcon} /></span>
+
             </p>
             <p style={{ color: '#eb5c1f' }}>{salePercentage}%</p>
           </div>
@@ -287,10 +296,10 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
           </div>
           <div className="progressAmount" onClick={() => setIsShowToken(!isShowToken)}>
             {
-              isShowToken?
-              <div>{`${nFormatter(tokenNum, 3)} / ${nFormatter(totalSale, 3)} ${projectToken}`}</div>
-              :
-              <div>{`${nFormatter(mainCoinNum, 3)} / ${nFormatter(receivedData.totalRaise, 3)} ${receivedData.mainCoin}`}</div>
+              isShowToken ?
+                <div>{`${nFormatter(tokenNum, 3)} / ${nFormatter(totalSale, 3)} ${projectToken}`}</div>
+                :
+                <div>{`${nFormatter(mainCoinNum, 3)} / ${nFormatter(receivedData.totalRaise, 3)} ${receivedData.mainCoin}`}</div>
             }
           </div>
         </div>
@@ -472,12 +481,96 @@ const ChartCard = () => {
   );
 };
 
+const AllocationCard = ({
+  index,
+  allocationInfo,
+  innerValues,
+  coverOpenStates,
+  setAllocationInfo,
+  updateInnerValues,
+  updateCoverStates,
+  account,
+  receivedData,
+  setSalesValue
+}) => {
+
+  const colorCodes = ["#C6224E", "#1C9965", "#E29227", "#1E5D91", "#70BA33"];
+  const baseColorCodes = ["#631027", "#0e4c32", "#74490f", "#0f2e48", "#375d19"];
+
+  const computeCoverClass = () => {
+    let classString = 'cover';
+    let coverOpenState = coverOpenStates[index];
+    if (coverOpenState === 'open') {
+      classString += ' openCover';
+    } else if (coverOpenState === 'removed') {
+      classString = 'nocover';
+    }
+    return classString;
+  };
+
+  // if allocation is done, cover cannot be opened
+  // otherwise, require an allocation from server
+  const clickCover = (e) => {
+    if (coverOpenStates[index] !== 'cover') return;
+
+    console.log(`click allocation card cover`, allocationInfo);
+    if (!account || !receivedData.projectToken) {
+      return;
+    }
+
+    // first time allocation
+    if (!allocationInfo.allocationAmount) {
+      requireAllocation(API_URL(), account, receivedData.projectToken).then(res => {
+        if (res && res.allocationAmount) {
+          console.log('resalloc: ', res);
+          setAllocationInfo(res);
+          setSalesValue(res.allocationLeft);
+          updateInnerValues(index, res);
+          updateCoverStates(index);
+        }
+      }).catch(e => {
+        console.error(e);
+      })
+    } else {
+      console.log('open cover');
+      updateInnerValues(index, allocationInfo);
+      updateCoverStates(index);
+      setSalesValue(allocationInfo.allocationLeft);
+    }
+  };
+
+  const computeTextStyle = () => {
+    if (coverOpenStates[index] === 'removed') {
+      return {
+        color: '#757579'
+      }
+    }
+  }
+
+  return (
+    <div className='allocationCard-container'>
+      <div className="allocationCard" onClick={clickCover} style={{ backgroundColor: baseColorCodes[index] }}>
+        <div
+          className={computeCoverClass()}
+          style={{ backgroundColor: colorCodes[index] }}
+        >
+        </div>
+        <p
+          className="inner-text-amount"
+          style={computeTextStyle()}
+        >{innerValues[index]}</p>
+      </div>
+    </div>
+  );
+};
+
 const Allocation = ({
   account,
   library,
   receivedData,
   mainCoinLogoURI,
   poolBaseData,
+  poolTokenDecimals,
   poolDistributionStage,
   poolDistributionDate,
   poolID,
@@ -486,13 +579,10 @@ const Allocation = ({
   poolMainCoinAddress
 }) => {
 
-  const colorCodes = ["#C6224E", "#1C9965", "#E29227", "#1E5D91", "#70BA33"];
-  const baseColorCodes = ["#631027", "#0e4c32", "#74490f", "#0f2e48", "#375d19"];
   const [allocationInfo, setAllocationInfo] = useState({});
-  const [innerValues, setInnerValues] = useState(new Array(5).fill(0));
+  const [innerValues, setInnerValues] = useState([0, 0, 0, 0, 0]);
   const [coverOpenStates, setCoverOpenStates] = useState(new Array(5).fill('cover'));
   const [salesValue, setSalesValue] = useState(0);
-  const [cardIndexClicked, setCardIndexClicked] = useState(null);
   const [isShowingBonusInstrution, SetIsShowingBonusInstruction] = useState(false);
   const [isClickedVesting, setIsClickedVesting] = useState(false);
 
@@ -502,11 +592,11 @@ const Allocation = ({
     // get allocation status from backend at begining
     getAllocationInfo(API_URL(), account, receivedData.projectToken)
       .then(res => {
-        if (res) {
+        if (res && res.allocationAmount) {
           setAllocationInfo(res);
-          if (res.allocationLeft) {
-            setSalesValue(res.allocationLeft);
-          }
+          updateInnerValues(2, res);
+          updateCoverStates(2);
+          setSalesValue(res.allocationLeft);
           console.log('allocation info', receivedData.projectToken, res);
         }
       })
@@ -516,122 +606,16 @@ const Allocation = ({
       });
   }, [account, receivedData]);
 
-  const AllocationCard = ({ index }) => {
-
-    const computeCoverClass = () => {
-      let classString = 'cover';
-      let coverOpenState = coverOpenStates[index];
-      if (coverOpenState === 'open') {
-        classString += ' openCover';
-      } else if (coverOpenState === 'removed') {
-        classString = 'nocover';
-      }
-      return classString;
-    };
-
-    // if allocation is done, cover cannot be opened
-    // otherwise, require an allocation from server
-    const clickCover = (e) => {
-      if (cardIndexClicked) return;
-      setCardIndexClicked(index);
-
-      console.log(`click allocation card cover`, allocationInfo);
-      if (!account || !receivedData.projectToken) {
-        return;
-      }
-
-      // let cards = document.querySelectorAll(".cover");
-      // cards.forEach(node => {
-      //   console.log(node);
-      //   node.classList.remove("inner-text")
-      //   node.classList.remove("cover");
-      //   let innerText = node.parentElement.querySelector(".inner-text-amount");
-      //   // get 4 random values for other allocation values
-      //   console.log(innerText);
-      //   innerText.style.color = "#757579";
-      // })
-      // try {
-      //   let originalElementParent = e.target.parentElement.querySelector(".inner-text-amount");
-      //   originalElementParent.style.color = "#ffffff"
-      // } catch (err) {
-      //   // set all values to $0 due to error
-      //   // innerText.textContent = "$0";
-      //   console.log(err);
-      // }
-      // e.preventDefault();
-
-      // first time allocation
-      if (!allocationInfo.allocationAmount) {
-        requireAllocation(API_URL(), account, receivedData.projectToken).then(res => {
-          if (res) {
-            console.log('resalloc: ', res);
-            setAllocationInfo(res);
-            setSalesValue(res.allocationInfo.allocationLeft);
-            updateInnerValues(index);
-            updateCoverStates(index);
-          }
-        }).catch(e => {
-          console.error(e);
-        })
-      } else {
-        console.log('updating');
-        updateInnerValues(index);
-        updateCoverStates(index);
-        setSalesValue(allocationInfo.allocationLeft);
-      }
-    };
-
-    const computeTextStyle = () => {
-      if (coverOpenStates[index] === 'removed') {
-        return {
-          color: '#757579'
-        }
-      }
-    }
-
-    return (
-      <div className='allocationCard-container'>
-        <div className="allocationCard" onClick={clickCover} style={{ backgroundColor: baseColorCodes[index] }}>
-          <div
-            className={computeCoverClass()}
-            style={{ backgroundColor: colorCodes[index] }}
-          >
-          </div>
-          <p
-            className="inner-text-amount"
-            style={computeTextStyle()}
-          >{innerValues[index]}</p>
-        </div>
-      </div>
-    );
-  };
-
-  const allocationCards = () => {
-    const cards = [];
-    for (let i = 0; i < 5; i++) {
-      cards.push(
-        <AllocationCard
-          index={i}
-          innerValue={innerValues[i]}
-          coverOpenState={coverOpenStates[i]}
-        />
-      );
-    }
-    return cards;
-  };
-
   const onChangeSaleValue = (e) => {
     const value = e.target.value;
     if (!allocationInfo) setSalesValue(0);
     const allocationLeft = allocationInfo.allocationLeft;
-    if (typeof value !== "number") {
-      setSalesValue(allocationLeft)
-      return
-    }
+
+    const minInvest = receivedData.minInvest ? receivedData.minInvest : 100
     if (value > allocationLeft) {
       setSalesValue(allocationLeft);
-    } else if (value < receivedData.minInvest) {
-      setSalesValue(receivedData.minInvest);
+    } else if (value < minInvest) {
+      setSalesValue(minInvest);
     } else {
       setSalesValue(value);
     }
@@ -645,8 +629,8 @@ const Allocation = ({
 
   const randomRange = (min, max) => Math.floor(Math.random() * (max - min) + min);
 
-  const updateInnerValues = (index) => {
-    const newInnerValues = innerValues;
+  const updateInnerValues = (index, allocationInfo) => {
+    const newInnerValues = [0, 0, 0, 0, 0];
     const allocationAmount = allocationInfo.allocationAmount;
     for (let i = 0; i < innerValues.length; i++) {
       if (i === index) {
@@ -660,10 +644,8 @@ const Allocation = ({
   }
 
   const updateCoverStates = (index) => {
-    const newCoverOpenStates = new Array(5).fill('removed');
-    console.log('CoverOpenStates', coverOpenStates);
+    const newCoverOpenStates = ['removed', 'removed', 'removed', 'removed', 'removed'];
     newCoverOpenStates[index] = 'open';
-    console.log('newCoverOpenStates', newCoverOpenStates);
     setCoverOpenStates(newCoverOpenStates);
   }
 
@@ -702,44 +684,10 @@ const Allocation = ({
   const vestingClaimClicked = async () => {
     const PoolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, library, account);
 
-    if (poolStatus !== 4) {
-      console.log('not vesting');
-    } else {
-      if (!account) {
-        connectWallet()
-      }
-      // Check if users have collected token for current vesting stage
-      const investorData = await PoolContract.GetInvestmentData(poolID, account)
-      const investorRes = []
-      if (investorData) {
-        investorData.map(data => investorRes.push(Number(BigNumber.from(data).toBigInt().toString())))
-      }
-      const tokenAllocated = investorRes[2] / (10 ** poolTokenDecimals)
-      const tokenClaimed = investorRes[3] / (10 ** poolTokenDecimals)
-      const curDate = new Date()
-      let tokenAvailable = 0
-      for (let i = 0; i < poolDistributionDate.length; i++) {
-        const tempDate = new Date(poolDistributionDate[i])
-        if (curDate > tempDate) {
-          tokenAvailable += tokenAllocated / 100 * poolDistributionStage[i]
-        } else {
-          break
-        }
-      }
-      if (tokenClaimed === tokenAvailable) {
-        console.log('has collected');
-      } else {
-        const status = await (async () => {
-          const result = await PoolContract.WithdrawERC20ToInvestor(poolID)
-            .catch(e => {
-              console.log(e)
-              return new CustomError('CustomError while withdrawing token');
-            });
-          return result;
-        })();
-        console.log("Vesting claimed: ", status)
-      }
-    }
+    const result = await PoolContract.WithdrawERC20ToInvestor(poolID)
+      .catch(e => {
+        console.log('claim Error', e);
+      });
   }
 
   const investClicked = async (poolAddress, poolId, amount) => {
@@ -790,6 +738,8 @@ const Allocation = ({
     return totalBonus;
   }
 
+  const card_indexes = [0, 1, 2, 3, 4];
+
   return (
     <div>
       <div className='cardContent allocation-content allocation-content-active'>
@@ -808,11 +758,23 @@ const Allocation = ({
 
           <div className='allocation-cards'>
             <div className="allocationContainer">
-              <AllocationCard index={0} />
-              <AllocationCard index={1} />
-              <AllocationCard index={2} />
-              <AllocationCard index={3} />
-              <AllocationCard index={4} />
+              {
+                card_indexes.map((index) =>
+                  <AllocationCard
+                    key={index}
+                    index={index}
+                    allocationInfo={allocationInfo}
+                    setAllocationInfo={setAllocationInfo}
+                    updateCoverStates={updateCoverStates}
+                    updateInnerValues={updateInnerValues}
+                    coverOpenStates={coverOpenStates}
+                    innerValues={innerValues}
+                    account={account}
+                    receivedData={receivedData}
+                    setSalesValue={setSalesValue}
+                  />
+                )
+              }
             </div>
           </div>
 
@@ -922,17 +884,6 @@ const LaunchpadProject = () => {
   // CONSTANTS
 
   // FUNCTIONS
-  const connectWallet = async () => {
-    activate(binance);
-    activate(injected);
-  };
-
-  const formatTime = timeZone => {
-    return moment(timeZone)
-      // .local()
-      .utc()
-      .format('MM/DD/YYYY HH:mm:ss');
-  };
 
   const convertUnixTime = unixTime => {
     const data = new Date((Number(unixTime)) * 1000)
@@ -940,10 +891,15 @@ const LaunchpadProject = () => {
     return res
   }
 
+  const connectWalletByLocalStorage = useConnectWallet();
+  useEffect(() => {
+    if (!account) {
+      connectWalletByLocalStorage();
+    }
+  }, [account]);
+
   // contract function
   const getPoolData = async (lib, acc) => {
-    console.log('getpool');
-    console.log('poolId', poolID, 'contract', poolContract);
 
     const poolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, lib, acc);
     const pool = []
@@ -955,11 +911,13 @@ const LaunchpadProject = () => {
     const distributionData = await poolContract.GetPoolDistributionData(poolID)
     const status = await poolContract.GetPoolStatus(poolID)
 
+    console.log('Base Data', baseData);
+    console.log('Pool Status', status);
+
     // getpoolbasedata 数据解析
     const token2Address = baseData[1]
     const tokenList = TOKEN_LIST()
     const token2Info = tokenList.find(item => item.address == token2Address)
-    console.log("baseData", baseData)
 
     const token1contract = getContract(baseData[0], ERC20ABI, lib, acc)
     const token2contract = getContract(token2Address, ERC20ABI, lib, acc)
@@ -971,6 +929,8 @@ const LaunchpadProject = () => {
     const res2 = BigNumber.from(baseData[3]).toBigInt().toString().slice(0, -(token1decimal)) // 已销售的token的数量
     const res3 = BigNumber.from(baseData[4]).toBigInt()
     const res4 = BigNumber.from(baseData[5]).toBigInt()
+
+    console.log('End time', res4);
 
     // 获取当前阶段
     const d = Math.round(new Date().getTime() / 1000)
@@ -986,7 +946,6 @@ const LaunchpadProject = () => {
 
     // 判断当前是否是vesting阶段
     const curPoolStatus = Number(BigNumber.from(status).toBigInt())
-    console.log('pooldate', pool);
 
     // set数据
     setPoolBaseData(pool)
@@ -996,13 +955,16 @@ const LaunchpadProject = () => {
     setPoolTokenAddress(baseData[0])
     setPoolTokenDecimals(token1decimal)
     setPoolMainCoinDecimals(token2decimal)
-    // setMainCoinLogoURI(token2Info.logoURI)
   }
 
   const updatePoolData = async () => {
-    console.log('updating pool data');
     // project must have poolID
     if (poolID === null) return;
+
+    const now_moment_utc = moment.utc();
+    const end_moment_utc = moment.utc(receivedData.saleEnd);
+    const start_moment_utc = moment.utc(receivedData.saleStart);
+    if (now_moment_utc > end_moment_utc || now_moment_utc < start_moment_utc) return;
 
     if (account && library) {
       await getPoolData(library, account);
@@ -1028,8 +990,9 @@ const LaunchpadProject = () => {
           res['alreadySale'] = contextData['alreadySale'];
           res['salePercentage'] = contextData['salePercentage'];
           res['posterUrl'] = contextData['posterUrl'];
+          res['bulletin'] = contextData['bulletin'];
           res['tokenLogoUrl'] = res.basicInfo.projectTokenUrl;
-          res['minInvest'] = res.allocationInfo.parameters.minInvest
+          res['minInvest'] = res.allocationInfo.parameters.minInvest;
 
           res['regStart'] = res.scheduleInfo.regStart;
           res['regEnd'] = res.scheduleInfo.regEnd;
@@ -1045,7 +1008,7 @@ const LaunchpadProject = () => {
             setpoolDistributionStage(distributionStage);
           }
 
-          res['tokenPrice'] = res.saleInfo.tokenPrice
+          res['tokenPrice'] = res.saleInfo.tokenPrice;
           res['totalSale'] = res.saleInfo.totalSale;
           res['totalRaise'] = res.saleInfo.totalRaise;
           res['projectUrl'] = res.saleInfo.projectUrl;
@@ -1089,7 +1052,7 @@ const LaunchpadProject = () => {
         </div>
       ) : (
         <div className="mainContainer">
-          <Timer callBack={updatePoolData} ms={10000} />
+          <Timer callBack={updatePoolData} ms={30000} />
           <TokenBanner posterUrl={receivedData.posterUrl} />
           <TokenLogoLabel
             projectName={receivedData.projectName}
@@ -1111,6 +1074,7 @@ const LaunchpadProject = () => {
             poolMainCoinDecimals={poolMainCoinDecimals}
             poolMainCoinAddress={poolMainCoinAddress}
             poolTokenAddress={poolTokenAddress}
+            poolTokenDecimals={poolTokenDecimals}
           />
         </div>
       )}
