@@ -23,7 +23,7 @@ export const useConnectWallet = () => {
             if (login_status == 'off'){
                 return;
             }
-            if (walletName === 'metamask' || walletName === 'opera') {
+            if (walletName === 'metamask' || walletName === 'opera' || walletName === 'bitkeep') {
                 activate(injected);
             } else if (walletName === 'walletconnect') {
                 activate(walletconnect);

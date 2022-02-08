@@ -175,7 +175,22 @@ const GlobalHeaderRight = props => {
         }
         return
       }
-    } else if (walletName === 'walletconnect') {
+    }else if (walletName === 'bitkeep'){
+      try {
+        ethereum;
+        activate(injected);
+        if (!window.isBitKeep){
+          message.info('Wrong wallet, please make sure other wallet extensions has been closed');
+        }
+      } catch (error) {
+        message.info('No provider was found');
+        if(account){
+          localStorage.setItem("login_status", "on");
+        }
+        return
+      }
+    } 
+    else if (walletName === 'walletconnect') {
       activate(walletconnect);
     } else if (walletName === 'coinbase') {
       activate(walletlink);
@@ -262,7 +277,7 @@ const GlobalHeaderRight = props => {
     }
     checkChainNetwork(chainId);
     // 监听钱包网络变化 metamask
-    if (localStorage.getItem("wallet") == "metamask") {
+    if (localStorage.getItem("wallet") == "metamask" || localStorage.getItem("wallet") == "bitkeep") {
       try {
         ethereum.on('networkChanged', function (chainId) {
           checkChainNetwork(chainId);
@@ -363,6 +378,13 @@ const GlobalHeaderRight = props => {
       icon: 'Nabox',
       onClick: () => {
         selectWallet('nabox');
+      },
+    },
+    {
+      name: 'Bitkeep Wallet',
+      icon: 'Bitkeep',
+      onClick: () => {
+        selectWallet('bitkeep');
       },
     },
     {
