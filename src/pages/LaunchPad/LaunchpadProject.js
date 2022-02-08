@@ -115,6 +115,15 @@ const TokenLogoLabel = ({ projectName, tokenLogo, receivedData }) => {
           }
         </div>
       </div>
+      {receivedData && receivedData.bulletin &&
+        <>
+          <div className="bulletinContainer">
+            <div className="bulletinContent">
+              {receivedData.bulletin}
+            </div>
+          </div>
+        </>
+      }
     </div>
   );
 };
@@ -270,8 +279,8 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
           style={{ background: '#1a1d1c', borderRadius: '0rem 0rem 1rem 1rem' }}
         >
           <div className="progressHeader">
-            <p>Sale ProgressBar<span><Image src={linkBIcon}/></span>
-              
+            <p>Sale ProgressBar<span><Image src={linkBIcon} /></span>
+
             </p>
             <p style={{ color: '#eb5c1f' }}>{salePercentage}%</p>
           </div>
@@ -675,45 +684,10 @@ const Allocation = ({
   const vestingClaimClicked = async () => {
     const PoolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, library, account);
 
-    if (poolStatus !== 4) {
-      console.log('not vesting');
-    } else {
-      // Check if users have collected token for current vesting stage
-      const investorData = await PoolContract.GetInvestmentData(poolID, account)
-      const investorRes = []
-      if (investorData) {
-        investorData.map(data => investorRes.push(Number(BigNumber.from(data).toBigInt().toString())))
-      }
-      console.log('invester res', investorRes);
-
-      const tokenAllocated = investorRes[2] / (10 ** poolTokenDecimals)
-      const tokenClaimed = investorRes[3] / (10 ** poolTokenDecimals)
-      const curDate = new Date()
-      let tokenAvailable = 0
-      for (let i = 0; i < poolDistributionDate.length; i++) {
-        const tempDate = new Date(poolDistributionDate[i])
-        if (curDate > tempDate) {
-          tokenAvailable += tokenAllocated / 100 * poolDistributionStage[i]
-        } else {
-          console.log('time not arrived');
-          break
-        }
-      }
-
-      if (tokenClaimed === tokenAvailable) {
-        console.log('has collected');
-      } else {
-        const status = await (async () => {
-          const result = await PoolContract.WithdrawERC20ToInvestor(poolID)
-            .catch(e => {
-              console.log(e)
-              return new CustomError('CustomError while withdrawing token');
-            });
-          return result;
-        })();
-        console.log("Vesting claimed: ", status)
-      }
-    }
+    const result = await PoolContract.WithdrawERC20ToInvestor(poolID)
+      .catch(e => {
+        console.log('claim Error', e);
+      });
   }
 
   const investClicked = async (poolAddress, poolId, amount) => {
@@ -937,6 +911,9 @@ const LaunchpadProject = () => {
     const distributionData = await poolContract.GetPoolDistributionData(poolID)
     const status = await poolContract.GetPoolStatus(poolID)
 
+    console.log('Base Data', baseData);
+    console.log('Pool Status', status);
+
     // getpoolbasedata 数据解析
     const token2Address = baseData[1]
     const tokenList = TOKEN_LIST()
@@ -952,6 +929,8 @@ const LaunchpadProject = () => {
     const res2 = BigNumber.from(baseData[3]).toBigInt().toString().slice(0, -(token1decimal)) // 已销售的token的数量
     const res3 = BigNumber.from(baseData[4]).toBigInt()
     const res4 = BigNumber.from(baseData[5]).toBigInt()
+
+    console.log('End time', res4);
 
     // 获取当前阶段
     const d = Math.round(new Date().getTime() / 1000)
@@ -1011,6 +990,7 @@ const LaunchpadProject = () => {
           res['alreadySale'] = contextData['alreadySale'];
           res['salePercentage'] = contextData['salePercentage'];
           res['posterUrl'] = contextData['posterUrl'];
+          res['bulletin'] = contextData['bulletin'];
           res['tokenLogoUrl'] = res.basicInfo.projectTokenUrl;
           res['minInvest'] = res.allocationInfo.parameters.minInvest;
 

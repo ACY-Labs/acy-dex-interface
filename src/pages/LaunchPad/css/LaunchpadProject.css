@@ -92,6 +92,23 @@
   font-family: 'Karla', sans-serif;
   font-weight: 500;
   margin-left: 0.2rem;
+  cursor: pointer;
+}
+
+.bulletinContainer {
+  display: flex;
+  flex-grow: 1;
+  padding: 20px;
+  justify-content: center;
+}
+
+.bulletinContent {
+  border: 4px solid #eb5c20;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 18px;
+  color: #eb5c20;
+  letter-spacing: 1px;
 }
 
 .tokenLabelBar {
@@ -868,6 +885,7 @@
 
   .tokenTitle {
     font-size: 1.5rem;
+    cursor: pointer;
   }
 
   .tokenLabel {
