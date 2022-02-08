@@ -277,7 +277,7 @@ const GlobalHeaderRight = props => {
     }
     checkChainNetwork(chainId);
     // 监听钱包网络变化 metamask
-    if (localStorage.getItem("wallet") == "metamask") {
+    if (localStorage.getItem("wallet") == "metamask" || localStorage.getItem("wallet") == "bitkeep") {
       try {
         ethereum.on('networkChanged', function (chainId) {
           checkChainNetwork(chainId);
