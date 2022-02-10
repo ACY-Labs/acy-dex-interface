@@ -95,8 +95,24 @@ import { useConnectWallet } from '@/components/ConnectWallet';
 
 import { AcyRadioButton } from '@/components/AcyRadioButton';
 
+import styled from "styled-components";
+const StyledRadioButton = styled(Radio.Button)`
+  background-color: #29292c;
+  border: none;
+  border-left: none !important;
+`;
 
-
+const StyledSlider = styled(Slider)`
+  .ant-slider-track{
+    background: #be4d00;
+  }
+  .ant-slider-rail {
+    background: #3b0000;
+  }
+  .ant-slider-dot {
+    background: transparent;
+  }
+`;
 
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
@@ -646,8 +662,8 @@ const SwapComponent = props => {
         <Radio.Group
           defaultValue={LONG} buttonStyle="solid" className={styles.modeSelector}
           onChange={modeSelect}>
-          <Radio.Button value={LONG} className={styles.modeSubOption}><RiseOutlined />Long</Radio.Button>
-          <Radio.Button value={SHORT} className={styles.modeSubOption}><FallOutlined />Short</Radio.Button>
+          <StyledRadioButton value={LONG} className={styles.modeSubOption}><RiseOutlined />Long</StyledRadioButton>
+          <StyledRadioButton value={SHORT} className={styles.modeSubOption}><FallOutlined />Short</StyledRadioButton>
         </Radio.Group>
       </div>
       <div>
@@ -737,7 +753,7 @@ const SwapComponent = props => {
           <div className={styles.slippageContainer}>
             <span style={{ fontWeight: 600 }}>Leverage ymj</span>
             <span className={styles.leverageSlider}>
-              <Slider marks={leverageSlider} defaultValue={leverage} max={30.51} min={1.10} onChange={leverageSliderOnChange} step={0.1} 
+              <StyledSlider marks={leverageSlider} defaultValue={leverage} max={30.51} min={1.10} onChange={leverageSliderOnChange} step={0.1} 
                 style={{color: 'red'}}/>
             </span>
           </div>
