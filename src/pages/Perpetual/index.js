@@ -497,31 +497,7 @@ const Swap = props => {
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
           <div className={`${styles.colItem} ${styles.priceChart}`}>
-            <StyledCard title={lineTitleRender()}>
-              <div
-                style={{
-                }}
-              >
-                <div
-                  style={{
-                    height: '400px',
-                  }}
-                  className={styles.showPeriodOnHover}
-                >
-                  <AcyPriceChart 
-                    data={chartData}
-                    format={format}
-                    showXAxis
-                    // showGradient
-                    lineColor="#e29227"
-                    range={range}
-                    showTooltip={true}
-                    onHover={(data, dataIndex) => updateActiveChartData(data, dataIndex)}
-                  />
-
-                </div>
-              </div>
-            </StyledCard> 
+          
           </div> 
           <div className={`${styles.colItem} ${styles.perpetualComponent}`} >
                 <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
