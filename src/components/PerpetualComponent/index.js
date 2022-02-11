@@ -26,7 +26,7 @@ import {
 import TokenSelectorModal from "@/components/TokenSelectorModal";
 // swapBox components start
 import { PriceBox } from './components/PriceBox';
-import { DetalBox } from './components/DetalBox';
+import { DetailBox } from './components/DetailBox';
 
 import {MARKET, LIMIT, LONG, SHORT} from './constant'
 // swapBox compontent end
@@ -759,7 +759,7 @@ const SwapComponent = props => {
           </div>
         </div>
       </AcyDescriptions>
-      <DetalBox
+      <DetailBox
       leverage={leverage}
       shortOrLong={mode}
       marketOrLimit={type}

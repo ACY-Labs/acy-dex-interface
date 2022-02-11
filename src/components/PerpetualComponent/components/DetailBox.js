@@ -13,7 +13,7 @@ import Pattern from '@/utils/pattern';
 import { MARKET, LIMIT, LONG, SHORT, FEE } from '../constant'
 
 
-export const DetalBox = (props) => {
+export const DetailBox = (props) => {
 
     const [shortModeProfitsModelVisible, setShortModeProfitsModelVisible] = useState(false);
     const [profitsIn, setProfitsIn] = useState("ETH");
