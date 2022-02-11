@@ -491,6 +491,20 @@ const Swap = props => {
     const lastDataIndex = chartData.length-1;
     updateActiveChartData(chartData[lastDataIndex][1], lastDataIndex);
   }, [chartData])
+
+  //#TODO (Austin) convert into ACY Style
+  const renderChart = () => {
+    return <ExchangeTVChart
+      fromTokenAddress={fromTokenAddress}
+      toTokenAddress={toTokenAddress}
+      infoTokens={infoTokens}
+      swapOption={swapOption}
+      chainId={chainId}
+      positions={positions}
+      savedShouldShowPositionLines={savedShouldShowPositionLines}
+      orders={orders}
+    />
+  }
  
   return (
     <PageHeaderWrapper>
