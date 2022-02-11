@@ -388,8 +388,8 @@ const ProjectDescription = ({ receivedData }) => {
           <div className='socialmedia-container'>
             {
               receivedData.social && receivedData.social[0] &&
-              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <a href={receivedData.social[0].Website} target="_blank" rel="noreferrer" style={{ width: '30%', marginRight: '1rem', alignSelf: 'center' }}>{receivedData.social[0].Website}</a>
+              <div className="socialmedia-link-container">
+                <a href={receivedData.social[0].Website} target="_blank" rel="noreferrer" style={{ width: '30%', alignSelf: 'center' }}>{receivedData.social[0].Website}</a>
                 <div id='social container' className='social-container'>
                   {Object.entries(receivedData.social[0]).map((item) => {
                     if (item[1] !== null) {
