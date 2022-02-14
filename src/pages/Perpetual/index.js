@@ -491,37 +491,27 @@ const Swap = props => {
     const lastDataIndex = chartData.length-1;
     updateActiveChartData(chartData[lastDataIndex][1], lastDataIndex);
   }, [chartData])
+
+  //#TODO (Austin) convert into ACY Style
+  const renderChart = () => {
+    return <ExchangeTVChart
+      fromTokenAddress={fromTokenAddress}
+      toTokenAddress={toTokenAddress}
+      infoTokens={infoTokens}
+      swapOption={swapOption}
+      chainId={chainId}
+      positions={positions}
+      savedShouldShowPositionLines={savedShouldShowPositionLines}
+      orders={orders}
+    />
+  }
  
   return (
     <PageHeaderWrapper>
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
           <div className={`${styles.colItem} ${styles.priceChart}`}>
-            <StyledCard title={lineTitleRender()}>
-              <div
-                style={{
-                }}
-              >
-                <div
-                  style={{
-                    height: '400px',
-                  }}
-                  className={styles.showPeriodOnHover}
-                >
-                  <AcyPriceChart 
-                    data={chartData}
-                    format={format}
-                    showXAxis
-                    // showGradient
-                    lineColor="#e29227"
-                    range={range}
-                    showTooltip={true}
-                    onHover={(data, dataIndex) => updateActiveChartData(data, dataIndex)}
-                  />
-
-                </div>
-              </div>
-            </StyledCard> 
+          
           </div> 
           <div className={`${styles.colItem} ${styles.perpetualComponent}`} >
                 <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
