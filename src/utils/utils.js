@@ -3,7 +3,6 @@ import React from 'react';
 import nzh from 'nzh/cn';
 import { parse, stringify } from 'qs';
 import { BigNumber } from '@ethersproject/bignumber';
-import { bigNumberify } from "ethers/utils";
 import { ethers } from 'ethers';
 export const USD_DECIMALS = 30;
 export const BASIS_POINTS_DIVISOR = 10000;
@@ -21,6 +20,10 @@ export function TranslateToUSD(symbol,amount,priceList){
     let result = amount * priceList[symbol];
     return result;
   }
+}
+
+export function bigNumberify(n){
+  return ethers.BigNumber.from(n);
 }
 
 export const limitDecimals = (amount, maxDecimals) => {

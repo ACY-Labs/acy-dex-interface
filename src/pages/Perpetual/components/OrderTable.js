@@ -13,28 +13,10 @@ const OrderTable = props => {
 
   const sampleOrderColumns = [
     {
-      // title: (
-      //   <div className={styles.tableDataFirstColumn}>
-      //     Type
-      //   </div>
-      // ),
       title: 'Type',
       dataIndex: 'type',
-      align: 'left',
-      render: (text, record) => {
-          return (
-            <div className={styles.tableEntryBig}>
-              {record.type}
-            </div>
-          );
-      }
     },
     {
-      // title: (
-      //   <div className={styles.tableData}>
-      //     Order
-      //   </div>
-      // ),
       title: 'Order',
       dataIndex: 'order',
       align: 'left',
@@ -43,12 +25,7 @@ const OrderTable = props => {
       }
     },
     {
-      // title: (
-      //   <div className={styles.tableData}>
-      //     Price
-      //   </div>
-      // ),
-      title: 'Price',
+      title: 'Trigger Price',
       dataIndex: 'price',
       align: 'left',
       render: (text, record) => {
@@ -56,11 +33,6 @@ const OrderTable = props => {
       }
     },
     {
-      // title: (
-      //   <div className={styles.tableData}>
-      //     Mark Price
-      //   </div>
-      // ),
       title: 'Mark Price',
       dataIndex: 'markPrice',
       align: 'left',
