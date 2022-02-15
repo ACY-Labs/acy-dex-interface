@@ -14,7 +14,7 @@ import { useConstantLoader } from '@/constants';
 import classNames from 'classnames';
 import { findTokenWithSymbol } from '@/utils/txData';
 import { getUserTokenBalance } from '@/acy-dex-swap/utils';
-import { formatAmount, USD_DECIMALS, mapPositionData, parseValue } from '@/utils/utils';
+import { formatAmount, USD_DECIMALS, mapPositionData, parseValue } from '@/acy-dex-futures/utils';
 
 import { makeStyles } from "@material-ui/styles";
 

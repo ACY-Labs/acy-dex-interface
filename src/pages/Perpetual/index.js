@@ -15,7 +15,7 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
-import { getLiquidationPrice } from '@/utils/utils';
+import { getLiquidationPrice } from '@/acy-dex-futures/utils';
 import Media from 'react-media';
 import { uniqueFun } from '@/utils/utils';
 import {getTransactionsByAccount,appendNewSwapTx, findTokenWithSymbol} from '@/utils/txData';
