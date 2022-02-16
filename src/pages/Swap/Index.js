@@ -130,24 +130,26 @@ const Swap = props => {
   // useSWR hook example - needs further implementation in backend
   const txListUrl = `${apiUrlPrefix}/txlist/all?`
   const {data : txList , mutate : updateTxList} = useSWR([txListUrl],{
-    fetcher: TxFetcher(account)
+    fetcher: TxFetcher(account),
+    // refreshInterval: 1000,
   })
 
-  // useEffect(()=>{
-  //   console.log('updating txlists',txList);
-  // },[txList])
+  const txref = useRef();
+  txref.current = txList;
 
-  console.log('printing tx lists',txList)
+  console.log('printing tx lists', txList);
+
+  // console.log('printing tx lists',txList)
   useEffect(() => {
     library.on('block', (blockNum) => {
       console.log('updating tx lists');
-      updateTxList([], true);
+      updateTxList();
     })
     return () => {
       library.removeAllListeners('block');
     }
-  }, [library, updateTxList])
-  //------------------
+  }, [library])
+  // ------------------
 
   useEffect(() => {
     if (!supportedTokens) return

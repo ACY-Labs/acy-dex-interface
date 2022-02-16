@@ -178,8 +178,6 @@ export function getPositionQuery(tokens, nativeTokenAddress) {
     }
   }
 
-  // console.log('printing position query', collateralTokens, indexTokens, isLong);
-
   return { collateralTokens, indexTokens, isLong }
 }
 
@@ -188,9 +186,6 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
   const propsLength = 9;
   const positions = []
   const positionsMap = {}
-
-  console.log('getting positions');
-  console.log(infoTokens);
 
   if (!positionData) {
     return { positions, positionsMap }
@@ -307,13 +302,7 @@ const Swap = props => {
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(tempLibrary, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
   })
-  vaultTokenInfo;
-  console.log('vault token info',vaultTokenInfo);
-
-  useEffect(()=>{
-
-    console.log('vault token info',vaultTokenInfo);
-  },[vaultTokenInfo]);
+  
   const { data: positionData, mutate: updatePositionData } = useSWR(account && [tempChainID, readerAddress, "getPositions", vaultAddress, account],{
     fetcher: fetcher(tempLibrary, Reader, [positionQuery.collateralTokens, positionQuery.indexTokens, positionQuery.isLong]),
   })
@@ -341,12 +330,6 @@ const Swap = props => {
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   const { positions, positionsMap } = getPositions(tempChainID, positionQuery, positionData, infoTokens, true)
-
-  console.log(positions);
-
-  useEffect(()=>{
-    console.log(positions)
-  },[positions])
 
 //--------- 
   useEffect(() => {
@@ -379,7 +362,6 @@ const Swap = props => {
       item['indexToken'] = findTokenWithSymbol(item.indexTokenSymbol);
       item['liqPrice'] = getLiquidationPrice(item);
     }
-    console.log(samplePositionsData); 
     setPositionsData(samplePositionsData);
 
     const sampleOrdersData = [
@@ -401,20 +383,18 @@ const Swap = props => {
 
   useEffect(() => {
       library.on('block', (blockNum) => {
-        updateVaultTokenInfo(undefined, true)
-        updateTokenBalances(undefined, true)
-        updatePositionData(undefined, true)
-        updateFundingRateInfo(undefined, true)
-        updateTotalTokenWeights(undefined, true)
-        updateUsdgSupply(undefined, true)
-        updateOrderBookApproved(undefined, true)
+        updateVaultTokenInfo()
+        updateTokenBalances()
+        updatePositionData()
+        updateFundingRateInfo()
+        updateTotalTokenWeights()
+        updateUsdgSupply()
+        updateOrderBookApproved()
       })
       return () => {
         library.removeAllListeners('block');
       }
-  }, [library, updateVaultTokenInfo, updateTokenBalances, updatePositionData,
-    updateFundingRateInfo, updateTotalTokenWeights, updateUsdgSupply,
-    updateOrderBookApproved])
+  }, [library])
 
   const refContainer = useRef();
   refContainer.current = transactionList;
@@ -481,12 +461,9 @@ const Swap = props => {
       A = temp;
       reverseFlag = true;
     }
-    console.log(A,B);
-    console.log("fetching the swap Rate data!!!!!!!!!!!!!!!!");
     axios.get(
       `${apiUrlPrefix}/chart/getRate`, {params : {token0 : A , token1 : B}}
     ).then(res => {
-      console.log("response",res.data);
       if(res.data){
       const historyData = res.data.History;
       timeMark = historyData[historyData.length-1].time;
@@ -618,7 +595,6 @@ const Swap = props => {
   };
 
   const RenderTable = () => {
-    console.log("renderTable", tableContent)
     if (tableContent === POSITIONS) {
       return (
         <PositionsTable
@@ -683,7 +659,6 @@ const Swap = props => {
 
   const updateTransactionList = async (receipt) => {
     setTableLoading(true);
-    console.log("updating list");
     appendNewSwapTx(refContainer.current,receipt,account,library).then((data) => {
       if(data && data.length > 0) setTransactionList(data);
       setTableLoading(false);
@@ -693,7 +668,6 @@ const Swap = props => {
 
 
   const onGetReceipt = async (receipt, library, account) => {
-    console.log('RECEIPT', receipt);
     updateTransactionList(receipt);
   };
   const {
