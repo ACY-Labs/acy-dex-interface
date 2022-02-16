@@ -6,6 +6,143 @@ export const MARGIN_FEE_BASIS_POINTS = 10;
 export const LIQUIDATION_FEE = expandDecimals(5, USD_DECIMALS)
 export const FUNDING_RATE_PRECISION = 1000000;
 export const MAX_LEVERAGE = 100 * 10000;
+export const POSITIONS = 'Positions';
+export const ACTIONS = 'Actions';
+export const ORDERS = 'Orders';
+const USDG_ADDRESS = '0x45096e7aA921f27590f8F19e457794EB09678141';
+
+const { AddressZero } = ethers.constants
+
+export const getTokenInfo = (infoTokens, tokenAddress, replaceNative, nativeTokenAddress) => {
+  if (replaceNative && tokenAddress === nativeTokenAddress) {
+    return infoTokens[AddressZero]
+  }
+  return infoTokens[tokenAddress]
+}
+
+export function getDeltaStr({ delta, deltaPercentage, hasProfit }) {
+  let deltaStr
+  let deltaPercentageStr
+
+  if (delta.gt(0)) {
+    deltaStr = hasProfit ? "+" : "-"
+    deltaPercentageStr = hasProfit ? "+" : "-"
+  } else {
+    deltaStr = "";
+    deltaPercentageStr = "";
+  }
+  deltaStr += `$${formatAmount(delta, USD_DECIMALS, 2, true)}`
+  deltaPercentageStr += `${formatAmount(deltaPercentage, 2, 2)}%`
+
+  return { deltaStr, deltaPercentageStr }
+}
+
+export function getPositionKey(collateralTokenAddress, indexTokenAddress, isLong, nativeTokenAddress) {
+  const tokenAddress0 = collateralTokenAddress === AddressZero ? nativeTokenAddress : collateralTokenAddress
+  const tokenAddress1 = indexTokenAddress === AddressZero ? nativeTokenAddress : indexTokenAddress
+  return tokenAddress0 + ":" + tokenAddress1 + ":" + isLong
+}
+
+export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo, vaultPropsLength) {
+
+  if (!vaultPropsLength) {
+    vaultPropsLength = 12
+  }
+  const fundingRatePropsLength = 2
+  const infoTokens = {}
+
+  for (let i = 0; i < tokens.length; i++) {
+    const token = JSON.parse(JSON.stringify(tokens[i]))
+    if (tokenBalances) {
+      token.balance = tokenBalances[i]
+    }
+    if (token.address === USDG_ADDRESS) {
+      token.minPrice = expandDecimals(1, USD_DECIMALS)
+      token.maxPrice = expandDecimals(1, USD_DECIMALS)
+    }
+    infoTokens[token.address] = token
+  }
+
+  for (let i = 0; i < whitelistedTokens.length; i++) {
+    const token = JSON.parse(JSON.stringify(whitelistedTokens[i]))
+    if (vaultTokenInfo) {
+      token.poolAmount = vaultTokenInfo[i * vaultPropsLength]
+      token.reservedAmount = vaultTokenInfo[i * vaultPropsLength + 1]
+      token.availableAmount = token.poolAmount.sub(token.reservedAmount)
+      token.usdgAmount = vaultTokenInfo[i * vaultPropsLength + 2]
+      token.redemptionAmount = vaultTokenInfo[i * vaultPropsLength + 3]
+      token.weight = vaultTokenInfo[i * vaultPropsLength + 4]
+      token.bufferAmount = vaultTokenInfo[i * vaultPropsLength + 5]
+      token.maxUsdgAmount = vaultTokenInfo[i * vaultPropsLength + 6]
+      token.minPrice = vaultTokenInfo[i * vaultPropsLength + 7]
+      token.maxPrice = vaultTokenInfo[i * vaultPropsLength + 8]
+      token.guaranteedUsd = vaultTokenInfo[i * vaultPropsLength + 9]
+
+      token.availableUsd = token.isStable
+        ? token.poolAmount.mul(token.minPrice).div(expandDecimals(1, token.decimals))
+        : token.availableAmount.mul(token.minPrice).div(expandDecimals(1, token.decimals))
+
+      token.managedUsd = token.availableUsd.add(token.guaranteedUsd)
+      token.managedAmount = token.managedUsd.mul(expandDecimals(1, token.decimals)).div(token.minPrice)
+    }
+
+    if (fundingRateInfo) {
+      token.fundingRate = fundingRateInfo[i * fundingRatePropsLength];
+      token.cumulativeFundingRate = fundingRateInfo[i * fundingRatePropsLength + 1];
+    }
+
+    if (infoTokens[token.address]) {
+      token.balance = infoTokens[token.address].balance
+    }
+
+    infoTokens[token.address] = token
+  }
+
+  return infoTokens
+}
+
+export function getProvider(library, chainId) {
+  let provider;
+  if (library) {
+    return library.getSigner()
+  }
+  provider = _.sample(RPC_PROVIDERS[chainId])
+  return new ethers.providers.JsonRpcProvider(provider)
+}
+
+export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
+  // eslint-disable-next-line
+  const [chainId, arg0, arg1, ...params] = args
+  const provider = library.getSigner(params[1])
+  const method = ethers.utils.isAddress(arg0) ? arg1 : arg0
+
+  function onError(e) {
+      console.error(contractInfo.contractName, method, e)
+  }
+
+  if (ethers.utils.isAddress(arg0)) {
+    const address = arg0
+    const contract = new ethers.Contract(address, contractInfo.abi, provider)
+
+    try {
+      if (additionalArgs) {
+        console.log('FETCHER FUNCTION CALLED WITH METHOD  --> ', method);
+        console.log('printing additional args', params, additionalArgs);
+        console.log('printing provider', contract);
+        return contract[method](...params.concat(additionalArgs)).catch(onError)
+      }
+      return contract[method](...params).catch(onError)
+    } catch (e) {
+      console.log('error', e);
+      onError(e)
+    }
+  }
+  if (!library) {
+    return
+  }
+  return library[method](arg1,...params).catch(onError);;
+}
+
 
 export async function getGasLimit(contract, method, params = [], value, gasBuffer) {
   const defaultGasBuffer = 200000;

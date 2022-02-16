@@ -15,7 +15,35 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
-import { getLiquidationPrice } from '@/acy-dex-futures/utils';
+
+import { 
+  ACTIONS,
+  ORDERS, 
+  POSITIONS,
+  FUNDING_RATE_PRECISION,
+  BASIS_POINTS_DIVISOR,
+  getLiquidationPrice, 
+  getTokenInfo,
+  getInfoTokens,
+  expandDecimals,
+  getPositionKey,
+  getLeverage,
+  bigNumberify,
+  getDeltaStr
+} from '@/acy-dex-futures/utils';
+
+import {
+
+  nativeTokenAddress,
+  readerAddress,
+  vaultAddress,
+  usdgAddress,
+  tempLibrary,
+  tempChainID,
+  orderBookAddress,
+  routerAddress,
+
+} from '@/acy-dex-futures/samples/constants'
 import Media from 'react-media';
 import { uniqueFun } from '@/utils/utils';
 import {getTransactionsByAccount,appendNewSwapTx, findTokenWithSymbol} from '@/utils/txData';
@@ -33,6 +61,17 @@ import PositionsTable from './components/PositionsTable';
 import ActionHistoryTable from './components/ActionHistoryTable';
 import OrderTable from './components/OrderTable'
 
+/// THIS SECTION IS FOR TESTING SWR AND GMX CONTRACT
+import { fetcher } from '@/acy-dex-futures/utils';
+import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
+import Router from '@/acy-dex-futures/abis/Router.json'
+import VaultV2 from '@/acy-dex-futures/abis/VaultV2.json'
+import Token from '@/acy-dex-futures/abis/Token.json'
+import {ethers} from 'ethers'
+import useSWR from 'swr'
+import sampleGmxTokens from '@/acy-dex-futures/samples/TokenList'
+const { AddressZero } = ethers.constants
+// ----------
 const { AcyTabPane } = AcyTabs;
 function getTIMESTAMP(time) {
     var date = new Date(time);
@@ -97,6 +136,137 @@ const StyledCard = styled(AcyCard)`
   }
     
 `;
+function getFundingFee(data) {
+  let { entryFundingRate, cumulativeFundingRate, size } = data
+  if (entryFundingRate && cumulativeFundingRate) {
+    return size.mul(cumulativeFundingRate.sub(entryFundingRate)).div(FUNDING_RATE_PRECISION)
+  }
+  return
+}
+const getTokenAddress = (token, nativeTokenAddress) => {
+  if (token.address === AddressZero) {
+    return nativeTokenAddress
+  }
+  return token.address
+}
+
+export function getPositionQuery(tokens, nativeTokenAddress) {
+  const collateralTokens = []
+  const indexTokens = []
+  const isLong = []
+
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i]
+    if (token.isStable) { continue }
+    if (token.isWrapped) { continue }
+    collateralTokens.push(getTokenAddress(token, nativeTokenAddress))
+    indexTokens.push(getTokenAddress(token, nativeTokenAddress))
+    isLong.push(true)
+  }
+
+  for (let i = 0; i < tokens.length; i++) {
+    const stableToken = tokens[i]
+    if (!stableToken.isStable) { continue }
+
+    for (let j = 0; j < tokens.length; j++) {
+      const token = tokens[j]
+      if (token.isStable) { continue }
+      if (token.isWrapped) { continue }
+      collateralTokens.push(stableToken.address)
+      indexTokens.push(getTokenAddress(token, nativeTokenAddress))
+      isLong.push(false)
+    }
+  }
+
+  // console.log('printing position query', collateralTokens, indexTokens, isLong);
+
+  return { collateralTokens, indexTokens, isLong }
+}
+
+export function getPositions(chainId, positionQuery, positionData, infoTokens, includeDelta) {
+  // const propsLength = getConstant(chainId, "positionReaderPropsLength")
+  const propsLength = 9;
+  const positions = []
+  const positionsMap = {}
+
+  console.log('getting positions');
+  console.log(infoTokens);
+
+  if (!positionData) {
+    return { positions, positionsMap }
+  }
+  const { collateralTokens, indexTokens, isLong } = positionQuery
+  for (let i = 0; i < collateralTokens.length; i++) {
+    const collateralToken = getTokenInfo(infoTokens, collateralTokens[i], true, nativeTokenAddress);
+    collateralToken.logoURI = findTokenWithSymbol(collateralToken.symbol).logoURI;
+    const indexToken = getTokenInfo(infoTokens, indexTokens[i], true, nativeTokenAddress)
+    indexToken.logoURI = findTokenWithSymbol(collateralToken).logoURI;
+    const key = getPositionKey(collateralTokens[i], indexTokens[i], isLong[i])
+
+    const position = {
+      key,
+      collateralToken,
+      indexToken,
+      isLong: isLong[i],
+      size: positionData[i * propsLength],
+      collateral: positionData[i * propsLength + 1],
+      averagePrice: positionData[i * propsLength + 2],
+      entryFundingRate: positionData[i * propsLength + 3],
+      cumulativeFundingRate: collateralToken.cumulativeFundingRate,
+      hasRealisedProfit: positionData[i * propsLength + 4].eq(1),
+      realisedPnl: positionData[i * propsLength + 5],
+      lastIncreasedTime: positionData[i * propsLength + 6].toNumber(),
+      hasProfit: positionData[i * propsLength + 7].eq(1),
+      delta: positionData[i * propsLength + 8],
+      markPrice: isLong[i] ? indexToken.minPrice : indexToken.maxPrice
+    }
+
+    let fundingFee = getFundingFee(position)
+    position.fundingFee = fundingFee ? fundingFee : bigNumberify(0)
+    position.collateralAfterFee = position.collateral.sub(position.fundingFee)
+
+    position.hasLowCollateral = position.collateralAfterFee.lte(0) || position.size.div(position.collateralAfterFee.abs()).gt(50)
+
+    position.pendingDelta = position.delta
+    if (position.collateral.gt(0)) {
+      if (position.delta.eq(0) && position.averagePrice && position.markPrice) {
+        const priceDelta = position.averagePrice.gt(position.markPrice) ? position.averagePrice.sub(position.markPrice) : position.markPrice.sub(position.averagePrice)
+        position.pendingDelta = position.size.mul(priceDelta).div(position.averagePrice)
+      }
+      position.deltaPercentage = position.pendingDelta.mul(BASIS_POINTS_DIVISOR).div(position.collateral)
+
+      const { deltaStr, deltaPercentageStr } = getDeltaStr({
+        delta: position.pendingDelta,
+        deltaPercentage: position.deltaPercentage,
+        hasProfit: position.hasProfit
+      })
+
+      position.deltaStr = deltaStr
+      position.deltaPercentageStr = deltaPercentageStr
+
+      let netValue = position.hasProfit ? position.collateral.add(position.pendingDelta) : position.collateral.sub(position.pendingDelta)
+      position.netValue = netValue.sub(position.fundingFee)
+    }
+
+    position.leverage = getLeverage({
+      size: position.size,
+      collateral: position.collateral,
+      entryFundingRate: position.entryFundingRate,
+      cumulativeFundingRate: position.cumulativeFundingRate,
+      hasProfit: position.hasProfit,
+      delta: position.delta,
+      includeDelta
+    })
+
+    positionsMap[key] = position
+
+    if (position.size.gt(0)) {
+      positions.push(position)
+    }
+  }
+
+  return { positions, positionsMap }
+}
 
 const Swap = props => {
   const {account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix}, globalSettings, } = useConstantLoader();
@@ -123,12 +293,62 @@ const Swap = props => {
   const [transactionNum, setTransactionNum] = useState(0);
 
   // this are new states for PERPETUAL
-  const [tableContent, setTableContent] = useState("Positions");
+  const [tableContent, setTableContent] = useState(POSITIONS);
   const [positionsData, setPositionsData] = useState([]);
   const [ordersData, setOrdersData] = useState([]);
   const { activate } = useWeb3React();
+//---------- FOR TESTING 
+  const whitelistedTokens = sampleGmxTokens.filter(token=>token.symbol!== "USDG");
+  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
+  const tokens = sampleGmxTokens;
+  const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress) 
+  
+
+  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
+    fetcher: fetcher(tempLibrary, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
+  })
+  vaultTokenInfo;
+  console.log('vault token info',vaultTokenInfo);
+
+  useEffect(()=>{
+
+    console.log('vault token info',vaultTokenInfo);
+  },[vaultTokenInfo]);
+  const { data: positionData, mutate: updatePositionData } = useSWR(account && [tempChainID, readerAddress, "getPositions", vaultAddress, account],{
+    fetcher: fetcher(tempLibrary, Reader, [positionQuery.collateralTokens, positionQuery.indexTokens, positionQuery.isLong]),
+  })
+  const tokenAddresses = tokens.map(token => token.address)
+  const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([tempChainID, readerAddress, "getTokenBalances", account], {
+    fetcher: fetcher(tempLibrary, Reader, [tokenAddresses]),
+  })
+
+  const { data: fundingRateInfo, mutate: updateFundingRateInfo } = useSWR(account && [tempChainID, readerAddress, "getFundingRates"], {
+    fetcher: fetcher(tempLibrary, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
+  })
+
+  const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([`Exchange:totalTokenWeights:${true}`, tempChainID, vaultAddress, "totalTokenWeights"], {
+    fetcher: fetcher(tempLibrary, VaultV2),
+  })
+
+  const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([`Exchange:usdgSupply:${true}`, tempChainID, usdgAddress, "totalSupply"], {
+    fetcher: fetcher(tempLibrary, Token),
+  })
+  
+  const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR(account && [ tempChainID, routerAddress, "approvedPlugins", account, orderBookAddress], {
+    fetcher: fetcher(tempLibrary, Router)
+  });
 
 
+  const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
+  const { positions, positionsMap } = getPositions(tempChainID, positionQuery, positionData, infoTokens, true)
+
+  console.log(positions);
+
+  useEffect(()=>{
+    console.log(positions)
+  },[positions])
+
+//--------- 
   useEffect(() => {
     if (!supportedTokens) return
 
@@ -181,14 +401,20 @@ const Swap = props => {
 
   useEffect(() => {
       library.on('block', (blockNum) => {
-        if(blockNum % globalSettings.onBlockUpdateInterval == 0){
-          console.log('updating list in block ', blockNum);
-        }
+        updateVaultTokenInfo(undefined, true)
+        updateTokenBalances(undefined, true)
+        updatePositionData(undefined, true)
+        updateFundingRateInfo(undefined, true)
+        updateTotalTokenWeights(undefined, true)
+        updateUsdgSupply(undefined, true)
+        updateOrderBookApproved(undefined, true)
       })
       return () => {
         library.removeAllListeners('block');
       }
-  }, [library])
+  }, [library, updateVaultTokenInfo, updateTokenBalances, updatePositionData,
+    updateFundingRateInfo, updateTotalTokenWeights, updateUsdgSupply,
+    updateOrderBookApproved])
 
   const refContainer = useRef();
   refContainer.current = transactionList;
@@ -393,21 +619,21 @@ const Swap = props => {
 
   const RenderTable = () => {
     console.log("renderTable", tableContent)
-    if (tableContent === "Positions") {
+    if (tableContent === POSITIONS) {
       return (
         <PositionsTable
             isMobile={isMobile}
-            dataSource={positionsData}
+            dataSource={positions}
         />
       )
-    } else if (tableContent === "Actions") {
+    } else if (tableContent === ACTIONS) {
       return (
         <ActionHistoryTable
             isMobile={isMobile}
             dataSource={positionsData}
         />
       )
-    } else if (tableContent === "Orders") {
+    } else if (tableContent === ORDERS) {
       return (
         <OrderTable
           isMobile={isMobile}
@@ -538,9 +764,9 @@ const Swap = props => {
         </div>
         <div className={styles.rowFlexContainer}>
               <div className={`${styles.colItem}`}>
-                  <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent("Positions")}}>Positions</a>
-                  <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent("Orders")}}>Orders</a>
-                  <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent("Actions")}}>Actions </a>
+                  <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(POSITIONS)}}>Positions</a>
+                  <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(ORDERS)}}>Orders</a>
+                  <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(ACTIONS)}}>Actions </a>
               </div>
           </div>
         <div className={styles.rowFlexContainer}>

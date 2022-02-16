@@ -15,7 +15,17 @@ export function TranslateToUSD(symbol,amount,priceList){
     return result;
   }
 }
+export const TxFetcher = (account) => (...args) => {
 
+  const [url] = args;
+  if(!account){
+    const allUrl = `${url}range=50`;
+    return fetch(allUrl).then(response => response.json().then(data => data.data))
+  }else{
+    console.log('fetching for an account', account);
+    return fetch(url).then(response => response.json().then(data => data.data.filter(item => item.address == account)));
+  }
+}
 export function totalInUSD (arr,priceList){
   // console.log(priceList);
   let total = 0;

@@ -32,8 +32,10 @@ import StakeHistoryTable from './components/StakeHistoryTable';
 import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
-import { useConstantLoader } from '@/constants';
+import { API_URL, useConstantLoader } from '@/constants';
 import {useConnectWallet} from '@/components/ConnectWallet';
+import useSWR from 'swr';
+import {TxFetcher} from '@/utils/utils';
 
 const { AcyTabPane } = AcyTabs;
 function getTIMESTAMP(time) {
@@ -125,6 +127,27 @@ const Swap = props => {
   const [transactionNum, setTransactionNum] = useState(0);
   const { activate } = useWeb3React();
 
+  // useSWR hook example - needs further implementation in backend
+  const txListUrl = `${apiUrlPrefix}/txlist/all?`
+  const {data : txList , mutate : updateTxList} = useSWR([txListUrl],{
+    fetcher: TxFetcher(account)
+  })
+
+  // useEffect(()=>{
+  //   console.log('updating txlists',txList);
+  // },[txList])
+
+  console.log('printing tx lists',txList)
+  useEffect(() => {
+    library.on('block', (blockNum) => {
+      console.log('updating tx lists');
+      updateTxList([], true);
+    })
+    return () => {
+      library.removeAllListeners('block');
+    }
+  }, [library, updateTxList])
+  //------------------
 
   useEffect(() => {
     if (!supportedTokens) return
@@ -169,6 +192,9 @@ const Swap = props => {
       if(account) setTableLoading(false);
     })
   }, [account]);
+
+
+  
 
   
   // 时间段选择

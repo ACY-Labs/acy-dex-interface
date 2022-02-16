@@ -8,7 +8,7 @@ export default [
         "size": BigNumber.from('0xfbedfa25a3259ab347f7400000'),
         "collateral": BigNumber.from('0x7d682ee2de8e04156db6b80000'),
         "averagePrice": BigNumber.from('0x0842ef2224d9a4f06599ffc0000000'),
-        "entryPrice" : BigNumber.from('0x0842ef2224d9a4f06599ffc0000000'),
+        "entryPrice" : BigNumber.from('0x0842ef2224d9a4f06599ffc0000000'),// average price is entry price, added here to make it easier to understand
         "entryFundingRate": BigNumber.from('0x01fdf9'),
         "cumulativeFundingRate": BigNumber.from('0x0212a8'),
         "hasRealisedProfit": true,
