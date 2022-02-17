@@ -1,5 +1,6 @@
 import { JsonRpcProvider } from "@ethersproject/providers"
 
+//ARBITRUM contract addresses
 
 export const readerAddress = '0xF09eD52638c22cc3f1D7F5583e3699A075e601B2'
 export const vaultAddress = '0x489ee077994B6658eAfA855C308275EAd8097C4A'
