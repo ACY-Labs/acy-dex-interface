@@ -1,5 +1,9 @@
 import {ethers} from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
+export const MARKET = 'Market';
+export const LIMIT = 'Limit';
+export const LONG = 'Long';
+export const SHORT = 'Short';
 export const USD_DECIMALS = 30;
 export const BASIS_POINTS_DIVISOR = 10000;
 export const MARGIN_FEE_BASIS_POINTS = 10;
@@ -490,3 +494,467 @@ export function bigNumberify(n){
     const afterFeeUsd = sizeDelta.mul(BASIS_POINTS_DIVISOR - MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR)
     return sizeDelta.sub(afterFeeUsd)
   }
+// ymj
+  export function getNextFromAmount(
+    chainId,
+    toAmount,
+    fromTokenAddress,
+    toTokenAddress,
+    infoTokens,
+    toTokenPriceUsd,
+    ratio,
+    usdgSupply,
+    totalTokenWeights
+  ) {
+    const defaultValue = { amount: bigNumberify(0) };
+  
+    if (!toAmount || !fromTokenAddress || !toTokenAddress || !infoTokens) {
+      return defaultValue;
+    }
+  
+    if (fromTokenAddress === toTokenAddress) {
+      return { amount: toAmount };
+    }
+  
+    const fromToken = getTokenInfo(infoTokens, fromTokenAddress);
+    const toToken = getTokenInfo(infoTokens, toTokenAddress);
+  
+    if (!fromToken || !fromToken.minPrice || !toToken || !toToken.maxPrice) {
+      return defaultValue;
+    }
+  
+    const adjustDecimals = adjustForDecimalsFactory(
+      fromToken.decimals - toToken.decimals
+    );
+  
+    let fromAmountBasedOnRatio;
+    if (ratio && !ratio.isZero()) {
+      fromAmountBasedOnRatio = toAmount.mul(ratio).div(PRECISION);
+    }
+  
+    if (toTokenAddress === USDG_ADDRESS) {
+      const feeBasisPoints = getSwapFeeBasisPoints(fromToken.isStable);
+  
+      if (ratio && !ratio.isZero()) {
+        return {
+          amount: adjustDecimals(
+            fromAmountBasedOnRatio
+              .mul(BASIS_POINTS_DIVISOR + feeBasisPoints)
+              .div(BASIS_POINTS_DIVISOR)
+          )
+        };
+      }
+      const fromAmount = toAmount.mul(PRECISION).div(fromToken.maxPrice);
+      return {
+        amount: adjustDecimals(
+          fromAmount
+            .mul(BASIS_POINTS_DIVISOR + feeBasisPoints)
+            .div(BASIS_POINTS_DIVISOR)
+        )
+      };
+    }
+  
+    if (fromTokenAddress === USDG_ADDRESS) {
+      const redemptionValue = toToken.redemptionAmount
+        .mul(toToken.maxPrice)
+        .div(expandDecimals(1, toToken.decimals));
+      if (redemptionValue.gt(THRESHOLD_REDEMPTION_VALUE)) {
+        const feeBasisPoints = getSwapFeeBasisPoints(toToken.isStable);
+  
+        const fromAmount =
+          ratio && !ratio.isZero()
+            ? fromAmountBasedOnRatio
+            : toAmount
+              .mul(expandDecimals(1, toToken.decimals))
+              .div(toToken.redemptionAmount);
+  
+        return {
+          amount: adjustDecimals(
+            fromAmount
+              .mul(BASIS_POINTS_DIVISOR + feeBasisPoints)
+              .div(BASIS_POINTS_DIVISOR)
+          )
+        };
+      }
+  
+      const expectedAmount = toAmount.mul(toToken.maxPrice).div(PRECISION);
+  
+      const stableToken = getMostAbundantStableToken(chainId, infoTokens);
+      if (!stableToken || stableToken.availableAmount.lt(expectedAmount)) {
+        const feeBasisPoints = getSwapFeeBasisPoints(toToken.isStable);
+  
+        const fromAmount =
+          ratio && !ratio.isZero()
+            ? fromAmountBasedOnRatio
+            : toAmount
+              .mul(expandDecimals(1, toToken.decimals))
+              .div(toToken.redemptionAmount);
+  
+        return {
+          amount: adjustDecimals(
+            fromAmount
+              .mul(BASIS_POINTS_DIVISOR + feeBasisPoints)
+              .div(BASIS_POINTS_DIVISOR)
+          )
+        };
+      }
+  
+      const feeBasisPoints0 = getSwapFeeBasisPoints(true);
+      const feeBasisPoints1 = getSwapFeeBasisPoints(false);
+  
+      if (ratio && !ratio.isZero()) {
+        // apply fees twice usdg -> token1 -> token2
+        const fromAmount = fromAmountBasedOnRatio
+          .mul(BASIS_POINTS_DIVISOR + feeBasisPoints0 + feeBasisPoints1)
+          .div(BASIS_POINTS_DIVISOR);
+        return {
+          amount: adjustDecimals(fromAmount),
+          path: [USDG_ADDRESS, stableToken.address, toToken.address]
+        };
+      }
+  
+      // get fromAmount for stableToken => toToken
+      let fromAmount = toAmount.mul(toToken.maxPrice).div(stableToken.minPrice);
+  
+      // apply stableToken => toToken fees
+      fromAmount = fromAmount
+        .mul(BASIS_POINTS_DIVISOR + feeBasisPoints1)
+        .div(BASIS_POINTS_DIVISOR);
+  
+      // get fromAmount for USDG => stableToken
+      fromAmount = fromAmount.mul(stableToken.maxPrice).div(PRECISION);
+  
+      // apply USDG => stableToken fees
+      fromAmount = fromAmount
+        .mul(BASIS_POINTS_DIVISOR + feeBasisPoints0)
+        .div(BASIS_POINTS_DIVISOR);
+  
+      return {
+        amount: adjustDecimals(fromAmount),
+        path: [USDG_ADDRESS, stableToken.address, toToken.address]
+      };
+    }
+  
+    const fromAmount =
+      ratio && !ratio.isZero()
+        ? fromAmountBasedOnRatio
+        : toAmount.mul(toToken.maxPrice).div(fromToken.minPrice);
+  
+    let usdgAmount = fromAmount.mul(fromToken.minPrice).div(PRECISION);
+    usdgAmount = adjustForDecimals(usdgAmount, toToken.decimals, USDG_DECIMALS);
+    const swapFeeBasisPoints =
+      fromToken.isStable && toToken.isStable
+        ? STABLE_SWAP_FEE_BASIS_POINTS
+        : SWAP_FEE_BASIS_POINTS;
+    const taxBasisPoints =
+      fromToken.isStable && toToken.isStable
+        ? STABLE_TAX_BASIS_POINTS
+        : TAX_BASIS_POINTS;
+    const feeBasisPoints0 = getFeeBasisPoints(
+      fromToken,
+      usdgAmount,
+      swapFeeBasisPoints,
+      taxBasisPoints,
+      true,
+      usdgSupply,
+      totalTokenWeights
+    );
+    const feeBasisPoints1 = getFeeBasisPoints(
+      toToken,
+      usdgAmount,
+      swapFeeBasisPoints,
+      taxBasisPoints,
+      false,
+      usdgSupply,
+      totalTokenWeights
+    );
+    const feeBasisPoints =
+      feeBasisPoints0 > feeBasisPoints1 ? feeBasisPoints0 : feeBasisPoints1;
+  
+    return {
+      amount: adjustDecimals(
+        fromAmount
+          .mul(BASIS_POINTS_DIVISOR)
+          .div(BASIS_POINTS_DIVISOR - feeBasisPoints)
+      ),
+      feeBasisPoints
+    };
+  }
+  
+  export function getNextToAmount(
+    chainId,
+    fromAmount,
+    fromTokenAddress,
+    toTokenAddress,
+    infoTokens,
+    toTokenPriceUsd,
+    ratio,
+    usdgSupply,
+    totalTokenWeights
+  ) {
+    const defaultValue = { amount: bigNumberify(0) };
+    if (!fromAmount || !fromTokenAddress || !toTokenAddress || !infoTokens) {
+      return defaultValue;
+    }
+  
+    if (fromTokenAddress === toTokenAddress) {
+      return { amount: fromAmount };
+    }
+  
+    const fromToken = getTokenInfo(infoTokens, fromTokenAddress);
+    const toToken = getTokenInfo(infoTokens, toTokenAddress);
+  
+    if (fromToken.isNative && toToken.isWrapped) {
+      console.log("ymj test 1", fromAmount)
+      return { amount: fromAmount };
+    }
+  
+    if (fromToken.isWrapped && toToken.isNative) {
+      console.log("ymj test 2")
+      return { amount: fromAmount };
+    }
+  
+    if (!fromToken || !fromToken.minPrice || !toToken || !toToken.maxPrice) {
+      return defaultValue;
+    }
+  
+    const adjustDecimals = adjustForDecimalsFactory(
+      toToken.decimals - fromToken.decimals
+    );
+  
+    let toAmountBasedOnRatio = bigNumberify(0);
+    if (ratio && !ratio.isZero()) {
+      toAmountBasedOnRatio = fromAmount.mul(PRECISION).div(ratio);
+    }
+  
+    if (toTokenAddress === USDG_ADDRESS) {
+      const feeBasisPoints = getSwapFeeBasisPoints(fromToken.isStable);
+  
+      if (ratio && !ratio.isZero()) {
+        const toAmount = toAmountBasedOnRatio;
+        console.log("ymj test")
+        return {
+          amount: adjustDecimals(
+            toAmount
+              .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+              .div(BASIS_POINTS_DIVISOR)
+          ),
+          feeBasisPoints
+        };
+      }
+  
+      const toAmount = fromAmount.mul(fromToken.minPrice).div(PRECISION);
+      console.log("ymj test", {
+        amount: adjustDecimals(
+          toAmount
+            .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+            .div(BASIS_POINTS_DIVISOR)
+        ),
+        feeBasisPoints
+      });
+      return {
+        amount: adjustDecimals(
+          toAmount
+            .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+            .div(BASIS_POINTS_DIVISOR)
+        ),
+        feeBasisPoints
+      };
+    }
+  
+    if (fromTokenAddress === USDG_ADDRESS) {
+      const redemptionValue = toToken.redemptionAmount
+        .mul(toTokenPriceUsd || toToken.maxPrice)
+        .div(expandDecimals(1, toToken.decimals));
+  
+      if (redemptionValue.gt(THRESHOLD_REDEMPTION_VALUE)) {
+        const feeBasisPoints = getSwapFeeBasisPoints(toToken.isStable);
+  
+        const toAmount =
+          ratio && !ratio.isZero()
+            ? toAmountBasedOnRatio
+            : fromAmount
+              .mul(toToken.redemptionAmount)
+              .div(expandDecimals(1, toToken.decimals));
+  
+        return {
+          amount: adjustDecimals(
+            toAmount
+              .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+              .div(BASIS_POINTS_DIVISOR)
+          ),
+          feeBasisPoints
+        };
+      }
+  
+      const expectedAmount = fromAmount;
+  
+      const stableToken = getMostAbundantStableToken(chainId, infoTokens);
+      if (!stableToken || stableToken.availableAmount.lt(expectedAmount)) {
+        const toAmount =
+          ratio && !ratio.isZero()
+            ? toAmountBasedOnRatio
+            : fromAmount
+              .mul(toToken.redemptionAmount)
+              .div(expandDecimals(1, toToken.decimals));
+        const feeBasisPoints = getSwapFeeBasisPoints(toToken.isStable);
+        return {
+          amount: adjustDecimals(
+            toAmount
+              .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+              .div(BASIS_POINTS_DIVISOR)
+          ),
+          feeBasisPoints
+        };
+      }
+  
+      const feeBasisPoints0 = getSwapFeeBasisPoints(true);
+      const feeBasisPoints1 = getSwapFeeBasisPoints(false);
+  
+      if (ratio && !ratio.isZero()) {
+        const toAmount = toAmountBasedOnRatio
+          .mul(BASIS_POINTS_DIVISOR - feeBasisPoints0 - feeBasisPoints1)
+          .div(BASIS_POINTS_DIVISOR);
+        return {
+          amount: adjustDecimals(toAmount),
+          path: [USDG_ADDRESS, stableToken.address, toToken.address],
+          feeBasisPoints: feeBasisPoints0 + feeBasisPoints1
+        };
+      }
+  
+      // get toAmount for USDG => stableToken
+      let toAmount = fromAmount.mul(PRECISION).div(stableToken.maxPrice);
+      // apply USDG => stableToken fees
+      toAmount = toAmount
+        .mul(BASIS_POINTS_DIVISOR - feeBasisPoints0)
+        .div(BASIS_POINTS_DIVISOR);
+  
+      // get toAmount for stableToken => toToken
+      toAmount = toAmount
+        .mul(stableToken.minPrice)
+        .div(toTokenPriceUsd || toToken.maxPrice);
+      // apply stableToken => toToken fees
+      toAmount = toAmount
+        .mul(BASIS_POINTS_DIVISOR - feeBasisPoints1)
+        .div(BASIS_POINTS_DIVISOR);
+  
+      return {
+        amount: adjustDecimals(toAmount),
+        path: [USDG_ADDRESS, stableToken.address, toToken.address],
+        feeBasisPoints: feeBasisPoints0 + feeBasisPoints1
+      };
+    }
+  
+    const toAmount =
+      ratio && !ratio.isZero()
+        ? toAmountBasedOnRatio
+        : fromAmount
+          .mul(fromToken.minPrice)
+          .div(toTokenPriceUsd || toToken.maxPrice);
+  
+    let usdgAmount = fromAmount.mul(fromToken.minPrice).div(PRECISION);
+    usdgAmount = adjustForDecimals(usdgAmount, fromToken.decimals, USDG_DECIMALS);
+    const swapFeeBasisPoints =
+      fromToken.isStable && toToken.isStable
+        ? STABLE_SWAP_FEE_BASIS_POINTS
+        : SWAP_FEE_BASIS_POINTS;
+    const taxBasisPoints =
+      fromToken.isStable && toToken.isStable
+        ? STABLE_TAX_BASIS_POINTS
+        : TAX_BASIS_POINTS;
+    const feeBasisPoints0 = getFeeBasisPoints(
+      fromToken,
+      usdgAmount,
+      swapFeeBasisPoints,
+      taxBasisPoints,
+      true,
+      usdgSupply,
+      totalTokenWeights
+    );
+    const feeBasisPoints1 = getFeeBasisPoints(
+      toToken,
+      usdgAmount,
+      swapFeeBasisPoints,
+      taxBasisPoints,
+      false,
+      usdgSupply,
+      totalTokenWeights
+    );
+    const feeBasisPoints =
+      feeBasisPoints0 > feeBasisPoints1 ? feeBasisPoints0 : feeBasisPoints1;
+  
+    return {
+      amount: adjustDecimals(
+        toAmount
+          .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+          .div(BASIS_POINTS_DIVISOR)
+      ),
+      feeBasisPoints
+    };
+  }
+  export function getUsd(
+    amount,
+    tokenAddress,
+    max,
+    infoTokens,
+    orderOption,
+    triggerPriceUsd
+  ) {
+    if (!amount) {
+      return;
+    }
+    if (tokenAddress === USDG_ADDRESS) {
+      return amount.mul(PRECISION).div(expandDecimals(1, 18));
+    }
+    const info = getTokenInfo(infoTokens, tokenAddress);
+    const price = getTriggerPrice(
+      tokenAddress,
+      max,
+      info,
+      orderOption,
+      triggerPriceUsd
+    );
+    if (!price) {
+      return;
+    }
+
+    return amount.mul(price).div(expandDecimals(1, info.decimals));
+  }
+  function getTriggerPrice(
+    tokenAddress,
+    max,
+    info,
+    orderOption,
+    triggerPriceUsd
+  ) {
+    // Limit/stop orders are executed with price specified by user
+    if (orderOption && orderOption !== MARKET && triggerPriceUsd) {
+      return triggerPriceUsd;
+    }
+  
+    // Market orders are executed with current market price
+    if (!info) {
+      return;
+    }
+    if (max && !info.maxPrice) {
+      return;
+    }
+    if (!max && !info.minPrice) {
+      return;
+    }
+    return max ? info.maxPrice : info.minPrice;
+  }
+  export const formatAmountFree = (amount, tokenDecimals, displayDecimals) => {
+    if (!amount) {
+      return "...";
+    }
+    let amountStr = ethers.utils.formatUnits(amount, tokenDecimals);
+    amountStr = limitDecimals(amountStr, displayDecimals);
+    return trimZeroDecimals(amountStr);
+  };
+  export const trimZeroDecimals = amount => {
+    if (parseFloat(amount) === parseInt(amount)) {
+      return parseInt(amount).toString();
+    }
+    return amount;
+  };
