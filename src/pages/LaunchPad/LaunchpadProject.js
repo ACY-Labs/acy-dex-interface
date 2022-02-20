@@ -190,6 +190,19 @@ const CardArea = ({
 };
 
 const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, comparevestDate }) => {
+
+  const now_moment_utc = moment.utc();
+  const end_moment_utc = moment.utc(receivedData.saleEnd);
+  const start_moment_utc = moment.utc(receivedData.saleStart);
+  let procedure_status;
+
+  if(end_moment_utc < now_moment_utc) {
+    procedure_status = 'end';
+  } else {
+    procedure_status = 'open';
+  }
+  console.log('procedure', procedure_status);
+
   const Procedure = () => {
     return (
       <div className="cardContent">
@@ -244,6 +257,7 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
       tokenNum = alreadySale
       mainCoinNum = (receivedData.totalRaise * alreadySale / totalSale).toFixed(0)
     }
+
     const progressStyle = {
       width: { salePercentage } + '%',
     };
@@ -280,7 +294,6 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
         >
           <div className="progressHeader">
             <p>Sale ProgressBar<span><Image src={linkBIcon} /></span>
-
             </p>
             <p style={{ color: '#eb5c1f' }}>{salePercentage}%</p>
           </div>
@@ -315,7 +328,7 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
       }}
     >
       <Procedure />
-      {poolBaseData &&
+      {poolBaseData && procedure_status === 'open' &&
         <ProgressBar
           alreadySale={poolBaseData[1]}
           totalSale={poolBaseData[0]}
@@ -590,25 +603,28 @@ const Allocation = ({
   useEffect(async () => {
     if (!account || !receivedData.projectToken) return;
     // get allocation status from backend at begining
-    getAllocationInfo(API_URL(), account, receivedData.projectToken)
+    await getAllocationInfo(API_URL(), account, receivedData.projectToken)
       .then(res => {
         if (res && res.allocationAmount) {
           setAllocationInfo(res);
           updateInnerValues(2, res);
           updateCoverStates(2);
           setSalesValue(res.allocationLeft);
-          console.log('allocation info', receivedData.projectToken, res);
         }
+        console.log('allocation info', receivedData.projectToken, res);
       })
       .catch(e => {
-        console.log('Error: ', e);
+        console.log('Get allocation error ', e);
         throw e;
       });
   }, [account, receivedData]);
 
   const onChangeSaleValue = (e) => {
     const value = e.target.value;
-    if (!allocationInfo) setSalesValue(0);
+    if (!allocationInfo.allocationAmount) {
+      setSalesValue(0);
+      return;
+    }
     const allocationLeft = allocationInfo.allocationLeft;
 
     const minInvest = receivedData.minInvest ? receivedData.minInvest : 100
@@ -706,7 +722,7 @@ const Allocation = ({
     // TODO: test if amount is valid!
     console.log('investing', amount);
     if (poolStatus !== 2) {// cannot buy
-      console.log('poolStatus', poolStatus);
+      console.log('poolStatus invalid', poolStatus);
     } else {
       if (!account) {
         return;
@@ -985,8 +1001,8 @@ const LaunchpadProject = () => {
         const accnt = "0x0000000000000000000000000000000000000000";
         await getPoolData(provider, accnt);
       };
-    } catch(error) {
-      console.log('get pool data error', error);
+    } catch (error) {
+      console.log('Invalid Pool ID.')
     }
     
   }
@@ -1014,7 +1030,7 @@ const LaunchpadProject = () => {
           res['regEnd'] = res.scheduleInfo.regEnd;
           res['saleStart'] = res.scheduleInfo.saleStart;
           res['saleEnd'] = res.scheduleInfo.saleEnd;
-
+          
           if (res.scheduleInfo.distributionData) {
             const distributionData = res.scheduleInfo.distributionData;
             const distributionRes = [];
