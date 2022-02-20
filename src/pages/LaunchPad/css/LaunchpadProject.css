@@ -17,6 +17,7 @@
 .flexContainer {
   display: flex;
   margin-top: 2.5rem;
+  text-align: center;
 }
 
 .gridContainer {
@@ -73,7 +74,7 @@
 }
 
 .tokenLogo {
-  display: block;
+  display: inline-block;
   width: 84px;
   height: 84px;
   border-radius: 2rem;
@@ -81,7 +82,7 @@
 }
 
 .tokenInfo {
-  margin-left: 1.25rem;
+  /* margin-left: 1.25rem; */
   overflow-wrap: break-word;
 }
 
@@ -109,6 +110,7 @@
   font-size: 18px;
   color: #eb5c20;
   letter-spacing: 1px;
+  text-align: center;
 }
 
 .tokenLabelBar {
@@ -508,7 +510,7 @@
 
 .vesting-schedule-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   width: 100%;
   align-items: center;
   flex-wrap: nowrap;
@@ -535,12 +537,6 @@
   transition: opacity 2s linear;
 }
 
-.vesting-open-container{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .vesting-schedule-open {
   display: block;
   width: 270px;
@@ -554,6 +550,7 @@
 .sale-vesting-title {
   font-size: 16px;
   width: 100px;
+  text-align: center;
   margin-right: 10px;
 }
 
@@ -569,6 +566,7 @@
   display: block;
   width: 100%;
   margin: 0 2em 0 2.4em;
+  margin-bottom: 14px;
 }
 
 .sales-input-max {
@@ -617,7 +615,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 2rem;
+  margin-right: 2.5rem;
 }
 
 .token-image{
@@ -634,6 +632,8 @@
   width: 20%;
   height: 100%;
   align-items: center;
+  margin-right: 20px;
+  justify-content: end;
 }
 
 
@@ -776,9 +776,15 @@
   cursor: pointer;
 }
 
+.socialmedia-link-container {
+  display: flex; 
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 /* Social Medias */
 .social-container {
-  width: 55%;
+  width: 40%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -794,6 +800,7 @@
   height: 1.2rem;
   cursor: pointer;
   padding: 0 5px;
+  margin: 5px
 }
 
 .antd-icon-container {
@@ -871,6 +878,7 @@
 
   .flexContainer {
     padding-left: 1em;
+    display: block;
   }
 
   .mainContainer {
@@ -879,6 +887,7 @@
   }
 
   .tokenLogo {
+    display: inline-block;
     width: 42px;
     height: 42px;
   }
@@ -902,25 +911,28 @@
   }
 
   .sales-input-container {
-    margin: 0;
+    margin: 0 0 0 0;
+    margin-bottom: 14px;
   }
 
   .allocation-title {
     font-size: 20px;
+    margin-right: 0px;
   }
 
   .sale-vesting-title {
-    font-size: 16px;
+    font-size: 20px;
     width: 100px;
-    margin-right: 16px;
+    margin-right: 0px;
+    margin-bottom: 14px;
   }
 
-  .sales-container .sales-submit {
+  /* .sales-container .sales-submit {
     width: 40px;
     font-size: 10px;
     margin-left: 16px;
     border-radius: 10px;
-  }
+  } */
   .allocation-cards {
     margin: 0px;
   }
@@ -961,7 +973,21 @@
   .allocation-title-container {
     flex-direction: column;
     column-gap: 10px;
-    /* margin-bottom: 40px; */
+    margin-bottom: 0px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .sales-container {
+    flex-direction: column;
+    column-gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .vesting-container{
+    flex-direction: column;
+    column-gap: 10px;
     justify-content: center;
     flex-wrap: wrap;
   }
@@ -990,6 +1016,35 @@
     padding: 2px 10px;
     font-size: 12px;
   }
+
+  .text-line-container {
+    margin: 0px 0px 0px 0px;
+  }
+
+  .vesting-procedure-container {
+    width: auto;
+  }
+
+  .vesting-percentage-claim-container {
+    flex-direction: column;
+  }
+
+  .vesting-percentage-container {
+    width: 70px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .socialmedia-link-container {
+    display: block; 
+    text-align: center;
+  }
+
+  .social-container {
+    width: auto;
+    justify-content: space-evenly;
+    margin-top: 10px;
+  }
 }
 @media (min-width: 427px) and (max-width: 768px) {
   :root {
@@ -1006,6 +1061,7 @@
 
   .flexContainer {
     padding-left: 1em;
+    display: block;
   }
 
   .mainContainer {
@@ -1015,6 +1071,7 @@
 
   .allocation-title {
     font-size: 20px;
+    margin-right: 0px;
   }
 
   .allocation-cards {
@@ -1057,10 +1114,70 @@
   .allocation-title-container {
     flex-direction: column;
     column-gap: 10px;
+    margin-bottom: 0px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .sales-container {
+    flex-direction: column;
+    column-gap: 10px;
     margin-bottom: 40px;
     justify-content: center;
     flex-wrap: wrap;
   }
+
+  .vesting-container {
+    flex-direction: column;
+    column-gap: 10px;
+    margin-bottom: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .sale-vesting-title {
+    font-size: 20px;
+    width: 100px;
+    margin-right: 0px;
+    margin-bottom: 14px;
+  }
+
+  .text-line-container {
+    margin: 0px 0px 0px 0px;
+  }
+
+  .sales-input-container {
+    margin: 0 0 0 0;
+    margin-bottom: 14px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .vesting-procedure-container {
+    width: auto;
+  }
+
+  .vesting-percentage-claim-container {
+    flex-direction: column;
+  }
+
+  .vesting-percentage-container {
+    width: 70px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .socialmedia-link-container {
+    display: block; 
+    text-align: center;
+  }
+
+  .social-container {
+    width: auto;
+    justify-content: space-evenly;
+    margin-top: 10px;
+  }
+
 }
 /* Tablets */
 @media (min-width: 769px) and (max-width: 1060px) {
