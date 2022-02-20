@@ -682,6 +682,16 @@ const Allocation = ({
   }
 
   const vestingClaimClicked = async () => {
+    // can't claim before vesting schedule
+    console.log('Distribution Date', poolDistributionDate);
+
+    let startDistributionTime = poolDistributionDate[0];
+    let nowTime = moment.utc().unix();
+    console.log(nowTime, startDistributionTime);
+    if (nowTime < startDistributionTime) {
+      return ;
+    }
+
     const PoolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, library, account);
 
     const result = await PoolContract.WithdrawERC20ToInvestor(poolID)
@@ -913,6 +923,7 @@ const LaunchpadProject = () => {
 
     console.log('Base Data', baseData);
     console.log('Pool Status', status);
+    console.log('Distribution Data', distributionData);
 
     // getpoolbasedata 数据解析
     const token2Address = baseData[1]
@@ -966,13 +977,18 @@ const LaunchpadProject = () => {
     const start_moment_utc = moment.utc(receivedData.saleStart);
     if (now_moment_utc > end_moment_utc || now_moment_utc < start_moment_utc) return;
 
-    if (account && library) {
-      await getPoolData(library, account);
-    } else {
-      const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
-      const accnt = "0x0000000000000000000000000000000000000000";
-      await getPoolData(provider, accnt);
-    };
+    try {
+      if (account && library) {
+        await getPoolData(library, account);
+      } else {
+        const provider = new JsonRpcProvider(LAUNCH_RPC_URL(), CHAINID());  // different RPC for mainnet
+        const accnt = "0x0000000000000000000000000000000000000000";
+        await getPoolData(provider, accnt);
+      };
+    } catch(error) {
+      console.log('get pool data error', error);
+    }
+    
   }
 
   // HOOKS
