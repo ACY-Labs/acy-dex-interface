@@ -389,7 +389,7 @@ const ProjectDescription = ({ receivedData }) => {
             {
               receivedData.social && receivedData.social[0] &&
               <div className="socialmedia-link-container">
-                <a href={receivedData.social[0].Website} target="_blank" rel="noreferrer" style={{ width: '30%', alignSelf: 'center' }}>{receivedData.social[0].Website}</a>
+                <a href={receivedData.social[0].Website} target="_blank" rel="noreferrer" style={{ width: '30%', alignSelf: 'center', fontSize: '16px' }}>{receivedData.social[0].Website}</a>
                 <div id='social container' className='social-container'>
                   {Object.entries(receivedData.social[0]).map((item) => {
                     if (item[1] !== null) {
@@ -855,19 +855,21 @@ const Allocation = ({
         <div className="vesting-open-container">
           <div className="vesting-container">
             <p className="sale-vesting-title vesting">Vesting</p>
-            <div className="text-line-container">
-              <p>Unlock {poolDistributionStage[0]}% at TGE, vesting in {poolDistributionStage.length} stages: </p>
-              <span className="vesting-line" />
+            
+            <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}>
+              <div className="text-line-container">
+                <p>Unlock {poolDistributionStage[0]}% at TGE, vesting in {poolDistributionStage.length} stages: </p>
+                <span className="vesting-line" />
 
+              </div>
+              <div className="arrow-down-container">
+                <CaretDownOutlined
+                  className={
+                    isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
+                  }
+                />
+              </div>
             </div>
-            <div className="arrow-down-container">
-              <CaretDownOutlined
-                className={
-                  isClickedVesting ? 'arrow-down-active arrow-down' : 'arrow-down-inactive arrow-down'
-                }
-              />
-            </div>
-            <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}></div>
           </div>
 
           <div className={isClickedVesting ? 'vesting-schedule vesting-schedule-active' : 'vesting-schedule'}>

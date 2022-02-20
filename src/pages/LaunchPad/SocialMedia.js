@@ -8,7 +8,7 @@ const SocialMedia = ({ url, link, socialText }) => {
   };
 
   return (
-    <div style={{display:'flex', justifyContent:'center', flexDirection:'column'}}>
+    <div className="social-media-container">
       <img
         className="icon-container"
         alt=""

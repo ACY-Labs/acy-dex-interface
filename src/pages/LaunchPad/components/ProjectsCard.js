@@ -46,12 +46,12 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
             }
           </div>
 
-          <div style={{ display: 'inherit', fontSize: '10px' }}>
+          <div className="timebar-container">
             {calcStatus() === 'upcoming' ?
               (
                 <>
                   <span style={{ marginRight: '2px' }}>Start: </span>
-                  <p style={{ color: '#fff' }}>
+                  <p style={{ color: '#eb5c20' }}>
                     <FormatedTime utc_string={start} />
                   </p>
                 </>
@@ -60,7 +60,7 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
               (
                 <>
                   <span style={{ marginRight: '2px' }}>End:</span>
-                  <p style={{ color: '#fff' }}>
+                  <p style={{ color: '#eb5c20' }}>
                     <FormatedTime utc_string={ddl} />
                   </p>
                 </>
