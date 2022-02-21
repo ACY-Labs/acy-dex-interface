@@ -302,7 +302,6 @@ const Swap = props => {
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(tempLibrary, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
   })
-  
   const { data: positionData, mutate: updatePositionData } = useSWR(account && [tempChainID, readerAddress, "getPositions", vaultAddress, account],{
     fetcher: fetcher(tempLibrary, Reader, [positionQuery.collateralTokens, positionQuery.indexTokens, positionQuery.isLong]),
   })
@@ -405,11 +404,6 @@ const Swap = props => {
     if(!account){
       connectWalletByLocalStorage()
      }
-    // getTransactionsByAccount(account,library,'SWAP').then(data =>{
-    //   console.log("found this tx dataa::::::", data);
-    //   setTransactionList(data);
-    //   if(account) setTableLoading(false);
-    // })
   }, [account]);
 
   
