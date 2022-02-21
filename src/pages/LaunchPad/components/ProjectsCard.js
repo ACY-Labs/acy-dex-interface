@@ -27,6 +27,34 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
     else if (now_moment_utc > ddl_moment_utc) return 'ended';
   }
 
+  const TimeBar = () => {
+    let status = calcStatus();
+    if (status === 'upcoming') {
+      return (
+        <>
+          <span style={{ marginRight: '5px' }}>Start: </span>
+          <FormatedTime utc_string={start} style={{ color: "white"}}/>
+        </>
+      )
+    } else if (status === 'ongoing') {
+      return (
+        <>
+          <span style={{ marginRight: '5px', color: '#eb5c20' }}>End: </span>
+          <FormatedTime utc_string={ddl} style={{ color: '#eb5c20' }}/>
+        </>
+      )
+    } else if (status === 'ended') {
+      return (
+        <>
+          <span style={{ marginRight: '5px' }}>End: </span>
+          <FormatedTime utc_string={ddl} style={{ color: "white"}}/>
+        </>
+      )
+    }
+    return (<></>)
+  }
+
+
   return (
     <div className="projects-card projects-container" onClick={() => onOpenProjectDetail(projectID)}>
       <div className="logo-countdown-container">
@@ -47,25 +75,7 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
           </div>
 
           <div className="timebar-container">
-            {calcStatus() === 'upcoming' ?
-              (
-                <>
-                  <span style={{ marginRight: '2px' }}>Start: </span>
-                  <p style={{ color: '#eb5c20' }}>
-                    <FormatedTime utc_string={start} />
-                  </p>
-                </>
-              )
-              :
-              (
-                <>
-                  <span style={{ marginRight: '2px' }}>End:</span>
-                  <p style={{ color: '#eb5c20' }}>
-                    <FormatedTime utc_string={ddl} />
-                  </p>
-                </>
-              )
-            }
+            <TimeBar />
           </div>
         </div>
       </div>
@@ -79,8 +89,8 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
             padding: '0 20px 0 10px',
           }}
         >
-          <span style={{ color: '#fff', marginLeft: '1rem' }}>Raise</span>
-          <span style={{ color: '#fff', marginRight: '0.5rem' }}>{raise}</span>
+          <span style={{ color: '#fff', marginLeft: '18px' }}>Raise</span>
+          <span style={{ color: '#fff'}}>{raise}</span>
         </div>
         <div
           style={{
@@ -90,8 +100,8 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
             padding: '0 20px 0 10px',
           }}
         >
-          <span style={{ color: '#fff', marginLeft: '1rem' }}>Sales</span>
-          <span style={{ color: '#fff', marginRight: '0.5rem' }}>{sales}</span>
+          <span style={{ color: '#fff', marginLeft: '18px' }}>Sales</span>
+          <span style={{ color: '#fff'}}>{sales}</span>
         </div>
         <div
           style={{
@@ -101,8 +111,8 @@ const ProjectsCard = ({ projectID, start, ddl, raise, sales, rate, title, isOngo
             padding: '0 20px 0 10px',
           }}
         >
-          <span style={{ color: '#fff', marginLeft: '1rem' }}>Rate</span>
-          <span style={{ color: '#fff', marginRight: '0.5rem' }}>{rate}</span>
+          <span style={{ color: '#fff', marginLeft: '18px' }}>Rate</span>
+          <span style={{ color: '#fff'}}>{rate}</span>
         </div>
       </div>
     </div>

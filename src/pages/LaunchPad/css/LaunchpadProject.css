@@ -82,7 +82,6 @@
 }
 
 .tokenInfo {
-  /* margin-left: 1.25rem; */
   overflow-wrap: break-word;
 }
 
@@ -92,7 +91,7 @@
   line-height: 1.2;
   font-family: 'Karla', sans-serif;
   font-weight: 500;
-  margin-left: 0.2rem;
+  margin-left: 1.5rem;
   cursor: pointer;
 }
 
@@ -902,6 +901,7 @@
   .tokenTitle {
     font-size: 1.5rem;
     cursor: pointer;
+    margin-left: 1rem;
   }
 
   .tokenLabel {
