@@ -719,39 +719,33 @@ const Allocation = ({
   const investClicked = async (poolAddress, poolId, amount) => {
     const PoolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, library, account);
 
-    // TODO: test if amount is valid!
-    console.log('investing', amount);
-    if (poolStatus !== 2) {// cannot buy
-      console.log('poolStatus invalid', poolStatus);
-    } else {
-      if (!account) {
-        return;
-      }
-      //TO-DO: Request UseAllocation API, process only when UseAllocation returns true
-      const status = await (async () => {
-        // NOTE (gary 2022.1.6): use toString method
-        const approveAmount = (amount * Math.pow(10, poolMainCoinDecimals)).toString()
-        const state = await approveNew(poolMainCoinAddress, approveAmount, poolAddress, library, account);
-        const result = await PoolContract.InvestERC20(poolId, approveAmount)
-          .then((res) => {
-            useAllocation(API_URL(), account, receivedData.projectToken, amount)
-              .then(res => {
-                if (res) {
-                  console.log('use alloc', res);
-                  setAllocationInfo(res);
-                }
-              })
-              .catch(e => console.log(e));
-          })
-          .catch(e => {
-            console.log(e)
-            return new CustomError('CustomError while buying token');
-          });
-        return result;
-      })();
-
-      console.log("buy contract", status)
+    if (!account) {
+      return;
     }
+    //TO-DO: Request UseAllocation API, process only when UseAllocation returns true
+    const status = await (async () => {
+      // NOTE (gary 2022.1.6): use toString method
+      const approveAmount = BigInt(amount) * BigInt(Math.pow(10, poolMainCoinDecimals))
+      const state = await approveNew(poolMainCoinAddress, approveAmount, poolAddress, library, account);
+      const result = await PoolContract.InvestERC20(poolId, approveAmount)
+        .then((res) => {
+          useAllocation(API_URL(), account, receivedData.projectToken, amount)
+            .then(res => {
+              if (res) {
+                console.log('use alloc', res);
+                setAllocationInfo(res);
+              }
+            })
+            .catch(e => console.log(e));
+        })
+        .catch(e => {
+          console.log(e)
+          return new CustomError('CustomError while buying token');
+        });
+      return result;
+    })();
+
+    console.log("buy contract", status)
   }
 
   const calcAllocBonus = (allocationBonus) => {
