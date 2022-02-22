@@ -5,19 +5,54 @@ import { Button } from 'antd';
 import tick from '@/assets/icon-tick-white.svg';
 import FormatedTime from '@/components/FormatedTime';
 
-const VestingSchedule = ({ vestingDate, stageData, vestingClick }) => {
-  // if (!vestingDate) return;
+const VestingSchedule = ({ vestingDate, stageData, vestingClick, receivedData }) => {
   const len = vestingDate.length;
   const curDate = new Date();
-
   const vestingData = [];
+
+  console.log('receivedData', receivedData);
+
+  const ClaimButton = () => {
+    let claimType = receivedData.distributionType;
+    console.log('claimType', receivedData, claimType);
+    if (claimType === "contract") {
+      return (
+        <div style={{ width: 80 }}>
+          <Button
+            className="claim-btn"
+            onClick={vestingClick}
+          >
+            Claim
+          </Button>
+        </div>
+      )
+    } else if (claimType === "project") {
+      return (
+        <div>
+          <Button
+            className="claim-btn"
+          >
+            Distributed by Project
+          </Button>
+        </div>
+      )
+    }
+    return (
+      <div style={{ width: 80 }}>
+        <Button
+          className="claim-btn"
+          onClick={vestingClick}
+        >
+          Claim
+        </Button>
+      </div>
+    );
+  }
 
   // setState
   return (
     <div className='vesting-schedule-container'>
       <div style={{ width: 100 }}></div>
-
-
       <div className='vesting-procedure-container'>
         {
           [...Array(len)].map((_1, index) => {
@@ -37,7 +72,7 @@ const VestingSchedule = ({ vestingDate, stageData, vestingClick }) => {
                     </div>
                     <div className="vesting-text-container">
                       <p className="vesting-text">
-                        <FormatedTime utc_second={vestingDate[index]}/>
+                        <FormatedTime utc_second={vestingDate[index]} />
                       </p>
                     </div>
                   </div>
@@ -48,15 +83,7 @@ const VestingSchedule = ({ vestingDate, stageData, vestingClick }) => {
           })
         }
       </div>
-
-      <div style={{width: 80, justifyContent: 'right'}}>
-        <Button
-          className="claim-btn"
-          onClick={vestingClick}
-        >
-          Claim
-        </Button>
-      </div>
+      <ClaimButton />
     </div>
   );
 };

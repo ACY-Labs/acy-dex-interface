@@ -611,7 +611,7 @@ const Allocation = ({
           updateCoverStates(2);
           setSalesValue(res.allocationLeft);
         }
-        console.log('allocation info', receivedData.projectToken, res);
+        console.log('allocation info: ', receivedData.projectToken, res);
       })
       .catch(e => {
         console.log('Get allocation error ', e);
@@ -871,6 +871,7 @@ const Allocation = ({
               vestingDate={poolDistributionDate}
               stageData={poolDistributionStage}
               vestingClick={vestingClaimClicked}
+              receivedData={receivedData}
             />
           </div>
         </div>
@@ -1039,7 +1040,7 @@ const LaunchpadProject = () => {
           res['tokenPrice'] = res.saleInfo.tokenPrice;
           res['totalSale'] = res.saleInfo.totalSale;
           res['totalRaise'] = res.saleInfo.totalRaise;
-          res['projectUrl'] = res.saleInfo.projectUrl;
+          res['distributionType'] = res.basicInfo.distributionType || "contract";
           res['projectName'] = res.basicInfo.projectName;
           res['projectToken'] = res.basicInfo.projectToken;
           res['mainCoin'] = res.basicInfo.mainCoin;
