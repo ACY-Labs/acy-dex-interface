@@ -99,10 +99,26 @@ export async function swapGetEstimated(
 
     if (!account) return new CustomError('Connect to wallet');
     else if (!inputToken0.symbol || !inputToken1.symbol) return new CustomError('please choose tokens');
-    if (exactIn && parseFloat(inToken0Amount) == '0') return new CustomError('Enter an amount');
-    else if (!exactIn && parseFloat(inToken1Amount) == '0') return new CustomError('Enter an amount');
-    if (exactIn && inToken0Amount == '') return new CustomError('Enter an amount');
-    else if (!exactIn && inToken1Amount == '') return new CustomError('Enter an amount');
+    if (exactIn && parseFloat(inToken0Amount) == '0') {
+      setToken1Amount('');
+      setBonus1(null);
+      return new CustomError('Enter an amount');
+    }
+    else if (!exactIn && parseFloat(inToken1Amount) == '0') {
+      setToken0Amount('');
+      setBonus0(null);
+      return new CustomError('Enter an amount');
+    }
+    if (exactIn && inToken0Amount == '') {
+      setToken1Amount('');
+      setBonus1(null);
+      return new CustomError('Enter an amount');
+    }
+    else if (!exactIn && inToken1Amount == '') {
+      setToken0Amount('');
+      setBonus0(null);
+      return new CustomError('Enter an amount');
+    }
 
     console.log(`token0Amount: ${inToken0Amount}`);
     console.log(`token1Amount: ${inToken1Amount}`);
@@ -351,13 +367,14 @@ export async function swapGetEstimated(
         console.log("TEST estimatedOutputAmount out");
         hasArb = true;
         midTokenAddress = estimatedOutputAmount[0];
-        ammOutput = estimatedOutputAmount.AMMOutput;
-        allPathAmountOut = estimatedOutputAmount.allPathAmountOut;
+        ammOutput = parseFloat(formatUnits(estimatedOutputAmount.AMMOutput, inToken1Decimal));
+        allPathAmountOut = parseFloat(formatUnits(estimatedOutputAmount.allPathAmountOut, inToken1Decimal));
         console.log("TEST2 estimatedOutputAmount:", estimatedOutputAmount);
         if (allPathAmountOut > ammOutput) {
-          console.log("TEST2 TIGGER WHEN USE BY ARB");
+          console.log("use arb in exactIn: FA / AMM", allPathAmountOut, ammOutput);
           isUseArb = true;
         } else {
+          console.log("NOT use arb in exactIn: FA / AMM", allPathAmountOut, ammOutput);
           isUseArb = false;
         }
       } else {
@@ -374,13 +391,14 @@ export async function swapGetEstimated(
         console.log("TEST estimatedInputAmount out");
         hasArb = true;
         midTokenAddress = estimatedInputAmount[0];
-        ammOutput = estimatedInputAmount.AMMOutput;
-        allPathAmountOut = estimatedInputAmount.allPathAmountOut;
+        ammOutput = parseFloat(formatUnits(estimatedInputAmount.AMMOutput, inToken0Decimal));
+        allPathAmountOut = parseFloat(formatUnits(estimatedInputAmount.allPathAmountOut, inToken0Decimal));
         console.log("TEST2 estimatedInputAmount:", estimatedInputAmount);
         if (allPathAmountOut < ammOutput) {
-          console.log("TEST2 TIGGER WHEN USE BY ARB");
+          console.log("use arb in exactOut: FA / AMM", allPathAmountOut, ammOutput);
           isUseArb = true;
         } else {
+          console.log("NOT use arb in exactOut: FA / AMM", allPathAmountOut, ammOutput);
           isUseArb = false;
         }
       }
@@ -492,21 +510,20 @@ export async function swapGetEstimated(
           // note that here trade.outputAmount is the same as formatUnits(ammOutput, inToken1Decimal)
           // console.log("test exact in, no arb: inputAmount, trade.output, FA, AMM", inputAmount.toExact(), trade.outputAmount.toExact(), formatUnits(allPathAmountOut, inToken1Decimal), formatUnits(ammOutput, inToken1Decimal))
 
-          const FAfloat = parseFloat(formatUnits(allPathAmountOut, inToken1Decimal));
-          const AMMfloat = parseFloat(formatUnits(ammOutput, inToken1Decimal));
+          const FAfloat = allPathAmountOut;
+          const AMMfloat = ammOutput;
           bonus1 = ((FAfloat - AMMfloat) * 0.4);
           console.log("test bonus", bonus1)
 
-
           isUseArb = true;
-          token1Amount = formatUnits(allPathAmountOut, inToken1Decimal);
+          token1Amount = ammOutput;
           minAmountOut = Math.ceil(allPathAmountOut * (1 - slippage / 100));
           minAmountOut = `0x${minAmountOut.toString(16)}`;
           slippageAdjustedAmount = minAmountOut;
         } else {
           isUseArb = false;
           setBonus1(null);
-          token1Amount = formatUnits(ammOutput, inToken1Decimal);
+          token1Amount = ammOutput;
           minAmountOut = Math.ceil(ammOutput * (1 - slippage / 100));
           minAmountOut = `0x${minAmountOut.toString(16)}`;
           slippageAdjustedAmount = minAmountOut;
@@ -522,25 +539,24 @@ export async function swapGetEstimated(
         else if (inToken1Symbol == wrappedCurrencySymbol || inToken1Symbol == nativeCurrencySymbol) methodsName = isUseArb ? "swapTokensForExactETHByArb" : "swapTokensForExactETH";
         else methodsName = isUseArb ? "swapTokensForExactTokensByArb" : "swapTokensForExactTokens";
 
-        console.log("bonus FAout vs ammOutput", allPathAmountOut, ammOutput)
         if (allPathAmountOut < ammOutput) {
           // show basic AMM output in UI, with (FA-AMM)*40% as additional bonus
           // note that here trade.outputAmount is the same as formatUnits(ammOutput, inToken1Decimal)
 
-          const FAfloat = parseFloat(formatUnits(allPathAmountOut, inToken1Decimal));
-          const AMMfloat = parseFloat(formatUnits(ammOutput, inToken1Decimal));
+          const FAfloat = allPathAmountOut;
+          const AMMfloat = ammOutput;
           bonus0 = ((FAfloat - AMMfloat) * 0.4);
           console.log("test bonus, should be negative", bonus0)
 
           isUseArb = true;
-          token0Amount = formatUnits(allPathAmountOut, inToken0Decimal);
+          token0Amount = ammOutput;
           maxAmountIn = Math.floor(allPathAmountOut * (1 + slippage / 100));
           maxAmountIn = `0x${maxAmountIn.toString(16)}`;
           slippageAdjustedAmount = maxAmountIn;
         } else {
           isUseArb = false;
           setBonus0(null);
-          token0Amount = formatUnits(ammOutput, inToken0Decimal);
+          token0Amount = ammOutput;
           maxAmountIn = Math.floor(ammOutput * (1 + slippage / 100));
           maxAmountIn = `0x${maxAmountIn.toString(16)}`;
           slippageAdjustedAmount = maxAmountIn;
