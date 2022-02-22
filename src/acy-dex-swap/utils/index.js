@@ -514,13 +514,13 @@ export async function getAllSuportedTokensPrice() {
     console.log("tokensPrice:",data);
     const tokensPrice = {};
     tokenList.forEach(token => {
-      tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'] || 0;
+      tokensPrice[token.symbol] = data[token.idOnCoingecko]?.usd || 0;
     })
 
-    // launchpad project token
-    // where tokens is not listed on coinGecko
-    // if (CHAINID() == 137)
-    //   tokensPrice["NULS"] = await getTokenPriceFromPool("NULS");
+    // // launchpad project token
+    // // where tokens is not listed on coinGecko
+    // if (CHAINID() == 56)
+    //   tokensPrice["OWLA"] = await getTokenPriceFromPool("OWLA");
 
     console.log(">>> tokenPriceDict", tokensPrice);
     return tokensPrice;
@@ -539,13 +539,13 @@ export async function getAllSuportedTokensPrice_forMarket() {
     console.log("tokensPrice_market:",data);
     const tokensPrice = {};
     tokenList.forEach(token => {
-      tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
+      tokensPrice[token.symbol] = data[token.idOnCoingecko]?.usd || 0;
     })
 
     // launchpad project token
     // where tokens is not listed on coinGecko
-    // if (CHAINID() == 137)
-    //   tokensPrice["NULS"] = await getTokenPriceFromPool("NULS");
+    // if (CHAINID() == 56)
+    //   tokensPrice["OWLA"] = await getTokenPriceFromPool("OWLA");
 
     console.log(">>> tokenPriceDict_market", tokensPrice);
     return tokensPrice;
