@@ -918,6 +918,9 @@ candleSeries.setData([
                         setActiveToken1(token);
 
                       }}
+                      infoTokens_test = {infoTokens}
+                      position = {positions}
+                      usdgSupply = {usdgSupply}
                       onGetReceipt={onGetReceipt}
                       profitsIn={'ETH'} 
                       liqPrice={456}

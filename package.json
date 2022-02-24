@@ -114,6 +114,7 @@
     "redux": "^4.0.5",
     "styled-components": "^5.3.3",
     "swiper": "^6.8.4",
+    "swr": "^1.2.2",
     "web3": "^1.6.1",
     "web3-eth": "^1.6.0",
     "web3-eth-contract": "^1.6.0",
