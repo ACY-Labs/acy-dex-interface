@@ -38,7 +38,9 @@ export const DetailBox = (props) => {
         toUsdMax,
         toTokenInfo,
         triggerPriceValue,
+        shortCollateralToken,
     } = props;
+    
     const shortModeProfitsTokenList = [
         {
             name: 'USD Tether',

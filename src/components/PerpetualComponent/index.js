@@ -257,6 +257,7 @@ const SwapComponent = props => {
     address: '0xf97f4df75117a78c1A5a0DBb814Af92458539FB4',
     isStable: false
   };
+  const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
   const totalTokenWeights = BigNumber.from("0x0186a0")
   const fromUsdMin = getUsd(fromAmount, fromTokenAddress, false, infoTokens);
   const toUsdMax = getUsd(
