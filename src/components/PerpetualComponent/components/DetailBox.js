@@ -11,7 +11,7 @@ import classname from 'classnames';
 import Pattern from '@/utils/pattern';
 
 
-import { MARKET, LIMIT, LONG, SHORT, FEE } from '../constant'
+import { MARKET, LIMIT, LONG, SHORT, SWAP, FEE } from '../constant'
 import {
     getLiquidationPrice, bigNumberify, formatAmount, expandDecimals, parseValue, getTokenInfo, getPositionKey,
     getWhitelistedTokens,
@@ -183,7 +183,7 @@ export const DetailBox = (props) => {
                     }
                     <p className={styles.describeTitle}>Leverage:
                         <span className={styles.describeInfo}>
-                            {!hasExistingPosition && (
+                            {hasExistingPosition && (
                                 <span>
                                     {/*formatAmount(existingPosition.leverage, 4, 2)*/}
                                     {Number(leverage).toFixed(2)}
@@ -194,7 +194,7 @@ export const DetailBox = (props) => {
                             {Number(leverage).toFixed(2)}x</span></p>
                     <p className={styles.describeTitle}>Entry Price:
                         <span className={styles.describeInfo}>
-                            {!hasExistingPosition && nextAveragePrice && (
+                            {hasExistingPosition && nextAveragePrice && (
                                 <span>$
                                     {/* {formatAmount(
                                         existingPosition.averagePrice,
@@ -211,9 +211,9 @@ export const DetailBox = (props) => {
                             {!nextAveragePrice && `-`} USD</span></p>
 
                     <p className={styles.describeTitle}>Liq. Price:  <span className={styles.describeInfo}>
-                        {!hasExistingPosition && displayLiquidationPrice && (
+                        {hasExistingPosition && displayLiquidationPrice && (
                             <span>$
-                            {/* {formatAmount(
+                                {/* {formatAmount(
                               existingLiquidationPrice,
                               USD_DECIMALS,
                               2,
@@ -228,6 +228,11 @@ export const DetailBox = (props) => {
                         {!feesUsd && '-'}
                         {feesUsd && `$${formatAmount(feesUsd, USD_DECIMALS, 2, true)}`}
                     </span></p>
+                    {shortOrLong === SWAP &&
+                        <div>
+                        </div>
+                    }
+                    {/* hj TODO : swap part not showing borrowFee */}
 
                 </div>
                 <div className={styles.describeMainTitle}>{shortOrLong} {token1Symbol}</div>

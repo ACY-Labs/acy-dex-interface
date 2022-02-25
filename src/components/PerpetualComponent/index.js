@@ -28,12 +28,13 @@ import TokenSelectorModal from "@/components/TokenSelectorModal";
 import { PriceBox } from './components/PriceBox';
 import { DetailBox } from './components/DetailBox';
 
-import { MARKET, LIMIT, LONG, SHORT } from './constant'
+import { MARKET, LIMIT, LONG, SHORT, SWAP } from './constant'
 import {
   getNextToAmount, getNextFromAmount, getTokenInfo, parseValue, getUsd, expandDecimals, formatAmountFree,
   usePrevious,
   getPositionKey,
 } from '@/acy-dex-futures/utils'
+
 import { USD_DECIMALS, BASIS_POINTS_DIVISOR, MARGIN_FEE_BASIS_POINTS } from '@/acy-dex-futures/utils'
 import { getInfoTokens_test } from './utils'
 import Pattern from '@/utils/pattern'
@@ -132,7 +133,7 @@ const SwapComponent = props => {
   const { profitsIn, liqPrice } = props;
   const { entryPriceMarket, exitPrice, borrowFee } = props;
   const { infoTokens_test, usdgSupply, positions, positionsMap } = props;
-  const {tokens} = props
+  const { tokens } = props
 
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
@@ -276,7 +277,7 @@ const SwapComponent = props => {
   const fromUsdMin = getUsd(fromAmount, fromTokenAddress, false, infoTokens);
   const toUsdMax = getUsd(
     toAmount,
-    toTokenAddress, 
+    toTokenAddress,
     true,
     infoTokens,
     mode,
@@ -337,7 +338,7 @@ const SwapComponent = props => {
     }
   };
   let positionKey;
-  if (mode===LONG) {
+  if (mode === LONG) {
     positionKey = getPositionKey(
       toTokenAddress,
       toTokenAddress,
@@ -345,7 +346,7 @@ const SwapComponent = props => {
       nativeTokenAddress
     );
   }
-  if (mode===SHORT) {
+  if (mode === SHORT) {
     positionKey = getPositionKey(
       shortCollateralAddress,
       toTokenAddress,
@@ -419,7 +420,7 @@ const SwapComponent = props => {
   }, [
     toTokenInfo
   ]);
-  
+
   useEffect(() => {
     if (mode !== SHORT) {
       return;
@@ -841,6 +842,8 @@ const SwapComponent = props => {
           onChange={modeSelect}>
           <StyledRadioButton value={LONG} className={styles.modeSubOption}><RiseOutlined />Long</StyledRadioButton>
           <StyledRadioButton value={SHORT} className={styles.modeSubOption}><FallOutlined />Short</StyledRadioButton>
+          <StyledRadioButton value={SWAP} className={styles.modeSubOption}><FallOutlined />Swap</StyledRadioButton>
+
         </Radio.Group>
       </div>
       <div>
@@ -934,96 +937,123 @@ const SwapComponent = props => {
           />
         </div>
       }
-      <AcyDescriptions>
-        <div className={styles.breakdownTopContainer}>
-          <div className={styles.slippageContainer}>
-            <span style={{ fontWeight: 600 }}>Leverage ymj</span>
-            <span className={styles.leverageSlider}>
-              <StyledSlider marks={leverageSlider} defaultValue={leverage} max={30.51} min={1.10} onChange={leverageSliderOnChange} step={0.1}
-                style={{ color: 'red' }} />
-            </span>
+      {mode !== SWAP &&
+        <div>
+          <AcyDescriptions>
+            <div className={styles.breakdownTopContainer}>
+              <div className={styles.slippageContainer}>
+                <span style={{ fontWeight: 600 }}>Leverage ymj</span>
+                <span className={styles.leverageSlider}>
+                  <StyledSlider marks={leverageSlider} defaultValue={leverage} max={30.51} min={1.10} onChange={leverageSliderOnChange} step={0.1}
+                    style={{ color: 'red' }} />
+                </span>
+              </div>
+            </div>
+          </AcyDescriptions>
+          <DetailBox
+            leverage={leverage}
+            shortOrLong={mode}
+            marketOrLimit={type}
+            profitsIn={profitsIn}
+            entryPriceLimit={entryPriceLimit}
+            liqPrice={liqPrice}
+            entryPriceMarket={entryPriceMarket}
+            exitPrice={exitPrice}
+            borrowFee={borrowFee}
+            token1Symbol={token1.symbol}
+            fromUsdMin={fromUsdMin}
+            toUsdMax={toUsdMax}
+            toTokenInfo={toTokenInfo}
+            triggerPriceValue={triggerPriceValue}
+            shortCollateralToken={shortCollateralToken}
+            toTokenAddress={toTokenAddress}
+            shortCollateralAddress={shortCollateralAddress}
+            positionsMap={positionsMap}
+            positionKey={positionKey}
+            positions={positions}
+          />
           </div>
-        </div>
-      </AcyDescriptions>
-      <DetailBox
-        leverage={leverage}
-        shortOrLong={mode}
-        marketOrLimit={type}
-        profitsIn={profitsIn}
-        entryPriceLimit={entryPriceLimit}
-        liqPrice={liqPrice}
-        entryPriceMarket={entryPriceMarket}
-        exitPrice={exitPrice}
-        borrowFee={borrowFee}
-        token1Symbol={token1.symbol}
-        fromUsdMin={fromUsdMin}
-        toUsdMax={toUsdMax}
-        toTokenInfo={toTokenInfo}
-        triggerPriceValue={triggerPriceValue}
-        shortCollateralToken={shortCollateralToken}
-        toTokenAddress={toTokenAddress}
-        shortCollateralAddress={shortCollateralAddress}
-        positionsMap={positionsMap}
-        positionKey={positionKey}
-        positions={positions}
-      />
-      {needApprove
-        ? <div>
-          <AcyButton
-            style={{ marginTop: '25px' }}
-            disabled={!approveButtonStatus}
-            onClick={async () => {
-              setShowSpinner(true);
-              setApproveButtonStatus(false);
-              const state = await approve(token0.address, approveAmount, library, account);
-              setApproveButtonStatus(true);
-              setShowSpinner(false);
-
-              if (state) {
-                setSwapButtonState(true);
-                setSwapButtonContent('Swap');
-                setApproveButtonStatus(false);
-                setNeedApprove(false);
-                console.log("test needApprove false")
-              }
-            }}
-          >
-            Approve{' '}
-            {showSpinner && <Icon type="loading" />}
-          </AcyButton>{' '}
-        </div>
-
-        : <AcyButton
-          style={{ marginTop: '25px' }}
-          disabled={!swapButtonState}
-          onClick={() => {
-            if (account == undefined) {
-              connectWalletByLocalStorage();
-            } else {
-              console.log("ready for function ymj");
-            }
-          }}
-        >
-          {swapButtonContent}
-        </AcyButton>
       }
+          {mode === SWAP &&
+            <DetailBox
+              leverage={leverage}
+              shortOrLong={mode}
+              marketOrLimit={type}
+              profitsIn={profitsIn}
+              entryPriceLimit={entryPriceLimit}
+              liqPrice={liqPrice}
+              entryPriceMarket={entryPriceMarket}
+              exitPrice={exitPrice}
+              borrowFee={borrowFee}
+              token1Symbol={token1.symbol}
+              fromUsdMin={fromUsdMin}
+              toUsdMax={toUsdMax}
+              toTokenInfo={toTokenInfo}
+              triggerPriceValue={triggerPriceValue}
+            />
+          }
+          {needApprove
+            ? <div>
+              <AcyButton
+                style={{ marginTop: '25px' }}
+                disabled={!approveButtonStatus}
+                onClick={async () => {
+                  setShowSpinner(true);
+                  setApproveButtonStatus(false);
+                  const state = await approve(token0.address, approveAmount, library, account);
+                  setApproveButtonStatus(true);
+                  setShowSpinner(false);
 
-      <AcyDescriptions>
-        {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
-      </AcyDescriptions>
+                  if (state) {
+                    setSwapButtonState(true);
+                    setSwapButtonContent('Swap');
+                    setApproveButtonStatus(false);
+                    setNeedApprove(false);
+                    console.log("test needApprove false")
+                  }
+                }}
+              >
+                Approve{' '}
+                {showSpinner && <Icon type="loading" />}
+              </AcyButton>{' '}
+            </div>
 
-      <TokenSelectorModal
-        onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick}
-      />
-    </div>
+            : <AcyButton
+              style={{ marginTop: '25px' }}
+              disabled={!swapButtonState}
+              onClick={() => {
+                if (account == undefined) {
+                  connectWalletByLocalStorage();
+                } else {
+                  //hj TODO
+                  // if ( currentTab == "swap" ) {
+                  //     setSwapButtonState( false )
+                  //     handleSwap();
+                  // }
+                  console.log("ready for function ymj");
+                }
+              }}
+            >
+              {swapButtonContent}
+            </AcyButton>
+          }
+
+          <AcyDescriptions>
+            {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
+          </AcyDescriptions>
+
+          <TokenSelectorModal
+            onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick}
+          />
+        </div>
   );
 };
 
-export default connect(({ global, transaction, swap, loading }) => ({
-  global,
-  transaction,
-  account: global.account,
-  swap,
-  loading: loading.global,
+      export default connect(({global, transaction, swap, loading}) => ({
+        global,
+        transaction,
+        account: global.account,
+      swap,
+      loading: loading.global,
 }))(SwapComponent);
 
