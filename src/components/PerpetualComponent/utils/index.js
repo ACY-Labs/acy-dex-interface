@@ -56,3 +56,30 @@ export function getInfoTokens_test() {
         }
     }
 }
+
+export const formatAmount = (
+    amount,
+    tokenDecimals,
+    displayDecimals,
+    useCommas,
+    defaultValue
+) => {
+    if (!defaultValue) {
+        defaultValue = "...";
+    }
+    if (amount === undefined || amount.toString().length === 0) {
+        return defaultValue;
+    }
+    if (displayDecimals === undefined) {
+        displayDecimals = 4;
+    }
+    let amountStr = ethers.utils.formatUnits(amount, tokenDecimals);
+    amountStr = limitDecimals(amountStr, displayDecimals);
+    if (displayDecimals !== 0) {
+        amountStr = padDecimals(amountStr, displayDecimals);
+    }
+    if (useCommas) {
+        return numberWithCommas(amountStr);
+    }
+    return amountStr;
+};
