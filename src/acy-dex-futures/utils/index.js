@@ -1,5 +1,6 @@
 import {ethers} from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
+import { useRef, useEffect } from "react";
 export const MARKET = 'Market';
 export const LIMIT = 'Limit';
 export const LONG = 'Long';
@@ -958,3 +959,11 @@ export function bigNumberify(n){
     }
     return amount;
   };
+
+  export function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+  }

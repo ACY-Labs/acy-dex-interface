@@ -29,7 +29,11 @@ import { PriceBox } from './components/PriceBox';
 import { DetailBox } from './components/DetailBox';
 
 import { MARKET, LIMIT, LONG, SHORT } from './constant'
-import { getNextToAmount, getNextFromAmount, getTokenInfo, parseValue, getUsd, expandDecimals, formatAmountFree } from '@/acy-dex-futures/utils'
+import {
+  getNextToAmount, getNextFromAmount, getTokenInfo, parseValue, getUsd, expandDecimals, formatAmountFree,
+  usePrevious,
+  getPositionKey,
+} from '@/acy-dex-futures/utils'
 import { USD_DECIMALS, BASIS_POINTS_DIVISOR, MARGIN_FEE_BASIS_POINTS } from '@/acy-dex-futures/utils'
 import { getInfoTokens_test } from './utils'
 import Pattern from '@/utils/pattern'
@@ -127,7 +131,8 @@ const SwapComponent = props => {
   const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1 = false } = props;
   const { profitsIn, liqPrice } = props;
   const { entryPriceMarket, exitPrice, borrowFee } = props;
-  const { infoTokens_test, usdgSupply, positions } = props;
+  const { infoTokens_test, usdgSupply, positions, positionsMap } = props;
+  const {tokens} = props
 
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
@@ -204,6 +209,7 @@ const SwapComponent = props => {
   const [triggerPriceValue, setTriggerPriceValue] = useState("");
   const [priceValue, setPriceValue] = useState('');
   const [entryMarkPrice, setEntryMarkPrice] = useState('');
+  const [shortCollateralAddress, setShortCollateralAddress] = useState('0xf97f4df75117a78c1A5a0DBb814Af92458539FB4');
 
 
   const connectWalletByLocalStorage = useConnectWallet();
@@ -245,7 +251,7 @@ const SwapComponent = props => {
     : parseValue(triggerPriceValue, USD_DECIMALS);
   // const indexTokenAddress = toTokenAddress === AddressZero ? nativeTokenAddress : toTokenAddress;
   const indexTokenAddress = toTokenAddress;
-  const shortCollateralAddress = indexTokenAddress; // need change
+  //setShortCollateralAddress(indexTokenAddress); // need change
   const collateralTokenAddress = mode === LONG
     ? indexTokenAddress
     : shortCollateralAddress;
@@ -259,10 +265,18 @@ const SwapComponent = props => {
   };
   const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
   const totalTokenWeights = BigNumber.from("0x0186a0")
+  const prevToTokenAddress = usePrevious(toTokenAddress);
+  const nativeTokenAddress = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'
+  //const whitelistedTokens = getWhitelistedTokens(42161);// chainId
+  const stableTokens = tokens.filter(token => token.isStable);
+  // const indexTokens = whitelistedTokens.filter(
+  //   token => !token.isStable && !token.isWrapped
+  // );
+  // const shortableTokens = indexTokens.filter(token => token.isShortable);
   const fromUsdMin = getUsd(fromAmount, fromTokenAddress, false, infoTokens);
   const toUsdMax = getUsd(
     toAmount,
-    toTokenAddress,
+    toTokenAddress, 
     true,
     infoTokens,
     mode,
@@ -322,6 +336,23 @@ const SwapComponent = props => {
       label: '30x'
     }
   };
+  let positionKey;
+  if (mode===LONG) {
+    positionKey = getPositionKey(
+      toTokenAddress,
+      toTokenAddress,
+      true,
+      nativeTokenAddress
+    );
+  }
+  if (mode===SHORT) {
+    positionKey = getPositionKey(
+      shortCollateralAddress,
+      toTokenAddress,
+      false,
+      nativeTokenAddress
+    );
+  }
 
   // ymj useEffect
   // initialization
@@ -387,6 +418,38 @@ const SwapComponent = props => {
     setEntryMarkPrice(mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
   }, [
     toTokenInfo
+  ]);
+  
+  useEffect(() => {
+    if (mode !== SHORT) {
+      return;
+    }
+    if (toTokenAddress === prevToTokenAddress) {
+      return;
+    }
+    for (let i = 0; i < stableTokens.length; i++) {
+      const stableToken = stableTokens[i];
+      const key = getPositionKey(
+        stableToken.address,
+        toTokenAddress,
+        false,
+        nativeTokenAddress
+      );
+      const position = positionsMap[key];
+      if (position && position.size && position.size.gt(0)) {
+        setShortCollateralAddress(position.collateralToken.address);
+        return;
+      }
+    }
+  }, [
+    toTokenAddress,
+    prevToTokenAddress,
+    mode,
+    positionsMap,
+    stableTokens,
+    nativeTokenAddress,
+    shortCollateralAddress,
+    setShortCollateralAddress
   ]);
 
   // connect to page model, reflect changes of pair ratio in this component
@@ -898,6 +961,11 @@ const SwapComponent = props => {
         toTokenInfo={toTokenInfo}
         triggerPriceValue={triggerPriceValue}
         shortCollateralToken={shortCollateralToken}
+        toTokenAddress={toTokenAddress}
+        shortCollateralAddress={shortCollateralAddress}
+        positionsMap={positionsMap}
+        positionKey={positionKey}
+        positions={positions}
       />
       {needApprove
         ? <div>

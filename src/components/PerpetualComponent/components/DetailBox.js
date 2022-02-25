@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Icon, Input, Row, Col } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
+import { DownOutlined, SwapRightOutlined } from '@ant-design/icons';
 import {
     AcyCard,
     AcyModal,
@@ -13,7 +13,10 @@ import Pattern from '@/utils/pattern';
 
 import { MARKET, LIMIT, LONG, SHORT, FEE } from '../constant'
 import {
-    getLiquidationPrice, bigNumberify, formatAmount, expandDecimals, parseValue, getTokenInfo, USD_DECIMALS,
+    getLiquidationPrice, bigNumberify, formatAmount, expandDecimals, parseValue, getTokenInfo, getPositionKey,
+    getWhitelistedTokens,
+    usePrevious,
+    USD_DECIMALS,
     MARGIN_FEE_BASIS_POINTS,
     BASIS_POINTS_DIVISOR
 } from '@/acy-dex-futures/utils'
@@ -39,8 +42,13 @@ export const DetailBox = (props) => {
         toTokenInfo,
         triggerPriceValue,
         shortCollateralToken,
+        toTokenAddress,
+        shortCollateralAddress,
+        positionsMap,
+        positionKey,
+        positions,
     } = props;
-    
+
     const shortModeProfitsTokenList = [
         {
             name: 'USD Tether',
@@ -95,6 +103,10 @@ export const DetailBox = (props) => {
             </AcyModal>
         )
     }
+    // position part
+    const existingPosition = positionKey ? positionsMap[positionKey] : undefined;
+    const hasExistingPosition =
+        existingPosition && existingPosition.size && existingPosition.size.gt(0);
     // liquidation part start
     let entryMarkPrice;
     let exitMarkPrice;
@@ -104,9 +116,6 @@ export const DetailBox = (props) => {
         exitMarkPrice =
             shortOrLong === LONG ? toTokenInfo.minPrice : toTokenInfo.maxPrice;
     }
-    let existingPosition = false;
-    let hasExistingPosition = false;
-
     const triggerPriceUsd = marketOrLimit === MARKET ? 0 : parseValue(triggerPriceValue, USD_DECIMALS)
     let nextAveragePrice = marketOrLimit === MARKET ? entryMarkPrice : triggerPriceUsd;
     //const liquidationPrice = getLiquidationPrice({amount:expandDecimals(123, USD_DECIMALS), leverage:leverage})
@@ -139,13 +148,13 @@ export const DetailBox = (props) => {
     }
     let hasZeroBorrowFee = false;
     let borrowFeeText;
-    if (shortOrLong===LONG && toTokenInfo && toTokenInfo.fundingRate) {
+    if (shortOrLong === LONG && toTokenInfo && toTokenInfo.fundingRate) {
         borrowFeeText = formatAmount(toTokenInfo.fundingRate, 4, 4) + "% / 1h";
         if (toTokenInfo.fundingRate.eq(0)) {
             // hasZeroBorrowFee = true
         }
     }
-    if (shortOrLong===SHORT && shortCollateralToken && shortCollateralToken.fundingRate) {
+    if (shortOrLong === SHORT && shortCollateralToken && shortCollateralToken.fundingRate) {
         borrowFeeText =
             formatAmount(shortCollateralToken.fundingRate, 4, 4) + "% / 1h";
         if (shortCollateralToken.fundingRate.eq(0)) {
@@ -172,14 +181,49 @@ export const DetailBox = (props) => {
                             {profitsIn ? profitsIn : '-'} <DownOutlined />
                         </span></p>
                     }
-                    <p className={styles.describeTitle}>Leverage:  <span className={styles.describeInfo}>{Number(leverage).toFixed(2)}x</span></p>
+                    <p className={styles.describeTitle}>Leverage:
+                        <span className={styles.describeInfo}>
+                            {!hasExistingPosition && (
+                                <span>
+                                    {/*formatAmount(existingPosition.leverage, 4, 2)*/}
+                                    {Number(leverage).toFixed(2)}
+                                    x
+                                    <SwapRightOutlined />
+                                </span>
+                            )}
+                            {Number(leverage).toFixed(2)}x</span></p>
                     <p className={styles.describeTitle}>Entry Price:
                         <span className={styles.describeInfo}>
+                            {!hasExistingPosition && nextAveragePrice && (
+                                <span>$
+                                    {/* {formatAmount(
+                                        existingPosition.averagePrice,
+                                        USD_DECIMALS,
+                                        2,
+                                        true
+                                    )} */}
+                                    {Number(leverage).toFixed(2)}
+                                    <SwapRightOutlined />
+                                </span>
+                            )}
                             {nextAveragePrice &&
                                 `$${formatAmount(nextAveragePrice, USD_DECIMALS, 2, true)}`}
                             {!nextAveragePrice && `-`} USD</span></p>
 
-                    <p className={styles.describeTitle}>Liq. Price:  <span className={styles.describeInfo}>{displayLiquidationPrice ? formatAmount(displayLiquidationPrice, USD_DECIMALS, 2, true) : '-'}USD</span></p>
+                    <p className={styles.describeTitle}>Liq. Price:  <span className={styles.describeInfo}>
+                        {!hasExistingPosition && displayLiquidationPrice && (
+                            <span>$
+                            {/* {formatAmount(
+                              existingLiquidationPrice,
+                              USD_DECIMALS,
+                              2,
+                              true
+                            )} */}
+                                {Number(leverage).toFixed(2)}
+                                <SwapRightOutlined />
+                            </span>
+                        )}
+                        {displayLiquidationPrice ? formatAmount(displayLiquidationPrice, USD_DECIMALS, 2, true) : '-'}USD</span></p>
                     <p className={styles.describeTitle}>Fees:  <span className={styles.describeInfo}>
                         {!feesUsd && '-'}
                         {feesUsd && `$${formatAmount(feesUsd, USD_DECIMALS, 2, true)}`}
