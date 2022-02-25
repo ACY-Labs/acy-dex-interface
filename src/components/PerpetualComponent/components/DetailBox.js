@@ -11,7 +11,7 @@ import classname from 'classnames';
 import Pattern from '@/utils/pattern';
 
 
-import { MARKET, LIMIT, LONG, SHORT, FEE } from '../constant'
+import { MARKET, LIMIT, LONG, SHORT, SWAP, FEE } from '../constant'
 import {
     getLiquidationPrice, bigNumberify, formatAmount, expandDecimals, parseValue, getTokenInfo, USD_DECIMALS,
     MARGIN_FEE_BASIS_POINTS,
@@ -160,30 +160,56 @@ export const DetailBox = (props) => {
     return (
         <div>
             <AcyCard className={styles.describeMain}>
-                <div>
-                    {shortOrLong === LONG &&
-                        <p className={styles.describeTitle}>Profits In: <span className={styles.describeInfo}>{token1Symbol ? token1Symbol : '-'}</span></p>
-                    }
-                    {shortOrLong === SHORT &&
-                        <p className={styles.describeTitle}>Profits In: <span className={styles.describeInfoClickable}
-                            onClick={profitsInOnClickHandle}>
-                            {profitsIn ? profitsIn : '-'} <DownOutlined />
-                        </span></p>
-                    }
-                    <p className={styles.describeTitle}>Leverage:  <span className={styles.describeInfo}>{Number(leverage).toFixed(2)}x</span></p>
-                    <p className={styles.describeTitle}>Entry Price:
-                        <span className={styles.describeInfo}>
-                            {nextAveragePrice &&
-                                `$${formatAmount(nextAveragePrice, USD_DECIMALS, 2, true)}`}
-                            {!nextAveragePrice && `-`} USD</span></p>
+                
+                    <div>
+                        {shortOrLong === LONG &&
+                            <p className={styles.describeTitle}>Profits In: <span className={styles.describeInfo}>{token1Symbol ? token1Symbol : '-'}</span></p>
+                        }
+                        {shortOrLong === SHORT &&
+                            <p className={styles.describeTitle}>Profits In: <span className={styles.describeInfoClickable}
+                                onClick={profitsInOnClickHandle}>
+                                {profitsIn ? profitsIn : '-'} <DownOutlined />
+                            </span></p>
+                        }
+                        {shortOrLong === LONG &&
+                            <div>
+                                <p className={styles.describeTitle}>Leverage:  <span className={styles.describeInfo}>{Number(leverage).toFixed(2)}x</span></p>
+                                <p className={styles.describeTitle}>Entry Price:
+                                    <span className={styles.describeInfo}>
+                                        {nextAveragePrice &&
+                                            `$${formatAmount(nextAveragePrice, USD_DECIMALS, 2, true)}`}
+                                        {!nextAveragePrice && `-`} USD</span></p>
 
-                    <p className={styles.describeTitle}>Liq. Price:  <span className={styles.describeInfo}>{displayLiquidationPrice ? formatAmount(displayLiquidationPrice, USD_DECIMALS, 2, true) : '-'}USD</span></p>
-                    <p className={styles.describeTitle}>Fees:  <span className={styles.describeInfo}>
-                        {!feesUsd && '-'}
-                        {feesUsd && `$${formatAmount(feesUsd, USD_DECIMALS, 2, true)}`}
-                    </span></p>
+                                <p className={styles.describeTitle}>Liq. Price:  <span className={styles.describeInfo}>{displayLiquidationPrice ? formatAmount(displayLiquidationPrice, USD_DECIMALS, 2, true) : '-'}USD</span></p>
+                                <p className={styles.describeTitle}>Fees:  <span className={styles.describeInfo}>
+                                    {!feesUsd && '-'}
+                                    {feesUsd && `$${formatAmount(feesUsd, USD_DECIMALS, 2, true)}`}
+                                </span></p>
+                            </div>
+                        }
+                        {shortOrLong === SHORT &&
+                            <div>
+                                <p className={styles.describeTitle}>Leverage:  <span className={styles.describeInfo}>{Number(leverage).toFixed(2)}x</span></p>
+                                <p className={styles.describeTitle}>Entry Price:
+                                    <span className={styles.describeInfo}>
+                                        {nextAveragePrice &&
+                                            `$${formatAmount(nextAveragePrice, USD_DECIMALS, 2, true)}`}
+                                        {!nextAveragePrice && `-`} USD</span></p>
 
-                </div>
+                                <p className={styles.describeTitle}>Liq. Price:  <span className={styles.describeInfo}>{displayLiquidationPrice ? formatAmount(displayLiquidationPrice, USD_DECIMALS, 2, true) : '-'}USD</span></p>
+                                <p className={styles.describeTitle}>Fees:  <span className={styles.describeInfo}>
+                                    {!feesUsd && '-'}
+                                    {feesUsd && `$${formatAmount(feesUsd, USD_DECIMALS, 2, true)}`}
+                                </span></p>
+                            </div>
+                        }
+                        {shortOrLong === SWAP &&
+                        <div>
+                        </div>
+                        }
+                    </div>
+                {/* hj TODO : swap part not showing borrowFee */}
+                
                 <div className={styles.describeMainTitle}>{shortOrLong} {token1Symbol}</div>
                 <div>
                     <p className={styles.describeTitle}>Entry Price: <span className={styles.describeInfo}>

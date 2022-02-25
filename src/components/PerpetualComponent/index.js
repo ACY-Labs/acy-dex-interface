@@ -28,7 +28,7 @@ import TokenSelectorModal from "@/components/TokenSelectorModal";
 import { PriceBox } from './components/PriceBox';
 import { DetailBox } from './components/DetailBox';
 
-import { MARKET, LIMIT, LONG, SHORT } from './constant'
+import { MARKET, LIMIT, LONG, SHORT, SWAP } from './constant'
 import { getNextToAmount, getNextFromAmount, getTokenInfo, parseValue, getUsd, expandDecimals, formatAmountFree } from '@/acy-dex-futures/utils'
 import { USD_DECIMALS, BASIS_POINTS_DIVISOR, MARGIN_FEE_BASIS_POINTS } from '@/acy-dex-futures/utils'
 import { getInfoTokens_test } from './utils'
@@ -777,6 +777,8 @@ const SwapComponent = props => {
           onChange={modeSelect}>
           <StyledRadioButton value={LONG} className={styles.modeSubOption}><RiseOutlined />Long</StyledRadioButton>
           <StyledRadioButton value={SHORT} className={styles.modeSubOption}><FallOutlined />Short</StyledRadioButton>
+          <StyledRadioButton value={SWAP} className={styles.modeSubOption}><FallOutlined />Swap</StyledRadioButton>
+
         </Radio.Group>
       </div>
       <div>
@@ -870,33 +872,55 @@ const SwapComponent = props => {
           />
         </div>
       }
-      <AcyDescriptions>
-        <div className={styles.breakdownTopContainer}>
-          <div className={styles.slippageContainer}>
-            <span style={{ fontWeight: 600 }}>Leverage ymj</span>
-            <span className={styles.leverageSlider}>
-              <StyledSlider marks={leverageSlider} defaultValue={leverage} max={30.51} min={1.10} onChange={leverageSliderOnChange} step={0.1}
-                style={{ color: 'red' }} />
-            </span>
+      {mode !== SWAP &&
+        <div>
+            <AcyDescriptions>
+                <div className={styles.breakdownTopContainer}>
+                <div className={styles.slippageContainer}>
+                    <span style={{ fontWeight: 600 }}>Leverage ymj</span>
+                    <span className={styles.leverageSlider}>
+                    <StyledSlider marks={leverageSlider} defaultValue={leverage} max={30.51} min={1.10} onChange={leverageSliderOnChange} step={0.1}
+                        style={{ color: 'red' }} />
+                    </span>
+                </div>
+                </div>
+            </AcyDescriptions>
+            <DetailBox
+                leverage={leverage}
+                shortOrLong={mode}
+                marketOrLimit={type}
+                profitsIn={profitsIn}
+                entryPriceLimit={entryPriceLimit}
+                liqPrice={liqPrice}
+                entryPriceMarket={entryPriceMarket}
+                exitPrice={exitPrice}
+                borrowFee={borrowFee}
+                token1Symbol={token1.symbol}
+                fromUsdMin={fromUsdMin}
+                toUsdMax={toUsdMax}
+                toTokenInfo={toTokenInfo}
+                triggerPriceValue={triggerPriceValue}
+            />
           </div>
-        </div>
-      </AcyDescriptions>
-      <DetailBox
-        leverage={leverage}
-        shortOrLong={mode}
-        marketOrLimit={type}
-        profitsIn={profitsIn}
-        entryPriceLimit={entryPriceLimit}
-        liqPrice={liqPrice}
-        entryPriceMarket={entryPriceMarket}
-        exitPrice={exitPrice}
-        borrowFee={borrowFee}
-        token1Symbol={token1.symbol}
-        fromUsdMin={fromUsdMin}
-        toUsdMax={toUsdMax}
-        toTokenInfo={toTokenInfo}
-        triggerPriceValue={triggerPriceValue}
-      />
+        }
+        {mode === SWAP &&
+            <DetailBox
+                leverage={leverage}
+                shortOrLong={mode}
+                marketOrLimit={type}
+                profitsIn={profitsIn}
+                entryPriceLimit={entryPriceLimit}
+                liqPrice={liqPrice}
+                entryPriceMarket={entryPriceMarket}
+                exitPrice={exitPrice}
+                borrowFee={borrowFee}
+                token1Symbol={token1.symbol}
+                fromUsdMin={fromUsdMin}
+                toUsdMax={toUsdMax}
+                toTokenInfo={toTokenInfo}
+                triggerPriceValue={triggerPriceValue}
+            />
+        }
       {needApprove
         ? <div>
           <AcyButton
@@ -930,6 +954,11 @@ const SwapComponent = props => {
             if (account == undefined) {
               connectWalletByLocalStorage();
             } else {
+                //hj TODO
+                // if ( currentTab == "swap" ) {
+                //     setSwapButtonState( false )
+                //     handleSwap();
+                // }
               console.log("ready for function ymj");
             }
           }}
