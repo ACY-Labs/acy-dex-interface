@@ -219,6 +219,7 @@ export function bigNumberify(n){
     return amountStr
   }
   
+  
   export function numberWithCommas(x) {
     if (!x) { return "..." }
     var parts = x.toString().split(".");
@@ -958,3 +959,59 @@ export function bigNumberify(n){
     }
     return amount;
   };
+//hj ---------------------
+export const shouldRaiseGasError = (token, amount) => {
+    if (!amount) {
+        return false;
+    }
+    if (token.address !== AddressZero) {
+        return false;
+    }
+    if (!token.balance) {
+        return false;
+    }
+    if (amount.gte(token.balance)) {
+        return true;
+    }
+    if (token.balance.sub(amount).lt(DUST_BNB)) {
+        return true;
+    }
+    return false;
+};
+
+export const helperToast = {
+    success: content => {
+        toast.dismiss();
+        toast.success(content);
+    },
+    error: content => {
+        toast.dismiss();
+        toast.error(content);
+    }
+};
+
+export const replaceNativeTokenAddress = (path, nativeTokenAddress) => {
+    if (!path) {
+        return;
+    }
+
+    let updatedPath = [];
+    for (let i = 0; i < path.length; i++) {
+        let address = path[i];
+        if (address === AddressZero) {
+            address = nativeTokenAddress;
+        }
+        updatedPath.push(address);
+    }
+
+    return updatedPath;
+};
+
+export function isTriggerRatioInverted(fromTokenInfo, toTokenInfo) {
+    if (!toTokenInfo || !fromTokenInfo) return false;
+    if (toTokenInfo.isStable || toTokenInfo.isUsdg) return true;
+    if (toTokenInfo.maxPrice)
+        return toTokenInfo.maxPrice.lt(fromTokenInfo.maxPrice);
+    return false;
+}
+

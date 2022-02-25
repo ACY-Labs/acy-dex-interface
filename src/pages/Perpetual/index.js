@@ -74,6 +74,9 @@ import sampleGmxTokens from '@/acy-dex-futures/samples/TokenList'
 // import { createChart } from 'krasulya-lightweight-charts'
 import { createChart } from 'lightweight-charts';
 
+//hj
+// const [isConfirming, setIsConfirming] = useState(false);
+// const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
 
 const { AddressZero } = ethers.constants
 // ----------
@@ -927,6 +930,10 @@ candleSeries.setData([
                       entryPriceMarket={123}
                       exitPrice={123}
                       borrowFee={123}
+                    // isConfirming={isConfirming}
+                    // setIsConfirming={setIsConfirming}
+                    // isPendingConfirmation={isPendingConfirmation}
+                    // setIsPendingConfirmation={setIsPendingConfirmation}
                     />
                   </div>
                 </AcyCard>

@@ -37,7 +37,12 @@ import {
     getUsd, 
     expandDecimals, 
     formatAmountFree,
-    formatAmount
+    formatAmount,
+    shouldRaiseGasError,
+    helperToast,
+    replaceNativeTokenAddress,
+    isTriggerRatioInverted,
+    bigNumberify
 } from '@/acy-dex-futures/utils'
 import { USD_DECIMALS, BASIS_POINTS_DIVISOR, MARGIN_FEE_BASIS_POINTS } from '@/acy-dex-futures/utils'
 import { getInfoTokens_test } from './utils'
@@ -52,7 +57,7 @@ import axios from 'axios';
 
 import { useWeb3React } from '@web3-react/core';
 import { binance, injected } from '@/connectors';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 import {
     Error,
@@ -141,7 +146,7 @@ const StyledSlider = styled(Slider)`
 
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
-
+//hj find in '@/pages/perpetual 的<perpetual component
     // ymj props
     const { account, library, chainId, tokenList: INITIAL_TOKEN_LIST, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
     console.log("constant loader chainid", chainId);
@@ -149,6 +154,7 @@ const SwapComponent = props => {
     const { profitsIn, liqPrice } = props;
     const { entryPriceMarket, exitPrice, borrowFee } = props;
     const { infoTokens_test, usdgSupply, positions } = props;
+    // const { isConfirming, setIsConfirming, isPendingConfirmation, setIsPendingConfirmation } = props;
 
     // 选择货币的弹窗
     const [visible, setVisible] = useState(null);
@@ -227,7 +233,26 @@ const SwapComponent = props => {
     const [triggerPriceValue, setTriggerPriceValue] = useState("");
     const [priceValue, setPriceValue] = useState('');
     const [entryMarkPrice, setEntryMarkPrice] = useState('');
-    const [pendingTxns, setPendingTxns] = useState([]); //hj add
+    const [pendingTxns, setPendingTxns] = useState([]); //hj add from
+    const [triggerRatioValue, setTriggerRatioValue] = useState("");
+    const triggerRatioInverted = useMemo(() => {
+        return isTriggerRatioInverted(fromTokenInfo, toTokenInfo);
+    }, [toTokenInfo, fromTokenInfo]);
+
+    const triggerRatio = useMemo(() => {
+        if (!triggerRatioValue) {
+            return bigNumberify(0);
+        }
+        let ratio = parseValue(triggerRatioValue, USD_DECIMALS);
+        if (ratio.eq(0)) {
+            return bigNumberify(0);
+        }
+        if (triggerRatioInverted) {
+            ratio = PRECISION.mul(PRECISION).div(ratio);
+        }
+        return ratio;
+    }, [triggerRatioValue, triggerRatioInverted]);
+    //hj add to
 
 
 
@@ -266,6 +291,7 @@ const SwapComponent = props => {
     // const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
     const fromAmount = parseValue(fromValue, fromToken && fromToken.decimals);
     const toAmount = parseValue(toValue, toToken && toToken.decimals);
+    const isMarketOrder = type === MARKET;
     const triggerPriceUsd = type === MARKET
         ? 0
         : parseValue(triggerPriceValue, USD_DECIMALS);
@@ -525,7 +551,7 @@ const SwapComponent = props => {
         infoTokens,
         fromUsdMin,
         toUsdMax,
-        //isMarketOrder,
+        isMarketOrder,
         type,
         triggerPriceUsd,
         //triggerRatio,
