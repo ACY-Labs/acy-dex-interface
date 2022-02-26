@@ -922,8 +922,10 @@ candleSeries.setData([
 
                       }}
                       infoTokens_test = {infoTokens}
-                      position = {positions}
+                      positions = {positions}
+                      positionsMap = {positionsMap}
                       usdgSupply = {usdgSupply}
+                      tokens={tokens}
                       onGetReceipt={onGetReceipt}
                       profitsIn={'ETH'} 
                       liqPrice={456}
