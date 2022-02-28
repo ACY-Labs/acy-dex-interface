@@ -77,7 +77,7 @@ import {
     parseArbitrageLog,
 } from '@/acy-dex-swap/utils/index';
 
-//hj add, get rid of getContract 
+//hj add
 import { getContractAddress } from '@/acy-dex-futures/utils/Addresses'
 
 
@@ -164,7 +164,10 @@ const SwapComponent = props => {
     const { profitsIn, liqPrice } = props;
     const { entryPriceMarket, exitPrice, borrowFee } = props;
     const { infoTokens_test, usdgSupply, positions } = props;
-    // const { isConfirming, setIsConfirming, isPendingConfirmation, setIsPendingConfirmation } = props;
+    const { isConfirming, setIsConfirming } = props;
+    console.log("here after confirm props");
+    // isPendingConfirmation, setIsPendingConfirmation } = props;
+    // const { savedSlippageAmount } = props;
 
     // 选择货币的弹窗
     const [visible, setVisible] = useState(null);
@@ -988,7 +991,7 @@ const SwapComponent = props => {
             unwrap();
             return;
         }
-        //setIsConfirming(true);
+        setIsConfirming(true);
         //metamask operations
     }
 

@@ -74,10 +74,6 @@ import sampleGmxTokens from '@/acy-dex-futures/samples/TokenList'
 // import { createChart } from 'krasulya-lightweight-charts'
 import { createChart } from 'lightweight-charts';
 
-//hj
-// const [isConfirming, setIsConfirming] = useState(false);
-// const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
-
 const { AddressZero } = ethers.constants
 // ----------
 const { AcyTabPane } = AcyTabs;
@@ -275,6 +271,9 @@ const Swap = props => {
   const {account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix}, globalSettings, } = useConstantLoader();
   console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
+    //hj
+    const [isConfirming, setIsConfirming] = useState(false);
+    const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
   const [pricePoint, setPricePoint] = useState(0);
   const [pastToken1, setPastToken1] = useState('ETH');
   const [pastToken0, setPastToken0] = useState('USDC');
@@ -936,10 +935,11 @@ candleSeries.setData([
                       entryPriceMarket={123}
                       exitPrice={123}
                       borrowFee={123}
-                    // isConfirming={isConfirming}
-                    // setIsConfirming={setIsConfirming}
+                    isConfirming={isConfirming}
+                    setIsConfirming={setIsConfirming}
                     // isPendingConfirmation={isPendingConfirmation}
                     // setIsPendingConfirmation={setIsPendingConfirmation}
+                    // savedSlippageAmount={savedSlippageAmount}
                     />
                   </div>
                 </AcyCard>
@@ -995,6 +995,7 @@ candleSeries.setData([
     </PageHeaderWrapper>
   );
 }
+
 export default connect(({ profile, transaction, swap, loading }) => ({
   profile,
   transaction,
