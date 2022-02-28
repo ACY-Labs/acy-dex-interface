@@ -129,9 +129,17 @@ import { AcyRadioButton } from '@/components/AcyRadioButton';
 
 import styled from "styled-components";
 const StyledRadioButton = styled(Radio.Button)`
-  background-color: #29292c;
+.ant-long{
+  background-color: #0ecc83;
   border: none;
   border-left: none !important;
+}
+.ant-short{
+
+}
+.ant-swap{
+
+}
 `;
 
 const StyledSlider = styled(Slider)`
@@ -1380,7 +1388,114 @@ const SwapComponent = props => {
         setLeverage(e);
     }
 
+<<<<<<< HEAD
     return (
+=======
+  return (
+    <div>
+      <div>
+        <Radio.Group
+          defaultValue={LONG} buttonStyle="solid" className={styles.modeSelector}
+          onChange={modeSelect}>
+          <StyledRadioButton value={LONG} className={styles.modeSubOption}>Long</StyledRadioButton>
+          <StyledRadioButton value={SHORT} className={styles.modeSubOption}>Short</StyledRadioButton>
+          <StyledRadioButton value={SWAP} className={styles.modeSubOption}>Swap</StyledRadioButton>
+
+        </Radio.Group>
+      </div>
+      <div>
+        <Tabs defaultActiveKey={MARKET} onChange={typeSelect}
+          size={'small'}
+          tabBarGutter={0}
+          type={'line'}
+          tabPosition={'top'}
+          tabBarStyle={{ border: '0px black' }}
+        //animated={false}
+        >
+          {perpetualType.map(i => (
+            <TabPane tab={<span>{i.icon}{i.name}{' '}</span>} key={i.id}>
+            </TabPane>
+          ))}
+        </Tabs>
+      </div>
+      <AcyCuarrencyCard
+        icon="eth"
+        title={token0BalanceShow && `Balance: ${parseFloat(token0Balance).toFixed(3)}`}
+        //coin={(token0 && token0.symbol) || 'Select'}
+        coin={(fromTokenInfo && fromTokenInfo.symbol) || 'Select'}
+        logoURI={token0 && token0.logoURI}
+        yuan="566.228"
+        dollar={`${token0Balance}`}
+        //token={token0Amount}
+        token={fromValue}
+        bonus={!exactIn && bonus0}
+        showBalance={token1BalanceShow}
+        onChoseToken={() => {
+          onClickCoin();
+          setBefore(true);
+        }}
+        onChangeToken={e => {
+          //setToken0Amount(e);
+          setFromValue(e)
+          setExactIn(true);
+          t0Changed(e);
+        }}
+        library={library}
+      />
+
+      <div
+        className={styles.arrow}
+        disabled={isLockedToken1}
+        onClick={() => {
+          if (!isLockedToken1) {
+            onSwitchCoinCard();
+          }
+
+        }}
+      >
+        <Icon style={{ fontSize: '16px' }} type="arrow-down" />
+      </div>
+
+      <AcyCuarrencyCard
+        icon="eth"
+        title={token1BalanceShow && `Balance: ${parseFloat(token1Balance).toFixed(3)}`}
+        coin={(token1 && token1.symbol) || 'Select'}
+        //coin={(toTokenInfo && toTokenInfo.symbol) || 'Select'}
+        logoURI={token1 && token1.logoURI}
+        yuan="566.228"
+        dollar={`${token1Balance}`}
+        //token={token1Amount}
+        token={toValue}
+        bonus={exactIn && bonus1}
+        showBalance={token1BalanceShow}
+        onChoseToken={() => {
+          onClickCoin();
+          setBefore(false);
+        }}
+        onChangeToken={e => {
+          // setToken1ApproxAmount(e);
+          //setToken1Amount(e);
+          setToValue(e);
+          setExactIn(false);
+          t1Changed(e);
+        }}
+        isLocked={isLockedToken1}
+        library={library}
+      />
+
+      {type === LIMIT &&
+        <div className={styles.priceBox}>
+          <PriceBox
+            onChange={limitOnChange}
+            markOnClick={markOnClick}
+            priceValue={priceValue}
+            toTokenInfo={toTokenInfo}
+            mode={mode}
+          />
+        </div>
+      }
+      {mode !== SWAP &&
+>>>>>>> 25b6e42872bfa07232bc96d645b6eade97148be3
         <div>
             <div>
                 <Radio.Group
