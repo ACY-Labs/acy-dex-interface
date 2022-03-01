@@ -107,12 +107,9 @@ import { AcyRadioButton } from '@/components/AcyRadioButton';
 
 import styled from "styled-components";
 const StyledRadioButton = styled(Radio.Button)`
-  background-color: ${props => props.inputColors};
-  color:#1B1B1C;
-  border:none;
-  border-color: inherit;
+  background-color: #29292c;
+  border: none;
   border-left: none !important;
-  border-right: none !important;
 `;
 
 const StyledSlider = styled(Slider)`
@@ -289,11 +286,11 @@ const SwapComponent = props => {
   const perpetualMode = [LONG, MARKET];
   const perpetualType = [{
     name: 'Market',
-    icon: <LineChartOutlined />,
+    // icon: <LineChartOutlined />,
     id: MARKET,
   }, {
     name: 'Limit',
-    icon: <FieldTimeOutlined />,
+    // icon: <FieldTimeOutlined />,
     id: LIMIT,
   }];
   const leverageSlider = {
@@ -857,6 +854,7 @@ const SwapComponent = props => {
           type={'line'}
           tabPosition={'top'}
           tabBarStyle={{ border: '0px black' }}
+          className={styles.tabStyle}
         //animated={false}
         >
           {perpetualType.map(i => (
@@ -946,7 +944,7 @@ const SwapComponent = props => {
           <AcyDescriptions>
             <div className={styles.breakdownTopContainer}>
               <div className={styles.slippageContainer}>
-                <span style={{ fontWeight: 600 }}>Leverage ymj</span>
+                <span style={{ fontWeight: 600 }}>Leverage <input className={styles.inputbox}></input></span>
                 <span className={styles.leverageSlider}>
                   <StyledSlider marks={leverageSlider} defaultValue={leverage} max={30.51} min={1.10} onChange={leverageSliderOnChange} step={0.1}
                     style={{ color: 'red' }} />
@@ -954,28 +952,6 @@ const SwapComponent = props => {
               </div>
             </div>
           </AcyDescriptions>
-          <DetailBox
-            leverage={leverage}
-            shortOrLong={mode}
-            marketOrLimit={type}
-            profitsIn={profitsIn}
-            entryPriceLimit={entryPriceLimit}
-            liqPrice={liqPrice}
-            entryPriceMarket={entryPriceMarket}
-            exitPrice={exitPrice}
-            borrowFee={borrowFee}
-            token1Symbol={token1.symbol}
-            fromUsdMin={fromUsdMin}
-            toUsdMax={toUsdMax}
-            toTokenInfo={toTokenInfo}
-            triggerPriceValue={triggerPriceValue}
-            shortCollateralToken={shortCollateralToken}
-            toTokenAddress={toTokenAddress}
-            shortCollateralAddress={shortCollateralAddress}
-            positionsMap={positionsMap}
-            positionKey={positionKey}
-            positions={positions}
-          />
           </div>
       }
           {mode === SWAP &&
@@ -1049,6 +1025,8 @@ const SwapComponent = props => {
           <TokenSelectorModal
             onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick}
           />
+
+          
         </div>
   );
 };

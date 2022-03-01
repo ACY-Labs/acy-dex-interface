@@ -15,7 +15,8 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
-
+import { PriceBox } from './components/PriceBox';
+import { DetailBox } from './components/DetailBox';
 import { 
   ACTIONS,
   ORDERS, 
@@ -935,6 +936,13 @@ candleSeries.setData([
                       borrowFee={123}
                     />
                   </div>
+                </AcyCard>
+                <AcyCard>
+                <AcyCard>
+          <DetailBox
+  
+          />
+          </AcyCard>
                 </AcyCard>
           </div>
 
