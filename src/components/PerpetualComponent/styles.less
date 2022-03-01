@@ -129,6 +129,11 @@
   .modeSelector {
     width: 100%;
     margin-bottom: 15px;
+    :global{
+      .ant-radio-button-wrapper:not(:first-child)::before{
+        background-color:inherit !important;
+      }
+    }
   }
   .modeSubOption{
     width: 33%;
@@ -136,6 +141,7 @@
     text-align: center;
     //line-height: normal;
     margin: auto;
+  
   }
   .typeSelector {
     width: 100%;

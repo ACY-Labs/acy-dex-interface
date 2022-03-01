@@ -107,17 +107,12 @@ import { AcyRadioButton } from '@/components/AcyRadioButton';
 
 import styled from "styled-components";
 const StyledRadioButton = styled(Radio.Button)`
-.ant-long{
-  background-color: #0ecc83;
-  border: none;
+  background-color: ${props => props.inputColors};
+  color:#1B1B1C;
+  border:none;
+  border-color: inherit;
   border-left: none !important;
-}
-.ant-short{
-
-}
-.ant-swap{
-
-}
+  border-right: none !important;
 `;
 
 const StyledSlider = styled(Slider)`
@@ -848,9 +843,10 @@ const SwapComponent = props => {
         <Radio.Group
           defaultValue={LONG} buttonStyle="solid" className={styles.modeSelector}
           onChange={modeSelect}>
-          <StyledRadioButton value={LONG} className={styles.modeSubOption}>Long</StyledRadioButton>
-          <StyledRadioButton value={SHORT} className={styles.modeSubOption}>Short</StyledRadioButton>
-          <StyledRadioButton value={SWAP} className={styles.modeSubOption}>Swap</StyledRadioButton>
+          <StyledRadioButton value={LONG} className={styles.modeSubOption} inputColors = "#0ecc83">Long         
+          </StyledRadioButton>
+          <StyledRadioButton value={SHORT} className={styles.modeSubOption} inputColors="#fa3c58">Short</StyledRadioButton>
+          <StyledRadioButton value={SWAP} className={styles.modeSubOption} inputColors="#e29227">Swap</StyledRadioButton>
 
         </Radio.Group>
       </div>
