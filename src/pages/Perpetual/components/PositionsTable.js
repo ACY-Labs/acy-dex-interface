@@ -11,7 +11,7 @@ import AcyClosePositionModal from '@/components/AcyClosePositionModal';
 import AcyCreateOrderModal from '@/components/AcyCreadeOrderModal';
 import { isDesktop } from '@/pages/Market/Util';
 import {sortTableTime} from '../utils'
-import { formatAmount , USD_DECIMALS } from '@/acy-dex-futures/utils';
+import { formatAmount , getLiquidationPrice, USD_DECIMALS } from '@/acy-dex-futures/utils';
 
 const PositionsTable = props => {
   const [displayNumber, setDisplayNumber] = useState(5);
@@ -108,7 +108,7 @@ const PositionsTable = props => {
     },
     {
       title: 'Entry Price',
-      dataIndex: 'entryPrice',
+      dataIndex: 'averagePrice',
       align : 'left',
       render: (text,record) => {
         return <div className={styles.tableEntryBig}>$ {formatAmount(text, USD_DECIMALS, 2, null , true)}</div>;
@@ -116,15 +116,15 @@ const PositionsTable = props => {
     },
     {
         title: 'Liq. Price',
-        dataIndex: 'liqPrice',
+        dataIndex: '',
         align : 'left',
         render: (text,record) => {
-          return <div className={styles.tableEntryBig}>$ {formatAmount(text, USD_DECIMALS, 2, null , true)}</div>;
+          const liqPrice = getLiquidationPrice(record);
+          return <div className={styles.tableEntryBig}>$ {formatAmount(liqPrice, USD_DECIMALS, 2, null , true)}</div>;
         }
       },
       {
         dataIndex: '',
-        key: 'transactionTime',
         align : 'left',
         render: (text,record) => {
           return <div>

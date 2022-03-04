@@ -30,7 +30,8 @@ import {
   getPositionKey,
   getLeverage,
   bigNumberify,
-  getDeltaStr
+  getDeltaStr,
+  useAccountOrders
 } from '@/acy-dex-futures/utils';
 
 import {
@@ -342,6 +343,9 @@ const chartRef = useRef(null);
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   const { positions, positionsMap } = getPositions(tempChainID, positionQuery, positionData, infoTokens, true)
+  // const [orders, updateOrders] = useAccountOrders(flagOrdersEnabled)
+
+  console.log('PRINTING ALL POSITIONS FOR USER', positions);
 
 //--------- 
   useEffect(() => {
@@ -963,7 +967,7 @@ candleSeries.setData([
           </div>
         <div className={styles.rowFlexContainer}>
             <div className={`${styles.colItem} ${styles.priceChart}`}>
-                <div className={styles.Trade}>
+                <div className={styles.positionsTable}>
                 <RenderTable/>
                 </div>
             </div>
