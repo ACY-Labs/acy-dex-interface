@@ -65,6 +65,11 @@ export default [
         component: './Farms/',
       },
       {
+        path: '/stablecoin',
+        name: 'USDAⓈ',
+        component: './StableCoin/Index',
+      },
+      {
         path: '/launchpad',
         name: 'Launch',
         hideChildrenInMenu: true,
