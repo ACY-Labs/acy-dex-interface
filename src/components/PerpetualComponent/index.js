@@ -328,11 +328,11 @@ const SwapComponent = props => {
     const perpetualMode = [LONG, MARKET];
     const perpetualType = [{
         name: 'Market',
-        icon: <LineChartOutlined />,
+        // icon: <LineChartOutlined />,
         id: MARKET,
     }, {
         name: 'Limit',
-        icon: <FieldTimeOutlined />,
+        // icon: <FieldTimeOutlined />,
         id: LIMIT,
     }];
     const leverageSlider = {
