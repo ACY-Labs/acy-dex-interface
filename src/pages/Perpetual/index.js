@@ -75,7 +75,6 @@ import sampleGmxTokens from '@/acy-dex-futures/samples/TokenList'
 // import { createChart } from 'krasulya-lightweight-charts'
 import { createChart } from 'lightweight-charts';
 
-
 const { AddressZero } = ethers.constants
 // ----------
 const { AcyTabPane } = AcyTabs;
@@ -273,6 +272,9 @@ const Swap = props => {
   const {account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix}, globalSettings, } = useConstantLoader();
   console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
+    //hj
+    const [isConfirming, setIsConfirming] = useState(false);
+    const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
   const [pricePoint, setPricePoint] = useState(0);
   const [pastToken1, setPastToken1] = useState('ETH');
   const [pastToken0, setPastToken0] = useState('USDC');
@@ -708,7 +710,7 @@ const chart = createChart(chartRef.current,{
 	width: 600,
   height: 300,
 	layout: {
-		backgroundColor: '#000000',
+		backgroundColor: '#1B1B1C',
 		textColor: 'rgba(255, 255, 255, 0.9)',
 	},
 	grid: {
@@ -728,12 +730,16 @@ const chart = createChart(chartRef.current,{
 });
 
 var candleSeries = chart.addCandlestickSeries({
-  upColor: 'rgba(255, 144, 0, 1)',
-  downColor: '#000',
-  borderDownColor: 'rgba(255, 144, 0, 1)',
-  borderUpColor: 'rgba(255, 144, 0, 1)',
-  wickDownColor: 'rgba(255, 144, 0, 1)',
-  wickUpColor: 'rgba(255, 144, 0, 1)',
+  lineColor: '#5472cc',
+  topColor: 'rgba(49, 69, 131, 0.4)',
+  bottomColor: 'rgba(42, 64, 103, 0.0)',
+  lineWidth: 2,
+	priceLineColor: '#3a3e5e',
+  downColor: '#fa3c58',
+  wickDownColor: '#fa3c58',
+  upColor: '#0ecc83',
+  wickUpColor: '#0ecc83',
+  borderVisible: false
 });
 
 candleSeries.setData([
@@ -912,7 +918,7 @@ candleSeries.setData([
           <div ref={chartRef}></div>
           </div> 
           <div className={`${styles.colItem} ${styles.perpetualComponent}`} >
-                <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
+                <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}>
                   <div className={styles.trade}>
                     <PerpetualComponent
                       onSelectToken0={token => {
@@ -922,12 +928,22 @@ candleSeries.setData([
                         setActiveToken1(token);
 
                       }}
+                      infoTokens_test = {infoTokens}
+                      positions = {positions}
+                      positionsMap = {positionsMap}
+                      usdgSupply = {usdgSupply}
+                      tokens={tokens}
                       onGetReceipt={onGetReceipt}
                       profitsIn={'ETH'} 
                       liqPrice={456}
                       entryPriceMarket={123}
                       exitPrice={123}
                       borrowFee={123}
+                    isConfirming={isConfirming}
+                    setIsConfirming={setIsConfirming}
+                    // isPendingConfirmation={isPendingConfirmation}
+                    // setIsPendingConfirmation={setIsPendingConfirmation}
+                    // savedSlippageAmount={savedSlippageAmount}
                     />
                   </div>
                 </AcyCard>
@@ -983,6 +999,7 @@ candleSeries.setData([
     </PageHeaderWrapper>
   );
 }
+
 export default connect(({ profile, transaction, swap, loading }) => ({
   profile,
   transaction,

@@ -3,6 +3,8 @@ export const MARKET = 'Market';
 export const LIMIT = 'Limit';
 export const LONG = 'Long';
 export const SHORT = 'Short';
+export const SWAP = 'Swap';
+
 export const FEE = 0.1;
 //export const USD_DECIMALS = 30;
 

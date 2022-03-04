@@ -114,6 +114,9 @@ const  BasicLayout =props=> {
     if(pathname.indexOf('/launchpad')>-1){
       setBgColor('launchpadRadialBg');
     }
+    if(pathname.indexOf('/perpetual')>-1){
+      setBgColor('launchpadRadialBg');
+    }
   })
   // componentDidUpdate(preProps) {
   //   // After changing to phone mode,
