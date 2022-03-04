@@ -2,25 +2,70 @@ import React, { Component, useState, useEffect, useRef } from 'react';
 //------FOR Pricehart-----TODO Austin
 // import { createChart } from 'krasulya-lightweight-charts'
 import { createChart } from 'lightweight-charts';
+import './styles.css';
+// import { getTokens,getToken } from '../../../acy-dex-futures/data/Tokens.js'
+// import {
+// 	USD_DECIMALS,
+// 	SWAP,
+//   INCREASE,
+//   CHART_PERIODS,
+// 	getTokenInfo,
+// 	formatAmount,
+// 	formatDateTime,
+//   usePrevious,
+//   getLiquidationPrice,
+//   useLocalStorageSerializeKey
+// } from '../../../acy-dex-futures/utils/Helpers'
+
+// import { useChartPrices } from '../../../acy-dex-futures/Api'
+import Tab from '../../../acy-dex-futures/Tab/Tab'
 
 const Kchart=()=> {
+
+    const [currentChart, setCurrentChart] = useState();
+    const [currentSeries, setCurrentSeries] = useState();
+    // let [period, setPeriod] = useLocalStorageSerializeKey([chainId, "Chart-period"], DEFAULT_PERIOD)
+    // if (!(period in CHART_PERIODS)) {
+    //   period = DEFAULT_PERIOD
+    // }
+
+    // const [hoveredCandlestick, setHoveredCandlestick] = useState()
+
+
+
+
 const chartRef = useRef(null);
+// const chartToken = getChartToken(swapOption, fromToken, toToken, chainId)
 
-
+// function getChartToken(swapOption, fromToken, toToken, chainId) {
+//     if (!fromToken || !toToken) { return }
+  
+//     if (swapOption !== SWAP) { return toToken }
+  
+//     if (fromToken.isUsdg && toToken.isUsdg) { return getTokens(chainId).find(t => t.isStable) }
+//     if (fromToken.isUsdg) { return toToken }
+//     if (toToken.isUsdg) { return fromToken }
+  
+//     if (fromToken.isStable && toToken.isStable) { return toToken }
+//     if (fromToken.isStable) { return toToken }
+//     if (toToken.isStable) { return fromToken }
+  
+//     return toToken
+//   }
 const getChartOptions = (width, height) => ({
     width,
     height,
     layout: {
-      backgroundColor: 'rgba(255, 255, 255, 0)',
+      backgroundColor: '#1b1b1c',
       textColor: '#ccc',
       fontFamily: 'Relative'
     },
-    localization: {
-      // https://github.com/tradingview/lightweight-charts/blob/master/docs/customization.md#time-format
-      timeFormatter: businessDayOrTimestamp => {
-        return formatDateTime(businessDayOrTimestamp - timezoneOffset);
-      }
-    },
+    // localization: {
+    //   // https://github.com/tradingview/lightweight-charts/blob/master/docs/customization.md#time-format
+    //   timeFormatter: businessDayOrTimestamp => {
+    //     return formatDateTime(businessDayOrTimestamp - timezoneOffset);
+    //   }
+    // },
     grid: {
       vertLines: {
         visible: true,
@@ -72,28 +117,10 @@ const getChartOptions = (width, height) => ({
   
     //#TODO (Austin) convert into ACY Style
     useEffect(()=>{
-  const chart = createChart(chartRef.current,{
-      width: 600,
-    height: 300,
-      layout: {
-          backgroundColor: '#1B1B1C',
-          textColor: 'rgba(255, 255, 255, 0.9)',
-      },
-      grid: {
-          vertLines: {
-              color: 'rgba(197, 203, 206, 0.5)',
-          },
-          horzLines: {
-              color: 'rgba(197, 203, 206, 0.5)',
-          },
-      },
-      rightPriceScale: {
-          borderColor: 'rgba(197, 203, 206, 0.8)',
-      },
-      timeScale: {
-          borderColor: 'rgba(197, 203, 206, 0.8)',
-      },
-  });
+        const chart = createChart(
+            chartRef.current,
+            getChartOptions(600, 400)
+          );
   
   var candleSeries = chart.addCandlestickSeries({
     lineColor: '#5472cc',
@@ -262,10 +289,39 @@ const getChartOptions = (width, height) => ({
   
     },[chartRef,])
 
+    useEffect(() => {
+        if (!currentChart) { return; }
+        const resizeChart = () => {
+          currentChart.resize(chartRef.current.offsetWidth, chartRef.current.offsetHeight)
+        }
+        window.addEventListener('resize', resizeChart);
+        return () => window.removeEventListener('resize', resizeChart);
+      }, [currentChart]);
 
+    
     return(
-        <div >
-        <div className="Austinbaba" ref={chartRef}></div>
+        <div className='PriceChart'>
+            <div className="TopInner">
+                <div>ACY/USDT</div>
+                <div>XXX</div>
+                <div>XXX</div>
+                <div>XXX</div>
+                <div>XXX</div>
+
+            </div>
+            <div className="BotInner">
+                <div className="KChartHeader">
+                    <div className='KChartControl'>
+                        {/* <div className='TabBlock'> </div> */}
+                        {/* <Tab options={Object.keys(CHART_PERIODS)} option={period} setOption={setPeriod} /> */}
+
+                    </div>
+                    <div className='KChartStat'></div>
+                </div>
+                <div className="KChartBox" ref={chartRef}></div>
+
+
+            </div>
         </div>
 
     )
