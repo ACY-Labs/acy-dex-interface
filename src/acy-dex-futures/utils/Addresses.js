@@ -155,12 +155,14 @@ const CONTRACTS = {
   }
 }
 
-export function getContract(chainId, name) {
+export function getContractAddress(chainId, name) {
+
+    console.log("getContractAddress, chainID", chainId, "name", name);
   if (!CONTRACTS[chainId]) {
-    throw new Error(`Unknown chainId ${chainId}`);
+    console.log(`Unknown chainId ${chainId}`);
   }
   if (!CONTRACTS[chainId][name]) {
-    throw new Error(`Unknown constant "${name}" for chainId ${chainId}`);
+    console.log(`Unknown constant "${name}" for chainId ${chainId}`);
   }
   return CONTRACTS[chainId][name]
 }
