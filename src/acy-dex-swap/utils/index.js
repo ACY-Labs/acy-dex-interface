@@ -505,6 +505,7 @@ export function parseArbitrageLog({ data, topics }) {
 }
 export async function getAllSuportedTokensPrice() {
   const tokenList = TOKENLIST();
+  const chainID = CHAINID();
   const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
   const searchIds = searchIdsArray.join('%2C');
   const tokensPrice = await axios.get(
@@ -521,6 +522,10 @@ export async function getAllSuportedTokensPrice() {
     // // where tokens is not listed on coinGecko
     // if (CHAINID() == 56)
     //   tokensPrice["OWLA"] = await getTokenPriceFromPool("OWLA");
+    if(chainID == 56) {
+      if(tokensPrice["DXS"] == 0)
+        tokensPrice["DXS"] = await getTokenPriceFromPool("DXS", tokensPrice);
+    }
 
     console.log(">>> tokenPriceDict", tokensPrice);
     return tokensPrice;
@@ -530,6 +535,7 @@ export async function getAllSuportedTokensPrice() {
 // market 专用
 export async function getAllSuportedTokensPrice_forMarket() {
   const tokenList = MARKET_TOKEN_LIST();
+  const chainID = CHAINID();
   const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
   const searchIds = searchIdsArray.join('%2C');
   const tokensPrice = await axios.get(
@@ -546,6 +552,11 @@ export async function getAllSuportedTokensPrice_forMarket() {
     // where tokens is not listed on coinGecko
     // if (CHAINID() == 56)
     //   tokensPrice["OWLA"] = await getTokenPriceFromPool("OWLA");
+    // for token that not listed on coinGecko
+    if(chainID == 56) {
+      if(tokensPrice["DXS"] == 0)
+        tokensPrice["DXS"] = await getTokenPriceFromPool("DXS", tokensPrice);
+    }
 
     console.log(">>> tokenPriceDict_market", tokensPrice);
     return tokensPrice;
@@ -568,14 +579,16 @@ export async function withExactOutEstimateInAmount(deltaY, xTokenAddress, yToken
   return estimateInputAmount;
 }
 
-export async function getTokenPriceFromPool(tokenSymbol){
+export async function getTokenPriceFromPool(tokenSymbol, tokensPrice){
   const tokenList = TOKENLIST();
   const chainId = CHAINID();
   const library = constantInstance.library;
 
   const tok  = tokenList.find(token => token.symbol == tokenSymbol);
-  const BUSD = tokenList.find(token => token.symbol == "USDC");
+  const BUSD = tokenList.find(token => token.symbol == "BUSD");
   const USDT = tokenList.find(token => token.symbol == "USDT");
+  const ACY = tokenList.find(token => token.symbol == "ACY");
+  
 
   const newToken  = new Token(chainId, tok.address, tok.decimals, tokenSymbol);
 
@@ -586,16 +599,25 @@ export async function getTokenPriceFromPool(tokenSymbol){
       return false
     });
     if (newTokenUsdtPair)
-      calcPriceTasks.push(getTokenPriceByPair(newTokenUsdtPair, tok.symbol, library))
+      calcPriceTasks.push(getTokenPriceByPair(newTokenUsdtPair, tok.symbol, library).then(res => res * tokensPrice[USDT.symbol]))
   }
 
   if (BUSD) {
-    const busdToken = new Token(chainId, BUSD.address, BUSD.decimals, "USDC");
+    const busdToken = new Token(chainId, BUSD.address, BUSD.decimals, "BUSD");
     const newTokenBusdPair = await Fetcher.fetchPairData(newToken, busdToken, library, chainId).catch(e => {
       return false
     });
     if (newTokenBusdPair)
-      calcPriceTasks.push(getTokenPriceByPair(newTokenBusdPair, tok.symbol, library))
+      calcPriceTasks.push(getTokenPriceByPair(newTokenBusdPair, tok.symbol, library).then(res => res * tokensPrice[BUSD.symbol]))
+  }
+
+  if(ACY) {
+    const acyToken = new Token(chainId, ACY.address, ACY.decimals, "ACY");
+    const newTokenBusdPair = await Fetcher.fetchPairData(newToken, acyToken, library, chainId).catch(e => {
+      return false
+    });
+    if (newTokenBusdPair)
+      calcPriceTasks.push(getTokenPriceByPair(newTokenBusdPair, tok.symbol, library).then(res => res * tokensPrice[ACY.symbol]))
   }
 
   const res = await Promise.all(calcPriceTasks);
