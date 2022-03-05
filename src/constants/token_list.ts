@@ -41,14 +41,14 @@ const BscMainNetTokenList: Array<TokenInfo> = [
     logoURI: 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/OWLA-min.png',
     idOnCoingecko: "undefined",
   },
-  // {
-  //   name: 'DX Spot',
-  //   symbol: 'DXS',
-  //   address: '0xBd9A43BA37a748b89331BD5Df2Ab5BC7815Cc6Bb',
-  //   decimals: 8,
-  //   logoURI: 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/DXSpot-min.png',
-  //   idOnCoingecko: "undefined",
-  // },
+  {
+    name: 'DX Spot',
+    symbol: 'DXS',
+    address: '0xB0Df5519F460E96117C12Ea667557b161866189c',
+    decimals: 8,
+    logoURI: 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/DXSpot-min.svg',
+    idOnCoingecko: "undefined",
+  },
   {
     name: 'Binance Coin',
     symbol: 'BNB',
@@ -65,14 +65,15 @@ const BscMainNetTokenList: Array<TokenInfo> = [
     logoURI: 'https://cryptologos.cc/logos/binance-usd-busd-logo.svg?v=014',
     idOnCoingecko: "tether",
   },
-  {
-    name: 'Wrapped BNB',
-    symbol: 'WBNB',
-    address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
-    decimals: 18,
-    logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
-    idOnCoingecko: "binancecoin",
-  },
+  // // comment out WBNB in case of having duplicated pair
+  // {
+  //   name: 'Wrapped BNB',
+  //   symbol: 'WBNB',
+  //   address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
+  //   decimals: 18,
+  //   logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
+  //   idOnCoingecko: "binancecoin",
+  // },
 
   {
     name: 'Ethereum',
@@ -120,15 +121,16 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
     idOnCoingecko: "usd-coin",
   },
-  {
-    name: 'Wrapped BNB',
-    symbol: 'WBNB',
-    address: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
-    addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-    decimals: 18,
-    logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
-    idOnCoingecko: "binancecoin",
-  },
+  // // comment out WBNB in case of having duplicated pair
+  // {
+  //   name: 'Wrapped BNB',
+  //   symbol: 'WBNB',
+  //   address: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
+  //   addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+  //   decimals: 18,
+  //   logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
+  //   idOnCoingecko: "binancecoin",
+  // },
   {
     name: 'ACY',
     symbol: 'ACY',
