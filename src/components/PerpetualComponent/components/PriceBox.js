@@ -1,29 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Card, Icon, Input, Row, Col } from 'antd';
 import AcyIcon from '@/components/AcyIcon';
 import styles from './styles.less';
 import classname from 'classnames';
 import Pattern from '@/utils/pattern';
-
+import { LONG, SHORT } from '../constant'
+import { BigNumber } from '@ethersproject/bignumber';
+import { formatAmount, USD_DECIMALS } from '@/acy-dex-futures/utils'
 
 
 export const PriceBox = (props) => {
-    const [mark, setMark] = useState(0);
-
     const {
-        inputTest,
         onChange,
-        marketPrice,
-        eLimitPrice,
+        markOnClick,
+        priceValue,
+        mark,
+        // toTokenInfo,
+        // mode,
     } = props;
-    useEffect(() => {
-        console.log('ymj price box online', inputTest)
-    })
 
-    const markOnClick=()=>{
-        setMark(marketPrice)
-    }
+    // let entryMarkPrice;
+    // let exitMarkPrice;
+    // if (toTokenInfo) {
+    //     entryMarkPrice =
+    //         mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice;
+    //     exitMarkPrice =
+    //         mode === LONG ? toTokenInfo.minPrice : toTokenInfo.maxPrice;
+    // }
+    // const mark = entryMarkPrice
 
+    // const onClick = () => {
+    //     markOnClick(formatAmount(mark, USD_DECIMALS, 2, true))
+    // }
 
     return (
         <div className={styles.acycuarrencycard}>
@@ -33,14 +41,18 @@ export const PriceBox = (props) => {
                     <input
                         className={styles.input}
                         placeholder="0.0"
+                        value={priceValue}
                         bordered={false}
                         onChange={onChange}
+                        oninput="value=value.replace(/[^\d]/g,'')"
                     />
                 </div>
                 <div className={styles.cua_bottomContainer}>
-          <div className={styles.cua_blanace} onClick={markOnClick}>{'Mark: '}{mark}</div>
-          <div>{'USD $'}</div>
-        </div>
+                    <div className={styles.cua_blanace} onClick={markOnClick}>
+                        Mark: {mark}
+                    </div>
+                    <div>USD</div>
+                </div>
             </div>
         </div>
     )

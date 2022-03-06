@@ -1,4 +1,5 @@
 import { useCallback,useMemo } from 'react'
+import { ethers } from 'ethers';
 import useSWR from 'swr'
 import { Token as UniToken } from '@uniswap/sdk-core'
 import { Pool } from '@uniswap/v3-sdk'
@@ -6,6 +7,8 @@ import Vault from '../abis/Vault.json'
 import UniPool from '../abis/UniPool.json'
 import { fetcher,parseValue,expandDecimals } from '../utils/index'
 import * as defaultToken from '../samples/TokenList'
+import { routerAddress } from '../samples/constants';
+import Router from '@/acy-dex-futures/abis/Router.json'
 
 const ARBITRUM = 42161
 
@@ -84,6 +87,16 @@ export async function callContract(chainID, method, params, opts) {
   }
 }
 
+export async function approvePlugin(chainId, pluginAddress, { library, pendingTxns, setPendingTxns }) {
+  const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner())
+  return callContract(chainId, contract, 'approvePlugin', [pluginAddress], {
+    sentMsg: 'Enable orders sent',
+    failMsg: 'Enable orders failed',
+    pendingTxns,
+    setPendingTxns
+  })
+}
+
 export function getTokenBySymbol(tokenlist, symbol) {
   for (let i = 0; i < tokenlist.length; i++) {
     if(tokenlist[i].symbol === symbol) {
@@ -95,13 +108,13 @@ export function getTokenBySymbol(tokenlist, symbol) {
 
 function useGmxPriceFromArbitrum(library, active) {
   const poolAddress = '0x80A9ae39310abf666A87C743d6ebBD0E8C42158E'
-  const { data: uniPoolSlot0, mutate: updateUniPoolSlot0 } = useSWR([`StakeV2:uniPoolSlot0:${active}`, ARBITRUM, poolAddress, "slot0"], {
+  const { data: uniPoolSlot0, mutate: updateUniPoolSlot0 } = useSWR([ARBITRUM, poolAddress, "slot0"], {
     fetcher: fetcher(library, UniPool),
   })
 
   const vaultAddress = "0x489ee077994B6658eAfA855C308275EAd8097C4A"
   const ethAddress = getTokenBySymbol(defaultToken.default, "WETH").address
-  const { data: ethPrice, mutate: updateEthPrice } = useSWR([`StakeV2:ethPrice:${active}`, ARBITRUM, vaultAddress, "getMinPrice", ethAddress], {
+  const { data: ethPrice, mutate: updateEthPrice } = useSWR([ARBITRUM, vaultAddress, "getMinPrice", ethAddress], {
     fetcher: fetcher(library, Vault),
   })
 

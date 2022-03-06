@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable import/extensions */
 import React, { useState, useEffect } from 'react'
-import { Link, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 import { useWeb3React } from '@web3-react/core'
 import { AcyIcon,} from '@/components/Acy'
@@ -11,7 +11,7 @@ import styles from './styles.less';
 
 const POLYGON = 137;
 
-const BuyGlp = (props) => {
+const BuyGlp = () => {
 
   const { chainId } = useWeb3React();
   const history = useHistory()
@@ -35,7 +35,7 @@ const BuyGlp = (props) => {
             Purchase GLP tokens to earn {chainId === POLYGON ? 'MATIC' : 'BNB'} fees from swaps and leverages trading.<br />Note that there is a minimum holding time of 15 minutes after a purchase.<br />
           </div>
         </div>
-        <GlpSwap {...props} isBuying={isBuying} setIsBuying={setIsBuying} />
+        <GlpSwap isBuying={isBuying} setIsBuying={setIsBuying} />
       </div>
       
     </PageHeaderWrapper>

@@ -4,7 +4,9 @@ import _ from "lodash";
 import Token from "@/acy-dex-futures/abis/Token.json";
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import { InjectedConnector, UserRejectedRequestError as UserRejectedRequestErrorInjected} from "@web3-react/injected-connector";
-
+import { useRef, useEffect, useCallback } from "react";
+import { useLocalStorage } from "react-use";
+import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
 export const MARKET = 'Market';
 export const LIMIT = 'Limit';
 export const LONG = 'Long';
@@ -33,11 +35,108 @@ export const PRECISION = expandDecimals(1, 30)
 export const TAX_BASIS_POINTS = 50
 export const MINT_BURN_FEE_BASIS_POINTS = 20
 export const DEFAULT_MAX_USDG_AMOUNT = expandDecimals(200 * 1000 * 1000, 18)
+export const ARBITRUM_DEFAULT_COLLATERAL_SYMBOL = 'USDC'
+export const ARBITRUM_DEFAULT_COLLATERAL_ADDRESS = '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'
+export const SLIPPAGE_BPS_KEY = "Exchange-swap-slippage-basis-points-v3";
+export const DEFAULT_SLIPPAGE_AMOUNT = 20;
+export const SWAP_FEE_BASIS_POINTS = 20;
+export const STABLE_SWAP_FEE_BASIS_POINTS = 1;
+export const STABLE_TAX_BASIS_POINTS = 5;
+export const THRESHOLD_REDEMPTION_VALUE = expandDecimals(993, 27); // 0.993
+export const MIN_PROFIT_TIME = 3 * 60 * 60; // 3 hours
+export const PROFIT_THRESHOLD_BASIS_POINTS = 120;
 
 const supportedChainIds = [ARBITRUM];
 const injectedConnector = new InjectedConnector({
   supportedChainIds
 });
+
+export function calculatePositionDelta(
+  price,
+  { size, collateral, isLong, averagePrice, lastIncreasedTime },
+  sizeDelta
+) {
+  if (!sizeDelta) {
+    sizeDelta = size;
+  }
+  const priceDelta = averagePrice.gt(price)
+    ? averagePrice.sub(price)
+    : price.sub(averagePrice);
+  let delta = sizeDelta.mul(priceDelta).div(averagePrice);
+  const pendingDelta = delta;
+
+  const minProfitExpired =
+    lastIncreasedTime + MIN_PROFIT_TIME < Date.now() / 1000;
+  const hasProfit = isLong ? price.gt(averagePrice) : price.lt(averagePrice);
+  if (
+    !minProfitExpired &&
+    hasProfit &&
+    delta.mul(BASIS_POINTS_DIVISOR).lte(size.mul(PROFIT_THRESHOLD_BASIS_POINTS))
+  ) {
+    delta = bigNumberify(0);
+  }
+
+  const deltaPercentage = delta.mul(BASIS_POINTS_DIVISOR).div(collateral);
+  const pendingDeltaPercentage = pendingDelta
+    .mul(BASIS_POINTS_DIVISOR)
+    .div(collateral);
+
+  return {
+    delta,
+    pendingDelta,
+    pendingDeltaPercentage,
+    hasProfit,
+    deltaPercentage
+  };
+}
+
+export function isTriggerRatioInverted(fromTokenInfo, toTokenInfo) {
+  if (!toTokenInfo || !fromTokenInfo) return false;
+  if (toTokenInfo.isStable || toTokenInfo.isUsdg) return true;
+  if (toTokenInfo.maxPrice)
+    return toTokenInfo.maxPrice.lt(fromTokenInfo.maxPrice);
+  return false;
+}
+
+export function useLocalStorageSerializeKey(key, value, opts) {
+  key = JSON.stringify(key);
+  return useLocalStorage(key, value, opts);
+}
+
+export function getSavedSlippageAmount(chainId) {
+  const [ savedSlippageAmount ] =
+    useLocalStorageSerializeKey([chainId, SLIPPAGE_BPS_KEY], DEFAULT_SLIPPAGE_AMOUNT);
+    return savedSlippageAmount
+}
+
+export function useLocalStorageByChainId(chainId, key, defaultValue) {
+  const [internalValue, setInternalValue] = useLocalStorage(key, {});
+
+  const setValue = useCallback(
+    value => {
+      setInternalValue(internalValue => {
+        if (typeof value === "function") {
+          value = value(internalValue[chainId] || defaultValue);
+        }
+        const newInternalValue = {
+          ...internalValue,
+          [chainId]: value
+        };
+        return newInternalValue;
+      });
+    },
+    [chainId, setInternalValue, defaultValue]
+  );
+
+  let value;
+  if (chainId in internalValue) {
+    value = internalValue[chainId];
+  } else {
+    value = defaultValue;
+  }
+
+  return [value, setValue];
+}
 
 export function adjustForDecimals(amount, divDecimals, mulDecimals) {
   return amount
@@ -517,7 +616,7 @@ export function getProvider(library, chainId) {
 
 export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   // eslint-disable-next-line
-  const [id, chainId, arg0, arg1, ...params] = args;
+  const [chainId, arg0, arg1, ...params] = args;
   const provider = getProvider(library, chainId);
   const method = ethers.utils.isHexString(arg0) ? arg1 : arg0;
 
@@ -528,7 +627,6 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   if (ethers.utils.isHexString(arg0)) {
     const address = arg0
     const contract = new ethers.Contract(address, contractInfo.abi, provider)
-
     try {
       if (additionalArgs) {
         console.log('FETCHER FUNCTION CALLED WITH METHOD  --> ', method);
@@ -895,7 +993,45 @@ export function bigNumberify(n){
     const afterFeeUsd = sizeDelta.mul(BASIS_POINTS_DIVISOR - MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR)
     return sizeDelta.sub(afterFeeUsd)
   }
-// ymj
+
+  const adjustForDecimalsFactory = n => number => {
+    if (n === 0) {
+      return number;
+    }
+    if (n > 0) {
+      return number.mul(expandDecimals(1, n));
+    }
+    return number.div(expandDecimals(1, -n));
+  };
+
+  export function getSwapFeeBasisPoints(isStable) {
+    return isStable ? STABLE_SWAP_FEE_BASIS_POINTS : SWAP_FEE_BASIS_POINTS;
+  }
+
+  export function getMostAbundantStableToken(chainId, infoTokens) {
+    const tokens = defaultToken.default
+    const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
+    let availableAmount;
+    let stableToken = whitelistedTokens.find(t => t.isStable);
+    for (let i = 0; i < whitelistedTokens.length; i++) {
+      const info = getTokenInfo(infoTokens, whitelistedTokens[i].address);
+      if (!info.isStable || !info.availableAmount) {
+        continue;
+      }
+  
+      const adjustedAvailableAmount = adjustForDecimals(
+        info.availableAmount,
+        info.decimals,
+        USD_DECIMALS
+      );
+      if (!availableAmount || adjustedAvailableAmount.gt(availableAmount)) {
+        availableAmount = adjustedAvailableAmount;
+        stableToken = info;
+      }
+    }
+    return stableToken;
+  }
+
   export function getNextFromAmount(
     chainId,
     toAmount,
@@ -919,6 +1055,14 @@ export function bigNumberify(n){
   
     const fromToken = getTokenInfo(infoTokens, fromTokenAddress);
     const toToken = getTokenInfo(infoTokens, toTokenAddress);
+  
+    if (fromToken.isNative && toToken.isWrapped) {
+      return { amount: toAmount };
+    }
+  
+    if (fromToken.isWrapped && toToken.isNative) {
+      return { amount: toAmount };
+    }
   
     if (!fromToken || !fromToken.minPrice || !toToken || !toToken.maxPrice) {
       return defaultValue;
@@ -966,8 +1110,8 @@ export function bigNumberify(n){
           ratio && !ratio.isZero()
             ? fromAmountBasedOnRatio
             : toAmount
-              .mul(expandDecimals(1, toToken.decimals))
-              .div(toToken.redemptionAmount);
+                .mul(expandDecimals(1, toToken.decimals))
+                .div(toToken.redemptionAmount);
   
         return {
           amount: adjustDecimals(
@@ -988,8 +1132,8 @@ export function bigNumberify(n){
           ratio && !ratio.isZero()
             ? fromAmountBasedOnRatio
             : toAmount
-              .mul(expandDecimals(1, toToken.decimals))
-              .div(toToken.redemptionAmount);
+                .mul(expandDecimals(1, toToken.decimals))
+                .div(toToken.redemptionAmount);
   
         return {
           amount: adjustDecimals(
@@ -1359,3 +1503,11 @@ export function bigNumberify(n){
     }
     return amount;
   };
+
+  export function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+      ref.current = value;
+    });
+    return ref.current;
+  }

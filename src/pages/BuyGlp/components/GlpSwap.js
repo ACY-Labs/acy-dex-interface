@@ -33,6 +33,7 @@ import {
   getUsd,
   adjustForDecimals,
   getInjectedHandler,
+  getSavedSlippageAmount,
   GLP_DECIMALS,
   USD_DECIMALS,
   BASIS_POINTS_DIVISOR,
@@ -130,8 +131,9 @@ function getNativeToken(tokenlist) {
 
 export default function GlpSwap(props) {
 
-  const { savedSlippageAmount, setPendingTxns, isBuying, setIsBuying } = props
+  const { isBuying, setIsBuying } = props
   const { account } = useConstantLoader(props)
+  const savedSlippageAmount = getSavedSlippageAmount(tempChainID)
 
   const { active, activate, library } = useWeb3React()
   const connectWallet = getInjectedHandler(activate)
@@ -158,48 +160,48 @@ export default function GlpSwap(props) {
   
 
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
-  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([`GlpSwap:getVaultTokenInfo:${active}`, tempChainID, readerAddress, "getFullVaultTokenInfo"], {
+  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([tempChainID, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, ReaderV2, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
   })
 
   const tokenAddresses = tokens.map(token => token.address)
-  const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([`GlpSwap:getTokenBalances:${active}`, tempChainID, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
+  const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([tempChainID, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, ReaderV2, [tokenAddresses]),
   })
 
-  const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([`GlpSwap:getTokenBalancesWithSupplies:${active}`, tempChainID, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
+  const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([tempChainID, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, ReaderV2, [tokensForBalanceAndSupplyQuery]),
   })
 
-  const { data: aums, mutate: updateAums } = useSWR([`GlpSwap:getAums:${active}`, tempChainID, glpManagerAddress, "getAums"], {
+  const { data: aums, mutate: updateAums } = useSWR([tempChainID, glpManagerAddress, "getAums"], {
     fetcher: fetcher(library, GlpManager),
   })
 
-  const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([`GlpSwap:totalTokenWeights:${active}`, tempChainID, vaultAddress, "totalTokenWeights"], {
+  const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([tempChainID, vaultAddress, "totalTokenWeights"], {
     fetcher: fetcher(library, VaultV2),
   })
 
   const tokenAllowanceAddress = swapTokenAddress === AddressZero ? nativeTokenAddress : swapTokenAddress
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([active, tempChainID, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, glpManagerAddress], {
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([tempChainID, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, glpManagerAddress], {
     fetcher: fetcher(library, Token),
   })
 
-  const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR([`GlpSwap:lastPurchaseTime:${active}`, tempChainID, glpManagerAddress, "lastAddedAt", account || PLACEHOLDER_ACCOUNT], {
+  const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR([tempChainID, glpManagerAddress, "lastAddedAt", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, GlpManager),
   })
 
-  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([`GlpSwap:glpBalance:${active}`, tempChainID, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
+  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([tempChainID, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, RewardTracker),
   })
 
-  const { data: reservedAmount, mutate: updateReservedAmount } = useSWR([`GlpSwap:reservedAmount:${active}`, tempChainID, glpVesterAddress, "pairAmounts", account || PLACEHOLDER_ACCOUNT], {
+  const { data: reservedAmount, mutate: updateReservedAmount } = useSWR([tempChainID, glpVesterAddress, "pairAmounts", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Vester),
   })
 
   const { gmxPrice, mutate: updateGmxPrice } = useGmxPrice(tempChainID, { arbitrum: library }, active)
 
   const rewardTrackersForStakingInfo = [ stakedGlpTrackerAddress, feeGlpTrackerAddress ]
-  const { data: stakingInfo, mutate: updateStakingInfo } = useSWR([`GlpSwap:stakingInfo:${active}`, tempChainID, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT], {
+  const { data: stakingInfo, mutate: updateStakingInfo } = useSWR([tempChainID, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, RewardReader, [rewardTrackersForStakingInfo]),
   })
 
@@ -460,7 +462,6 @@ export default function GlpSwap(props) {
       sentMsg: "Buy submitted!",
       failMsg: "Buy failed.",
       successMsg: `${parseFloat(glpAmount).toFixed(4)} GLP bought with ${parseFloat(swapAmount).toFixed(4)} ${swapToken.symbol}.`,
-      setPendingTxns
     })
       .then(async () => {
       })
@@ -482,7 +483,6 @@ export default function GlpSwap(props) {
       sentMsg: "Sell submitted!",
       failMsg: "Sell failed.",
       successMsg: `${parseFloat(glpAmount).toFixed(4)} GLP sold for ${parseFloat(swapAmount).toFixed(4)} ${swapToken.symbol}.`,
-      setPendingTxns
     })
       .then(async () => {
       })
