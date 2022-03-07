@@ -6,7 +6,7 @@ import { history } from 'umi';
 import styles from "./styles.less"
 import LaunchChart from './launchChart';
 import { getTransferData } from '@/acy-dex-swap/core/launchPad';
-import { requireAllocation, getAllocationInfo, getProjectInfo, useAllocation } from '@/services/api';
+import { requireAllocation, getAllocationInfo, getProjectInfo, useAllocation, recordWallet } from '@/services/api';
 import { BigNumber } from '@ethersproject/bignumber';
 import ERC20ABI from '@/abis/ERC20.json';
 import { binance, injected } from '@/connectors';
@@ -44,6 +44,7 @@ import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from "@/components/ConnectWallet";
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
 import Timer from "@/components/Timer";
+import { message } from "antd";
 import { useConstantLoader, SCAN_URL_PREFIX, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL, TOKEN_LIST, MARKET_TOKEN_LIST, LAUNCH_MAIN_TOKEN } from "@/constants";
 import { CustomError } from "@/acy-dex-swap/utils"
 import { approveNew, getAllowance } from "@/acy-dex-swap/utils"
@@ -196,7 +197,7 @@ const TokenProcedure = ({ receivedData, poolBaseData, comparesaleDate, compareve
   const start_moment_utc = moment.utc(receivedData.saleStart);
   let procedure_status;
 
-  if(end_moment_utc < now_moment_utc) {
+  if (end_moment_utc < now_moment_utc) {
     procedure_status = 'end';
   } else {
     procedure_status = 'open';
@@ -598,6 +599,7 @@ const Allocation = ({
   const [salesValue, setSalesValue] = useState(0);
   const [isShowingBonusInstrution, SetIsShowingBonusInstruction] = useState(false);
   const [isClickedVesting, setIsClickedVesting] = useState(false);
+  const [recordWalletId, setRecordWalletId] = useState("");
 
   // fetching allocation data
   useEffect(async () => {
@@ -610,6 +612,7 @@ const Allocation = ({
           updateInnerValues(2, res);
           updateCoverStates(2);
           setSalesValue(res.allocationLeft);
+          setRecordWalletId(res.recordWalletId ? res.recordWalletId : "");
         }
         console.log('allocation info: ', receivedData.projectToken, res);
       })
@@ -637,10 +640,44 @@ const Allocation = ({
     }
   }
 
+  const validWalletId = (chain, walletId) => {
+    if(walletId === "") return false;
+    return true;
+  }
+
   const onClickBuy = () => {
     console.log("buy");
     console.log("sales value", salesValue);
+
+    if (receivedData.actualChain) {
+      console.log(receivedData.actualChain, recordWalletId);
+      if (!validWalletId(receivedData.actualChain, recordWalletId)) {
+        message.warn('Please submit a valid walletId before investing.')
+        return
+      } else {
+        onClickRecordWallet();
+      }
+    }
+
     investClicked(LAUNCHPAD_ADDRESS(), poolID, salesValue);
+  }
+
+  const onClickRecordWallet = () => {
+    console.log("record walletId.", recordWalletId);
+
+    recordWallet(API_URL(), account, receivedData.projectToken, recordWalletId)
+      .then(res => {
+        if (res && res.recordWalletId) {
+          setRecordWalletId(res.recordWalletId);
+          message.success('Save walletId success.')
+        }
+        console.log('userProject info: ', res);
+      })
+      .catch(e => {
+        console.log('Get allocation error ', e);
+        message.error('Failed to save walletId.')
+        throw e;
+      });
   }
 
   const randomRange = (min, max) => Math.floor(Math.random() * (max - min) + min);
@@ -705,7 +742,7 @@ const Allocation = ({
     let nowTime = moment.utc().unix();
     console.log(nowTime, startDistributionTime);
     if (nowTime < startDistributionTime) {
-      return ;
+      return;
     }
 
     const PoolContract = getContract(LAUNCHPAD_ADDRESS(), POOLABI, library, account);
@@ -813,6 +850,35 @@ const Allocation = ({
             <div>Allocation Left: <span>{allocationInfo.allocationLeft}</span></div>
           </div>
         } */}
+        {receivedData && receivedData.actualChain &&
+          <>
+            <form className="sales-container" style={{ marginBottom: "12px" }}>
+              <div className="sale-vesting-title">
+                <label for="sale-number" >
+                  Wallet
+                </label>
+              </div>
+
+              <div className="sales-input-container">
+                <InputGroup>
+                  <Input
+                    className="sales-input"
+                    value={recordWalletId}
+                    onChange={(e) => setRecordWalletId(e.target.value)}
+                    placeholder={`Please add your ${receivedData.actualChain} wallet address.`}
+                    // onBlur={onChangeRecordWalletId}
+                  />
+                </InputGroup>
+              </div>
+              <Button
+                className="sales-submit"
+                onClick={onClickRecordWallet}
+              >
+                Save
+              </Button>
+            </form>
+          </>
+        }
 
         <form className="sales-container">
           <div className="sale-vesting-title">
@@ -849,7 +915,7 @@ const Allocation = ({
         <div className="vesting-open-container">
           <div className="vesting-container">
             <p className="sale-vesting-title vesting">Vesting</p>
-            
+
             <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}>
               <div className="text-line-container">
                 <p>Unlock {poolDistributionStage[0]}% at TGE, vesting in {poolDistributionStage.length} stages: </p>
@@ -1001,7 +1067,7 @@ const LaunchpadProject = () => {
     } catch (error) {
       console.log('Invalid Pool ID.')
     }
-    
+
   }
 
   // HOOKS
@@ -1027,7 +1093,7 @@ const LaunchpadProject = () => {
           res['regEnd'] = res.scheduleInfo.regEnd;
           res['saleStart'] = res.scheduleInfo.saleStart;
           res['saleEnd'] = res.scheduleInfo.saleEnd;
-          
+
           if (res.scheduleInfo.distributionData) {
             const distributionData = res.scheduleInfo.distributionData;
             const distributionRes = [];
@@ -1044,6 +1110,7 @@ const LaunchpadProject = () => {
           res['projectName'] = res.basicInfo.projectName;
           res['projectToken'] = res.basicInfo.projectToken;
           res['mainCoin'] = res.basicInfo.mainCoin;
+          res['actualChain'] = res.basicInfo.actualChain;
 
           // get state to hide graph and table
           const curT = new Date()
