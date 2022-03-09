@@ -503,8 +503,8 @@ export function parseArbitrageLog({ data, topics }) {
     nonZeroTokenAmount,
   };
 }
-export async function getAllSuportedTokensPrice() {
-  const tokenList = TOKENLIST();
+export async function getAllSupportedTokensPrice(isForMarketPage=false) {
+  const tokenList = isForMarketPage ? MARKET_TOKEN_LIST() : TOKENLIST();
   const chainID = CHAINID();
   const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
   const searchIds = searchIdsArray.join('%2C');
@@ -520,11 +520,14 @@ export async function getAllSuportedTokensPrice() {
 
     // // launchpad project token
     // // where tokens is not listed on coinGecko
-    // if (CHAINID() == 56)
-    //   tokensPrice["OWLA"] = await getTokenPriceFromPool("OWLA");
-    if(chainID == 56) {
-      if(tokensPrice["DXS"] == 0)
-        tokensPrice["DXS"] = await getTokenPriceFromPool("DXS", tokensPrice);
+    // TODO: in future we could remove this block completely. Get price from pool when it's not available on CoinGecko
+    if (chainID == 56) {
+      if (tokensPrice["DXS"] == 0)
+        tokensPrice["DXS"] = await getTokenPriceFromPool("DXS", tokensPrice, isForMarketPage);
+      if (tokensPrice["OWLA"] == 0)
+        tokensPrice["OWLA"] = await getTokenPriceFromPool("OWLA", tokensPrice, isForMarketPage);
+      if (tokensPrice["RUBY"] == 0)
+        tokensPrice["RUBY"] = await getTokenPriceFromPool("RUBY", tokensPrice, isForMarketPage);
     }
 
     console.log(">>> tokenPriceDict", tokensPrice);
@@ -533,35 +536,8 @@ export async function getAllSuportedTokensPrice() {
   return tokensPrice;
 }
 // market 专用
-export async function getAllSuportedTokensPrice_forMarket() {
-  const tokenList = MARKET_TOKEN_LIST();
-  const chainID = CHAINID();
-  const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
-  const searchIds = searchIdsArray.join('%2C');
-  const tokensPrice = await axios.get(
-    `https://api.coingecko.com/api/v3/simple/price?ids=${searchIds}&vs_currencies=usd`
-  ).then(async (result) => {
-    const data = result.data;
-    console.log("tokensPrice_market:",data);
-    const tokensPrice = {};
-    tokenList.forEach(token => {
-      tokensPrice[token.symbol] = data[token.idOnCoingecko]?.usd || 0;
-    })
-
-    // launchpad project token
-    // where tokens is not listed on coinGecko
-    // if (CHAINID() == 56)
-    //   tokensPrice["OWLA"] = await getTokenPriceFromPool("OWLA");
-    // for token that not listed on coinGecko
-    if(chainID == 56) {
-      if(tokensPrice["DXS"] == 0)
-        tokensPrice["DXS"] = await getTokenPriceFromPool("DXS", tokensPrice);
-    }
-
-    console.log(">>> tokenPriceDict_market", tokensPrice);
-    return tokensPrice;
-  });
-  return tokensPrice;
+export async function getAllSupportedTokensPrice_forMarket() {
+  return await getAllSupportedTokensPrice(true);
 }
 
 // return output field amount for swap component
@@ -579,8 +555,8 @@ export async function withExactOutEstimateInAmount(deltaY, xTokenAddress, yToken
   return estimateInputAmount;
 }
 
-export async function getTokenPriceFromPool(tokenSymbol, tokensPrice){
-  const tokenList = TOKENLIST();
+export async function getTokenPriceFromPool(tokenSymbol, tokensPrice, forMarketPage){
+  const tokenList = forMarketPage ? MARKET_TOKEN_LIST() : TOKENLIST();
   const chainId = CHAINID();
   const library = constantInstance.library;
 
@@ -627,7 +603,7 @@ export async function getTokenPriceFromPool(tokenSymbol, tokensPrice){
     const average = (array) => array.reduce((a, b) => a + b) / array.length;
     return average(res);
   } else {
-    return 0.2;
+    return 0;
   }
 }
 

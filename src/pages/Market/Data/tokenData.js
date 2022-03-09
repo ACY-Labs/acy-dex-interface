@@ -10,7 +10,7 @@ import { convertTokenForList } from './util';
 import { sortTable } from '../Util';
 import { getBlockFromTimestamp } from './blocks';
 
-import {getAllSuportedTokensPrice, getAllSuportedTokensPrice_forMarket} from '@/acy-dex-swap/utils/index';
+import {getAllSupportedTokensPrice, getAllSupportedTokensPrice_forMarket} from '@/acy-dex-swap/utils/index';
 import {findTokenWithAddress} from '@/utils/txData';
 import {totalInUSD} from '@/utils/utils';
 import { symbol } from 'prop-types';
@@ -241,7 +241,7 @@ function parseTokenData (data){
 
 export async function fetchGeneralTokenInfo() {
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
-  tokensPriceUSD = await getAllSuportedTokensPrice_forMarket();
+  tokensPriceUSD = await getAllSupportedTokensPrice_forMarket();
   try{
     //let request = `${API_URL()}/poolchart/all`;
     let request = `${MARKET_API_URL()}/poolchart/all`;
@@ -367,7 +367,7 @@ function parseSearchCoinReturns (data, key){
 
 // fetch tokens for search
 export async function fetchSearchCoinReturns(key) {
-  tokensPriceUSD = await getAllSuportedTokensPrice_forMarket();
+  tokensPriceUSD = await getAllSupportedTokensPrice_forMarket();
   try{
     //let request = `${API_URL()}/poolchart/all`;
     let request = `${MARKET_API_URL()}/poolchart/all`;

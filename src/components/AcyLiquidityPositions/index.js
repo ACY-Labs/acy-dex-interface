@@ -1,5 +1,5 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { getAllSuportedTokensPrice } from "@/acy-dex-swap/utils";
+import { getAllSupportedTokensPrice } from "@/acy-dex-swap/utils";
 import { useState, useEffect, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { connect } from 'umi';
@@ -518,7 +518,7 @@ const AcyLiquidityPositions = (props) => {
         // calculate volume in USD
         console.log("this is return data", res.data)
         const { token0: token0Vol, token1: token1Vol } = res.data.data.lastVolume;
-        const currentPriceDict = await getAllSuportedTokensPrice();
+        const currentPriceDict = await getAllSupportedTokensPrice();
         const vol0Usd = currentPriceDict[token0.symbol] * token0Vol;
         const vol1Usd = currentPriceDict[token1.symbol] * token1Vol;
         const poolVolumeInUsd = vol0Usd + vol1Usd;
