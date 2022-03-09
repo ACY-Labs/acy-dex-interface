@@ -116,7 +116,6 @@ export function getProvider(library, chainId) {
 }
 
 export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
-<<<<<<< HEAD
   // eslint-disable-next-line
   const [chainId, arg0, arg1, ...params] = args
   // const provider = library.getSigner(params[1])
@@ -147,38 +146,6 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
     return
   }
   return library[method](arg1,...params).catch(onError);;
-=======
-    // eslint-disable-next-line
-    const [chainId, arg0, arg1, ...params] = args
-    const provider = library.getSigner(params[1])
-    const method = ethers.utils.isAddress(arg0) ? arg1 : arg0
-
-    function onError(e) {
-        console.error(contractInfo.contractName, method, e)
-    }
-
-    if (ethers.utils.isAddress(arg0)) {
-        const address = arg0
-        const contract = new ethers.Contract(address, contractInfo.abi, provider)
-
-        try {
-            if (additionalArgs) {
-                console.log('FETCHER FUNCTION CALLED WITH METHOD  --> ', method);
-                console.log('printing additional args', params, additionalArgs);
-                console.log('printing provider', contract);
-                return contract[method](...params.concat(additionalArgs)).catch(onError)
-            }
-            return contract[method](...params).catch(onError)
-        } catch (e) {
-            console.log('error', e);
-            onError(e)
-        }
-    }
-    if (!library) {
-        return
-    }
-    return library[method](arg1, ...params).catch(onError);;
->>>>>>> f165d3ae7f1a618659d25a5c7ebba3f12b0c11a6
 }
 
 
