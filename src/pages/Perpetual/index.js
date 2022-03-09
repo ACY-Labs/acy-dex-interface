@@ -338,6 +338,11 @@ const Swap = props => {
     fetcher: fetcher(tempLibrary, Router)
   });
 
+  useEffect(()=>{ 
+
+  console.log("printing all vault", vaultTokenInfo);
+    
+  },[vaultTokenInfo])
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   const { positions, positionsMap } = getPositions(tempChainID, positionQuery, positionData, infoTokens, true)
