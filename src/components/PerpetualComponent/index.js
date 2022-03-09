@@ -136,11 +136,6 @@ import { AcyRadioButton } from '@/components/AcyRadioButton';
 
 import styled from 'styled-components';
 const StyledRadioButton = styled(Radio.Button)`
-<<<<<<< Updated upstream
-  background-color: #29292c;
-  border: none;
-  border-left: none !important;
-=======
   .ant-long {
     background-color: #0ecc83;
     border: none;
@@ -150,7 +145,6 @@ const StyledRadioButton = styled(Radio.Button)`
   }
   .ant-swap {
   }
->>>>>>> Stashed changes
 `;
 
 const StyledSlider = styled(Slider)`
@@ -167,267 +161,6 @@ const StyledSlider = styled(Slider)`
 
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
-<<<<<<< Updated upstream
-    //hj find in '@/pages/perpetual 的<perpetual component
-    // ymj props
-    const { account, library, chainId, tokenList: INITIAL_TOKEN_LIST, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
-    console.log("constant loader chainid", chainId);
-    const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1 = false } = props;
-    const { profitsIn, liqPrice } = props;
-    const { entryPriceMarket, exitPrice, borrowFee } = props;
-    const { infoTokens_test, usdgSupply, positions } = props;
-    const { isConfirming, setIsConfirming } = props;
-    console.log("here after confirm props");
-    // isPendingConfirmation, setIsPendingConfirmation } = props;
-    // const { savedSlippageAmount } = props;
-
-    // 选择货币的弹窗
-    const [visible, setVisible] = useState(null);
-
-    // 选择货币前置和后置
-    const [before, setBefore] = useState(true);
-
-    // 交易对前置货币
-    const [token0, setToken0] = useState(INITIAL_TOKEN_LIST[0]);
-    // 交易对后置货币
-    const [token1, setToken1] = useState(INITIAL_TOKEN_LIST[1]);
-
-    // 交易对前置货币余额
-    const [token0Balance, setToken0Balance] = useState('0');
-    // 交易对后置货币余额
-    const [token1Balance, setToken1Balance] = useState('0');
-
-    // 交易对前置货币兑换量
-    const [token0Amount, setToken0Amount] = useState('');
-    // 交易对后置货币兑换量
-    const [token1Amount, setToken1Amount] = useState('');
-    // 交易中用户使用Flash Arbitrage的额外获利
-    const [bonus0, setBonus0] = useState(null);
-    const [bonus1, setBonus1] = useState(null);
-
-    const [token0BalanceShow, setToken0BalanceShow] = useState(false);
-    const [token1BalanceShow, setToken1BalanceShow] = useState(false);
-
-
-
-    // when exactIn is true, it means the firt line
-    // when exactIn is false, it means the second line
-    const [exactIn, setExactIn] = useState(true);
-
-    const [needApprove, setNeedApprove] = useState(false);
-    const [approveAmount, setApproveAmount] = useState('0');
-    const [approveButtonStatus, setApproveButtonStatus] = useState(true);
-
-    // Breakdown shows the estimated information for swap
-
-    // let [estimatedStatus,setEstimatedStatus]=useState();
-    const [swapBreakdown, setSwapBreakdown] = useState();
-    const [swapButtonState, setSwapButtonState] = useState(false);
-    const [swapButtonContent, setSwapButtonContent] = useState('Connect to Wallet');
-    const [swapStatus, setSwapStatus] = useState();
-
-
-    const [pair, setPair] = useState();
-    const [route, setRoute] = useState();
-    const [trade, setTrade] = useState();
-    const [slippageAdjustedAmount, setSlippageAdjustedAmount] = useState();
-    const [minAmountOut, setMinAmountOut] = useState();
-    const [maxAmountIn, setMaxAmountIn] = useState();
-    const [wethContract, setWethContract] = useState();
-    const [wrappedAmount, setWrappedAmount] = useState();
-    const [showSpinner, setShowSpinner] = useState(false);
-
-    const [methodName, setMethodName] = useState();
-    const [midTokenAddress, setMidTokenAddress] = useState();
-    const [poolExist, setPoolExist] = useState(true);
-
-    // ymj useState
-    const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
-    const [toTokenAddress, setToTokenAddress] = useState("0xf97f4df75117a78c1A5a0DBb814Af92458539FB4");
-    const [fromTokenInfo, setFromTokenInfo] = useState();
-    const [toTokenInfo, setToTokenInfo] = useState();
-    const [mode, setMode] = useState(LONG);
-    const [type, setType] = useState(MARKET);
-    const [fees, setFees] = useState(0.1);
-    const [leverage, setLeverage] = useState(5);
-    const [entryPriceLimit, setEntryPriceLimit] = useState(0);
-    const [anchorOnFromAmount, setAnchorOnFromAmount] = useState(true);
-    const [fromValue, setFromValue] = useState("");
-    const [toValue, setToValue] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false); //hj add
-    const [triggerPriceValue, setTriggerPriceValue] = useState("");
-    const [priceValue, setPriceValue] = useState('');
-    const [entryMarkPrice, setEntryMarkPrice] = useState('');
-    const [pendingTxns, setPendingTxns] = useState([]); //hj add from
-    const [triggerRatioValue, setTriggerRatioValue] = useState("");
-    const triggerRatioInverted = useMemo(() => {
-        return isTriggerRatioInverted(fromTokenInfo, toTokenInfo);
-    }, [toTokenInfo, fromTokenInfo]);
-
-    const triggerRatio = useMemo(() => {
-        if (!triggerRatioValue) {
-            return bigNumberify(0);
-        }
-        let ratio = parseValue(triggerRatioValue, USD_DECIMALS);
-        if (ratio.eq(0)) {
-            return bigNumberify(0);
-        }
-        if (triggerRatioInverted) {
-            ratio = PRECISION.mul(PRECISION).div(ratio);
-        }
-        return ratio;
-    }, [triggerRatioValue, triggerRatioInverted]);
-    //hj add to
-
-
-
-    const connectWalletByLocalStorage = useConnectWallet();
-    const { activate } = useWeb3React();
-
-
-    // ymj const
-    const individualFieldPlaceholder = 'Enter amount';
-    const dependentFieldPlaceholder = 'Estimated value';
-    const slippageTolerancePlaceholder = 'Please input a number from 1.00 to 100.00';
-    // 先写固定地址
-    //const fromToken = getToken(chainId, fromTokenAddress); 
-    //const toToken = getToken(chainId, toTokenAddress);
-    const infoTokens = getInfoTokens_test();
-    const fromToken = {
-        address: "0x0000000000000000000000000000000000000000",
-        decimals: 18,
-        isNative: true,
-        isShortable: true,
-        name: "Ethereum",
-        symbol: "ETH"
-    };
-    const toToken = {
-        address: "0xf97f4df75117a78c1A5a0DBb814Af92458539FB4",
-        decimals: 18,
-        isStable: false,
-        name: "Chainlink",
-        symbol: "LINK",
-    };
-    // const fromTokenAddress = BigNumber.from(fromToken.address);
-    // const toTokenAddress = BigNumber.from(toToken.address);
-    //const fromTokenAddress = fromToken.address;
-    //const toTokenAddress = toToken.address;
-    // const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
-    // const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
-    const fromAmount = parseValue(fromValue, fromToken && fromToken.decimals);
-    const toAmount = parseValue(toValue, toToken && toToken.decimals);
-    const isMarketOrder = type === MARKET;
-    const triggerPriceUsd = type === MARKET
-        ? 0
-        : parseValue(triggerPriceValue, USD_DECIMALS);
-    // const indexTokenAddress = toTokenAddress === AddressZero ? nativeTokenAddress : toTokenAddress;
-    const indexTokenAddress = toTokenAddress;
-    const shortCollateralAddress = indexTokenAddress; // need change
-    const collateralTokenAddress = mode === LONG
-        ? indexTokenAddress
-        : shortCollateralAddress;
-    //const collateralToken = getToken(chainId, collateralTokenAddress);
-    const collateralToken = {
-        name: 'Chainlink',
-        symbol: 'LINK',
-        decimals: 18,
-        address: '0xf97f4df75117a78c1A5a0DBb814Af92458539FB4',
-        isStable: false
-    };
-    const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
-    const totalTokenWeights = BigNumber.from("0x0186a0")
-    const fromUsdMin = getUsd(fromAmount, fromTokenAddress, false, infoTokens);
-    const toUsdMax = getUsd(
-        toAmount,
-        toTokenAddress,
-        true,
-        infoTokens,
-        mode,
-        triggerPriceUsd
-    );
-    const perpetualMode = [LONG, MARKET];
-    const perpetualType = [{
-        name: 'Market',
-        // icon: <LineChartOutlined />,
-        id: MARKET,
-    }, {
-        name: 'Limit',
-        // icon: <FieldTimeOutlined />,
-        id: LIMIT,
-    }];
-    const leverageSlider = {
-        2: {
-            style: {
-                color: '#b5b6b6',
-            },
-            label: '2x'
-        },
-        5: {
-            style: {
-                color: '#b5b6b6',
-            },
-            label: '5x'
-        },
-        10: {
-            style: {
-                color: '#b5b6b6',
-            },
-            label: '10x'
-        },
-        15: {
-            style: {
-                color: '#b5b6b6',
-            },
-            label: '15x'
-        },
-        20: {
-            style: {
-                color: '#b5b6b6',
-            },
-            label: '20x'
-        },
-        25: {
-            style: {
-                color: '#b5b6b6',
-            },
-            label: '25x'
-        },
-        30: {
-            style: {
-                color: '#b5b6b6',
-            },
-            label: '30x'
-        }
-    };
-
-    // ymj useEffect
-    // initialization
-    useEffect(() => {
-        console.log("chainId here", chainId);
-        console.log('ymj 1', infoTokens_test, infoTokens)
-        setFromTokenInfo(getTokenInfo(infoTokens, fromTokenAddress));
-        setToTokenInfo(getTokenInfo(infoTokens, toTokenAddress));
-        //setEntryMarkPrice(mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
-        if (!INITIAL_TOKEN_LIST) return
-        setVisible(null);
-        // 选择货币前置和后置
-        setBefore(true);
-        // 交易对前置货币
-        setToken0(INITIAL_TOKEN_LIST[0]);
-        // 交易对后置货币
-        setToken1(INITIAL_TOKEN_LIST[1]);
-        // 交易对前置货币余额
-        setToken0Balance('0');
-        // 交易对后置货币余额
-        setToken1Balance('0');
-        // 交易对前置货币兑换量
-        setToken0Amount('');
-        // 交易对后置货币兑换量
-        setToken1Amount('');
-        // 交易中用户使用Flash Arbitrage的额外获利
-        setBonus0(null);
-        setBonus1(null);
-=======
   //hj find in '@/pages/perpetual 的<perpetual component
   // ymj props
   const {
@@ -765,7 +498,6 @@ const SwapComponent = props => {
   useEffect(
     () => {
       if (!account || !chainId || !library) {
->>>>>>> Stashed changes
         setToken0BalanceShow(false);
         setToken1BalanceShow(false);
         return;
@@ -1281,60 +1013,6 @@ const SwapComponent = props => {
         setTriggerPriceValue('');
       }
     }
-<<<<<<< Updated upstream
-
-
-    return (
-        <div>
-            <div>
-                <Radio.Group
-                    defaultValue={LONG} buttonStyle="solid" className={styles.modeSelector}
-                    onChange={modeSelect}>
-                    <StyledRadioButton value={LONG} className={styles.modeSubOption}>Long</StyledRadioButton>
-                    <StyledRadioButton value={SHORT} className={styles.modeSubOption}>Short</StyledRadioButton>
-                    <StyledRadioButton value={SWAP} className={styles.modeSubOption}>Swap</StyledRadioButton>
-
-                </Radio.Group>
-            </div>
-            <div>
-                <Tabs defaultActiveKey={MARKET} onChange={typeSelect}
-                    size={'small'}
-                    tabBarGutter={0}
-                    type={'line'}
-                    tabPosition={'top'}
-                    tabBarStyle={{ border: '0px black' }}
-                //animated={false}
-                >
-                    {perpetualType.map(i => (
-                        <TabPane tab={<span>{i.icon}{i.name}{' '}</span>} key={i.id}>
-                        </TabPane>
-                    ))}
-                </Tabs>
-            </div>
-            <AcyCuarrencyCard
-                icon="eth"
-                title={token0BalanceShow && `Balance: ${parseFloat(token0Balance).toFixed(3)}`}
-                //coin={(token0 && token0.symbol) || 'Select'}
-                coin={(fromTokenInfo && fromTokenInfo.symbol) || 'Select'}
-                logoURI={token0 && token0.logoURI}
-                yuan="566.228"
-                dollar={`${token0Balance}`}
-                //token={token0Amount}
-                token={fromValue}
-                bonus={!exactIn && bonus0}
-                showBalance={token1BalanceShow}
-                onChoseToken={() => {
-                    onClickCoin();
-                    setBefore(true);
-                }}
-                onChangeToken={e => {
-                    //setToken0Amount(e);
-                    setFromValue(e)
-                    setExactIn(true);
-                    t0Changed(e);
-                }}
-                library={library}
-=======
   };
   const markOnClick = e => {
     // setTriggerPriceValue(marketPrice.toString());
@@ -1388,7 +1066,6 @@ const SwapComponent = props => {
                 </span>
               }
               key={i.id}
->>>>>>> Stashed changes
             />
           ))}
         </Tabs>
@@ -1487,154 +1164,6 @@ const SwapComponent = props => {
                 </span>
               </div>
             </div>
-<<<<<<< Updated upstream
-
-            <AcyCuarrencyCard
-                icon="eth"
-                title={token1BalanceShow && `Balance: ${parseFloat(token1Balance).toFixed(3)}`}
-                coin={(token1 && token1.symbol) || 'Select'}
-                //coin={(toTokenInfo && toTokenInfo.symbol) || 'Select'}
-                logoURI={token1 && token1.logoURI}
-                yuan="566.228"
-                dollar={`${token1Balance}`}
-                //token={token1Amount}
-                token={toValue}
-                bonus={exactIn && bonus1}
-                showBalance={token1BalanceShow}
-                onChoseToken={() => {
-                    onClickCoin();
-                    setBefore(false);
-                }}
-                onChangeToken={e => {
-                    // setToken1ApproxAmount(e);
-                    //setToken1Amount(e);
-                    setToValue(e);
-                    setExactIn(false);
-                    t1Changed(e);
-                }}
-                isLocked={isLockedToken1}
-                library={library}
-            />
-
-          <TokenSelectorModal
-            onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick}
-          />
-
-          
-            {type === LIMIT &&
-                <div className={styles.priceBox}>
-                    <PriceBox
-                        onChange={limitOnChange}
-                        markOnClick={markOnClick}
-                        priceValue={priceValue}
-                        toTokenInfo={toTokenInfo}
-                        mode={mode}
-                    />
-                </div>
-            }
-            {mode !== SWAP &&
-                <div>
-                    <AcyDescriptions>
-                        <div className={styles.breakdownTopContainer}>
-                            <div className={styles.slippageContainer}>
-                                <span style={{ fontWeight: 600 }}>Leverage ymj</span>
-                                <span className={styles.leverageSlider}>
-                                    <StyledSlider marks={leverageSlider} defaultValue={leverage} max={30.51} min={1.10} onChange={leverageSliderOnChange} step={0.1}
-                                        style={{ color: 'red' }} />
-                                </span>
-                            </div>
-                        </div>
-                    </AcyDescriptions>
-                    <DetailBox
-                        leverage={leverage}
-                        shortOrLong={mode}
-                        marketOrLimit={type}
-                        profitsIn={profitsIn}
-                        entryPriceLimit={entryPriceLimit}
-                        liqPrice={liqPrice}
-                        entryPriceMarket={entryPriceMarket}
-                        exitPrice={exitPrice}
-                        borrowFee={borrowFee}
-                        token1Symbol={token1.symbol}
-                        fromUsdMin={fromUsdMin}
-                        toUsdMax={toUsdMax}
-                        toTokenInfo={toTokenInfo}
-                        triggerPriceValue={triggerPriceValue}
-                    />
-                </div>
-            }
-            {mode === SWAP &&
-                <DetailBox
-                    leverage={leverage}
-                    shortOrLong={mode}
-                    marketOrLimit={type}
-                    profitsIn={profitsIn}
-                    entryPriceLimit={entryPriceLimit}
-                    liqPrice={liqPrice}
-                    entryPriceMarket={entryPriceMarket}
-                    exitPrice={exitPrice}
-                    borrowFee={borrowFee}
-                    token1Symbol={token1.symbol}
-                    fromUsdMin={fromUsdMin}
-                    toUsdMax={toUsdMax}
-                    toTokenInfo={toTokenInfo}
-                    triggerPriceValue={triggerPriceValue}
-                />
-            }
-            {needApprove
-                ? <div>
-                    <AcyButton
-                        style={{ marginTop: '25px' }}
-                        disabled={!approveButtonStatus}
-                        onClick={async () => {
-                            setShowSpinner(true);
-                            setApproveButtonStatus(false);
-                            const state = await approve(token0.address, approveAmount, library, account);
-                            setApproveButtonStatus(true);
-                            setShowSpinner(false);
-
-                            if (state) {
-                                setSwapButtonState(true);
-                                setSwapButtonContent('Swap');
-                                setApproveButtonStatus(false);
-                                setNeedApprove(false);
-                                console.log("test needApprove false")
-                            }
-                        }}
-                    >
-                        Approve{' '}
-                        {showSpinner && <Icon type="loading" />}
-                    </AcyButton>{' '}
-                </div>
-
-                : <AcyButton
-                    style={{ marginTop: '25px' }}
-                    disabled={!swapButtonState}
-                    onClick={() => {
-                        if (account == undefined) {
-                            // connectWalletByLocalStorage();
-                        } else {
-                            //hj TODO
-                            // if ( currentTab == "swap" ) {
-                            //     setSwapButtonState( false )
-                            //     handleSwap();
-                            // }
-                            console.log("ready for function ymj");
-                        }
-                    }}
-                >
-                    {swapButtonContent}
-                </AcyButton>
-            }
-
-            <AcyDescriptions>
-                {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
-            </AcyDescriptions>
-
-            <TokenSelectorModal
-                onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick}
-            />
-=======
           </AcyDescriptions>
           <DetailBox
             leverage={leverage}
@@ -1652,7 +1181,6 @@ const SwapComponent = props => {
             toTokenInfo={toTokenInfo}
             triggerPriceValue={triggerPriceValue}
           />
->>>>>>> Stashed changes
         </div>
       )}
       {mode === SWAP && (
