@@ -26,7 +26,7 @@ import {
   getUserTokenBalanceRaw,
   getTokenTotalSupply,
   approveTokenWithSpender,
-  getAllSuportedTokensPrice,
+  getAllSupportedTokensPrice,
   BLOCK_TIME
 } from '@/acy-dex-swap/utils/index';
 import {
@@ -564,7 +564,7 @@ function AccountInfo(props) {
 
       const totalSupply = await getTokenTotalSupply(pair.liquidityToken, library, account);
 
-      const tokenPrice = await getAllSuportedTokensPrice();
+      const tokenPrice = await getAllSupportedTokensPrice();
 
       // console.log(tokenPrice['ETH']);
       const token0Deposited = pair.getLiquidityValue(

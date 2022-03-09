@@ -577,11 +577,14 @@ export async function swapGetEstimated(
       account,
       library
     );
-    console.log("test white button", userToken0Balance.toString(), inToken0Amount, inToken1Amount)
-
+    userToken0Balance = parseFloat(formatUnits(userToken0Balance, inToken0Decimal));
+    console.log("test white button", userToken0Balance, inToken0Amount, inToken1Amount)
+    
     let userHasSufficientBalance;
     try {
-      userHasSufficientBalance = userToken0Balance.gte(parseUnits(token0Amount, inToken0Decimal));
+      // TODO: potential issue is that precision loss due to float type.
+      // maybe comparing between BigNumber is better?
+      userHasSufficientBalance = userToken0Balance >= token0Amount;
     } catch (e) {
       console.log('wrappedAmount!!!');
       console.log(e);

@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/client';
 import {GET_MARKET_DATA} from './query';
 import axios from 'axios';
-import {getAllSuportedTokensPrice, getAllSuportedTokensPrice_forMarket} from '@/acy-dex-swap/utils/index';
+import {getAllSupportedTokensPrice, getAllSupportedTokensPrice_forMarket} from '@/acy-dex-swap/utils/index';
 
 import {findTokenWithAddress, findTokenWithAddress_market} from '@/utils/txData';
 import {totalInUSD} from '@/utils/utils'
@@ -103,7 +103,7 @@ function parseMarketData (data){
 export async  function fetchMarketData () {
     // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
   //tokensPriceUSD = await getAllSuportedTokensPrice();
-  tokensPriceUSD = await getAllSuportedTokensPrice_forMarket();
+  tokensPriceUSD = await getAllSupportedTokensPrice_forMarket();
   try{
     //const apiUrlPrefix = API_URL();
     const apiUrlPrefix = MARKET_API_URL();
@@ -119,7 +119,7 @@ export async  function fetchMarketData () {
 }
 
 export async function fetchMarketData_ver2() {
-    tokensPriceUSD = await getAllSuportedTokensPrice();
+    tokensPriceUSD = await getAllSupportedTokensPrice();
     try {
         
     } catch (error) {
