@@ -26,6 +26,14 @@ const BscMainNetTokenList: Array<TokenInfo> = [
     idOnCoingecko: "acy-finance",
   },
   {
+    name: 'Ruby',
+    symbol: 'RUBY',
+    address: '0xf7722aA0714096f1FB5ef83e6041CEBB4d58a08e',
+    decimals: 12,
+    logoURI: 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/Ruby-min.svg',
+    idOnCoingecko: "undefined",
+  },
+  {
     name: 'Bit Store',
     symbol: 'STORE',
     address: '0x65d9033cff96782394dab5dbef17fa771bbe1732',
