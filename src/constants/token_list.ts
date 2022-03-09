@@ -30,7 +30,7 @@ const BscMainNetTokenList: Array<TokenInfo> = [
     symbol: 'RUBY',
     address: '0xf7722aA0714096f1FB5ef83e6041CEBB4d58a08e',
     decimals: 12,
-    logoURI: 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/Ruby-min.svg',
+    logoURI: 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/Ruby-min.png',
     idOnCoingecko: "undefined",
   },
   {
