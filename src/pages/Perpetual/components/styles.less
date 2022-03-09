@@ -1,0 +1,171 @@
+@import '~antd/lib/style/themes/default.less';
+.acycuarrencycard{
+  display: flex;
+  flex-flow: column nowrap;
+  position: relative;
+  border-radius: 20px;
+  background-color: rgb(44, 47, 54);
+  z-index: 1;
+  width: initial;
+  .cua_title{
+    font-size: 14px;
+    font-weight: 400;
+    color: #f3f3fc;
+    padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .cua_body{
+    border-radius: 10px;
+    border: 1px solid rgb(44, 47, 54);
+    background-color: #29292c;
+    width: initial;
+    &:hover{
+      border: 1px solid rgb(64, 68, 79);
+    }
+    .cua_group{
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      padding:1rem 1rem 0.75rem;
+      .switchcoin{
+        align-items: center;
+        font-size: 18px;
+        font-weight: 500;
+        background-color: #1b1b1c;
+        color: rgb(255, 255, 255);
+        border-radius: 10px;
+        outline: none;
+        cursor: pointer;
+        user-select: none;
+        border: none;
+        height: 2.4rem;
+        width: initial;
+        padding: 0px 8px;
+        justify-content: space-between;
+        margin-right: 12px;
+        line-height: inherit;
+        &:hover{
+          cursor: pointer;
+          background-color: rgb(44, 47, 54);
+        }
+        .wrap{
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          box-sizing: border-box;
+          margin: 0px;
+          min-width: 0px;
+          .coin{
+            width: fit-content;
+            display: flex;
+            padding: 0px;
+            align-items: center;
+            justify-content: flex-start;
+           
+          }
+        }
+      }
+      :global{
+        input:focus{
+          outline:medium !important;
+        }
+      }
+      .input{
+        color: rgb(255, 255, 255);
+        width: 0px;
+        position: relative;
+        font-weight: 500;
+        outline: none;
+        border: none;
+        flex: 1 1 auto;
+        height: unset;
+        border: 0;
+        border-radius: 0;
+        background-color: #29292c;
+        font-size: 22px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 0px;
+        appearance: textfield;
+        text-align: right;
+      }
+    }
+    .inputTitle{
+        font-size: 20px;
+        font-weight: bold;
+    }
+    .bonus {
+      justify-content: end;
+      color: #eb5c20;
+      padding-top: 0;
+      margin-top: -0.9rem;
+      font-size: 1rem;
+    }
+    .cua_bottomContainer {
+      display: flex;
+      margin: 0 1rem 1rem;
+      justify-content: space-between;
+    }
+    .cua_blanace{
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      line-height: 1rem;
+      // padding: 0px 1rem 1rem;
+      box-sizing: border-box;
+      margin: 0px;
+      min-width: 0px;
+      font-weight: 400;
+      font-size: 14px;
+      color: rgb(195, 197, 203);
+    }
+  }
+  .cua_light{
+    border: 1px solid #e29228;
+    &:hover{
+      cursor: pointer;
+      border: 1px solid #e29228;
+    }
+  }
+}
+
+.describeMain{
+  padding: 10px;
+  margin-top: 4px;
+}
+.describeMainTitle{
+  font-size: 14px;
+  font-weight: bold;
+  border-bottom: 1px solid #b5b6b6;
+}
+.describeTitle{
+  font-size: 12px;
+}
+.describeInfoClickable{
+  font-size: 12px;
+  float: right;
+  &:hover{
+    cursor: pointer;
+    color: #e29228;
+    font-weight: bold;
+  }
+}
+.describeInfo{
+  font-size: 12px;
+  float: right;
+}
+.modelTitle {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 52px;
+  color: #b5b6b6;
+  //border-bottom: 1px solid #b5b6b6;
+}
+
+
+
+
