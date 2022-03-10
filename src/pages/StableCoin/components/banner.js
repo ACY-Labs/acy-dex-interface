@@ -7,41 +7,41 @@ export const Banner = props => {
   return (
     <div className={styles.banner}>
       <div className={styles.hummingbird}>
-        <div class="body">
-          <div class="back" />
-          <div class="wings" />
-          <div class="head">
-            <div class="nape" />
-            <div class="beak" />
+        <div className={styles.body}>
+          <div className={styles.back} />
+          <div className={styles.wings} />
+          <div className={styles.head}>
+            <div className={styles.nape} />
+            <div className={styles.beak} />
           </div>
         </div>
       </div>
-      <embed class="logo" src={logo} type="image/svg+xml" width="25%" />
-      <div class="banner-content">
+      <embed className={styles.logo} src={logo} type="image/svg+xml" width="25%" />
+      <div className={styles.bannerContent}>
         The world`s first automatic interest-earning algorithmic stablecon
       </div>
-      <div class="banner-box">
-        <div class="acycard">
-          <div class="const">0.0</div>
-          <div class="state">
+      <div className={styles.bannerBox}>
+        <div className={styles.bannerCard}>
+          <div className={styles.const}>0.0</div>
+          <div className={styles.state}>
             <ins>Balance</ins>
           </div>
         </div>
-        <div class="acycard">
-          <div class="const">0.0</div>
-          <div class="state">
+        <div className={styles.bannerCard}>
+          <div className={styles.const}>0.0</div>
+          <div className={styles.state}>
             <ins>Pending yield</ins>
           </div>
         </div>
-        <div class="acycard">
-          <div class="const">0.0</div>
-          <div class="state">
+        <div className={styles.bannerCard}>
+          <div className={styles.const}>0.0</div>
+          <div className={styles.state}>
             <ins>Lifetime earning</ins>
           </div>
         </div>
-        <div class="acycard">
-          <div class="const">0.0</div>
-          <div class="state">
+        <div className={styles.bannerCard}>
+          <div className={styles.const}>0.0</div>
+          <div className={styles.state}>
             <ins>30-day trailing APY</ins>
           </div>
         </div>
