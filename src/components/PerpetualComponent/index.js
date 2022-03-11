@@ -1202,12 +1202,7 @@ const SwapComponent = props => {
     setToTokenAddress(fromTokenAddress)
   };
 
-  const isLeverageDisabled = true
-
   const getLeverageError = useCallback(() => {
-    if (isLeverageDisabled) {
-      return ["Temporarily disabled, pending upgrade"]
-    }
 
     if (!toAmount || toAmount.eq(0)) {
       return ["Enter an amount"];
@@ -1425,8 +1420,7 @@ const SwapComponent = props => {
     triggerPriceUsd,
     triggerPriceValue,
     usdgSupply,
-    entryMarkPrice,
-    isLeverageDisabled
+    entryMarkPrice    
   ]);
 
   const getError = () => {
@@ -1529,7 +1523,6 @@ const SwapComponent = props => {
   }
 
   const onClickPrimary = () => {
-    console.log('test acc',account,active)
     if (!account) {
       connectWalletByLocalStorage()
       return;
@@ -1839,12 +1832,11 @@ const SwapComponent = props => {
             <div className={styles.detailCard}>
               <div className={styles.label}>Leverage</div>
               <div className={styles.value}>
-                {hasExistingPosition && toAmount && toAmount.gt(0) && (
-                <div>
-                  {formatAmount(existingPosition.leverage, 4, 2)}x → 
-                  {/* <BsArrowRight className="transition-arrow" /> */}
-                </div>
-                )}
+                {hasExistingPosition && 
+                  toAmount && 
+                  toAmount.gt(0) && 
+                  `${formatAmount(existingPosition.leverage, 4, 2)}x →` 
+                }
                 {toAmount &&
                   leverage &&
                   leverage.gt(0) &&
@@ -1858,12 +1850,11 @@ const SwapComponent = props => {
             <div className={styles.detailCard}>
               <div className={styles.label}>Entry Price</div>
               <div className={styles.value}>
-                {hasExistingPosition && toAmount && toAmount.gt(0) && (
-                <div>
-                  ${formatAmount(existingPosition.averagePrice, USD_DECIMALS, 2, true)} →
-                  {/* <BsArrowRight className="transition-arrow" /> */}
-                </div>
-                )}
+                {hasExistingPosition && 
+                toAmount && 
+                toAmount.gt(0) &&
+                `$${formatAmount(existingPosition.averagePrice, USD_DECIMALS, 2, true)} →`
+                }
                 {nextAveragePrice &&
                   `$${formatAmount(nextAveragePrice, USD_DECIMALS, 2, true)}`}
                 {!nextAveragePrice && `-`}
@@ -1874,12 +1865,11 @@ const SwapComponent = props => {
             <div className={styles.detailCard}>
               <div className={styles.label}>Liq. Price</div>
               <div className={styles.value}>
-                {hasExistingPosition && toAmount && toAmount.gt(0) && (
-                <div className="inline-block muted">
-                  ${formatAmount(existingLiquidationPrice, USD_DECIMALS, 2, true)} →
-                  {/* <BsArrowRight className="transition-arrow" /> */}
-                </div>
-                )}
+                {hasExistingPosition && 
+                toAmount && 
+                toAmount.gt(0) && 
+                `$${formatAmount(existingLiquidationPrice, USD_DECIMALS, 2, true)} →`
+                }
                 {toAmount && displayLiquidationPrice &&
                 `$${formatAmount(displayLiquidationPrice, USD_DECIMALS, 2, true)}`
                 }
