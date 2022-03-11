@@ -516,7 +516,7 @@ export async function swapGetEstimated(
           console.log("test bonus", bonus1)
 
           isUseArb = true;
-          token1Amount = ammOutput;
+          token1Amount = allPathAmountOut;
           minAmountOut = Math.ceil(allPathAmountOut * (1 - slippage / 100));
           minAmountOut = `0x${minAmountOut.toString(16)}`;
           slippageAdjustedAmount = minAmountOut;
@@ -549,7 +549,7 @@ export async function swapGetEstimated(
           console.log("test bonus, should be negative", bonus0)
 
           isUseArb = true;
-          token0Amount = ammOutput;
+          token0Amount = allPathAmountOut;
           maxAmountIn = Math.floor(allPathAmountOut * (1 + slippage / 100));
           maxAmountIn = `0x${maxAmountIn.toString(16)}`;
           slippageAdjustedAmount = maxAmountIn;
