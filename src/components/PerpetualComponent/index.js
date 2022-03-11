@@ -23,7 +23,7 @@ import {
   AcyButton,
   AcyDescriptions,
 } from '@/components/Acy';
-import TokenSelectorModal from "@/components/TokenSelectorModal";
+import TokenSelectorModal from '@/components/TokenSelectorModal';
 // ymj swapBox components start
 import { PriceBox } from './components/PriceBox';
 import { DetailBox } from './components/DetailBox';
@@ -58,7 +58,10 @@ import {
   getLiquidationPrice,
   calculatePositionDelta,
   getSavedSlippageAmount,
-  approveTokens
+  approveTokens,
+  shouldRaiseGasError,
+  helperToast,
+  replaceNativeTokenAddress,
 } from '@/acy-dex-futures/utils'
 import {
   readerAddress,
@@ -67,7 +70,8 @@ import {
   nativeTokenAddress,
   routerAddress,
   orderBookAddress,
-  tempChainID
+  tempChainID,
+  tempLibrary
 } from '@/acy-dex-futures/samples/constants'
 import { callContract } from '@/acy-dex-futures/core/Perpetual'
 import Reader from '@/acy-dex-futures/abis/Reader.json'
@@ -107,8 +111,10 @@ import {
   parseArbitrageLog,
 } from '@/acy-dex-swap/utils/index';
 
+//hj add
+import { getContractAddress } from '@/acy-dex-futures/utils/Addresses';
+import * as Api from '@/acy-dex-futures/core/Perpetual';
 import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
-
 import ERC20ABI from '@/abis/ERC20.json';
 import WETHABI from '@/abis/WETH.json';
 
@@ -121,8 +127,8 @@ import {
   Trade,
   Percent,
   // Router,
-  WETH,
-  ETHER,
+  // WETH,
+  // ETHER,
   CurrencyAmount,
   InsufficientReservesError,
 } from '@acyswap/sdk';
@@ -149,21 +155,19 @@ const { TabPane } = Tabs;
 const { AddressZero } = ethers.constants;
 
 const StyledRadioButton = styled(Radio.Button)`
-.ant-long{
-  background-color: #0ecc83;
-  border: none;
-  border-left: none !important;
-}
-.ant-short{
-
-}
-.ant-swap{
-
-}
+  .ant-long {
+    background-color: #0ecc83;
+    border: none;
+    border-left: none !important;
+  }
+  .ant-short {
+  }
+  .ant-swap {
+  }
 `;
 
 const StyledSlider = styled(Slider)`
-  .ant-slider-track{
+  .ant-slider-track {
     background: #be4d00;
   }
   .ant-slider-rail {
@@ -205,6 +209,30 @@ function getNextAveragePrice({size, sizeDelta, hasProfit, delta, nextPrice, isLo
 const SwapComponent = props => {
 
   const {
+    account,
+    library,
+    chainId,
+    tokenList: INITIAL_TOKEN_LIST,
+    farmSetting: { INITIAL_ALLOWED_SLIPPAGE },
+  } = useConstantLoader(props);
+  // console.log('constant loader chainid', chainId);
+  // const {
+  //   dispatch,
+  //   onSelectToken0,
+  //   onSelectToken1,
+  //   onSelectToken,
+  //   token,
+  //   isLockedToken1 = false,
+  // } = props;
+  const { profitsIn, liqPrice } = props;
+  const { entryPriceMarket, exitPrice, borrowFee, positions } = props;
+  // const { infoTokens_test, usdgSupply, positions } = props;
+  const { isConfirming, setIsConfirming } = props;
+  console.log('here after confirm props');
+  // isPendingConfirmation, setIsPendingConfirmation } = props;
+  // const { savedSlippageAmount } = props;
+  
+  const {
     positionsMap,
     pendingTxns,
     setPendingTxns,
@@ -218,7 +246,7 @@ const SwapComponent = props => {
   } = props;
 
   const connectWalletByLocalStorage = useConnectWallet();
-  const { library, active, activate } = useWeb3React();
+  const { active, activate } = useWeb3React();
   const flagOrdersEnabled = true
 
   const [fromValue, setFromValue] = useState("");
@@ -227,19 +255,11 @@ const SwapComponent = props => {
   const [isApproving, setIsApproving] = useState(false);
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isConfirming, setIsConfirming] = useState(false);
+  // const [isConfirming, setIsConfirming] = useState(false);
   const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
   const [modalError, setModalError] = useState(false);
   const [ordersToaOpen, setOrdersToaOpen] = useState(false);
 
-  // ymj props
-  const { account, tokenList: INITIAL_TOKEN_LIST, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
-  // const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1 = false } = props;
-  const { profitsIn, liqPrice } = props;
-  const { entryPriceMarket, exitPrice, borrowFee, positions } = props;
-  // const { infoTokens_test, usdgSupply, positions, positionsMap } = props;
-
-  const chainId = tempChainID
   const savedSlippageAmount = getSavedSlippageAmount(chainId)
   const tokens = defaultToken.default
   const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
@@ -318,6 +338,7 @@ const SwapComponent = props => {
   // const [shortCollateralAddress, setShortCollateralAddress] = useState('0xf97f4df75117a78c1A5a0DBb814Af92458539FB4');
   // const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
 
+  //hj add to
 
   const [triggerPriceValue, setTriggerPriceValue] = useState("");
   const triggerPriceUsd = type === MARKET ? 0 : parseValue(triggerPriceValue, USD_DECIMALS);
@@ -334,29 +355,29 @@ const SwapComponent = props => {
   // const slippageTolerancePlaceholder = 'Please input a number from 1.00 to 100.00';
 
   const tokenAddresses = tokens.map(token => token.address)
-  const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, Reader, [tokenAddresses]),
+  const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([tempChainID, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(tempLibrary, Reader, [tokenAddresses]),
   })
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
-  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
-    fetcher: fetcher(library, ReaderV2, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
+  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([tempChainID, readerAddress, "getFullVaultTokenInfo"], {
+    fetcher: fetcher(tempLibrary, ReaderV2, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
   })
-  const { data: fundingRateInfo, mutate: updateFundingRateInfo } = useSWR([chainId, readerAddress, "getFundingRates"], {
-    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
+  const { data: fundingRateInfo, mutate: updateFundingRateInfo } = useSWR([tempChainID, readerAddress, "getFundingRates"], {
+    fetcher: fetcher(tempLibrary, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
   })
-  const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([chainId, vaultAddress, "totalTokenWeights"], {
-    fetcher: fetcher(library, VaultV2),
+  const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([tempChainID, vaultAddress, "totalTokenWeights"], {
+    fetcher: fetcher(tempLibrary, VaultV2),
   })
-  const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
-    fetcher: fetcher(library, Token),
+  const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([tempChainID, usdgAddress, "totalSupply"], {
+    fetcher: fetcher(tempLibrary, Token),
   })
-  const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR([chainId, routerAddress, "approvedPlugins", account || PLACEHOLDER_ACCOUNT, orderBookAddress], {
-    fetcher: fetcher(library, Router)
+  const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR([tempChainID, routerAddress, "approvedPlugins", account || PLACEHOLDER_ACCOUNT, orderBookAddress], {
+    fetcher: fetcher(tempLibrary, Router)
   });
 
   const tokenAllowanceAddress = fromTokenAddress === AddressZero ? nativeTokenAddress : fromTokenAddress;
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
-      fetcher: fetcher(library, Token)
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([tempChainID, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
+      fetcher: fetcher(tempLibrary, Token)
   });
 
   // default collateral address on ARBITRUM
@@ -893,6 +914,201 @@ const SwapComponent = props => {
     setToValue(e.target.value);
   };
 
+  const wrap = async () => {
+    setIsSubmitting(true);
+
+    const contract = new ethers.Contract(
+      getContractAddress(chainId, 'NATIVE_TOKEN'),
+      WETHABI,
+      library.getSigner()
+    );
+    Api.callContract(chainId, contract, 'deposit', {
+      value: fromAmount,
+      sentMsg: 'Swap submitted!',
+      successMsg: `Swapped ${formatAmount(fromAmount, fromToken.decimals, 4, true)} ${
+        fromToken.symbol
+      } for ${formatAmount(toAmount, toToken.decimals, 4, true)} ${toToken.symbol}`,
+      failMsg: 'Swap failed.',
+      setPendingTxns,
+    })
+      .then(async res => {})
+      .finally(() => {
+        setIsSubmitting(false);
+      });
+  };
+
+  const unwrap = async () => {
+    setIsSubmitting(true);
+
+    const contract = new ethers.Contract(
+      getContractAddress(chainId, 'NATIVE_TOKEN'),
+      WETHABI,
+      library.getSigner()
+    );
+    Api.callContract(chainId, contract, 'withdraw', [fromAmount], {
+      sentMsg: 'Swap submitted!',
+      failMsg: 'Swap failed.',
+      successMsg: `Swapped ${formatAmount(fromAmount, fromToken.decimals, 4, true)} ${
+        fromToken.symbol
+      } for ${formatAmount(toAmount, toToken.decimals, 4, true)} ${toToken.symbol}`,
+      setPendingTxns,
+    })
+      .then(async res => {})
+      .finally(() => {
+        setIsSubmitting(false);
+      });
+  };
+
+  const swap = async () => {
+    if (fromToken.isNative && toToken.isWrapped) {
+      wrap();
+      return;
+    }
+
+    if (fromTokenAddress.isWrapped && toToken.isNative) {
+      unwrap();
+      return;
+    }
+
+    setIsSubmitting(true);
+    let path = [fromTokenAddress, toTokenAddress];
+    if (anchorOnFromAmount) {
+      const { path: multiPath } = getNextToAmount(
+        chainId,
+        fromAmount,
+        fromTokenAddress,
+        toTokenAddress,
+        infoTokens,
+        undefined,
+        undefined,
+        usdgSupply,
+        totalTokenWeights
+      );
+      if (multiPath) {
+        path = multiPath;
+      }
+    } else {
+      const { path: multiPath } = getNextFromAmount(
+        chainId,
+        toAmount,
+        fromTokenAddress,
+        toTokenAddress,
+        infoTokens,
+        undefined,
+        undefined,
+        usdgSupply,
+        totalTokenWeights
+      );
+      if (multiPath) {
+        path = multiPath;
+      }
+    }
+
+    let method;
+    let contract;
+    let value;
+    let params;
+    let minOut;
+    if (shouldRaiseGasError(getTokenInfo(infoTokens, fromTokenAddress), fromAmount)) {
+      setIsSubmitting(false);
+      setIsPendingConfirmation(true);
+      helperToast.error(
+        `Leave at least ${formatAmount(DUST_BNB, 18, 3)} ${getConstant(
+          chainId,
+          'nativeTokenSymbol'
+        )} for gas`
+      );
+      return;
+    }
+
+    if (!isMarketOrder) {
+      minOut = toAmount;
+      Api.createSwapOrder(
+        chainId,
+        library,
+        path,
+        fromAmount,
+        minOut,
+        triggerRatio,
+        getContractAddress(chainId, 'NATIVE_TOKEN'),
+        {
+          sentMsg: 'Swap Order submitted!',
+          successMsg: 'Swap Order created!',
+          failMsg: 'Swap Order creation failed',
+          pendingTxns,
+          setPendingTxns,
+        }
+      )
+        .then(() => {
+          setIsConfirming(false);
+        })
+        .finally(() => {
+          setIsSubmitting(false);
+          setIsPendingConfirmation(false);
+        });
+      return;
+    }
+
+    path = replaceNativeTokenAddress(path, getContractAddress(chainId, 'NATIVE_TOKEN'));
+    method = 'swap';
+    value = bigNumberify(0);
+    if (toTokenAddress === AddressZero) {
+      method = 'swapTokensToETH';
+    }
+
+    minOut = toAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR);
+    params = [path, fromAmount, minOut, account];
+    if (fromTokenAddress === AddressZero) {
+      method = 'swapETHToTokens';
+      value = fromAmount;
+      params = [path, minOut, account];
+    }
+    contract = new ethers.Contract(
+      getContractAddress(chainId, 'Router'),
+      Router.abi,
+      library.getSigner()
+    );
+
+    Api.callContract(chainId, contract, method, params, {
+      value,
+      sentMsg: `Swap ${!isMarketOrder ? ' order ' : ''} submitted!`,
+      successMsg: `Swapped ${formatAmount(fromAmount, fromToken.decimals, 4, true)} ${
+        fromToken.symbol
+      } for ${formatAmount(toAmount, toToken.decimals, 4, true)} ${toToken.symbol}`,
+      failMsg: 'Swap failed.',
+      setPendingTxns,
+    })
+      .then(async () => {
+        setIsConfirming(false);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+        setIsPendingConfirmation(false);
+      });
+  };
+
+  function handleSwap() {
+    // when need approval :
+    // orderbook approval, setOrders to Open
+    // approve from token (in gmx = approve in acy)
+    // modal
+    // after isSwap
+    if (
+      fromTokenAddress === AddressZero &&
+      toTokenAddress === getContractAddress(chainId, 'NATIVE_TOKEN')
+    ) {
+      wrap();
+      return;
+    }
+
+    if (token0Addr === getContractAddress(chainId, 'NATIVE_TOKEN') && token1Addr === AddressZero) {
+      unwrap();
+      return;
+    }
+    setIsConfirming(true);
+    //metamask operations
+  }
+
   // swap的交易状态
   const swapCallback = async (status, inputToken, outToken) => {
     // 循环获取交易结果
@@ -902,35 +1118,31 @@ const SwapComponent = props => {
     // 检查是否已经包含此交易
     const transLength = transactions.filter(item => item.hash == status.hash).length;
 
-    const sti = async (hash) => {
+    const sti = async hash => {
       library.getTransactionReceipt(hash).then(async receipt => {
         console.log(`receiptreceipt for ${hash}: `, receipt);
         // receipt is not null when transaction is done
-        if (!receipt)
-          setTimeout(sti(hash), 500);
+        if (!receipt) setTimeout(sti(hash), 500);
         else {
-
           if (!receipt.status) {
-            setSwapButtonContent("Failed");
+            setSwapButtonContent('Failed');
           } else {
-
             props.onGetReceipt(receipt.transactionHash, library, account);
 
             // set button to done and disabled on default
-            setSwapButtonContent("Done");
+            setSwapButtonContent('Done');
           }
 
           const newData = transactions.filter(item => item.hash != hash);
           dispatch({
             type: 'transaction/addTransaction',
             payload: {
-              transactions: newData
+              transactions: newData,
             },
           });
-
         }
       });
-    }
+    };
     sti(status.hash);
   };
 
@@ -951,7 +1163,7 @@ const SwapComponent = props => {
   }
 
   // MARKET or LIMIT
-  const typeSelect = (input) => {
+  const typeSelect = input => {
     setType(input);
   }
   // const calculateFee = () => fees * 100
@@ -1317,8 +1529,9 @@ const SwapComponent = props => {
   }
 
   const onClickPrimary = () => {
-    if (!active) {
-      props.connectWallet();
+    console.log('test acc',account,active)
+    if (!account) {
+      connectWalletByLocalStorage()
       return;
     }
 
@@ -1358,67 +1571,6 @@ const SwapComponent = props => {
     }
 
     setIsConfirming(true);
-  };
-
-  const wrap = async () => {
-    setIsSubmitting(true);
-
-    const contract = new ethers.Contract(
-      nativeTokenAddress,
-      WETH.abi,
-      library.getSigner()
-    );
-    callContract(chainId, contract, "deposit", {
-      value: fromAmount,
-      sentMsg: "Swap submitted!",
-      successMsg: `Swapped ${formatAmount(
-        fromAmount,
-        fromToken.decimals,
-        4,
-        true
-      )} ${fromToken.symbol} for ${formatAmount(
-        toAmount,
-        toToken.decimals,
-        4,
-        true
-      )} ${toToken.symbol}`,
-      failMsg: "Swap failed.",
-      setPendingTxns
-    })
-      .then(async res => {})
-      .finally(() => {
-        setIsSubmitting(false);
-      });
-  };
-
-  const unwrap = async () => {
-    setIsSubmitting(true);
-
-    const contract = new ethers.Contract(
-      nativeTokenAddress,
-      WETH.abi,
-      library.getSigner()
-    );
-    callContract(chainId, contract, "withdraw", [fromAmount], {
-      sentMsg: "Swap submitted!",
-      failMsg: "Swap failed.",
-      successMsg: `Swapped ${formatAmount(
-        fromAmount,
-        fromToken.decimals,
-        4,
-        true
-      )} ${fromToken.symbol} for ${formatAmount(
-        toAmount,
-        toToken.decimals,
-        4,
-        true
-      )} ${toToken.symbol}`,
-      setPendingTxns
-    })
-      .then(async res => {})
-      .finally(() => {
-        setIsSubmitting(false);
-      });
   };
 
   let hasZeroBorrowFee = false;
@@ -2017,11 +2169,10 @@ const SwapComponent = props => {
   );
 };
 
-export default connect(({global, transaction, swap, loading}) => ({
-        global,
-        transaction,
-        account: global.account,
-      swap,
-      loading: loading.global,
+export default connect(({ global, transaction, swap, loading }) => ({
+  global,
+  transaction,
+  account: global.account,
+  swap,
+  loading: loading.global,
 }))(SwapComponent);
-

@@ -1,0 +1,76 @@
+.PriceChart{
+  position: relative;
+  height: 32rem;
+  }
+
+  .KChartBox{
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    top: 4.5rem;
+    z-index: 1;
+
+    /* position: relative; */
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(30, 33, 54);
+    border-image: initial;
+    border-radius: 4px;
+    background: rgb(23, 24, 44);
+  }
+
+  .TopInner{
+    display: grid;
+    grid-template-columns: auto auto auto auto auto 1fr;
+    align-items: center;
+    padding-left: 1rem;
+    grid-column-gap: 3rem;
+  }
+
+  .BotInner{
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    top: 4.5rem;
+    z-index: 1;
+    position: relative;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(30, 33, 54);
+    border-image: initial;
+    border-radius: 4px;
+    background: rgb(23, 24, 44);
+  }
+
+  .KChartHeader{
+    position: absolute;
+    display: flex;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    z-index: 5;
+  }
+
+  .KChartControl{
+    display: inline-block;
+  }
+
+  .KChartStat{
+    font-size: 14px;
+    margin-left: 2rem;
+    white-space: nowrap;
+    z-index: 2;
+    padding: 0.5rem 0px;
+  }
+  .TabBlock{
+    display: grid;
+    grid-auto-flow: column;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    box-shadow: rgba(255, 255, 255, 0.01) 0px 0px 30px 5px inset;
+    border-radius: 3px;
+    overflow: hidden;
+    background: linear-gradient(90deg, rgba(30, 34, 61, 0.9), rgba(38, 43, 71, 0.9));
+  }

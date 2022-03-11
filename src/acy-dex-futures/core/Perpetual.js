@@ -164,3 +164,44 @@ export function useGmxPrice(chainId, libraries, active) {
     mutate
   }
 }
+export async function createSwapOrder(
+    chainId,
+    library,
+    path,
+    amountIn,
+    minOut,
+    triggerRatio,
+    nativeTokenAddress,
+    opts = {}
+) {
+    const executionFee = getConstant(chainId, 'SWAP_ORDER_EXECUTION_GAS_FEE')
+    const triggerAboveThreshold = false
+    let shouldWrap = false
+    let shouldUnwrap = false
+    opts.value = executionFee
+
+    if (path[0] === AddressZero) {
+        shouldWrap = true
+        opts.value = opts.value.add(amountIn)
+    }
+    if (path[path.length - 1] === AddressZero) {
+        shouldUnwrap = true
+    }
+    path = replaceNativeTokenAddress(path, nativeTokenAddress)
+
+    const params = [
+        path,
+        amountIn,
+        minOut,
+        triggerRatio,
+        triggerAboveThreshold,
+        executionFee,
+        shouldWrap,
+        shouldUnwrap
+    ]
+
+    const orderBookAddress = getContract(chainId, "OrderBook")
+    const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner())
+
+    return callContract(chainId, contract, 'createSwapOrder', params, opts)
+}
