@@ -17,14 +17,14 @@ const VestingSchedule = ({ vestingDate, stageData, vestingClick, receivedData })
     console.log('claimType', receivedData, claimType);
     if (claimType === "contract") {
       return (
-        <div style={{ width: 80 }}>
+        // <div style={{ width: 80, height: 35 }}>
           <Button
             className="claim-btn"
             onClick={vestingClick}
           >
             Claim
           </Button>
-        </div>
+        // </div>
       )
     } else if (claimType === "project") {
       return (
@@ -38,14 +38,14 @@ const VestingSchedule = ({ vestingDate, stageData, vestingClick, receivedData })
       )
     }
     return (
-      <div style={{ width: 80 }}>
+      // <div style={{ width: 80 }}>
         <Button
           className="claim-btn"
           onClick={vestingClick}
         >
           Claim
         </Button>
-      </div>
+      // </div>
     );
   }
 

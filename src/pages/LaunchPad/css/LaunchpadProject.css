@@ -510,7 +510,8 @@
 
 .vesting-schedule-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
   width: 100%;
   align-items: center;
   flex-wrap: nowrap;
@@ -709,12 +710,10 @@
 .claim-btn {
   background-color: #eb5c20;
   border: unset;
-  font-size: 12px;
   border-radius: 999px;
   color: white;
+  width: 79.87px;
   height: 35px;
-  padding-left: 20px;
-  padding-right: 20px;
 }
 
 .vesting-tick-icon {
@@ -1031,6 +1030,17 @@
 
   .vesting-procedure-container {
     width: auto;
+    order: 2;
+  }
+
+  .vesting-schedule-container {
+    flex-direction: column;
+  }
+
+  .claim-btn {
+    width: 100px;
+    margin-top: 20px;
+    margin-bottom: 40px;
   }
 
   .vesting-percentage-claim-container {
@@ -1143,6 +1153,15 @@
     flex-wrap: wrap;
   }
 
+  .vesting-schedule-container {
+    flex-direction: column;
+  }
+
+  .claim-btn {
+    width: 100px;
+    margin-bottom: 40px;
+  }
+
   .sale-vesting-title {
     font-size: 20px;
     width: 100px;
@@ -1163,6 +1182,7 @@
 
   .vesting-procedure-container {
     width: auto;
+    order: 2;
   }
 
   .vesting-percentage-claim-container {
