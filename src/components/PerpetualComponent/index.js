@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/button-has-type */
@@ -62,6 +63,7 @@ import {
   shouldRaiseGasError,
   helperToast,
   replaceNativeTokenAddress,
+  getExchangeRate
 } from '@/acy-dex-futures/utils'
 import {
   readerAddress,
@@ -111,7 +113,7 @@ import {
   parseArbitrageLog,
 } from '@/acy-dex-swap/utils/index';
 
-//hj add
+// hj add
 import { getContractAddress } from '@/acy-dex-futures/utils/Addresses';
 import * as Api from '@/acy-dex-futures/core/Perpetual';
 import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
@@ -338,7 +340,7 @@ const SwapComponent = props => {
   // const [shortCollateralAddress, setShortCollateralAddress] = useState('0xf97f4df75117a78c1A5a0DBb814Af92458539FB4');
   // const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
 
-  //hj add to
+  // hj add to
 
   const [triggerPriceValue, setTriggerPriceValue] = useState("");
   const triggerPriceUsd = type === MARKET ? 0 : parseValue(triggerPriceValue, USD_DECIMALS);
@@ -1423,10 +1425,108 @@ const SwapComponent = props => {
     entryMarkPrice    
   ]);
 
+  const getSwapError = () => {
+    if (fromTokenAddress === toTokenAddress) {
+      return ["Select different tokens"];
+    }
+
+    if (type === MARKET) {
+      if (
+        (toToken.isStable || toToken.isUsdg) &&
+        (fromToken.isStable || fromToken.isUsdg)
+      ) {
+        return ["Select different tokens"];
+      }
+
+      if (fromToken.isNative && toToken.isWrapped) {
+        return ["Select different tokens"];
+      }
+
+      if (toToken.isNative && fromToken.isWrapped) {
+        return ["Select different tokens"];
+      }
+    }
+
+    if (!fromAmount || fromAmount.eq(0)) {
+      return ["Enter an amount"];
+    }
+    if (!toAmount || toAmount.eq(0)) {
+      return ["Enter an amount"];
+    }
+
+    const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
+    if (!fromTokenInfo || !fromTokenInfo.minPrice) {
+      return ["Incorrect network"];
+    }
+    if (
+      fromTokenInfo &&
+      fromTokenInfo.balance &&
+      fromAmount &&
+      fromAmount.gt(fromTokenInfo.balance)
+    ) {
+      return [`Insufficient ${fromTokenInfo.symbol} balance`];
+    }
+
+    const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
+
+    if (type !== MARKET) {
+      if (!triggerRatioValue || triggerRatio.eq(0)) {
+        return ["Enter a price"];
+      }
+
+      const currentRate = getExchangeRate(fromTokenInfo, toTokenInfo);
+      if (currentRate && currentRate.lt(triggerRatio)) {
+        return [`Price ${triggerRatioInverted ? "below" : "above"} Mark Price`];
+      }
+    }
+
+    if (
+      !isWrapOrUnwrap &&
+      toToken &&
+      toTokenAddress !== USDG_ADDRESS &&
+      toTokenInfo &&
+      toTokenInfo.availableAmount &&
+      toAmount.gt(toTokenInfo.availableAmount)
+    ) {
+      return ["Insufficient liquidity"];
+    }
+    if (
+      !isWrapOrUnwrap &&
+      toAmount &&
+      toTokenInfo.bufferAmount &&
+      toTokenInfo.poolAmount &&
+      toTokenInfo.bufferAmount.gt(toTokenInfo.poolAmount.sub(toAmount))
+    ) {
+      return ["Insufficient liquidity"];
+    }
+
+    if (
+      fromUsdMin &&
+      fromTokenInfo.maxUsdgAmount &&
+      fromTokenInfo.maxUsdgAmount.gt(0) &&
+      fromTokenInfo.usdgAmount &&
+      fromTokenInfo.maxPrice
+    ) {
+      const usdgFromAmount = adjustForDecimals(
+        fromUsdMin,
+        USD_DECIMALS,
+        USDG_DECIMALS
+      );
+      const nextUsdgAmount = fromTokenInfo.usdgAmount.add(usdgFromAmount);
+
+      if (nextUsdgAmount.gt(fromTokenInfo.maxUsdgAmount)) {
+        return [`${fromTokenInfo.symbol} pool exceeded`];
+      }
+    }
+
+    return [false];
+  };
+
   const getError = () => {
     if (mode !== SWAP) {
       return getLeverageError();
     }
+    return getSwapError()
   };
 
   const isPrimaryEnabled = () => {

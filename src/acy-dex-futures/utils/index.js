@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
 import _ from "lodash";
@@ -129,6 +130,21 @@ export function useLocalStorageByChainId(chainId, key, defaultValue) {
 
   return [value, setValue];
 }
+
+export function getExchangeRate(tokenAInfo, tokenBInfo, inverted) {
+    if (
+      !tokenAInfo ||
+      !tokenAInfo.minPrice ||
+      !tokenBInfo ||
+      !tokenBInfo.maxPrice
+    ) {
+      return;
+    }
+    if (inverted) {
+      return tokenAInfo.minPrice.mul(PRECISION).div(tokenBInfo.maxPrice);
+    }
+    return tokenBInfo.maxPrice.mul(PRECISION).div(tokenAInfo.minPrice);
+  }
 
 export function adjustForDecimals(amount, divDecimals, mulDecimals) {
   return amount
