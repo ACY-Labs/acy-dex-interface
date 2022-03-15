@@ -167,6 +167,10 @@ export function getContractAddress(chainId, name) {
   return CONTRACTS[chainId][name]
 }
 
+export const getContract = (chainId, name) => {
+  return getContractAddress(chainId, name);
+};
+
 export const XGMT_EXCLUDED_ACCOUNTS = [
     "0x330eef6b9b1ea6edd620c825c9919dc8b611d5d5",
     "0xd9b1c23411adbb984b1c4be515fafc47a12898b2",
