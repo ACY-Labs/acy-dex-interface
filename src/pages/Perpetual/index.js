@@ -52,7 +52,7 @@ import {getTransactionsByAccount,appendNewSwapTx, findTokenWithSymbol} from '@/u
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import PerpetualComponent from '@/components/PerpetualComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import Kchart from './components/Kchart';
+import KChart from './components/KChart';
 import axios from 'axios';
 import moment from 'moment';
 import styles from './styles.less';
@@ -726,7 +726,7 @@ const Swap = props => {
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
           <div className={`${styles.colItem} ${styles.priceChart}`}>
-          <Kchart></Kchart>
+          <KChart token1={activeToken0} token2={activeToken1} />
           </div> 
           <div className={`${styles.colItem} ${styles.perpetualComponent}`} >
                 <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}>
