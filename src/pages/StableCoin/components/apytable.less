@@ -1,12 +1,17 @@
 @import (css) url("https://fonts.googleapis.com/css?family=Lora:700");
 
 .APYtable{
-    background-color: #29292c;
-    padding-left: 20px;
+    // background-color: #29292c;
+    // padding-left: 20px;
     padding: absolute;
     margin-top: 50px;
     height: 500px;
     width: 100%;
+    :global{
+      .ant-table-thead > tr > th:not(.leftAlignTableHeader){
+        text-align: left !important;
+      }
+    }
   }
   .tableHeadBlock{
     float: left;
@@ -17,13 +22,12 @@
   .data{
     color: #fff;
     font-size: 40px;
-    margin-top:5px;
   }
   .expContent{
     color:#fff;
   }
   .tableData{
-    margin-top: 5px;
+    width: 100%;
   }
   .APYtableData{
     font-size: 20px;
@@ -31,6 +35,7 @@
     margin: 0 auto;
     border-spacing: 0px;
     border-collapse: collapse;
+    width: 96%;
   }
   .tableTr{
     border-bottom: 2px solid #797775;
@@ -38,4 +43,9 @@
   }
   .tableTh{
     border-bottom: 2px solid #fff;
+  }
+  @media (max-width: 760) {
+    .hind{
+      display: none;
+    }
   }

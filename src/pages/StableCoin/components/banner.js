@@ -16,7 +16,7 @@ export const Banner = props => {
           </div>
         </div>
       </div>
-      <embed className={styles.logo} src={logo} type="image/svg+xml" width="25%" />
+      <embed className={styles.logo} src={logo} type="image/svg+xml" width="15%" />
       <div className={styles.bannerContent}>
         The world`s first automatic interest-earning algorithmic stablecon
       </div>

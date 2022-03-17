@@ -66,8 +66,21 @@ export default [
       },
       {
         path: '/stablecoin',
-        name: 'USDAⓈ',
-        component: './StableCoin/Index',
+        // name: 'USDAⓈ',
+        name: 'StableCoin',
+        // component: './StableCoin/Index',
+        // hideChildrenInMenu: true,
+        routes:[
+          {
+            path: '/stablecoin',
+            component: './StableCoin/Index',
+            
+          },
+          {
+            path: '/stablecoin/stats',
+            component:'./StableCoin/stats'
+          }
+        ]
       },
       {
         path: '/launchpad',
@@ -90,6 +103,10 @@ export default [
         hideInMenu: true,
         component: './Transaction/Index',
       },
+      // {
+      //   path: '/stablecon/stats',
+      //   component:'./StableCoin/stats'
+      // }
     ],
   },
 ];

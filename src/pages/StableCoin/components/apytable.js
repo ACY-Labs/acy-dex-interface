@@ -1,5 +1,57 @@
 
 import styles from './apytable.less';
+import { Table } from 'antd'
+const columns = [
+    {
+      title: 'Block',
+      dataIndex: 'Block',
+    },
+    {
+      title:'APY',
+      dataIndex: 'APY',
+    },
+    {
+      title:'Multiplier',
+      dataIndex: 'Multiplier',
+    },
+    {
+      title:'Aprx.Yield',
+      dataIndex: 'AprxYield',
+    },
+    {
+        title:'OUSD Supply',
+        dataIndex: 'OUSDSupply',
+    },
+    {
+        title:'Backing Supply',
+        dataIndex: 'BackingSupply',
+    },
+    {
+        title:'Rebasing Supply',
+        dataIndex: 'RebasingSupply',
+    },
+    {
+        title:'Non- Rebasing Supply',
+        dataIndex: 'NonRebasingSupply',
+    },
+    {
+        title:'%',
+        dataIndex: 'cen',
+    },
+    {
+        title:'Ration',
+        dataIndex: 'Ration',
+    }    
+  ];
+  
+  const dataSource = [
+      {
+        Ration:'xxx',
+        cen: 'xxx',
+        NonRebasingSupply:'xxx'
+      }
+  ]
+
 export const APYtable = props => {
     //read props
 
@@ -15,14 +67,15 @@ export const APYtable = props => {
                     <div className={styles.expContent}>Next rebase</div>
                 </div>
             </div>
-            <div>
-                <div color="#fff">Daily APY for the last thirty days:</div>
+            <div color="#fff">Daily APY for the last thirty days:</div>
+            <div className={styles.tableDate}>
+                <Table dataSource={dataSource} columns={columns} pagination={false} width/>
             </div>
-            <div className={styles.tableData}>
+            {/* <div className={styles.tableData}>
                 <table className={styles.APYtableData}>
                     <tr>
                         <td className={styles.tableTh}>Block</td>
-                        <td className={styles.tableTh}>APY</td>
+                        <td className={`${styles.tableTh}, ${styles.hind}`}>APY</td>
                         <td className={styles.tableTh}>Multiplier</td>
                         <td className={styles.tableTh}>Unboosted</td>
                         <td className={styles.tableTh}>Aprx.Yield</td>
@@ -35,7 +88,7 @@ export const APYtable = props => {
                     </tr>
                     <tr>
                         <td className={styles.tableTr}>datadata</td>
-                        <td className={styles.tableTr}>datadata</td>
+                        <td className={`${styles.tableTh}, ${styles.hind}`}>datadata</td>
                         <td className={styles.tableTr}>datadata</td>
                         <td className={styles.tableTr}>datadata</td>
                         <td className={styles.tableTr}>datadata</td>
@@ -48,12 +101,12 @@ export const APYtable = props => {
                     </tr>
                     <tr>
                         <td className={styles.tableTr}>datadata</td>
-                        <td className={styles.tableTr}>datadata</td>
+                        <td className={`${styles.tableTh}, ${styles.hind}`}>datadata</td>
                         <td className={styles.tableTr}>datadata</td>
                         <td className={styles.tableTr}>datadata</td>
                     </tr>
                 </table>
-            </div>
+            </div> */}
         </div>
     );
 };
