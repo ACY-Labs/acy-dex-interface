@@ -1,5 +1,5 @@
 const BscMainNetScan = {
-    "scanUrl": "https://www.bscscan.com",
+    "scanUrl": "https://bscscan.com",
     "scanName": "BSC Scan"
 }
 

@@ -1107,6 +1107,7 @@ const LaunchpadProject = () => {
           res['totalSale'] = res.saleInfo.totalSale;
           res['totalRaise'] = res.saleInfo.totalRaise;
           res['distributionType'] = res.basicInfo.distributionType || "contract";
+          res['distributionLink'] = res.basicInfo.distributionLink || "";
           res['projectName'] = res.basicInfo.projectName;
           res['projectToken'] = res.basicInfo.projectToken;
           res['mainCoin'] = res.basicInfo.mainCoin;

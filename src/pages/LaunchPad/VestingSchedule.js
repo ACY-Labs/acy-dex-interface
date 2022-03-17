@@ -28,13 +28,20 @@ const VestingSchedule = ({ vestingDate, stageData, vestingClick, receivedData })
       )
     } else if (claimType === "project") {
       return (
-        <div>
-          <Button
-            className="claim-btn"
-          >
-            Distributed by Project
-          </Button>
-        </div>
+        <>
+          <div>
+            <Button
+              className="claim-btn"
+            >
+              Distributed by Project
+            </Button>
+          </div>
+          {receivedData && receivedData.distributionLink &&
+            <a href={receivedData.distributionLink} target="_blank" rel="noreferrer" style={{ alignSelf: 'center', fontSize: '16px', marginTop: '16px' }}>
+              {receivedData.distributionLink}
+            </a>
+          }
+        </>
       )
     }
     return (
