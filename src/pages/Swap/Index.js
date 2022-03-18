@@ -1,7 +1,7 @@
 import { useWeb3React } from '@web3-react/core';
 import React, { Component, useState, useEffect, useRef, useMemo } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { connect } from 'umi';
+import { connect, history } from 'umi';
 import { Button, Row, Col, Icon, Skeleton, Card } from 'antd';
 import {
   AcyCard,
@@ -577,7 +577,10 @@ const Swap = props => {
               </div>
             </StyledCard> 
           </div> 
-
+          
+          {/* <div>
+            Hello: {history.location.pathname}
+          </div> */}
           <div className={`${styles.colItem} ${styles.swapComponent}`} >
             <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
               <div className={styles.trade}>

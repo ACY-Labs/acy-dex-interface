@@ -15,6 +15,7 @@ import Authorized from '@/utils/Authorized';
 import logo from '../assets/logo.png';
 import Footer from './Footer';
 import Header from './Header';
+import Sidebar from './Sidebar';
 import Context from './MenuContext';
 import PageLoading from '@/components/PageLoading';
 import SiderMenu from '@/components/SiderMenu';
@@ -215,32 +216,22 @@ const  BasicLayout =props=> {
     const isTop = PropsLayout === 'topmenu';
     const routerConfig = getRouterAuthority(pathname, routes);
     const contentStyle = !fixedHeader ? { paddingTop: 0 } : {};
-    const layout = (
-      <Layout
-      >
-        <Layout
-          style={{
-            ...getLayoutStyle(),
-            minHeight: '100vh'
+    const layout = 
+      <Layout>
+        <Sidebar />
+        <Layout 
+          style={{ ...getLayoutStyle(), minHeight: '100vh' }
             // background: styles.radialBg
-          }}
-
+          } 
           className={styles[bgColor]}
         >
-          <Header
-            menuData={menuData}
-            handleMenuCollapse={handleMenuCollapse}
-            logo={logo}
-            isMobile={isMobile}
-            {...props}
-          />
+          <Header menuData={menuData} handleMenuCollapse={handleMenuCollapse} logo={logo} isMobile={isMobile} {...props} />
           <Content className={styles.content} style={contentStyle}>
-              {children}
+            {children}
           </Content>
           {/* <Footer /> */}
         </Layout>
-      </Layout>
-    );
+      </Layout>;
     return (
       <React.Fragment>
         <DocumentTitle title={getPageTitle(pathname, breadcrumbNameMap)}>
