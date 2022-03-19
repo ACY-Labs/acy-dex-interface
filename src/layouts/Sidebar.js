@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, Tabs, Icon, Button} from 'antd';
+import { Layout, Menu, Icon, Button} from 'antd';
 import { UserOutlined, LaptopOutlined, NotificationOutlined, SearchOutlined } from '@ant-design/icons';
 import { history } from 'umi';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
-const { TabPane } = Tabs;
 
 const Sidebar = (props) => {
   // state = {
@@ -118,6 +117,7 @@ const Sidebar = (props) => {
     const tabMenu = selectedTab === 1 ?
       (
         <Menu
+          theme='dark'
           onClick={handleMenuClick}
           mode="inline"
           defaultSelectedKeys={['1']}
@@ -162,6 +162,7 @@ const Sidebar = (props) => {
       ) :
       (
         <Menu
+          theme='dark'
           onClick={handleMenuClick}
           mode="inline"
           defaultSelectedKeys={['1']}
@@ -186,6 +187,7 @@ const Sidebar = (props) => {
       );
     return (
       <Sider
+        theme='dark'
         style={{
           overflow: 'auto',
           height: '100%',
