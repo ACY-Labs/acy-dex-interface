@@ -218,7 +218,10 @@ const  BasicLayout =props=> {
     const contentStyle = !fixedHeader ? { paddingTop: 0 } : {};
     const layout = 
       <Layout>
+        {/* Conditional rendering: show Sidebar only in certain pages */}
+        {pathname.indexOf('/launchpad')>-1 &&
         <Sidebar />
+        }
         <Layout 
           style={{ ...getLayoutStyle(), minHeight: '100vh' }
             // background: styles.radialBg
