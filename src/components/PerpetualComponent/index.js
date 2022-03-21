@@ -28,12 +28,14 @@ import TokenSelectorModal from '@/components/TokenSelectorModal';
 // ymj swapBox components start
 import { PriceBox } from './components/PriceBox';
 import { DetailBox } from './components/DetailBox';
+import { GlpSwapBox, GlpSwapDetailBox } from './components/GlpSwapBox'
 
-import { MARKET, LIMIT, LONG, SHORT, SWAP } from './constant'
+import { MARKET, LIMIT, LONG, SHORT, SWAP, POOL } from './constant'
 import { 
   USD_DECIMALS, 
   USDG_ADDRESS,
   USDG_DECIMALS,
+  GLP_DECIMALS,
   BASIS_POINTS_DIVISOR, 
   MARGIN_FEE_BASIS_POINTS,
   PLACEHOLDER_ACCOUNT,
@@ -72,15 +74,24 @@ import {
   nativeTokenAddress,
   routerAddress,
   orderBookAddress,
+  stakedGlpTrackerAddress,
+  glpManagerAddress,
+  feeGlpTrackerAddress,
+  glpVesterAddress,
+  rewardReaderAddress,
   tempChainID,
   tempLibrary
 } from '@/acy-dex-futures/samples/constants'
-import { callContract } from '@/acy-dex-futures/core/Perpetual'
+import { callContract, useGmxPrice } from '@/acy-dex-futures/core/Perpetual'
 import Reader from '@/acy-dex-futures/abis/Reader.json'
 import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
 import VaultV2 from '@/acy-dex-futures/abis/VaultV2.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
 import Router from '@/acy-dex-futures/abis/Router.json'
+import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
+import RewardTracker from '@/acy-dex-futures/abis/RewardTracker.json'
+import Vester from '@/acy-dex-futures/abis/Vester.json'
+import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
 import useSWR from 'swr'
 
 import { getInfoTokens_test } from './utils'
@@ -95,7 +106,7 @@ import { ethers } from "ethers"
 
 import { useWeb3React } from '@web3-react/core';
 import { binance, injected } from '@/connectors';
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 import {
   Error,
@@ -157,26 +168,43 @@ const { TabPane } = Tabs;
 const { AddressZero } = ethers.constants;
 
 const StyledRadioButton = styled(Radio.Button)`
-  .ant-long {
-    background-color: #0ecc83;
+  .ant-radio-button-wrapper {
     border: none;
-    border-left: none !important;
+    background-color: transparent;
   }
-  .ant-short {
-  }
-  .ant-swap {
+  .ant-radio-button-wrapper:not(:first-child)::before {
+    background-color: transparent;
   }
 `;
 
 const StyledSlider = styled(Slider)`
   .ant-slider-track {
-    background: #be4d00;
+    background: #929293;
   }
   .ant-slider-rail {
-    background: #3b0000;
+    background: #29292c;
+  }
+  .ant-slider-handle {
+    background: #929293;
+    border: 2px solid #929293;
+  }
+  .ant-slider-handle-active {
+    background: #929293;
+    border: 2px solid #929293;
   }
   .ant-slider-dot {
-    background: transparent;
+    border: 2px solid #29292c;
+    border-radius: 1px;
+    background: #29292c;
+    width: 2px;
+    height: 11px;
+  }
+  .ant-slider-dot-active {
+    border: 2px solid #929293;
+    border-radius: 1px;
+    background: #929293;
+    width: 2px;
+    height: 11px;
   }
 `;
 
@@ -217,15 +245,6 @@ const SwapComponent = props => {
     tokenList: INITIAL_TOKEN_LIST,
     farmSetting: { INITIAL_ALLOWED_SLIPPAGE },
   } = useConstantLoader(props);
-  // console.log('constant loader chainid', chainId);
-  // const {
-  //   dispatch,
-  //   onSelectToken0,
-  //   onSelectToken1,
-  //   onSelectToken,
-  //   token,
-  //   isLockedToken1 = false,
-  // } = props;
   const { profitsIn, liqPrice } = props;
   const { entryPriceMarket, exitPrice, borrowFee, positions } = props;
   // const { infoTokens_test, usdgSupply, positions } = props;
@@ -244,7 +263,10 @@ const SwapComponent = props => {
     approveOrderBook,
     isWaitingForPluginApproval,
     setIsWaitingForPluginApproval,
-    isPluginApproving
+    isPluginApproving,
+    isBuying,
+    setIsBuying,
+    onChangeMode,
   } = props;
 
   const connectWalletByLocalStorage = useConnectWallet();
@@ -1161,7 +1183,8 @@ const SwapComponent = props => {
 
   // LONG or SHORT
   const modeSelect = (input) => {
-    setMode(input);
+    setMode(input.target.value);
+    onChangeMode(input.target.value);
   }
 
   // MARKET or LIMIT
@@ -1745,158 +1768,222 @@ const SwapComponent = props => {
     leverageValue = `${parseFloat(leverageOption).toFixed(2)}x`
   }
 
+  // Glp Swap Component
+  const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
+  const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([tempChainID, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(tempLibrary, ReaderV2, [tokensForBalanceAndSupplyQuery]),
+  })
+  const { data: aums, mutate: updateAums } = useSWR([tempChainID, glpManagerAddress, "getAums"], {
+    fetcher: fetcher(tempLibrary, GlpManager),
+  })
+  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([tempChainID, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(tempLibrary, RewardTracker),
+  })
+  const { data: reservedAmount, mutate: updateReservedAmount } = useSWR([tempChainID, glpVesterAddress, "pairAmounts", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(tempLibrary, Vester),
+  })
+  const { gmxPrice, mutate: updateGmxPrice } = useGmxPrice(tempChainID, { arbitrum: tempLibrary }, active)
+  const rewardTrackersForStakingInfo = [ stakedGlpTrackerAddress, feeGlpTrackerAddress ]
+  const { data: stakingInfo, mutate: updateStakingInfo } = useSWR([tempChainID, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(tempLibrary, RewardReader, [rewardTrackersForStakingInfo]),
+  })
+  const [glpValue, setGlpValue] = useState("")
+  const glpAmount = parseValue(glpValue, GLP_DECIMALS)
+
+  const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
+  const glp_usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
+  let aum
+  if (aums && aums.length > 0) {
+    aum = isBuying ? aums[0] : aums[1]
+  }
+  const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  let glpBalanceUsd
+  if (glpBalance) {
+    glpBalanceUsd = glpBalance.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
+  }
+  const glpSupplyUsd = glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
+
+  let reserveAmountUsd
+  if (reservedAmount) {
+    reserveAmountUsd = reservedAmount.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
+  }
+
+  const glp_infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
+
   return (
     <div>
       <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}>
         <div className={styles.modeSelector}>
-          <AcyTabs onChange={modeSelect}>
-            <AcyTabPane tab="Long" key='Long' />
-            <AcyTabPane tab="Short" key='Short' />
-            <AcyTabPane tab="Swap" key='Swap' />
-          </AcyTabs> 
+          <Radio.Group defaultValue={LONG} buttonStyle="solid" onChange={modeSelect}>
+            <StyledRadioButton value={LONG} className={styles.modeSubOption}>
+              Long
+            </StyledRadioButton>
+            <StyledRadioButton value={SHORT} className={styles.modeSubOption}>
+              Short
+            </StyledRadioButton>
+            <StyledRadioButton value={SWAP} className={styles.modeSubOption}>
+              Swap
+            </StyledRadioButton>
+            <StyledRadioButton value={POOL} className={styles.modeSubOption}>
+              Pool
+            </StyledRadioButton>
+          </Radio.Group>
+
+          {/* <Tabs onChange={modeSelect} type="card">
+            <TabPane tab="Long" key='Long' />
+            <TabPane tab="Short" key='Short' />
+            <TabPane tab="Swap" key='Swap' />
+          </Tabs>  */}
         </div>
 
-        <div>
-          <Tabs 
-            defaultActiveKey={MARKET} 
-            onChange={typeSelect}
-            size={'small'}
-            tabBarGutter={0}
-            type={'line'}
-            tabPosition={'top'}
-            tabBarStyle={{ border: '0px black' }}
-          // animated={false}
-          >
-            {perpetualType.map(i => (
-              <TabPane tab={<span>{i.icon}{i.name}{' '}</span>} key={i.id} />
-            ))}
-          </Tabs>
-        </div>
+        {mode !== POOL ?
+          <>
+            <div>
+              <Tabs 
+                defaultActiveKey={MARKET} 
+                onChange={typeSelect}
+                size={'small'}
+                tabBarGutter={0}
+                type={'line'}
+                tabPosition={'top'}
+                tabBarStyle={{ border: '0px black' }}
+              // animated={false}
+              >
+                {perpetualType.map(i => (
+                  <TabPane tab={<span>{i.name}{' '}</span>} key={i.id} />
+                ))}
+              </Tabs>
+            </div>
 
-        <BuyInputSection
-          token={fromToken}
-          tokenlist={tokens}
-          topLeftLabel="Pay"
-          balance={payBalance} 
-          topRightLabel='Balance: '
-          tokenBalance={formatAmount(fromBalance, fromToken.decimals, 4, true)}
-          inputValue={fromValue}
-          onInputValueChange={onFromValueChange}
-          onSelectToken={selectFromToken}
-        />  
-
-        <div className={styles.arrow} onClick={switchTokens}>
-          <Icon style={{ fontSize: '16px' }} type="arrow-down" />
-        </div>
-
-        <BuyInputSection
-          token={toToken}
-          tokenlist={toTokens}
-          topLeftLabel={getTokenLabel()}
-          balance={receiveBalance} 
-          topRightLabel={leverageLabel}
-          tokenBalance={leverageValue}
-          inputValue={toValue}
-          onInputValueChange={onToValueChange}
-          onSelectToken={selectToToken}
-        />
-
-        {/* todo: showSizeSection, */}
-        
-        {type === LIMIT &&
-          <div className={styles.priceBox}>
-            <PriceBox
-              priceValue={triggerPriceValue}
-              onChange={onTriggerPriceChange}
-              markOnClick={() => {
-                setTriggerPriceValue(
-                  formatAmountFree(entryMarkPrice, USD_DECIMALS, 2)
-                );
-              }}
-              mark={formatAmount(entryMarkPrice, USD_DECIMALS, 2, true)}
+            <BuyInputSection
+              token={fromToken}
+              tokenlist={tokens}
+              topLeftLabel="Pay"
+              balance={payBalance} 
+              topRightLabel='Balance: '
+              tokenBalance={formatAmount(fromBalance, fromToken.decimals, 4, true)}
+              inputValue={fromValue}
+              onInputValueChange={onFromValueChange}
+              onSelectToken={selectFromToken}
             />
-          </div>
-        }
 
-        {/* Leverage Splider */}
-        {mode !== SWAP &&
-          <AcyDescriptions>
-            <div className={styles.breakdownTopContainer}>
-              <div className={styles.slippageContainer}>
-                <span style={{ fontWeight: 600 }}>Leverage splider</span>
-                <Checkbox
-                  checked={isLeverageSliderEnabled}
-                  onChange={()=>{
-                    setIsLeverageSliderEnabled(!isLeverageSliderEnabled)
+            <div className={styles.arrow} onClick={switchTokens}>
+              <Icon style={{ fontSize: '16px' }} type="arrow-down" />
+            </div>
+
+            <BuyInputSection
+              token={toToken}
+              tokenlist={toTokens}
+              topLeftLabel={getTokenLabel()}
+              balance={receiveBalance} 
+              topRightLabel={leverageLabel}
+              tokenBalance={leverageValue}
+              inputValue={toValue}
+              onInputValueChange={onToValueChange}
+              onSelectToken={selectToToken}
+            />
+          
+            {type === LIMIT &&
+              <div className={styles.priceBox}>
+                <PriceBox
+                  priceValue={triggerPriceValue}
+                  onChange={onTriggerPriceChange}
+                  markOnClick={() => {
+                    setTriggerPriceValue(
+                      formatAmountFree(entryMarkPrice, USD_DECIMALS, 2)
+                    );
                   }}
+                  mark={formatAmount(entryMarkPrice, USD_DECIMALS, 2, true)}
                 />
               </div>
-              {isLeverageSliderEnabled &&
-                <span className={styles.leverageSlider}>
-                  <div className={styles.leverageInputContainer}>
-                    <button 
-                      className={styles.leverageButton}
-                      onClick={()=>{
-                        if(leverageOption > 1.1) {
-                          setLeverageOption((parseFloat(leverageOption)-0.1).toFixed(1))
-                        }
-                      }}
-                    >
-                      <span> - </span>
-                    </button>
-                    <input
-                      type="number"
-                      min={1.1}
-                      max={30.5}
-                      value={leverageOption} 
-                      onChange={e => {
-                        let val = parseFloat(e.target.value.replace(/^(-)*(\d+)\.(\d).*$/, '$1$2.$3')).toFixed(1)
-                        if(val >= 1.1 && val <= 30.5){
-                          setLeverageOption(val)
-                        }
-                      }} 
-                      className={styles.leverageInput}
-                    />
-                    <button 
-                      className={styles.leverageButton}
-                      onClick={()=>{
-                        if(leverageOption < 30.5) {
-                          setLeverageOption((parseFloat(leverageOption)+0.1).toFixed(1))
-                        }
-                      }}
-                    >
-                      <span> + </span>
-                    </button>
-                  </div>
-                  <StyledSlider 
-                    min={1.1} 
-                    max={30.5} 
-                    step={0.1}
-                    marks={leverageMarks} 
-                    value={leverageOption} 
-                    onChange={value => setLeverageOption(value)} 
-                    defaultValue={leverageOption} 
-                    style={{ color: 'red' }} 
-                  />
-                </span>}
-            </div>
-          </AcyDescriptions>
-        }
+            }
 
-        <div>
-          <AcyButton 
-            style={{ marginTop: '25px' }}
-            onClick={onClickPrimary} 
-            disabled={!isPrimaryEnabled()}
-          >
-            {getPrimaryText()}
-          </AcyButton>
-        </div>
+            {/* Leverage Slider */}
+            {(mode === LONG || mode === SHORT) &&
+              <AcyDescriptions>
+                <div className={styles.breakdownTopContainer}>
+                  <div className={styles.slippageContainer}>
+                    <span style={{ fontWeight: 600 }}>Leverage</span>
+                    {isLeverageSliderEnabled &&
+                      <div className={styles.leverageInputContainer}>
+                        <button 
+                          className={styles.leverageButton}
+                          onClick={()=>{
+                            if(leverageOption > 1.1) {
+                              setLeverageOption((parseFloat(leverageOption)-0.1).toFixed(1))
+                            }
+                          }}
+                        >
+                          <span> - </span>
+                        </button>
+                        <input
+                          type="number"
+                          min={1.1}
+                          max={30.5}
+                          value={leverageOption} 
+                          onChange={e => {
+                            let val = parseFloat(e.target.value.replace(/^(-)*(\d+)\.(\d).*$/, '$1$2.$3')).toFixed(1)
+                            if(val >= 1.1 && val <= 30.5){
+                              setLeverageOption(val)
+                            }
+                          }} 
+                          className={styles.leverageInput}
+                        />
+                        <button 
+                          className={styles.leverageButton}
+                          onClick={()=>{
+                            if(leverageOption < 30.5) {
+                              setLeverageOption((parseFloat(leverageOption)+0.1).toFixed(1))
+                            }
+                          }}
+                        >
+                          <span> + </span>
+                        </button>
+                      </div>
+                    }
+                    <Checkbox
+                      checked={isLeverageSliderEnabled}
+                      onChange={()=>{
+                        setIsLeverageSliderEnabled(!isLeverageSliderEnabled)
+                      }}
+                    />
+                  </div>
+                  {isLeverageSliderEnabled &&
+                    <span className={styles.leverageSlider}>
+                      <StyledSlider 
+                        min={1.1} 
+                        max={30.5} 
+                        step={0.1}
+                        marks={leverageMarks} 
+                        value={leverageOption} 
+                        onChange={value => setLeverageOption(value)} 
+                        defaultValue={leverageOption} 
+                        style={{ color: 'red' }} 
+                      />
+                    </span>}
+                </div>
+              </AcyDescriptions>
+            }
+
+            <div>
+              <AcyButton 
+                style={{ marginTop: '25px' }}
+                onClick={onClickPrimary} 
+                disabled={!isPrimaryEnabled()}
+              >
+                {getPrimaryText()}
+              </AcyButton>
+            </div>
+          </> :
+          <>
+            <GlpSwapBox isBuying={isBuying} setIsBuying={setIsBuying} />
+          </>
+        }
 
       </AcyCard>
       
       {/* Long/Short Detail card  */}
-      {mode !== SWAP &&
+      {(mode === LONG || mode === SHORT) &&
         <>
           <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}>
           
@@ -2154,30 +2241,6 @@ const SwapComponent = props => {
             }
           </AcyCard>
         </>
-        // <div>
-        //   <DetailBox
-        //     leverage={leverage}
-        //     shortOrLong={mode}
-        //     marketOrLimit={type}
-        //     profitsIn={profitsIn}
-        //     entryPriceLimit={entryPriceLimit}
-        //     liqPrice={liqPrice}
-        //     entryPriceMarket={entryPriceMarket}
-        //     exitPrice={exitPrice}
-        //     borrowFee={borrowFee}
-        //     token1Symbol={toToken.symbol}
-        //     fromUsdMin={fromUsdMin}
-        //     toUsdMax={toUsdMax}
-        //     toTokenInfo={toTokenInfo}
-        //     triggerPriceValue={triggerPriceValue}
-        //     shortCollateralToken={shortCollateralToken}
-        //     toTokenAddress={toTokenAddress}
-        //     shortCollateralAddress={shortCollateralAddress}
-        //     positionsMap={positionsMap}
-        //     positionKey={positionKey}
-        //     positions={positions}
-        //   />
-        // </div>
       }
 
       {mode === SWAP &&
@@ -2199,62 +2262,23 @@ const SwapComponent = props => {
         />
       }
 
-      {/* {needApprove 
-      ? 
-        <div>
-          <AcyButton
-            style={{ marginTop: '25px' }}
-            disabled={!approveButtonStatus}
-            onClick={async () => {
-              setShowSpinner(true);
-              setApproveButtonStatus(false);
-              const state = await approve(token0.address, approveAmount, library, account);
-              setApproveButtonStatus(true);
-              setShowSpinner(false);
-              if (state) {
-                setSwapButtonState(true);
-                setSwapButtonContent('Swap');
-                setApproveButtonStatus(false);
-                setNeedApprove(false);
-                console.log("test needApprove false")
-              }
-            }}
-          >
-            Approve{' '}
-            {showSpinner && <Icon type="loading" />}
-          </AcyButton> {' '}
-        </div> 
-      : 
-        <AcyButton
-          style={{ marginTop: '25px' }}
-          disabled={!swapButtonState}
-          onClick={() => {
-            if (account == undefined) {
-              connectWalletByLocalStorage();
-            } else {
-              // hj TODO
-              // if ( currentTab == "swap" ) {
-              //     setSwapButtonState( false )
-              //     handleSwap();
-              // }
-              console.log("ready for function ymj");
-                }
-              }}
-        >
-          {swapButtonContent}
-        </AcyButton>
-      } */}
-
-      {/* <AcyDescriptions>
-        {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
-      </AcyDescriptions> */}
-
-      {/* <TokenSelectorModal
-        onCancel={onCancel} 
-        width={400} 
-        visible={visible} 
-        onCoinClick={onCoinClick}
-      /> */}
+      {mode === POOL &&
+        <GlpSwapDetailBox 
+          isBuying={isBuying}
+          setIsBuying={setIsBuying}
+          tokens={tokens}
+          infoTokens={glp_infoTokens}
+          glpPrice={glpPrice}
+          glpBalance={glpBalance}
+          glpBalanceUsd={glpBalanceUsd}
+          reservedAmount={reservedAmount}
+          reserveAmountUsd={reserveAmountUsd}
+          stakingInfo={stakingInfo}
+          glpSupply={glpSupply}
+          glpSupplyUsd={glpSupplyUsd}
+          gmxPrice={gmxPrice}
+        />
+      }
     </div>
   );
 };

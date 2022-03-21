@@ -119,7 +119,7 @@ const getChartOptions = (width, height) => ({
     useEffect(()=>{
         const chart = createChart(
             chartRef.current,
-            getChartOptions(600, 400)
+            getChartOptions(840, 400)
           );
   
   var candleSeries = chart.addCandlestickSeries({

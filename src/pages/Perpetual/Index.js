@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable camelcase */
 /* eslint-disable no-useless-computed-key */
 import { useWeb3React } from '@web3-react/core';
-import React, { Component, useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { Component, useState, useEffect, useRef, useCallback, useMemo, useHistory } from 'react';
 import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton, Card } from 'antd';
 import samplePositionsData from "./SampleData"
@@ -25,6 +27,10 @@ import {
   FUNDING_RATE_PRECISION,
   BASIS_POINTS_DIVISOR,
   ARBITRUM_DEFAULT_COLLATERAL_SYMBOL,
+  GLP_DECIMALS,
+  USD_DECIMALS,
+  PLACEHOLDER_ACCOUNT,
+  parseValue, 
   getLiquidationPrice, 
   getTokenInfo,
   getInfoTokens,
@@ -47,15 +53,20 @@ import {
   tempChainID,
   orderBookAddress,
   routerAddress,
-
+  stakedGlpTrackerAddress,
+  glpManagerAddress,
+  feeGlpTrackerAddress,
+  glpVesterAddress,
+  rewardReaderAddress,
 } from '@/acy-dex-futures/samples/constants'
-import { approvePlugin } from '@/acy-dex-futures/core/Perpetual'
+import { approvePlugin, useGmxPrice } from '@/acy-dex-futures/core/Perpetual'
 import Media from 'react-media';
 import { uniqueFun } from '@/utils/utils';
 import {getTransactionsByAccount,appendNewSwapTx, findTokenWithSymbol} from '@/utils/txData';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import PerpetualComponent from '@/components/PerpetualComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { GlpSwapTokenTable } from '@/components/PerpetualComponent/components/GlpSwapBox'
 import Kchart from './components/Kchart';
 import axios from 'axios';
 import moment from 'moment';
@@ -74,6 +85,11 @@ import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
 import Router from '@/acy-dex-futures/abis/Router.json'
 import VaultV2 from '@/acy-dex-futures/abis/VaultV2.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
+import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
+import RewardTracker from '@/acy-dex-futures/abis/RewardTracker.json'
+import Vester from '@/acy-dex-futures/abis/Vester.json'
+import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
+import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
 import {ethers} from 'ethers'
 import useSWR from 'swr'
 import sampleGmxTokens from '@/acy-dex-futures/samples/TokenList'
@@ -315,7 +331,7 @@ const Swap = props => {
   const [tableContent, setTableContent] = useState(POSITIONS);
   const [positionsData, setPositionsData] = useState([]);
   const [ordersData, setOrdersData] = useState([]);
-  const { activate } = useWeb3React();
+  const { active,activate } = useWeb3React();
 //---------- FOR TESTING 
   const whitelistedTokens = sampleGmxTokens.filter(token=>token.symbol!== "USDG");
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
@@ -768,8 +784,6 @@ const Swap = props => {
     updateActiveChartData(chartData[lastDataIndex][1], lastDataIndex);
   }, [chartData])
 
-
-
   // const renderChart = () => {
   //   return <ExchangeTVChart
   //     fromTokenAddress={fromTokenAddress}
@@ -783,111 +797,185 @@ const Swap = props => {
   //   />
   // }
  
+  // Glp Swap
+  const [isBuying, setIsBuying] = useState(true)
+  const [showTokenTable, setShowTokenTable] = useState(false)
+  // const history = useHistory()
+  // useEffect(() => {
+  //   const hash = history.location.hash.replace('#', '')
+  //   const buying = !(hash === 'redeem') 
+  //   setIsBuying(buying)
+  // }, [history.location.hash])
+
+  const glp_tokenList = whitelistedTokens.filter(t => !t.isWrapped)
+  const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
+  const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([tempChainID, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(tempLibrary, ReaderV2, [tokensForBalanceAndSupplyQuery]),
+  })
+  const { data: aums, mutate: updateAums } = useSWR([tempChainID, glpManagerAddress, "getAums"], {
+    fetcher: fetcher(tempLibrary, GlpManager),
+  })
+  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([tempChainID, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(tempLibrary, RewardTracker),
+  })
+  const { data: reservedAmount, mutate: updateReservedAmount } = useSWR([tempChainID, glpVesterAddress, "pairAmounts", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(tempLibrary, Vester),
+  })
+  const { gmxPrice, mutate: updateGmxPrice } = useGmxPrice(tempChainID, { arbitrum: tempLibrary }, active)
+  const rewardTrackersForStakingInfo = [ stakedGlpTrackerAddress, feeGlpTrackerAddress ]
+  const { data: stakingInfo, mutate: updateStakingInfo } = useSWR([tempChainID, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(tempLibrary, RewardReader, [rewardTrackersForStakingInfo]),
+  })
+  const [glpValue, setGlpValue] = useState("")
+  const glpAmount = parseValue(glpValue, GLP_DECIMALS)
+
+  const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
+  const glp_usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
+  let aum
+  if (aums && aums.length > 0) {
+    aum = isBuying ? aums[0] : aums[1]
+  }
+  const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  let glpBalanceUsd
+  if (glpBalance) {
+    glpBalanceUsd = glpBalance.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
+  }
+  const glpSupplyUsd = glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
+  let reserveAmountUsd
+  if (reservedAmount) {
+    reserveAmountUsd = reservedAmount.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
+  }
+  const glp_infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
+
+  const onChangeMode = (mode) => {
+    console.log('joy mode', mode)
+    if (mode === "Pool") {
+      setShowTokenTable(true)
+    } else {
+      setShowTokenTable(false)
+    }
+  }
+
   return (
     <PageHeaderWrapper>
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
-          <div className={`${styles.colItem} ${styles.priceChart}`}>
-          <Kchart></Kchart>
-          </div> 
-          <div className={`${styles.colItem} ${styles.perpetualComponent}`} >
-                {/* <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}> */}
-                  <div className={styles.trade}>
-                    <PerpetualComponent
-                      fromTokenAddress={fromTokenAddress}
-                      setFromTokenAddress={setFromTokenAddress}
-                      toTokenAddress={toTokenAddress}
-                      setToTokenAddress={setToTokenAddress}
-                      positionsMap={positionsMap}
-                      pendingTxns={pendingTxns}
-                      setPendingTxns={setPendingTxns}
-                      tokenSelection={tokenSelection}
-                      setTokenSelection={setTokenSelection}
-                      savedSlippageAmount={savedSlippageAmount}
-                      savedIsPnlInLeverage={savedIsPnlInLeverage}
-                      approveOrderBook={approveOrderBook}
-                      isWaitingForPluginApproval={isWaitingForPluginApproval}
-                      setIsWaitingForPluginApproval={setIsWaitingForPluginApproval}
-                      isPluginApproving={isPluginApproving}
-                      
-                      positions = {positions}
-                      profitsIn={'ETH'} 
-                      liqPrice={456}
-                      entryPriceMarket={123}
-                      exitPrice={123}
-                      borrowFee={123}
-                    />
-                    {/* <PerpetualComponent
-                      onSelectToken0={token => {
-                        setActiveToken0(token);
-                      }}
-                      onSelectToken1={token => {
-                        setActiveToken1(token);
+          {/* K chart */}
+          <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}>
+            <div className={`${styles.colItem} ${styles.kChart}`}>
+              <Kchart />
+            </div> 
+          </AcyCard>
 
-                      }}
-                      infoTokens_test = {infoTokens}
-                      positions = {positions}
-                      positionsMap = {positionsMap}
-                      usdgSupply = {usdgSupply}
-                      tokens={tokens}
-                      onGetReceipt={onGetReceipt}
-                      profitsIn={'ETH'} 
-                      liqPrice={456}
-                      entryPriceMarket={123}
-                      exitPrice={123}
-                      borrowFee={123}
-                    /> */}
+          {/* Position table */}
+          {!showTokenTable ?
+            <>
+              <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}>
+                <div className={`${styles.colItem} ${styles.priceChart}`}>
+                  <div className={`${styles.colItem}`}>
+                    <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(POSITIONS)}}>Positions</a>
+                    <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(ORDERS)}}>Orders</a>
+                    <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(ACTIONS)}}>Actions </a>
                   </div>
-                {/* </AcyCard> */}
-          </div>
+                  <div className={styles.positionsTable}>
+                    <RenderTable />
+                  </div>
+                </div>
+              </AcyCard>
+            </> :
+            <>
+              <GlpSwapTokenTable 
+                isBuying={isBuying}
+                setIsBuying={setIsBuying}
+                tokenList={glp_tokenList}
+                infoTokens={infoTokens}
+                glpAmount={glpAmount}
+                glpPrice={glpPrice}
+                usdgSupply={glp_usdgSupply}
+                totalTokenWeights={totalTokenWeights}
+              />
+            </>}
 
-        </div>
-        <div className={styles.rowFlexContainer}>
-              <div className={`${styles.colItem}`}>
+          {/* <div className={styles.rowFlexContainer}>
+                <div className={`${styles.colItem}`}>
                   <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(POSITIONS)}}>Positions</a>
                   <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(ORDERS)}}>Orders</a>
                   <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(ACTIONS)}}>Actions </a>
-              </div>
-          </div>
-        <div className={styles.rowFlexContainer}>
-            <div className={`${styles.colItem} ${styles.priceChart}`}>
-                <div className={styles.positionsTable}>
-                <RenderTable/>
                 </div>
+              </div> */}
+
+          {/* <div className={styles.rowFlexContainer}>
+                <div className={`${styles.colItem} ${styles.priceChart}`}>
+                  <div className={styles.positionsTable}>
+                    <RenderTable/>
+                  </div>
+                </div>
+                <div className={styles.exchangeItem}>
+                </div>
+          </div> */}
+
+          <AcyModal onCancel={onCancel} width={600} visible={visible}>
+            <div className={styles.title}>
+              <AcyIcon name="back" /> Select a token
             </div>
-        <div className={styles.exchangeItem}>
+            <div className={styles.search}>
+              <AcyInput
+                placeholder="Enter the token symbol or address"
+                suffix={<AcyIcon name="search" />}
+              />
+            </div>
+            <div className={styles.coinList}>
+              <AcyTabs>
+                <AcyTabPane tab="All" key="1">
+                  <AcyCoinItem />
+                  <AcyCoinItem />
+                  <AcyCoinItem />
+                  <AcyCoinItem />
+                </AcyTabPane>
+                <AcyTabPane tab="Favorite" key="2" />
+                <AcyTabPane tab="Index" key="3" />
+                <AcyTabPane tab="Synth" key="4" />
+              </AcyTabs>
+            </div>
+          </AcyModal>
+          <AcyApprove
+            onCancel={() => setVisibleLoading(false)}
+            visible={visibleLoading}
+          />
+      
         </div>
-      </div>
-      <AcyModal onCancel={onCancel} width={600} visible={visible}>
-        <div className={styles.title}>
-          <AcyIcon name="back" /> Select a token
-        </div>
-        <div className={styles.search}>
-          <AcyInput
-            placeholder="Enter the token symbol or address"
-            suffix={<AcyIcon name="search" />}
+        {/* <div className={styles.rowFlexContainer}> */}
+        {/* Perpetual Component */}
+        <div className={styles.perpetualComponent}>
+          <PerpetualComponent
+            fromTokenAddress={fromTokenAddress}
+            setFromTokenAddress={setFromTokenAddress}
+            toTokenAddress={toTokenAddress}
+            setToTokenAddress={setToTokenAddress}
+            positionsMap={positionsMap}
+            pendingTxns={pendingTxns}
+            setPendingTxns={setPendingTxns}
+            tokenSelection={tokenSelection}
+            setTokenSelection={setTokenSelection}
+            savedSlippageAmount={savedSlippageAmount}
+            savedIsPnlInLeverage={savedIsPnlInLeverage}
+            approveOrderBook={approveOrderBook}
+            isWaitingForPluginApproval={isWaitingForPluginApproval}
+            setIsWaitingForPluginApproval={setIsWaitingForPluginApproval}
+            isPluginApproving={isPluginApproving}  
+            positions={positions}
+            profitsIn='ETH'
+            liqPrice={456}
+            entryPriceMarket={123}
+            exitPrice={123}
+            borrowFee={123}
+            isBuying={isBuying}
+            setIsBuying={setIsBuying}
+            onChangeMode={onChangeMode}
           />
         </div>
-        <div className={styles.coinList}>
-          <AcyTabs>
-            <AcyTabPane tab="All" key="1">
-              <AcyCoinItem />
-              <AcyCoinItem />
-              <AcyCoinItem />
-              <AcyCoinItem />
-            </AcyTabPane>
-            <AcyTabPane tab="Favorite" key="2" />
-            <AcyTabPane tab="Index" key="3" />
-            <AcyTabPane tab="Synth" key="4" />
-          </AcyTabs>
-        </div>
-      </AcyModal>
-      <AcyApprove
-        onCancel={() => setVisibleLoading(false)}
-        visible={visibleLoading}
-      />
-      
       </div>
+      {/* </div> */}
     </PageHeaderWrapper>
   );
 }
