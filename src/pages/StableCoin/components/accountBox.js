@@ -1,4 +1,3 @@
-
 import styles from './accountBox.less';
 export const AccountBox = props => {
   //read props
