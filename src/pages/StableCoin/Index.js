@@ -7,6 +7,7 @@ import { ExchangeTable } from "./components/exchangeTable"
 import { AcyCard } from '@/components/Acy';
 import SwapComponent from '@/components/SwapComponent';
 import { APYtable } from "./components/apytable"
+import { AccountBox } from "./components/accountBox"
 
 const icon = require('./aperture.svg');
 
@@ -15,9 +16,11 @@ const StableCoin = (props) => {
     return (
         <PageHeaderWrapper>
         <Banner></Banner>
-        
-        <div className={styles.exchangeBlock}>
+        <div className={styles.dataBlock}>
+            <AccountBox></AccountBox>
             <ExchangeTable></ExchangeTable>
+        </div>
+        
             <div className={styles.swapCard}>
                 <div className={`${styles.colItem} ${styles.swapComponent}`} >
                     <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
@@ -27,7 +30,6 @@ const StableCoin = (props) => {
                     </AcyCard>
                 </div>
             </div>
-         </div>
 
         </PageHeaderWrapper>
     )

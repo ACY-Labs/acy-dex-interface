@@ -26,22 +26,30 @@ export const ExchangeTable = props => {
   
   const dataSource = [
     {
-      Exchange: 'Filpper',
+      Exchange: 'Cureve',
       Estreceived: '——',
       Gasestimate: '——',
       Diff: '——',
     },
     {
-      Exchange: 'Origin Vault',
+      Exchange: 'SushiSwap',
       Estreceived: '——',
       Gasestimate: '——',
       Diff: '——',
+    },
+    {
+      Exchange: 'Uniswap V2',
+      Estreceived: '——',
+      Gasestimate: '——',
+      Diff: '——',
+      
     },
     {
       Exchange: 'Uniswap V3',
       Estreceived: '——',
       Gasestimate: '——',
       Diff: '——',
+      
     },
   ]
   const [stakeDisplayNumber, setStakeDisplayNumber] = useState(5);
