@@ -2104,14 +2104,12 @@ const SwapComponent = props => {
                 }
               </div>
             </div>
-
-          </AcyCard>
-          <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}>
+           
+            <div className={styles.cardDivider} />
             <div className={styles.detailCard}>
               <div className={styles.label}>{mode}&nbsp;{toToken.symbol}</div>
             </div>
-            <div className={styles.cardDivider} />
-
+            
             {/* Entry Price */}
             <div className={styles.detailCard}>
               <div className={styles.label}>Entry Price</div>
@@ -2239,6 +2237,7 @@ const SwapComponent = props => {
               </Tooltip>
             </div>
             }
+
           </AcyCard>
         </>
       }
