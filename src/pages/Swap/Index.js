@@ -106,6 +106,25 @@ const Swap = props => {
   const {account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix}} = useConstantLoader();
   console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
+  // 当 chainId 发生切换时，就更新 url
+  // useEffect(() => {
+  //   let chainName = "BSC";
+  //   switch(chainId) {
+  //     case 56: 
+  //       chainName = "BSC"; break;
+  //     case 137: 
+  //       chainName = "Polygon"; break;
+  //     default: 
+  //       chainName = "BSC";
+  //   }
+  //   history.push({
+  //     pathname: history.location.pathname,
+  //     query: {
+  //       chain: chainName,
+  //     },
+  //   })
+  // }, [chainId])
+
   const [pricePoint, setPricePoint] = useState(0);
   const [pastToken1, setPastToken1] = useState('ETH');
   const [pastToken0, setPastToken0] = useState('USDC');

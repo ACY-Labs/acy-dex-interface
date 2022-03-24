@@ -219,7 +219,7 @@ const  BasicLayout =props=> {
     const layout = 
       <Layout>
         {/* Conditional rendering: show Sidebar only in certain pages */}
-        {pathname.indexOf('/launchpad')>-1 &&
+        {pathname.indexOf('/launchpad')>-1 && false &&
         <Sidebar />
         }
         <Layout 
