@@ -185,8 +185,8 @@ export const useConstantLoader = () => {
     useEffect(() => {
         const chainSupportedIndex = (supportedChainIds.indexOf(chainId) !== -1);
         const fallbackChainId = chainSupportedIndex ? chainId : 56;    // redirect unsupported chainId and undefined to 56
-        //console.log("chainId before fallback:", chainId);
-        //console.log("fallbackChainId chainId:", fallbackChainId);
+        // console.log("chainId before fallback:", chainId);
+        // console.log("fallbackChainId chainId:", fallbackChainId);
         const marketChainSupportedIndex = (supportedChainIds.indexOf(marketChainId) !== -1);
         const marketNetwork = marketChainSupportedIndex ? marketChainId : 56;
 
