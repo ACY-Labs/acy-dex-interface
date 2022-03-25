@@ -55,6 +55,11 @@ export default [
         component: './Perpetual/Index',
       },
       {
+        path: '/stats',
+        name: 'Stats',
+        component: './Stats/Index',
+      },
+      {
         path: '/exchange',
         name: 'Exchange',
         component: './Swap/Index',

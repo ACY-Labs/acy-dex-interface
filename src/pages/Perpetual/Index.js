@@ -67,7 +67,8 @@ import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import PerpetualComponent from '@/components/PerpetualComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { GlpSwapTokenTable } from '@/components/PerpetualComponent/components/GlpSwapBox'
-import Kchart from './components/Kchart';
+// import Kchart from './components/Kchart';
+import KChart from './components/KChart';
 import axios from 'axios';
 import moment from 'moment';
 import styles from './styles.less';
@@ -862,8 +863,8 @@ const Swap = props => {
         <div className={styles.rowFlexContainer}>
           {/* K chart */}
           <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}>
-            <div className={`${styles.colItem} ${styles.kChart}`}>
-              <Kchart />
+            <div className={`${styles.colItem} ${styles.priceChart}`}>
+              <KChart token1={activeToken0} token2={activeToken1} />
             </div> 
           </AcyCard>
 
