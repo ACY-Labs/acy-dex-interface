@@ -113,6 +113,31 @@
       transform: rotateZ(360deg);
     }
   }
+
+  .detailCard {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-column-gap: 1rem;
+    padding: unset;
+  
+    .label {
+      color: #a9a9b0;
+      font-size: 1rem;
+      opacity: 1;
+    }
+  
+    .value {
+      color: #a9a9b0;
+      font-size: 1rem;
+      opacity: 1;
+    }
+  }
+
+  .cardDivider {
+    height: 1px;
+    background: #545461;
+    margin: 0.7rem -1rem;
+  }
   
   .spinner {
     animation-name: spin;
@@ -124,24 +149,23 @@
   
   .slippageContainer{
     margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .modeSelector {
-    width: 100%;
-    margin-bottom: 15px;
-    :global{
-      .ant-radio-button-wrapper:not(:first-child)::before{
-        background-color:inherit !important;
-      }
-    }
+    margin-bottom: 10px;
+    text-align: center;
+    overflow: hidden;
   }
   .modeSubOption{
-    width: 33%;
+    width: 90px;
     font-size: 15px;
     text-align: center;
-    //line-height: normal;
     margin: auto;
-  
+    background: #29292c;
+    border: none;
   }
   .typeSelector {
     width: 100%;
@@ -170,6 +194,57 @@
   }
   .leverageSlider{
     color: red;
+  }
+  .leverageInputContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    width: 50%;
+    margin-left: 20px;
+    margin-right: 30px;
+  }
+  .leverageButton {
+    align-items: center;
+    font-size: 18px;
+    font-weight: 500;
+    background-color: #1b1b1c;
+    color: #fff;
+    border-radius: 10px;
+    outline: none;
+    cursor: pointer;
+    user-select: none;
+    border: none;
+    height: 2.4rem;
+    width: auto;
+    padding: 0 8px;
+    justify-content: space-between;
+    line-height: inherit;
+  }
+  .leverageInput {
+    color: #fff;
+    width: 0;
+    position: relative;
+    font-weight: 500;
+    outline: none;
+    flex: 1 1 auto;
+    height: unset;
+    border: 0;
+    border-radius: 0;
+    background-color: #29292c;
+    font-size: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0;
+    text-align: center;
+  }
+  .TooltipHandle {
+    color: #a9a9b0;
+    font-size: 1rem;
+    opacity: 1;
+    border-bottom: 1px dotted;
   }
   .inputbox{
     color: rgb(234, 236, 239);

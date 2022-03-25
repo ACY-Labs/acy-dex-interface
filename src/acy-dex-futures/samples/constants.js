@@ -12,3 +12,11 @@ export const routerAddress = '0xaBBc5F99639c9B6bCb58544ddf04EFA6802F4064'
 
 export const tempLibrary = new JsonRpcProvider('https://arb1.arbitrum.io/rpc')
 export const tempChainID = 42161;
+
+
+export const glpManagerAddress = "0x321F653eED006AD1C29D174e17d96351BDe22649"
+export const rewardRouterAddress = "0xA906F338CB21815cBc4Bc87ace9e68c87eF8d8F1"
+export const rewardReaderAddress = "0xe725Ad0ce3eCf68A7B93d8D8091E83043Ff12e9A"
+export const stakedGlpTrackerAddress = "0x1aDDD80E6039594eE970E5872D247bf0414C8903"
+export const feeGlpTrackerAddress = "0x4e971a87900b931fF39d1Aad67697F49835400b6"
+export const glpVesterAddress = "0xA75287d2f8b217273E7FCD7E86eF07D33972042E"

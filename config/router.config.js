@@ -55,6 +55,11 @@ export default [
         component: './Perpetual/Index',
       },
       {
+        path: '/stats',
+        name: 'Stats',
+        component: './Stats/Index',
+      },
+      {
         path: '/exchange',
         name: 'Exchange',
         component: './Swap/Index',
@@ -89,6 +94,12 @@ export default [
         name: 'Transaction',
         hideInMenu: true,
         component: './Transaction/Index',
+      },
+      {
+        path: '/buyglp',
+        name: 'BuyGlp',
+        hideInMenu: true,
+        component: './BuyGlp/Index',
       },
     ],
   },

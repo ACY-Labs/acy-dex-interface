@@ -1,17 +1,17 @@
 .main {
-    width: 90%;
-    max-width: 1000px;
+    // width: 90%;
+    // max-width: 1000px;
     margin: auto;
     z-index: 0;
     color: #b5b6b6;
     margin-bottom: 20px;
     font-weight: 400;
+    display: flex;
+    position: relative;
   }
   
   .rowFlexContainer {
-    display: flex;
     width: 100%;
-    margin: auto;
     flex-wrap: wrap;
     justify-content: space-between;
     position : relative;
@@ -32,18 +32,28 @@
       min-width: 310px;
       flex-wrap: nowrap;
     }
-    .priceChart {
+    .kChart {
       order: 1;
       flex: 2;
-        bottom: 0.5rem;
-        left: 0;
-        right: 0;
-        top: 0.5rem;
-      
+      height: 65%;
+      // bottom: 0.5rem;
+      // left: 0;
+      // right: 0;
+      // top: 0.5rem;
+    }
+    .priceChart {
+      order: 2;
+      flex: 2;
+      // bottom: 0.5rem;
+      // left: 0;
+      // right: 0;
+      // top: 0.5rem;
     }
     .perpetualComponent {
-      order: 2;
-      flex: 1;
+      width: 600px;
+      margin-left: 20px;
+      // order: 2;
+      // flex: 1;
     }
   }
   
@@ -56,16 +66,19 @@
       margin: 0 0.5rem;
       width: 100%;
     }
+    .kChart {
+      order: 1;
+    }
     .priceChart {
       order: 2;
     }
     .perpetualComponent {
-      order: 1;
+      // order: 1;
     }
   }
   
   .positionsTable {
-    display : flex;
+    // display : flex;
     position : relative;
   }
   .maintitle {

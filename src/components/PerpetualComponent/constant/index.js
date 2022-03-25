@@ -10,6 +10,7 @@ export const LIMIT = 'Limit';
 export const LONG = 'Long';
 export const SHORT = 'Short';
 export const SWAP = 'Swap';
+export const POOL = 'Pool';
 export const BSC_MAINNET = 56;
 export const POLYGON = 137;
 

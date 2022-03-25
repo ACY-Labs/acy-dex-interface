@@ -14,23 +14,24 @@ export const PriceBox = (props) => {
         onChange,
         markOnClick,
         priceValue,
-        toTokenInfo,
-        mode,
+        mark,
+        // toTokenInfo,
+        // mode,
     } = props;
 
-    let entryMarkPrice;
-    let exitMarkPrice;
-    if (toTokenInfo) {
-        entryMarkPrice =
-            mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice;
-        exitMarkPrice =
-            mode === LONG ? toTokenInfo.minPrice : toTokenInfo.maxPrice;
-    }
-    const mark = entryMarkPrice
+    // let entryMarkPrice;
+    // let exitMarkPrice;
+    // if (toTokenInfo) {
+    //     entryMarkPrice =
+    //         mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice;
+    //     exitMarkPrice =
+    //         mode === LONG ? toTokenInfo.minPrice : toTokenInfo.maxPrice;
+    // }
+    // const mark = entryMarkPrice
 
-    const onClick = () => {
-        markOnClick(formatAmount(mark, USD_DECIMALS, 2, true))
-    }
+    // const onClick = () => {
+    //     markOnClick(formatAmount(mark, USD_DECIMALS, 2, true))
+    // }
 
     return (
         <div className={styles.acycuarrencycard}>
@@ -47,11 +48,10 @@ export const PriceBox = (props) => {
                     />
                 </div>
                 <div className={styles.cua_bottomContainer}>
-                    <div className={styles.cua_blanace} onClick={onClick}>{'Mark: '}
-                        {mark &&
-                            `$${formatAmount(mark, USD_DECIMALS, 2, true)}`}
-                        {!mark && `-`}</div>
-                    <div>{'USD $'}</div>
+                    <div className={styles.cua_blanace} onClick={markOnClick}>
+                        Mark: {mark}
+                    </div>
+                    <div>USD</div>
                 </div>
             </div>
         </div>
