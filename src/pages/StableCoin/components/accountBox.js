@@ -7,11 +7,11 @@ export const AccountBox = props => {
       <div className={styles.APYCard}>
         <div className={styles.const}>0.0</div>
         <div className={styles.state}>
-          <ins>Balance</ins>
+          <ins>365-day trailing APY</ins>
         </div>
       </div>
       <div className={styles.accountCard}>
-        <div className={styles.const}>Detail</div>
+        <div className={styles.detailStyle}>Detail</div>
         <div className={styles.state}>
           <ins>MyAccount</ins>
         </div>

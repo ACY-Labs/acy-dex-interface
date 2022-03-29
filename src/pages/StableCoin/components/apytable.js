@@ -71,42 +71,6 @@ export const APYtable = props => {
             <div className={styles.tableDate}>
                 <Table dataSource={dataSource} columns={columns} pagination={false} width/>
             </div>
-            {/* <div className={styles.tableData}>
-                <table className={styles.APYtableData}>
-                    <tr>
-                        <td className={styles.tableTh}>Block</td>
-                        <td className={`${styles.tableTh}, ${styles.hind}`}>APY</td>
-                        <td className={styles.tableTh}>Multiplier</td>
-                        <td className={styles.tableTh}>Unboosted</td>
-                        <td className={styles.tableTh}>Aprx.Yield</td>
-                        <td className={styles.tableTh}>OUSD Supply</td>
-                        <td className={styles.tableTh}>Backing Supply</td>
-                        <td className={styles.tableTh}>Rebasing Supply</td>
-                        <td className={styles.tableTh}>Non- Rebasing Supply</td>
-                        <td className={styles.tableTh}>%</td>
-                        <td className={styles.tableTh}>Ration</td>
-                    </tr>
-                    <tr>
-                        <td className={styles.tableTr}>datadata</td>
-                        <td className={`${styles.tableTh}, ${styles.hind}`}>datadata</td>
-                        <td className={styles.tableTr}>datadata</td>
-                        <td className={styles.tableTr}>datadata</td>
-                        <td className={styles.tableTr}>datadata</td>
-                        <td className={styles.tableTr}>datadata</td>
-                        <td className={styles.tableTr}>datadata</td>
-                        <td className={styles.tableTr}>datadata</td>
-                        <td className={styles.tableTr}>datadata</td>
-                        <td className={styles.tableTr}>datadata</td>
-                        <td className={styles.tableTr}>datadata</td>
-                    </tr>
-                    <tr>
-                        <td className={styles.tableTr}>datadata</td>
-                        <td className={`${styles.tableTh}, ${styles.hind}`}>datadata</td>
-                        <td className={styles.tableTr}>datadata</td>
-                        <td className={styles.tableTr}>datadata</td>
-                    </tr>
-                </table>
-            </div> */}
         </div>
     );
 };
