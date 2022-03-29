@@ -19,7 +19,7 @@
 /* eslint-disable import/order */
 /* eslint-disable import/extensions */
 import {
-    AcyCard,
+    AcyPerpetualCard,
     AcyTabs,
     AcyButton,
     AcyDescriptions,
@@ -1808,7 +1808,7 @@ const SwapComponent = props => {
 
     return (
         <div>
-            <AcyCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
+            <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
                 <div className={styles.modeSelector}>
                     <Radio.Group defaultValue={LONG} buttonStyle="solid" onChange={modeSelect}>
                         <StyledRadioButton value={LONG} className={styles.modeSubOption}>
@@ -1976,12 +1976,12 @@ const SwapComponent = props => {
                     </>
                 }
 
-            </AcyCard>
+            </AcyPerpetualCard>
 
             {/* Long/Short Detail card  */}
             {(mode === LONG || mode === SHORT) &&
                 <>
-                    <AcyCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
+                    <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
 
                         {/* Profits In */}
                         {mode === LONG && (
@@ -2234,7 +2234,7 @@ const SwapComponent = props => {
                             </div>
                         }
 
-                    </AcyCard>
+                    </AcyPerpetualCard>
                 </>
             }
 
