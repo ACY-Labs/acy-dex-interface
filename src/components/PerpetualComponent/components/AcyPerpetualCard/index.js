@@ -1,7 +1,7 @@
 import { Card } from 'antd';
 import { Children } from 'react';
 import className from 'classnames';
-import styles from './perpetual.less';
+import styles from './index.less';
 const AcyPerpetualCard = ({ className: styledClassName, ...props }) => {
     const { max } = props;
     return <Card
