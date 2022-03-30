@@ -23,6 +23,7 @@ import {
     AcyTabs,
     AcyButton,
     AcyDescriptions,
+    AcyPerpetualButton
 } from '@/components/Acy';
 import TokenSelectorModal from '@/components/TokenSelectorModal';
 // ymj swapBox components start
@@ -1808,7 +1809,7 @@ const SwapComponent = props => {
 
     return (
         <div>
-            <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
+            <AcyPerpetualCard style={{ backgroundColor: '#0E0304' }}>
                 <div className={styles.modeSelector}>
                     <Radio.Group defaultValue={LONG} buttonStyle="solid" onChange={modeSelect}>
                         <StyledRadioButton value={LONG} className={styles.modeSubOption}>
@@ -1962,13 +1963,15 @@ const SwapComponent = props => {
                         }
 
                         <div>
-                            <AcyButton
+                            {/* <AcyPerpetualButton */}
+                            {/* <AcyButton
                                 style={{ marginTop: '25px' }}
                                 onClick={onClickPrimary}
                                 disabled={!isPrimaryEnabled()}
                             >
-                                {getPrimaryText()}
-                            </AcyButton>
+                                {getPrimaryText()} */}
+                            {/* </AcyPerpetualButton> */}
+                            {/* </AcyButton> */}
                         </div>
                     </> :
                     <>

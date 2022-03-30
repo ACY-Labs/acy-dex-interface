@@ -8,7 +8,7 @@
     flex-direction: column;
     justify-content: space-between;
     padding: 1rem;
-    background: #29292c;
+    /* background: #29292c; */
     /* border-radius: 10px; */
     border: 1px solid #2c2f36;
   }
@@ -49,7 +49,8 @@
     height: unset;
     border: 0;
     border-radius: 0;
-    background-color: #29292c;
+    /* background-color: #29292c; */
+    background-color: #0e0304;
     font-size: 22px;
     white-space: nowrap;
     overflow: hidden;
