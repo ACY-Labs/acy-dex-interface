@@ -25,6 +25,7 @@ import {
     AcyDescriptions,
     AcyPerpetualButton
 } from '@/components/Acy';
+// import { AcyPerpetualButton } from '@/components/PerpetualComponent/components/AcyPerpetualButton';
 import TokenSelectorModal from '@/components/TokenSelectorModal';
 // ymj swapBox components start
 import { PriceBox } from './components/PriceBox';
@@ -206,6 +207,9 @@ const StyledSlider = styled(Slider)`
     background: #929293;
     width: 2px;
     height: 11px;
+  }
+  .ant-slider-with-marks {
+      margin-bottom: 50px;
   }
 `;
 
@@ -1957,20 +1961,21 @@ const SwapComponent = props => {
                                                 defaultValue={leverageOption}
                                                 style={{ color: 'red' }}
                                             />
-                                        </span>}
+                                        </span>
+                                    }
                                 </div>
                             </AcyDescriptions>
                         }
 
                         <div>
-                            {/* <AcyPerpetualButton */}
-                            {/* <AcyButton
+                            <AcyPerpetualButton
+                                // <AcyButton
                                 style={{ marginTop: '25px' }}
                                 onClick={onClickPrimary}
                                 disabled={!isPrimaryEnabled()}
                             >
-                                {getPrimaryText()} */}
-                            {/* </AcyPerpetualButton> */}
+                                {getPrimaryText()}
+                            </AcyPerpetualButton>
                             {/* </AcyButton> */}
                         </div>
                     </> :
