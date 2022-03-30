@@ -449,12 +449,34 @@ const PolygonTestNetTokenList: Array<TokenInfo> = [
   }
 ];
 
+const ArbitrumMainNetTokenList = [
+  {
+    name: "Ethereum",
+    symbol: "ETH",
+    decimals: 18,
+    address: "0x0000000000000000000000000000000000000000",
+    isNative: true,
+    isShortable: true,
+    idOnCoingecko: "ethereum",
+  },
+  {
+    name: "Wrapped Ethereum",
+    symbol: "WETH",
+    decimals: 18,
+    address: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+    isWrapped: true,
+    baseSymbol: "ETH",
+    idOnCoingecko: "weth"
+  },
+];
+
 const TokenListSelector = (arg: string) => {
   return {
     56: BscMainNetTokenList,
     97: BscTestNetTokenList,
     137: PolygonMainNetTokenList,
-    80001: PolygonTestNetTokenList
+    80001: PolygonTestNetTokenList,
+    42161: ArbitrumMainNetTokenList,
   }[arg];
 }
 

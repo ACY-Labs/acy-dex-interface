@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useWeb3React } from '@web3-react/core';
+import { history } from 'umi';
 
 import TokenListSelector from './token_list';
 import MethodActionSelector from './contract_method_list';
@@ -13,7 +14,7 @@ import GAS_TOKEN_SYMBOL from "./gas_token";
 import { JsonRpcProvider } from "@ethersproject/providers";
 
 
-export const supportedChainIds = [56, 97, 137, 80001];
+export const supportedChainIds = [56, 97, 137, 42161, 80001];
 const defaultLibrary = new JsonRpcProvider('https://bsc-dataseed1.defibit.io/');
 
 // import constant to normal js file
@@ -92,6 +93,87 @@ export const ConstantLoader = (chainId = 56, marketChainId = 56) => {
     return constants;
 }
 
+
+const networkParams = {
+    "0x38": {
+      chainId: '0x38',
+      chainName: 'Binance Smart Chain Netwaok',
+      nativeCurrency: {
+        name: 'Binance',
+        symbol: 'BNB', // 2-6 characters long
+        decimals: 18
+      },
+      blockExplorerUrls: ['https://bscscan.com'],
+      rpcUrls: ['https://bsc-dataseed.binance.org/'],
+    },
+    "0x61": {
+      chainId: '0x61',
+      chainName: 'Binance Smart Chain Testnet',
+      nativeCurrency: {
+        name: 'Binance',
+        symbol: 'BNB', // 2-6 characters long
+        decimals: 18
+      },
+      blockExplorerUrls: ['https://testnet.bscscan.com'],
+      rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
+    },
+    "0x89": {
+      chainId: '0x89',
+      chainName: 'Polygon',
+      nativeCurrency: {
+        name: 'Matic',
+        symbol: 'MATIC', // 2-6 characters long
+        decimals: 18
+      },
+      blockExplorerUrls: ['https://polygonscan.com/'],
+      rpcUrls: ['https://polygon-rpc.com/'],
+    },
+    "0xA4B1": {
+        chainId: '0xA4B1',
+        chainName: 'Arbitrum',
+        nativeCurrency: {
+          name: 'ETH',
+          symbol: 'ETH', // 2-6 characters long
+          decimals: 18
+        },
+        blockExplorerUrls: ['https://arbiscan.io/'],
+        rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+      },
+  };
+
+
+const urlChainName2ChainId = (urlChainName) => {
+    let urlChainId = -1;
+    switch(urlChainName) {
+        case "bsc": 
+            urlChainId = 56; break;
+        case "polygon": 
+            urlChainId = 137; break;
+        case "arbitrum":
+            urlChainId = 42161; break;
+        default: 
+            urlChainId = -1;
+    }
+    return urlChainId;
+}
+
+
+const chainId2UrlChainName = (chainId) => {
+    let chainName = "bsc";
+    switch(chainId) {
+        case 56: 
+          chainName = "bsc"; break;
+        case 137: 
+          chainName = "polygon"; break;
+        case 42161:
+            chainName = "arbitrum"; break;
+        default: 
+          chainName = "bsc";
+    }
+    return chainName;
+}
+
+
 // import constant to react component
 export const useConstantLoader = () => {
     const { account, chainId, library } = useWeb3React();
@@ -103,7 +185,8 @@ export const useConstantLoader = () => {
     useEffect(() => {
         const chainSupportedIndex = (supportedChainIds.indexOf(chainId) !== -1);
         const fallbackChainId = chainSupportedIndex ? chainId : 56;    // redirect unsupported chainId and undefined to 56
-
+        // console.log("chainId before fallback:", chainId);
+        // console.log("fallbackChainId chainId:", fallbackChainId);
         const marketChainSupportedIndex = (supportedChainIds.indexOf(marketChainId) !== -1);
         const marketNetwork = marketChainSupportedIndex ? marketChainId : 56;
 
@@ -118,6 +201,117 @@ export const useConstantLoader = () => {
         constantInstance = constants;
         setConstant(constants);
     }, [account, chainId, marketChainId]);
+
+
+    // 将实际的 chainId 显示在 url 的参数里
+    const changeUrlChainId = () => {
+        const chainName = chainId2UrlChainName(chainId);
+        history.replace({
+          pathname: history.location.pathname,
+          query: {
+            chain: chainName,
+          },
+        })
+    }
+
+
+    // 请求切换 chain network
+    const switchChain = async (givenChainId) => {
+        if (localStorage.getItem("wallet") === "metamask") {
+            try {
+                await ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: givenChainId }],
+                });
+            } catch (e) {
+                if (e.code === 4902) {
+                    try {
+                        await ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [
+                                networkParams[givenChainId]
+                            ],
+                        });
+                    } catch (addError) {
+                        console.error(addError);
+                    }
+                } else {
+                    // 失败时，将 url 的 chainId 切换回原本的
+                    changeUrlChainId();
+                }
+            }
+        }
+        else if (localStorage.getItem("wallet") === "nabox") {
+            try {
+                await NaboxWallet.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: givenChainId }],
+                });
+            } catch (e) {
+                if (e.code === 4902) {
+                    try {
+                        await NaboxWallet.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [
+                                networkParams[givenChainId]
+                            ],
+                        });
+                    } catch (addError) {
+                        console.error(addError);
+                    }
+                } else {
+                    // 失败时，将 url 的 chainId 切换回原本的
+                    changeUrlChainId();
+                }
+            }
+        }
+        else if (localStorage.getItem("wallet") === "binance") {
+            try {
+                await BinanceChain.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: givenChainId }],
+                });
+            } catch (e) {
+                if (e.code === 4902) {
+                    try {
+                        await BinanceChain.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [
+                                networkParams[givenChainId]
+                            ],
+                        });
+                    } catch (addError) {
+                        console.error(addError);
+                    }
+                } else {
+                    // 失败时，将 url 的 chainId 切换回原本的
+                    changeUrlChainId();
+                }
+            }
+        }
+    }
+
+
+    // chainId 有更动时，url 显示的 chainId 也应该修改
+    useEffect(() => {
+        changeUrlChainId()
+        // console.log("current chainId: " , history.location);
+      }, [chainId])
+
+
+    
+    // 如果手动修改 url 的 chainId，就触发切换 chain network 的请求
+    // @TODO: 用户还没 connect 钱包时不要触发 request
+    useEffect(() => {
+        if ("chain" in history.location.query) {
+            const urlChainName = history.location.query.chain;
+            const urlChainId = urlChainName2ChainId(urlChainName);
+            if (urlChainId !== -1 && urlChainId !== chainId) {
+                // console.log("switch to chainId:", urlChainId);
+                switchChain("0x".concat(urlChainId.toString(16)));
+            }
+        }
+    }, [history.location.query])
 
     return constant;
 }
