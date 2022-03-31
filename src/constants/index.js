@@ -206,12 +206,14 @@ export const useConstantLoader = () => {
     // 将实际的 chainId 显示在 url 的参数里
     const changeUrlChainId = () => {
         const chainName = chainId2UrlChainName(chainId);
-        history.replace({
-          pathname: history.location.pathname,
-          query: {
-            chain: chainName,
-          },
-        })
+        if (history.location.query.chain !== chainName) {
+            history.replace({
+                pathname: history.location.pathname,
+                query: {
+                  chain: chainName,
+                },
+            })
+        }
     }
 
 
@@ -294,6 +296,7 @@ export const useConstantLoader = () => {
 
     // chainId 有更动时，url 显示的 chainId 也应该修改
     useEffect(() => {
+        // debugger;
         changeUrlChainId()
         // console.log("current chainId: " , history.location);
       }, [chainId])
