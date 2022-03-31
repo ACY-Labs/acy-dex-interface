@@ -1878,17 +1878,17 @@ const SwapComponent = props => {
               onSelectToken={selectFromToken}
             />
 
-            <div className={styles.arrow} onClick={switchTokens}>
+            {/* <div className={styles.arrow} onClick={switchTokens}>
               <Icon style={{ fontSize: '16px' }} type="arrow-down" />
-            </div>
+            </div> */}
 
             <BuyInputSection
               token={toToken}
               tokenlist={toTokens}
               topLeftLabel={getTokenLabel()}
               balance={receiveBalance}
-              topRightLabel={leverageLabel}
-              tokenBalance={leverageValue}
+              // topRightLabel={leverageLabel}
+              // tokenBalance={leverageValue}
               inputValue={toValue}
               onInputValueChange={onToValueChange}
               onSelectToken={selectToToken}
@@ -1912,46 +1912,48 @@ const SwapComponent = props => {
             {/* Leverage Slider */}
             {(mode === LONG || mode === SHORT) &&
               <AcyDescriptions>
-                <div className={styles.breakdownTopContainer}>
+                <div className={styles.leverageContainer}>
                   <div className={styles.slippageContainer}>
-                    <span style={{ fontWeight: 600 }}>Leverage</span>
-                    {isLeverageSliderEnabled &&
-                      <div className={styles.leverageInputContainer}>
-                        <button
-                          className={styles.leverageButton}
-                          onClick={() => {
-                            if (leverageOption > 1.1) {
-                              setLeverageOption((parseFloat(leverageOption) - 0.1).toFixed(1))
-                            }
-                          }}
-                        >
-                          <span> - </span>
-                        </button>
-                        <input
-                          type="number"
-                          min={1.1}
-                          max={30.5}
-                          value={leverageOption}
-                          onChange={e => {
-                            let val = parseFloat(e.target.value.replace(/^(-)*(\d+)\.(\d).*$/, '$1$2.$3')).toFixed(1)
-                            if (val >= 1.1 && val <= 30.5) {
-                              setLeverageOption(val)
-                            }
-                          }}
-                          className={styles.leverageInput}
-                        />
-                        <button
-                          className={styles.leverageButton}
-                          onClick={() => {
-                            if (leverageOption < 30.5) {
-                              setLeverageOption((parseFloat(leverageOption) + 0.1).toFixed(1))
-                            }
-                          }}
-                        >
-                          <span> + </span>
-                        </button>
-                      </div>
-                    }
+                    <div className={styles.leverageLabel}>
+                      <span>Leverage</span>
+                      {isLeverageSliderEnabled &&
+                        <div className={styles.leverageInputContainer}>
+                          <button
+                            className={styles.leverageButton}
+                            onClick={() => {
+                              if (leverageOption > 1.1) {
+                                setLeverageOption((parseFloat(leverageOption) - 0.1).toFixed(1))
+                              }
+                            }}
+                          >
+                            <span> - </span>
+                          </button>
+                          <input
+                            type="number"
+                            min={1.1}
+                            max={30.5}
+                            value={leverageOption}
+                            onChange={e => {
+                              let val = parseFloat(e.target.value.replace(/^(-)*(\d+)\.(\d).*$/, '$1$2.$3')).toFixed(1)
+                              if (val >= 1.1 && val <= 30.5) {
+                                setLeverageOption(val)
+                              }
+                            }}
+                            className={styles.leverageInput}
+                          />
+                          <button
+                            className={styles.leverageButton}
+                            onClick={() => {
+                              if (leverageOption < 30.5) {
+                                setLeverageOption((parseFloat(leverageOption) + 0.1).toFixed(1))
+                              }
+                            }}
+                          >
+                            <span> + </span>
+                          </button>
+                        </div>
+                      }
+                    </div>
                     <Checkbox
                       checked={isLeverageSliderEnabled}
                       onChange={() => {
@@ -2117,11 +2119,6 @@ const SwapComponent = props => {
                   </Tooltip>
                 }
               </div>
-            </div>
-
-            <div className={styles.cardDivider} />
-            <div className={styles.detailCard}>
-              <div className={styles.label}>{mode}&nbsp;{toToken.symbol}</div>
             </div>
 
             {/* Entry Price */}

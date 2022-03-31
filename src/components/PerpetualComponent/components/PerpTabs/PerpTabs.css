@@ -31,7 +31,7 @@
   .Tab.block .Tab-option.active {
     opacity: 1;
     pointer-events: none;
-    background: #1b1b1c;
+    background: #232323;
     border: 0.75px solid #373738;
     color: rgba(255, 255, 255, 0.9);
   }

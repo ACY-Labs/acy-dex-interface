@@ -124,13 +124,13 @@
   
     .label {
       color: #a9a9b0;
-      font-size: 1rem;
+      font-size: 14px;
       opacity: 1;
     }
   
     .value {
       color: #a9a9b0;
-      font-size: 1rem;
+      font-size: 14px;
       opacity: 1;
     }
   }
@@ -196,30 +196,36 @@
     font-size: 12px;
     float: right;
   }
+  .leverageContainer{
+    margin-bottom: 40px;
+  }
+  .leverageLabel{
+    display: flex;
+    align-items: center;
+  }
   .leverageSlider{
     color: red;
   }
   .leverageInputContainer{
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    overflow: hidden;
-    width: 50%;
+    // align-items: center;
+    // justify-content: space-between;
+    // position: relative;
+    // overflow: hidden;
+    // width: 50%;
     margin-left: 20px;
-    margin-right: 30px;
+    // margin-right: 30px;
   }
   .leverageButton {
     align-items: center;
     font-size: 18px;
     font-weight: 500;
-    background-color: #1b1b1c;
+    border: 0.75px solid #232323;
+    background-color: transparent;
     color: #fff;
-    border-radius: 10px;
     outline: none;
     cursor: pointer;
     user-select: none;
-    border: none;
     height: 2.4rem;
     width: auto;
     padding: 0 8px;
@@ -227,26 +233,15 @@
     line-height: inherit;
   }
   .leverageInput {
-    color: #fff;
-    width: 0;
-    position: relative;
-    font-weight: 500;
-    outline: none;
-    flex: 1 1 auto;
-    height: unset;
-    border: 0;
-    border-radius: 0;
-    background-color: #29292c;
-    font-size: 18px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0;
+    color: white;
+    border: 0.75px solid #232323;
+    background-color: transparent;
+    font-size: 16px;
     text-align: center;
   }
   .TooltipHandle {
     color: #a9a9b0;
-    font-size: 1rem;
+    font-size: 14px;
     opacity: 1;
     border-bottom: 1px dotted;
   }
