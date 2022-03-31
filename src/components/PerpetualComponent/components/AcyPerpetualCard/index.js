@@ -11,7 +11,7 @@ const AcyPerpetualCard = ({ className: styledClassName, ...props }) => {
             borderBottom: 0,
         }}
         bodyStyle={{
-            padding: '8px',
+            padding: '0px',
         }}
         title={
             props.title && <div className={styles.card_header}>

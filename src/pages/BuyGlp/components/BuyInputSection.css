@@ -10,7 +10,7 @@
     padding: 1rem;
     /* background: #29292c; */
     /* border-radius: 10px; */
-    border: 1px solid #2c2f36;
+    border-bottom: 0.75px solid #333333;
   }
 
   .align-right {

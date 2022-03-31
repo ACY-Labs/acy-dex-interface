@@ -1,12 +1,13 @@
 .Tab.block {
   display: grid;
+  height: 50px;
   grid-auto-flow: column;
   font-size: 0.9rem;
-  border-radius: 3px;
+  border-radius: 0px;
   overflow: hidden;
   color: rgba(255, 255, 255, 0.7);
-  background: linear-gradient(90deg, rgba(30,34,61,0.9) 0%, rgba(38,43,71,0.9) 100%);
-  box-shadow: inset 0px 0px 30px 5px rgba(255, 255, 255, 0.01);
+  background: 262423;
+  /* box-shadow: inset 0px 0px 30px 5px rgba(255, 255, 255, 0.01); */
 }
 
 .Tab-option-icon {
@@ -15,22 +16,23 @@
 }
 
 .Tab.block .Tab-option {
-  text-align: center;
-  padding: 0.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  cursor: pointer;
+    text-align: center;
+    padding: 0.5rem;
+    padding-top: 0.75rem;
+    /* padding-left: 1rem; */
+    padding-right: 1rem;
+    cursor: pointer;
 }
 
 .Tab.block .Tab-option:hover {
   color: rgba(255, 255, 255, 1);
-  background: linear-gradient(90deg, rgba(35,57,172,1) 0%, rgba(43,59,147,1) 100%);
+  background: #1a1818;
 }
 
 .Tab.block .Tab-option.active {
   opacity: 1;
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(45,66,252,1) 0%, rgba(46,61,205,1) 100%);
+  background: #2f3131;
   color: rgba(255, 255, 255, 1);
 }
 
