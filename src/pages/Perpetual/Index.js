@@ -849,7 +849,6 @@ const Swap = props => {
     const glp_infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
 
     const onChangeMode = (mode) => {
-        console.log('joy mode', mode)
         if (mode === "Pool") {
             setShowTokenTable(true)
         } else {

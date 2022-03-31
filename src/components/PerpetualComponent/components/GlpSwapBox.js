@@ -839,8 +839,6 @@ export const GlpSwapTokenTable = (props) => {
       wallet: formatKeyAmount(tokenInfo, "balance", tokenInfo.decimals, 2, true) + ' ' + tokenInfo.symbol + ' ($' + formatAmount(balanceUsd, USD_DECIMALS, 2, true),
       fees: formatAmount(tokenFeeBps, 2, 2, true, "-") + ((tokenFeeBps !== undefined && tokenFeeBps.toString().length > 0) ? "%" : "")
     }
-    console.log('joy token', tokenInfo, balanceUsd)
-    console.log('joy info',infoTokens)
 
     tokenListData.push(tData)
   })
