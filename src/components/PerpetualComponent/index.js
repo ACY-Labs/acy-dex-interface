@@ -1,69 +1,112 @@
-/* eslint-disable no-console */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-param-reassign */
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable react/react-in-jsx-scope */
-/* eslint-disable no-return-await */
 /* eslint-disable no-restricted-globals */
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/button-has-type */
+/* eslint-disable arrow-body-style */
+/* eslint-disable no-unneeded-ternary */
+/* eslint-disable prefer-template */
+/* eslint-disable no-inner-declarations */
+/* eslint-disable radix */
+/* eslint-disable no-plusplus */
+/* eslint-disable prefer-const */
 /* eslint-disable consistent-return */
+/* eslint-disable react/jsx-curly-brace-presence */
+/* eslint-disable no-shadow */
+/* eslint-disable no-use-before-define */
+/* eslint-disable react/destructuring-assignment */
+/* eslint-disable camelcase */
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable import/order */
+/* eslint-disable import/extensions */
 import {
   AcyCard,
-  AcyIcon,
-  AcyPeriodTime,
   AcyTabs,
-  AcyCuarrencyCard,
-  AcyConnectWalletBig,
-  AcyModal,
-  AcyInput,
-  AcyCoinItem,
-  AcyLineChart,
-  AcyConfirm,
-  AcyApprove,
   AcyButton,
   AcyDescriptions,
-  AcySmallButton,
 } from '@/components/Acy';
 import TokenSelectorModal from '@/components/TokenSelectorModal';
 // ymj swapBox components start
 import { PriceBox } from './components/PriceBox';
 import { DetailBox } from './components/DetailBox';
+import { GlpSwapBox, GlpSwapDetailBox } from './components/GlpSwapBox'
 
-import { MARKET, LIMIT, LONG, SHORT, SWAP } from './constant';
-import {
-  getNextToAmount,
-  getNextFromAmount,
-  getTokenInfo,
-  parseValue,
-  getUsd,
-  expandDecimals,
+import { MARKET, LIMIT, LONG, SHORT, SWAP, POOL } from './constant'
+import { 
+  USD_DECIMALS, 
+  USDG_ADDRESS,
+  USDG_DECIMALS,
+  GLP_DECIMALS,
+  BASIS_POINTS_DIVISOR, 
+  MARGIN_FEE_BASIS_POINTS,
+  PLACEHOLDER_ACCOUNT,
+  ARBITRUM_DEFAULT_COLLATERAL_ADDRESS,
+  PRECISION,
+  getNextToAmount, 
+  getTokenInfo, 
+  parseValue, 
+  getUsd, 
+  expandDecimals, 
   formatAmountFree,
-  usePrevious,
+  usePrevious, 
   getPositionKey,
   formatAmount,
+  fetcher,
+  getInfoTokens,
+  adjustForDecimals,
+  bigNumberify,
+  useLocalStorageSerializeKey,
+  getNextFromAmount,
+  isTriggerRatioInverted,
+  getLeverage,
+  getLiquidationPrice,
+  calculatePositionDelta,
+  getSavedSlippageAmount,
+  approveTokens,
   shouldRaiseGasError,
   helperToast,
   replaceNativeTokenAddress,
-  isTriggerRatioInverted,
-  bigNumberify,
-} from '@/acy-dex-futures/utils';
+  getExchangeRate
+} from '@/acy-dex-futures/utils'
 import {
-  USD_DECIMALS,
-  BASIS_POINTS_DIVISOR,
-  MARGIN_FEE_BASIS_POINTS,
-} from '@/acy-dex-futures/utils';
-import { getInfoTokens_test } from './utils';
-import Pattern from '@/utils/pattern';
+  readerAddress,
+  vaultAddress,
+  usdgAddress,
+  nativeTokenAddress,
+  routerAddress,
+  orderBookAddress,
+  stakedGlpTrackerAddress,
+  glpManagerAddress,
+  feeGlpTrackerAddress,
+  glpVesterAddress,
+  rewardReaderAddress,
+  tempChainID,
+  tempLibrary
+} from '@/acy-dex-futures/samples/constants'
+import { callContract, useGmxPrice } from '@/acy-dex-futures/core/Perpetual'
+import Reader from '@/acy-dex-futures/abis/Reader.json'
+import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
+import VaultV2 from '@/acy-dex-futures/abis/VaultV2.json'
+import Token from '@/acy-dex-futures/abis/Token.json'
+import Router from '@/acy-dex-futures/abis/Router.json'
+import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
+import RewardTracker from '@/acy-dex-futures/abis/RewardTracker.json'
+import Vester from '@/acy-dex-futures/abis/Vester.json'
+import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
+import useSWR from 'swr'
+
+import { getInfoTokens_test } from './utils'
+import Pattern from '@/utils/pattern'
 
 // swapBox compontent end
-
 import { connect } from 'umi';
 import styles from './styles.less';
 import { sortAddress, abbrNumber } from '@/utils/utils';
 import axios from 'axios';
+import { ethers } from "ethers"
 
 import { useWeb3React } from '@web3-react/core';
 import { binance, injected } from '@/connectors';
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 import {
   Error,
@@ -81,28 +124,20 @@ import {
   parseArbitrageLog,
 } from '@/acy-dex-swap/utils/index';
 
-//hj add
+// hj add
 import { getContractAddress } from '@/acy-dex-futures/utils/Addresses';
-
-import { ethers } from 'ethers';
-const { AddressZero } = ethers.constants;
-
 import * as Api from '@/acy-dex-futures/core/Perpetual';
-
 import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
-
 import ERC20ABI from '@/abis/ERC20.json';
 import WETHABI from '@/abis/WETH.json';
-import Router from '@/acy-dex-futures/abis/Router.json';
 
 import {
-  Token,
+  // Token,
   TokenAmount,
   Pair,
   TradeType,
   Route,
   Trade,
-  Fetcher,
   Percent,
   // Router,
   // WETH,
@@ -116,53 +151,93 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import { hexlify } from '@ethersproject/bytes';
 
-const { AcyTabPane } = AcyTabs;
-import { Row, Col, Button, Input, Icon, Radio, Tabs, Slider } from 'antd';
-import {
-  RiseOutlined,
-  FallOutlined,
-  LineChartOutlined,
-  FieldTimeOutlined,
-} from '@ant-design/icons';
-const { TabPane } = Tabs;
-
-import { Alert } from 'antd';
+import { Row, Col, Button, Input, InputNumber, Icon, Radio, Tabs, Slider, Alert, Checkbox, Tooltip } from 'antd';
+import { RiseOutlined, FallOutlined, LineChartOutlined, FieldTimeOutlined } from '@ant-design/icons';
 import spinner from '@/assets/loading.svg';
 import moment from 'moment';
 import { useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
-
 import { AcyRadioButton } from '@/components/AcyRadioButton';
+import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
+import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 
-import styled from 'styled-components';
+import styled from "styled-components";
+
+const { AcyTabPane } = AcyTabs;
+const { TabPane } = Tabs;
+const { AddressZero } = ethers.constants;
+
 const StyledRadioButton = styled(Radio.Button)`
-  .ant-long {
-    background-color: #0ecc83;
+  .ant-radio-button-wrapper {
     border: none;
-    border-left: none !important;
+    background-color: transparent;
   }
-  .ant-short {
-  }
-  .ant-swap {
+  .ant-radio-button-wrapper:not(:first-child)::before {
+    background-color: transparent;
   }
 `;
 
 const StyledSlider = styled(Slider)`
   .ant-slider-track {
-    background: #be4d00;
+    background: #929293;
   }
   .ant-slider-rail {
-    background: #3b0000;
+    background: #29292c;
+  }
+  .ant-slider-handle {
+    background: #929293;
+    border: 2px solid #929293;
+  }
+  .ant-slider-handle-active {
+    background: #929293;
+    border: 2px solid #929293;
   }
   .ant-slider-dot {
-    background: transparent;
+    border: 2px solid #29292c;
+    border-radius: 1px;
+    background: #29292c;
+    width: 2px;
+    height: 11px;
+  }
+  .ant-slider-dot-active {
+    border: 2px solid #929293;
+    border-radius: 1px;
+    background: #929293;
+    width: 2px;
+    height: 11px;
   }
 `;
 
+function getToken(tokenlist, tokenAddr) {
+  for (let i = 0; i < tokenlist.length; i++) {
+    if(tokenlist[i].address === tokenAddr) {
+      return tokenlist[i]
+    }
+  }
+  return undefined
+}
+
+function getNextAveragePrice({size, sizeDelta, hasProfit, delta, nextPrice, isLong}) {
+  if (!size || !sizeDelta || !delta || !nextPrice) {
+    return;
+  }
+  const nextSize = size.add(sizeDelta);
+  let divisor;
+  if (isLong) {
+    divisor = hasProfit ? nextSize.add(delta) : nextSize.sub(delta);
+  } else {
+    divisor = hasProfit ? nextSize.sub(delta) : nextSize.add(delta);
+  }
+  if (!divisor || divisor.eq(0)) {
+    return;
+  }
+  const nextAveragePrice = nextPrice.mul(nextSize).div(divisor);
+  return nextAveragePrice;
+}
+
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
-  //hj find in '@/pages/perpetual 的<perpetual component
-  // ymj props
+
   const {
     account,
     library,
@@ -170,49 +245,77 @@ const SwapComponent = props => {
     tokenList: INITIAL_TOKEN_LIST,
     farmSetting: { INITIAL_ALLOWED_SLIPPAGE },
   } = useConstantLoader(props);
-  console.log('constant loader chainid', chainId);
-  const {
-    dispatch,
-    onSelectToken0,
-    onSelectToken1,
-    onSelectToken,
-    token,
-    isLockedToken1 = false,
-  } = props;
   const { profitsIn, liqPrice } = props;
-  const { entryPriceMarket, exitPrice, borrowFee } = props;
-  const { infoTokens_test, usdgSupply, positions } = props;
+  const { entryPriceMarket, exitPrice, borrowFee, positions } = props;
+  // const { infoTokens_test, usdgSupply, positions } = props;
   const { isConfirming, setIsConfirming } = props;
   console.log('here after confirm props');
   // isPendingConfirmation, setIsPendingConfirmation } = props;
   // const { savedSlippageAmount } = props;
+  
+  const {
+    positionsMap,
+    pendingTxns,
+    setPendingTxns,
+    tokenSelection,
+    setTokenSelection,    
+    savedIsPnlInLeverage,
+    approveOrderBook,
+    isWaitingForPluginApproval,
+    setIsWaitingForPluginApproval,
+    isPluginApproving,
+    isBuying,
+    setIsBuying,
+    onChangeMode,
+  } = props;
 
-  // 选择货币的弹窗
-  const [visible, setVisible] = useState(null);
+  const connectWalletByLocalStorage = useConnectWallet();
+  const { active, activate } = useWeb3React();
+  const flagOrdersEnabled = true
 
-  // 选择货币前置和后置
-  const [before, setBefore] = useState(true);
+  const [fromValue, setFromValue] = useState("");
+  const [toValue, setToValue] = useState("");
+  const [anchorOnFromAmount, setAnchorOnFromAmount] = useState(true);
+  const [isApproving, setIsApproving] = useState(false);
+  const [isWaitingForApproval, setIsWaitingForApproval] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [isConfirming, setIsConfirming] = useState(false);
+  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
+  const [modalError, setModalError] = useState(false);
+  const [ordersToaOpen, setOrdersToaOpen] = useState(false);
 
-  // 交易对前置货币
-  const [token0, setToken0] = useState(INITIAL_TOKEN_LIST[0]);
-  // 交易对后置货币
-  const [token1, setToken1] = useState(INITIAL_TOKEN_LIST[1]);
+  const savedSlippageAmount = getSavedSlippageAmount(chainId)
+  const tokens = defaultToken.default
+  const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
+  const stableTokens = tokens.filter(token => token.isStable);
+  const indexTokens = whitelistedTokens.filter(token => !token.isStable && !token.isWrapped);
+  const shortableTokens = indexTokens.filter(token => token.isShortable);
+  let toTokens = tokens;
+  if (mode === LONG) {
+    toTokens = indexTokens;
+  }
+  if (mode === SHORT) {
+    toTokens = shortableTokens;
+  }
 
-  // 交易对前置货币余额
-  const [token0Balance, setToken0Balance] = useState('0');
-  // 交易对后置货币余额
-  const [token1Balance, setToken1Balance] = useState('0');
+  const needOrderBookApproval = type !== MARKET && !orderBookApproved;
+  const prevNeedOrderBookApproval = usePrevious(needOrderBookApproval);
 
-  // 交易对前置货币兑换量
-  const [token0Amount, setToken0Amount] = useState('');
-  // 交易对后置货币兑换量
-  const [token1Amount, setToken1Amount] = useState('');
-  // 交易中用户使用Flash Arbitrage的额外获利
-  const [bonus0, setBonus0] = useState(null);
-  const [bonus1, setBonus1] = useState(null);
-
-  const [token0BalanceShow, setToken0BalanceShow] = useState(false);
-  const [token1BalanceShow, setToken1BalanceShow] = useState(false);
+  useEffect(() => {
+    if (
+      !needOrderBookApproval &&
+      prevNeedOrderBookApproval &&
+      isWaitingForPluginApproval
+    ) {
+      setIsWaitingForPluginApproval(false);
+      // helperToast.success(<div>Orders enabled!</div>);
+    }
+  }, [
+    needOrderBookApproval,
+    prevNeedOrderBookApproval,
+    setIsWaitingForPluginApproval,
+    isWaitingForPluginApproval
+  ]);
 
   // when exactIn is true, it means the firt line
   // when exactIn is false, it means the second line
@@ -245,517 +348,594 @@ const SwapComponent = props => {
   const [poolExist, setPoolExist] = useState(true);
 
   // ymj useState
-  const [fromTokenAddress, setFromTokenAddress] = useState(
-    '0x0000000000000000000000000000000000000000'
-  );
-  const [toTokenAddress, setToTokenAddress] = useState(
-    '0xf97f4df75117a78c1A5a0DBb814Af92458539FB4'
-  );
-  const [fromTokenInfo, setFromTokenInfo] = useState();
-  const [toTokenInfo, setToTokenInfo] = useState();
+  const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
+  const [toTokenAddress, setToTokenAddress] = useState("0xf97f4df75117a78c1A5a0DBb814Af92458539FB4");
+  // const [fromTokenInfo, setFromTokenInfo] = useState();
+  // const [toTokenInfo, setToTokenInfo] = useState();
   const [mode, setMode] = useState(LONG);
   const [type, setType] = useState(MARKET);
-  const [fees, setFees] = useState(0.1);
-  const [leverage, setLeverage] = useState(5);
+  // const [fees, setFees] = useState(0.1);
+  // const [leverage, setLeverage] = useState(5);
+  // const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useState(true);
   const [entryPriceLimit, setEntryPriceLimit] = useState(0);
-  const [anchorOnFromAmount, setAnchorOnFromAmount] = useState(true);
-  const [fromValue, setFromValue] = useState('');
-  const [toValue, setToValue] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false); //hj add
-  const [triggerPriceValue, setTriggerPriceValue] = useState('');
-  const [priceValue, setPriceValue] = useState('');
-  const [entryMarkPrice, setEntryMarkPrice] = useState('');
-  const [pendingTxns, setPendingTxns] = useState([]); //hj add from
-  const [triggerRatioValue, setTriggerRatioValue] = useState('');
-  const triggerRatioInverted = useMemo(
-    () => {
-      return isTriggerRatioInverted(fromTokenInfo, toTokenInfo);
-    },
-    [toTokenInfo, fromTokenInfo]
-  );
+  // const [priceValue, setPriceValue] = useState('');
+  // const [shortCollateralAddress, setShortCollateralAddress] = useState('0xf97f4df75117a78c1A5a0DBb814Af92458539FB4');
+  // const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
 
-  const triggerRatio = useMemo(
-    () => {
-      if (!triggerRatioValue) {
-        return bigNumberify(0);
-      }
-      let ratio = parseValue(triggerRatioValue, USD_DECIMALS);
-      if (ratio.eq(0)) {
-        return bigNumberify(0);
-      }
-      if (triggerRatioInverted) {
-        ratio = PRECISION.mul(PRECISION).div(ratio);
-      }
-      return ratio;
-    },
-    [triggerRatioValue, triggerRatioInverted]
-  );
-  //hj add to
+  // hj add to
 
-  const connectWalletByLocalStorage = useConnectWallet();
-  const { activate } = useWeb3React();
+  const [triggerPriceValue, setTriggerPriceValue] = useState("");
+  const triggerPriceUsd = type === MARKET ? 0 : parseValue(triggerPriceValue, USD_DECIMALS);
+  const onTriggerPriceChange = evt => {
+    setTriggerPriceValue(evt.target.value || "");
+  };
+  const onTriggerRatioChange = evt => {
+    setTriggerRatioValue(evt.target.value || "");
+  };
 
   // ymj const
-  const individualFieldPlaceholder = 'Enter amount';
-  const dependentFieldPlaceholder = 'Estimated value';
-  const slippageTolerancePlaceholder = 'Please input a number from 1.00 to 100.00';
-  // 先写固定地址
-  // const fromToken = getToken(chainId, fromTokenAddress);
-  // const toToken = getToken(chainId, toTokenAddress);
-  const infoTokens = getInfoTokens_test();
-  const fromToken = {
-    address: '0x0000000000000000000000000000000000000000',
-    decimals: 18,
-    isNative: true,
-    isShortable: true,
-    name: 'Ethereum',
-    symbol: 'ETH',
-  };
-  const toToken = {
-    address: '0xf97f4df75117a78c1A5a0DBb814Af92458539FB4',
-    decimals: 18,
-    isStable: false,
-    name: 'Chainlink',
-    symbol: 'LINK',
-  };
-  // const fromTokenAddress = BigNumber.from(fromToken.address);
-  // const toTokenAddress = BigNumber.from(toToken.address);
-  // const fromTokenAddress = fromToken.address;
-  // const toTokenAddress = toToken.address;
-  // const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
-  // const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
+  // const individualFieldPlaceholder = 'Enter amount';
+  // const dependentFieldPlaceholder = 'Estimated value';
+  // const slippageTolerancePlaceholder = 'Please input a number from 1.00 to 100.00';
+
+  const tokenAddresses = tokens.map(token => token.address)
+  const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([tempChainID, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(tempLibrary, Reader, [tokenAddresses]),
+  })
+  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
+  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([tempChainID, readerAddress, "getFullVaultTokenInfo"], {
+    fetcher: fetcher(tempLibrary, ReaderV2, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
+  })
+  const { data: fundingRateInfo, mutate: updateFundingRateInfo } = useSWR([tempChainID, readerAddress, "getFundingRates"], {
+    fetcher: fetcher(tempLibrary, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
+  })
+  const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([tempChainID, vaultAddress, "totalTokenWeights"], {
+    fetcher: fetcher(tempLibrary, VaultV2),
+  })
+  const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([tempChainID, usdgAddress, "totalSupply"], {
+    fetcher: fetcher(tempLibrary, Token),
+  })
+  const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR([tempChainID, routerAddress, "approvedPlugins", account || PLACEHOLDER_ACCOUNT, orderBookAddress], {
+    fetcher: fetcher(tempLibrary, Router)
+  });
+
+  const tokenAllowanceAddress = fromTokenAddress === AddressZero ? nativeTokenAddress : fromTokenAddress;
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([tempChainID, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
+      fetcher: fetcher(tempLibrary, Token)
+  });
+
+  // default collateral address on ARBITRUM
+  const [shortCollateralAddress, setShortCollateralAddress] = useState(ARBITRUM_DEFAULT_COLLATERAL_ADDRESS)
+
+  const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
+  const fromToken = getToken(tokens, fromTokenAddress); 
+  const toToken = getToken(tokens, toTokenAddress);
+
+  const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
+  const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
+  const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
+
+  const fromBalance = fromTokenInfo ? fromTokenInfo.balance : bigNumberify(0);
+  const toBalance = toTokenInfo ? toTokenInfo.balance : bigNumberify(0);
+ 
   const fromAmount = parseValue(fromValue, fromToken && fromToken.decimals);
   const toAmount = parseValue(toValue, toToken && toToken.decimals);
-  const isMarketOrder = type === MARKET;
-  const triggerPriceUsd = type === MARKET ? 0 : parseValue(triggerPriceValue, USD_DECIMALS);
-  // const indexTokenAddress = toTokenAddress === AddressZero ? nativeTokenAddress : toTokenAddress;
-  const indexTokenAddress = toTokenAddress;
-  const shortCollateralAddress = indexTokenAddress; // need change
-  const collateralTokenAddress = mode === LONG ? indexTokenAddress : shortCollateralAddress;
-  // const collateralToken = getToken(chainId, collateralTokenAddress);
-  const collateralToken = {
-    name: 'Chainlink',
-    symbol: 'LINK',
-    decimals: 18,
-    address: '0xf97f4df75117a78c1A5a0DBb814Af92458539FB4',
-    isStable: false,
-  };
-  const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
-  const totalTokenWeights = BigNumber.from('0x0186a0');
+
+  const isPotentialWrap = (fromToken.isNative && toToken.isWrapped) || (fromToken.isWrapped && toToken.isNative);
+  const isWrapOrUnwrap = mode === SWAP && isPotentialWrap;
+  const needApproval =
+    fromTokenAddress !== AddressZero &&
+    tokenAllowance &&
+    fromAmount &&
+    fromAmount.gt(tokenAllowance) &&
+    !isWrapOrUnwrap;
+  const prevFromTokenAddress = usePrevious(fromTokenAddress);
+  const prevNeedApproval = usePrevious(needApproval);
+  const prevToTokenAddress = usePrevious(toTokenAddress);
+
   const fromUsdMin = getUsd(fromAmount, fromTokenAddress, false, infoTokens);
-  const toUsdMax = getUsd(toAmount, toTokenAddress, true, infoTokens, mode, triggerPriceUsd);
-  const perpetualMode = [LONG, MARKET];
-  const perpetualType = [
-    {
-      name: 'Market',
-      icon: <LineChartOutlined />,
-      id: MARKET,
-    },
-    {
-      name: 'Limit',
-      icon: <FieldTimeOutlined />,
-      id: LIMIT,
-    },
-  ];
-  const leverageSlider = {
+  const toUsdMax = getUsd(toAmount, toTokenAddress, true, infoTokens, type, triggerPriceUsd);
+
+  const indexTokenAddress = toTokenAddress === AddressZero ? nativeTokenAddress : toTokenAddress;
+  const collateralTokenAddress = mode === LONG
+    ? indexTokenAddress
+    : shortCollateralAddress;
+  const collateralToken = getToken(tokens, collateralTokenAddress);
+  
+  const [triggerRatioValue, setTriggerRatioValue] = useState("");
+  const triggerRatioInverted = useMemo(() => {
+    return isTriggerRatioInverted(fromTokenInfo, toTokenInfo);
+  }, [toTokenInfo, fromTokenInfo]);
+  const triggerRatio = useMemo(() => {
+    if (!triggerRatioValue) {
+      return bigNumberify(0);
+    }
+    let ratio = parseValue(triggerRatioValue, USD_DECIMALS);
+    if (ratio.eq(0)) {
+      return bigNumberify(0);
+    }
+    if (triggerRatioInverted) {
+      ratio = PRECISION.mul(PRECISION).div(ratio);
+    }
+    return ratio;
+  }, [triggerRatioValue, triggerRatioInverted]);
+  
+
+  // useCallback(() => {
+  //   setFromTokenInfo(getTokenInfo(infoTokens, fromTokenAddress));
+  //   setToTokenInfo(getTokenInfo(infoTokens, toTokenAddress));
+  //   // setEntryMarkPrice(mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
+  // }, [
+  //   fromTokenAddress,
+  //   toTokenAddress
+  // ]);
+  // useCallback(() => {
+  //   setEntryMarkPrice(mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
+  // }, [
+  //   toTokenInfo
+  // ]);
+
+  
+  const getTokenLabel = () => {
+    if (mode === SWAP) {
+      return "Receive";
+    }
+    if (mode === LONG) {
+      return "Long";
+    }
+    return "Short";
+  };
+
+  const leverageMarks = {
     2: {
-      style: {
-        color: '#b5b6b6',
-      },
-      label: '2x',
+      style: {color: '#b5b6b6',},
+      label: '2x'
     },
     5: {
-      style: {
-        color: '#b5b6b6',
-      },
-      label: '5x',
+      style: {color: '#b5b6b6',},
+      label: '5x'
     },
     10: {
-      style: {
-        color: '#b5b6b6',
-      },
-      label: '10x',
+      style: {color: '#b5b6b6',},
+      label: '10x'
     },
     15: {
-      style: {
-        color: '#b5b6b6',
-      },
-      label: '15x',
+      style: {color: '#b5b6b6',},
+      label: '15x'
     },
     20: {
-      style: {
-        color: '#b5b6b6',
-      },
-      label: '20x',
+      style: {color: '#b5b6b6',},
+      label: '20x'
     },
     25: {
-      style: {
-        color: '#b5b6b6',
-      },
-      label: '25x',
+      style: {color: '#b5b6b6',},
+      label: '25x'
     },
     30: {
-      style: {
-        color: '#b5b6b6',
-      },
-      label: '30x',
-    },
+      style: {color: '#b5b6b6',},
+      label: '30x'
+    }
   };
 
-  // ymj useEffect
-  // initialization
-  useEffect(
-    () => {
-      console.log('chainId here', chainId);
-      console.log('ymj 1', infoTokens_test, infoTokens);
-      setFromTokenInfo(getTokenInfo(infoTokens, fromTokenAddress));
-      setToTokenInfo(getTokenInfo(infoTokens, toTokenAddress));
-      // setEntryMarkPrice(mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
-      if (!INITIAL_TOKEN_LIST) return;
-      setVisible(null);
-      // 选择货币前置和后置
-      setBefore(true);
-      // 交易对前置货币
-      setToken0(INITIAL_TOKEN_LIST[0]);
-      // 交易对后置货币
-      setToken1(INITIAL_TOKEN_LIST[1]);
-      // 交易对前置货币余额
-      setToken0Balance('0');
-      // 交易对后置货币余额
-      setToken1Balance('0');
-      // 交易对前置货币兑换量
-      setToken0Amount('');
-      // 交易对后置货币兑换量
-      setToken1Amount('');
-      // 交易中用户使用Flash Arbitrage的额外获利
-      setBonus0(null);
-      setBonus1(null);
-      setToken0BalanceShow(false);
-      setToken1BalanceShow(false);
-      setExactIn(true);
-      setNeedApprove(false);
-      setApproveAmount('0');
-      setApproveButtonStatus(true);
-      // Breakdown shows the estimated information for swap
-      // let [estimatedStatus,setEstimatedStatus]=useState();
-      setSwapBreakdown();
-      setSwapButtonState(false);
-      setSwapButtonContent('Connect to Wallet');
-      setSwapStatus();
-      setPair();
-      setRoute();
-      setTrade();
-      setSlippageAdjustedAmount();
-      setMinAmountOut();
-      setMaxAmountIn();
-      setWethContract();
-      setWrappedAmount();
-      setShowSpinner(false);
-      setMethodName();
-      setMidTokenAddress();
-      setPoolExist(true);
-    },
-    [chainId]
-  );
+  const [leverageOption, setLeverageOption] = useLocalStorageSerializeKey([chainId, "Exchange-swap-leverage-option"], "2");
+  const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useLocalStorageSerializeKey( [chainId, "Exchange-swap-leverage-slider-enabled"], true);
+  const hasLeverageOption = isLeverageSliderEnabled && !isNaN(parseFloat(leverageOption));
 
-  useCallback(
-    () => {
-      setFromTokenInfo(getTokenInfo(infoTokens, fromTokenAddress));
-      setToTokenInfo(getTokenInfo(infoTokens, toTokenAddress));
-      // setEntryMarkPrice(mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
-    },
-    [fromTokenAddress, toTokenAddress]
-  );
-  useCallback(
-    () => {
-      setEntryMarkPrice(mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
-    },
-    [toTokenInfo]
-  );
+  useEffect(() => {
+    if (
+      fromToken &&
+      fromTokenAddress === prevFromTokenAddress &&
+      !needApproval &&
+      prevNeedApproval &&
+      isWaitingForApproval
+    ) {
+      setIsWaitingForApproval(false);
+      // helperToast.success(<div>{fromToken.symbol} approved!</div>);
+    }
+  }, [
+    fromTokenAddress,
+    prevFromTokenAddress,
+    needApproval,
+    prevNeedApproval,
+    setIsWaitingForApproval,
+    fromToken.symbol,
+    isWaitingForApproval,
+    fromToken
+  ]);
 
-  // connect to page model, reflect changes of pair ratio in this component
-  useEffect(
-    () => {
-      const {
-        swap: { token0: modelToken0, token1: modelToken1 },
-      } = props;
-      setToken0(modelToken0);
-      setToken1(modelToken1);
-    },
-    [props.swap]
-  );
+  useEffect(() => {
+    if (!toTokens.find(token => token.address === toTokenAddress)) {
+      setToTokenAddress(mode, toTokens[0].address);
+    }
+  }, [mode, toTokens, toTokenAddress, setToTokenAddress]);
 
-  useEffect(
-    () => {
-      if (token) {
-        setToken0(token.token0);
-        setToken1(token.token1);
+  useEffect(() => {
+    if (active) {
+      function onBlock() {
+        updateTokenAllowance(undefined, true);
       }
-    },
-    [token]
-  );
+      library.on("block", onBlock);
+      return () => {
+        library.removeListener("block", onBlock);
+      };
+    }
+  }, [active, library, updateTokenAllowance]);
 
-  useEffect(
-    () => {
-      if (!account || !chainId || !library) {
-        setToken0BalanceShow(false);
-        setToken1BalanceShow(false);
-        return;
-      }
-      const _token0 = INITIAL_TOKEN_LIST[0];
-      const _token1 = INITIAL_TOKEN_LIST[1];
-      setToken0(_token0);
-      setToken1(_token1);
-      async function refreshBalances() {
-        setToken0Balance(
-          await getUserTokenBalance(_token0, chainId, account, library).catch(e =>
-            console.log('refrersh balances error', e)
-          )
-        );
-        setToken0BalanceShow(true);
-        setToken1Balance(
-          await getUserTokenBalance(_token1, chainId, account, library).catch(e =>
-            console.log('refrersh balances error', e)
-          )
-        );
-        setToken1BalanceShow(true);
-      }
-      try {
-        refreshBalances();
-      } catch {
-        e => console.log('refrersh balances error', e);
-      }
-    },
-    [account, INITIAL_TOKEN_LIST]
-  );
-  // t0 or t1 changed
-  useEffect(
-    async () => {
-      await t0Changed(token0Amount);
-    },
-    [token0, token1, exactIn, chainId, library, account]
-  );
-  useEffect(
-    async () => {
-      await t1Changed(token1Amount);
-    },
-    [token0, token1, exactIn, chainId, library, account]
-  );
-  // connect wallet
-  useEffect(
-    () => {
-      if (account == undefined) {
-        setSwapButtonState(false);
-        setSwapButtonContent('Connect to Wallet');
-      }
-      // else {
-      //     setSwapButtonState(true);
-      //     setSwapButtonContent('Swap');
-      // }
-    },
-    [account]
-  );
-
-  useEffect(
-    () => {
-      if (type == MARKET && entryPriceMarket) {
-        setEntryPriceLimit(entryPriceMarket);
-      } else if (type == LIMIT) {
-        setEntryPriceLimit(0);
-      }
-    },
-    [type]
-  );
-
-  useEffect(
-    () => {
-      if (mode === LONG || mode === SHORT) updateLeverageAmounts();
-      else {
-        // swap function
-      }
-    },
-    [
-      anchorOnFromAmount,
-      fromAmount,
-      toAmount,
-      fromToken,
-      toToken,
-      fromTokenAddress,
-      toTokenAddress,
-      infoTokens,
-      fromUsdMin,
-      toUsdMax,
-      isMarketOrder,
-      type,
-      triggerPriceUsd,
-      // triggerRatio,
-      // hasLeverageOption,
-      leverage,
-      usdgSupply,
-      totalTokenWeights,
-      chainId,
-      collateralTokenAddress,
-      indexTokenAddress,
-    ]
-  );
-
-  // ymj function
-  // token1Amount is changed according to token0Amount
-  const t0Changed = async e => {
-    if (!token0 || !token1) return;
-    if (!exactIn) return;
-    setAnchorOnFromAmount(true);
-  };
-
-  // token0Amount is changed according to token1Amount
-  const t1Changed = async e => {
-    if (!token0 || !token1) return;
-    if (exactIn) return;
-    setAnchorOnFromAmount(false);
-  };
-
-  const updateLeverageAmounts = () => {
-    if (!leverage) {
+  useEffect(() => {
+    if (mode !== SHORT) {
       return;
     }
-    if (anchorOnFromAmount) {
-      if (!fromAmount) {
-        setToValue('');
-        setToken1Amount('');
+    if (toTokenAddress === prevToTokenAddress) {
+      return;
+    }
+    for (let i = 0; i < stableTokens.length; i++) {
+      const stableToken = stableTokens[i];
+      const key = getPositionKey(
+        stableToken.address,
+        toTokenAddress,
+        false,
+        nativeTokenAddress
+      );
+      const position = positionsMap[key];
+      if (position && position.size && position.size.gt(0)) {
+        setShortCollateralAddress(position.collateralToken.address);
+        return;
+      }
+    }
+  }, [
+    toTokenAddress,
+    prevToTokenAddress,
+    mode,
+    positionsMap,
+    stableTokens,
+    nativeTokenAddress,
+    shortCollateralAddress,
+    setShortCollateralAddress
+  ]);
+
+  useEffect(() => {
+    const updateSwapAmounts = () => {
+      if (anchorOnFromAmount) {
+        if (!fromAmount) {
+          setToValue("");
+          return;
+        }
+        if (toToken) {
+          const { amount: nextToAmount } = getNextToAmount(
+            chainId,
+            fromAmount,
+            fromTokenAddress,
+            toTokenAddress,
+            infoTokens,
+            undefined,
+            type !== MARKET && triggerRatio,
+            usdgSupply,
+            totalTokenWeights
+          );
+
+          const nextToValue = formatAmountFree(
+            nextToAmount,
+            toToken.decimals,
+            toToken.decimals
+          );
+          setToValue(nextToValue);
+        }
         return;
       }
 
-      const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
-      console.log('ymj 111', toTokenInfo);
-      if (toTokenInfo && toTokenInfo.maxPrice && fromUsdMin && fromUsdMin.gt(0)) {
-        const leverageMultiplier = parseInt(leverage * BASIS_POINTS_DIVISOR);
-        const toTokenPriceUsd =
-          type === !MARKET && triggerPriceUsd && triggerPriceUsd.gt(0)
-            ? triggerPriceUsd
-            : toTokenInfo.maxPrice;
+      if (!toAmount) {
+        setFromValue("");
+        return;
+      }
+      if (fromToken) {
+        const { amount: nextFromAmount } = getNextFromAmount(
+          chainId,
+          toAmount,
+          fromTokenAddress,
+          toTokenAddress,
+          infoTokens,
+          undefined,
+          type !== MARKET && triggerRatio,
+          usdgSupply,
+          totalTokenWeights
+        );
+        const nextFromValue = formatAmountFree(
+          nextFromAmount,
+          fromToken.decimals,
+          fromToken.decimals
+        );
+        setFromValue(nextFromValue);
+      }
+    };
+
+    const updateLeverageAmounts = () => {
+      if (!hasLeverageOption) {
+        return;
+      }
+      if (anchorOnFromAmount) {
+        if (!fromAmount) {
+          setToValue("");
+          return;
+        }
+
+        const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
+        if (
+          toTokenInfo &&
+          toTokenInfo.maxPrice &&
+          fromUsdMin &&
+          fromUsdMin.gt(0)
+        ) {
+          const leverageMultiplier = parseInt(
+            leverageOption * BASIS_POINTS_DIVISOR
+          );
+          const toTokenPriceUsd =
+            type!==MARKET && triggerPriceUsd && triggerPriceUsd.gt(0)
+              ? triggerPriceUsd
+              : toTokenInfo.maxPrice;
+
+          const { feeBasisPoints } = getNextToAmount(
+            chainId,
+            fromAmount,
+            fromTokenAddress,
+            collateralTokenAddress,
+            infoTokens,
+            undefined,
+            undefined,
+            usdgSupply,
+            totalTokenWeights
+          );
+
+          let fromUsdMinAfterFee = fromUsdMin;
+          if (feeBasisPoints) {
+            fromUsdMinAfterFee = fromUsdMin
+              .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+              .div(BASIS_POINTS_DIVISOR);
+          }
+
+          const toNumerator = fromUsdMinAfterFee.mul(leverageMultiplier).mul(BASIS_POINTS_DIVISOR)
+          const toDenominator = bigNumberify(MARGIN_FEE_BASIS_POINTS).mul(leverageMultiplier).add(bigNumberify(BASIS_POINTS_DIVISOR).mul(BASIS_POINTS_DIVISOR))
+
+          const nextToUsd = toNumerator.div(toDenominator)
+
+          const nextToAmount = nextToUsd
+            .mul(expandDecimals(1, toToken.decimals))
+            .div(toTokenPriceUsd);
+
+          const nextToValue = formatAmountFree(
+            nextToAmount,
+            toToken.decimals,
+            toToken.decimals
+          );
+
+          setToValue(nextToValue);
+        }
+        return;
+      }
+
+      if (!toAmount) {
+        setFromValue("");
+        return;
+      }
+
+      const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
+      if (
+        fromTokenInfo &&
+        fromTokenInfo.minPrice &&
+        toUsdMax &&
+        toUsdMax.gt(0)
+      ) {
+        const leverageMultiplier = parseInt(
+          leverageOption * BASIS_POINTS_DIVISOR
+        );
+
+        const baseFromAmountUsd = toUsdMax
+          .mul(BASIS_POINTS_DIVISOR)
+          .div(leverageMultiplier);
+
+        let fees = toUsdMax
+          .mul(MARGIN_FEE_BASIS_POINTS)
+          .div(BASIS_POINTS_DIVISOR);
 
         const { feeBasisPoints } = getNextToAmount(
           chainId,
           fromAmount,
+          fromTokenAddress,
           collateralTokenAddress,
-          indexTokenAddress,
           infoTokens,
           undefined,
           undefined,
           usdgSupply,
           totalTokenWeights
         );
-        let fromUsdMinAfterFee = fromUsdMin;
+
         if (feeBasisPoints) {
-          fromUsdMinAfterFee = fromUsdMin
-            .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+          const swapFees = baseFromAmountUsd
+            .mul(feeBasisPoints)
             .div(BASIS_POINTS_DIVISOR);
+          fees = fees.add(swapFees);
         }
 
-        const baseToUsd = fromUsdMinAfterFee.mul(leverageMultiplier).div(BASIS_POINTS_DIVISOR);
-        fromUsdMinAfterFee = fromUsdMinAfterFee.sub(
-          baseToUsd.mul(MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR)
+        const nextFromUsd = baseFromAmountUsd.add(fees);
+
+        const nextFromAmount = nextFromUsd
+          .mul(expandDecimals(1, fromToken.decimals))
+          .div(fromTokenInfo.minPrice);
+
+        const nextFromValue = formatAmountFree(
+          nextFromAmount,
+          fromToken.decimals,
+          fromToken.decimals
         );
-        const nextToUsd = fromUsdMinAfterFee.mul(leverageMultiplier).div(BASIS_POINTS_DIVISOR);
-        const nextToAmount = nextToUsd
-          .mul(expandDecimals(1, toToken.decimals))
-          .div(toTokenPriceUsd);
-        const nextToValue = formatAmountFree(nextToAmount, toToken.decimals, toToken.decimals);
 
-        console.log('ymj updateSwapAmounts 456', nextToValue);
-        setToValue(nextToValue);
-        setToken1Amount(nextToValue);
+        setFromValue(nextFromValue);
       }
-      return;
+    };
+
+    if (mode === SWAP) {
+      updateSwapAmounts();
     }
 
-    if (!toAmount) {
-      setFromValue('');
-      setToken0Amount('');
-      return;
+    if (mode === LONG || mode === SHORT) {
+      updateLeverageAmounts();
     }
+  }, [
+    mode,
+    type,
+    anchorOnFromAmount,
+    fromAmount,
+    toAmount,
+    fromToken,
+    toToken,
+    fromTokenAddress,
+    toTokenAddress,
+    infoTokens,
+    leverageOption,
+    fromUsdMin,
+    toUsdMax,
+    triggerPriceUsd,
+    triggerRatio,
+    hasLeverageOption,
+    usdgSupply,
+    totalTokenWeights,
+    chainId,
+    collateralTokenAddress,
+    indexTokenAddress
+  ]);
 
-    const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
-    if (fromTokenInfo && fromTokenInfo.minPrice && toUsdMax && toUsdMax.gt(0)) {
-      const leverageMultiplier = parseInt(leverage * BASIS_POINTS_DIVISOR);
-      const baseFromAmountUsd = toUsdMax.mul(BASIS_POINTS_DIVISOR).div(leverageMultiplier);
-      let fees = toUsdMax.mul(MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR);
+  let entryMarkPrice;
+  let exitMarkPrice;
+  if (toTokenInfo) {
+    entryMarkPrice =
+      mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice;
+    exitMarkPrice =
+      mode === LONG ? toTokenInfo.minPrice : toTokenInfo.maxPrice;
+  }
 
-      const { feeBasisPoints } = getNextToAmount(
-        chainId,
-        fromAmount,
-        collateralTokenAddress,
-        indexTokenAddress,
-        infoTokens,
-        undefined,
-        undefined,
-        usdgSupply,
-        totalTokenWeights
-      );
-      console.log('ymj updateSwapAmounts fee2', feeBasisPoints);
-      if (feeBasisPoints) {
-        const swapFees = baseFromAmountUsd.mul(feeBasisPoints).div(BASIS_POINTS_DIVISOR);
-        fees = fees.add(swapFees);
-      }
-
-      const nextFromUsd = baseFromAmountUsd.add(fees);
-      const nextFromAmount = nextFromUsd
-        .mul(expandDecimals(1, fromToken.decimals))
-        .div(fromTokenInfo.minPrice);
-      const nextFromValue = formatAmountFree(
-        nextFromAmount,
-        fromToken.decimals,
-        fromToken.decimals
-      );
-      setFromValue(nextFromValue);
-      setToken0Amount(nextFromValue);
+  let leverage = bigNumberify(0);
+  if (fromUsdMin && toUsdMax && fromUsdMin.gt(0)) {
+    const fees = toUsdMax.mul(MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR);
+    if (fromUsdMin.sub(fees).gt(0)) {
+      leverage = toUsdMax.mul(BASIS_POINTS_DIVISOR).div(fromUsdMin.sub(fees));
     }
-  };
+  }
 
-  const onCoinClick = async token => {
-    onCancel();
-    if (before) {
-      if (account == undefined) {
-        alert('Please connect to your account');
-      } else {
-        console.log('SET TOKEN 0');
-        console.log(onSelectToken0);
-        onSelectToken0(token);
-        setToken0(token);
-        setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
-        setToken0BalanceShow(true);
-      }
+  let nextAveragePrice = type === MARKET ? entryMarkPrice : triggerPriceUsd;
+  if (hasExistingPosition) {
+    let nextDelta
+    let nextHasProfit
+
+    if (type === MARKET) {
+      nextDelta = existingPosition.delta;
+      nextHasProfit = existingPosition.hasProfit;
     } else {
-      if (account == undefined) {
-        alert('Please connect to your account');
-      } else {
-        onSelectToken1(token);
-        setToken1(token);
-        setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
-        setToken1BalanceShow(true);
-      }
+      const data = calculatePositionDelta(
+        triggerPriceUsd || bigNumberify(0),
+        existingPosition
+      );
+      nextDelta = data.delta;
+      nextHasProfit = data.hasProfit;
+    }
+
+    nextAveragePrice = getNextAveragePrice({
+      size: existingPosition.size,
+      sizeDelta: toUsdMax,
+      hasProfit: nextHasProfit,
+      delta: nextDelta,
+      nextPrice: type === MARKET ? entryMarkPrice : triggerPriceUsd,
+      isLong: mode === LONG
+    });
+  }
+
+  let positionKey;
+  if (mode === LONG) {
+    positionKey = getPositionKey(
+      toTokenAddress,
+      toTokenAddress,
+      true,
+      nativeTokenAddress
+    );
+  }
+  if (mode === SHORT) {
+    positionKey = getPositionKey(
+      shortCollateralAddress,
+      toTokenAddress,
+      false,
+      nativeTokenAddress
+    );
+  }
+
+  const existingPosition = positionKey ? positionsMap[positionKey] : undefined;
+  const hasExistingPosition = existingPosition && existingPosition.size && existingPosition.size.gt(0);
+
+  const liquidationPrice = getLiquidationPrice({
+    isLong: mode === LONG,
+    size: hasExistingPosition ? existingPosition.size : bigNumberify(0),
+    collateral: hasExistingPosition
+      ? existingPosition.collateral
+      : bigNumberify(0),
+    averagePrice: nextAveragePrice,
+    entryFundingRate: hasExistingPosition
+      ? existingPosition.entryFundingRate
+      : bigNumberify(0),
+    cumulativeFundingRate: hasExistingPosition
+      ? existingPosition.cumulativeFundingRate
+      : bigNumberify(0),
+    sizeDelta: toUsdMax,
+    collateralDelta: fromUsdMin,
+    increaseCollateral: true,
+    increaseSize: true
+  });
+  
+  const existingLiquidationPrice = existingPosition
+    ? getLiquidationPrice(existingPosition)
+    : undefined;
+  let displayLiquidationPrice = liquidationPrice
+    ? liquidationPrice
+    : existingLiquidationPrice;
+  
+  if (hasExistingPosition) {
+    const collateralDelta = fromUsdMin ? fromUsdMin : bigNumberify(0);
+    const sizeDelta = toUsdMax ? toUsdMax : bigNumberify(0);
+    leverage = getLeverage({
+      size: existingPosition.size,
+      sizeDelta,
+      collateral: existingPosition.collateral,
+      collateralDelta,
+      increaseCollateral: true,
+      entryFundingRate: existingPosition.entryFundingRate,
+      cumulativeFundingRate: existingPosition.cumulativeFundingRate,
+      increaseSize: true,
+      hasProfit: existingPosition.hasProfit,
+      delta: existingPosition.delta,
+      includeDelta: savedIsPnlInLeverage
+    });
+  } else if (hasLeverageOption) {
+    leverage = bigNumberify(parseInt(leverageOption * BASIS_POINTS_DIVISOR));
+  }
+
+  const [visible, setVisible] = useState()
+
+  const selectFromToken = token => {
+    setFromTokenAddress(token.address);
+    setIsWaitingForApproval(false);
+
+    if (mode === SHORT && token.isStable) {
+      setShortCollateralAddress(token.address);
     }
   };
 
-  const onClickCoin = () => {
-    setVisible(true);
-  };
-  const onCancel = () => {
-    setVisible(false);
+  const selectToToken = token => {
+    setToTokenAddress(token.address);
   };
 
-  const onSwitchCoinCard = () => {
-    let tempToken = token1;
-    let tempAmount = token1Amount;
-    let tempBalance = token1Balance;
+  const onFromValueChange = e => {
+    setAnchorOnFromAmount(true);
+    setFromValue(e.target.value);
+  };
 
-    setToken1(token0);
-    setToken1Amount(token0Amount);
-    setToken1Balance(token0Balance);
-
-    setToken0(tempToken);
-    setToken0Amount(tempAmount);
-    setToken0Balance(tempBalance);
+  const onToValueChange = e => {
+    setAnchorOnFromAmount(false);
+    setToValue(e.target.value);
   };
 
   const wrap = async () => {
@@ -990,200 +1170,1079 @@ const SwapComponent = props => {
     sti(status.hash);
   };
 
+  const perpetualMode = [LONG, MARKET];
+  const perpetualType = [{
+    name: 'Market',
+    icon: <LineChartOutlined />,
+    id: MARKET,
+  }, {
+    name: 'Limit',
+    icon: <FieldTimeOutlined />,
+    id: LIMIT,
+  }];
+
   // LONG or SHORT
-  const modeSelect = input => {
+  const modeSelect = (input) => {
     setMode(input.target.value);
-  };
+    onChangeMode(input.target.value);
+  }
+
   // MARKET or LIMIT
   const typeSelect = input => {
     setType(input);
+  }
+  // const calculateFee = () => fees * 100
+  // const limitOnChange = (e) => {
+  //   const check = Pattern.coinNum.test(e.target.value);
+  //   if (check) {
+  //     setEntryPriceLimit(e.target.value)
+  //     setPriceValue(e.target.value.toString())
+  //     setTriggerPriceValue(e.target.value.toString())
+  //     if (!e.target.value) {
+  //       setEntryPriceLimit(0);
+  //       setPriceValue("")
+  //       setTriggerPriceValue("")
+  //     }
+  //   }
+  // };
+  // const markOnClick = (e) => {
+  //   // setTriggerPriceValue(marketPrice.toString());
+  //   setTriggerPriceValue(e.toString());
+  //   setPriceValue(e.toString())
+
+  // }
+
+  const switchTokens = () => {
+    if (fromAmount && toAmount) {
+      if (anchorOnFromAmount) {
+        setToValue(formatAmountFree(fromAmount, fromToken.decimals, 8));
+      } else {
+        setFromValue(formatAmountFree(toAmount, toToken.decimals, 8));
+      }
+      setAnchorOnFromAmount(!anchorOnFromAmount);
+    }
+    setIsWaitingForApproval(false);
+
+    setFromTokenAddress(toTokenAddress)
+    setToTokenAddress(fromTokenAddress)
   };
-  const calculateFee = () => {
-    return fees * 100;
-  };
-  const limitOnChange = e => {
-    const check = Pattern.coinNum.test(e.target.value);
-    if (check) {
-      setEntryPriceLimit(e.target.value);
-      setPriceValue(e.target.value.toString());
-      setTriggerPriceValue(e.target.value.toString());
-      if (!e.target.value) {
-        setEntryPriceLimit(0);
-        setPriceValue('');
-        setTriggerPriceValue('');
+
+  const getLeverageError = useCallback(() => {
+
+    if (!toAmount || toAmount.eq(0)) {
+      return ["Enter an amount"];
+    }
+
+    let toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
+    if (toTokenInfo && toTokenInfo.isStable) {
+      return [
+        `${mode === LONG ? "Longing" : "Shorting"} ${
+          toTokenInfo.symbol
+        } not supported`
+      ];
+    }
+
+    const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
+    if (
+      fromTokenInfo &&
+      fromTokenInfo.balance &&
+      fromAmount &&
+      fromAmount.gt(fromTokenInfo.balance)
+    ) {
+      return [`Insufficient ${fromTokenInfo.symbol} balance`];
+    }
+
+    if (leverage && leverage.eq(0)) {
+      return ["Enter an amount"];
+    }
+    if (type !== MARKET && (!triggerPriceValue || triggerPriceUsd.eq(0))) {
+      return ["Enter a price"];
+    }
+
+    if (
+      !hasExistingPosition &&
+      fromUsdMin &&
+      fromUsdMin.lt(expandDecimals(10, USD_DECIMALS))
+    ) {
+      return ["Min order: 10 USD"];
+    }
+
+    if (leverage && leverage.lt(1.1 * BASIS_POINTS_DIVISOR)) {
+      return ["Min leverage: 1.1x"];
+    }
+
+    if (leverage && leverage.gt(30.5 * BASIS_POINTS_DIVISOR)) {
+      return ["Max leverage: 30.5x"];
+    }
+
+    if (type !== MARKET && entryMarkPrice && triggerPriceUsd) {
+      if (mode === LONG && entryMarkPrice.lt(triggerPriceUsd)) {
+        return ["Price above Mark Price"];
+      }
+      if (mode !== LONG && entryMarkPrice.gt(triggerPriceUsd)) {
+        return ["Price below Mark Price"];
       }
     }
+
+    if (mode === LONG) {
+      let requiredAmount = toAmount;
+      if (fromTokenAddress !== toTokenAddress) {
+        const { amount: swapAmount } = getNextToAmount(
+          chainId,
+          fromAmount,
+          fromTokenAddress,
+          toTokenAddress,
+          infoTokens,
+          undefined,
+          undefined,
+          usdgSupply,
+          totalTokenWeights
+        );
+        requiredAmount = requiredAmount.add(swapAmount);
+
+        if (
+          toToken &&
+          toTokenAddress !== USDG_ADDRESS &&
+          toTokenInfo.availableAmount &&
+          requiredAmount.gt(toTokenInfo.availableAmount)
+        ) {
+          return ["Insufficient liquidity"];
+        }
+
+        if (
+          toTokenInfo.poolAmount &&
+          toTokenInfo.bufferAmount &&
+          toTokenInfo.bufferAmount.gt(toTokenInfo.poolAmount.sub(swapAmount))
+        ) {
+          return ["Insufficient liquidity", true, "BUFFER"];
+        }
+
+        if (
+          fromUsdMin &&
+          fromTokenInfo.maxUsdgAmount &&
+          fromTokenInfo.maxUsdgAmount.gt(0) &&
+          fromTokenInfo.minPrice &&
+          fromTokenInfo.usdgAmount
+        ) {
+          const usdgFromAmount = adjustForDecimals(
+            fromUsdMin,
+            USD_DECIMALS,
+            USDG_DECIMALS
+          );
+          const nextUsdgAmount = fromTokenInfo.usdgAmount.add(usdgFromAmount);
+          if (nextUsdgAmount.gt(fromTokenInfo.maxUsdgAmount)) {
+            return [
+              `${fromTokenInfo.symbol} pool exceeded, try different token`,
+              true,
+              "MAX_USDG"
+            ];
+          }
+        }
+      }
+    }
+
+    if (mode === SHORT) {
+      let stableTokenAmount = bigNumberify(0);
+      if (
+        fromTokenAddress !== shortCollateralAddress &&
+        fromAmount &&
+        fromAmount.gt(0)
+      ) {
+        const { amount: nextToAmount } = getNextToAmount(
+          chainId,
+          fromAmount,
+          fromTokenAddress,
+          shortCollateralAddress,
+          infoTokens,
+          undefined,
+          undefined,
+          usdgSupply,
+          totalTokenWeights
+        );
+        stableTokenAmount = nextToAmount;
+        if (stableTokenAmount.gt(shortCollateralToken.availableAmount)) {
+          return [`Insufficient liquidity, change "Profits In"`];
+        }
+
+        if (
+          shortCollateralToken.bufferAmount &&
+          shortCollateralToken.poolAmount &&
+          shortCollateralToken.bufferAmount.gt(
+            shortCollateralToken.poolAmount.sub(stableTokenAmount)
+          )
+        ) {
+          // suggest swapping to collateralToken
+          return [
+            `Insufficient liquidity, change "Profits In"`,
+            true,
+            "BUFFER"
+          ];
+        }
+
+        if (
+          fromTokenInfo.maxUsdgAmount &&
+          fromTokenInfo.maxUsdgAmount.gt(0) &&
+          fromTokenInfo.minPrice &&
+          fromTokenInfo.usdgAmount
+        ) {
+          const usdgFromAmount = adjustForDecimals(
+            fromUsdMin,
+            USD_DECIMALS,
+            USDG_DECIMALS
+          );
+          const nextUsdgAmount = fromTokenInfo.usdgAmount.add(usdgFromAmount);
+          if (nextUsdgAmount.gt(fromTokenInfo.maxUsdgAmount)) {
+            return [
+              `${fromTokenInfo.symbol} pool exceeded, try different token`,
+              true,
+              "MAX_USDG"
+            ];
+          }
+        }
+      }
+      if (
+        !shortCollateralToken ||
+        !fromTokenInfo ||
+        !toTokenInfo ||
+        !toTokenInfo.maxPrice ||
+        !shortCollateralToken.availableAmount
+      ) {
+        return ["Fetching token info..."];
+      }
+
+      const sizeUsd = toAmount
+        .mul(toTokenInfo.maxPrice)
+        .div(expandDecimals(1, toTokenInfo.decimals));
+      const sizeTokens = sizeUsd
+        .mul(expandDecimals(1, shortCollateralToken.decimals))
+        .div(shortCollateralToken.minPrice);
+
+      if (toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) && sizeUsd.gt(toTokenInfo.maxAvailableShort)) {
+        return [`Max ${toTokenInfo.symbol} short exceeded`]
+      }
+
+      stableTokenAmount = stableTokenAmount.add(sizeTokens)
+      if (stableTokenAmount.gt(shortCollateralToken.availableAmount)) {
+        return [`Insufficient liquidity, change "Profits In"`];
+      }
+    }
+
+    return [false];
+  }, [
+    chainId,
+    fromAmount,
+    fromTokenAddress,
+    fromUsdMin,
+    // hasExistingPosition,
+    infoTokens,
+    leverage,
+    shortCollateralAddress,
+    shortCollateralToken,
+    toAmount,
+    toToken,
+    toTokenAddress,
+    totalTokenWeights,
+    triggerPriceUsd,
+    triggerPriceValue,
+    usdgSupply,
+    entryMarkPrice    
+  ]);
+
+  const getSwapError = () => {
+    if (fromTokenAddress === toTokenAddress) {
+      return ["Select different tokens"];
+    }
+
+    if (type === MARKET) {
+      if (
+        (toToken.isStable || toToken.isUsdg) &&
+        (fromToken.isStable || fromToken.isUsdg)
+      ) {
+        return ["Select different tokens"];
+      }
+
+      if (fromToken.isNative && toToken.isWrapped) {
+        return ["Select different tokens"];
+      }
+
+      if (toToken.isNative && fromToken.isWrapped) {
+        return ["Select different tokens"];
+      }
+    }
+
+    if (!fromAmount || fromAmount.eq(0)) {
+      return ["Enter an amount"];
+    }
+    if (!toAmount || toAmount.eq(0)) {
+      return ["Enter an amount"];
+    }
+
+    const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
+    if (!fromTokenInfo || !fromTokenInfo.minPrice) {
+      return ["Incorrect network"];
+    }
+    if (
+      fromTokenInfo &&
+      fromTokenInfo.balance &&
+      fromAmount &&
+      fromAmount.gt(fromTokenInfo.balance)
+    ) {
+      return [`Insufficient ${fromTokenInfo.symbol} balance`];
+    }
+
+    const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
+
+    if (type !== MARKET) {
+      if (!triggerRatioValue || triggerRatio.eq(0)) {
+        return ["Enter a price"];
+      }
+
+      const currentRate = getExchangeRate(fromTokenInfo, toTokenInfo);
+      if (currentRate && currentRate.lt(triggerRatio)) {
+        return [`Price ${triggerRatioInverted ? "below" : "above"} Mark Price`];
+      }
+    }
+
+    if (
+      !isWrapOrUnwrap &&
+      toToken &&
+      toTokenAddress !== USDG_ADDRESS &&
+      toTokenInfo &&
+      toTokenInfo.availableAmount &&
+      toAmount.gt(toTokenInfo.availableAmount)
+    ) {
+      return ["Insufficient liquidity"];
+    }
+    if (
+      !isWrapOrUnwrap &&
+      toAmount &&
+      toTokenInfo.bufferAmount &&
+      toTokenInfo.poolAmount &&
+      toTokenInfo.bufferAmount.gt(toTokenInfo.poolAmount.sub(toAmount))
+    ) {
+      return ["Insufficient liquidity"];
+    }
+
+    if (
+      fromUsdMin &&
+      fromTokenInfo.maxUsdgAmount &&
+      fromTokenInfo.maxUsdgAmount.gt(0) &&
+      fromTokenInfo.usdgAmount &&
+      fromTokenInfo.maxPrice
+    ) {
+      const usdgFromAmount = adjustForDecimals(
+        fromUsdMin,
+        USD_DECIMALS,
+        USDG_DECIMALS
+      );
+      const nextUsdgAmount = fromTokenInfo.usdgAmount.add(usdgFromAmount);
+
+      if (nextUsdgAmount.gt(fromTokenInfo.maxUsdgAmount)) {
+        return [`${fromTokenInfo.symbol} pool exceeded`];
+      }
+    }
+
+    return [false];
   };
-  const markOnClick = e => {
-    // setTriggerPriceValue(marketPrice.toString());
-    setTriggerPriceValue(e.toString());
-    setPriceValue(e.toString());
+
+  const getError = () => {
+    if (mode !== SWAP) {
+      return getLeverageError();
+    }
+    return getSwapError()
   };
-  const leverageSliderOnChange = e => {
-    setLeverage(e);
+
+  const isPrimaryEnabled = () => {
+    if (!active) { return true }
+    const [error, modal] = getError()
+    if (error && !modal) { return false }
+    if (needOrderBookApproval && isWaitingForPluginApproval) { return false }
+    if ((needApproval && isWaitingForApproval) || isApproving) { return false }
+    if (isApproving) { return false }
+    if (isSubmitting) { return false }
+
+    return true;
   };
+
+  const getPrimaryText = () => {
+    if (!active) { return "Connect Wallet";}
+    const [error, modal] = getError();
+    if (error && !modal) { return error;}
+
+    if (needApproval && isWaitingForApproval) {
+      return "Waiting for Approval";
+    }
+    if (isApproving) {
+      return `Approving ${fromToken.symbol}...`;
+    }
+    if (needApproval) {
+      return `Approve ${fromToken.symbol}`;
+    }
+
+    if (needOrderBookApproval && isWaitingForPluginApproval) {
+      return "Enabling Orders...";
+    }
+    if (isPluginApproving) {
+      return "Enabling Orders...";
+    }
+    if (needOrderBookApproval) {
+      return "Enable Orders";
+    }
+
+    if (type !== MARKET)
+      return `Create ${type} Order`;
+
+    if (mode === SWAP) {
+      if (toUsdMax && toUsdMax.lt(fromUsdMin.mul(95).div(100))) {
+        return "High Slippage, Swap Anyway";
+      }
+      return "Swap";
+    }
+
+    if (mode === LONG) {
+      const indexTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
+      if (indexTokenInfo && indexTokenInfo.minPrice) {
+        const { amount: nextToAmount } = getNextToAmount(
+          chainId,
+          fromAmount,
+          fromTokenAddress,
+          indexTokenAddress,
+          infoTokens,
+          undefined,
+          undefined,
+          usdgSupply,
+          totalTokenWeights
+        );
+        const nextToAmountUsd = nextToAmount
+          .mul(indexTokenInfo.minPrice)
+          .div(expandDecimals(1, indexTokenInfo.decimals));
+        if (
+          fromTokenAddress === USDG_ADDRESS &&
+          nextToAmountUsd.lt(fromUsdMin.mul(98).div(100))
+        ) {
+          return "High USDG Slippage, Long Anyway";
+        }
+      }
+      return `Long ${toToken.symbol}`;
+    }
+
+    return `Short ${toToken.symbol}`;
+  };
+
+  function approveFromToken() {
+    approveTokens({
+      setIsApproving,
+      library,
+      tokenAddress: fromToken.address,
+      spender: routerAddress,
+      chainId,
+      onApproveSubmitted: () => {
+        setIsWaitingForApproval(true);
+      },
+      infoTokens,
+      getTokenInfo,
+      pendingTxns
+    });
+  }
+
+  const onClickPrimary = () => {
+    if (!account) {
+      connectWalletByLocalStorage()
+      return;
+    }
+
+    if (needOrderBookApproval) {
+      setOrdersToaOpen(true);
+      return;
+    }
+
+    if (needApproval) {
+      approveFromToken();
+      return;
+    }
+
+    const [, modal, errorCode] = getError();
+
+    if (modal) {
+      setModalError(errorCode);
+      return;
+    }
+
+    if (mode === SWAP) {
+      if (
+        fromTokenAddress === AddressZero &&
+        toTokenAddress === nativeTokenAddress
+      ) {
+        wrap();
+        return;
+      }
+
+      if (
+        fromTokenAddress === nativeTokenAddress &&
+        toTokenAddress === AddressZero
+      ) {
+        unwrap();
+        return;
+      }
+    }
+
+    setIsConfirming(true);
+  };
+
+  let hasZeroBorrowFee = false;
+  let borrowFeeText;
+  if (mode === LONG && toTokenInfo && toTokenInfo.fundingRate) {
+    borrowFeeText = formatAmount(toTokenInfo.fundingRate, 4, 4) + "% / 1h";
+  }
+  if (mode === SHORT && shortCollateralToken && shortCollateralToken.fundingRate) {
+    borrowFeeText =
+      formatAmount(shortCollateralToken.fundingRate, 4, 4) + "% / 1h";
+  }
+
+  let fees;
+  let feesUsd;
+  let feeBps;
+  let swapFees;
+  let positionFee;
+  if (mode === SWAP) {
+    if (fromAmount) {
+      const { feeBasisPoints } = getNextToAmount(
+        chainId,
+        fromAmount,
+        fromTokenAddress,
+        toTokenAddress,
+        infoTokens,
+        undefined,
+        undefined,
+        usdgSupply,
+        totalTokenWeights
+      );
+      if (feeBasisPoints !== undefined) {
+        fees = fromAmount.mul(feeBasisPoints).div(BASIS_POINTS_DIVISOR);
+        const feeTokenPrice =
+          fromTokenInfo.address === USDG_ADDRESS
+            ? expandDecimals(1, USD_DECIMALS)
+            : fromTokenInfo.maxPrice;
+        feesUsd = fees
+          .mul(feeTokenPrice)
+          .div(expandDecimals(1, fromTokenInfo.decimals));
+      }
+      feeBps = feeBasisPoints;
+    }
+  } else if (toUsdMax) {
+    positionFee = toUsdMax
+      .mul(MARGIN_FEE_BASIS_POINTS)
+      .div(BASIS_POINTS_DIVISOR);
+    feesUsd = positionFee;
+
+    const { feeBasisPoints } = getNextToAmount(
+      chainId,
+      fromAmount,
+      fromTokenAddress,
+      collateralTokenAddress,
+      infoTokens,
+      undefined,
+      undefined,
+      usdgSupply,
+      totalTokenWeights
+    );
+    if (feeBasisPoints) {
+      swapFees = fromUsdMin.mul(feeBasisPoints).div(BASIS_POINTS_DIVISOR);
+      feesUsd = feesUsd.add(swapFees);
+    }
+    feeBps = feeBasisPoints;
+  }
+
+  let payBalance = "$0.00"
+  let receiveBalance = "$0.00"
+  let leverageLabel = ""
+  let leverageValue = ""
+  if(fromUsdMin) {
+    payBalance = `$${formatAmount(fromUsdMin, USD_DECIMALS, 2, true, 0)}`
+  }
+  if (toUsdMax) {
+    receiveBalance = `$${formatAmount(toUsdMax, USD_DECIMALS, 2, true)}`
+  }
+  if(mode !== SWAP && isLeverageSliderEnabled) {
+    leverageLabel = "Leverage: "
+    leverageValue = `${parseFloat(leverageOption).toFixed(2)}x`
+  }
+
+  // Glp Swap Component
+  const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
+  const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([tempChainID, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(tempLibrary, ReaderV2, [tokensForBalanceAndSupplyQuery]),
+  })
+  const { data: aums, mutate: updateAums } = useSWR([tempChainID, glpManagerAddress, "getAums"], {
+    fetcher: fetcher(tempLibrary, GlpManager),
+  })
+  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([tempChainID, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(tempLibrary, RewardTracker),
+  })
+  const { data: reservedAmount, mutate: updateReservedAmount } = useSWR([tempChainID, glpVesterAddress, "pairAmounts", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(tempLibrary, Vester),
+  })
+  const { gmxPrice, mutate: updateGmxPrice } = useGmxPrice(tempChainID, { arbitrum: tempLibrary }, active)
+  const rewardTrackersForStakingInfo = [ stakedGlpTrackerAddress, feeGlpTrackerAddress ]
+  const { data: stakingInfo, mutate: updateStakingInfo } = useSWR([tempChainID, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(tempLibrary, RewardReader, [rewardTrackersForStakingInfo]),
+  })
+  const [glpValue, setGlpValue] = useState("")
+  const glpAmount = parseValue(glpValue, GLP_DECIMALS)
+
+  const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
+  const glp_usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
+  let aum
+  if (aums && aums.length > 0) {
+    aum = isBuying ? aums[0] : aums[1]
+  }
+  const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  let glpBalanceUsd
+  if (glpBalance) {
+    glpBalanceUsd = glpBalance.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
+  }
+  const glpSupplyUsd = glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
+
+  let reserveAmountUsd
+  if (reservedAmount) {
+    reserveAmountUsd = reservedAmount.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
+  }
+
+  const glp_infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
 
   return (
     <div>
-      <div>
-        <Radio.Group
-          defaultValue={LONG}
-          buttonStyle="solid"
-          className={styles.modeSelector}
-          onChange={modeSelect}
-        >
-          <StyledRadioButton value={LONG} className={styles.modeSubOption}>
-            <RiseOutlined />
-            Long
-          </StyledRadioButton>
-          <StyledRadioButton value={SHORT} className={styles.modeSubOption}>
-            <FallOutlined />
-            Short
-          </StyledRadioButton>
-          <StyledRadioButton value={SWAP} className={styles.modeSubOption}>
-            <FallOutlined />
-            Swap
-          </StyledRadioButton>
-        </Radio.Group>
-      </div>
-      <div>
-        <Tabs
-          defaultActiveKey={MARKET}
-          onChange={typeSelect}
-          size={'small'}
-          tabBarGutter={0}
-          type={'line'}
-          tabPosition={'top'}
-          tabBarStyle={{ border: '0px black' }}
-          // animated={false}
-        >
-          {perpetualType.map(i => (
-            <TabPane
-              tab={
-                <span>
-                  {i.icon}
-                  {i.name}{' '}
-                </span>
-              }
-              key={i.id}
-            />
-          ))}
-        </Tabs>
-      </div>
-      <AcyCuarrencyCard
-        icon="eth"
-        title={token0BalanceShow && `Balance: ${parseFloat(token0Balance).toFixed(3)}`}
-        // coin={(token0 && token0.symbol) || 'Select'}
-        coin={(fromTokenInfo && fromTokenInfo.symbol) || 'Select'}
-        logoURI={token0 && token0.logoURI}
-        yuan="566.228"
-        dollar={`${token0Balance}`}
-        // token={token0Amount}
-        token={fromValue}
-        bonus={!exactIn && bonus0}
-        showBalance={token1BalanceShow}
-        onChoseToken={() => {
-          onClickCoin();
-          setBefore(true);
-        }}
-        onChangeToken={e => {
-          // setToken0Amount(e);
-          setFromValue(e);
-          setExactIn(true);
-          t0Changed(e);
-        }}
-        library={library}
-      />
+      <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}>
+        <div className={styles.modeSelector}>
+          <Radio.Group defaultValue={LONG} buttonStyle="solid" onChange={modeSelect}>
+            <StyledRadioButton value={LONG} className={styles.modeSubOption}>
+              Long
+            </StyledRadioButton>
+            <StyledRadioButton value={SHORT} className={styles.modeSubOption}>
+              Short
+            </StyledRadioButton>
+            <StyledRadioButton value={SWAP} className={styles.modeSubOption}>
+              Swap
+            </StyledRadioButton>
+            <StyledRadioButton value={POOL} className={styles.modeSubOption}>
+              Pool
+            </StyledRadioButton>
+          </Radio.Group>
 
-      <div
-        className={styles.arrow}
-        disabled={isLockedToken1}
-        onClick={() => {
-          if (!isLockedToken1) {
-            onSwitchCoinCard();
-          }
-        }}
-      >
-        <Icon style={{ fontSize: '16px' }} type="arrow-down" />
-      </div>
-
-      <AcyCuarrencyCard
-        icon="eth"
-        title={token1BalanceShow && `Balance: ${parseFloat(token1Balance).toFixed(3)}`}
-        coin={(token1 && token1.symbol) || 'Select'}
-        // coin={(toTokenInfo && toTokenInfo.symbol) || 'Select'}
-        logoURI={token1 && token1.logoURI}
-        yuan="566.228"
-        dollar={`${token1Balance}`}
-        // token={token1Amount}
-        token={toValue}
-        bonus={exactIn && bonus1}
-        showBalance={token1BalanceShow}
-        onChoseToken={() => {
-          onClickCoin();
-          setBefore(false);
-        }}
-        onChangeToken={e => {
-          // setToken1ApproxAmount(e);
-          //setToken1Amount(e);
-          setToValue(e);
-          setExactIn(false);
-          t1Changed(e);
-        }}
-        isLocked={isLockedToken1}
-        library={library}
-      />
-
-      {type === LIMIT && (
-        <div className={styles.priceBox}>
-          <PriceBox
-            onChange={limitOnChange}
-            markOnClick={markOnClick}
-            priceValue={priceValue}
-            toTokenInfo={toTokenInfo}
-            mode={mode}
-          />
+          {/* <Tabs onChange={modeSelect} type="card">
+            <TabPane tab="Long" key='Long' />
+            <TabPane tab="Short" key='Short' />
+            <TabPane tab="Swap" key='Swap' />
+          </Tabs>  */}
         </div>
-      )}
-      {mode !== SWAP && (
-        <div>
-          <AcyDescriptions>
-            <div className={styles.breakdownTopContainer}>
-              <div className={styles.slippageContainer}>
-                <span style={{ fontWeight: 600 }}>Leverage ymj</span>
-                <span className={styles.leverageSlider}>
-                  <StyledSlider
-                    marks={leverageSlider}
-                    defaultValue={leverage}
-                    max={30.51}
-                    min={1.1}
-                    onChange={leverageSliderOnChange}
-                    step={0.1}
-                    style={{ color: 'red' }}
+
+        {mode !== POOL ?
+          <>
+            <div>
+              <Tabs 
+                defaultActiveKey={MARKET} 
+                onChange={typeSelect}
+                size={'small'}
+                tabBarGutter={0}
+                type={'line'}
+                tabPosition={'top'}
+                tabBarStyle={{ border: '0px black' }}
+              // animated={false}
+              >
+                {perpetualType.map(i => (
+                  <TabPane tab={<span>{i.name}{' '}</span>} key={i.id} />
+                ))}
+              </Tabs>
+            </div>
+
+            <BuyInputSection
+              token={fromToken}
+              tokenlist={tokens}
+              topLeftLabel="Pay"
+              balance={payBalance} 
+              topRightLabel='Balance: '
+              tokenBalance={formatAmount(fromBalance, fromToken.decimals, 4, true)}
+              inputValue={fromValue}
+              onInputValueChange={onFromValueChange}
+              onSelectToken={selectFromToken}
+            />
+
+            <div className={styles.arrow} onClick={switchTokens}>
+              <Icon style={{ fontSize: '16px' }} type="arrow-down" />
+            </div>
+
+            <BuyInputSection
+              token={toToken}
+              tokenlist={toTokens}
+              topLeftLabel={getTokenLabel()}
+              balance={receiveBalance} 
+              topRightLabel={leverageLabel}
+              tokenBalance={leverageValue}
+              inputValue={toValue}
+              onInputValueChange={onToValueChange}
+              onSelectToken={selectToToken}
+            />
+          
+            {type === LIMIT &&
+              <div className={styles.priceBox}>
+                <PriceBox
+                  priceValue={triggerPriceValue}
+                  onChange={onTriggerPriceChange}
+                  markOnClick={() => {
+                    setTriggerPriceValue(
+                      formatAmountFree(entryMarkPrice, USD_DECIMALS, 2)
+                    );
+                  }}
+                  mark={formatAmount(entryMarkPrice, USD_DECIMALS, 2, true)}
+                />
+              </div>
+            }
+
+            {/* Leverage Slider */}
+            {(mode === LONG || mode === SHORT) &&
+              <AcyDescriptions>
+                <div className={styles.breakdownTopContainer}>
+                  <div className={styles.slippageContainer}>
+                    <span style={{ fontWeight: 600 }}>Leverage</span>
+                    {isLeverageSliderEnabled &&
+                      <div className={styles.leverageInputContainer}>
+                        <button 
+                          className={styles.leverageButton}
+                          onClick={()=>{
+                            if(leverageOption > 1.1) {
+                              setLeverageOption((parseFloat(leverageOption)-0.1).toFixed(1))
+                            }
+                          }}
+                        >
+                          <span> - </span>
+                        </button>
+                        <input
+                          type="number"
+                          min={1.1}
+                          max={30.5}
+                          value={leverageOption} 
+                          onChange={e => {
+                            let val = parseFloat(e.target.value.replace(/^(-)*(\d+)\.(\d).*$/, '$1$2.$3')).toFixed(1)
+                            if(val >= 1.1 && val <= 30.5){
+                              setLeverageOption(val)
+                            }
+                          }} 
+                          className={styles.leverageInput}
+                        />
+                        <button 
+                          className={styles.leverageButton}
+                          onClick={()=>{
+                            if(leverageOption < 30.5) {
+                              setLeverageOption((parseFloat(leverageOption)+0.1).toFixed(1))
+                            }
+                          }}
+                        >
+                          <span> + </span>
+                        </button>
+                      </div>
+                    }
+                    <Checkbox
+                      checked={isLeverageSliderEnabled}
+                      onChange={()=>{
+                        setIsLeverageSliderEnabled(!isLeverageSliderEnabled)
+                      }}
+                    />
+                  </div>
+                  {isLeverageSliderEnabled &&
+                    <span className={styles.leverageSlider}>
+                      <StyledSlider 
+                        min={1.1} 
+                        max={30.5} 
+                        step={0.1}
+                        marks={leverageMarks} 
+                        value={leverageOption} 
+                        onChange={value => setLeverageOption(value)} 
+                        defaultValue={leverageOption} 
+                        style={{ color: 'red' }} 
+                      />
+                    </span>}
+                </div>
+              </AcyDescriptions>
+            }
+
+            <div>
+              <AcyButton 
+                style={{ marginTop: '25px' }}
+                onClick={onClickPrimary} 
+                disabled={!isPrimaryEnabled()}
+              >
+                {getPrimaryText()}
+              </AcyButton>
+            </div>
+          </> :
+          <>
+            <GlpSwapBox isBuying={isBuying} setIsBuying={setIsBuying} />
+          </>
+        }
+
+      </AcyCard>
+      
+      {/* Long/Short Detail card  */}
+      {(mode === LONG || mode === SHORT) &&
+        <>
+          <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}>
+          
+            {/* Profits In */}
+            {mode === LONG && (
+              <div className={styles.detailCard}>
+                <div className={styles.label}>Profits In</div>
+                <div className={styles.value}>{toToken.symbol}</div>
+              </div>
+            )}
+            {mode === SHORT && (
+              <div className={styles.detailCard}>
+                <div className={styles.label}>Profits In</div>
+                <div className={styles.TooltipHandle}>
+                  <span onClick={()=>{setVisible(true)}}>{shortCollateralToken.symbol}</span>
+                  <TokenSelectorModal
+                    onCancel={() => {
+                      setVisible(false)
+                    }} 
+                    width={400} 
+                    visible={visible} 
+                    onCoinClick={token => {
+                      setVisible(false)
+                      setShortCollateralAddress(token.address)
+                    }}
+                    tokenlist={stableTokens}
                   />
-                </span>
+                </div>
+              </div>
+            )}
+
+            {/* Leverage */}
+            <div className={styles.detailCard}>
+              <div className={styles.label}>Leverage</div>
+              <div className={styles.value}>
+                {hasExistingPosition && 
+                  toAmount && 
+                  toAmount.gt(0) && 
+                  `${formatAmount(existingPosition.leverage, 4, 2)}x →` 
+                }
+                {toAmount &&
+                  leverage &&
+                  leverage.gt(0) &&
+                  `${formatAmount(leverage, 4, 2)}x`}
+                {!toAmount && leverage && leverage.gt(0) && `-`}
+                {leverage && leverage.eq(0) && `-`}
               </div>
             </div>
-          </AcyDescriptions>
-          <DetailBox
-            leverage={leverage}
-            shortOrLong={mode}
-            marketOrLimit={type}
-            profitsIn={profitsIn}
-            entryPriceLimit={entryPriceLimit}
-            liqPrice={liqPrice}
-            entryPriceMarket={entryPriceMarket}
-            exitPrice={exitPrice}
-            borrowFee={borrowFee}
-            token1Symbol={token1.symbol}
-            fromUsdMin={fromUsdMin}
-            toUsdMax={toUsdMax}
-            toTokenInfo={toTokenInfo}
-            triggerPriceValue={triggerPriceValue}
-          />
-        </div>
-      )}
-      {mode === SWAP && (
+
+            {/* Entry Price */}
+            <div className={styles.detailCard}>
+              <div className={styles.label}>Entry Price</div>
+              <div className={styles.value}>
+                {hasExistingPosition && 
+                toAmount && 
+                toAmount.gt(0) &&
+                `$${formatAmount(existingPosition.averagePrice, USD_DECIMALS, 2, true)} →`
+                }
+                {nextAveragePrice &&
+                  `$${formatAmount(nextAveragePrice, USD_DECIMALS, 2, true)}`}
+                {!nextAveragePrice && `-`}
+              </div>
+            </div>
+
+            {/* Liq. Price */}
+            <div className={styles.detailCard}>
+              <div className={styles.label}>Liq. Price</div>
+              <div className={styles.value}>
+                {hasExistingPosition && 
+                toAmount && 
+                toAmount.gt(0) && 
+                `$${formatAmount(existingLiquidationPrice, USD_DECIMALS, 2, true)} →`
+                }
+                {toAmount && displayLiquidationPrice &&
+                `$${formatAmount(displayLiquidationPrice, USD_DECIMALS, 2, true)}`
+                }
+                {!toAmount && displayLiquidationPrice && `-`}
+                {!displayLiquidationPrice && `-`}
+              </div>
+            </div>
+
+            {/* Fees */}
+            <div className={styles.detailCard}>
+              <div className={styles.label}>Fees</div>
+              <div className={styles.value}>
+                {!feesUsd && "-"}
+                { feesUsd &&
+                  <Tooltip 
+                    placement='bottomLeft' 
+                    color='#b5b5b6' 
+                    mouseEnterDelay={0.5}
+                    title={() => {
+                      return (
+                        <>
+                          {swapFees && (
+                            <div>
+                              {collateralToken.symbol} is required for
+                              collateral. 
+                              <br /><br />
+                              Swap {fromToken.symbol} to{" "}
+                              {collateralToken.symbol} Fee: $
+                              {formatAmount(swapFees, USD_DECIMALS, 2, true)}
+                              <br /><br />
+                            </div>
+                          )}
+                          <div>
+                            Position Fee (0.08% of position size): $
+                            {formatAmount(positionFee, USD_DECIMALS, 2, true)}
+                          </div>
+                        </>
+                      )
+                    }}
+                  >
+                    <div className={styles.TooltipHandle}>
+                      ${formatAmount(feesUsd, USD_DECIMALS, 2, true)}
+                    </div>
+                  </Tooltip>
+                }
+              </div>
+            </div>
+           
+            <div className={styles.cardDivider} />
+            <div className={styles.detailCard}>
+              <div className={styles.label}>{mode}&nbsp;{toToken.symbol}</div>
+            </div>
+            
+            {/* Entry Price */}
+            <div className={styles.detailCard}>
+              <div className={styles.label}>Entry Price</div>
+              <Tooltip 
+                placement='bottomLeft' 
+                color='#b5b5b6' 
+                mouseEnterDelay={0.5}
+                title={() => {
+                  return (
+                    <>
+                      The position will be opened at{" "}
+                      {formatAmount(entryMarkPrice, USD_DECIMALS, 2, true)} USD
+                      with a max slippage of{" "}
+                      {parseFloat(savedSlippageAmount / 100.0).toFixed(2)}%.
+                      <br /><br />
+                      The slippage amount can be configured under Settings,
+                      found by clicking on your address at the top right of the
+                      page after connecting your wallet.
+                      <br /><br />
+                      <a href="https://gmxio.gitbook.io/gmx/trading#opening-a-position" target="_blank" rel="noopener noreferrer">
+                        More Info
+                      </a>
+                    </>
+                  )
+                }}
+              >
+                <div className={styles.TooltipHandle}>
+                  {`${formatAmount(entryMarkPrice, USD_DECIMALS, 2,true)} USD`}
+                </div>
+              </Tooltip>
+            </div>
+
+            {/* Exit Price */}
+            <div className={styles.detailCard}>
+              <div className={styles.label}>Exit Price</div>
+              <Tooltip 
+                placement='bottomLeft' 
+                color='#b5b5b6' 
+                mouseEnterDelay={0.5}
+                title={() => {
+                  return (
+                    <>
+                      If you have an existing position, the position will be
+                      closed at{" "}
+                      {formatAmount(entryMarkPrice, USD_DECIMALS, 2, true)} USD.
+                      <br /><br />
+                      This exit price will change with the price of the asset.
+                      <br /><br />
+                      <a href="https://gmxio.gitbook.io/gmx/trading#opening-a-position" target="_blank" rel="noopener noreferrer">
+                        More Info
+                      </a>
+                    </>
+                  )
+                }}
+              >
+                <div className={styles.TooltipHandle}>
+                  {`${formatAmount(exitMarkPrice, USD_DECIMALS, 2, true)} USD`}
+                </div>
+              </Tooltip>
+            </div>
+
+            {/* Borrow Fee */}
+            <div className={styles.detailCard}>
+              <div className={styles.label}>Borrow Fee</div>
+              <Tooltip 
+                placement='bottomLeft' 
+                color='#b5b5b6' 
+                mouseEnterDelay={0.5}
+                title={() => {
+                  return (
+                    <>
+                      {hasZeroBorrowFee && (
+                        <div>
+                          {mode === LONG &&
+                            "There are more shorts than longs, borrow fees for longing is currently zero"}
+                          {mode === SHORT &&
+                            "There are more longs than shorts, borrow fees for shorting is currently zero"}
+                        </div>
+                      )}
+                      {!hasZeroBorrowFee && (
+                        <div>
+                          The borrow fee is calculated as (assets borrowed) /
+                          (total assets in pool) * 0.01% per hour.
+                          <br /><br />
+                          {mode === SHORT &&
+                            `You can change the "Profits In" token above to find lower fees`}
+                        </div>
+                      )}
+                      <br />
+                      <a href="https://gmxio.gitbook.io/gmx/trading#opening-a-position" target="_blank" rel="noopener noreferrer">
+                        More Info
+                      </a>
+                    </>
+                  )
+                }}
+              >
+                <div className={styles.TooltipHandle}>
+                  {borrowFeeText}
+                </div>
+              </Tooltip>
+            </div>
+
+            {/* Available Liquidity */}
+            {mode === SHORT && toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) && 
+            <div className={styles.detailCard}>
+              <div className={styles.label}>Available Liquidity</div>
+              <Tooltip 
+                placement='bottomLeft' 
+                color='#b5b5b6' 
+                mouseEnterDelay={0.5}
+                title={() => {
+                  return (
+                    <>
+                      Max {toTokenInfo.symbol} short capacity: ${formatAmount(toTokenInfo.maxGlobalShortSize, USD_DECIMALS, 2, true)}
+                      <br /><br />
+                      Current {toTokenInfo.symbol} shorts: ${formatAmount(toTokenInfo.globalShortSize, USD_DECIMALS, 2, true)}
+                      <br />
+                    </>
+                  )
+                }}
+              >
+                <div className={styles.TooltipHandle}>
+                  {formatAmount(toTokenInfo.maxAvailableShort, USD_DECIMALS, 2, true)}
+                </div>
+              </Tooltip>
+            </div>
+            }
+
+          </AcyCard>
+        </>
+      }
+
+      {mode === SWAP &&
         <DetailBox
           leverage={leverage}
           shortOrLong={mode}
@@ -1194,68 +2253,31 @@ const SwapComponent = props => {
           entryPriceMarket={entryPriceMarket}
           exitPrice={exitPrice}
           borrowFee={borrowFee}
-          token1Symbol={token1.symbol}
+          token1Symbol={toToken.symbol}
           fromUsdMin={fromUsdMin}
           toUsdMax={toUsdMax}
           toTokenInfo={toTokenInfo}
           triggerPriceValue={triggerPriceValue}
         />
-      )}
-      {needApprove ? (
-        <div>
-          <AcyButton
-            style={{ marginTop: '25px' }}
-            disabled={!approveButtonStatus}
-            onClick={async () => {
-              setShowSpinner(true);
-              setApproveButtonStatus(false);
-              const state = await approve(token0.address, approveAmount, library, account);
-              setApproveButtonStatus(true);
-              setShowSpinner(false);
+      }
 
-              if (state) {
-                setSwapButtonState(true);
-                setSwapButtonContent('Swap');
-                setApproveButtonStatus(false);
-                setNeedApprove(false);
-                console.log('test needApprove false');
-              }
-            }}
-          >
-            Approve {showSpinner && <Icon type="loading" />}
-          </AcyButton>{' '}
-        </div>
-      ) : (
-        <AcyButton
-          style={{ marginTop: '25px' }}
-          disabled={!swapButtonState}
-          onClick={() => {
-            if (account == undefined) {
-              // connectWalletByLocalStorage();
-            } else {
-              //hj TODO
-              // if ( currentTab == "swap" ) {
-              //     setSwapButtonState( false )
-              //     handleSwap();
-              // }
-              console.log('ready for function ymj');
-            }
-          }}
-        >
-          {swapButtonContent}
-        </AcyButton>
-      )}
-
-      <AcyDescriptions>
-        {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
-      </AcyDescriptions>
-
-      <TokenSelectorModal
-        onCancel={onCancel}
-        width={400}
-        visible={visible}
-        onCoinClick={onCoinClick}
-      />
+      {mode === POOL &&
+        <GlpSwapDetailBox 
+          isBuying={isBuying}
+          setIsBuying={setIsBuying}
+          tokens={tokens}
+          infoTokens={glp_infoTokens}
+          glpPrice={glpPrice}
+          glpBalance={glpBalance}
+          glpBalanceUsd={glpBalanceUsd}
+          reservedAmount={reservedAmount}
+          reserveAmountUsd={reserveAmountUsd}
+          stakingInfo={stakingInfo}
+          glpSupply={glpSupply}
+          glpSupplyUsd={glpSupplyUsd}
+          gmxPrice={gmxPrice}
+        />
+      }
     </div>
   );
 };

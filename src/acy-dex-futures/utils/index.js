@@ -1,6 +1,13 @@
+/* eslint-disable consistent-return */
 import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
-import { useRef, useEffect } from "react";
+import _ from "lodash";
+import Token from "@/acy-dex-futures/abis/Token.json";
+import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
+import { InjectedConnector, UserRejectedRequestError as UserRejectedRequestErrorInjected} from "@web3-react/injected-connector";
+import { useRef, useEffect, useCallback } from "react";
+import { useLocalStorage } from "react-use";
+import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
 export const MARKET = 'Market';
 export const LIMIT = 'Limit';
 export const LONG = 'Long';
@@ -17,6 +24,505 @@ export const ORDERS = 'Orders';
 const USDG_ADDRESS = '0x45096e7aA921f27590f8F19e457794EB09678141';
 
 const { AddressZero } = ethers.constants
+
+
+export const GLP_COOLDOWN_DURATION = 15 * 60
+export const SECONDS_PER_YEAR = 31536000
+export const GLP_DECIMALS = 18
+export const USDG_DECIMALS = 18
+export const PLACEHOLDER_ACCOUNT = ethers.Wallet.createRandom().address
+export const ARBITRUM = 42161
+export const PRECISION = expandDecimals(1, 30)
+export const TAX_BASIS_POINTS = 50
+export const MINT_BURN_FEE_BASIS_POINTS = 20
+export const DEFAULT_MAX_USDG_AMOUNT = expandDecimals(200 * 1000 * 1000, 18)
+export const ARBITRUM_DEFAULT_COLLATERAL_SYMBOL = 'USDC'
+export const ARBITRUM_DEFAULT_COLLATERAL_ADDRESS = '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'
+export const SLIPPAGE_BPS_KEY = "Exchange-swap-slippage-basis-points-v3";
+export const DEFAULT_SLIPPAGE_AMOUNT = 20;
+export const SWAP_FEE_BASIS_POINTS = 20;
+export const STABLE_SWAP_FEE_BASIS_POINTS = 1;
+export const STABLE_TAX_BASIS_POINTS = 5;
+export const THRESHOLD_REDEMPTION_VALUE = expandDecimals(993, 27); // 0.993
+export const MIN_PROFIT_TIME = 3 * 60 * 60; // 3 hours
+export const PROFIT_THRESHOLD_BASIS_POINTS = 120;
+
+const supportedChainIds = [ARBITRUM];
+const injectedConnector = new InjectedConnector({
+  supportedChainIds
+});
+
+export function calculatePositionDelta(
+  price,
+  { size, collateral, isLong, averagePrice, lastIncreasedTime },
+  sizeDelta
+) {
+  if (!sizeDelta) {
+    sizeDelta = size;
+  }
+  const priceDelta = averagePrice.gt(price)
+    ? averagePrice.sub(price)
+    : price.sub(averagePrice);
+  let delta = sizeDelta.mul(priceDelta).div(averagePrice);
+  const pendingDelta = delta;
+
+  const minProfitExpired =
+    lastIncreasedTime + MIN_PROFIT_TIME < Date.now() / 1000;
+  const hasProfit = isLong ? price.gt(averagePrice) : price.lt(averagePrice);
+  if (
+    !minProfitExpired &&
+    hasProfit &&
+    delta.mul(BASIS_POINTS_DIVISOR).lte(size.mul(PROFIT_THRESHOLD_BASIS_POINTS))
+  ) {
+    delta = bigNumberify(0);
+  }
+
+  const deltaPercentage = delta.mul(BASIS_POINTS_DIVISOR).div(collateral);
+  const pendingDeltaPercentage = pendingDelta
+    .mul(BASIS_POINTS_DIVISOR)
+    .div(collateral);
+
+  return {
+    delta,
+    pendingDelta,
+    pendingDeltaPercentage,
+    hasProfit,
+    deltaPercentage
+  };
+}
+
+export function useLocalStorageSerializeKey(key, value, opts) {
+  key = JSON.stringify(key);
+  return useLocalStorage(key, value, opts);
+}
+
+export function getSavedSlippageAmount(chainId) {
+  const [ savedSlippageAmount ] =
+    useLocalStorageSerializeKey([chainId, SLIPPAGE_BPS_KEY], DEFAULT_SLIPPAGE_AMOUNT);
+    return savedSlippageAmount
+}
+
+export function useLocalStorageByChainId(chainId, key, defaultValue) {
+  const [internalValue, setInternalValue] = useLocalStorage(key, {});
+
+  const setValue = useCallback(
+    value => {
+      setInternalValue(internalValue => {
+        if (typeof value === "function") {
+          value = value(internalValue[chainId] || defaultValue);
+        }
+        const newInternalValue = {
+          ...internalValue,
+          [chainId]: value
+        };
+        return newInternalValue;
+      });
+    },
+    [chainId, setInternalValue, defaultValue]
+  );
+
+  let value;
+  if (chainId in internalValue) {
+    value = internalValue[chainId];
+  } else {
+    value = defaultValue;
+  }
+
+  return [value, setValue];
+}
+
+export function getExchangeRate(tokenAInfo, tokenBInfo, inverted) {
+    if (
+      !tokenAInfo ||
+      !tokenAInfo.minPrice ||
+      !tokenBInfo ||
+      !tokenBInfo.maxPrice
+    ) {
+      return;
+    }
+    if (inverted) {
+      return tokenAInfo.minPrice.mul(PRECISION).div(tokenBInfo.maxPrice);
+    }
+    return tokenBInfo.maxPrice.mul(PRECISION).div(tokenAInfo.minPrice);
+  }
+
+export function adjustForDecimals(amount, divDecimals, mulDecimals) {
+  return amount
+    .mul(expandDecimals(1, mulDecimals))
+    .div(expandDecimals(1, divDecimals));
+}
+
+export const formatKeyAmount = (
+  map,
+  key,
+  tokenDecimals,
+  displayDecimals,
+  useCommas
+) => {
+  if (!map || !map[key]) {
+    return "...";
+  }
+
+  return formatAmount(map[key], tokenDecimals, displayDecimals, useCommas);
+};
+
+export function approveTokens({
+  setIsApproving,
+  library,
+  tokenAddress,
+  spender,
+  chainId,
+  onApproveSubmitted,
+  getTokenInfo,
+  infoTokens,
+  pendingTxns,
+  setPendingTxns,
+  includeMessage
+}) {
+  setIsApproving(true);
+  const contract = new ethers.Contract(
+    tokenAddress,
+    Token.abi,
+    library.getSigner()
+  );
+  contract
+    .approve(spender, ethers.constants.MaxUint256)
+    .then(async res => {
+      // const txUrl = getExplorerUrl(chainId) + "tx/" + res.hash;
+      // helperToast.success(
+      //   <div>
+      //     Approval submitted!{" "}
+      //     <a href={txUrl} target="_blank" rel="noopener noreferrer">
+      //       View status.
+      //     </a>
+      //     <br />
+      //   </div>
+      // );
+      if (onApproveSubmitted) {
+        onApproveSubmitted();
+      }
+      if (getTokenInfo && infoTokens && pendingTxns && setPendingTxns) {
+        const token = getTokenInfo(infoTokens, tokenAddress);
+        const pendingTxn = {
+          hash: res.hash,
+          message: includeMessage ? `${token.symbol} Approved!` : false
+        };
+        setPendingTxns([...pendingTxns, pendingTxn]);
+      }
+    })
+    .catch(e => {
+      console.error(e);
+      // let failMsg;
+      // if (
+      //   [
+      //     "not enough funds for gas",
+      //     "failed to execute call with revert code InsufficientGasFunds"
+      //   ].includes(e.data?.message)
+      // ) {
+      //   failMsg = (
+      //     <div>
+      //       There is not enough ETH in your account on Arbitrum to send this
+      //       transaction.
+      //       <br />
+      //       <br />
+      //       <a
+      //         href={"https://arbitrum.io/bridge-tutorial/"}
+      //         target="_blank"
+      //         rel="noopener noreferrer"
+      //       >
+      //         Bridge ETH to Arbitrum
+      //       </a>
+      //     </div>
+      //   );
+      // } else if (e.message?.includes("User denied transaction signature")) {
+      //   failMsg = "Approval was cancelled.";
+      // } else {
+      //   failMsg = "Approval failed.";
+      // }
+      // helperToast.error(failMsg);
+    })
+    .finally(() => {
+      setIsApproving(false);
+    });
+}
+
+export function getTargetUsdgAmount(token, usdgSupply, totalTokenWeights) {
+  if (!token || !token.weight || !usdgSupply) {
+    return;
+  }
+
+  if (usdgSupply.eq(0)) {
+    return bigNumberify(0);
+  }
+
+  return token.weight.mul(usdgSupply).div(totalTokenWeights);
+}
+
+export function getFeeBasisPoints(
+  token,
+  usdgDelta,
+  feeBasisPoints,
+  taxBasisPoints,
+  increment,
+  usdgSupply,
+  totalTokenWeights
+) {
+  if (!token || !token.usdgAmount || !usdgSupply || !totalTokenWeights) {
+    return 0;
+  }
+
+  feeBasisPoints = bigNumberify(feeBasisPoints);
+  taxBasisPoints = bigNumberify(taxBasisPoints);
+
+  const initialAmount = token.usdgAmount;
+  let nextAmount = initialAmount.add(usdgDelta);
+  if (!increment) {
+    nextAmount = usdgDelta.gt(initialAmount)
+      ? bigNumberify(0)
+      : initialAmount.sub(usdgDelta);
+  }
+
+  const targetAmount = getTargetUsdgAmount(
+    token,
+    usdgSupply,
+    totalTokenWeights
+  );
+  if (!targetAmount || targetAmount.eq(0)) {
+    return feeBasisPoints.toNumber();
+  }
+
+  const initialDiff = initialAmount.gt(targetAmount)
+    ? initialAmount.sub(targetAmount)
+    : targetAmount.sub(initialAmount);
+  const nextDiff = nextAmount.gt(targetAmount)
+    ? nextAmount.sub(targetAmount)
+    : targetAmount.sub(nextAmount);
+
+  if (nextDiff.lt(initialDiff)) {
+    const rebateBps = taxBasisPoints.mul(initialDiff).div(targetAmount);
+    return rebateBps.gt(feeBasisPoints)
+      ? 0
+      : feeBasisPoints.sub(rebateBps).toNumber();
+  }
+
+  let averageDiff = initialDiff.add(nextDiff).div(2);
+  if (averageDiff.gt(targetAmount)) {
+    averageDiff = targetAmount;
+  }
+  const taxBps = taxBasisPoints.mul(averageDiff).div(targetAmount);
+  return feeBasisPoints.add(taxBps).toNumber();
+}
+
+export function getBuyGlpToAmount(
+  fromAmount,
+  swapTokenAddress,
+  infoTokens,
+  glpPrice,
+  usdgSupply,
+  totalTokenWeights
+) {
+  const defaultValue = { amount: bigNumberify(0), feeBasisPoints: 0 };
+  if (
+    !fromAmount ||
+    !swapTokenAddress ||
+    !infoTokens ||
+    !glpPrice ||
+    !usdgSupply ||
+    !totalTokenWeights
+  ) {
+    return defaultValue;
+  }
+
+  const swapToken = getTokenInfo(infoTokens, swapTokenAddress);
+  if (!swapToken || !swapToken.minPrice) {
+    return defaultValue;
+  }
+
+  let glpAmount = fromAmount.mul(swapToken.minPrice).div(glpPrice);
+  glpAmount = adjustForDecimals(glpAmount, swapToken.decimals, USDG_DECIMALS);
+
+  let usdgAmount = fromAmount.mul(swapToken.minPrice).div(PRECISION);
+  usdgAmount = adjustForDecimals(usdgAmount, swapToken.decimals, USDG_DECIMALS);
+  const feeBasisPoints = getFeeBasisPoints(
+    swapToken,
+    usdgAmount,
+    MINT_BURN_FEE_BASIS_POINTS,
+    TAX_BASIS_POINTS,
+    true,
+    usdgSupply,
+    totalTokenWeights
+  );
+
+  glpAmount = glpAmount
+    .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+    .div(BASIS_POINTS_DIVISOR);
+
+  return { amount: glpAmount, feeBasisPoints };
+}
+
+export function getSellGlpFromAmount(
+  toAmount,
+  swapTokenAddress,
+  infoTokens,
+  glpPrice,
+  usdgSupply,
+  totalTokenWeights
+) {
+  const defaultValue = { amount: bigNumberify(0), feeBasisPoints: 0 };
+  if (
+    !toAmount ||
+    !swapTokenAddress ||
+    !infoTokens ||
+    !glpPrice ||
+    !usdgSupply ||
+    !totalTokenWeights
+  ) {
+    return defaultValue;
+  }
+
+  const swapToken = getTokenInfo(infoTokens, swapTokenAddress);
+  if (!swapToken || !swapToken.maxPrice) {
+    return defaultValue;
+  }
+
+  let glpAmount = toAmount.mul(swapToken.maxPrice).div(glpPrice);
+  glpAmount = adjustForDecimals(glpAmount, swapToken.decimals, USDG_DECIMALS);
+
+  let usdgAmount = toAmount.mul(swapToken.maxPrice).div(PRECISION);
+  usdgAmount = adjustForDecimals(usdgAmount, swapToken.decimals, USDG_DECIMALS);
+  const feeBasisPoints = getFeeBasisPoints(
+    swapToken,
+    usdgAmount,
+    MINT_BURN_FEE_BASIS_POINTS,
+    TAX_BASIS_POINTS,
+    false,
+    usdgSupply,
+    totalTokenWeights
+  );
+
+  glpAmount = glpAmount
+    .mul(BASIS_POINTS_DIVISOR)
+    .div(BASIS_POINTS_DIVISOR - feeBasisPoints);
+
+  return { amount: glpAmount, feeBasisPoints };
+}
+
+export function getBuyGlpFromAmount(
+  toAmount,
+  fromTokenAddress,
+  infoTokens,
+  glpPrice,
+  usdgSupply,
+  totalTokenWeights
+) {
+  const defaultValue = { amount: bigNumberify(0) };
+  if (
+    !toAmount ||
+    !fromTokenAddress ||
+    !infoTokens ||
+    !glpPrice ||
+    !usdgSupply ||
+    !totalTokenWeights
+  ) {
+    return defaultValue;
+  }
+
+  const fromToken = getTokenInfo(infoTokens, fromTokenAddress);
+  if (!fromToken || !fromToken.minPrice) {
+    return defaultValue;
+  }
+
+  let fromAmount = toAmount.mul(glpPrice).div(fromToken.minPrice);
+  fromAmount = adjustForDecimals(fromAmount, GLP_DECIMALS, fromToken.decimals);
+
+  const usdgAmount = toAmount.mul(glpPrice).div(PRECISION);
+  const feeBasisPoints = getFeeBasisPoints(
+    fromToken,
+    usdgAmount,
+    MINT_BURN_FEE_BASIS_POINTS,
+    TAX_BASIS_POINTS,
+    true,
+    usdgSupply,
+    totalTokenWeights
+  );
+
+  fromAmount = fromAmount
+    .mul(BASIS_POINTS_DIVISOR)
+    .div(BASIS_POINTS_DIVISOR - feeBasisPoints);
+
+  return { amount: fromAmount, feeBasisPoints };
+}
+
+export function getSellGlpToAmount(
+  toAmount,
+  fromTokenAddress,
+  infoTokens,
+  glpPrice,
+  usdgSupply,
+  totalTokenWeights
+) {
+  const defaultValue = { amount: bigNumberify(0) };
+  if (
+    !toAmount ||
+    !fromTokenAddress ||
+    !infoTokens ||
+    !glpPrice ||
+    !usdgSupply ||
+    !totalTokenWeights
+  ) {
+    return defaultValue;
+  }
+
+  const fromToken = getTokenInfo(infoTokens, fromTokenAddress);
+  if (!fromToken || !fromToken.maxPrice) {
+    return defaultValue;
+  }
+
+  let fromAmount = toAmount.mul(glpPrice).div(fromToken.maxPrice);
+  fromAmount = adjustForDecimals(fromAmount, GLP_DECIMALS, fromToken.decimals);
+
+  const usdgAmount = toAmount.mul(glpPrice).div(PRECISION);
+  const feeBasisPoints = getFeeBasisPoints(
+    fromToken,
+    usdgAmount,
+    MINT_BURN_FEE_BASIS_POINTS,
+    TAX_BASIS_POINTS,
+    false,
+    usdgSupply,
+    totalTokenWeights
+  );
+
+  fromAmount = fromAmount
+    .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+    .div(BASIS_POINTS_DIVISOR);
+
+  return { amount: fromAmount, feeBasisPoints };
+}
+
+export function getInjectedConnector() {
+  return injectedConnector;
+}
+
+export const getInjectedHandler = activate => {
+  const fn = async () => {
+    activate(getInjectedConnector(), e => {
+      const chainId =
+        localStorage.getItem("SELECTED_NETWORK") || ARBITRUM;
+
+      if (e.message.includes("No Ethereum provider")) {
+        return;
+      }
+      if (e instanceof UserRejectedRequestErrorInjected) {
+        return;
+      }
+      if (e instanceof UnsupportedChainIdError) {
+        return;
+      }
+      console.log(e.toString());
+    });
+  };
+  return fn;
+};
 
 export const getTokenInfo = (infoTokens, tokenAddress, replaceNative, nativeTokenAddress) => {
     if (replaceNative && tokenAddress === nativeTokenAddress) {
@@ -122,10 +628,10 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   const method = ethers.utils.isAddress(arg0) ? arg1 : arg0
 
   function onError(e) {
-      console.error(contractInfo.contractName, method, e)
+    console.error(contractInfo.contractName, method, e)
   }
 
-  if (ethers.utils.isAddress(arg0)) {
+  if (ethers.utils.isHexString(arg0)) {
     const address = arg0
     const contract = new ethers.Contract(address, contractInfo.abi, library)
 
@@ -198,8 +704,8 @@ export const padDecimals = (amount, minDecimals) => {
         amountStr = amountStr + ".0000"
     }
     return amountStr
-}
-export const formatAmount = (amount, tokenDecimals, displayDecimals, defaultValue, useCommas) => {
+  }
+  export const formatAmount = (amount, tokenDecimals, displayDecimals, useCommas, defaultValue) => {
     if (!defaultValue) {
         defaultValue = "..."
     }
@@ -495,9 +1001,47 @@ export function getMarginFee(sizeDelta) {
     }
     const afterFeeUsd = sizeDelta.mul(BASIS_POINTS_DIVISOR - MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR)
     return sizeDelta.sub(afterFeeUsd)
-}
-// ymj
-export function getNextFromAmount(
+  }
+
+  const adjustForDecimalsFactory = n => number => {
+    if (n === 0) {
+      return number;
+    }
+    if (n > 0) {
+      return number.mul(expandDecimals(1, n));
+    }
+    return number.div(expandDecimals(1, -n));
+  };
+
+  export function getSwapFeeBasisPoints(isStable) {
+    return isStable ? STABLE_SWAP_FEE_BASIS_POINTS : SWAP_FEE_BASIS_POINTS;
+  }
+
+  export function getMostAbundantStableToken(chainId, infoTokens) {
+    const tokens = defaultToken.default
+    const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
+    let availableAmount;
+    let stableToken = whitelistedTokens.find(t => t.isStable);
+    for (let i = 0; i < whitelistedTokens.length; i++) {
+      const info = getTokenInfo(infoTokens, whitelistedTokens[i].address);
+      if (!info.isStable || !info.availableAmount) {
+        continue;
+      }
+  
+      const adjustedAvailableAmount = adjustForDecimals(
+        info.availableAmount,
+        info.decimals,
+        USD_DECIMALS
+      );
+      if (!availableAmount || adjustedAvailableAmount.gt(availableAmount)) {
+        availableAmount = adjustedAvailableAmount;
+        stableToken = info;
+      }
+    }
+    return stableToken;
+  }
+
+  export function getNextFromAmount(
     chainId,
     toAmount,
     fromTokenAddress,
@@ -520,7 +1064,15 @@ export function getNextFromAmount(
 
     const fromToken = getTokenInfo(infoTokens, fromTokenAddress);
     const toToken = getTokenInfo(infoTokens, toTokenAddress);
-
+  
+    if (fromToken.isNative && toToken.isWrapped) {
+      return { amount: toAmount };
+    }
+  
+    if (fromToken.isWrapped && toToken.isNative) {
+      return { amount: toAmount };
+    }
+  
     if (!fromToken || !fromToken.minPrice || !toToken || !toToken.maxPrice) {
         return defaultValue;
     }
