@@ -21,7 +21,7 @@ export const MAX_LEVERAGE = 100 * 10000;
 export const POSITIONS = 'Positions';
 export const ACTIONS = 'Actions';
 export const ORDERS = 'Orders';
-const USDG_ADDRESS = '0x45096e7aA921f27590f8F19e457794EB09678141';
+export const USDG_ADDRESS = '0x45096e7aA921f27590f8F19e457794EB09678141';
 
 const { AddressZero } = ethers.constants
 
