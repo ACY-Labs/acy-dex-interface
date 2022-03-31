@@ -126,13 +126,13 @@
     align-items: center;
     font-size: 18px;
     font-weight: 500;
-    background-color: #1b1b1c;
+    background-color: transparent;
+    border: 0.75px solid #232323;
     color: #fff;
-    border-radius: 10px;
+    border-radius: 5px;
     outline: none;
     cursor: pointer;
     user-select: none;
-    border: none;
     height: 2.4rem;
     width: auto;
     padding: 0 8px;

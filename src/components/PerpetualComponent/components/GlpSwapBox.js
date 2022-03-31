@@ -17,7 +17,7 @@ import { useWeb3React } from '@web3-react/core'
 import useSWR from 'swr'
 import { useConstantLoader } from '@/constants'
 import { useConnectWallet } from '@/components/ConnectWallet'
-import { AcyIcon, AcyTabs, AcyButton } from "@/components/Acy"
+import { AcyIcon, AcyTabs, AcyButton, AcyPerpetualButton } from "@/components/Acy"
 
 import {
   getInfoTokens,
@@ -72,6 +72,7 @@ import Token from '@/acy-dex-futures/abis/Token.json'
 import { callContract, useGmxPrice } from '@/acy-dex-futures/core/Perpetual'
 import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
 
+import PerpTabs from './PerpTabs/PerpTabs'
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 import TokenTable  from '@/pages/BuyGlp/components/SwapTokenTable'
 import glp40Icon from '@/pages/BuyGlp/components/ic_glp_40.svg'
@@ -511,23 +512,35 @@ export const GlpSwapBox = (props) => {
     }
   }
 
+  const [buySellLabel, setBuySellLabel] = useState("Buy GLP")
+  const buySellTabs = ['Buy GLP', 'Sell GLP']
+
   const switchSwapOption = (hash = '') => {
     history.push(`${history.location.pathname}#${hash}`)
     setIsBuying(!(hash === 'redeem'))
   }
 
   const onSwapOptionChange = (opt) => {
-    if (opt === "sell") {
+    if (opt === "Sell GLP") {
       switchSwapOption('redeem')
+      setBuySellLabel("Sell GLP")
     } else {
       switchSwapOption()
+      setBuySellLabel("Buy GLP")
     }
   }
 
   return (
     <div className="GlpSwap">
-      <div>
-        <Tabs 
+      <div className={styles.BuySellSelector}>
+        <PerpTabs
+          option={buySellLabel}
+          options={buySellTabs}
+          type="inline"
+          onChange={onSwapOptionChange}
+        />
+
+        {/* <Tabs 
           activeKey={tabLabel}
           onChange={onSwapOptionChange}
           size='small'
@@ -538,7 +551,7 @@ export const GlpSwapBox = (props) => {
         >
           <TabPane tab="Buy GLP" key='buy' />
           <TabPane tab="Sell GLP" key='sell' />
-        </Tabs>
+        </Tabs> */}
       </div>  
 
       {isBuying && 
@@ -567,9 +580,9 @@ export const GlpSwapBox = (props) => {
         isLocked={!isBuying}
       />}
 
-      <div className={styles.Arrow}>
+      {/* <div className={styles.Arrow}>
         <Icon style={{ fontSize: '16px' }} type="arrow-down" />
-      </div>
+      </div> */}
 
       {isBuying && 
         <BuyInputSection
@@ -638,13 +651,13 @@ export const GlpSwapBox = (props) => {
       </div>
 
       <div>
-        <AcyButton 
+        <AcyPerpetualButton 
           style={{ marginTop: '25px' }}
           onClick={onClickPrimary} 
           disabled={!isPrimaryEnabled()}
         >
           {getPrimaryText()}
-        </AcyButton>
+        </AcyPerpetualButton>
       </div>
           
     </div>
