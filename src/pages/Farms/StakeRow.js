@@ -81,7 +81,7 @@ const StakeRow = props => {
         return supportedTokens[j].logoURI;
       }
     }
-    return 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg';
+    return 'https://storageapi2.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg';
   }
 
   const withdrawClicked = () => {

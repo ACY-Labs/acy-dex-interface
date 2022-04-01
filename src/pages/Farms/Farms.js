@@ -98,7 +98,7 @@ const Farms = (props) => {
       address:      '0x0000000000000000000000000000000000000000',
       addressOnEth: '0x0000000000000000000000000000000000000000',
       decimals: 18,
-      logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg'
+      logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg'
     };
   }
 

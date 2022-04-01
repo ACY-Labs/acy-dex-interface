@@ -39,11 +39,11 @@ const swapTicket = (props) => {
               {/* <div className={styles.dropdown}>  
                 <ul>
                   <li> 
-                    <img src='https://storageapi.fleek.co/chwizdo-team-bucket/ACY%20Token%20List/USDT.svg' style={{ width: '24px', marginRight: '0.5rem' }} />
+                    <img src='https://storageapi2.fleek.co/chwizdo-team-bucket/ACY%20Token%20List/USDT.svg' style={{ width: '24px', marginRight: '0.5rem' }} />
                     USDT
                   </li>
                   <li> 
-                    <img src='https://storageapi.fleek.co/chwizdo-team-bucket/ACY%20Token%20List/USDC.svg' style={{ width: '24px', marginRight: '0.5rem' }} />
+                    <img src='https://storageapi2.fleek.co/chwizdo-team-bucket/ACY%20Token%20List/USDC.svg' style={{ width: '24px', marginRight: '0.5rem' }} />
                     USDC
                   </li>
                 </ul>
