@@ -22,7 +22,7 @@ const calcBlocksPerPeriod = (period: 'month' | 'year', blockTime: number) => {
     }
 }
 
-const BscMainNetFarmSetting: FarmSetting = {
+export const BscMainNetFarmSetting: FarmSetting = {
     INITIAL_ALLOWED_SLIPPAGE: 50,
     FACTORY_ADDRESS: "0x3d077c05c3AbCE52257E453607209f81D9db01fC",
     INIT_CODE_HASH: "0xfbf3b88d6f337be529b00f1dc9bff44bb43fa3c6b5b7d58a2149e59ac5e0c4a8",
@@ -40,7 +40,7 @@ const BscMainNetFarmSetting: FarmSetting = {
     // API_URL: "http://147.182.251.92:3001/bsc-main/api"   // testing with test server
 }
 
-const BscTestNetFarmSetting: FarmSetting = {
+export const BscTestNetFarmSetting: FarmSetting = {
     INITIAL_ALLOWED_SLIPPAGE: 50,
     FACTORY_ADDRESS: "0x89D20aB13D093Eecea6C5af0a22566d4e780892A",
     INIT_CODE_HASH: "0xfbf3b88d6f337be529b00f1dc9bff44bb43fa3c6b5b7d58a2149e59ac5e0c4a8",
@@ -58,7 +58,7 @@ const BscTestNetFarmSetting: FarmSetting = {
     // API_URL: "http://147.182.251.92:3001/bsc-test/api" // testing with test server
 }
 
-const PolygonMainNetFarmSetting: FarmSetting = {
+export const PolygonMainNetFarmSetting: FarmSetting = {
     INITIAL_ALLOWED_SLIPPAGE: 50,
     FACTORY_ADDRESS: "0x3d077c05c3AbCE52257E453607209f81D9db01fC",
     INIT_CODE_HASH: "0xfbf3b88d6f337be529b00f1dc9bff44bb43fa3c6b5b7d58a2149e59ac5e0c4a8",
@@ -76,7 +76,7 @@ const PolygonMainNetFarmSetting: FarmSetting = {
     // API_URL: "http://147.182.251.92:3001/polygon-main/api"  // testing with test server
 }
 
-const PolygonTestNetFarmSetting: FarmSetting = {
+export const PolygonTestNetFarmSetting: FarmSetting = {
     INITIAL_ALLOWED_SLIPPAGE: 50,
     FACTORY_ADDRESS: "0x5cfc3885d58BfDa0B9F0A9709E414Fd345985AA0",
     INIT_CODE_HASH: "0xfbf3b88d6f337be529b00f1dc9bff44bb43fa3c6b5b7d58a2149e59ac5e0c4a8",
@@ -94,7 +94,7 @@ const PolygonTestNetFarmSetting: FarmSetting = {
     // API_URL: "http://147.182.251.92:3001/polygon-test/api"  // testing with test server
 }
 
-const ArbitrumMainNetFarmSetting: FarmSetting = {
+export const ArbitrumMainNetFarmSetting: FarmSetting = {
     INITIAL_ALLOWED_SLIPPAGE: 50,
     FACTORY_ADDRESS: "0x5cfc3885d58BfDa0B9F0A9709E414Fd345985AA0",
     INIT_CODE_HASH: "0xfbf3b88d6f337be529b00f1dc9bff44bb43fa3c6b5b7d58a2149e59ac5e0c4a8",

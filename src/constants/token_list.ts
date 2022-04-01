@@ -1,3 +1,8 @@
+import axios from 'axios';
+import {BscMainNetFarmSetting, BscTestNetFarmSetting, 
+  PolygonMainNetFarmSetting, PolygonTestNetFarmSetting, 
+  ArbitrumMainNetFarmSetting} from './farm_setting';
+
 interface TokenInfo {
   name: string,
   symbol: string,
@@ -470,14 +475,44 @@ const ArbitrumMainNetTokenList = [
   },
 ];
 
-const TokenListSelector = (arg: string) => {
+export function TokenListSelector (chainId: number) {
   return {
     56: BscMainNetTokenList,
     97: BscTestNetTokenList,
     137: PolygonMainNetTokenList,
     80001: PolygonTestNetTokenList,
     42161: ArbitrumMainNetTokenList,
-  }[arg];
+  }[chainId];
 }
 
-export default TokenListSelector;
+
+// 从后端获取 tokenList
+export async function TokenListSelectorBackend(chainId: number) {
+  // console.log("@tokenlistselectorbanckend start");
+  let REQUEST_API_URL = BscMainNetFarmSetting.API_URL;
+  switch(chainId) {
+    case 56: 
+      REQUEST_API_URL = BscMainNetFarmSetting.API_URL; break;
+    case 97:
+      REQUEST_API_URL = BscTestNetFarmSetting.API_URL; break;
+    case 137: 
+      REQUEST_API_URL = PolygonMainNetFarmSetting.API_URL; break;
+    case 80001:
+      REQUEST_API_URL = PolygonTestNetFarmSetting.API_URL; break;
+    case 42161:
+      REQUEST_API_URL = ArbitrumMainNetFarmSetting.API_URL; break;
+    default: 
+      REQUEST_API_URL = BscMainNetFarmSetting.API_URL;
+  }
+  REQUEST_API_URL = REQUEST_API_URL.concat("/configs/tokenlist");
+  
+  const tokenList = await axios.get(
+    REQUEST_API_URL
+  ).then(async (result) => {
+    // console.log("tokenList from backend:", result.data);
+    return result.data;
+  })
+
+  // console.log("@tokenlistselector", tokenList);
+  return tokenList.data;
+}

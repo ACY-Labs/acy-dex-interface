@@ -104,7 +104,8 @@ const StyledCard = styled(AcyCard)`
 
 const Swap = props => {
   const {account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix}} = useConstantLoader();
-  ////console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
+  // console.log("@/ inside swap:", supportedTokens);
+  
 
   // 当 chainId 发生切换时，就更新 url
   // useEffect(() => {

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useWeb3React } from '@web3-react/core';
 import { history } from 'umi';
 
-import TokenListSelector from './token_list';
+import { TokenListSelector, TokenListSelectorBackend } from './token_list';
 import MethodActionSelector from './contract_method_list';
 import ScanUrlSelector from './scan_url';
 import ScanAPIUrlSelector from './scan_api_url';
@@ -189,7 +189,6 @@ export const useConstantLoader = () => {
         // console.log("fallbackChainId chainId:", fallbackChainId);
         const marketChainSupportedIndex = (supportedChainIds.indexOf(marketChainId) !== -1);
         const marketNetwork = marketChainSupportedIndex ? marketChainId : 56;
-
         const staticConstants = ConstantLoader(fallbackChainId, marketNetwork);
         const constants = Object.assign({
             'account': chainSupportedIndex ? account : undefined,
@@ -197,21 +196,34 @@ export const useConstantLoader = () => {
             'library': chainSupportedIndex ? library : defaultLibrary,
             'marketNetwork': marketNetwork,
         }, staticConstants);
-
+        // console.log("@constant:", constants);
         constantInstance = constants;
         setConstant(constants);
+
+        // 从后端获取 tokenList，代替前端的 tokenList
+        const fecthTokenListBackend = async () => {
+            // chainId 初始时可能是 undefined，因此要用 fallbackChainId
+            const tokenListBackend = await TokenListSelectorBackend(fallbackChainId);
+            // console.log("@constant backend tokenList", tokenListBackend);
+            constants.tokenList = tokenListBackend;
+            constantInstance = constants;
+            setConstant(constants);
+        }
+        fecthTokenListBackend();
     }, [account, chainId, marketChainId]);
 
 
     // 将实际的 chainId 显示在 url 的参数里
     const changeUrlChainId = () => {
         const chainName = chainId2UrlChainName(chainId);
-        history.replace({
-          pathname: history.location.pathname,
-          query: {
-            chain: chainName,
-          },
-        })
+        if (history.location.query.chain !== chainName) {
+            history.replace({
+                pathname: history.location.pathname,
+                query: {
+                  chain: chainName,
+                },
+            })
+        }
     }
 
 

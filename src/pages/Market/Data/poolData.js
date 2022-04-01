@@ -128,10 +128,14 @@ export async function fetchPoolDayData(address) {
     
     //const supportedTokens = TOKENLIST();
     const supportedTokens = MARKET_TOKEN_LIST();
+    //console.log("@pooldata supportedTokens", supportedTokens);
+    //console.log("@pooldata tokenPool", tokenPool);
     const parsedPairData = [];
     for (const pool of tokenPool) {
       const token0 = supportedTokens.find(t => t.address.toLowerCase() == pool.token0.toLowerCase());
       const token1 = supportedTokens.find(t => t.address.toLowerCase() == pool.token1.toLowerCase())
+      //console.log("@pooldata token0", token0, pool.token0);
+      //console.log("@pooldata token1", token1, pool.token1);
       const token0Symbol = token0.symbol;
       const token1Symbol = token1.symbol
       const tvl = pool.lastReserves.token0 * 2 * priceDict[token0Symbol];
