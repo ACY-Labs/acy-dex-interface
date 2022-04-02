@@ -214,6 +214,27 @@ const StyledSlider = styled(Slider)`
   }
 `;
 
+const StyledCheckbox = styled(Checkbox)`
+  .ant-checkbox .ant-checkbox-inner {
+      background-color: transparent;
+      border-color: #b5b5b6;
+  }
+  .ant-checkbox-checked .ant-checkbox-inner {
+      background-color: transparent;
+      border-color: #b5b5b6;
+  }
+  .ant-checkbox-disabled .ant-checkbox-inner {
+      background-color: #333333;
+      border: 1px solid #b5b5b6;
+  }
+  .ant-checkbox-checked::after {
+      border: 1px solid #333333;
+  }
+  .ant-checkbox::after {
+      border: 1px solid #333333;
+  }
+`;
+
 function getToken(tokenlist, tokenAddr) {
     for (let i = 0; i < tokenlist.length; i++) {
         if (tokenlist[i].address === tokenAddr) {
@@ -1954,7 +1975,7 @@ const SwapComponent = props => {
                                                 </div>
                                             }
                                         </div>
-                                        <Checkbox
+                                        <StyledCheckbox
                                             checked={isLeverageSliderEnabled}
                                             onChange={() => {
                                                 setIsLeverageSliderEnabled(!isLeverageSliderEnabled)

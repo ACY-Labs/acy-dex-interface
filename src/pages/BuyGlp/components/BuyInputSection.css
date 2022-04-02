@@ -1,8 +1,8 @@
 .buy-input .InputSection-static-input {
     font-size: 1.5rem;
-  }
-  
-  .buy-input.Exchange-swap-section {
+}
+
+.buy-input.Exchange-swap-section {
     min-height: 5.935rem;
     display: flex;
     flex-direction: column;
@@ -11,15 +11,15 @@
     /* background: #29292c; */
     /* border-radius: 10px; */
     border-bottom: 0.75px solid #333333;
-  }
+}
 
-  .align-right {
+.align-right {
     text-align: right;
     display: flex;
     justify-content: flex-end;
-  }
-  
-  .buy-input .TokenSelector-box {
+}
+
+.buy-input .TokenSelector-box {
     display: flex;
     align-items: center;
     border-radius: 4px;
@@ -29,17 +29,17 @@
     font-size: 1.25rem;
     line-height: 1.625rem;
     justify-content: flex-end;
-  }
-  
-  .buy-input .Exchange-swap-input-container {
+}
+
+.buy-input .Exchange-swap-input-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: relative;
     overflow: hidden;
-  }
+}
 
-  .Exchange-swap-input {
+.Exchange-swap-input {
     color: #fff;
     width: 0;
     position: relative;
@@ -60,9 +60,9 @@
     -moz-appearance: textfield;
     appearance: textfield;
     text-align: right;
-  }
-  
-  .buy-input .Exchange-swap-max {
+}
+
+.buy-input .Exchange-swap-max {
     position: unset;
     color: white;
     font-size: 1rem;
@@ -72,57 +72,57 @@
     border-radius: 3px;
     z-index: 1;
     cursor: pointer;
-    background: linear-gradient(90deg,#2d42fc,#2e3dcd);
-  }
-  
-  .buy-input .TokenSelector-caret {
+    background: linear-gradient(90deg, #2d42fc, #2e3dcd);
+}
+
+.buy-input .TokenSelector-caret {
     margin: 0;
     margin-right: -5px;
-  }
-  
-  .buy-input .TokenSelector-box-symbol {
+}
+
+.buy-input .TokenSelector-box-symbol {
     margin-left: 0.5rem;
-  }
-  
-  .buy-input .PositionEditor-token-symbol {
+}
+
+.buy-input .PositionEditor-token-symbol {
     display: flex;
     align-items: center;
     margin-left: 0.9rem;
     font-size: 1.35rem;
     text-align: right;
-  }
-  
-  .buy-input .PositionEditor-token-symbol img {
+}
+
+.buy-input .PositionEditor-token-symbol img {
     margin-left: 0.5rem;
     display: none;
-  }
-  
-  .buy-input .Exchange-swap-section-top {
+}
+
+.buy-input .Exchange-swap-section-top {
     padding-bottom: 0;
     display: grid;
     grid-template-columns: auto auto;
     font-size: .9rem;
     margin-bottom: 8px
-  }
+}
 
-  .Exchange-swap-section-bottom {
+.Exchange-swap-section-bottom {
     display: grid;
     grid-template-columns: 1fr auto;
     padding-bottom: 0.2rem;
-  }
-  
-  .buy-input .selected-token {
+}
+
+.buy-input .selected-token {
     /* padding-top: 0.5rem; */
     /* padding-bottom: 0.5rem; */
     display: flex;
     align-items: center;
-  }
-  
-  .buy-input .Exchange-swap-balance {
-    color: white;
-  }
+}
 
-  .switchcoin {
+.buy-input .Exchange-swap-balance {
+    color: #b5b5b6;
+}
+
+.switchcoin {
     align-items: center;
     font-size: 18px;
     font-weight: 500;
@@ -139,9 +139,9 @@
     justify-content: space-between;
     margin-right: 12px;
     line-height: inherit;
-  }
-  
-   .wrap {
+}
+
+.wrap {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -149,12 +149,12 @@
     box-sizing: border-box;
     margin: 0;
     min-width: 0;
-   }
+}
 
-   .coin {
+.coin {
     width: fit-content;
     display: flex;
     padding: 0;
     align-items: center;
     justify-content: flex-start;
-   }
+}
