@@ -419,6 +419,7 @@ const SwapComponent = props => {
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([tempChainID, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(tempLibrary, Reader, [tokenAddresses]),
   })
+  console.log("token balances", tokenBalances);
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([tempChainID, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(tempLibrary, ReaderV2, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
