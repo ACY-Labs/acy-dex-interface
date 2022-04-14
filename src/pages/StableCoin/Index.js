@@ -1,4 +1,5 @@
 import { useWeb3React } from '@web3-react/core';
+import { supportedTokens} from '@/acy-dex-usda/utils';
 import { useConstantLoader } from '@/constants';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
@@ -15,15 +16,12 @@ import { useState,useEffect } from 'react';
 const icon = require('./aperture.svg');
 
 const StableCoin = props => {
-  const {account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix}} = useConstantLoader();
+  const {account, library, chainId, farmSetting: { API_URL: apiUrlPrefix}} = useConstantLoader(props);
   const{dispatch}=props
-  const [activeToken0,setActiveToken0] = useState(supportedTokens[0]);
-  const [activeToken1,setActiveToken1] = useState(supportedTokens[1]);;
+  const [activeToken0,setActiveToken0] = useState(supportedTokens[2]);
+  const [activeToken1,setActiveToken1] = useState(supportedTokens[0]);;
   
   const onGetReceipt = async (receipt, library, account) => {
-    console.log('@@@RECEIPT', receipt);
-    console.log('@@@library',library);
-    console.log('@@@account',account);
     // updateTransactionList(receipt);
   };
 
@@ -32,8 +30,8 @@ const StableCoin = props => {
 
     console.log("resetting page states")
     // reset on chainId change => supportedTokens change
-    setActiveToken1(supportedTokens[1]);
-    setActiveToken0(supportedTokens[0]);
+    setActiveToken1(supportedTokens[0]);
+    setActiveToken0(supportedTokens[2]);
     // setActiveRate('Not available');
     // setRange('1D');
     // setChartData([]);

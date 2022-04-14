@@ -23,7 +23,8 @@ import {
   AcyDescriptions,
   AcySmallButton,
 } from '@/components/Acy';
-import TokenSelectorModal from "@/components/TokenSelectorModal";
+import TokenSelectorModal from './tokenSelectorModal';
+import { supportedTokens} from '@/acy-dex-usda/utils';
 
 import { connect } from 'umi';
 import styles from './stableCoinComponent.less';
@@ -41,14 +42,10 @@ import {
   checkTokenIsApproved,
   computeTradePriceBreakdown,
   getAllowance,
-  getContract,
-  getRouterContract,
-  getUserTokenBalance,
-  getUserTokenBalanceRaw,
   isZero,
-  supportedTokens,
   parseArbitrageLog,
 } from '@/acy-dex-swap/utils/index';
+import {getUserTokenBalance,getUserTokenBalanceRaw}from '@/acy-dex-usda/utils'
 
 // import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
 import { swapGetEstimated, swap } from './swap';
@@ -89,9 +86,9 @@ import {useConnectWallet} from '@/components/ConnectWallet';
 
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
-  const { account, library, chainId, tokenList: INITIAL_TOKEN_LIST, farmSetting: {INITIAL_ALLOWED_SLIPPAGE}} = useConstantLoader(props);
+  const { account, library, chainId, farmSetting: {INITIAL_ALLOWED_SLIPPAGE}} = useConstantLoader(props);
   const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1=false} = props;
-
+  const INITIAL_TOKEN_LIST = supportedTokens
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
 
@@ -99,9 +96,9 @@ const SwapComponent = props => {
   const [before, setBefore] = useState(true);
 
   // 交易对前置货币
-  const [token0, setToken0] = useState(INITIAL_TOKEN_LIST[0]);
+  const [token0, setToken0] = useState(INITIAL_TOKEN_LIST[2]);
   // 交易对后置货币
-  const [token1, setToken1] = useState(INITIAL_TOKEN_LIST[1]);
+  const [token1, setToken1] = useState(INITIAL_TOKEN_LIST[0]);
 
   // 交易对前置货币余额
   const [token0Balance, setToken0Balance] = useState('0');
@@ -159,7 +156,7 @@ const SwapComponent = props => {
   const [showDescription, setShowDescription] = useState(false);
   const connectWalletByLocalStorage = useConnectWallet();
   const [isUSDA,setIsUSDA] = useState(true)
-  
+  const [swapMode,setSwapMode] = useState('redeem')
   useEffect(() => {
     if (!INITIAL_TOKEN_LIST) return
     console.log("resetting page states, new swapComponent token0, token1", INITIAL_TOKEN_LIST[0], INITIAL_TOKEN_LIST[1])
@@ -167,9 +164,9 @@ const SwapComponent = props => {
       // 选择货币前置和后置
     setBefore(true);
       // 交易对前置货币
-    setToken0(INITIAL_TOKEN_LIST[0]);
+    setToken0(INITIAL_TOKEN_LIST[2]);
       // 交易对后置货币
-    setToken1(INITIAL_TOKEN_LIST[1]);
+    setToken1(INITIAL_TOKEN_LIST[0]);
       // 交易对前置货币余额
     setToken0Balance('0');
       // 交易对后置货币余额
@@ -211,23 +208,8 @@ const SwapComponent = props => {
     setMidTokenAddress();
     setPoolExist(true);
     setShowDescription(false);
+    setSwapMode('redeem')
   }, [chainId])
-
-
-  // connect to page model, reflect changes of pair ratio in this component
-  useEffect(() => {
-    const { swap: { token0: modelToken0, token1: modelToken1 } } = props;
-    setToken0(modelToken0);
-    setToken1(modelToken1);
-
-    // console.log(">> old new token 0/1 compare", token0 == modelToken1, token1 == modelToken0)
-    if (token0 == modelToken1 && token1 == modelToken0) {
-      const newToken0Balance = token1Balance;
-      const newToken1Balance = token0Balance;
-      setToken0Balance(newToken0Balance);
-      setToken1Balance(newToken1Balance);
-    }
-  }, [props.swap]);
 
   useEffect(() => {
     if(token) {
@@ -247,18 +229,16 @@ const SwapComponent = props => {
 
   useEffect(
     () => {
-      console.log("swapComp 239", account, chainId, library)
       if (!account || !chainId || !library) {
         setToken0BalanceShow(false);
         setToken1BalanceShow(false);
         return;
       }
-      console.log("try to refresh balance", INITIAL_TOKEN_LIST, token0, token1)
-
-      const _token0 = INITIAL_TOKEN_LIST[0];
-      const _token1 = INITIAL_TOKEN_LIST[1];
+      const _token0 = INITIAL_TOKEN_LIST[2];
+      const _token1 = INITIAL_TOKEN_LIST[0];
       setToken0(_token0);
       setToken1(_token1);
+    setSwapMode('redeem')
       async function refreshBalances() {
         setToken0Balance(await getUserTokenBalance(_token0, chainId, account, library).catch(e => console.log("refrersh balances error", e)));
         setToken0BalanceShow(true);
@@ -290,99 +270,39 @@ const SwapComponent = props => {
           ...token1,
           amount: token1Amount,
         },
-        slippageTolerance * 100,
-        exactIn,
+        swapMode,
+        // slippageTolerance * 100,
         chainId,
         library,
         account,
-        setToken0Amount,
         setToken1Amount,
-        setBonus0,
-        setBonus1,
-        setNeedApprove,
-        setApproveAmount,
-        setApproveButtonStatus,
-        setSwapBreakdown,
+        // setBonus0,
+        // setBonus1,
+        // setNeedApprove,
+        // setApproveAmount,
+        // setApproveButtonStatus,
+        // setSwapBreakdown,
         setSwapButtonState,
         setSwapButtonContent,
-        setSwapStatus,
-        setPair,
-        setRoute,
-        setTrade,
-        setSlippageAdjustedAmount,
-        setMinAmountOut,
-        setMaxAmountIn,
-        setWethContract,
-        setWrappedAmount,
-        setMethodName,
-        setIsUseArb,
-        setMidTokenAddress,
-        setPoolExist
-      );
-    }
-
-  // token0Amount is changed according to token1Amount
-  const t1Changed = 
-    async (e) => {
-      if (!token0 || !token1) return;
-      if (exactIn) return;
-      await swapGetEstimated(
-        {
-          ...token0,
-          amount: token0Amount,
-        },
-        {
-          ...token1,
-          amount: e,
-        },
-        slippageTolerance * 100,
-        exactIn,
-        chainId,
-        library,
-        account,
-        setToken0Amount,
-        setToken1Amount,
-        setBonus0,
-        setBonus1,
-        setNeedApprove,
-        setApproveAmount,
-        setApproveButtonStatus,
-        setSwapBreakdown,
-        setSwapButtonState,
-        setSwapButtonContent,
-        setSwapStatus,
-        setPair,
-        setRoute,
-        setTrade,
-        setSlippageAdjustedAmount,
-        setMinAmountOut,
-        setMaxAmountIn,
-        setWethContract,
-        setWrappedAmount,
-        setMethodName,
-        setIsUseArb,
-        setMidTokenAddress,
-        setPoolExist
+        // setSwapStatus,
+        // setPair,
+        // setRoute,
+        // setTrade,
+        // setSlippageAdjustedAmount,
+        // setMinAmountOut,
+        // setMaxAmountIn,
+        // setWethContract,
+        // setWrappedAmount,
+        // setMethodName,
+        // setIsUseArb,
+        // setMidTokenAddress,
+        // setPoolExist
       );
     }
 
   useEffect(
     async () => {
       await t0Changed(token0Amount);
-    },
-    [
-      token0,
-      token1,
-      slippageTolerance,
-      exactIn,
-      chainId,
-      library,
-      account,
-    ]
-  );
-  useEffect(
-    async () => {
-      await t1Changed(token1Amount);
     },
     [
       token0,
@@ -441,6 +361,7 @@ const SwapComponent = props => {
     let tempToken = token1;
     let tempAmount = token1Amount;
     let tempBalance = token1Balance;
+    let mode = swapMode === 'redeem'? 'mint':'redeem'
     setToken1(token0);
     setToken1Amount(token0Amount);
     setToken1Balance(token0Balance);
@@ -449,6 +370,7 @@ const SwapComponent = props => {
     setToken0Amount(tempAmount);
     setToken0Balance(tempBalance);
     setIsUSDA(!isUSDA)
+    setSwapMode(mode)
   };
 
   // swap的交易状态
@@ -459,25 +381,6 @@ const SwapComponent = props => {
     } = props;
     // 检查是否已经包含此交易
     const transLength = transactions.filter(item => item.hash == status.hash).length;
-    // if (transLength == 0) {
-    //   dispatch({
-    //     type: 'transaction/addTransaction',
-    //     payload: {
-    //       transactions: [...transactions, status.hash],
-    //     },
-    //   });
-    // }
-    // let lists=[{
-    //   hash:status.hash,
-    //   receipt
-    // },
-    // {
-    //   hash:status.hash,
-    //   receipt
-    // }];
-
-    // FIXME: implement the following logic with setTimeout(). refer to AddComponent.js checkStatusAndFinish()
-
     const sti = async (hash) => {
       library.getTransactionReceipt(hash).then(async receipt => {
         // console.log(`receiptreceipt for ${hash}: `, receipt);
@@ -571,16 +474,6 @@ const SwapComponent = props => {
           onClickCoin();
           setBefore(false);
         }}
-        onChangeToken={e => {
-          // setToken1ApproxAmount(e);
-          setShowDescription(true)
-          setToken1Amount(e);
-          setExactIn(false);
-          // console.log("test exactin and bonus1", exactIn, bonus0)
-          // console.log("current token1amount", e)
-          t1Changed(e);
-        }}
-        // isLocked={isLockedToken1}
         library={library}
       />
 
@@ -589,16 +482,6 @@ const SwapComponent = props => {
           <div className={styles.slippageContainer}>
             <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '7px' }}>
-              {/* <Button
-                    type="link"
-                    style={{ marginRight: '5px' }}
-                    onClick={() => {
-                      setInputSlippageTol(INITIAL_ALLOWED_SLIPPAGE / 100);
-                      setSlippageTolerance(INITIAL_ALLOWED_SLIPPAGE / 100);
-                    }}
-                  >
-                    Auto
-                  </Button> */}
               <Input
                 value={inputSlippageTol || ''}
                 onChange={e => {
