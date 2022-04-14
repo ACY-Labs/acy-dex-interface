@@ -2,7 +2,7 @@ import { Card } from 'antd';
 import { Children } from 'react';
 import className from 'classnames';
 import styles from './index.less';
-const AcyCard = ({ className: styledClassName, ...props }) => {
+const AcyPerpetualCard = ({ className: styledClassName, ...props }) => {
     const { max } = props;
     return <Card
         {...props}
@@ -11,7 +11,7 @@ const AcyCard = ({ className: styledClassName, ...props }) => {
             borderBottom: 0,
         }}
         bodyStyle={{
-            padding: '8px',
+            padding: '0px',
         }}
         title={
             props.title && <div className={styles.card_header}>
@@ -24,4 +24,4 @@ const AcyCard = ({ className: styledClassName, ...props }) => {
         {props.children}
     </Card>
 }
-export default AcyCard;
+export default AcyPerpetualCard;

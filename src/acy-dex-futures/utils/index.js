@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 /* eslint-disable consistent-return */
 import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -613,18 +614,18 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
 }
 
 export function getProvider(library, chainId) {
-    let provider;
-    if (library) {
-        return library.getSigner()
-    }
-    provider = _.sample(RPC_PROVIDERS[chainId])
-    return new ethers.providers.JsonRpcProvider(provider)
+  let provider;
+  if (library) {
+    return library.getSigner();
+  }
+  provider = _.sample(RPC_PROVIDERS[chainId]);
+  return new ethers.providers.StaticJsonRpcProvider(provider, { chainId });
 }
 
 export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   // eslint-disable-next-line
   const [chainId, arg0, arg1, ...params] = args
-  // const provider = library.getSigner(params[1])
+  // const provider = getProvider(library, chainId);
   const method = ethers.utils.isAddress(arg0) ? arg1 : arg0
 
   function onError(e) {
@@ -634,6 +635,7 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   if (ethers.utils.isHexString(arg0)) {
     const address = arg0
     const contract = new ethers.Contract(address, contractInfo.abi, library)
+    console.log('fetcher', contract, method, library, library.getSigner())
 
     try {
       if (additionalArgs) {

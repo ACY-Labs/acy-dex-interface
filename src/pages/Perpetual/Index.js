@@ -7,6 +7,7 @@ import { connect } from 'umi';
 import { Button, Row, Col, Icon, Skeleton, Card } from 'antd';
 import samplePositionsData from "./SampleData"
 import {
+  AcyPerpetualCard,
   AcyCard,
   AcyIcon,
   AcyPeriodTime,
@@ -20,9 +21,9 @@ import {
 } from '@/components/Acy';
 import { PriceBox } from './components/PriceBox';
 import { DetailBox } from './components/DetailBox';
-import { 
+import {
   ACTIONS,
-  ORDERS, 
+  ORDERS,
   POSITIONS,
   FUNDING_RATE_PRECISION,
   BASIS_POINTS_DIVISOR,
@@ -30,8 +31,8 @@ import {
   GLP_DECIMALS,
   USD_DECIMALS,
   PLACEHOLDER_ACCOUNT,
-  parseValue, 
-  getLiquidationPrice, 
+  parseValue,
+  getLiquidationPrice,
   getTokenInfo,
   getInfoTokens,
   expandDecimals,
@@ -62,7 +63,7 @@ import {
 import { approvePlugin, useGmxPrice } from '@/acy-dex-futures/core/Perpetual'
 import Media from 'react-media';
 import { uniqueFun } from '@/utils/utils';
-import {getTransactionsByAccount,appendNewSwapTx, findTokenWithSymbol} from '@/utils/txData';
+import { getTransactionsByAccount, appendNewSwapTx, findTokenWithSymbol } from '@/utils/txData';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import PerpetualComponent from '@/components/PerpetualComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
@@ -75,7 +76,7 @@ import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
 import { useConstantLoader } from '@/constants';
-import {useConnectWallet} from '@/components/ConnectWallet';
+import { useConnectWallet } from '@/components/ConnectWallet';
 import PositionsTable from './components/PositionsTable';
 import ActionHistoryTable from './components/ActionHistoryTable';
 import OrderTable from './components/OrderTable'
@@ -91,7 +92,7 @@ import RewardTracker from '@/acy-dex-futures/abis/RewardTracker.json'
 import Vester from '@/acy-dex-futures/abis/Vester.json'
 import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
 import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
-import {ethers} from 'ethers'
+import { ethers } from 'ethers'
 import useSWR from 'swr'
 import sampleGmxTokens from '@/acy-dex-futures/samples/TokenList'
 
@@ -101,16 +102,16 @@ const { AddressZero } = ethers.constants
 // ----------
 const { AcyTabPane } = AcyTabs;
 function getTIMESTAMP(time) {
-    var date = new Date(time);
-    var year = date.getFullYear(time);
-    var month = ("0" + (date.getMonth(time) + 1)).substr(-2);
-    var day = ("0" + date.getDate(time)).substr(-2);
-    var hour = ("0" + date.getHours(time)).substr(-2);
-    var minutes = ("0" + date.getMinutes(time)).substr(-2);
-    var seconds = ("0" + date.getSeconds(time)).substr(-2);
-  
-    return hour + ":" + minutes + ":" + seconds;
-    // return `${year}-${month}-${day}`;
+  var date = new Date(time);
+  var year = date.getFullYear(time);
+  var month = ("0" + (date.getMonth(time) + 1)).substr(-2);
+  var day = ("0" + date.getDate(time)).substr(-2);
+  var hour = ("0" + date.getHours(time)).substr(-2);
+  var minutes = ("0" + date.getMinutes(time)).substr(-2);
+  var seconds = ("0" + date.getSeconds(time)).substr(-2);
+
+  return hour + ":" + minutes + ":" + seconds;
+  // return `${year}-${month}-${day}`;
 
 }
 function abbrNumber(number) {
@@ -149,8 +150,8 @@ const defaultData = [
   ['2000-06-05', 116],
   ['2000-06-06', 129],
   ['2000-06-07', 135],
-  
-  
+
+
 ];
 const StyledCard = styled(AcyCard)`
   background: transparent;
@@ -292,7 +293,7 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
 
 function getTokenBySymbol(tokenlist, symbol) {
   for (let i = 0; i < tokenlist.length; i++) {
-    if(tokenlist[i].symbol === symbol) {
+    if (tokenlist[i].symbol === symbol) {
       return tokenlist[i]
     }
   }
@@ -302,12 +303,12 @@ function getTokenBySymbol(tokenlist, symbol) {
 const Swap = props => {
   const { savedIsPnlInLeverage, setSavedIsPnlInLeverage, savedSlippageAmount, pendingTxns, setPendingTxns } = props
 
-  const {account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix}, globalSettings, } = useConstantLoader();
+  const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix }, globalSettings, } = useConstantLoader();
   console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
-    //hj
-    const [isConfirming, setIsConfirming] = useState(false);
-    const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
+  //hj
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
   const [pricePoint, setPricePoint] = useState(0);
   const [pastToken1, setPastToken1] = useState('ETH');
   const [pastToken0, setPastToken0] = useState('USDC');
@@ -332,12 +333,12 @@ const Swap = props => {
   const [tableContent, setTableContent] = useState(POSITIONS);
   const [positionsData, setPositionsData] = useState([]);
   const [ordersData, setOrdersData] = useState([]);
-  const { active,activate } = useWeb3React();
-//---------- FOR TESTING 
-  const whitelistedTokens = sampleGmxTokens.filter(token=>token.symbol!== "USDG");
+  const { active, activate } = useWeb3React();
+  //---------- FOR TESTING 
+  const whitelistedTokens = sampleGmxTokens.filter(token => token.symbol !== "USDG");
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
   const tokens = sampleGmxTokens;
-  const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress) 
+  const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
 
 
 
@@ -400,11 +401,11 @@ const Swap = props => {
     fetcher: fetcher(library, Router)
   });
 
-  useEffect(()=>{ 
+  useEffect(() => {
 
-  console.log("printing all vault", vaultTokenInfo);
-    
-  },[vaultTokenInfo])
+    console.log("printing all vault", vaultTokenInfo);
+
+  }, [vaultTokenInfo])
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   const { positions, positionsMap } = getPositions(chainId, positionQuery, positionData, infoTokens, true)
@@ -429,7 +430,7 @@ const Swap = props => {
     })
   }
 
-//--------- 
+  //--------- 
   useEffect(() => {
     if (!supportedTokens) return
 
@@ -454,8 +455,8 @@ const Swap = props => {
     setTransactionList([]);
     setTableLoading(true);
     setTransactionNum(0);
-    
-    for ( let item of samplePositionsData){
+
+    for (let item of samplePositionsData) {
       item['collateralToken'] = findTokenWithSymbol(item.collateralTokenSymbol);
       item['indexToken'] = findTokenWithSymbol(item.indexTokenSymbol);
       item['liqPrice'] = getLiquidationPrice(item);
@@ -480,18 +481,18 @@ const Swap = props => {
   }, [chainId])
 
   useEffect(() => {
-      library.on('block', (blockNum) => {
-        updateVaultTokenInfo()
-        updateTokenBalances()
-        updatePositionData()
-        updateFundingRateInfo()
-        updateTotalTokenWeights()
-        updateUsdgSupply()
-        updateOrderBookApproved()
-      })
-      return () => {
-        library.removeAllListeners('block');
-      }
+    library.on('block', (blockNum) => {
+      updateVaultTokenInfo()
+      updateTokenBalances()
+      updatePositionData()
+      updateFundingRateInfo()
+      updateTotalTokenWeights()
+      updateUsdgSupply()
+      updateOrderBookApproved()
+    })
+    return () => {
+      library.removeAllListeners('block');
+    }
   }, [library])
 
   const refContainer = useRef();
@@ -500,12 +501,12 @@ const Swap = props => {
   // connect to provider, listen for wallet to connect
   const connectWalletByLocalStorage = useConnectWallet();
   useEffect(() => {
-    if(!account){
+    if (!account) {
       connectWalletByLocalStorage()
-     }
+    }
   }, [account]);
 
-  
+
   // 时间段选择
   const onhandPeriodTimeChoose = periodTimeName => {
     let pt;
@@ -540,83 +541,82 @@ const Swap = props => {
         token1: activeToken1
       }
     });
-    const dayLength = 24*60/5;
+    const dayLength = 24 * 60 / 5;
     let reverseFlag = false;
     let timeMark = 0;
     let timeMark2 = 0;
     let timeData = [];
     let A = activeToken0.symbol;
     let B = activeToken1.symbol;
-    if(A>B)
-    {
+    if (A > B) {
       let temp = B;
       B = A;
       A = temp;
       reverseFlag = true;
     }
     axios.get(
-      `${apiUrlPrefix}/chart/getRate`, {params : {token0 : A , token1 : B}}
+      `${apiUrlPrefix}/chart/getRate`, { params: { token0: A, token1: B } }
     ).then(res => {
-      if(res.data){
-      const historyData = res.data.History;
-      timeMark = historyData[historyData.length-1].time;
-      timeMark2 = historyData[0].time
+      if (res.data) {
+        const historyData = res.data.History;
+        timeMark = historyData[historyData.length - 1].time;
+        timeMark2 = historyData[0].time
 
-      let date = new Date(timeMark*60*1000);
+        let date = new Date(timeMark * 60 * 1000);
 
-      for (let i = 0; i < historyData.length; i++) {
-  
-        while(i < 0) i++;
-        const element = historyData[i];
-        timeData.push(element);
-        
-      };
+        for (let i = 0; i < historyData.length; i++) {
 
-      const addData = []
-      for (let i = timeMark - 24*60; i < timeMark2; i = i+5) {
-        let temp2 = [(i*60*1000),  0 ] ;
-        addData.push(temp2);
-      } 
-      console.log("timemark",timeMark - 24*60,timeMark2);
-      console.log("addData",addData);
+          while (i < 0) i++;
+          const element = historyData[i];
+          timeData.push(element);
 
-          console.log("timeData",timeData);
-          const tempChart = [];
-          for (let a = 0; a < timeData.length; a++) {
-            if(timeData[a].time > timeMark - 24*60){
-            const time = timeData[a].time*60*1000;
+        };
+
+        const addData = []
+        for (let i = timeMark - 24 * 60; i < timeMark2; i = i + 5) {
+          let temp2 = [(i * 60 * 1000), 0];
+          addData.push(temp2);
+        }
+        console.log("timemark", timeMark - 24 * 60, timeMark2);
+        console.log("addData", addData);
+
+        console.log("timeData", timeData);
+        const tempChart = [];
+        for (let a = 0; a < timeData.length; a++) {
+          if (timeData[a].time > timeMark - 24 * 60) {
+            const time = timeData[a].time * 60 * 1000;
             let date = new Date(time);
             let dateString = date.getMinutes();
             let temp;
-            if(reverseFlag)
-            temp = [time, 1.0/timeData[a].exchangeRate ] ;
+            if (reverseFlag)
+              temp = [time, 1.0 / timeData[a].exchangeRate];
             else
-            temp = [time,timeData[a].exchangeRate ] ;
+              temp = [time, timeData[a].exchangeRate];
             tempChart.push(temp);
-            
+
           }
         }
-          console.log("CHARTING!!!!!!!!!!!",tempChart);
+        console.log("CHARTING!!!!!!!!!!!", tempChart);
 
-          const finalChartData = addData.concat(tempChart);
-          console.log("finalChartData", finalChartData);
-          setChartData(finalChartData);
-    }
-      else{
+        const finalChartData = addData.concat(tempChart);
+        console.log("finalChartData", finalChartData);
+        setChartData(finalChartData);
+      }
+      else {
         setActiveRate("No this pair data yet");
         setChartData([]);
       }
 
     })
-     
 
-      console.log("chartdata");
-      console.log(timeData);
-   
+
+    console.log("chartdata");
+    console.log(timeData);
+
   }, [activeToken0, activeToken1]);
 
   const getRoutePrice = (token0Address, token1Address) => {
-    if(!token0Address || !token1Address) return;    
+    if (!token0Address || !token1Address) return;
 
     axios
       .post(
@@ -646,10 +646,10 @@ const Swap = props => {
       setActiveToken0(activeToken1);
       setActiveToken1(tempSwapToken);
     }
-    
+
 
     return [
-      <div style={{width: "100%"}}>
+      <div style={{ width: "100%" }}>
         <div className={styles.maintitle}>
           <div className={styles.lighttitle} style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }} onClick={swapTokenPosition}>
             <img
@@ -669,7 +669,7 @@ const Swap = props => {
           </div>
 
         </div>
-        <div style={{display: "flex", justifyContent: "space-between"}}>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div className={styles.secondarytitle}>
             <span className={styles.lighttitle}>{activeRate}</span>{' '}
             <span className={styles.percentage}>{activeAbsoluteChange}</span>
@@ -691,15 +691,15 @@ const Swap = props => {
     if (tableContent === POSITIONS) {
       return (
         <PositionsTable
-            isMobile={isMobile}
-            dataSource={positions}
+          isMobile={isMobile}
+          dataSource={positions}
         />
       )
     } else if (tableContent === ACTIONS) {
       return (
         <ActionHistoryTable
-            isMobile={isMobile}
-            dataSource={positionsData}
+          isMobile={isMobile}
+          dataSource={positionsData}
         />
       )
     } else if (tableContent === ORDERS) {
@@ -752,11 +752,11 @@ const Swap = props => {
 
   const updateTransactionList = async (receipt) => {
     setTableLoading(true);
-    appendNewSwapTx(refContainer.current,receipt,account,library).then((data) => {
-      if(data && data.length > 0) setTransactionList(data);
+    appendNewSwapTx(refContainer.current, receipt, account, library).then((data) => {
+      if (data && data.length > 0) setTransactionList(data);
       setTableLoading(false);
     })
-    
+
   }
 
 
@@ -781,7 +781,7 @@ const Swap = props => {
   useEffect(() => {
     if (!chartData.length)
       return;
-    const lastDataIndex = chartData.length-1;
+    const lastDataIndex = chartData.length - 1;
     updateActiveChartData(chartData[lastDataIndex][1], lastDataIndex);
   }, [chartData])
 
@@ -797,10 +797,12 @@ const Swap = props => {
   //     orders={orders}
   //   />
   // }
- 
+
   // Glp Swap
   const [isBuying, setIsBuying] = useState(true)
   const [showTokenTable, setShowTokenTable] = useState(false)
+  const [swapTokenAddress, setSwapTokenAddress] = useState(tokens[0].address)
+  const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
   // const history = useHistory()
   // useEffect(() => {
   //   const hash = history.location.hash.replace('#', '')
@@ -849,7 +851,6 @@ const Swap = props => {
   const glp_infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
 
   const onChangeMode = (mode) => {
-    console.log('joy mode', mode)
     if (mode === "Pool") {
       setShowTokenTable(true)
     } else {
@@ -862,32 +863,34 @@ const Swap = props => {
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
           {/* K chart */}
-          <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}>
+          <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
             <div className={`${styles.colItem} ${styles.priceChart}`}>
               <KChart token1={activeToken0} token2={activeToken1} />
-            </div> 
-          </AcyCard>
+            </div>
+          </AcyPerpetualCard>
 
           {/* Position table */}
           {!showTokenTable ?
             <>
-              <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}>
+              <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
                 <div className={`${styles.colItem} ${styles.priceChart}`}>
                   <div className={`${styles.colItem}`}>
-                    <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(POSITIONS)}}>Positions</a>
-                    <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(ORDERS)}}>Orders</a>
-                    <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(ACTIONS)}}>Actions </a>
+                    <a className={`${styles.colItem} ${styles.optionTab}`} onClick={() => { setTableContent(POSITIONS) }}>Positions</a>
+                    <a className={`${styles.colItem} ${styles.optionTab}`} onClick={() => { setTableContent(ORDERS) }}>Orders</a>
+                    <a className={`${styles.colItem} ${styles.optionTab}`} onClick={() => { setTableContent(ACTIONS) }}>Actions </a>
                   </div>
                   <div className={styles.positionsTable}>
                     <RenderTable />
                   </div>
                 </div>
-              </AcyCard>
+              </AcyPerpetualCard>
             </> :
             <>
-              <GlpSwapTokenTable 
+              <GlpSwapTokenTable
                 isBuying={isBuying}
                 setIsBuying={setIsBuying}
+                setSwapTokenAddress={setSwapTokenAddress}
+                setIsWaitingForApproval={setIsWaitingForApproval}
                 tokenList={glp_tokenList}
                 infoTokens={infoTokens}
                 glpAmount={glpAmount}
@@ -943,7 +946,7 @@ const Swap = props => {
             onCancel={() => setVisibleLoading(false)}
             visible={visibleLoading}
           />
-      
+
         </div>
         {/* <div className={styles.rowFlexContainer}> */}
         {/* Perpetual Component */}
@@ -963,7 +966,7 @@ const Swap = props => {
             approveOrderBook={approveOrderBook}
             isWaitingForPluginApproval={isWaitingForPluginApproval}
             setIsWaitingForPluginApproval={setIsWaitingForPluginApproval}
-            isPluginApproving={isPluginApproving}  
+            isPluginApproving={isPluginApproving}
             positions={positions}
             profitsIn='ETH'
             liqPrice={456}
@@ -973,6 +976,10 @@ const Swap = props => {
             isBuying={isBuying}
             setIsBuying={setIsBuying}
             onChangeMode={onChangeMode}
+            swapTokenAddress={swapTokenAddress}
+            setSwapTokenAddress={setSwapTokenAddress}
+            glp_isWaitingForApproval={isWaitingForApproval}
+            glp_setIsWaitingForApproval={setIsWaitingForApproval}
           />
         </div>
       </div>
