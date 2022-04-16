@@ -209,6 +209,7 @@ const SwapComponent = props => {
     setPoolExist(true);
     setShowDescription(false);
     setSwapMode('redeem')
+    setIsUSDA('true')
   }, [chainId])
 
   useEffect(() => {
@@ -312,6 +313,7 @@ const SwapComponent = props => {
       chainId,
       library,
       account,
+      token0Amount
     ]
   );
 
@@ -580,28 +582,29 @@ const SwapComponent = props => {
                   ...token1,
                   amount: token1Amount,
                 },
-                slippageTolerance * 100,
-                exactIn,
+                swapMode,
+                // slippageTolerance * 100,
+                // exactIn,
                 chainId,
                 library,
                 account,
-                pair,
-                route,
-                trade,
-                slippageAdjustedAmount,
-                minAmountOut,
-                maxAmountIn,
-                wethContract,
-                wrappedAmount,
-                deadline,
-                setSwapStatus,
-                setSwapButtonContent,
-                setSwapButtonState,
-                swapCallback,
-                methodName,
-                isUseArb,
-                midTokenAddress,
-                poolExist
+                // pair,
+                // route,
+                // trade,
+                // slippageAdjustedAmount,
+                // minAmountOut,
+                // maxAmountIn,
+                // wethContract,
+                // wrappedAmount,
+                // deadline,
+                // setSwapStatus,
+                // setSwapButtonContent,
+                // setSwapButtonState,
+                // swapCallback,
+                // methodName,
+                // isUseArb,
+                // midTokenAddress,
+                // poolExist
               );
             }
           }}

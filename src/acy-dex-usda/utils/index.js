@@ -37,8 +37,9 @@ export const supportedTokens = [{
   logoURI: 'https://storageapi2.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/USDA-min.svg',
   idOnCoingecko: "tether",
 }]
-const vaultAddress = '0x9a9248BA8A6A75B808dc86CC61848a2bFE8859C6'
-const USDAAddress = '0xC5b4CC3d3B43647c3B91677Db76790e25673411D'
+const vaultProxyAddress = '0x25e4D0dF994698123A3CcC85bAf435Ae821a2F13'
+const USDAProxyAddress = '0x45a2DFF9569F7fAA29015897ea956A5A48068273'
+
 export function isAddress(value) {
   try {
     return getAddress(value);
@@ -64,13 +65,13 @@ export function getContract(address, ABI, library, account) {
   return new Contract(address, ABI, getProviderOrSigner(library, account));
 }
 export function getUSDAContract(library, account) {
-  return getContract(USDAAddress, usdaABI, library, account);
+  return getContract(USDAProxyAddress, usdaABI, library, account);
 }
 export function getVaultAdminContract(library, account) {
-  return getContract(vaultAddress, vaultAdminABI, library, account);
+  return getContract(vaultProxyAddress, vaultAdminABI, library, account);
 }
 export function getVaultCoreContract(library, account) {
-  return getContract(vaultAddress, vaultCoreABI, library, account);
+  return getContract(vaultProxyAddress, vaultCoreABI, library, account);
 }
 
 // get user token balance in BigNumber
@@ -95,19 +96,24 @@ export async function getUserTokenBalance(token, chainId, account, library) {
     decimals
   );
 }
-
-export async function getEstimateAmount(swapMode, address, library, account) {
+export async function getEstimateAmount(swapMode, token, library, account) {
+  const {address,decimals} = token 
+// export async function getEstimateAmount(swapMode, address, library, account) {
   const vault = getVaultAdminContract(library, account)
   // const contractToGetEstimateAmount = getContract(address, vaultAdminABI, library, account);
-  console.log('###vault',vault)
   let estimateOutputAmount
   if (swapMode == 'mint') {
     estimateOutputAmount = vault.priceUSDMint(address);
   } else {
     estimateOutputAmount = vault.priceUSDRedeem(address);
-    console.log('aaaaa',estimateOutputAmount)
+    // console.log('aaaaa',estimateOutputAmount.toNumber())
   }
-  return estimateOutputAmount;
+
+  return formatUnits(
+    await estimateOutputAmount,
+    18
+  )
+  // return estimateOutputAmount;
 }
 
 export class CustomError {
@@ -118,4 +124,14 @@ export class CustomError {
   constructor(errorText) {
     this.errorText = errorText;
   }
+}
+
+export async function getApprove(token,library,account){
+  const {address,amount} = token
+  const contractToApprove = getUSDAContract(library, account);
+  console.log('type of amount',typeof(amount))
+  const approveAmount = parseUnits(amount,18)
+  console.log('approveAmount', approveAmount)
+  const appr = contractToApprove.approve(address,approveAmount)
+  return appr
 }
