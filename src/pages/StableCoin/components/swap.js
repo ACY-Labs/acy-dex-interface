@@ -18,20 +18,16 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits, formatUnits } from '@ethersproject/units';
 import WETHABI from '@/abis/WETH.json';
 import {
-  calculateGasMargin,
-  checkTokenIsApproved,
-  computeTradePriceBreakdown,
-  getAllowance,
-  getContract,
-  isZero,
-  withExactOutEstimateInAmount
-} from '@/acy-dex-swap/utils';
-import {
   getUserTokenBalance,
   getUserTokenBalanceRaw,
   CustomError,
   getEstimateAmount,
   getApprove,
+  getAllowance,
+  redeemUSDAtoUSDT,
+  redeemUSDAtoUSDC,
+  redeemUSDAtoDAI,
+  mintUSDA
 } from '@/acy-dex-usda/utils'
 import axios from 'axios';
 import { TOKENLIST, NATIVE_CURRENCY, SCAN_URL_PREFIX, SCAN_NAME, API_URL, ROUTER_ADDRESS } from '@/constants';
@@ -63,8 +59,9 @@ export async function swapGetEstimated(
     return new CustomError('Enter an amount');
   }
 
-  let userToken0Balance = await getUserTokenBalanceRaw(
+  let userToken0Balance = await getUserTokenBalance(
     inputToken0,
+    chainId,
     account,
     library
   ).catch(err => {
@@ -73,9 +70,9 @@ export async function swapGetEstimated(
 
   let userHasSufficientBalance;
   try {
-    userHasSufficientBalance = userToken0Balance.gte(
-      parseUnits(inputToken0.amount, inputToken0.decimal)
-    );
+    userHasSufficientBalance = userToken0Balance > inputToken0.amount
+    console.log('inputToken0.balance', inputToken0.balance, 'inputToken0.amount', inputToken0.amount)
+    console.log('amuserHasSufficientBalanceount', userHasSufficientBalance)
   } catch (e) {
     setSwapButtonState(false);
     if (e.fault === 'underflow') setSwapButtonContent(e.fault);
@@ -91,10 +88,9 @@ export async function swapGetEstimated(
       let token1Amount = estimateAmount * inputToken0.amount
       token1Amount = token1Amount.toFixed(3)
       setToken1Amount(token1Amount)
-
     } else {
       const estimateAmount = await getEstimateAmount(swapMode, inputToken0, library, account).catch(err => { console.log('failed to get estimate,', err) })
-      const token1Amount = estimateAmount * inputToken0.amount
+      let token1Amount = estimateAmount * inputToken0.amount
       token1Amount = token1Amount.toFixed(3)
       setToken1Amount(token1Amount)
     }
@@ -132,7 +128,35 @@ export async function swap(
   chainId,
   library,
   account,
+  setisTransactionSucc,
+  setSwapButtonContent,
 ) {
-  const isApprove = await getApprove(inputToken0, library, account)
-  console.log('###isApprove', isApprove)
+  const { amount } = inputToken0
+  if (swapMode == 'redeem') {
+    if (inputToken1.symbol == 'USDT') {
+      const isRedeemSucc = await redeemUSDAtoUSDT(inputToken1.address, amount, library, account)
+      console.log('@@@isRedeemSucc', isRedeemSucc)
+      setSwapButtonContent('Created transaction')
+
+      setisTransactionSucc(true)
+    } else if (inputToken1.symbol == 'USDC') {
+      const isRedeemSucc = await redeemUSDAtoUSDC(inputToken1.address, amount, library, account)
+      setSwapButtonContent('Created transaction')
+      setisTransactionSucc(true)
+    } else if (inputToken1.symbol == 'DAI') {
+      const isRedeemSucc = await redeemUSDAtoDAI(inputToken1.address, amount, library, account)
+      setSwapButtonContent('Created transaction')
+      setisTransactionSucc(true)
+    }
+  } else {
+    let Allowance = await getAllowance(inputToken0, library, account)
+    console.log('Allowance', Allowance)
+    let needApprove = (Allowance < amount) ? true : false
+    if (needApprove) {
+      getApprove(inputToken0, library, account)
+    }
+    const isRedeemSucc = await mintUSDA(inputToken0,library, account)
+    setSwapButtonContent('Created transaction')
+    setisTransactionSucc(true)
+  }
 }

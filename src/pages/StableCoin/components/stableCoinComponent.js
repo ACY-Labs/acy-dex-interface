@@ -157,6 +157,8 @@ const SwapComponent = props => {
   const connectWalletByLocalStorage = useConnectWallet();
   const [isUSDA,setIsUSDA] = useState(true)
   const [swapMode,setSwapMode] = useState('redeem')
+  const [isTransactionSucc,setIstransactionSucc] = useState(false)
+
   useEffect(() => {
     if (!INITIAL_TOKEN_LIST) return
     console.log("resetting page states, new swapComponent token0, token1", INITIAL_TOKEN_LIST[0], INITIAL_TOKEN_LIST[1])
@@ -254,6 +256,16 @@ const SwapComponent = props => {
     },
     [account, INITIAL_TOKEN_LIST]
   );
+  useEffect(async()=>{
+    setToken0Amount('')
+    setToken1Amount('')
+    const newToken0Balance = await getUserTokenBalance(token0, chainId, account, library)
+    setToken0Balance(newToken0Balance)
+    const newToken1Balance = await getUserTokenBalance(token1, chainId, account, library)
+    setToken1Balance(newToken1Balance)
+    setIstransactionSucc(false)
+    t0Changed('')
+  },[isTransactionSucc])
 
 
   // token1Amount is changed according to token0Amount
@@ -588,6 +600,9 @@ const SwapComponent = props => {
                 chainId,
                 library,
                 account,
+                setToken0Balance,
+                setToken1Balance,
+                setIstransactionSucc,
                 // pair,
                 // route,
                 // trade,
@@ -598,7 +613,7 @@ const SwapComponent = props => {
                 // wrappedAmount,
                 // deadline,
                 // setSwapStatus,
-                // setSwapButtonContent,
+                setSwapButtonContent,
                 // setSwapButtonState,
                 // swapCallback,
                 // methodName,
