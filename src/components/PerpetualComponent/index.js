@@ -300,6 +300,15 @@ function getNextAveragePrice({ size, sizeDelta, hasProfit, delta, nextPrice, isL
   return nextAveragePrice;
 }
 
+function getTokenfromSymbol(tokenlist, symbol) {
+  for (let i = 0; i < tokenlist.length; i++) {
+    if (tokenlist[i].symbol === symbol) {
+      return tokenlist[i]
+    }
+  }
+  return undefined
+}
+
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
 
@@ -985,7 +994,8 @@ const SwapComponent = props => {
 
   const [visible, setVisible] = useState()
 
-  const selectFromToken = token => {
+  const selectFromToken = symbol => {
+    const token = getTokenfromSymbol(tokens, symbol)
     setFromTokenAddress(token.address);
     setIsWaitingForApproval(false);
 
@@ -994,7 +1004,8 @@ const SwapComponent = props => {
     }
   };
 
-  const selectToToken = token => {
+  const selectToToken = symbol => {
+    const token = getTokenfromSymbol(tokens, symbol)
     setToTokenAddress(token.address);
   };
 

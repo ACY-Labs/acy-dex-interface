@@ -114,6 +114,15 @@ function getToken(tokenlist, tokenAddr) {
   return undefined
 }
 
+function getTokenfromSymbol(tokenlist, symbol) {
+  for (let i = 0; i < tokenlist.length; i++) {
+    if (tokenlist[i].symbol === symbol) {
+      return tokenlist[i]
+    }
+  }
+  return undefined
+}
+
 function getWrappedToken(tokenlist) {
   let wrappedToken;
   for (const t of tokenlist) {
@@ -260,7 +269,8 @@ export const GlpSwapBox = (props) => {
     setGlpValue(e.target.value)
   }
 
-  const onSelectSwapToken = (token) => {
+  const onSelectSwapToken = (symbol) => {
+    const token = getTokenfromSymbol(tokens, symbol)
     setSwapTokenAddress(token.address)
     setIsWaitingForApproval(false)
   }
