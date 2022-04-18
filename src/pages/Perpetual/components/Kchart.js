@@ -322,14 +322,6 @@ const Kchart=()=> {
     
     return(
         <div className='PriceChart' ref={chartRef}>
-            <div className="TopInner">
-                <div>ACY/USDT</div>
-                <div>XXX</div>
-                <div>XXX</div>
-                <div>XXX</div>
-                <div>XXX</div>
-
-            </div>
             <div className="BotInner">
                 <div className="KChartHeader">
                     <div className='KChartControl'>

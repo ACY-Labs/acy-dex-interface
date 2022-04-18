@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-computed-key */
+import { Menu, Dropdown, message } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import { useWeb3React } from '@web3-react/core';
 import React, { Component, useState, useEffect, useRef, useCallback, useMemo, useHistory } from 'react';
 import { connect } from 'umi';
@@ -65,6 +67,7 @@ import Media from 'react-media';
 import { uniqueFun } from '@/utils/utils';
 import { getTransactionsByAccount, appendNewSwapTx, findTokenWithSymbol } from '@/utils/txData';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
+import { getChartToken } from '@/components/PerpetualComponent';
 import PerpetualComponent from '@/components/PerpetualComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { GlpSwapTokenTable } from '@/components/PerpetualComponent/components/GlpSwapBox'
@@ -96,7 +99,7 @@ import { ethers } from 'ethers'
 import useSWR from 'swr'
 import sampleGmxTokens from '@/acy-dex-futures/samples/TokenList'
 
-
+//import ChartTokenSelector from './ChartTokenSelector'
 
 const { AddressZero } = ethers.constants
 // ----------
@@ -299,6 +302,8 @@ function getTokenBySymbol(tokenlist, symbol) {
   }
   return undefined
 }
+
+
 
 const Swap = props => {
   const { savedIsPnlInLeverage, setSavedIsPnlInLeverage, savedSlippageAmount, pendingTxns, setPendingTxns } = props
@@ -633,6 +638,8 @@ const Swap = props => {
     let token0logo = null;
     let token1logo = null;
     for (let j = 0; j < supportedTokens.length; j++) {
+      console.log("active token0", activeToken0);
+      console.log("active token1", activeToken1);
       if (activeToken0.symbol === supportedTokens[j].symbol) {
         token0logo = supportedTokens[j].logoURI;
       }
@@ -641,17 +648,24 @@ const Swap = props => {
       }
     }
 
-    const swapTokenPosition = () => {
-      const tempSwapToken = activeToken0;
-      setActiveToken0(activeToken1);
-      setActiveToken1(tempSwapToken);
-    }
+    // const swapTokenPosition = () => {
+    //   const tempSwapToken = activeToken0;
+    //   setActiveToken0(activeToken1);
+    //   setActiveToken1(tempSwapToken);
+    // }
+    // const onSelectToken = (token) => {
+    //   console.log ("tmp", token)
+    //   const tmp = getTokenInfo(infoTokens, token.address)
+    //   //setActiveToken0(tmp)
+    //   setActiveToken1(tmp, token.address)
+    // }
 
 
     return [
       <div style={{ width: "100%" }}>
-        <div className={styles.maintitle}>
-          <div className={styles.lighttitle} style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }} onClick={swapTokenPosition}>
+        {/* <div className={styles.maintitle}>
+         
+          <div className={styles.lighttitle} style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }} onClick={onSelectToken}>
             <img
               src={token0logo}
               alt=""
@@ -680,9 +694,8 @@ const Swap = props => {
             // times={['1D', '1W', '1M']}
             // times={['24h', 'Max']}
             times={['24h']}
-
           />
-        </div>
+        </div> */}
       </div>,
     ];
   };
@@ -726,6 +739,10 @@ const Swap = props => {
   };
 
 
+  const onClickDropdown = e => {
+    console.log(e, `Click on item ${e.key}`, supportedTokens.filter(el => el.symbol == e.key));
+    setActiveToken1((supportedTokens.filter(el => el.symbol == e.key))[0]);
+  };
 
   // 选择Coin
   const onClickCoin = () => {
@@ -858,10 +875,46 @@ const Swap = props => {
     }
   }
 
+  // let options = supportedTokens;
+  const menu = (
+    <Menu onClick={onClickDropdown}>
+      {
+        supportedTokens.map((option) => (
+          <Menu.Item key={option.symbol}>
+            <span>{option.symbol} / USD</span> 
+            {/* for showing before hover */}
+          </Menu.Item>
+        ))
+      }
+      {/* {lineTitleRender()} */}
+    </Menu>
+  );
+
+  function onChange (value) {
+    console.log("onchange",value);
+    setActiveToken1(option);
+  }
+
   return (
     <PageHeaderWrapper>
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
+          <div>
+          
+              <Dropdown overlay={menu} > 
+                <div
+                  className="site-dropdown-context-menu"
+                  style={{
+                    textAlign: 'left',
+                    height: 50,
+                    lineHeight: '50px',
+                  }}
+                >
+                  {activeToken1.symbol} / USD
+                </div>
+              </Dropdown>
+               
+          </div>
           {/* K chart */}
           <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
             <div className={`${styles.colItem} ${styles.priceChart}`}>
