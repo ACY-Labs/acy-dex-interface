@@ -99,6 +99,9 @@ import { ethers } from 'ethers'
 import useSWR from 'swr'
 import sampleGmxTokens from '@/acy-dex-futures/samples/TokenList'
 
+import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
+
+
 //import ChartTokenSelector from './ChartTokenSelector'
 
 const { AddressZero } = ethers.constants
@@ -308,7 +311,8 @@ function getTokenBySymbol(tokenlist, symbol) {
 const Swap = props => {
   const { savedIsPnlInLeverage, setSavedIsPnlInLeverage, savedSlippageAmount, pendingTxns, setPendingTxns } = props
 
-  const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix }, globalSettings, } = useConstantLoader();
+  const { account, library, chainId, farmSetting: { API_URL: apiUrlPrefix }, globalSettings, } = useConstantLoader();
+  const supportedTokens = defaultToken.default;
   console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
   //hj
@@ -740,9 +744,9 @@ const Swap = props => {
 
 
   const onClickDropdown = e => {
-    console.log(e, `Click on item ${e.key}`, supportedTokens.filter(el => el.symbol == e.key));
     setActiveToken1((supportedTokens.filter(el => el.symbol == e.key))[0]);
   };
+
 
   // 选择Coin
   const onClickCoin = () => {
@@ -1005,6 +1009,10 @@ const Swap = props => {
         {/* Perpetual Component */}
         <div className={styles.perpetualComponent}>
           <PerpetualComponent
+            activeToken0={activeToken0}
+            setActiveToken0={setActiveToken0}
+            activeToken1={activeToken1}
+            setActiveToken1={setActiveToken1}
             fromTokenAddress={fromTokenAddress}
             setFromTokenAddress={setFromTokenAddress}
             toTokenAddress={toTokenAddress}

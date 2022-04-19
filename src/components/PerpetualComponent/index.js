@@ -328,6 +328,10 @@ const SwapComponent = props => {
   // const { savedSlippageAmount } = props;
 
   const {
+    activeToken0,
+    activeToken1,
+    setActiveToken0,
+    setActiveToken1,
     positionsMap,
     pendingTxns,
     setPendingTxns,
@@ -1003,6 +1007,19 @@ const SwapComponent = props => {
       setShortCollateralAddress(token.address);
     }
   };
+
+  useEffect(() => {
+    console.log("tokens in useeffect", tokens);
+    const fromToken = getTokenfromSymbol(tokens, activeToken0.symbol)
+    const toToken = getTokenfromSymbol(tokens, activeToken1.symbol)
+    console.log("useeffect fromtoken",fromToken);
+    console.log("useeffect totoken",activeToken1);
+
+    setFromTokenAddress(fromToken.address);
+    setToTokenAddress(toToken.address);
+
+  }, [activeToken0, activeToken1])
+
 
   const selectToToken = symbol => {
     const token = getTokenfromSymbol(tokens, symbol)
