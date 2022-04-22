@@ -12,33 +12,7 @@ import { JSBI, Token, TokenAmount, Percent, ETHER, CurrencyAmount, Fetcher, Pair
 
 import { constantInstance, ROUTER_ADDRESS, FARMS_ADDRESS, FLASH_ARBITRAGE_ADDRESS, FACTORY_ADDRESS, INIT_CODE_HASH, RPC_URL, CHAINID, TOKENLIST, API_URL, NATIVE_CURRENCY, MARKET_TOKEN_LIST } from "@/constants";
 import { columnsPool } from '@/pages/Dao/Util';
-
-export const supportedTokens = [{
-  name: 'USD Tether',
-  symbol: 'USDT',
-  address: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
-  decimals: 6,
-  logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg', // not changed
-  idOnCoingecko: "tether",
-},
-{
-  name: 'USD Coin',
-  symbol: 'USDC',
-  address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',//0xe9e7cea3dedca5984780bafc599bd69add087d56
-  decimals: 6,
-  logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
-  idOnCoingecko: "usd-coin",
-},
-{
-  name: 'stable coin',
-  symbol: 'USDA',
-  address: '0x45a2DFF9569F7fAA29015897ea956A5A48068273',
-  decimals: 18,
-  logoURI: 'https://storageapi2.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/USDA-min.svg',
-  idOnCoingecko: "tether",
-}]
-const vaultProxyAddress = '0x25e4D0dF994698123A3CcC85bAf435Ae821a2F13'
-const USDAProxyAddress = '0x45a2DFF9569F7fAA29015897ea956A5A48068273'
+import { USDAProxyAddress, vaultProxyAddress } from './address';
 
 export function isAddress(value) {
   try {
@@ -97,8 +71,8 @@ export async function getUserTokenBalance(token, chainId, account, library) {
   );
 }
 export async function getEstimateAmount(swapMode, token, library, account) {
-  const {address,decimals} = token 
-// export async function getEstimateAmount(swapMode, address, library, account) {
+  const { address, decimals } = token
+  // export async function getEstimateAmount(swapMode, address, library, account) {
   const vault = getVaultAdminContract(library, account)
   // const contractToGetEstimateAmount = getContract(address, vaultAdminABI, library, account);
   let estimateOutputAmount
@@ -113,7 +87,7 @@ export async function getEstimateAmount(swapMode, token, library, account) {
     await estimateOutputAmount,
     18
   )
-  
+
   // return estimateOutputAmount;
 }
 
@@ -126,64 +100,56 @@ export class CustomError {
     this.errorText = errorText;
   }
 }
-export async function getAllowance(token,library,account){
-  const {address,amount,decimals} = token
+export async function getAllowance(token, library, account) {
+  const { address, amount, decimals } = token
   const contractToken = getContract(token.address, usdaABI, library, account);
-  const allowance = await contractToken.connect(getProviderOrSigner(library,account)).allowance(account, vaultProxyAddress)
-  return formatUnits(allowance,decimals)
+  const allowance = await contractToken.connect(getProviderOrSigner(library, account)).allowance(account, vaultProxyAddress)
+  return formatUnits(allowance, decimals)
 }
-export async function getApprove(token,library,account){
-  const {address,amount,decimals} = token
+export async function getApprove(token, library, account) {
+  const { address, amount, decimals } = token
   const contractToken = getContract(address, usdaABI, library, account);
-  const approveAmount = parseUnits(amount,decimals)
+  const approveAmount = parseUnits(amount, decimals)
   console.log('approveAmount', approveAmount)
-  const appr = contractToken.connect(getProviderOrSigner(library,account)).approve(vaultProxyAddress,approveAmount)
-  console.log('appr',appr)
+  const appr = contractToken.connect(getProviderOrSigner(library, account)).approve(vaultProxyAddress, approveAmount)
+  console.log('appr', appr)
   return appr
 }
-export async function mintUSDA(token,library,account){
-  const {address,amount,decimals} = token
-  const tokenAmount = parseUnits(amount,decimals)
-  const minAmount = parseUnits('0',decimals)
-  const contractToMint = getVaultCoreContract(library,account)
-  const mint = contractToMint.connect(getProviderOrSigner(library,account)).mint(address,tokenAmount,minAmount)
+export async function mintUSDA(token, library, account) {
+  const { address, amount, decimals } = token
+  const tokenAmount = parseUnits(amount, decimals)
+  const minAmount = parseUnits('0', decimals)
+  const contractToMint = getVaultCoreContract(library, account)
+  const mint = contractToMint.connect(getProviderOrSigner(library, account)).mint(address, tokenAmount, minAmount)
   return mint
 }
 
-export async function redeemUSDAtoUSDT(address,amount,library,acount){
-  console.log('address',address)
-  const redeemAmount = parseUnits(amount,18)
-  const minAmount = parseUnits('0',18)
-  const contractToRedeem = getVaultCoreContract(library,acount)
-  const contractTotoken = getContract(address,vaultCoreABI,library,acount)
-  console.log('contractTotoken',contractTotoken)
-  console.log('contractToRedeem',contractToRedeem)
-  
-  const res =  contractToRedeem.connect(getProviderOrSigner(library,acount)).redeem(redeemAmount,minAmount)
-  console.log('Redeemres',res)
+export async function redeemUSDAtoUSDT(address, amount, library, acount) {
+  const redeemAmount = parseUnits(amount, 18)
+  const minAmount = parseUnits('0', 18)
+  const contractToRedeem = getVaultCoreContract(library, acount)
+  const contractTotoken = getContract(address, vaultCoreABI, library, acount)
+
+  const res = contractToRedeem.connect(getProviderOrSigner(library, acount)).redeem(redeemAmount, minAmount)
   return res
 }
-export async function redeemUSDAtoUSDC(address,amount,library,acount){
-  console.log('address',address)
-  const redeemAmount = parseUnits(amount,18)
-  const minAmount = parseUnits('0',18)
-  const contractToRedeem = getVaultCoreContract(library,acount)
-  const contractTotoken = getContract(address,vaultCoreABI,library,acount)
-  console.log('contractTotoken',contractTotoken)
-  console.log('contractToRedeem',contractToRedeem)
-  
+export async function redeemUSDAtoUSDC(address, amount, library, acount) {
+  console.log('address', address)
+  const redeemAmount = parseUnits(amount, 18)
+  const minAmount = parseUnits('0', 18)
+  const contractToRedeem = getVaultCoreContract(library, acount)
+  const contractTotoken = getContract(address, vaultCoreABI, library, acount)
+
   // const res =  contractToRedeem.connect(getProviderOrSigner(library,acount)).redeem(redeemAmount,minAmount)
   // console.log('Redeemres',res)
   // return res
-}export async function redeemUSDAtoDAI(address,amount,library,acount){
-  console.log('address',address)
-  const redeemAmount = parseUnits(amount,18)
-  const minAmount = parseUnits('0',18)
-  const contractToRedeem = getVaultCoreContract(library,acount)
-  const contractTotoken = getContract(address,vaultCoreABI,library,acount)
-  console.log('contractTotoken',contractTotoken)
-  console.log('contractToRedeem',contractToRedeem)
-  
+} 
+export async function redeemUSDAtoDAI(address, amount, library, acount) {
+  const redeemAmount = parseUnits(amount, 18)
+  const minAmount = parseUnits('0', 18)
+  const contractToRedeem = getVaultCoreContract(library, acount)
+  const contractTotoken = getContract(address, vaultCoreABI, library, acount)
+
   // const res =  contractToRedeem.connect(getProviderOrSigner(library,acount)).redeem(redeemAmount,minAmount)
   // console.log('Redeemres',res)
   // return res

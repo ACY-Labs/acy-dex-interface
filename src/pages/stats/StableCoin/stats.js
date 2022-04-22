@@ -1,10 +1,10 @@
 import { connect } from "umi";
 import Media from 'react-media';
-import styles from './statsStyle.less';
-import { Graphics } from "./components/stats/graphics"
-import { VaultCard } from "./components/stats/vaultCard";
-import { StartegyCard } from "./components/stats/strategyCard";
-import { ValueCalculations } from "./components/stats/valueCalculations"
+import styles from './style.less';
+import { Graphics } from "./components/graphics"
+import { VaultCard } from "./components/vaultCard";
+import { StartegyCard } from "./components/strategyCard";
+import { ValueCalculations } from "./components/valueCalculations"
 
 const stats = (props) => {
     /* #region  graph */

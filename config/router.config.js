@@ -72,20 +72,15 @@ export default [
       {
         path: '/stats',
         name: 'Stats',
-        component: './StableCoin/stats'
+        // component: './stats/stats',
+        routes:[
+          {
+            path:'/stats/stablecoin',
+            name:'Stablecoin',
+            component:'./stats/StableCoin/stats'
+          }
+        ]
       },
-      // routes:[
-      //   {
-      //     path: '/stablecoin',
-      //     component: './StableCoin/Index',
-
-      //   },
-      //   {
-      //     path: '/stablecoin/stats',
-      //     component:'./StableCoin/stats'
-      //   }
-      // ]
-      // },
       {
         path: '/launchpad',
         name: 'Launch',
@@ -107,10 +102,6 @@ export default [
         hideInMenu: true,
         component: './Transaction/Index',
       },
-      // {
-      //   path: '/stablecon/stats',
-      //   component:'./StableCoin/stats'
-      // }
     ],
   },
 ];

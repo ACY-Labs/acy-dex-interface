@@ -12,7 +12,6 @@ import {
   mintUSDA
 } from '@/acy-dex-usda/utils'
 import { useEffect, useState } from 'react';
-import { SCAN_URL_PREFIX,SCAN_NAME } from '@/constants';
 
 function toFixed4(floatInString) {
   return parseFloat(floatInString).toFixed(4);
@@ -108,86 +107,41 @@ export async function swap(
   setisTransactionSucc,
   setSwapButtonContent,
   swapCallback,
-  setSwapStatus,
-  setScanUrl,
-  getSwapStatus
 ) {
   const { amount } = inputToken0
-  const transactionRes = await (async () => {
-    if (swapMode == 'redeem') {
-      if (inputToken1.symbol == 'USDT') {
-        const isRedeemSucc = await redeemUSDAtoUSDT(inputToken1.address, amount, library, account)
-        setisTransactionSucc(true)
-        return isRedeemSucc
-        setSwapButtonContent('Created transaction')
-
-        // setisTransactionSucc(true)
-      } else if (inputToken1.symbol == 'USDC') {
-        const isRedeemSucc = await redeemUSDAtoUSDC(inputToken1.address, amount, library, account)
-        setSwapButtonContent('Created transaction')
-        return isRedeemSucc
-        setisTransactionSucc(true)
-      } else if (inputToken1.symbol == 'DAI') {
-        const isRedeemSucc = await redeemUSDAtoDAI(inputToken1.address, amount, library, account)
-        setSwapButtonContent('Created transaction')
-        return isRedeemSucc
-        // setisTransactionSucc(true)
-      }
-    } else {
-      let Allowance = await getAllowance(inputToken0, library, account)
-      console.log('Allowance', Allowance)
-      let needApprove = (Allowance < amount) ? true : false
-      if (needApprove) {
-        getApprove(inputToken0, library, account)
-      }
-      const isMintSucc = await mintUSDA(inputToken0, library, account)
-      console.log('@@@@ismintSucc', isMintSucc)
-      // const receipt = await rpcProvider.waitForTransaction(receipt.hash)
-      // console.log('@@@@receipt', receipt)
+  if (swapMode == 'redeem') {
+    if (inputToken1.symbol == 'USDT') {
+      const isRedeemSucc = await redeemUSDAtoUSDT(inputToken1.address, amount, library, account)
+      console.log('@@@isRedeemSucc', isRedeemSucc)
       setSwapButtonContent('Created transaction')
-      return isMintSucc
-      // setisTransactionSucc(true)
+
+      setisTransactionSucc(true)
+    } else if (inputToken1.symbol == 'USDC') {
+      const isRedeemSucc = await redeemUSDAtoUSDC(inputToken1.address, amount, library, account)
+      setSwapButtonContent('Created transaction')
+      setisTransactionSucc(true)
+    } else if (inputToken1.symbol == 'DAI') {
+      const isRedeemSucc = await redeemUSDAtoDAI(inputToken1.address, amount, library, account)
+      setSwapButtonContent('Created transaction')
+      setisTransactionSucc(true)
     }
-  })()
-  if (transactionRes instanceof CustomError) {
-    let text = transactionRes.getErrorText();
-    console.log('text',text)
-    // setSwapStatus(text);
-    setSwapButtonContent("Please try again");
   } else {
-    console.log("TEST status:");
-    if ((transactionRes.error && transactionRes.error.code == 4001) || transactionRes.code == 4001) {
-      setSwapButtonContent("Swap");
-      setSwapButtonState(true);
-    } else if ((transactionRes.error && transactionRes.error.code == -32603) || transactionRes.code == -32603) {
-      console.log("error status -32603", transactionRes)
-      let text = null;
-      setSwapButtonContent("Please try again");
-    } else {
-
-
-      console.log("this is swap data: ", transactionRes);
-
-      const scanUrlPrefix = SCAN_URL_PREFIX();
-      const url = `${scanUrlPrefix}/tx/${transactionRes.hash}`;
-      console.log('url',url)
-
-      // setScanUrl(url)
-      const view = (
-        <div>
-          <a href={url} target="_blank" rel="noreferrer">
-            View it on {SCAN_NAME()}
-          </a>
-        </div>
-      )
-      // getSwapStatus(view)
-
-
-      // try {
-      //   swapCallback(transactionRes);
-      // } catch (err) {
-      //   console.log("error caught", err)
-      // }
+    let Allowance = await getAllowance(inputToken0, library, account)
+    console.log('Allowance', Allowance)
+    let needApprove = (Allowance < amount) ? true : false
+    if (needApprove) {
+      getApprove(inputToken0, library, account)
     }
+    const ismintSucc = await mintUSDA(inputToken0,library, account)
+    console.log('@@@@ismintSucc',ismintSucc)
+    const receipt = await rpcProvider.waitForTransaction(receipt.hash)
+    console.log('@@@@receipt',receipt)
+    setSwapButtonContent('Created transaction')
+    // setisTransactionSucc(true)
+  }
+  try {
+    swapCallback(inputToken0, inputToken1);
+  } catch (err) {
+    console.log("error caught", err)
   }
 }

@@ -13,7 +13,7 @@ import TokenListManager from "@/components/TokenSelectorModal/TokenListManager";
 import { Input, Icon } from "antd";
 import { useWeb3React } from '@web3-react/core';
 import { getUserTokenBalance } from '@/acy-dex-usda/utils';
-import { supportedTokens} from '@/acy-dex-usda/utils';
+import { supportedTokens} from '@/acy-dex-usda/utils/address';
 import { asyncForEach } from "@/utils/asynctools";
 import { processString } from "@/components/AcyCoinItem";
 import styles from "./tokenSelectorModal.less";
@@ -21,7 +21,7 @@ import {useConstantLoader} from '@/constants';
 
 const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
     const {account, library, chainId, } = useConstantLoader();
-    const INITIAL_TOKEN_LIST = supportedTokens
+    const INITIAL_TOKEN_LIST = supportedTokens[chainId]
     const [currentPanel, setCurrentPanel] = useState("selectToken");
 
     const [initTokenList, setInitTokenList] = useState(INITIAL_TOKEN_LIST);

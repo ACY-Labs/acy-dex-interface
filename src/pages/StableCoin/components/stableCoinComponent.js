@@ -1,11 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-param-reassign */
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable react/react-in-jsx-scope */
-/* eslint-disable no-return-await */
-/* eslint-disable no-restricted-globals */
-/* eslint-disable consistent-return */
 import {
   AcyCard,
   AcyIcon,
@@ -24,7 +16,7 @@ import {
   AcySmallButton,
 } from '@/components/Acy';
 import TokenSelectorModal from './tokenSelectorModal';
-import { supportedTokens} from '@/acy-dex-usda/utils';
+import { supportedTokens } from '@/acy-dex-usda/utils/address';
 
 import { connect } from 'umi';
 import styles from './stableCoinComponent.less';
@@ -32,7 +24,7 @@ import { sortAddress, abbrNumber } from '@/utils/utils';
 import axios from 'axios';
 
 import { useWeb3React } from '@web3-react/core';
-import { binance,injected } from '@/connectors';
+import { binance, injected } from '@/connectors';
 import React, { useState, useEffect, useCallback } from 'react';
 
 import {
@@ -45,13 +37,15 @@ import {
   isZero,
   parseArbitrageLog,
 } from '@/acy-dex-swap/utils/index';
-import {getUserTokenBalance,getUserTokenBalanceRaw}from '@/acy-dex-usda/utils'
+import { getUserTokenBalance, getUserTokenBalanceRaw } from '@/acy-dex-usda/utils'
 
 // import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
 import { swapGetEstimated, swap } from './swap';
 
 import ERC20ABI from '@/abis/ERC20.json';
 import WETHABI from '@/abis/WETH.json';
+import { SCAN_URL_PREFIX,SCAN_NAME } from '@/constants';
+
 
 import {
   Token,
@@ -79,16 +73,13 @@ import { Row, Col, Button, Input, Icon } from 'antd';
 import { Alert } from 'antd';
 import spinner from '@/assets/loading.svg';
 import moment from 'moment';
-import {useConstantLoader} from '@/constants';
-import {useConnectWallet} from '@/components/ConnectWallet';
+import { useConstantLoader } from '@/constants';
+import { useConnectWallet } from '@/components/ConnectWallet';
 
-
-
-// var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
-  const { account, library, chainId, farmSetting: {INITIAL_ALLOWED_SLIPPAGE}} = useConstantLoader(props);
-  const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1=false} = props;
-  const INITIAL_TOKEN_LIST = supportedTokens
+  const { account, library, chainId, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
+  const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1 = false } = props;
+  const INITIAL_TOKEN_LIST = supportedTokens[chainId]
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
 
@@ -132,7 +123,6 @@ const SwapComponent = props => {
 
   // Breakdown shows the estimated information for swap
 
-  // let [estimatedStatus,setEstimatedStatus]=useState();
   const [swapBreakdown, setSwapBreakdown] = useState();
   const [swapButtonState, setSwapButtonState] = useState(false);
   const [swapButtonContent, setSwapButtonContent] = useState('Connect to Wallet');
@@ -155,29 +145,29 @@ const SwapComponent = props => {
 
   const [showDescription, setShowDescription] = useState(false);
   const connectWalletByLocalStorage = useConnectWallet();
-  const [isUSDA,setIsUSDA] = useState(true)
-  const [swapMode,setSwapMode] = useState('redeem')
-  const [isTransactionSucc,setIstransactionSucc] = useState(false)
+  const [isUSDA, setIsUSDA] = useState(true)
+  const [swapMode, setSwapMode] = useState('redeem')
+  const [isTransactionSucc, setIstransactionSucc] = useState(false)
+  const [scanUrl, setScanUrl] = useState()
 
   useEffect(() => {
     if (!INITIAL_TOKEN_LIST) return
-    console.log("resetting page states, new swapComponent token0, token1", INITIAL_TOKEN_LIST[0], INITIAL_TOKEN_LIST[1])
     setVisible(null);
-      // 选择货币前置和后置
+    // 选择货币前置和后置
     setBefore(true);
-      // 交易对前置货币
+    // 交易对前置货币
     setToken0(INITIAL_TOKEN_LIST[2]);
-      // 交易对后置货币
+    // 交易对后置货币
     setToken1(INITIAL_TOKEN_LIST[0]);
-      // 交易对前置货币余额
+    // 交易对前置货币余额
     setToken0Balance('0');
-      // 交易对后置货币余额
+    // 交易对后置货币余额
     setToken1Balance('0');
-      // 交易对前置货币兑换量
+    // 交易对前置货币兑换量
     setToken0Amount('');
-      // 交易对后置货币兑换量
+    // 交易对后置货币兑换量
     setToken1Amount('');
-      // 交易中用户使用Flash Arbitrage的额外获利
+    // 交易中用户使用Flash Arbitrage的额外获利
     setBonus0(null);
     setBonus1(null);
     setToken0BalanceShow(false);
@@ -190,8 +180,6 @@ const SwapComponent = props => {
     setNeedApprove(false);
     setApproveAmount('0');
     setApproveButtonStatus(true);
-      // Breakdown shows the estimated information for swap
-      // let [estimatedStatus,setEstimatedStatus]=useState();
     setSwapBreakdown();
     setSwapButtonState(false);
     setSwapButtonContent('Connect to Wallet');
@@ -214,15 +202,18 @@ const SwapComponent = props => {
     setIsUSDA('true')
   }, [chainId])
 
+  useEffect(()=>{
+    console.log('swapStatus',swapStatus)
+  },[swapStatus])
+
   useEffect(() => {
-    if(token) {
-      console.log('@@@Changetoken')
+    if (token) {
       setToken0(token.token0);
       setToken1(token.token1);
     }
   }, [token]);
 
-  
+
 
   const individualFieldPlaceholder = 'Enter amount';
   const dependentFieldPlaceholder = 'Estimated value';
@@ -241,7 +232,7 @@ const SwapComponent = props => {
       const _token1 = INITIAL_TOKEN_LIST[0];
       setToken0(_token0);
       setToken1(_token1);
-    setSwapMode('redeem')
+      setSwapMode('redeem')
       async function refreshBalances() {
         setToken0Balance(await getUserTokenBalance(_token0, chainId, account, library).catch(e => console.log("refrersh balances error", e)));
         setToken0BalanceShow(true);
@@ -251,25 +242,19 @@ const SwapComponent = props => {
       try {
         refreshBalances();
       } catch {
-        // e => console.log("refrersh balances error", e)
+        e => console.log("refrersh balances error", e)
       }
     },
     [account, INITIAL_TOKEN_LIST]
   );
-  useEffect(async()=>{
-    setToken0Amount('')
-    setToken1Amount('')
-    const newToken0Balance = await getUserTokenBalance(token0, chainId, account, library)
-    setToken0Balance(newToken0Balance)
-    const newToken1Balance = await getUserTokenBalance(token1, chainId, account, library)
-    setToken1Balance(newToken1Balance)
-    setIstransactionSucc(false)
-    t0Changed('')
-  },[isTransactionSucc])
+  function getSwapStatus(view){
+    console.log('rrrgetStatus')
+    setSwapStatus(view)
+  }
 
 
   // token1Amount is changed according to token0Amount
-  const t0Changed = 
+  const t0Changed =
     async (e) => {
       if (!token0 || !token1) return;
       if (!exactIn) return;
@@ -345,8 +330,6 @@ const SwapComponent = props => {
       if (account == undefined) {
         alert('Please connect to your account');
       } else {
-        // console.log('SET TOKEN 0');
-        console.log(onSelectToken0);
         onSelectToken0(token);
         setToken0(token);
         setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
@@ -375,7 +358,7 @@ const SwapComponent = props => {
     let tempToken = token1;
     let tempAmount = token1Amount;
     let tempBalance = token1Balance;
-    let mode = swapMode === 'redeem'? 'mint':'redeem'
+    let mode = swapMode === 'redeem' ? 'mint' : 'redeem'
     setToken1(token0);
     setToken1Amount(token0Amount);
     setToken1Balance(token0Balance);
@@ -388,18 +371,20 @@ const SwapComponent = props => {
   };
 
   // swap的交易状态
-  const swapCallback = async (status, inputToken, outToken) => {
+  const swapCallback = async (status) => {
     // 循环获取交易结果
+    console.log('rrrunswapcallback')
     const {
       transaction: { transactions },
     } = props;
+    console.log('####transction', transactions)
     // 检查是否已经包含此交易
-    const transLength = transactions.filter(item => item.hash == status.hash).length;
     const sti = async (hash) => {
+    const transLength = transactions.filter(item => item.hash == status.hash).length;
       library.getTransactionReceipt(hash).then(async receipt => {
         // console.log(`receiptreceipt for ${hash}: `, receipt);
         // receipt is not null when transaction is done
-        if (!receipt) 
+        if (!receipt)
           setTimeout(sti(hash), 500);
         else {
 
@@ -408,11 +393,11 @@ const SwapComponent = props => {
           } else {
 
             props.onGetReceipt(receipt.transactionHash, library, account);
-            
+
             // set button to done and disabled on default
             setSwapButtonContent("Done");
           }
-          
+
           const newData = transactions.filter(item => item.hash != hash);
           dispatch({
             type: 'transaction/addTransaction',
@@ -420,7 +405,7 @@ const SwapComponent = props => {
               transactions: newData
             },
           });
-          
+
         }
       });
     }
@@ -428,10 +413,8 @@ const SwapComponent = props => {
   };
 
   useEffect(() => {
-    // console.log("transactions changed", props.transaction.transactions)
+    console.log("@@@@@@transactions changed", props.transaction.transactions)
   }, [props.transaction.transactions]);
-
-  useEffect(() => console.log("test slippage: ", slippageTolerance), [slippageTolerance]);
 
   return (
     <div className={styles.sc}>
@@ -454,7 +437,6 @@ const SwapComponent = props => {
           setShowDescription(true);
           setToken0Amount(e);
           setExactIn(true);
-          // console.log("current t0 amount", e)
           t0Changed(e);
         }}
         library={library}
@@ -464,10 +446,10 @@ const SwapComponent = props => {
         className={styles.arrow}
         disabled={isLockedToken1}
         onClick={() => {
-          if(!isLockedToken1){
+          if (!isLockedToken1) {
             onSwitchCoinCard();
           }
-          
+
         }}
       >
         <Icon style={{ fontSize: '16px' }} type="arrow-down" />
@@ -540,96 +522,64 @@ const SwapComponent = props => {
             </div>
           </div>
         </div>
-        {/* <div className={styles.acyDescriptionContainer}>
-              {swapBreakdown.map(info => (
-                <AcyDescriptions.Item>
-                  <div className={styles.acyDescriptionItem}>{info}</div>
-                </AcyDescriptions.Item>
-              ))}
-            </div> */}
       </AcyDescriptions>
-      : null}
+        : null}
 
-      {needApprove
-        ? <div>
-          <AcyButton
-            style={{ marginTop: '25px' }}
-            disabled={!approveButtonStatus}
-            onClick={async () => {
-              setShowSpinner(true);
-              setApproveButtonStatus(false);
-              const state = await approve(token0.address, approveAmount, library, account);
-              setApproveButtonStatus(true);
-              setShowSpinner(false);
-
-              if (state) {
-                setSwapButtonState(true);
-                setSwapButtonContent('Swap');
-                setApproveButtonStatus(false);
-                setNeedApprove(false);
-                // console.log("test needApprove false")
-              }
-            }}
-          >
-            Approve{' '}
-            {showSpinner && <Icon type="loading" />}
-          </AcyButton>{' '}
-        </div>
-
-        : <AcyButton
-          style={{ marginTop: '25px' }}
-          disabled={!swapButtonState}
-          onClick={() => {
-            if (account == undefined) {
-              connectWalletByLocalStorage();
-            } else {
-              setSwapButtonState(false);
-              setSwapButtonContent(<>Processing <Icon type="loading" /></>)
-              swap(
-                {
-                  ...token0,
-                  amount: token0Amount,
-                },
-                {
-                  ...token1,
-                  amount: token1Amount,
-                },
-                swapMode,
-                // slippageTolerance * 100,
-                // exactIn,
-                chainId,
-                library,
-                account,
-                setToken0Balance,
-                setToken1Balance,
-                setIstransactionSucc,
-                // pair,
-                // route,
-                // trade,
-                // slippageAdjustedAmount,
-                // minAmountOut,
-                // maxAmountIn,
-                // wethContract,
-                // wrappedAmount,
-                // deadline,
-                // setSwapStatus,
-                setSwapButtonContent,
-                // setSwapButtonState,
-                // swapCallback,
-                // methodName,
-                // isUseArb,
-                // midTokenAddress,
-                // poolExist
-              );
-            }
-          }}
-        >
-          {swapButtonContent}
-        </AcyButton>
-      }
+      <AcyButton
+        style={{ marginTop: '25px' }}
+        disabled={!swapButtonState}
+        onClick={() => {
+          if (account == undefined) {
+            connectWalletByLocalStorage();
+          } else {
+            setSwapButtonState(false);
+            setSwapButtonContent(<>Processing <Icon type="loading" /></>)
+            swap(
+              {
+                ...token0,
+                amount: token0Amount,
+              },
+              {
+                ...token1,
+                amount: token1Amount,
+              },
+              swapMode,
+              // slippageTolerance * 100,
+              // exactIn,
+              chainId,
+              library,
+              account,
+              setToken0Balance,
+              setToken1Balance,
+              setIstransactionSucc,
+              // pair,
+              // route,
+              // trade,
+              // slippageAdjustedAmount,
+              // minAmountOut,
+              // maxAmountIn,
+              // wethContract,
+              // wrappedAmount,
+              // deadline,
+              setSwapButtonContent,
+              // setSwapButtonState,
+              swapCallback,
+              setSwapStatus,
+              // methodName,
+              // isUseArb,
+              // midTokenAddress,
+              // poolExist
+              setScanUrl,
+              getSwapStatus
+            );
+          }
+        }}
+      >
+        {swapButtonContent}
+      </AcyButton>
 
       <AcyDescriptions>
-        {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
+        {swapStatus  && <AcyDescriptions.Item> {swapStatus} </AcyDescriptions.Item>}
       </AcyDescriptions>
 
       <TokenSelectorModal

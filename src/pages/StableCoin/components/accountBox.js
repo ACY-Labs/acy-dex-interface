@@ -1,5 +1,5 @@
-import { getUserTokenBalance, supportedTokens} from '@/acy-dex-usda/utils';
-
+import { getUserTokenBalance} from '@/acy-dex-usda/utils';
+import { supportedTokens } from '@/acy-dex-usda/utils/address';
 import { useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 
@@ -23,8 +23,8 @@ async function getBalance(token, chainId, account, library) {
 export const AccountBox = props => {
   //read props
   const { account, library, chainId,} = useConstantLoader(props);
-
-  const usda = supportedTokens[2]
+  const tokenlist = supportedTokens[chainId]
+  const usda = tokenlist[2]
 
   const [balance, setBalance] = useState('-.-')
   useEffect(async () => {
