@@ -2,6 +2,7 @@
 /* eslint-disable consistent-return */
 import { ethers } from 'ethers';
 import { BigNumber } from '@ethersproject/bignumber';
+import { JsonRpcProvider } from "@ethersproject/providers"
 import _ from "lodash";
 import Token from "@/acy-dex-futures/abis/Token.json";
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
@@ -183,7 +184,7 @@ export function approveTokens({
   setIsApproving(true);
   const contract = new ethers.Contract(
     tokenAddress,
-    Token.abi,
+    Token,
     library.getSigner()
   );
   contract
@@ -614,28 +615,29 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
 }
 
 export function getProvider(library, chainId) {
-  let provider;
   if (library) {
     return library.getSigner();
   }
-  provider = _.sample(RPC_PROVIDERS[chainId]);
-  return new ethers.providers.StaticJsonRpcProvider(provider, { chainId });
+  // let provider;
+  // provider = _.sample(RPC_PROVIDERS[chainId]);
+  // return new ethers.providers.StaticJsonRpcProvider(provider, { chainId });
+  return new JsonRpcProvider('https://arb1.arbitrum.io/rpc');
 }
 
 export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   // eslint-disable-next-line
   const [chainId, arg0, arg1, ...params] = args
-  // const provider = getProvider(library, chainId);
+  const provider = getProvider(library, chainId);
   const method = ethers.utils.isAddress(arg0) ? arg1 : arg0
 
   function onError(e) {
-    console.error(contractInfo.contractName, method, e)
+    console.error(contractInfo, method, e)
   }
 
   if (ethers.utils.isHexString(arg0)) {
     const address = arg0
-    const contract = new ethers.Contract(address, contractInfo.abi, library)
-    console.log('fetcher', contract, method, library, library.getSigner())
+    const contract = new ethers.Contract(address, contractInfo, provider)
+    console.log('fetcher', contractInfo, method, contract)
 
     try {
       if (additionalArgs) {
@@ -646,7 +648,6 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
       }
       return contract[method](...params).catch(onError)
     } catch (e) {
-      console.log('error', e);
       onError(e)
     }
   }

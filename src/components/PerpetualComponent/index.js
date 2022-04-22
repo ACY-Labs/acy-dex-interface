@@ -77,21 +77,23 @@ import {
   nativeTokenAddress,
   routerAddress,
   orderBookAddress,
-  stakedGlpTrackerAddress,
+  // stakedGlpTrackerAddress,
   glpManagerAddress,
-  feeGlpTrackerAddress,
-  glpVesterAddress,
-  rewardReaderAddress,
+  glpAddress,
+  // feeGlpTrackerAddress,
+  // glpVesterAddress,
+  // rewardReaderAddress,
   tempChainID,
   tempLibrary
 } from '@/acy-dex-futures/samples/constants'
 import { callContract, useGmxPrice } from '@/acy-dex-futures/core/Perpetual'
 import Reader from '@/acy-dex-futures/abis/Reader.json'
 import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
-import VaultV2 from '@/acy-dex-futures/abis/VaultV2.json'
+import Vault from '@/acy-dex-futures/abis/Vault.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
 import Router from '@/acy-dex-futures/abis/Router.json'
 import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
+import Glp from '@/acy-dex-futures/abis/Glp.json'
 import RewardTracker from '@/acy-dex-futures/abis/RewardTracker.json'
 import Vester from '@/acy-dex-futures/abis/Vester.json'
 import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
@@ -393,8 +395,8 @@ const SwapComponent = props => {
   const [poolExist, setPoolExist] = useState(true);
 
   // ymj useState
-  const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
-  const [toTokenAddress, setToTokenAddress] = useState("0xf97f4df75117a78c1A5a0DBb814Af92458539FB4");
+  const [fromTokenAddress, setFromTokenAddress] = useState("0xF82eEeC2C58199cb409788E5D5806727cf549F9f");
+  const [toTokenAddress, setToTokenAddress] = useState("0xF82eEeC2C58199cb409788E5D5806727cf549F9f");
   // const [fromTokenInfo, setFromTokenInfo] = useState();
   // const [toTokenInfo, setToTokenInfo] = useState();
   const [mode, setMode] = useState(LONG);
@@ -427,38 +429,29 @@ const SwapComponent = props => {
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
   })
-  console.log('library=',library,chainId)
-  console.log('tokenBalance', tokenBalances)
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
-    fetcher: fetcher(library, ReaderV2, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
+    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
   })
-  console.log('vaultTokenInfo', vaultTokenInfo)
   const { data: fundingRateInfo, mutate: updateFundingRateInfo } = useSWR([chainId, readerAddress, "getFundingRates"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
   })
-  console.log('fundingRateInfo', fundingRateInfo)
   const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([chainId, vaultAddress, "totalTokenWeights"], {
-    fetcher: fetcher(library, VaultV2),
+    fetcher: fetcher(library, Vault),
   })
-  console.log('totalTokenWeights', totalTokenWeights)
   const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
-    fetcher: fetcher(library, Token),
+    fetcher: fetcher(library, Glp),
   })
-  console.log('usdgSupply', usdgSupply)
   const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR([chainId, routerAddress, "approvedPlugins", account || PLACEHOLDER_ACCOUNT, orderBookAddress], {
     fetcher: fetcher(library, Router)
   });
-  console.log('orderBookApproved', orderBookApproved)
-
   const tokenAllowanceAddress = fromTokenAddress === AddressZero ? nativeTokenAddress : fromTokenAddress;
   const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
-      fetcher: fetcher(library, Token)
+    fetcher: fetcher(library, Glp)
   });
-  console.log('tokenAllowance', tokenAllowance)
 
   // default collateral address on ARBITRUM
-  const [shortCollateralAddress, setShortCollateralAddress] = useState(ARBITRUM_DEFAULT_COLLATERAL_ADDRESS)
+  const [shortCollateralAddress, setShortCollateralAddress] = useState("0xF82eEeC2C58199cb409788E5D5806727cf549F9f")
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   const fromToken = getToken(tokens, fromTokenAddress);
@@ -1036,191 +1029,191 @@ const SwapComponent = props => {
       });
   };
 
-  const swap = async () => {
-    if (fromToken.isNative && toToken.isWrapped) {
-      wrap();
-      return;
-    }
+  // const swap = async () => {
+  //   if (fromToken.isNative && toToken.isWrapped) {
+  //     wrap();
+  //     return;
+  //   }
 
-    if (fromTokenAddress.isWrapped && toToken.isNative) {
-      unwrap();
-      return;
-    }
+  //   if (fromTokenAddress.isWrapped && toToken.isNative) {
+  //     unwrap();
+  //     return;
+  //   }
 
-    setIsSubmitting(true);
-    let path = [fromTokenAddress, toTokenAddress];
-    if (anchorOnFromAmount) {
-      const { path: multiPath } = getNextToAmount(
-        chainId,
-        fromAmount,
-        fromTokenAddress,
-        toTokenAddress,
-        infoTokens,
-        undefined,
-        undefined,
-        usdgSupply,
-        totalTokenWeights
-      );
-      if (multiPath) {
-        path = multiPath;
-      }
-    } else {
-      const { path: multiPath } = getNextFromAmount(
-        chainId,
-        toAmount,
-        fromTokenAddress,
-        toTokenAddress,
-        infoTokens,
-        undefined,
-        undefined,
-        usdgSupply,
-        totalTokenWeights
-      );
-      if (multiPath) {
-        path = multiPath;
-      }
-    }
+  //   setIsSubmitting(true);
+  //   let path = [fromTokenAddress, toTokenAddress];
+  //   if (anchorOnFromAmount) {
+  //     const { path: multiPath } = getNextToAmount(
+  //       chainId,
+  //       fromAmount,
+  //       fromTokenAddress,
+  //       toTokenAddress,
+  //       infoTokens,
+  //       undefined,
+  //       undefined,
+  //       usdgSupply,
+  //       totalTokenWeights
+  //     );
+  //     if (multiPath) {
+  //       path = multiPath;
+  //     }
+  //   } else {
+  //     const { path: multiPath } = getNextFromAmount(
+  //       chainId,
+  //       toAmount,
+  //       fromTokenAddress,
+  //       toTokenAddress,
+  //       infoTokens,
+  //       undefined,
+  //       undefined,
+  //       usdgSupply,
+  //       totalTokenWeights
+  //     );
+  //     if (multiPath) {
+  //       path = multiPath;
+  //     }
+  //   }
 
-    let method;
-    let contract;
-    let value;
-    let params;
-    let minOut;
-    if (shouldRaiseGasError(getTokenInfo(infoTokens, fromTokenAddress), fromAmount)) {
-      setIsSubmitting(false);
-      setIsPendingConfirmation(true);
-      helperToast.error(
-        `Leave at least ${formatAmount(DUST_BNB, 18, 3)} ${getConstant(
-          chainId,
-          'nativeTokenSymbol'
-        )} for gas`
-      );
-      return;
-    }
+  //   let method;
+  //   let contract;
+  //   let value;
+  //   let params;
+  //   let minOut;
+  //   if (shouldRaiseGasError(getTokenInfo(infoTokens, fromTokenAddress), fromAmount)) {
+  //     setIsSubmitting(false);
+  //     setIsPendingConfirmation(true);
+  //     helperToast.error(
+  //       `Leave at least ${formatAmount(DUST_BNB, 18, 3)} ${getConstant(
+  //         chainId,
+  //         'nativeTokenSymbol'
+  //       )} for gas`
+  //     );
+  //     return;
+  //   }
 
-    if (!isMarketOrder) {
-      minOut = toAmount;
-      Api.createSwapOrder(
-        chainId,
-        library,
-        path,
-        fromAmount,
-        minOut,
-        triggerRatio,
-        getContractAddress(chainId, 'NATIVE_TOKEN'),
-        {
-          sentMsg: 'Swap Order submitted!',
-          successMsg: 'Swap Order created!',
-          failMsg: 'Swap Order creation failed',
-          pendingTxns,
-          setPendingTxns,
-        }
-      )
-        .then(() => {
-          setIsConfirming(false);
-        })
-        .finally(() => {
-          setIsSubmitting(false);
-          setIsPendingConfirmation(false);
-        });
-      return;
-    }
+  //   if (!isMarketOrder) {
+  //     minOut = toAmount;
+  //     Api.createSwapOrder(
+  //       chainId,
+  //       library,
+  //       path,
+  //       fromAmount,
+  //       minOut,
+  //       triggerRatio,
+  //       getContractAddress(chainId, 'NATIVE_TOKEN'),
+  //       {
+  //         sentMsg: 'Swap Order submitted!',
+  //         successMsg: 'Swap Order created!',
+  //         failMsg: 'Swap Order creation failed',
+  //         pendingTxns,
+  //         setPendingTxns,
+  //       }
+  //     )
+  //       .then(() => {
+  //         setIsConfirming(false);
+  //       })
+  //       .finally(() => {
+  //         setIsSubmitting(false);
+  //         setIsPendingConfirmation(false);
+  //       });
+  //     return;
+  //   }
 
-    path = replaceNativeTokenAddress(path, getContractAddress(chainId, 'NATIVE_TOKEN'));
-    method = 'swap';
-    value = bigNumberify(0);
-    if (toTokenAddress === AddressZero) {
-      method = 'swapTokensToETH';
-    }
+  //   path = replaceNativeTokenAddress(path, getContractAddress(chainId, 'NATIVE_TOKEN'));
+  //   method = 'swap';
+  //   value = bigNumberify(0);
+  //   if (toTokenAddress === AddressZero) {
+  //     method = 'swapTokensToETH';
+  //   }
 
-    minOut = toAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR);
-    params = [path, fromAmount, minOut, account];
-    if (fromTokenAddress === AddressZero) {
-      method = 'swapETHToTokens';
-      value = fromAmount;
-      params = [path, minOut, account];
-    }
-    contract = new ethers.Contract(
-      getContractAddress(chainId, 'Router'),
-      Router.abi,
-      library.getSigner()
-    );
+  //   minOut = toAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR);
+  //   params = [path, fromAmount, minOut, account];
+  //   if (fromTokenAddress === AddressZero) {
+  //     method = 'swapETHToTokens';
+  //     value = fromAmount;
+  //     params = [path, minOut, account];
+  //   }
+  //   contract = new ethers.Contract(
+  //     getContractAddress(chainId, 'Router'),
+  //     Router.abi,
+  //     library.getSigner()
+  //   );
 
-    Api.callContract(chainId, contract, method, params, {
-      value,
-      sentMsg: `Swap ${!isMarketOrder ? ' order ' : ''} submitted!`,
-      successMsg: `Swapped ${formatAmount(fromAmount, fromToken.decimals, 4, true)} ${fromToken.symbol
-        } for ${formatAmount(toAmount, toToken.decimals, 4, true)} ${toToken.symbol}`,
-      failMsg: 'Swap failed.',
-      setPendingTxns,
-    })
-      .then(async () => {
-        setIsConfirming(false);
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-        setIsPendingConfirmation(false);
-      });
-  };
+  //   Api.callContract(chainId, contract, method, params, {
+  //     value,
+  //     sentMsg: `Swap ${!isMarketOrder ? ' order ' : ''} submitted!`,
+  //     successMsg: `Swapped ${formatAmount(fromAmount, fromToken.decimals, 4, true)} ${fromToken.symbol
+  //       } for ${formatAmount(toAmount, toToken.decimals, 4, true)} ${toToken.symbol}`,
+  //     failMsg: 'Swap failed.',
+  //     setPendingTxns,
+  //   })
+  //     .then(async () => {
+  //       setIsConfirming(false);
+  //     })
+  //     .finally(() => {
+  //       setIsSubmitting(false);
+  //       setIsPendingConfirmation(false);
+  //     });
+  // };
 
-  function handleSwap() {
-    // when need approval :
-    // orderbook approval, setOrders to Open
-    // approve from token (in gmx = approve in acy)
-    // modal
-    // after isSwap
-    if (
-      fromTokenAddress === AddressZero &&
-      toTokenAddress === getContractAddress(chainId, 'NATIVE_TOKEN')
-    ) {
-      wrap();
-      return;
-    }
+  // function handleSwap() {
+  //   // when need approval :
+  //   // orderbook approval, setOrders to Open
+  //   // approve from token (in gmx = approve in acy)
+  //   // modal
+  //   // after isSwap
+  //   if (
+  //     fromTokenAddress === AddressZero &&
+  //     toTokenAddress === getContractAddress(chainId, 'NATIVE_TOKEN')
+  //   ) {
+  //     wrap();
+  //     return;
+  //   }
 
-    if (token0Addr === getContractAddress(chainId, 'NATIVE_TOKEN') && token1Addr === AddressZero) {
-      unwrap();
-      return;
-    }
-    setIsConfirming(true);
-    //metamask operations
-  }
+  //   if (token0Addr === getContractAddress(chainId, 'NATIVE_TOKEN') && token1Addr === AddressZero) {
+  //     unwrap();
+  //     return;
+  //   }
+  //   setIsConfirming(true);
+  //   //metamask operations
+  // }
 
   // swap的交易状态
-  const swapCallback = async (status, inputToken, outToken) => {
-    // 循环获取交易结果
-    const {
-      transaction: { transactions },
-    } = props;
-    // 检查是否已经包含此交易
-    const transLength = transactions.filter(item => item.hash == status.hash).length;
+  // const swapCallback = async (status, inputToken, outToken) => {
+  //   // 循环获取交易结果
+  //   const {
+  //     transaction: { transactions },
+  //   } = props;
+  //   // 检查是否已经包含此交易
+  //   const transLength = transactions.filter(item => item.hash == status.hash).length;
 
-    const sti = async hash => {
-      library.getTransactionReceipt(hash).then(async receipt => {
-        console.log(`receiptreceipt for ${hash}: `, receipt);
-        // receipt is not null when transaction is done
-        if (!receipt) setTimeout(sti(hash), 500);
-        else {
-          if (!receipt.status) {
-            setSwapButtonContent('Failed');
-          } else {
-            props.onGetReceipt(receipt.transactionHash, library, account);
+  //   const sti = async hash => {
+  //     library.getTransactionReceipt(hash).then(async receipt => {
+  //       console.log(`receiptreceipt for ${hash}: `, receipt);
+  //       // receipt is not null when transaction is done
+  //       if (!receipt) setTimeout(sti(hash), 500);
+  //       else {
+  //         if (!receipt.status) {
+  //           setSwapButtonContent('Failed');
+  //         } else {
+  //           props.onGetReceipt(receipt.transactionHash, library, account);
 
-            // set button to done and disabled on default
-            setSwapButtonContent('Done');
-          }
+  //           // set button to done and disabled on default
+  //           setSwapButtonContent('Done');
+  //         }
 
-          const newData = transactions.filter(item => item.hash != hash);
-          dispatch({
-            type: 'transaction/addTransaction',
-            payload: {
-              transactions: newData,
-            },
-          });
-        }
-      });
-    };
-    sti(status.hash);
-  };
+  //         const newData = transactions.filter(item => item.hash != hash);
+  //         dispatch({
+  //           type: 'transaction/addTransaction',
+  //           payload: {
+  //             transactions: newData,
+  //           },
+  //         });
+  //       }
+  //     });
+  //   };
+  //   sti(status.hash);
+  // };
 
   const perpetualMode = [LONG, SHORT, POOL];
   const perpetualType = [MARKET, LIMIT]
@@ -1821,44 +1814,54 @@ const SwapComponent = props => {
   }
 
   // Glp Swap Component
-  const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
-  const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([chainId, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, ReaderV2, [tokensForBalanceAndSupplyQuery]),
+  // const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
+  // const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([chainId, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
+  //   fetcher: fetcher(library, ReaderV2, [tokensForBalanceAndSupplyQuery]),
+  // })
+  // const { data: aums, mutate: updateAums } = useSWR([chainId, glpManagerAddress, "getAums"], {
+  //   fetcher: fetcher(library, GlpManager),
+  // })
+  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, glpAddress, "balanceOf", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, Glp),
   })
-  const { data: aums, mutate: updateAums } = useSWR([chainId, glpManagerAddress, "getAums"], {
-    fetcher: fetcher(library, GlpManager),
-  })
-  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, RewardTracker),
-  })
-  const { data: reservedAmount, mutate: updateReservedAmount } = useSWR([chainId, glpVesterAddress, "pairAmounts", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, Vester),
-  })
-  const { gmxPrice, mutate: updateGmxPrice } = useGmxPrice(chainId, { arbitrum: library }, active)
-  const rewardTrackersForStakingInfo = [ stakedGlpTrackerAddress, feeGlpTrackerAddress ]
-  const { data: stakingInfo, mutate: updateStakingInfo } = useSWR([chainId, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, RewardReader, [rewardTrackersForStakingInfo]),
-  })
+  // const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
+  //   fetcher: fetcher(library, RewardTracker),
+  // })
+  // const { data: reservedAmount, mutate: updateReservedAmount } = useSWR([chainId, glpVesterAddress, "pairAmounts", account || PLACEHOLDER_ACCOUNT], {
+  //   fetcher: fetcher(library, Vester),
+  // })
+  // const { gmxPrice, mutate: updateGmxPrice } = useGmxPrice(chainId, { arbitrum: library }, active)
+  // const rewardTrackersForStakingInfo = [ stakedGlpTrackerAddress, feeGlpTrackerAddress ]
+  // const { data: stakingInfo, mutate: updateStakingInfo } = useSWR([chainId, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT], {
+  //   fetcher: fetcher(library, RewardReader, [rewardTrackersForStakingInfo]),
+  // })
   const [glpValue, setGlpValue] = useState("")
   const glpAmount = parseValue(glpValue, GLP_DECIMALS)
 
-  const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
-  const glp_usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
-  let aum
-  if (aums && aums.length > 0) {
-    aum = isBuying ? aums[0] : aums[1]
-  }
-  const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  const { data: glpSupply, mutate: updateGlpSupply } = useSWR([chainId, glpAddress, "totalSupply"], {
+    fetcher: fetcher(library, Glp),
+  })
+  // const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
+  // const glp_usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
+  // let aum
+  // if (aums && aums.length > 0) {
+  //   aum = isBuying ? aums[0] : aums[1]
+  // }
+  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsdg", true], {
+    fetcher: fetcher(library, GlpManager),
+  })
+  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply.gt(0)) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  // const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   let glpBalanceUsd
   if (glpBalance) {
     glpBalanceUsd = glpBalance.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
   }
-  const glpSupplyUsd = glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
+  const glpSupplyUsd = glpSupply ? glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS)) : bigNumberify(0)
 
-  let reserveAmountUsd
-  if (reservedAmount) {
-    reserveAmountUsd = reservedAmount.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
-  }
+  // let reserveAmountUsd
+  // if (reservedAmount) {
+  //   reserveAmountUsd = reservedAmount.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
+  // }
 
   const glp_infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
 
@@ -2056,8 +2059,8 @@ const SwapComponent = props => {
               <div className={styles.detailCard}>
                 <div className={styles.label}>Profits In</div>
                 <div className={styles.TooltipHandle}>
-                  <span onClick={() => { setVisible(true) }}>{shortCollateralToken.symbol}</span>
-                  <TokenSelectorModal
+                  <span>{shortCollateralToken.symbol}</span>
+                  {/* <TokenSelectorModal
                     onCancel={() => {
                       setVisible(false)
                     }}
@@ -2068,7 +2071,7 @@ const SwapComponent = props => {
                       setShortCollateralAddress(token.address)
                     }}
                     tokenlist={stableTokens}
-                  />
+                  /> */}
                 </div>
               </div>
             )}
@@ -2305,12 +2308,12 @@ const SwapComponent = props => {
             glpPrice={glpPrice}
             glpBalance={glpBalance}
             glpBalanceUsd={glpBalanceUsd}
-            reservedAmount={reservedAmount}
-            reserveAmountUsd={reserveAmountUsd}
-            stakingInfo={stakingInfo}
+            // reservedAmount={reservedAmount}
+            // reserveAmountUsd={reserveAmountUsd}
+            // stakingInfo={stakingInfo}
             glpSupply={glpSupply}
             glpSupplyUsd={glpSupplyUsd}
-            gmxPrice={gmxPrice}
+            // gmxPrice={gmxPrice}
           />
         </>
       }

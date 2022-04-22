@@ -165,7 +165,7 @@ export function useAllPositions(chainId, library) {
   const { data: positions = [] } = useSWR(key, async () => {
     const provider = getProvider(library, chainId)
     const vaultAddress = getContract(chainId, "Vault")
-    const contract = new ethers.Contract(vaultAddress, Vault.abi, provider)
+    const contract = new ethers.Contract(vaultAddress, Vault, provider)
     const ret = await Promise.all(res.data.aggregatedTradeOpens.map(async dataItem => {
       try {
         const { indexToken, collateralToken, isLong } = dataItem.initialPosition
@@ -254,7 +254,7 @@ export function usePositionsForOrders(chainId, library, orders) {
   const { data: positions = {} } = useSWR(key, async () => {
     const provider = getProvider(library, chainId)
     const vaultAddress = getContract(chainId, "Vault")
-    const contract = new ethers.Contract(vaultAddress, Vault.abi, provider)
+    const contract = new ethers.Contract(vaultAddress, Vault, provider)
     const data = await Promise.all(orders.map(async order => {
       try {
         const position = await contract.getPosition(order.account, order.collateralToken, order.indexToken, order.isLong)
@@ -297,7 +297,7 @@ export function useStakedGmxSupply(library, active) {
   const stakedGmxTrackerAddress = getContract(chainId, "StakedGmxTracker")
 
   const { data, mutate } = useSWR([`StakeV2:stakedGmxSupply:${active}`, chainId, gmxAddress, "balanceOf", stakedGmxTrackerAddress], {
-    fetcher: fetcher(library, Token),
+    fetcher: fetcher(library, Token.abi),
   })
 
   return { data, mutate }
@@ -396,7 +396,7 @@ function useGmxPriceFromArbitrum(library, active) {
 
 export async function approvePlugin(chainId, pluginAddress, { library, pendingTxns, setPendingTxns, sentMsg, failMsg }) {
   const routerAddress = getContract(chainId, "Router")
-  const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner())
+  const contract = new ethers.Contract(routerAddress, Router, library.getSigner())
   return callContract(chainId, contract, 'approvePlugin', [pluginAddress], {
     sentMsg,
     failMsg,

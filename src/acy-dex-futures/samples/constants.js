@@ -11,10 +11,10 @@ import { JsonRpcProvider } from "@ethersproject/providers"
 // export const orderBookAddress = '0x09f77E8A13De9a35a7231028187e9fD5DB8a2ACB';
 // export const routerAddress = '0xaBBc5F99639c9B6bCb58544ddf04EFA6802F4064'
 
-export const rewardReaderAddress = "0xe725Ad0ce3eCf68A7B93d8D8091E83043Ff12e9A"
+// export const rewardReaderAddress = "0xe725Ad0ce3eCf68A7B93d8D8091E83043Ff12e9A"
 export const stakedGlpTrackerAddress = "0x1aDDD80E6039594eE970E5872D247bf0414C8903"
-export const feeGlpTrackerAddress = "0x4e971a87900b931fF39d1Aad67697F49835400b6"
-export const glpVesterAddress = "0xA75287d2f8b217273E7FCD7E86eF07D33972042E"
+// export const feeGlpTrackerAddress = "0x4e971a87900b931fF39d1Aad67697F49835400b6"
+// export const glpVesterAddress = "0xA75287d2f8b217273E7FCD7E86eF07D33972042E"
 
 export const tempLibrary = new JsonRpcProvider('https://arb1.arbitrum.io/rpc')
 export const tempChainID = 42161;
@@ -28,9 +28,9 @@ export const glpManagerAddress = '0xfd72eae36D520F477D9cBBb91B9Fe6B78bA13e95'
 export const rewardRouterAddress = '0x659703093846c09075c85Ed63f37F07E0afe5dcA'
 export const orderBookAddress = '0xE01A9BDCe95a2635144A0997FE62BCc66DB39Afe'
 export const routerAddress = '0x8060631Ff0b94e7934B8768DA86cFfB513053118'
+export const glpAddress = '0xee0068982aA8512bE9A4b625DCC585A6388c929b'
 
 // unsed
-export const glpAddress = '0xee0068982aA8512bE9A4b625DCC585A6388c929b'
 export const vaultUtilsAddress = '0x316BBC0A156f653dE05075Dbe589f3c7aDFf453A'
 export const vaultPriceFeedAddress = '0xF4613EB1191aD5C756F2079E464a124745F76fE0'
 export const orderBookReaderAddress = '0x75A3da6aC51DCD0266D1caEf1E3e17392e74f4e7'

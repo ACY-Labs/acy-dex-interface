@@ -56,15 +56,17 @@ import {
   routerAddress,
   stakedGlpTrackerAddress,
   glpManagerAddress,
-  feeGlpTrackerAddress,
+  glpAddress,
+  // feeGlpTrackerAddress,
   glpVesterAddress,
-  rewardReaderAddress,
+  // rewardReaderAddress,
 } from '@/acy-dex-futures/samples/constants'
 import { approvePlugin, useGmxPrice } from '@/acy-dex-futures/core/Perpetual'
 import Media from 'react-media';
 import { uniqueFun } from '@/utils/utils';
 import { getTransactionsByAccount, appendNewSwapTx, findTokenWithSymbol } from '@/utils/txData';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
+import { getConstant } from '@/acy-dex-futures/utils/Constants'
 import PerpetualComponent from '@/components/PerpetualComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { GlpSwapTokenTable } from '@/components/PerpetualComponent/components/GlpSwapBox'
@@ -85,13 +87,14 @@ import OrderTable from './components/OrderTable'
 import { fetcher } from '@/acy-dex-futures/utils';
 import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
 import Router from '@/acy-dex-futures/abis/Router.json'
-import VaultV2 from '@/acy-dex-futures/abis/VaultV2.json'
+import Vault from '@/acy-dex-futures/abis/Vault.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
 import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
+import Glp from '@/acy-dex-futures/abis/Glp.json'
+import Usdg from "@/acy-dex-futures/abis/Usdg.json"
 import RewardTracker from '@/acy-dex-futures/abis/RewardTracker.json'
 import Vester from '@/acy-dex-futures/abis/Vester.json'
 import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
-import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
 import { ethers } from 'ethers'
 import useSWR from 'swr'
 import sampleGmxTokens from '@/acy-dex-futures/samples/TokenList'
@@ -210,8 +213,8 @@ export function getPositionQuery(tokens, nativeTokenAddress) {
 }
 
 export function getPositions(chainId, positionQuery, positionData, infoTokens, includeDelta) {
-  // const propsLength = getConstant(chainId, "positionReaderPropsLength")
-  const propsLength = 9;
+  const propsLength = getConstant(chainId, "positionReaderPropsLength")
+  // const propsLength = 9;
   const positions = []
   const positionsMap = {}
 
@@ -219,7 +222,7 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
     return { positions, positionsMap }
   }
   const { collateralTokens, indexTokens, isLong } = positionQuery
-  for (let i = 0; i < collateralTokens.length; i++) {
+  for (let i = 0; i < collateralTokens.length; i+=1) {
     const collateralToken = getTokenInfo(infoTokens, collateralTokens[i], true, nativeTokenAddress);
     collateralToken.logoURI = findTokenWithSymbol(collateralToken.symbol).logoURI;
     const indexToken = getTokenInfo(infoTokens, indexTokens[i], true, nativeTokenAddress)
@@ -377,9 +380,10 @@ const Swap = props => {
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
   })
-  const { data: positionData, mutate: updatePositionData } = useSWR(account && [chainId, readerAddress, "getPositions", vaultAddress, account],{
+  const { data: positionData, mutate: updatePositionData } = useSWR([chainId, readerAddress, "getPositions", vaultAddress, account],{
     fetcher: fetcher(library, Reader, [positionQuery.collateralTokens, positionQuery.indexTokens, positionQuery.isLong]),
   })
+  console.log('check positionData',positionData)
   const tokenAddresses = tokens.map(token => token.address)
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
@@ -390,11 +394,11 @@ const Swap = props => {
   })
 
   const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([chainId, vaultAddress, "totalTokenWeights"], {
-    fetcher: fetcher(library, VaultV2),
+    fetcher: fetcher(library, Vault),
   })
 
   const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
-    fetcher: fetcher(library, Token),
+    fetcher: fetcher(library, Glp),
   })
   
   const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR(account && [ chainId, routerAddress, "approvedPlugins", account, orderBookAddress], {
@@ -402,9 +406,7 @@ const Swap = props => {
   });
 
   useEffect(() => {
-
     console.log("printing all vault", vaultTokenInfo);
-
   }, [vaultTokenInfo])
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
@@ -430,7 +432,7 @@ const Swap = props => {
     })
   }
 
-  //--------- 
+  // --------- 
   useEffect(() => {
     if (!supportedTokens) return
 
@@ -811,43 +813,51 @@ const Swap = props => {
   // }, [history.location.hash])
 
   const glp_tokenList = whitelistedTokens.filter(t => !t.isWrapped)
-  const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
-  const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([chainId, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, ReaderV2, [tokensForBalanceAndSupplyQuery]),
+  // const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
+  // const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([chainId, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
+  //   fetcher: fetcher(library, ReaderV2, [tokensForBalanceAndSupplyQuery]),
+  // })
+  // const { data: aums, mutate: updateAums } = useSWR([chainId, glpManagerAddress, "getAums"], {
+  //   fetcher: fetcher(library, GlpManager),
+  // })
+  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, glpAddress, "balanceOf", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, Glp),
   })
-  const { data: aums, mutate: updateAums } = useSWR([chainId, glpManagerAddress, "getAums"], {
-    fetcher: fetcher(library, GlpManager),
-  })
-  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, RewardTracker),
-  })
-  const { data: reservedAmount, mutate: updateReservedAmount } = useSWR([chainId, glpVesterAddress, "pairAmounts", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, Vester),
-  })
-  const { gmxPrice, mutate: updateGmxPrice } = useGmxPrice(chainId, { arbitrum: library }, active)
-  const rewardTrackersForStakingInfo = [ stakedGlpTrackerAddress, feeGlpTrackerAddress ]
-  const { data: stakingInfo, mutate: updateStakingInfo } = useSWR([chainId, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, RewardReader, [rewardTrackersForStakingInfo]),
-  })
+  // const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
+  //   fetcher: fetcher(library, RewardTracker),
+  // })
   const [glpValue, setGlpValue] = useState("")
   const glpAmount = parseValue(glpValue, GLP_DECIMALS)
 
-  const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
-  const glp_usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
-  let aum
-  if (aums && aums.length > 0) {
-    aum = isBuying ? aums[0] : aums[1]
-  }
-  const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  const { data: glpSupply, mutate: updateGlpSupply } = useSWR([chainId, glpAddress, "totalSupply"], {
+    fetcher: fetcher(library, Glp),
+  })
+  // todo: usdgSupply -> vaultUtil
+  // const { data: glpUsdgSupply, mutate: updateGlpUsdgSupply } = useSWR([chainId, vaultAddress, "vaultUtils"], {
+  //   fetcher: fetcher(library, Vault),
+  // })
+  const { data: glpUsdgSupply, mutate: updateGlpUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
+    fetcher: fetcher(library, Usdg),
+  })
+  console.log('joy glpusdgSupply', glpUsdgSupply)
+  // const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
+  // const glp_usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
+  // let aum
+  // if (aums && aums.length > 0) {
+  //   aum = isBuying ? aums[0] : aums[1]
+  // }
+
+  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsdg", true], {
+    fetcher: fetcher(library, GlpManager),
+  })
+  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply.gt(0)) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  // const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   let glpBalanceUsd
   if (glpBalance) {
     glpBalanceUsd = glpBalance.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
   }
-  const glpSupplyUsd = glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
-  let reserveAmountUsd
-  if (reservedAmount) {
-    reserveAmountUsd = reservedAmount.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
-  }
+  const glpSupplyUsd = glpSupply ? glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS)) : bigNumberify(0)
+
   const glp_infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
 
   const onChangeMode = (mode) => {
@@ -895,7 +905,7 @@ const Swap = props => {
                 infoTokens={infoTokens}
                 glpAmount={glpAmount}
                 glpPrice={glpPrice}
-                usdgSupply={glp_usdgSupply}
+                usdgSupply={glpUsdgSupply}
                 totalTokenWeights={totalTokenWeights}
               />
             </>}
