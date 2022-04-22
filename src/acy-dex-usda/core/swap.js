@@ -10,12 +10,9 @@ import {
   redeemUSDAtoUSDC,
   redeemUSDAtoDAI,
   mintUSDA
-} from '@/acy-dex-usda/utils'
+} from '../utils'
 import { useEffect, useState } from 'react';
-
-function toFixed4(floatInString) {
-  return parseFloat(floatInString).toFixed(4);
-}
+import { SCAN_URL_PREFIX,SCAN_NAME, ConstantLoader } from '@/constants';
 
 // get the estimated amount  of the other token required when swapping, in readable string.
 export async function swapGetEstimated(
@@ -85,63 +82,94 @@ export async function swapGetEstimated(
 
 
 }
-function truncateDecimals(value, decimals) {
-  if (!value) return value
-  const [whole, fraction] = value.toString().split('.')
 
-  if (!fraction || fraction.length <= decimals) {
-    // No change
-    return value.toString()
-  }
-
-  // truncate decimals & return
-  return `${whole}.${fraction.slice(0, decimals)}`
-}
 export async function swap(
   inputToken0,
   inputToken1,
   swapMode,
-  chainId,
   library,
   account,
   setisTransactionSucc,
   setSwapButtonContent,
-  swapCallback,
+  setSwapButtonState,
+  setSwapStatus,
 ) {
   const { amount } = inputToken0
-  if (swapMode == 'redeem') {
-    if (inputToken1.symbol == 'USDT') {
-      const isRedeemSucc = await redeemUSDAtoUSDT(inputToken1.address, amount, library, account)
-      console.log('@@@isRedeemSucc', isRedeemSucc)
-      setSwapButtonContent('Created transaction')
+  const transactionRes = await (async () => {
+    if (swapMode == 'redeem') {
+      if (inputToken1.symbol == 'USDT') {
+        const isRedeemSucc = await redeemUSDAtoUSDT(inputToken1.address, amount, library, account)
+        .catch(err => {
+          setSwapButtonContent('Failed to transaction')
+          return err
+        })
+        setisTransactionSucc(true)
+        return isRedeemSucc
 
-      setisTransactionSucc(true)
-    } else if (inputToken1.symbol == 'USDC') {
-      const isRedeemSucc = await redeemUSDAtoUSDC(inputToken1.address, amount, library, account)
-      setSwapButtonContent('Created transaction')
-      setisTransactionSucc(true)
-    } else if (inputToken1.symbol == 'DAI') {
-      const isRedeemSucc = await redeemUSDAtoDAI(inputToken1.address, amount, library, account)
-      setSwapButtonContent('Created transaction')
-      setisTransactionSucc(true)
+      } else if (inputToken1.symbol == 'USDC') {
+        const isRedeemSucc = await redeemUSDAtoUSDC(inputToken1.address, amount, library, account)
+        .catch(err => {
+          setSwapButtonContent('Failed to transaction')
+          return err
+        })
+        return isRedeemSucc
+      } else if (inputToken1.symbol == 'DAI') {
+        const isRedeemSucc = await redeemUSDAtoDAI(inputToken1.address, amount, library, account)
+        .catch(err => {
+          setSwapButtonContent('Failed to transaction')
+          return err
+        })
+        return isRedeemSucc
+      }
+    } else {
+      let Allowance = await getAllowance(inputToken0, library, account)
+      .catch(err => {
+        setSwapButtonContent('Failed to transaction')
+        return err
+      })
+      let needApprove = (Allowance < amount) ? true : false
+      if (needApprove) {
+        getApprove(inputToken0, library, account)
+      }
+      const isMintSucc = await mintUSDA(inputToken0, library, account)
+      .catch(err => {
+        setSwapButtonContent('Failed to transaction')
+        return err
+      })
+      return isMintSucc
     }
+  })()
+  if (transactionRes instanceof CustomError) {
+    let text = transactionRes.getErrorText();
+    console.log('text',text)
+    setSwapButtonContent("Please try again");
   } else {
-    let Allowance = await getAllowance(inputToken0, library, account)
-    console.log('Allowance', Allowance)
-    let needApprove = (Allowance < amount) ? true : false
-    if (needApprove) {
-      getApprove(inputToken0, library, account)
+    console.log("TEST status:");
+    if ((transactionRes.error && transactionRes.error.code == 4001) || transactionRes.code == 4001) {
+      setSwapButtonContent("Swap");
+      setSwapButtonState(true);
+    } else if ((transactionRes.error && transactionRes.error.code == -32603) || transactionRes.code == -32603) {
+      console.log("error status -32603", transactionRes)
+      let text = null;
+      setSwapButtonContent("Please try again");
+    } else {
+
+
+      console.log("this is swap data: ", transactionRes);
+
+      const scanUrlPrefix = SCAN_URL_PREFIX();
+      const url = `${scanUrlPrefix}/tx/${transactionRes.hash}`;
+
+      const view = (
+        <div>
+          <a href={url} target="_blank" rel="noreferrer">
+            View it on {SCAN_NAME()}
+          </a>
+        </div>
+      )
+      setSwapStatus(view);
+      setSwapButtonContent('Created transaction')
     }
-    const ismintSucc = await mintUSDA(inputToken0,library, account)
-    console.log('@@@@ismintSucc',ismintSucc)
-    const receipt = await rpcProvider.waitForTransaction(receipt.hash)
-    console.log('@@@@receipt',receipt)
-    setSwapButtonContent('Created transaction')
-    // setisTransactionSucc(true)
-  }
-  try {
-    swapCallback(inputToken0, inputToken1);
-  } catch (err) {
-    console.log("error caught", err)
   }
 }
+

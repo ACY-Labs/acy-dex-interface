@@ -40,7 +40,7 @@ import {
 import { getUserTokenBalance, getUserTokenBalanceRaw } from '@/acy-dex-usda/utils'
 
 // import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
-import { swapGetEstimated, swap } from './swap';
+import { swapGetEstimated, swap } from '../../../acy-dex-usda/core/swap';
 
 import ERC20ABI from '@/abis/ERC20.json';
 import WETHABI from '@/abis/WETH.json';
@@ -150,6 +150,8 @@ const SwapComponent = props => {
   const [isTransactionSucc, setIstransactionSucc] = useState(false)
   const [scanUrl, setScanUrl] = useState()
 
+  const [acyTest, setAcyTest] = useState(false)
+
   useEffect(() => {
     if (!INITIAL_TOKEN_LIST) return
     setVisible(null);
@@ -202,10 +204,6 @@ const SwapComponent = props => {
     setIsUSDA('true')
   }, [chainId])
 
-  useEffect(()=>{
-    console.log('swapStatus',swapStatus)
-  },[swapStatus])
-
   useEffect(() => {
     if (token) {
       setToken0(token.token0);
@@ -248,8 +246,11 @@ const SwapComponent = props => {
     [account, INITIAL_TOKEN_LIST]
   );
   function getSwapStatus(view){
-    console.log('rrrgetStatus')
     setSwapStatus(view)
+  }
+
+  function acyTestButtonHandler(){
+    acyTestInSwap(setAcyTest, setSwapStatus);
   }
 
 
@@ -269,32 +270,12 @@ const SwapComponent = props => {
           amount: token1Amount,
         },
         swapMode,
-        // slippageTolerance * 100,
         chainId,
         library,
         account,
         setToken1Amount,
-        // setBonus0,
-        // setBonus1,
-        // setNeedApprove,
-        // setApproveAmount,
-        // setApproveButtonStatus,
-        // setSwapBreakdown,
         setSwapButtonState,
         setSwapButtonContent,
-        // setSwapStatus,
-        // setPair,
-        // setRoute,
-        // setTrade,
-        // setSlippageAdjustedAmount,
-        // setMinAmountOut,
-        // setMaxAmountIn,
-        // setWethContract,
-        // setWrappedAmount,
-        // setMethodName,
-        // setIsUseArb,
-        // setMidTokenAddress,
-        // setPoolExist
       );
     }
 
@@ -369,52 +350,6 @@ const SwapComponent = props => {
     setIsUSDA(!isUSDA)
     setSwapMode(mode)
   };
-
-  // swap的交易状态
-  const swapCallback = async (status) => {
-    // 循环获取交易结果
-    console.log('rrrunswapcallback')
-    const {
-      transaction: { transactions },
-    } = props;
-    console.log('####transction', transactions)
-    // 检查是否已经包含此交易
-    const sti = async (hash) => {
-    const transLength = transactions.filter(item => item.hash == status.hash).length;
-      library.getTransactionReceipt(hash).then(async receipt => {
-        // console.log(`receiptreceipt for ${hash}: `, receipt);
-        // receipt is not null when transaction is done
-        if (!receipt)
-          setTimeout(sti(hash), 500);
-        else {
-
-          if (!receipt.status) {
-            setSwapButtonContent("Failed");
-          } else {
-
-            props.onGetReceipt(receipt.transactionHash, library, account);
-
-            // set button to done and disabled on default
-            setSwapButtonContent("Done");
-          }
-
-          const newData = transactions.filter(item => item.hash != hash);
-          dispatch({
-            type: 'transaction/addTransaction',
-            payload: {
-              transactions: newData
-            },
-          });
-
-        }
-      });
-    }
-    sti(status.hash);
-  };
-
-  useEffect(() => {
-    console.log("@@@@@@transactions changed", props.transaction.transactions)
-  }, [props.transaction.transactions]);
 
   return (
     <div className={styles.sc}>
@@ -544,33 +479,12 @@ const SwapComponent = props => {
                 amount: token1Amount,
               },
               swapMode,
-              // slippageTolerance * 100,
-              // exactIn,
-              chainId,
               library,
               account,
-              setToken0Balance,
-              setToken1Balance,
               setIstransactionSucc,
-              // pair,
-              // route,
-              // trade,
-              // slippageAdjustedAmount,
-              // minAmountOut,
-              // maxAmountIn,
-              // wethContract,
-              // wrappedAmount,
-              // deadline,
               setSwapButtonContent,
-              // setSwapButtonState,
-              swapCallback,
+              setSwapButtonState,
               setSwapStatus,
-              // methodName,
-              // isUseArb,
-              // midTokenAddress,
-              // poolExist
-              setScanUrl,
-              getSwapStatus
             );
           }
         }}
