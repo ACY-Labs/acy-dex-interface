@@ -51,13 +51,11 @@ const StakeRow = props => {
     token2,
     token2Logo,
     refreshPoolInfo,
-    ratio,
-    token1Ratio,
-    token2Ratio
+    ratio
   } = props;
 
   const [isHarvestDisabled, setIsHarvestDisabled] = useState(false);
-  const [withdrawModalShow,setWithdrawModalShow] = useState(false);
+  const [withdrawModal,setWithdrawModal] = useState(false);
   const [withdrawButtonText,setWithdrawButtonText] = useState('Withdraw');
   const [withdrawButtonStatus,setWithdrawButtonStatus] = useState(true);
   const hideWithdrawModal = () => setWithdrawModalShow(false);
@@ -241,8 +239,6 @@ const StakeRow = props => {
         withdrawModalShow={withdrawModalShow}
         hideWithdrawModal={hideWithdrawModal}
         ratio={ratio}
-        token1Ratio={token1Ratio}
-        token2Ratio={token2Ratio}
       />
     </div>
   );

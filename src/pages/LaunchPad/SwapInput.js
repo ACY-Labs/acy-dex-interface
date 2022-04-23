@@ -51,7 +51,7 @@ const SwapInput = ({
                 <div className={styles.coin}>
                   {  isInput && (
                   <div style={{display: 'flex', justifyContent:'center', alignItems:'center'}}>
-                    <img src='https://storageapi.fleek.co/chwizdo-team-bucket/ACY%20Token%20List/USDT.svg' alt="" style={{ width: '24px', marginTop:'2px'}} />
+                    <img src='https://storageapi2.fleek.co/chwizdo-team-bucket/ACY%20Token%20List/USDT.svg' alt="" style={{ width: '24px', marginTop:'2px'}} />
                     <span style={{ margin: '0 0.35rem' }}>{title}</span>
                   </div>
                   )}

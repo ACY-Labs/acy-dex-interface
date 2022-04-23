@@ -38,49 +38,49 @@ export const supportedTokens = [
     address: '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b',
     addressOnEth: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     decimals: 6,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
   },
   {
     symbol: 'ETH',
     address: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
   },
   {
     symbol: 'WETH',
     address: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/ETH.svg',
   },
   {
     symbol: 'UNI',
     address: '0x03e6c12ef405ac3f642b9184eded8e1322de1a9e',
     addressOnEth: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/UNI.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/UNI.svg',
   },
   {
     symbol: 'DAI',
     address: '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea',
     addressOnEth: '0x6b175474e89094c44da98b954eedeac495271d0f',
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg',
   },
   {
     symbol: 'cDAI',
     address: '0x6d7f0754ffeb405d23c51ce938289d4835be3b14',
     addressOnEth: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
     decimals: 8,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg',
   },
   {
     symbol: 'WBTC',
     address: '0x577d296678535e4903d59a4c929b718e1d575e0a',
     addressOnEth: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
     decimals: 8,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/WBTC.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/WBTC.svg',
   },
 ];
 
@@ -503,8 +503,9 @@ export function parseArbitrageLog({ data, topics }) {
     nonZeroTokenAmount,
   };
 }
-export async function getAllSuportedTokensPrice() {
-  const tokenList = TOKENLIST();
+export async function getAllSupportedTokensPrice(isForMarketPage=false) {
+  const tokenList = isForMarketPage ? MARKET_TOKEN_LIST() : TOKENLIST();
+  const chainID = CHAINID();
   const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
   const searchIds = searchIdsArray.join('%2C');
   const tokensPrice = await axios.get(
@@ -514,13 +515,20 @@ export async function getAllSuportedTokensPrice() {
     console.log("tokensPrice:",data);
     const tokensPrice = {};
     tokenList.forEach(token => {
-      tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'] || 0;
+      tokensPrice[token.symbol] = data[token.idOnCoingecko]?.usd || 0;
     })
 
-    // launchpad project token
-    // where tokens is not listed on coinGecko
-    // if (CHAINID() == 137)
-    //   tokensPrice["NULS"] = await getTokenPriceFromPool("NULS");
+    // // launchpad project token
+    // // where tokens is not listed on coinGecko
+    // TODO: in future we could remove this block completely. Get price from pool when it's not available on CoinGecko
+    if (chainID == 56) {
+      if (tokensPrice["DXS"] == 0)
+        tokensPrice["DXS"] = await getTokenPriceFromPool("DXS", tokensPrice, isForMarketPage);
+      if (tokensPrice["OWLA"] == 0)
+        tokensPrice["OWLA"] = await getTokenPriceFromPool("OWLA", tokensPrice, isForMarketPage);
+      if (tokensPrice["RUBY"] == 0)
+        tokensPrice["RUBY"] = await getTokenPriceFromPool("RUBY", tokensPrice, isForMarketPage);
+    }
 
     console.log(">>> tokenPriceDict", tokensPrice);
     return tokensPrice;
@@ -528,29 +536,8 @@ export async function getAllSuportedTokensPrice() {
   return tokensPrice;
 }
 // market 专用
-export async function getAllSuportedTokensPrice_forMarket() {
-  const tokenList = MARKET_TOKEN_LIST();
-  const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
-  const searchIds = searchIdsArray.join('%2C');
-  const tokensPrice = await axios.get(
-    `https://api.coingecko.com/api/v3/simple/price?ids=${searchIds}&vs_currencies=usd`
-  ).then(async (result) => {
-    const data = result.data;
-    console.log("tokensPrice_market:",data);
-    const tokensPrice = {};
-    tokenList.forEach(token => {
-      tokensPrice[token.symbol] = data[token.idOnCoingecko]['usd'];
-    })
-
-    // launchpad project token
-    // where tokens is not listed on coinGecko
-    // if (CHAINID() == 137)
-    //   tokensPrice["NULS"] = await getTokenPriceFromPool("NULS");
-
-    console.log(">>> tokenPriceDict_market", tokensPrice);
-    return tokensPrice;
-  });
-  return tokensPrice;
+export async function getAllSupportedTokensPrice_forMarket() {
+  return await getAllSupportedTokensPrice(true);
 }
 
 // return output field amount for swap component
@@ -568,14 +555,16 @@ export async function withExactOutEstimateInAmount(deltaY, xTokenAddress, yToken
   return estimateInputAmount;
 }
 
-export async function getTokenPriceFromPool(tokenSymbol){
-  const tokenList = TOKENLIST();
+export async function getTokenPriceFromPool(tokenSymbol, tokensPrice, forMarketPage){
+  const tokenList = forMarketPage ? MARKET_TOKEN_LIST() : TOKENLIST();
   const chainId = CHAINID();
   const library = constantInstance.library;
 
   const tok  = tokenList.find(token => token.symbol == tokenSymbol);
-  const BUSD = tokenList.find(token => token.symbol == "USDC");
+  const BUSD = tokenList.find(token => token.symbol == "BUSD");
   const USDT = tokenList.find(token => token.symbol == "USDT");
+  const ACY = tokenList.find(token => token.symbol == "ACY");
+  
 
   const newToken  = new Token(chainId, tok.address, tok.decimals, tokenSymbol);
 
@@ -586,16 +575,25 @@ export async function getTokenPriceFromPool(tokenSymbol){
       return false
     });
     if (newTokenUsdtPair)
-      calcPriceTasks.push(getTokenPriceByPair(newTokenUsdtPair, tok.symbol, library))
+      calcPriceTasks.push(getTokenPriceByPair(newTokenUsdtPair, tok.symbol, library).then(res => res * tokensPrice[USDT.symbol]))
   }
 
   if (BUSD) {
-    const busdToken = new Token(chainId, BUSD.address, BUSD.decimals, "USDC");
+    const busdToken = new Token(chainId, BUSD.address, BUSD.decimals, "BUSD");
     const newTokenBusdPair = await Fetcher.fetchPairData(newToken, busdToken, library, chainId).catch(e => {
       return false
     });
     if (newTokenBusdPair)
-      calcPriceTasks.push(getTokenPriceByPair(newTokenBusdPair, tok.symbol, library))
+      calcPriceTasks.push(getTokenPriceByPair(newTokenBusdPair, tok.symbol, library).then(res => res * tokensPrice[BUSD.symbol]))
+  }
+
+  if(ACY) {
+    const acyToken = new Token(chainId, ACY.address, ACY.decimals, "ACY");
+    const newTokenBusdPair = await Fetcher.fetchPairData(newToken, acyToken, library, chainId).catch(e => {
+      return false
+    });
+    if (newTokenBusdPair)
+      calcPriceTasks.push(getTokenPriceByPair(newTokenBusdPair, tok.symbol, library).then(res => res * tokensPrice[ACY.symbol]))
   }
 
   const res = await Promise.all(calcPriceTasks);
@@ -605,7 +603,7 @@ export async function getTokenPriceFromPool(tokenSymbol){
     const average = (array) => array.reduce((a, b) => a + b) / array.length;
     return average(res);
   } else {
-    return 0.2;
+    return 0;
   }
 }
 

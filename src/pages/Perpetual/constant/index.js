@@ -6,6 +6,8 @@ export const SHORT = 'Short';
 export const SWAP = 'Swap';
 
 export const FEE = 0.1;
+
+export const KChartDataURL = "http://localhost:3000/api/candles/"
 //export const USD_DECIMALS = 30;
 
 //export const BASIS_POINTS_DIVISOR = 10000;

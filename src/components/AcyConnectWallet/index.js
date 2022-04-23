@@ -8,7 +8,7 @@ import { useConstantLoader } from "@/constants";
 import { asyncForEach } from "@/utils/asynctools";
 import { getUserTokenBalance } from '@/acy-dex-swap/utils';
 import { processString } from "@/components/AcyCoinItem";
-import { getAllSuportedTokensPrice } from '@/acy-dex-swap/utils';
+import { getAllSupportedTokensPrice } from '@/acy-dex-swap/utils';
 
 
 import { Button, Icon, Tooltip } from 'antd';
@@ -63,7 +63,7 @@ const AcyConnectWallet = props => {
   }
 
   const getAllPrice = async () => {
-    const tokenPriceList = await getAllSuportedTokensPrice().then(res => {
+    const tokenPriceList = await getAllSupportedTokensPrice().then(res => {
       setTokenPriceDict(res);
     });
   }

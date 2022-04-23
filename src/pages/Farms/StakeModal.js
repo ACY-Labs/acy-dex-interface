@@ -96,7 +96,8 @@ const StakeModal = props => {
   
   const maxDay = Math.floor(endAfter/(60*60*24)).toString();
   const maxDayStr = `MAX ${maxDay}D`;
-  const [roi, setRoi] = useState();
+  const [roi, setRoi] = useState([]);
+  const [roiUSD, setRoiUSD] = useState(0);
 
   const getLockDuration = () => {
     if (is4Years) return 126144000;
@@ -186,8 +187,12 @@ const StakeModal = props => {
     const dayNum = dif / (1000*60*60*24);
     var weight = lp * Math.sqrt(dayNum);
     var share = weight / (totalScore + weight);
-    var _roi = dayNum*60*60*24/BLOCK_TIME() * tokensRewardPerBlock[0].rewardPerBlock * share;
+    console.log("REWARD PERBLOCK:", tokensRewardPerBlock)
+    var _roi = tokensRewardPerBlock.map(value => dayNum*60*60*24/BLOCK_TIME() * value.rewardPerBlock * share);
+    var _roiUSD = tokensRewardPerBlock.reduce((sum, value, id) => sum + _roi[id]*value.rate|| 0,0);
+    console.log("REWARD PERBLOCK test:", _roiUSD, tokensRewardPerBlock, _roi)
     setRoi(_roi);
+    setRoiUSD(_roiUSD);
 
     if(showStake > totalUSDBalance && showStake != totalUSDBalance.toFixed(2)) {
       setButtonStatus(false);
@@ -254,8 +259,10 @@ const StakeModal = props => {
     const dayNum = dif / (1000*60*60*24);
     var weight = lp * Math.sqrt(dayNum);
     var share = weight / (totalScore + weight);
-    var _roi = dayNum*60*60*24/BLOCK_TIME() * tokensRewardPerBlock[0].rewardPerBlock * share;
+    var _roi = tokensRewardPerBlock.map(value => dayNum*60*60*24/BLOCK_TIME() * value.rewardPerBlock * share); 
+    var _roiUSD = tokensRewardPerBlock.reduce((sum, value, id) => sum + _roi[id]*value.rate|| 0,0);
     setRoi(_roi);
+    setRoiUSD(_roiUSD);
   }, [date]);
 
   
@@ -588,11 +595,17 @@ const StakeModal = props => {
 
         </div>
         <div className={styles.amountText}>
-          {`$${(roi * tokensRewardPerBlock[0].rate || 0).toFixed(2)}`}
+          {`$${roiUSD.toFixed(2)}`}
         </div>
         <div className={styles.balanceAmountContainer}>
           <div className={styles.balanceAmount}>
-            ~ {`${(roi || 0).toFixed(0)} ${tokensRewardPerBlock[0].token} (${(((roi*tokensRewardPerBlock[0].rate)/showStake*100||0)).toFixed(2)}%)`}
+            ~ {
+              roi.map((value, id) => 
+                <>
+                  {`${(roi[id] || 0).toFixed(0)} ${tokensRewardPerBlock[id].token}`} {id==roi.length-1?'':'and ' }
+                </>
+              )
+            }
           </div>
 
         </div>

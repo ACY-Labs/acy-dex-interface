@@ -43,7 +43,8 @@ import {
   bigNumberify,
   getDeltaStr,
   useLocalStorageByChainId,
-  useAccountOrders
+  useAccountOrders,
+  formatAmount
 } from '@/acy-dex-futures/utils';
 
 import {
@@ -67,7 +68,7 @@ import Media from 'react-media';
 import { uniqueFun } from '@/utils/utils';
 import { getTransactionsByAccount, appendNewSwapTx, findTokenWithSymbol } from '@/utils/txData';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
-import { getChartToken } from '@/components/PerpetualComponent';
+import { getChartToken, updateChartFromToken, updateChartToToken } from '@/components/PerpetualComponent';
 import PerpetualComponent from '@/components/PerpetualComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { GlpSwapTokenTable } from '@/components/PerpetualComponent/components/GlpSwapBox'
@@ -104,6 +105,8 @@ import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
 
 //import ChartTokenSelector from './ChartTokenSelector'
 
+let indexToken = []
+let indexTokens = []
 const { AddressZero } = ethers.constants
 // ----------
 const { AcyTabPane } = AcyTabs;
@@ -186,7 +189,7 @@ const getTokenAddress = (token, nativeTokenAddress) => {
 
 export function getPositionQuery(tokens, nativeTokenAddress) {
   const collateralTokens = []
-  const indexTokens = []
+  //const indexTokens = []
   const isLong = []
 
   for (let i = 0; i < tokens.length; i++) {
@@ -195,6 +198,8 @@ export function getPositionQuery(tokens, nativeTokenAddress) {
     if (token.isWrapped) { continue }
     collateralTokens.push(getTokenAddress(token, nativeTokenAddress))
     indexTokens.push(getTokenAddress(token, nativeTokenAddress))
+    // console.log("see indextokens", token);
+    // console.log("see index token native addr", nativeTokenAddress);
     isLong.push(true)
   }
 
@@ -228,7 +233,7 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
   for (let i = 0; i < collateralTokens.length; i++) {
     const collateralToken = getTokenInfo(infoTokens, collateralTokens[i], true, nativeTokenAddress);
     collateralToken.logoURI = findTokenWithSymbol(collateralToken.symbol).logoURI;
-    const indexToken = getTokenInfo(infoTokens, indexTokens[i], true, nativeTokenAddress)
+    indexToken = getTokenInfo(infoTokens, indexTokens[i], true, nativeTokenAddress)
     indexToken.logoURI = findTokenWithSymbol(collateralToken).logoURI;
     const key = getPositionKey(collateralTokens[i], indexTokens[i], isLong[i])
 
@@ -624,6 +629,12 @@ const Swap = props => {
 
   }, [activeToken0, activeToken1]);
 
+    useEffect(() => {
+      console.log ("see whats going on", updateChartFromToken, activeToken0);
+    // setActiveToken0(updateChartFromToken);
+    // setActiveToken1(updateChartToToken);
+  }, [updateChartFromToken, updateChartToToken]);
+
   const getRoutePrice = (token0Address, token1Address) => {
     if (!token0Address || !token1Address) return;
 
@@ -651,6 +662,10 @@ const Swap = props => {
         token1logo = supportedTokens[j].logoURI;
       }
     }
+    const chartToken = getTokenInfo(infoTokens, activeToken1.address)
+
+    let high;
+    let low;
 
     // const swapTokenPosition = () => {
     //   const tempSwapToken = activeToken0;
@@ -666,7 +681,11 @@ const Swap = props => {
 
 
     return [
-      <div style={{ width: "100%" }}>
+      // <div style={{ width: "100%" }}>      
+      <div >
+        <div>${chartToken.maxPrice && formatAmount(chartToken.maxPrice, USD_DECIMALS, 2)}</div>
+        <div >24h Change</div>
+
         {/* <div className={styles.maintitle}>
          
           <div className={styles.lighttitle} style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }} onClick={onSelectToken}>
@@ -890,7 +909,6 @@ const Swap = props => {
           </Menu.Item>
         ))
       }
-      {/* {lineTitleRender()} */}
     </Menu>
   );
 
@@ -898,6 +916,12 @@ const Swap = props => {
     console.log("onchange",value);
     setActiveToken1(option);
   }
+
+  console.log("active token max", getTokenBySymbol(tokens, activeToken1.symbol));
+  console.log("active token info", getTokenInfo(infoTokens, activeToken1.address));
+
+  // console.log("active token info", getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo, undefined)[activeToken1]);
+  // console.log("active token max", latestAnswer());
 
   return (
     <PageHeaderWrapper>
@@ -911,12 +935,16 @@ const Swap = props => {
                   style={{
                     textAlign: 'left',
                     height: 50,
+                    width: 120,
                     lineHeight: '50px',
                   }}
                 >
                   {activeToken1.symbol} / USD
                 </div>
               </Dropdown>
+              <div>{activeToken1.maxPrice && formatAmount(activeToken1.maxPrice, USD_DECIMALS, 2)}</div>
+                    {lineTitleRender()}
+
                
           </div>
           {/* K chart */}

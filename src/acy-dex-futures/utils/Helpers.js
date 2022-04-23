@@ -2366,6 +2366,8 @@ export const getInjectedHandler = activate => {
   return fn;
 };
 
+
+
 export function getInfoTokens(
   tokens,
   tokenBalances,
