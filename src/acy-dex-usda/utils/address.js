@@ -60,7 +60,7 @@ export const supportedTokens = {
     {
         name: 'Dai Stablecoin',
         symbol: 'DAI',
-        address: '0x5b8533c9a6C330EE1E376dba1AFe7b5e137a76a9',
+        address: '0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3',
         addressOnEth: '0x6b175474e89094c44da98b954eedeac495271d0f',
         decimals: 18,
         logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg',

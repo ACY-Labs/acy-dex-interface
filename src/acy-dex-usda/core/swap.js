@@ -89,7 +89,6 @@ export async function swap(
   swapMode,
   library,
   account,
-  setisTransactionSucc,
   setSwapButtonContent,
   setSwapButtonState,
   setSwapStatus,
@@ -103,7 +102,7 @@ export async function swap(
           setSwapButtonContent('Failed to transaction')
           return err
         })
-        setisTransactionSucc(true)
+        (true)
         return isRedeemSucc
 
       } else if (inputToken1.symbol == 'USDC') {

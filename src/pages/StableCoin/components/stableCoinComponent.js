@@ -147,7 +147,6 @@ const SwapComponent = props => {
   const connectWalletByLocalStorage = useConnectWallet();
   const [isUSDA, setIsUSDA] = useState(true)
   const [swapMode, setSwapMode] = useState('redeem')
-  const [isTransactionSucc, setIstransactionSucc] = useState(false)
   const [scanUrl, setScanUrl] = useState()
 
   const [acyTest, setAcyTest] = useState(false)
@@ -481,7 +480,6 @@ const SwapComponent = props => {
               swapMode,
               library,
               account,
-              setIstransactionSucc,
               setSwapButtonContent,
               setSwapButtonState,
               setSwapStatus,
