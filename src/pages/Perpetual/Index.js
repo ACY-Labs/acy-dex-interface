@@ -48,7 +48,6 @@ import {
 } from '@/acy-dex-futures/utils';
 
 import {
-
   nativeTokenAddress,
   readerAddress,
   vaultAddress,
@@ -98,10 +97,7 @@ import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
 import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
 import { ethers } from 'ethers'
 import useSWR from 'swr'
-import sampleGmxTokens from '@/acy-dex-futures/samples/TokenList'
-
 import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
-
 
 //import ChartTokenSelector from './ChartTokenSelector'
 
@@ -317,7 +313,7 @@ const Swap = props => {
   const { savedIsPnlInLeverage, setSavedIsPnlInLeverage, savedSlippageAmount, pendingTxns, setPendingTxns } = props
 
   const { account, library, chainId, farmSetting: { API_URL: apiUrlPrefix }, globalSettings, } = useConstantLoader();
-  const supportedTokens = defaultToken.default;
+  const supportedTokens = defaultToken.longTokenList;
   console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
   //hj
@@ -349,9 +345,9 @@ const Swap = props => {
   const [ordersData, setOrdersData] = useState([]);
   const { active, activate } = useWeb3React();
   //---------- FOR TESTING 
-  const whitelistedTokens = sampleGmxTokens.filter(token => token.symbol !== "USDG");
+  const whitelistedTokens = defaultToken.default.filter(token => token.symbol !== "USDG");
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
-  const tokens = sampleGmxTokens;
+  const tokens = defaultToken.default;
   const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
 
 
@@ -662,7 +658,7 @@ const Swap = props => {
         token1logo = supportedTokens[j].logoURI;
       }
     }
-    const chartToken = getTokenInfo(infoTokens, activeToken1.address)
+    const chartToken = getTokenInfo(infoTokens, activeToken1.address)    
 
     let high;
     let low;
@@ -763,7 +759,7 @@ const Swap = props => {
 
 
   const onClickDropdown = e => {
-    setActiveToken1((supportedTokens.filter(el => el.symbol == e.key))[0]);
+    setActiveToken1((supportedTokens.filter(ele => ele.symbol == e.key))[0]);
   };
 
 
@@ -917,8 +913,8 @@ const Swap = props => {
     setActiveToken1(option);
   }
 
-  console.log("active token max", getTokenBySymbol(tokens, activeToken1.symbol));
-  console.log("active token info", getTokenInfo(infoTokens, activeToken1.address));
+  // console.log("active token max", getTokenBySymbol(tokens, activeToken1.symbol));
+  // console.log("active token info", getTokenInfo(infoTokens, activeToken1.address));
 
   // console.log("active token info", getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo, undefined)[activeToken1]);
   // console.log("active token max", latestAnswer());

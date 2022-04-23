@@ -123,7 +123,6 @@ import {
   getUserTokenBalance,
   getUserTokenBalanceRaw,
   isZero,
-  supportedTokens,
   parseArbitrageLog,
 } from '@/acy-dex-swap/utils/index';
 
@@ -376,7 +375,7 @@ const SwapComponent = props => {
   const stableTokens = tokens.filter(token => token.isStable);
   const indexTokens = whitelistedTokens.filter(token => !token.isStable && !token.isWrapped);
   const shortableTokens = indexTokens.filter(token => token.isShortable);
-  let toTokens = tokens;
+  let toTokens = defaultToken.longTokenList;
   if (mode === LONG) {
     toTokens = indexTokens;
   }
@@ -435,7 +434,7 @@ const SwapComponent = props => {
 
   // ymj useState
   const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
-  const [toTokenAddress, setToTokenAddress] = useState("0xf97f4df75117a78c1A5a0DBb814Af92458539FB4");
+  const [toTokenAddress, setToTokenAddress] = useState("0x20865e63B111B2649ef829EC220536c82C58ad7B");
   // const [fromTokenInfo, setFromTokenInfo] = useState();
   // const [toTokenInfo, setToTokenInfo] = useState();
   const [mode, setMode] = useState(LONG);
@@ -1029,6 +1028,7 @@ const SwapComponent = props => {
   const selectToToken = symbol => {
     const token = getTokenfromSymbol(tokens, symbol)
     setToTokenAddress(token.address);
+    setActiveToken1((tokens.filter(ele => ele.symbol == symbol))[0]);
     const updateChartToToken = token;
   };
 
