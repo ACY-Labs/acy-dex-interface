@@ -29,7 +29,8 @@ function candleSeriesDataParser(data) {
   return parsedData;
 }
 
-export async function getKChartData(tokenSymbol, preferableChainId="42161", period="1h", from, to, preferableSource ) {
+export async function getKChartData(tokenSymbol, preferableChainId, period, from, to, preferableSource ) {
+  console.log("hereim 1.1 in getkchartdata" );
   const kchartdata = await axios.get(
     KChartDataURL + tokenSymbol, {
       params: {
@@ -41,14 +42,15 @@ export async function getKChartData(tokenSymbol, preferableChainId="42161", peri
       }
     })
     .then(function (response) {
+      console.log("hereim 1.2 kchart response", response);
       const data = response.data.prices;
-      console.log("test response", data);
+      console.log("hereim 1.3 kchart data", data);
       const parseddata = candleSeriesDataParser(data);
-      console.log("test parseddata", parseddata);
+      console.log("hereim 1.4 parseddata", parseddata);
       return parseddata;
     })
     .catch(function (error) {
-      console.log("test error:", error);
+      console.log("hereim 1.x test error:", error);
     });
   return kchartdata;
 }

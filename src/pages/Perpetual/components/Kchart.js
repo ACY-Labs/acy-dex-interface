@@ -21,40 +21,16 @@ import './styles.css';
 // import { useChartPrices } from '../../../acy-dex-futures/Api'
 import Tab from '../../../acy-dex-futures/Tab/Tab'
 
-const Kchart=()=> {
+const Kchart=(props)=> {
 
-    const [currentChart, setCurrentChart] = useState();
-    const [currentSeries, setCurrentSeries] = useState();
-    const [currentChartData, setCurrentChartData] = useState([]);
-    // let [period, setPeriod] = useLocalStorageSerializeKey([chainId, "Chart-period"], DEFAULT_PERIOD)
-    // if (!(period in CHART_PERIODS)) {
-    //   period = DEFAULT_PERIOD
-    // }
+  const [currentChart, setCurrentChart] = useState();
+  const [currentSeries, setCurrentSeries] = useState();
+  const [currentChartData, setCurrentChartData] = useState([]);
 
-    // const [hoveredCandlestick, setHoveredCandlestick] = useState()
-
-
-
+  // const { activeToken0, activeToken1 } = props;
 
   const ref = useRef(null);
   const chartRef = useRef();
-  // const chartToken = getChartToken(swapOption, fromToken, toToken, chainId)
-
-  // function getChartToken(swapOption, fromToken, toToken, chainId) {
-  //     if (!fromToken || !toToken) { return }
-    
-  //     if (swapOption !== SWAP) { return toToken }
-    
-  //     if (fromToken.isUsdg && toToken.isUsdg) { return getTokens(chainId).find(t => t.isStable) }
-  //     if (fromToken.isUsdg) { return toToken }
-  //     if (toToken.isUsdg) { return fromToken }
-    
-  //     if (fromToken.isStable && toToken.isStable) { return toToken }
-  //     if (fromToken.isStable) { return toToken }
-  //     if (toToken.isStable) { return fromToken }
-    
-  //     return toToken
-  //   }
 
   const getChartOptions = (width, height) => ({
     // width: document.body.offsetWidth *0.7,
@@ -122,64 +98,102 @@ const Kchart=()=> {
     borderVisible: false
   });
   
-    //#TODO (Austin) convert into ACY Style
-    useEffect(async () => {
-      if (currentChart) {
-        return;
-      }
+  //#TODO (Austin) convert into ACY Style
+  useEffect(async () => {
+    let chart;
+    if (currentChart) {
+   return;
+    } 
+    chart = createChart(
+      chartRef.current,
+      getChartOptions(chartRef.current.offsetWidth, chartRef.current.offsetHeight),
+    );
 
-      const chart = createChart(
-          chartRef.current,
-          getChartOptions(chartRef.current.offsetWidth, chartRef.current.offsetHeight),
-      );
+    var candleSeries = chart.addCandlestickSeries({
+      lineColor: '#5472cc',
+      topColor: 'rgba(49, 69, 131, 0.4)',
+      bottomColor: 'rgba(42, 64, 103, 0.0)',
+      lineWidth: 2,
+      priceLineColor: '#3a3e5e',
+      downColor: '#fa3c58',
+      wickDownColor: '#fa3c58',
+      upColor: '#0ecc83',
+      wickUpColor: '#0ecc83',
+      borderVisible: false
+    });
 
-      var candleSeries = chart.addCandlestickSeries({
-        lineColor: '#5472cc',
-        topColor: 'rgba(49, 69, 131, 0.4)',
-        bottomColor: 'rgba(42, 64, 103, 0.0)',
-        lineWidth: 2,
-        priceLineColor: '#3a3e5e',
-        downColor: '#fa3c58',
-        wickDownColor: '#fa3c58',
-        upColor: '#0ecc83',
-        wickUpColor: '#0ecc83',
-        borderVisible: false
-      });
+    const data = await getKChartData(props.activeToken1.symbol, "42161", "1h", "1650234954", "1650378658", "chainlink");
+    candleSeries.setData(data != undefined ? data : []);
 
-      candleSeries.setData(currentChartData);
+    const series = chart.addCandlestickSeries(getSeriesOptions())
+    setCurrentChart(chart);
+    setCurrentSeries(series);
+  },[ref, currentChart])
 
-      const series = chart.addCandlestickSeries(getSeriesOptions())
-      setCurrentChart(chart);
-      setCurrentSeries(series);
-    },[ref, currentChart])
 
-    useEffect(() => {
-      if (!currentChart) { return; }
-      const resizeChart = () => {
-        currentChart.resize(chartRef.current.offsetWidth, chartRef.current.offsetHeight)
-      }
-      window.addEventListener('resize', resizeChart);
-      return () => window.removeEventListener('resize', resizeChart);
-    }, [currentChart]);
+
+  useEffect(async () => {
+    if (currentChart == undefined) {
+      return;
+    } 
+    currentChart.resize(0,0);
+    const chart = createChart(
+        chartRef.current,
+        getChartOptions(chartRef.current.offsetWidth, chartRef.current.offsetHeight),
+    );
+
+    var candleSeries = chart.addCandlestickSeries({
+      lineColor: '#5472cc',
+      topColor: 'rgba(49, 69, 131, 0.4)',
+      bottomColor: 'rgba(42, 64, 103, 0.0)',
+      lineWidth: 2,
+      priceLineColor: '#3a3e5e',
+      downColor: '#fa3c58',
+      wickDownColor: '#fa3c58',
+      upColor: '#0ecc83',
+      wickUpColor: '#0ecc83',
+      borderVisible: false
+    });
+    // candleSeries.setData(currentChartData);
+    const data = await getKChartData(props.activeToken1.symbol, "42161", "1h", "1650234954", "1650378658", "chainlink");
+
+    if (data != undefined) {
+      // candleSeries.update(data);
+      // const series = chart.addCandlestickSeries(getSeriesOptions())
+      // setCurrentChart(chart);
+      // setCurrentSeries(series);
+    }
+    candleSeries.setData(data);
+    setCurrentChart(chart);
+  },[props.activeToken1.symbol])
+
+  useEffect(() => {
+    if (!currentChart) { return; }
+    const resizeChart = () => {
+      currentChart.resize(chartRef.current.offsetWidth, chartRef.current.offsetHeight)
+    }
+    window.addEventListener('resize', resizeChart);
+    return () => window.removeEventListener('resize', resizeChart);
+  }, [currentChart]);
 
     
-    return(
-        <div className='PriceChart' ref={chartRef}>
-            <div className="BotInner">
-                <div className="KChartHeader">
-                    <div className='KChartControl'>
-                        {/* <div className='TabBlock'> </div> */}
-                        {/* <Tab options={Object.keys(CHART_PERIODS)} option={period} setOption={setPeriod} /> */}
+  return(
+      <div className='PriceChart' ref={chartRef}>
+          <div className="BotInner">
+              <div className="KChartHeader">
+                  <div className='KChartControl'>
+                      {/* <div className='TabBlock'> </div> */}
+                      {/* <Tab options={Object.keys(CHART_PERIODS)} option={period} setOption={setPeriod} /> */}
 
-                    </div>
-                    <div className='KChartStat'></div>
-                </div>
-                <div className="KChartBox"></div>
+                  </div>
+                  <div className='KChartStat'></div>
+              </div>
+              <div className="KChartBox"></div>
 
 
-            </div>
-        </div>
+          </div>
+      </div>
 
-    )
+  )
 }
 export default Kchart;

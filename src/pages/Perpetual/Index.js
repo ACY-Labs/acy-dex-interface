@@ -67,7 +67,7 @@ import Media from 'react-media';
 import { uniqueFun } from '@/utils/utils';
 import { getTransactionsByAccount, appendNewSwapTx, findTokenWithSymbol } from '@/utils/txData';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
-import { getChartToken, updateChartFromToken, updateChartToToken } from '@/components/PerpetualComponent';
+import { getChartToken } from '@/components/PerpetualComponent';
 import PerpetualComponent from '@/components/PerpetualComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { GlpSwapTokenTable } from '@/components/PerpetualComponent/components/GlpSwapBox'
@@ -98,6 +98,7 @@ import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
 import { ethers } from 'ethers'
 import useSWR from 'swr'
 import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
+import { getKChartData } from './utils';
 
 //import ChartTokenSelector from './ChartTokenSelector'
 
@@ -543,93 +544,19 @@ const Swap = props => {
     setFormat(_format);
   };
 
-  useEffect(() => {
-    dispatch({
-      type: "swap/updateTokens",
-      payload: {
-        token0: activeToken0,
-        token1: activeToken1
-      }
-    });
-    const dayLength = 24 * 60 / 5;
-    let reverseFlag = false;
-    let timeMark = 0;
-    let timeMark2 = 0;
-    let timeData = [];
-    let A = activeToken0.symbol;
-    let B = activeToken1.symbol;
-    if (A > B) {
-      let temp = B;
-      B = A;
-      A = temp;
-      reverseFlag = true;
-    }
-    axios.get(
-      `${apiUrlPrefix}/chart/getRate`, { params: { token0: A, token1: B } }
-    ).then(res => {
-      if (res.data) {
-        const historyData = res.data.History;
-        timeMark = historyData[historyData.length - 1].time;
-        timeMark2 = historyData[0].time
+  // useEffect(async () => {
+  //   // dispatch({
+  //   //   type: "swap/updateTokens",
+  //   //   payload: {
+  //   //     token0: activeToken0,
+  //   //     token1: activeToken1
+  //   //   }
+  //   // });
+  //   console.log("hereim", activeToken1);
+  //   // setChartData(await getKChartData(activeToken1.symbol, "42161", "1h", "1650234954", "1650378658", "chainlink"))
 
-        let date = new Date(timeMark * 60 * 1000);
+  // }, [activeToken0, activeToken1]);
 
-        for (let i = 0; i < historyData.length; i++) {
-
-          while (i < 0) i++;
-          const element = historyData[i];
-          timeData.push(element);
-
-        };
-
-        const addData = []
-        for (let i = timeMark - 24 * 60; i < timeMark2; i = i + 5) {
-          let temp2 = [(i * 60 * 1000), 0];
-          addData.push(temp2);
-        }
-        console.log("timemark", timeMark - 24 * 60, timeMark2);
-        console.log("addData", addData);
-
-        console.log("timeData", timeData);
-        const tempChart = [];
-        for (let a = 0; a < timeData.length; a++) {
-          if (timeData[a].time > timeMark - 24 * 60) {
-            const time = timeData[a].time * 60 * 1000;
-            let date = new Date(time);
-            let dateString = date.getMinutes();
-            let temp;
-            if (reverseFlag)
-              temp = [time, 1.0 / timeData[a].exchangeRate];
-            else
-              temp = [time, timeData[a].exchangeRate];
-            tempChart.push(temp);
-
-          }
-        }
-        console.log("CHARTING!!!!!!!!!!!", tempChart);
-
-        const finalChartData = addData.concat(tempChart);
-        console.log("finalChartData", finalChartData);
-        setChartData(finalChartData);
-      }
-      else {
-        setActiveRate("No this pair data yet");
-        setChartData([]);
-      }
-
-    })
-
-
-    console.log("chartdata");
-    console.log(timeData);
-
-  }, [activeToken0, activeToken1]);
-
-    useEffect(() => {
-      console.log ("see whats going on", updateChartFromToken, activeToken0);
-    // setActiveToken0(updateChartFromToken);
-    // setActiveToken1(updateChartToToken);
-  }, [updateChartFromToken, updateChartToToken]);
 
   const getRoutePrice = (token0Address, token1Address) => {
     if (!token0Address || !token1Address) return;
@@ -649,8 +576,6 @@ const Swap = props => {
     let token0logo = null;
     let token1logo = null;
     for (let j = 0; j < supportedTokens.length; j++) {
-      console.log("active token0", activeToken0);
-      console.log("active token1", activeToken1);
       if (activeToken0.symbol === supportedTokens[j].symbol) {
         token0logo = supportedTokens[j].logoURI;
       }
@@ -759,6 +684,7 @@ const Swap = props => {
 
 
   const onClickDropdown = e => {
+    console.log("hereim dropdown", e.key);
     setActiveToken1((supportedTokens.filter(ele => ele.symbol == e.key))[0]);
   };
 
@@ -909,7 +835,7 @@ const Swap = props => {
   );
 
   function onChange (value) {
-    console.log("onchange",value);
+    // console.log("onchange",value);
     setActiveToken1(option);
   }
 
@@ -946,7 +872,7 @@ const Swap = props => {
           {/* K chart */}
           <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
             <div className={`${styles.colItem} ${styles.priceChart}`}>
-              <KChart token1={activeToken0} token2={activeToken1} />
+              <KChart activeToken0={activeToken0} activeToken1={activeToken1} />
             </div>
           </AcyPerpetualCard>
 

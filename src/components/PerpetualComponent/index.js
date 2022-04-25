@@ -240,8 +240,6 @@ const StyledCheckbox = styled(Checkbox)`
   }
 `;
 
-export const updateChartFromToken = null;
-export const updateChartToToken = null;
 
 
 export function getChartToken(swapOption, fromToken, toToken, chainId) {
@@ -1005,8 +1003,6 @@ const SwapComponent = props => {
     const token = getTokenfromSymbol(tokens, symbol)
     setFromTokenAddress(token.address);
     setIsWaitingForApproval(false);
-    const updateChartFromToken = token;
-    console.log("see whats going on pc", updateChartFromToken);
     if (mode === SHORT && token.isStable) {
       setShortCollateralAddress(token.address);
     }
@@ -1028,8 +1024,8 @@ const SwapComponent = props => {
   const selectToToken = symbol => {
     const token = getTokenfromSymbol(tokens, symbol)
     setToTokenAddress(token.address);
+    console.log("hereim selectToToken", symbol);
     setActiveToken1((tokens.filter(ele => ele.symbol == symbol))[0]);
-    const updateChartToToken = token;
   };
 
   const onFromValueChange = e => {
