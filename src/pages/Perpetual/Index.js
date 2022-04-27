@@ -99,6 +99,7 @@ import { ethers } from 'ethers'
 import useSWR from 'swr'
 import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
 import { getKChartData } from './utils';
+import { from, HeuristicFragmentMatcher } from 'apollo-boost';
 
 //import ChartTokenSelector from './ChartTokenSelector'
 
@@ -169,6 +170,15 @@ const StyledCard = styled(AcyCard)`
     padding: 0;
   }
     
+`;
+
+const StyledSelect = styled(Radio.Group)`
+  .ant-radio-button-wrapper{
+    background: transparent;
+  }
+  .ant-select-selection {
+    background-color: transparent;
+  }
 `;
 function getFundingFee(data) {
   let { entryFundingRate, cumulativeFundingRate, size } = data
@@ -349,6 +359,8 @@ const Swap = props => {
   const [placement, setPlacement] = useState('1d');
   const [high24, setHigh24] = useState(0);
   const [low24, setLow24] = useState(0);
+  const [deltaPrice24, setDeltaPrice24] = useState(0);
+  const [percentage24, setPercentage24] = useState(0);
 
   //---------- FOR TESTING 
   const whitelistedTokens = defaultToken.default.filter(token => token.symbol !== "USDG");
@@ -576,69 +588,108 @@ const Swap = props => {
   }
 
   const getCurrentTime = () => {
-    let currentDate = Math.floor(new Date().getTime()/1000);
-    console.log("hereim timedata", currentDate);
-    return currentDate;
+    let currentTime = Math.floor(new Date().getTime()/1000);
+    // console.log("hereim current time", currentTime);
+    return currentTime;
   }
-  const get24Change = ( timeScale ) => {
-    let currentTime = getCurrentTime();
-    let fromTime;
-    switch (timeScale) {
-      case "1w":
-        fromTime = currentTime - 7*24*60*60;
-        break;
-      case "1d": 
-        fromTime = currentTime - 24*60*60;
-        break;
-      case "4h":
-        fromTime = currentTime - 4*60*60;
-        break;
-      case "1h":
-        fromTime = currentTime - 60*60;
-        break;
-      case "15m":
-        fromTime = currentTime - 15*60;
-        break;
-      case "5m":
-        fromTime = currentTime - 5*60;
-        break;
-    }
+  const getFromTime = ( currentTime ) => {
+    let fromTime = currentTime - 100* 24* 60* 60;
+    // console.log("hereim from time", fromTime);
     return fromTime;
   }
+
+  // const get24Change = ( timeScale ) => {
+  //   let currentTime = getCurrentTime();
+  //   let fromTime;
+  //   switch (timeScale) {
+  //     case "1w":
+  //       fromTime = currentTime - 7*24*60*60;
+  //       break;
+  //     case "1d": 
+  //       fromTime = currentTime - 24*60*60;
+  //       break;
+  //     case "4h":
+  //       fromTime = currentTime - 4*60*60;
+  //       break;
+  //     case "1h":
+  //       fromTime = currentTime - 60*60;
+  //       break;
+  //     case "15m":
+  //       fromTime = currentTime - 15*60;
+  //       break;
+  //     case "5m":
+  //       fromTime = currentTime - 5*60;
+  //       break;
+  //   }
+  //   return fromTime;
+  // }
 
 
   useEffect(async () => {
     let currentTime = getCurrentTime();
-    let from = get24Change("1d");
-    console.log("hereim from", from.toString());
+    let fromTime = getFromTime( currentTime );
+    console.log("hereim from", fromTime.toString());
     console.log("hereim to", currentTime.toString());
-    let data = await getKChartData(activeToken1.symbol, "42161", "1d", from.toString(), currentTime.toString(), "chainlink");
-    let high = Math.round(data[0].high * 100) / 100;
-    let low = Math.round(data[0].low * 100) / 100;
-
-    setHigh24(high);
-    setLow24(low);
-    console.log("hereim high24", high24);
+    console.log("hereim timescale", activeTimeScale);
+    let data = await getKChartData(activeToken1.symbol, "42161", activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
+    console.log("hereim data", data);
     
-  },[activeToken1])
+    
+  },[activeToken1, activeTimeScale])
 
+  useEffect(async () => {
+    let currentTime = getCurrentTime();
+    let previous24 = currentTime - 24*60*60;
+    let data24 = await getKChartData(activeToken1.symbol, "42161", "1d", previous24.toString(), currentTime.toString(), "chainlink");
+    console.log("hereim data24", data24);
+    let high24 = Math.round(data24[0].high * 100) / 100;
+    let low24 = Math.round(data24[0].low * 100) / 100;
+
+    setHigh24(high24);
+    setLow24(low24);
+    setDeltaPrice24(deltaPrice24);
+    let currentAveragePrice = ((high24+low24)/2);
+    setPercentage24((currentAveragePrice - deltaPrice24) *100 / currentAveragePrice);
+    let percentage = Math.round((currentAveragePrice - deltaPrice24) *100 / currentAveragePrice *100)/100;
+    
+    setPercentage24(percentage);
+
+  }, [activeToken1])
+
+  useEffect(async () => {
+    let currentTime = getCurrentTime();
+    let previous24 = currentTime - 24*60*60;
+    let data24 = await getKChartData(activeToken1.symbol, "42161", "1d", previous24.toString(), currentTime.toString(), "chainlink");
+    console.log("hereim data24", data24);
+    let high24 = Math.round(data24[0].high * 100) / 100;
+    let low24 = Math.round(data24[0].low * 100) / 100;
+    let deltaPrice24 = Math.round(data24[0].open * 100) / 100;
+    setHigh24(high24);
+    setLow24(low24);
+    setDeltaPrice24(deltaPrice24);
+    let currentAveragePrice = ((high24+low24)/2);
+    let percentage = Math.round((currentAveragePrice - deltaPrice24) *100 / currentAveragePrice *100)/100;
+    
+    setPercentage24(percentage);
+
+  }, [])
 
   const lineTitleRender = () => {
 
-    let token0logo = null;
-    let token1logo = null;
-    for (let j = 0; j < supportedTokens.length; j++) {
-      if (activeToken0.symbol === supportedTokens[j].symbol) {
-        token0logo = supportedTokens[j].logoURI;
-      }
-      if (activeToken1.symbol === supportedTokens[j].symbol) {
-        token1logo = supportedTokens[j].logoURI;
-      }
-    }
-    const chartToken = getTokenInfo(infoTokens, activeToken1.address)    
+    // let token0logo = null;
+    // let token1logo = null;
+    // for (let j = 0; j < supportedTokens.length; j++) {
+    //   if (activeToken0.symbol === supportedTokens[j].symbol) {
+    //     token0logo = supportedTokens[j].logoURI;
+    //   }
+    //   if (activeToken1.symbol === supportedTokens[j].symbol) {
+    //     token1logo = supportedTokens[j].logoURI;
+    //   }
+    // }
+    // console.log("hereim after await", high24 );
+    // const chartToken = getTokenInfo(infoTokens, activeToken1.address)    
 
-    let high;
-    let low;
+  
 
     // const swapTokenPosition = () => {
     //   const tempSwapToken = activeToken0;
@@ -654,15 +705,15 @@ const Swap = props => {
 
 
     return [
-      // <div style={{ width: "100%" }}>      
+      // <div style={{ width: 50%}}>      
       <div className={styles.maintitle}>
-        <div>
+        {/* <div>
           <div className={styles.secondarytitle}> $ {high24}</div>
           <div className={styles.secondarytitle}> $ {low24}</div>
-        </div>
+        </div> */}
         <div>
           <div className={styles.secondarytitle}> 24h Change</div>
-          <div className={styles.secondarytitle}> {} % </div>
+          <div className={styles.secondarytitle}> {percentage24} % </div>
 
         </div>
         <div>
@@ -922,7 +973,7 @@ const Swap = props => {
     <PageHeaderWrapper>
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
-          <div>
+          <div className={styles.secondarytitle}>
           
               <Dropdown overlay={menu} > 
                 <div
@@ -936,15 +987,18 @@ const Swap = props => {
                 >
                   {activeToken1.symbol} / USD
                 </div>
+                {/* <div>{lineTitleRender()}</div> */}
               </Dropdown>
-              <Radio.Group value={placement} onChange={placementChange}>
+              {lineTitleRender()}
+              <StyledSelect value={placement} onChange={placementChange}>
                 <Radio.Button value="5m">5m</Radio.Button>
                 <Radio.Button value="15m">15m</Radio.Button>
                 <Radio.Button value="1h">1h</Radio.Button>
                 <Radio.Button value="4h">4h</Radio.Button>
-              </Radio.Group>
+                <Radio.Button value="1d">1d</Radio.Button>
+                {/* <Radio.Button value="1w">1w</Radio.Button> */}
+              </StyledSelect>
               {/* <div>{activeToken1.maxPrice && formatAmount(activeToken1.maxPrice, USD_DECIMALS, 2)}</div> */}
-              {lineTitleRender()}
           </div>
           {/* K chart */}
           <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>

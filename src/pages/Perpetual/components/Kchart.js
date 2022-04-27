@@ -178,6 +178,7 @@ const Kchart=(props)=> {
     
   return(
       <div className='PriceChart' ref={chartRef}>
+        {/* <div>wefiweu</div> */}
           <div className="BotInner">
               <div className="KChartHeader">
                   <div className='KChartControl'>
