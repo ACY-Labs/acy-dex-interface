@@ -839,7 +839,6 @@ const Swap = props => {
   const { data: glpUsdgSupply, mutate: updateGlpUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
     fetcher: fetcher(library, Usdg),
   })
-  console.log('joy glpusdgSupply', glpUsdgSupply)
   // const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
   // const glp_usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
   // let aum

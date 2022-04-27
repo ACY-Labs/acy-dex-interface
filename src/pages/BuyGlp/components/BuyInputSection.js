@@ -57,7 +57,7 @@ export default function BuyInputSection(props) {
               <span className={styles.wrap}>
                 <div className={styles.coin}>
                   <img src={glp40Icon} alt="glp" style={{ width: '24px', marginRight: '0.5rem' }} />
-                  <span style={{ margin: '0px 0.25rem' }}>GLP</span>
+                  <span style={{ margin: '0px 0.25rem' }}>ALP</span>
                 </div>
               </span>
             </button>

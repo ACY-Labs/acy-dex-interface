@@ -249,7 +249,6 @@ export const GlpSwapBox = (props) => {
   const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
     fetcher: fetcher(library, Usdg),
   })
-  console.log('joy usdgSupply', usdgSupply)
   // const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
   // const usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
   
@@ -433,7 +432,7 @@ export const GlpSwapBox = (props) => {
 
     if (!isBuying) {
       if (maxSellAmount && glpAmount && glpAmount.gt(maxSellAmount)) {
-        return [`Insufficient GLP balance`]
+        return [`Insufficient ALP balance`]
       }
 
       const swapTokenInfo = getTokenInfo(infoTokens, swapTokenAddress)
@@ -466,7 +465,7 @@ export const GlpSwapBox = (props) => {
 
     if (isSubmitting) { return isBuying ? `Buying...` : `Selling...` }
 
-    return isBuying ? "Buy GLP" : "Sell GLP"
+    return isBuying ? "Buy ALP" : "Sell ALP"
   }
 
   const buyGlp = () => {
@@ -486,7 +485,7 @@ export const GlpSwapBox = (props) => {
       // value,
       sentMsg: "Buy submitted!",
       failMsg: "Buy failed.",
-      successMsg: `${parseFloat(glpAmount).toFixed(4)} GLP bought with ${parseFloat(swapAmount).toFixed(4)} ${swapToken.symbol}.`,
+      successMsg: `${parseFloat(glpAmount).toFixed(4)} ALP bought with ${parseFloat(swapAmount).toFixed(4)} ${swapToken.symbol}.`,
     })
       .then(async () => {
       })
@@ -510,7 +509,7 @@ export const GlpSwapBox = (props) => {
     callContract(chainId, contract, method, params, {
       sentMsg: "Sell submitted!",
       failMsg: "Sell failed.",
-      successMsg: `${parseFloat(glpAmount).toFixed(4)} GLP sold for ${parseFloat(swapAmount).toFixed(4)} ${swapToken.symbol}.`,
+      successMsg: `${parseFloat(glpAmount).toFixed(4)} ALP sold for ${parseFloat(swapAmount).toFixed(4)} ${swapToken.symbol}.`,
     })
       .then(async () => {
       })
@@ -560,8 +559,8 @@ export const GlpSwapBox = (props) => {
     }
   }
 
-  const [buySellLabel, setBuySellLabel] = useState("Buy GLP")
-  const buySellTabs = ['Buy GLP', 'Sell GLP']
+  const [buySellLabel, setBuySellLabel] = useState("Buy ALP")
+  const buySellTabs = ['Buy ALP', 'Sell ALP']
 
   // const switchSwapOption = (hash = '') => {
   //   history.push(`${history.location.pathname}#${hash}`)
@@ -569,14 +568,14 @@ export const GlpSwapBox = (props) => {
   // }
 
   const onSwapOptionChange = (opt) => {
-    if (opt === "Sell GLP") {
+    if (opt === "Sell ALP") {
       // switchSwapOption('redeem')
       setIsBuying(false)
-      setBuySellLabel("Sell GLP")
+      setBuySellLabel("Sell ALP")
     } else {
       // switchSwapOption()
       setIsBuying(true)
-      setBuySellLabel("Buy GLP")
+      setBuySellLabel("Buy ALP")
     }
   }
 
@@ -589,19 +588,6 @@ export const GlpSwapBox = (props) => {
           type="inline"
           onChange={onSwapOptionChange}
         />
-
-        {/* <Tabs 
-          activeKey={tabLabel}
-          onChange={onSwapOptionChange}
-          size='small'
-          tabBarGutter={0}
-          type='line'
-          tabPosition='top'
-          tabBarStyle={{ border: '0px black' }}
-        >
-          <TabPane tab="Buy GLP" key='buy' />
-          <TabPane tab="Sell GLP" key='sell' />
-        </Tabs> */}
       </div>
 
       {isBuying &&
@@ -763,8 +749,8 @@ export const GlpSwapDetailBox = (props) => {
           <img src={glp40Icon} alt="glp40Icon" />
         </div>
         <div className={styles.GlpSwapinfo}>
-          <div className={styles.statstitle}>GLP</div>
-          <div className={styles.statssubtitle}>GLP</div>
+          <div className={styles.statstitle}>ALP</div>
+          <div className={styles.statssubtitle}>ALP</div>
         </div>
       </div>
 
@@ -780,7 +766,7 @@ export const GlpSwapDetailBox = (props) => {
         <div className={styles.GlpSwapcardrow}>
           <div className={styles.label}>Wallet</div>
           <div className={styles.value}>
-            {formatAmount(glpBalance, GLP_DECIMALS, 4, true)} GLP (${formatAmount(glpBalanceUsd, USD_DECIMALS, 2, true)})
+            {formatAmount(glpBalance, GLP_DECIMALS, 4, true)} ALP (${formatAmount(glpBalanceUsd, USD_DECIMALS, 2, true)})
           </div>
         </div>
       </div>
@@ -795,10 +781,10 @@ export const GlpSwapDetailBox = (props) => {
               placement='bottomLeft'
               color='#b5b5b6'
               mouseEnterDelay={0.5}
-              title={`${formatAmount(reservedAmount, 18, 4, true)} GLP have been reserved for vesting.`}
+              title={`${formatAmount(reservedAmount, 18, 4, true)} ALP have been reserved for vesting.`}
             >
               <div className={styles.TooltipHandle}>
-                ${formatAmount(reservedAmount, 18, 4, true)} GLP (${formatAmount(reserveAmountUsd, USD_DECIMALS, 2, true)})
+                ${formatAmount(reservedAmount, 18, 4, true)} ALP (${formatAmount(reserveAmountUsd, USD_DECIMALS, 2, true)})
               </div>
             </Tooltip>
           </div>
@@ -831,7 +817,7 @@ export const GlpSwapDetailBox = (props) => {
         <div className={styles.GlpSwapcardrow}>
           <div className={styles.label}>Total Supply</div>
           <div className={styles.value}>
-            {formatAmount(glpSupply, GLP_DECIMALS, 4, true)} GLP (${formatAmount(glpSupplyUsd, GLP_DECIMALS, 2, true)})
+            {formatAmount(glpSupply, GLP_DECIMALS, 4, true)} ALP (${formatAmount(glpSupplyUsd, GLP_DECIMALS, 2, true)})
           </div>
         </div>
       </div>
