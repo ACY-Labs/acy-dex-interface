@@ -124,11 +124,10 @@ const Kchart=(props)=> {
 
     const data = await getKChartData(props.activeToken1.symbol, "42161", "1h", "1650234954", "1650378658", "chainlink");
     candleSeries.setData(data != undefined ? data : []);
-
     const series = chart.addCandlestickSeries(getSeriesOptions())
     setCurrentChart(chart);
     setCurrentSeries(series);
-  },[ref, currentChart])
+  },[ref, currentChart,])
 
 
 
@@ -155,8 +154,8 @@ const Kchart=(props)=> {
       borderVisible: false
     });
     // candleSeries.setData(currentChartData);
-    const data = await getKChartData(props.activeToken1.symbol, "42161", "1h", "1650234954", "1650378658", "chainlink");
-
+    const data = await getKChartData(props.activeToken1.symbol, "42161", props.activeTimeScale, "1650234954", "1650378658", "chainlink");
+    console.log("hereim kchart timescale", data);
     if (data != undefined) {
       // candleSeries.update(data);
       // const series = chart.addCandlestickSeries(getSeriesOptions())
@@ -165,7 +164,7 @@ const Kchart=(props)=> {
     }
     candleSeries.setData(data);
     setCurrentChart(chart);
-  },[props.activeToken1.symbol])
+  },[props.activeToken1.symbol, props.activeTimeScale])
 
   useEffect(() => {
     if (!currentChart) { return; }

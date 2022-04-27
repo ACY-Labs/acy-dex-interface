@@ -706,23 +706,37 @@ export const padDecimals = (amount, minDecimals) => {
     return amountStr
   }
 export const formatAmount = (amount, tokenDecimals, displayDecimals, useCommas, defaultValue) => {
+  // console.log("hereim formatamount 1", amount);
+
   if (!defaultValue) {
       defaultValue = "..."
   }
+  // console.log("hereim formatamount 2", amount);
+
   if (amount === undefined || amount.toString().length === 0) {
       return defaultValue
   }
+  // console.log("hereim formatamount 3", amount);
+
   if (displayDecimals === undefined) {
       displayDecimals = 4
   }
+  // console.log("hereim formatamount 4", amount);
+
   let amountStr = ethers.utils.formatUnits(amount, tokenDecimals)
   amountStr = limitDecimals(amountStr, displayDecimals)
+  // console.log("hereim formatamount 5", amount);
+
   if (displayDecimals !== 0) {
       amountStr = padDecimals(amountStr, displayDecimals)
   }
+  // console.log("hereim formatamount 6", amount);
+
   if (useCommas) {
       return numberWithCommas(amountStr)
   }
+  // console.log("hereim formatamount 7", amount);
+
   return amountStr
 }
 

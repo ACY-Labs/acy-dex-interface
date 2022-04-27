@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-computed-key */
-import { Menu, Dropdown, message } from 'antd';
+import { Menu, Dropdown, message, Radio } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { useWeb3React } from '@web3-react/core';
 import React, { Component, useState, useEffect, useRef, useCallback, useMemo, useHistory } from 'react';
 import { connect } from 'umi';
-import { Button, Row, Col, Icon, Skeleton, Card } from 'antd';
+import { Button, Row, Col, Icon, Skeleton, Card, Select } from 'antd';
 import samplePositionsData from "./SampleData"
 import {
   AcyPerpetualCard,
@@ -328,6 +328,7 @@ const Swap = props => {
   const [format, setFormat] = useState('h:mm:ss a');
   const [activeToken1, setActiveToken1] = useState(supportedTokens[1]);
   const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
+  const [activeTimeScale, setActiveTimeScale] = useState("1h");
   const [activeAbsoluteChange, setActiveAbsoluteChange] = useState('+0.00');
   const [activeRate, setActiveRate] = useState('Not available');
   const [range, setRange] = useState('1D');
@@ -345,6 +346,10 @@ const Swap = props => {
   const [positionsData, setPositionsData] = useState([]);
   const [ordersData, setOrdersData] = useState([]);
   const { active, activate } = useWeb3React();
+  const [placement, setPlacement] = useState('1d');
+  const [high24, setHigh24] = useState(0);
+  const [low24, setLow24] = useState(0);
+
   //---------- FOR TESTING 
   const whitelistedTokens = defaultToken.default.filter(token => token.symbol !== "USDG");
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
@@ -570,6 +575,53 @@ const Swap = props => {
       });
   }
 
+  const getCurrentTime = () => {
+    let currentDate = Math.floor(new Date().getTime()/1000);
+    console.log("hereim timedata", currentDate);
+    return currentDate;
+  }
+  const get24Change = ( timeScale ) => {
+    let currentTime = getCurrentTime();
+    let fromTime;
+    switch (timeScale) {
+      case "1w":
+        fromTime = currentTime - 7*24*60*60;
+        break;
+      case "1d": 
+        fromTime = currentTime - 24*60*60;
+        break;
+      case "4h":
+        fromTime = currentTime - 4*60*60;
+        break;
+      case "1h":
+        fromTime = currentTime - 60*60;
+        break;
+      case "15m":
+        fromTime = currentTime - 15*60;
+        break;
+      case "5m":
+        fromTime = currentTime - 5*60;
+        break;
+    }
+    return fromTime;
+  }
+
+
+  useEffect(async () => {
+    let currentTime = getCurrentTime();
+    let from = get24Change("1d");
+    console.log("hereim from", from.toString());
+    console.log("hereim to", currentTime.toString());
+    let data = await getKChartData(activeToken1.symbol, "42161", "1d", from.toString(), currentTime.toString(), "chainlink");
+    let high = Math.round(data[0].high * 100) / 100;
+    let low = Math.round(data[0].low * 100) / 100;
+
+    setHigh24(high);
+    setLow24(low);
+    console.log("hereim high24", high24);
+    
+  },[activeToken1])
+
 
   const lineTitleRender = () => {
 
@@ -603,9 +655,26 @@ const Swap = props => {
 
     return [
       // <div style={{ width: "100%" }}>      
-      <div >
-        <div>${chartToken.maxPrice && formatAmount(chartToken.maxPrice, USD_DECIMALS, 2)}</div>
-        <div >24h Change</div>
+      <div className={styles.maintitle}>
+        <div>
+          <div className={styles.secondarytitle}> $ {high24}</div>
+          <div className={styles.secondarytitle}> $ {low24}</div>
+        </div>
+        <div>
+          <div className={styles.secondarytitle}> 24h Change</div>
+          <div className={styles.secondarytitle}> {} % </div>
+
+        </div>
+        <div>
+          <div className={styles.secondarytitle}> 24h High</div>
+          <div className={styles.secondarytitle}> $ {high24}</div>
+
+        </div>
+        <div>
+          <div className={styles.secondarytitle}> 24h Low</div>
+          <div className={styles.secondarytitle}> $ {low24}</div>
+        </div>
+
 
         {/* <div className={styles.maintitle}>
          
@@ -639,8 +708,8 @@ const Swap = props => {
             // times={['24h', 'Max']}
             times={['24h']}
           />
-        </div> */}
-      </div>,
+    </div> */}
+      </div>
     ];
   };
 
@@ -820,6 +889,15 @@ const Swap = props => {
     }
   }
 
+  const { Option } = Select;
+    
+  const placementChange = e => {
+    setPlacement(e.target.value);
+    setActiveTimeScale(e.target.value);
+    console.log("hereim activetimescale", activeTimeScale);
+  };
+
+
   // let options = supportedTokens;
   const menu = (
     <Menu onClick={onClickDropdown}>
@@ -839,11 +917,6 @@ const Swap = props => {
     setActiveToken1(option);
   }
 
-  // console.log("active token max", getTokenBySymbol(tokens, activeToken1.symbol));
-  // console.log("active token info", getTokenInfo(infoTokens, activeToken1.address));
-
-  // console.log("active token info", getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo, undefined)[activeToken1]);
-  // console.log("active token max", latestAnswer());
 
   return (
     <PageHeaderWrapper>
@@ -864,15 +937,19 @@ const Swap = props => {
                   {activeToken1.symbol} / USD
                 </div>
               </Dropdown>
-              <div>{activeToken1.maxPrice && formatAmount(activeToken1.maxPrice, USD_DECIMALS, 2)}</div>
-                    {lineTitleRender()}
-
-               
+              <Radio.Group value={placement} onChange={placementChange}>
+                <Radio.Button value="5m">5m</Radio.Button>
+                <Radio.Button value="15m">15m</Radio.Button>
+                <Radio.Button value="1h">1h</Radio.Button>
+                <Radio.Button value="4h">4h</Radio.Button>
+              </Radio.Group>
+              {/* <div>{activeToken1.maxPrice && formatAmount(activeToken1.maxPrice, USD_DECIMALS, 2)}</div> */}
+              {lineTitleRender()}
           </div>
           {/* K chart */}
           <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
             <div className={`${styles.colItem} ${styles.priceChart}`}>
-              <KChart activeToken0={activeToken0} activeToken1={activeToken1} />
+              <KChart activeToken0={activeToken0} activeToken1={activeToken1} activeTimeScale={activeTimeScale}/>
             </div>
           </AcyPerpetualCard>
 
