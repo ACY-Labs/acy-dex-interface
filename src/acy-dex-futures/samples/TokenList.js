@@ -1,4 +1,36 @@
 import {ethers} from 'ethers';;
+
+export const longTokenList =  [
+  {
+    name: "Ethereum",
+    symbol: "ETH",
+    decimals: 18,
+    address: ethers.constants.AddressZero,
+    isNative: true,
+    isShortable: true
+  },
+  {
+    name: "Wrapped Bitcoin",
+    symbol: "BTC",
+    decimals: 8,
+    address: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
+    isShortable: true
+  },
+  {
+    name: "BNB",
+    symbol: "BNB",
+    decimals: 18,
+    address: "0x20865e63B111B2649ef829EC220536c82C58ad7B",
+    isShortable: true
+  },
+  {
+    name: "Tether",
+    symbol: "USDT",
+    decimals: 18,
+    address: "0xF82eEeC2C58199cb409788E5D5806727cf549F9f",
+    isStable: true
+  }
+]
 // export default [
 //     {
 //       name: "Ethereum",

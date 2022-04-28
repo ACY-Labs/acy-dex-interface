@@ -125,7 +125,6 @@ import {
   getUserTokenBalance,
   getUserTokenBalanceRaw,
   isZero,
-  supportedTokens,
   parseArbitrageLog,
 } from '@/acy-dex-swap/utils/index';
 
@@ -243,6 +242,40 @@ const StyledCheckbox = styled(Checkbox)`
   }
 `;
 
+
+
+export function getChartToken(swapOption, fromToken, toToken, chainId) {
+  if (!fromToken || !toToken) {
+    return;
+  }
+
+  if (swapOption !== SWAP) {
+    return toToken;
+  }
+
+  if (fromToken.isUsdg && toToken.isUsdg) {
+    return getTokens(chainId).find((t) => t.isStable);
+  }
+  if (fromToken.isUsdg) {
+    return toToken;
+  }
+  if (toToken.isUsdg) {
+    return fromToken;
+  }
+
+  if (fromToken.isStable && toToken.isStable) {
+    return toToken;
+  }
+  if (fromToken.isStable) {
+    return toToken;
+  }
+  if (toToken.isStable) {
+    return fromToken;
+  }
+  
+  return toToken;
+}
+
 function getToken(tokenlist, tokenAddr) {
   for (let i = 0; i < tokenlist.length; i++) {
     if (tokenlist[i].address === tokenAddr) {
@@ -297,6 +330,10 @@ const SwapComponent = props => {
   // const { savedSlippageAmount } = props;
 
   const {
+    activeToken0,
+    activeToken1,
+    setActiveToken0,
+    setActiveToken1,
     positionsMap,
     pendingTxns,
     setPendingTxns,
@@ -332,12 +369,12 @@ const SwapComponent = props => {
   const [ordersToaOpen, setOrdersToaOpen] = useState(false);
 
   const savedSlippageAmount = getSavedSlippageAmount(chainId)
-  const tokens = defaultToken.default
+  const tokens = defaultToken.longTokenList
   const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
   const stableTokens = tokens.filter(token => token.isStable);
   const indexTokens = whitelistedTokens.filter(token => !token.isStable && !token.isWrapped);
   const shortableTokens = indexTokens.filter(token => token.isShortable);
-  let toTokens = tokens;
+  let toTokens = defaultToken.longTokenList;
   if (mode === LONG) {
     toTokens = indexTokens;
   }
@@ -395,8 +432,8 @@ const SwapComponent = props => {
   const [poolExist, setPoolExist] = useState(true);
 
   // ymj useState
-  const [fromTokenAddress, setFromTokenAddress] = useState("0xF82eEeC2C58199cb409788E5D5806727cf549F9f");
-  const [toTokenAddress, setToTokenAddress] = useState("0xF82eEeC2C58199cb409788E5D5806727cf549F9f");
+  const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
+  const [toTokenAddress, setToTokenAddress] = useState("0x20865e63B111B2649ef829EC220536c82C58ad7B");
   // const [fromTokenInfo, setFromTokenInfo] = useState();
   // const [toTokenInfo, setToTokenInfo] = useState();
   const [mode, setMode] = useState(LONG);
@@ -429,6 +466,7 @@ const SwapComponent = props => {
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
   })
+  console.log("token balances", tokenBalances);
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
@@ -455,8 +493,8 @@ const SwapComponent = props => {
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   const fromToken = getToken(tokens, fromTokenAddress);
-  const toToken = getToken(tokens, toTokenAddress);
-
+  const toToken = getToken(toTokens, toTokenAddress);
+  
   const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
   const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
   const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
@@ -466,7 +504,7 @@ const SwapComponent = props => {
 
   const fromAmount = parseValue(fromValue, fromToken && fromToken.decimals);
   const toAmount = parseValue(toValue, toToken && toToken.decimals);
-
+  
   const isPotentialWrap = (fromToken.isNative && toToken.isWrapped) || (fromToken.isWrapped && toToken.isNative);
   const isWrapOrUnwrap = mode === SWAP && isPotentialWrap;
   const needApproval =
@@ -965,15 +1003,29 @@ const SwapComponent = props => {
     const token = getTokenfromSymbol(tokens, symbol)
     setFromTokenAddress(token.address);
     setIsWaitingForApproval(false);
-
     if (mode === SHORT && token.isStable) {
       setShortCollateralAddress(token.address);
     }
   };
 
+  useEffect(() => {
+    console.log("tokens in useeffect", tokens);
+    const fromToken = getTokenfromSymbol(tokens, activeToken0.symbol)
+    const toToken = getTokenfromSymbol(tokens, activeToken1.symbol)
+    console.log("useeffect fromtoken",fromToken);
+    console.log("useeffect totoken",activeToken1);
+
+    setFromTokenAddress(fromToken.address);
+    setToTokenAddress(toToken.address);
+
+  }, [activeToken0, activeToken1])
+
+
   const selectToToken = symbol => {
     const token = getTokenfromSymbol(tokens, symbol)
     setToTokenAddress(token.address);
+    console.log("hereim selectToToken", symbol);
+    setActiveToken1((tokens.filter(ele => ele.symbol == symbol))[0]);
   };
 
   const onFromValueChange = e => {

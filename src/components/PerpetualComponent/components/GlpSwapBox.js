@@ -167,7 +167,7 @@ export const GlpSwapBox = (props) => {
   const history = useHistory()
   const tabLabel = isBuying ? 'buy' : 'sell'
 
-  const tokens = defaultToken.default
+  const tokens = defaultToken.longTokenList
   const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
   const tokenList = whitelistedTokens.filter(t => !t.isWrapped)
 
@@ -319,7 +319,7 @@ export const GlpSwapBox = (props) => {
   //   maxSellAmount = glpBalance.sub(reservedAmount)
   // }
 
-  const wrappedTokenSymbol = getWrappedToken(tokens).symbol
+  // const wrappedTokenSymbol = getWrappedToken(tokens).symbol
   const nativeTokenSymbol = getNativeToken(tokens).symbol
 
   useEffect(() => {
@@ -719,7 +719,7 @@ export const GlpSwapDetailBox = (props) => {
     // gmxPrice,
   } = props
 
-  const wrappedTokenSymbol = getWrappedToken(tokens).symbol
+  // const wrappedTokenSymbol = getWrappedToken(tokens).symbol
   const nativeTokenSymbol = getNativeToken(tokens).symbol
 
   const nativeToken = getTokenInfo(infoTokens, AddressZero)

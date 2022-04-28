@@ -1,7 +1,7 @@
 .main {
     // width: 90%;
     // max-width: 1000px;
-    margin: auto;
+    margin: 0;
     z-index: 0;
     color: #b6b5b5;
     margin-bottom: 20px;
@@ -27,15 +27,20 @@
   }
   
   @media screen and (min-width: 1024px) {
+    .main {
+      // min-width: 100px;
+      width:100%;
+    }
     .rowFlexContainer {
-      // width: 30%;
-      min-width: 310px;
+      width: 100%;
+
       flex-wrap: nowrap;
     }
     .kChart {
       order: 1;
       flex: 2;
       height: 65%;
+      width: 50%;
       // bottom: 0.5rem;
       // left: 0;
       // right: 0;
@@ -68,6 +73,7 @@
     }
     .kChart {
       order: 1;
+      width: 50%;
     }
     .priceChart {
       order: 2;
@@ -96,7 +102,9 @@
     }
   }
   .secondarytitle {
-    font-size: 1.2rem;
+    margin-right: 1rem;
+
+    font-size: 1rem;
     font-weight: 400;
     color: #929298;
     .lighttitle {
@@ -208,9 +216,10 @@
   }
   
   @media (max-width: 768px) {
-    // .main {
-    //   padding: 0 40px;
-    // }
+    .main {
+      width:100%;
+      padding: 0 40px;
+    }
     .exchangeBottomWrapper{
       width: 100%;
       padding: 0 40px;

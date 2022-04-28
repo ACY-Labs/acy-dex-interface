@@ -16,7 +16,7 @@ const BscMainNetTokenList: Array<TokenInfo> = [
     address: '0x55d398326f99059ff775485246999027b3197955',
     isStable: true,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg',
     idOnCoingecko: "tether",
   },
   {
@@ -29,13 +29,37 @@ const BscMainNetTokenList: Array<TokenInfo> = [
     idOnCoingecko: "acy-finance",
   },
   {
+    name: 'Ruby',
+    symbol: 'RUBY',
+    address: '0xf7722aA0714096f1FB5ef83e6041CEBB4d58a08e',
+    decimals: 12,
+    logoURI: 'https://storageapi2.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/Ruby-min.png',
+    idOnCoingecko: "undefined",
+  },
+  {
     name: 'Bit Store',
     symbol: 'STORE',
     address: '0x65d9033cff96782394dab5dbef17fa771bbe1732',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/token_STORE.svg',
+    logoURI: 'https://storageapi2.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/bitstore-min.svg',
     idOnCoingecko: "bit-store-coin",
+  },
+  {
+    name: 'Owl Analytics',
+    symbol: 'OWLA',
+    address: '0x6E78D6831303A9e53a0F1C92389aA5128Bc38A09',
+    decimals: 18,
+    logoURI: 'https://storageapi2.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/OWLA-min.png',
+    idOnCoingecko: "undefined",
+  },
+  {
+    name: 'DX Spot',
+    symbol: 'DXS',
+    address: '0xB0Df5519F460E96117C12Ea667557b161866189c',
+    decimals: 8,
+    logoURI: 'https://storageapi2.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/DXSpot-min.svg',
+    idOnCoingecko: "undefined",
   },
   {
     name: 'Binance Coin',
@@ -55,15 +79,15 @@ const BscMainNetTokenList: Array<TokenInfo> = [
     logoURI: 'https://cryptologos.cc/logos/binance-usd-busd-logo.svg?v=014',
     idOnCoingecko: "tether",
   },
-  {
-    name: 'Wrapped BNB',
-    symbol: 'WBNB',
-    address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
-    isStable: false,
-    decimals: 18,
-    logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
-    idOnCoingecko: "binancecoin",
-  },
+  // // comment out WBNB in case of having duplicated pair
+  // {
+  //   name: 'Wrapped BNB',
+  //   symbol: 'WBNB',
+  //   address: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
+  //   decimals: 18,
+  //   logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
+  //   idOnCoingecko: "binancecoin",
+  // },
 
   {
     name: 'Ethereum',
@@ -93,7 +117,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     isStable: true,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg',
     idOnCoingecko: "usd-coin",
   },
   {
@@ -113,19 +137,19 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     isStable: true,
     decimals: 6,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
     idOnCoingecko: "usd-coin",
   },
-  {
-    name: 'Wrapped BNB',
-    symbol: 'WBNB',
-    address: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
-    addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-    isStable: false,
-    decimals: 18,
-    logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
-    idOnCoingecko: "binancecoin",
-  },
+  // // comment out WBNB in case of having duplicated pair
+  // {
+  //   name: 'Wrapped BNB',
+  //   symbol: 'WBNB',
+  //   address: '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
+  //   addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+  //   decimals: 18,
+  //   logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
+  //   idOnCoingecko: "binancecoin",
+  // },
   {
     name: 'ACY',
     symbol: 'ACY',
@@ -144,7 +168,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/UNI.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/UNI.svg',
     idOnCoingecko: "unicorn-token",
   },
   {
@@ -154,7 +178,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0x6b175474e89094c44da98b954eedeac495271d0f',
     isStable: true,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg',
     idOnCoingecko: "dai",
   },
   {
@@ -164,7 +188,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
     isStable: false,
     decimals: 8,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/DAI.svg',
     idOnCoingecko: "cdai",
   },
   {
@@ -174,7 +198,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
     isStable: false,
     decimals: 8,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/WBTC.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/WBTC.svg',
     idOnCoingecko: "wrapped-bitcoin",
   },
   {
@@ -184,7 +208,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/AAVE.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/AAVE.svg',
     idOnCoingecko: "aave",
   },
   // token not exist in testnet
@@ -194,7 +218,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
   //   "name": "Amp",
   //   "symbol": "AMP",
   //   "decimals": 18,
-  //   "logoURI": "https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/AMP.svg"
+  //   "logoURI": "https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/AMP.svg"
   // },
   {
     name: 'Aragon Network Token',
@@ -203,7 +227,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0x960b236A07cf122663c4303350609A66A7B288C0',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/ANT.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/ANT.svg',
     idOnCoingecko: "aragon",
   },
   // balancer token address in testnet is not verified
@@ -215,7 +239,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0xba100000625a3754423978a60c9317c58a424e3D',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/BAL.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/BAL.svg',
     idOnCoingecko: "balancer",
   },
   // band protocol token address in testnet is not verified
@@ -227,7 +251,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0xBA11D00c5f74255f56a5E366F4F77f5A186d7f55',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/BAND.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/BAND.svg',
     idOnCoingecko: "band-protocol",
   },
   // bancor network token address in testnet is not verified
@@ -239,7 +263,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/BNT.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/BNT.svg',
     idOnCoingecko: "bancor",
   },
   // compound token address in testnet is not verified
@@ -251,7 +275,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0xc00e94Cb662C3520282E6f5717214004A7f26888',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/COMP.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/COMP.svg',
     idOnCoingecko: "compound-coin",
   },
   {
@@ -261,7 +285,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0xD533a949740bb3306d119CC777fa900bA034cd52',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/CRV.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/CRV.svg',
     idOnCoingecko: "curve-dao-token",
   },
   {
@@ -271,7 +295,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0x41e5560054824eA6B0732E656E3Ad64E20e94E45',
     isStable: false,
     decimals: 8,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/CVC.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/CVC.svg',
     idOnCoingecko: "civic",
   },
   {
@@ -281,7 +305,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0x0AbdAce70D3790235af448C88547603b945604ea',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/DNT.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/DNT.svg',
     idOnCoingecko: "district0x",
   },
   // gnosis token address in testnet is not verified
@@ -293,7 +317,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0x6810e776880C02933D47DB1b9fc05908e5386b96',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/GNO.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/GNO.svg',
     idOnCoingecko: "gnosis",
   },
   // the graph token address in testnet is not verified
@@ -305,7 +329,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0xc944E90C64B2c07662A292be6244BDf05Cda44a7',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/GRT.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/GRT.svg',
     idOnCoingecko: "the-graph",
   },
   // keep network token address in testnet is not verified
@@ -317,7 +341,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0x85Eee30c52B0b379b046Fb0F85F4f3Dc3009aFEC',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/KEEP.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/KEEP.svg',
     idOnCoingecko: "keep-network",
   },
   // kyber network crystal token address in testnet is not verified
@@ -329,7 +353,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0xdd974D5C2e2928deA5F71b9825b8b646686BD200',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/KNC.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/KNC.svg',
     idOnCoingecko: "kyber-network-crystal",
   },
   {
@@ -339,7 +363,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0x514910771AF9Ca656af840dff83E8264EcF986CA',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/LINK.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/LINK.svg',
     idOnCoingecko: "chainlink",
   },
 ];
@@ -351,7 +375,7 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     address: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f',
     isStable: true,
     decimals: 6,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg', // not changed
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg', // not changed
     idOnCoingecko: "tether",
   },
   {
@@ -369,7 +393,7 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     address: '0x8b8e48a8cc52389cd16a162e5d8bd514fabf4ba0',
     isStable: false,
     decimals: 8,
-    logoURI: 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/2021_NULS_ICON-01(1).svg',
+    logoURI: 'https://storageapi2.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/NULS-min.svg',
     idOnCoingecko: "nuls",
   },
   {
@@ -378,7 +402,7 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',//0xe9e7cea3dedca5984780bafc599bd69add087d56
     isStable: true,
     decimals: 6,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
     idOnCoingecko: "usd-coin",
   },
   {
@@ -396,7 +420,7 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     address: '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6',
     isStable: false,
     decimals: 8,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/WBTC.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/WBTC.svg',
     idOnCoingecko: "wrapped-bitcoin",
   },
   {
@@ -435,7 +459,7 @@ const PolygonTestNetTokenList: Array<TokenInfo> = [
     address: '0x158653b66fd72555F68eDf983736781E471639Cc',
     isStable: true,
     decimals: 18,
-    logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg',
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg',
     idOnCoingecko: "tether",
   },
   {

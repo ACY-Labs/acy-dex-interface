@@ -58,6 +58,7 @@
 
   .KChartControl{
     display: inline-block;
+    background-color: transparent;
   }
 
   .KChartStat{

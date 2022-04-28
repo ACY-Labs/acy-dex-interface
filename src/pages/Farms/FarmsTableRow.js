@@ -118,7 +118,6 @@ const FarmsTableRow = props => {
   const [percent,setPercent] = useState(50);
   const [withdrawAmount, setWithdrawAmount] = useState(0);
   
-  
 
   const ACY_LOGO = "https://acy.finance/static/media/logo.78c0179c.svg";
 
@@ -141,8 +140,6 @@ const FarmsTableRow = props => {
     },
     [isLoading]
   );
-
-  
   
 
   useEffect(
@@ -576,6 +573,9 @@ const FarmsTableRow = props => {
             token2={poolInfo.token2}
             token2Logo={poolInfo.token2Logo}
             refreshPoolInfo={refreshPoolInfo}
+            ratio={poolInfo.ratio}
+            token1Ratio={poolInfo.token1Ratio}
+            token2Ratio={poolInfo.token2Ratio}
           >
               { (id == Math.ceil(poolInfo.stakeData.length/2) - 1 && !isMobile) || 
               (id == 0 && isMobile) ?  (
