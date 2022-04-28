@@ -1,6 +1,6 @@
 import React, { Component, useState, useEffect, useRef } from 'react';
 import { getKChartData } from '../utils/index'
-//------FOR Pricehart-----TODO Austin
+//------FOR Pricehart-----TODO Austin 
 // import { createChart } from 'krasulya-lightweight-charts'
 import { createChart } from 'lightweight-charts';
 import './styles.css';
