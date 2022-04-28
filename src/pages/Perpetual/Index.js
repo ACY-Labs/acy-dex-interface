@@ -93,10 +93,11 @@ import Vault from '@/acy-dex-futures/abis/Vault.json'
 // import VaultV2 from '@/acy-dex-futures/abis/VaultV2.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
 import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
+import Glp from '@/acy-dex-futures/abis/Glp.json'
+import Usdg from "@/acy-dex-futures/abis/Usdg.json"
 import RewardTracker from '@/acy-dex-futures/abis/RewardTracker.json'
 import Vester from '@/acy-dex-futures/abis/Vester.json'
 import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
-import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
 // import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
 import { ethers } from 'ethers'
 import useSWR from 'swr'
@@ -665,7 +666,7 @@ const Swap = props => {
     let high24 = Math.round(data24[0].high * 100) / 100;
     let low24 = Math.round(data24[0].low * 100) / 100;
     let deltaPrice24 = Math.round(data24[0].open * 100) / 100;
-    console.log("hereim show 24 cal", "high24:", high24, " low24:" low24, " average:" currentAveragePrice, " delta:"deltaPrice24);
+    console.log("hereim show 24 cal", "high24:", high24, " low24:", low24, " average:", currentAveragePrice, " delta:", deltaPrice24);
 
     setHigh24(high24);
     setLow24(low24);
