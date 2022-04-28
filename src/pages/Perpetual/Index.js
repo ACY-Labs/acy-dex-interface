@@ -79,7 +79,7 @@ import moment from 'moment';
 import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
-import { useConstantLoader } from '@/constants'; 
+import { useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import PositionsTable from './components/PositionsTable';
 import ActionHistoryTable from './components/ActionHistoryTable';
@@ -90,13 +90,14 @@ import { fetcher } from '@/acy-dex-futures/utils';
 import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
 import Router from '@/acy-dex-futures/abis/Router.json'
 import Vault from '@/acy-dex-futures/abis/Vault.json'
+// import VaultV2 from '@/acy-dex-futures/abis/VaultV2.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
 import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
-import Glp from '@/acy-dex-futures/abis/Glp.json'
-import Usdg from "@/acy-dex-futures/abis/Usdg.json"
 import RewardTracker from '@/acy-dex-futures/abis/RewardTracker.json'
 import Vester from '@/acy-dex-futures/abis/Vester.json'
 import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
+import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
+// import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
 import { ethers } from 'ethers'
 import useSWR from 'swr'
 import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
@@ -432,6 +433,7 @@ const Swap = props => {
     fetcher: fetcher(library, Router)
   });
 
+ 
   useEffect(() => {
     console.log("printing all vault", vaultTokenInfo);
   }, [vaultTokenInfo])
@@ -439,7 +441,6 @@ const Swap = props => {
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   const { positions, positionsMap } = getPositions(chainId, positionQuery, positionData, infoTokens, true)
   // const [orders, updateOrders] = useAccountOrders(flagOrdersEnabled)
-
   console.log('PRINTING ALL POSITIONS FOR USER', positions);
 
   const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
@@ -459,7 +460,7 @@ const Swap = props => {
     })
   }
 
-  // --------- 
+  //--------- 
   useEffect(() => {
     if (!supportedTokens) return
 
@@ -644,13 +645,13 @@ const Swap = props => {
     let data24 = await getKChartData(activeToken1.symbol, "42161", "1d", previous24.toString(), currentTime.toString(), "chainlink");
     console.log("hereim data24", data24);
     let high24 = Math.round(data24[0].high * 100) / 100;
-    let low24 = Math.round(data24[0].low * 100) / 100;
+    let low24 = Math.round(data24[0].low * 100) / 100;    
+    let deltaPrice24 = Math.round(data24[0].open * 100) / 100;
 
     setHigh24(high24);
     setLow24(low24);
     setDeltaPrice24(deltaPrice24);
     let currentAveragePrice = ((high24+low24)/2);
-    setPercentage24((currentAveragePrice - deltaPrice24) *100 / currentAveragePrice);
     let percentage = Math.round((currentAveragePrice - deltaPrice24) *100 / currentAveragePrice *100)/100;
     
     setPercentage24(percentage);
@@ -661,10 +662,11 @@ const Swap = props => {
     let currentTime = getCurrentTime();
     let previous24 = currentTime - 24*60*60;
     let data24 = await getKChartData(activeToken1.symbol, "42161", "1d", previous24.toString(), currentTime.toString(), "chainlink");
-    console.log("hereim data24", data24);
     let high24 = Math.round(data24[0].high * 100) / 100;
     let low24 = Math.round(data24[0].low * 100) / 100;
     let deltaPrice24 = Math.round(data24[0].open * 100) / 100;
+    console.log("hereim show 24 cal", "high24:", high24, " low24:" low24, " average:" currentAveragePrice, " delta:"deltaPrice24);
+
     setHigh24(high24);
     setLow24(low24);
     setDeltaPrice24(deltaPrice24);
