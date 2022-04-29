@@ -70,6 +70,7 @@ import { getConstant } from '@/acy-dex-futures/utils/Constants'
 import PerpetualComponent from '@/components/PerpetualComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { GlpSwapTokenTable } from '@/components/PerpetualComponent/components/GlpSwapBox'
+import Orderbook from '@/components/PerpetualComponent/orderbook'
 // import Kchart from './components/Kchart';
 import KChart from './components/KChart';
 import axios from 'axios';
@@ -871,6 +872,7 @@ const Swap = props => {
   return (
     <PageHeaderWrapper>
       <div className={styles.main}>
+        {/* Kchart-PositionTable Component */}
         <div className={styles.rowFlexContainer}>
           {/* K chart */}
           <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
@@ -958,7 +960,14 @@ const Swap = props => {
           />
 
         </div>
-        {/* <div className={styles.rowFlexContainer}> */}
+        
+        {/* Orderbook Component */}
+        <AcyPerpetualCard style={{ backgroundColor: 'transparent', height: '66.28rem' }}>
+          <div className={styles.orderBook}>
+            <Orderbook />
+          </div>
+        </AcyPerpetualCard>
+        
         {/* Perpetual Component */}
         <div className={styles.perpetualComponent}>
           <PerpetualComponent
