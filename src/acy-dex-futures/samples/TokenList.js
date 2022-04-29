@@ -2,18 +2,18 @@ import {ethers} from 'ethers';;
 
 export const longTokenList =  [
   {
+    name: "Wrapped Bitcoin",
+    symbol: "BTC",
+    decimals: 8,
+    address: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
+    isShortable: true
+  },
+  {
     name: "Ethereum",
     symbol: "ETH",
     decimals: 18,
     address: ethers.constants.AddressZero,
     isNative: true,
-    isShortable: true
-  },
-  {
-    name: "Wrapped Bitcoin",
-    symbol: "BTC",
-    decimals: 8,
-    address: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
     isShortable: true
   },
   {
@@ -24,12 +24,20 @@ export const longTokenList =  [
     isShortable: true
   },
   {
+    name: "USD Coin",
+    symbol: "USDC",
+    decimals: 6,
+    address: "0xE971616d94335dec2E54939118AdFcB68E6dCAd6",
+    isStable: true
+  },
+  {
     name: "Tether",
     symbol: "USDT",
     decimals: 18,
     address: "0xF82eEeC2C58199cb409788E5D5806727cf549F9f",
     isStable: true
-  }
+  },
+
 ]
 // export default [
 //     {
@@ -116,19 +124,19 @@ export default [
     isShortable: true
   },
   {
+    name: "Wrapped Bitcoin",
+    symbol: "BTC",
+    decimals: 8,
+    address: "0x6E59735D808E49D050D0CB21b0c9549D379BBB39",
+    isShortable: true
+  },
+  {
     name: "Wrapped BNB",
     symbol: "WBNB",
     decimals: 18,
     address: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
     isWrapped: true,
     baseSymbol: "BNB"
-  },
-  {
-    name: "Wrapped Bitcoin",
-    symbol: "BTC",
-    decimals: 8,
-    address: "0x6E59735D808E49D050D0CB21b0c9549D379BBB39",
-    isShortable: true
   },
   {
     name: "Wrapped ETH",

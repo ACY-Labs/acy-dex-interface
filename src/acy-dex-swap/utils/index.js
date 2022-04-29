@@ -564,6 +564,7 @@ export async function getTokenPriceFromPool(tokenSymbol, tokensPrice, forMarketP
   const BUSD = tokenList.find(token => token.symbol == "BUSD");
   const USDT = tokenList.find(token => token.symbol == "USDT");
   const ACY = tokenList.find(token => token.symbol == "ACY");
+  if(!tok) return 0;
   
 
   const newToken  = new Token(chainId, tok.address, tok.decimals, tokenSymbol);

@@ -964,7 +964,7 @@ const Swap = props => {
   const menu = (
     <Menu onClick={onClickDropdown}>
       {
-        supportedTokens.map((option) => (
+        supportedTokens.filter(token => !token.isStable).map((option) => (
           <Menu.Item key={option.symbol}>
             <span>{option.symbol} / USD</span> 
             {/* for showing before hover */}
