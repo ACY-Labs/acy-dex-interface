@@ -171,16 +171,6 @@ const { AcyTabPane } = AcyTabs;
 const { TabPane } = Tabs;
 const { AddressZero } = ethers.constants;
 
-const StyledRadioButton = styled(Radio.Button)`
-  .ant-radio-button-wrapper {
-    border: none;
-    background-color: transparent;
-  }
-  .ant-radio-button-wrapper:not(:first-child)::before {
-    background-color: transparent;
-  }
-`;
-
 const StyledSlider = styled(Slider)`
   .ant-slider-track {
     background: #929293;
@@ -322,28 +312,27 @@ const SwapComponent = props => {
     tokenList: INITIAL_TOKEN_LIST,
     farmSetting: { INITIAL_ALLOWED_SLIPPAGE },
   } = useConstantLoader(props);
-  const { profitsIn, liqPrice } = props;
-  const { entryPriceMarket, exitPrice, borrowFee, positions } = props;
+  // const { profitsIn, liqPrice } = props;
+  // const { entryPriceMarket, exitPrice, borrowFee, positions } = props;
   // const { infoTokens_test, usdgSupply, positions } = props;
-  const { isConfirming, setIsConfirming } = props;
+  // const { isConfirming, setIsConfirming } = props;
   // isPendingConfirmation, setIsPendingConfirmation } = props;
   // const { savedSlippageAmount } = props;
 
   const {
     activeToken0,
-    activeToken1,
     setActiveToken0,
+    activeToken1,
     setActiveToken1,
     positionsMap,
     pendingTxns,
     setPendingTxns,
-    tokenSelection,
-    setTokenSelection,
     savedIsPnlInLeverage,
     approveOrderBook,
     isWaitingForPluginApproval,
     setIsWaitingForPluginApproval,
     isPluginApproving,
+    setIsConfirming,
     isBuying,
     setIsBuying,
     onChangeMode,
@@ -1024,8 +1013,7 @@ const SwapComponent = props => {
   const selectToToken = symbol => {
     const token = getTokenfromSymbol(tokens, symbol)
     setToTokenAddress(token.address);
-    console.log("hereim selectToToken", symbol);
-    setActiveToken1((tokens.filter(ele => ele.symbol == symbol))[0]);
+    setActiveToken1((tokens.filter(ele => ele.symbol === symbol))[0]);
   };
 
   const onFromValueChange = e => {
@@ -1081,203 +1069,8 @@ const SwapComponent = props => {
       });
   };
 
-  // const swap = async () => {
-  //   if (fromToken.isNative && toToken.isWrapped) {
-  //     wrap();
-  //     return;
-  //   }
-
-  //   if (fromTokenAddress.isWrapped && toToken.isNative) {
-  //     unwrap();
-  //     return;
-  //   }
-
-  //   setIsSubmitting(true);
-  //   let path = [fromTokenAddress, toTokenAddress];
-  //   if (anchorOnFromAmount) {
-  //     const { path: multiPath } = getNextToAmount(
-  //       chainId,
-  //       fromAmount,
-  //       fromTokenAddress,
-  //       toTokenAddress,
-  //       infoTokens,
-  //       undefined,
-  //       undefined,
-  //       usdgSupply,
-  //       totalTokenWeights
-  //     );
-  //     if (multiPath) {
-  //       path = multiPath;
-  //     }
-  //   } else {
-  //     const { path: multiPath } = getNextFromAmount(
-  //       chainId,
-  //       toAmount,
-  //       fromTokenAddress,
-  //       toTokenAddress,
-  //       infoTokens,
-  //       undefined,
-  //       undefined,
-  //       usdgSupply,
-  //       totalTokenWeights
-  //     );
-  //     if (multiPath) {
-  //       path = multiPath;
-  //     }
-  //   }
-
-  //   let method;
-  //   let contract;
-  //   let value;
-  //   let params;
-  //   let minOut;
-  //   if (shouldRaiseGasError(getTokenInfo(infoTokens, fromTokenAddress), fromAmount)) {
-  //     setIsSubmitting(false);
-  //     setIsPendingConfirmation(true);
-  //     helperToast.error(
-  //       `Leave at least ${formatAmount(DUST_BNB, 18, 3)} ${getConstant(
-  //         chainId,
-  //         'nativeTokenSymbol'
-  //       )} for gas`
-  //     );
-  //     return;
-  //   }
-
-  //   if (!isMarketOrder) {
-  //     minOut = toAmount;
-  //     Api.createSwapOrder(
-  //       chainId,
-  //       library,
-  //       path,
-  //       fromAmount,
-  //       minOut,
-  //       triggerRatio,
-  //       getContractAddress(chainId, 'NATIVE_TOKEN'),
-  //       {
-  //         sentMsg: 'Swap Order submitted!',
-  //         successMsg: 'Swap Order created!',
-  //         failMsg: 'Swap Order creation failed',
-  //         pendingTxns,
-  //         setPendingTxns,
-  //       }
-  //     )
-  //       .then(() => {
-  //         setIsConfirming(false);
-  //       })
-  //       .finally(() => {
-  //         setIsSubmitting(false);
-  //         setIsPendingConfirmation(false);
-  //       });
-  //     return;
-  //   }
-
-  //   path = replaceNativeTokenAddress(path, getContractAddress(chainId, 'NATIVE_TOKEN'));
-  //   method = 'swap';
-  //   value = bigNumberify(0);
-  //   if (toTokenAddress === AddressZero) {
-  //     method = 'swapTokensToETH';
-  //   }
-
-  //   minOut = toAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR);
-  //   params = [path, fromAmount, minOut, account];
-  //   if (fromTokenAddress === AddressZero) {
-  //     method = 'swapETHToTokens';
-  //     value = fromAmount;
-  //     params = [path, minOut, account];
-  //   }
-  //   contract = new ethers.Contract(
-  //     getContractAddress(chainId, 'Router'),
-  //     Router.abi,
-  //     library.getSigner()
-  //   );
-
-  //   Api.callContract(chainId, contract, method, params, {
-  //     value,
-  //     sentMsg: `Swap ${!isMarketOrder ? ' order ' : ''} submitted!`,
-  //     successMsg: `Swapped ${formatAmount(fromAmount, fromToken.decimals, 4, true)} ${fromToken.symbol
-  //       } for ${formatAmount(toAmount, toToken.decimals, 4, true)} ${toToken.symbol}`,
-  //     failMsg: 'Swap failed.',
-  //     setPendingTxns,
-  //   })
-  //     .then(async () => {
-  //       setIsConfirming(false);
-  //     })
-  //     .finally(() => {
-  //       setIsSubmitting(false);
-  //       setIsPendingConfirmation(false);
-  //     });
-  // };
-
-  // function handleSwap() {
-  //   // when need approval :
-  //   // orderbook approval, setOrders to Open
-  //   // approve from token (in gmx = approve in acy)
-  //   // modal
-  //   // after isSwap
-  //   if (
-  //     fromTokenAddress === AddressZero &&
-  //     toTokenAddress === getContractAddress(chainId, 'NATIVE_TOKEN')
-  //   ) {
-  //     wrap();
-  //     return;
-  //   }
-
-  //   if (token0Addr === getContractAddress(chainId, 'NATIVE_TOKEN') && token1Addr === AddressZero) {
-  //     unwrap();
-  //     return;
-  //   }
-  //   setIsConfirming(true);
-  //   //metamask operations
-  // }
-
-  // swap的交易状态
-  // const swapCallback = async (status, inputToken, outToken) => {
-  //   // 循环获取交易结果
-  //   const {
-  //     transaction: { transactions },
-  //   } = props;
-  //   // 检查是否已经包含此交易
-  //   const transLength = transactions.filter(item => item.hash == status.hash).length;
-
-  //   const sti = async hash => {
-  //     library.getTransactionReceipt(hash).then(async receipt => {
-  //       console.log(`receiptreceipt for ${hash}: `, receipt);
-  //       // receipt is not null when transaction is done
-  //       if (!receipt) setTimeout(sti(hash), 500);
-  //       else {
-  //         if (!receipt.status) {
-  //           setSwapButtonContent('Failed');
-  //         } else {
-  //           props.onGetReceipt(receipt.transactionHash, library, account);
-
-  //           // set button to done and disabled on default
-  //           setSwapButtonContent('Done');
-  //         }
-
-  //         const newData = transactions.filter(item => item.hash != hash);
-  //         dispatch({
-  //           type: 'transaction/addTransaction',
-  //           payload: {
-  //             transactions: newData,
-  //           },
-  //         });
-  //       }
-  //     });
-  //   };
-  //   sti(status.hash);
-  // };
-
   const perpetualMode = [LONG, SHORT, POOL];
   const perpetualType = [MARKET, LIMIT]
-  // const perpetualType = [{
-  //   name: 'Market',
-  //   icon: <LineChartOutlined />,
-  //   id: MARKET,
-  // }, {
-  //   name: 'Limit',
-  //   icon: <FieldTimeOutlined />,
-  //   id: LIMIT,
-  // }];
 
   // LONG or SHORT
   const modeSelect = (input) => {
@@ -1545,126 +1338,25 @@ const SwapComponent = props => {
     entryMarkPrice
   ]);
 
-  const getSwapError = () => {
-    if (fromTokenAddress === toTokenAddress) {
-      return ["Select different tokens"];
-    }
-
-    if (type === MARKET) {
-      if (
-        (toToken.isStable || toToken.isUsdg) &&
-        (fromToken.isStable || fromToken.isUsdg)
-      ) {
-        return ["Select different tokens"];
-      }
-
-      if (fromToken.isNative && toToken.isWrapped) {
-        return ["Select different tokens"];
-      }
-
-      if (toToken.isNative && fromToken.isWrapped) {
-        return ["Select different tokens"];
-      }
-    }
-
-    if (!fromAmount || fromAmount.eq(0)) {
-      return ["Enter an amount"];
-    }
-    if (!toAmount || toAmount.eq(0)) {
-      return ["Enter an amount"];
-    }
-
-    const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
-    if (!fromTokenInfo || !fromTokenInfo.minPrice) {
-      return ["Incorrect network"];
-    }
-    if (
-      fromTokenInfo &&
-      fromTokenInfo.balance &&
-      fromAmount &&
-      fromAmount.gt(fromTokenInfo.balance)
-    ) {
-      return [`Insufficient ${fromTokenInfo.symbol} balance`];
-    }
-
-    const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
-
-    if (type !== MARKET) {
-      if (!triggerRatioValue || triggerRatio.eq(0)) {
-        return ["Enter a price"];
-      }
-
-      const currentRate = getExchangeRate(fromTokenInfo, toTokenInfo);
-      if (currentRate && currentRate.lt(triggerRatio)) {
-        return [`Price ${triggerRatioInverted ? "below" : "above"} Mark Price`];
-      }
-    }
-
-    if (
-      !isWrapOrUnwrap &&
-      toToken &&
-      toTokenAddress !== USDG_ADDRESS &&
-      toTokenInfo &&
-      toTokenInfo.availableAmount &&
-      toAmount.gt(toTokenInfo.availableAmount)
-    ) {
-      return ["Insufficient liquidity"];
-    }
-    if (
-      !isWrapOrUnwrap &&
-      toAmount &&
-      toTokenInfo.bufferAmount &&
-      toTokenInfo.poolAmount &&
-      toTokenInfo.bufferAmount.gt(toTokenInfo.poolAmount.sub(toAmount))
-    ) {
-      return ["Insufficient liquidity"];
-    }
-
-    if (
-      fromUsdMin &&
-      fromTokenInfo.maxUsdgAmount &&
-      fromTokenInfo.maxUsdgAmount.gt(0) &&
-      fromTokenInfo.usdgAmount &&
-      fromTokenInfo.maxPrice
-    ) {
-      const usdgFromAmount = adjustForDecimals(
-        fromUsdMin,
-        USD_DECIMALS,
-        USDG_DECIMALS
-      );
-      const nextUsdgAmount = fromTokenInfo.usdgAmount.add(usdgFromAmount);
-
-      if (nextUsdgAmount.gt(fromTokenInfo.maxUsdgAmount)) {
-        return [`${fromTokenInfo.symbol} pool exceeded`];
-      }
-    }
-
-    return [false];
-  };
-
-  const getError = () => {
-    if (mode !== SWAP) {
-      return getLeverageError();
-    }
-    return getSwapError()
-  };
-
   const isPrimaryEnabled = () => {
     if (!active) { return true }
-    const [error, modal] = getError()
-    if (error && !modal) { return false }
+    if (mode !== POOL) {
+      const [error, modal] = getLeverageError()
+      if (error && !modal) { return false }
+    }
     if (needOrderBookApproval && isWaitingForPluginApproval) { return false }
     if ((needApproval && isWaitingForApproval) || isApproving) { return false }
     if (isApproving) { return false }
     if (isSubmitting) { return false }
-
     return true;
   };
 
   const getPrimaryText = () => {
     if (!active) { return "Connect Wallet"; }
-    const [error, modal] = getError();
-    if (error && !modal) { return error; }
+    if (mode !== POOL) {
+      const [error, modal] = getLeverageError()
+      if (error && !modal) { return error }
+    }
 
     if (needApproval && isWaitingForApproval) {
       return "Waiting for Approval";
@@ -1688,13 +1380,6 @@ const SwapComponent = props => {
 
     if (type !== MARKET)
       return `Create ${type} Order`;
-
-    // if (mode === SWAP) {
-    //   if (toUsdMax && toUsdMax.lt(fromUsdMin.mul(95).div(100))) {
-    //     return "High Slippage, Swap Anyway";
-    //   }
-    //   return "Swap";
-    // }
 
     if (mode === LONG) {
       const indexTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
@@ -1757,28 +1442,11 @@ const SwapComponent = props => {
       approveFromToken();
       return;
     }
-
-    const [, modal, errorCode] = getError();
-
-    if (modal) {
-      setModalError(errorCode);
-      return;
-    }
-
-    if (mode === SWAP) {
-      if (
-        fromTokenAddress === AddressZero &&
-        toTokenAddress === nativeTokenAddress
-      ) {
-        wrap();
-        return;
-      }
-
-      if (
-        fromTokenAddress === nativeTokenAddress &&
-        toTokenAddress === AddressZero
-      ) {
-        unwrap();
+    
+    if (mode !== POOL) {
+      const [, modal, errorCode] = getLeverageError()
+      if (modal) {
+        setModalError(errorCode);
         return;
       }
     }
