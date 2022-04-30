@@ -433,7 +433,7 @@ const SwapComponent = props => {
 
   // ymj useState
   const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
-  const [toTokenAddress, setToTokenAddress] = useState("0x20865e63B111B2649ef829EC220536c82C58ad7B");
+  const [toTokenAddress, setToTokenAddress] = useState("0x6E59735D808E49D050D0CB21b0c9549D379BBB39");
   // const [fromTokenInfo, setFromTokenInfo] = useState();
   // const [toTokenInfo, setToTokenInfo] = useState();
   const [mode, setMode] = useState(LONG);
