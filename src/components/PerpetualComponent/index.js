@@ -1956,7 +1956,7 @@ const SwapComponent = props => {
 
             <BuyInputSection
               token={fromToken}
-              tokenlist={tokens}
+              tokenlist={tokens.filter(token => !token.isWrapped)}
               topLeftLabel="Pay"
               balance={payBalance}
               topRightLabel='Balance: '
