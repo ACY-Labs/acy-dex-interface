@@ -21,7 +21,7 @@ import {
 import {
   getToken
 } from '../../data/Tokens'
-import { useChartPrices } from '../../Api'
+import { useChartPrices } from '../../Api/Prices'
 import Tab from '../Tab/Tab'
 
 import { getTokens } from '../../data/Tokens'

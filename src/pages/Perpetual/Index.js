@@ -628,17 +628,17 @@ const Swap = props => {
   // }
 
 
-  useEffect(async () => {
-    let currentTime = getCurrentTime();
-    let fromTime = getFromTime( currentTime );
-    console.log("hereim from", fromTime.toString());
-    console.log("hereim to", currentTime.toString());
-    console.log("hereim timescale", activeTimeScale);
-    let data = await getKChartData(activeToken1.symbol, "42161", activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
-    console.log("hereim data", data);
+  // useEffect(async () => {
+  //   let currentTime = getCurrentTime();
+  //   let fromTime = getFromTime( currentTime );
+  //   console.log("hereim from", fromTime.toString());
+  //   console.log("hereim to", currentTime.toString());
+  //   console.log("hereim timescale", activeTimeScale);
+  //   let data = await getKChartData(activeToken1.symbol, "42161", activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
+  //   console.log("hereim data", data);
     
     
-  },[activeToken1, activeTimeScale])
+  // },[activeToken1, activeTimeScale])
 
   useEffect(async () => {
     let currentTime = getCurrentTime();
