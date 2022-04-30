@@ -357,6 +357,8 @@ const SwapComponent = props => {
   const { active, activate } = useWeb3React();
   const flagOrdersEnabled = true
 
+  const [mode, setMode] = useState(LONG);
+  const [type, setType] = useState(MARKET);
   const [fromValue, setFromValue] = useState("");
   const [toValue, setToValue] = useState("");
   const [anchorOnFromAmount, setAnchorOnFromAmount] = useState(true);
@@ -381,7 +383,7 @@ const SwapComponent = props => {
   if (mode === SHORT) {
     toTokens = shortableTokens;
   }
-
+  
   const needOrderBookApproval = type !== MARKET && !orderBookApproved;
   const prevNeedOrderBookApproval = usePrevious(needOrderBookApproval);
 
@@ -436,8 +438,6 @@ const SwapComponent = props => {
   const [toTokenAddress, setToTokenAddress] = useState("0x20865e63B111B2649ef829EC220536c82C58ad7B");
   // const [fromTokenInfo, setFromTokenInfo] = useState();
   // const [toTokenInfo, setToTokenInfo] = useState();
-  const [mode, setMode] = useState(LONG);
-  const [type, setType] = useState(MARKET);
   // const [fees, setFees] = useState(0.1);
   // const [leverage, setLeverage] = useState(5);
   // const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useState(true);
