@@ -6,9 +6,7 @@ import {
   getEstimateAmount,
   getApprove,
   getAllowance,
-  redeemUSDAtoUSDT,
-  redeemUSDAtoUSDC,
-  redeemUSDAtoDAI,
+  redeemUSDA,
   mintUSDA
 } from '../utils'
 import { useEffect, useState } from 'react';
@@ -96,30 +94,13 @@ export async function swap(
   const { amount } = inputToken0
   const transactionRes = await (async () => {
     if (swapMode == 'redeem') {
-      if (inputToken1.symbol == 'USDT') {
-        const isRedeemSucc = await redeemUSDAtoUSDT(inputToken1.address, amount, library, account)
+        const isRedeemSucc = await redeemUSDA(inputToken1, library, account)
         .catch(err => {
           setSwapButtonContent('Failed to transaction')
           return err
         })
-        (true)
+        console.log('@@@redeemres',isRedeemSucc)
         return isRedeemSucc
-
-      } else if (inputToken1.symbol == 'USDC') {
-        const isRedeemSucc = await redeemUSDAtoUSDC(inputToken1.address, amount, library, account)
-        .catch(err => {
-          setSwapButtonContent('Failed to transaction')
-          return err
-        })
-        return isRedeemSucc
-      } else if (inputToken1.symbol == 'DAI') {
-        const isRedeemSucc = await redeemUSDAtoDAI(inputToken1.address, amount, library, account)
-        .catch(err => {
-          setSwapButtonContent('Failed to transaction')
-          return err
-        })
-        return isRedeemSucc
-      }
     } else {
       let Allowance = await getAllowance(inputToken0, library, account)
       .catch(err => {
@@ -152,10 +133,6 @@ export async function swap(
       let text = null;
       setSwapButtonContent("Please try again");
     } else {
-
-
-      console.log("this is swap data: ", transactionRes);
-
       const scanUrlPrefix = SCAN_URL_PREFIX();
       const url = `${scanUrlPrefix}/tx/${transactionRes.hash}`;
 

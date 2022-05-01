@@ -19,7 +19,6 @@ const StableCoin = props => {
   const {account, library, chainId, farmSetting: { API_URL: apiUrlPrefix}} = useConstantLoader(props);
   const{dispatch}=props
   const tokenlist = supportedTokens[chainId]
-  console.log('@@@tokenlist',tokenlist)
   const [activeToken0,setActiveToken0] = useState(tokenlist[0]);
   const [activeToken1,setActiveToken1] = useState(tokenlist[2]);;
   
@@ -34,16 +33,6 @@ const StableCoin = props => {
     // reset on chainId change => supportedTokens change
     setActiveToken1(tokenlist[0]);
     setActiveToken0(tokenlist[2]);
-    // setActiveRate('Not available');
-    // setRange('1D');
-    // setChartData([]);
-    // setAlphaTable('Line');
-    // setVisibleLoading(false);
-    // setVisible(false);
-    // setVisibleConfirmOrder(false);
-    // setTransactionList([]);
-    // setTableLoading(true);
-    // setTransactionNum(0);
   }, [chainId])
 
   useEffect(() => {

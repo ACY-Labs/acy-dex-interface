@@ -124,33 +124,13 @@ export async function mintUSDA(token, library, account) {
   return mint
 }
 
-export async function redeemUSDAtoUSDT(address, amount, library, acount) {
+export async function redeemUSDA(token, library, acount) {
+  const {address, amount} = token
   const redeemAmount = parseUnits(amount, 18)
   const minAmount = parseUnits('0', 18)
   const contractToRedeem = getVaultCoreContract(library, acount)
-  const contractTotoken = getContract(address, vaultCoreABI, library, acount)
+  console.log('@@@contractToRedeem',contractToRedeem)
 
-  const res = contractToRedeem.connect(getProviderOrSigner(library, acount)).redeem(redeemAmount, minAmount)
+  const res = contractToRedeem.connect(getProviderOrSigner(library, acount)).redeeemUnique(address,redeemAmount, minAmount)
   return res
-}
-export async function redeemUSDAtoUSDC(address, amount, library, acount) {
-  console.log('address', address)
-  const redeemAmount = parseUnits(amount, 18)
-  const minAmount = parseUnits('0', 18)
-  const contractToRedeem = getVaultCoreContract(library, acount)
-  const contractTotoken = getContract(address, vaultCoreABI, library, acount)
-
-  // const res =  contractToRedeem.connect(getProviderOrSigner(library,acount)).redeem(redeemAmount,minAmount)
-  // console.log('Redeemres',res)
-  // return res
-} 
-export async function redeemUSDAtoDAI(address, amount, library, acount) {
-  const redeemAmount = parseUnits(amount, 18)
-  const minAmount = parseUnits('0', 18)
-  const contractToRedeem = getVaultCoreContract(library, acount)
-  const contractTotoken = getContract(address, vaultCoreABI, library, acount)
-
-  // const res =  contractToRedeem.connect(getProviderOrSigner(library,acount)).redeem(redeemAmount,minAmount)
-  // console.log('Redeemres',res)
-  // return res
 }
