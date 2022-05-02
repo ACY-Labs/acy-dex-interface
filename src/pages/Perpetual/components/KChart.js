@@ -135,13 +135,13 @@ const Kchart=(props)=> {
     let currentTime = getCurrentTime();
     let fromTime = getFromTime( currentTime );
     let data = await getKChartData(props.activeToken1.symbol, "42161", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
-    console.log("hereim data", data);
+    // console.log("hereim data", data);
     candleSeries.setData(data != undefined ? data : []);
 
     const series = chart.addCandlestickSeries(getSeriesOptions())
     setCurrentChart(chart);
     setCurrentSeries(series);
-  },[ref, currentChart,])
+  },[ref, currentChart])
 
 
 

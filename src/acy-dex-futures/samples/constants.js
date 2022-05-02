@@ -29,6 +29,7 @@ export const rewardRouterAddress = '0x659703093846c09075c85Ed63f37F07E0afe5dcA'
 export const orderBookAddress = '0xE01A9BDCe95a2635144A0997FE62BCc66DB39Afe'
 export const routerAddress = '0x8060631Ff0b94e7934B8768DA86cFfB513053118'
 export const glpAddress = '0xee0068982aA8512bE9A4b625DCC585A6388c929b'
+export const positionRouterAddress = ''
 
 // unsed
 export const vaultUtilsAddress = '0x316BBC0A156f653dE05075Dbe589f3c7aDFf453A'

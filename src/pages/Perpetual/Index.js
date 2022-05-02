@@ -62,6 +62,7 @@ import {
   // feeGlpTrackerAddress,
   glpVesterAddress,
   // rewardReaderAddress,
+  positionRouterAddress,
 } from '@/acy-dex-futures/samples/constants'
 import { approvePlugin, useGmxPrice } from '@/acy-dex-futures/core/Perpetual'
 import Media from 'react-media';
@@ -87,6 +88,7 @@ import OrderTable from './components/OrderTable'
 
 /// THIS SECTION IS FOR TESTING SWR AND GMX CONTRACT
 import { fetcher } from '@/acy-dex-futures/utils';
+import PositionRouter from "@/acy-dex-futures/abis/PositionRouter.json";
 import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
 import Router from '@/acy-dex-futures/abis/Router.json'
 import Vault from '@/acy-dex-futures/abis/Vault.json'
@@ -331,7 +333,6 @@ const Swap = props => {
   const supportedTokens = defaultToken.longTokenList;
   console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
-  //hj
   const [isConfirming, setIsConfirming] = useState(false);
   const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
   const [pricePoint, setPricePoint] = useState(0);
@@ -434,15 +435,26 @@ const Swap = props => {
     fetcher: fetcher(library, Router)
   });
 
+  const { data: positionRouterApproved } = useSWR(account && [ account, chainId, routerAddress, "approvedPlugins", account, positionRouterAddress], {
+      fetcher: fetcher(library, Router),
+    });
+
+  const { data: minExecutionFee } = useSWR([account, chainId, positionRouterAddress, "minExecutionFee"], {
+    fetcher: fetcher(library, PositionRouter),
+  });
  
+  console.log("hereyou minexe swap", minExecutionFee);
+
   useEffect(() => {
     console.log("printing all vault", vaultTokenInfo);
   }, [vaultTokenInfo])
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   const { positions, positionsMap } = getPositions(chainId, positionQuery, positionData, infoTokens, true)
-  // const [orders, updateOrders] = useAccountOrders(flagOrdersEnabled)
   console.log('PRINTING ALL POSITIONS FOR USER', positions);
+
+  const flagOrdersEnabled = true;
+  const [orders] = useAccountOrders(flagOrdersEnabled);
 
   const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
   const [isPluginApproving, setIsPluginApproving] = useState(false);
@@ -808,7 +820,7 @@ const Swap = props => {
 
 
   const onClickDropdown = e => {
-    console.log("hereim dropdown", e.key);
+    // console.log("hereim dropdown", e.key);
     setActiveToken1((supportedTokens.filter(ele => ele.symbol == e.key))[0]);
   };
 
@@ -933,7 +945,7 @@ const Swap = props => {
   const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsdg", true], {
     fetcher: fetcher(library, GlpManager),
   })
-  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply.gt(0)) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0) ) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   // const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   let glpBalanceUsd
   if (glpBalance) {
@@ -964,7 +976,7 @@ const Swap = props => {
   const menu = (
     <Menu onClick={onClickDropdown}>
       {
-        supportedTokens.filter(token => !token.isStable).map((option) => (
+        supportedTokens.filter(token => !token.symbol !== 'USDT').map((option) => (
           <Menu.Item key={option.symbol}>
             <span>{option.symbol} / USD</span> 
             {/* for showing before hover */}
@@ -1117,7 +1129,10 @@ const Swap = props => {
             isWaitingForPluginApproval={isWaitingForPluginApproval}
             setIsWaitingForPluginApproval={setIsWaitingForPluginApproval}
             isPluginApproving={isPluginApproving}
+            isConfirming = {isConfirming}
             setIsConfirming={setIsConfirming}
+            isPendingConfirmation = {isPendingConfirmation}
+            setIsPendingConfirmation = {setIsPendingConfirmation}
             isBuying={isBuying}
             setIsBuying={setIsBuying}
             onChangeMode={onChangeMode}
@@ -1125,6 +1140,9 @@ const Swap = props => {
             setSwapTokenAddress={setSwapTokenAddress}
             glp_isWaitingForApproval={isWaitingForApproval}
             glp_setIsWaitingForApproval={setIsWaitingForApproval}
+            positionRouterApproved={positionRouterApproved}
+            orders={orders}
+            minExecutionFee={minExecutionFee}
           />
         </div>
       </div>

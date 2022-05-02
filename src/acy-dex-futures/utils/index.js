@@ -8,6 +8,9 @@ import Token from "@/acy-dex-futures/abis/Token.json";
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import { InjectedConnector, UserRejectedRequestError as UserRejectedRequestErrorInjected} from "@web3-react/injected-connector";
 import { useRef, useEffect, useCallback } from "react";
+import useSWR from "swr";
+import { useChainId } from './Helpers';
+import { getContract } from './Addresses';
 import { useLocalStorage } from "react-use";
 import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
 export const MARKET = 'Market';
@@ -614,6 +617,100 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
     return infoTokens
 }
 
+export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
+  const { library, account: connectedAccount } = useWeb3React();
+  const active = true; // this is used in Actions.js so set active to always be true
+  const account = overrideAccount || connectedAccount;
+
+  const { chainId } = useChainId();
+  const shouldRequest = active && account && flagOrdersEnabled;
+
+  const orderBookAddress = getContract(chainId, "OrderBook");
+  const orderBookReaderAddress = getContract(chainId, "OrderBookReader");
+  const key = shouldRequest ? [active, chainId, orderBookAddress, account] : false;
+  const { data: orders = [], mutate: updateOrders } = useSWR(key, {
+    dedupingInterval: 5000,
+    fetcher: async (active, chainId, orderBookAddress, account) => {
+      const provider = getProvider(library, chainId);
+      const orderBookContract = new ethers.Contract(orderBookAddress, OrderBook.abi, provider);
+      const orderBookReaderContract = new ethers.Contract(orderBookReaderAddress, OrderBookReader.abi, provider);
+
+      const fetchIndexesFromServer = () => {
+        const ordersIndexesUrl = `${getServerBaseUrl(chainId)}/orders_indices?account=${account}`;
+        return fetch(ordersIndexesUrl)
+          .then(async (res) => {
+            const json = await res.json();
+            const ret = {};
+            for (const key of Object.keys(json)) {
+              ret[key.toLowerCase()] = json[key].map((val) => parseInt(val.value));
+            }
+
+            return ret;
+          })
+          .catch(() => ({ swap: [], increase: [], decrease: [] }));
+      };
+
+      const fetchLastIndex = async (type) => {
+        const method = type.toLowerCase() + "OrdersIndex";
+        return await orderBookContract[method](account).then((res) => bigNumberify(res._hex).toNumber());
+      };
+
+      const fetchLastIndexes = async () => {
+        const [swap, increase, decrease] = await Promise.all([
+          fetchLastIndex("swap"),
+          fetchLastIndex("increase"),
+          fetchLastIndex("decrease"),
+        ]);
+
+        return { swap, increase, decrease };
+      };
+
+      const getRange = (to, from) => {
+        const LIMIT = 10;
+        const _indexes = [];
+        from = from || Math.max(to - LIMIT, 0);
+        for (let i = to - 1; i >= from; i--) {
+          _indexes.push(i);
+        }
+        return _indexes;
+      };
+
+      const getIndexes = (knownIndexes, lastIndex) => {
+        if (knownIndexes.length === 0) {
+          return getRange(lastIndex);
+        }
+        return [
+          ...knownIndexes,
+          ...getRange(lastIndex, knownIndexes[knownIndexes.length - 1] + 1).sort((a, b) => b - a),
+        ];
+      };
+
+      const getOrders = async (method, knownIndexes, lastIndex, parseFunc) => {
+        const indexes = getIndexes(knownIndexes, lastIndex);
+        const ordersData = await orderBookReaderContract[method](orderBookAddress, account, indexes);
+        const orders = parseFunc(chainId, ordersData, account, indexes);
+
+        return orders;
+      };
+
+      try {
+        const [serverIndexes, lastIndexes] = await Promise.all([fetchIndexesFromServer(), fetchLastIndexes()]);
+        const [swapOrders = [], increaseOrders = [], decreaseOrders = []] = await Promise.all([
+          getOrders("getSwapOrders", serverIndexes.swap, lastIndexes.swap, parseSwapOrdersData),
+          getOrders("getIncreaseOrders", serverIndexes.increase, lastIndexes.increase, parseIncreaseOrdersData),
+          getOrders("getDecreaseOrders", serverIndexes.decrease, lastIndexes.decrease, parseDecreaseOrdersData),
+        ]);
+        return [...swapOrders, ...increaseOrders, ...decreaseOrders];
+      } catch (ex) {
+        console.error(ex);
+      }
+    },
+  });
+
+  return [orders, updateOrders];
+
+}
+
 export function getProvider(library, chainId) {
   if (library) {
     return library.getSigner();
@@ -775,8 +872,6 @@ export function getPositionFee(size) {
         return bigNumberify(0);
     }
     let myBigNumber = BigNumber.from('0xfbedfa25a3259ab347f7400000');
-    console.log(myBigNumber);
-    console.log("finding bug here", size);
     const afterFeeUsd = size.mul(BASIS_POINTS_DIVISOR - MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR)
     return size.sub(afterFeeUsd)
 }

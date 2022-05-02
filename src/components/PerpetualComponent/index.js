@@ -30,10 +30,15 @@ import TokenSelectorModal from '@/components/TokenSelectorModal';
 // ymj swapBox components start
 import { PriceBox } from './components/PriceBox';
 import { DetailBox } from './components/DetailBox';
+import ConfirmationBox from './components/ConfirmationBox';
 import { GlpSwapBox, GlpSwapDetailBox } from './components/GlpSwapBox'
 import PerpTabs from './components/PerpTabs/PerpTabs'
 
 import { MARKET, LIMIT, LONG, SHORT, SWAP, POOL } from './constant'
+import { DEFAULT_SLIPPAGE_AMOUNT, DEFAULT_HIGHER_SLIPPAGE_AMOUNT } from './constant'
+
+import { getConstant } from '@/acy-dex-futures/utils/Constants'
+
 import {
   USD_DECIMALS,
   USDG_ADDRESS,
@@ -68,7 +73,7 @@ import {
   shouldRaiseGasError,
   helperToast,
   replaceNativeTokenAddress,
-  getExchangeRate
+  getExchangeRate,
 } from '@/acy-dex-futures/utils'
 import {
   readerAddress,
@@ -128,7 +133,6 @@ import {
   parseArbitrageLog,
 } from '@/acy-dex-swap/utils/index';
 
-// hj add
 import { getContractAddress } from '@/acy-dex-futures/utils/Addresses';
 import * as Api from '@/acy-dex-futures/core/Perpetual';
 import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
@@ -315,8 +319,6 @@ const SwapComponent = props => {
   // const { profitsIn, liqPrice } = props;
   // const { entryPriceMarket, exitPrice, borrowFee, positions } = props;
   // const { infoTokens_test, usdgSupply, positions } = props;
-  // const { isConfirming, setIsConfirming } = props;
-  // isPendingConfirmation, setIsPendingConfirmation } = props;
   // const { savedSlippageAmount } = props;
 
   const {
@@ -332,14 +334,21 @@ const SwapComponent = props => {
     isWaitingForPluginApproval,
     setIsWaitingForPluginApproval,
     isPluginApproving,
+    isConfirming,
     setIsConfirming,
+    isPendingConfirmation,
+    setIsPendingConfirmation,
     isBuying,
     setIsBuying,
     onChangeMode,
     swapTokenAddress,
     setSwapTokenAddress,
     glp_isWaitingForApproval,
-    glp_setIsWaitingForApproval,
+    glp_setIsWaitingForApproval,    
+    isPositionRouterApproving,
+    positionRouterApproved, 
+    orders,
+    minExecutionFee
   } = props;
 
   const connectWalletByLocalStorage = useConnectWallet();
@@ -355,26 +364,41 @@ const SwapComponent = props => {
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // const [isConfirming, setIsConfirming] = useState(false);
-  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
   const [modalError, setModalError] = useState(false);
   const [ordersToaOpen, setOrdersToaOpen] = useState(false);
+  const [isHigherSlippageAllowed, setIsHigherSlippageAllowed] = useState(false);
+
 
   const savedSlippageAmount = getSavedSlippageAmount(chainId)
+
+  let allowedSlippage = savedSlippageAmount;
+  if (isHigherSlippageAllowed) {
+    allowedSlippage = DEFAULT_HIGHER_SLIPPAGE_AMOUNT;
+  }
+
   const tokens = defaultToken.longTokenList
   const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
   const stableTokens = tokens.filter(token => token.isStable);
   const indexTokens = whitelistedTokens.filter(token => !token.isStable && !token.isWrapped);
   const shortableTokens = indexTokens.filter(token => token.isShortable);
   let toTokens = defaultToken.longTokenList;
-  if (mode === LONG) {
+
+  const isLong = mode === LONG;
+  const isShort = mode === SHORT;
+  const isSwap = mode === SWAP;
+
+  if (isLong) {
     toTokens = indexTokens;
   }
-  if (mode === SHORT) {
+  if (isShort) {
     toTokens = shortableTokens;
   }
   
   const needOrderBookApproval = type !== MARKET && !orderBookApproved;
   const prevNeedOrderBookApproval = usePrevious(needOrderBookApproval);
+
+  const needPositionRouterApproval = (isLong || isShort) && type === MARKET && !positionRouterApproved;
+  const prevNeedPositionRouterApproval = usePrevious(needPositionRouterApproval);
 
   useEffect(() => {
     if (
@@ -435,7 +459,6 @@ const SwapComponent = props => {
   // const [shortCollateralAddress, setShortCollateralAddress] = useState('0xf97f4df75117a78c1A5a0DBb814Af92458539FB4');
   // const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
 
-  // hj add to
 
   const [triggerPriceValue, setTriggerPriceValue] = useState("");
   const triggerPriceUsd = type === MARKET ? 0 : parseValue(triggerPriceValue, USD_DECIMALS);
@@ -477,6 +500,7 @@ const SwapComponent = props => {
     fetcher: fetcher(library, Glp)
   });
 
+
   // default collateral address on ARBITRUM
   const [shortCollateralAddress, setShortCollateralAddress] = useState("0xF82eEeC2C58199cb409788E5D5806727cf549F9f")
 
@@ -510,7 +534,7 @@ const SwapComponent = props => {
   const toUsdMax = getUsd(toAmount, toTokenAddress, true, infoTokens, type, triggerPriceUsd);
 
   const indexTokenAddress = toTokenAddress === AddressZero ? nativeTokenAddress : toTokenAddress;
-  const collateralTokenAddress = mode === LONG
+  const collateralTokenAddress = isLong
     ? indexTokenAddress
     : shortCollateralAddress;
   const collateralToken = getToken(tokens, collateralTokenAddress);
@@ -537,13 +561,13 @@ const SwapComponent = props => {
   // useCallback(() => {
   //   setFromTokenInfo(getTokenInfo(infoTokens, fromTokenAddress));
   //   setToTokenInfo(getTokenInfo(infoTokens, toTokenAddress));
-  //   // setEntryMarkPrice(mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
+  //   // setEntryMarkPrice(isLong ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
   // }, [
   //   fromTokenAddress,
   //   toTokenAddress
   // ]);
   // useCallback(() => {
-  //   setEntryMarkPrice(mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
+  //   setEntryMarkPrice(isLong ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
   // }, [
   //   toTokenInfo
   // ]);
@@ -553,7 +577,7 @@ const SwapComponent = props => {
     // if (mode === SWAP) {
     //   return "Receive";
     // }
-    if (mode === LONG) {
+    if (isLong) {
       return "Long";
     }
     return "Short";
@@ -848,7 +872,7 @@ const SwapComponent = props => {
     //   updateSwapAmounts();
     // }
 
-    if (mode === LONG || mode === SHORT) {
+    if (isLong || isShort) {
       updateLeverageAmounts();
     }
   }, [
@@ -879,9 +903,9 @@ const SwapComponent = props => {
   let exitMarkPrice;
   if (toTokenInfo) {
     entryMarkPrice =
-      mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice;
+      isLong ? toTokenInfo.maxPrice : toTokenInfo.minPrice;
     exitMarkPrice =
-      mode === LONG ? toTokenInfo.minPrice : toTokenInfo.maxPrice;
+      isLong ? toTokenInfo.minPrice : toTokenInfo.maxPrice;
   }
 
   let leverage = bigNumberify(0);
@@ -920,7 +944,7 @@ const SwapComponent = props => {
   }
 
   let positionKey;
-  if (mode === LONG) {
+  if (isLong) {
     positionKey = getPositionKey(
       toTokenAddress,
       toTokenAddress,
@@ -928,7 +952,7 @@ const SwapComponent = props => {
       nativeTokenAddress
     );
   }
-  if (mode === SHORT) {
+  if (isShort) {
     positionKey = getPositionKey(
       shortCollateralAddress,
       toTokenAddress,
@@ -992,7 +1016,7 @@ const SwapComponent = props => {
     const token = getTokenfromSymbol(tokens, symbol)
     setFromTokenAddress(token.address);
     setIsWaitingForApproval(false);
-    if (mode === SHORT && token.isStable) {
+    if (isShort && token.isStable) {
       setShortCollateralAddress(token.address);
     }
   };
@@ -1069,6 +1093,222 @@ const SwapComponent = props => {
       });
   };
 
+  const createIncreaseOrder = () => {
+    let path = [fromTokenAddress];
+
+    if (path[0] === USDG_ADDRESS) {
+      if (isLong) {
+        const stableToken = getMostAbundantStableToken(chainId, infoTokens);
+        path.push(stableToken.address);
+      } else {
+        path.push(shortCollateralAddress);
+      }
+    }
+
+    const minOut = 0;
+    const indexToken = getToken(chainId, indexTokenAddress);
+    const successMsg = `
+      Created limit order for ${indexToken.symbol} ${isLong ? "Long" : "Short"}: ${formatAmount(
+      toUsdMax,
+      USD_DECIMALS,
+      2
+    )} USD!
+    `;
+    return Api.createIncreaseOrder(
+      chainId,
+      library,
+      nativeTokenAddress,
+      path,
+      fromAmount,
+      indexTokenAddress,
+      minOut,
+      toUsdMax,
+      collateralTokenAddress,
+      isLong,
+      triggerPriceUsd,
+      {
+        pendingTxns,
+        setPendingTxns,
+        sentMsg: "Limit order submitted!",
+        successMsg,
+        failMsg: "Limit order creation failed.",
+      }
+    )
+      .then(() => {
+        setIsConfirming(false);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+        setIsPendingConfirmation(false);
+      });
+  };
+
+  const referralCode = ethers.constants.HashZero;
+
+  const increasePosition = async () => {
+    setIsSubmitting(true);
+    const tokenAddress0 = fromTokenAddress === AddressZero ? nativeTokenAddress : fromTokenAddress;
+    const indexTokenAddress = toTokenAddress === AddressZero ? nativeTokenAddress : toTokenAddress;
+    let path = [indexTokenAddress]; // assume long
+    if (toTokenAddress !== fromTokenAddress) {
+      path = [tokenAddress0, indexTokenAddress];
+    }
+
+    if (fromTokenAddress === AddressZero && toTokenAddress === nativeTokenAddress) {
+      path = [nativeTokenAddress];
+    }
+
+    if (fromTokenAddress === nativeTokenAddress && toTokenAddress === AddressZero) {
+      path = [nativeTokenAddress];
+    }
+
+    if (isShort) {
+      path = [shortCollateralAddress];
+      if (tokenAddress0 !== shortCollateralAddress) {
+        path = [tokenAddress0, shortCollateralAddress];
+      }
+    }
+
+    const refPrice = isLong ? toTokenInfo.maxPrice : toTokenInfo.minPrice;
+    const priceBasisPoints = isLong ? BASIS_POINTS_DIVISOR + allowedSlippage : BASIS_POINTS_DIVISOR - allowedSlippage;
+    const priceLimit = refPrice.mul(priceBasisPoints).div(BASIS_POINTS_DIVISOR);
+
+    const boundedFromAmount = fromAmount ? fromAmount : bigNumberify(0);
+
+    if (fromAmount && fromAmount.gt(0) && fromTokenAddress === USDG_ADDRESS && isLong) {
+      const { amount: nextToAmount, path: multiPath } = getNextToAmount(
+        chainId,
+        fromAmount,
+        fromTokenAddress,
+        indexTokenAddress,
+        infoTokens,
+        undefined,
+        undefined,
+        usdgSupply,
+        totalTokenWeights
+      );
+      if (nextToAmount.eq(0)) {
+        helperToast.error("Insufficient liquidity");
+        return;
+      }
+      if (multiPath) {
+        path = replaceNativeTokenAddress(multiPath);
+      }
+    }
+
+    let params = [
+      path, // _path
+      indexTokenAddress, // _indexToken
+      boundedFromAmount, // _amountIn
+      0, // _minOut
+      toUsdMax, // _sizeDelta
+      isLong, // _isLong
+      priceLimit, // _acceptablePrice
+      minExecutionFee, // _executionFee
+      referralCode, // _referralCode
+    ];
+
+    let method = "createIncreasePosition";
+    let value = minExecutionFee;
+    if (fromTokenAddress === AddressZero) {
+      method = "createIncreasePositionETH";
+      console.log("hereyou minexe", minExecutionFee);
+      value = boundedFromAmount.add(minExecutionFee);
+      params = [
+        path, // _path
+        indexTokenAddress, // _indexToken
+        0, // _minOut
+        toUsdMax, // _sizeDelta
+        isLong, // _isLong
+        priceLimit, // _acceptablePrice
+        minExecutionFee, // _executionFee
+        referralCode, // _referralCode
+      ];
+    }
+
+    if (shouldRaiseGasError(getTokenInfo(infoTokens, fromTokenAddress), fromAmount)) {
+      setIsSubmitting(false);
+      setIsPendingConfirmation(false);
+      helperToast.error(
+        `Leave at least ${formatAmount(DUST_BNB, 18, 3)} ${getConstant(chainId, "nativeTokenSymbol")} for gas`
+      );
+      return;
+    }
+
+    const contractAddress = getContract(chainId, "PositionRouter");
+    const contract = new ethers.Contract(contractAddress, PositionRouter.abi, library.getSigner());
+    const indexToken = getTokenInfo(infoTokens, indexTokenAddress);
+    const tokenSymbol = indexToken.isWrapped ? getConstant(chainId, "nativeTokenSymbol") : indexToken.symbol;
+    const successMsg = `Requested increase of ${tokenSymbol} ${isLong ? "Long" : "Short"} by ${formatAmount(
+      toUsdMax,
+      USD_DECIMALS,
+      2
+    )} USD.`;
+
+    Api.callContract(chainId, contract, method, params, {
+      value,
+      setPendingTxns,
+      sentMsg: `${isLong ? "Long" : "Short"} submitted.`,
+      failMsg: `${isLong ? "Long" : "Short"} failed.`,
+      successMsg,
+    })
+      .then(async () => {
+        setIsConfirming(false);
+
+        const key = getPositionKey(account, path[path.length - 1], indexTokenAddress, isLong);
+        let nextSize = toUsdMax;
+        if (hasExistingPosition) {
+          nextSize = existingPosition.size.add(toUsdMax);
+        }
+
+        pendingPositions[key] = {
+          updatedAt: Date.now(),
+          pendingChanges: {
+            size: nextSize,
+          },
+        };
+
+        setPendingPositions({ ...pendingPositions });
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+        setIsPendingConfirmation(false);
+      });
+  };
+
+  const onConfirmationClick = () => {
+    console.log("hereim OCC, 0")
+    if (!active) {
+      props.connectWallet();
+      return;
+    }
+    console.log("hereim OCC, 1")
+
+    if (needOrderBookApproval) {
+      approveOrderBook();
+      return;
+    }
+
+    console.log("hereim OCC, 2")
+
+    setIsPendingConfirmation(true);
+
+    if (isSwap) {
+      swap();
+      return;
+    }
+
+    console.log("hereim OCC, 3")
+
+    if (type === LIMIT) {
+      createIncreaseOrder();
+      return;
+    }
+    console.log("hereim OCC, 4")
+
+    increasePosition();
+  };
+
   const perpetualMode = [LONG, SHORT, POOL];
   const perpetualType = [MARKET, LIMIT]
 
@@ -1127,7 +1367,7 @@ const SwapComponent = props => {
     let toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
     if (toTokenInfo && toTokenInfo.isStable) {
       return [
-        `${mode === LONG ? "Longing" : "Shorting"} ${toTokenInfo.symbol
+        `${isLong ? "Longing" : "Shorting"} ${toTokenInfo.symbol
         } not supported`
       ];
     }
@@ -1166,7 +1406,7 @@ const SwapComponent = props => {
     }
 
     if (type !== MARKET && entryMarkPrice && triggerPriceUsd) {
-      if (mode === LONG && entryMarkPrice.lt(triggerPriceUsd)) {
+      if (isLong && entryMarkPrice.lt(triggerPriceUsd)) {
         return ["Price above Mark Price"];
       }
       if (mode !== LONG && entryMarkPrice.gt(triggerPriceUsd)) {
@@ -1174,7 +1414,7 @@ const SwapComponent = props => {
       }
     }
 
-    if (mode === LONG) {
+    if (isLong) {
       let requiredAmount = toAmount;
       if (fromTokenAddress !== toTokenAddress) {
         const { amount: swapAmount } = getNextToAmount(
@@ -1231,7 +1471,7 @@ const SwapComponent = props => {
       }
     }
 
-    if (mode === SHORT) {
+    if (isShort) {
       let stableTokenAmount = bigNumberify(0);
       if (
         fromTokenAddress !== shortCollateralAddress &&
@@ -1381,7 +1621,7 @@ const SwapComponent = props => {
     if (type !== MARKET)
       return `Create ${type} Order`;
 
-    if (mode === LONG) {
+    if (isLong) {
       const indexTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
       if (indexTokenInfo && indexTokenInfo.minPrice) {
         const { amount: nextToAmount } = getNextToAmount(
@@ -1456,10 +1696,10 @@ const SwapComponent = props => {
 
   let hasZeroBorrowFee = false;
   let borrowFeeText;
-  if (mode === LONG && toTokenInfo && toTokenInfo.fundingRate) {
+  if (isLong && toTokenInfo && toTokenInfo.fundingRate) {
     borrowFeeText = formatAmount(toTokenInfo.fundingRate, 4, 4) + "% / 1h";
   }
-  if (mode === SHORT && shortCollateralToken && shortCollateralToken.fundingRate) {
+  if (isShort && shortCollateralToken && shortCollateralToken.fundingRate) {
     borrowFeeText =
       formatAmount(shortCollateralToken.fundingRate, 4, 4) + "% / 1h";
   }
@@ -1570,7 +1810,7 @@ const SwapComponent = props => {
   const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsdg", true], {
     fetcher: fetcher(library, GlpManager),
   })
-  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply.gt(0)) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0) ) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   // const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   let glpBalanceUsd
   if (glpBalance) {
@@ -1584,6 +1824,8 @@ const SwapComponent = props => {
   // }
 
   const glp_infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
+
+
 
   return (
     <div>
@@ -1666,7 +1908,7 @@ const SwapComponent = props => {
             }
 
             {/* Leverage Slider */}
-            {(mode === LONG || mode === SHORT) &&
+            {(isLong || isShort) &&
               <AcyDescriptions>
                 <div className={styles.leverageContainer}>
                   <div className={styles.slippageContainer}>
@@ -1764,18 +2006,18 @@ const SwapComponent = props => {
       </AcyPerpetualCard>
 
       {/* Long/Short Detail card  */}
-      {(mode === LONG || mode === SHORT) &&
+      {(isLong || isShort) &&
         <>
           <AcyPerpetualCard style={{ backgroundColor: 'transparent', padding: '10px' }}>
 
             {/* Profits In */}
-            {mode === LONG && (
+            {isLong && (
               <div className={styles.detailCard}>
                 <div className={styles.label}>Profits In</div>
                 <div className={styles.value}>{toToken.symbol}</div>
               </div>
             )}
-            {mode === SHORT && (
+            {isShort && (
               <div className={styles.detailCard}>
                 <div className={styles.label}>Profits In</div>
                 <div className={styles.TooltipHandle}>
@@ -1959,9 +2201,9 @@ const SwapComponent = props => {
                     <>
                       {hasZeroBorrowFee && (
                         <div>
-                          {mode === LONG &&
+                          {isLong &&
                             "There are more shorts than longs, borrow fees for longing is currently zero"}
-                          {mode === SHORT &&
+                          {isShort &&
                             "There are more longs than shorts, borrow fees for shorting is currently zero"}
                         </div>
                       )}
@@ -1970,7 +2212,7 @@ const SwapComponent = props => {
                           The borrow fee is calculated as (assets borrowed) /
                           (total assets in pool) * 0.01% per hour.
                           <br /><br />
-                          {mode === SHORT &&
+                          {isShort &&
                             `You can change the "Profits In" token above to find lower fees`}
                         </div>
                       )}
@@ -1989,7 +2231,7 @@ const SwapComponent = props => {
             </div>
 
             {/* Available Liquidity */}
-            {mode === SHORT && toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) &&
+            {isShort && toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) &&
               <div className={styles.detailCard}>
                 <div className={styles.label}>Available Liquidity</div>
                 <Tooltip
@@ -2037,6 +2279,48 @@ const SwapComponent = props => {
           />
         </>
       }
+
+
+      {isConfirming && (
+        <ConfirmationBox
+          fromToken={fromToken}
+          fromTokenInfo={fromTokenInfo}
+          toToken={toToken}
+          toTokenInfo={toTokenInfo}
+          isSwap={isSwap}
+          isLong={isLong}
+          isMarketOrder={type === MARKET}
+          type={type}
+          isHigherSlippageAllowed={isHigherSlippageAllowed}
+          setIsHigherSlippageAllowed={setIsHigherSlippageAllowed}
+          isShort={isShort}
+          toAmount={toAmount}
+          fromAmount={fromAmount}
+          onConfirmationClick={onConfirmationClick}
+          setIsConfirming={setIsConfirming}
+          shortCollateralAddress={shortCollateralAddress}
+          hasExistingPosition={hasExistingPosition}
+          leverage={leverage}
+          existingPosition={existingPosition}
+          existingLiquidationPrice={existingLiquidationPrice}
+          displayLiquidationPrice={displayLiquidationPrice}
+          shortCollateralToken={shortCollateralToken}
+          isPendingConfirmation={isPendingConfirmation}
+          triggerPriceUsd={triggerPriceUsd}
+          triggerRatio={triggerRatio}
+          fees={fees}
+          feesUsd={feesUsd}
+          isSubmitting={isSubmitting}
+          fromUsdMin={fromUsdMin}
+          toUsdMax={toUsdMax}
+          nextAveragePrice={nextAveragePrice}
+          collateralTokenAddress={collateralTokenAddress}
+          feeBps={feeBps}
+          chainId={chainId}
+          orders={orders}
+        />
+      )}
+
     </div>
   );
 };

@@ -1,5 +1,8 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo, useEffect } from 'react';
 import { BsArrowRight } from 'react-icons/bs';
+
+import { getConstant } from '@/acy-dex-futures/utils/Constants'
+
 import {
   USD_DECIMALS,
   PRECISION,
@@ -24,6 +27,7 @@ import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
 import Checkbox from '../Checkbox/Checkbox';
 import ExchangeInfoRow from './ExchangeInfoRow';
+import { getNativeToken, getToken, getWrappedToken } from "@/acy-dex-futures/data/Tokens";
 
 const HIGH_SPREAD_THRESHOLD = expandDecimals(1, USD_DECIMALS).div(100); // 1%;
 
@@ -50,7 +54,7 @@ export default function ConfirmationBox(props) {
     isSwap,
     isLong,
     isMarketOrder,
-    orderOption,
+    type,
     isShort,
     toAmount,
     fromAmount,
@@ -207,7 +211,7 @@ export default function ConfirmationBox(props) {
 
   const renderFeeWarning = useCallback(
     () => {
-      if (orderOption === LIMIT || !feeBps || feeBps <= 50) {
+      if (type === LIMIT || !feeBps || feeBps <= 50) {
         return null;
       }
 
@@ -231,7 +235,7 @@ export default function ConfirmationBox(props) {
         </div>
       );
     },
-    [feeBps, isSwap, collateralTokenAddress, chainId, fromToken.symbol, toToken.symbol, orderOption]
+    [feeBps, isSwap, collateralTokenAddress, chainId, fromToken.symbol, toToken.symbol, type]
   );
 
   const hasPendingProfit =
@@ -473,7 +477,7 @@ export default function ConfirmationBox(props) {
                 </Checkbox>
               </div>
             )}
-            {orderOption === LIMIT && renderAvailableLiquidity()}
+            {type === LIMIT && renderAvailableLiquidity()}
             {isShort && (
               <ExchangeInfoRow label="Profits In">
                 {getToken(chainId, shortCollateralAddress).symbol}
@@ -589,7 +593,7 @@ export default function ConfirmationBox(props) {
       hasPendingProfit,
       isProfitWarningAccepted,
       renderAvailableLiquidity,
-      orderOption,
+      type,
       fromUsdMin,
       collateralAfterFees,
     ]
@@ -603,7 +607,7 @@ export default function ConfirmationBox(props) {
             {renderMain()}
             {renderFeeWarning()}
             {renderSpreadWarning()}
-            {orderOption === LIMIT && renderAvailableLiquidity()}
+            {type === LIMIT && renderAvailableLiquidity()}
             <ExchangeInfoRow label="Min. Receive">
               {formatAmount(minOut, toTokenInfo.decimals, 4, true)} {toTokenInfo.symbol}
             </ExchangeInfoRow>
@@ -657,7 +661,7 @@ export default function ConfirmationBox(props) {
       renderSpreadWarning,
       fromTokenInfo,
       toTokenInfo,
-      orderOption,
+      type,
       showSpread,
       spread,
       feesUsd,
