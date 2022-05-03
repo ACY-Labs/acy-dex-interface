@@ -49,6 +49,7 @@ import {
   PLACEHOLDER_ACCOUNT,
   ARBITRUM_DEFAULT_COLLATERAL_ADDRESS,
   PRECISION,
+  DUST_BNB,
   getNextToAmount,
   getTokenInfo,
   parseValue,
@@ -96,6 +97,7 @@ import Reader from '@/acy-dex-futures/abis/Reader.json'
 import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
 import Vault from '@/acy-dex-futures/abis/Vault.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
+import PositionRouter from "@/acy-dex-futures/abis/PositionRouter.json";
 import Router from '@/acy-dex-futures/abis/Router.json'
 import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
 import Glp from '@/acy-dex-futures/abis/Glp.json'
@@ -266,7 +268,7 @@ export function getChartToken(swapOption, fromToken, toToken, chainId) {
   if (toToken.isStable) {
     return fromToken;
   }
-  
+
   return toToken;
 }
 
@@ -344,9 +346,9 @@ const SwapComponent = props => {
     swapTokenAddress,
     setSwapTokenAddress,
     glp_isWaitingForApproval,
-    glp_setIsWaitingForApproval,    
+    glp_setIsWaitingForApproval,
     isPositionRouterApproving,
-    positionRouterApproved, 
+    positionRouterApproved,
     orders,
     minExecutionFee
   } = props;
@@ -393,7 +395,7 @@ const SwapComponent = props => {
   if (isShort) {
     toTokens = shortableTokens;
   }
-  
+
   const needOrderBookApproval = type !== MARKET && !orderBookApproved;
   const prevNeedOrderBookApproval = usePrevious(needOrderBookApproval);
 
@@ -507,7 +509,7 @@ const SwapComponent = props => {
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   const fromToken = getToken(tokens, fromTokenAddress);
   const toToken = getToken(toTokens, toTokenAddress);
-  
+
   const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
   const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
   const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
@@ -517,7 +519,7 @@ const SwapComponent = props => {
 
   const fromAmount = parseValue(fromValue, fromToken && fromToken.decimals);
   const toAmount = parseValue(toValue, toToken && toToken.decimals);
-  
+
   const isPotentialWrap = (fromToken.isNative && toToken.isWrapped) || (fromToken.isWrapped && toToken.isNative);
   const isWrapOrUnwrap = mode === SWAP && isPotentialWrap;
   const needApproval =
@@ -1022,11 +1024,8 @@ const SwapComponent = props => {
   };
 
   useEffect(() => {
-    console.log("tokens in useeffect", tokens);
     const fromToken = getTokenfromSymbol(tokens, activeToken0.symbol)
     const toToken = getTokenfromSymbol(tokens, activeToken1.symbol)
-    console.log("useeffect fromtoken",fromToken);
-    console.log("useeffect totoken",activeToken1);
 
     setFromTokenAddress(fromToken.address);
     setToTokenAddress(toToken.address);
@@ -1212,7 +1211,6 @@ const SwapComponent = props => {
     let value = minExecutionFee;
     if (fromTokenAddress === AddressZero) {
       method = "createIncreasePositionETH";
-      console.log("hereyou minexe", minExecutionFee);
       value = boundedFromAmount.add(minExecutionFee);
       params = [
         path, // _path
@@ -1236,7 +1234,7 @@ const SwapComponent = props => {
     }
 
     const contractAddress = getContract(chainId, "PositionRouter");
-    const contract = new ethers.Contract(contractAddress, PositionRouter.abi, library.getSigner());
+    const contract = new ethers.Contract(contractAddress, PositionRouter, library.getSigner());
     const indexToken = getTokenInfo(infoTokens, indexTokenAddress);
     const tokenSymbol = indexToken.isWrapped ? getConstant(chainId, "nativeTokenSymbol") : indexToken.symbol;
     const successMsg = `Requested increase of ${tokenSymbol} ${isLong ? "Long" : "Short"} by ${formatAmount(
@@ -1255,20 +1253,20 @@ const SwapComponent = props => {
       .then(async () => {
         setIsConfirming(false);
 
-        const key = getPositionKey(account, path[path.length - 1], indexTokenAddress, isLong);
-        let nextSize = toUsdMax;
-        if (hasExistingPosition) {
-          nextSize = existingPosition.size.add(toUsdMax);
-        }
+        // const key = getPositionKey(account, path[path.length - 1], indexTokenAddress, isLong);
+        // let nextSize = toUsdMax;
+        // if (hasExistingPosition) {
+        //   nextSize = existingPosition.size.add(toUsdMax);
+        // }
 
-        pendingPositions[key] = {
-          updatedAt: Date.now(),
-          pendingChanges: {
-            size: nextSize,
-          },
-        };
+        // pendingPositions[key] = {
+        //   updatedAt: Date.now(),
+        //   pendingChanges: {
+        //     size: nextSize,
+        //   },
+        // };
 
-        setPendingPositions({ ...pendingPositions });
+        // setPendingPositions({ ...pendingPositions });
       })
       .finally(() => {
         setIsSubmitting(false);
@@ -1277,34 +1275,22 @@ const SwapComponent = props => {
   };
 
   const onConfirmationClick = () => {
-    console.log("hereim OCC, 0")
-    if (!active) {
-      props.connectWallet();
+    if (!account) {
+      connectWalletByLocalStorage()
       return;
     }
-    console.log("hereim OCC, 1")
 
     if (needOrderBookApproval) {
       approveOrderBook();
       return;
     }
 
-    console.log("hereim OCC, 2")
-
     setIsPendingConfirmation(true);
-
-    if (isSwap) {
-      swap();
-      return;
-    }
-
-    console.log("hereim OCC, 3")
 
     if (type === LIMIT) {
       createIncreaseOrder();
       return;
     }
-    console.log("hereim OCC, 4")
 
     increasePosition();
   };
@@ -1682,7 +1668,7 @@ const SwapComponent = props => {
       approveFromToken();
       return;
     }
-    
+
     if (mode !== POOL) {
       const [, modal, errorCode] = getLeverageError()
       if (modal) {
@@ -1992,9 +1978,9 @@ const SwapComponent = props => {
             </div>
           </> :
           <>
-            <GlpSwapBox 
-              isBuying={isBuying} 
-              setIsBuying={setIsBuying} 
+            <GlpSwapBox
+              isBuying={isBuying}
+              setIsBuying={setIsBuying}
               swapTokenAddress={swapTokenAddress}
               setSwapTokenAddress={setSwapTokenAddress}
               isWaitingForApproval={glp_isWaitingForApproval}
@@ -2275,7 +2261,7 @@ const SwapComponent = props => {
             // stakingInfo={stakingInfo}
             glpSupply={glpSupply}
             glpSupplyUsd={glpSupplyUsd}
-            // gmxPrice={gmxPrice}
+          // gmxPrice={gmxPrice}
           />
         </>
       }

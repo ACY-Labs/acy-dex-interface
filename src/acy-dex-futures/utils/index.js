@@ -8,6 +8,7 @@ import Token from "@/acy-dex-futures/abis/Token.json";
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import { InjectedConnector, UserRejectedRequestError as UserRejectedRequestErrorInjected} from "@web3-react/injected-connector";
 import { useRef, useEffect, useCallback } from "react";
+import { toast } from "react-toastify";
 import useSWR from "swr";
 import { useChainId } from './Helpers';
 import { getContract } from './Addresses';
@@ -51,6 +52,7 @@ export const STABLE_TAX_BASIS_POINTS = 5;
 export const THRESHOLD_REDEMPTION_VALUE = expandDecimals(993, 27); // 0.993
 export const MIN_PROFIT_TIME = 3 * 60 * 60; // 3 hours
 export const PROFIT_THRESHOLD_BASIS_POINTS = 120;
+export const DUST_BNB = "2000000000000000";
 
 const supportedChainIds = [ARBITRUM];
 const injectedConnector = new InjectedConnector({

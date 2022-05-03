@@ -445,10 +445,6 @@ const Swap = props => {
  
   console.log("hereyou minexe swap", minExecutionFee);
 
-  useEffect(() => {
-    console.log("printing all vault", vaultTokenInfo);
-  }, [vaultTokenInfo])
-
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   const { positions, positionsMap } = getPositions(chainId, positionQuery, positionData, infoTokens, true)
   console.log('PRINTING ALL POSITIONS FOR USER', positions);
@@ -1129,10 +1125,10 @@ const Swap = props => {
             isWaitingForPluginApproval={isWaitingForPluginApproval}
             setIsWaitingForPluginApproval={setIsWaitingForPluginApproval}
             isPluginApproving={isPluginApproving}
-            isConfirming = {isConfirming}
+            isConfirming={isConfirming}
             setIsConfirming={setIsConfirming}
-            isPendingConfirmation = {isPendingConfirmation}
-            setIsPendingConfirmation = {setIsPendingConfirmation}
+            isPendingConfirmation={isPendingConfirmation}
+            setIsPendingConfirmation={setIsPendingConfirmation}
             isBuying={isBuying}
             setIsBuying={setIsBuying}
             onChangeMode={onChangeMode}
