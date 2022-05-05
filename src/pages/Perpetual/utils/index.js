@@ -46,7 +46,8 @@ export async function getKChartData(tokenSymbol, preferableChainId, period, from
       return parseddata;
     })
     .catch(function (error) {
-      console.log("test error:", error);
+      console.log("geteKChartData error, most probably backend service is down: ", error);
+      return [];
     });
   return kchartdata;
 }

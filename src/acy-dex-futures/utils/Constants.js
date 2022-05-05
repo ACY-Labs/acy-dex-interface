@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 
-import { MAINNET, TESTNET, ARBITRUM_TESTNET, ARBITRUM, AVALANCHE, expandDecimals } from "./Helpers"
+import { MAINNET, TESTNET, ARBITRUM_TESTNET, ARBITRUM, AVALANCHE, expandDecimals } from "./index"
 
 const { parseEther } = ethers.utils
 

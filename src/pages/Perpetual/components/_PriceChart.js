@@ -24,7 +24,7 @@ import {
 import { useChartPrices } from '../../Api/Prices'
 import Tab from '../Tab/Tab'
 
-import { getTokens } from '../../data/Tokens'
+import { getTokens } from '../../data/_Tokens'
 
 const PRICE_LINE_TEXT_WIDTH = 15
 

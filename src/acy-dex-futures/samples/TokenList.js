@@ -1,53 +1,5 @@
 import {ethers} from 'ethers';;
 
-export const longTokenList =  [
-  {
-    name: "Binance Coin",
-    symbol: "BNB",
-    decimals: 18,
-    address: ethers.constants.AddressZero,
-    isNative: true,
-    isShortable: true
-  },
-  {
-    name: "Wrapped Bitcoin",
-    symbol: "BTC",
-    decimals: 8,
-    address: "0x6E59735D808E49D050D0CB21b0c9549D379BBB39",
-    isShortable: true
-  },
-  {
-    name: "Wrapped BNB",
-    symbol: "WBNB",
-    decimals: 18,
-    address: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
-    isWrapped: true,
-    baseSymbol: "BNB"
-  },
-  {
-    name: "Wrapped ETH",
-    symbol: "ETH",
-    decimals: 18,
-    address: "0xF471F7051D564dE03F3736EeA037D2dA2fa189c1",
-    isShortable: true,
-    isStable: false
-  },
-  {
-    name: "USD Coin",
-    symbol: "USDC",
-    decimals: 6,
-    address: "0xE971616d94335dec2E54939118AdFcB68E6dCAd6",
-    isStable: true
-  },
-  {
-    name: "Tether",
-    symbol: "USDT",
-    decimals: 18,
-    address: "0xF82eEeC2C58199cb409788E5D5806727cf549F9f",
-    isStable: true
-  },
-
-]
 // export default [
 //     {
 //       name: "Ethereum",
@@ -123,7 +75,9 @@ export const longTokenList =  [
 //     }
 //   ]
 
-export default [
+const TOKENS = {
+  56: [],
+  97: [
   {
     name: "Binance Coin",
     symbol: "BNB",
@@ -170,3 +124,77 @@ export default [
     isStable: true
   },
 ]
+};
+
+// const CHAIN_IDS = [56, 97, 42161, 421611, 43114];
+const CHAIN_IDS = [97];
+
+const TOKENS_MAP = {};
+const TOKENS_BY_SYMBOL_MAP = {};
+
+for (let j = 0; j < CHAIN_IDS.length; j++) {
+  const chainId = CHAIN_IDS[j];
+  TOKENS_MAP[chainId] = {};
+  TOKENS_BY_SYMBOL_MAP[chainId] = {};
+  for (let i = 0; i < TOKENS[chainId].length; i++) {
+    const token = TOKENS[chainId][i];
+    TOKENS_MAP[chainId][token.address] = token;
+    TOKENS_BY_SYMBOL_MAP[chainId][token.symbol] = token;
+  }
+}
+
+const WRAPPED_TOKENS_MAP = {};
+const NATIVE_TOKENS_MAP = {};
+for (const chainId of CHAIN_IDS) {
+  for (const token of TOKENS[chainId]) {
+    if (token.isWrapped) {
+      WRAPPED_TOKENS_MAP[chainId] = token;
+    } else if (token.isNative) {
+      NATIVE_TOKENS_MAP[chainId] = token;
+    }
+  }
+}
+// done
+export function getWrappedToken(chainId) {
+  return WRAPPED_TOKENS_MAP[chainId];
+}
+// done
+export function getNativeToken(chainId) {
+  return NATIVE_TOKENS_MAP[chainId];
+}
+// done
+export function getTokens(chainId) {
+  return TOKENS[chainId];
+}
+// still in use by the Order data table
+export function isValidToken(chainId, address) {
+  if (!TOKENS_MAP[chainId]) {
+    throw new Error(`Incorrect chainId ${chainId}`);
+  }
+  return address in TOKENS_MAP[chainId];
+}
+// done, multiple getToken function in various files
+export function getToken(chainId, address) {
+  if (!TOKENS_MAP[chainId]) {
+    throw new Error(`Incorrect chainId ${chainId}`);
+  }
+  if (!TOKENS_MAP[chainId][address]) {
+    throw new Error(`Incorrect address "${address}" for chainId ${chainId}`);
+  }
+  return TOKENS_MAP[chainId][address];
+}
+
+// done
+export function getTokenBySymbol(chainId, symbol) {
+  const token = TOKENS_BY_SYMBOL_MAP[chainId][symbol];
+  if (!token) {
+    throw new Error(`Incorrect symbol "${symbol}" for chainId ${chainId}`);
+  }
+  return token;
+}
+
+// done
+export function getWhitelistedTokens(chainId) {
+  console.log("debug whitelist", chainId, TOKENS)
+  return TOKENS[chainId].filter(token => token.symbol !== "USDG");
+}

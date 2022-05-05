@@ -7,7 +7,7 @@ import {
   USD_DECIMALS,
   CHART_PERIODS,
   formatAmount
-} from '../utils/Helpers'
+} from '../utils'
 import {
   chainlinkClient
 } from './common'

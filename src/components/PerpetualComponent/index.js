@@ -64,22 +64,9 @@ import {
   replaceNativeTokenAddress,
   getMostAbundantStableToken,
 } from '@/acy-dex-futures/utils'
-import {
-  readerAddress,
-  vaultAddress,
-  usdgAddress,
-  nativeTokenAddress,
-  routerAddress,
-  orderBookAddress,
-  glpManagerAddress,
-  glpAddress,
-} from '@/acy-dex-futures/samples/constants'
 import { getConstant } from '@/acy-dex-futures/utils/Constants'
-import { getContract, getContractAddress } from '@/acy-dex-futures/utils/Addresses';
-import * as Api from '@/acy-dex-futures/core/Perpetual';
 import Reader from '@/acy-dex-futures/abis/Reader.json'
 import Vault from '@/acy-dex-futures/abis/Vault.json'
-import PositionRouter from "@/acy-dex-futures/abis/PositionRouter.json";
 import Router from '@/acy-dex-futures/abis/Router.json'
 import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
 import Glp from '@/acy-dex-futures/abis/Glp.json'
@@ -94,12 +81,14 @@ import { useWeb3React } from '@web3-react/core';
 // import { binance, injected } from '@/connectors';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
+import * as Api from '@/acy-dex-futures/Api';
 import WETHABI from '@/abis/WETH.json';
 
 import { Slider, Checkbox, Tooltip } from 'antd';
 import { useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
-import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
+import { AcyRadioButton } from '@/components/AcyRadioButton';
+import { constantInstance } from '@/constants';
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 
 import styled from "styled-components";
@@ -167,37 +156,6 @@ const StyledCheckbox = styled(Checkbox)`
   }
 `;
 
-export function getChartToken(swapOption, fromToken, toToken, chainId) {
-  if (!fromToken || !toToken) {
-    return;
-  }
-
-  if (swapOption !== SWAP) {
-    return toToken;
-  }
-
-  if (fromToken.isUsdg && toToken.isUsdg) {
-    return getTokens(chainId).find((t) => t.isStable);
-  }
-  if (fromToken.isUsdg) {
-    return toToken;
-  }
-  if (toToken.isUsdg) {
-    return fromToken;
-  }
-
-  if (fromToken.isStable && toToken.isStable) {
-    return toToken;
-  }
-  if (fromToken.isStable) {
-    return toToken;
-  }
-  if (toToken.isStable) {
-    return fromToken;
-  }
-
-  return toToken;
-}
 
 function getToken(tokenlist, tokenAddr) {
   for (let i = 0; i < tokenlist.length; i++) {
@@ -270,8 +228,6 @@ const SwapComponent = props => {
     setSwapTokenAddress,
     glp_isWaitingForApproval,
     glp_setIsWaitingForApproval,
-    isPositionRouterApproving,
-    positionRouterApproved,
     orders,
     minExecutionFee
   } = props;
@@ -300,12 +256,12 @@ const SwapComponent = props => {
     allowedSlippage = DEFAULT_HIGHER_SLIPPAGE_AMOUNT;
   }
 
-  const tokens = defaultToken.longTokenList
+  const tokens = constantInstance.perpetuals.tokenList;
   const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
   const stableTokens = tokens.filter(token => token.isStable);
   const indexTokens = whitelistedTokens.filter(token => !token.isStable && !token.isWrapped);
   const shortableTokens = indexTokens.filter(token => token.isShortable);
-  let toTokens = defaultToken.longTokenList;
+  let toTokens = tokens;
 
   const isLong = mode === LONG;
   const isShort = mode === SHORT;
@@ -320,9 +276,6 @@ const SwapComponent = props => {
 
   const needOrderBookApproval = type !== MARKET && !orderBookApproved;
   const prevNeedOrderBookApproval = usePrevious(needOrderBookApproval);
-
-  const needPositionRouterApproval = (isLong || isShort) && type === MARKET && !positionRouterApproved;
-  const prevNeedPositionRouterApproval = usePrevious(needPositionRouterApproval);
 
   useEffect(() => {
     if (
@@ -363,6 +316,15 @@ const SwapComponent = props => {
   };
 
   const tokenAddresses = tokens.map(token => token.address)
+  const { perpetuals } = useConstantLoader()
+  const readerAddress = perpetuals.getContract("Reader")
+  const vaultAddress = perpetuals.getContract("Vault")
+  const usdgAddress = perpetuals.getContract("USDG")
+  const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
+  const routerAddress = perpetuals.getContract("Router")
+  const orderBookAddress = perpetuals.getContract("OrderBook")
+  const glpManagerAddress = perpetuals.getContract("GlpManager")
+  const glpAddress = perpetuals.getContract("GLP")
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
   })
@@ -899,9 +861,9 @@ const SwapComponent = props => {
       });
   };
 
-  const referralCode = ethers.constants.HashZero;
-
+  // refers to gmx 9c6b4a8 commit
   const increasePosition = async () => {
+    console.log("try to increasePosition");
     setIsSubmitting(true);
     const tokenAddress0 = fromTokenAddress === AddressZero ? nativeTokenAddress : fromTokenAddress;
     const indexTokenAddress = toTokenAddress === AddressZero ? nativeTokenAddress : toTokenAddress;
@@ -960,25 +922,14 @@ const SwapComponent = props => {
       toUsdMax, // _sizeDelta
       isLong, // _isLong
       priceLimit, // _acceptablePrice
-      minExecutionFee, // _executionFee
-      referralCode, // _referralCode
     ];
 
-    let method = "createIncreasePosition";
-    let value = minExecutionFee;
-    if (fromTokenAddress === AddressZero) {
-      method = "createIncreasePositionETH";
-      value = boundedFromAmount.add(minExecutionFee);
-      params = [
-        path, // _path
-        indexTokenAddress, // _indexToken
-        0, // _minOut
-        toUsdMax, // _sizeDelta
-        isLong, // _isLong
-        priceLimit, // _acceptablePrice
-        minExecutionFee, // _executionFee
-        referralCode, // _referralCode
-      ];
+    let method = "increasePosition";	
+    let value = bigNumberify(0);	
+    if (fromTokenAddress === AddressZero) {	
+      method = "increasePositionETH";	
+      value = boundedFromAmount;	
+      params = [path, indexTokenAddress, 0, toUsdMax, isLong, priceLimit];
     }
 
     if (shouldRaiseGasError(getTokenInfo(infoTokens, fromTokenAddress), fromAmount)) {
@@ -990,8 +941,8 @@ const SwapComponent = props => {
       return;
     }
 
-    const contractAddress = getContract(chainId, "PositionRouter");
-    const contract = new ethers.Contract(contractAddress, PositionRouter, library.getSigner());
+    console.log("increasePosition 2: ", params);
+    const contract = new ethers.Contract(routerAddress, Router, library.getSigner());
     const indexToken = getTokenInfo(infoTokens, indexTokenAddress);
     const tokenSymbol = indexToken.isWrapped ? getConstant(chainId, "nativeTokenSymbol") : indexToken.symbol;
     const successMsg = `Requested increase of ${tokenSymbol} ${isLong ? "Long" : "Short"} by ${formatAmount(
@@ -1010,20 +961,6 @@ const SwapComponent = props => {
       .then(async () => {
         setIsConfirming(false);
 
-        // const key = getPositionKey(account, path[path.length - 1], indexTokenAddress, isLong);
-        // let nextSize = toUsdMax;
-        // if (hasExistingPosition) {
-        //   nextSize = existingPosition.size.add(toUsdMax);
-        // }
-
-        // pendingPositions[key] = {
-        //   updatedAt: Date.now(),
-        //   pendingChanges: {
-        //     size: nextSize,
-        //   },
-        // };
-
-        // setPendingPositions({ ...pendingPositions });
       })
       .finally(() => {
         setIsSubmitting(false);
@@ -1940,6 +1877,7 @@ const SwapComponent = props => {
         </>
       }
 
+      {/* Swap detail box */}
       {mode === POOL &&
         <>
           <GlpSwapDetailBox

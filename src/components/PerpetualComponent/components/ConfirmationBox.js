@@ -27,7 +27,7 @@ import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
 import Checkbox from '../Checkbox/Checkbox';
 import ExchangeInfoRow from './ExchangeInfoRow';
-import { getNativeToken, getToken, getWrappedToken } from "@/acy-dex-futures/data/Tokens";
+import { constantInstance } from '@/constants';
 
 const HIGH_SPREAD_THRESHOLD = expandDecimals(1, USD_DECIMALS).div(100); // 1%;
 
@@ -117,7 +117,7 @@ export default function ConfirmationBox(props) {
 
   const existingOrder = useMemo(
     () => {
-      const wrappedToken = getWrappedToken(chainId);
+      const wrappedToken = constantInstance.perpetuals.wrappedToken;
       for (const order of orders) {
         if (order.type !== INCREASE) continue;
         const sameToken =
@@ -227,7 +227,7 @@ export default function ConfirmationBox(props) {
         return null;
       }
 
-      const collateralToken = getToken(chainId, collateralTokenAddress);
+      const collateralToken = constantInstance.perpetuals.getToken(collateralTokenAddress);
       return (
         <div className="Confirmation-box-warning">
           Fees are high to swap from {fromToken.symbol} to {collateralToken.symbol}. <br />
@@ -320,7 +320,7 @@ export default function ConfirmationBox(props) {
       if (isSwap || !existingOrder) {
         return;
       }
-      const indexToken = getToken(chainId, existingOrder.indexToken);
+      const indexToken = constantInstance.perpetuals.getToken(existingOrder.indexToken);
       const sizeInToken = formatAmount(
         existingOrder.sizeDelta.mul(PRECISION).div(existingOrder.triggerPrice),
         USD_DECIMALS,
@@ -480,7 +480,7 @@ export default function ConfirmationBox(props) {
             {type === LIMIT && renderAvailableLiquidity()}
             {isShort && (
               <ExchangeInfoRow label="Profits In">
-                {getToken(chainId, shortCollateralAddress).symbol}
+                {constantInstance.perpetuals.getToken(shortCollateralAddress).symbol}
               </ExchangeInfoRow>
             )}
             {isLong && <ExchangeInfoRow label="Profits In" value={toTokenInfo.symbol} />}
