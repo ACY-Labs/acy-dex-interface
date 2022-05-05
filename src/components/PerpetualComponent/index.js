@@ -1277,19 +1277,15 @@ const SwapComponent = props => {
   };
 
   const onConfirmationClick = () => {
-    console.log("hereim OCC, 0")
     if (!active) {
       props.connectWallet();
       return;
     }
-    console.log("hereim OCC, 1")
 
     if (needOrderBookApproval) {
       approveOrderBook();
       return;
     }
-
-    console.log("hereim OCC, 2")
 
     setIsPendingConfirmation(true);
 
@@ -1298,13 +1294,10 @@ const SwapComponent = props => {
       return;
     }
 
-    console.log("hereim OCC, 3")
-
     if (type === LIMIT) {
       createIncreaseOrder();
       return;
     }
-    console.log("hereim OCC, 4")
 
     increasePosition();
   };
