@@ -20,24 +20,14 @@
 /* eslint-disable import/extensions */
 import {
   AcyPerpetualCard,
-  AcyTabs,
-  AcyButton,
   AcyDescriptions,
   AcyPerpetualButton
 } from '@/components/Acy';
-// import { AcyPerpetualButton } from '@/components/PerpetualComponent/components/AcyPerpetualButton';
-import TokenSelectorModal from '@/components/TokenSelectorModal';
-// ymj swapBox components start
 import { PriceBox } from './components/PriceBox';
-import { DetailBox } from './components/DetailBox';
 import ConfirmationBox from './components/ConfirmationBox';
 import { GlpSwapBox, GlpSwapDetailBox } from './components/GlpSwapBox'
 import PerpTabs from './components/PerpTabs/PerpTabs'
-
-import { MARKET, LIMIT, LONG, SHORT, SWAP, POOL } from './constant'
-import { DEFAULT_SLIPPAGE_AMOUNT, DEFAULT_HIGHER_SLIPPAGE_AMOUNT } from './constant'
-
-import { getConstant } from '@/acy-dex-futures/utils/Constants'
+import { MARKET, LIMIT, LONG, SHORT, SWAP, POOL, DEFAULT_HIGHER_SLIPPAGE_AMOUNT } from './constant'
 
 import {
   USD_DECIMALS,
@@ -47,7 +37,6 @@ import {
   BASIS_POINTS_DIVISOR,
   MARGIN_FEE_BASIS_POINTS,
   PLACEHOLDER_ACCOUNT,
-  ARBITRUM_DEFAULT_COLLATERAL_ADDRESS,
   PRECISION,
   DUST_BNB,
   getNextToAmount,
@@ -64,7 +53,6 @@ import {
   adjustForDecimals,
   bigNumberify,
   useLocalStorageSerializeKey,
-  getNextFromAmount,
   isTriggerRatioInverted,
   getLeverage,
   getLiquidationPrice,
@@ -74,7 +62,7 @@ import {
   shouldRaiseGasError,
   helperToast,
   replaceNativeTokenAddress,
-  getExchangeRate,
+  getMostAbundantStableToken,
 } from '@/acy-dex-futures/utils'
 import {
   readerAddress,
@@ -83,98 +71,39 @@ import {
   nativeTokenAddress,
   routerAddress,
   orderBookAddress,
-  // stakedGlpTrackerAddress,
   glpManagerAddress,
   glpAddress,
-  // feeGlpTrackerAddress,
-  // glpVesterAddress,
-  // rewardReaderAddress,
-  tempChainID,
-  tempLibrary
 } from '@/acy-dex-futures/samples/constants'
-import { callContract, useGmxPrice } from '@/acy-dex-futures/core/Perpetual'
+import { getConstant } from '@/acy-dex-futures/utils/Constants'
+import { getContract, getContractAddress } from '@/acy-dex-futures/utils/Addresses';
+import * as Api from '@/acy-dex-futures/core/Perpetual';
 import Reader from '@/acy-dex-futures/abis/Reader.json'
-import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
 import Vault from '@/acy-dex-futures/abis/Vault.json'
-import Token from '@/acy-dex-futures/abis/Token.json'
 import PositionRouter from "@/acy-dex-futures/abis/PositionRouter.json";
 import Router from '@/acy-dex-futures/abis/Router.json'
 import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
 import Glp from '@/acy-dex-futures/abis/Glp.json'
-import RewardTracker from '@/acy-dex-futures/abis/RewardTracker.json'
-import Vester from '@/acy-dex-futures/abis/Vester.json'
-import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
 import useSWR from 'swr'
-
-import { getInfoTokens_test } from './utils'
-import Pattern from '@/utils/pattern'
 
 // swapBox compontent end
 import { connect } from 'umi';
 import styles from './styles.less';
-import { sortAddress, abbrNumber } from '@/utils/utils';
-import axios from 'axios';
 import { ethers } from "ethers"
 
 import { useWeb3React } from '@web3-react/core';
-import { binance, injected } from '@/connectors';
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+// import { binance, injected } from '@/connectors';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
-import {
-  Error,
-  approve,
-  calculateGasMargin,
-  checkTokenIsApproved,
-  computeTradePriceBreakdown,
-  getAllowance,
-  getContract,
-  getRouterContract,
-  getUserTokenBalance,
-  getUserTokenBalanceRaw,
-  isZero,
-  parseArbitrageLog,
-} from '@/acy-dex-swap/utils/index';
-
-import { getContractAddress } from '@/acy-dex-futures/utils/Addresses';
-import * as Api from '@/acy-dex-futures/core/Perpetual';
-import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
-import ERC20ABI from '@/abis/ERC20.json';
 import WETHABI from '@/abis/WETH.json';
 
-import {
-  // Token,
-  TokenAmount,
-  Pair,
-  TradeType,
-  Route,
-  Trade,
-  Percent,
-  // Router,
-  // WETH,
-  // ETHER,
-  CurrencyAmount,
-  InsufficientReservesError,
-} from '@acyswap/sdk';
-
-import { MaxUint256 } from '@ethersproject/constants';
-import { BigNumber } from '@ethersproject/bignumber';
-import { parseUnits } from '@ethersproject/units';
-import { hexlify } from '@ethersproject/bytes';
-
-import { Row, Col, Button, Input, InputNumber, Icon, Radio, Tabs, Slider, Alert, Checkbox, Tooltip } from 'antd';
-import { RiseOutlined, FallOutlined, LineChartOutlined, FieldTimeOutlined } from '@ant-design/icons';
-import spinner from '@/assets/loading.svg';
-import moment from 'moment';
+import { Slider, Checkbox, Tooltip } from 'antd';
 import { useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
-import { AcyRadioButton } from '@/components/AcyRadioButton';
 import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 
 import styled from "styled-components";
 
-const { AcyTabPane } = AcyTabs;
-const { TabPane } = Tabs;
 const { AddressZero } = ethers.constants;
 
 const StyledSlider = styled(Slider)`
@@ -237,8 +166,6 @@ const StyledCheckbox = styled(Checkbox)`
       border: 1px solid #333333;
   }
 `;
-
-
 
 export function getChartToken(swapOption, fromToken, toToken, chainId) {
   if (!fromToken || !toToken) {
@@ -318,10 +245,6 @@ const SwapComponent = props => {
     tokenList: INITIAL_TOKEN_LIST,
     farmSetting: { INITIAL_ALLOWED_SLIPPAGE },
   } = useConstantLoader(props);
-  // const { profitsIn, liqPrice } = props;
-  // const { entryPriceMarket, exitPrice, borrowFee, positions } = props;
-  // const { infoTokens_test, usdgSupply, positions } = props;
-  // const { savedSlippageAmount } = props;
 
   const {
     activeToken0,
@@ -355,7 +278,6 @@ const SwapComponent = props => {
 
   const connectWalletByLocalStorage = useConnectWallet();
   const { active, activate } = useWeb3React();
-  const flagOrdersEnabled = true
 
   const [mode, setMode] = useState(LONG);
   const [type, setType] = useState(MARKET);
@@ -418,37 +340,6 @@ const SwapComponent = props => {
     isWaitingForPluginApproval
   ]);
 
-  // when exactIn is true, it means the firt line
-  // when exactIn is false, it means the second line
-  const [exactIn, setExactIn] = useState(true);
-
-  const [needApprove, setNeedApprove] = useState(false);
-  const [approveAmount, setApproveAmount] = useState('0');
-  const [approveButtonStatus, setApproveButtonStatus] = useState(true);
-
-  // Breakdown shows the estimated information for swap
-
-  // let [estimatedStatus,setEstimatedStatus]=useState();
-  const [swapBreakdown, setSwapBreakdown] = useState();
-  const [swapButtonState, setSwapButtonState] = useState(false);
-  const [swapButtonContent, setSwapButtonContent] = useState('Connect to Wallet');
-  const [swapStatus, setSwapStatus] = useState();
-
-  const [pair, setPair] = useState();
-  const [route, setRoute] = useState();
-  const [trade, setTrade] = useState();
-  const [slippageAdjustedAmount, setSlippageAdjustedAmount] = useState();
-  const [minAmountOut, setMinAmountOut] = useState();
-  const [maxAmountIn, setMaxAmountIn] = useState();
-  const [wethContract, setWethContract] = useState();
-  const [wrappedAmount, setWrappedAmount] = useState();
-  const [showSpinner, setShowSpinner] = useState(false);
-
-  const [methodName, setMethodName] = useState();
-  const [midTokenAddress, setMidTokenAddress] = useState();
-  const [poolExist, setPoolExist] = useState(true);
-
-  // ymj useState
   const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
   const [toTokenAddress, setToTokenAddress] = useState("0x6E59735D808E49D050D0CB21b0c9549D379BBB39");
   // const [fromTokenInfo, setFromTokenInfo] = useState();
@@ -456,7 +347,7 @@ const SwapComponent = props => {
   // const [fees, setFees] = useState(0.1);
   // const [leverage, setLeverage] = useState(5);
   // const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useState(true);
-  const [entryPriceLimit, setEntryPriceLimit] = useState(0);
+  // const [entryPriceLimit, setEntryPriceLimit] = useState(0);
   // const [priceValue, setPriceValue] = useState('');
   // const [shortCollateralAddress, setShortCollateralAddress] = useState('0xf97f4df75117a78c1A5a0DBb814Af92458539FB4');
   // const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
@@ -471,16 +362,10 @@ const SwapComponent = props => {
     setTriggerRatioValue(evt.target.value || "");
   };
 
-  // ymj const
-  // const individualFieldPlaceholder = 'Enter amount';
-  // const dependentFieldPlaceholder = 'Estimated value';
-  // const slippageTolerancePlaceholder = 'Please input a number from 1.00 to 100.00';
-
   const tokenAddresses = tokens.map(token => token.address)
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
   })
-  console.log("token balances", tokenBalances);
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
@@ -501,7 +386,6 @@ const SwapComponent = props => {
   const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
     fetcher: fetcher(library, Glp)
   });
-
 
   // default collateral address on ARBITRUM
   const [shortCollateralAddress, setShortCollateralAddress] = useState("0xF82eEeC2C58199cb409788E5D5806727cf549F9f")
@@ -559,26 +443,7 @@ const SwapComponent = props => {
     return ratio;
   }, [triggerRatioValue, triggerRatioInverted]);
 
-
-  // useCallback(() => {
-  //   setFromTokenInfo(getTokenInfo(infoTokens, fromTokenAddress));
-  //   setToTokenInfo(getTokenInfo(infoTokens, toTokenAddress));
-  //   // setEntryMarkPrice(isLong ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
-  // }, [
-  //   fromTokenAddress,
-  //   toTokenAddress
-  // ]);
-  // useCallback(() => {
-  //   setEntryMarkPrice(isLong ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
-  // }, [
-  //   toTokenInfo
-  // ]);
-
-
   const getTokenLabel = () => {
-    // if (mode === SWAP) {
-    //   return "Receive";
-    // }
     if (isLong) {
       return "Long";
     }
@@ -629,7 +494,7 @@ const SwapComponent = props => {
       isWaitingForApproval
     ) {
       setIsWaitingForApproval(false);
-      // helperToast.success(<div>{fromToken.symbol} approved!</div>);
+      helperToast.success(<div>{fromToken.symbol} approved!</div>);
     }
   }, [
     fromTokenAddress,
@@ -693,60 +558,6 @@ const SwapComponent = props => {
   ]);
 
   useEffect(() => {
-    const updateSwapAmounts = () => {
-      if (anchorOnFromAmount) {
-        if (!fromAmount) {
-          setToValue("");
-          return;
-        }
-        if (toToken) {
-          const { amount: nextToAmount } = getNextToAmount(
-            chainId,
-            fromAmount,
-            fromTokenAddress,
-            toTokenAddress,
-            infoTokens,
-            undefined,
-            type !== MARKET && triggerRatio,
-            usdgSupply,
-            totalTokenWeights
-          );
-
-          const nextToValue = formatAmountFree(
-            nextToAmount,
-            toToken.decimals,
-            toToken.decimals
-          );
-          setToValue(nextToValue);
-        }
-        return;
-      }
-
-      if (!toAmount) {
-        setFromValue("");
-        return;
-      }
-      if (fromToken) {
-        const { amount: nextFromAmount } = getNextFromAmount(
-          chainId,
-          toAmount,
-          fromTokenAddress,
-          toTokenAddress,
-          infoTokens,
-          undefined,
-          type !== MARKET && triggerRatio,
-          usdgSupply,
-          totalTokenWeights
-        );
-        const nextFromValue = formatAmountFree(
-          nextFromAmount,
-          fromToken.decimals,
-          fromToken.decimals
-        );
-        setFromValue(nextFromValue);
-      }
-    };
-
     const updateLeverageAmounts = () => {
       if (!hasLeverageOption) {
         return;
@@ -869,10 +680,6 @@ const SwapComponent = props => {
         setFromValue(nextFromValue);
       }
     };
-
-    // if (mode === SWAP) {
-    //   updateSwapAmounts();
-    // }
 
     if (isLong || isShort) {
       updateLeverageAmounts();
@@ -1012,8 +819,6 @@ const SwapComponent = props => {
     leverage = bigNumberify(parseInt(leverageOption * BASIS_POINTS_DIVISOR));
   }
 
-  const [visible, setVisible] = useState()
-
   const selectFromToken = symbol => {
     const token = getTokenfromSymbol(tokens, symbol)
     setFromTokenAddress(token.address);
@@ -1049,49 +854,6 @@ const SwapComponent = props => {
     setToValue(e.target.value);
   };
 
-  const wrap = async () => {
-    setIsSubmitting(true);
-
-    const contract = new ethers.Contract(
-      getContractAddress(chainId, 'NATIVE_TOKEN'),
-      WETHABI,
-      library.getSigner()
-    );
-    Api.callContract(chainId, contract, 'deposit', {
-      value: fromAmount,
-      sentMsg: 'Swap submitted!',
-      successMsg: `Swapped ${formatAmount(fromAmount, fromToken.decimals, 4, true)} ${fromToken.symbol
-        } for ${formatAmount(toAmount, toToken.decimals, 4, true)} ${toToken.symbol}`,
-      failMsg: 'Swap failed.',
-      setPendingTxns,
-    })
-      .then(async res => { })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
-  };
-
-  const unwrap = async () => {
-    setIsSubmitting(true);
-
-    const contract = new ethers.Contract(
-      getContractAddress(chainId, 'NATIVE_TOKEN'),
-      WETHABI,
-      library.getSigner()
-    );
-    Api.callContract(chainId, contract, 'withdraw', [fromAmount], {
-      sentMsg: 'Swap submitted!',
-      failMsg: 'Swap failed.',
-      successMsg: `Swapped ${formatAmount(fromAmount, fromToken.decimals, 4, true)} ${fromToken.symbol
-        } for ${formatAmount(toAmount, toToken.decimals, 4, true)} ${toToken.symbol}`,
-      setPendingTxns,
-    })
-      .then(async res => { })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
-  };
-
   const createIncreaseOrder = () => {
     let path = [fromTokenAddress];
 
@@ -1107,12 +869,7 @@ const SwapComponent = props => {
     const minOut = 0;
     const indexToken = getToken(chainId, indexTokenAddress);
     const successMsg = `
-      Created limit order for ${indexToken.symbol} ${isLong ? "Long" : "Short"}: ${formatAmount(
-      toUsdMax,
-      USD_DECIMALS,
-      2
-    )} USD!
-    `;
+      Created limit order for ${indexToken.symbol} ${isLong ? "Long" : "Short"}: ${formatAmount(toUsdMax, USD_DECIMALS, 2)} USD!`;
     return Api.createIncreaseOrder(
       chainId,
       library,
@@ -1308,26 +1065,6 @@ const SwapComponent = props => {
   const typeSelect = input => {
     setType(input);
   }
-  // const calculateFee = () => fees * 100
-  // const limitOnChange = (e) => {
-  //   const check = Pattern.coinNum.test(e.target.value);
-  //   if (check) {
-  //     setEntryPriceLimit(e.target.value)
-  //     setPriceValue(e.target.value.toString())
-  //     setTriggerPriceValue(e.target.value.toString())
-  //     if (!e.target.value) {
-  //       setEntryPriceLimit(0);
-  //       setPriceValue("")
-  //       setTriggerPriceValue("")
-  //     }
-  //   }
-  // };
-  // const markOnClick = (e) => {
-  //   // setTriggerPriceValue(marketPrice.toString());
-  //   setTriggerPriceValue(e.toString());
-  //   setPriceValue(e.toString())
-
-  // }
 
   const switchTokens = () => {
     if (fromAmount && toAmount) {
@@ -1746,17 +1483,11 @@ const SwapComponent = props => {
 
   let payBalance = "$0.00"
   let receiveBalance = "$0.00"
-  let leverageLabel = ""
-  let leverageValue = ""
   if (fromUsdMin) {
     payBalance = `$${formatAmount(fromUsdMin, USD_DECIMALS, 2, true, 0)}`
   }
   if (toUsdMax) {
     receiveBalance = `$${formatAmount(toUsdMax, USD_DECIMALS, 2, true)}`
-  }
-  if (mode !== SWAP && isLeverageSliderEnabled) {
-    leverageLabel = "Leverage: "
-    leverageValue = `${parseFloat(leverageOption).toFixed(2)}x`
   }
 
   // Glp Swap Component
@@ -1781,8 +1512,6 @@ const SwapComponent = props => {
   // const { data: stakingInfo, mutate: updateStakingInfo } = useSWR([chainId, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT], {
   //   fetcher: fetcher(library, RewardReader, [rewardTrackersForStakingInfo]),
   // })
-  const [glpValue, setGlpValue] = useState("")
-  const glpAmount = parseValue(glpValue, GLP_DECIMALS)
 
   const { data: glpSupply, mutate: updateGlpSupply } = useSWR([chainId, glpAddress, "totalSupply"], {
     fetcher: fetcher(library, Glp),
@@ -1803,15 +1532,7 @@ const SwapComponent = props => {
     glpBalanceUsd = glpBalance.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
   }
   const glpSupplyUsd = glpSupply ? glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS)) : bigNumberify(0)
-
-  // let reserveAmountUsd
-  // if (reservedAmount) {
-  //   reserveAmountUsd = reservedAmount.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
-  // }
-
   const glp_infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
-
-
 
   return (
     <div>
@@ -1833,21 +1554,6 @@ const SwapComponent = props => {
                 type="inline"
                 onChange={typeSelect}
               />
-
-              {/* <Tabs
-                defaultActiveKey={MARKET}
-                onChange={typeSelect}
-                size={'small'}
-                tabBarGutter={0}
-                type="inline"
-                tabPosition={'top'}
-                tabBarStyle={{ border: '0px black' }}
-              // animated={false}
-              >
-                {perpetualType.map(i => (
-                  <TabPane tab={<span>{i.name}{' '}</span>} key={i.id} />
-                ))}
-              </Tabs> */}
             </div>
 
             <BuyInputSection
@@ -2008,18 +1714,6 @@ const SwapComponent = props => {
                 <div className={styles.label}>Profits In</div>
                 <div className={styles.TooltipHandle}>
                   <span>{shortCollateralToken.symbol}</span>
-                  {/* <TokenSelectorModal
-                    onCancel={() => {
-                      setVisible(false)
-                    }}
-                    width={400}
-                    visible={visible}
-                    onCoinClick={token => {
-                      setVisible(false)
-                      setShortCollateralAddress(token.address)
-                    }}
-                    tokenlist={stableTokens}
-                  /> */}
                 </div>
               </div>
             )}
