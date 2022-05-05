@@ -111,7 +111,8 @@ const Kchart=(props)=> {
   useEffect(async () => {
     let chart;
     if (currentChart) {
-      currentChart.resize(0,0);
+      console.log("hereim init if")
+
     }
 
     chart = createChart(
@@ -141,50 +142,24 @@ const Kchart=(props)=> {
     const series = chart.addCandlestickSeries(getSeriesOptions())
     setCurrentChart(chart);
     setCurrentSeries(series);
-  },[ref, currentChart])
+  },[])
 
+  useEffect(() => {
+    if (!currentChart) { return; }
+    const resizeChart = () => {
+      currentChart.resize(chartRef.current.offsetWidth, chartRef.current.offsetHeight)
+    }
+    window.addEventListener('resize', resizeChart);
+    return () => window.removeEventListener('resize', resizeChart);
+  }, [currentChart]);
 
-
-  // useEffect(async () => {
-  //   if (currentChart == undefined) {
-  //     return;
-  //   } 
-  //   currentChart.resize(0,0);
-  //   const chart = createChart(
-  //       chartRef.current,
-  //       getChartOptions(chartRef.current.offsetWidth, chartRef.current.offsetHeight),
-  //   );
-
-  //   var candleSeries = chart.addCandlestickSeries({
-  //     lineColor: '#5472cc',
-  //     topColor: 'rgba(49, 69, 131, 0.4)',
-  //     bottomColor: 'rgba(42, 64, 103, 0.0)',
-  //     lineWidth: 2,
-  //     priceLineColor: '#3a3e5e',
-  //     downColor: '#fa3c58',
-  //     wickDownColor: '#fa3c58',
-  //     upColor: '#0ecc83',
-  //     wickUpColor: '#0ecc83',
-  //     borderVisible: false
-  //   });
-  //   // candleSeries.setData(currentChartData);
-  //   const data = await getKChartData(props.activeToken1.symbol, "42161", props.activeTimeScale, "1650234954", "1650378658", "chainlink");
-  //   console.log("hereim kchart timescale", data);
-  //   if (data != undefined) {
-  //     // candleSeries.update(data);
-  //     // const series = chart.addCandlestickSeries(getSeriesOptions())
-  //     // setCurrentChart(chart);
-  //     // setCurrentSeries(series);
-  //   }
-  //   candleSeries.setData(data);
-  //   setCurrentChart(chart);
-  // },[props.activeToken1.symbol, props.activeTimeScale])
 
   useEffect(async () => {
     if (currentChart == undefined) {
       return;
     } 
-    currentChart.resize(0, 0);
+    currentChart.resize(0,0);
+    
     const chart = createChart(
         chartRef.current,
         getChartOptions(chartRef.current.offsetWidth, chartRef.current.offsetHeight),
@@ -203,12 +178,13 @@ const Kchart=(props)=> {
     });
     let currentTime = getCurrentTime();
     let fromTime = getFromTime( currentTime );
-    console.log("hereim from", fromTime.toString());
-    console.log("hereim to", currentTime.toString());
-    console.log("hereim timescale", props.activeTimeScale);
+    // console.log("hereim from", fromTime.toString());
+    // console.log("hereim to", currentTime.toString());
+    // console.log("hereim timescale", props.activeTimeScale);
     let data = await getKChartData(props.activeToken1.symbol, "42161", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
-    console.log("hereim data", data);
+    // console.log("hereim data is being displayed", data);
     candleSeries.setData(data != undefined ? data : []);
+    setCurrentChart(chart);
 
   },[props.activeToken1.symbol, props.activeTimeScale])
 
