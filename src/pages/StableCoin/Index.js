@@ -13,8 +13,6 @@ import { APYtable } from './components/apytable';
 import { AccountBox } from './components/accountBox';
 import { useState,useEffect } from 'react';
 
-const icon = require('./aperture.svg');
-
 const StableCoin = props => {
   const {account, library, chainId, farmSetting: { API_URL: apiUrlPrefix}} = useConstantLoader(props);
   const{dispatch}=props

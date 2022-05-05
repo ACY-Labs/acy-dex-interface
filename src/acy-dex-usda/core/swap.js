@@ -7,10 +7,11 @@ import {
   getApprove,
   getAllowance,
   redeemUSDA,
-  mintUSDA
+  mintUSDA,
+  redeemAll,
 } from '../utils'
 import { useEffect, useState } from 'react';
-import { SCAN_URL_PREFIX,SCAN_NAME, ConstantLoader } from '@/constants';
+import { SCAN_URL_PREFIX, SCAN_NAME, ConstantLoader } from '@/constants';
 
 // get the estimated amount  of the other token required when swapping, in readable string.
 export async function swapGetEstimated(
@@ -23,6 +24,8 @@ export async function swapGetEstimated(
   setToken1Amount,
   setSwapButtonState,
   setSwapButtonContent,
+  setIsMax,
+  setNeedApprove,
 ) {
   if (!account) return new CustomError('Connect to wallet');
   else if (!inputToken0.symbol || !inputToken1.symbol) return new CustomError('please choose tokens');
@@ -44,18 +47,22 @@ export async function swapGetEstimated(
 
   let userHasSufficientBalance;
   try {
-    userHasSufficientBalance = userToken0Balance > inputToken0.amount
+    userHasSufficientBalance = userToken0Balance >= inputToken0.amount
   } catch (e) {
     setSwapButtonState(false);
     if (e.fault === 'underflow') setSwapButtonContent(e.fault);
     else setSwapButtonContent('Failed to get balance');
     return new CustomError(e.fault);
   }
+  if (userToken0Balance == inputToken0.amount) {
+    setIsMax(true)
+  } else {
+    setIsMax(false)
+  }
   setSwapButtonState(false);
   setSwapButtonContent('Loading...');
   try {
     if (swapMode == 'redeem') {
-      // const  estimateAmount = await getEstimateAmount(swapMode,inputToken1.address,library,account)
       const estimateAmount = await getEstimateAmount(swapMode, inputToken1, library, account).catch(err => { console.log('failed to get estimate,', err) })
       let token1Amount = estimateAmount * inputToken0.amount
       token1Amount = token1Amount.toFixed(3)
@@ -65,7 +72,22 @@ export async function swapGetEstimated(
       let token1Amount = estimateAmount * inputToken0.amount
       token1Amount = token1Amount.toFixed(3)
       setToken1Amount(token1Amount)
+      let Allowance = await getAllowance(inputToken0, library, account)
+        .catch(err => {
+          setSwapButtonContent('Failed to transaction')
+          return err
+        })
+      console.log('@@@allowance', Allowance)
+      let needApprove = (Allowance < inputToken0.amount) ? true : false
+      console.log('@@@needApprove', needApprove)
+      if (needApprove && userHasSufficientBalance) {
+        setNeedApprove(true)
+        setSwapButtonState(true)
+        setSwapButtonContent('approve')
+        return new CustomError('need approve');
+      }
     }
+    console.log('@@@111')
     setSwapButtonContent('swap');
     setSwapButtonState(true);
   } catch (e) {
@@ -77,8 +99,6 @@ export async function swapGetEstimated(
     setSwapButtonContent('Not enough balance');
     return new CustomError('Not enough balance');
   }
-
-
 }
 
 export async function swap(
@@ -87,6 +107,7 @@ export async function swap(
   swapMode,
   library,
   account,
+  isMax,
   setSwapButtonContent,
   setSwapButtonState,
   setSwapStatus,
@@ -94,34 +115,34 @@ export async function swap(
   const { amount } = inputToken0
   const transactionRes = await (async () => {
     if (swapMode == 'redeem') {
-        const isRedeemSucc = await redeemUSDA(inputToken1, library, account)
+      if (isMax) {
+        const isRedeemSucc = await redeemAll(inputToken1, library, account)
+          .catch(err => {
+            setSwapButtonContent('Failed to transaction')
+            return err
+          })
+        console.log('@@@redeemres', isRedeemSucc)
+        return isRedeemSucc
+      }
+      const isRedeemSucc = await redeemUSDA(inputToken1, amount, library, account)
         .catch(err => {
           setSwapButtonContent('Failed to transaction')
           return err
         })
-        console.log('@@@redeemres',isRedeemSucc)
-        return isRedeemSucc
+      console.log('@@@redeemres', isRedeemSucc)
+      return isRedeemSucc
     } else {
-      let Allowance = await getAllowance(inputToken0, library, account)
-      .catch(err => {
-        setSwapButtonContent('Failed to transaction')
-        return err
-      })
-      let needApprove = (Allowance < amount) ? true : false
-      if (needApprove) {
-        getApprove(inputToken0, library, account)
-      }
       const isMintSucc = await mintUSDA(inputToken0, library, account)
-      .catch(err => {
-        setSwapButtonContent('Failed to transaction')
-        return err
-      })
+        .catch(err => {
+          setSwapButtonContent('Failed to transaction')
+          return err
+        })
       return isMintSucc
     }
   })()
   if (transactionRes instanceof CustomError) {
     let text = transactionRes.getErrorText();
-    console.log('text',text)
+    console.log('text', text)
     setSwapButtonContent("Please try again");
   } else {
     console.log("TEST status:");
@@ -135,7 +156,7 @@ export async function swap(
     } else {
       const scanUrlPrefix = SCAN_URL_PREFIX();
       const url = `${scanUrlPrefix}/tx/${transactionRes.hash}`;
-
+      console.log('@@@SCAN', url)
       const view = (
         <div>
           <a href={url} target="_blank" rel="noreferrer">

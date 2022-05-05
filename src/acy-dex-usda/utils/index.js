@@ -72,23 +72,18 @@ export async function getUserTokenBalance(token, chainId, account, library) {
 }
 export async function getEstimateAmount(swapMode, token, library, account) {
   const { address, decimals } = token
-  // export async function getEstimateAmount(swapMode, address, library, account) {
   const vault = getVaultAdminContract(library, account)
-  // const contractToGetEstimateAmount = getContract(address, vaultAdminABI, library, account);
   let estimateOutputAmount
   if (swapMode == 'mint') {
     estimateOutputAmount = vault.priceUSDMint(address);
   } else {
     estimateOutputAmount = vault.priceUSDRedeem(address);
-    // console.log('aaaaa',estimateOutputAmount.toNumber())
   }
 
   return formatUnits(
     await estimateOutputAmount,
     18
   )
-
-  // return estimateOutputAmount;
 }
 
 export class CustomError {
@@ -106,8 +101,8 @@ export async function getAllowance(token, library, account) {
   const allowance = await contractToken.connect(getProviderOrSigner(library, account)).allowance(account, vaultProxyAddress)
   return formatUnits(allowance, decimals)
 }
-export async function getApprove(token, library, account) {
-  const { address, amount, decimals } = token
+export async function getApprove(token, amount, library, account) {
+  const { address, decimals } = token
   const contractToken = getContract(address, usdaABI, library, account);
   const approveAmount = parseUnits(amount, decimals)
   console.log('approveAmount', approveAmount)
@@ -116,6 +111,7 @@ export async function getApprove(token, library, account) {
   return appr
 }
 export async function mintUSDA(token, library, account) {
+  console.log('@@@M')
   const { address, amount, decimals } = token
   const tokenAmount = parseUnits(amount, decimals)
   const minAmount = parseUnits('0', decimals)
@@ -124,13 +120,20 @@ export async function mintUSDA(token, library, account) {
   return mint
 }
 
-export async function redeemUSDA(token, library, acount) {
-  const {address, amount} = token
+export async function redeemUSDA(token, amount, library, account) {
+  console.log("@@@R")
+  const { address } = token
   const redeemAmount = parseUnits(amount, 18)
   const minAmount = parseUnits('0', 18)
-  const contractToRedeem = getVaultCoreContract(library, acount)
-  console.log('@@@contractToRedeem',contractToRedeem)
-
-  const res = contractToRedeem.connect(getProviderOrSigner(library, acount)).redeeemUnique(address,redeemAmount, minAmount)
+  const contractToRedeem = getVaultCoreContract(library, account)
+  const res = contractToRedeem.connect(getProviderOrSigner(library, account)).redeeemUnique(address, redeemAmount, minAmount)
+  return res
+}
+export async function redeemAll(token, library, account) {
+  console.log('@@@RA')
+  const { address } = token
+  const minAmount = parseUnits('0', 18)
+  const contractToRedeem = getVaultCoreContract(library, account)
+  const res = contractToRedeem.connect(getProviderOrSigner(library, account)).redeemAllUnique(address, minAmount)
   return res
 }

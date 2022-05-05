@@ -3,7 +3,7 @@ import {
   AcyIcon,
   AcyPeriodTime,
   AcyTabs,
-  AcyCuarrencyCard,
+  // AcyCuarrencyCard,
   AcyConnectWalletBig,
   AcyModal,
   AcyInput,
@@ -17,7 +17,7 @@ import {
 } from '@/components/Acy';
 import TokenSelectorModal from './tokenSelectorModal';
 import { supportedTokens } from '@/acy-dex-usda/utils/address';
-
+import AcyCuarrencyCard from './acyCuarrencyCard'
 import { connect } from 'umi';
 import styles from './stableCoinComponent.less';
 import { sortAddress, abbrNumber } from '@/utils/utils';
@@ -37,14 +37,14 @@ import {
   isZero,
   parseArbitrageLog,
 } from '@/acy-dex-swap/utils/index';
-import { getUserTokenBalance, getUserTokenBalanceRaw } from '@/acy-dex-usda/utils'
+import { getUserTokenBalance, getUserTokenBalanceRaw, getApprove } from '@/acy-dex-usda/utils'
 
 // import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
 import { swapGetEstimated, swap } from '../../../acy-dex-usda/core/swap';
 
 import ERC20ABI from '@/abis/ERC20.json';
 import WETHABI from '@/abis/WETH.json';
-import { SCAN_URL_PREFIX,SCAN_NAME } from '@/constants';
+import { SCAN_URL_PREFIX, SCAN_NAME } from '@/constants';
 
 
 import {
@@ -147,9 +147,7 @@ const SwapComponent = props => {
   const connectWalletByLocalStorage = useConnectWallet();
   const [isUSDA, setIsUSDA] = useState(true)
   const [swapMode, setSwapMode] = useState('redeem')
-  const [scanUrl, setScanUrl] = useState()
-
-  const [acyTest, setAcyTest] = useState(false)
+  const [isMax, setIsMax] = useState(false)
 
   useEffect(() => {
     if (!INITIAL_TOKEN_LIST) return
@@ -244,12 +242,8 @@ const SwapComponent = props => {
     },
     [account, INITIAL_TOKEN_LIST]
   );
-  function getSwapStatus(view){
+  function getSwapStatus(view) {
     setSwapStatus(view)
-  }
-
-  function acyTestButtonHandler(){
-    acyTestInSwap(setAcyTest, setSwapStatus);
   }
 
 
@@ -259,6 +253,7 @@ const SwapComponent = props => {
       if (!token0 || !token1) return;
       if (!exactIn) return;
       //输入amount从而估计另一个的amount
+      setSwapStatus();
       await swapGetEstimated(
         {
           ...token0,
@@ -275,9 +270,12 @@ const SwapComponent = props => {
         setToken1Amount,
         setSwapButtonState,
         setSwapButtonContent,
+        setIsMax,
+        setNeedApprove,
       );
     }
 
+  useEffect(() => { '@@@ismaxchange' }, [isMax])
   useEffect(
     async () => {
       await t0Changed(token0Amount);
@@ -290,7 +288,7 @@ const SwapComponent = props => {
       chainId,
       library,
       account,
-      token0Amount
+      token0Amount,
     ]
   );
 
@@ -348,6 +346,7 @@ const SwapComponent = props => {
     setToken0Balance(tempBalance);
     setIsUSDA(!isUSDA)
     setSwapMode(mode)
+    setIsMax(false)
   };
 
   return (
@@ -363,6 +362,9 @@ const SwapComponent = props => {
         bonus={!exactIn && bonus0}
         showBalance={token1BalanceShow}
         isLocked={isUSDA}
+        token0Balance={token0Balance}
+        account={account}
+        isMax={isMax}
         onChoseToken={() => {
           onClickCoin();
           setBefore(true);
@@ -372,6 +374,10 @@ const SwapComponent = props => {
           setToken0Amount(e);
           setExactIn(true);
           t0Changed(e);
+        }}
+        onClickMax={() => {
+          setToken0Amount(token0Balance)
+          setIsMax(true)
         }}
         library={library}
       />
@@ -405,6 +411,7 @@ const SwapComponent = props => {
           setBefore(false);
         }}
         library={library}
+        isMax={isMax}
       />
 
       {showDescription ? <AcyDescriptions>
@@ -459,39 +466,66 @@ const SwapComponent = props => {
       </AcyDescriptions>
         : null}
 
-      <AcyButton
-        style={{ marginTop: '25px' }}
-        disabled={!swapButtonState}
-        onClick={() => {
-          if (account == undefined) {
-            connectWalletByLocalStorage();
-          } else {
-            setSwapButtonState(false);
-            setSwapButtonContent(<>Processing <Icon type="loading" /></>)
-            swap(
-              {
-                ...token0,
-                amount: token0Amount,
-              },
-              {
-                ...token1,
-                amount: token1Amount,
-              },
-              swapMode,
-              library,
-              account,
-              setSwapButtonContent,
-              setSwapButtonState,
-              setSwapStatus,
-            );
-          }
-        }}
-      >
-        {swapButtonContent}
-      </AcyButton>
+      {needApprove
+        ? <div>
+          <AcyButton
+            style={{ marginTop: '25px' }}
+            disabled={!swapButtonState}
+            onClick={async () => {
+              setShowSpinner(true);
+              setApproveButtonStatus(false);
+              const isApproved = await getApprove(token0, token0Amount, library, account)
+              console.log('@@@isApproved',isApproved)
+              setApproveButtonStatus(true);
+              setShowSpinner(false);
+
+              if (isApproved) {
+                setSwapButtonState(true);
+                setSwapButtonContent('Swap');
+                setApproveButtonStatus(false);
+                setNeedApprove(false);
+                console.log("test needApprove false")
+              }
+            }}
+          >
+            {swapButtonContent}
+            {/* {showSpinner && <Icon type="loading" />} */}
+          </AcyButton>
+        </div> :
+        <AcyButton
+          style={{ marginTop: '25px' }}
+          disabled={!swapButtonState}
+          onClick={() => {
+            if (account == undefined) {
+              connectWalletByLocalStorage();
+            } else {
+              setSwapButtonState(false);
+              setSwapButtonContent(<>Processing <Icon type="loading" /></>)
+              swap(
+                {
+                  ...token0,
+                  amount: token0Amount,
+                },
+                {
+                  ...token1,
+                  amount: token1Amount,
+                },
+                swapMode,
+                library,
+                account,
+                isMax,
+                setSwapButtonContent,
+                setSwapButtonState,
+                setSwapStatus,
+              );
+            }
+          }}
+        >
+          {swapButtonContent}
+        </AcyButton>}
 
       <AcyDescriptions>
-        {swapStatus  && <AcyDescriptions.Item> {swapStatus} </AcyDescriptions.Item>}
+        {swapStatus && <AcyDescriptions.Item> {swapStatus} </AcyDescriptions.Item>}
       </AcyDescriptions>
 
       <TokenSelectorModal
