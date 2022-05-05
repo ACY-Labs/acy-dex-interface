@@ -27,7 +27,10 @@ import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
 import Checkbox from '../Checkbox/Checkbox';
 import ExchangeInfoRow from './ExchangeInfoRow';
-import { getNativeToken, getToken, getWrappedToken } from "@/acy-dex-futures/data/Tokens";
+// import { getNativeToken, getToken, getWrappedToken } from "@/acy-dex-futures/data/Tokens";
+import { getNativeToken, getWrappedToken } from "@/acy-dex-futures/data/Tokens";
+import { getToken } from '@/acy-dex-futures/utils/Helpers'
+import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
 
 const HIGH_SPREAD_THRESHOLD = expandDecimals(1, USD_DECIMALS).div(100); // 1%;
 
@@ -87,6 +90,8 @@ export default function ConfirmationBox(props) {
     DEFAULT_SLIPPAGE_AMOUNT
   );
   const [isProfitWarningAccepted, setIsProfitWarningAccepted] = useState(false);
+
+  const tokens = defaultToken.longTokenList
 
   let minOut;
   let fromTokenUsd;
@@ -227,9 +232,12 @@ export default function ConfirmationBox(props) {
         return null;
       }
 
-      const collateralToken = getToken(chainId, collateralTokenAddress);
+      
+      const collateralToken = getToken(tokens, collateralTokenAddress);      
+      console.log("hereim symbol", tokens, collateralToken)
+
       return (
-        <div className="Confirmation-box-warning">
+        <div >
           Fees are high to swap from {fromToken.symbol} to {collateralToken.symbol}. <br />
           {collateralToken.symbol} is needed for collateral.
         </div>
@@ -480,7 +488,7 @@ export default function ConfirmationBox(props) {
             {type === LIMIT && renderAvailableLiquidity()}
             {isShort && (
               <ExchangeInfoRow label="Profits In">
-                {getToken(chainId, shortCollateralAddress).symbol}
+                {getToken(tokens, shortCollateralAddress).symbol}
               </ExchangeInfoRow>
             )}
             {isLong && <ExchangeInfoRow label="Profits In" value={toTokenInfo.symbol} />}

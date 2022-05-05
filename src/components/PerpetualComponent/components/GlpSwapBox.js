@@ -75,6 +75,7 @@ import RewardRouter from '@/acy-dex-futures/abis/RewardRouter.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
 import { callContract, useGmxPrice } from '@/acy-dex-futures/core/Perpetual'
 import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
+import { getWrappedToken } from '@/acy-dex-futures/utils/Helpers'
 
 import PerpTabs from './PerpTabs/PerpTabs'
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
@@ -127,15 +128,15 @@ function getTokenfromSymbol(tokenlist, symbol) {
   return undefined
 }
 
-function getWrappedToken(tokenlist) {
-  let wrappedToken;
-  for (const t of tokenlist) {
-    if (t.isWrapped) {
-      wrappedToken = t;
-    }
-  }
-  return wrappedToken;
-}
+// function getWrappedToken(tokenlist) {
+//   let wrappedToken;
+//   for (const t of tokenlist) {
+//     if (t.isWrapped) {
+//       wrappedToken = t;
+//     }
+//   }
+//   return wrappedToken;
+// }
 
 function getNativeToken(tokenlist) {
   let nativeToken;

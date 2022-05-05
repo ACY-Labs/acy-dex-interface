@@ -39,6 +39,8 @@ import { DEFAULT_SLIPPAGE_AMOUNT, DEFAULT_HIGHER_SLIPPAGE_AMOUNT } from './const
 
 import { getConstant } from '@/acy-dex-futures/utils/Constants'
 
+import { getToken } from '@/acy-dex-futures/utils/Helpers'
+
 import {
   USD_DECIMALS,
   USDG_ADDRESS,
@@ -270,14 +272,14 @@ export function getChartToken(swapOption, fromToken, toToken, chainId) {
   return toToken;
 }
 
-function getToken(tokenlist, tokenAddr) {
-  for (let i = 0; i < tokenlist.length; i++) {
-    if (tokenlist[i].address === tokenAddr) {
-      return tokenlist[i]
-    }
-  }
-  return undefined
-}
+// function getToken(tokenlist, tokenAddr) {
+//   for (let i = 0; i < tokenlist.length; i++) {
+//     if (tokenlist[i].address === tokenAddr) {
+//       return tokenlist[i]
+//     }
+//   }
+//   return undefined
+// }
 
 function getNextAveragePrice({ size, sizeDelta, hasProfit, delta, nextPrice, isLong }) {
   if (!size || !sizeDelta || !delta || !nextPrice) {

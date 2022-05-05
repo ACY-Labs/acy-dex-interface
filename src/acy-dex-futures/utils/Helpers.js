@@ -2764,3 +2764,22 @@ export function getProcessedData(
 
   return data;
 }
+
+export function getToken(tokenlist, tokenAddr) {
+  for (let i = 0; i < tokenlist.length; i++) {
+    if (tokenlist[i].address === tokenAddr) {
+      return tokenlist[i]
+    }
+  }
+  return undefined
+}
+
+export function getWrappedToken(tokenlist) {
+  let wrappedToken;
+  for (const t of tokenlist) {
+    if (t.isWrapped) {
+      wrappedToken = t;
+    }
+  }
+  return wrappedToken;
+}
