@@ -88,7 +88,7 @@ export default function ConfirmationBox(props) {
   );
   const [isProfitWarningAccepted, setIsProfitWarningAccepted] = useState(false);
 
-  const tokens = defaultToken.longTokenList
+  const tokens = constantInstance.perpetuals.tokenList
 
   let minOut;
   let fromTokenUsd;

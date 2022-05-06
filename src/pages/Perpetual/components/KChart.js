@@ -82,14 +82,71 @@ const Kchart=(props)=> {
       mode: 0
     }
   });
+  function fillGaps(prices, periodSeconds) {
+    if (prices.length < 2) {
+      return prices
+    }
+  
+    const newPrices = [prices[0]]
+    let prevTime = prices[0].time
+    for (let i = 1; i < prices.length; i++) {
+      const { time, open } = prices[i]
+      if (prevTime) {
+        let j = (time - prevTime) / periodSeconds - 1
+        while (j > 0) {
+          newPrices.push({
+            time: time - j * periodSeconds,
+            open,
+            close: open,
+            high: open * 1.0003,
+            low: open * 0.9996
+          })
+          j--
+        }
+      }
+  
+      prevTime = time
+      newPrices.push(prices[i])
+    }
+  
+    return newPrices
+  }
   const getCurrentTime = () => {
     let currentTime = Math.floor(new Date().getTime()/1000);
     // console.log("hereim current time", currentTime);
     return currentTime;
   }
-  const getFromTime = ( currentTime ) => {
+  const getFromTime100 = ( currentTime ) => {
     let fromTime = currentTime - 100* 24* 60* 60;
-    // console.log("hereim from time", fromTime);
+    return fromTime;
+  }
+  const getSeconds = ( timeScale ) => {
+    let seconds;
+    switch (timeScale) {
+        case "1w":
+          seconds = 7*24*60*60;
+          break;
+        case "1d": 
+          seconds = 24*60*60;
+          break;
+        case "4h":
+          seconds = 4*60*60;
+          break;
+        case "1h":
+          seconds = 60*60;
+          break;
+        case "15m":
+          seconds = 15*60;
+          break;
+        case "5m":
+          seconds = 5*60;
+          break;
+      }
+    return seconds;
+  }
+  const getFromTimeUpdate = ( currentTime, timeScale ) => {
+    let fromTime;
+    fromTime = currentTime - getSeconds(timeScale);
     return fromTime;
   }
   const getSeriesOptions = () => ({
@@ -119,24 +176,20 @@ const Kchart=(props)=> {
       getChartOptions(chartRef.current.offsetWidth, chartRef.current.offsetHeight),
     );
 
-    var candleSeries = chart.addCandlestickSeries({
-      lineColor: '#5472cc',
-      topColor: 'rgba(49, 69, 131, 0.4)',
-      bottomColor: 'rgba(42, 64, 103, 0.0)',
-      lineWidth: 2,
-      priceLineColor: '#3a3e5e',
-      downColor: '#fa3c58',
-      wickDownColor: '#fa3c58',
-      upColor: '#0ecc83',
-      wickUpColor: '#0ecc83',
-      borderVisible: false
-    });
+    var candleSeries = chart.addCandlestickSeries(getSeriesOptions());
 
     let currentTime = getCurrentTime();
-    let fromTime = getFromTime( currentTime );
-    let data = await getKChartData(props.activeToken1.symbol, "42161", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
-    // console.log("hereim data", data);
-    candleSeries.setData(data != undefined ? data : []);
+    let fromTime = getFromTime100( currentTime );
+    let data;
+    try {
+      data = await getKChartData(props.activeToken1.symbol, "42161", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
+    } catch {
+      data = [];
+      console.log("fallback to empty array");
+    }
+    let seconds = getSeconds(props.activeTimeScale);
+    let filledData = fillGaps(data, seconds);
+    candleSeries.setData(filledData);
 
     const series = chart.addCandlestickSeries(getSeriesOptions())
     setCurrentChart(chart);
@@ -163,30 +216,21 @@ const Kchart=(props)=> {
         chartRef.current,
         getChartOptions(chartRef.current.offsetWidth, chartRef.current.offsetHeight),
     );
-    var candleSeries = chart.addCandlestickSeries({
-      lineColor: '#5472cc',
-      topColor: 'rgba(49, 69, 131, 0.4)',
-      bottomColor: 'rgba(42, 64, 103, 0.0)',
-      lineWidth: 2,
-      priceLineColor: '#3a3e5e',
-      downColor: '#fa3c58',
-      wickDownColor: '#fa3c58',
-      upColor: '#0ecc83',
-      wickUpColor: '#0ecc83',
-      borderVisible: false
-    });
+    var candleSeries = chart.addCandlestickSeries(getSeriesOptions());
+
     // candleSeries.setData(currentChartData);
     let currentTime = getCurrentTime();
-    let fromTime = getFromTime( currentTime );
-    let data;
+  let fromTime = getFromTime100( currentTime );
+  let data;
     try {
       data = await getKChartData(props.activeToken1.symbol, "42161", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
     } catch {
       data = [];
       console.log("fallback to empty array");
     }
-    console.log("hereim kchart timescale", data);
-    candleSeries.setData(data);
+    let seconds = getSeconds(props.activeTimeScale);
+    let filledData = fillGaps(data, seconds);
+    candleSeries.setData(filledData);
     setCurrentChart(chart);
   },[props.activeToken1.symbol, props.activeTimeScale])
 
@@ -198,6 +242,28 @@ const Kchart=(props)=> {
     window.addEventListener('resize', resizeChart);
     return () => window.removeEventListener('resize', resizeChart);
   }, [currentChart]);
+
+
+  useEffect(async() => {
+    if (currentChart == undefined) {
+      return;
+    } 
+    
+    let chart = currentChart;
+    var candleSeries = chart.addCandlestickSeries(getSeriesOptions());
+
+    // const interval = setInterval(async() => {
+    //   let currentTime = getCurrentTime();
+    //   let fromTime = getFromTimeUpdate( currentTime, props.activeTimeScale );
+    //   let data = await getKChartData(props.activeToken1.symbol, "42161", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
+    //   console.log("hereim data timescale", data);
+    //   candleSeries.update(data[0])
+    //   // candleSeries.update({ time: '2022-05-06', open: 112, high: 112, low: 100, close: 101 });
+
+    //   // console.log("hereim update")
+    // }, 5 * 1000)
+    // return () => clearInterval(interval);
+  }, [props.activeTimeScale])
 
     
   return(
