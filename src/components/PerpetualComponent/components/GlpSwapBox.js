@@ -15,7 +15,7 @@ import { ethers } from "ethers"
 import { Icon, Tooltip, Tabs } from 'antd'
 import { useWeb3React } from '@web3-react/core'
 import useSWR from 'swr'
-import { useConstantLoader } from '@/constants'
+import { constantInstance, useConstantLoader } from '@/constants'
 import { useConnectWallet } from '@/components/ConnectWallet'
 import { AcyIcon, AcyTabs, AcyButton, AcyPerpetualButton } from "@/components/Acy"
 
@@ -47,22 +47,6 @@ import {
   DEFAULT_MAX_USDG_AMOUNT,
   PLACEHOLDER_ACCOUNT
 } from '@/acy-dex-futures/utils/index'
-import {
-  readerAddress,
-  // rewardReaderAddress,
-  vaultAddress,
-  routerAddress,
-  nativeTokenAddress,
-  // stakedGlpTrackerAddress,
-  glpAddress,
-  // feeGlpTrackerAddress,
-  usdgAddress,
-  glpManagerAddress,
-  rewardRouterAddress,
-  // glpVesterAddress,
-  tempLibrary,
-  tempChainID
-} from '@/acy-dex-futures/samples/constants'
 import Reader from '@/acy-dex-futures/abis/Reader.json'
 import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
 import Vault from '@/acy-dex-futures/abis/Vault.json'
@@ -73,16 +57,14 @@ import RewardTracker from '@/acy-dex-futures/abis/RewardTracker.json'
 import Vester from '@/acy-dex-futures/abis/Vester.json'
 import RewardRouter from '@/acy-dex-futures/abis/RewardRouter.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
-import { callContract, useGmxPrice } from '@/acy-dex-futures/core/Perpetual'
-import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
-import { getWrappedToken } from '@/acy-dex-futures/utils/Helpers'
+import { callContract } from '@/acy-dex-futures/Api'
 
 import PerpTabs from './PerpTabs/PerpTabs'
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 import TokenTable from '@/pages/BuyGlp/components/SwapTokenTable'
 import glp40Icon from '@/pages/BuyGlp/components/ic_glp_40.svg'
 
-import styles from '@/pages/BuyGlp/components/GlpSwap.less'
+import styles from './GlpSwap.less'
 
 const { AddressZero } = ethers.constants
 const { TabPane } = Tabs
@@ -168,7 +150,7 @@ export const GlpSwapBox = (props) => {
   const history = useHistory()
   const tabLabel = isBuying ? 'buy' : 'sell'
 
-  const tokens = defaultToken.longTokenList
+  const tokens = constantInstance.perpetuals.tokenList;
   const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
   const tokenList = whitelistedTokens.filter(t => !t.isWrapped)
 
@@ -185,6 +167,15 @@ export const GlpSwapBox = (props) => {
   // const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
 
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
+  const { perpetuals } = useConstantLoader()
+  const readerAddress = perpetuals.getContract("Reader")
+  const vaultAddress = perpetuals.getContract("Vault")
+  const usdgAddress = perpetuals.getContract("USDG")
+  const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
+  const routerAddress = perpetuals.getContract("Router")
+  const glpManagerAddress = perpetuals.getContract("GlpManager")
+  const glpAddress = perpetuals.getContract("GLP")
+  const rewardRouterAddress = perpetuals.getContract("RewardRouter")
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
   })

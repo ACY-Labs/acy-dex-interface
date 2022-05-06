@@ -8,11 +8,11 @@ import Token from "@/acy-dex-futures/abis/Token.json";
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import { InjectedConnector, UserRejectedRequestError as UserRejectedRequestErrorInjected} from "@web3-react/injected-connector";
 import { useRef, useEffect, useCallback } from "react";
+import { toast } from "react-toastify";
 import useSWR from "swr";
-import { useChainId } from './Helpers';
 import { getContract } from './Addresses';
 import { useLocalStorage } from "react-use";
-import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
+import { constantInstance, useConstantLoader } from '@/constants';
 export const MARKET = 'Market';
 export const LIMIT = 'Limit';
 export const LONG = 'Long';
@@ -26,7 +26,7 @@ export const MAX_LEVERAGE = 100 * 10000;
 export const POSITIONS = 'Positions';
 export const ACTIONS = 'Actions';
 export const ORDERS = 'Orders';
-export const USDG_ADDRESS = '0x45096e7aA921f27590f8F19e457794EB09678141';
+export const USDG_ADDRESS = getContract(97, "USDG");
 
 const { AddressZero } = ethers.constants
 
@@ -36,13 +36,12 @@ export const SECONDS_PER_YEAR = 31536000
 export const GLP_DECIMALS = 18
 export const USDG_DECIMALS = 18
 export const PLACEHOLDER_ACCOUNT = ethers.Wallet.createRandom().address
-export const ARBITRUM = 42161
 export const PRECISION = expandDecimals(1, 30)
 export const TAX_BASIS_POINTS = 50
 export const MINT_BURN_FEE_BASIS_POINTS = 20
 export const DEFAULT_MAX_USDG_AMOUNT = expandDecimals(200 * 1000 * 1000, 18)
 export const ARBITRUM_DEFAULT_COLLATERAL_SYMBOL = 'USDC'
-export const ARBITRUM_DEFAULT_COLLATERAL_ADDRESS = '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'
+// export const ARBITRUM_DEFAULT_COLLATERAL_ADDRESS = '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'
 export const SLIPPAGE_BPS_KEY = "Exchange-swap-slippage-basis-points-v3";
 export const DEFAULT_SLIPPAGE_AMOUNT = 20;
 export const SWAP_FEE_BASIS_POINTS = 20;
@@ -51,6 +50,20 @@ export const STABLE_TAX_BASIS_POINTS = 5;
 export const THRESHOLD_REDEMPTION_VALUE = expandDecimals(993, 27); // 0.993
 export const MIN_PROFIT_TIME = 3 * 60 * 60; // 3 hours
 export const PROFIT_THRESHOLD_BASIS_POINTS = 120;
+export const DUST_BNB = "2000000000000000";
+export const CHART_PERIODS = {
+  "5m": 60 * 5,
+  "15m": 60 * 15,
+  "1h": 60 * 60,
+  "4h": 60 * 60 * 4,
+  "1d": 60 * 60 * 24
+};
+
+export const MAINNET = 56;
+export const AVALANCHE = 43114;
+export const TESTNET = 97;
+export const ARBITRUM_TESTNET = 421611;
+export const ARBITRUM = 42161;
 
 const supportedChainIds = [ARBITRUM];
 const injectedConnector = new InjectedConnector({
@@ -617,12 +630,13 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
     return infoTokens
 }
 
+// TODO need update to fetch data from subgraph
 export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
   const { library, account: connectedAccount } = useWeb3React();
   const active = true; // this is used in Actions.js so set active to always be true
   const account = overrideAccount || connectedAccount;
 
-  const { chainId } = useChainId();
+  const {chainId} = useConstantLoader();
   const shouldRequest = active && account && flagOrdersEnabled;
 
   const orderBookAddress = getContract(chainId, "OrderBook");
@@ -721,6 +735,10 @@ export function getProvider(library, chainId) {
   return new JsonRpcProvider('https://arb1.arbitrum.io/rpc');
 }
 
+export function getOrderKey(order) {
+  return `${order.type}-${order.account}-${order.index}`;
+}
+
 export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   // eslint-disable-next-line
   const [chainId, arg0, arg1, ...params] = args
@@ -754,6 +772,35 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   return library[method](arg1,...params).catch(onError);;
 }
 
+export function getExplorerUrl(chainId) {
+  if (chainId === 3) {
+    return "https://ropsten.etherscan.io/";
+  } else if (chainId === 42) {
+    return "https://kovan.etherscan.io/";
+  } else if (chainId === MAINNET) {
+    return "https://bscscan.com/";
+  } else if (chainId === TESTNET) {
+    return "https://testnet.bscscan.com/";
+  } else if (chainId === ARBITRUM_TESTNET) {
+    return "https://rinkeby-explorer.arbitrum.io/";
+  } else if (chainId === ARBITRUM) {
+    return "https://arbiscan.io/";
+  } else if (chainId === AVALANCHE) {
+    return "https://snowtrace.io/";
+  }
+  return "https://etherscan.io/";
+}
+
+export async function getGasPrice(provider, chainId) {
+  if (!provider) {
+    return;
+  }
+
+  const gasPrice = await provider.getGasPrice();
+  const premium = GAS_PRICE_ADJUSTMENT_MAP[chainId] || bigNumberify(0);
+
+  return gasPrice.add(premium);
+}
 
 export async function getGasLimit(contract, method, params = [], value, gasBuffer) {
     const defaultGasBuffer = 200000;
@@ -1108,12 +1155,34 @@ export function getLeverage({ size, sizeDelta, increaseSize, collateral, collate
 }
 
 export function getMarginFee(sizeDelta) {
-    if (!sizeDelta) {
-        return bigNumberify(0);
-    }
-    const afterFeeUsd = sizeDelta.mul(BASIS_POINTS_DIVISOR - MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR)
-    return sizeDelta.sub(afterFeeUsd)
+  if (!sizeDelta) {
+      return bigNumberify(0);
   }
+  const afterFeeUsd = sizeDelta.mul(BASIS_POINTS_DIVISOR - MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR)
+  return sizeDelta.sub(afterFeeUsd)
+}
+
+export function getServerBaseUrl(chainId) {
+  if (!chainId) {
+    throw new Error("chainId is not provided");
+  }
+  if (document.location.hostname.includes("deploy-preview")) {
+    const fromLocalStorage = localStorage.getItem("SERVER_BASE_URL");
+    if (fromLocalStorage) {
+      return fromLocalStorage;
+    }
+  }
+  if (chainId === MAINNET) {
+    return "https://gambit-server-staging.uc.r.appspot.com";
+  } else if (chainId === ARBITRUM_TESTNET) {
+    return "https://gambit-l2.as.r.appspot.com";
+  } else if (chainId === ARBITRUM) {
+    return "https://gmx-server-mainnet.uw.r.appspot.com";
+  } else if (chainId === AVALANCHE) {
+    return "https://gmx-avax-server.uc.r.appspot.com";
+  }
+  return "https://gmx-server-mainnet.uw.r.appspot.com";
+}
 
   const adjustForDecimalsFactory = n => number => {
     if (n === 0) {
@@ -1130,7 +1199,7 @@ export function getMarginFee(sizeDelta) {
   }
 
   export function getMostAbundantStableToken(chainId, infoTokens) {
-    const tokens = defaultToken.default
+    const tokens = constantInstance.perpetuals.tokenList;
     const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
     let availableAmount;
     let stableToken = whitelistedTokens.find(t => t.isStable);

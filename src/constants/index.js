@@ -9,6 +9,7 @@ import ScanAPIUrlSelector from './scan_api_url';
 import GlobalSettingsSelector from './global_settings';
 import FarmSettingSelector from './farm_setting';
 import LaunchpadSettingSelector from './launchpad_setting';
+import PerpetualSelector from './perpetuals';
 import SDK_SETTING from './sdk_setting';
 import GAS_TOKEN_SYMBOL from "./gas_token";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -34,7 +35,8 @@ export let constantInstance = {
     'marketNetwork': 56,
     'marketAPISetting': FarmSettingSelector(56),
     'marketTokenList': TokenListSelector(56),
-    'globalSettings' : GlobalSettingsSelector(56)
+    'globalSettings' : GlobalSettingsSelector(56),
+    'perpetuals': PerpetualSelector(97),
 };
 
 // export web3 wallet status
@@ -87,7 +89,8 @@ export const ConstantLoader = (chainId = 56, marketChainId = 56) => {
         'gasTokenSymbol': GAS_TOKEN_SYMBOL[fallbackChainId],
         'marketAPISetting': FarmSettingSelector(marketNetwork),
         'marketTokenList': TokenListSelector(marketNetwork),
-        'globalSettings' : GlobalSettingsSelector(fallbackChainId)
+        'globalSettings' : GlobalSettingsSelector(fallbackChainId),
+        'perpetuals': PerpetualSelector(97)
     };
 
     return constants;
@@ -168,7 +171,7 @@ const chainId2UrlChainName = (chainId) => {
         case 42161:
             chainName = "arbitrum"; break;
         default: 
-          chainName = "bsc";
+          chainName = "other";
     }
     return chainName;
 }
@@ -184,9 +187,9 @@ export const useConstantLoader = () => {
 
     useEffect(() => {
         const chainSupportedIndex = (supportedChainIds.indexOf(chainId) !== -1);
-        const fallbackChainId = chainSupportedIndex ? chainId : 56;    // redirect unsupported chainId and undefined to 56
-        // console.log("chainId before fallback:", chainId);
-        // console.log("fallbackChainId chainId:", fallbackChainId);
+        const fallbackChainId = chainSupportedIndex ? chainId : 97;    // redirect unsupported chainId and undefined to 56
+        console.log("chainId before fallback:", chainId);
+        console.log("fallbackChainId chainId:", fallbackChainId);
         const marketChainSupportedIndex = (supportedChainIds.indexOf(marketChainId) !== -1);
         const marketNetwork = marketChainSupportedIndex ? marketChainId : 56;
 

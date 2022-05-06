@@ -6,7 +6,6 @@ import { Pool } from '@uniswap/v3-sdk'
 import Vault from '../abis/Vault.json'
 import UniPool from '../abis/UniPool.json'
 import { fetcher,parseValue,expandDecimals } from '../utils/index'
-import * as defaultToken from '../samples/TokenList'
 import { routerAddress } from '../samples/constants';
 import Router from '@/acy-dex-futures/abis/Router.json'
 
@@ -106,64 +105,6 @@ export function getTokenBySymbol(tokenlist, symbol) {
   return undefined
 }
 
-function useGmxPriceFromArbitrum(library, active) {
-  const poolAddress = '0x80A9ae39310abf666A87C743d6ebBD0E8C42158E'
-  const { data: uniPoolSlot0, mutate: updateUniPoolSlot0 } = useSWR([ARBITRUM, poolAddress, "slot0"], {
-    fetcher: fetcher(library, UniPool),
-  })
-
-  const vaultAddress = "0x489ee077994B6658eAfA855C308275EAd8097C4A"
-  const ethAddress = getTokenBySymbol(defaultToken.default, "WETH").address
-  const { data: ethPrice, mutate: updateEthPrice } = useSWR([ARBITRUM, vaultAddress, "getMinPrice", ethAddress], {
-    fetcher: fetcher(library, Vault),
-  })
-
-  const gmxPrice = useMemo(() => {
-    if (uniPoolSlot0 && ethPrice) {
-      const tokenA = new UniToken(ARBITRUM, ethAddress, 18, "SYMBOL", "NAME")
-
-      const gmxAddress = "0xfc5A1A6EB076a2C7aD06eD22C90d7E710E35ad0a"
-      const tokenB = new UniToken(ARBITRUM, gmxAddress, 18, "SYMBOL", "NAME")
-
-      const pool = new Pool(
-        tokenA, // tokenA
-        tokenB, // tokenB
-        10000, // fee
-        uniPoolSlot0.sqrtPriceX96, // sqrtRatioX96
-        1, // liquidity
-        uniPoolSlot0.tick, // tickCurrent
-        []
-      )
-
-      const poolTokenPrice = pool.priceOf(tokenB).toSignificant(6)
-      const poolTokenPriceAmount = parseValue(poolTokenPrice, 18)
-      return poolTokenPriceAmount.mul(ethPrice).div(expandDecimals(1, 18))
-    }
-  }, [ethPrice, uniPoolSlot0, ethAddress])
-
-  const mutate = useCallback(() => {
-    updateUniPoolSlot0(undefined, true)
-    updateEthPrice(undefined, true)
-  }, [updateEthPrice, updateUniPoolSlot0])
-
-  return { data: gmxPrice, mutate }
-}
-
-export function useGmxPrice(chainId, libraries, active) {
-  const arbitrumLibrary = libraries && libraries.arbitrum ? libraries.arbitrum : undefined
-  const { data: gmxPriceFromArbitrum, mutate: mutateFromArbitrum } = useGmxPriceFromArbitrum(arbitrumLibrary, active)
-
-  const gmxPrice = gmxPriceFromArbitrum
-  const mutate = useCallback(() => {
-    mutateFromArbitrum()
-  }, [mutateFromArbitrum])
-
-  return {
-    gmxPrice,
-    gmxPriceFromArbitrum,
-    mutate
-  }
-}
 export async function createSwapOrder(
     chainId,
     library,

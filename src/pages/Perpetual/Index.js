@@ -47,24 +47,7 @@ import {
   formatAmount
 } from '@/acy-dex-futures/utils';
 
-import {
-  nativeTokenAddress,
-  readerAddress,
-  vaultAddress,
-  usdgAddress,
-  tempLibrary,
-  tempChainID,
-  orderBookAddress,
-  routerAddress,
-  stakedGlpTrackerAddress,
-  glpManagerAddress,
-  glpAddress,
-  // feeGlpTrackerAddress,
-  glpVesterAddress,
-  // rewardReaderAddress,
-  positionRouterAddress,
-} from '@/acy-dex-futures/samples/constants'
-import { approvePlugin, useGmxPrice } from '@/acy-dex-futures/core/Perpetual'
+import { approvePlugin } from '@/acy-dex-futures/Api'
 import Media from 'react-media';
 import { uniqueFun } from '@/utils/utils';
 import { getTransactionsByAccount, appendNewSwapTx, findTokenWithSymbol } from '@/utils/txData';
@@ -80,7 +63,7 @@ import moment from 'moment';
 import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
-import { useConstantLoader } from '@/constants';
+import { constantInstance, useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import PositionsTable from './components/PositionsTable';
 import ActionHistoryTable from './components/ActionHistoryTable';
@@ -88,7 +71,7 @@ import OrderTable from './components/OrderTable'
 
 /// THIS SECTION IS FOR TESTING SWR AND GMX CONTRACT
 import { fetcher } from '@/acy-dex-futures/utils';
-import PositionRouter from "@/acy-dex-futures/abis/PositionRouter.json";
+// import PositionRouter from "@/acy-dex-futures/abis/PositionRouter.json";
 import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
 import Router from '@/acy-dex-futures/abis/Router.json'
 import Vault from '@/acy-dex-futures/abis/Vault.json'
@@ -103,7 +86,6 @@ import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
 // import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
 import { ethers } from 'ethers'
 import useSWR from 'swr'
-import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
 import { getKChartData } from './utils';
 import { from, HeuristicFragmentMatcher } from 'apollo-boost';
 
@@ -202,7 +184,7 @@ const getTokenAddress = (token, nativeTokenAddress) => {
 
 export function getPositionQuery(tokens, nativeTokenAddress) {
   const collateralTokens = []
-  //const indexTokens = []
+  const indexTokens = []
   const isLong = []
 
   for (let i = 0; i < tokens.length; i++) {
@@ -234,6 +216,7 @@ export function getPositionQuery(tokens, nativeTokenAddress) {
 }
 
 export function getPositions(chainId, positionQuery, positionData, infoTokens, includeDelta) {
+
   const propsLength = getConstant(chainId, "positionReaderPropsLength")
   // const propsLength = 9;
   const positions = []
@@ -330,7 +313,8 @@ const Swap = props => {
   const { savedIsPnlInLeverage, setSavedIsPnlInLeverage, savedSlippageAmount, pendingTxns, setPendingTxns } = props
 
   const { account, library, chainId, farmSetting: { API_URL: apiUrlPrefix }, globalSettings, } = useConstantLoader();
-  const supportedTokens = defaultToken.longTokenList;
+  console.log("this is constantInstance ", constantInstance);
+  const supportedTokens = constantInstance.perpetuals.tokenList;
   console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
   const [isConfirming, setIsConfirming] = useState(false);
@@ -368,9 +352,9 @@ const Swap = props => {
   const [percentage24, setPercentage24] = useState(0);
 
   //---------- FOR TESTING 
-  const whitelistedTokens = defaultToken.default.filter(token => token.symbol !== "USDG");
+  const whitelistedTokens = supportedTokens.filter(token => token.symbol !== "USDG");
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
-  const tokens = defaultToken.default;
+  const tokens = supportedTokens;
   const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
 
 
@@ -407,6 +391,16 @@ const Swap = props => {
     setTokenSelection(newTokenSelection)
   }, [tokenSelection, setTokenSelection])
 
+  const { perpetuals } = useConstantLoader()
+  const readerAddress = perpetuals.getContract("Reader")
+  const vaultAddress = perpetuals.getContract("Vault")
+  const usdgAddress = perpetuals.getContract("USDG")
+  const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
+  const routerAddress = perpetuals.getContract("Router")
+  const glpManagerAddress = perpetuals.getContract("GlpManager")
+  const glpAddress = perpetuals.getContract("GLP")
+  const orderBookAddress = perpetuals.getContract("OrderBook")
+
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
   })
@@ -434,20 +428,6 @@ const Swap = props => {
   const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR(account && [ chainId, routerAddress, "approvedPlugins", account, orderBookAddress], {
     fetcher: fetcher(library, Router)
   });
-
-  const { data: positionRouterApproved } = useSWR(account && [ account, chainId, routerAddress, "approvedPlugins", account, positionRouterAddress], {
-      fetcher: fetcher(library, Router),
-    });
-
-  const { data: minExecutionFee } = useSWR([account, chainId, positionRouterAddress, "minExecutionFee"], {
-    fetcher: fetcher(library, PositionRouter),
-  });
- 
-  console.log("hereyou minexe swap", minExecutionFee);
-
-  useEffect(() => {
-    console.log("printing all vault", vaultTokenInfo);
-  }, [vaultTokenInfo])
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   const { positions, positionsMap } = getPositions(chainId, positionQuery, positionData, infoTokens, true)
@@ -657,16 +637,23 @@ const Swap = props => {
     let previous24 = currentTime - 24*60*60;
     let data24 = await getKChartData(activeToken1.symbol, "42161", "1d", previous24.toString(), currentTime.toString(), "chainlink");
     console.log("hereim data24", data24);
-    let high24 = Math.round(data24[0].high * 100) / 100;
-    let low24 = Math.round(data24[0].low * 100) / 100;    
-    let deltaPrice24 = Math.round(data24[0].open * 100) / 100;
-
+    
+    let high24 = 0;
+    let low24 = 0;
+    let deltaPrice24 = 0;
+    let currentAveragePrice = 0;
+    let percentage = 0;
+    if (data24.length > 1) {
+      high24 = Math.round(data24[0].high * 100) / 100;
+      low24 = Math.round(data24[0].low * 100) / 100;    
+      deltaPrice24 = Math.round(data24[0].open * 100) / 100;
+      currentAveragePrice = ((high24+low24)/2);
+      percentage = Math.round((currentAveragePrice - deltaPrice24) *100 / currentAveragePrice *100)/100;
+    }
+    
     setHigh24(high24);
     setLow24(low24);
     setDeltaPrice24(deltaPrice24);
-    let currentAveragePrice = ((high24+low24)/2);
-    let percentage = Math.round((currentAveragePrice - deltaPrice24) *100 / currentAveragePrice *100)/100;
-    
     setPercentage24(percentage);
 
   }, [activeToken1])
@@ -675,18 +662,25 @@ const Swap = props => {
     let currentTime = getCurrentTime();
     let previous24 = currentTime - 24*60*60;
     let data24 = await getKChartData(activeToken1.symbol, "42161", "1d", previous24.toString(), currentTime.toString(), "chainlink");
-    let high24 = Math.round(data24[0].high * 100) / 100;
-    let low24 = Math.round(data24[0].low * 100) / 100;
-    let deltaPrice24 = Math.round(data24[0].open * 100) / 100;
-    console.log("hereim show 24 cal", "high24:", high24, " low24:", low24, " average:", currentAveragePrice, " delta:", deltaPrice24);
 
+    let high24 = 0;
+    let low24 = 0;
+    let deltaPrice24 = 0;
+    let currentAveragePrice = 0;
+    let percentage = 0;
+    if (data24.length > 1) {
+      high24 = Math.round(data24[0].high * 100) / 100;
+      low24 = Math.round(data24[0].low * 100) / 100;    
+      deltaPrice24 = Math.round(data24[0].open * 100) / 100;
+      currentAveragePrice = ((high24+low24)/2);
+      percentage = Math.round((currentAveragePrice - deltaPrice24) *100 / currentAveragePrice *100)/100;
+    }
+    
     setHigh24(high24);
     setLow24(low24);
     setDeltaPrice24(deltaPrice24);
-    let currentAveragePrice = ((high24+low24)/2);
-    let percentage = Math.round((currentAveragePrice - deltaPrice24) *100 / currentAveragePrice *100)/100;
-    
     setPercentage24(percentage);
+    console.log("hereim show 24 cal", "high24:", high24, " low24:", low24, " average:", currentAveragePrice, " delta:", deltaPrice24);
 
   }, [])
 
@@ -882,19 +876,6 @@ const Swap = props => {
     const lastDataIndex = chartData.length - 1;
     updateActiveChartData(chartData[lastDataIndex][1], lastDataIndex);
   }, [chartData])
-
-  // const renderChart = () => {
-  //   return <ExchangeTVChart
-  //     fromTokenAddress={fromTokenAddress}
-  //     toTokenAddress={toTokenAddress}
-  //     infoTokens={infoTokens}
-  //     swapOption={swapOption}
-  //     chainId={chainId}
-  //     positions={positions}
-  //     savedShouldShowPositionLines={savedShouldShowPositionLines}
-  //     orders={orders}
-  //   />
-  // }
 
   // Glp Swap
   const [isBuying, setIsBuying] = useState(true)
@@ -1129,10 +1110,10 @@ const Swap = props => {
             isWaitingForPluginApproval={isWaitingForPluginApproval}
             setIsWaitingForPluginApproval={setIsWaitingForPluginApproval}
             isPluginApproving={isPluginApproving}
-            isConfirming = {isConfirming}
+            isConfirming={isConfirming}
             setIsConfirming={setIsConfirming}
-            isPendingConfirmation = {isPendingConfirmation}
-            setIsPendingConfirmation = {setIsPendingConfirmation}
+            isPendingConfirmation={isPendingConfirmation}
+            setIsPendingConfirmation={setIsPendingConfirmation}
             isBuying={isBuying}
             setIsBuying={setIsBuying}
             onChangeMode={onChangeMode}
@@ -1140,9 +1121,7 @@ const Swap = props => {
             setSwapTokenAddress={setSwapTokenAddress}
             glp_isWaitingForApproval={isWaitingForApproval}
             glp_setIsWaitingForApproval={setIsWaitingForApproval}
-            positionRouterApproved={positionRouterApproved}
             orders={orders}
-            minExecutionFee={minExecutionFee}
           />
         </div>
       </div>

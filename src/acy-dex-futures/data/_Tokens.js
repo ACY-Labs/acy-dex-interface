@@ -340,25 +340,26 @@ for (const chainId of CHAIN_IDS) {
   }
 }
 
+// done
 export function getWrappedToken(chainId) {
   return WRAPPED_TOKENS_MAP[chainId];
 }
-
+// done
 export function getNativeToken(chainId) {
   return NATIVE_TOKENS_MAP[chainId];
 }
-
+// done
 export function getTokens(chainId) {
   return TOKENS[chainId];
 }
-
+// still in use by the Order data table
 export function isValidToken(chainId, address) {
   if (!TOKENS_MAP[chainId]) {
     throw new Error(`Incorrect chainId ${chainId}`);
   }
   return address in TOKENS_MAP[chainId];
 }
-
+// done, multiple getToken function in various files
 export function getToken(chainId, address) {
   if (!TOKENS_MAP[chainId]) {
     throw new Error(`Incorrect chainId ${chainId}`);
@@ -369,6 +370,7 @@ export function getToken(chainId, address) {
   return TOKENS_MAP[chainId][address];
 }
 
+// done
 export function getTokenBySymbol(chainId, symbol) {
   const token = TOKENS_BY_SYMBOL_MAP[chainId][symbol];
   if (!token) {
@@ -377,6 +379,7 @@ export function getTokenBySymbol(chainId, symbol) {
   return token;
 }
 
+// done
 export function getWhitelistedTokens(chainId) {
   return TOKENS[chainId].filter(token => token.symbol !== "USDG");
 }

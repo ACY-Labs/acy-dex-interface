@@ -20,7 +20,7 @@ import useSWR from "swr";
 import OrderBookReader from "../abis/OrderBookReader.json";
 import OrderBook from "../abis/OrderBook.json";
 
-import { getWhitelistedTokens, isValidToken } from "../data/Tokens";
+import { constantInstance } from "@/constants";
 
 const { AddressZero } = ethers.constants;
 
@@ -329,7 +329,7 @@ export function getExchangeRate(tokenAInfo, tokenBInfo, inverted) {
 }
 
 export function getMostAbundantStableToken(chainId, infoTokens) {
-  const whitelistedTokens = getWhitelistedTokens(chainId);
+  const whitelistedTokens = constantInstance.perpetuals.whitelistedTokens;
   let availableAmount;
   let stableToken = whitelistedTokens.find(t => t.isStable);
   for (let i = 0; i < whitelistedTokens.length; i++) {
@@ -1733,8 +1733,8 @@ function parseDecreaseOrdersData(
     2
   ).filter(order => {
     return (
-      isValidToken(chainId, order.collateralToken) &&
-      isValidToken(chainId, order.indexToken)
+      constantInstance.perpetuals.isValidToken(order.collateralToken) &&
+      constantInstance.perpetuals.isValidToken(order.indexToken)
     );
   });
 }
@@ -1768,9 +1768,9 @@ function parseIncreaseOrdersData(
     3
   ).filter(order => {
     return (
-      isValidToken(chainId, order.purchaseToken) &&
-      isValidToken(chainId, order.collateralToken) &&
-      isValidToken(chainId, order.indexToken)
+      constantInstance.perpetuals.isValidToken(order.purchaseToken) &&
+      constantInstance.perpetuals.isValidToken(order.collateralToken) &&
+      constantInstance.perpetuals.isValidToken(order.indexToken)
     );
   });
 }
@@ -1804,7 +1804,7 @@ function parseSwapOrdersData(chainId, swapOrdersData, account, indexes) {
     5,
     3
   ).filter(order => {
-    return order.path.every(token => isValidToken(chainId, token));
+    return order.path.every(token => constantInstance.perpetuals.isValidToken(token));
   });
 }
 

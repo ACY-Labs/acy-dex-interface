@@ -27,10 +27,7 @@ import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
 import Checkbox from '../Checkbox/Checkbox';
 import ExchangeInfoRow from './ExchangeInfoRow';
-// import { getNativeToken, getToken, getWrappedToken } from "@/acy-dex-futures/data/Tokens";
-import { getNativeToken, getWrappedToken } from "@/acy-dex-futures/data/Tokens";
-import { getToken } from '@/acy-dex-futures/utils/Helpers'
-import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
+import { constantInstance } from '@/constants';
 
 const HIGH_SPREAD_THRESHOLD = expandDecimals(1, USD_DECIMALS).div(100); // 1%;
 
@@ -122,7 +119,7 @@ export default function ConfirmationBox(props) {
 
   const existingOrder = useMemo(
     () => {
-      const wrappedToken = getWrappedToken(chainId);
+      const wrappedToken = constantInstance.perpetuals.wrappedToken;
       for (const order of orders) {
         if (order.type !== INCREASE) continue;
         const sameToken =
@@ -232,8 +229,7 @@ export default function ConfirmationBox(props) {
         return null;
       }
 
-      
-      const collateralToken = getToken(tokens, collateralTokenAddress);      
+      const collateralToken = constantInstance.perpetuals.getToken(collateralTokenAddress);
       console.log("hereim symbol", tokens, collateralToken)
 
       return (
@@ -328,7 +324,7 @@ export default function ConfirmationBox(props) {
       if (isSwap || !existingOrder) {
         return;
       }
-      const indexToken = getToken(chainId, existingOrder.indexToken);
+      const indexToken = constantInstance.perpetuals.getToken(existingOrder.indexToken);
       const sizeInToken = formatAmount(
         existingOrder.sizeDelta.mul(PRECISION).div(existingOrder.triggerPrice),
         USD_DECIMALS,
@@ -488,7 +484,7 @@ export default function ConfirmationBox(props) {
             {type === LIMIT && renderAvailableLiquidity()}
             {isShort && (
               <ExchangeInfoRow label="Profits In">
-                {getToken(tokens, shortCollateralAddress).symbol}
+                {constantInstance.perpetuals.getToken(shortCollateralAddress).symbol}
               </ExchangeInfoRow>
             )}
             {isLong && <ExchangeInfoRow label="Profits In" value={toTokenInfo.symbol} />}

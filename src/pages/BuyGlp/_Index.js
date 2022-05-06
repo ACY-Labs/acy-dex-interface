@@ -6,7 +6,7 @@ import { useHistory } from 'react-router-dom'
 import { useWeb3React } from '@web3-react/core'
 import { AcyIcon,} from '@/components/Acy'
 import PageHeaderWrapper from '@/components/PageHeaderWrapper'
-import GlpSwap from './components/GlpSwap'
+import GlpSwap from './components/_GlpSwap'
 import styles from './styles.less';
 
 const POLYGON = 137;

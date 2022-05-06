@@ -95,12 +95,6 @@ export default [
         hideInMenu: true,
         component: './Transaction/Index',
       },
-      {
-        path: '/buyglp',
-        name: 'BuyGlp',
-        hideInMenu: true,
-        component: './BuyGlp/Index',
-      },
     ],
   },
 ];

@@ -4,7 +4,6 @@ import { getKChartData } from '../utils/index'
 // import { createChart } from 'krasulya-lightweight-charts'
 import { createChart } from 'lightweight-charts';
 import './styles.css';
-// import { getTokens,getToken } from '../../../acy-dex-futures/data/Tokens.js'
 // import {
 // 	USD_DECIMALS,
 // 	SWAP,
@@ -176,16 +175,19 @@ const Kchart=(props)=> {
       wickUpColor: '#0ecc83',
       borderVisible: false
     });
+    // candleSeries.setData(currentChartData);
     let currentTime = getCurrentTime();
     let fromTime = getFromTime( currentTime );
-    // console.log("hereim from", fromTime.toString());
-    // console.log("hereim to", currentTime.toString());
-    // console.log("hereim timescale", props.activeTimeScale);
-    let data = await getKChartData(props.activeToken1.symbol, "42161", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
-    // console.log("hereim data is being displayed", data);
-    candleSeries.setData(data != undefined ? data : []);
+    let data;
+    try {
+      data = await getKChartData(props.activeToken1.symbol, "42161", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
+    } catch {
+      data = [];
+      console.log("fallback to empty array");
+    }
+    console.log("hereim kchart timescale", data);
+    candleSeries.setData(data);
     setCurrentChart(chart);
-
   },[props.activeToken1.symbol, props.activeTimeScale])
 
   useEffect(() => {
