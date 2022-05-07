@@ -36,7 +36,7 @@ export const SECONDS_PER_YEAR = 31536000
 export const GLP_DECIMALS = 18
 export const USDG_DECIMALS = 18
 export const PLACEHOLDER_ACCOUNT = ethers.Wallet.createRandom().address
-export const PRECISION = expandDecimals(1, 30)
+export const PRECISION = expandDecimals(1, USD_DECIMALS)
 export const TAX_BASIS_POINTS = 50
 export const MINT_BURN_FEE_BASIS_POINTS = 20
 export const DEFAULT_MAX_USDG_AMOUNT = expandDecimals(200 * 1000 * 1000, 18)
@@ -356,9 +356,18 @@ export function getBuyGlpToAmount(
     return defaultValue;
   }
 
-  let glpAmount = fromAmount.mul(swapToken.minPrice).div(glpPrice);
-  glpAmount = adjustForDecimals(glpAmount, swapToken.decimals, USDG_DECIMALS);
+  // for BTC example, BTC has 8 decimals on BSC
+  // FIRST line code: glpAmount will be in 8 decimals (in BTC.decimals)
+  // fromAmount = 8 decimals
+  // swapToken.minPrice = 30 decimals 
+  // swapToken.decimals = 8 decimals (variable, depends on particular tokens), so .mul(10**12) to make it to 30 decimals
+  
+  // SECOND line code: glpAmount is converted to GLP_DECIMALS
+  // glpPrice = 18 decimals (fixed)
 
+  let glpAmount = fromAmount.mul(swapToken.minPrice).div(glpPrice.mul(10**12));
+  glpAmount = adjustForDecimals(glpAmount, swapToken.decimals, GLP_DECIMALS);
+  
   let usdgAmount = fromAmount.mul(swapToken.minPrice).div(PRECISION);
   usdgAmount = adjustForDecimals(usdgAmount, swapToken.decimals, USDG_DECIMALS);
   const feeBasisPoints = getFeeBasisPoints(
@@ -403,8 +412,8 @@ export function getSellGlpFromAmount(
     return defaultValue;
   }
 
-  let glpAmount = toAmount.mul(swapToken.maxPrice).div(glpPrice);
-  glpAmount = adjustForDecimals(glpAmount, swapToken.decimals, USDG_DECIMALS);
+  let glpAmount = toAmount.mul(swapToken.maxPrice).div(glpPrice.mul(10**12));
+  glpAmount = adjustForDecimals(glpAmount, swapToken.decimals, GLP_DECIMALS);
 
   let usdgAmount = toAmount.mul(swapToken.maxPrice).div(PRECISION);
   usdgAmount = adjustForDecimals(usdgAmount, swapToken.decimals, USDG_DECIMALS);
@@ -752,7 +761,7 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   if (ethers.utils.isHexString(arg0)) {
     const address = arg0
     const contract = new ethers.Contract(address, contractInfo, provider)
-    console.log('fetcher', contractInfo, method, contract)
+    // console.log('fetcher', contractInfo, method, contract)
 
     try {
       if (additionalArgs) {
@@ -790,6 +799,11 @@ export function getExplorerUrl(chainId) {
   }
   return "https://etherscan.io/";
 }
+
+const GAS_PRICE_ADJUSTMENT_MAP = {
+  [ARBITRUM]: "0",
+  [AVALANCHE]: "3000000000" // 3 gwei
+};
 
 export async function getGasPrice(provider, chainId) {
   if (!provider) {
