@@ -29,6 +29,8 @@ import Checkbox from '../Checkbox/Checkbox';
 import ExchangeInfoRow from './ExchangeInfoRow';
 import { constantInstance } from '@/constants';
 
+import styles from './ConfirmationBox.less';
+
 const HIGH_SPREAD_THRESHOLD = expandDecimals(1, USD_DECIMALS).div(100); // 1%;
 
 function getSpread(fromTokenInfo, toTokenInfo) {
@@ -202,7 +204,7 @@ export default function ConfirmationBox(props) {
 
       if (spread && spread.isHigh) {
         return (
-          <div className="Confirmation-box-warning">
+          <div className={styles.ConfirmationBoxWarning}>
             The spread is > 1%, please ensure the trade details are acceptable before comfirming
           </div>
         );
@@ -219,7 +221,7 @@ export default function ConfirmationBox(props) {
 
       if (isSwap) {
         return (
-          <div className="Confirmation-box-warning">
+          <div className={styles.ConfirmationBoxWarning}>
             Fees are high to swap from {fromToken.symbol} to {toToken.symbol}.
           </div>
         );
@@ -257,7 +259,7 @@ export default function ConfirmationBox(props) {
           ) {
             const profitPrice = getProfitPrice(existingPosition.markPrice, existingPosition);
             return (
-              <div className="Confirmation-box-warning">
+              <div className={styles.ConfirmationBoxWarning}>
                 Increasing this position at the current price will forfeit a&nbsp;
                 <a
                   href="https://gmxio.gitbook.io/gmx/trading#minimum-price-change"
@@ -280,7 +282,7 @@ export default function ConfirmationBox(props) {
             if (hasProfit && delta.eq(0)) {
               const profitPrice = getProfitPrice(existingPosition.markPrice, existingPosition);
               return (
-                <div className="Confirmation-box-warning">
+                <div className={styles.ConfirmationBoxWarning}>
                   This order will forfeit a&nbsp;
                   <a
                     href="https://gmxio.gitbook.io/gmx/trading#minimum-price-change"
@@ -301,7 +303,7 @@ export default function ConfirmationBox(props) {
         }
 
         return (
-          <div className="Confirmation-box-warning">
+          <div className={styles.ConfirmationBoxWarning}>
             A minimum price change of&nbsp;
             <a
               href="https://gmxio.gitbook.io/gmx/trading#minimum-price-change"
@@ -332,7 +334,7 @@ export default function ConfirmationBox(props) {
         true
       );
       return (
-        <div className="Confirmation-box-warning">
+        <div className={styles.ConfirmationBoxWarning}>
           You have an active Limit Order to Increase {existingOrder.isLong ? 'Long' : 'Short'}{' '}
           {sizeInToken} {indexToken.symbol} ($
           {formatAmount(existingOrder.sizeDelta, USD_DECIMALS, 2, true)}) at price $
@@ -348,12 +350,12 @@ export default function ConfirmationBox(props) {
     () => {
       if (isSwap) {
         return (
-          <div className="Confirmation-box-main">
+          <div className={styles.ConfirmationBoxMain}>
             <div>
               Pay&nbsp;{formatAmount(fromAmount, fromToken.decimals, 4, true)} {fromToken.symbol} ($
               {formatAmount(fromUsdMin, USD_DECIMALS, 2, true)})
             </div>
-            <div className="Confirmation-box-main-icon" />
+            <div className={styles.ConfirmationBoxMainIcon} />
             <div>
               Receive&nbsp;{formatAmount(toAmount, toToken.decimals, 4, true)} {toToken.symbol} ($
               {formatAmount(toUsdMax, USD_DECIMALS, 2, true)})
@@ -363,12 +365,12 @@ export default function ConfirmationBox(props) {
       }
 
       return (
-        <div className="Confirmation-box-main">
+        <div className={styles.ConfirmationBoxMain}>
           <span>
             Pay&nbsp;{formatAmount(fromAmount, fromToken.decimals, 4, true)} {fromToken.symbol} ($
             {formatAmount(fromUsdMin, USD_DECIMALS, 2, true)})
           </span>
-          <div className="Confirmation-box-main-icon" />
+          <div className={styles.ConfirmationBoxMainIcon} />
           <div>
             {isLong ? 'Long' : 'Short'}&nbsp;
             {formatAmount(toAmount, toToken.decimals, 4, true)} {toToken.symbol} ($
@@ -466,18 +468,18 @@ export default function ConfirmationBox(props) {
     () => {
       return (
         <>
-          <div className="Confirmation-box-info">
+          <div className={styles.ConfirmationBoxInfo}>
             {renderMain()}
             {renderFeeWarning()}
             {renderMinProfitWarning()}
             {renderExistingOrderWarning()}
             {hasPendingProfit && isMarketOrder && (
-              <div className="PositionEditor-accept-profit-warning">
+              <div className={styles.PositionEditor}>
                 <Checkbox
                   isChecked={isProfitWarningAccepted}
                   setIsChecked={setIsProfitWarningAccepted}
                 >
-                  <span className="muted">Forfeit profit</span>
+                  <span className={styles.muted}>Forfeit profit</span>
                 </Checkbox>
               </div>
             )}
@@ -490,9 +492,9 @@ export default function ConfirmationBox(props) {
             {isLong && <ExchangeInfoRow label="Profits In" value={toTokenInfo.symbol} />}
             <ExchangeInfoRow label="Leverage">
               {hasExistingPosition && toAmount && toAmount.gt(0) && (
-                <div className="inline-block muted">
+                <div className={styles.inlineBlock}>
                   {formatAmount(existingPosition.leverage, 4, 2)}x
-                  <BsArrowRight className="transition-arrow" />
+                  <BsArrowRight className={styles.transitionArrow} />
                 </div>
               )}
               {toAmount && leverage && leverage.gt(0) && `${formatAmount(leverage, 4, 2)}x`}
@@ -501,9 +503,9 @@ export default function ConfirmationBox(props) {
             </ExchangeInfoRow>
             <ExchangeInfoRow label="Liq. Price">
               {hasExistingPosition && toAmount && toAmount.gt(0) && (
-                <div className="inline-block muted">
+                <div className={styles.inlineBlock}>
                   ${formatAmount(existingLiquidationPrice, USD_DECIMALS, 2, true)}
-                  <BsArrowRight className="transition-arrow" />
+                  <BsArrowRight className={styles.transitionArrow} />
                 </div>
               )}
               {toAmount &&
@@ -542,9 +544,9 @@ export default function ConfirmationBox(props) {
             {isMarketOrder && (
               <ExchangeInfoRow label="Entry Price">
                 {hasExistingPosition && toAmount && toAmount.gt(0) && (
-                  <div className="inline-block muted">
+                  <div className={styles.inlineBlock}>
                     ${formatAmount(existingPosition.averagePrice, USD_DECIMALS, 2, true)}
-                    <BsArrowRight className="transition-arrow" />
+                    <BsArrowRight trclassName={styles.transitionArrow} />
                   </div>
                 )}
                 {nextAveragePrice && `$${formatAmount(nextAveragePrice, USD_DECIMALS, 2, true)}`}
@@ -607,7 +609,7 @@ export default function ConfirmationBox(props) {
     () => {
       return (
         <>
-          <div className="Confirmation-box-info">
+          <div className={styles.ConfirmationBoxInfo}>
             {renderMain()}
             {renderFeeWarning()}
             {renderSpreadWarning()}
@@ -623,9 +625,9 @@ export default function ConfirmationBox(props) {
               )}
             </ExchangeInfoRow>
             {!isMarketOrder && (
-              <div className="Exchange-info-row">
-                <div className="Exchange-info-label">Limit Price</div>
-                <div className="align-right">
+              <div className={styles.ExchangeInfoRow}>
+                <div className={styles.ExchangeInfoLabel}>Limit Price</div>
+                <div className={styles.alignRight}>
                   {getExchangeRateDisplay(triggerRatio, fromTokenInfo, toTokenInfo)}
                 </div>
               </div>
@@ -635,9 +637,9 @@ export default function ConfirmationBox(props) {
                 {formatAmount(spread.value.mul(100), USD_DECIMALS, 2, true)}%
               </ExchangeInfoRow>
             )}
-            <div className="Exchange-info-row">
-              <div className="Exchange-info-label">Fees</div>
-              <div className="align-right">
+            <div className={styles.ExchangeInfoRow}>
+              <div className={styles.ExchangeInfoLabel}>Fees</div>
+              <div className={styles.alignRight}>
                 {formatAmount(feeBps, 2, 2, true)}% (
                 {formatAmount(fees, fromTokenInfo.decimals, 4, true)} {fromTokenInfo.symbol}: $
                 {formatAmount(feesUsd, USD_DECIMALS, 2, true)})
@@ -645,15 +647,15 @@ export default function ConfirmationBox(props) {
             </div>
             {renderExecutionFee()}
             {fromTokenUsd && (
-              <div className="Exchange-info-row">
-                <div className="Exchange-info-label">{fromTokenInfo.symbol} Price</div>
-                <div className="align-right">{fromTokenUsd} USD</div>
+              <div className={styles.ExchangeInfoRow}>
+                <div className={styles.ExchangeInfoLabel}>{fromTokenInfo.symbol} Price</div>
+                <div className={styles.alignRight}>{fromTokenUsd} USD</div>
               </div>
             )}
             {toTokenUsd && (
-              <div className="Exchange-info-row">
-                <div className="Exchange-info-label">{toTokenInfo.symbol} Price</div>
-                <div className="align-right">{toTokenUsd} USD</div>
+              <div className={styles.ExchangeInfoRow}>
+                <div className={styles.ExchangeInfoLabel}>{toTokenInfo.symbol} Price</div>
+                <div className={styles.alignRight}>{toTokenUsd} USD</div>
               </div>
             )}
           </div>
@@ -683,14 +685,14 @@ export default function ConfirmationBox(props) {
   );
 
   return (
-    <div className="Confirmation-box">
+    <div className={styles.ConfirmationBox}>
       <Modal isVisible={true} setIsVisible={() => setIsConfirming(false)} label={title}>
         {isSwap && renderSwapSection()}
         {!isSwap && renderMarginSection()}
-        <div className="Confirmation-box-row">
+        <div className={styles.ConfirmationBoxRow}>
           <button
             onClick={onConfirmationClick}
-            className="App-cta Confirmation-box-button"
+            className={styles.ConfirmationBoxButton}
             disabled={!isPrimaryEnabled()}
           >
             {getPrimaryText()}

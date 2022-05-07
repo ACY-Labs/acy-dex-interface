@@ -1573,14 +1573,14 @@ const SwapComponent = props => {
                         </div>
                       }
                     </div>
-                    <div className={styles.checkbox}>
+                    {/* <div className={styles.checkbox}>
                       <StyledCheckbox
                         checked={isLeverageSliderEnabled}
                         onChange={() => {
                           setIsLeverageSliderEnabled(!isLeverageSliderEnabled)
                         }}
                       />
-                    </div>
+                    </div> */}
                   </div>
                   {isLeverageSliderEnabled &&
                     <span className={styles.leverageSlider}>

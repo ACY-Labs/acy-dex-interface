@@ -24,15 +24,16 @@
   .Modal-content {
     z-index: 20;
     position: relative;
-    max-width: 100%;
+    max-width: 25%;
     max-height: 90vh;
     overflow: auto;
     background: var(--dark-blue);
-    border-radius: 4px;
+    border: 0.75px solid #232323;
+    border-radius: 10px;
   }
   
   .divider {
-    border-bottom: 1px solid #ffffff29;
+    border-bottom: 1px solid #232323;
     margin-bottom: 1rem;
   }
   
