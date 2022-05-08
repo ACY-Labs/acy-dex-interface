@@ -1,4 +1,4 @@
-import {ethers} from 'ethers';;
+import { ethers } from 'ethers';;
 
 // export default [
 //     {
@@ -78,56 +78,103 @@ import {ethers} from 'ethers';;
 const TOKENS = {
   56: [],
   97: [
-  {
-    name: "Binance Coin",
-    symbol: "BNB",
-    decimals: 18,
-    address: ethers.constants.AddressZero,
-    isNative: true,
-    isShortable: true
-  },
-  {
-    name: "Wrapped Bitcoin",
-    symbol: "BTC",
-    decimals: 8,
-    address: "0x6E59735D808E49D050D0CB21b0c9549D379BBB39",
-    isShortable: true
-  },
-  {
-    name: "Wrapped BNB",
-    symbol: "WBNB",
-    decimals: 18,
-    address: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
-    isWrapped: true,
-    baseSymbol: "BNB"
-  },
-  {
-    name: "Wrapped ETH",
-    symbol: "ETH",
-    decimals: 18,
-    address: "0xF471F7051D564dE03F3736EeA037D2dA2fa189c1",
-    isShortable: true,
-    isStable: false
-  },
-  {
-    name: "USD Coin",
-    symbol: "USDC",
-    decimals: 6,
-    address: "0xE971616d94335dec2E54939118AdFcB68E6dCAd6",
-    isStable: true
-  },
-  {
-    name: "Tether",
-    symbol: "USDT",
-    decimals: 18,
-    address: "0xF82eEeC2C58199cb409788E5D5806727cf549F9f",
-    isStable: true
-  },
-]
+    {
+      name: "Binance Coin",
+      symbol: "BNB",
+      decimals: 18,
+      address: ethers.constants.AddressZero,
+      isNative: true,
+      isShortable: true
+    },
+    {
+      name: "Wrapped Bitcoin",
+      symbol: "BTC",
+      decimals: 8,
+      address: "0x6E59735D808E49D050D0CB21b0c9549D379BBB39",
+      isShortable: true
+    },
+    {
+      name: "Wrapped BNB",
+      symbol: "WBNB",
+      decimals: 18,
+      address: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+      isWrapped: true,
+      baseSymbol: "BNB"
+    },
+    {
+      name: "Wrapped ETH",
+      symbol: "ETH",
+      decimals: 18,
+      address: "0xF471F7051D564dE03F3736EeA037D2dA2fa189c1",
+      isShortable: true,
+      isStable: false
+    },
+    {
+      name: "USD Coin",
+      symbol: "USDC",
+      decimals: 6,
+      address: "0xE971616d94335dec2E54939118AdFcB68E6dCAd6",
+      isStable: true
+    },
+    {
+      name: "Tether",
+      symbol: "USDT",
+      decimals: 18,
+      address: "0xF82eEeC2C58199cb409788E5D5806727cf549F9f",
+      isStable: true
+    },
+  ],
+  80001: [
+    {
+      name: "MATIC",
+      symbol: "MATIC",
+      decimals: 18,
+      address: ethers.constants.AddressZero,
+      isNative: true,
+      isShortable: true
+    },
+    {
+      name: "Wrapped Bitcoin",
+      symbol: "BTC",
+      decimals: 8,
+      address: "0x05d6f705C80d9F812d9bc1A142A655CDb25e2571",
+      isShortable: true
+    },
+    {
+      name: "Wrapped MATIC",
+      symbol: "WMATIC",
+      decimals: 18,
+      address: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
+      isWrapped: true,
+      baseSymbol: "MATIC"
+    },
+    {
+      name: "Wrapped ETH",
+      symbol: "ETH",
+      decimals: 18,
+      address: "0xeBC8428DC717D440d5deCE1547456B115b868F0e",
+      isShortable: true,
+      isStable: false
+    },
+    {
+      name: "USD Coin",
+      symbol: "USDC",
+      decimals: 6,
+      address: "0x7a96316B13bD7d0529e701d2ED8b9fC4E4fd8696 ",
+      isStable: true
+    },
+    {
+      name: "Tether",
+      symbol: "USDT",
+      decimals: 18,
+      address: "0x158653b66fd72555F68eDf983736781E471639Cc",
+      isStable: true
+    },
+  ],
 };
 
 // const CHAIN_IDS = [56, 97, 42161, 421611, 43114];
-const CHAIN_IDS = [97];
+const CHAIN_IDS = [97, 80001];
 
 const TOKENS_MAP = {};
 const TOKENS_BY_SYMBOL_MAP = {};

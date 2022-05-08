@@ -1,17 +1,17 @@
 import { ethers } from 'ethers'
 
-import { MAINNET, TESTNET, ARBITRUM_TESTNET, ARBITRUM, AVALANCHE, expandDecimals } from "./index"
+import { BSC_MAINNET, BSC_TESTNET, POLYGON_MAINNET, POLYGON_TESTNET, ARBITRUM_TESTNET, ARBITRUM, AVALANCHE, expandDecimals } from "./index"
 
 const { parseEther } = ethers.utils
 
-const INCREASE_ORDER_EXECUTION_GAS_LIMIT = 1000000 // https://arbiscan.io/tx/0x63e08dab7044af40f074c1458734ad6aba61061c9161a002f02cb65a23e518db
-const DECREASE_ORDER_EXECUTION_GAS_LIMIT = 1000000 // https://arbiscan.io/tx/0xa27b456717e0d092992ff013a93d106043e5d9dbdd5761ddebd06d9c9dc6cd39
+const INCREASE_ORDER_EXECUTION_GAS_LIMIT = 10000000 // https://arbiscan.io/tx/0x63e08dab7044af40f074c1458734ad6aba61061c9161a002f02cb65a23e518db
+const DECREASE_ORDER_EXECUTION_GAS_LIMIT = 10000000 // https://arbiscan.io/tx/0xa27b456717e0d092992ff013a93d106043e5d9dbdd5761ddebd06d9c9dc6cd39
 const SWAP_ORDER_EXECUTION_GAS_LIMIT = 1000000 // https://arbiscan.io/tx/0x18070f49e94d428bf3c7d3c249b8e4cdb18ea6a3f4945de52b705187827a6b73
 
 const ARBITRUM_ORDER_EXECUTION_GAS_PRICE = expandDecimals(1, 9) // 1 gwei
 
 const constants = {
-  [MAINNET]: {
+  [BSC_MAINNET]: {
     nativeTokenSymbol: "BNB",
     defaultCollateralSymbol: "BUSD",
     defaultFlagOrdersEnabled: false,
@@ -19,8 +19,19 @@ const constants = {
     v2: false
   },
 
-  [TESTNET]: {
+  [BSC_TESTNET]: {
     nativeTokenSymbol: "BNB",
+    defaultCollateralSymbol: "BUSD",
+    defaultFlagOrdersEnabled: true,
+    positionReaderPropsLength: 8,
+    v2: false,
+    SWAP_ORDER_EXECUTION_GAS_FEE: ARBITRUM_ORDER_EXECUTION_GAS_PRICE.mul(SWAP_ORDER_EXECUTION_GAS_LIMIT),
+    INCREASE_ORDER_EXECUTION_GAS_FEE: ARBITRUM_ORDER_EXECUTION_GAS_PRICE.mul(INCREASE_ORDER_EXECUTION_GAS_LIMIT),
+    DECREASE_ORDER_EXECUTION_GAS_FEE: ARBITRUM_ORDER_EXECUTION_GAS_PRICE.mul(DECREASE_ORDER_EXECUTION_GAS_LIMIT)
+  },
+
+  [POLYGON_TESTNET]: {
+    nativeTokenSymbol: "MATIC",
     defaultCollateralSymbol: "BUSD",
     defaultFlagOrdersEnabled: true,
     positionReaderPropsLength: 8,

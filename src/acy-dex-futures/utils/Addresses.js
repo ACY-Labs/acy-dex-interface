@@ -44,7 +44,18 @@ const CONTRACTS = {
     OrderBook: '0xE01A9BDCe95a2635144A0997FE62BCc66DB39Afe',
     Router: '0x8060631Ff0b94e7934B8768DA86cFfB513053118',
     GLP: '0xee0068982aA8512bE9A4b625DCC585A6388c929b',
-},
+  },
+  80001: {
+    Reader: '0xf57b9B3e55773dA18612746A3213f3F8387Cd943',
+    Vault: '0x14d92826376F57c065Fe0804314A2BFA860EF08c',
+    USDG: '0xD0C079F4da905D95D6A41878F079E1B229F5F290',
+    NATIVE_TOKEN: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
+    GlpManager: '0xB4E63f86a78017527790E5351790FDC3C8950Cd9',
+    RewardRouter: '0x7f4175F54d67c5e3bC562F3318697FB0De61852C',
+    OrderBook: '0x64109736f6ccf5f8D5fCF7CBbbc38ec6aB6198FD',
+    Router: '0x4251B5E213E311F09681f4748Ff6EBBc4f4A7ebe',
+    GLP: '0xC7Edb1466177f861018C660B6C3c4D5950C164c3',
+  },
   421611: { // arbitrum testnet
     Vault: "0xA4704fBfaf7c89511668052931Ba0f1816D2c9d3",
     Router: "0x526f42EA12E167E36E3De747187f53b6989d121A",
@@ -140,12 +151,12 @@ const CONTRACTS = {
 
 export function getContractAddress(chainId, name) {
 
-    console.log("getContractAddress, chainID", chainId, "name", name);
+  // console.log("getContractAddress, chainID", chainId, "name", name);
   if (!CONTRACTS[chainId]) {
-    console.log(`Unknown chainId ${chainId}`);
+    // console.log(`Unknown chainId ${chainId}`);
   }
   if (!CONTRACTS[chainId][name]) {
-    console.log(`Unknown constant "${name}" for chainId ${chainId}`);
+    // console.log(`Unknown constant "${name}" for chainId ${chainId}`);
   }
   return CONTRACTS[chainId][name]
 }
@@ -155,8 +166,8 @@ export const getContract = (chainId, name) => {
 };
 
 export const XGMT_EXCLUDED_ACCOUNTS = [
-    "0x330eef6b9b1ea6edd620c825c9919dc8b611d5d5",
-    "0xd9b1c23411adbb984b1c4be515fafc47a12898b2",
-    "0xa633158288520807f91ccc98aa58e0ea43acb400",
-    "0xffd0a93b4362052a336a7b22494f1b77018dd34b"
+  "0x330eef6b9b1ea6edd620c825c9919dc8b611d5d5",
+  "0xd9b1c23411adbb984b1c4be515fafc47a12898b2",
+  "0xa633158288520807f91ccc98aa58e0ea43acb400",
+  "0xffd0a93b4362052a336a7b22494f1b77018dd34b"
 ]

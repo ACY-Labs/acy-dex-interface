@@ -194,6 +194,7 @@ const SwapComponent = props => {
     chainId,
     tokenList: INITIAL_TOKEN_LIST,
     farmSetting: { INITIAL_ALLOWED_SLIPPAGE },
+    perpetuals
   } = useConstantLoader(props);
 
   const {
@@ -248,7 +249,7 @@ const SwapComponent = props => {
     allowedSlippage = DEFAULT_HIGHER_SLIPPAGE_AMOUNT;
   }
 
-  const tokens = constantInstance.perpetuals.tokenList;
+  const tokens = perpetuals.tokenList;
   const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
   const stableTokens = tokens.filter(token => token.isStable);
   const indexTokens = whitelistedTokens.filter(token => !token.isStable && !token.isWrapped);
@@ -266,49 +267,7 @@ const SwapComponent = props => {
     toTokens = shortableTokens;
   }
 
-  const needOrderBookApproval = type !== MARKET && !orderBookApproved;
-  const prevNeedOrderBookApproval = usePrevious(needOrderBookApproval);
-
-  useEffect(() => {
-    if (
-      !needOrderBookApproval &&
-      prevNeedOrderBookApproval &&
-      isWaitingForPluginApproval
-    ) {
-      setIsWaitingForPluginApproval(false);
-      // helperToast.success(<div>Orders enabled!</div>);
-    }
-  }, [
-    needOrderBookApproval,
-    prevNeedOrderBookApproval,
-    setIsWaitingForPluginApproval,
-    isWaitingForPluginApproval
-  ]);
-
-  const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
-  const [toTokenAddress, setToTokenAddress] = useState("0x6E59735D808E49D050D0CB21b0c9549D379BBB39");
-  // const [fromTokenInfo, setFromTokenInfo] = useState();
-  // const [toTokenInfo, setToTokenInfo] = useState();
-  // const [fees, setFees] = useState(0.1);
-  // const [leverage, setLeverage] = useState(5);
-  // const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useState(true);
-  // const [entryPriceLimit, setEntryPriceLimit] = useState(0);
-  // const [priceValue, setPriceValue] = useState('');
-  // const [shortCollateralAddress, setShortCollateralAddress] = useState('0xf97f4df75117a78c1A5a0DBb814Af92458539FB4');
-  // const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
-
-
-  const [triggerPriceValue, setTriggerPriceValue] = useState("");
-  const triggerPriceUsd = type === MARKET ? 0 : parseValue(triggerPriceValue, USD_DECIMALS);
-  const onTriggerPriceChange = evt => {
-    setTriggerPriceValue(evt.target.value || "");
-  };
-  const onTriggerRatioChange = evt => {
-    setTriggerRatioValue(evt.target.value || "");
-  };
-
   const tokenAddresses = tokens.map(token => token.address)
-  const { perpetuals } = useConstantLoader()
   const readerAddress = perpetuals.getContract("Reader")
   const vaultAddress = perpetuals.getContract("Vault")
   const usdgAddress = perpetuals.getContract("USDG")
@@ -336,17 +295,66 @@ const SwapComponent = props => {
   const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR([chainId, routerAddress, "approvedPlugins", account || PLACEHOLDER_ACCOUNT, orderBookAddress], {
     fetcher: fetcher(library, Router)
   });
+  console.log("test orderbook approved: ", routerAddress, account, orderBookAddress, orderBookApproved)
   const tokenAllowanceAddress = fromTokenAddress === AddressZero ? nativeTokenAddress : fromTokenAddress;
   const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
     fetcher: fetcher(library, Glp)
   });
 
-  // default collateral address on ARBITRUM
-  const [shortCollateralAddress, setShortCollateralAddress] = useState("0xF82eEeC2C58199cb409788E5D5806727cf549F9f")
+  console.log("test needOrderBookApproval: ", type!==MARKET, !orderBookApproved)
+  const needOrderBookApproval = type !== MARKET && !orderBookApproved;
+  const prevNeedOrderBookApproval = usePrevious(needOrderBookApproval);
 
+  useEffect(() => {
+    if (
+      !needOrderBookApproval &&
+      prevNeedOrderBookApproval &&
+      isWaitingForPluginApproval
+    ) {
+      setIsWaitingForPluginApproval(false);
+      // helperToast.success(<div>Orders enabled!</div>);
+    }
+  }, [
+    needOrderBookApproval,
+    prevNeedOrderBookApproval,
+    setIsWaitingForPluginApproval,
+    isWaitingForPluginApproval
+  ]);
+
+  const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
+  const initialToToken = perpetuals.getTokenBySymBol("BTC").address;
+  console.log("initialToToken: ", initialToToken, chainId)
+  const [toTokenAddress, setToTokenAddress] = useState(initialToToken);
+  // const [fromTokenInfo, setFromTokenInfo] = useState();
+  // const [toTokenInfo, setToTokenInfo] = useState();
+  // const [fees, setFees] = useState(0.1);
+  // const [leverage, setLeverage] = useState(5);
+  // const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useState(true);
+  // const [entryPriceLimit, setEntryPriceLimit] = useState(0);
+  // const [priceValue, setPriceValue] = useState('');
+  // const [shortCollateralAddress, setShortCollateralAddress] = useState('0xf97f4df75117a78c1A5a0DBb814Af92458539FB4');
+  // const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
+
+
+  const [triggerPriceValue, setTriggerPriceValue] = useState("");
+  const triggerPriceUsd = type === MARKET ? 0 : parseValue(triggerPriceValue, USD_DECIMALS);
+  const onTriggerPriceChange = evt => {
+    setTriggerPriceValue(evt.target.value || "");
+  };
+  const onTriggerRatioChange = evt => {
+    setTriggerRatioValue(evt.target.value || "");
+  };
+
+  
+
+  // default collateral address on ARBITRUM
+  
+  const shortCollateralAddressInitAddr = perpetuals.getTokenBySymBol("USDT").address;
+  const [shortCollateralAddress, setShortCollateralAddress] = useState(shortCollateralAddressInitAddr);
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
-  const fromToken = constantInstance.perpetuals.getToken(fromTokenAddress);
-  const toToken = constantInstance.perpetuals.getToken(toTokenAddress);
+  console.log("test multichain: tokens", infoTokens, tokens)
+  const fromToken = perpetuals.getToken(fromTokenAddress);
+  const toToken = perpetuals.getToken(toTokenAddress);
 
   const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
   const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
@@ -377,7 +385,7 @@ const SwapComponent = props => {
   const collateralTokenAddress = isLong
     ? indexTokenAddress
     : shortCollateralAddress;
-  const collateralToken = constantInstance.perpetuals.getToken(collateralTokenAddress);
+  const collateralToken = perpetuals.getToken(collateralTokenAddress);
 
   const [triggerRatioValue, setTriggerRatioValue] = useState("");
   const triggerRatioInverted = useMemo(() => {
@@ -809,6 +817,7 @@ const SwapComponent = props => {
   };
 
   const createIncreaseOrder = () => {
+    console.log("inside createIncreaseOrder")
     let path = [fromTokenAddress];
 
     if (path[0] === USDG_ADDRESS) {
@@ -821,7 +830,7 @@ const SwapComponent = props => {
     }
 
     const minOut = 0;
-    const indexToken = constantInstance.perpetuals.getToken(indexTokenAddress);
+    const indexToken = perpetuals.getToken(indexTokenAddress);
     const successMsg = `
       Created limit order for ${indexToken.symbol} ${isLong ? "Long" : "Short"}: ${formatAmount(toUsdMax, USD_DECIMALS, 2)} USD!`;
     return Api.createIncreaseOrder(
@@ -1325,9 +1334,10 @@ const SwapComponent = props => {
       return;
     }
 
+    // TODO terms and condition pop up, we dont have it now
     if (needOrderBookApproval) {
       setOrdersToaOpen(true);
-      return;
+      // return;
     }
 
     if (needApproval) {

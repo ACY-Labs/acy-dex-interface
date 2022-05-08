@@ -59,9 +59,11 @@ export const CHART_PERIODS = {
   "1d": 60 * 60 * 24
 };
 
-export const MAINNET = 56;
+export const BSC_MAINNET = 56;
+export const BSC_TESTNET = 97;
+export const POLYGON_MAINNET = 137;
+export const POLYGON_TESTNET = 80001;
 export const AVALANCHE = 43114;
-export const TESTNET = 97;
 export const ARBITRUM_TESTNET = 421611;
 export const ARBITRUM = 42161;
 
@@ -755,21 +757,24 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   const method = ethers.utils.isAddress(arg0) ? arg1 : arg0
 
   function onError(e) {
-    console.error(contractInfo, method, e)
+    console.error(method, e)
   }
 
   if (ethers.utils.isHexString(arg0)) {
     const address = arg0
     const contract = new ethers.Contract(address, contractInfo, provider)
-    // console.log('fetcher', contractInfo, method, contract)
+    // console.log('fetcher contract', contract)
 
     try {
       if (additionalArgs) {
+        // console.log(method, "fetcher 2")
         // console.log('FETCHER FUNCTION CALLED WITH METHOD  --> ', method);
         // console.log('printing additional args', params, additionalArgs);
         // console.log('printing provider', contract);
+        // console.log("debug useSWR: ", contract, method, params.concat(additionalArgs))
         return contract[method](...params.concat(additionalArgs)).catch(onError)
       }
+      // console.log(method, "fetcher 3")
       return contract[method](...params).catch(onError)
     } catch (e) {
       onError(e)
@@ -778,6 +783,7 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   if (!library) {
     return
   }
+  // console.log(method, "fetcher 4")
   return library[method](arg1,...params).catch(onError);;
 }
 
@@ -786,9 +792,9 @@ export function getExplorerUrl(chainId) {
     return "https://ropsten.etherscan.io/";
   } else if (chainId === 42) {
     return "https://kovan.etherscan.io/";
-  } else if (chainId === MAINNET) {
+  } else if (chainId === BSC_MAINNET) {
     return "https://bscscan.com/";
-  } else if (chainId === TESTNET) {
+  } else if (chainId === BSC_TESTNET) {
     return "https://testnet.bscscan.com/";
   } else if (chainId === ARBITRUM_TESTNET) {
     return "https://rinkeby-explorer.arbitrum.io/";
@@ -1186,7 +1192,7 @@ export function getServerBaseUrl(chainId) {
       return fromLocalStorage;
     }
   }
-  if (chainId === MAINNET) {
+  if (chainId === BSC_MAINNET) {
     return "https://gambit-server-staging.uc.r.appspot.com";
   } else if (chainId === ARBITRUM_TESTNET) {
     return "https://gambit-l2.as.r.appspot.com";

@@ -9,7 +9,7 @@ import { getContract } from "@/acy-dex-futures/utils/Addresses"
 // getTokenBySymbol(chainId, symbol)
 // getWhitelistedTokens(chainId)
 
-const TokenListSelector = (arg: string) => {
+const PerpetualSelector = (arg: string) => {
     const chainId = parseInt(arg);
     return {
         wrappedToken: getWrappedToken(chainId),
@@ -24,4 +24,4 @@ const TokenListSelector = (arg: string) => {
     };
   }
   
-export default TokenListSelector;
+export default PerpetualSelector;

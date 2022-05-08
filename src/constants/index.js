@@ -36,7 +36,7 @@ export let constantInstance = {
     'marketAPISetting': FarmSettingSelector(56),
     'marketTokenList': TokenListSelector(56),
     'globalSettings' : GlobalSettingsSelector(56),
-    'perpetuals': PerpetualSelector(97),
+    'perpetuals': PerpetualSelector(80001),
 };
 
 // export web3 wallet status
@@ -90,7 +90,7 @@ export const ConstantLoader = (chainId = 56, marketChainId = 56) => {
         'marketAPISetting': FarmSettingSelector(marketNetwork),
         'marketTokenList': TokenListSelector(marketNetwork),
         'globalSettings' : GlobalSettingsSelector(fallbackChainId),
-        'perpetuals': PerpetualSelector(97)
+        'perpetuals': PerpetualSelector(fallbackChainId)
     };
 
     return constants;
@@ -187,7 +187,7 @@ export const useConstantLoader = () => {
 
     useEffect(() => {
         const chainSupportedIndex = (supportedChainIds.indexOf(chainId) !== -1);
-        const fallbackChainId = chainSupportedIndex ? chainId : 97;    // redirect unsupported chainId and undefined to 56
+        const fallbackChainId = chainSupportedIndex ? chainId : 80001;    // redirect unsupported chainId and undefined to 56
         console.log("chainId before fallback:", chainId);
         console.log("fallbackChainId chainId:", fallbackChainId);
         const marketChainSupportedIndex = (supportedChainIds.indexOf(marketChainId) !== -1);
@@ -303,6 +303,18 @@ export const useConstantLoader = () => {
         changeUrlChainId()
         // console.log("current chainId: " , history.location);
       }, [chainId])
+
+
+    // useEffect(() => {
+    //     if (window.ethereum) {
+    //         ethereum.on("chainChanged", (_chainId) => {
+    //             console.log("detected chainChanged: new on ", chainId, _chainId);
+    //             localStorage.setItem("lastChainId", _chainId);
+    //             window.location.reload()
+    //         })
+    //     }
+    // }, [chainId])
+
 
 
     
