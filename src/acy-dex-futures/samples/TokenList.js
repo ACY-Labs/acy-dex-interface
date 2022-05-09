@@ -160,7 +160,7 @@ const TOKENS = {
       name: "USD Coin",
       symbol: "USDC",
       decimals: 6,
-      address: "0x7a96316B13bD7d0529e701d2ED8b9fC4E4fd8696 ",
+      address: "0x7a96316B13bD7d0529e701d2ED8b9fC4E4fd8696",
       isStable: true
     },
     {
