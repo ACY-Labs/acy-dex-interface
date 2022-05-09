@@ -267,6 +267,21 @@ const SwapComponent = props => {
     toTokens = shortableTokens;
   }
 
+  const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
+  const initialToToken = perpetuals.getTokenBySymBol("BTC").address;
+  console.log("initialToToken: ", initialToToken, chainId)
+  const [toTokenAddress, setToTokenAddress] = useState(initialToToken);
+  // const [fromTokenInfo, setFromTokenInfo] = useState();
+  // const [toTokenInfo, setToTokenInfo] = useState();
+  // const [fees, setFees] = useState(0.1);
+  // const [leverage, setLeverage] = useState(5);
+  // const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useState(true);
+  // const [entryPriceLimit, setEntryPriceLimit] = useState(0);
+  // const [priceValue, setPriceValue] = useState('');
+  // const [shortCollateralAddress, setShortCollateralAddress] = useState('0xf97f4df75117a78c1A5a0DBb814Af92458539FB4');
+  // const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
+
+
   const tokenAddresses = tokens.map(token => token.address)
   const readerAddress = perpetuals.getContract("Reader")
   const vaultAddress = perpetuals.getContract("Vault")
@@ -321,19 +336,6 @@ const SwapComponent = props => {
     isWaitingForPluginApproval
   ]);
 
-  const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
-  const initialToToken = perpetuals.getTokenBySymBol("BTC").address;
-  console.log("initialToToken: ", initialToToken, chainId)
-  const [toTokenAddress, setToTokenAddress] = useState(initialToToken);
-  // const [fromTokenInfo, setFromTokenInfo] = useState();
-  // const [toTokenInfo, setToTokenInfo] = useState();
-  // const [fees, setFees] = useState(0.1);
-  // const [leverage, setLeverage] = useState(5);
-  // const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useState(true);
-  // const [entryPriceLimit, setEntryPriceLimit] = useState(0);
-  // const [priceValue, setPriceValue] = useState('');
-  // const [shortCollateralAddress, setShortCollateralAddress] = useState('0xf97f4df75117a78c1A5a0DBb814Af92458539FB4');
-  // const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
 
 
   const [triggerPriceValue, setTriggerPriceValue] = useState("");
@@ -977,7 +979,7 @@ const SwapComponent = props => {
 
     if (needOrderBookApproval) {
       approveOrderBook();
-      return;
+      // return;
     }
 
     setIsPendingConfirmation(true);
