@@ -636,7 +636,7 @@ const Swap = props => {
     let currentTime = getCurrentTime();
     let previous24 = currentTime - 24*60*60;    
     console.log("hereim time", previous24, currentTime);
-    let data24 = await getKChartData(activeToken1.symbol, "42161", "1d", previous24.toString(), currentTime.toString(), "chainlink");
+    let data24 = await getKChartData(activeToken1.symbol, "56", "1d", previous24.toString(), currentTime.toString(), "chainlink");
     console.log("hereim data24", data24);
     
     let high24 = 0;
@@ -662,7 +662,7 @@ const Swap = props => {
   useEffect(async () => {
     let currentTime = getCurrentTime();
     let previous24 = currentTime - 24*60*60;
-    let data24 = await getKChartData(activeToken1.symbol, "42161", "1d", previous24.toString(), currentTime.toString(), "chainlink");
+    let data24 = await getKChartData(activeToken1.symbol, "56", "1d", previous24.toString(), currentTime.toString(), "chainlink");
 
     let high24 = 0;
     let low24 = 0;

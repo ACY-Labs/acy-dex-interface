@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { KChartDataURL } from '../constant/index';
+import { constantInstance } from '@/constants';
 
 export function calcPercent( a, b){
   return ( (a/b) * 100 ).toFixed(2);
@@ -30,8 +30,9 @@ function candleSeriesDataParser(data) {
 }
 
 export async function getKChartData(tokenSymbol, preferableChainId, period, from, to, preferableSource ) {
+  const {backendPrefix} = constantInstance.perpetuals;
   const kchartdata = await axios.get(
-    KChartDataURL + tokenSymbol, {
+    backendPrefix + `/candles/${tokenSymbol}`, {
       params: {
         preferableChainId: preferableChainId,
         period: period,

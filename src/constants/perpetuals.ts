@@ -18,8 +18,8 @@ const PerpetualSelector = (chainId: Number) => {
         getToken: (address) => getToken(chainId, address),
         getTokenBySymBol: (symbol) => getTokenBySymbol(chainId, symbol),
         whitelistedTokens: getWhitelistedTokens(chainId),
-
         getContract: (name) => getContract(chainId, name),
+        backendPrefix: "http://localhost:3000/api"
     };
   }
   

@@ -17,7 +17,6 @@ import './styles.css';
 //   useLocalStorageSerializeKey
 // } from '../../../acy-dex-futures/utils/Helpers'
 
-// import { useChartPrices } from '../../../acy-dex-futures/Api'
 import Tab from '../../../acy-dex-futures/Tab/Tab'
 
 const Kchart=(props)=> {
@@ -182,7 +181,7 @@ const Kchart=(props)=> {
     let fromTime = getFromTime100( currentTime );
     let data;
     try {
-      data = await getKChartData(props.activeToken1.symbol, "42161", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
+      data = await getKChartData(props.activeToken1.symbol, "56", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
     } catch {
       data = [];
       console.log("fallback to empty array");
@@ -223,7 +222,7 @@ const Kchart=(props)=> {
   let fromTime = getFromTime100( currentTime );
   let data;
     try {
-      data = await getKChartData(props.activeToken1.symbol, "42161", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
+      data = await getKChartData(props.activeToken1.symbol, "56", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
     } catch {
       data = [];
       console.log("fallback to empty array");

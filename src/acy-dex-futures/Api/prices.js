@@ -59,6 +59,7 @@ function fillGaps(prices, periodSeconds) {
   return newPrices
 }
 
+// not in use anymore
 async function getChartPricesFromStats(chainId, symbol, period) {
   if (['WBTC', 'WETH', 'WAVAX'].includes(symbol)) {
     symbol = symbol.substr(1)
