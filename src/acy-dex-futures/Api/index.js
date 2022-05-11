@@ -558,15 +558,12 @@ export async function callContract(chainId, contract, method, params, opts) {
     if (!opts) {
       opts = {}
     }
-
     if (!opts.gasLimit) {
       opts.gasLimit = await getGasLimit(contract, method, params, opts.value)
     }
-
     if (!opts.gasPrice) {
       opts.gasPrice = await getGasPrice(contract.provider, chainId)
     }
-
     const res = await contract[method](...params, { gasLimit: opts.gasLimit, value: opts.value, gasPrice: opts.gasPrice })
     const txUrl = getExplorerUrl(chainId) + "tx/" + res.hash
     const sentMsg = opts.sentMsg || "Transaction sent."

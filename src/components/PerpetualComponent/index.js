@@ -327,7 +327,7 @@ const SwapComponent = props => {
       isWaitingForPluginApproval
     ) {
       setIsWaitingForPluginApproval(false);
-      // helperToast.success(<div>Orders enabled!</div>);
+      helperToast.success(<div>Orders enabled!</div>);
     }
   }, [
     needOrderBookApproval,
@@ -953,7 +953,7 @@ const SwapComponent = props => {
       USD_DECIMALS,
       2
     )} USD.`;
-
+    
     Api.callContract(chainId, contract, method, params, {
       value,
       setPendingTxns,
@@ -966,6 +966,7 @@ const SwapComponent = props => {
 
       })
       .finally(() => {
+        setIsConfirming(false);
         setIsSubmitting(false);
         setIsPendingConfirmation(false);
       });

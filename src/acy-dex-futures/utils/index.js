@@ -9,6 +9,7 @@ import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import { InjectedConnector, UserRejectedRequestError as UserRejectedRequestErrorInjected} from "@web3-react/injected-connector";
 import { useRef, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
+import { notification } from 'antd';
 import useSWR from "swr";
 import { getContract } from './Addresses';
 import { useLocalStorage } from "react-use";
@@ -1735,12 +1736,22 @@ export const shouldRaiseGasError = (token, amount) => {
 
 export const helperToast = {
     success: content => {
-        toast.dismiss();
-        toast.success(content);
+      notification.open({
+        message: "Successed",
+        description: content,
+        onClose: async () => {},
+      });
+        // toast.dismiss();
+        // toast.success(content);
     },
     error: content => {
-        toast.dismiss();
-        toast.error(content);
+      notification.open({
+        message: "Failed",
+        description: content,
+        onClose: async () => {},
+      });
+        // toast.dismiss();
+        // toast.error(content);
     }
 };
 
