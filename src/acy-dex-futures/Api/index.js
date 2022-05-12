@@ -14,6 +14,7 @@ import Token from '../abis/Token.json'
 
 import { getContract } from '../utils/Addresses'
 import { getConstant } from '../utils/Constants'
+import { constantInstance } from '@/constants'
 import {
   ARBITRUM,
   AVALANCHE,
@@ -565,7 +566,7 @@ export async function callContract(chainId, contract, method, params, opts) {
       opts.gasPrice = await getGasPrice(contract.provider, chainId)
     }
     const res = await contract[method](...params, { gasLimit: opts.gasLimit, value: opts.value, gasPrice: opts.gasPrice })
-    const txUrl = getExplorerUrl(chainId) + "tx/" + res.hash
+    const txUrl = constantInstance.perpetuals.explorerUrl + "tx/" + res.hash
     const sentMsg = opts.sentMsg || "Transaction sent."
     helperToast.success(
       <div>

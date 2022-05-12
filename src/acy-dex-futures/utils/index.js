@@ -803,6 +803,10 @@ export function getExplorerUrl(chainId) {
     return "https://arbiscan.io/";
   } else if (chainId === AVALANCHE) {
     return "https://snowtrace.io/";
+  } else if (chianId === POLYGON_TESTNET) {
+    return "https://mumbai.polygonscan.com/"
+  } else if (chainId === POLYGON_MAINNET) {
+    return "https://polygonscan.com/"
   }
   return "https://etherscan.io/";
 }
@@ -1737,8 +1741,14 @@ export const shouldRaiseGasError = (token, amount) => {
 export const helperToast = {
     success: content => {
       notification.open({
-        message: "Successed",
+        message: <div style={{"color": "#c3c5cb"}}>Submitted</div>,
         description: content,
+        style: {
+          radius: "10px",
+          border: "1px solid #2c2f36",
+          background: "#29292c",
+          color: "#c3c5cb",
+        },
         onClose: async () => {},
       });
         // toast.dismiss();
@@ -1746,8 +1756,14 @@ export const helperToast = {
     },
     error: content => {
       notification.open({
-        message: "Failed",
+        message: <div style={{"color": "#c3c5cb"}}>Failed</div>,
         description: content,
+        style: {
+          radius: "10px",
+          border: "1px solid #2c2f36",
+          background: "#29292c",
+          color: "#c3c5cb",
+        },
         onClose: async () => {},
       });
         // toast.dismiss();

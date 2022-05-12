@@ -138,7 +138,8 @@ export const GlpSwapBox = (props) => {
     swapTokenAddress, 
     setSwapTokenAddress,
     isWaitingForApproval, 
-    setIsWaitingForApproval
+    setIsWaitingForApproval,
+    setPendingTxns
   } = props
 
   const { account } = useConstantLoader(props)
@@ -465,16 +466,17 @@ export const GlpSwapBox = (props) => {
 
     const minGlp = glpAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR)
 
-    // const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner())
-    // const method = swapTokenAddress === AddressZero ? "mintAndStakeGlpETH" : "mintAndStakeGlp"
+    const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner())
+    const method = swapTokenAddress === AddressZero ? "mintAndStakeGlpETH" : "mintAndStakeGlp"
+    const params = swapTokenAddress === AddressZero ? [0, minGlp] : [swapTokenAddress, swapAmount, 0, minGlp]
+    const value = swapTokenAddress === AddressZero ? swapAmount : 0
+    // const contract = new ethers.Contract(glpManagerAddress, GlpManager, library.getSigner())
+    // const method = "addLiquidity"
     // const params = swapTokenAddress === AddressZero ? [0, minGlp] : [swapTokenAddress, swapAmount, 0, minGlp]
     // const value = swapTokenAddress === AddressZero ? swapAmount : 0
-    const contract = new ethers.Contract(glpManagerAddress, GlpManager, library.getSigner())
-    const method = "addLiquidity"
-    const params = [swapTokenAddress, swapAmount, 0, minGlp]
 
     callContract(chainId, contract, method, params, {
-      // value,
+      value,
       sentMsg: "Buy submitted!",
       failMsg: "Buy failed.",
       successMsg: `${parseFloat(glpAmount).toFixed(4)} ALP bought with ${parseFloat(swapAmount).toFixed(4)} ${swapToken.symbol}.`,
@@ -491,14 +493,16 @@ export const GlpSwapBox = (props) => {
 
     const minOut = swapAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR)
 
-    // const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner())
-    // const method = swapTokenAddress === AddressZero ? "unstakeAndRedeemGlpETH" : "unstakeAndRedeemGlp"
+    const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner())
+    const method = swapTokenAddress === AddressZero ? "unstakeAndRedeemGlpETH" : "unstakeAndRedeemGlp"
+    const params = swapTokenAddress === AddressZero ? [glpAmount, minOut, account] : [swapTokenAddress, glpAmount, minOut, account]
+    // const contract = new ethers.Contract(glpManagerAddress, GlpManager, library.getSigner())
+    // const method = "removeLiquidity"
     // const params = swapTokenAddress === AddressZero ? [glpAmount, minOut, account] : [swapTokenAddress, glpAmount, minOut, account]
-    const contract = new ethers.Contract(glpManagerAddress, GlpManager, library.getSigner())
-    const method = "removeLiquidity"
-    const params = [swapTokenAddress, glpAmount, minOut, account]
+    const value = swapTokenAddress === AddressZero ? swapAmount : 0
 
     callContract(chainId, contract, method, params, {
+      // value,
       sentMsg: "Sell submitted!",
       failMsg: "Sell failed.",
       successMsg: `${parseFloat(glpAmount).toFixed(4)} ALP sold for ${parseFloat(swapAmount).toFixed(4)} ${swapToken.symbol}.`,

@@ -963,7 +963,7 @@ const SwapComponent = props => {
     })
       .then(async () => {
         setIsConfirming(false);
-
+        
       })
       .finally(() => {
         setIsConfirming(false);
@@ -1633,6 +1633,7 @@ const SwapComponent = props => {
               setSwapTokenAddress={setSwapTokenAddress}
               isWaitingForApproval={glp_isWaitingForApproval}
               setIsWaitingForApproval={glp_setIsWaitingForApproval}
+              setPendingTxns={setPendingTxns}
             />
           </>
         }
