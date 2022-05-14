@@ -2,9 +2,12 @@
 
 .head {
   width: 100%;
-  transition: background 0.3s, width 0.2s;
+  // transition: background 0.3s, width 0.2s;
   height: @layout-header-height;
   position: relative;
+  background: black;
+  font-family: "Karla", sans-serif;
+  border: 0.75px solid #333333;
   :global {
     .ant-menu-submenu.ant-menu-submenu-horizontal {
       line-height: @layout-header-height;
@@ -33,7 +36,7 @@
           bottom: -2px;
           left: 20px;
           width: ~'calc(100% - 40px)';
-          background: #eb5c20;
+          // background: #eb5c20;
         }
       }
     }
@@ -50,7 +53,7 @@
         bottom: 7px;
         left: 20px;
         width: ~'calc(100% - 40px)';
-        background: #eb5c20;
+        // background: #eb5c20;
       }
       &:hover {
         &:after {
@@ -60,7 +63,7 @@
           bottom: 0px;
           left: 20px;
           width: ~'calc(100% - 40px)';
-          background: #eb5c20;
+          // background: #eb5c20;
           transition-property: bottom;
           transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
           transition-duration: 0.15s;
@@ -158,7 +161,7 @@
   height: calc(~'@{layout-header-height} - 0px');
   line-height: calc(~'@{layout-header-height} - 0px');
   border-bottom: 0 !important;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: bold;
   display: flex;
   flex-wrap: wrap;
