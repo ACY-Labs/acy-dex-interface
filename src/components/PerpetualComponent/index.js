@@ -1477,7 +1477,7 @@ const SwapComponent = props => {
   const glp_infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
 
   return (
-    <div>
+    <div className={styles.mainContent}>
       <AcyPerpetualCard style={{ backgroundColor: 'transparent' }}>
         <div className={styles.modeSelector}>
           <PerpTabs
