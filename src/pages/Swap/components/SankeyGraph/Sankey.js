@@ -66,8 +66,8 @@ const Link = ({ data, width, length, colors }) => {
       <path
         d={link(data)}
         fill="none"
-        // stroke={d3.rgb(colors(data.index))}
-        stroke={`url(#gradient-${data.index})`}
+        stroke={colors((data.target.index + data.source.index) / length)}
+        // stroke={`url(#gradient-${data.index})`}
         strokeOpacity={0.9}
         strokeWidth={width}
       />
@@ -145,33 +145,6 @@ export default function Sankey(props) {
     dragElement.current = null;
   };
 
-  const onMouseDown = e => {
-    if (e.target.tagName === "rect") {
-      dragElement.current = e.target;
-      offset.current = getMousePosition(e);
-      offset.current.y -= parseFloat(e.target.getAttributeNS(null, "y"));
-    }
-  };
-
-  const onMouseMove = e => {
-    if (dragElement.current) {
-      const coord = getMousePosition(e);
-      dragElement.current.setAttributeNS(null, "y", coord.y - offset.current.y);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("mouseup", onMouseUp);
-    window.addEventListener("mousedown", onMouseDown);
-    window.addEventListener("mousemove", onMouseMove);
-
-    return () => {
-      window.removeEventListener("mouseup", onMouseUp);
-      window.removeEventListener("mousedown", onMouseDown);
-      window.removeEventListener("mousemove", onMouseMove);
-    };
-  }, []);
-
   if (props.data) {
     graph.current = sankey(props.data);
     const { links, nodes } = graph.current;
@@ -184,7 +157,7 @@ export default function Sankey(props) {
               data={d}
               width={d.width}
               length={nodes.length}
-              colors={d3.interpolateCool}
+              colors={d3.interpolateRainbow}
             />
           ))}
         </g>
