@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-computed-key */
-import { Menu, Dropdown, message, Radio } from 'antd';
+import { Menu, Dropdown, message, Radio, Spin } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { useWeb3React } from '@web3-react/core';
 import React, { Component, useState, useEffect, useRef, useCallback, useMemo, useHistory } from 'react';
@@ -163,11 +163,89 @@ const StyledCard = styled(AcyCard)`
 const StyledSelect = styled(Radio.Group)`
   .ant-radio-button-wrapper{
     background: transparent;
+    // color: #48484a;
+    border: 0px;
+  }
+  .ant-radio-button-wrapper:hover{
+    background: #636366;
+    color: #fff;
+    border: 0px;
   }
   .ant-select-selection {
-    background-color: transparent;
+    background-color: #48484a;
+    color: #fff;
+    border: 0px;
+
+  }
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+    color: #fff;
+    border: 0px;
+  }
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover {
+    color: #fff;
+    border: 0px;
+  }
+  .ant-radio-button-wrapper:not(:first-child)::before{
+    border: 0px;
+    background-color: #0E0304 !important;
+    border-color: #0E0304;
+  }
+ 
+`;
+const StyledDropdown = styled(Dropdown)`
+  .ant-select-dropdown-menu {
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+  .ant-select-arrow {
+    color: white;
+  }
+  .ant-select-selection {
+    background-color: transparent !important;
+    border: 0.75px solid #232323;
+    border-radius: 5px;
+    height: 2.4rem;
+    width: 95px;
+    padding: 2px 6px;
+    font-size: 15px;
+    font-weight: 200;
+    color: white;
+    overflow: inherit;
+    margin-right: 10px;
+  }
+  site-dropdown-context-menu ant-dropdown-trigger
+  .ant-select-dropdown-menu,
+  .ant-select-dropdown-menu-root,
+  .ant-select-dropdown-menu-vertical{
+    max-height: none !important;
+    color: transparent;
+  }
+  .ant-select-dropdown-menu-item-active:not(.ant-select-dropdown-menu-item-disabled) {
+    background-color: transparent !important;
+  }
+  .ant-select-dropdown-menu-item {
+    color: #fff !important;
+    }
+  .dropdown-style {
+    .ant-select-dropdown-menu {
+    background: #1F1F26;
+    border: solid 1px #32323a;
+    }
+    .ant-select-dropdown-menu-item {
+    color: #b5b5b6 !important;
+    }
+    .ant-select-dropdown-menu-item:hover {
+    background: #32323a;
+    }
+    .ant-select-dropdown-menu-item-selected {
+    background: #fff;
+    }
+    .ant-select-dropdown-menu-item-active {
+    background: #32323a;
+    }
   }
 `;
+
 function getFundingFee(data) {
   let { entryFundingRate, cumulativeFundingRate, size } = data
   if (entryFundingRate && cumulativeFundingRate) {
@@ -184,7 +262,6 @@ const getTokenAddress = (token, nativeTokenAddress) => {
 
 export function getPositionQuery(tokens, nativeTokenAddress) {
   const collateralTokens = []
-  const indexTokens = []
   const isLong = []
 
   for (let i = 0; i < tokens.length; i++) {
@@ -193,8 +270,6 @@ export function getPositionQuery(tokens, nativeTokenAddress) {
     if (token.isWrapped) { continue }
     collateralTokens.push(getTokenAddress(token, nativeTokenAddress))
     indexTokens.push(getTokenAddress(token, nativeTokenAddress))
-    // console.log("see indextokens", token);
-    // console.log("see index token native addr", nativeTokenAddress);
     isLong.push(true)
   }
 
@@ -313,9 +388,8 @@ const Swap = props => {
   const { savedIsPnlInLeverage, setSavedIsPnlInLeverage, savedSlippageAmount, pendingTxns, setPendingTxns } = props
 
   const { account, library, chainId, farmSetting: { API_URL: apiUrlPrefix }, globalSettings, } = useConstantLoader();
-  console.log("this is constantInstance ", constantInstance);
+  // console.log("this is constantInstance ", constantInstance);
   const supportedTokens = constantInstance.perpetuals.tokenList;
-  console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
   const [isConfirming, setIsConfirming] = useState(false);
   const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
@@ -327,7 +401,7 @@ const Swap = props => {
   const [format, setFormat] = useState('h:mm:ss a');
   const [activeToken1, setActiveToken1] = useState(supportedTokens[1]);
   const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
-  const [activeTimeScale, setActiveTimeScale] = useState("1h");
+  const [activeTimeScale, setActiveTimeScale] = useState("5m");
   const [activeAbsoluteChange, setActiveAbsoluteChange] = useState('+0.00');
   const [activeRate, setActiveRate] = useState('Not available');
   const [range, setRange] = useState('1D');
@@ -345,11 +419,12 @@ const Swap = props => {
   const [positionsData, setPositionsData] = useState([]);
   const [ordersData, setOrdersData] = useState([]);
   const { active, activate } = useWeb3React();
-  const [placement, setPlacement] = useState('1d');
+  const [placement, setPlacement] = useState('5m');
   const [high24, setHigh24] = useState(0);
   const [low24, setLow24] = useState(0);
   const [deltaPrice24, setDeltaPrice24] = useState(0);
   const [percentage24, setPercentage24] = useState(0);
+  const [currentAveragePrice, setCurrentAveragePrice] = useState(0);
 
   //---------- FOR TESTING 
   const whitelistedTokens = supportedTokens.filter(token => token.symbol !== "USDG");
@@ -363,6 +438,7 @@ const Swap = props => {
     ["Swap"]: {
       from: AddressZero,
       to: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
+      // to: getTokenBySymbol(tokens, 'BTC').address,
     },
     ["Long"]: {
       from: AddressZero,
@@ -370,9 +446,12 @@ const Swap = props => {
     },
     ["Short"]: {
       from: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
+      // from: getTokenBySymbol(tokens, 'BTC').address,
       to: AddressZero,
     }
   }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
+// }), [chainId])
+
 
   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
   const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
@@ -565,7 +644,7 @@ const Swap = props => {
   //   //   }
   //   // });
   //   console.log("hereim", activeToken1);
-  //   // setChartData(await getKChartData(activeToken1.symbol, "42161", "1h", "1650234954", "1650378658", "chainlink"))
+  //   // setChartData(await getKChartData(activeToken1.symbol, "56", "1h", "1650234954", "1650378658", "chainlink"))
 
   // }, [activeToken0, activeToken1]);
 
@@ -584,7 +663,6 @@ const Swap = props => {
 
   const getCurrentTime = () => {
     let currentTime = Math.floor(new Date().getTime()/1000);
-    // console.log("hereim current time", currentTime);
     return currentTime;
   }
   const getFromTime = ( currentTime ) => {
@@ -593,97 +671,90 @@ const Swap = props => {
     return fromTime;
   }
 
-  // const get24Change = ( timeScale ) => {
-  //   let currentTime = getCurrentTime();
-  //   let fromTime;
-  //   switch (timeScale) {
-  //     case "1w":
-  //       fromTime = currentTime - 7*24*60*60;
-  //       break;
-  //     case "1d": 
-  //       fromTime = currentTime - 24*60*60;
-  //       break;
-  //     case "4h":
-  //       fromTime = currentTime - 4*60*60;
-  //       break;
-  //     case "1h":
-  //       fromTime = currentTime - 60*60;
-  //       break;
-  //     case "15m":
-  //       fromTime = currentTime - 15*60;
-  //       break;
-  //     case "5m":
-  //       fromTime = currentTime - 5*60;
-  //       break;
-  //   }
-  //   return fromTime;
-  // }
-
-
+ 
   // useEffect(async () => {
   //   let currentTime = getCurrentTime();
-  //   let fromTime = getFromTime( currentTime );
-  //   console.log("hereim from", fromTime.toString());
-  //   console.log("hereim to", currentTime.toString());
-  //   console.log("hereim timescale", activeTimeScale);
-  //   let data = await getKChartData(activeToken1.symbol, "42161", activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
-  //   console.log("hereim data", data);
+  //   let previous24 = currentTime - 24*60*60;    
+  //   console.log("hereim time", previous24, currentTime);
+  //   let data24 = await getKChartData(activeToken1.symbol, "56", "1d", previous24.toString(), currentTime.toString(), "chainlink");
+  //   console.log("hereim data24", data24);
     
+  //   let high24 = 0;
+  //   let low24 = 0;
+  //   let deltaPrice24 = 0;
+  //   let currentAveragePrice = 0;
+  //   let percentage = 0;
+  //   if (data24.length > 1) {
+  //     high24 = Math.round(data24[0].high * 100) / 100;
+  //     low24 = Math.round(data24[0].low * 100) / 100;    
+  //     deltaPrice24 = Math.round(data24[0].open * 100) / 100;
+  //     currentAveragePrice = ((high24+low24)/2);
+  //     percentage = Math.round((currentAveragePrice - deltaPrice24) *100 / currentAveragePrice *100)/100;
+  //   }
     
-  // },[activeToken1, activeTimeScale])
+  //   setHigh24(high24);
+  //   setLow24(low24);
+  //   setDeltaPrice24(deltaPrice24);
+  //   setPercentage24(percentage);
+
+  // }, [activeToken1])
 
   useEffect(async () => {
     let currentTime = getCurrentTime();
-    let previous24 = currentTime - 24*60*60;    
-    console.log("hereim time", previous24, currentTime);
-    let data24 = await getKChartData(activeToken1.symbol, "56", "1d", previous24.toString(), currentTime.toString(), "chainlink");
-    console.log("hereim data24", data24);
-    
-    let high24 = 0;
-    let low24 = 0;
-    let deltaPrice24 = 0;
-    let currentAveragePrice = 0;
-    let percentage = 0;
-    if (data24.length > 1) {
-      high24 = Math.round(data24[0].high * 100) / 100;
-      low24 = Math.round(data24[0].low * 100) / 100;    
-      deltaPrice24 = Math.round(data24[0].open * 100) / 100;
-      currentAveragePrice = ((high24+low24)/2);
-      percentage = Math.round((currentAveragePrice - deltaPrice24) *100 / currentAveragePrice *100)/100;
+    console.log("hereim current time", getCurrentTime())
+    let previousTime;
+    previousTime = currentTime - 24*60*60 ;
+    console.log("hereim previous time", previousTime)
+
+    let data24
+    let high24
+    let low24;
+    let deltaPrice24
+    let percentage;
+    try {
+      data24 = await getKChartData(activeToken1.symbol, "56", "5m", previousTime.toString(), currentTime.toString(), "chainlink");
+    } catch {
+      data = [];
+      console.log("fallback to empty array");
     }
+    let highArr = [];
+    let lowArr = [];
+    for (let i=1; i < data24.length; i++){
+      highArr.push(data24[i].high);
+      lowArr.push(data24[i].low);
+    }
+    high24 = Math.max(...highArr);
+    low24 = Math.min(...lowArr);
+    high24 = Math.round(high24*100)/100;
+    low24 = Math.round(low24*100)/100;
     
+    // console.log("hereim 24 indextokens", vaultTokenInfo);
+    // console.log("hereim 24 tokeninfo", infoTokens);
+
+    // const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
+    // console.log("hereim 24 infoTokens", infoTokens);
+    // const tokenInfo = getTokenInfo(infoTokens, activeToken1.address, true, nativeTokenAddress);
+    // console.log("hereim 24tokeninfo", tokenInfo);
+
+    // console.log("hereim in useeffect perpetual data", data24[1])
+    // if (data24.length > 1) {
+      // high24 = Math.round(data24[1].high * 100) / 100;
+      // low24 = Math.round(data24[1].low * 100) / 100;    
+      // high24 = tokenInfo.maxPrice;
+      // low24 = tokenInfo.minPrice;
+    // }
+    
+    deltaPrice24 = Math.round(data24[0].open * 100) / 100;
+    let average = Math.round( ((high24+low24)/2) *100)/100;
+    percentage = Math.round((average - deltaPrice24) *100 / average *100)/100;
+
     setHigh24(high24);
     setLow24(low24);
     setDeltaPrice24(deltaPrice24);
     setPercentage24(percentage);
-
+    setCurrentAveragePrice(average);
+    // console.log("hereim show 24 cal", "high24:", high24, " low24:", low24, " average:", currentAveragePrice, " delta:", deltaPrice24);
   }, [activeToken1])
-
-  useEffect(async () => {
-    let currentTime = getCurrentTime();
-    let previous24 = currentTime - 24*60*60;
-    let data24 = await getKChartData(activeToken1.symbol, "56", "1d", previous24.toString(), currentTime.toString(), "chainlink");
-
-    let high24 = 0;
-    let low24 = 0;
-    let deltaPrice24 = 0;
-    let currentAveragePrice = 0;
-    let percentage = 0;
-    if (data24.length > 1) {
-      high24 = Math.round(data24[0].high * 100) / 100;
-      low24 = Math.round(data24[0].low * 100) / 100;    
-      deltaPrice24 = Math.round(data24[0].open * 100) / 100;
-      currentAveragePrice = ((high24+low24)/2);
-      percentage = Math.round((currentAveragePrice - deltaPrice24) *100 / currentAveragePrice *100)/100;
-    }
-    
-    setHigh24(high24);
-    setLow24(low24);
-    setDeltaPrice24(deltaPrice24);
-    setPercentage24(percentage);
-    console.log("hereim show 24 cal", "high24:", high24, " low24:", low24, " average:", currentAveragePrice, " delta:", deltaPrice24);
-
-  }, [])
 
   const lineTitleRender = () => {
 
@@ -699,8 +770,6 @@ const Swap = props => {
     // }
     // console.log("hereim after await", high24 );
     // const chartToken = getTokenInfo(infoTokens, activeToken1.address)    
-
-  
 
     // const swapTokenPosition = () => {
     //   const tempSwapToken = activeToken0;
@@ -718,60 +787,22 @@ const Swap = props => {
     return [
       // <div style={{ width: 50%}}>      
       <div className={styles.maintitle}>
-        {/* <div>
-          <div className={styles.secondarytitle}> $ {high24}</div>
-          <div className={styles.secondarytitle}> $ {low24}</div>
-        </div> */}
         <div>
-          <div className={styles.secondarytitle}> 24h Change</div>
-          <div className={styles.secondarytitle}> {percentage24} % </div>
+          <div className={styles.secondarytitle}> 24h Change </div>
+          <div className={styles.lighttitle}> {percentage24} % </div>
 
         </div>
         <div>
-          <div className={styles.secondarytitle}> 24h High</div>
-          <div className={styles.secondarytitle}> $ {high24}</div>
+          <div className={styles.secondarytitle}> 24h High </div>
+          <div className={styles.lighttitle}> $ {high24} </div>
 
         </div>
         <div>
-          <div className={styles.secondarytitle}> 24h Low</div>
-          <div className={styles.secondarytitle}> $ {low24}</div>
+          <div className={styles.secondarytitle}> 24h Low </div>
+          <div className={styles.lighttitle}> $ {low24} </div>
         </div>
-
-
-        {/* <div className={styles.maintitle}>
-         
-          <div className={styles.lighttitle} style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }} onClick={onSelectToken}>
-            <img
-              src={token0logo}
-              alt=""
-              style={{ width: 24, maxWidth: '24px', maxHeight: '24px', marginRight: '0.25rem', marginTop: '0.1rem' }}
-            />
-            <img
-              src={token1logo}
-              alt=""
-              style={{ width: 24, maxHeight: '24px', marginRight: '0.5rem', marginTop: '0.1rem' }}
-            />
-            <span>
-              {activeToken0.symbol}&nbsp;/&nbsp;{activeToken1.symbol}
-            </span>
-
-          </div>
-
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div className={styles.secondarytitle}>
-            <span className={styles.lighttitle}>{activeRate}</span>{' '}
-            <span className={styles.percentage}>{activeAbsoluteChange}</span>
-          </div>
-          <AcyPeriodTime
-            onhandPeriodTimeChoose={onhandPeriodTimeChoose}
-            className={styles.pt}
-            // times={['1D', '1W', '1M']}
-            // times={['24h', 'Max']}
-            times={['24h']}
-          />
-    </div> */}
       </div>
+
     ];
   };
 
@@ -816,7 +847,9 @@ const Swap = props => {
 
   const onClickDropdown = e => {
     // console.log("hereim dropdown", e.key);
-    setActiveToken1((supportedTokens.filter(ele => ele.symbol == e.key))[0]);
+    console.log("hereim dropdown", e); 
+    console.log("hereim dropdown supprted", supportedTokens);   
+    setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
   };
 
 
@@ -950,26 +983,28 @@ const Swap = props => {
   const placementChange = e => {
     setPlacement(e.target.value);
     setActiveTimeScale(e.target.value);
-    console.log("hereim activetimescale", activeTimeScale);
   };
 
 
   // let options = supportedTokens;
-  const menu = (
-    <Menu onClick={onClickDropdown}>
-      {
-        supportedTokens.filter(token => !token.symbol !== 'USDT').map((option) => (
-          <Menu.Item key={option.symbol}>
-            <span>{option.symbol} / USD</span> 
-            {/* for showing before hover */}
-          </Menu.Item>
-        ))
-      }
-    </Menu>
-  );
+  // const menu = (
+  //   <div className={styles.tokenSelector}>
+  //     <Menu onClick={onClickDropdown}>
+  //       {
+
+  //         // supportedTokens.filter(token => !token.symbol !== 'USDT').map((option) => (
+  //         //   <Menu.Item key={option.symbol}>
+  //         //     <span>{option.symbol} / USD</span> 
+  //         //     {/* for showing before hover */}
+  //         //   </Menu.Item>
+  //         // ))
+  //       }
+  //     </Menu>
+  //   </div>
+  // );
 
   function onChange (value) {
-    // console.log("onchange",value);
+    // console.log("hereim onchange",value);
     setActiveToken1(option);
   }
 
@@ -978,38 +1013,59 @@ const Swap = props => {
     <PageHeaderWrapper>
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
-          <div className={styles.secondarytitle}>
-          
-              <Dropdown overlay={menu} > 
-                <div
-                  className="site-dropdown-context-menu"
-                  style={{
-                    textAlign: 'left',
-                    height: 50,
-                    width: 120,
-                    lineHeight: '50px',
-                  }}
-                >
-                  {activeToken1.symbol} / USD
-                </div>
-                {/* <div>{lineTitleRender()}</div> */}
-              </Dropdown>
-              {lineTitleRender()}
-              <StyledSelect value={placement} onChange={placementChange}>
+            <div className={styles.chartHeader}>
+              <div className={styles.tokenSelector}>
+                  <Select 
+                    value={activeToken1.symbol} 
+                    onChange={onClickDropdown}                  
+                    dropdownClassName={styles.dropDownMenu}
+                  >
+                  {supportedTokens.filter(token => token.symbol !== 'USDT' && token.symbol !== 'USDC' && token.symbol !== 'WMATIC').map((option) => (
+                    <Option className={styles.optionItem} value={option.symbol}>{option.symbol} / USD</Option>
+                  ))}
+                </Select>
+              </div>
+
+              {/* <Dropdown overlay={menu} > 
+                <div className={styles.tokenSelector}>
+                    <div
+                      className="site-dropdown-context-menu"
+                      style={{
+                        textAlign: 'left',
+                        height: 50,
+                        width: 120,
+                        lineHeight: '50px',
+                      }}
+                    >
+                      {activeToken1.symbol} / USD
+                    </div>
+                    {/* <div>{lineTitleRender()}</div> */}
+                  {/* </div> */}
+                {/* </Dropdown> */} 
+                {lineTitleRender()}
+            </div>
+              {/* <div>{activeToken1.maxPrice && formatAmount(activeToken1.maxPrice, USD_DECIMALS, 2)}</div> */}
+          {/* K chart */}
+              
+              
+          <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
+            <div className={styles.kchartBox}>
+            <StyledSelect value={placement} onChange={placementChange}>
                 <Radio.Button value="5m">5m</Radio.Button>
                 <Radio.Button value="15m">15m</Radio.Button>
                 <Radio.Button value="1h">1h</Radio.Button>
                 <Radio.Button value="4h">4h</Radio.Button>
                 <Radio.Button value="1d">1d</Radio.Button>
-                {/* <Radio.Button value="1w">1w</Radio.Button> */}
+                <Radio.Button value="1w">1w</Radio.Button>
               </StyledSelect>
-              {/* <div>{activeToken1.maxPrice && formatAmount(activeToken1.maxPrice, USD_DECIMALS, 2)}</div> */}
-          </div>
-          {/* K chart */}
-          <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
-            <div className={`${styles.colItem} ${styles.priceChart}`}>
-              <KChart activeToken0={activeToken0} activeToken1={activeToken1} activeTimeScale={activeTimeScale}/>
-            </div>
+              </div>
+              <div className={`${styles.colItem} ${styles.priceChart}`}>
+                {
+                  currentAveragePrice === 0 ?
+                  <Spin/>
+                  : <KChart activeToken0={activeToken0} activeToken1={activeToken1} activeTimeScale={activeTimeScale} currentAveragePrice={currentAveragePrice} />
+                }
+              </div>
           </AcyPerpetualCard>
 
           {/* Position table */}

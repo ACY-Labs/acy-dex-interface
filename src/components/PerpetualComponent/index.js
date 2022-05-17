@@ -357,7 +357,7 @@ const SwapComponent = props => {
   console.log("test multichain: tokens", infoTokens, tokens)
   const fromToken = perpetuals.getToken(fromTokenAddress);
   const toToken = perpetuals.getToken(toTokenAddress);
-
+  
   const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
   const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
   const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
@@ -1613,7 +1613,7 @@ const SwapComponent = props => {
               </AcyDescriptions>
             }
 
-            <div>
+            <div className={styles.centerButton}>
               <AcyPerpetualButton
                 // <AcyButton
                 style={{ marginTop: '25px' }}

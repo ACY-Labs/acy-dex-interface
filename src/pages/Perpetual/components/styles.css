@@ -67,6 +67,7 @@
     white-space: nowrap;
     z-index: 2;
     padding: 0.5rem 0px;
+    font-family: "Karla", sans-serif;
   }
   .TabBlock{
     display: grid;

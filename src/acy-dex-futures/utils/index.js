@@ -14,6 +14,7 @@ import useSWR from "swr";
 import { getContract } from './Addresses';
 import { useLocalStorage } from "react-use";
 import { constantInstance, useConstantLoader } from '@/constants';
+import { format as formatDateFn } from "date-fns";
 export const MARKET = 'Market';
 export const LIMIT = 'Limit';
 export const LONG = 'Long';
@@ -603,10 +604,13 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
         }
         infoTokens[token.address] = token
     }
-
+    // console.log("hereim whitelisted", vaultTokenInfo)
     for (let i = 0; i < whitelistedTokens.length; i++) {
         const token = JSON.parse(JSON.stringify(whitelistedTokens[i]))
+        // console.log("hereim vault above", vaultTokenInfo)
+
         if (vaultTokenInfo) {
+          // console.log("hereim vault", vaultTokenInfo)
             token.poolAmount = vaultTokenInfo[i * vaultPropsLength]
             token.reservedAmount = vaultTokenInfo[i * vaultPropsLength + 1]
             token.availableAmount = token.poolAmount.sub(token.reservedAmount)
@@ -758,6 +762,7 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   const method = ethers.utils.isAddress(arg0) ? arg1 : arg0
 
   function onError(e) {
+    // console.log("hereim fetcher error", e);
     console.error(method, e)
   }
 
@@ -775,7 +780,6 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
         // console.log("debug useSWR: ", contract, method, params.concat(additionalArgs))
         return contract[method](...params.concat(additionalArgs)).catch(onError)
       }
-      // console.log(method, "fetcher 3")
       return contract[method](...params).catch(onError)
     } catch (e) {
       onError(e)
@@ -784,7 +788,6 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   if (!library) {
     return
   }
-  // console.log(method, "fetcher 4")
   return library[method](arg1,...params).catch(onError);;
 }
 
@@ -803,7 +806,7 @@ export function getExplorerUrl(chainId) {
     return "https://arbiscan.io/";
   } else if (chainId === AVALANCHE) {
     return "https://snowtrace.io/";
-  } else if (chianId === POLYGON_TESTNET) {
+  } else if (chainId === POLYGON_TESTNET) {
     return "https://mumbai.polygonscan.com/"
   } else if (chainId === POLYGON_MAINNET) {
     return "https://polygonscan.com/"
@@ -1803,4 +1806,11 @@ export function usePrevious(value) {
         ref.current = value;
     });
     return ref.current;
+}
+
+export function formatDateTime(time) {
+  return formatDateFn(time * 1000, "dd MMM yyyy, h:mm a");
+}
+export function formatDate(time) {
+  return formatDateFn(time * 1000, "dd MMM yyyy");
 }
