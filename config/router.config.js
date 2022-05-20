@@ -60,6 +60,10 @@ export default [
         component: './Perpetual/Index',
       },
       {
+        path: '/',
+        name: 'Option',
+      },
+      {
         path: '/launchpad',
         name: 'Launch',
         hideChildrenInMenu: true,
@@ -73,6 +77,10 @@ export default [
             component: './LaunchPad/LaunchpadProject',
           },
         ],
+      },
+      {
+        path: '/',
+        name: 'Stablecoin',
       },
       {
         path: '/liquidity',
