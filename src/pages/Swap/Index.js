@@ -36,6 +36,7 @@ import { API_URL, useConstantLoader } from '@/constants';
 import {useConnectWallet} from '@/components/ConnectWallet';
 import useSWR from 'swr';
 import {TxFetcher} from '@/utils/utils';
+import SankeyGraph from './components/SankeyGraph'
 
 const { AcyTabPane } = AcyTabs;
 function getTIMESTAMP(time) {
@@ -568,7 +569,10 @@ const Swap = props => {
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
           <div className={`${styles.colItem} ${styles.priceChart}`}>
-            <StyledCard title={lineTitleRender()}>
+            <AcyCard style={{ backgroundColor: '#1b1b1c', padding: '10px' }}>
+              <SankeyGraph />
+            </AcyCard>
+            {/* <StyledCard title={lineTitleRender()}>
               <div
                 style={{
                   // width: '100%',
@@ -594,14 +598,14 @@ const Swap = props => {
 
                 </div>
               </div>
-            </StyledCard> 
+            </StyledCard>  */}
           </div> 
           
           {/* <div>
             Hello: {history.location.pathname}
           </div> */}
           <div className={`${styles.colItem} ${styles.swapComponent}`} >
-            <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
+            <AcyCard style={{ backgroundColor: '#1b1b1c', padding: '10px' }}>
               <div className={styles.trade}>
                 <SwapComponent
                   onSelectToken0={token => {

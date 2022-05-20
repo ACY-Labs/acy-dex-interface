@@ -62,6 +62,15 @@ const AcyCuarrencyCard = ({
     >
       <div className={`${styles.cua_body} ${light && styles.cua_light}`}>
         <div className={styles.cua_group}>
+          <input
+              ref={inputRef}
+              className={styles.input}
+              style={{ color: inputColor }}
+              placeholder="0.0"
+              bordered={false}
+              value={token}
+              onChange={onChange}
+            />
           <button className={styles.switchcoin} onClick={onChoseToken} disabled={isLocked}>
             <span className={styles.wrap}>
               <div className={styles.coin}>
@@ -73,15 +82,6 @@ const AcyCuarrencyCard = ({
               )}
             </span>
           </button>
-          <input
-            ref={inputRef}
-            className={styles.input}
-            style={{ color: inputColor }}
-            placeholder="0.0"
-            bordered={false}
-            value={token}
-            onChange={onChange}
-          />
         </div>
           {rest.bonus && rest.bonus != 0
           ? <div className={classname(styles.cua_group, styles.bonus)}>{rest.bonus > 0 ? "+" + rest.bonus : rest.bonus}</div>

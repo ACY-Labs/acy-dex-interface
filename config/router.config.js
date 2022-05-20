@@ -50,29 +50,14 @@ export default [
         ],
       },
       {
-        path: '/perpetual',
-        name: 'Perpetual',
-        component: './Perpetual/Index',
-      },
-      {
-        path: '/stats',
-        name: 'Stats',
-        component: './Stats/Index',
-      },
-      {
         path: '/exchange',
         name: 'Exchange',
         component: './Swap/Index',
       },
       {
-        path: '/liquidity',
-        name: 'Liquidity',
-        component: './Liquidity/Index',
-      },
-      {
-        path: '/farms',
-        name: 'Farm',
-        component: './Farms/',
+        path: '/perpetual',
+        name: 'Future',
+        component: './Perpetual/Index',
       },
       {
         path: '/launchpad',
@@ -88,6 +73,21 @@ export default [
             component: './LaunchPad/LaunchpadProject',
           },
         ],
+      },
+      {
+        path: '/liquidity',
+        name: 'Liquidity',
+        component: './Liquidity/Index',
+      },
+      {
+        path: '/farms',
+        name: 'Farm',
+        component: './Farms/',
+      },
+      {
+        path: '/stats',
+        name: 'Statistics',
+        component: './Stats/Index',
       },
       {
         path: '/transaction/:id?',

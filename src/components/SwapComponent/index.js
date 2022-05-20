@@ -650,6 +650,7 @@ const SwapComponent = props => {
                     Auto
                   </Button> */}
               <Input
+                className={styles.input}
                 value={inputSlippageTol || ''}
                 onChange={e => {
                   setInputSlippageTol(e.target.value);
@@ -685,11 +686,18 @@ const SwapComponent = props => {
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                width: '50%',
+                height: '33px',
                 marginTop: '7px',
               }}
             >
-              <Input type="number" value={Number(deadline).toString()} onChange={e => setDeadline(e.target.valueAsNumber || 0)} placeholder={30} suffix={<strong>minutes</strong>} />
+              <Input 
+                className={styles.input}
+                type="number" 
+                value={Number(deadline).toString()} 
+                onChange={e => setDeadline(e.target.valueAsNumber || 0)} 
+                placeholder={30} 
+                suffix={<strong>minutes</strong>} 
+              />
             </div>
           </div>
         </div>

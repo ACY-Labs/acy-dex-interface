@@ -13,79 +13,79 @@ import {
 import { dataSourceCoin, dataSourcePool } from './SampleData.js';
 import styles from './styles.less';
 import { abbrNumber, FEE_PERCENT } from './Util.js';
-import { MarketSearchBar, PoolTable, TokenTable, TransactionTable } from './UtilComponent.js';
-import { JsonRpcProvider } from "@ethersproject/providers"; 
+import { MarketSearchBar, PoolTable, TokenTable, TransactionTable, CurrencyTable } from './UtilComponent.js';
+import { JsonRpcProvider } from "@ethersproject/providers";
 import { isMobile } from 'react-device-detect';
 import ConnectWallet from './ConnectWallet';
 
 import { useConstantLoader } from '@/constants';
 
-import {useConnectWallet} from '@/components/ConnectWallet';
+import { useConnectWallet } from '@/components/ConnectWallet';
 
 
 const MarketIndex = props => {
-  const [visible,setVisible] = useState(true);
-  const [tabIndex,setTabIndex] = useState(0);
-  const [selectedIndexLine,setselectedIndexLine] = useState(0);
-  const [selectedDataLine,setselectedDataLine] = useState(0);
-  const [selectedIndexBar,setselectedIndexBar] = useState(0);
-  const [selectedDataBar,setselectedDataBar] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const [tabIndex, setTabIndex] = useState(0);
+  const [selectedIndexLine, setselectedIndexLine] = useState(0);
+  const [selectedDataLine, setselectedDataLine] = useState(0);
+  const [selectedIndexBar, setselectedIndexBar] = useState(0);
+  const [selectedDataBar, setselectedDataBar] = useState(0);
   const [chartData, setchartData] = useState({
     tvl: [],
     volume24h: [],
   });
-  const [overallVolume,setoverallVolume] = useState(-1);
-  const [overallTvl,setoverallTvl] = useState(-1);
-  const [overallFees,setoverallFees] = useState(-1);
-  const [ovrVolChange,setovrVolChange] = useState(0.0);
-  const [ovrTvlChange,setovrTvlChange] = useState(0.0);
-  const [ovrFeeChange,setovrFeeChange] = useState(0.0);
-  const [transactions,settransactions] = useState(null);
-  const [tokenInfo,settokenInfo] = useState([]);
+  const [overallVolume, setoverallVolume] = useState(-1);
+  const [overallTvl, setoverallTvl] = useState(-1);
+  const [overallFees, setoverallFees] = useState(-1);
+  const [ovrVolChange, setovrVolChange] = useState(0.0);
+  const [ovrTvlChange, setovrTvlChange] = useState(0.0);
+  const [ovrFeeChange, setovrFeeChange] = useState(0.0);
+  const [transactions, settransactions] = useState(null);
+  const [tokenInfo, settokenInfo] = useState([]);
 
-  const [poolInfo,setpoolInfo] = useState([]);
+  const [poolInfo, setpoolInfo] = useState([]);
 
-  const [tokenError,settokenError] = useState('');
+  const [tokenError, settokenError] = useState('');
 
-  const [pullError,setpullError] = useState('');
-  const [transactionError,settransactionError] = useState('');
+  const [pullError, setpullError] = useState('');
+  const [transactionError, settransactionError] = useState('');
 
-  const [barChartError,setbarChartError] = useState('');
+  const [barChartError, setbarChartError] = useState('');
 
-  const [lineChartError,setlineChartError] = useState('');
-  const [overviewError,setoverviewError] = useState('');
+  const [lineChartError, setlineChartError] = useState('');
+  const [overviewError, setoverviewError] = useState('');
 
-  const [marketNetwork,setmarketNetwork] = useState('');
+  const [marketNetwork, setmarketNetwork] = useState('');
 
-  const {activate } = useWeb3React();
-  const {account, library, chainId} = useConstantLoader();
+  const { activate } = useWeb3React();
+  const { account, library, chainId } = useConstantLoader();
 
 
   // connect to provider, listen for wallet to connect
   const connectWalletByLocalStorage = useConnectWallet();
- 
+
   useEffect(() => {
-    if(!localStorage.getItem("market")){
+    if (!localStorage.getItem("market")) {
       localStorage.setItem("market", 56);
     }
-    if(!account){
+    if (!account) {
       connectWalletByLocalStorage();
     }
   }, []);
 
   useEffect(() => {
     fetchGlobalTransaction().then(globalTransactions => {
-        console.log('globaltransaction', globalTransactions);
-        if(globalTransactions) settransactions(globalTransactions);
+      console.log('globaltransaction', globalTransactions);
+      if (globalTransactions) settransactions(globalTransactions);
     });
-    
+
     fetchGeneralPoolInfoDay().then(poolInfo => {
-      if(poolInfo) setpoolInfo ( poolInfo );
+      if (poolInfo) setpoolInfo(poolInfo);
     });
 
     // fetch token info
     fetchGeneralTokenInfo().then(tokenInfo => {
-      if(tokenInfo) settokenInfo(tokenInfo);
+      if (tokenInfo) settokenInfo(tokenInfo);
       console.log("token to render", tokenInfo)
     });
 
@@ -93,28 +93,29 @@ const MarketIndex = props => {
     console.log("BUG HERE:");
     fetchMarketData().then(dataDict => {
       console.log("BUG HERE2:", dataDict);
-      if(dataDict){
-      let volumeChange =
-        (dataDict.volume24h[dataDict.tvl.length - 1][1] -
-          dataDict.volume24h[dataDict.tvl.length - 2][1]) /
-        dataDict.volume24h[dataDict.tvl.length - 2][1];
+      if (dataDict) {
+        let volumeChange =
+          (dataDict.volume24h[dataDict.tvl.length - 1][1] -
+            dataDict.volume24h[dataDict.tvl.length - 2][1]) /
+          dataDict.volume24h[dataDict.tvl.length - 2][1];
 
-      let tvlChange =
-        (dataDict.tvl[dataDict.tvl.length - 1][1] - dataDict.tvl[dataDict.tvl.length - 2][1]) /
-        dataDict.tvl[dataDict.tvl.length - 2][1];
+        let tvlChange =
+          (dataDict.tvl[dataDict.tvl.length - 1][1] - dataDict.tvl[dataDict.tvl.length - 2][1]) /
+          dataDict.tvl[dataDict.tvl.length - 2][1];
 
-      let fee = dataDict.volume24h[dataDict.tvl.length - 1][1] * FEE_PERCENT
-      setchartData (dataDict);
-      setoverallVolume(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));
-      setoverallTvl(abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]));
-      setoverallFees(abbrNumber(fee));
-      setovrVolChange((volumeChange * 100).toFixed(2));
-      setovrFeeChange((volumeChange * 100).toFixed(2));
-      setovrTvlChange((tvlChange * 100).toFixed(2));
-      setselectedIndexLine(dataDict.tvl.length - 1);
-      setselectedDataLine(abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]));
-      setselectedIndexBar(dataDict.volume24h.length - 1);
-      setselectedDataBar(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));}
+        let fee = dataDict.volume24h[dataDict.tvl.length - 1][1] * FEE_PERCENT
+        setchartData(dataDict);
+        setoverallVolume(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));
+        setoverallTvl(abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]));
+        setoverallFees(abbrNumber(fee));
+        setovrVolChange((volumeChange * 100).toFixed(2));
+        setovrFeeChange((volumeChange * 100).toFixed(2));
+        setovrTvlChange((tvlChange * 100).toFixed(2));
+        setselectedIndexLine(dataDict.tvl.length - 1);
+        setselectedDataLine(abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]));
+        setselectedIndexBar(dataDict.volume24h.length - 1);
+        setselectedDataBar(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));
+      }
     });
   }, [chainId, marketNetwork]);
 
@@ -135,7 +136,7 @@ const MarketIndex = props => {
 
   return (
     <div className={styles.marketRoot}>
-      <ConnectWallet/>
+      <ConnectWallet />
       <MarketSearchBar
         className={styles.searchBar}
         dataSourceCoin={dataSourceCoin}
@@ -143,9 +144,19 @@ const MarketIndex = props => {
         account={account}
         visible={true}
         getNetwork={getNetwork}
-        networkShow = {true}
+        networkShow={true}
       />
-      <div className={styles.chartsMain}>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <h2>Cryptocurrencies</h2>
+      </div>
+      {tokenInfo.length > 0 ? (
+        <CurrencyTable dataSourceCoin={tokenInfo} />
+      ) : (
+        <Icon type="loading" />
+      )}
+
+      {/* <div className={styles.chartsMain}>
         <div className={styles.chartSectionMain}>
           {chartData.tvl.length > 0 ? (
             <>
@@ -234,7 +245,7 @@ const MarketIndex = props => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <h2>Top Tokens</h2>
         <h3>
-          <Link style={{ color: '#b5b5b6' }} /*to="/market/list/token"*/>
+          <Link style={{ color: '#b5b5b6' }} >
             Explore
           </Link>
         </h3>
@@ -248,7 +259,7 @@ const MarketIndex = props => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <h2>Top Pools</h2>
         <h3>
-          <Link style={{ color: '#b5b5b6' }} /*to="/market/list/pool"*/>
+          <Link style={{ color: '#b5b5b6' }} >
             Explore
           </Link>
         </h3>
@@ -265,7 +276,8 @@ const MarketIndex = props => {
         <Icon type="loading" />
       ) : (
         <TransactionTable dataSourceTransaction={transactions} />
-      )}
+      )} 
+      */}
       <div style={{ height: '20px' }} />
     </div>
   );
@@ -319,7 +331,7 @@ const MarketIndex = props => {
 
 //   componentDidMount() {
 //     // fetch pool data
-    
+
 //   }
 
 //   onLineGraphHover = (newData, newIndex) => {
