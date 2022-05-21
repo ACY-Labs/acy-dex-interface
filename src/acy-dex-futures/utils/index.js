@@ -35,7 +35,7 @@ const { AddressZero } = ethers.constants
 
 export const GLP_COOLDOWN_DURATION = 15 * 60
 export const SECONDS_PER_YEAR = 31536000
-export const GLP_DECIMALS = 8
+export const GLP_DECIMALS = 18
 export const USDG_DECIMALS = 18
 export const PLACEHOLDER_ACCOUNT = ethers.Wallet.createRandom().address
 export const PRECISION = expandDecimals(1, USD_DECIMALS)
