@@ -702,52 +702,32 @@ const Swap = props => {
   useEffect(async () => {
     let currentTime = getCurrentTime();
     console.log("hereim current time", getCurrentTime())
-    let previousTime;
-    previousTime = currentTime - 24*60*60 ;
+    let previousTime = currentTime - 24*60*60 ;
     console.log("hereim previous time", previousTime)
 
-    let data24
-    let high24
-    let low24;
-    let deltaPrice24
-    let percentage;
-    try {
-      data24 = await getKChartData(activeToken1.symbol, "56", "5m", previousTime.toString(), currentTime.toString(), "chainlink");
-    } catch {
-      data = [];
-      console.log("fallback to empty array");
-    }
+    let data24 = await getKChartData(activeToken1.symbol, "56", "5m", previousTime.toString(), currentTime.toString(), "chainlink");
+    let high24 = 0;
+    let low24 = 0;
+    let deltaPrice24 = 0;
+    let percentage = 0;
+    let average = 0;
     let highArr = [];
     let lowArr = [];
-    for (let i=1; i < data24.length; i++){
-      highArr.push(data24[i].high);
-      lowArr.push(data24[i].low);
+    if (data24.length > 0) {
+      for (let i=1; i < data24.length; i++){
+        highArr.push(data24[i].high);
+        lowArr.push(data24[i].low);
+      }
+      high24 = Math.max(...highArr);
+      low24 = Math.min(...lowArr);
+      high24 = Math.round(high24*100)/100;
+      low24 = Math.round(low24*100)/100;
+
+      deltaPrice24 = Math.round(data24[0].open * 100) / 100;
+      average = Math.round( ((high24+low24)/2) *100)/100;
+      percentage = Math.round((average - deltaPrice24) *100 / average *100)/100;
     }
-    high24 = Math.max(...highArr);
-    low24 = Math.min(...lowArr);
-    high24 = Math.round(high24*100)/100;
-    low24 = Math.round(low24*100)/100;
     
-    // console.log("hereim 24 indextokens", vaultTokenInfo);
-    // console.log("hereim 24 tokeninfo", infoTokens);
-
-    // const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
-    // console.log("hereim 24 infoTokens", infoTokens);
-    // const tokenInfo = getTokenInfo(infoTokens, activeToken1.address, true, nativeTokenAddress);
-    // console.log("hereim 24tokeninfo", tokenInfo);
-
-    // console.log("hereim in useeffect perpetual data", data24[1])
-    // if (data24.length > 1) {
-      // high24 = Math.round(data24[1].high * 100) / 100;
-      // low24 = Math.round(data24[1].low * 100) / 100;    
-      // high24 = tokenInfo.maxPrice;
-      // low24 = tokenInfo.minPrice;
-    // }
-    
-    deltaPrice24 = Math.round(data24[0].open * 100) / 100;
-    let average = Math.round( ((high24+low24)/2) *100)/100;
-    percentage = Math.round((average - deltaPrice24) *100 / average *100)/100;
-
     setHigh24(high24);
     setLow24(low24);
     setDeltaPrice24(deltaPrice24);
