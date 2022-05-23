@@ -55,11 +55,6 @@ export default [
         component: './Perpetual/Index',
       },
       {
-        path: '/stats',
-        name: 'Stats',
-        component: './Stats/Index',
-      },
-      {
         path: '/exchange',
         name: 'Exchange',
         component: './Swap/Index',
@@ -85,9 +80,14 @@ export default [
         // component: './stats/stats',
         routes:[
           {
+            path:'/stats/perpetual',
+            name:'Perpetual',
+            component:'./Stats/Perpetual/Index'
+          },
+          {
             path:'/stats/stablecoin',
-            name:'Stablecoin',
-            component:'./stats/StableCoin/stats'
+            name:'StableCoin',
+            component:'./Stats/StableCoin/stats'
           }
         ]
       },
