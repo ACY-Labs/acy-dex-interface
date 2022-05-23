@@ -75,6 +75,23 @@ export default [
         component: './Farms/',
       },
       {
+        path: '/stablecoin',
+        name: 'StableCoin',
+        component: './StableCoin/Index',
+      },
+      {
+        path: '/stats',
+        name: 'Stats',
+        // component: './stats/stats',
+        routes:[
+          {
+            path:'/stats/stablecoin',
+            name:'Stablecoin',
+            component:'./stats/StableCoin/stats'
+          }
+        ]
+      },
+      {
         path: '/launchpad',
         name: 'Launch',
         hideChildrenInMenu: true,
