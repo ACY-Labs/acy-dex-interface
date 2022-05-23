@@ -197,7 +197,7 @@ export const GlpSwapBox = (props) => {
     fetcher: fetcher(library, Vault),
   })
   const tokenAllowanceAddress = swapTokenAddress === AddressZero ? nativeTokenAddress : swapTokenAddress
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, glpManagerAddress], {
     fetcher: fetcher(library, Glp)
   });
   const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR([chainId, glpManagerAddress, "lastAddedAt", account || PLACEHOLDER_ACCOUNT], {
