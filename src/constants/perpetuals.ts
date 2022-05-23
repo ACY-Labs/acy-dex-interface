@@ -21,7 +21,8 @@ const PerpetualSelector = (chainId: Number) => {
         whitelistedTokens: getWhitelistedTokens(chainId),
         getContract: (name) => getContract(chainId, name),
         explorerUrl: getExplorerUrl(chainId),
-        backendPrefix: "http://localhost:3000/api"
+        backendPrefix: "http://0.0.0.0:3000/api",
+        // backendPrefix: "http://147.182.18.223:8080/api"
     };
   }
   
