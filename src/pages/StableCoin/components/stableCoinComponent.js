@@ -77,7 +77,9 @@ import { useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 
 const SwapComponent = props => {
-  const { account, library, chainId, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
+  const { account, library, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
+  // TODO: TESTING
+  const chainId = 137;
   const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1 = false } = props;
   const INITIAL_TOKEN_LIST = supportedTokens[chainId]
   // 选择货币的弹窗

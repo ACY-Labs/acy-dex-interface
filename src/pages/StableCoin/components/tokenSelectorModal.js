@@ -20,7 +20,10 @@ import styles from "./tokenSelectorModal.less";
 import {useConstantLoader} from '@/constants';
 
 const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
-    const {account, library, chainId, } = useConstantLoader();
+    const {account, library, } = useConstantLoader();
+    // TODO: TESTING
+    const chainId = 137;
+    
     const INITIAL_TOKEN_LIST = supportedTokens[chainId]
     const [currentPanel, setCurrentPanel] = useState("selectToken");
 

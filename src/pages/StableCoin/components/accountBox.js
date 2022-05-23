@@ -22,7 +22,10 @@ async function getBalance(token, chainId, account, library) {
 }
 export const AccountBox = props => {
   //read props
-  const { account, library, chainId,} = useConstantLoader(props);
+  const { account, library } = useConstantLoader(props);
+  // TODO: TESTING
+  const chainId = 137;
+  
   const tokenlist = supportedTokens[chainId]
   const usda = tokenlist[2]
 

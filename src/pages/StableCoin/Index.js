@@ -14,7 +14,9 @@ import { AccountBox } from './components/accountBox';
 import { useState,useEffect } from 'react';
 
 const StableCoin = props => {
-  const {account, library, chainId, farmSetting: { API_URL: apiUrlPrefix}} = useConstantLoader(props);
+  const {account, library, farmSetting: { API_URL: apiUrlPrefix}} = useConstantLoader(props);
+  // TODO: TESTING
+  const chainId = 137;
   const{dispatch}=props
   const tokenlist = supportedTokens[chainId]
   const [activeToken0,setActiveToken0] = useState(tokenlist[0]);
