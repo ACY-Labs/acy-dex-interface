@@ -17,6 +17,7 @@ import { MarketSearchBar, PoolTable, TokenTable, TransactionTable, CurrencyTable
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { isMobile } from 'react-device-detect';
 import ConnectWallet from './ConnectWallet';
+import axios from 'axios';
 
 import { useConstantLoader } from '@/constants';
 
@@ -42,6 +43,7 @@ const MarketIndex = props => {
   const [ovrFeeChange, setovrFeeChange] = useState(0.0);
   const [transactions, settransactions] = useState(null);
   const [tokenInfo, settokenInfo] = useState([]);
+  const [coinList, setCoinList] = useState([])
 
   const [poolInfo, setpoolInfo] = useState([]);
 
@@ -74,50 +76,65 @@ const MarketIndex = props => {
   }, []);
 
   useEffect(() => {
-    fetchGlobalTransaction().then(globalTransactions => {
-      console.log('globaltransaction', globalTransactions);
-      if (globalTransactions) settransactions(globalTransactions);
+    // fetchGlobalTransaction().then(globalTransactions => {
+    //   console.log('globaltransaction', globalTransactions);
+    //   if (globalTransactions) settransactions(globalTransactions);
+    // });
+
+    // fetchGeneralPoolInfoDay().then(poolInfo => {
+    //   if (poolInfo) setpoolInfo(poolInfo);
+    // });
+
+    // // fetch token info
+    // fetchGeneralTokenInfo().then(tokenInfo => {
+    //   if (tokenInfo) settokenInfo(tokenInfo);
+    //   console.log("token to render", tokenInfo)
+    // });
+
+    // // fetch market data
+    // console.log("BUG HERE:");
+    // fetchMarketData().then(dataDict => {
+    //   console.log("BUG HERE2:", dataDict);
+    //   if (dataDict) {
+    //     let volumeChange =
+    //       (dataDict.volume24h[dataDict.tvl.length - 1][1] -
+    //         dataDict.volume24h[dataDict.tvl.length - 2][1]) /
+    //       dataDict.volume24h[dataDict.tvl.length - 2][1];
+
+    //     let tvlChange =
+    //       (dataDict.tvl[dataDict.tvl.length - 1][1] - dataDict.tvl[dataDict.tvl.length - 2][1]) /
+    //       dataDict.tvl[dataDict.tvl.length - 2][1];
+
+    //     let fee = dataDict.volume24h[dataDict.tvl.length - 1][1] * FEE_PERCENT
+    //     setchartData(dataDict);
+    //     setoverallVolume(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));
+    //     setoverallTvl(abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]));
+    //     setoverallFees(abbrNumber(fee));
+    //     setovrVolChange((volumeChange * 100).toFixed(2));
+    //     setovrFeeChange((volumeChange * 100).toFixed(2));
+    //     setovrTvlChange((tvlChange * 100).toFixed(2));
+    //     setselectedIndexLine(dataDict.tvl.length - 1);
+    //     setselectedDataLine(abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]));
+    //     setselectedIndexBar(dataDict.volume24h.length - 1);
+    //     setselectedDataBar(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));
+    //   }
+    // });
+
+    // fetch coin list
+    const apiUrlPrefix = "https://api.coingecko.com/api/v3"
+    axios.get(
+      `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false`
+    ).then(data => {
+      setCoinList(data.data)
+      console.log('fetching coin list', data.data)
+    })
+    .catch(e => {
+      console.log(e);
     });
-
-    fetchGeneralPoolInfoDay().then(poolInfo => {
-      if (poolInfo) setpoolInfo(poolInfo);
-    });
-
-    // fetch token info
-    fetchGeneralTokenInfo().then(tokenInfo => {
-      if (tokenInfo) settokenInfo(tokenInfo);
-      console.log("token to render", tokenInfo)
-    });
-
-    // fetch market data
-    console.log("BUG HERE:");
-    fetchMarketData().then(dataDict => {
-      console.log("BUG HERE2:", dataDict);
-      if (dataDict) {
-        let volumeChange =
-          (dataDict.volume24h[dataDict.tvl.length - 1][1] -
-            dataDict.volume24h[dataDict.tvl.length - 2][1]) /
-          dataDict.volume24h[dataDict.tvl.length - 2][1];
-
-        let tvlChange =
-          (dataDict.tvl[dataDict.tvl.length - 1][1] - dataDict.tvl[dataDict.tvl.length - 2][1]) /
-          dataDict.tvl[dataDict.tvl.length - 2][1];
-
-        let fee = dataDict.volume24h[dataDict.tvl.length - 1][1] * FEE_PERCENT
-        setchartData(dataDict);
-        setoverallVolume(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));
-        setoverallTvl(abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]));
-        setoverallFees(abbrNumber(fee));
-        setovrVolChange((volumeChange * 100).toFixed(2));
-        setovrFeeChange((volumeChange * 100).toFixed(2));
-        setovrTvlChange((tvlChange * 100).toFixed(2));
-        setselectedIndexLine(dataDict.tvl.length - 1);
-        setselectedDataLine(abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]));
-        setselectedIndexBar(dataDict.volume24h.length - 1);
-        setselectedDataBar(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));
-      }
-    });
+    
   }, [chainId, marketNetwork]);
+
+
 
   const onLineGraphHover = (newData, newIndex) => {
     setselectedDataLine(abbrNumber(newData));
@@ -133,6 +150,17 @@ const MarketIndex = props => {
     console.log(index);
     setmarketNetwork(index);
   }
+
+  // const apiUrlPrefix = "https://api.coingecko.com/api/v3"
+  // axios.get(
+  //   `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false`
+  // )
+  // .then(data => {
+  //   console.log(data.data)
+  // })
+  // .catch(e => {
+  //   console.log(e);
+  // })
 
   return (
     <div className={styles.marketRoot}>
@@ -150,8 +178,8 @@ const MarketIndex = props => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <h2>Cryptocurrencies</h2>
       </div>
-      {tokenInfo.length > 0 ? (
-        <CurrencyTable dataSourceCoin={tokenInfo} />
+      {coinList.length > 0 ? (
+        <CurrencyTable dataSourceCoin={coinList} />
       ) : (
         <Icon type="loading" />
       )}

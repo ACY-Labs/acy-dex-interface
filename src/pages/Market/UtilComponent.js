@@ -980,14 +980,14 @@ export function CurrencyTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableHeader}>
-              <AcyTokenIcon symbol={entry.logoURL} />
+              <AcyTokenIcon symbol={entry.image} />
               <Link
                 style={{ color: 'white' }}
                 className={styles.coinName}
-                to={`/market/info/token/${entry.address}`}
+                // to={`/market/info/token/${entry.address}`}
                 tokenData={entry}
               >
-                {entry.short}
+                {entry.name}
               </Link>
             </div>
           );
@@ -999,12 +999,12 @@ export function CurrencyTable(props) {
           <div
             className={styles.tableHeader}
             onClick={() => {
-              setCurrentKey('price');
+              setCurrentKey('current_price');
               onSortChange();
             }}
           >
             Price
-            {currentKey == 'price' && (
+            {currentKey == 'current_price' && (
               <Icon
                 type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
@@ -1012,8 +1012,8 @@ export function CurrencyTable(props) {
             )}
           </div>
         ),
-        dataIndex: 'price',
-        key: 'price',
+        dataIndex: 'current_price',
+        key: 'current_price',
         render: (text, entry) => {
           return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
         },
@@ -1024,12 +1024,12 @@ export function CurrencyTable(props) {
           <div
             className={styles.tableHeader}
             onClick={() => {
-              setCurrentKey('24h');
+              setCurrentKey('price_change_percentage_24h');
               onSortChange();
             }}
           >
             24h %
-            {currentKey == '24h' && (
+            {currentKey == 'price_change_percentage_24h' && (
               <Icon
                 type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
@@ -1037,8 +1037,8 @@ export function CurrencyTable(props) {
             )}
           </div>
         ),
-        dataIndex: '24h',
-        key: '24h',
+        dataIndex: 'price_change_percentage_24h',
+        key: 'price_change_percentage_24h',
         render: (text, entry) => {
           return <div className={styles.tableData}>{abbrNumber(text)} %</div>;
         },
@@ -1049,12 +1049,12 @@ export function CurrencyTable(props) {
           <div
             className={styles.tableHeader}
             onClick={() => {
-              setCurrentKey('marketcap');
+              setCurrentKey('market_cap');
               onSortChange();
             }}
           >
             Market Cap
-            {currentKey == 'marketcap' && (
+            {currentKey == 'market_cap' && (
               <Icon
                 type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
@@ -1062,8 +1062,8 @@ export function CurrencyTable(props) {
             )}
           </div>
         ),
-        dataIndex: 'marketcap',
-        key: 'marketcap',
+        dataIndex: 'market_cap',
+        key: 'market_cap',
         render: (text, entry) => {
           return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
         },
@@ -1074,12 +1074,12 @@ export function CurrencyTable(props) {
           <div
             className={styles.tableHeader}
             onClick={() => {
-              setCurrentKey('fullydiluted');
+              setCurrentKey('fdmc');
               onSortChange();
             }}
           >
             Fully Diluted Market Cap
-            {currentKey == 'fullydiluted' && (
+            {currentKey == 'fdmc' && (
               <Icon
                 type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
@@ -1087,10 +1087,21 @@ export function CurrencyTable(props) {
             )}
           </div>
         ),
-        dataIndex: 'fullydiluted',
-        key: 'fullydiluted',
+        dataIndex: 'fdmc',
+        key: 'fdmc',
         render: (text, entry) => {
-          return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
+          // Fully-diluted market cap (FDMC) = price x max supply. If max supply is null, FDMC = price x total supply
+          let val
+          if(entry.max_supply !== null) {
+            val = `$${abbrNumber(entry.max_supply * entry.current_price)}`
+          } else if(entry.total_supply !== null) {
+            val = `$${abbrNumber(entry.total_supply * entry.current_price)}`
+          } else {
+            val = '-'
+          }
+          return (
+            <div className={styles.tableData}>{val}</div>
+          );
         },
         visible: isDesktop(),
       },
@@ -1099,12 +1110,12 @@ export function CurrencyTable(props) {
           <div
             className={styles.tableHeader}
             onClick={() => {
-              setCurrentKey('volume24h');
+              setCurrentKey('total_volume');
               onSortChange();
             }}
           >
-            Volume 24H
-            {currentKey == 'volume24h' && (
+            24h Volume
+            {currentKey == 'total_volume' && (
               <Icon
                 type={!isAscending ? 'arrow-up' : 'arrow-down'}
                 style={{ fontSize: '14px', marginLeft: '4px' }}
@@ -1112,8 +1123,8 @@ export function CurrencyTable(props) {
             )}
           </div>
         ),
-        dataIndex: 'volume24h',
-        key: 'volume24h',
+        dataIndex: 'total_volume',
+        key: 'total_volume',
         render: (text, entry) => {
           return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
         },
@@ -1126,7 +1137,7 @@ export function CurrencyTable(props) {
           return (
           <div
             onClick={() => {
-              console.log('joy', entry, favTokenList)
+              console.log('favTokenList', entry, favTokenList)
               if (favTokenList.includes(entry)) {
                 setFavTokenList(favTokenList.filter(value => value != entry))
               } else {
