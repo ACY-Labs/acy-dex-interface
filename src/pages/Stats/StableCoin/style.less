@@ -1,0 +1,53 @@
+.statsPage{
+    font-family: "Karla", sans-serif;
+    font-size: 1.875rem;
+  line-height: 2.25rem;
+  }
+  .container{
+    margin:auto;
+    // max-width: calc(100% - 20px * 2);
+    max-width: 960px;
+    padding-left: 20px;
+    padding-right: 20px;
+    width: 100%;
+}
+.tittle{
+  padding-right: 10%;
+  color: #EB5C20;
+  line-height: 100%;
+  font-size: 1.875rem;
+  font-weight: 700;
+
+  // max-width: 960px;
+}
+.content{
+  padding-top: 45px;
+}
+.iframeHolder{
+  position: relative;
+        width: 100%;
+}
+.columns{
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .columns {
+      display: flex;
+  }
+  .columns .module {
+      width: calc(50% - 20px / 2)
+  }
+  .columns .module:not(:first-of-type) {
+      margin-left: 20px;
+  }
+  .value-calculations .columns .module {
+      margin: 0;
+      width: 100%;
+  }
+  .logs .filters {
+      margin-left: auto;
+  }
+  .logs .filters a {
+      margin-left: 20px;
+  }
+}

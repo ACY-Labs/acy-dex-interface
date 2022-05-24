@@ -79,8 +79,9 @@ export default [
         ],
       },
       {
-        path: '/',
-        name: 'Stablecoin',
+        path: '/stablecoin',
+        name: 'StableCoin',
+        component: './StableCoin/Index',
       },
       {
         path: '/liquidity',
@@ -95,7 +96,19 @@ export default [
       {
         path: '/stats',
         name: 'Statistics',
-        component: './Stats/Index',
+        // component: './stats/stats',
+        routes:[
+          {
+            path:'/stats/perpetual',
+            name:'Perpetual',
+            component:'./Stats/Perpetual/Index'
+          },
+          {
+            path:'/stats/stablecoin',
+            name:'StableCoin',
+            component:'./Stats/StableCoin/stats'
+          }
+        ]
       },
       {
         path: '/transaction/:id?',

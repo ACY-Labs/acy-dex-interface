@@ -1,0 +1,127 @@
+.maindiv {
+  width: 200px;
+}
+.maintitle {
+  font-size: 28px;
+  font-weight: 400;
+  margin-bottom: 11px;
+  color: #929298;
+}
+.lighttitle {
+  color: #b5b5b6;
+}
+.secondarytitle {
+  font-size: 28px;
+  font-weight: 400;
+  color: #929298;
+  .percentage {
+    margin: 0 30px;
+  }
+}
+.smalltitle {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #b5b5b6;
+}
+.pt {
+  flex: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.trade {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.confirm {
+  margin: 24px auto;
+  font-size: 18px;
+  font-weight: 400;
+  color: #b5b6b6;
+  text-align: center;
+  p {
+    text-align: left;
+    margin-bottom: 14px;
+    &:nth-last-child(2) {
+      margin-bottom: 51px;
+    }
+  }
+}
+.pool {
+  display: flex;
+  .bigtitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #eb5c20;
+  }
+  .value {
+    font-size: 14px;
+    font-weight: 400;
+    color: #b5b6b6;
+  }
+}
+.arrow {
+  padding: 4px;
+  border-radius: 100%;
+  height: 32px;
+  width: 32px;
+  position: relative;
+  margin-top: -14px;
+  margin-bottom: -14px;
+  left: calc(50% - 16px);
+  background-color: rgb(33, 36, 41);
+  border: 4px solid rgb(25, 27, 31);
+  z-index: 2;
+  &:hover {
+    cursor: pointer;
+    opacity: 0.9;
+  }
+}
+
+.acyDescriptionContainer {
+  background-color: #29292c;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid #40444f99;
+
+  &:hover {
+    border: 1px solid #40444fff;
+  }
+}
+
+.acyDescriptionTitle,
+.acyDescriptionItem {
+  color: white;
+  font-size: 1rem;
+  font-weight: lighter;
+  opacity: 0.8;
+}
+
+.acyDescriptionTitle {
+  opacity: 0.5;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotateZ(0deg);
+  }
+  from {
+    transform: rotateZ(360deg);
+  }
+}
+
+.spinner {
+  animation-name: spin;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  transform: rotateZ(0deg);
+  animation-timing-function: linear;
+}
+
+.slippageContainer{
+  margin-bottom: 10px;
+}
