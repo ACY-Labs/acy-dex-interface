@@ -50,6 +50,11 @@ export default [
         ],
       },
       {
+        path: '/perpetual',
+        name: 'Perpetual',
+        component: './Perpetual/Index',
+      },
+      {
         path: '/exchange',
         name: 'Exchange',
         component: './Swap/Index',
@@ -63,6 +68,28 @@ export default [
         path: '/farms',
         name: 'Farm',
         component: './Farms/',
+      },
+      {
+        path: '/stablecoin',
+        name: 'StableCoin',
+        component: './StableCoin/Index',
+      },
+      {
+        path: '/stats',
+        name: 'Stats',
+        // component: './stats/stats',
+        routes:[
+          {
+            path:'/stats/perpetual',
+            name:'Perpetual',
+            component:'./Stats/Perpetual/Index'
+          },
+          {
+            path:'/stats/stablecoin',
+            name:'StableCoin',
+            component:'./Stats/StableCoin/stats'
+          }
+        ]
       },
       {
         path: '/launchpad',

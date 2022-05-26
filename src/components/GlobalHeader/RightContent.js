@@ -240,6 +240,9 @@ const GlobalHeaderRight = props => {
     if (chainId == 137 || chainId == 80001) {
       return 3
     }
+    if (chainId == 42161) {
+      return 4
+    }
     if (chainId == undefined){
       return 0
     }
@@ -480,6 +483,17 @@ const GlobalHeaderRight = props => {
       blockExplorerUrls: ['https://polygonscan.com/'],
       rpcUrls: ['https://polygon-rpc.com/'],
     },
+    "0xA4B1": {
+      chainId: '0xA4B1',
+      chainName: 'Arbitrum',
+      nativeCurrency: {
+        name: 'ETH',
+        symbol: 'ETH', // 2-6 characters long
+        decimals: 18
+      },
+      blockExplorerUrls: ['https://arbiscan.io/'],
+      rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+    },
   };
 
   const switchEthereumChain = async (chainId) => {
@@ -589,6 +603,14 @@ const GlobalHeaderRight = props => {
         setVisibleMetaMask(false);
       },
     },
+    // {
+    //   name: 'Arbitrum',
+    //   icon: 'Arbitrum',
+    //   onClick: async () => {
+    //     await switchEthereumChain("0xA4B1");
+    //     setVisibleMetaMask(false);
+    //   },
+    // },
   ];
   const networkListInCardList = (
     <div className={styles.networkListBlock}>

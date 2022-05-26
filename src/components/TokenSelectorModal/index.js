@@ -18,9 +18,11 @@ import { processString } from "@/components/AcyCoinItem";
 import styles from "./styles.less";
 import {useConstantLoader} from '@/constants';
 
-const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
-    const {account, library, chainId, tokenList: INITIAL_TOKEN_LIST} = useConstantLoader();
+const TokenSelectorModal = ({ onCancel, visible, onCoinClick, tokenlist }) => {
+    const {account, library, chainId, tokenList: TOKEN_LIST} = useConstantLoader();
     
+    const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
+
     const [currentPanel, setCurrentPanel] = useState("selectToken");
 
     const [initTokenList, setInitTokenList] = useState(INITIAL_TOKEN_LIST);

@@ -1,0 +1,88 @@
+.modalTitle{
+    text-align: center;
+    margin-bottom :  .5rem;
+    font-weight: 600;
+    font-size: 150%;
+}
+.editPositionInfo{
+    margin-top: 2rem;
+    padding: 0.5rem;
+    font-weight: 600;
+    align-items: right;
+}
+.infoSmallBox {
+  display : grid;
+  grid-template-columns: auto auto;
+  font-size: .9rem;
+  margin-bottom: 0.3rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+.infoBoxTitle{
+   font-weight: 400;
+    
+}
+.infoBoxValue{
+  font-weight: 800;
+  text-align: right;
+}
+.buttonContainer {
+  display : flex;
+  justify-content: space-between;
+}
+
+.optionBarContainer{
+  display: grid;
+  grid-template-columns: auto auto;
+  font-size: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.optionBar {
+  text-align: center;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  border-radius: .2rem;
+  background-color: rgb(44, 47, 54);
+  &:hover{
+    cursor : pointer;
+  }
+  &:active{
+    transform: scale(0.90);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+  }
+}
+.optionBarSelected {
+  background-color: #eb5c20;
+  color: white;
+  font-weight: 600;
+}
+.inlineInfoBlock {
+  opacity: .8;
+  display : inline-block;
+}
+.linediv{
+  margin : auto 5%;
+  border : 1px solid #eb5c20;
+  opacity: .5;
+}
+.checkboxContainer {
+  text-align: right;
+  margin-bottom: 0.3rem;
+  margin-top :0.3rem;
+  font-weight: 500;
+}
+.infoBoxTransitionArrow {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  stroke : currentColor;
+  fill : currentColor ;
+  stroke-width : 0;
+  height : 1em;
+  width : 1em;
+}
+
+.newPriceContainer {
+  text-align: right;
+  margin-bottom: 1rem;
+}

@@ -105,17 +105,38 @@ const StakeHistoryTable = props => {
     },
   ]
   const sampleStakeHistoryMobileColumns = [
-    {
-      title: 'Swap',
-      key: 'fromforto',
-      render: record =>`${record.action} ${record.token1Symbol} and ${record.token2Symbol}`
-    },
+    {title: (
+      <div
+        className={styles.tableDataFirstColumn}
+      >
+        Swap
+      </div>
+    ),
+    dataIndex: '',
+    key: 'fromforto',
+    render: (text, record) => {
+        return (
+        <div className={styles.tableDataFirstColumn}>
+          Swap {record.inputTokenSymbol} for {record.outTokenSymbol} {record.FA ? " (FA)" : ""}
+          </div>
+        );  
+    }
+  },
     
-    {
-      title: 'Time',
-      dataIndex: 'transactionTime',
-      key: 'transactionTime'
-    },
+  {
+    title: (
+      <div
+        className={styles.tableData}
+      >
+        Time
+      </div>
+    ),
+    dataIndex: 'transactionTime',
+    key: 'transactionTime',
+    render: (text,record) => {
+      return <div className={styles.tableData}>{text}</div>;
+    }
+  },
   ]
   return (
     <div className={styles.nobgTable}>

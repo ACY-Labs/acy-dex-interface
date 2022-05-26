@@ -1,0 +1,489 @@
+@import (css) url("https://fonts.googleapis.com/css?family=Lora:700");
+*, *:after, *:before {
+  box-sizing: border-box;
+  -webkit-backface-visibility: visible;
+          backface-visibility: visible;
+}
+
+.banner {
+  // min-width: 100vw;
+  // min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0e0304;
+  font-family: Lora, serif;
+  overflow: hidden;
+  margin-bottom: 5px;
+  height: 400px;
+}
+/* #region  hummingbird style */
+
+.hummingbird {
+  margin-top: 50px;
+  width: 200px;
+  height: 200px;
+  perspective: 60rem;
+  transform: perspective(60rem);
+  transform-style: preserve-3d;
+  transition: transform 0.2s ease-out;
+  transform-origin: center;
+  pointer-events: none;
+}
+@media (max-width: 768px) {
+  .hummingbird {
+    transform: scale(0.8);
+  }
+}
+.hummingbird .body {
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateY(0deg);
+  -webkit-animation: rotate 60s linear infinite;
+          animation: rotate 60s linear infinite;
+}
+@-webkit-keyframes rotate {
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+@keyframes rotate {
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+.hummingbird .body:before, .hummingbird .body:after {
+  content: "";
+  display: block;
+  width: 70px;
+  height: 100%;
+  position: absolute;
+  left: 50%;
+  transform-origin: top right;
+  background: linear-gradient(to bottom, rgba(119, 238, 180, 0.8), rgba(83, 169, 197, 0.8), transparent);
+}
+.hummingbird .body:before {
+  transform: rotateZ(30deg) rotateY(30deg);
+  -webkit-clip-path: polygon(0 0, 100% 10%, 100% 100%);
+          clip-path: polygon(0 0, 100% 10%, 100% 100%);
+}
+.hummingbird .body:after {
+  transform: rotateZ(30deg) rotateY(-30deg);
+  -webkit-clip-path: polygon(0 0, 100% 10%, 100% 100%);
+          clip-path: polygon(0 0, 100% 10%, 100% 100%);
+}
+.hummingbird .body .back {
+  width: 60px;
+  height: 100%;
+  position: absolute;
+  background: linear-gradient(to bottom, rgba(119, 238, 180, 0.8), rgba(83, 169, 197, 0.8), transparent);
+  transform-style: preserve-3d;
+  -webkit-clip-path: polygon(0 0, 100% 0, 50% 100%);
+          clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform: rotateY(90deg) rotateX(-13deg) translateZ(55px) translateY(-45px);
+}
+.hummingbird .body .wings {
+  position: absolute;
+  left: 35%;
+  top: 40px;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+.hummingbird .body .wings:before, .hummingbird .body .wings:after {
+  content: "";
+  display: block;
+  width: 70px;
+  height: 100%;
+  position: absolute;
+  left: 50%;
+  top: -25px;
+  transform-origin: top center;
+  background: linear-gradient(to top, #d46f30, transparent);
+}
+.hummingbird .body .wings:before {
+  -webkit-clip-path: polygon(100% 0, 100% 100%, 0 0);
+          clip-path: polygon(100% 0, 100% 100%, 0 0);
+  -webkit-animation: beating-left 2s ease-in-out infinite;
+          animation: beating-left 2s ease-in-out infinite;
+}
+@-webkit-keyframes beating-left {
+  0% {
+    transform: rotateZ(-75deg) rotateY(-10deg) translateZ(30px) rotateX(0deg);
+  }
+  50% {
+    transform: rotateZ(-75deg) rotateY(-10deg) translateZ(30px) rotateX(180deg);
+  }
+  100% {
+    transform: rotateZ(-75deg) rotateY(-10deg) translateZ(30px) rotateX(0deg);
+  }
+}
+@keyframes beating-left {
+  0% {
+    transform: rotateZ(-75deg) rotateY(-10deg) translateZ(30px) rotateX(0deg);
+  }
+  50% {
+    transform: rotateZ(-75deg) rotateY(-10deg) translateZ(30px) rotateX(180deg);
+  }
+  100% {
+    transform: rotateZ(-75deg) rotateY(-10deg) translateZ(30px) rotateX(0deg);
+  }
+}
+.hummingbird .body .wings:after {
+  -webkit-clip-path: polygon(100% 0, 100% 100%, 0 0);
+          clip-path: polygon(100% 0, 100% 100%, 0 0);
+  -webkit-animation: beating-right 2s ease-in-out infinite;
+          animation: beating-right 2s ease-in-out infinite;
+}
+@-webkit-keyframes beating-right {
+  0% {
+    transform: rotateZ(-75deg) rotateY(10deg) translateZ(-30px) rotateX(0deg);
+  }
+  50% {
+    transform: rotateZ(-75deg) rotateY(10deg) translateZ(-30px) rotateX(-180deg);
+  }
+  100% {
+    transform: rotateZ(-75deg) rotateY(10deg) translateZ(-30px) rotateX(0deg);
+  }
+}
+@keyframes beating-right {
+  0% {
+    transform: rotateZ(-75deg) rotateY(10deg) translateZ(-30px) rotateX(0deg);
+  }
+  50% {
+    transform: rotateZ(-75deg) rotateY(10deg) translateZ(-30px) rotateX(-180deg);
+  }
+  100% {
+    transform: rotateZ(-75deg) rotateY(10deg) translateZ(-30px) rotateX(0deg);
+  }
+}
+.hummingbird .body .head:before, .hummingbird .body .head:after {
+  content: "";
+  display: block;
+  width: 50px;
+  height: 30%;
+  position: absolute;
+  left: 55%;
+  top: -45px;
+  transform-origin: top right;
+  background: linear-gradient(to bottom, #77eeb4, transparent);
+}
+.hummingbird .body .head:before {
+  transform: rotateZ(0deg) rotateY(40deg);
+  -webkit-clip-path: polygon(0 20%, 100% 0, 100% 100%);
+          clip-path: polygon(0 20%, 100% 0, 100% 100%);
+}
+.hummingbird .body .head:after {
+  transform: rotateZ(0deg) rotateY(-40deg);
+  -webkit-clip-path: polygon(0 20%, 100% 0, 100% 100%);
+          clip-path: polygon(0 20%, 100% 0, 100% 100%);
+}
+.hummingbird .body .head .nape:after {
+  content: "";
+  display: block;
+  width: 50px;
+  height: 35px;
+  position: absolute;
+  top: 0%;
+  background: linear-gradient(to bottom, rgba(119, 238, 180, 0.8), rgba(83, 169, 197, 0.8), transparent);
+  transform-origin: bottom center;
+  -webkit-clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+          clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  transform: rotateY(90deg) rotateX(-73deg) translateZ(-37px) translateY(-110px);
+}
+.hummingbird .body .head .beak:before, .hummingbird .body .head .beak:after {
+  content: "";
+  display: block;
+  width: 10px;
+  height: 60%;
+  position: absolute;
+  left: 75%;
+  top: -45px;
+  transform-origin: top right;
+  background: linear-gradient(to top, #d1c6da, transparent);
+}
+.hummingbird .body .head .beak:before {
+  transform: rotateZ(-105deg) rotateY(25deg);
+  -webkit-clip-path: polygon(0 0, 100% 1%, 100% 100%);
+          clip-path: polygon(0 0, 100% 1%, 100% 100%);
+}
+.hummingbird .body .head .beak:after {
+  transform: rotateZ(-105deg) rotateY(-25deg);
+  -webkit-clip-path: polygon(0 0, 100% 1%, 100% 100%);
+          clip-path: polygon(0 0, 100% 1%, 100% 100%);
+}
+.hummingbird .platform {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 0px;
+  transform: rotateX(90deg) translateZ(-100px);
+  color: #FFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 8px dashed #53a9c5;
+  box-shadow: 0 0 50px 0px #53a9c5;
+  font-family: Tahoma;
+  display: none;
+}
+/* #endregion */
+
+/* #region  banner content style  */
+.bannerTittle{
+  font-size: 3rem;
+  font-family: Karla, sans-serif;
+  font-weight: 725;
+  filter: opacity(0.9);
+  position: absolute;
+  color: #EB5C20;
+  bottom: 22%;
+}
+
+.bannerContent{
+  width: 100%;
+  text-align: center;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  // padding: 2em 5em 0;
+  position: absolute;
+  bottom: 15%;
+  font-family: Karla, sans-serif;
+  }
+  .bannerContent:before {
+    content: "The world's first automatic interest-earning algorithmic stablecon";
+    animation: typeword 9.2s linear infinite;
+  }
+  .bannerContent:after {
+    content: "|";
+    animation: blink 1s steps(2, end) forwards infinite;
+  }
+// @media (min-width: 641px) and (max-width: 996px){
+@media (max-width: 996px){
+  .bannerContent {
+    font-size: 1.25rem;
+  }
+}
+
+@keyframes typeword {
+  0% {
+    content: "T";
+  }
+  1% {
+    content: "Th";
+  }
+  2% {
+    content: "The";
+  }
+  3% {
+    content: "The ";
+  }
+  4% {
+    content: "The w";
+  }
+  5% {
+    content: "The wo";
+  }
+  6% {
+    content: "The wor";
+  }
+  7% {
+    content: "The worl";
+  }
+  8% {
+    content: "The world";
+  }
+  9% {
+    content: "The world'";
+  }
+  10% {
+    content: "The world's";
+  }
+  11% {
+    content: "The world's ";
+  }
+  12% {
+    content: "The world's ";
+  }
+  13% {
+    content: "The world's f";
+  }
+  14% {
+    content: "The world's fi";
+  }
+  15% {
+    content: "The world's fir";
+  }
+  16% {
+    content: "The world's firs";
+  }
+  17% {
+    content: "The world's first";
+  }
+  18% {
+    content: "The world's first ";
+  }
+  19% {
+    content: "The world's first a";
+  }
+  20% {
+    content: "The world's first au";
+  }
+  21% {
+    content: "The world's first aut";
+  }
+  22% {
+    content: "The world's first auto";
+  }
+  23% {
+    content: "The world's first autom";
+  }
+  24% {
+    content: "The world's first automa";
+  }
+  25% {
+    content: "The world's first automat";
+  }
+  26% {
+    content: "The world's first automati";
+  }
+  27% {
+    content: "The world's first automatic";
+  }
+  28% {
+    content: "The world's first automatic ";
+  }
+  29% {
+    content: "The world's first automatic i";
+  }
+  30% {
+    content: "The world's first automatic in";
+  }
+  31% {
+    content: "The world's first automatic int";
+  }
+  32% {
+    content: "The world's first automatic inte";
+  }
+  33% {
+    content: "The world's first automatic inter";
+  }
+  34% {
+    content: "The world's first automatic intere";
+  }
+  35% {
+    content: "The world's first automatic interes";
+  }
+  36% {
+    content: "The world's first automatic interest";
+  }
+  37% {
+    content: "The world's first automatic interest-";
+  }
+  38% {
+    content: "The world's first automatic interest-e";
+  }
+  39% {
+    content: "The world's first automatic interest-ea";
+  }
+  40% {
+    content: "The world's first automatic interest-ear";
+  }
+  41% {
+    content: "The world's first automatic interest-earn";
+  }
+  42% {
+    content: "The world's first automatic interest-earni";
+  }
+  43% {
+    content: "The world's first automatic interest-earnin";
+  }
+  44% {
+    content: "The world's first automatic interest-earning";
+  }
+  45% {
+    content: "The world's first automatic interest-earning ";
+  }
+  46% {
+    content: "The world's first automatic interest-earning a";
+  }
+  47%{
+    content: "The world's first automatic interest-earning al";
+  }
+  48%{
+    content: "The world's first automatic interest-earning alg";
+  }
+  49%{
+    content: "The world's first automatic interest-earning algo";
+  }
+  50%{
+    content: "The world's first automatic interest-earning algor";
+  }
+  51%{
+    content: "The world's first automatic interest-earning algori";
+  }
+  52%{
+    content: "The world's first automatic interest-earning algorit";
+  }
+  53%{
+    content: "The world's first automatic interest-earning algorith";
+  }
+  54%{
+    content: "The world's first automatic interest-earning algorithm";
+  }
+  55%{
+    content: "The world's first automatic interest-earning algorithmi";
+  }
+  56%{
+    content: "The world's first automatic interest-earning algorithmic";
+  }
+  57%{
+    content: "The world's first automatic interest-earning algorithmic ";
+  }
+  58%{
+    content: "The world's first automatic interest-earning algorithmic s";
+  }
+  59%{
+    content: "The world's first automatic interest-earning algorithmic st";
+  }
+  60%{
+    content: "The world's first automatic interest-earning algorithmic sta";
+  }
+  61%{
+    content: "The world's first automatic interest-earning algorithmic stab";
+  }
+  62%{
+    content: "The world's first automatic interest-earning algorithmic stabl";
+  }
+  63%{
+    content: "The world's first automatic interest-earning algorithmic stable";
+  }
+  64%{
+    content: "The world's first automatic interest-earning algorithmic stablec";
+  }
+  65%{
+    content: "The world's first automatic interest-earning algorithmic stableco";
+  }
+  66% {
+    content: "The world's first automatic interest-earning algorithmic stablecoi";
+  }
+  67%{
+    content: "The world's first automatic interest-earning algorithmic stablecoin";
+  }
+  100% {
+    content: "The world's first automatic interest-earning algorithmic stablecoin";
+  }
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+/* #endregion */
+  
+

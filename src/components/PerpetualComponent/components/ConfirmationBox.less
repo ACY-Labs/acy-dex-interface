@@ -1,0 +1,110 @@
+.ConfirmationBox {
+  font-family: "Karla", sans-serif;
+  font-size: 20px;
+}
+
+.ConfirmationBoxMain {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  margin: 1rem 0 1.5rem;
+}
+
+.ConfirmationBoxMainIcon {
+  margin: 5px 0;
+}
+
+.ConfirmationBoxMainIcon:after {
+  content: "↓";
+}
+
+.ConfirmationBoxMainIcon.dot:after {
+  content: "•";
+}
+
+.ConfirmationBox {
+  .Modal-content {
+    width: 22rem;
+  }
+}
+
+.ConfirmationBoxRow {
+  margin-top: 1rem;
+}
+
+.ConfirmationBoxButton {
+  margin-top: 10px;
+  width: 100%;
+  color: #b5b5b6;
+  background: transparent;
+  border: 0.75px solid #232323;
+  border-radius: 3px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.ConfirmationBoxWarning {
+  color: #b5b5b6;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 1rem;
+}
+
+.ExchangeInfoRow {
+  display: grid;
+  grid-template-columns: auto auto;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+.ExchangeInfoLabel {
+  opacity: 0.7;
+  margin-right: 0.5rem;
+}
+
+.alignRight {
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.alignRightImportant {
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  color: white;
+  font-weight: bold;
+}
+
+.PositionEditor {
+  .Checkbox {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    direction: rtl;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+  }
+}
+
+.muted {
+  opacity: 0.7;
+}
+
+.inlineBlock {
+  display: inline-block;
+  opacity: 0.7;
+}
+
+.transitionArrow {
+  vertical-align: middle;
+  margin-top: -0.2rem;
+}
+
+.ExchangeInfoValueWarning {
+  color: #fa3c58;
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+}

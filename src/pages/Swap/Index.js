@@ -1,7 +1,7 @@
 import { useWeb3React } from '@web3-react/core';
-import React, { Component, useState, useEffect, useRef } from 'react';
+import React, { Component, useState, useEffect, useRef, useMemo } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { connect } from 'umi';
+import { connect, history } from 'umi';
 import { Button, Row, Col, Icon, Skeleton, Card } from 'antd';
 import {
   AcyCard,
@@ -32,8 +32,10 @@ import StakeHistoryTable from './components/StakeHistoryTable';
 import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
-import { useConstantLoader } from '@/constants';
+import { API_URL, useConstantLoader } from '@/constants';
 import {useConnectWallet} from '@/components/ConnectWallet';
+import useSWR from 'swr';
+import {TxFetcher} from '@/utils/utils';
 
 const { AcyTabPane } = AcyTabs;
 function getTIMESTAMP(time) {
@@ -102,7 +104,26 @@ const StyledCard = styled(AcyCard)`
 
 const Swap = props => {
   const {account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix}} = useConstantLoader();
-  console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
+  ////console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
+
+  // 当 chainId 发生切换时，就更新 url
+  // useEffect(() => {
+  //   let chainName = "BSC";
+  //   switch(chainId) {
+  //     case 56: 
+  //       chainName = "BSC"; break;
+  //     case 137: 
+  //       chainName = "Polygon"; break;
+  //     default: 
+  //       chainName = "BSC";
+  //   }
+  //   history.push({
+  //     pathname: history.location.pathname,
+  //     query: {
+  //       chain: chainName,
+  //     },
+  //   })
+  // }, [chainId])
 
   const [pricePoint, setPricePoint] = useState(0);
   const [pastToken1, setPastToken1] = useState('ETH');
@@ -125,11 +146,34 @@ const Swap = props => {
   const [transactionNum, setTransactionNum] = useState(0);
   const { activate } = useWeb3React();
 
+  // useSWR hook example - needs further implementation in backend
+  const txListUrl = `${apiUrlPrefix}/txlist/all?`
+  const {data : txList , mutate : updateTxList} = useSWR([txListUrl],{
+    fetcher: TxFetcher(account),
+    // refreshInterval: 1000,
+  })
+
+  const txref = useRef();
+  txref.current = txList;
+
+  ////console.log('printing tx lists', txList);
+
+  // //console.log('printing tx lists',txList)
+  useEffect(() => {
+    library.on('block', (blockNum) => {
+      ////console.log('updating tx lists');
+      updateTxList();
+    })
+    return () => {
+      library.removeAllListeners('block');
+    }
+  }, [library])
+  // ------------------
 
   useEffect(() => {
     if (!supportedTokens) return
 
-    console.log("resetting page states")
+    //console.log("resetting page states")
     // reset on chainId change => supportedTokens change
     setPricePoint(0);
     setPastToken1('ETH');
@@ -157,16 +201,21 @@ const Swap = props => {
 
   // connect to provider, listen for wallet to connect
   const connectWalletByLocalStorage = useConnectWallet();
-  useEffect(() => {
+  useMemo(() => {
     if(!account){
-      connectWalletByLocalStorage()
+      //console.log('ymj connect');
+      connectWalletByLocalStorage();
      }
+    //console.log('ymj connect', account);
     getTransactionsByAccount(account,library,'SWAP').then(data =>{
-      console.log("found this tx dataa::::::", data);
+      ////console.log("found this tx dataa::::::", data);
       setTransactionList(data);
       if(account) setTableLoading(false);
     })
   }, [account]);
+
+
+  
 
   
   // 时间段选择
@@ -254,12 +303,12 @@ const Swap = props => {
       A = temp;
       reverseFlag = true;
     }
-    console.log(A,B);
-    console.log("fetching the swap Rate data!!!!!!!!!!!!!!!!");
+    ////console.log(A,B);
+    ////console.log("fetching the swap Rate data!!!!!!!!!!!!!!!!");
     axios.get(
       `${apiUrlPrefix}/chart/getRate`, {params : {token0 : A , token1 : B}}
     ).then(res => {
-      console.log("response",res.data);
+      //console.log("response",res.data);
       if(res.data){
       const historyData = res.data.History;
       timeMark = historyData[historyData.length-1].time;
@@ -278,7 +327,7 @@ const Swap = props => {
         // var time = element.time*60*1000
         // var date = new Date(time);
         // var dateString = date.toString();
-        // console.log("Time : " + date);
+        // //console.log("Time : " + date);
         
       };
         
@@ -288,12 +337,12 @@ const Swap = props => {
         let temp2 = [(i*60*1000),  0 ] ;
         addData.push(temp2);
       } 
-      console.log("timemark",timeMark - 24*60,timeMark2);
-      console.log("addData",addData);
+      //console.log("timemark",timeMark - 24*60,timeMark2);
+      //console.log("addData",addData);
 
 
       // drawing chart
-          console.log("timeData",timeData);
+          //console.log("timeData",timeData);
           const tempChart = [];
           for (let a = 0; a < timeData.length; a++) {
             if(timeData[a].time > timeMark - 24*60){
@@ -309,10 +358,10 @@ const Swap = props => {
             
           }
         }
-          console.log("CHARTING!!!!!!!!!!!",tempChart);
+          //console.log("CHARTING!!!!!!!!!!!",tempChart);
 
           const finalChartData = addData.concat(tempChart);
-          console.log("finalChartData", finalChartData);
+          //console.log("finalChartData", finalChartData);
           setChartData(finalChartData);
     }
       else{
@@ -323,8 +372,8 @@ const Swap = props => {
     })
      
 
-      console.log("chartdata");
-      console.log(timeData);
+      //console.log("chartdata");
+      //console.log(timeData);
    
   }, [activeToken0, activeToken1]);
   // workaround way to get USD price (put token1 as USDC)
@@ -337,10 +386,10 @@ const Swap = props => {
         `${apiUrlPrefix}/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
       )
       .then(data => {
-        console.log(data);
+        //console.log(data);
         // const { swaps } = data.data.data;
         // const lastDataPoint = swaps[swaps.length - 1];
-        // console.log('ROUTE PRICE POINT', lastDataPoint);
+        // //console.log('ROUTE PRICE POINT', lastDataPoint);
         // setState({
         //   pricePoint: lastDataPoint.rate,
         // });
@@ -358,11 +407,11 @@ const Swap = props => {
   //       let { swaps } = data.data.data;
   //       // invert the nominator and denominator when toggled on the token image (top right of the page)
   //       if (activeToken1.symbol < activeToken0.symbol) {
-  //         console.log("swapping token position")
+  //         //console.log("swapping token position")
   //         swaps = Array.from(swaps, o => ({ ...o, "rate": 1 / o.rate }))
   //       }
-  //       console.log(activeToken0.symbol, activeToken1.symbol)
-  //       console.log(swaps)
+  //       //console.log(activeToken0.symbol, activeToken1.symbol)
+  //       //console.log(swaps)
   //       const lastDataPointIndex = swaps.length - 1;
 
   //       let precisionedData = swaps.map(item => [item.time, item.rate.toFixed(3)])
@@ -479,7 +528,7 @@ const Swap = props => {
 
   const updateTransactionList = async (receipt) => {
     setTableLoading(true);
-    console.log("updating list");
+    //console.log("updating list");
     appendNewSwapTx(refContainer.current,receipt,account,library).then((data) => {
       if(data && data.length > 0) setTransactionList(data);
       setTableLoading(false);
@@ -489,7 +538,7 @@ const Swap = props => {
 
 
   const onGetReceipt = async (receipt, library, account) => {
-    console.log('RECEIPT', receipt);
+    //console.log('RECEIPT', receipt);
     updateTransactionList(receipt);
   };
   const {
@@ -547,7 +596,10 @@ const Swap = props => {
               </div>
             </StyledCard> 
           </div> 
-
+          
+          {/* <div>
+            Hello: {history.location.pathname}
+          </div> */}
           <div className={`${styles.colItem} ${styles.swapComponent}`} >
             <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
               <div className={styles.trade}>
