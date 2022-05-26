@@ -3,7 +3,7 @@ import * as d3 from './d3'
 import * as d3sankey from './d3-sankey';
 
 const size = {
-  width: 600,
+  width: 700,
   height: 300
 };
 
@@ -66,23 +66,6 @@ const Link = ({ data, width, length, colors }) => {
   );
 };
 
-const Tag = ({ data, width, length, colors, x0, y0, index }) => {
-  const link = d3sankey.sankeyLinkHorizontal();
-
-  return (
-    <>
-      <rect
-        x={20 + data.index * 100}
-        y={290}
-        width={20}
-        height={20}
-        fill={d3.rgb("black")}
-        data-index={index}
-      />
-    </>
-  );
-};
-
 export default function Sankey(props) {
   const dragElement = useRef(null);
   const graph = useRef(null);
@@ -127,19 +110,6 @@ export default function Sankey(props) {
               value={d.value}
               length={nodes.length}
               colors={d3.interpolateCool}
-            />
-          ))}
-        </g>
-        <g>
-          {links.map((d, i) => (
-            <Tag
-              data={d}
-              width={d.width}
-              length={nodes.length}
-              colors={d3.interpolateRainbow}
-              x0={d.x0}
-              y0={d.y0}
-              index={d.index}
             />
           ))}
         </g>

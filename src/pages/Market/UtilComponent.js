@@ -932,7 +932,7 @@ export function TransactionTable(props) {
 
 export function CurrencyTable(props) {
   const [tokenSortAscending, setTokenSortAscending] = useState(true);
-  const [tokenDisplayNumber, setTokenDisplayNumber] = useState(9);
+  const [tokenDisplayNumber, setTokenDisplayNumber] = useState(49);
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
   const [favTokenList, setFavTokenList] = useState([]);
@@ -1188,7 +1188,7 @@ export function CurrencyTable(props) {
               <a
                 className={styles.tableSeeMore}
                 onClick={() => {
-                  setTokenDisplayNumber(tokenDisplayNumber + 5);
+                  setTokenDisplayNumber(tokenDisplayNumber + 50);
                 }}
               >
                 See More...
@@ -1530,8 +1530,10 @@ export const MarketSearchBar = props => {
                     placeholder="Search"
                     size="large"
                     style={{
-                      backgroundColor: '#373739',
+                      backgroundColor: 'black',
                       borderRadius: '40px',
+                      border: '1px solid #333333',
+                      paddingLeft: '20px',
                     }}
                     onFocus={onSearchFocus}
                     onChange={onInput}
@@ -1566,7 +1568,7 @@ export const MarketSearchBar = props => {
                           </>
                         )}
 
-                        <Divider className={styles.searchModalDivider} />
+                        {/* <Divider className={styles.searchModalDivider} />
                         {isLoading ? (
                           <Icon type="loading" />
                         ) : (
@@ -1587,7 +1589,7 @@ export const MarketSearchBar = props => {
                               </div>
                             )}
                           </>
-                        )}
+                        )} */}
                       </AcyTabPane>
                       {/* <AcyTabPane tab="Watchlist" key="2">
                         {watchlistToken.length > 0 ? (
