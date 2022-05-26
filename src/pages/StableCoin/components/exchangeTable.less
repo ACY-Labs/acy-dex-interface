@@ -1,21 +1,38 @@
 @import (css) url("https://fonts.googleapis.com/css?family=Lora:700");
-.exchangeTable{
-    float: left;
-    width: 100%;
-    display: table-cell;
-    margin-top: 20px;
-    // margin-left: 10px;
-    :global{
-    .ant-table-thead > tr > th:not(.leftAlignTableHeader){
+
+.exchangeTable {
+  float: left;
+  width: 100%;
+  display: table-cell;
+  margin-top: 20px;
+  // border: 0.75px solid #333333;
+  // border-radius: 10px;
+  background-color: #0e0304;
+
+  // margin-left: 10px;
+  :global {
+    .ant-table-thead>tr>th:not(.leftAlignTableHeader) {
       text-align: left !important;
     }
+
+    .ant-table-thead>tr>th {
+      background: #0e0304 !important;
+    }
+
+    .ant-table-tbody>tr>td {
+      background: #0e0304 !important;
+    }
+
+    .ant-table-body {
+      border: 0.75px solid #333333;
+    }
   }
-  }
+}
+
 @media (max-width: 900px) {
-  .exchangeTable{
+  .exchangeTable {
     float: left;
     width: 100%;
     display: table-cell;
   }
 }
-

@@ -19,7 +19,6 @@ export const Banner = props => {
 
       {/* <embed className={styles.logo} src={logo} type="image/svg+xml" width="15%" /> */}
       <div className={styles.bannerTittle}>USDA</div>
-      <div className={styles.bannerContent}></div>
     </div>
   );
 };

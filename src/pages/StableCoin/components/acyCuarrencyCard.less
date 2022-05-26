@@ -10,6 +10,7 @@
   width: initial;
 
   .cua_title {
+    border: 0.75px solid #333333;
     font-size: 14px;
     font-weight: 400;
     color: #f3f3fc;
@@ -17,11 +18,10 @@
     display: flex;
     justify-content: space-between;
   }
-
+                                                             
   .cua_body {
-    border-radius: 10px;
-    border: 1px solid rgb(44, 47, 54);
-    background-color: #29292c;
+    border: 0.75px solid #333333;
+    background-color: #0e0304;
     width: initial;
 
     &:hover {
@@ -38,13 +38,12 @@
         align-items: center;
         font-size: 18px;
         font-weight: 500;
-        background-color: #1b1b1c;
+        background-color: #0e0304;
         color: rgb(255, 255, 255);
-        border-radius: 10px;
+        border: none;
         outline: none;
         cursor: pointer;
         user-select: none;
-        border: none;
         height: 2.4rem;
         width: initial;
         padding: 0px 8px;
@@ -94,7 +93,7 @@
         height: unset;
         border: 0;
         border-radius: 0;
-        background-color: #29292c;
+        background-color: #0e0304;
         font-size: 22px;
         white-space: nowrap;
         overflow: hidden;
@@ -107,7 +106,7 @@
 
     .bonus {
       justify-content: end;
-      color: #eb5c20;
+      color: rgb(255, 255, 255);
       padding-top: 0;
       margin-top: -0.9rem;
       font-size: 1rem;
@@ -136,7 +135,6 @@
     .maxButton {
       color: #ffffff;
       background: #eb5c20;
-      border-radius: 15px;
       // border-color: #eb5c20;
       text-align: center;
       cursor: pointer;
@@ -154,11 +152,12 @@
   }
 
   .cua_light {
-    border: 1px solid #e29228;
+    border: 1px solid rgb(195, 197, 203);
 
     &:hover {
       cursor: pointer;
-      border: 1px solid #e29228;
+      // border: 1px solid #e29228;
+    border: 1px solid rgb(195, 197, 203);
     }
   }
 }
