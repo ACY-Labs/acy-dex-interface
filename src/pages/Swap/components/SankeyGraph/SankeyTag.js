@@ -13,18 +13,16 @@ const Tag = ({ data, width, length, colors }) => {
   return (
     <>
       <rect
-        // x={20 + (data.index % 4) * 100}
-        // y={10 + Math.floor(data.index / 4)
-        x={20 + (data.index) * 100}
-        y={10}
+        x={20 + (data.index % 7) * 100}
+        y={10 + Math.floor(data.index / 7) * 20}
         width={15}
         height={15}
-        fill={colors((data.target.index + data.source.index) / length)}
+        fill={colors(0.05 + 0.95 * (data.index) / length)}
         data-index={data.index}
       />
       <text
-        x={40 + data.index * 100}
-        y={18}
+        x={40 + (data.index % 7) * 100}
+        y={18 + Math.floor(data.index / 7) * 20}
         style={{
           fill: d3.rgb("white"),
           alignmentBaseline: "middle",
@@ -61,7 +59,7 @@ export default function SankeyTag(props) {
             <Tag
               data={d}
               width={d.width}
-              length={nodes.length}
+              length={links.length}
               colors={d3.interpolateRainbow}
             />
           ))}

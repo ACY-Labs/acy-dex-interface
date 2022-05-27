@@ -634,11 +634,11 @@ const SwapComponent = props => {
         library={library}
       />
 
-      {showDescription ? <AcyDescriptions>
+      <AcyDescriptions>
         <div className={styles.breakdownTopContainer}>
           <div className={styles.slippageContainer}>
             <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '7px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
               {/* <Button
                     type="link"
                     style={{ marginRight: '5px' }}
@@ -686,8 +686,8 @@ const SwapComponent = props => {
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                height: '33px',
-                marginTop: '7px',
+                height: '33.6px',
+                marginTop: '10px',
               }}
             >
               <Input 
@@ -709,12 +709,12 @@ const SwapComponent = props => {
               ))}
             </div> */}
       </AcyDescriptions>
-      : null}
+     
 
       {needApprove
         ? <div>
           <AcyButton
-            style={{ marginTop: '25px' }}
+            style={{ marginTop: '30px' }}
             disabled={!approveButtonStatus}
             onClick={async () => {
               setShowSpinner(true);

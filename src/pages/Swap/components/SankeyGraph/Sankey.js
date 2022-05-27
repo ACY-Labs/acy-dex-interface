@@ -43,22 +43,10 @@ const Link = ({ data, width, length, colors }) => {
 
   return (
     <>
-      <defs>
-        <linearGradient
-          id={`gradient-${data.index}`}
-          gradientUnits="userSpaceOnUse"
-          x1={data.source.x1}
-          x2={data.target.x0}
-        >
-          <stop offset="0" stopColor={colors(data.source.index / length)} />
-          <stop offset="100%" stopColor={colors(data.target.index / length)} />
-        </linearGradient>
-      </defs>
       <path
         d={link(data)}
         fill="none"
-        stroke={colors((data.target.index + data.source.index) / length)}
-        // stroke={`url(#gradient-${data.index})`}
+        stroke={colors(0.05 + 0.95 * (data.index) / length)}
         strokeOpacity={0.9}
         strokeWidth={width}
       />
@@ -78,10 +66,6 @@ export default function Sankey(props) {
     .nodePadding(10)
     .extent([[0, 0], [size.width, size.height]]);
 
-  const onMouseUp = e => {
-    dragElement.current = null;
-  };
-
   if (props.data) {
     graph.current = sankey(props.data);
     const { links, nodes } = graph.current;
@@ -93,7 +77,7 @@ export default function Sankey(props) {
             <Link
               data={d}
               width={d.width}
-              length={nodes.length}
+              length={links.length}
               colors={d3.interpolateRainbow}
             />
           ))}
