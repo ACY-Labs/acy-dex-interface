@@ -1049,6 +1049,31 @@ export function CurrencyTable(props) {
           <div
             className={styles.tableHeader}
             onClick={() => {
+              setCurrentKey('total_volume');
+              onSortChange();
+            }}
+          >
+            24h Volume
+            {currentKey == 'total_volume' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
+        dataIndex: 'total_volume',
+        key: 'total_volume',
+        render: (text, entry) => {
+          return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
+        },
+        visible: true,
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
               setCurrentKey('market_cap');
               onSortChange();
             }}
@@ -1104,31 +1129,6 @@ export function CurrencyTable(props) {
           );
         },
         visible: isDesktop(),
-      },
-      {
-        title: (
-          <div
-            className={styles.tableHeader}
-            onClick={() => {
-              setCurrentKey('total_volume');
-              onSortChange();
-            }}
-          >
-            24h Volume
-            {currentKey == 'total_volume' && (
-              <Icon
-                type={!isAscending ? 'arrow-up' : 'arrow-down'}
-                style={{ fontSize: '14px', marginLeft: '4px' }}
-              />
-            )}
-          </div>
-        ),
-        dataIndex: 'total_volume',
-        key: 'total_volume',
-        render: (text, entry) => {
-          return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
-        },
-        visible: true,
       },
       {
         dataIndex: 'favourite',

@@ -736,7 +736,7 @@ const GlobalHeaderRight = props => {
       },
     },
     {
-      name: 'BNBChain',
+      name: 'BNB Chain',
       icon: 'Binance',
       onClick: async () => {
         await switchEthereumChain("0x38");
@@ -760,7 +760,7 @@ const GlobalHeaderRight = props => {
       },
     },
     {
-      name: 'ETH',
+      name: 'Ethereum',
       icon: 'Eth',
       onClick: async () => {
         await switchEthereumChain("0x1");
@@ -893,16 +893,17 @@ const GlobalHeaderRight = props => {
         <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}
           bodyStyle={{
             padding: '21px',
-            background: '#2e3032',
+            background: 'black',
             // backgroundColor: '#1b1b1c',
             borderRadius: ' 20px',
             // boxShadow: '0 0 14px #2d2d2d'
+            border: '0.75px solid #333333',
           }}>
           <div className={styles.networkTitle}>
             <span>Select a Network</span>
           </div>
           {/*ymj*/}
-          <AcyCardList>
+          <AcyCardList grid={true}>
             {networkList.slice(2,).map((item) => {
               return (
                 <AcyCardList.Thin className={selectedNetwork == item.name ? styles.networkListLayout_selected : styles.networkListLayout} onClick={() => {
@@ -945,7 +946,7 @@ const GlobalHeaderRight = props => {
           ))}
         </AcyCardList> */}
 
-          <AcyCardList>
+          <AcyCardList grid={true}>
             { /*ymj */}
             {broswer === 'Opera' && OperaWallet.map((item, index) => {
 
@@ -963,7 +964,7 @@ const GlobalHeaderRight = props => {
             {walletListAllSupported.map((item, index) => {
 
               return (
-                <AcyCardList.Thin onClick={() => item.onClick()}>
+                <AcyCardList.Thin className={styles.walletList} onClick={() => item.onClick()}>
                   {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
                     <AcyIcon.MyIcon width={32} type={item.icon} />
                   )}

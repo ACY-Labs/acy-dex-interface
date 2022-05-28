@@ -28,15 +28,21 @@ const Agree = ({ children, ...rest }) => {
 export default class AcyCardList extends PureComponent {
 
   render() {
-    const { children,title, ...restProps} = this.props;
+    const { children,title,grid, ...restProps} = this.props;
     return (
       <div className={styles.acycardlist} {...restProps}>
       {
         title&& <div className={styles.acl_title}>{title}</div>
       } 
+      {grid ? 
+        <div className={styles.acl_list_grid}>
+        {children}
+        </div>
+      :
         <div className={styles.acl_list}>
           {children}
         </div>
+      }
       </div>
   
     );
