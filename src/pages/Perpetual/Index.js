@@ -1029,7 +1029,7 @@ const Swap = props => {
           {/* K chart */}
               
               
-          <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
+          <div style={{ backgroundColor: '#0E0304', margin: '10px', height: "450px", display: "flex", flexDirection: "column" }}>
             <div className={styles.kchartBox}>
             <StyledSelect value={placement} onChange={placementChange}>
                 <Radio.Button value="5m">5m</Radio.Button>
@@ -1040,7 +1040,7 @@ const Swap = props => {
                 <Radio.Button value="1w">1w</Radio.Button>
               </StyledSelect>
               </div>
-              <div className={`${styles.colItem} ${styles.priceChart}`}>
+              <div className={`${styles.colItem} ${styles.priceChart}`} style={{ flex: 1 }}>
                 {
                   // currentAveragePrice === 0 ?
                   // <Spin/>
@@ -1060,7 +1060,7 @@ const Swap = props => {
                   />
                 }
               </div>
-          </AcyPerpetualCard>
+          </div>
 
           {/* Position table */}
           {!showTokenTable ?

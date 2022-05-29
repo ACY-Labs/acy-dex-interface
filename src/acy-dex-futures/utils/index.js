@@ -60,7 +60,8 @@ export const CHART_PERIODS = {
   "15m": 60 * 15,
   "1h": 60 * 60,
   "4h": 60 * 60 * 4,
-  "1d": 60 * 60 * 24
+  "1d": 60 * 60 * 24,
+  "1w": 60 * 60 * 24 * 7
 };
 
 export const BSC_MAINNET = 56;
