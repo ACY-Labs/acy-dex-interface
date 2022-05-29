@@ -318,6 +318,7 @@ export const GlpSwapBox = (props) => {
   useEffect(() => {
     if (active) {
       library.on('block', () => {
+        console.log("update on block: ", tokenAllowance, tokenAllowanceAddress)
         updateVaultTokenInfo(undefined, true)
         updateTokenBalances(undefined, true)
         // updateBalancesAndSupplies(undefined, true)
@@ -452,6 +453,7 @@ export const GlpSwapBox = (props) => {
     const [error, modal] = getError()
     if (error && !modal) { return error }
 
+    console.log("get primary text: ", needApproval, isWaitingForApproval)
     if (needApproval && isWaitingForApproval) { return "Waiting for Approval" }
     if (isApproving) { return `Approving ${swapToken.symbol}...` }
     if (needApproval) { return `Approve ${swapToken.symbol}` }

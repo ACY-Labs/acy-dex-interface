@@ -5,6 +5,8 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { JsonRpcProvider } from "@ethersproject/providers"
 import _ from "lodash";
 import Token from "@/acy-dex-futures/abis/Token.json";
+import OrderBook from "@/acy-dex-futures/abis/OrderBook";
+import OrderBookReader from "@/acy-dex-futures/abis/OrderBookReader";
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import { InjectedConnector, UserRejectedRequestError as UserRejectedRequestErrorInjected} from "@web3-react/injected-connector";
 import { useRef, useEffect, useCallback } from "react";
@@ -204,7 +206,7 @@ export function approveTokens({
   setIsApproving(true);
   const contract = new ethers.Contract(
     tokenAddress,
-    Token,
+    Token.abi,
     library.getSigner()
   );
   contract
@@ -768,7 +770,7 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
 
   if (ethers.utils.isHexString(arg0)) {
     const address = arg0
-    const contract = new ethers.Contract(address, contractInfo, provider)
+    const contract = new ethers.Contract(address, contractInfo.abi, provider)
     // console.log('fetcher contract', contract)
 
     try {

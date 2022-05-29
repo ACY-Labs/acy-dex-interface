@@ -58,6 +58,7 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { GlpSwapTokenTable } from '@/components/PerpetualComponent/components/GlpSwapBox'
 // import Kchart from './components/Kchart';
 import KChart from './components/KChart';
+import ExchangeTVChart from './components/ExchangeTVChart';
 import axios from 'axios';
 import moment from 'moment';
 import styles from './styles.less';
@@ -425,15 +426,8 @@ const Swap = props => {
   const [deltaPrice24, setDeltaPrice24] = useState(0);
   const [percentage24, setPercentage24] = useState(0);
   const [currentAveragePrice, setCurrentAveragePrice] = useState(0);
-
-  //---------- FOR TESTING 
-  const whitelistedTokens = supportedTokens.filter(token => token.symbol !== "USDG");
-  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
   const tokens = supportedTokens;
-  const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
-
-
-
+  
   const defaultTokenSelection = useMemo(() => ({
     ["Swap"]: {
       from: AddressZero,
@@ -470,6 +464,8 @@ const Swap = props => {
     setTokenSelection(newTokenSelection)
   }, [tokenSelection, setTokenSelection])
 
+  console.log("debug perpetual page, toTokenAddress: ", toTokenAddress)
+
   const { perpetuals } = useConstantLoader()
   const readerAddress = perpetuals.getContract("Reader")
   const vaultAddress = perpetuals.getContract("Vault")
@@ -479,6 +475,11 @@ const Swap = props => {
   const glpManagerAddress = perpetuals.getContract("GlpManager")
   const glpAddress = perpetuals.getContract("GLP")
   const orderBookAddress = perpetuals.getContract("OrderBook")
+
+  //---------- FOR TESTING 
+  const whitelistedTokens = supportedTokens.filter(token => token.symbol !== "USDG");
+  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
+  const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
 
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
@@ -1041,9 +1042,22 @@ const Swap = props => {
               </div>
               <div className={`${styles.colItem} ${styles.priceChart}`}>
                 {
-                  currentAveragePrice === 0 ?
-                  <Spin/>
-                  : <KChart activeToken0={activeToken0} activeToken1={activeToken1} activeTimeScale={activeTimeScale} currentAveragePrice={currentAveragePrice} />
+                  // currentAveragePrice === 0 ?
+                  // <Spin/>
+                  // // : <KChart activeToken0={activeToken0} activeToken1={activeToken1} activeTimeScale={activeTimeScale} currentAveragePrice={currentAveragePrice} />
+                  // :
+                   <ExchangeTVChart 
+                  swapOption={swapOption}
+                  fromTokenAddress={fromTokenAddress}
+                  toTokenAddress={toTokenAddress}
+                  period={placement}
+                  infoTokens={infoTokens}
+                  chainId={chainId}
+                  positions={positions}
+                  // savedShouldShowPositionLines,
+                  orders={orders}
+                  setToTokenAddress={setToTokenAddress}
+                  />
                 }
               </div>
           </AcyPerpetualCard>
