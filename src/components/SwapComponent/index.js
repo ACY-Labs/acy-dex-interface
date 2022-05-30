@@ -634,11 +634,11 @@ const SwapComponent = props => {
         library={library}
       />
 
-      {showDescription ? <AcyDescriptions>
+      <AcyDescriptions>
         <div className={styles.breakdownTopContainer}>
           <div className={styles.slippageContainer}>
             <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '7px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
               {/* <Button
                     type="link"
                     style={{ marginRight: '5px' }}
@@ -650,6 +650,7 @@ const SwapComponent = props => {
                     Auto
                   </Button> */}
               <Input
+                className={styles.input}
                 value={inputSlippageTol || ''}
                 onChange={e => {
                   setInputSlippageTol(e.target.value);
@@ -685,11 +686,18 @@ const SwapComponent = props => {
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                width: '50%',
-                marginTop: '7px',
+                height: '33.6px',
+                marginTop: '10px',
               }}
             >
-              <Input type="number" value={Number(deadline).toString()} onChange={e => setDeadline(e.target.valueAsNumber || 0)} placeholder={30} suffix={<strong>minutes</strong>} />
+              <Input 
+                className={styles.input}
+                type="number" 
+                value={Number(deadline).toString()} 
+                onChange={e => setDeadline(e.target.valueAsNumber || 0)} 
+                placeholder={30} 
+                suffix={<strong>minutes</strong>} 
+              />
             </div>
           </div>
         </div>
@@ -701,12 +709,12 @@ const SwapComponent = props => {
               ))}
             </div> */}
       </AcyDescriptions>
-      : null}
+     
 
       {needApprove
         ? <div>
           <AcyButton
-            style={{ marginTop: '25px' }}
+            style={{ marginTop: '30px' }}
             disabled={!approveButtonStatus}
             onClick={async () => {
               setShowSpinner(true);

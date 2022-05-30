@@ -197,8 +197,8 @@ export class SmallTable extends React.Component {
     );
   };
 
-  
-  render() { 
+
+  render() {
     return (
       <table className={styles.smallTable}>
         <tbody>
@@ -930,6 +930,278 @@ export function TransactionTable(props) {
   );
 }
 
+export function CurrencyTable(props) {
+  const [tokenSortAscending, setTokenSortAscending] = useState(true);
+  const [tokenDisplayNumber, setTokenDisplayNumber] = useState(99);
+  const [currentKey, setCurrentKey] = useState('');
+  const [isHover, setIsHover] = useState(false);
+  const [favTokenList, setFavTokenList] = useState([]);
+  const navHistory = useHistory();
+
+
+  function columnsCoin(isAscending, onSortChange) {
+    return [
+      {
+        title: (
+          <div className={className(styles.tableHeaderFirst, styles.tableIndex)}>
+            #
+          </div>
+        ),
+        key: 'index',
+        width: '6rem',
+        render: (text, record, index) => (
+          <div className={className(styles.tableDataFirstColumn, styles.tableIndex)}>
+            {index + 1}
+          </div>
+        ),
+        visible: isDesktop()
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeaderFirst}
+            onClick={() => {
+              setCurrentKey('name');
+              onSortChange();
+            }}
+          >
+            Name
+            {currentKey == 'name' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
+        dataIndex: 'name',
+        key: 'name',
+        className: 'leftAlignTableHeader',
+        render: (text, entry) => {
+          return (
+            <div className={styles.tableHeader}>
+              <AcyTokenIcon symbol={entry.image} />
+              <Link
+                style={{ color: 'white' }}
+                className={styles.coinName}
+                // to={`/market/info/token/${entry.address}`}
+                tokenData={entry}
+              >
+                {entry.name}
+              </Link>
+            </div>
+          );
+        },
+        visible: true,
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('current_price');
+              onSortChange();
+            }}
+          >
+            Price
+            {currentKey == 'current_price' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
+        dataIndex: 'current_price',
+        key: 'current_price',
+        render: (text, entry) => {
+          return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
+        },
+        visible: isDesktop(),
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('price_change_percentage_24h');
+              onSortChange();
+            }}
+          >
+            24h %
+            {currentKey == 'price_change_percentage_24h' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
+        dataIndex: 'price_change_percentage_24h',
+        key: 'price_change_percentage_24h',
+        render: (text, entry) => {
+          return <div className={styles.tableData}>{abbrNumber(text)} %</div>;
+        },
+        visible: isDesktop(),
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('total_volume');
+              onSortChange();
+            }}
+          >
+            24h Volume
+            {currentKey == 'total_volume' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
+        dataIndex: 'total_volume',
+        key: 'total_volume',
+        render: (text, entry) => {
+          return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
+        },
+        visible: true,
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('market_cap');
+              onSortChange();
+            }}
+          >
+            Market Cap
+            {currentKey == 'market_cap' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
+        dataIndex: 'market_cap',
+        key: 'market_cap',
+        render: (text, entry) => {
+          return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
+        },
+        visible: isDesktop(),
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => {
+              setCurrentKey('fdmc');
+              onSortChange();
+            }}
+          >
+            Fully Diluted Market Cap
+            {currentKey == 'fdmc' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
+          </div>
+        ),
+        dataIndex: 'fdmc',
+        key: 'fdmc',
+        render: (text, entry) => {
+          // Fully-diluted market cap (FDMC) = price x max supply. If max supply is null, FDMC = price x total supply
+          let val
+          if(entry.max_supply !== null) {
+            val = `$${abbrNumber(entry.max_supply * entry.current_price)}`
+          } else if(entry.total_supply !== null) {
+            val = `$${abbrNumber(entry.total_supply * entry.current_price)}`
+          } else {
+            val = '-'
+          }
+          return (
+            <div className={styles.tableData}>{val}</div>
+          );
+        },
+        visible: isDesktop(),
+      },
+      {
+        dataIndex: 'favourite',
+        key: 'favourite',
+        render: (text, entry) => {
+          return (
+          <div
+            onClick={() => {
+              console.log('favTokenList', entry, favTokenList)
+              if (favTokenList.includes(entry)) {
+                setFavTokenList(favTokenList.filter(value => value != entry))
+              } else {
+                favTokenList.push(entry)
+              }
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ height: '1.25rem' }}
+              className={styles.favButton}
+              viewBox="0 0 20 20"
+              fill={favTokenList.includes(entry) ? "#EB5C20" : "currentColor"}
+            >
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          </div>
+          )
+        },
+        visible: isDesktop(),
+      },
+    ];
+  }
+
+  return (
+    <div className={styles.nobgTable}>
+      <Table
+        dataSource={sortTable(props.dataSourceCoin, currentKey, tokenSortAscending).slice(
+          0,
+          tokenDisplayNumber + 1
+        )}
+        columns={columnsCoin(tokenSortAscending, () => {
+          setTokenSortAscending(!tokenSortAscending);
+        }).filter(item => item.visible == true)}
+        pagination={false}
+        style={{
+          marginBottom: '20px',
+          cursor: isHover ? 'pointer' : 'default',
+        }}
+        // onRowClick={(record, index, event) => {
+        //   navHistory.push(`/market/info/token/${record.address}`);
+        // }}
+        onRowMouseEnter={() => setIsHover(true)}
+        onRowMouseLeave={() => setIsHover(false)}
+        footer={() => (
+          <div className={styles.tableSeeMoreWrapper}>
+            {props.dataSourceCoin.slice(0, tokenDisplayNumber + 1).length > tokenDisplayNumber && (
+              <a
+                className={styles.tableSeeMore}
+                onClick={() => {
+                  props.fetchMarketList()
+                  setTokenDisplayNumber(tokenDisplayNumber + 100);
+                }}
+              >
+                See More...
+              </a>
+            )}
+          </div>
+        )}
+      />
+    </div>
+  );
+}
+
 // react functional component
 export const MarketSearchBar = props => {
   // states
@@ -1010,12 +1282,12 @@ export const MarketSearchBar = props => {
     const key = 'volume24h'
     setSearchCoinReturns(
       localToken.filter(
-        token => token.short.includes(e.target.value.toUpperCase())||token.name.toUpperCase().includes(e.target.value.toUpperCase())
+        token => token.short.includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase())
       )
     );
     setSearchPoolReturns(
       localPool.filter(
-        item => item.coin1.includes(e.target.value.toUpperCase())||item.coin2.includes(e.target.value.toUpperCase())
+        item => item.coin1.includes(e.target.value.toUpperCase()) || item.coin2.includes(e.target.value.toUpperCase())
       )
     );
 
@@ -1130,7 +1402,7 @@ export const MarketSearchBar = props => {
       },
     },
   ];
-  
+
   const networkListInCardList = (
     <div className={styles.networkListBlock}>
       <div>
@@ -1152,13 +1424,13 @@ export const MarketSearchBar = props => {
     </div>
   );
 
-  const n_index = () =>{
+  const n_index = () => {
     const n = localStorage.getItem("market");
-    if (n == 56){
+    if (n == 56) {
       return 0;
-    }else if (n==137){
+    } else if (n == 137) {
       return 1;
-    }else return 0;
+    } else return 0;
   }
 
   // lifecycle methods
@@ -1259,8 +1531,10 @@ export const MarketSearchBar = props => {
                     placeholder="Search"
                     size="large"
                     style={{
-                      backgroundColor: '#373739',
+                      backgroundColor: 'black',
                       borderRadius: '40px',
+                      border: '1px solid #333333',
+                      paddingLeft: '20px',
                     }}
                     onFocus={onSearchFocus}
                     onChange={onInput}
@@ -1295,7 +1569,7 @@ export const MarketSearchBar = props => {
                           </>
                         )}
 
-                        <Divider className={styles.searchModalDivider} />
+                        {/* <Divider className={styles.searchModalDivider} />
                         {isLoading ? (
                           <Icon type="loading" />
                         ) : (
@@ -1316,7 +1590,7 @@ export const MarketSearchBar = props => {
                               </div>
                             )}
                           </>
-                        )}
+                        )} */}
                       </AcyTabPane>
                       {/* <AcyTabPane tab="Watchlist" key="2">
                         {watchlistToken.length > 0 ? (
@@ -1354,27 +1628,27 @@ export const MarketSearchBar = props => {
             </div>
           </div>
         </div>
-        
+
       </div>
 
       {/* network button */}
-      <div>
+      {/* <div>
         {props.networkShow ?
-        (<Dropdown
-        overlay={networkListInCardList}
-        trigger={['click']}
-        placement="bottomLeft"
-        className={styles.networkHandle}
-      >
-        <div type="primary" shape="round">
-          {[networkList[networkListIndex]].map(item => (
-            <div>
-              <AcyIcon.MyIcon type={item.icon} /> {item.name} Network<DownOutlined className={styles.networkHandleFont}/> </div>
-          ))}
-        </div>
-      </Dropdown>):''}
-      </div>
-      
+          (<Dropdown
+            overlay={networkListInCardList}
+            trigger={['click']}
+            placement="bottomLeft"
+            className={styles.networkHandle}
+          >
+            <div type="primary" shape="round">
+              {[networkList[networkListIndex]].map(item => (
+                <div>
+                  <AcyIcon.MyIcon type={item.icon} /> {item.name} Network<DownOutlined className={styles.networkHandleFont} /> </div>
+              ))}
+            </div>
+          </Dropdown>) : ''}
+      </div> */}
+
     </div>
   );
 };

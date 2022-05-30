@@ -57,10 +57,11 @@ const AcyModal = ({ children, ...rest }) => {
       className={styles.acymodal}
       bodyStyle={{
         padding: '21px',
-        background: rest.backgroundColor ? rest.backgroundColor : '#2e3032',
-        // backgroundColor: '#1b1b1c',
+        // background: rest.backgroundColor ? rest.backgroundColor : '#2e3032',
+        backgroundColor: 'black',
         borderRadius: ' 20px',
-        boxShadow: '0 0 14px #2d2d2d'
+        boxShadow: '0 0 14px #2d2d2d',
+        border: '1px solid #333333',
       }}
       footer={null}
       closable={false}

@@ -50,46 +50,18 @@ export default [
         ],
       },
       {
-        path: '/perpetual',
-        name: 'Perpetual',
-        component: './Perpetual/Index',
-      },
-      {
         path: '/exchange',
         name: 'Exchange',
         component: './Swap/Index',
       },
       {
-        path: '/liquidity',
-        name: 'Liquidity',
-        component: './Liquidity/Index',
+        path: '/perpetual',
+        name: 'Future',
+        component: './Perpetual/Index',
       },
       {
-        path: '/farms',
-        name: 'Farm',
-        component: './Farms/',
-      },
-      {
-        path: '/stablecoin',
-        name: 'StableCoin',
-        component: './StableCoin/Index',
-      },
-      {
-        path: '/stats',
-        name: 'Stats',
-        // component: './stats/stats',
-        routes:[
-          {
-            path:'/stats/perpetual',
-            name:'Perpetual',
-            component:'./Stats/Perpetual/Index'
-          },
-          {
-            path:'/stats/stablecoin',
-            name:'StableCoin',
-            component:'./Stats/StableCoin/stats'
-          }
-        ]
+        path: '/',
+        name: 'Option',
       },
       {
         path: '/launchpad',
@@ -105,6 +77,38 @@ export default [
             component: './LaunchPad/LaunchpadProject',
           },
         ],
+      },
+      {
+        path: '/stablecoin',
+        name: 'StableCoin',
+        component: './StableCoin/Index',
+      },
+      {
+        path: '/liquidity',
+        name: 'Liquidity',
+        component: './Liquidity/Index',
+      },
+      {
+        path: '/farms',
+        name: 'Farm',
+        component: './Farms/',
+      },
+      {
+        path: '/stats',
+        name: 'Statistics',
+        // component: './stats/stats',
+        routes:[
+          {
+            path:'/stats/perpetual',
+            name:'Perpetual',
+            component:'./Stats/Perpetual/Index'
+          },
+          {
+            path:'/stats/stablecoin',
+            name:'StableCoin',
+            component:'./Stats/StableCoin/stats'
+          }
+        ]
       },
       {
         path: '/transaction/:id?',

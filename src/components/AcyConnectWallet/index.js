@@ -172,13 +172,13 @@ const AcyConnectWallet = props => {
       <div {...rest} className={styles.connect}>
         <div className={styles.wrap}>
           {/* {chainName} ( {displayedChainId || 'disconnected'} ) */}
-          <Tooltip placement='bottomLeft' color={'#b5b5b6'} title="Click to show your balance" mouseEnterDelay={0.5}>
+          {/* <Tooltip placement='bottomLeft' color={'#b5b5b6'} title="Click to show your balance" mouseEnterDelay={0.5}>
 
             <div className={styles.balanceBtn} onClick={balanceHandle}>
               <p style={{ display: balanceTitleShow }}>Balance</p>
               <div className={styles.showBalance} style={{ display: balanceShow }}>$ {userBalance}</div>
             </div>
-          </Tooltip>
+          </Tooltip> */}
           {/* pending */}
           {pendingLength
             &&

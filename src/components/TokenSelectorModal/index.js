@@ -146,8 +146,9 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick, tokenlist }) => {
                         <Input
                             size="large"
                             style={{
-                                backgroundColor: '#373739',
+                                backgroundColor: 'black',
                                 borderRadius: '40px',
+                                border: '1px solid #333333',
                             }}
                             placeholder="Enter the token symbol or address"
                             value={tokenSearchInput}
@@ -160,22 +161,6 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick, tokenlist }) => {
                     <div className={styles.coinList}>
                         <AcyTabs>
                             <AcyTabPane tab="All" key="1">
-                                {/* {customTokenList.length ? customTokenList.map((token, index) => {
-                                    return (
-                                        <AcyCoinItem
-                                            data={token}
-                                            key={index}
-                                            customIcon={false}
-                                            clickCallback={() => setTokenAsFav(token)}
-                                            selectToken={() => {
-                                                onCoinClick(token);
-                                            }}
-                                            isFav={favTokenList.includes(token)}
-                                            constBal={ token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null }
-                                        />
-                                    );
-                                }) : null} */}
-
                                 {initTokenList.length ? initTokenList.map((token, index) => {
                                     return (
                                         <AcyCoinItem
