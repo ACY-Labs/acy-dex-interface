@@ -23,7 +23,6 @@ import { useConstantLoader } from '@/constants';
 
 import { useConnectWallet } from '@/components/ConnectWallet';
 
-
 const MarketIndex = props => {
   const [visible, setVisible] = useState(true);
   const [tabIndex, setTabIndex] = useState(0);
@@ -44,6 +43,7 @@ const MarketIndex = props => {
   const [transactions, settransactions] = useState(null);
   const [tokenInfo, settokenInfo] = useState([]);
   const [coinList, setCoinList] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
 
   const [poolInfo, setpoolInfo] = useState([]);
 
@@ -126,14 +126,28 @@ const MarketIndex = props => {
       `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false`
     ).then(data => {
       setCoinList(data.data)
-      console.log('fetching coin list', data.data)
+      console.log('joy init coin list', data.data)
     })
+      .catch(e => {
+        console.log(e);
+      });
+
+  }, [chainId, marketNetwork]);
+
+  
+function fetchMarketList() {
+  const apiUrlPrefix = "https://api.coingecko.com/api/v3"
+  axios.get(
+    `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=${currentPage + 1}&sparkline=false`
+  ).then(data => {
+    setCoinList(coinList.concat(data.data))
+    setCurrentPage(currentPage + 1)
+    console.log('joy fetching market list', data.data)
+  })
     .catch(e => {
       console.log(e);
     });
-    
-  }, [chainId, marketNetwork]);
-
+}
 
 
   const onLineGraphHover = (newData, newIndex) => {
@@ -150,17 +164,6 @@ const MarketIndex = props => {
     console.log(index);
     setmarketNetwork(index);
   }
-
-  // const apiUrlPrefix = "https://api.coingecko.com/api/v3"
-  // axios.get(
-  //   `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false`
-  // )
-  // .then(data => {
-  //   console.log(data.data)
-  // })
-  // .catch(e => {
-  //   console.log(e);
-  // })
 
   return (
     <div className={styles.marketRoot}>
@@ -179,7 +182,7 @@ const MarketIndex = props => {
         <h2>Cryptocurrencies</h2>
       </div>
       {coinList.length > 0 ? (
-        <CurrencyTable dataSourceCoin={coinList} />
+        <CurrencyTable dataSourceCoin={coinList} fetchMarketList={fetchMarketList} />
       ) : (
         <Icon type="loading" />
       )}

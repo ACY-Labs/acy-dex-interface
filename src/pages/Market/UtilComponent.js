@@ -932,7 +932,7 @@ export function TransactionTable(props) {
 
 export function CurrencyTable(props) {
   const [tokenSortAscending, setTokenSortAscending] = useState(true);
-  const [tokenDisplayNumber, setTokenDisplayNumber] = useState(49);
+  const [tokenDisplayNumber, setTokenDisplayNumber] = useState(99);
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
   const [favTokenList, setFavTokenList] = useState([]);
@@ -1188,7 +1188,8 @@ export function CurrencyTable(props) {
               <a
                 className={styles.tableSeeMore}
                 onClick={() => {
-                  setTokenDisplayNumber(tokenDisplayNumber + 50);
+                  props.fetchMarketList()
+                  setTokenDisplayNumber(tokenDisplayNumber + 100);
                 }}
               >
                 See More...
