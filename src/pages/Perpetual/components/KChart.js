@@ -3,6 +3,9 @@ import { getKChartData } from '../utils/index'
 //------FOR Pricehart-----TODO Austin 
 // import { createChart } from 'krasulya-lightweight-charts'
 import { createChart } from 'lightweight-charts';
+import { formatAmount, USD_DECIMALS, formatDateTime } from '@/acy-dex-futures/utils';
+// import  USD_DECIMALS  from '@/acy-dex-futures/utils/Helpers';
+
 import './styles.css';
 // import {
 // 	USD_DECIMALS,
@@ -18,8 +21,11 @@ import './styles.css';
 // } from '../../../acy-dex-futures/utils/Helpers'
 
 import Tab from '../../../acy-dex-futures/Tab/Tab'
+import { MdOutlineSignalCellularConnectedNoInternet4Bar } from 'react-icons/md';
 
-const Kchart=(props)=> {
+const timezoneOffset = -(new Date()).getTimezoneOffset() * 60
+
+const KChart=(props)=> {
 
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
@@ -36,10 +42,10 @@ const Kchart=(props)=> {
     width,
     height,
     layout: {
-
       backgroundColor: '#0e0304',
       textColor: '#ccc',
-      fontFamily: 'Relative'
+      fontFamily: 'Karla'
+      // font-family: "Karla", sans-serif;
     },
     // localization: {
     //   // https://github.com/tradingview/lightweight-charts/blob/master/docs/customization.md#time-format
@@ -50,13 +56,13 @@ const Kchart=(props)=> {
     grid: {
       vertLines: {
         visible: true,
-        color: 'rgba(46, 46, 49, 1)',
-        style: 2
+        color: 'rgb(28, 28, 30)',
+        style: 1
       },
       horzLines: {
         visible: true,
-        color: 'rgba(46, 46, 49, 1)',
-        style: 2
+        color: 'rgb(28, 28, 30)',
+        style: 1
       }
     },
     // https://github.com/tradingview/lightweight-charts/blob/master/docs/time-scale.md#time-scale
@@ -67,20 +73,24 @@ const Kchart=(props)=> {
       timeVisible: true,
       fixLeftEdge: true
     },
+    // localization: {
+    //   // locale,
+    // },
     // https://github.com/tradingview/lightweight-charts/blob/master/docs/customization.md#price-axis
     priceScale: {
       borderVisible: false
     },
     crosshair: {
       horzLine: {
-        color: 'rgba(46, 46, 49, 1)'
+        color: 'rgb(142, 142, 147)'
       },
       vertLine: {
-        color: 'rgba(46, 46, 49, 1)'
+        color: 'rgb(142, 142, 147)'
       },
       mode: 0
     }
   });
+
   function fillGaps(prices, periodSeconds) {
     if (prices.length < 2) {
       return prices
@@ -90,8 +100,10 @@ const Kchart=(props)=> {
     let prevTime = prices[0].time
     for (let i = 1; i < prices.length; i++) {
       const { time, open } = prices[i]
+      // console.log("hereim time, open", time, open)
       if (prevTime) {
         let j = (time - prevTime) / periodSeconds - 1
+        // console.log("hereim j", j)
         while (j > 0) {
           newPrices.push({
             time: time - j * periodSeconds,
@@ -110,13 +122,13 @@ const Kchart=(props)=> {
   
     return newPrices
   }
+
   const getCurrentTime = () => {
     let currentTime = Math.floor(new Date().getTime()/1000);
-    // console.log("hereim current time", currentTime);
     return currentTime;
   }
-  const getFromTime100 = ( currentTime ) => {
-    let fromTime = currentTime - 100* 24* 60* 60;
+  const getFromTimeDays = ( days, currentTime ) => {
+    let fromTime = currentTime - days * 24* 60* 60;
     return fromTime;
   }
   const getSeconds = ( timeScale ) => {
@@ -162,11 +174,12 @@ const Kchart=(props)=> {
     borderVisible: false
   });
   
-  //#TODO (Austin) convert into ACY Style
+  // let series;
+  let chart;
+  //for init
   useEffect(async () => {
-    let chart;
+    // let chart;
     if (currentChart) {
-      console.log("hereim init if")
 
     }
 
@@ -175,10 +188,13 @@ const Kchart=(props)=> {
       getChartOptions(chartRef.current.offsetWidth, chartRef.current.offsetHeight),
     );
 
-    var candleSeries = chart.addCandlestickSeries(getSeriesOptions());
+    const candleSeries = chart.addCandlestickSeries(getSeriesOptions()) ;
+    // console.log("hereim init candleseries add series option", series);
+
+    setCurrentChart(chart);
 
     let currentTime = getCurrentTime();
-    let fromTime = getFromTime100( currentTime );
+    let fromTime = getFromTimeDays( 100, currentTime );
     let data;
     try {
       data = await getKChartData(props.activeToken1.symbol, "56", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
@@ -187,14 +203,24 @@ const Kchart=(props)=> {
       console.log("fallback to empty array");
     }
     let seconds = getSeconds(props.activeTimeScale);
+    data = appendCurrentAveragePrice(data, props.currentAveragePrice, seconds)
     let filledData = fillGaps(data, seconds);
-    candleSeries.setData(filledData);
+    candleSeries.setData(data);
+    // console.log("hereim set filledData", series);
 
-    const series = chart.addCandlestickSeries(getSeriesOptions())
-    setCurrentChart(chart);
-    setCurrentSeries(series);
+    let changedTzData = timeToTz(filledData);
+    candleSeries.setData(changedTzData);
+    // console.log("hereim set changedTzData", series);
+
+    // const series = chart.addCandlestickSeries(getSeriesOptions())
+    setCurrentSeries(candleSeries);
   },[])
 
+  useEffect(() => {
+    console.log("hereim second useeffect")
+  }, [])  
+
+  //for resize
   useEffect(() => {
     if (!currentChart) { return; }
     const resizeChart = () => {
@@ -204,7 +230,7 @@ const Kchart=(props)=> {
     return () => window.removeEventListener('resize', resizeChart);
   }, [currentChart]);
 
-
+  //reload when new timescale or token selected
   useEffect(async () => {
     if (currentChart == undefined) {
       return;
@@ -219,18 +245,26 @@ const Kchart=(props)=> {
 
     // candleSeries.setData(currentChartData);
     let currentTime = getCurrentTime();
-  let fromTime = getFromTime100( currentTime );
-  let data;
-    try {
-      data = await getKChartData(props.activeToken1.symbol, "56", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
-    } catch {
-      data = [];
-      console.log("fallback to empty array");
-    }
+    console.log("hereim current", currentTime)
+    let fromTime = getFromTimeDays( 100, currentTime );
+    let data;
+      try {
+        data = await getKChartData(props.activeToken1.symbol, "56", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
+      } catch {
+        data = [];
+        console.log("fallback to empty array");
+      }
     let seconds = getSeconds(props.activeTimeScale);
+    data = appendCurrentAveragePrice(data, props.currentAveragePrice, seconds)
+    console.log("hereim 1")
     let filledData = fillGaps(data, seconds);
-    candleSeries.setData(filledData);
+    let changedTzData = timeToTz(filledData);
+    // console.log("hereim changed timescale candleseries", series);
+    candleSeries.setData(changedTzData);
     setCurrentChart(chart);
+    updateChart(chart);
+    setCurrentSeries(candleSeries);
+    
   },[props.activeToken1.symbol, props.activeTimeScale])
 
   useEffect(() => {
@@ -242,27 +276,133 @@ const Kchart=(props)=> {
     return () => window.removeEventListener('resize', resizeChart);
   }, [currentChart]);
 
+  function timeToTz (timeData) {
+    for (let i=1; i<timeData.length; i++) {
+      timeData[i].time = timeData[i].time + timezoneOffset;
+    }
+    return timeData;
+  }
 
-  useEffect(async() => {
-    if (currentChart == undefined) {
-      return;
-    } 
+  function updateChart( currentChart ) {
+    let seconds = getSeconds(props.activeTimeScale);
+
+    const interval = setInterval(async() => {
+      if (currentChart == undefined) {
+        return;
+      } 
+      // currentChart.resize(0,0);
+      
+      // const chart = createChart(
+      //     chartRef.current,
+      //     getChartOptions(chartRef.current.offsetWidth, chartRef.current.offsetHeight),
+      // );
+      // var candleSeries = chart.addCandlestickSeries(getSeriesOptions());
+  
+      let currentTime = getCurrentTime();
+      let fromTime = getFromTimeDays( 2, currentTime );
+      let data;
+      try {
+        data = await getKChartData(props.activeToken1.symbol, "56", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
+      } catch {
+        data = [];
+        console.log("fallback to empty array");
+      }
+      let seconds = getSeconds(props.activeTimeScale);
+      data = appendCurrentAveragePrice(data, props.currentAveragePrice, seconds)
+      let filledData = fillGaps(data, seconds);
+      let changedTzData = timeToTz(filledData);
+      // currentSeries.update(changedTzData);
+      setCurrentChart(changedTzData);
+      console.log("hereim update", seconds)
+    }, seconds * 1000)
+
+    return () => clearInterval(interval);
+  }
+
+  function appendCurrentAveragePrice(prices, currentAveragePrice, periodSeconds) {
+    let currentTime = Math.floor( Date.now() / 1000)
+    let currentTimeA = Math.floor(currentTime/periodSeconds)
+    const currentCandleTime = currentTimeA* periodSeconds
+    const last = prices[prices.length - 1]
+    const averagePriceValue = parseFloat(currentAveragePrice)
+    if (currentCandleTime === last.time) {
+      // last.close = averagePriceValue
+      // last.high = Math.max(last.high, averagePriceValue)
+      // last.low = Math.max(last.low, averagePriceValue)
+      return prices
+    } else {
+      const newCandle = {
+        time: currentCandleTime,
+        open: last.close,
+        close: last.close,
+        high: last.high,
+        low: last.low
+      }
+      // console.log("hereim see new candle", newCandle)
+
+      return [...prices, newCandle]
+    }
+  }
+
+  //update data every timescale
+  // useEffect(async() => {
     
-    let chart = currentChart;
-    var candleSeries = chart.addCandlestickSeries(getSeriesOptions());
+  
+  //   let chart = currentChart;
+  //   var candleSeries = chart.addCandlestickSeries(getSeriesOptions());
 
-    // const interval = setInterval(async() => {
-    //   let currentTime = getCurrentTime();
-    //   let fromTime = getFromTimeUpdate( currentTime, props.activeTimeScale );
-    //   let data = await getKChartData(props.activeToken1.symbol, "42161", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
-    //   console.log("hereim data timescale", data);
-    //   candleSeries.update(data[0])
-    //   // candleSeries.update({ time: '2022-05-06', open: 112, high: 112, low: 100, close: 101 });
+  //   const interval = setInterval(async() => {
+  //     if (currentChart == undefined) {
+  //       return;
+  //     } 
+  //     currentChart.resize(0,0);
+      
+  //     const chart = createChart(
+  //         chartRef.current,
+  //         getChartOptions(chartRef.current.offsetWidth, chartRef.current.offsetHeight),
+  //     );
+  //     var candleSeries = chart.addCandlestickSeries(getSeriesOptions());
+  
+  //     let currentTime = getCurrentTime();
+  //     let fromTime = getFromTimeDays( 2, currentTime );
+  //     let data;
+  //     try {
+  //       data = await getKChartData(props.activeToken1.symbol, "56", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
+  //     } catch {
+  //       data = [];
+  //       console.log("fallback to empty array");
+  //     }
+  //     let seconds = getSeconds(props.activeTimeScale);
+  //     let filledData = fillGaps(data, seconds);
+  //     candleSeries.setData(filledData);
+  //     setCurrentChart(chart);
 
-    //   // console.log("hereim update")
-    // }, 5 * 1000)
-    // return () => clearInterval(interval);
-  }, [props.activeTimeScale])
+  //     // let prevTime = getCurrentTime();
+  //     // let fromTime = getFromTimeDays( 2, prevTime );
+  //     // let data = await getKChartData(props.activeToken1.symbol, "56", props.activeTimeScale, fromTime.toString(), prevTime.toString(), "chainlink");
+  //     // let seconds = getSeconds(props.activeTimeScale);
+  //     // let filledData = fillGaps(data, seconds);
+  //     // let lastDataIndex = filledData.length-1;
+  //     // let lastData = filledData[lastDataIndex];
+
+  //     // let currentTime = getCurrentTime();
+  //     // let newData = await getKChartData(props.activeToken1.symbol, "42161", props.activeTimeScale, fromTime.toString(), currentTime.toString(), "chainlink");
+  //     // let updatePrice;
+  //     // if (lastData.time === newData[filledNewData.length-1].time)
+  //     // updatePrice.push({
+  //     //   time: lastData.time + ,
+  //     //   open,
+  //     //   close: open,
+  //     //   high: open * 1.0003,
+  //     //   low: open * 0.9996
+  //     // })
+      
+  //   //   candleSeries.update(data[0])
+  //   //   // candleSeries.update({ time: '2022-05-06', open: 112, high: 112, low: 100, close: 101 });
+  //     seconds = getSeconds(props.timeScale);
+  //   }, seconds)
+  //   return () => clearInterval(interval);
+  // }, [props.activeTimeScale])
 
     
   return(
@@ -285,4 +425,4 @@ const Kchart=(props)=> {
 
   )
 }
-export default Kchart;
+export default KChart;

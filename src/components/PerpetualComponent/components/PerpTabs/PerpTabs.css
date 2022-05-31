@@ -20,7 +20,7 @@
     padding-left: 1rem;
     padding-right: 1rem;
     cursor: pointer;
-    /* border: 0.75px solid #373738; */
+    border: 0.5px solid #232323;
   }
   
   .Tab.block .Tab-option:hover {

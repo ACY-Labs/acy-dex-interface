@@ -5,6 +5,8 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { JsonRpcProvider } from "@ethersproject/providers"
 import _ from "lodash";
 import Token from "@/acy-dex-futures/abis/Token.json";
+import OrderBook from "@/acy-dex-futures/abis/OrderBook";
+import OrderBookReader from "@/acy-dex-futures/abis/OrderBookReader";
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import { InjectedConnector, UserRejectedRequestError as UserRejectedRequestErrorInjected} from "@web3-react/injected-connector";
 import { useRef, useEffect, useCallback } from "react";
@@ -14,6 +16,7 @@ import useSWR from "swr";
 import { getContract } from './Addresses';
 import { useLocalStorage } from "react-use";
 import { constantInstance, useConstantLoader } from '@/constants';
+import { format as formatDateFn } from "date-fns";
 export const MARKET = 'Market';
 export const LIMIT = 'Limit';
 export const LONG = 'Long';
@@ -57,7 +60,8 @@ export const CHART_PERIODS = {
   "15m": 60 * 15,
   "1h": 60 * 60,
   "4h": 60 * 60 * 4,
-  "1d": 60 * 60 * 24
+  "1d": 60 * 60 * 24,
+  "1w": 60 * 60 * 24 * 7
 };
 
 export const BSC_MAINNET = 56;
@@ -203,7 +207,7 @@ export function approveTokens({
   setIsApproving(true);
   const contract = new ethers.Contract(
     tokenAddress,
-    Token,
+    Token.abi,
     library.getSigner()
   );
   contract
@@ -603,10 +607,13 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
         }
         infoTokens[token.address] = token
     }
-
+    // console.log("hereim whitelisted", vaultTokenInfo)
     for (let i = 0; i < whitelistedTokens.length; i++) {
         const token = JSON.parse(JSON.stringify(whitelistedTokens[i]))
+        // console.log("hereim vault above", vaultTokenInfo)
+
         if (vaultTokenInfo) {
+          // console.log("hereim vault", vaultTokenInfo)
             token.poolAmount = vaultTokenInfo[i * vaultPropsLength]
             token.reservedAmount = vaultTokenInfo[i * vaultPropsLength + 1]
             token.availableAmount = token.poolAmount.sub(token.reservedAmount)
@@ -758,6 +765,7 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   const method = ethers.utils.isAddress(arg0) ? arg1 : arg0
 
   function onError(e) {
+    // console.log("hereim fetcher error", e);
     console.error(method, e)
   }
 
@@ -775,7 +783,6 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
         // console.log("debug useSWR: ", contract, method, params.concat(additionalArgs))
         return contract[method](...params.concat(additionalArgs)).catch(onError)
       }
-      // console.log(method, "fetcher 3")
       return contract[method](...params).catch(onError)
     } catch (e) {
       onError(e)
@@ -784,7 +791,6 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   if (!library) {
     return
   }
-  // console.log(method, "fetcher 4")
   return library[method](arg1,...params).catch(onError);;
 }
 
@@ -1803,4 +1809,11 @@ export function usePrevious(value) {
         ref.current = value;
     });
     return ref.current;
+}
+
+export function formatDateTime(time) {
+  return formatDateFn(time * 1000, "dd MMM yyyy, h:mm a");
+}
+export function formatDate(time) {
+  return formatDateFn(time * 1000, "dd MMM yyyy");
 }

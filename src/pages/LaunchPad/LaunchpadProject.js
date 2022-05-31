@@ -95,14 +95,14 @@ const TokenLogoLabel = ({ projectName, tokenLogo, receivedData }) => {
         onClick={() => clickToWebsite()}
       />
       <div className="tokenInfo">
-        <span className="tokenTitle" onClick={() => clickToWebsite()}>{projectName}</span>
+        <div className="tokenTitle" onClick={() => clickToWebsite()}>{projectName}</div>
         <div className="tokenLabelBar">
           {receivedData.tokenLabels &&
             receivedData.tokenLabels.map((label) => {
-              if (label === "BSC") return (
+              if (label === "BNB Chain") return (
                 <span className="tokenLabel">
                   <img src={bscChainIcon} alt="" style={{ width: '13px', height: '13px', marginRight: '0.2rem' }} />
-                  BSC
+                  {label}
                 </span>
               )
               if (label === "Polygon") return (
@@ -622,7 +622,22 @@ const Allocation = ({
       });
   }, [account, receivedData]);
 
-  const onChangeSaleValue = (e) => {
+  const onFocusSaleValue = (e) => {
+    if (!allocationInfo.allocationAmount) {
+      requireAllocation(API_URL(), account, receivedData.projectToken).then(res => {
+        if (res && res.allocationAmount) {
+          console.log('resalloc: ', res);
+          setAllocationInfo(res);
+          updateInnerValues(2, res);
+          updateCoverStates(2);
+        }
+      }).catch(e => {
+        console.error(e);
+      })
+    }
+  }
+
+  const onBlurSaleValue = (e) => {
     const value = e.target.value;
     if (!allocationInfo.allocationAmount) {
       setSalesValue(0);
@@ -893,7 +908,8 @@ const Allocation = ({
                 className="sales-input"
                 value={salesValue}
                 onChange={(e) => setSalesValue(e.target.value)}
-                onBlur={onChangeSaleValue}
+                onBlur={onBlurSaleValue}
+                onFocus={onFocusSaleValue}
               />
               <div className="unit-max-group">
                 <div className="token-logo">

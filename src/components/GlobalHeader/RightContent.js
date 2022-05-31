@@ -603,14 +603,14 @@ const GlobalHeaderRight = props => {
         setVisibleMetaMask(false);
       },
     },
-    {
-      name: 'Arbitrum',
-      icon: 'Arbitrum',
-      onClick: async () => {
-        await switchEthereumChain("0xA4B1");
-        setVisibleMetaMask(false);
-      },
-    },
+    // {
+    //   name: 'Arbitrum',
+    //   icon: 'Arbitrum',
+    //   onClick: async () => {
+    //     await switchEthereumChain("0xA4B1");
+    //     setVisibleMetaMask(false);
+    //   },
+    // },
   ];
   const networkListInCardList = (
     <div className={styles.networkListBlock}>
