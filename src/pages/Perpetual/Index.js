@@ -191,6 +191,8 @@ export function getPositionQuery(tokens, nativeTokenAddress) {
     const token = tokens[i]
     if (token.isStable) { continue }
     if (token.isWrapped) { continue }
+    if (token.isNative) { continue }
+
     collateralTokens.push(getTokenAddress(token, nativeTokenAddress))
     indexTokens.push(getTokenAddress(token, nativeTokenAddress))
     isLong.push(true)
@@ -213,10 +215,12 @@ export function getPositionQuery(tokens, nativeTokenAddress) {
   return { collateralTokens, indexTokens, isLong }
 }
 
-export function getPositions(chainId, positionQuery, positionData, infoTokens, includeDelta) {
+export function getPositions(chainId, positionQuery, positionData, infoTokens, includeDelta, nativeTokenAddress) {
 
   const propsLength = getConstant(chainId, "positionReaderPropsLength")
   // const propsLength = 9;
+
+  console.log('TESTING  getPositions', propsLength, infoTokens )
   const positions = []
   const positionsMap = {}
 
@@ -353,9 +357,6 @@ const Swap = props => {
   const whitelistedTokens = supportedTokens.filter(token => token.symbol !== "USDG");
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
   const tokens = supportedTokens;
-  const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
-
-
 
   const defaultTokenSelection = useMemo(() => ({
     ["Swap"]: {
@@ -398,6 +399,7 @@ const Swap = props => {
   const glpManagerAddress = perpetuals.getContract("GlpManager")
   const glpAddress = perpetuals.getContract("GLP")
   const orderBookAddress = perpetuals.getContract("OrderBook")
+  const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
 
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
@@ -427,7 +429,7 @@ const Swap = props => {
   });
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
-  const { positions, positionsMap } = getPositions(chainId, positionQuery, positionData, infoTokens, true)
+  const { positions, positionsMap } = getPositions(chainId, positionQuery, positionData, infoTokens, true, nativeTokenAddress)
   console.log('PRINTING ALL POSITIONS FOR USER', positions);
 
   const flagOrdersEnabled = true;
