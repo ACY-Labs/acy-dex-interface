@@ -193,8 +193,6 @@ export function getPositionQuery(tokens, nativeTokenAddress) {
     if (token.isWrapped) { continue }
     collateralTokens.push(getTokenAddress(token, nativeTokenAddress))
     indexTokens.push(getTokenAddress(token, nativeTokenAddress))
-    // console.log("see indextokens", token);
-    // console.log("see index token native addr", nativeTokenAddress);
     isLong.push(true)
   }
 
@@ -407,7 +405,6 @@ const Swap = props => {
   const { data: positionData, mutate: updatePositionData } = useSWR([chainId, readerAddress, "getPositions", vaultAddress, account],{
     fetcher: fetcher(library, Reader, [positionQuery.collateralTokens, positionQuery.indexTokens, positionQuery.isLong]),
   })
-  console.log('check positionData',positionData)
   const tokenAddresses = tokens.map(token => token.address)
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),

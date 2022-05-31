@@ -763,7 +763,7 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
 
   if (ethers.utils.isHexString(arg0)) {
     const address = arg0
-    const contract = new ethers.Contract(address, contractInfo, provider)
+    const contract = new ethers.Contract(address, contractInfo.abi, provider)
     // console.log('fetcher contract', contract)
 
     try {
@@ -803,7 +803,7 @@ export function getExplorerUrl(chainId) {
     return "https://arbiscan.io/";
   } else if (chainId === AVALANCHE) {
     return "https://snowtrace.io/";
-  } else if (chianId === POLYGON_TESTNET) {
+  } else if (chainId === POLYGON_TESTNET) {
     return "https://mumbai.polygonscan.com/"
   } else if (chainId === POLYGON_MAINNET) {
     return "https://polygonscan.com/"
