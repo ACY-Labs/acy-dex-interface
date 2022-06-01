@@ -1,11 +1,11 @@
-import {useEffect} from 'react';
+import { useEffect } from 'react';
 import { Modal } from 'antd';
 import { useWeb3React } from "@web3-react/core";
 import { InjectedConnector } from "@web3-react/injected-connector";
 import styles from './style.less';
 import { rest } from 'lodash-decorators';
 
-const AcyModal = ({ children, ...rest }) => {
+const AcyModal = ({ children, sideComponent, ...rest }) => {
   // const { account, chainId, library, activate } = useWeb3React();
   // const injected = new InjectedConnector({
   //   supportedChainIds: [1, 3, 4, 5, 42],
@@ -53,23 +53,50 @@ const AcyModal = ({ children, ...rest }) => {
   //   activate(injected);
   // }, []);
   return (
-    <Modal
-      className={styles.acymodal}
-      bodyStyle={{
-        padding: '21px',
-        // background: rest.backgroundColor ? rest.backgroundColor : '#2e3032',
-        backgroundColor: 'black',
-        borderRadius: ' 20px',
-        boxShadow: '0 0 14px #2d2d2d',
-        border: '1px solid #333333',
-      }}
-      footer={null}
-      closable={false}
-      {...rest}
-    >
-        {/* <h1>{account}</h1> */}
-      {children}
-    </Modal>
+    <>
+      {sideComponent ?
+        <Modal
+          className={styles.acymodal}
+          style={{
+            display: 'inline-block',
+            float: 'right',
+            top: 'auto',
+            marginTop: '65px',
+            marginRight: '100px',
+          }}
+          bodyStyle={{
+            width: '509px',
+            height: '686px',
+            padding: '21px',
+            backgroundColor: 'black',
+          }}
+          footer={null}
+          closable={false}
+          {...rest}
+        >
+          {/* <h1>{account}</h1> */}
+          {children}
+        </Modal>
+        :
+        <Modal
+          className={styles.acymodal}
+          bodyStyle={{
+            padding: '21px',
+            // background: rest.backgroundColor ? rest.backgroundColor : '#2e3032',
+            backgroundColor: 'black',
+            borderRadius: ' 20px',
+            boxShadow: '0 0 14px #2d2d2d',
+            border: '1px solid #333333',
+          }}
+          footer={null}
+          closable={false}
+          {...rest}
+        >
+          {/* <h1>{account}</h1> */}
+          {children}
+        </Modal>
+      }
+    </>
   );
 };
 export default AcyModal;

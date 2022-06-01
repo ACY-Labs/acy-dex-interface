@@ -65,7 +65,7 @@ export default [
       },
       {
         path: '/launchpad',
-        name: 'Launch',
+        name: 'Launchpad',
         hideChildrenInMenu: true,
         routes: [
           {
@@ -94,21 +94,27 @@ export default [
         component: './Farms/',
       },
       {
-        path: '/stats',
+        path: '/stats/perpetual',
         name: 'Statistics',
-        // component: './stats/stats',
-        routes:[
-          {
-            path:'/stats/perpetual',
-            name:'Perpetual',
-            component:'./Stats/Perpetual/Index'
-          },
-          {
-            path:'/stats/stablecoin',
-            name:'StableCoin',
-            component:'./Stats/StableCoin/stats'
-          }
-        ]
+        component: './Stats/Perpetual/Index',
+        // routes:[
+        //   {
+        //     path:'/stats/perpetual',
+        //     name:'Perpetual',
+        //     component:'./Stats/Perpetual/Index'
+        //   },
+        //   {
+        //     path:'/stats/stablecoin',
+        //     name:'StableCoin',
+        //     component:'./Stats/StableCoin/stats'
+        //   }
+        // ]
+      },
+      {
+        path: './stats/stablecoin',
+        name:'Statistics',
+        component: './Stats/StableCoin/stats',
+        hideInMenu: true,
       },
       {
         path: '/transaction/:id?',

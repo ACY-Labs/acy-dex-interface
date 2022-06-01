@@ -634,6 +634,7 @@ const SwapComponent = props => {
         library={library}
       />
 
+      {showDescription ?
       <AcyDescriptions>
         <div className={styles.breakdownTopContainer}>
           <div className={styles.slippageContainer}>
@@ -709,7 +710,7 @@ const SwapComponent = props => {
               ))}
             </div> */}
       </AcyDescriptions>
-     
+      : null}
 
       {needApprove
         ? <div>
@@ -790,7 +791,7 @@ const SwapComponent = props => {
       </AcyDescriptions>
 
       <TokenSelectorModal
-        onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick}
+        onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} sideComponent={true}
       />
     </div>
   );

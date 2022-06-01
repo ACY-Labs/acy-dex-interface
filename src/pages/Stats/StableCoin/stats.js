@@ -5,6 +5,7 @@ import { Graphics } from "./components/graphics"
 import { VaultCard } from "./components/vaultCard";
 import { StartegyCard } from "./components/strategyCard";
 import { ValueCalculations } from "./components/valueCalculations"
+import { useHistory } from 'react-router-dom'
 
 const stats = (props) => {
     /* #region  graph */
@@ -106,8 +107,21 @@ const stats = (props) => {
         ]
     }
 
+    const history = useHistory()
+
     return (
         <div className={styles.statsPage}>
+            <div className={`${styles.colItem}`}>
+                <a
+                    className={styles.optionTab}
+                    onClick={() => {
+                        history.push('/stats/perpetual')
+                    }}
+                >
+                    Perpetual
+                </a>
+                <a className={styles.optionTabSelected}> StableCoin </a>
+            </div>
             <div className={styles.tittle}>
                 USDA ANALYTICS
             </div>

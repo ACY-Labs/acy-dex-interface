@@ -568,15 +568,19 @@ const Swap = props => {
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
           <div className={`${styles.colItem} ${styles.priceChart}`}>
-            <AcyCard style={{ backgroundColor: 'transparent', padding: '0 150px', border: 'none' }}>
+            <AcyCard style={{ backgroundColor: 'transparent', padding: '0 150px', paddingTop: '20px', border: 'none' }}>
               <SankeyGraph />
             </AcyCard>
             <div className={styles.exchangeBottomWrapper}>
               <div className={styles.exchangeItem}>
-                <h3>
+                {/* <h3>
                   <AcyIcon.MyIcon width={30} type="arrow" />
                   <span className={styles.span}>TRANSACTION HISTORY</span>
-                </h3>
+                </h3> */}
+                <div className={`${styles.colItem}`}>
+                    <a className={`${styles.colItem} ${styles.optionTab}`}>All Orders</a>
+                    <a className={`${styles.colItem} ${styles.optionTab}`}>My Orders</a>
+                </div>
                 {account && tableLoading ? (
                   <h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>
                 ) : (

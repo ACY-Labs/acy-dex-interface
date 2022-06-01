@@ -1,5 +1,5 @@
 import { useWeb3React } from '@web3-react/core';
-import { supportedTokens} from '@/acy-dex-usda/utils/address';
+import { supportedTokens } from '@/acy-dex-usda/utils/address';
 import { useConstantLoader } from '@/constants';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
@@ -11,17 +11,17 @@ import { AcyCard } from '@/components/Acy';
 import SwapComponent from './components/stableCoinComponent';
 import { APYtable } from './components/apytable';
 import { AccountBox } from './components/accountBox';
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const StableCoin = props => {
-  const {account, library, farmSetting: { API_URL: apiUrlPrefix}} = useConstantLoader(props);
+  const { account, library, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader(props);
   // TODO: TESTING
   const chainId = 137;
-  const{dispatch}=props
+  const { dispatch } = props
   const tokenlist = supportedTokens[chainId]
-  const [activeToken0,setActiveToken0] = useState(tokenlist[0]);
-  const [activeToken1,setActiveToken1] = useState(tokenlist[2]);;
-  
+  const [activeToken0, setActiveToken0] = useState(tokenlist[0]);
+  const [activeToken1, setActiveToken1] = useState(tokenlist[2]);;
+
   const onGetReceipt = async (receipt, library, account) => {
     // updateTransactionList(receipt);
   };
@@ -47,30 +47,33 @@ const StableCoin = props => {
 
   return (
     <PageHeaderWrapper>
-      <Banner />
-      
-      <div className={styles.dataBlock}>
-        <AccountBox />
-        <ExchangeTable />
+      {/* <Banner /> */}
+
+      <div className={styles.content}>
+        <div className={styles.dataBlock}>
+          <AccountBox />
+          <ExchangeTable />
+        </div>
+
+        <div className={styles.swapCard}>
+          <div className={`${styles.colItem} ${styles.swapComponent}`}>
+            <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', border: 'none' }}>
+              <div className={styles.trade}>
+                <SwapComponent
+                  onSelectToken0={token => {
+                    setActiveToken0(token);
+                  }}
+                  onSelectToken1={token => {
+                    setActiveToken1(token);
+                  }}
+                  onGetReceipt={onGetReceipt} />
+              </div>
+            </AcyCard>
+          </div>
+        </div>
+
       </div>
 
-      <div className={styles.swapCard}>
-        <div className={`${styles.colItem} ${styles.swapComponent}`}>
-          <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
-            <div className={styles.trade}>
-              <SwapComponent 
-              
-              onSelectToken0={token => {
-                setActiveToken0(token);
-              }}
-              onSelectToken1={token => {
-                setActiveToken1(token);
-              }}
-              onGetReceipt={onGetReceipt}/>
-            </div>
-          </AcyCard>
-        </div>
-      </div>
     </PageHeaderWrapper>
   );
 };
