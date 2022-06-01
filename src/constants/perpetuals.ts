@@ -11,6 +11,7 @@ import { getExplorerUrl } from '@/acy-dex-futures/utils'
 // getWhitelistedTokens(chainId)
 
 const PerpetualSelector = (chainId: Number) => {
+  // chainId = 80001;
     return {
         wrappedToken: getWrappedToken(chainId),
         nativeToken: getNativeToken(chainId),
@@ -21,8 +22,7 @@ const PerpetualSelector = (chainId: Number) => {
         whitelistedTokens: getWhitelistedTokens(chainId),
         getContract: (name) => getContract(chainId, name),
         explorerUrl: getExplorerUrl(chainId),
-        backendPrefix: "http://0.0.0.0:3000/api",
-        // backendPrefix: "http://147.182.18.223:8080/api"
+        backendPrefix: "http://147.182.251.92:8080/api"
     };
   }
   

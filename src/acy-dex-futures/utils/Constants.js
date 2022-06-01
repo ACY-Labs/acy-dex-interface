@@ -30,6 +30,15 @@ const constants = {
     DECREASE_ORDER_EXECUTION_GAS_FEE: ARBITRUM_ORDER_EXECUTION_GAS_PRICE.mul(DECREASE_ORDER_EXECUTION_GAS_LIMIT)
   },
 
+  // TODO: this is placeholder
+  [POLYGON_MAINNET]: {
+    nativeTokenSymbol: "MATIC",
+    defaultCollateralSymbol: "BUSD",
+    defaultFlagOrdersEnabled: true,
+    positionReaderPropsLength: 8,
+    v2: false,
+  },
+
   [POLYGON_TESTNET]: {
     nativeTokenSymbol: "MATIC",
     defaultCollateralSymbol: "BUSD",
