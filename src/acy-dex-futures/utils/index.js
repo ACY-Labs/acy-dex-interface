@@ -765,22 +765,15 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   const method = ethers.utils.isAddress(arg0) ? arg1 : arg0
 
   function onError(e) {
-    // console.log("hereim fetcher error", e);
     console.error(method, e)
   }
 
   if (ethers.utils.isHexString(arg0)) {
     const address = arg0
     const contract = new ethers.Contract(address, contractInfo.abi, provider)
-    // console.log('fetcher contract', contract)
 
     try {
       if (additionalArgs) {
-        // console.log(method, "fetcher 2")
-        // console.log('FETCHER FUNCTION CALLED WITH METHOD  --> ', method);
-        // console.log('printing additional args', params, additionalArgs);
-        // console.log('printing provider', contract);
-        // console.log("debug useSWR: ", contract, method, params.concat(additionalArgs))
         return contract[method](...params.concat(additionalArgs)).catch(onError)
       }
       return contract[method](...params).catch(onError)

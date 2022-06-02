@@ -479,11 +479,11 @@ const Swap = props => {
   const glpManagerAddress = perpetuals.getContract("GlpManager")
   const glpAddress = perpetuals.getContract("GLP")
   const orderBookAddress = perpetuals.getContract("OrderBook")
-  const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
 
   //---------- FOR TESTING 
   const whitelistedTokens = supportedTokens.filter(token => token.symbol !== "USDG");
-  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
+  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
+  const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
 
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
@@ -512,9 +512,8 @@ const Swap = props => {
     fetcher: fetcher(library, Router)
   });
 
-  const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
-  const { positions, positionsMap } = getPositions(chainId, positionQuery, positionData, infoTokens, true, nativeTokenAddress)
-  console.log('PRINTING ALL POSITIONS FOR USER', positions);
+  const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
+  const { positions, positionsMap } = getPositions(chainId, positionQuery, positionData, infoTokens, true, nativeTokenAddress);
 
   const flagOrdersEnabled = true;
   const [orders] = useAccountOrders(flagOrdersEnabled);
