@@ -180,7 +180,7 @@ const Stats = (props) => {
           </p>
         }
         <div className={`${styles.colItem}`}>
-          <a className={`${styles.colItem} ${styles.optionTabSelected}`}>Perpetual</a>
+          <a className={`${styles.colItem} ${styles.optionTabSelected}`}>Future</a>
           <a
             className={`${styles.colItem} ${styles.optionTab}`}
             onClick={() => {

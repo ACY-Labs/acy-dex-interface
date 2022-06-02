@@ -118,13 +118,13 @@ const stats = (props) => {
                         history.push('/stats/perpetual')
                     }}
                 >
-                    Perpetual
+                    Future
                 </a>
                 <a className={styles.optionTabSelected}> StableCoin </a>
             </div>
-            <div className={styles.tittle}>
+            {/* <div className={styles.tittle}>
                 USDA ANALYTICS
-            </div>
+            </div> */}
             <div className={`${styles.content} ${styles.container}`}>
                 <div className={styles.graph} >
                     <Graphics {...graphData1}></Graphics>

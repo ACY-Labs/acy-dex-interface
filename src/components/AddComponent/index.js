@@ -547,7 +547,7 @@ const AddLiquidityComponent = props => {
 
   return (
     <div className={shake ? styles.shake : null}>
-      <AcyCard style={{ backgroundColor: '#1b1b1c', padding: '10px' }}>
+      <AcyCard style={{ backgroundColor: 'black', border: '1px solid #333333', padding: '10px' }}>
         <div className={styles.addLiquidity}>
           <div className={styles.addComponent}>
             <AcyCuarrencyCard
