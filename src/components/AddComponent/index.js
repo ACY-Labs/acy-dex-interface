@@ -161,6 +161,8 @@ const AddLiquidityComponent = props => {
 
   // shake this component when tokens are changed via page model "props.liquidity"
   const [shake, setShake] = useState(false);
+  // user pool in DB
+  const [userLPHandlers, setUserLPHandlers] = useState();
 
   // method to update the value of token search input field,
   // and filter the token list based on the comparison of the value of search input field and token symbol.
@@ -402,11 +404,12 @@ const AddLiquidityComponent = props => {
             token1pass = INITIAL_TOKEN_LIST[i];
           }
         }
-        console.log("TEST HERE token:",token0pass,token1pass);
         setToken0(token0pass);
         setToken1(token1pass);
         getTokenBalances(token0pass, token1pass);
       }
+
+      getValidPoolList();
     },
     [account, chainId, library]
   );
@@ -517,6 +520,25 @@ const AddLiquidityComponent = props => {
     }
   };
 
+  const addPair = async ()  => {
+    if(pair && pair.token0 && pair.token1 ) {
+      axios.post(
+        // fetch valid pool list from remote
+        `${apiUrlPrefix}/pool/update?walletId=${account}&action=add&token0=${pair.token0.address}&token1=${pair.token1.address}`
+      ).then(res => {
+        console.log("add to server return: ", res);
+
+        // refresh the table
+        setTimeout(() =>
+          dispatch({
+            type: "liquidity/setRefreshTable",
+            payload: true,
+          }), 1000);
+          getValidPoolList();
+      }).catch(e => console.log("error: ", e));
+    }
+  };
+
   // link to liquidity position table
   const { liquidity } = props;
   useEffect(async () => {
@@ -544,6 +566,57 @@ const AddLiquidityComponent = props => {
 
     }
   }, [liquidity.token0, liquidity.token1]);
+
+  // fetch lists of valid pool
+  const getValidPoolList = () => {
+    console.log("fetching user pool list, urlPrefix:", apiUrlPrefix);
+    axios.get(
+      // fetch valid pool list from remote
+      `${apiUrlPrefix}/userpool?walletId=${account}`
+    ).then(async res => {
+      const tokens = INITIAL_TOKEN_LIST;
+
+      // construct pool list locally
+      const pools = res.data.pools;
+
+      const fetchTask = [];
+      for (let pairAddr of pools) {
+        const token0addr = INITIAL_TOKEN_LIST.findIndex(item => item.address.toLowerCase() === pairAddr.token0.toLowerCase());
+        const token1addr = INITIAL_TOKEN_LIST.findIndex(item => item.address.toLowerCase() === pairAddr.token1.toLowerCase());
+        const { address: token0Address, symbol: token0Symbol, decimals: token0Decimal } = tokens[token0addr];
+        const { address: token1Address, symbol: token1Symbol, decimals: token1Decimal } = tokens[token1addr];
+        const token0 = new Token(chainId, token0Address, token0Decimal, token0Symbol);
+        const token1 = new Token(chainId, token1Address, token1Decimal, token1Symbol);
+
+        // queue get pair task
+        const pair = Fetcher.fetchPairData(token0, token1, library, chainId);
+        fetchTask.push(pair);
+      }
+      const pairs = await Promise.allSettled(fetchTask);
+
+      const LPHandlers = pairs.map(pair => pair.value);
+      setUserLPHandlers(LPHandlers);
+
+    }).catch(e => console.log("error: ", e));
+  }
+
+  useEffect(
+    async () => {
+      if(pair && pair.token0 && pair.token1 && userLPHandlers) {
+
+        let userPoolBalance = await getUserTokenBalanceRaw(pair.liquidityToken, account, library).catch(e => console.log("fetchPoolShare error", e));
+        if(userPoolBalance == 0) return
+        for(let lp of userLPHandlers) {
+          if (!pair) continue;
+          if(pair.liquidityToken.address == lp.liquidityToken.address) {
+            return
+          }
+        }
+        addPair();
+      }
+    },
+    [buttonContent]
+  );
 
   return (
     <div className={shake ? styles.shake : null}>
@@ -794,8 +867,7 @@ const AddLiquidityComponent = props => {
                         )}
                       </AcyButton>
                     </>
-                  ) :
-
+                  ) : 
                   <AcyButton
                     variant="success"
                     disabled={!buttonStatus}
