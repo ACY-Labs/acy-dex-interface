@@ -959,12 +959,16 @@ const Swap = props => {
   }
 
   const { Option } = Select;
-    
+  
+  const [updatingKchartsFlag, setUpdatingKchartsFlag] = useState(false);
+
   const placementChange = e => {
+    if(updatingKchartsFlag) return;
+
+    setUpdatingKchartsFlag(true);
     setPlacement(e.target.value);
     setActiveTimeScale(e.target.value);
   };
-
 
   // let options = supportedTokens;
   // const menu = (
@@ -1031,6 +1035,7 @@ const Swap = props => {
           <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
             <div className={styles.kchartBox}>
             <StyledSelect value={placement} onChange={placementChange}>
+                <Radio.Button value="1m">1m</Radio.Button>
                 <Radio.Button value="5m">5m</Radio.Button>
                 <Radio.Button value="15m">15m</Radio.Button>
                 <Radio.Button value="1h">1h</Radio.Button>
@@ -1043,7 +1048,7 @@ const Swap = props => {
                 {
                   currentAveragePrice === 0 ?
                   <Spin/>
-                  : <KChart activeToken0={activeToken0} activeToken1={activeToken1} activeTimeScale={activeTimeScale} currentAveragePrice={currentAveragePrice} />
+                  : <KChart activeToken0={activeToken0} activeToken1={activeToken1} activeTimeScale={activeTimeScale} currentAveragePrice={currentAveragePrice} setUpdatingKchartsFlag={setUpdatingKchartsFlag}/>
                 }
               </div>
           </AcyPerpetualCard>
