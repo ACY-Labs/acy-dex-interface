@@ -449,8 +449,6 @@ const Swap = props => {
 
   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
   const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
-  const fromTokenAddress = tokenSelection[swapOption].from
-  const toTokenAddress = tokenSelection[swapOption].to
 
   const setFromTokenAddress = useCallback((selectedSwapOption, address) => {
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
@@ -463,6 +461,9 @@ const Swap = props => {
     newTokenSelection[selectedSwapOption].to = address
     setTokenSelection(newTokenSelection)
   }, [tokenSelection, setTokenSelection])
+
+  const fromTokenAddress = tokenSelection[swapOption].from
+  const toTokenAddress = tokenSelection[swapOption].to
 
   console.log("debug perpetual page, toTokenAddress: ", toTokenAddress)
 

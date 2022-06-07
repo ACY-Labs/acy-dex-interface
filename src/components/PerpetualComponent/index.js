@@ -816,7 +816,8 @@ const SwapComponent = props => {
     const token = getTokenfromSymbol(tokens, symbol)
     setFromTokenAddress(mode, token.address);
     setIsWaitingForApproval(false);
-    if (isShort && token.isStable) {
+    if (isShort) {
+      console.log("is short and changed short collateral token to ", token.address)
       setShortCollateralAddress(token.address);
     }
   };
