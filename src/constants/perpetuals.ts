@@ -22,7 +22,7 @@ const PerpetualSelector = (chainId: Number) => {
         whitelistedTokens: getWhitelistedTokens(chainId),
         getContract: (name) => getContract(chainId, name),
         explorerUrl: getExplorerUrl(chainId),
-        backendPrefix: "http://147.182.251.92:8080/api"
+        backendPrefix: "https://futureapi.acy.finance/api"
     };
   }
   
