@@ -93,6 +93,8 @@ import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 
 import styled from "styled-components";
 
+import { JsonRpcProvider } from "@ethersproject/providers";
+
 const { AddressZero } = ethers.constants;
 
 const StyledSlider = styled(Slider)`
@@ -297,6 +299,10 @@ const SwapComponent = props => {
   const orderBookAddress = perpetuals.getContract("OrderBook")
   const glpManagerAddress = perpetuals.getContract("GlpManager")
   const glpAddress = perpetuals.getContract("GLP")
+
+  const { farmSetting: { RPC_URL }} = useConstantLoader();
+  const provider = new JsonRpcProvider(RPC_URL, chainId);
+
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
   })
@@ -321,13 +327,15 @@ const SwapComponent = props => {
   useEffect(() => {
     if (active) {
       function onBlock() {
-        updateVaultTokenInfo(undefined, true)
-        updateTokenBalances(undefined, true)
+        
+        updateVaultTokenInfo()
+        updateTokenBalances()
         // updatePositionData(undefined, true)
-        updateFundingRateInfo(undefined, true)
-        updateTotalTokenWeights(undefined, true)
-        updateUsdgSupply(undefined, true)
-        updateOrderBookApproved(undefined, true)
+        updateFundingRateInfo()
+        updateTotalTokenWeights()
+        updateUsdgSupply()
+        updateOrderBookApproved()
+        console.log("BLOCK HERE:")
       }
       library.on('block', onBlock)
       return () => {
