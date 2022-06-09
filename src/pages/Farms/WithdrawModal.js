@@ -5,7 +5,7 @@ import { AcyModal } from '@/components/Acy';
 import { Icon } from 'antd';
 import classNames from 'classnames';
 import axios from 'axios';
-import {API_URL } from "@/constants";
+import {API_URL, useConstantLoader } from "@/constants";
 import Pattern from '@/utils/pattern';
 import { StepBackwardFilled } from '@ant-design/icons';
 
@@ -67,6 +67,7 @@ const WithdrawModal = props => {
   const [totalUSDBalance, setTotalUSDBalance] = useState(0);
   const [lpValue, setLpValue] = useState(0);
   const [USDValue, setUSDValue] = useState(0);
+  const {tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix}} = useConstantLoader();
 
   useEffect(() => {
     setTotalUSDBalance(data.lpAmount*ratio);
@@ -98,7 +99,25 @@ const WithdrawModal = props => {
       } else {
         withdraw(poolId, data.positionId, data.lpAmount.toString(), setWithdrawButtonText, setWithdrawButtonStatus, withdrawCallback, library, account);
       }
-      
+    }
+  };
+
+  const getTokenInde = (symbol) => {
+    
+  }
+
+  const addPair = async ()  => {
+    console.log("add to server return: ");
+    if(token1 && token2 ) {
+      let token1Detail = supportedTokens.find(token => token.symbol == token1)
+      let token2Detail = supportedTokens.find(token => token.symbol == token2)
+      if(token1Detail && token2Detail) {
+        await axios.post(
+          // update User pool
+          `${apiUrlPrefix}/pool/update?walletId=${account}&action=add&token0=${token1Detail.address}&token1=${token2Detail.address}`
+        ).then(res => {
+        }).catch(e => console.log("error: ", e));
+      }
     }
   };
 
@@ -111,6 +130,7 @@ const WithdrawModal = props => {
           await refreshPoolInfo();
           setWithdrawButtonText("Withdraw");
           setWithdrawButtonStatus(false);
+          await addPair();
           hideWithdrawModal();    
         }
       })

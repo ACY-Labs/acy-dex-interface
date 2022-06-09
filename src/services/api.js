@@ -170,7 +170,8 @@ export async function recordWallet(network, walletId, projectToken, recordWallet
 }
 
 export async function getProjects(network) {
-  return r.get(`${API_URL()}/launch/projects`)
+  // return r.get(`${API_URL()}/launch/projects`)
+  return r.get(`https://api.acy.finance/bsc-main/api/launch/projects`)
 }
 
 export async function getProjectInfo(network, projectId) {
