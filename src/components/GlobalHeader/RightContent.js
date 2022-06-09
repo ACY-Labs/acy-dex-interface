@@ -951,7 +951,7 @@ const GlobalHeaderRight = props => {
             {broswer === 'Opera' && OperaWallet.map((item, index) => {
 
               return (
-                <AcyCardList.Thin onClick={() => item.onClick()}>
+                <AcyCardList.Thin className={styles.walletList} onClick={() => item.onClick()}>
                   {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
                     <AcyIcon.MyIcon width={32} type={item.icon} />
                   )}
@@ -976,7 +976,7 @@ const GlobalHeaderRight = props => {
             {supportedWallets.map((item, index) => {
 
               return (
-                <AcyCardList.Thin onClick={() => item.onClick()}>
+                <AcyCardList.Thin className={styles.walletList} onClick={() => item.onClick()}>
                   {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
                     <AcyIcon.MyIcon width={32} type={item.icon} />
                   )}

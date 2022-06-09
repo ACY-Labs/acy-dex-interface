@@ -27,7 +27,7 @@ import AddComponent from '@/components/AddComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { getTransactionsByAccount, appendNewLiquidityTx } from '@/utils/txData';
 import styles from './styles.less';
-import {useConnectWallet} from '@/components/ConnectWallet';
+import { useConnectWallet } from '@/components/ConnectWallet';
 
 
 
@@ -134,35 +134,38 @@ const BasicProfile = (props) => {
         <div className={styles.rowFlexContainer} >
           {loggedIn &&
             <div className={`${styles.colItem} ${styles.leftComponent}`}>
-              <AcyLiquidityPositions />
+              <AcyCard style={{ backgroundColor: 'transparent', padding: '40px 20px', border: 'none' }}>
+                <AcyLiquidityPositions />
+              </AcyCard>
               {/* <div>Table hidden for now, waiting for dedicated database for BSC data to avoid error on this page.</div> */}
+
+              {/* operation history table */}
+              <div className={styles.operationBottomWrapper}>
+                <div className={styles.operationItem}>
+                  {/* <h3>
+                    <AcyIcon.MyIcon width={30} type="arrow" />
+                    <span className={styles.span}>OPERATION HISTORY</span>
+                  </h3> */}
+                  {account && tableLoading ? (
+                    <h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>
+                  ) : (
+                    <OperationHistoryTable
+                      isMobile={props.isMobile}
+                      dataSource={transactionList}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           }
+
           {/* <div style={{ flex: 1, width: "50vw", minWidth: loggedIn ? null : "340px", maxWidth: loggedIn ? null : "420px" }}> */}
           <div className={`${styles.colItem} ${styles.rightComponent}`}>
-            <AddComponent onLogInChanged={onLogInChanged} onGetReceipt={onGetReceipt} />
+            <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', border: 'none' }}>
+              <AddComponent onLogInChanged={onLogInChanged} onGetReceipt={onGetReceipt} />
+            </AcyCard>
           </div>
         </div>
-
-        {/* operation history table */}
-        {loggedIn && (
-          <div className={styles.operationBottomWrapper}>
-            <div className={styles.operationItem}>
-              <h3>
-                <AcyIcon.MyIcon width={30} type="arrow" />
-                <span className={styles.span}>OPERATION HISTORY</span>
-              </h3>
-              {account && tableLoading ? (
-                <h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>
-              ) : (
-                <OperationHistoryTable
-                  isMobile={props.isMobile}
-                  dataSource={transactionList}
-                />
-              )}
-            </div>
-          </div>
-        )}
 
       </div>
 

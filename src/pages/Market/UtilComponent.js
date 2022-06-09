@@ -112,13 +112,13 @@ export class SmallTable extends React.Component {
     if (this.state.mode == 'token') {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyTokenIcon symbol={entry.logoURL} width={20} />
+          <AcyTokenIcon symbol={entry.image} width={20} />
           <Link
             style={{ color: 'white' }}
             className={styles.coinName}
-            to={`/market/info/token/${entry.address}`}
+            // to={`/market/info/token/${entry.address}`}
           >
-            {entry.short}
+            {entry.symbol}
           </Link>
           <div style={{ width: 5 }}></div>
           <span className={styles.coinShort}> ({entry.name})</span>
@@ -1281,8 +1281,11 @@ export const MarketSearchBar = props => {
     setSearchQuery(e.target.value);
     const key = 'volume24h'
     setSearchCoinReturns(
-      localToken.filter(
-        token => token.short.includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase())
+      // localToken.filter(
+      //   token => token.short.includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase())
+      // )
+      props.dataSourceCoin.filter(
+        token => token.symbol.includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase())
       )
     );
     setSearchPoolReturns(
@@ -1449,11 +1452,11 @@ export const MarketSearchBar = props => {
     const key = 'volume24h'
     fetchSearchCoinReturns(key).then(data => {
       if (data) {
-        setSearchCoinReturns(
-          data.map(item => {
-            return { logoURL: item.logoURL, address: item.address, name: item.name, short: item.short };
-          })
-        );
+        // setSearchCoinReturns(
+        //   data.map(item => {
+        //     return { logoURL: item.logoURL, address: item.address, name: item.name, short: item.short };
+        //   })
+        // );
         setLocalToken(
           data.map(item => {
             return { logoURL: item.logoURL, address: item.address, name: item.name, short: item.short };
@@ -1463,6 +1466,8 @@ export const MarketSearchBar = props => {
     }).catch(error => {
       console.log("Error in fetch search coin returns:", error);
     })
+
+    setSearchCoinReturns(props.dataSourceCoin)
 
     // fetch search pool returns
     fetchSearchPoolReturns(key).then(data => {

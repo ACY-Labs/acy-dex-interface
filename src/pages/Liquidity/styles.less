@@ -29,7 +29,6 @@
 }
 .operationBottomWrapper {
   display: flex;
-  padding-right: 40px;
   align-items: center;
   flex-direction: column;
   justify-content: stretch;
@@ -37,7 +36,8 @@
 .operationBottomWrapper{
   .operationItem{
     width: 100%;
-    padding: 48px 0;
+    padding: 20px 30px;
+    border-top: 0.75px solid #333333;
     h3{
       font-size: 20px;
       margin-top: 0px;
@@ -95,14 +95,11 @@
 }
 
 .main {
-  width: 90%;
-  max-width: 1000px;
-  margin: auto;
   z-index: 0;
   color: #b5b6b6;
-  margin-top: 20px;
   margin-bottom: 20px;
   font-weight: 400;
+  font-family: "Karla", sans-serif;
 }
 // .rowFlexContainer {
 //   display: flex;
@@ -110,16 +107,6 @@
 //   justify-content: space-between;
 //   gap: 1rem;
 // }
-.main {
-  width: 90%;
-  max-width: 1000px;
-  margin: auto;
-  z-index: 0;
-  color: #b5b6b6;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  font-weight: 400;
-}
 
 @media (max-width: 1024px) {
   .main, .main_notLoggedIn {
@@ -145,7 +132,7 @@
   margin: auto;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 1rem;
+  // gap: 1rem;
 }
 @media screen and (min-width: 1024px) {
   .rowFlexContainer {
@@ -154,6 +141,7 @@
     flex-wrap: nowrap;
   }
   .leftComponent {
+    border-right: 0.75px solid #333333;
     order: 1;
     flex: 2;
   }

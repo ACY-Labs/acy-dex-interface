@@ -79,7 +79,7 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick, tokenlist, sideCom
     const onTokenSearchChange = e => {
         setTokenSearchInput(e.target.value);
         setInitTokenList(
-            INITIAL_TOKEN_LIST.filter(token => token.symbol.includes(e.target.value.toUpperCase()))
+            INITIAL_TOKEN_LIST.filter(token => token.symbol.toUpperCase().includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase()))
         );
     };
 

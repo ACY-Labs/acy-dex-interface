@@ -170,7 +170,8 @@ function fetchMarketList() {
       <ConnectWallet />
       <MarketSearchBar
         className={styles.searchBar}
-        dataSourceCoin={dataSourceCoin}
+        // dataSourceCoin={dataSourceCoin}
+        dataSourceCoin={coinList}
         dataSourcePool={dataSourcePool}
         account={account}
         visible={true}
