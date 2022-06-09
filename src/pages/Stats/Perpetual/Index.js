@@ -293,7 +293,7 @@ const Stats = (props) => {
             <ChartWrapper title="AUM & Glp Supply" loading={glpLoading} data={glpData} csvFields={[{ key: 'aum' }, { key: 'glpSupply' }]}>
               <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
                 <LineChart data={glpData} syncId="syncGlp">
-                  <CartesianGrid strokeDasharray="10 10" />
+                  <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
                   <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
                   <YAxis dataKey="aum" tickFormatter={yaxisFormatter} width={YAXIS_WIDTH} />
                   <Tooltip
@@ -317,7 +317,7 @@ const Stats = (props) => {
             >
               <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
                 <LineChart data={glpPerformanceData} syncId="syncGlp">
-                  <CartesianGrid strokeDasharray="10 10" />
+                  <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
                   <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
                   <YAxis dataKey="performanceSyntheticCollectedFees" domain={[60, 210]} unit="%" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
                   <YAxis dataKey="glpPrice" domain={[0.4, 1.7]} orientation="right" yAxisId="right" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
@@ -352,7 +352,7 @@ const Stats = (props) => {
             <ChartWrapper title="Performance vs. Index" loading={glpLoading}>
               <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
                 <LineChart data={glpPerformanceData} syncId="syncGlp">
-                  <CartesianGrid strokeDasharray="10 10" />
+                  <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
                   <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
                   <YAxis dataKey="performanceSyntheticCollectedFees" domain={[80, 120]} unit="%" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
                   <Tooltip
@@ -373,7 +373,7 @@ const Stats = (props) => {
             <ChartWrapper title="Performance vs. ETH LP" loading={glpLoading}>
               <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
                 <LineChart data={glpPerformanceData} syncId="syncGlp">
-                  <CartesianGrid strokeDasharray="10 10" />
+                  <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
                   <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
                   <YAxis dataKey="performanceLpEthCollectedFees" domain={[80, 120]} unit="%" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
                   <Tooltip
@@ -399,7 +399,7 @@ const Stats = (props) => {
             >
               <ResponsiveContainer width="100%" syncId="tradersId" height={CHART_HEIGHT}>
                 <ComposedChart data={tradersData?.data}>
-                  <CartesianGrid strokeDasharray="10 10" />
+                  <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
                   <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
                   <YAxis domain={[-tradersData?.stats.maxAbsOfPnlAndCumulativePnl * 1.05, tradersData?.stats.maxAbsOfPnlAndCumulativePnl * 1.05]} tickFormatter={yaxisFormatter} width={YAXIS_WIDTH} />
                   <Tooltip
@@ -431,7 +431,7 @@ const Stats = (props) => {
             >
               <ResponsiveContainer width="100%" syncId="tradersId" height={CHART_HEIGHT}>
                 <ComposedChart data={tradersData?.data} barGap={0}>
-                  <CartesianGrid strokeDasharray="10 10" />
+                  <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
                   <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
                   <YAxis domain={[-tradersData?.stats.maxProfitLoss * 1.05, tradersData?.stats.maxProfitLoss * 1.05]} tickFormatter={yaxisFormatter} width={YAXIS_WIDTH} />
                   <YAxis domain={[-tradersData?.stats.maxCumulativeProfitLoss * 1.1, tradersData?.stats.maxCumulativeProfitLoss * 1.1]} orientation="right" yAxisId="right" tickFormatter={yaxisFormatter} width={YAXIS_WIDTH} />

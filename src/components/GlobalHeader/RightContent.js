@@ -743,7 +743,7 @@ const GlobalHeaderRight = props => {
         setVisibleMetaMask(false);
       },
       onClick_showSupportedWallet: async () => {
-        setSelectedNetwork('BNBChain');
+        setSelectedNetwork('BNB Chain');
         setSupportWallets(supportedWalletBsc);
       },
     },
@@ -767,7 +767,7 @@ const GlobalHeaderRight = props => {
         setVisibleMetaMask(false);
       },
       onClick_showSupportedWallet: async () => {
-        setSelectedNetwork('ETH');
+        setSelectedNetwork('Ethereum');
         setSupportWallets(supportedWalletEth);
       },
     },

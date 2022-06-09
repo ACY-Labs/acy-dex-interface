@@ -161,7 +161,7 @@ const BasicProfile = (props) => {
 
           {/* <div style={{ flex: 1, width: "50vw", minWidth: loggedIn ? null : "340px", maxWidth: loggedIn ? null : "420px" }}> */}
           <div className={`${styles.colItem} ${styles.rightComponent}`}>
-            <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', border: 'none' }}>
+            <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', border: '0.75px solid #333333' }}>
               <AddComponent onLogInChanged={onLogInChanged} onGetReceipt={onGetReceipt} />
             </AcyCard>
           </div>
