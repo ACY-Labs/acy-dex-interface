@@ -35,14 +35,16 @@ const VestingSchedule = ({ vestingDate, stageData, vestingClick, receivedData })
             <Button
               className="claim-btn"
             >
-              Distributed by Project
+              {receivedData.distributionLink ?
+                <a href={receivedData.distributionLink} target="_blank" rel="noreferrer">
+                  Distributed by Project
+                </a>
+                :
+                <span>Distributed by Project</span>
+              }
             </Button>
           </div>
-          {receivedData && receivedData.distributionLink &&
-            <a href={receivedData.distributionLink} target="_blank" rel="noreferrer" style={{ alignSelf: 'center', fontSize: '16px', marginTop: '16px' }}>
-              {receivedData.distributionLink}
-            </a>
-          }
+          
         </>
       )
     }

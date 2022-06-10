@@ -26,6 +26,7 @@ import polyIcon from '@/assets/icon_polyscan.svg';
 import bscIcon from '@/assets/icon_bscscan.svg';
 import bscChainIcon from '@/assets/icon_bsc.svg';
 import polygonIcon from '@/assets/icon_polygon.svg';
+import solanaIcon from '@/assets/icon_solana.svg'
 import linkedinIcon from '@/assets/icon_linkedin.svg';
 import mediumIcon from '@/assets/icon_medium.svg';
 import youtubeIcon from '@/assets/icon_youtube.svg';
@@ -45,7 +46,7 @@ import { useConnectWallet } from "@/components/ConnectWallet";
 import POOLABI from "@/acy-dex-swap/abis/AcyV1Poolz.json";
 import Timer from "@/components/Timer";
 import { message } from "antd";
-import { useConstantLoader, SCAN_URL_PREFIX, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL, TOKEN_LIST, MARKET_TOKEN_LIST, LAUNCH_MAIN_TOKEN } from "@/constants";
+import { useConstantLoader, SCAN_URL_PREFIX, LAUNCHPAD_ADDRESS, LAUNCH_RPC_URL, CHAINID, API_URL, TOKEN_LIST, MARKET_TOKEN_LIST, LAUNCH_MAIN_TOKEN, ConstantLoader } from "@/constants";
 import { CustomError } from "@/acy-dex-swap/utils"
 import { approveNew, getAllowance } from "@/acy-dex-swap/utils"
 import FormatedTime from '@/components/FormatedTime';
@@ -109,6 +110,12 @@ const TokenLogoLabel = ({ projectName, tokenLogo, receivedData }) => {
                 <span className="tokenLabel">
                   <img src={polygonIcon} alt="" style={{ width: '15px', height: '15px', marginRight: '0.2rem' }} />
                   Polygon
+                </span>
+              )
+              if (label === "Solana") return (
+                <span className="tokenLabel">
+                  <img src={solanaIcon} alt="" style={{ width: '13px', height: '13px', marginRight: '0.2rem' }} />
+                  {label}
                 </span>
               )
               return <span className="tokenLabel">{label}</span>
@@ -690,7 +697,7 @@ const Allocation = ({
       })
       .catch(e => {
         console.log('Get allocation error ', e);
-        message.error('Failed to save walletId.')
+        message.error('Failed to save walletId. Please click cover to get allocation first.')
         throw e;
       });
   }
@@ -1132,7 +1139,10 @@ const LaunchpadProject = () => {
           // get state to hide graph and table
           const curT = new Date()
           if (curT < res.scheduleInfo.saleStart) setCompareAlloDate(true)
-          const mainCoinInfo = TOKEN_LIST().find(item => item.symbol == res.basicInfo.mainCoin)
+          const tokenList = ConstantLoader()['tokenList'];
+          console.log(tokenList);
+          const mainCoinInfo = tokenList.find(item => item.symbol == res.basicInfo.mainCoin)
+          // const mainCoinInfo = TOKEN_LIST().find(item => item.symbol == res.basicInfo.mainCoin)
           setMainCoinLogoURI(mainCoinInfo.logoURI);
           setPoolID(res.basicInfo.poolID);
 
@@ -1140,13 +1150,13 @@ const LaunchpadProject = () => {
           setReceivedData(res);
         } else {
           console.log('redirect to list page');
-          history.push('/launchpad');
+          // history.push('/launchpad');
         }
       })
       .catch(e => {
         console.log("Project Detail check errrrrrrrrrrr", e);
         // console.error(e);
-        history.push('/launchpad');
+        // history.push('/launchpad');
       });
 
   }, [library, account]);
