@@ -5,7 +5,7 @@ import styles from './acyCuarrencyCard.less';
 import classname from 'classnames';
 import Pattern from '@/utils/pattern';
 import { getAllSupportedTokensPrice } from '@/acy-dex-swap/utils';
-import { getUserTokenBalance} from '@/acy-dex-usda/utils'
+import { getUserTokenBalance } from '@/acy-dex-usda/utils'
 
 
 const AcyCuarrencyCard = ({
@@ -39,7 +39,7 @@ const AcyCuarrencyCard = ({
     setLight(true);
     inputRef.current.focus();
   };
-  
+
 
   const [usdValue, setUsdValue] = useState(null);
   useEffect(async () => {
@@ -67,6 +67,15 @@ const AcyCuarrencyCard = ({
     >
       <div className={`${styles.cua_body} ${light && styles.cua_light}`}>
         <div className={styles.cua_group}>
+          <input
+            ref={inputRef}
+            className={styles.input}
+            style={{ color: inputColor }}
+            placeholder="0.0"
+            bordered={false}
+            value={token}
+            onChange={onChange}
+          />
           <button className={styles.switchcoin} onClick={onChoseToken} disabled={isLocked}>
             <span className={styles.wrap}>
               <div className={styles.coin}>
@@ -78,15 +87,6 @@ const AcyCuarrencyCard = ({
               )}
             </span>
           </button>
-          <input
-            ref={inputRef}
-            className={styles.input}
-            style={{ color: inputColor }}
-            placeholder="0.0"
-            bordered={false}
-            value={token}
-            onChange={onChange}
-          />
         </div>
         <div className={styles.cua_bottomContainer}>
           <div className={styles.cua_blanace}>

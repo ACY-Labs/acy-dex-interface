@@ -49,13 +49,15 @@ const StableCoin = props => {
     <PageHeaderWrapper>
       {/* <Banner /> */}
 
-      <div className={styles.content}>
-        <div className={styles.dataBlock}>
-          <AccountBox />
-          <ExchangeTable />
-        </div>
+      <div className={styles.main}>
+        <div className={styles.rowFlexContainer}>
+          <div className={`${styles.colItem} ${styles.priceChart}`}>
+            <div className={styles.dataBlock}>
+              <AccountBox />
+              <ExchangeTable />
+            </div>
+          </div>
 
-        <div className={styles.swapCard}>
           <div className={`${styles.colItem} ${styles.swapComponent}`}>
             <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', border: 'none' }}>
               <div className={styles.trade}>
