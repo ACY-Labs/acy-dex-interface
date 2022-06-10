@@ -38,7 +38,7 @@ export default function FeesChart(props) {
   return <ChartWrapper title="Fees" loading={loading} csvFields={csvFields} data={data}>
     <ResponsiveContainer width="100%" height={chartHeight}>
       <ComposedChart data={data} syncId="syncA">
-        <CartesianGrid strokeDasharray="10 10" />
+        <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
         <XAxis dataKey="timestamp" tickFormatter={xaxisTickFormatter} minTickGap={30} />
         <YAxis dataKey="all" interval="preserveStartEnd" tickCount={7} tickFormatter={yaxisTickFormatter} width={yaxisWidth} />
         <YAxis dataKey="cumulative" orientation="right" yAxisId="right" tickFormatter={yaxisTickFormatter} width={yaxisWidth} />

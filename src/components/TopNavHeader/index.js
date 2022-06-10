@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, useState } from 'react';
 import { Link } from 'umi';
 import RightContent from '../GlobalHeader/RightContent';
 import BaseMenu from '../SiderMenu/BaseMenu';
@@ -13,7 +13,8 @@ export default class TopNavHeader extends PureComponent {
 
   static getDerivedStateFromProps(props) {
     return {
-      maxWidth: (props.contentWidth === 'Fixed' ? 1200 : window.innerWidth) - 280 - 165 - 40 - 50,
+      // maxWidth: (props.contentWidth === 'Fixed' ? 1200 : window.innerWidth) - 280 - 165 - 40 - 50,
+      maxWidth: 665,
     };
   }
 
@@ -38,7 +39,7 @@ export default class TopNavHeader extends PureComponent {
             </div>
             <div
               style={{
-                maxWidth,
+                maxWidth
               }}
             >
               <BaseMenu {...this.props} flatMenuKeys={flatMenuKeys} className={styles.menu} />

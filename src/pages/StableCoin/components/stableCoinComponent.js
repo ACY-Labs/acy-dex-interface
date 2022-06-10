@@ -80,7 +80,7 @@ const SwapComponent = props => {
   const { account, library, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
   // TODO: TESTING
   const chainId = 137;
-  const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1 = false } = props;
+  const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1 = false, sideComponent } = props;
   const INITIAL_TOKEN_LIST = supportedTokens[chainId]
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
@@ -531,7 +531,7 @@ const SwapComponent = props => {
       </AcyDescriptions>
 
       <TokenSelectorModal
-        onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick}
+        onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} sideComponent={true}
       />
     </div>
   );

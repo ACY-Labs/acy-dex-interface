@@ -19,7 +19,7 @@ import { processString } from "@/components/AcyCoinItem";
 import styles from "./tokenSelectorModal.less";
 import {useConstantLoader} from '@/constants';
 
-const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
+const TokenSelectorModal = ({ onCancel, visible, onCoinClick, sideComponent }) => {
     const {account, library, } = useConstantLoader();
     // TODO: TESTING
     const chainId = 137;
@@ -140,7 +140,7 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
     };
 
     return (
-        <AcyModal onCancel={onCancel} width={400} visible={visible}>
+        <AcyModal onCancel={onCancel} width={400} visible={visible}  sideComponent={sideComponent}>
             {currentPanel == "selectToken" ? (
                 <>
                     <div className={styles.title}>Select a token</div>
@@ -148,8 +148,9 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick }) => {
                         <Input
                             size="large"
                             style={{
-                                backgroundColor: '#373739',
+                                backgroundColor: 'black',
                                 borderRadius: '40px',
+                                border: '1px solid #333333',
                             }}
                             placeholder="Enter the token symbol or address"
                             value={tokenSearchInput}

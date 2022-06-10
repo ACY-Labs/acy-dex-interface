@@ -18,7 +18,7 @@ import { processString } from "@/components/AcyCoinItem";
 import styles from "./styles.less";
 import {useConstantLoader} from '@/constants';
 
-const TokenSelectorModal = ({ onCancel, visible, onCoinClick, tokenlist }) => {
+const TokenSelectorModal = ({ onCancel, visible, onCoinClick, tokenlist, sideComponent }) => {
     const {account, library, chainId, tokenList: TOKEN_LIST} = useConstantLoader();
     
     const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
@@ -79,7 +79,7 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick, tokenlist }) => {
     const onTokenSearchChange = e => {
         setTokenSearchInput(e.target.value);
         setInitTokenList(
-            INITIAL_TOKEN_LIST.filter(token => token.symbol.includes(e.target.value.toUpperCase()))
+            INITIAL_TOKEN_LIST.filter(token => token.symbol.toUpperCase().includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase()))
         );
     };
 
@@ -138,7 +138,7 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick, tokenlist }) => {
     };
 
     return (
-        <AcyModal onCancel={onCancel} width={400} visible={visible}>
+        <AcyModal onCancel={onCancel} width={400} visible={visible} sideComponent={sideComponent}>
             {currentPanel == "selectToken" ? (
                 <>
                     <div className={styles.title}>Select a token</div>

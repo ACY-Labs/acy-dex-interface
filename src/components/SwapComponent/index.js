@@ -158,6 +158,8 @@ const SwapComponent = props => {
   const [showDescription, setShowDescription] = useState(false);
   const connectWalletByLocalStorage = useConnectWallet();
 
+  const [coinList, setCoinList] = useState([])
+
   useEffect(() => {
     if (!INITIAL_TOKEN_LIST) return
     console.log("resetting page states, new swapComponent token0, token1", INITIAL_TOKEN_LIST[0], INITIAL_TOKEN_LIST[1])
@@ -262,6 +264,25 @@ const SwapComponent = props => {
     setMidTokenAddress();
     setPoolExist(true);
     setShowDescription(false);
+  }, [chainId])
+
+  useEffect(() => {
+    const apiUrlPrefix = "https://api.coingecko.com/api/v3"
+    axios.get(
+      `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false`
+    ).then(data => {
+      // setCoinList(data.data)
+      data.data.map(token => {
+        coinList.push({
+          name: token.name,
+          symbol: token.symbol,
+          logoURI: token.image,
+        })
+      })
+    })
+    .catch(e => {
+      console.log(e);
+    });
   }, [chainId])
 
   // connect to page model, reflect changes of pair ratio in this component
@@ -634,6 +655,7 @@ const SwapComponent = props => {
         library={library}
       />
 
+      {showDescription ?
       <AcyDescriptions>
         <div className={styles.breakdownTopContainer}>
           <div className={styles.slippageContainer}>
@@ -709,7 +731,7 @@ const SwapComponent = props => {
               ))}
             </div> */}
       </AcyDescriptions>
-     
+      : null}
 
       {needApprove
         ? <div>
@@ -790,7 +812,7 @@ const SwapComponent = props => {
       </AcyDescriptions>
 
       <TokenSelectorModal
-        onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick}
+        onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} sideComponent={true} tokenlist={coinList}
       />
     </div>
   );

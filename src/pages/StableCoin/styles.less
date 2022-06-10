@@ -2,21 +2,74 @@
 .usdaPage{
   font-family: "Karla", sans-serif;
 }
+.main {
+  z-index: 0;
+  color: #b5b6b6;
+  margin-bottom: 20px;
+  font-weight: 400;
+  font-family: "Karla", sans-serif;
+}
+
+.rowFlexContainer {
+  display: flex;
+  width: 100%;
+  margin: auto;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+@media screen and (min-width: 1024px) {
+  .rowFlexContainer {
+    // width: 30%;
+    min-width: 310px;
+    flex-wrap: nowrap;
+  }
+  .priceChart {
+    border-right: 0.75px solid #333333;
+    order: 1;
+    flex: 2;
+  }
+  .swapComponent {
+    order: 2;
+    flex: 1;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .main {
+    min-width: 370px;
+    width: 65%;
+  }
+  .colItem {
+    margin: 0 0.5rem;
+    width: 100%;
+  }
+  .priceChart {
+    order: 2;
+  }
+  .swapComponent {
+    order: 1;
+  }
+}
+
+
 .dataBlock{
-  width: 50%;
-  float: left;
-  // margin-right: 2rem;
-  padding-right: 2rem;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: stretch;
+  padding: 20px 30px;
 }
 .statsPage{
   font-family: "Karla", sans-serif;
 }
 .swapCard{
-  background-color: #1b1b1c;
+  background-color: transparent;
+  border: 0.75px solid #333333;
   border-radius: 10px;
   padding: 10px;
-  width: 50%;
-  margin: auto;
+  width: 35%;
+  margin-top: 20px;
   float: left;
   display: table-cell;
 }
@@ -41,7 +94,7 @@
   }
 }
 .colItem {
-  margin: 0 0.5rem;
+  margin: 1rem 0.5rem;
   margin: auto;
 }
 .swapComponent {

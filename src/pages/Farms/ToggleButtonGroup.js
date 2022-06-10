@@ -16,7 +16,7 @@ const ToggleButtonGroup = (
       <button
         type="button"
         className={styles.firstToggleButton}
-        style={{ backgroundColor: selectedTable === 0 && !isMyFarms ? "#174163" : "#2e3032", color: selectedTable === 0 && !isMyFarms? "white": ""}}
+        style={{ backgroundColor: selectedTable === 0 && !isMyFarms ? "#2e3032" : "transparent", color: selectedTable === 0 && !isMyFarms? "white": "", border: '0.75px solid #333333'}}
         onClick={onAllToggleButtonClick}
         // disabled={isMyFarms}
       >
@@ -25,7 +25,7 @@ const ToggleButtonGroup = (
       <button
         type="button"
         className={`${isMyFarms ? styles.tableToggleButtonMyFarm : styles.leftToggleButton}`}
-        style={{ backgroundColor: selectedTable === 3 && !isMyFarms ? "#174163" : "#2e3032", color: selectedTable === 3 && !isMyFarms? "white": ""}}
+        style={{ backgroundColor: selectedTable === 3 && !isMyFarms ? "#2e3032" : "transparent", color: selectedTable === 3 && !isMyFarms? "white": "", border: '0.75px solid #333333'}}
         onClick={onDaoToggleButtonClick}
         disabled={isMyFarms}
       >
@@ -34,7 +34,7 @@ const ToggleButtonGroup = (
       <button
         type="button"
         className={`${isMyFarms ? styles.tableToggleButtonMyFarm : styles.middleToggleButton}`}
-        style={{ backgroundColor: selectedTable === 1 && !isMyFarms ? "#174163" : "#2e3032", color: selectedTable === 1 && !isMyFarms? "white": ""}}
+        style={{ backgroundColor: selectedTable === 1 && !isMyFarms ? "#2e3032" : "transparent", color: selectedTable === 1 && !isMyFarms? "white": "", border: '0.75px solid #333333'}}
         onClick={onAcyToggleButtonClick}
         disabled={isMyFarms}
       >
@@ -44,7 +44,7 @@ const ToggleButtonGroup = (
       <button
         type="button"
         className={`${isMyFarms ? styles.tableToggleButtonMyFarm : styles.rightToggleButton}`}
-        style={{ backgroundColor: selectedTable === 2 && !isMyFarms ? "#174163" : "#2e3032", color: selectedTable === 2 && !isMyFarms? "white": ""}}
+        style={{ backgroundColor: selectedTable === 2 && !isMyFarms ? "#2e3032" : "transparent", color: selectedTable === 2 && !isMyFarms? "white": "", border: '0.75px solid #333333'}}
         onClick={onPremierToggleButtonClick}
         disabled={isMyFarms}
       >
