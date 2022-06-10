@@ -55,7 +55,7 @@ export default [
         component: './Swap/Index',
       },
       {
-        path: '/perpetual',
+        path: '/future',
         name: 'Future',
         component: './Perpetual/Index',
       },
@@ -94,7 +94,7 @@ export default [
         component: './Farms/',
       },
       {
-        path: '/stats/perpetual',
+        path: '/stats/future',
         name: 'Statistics',
         component: './Stats/Perpetual/Index',
         // routes:[

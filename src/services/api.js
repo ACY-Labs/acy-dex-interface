@@ -1,7 +1,7 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
 import r from 'umi-request';
-import { API_URL } from '@/constants'
+// import { API_URL } from '@/constants'
 
 export async function queryProjectNotice() {
   return request('/api/project/notice');
@@ -128,7 +128,9 @@ export async function getFakeCaptcha(mobile) {
 }
 
 // TODO: move this part to constants
-// const API_URL() = 'https://api.acy.finance/bsc-main/api';
+const API_URL = () => {
+  return 'https://api.acy.finance/bsc-main/api'
+}
 // const API_URL() = 'http://147.182.251.92:3001/bsc-main/api';
 
 export async function requireAllocation(network, walletId, projectToken) {
@@ -170,8 +172,7 @@ export async function recordWallet(network, walletId, projectToken, recordWallet
 }
 
 export async function getProjects(network) {
-  // return r.get(`${API_URL()}/launch/projects`)
-  return r.get(`https://api.acy.finance/bsc-main/api/launch/projects`)
+  return r.get(`${API_URL()}/launch/projects`)
 }
 
 export async function getProjectInfo(network, projectId) {
