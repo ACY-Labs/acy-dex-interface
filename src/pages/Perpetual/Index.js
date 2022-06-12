@@ -68,6 +68,8 @@ import { useConnectWallet } from '@/components/ConnectWallet';
 import PositionsTable from './components/PositionsTable';
 import ActionHistoryTable from './components/ActionHistoryTable';
 import OrderTable from './components/OrderTable'
+// import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs'
+import PerpetualTimeSelector from '@/components/PerpetualComponent/components/PerpetualTimeSelector'
 
 /// THIS SECTION IS FOR TESTING SWR AND GMX CONTRACT
 import { fetcher } from '@/acy-dex-futures/utils';
@@ -162,35 +164,64 @@ const StyledCard = styled(AcyCard)`
 
 const StyledSelect = styled(Radio.Group)`
   .ant-radio-button-wrapper{
-    background: transparent;
+    font-size: 0.7rem;
+    background-color: #0E0304;
     // color: #48484a;
-    border: 0px;
+    border-color: #0E0304;
+    height: 17px;
+    padding: 0 5%;
+    align-items: middle;
+    line-height: 17px;
+    text-align: middle;
+    border-radius: 0px;
   }
   .ant-radio-button-wrapper:hover{
-    background: #636366;
+    background-color: #636366;
     color: #fff;
     border: 0px;
+    border-color: #0E0304;
   }
   .ant-select-selection {
     background-color: #48484a;
     color: #fff;
     border: 0px;
+    border-color: #fff;
+    box-shadow: 0 0 0 0;
+  }
+  .ant-radio-button-wrapper:not(:first-child)::before{
+    border-color: transparent;
+    background-color: transparent;
+    box-shadow: 0 0 0 0;
+    border-radius: 0px;
 
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
     color: #fff;
     border: 0px;
+    background-color: #636366;
+    box-shadow: 0 0 0 0 #0E0304 !important;
+    border-radius: 0px;
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover {
     color: #fff;
-    border: 0px;
-  }
-  .ant-radio-button-wrapper:not(:first-child)::before{
-    border: 0px;
-    background-color: #0E0304 !important;
+    border: 0 0 0 0;
     border-color: #0E0304;
+    box-shadow: 0 0 0 0 #fff !important;
+    border-radius: 0px;
   }
- 
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before{
+    color: #fff;
+    background-color: #0E0304 !important;
+    border: 0 0 0 0;
+    box-shadow: 0 0 0 0 #fff;
+    border-radius: 0px;
+  }
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):first-child{
+    color: #fff;
+    border: 0 0 0 0;
+    border-color: #0E0304;
+    box-shadow: 0 0 0 0 #fff;
+  }
 `;
 const StyledDropdown = styled(Dropdown)`
   .ant-select-dropdown-menu {
@@ -980,7 +1011,9 @@ const Swap = props => {
 
   const { Option } = Select;
     
+  const placements = ['5m', '15m', '30m', '1h', '2h', '4h', '1d', '1w', '1m', '1q'];
   const placementChange = e => {
+    // console.log("hereim set placement", e.target.value)
     setPlacement(e.target.value);
     setActiveTimeScale(e.target.value);
   };
@@ -1013,60 +1046,54 @@ const Swap = props => {
     <PageHeaderWrapper>
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
-            <div className={styles.chartHeader}>
-              <div className={styles.tokenSelector}>
-                  <Select 
+            <div className={styles.timeSelector}>
+              
+                {/* <div className={styles.tokenSelector}>
+                  {/* <Select 
                     value={activeToken1.symbol} 
                     onChange={onClickDropdown}                  
                     dropdownClassName={styles.dropDownMenu}
                   >
-                  {supportedTokens.filter(token => token.symbol !== 'USDT' && token.symbol !== 'USDC' && token.symbol !== 'WMATIC').map((option) => (
-                    <Option className={styles.optionItem} value={option.symbol}>{option.symbol} / USD</Option>
-                  ))}
-                </Select>
-              </div>
-
-              {/* <Dropdown overlay={menu} > 
-                <div className={styles.tokenSelector}>
-                    <div
-                      className="site-dropdown-context-menu"
-                      style={{
-                        textAlign: 'left',
-                        height: 50,
-                        width: 120,
-                        lineHeight: '50px',
-                      }}
-                    >
-                      {activeToken1.symbol} / USD
-                    </div>
-                    {/* <div>{lineTitleRender()}</div> */}
-                  {/* </div> */}
-                {/* </Dropdown> */} 
-                {lineTitleRender()}
+                    {supportedTokens.filter(token => token.symbol !== 'USDT' && token.symbol !== 'USDC' && token.symbol !== 'WMATIC').map((option) => (
+                      <Option className={styles.optionItem} value={option.symbol}>{option.symbol} / USD</Option>
+                    ))}
+                  </Select> */}
+                {/* </div> */}
+                {/* {lineTitleRender()
+                }  */}
+                {/* <PerpetualTimeSelector
+                  option={placement}
+                  options={placements}
+                  onChange={placementChange}
+                  // style={{ height: '10px'}}
+                /> */}
+                <StyledSelect value={placement} onChange={placementChange} 
+                  style={{ fontsize:'0.5rem', width:'100%', height:'25px'}}>
+                  <Radio.Button value="5m" style={{width:'11%'}}>5m</Radio.Button>
+                  <Radio.Button value="15m" style={{width:'11%'}}>15m</Radio.Button>
+                  <Radio.Button value="15m" style={{width:'11%'}}>30m</Radio.Button>
+                  <Radio.Button value="1h" style={{width:'11%'}}>1h</Radio.Button>
+                  <Radio.Button value="15m" style={{width:'11%'}}>2h</Radio.Button>
+                  <Radio.Button value="4h" style={{width:'11%'}}>4h</Radio.Button>
+                  <Radio.Button value="1d" style={{width:'11%'}}>1d</Radio.Button>
+                  <Radio.Button value="1w" style={{width:'11%'}}>1w</Radio.Button>
+                  <Radio.Button value="15m" style={{width:'12%'}}>1q</Radio.Button>
+                </StyledSelect>
             </div>
-              {/* <div>{activeToken1.maxPrice && formatAmount(activeToken1.maxPrice, USD_DECIMALS, 2)}</div> */}
           {/* K chart */}
               
-              
-          <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
-            <div className={styles.kchartBox}>
-            <StyledSelect value={placement} onChange={placementChange}>
-                <Radio.Button value="5m">5m</Radio.Button>
-                <Radio.Button value="15m">15m</Radio.Button>
-                <Radio.Button value="1h">1h</Radio.Button>
-                <Radio.Button value="4h">4h</Radio.Button>
-                <Radio.Button value="1d">1d</Radio.Button>
-                <Radio.Button value="1w">1w</Radio.Button>
-              </StyledSelect>
-              </div>
-              <div className={`${styles.colItem} ${styles.priceChart}`}>
-                {
-                  currentAveragePrice === 0 ?
-                  <Spin/>
-                  : <KChart activeToken0={activeToken0} activeToken1={activeToken1} activeTimeScale={activeTimeScale} currentAveragePrice={currentAveragePrice} />
-                }
-              </div>
-          </AcyPerpetualCard>
+          <div className={styles.kchartBox}>
+            <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
+
+                <div className={`${styles.colItem} ${styles.priceChart}`}>
+                  {
+                    currentAveragePrice === 0 ?
+                    <Spin/>
+                    : <KChart activeToken0={activeToken0} activeToken1={activeToken1} activeTimeScale={activeTimeScale} currentAveragePrice={currentAveragePrice} />
+                  }
+                </div>
+            </AcyPerpetualCard>
+          </div>
 
           {/* Position table */}
           {!showTokenTable ?

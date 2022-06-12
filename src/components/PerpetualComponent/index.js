@@ -26,7 +26,7 @@ import {
 import { PriceBox } from './components/PriceBox';
 import ConfirmationBox from './components/ConfirmationBox';
 import { GlpSwapBox, GlpSwapDetailBox } from './components/GlpSwapBox'
-import PerpTabs from './components/PerpTabs/PerpTabs'
+import PerpetualTabs from './components/PerpetualTabs'
 import { MARKET, LIMIT, LONG, SHORT, SWAP, POOL, DEFAULT_HIGHER_SLIPPAGE_AMOUNT } from './constant'
 
 import {
@@ -1480,35 +1480,25 @@ const SwapComponent = props => {
     <div className={styles.mainContent}>
       <AcyPerpetualCard style={{ backgroundColor: 'transparent' }}>
         <div className={styles.modeSelector}>
-          <PerpTabs
+          <PerpetualTabs
             option={mode}
             options={perpetualMode}
             onChange={modeSelect}
+            // style={{height:''}}
           />
         </div>
 
         {mode !== POOL ?
           <>
             <div className={styles.typeSelector}>
-              <PerpTabs
+              <PerpetualTabs
                 option={type}
                 options={perpetualType}
                 type="inline"
                 onChange={typeSelect}
+                style={{height:'30px'}}
               />
             </div>
-
-            <BuyInputSection
-              token={fromToken}
-              tokenlist={tokens.filter(token => !token.isWrapped)}
-              topLeftLabel="Pay"
-              balance={payBalance}
-              topRightLabel='Balance: '
-              tokenBalance={formatAmount(fromBalance, fromToken.decimals, 4, true)}
-              inputValue={fromValue}
-              onInputValueChange={onFromValueChange}
-              onSelectToken={selectFromToken}
-            />
 
             {/* <div className={styles.arrow} onClick={switchTokens}>
               <Icon style={{ fontSize: '16px' }} type="arrow-down" />
@@ -1524,6 +1514,17 @@ const SwapComponent = props => {
               inputValue={toValue}
               onInputValueChange={onToValueChange}
               onSelectToken={selectToToken}
+            />
+            <BuyInputSection
+              token={fromToken}
+              tokenlist={tokens.filter(token => !token.isWrapped)}
+              topLeftLabel="Pay"
+              balance={payBalance}
+              topRightLabel='Balance: '
+              tokenBalance={formatAmount(fromBalance, fromToken.decimals, 4, true)}
+              inputValue={fromValue}
+              onInputValueChange={onFromValueChange}
+              onSelectToken={selectFromToken}
             />
 
             {type === LIMIT &&
