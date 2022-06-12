@@ -1,4 +1,4 @@
-[{
+{"abi": [{
   "inputs": [{
     "internalType": "address",
     "name": "_vault",
@@ -540,3 +540,4 @@
   "stateMutability": "payable",
   "type": "receive"
 }]
+}

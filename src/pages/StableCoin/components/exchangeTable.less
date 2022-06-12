@@ -1,0 +1,21 @@
+@import (css) url("https://fonts.googleapis.com/css?family=Lora:700");
+.exchangeTable{
+    float: left;
+    width: 100%;
+    display: table-cell;
+    margin-top: 20px;
+    // margin-left: 10px;
+    :global{
+    .ant-table-thead > tr > th:not(.leftAlignTableHeader){
+      text-align: left !important;
+    }
+  }
+  }
+@media (max-width: 900px) {
+  .exchangeTable{
+    float: left;
+    width: 100%;
+    display: table-cell;
+  }
+}
+

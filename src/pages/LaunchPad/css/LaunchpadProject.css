@@ -79,10 +79,16 @@
   height: 84px;
   border-radius: 2rem;
   max-width: 100%;
+  background: white;
 }
 
 .tokenInfo {
   overflow-wrap: break-word;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding-left: 1.25rem;
 }
 
 .tokenTitle {
@@ -91,8 +97,8 @@
   line-height: 1.2;
   font-family: 'Karla', sans-serif;
   font-weight: 500;
-  margin-left: 1.5rem;
   cursor: pointer;
+  margin-left: 0.25rem;
 }
 
 .bulletinContainer {
@@ -114,7 +120,6 @@
 
 .tokenLabelBar {
   display: flex;
-  margin-left: 1.5rem;
 }
 
 .tokenLabel {
@@ -903,7 +908,6 @@
   .tokenTitle {
     font-size: 1.5rem;
     cursor: pointer;
-    margin-left: 1rem;
   }
 
   .tokenLabel {

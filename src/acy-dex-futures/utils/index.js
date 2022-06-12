@@ -5,6 +5,8 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { JsonRpcProvider } from "@ethersproject/providers"
 import _ from "lodash";
 import Token from "@/acy-dex-futures/abis/Token.json";
+import OrderBook from "@/acy-dex-futures/abis/OrderBook";
+import OrderBookReader from "@/acy-dex-futures/abis/OrderBookReader";
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import { InjectedConnector, UserRejectedRequestError as UserRejectedRequestErrorInjected} from "@web3-react/injected-connector";
 import { useRef, useEffect, useCallback } from "react";
@@ -35,7 +37,7 @@ const { AddressZero } = ethers.constants
 
 export const GLP_COOLDOWN_DURATION = 15 * 60
 export const SECONDS_PER_YEAR = 31536000
-export const GLP_DECIMALS = 8
+export const GLP_DECIMALS = 18
 export const USDG_DECIMALS = 18
 export const PLACEHOLDER_ACCOUNT = ethers.Wallet.createRandom().address
 export const PRECISION = expandDecimals(1, USD_DECIMALS)
@@ -58,7 +60,8 @@ export const CHART_PERIODS = {
   "15m": 60 * 15,
   "1h": 60 * 60,
   "4h": 60 * 60 * 4,
-  "1d": 60 * 60 * 24
+  "1d": 60 * 60 * 24,
+  "1w": 60 * 60 * 24 * 7
 };
 
 export const BSC_MAINNET = 56;
@@ -204,7 +207,7 @@ export function approveTokens({
   setIsApproving(true);
   const contract = new ethers.Contract(
     tokenAddress,
-    Token,
+    Token.abi,
     library.getSigner()
   );
   contract
@@ -768,7 +771,7 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
 
   if (ethers.utils.isHexString(arg0)) {
     const address = arg0
-    const contract = new ethers.Contract(address, contractInfo, provider)
+    const contract = new ethers.Contract(address, contractInfo.abi, provider)
     // console.log('fetcher contract', contract)
 
     try {

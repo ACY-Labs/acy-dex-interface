@@ -197,7 +197,7 @@ export const GlpSwapBox = (props) => {
     fetcher: fetcher(library, Vault),
   })
   const tokenAllowanceAddress = swapTokenAddress === AddressZero ? nativeTokenAddress : swapTokenAddress
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, glpManagerAddress], {
     fetcher: fetcher(library, Glp)
   });
   const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR([chainId, glpManagerAddress, "lastAddedAt", account || PLACEHOLDER_ACCOUNT], {
@@ -318,6 +318,7 @@ export const GlpSwapBox = (props) => {
   useEffect(() => {
     if (active) {
       library.on('block', () => {
+        console.log("update on block: ", tokenAllowance, tokenAllowanceAddress)
         updateVaultTokenInfo(undefined, true)
         updateTokenBalances(undefined, true)
         // updateBalancesAndSupplies(undefined, true)
@@ -452,6 +453,7 @@ export const GlpSwapBox = (props) => {
     const [error, modal] = getError()
     if (error && !modal) { return error }
 
+    console.log("get primary text: ", needApproval, isWaitingForApproval)
     if (needApproval && isWaitingForApproval) { return "Waiting for Approval" }
     if (isApproving) { return `Approving ${swapToken.symbol}...` }
     if (needApproval) { return `Approve ${swapToken.symbol}` }

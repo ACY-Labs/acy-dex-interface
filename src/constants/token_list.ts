@@ -432,6 +432,14 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     logoURI: 'https://cryptologos.cc/logos/polygon-matic-logo.svg?v=014',
     idOnCoingecko: "matic-network",
   },
+  {
+    name: 'stable coin',
+    symbol: 'USDA',
+    address: '0x45a2DFF9569F7fAA29015897ea956A5A48068273',
+    decimals: 18,
+    logoURI: 'https://storageapi2.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/USDA-min.svg',
+    idOnCoingecko: "tether",
+  },
 ];
 
 const PolygonTestNetTokenList: Array<TokenInfo> = [

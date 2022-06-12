@@ -58,6 +58,7 @@ import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { GlpSwapTokenTable } from '@/components/PerpetualComponent/components/GlpSwapBox'
 // import Kchart from './components/Kchart';
 import KChart from './components/KChart';
+import ExchangeTVChart from './components/ExchangeTVChart';
 import axios from 'axios';
 import moment from 'moment';
 import styles from './styles.less';
@@ -456,15 +457,8 @@ const Swap = props => {
   const [deltaPrice24, setDeltaPrice24] = useState(0);
   const [percentage24, setPercentage24] = useState(0);
   const [currentAveragePrice, setCurrentAveragePrice] = useState(0);
-
-  //---------- FOR TESTING 
-  const whitelistedTokens = supportedTokens.filter(token => token.symbol !== "USDG");
-  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
   const tokens = supportedTokens;
-  const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
-
-
-
+  
   const defaultTokenSelection = useMemo(() => ({
     ["Swap"]: {
       from: AddressZero,
@@ -486,8 +480,6 @@ const Swap = props => {
 
   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
   const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
-  const fromTokenAddress = tokenSelection[swapOption].from
-  const toTokenAddress = tokenSelection[swapOption].to
 
   const setFromTokenAddress = useCallback((selectedSwapOption, address) => {
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
@@ -501,6 +493,11 @@ const Swap = props => {
     setTokenSelection(newTokenSelection)
   }, [tokenSelection, setTokenSelection])
 
+  const fromTokenAddress = tokenSelection[swapOption].from
+  const toTokenAddress = tokenSelection[swapOption].to
+
+  console.log("debug perpetual page, toTokenAddress: ", toTokenAddress)
+
   const { perpetuals } = useConstantLoader()
   const readerAddress = perpetuals.getContract("Reader")
   const vaultAddress = perpetuals.getContract("Vault")
@@ -510,6 +507,11 @@ const Swap = props => {
   const glpManagerAddress = perpetuals.getContract("GlpManager")
   const glpAddress = perpetuals.getContract("GLP")
   const orderBookAddress = perpetuals.getContract("OrderBook")
+
+  //---------- FOR TESTING 
+  const whitelistedTokens = supportedTokens.filter(token => token.symbol !== "USDG");
+  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
+  const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
 
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
@@ -733,52 +735,32 @@ const Swap = props => {
   useEffect(async () => {
     let currentTime = getCurrentTime();
     console.log("hereim current time", getCurrentTime())
-    let previousTime;
-    previousTime = currentTime - 24*60*60 ;
+    let previousTime = currentTime - 24*60*60 ;
     console.log("hereim previous time", previousTime)
 
-    let data24
-    let high24
-    let low24;
-    let deltaPrice24
-    let percentage;
-    try {
-      data24 = await getKChartData(activeToken1.symbol, "56", "5m", previousTime.toString(), currentTime.toString(), "chainlink");
-    } catch {
-      data = [];
-      console.log("fallback to empty array");
-    }
+    let data24 = await getKChartData(activeToken1.symbol, "56", "5m", previousTime.toString(), currentTime.toString(), "chainlink");
+    let high24 = 0;
+    let low24 = 0;
+    let deltaPrice24 = 0;
+    let percentage = 0;
+    let average = 0;
     let highArr = [];
     let lowArr = [];
-    for (let i=1; i < data24.length; i++){
-      highArr.push(data24[i].high);
-      lowArr.push(data24[i].low);
+    if (data24.length > 0) {
+      for (let i=1; i < data24.length; i++){
+        highArr.push(data24[i].high);
+        lowArr.push(data24[i].low);
+      }
+      high24 = Math.max(...highArr);
+      low24 = Math.min(...lowArr);
+      high24 = Math.round(high24*100)/100;
+      low24 = Math.round(low24*100)/100;
+
+      deltaPrice24 = Math.round(data24[0].open * 100) / 100;
+      average = Math.round( ((high24+low24)/2) *100)/100;
+      percentage = Math.round((average - deltaPrice24) *100 / average *100)/100;
     }
-    high24 = Math.max(...highArr);
-    low24 = Math.min(...lowArr);
-    high24 = Math.round(high24*100)/100;
-    low24 = Math.round(low24*100)/100;
     
-    // console.log("hereim 24 indextokens", vaultTokenInfo);
-    // console.log("hereim 24 tokeninfo", infoTokens);
-
-    // const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
-    // console.log("hereim 24 infoTokens", infoTokens);
-    // const tokenInfo = getTokenInfo(infoTokens, activeToken1.address, true, nativeTokenAddress);
-    // console.log("hereim 24tokeninfo", tokenInfo);
-
-    // console.log("hereim in useeffect perpetual data", data24[1])
-    // if (data24.length > 1) {
-      // high24 = Math.round(data24[1].high * 100) / 100;
-      // low24 = Math.round(data24[1].low * 100) / 100;    
-      // high24 = tokenInfo.maxPrice;
-      // low24 = tokenInfo.minPrice;
-    // }
-    
-    deltaPrice24 = Math.round(data24[0].open * 100) / 100;
-    let average = Math.round( ((high24+low24)/2) *100)/100;
-    percentage = Math.round((average - deltaPrice24) *100 / average *100)/100;
-
     setHigh24(high24);
     setLow24(low24);
     setDeltaPrice24(deltaPrice24);
@@ -1082,17 +1064,32 @@ const Swap = props => {
             </div>
           {/* K chart */}
               
+              
           <div className={styles.kchartBox}>
-            <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
+            <div style={{ backgroundColor: '#0E0304', margin: '10px', height: "450px", display: "flex", flexDirection: "column" }}>
+            
+              <div className={`${styles.colItem} ${styles.priceChart}`} style={{ flex: 1 }}>
+                {
+                  // currentAveragePrice === 0 ?
+                  // <Spin/>
+                  // // : <KChart activeToken0={activeToken0} activeToken1={activeToken1} activeTimeScale={activeTimeScale} currentAveragePrice={currentAveragePrice} />
+                  // :
+                  <ExchangeTVChart 
+                  swapOption={swapOption}
+                  fromTokenAddress={fromTokenAddress}
+                  toTokenAddress={toTokenAddress}
+                  period={placement}
+                  infoTokens={infoTokens}
+                  chainId={chainId}
+                  positions={positions}
+                  // savedShouldShowPositionLines,
+                  orders={orders}
+                  setToTokenAddress={setToTokenAddress}
+                  />
+                }
+              </div>
+            </div> 
 
-                <div className={`${styles.colItem} ${styles.priceChart}`}>
-                  {
-                    currentAveragePrice === 0 ?
-                    <Spin/>
-                    : <KChart activeToken0={activeToken0} activeToken1={activeToken1} activeTimeScale={activeTimeScale} currentAveragePrice={currentAveragePrice} />
-                  }
-                </div>
-            </AcyPerpetualCard>
           </div>
 
           {/* Position table */}

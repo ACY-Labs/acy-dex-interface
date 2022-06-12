@@ -93,6 +93,8 @@ import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 
 import styled from "styled-components";
 
+import { JsonRpcProvider } from "@ethersproject/providers";
+
 const { AddressZero } = ethers.constants;
 
 const StyledSlider = styled(Slider)`
@@ -202,6 +204,12 @@ const SwapComponent = props => {
     setActiveToken0,
     activeToken1,
     setActiveToken1,
+
+    toTokenAddress,
+    setToTokenAddress,
+    fromTokenAddress,
+    setFromTokenAddress,
+
     positionsMap,
     pendingTxns,
     setPendingTxns,
@@ -267,10 +275,10 @@ const SwapComponent = props => {
     toTokens = shortableTokens;
   }
 
-  const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
+  // const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
   const initialToToken = perpetuals.getTokenBySymBol("BTC").address;
   console.log("initialToToken: ", initialToToken, chainId)
-  const [toTokenAddress, setToTokenAddress] = useState(initialToToken);
+  // const [toTokenAddress, setToTokenAddress] = useState(initialToToken);
   // const [fromTokenInfo, setFromTokenInfo] = useState();
   // const [toTokenInfo, setToTokenInfo] = useState();
   // const [fees, setFees] = useState(0.1);
@@ -291,6 +299,10 @@ const SwapComponent = props => {
   const orderBookAddress = perpetuals.getContract("OrderBook")
   const glpManagerAddress = perpetuals.getContract("GlpManager")
   const glpAddress = perpetuals.getContract("GLP")
+
+  const { farmSetting: { RPC_URL }} = useConstantLoader();
+  const provider = new JsonRpcProvider(RPC_URL, chainId);
+
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
   })
@@ -311,8 +323,31 @@ const SwapComponent = props => {
     fetcher: fetcher(library, Router)
   });
   console.log("test orderbook approved: ", routerAddress, account, orderBookAddress, orderBookApproved)
+
+  useEffect(() => {
+    if (active) {
+      function onBlock() {
+        
+        updateVaultTokenInfo()
+        updateTokenBalances()
+        // updatePositionData(undefined, true)
+        updateFundingRateInfo()
+        updateTotalTokenWeights()
+        updateUsdgSupply()
+        updateOrderBookApproved()
+        console.log("BLOCK HERE:")
+      }
+      library.on('block', onBlock)
+      return () => {
+        library.removeListener('block', onBlock)
+      }
+    }
+  }, [active, library, chainId,
+      updateVaultTokenInfo, updateTokenBalances, updateFundingRateInfo, updateTotalTokenWeights, updateUsdgSupply,
+      updateOrderBookApproved])
+
   const tokenAllowanceAddress = fromTokenAddress === AddressZero ? nativeTokenAddress : fromTokenAddress;
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
     fetcher: fetcher(library, Glp)
   });
 
@@ -376,6 +411,7 @@ const SwapComponent = props => {
     fromAmount &&
     fromAmount.gt(tokenAllowance) &&
     !isWrapOrUnwrap;
+  console.log("needApproval? ", needApproval)
   const prevFromTokenAddress = usePrevious(fromTokenAddress);
   const prevNeedApproval = usePrevious(needApproval);
   const prevToTokenAddress = usePrevious(toTokenAddress);
@@ -480,6 +516,7 @@ const SwapComponent = props => {
   useEffect(() => {
     if (active) {
       function onBlock() {
+        console.log("onBlock, updateTokenAllowance");
         updateTokenAllowance(undefined, true);
       }
       library.on("block", onBlock);
@@ -785,9 +822,10 @@ const SwapComponent = props => {
 
   const selectFromToken = symbol => {
     const token = getTokenfromSymbol(tokens, symbol)
-    setFromTokenAddress(token.address);
+    setFromTokenAddress(mode, token.address);
     setIsWaitingForApproval(false);
-    if (isShort && token.isStable) {
+    if (isShort) {
+      console.log("is short and changed short collateral token to ", token.address)
       setShortCollateralAddress(token.address);
     }
   };
@@ -796,15 +834,16 @@ const SwapComponent = props => {
     const fromToken = getTokenfromSymbol(tokens, activeToken0.symbol)
     const toToken = getTokenfromSymbol(tokens, activeToken1.symbol)
 
-    setFromTokenAddress(fromToken.address);
-    setToTokenAddress(toToken.address);
+    setFromTokenAddress(mode, fromToken.address);
+    setToTokenAddress(mode, toToken.address);
 
   }, [activeToken0, activeToken1])
 
-
+  console.log("show this")
   const selectToToken = symbol => {
     const token = getTokenfromSymbol(tokens, symbol)
-    setToTokenAddress(token.address);
+    console.log("selectToToken symbol and address", symbol, token.address)
+    setToTokenAddress(mode, token.address);
     setActiveToken1((tokens.filter(ele => ele.symbol === symbol))[0]);
   };
 
@@ -945,7 +984,7 @@ const SwapComponent = props => {
     }
 
     console.log("increasePosition 2: ", params);
-    const contract = new ethers.Contract(routerAddress, Router, library.getSigner());
+    const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner());
     const indexToken = getTokenInfo(infoTokens, indexTokenAddress);
     const tokenSymbol = indexToken.isWrapped ? getConstant(chainId, "nativeTokenSymbol") : indexToken.symbol;
     const successMsg = `Requested increase of ${tokenSymbol} ${isLong ? "Long" : "Short"} by ${formatAmount(
@@ -1018,8 +1057,8 @@ const SwapComponent = props => {
     }
     setIsWaitingForApproval(false);
 
-    setFromTokenAddress(toTokenAddress)
-    setToTokenAddress(fromTokenAddress)
+    setFromTokenAddress(mode, toTokenAddress)
+    setToTokenAddress(mode, fromTokenAddress)
   };
 
   const getLeverageError = useCallback(() => {
@@ -1154,8 +1193,9 @@ const SwapComponent = props => {
           totalTokenWeights
         );
         stableTokenAmount = nextToAmount;
+        console.log("test here2 ", stableTokenAmount, shortCollateralToken, infoTokens, shortCollateralAddress)
         if (stableTokenAmount.gt(shortCollateralToken.availableAmount)) {
-          return [`Insufficient liquidity, change "Profits In"`];
+          return [`Insufficient liquidity, change "Profits In" 1`];
         }
 
         if (
@@ -1167,7 +1207,7 @@ const SwapComponent = props => {
         ) {
           // suggest swapping to collateralToken
           return [
-            `Insufficient liquidity, change "Profits In"`,
+            `Insufficient liquidity, change "Profits In" 2`,
             true,
             "BUFFER"
           ];
@@ -1217,7 +1257,7 @@ const SwapComponent = props => {
 
       stableTokenAmount = stableTokenAmount.add(sizeTokens)
       if (stableTokenAmount.gt(shortCollateralToken.availableAmount)) {
-        return [`Insufficient liquidity, change "Profits In"`];
+        return [`Insufficient liquidity, change "Profits In" 3`];
       }
     }
 
