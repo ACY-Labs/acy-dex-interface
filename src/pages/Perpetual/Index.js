@@ -164,10 +164,11 @@ const StyledCard = styled(AcyCard)`
 `;
 
 const StyledSelect = styled(Radio.Group)`
+// default
   .ant-radio-button-wrapper{
     font-size: 0.7rem;
     background-color: #0E0304;
-    // color: #48484a;
+    color: #b5b5b6;
     border-color: #0E0304;
     height: 17px;
     padding: 0 5%;
@@ -177,29 +178,30 @@ const StyledSelect = styled(Radio.Group)`
     border-radius: 0px;
   }
   .ant-radio-button-wrapper:hover{
-    background-color: #636366;
     color: #fff;
+    background-color: #0E0304;
     border: 0px;
     border-color: #0E0304;
   }
   .ant-select-selection {
-    background-color: #48484a;
-    color: #fff;
-    border: 0px;
-    border-color: #fff;
-    box-shadow: 0 0 0 0;
+    color: #ffffff;
+    background-color: #0E0304;
+    border: 0 0 0 0;
+    border-color: #0E0304;
+    box-shadow: 0 0 0 0 #0E0304;
   }
   .ant-radio-button-wrapper:not(:first-child)::before{
-    border-color: transparent;
+    border-color: #0E0304;
     background-color: transparent;
-    box-shadow: 0 0 0 0;
+    box-shadow: 0 0 0 0 #0E0304;
     border-radius: 0px;
-
   }
+// color of the tab chosen
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
     color: #fff;
-    border: 0px;
-    background-color: #636366;
+    border: 0 0 0 0;
+    border-color: #0E0304;
+    background-color: #0E0304;
     box-shadow: 0 0 0 0 #0E0304 !important;
     border-radius: 0px;
   }
@@ -207,21 +209,22 @@ const StyledSelect = styled(Radio.Group)`
     color: #fff;
     border: 0 0 0 0;
     border-color: #0E0304;
-    box-shadow: 0 0 0 0 #fff !important;
+    box-shadow: 0 0 0 0 #0E0304 !important;
     border-radius: 0px;
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before{
     color: #fff;
     background-color: #0E0304 !important;
     border: 0 0 0 0;
-    box-shadow: 0 0 0 0 #fff;
+    border-color: #0E0304;
+    box-shadow: 0 0 0 0 #0E0304;
     border-radius: 0px;
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):first-child{
     color: #fff;
     border: 0 0 0 0;
     border-color: #0E0304;
-    box-shadow: 0 0 0 0 #fff;
+    box-shadow: 0 0 0 0 #0E0304;
   }
 `;
 const StyledDropdown = styled(Dropdown)`
