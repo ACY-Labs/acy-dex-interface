@@ -429,7 +429,7 @@ const Swap = props => {
   const tokens = supportedTokens;
   
   const defaultTokenSelection = useMemo(() => ({
-    ["Swap"]: {
+    ["Pool"]: {
       from: AddressZero,
       to: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
       // to: getTokenBySymbol(tokens, 'BTC').address,
@@ -950,8 +950,6 @@ const Swap = props => {
   }
   const glpSupplyUsd = glpSupply ? glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS)) : bigNumberify(0)
 
-  const glp_infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
-
   const onChangeMode = (mode) => {
     if (mode === "Pool") {
       setShowTokenTable(true)
@@ -1033,6 +1031,7 @@ const Swap = props => {
           <div style={{ backgroundColor: '#0E0304', margin: '10px', height: "450px", display: "flex", flexDirection: "column" }}>
             <div className={styles.kchartBox}>
             <StyledSelect value={placement} onChange={placementChange}>
+                <Radio.Button value="1m">1m</Radio.Button>
                 <Radio.Button value="5m">5m</Radio.Button>
                 <Radio.Button value="15m">15m</Radio.Button>
                 <Radio.Button value="1h">1h</Radio.Button>
@@ -1146,6 +1145,8 @@ const Swap = props => {
         {/* Perpetual Component */}
         <div className={styles.perpetualComponent}>
           <PerpetualComponent
+            swapOption={swapOption}
+            setSwapOption={setSwapOption}
             activeToken0={activeToken0}
             setActiveToken0={setActiveToken0}
             activeToken1={activeToken1}

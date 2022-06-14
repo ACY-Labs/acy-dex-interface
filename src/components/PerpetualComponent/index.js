@@ -198,6 +198,8 @@ const SwapComponent = props => {
   } = useConstantLoader(props);
 
   const {
+    swapOption: mode,
+    setSwapOption: setMode,
     activeToken0,
     setActiveToken0,
     activeToken1,
@@ -234,7 +236,6 @@ const SwapComponent = props => {
   const connectWalletByLocalStorage = useConnectWallet();
   const { active, activate } = useWeb3React();
 
-  const [mode, setMode] = useState(LONG);
   const [type, setType] = useState(MARKET);
   const [fromValue, setFromValue] = useState("");
   const [toValue, setToValue] = useState("");
@@ -264,7 +265,6 @@ const SwapComponent = props => {
 
   const isLong = mode === LONG;
   const isShort = mode === SHORT;
-  const isSwap = mode === SWAP;
 
   if (isLong) {
     toTokens = indexTokens;
@@ -815,12 +815,18 @@ const SwapComponent = props => {
   const selectFromToken = symbol => {
     const token = getTokenfromSymbol(tokens, symbol)
     setFromTokenAddress(mode, token.address);
+    console.log("update from token: ", symbol, token, mode);
+    setActiveToken0((tokens.filter(ele => ele.symbol === symbol))[0]);
     setIsWaitingForApproval(false);
     if (isShort) {
       console.log("is short and changed short collateral token to ", token.address)
       setShortCollateralAddress(token.address);
     }
   };
+
+  useEffect(() => {
+    console.log("update from token 1: ", fromTokenAddress)
+  }, [fromTokenAddress])
 
   useEffect(() => {
     const fromToken = getTokenfromSymbol(tokens, activeToken0.symbol)
@@ -1027,7 +1033,7 @@ const SwapComponent = props => {
   const perpetualMode = [LONG, SHORT, POOL];
   const perpetualType = [MARKET, LIMIT]
 
-  // LONG or SHORT
+  // LONG or SHORT or POOL
   const modeSelect = (input) => {
     setMode(input);
     onChangeMode(input);
@@ -1185,7 +1191,7 @@ const SwapComponent = props => {
           totalTokenWeights
         );
         stableTokenAmount = nextToAmount;
-        console.log("test here2 ", stableTokenAmount, shortCollateralToken, infoTokens, shortCollateralAddress)
+        console.log("test here2 ", stableTokenAmount, shortCollateralToken, infoTokens, vaultTokenInfo, shortCollateralAddress)
         if (stableTokenAmount.gt(shortCollateralToken.availableAmount)) {
           return [`Insufficient liquidity, change "Profits In" 1`];
         }
@@ -1943,7 +1949,6 @@ const SwapComponent = props => {
           fromTokenInfo={fromTokenInfo}
           toToken={toToken}
           toTokenInfo={toTokenInfo}
-          isSwap={isSwap}
           isLong={isLong}
           isMarketOrder={type === MARKET}
           type={type}
