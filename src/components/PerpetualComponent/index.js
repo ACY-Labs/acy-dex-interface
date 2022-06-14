@@ -449,10 +449,18 @@ const SwapComponent = props => {
   };
 
   const leverageMarks = {
-    2: {
+    // 0.1: {
+    //   style: { color: '#b5b6b6', },
+    //   label: '0.1x'
+    // },
+    1: {
       style: { color: '#b5b6b6', },
-      label: '2x'
+      label: '1x'
     },
+    // 2: {
+    //   style: { color: '#b5b6b6', },
+    //   label: '2x'
+    // },
     5: {
       style: { color: '#b5b6b6', },
       label: '5x'
@@ -480,6 +488,7 @@ const SwapComponent = props => {
   };
 
   const [leverageOption, setLeverageOption] = useLocalStorageSerializeKey([chainId, "Exchange-swap-leverage-option"], "2");
+  useEffect(() => console.log("leverageOption ", leverageOption), [leverageOption])
   const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useLocalStorageSerializeKey([chainId, "Exchange-swap-leverage-slider-enabled"], true);
   const hasLeverageOption = isLeverageSliderEnabled && !isNaN(parseFloat(leverageOption));
 
@@ -1103,8 +1112,8 @@ const SwapComponent = props => {
       return ["Min order: 10 USD"];
     }
 
-    if (leverage && leverage.lt(1.1 * BASIS_POINTS_DIVISOR)) {
-      return ["Min leverage: 1.1x"];
+    if (leverage && leverage.lt(0.1 * BASIS_POINTS_DIVISOR)) {
+      return ["Min leverage: 0.1x"];
     }
 
     if (leverage && leverage.gt(30.5 * BASIS_POINTS_DIVISOR)) {
@@ -1597,7 +1606,7 @@ const SwapComponent = props => {
                           <button
                             className={styles.leverageButton}
                             onClick={() => {
-                              if (leverageOption > 1.1) {
+                              if (leverageOption > 0.1) {
                                 setLeverageOption((parseFloat(leverageOption) - 0.1).toFixed(1))
                               }
                             }}
@@ -1606,12 +1615,12 @@ const SwapComponent = props => {
                           </button>
                           <input
                             type="number"
-                            min={1.1}
+                            min={0.1}
                             max={30.5}
                             value={leverageOption}
                             onChange={e => {
                               let val = parseFloat(e.target.value.replace(/^(-)*(\d+)\.(\d).*$/, '$1$2.$3')).toFixed(1)
-                              if (val >= 1.1 && val <= 30.5) {
+                              if (val >= 0.1 && val <= 30.5) {
                                 setLeverageOption(val)
                               }
                             }}
@@ -1642,7 +1651,7 @@ const SwapComponent = props => {
                   {isLeverageSliderEnabled &&
                     <span className={styles.leverageSlider}>
                       <StyledSlider
-                        min={1.1}
+                        min={0.1}
                         max={30.5}
                         step={0.1}
                         marks={leverageMarks}
