@@ -1,0 +1,59 @@
+.Tab.box {
+    height: 10px !important;
+    display: grid;
+    grid-auto-flow: column;
+    font-size: 0.9rem;
+    border-radius: 3px;
+    overflow: hidden;
+    color: #ffffffb3;
+    /* background: linear-gradient(90deg, rgb(27 27 28) 0%, rgba(27 27 28) 100%); */
+    box-shadow: inset 0px 0px 30px 5px rgba(255, 255, 255, 0.01);
+  }
+  
+  .Tab-option-icon {
+    margin-right: 0.3rem;
+    opacity: 0.7;
+  }
+  
+  .Tab.box .Tab-option {
+    text-align: center;
+    padding: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    cursor: pointer;
+    border: 0.5px solid #232323;
+  }
+  
+  .Tab.box .Tab-option:hover {
+    /* color: rgba(255, 255, 255, 1); */
+    background: linear-gradient(90deg, #1b1b1c 0%, #1b1b1c 100%);
+  }
+  
+  .Tab.box .Tab-option.active {
+    opacity: 1;
+    pointer-events: none;
+    background: #232323;
+    border: 0.75px solid #373738;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .Tab.box .Tab-option.active .Tab-option-icon {
+    opacity: 1;
+  }
+  
+  .Tab.inline .Tab-option {
+    cursor: pointer;
+    display: inline-block;
+    margin-right: 1rem;
+  }
+  
+  .Tab.inline .Tab-option:hover {
+    opacity: 0.8;
+  }
+  
+  .Tab.inline .Tab-option.active {
+    opacity: 1;
+    pointer-events: none;
+    color: white;
+  }
+  

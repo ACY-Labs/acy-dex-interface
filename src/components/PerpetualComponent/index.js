@@ -26,7 +26,7 @@ import {
 import { PriceBox } from './components/PriceBox';
 import ConfirmationBox from './components/ConfirmationBox';
 import { GlpSwapBox, GlpSwapDetailBox } from './components/GlpSwapBox'
-import PerpTabs from './components/PerpTabs/PerpTabs'
+import PerpetualTabs from './components/PerpetualTabs'
 import { MARKET, LIMIT, LONG, SHORT, SWAP, POOL, DEFAULT_HIGHER_SLIPPAGE_AMOUNT } from './constant'
 
 import {
@@ -92,6 +92,8 @@ import { constantInstance } from '@/constants';
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 
 import styled from "styled-components";
+
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 const { AddressZero } = ethers.constants;
 
@@ -297,6 +299,10 @@ const SwapComponent = props => {
   const orderBookAddress = perpetuals.getContract("OrderBook")
   const glpManagerAddress = perpetuals.getContract("GlpManager")
   const glpAddress = perpetuals.getContract("GLP")
+
+  const { farmSetting: { RPC_URL }} = useConstantLoader();
+  const provider = new JsonRpcProvider(RPC_URL, chainId);
+
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
   })
@@ -321,13 +327,14 @@ const SwapComponent = props => {
   useEffect(() => {
     if (active) {
       function onBlock() {
-        updateVaultTokenInfo(undefined, true)
-        updateTokenBalances(undefined, true)
+        updateVaultTokenInfo()
+        updateTokenBalances()
         // updatePositionData(undefined, true)
-        updateFundingRateInfo(undefined, true)
-        updateTotalTokenWeights(undefined, true)
-        updateUsdgSupply(undefined, true)
-        updateOrderBookApproved(undefined, true)
+        updateFundingRateInfo()
+        updateTotalTokenWeights()
+        updateUsdgSupply()
+        updateOrderBookApproved()
+        console.log("BLOCK HERE:")
       }
       library.on('block', onBlock)
       return () => {
@@ -1518,7 +1525,7 @@ const SwapComponent = props => {
     <div className={styles.mainContent}>
       <AcyPerpetualCard style={{ backgroundColor: 'transparent' }}>
         <div className={styles.modeSelector}>
-          <PerpTabs
+          <PerpetualTabs
             option={mode}
             options={perpetualMode}
             onChange={modeSelect}
@@ -1528,11 +1535,12 @@ const SwapComponent = props => {
         {mode !== POOL ?
           <>
             <div className={styles.typeSelector}>
-              <PerpTabs
+              <PerpetualTabs
                 option={type}
                 options={perpetualType}
                 type="inline"
                 onChange={typeSelect}
+                style={{height:'30px'}}
               />
             </div>
 

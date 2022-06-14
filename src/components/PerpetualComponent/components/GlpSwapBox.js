@@ -59,7 +59,7 @@ import RewardRouter from '@/acy-dex-futures/abis/RewardRouter.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
 import { callContract } from '@/acy-dex-futures/Api'
 
-import PerpTabs from './PerpTabs/PerpTabs'
+import PerpetualTabs from './PerpetualTabs'
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 import TokenTable from '@/pages/BuyGlp/components/SwapTokenTable'
 import glp40Icon from '@/pages/BuyGlp/components/ic_glp_40.svg'
@@ -580,7 +580,7 @@ export const GlpSwapBox = (props) => {
   return (
     <div className="GlpSwap">
       <div className={styles.BuySellSelector}>
-        <PerpTabs
+        <PerpetualTabs
           option={buySellLabel}
           options={buySellTabs}
           type="inline"
@@ -684,7 +684,7 @@ export const GlpSwapBox = (props) => {
         </div>
       </div>
 
-      <div>
+      <div className={styles.centerButton}>
         <AcyPerpetualButton
           style={{ marginTop: '25px' }}
           onClick={onClickPrimary}
