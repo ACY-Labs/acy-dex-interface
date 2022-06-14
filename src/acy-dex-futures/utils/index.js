@@ -56,6 +56,7 @@ export const MIN_PROFIT_TIME = 3 * 60 * 60; // 3 hours
 export const PROFIT_THRESHOLD_BASIS_POINTS = 120;
 export const DUST_BNB = "2000000000000000";
 export const CHART_PERIODS = {
+  "1m": 60, 
   "5m": 60 * 5,
   "15m": 60 * 15,
   "1h": 60 * 60,
