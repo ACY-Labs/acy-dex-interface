@@ -385,8 +385,7 @@ const SwapComponent = props => {
 
   // default collateral address on ARBITRUM
   
-  const shortCollateralAddressInitAddr = perpetuals.getTokenBySymBol("USDT").address;
-  const [shortCollateralAddress, setShortCollateralAddress] = useState(shortCollateralAddressInitAddr);
+  const [shortCollateralAddress, setShortCollateralAddress] = useState(fromTokenAddress);
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   console.log("test multichain: tokens", infoTokens, tokens)
   const fromToken = perpetuals.getToken(fromTokenAddress);
@@ -1067,7 +1066,6 @@ const SwapComponent = props => {
   };
 
   const getLeverageError = useCallback(() => {
-
     if (!toAmount || toAmount.eq(0)) {
       return ["Enter an amount"];
     }
