@@ -327,8 +327,9 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
   // const propsLength = 9;
   const positions = []
   const positionsMap = {}
-
-  if (!positionData) {
+  // 
+  // if (!positionData) {
+  if (true) {
     return { positions, positionsMap }
   }
   const { collateralTokens, indexTokens, isLong } = positionQuery
@@ -970,7 +971,7 @@ const Swap = props => {
   //   aum = isBuying ? aums[0] : aums[1]
   // }
 
-  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsdg", true], {
+  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsda", true], {
     fetcher: fetcher(library, GlpManager),
   })
   const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0) ) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)

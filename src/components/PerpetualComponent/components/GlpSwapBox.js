@@ -249,7 +249,7 @@ export const GlpSwapBox = (props) => {
   // if (aums && aums.length > 0) {
   //   aum = isBuying ? aums[0] : aums[1]
   // }
-  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsdg", true], {
+  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsda", true], {
     fetcher: fetcher(library, GlpManager),
   })
   const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply.gt(0)) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
@@ -469,7 +469,7 @@ export const GlpSwapBox = (props) => {
     const minGlp = glpAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR)
 
     const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner())
-    const method = swapTokenAddress === AddressZero ? "mintAndStakeGlpETH" : "mintAndStakeGlp"
+    const method = swapTokenAddress === AddressZero ? "mintAndStakeAlpETH" : "mintAndStakeAlp"
     const params = swapTokenAddress === AddressZero ? [0, minGlp] : [swapTokenAddress, swapAmount, 0, minGlp]
     const value = swapTokenAddress === AddressZero ? swapAmount : 0
     // const contract = new ethers.Contract(glpManagerAddress, GlpManager, library.getSigner())
@@ -496,7 +496,7 @@ export const GlpSwapBox = (props) => {
     const minOut = swapAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR)
 
     const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner())
-    const method = swapTokenAddress === AddressZero ? "unstakeAndRedeemGlpETH" : "unstakeAndRedeemGlp"
+    const method = swapTokenAddress === AddressZero ? "unstakeAndRedeemAlpETH" : "unstakeAndRedeemAlp"
     const params = swapTokenAddress === AddressZero ? [glpAmount, minOut, account] : [swapTokenAddress, glpAmount, minOut, account]
     // const contract = new ethers.Contract(glpManagerAddress, GlpManager, library.getSigner())
     // const method = "removeLiquidity"

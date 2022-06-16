@@ -1516,7 +1516,7 @@ const SwapComponent = props => {
   // if (aums && aums.length > 0) {
   //   aum = isBuying ? aums[0] : aums[1]
   // }
-  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsdg", true], {
+  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsda", true], {
     fetcher: fetcher(library, GlpManager),
   })
   const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0) ) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
