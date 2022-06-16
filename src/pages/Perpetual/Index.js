@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-computed-key */
-import { Menu, Dropdown, message, Radio, Spin } from 'antd';
+import { Menu, Dropdown, message, Radio, Spin, Tabs } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { useWeb3React } from '@web3-react/core';
 import React, { Component, useState, useEffect, useRef, useCallback, useMemo, useHistory } from 'react';
@@ -99,6 +99,8 @@ let indexTokens = []
 const { AddressZero } = ethers.constants
 // ----------
 const { AcyTabPane } = AcyTabs;
+const { TabPane } = Tabs;
+
 function getTIMESTAMP(time) {
   var date = new Date(time);
   var year = date.getFullYear(time);
@@ -178,7 +180,7 @@ const StyledSelect = styled(Radio.Group)`
     border-radius: 0px;
   }
   .ant-radio-button-wrapper:hover{
-    color: #fff;
+    color: #ffffff;
     background-color: #0E0304;
     border: 0px;
     border-color: #0E0304;
@@ -198,7 +200,7 @@ const StyledSelect = styled(Radio.Group)`
   }
 // color of the tab chosen
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
-    color: #fff;
+    color: #ffffff;
     border: 0 0 0 0;
     border-color: #0E0304;
     background-color: #0E0304;
@@ -206,14 +208,14 @@ const StyledSelect = styled(Radio.Group)`
     border-radius: 0px;
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover {
-    color: #fff;
+    color: #ffffff;
     border: 0 0 0 0;
     border-color: #0E0304;
     box-shadow: 0 0 0 0 #0E0304 !important;
     border-radius: 0px;
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before{
-    color: #fff;
+    color: #ffffff;
     background-color: #0E0304 !important;
     border: 0 0 0 0;
     border-color: #0E0304;
@@ -221,12 +223,80 @@ const StyledSelect = styled(Radio.Group)`
     border-radius: 0px;
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):first-child{
-    color: #fff;
+    color: #ffffff;
     border: 0 0 0 0;
     border-color: #0E0304;
     box-shadow: 0 0 0 0 #0E0304;
   }
 `;
+const StyledTokenSelect = styled(Radio.Group)`
+// default
+  .ant-radio-button-wrapper{
+    font-size: 1rem;
+    background-color: #0E0304;
+    color: #b5b5b6;
+    border-color: #333333;
+    height: 23px;
+    padding: 27 0;
+    line-height: 25px;
+    align-items: center;
+    border-radius: 0px;
+  }
+  .ant-radio-button-wrapper:hover{
+    color: #ffffff;
+    background-color: #0E0304;
+    border: 0px;
+    border-color: #0E0304;
+  }
+  .ant-select-selection {
+    color: #ffffff;
+    background-color: #0E0304;
+    border: 0 0 0 0;
+    border-color: #0E0304;
+    box-shadow: 0 0 0 0 #0E0304;
+  }
+  .ant-radio-button-wrapper:not(:first-child)::before{
+    border-color: #0E0304;
+    background-color: transparent;
+    box-shadow: 0 0 0 0 #0E0304;
+    border-radius: 0px;
+  }
+// color of the tab chosen
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+    color: #ffffff;
+    border: 0 0 0 0;
+    border-color: #0E0304;
+    background-color: #0E0304;
+    box-shadow: 0 0 0 0 #0E0304 !important;
+    border-radius: 0px;
+  }
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover {
+    color: #ffffff;
+    border: 0 0 0 0;
+    border-color: #0E0304;
+    box-shadow: 0 0 0 0 #0E0304 !important;
+    border-radius: 0px;
+  }
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before{
+    color: #ffffff;
+    background-color: #0E0304 !important;
+    border: 0 0 0 0;
+    border-color: #0E0304;
+    box-shadow: 0 0 0 0 #0E0304;
+    border-radius: 0px;
+  }
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):first-child{
+    color: #ffffff;
+    border: 0 0 0 0;
+    border-color: #0E0304;
+    box-shadow: 0 0 0 0 #0E0304;
+  }
+`;
+
+const StyledChartTab = styled(Tabs)`
+
+`
+
 const StyledDropdown = styled(Dropdown)`
   .ant-select-dropdown-menu {
     max-height: none !important;
@@ -491,6 +561,7 @@ const Swap = props => {
   }, [tokenSelection, setTokenSelection])
 
   const setToTokenAddress = useCallback((selectedSwapOption, address) => {
+    console.log("hereim see tokenSelection", tokenSelection)
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
     newTokenSelection[selectedSwapOption].to = address
     setTokenSelection(newTokenSelection)
@@ -995,7 +1066,18 @@ const Swap = props => {
   }
 
   const { Option } = Select;
+//charttokenselection
+  const tokenPlacements = ['BTC', 'ETH'];
+
+  const tokenPlacementChange = e => {
+    setActiveToken1((supportedTokens.filter(ele => ele.symbol == e.target.value))[0]);
+
+    // console.log("hereim set placement", e.target.value)
+    // setPlacement(e.target.value);
+    // setActiveTimeScale(e.target.value);
+  };
     
+//timescale
   const placements = ['5m', '15m', '30m', '1h', '2h', '4h', '1d', '1w', '1m', '1q'];
   const placementChange = e => {
     // console.log("hereim set placement", e.target.value)
@@ -1003,6 +1085,60 @@ const Swap = props => {
     setActiveTimeScale(e.target.value);
   };
 
+  const chartPanes = [
+    { title: 'BTC', content: 'BTC', key: 'BTC', closable: false },
+    { title: 'ETH', content: 'ETH', key: 'ETH' },
+    // { title: 'Tab 3', content: 'Content of Tab 3', key: '3'},
+  ];
+  const [activeKey, setActiveKey] = useState(chartPanes[0].key);
+  const [panes, setPanes] = useState(chartPanes);
+  const newTabIndex = useRef(0);
+
+  const onChange = (newActiveKey) => {
+    setActiveKey(newActiveKey);
+    setActiveToken1((supportedTokens.filter(ele => ele.symbol == newActiveKey))[0])
+  };
+  const add = () => {
+    const newActiveKey = `newTab${newTabIndex.current++}`;
+    const newPanes = [...panes];
+    newPanes.push({
+      title: 'New Tab',
+      content: 'Content of new Tab',
+      key: newActiveKey,
+    });
+    setPanes(newPanes);
+    setActiveKey(newActiveKey);
+  };
+
+  const remove = (targetKey) => {
+    let newActiveKey = activeKey;
+    let lastIndex = -1;
+    panes.forEach((pane, i) => {
+      if (pane.key === targetKey) {
+        lastIndex = i - 1;
+      }
+    });
+    const newPanes = panes.filter((pane) => pane.key !== targetKey);
+
+    if (newPanes.length && newActiveKey === targetKey) {
+      if (lastIndex >= 0) {
+        newActiveKey = newPanes[lastIndex].key;
+      } else {
+        newActiveKey = newPanes[0].key;
+      }
+    }
+
+    setPanes(newPanes);
+    setActiveKey(newActiveKey);
+  };
+
+  const onEdit = (targetKey, action) => {
+    if (action === 'add') {
+      add();
+    } else {
+      remove(targetKey);
+    }
+  };
 
   // let options = supportedTokens;
   // const menu = (
@@ -1021,17 +1157,33 @@ const Swap = props => {
   //   </div>
   // );
 
-  function onChange (value) {
-    // console.log("hereim onchange",value);
-    setActiveToken1(option);
-  }
+  // function onChange (value) {
+  //   // console.log("hereim onchange",value);
+  //   setActiveToken1(option);
+  // }
 
 
   return (
     <PageHeaderWrapper>
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
+            <div className={styles.chartTokenSelectorTab}>
+            <StyledChartTab type="editable-card" onChange={onChange} activeKey={activeKey} 
+            // <StyledChartTab type="editable-card" onChange={onChange} activeKey={activeKey} onEdit={onEdit}
+              style={{ background:'black', width:'100%', height:'25px'}}>
+              {panes.map((pane) => (
+                <TabPane tab={pane.title} key={pane.key} closable={pane.closable}
+                  style={{ background:'black', width:'100%', height:'25px'}}>
+                  {pane.content}
+                </TabPane>
+              ))}
+            </StyledChartTab>
+              
+            </div>
             <div className={styles.timeSelector}>
+              
+
+
               
                 {/* <div className={styles.tokenSelector}>
                   {/* <Select 
@@ -1053,16 +1205,17 @@ const Swap = props => {
                   // style={{ height: '10px'}}
                 /> */}
                 <StyledSelect value={placement} onChange={placementChange} 
-                  style={{ fontsize:'0.5rem', width:'100%', height:'25px'}}>
-                  <Radio.Button value="5m" style={{width:'11%'}}>5m</Radio.Button>
-                  <Radio.Button value="15m" style={{width:'11%'}}>15m</Radio.Button>
-                  <Radio.Button value="15m" style={{width:'11%'}}>30m</Radio.Button>
-                  <Radio.Button value="1h" style={{width:'11%'}}>1h</Radio.Button>
-                  <Radio.Button value="15m" style={{width:'11%'}}>2h</Radio.Button>
-                  <Radio.Button value="4h" style={{width:'11%'}}>4h</Radio.Button>
-                  <Radio.Button value="1d" style={{width:'11%'}}>1d</Radio.Button>
-                  <Radio.Button value="1w" style={{width:'11%'}}>1w</Radio.Button>
-                  <Radio.Button value="15m" style={{width:'12%'}}>1q</Radio.Button>
+                  style={{ width:'100%', height:'23px'}}>
+                  <Radio.Button value="1m" style={{width:'10%'}}>1m</Radio.Button>
+                  <Radio.Button value="5m" style={{width:'10%'}}>5m</Radio.Button>
+                  <Radio.Button value="15m" style={{width:'10%'}}>15m</Radio.Button>
+                  <Radio.Button value="30m" style={{width:'10%'}}>30m</Radio.Button>
+                  <Radio.Button value="1h" style={{width:'10%'}}>1h</Radio.Button>
+                  <Radio.Button value="2h" style={{width:'10%'}}>2h</Radio.Button>
+                  <Radio.Button value="4h" style={{width:'10%'}}>4h</Radio.Button>
+                  <Radio.Button value="1d" style={{width:'10%'}}>1d</Radio.Button>
+                  <Radio.Button value="1w" style={{width:'10%'}}>1w</Radio.Button>
+                  <Radio.Button value="1q" style={{width:'10%'}}>1q</Radio.Button>
                 </StyledSelect>
             </div>
           {/* K chart */}
