@@ -1,8 +1,8 @@
 import React from "react";
 import cx from "classnames";
-import "./PerpTabs.css";
+import "./PerpetualTabs.css";
 
-export default function PerpTabs(props) {
+export default function PerpetualTabs(props) {
   const { options, option, setOption, onChange, type = "block", className, optionLabels, icons } = props;
 
   const onClick = (opt) => {

@@ -1,4 +1,5 @@
 .Tab.block {
+  height: 50px !important;
     display: grid;
     grid-auto-flow: column;
     font-size: 0.9rem;
@@ -20,19 +21,20 @@
     padding-left: 1rem;
     padding-right: 1rem;
     cursor: pointer;
-    border: 0.5px solid #232323;
+    /* border: 0.75px solid #373738; */
   }
   
   .Tab.block .Tab-option:hover {
     /* color: rgba(255, 255, 255, 1); */
-    background: linear-gradient(90deg, #1b1b1c 0%, #1b1b1c 100%);
+    /* background: linear-gradient(90deg, #1b1b1c 0%, #1b1b1c 100%); */
+    background: #636366 !important;
   }
   
   .Tab.block .Tab-option.active {
     opacity: 1;
     pointer-events: none;
-    background: #232323;
-    border: 0.75px solid #373738;
+    background: #636366 !important;
+    border: 0.75px solid #0E0304;
     color: rgba(255, 255, 255, 0.9);
   }
   
@@ -48,6 +50,7 @@
   
   .Tab.inline .Tab-option:hover {
     opacity: 0.8;
+    background: #636366 !important;
   }
   
   .Tab.inline .Tab-option.active {

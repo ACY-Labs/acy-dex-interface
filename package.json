@@ -65,6 +65,7 @@
     "antd": "^3.26.20",
     "apollo-boost": "^0.4.9",
     "axios": "^0.18.1",
+    "binance-api-node": "^0.11.40",
     "bizcharts": "^3.4.2",
     "bizcharts-plugin-slider": "^2.1.1-beta.1",
     "body-parser": "^1.19.0",

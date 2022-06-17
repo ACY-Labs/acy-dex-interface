@@ -197,14 +197,14 @@ export function useChartPrices(chainId, symbol, isStable, period, currentAverage
   let { data: prices, mutate: updatePrices } = useSWR(swrKey, {
     fetcher: async (...args) => {
       try {
+        console.log("swrKey: ", swrKey);
         // TODO: TESTING
         // chainId is fixed to be 56 for testing
         const res =  await getChartPricesFromStats(56, symbol, period);
         console.log("swrKey: ", swrKey, "fetched data: ", res);
         return res;
       } catch (ex) {
-        console.warn(ex)
-        console.warn('getChartPricesFromBackend failed')
+        console.warn('getChartPricesFromBackend failed: ', ex)
         // console.warn('Switching to graph chainlink data')
       //   try {
       //     return await getChainlinkChartPricesFromGraph(symbol, period)

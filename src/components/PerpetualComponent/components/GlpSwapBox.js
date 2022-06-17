@@ -59,7 +59,7 @@ import RewardRouter from '@/acy-dex-futures/abis/RewardRouter.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
 import { callContract } from '@/acy-dex-futures/Api'
 
-import PerpTabs from './PerpTabs/PerpTabs'
+import PerpetualTabs from './PerpetualTabs'
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 import TokenTable from '@/pages/BuyGlp/components/SwapTokenTable'
 import glp40Icon from '@/pages/BuyGlp/components/ic_glp_40.svg'
@@ -249,7 +249,7 @@ export const GlpSwapBox = (props) => {
   // if (aums && aums.length > 0) {
   //   aum = isBuying ? aums[0] : aums[1]
   // }
-  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsdg", true], {
+  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsda", true], {
     fetcher: fetcher(library, GlpManager),
   })
   const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply.gt(0)) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
@@ -469,7 +469,7 @@ export const GlpSwapBox = (props) => {
     const minGlp = glpAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR)
 
     const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner())
-    const method = swapTokenAddress === AddressZero ? "mintAndStakeGlpETH" : "mintAndStakeGlp"
+    const method = swapTokenAddress === AddressZero ? "mintAndStakeAlpETH" : "mintAndStakeAlp"
     const params = swapTokenAddress === AddressZero ? [0, minGlp] : [swapTokenAddress, swapAmount, 0, minGlp]
     const value = swapTokenAddress === AddressZero ? swapAmount : 0
     // const contract = new ethers.Contract(glpManagerAddress, GlpManager, library.getSigner())
@@ -496,7 +496,7 @@ export const GlpSwapBox = (props) => {
     const minOut = swapAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR)
 
     const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner())
-    const method = swapTokenAddress === AddressZero ? "unstakeAndRedeemGlpETH" : "unstakeAndRedeemGlp"
+    const method = swapTokenAddress === AddressZero ? "unstakeAndRedeemAlpETH" : "unstakeAndRedeemAlp"
     const params = swapTokenAddress === AddressZero ? [glpAmount, minOut, account] : [swapTokenAddress, glpAmount, minOut, account]
     // const contract = new ethers.Contract(glpManagerAddress, GlpManager, library.getSigner())
     // const method = "removeLiquidity"
@@ -580,7 +580,7 @@ export const GlpSwapBox = (props) => {
   return (
     <div className="GlpSwap">
       <div className={styles.BuySellSelector}>
-        <PerpTabs
+        <PerpetualTabs
           option={buySellLabel}
           options={buySellTabs}
           type="inline"
@@ -684,7 +684,7 @@ export const GlpSwapBox = (props) => {
         </div>
       </div>
 
-      <div>
+      <div className={styles.centerButton}>
         <AcyPerpetualButton
           style={{ marginTop: '25px' }}
           onClick={onClickPrimary}
