@@ -5,9 +5,30 @@ import { Link } from 'umi';
 import { urlToList } from '../_utils/pathTools';
 import { getMenuMatches } from './SiderMenuUtils';
 import { isUrl } from '@/utils/utils';
+import MarketIcon from './Icons/MarketIcon.svg'
+import SwapIcon from './Icons/SwapIcon.svg'
+import FutureIcon from './Icons/FutureIcon.svg'
+import OptionIcon from './Icons/OptionIcon.svg'
+import LaunchpadIcon from './Icons/LaunchpadIcon.svg'
+import StablecoinIcon from './Icons/StablecoinIcon.svg'
+import LiquidityIcon from './Icons/LiquidityIcon.svg'
+import FarmIcon from './Icons/FarmIcon.svg'
+import StatisticsIcon from './Icons/StatisticsIcon.svg'
 import styles from './index.less';
 
 const { SubMenu } = Menu;
+
+const menuIcon = {
+  Market: MarketIcon,
+  Exchange: SwapIcon,
+  Future: FutureIcon,
+  Option: OptionIcon,
+  Launchpad: LaunchpadIcon,
+  StableCoin: StablecoinIcon,
+  Liquidity: LiquidityIcon,
+  Farm: FarmIcon,
+  Statistics: StatisticsIcon,
+}
 
 // Allow menu.js config icon as string or ReactNode
 //   icon: 'setting',
@@ -105,8 +126,11 @@ export default class BaseMenu extends PureComponent {
             : undefined
         }
       >
-        {icon}
-        <span>{name}</span>
+        {/* {icon} */}
+        <div className={styles.menuItem}>
+          <img src={menuIcon[name]} alt={name} style={{ width: '40px', marginLeft: '13px', marginBottom: '-10px' }} />
+          <span>{name}</span>
+        </div>
       </Link>
     );
   };

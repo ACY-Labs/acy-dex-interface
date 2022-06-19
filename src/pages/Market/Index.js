@@ -168,7 +168,7 @@ function fetchMarketList() {
   return (
     <div className={styles.marketRoot}>
       <ConnectWallet />
-      <MarketSearchBar
+      {/* <MarketSearchBar
         className={styles.searchBar}
         // dataSourceCoin={dataSourceCoin}
         dataSourceCoin={coinList}
@@ -177,7 +177,7 @@ function fetchMarketList() {
         visible={true}
         getNetwork={getNetwork}
         networkShow={true}
-      />
+      /> */}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <h2>Cryptocurrencies</h2>

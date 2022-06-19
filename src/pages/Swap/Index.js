@@ -578,7 +578,7 @@ const Swap = props => {
                   <span className={styles.span}>TRANSACTION HISTORY</span>
                 </h3> */}
                 <div className={`${styles.colItem}`}>
-                    <a className={`${styles.colItem} ${styles.optionTab}`}>All Orders</a>
+                    {/* <a className={`${styles.colItem} ${styles.optionTab}`}>All Orders</a> */}
                     <a className={`${styles.colItem} ${styles.optionTab}`}>My Orders</a>
                 </div>
                 {account && tableLoading ? (
