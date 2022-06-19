@@ -8,6 +8,7 @@ import UniPool from '../abis/UniPool.json'
 import { fetcher,parseValue,expandDecimals } from '../utils/index'
 import { routerAddress } from '../samples/constants';
 import Router from '@/acy-dex-futures/abis/Router.json'
+import OrderBook from '@/acy-dex-futures/abis/OrderBook.json'
 
 const ARBITRUM = 42161
 
@@ -87,7 +88,7 @@ export async function callContract(chainID, method, params, opts) {
 }
 
 export async function approvePlugin(chainId, pluginAddress, { library, pendingTxns, setPendingTxns }) {
-  const contract = new ethers.Contract(routerAddress, Router, library.getSigner())
+  const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner())
   return callContract(chainId, contract, 'approvePlugin', [pluginAddress], {
     sentMsg: 'Enable orders sent',
     failMsg: 'Enable orders failed',

@@ -4,7 +4,7 @@
     margin: 0;
     z-index: 0;
     color: #b6b5b5;
-    margin-bottom: 20px;
+    // margin-bottom: 20px;
     font-weight: 400;
     display: flex;
     position: relative;
@@ -156,6 +156,7 @@
         color: #fff;
       }
       .ant-select-selection {
+        box-shadow: none;
         background-color: transparent !important;
         border: 0.5px solid #333333;
         border-radius: 5px;
@@ -181,16 +182,40 @@
       }
     }
   }
-  .chartHeader {
-    display: grid;
-    grid-template-columns: auto auto auto auto auto 0;
-    grid-column-gap: 3rem;
-    align-items: center;
-    padding-left: 0rem;
-    padding-right: 0rem;
-    border-left: 0.75px solid #333333;
-    height: 5rem;
+  // .chartHeader {
+  //   display: grid;
+  //   grid-template-columns: auto auto auto auto auto 0;
+  //   grid-column-gap: 3rem;
+  //   align-items: center;
+  //   padding-left: 0rem;
+  //   padding-right: 0rem;
+  //   // border: 0.75px solid #232323;
+  //   height: 5rem;
+  // }
+  .chartTokenSelectorTab {
+    // border: 0.75px solid #444444;
+    height: 25px;
+    // text-align: center;
+    margin-bottom: 0px;
+    // position: relative;
+    font-size: 5px;
   }
+  .timeSelector {
+    // border-top: 0.75px solid #333333;
+    // border-bottom: 0.75px solid #333333;
+    height: 22px;
+    align-items: center;
+    margin-bottom: -25px;
+    // position: relative;
+    font-size: 5px;
+    // transform: translateY(-50%);
+    // padding-left: 0rem;
+    // padding-right: 0rem;
+    // border: 0.75px solid #333333;
+    // height: 5rem;
+  
+  }
+
   .smalltitle {
     font-size: 14px;
     font-weight: 400;
@@ -500,3 +525,6 @@
     
   }
   
+.kchartBox{
+  transform: translate(0, 4%);
+}

@@ -1,4 +1,4 @@
-[{
+{"abi": [{
     "inputs": [{
       "internalType": "address",
       "name": "_vault",
@@ -591,3 +591,4 @@
     "type": "function"
   }
 ]
+}

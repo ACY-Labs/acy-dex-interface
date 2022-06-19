@@ -1,4 +1,4 @@
-[
+{"abi": [
   {
     "inputs": [],
     "name": "BASIS_POINTS_DIVISOR",
@@ -621,3 +621,4 @@
     "type": "function"
   }
 ]
+}

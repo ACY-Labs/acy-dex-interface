@@ -5,6 +5,8 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { JsonRpcProvider } from "@ethersproject/providers"
 import _ from "lodash";
 import Token from "@/acy-dex-futures/abis/Token.json";
+import OrderBook from "@/acy-dex-futures/abis/OrderBook";
+import OrderBookReader from "@/acy-dex-futures/abis/OrderBookReader";
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import { InjectedConnector, UserRejectedRequestError as UserRejectedRequestErrorInjected} from "@web3-react/injected-connector";
 import { useRef, useEffect, useCallback } from "react";
@@ -15,6 +17,7 @@ import { getContract } from './Addresses';
 import { useLocalStorage } from "react-use";
 import { constantInstance, useConstantLoader } from '@/constants';
 import { format as formatDateFn } from "date-fns";
+import { BURN_FEE_BASIS_POINTS, MINT_FEE_BASIS_POINTS } from './_Helpers';
 export const MARKET = 'Market';
 export const LIMIT = 'Limit';
 export const LONG = 'Long';
@@ -54,11 +57,13 @@ export const MIN_PROFIT_TIME = 3 * 60 * 60; // 3 hours
 export const PROFIT_THRESHOLD_BASIS_POINTS = 120;
 export const DUST_BNB = "2000000000000000";
 export const CHART_PERIODS = {
+  "1m": 60, 
   "5m": 60 * 5,
   "15m": 60 * 15,
   "1h": 60 * 60,
   "4h": 60 * 60 * 4,
-  "1d": 60 * 60 * 24
+  "1d": 60 * 60 * 24,
+  "1w": 60 * 60 * 24 * 7
 };
 
 export const BSC_MAINNET = 56;
@@ -204,7 +209,7 @@ export function approveTokens({
   setIsApproving(true);
   const contract = new ethers.Contract(
     tokenAddress,
-    Token,
+    Token.abi,
     library.getSigner()
   );
   contract
@@ -292,6 +297,7 @@ export function getFeeBasisPoints(
   if (!token || !token.usdgAmount || !usdgSupply || !totalTokenWeights) {
     return 0;
   }
+  return feeBasisPoints;
 
   feeBasisPoints = bigNumberify(feeBasisPoints);
   taxBasisPoints = bigNumberify(taxBasisPoints);
@@ -377,7 +383,7 @@ export function getBuyGlpToAmount(
   const feeBasisPoints = getFeeBasisPoints(
     swapToken,
     usdgAmount,
-    MINT_BURN_FEE_BASIS_POINTS,
+    MINT_FEE_BASIS_POINTS,
     TAX_BASIS_POINTS,
     true,
     usdgSupply,
@@ -424,7 +430,7 @@ export function getSellGlpFromAmount(
   const feeBasisPoints = getFeeBasisPoints(
     swapToken,
     usdgAmount,
-    MINT_BURN_FEE_BASIS_POINTS,
+    BURN_FEE_BASIS_POINTS,
     TAX_BASIS_POINTS,
     false,
     usdgSupply,
@@ -470,7 +476,7 @@ export function getBuyGlpFromAmount(
   const feeBasisPoints = getFeeBasisPoints(
     fromToken,
     usdgAmount,
-    MINT_BURN_FEE_BASIS_POINTS,
+    MINT_FEE_BASIS_POINTS,
     TAX_BASIS_POINTS,
     true,
     usdgSupply,
@@ -516,7 +522,7 @@ export function getSellGlpToAmount(
   const feeBasisPoints = getFeeBasisPoints(
     fromToken,
     usdgAmount,
-    MINT_BURN_FEE_BASIS_POINTS,
+    BURN_FEE_BASIS_POINTS,
     TAX_BASIS_POINTS,
     false,
     usdgSupply,
@@ -611,17 +617,19 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
 
         if (vaultTokenInfo) {
           // console.log("hereim vault", vaultTokenInfo)
-            token.poolAmount = vaultTokenInfo[i * vaultPropsLength]
-            token.reservedAmount = vaultTokenInfo[i * vaultPropsLength + 1]
-            token.availableAmount = token.poolAmount.sub(token.reservedAmount)
-            token.usdgAmount = vaultTokenInfo[i * vaultPropsLength + 2]
-            token.redemptionAmount = vaultTokenInfo[i * vaultPropsLength + 3]
-            token.weight = vaultTokenInfo[i * vaultPropsLength + 4]
-            token.bufferAmount = vaultTokenInfo[i * vaultPropsLength + 5]
-            token.maxUsdgAmount = vaultTokenInfo[i * vaultPropsLength + 6]
-            token.minPrice = vaultTokenInfo[i * vaultPropsLength + 7]
-            token.maxPrice = vaultTokenInfo[i * vaultPropsLength + 8]
-            token.guaranteedUsd = vaultTokenInfo[i * vaultPropsLength + 9]
+            token.poolAmount = vaultTokenInfo[i * vaultPropsLength];
+            token.reservedAmount = vaultTokenInfo[i * vaultPropsLength + 1];
+            token.availableAmount = token.poolAmount.sub(token.reservedAmount);
+            token.usdgAmount = vaultTokenInfo[i * vaultPropsLength + 2];
+            token.redemptionAmount = vaultTokenInfo[i * vaultPropsLength + 3];
+            token.weight = vaultTokenInfo[i * vaultPropsLength + 4];
+            token.bufferAmount = 0;
+            token.maxUsdgAmount = 0;
+            token.globalShortSize = 0;
+            token.maxGlobalShortSize = 0;
+            token.minPrice = vaultTokenInfo[i * vaultPropsLength + 7];
+            token.maxPrice = vaultTokenInfo[i * vaultPropsLength + 8];
+            token.guaranteedUsd = 0;
 
             token.availableUsd = token.isStable
                 ? token.poolAmount.mul(token.minPrice).div(expandDecimals(1, token.decimals))
@@ -757,27 +765,21 @@ export function getOrderKey(order) {
 
 export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   // eslint-disable-next-line
+  console.log("CALL CONTRACT:", library, contractInfo, additionalArgs)
   const [chainId, arg0, arg1, ...params] = args
   const provider = getProvider(library, chainId);
   const method = ethers.utils.isAddress(arg0) ? arg1 : arg0
 
   function onError(e) {
-    // console.log("hereim fetcher error", e);
     console.error(method, e)
   }
 
   if (ethers.utils.isHexString(arg0)) {
     const address = arg0
-    const contract = new ethers.Contract(address, contractInfo, provider)
-    // console.log('fetcher contract', contract)
+    const contract = new ethers.Contract(address, contractInfo.abi, provider)
 
     try {
       if (additionalArgs) {
-        // console.log(method, "fetcher 2")
-        // console.log('FETCHER FUNCTION CALLED WITH METHOD  --> ', method);
-        // console.log('printing additional args', params, additionalArgs);
-        // console.log('printing provider', contract);
-        // console.log("debug useSWR: ", contract, method, params.concat(additionalArgs))
         return contract[method](...params.concat(additionalArgs)).catch(onError)
       }
       return contract[method](...params).catch(onError)
