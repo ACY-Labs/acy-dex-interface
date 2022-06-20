@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-computed-key */
-import { Menu, Dropdown, message, Radio, Spin, Tabs } from 'antd';
+import { Menu, Dropdown, message, Radio, Spin, Tabs, Layout } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { useWeb3React } from '@web3-react/core';
 import React, { Component, useState, useEffect, useRef, useCallback, useMemo, useHistory } from 'react';
@@ -89,6 +89,7 @@ import { ethers } from 'ethers'
 import useSWR from 'swr'
 import { getKChartData } from './utils';
 import { from, HeuristicFragmentMatcher } from 'apollo-boost';
+// import e from '@umijs/deps/compiled/express';
 
 //import ChartTokenSelector from './ChartTokenSelector'
 
@@ -162,11 +163,90 @@ const StyledCard = styled(AcyCard)`
   }
     
 `;
+const StyledLayout = styled(Layout)`
+  .ant-layout{
+    background: #0e0304 !important;
+    width: 50px;
+  }
+  .ant-layout-sider{
+    background: #0e0304 !important;
+    height: 40px;
+    width: 80px;
+  }
+  .ant-layout-sider ant-layout-sider-dark{
+    flex: 0 0 65px !important;
+    max-width: 65px !important;
+    min-width: 65px !important;
+    width: 65px !important;
+  }
+  .ant-radio-button-wrapper{
+    background: #0e0304;
+  }
+  .ant-layout-header{
+    height: 20px;
+    background: #0e0304 !important;
+    color: #b5b5b6;
+    line-height: 20px;
+    padding: 0 0;
+  }
+  .ant-layout-footer{
+    height: 20px;
+    background: #0e0304 !important;
+    color: #b5b5b6;
+    line-height: 20px;
+    padding: 0 0;
+
+  }
+`
+const StyledButton = styled(Button)`
+  .ant-btn{
+    height: 50px !important;
+    background-color: #0e0304 !important;    
+    border-color: #0e0304 !important;
+  }
+  .ant-row{
+    line-height: 9px;
+    margin-top: 3px;
+    margin-left: 0.3rem;
+  }
+`
+// const StyledTokenSelect = styled(Radio.Group)`
+// // default
+//   .ant-radio-button-wrapper{
+//     font-size: 1rem;
+//     background-color: #0E0304;
+//     color: #b5b5b6;
+//     border-color: #333333;
+//     height: 45px;
+//     padding: 0 0;
+//     line-height: 45px;
+//     align-items: center;
+//     border-radius: 0px;
+//     width: 250px;
+//   }
+//   .ant-radio-button-wrapper:hover{
+//     color: #ffffff;
+//     background-color: #0E0304;
+//     border: 0px;
+//   }
+//   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover {
+//     color: #fff;
+//     border: 0px;
+//   }
+//   .ant-radio-button-wrapper:not(:first-child)::before{
+//     border: 0px;
+//     background-color: #0E0304 !important;
+//     border-color: #0E0304;
+//   }
+// `;
 
 const StyledSelect = styled(Radio.Group)`
+
   .ant-radio-button-wrapper{
     background: transparent !important;
     height: 22px;
+    font-size: 0.7rem;
+    padding: 0 0.1rem;
     border: 0.75px solid #333333;
     border-radius: 0 0 0 0;
     line-height: 22px;
@@ -189,35 +269,7 @@ const StyledSelect = styled(Radio.Group)`
   }
   
 `;
-const StyledTokenSelect = styled(Radio.Group)`
-// // default
-//   .ant-radio-button-wrapper{
-//     font-size: 1rem;
-//     background-color: #0E0304;
-//     color: #b5b5b6;
-//     border-color: #333333;
-//     height: 23px;
-//     padding: 27 0;
-//     line-height: 25px;
-//     align-items: center;
-//     border-radius: 0px;
-//   }
-//   .ant-radio-button-wrapper:hover{
-//     color: #ffffff;
-//     background-color: #0E0304;
-//     border: 0px;
-//   }
-//   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover {
-//     color: #fff;
-//     border: 0px;
-//   }
-//   .ant-radio-button-wrapper:not(:first-child)::before{
-//     border: 0px;
-//     background-color: #0E0304 !important;
-//     border-color: #0E0304;
-//   }
- 
-`;
+
 
 const StyledChartTab = styled(Tabs)`
 
@@ -487,7 +539,7 @@ const Swap = props => {
   }, [tokenSelection, setTokenSelection])
 
   const setToTokenAddress = useCallback((selectedSwapOption, address) => {
-    console.log("hereim see tokenSelection", tokenSelection)
+    // console.log("hereim see tokenSelection", tokenSelection)
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
     newTokenSelection[selectedSwapOption].to = address
     setTokenSelection(newTokenSelection)
@@ -991,75 +1043,92 @@ const Swap = props => {
 
   const { Option } = Select;
 //charttokenselection
-  const tokenPlacements = ['BTC', 'ETH'];
+  const { Header, Footer, Sider, Content } = Layout; 
 
-  const tokenPlacementChange = e => {
-    setActiveToken1((supportedTokens.filter(ele => ele.symbol == e.target.value))[0]);
+  // const tokenPlacements = ['BTC', 'ETH'];
 
-    // console.log("hereim set placement", e.target.value)
-    // setPlacement(e.target.value);
-    // setActiveTimeScale(e.target.value);
-  };
+  // const tokenPlacementChange = e => {
+  //   console.log("hereim set placement", e)
+
+  //   setActiveToken1((supportedTokens.filter(ele => ele.symbol == e.target.value))[0]);
+
+  //   // setPlacement(e.target.value);
+  //   // setActiveTimeScale(e.target.value);
+  // };
+  // const tokenPlacementChange = value => {
+  //   console.log("hereim set placement", value)
+
+  //   // setActiveToken1((supportedTokens.filter(ele => ele.symbol == e.target.value))[0]);
+
+  //   // setPlacement(e.target.value);
+  //   // setActiveTimeScale(e.target.value);
+  // };
+  const onClickSetActiveToken = (e) => {
+    // console.log("hereim see click token", e)
+    setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
+  }
     
   const placementChange = e => {
     setPlacement(e.target.value);
     setActiveTimeScale(e.target.value);
   };
 
-  const chartPanes = [
-    { title: 'BTC', content: 'BTC', key: 'BTC', closable: false },
-    { title: 'ETH', content: 'ETH', key: 'ETH' },
-    // { title: 'Tab 3', content: 'Content of Tab 3', key: '3'},
-  ];
-  const [activeKey, setActiveKey] = useState(chartPanes[0].key);
-  const [panes, setPanes] = useState(chartPanes);
-  const newTabIndex = useRef(0);
+  // const chartPanes = [
+  //   { title: 'BTC ', content: 'BTC', key: 'BTC', closable: false },
+  //   { title: 'ETH', content: 'ETH', key: 'ETH' },
+  //   // { title: 'Tab 3', content: 'Content of Tab 3', key: '3'},
+  // ];
+ 
 
-  const onChange = (newActiveKey) => {
-    setActiveKey(newActiveKey);
-    setActiveToken1((supportedTokens.filter(ele => ele.symbol == newActiveKey))[0])
-  };
-  const add = () => {
-    const newActiveKey = `newTab${newTabIndex.current++}`;
-    const newPanes = [...panes];
-    newPanes.push({
-      title: 'New Tab',
-      content: 'Content of new Tab',
-      key: newActiveKey,
-    });
-    setPanes(newPanes);
-    setActiveKey(newActiveKey);
-  };
+  // const [activeKey, setActiveKey] = useState(chartPanes[0].key);
+  // const [panes, setPanes] = useState(chartPanes);
+  // const newTabIndex = useRef(0);
 
-  const remove = (targetKey) => {
-    let newActiveKey = activeKey;
-    let lastIndex = -1;
-    panes.forEach((pane, i) => {
-      if (pane.key === targetKey) {
-        lastIndex = i - 1;
-      }
-    });
-    const newPanes = panes.filter((pane) => pane.key !== targetKey);
+  // const onChange = (newActiveKey) => {
+  //   setActiveKey(newActiveKey);
+  //   setActiveToken1((supportedTokens.filter(ele => ele.symbol == newActiveKey))[0])
+  // };
+  // const add = () => {
+  //   const newActiveKey = `newTab${newTabIndex.current++}`;
+  //   const newPanes = [...panes];
+  //   newPanes.push({
+  //     title: 'New Tab',
+  //     content: 'Content of new Tab',
+  //     key: newActiveKey,
+  //   });
+  //   setPanes(newPanes);
+  //   setActiveKey(newActiveKey);
+  // };
 
-    if (newPanes.length && newActiveKey === targetKey) {
-      if (lastIndex >= 0) {
-        newActiveKey = newPanes[lastIndex].key;
-      } else {
-        newActiveKey = newPanes[0].key;
-      }
-    }
+  // const remove = (targetKey) => {
+  //   let newActiveKey = activeKey;
+  //   let lastIndex = -1;
+  //   panes.forEach((pane, i) => {
+  //     if (pane.key === targetKey) {
+  //       lastIndex = i - 1;
+  //     }
+  //   });
+  //   const newPanes = panes.filter((pane) => pane.key !== targetKey);
 
-    setPanes(newPanes);
-    setActiveKey(newActiveKey);
-  };
+  //   if (newPanes.length && newActiveKey === targetKey) {
+  //     if (lastIndex >= 0) {
+  //       newActiveKey = newPanes[lastIndex].key;
+  //     } else {
+  //       newActiveKey = newPanes[0].key;
+  //     }
+  //   }
 
-  const onEdit = (targetKey, action) => {
-    if (action === 'add') {
-      add();
-    } else {
-      remove(targetKey);
-    }
-  };
+  //   setPanes(newPanes);
+  //   setActiveKey(newActiveKey);
+  // };
+
+  // const onEdit = (targetKey, action) => {
+  //   if (action === 'add') {
+  //     add();
+  //   } else {
+  //     remove(targetKey);
+  //   }
+  // };
 
   // let options = supportedTokens;
   // const menu = (
@@ -1089,16 +1158,37 @@ const Swap = props => {
       <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
             <div className={styles.chartTokenSelectorTab}>
-              <StyledChartTab type="editable-card" onChange={onChange} activeKey={activeKey} 
+            {/* <StyledTokenSelect value={tokenPlacements} onChange={tokenPlacementChange}> */}
+              <StyledButton value="BTC" onClick={() => onClickSetActiveToken("BTC")} style={{ fontFamily:"Karla, sans-serif", height:"50px", background: "#0e0304", borderColor: "#0e0304" }}> 
+                  <Row>
+                    <Col span={12} style={{ lineHeight: "25px", fontSize: "1.5rem" }} >BTC</Col>
+                    <Col span={12}>
+                      <Row span={30}>$25000</Row>                      
+                      <Row span={30}>-2.34%</Row>
+                    </Col>
+                  </Row>
+              </StyledButton>
+              <StyledButton value="ETH" onClick={() => onClickSetActiveToken("ETH")} style={{ height:"50px", background: "black", borderColor: "black" }}> 
+                  <Row>
+                    <Col span={12} style={{ lineHeight: "25px", fontSize: "1.5rem" }} >ETH</Col>
+                    <Col span={12}>
+                      <Row span={30}>$2100</Row>                      
+                      <Row span={30}>+3.74%</Row>
+                    </Col>
+                  </Row>
+              </StyledButton>
+            {/* </StyledTokenSelect> */}
+
+              {/* <StyledChartTab type="editable-card" onChange={onChange} activeKey={activeKey} 
               // <StyledChartTab type="editable-card" onChange={onChange} activeKey={activeKey} onEdit={onEdit}
-                style={{ background:'black', width:'100%', height:'25px'}}>
+                style={{ background:'black', width:'100%', height:'45px'}}>
                 {panes.map((pane) => (
                   <TabPane tab={pane.title} key={pane.key} closable={pane.closable}
-                    style={{ background:'black', width:'100%', height:'25px'}}>
+                    style={{ background:'black', width:'100%', height:'45px'}}>
                     {pane.content}
                   </TabPane>
                 ))}
-              </StyledChartTab>
+              </StyledChartTab> */}
         
             </div>
             <div className={styles.timeSelector}>
@@ -1126,17 +1216,16 @@ const Swap = props => {
                   // style={{ height: '10px'}}
                 /> */}
                 <StyledSelect value={placement} onChange={placementChange} 
-                  style={{ width:'100%', height:'23px'}}>
-                  <Radio.Button value="1m" style={{width:'10%'}}>1m</Radio.Button>
-                  <Radio.Button value="5m" style={{width:'10%'}}>5m</Radio.Button>
-                  <Radio.Button value="15m" style={{width:'10%'}}>15m</Radio.Button>
-                  <Radio.Button value="30m" style={{width:'10%'}}>30m</Radio.Button>
-                  <Radio.Button value="1h" style={{width:'10%'}}>1h</Radio.Button>
-                  <Radio.Button value="2h" style={{width:'10%'}}>2h</Radio.Button>
-                  <Radio.Button value="4h" style={{width:'10%'}}>4h</Radio.Button>
-                  <Radio.Button value="1d" style={{width:'10%'}}>1d</Radio.Button>
-                  <Radio.Button value="1w" style={{width:'10%'}}>1w</Radio.Button>
-                  <Radio.Button value="1q" style={{width:'10%'}}>1q</Radio.Button>
+                  style={{ width:'50%', height:'23px'}}>
+                  <Radio.Button value="1m" style={{width:'9%'}}>1m</Radio.Button>
+                  <Radio.Button value="5m" style={{width:'9%'}}>5m</Radio.Button>
+                  <Radio.Button value="15m" style={{width:'9%'}}>15m</Radio.Button>
+                  <Radio.Button value="30m" style={{width:'9%'}}>30m</Radio.Button>
+                  <Radio.Button value="1h" style={{width:'9%'}}>1h</Radio.Button>
+                  <Radio.Button value="2h" style={{width:'9%'}}>2h</Radio.Button>
+                  <Radio.Button value="4h" style={{width:'9%'}}>4h</Radio.Button>
+                  <Radio.Button value="1d" style={{width:'9%'}}>1D</Radio.Button>
+                  <Radio.Button value="1w" style={{width:'9%'}}>1W</Radio.Button>
                 </StyledSelect>
             </div>
           {/* K chart */}
