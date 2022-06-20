@@ -253,6 +253,7 @@ export default function ExchangeTVChart(props) {
       console.log("ws received: ", candleData.time, candleData.close)
       currentSeries.update(candleData)
       setLastCandle(candleData);
+      console.log("hereim see currentseries", currentSeries)
     });
     cleaner.current = clean;
     console.log("added new candles subscription for ", pairName)
