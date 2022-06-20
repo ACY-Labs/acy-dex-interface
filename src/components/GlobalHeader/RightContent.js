@@ -895,12 +895,12 @@ const GlobalHeaderRight = props => {
             padding: '21px',
             background: 'black',
             // backgroundColor: '#1b1b1c',
-            borderRadius: ' 20px',
+            borderRadius: ' 10px',
             // boxShadow: '0 0 14px #2d2d2d'
             border: '0.75px solid #333333',
           }}>
           <div className={styles.networkTitle}>
-            <span>Select a Network</span>
+            <span>1. Select a Network</span>
           </div>
           {/*ymj*/}
           <AcyCardList grid={true}>
@@ -923,7 +923,7 @@ const GlobalHeaderRight = props => {
             )}
           </AcyCardList>
           <div className={styles.walltitle}>
-            <span style={{ marginLeft: '10px' }}>Select a Wallet</span>
+            <span style={{ marginLeft: '10px' }}>2. Select a Wallet</span>
           </div>
 
 

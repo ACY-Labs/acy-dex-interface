@@ -94,7 +94,7 @@ export default [
         component: './Farms/',
       },
       {
-        path: '/stats/future',
+        path: '/statistics/future',
         name: 'Statistics',
         component: './Stats/Perpetual/Index',
         // routes:[
@@ -111,7 +111,7 @@ export default [
         // ]
       },
       {
-        path: './stats/stablecoin',
+        path: './statistics/stablecoin',
         name:'Statistics',
         component: './Stats/StableCoin/stats',
         hideInMenu: true,

@@ -156,9 +156,9 @@ export class SmallTable extends React.Component {
                         .map(item => this.renderBody(item))}
 
                     <tr>
-                        <a className={styles.smallTableSeeMore} onClick={this.expandSmallTable}>
+                        {/* <a className={styles.smallTableSeeMore} onClick={this.expandSmallTable}>
                             See more...
-                        </a>
+                        </a> */}
                     </tr>
                 </tbody>
             </table>
@@ -475,7 +475,7 @@ export const SearchBar = props => {
                                         size="large"
                                         style={{
                                             backgroundColor: 'black',
-                                            borderRadius: '40px',
+                                            borderRadius: '5px',
                                             border: '1px solid #333333',
                                             paddingLeft: '20px',
                                         }}

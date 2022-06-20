@@ -115,7 +115,7 @@ const stats = (props) => {
                 <a
                     className={styles.optionTab}
                     onClick={() => {
-                        history.push('/stats/perpetual')
+                        history.push('/statistics/future')
                     }}
                 >
                     Future
