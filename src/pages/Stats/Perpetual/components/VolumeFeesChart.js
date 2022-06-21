@@ -100,7 +100,6 @@ const VolumeFeesChart = props => {
     // if (this.props.onHover) this.props.onHover(v[0].data, v[0].dataIndex);
     // console.log("TEST HERE:", v);
     const idx = v[0].dataIndex;
-    console.log("TEST HERE:", );
     // setSelectedIndex(1);
     return `
       <span style="color :#b5b5b6"> ${formatFullTimestamp(data[idx].timestamp)} , ${formatCurrency(data[idx].all)}</span></br>

@@ -404,7 +404,6 @@ export async function swapGetEstimated(
       }
     }
     catch (e) {
-      console.log("TEST ERROR HERE:", e);
       setSwapButtonState(false);
       if (!poolExist) {
         return new CustomError('Pool does not exist!');

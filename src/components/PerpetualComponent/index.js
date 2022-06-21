@@ -334,7 +334,6 @@ const SwapComponent = props => {
         updateTotalTokenWeights()
         updateUsdgSupply()
         updateOrderBookApproved()
-        console.log("BLOCK HERE:")
       }
       library.on('block', onBlock)
       return () => {
@@ -391,7 +390,6 @@ const SwapComponent = props => {
   console.log("test multichain: tokens", infoTokens, tokens)
   const fromToken = perpetuals.getToken(fromTokenAddress);
   const toToken = perpetuals.getToken(toTokenAddress);
-  console.log("DEBUG HERE:", toToken);
   
   const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
   const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
@@ -425,7 +423,6 @@ const SwapComponent = props => {
   //   : shortCollateralAddress;
   const collateralTokenAddress = shortCollateralAddress;
   const collateralToken = perpetuals.getToken(collateralTokenAddress);
-  console.log("collaterals HERE:", collateralToken)
 
   const [triggerRatioValue, setTriggerRatioValue] = useState("");
   const triggerRatioInverted = useMemo(() => {
@@ -1013,7 +1010,6 @@ const SwapComponent = props => {
       USD_DECIMALS,
       2
     )} USD.`;
-    console.log("CALL CONTRACT HERE:", method, params, fromTokenAddress)
     Api.callContract(chainId, contract, method, params, {
       value,
       setPendingTxns,
@@ -1139,7 +1135,6 @@ const SwapComponent = props => {
 
     if (isLong) {
       let requiredAmount = toAmount;
-      console.log("DEBUG HERE: fromTokenInfo", fromTokenInfo)
       if (fromTokenAddress !== toTokenAddress) {
         const { amount: swapAmount } = getNextToAmount(
           chainId,
