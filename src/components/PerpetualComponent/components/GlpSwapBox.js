@@ -15,9 +15,9 @@ import { ethers } from "ethers"
 import { Icon, Tooltip, Tabs } from 'antd'
 import { useWeb3React } from '@web3-react/core'
 import useSWR from 'swr'
-import { useConstantLoader } from '@/constants'
+import { constantInstance, useConstantLoader } from '@/constants'
 import { useConnectWallet } from '@/components/ConnectWallet'
-import { AcyIcon, AcyTabs, AcyButton } from "@/components/Acy"
+import { AcyIcon, AcyTabs, AcyButton, AcyPerpetualButton } from "@/components/Acy"
 
 import {
   getInfoTokens,
@@ -47,36 +47,24 @@ import {
   DEFAULT_MAX_USDG_AMOUNT,
   PLACEHOLDER_ACCOUNT
 } from '@/acy-dex-futures/utils/index'
-import {
-  readerAddress,
-  rewardReaderAddress,
-  vaultAddress,
-  nativeTokenAddress,
-  stakedGlpTrackerAddress,
-  feeGlpTrackerAddress,
-  usdgAddress,
-  glpManagerAddress,
-  rewardRouterAddress,
-  glpVesterAddress,
-  tempLibrary,
-  tempChainID
-} from '@/acy-dex-futures/samples/constants'
-import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
+import Reader from '@/acy-dex-futures/abis/Reader.json'
 import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
-import VaultV2 from '@/acy-dex-futures/abis/VaultV2.json'
+import Vault from '@/acy-dex-futures/abis/Vault.json'
 import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
+import Glp from '@/acy-dex-futures/abis/Glp.json'
+import Usdg from "@/acy-dex-futures/abis/Usdg.json"
 import RewardTracker from '@/acy-dex-futures/abis/RewardTracker.json'
 import Vester from '@/acy-dex-futures/abis/Vester.json'
 import RewardRouter from '@/acy-dex-futures/abis/RewardRouter.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
-import { callContract, useGmxPrice } from '@/acy-dex-futures/core/Perpetual'
-import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
+import { callContract } from '@/acy-dex-futures/Api'
 
+import PerpetualTabs from './PerpetualTabs'
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
-import TokenTable  from '@/pages/BuyGlp/components/SwapTokenTable'
+import TokenTable from '@/pages/BuyGlp/components/SwapTokenTable'
 import glp40Icon from '@/pages/BuyGlp/components/ic_glp_40.svg'
 
-import styles from '@/pages/BuyGlp/components/GlpSwap.less'
+import styles from './GlpSwap.less'
 
 const { AddressZero } = ethers.constants
 const { TabPane } = Tabs
@@ -106,27 +94,36 @@ function getStakingData(stakingInfo) {
 
 function getToken(tokenlist, tokenAddr) {
   for (let i = 0; i < tokenlist.length; i++) {
-    if(tokenlist[i].address === tokenAddr) {
+    if (tokenlist[i].address === tokenAddr) {
       return tokenlist[i]
     }
   }
   return undefined
 }
 
-function getWrappedToken(tokenlist) {
-  let wrappedToken;
-  for (const t of tokenlist) {
-    if(t.isWrapped) {
-      wrappedToken = t;
+function getTokenfromSymbol(tokenlist, symbol) {
+  for (let i = 0; i < tokenlist.length; i++) {
+    if (tokenlist[i].symbol === symbol) {
+      return tokenlist[i]
     }
   }
-  return wrappedToken;
+  return undefined
 }
+
+// function getWrappedToken(tokenlist) {
+//   let wrappedToken;
+//   for (const t of tokenlist) {
+//     if (t.isWrapped) {
+//       wrappedToken = t;
+//     }
+//   }
+//   return wrappedToken;
+// }
 
 function getNativeToken(tokenlist) {
   let nativeToken;
   for (const t of tokenlist) {
-    if(t.isNative) {
+    if (t.isNative) {
       nativeToken = t;
     }
   }
@@ -135,78 +132,95 @@ function getNativeToken(tokenlist) {
 
 export const GlpSwapBox = (props) => {
 
-  const { isBuying, setIsBuying } = props
-  
-  const { account } = useConstantLoader(props)
-  const savedSlippageAmount = getSavedSlippageAmount(tempChainID)
+  const { 
+    isBuying, 
+    setIsBuying, 
+    swapTokenAddress, 
+    setSwapTokenAddress,
+    isWaitingForApproval, 
+    setIsWaitingForApproval,
+    setPendingTxns
+  } = props
 
-  const { active, activate, library } = useWeb3React()
+  const { account } = useConstantLoader(props)
+
+  const { active, activate, library, chainId } = useWeb3React()
   const connectWallet = getInjectedHandler(activate)
-  
+  const savedSlippageAmount = getSavedSlippageAmount(chainId)
+
   const history = useHistory()
   const tabLabel = isBuying ? 'buy' : 'sell'
 
-  const tokens = defaultToken.default
+  const tokens = constantInstance.perpetuals.tokenList;
   const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
   const tokenList = whitelistedTokens.filter(t => !t.isWrapped)
 
   const [swapValue, setSwapValue] = useState("")
   const [glpValue, setGlpValue] = useState("")
-  const [swapTokenAddress, setSwapTokenAddress] = useState(tokens[0].address)
+  // const [swapTokenAddress, setSwapTokenAddress] = useState(tokens[0].address)
   const [isApproving, setIsApproving] = useState(false)
-  const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
+  // const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [anchorOnSwapAmount, setAnchorOnSwapAmount] = useState(true)
   const [feeBasisPoints, setFeeBasisPoints] = useState("")
   const [modalError, setModalError] = useState(false)
 
-  const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
+  // const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
 
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
-  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([tempChainID, readerAddress, "getFullVaultTokenInfo"], {
-    fetcher: fetcher(tempLibrary, ReaderV2, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
+  const { perpetuals } = useConstantLoader()
+  const readerAddress = perpetuals.getContract("Reader")
+  const vaultAddress = perpetuals.getContract("Vault")
+  const usdgAddress = perpetuals.getContract("USDG")
+  const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
+  const routerAddress = perpetuals.getContract("Router")
+  const glpManagerAddress = perpetuals.getContract("GlpManager")
+  const glpAddress = perpetuals.getContract("GLP")
+  const rewardRouterAddress = perpetuals.getContract("RewardRouter")
+  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
+    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
   })
-
   const tokenAddresses = tokens.map(token => token.address)
-  const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([tempChainID, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(tempLibrary, ReaderV2, [tokenAddresses]),
+  const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, Reader, [tokenAddresses]),
   })
 
-  const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([tempChainID, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(tempLibrary, ReaderV2, [tokensForBalanceAndSupplyQuery]),
-  })
+  // const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([chainId, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
+  //   fetcher: fetcher(library, ReaderV2, [tokensForBalanceAndSupplyQuery]),
+  // })
 
-  const { data: aums, mutate: updateAums } = useSWR([tempChainID, glpManagerAddress, "getAums"], {
-    fetcher: fetcher(tempLibrary, GlpManager),
-  })
+  // const { data: aums, mutate: updateAums } = useSWR([chainId, glpManagerAddress, "getAums"], {
+  //   fetcher: fetcher(library, GlpManager),
+  // })
 
-  const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([tempChainID, vaultAddress, "totalTokenWeights"], {
-    fetcher: fetcher(tempLibrary, VaultV2),
+  const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([chainId, vaultAddress, "totalTokenWeights"], {
+    fetcher: fetcher(library, Vault),
   })
-
   const tokenAllowanceAddress = swapTokenAddress === AddressZero ? nativeTokenAddress : swapTokenAddress
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([tempChainID, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, glpManagerAddress], {
-    fetcher: fetcher(tempLibrary, Token),
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, glpManagerAddress], {
+    fetcher: fetcher(library, Glp)
+  });
+  const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR([chainId, glpManagerAddress, "lastAddedAt", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, GlpManager),
   })
 
-  const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR([tempChainID, glpManagerAddress, "lastAddedAt", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(tempLibrary, GlpManager),
+  // todo: glpBalance -> GLP.balanceOf(account)
+  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, glpAddress, "balanceOf", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, Glp),
   })
+  // const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
+  //   fetcher: fetcher(library, RewardTracker),
+  // })
 
-  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([tempChainID, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(tempLibrary, RewardTracker),
-  })
+  // const { data: reservedAmount, mutate: updateReservedAmount } = useSWR([chainId, glpVesterAddress, "pairAmounts", account || PLACEHOLDER_ACCOUNT], {
+  //   fetcher: fetcher(library, Vester),
+  // })
 
-  const { data: reservedAmount, mutate: updateReservedAmount } = useSWR([tempChainID, glpVesterAddress, "pairAmounts", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(tempLibrary, Vester),
-  })
-
-  const { gmxPrice, mutate: updateGmxPrice } = useGmxPrice(tempChainID, { arbitrum: tempLibrary }, active)
-  const rewardTrackersForStakingInfo = [ stakedGlpTrackerAddress, feeGlpTrackerAddress ]
-  const { data: stakingInfo, mutate: updateStakingInfo } = useSWR([tempChainID, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(tempLibrary, RewardReader, [rewardTrackersForStakingInfo]),
-  })
-
+  // const { gmxPrice, mutate: updateGmxPrice } = useGmxPrice(chainId, { arbitrum: library }, active)
+  // const rewardTrackersForStakingInfo = [ stakedGlpTrackerAddress, feeGlpTrackerAddress ]
+  // const { data: stakingInfo, mutate: updateStakingInfo } = useSWR([chainId, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT], {
+  //   fetcher: fetcher(library, RewardReader, [rewardTrackersForStakingInfo]),
+  // })
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
   const swapToken = getToken(tokens, swapTokenAddress)
@@ -220,19 +234,31 @@ export const GlpSwapBox = (props) => {
   const redemptionTime = lastPurchaseTime ? lastPurchaseTime.add(GLP_COOLDOWN_DURATION) : undefined
   const inCooldownWindow = redemptionTime && parseInt(Date.now() / 1000, 10) < redemptionTime
 
-  const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
-  const usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
-  let aum
-  if (aums && aums.length > 0) {
-    aum = isBuying ? aums[0] : aums[1]
-  }
-  const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  const { data: glpSupply, mutate: updateGlpSupply } = useSWR([chainId, glpAddress, "totalSupply"], {
+    fetcher: fetcher(library, Glp),
+  })
+
+  // todo: usdgSupply
+  const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
+    fetcher: fetcher(library, Usdg),
+  })
+  // const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
+  // const usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
+  
+  // let aum
+  // if (aums && aums.length > 0) {
+  //   aum = isBuying ? aums[0] : aums[1]
+  // }
+  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsda", true], {
+    fetcher: fetcher(library, GlpManager),
+  })
+  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply.gt(0)) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  // const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   let glpBalanceUsd
   if (glpBalance) {
     glpBalanceUsd = glpBalance.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
   }
-  const glpSupplyUsd = glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
-
+  const glpSupplyUsd = glpSupply ? glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS)) : bigNumberify(0)
 
   // let reserveAmountUsd
   // if (reservedAmount) {
@@ -252,7 +278,8 @@ export const GlpSwapBox = (props) => {
     setGlpValue(e.target.value)
   }
 
-  const onSelectSwapToken = (token) => {
+  const onSelectSwapToken = (symbol) => {
+    const token = getTokenfromSymbol(tokens, symbol)
     setSwapTokenAddress(token.address)
     setIsWaitingForApproval(false)
   }
@@ -281,37 +308,46 @@ export const GlpSwapBox = (props) => {
   }
 
   let maxSellAmount = glpBalance
-  if (glpBalance && reservedAmount) {
-    maxSellAmount = glpBalance.sub(reservedAmount)
-  }
+  // if (glpBalance && reservedAmount) {
+  //   maxSellAmount = glpBalance.sub(reservedAmount)
+  // }
 
-  const wrappedTokenSymbol = getWrappedToken(tokens).symbol
+  // const wrappedTokenSymbol = getWrappedToken(tokens).symbol
   const nativeTokenSymbol = getNativeToken(tokens).symbol
 
   useEffect(() => {
     if (active) {
       library.on('block', () => {
+        console.log("update on block: ", tokenAllowance, tokenAllowanceAddress)
         updateVaultTokenInfo(undefined, true)
         updateTokenBalances(undefined, true)
-        updateBalancesAndSupplies(undefined, true)
-        updateAums(undefined, true)
+        // updateBalancesAndSupplies(undefined, true)
+        // updateAums(undefined, true)
         updateTotalTokenWeights(undefined, true)
         updateTokenAllowance(undefined, true)
         updateLastPurchaseTime(undefined, true)
-        updateStakingInfo(undefined, true)
-        updateGmxPrice(undefined, true)
-        updateReservedAmount(undefined, true)
+        // updateStakingInfo(undefined, true)
+        // updateGmxPrice(undefined, true)
+        // updateReservedAmount(undefined, true)
         updateGlpBalance(undefined, true)
       })
       return () => {
         library.removeAllListeners('block')
       }
     }
-  }, [active, library, tempChainID,
-    updateVaultTokenInfo, updateTokenBalances, updateBalancesAndSupplies,
-    updateAums, updateTotalTokenWeights, updateTokenAllowance,
-    updateLastPurchaseTime, updateStakingInfo, updateGmxPrice,
-    updateReservedAmount, updateGlpBalance])
+  }, [active, library, chainId,
+    updateVaultTokenInfo, 
+    updateTokenBalances, 
+    // updateBalancesAndSupplies,
+    // updateAums, 
+    updateTotalTokenWeights, 
+    updateTokenAllowance,
+    updateLastPurchaseTime, 
+    // updateStakingInfo, 
+    // updateGmxPrice,
+    // updateReservedAmount, 
+    updateGlpBalance
+  ])
 
   useEffect(() => {
     const updateSwapAmounts = () => {
@@ -390,7 +426,7 @@ export const GlpSwapBox = (props) => {
 
     if (!isBuying) {
       if (maxSellAmount && glpAmount && glpAmount.gt(maxSellAmount)) {
-        return [`Insufficient GLP balance`]
+        return [`Insufficient ALP balance`]
       }
 
       const swapTokenInfo = getTokenInfo(infoTokens, swapTokenAddress)
@@ -417,13 +453,14 @@ export const GlpSwapBox = (props) => {
     const [error, modal] = getError()
     if (error && !modal) { return error }
 
+    console.log("get primary text: ", needApproval, isWaitingForApproval)
     if (needApproval && isWaitingForApproval) { return "Waiting for Approval" }
     if (isApproving) { return `Approving ${swapToken.symbol}...` }
     if (needApproval) { return `Approve ${swapToken.symbol}` }
 
     if (isSubmitting) { return isBuying ? `Buying...` : `Selling...` }
 
-    return isBuying ? "Buy GLP" : "Sell GLP"
+    return isBuying ? "Buy ALP" : "Sell ALP"
   }
 
   const buyGlp = () => {
@@ -432,15 +469,19 @@ export const GlpSwapBox = (props) => {
     const minGlp = glpAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR)
 
     const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner())
-    const method = swapTokenAddress === AddressZero ? "mintAndStakeGlpETH" : "mintAndStakeGlp"
+    const method = swapTokenAddress === AddressZero ? "mintAndStakeAlpETH" : "mintAndStakeAlp"
     const params = swapTokenAddress === AddressZero ? [0, minGlp] : [swapTokenAddress, swapAmount, 0, minGlp]
     const value = swapTokenAddress === AddressZero ? swapAmount : 0
+    // const contract = new ethers.Contract(glpManagerAddress, GlpManager, library.getSigner())
+    // const method = "addLiquidity"
+    // const params = swapTokenAddress === AddressZero ? [0, minGlp] : [swapTokenAddress, swapAmount, 0, minGlp]
+    // const value = swapTokenAddress === AddressZero ? swapAmount : 0
 
-    callContract(tempChainID, contract, method, params, {
+    callContract(chainId, contract, method, params, {
       value,
       sentMsg: "Buy submitted!",
       failMsg: "Buy failed.",
-      successMsg: `${parseFloat(glpAmount).toFixed(4)} GLP bought with ${parseFloat(swapAmount).toFixed(4)} ${swapToken.symbol}.`,
+      successMsg: `${parseFloat(glpAmount).toFixed(4)} ALP bought with ${parseFloat(swapAmount).toFixed(4)} ${swapToken.symbol}.`,
     })
       .then(async () => {
       })
@@ -455,13 +496,18 @@ export const GlpSwapBox = (props) => {
     const minOut = swapAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR)
 
     const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner())
-    const method = swapTokenAddress === AddressZero ? "unstakeAndRedeemGlpETH" : "unstakeAndRedeemGlp"
+    const method = swapTokenAddress === AddressZero ? "unstakeAndRedeemAlpETH" : "unstakeAndRedeemAlp"
     const params = swapTokenAddress === AddressZero ? [glpAmount, minOut, account] : [swapTokenAddress, glpAmount, minOut, account]
+    // const contract = new ethers.Contract(glpManagerAddress, GlpManager, library.getSigner())
+    // const method = "removeLiquidity"
+    // const params = swapTokenAddress === AddressZero ? [glpAmount, minOut, account] : [swapTokenAddress, glpAmount, minOut, account]
+    const value = swapTokenAddress === AddressZero ? swapAmount : 0
 
-    callContract(tempChainID, contract, method, params, {
+    callContract(chainId, contract, method, params, {
+      // value,
       sentMsg: "Sell submitted!",
       failMsg: "Sell failed.",
-      successMsg: `${parseFloat(glpAmount).toFixed(4)} GLP sold for ${parseFloat(swapAmount).toFixed(4)} ${swapToken.symbol}.`,
+      successMsg: `${parseFloat(glpAmount).toFixed(4)} ALP sold for ${parseFloat(swapAmount).toFixed(4)} ${swapToken.symbol}.`,
     })
       .then(async () => {
       })
@@ -476,7 +522,7 @@ export const GlpSwapBox = (props) => {
       library,
       tokenAddress: swapToken.address,
       spender: glpManagerAddress,
-      chainId: tempChainID,
+      chainId,
       onApproveSubmitted: () => {
         setIsWaitingForApproval(true)
       },
@@ -511,67 +557,68 @@ export const GlpSwapBox = (props) => {
     }
   }
 
-  const switchSwapOption = (hash = '') => {
-    history.push(`${history.location.pathname}#${hash}`)
-    setIsBuying(!(hash === 'redeem'))
-  }
+  const [buySellLabel, setBuySellLabel] = useState("Buy ALP")
+  const buySellTabs = ['Buy ALP', 'Sell ALP']
+
+  // const switchSwapOption = (hash = '') => {
+  //   history.push(`${history.location.pathname}#${hash}`)
+  //   setIsBuying(!(hash === 'redeem'))
+  // }
 
   const onSwapOptionChange = (opt) => {
-    if (opt === "sell") {
-      switchSwapOption('redeem')
+    if (opt === "Sell ALP") {
+      // switchSwapOption('redeem')
+      setIsBuying(false)
+      setBuySellLabel("Sell ALP")
     } else {
-      switchSwapOption()
+      // switchSwapOption()
+      setIsBuying(true)
+      setBuySellLabel("Buy ALP")
     }
   }
 
   return (
     <div className="GlpSwap">
-      <div>
-        <Tabs 
-          activeKey={tabLabel}
+      <div className={styles.BuySellSelector}>
+        <PerpetualTabs
+          option={buySellLabel}
+          options={buySellTabs}
+          type="inline"
           onChange={onSwapOptionChange}
-          size='small'
-          tabBarGutter={0}
-          type='line'
-          tabPosition='top'
-          tabBarStyle={{ border: '0px black' }}
-        >
-          <TabPane tab="Buy GLP" key='buy' />
-          <TabPane tab="Sell GLP" key='sell' />
-        </Tabs>
-      </div>  
-
-      {isBuying && 
-      <BuyInputSection
-        token={swapToken}
-        tokenlist={tokens}
-        topLeftLabel='Pay ' 
-        balance={payBalance} 
-        topRightLabel='Balance: '
-        tokenBalance={`${formatAmount(swapTokenBalance, swapToken.decimals, 4, true)}`}
-        inputValue={swapValue}
-        onInputValueChange={onSwapValueChange}
-        onSelectToken={onSelectSwapToken}
-      />}
-
-      {!isBuying && 
-      <BuyInputSection
-        token={swapToken}
-        tokenlist={tokens}
-        topLeftLabel='Pay'
-        balance={payBalance}
-        topRightLabel='Available: '
-        tokenBalance={`${formatAmount(maxSellAmount, GLP_DECIMALS, 4, true)}`}
-        inputValue={glpValue}
-        onInputValueChange={onGlpValueChange}
-        isLocked={!isBuying}
-      />}
-
-      <div className={styles.Arrow}>
-        <Icon style={{ fontSize: '16px' }} type="arrow-down" />
+        />
       </div>
 
-      {isBuying && 
+      {isBuying &&
+        <BuyInputSection
+          token={swapToken}
+          tokenlist={tokens}
+          topLeftLabel='Pay '
+          balance={payBalance}
+          topRightLabel='Balance: '
+          tokenBalance={`${formatAmount(swapTokenBalance, swapToken.decimals, 4, true)}`}
+          inputValue={swapValue}
+          onInputValueChange={onSwapValueChange}
+          onSelectToken={onSelectSwapToken}
+        />}
+
+      {!isBuying &&
+        <BuyInputSection
+          token={swapToken}
+          tokenlist={tokens}
+          topLeftLabel='Pay'
+          balance={payBalance}
+          topRightLabel='Available: '
+          tokenBalance={`${formatAmount(maxSellAmount, GLP_DECIMALS, 4, true)}`}
+          inputValue={glpValue}
+          onInputValueChange={onGlpValueChange}
+          isLocked={!isBuying}
+        />}
+
+      {/* <div className={styles.Arrow}>
+        <Icon style={{ fontSize: '16px' }} type="arrow-down" />
+      </div> */}
+
+      {isBuying &&
         <BuyInputSection
           token={swapToken}
           tokenlist={tokens}
@@ -584,7 +631,7 @@ export const GlpSwapBox = (props) => {
           isLocked={isBuying}
         />}
 
-      {!isBuying && 
+      {!isBuying &&
         <BuyInputSection
           token={swapToken}
           tokenlist={tokens}
@@ -604,49 +651,49 @@ export const GlpSwapBox = (props) => {
           </div>
           <div className={styles.FeeBlock}>
             {isBuying &&
-            <Tooltip 
-              placement='bottomRight' 
-              mouseEnterDelay={0.5}
-              title={() => (
-                <>
-                  {feeBasisPoints > 50 && <div>To reduce fees, select a different asset to pay with.</div>}
-                  Check the "Save on Fees" section below to get the lowest fee percentages.
-                </>
-              )}
-            >
-              <div className={styles.TooltipHandle}>
-                {feePercentageText}
-              </div>
-            </Tooltip>}
+              <Tooltip
+                placement='bottomRight'
+                mouseEnterDelay={0.5}
+                title={() => (
+                  <>
+                    {feeBasisPoints > 50 && <div>To reduce fees, select a different asset to pay with.</div>}
+                    Check the "Save on Fees" section below to get the lowest fee percentages.
+                  </>
+                )}
+              >
+                <div className={styles.TooltipHandle}>
+                  {feePercentageText}
+                </div>
+              </Tooltip>}
             {!isBuying &&
-            <Tooltip 
-              placement='bottomRight' 
-              mouseEnterDelay={0.5}
-              title={() => (
-                <>
-                  {feeBasisPoints > 50 && <div>To reduce fees, select a different asset to receive.</div>}
-                  Check the "Save on Fees" section below to get the lowest fee percentages.
-                </>
-              )}
-            >
-              <div className={styles.TooltipHandle}>
-                {feePercentageText}
-              </div>
-            </Tooltip>}
+              <Tooltip
+                placement='bottomRight'
+                mouseEnterDelay={0.5}
+                title={() => (
+                  <>
+                    {feeBasisPoints > 50 && <div>To reduce fees, select a different asset to receive.</div>}
+                    Check the "Save on Fees" section below to get the lowest fee percentages.
+                  </>
+                )}
+              >
+                <div className={styles.TooltipHandle}>
+                  {feePercentageText}
+                </div>
+              </Tooltip>}
           </div>
         </div>
       </div>
 
-      <div>
-        <AcyButton 
+      <div className={styles.centerButton}>
+        <AcyPerpetualButton
           style={{ marginTop: '25px' }}
-          onClick={onClickPrimary} 
+          onClick={onClickPrimary}
           disabled={!isPrimaryEnabled()}
         >
           {getPrimaryText()}
-        </AcyButton>
+        </AcyPerpetualButton>
       </div>
-          
+
     </div>
   )
 
@@ -654,96 +701,97 @@ export const GlpSwapBox = (props) => {
 
 export const GlpSwapDetailBox = (props) => {
 
-  const { 
-    isBuying, 
+  const {
+    isBuying,
     setIsBuying,
     tokens,
     infoTokens,
     glpPrice,
     glpBalance,
     glpBalanceUsd,
-    reservedAmount,
-    reserveAmountUsd,
-    stakingInfo,
+    // reservedAmount,
+    // reserveAmountUsd,
+    // stakingInfo,
     glpSupply,
     glpSupplyUsd,
-    gmxPrice,
+    // gmxPrice,
   } = props
 
-  const wrappedTokenSymbol = getWrappedToken(tokens).symbol
+  // const wrappedTokenSymbol = getWrappedToken(tokens).symbol
   const nativeTokenSymbol = getNativeToken(tokens).symbol
 
   const nativeToken = getTokenInfo(infoTokens, AddressZero)
-  const stakingData = getStakingData(stakingInfo)
+  // const stakingData = getStakingData(stakingInfo)
 
-  let totalApr = bigNumberify(0)
-  let feeGlpTrackerAnnualRewardsUsd
-  let feeGlpTrackerApr
-  if (stakingData && stakingData.feeGlpTracker && stakingData.feeGlpTracker.tokensPerInterval && nativeToken && nativeToken.minPrice && glpSupplyUsd && glpSupplyUsd.gt(0)) {
-    feeGlpTrackerAnnualRewardsUsd = stakingData.feeGlpTracker.tokensPerInterval.mul(SECONDS_PER_YEAR).mul(nativeToken.minPrice).div(expandDecimals(1, 18))
-    feeGlpTrackerApr = feeGlpTrackerAnnualRewardsUsd.mul(BASIS_POINTS_DIVISOR).div(glpSupplyUsd)
-    totalApr = totalApr.add(feeGlpTrackerApr)
-  }
+  // let totalApr = bigNumberify(0)
+  // let feeGlpTrackerAnnualRewardsUsd
+  // let feeGlpTrackerApr = bigNumberify(0)
+  // if (stakingData && stakingData.feeGlpTracker && stakingData.feeGlpTracker.tokensPerInterval && nativeToken && nativeToken.minPrice && glpSupplyUsd && glpSupplyUsd.gt(0)) {
+  //   feeGlpTrackerAnnualRewardsUsd = stakingData.feeGlpTracker.tokensPerInterval.mul(SECONDS_PER_YEAR).mul(nativeToken.minPrice).div(expandDecimals(1, 18))
+  //   feeGlpTrackerApr = feeGlpTrackerAnnualRewardsUsd.mul(BASIS_POINTS_DIVISOR).div(glpSupplyUsd)
+  //   totalApr = totalApr.add(feeGlpTrackerApr)
+  // }
 
-  let stakedGlpTrackerAnnualRewardsUsd
-  let stakedGlpTrackerApr
-  if (gmxPrice && stakingData && stakingData.stakedGlpTracker && stakingData.stakedGlpTracker.tokensPerInterval && glpSupplyUsd && glpSupplyUsd.gt(0)) {
-    stakedGlpTrackerAnnualRewardsUsd = stakingData.stakedGlpTracker.tokensPerInterval.mul(SECONDS_PER_YEAR).mul(gmxPrice).div(expandDecimals(1, 18))
-    stakedGlpTrackerApr = stakedGlpTrackerAnnualRewardsUsd.mul(BASIS_POINTS_DIVISOR).div(glpSupplyUsd)
-    totalApr = totalApr.add(stakedGlpTrackerApr)
-  }
+  // let stakedGlpTrackerAnnualRewardsUsd
+  // let stakedGlpTrackerApr = bigNumberify(0)
+  // if (gmxPrice && stakingData && stakingData.stakedGlpTracker && stakingData.stakedGlpTracker.tokensPerInterval && glpSupplyUsd && glpSupplyUsd.gt(0)) {
+  //   stakedGlpTrackerAnnualRewardsUsd = stakingData.stakedGlpTracker.tokensPerInterval.mul(SECONDS_PER_YEAR).mul(gmxPrice).div(expandDecimals(1, 18))
+  //   stakedGlpTrackerApr = stakedGlpTrackerAnnualRewardsUsd.mul(BASIS_POINTS_DIVISOR).div(glpSupplyUsd)
+  //   totalApr = totalApr.add(stakedGlpTrackerApr)
+  // }
 
-  return(
+  return (
     <div className={styles.GlpSwapstatscard}>
       <div className={styles.GlpSwapstatsmark}>
         <div className={styles.GlpSwapstatsicon}>
           <img src={glp40Icon} alt="glp40Icon" />
         </div>
         <div className={styles.GlpSwapinfo}>
-          <div className={styles.statstitle}>GLP</div>
-          <div className={styles.statssubtitle}>GLP</div>
+          <div className={styles.statstitle}>ALP</div>
+          <div className={styles.statssubtitle}>ALP</div>
         </div>
       </div>
-    
+
       <div className={styles.GlpSwapdivider} />
-    
+
       <div className={styles.GlpSwapstatscontent}>
         <div className={styles.GlpSwapcardrow}>
           <div className={styles.label}>Price</div>
           <div className={styles.value}>
-            ${formatAmount(glpPrice, USD_DECIMALS, 2, true)}
+            ${formatAmount(glpPrice, GLP_DECIMALS, 2, true)}
           </div>
         </div>
         <div className={styles.GlpSwapcardrow}>
           <div className={styles.label}>Wallet</div>
           <div className={styles.value}>
-            {formatAmount(glpBalance, GLP_DECIMALS, 4, true)} GLP (${formatAmount(glpBalanceUsd, USD_DECIMALS, 2, true)})
+            {formatAmount(glpBalance, GLP_DECIMALS, 4, true)} ALP (${formatAmount(glpBalanceUsd, USD_DECIMALS, 2, true)})
           </div>
         </div>
       </div>
-    
+
       <div className={styles.GlpSwapdivider} />
-    
+
       <div className={styles.GlpSwapstatscontent}>
-        {!isBuying && 
-        <div className={styles.GlpSwapcardrow}>
-          <div className={styles.label}>Reserved</div>
-          <Tooltip 
-            placement='bottomLeft' 
-            color='#b5b5b6' 
-            mouseEnterDelay={0.5}
-            title={`${formatAmount(reservedAmount, 18, 4, true)} GLP have been reserved for vesting.`}
-          >
-            <div className={styles.TooltipHandle}>
-              ${formatAmount(reservedAmount, 18, 4, true)} GLP (${formatAmount(reserveAmountUsd, USD_DECIMALS, 2, true)})
-            </div>
-          </Tooltip>
-        </div>}
+        {/* {!isBuying &&
+          <div className={styles.GlpSwapcardrow}>
+            <div className={styles.label}>Reserved</div>
+            <Tooltip
+              placement='bottomLeft'
+              color='#b5b5b6'
+              mouseEnterDelay={0.5}
+              title={`${formatAmount(reservedAmount, 18, 4, true)} ALP have been reserved for vesting.`}
+            >
+              <div className={styles.TooltipHandle}>
+                ${formatAmount(reservedAmount, 18, 4, true)} ALP (${formatAmount(reserveAmountUsd, USD_DECIMALS, 2, true)})
+              </div>
+            </Tooltip>
+          </div>
+        }
         <div className={styles.GlpSwapcardrow}>
           <div className={styles.label}>APR</div>
-          <Tooltip 
-            placement='bottomLeft' 
-            color='#b5b5b6' 
+          <Tooltip
+            placement='bottomLeft'
+            color='#b5b5b6'
             mouseEnterDelay={0.5}
             title={() => (
               <>
@@ -762,25 +810,27 @@ export const GlpSwapDetailBox = (props) => {
               ${formatAmount(totalApr, 2, 2, true)}%
             </div>
           </Tooltip>
-        </div>
-                
+        </div> */}
+
         <div className={styles.GlpSwapcardrow}>
           <div className={styles.label}>Total Supply</div>
           <div className={styles.value}>
-            {formatAmount(glpSupply, GLP_DECIMALS, 4, true)} GLP (${formatAmount(glpSupplyUsd, USD_DECIMALS, 2, true)})
+            {formatAmount(glpSupply, GLP_DECIMALS, 4, true)} ALP (${formatAmount(glpSupplyUsd, GLP_DECIMALS, 2, true)})
           </div>
         </div>
       </div>
-    
+
     </div>
   )
 }
 
 export const GlpSwapTokenTable = (props) => {
 
-  const { 
-    isBuying, 
+  const {
+    isBuying,
     setIsBuying,
+    setSwapTokenAddress,
+    setIsWaitingForApproval,
     tokenList,
     infoTokens,
     glpAmount,
@@ -790,7 +840,8 @@ export const GlpSwapTokenTable = (props) => {
   } = props
 
   const onSelectSwapToken = (token) => {
-    console.log('select from token table: ',token.symbol)
+    setSwapTokenAddress(token.address)
+    setIsWaitingForApproval(false)
   }
 
   const tokenListData = []
@@ -828,19 +879,17 @@ export const GlpSwapTokenTable = (props) => {
       symbol: token.symbol,
       price: formatKeyAmount(tokenInfo, "minPrice", USD_DECIMALS, 2, true),
       pool: formatAmount(managedUsd, USD_DECIMALS, 2, true),
-      wallet: formatKeyAmount(tokenInfo, "balance", tokenInfo.decimals, 2, true) + ' ' +  tokenInfo.symbol + ' ($' + formatAmount(balanceUsd, USD_DECIMALS, 2, true) + ')',
+      wallet: `${formatKeyAmount(tokenInfo, "balance", tokenInfo.decimals, 2, true)  } ${  tokenInfo.symbol  } ($${  formatAmount(balanceUsd, USD_DECIMALS, 2, true)  })`,
       fees: formatAmount(tokenFeeBps, 2, 2, true, "-") + ((tokenFeeBps !== undefined && tokenFeeBps.toString().length > 0) ? "%" : "")
     } : {
       address: token.address,
       name: token.name,
       symbol: token.symbol,
       price: formatKeyAmount(tokenInfo, "minPrice", USD_DECIMALS, 2, true),
-      available: `${formatKeyAmount(tokenInfo, "availableAmount", token.decimals, 2, true)  } ${  token.symbol  } ($${  formatAmount(availableAmountUsd, USD_DECIMALS, 2, true) })`,
-      wallet: formatKeyAmount(tokenInfo, "balance", tokenInfo.decimals, 2, true) + ' ' + tokenInfo.symbol + ' ($' + formatAmount(balanceUsd, USD_DECIMALS, 2, true),
+      available: `${formatKeyAmount(tokenInfo, "availableAmount", token.decimals, 2, true)} ${token.symbol} ($${formatAmount(availableAmountUsd, USD_DECIMALS, 2, true)})`,
+      wallet: `${formatKeyAmount(tokenInfo, "balance", tokenInfo.decimals, 2, true)  } ${  tokenInfo.symbol  } ($${  formatAmount(balanceUsd, USD_DECIMALS, 2, true)}`,
       fees: formatAmount(tokenFeeBps, 2, 2, true, "-") + ((tokenFeeBps !== undefined && tokenFeeBps.toString().length > 0) ? "%" : "")
     }
-    console.log('joy token', tokenInfo, balanceUsd)
-    console.log('joy info',infoTokens)
 
     tokenListData.push(tData)
   })
@@ -848,12 +897,12 @@ export const GlpSwapTokenTable = (props) => {
   return (
     <>
       {tokenListData.length > 0
-      ? (<TokenTable 
-          dataSourceCoin={tokenListData} 
-          isBuying={isBuying} 
-          onClickSelectToken={onSelectSwapToken}
-      />) 
-      : (<Icon type="loading" />)}
+        ? (<TokenTable
+            dataSourceCoin={tokenListData}
+            isBuying={isBuying}
+            onClickSelectToken={onSelectSwapToken}
+        />)
+        : (<Icon type="loading" />)}
     </>
   )
 }

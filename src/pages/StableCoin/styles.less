@@ -1,0 +1,102 @@
+@import (css) url("https://fonts.googleapis.com/css?family=Lora:700");
+.usdaPage{
+  font-family: "Karla", sans-serif;
+}
+.main {
+  z-index: 0;
+  color: #b5b6b6;
+  margin-bottom: 20px;
+  font-weight: 400;
+  font-family: "Karla", sans-serif;
+}
+
+.rowFlexContainer {
+  display: flex;
+  width: 100%;
+  margin: auto;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+@media screen and (min-width: 1024px) {
+  .rowFlexContainer {
+    // width: 30%;
+    min-width: 310px;
+    flex-wrap: nowrap;
+  }
+  .priceChart {
+    border-right: 0.75px solid #333333;
+    order: 1;
+    flex: 2;
+  }
+  .swapComponent {
+    order: 2;
+    flex: 1;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .main {
+    min-width: 370px;
+    width: 65%;
+  }
+  .colItem {
+    margin: 0 0.5rem;
+    width: 100%;
+  }
+  .priceChart {
+    order: 2;
+  }
+  .swapComponent {
+    order: 1;
+  }
+}
+
+
+.dataBlock{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: stretch;
+  padding: 20px 30px;
+}
+.statsPage{
+  font-family: "Karla", sans-serif;
+}
+.swapCard{
+  background-color: transparent;
+  border: 0.75px solid #333333;
+  border-radius: 10px;
+  padding: 10px;
+  width: 35%;
+  margin-top: 20px;
+  float: left;
+  display: table-cell;
+}
+@media (max-width: 900px) {
+  .exchangeBlock{
+  	width: 100%;
+  	height: 700px;
+  	padding-left: 20px;
+  }
+  .swapCard{
+  	background-color: #1b1b1c;
+  	padding: 15px;
+  	width: 100%;
+  	float: left;
+  	display: table-cell;
+  }
+  .dataBlock{
+    width: 100%;
+    padding-right: 0rem;
+    margin-bottom: 2rem;
+
+  }
+}
+.colItem {
+  margin: 1rem 0.5rem;
+  margin: auto;
+}
+.swapComponent {
+  order: 1;
+}

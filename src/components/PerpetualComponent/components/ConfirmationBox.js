@@ -1,5 +1,8 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo, useEffect } from 'react';
 import { BsArrowRight } from 'react-icons/bs';
+
+import { getConstant } from '@/acy-dex-futures/utils/Constants'
+
 import {
   USD_DECIMALS,
   PRECISION,
@@ -24,6 +27,9 @@ import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
 import Checkbox from '../Checkbox/Checkbox';
 import ExchangeInfoRow from './ExchangeInfoRow';
+import { constantInstance } from '@/constants';
+
+import styles from './ConfirmationBox.less';
 
 const HIGH_SPREAD_THRESHOLD = expandDecimals(1, USD_DECIMALS).div(100); // 1%;
 
@@ -47,10 +53,9 @@ export default function ConfirmationBox(props) {
     fromTokenInfo,
     toToken,
     toTokenInfo,
-    isSwap,
     isLong,
     isMarketOrder,
-    orderOption,
+    type,
     isShort,
     toAmount,
     fromAmount,
@@ -84,6 +89,8 @@ export default function ConfirmationBox(props) {
   );
   const [isProfitWarningAccepted, setIsProfitWarningAccepted] = useState(false);
 
+  const tokens = constantInstance.perpetuals.tokenList
+
   let minOut;
   let fromTokenUsd;
   let toTokenUsd;
@@ -93,19 +100,9 @@ export default function ConfirmationBox(props) {
     collateralAfterFees = fromUsdMin.sub(feesUsd);
   }
 
-  if (isSwap) {
-    minOut = toAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR);
-
-    fromTokenUsd = fromTokenInfo ? formatAmount(fromTokenInfo.minPrice, USD_DECIMALS, 2, true) : 0;
-    toTokenUsd = toTokenInfo ? formatAmount(toTokenInfo.maxPrice, USD_DECIMALS, 2, true) : 0;
-  }
-
   const getTitle = () => {
     if (!isMarketOrder) {
       return 'Confirm Limit Order';
-    }
-    if (isSwap) {
-      return 'Confirm Swap';
     }
     return isLong ? 'Confirm Long' : 'Confirm Short';
   };
@@ -113,7 +110,7 @@ export default function ConfirmationBox(props) {
 
   const existingOrder = useMemo(
     () => {
-      const wrappedToken = getWrappedToken(chainId);
+      const wrappedToken = constantInstance.perpetuals.wrappedToken;
       for (const order of orders) {
         if (order.type !== INCREASE) continue;
         const sameToken =
@@ -129,7 +126,7 @@ export default function ConfirmationBox(props) {
   );
 
   const getError = () => {
-    if (!isSwap && hasExistingPosition && !isMarketOrder) {
+    if (hasExistingPosition && !isMarketOrder) {
       const { delta, hasProfit } = calculatePositionDelta(triggerPriceUsd, existingPosition);
       if (hasProfit && delta.eq(0)) {
         return 'Invalid price, see warning';
@@ -148,9 +145,6 @@ export default function ConfirmationBox(props) {
         return error;
       }
 
-      if (isSwap) {
-        return title;
-      }
       const action = isMarketOrder ? (isLong ? 'Long' : 'Short') : 'Create Order';
 
       if (
@@ -162,14 +156,11 @@ export default function ConfirmationBox(props) {
         return isLong ? `Forfeit profit and ${action}` : `Forfeit profit and Short`;
       }
 
-      return isMarketOrder ? `Accept minimum and ${action}` : action;
+      return action;
     }
 
     if (!isMarketOrder) {
       return 'Creating Order...';
-    }
-    if (isSwap) {
-      return 'Swapping...';
     }
     if (isLong) {
       return 'Longing...';
@@ -196,8 +187,19 @@ export default function ConfirmationBox(props) {
 
       if (spread && spread.isHigh) {
         return (
-          <div className="Confirmation-box-warning">
-            The spread is > 1%, please ensure the trade details are acceptable before comfirming
+          <div className={styles.ConfirmationBoxWarning}>
+            <Tooltip
+              handle="Tips"
+              position="center-bottom"
+              renderContent={() => {
+                return (
+                  <>
+                    {renderFeeWarning()}
+                    The spread is > 1%, please ensure the trade details are acceptable before comfirming
+                  </>
+                );
+              }}
+            />
           </div>
         );
       }
@@ -207,31 +209,26 @@ export default function ConfirmationBox(props) {
 
   const renderFeeWarning = useCallback(
     () => {
-      if (orderOption === LIMIT || !feeBps || feeBps <= 50) {
+      if (type === LIMIT || !feeBps || feeBps <= 50) {
         return null;
-      }
-
-      if (isSwap) {
-        return (
-          <div className="Confirmation-box-warning">
-            Fees are high to swap from {fromToken.symbol} to {toToken.symbol}.
-          </div>
-        );
       }
 
       if (!collateralTokenAddress) {
         return null;
       }
 
-      const collateralToken = getToken(chainId, collateralTokenAddress);
+      const collateralToken = constantInstance.perpetuals.getToken(collateralTokenAddress);
+      console.log("hereim symbol", tokens, collateralToken)
+
       return (
-        <div className="Confirmation-box-warning">
-          Fees are high to swap from {fromToken.symbol} to {collateralToken.symbol}. <br />
-          {collateralToken.symbol} is needed for collateral.
+        <div>
+          Warning:&nbsp;
+          Fees are high to swap from {fromToken.symbol} to {collateralToken.symbol}.&nbsp;
+          {collateralToken.symbol} is needed for collateral. <br /><br />
         </div>
       );
     },
-    [feeBps, isSwap, collateralTokenAddress, chainId, fromToken.symbol, toToken.symbol, orderOption]
+    [feeBps, collateralTokenAddress, chainId, fromToken.symbol, toToken.symbol, type]
   );
 
   const hasPendingProfit =
@@ -239,84 +236,115 @@ export default function ConfirmationBox(props) {
 
   const renderMinProfitWarning = useCallback(
     () => {
-      if (!isSwap) {
-        if (hasExistingPosition) {
-          const minProfitExpiration = existingPosition.lastIncreasedTime + MIN_PROFIT_TIME;
-          if (
-            isMarketOrder &&
-            existingPosition.delta.eq(0) &&
-            existingPosition.pendingDelta.gt(0)
-          ) {
+      if (hasExistingPosition) {
+        const minProfitExpiration = existingPosition.lastIncreasedTime + MIN_PROFIT_TIME;
+        if (
+          isMarketOrder &&
+          existingPosition.delta.eq(0) &&
+          existingPosition.pendingDelta.gt(0)
+        ) {
+          const profitPrice = getProfitPrice(existingPosition.markPrice, existingPosition);
+          return (
+            <div className={styles.ConfirmationBoxWarning}>
+              <Tooltip
+                handle="Tips"
+                position="center-bottom"
+                renderContent={() => {
+                  return (
+                    <>
+                      {renderFeeWarning()}
+                      Increasing this position at the current price will forfeit a&nbsp;
+                      <a
+                        href="https://gmxio.gitbook.io/gmx/trading#minimum-price-change"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        pending profit
+                      </a>{' '}
+                      of {existingPosition.deltaStr}.<br />
+                      <br />
+                      Profit price: {existingPosition.isLong ? '>' : '<'} $
+                      {formatAmount(profitPrice, USD_DECIMALS, 2, true)}. This rule only applies for the
+                      next {getTimeRemaining(minProfitExpiration)}, until{' '}
+                      {formatDateTime(minProfitExpiration)}.
+                    </>
+                  );
+                }}
+              />
+            </div>
+          );
+        }
+        if (!isMarketOrder) {
+          const { delta, hasProfit } = calculatePositionDelta(triggerPriceUsd, existingPosition);
+          if (hasProfit && delta.eq(0)) {
             const profitPrice = getProfitPrice(existingPosition.markPrice, existingPosition);
             return (
-              <div className="Confirmation-box-warning">
-                Increasing this position at the current price will forfeit a&nbsp;
-                <a
-                  href="https://gmxio.gitbook.io/gmx/trading#minimum-price-change"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  pending profit
-                </a>{' '}
-                of {existingPosition.deltaStr}.<br />
-                <br />
-                Profit price: {existingPosition.isLong ? '>' : '<'} $
-                {formatAmount(profitPrice, USD_DECIMALS, 2, true)}. This rule only applies for the
-                next {getTimeRemaining(minProfitExpiration)}, until{' '}
-                {formatDateTime(minProfitExpiration)}.
+              <div className={styles.ConfirmationBoxWarning}>
+                <Tooltip
+                  handle="Tips"
+                  position="center-bottom"
+                  renderContent={() => {
+                    return (
+                      <>
+                        {renderFeeWarning()}
+                        This order will forfeit a&nbsp;
+                        <a
+                          href="https://gmxio.gitbook.io/gmx/trading#minimum-price-change"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          profit
+                        </a>{' '}
+                        of {existingPosition.deltaStr}.<br />
+                        Profit price: {existingPosition.isLong ? '>' : '<'} $
+                        {formatAmount(profitPrice, USD_DECIMALS, 2, true)}. This rule only applies for the
+                        next {getTimeRemaining(minProfitExpiration)}, until{' '}
+                        {formatDateTime(minProfitExpiration)}.
+                      </>
+                    );
+                  }}
+                />
               </div>
             );
           }
-          if (!isMarketOrder) {
-            const { delta, hasProfit } = calculatePositionDelta(triggerPriceUsd, existingPosition);
-            if (hasProfit && delta.eq(0)) {
-              const profitPrice = getProfitPrice(existingPosition.markPrice, existingPosition);
+        }
+      }
+
+      return (
+        <div className={styles.ConfirmationBoxWarning}>
+          <Tooltip
+            handle="Tips"
+            position="center-bottom"
+            renderContent={() => {
               return (
-                <div className="Confirmation-box-warning">
-                  This order will forfeit a&nbsp;
+                <>
+                  {renderFeeWarning()}
+                  A minimum price change of&nbsp;
                   <a
                     href="https://gmxio.gitbook.io/gmx/trading#minimum-price-change"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    profit
+                    1.5%
                   </a>{' '}
-                  of {existingPosition.deltaStr}.<br />
-                  Profit price: {existingPosition.isLong ? '>' : '<'} $
-                  {formatAmount(profitPrice, USD_DECIMALS, 2, true)}. This rule only applies for the
-                  next {getTimeRemaining(minProfitExpiration)}, until{' '}
-                  {formatDateTime(minProfitExpiration)}.
-                </div>
+                  is required for a position to be in profit. This only applies for the first{' '}
+                  {MIN_PROFIT_TIME / 60 / 60} hours after increasing a position.
+                </>
               );
-            }
-          }
-        }
-
-        return (
-          <div className="Confirmation-box-warning">
-            A minimum price change of&nbsp;
-            <a
-              href="https://gmxio.gitbook.io/gmx/trading#minimum-price-change"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              1.5%
-            </a>{' '}
-            is required for a position to be in profit. This only applies for the first{' '}
-            {MIN_PROFIT_TIME / 60 / 60} hours after increasing a position.
-          </div>
-        );
-      }
+            }}
+          />
+        </div>
+      );
     },
-    [isSwap, hasExistingPosition, existingPosition, isMarketOrder, triggerPriceUsd]
+    [hasExistingPosition, existingPosition, isMarketOrder, triggerPriceUsd]
   );
 
   const renderExistingOrderWarning = useCallback(
     () => {
-      if (isSwap || !existingOrder) {
+      if (!existingOrder) {
         return;
       }
-      const indexToken = getToken(chainId, existingOrder.indexToken);
+      const indexToken = constantInstance.perpetuals.getToken(existingOrder.indexToken);
       const sizeInToken = formatAmount(
         existingOrder.sizeDelta.mul(PRECISION).div(existingOrder.triggerPrice),
         USD_DECIMALS,
@@ -324,43 +352,38 @@ export default function ConfirmationBox(props) {
         true
       );
       return (
-        <div className="Confirmation-box-warning">
-          You have an active Limit Order to Increase {existingOrder.isLong ? 'Long' : 'Short'}{' '}
-          {sizeInToken} {indexToken.symbol} ($
-          {formatAmount(existingOrder.sizeDelta, USD_DECIMALS, 2, true)}) at price $
-          {formatAmount(existingOrder.triggerPrice, USD_DECIMALS, 2, true)}
+        <div className={styles.ConfirmationBoxWarning}>
+          <Tooltip
+            handle="Tips"
+            position="center-bottom"
+            renderContent={() => {
+              return (
+                <>
+                  {renderFeeWarning()}
+                  You have an active Limit Order to Increase {existingOrder.isLong ? 'Long' : 'Short'}{' '}
+                  {sizeInToken} {indexToken.symbol} ($
+                  {formatAmount(existingOrder.sizeDelta, USD_DECIMALS, 2, true)}) at price $
+                  {formatAmount(existingOrder.triggerPrice, USD_DECIMALS, 2, true)}
+                </>
+              );
+            }}
+          />
         </div>
       );
     },
-    [existingOrder, isSwap, chainId]
+    [existingOrder, chainId]
   );
 
   // TODO handle unaprproved order plugin (very unlikely case)
   const renderMain = useCallback(
     () => {
-      if (isSwap) {
-        return (
-          <div className="Confirmation-box-main">
-            <div>
-              Pay&nbsp;{formatAmount(fromAmount, fromToken.decimals, 4, true)} {fromToken.symbol} ($
-              {formatAmount(fromUsdMin, USD_DECIMALS, 2, true)})
-            </div>
-            <div className="Confirmation-box-main-icon" />
-            <div>
-              Receive&nbsp;{formatAmount(toAmount, toToken.decimals, 4, true)} {toToken.symbol} ($
-              {formatAmount(toUsdMax, USD_DECIMALS, 2, true)})
-            </div>
-          </div>
-        );
-      }
-
       return (
-        <div className="Confirmation-box-main">
+        <div className={styles.ConfirmationBoxMain}>
           <span>
             Pay&nbsp;{formatAmount(fromAmount, fromToken.decimals, 4, true)} {fromToken.symbol} ($
             {formatAmount(fromUsdMin, USD_DECIMALS, 2, true)})
           </span>
-          <div className="Confirmation-box-main-icon" />
+          <div className={styles.ConfirmationBoxMainIcon} />
           <div>
             {isLong ? 'Long' : 'Short'}&nbsp;
             {formatAmount(toAmount, toToken.decimals, 4, true)} {toToken.symbol} ($
@@ -369,12 +392,11 @@ export default function ConfirmationBox(props) {
         </div>
       );
     },
-    [isSwap, fromAmount, fromToken, toToken, fromUsdMin, toUsdMax, isLong, toAmount]
+    [fromAmount, fromToken, toToken, fromUsdMin, toUsdMax, isLong, toAmount]
   );
 
-  const SWAP_ORDER_EXECUTION_GAS_FEE = getConstant(chainId, 'SWAP_ORDER_EXECUTION_GAS_FEE');
   const INCREASE_ORDER_EXECUTION_GAS_FEE = getConstant(chainId, 'INCREASE_ORDER_EXECUTION_GAS_FEE');
-  const executionFee = isSwap ? SWAP_ORDER_EXECUTION_GAS_FEE : INCREASE_ORDER_EXECUTION_GAS_FEE;
+  const executionFee = INCREASE_ORDER_EXECUTION_GAS_FEE;
   const renderExecutionFee = useCallback(
     () => {
       if (isMarketOrder) {
@@ -394,37 +416,26 @@ export default function ConfirmationBox(props) {
       let availableLiquidity;
       const riskThresholdBps = 5000;
       let isLiquidityRisk;
-      const token = isSwap || isLong ? toTokenInfo : shortCollateralToken;
+      const token = isLong ? toTokenInfo : shortCollateralToken;
 
       if (!token || !token.poolAmount || !token.availableAmount) {
         return null;
       }
 
-      if (isSwap) {
-        const poolWithoutBuffer = token.poolAmount.sub(token.bufferAmount);
-        availableLiquidity = token.availableAmount.gt(poolWithoutBuffer)
-          ? poolWithoutBuffer
-          : token.availableAmount;
+      if (isShort) {
+        availableLiquidity = token.availableAmount;
+
+        const sizeTokens = toUsdMax.mul(expandDecimals(1, token.decimals)).div(token.minPrice);
+        isLiquidityRisk = availableLiquidity
+          .mul(riskThresholdBps)
+          .div(BASIS_POINTS_DIVISOR)
+          .lt(sizeTokens);
+      } else {
+        availableLiquidity = token.availableAmount;
         isLiquidityRisk = availableLiquidity
           .mul(riskThresholdBps)
           .div(BASIS_POINTS_DIVISOR)
           .lt(toAmount);
-      } else {
-        if (isShort) {
-          availableLiquidity = token.availableAmount;
-
-          const sizeTokens = toUsdMax.mul(expandDecimals(1, token.decimals)).div(token.minPrice);
-          isLiquidityRisk = availableLiquidity
-            .mul(riskThresholdBps)
-            .div(BASIS_POINTS_DIVISOR)
-            .lt(sizeTokens);
-        } else {
-          availableLiquidity = token.availableAmount;
-          isLiquidityRisk = availableLiquidity
-            .mul(riskThresholdBps)
-            .div(BASIS_POINTS_DIVISOR)
-            .lt(toAmount);
-        }
       }
 
       if (!availableLiquidity) {
@@ -451,40 +462,40 @@ export default function ConfirmationBox(props) {
         </ExchangeInfoRow>
       );
     },
-    [toTokenInfo, shortCollateralToken, isShort, isLong, isSwap, toAmount, toUsdMax]
+    [toTokenInfo, shortCollateralToken, isShort, isLong, toAmount, toUsdMax]
   );
 
   const renderMarginSection = useCallback(
     () => {
       return (
         <>
-          <div className="Confirmation-box-info">
+          <div className={styles.ConfirmationBoxInfo}>
             {renderMain()}
-            {renderFeeWarning()}
+            {/* {renderFeeWarning()} */}
             {renderMinProfitWarning()}
             {renderExistingOrderWarning()}
             {hasPendingProfit && isMarketOrder && (
-              <div className="PositionEditor-accept-profit-warning">
+              <div className={styles.PositionEditor}>
                 <Checkbox
                   isChecked={isProfitWarningAccepted}
                   setIsChecked={setIsProfitWarningAccepted}
                 >
-                  <span className="muted">Forfeit profit</span>
+                  <span className={styles.muted}>Forfeit profit</span>
                 </Checkbox>
               </div>
             )}
-            {orderOption === LIMIT && renderAvailableLiquidity()}
+            {type === LIMIT && renderAvailableLiquidity()}
             {isShort && (
-              <ExchangeInfoRow label="Profits In">
-                {getToken(chainId, shortCollateralAddress).symbol}
+              <ExchangeInfoRow isImportant={true} label="Profits In">
+                {constantInstance.perpetuals.getToken(shortCollateralAddress).symbol}
               </ExchangeInfoRow>
             )}
-            {isLong && <ExchangeInfoRow label="Profits In" value={toTokenInfo.symbol} />}
+            {isLong && <ExchangeInfoRow isImportant={true} label="Profits In" value={shortCollateralToken.symbol} />}
             <ExchangeInfoRow label="Leverage">
               {hasExistingPosition && toAmount && toAmount.gt(0) && (
-                <div className="inline-block muted">
+                <div className={styles.inlineBlock}>
                   {formatAmount(existingPosition.leverage, 4, 2)}x
-                  <BsArrowRight className="transition-arrow" />
+                  <BsArrowRight className={styles.transitionArrow} />
                 </div>
               )}
               {toAmount && leverage && leverage.gt(0) && `${formatAmount(leverage, 4, 2)}x`}
@@ -493,9 +504,9 @@ export default function ConfirmationBox(props) {
             </ExchangeInfoRow>
             <ExchangeInfoRow label="Liq. Price">
               {hasExistingPosition && toAmount && toAmount.gt(0) && (
-                <div className="inline-block muted">
+                <div className={styles.inlineBlock}>
                   ${formatAmount(existingLiquidationPrice, USD_DECIMALS, 2, true)}
-                  <BsArrowRight className="transition-arrow" />
+                  <BsArrowRight className={styles.transitionArrow} />
                 </div>
               )}
               {toAmount &&
@@ -534,9 +545,9 @@ export default function ConfirmationBox(props) {
             {isMarketOrder && (
               <ExchangeInfoRow label="Entry Price">
                 {hasExistingPosition && toAmount && toAmount.gt(0) && (
-                  <div className="inline-block muted">
+                  <div className={styles.inlineBlock}>
                     ${formatAmount(existingPosition.averagePrice, USD_DECIMALS, 2, true)}
-                    <BsArrowRight className="transition-arrow" />
+                    <BsArrowRight trclassName={styles.transitionArrow} />
                   </div>
                 )}
                 {nextAveragePrice && `$${formatAmount(nextAveragePrice, USD_DECIMALS, 2, true)}`}
@@ -589,100 +600,20 @@ export default function ConfirmationBox(props) {
       hasPendingProfit,
       isProfitWarningAccepted,
       renderAvailableLiquidity,
-      orderOption,
+      type,
       fromUsdMin,
       collateralAfterFees,
     ]
   );
 
-  const renderSwapSection = useCallback(
-    () => {
-      return (
-        <>
-          <div className="Confirmation-box-info">
-            {renderMain()}
-            {renderFeeWarning()}
-            {renderSpreadWarning()}
-            {orderOption === LIMIT && renderAvailableLiquidity()}
-            <ExchangeInfoRow label="Min. Receive">
-              {formatAmount(minOut, toTokenInfo.decimals, 4, true)} {toTokenInfo.symbol}
-            </ExchangeInfoRow>
-            <ExchangeInfoRow label="Price">
-              {getExchangeRateDisplay(
-                getExchangeRate(fromTokenInfo, toTokenInfo),
-                fromTokenInfo,
-                toTokenInfo
-              )}
-            </ExchangeInfoRow>
-            {!isMarketOrder && (
-              <div className="Exchange-info-row">
-                <div className="Exchange-info-label">Limit Price</div>
-                <div className="align-right">
-                  {getExchangeRateDisplay(triggerRatio, fromTokenInfo, toTokenInfo)}
-                </div>
-              </div>
-            )}
-            {showSpread && (
-              <ExchangeInfoRow label="Spread" isWarning={spread.isHigh}>
-                {formatAmount(spread.value.mul(100), USD_DECIMALS, 2, true)}%
-              </ExchangeInfoRow>
-            )}
-            <div className="Exchange-info-row">
-              <div className="Exchange-info-label">Fees</div>
-              <div className="align-right">
-                {formatAmount(feeBps, 2, 2, true)}% (
-                {formatAmount(fees, fromTokenInfo.decimals, 4, true)} {fromTokenInfo.symbol}: $
-                {formatAmount(feesUsd, USD_DECIMALS, 2, true)})
-              </div>
-            </div>
-            {renderExecutionFee()}
-            {fromTokenUsd && (
-              <div className="Exchange-info-row">
-                <div className="Exchange-info-label">{fromTokenInfo.symbol} Price</div>
-                <div className="align-right">{fromTokenUsd} USD</div>
-              </div>
-            )}
-            {toTokenUsd && (
-              <div className="Exchange-info-row">
-                <div className="Exchange-info-label">{toTokenInfo.symbol} Price</div>
-                <div className="align-right">{toTokenUsd} USD</div>
-              </div>
-            )}
-          </div>
-        </>
-      );
-    },
-    [
-      renderMain,
-      renderSpreadWarning,
-      fromTokenInfo,
-      toTokenInfo,
-      orderOption,
-      showSpread,
-      spread,
-      feesUsd,
-      feeBps,
-      renderExecutionFee,
-      fromTokenUsd,
-      toTokenUsd,
-      triggerRatio,
-      fees,
-      isMarketOrder,
-      minOut,
-      renderFeeWarning,
-      renderAvailableLiquidity,
-    ]
-  );
-
   return (
-    <div className="Confirmation-box">
+    <div className={styles.ConfirmationBox}>
       <Modal isVisible={true} setIsVisible={() => setIsConfirming(false)} label={title}>
-        {isSwap && renderSwapSection()}
-        {!isSwap && renderMarginSection()}
-        <div className="Confirmation-box-row">
+        {renderMarginSection()}
+        <div className={styles.ConfirmationBoxRow}>
           <button
             onClick={onConfirmationClick}
-            className="App-cta Confirmation-box-button"
+            className={styles.ConfirmationBoxButton}
             disabled={!isPrimaryEnabled()}
           >
             {getPrimaryText()}

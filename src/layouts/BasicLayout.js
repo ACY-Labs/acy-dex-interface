@@ -118,6 +118,12 @@ const  BasicLayout =props=> {
     if(pathname.indexOf('/perpetual')>-1){
       setBgColor('launchpadRadialBg');
     }
+    if(pathname.indexOf('/stablecoin')>-1){
+      setBgColor('stableCoinRadialBg');
+    }
+    if(pathname.indexOf('/stats')>-1){
+      setBgColor('statsRadialBg');
+    }
   })
   // componentDidUpdate(preProps) {
   //   // After changing to phone mode,

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, connect } from 'umi';
 import { Spin, Tag, Menu, Icon, Dropdown, Button, Space, Modal, message } from 'antd';
+
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
 import { Link } from 'react-router-dom';
@@ -27,12 +28,15 @@ import {
   nabox,
 } from '@/connectors';
 import {
-  DownOutlined
+  DownOutlined,
+  DisconnectOutlined,
+  CheckCircleTwoTone
 } from '@ant-design/icons';
 
 import styles from './index.less';
 import { ReactComponent as Opera } from './Opera.svg';
 import styled from "styled-components";
+import { disconnect } from 'echarts';
 
 
 const GlobalHeaderRight = props => {
@@ -47,6 +51,9 @@ const GlobalHeaderRight = props => {
   const { account, chainId, activate, deactivate, active } = useWeb3React();
 
   const [wallet, setWallet] = useState(localStorage.getItem("wallet"));
+
+  const [selectedNetwork, setSelectedNetwork] = useState("BSC");
+  const [supportedWallets, setSupportWallets] = useState([]);
 
   // 连接钱包 根据localStorage
   useEffect(() => {
@@ -67,6 +74,30 @@ const GlobalHeaderRight = props => {
 
   // 判断设备
   const [userSystem, setuserSystem] = useState("other");
+  const [broswer, setBroswer] = useState();
+
+  function getBroswer() {
+    var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
+    var isOpera = userAgent.indexOf("Opera") > -1;
+    if (isOpera || userAgent.indexOf("OPR") > -1) {
+      console.log(userAgent, 'ymj')
+      return "Opera"
+    }; //判断是否Opera浏览器
+    if (userAgent.indexOf("Firefox") > -1) {
+      return "FF";
+    } //判断是否Firefox浏览器
+    if (userAgent.indexOf("Chrome") > -1) {
+      console.log(userAgent, 'ymj')
+      return "Chrome";
+    }
+    if (userAgent.indexOf("Safari") > -1) {
+      return "Safari";
+    } //判断是否Safari浏览器
+    if (userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1 && !isOpera) {
+      return "IE";
+    }; //判断是否IE浏览器
+
+  }
 
   useEffect(() => {
     function fIsMobile() {
@@ -82,13 +113,15 @@ const GlobalHeaderRight = props => {
     } else if (isiOS) {
       setuserSystem("isiOS");
     } else setuserSystem("other");
+    var b = getBroswer();
+    setBroswer(b);
   }, [])
 
   useEffect(() => {
-    if (account){
+    if (account) {
       localStorage.setItem("login_status", "on");
     }
-    else{
+    else {
       //localStorage.setItem("login_status", "off");
       setNetworkListIndex(0)
     }
@@ -144,6 +177,7 @@ const GlobalHeaderRight = props => {
   const onhandMetaMask = () => {
     setVisibleMetaMask(true);
     setNetworkListIndex(n_index(chainId));
+    console.log(broswer, 'ymj')
   };
   const onhandCancelMetaMask = () => {
     setVisibleMetaMask(false);
@@ -161,21 +195,39 @@ const GlobalHeaderRight = props => {
 
   // 选择钱包
   const selectWallet = walletName => {
-    if (walletName!=localStorage.getItem("wallet"))
+    if (walletName != localStorage.getItem("wallet"))
       localStorage.setItem("login_status", "off");
     console.log('selecting wallet', walletName);
-    if (walletName === 'metamask' || walletName === 'opera') {
+    if (walletName === 'metamask') {
       try {
         ethereum;
         activate(injected);
       } catch (error) {
         message.info('No provider was found');
-        if(account){
+        if (account) {
           localStorage.setItem("login_status", "on");
         }
         return
       }
-    } else if (walletName === 'walletconnect') {
+    } else if (walletName === 'bitkeep') {
+      try {
+        ethereum;
+        activate(injected);
+        if (!window.isBitKeep) {
+          message.info('Wrong wallet, please make sure other wallet extensions has been closed');
+        }
+      } catch (error) {
+        message.info('No provider was found');
+        if (account) {
+          localStorage.setItem("login_status", "on");
+        }
+        return
+      }
+    }
+    else if (walletName === 'opera') {
+      activate(injected);
+    }
+    else if (walletName === 'walletconnect') {
       activate(walletconnect);
     } else if (walletName === 'coinbase') {
       activate(walletlink);
@@ -195,7 +247,7 @@ const GlobalHeaderRight = props => {
         activate(binance);
       } catch (error) {
         message.info('No provider was found');
-        if(account){
+        if (account) {
           localStorage.setItem("login_status", "on");
         }
         return
@@ -206,7 +258,7 @@ const GlobalHeaderRight = props => {
         activate(nabox);
       } catch (error) {
         message.info('No provider was found');
-        if(account){
+        if (account) {
           localStorage.setItem("login_status", "on");
         }
         return
@@ -225,10 +277,10 @@ const GlobalHeaderRight = props => {
     if (chainId == 137 || chainId == 80001) {
       return 3
     }
-    if (chainId == 42161) {
+    if (chainId == 1) {
       return 4
     }
-    if (chainId == undefined){
+    if (chainId == undefined) {
       return 0
     }
     return 1
@@ -265,7 +317,7 @@ const GlobalHeaderRight = props => {
     }
     checkChainNetwork(chainId);
     // 监听钱包网络变化 metamask
-    if (localStorage.getItem("wallet") == "metamask") {
+    if (localStorage.getItem("wallet") == "metamask" || localStorage.getItem("wallet") == "bitkeep") {
       try {
         ethereum.on('networkChanged', function (chainId) {
           checkChainNetwork(chainId);
@@ -352,6 +404,54 @@ const GlobalHeaderRight = props => {
       },
     },
   ];
+  const OperaWallet = [
+    {
+      name: 'Opera',
+      icon: 'Opera',
+      svgicon: true,
+      onClick: () => {
+        selectWallet('opera');
+      },
+    },
+  ]
+  const walletListAllSupported = [
+    {
+      name: 'MetaMask',
+      icon: 'Metamask',
+      onClick: () => {
+        selectWallet('metamask');
+      },
+    },
+    {
+      name: 'Nabox Wallet',
+      icon: 'Nabox',
+      onClick: () => {
+        selectWallet('nabox');
+      },
+    },
+    {
+      name: 'Bitkeep Wallet',
+      icon: 'Bitkeep',
+      onClick: () => {
+        selectWallet('bitkeep');
+      },
+    },
+    {
+      name: 'WalletConnect',
+      icon: 'WalletConnect',
+      onClick: () => {
+        selectWallet('walletconnect');
+      },
+    },
+    {
+      name: 'TrustWallet',
+      icon: 'TrustWallet',
+      onClick: () => {
+        selectWallet('walletconnect');
+      },
+    },
+
+  ]
 
   const walletList = [
     {
@@ -366,6 +466,13 @@ const GlobalHeaderRight = props => {
       icon: 'Nabox',
       onClick: () => {
         selectWallet('nabox');
+      },
+    },
+    {
+      name: 'Bitkeep Wallet',
+      icon: 'Bitkeep',
+      onClick: () => {
+        selectWallet('bitkeep');
       },
     },
     {
@@ -426,6 +533,54 @@ const GlobalHeaderRight = props => {
       },
     },
   ];
+  const supportedWalletEth = [
+    {
+      name: 'Binance Wallet',
+      icon: 'Binance',
+      onClick: () => {
+        selectWallet('binance');
+      },
+    },
+    {
+      name: 'Coinbase Wallet',
+      icon: 'Coinbase',
+      onClick: () => {
+        selectWallet('coinbase');
+      },
+    },
+    {
+      name: 'Portis',
+      icon: 'Portis',
+      onClick: () => {
+        selectWallet('portis');
+      },
+    },
+    {
+      name: 'Torus',
+      icon: 'Torus',
+      onClick: () => {
+        selectWallet('torus');
+      },
+    },
+  ]
+  const supportedWalletBsc = [
+    {
+      name: 'Binance Wallet',
+      icon: 'Binance',
+      onClick: () => {
+        selectWallet('binance');
+      },
+    },
+  ]
+  const supportedWalletPolygon = [
+    {
+      name: 'Torus',
+      icon: 'Torus',
+      onClick: () => {
+        selectWallet('torus');
+      },
+    },
+  ]
 
   const networkParams = {
     "0x38": {
@@ -538,6 +693,15 @@ const GlobalHeaderRight = props => {
         }
       }
     }
+    if (chainId == 1) {
+      setSelectedNetwork('ETH');
+    }
+    else if (chainId == 56) {
+      setSelectedNetwork('BNBChain');
+    }
+    else if (chainId == 137) {
+      setSelectedNetwork('Polygon');
+    }
   }
   const showMore = () => {
     setOnly(!only);
@@ -557,6 +721,9 @@ const GlobalHeaderRight = props => {
       onClick: async () => {
         setVisibleMetaMask(false);
       },
+      onClick_showSupportedWallet: async () => {
+
+      },
     },
     {
       name: 'Wrong Network',
@@ -564,13 +731,20 @@ const GlobalHeaderRight = props => {
       onClick: async () => {
         setVisibleMetaMask(false);
       },
+      onClick_showSupportedWallet: async () => {
+
+      },
     },
     {
-      name: 'BSC',
+      name: 'BNB Chain',
       icon: 'Binance',
       onClick: async () => {
         await switchEthereumChain("0x38");
         setVisibleMetaMask(false);
+      },
+      onClick_showSupportedWallet: async () => {
+        setSelectedNetwork('BNB Chain');
+        setSupportWallets(supportedWalletBsc);
       },
     },
     {
@@ -580,15 +754,31 @@ const GlobalHeaderRight = props => {
         await switchEthereumChain("0x89");
         setVisibleMetaMask(false);
       },
-    },
-    {
-      name: 'Arbitrum',
-      icon: 'Arbitrum',
-      onClick: async () => {
-        await switchEthereumChain("0xA4B1");
-        setVisibleMetaMask(false);
+      onClick_showSupportedWallet: async () => {
+        setSelectedNetwork('Polygon');
+        setSupportWallets(supportedWalletPolygon);
       },
     },
+    {
+      name: 'Ethereum',
+      icon: 'Eth',
+      onClick: async () => {
+        await switchEthereumChain("0x1");
+        setVisibleMetaMask(false);
+      },
+      onClick_showSupportedWallet: async () => {
+        setSelectedNetwork('Ethereum');
+        setSupportWallets(supportedWalletEth);
+      },
+    },
+    // {
+    //   name: 'Arbitrum',
+    //   icon: 'Arbitrum',
+    //   onClick: async () => {
+    //     await switchEthereumChain("0xA4B1");
+    //     setVisibleMetaMask(false);
+    //   },
+    // },
   ];
   const networkListInCardList = (
     <div className={styles.networkListBlock}>
@@ -699,46 +889,45 @@ const GlobalHeaderRight = props => {
       )}
 
 
-
-      <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}>
-
-        {/* <div className={styles.walltitle}>
-          <span style={{ marginLeft: '10px' }}>Select Network</span>
-        </div>
-        <Dropdown
-          overlay={networkListInCardList}
-          trigger={['click']}
-          placement="bottomLeft"
-        >
-          <AcyCardList>
-            {[networkList[networkListIndex]].map(item => (
-              <AcyCardList.Thin className={styles.networkListLayout}>
-                {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
-                  <AcyIcon.MyIcon width={32} type={item.icon} />
-                )}
-                <span>{item.name}</span>
-              </AcyCardList.Thin>
-            ))}
+      {!account && <div>
+        <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}
+          bodyStyle={{
+            padding: '21px',
+            background: 'black',
+            // backgroundColor: '#1b1b1c',
+            borderRadius: ' 20px',
+            // boxShadow: '0 0 14px #2d2d2d'
+            border: '0.75px solid #333333',
+          }}>
+          <div className={styles.networkTitle}>
+            <span>Select a Network</span>
+          </div>
+          {/*ymj*/}
+          <AcyCardList grid={true}>
+            {networkList.slice(2,).map((item) => {
+              return (
+                <AcyCardList.Thin className={selectedNetwork == item.name ? styles.networkListLayout_selected : styles.networkListLayout} onClick={() => {
+                  item.onClick_showSupportedWallet()
+                }}>
+                  {
+                    <AcyIcon.MyIcon width={20} type={item.icon} />
+                  } 
+                  <span>{item.name}</span>
+                  {selectedNetwork == item.name &&
+                    <span className={styles.networkListLayout_selectedCheck}>
+                      <CheckCircleTwoTone />
+                    </span>}
+                </AcyCardList.Thin>
+              );
+            }
+            )}
           </AcyCardList>
-        </Dropdown> */}
+          <div className={styles.walltitle}>
+            <span style={{ marginLeft: '10px' }}>Select a Wallet</span>
+          </div>
 
 
-        <div className={styles.walltitle}>
-          {/* <AcyIcon.MyIcon width={20} type="Wallet" />{' '} */}
-          <span style={{ marginLeft: '10px' }}>Select a Wallet</span>
-          {/* <AcyIcon onClick={this.onhandCancel} name="close" /> */}
-        </div>
-        {/* <AcyCardList style={{ marginTop: '10px' }}>
-          <AcyCardList.Agree>
-            By connecting a wallet, you agree to ACY{' '}
-            <a target="_blank" href="https://acy.finance/terms-of-use">
-              Terms of Service
-            </a>{' '}
-            .
-          </AcyCardList.Agree>
-        </AcyCardList> */}
-
-        <AcyCardList>
+          {/* <AcyCardList>
           {MetaMask.map(item => (
             <AcyCardList.Thin onClick={() => item.onClick()}>
               {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
@@ -755,62 +944,61 @@ const GlobalHeaderRight = props => {
               <span className={styles.fontBold}>{item.name}</span>
             </AcyCardList.Thin>
           ))}
-        </AcyCardList>
+        </AcyCardList> */}
 
-        <AcyCardList>
+          <AcyCardList grid={true}>
+            { /*ymj */}
+            {broswer === 'Opera' && OperaWallet.map((item, index) => {
 
-          {walletList.map((item, index) => {
-            if (only && index > -1) {
-              return;
-            } else {
               return (
-                <AcyCardList.Thin onClick={() => item.onClick()}>
+                <AcyCardList.Thin className={styles.walletList} onClick={() => item.onClick()}>
                   {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
                     <AcyIcon.MyIcon width={32} type={item.icon} />
                   )}
                   <span className={styles.fontBold}>{item.name}</span>
                 </AcyCardList.Thin>
               );
-            }
-          })}
-        </AcyCardList>
-        {only && (
-          <p className={styles.showmore} onClick={showMore}>
-            See More...
-          </p>
-        )}
-        {/* {account && (
-          <AcyCardList>
-            <div
-              style={{
-                background: '#29292c',
-                width: '100%',
-                marginTop: 10,
-                borderRadius: 10,
-                padding: 10,
-              }}
-            >
-              <Link to={`/market/accounts/${account}`} style={{ color: '#eb5c20' }}>
-                See My Account
-              </Link>
-              <div style={{ marginTop: 5 }}>
-                <div className={styles.descLine}>
-                  <div style={{fontWeight: "bold"}}>My Liquidity</div>
-                  <div>$999.99</div>
-                </div>
-                <div className={styles.descLine}>
-                  <div style={{fontWeight: "bold"}}>My Volume</div>
-                  <div>$999.99</div>
-                </div>
-                <div className={styles.descLine}>
-                  <div style={{fontWeight: "bold"}}>My Farms</div>
-                  <div>$999.99</div>
-                </div>
-              </div>
-            </div>
+
+            })}
+
+            {walletListAllSupported.map((item, index) => {
+
+              return (
+                <AcyCardList.Thin className={styles.walletList} onClick={() => item.onClick()}>
+                  {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
+                    <AcyIcon.MyIcon width={32} type={item.icon} />
+                  )}
+                  <span className={styles.fontBold}>{item.name}</span>
+                </AcyCardList.Thin>
+              );
+
+            })}
+            {supportedWallets.map((item, index) => {
+
+              return (
+                <AcyCardList.Thin className={styles.walletList} onClick={() => item.onClick()}>
+                  {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
+                    <AcyIcon.MyIcon width={32} type={item.icon} />
+                  )}
+                  <span className={styles.fontBold}>{item.name}</span>
+                </AcyCardList.Thin>
+              );
+
+            })}
           </AcyCardList>
-        )} */}
-      </AcyModal>
+        </AcyModal>
+      </div>}
+      {account && <div>
+        <AcyModal width={200} height={100} visible={visibleMetaMask} onCancel={onhandCancel}
+          bodyStyle={{
+            padding: '21px',
+            background: '#2e3032',
+            borderRadius: ' 20px',
+          }}>
+          <div type="primary" shape="round" className={styles.disconnectBtn} onClick={deactivateTest}><DisconnectOutlined /> Disconnect</div>
+        </AcyModal>
+      </div>}
+
       {/* 错误弹窗*/}
       <AcyModal width={420} visible={isModalVisible}>
         <p>ERROR: UNSUPPORT NETWORKS</p>

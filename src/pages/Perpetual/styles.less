@@ -1,17 +1,19 @@
 .main {
     // width: 90%;
     // max-width: 1000px;
-    margin: auto;
+    margin: 0;
     z-index: 0;
-    color: #b5b6b6;
-    margin-bottom: 20px;
+    color: #b6b5b5;
+    // margin-bottom: 20px;
     font-weight: 400;
     display: flex;
     position: relative;
+    font-family: "Karla", sans-serif;
   }
   
   .rowFlexContainer {
     width: 100%;
+    margin-right: 0px;
     flex-wrap: wrap;
     justify-content: space-between;
     position : relative;
@@ -27,15 +29,20 @@
   }
   
   @media screen and (min-width: 1024px) {
+    .main {
+      // min-width: 100px;
+      width:100%;
+    }
     .rowFlexContainer {
-      // width: 30%;
-      min-width: 310px;
+      width: 100%;
+
       flex-wrap: nowrap;
     }
     .kChart {
       order: 1;
       flex: 2;
       height: 65%;
+      width: 50%;
       // bottom: 0.5rem;
       // left: 0;
       // right: 0;
@@ -51,7 +58,7 @@
     }
     .perpetualComponent {
       width: 600px;
-      margin-left: 20px;
+      margin-left: 0px;
       // order: 2;
       // flex: 1;
     }
@@ -68,6 +75,7 @@
     }
     .kChart {
       order: 1;
+      width: 50%;
     }
     .priceChart {
       order: 2;
@@ -82,32 +90,132 @@
     position : relative;
   }
   .maintitle {
+    width: 100%;
     display: flex;
     align-items: center;
-    font-size: 1.5rem;
+    font-size: 0.9rem;
     font-weight: 400;
-    margin-bottom: 11px;
+    margin-bottom: 2px;
+    margin-left: 0rem;    
+    margin-right: 0rem;
     color: #929298;
   }
   .lighttitle {
     color: #b5b5b6;
+    margin-right: 2rem;
+    font-family: "Karla", sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #b5b5b6;
     &:hover {
-      filter: brightness(1.5);
+      filter: brightness(1.3);
     }
   }
   .secondarytitle {
-    font-size: 1.2rem;
-    font-weight: 400;
-    color: #929298;
+    margin-right: 2rem;
+    font-size: 0.9rem;
+    font-family: "Karla", sans-serif;
+    // font-weight: 400;
+    color: #b5b5b6;
     .lighttitle {
-      font-size: 1.3rem;
-      font-weight: 500;
-      color: white;
+      color: #b5b5b6;
+
     }
     .percentage {
       margin: 0 30px;
     }
   }
+  .dropDownMenu{
+    :global {
+      font-family: "Karla", sans-serif;
+      background-color: #0e0304 !important;
+      text-align: center;
+    }
+  }
+
+  .optionItem{
+    background-color: #0e0304 !important;
+    font-family: "Karla", sans-serif;
+    font-size: 13px;
+    font-weight: 100;
+    height: 24px;
+    &:hover {
+      filter: brightness(1.5);
+      background-color: #333333;
+    }
+    // &:hover {
+    //   background: #232323;
+    // }
+  }
+
+  .tokenSelector {
+    :global {
+      margin-left: 1.5rem;
+      font-family: "Karla", sans-serif;
+      .ant-select-arrow {
+        color: #fff;
+      }
+      .ant-select-selection {
+        box-shadow: none;
+        background-color: transparent !important;
+        border: 0.5px solid #333333;
+        border-radius: 5px;
+        height: 2.4rem;
+        width: 100%;
+        padding: 3px 6px;
+        font-size: 1.5rem;
+        font-family: "Karla", sans-serif;
+        font-weight: 200;
+        color: white;
+        overflow: inherit;
+        margin-right: 0px;
+        margin-bottom: 5px;
+      }
+      .ant-select-dropdown-menu,
+      .ant-select-dropdown-menu-root,
+      .ant-select-dropdown-menu-vertical{
+        max-height: none !important;
+      }
+      .ant-select-dropdown-menu-item-active:not(.ant-select-dropdown-menu-item-disabled) {
+        background-color: transparent !important;
+        border-color: transparent;
+      }
+    }
+  }
+  // .chartHeader {
+  //   display: grid;
+  //   grid-template-columns: auto auto auto auto auto 0;
+  //   grid-column-gap: 3rem;
+  //   align-items: center;
+  //   padding-left: 0rem;
+  //   padding-right: 0rem;
+  //   // border: 0.75px solid #232323;
+  //   height: 5rem;
+  // }
+  .chartTokenSelectorTab {
+    // border: 0.75px solid #444444;
+    height: 45px;
+    // text-align: center;
+    margin-bottom: 0px;
+    // position: relative;
+    font-size: 5px;
+  }
+  .timeSelector {
+    // border-top: 0.75px solid #333333;
+    // border-bottom: 0.75px solid #333333;
+    height: 22px;
+    align-items: center;
+    margin-bottom: -25px;
+    // position: relative;
+    font-size: 11px;
+    // transform: trans lateY(-50%);
+    // padding-left: 0rem;
+    // padding-right: 0rem;
+    // border: 0.75px solid #333333;
+    // height: 5rem;
+  
+  }
+
   .smalltitle {
     font-size: 14px;
     font-weight: 400;
@@ -208,9 +316,10 @@
   }
   
   @media (max-width: 768px) {
-    // .main {
-    //   padding: 0 40px;
-    // }
+    .main {
+      width:100%;
+      padding: 0 40px;
+    }
     .exchangeBottomWrapper{
       width: 100%;
       padding: 0 40px;
@@ -416,3 +525,6 @@
     
   }
   
+.kchartBox{
+  transform: translate(0, 4%);
+}

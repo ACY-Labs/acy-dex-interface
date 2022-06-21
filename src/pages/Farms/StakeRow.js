@@ -1,21 +1,11 @@
-import React, { forwardRef, useState, useEffect, useRef} from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from '@/pages/Farms/Farms.less';
-import { isMobile } from 'react-device-detect';
-import { harvestAll, harvest, withdraw } from '@/acy-dex-swap/core/farms';
-import { getUserTokenBalanceWithAddress} from '@/acy-dex-swap/utils';
-import StakeModal from './StakeModal';
-import { addLiquidity } from '@/acy-dex-swap/core/addLiquidity';
-import { AcyActionModal, AcyModal, AcyButton, AcyBarChart } from '@/components/Acy';
-import AddLiquidityComponent from '@/components/AddComponent';
-import { Modal, Icon, Divider } from 'antd';
-import { connect } from 'umi';
-import moment from 'moment';
+import { harvestAll, harvest} from '@/acy-dex-swap/core/farms';
+import { AcyActionModal } from '@/components/Acy';
+import { Icon } from 'antd';
 import classNames from 'classnames';
-import { getPool, getPoolAccmulateReward} from '@/acy-dex-swap/core/farms';
-import axios from 'axios';
-import {TOKENLIST, API_URL } from "@/constants";
-// const supportedTokens = TOKENLIST();
+import {TOKENLIST } from "@/constants";
+import WithdrawModal from "./WithdrawModal";
 
 
 const AutoResizingInput = ({ value: inputValue, onChange: setInputValue }) => {
@@ -60,15 +50,17 @@ const StakeRow = props => {
     token1Logo,
     token2,
     token2Logo,
-    refreshPoolInfo
+    refreshPoolInfo,
+    ratio,
+    token1Ratio,
+    token2Ratio
   } = props;
 
   const [isHarvestDisabled, setIsHarvestDisabled] = useState(false);
-  const [withdrawModal,setWithdrawModal] = useState(false);
+  const [withdrawModalShow,setWithdrawModalShow] = useState(false);
   const [withdrawButtonText,setWithdrawButtonText] = useState('Withdraw');
   const [withdrawButtonStatus,setWithdrawButtonStatus] = useState(true);
-  const hideWithdrawModal = () => setWithdrawModal(false);
-  const showWithdrawModal = () => setWithdrawModal(true);
+  const hideWithdrawModal = () => setWithdrawModalShow(false);
 
   const [harvestModal,setHarvestModal] = useState(false);
   const [harvestButtonText, setHarvestButtonText] = useState('Harvest');
@@ -80,7 +72,6 @@ const StakeRow = props => {
   const [withdrawAmount, setWithdrawAmount] = useState(0);
   const [percent,setPercent] = useState(50);
 
-  const ACY_LOGO = "https://acy.finance/static/media/logo.78c0179c.svg";
 
   //function to get logo URI
   function getLogoURIWithSymbol(symbol) {
@@ -90,25 +81,9 @@ const StakeRow = props => {
         return supportedTokens[j].logoURI;
       }
     }
-    return 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg';
+    return 'https://storageapi2.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg';
   }
 
-  // useEffect(
-  //   () => {
-  //     setErrorMessages('');
-  //     setWithdrawButtonText('Withdraw');
-  //     setHarvestButtonStatus(true);
-  //   },[withdrawModal]
-  // );
-  // useEffect(
-  //   () => {
-  //     setErrorMessages('');
-  //     setHarvestButtonText('Harvest');
-  //     setHarvestButtonStatus(true);
-  //   },[harvestModal]
-  // );
-  
-  
   const withdrawClicked = () => {
     if(false) {
       setErrorMessages("- You can't withdraw now");
@@ -125,55 +100,16 @@ const StakeRow = props => {
   };
 
   const harvestCallback = status => {
-    // const transactions = props.transaction.transactions;
-    // const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
-    // trigger loading spin on top right
-    // if (isCurrentTransactionDispatched == 0) {
-    //   dispatch({
-    //     type: "transaction/addTransaction",
-    //     payload: {
-    //       transactions: [...transactions, { hash: status.hash }]
-    //     }
-    //   })
-    // }
-
-    const checkStatusAndFinish = async () => {
+   const checkStatusAndFinish = async () => {
       await library.getTransactionReceipt(status.hash).then(async receipt => {
 
         if (!receipt) {
           setTimeout(checkStatusAndFinish, 500);
         } else {
-          // let transactionTime;
-          // await library.getBlock(receipt.logs[0].blockNumber).then(res => {
-          //   transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
-          // });
-
-          // await axios.get(
-          //   // fetch valid pool list from remote
-          //   `${API_URL}/farm/updatePool?poolId=${poolId}`
-          // ).then( async (res) => {
-            
-          //   console.log("update pool on server return: ", res);
-          // }).catch(e => console.log("error: ", e));
-
           await refreshPoolInfo();
           setHarvestButtonText("Harvest");
           setHarvestButtonStatus(true);
           hideHarvestModal();
-          // clear top right loading spin
-          // const newData = transactions.filter(item => item.hash != status.hash);
-          // dispatch({
-          //   type: "transaction/addTransaction",
-          //   payload: {
-          //     transactions: [
-          //       ...newData,
-          //       { hash: status.hash, transactionTime }
-          //     ]
-          //   }
-          // });
-          // disable button after each transaction on default, enable it after re-entering amount to add
-          
-          
         }
       })
     };
@@ -181,55 +117,16 @@ const StakeRow = props => {
   }
 
   const withdrawCallback = status => {
-    // const transactions = props.transaction.transactions;
-    // const isCurrentTransactionDispatched = transactions.filter(item => item.hash == status.hash).length;
-    //trigger loading spin on top right
-    // if (isCurrentTransactionDispatched == 0) {
-    //   dispatch({
-    //     type: "transaction/addTransaction",
-    //     payload: {
-    //       transactions: [...transactions, { hash: status.hash }]
-    //     }
-    //   })
-    // }
-
     const checkStatusAndFinish = async () => {
       await library.getTransactionReceipt(status.hash).then(async receipt => {
 
         if (!receipt) {
           setTimeout(checkStatusAndFinish, 500);
         } else {
-          // let transactionTime;
-          // await library.getBlock(receipt.logs[0].blockNumber).then(res => {
-          //   transactionTime = moment(parseInt(res.timestamp * 1000)).format("YYYY-MM-DD HH:mm:ss");
-          // });
-          //refresh talbe
-          // clear top right loading spin
-          // const newData = transactions.filter(item => item.hash != status.hash);
-          // dispatch({
-          //   type: "transaction/addTransaction",
-          //   payload: {
-          //     transactions: [
-          //       ...newData,
-          //       { hash: status.hash, transactionTime }
-          //     ]
-          //   }
-          // });
-          // await axios.get(
-          //   // fetch valid pool list from remote
-          //   `${API_URL}/farm/updatePool?poolId=${poolId}`
-          // ).then( async (res) => {
-            
-          //   console.log("update pool on server return: ", res);
-          // }).catch(e => console.log("error: ", e));
-
           await refreshPoolInfo();
           setWithdrawButtonText("Withdraw");
           setWithdrawButtonStatus(false);
-          hideWithdrawModal();
-          // disable button after each transaction on default, enable it after re-entering amount to add
-          
-      
+          hideWithdrawModal();      
         }
       })
     };
@@ -253,35 +150,6 @@ const StakeRow = props => {
     <div>
       <div className={styles.tableBodyDrawerContainer} >
         {children}
-        {/* <div className={styles.tableBodyDrawerWithdrawContainer}>
-        <div className={styles.tableBodyDrawerWithdrawContent}>
-            <div className={styles.tableBodyDrawerWithdrawDaysDateContainer}>
-              <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
-                Remaining
-              </div> */}
-              {/* <div className={styles.tableBodyDrawerWithdrawDateContainer}>
-                Expired Date
-              </div> */}
-            {/* </div>
-          </div>
-          <div className={styles.tableBodyDrawerWithdrawContent}>
-            <div className={styles.tableBodyDrawerWithdrawDaysDateContainer}>
-              <div className={styles.tableBodyDrawerWithdrawDaysContainer}>
-                {data.remaining}
-              </div>
-            </div>
-            
-            <button
-              type="button"
-              className={styles.tableBodyDrawerWithdrawButton}
-              onClick={() =>{
-                setWithdrawModal(true);
-              }}
-            >
-              {withdrawButtonText}
-            </button>
-          </div>
-        </div> */}
         <div className={styles.tableBodyDrawerWithdrawContainer}>
           <div className={styles.tableBodyDrawerWithdrawTitle}>Remaining</div>
           <div className={styles.tableBodyDrawerWithdrawContent}>
@@ -294,7 +162,7 @@ const StakeRow = props => {
               type="button"
               className={styles.tableBodyDrawerWithdrawButton}
               onClick={() =>{
-                setWithdrawModal(true);
+                setWithdrawModalShow(true);
               }}
             >
               {withdrawButtonText}
@@ -316,7 +184,6 @@ const StakeRow = props => {
               className={styles.tableBodyDrawerWithdrawButton}
               style={isHarvestDisabled ? { cursor: 'not-allowed' } : {}}
               onClick={async () => {
-                // setSelectedRowData(data);
                 showHarvestModal();
               }}
               disabled={isHarvestDisabled}
@@ -334,7 +201,6 @@ const StakeRow = props => {
           if(harvestButtonStatus) {
             setHarvestButtonText(<>Processing <Icon type="loading" /></>);
             setHarvestButtonStatus(false);
-            // console.log(data);
             harvest(poolId, data.positionId, setHarvestButtonText, harvestCallback,library, account)
           }
 
@@ -351,12 +217,7 @@ const StakeRow = props => {
                 </div>
                 <div className={styles.tokenContainer}>
                   <div className={styles.tokenLogoContainer}>
-                    { reward.token == "ACY" ? (
-                        <img src={ACY_LOGO}/>
-                      ) : (
-                        <img src={'https://storageapi.fleek.co/chwizdo-team-bucket/ACY%20Token%20List/'+reward.token+'.svg'}/>
-                      )
-                    }
+                    <img src={getLogoURIWithSymbol(reward.token)}/>
                   </div>
                   <div className={styles.token}>
                     {reward.token}
@@ -365,107 +226,26 @@ const StakeRow = props => {
               </div>
             ))}
           </div>
-          <div className={styles.harvestChart} >
-            {/* <AcyBarChart data={harvestHistory.myAll.slice(-14)} showXAxis barColor="#1d5e91" /> */}
-          </div>
         </div>
       </AcyActionModal>
-      {/* withdraw modal */}
-      <AcyModal 
-        // backgroundColor="#0e0304" width={400} 
-        width={400}
-        bodyStyle={{
-          padding: '21px',
-          background: '#0e0304',
-          borderRadius: '.5rem',
-      }}
-        visible={withdrawModal} 
-        onCancel={hideWithdrawModal}>
-        <div className={styles.removeAmountContainer}>
-          <div>Withdraw Amount</div>
-          <div className={styles.amountText}>
-            <AutoResizingInput value={percent} onChange={setPercent} />%
-          </div>
-          <div className={styles.sliderContainer}>
-            <input
-              value={percent}
-              type="range"
-              className={styles.sliderInput}
-              onChange={e => {
-                setPercent(parseInt(e.target.value));
-              }}
-            />
-          </div>
-        </div>
-        <div className={styles.tokenAmountContainer}>
-          <div className={styles.tokenAmountContent}>
-            <div className={styles.tokenAmount}>
-              Amount
-            </div>
-            <div className={styles.tokenDetailContainer}>
-              <div className={styles.tokenSymbol}>
-                {data && (data.lpAmount * percent / 100).toFixed(6)}
-              </div>
-            </div>
-          </div>
-          <div className={styles.tokenAmountContent}>
-            <div className={styles.tokenAmount}>
-            {token1 && token2 && `LP Token`}
-            {token1 && !token2 && `Token`}
-            </div>
-            <div className={styles.tokenDetailContainer}>
-              <div>
-                {token1Logo && (
-                    <img src={token1Logo} alt="token" className={styles.tokenImg}/>
-                )}
-                {token2Logo && (
-                    <img src={token2Logo} alt="token" className={styles.tokenImg}/>
-                )}
-              </div>
-              <div className={styles.tokenSymbol}>
-                
-                {token1 && token2 && `${token1}-${token2} LP`}
-                {token1 && !token2 && `${token1}`}
-                {token2 && !token1 && `${token2}`}
-              </div>
-              
-            </div>
-          </div>
-          <div className={styles.tokenAmountContent}>
-            <div className={styles.tokenAmount}>
-              Remaining
-            </div>
-            <div className={styles.tokenDetailContainer}>
-              <div className={styles.tokenSymbol}>
-                  {data && data.remaining }
-              </div>
-            </div>
-          </div>
-          
-        </div>
-        {/* <div className={styles.buttonContainer}> */}
-        <div className={styles.modalButtonContainer}>
-          <div className={styles.buttonPadding}>
-              <button 
-                className={((!withdrawButtonStatus||data.locked) && classNames(styles.button,styles.buttonDisabled)) || styles.button}
-                // className={styles.button}
-                onClick={async () => {
-                  if(!data.locked && data.lpAmount * percent / 100 != 0 && withdrawButtonStatus){
-                    withdrawClicked();
-                  }
-                }}
-              >
-                {data && data.locked? "Locked":withdrawButtonText}
-              </button>
-          </div>
-        </div>
-      {/* </div> */}
-      </AcyModal>
+      <WithdrawModal
+        data={data}
+        account={account}
+        library={library}
+        poolId={poolId}
+        token1={token1}
+        token1Logo={token1Logo}
+        token2={token2}
+        token2Logo={token2Logo}
+        refreshPoolInfo={refreshPoolInfo}
+        withdrawModalShow={withdrawModalShow}
+        hideWithdrawModal={hideWithdrawModal}
+        ratio={ratio}
+        token1Ratio={token1Ratio}
+        token2Ratio={token2Ratio}
+      />
     </div>
   );
 };
-export default connect(({ global, transaction, loading }) => ({
-  global,
-  transaction,
-  loading: loading.global,
-}))(StakeRow);
+
+export default StakeRow;

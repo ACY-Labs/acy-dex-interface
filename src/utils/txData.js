@@ -4,7 +4,7 @@ import liquidity from '@/pages/Liquidity/models/liquidity';
 import {getContract, supportedTokens} from '@/acy-dex-swap/utils'
 import {totalInUSD} from '@/utils/utils';
 import { BigNumber } from '@ethersproject/bignumber';
-import {getAllSuportedTokensPrice} from '@/acy-dex-swap/utils/index';
+import {getAllSupportedTokensPrice} from '@/acy-dex-swap/utils/index';
 import { abi as IUniswapV2Router02ABI } from '@/abis/IUniswapV2Router02.json';
 import ACYV1ROUTER02_ABI from '@/acy-dex-swap/abis/AcyV1Router02';
 import transaction from '@/models/transaction';
@@ -808,7 +808,7 @@ export async function getTransactionsByAccount (account,library,filter){
     let SCAN_API = constantInstance.scanAPIPrefix;
     console.log("printing constant instance,,,, ",constantInstance);
     if(account){
-        tokenPriceUSD = await getAllSuportedTokensPrice();
+        tokenPriceUSD = await getAllSupportedTokensPrice();
         try{
         let address =  account.toString();
         // let apikey = 'H2W1JHHRFB5H7V735N79N75UVG86E9HFH2';
@@ -953,7 +953,7 @@ function decodeFinalLog(log, from, to, transferLogs ,input){
 
 export async function fetchTransactionData(address,library){
 
-    tokenPriceUSD = await getAllSuportedTokensPrice();
+    tokenPriceUSD = await getAllSupportedTokensPrice();
     const web3 = new Web3(RPC_URL());
     let SCAN_API = constantInstance.scanAPIPrefix.scanUrl;
     let GAS_TOKEN = constantInstance.gasTokenSymbol;

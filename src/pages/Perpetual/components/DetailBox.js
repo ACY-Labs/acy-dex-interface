@@ -14,7 +14,6 @@ import Pattern from '@/utils/pattern';
 import { MARKET, LIMIT, LONG, SHORT, SWAP, FEE } from '../constant'
 import {
     getLiquidationPrice, bigNumberify, formatAmount, expandDecimals, parseValue, getTokenInfo, getPositionKey,
-    getWhitelistedTokens,
     usePrevious,
     USD_DECIMALS,
     MARGIN_FEE_BASIS_POINTS,

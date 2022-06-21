@@ -292,7 +292,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
                 src={
                   removeLiquidityPosition
                     ? removeLiquidityPosition.token0LogoURI
-                    : 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg'
+                    : 'https://storageapi2.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg'
                 }
                 alt="token"
                 className={styles.tokenImg}
@@ -309,7 +309,7 @@ const AcyRemoveLiquidityModal = ({ removeLiquidityPosition, isModalVisible, onCa
                 src={
                   removeLiquidityPosition
                     ? removeLiquidityPosition.token1LogoURI
-                    : 'https://storageapi.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg'
+                    : 'https://storageapi2.fleek.co/chwizdo-team-bucket/token image/ethereum-eth-logo.svg'
                 }
                 alt="token"
                 className={styles.tokenImg}

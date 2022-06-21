@@ -50,33 +50,22 @@ export default [
         ],
       },
       {
-        path: '/perpetual',
-        name: 'Perpetual',
-        component: './Perpetual/Index',
-      },
-      {
-        path: '/stats',
-        name: 'Stats',
-        component: './Stats/Index',
-      },
-      {
         path: '/exchange',
         name: 'Exchange',
         component: './Swap/Index',
       },
       {
-        path: '/liquidity',
-        name: 'Liquidity',
-        component: './Liquidity/Index',
+        path: '/future',
+        name: 'Future',
+        component: './Perpetual/Index',
       },
       {
-        path: '/farms',
-        name: 'Farm',
-        component: './Farms/',
+        path: '/',
+        name: 'Option',
       },
       {
         path: '/launchpad',
-        name: 'Launch',
+        name: 'Launchpad',
         hideChildrenInMenu: true,
         routes: [
           {
@@ -90,16 +79,48 @@ export default [
         ],
       },
       {
+        path: '/stablecoin',
+        name: 'StableCoin',
+        component: './StableCoin/Index',
+      },
+      {
+        path: '/liquidity',
+        name: 'Liquidity',
+        component: './Liquidity/Index',
+      },
+      {
+        path: '/farms',
+        name: 'Farm',
+        component: './Farms/',
+      },
+      {
+        path: '/stats/future',
+        name: 'Statistics',
+        component: './Stats/Perpetual/Index',
+        // routes:[
+        //   {
+        //     path:'/stats/perpetual',
+        //     name:'Perpetual',
+        //     component:'./Stats/Perpetual/Index'
+        //   },
+        //   {
+        //     path:'/stats/stablecoin',
+        //     name:'StableCoin',
+        //     component:'./Stats/StableCoin/stats'
+        //   }
+        // ]
+      },
+      {
+        path: './stats/stablecoin',
+        name:'Statistics',
+        component: './Stats/StableCoin/stats',
+        hideInMenu: true,
+      },
+      {
         path: '/transaction/:id?',
         name: 'Transaction',
         hideInMenu: true,
         component: './Transaction/Index',
-      },
-      {
-        path: '/buyglp',
-        name: 'BuyGlp',
-        hideInMenu: true,
-        component: './BuyGlp/Index',
       },
     ],
   },

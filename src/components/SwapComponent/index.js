@@ -158,6 +158,8 @@ const SwapComponent = props => {
   const [showDescription, setShowDescription] = useState(false);
   const connectWalletByLocalStorage = useConnectWallet();
 
+  const [coinList, setCoinList] = useState([])
+
   useEffect(() => {
     if (!INITIAL_TOKEN_LIST) return
     console.log("resetting page states, new swapComponent token0, token1", INITIAL_TOKEN_LIST[0], INITIAL_TOKEN_LIST[1])
@@ -262,6 +264,25 @@ const SwapComponent = props => {
     setMidTokenAddress();
     setPoolExist(true);
     setShowDescription(false);
+  }, [chainId])
+
+  useEffect(() => {
+    const apiUrlPrefix = "https://api.coingecko.com/api/v3"
+    axios.get(
+      `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false`
+    ).then(data => {
+      // setCoinList(data.data)
+      data.data.map(token => {
+        coinList.push({
+          name: token.name,
+          symbol: token.symbol,
+          logoURI: token.image,
+        })
+      })
+    })
+    .catch(e => {
+      console.log(e);
+    });
   }, [chainId])
 
   // connect to page model, reflect changes of pair ratio in this component
@@ -634,11 +655,12 @@ const SwapComponent = props => {
         library={library}
       />
 
-      {showDescription ? <AcyDescriptions>
+      {showDescription ?
+      <AcyDescriptions>
         <div className={styles.breakdownTopContainer}>
           <div className={styles.slippageContainer}>
             <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '7px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
               {/* <Button
                     type="link"
                     style={{ marginRight: '5px' }}
@@ -650,6 +672,7 @@ const SwapComponent = props => {
                     Auto
                   </Button> */}
               <Input
+                className={styles.input}
                 value={inputSlippageTol || ''}
                 onChange={e => {
                   setInputSlippageTol(e.target.value);
@@ -685,11 +708,18 @@ const SwapComponent = props => {
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                width: '50%',
-                marginTop: '7px',
+                height: '33.6px',
+                marginTop: '10px',
               }}
             >
-              <Input type="number" value={Number(deadline).toString()} onChange={e => setDeadline(e.target.valueAsNumber || 0)} placeholder={30} suffix={<strong>minutes</strong>} />
+              <Input 
+                className={styles.input}
+                type="number" 
+                value={Number(deadline).toString()} 
+                onChange={e => setDeadline(e.target.valueAsNumber || 0)} 
+                placeholder={30} 
+                suffix={<strong>minutes</strong>} 
+              />
             </div>
           </div>
         </div>
@@ -706,7 +736,7 @@ const SwapComponent = props => {
       {needApprove
         ? <div>
           <AcyButton
-            style={{ marginTop: '25px' }}
+            style={{ marginTop: '30px' }}
             disabled={!approveButtonStatus}
             onClick={async () => {
               setShowSpinner(true);
@@ -782,7 +812,7 @@ const SwapComponent = props => {
       </AcyDescriptions>
 
       <TokenSelectorModal
-        onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick}
+        onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} sideComponent={true} tokenlist={coinList}
       />
     </div>
   );

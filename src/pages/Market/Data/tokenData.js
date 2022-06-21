@@ -10,7 +10,7 @@ import { convertTokenForList } from './util';
 import { sortTable } from '../Util';
 import { getBlockFromTimestamp } from './blocks';
 
-import {getAllSuportedTokensPrice, getAllSuportedTokensPrice_forMarket} from '@/acy-dex-swap/utils/index';
+import {getAllSupportedTokensPrice, getAllSupportedTokensPrice_forMarket} from '@/acy-dex-swap/utils/index';
 import {findTokenWithAddress} from '@/utils/txData';
 import {totalInUSD} from '@/utils/utils';
 import { symbol } from 'prop-types';
@@ -39,6 +39,29 @@ export async function fetchTokenInfo(client, tokenAddress, timestamp) {
   console.log(data);
 
   return data.tokens[0];
+}
+
+export async function fetchCoinList () {
+  /**
+   * name
+   * symbol
+   * image
+   * current_price
+   * price_change_percentage_24h
+   * market_cap
+   * fully_diluted_valuation
+   * total_volume
+   */
+   const apiUrlPrefix = "https://api.coingecko.com/api/v3"
+   axios.get(
+     `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false`
+   ).then(data => {
+     return data.data;
+   })
+   .catch(e => {
+     console.log(e);
+     return [];
+   });
 }
 
 export async function fetchTokenDayData(tokenId) {
@@ -241,7 +264,7 @@ function parseTokenData (data){
 
 export async function fetchGeneralTokenInfo() {
   // FOLLOWING CODE WILL BE WORKING ONCE THE SERVICE IS ON !
-  tokensPriceUSD = await getAllSuportedTokensPrice_forMarket();
+  tokensPriceUSD = await getAllSupportedTokensPrice_forMarket();
   try{
     //let request = `${API_URL()}/poolchart/all`;
     let request = `${MARKET_API_URL()}/poolchart/all`;
@@ -367,7 +390,7 @@ function parseSearchCoinReturns (data, key){
 
 // fetch tokens for search
 export async function fetchSearchCoinReturns(key) {
-  tokensPriceUSD = await getAllSuportedTokensPrice_forMarket();
+  tokensPriceUSD = await getAllSupportedTokensPrice_forMarket();
   try{
     //let request = `${API_URL()}/poolchart/all`;
     let request = `${MARKET_API_URL()}/poolchart/all`;

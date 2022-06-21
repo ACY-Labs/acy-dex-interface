@@ -36,6 +36,7 @@ export const STABLE_SWAP_FEE_BASIS_POINTS = 1;
 export const MARGIN_FEE_BASIS_POINTS = 10;
 export const FUNDING_RATE_PRECISION = 1000000;
 export const DEFAULT_SLIPPAGE_AMOUNT = 20;
+export const DEFAULT_HIGHER_SLIPPAGE_AMOUNT = 100;
 export const PRECISION = expandDecimals(1, 30);
 export const MIN_PROFIT_TIME = 3 * 60 * 60; // 3 hours
 export const MIN_PROFIT_BIPS = 150;

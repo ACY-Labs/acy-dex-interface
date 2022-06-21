@@ -8,7 +8,7 @@ import { useConstantLoader } from "@/constants";
 import { asyncForEach } from "@/utils/asynctools";
 import { getUserTokenBalance } from '@/acy-dex-swap/utils';
 import { processString } from "@/components/AcyCoinItem";
-import { getAllSuportedTokensPrice } from '@/acy-dex-swap/utils';
+import { getAllSupportedTokensPrice } from '@/acy-dex-swap/utils';
 
 
 import { Button, Icon, Tooltip } from 'antd';
@@ -63,7 +63,7 @@ const AcyConnectWallet = props => {
   }
 
   const getAllPrice = async () => {
-    const tokenPriceList = await getAllSuportedTokensPrice().then(res => {
+    const tokenPriceList = await getAllSupportedTokensPrice().then(res => {
       setTokenPriceDict(res);
     });
   }
@@ -172,13 +172,13 @@ const AcyConnectWallet = props => {
       <div {...rest} className={styles.connect}>
         <div className={styles.wrap}>
           {/* {chainName} ( {displayedChainId || 'disconnected'} ) */}
-          <Tooltip placement='bottomLeft' color={'#b5b5b6'} title="Click to show your balance" mouseEnterDelay={0.5}>
+          {/* <Tooltip placement='bottomLeft' color={'#b5b5b6'} title="Click to show your balance" mouseEnterDelay={0.5}>
 
             <div className={styles.balanceBtn} onClick={balanceHandle}>
               <p style={{ display: balanceTitleShow }}>Balance</p>
               <div className={styles.showBalance} style={{ display: balanceShow }}>$ {userBalance}</div>
             </div>
-          </Tooltip>
+          </Tooltip> */}
           {/* pending */}
           {pendingLength
             &&

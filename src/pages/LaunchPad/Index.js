@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Card } from 'antd';
 import styles from './styles.less';
+import "./css/seemore.css";
 import telegramWIcon from '@/assets/icon_telegram_white.svg';
 import announcementIcon from '@/assets/icon_announcement.svg';
 import OngoingProjects from './components/OngoingProjects.js';
@@ -9,12 +10,14 @@ import IncomingProjects from './components/IncomingProjects.js';
 import EndedProjects from './components/EndedProjects.js';
 import BubblyButton from './components/BubblyButton.js';
 import RaiseButton from './components/RaiseButton.js';
-import $ from 'jquery';
 import { getProjects } from '@/services/api';
 import ExpandingContent from './components/ExpandedContent';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { useWeb3React } from '@web3-react/core';
-import { API_URL } from '@/constants'
+// import { API_URL } from '@/constants';
+import moment from 'moment';
+
+const API_URL = () => "https://api.acy.finance/bsc-main/api";
 
 const { Meta } = Card;
 
@@ -22,6 +25,7 @@ const Pool = props => {
   const [ongoingData, setOngoingData] = useState([]);
   const [upcomingData, setUpcomingData] = useState([]);
   const [endedData, setEndedData] = useState([]);
+  const [isActive, setIsActive] = useState(true); // is see more ended projects
 
   const history = useHistory();
   const onClickProject = projectID => {
@@ -39,11 +43,12 @@ const Pool = props => {
     }
   }, [account]);
 
-
-
   // project variables
   useEffect(() => {
-    console.log("api url", API_URL())
+    
+    console.log("api url", API_URL());
+    console.log("actual request");
+
     getProjects(API_URL())
       .then(res => {
         if (res) {
@@ -56,14 +61,24 @@ const Pool = props => {
             if (obj.projectStatus === 'Ongoing') newOngoingData.push(obj);
             else if (obj.projectStatus === 'Upcoming') newUpcomingData.push(obj);
             else if (obj.projectStatus === 'Ended') newEndedData.push(obj);
-          }
-            // obj.projectStatus === 'Ongoing'
-            //   ? newOngoingData.push(obj)
-            //   : obj.projectStatus === 'Upcoming'
-            //     ? newUpcomingData.push(obj)
-            //     : newEndedData.push(obj)
-          );
-          console.log(API_URL())
+          });
+          console.log(API_URL());
+
+          // "2/22/2022 00:00:00 "
+          // TODO: fault in backend but parse it in frontend for now
+          newOngoingData.sort((a, b) => {
+            return moment.utc(a.saleStart, "M/D/YYYY hh:mm:ss ") > moment.utc(b.saleStart, "M/D/YYYY hh:mm:ss ") ? 1 : -1;
+          });
+
+          newUpcomingData.sort((a, b) => {
+            return moment.utc(a.saleStart, "M/D/YYYY hh:mm:ss ") > moment.utc(b.saleStart, "M/D/YYYY hh:mm:ss ") ? 1 : -1;
+          });
+
+          // show ended project in desencding order
+          newEndedData.sort((a, b) => {
+            return moment.utc(a.saleEnd, "M/D/YYYY hh:mm:ss ") < moment.utc(b.saleEnd, "M/D/YYYY hh:mm:ss ") ? 1 : -1;
+          });
+
           setOngoingData([...newOngoingData]);
           setUpcomingData([...newUpcomingData]);
           setEndedData([...newEndedData]);
@@ -150,7 +165,16 @@ const Pool = props => {
               <div className={styles.lineSeperator} />
             </div>
             <div className={styles.projectsContainer}>
-              <EndedProjects data={endedData} />
+              <div
+                className={
+                  isActive ? "see-more-container" : "see-more-container active"
+                }
+              >
+                <div className='content'>
+                  <EndedProjects data={endedData} />
+                </div>
+                <a className="more" onClick={() => setIsActive(!isActive)}></a>
+              </div>
             </div>
           </div>
         </section>

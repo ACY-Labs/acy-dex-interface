@@ -53,7 +53,7 @@ const TableControl = ({ searchInput, setSearchInput, isMyFarms, setIsMyFarms, wa
       <div className={styles.tableHeaderToggleButtonContainer}>
         <button 
           type="button" 
-          style={{ backgroundColor: activeEnded ? "#174163" : "#2e3032", color: activeEnded? "white": ""}}
+          style={{ backgroundColor: activeEnded ? "#2e3032" : "transparent", color: activeEnded? "white": "", border: '0.75px solid #333333'}}
           onClick={()=>{
             setActiveEnded(true);
           }}
@@ -62,7 +62,7 @@ const TableControl = ({ searchInput, setSearchInput, isMyFarms, setIsMyFarms, wa
         </button>
         <button 
           type="button" 
-          style={{ backgroundColor: !activeEnded ? "#174163" : "#2e3032", color: !activeEnded? "white": ""}}
+          style={{ backgroundColor: !activeEnded ? "#2e3032" : "transparent", color: !activeEnded? "white": "", border: '0.75px solid #333333'}}
           onClick={()=>{
             setActiveEnded(false);
           }}

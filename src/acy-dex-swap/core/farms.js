@@ -12,7 +12,7 @@ import {
   FARMS_ADDRESS,
   CustomError,
   getTokenTotalSupply,
-  getAllSuportedTokensPrice,
+  getAllSupportedTokensPrice,
 } from '@/acy-dex-swap/utils';
 import { Fetcher, Token, TokenAmount, Pair} from '@acyswap/sdk';
 import { abi as FarmsABI } from '../abis/ACYMultiFarm.json';
@@ -170,7 +170,7 @@ const getPool = async (library, account, poolId)=> {
     contract.poolInfo(poolId),
     contract.getPoolRewardTokens(poolId),
     contract.getPoolRewardTokenAddresses(poolId),
-    getAllSuportedTokensPrice()
+    getAllSupportedTokensPrice()
   ]);
 
   // retrieve reward tokens symbol.
@@ -540,7 +540,7 @@ const getExpiredTime = (timestamp, lockDuration) => {
 }
 
 const newGetAllPools = async (library, account, chainId) => {
-  const tokenPrice = await getAllSuportedTokensPrice();
+  const tokenPrice = await getAllSupportedTokensPrice();
   console.log("tokenPrice:",tokenPrice);
   console.log(`${API_URL()}/farm/getAllPools`);
   const allFarm = await axios.get(
@@ -587,7 +587,7 @@ const calculateVolAndApr = async (token0, token1, tokenPrices) => {
 }
 
 const newGetPool = async (poolId, library, account, chainId) => {
-  const tokenPrice = await getAllSuportedTokensPrice();
+  const tokenPrice = await getAllSupportedTokensPrice();
   //bug, only get on pool not working, may fix this later
   const farm = await axios.get(
     `${API_URL()}/farm/getPool?poolId=${poolId}`

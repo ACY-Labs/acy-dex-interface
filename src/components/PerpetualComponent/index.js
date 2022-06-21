@@ -19,35 +19,33 @@
 /* eslint-disable import/order */
 /* eslint-disable import/extensions */
 import {
-  AcyCard,
-  AcyTabs,
-  AcyButton,
+  AcyPerpetualCard,
   AcyDescriptions,
+  AcyPerpetualButton
 } from '@/components/Acy';
-import TokenSelectorModal from '@/components/TokenSelectorModal';
-// ymj swapBox components start
 import { PriceBox } from './components/PriceBox';
-import { DetailBox } from './components/DetailBox';
+import ConfirmationBox from './components/ConfirmationBox';
 import { GlpSwapBox, GlpSwapDetailBox } from './components/GlpSwapBox'
+import PerpetualTabs from './components/PerpetualTabs'
+import { MARKET, LIMIT, LONG, SHORT, SWAP, POOL, DEFAULT_HIGHER_SLIPPAGE_AMOUNT } from './constant'
 
-import { MARKET, LIMIT, LONG, SHORT, SWAP, POOL } from './constant'
-import { 
-  USD_DECIMALS, 
+import {
+  USD_DECIMALS,
   USDG_ADDRESS,
   USDG_DECIMALS,
   GLP_DECIMALS,
-  BASIS_POINTS_DIVISOR, 
+  BASIS_POINTS_DIVISOR,
   MARGIN_FEE_BASIS_POINTS,
   PLACEHOLDER_ACCOUNT,
-  ARBITRUM_DEFAULT_COLLATERAL_ADDRESS,
   PRECISION,
-  getNextToAmount, 
-  getTokenInfo, 
-  parseValue, 
-  getUsd, 
-  expandDecimals, 
+  DUST_BNB,
+  getNextToAmount,
+  getTokenInfo,
+  parseValue,
+  getUsd,
+  expandDecimals,
   formatAmountFree,
-  usePrevious, 
+  usePrevious,
   getPositionKey,
   formatAmount,
   fetcher,
@@ -55,7 +53,6 @@ import {
   adjustForDecimals,
   bigNumberify,
   useLocalStorageSerializeKey,
-  getNextFromAmount,
   isTriggerRatioInverted,
   getLeverage,
   getLiquidationPrice,
@@ -65,159 +62,105 @@ import {
   shouldRaiseGasError,
   helperToast,
   replaceNativeTokenAddress,
-  getExchangeRate
+  getMostAbundantStableToken,
 } from '@/acy-dex-futures/utils'
-import {
-  readerAddress,
-  vaultAddress,
-  usdgAddress,
-  nativeTokenAddress,
-  routerAddress,
-  orderBookAddress,
-  stakedGlpTrackerAddress,
-  glpManagerAddress,
-  feeGlpTrackerAddress,
-  glpVesterAddress,
-  rewardReaderAddress,
-  tempChainID,
-  tempLibrary
-} from '@/acy-dex-futures/samples/constants'
-import { callContract, useGmxPrice } from '@/acy-dex-futures/core/Perpetual'
+import { getConstant } from '@/acy-dex-futures/utils/Constants'
 import Reader from '@/acy-dex-futures/abis/Reader.json'
-import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
-import VaultV2 from '@/acy-dex-futures/abis/VaultV2.json'
-import Token from '@/acy-dex-futures/abis/Token.json'
+import Vault from '@/acy-dex-futures/abis/Vault.json'
 import Router from '@/acy-dex-futures/abis/Router.json'
 import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
-import RewardTracker from '@/acy-dex-futures/abis/RewardTracker.json'
-import Vester from '@/acy-dex-futures/abis/Vester.json'
-import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
+import Glp from '@/acy-dex-futures/abis/Glp.json'
 import useSWR from 'swr'
-
-import { getInfoTokens_test } from './utils'
-import Pattern from '@/utils/pattern'
 
 // swapBox compontent end
 import { connect } from 'umi';
 import styles from './styles.less';
-import { sortAddress, abbrNumber } from '@/utils/utils';
-import axios from 'axios';
 import { ethers } from "ethers"
 
 import { useWeb3React } from '@web3-react/core';
-import { binance, injected } from '@/connectors';
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+// import { binance, injected } from '@/connectors';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
-import {
-  Error,
-  approve,
-  calculateGasMargin,
-  checkTokenIsApproved,
-  computeTradePriceBreakdown,
-  getAllowance,
-  getContract,
-  getRouterContract,
-  getUserTokenBalance,
-  getUserTokenBalanceRaw,
-  isZero,
-  supportedTokens,
-  parseArbitrageLog,
-} from '@/acy-dex-swap/utils/index';
-
-// hj add
-import { getContractAddress } from '@/acy-dex-futures/utils/Addresses';
-import * as Api from '@/acy-dex-futures/core/Perpetual';
-import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
-import ERC20ABI from '@/abis/ERC20.json';
+import * as Api from '@/acy-dex-futures/Api';
 import WETHABI from '@/abis/WETH.json';
 
-import {
-  // Token,
-  TokenAmount,
-  Pair,
-  TradeType,
-  Route,
-  Trade,
-  Percent,
-  // Router,
-  // WETH,
-  // ETHER,
-  CurrencyAmount,
-  InsufficientReservesError,
-} from '@acyswap/sdk';
-
-import { MaxUint256 } from '@ethersproject/constants';
-import { BigNumber } from '@ethersproject/bignumber';
-import { parseUnits } from '@ethersproject/units';
-import { hexlify } from '@ethersproject/bytes';
-
-import { Row, Col, Button, Input, InputNumber, Icon, Radio, Tabs, Slider, Alert, Checkbox, Tooltip } from 'antd';
-import { RiseOutlined, FallOutlined, LineChartOutlined, FieldTimeOutlined } from '@ant-design/icons';
-import spinner from '@/assets/loading.svg';
-import moment from 'moment';
+import { Slider, Checkbox, Tooltip } from 'antd';
 import { useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { AcyRadioButton } from '@/components/AcyRadioButton';
-import * as defaultToken from '@/acy-dex-futures/samples/TokenList'
+import { constantInstance } from '@/constants';
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 
 import styled from "styled-components";
 
-const { AcyTabPane } = AcyTabs;
-const { TabPane } = Tabs;
-const { AddressZero } = ethers.constants;
+import { JsonRpcProvider } from "@ethersproject/providers";
 
-const StyledRadioButton = styled(Radio.Button)`
-  .ant-radio-button-wrapper {
-    border: none;
-    background-color: transparent;
-  }
-  .ant-radio-button-wrapper:not(:first-child)::before {
-    background-color: transparent;
-  }
-`;
+const { AddressZero } = ethers.constants;
 
 const StyledSlider = styled(Slider)`
   .ant-slider-track {
     background: #929293;
+    height: 3px;
   }
   .ant-slider-rail {
     background: #29292c;
+    height: 3px;
   }
   .ant-slider-handle {
     background: #929293;
-    border: 2px solid #929293;
+    width: 12px;
+    height: 12px;
+    border: none;
   }
   .ant-slider-handle-active {
     background: #929293;
-    border: 2px solid #929293;
+    width: 12px;
+    height: 12px;
+    border: none;
   }
   .ant-slider-dot {
-    border: 2px solid #29292c;
+    border: 1.5px solid #29292c;
     border-radius: 1px;
     background: #29292c;
     width: 2px;
-    height: 11px;
+    height: 10px;
   }
   .ant-slider-dot-active {
-    border: 2px solid #929293;
+    border: 1.5px solid #929293;
     border-radius: 1px;
     background: #929293;
     width: 2px;
-    height: 11px;
+    height: 10px;
+  }
+  .ant-slider-with-marks {
+      margin-bottom: 50px;
   }
 `;
 
-function getToken(tokenlist, tokenAddr) {
-  for (let i = 0; i < tokenlist.length; i++) {
-    if(tokenlist[i].address === tokenAddr) {
-      return tokenlist[i]
-    }
+const StyledCheckbox = styled(Checkbox)`
+  .ant-checkbox .ant-checkbox-inner {
+      background-color: transparent;
+      border-color: #b5b5b6;
   }
-  return undefined
-}
+  .ant-checkbox-checked .ant-checkbox-inner {
+      background-color: transparent;
+      border-color: #b5b5b6;
+  }
+  .ant-checkbox-disabled .ant-checkbox-inner {
+      background-color: #333333;
+      border: 1px solid #b5b5b6;
+  }
+  .ant-checkbox-checked::after {
+      border: 1px solid #333333;
+  }
+  .ant-checkbox::after {
+      border: 1px solid #333333;
+  }
+`;
 
-function getNextAveragePrice({size, sizeDelta, hasProfit, delta, nextPrice, isLong}) {
+
+
+function getNextAveragePrice({ size, sizeDelta, hasProfit, delta, nextPrice, isLong }) {
   if (!size || !sizeDelta || !delta || !nextPrice) {
     return;
   }
@@ -235,6 +178,15 @@ function getNextAveragePrice({size, sizeDelta, hasProfit, delta, nextPrice, isLo
   return nextAveragePrice;
 }
 
+function getTokenfromSymbol(tokenlist, symbol) {
+  for (let i = 0; i < tokenlist.length; i++) {
+    if (tokenlist[i].symbol === symbol) {
+      return tokenlist[i]
+    }
+  }
+  return undefined
+}
+
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
 
@@ -244,35 +196,49 @@ const SwapComponent = props => {
     chainId,
     tokenList: INITIAL_TOKEN_LIST,
     farmSetting: { INITIAL_ALLOWED_SLIPPAGE },
+    perpetuals
   } = useConstantLoader(props);
-  const { profitsIn, liqPrice } = props;
-  const { entryPriceMarket, exitPrice, borrowFee, positions } = props;
-  // const { infoTokens_test, usdgSupply, positions } = props;
-  const { isConfirming, setIsConfirming } = props;
-  console.log('here after confirm props');
-  // isPendingConfirmation, setIsPendingConfirmation } = props;
-  // const { savedSlippageAmount } = props;
-  
+
   const {
+    swapOption: mode,
+    setSwapOption: setMode,
+    activeToken0,
+    setActiveToken0,
+    activeToken1,
+    setActiveToken1,
+
+    toTokenAddress,
+    setToTokenAddress,
+    fromTokenAddress,
+    setFromTokenAddress,
+
     positionsMap,
     pendingTxns,
     setPendingTxns,
-    tokenSelection,
-    setTokenSelection,    
     savedIsPnlInLeverage,
     approveOrderBook,
     isWaitingForPluginApproval,
     setIsWaitingForPluginApproval,
     isPluginApproving,
+    isConfirming,
+    setIsConfirming,
+    isPendingConfirmation,
+    setIsPendingConfirmation,
     isBuying,
     setIsBuying,
     onChangeMode,
+    swapTokenAddress,
+    setSwapTokenAddress,
+    glp_isWaitingForApproval,
+    glp_setIsWaitingForApproval,
+    orders,
+    minExecutionFee
   } = props;
 
   const connectWalletByLocalStorage = useConnectWallet();
   const { active, activate } = useWeb3React();
-  const flagOrdersEnabled = true
 
+  const [type, setType] = useState(MARKET);
   const [fromValue, setFromValue] = useState("");
   const [toValue, setToValue] = useState("");
   const [anchorOnFromAmount, setAnchorOnFromAmount] = useState(true);
@@ -280,24 +246,110 @@ const SwapComponent = props => {
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // const [isConfirming, setIsConfirming] = useState(false);
-  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
   const [modalError, setModalError] = useState(false);
   const [ordersToaOpen, setOrdersToaOpen] = useState(false);
+  const [isHigherSlippageAllowed, setIsHigherSlippageAllowed] = useState(false);
+
 
   const savedSlippageAmount = getSavedSlippageAmount(chainId)
-  const tokens = defaultToken.default
+
+  let allowedSlippage = savedSlippageAmount;
+  if (isHigherSlippageAllowed) {
+    allowedSlippage = DEFAULT_HIGHER_SLIPPAGE_AMOUNT;
+  }
+
+  const tokens = perpetuals.tokenList;
   const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
   const stableTokens = tokens.filter(token => token.isStable);
   const indexTokens = whitelistedTokens.filter(token => !token.isStable && !token.isWrapped);
   const shortableTokens = indexTokens.filter(token => token.isShortable);
   let toTokens = tokens;
-  if (mode === LONG) {
+
+  const isLong = mode === LONG;
+  const isShort = mode === SHORT;
+
+  if (isLong) {
     toTokens = indexTokens;
   }
-  if (mode === SHORT) {
+  if (isShort) {
     toTokens = shortableTokens;
   }
 
+  // const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
+  const initialToToken = perpetuals.getTokenBySymBol("BTC").address;
+  console.log("initialToToken: ", initialToToken, chainId)
+  // const [toTokenAddress, setToTokenAddress] = useState(initialToToken);
+  // const [fromTokenInfo, setFromTokenInfo] = useState();
+  // const [toTokenInfo, setToTokenInfo] = useState();
+  // const [fees, setFees] = useState(0.1);
+  // const [leverage, setLeverage] = useState(5);
+  // const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useState(true);
+  // const [entryPriceLimit, setEntryPriceLimit] = useState(0);
+  // const [priceValue, setPriceValue] = useState('');
+  // const [shortCollateralAddress, setShortCollateralAddress] = useState('0xf97f4df75117a78c1A5a0DBb814Af92458539FB4');
+  // const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
+
+
+  const tokenAddresses = tokens.map(token => token.address)
+  const readerAddress = perpetuals.getContract("Reader")
+  const vaultAddress = perpetuals.getContract("Vault")
+  const usdgAddress = perpetuals.getContract("USDG")
+  const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
+  const routerAddress = perpetuals.getContract("Router")
+  const orderBookAddress = perpetuals.getContract("OrderBook")
+  const glpManagerAddress = perpetuals.getContract("GlpManager")
+  const glpAddress = perpetuals.getContract("GLP")
+
+  const { farmSetting: { RPC_URL }} = useConstantLoader();
+  const provider = new JsonRpcProvider(RPC_URL, chainId);
+
+  const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, Reader, [tokenAddresses]),
+  })
+  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
+  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
+    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
+  })
+  const { data: fundingRateInfo, mutate: updateFundingRateInfo } = useSWR([chainId, readerAddress, "getFundingRates"], {
+    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
+  })
+  const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([chainId, vaultAddress, "totalTokenWeights"], {
+    fetcher: fetcher(library, Vault),
+  })
+  const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
+    fetcher: fetcher(library, Glp),
+  })
+  const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR([chainId, routerAddress, "approvedPlugins", account || PLACEHOLDER_ACCOUNT, orderBookAddress], {
+    fetcher: fetcher(library, Router)
+  });
+  console.log("test orderbook approved: ", routerAddress, account, orderBookAddress, orderBookApproved)
+
+  useEffect(() => {
+    if (active) {
+      function onBlock() {
+        updateVaultTokenInfo()
+        updateTokenBalances()
+        // updatePositionData(undefined, true)
+        updateFundingRateInfo()
+        updateTotalTokenWeights()
+        updateUsdgSupply()
+        updateOrderBookApproved()
+      }
+      library.on('block', onBlock)
+      return () => {
+        library.removeListener('block', onBlock)
+      }
+    }
+  }, [active, library, chainId,
+      updateVaultTokenInfo, updateTokenBalances, updateFundingRateInfo, updateTotalTokenWeights, updateUsdgSupply,
+      updateOrderBookApproved])
+
+  const tokenAllowanceAddress = fromTokenAddress === AddressZero ? nativeTokenAddress : fromTokenAddress;
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
+    fetcher: fetcher(library, Glp)
+  });
+
+  console.log("test needOrderBookApproval: ", type!==MARKET, !orderBookApproved)
   const needOrderBookApproval = type !== MARKET && !orderBookApproved;
   const prevNeedOrderBookApproval = usePrevious(needOrderBookApproval);
 
@@ -308,7 +360,7 @@ const SwapComponent = props => {
       isWaitingForPluginApproval
     ) {
       setIsWaitingForPluginApproval(false);
-      // helperToast.success(<div>Orders enabled!</div>);
+      helperToast.success(<div>Orders enabled!</div>);
     }
   }, [
     needOrderBookApproval,
@@ -317,52 +369,7 @@ const SwapComponent = props => {
     isWaitingForPluginApproval
   ]);
 
-  // when exactIn is true, it means the firt line
-  // when exactIn is false, it means the second line
-  const [exactIn, setExactIn] = useState(true);
 
-  const [needApprove, setNeedApprove] = useState(false);
-  const [approveAmount, setApproveAmount] = useState('0');
-  const [approveButtonStatus, setApproveButtonStatus] = useState(true);
-
-  // Breakdown shows the estimated information for swap
-
-  // let [estimatedStatus,setEstimatedStatus]=useState();
-  const [swapBreakdown, setSwapBreakdown] = useState();
-  const [swapButtonState, setSwapButtonState] = useState(false);
-  const [swapButtonContent, setSwapButtonContent] = useState('Connect to Wallet');
-  const [swapStatus, setSwapStatus] = useState();
-
-  const [pair, setPair] = useState();
-  const [route, setRoute] = useState();
-  const [trade, setTrade] = useState();
-  const [slippageAdjustedAmount, setSlippageAdjustedAmount] = useState();
-  const [minAmountOut, setMinAmountOut] = useState();
-  const [maxAmountIn, setMaxAmountIn] = useState();
-  const [wethContract, setWethContract] = useState();
-  const [wrappedAmount, setWrappedAmount] = useState();
-  const [showSpinner, setShowSpinner] = useState(false);
-
-  const [methodName, setMethodName] = useState();
-  const [midTokenAddress, setMidTokenAddress] = useState();
-  const [poolExist, setPoolExist] = useState(true);
-
-  // ymj useState
-  const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
-  const [toTokenAddress, setToTokenAddress] = useState("0xf97f4df75117a78c1A5a0DBb814Af92458539FB4");
-  // const [fromTokenInfo, setFromTokenInfo] = useState();
-  // const [toTokenInfo, setToTokenInfo] = useState();
-  const [mode, setMode] = useState(LONG);
-  const [type, setType] = useState(MARKET);
-  // const [fees, setFees] = useState(0.1);
-  // const [leverage, setLeverage] = useState(5);
-  // const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useState(true);
-  const [entryPriceLimit, setEntryPriceLimit] = useState(0);
-  // const [priceValue, setPriceValue] = useState('');
-  // const [shortCollateralAddress, setShortCollateralAddress] = useState('0xf97f4df75117a78c1A5a0DBb814Af92458539FB4');
-  // const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
-
-  // hj add to
 
   const [triggerPriceValue, setTriggerPriceValue] = useState("");
   const triggerPriceUsd = type === MARKET ? 0 : parseValue(triggerPriceValue, USD_DECIMALS);
@@ -373,51 +380,24 @@ const SwapComponent = props => {
     setTriggerRatioValue(evt.target.value || "");
   };
 
-  // ymj const
-  // const individualFieldPlaceholder = 'Enter amount';
-  // const dependentFieldPlaceholder = 'Estimated value';
-  // const slippageTolerancePlaceholder = 'Please input a number from 1.00 to 100.00';
-
-  const tokenAddresses = tokens.map(token => token.address)
-  const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([tempChainID, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(tempLibrary, Reader, [tokenAddresses]),
-  })
-  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
-  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([tempChainID, readerAddress, "getFullVaultTokenInfo"], {
-    fetcher: fetcher(tempLibrary, ReaderV2, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
-  })
-  const { data: fundingRateInfo, mutate: updateFundingRateInfo } = useSWR([tempChainID, readerAddress, "getFundingRates"], {
-    fetcher: fetcher(tempLibrary, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
-  })
-  const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([tempChainID, vaultAddress, "totalTokenWeights"], {
-    fetcher: fetcher(tempLibrary, VaultV2),
-  })
-  const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([tempChainID, usdgAddress, "totalSupply"], {
-    fetcher: fetcher(tempLibrary, Token),
-  })
-  const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR([tempChainID, routerAddress, "approvedPlugins", account || PLACEHOLDER_ACCOUNT, orderBookAddress], {
-    fetcher: fetcher(tempLibrary, Router)
-  });
-
-  const tokenAllowanceAddress = fromTokenAddress === AddressZero ? nativeTokenAddress : fromTokenAddress;
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([tempChainID, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
-      fetcher: fetcher(tempLibrary, Token)
-  });
+  
 
   // default collateral address on ARBITRUM
-  const [shortCollateralAddress, setShortCollateralAddress] = useState(ARBITRUM_DEFAULT_COLLATERAL_ADDRESS)
+  
+  const [shortCollateralAddress, setShortCollateralAddress] = useState(fromTokenAddress);
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
-  const fromToken = getToken(tokens, fromTokenAddress); 
-  const toToken = getToken(tokens, toTokenAddress);
-
+  console.log("test multichain: tokens", infoTokens, tokens)
+  const fromToken = perpetuals.getToken(fromTokenAddress);
+  const toToken = perpetuals.getToken(toTokenAddress);
+  
   const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
   const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
   const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
 
   const fromBalance = fromTokenInfo ? fromTokenInfo.balance : bigNumberify(0);
   const toBalance = toTokenInfo ? toTokenInfo.balance : bigNumberify(0);
- 
+
   const fromAmount = parseValue(fromValue, fromToken && fromToken.decimals);
   const toAmount = parseValue(toValue, toToken && toToken.decimals);
 
@@ -429,6 +409,7 @@ const SwapComponent = props => {
     fromAmount &&
     fromAmount.gt(tokenAllowance) &&
     !isWrapOrUnwrap;
+  console.log("needApproval? ", needApproval)
   const prevFromTokenAddress = usePrevious(fromTokenAddress);
   const prevNeedApproval = usePrevious(needApproval);
   const prevToTokenAddress = usePrevious(toTokenAddress);
@@ -437,11 +418,12 @@ const SwapComponent = props => {
   const toUsdMax = getUsd(toAmount, toTokenAddress, true, infoTokens, type, triggerPriceUsd);
 
   const indexTokenAddress = toTokenAddress === AddressZero ? nativeTokenAddress : toTokenAddress;
-  const collateralTokenAddress = mode === LONG
-    ? indexTokenAddress
-    : shortCollateralAddress;
-  const collateralToken = getToken(tokens, collateralTokenAddress);
-  
+  // const collateralTokenAddress = isLong
+  //   ? indexTokenAddress
+  //   : shortCollateralAddress;
+  const collateralTokenAddress = shortCollateralAddress;
+  const collateralToken = perpetuals.getToken(collateralTokenAddress);
+
   const [triggerRatioValue, setTriggerRatioValue] = useState("");
   const triggerRatioInverted = useMemo(() => {
     return isTriggerRatioInverted(fromTokenInfo, toTokenInfo);
@@ -459,66 +441,56 @@ const SwapComponent = props => {
     }
     return ratio;
   }, [triggerRatioValue, triggerRatioInverted]);
-  
 
-  // useCallback(() => {
-  //   setFromTokenInfo(getTokenInfo(infoTokens, fromTokenAddress));
-  //   setToTokenInfo(getTokenInfo(infoTokens, toTokenAddress));
-  //   // setEntryMarkPrice(mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
-  // }, [
-  //   fromTokenAddress,
-  //   toTokenAddress
-  // ]);
-  // useCallback(() => {
-  //   setEntryMarkPrice(mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice);
-  // }, [
-  //   toTokenInfo
-  // ]);
-
-  
   const getTokenLabel = () => {
-    if (mode === SWAP) {
-      return "Receive";
-    }
-    if (mode === LONG) {
+    if (isLong) {
       return "Long";
     }
     return "Short";
   };
 
   const leverageMarks = {
-    2: {
-      style: {color: '#b5b6b6',},
-      label: '2x'
+    // 0.1: {
+    //   style: { color: '#b5b6b6', },
+    //   label: '0.1x'
+    // },
+    1: {
+      style: { color: '#b5b6b6', },
+      label: '1x'
     },
+    // 2: {
+    //   style: { color: '#b5b6b6', },
+    //   label: '2x'
+    // },
     5: {
-      style: {color: '#b5b6b6',},
+      style: { color: '#b5b6b6', },
       label: '5x'
     },
     10: {
-      style: {color: '#b5b6b6',},
+      style: { color: '#b5b6b6', },
       label: '10x'
     },
     15: {
-      style: {color: '#b5b6b6',},
+      style: { color: '#b5b6b6', },
       label: '15x'
     },
     20: {
-      style: {color: '#b5b6b6',},
+      style: { color: '#b5b6b6', },
       label: '20x'
     },
     25: {
-      style: {color: '#b5b6b6',},
+      style: { color: '#b5b6b6', },
       label: '25x'
     },
     30: {
-      style: {color: '#b5b6b6',},
+      style: { color: '#b5b6b6', },
       label: '30x'
     }
   };
 
   const [leverageOption, setLeverageOption] = useLocalStorageSerializeKey([chainId, "Exchange-swap-leverage-option"], "2");
-  const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useLocalStorageSerializeKey( [chainId, "Exchange-swap-leverage-slider-enabled"], true);
+  useEffect(() => console.log("leverageOption ", leverageOption), [leverageOption])
+  const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useLocalStorageSerializeKey([chainId, "Exchange-swap-leverage-slider-enabled"], true);
   const hasLeverageOption = isLeverageSliderEnabled && !isNaN(parseFloat(leverageOption));
 
   useEffect(() => {
@@ -530,7 +502,7 @@ const SwapComponent = props => {
       isWaitingForApproval
     ) {
       setIsWaitingForApproval(false);
-      // helperToast.success(<div>{fromToken.symbol} approved!</div>);
+      helperToast.success(<div>{fromToken.symbol} approved!</div>);
     }
   }, [
     fromTokenAddress,
@@ -552,6 +524,7 @@ const SwapComponent = props => {
   useEffect(() => {
     if (active) {
       function onBlock() {
+        console.log("onBlock, updateTokenAllowance");
         updateTokenAllowance(undefined, true);
       }
       library.on("block", onBlock);
@@ -594,60 +567,6 @@ const SwapComponent = props => {
   ]);
 
   useEffect(() => {
-    const updateSwapAmounts = () => {
-      if (anchorOnFromAmount) {
-        if (!fromAmount) {
-          setToValue("");
-          return;
-        }
-        if (toToken) {
-          const { amount: nextToAmount } = getNextToAmount(
-            chainId,
-            fromAmount,
-            fromTokenAddress,
-            toTokenAddress,
-            infoTokens,
-            undefined,
-            type !== MARKET && triggerRatio,
-            usdgSupply,
-            totalTokenWeights
-          );
-
-          const nextToValue = formatAmountFree(
-            nextToAmount,
-            toToken.decimals,
-            toToken.decimals
-          );
-          setToValue(nextToValue);
-        }
-        return;
-      }
-
-      if (!toAmount) {
-        setFromValue("");
-        return;
-      }
-      if (fromToken) {
-        const { amount: nextFromAmount } = getNextFromAmount(
-          chainId,
-          toAmount,
-          fromTokenAddress,
-          toTokenAddress,
-          infoTokens,
-          undefined,
-          type !== MARKET && triggerRatio,
-          usdgSupply,
-          totalTokenWeights
-        );
-        const nextFromValue = formatAmountFree(
-          nextFromAmount,
-          fromToken.decimals,
-          fromToken.decimals
-        );
-        setFromValue(nextFromValue);
-      }
-    };
-
     const updateLeverageAmounts = () => {
       if (!hasLeverageOption) {
         return;
@@ -669,7 +588,7 @@ const SwapComponent = props => {
             leverageOption * BASIS_POINTS_DIVISOR
           );
           const toTokenPriceUsd =
-            type!==MARKET && triggerPriceUsd && triggerPriceUsd.gt(0)
+            type !== MARKET && triggerPriceUsd && triggerPriceUsd.gt(0)
               ? triggerPriceUsd
               : toTokenInfo.maxPrice;
 
@@ -771,11 +690,7 @@ const SwapComponent = props => {
       }
     };
 
-    if (mode === SWAP) {
-      updateSwapAmounts();
-    }
-
-    if (mode === LONG || mode === SHORT) {
+    if (isLong || isShort) {
       updateLeverageAmounts();
     }
   }, [
@@ -806,9 +721,9 @@ const SwapComponent = props => {
   let exitMarkPrice;
   if (toTokenInfo) {
     entryMarkPrice =
-      mode === LONG ? toTokenInfo.maxPrice : toTokenInfo.minPrice;
+      isLong ? toTokenInfo.maxPrice : toTokenInfo.minPrice;
     exitMarkPrice =
-      mode === LONG ? toTokenInfo.minPrice : toTokenInfo.maxPrice;
+      isLong ? toTokenInfo.minPrice : toTokenInfo.maxPrice;
   }
 
   let leverage = bigNumberify(0);
@@ -847,7 +762,7 @@ const SwapComponent = props => {
   }
 
   let positionKey;
-  if (mode === LONG) {
+  if (isLong) {
     positionKey = getPositionKey(
       toTokenAddress,
       toTokenAddress,
@@ -855,7 +770,7 @@ const SwapComponent = props => {
       nativeTokenAddress
     );
   }
-  if (mode === SHORT) {
+  if (isShort) {
     positionKey = getPositionKey(
       shortCollateralAddress,
       toTokenAddress,
@@ -885,14 +800,14 @@ const SwapComponent = props => {
     increaseCollateral: true,
     increaseSize: true
   });
-  
+
   const existingLiquidationPrice = existingPosition
     ? getLiquidationPrice(existingPosition)
     : undefined;
   let displayLiquidationPrice = liquidationPrice
     ? liquidationPrice
     : existingLiquidationPrice;
-  
+
   if (hasExistingPosition) {
     const collateralDelta = fromUsdMin ? fromUsdMin : bigNumberify(0);
     const sizeDelta = toUsdMax ? toUsdMax : bigNumberify(0);
@@ -913,19 +828,41 @@ const SwapComponent = props => {
     leverage = bigNumberify(parseInt(leverageOption * BASIS_POINTS_DIVISOR));
   }
 
-  const [visible, setVisible] = useState()
-
-  const selectFromToken = token => {
-    setFromTokenAddress(token.address);
+  const selectFromToken = symbol => {
+    const token = getTokenfromSymbol(tokens, symbol)
+    setFromTokenAddress(mode, token.address);
+    console.log("update from token: ", symbol, token, mode);
+    setActiveToken0((tokens.filter(ele => ele.symbol === symbol))[0]);
     setIsWaitingForApproval(false);
-
-    if (mode === SHORT && token.isStable) {
+    if (isShort) {
+      console.log("is short and changed short collateral token to ", token.address)
       setShortCollateralAddress(token.address);
     }
   };
 
-  const selectToToken = token => {
-    setToTokenAddress(token.address);
+  const getToUsdAmount = () => {
+
+  }
+
+  useEffect(() => {
+    console.log("update from token 1: ", fromTokenAddress)
+  }, [fromTokenAddress])
+
+  useEffect(() => {
+    const fromToken = getTokenfromSymbol(tokens, activeToken0.symbol)
+    const toToken = getTokenfromSymbol(tokens, activeToken1.symbol)
+
+    setFromTokenAddress(mode, fromToken.address);
+    setToTokenAddress(mode, toToken.address);
+
+  }, [activeToken0, activeToken1])
+
+  console.log("show this")
+  const selectToToken = symbol => {
+    const token = getTokenfromSymbol(tokens, symbol)
+    console.log("selectToToken symbol and address", symbol, token.address)
+    setToTokenAddress(mode, token.address);
+    setActiveToken1((tokens.filter(ele => ele.symbol === symbol))[0]);
   };
 
   const onFromValueChange = e => {
@@ -938,171 +875,44 @@ const SwapComponent = props => {
     setToValue(e.target.value);
   };
 
-  const wrap = async () => {
-    setIsSubmitting(true);
+  const createIncreaseOrder = () => {
+    console.log("inside createIncreaseOrder")
+    let path = [fromTokenAddress];
 
-    const contract = new ethers.Contract(
-      getContractAddress(chainId, 'NATIVE_TOKEN'),
-      WETHABI,
-      library.getSigner()
-    );
-    Api.callContract(chainId, contract, 'deposit', {
-      value: fromAmount,
-      sentMsg: 'Swap submitted!',
-      successMsg: `Swapped ${formatAmount(fromAmount, fromToken.decimals, 4, true)} ${
-        fromToken.symbol
-      } for ${formatAmount(toAmount, toToken.decimals, 4, true)} ${toToken.symbol}`,
-      failMsg: 'Swap failed.',
-      setPendingTxns,
-    })
-      .then(async res => {})
-      .finally(() => {
-        setIsSubmitting(false);
-      });
-  };
-
-  const unwrap = async () => {
-    setIsSubmitting(true);
-
-    const contract = new ethers.Contract(
-      getContractAddress(chainId, 'NATIVE_TOKEN'),
-      WETHABI,
-      library.getSigner()
-    );
-    Api.callContract(chainId, contract, 'withdraw', [fromAmount], {
-      sentMsg: 'Swap submitted!',
-      failMsg: 'Swap failed.',
-      successMsg: `Swapped ${formatAmount(fromAmount, fromToken.decimals, 4, true)} ${
-        fromToken.symbol
-      } for ${formatAmount(toAmount, toToken.decimals, 4, true)} ${toToken.symbol}`,
-      setPendingTxns,
-    })
-      .then(async res => {})
-      .finally(() => {
-        setIsSubmitting(false);
-      });
-  };
-
-  const swap = async () => {
-    if (fromToken.isNative && toToken.isWrapped) {
-      wrap();
-      return;
-    }
-
-    if (fromTokenAddress.isWrapped && toToken.isNative) {
-      unwrap();
-      return;
-    }
-
-    setIsSubmitting(true);
-    let path = [fromTokenAddress, toTokenAddress];
-    if (anchorOnFromAmount) {
-      const { path: multiPath } = getNextToAmount(
-        chainId,
-        fromAmount,
-        fromTokenAddress,
-        toTokenAddress,
-        infoTokens,
-        undefined,
-        undefined,
-        usdgSupply,
-        totalTokenWeights
-      );
-      if (multiPath) {
-        path = multiPath;
-      }
-    } else {
-      const { path: multiPath } = getNextFromAmount(
-        chainId,
-        toAmount,
-        fromTokenAddress,
-        toTokenAddress,
-        infoTokens,
-        undefined,
-        undefined,
-        usdgSupply,
-        totalTokenWeights
-      );
-      if (multiPath) {
-        path = multiPath;
+    if (path[0] === USDG_ADDRESS) {
+      if (isLong) {
+        const stableToken = getMostAbundantStableToken(chainId, infoTokens);
+        path.push(stableToken.address);
+      } else {
+        path.push(shortCollateralAddress);
       }
     }
 
-    let method;
-    let contract;
-    let value;
-    let params;
-    let minOut;
-    if (shouldRaiseGasError(getTokenInfo(infoTokens, fromTokenAddress), fromAmount)) {
-      setIsSubmitting(false);
-      setIsPendingConfirmation(true);
-      helperToast.error(
-        `Leave at least ${formatAmount(DUST_BNB, 18, 3)} ${getConstant(
-          chainId,
-          'nativeTokenSymbol'
-        )} for gas`
-      );
-      return;
-    }
-
-    if (!isMarketOrder) {
-      minOut = toAmount;
-      Api.createSwapOrder(
-        chainId,
-        library,
-        path,
-        fromAmount,
-        minOut,
-        triggerRatio,
-        getContractAddress(chainId, 'NATIVE_TOKEN'),
-        {
-          sentMsg: 'Swap Order submitted!',
-          successMsg: 'Swap Order created!',
-          failMsg: 'Swap Order creation failed',
-          pendingTxns,
-          setPendingTxns,
-        }
-      )
-        .then(() => {
-          setIsConfirming(false);
-        })
-        .finally(() => {
-          setIsSubmitting(false);
-          setIsPendingConfirmation(false);
-        });
-      return;
-    }
-
-    path = replaceNativeTokenAddress(path, getContractAddress(chainId, 'NATIVE_TOKEN'));
-    method = 'swap';
-    value = bigNumberify(0);
-    if (toTokenAddress === AddressZero) {
-      method = 'swapTokensToETH';
-    }
-
-    minOut = toAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR);
-    params = [path, fromAmount, minOut, account];
-    if (fromTokenAddress === AddressZero) {
-      method = 'swapETHToTokens';
-      value = fromAmount;
-      params = [path, minOut, account];
-    }
-    contract = new ethers.Contract(
-      getContractAddress(chainId, 'Router'),
-      Router.abi,
-      library.getSigner()
-    );
-
-    Api.callContract(chainId, contract, method, params, {
-      value,
-      sentMsg: `Swap ${!isMarketOrder ? ' order ' : ''} submitted!`,
-      successMsg: `Swapped ${formatAmount(fromAmount, fromToken.decimals, 4, true)} ${
-        fromToken.symbol
-      } for ${formatAmount(toAmount, toToken.decimals, 4, true)} ${toToken.symbol}`,
-      failMsg: 'Swap failed.',
-      setPendingTxns,
-    })
-      .then(async () => {
+    const minOut = 0;
+    const indexToken = perpetuals.getToken(indexTokenAddress);
+    const successMsg = `
+      Created limit order for ${indexToken.symbol} ${isLong ? "Long" : "Short"}: ${formatAmount(toUsdMax, USD_DECIMALS, 2)} USD!`;
+    return Api.createIncreaseOrder(
+      chainId,
+      library,
+      nativeTokenAddress,
+      path,
+      fromAmount,
+      indexTokenAddress,
+      minOut,
+      toUsdMax,
+      collateralTokenAddress,
+      isLong,
+      triggerPriceUsd,
+      {
+        pendingTxns,
+        setPendingTxns,
+        sentMsg: "Limit order submitted!",
+        successMsg,
+        failMsg: "Limit order creation failed.",
+      }
+    )
+      .then(() => {
         setIsConfirming(false);
       })
       .finally(() => {
@@ -1111,106 +921,147 @@ const SwapComponent = props => {
       });
   };
 
-  function handleSwap() {
-    // when need approval :
-    // orderbook approval, setOrders to Open
-    // approve from token (in gmx = approve in acy)
-    // modal
-    // after isSwap
-    if (
-      fromTokenAddress === AddressZero &&
-      toTokenAddress === getContractAddress(chainId, 'NATIVE_TOKEN')
-    ) {
-      wrap();
+  // refers to gmx 9c6b4a8 commit
+  const increasePosition = async () => {
+    console.log("try to increasePosition");
+    setIsSubmitting(true);
+    const tokenAddress0 = fromTokenAddress === AddressZero ? nativeTokenAddress : fromTokenAddress;
+    const indexTokenAddress = toTokenAddress === AddressZero ? nativeTokenAddress : toTokenAddress;
+    let path = [indexTokenAddress]; // assume long
+    if (toTokenAddress !== fromTokenAddress) {
+      path = [tokenAddress0];
+    }
+
+    if (fromTokenAddress === AddressZero && toTokenAddress === nativeTokenAddress) {
+      path = [nativeTokenAddress];
+    }
+
+    if (fromTokenAddress === nativeTokenAddress && toTokenAddress === AddressZero) {
+      path = [nativeTokenAddress];
+    }
+
+    if (isShort) {
+      path = [shortCollateralAddress];
+      if (tokenAddress0 !== shortCollateralAddress) {
+        path = [tokenAddress0, shortCollateralAddress];
+      }
+    }
+
+    const refPrice = isLong ? toTokenInfo.maxPrice : toTokenInfo.minPrice;
+    const priceBasisPoints = isLong ? BASIS_POINTS_DIVISOR + allowedSlippage : BASIS_POINTS_DIVISOR - allowedSlippage;
+    const priceLimit = refPrice.mul(priceBasisPoints).div(BASIS_POINTS_DIVISOR);
+
+    const boundedFromAmount = fromAmount ? fromAmount : bigNumberify(0);
+
+    if (fromAmount && fromAmount.gt(0) && fromTokenAddress === USDG_ADDRESS && isLong) {
+      const { amount: nextToAmount, path: multiPath } = getNextToAmount(
+        chainId,
+        fromAmount,
+        fromTokenAddress,
+        indexTokenAddress,
+        infoTokens,
+        undefined,
+        undefined,
+        usdgSupply,
+        totalTokenWeights
+      );
+      if (nextToAmount.eq(0)) {
+        helperToast.error("Insufficient liquidity");
+        return;
+      }
+      if (multiPath) {
+        path = replaceNativeTokenAddress(multiPath);
+      }
+    }
+
+    let params = [
+      path, // _path
+      indexTokenAddress, // _indexToken
+      boundedFromAmount, // _amountIn
+      0, // _minOut
+      toUsdMax, // _sizeDelta
+      isLong, // _isLong
+      priceLimit, // _acceptablePrice
+    ];
+
+    let method = "increasePosition";	
+    let value = bigNumberify(0);	
+    if (fromTokenAddress === AddressZero) {	
+      method = "increasePositionETH";	
+      value = boundedFromAmount;	
+      params = [path, indexTokenAddress, 0, toUsdMax, isLong, priceLimit];
+    }
+
+    if (shouldRaiseGasError(getTokenInfo(infoTokens, fromTokenAddress), fromAmount)) {
+      setIsSubmitting(false);
+      setIsPendingConfirmation(false);
+      helperToast.error(
+        `Leave at least ${formatAmount(DUST_BNB, 18, 3)} ${getConstant(chainId, "nativeTokenSymbol")} for gas`
+      );
       return;
     }
 
-    if (token0Addr === getContractAddress(chainId, 'NATIVE_TOKEN') && token1Addr === AddressZero) {
-      unwrap();
-      return;
-    }
-    setIsConfirming(true);
-    //metamask operations
-  }
-
-  // swap的交易状态
-  const swapCallback = async (status, inputToken, outToken) => {
-    // 循环获取交易结果
-    const {
-      transaction: { transactions },
-    } = props;
-    // 检查是否已经包含此交易
-    const transLength = transactions.filter(item => item.hash == status.hash).length;
-
-    const sti = async hash => {
-      library.getTransactionReceipt(hash).then(async receipt => {
-        console.log(`receiptreceipt for ${hash}: `, receipt);
-        // receipt is not null when transaction is done
-        if (!receipt) setTimeout(sti(hash), 500);
-        else {
-          if (!receipt.status) {
-            setSwapButtonContent('Failed');
-          } else {
-            props.onGetReceipt(receipt.transactionHash, library, account);
-
-            // set button to done and disabled on default
-            setSwapButtonContent('Done');
-          }
-
-          const newData = transactions.filter(item => item.hash != hash);
-          dispatch({
-            type: 'transaction/addTransaction',
-            payload: {
-              transactions: newData,
-            },
-          });
-        }
+    console.log("increasePosition 2: ", params);
+    const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner());
+    const indexToken = getTokenInfo(infoTokens, indexTokenAddress);
+    const tokenSymbol = indexToken.isWrapped ? getConstant(chainId, "nativeTokenSymbol") : indexToken.symbol;
+    const successMsg = `Requested increase of ${tokenSymbol} ${isLong ? "Long" : "Short"} by ${formatAmount(
+      toUsdMax,
+      USD_DECIMALS,
+      2
+    )} USD.`;
+    Api.callContract(chainId, contract, method, params, {
+      value,
+      setPendingTxns,
+      sentMsg: `${isLong ? "Long" : "Short"} submitted.`,
+      failMsg: `${isLong ? "Long" : "Short"} failed.`,
+      successMsg,
+    })
+      .then(async () => {
+        setIsConfirming(false);
+        
+      })
+      .finally(() => {
+        setIsConfirming(false);
+        setIsSubmitting(false);
+        setIsPendingConfirmation(false);
       });
-    };
-    sti(status.hash);
   };
 
-  const perpetualMode = [LONG, MARKET];
-  const perpetualType = [{
-    name: 'Market',
-    icon: <LineChartOutlined />,
-    id: MARKET,
-  }, {
-    name: 'Limit',
-    icon: <FieldTimeOutlined />,
-    id: LIMIT,
-  }];
+  const onConfirmationClick = () => {
+    if (!account) {
+      connectWalletByLocalStorage()
+      return;
+    }
 
-  // LONG or SHORT
+    if (needOrderBookApproval) {
+      approveOrderBook();
+      // return;
+    }
+
+    setIsPendingConfirmation(true);
+
+    if (type === LIMIT) {
+      createIncreaseOrder();
+      return;
+    }
+
+    increasePosition();
+  };
+
+  const perpetualMode = [LONG, SHORT, POOL];
+  const perpetualType = [MARKET, LIMIT]
+
+  // LONG or SHORT or POOL
   const modeSelect = (input) => {
-    setMode(input.target.value);
-    onChangeMode(input.target.value);
+    setMode(input);
+    onChangeMode(input);
   }
 
   // MARKET or LIMIT
   const typeSelect = input => {
     setType(input);
   }
-  // const calculateFee = () => fees * 100
-  // const limitOnChange = (e) => {
-  //   const check = Pattern.coinNum.test(e.target.value);
-  //   if (check) {
-  //     setEntryPriceLimit(e.target.value)
-  //     setPriceValue(e.target.value.toString())
-  //     setTriggerPriceValue(e.target.value.toString())
-  //     if (!e.target.value) {
-  //       setEntryPriceLimit(0);
-  //       setPriceValue("")
-  //       setTriggerPriceValue("")
-  //     }
-  //   }
-  // };
-  // const markOnClick = (e) => {
-  //   // setTriggerPriceValue(marketPrice.toString());
-  //   setTriggerPriceValue(e.toString());
-  //   setPriceValue(e.toString())
-
-  // }
 
   const switchTokens = () => {
     if (fromAmount && toAmount) {
@@ -1223,12 +1074,11 @@ const SwapComponent = props => {
     }
     setIsWaitingForApproval(false);
 
-    setFromTokenAddress(toTokenAddress)
-    setToTokenAddress(fromTokenAddress)
+    setFromTokenAddress(mode, toTokenAddress)
+    setToTokenAddress(mode, fromTokenAddress)
   };
 
   const getLeverageError = useCallback(() => {
-
     if (!toAmount || toAmount.eq(0)) {
       return ["Enter an amount"];
     }
@@ -1236,8 +1086,7 @@ const SwapComponent = props => {
     let toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
     if (toTokenInfo && toTokenInfo.isStable) {
       return [
-        `${mode === LONG ? "Longing" : "Shorting"} ${
-          toTokenInfo.symbol
+        `${isLong ? "Longing" : "Shorting"} ${toTokenInfo.symbol
         } not supported`
       ];
     }
@@ -1267,8 +1116,8 @@ const SwapComponent = props => {
       return ["Min order: 10 USD"];
     }
 
-    if (leverage && leverage.lt(1.1 * BASIS_POINTS_DIVISOR)) {
-      return ["Min leverage: 1.1x"];
+    if (leverage && leverage.lt(0.1 * BASIS_POINTS_DIVISOR)) {
+      return ["Min leverage: 0.1x"];
     }
 
     if (leverage && leverage.gt(30.5 * BASIS_POINTS_DIVISOR)) {
@@ -1276,7 +1125,7 @@ const SwapComponent = props => {
     }
 
     if (type !== MARKET && entryMarkPrice && triggerPriceUsd) {
-      if (mode === LONG && entryMarkPrice.lt(triggerPriceUsd)) {
+      if (isLong && entryMarkPrice.lt(triggerPriceUsd)) {
         return ["Price above Mark Price"];
       }
       if (mode !== LONG && entryMarkPrice.gt(triggerPriceUsd)) {
@@ -1284,27 +1133,28 @@ const SwapComponent = props => {
       }
     }
 
-    if (mode === LONG) {
+    if (isLong) {
       let requiredAmount = toAmount;
       if (fromTokenAddress !== toTokenAddress) {
         const { amount: swapAmount } = getNextToAmount(
           chainId,
-          fromAmount,
-          fromTokenAddress,
+          toAmount,
           toTokenAddress,
+          fromTokenAddress,
           infoTokens,
           undefined,
           undefined,
           usdgSupply,
           totalTokenWeights
         );
+        
         requiredAmount = requiredAmount.add(swapAmount);
-
+        console.log("DEBUG HERE2:", requiredAmount.toString(), fromTokenInfo.availableAmount.toString(), leverageOption)
         if (
           toToken &&
           toTokenAddress !== USDG_ADDRESS &&
-          toTokenInfo.availableAmount &&
-          requiredAmount.gt(toTokenInfo.availableAmount)
+          fromTokenInfo.availableAmount &&
+          requiredAmount.gt(fromTokenInfo.availableAmount)
         ) {
           return ["Insufficient liquidity"];
         }
@@ -1341,7 +1191,7 @@ const SwapComponent = props => {
       }
     }
 
-    if (mode === SHORT) {
+    if (isShort) {
       let stableTokenAmount = bigNumberify(0);
       if (
         fromTokenAddress !== shortCollateralAddress &&
@@ -1361,7 +1211,7 @@ const SwapComponent = props => {
         );
         stableTokenAmount = nextToAmount;
         if (stableTokenAmount.gt(shortCollateralToken.availableAmount)) {
-          return [`Insufficient liquidity, change "Profits In"`];
+          return [`Insufficient liquidity, change "Profits In" 1`];
         }
 
         if (
@@ -1373,7 +1223,7 @@ const SwapComponent = props => {
         ) {
           // suggest swapping to collateralToken
           return [
-            `Insufficient liquidity, change "Profits In"`,
+            `Insufficient liquidity, change "Profits In" 2`,
             true,
             "BUFFER"
           ];
@@ -1416,14 +1266,14 @@ const SwapComponent = props => {
       const sizeTokens = sizeUsd
         .mul(expandDecimals(1, shortCollateralToken.decimals))
         .div(shortCollateralToken.minPrice);
-
-      if (toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) && sizeUsd.gt(toTokenInfo.maxAvailableShort)) {
-        return [`Max ${toTokenInfo.symbol} short exceeded`]
-      }
-
+      // no more this short limits
+      // if (toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) && sizeUsd.gt(toTokenInfo.maxAvailableShort)) {
+      //   return [`Max ${toTokenInfo.symbol} short exceeded`]
+      // }
+      console.log("DEBUG HERE3:", stableTokenAmount, sizeTokens.toString(), shortCollateralToken)
       stableTokenAmount = stableTokenAmount.add(sizeTokens)
       if (stableTokenAmount.gt(shortCollateralToken.availableAmount)) {
-        return [`Insufficient liquidity, change "Profits In"`];
+        return [`Insufficient liquidity, change "Profits In" 3`];
       }
     }
 
@@ -1445,129 +1295,28 @@ const SwapComponent = props => {
     triggerPriceUsd,
     triggerPriceValue,
     usdgSupply,
-    entryMarkPrice    
+    entryMarkPrice
   ]);
-
-  const getSwapError = () => {
-    if (fromTokenAddress === toTokenAddress) {
-      return ["Select different tokens"];
-    }
-
-    if (type === MARKET) {
-      if (
-        (toToken.isStable || toToken.isUsdg) &&
-        (fromToken.isStable || fromToken.isUsdg)
-      ) {
-        return ["Select different tokens"];
-      }
-
-      if (fromToken.isNative && toToken.isWrapped) {
-        return ["Select different tokens"];
-      }
-
-      if (toToken.isNative && fromToken.isWrapped) {
-        return ["Select different tokens"];
-      }
-    }
-
-    if (!fromAmount || fromAmount.eq(0)) {
-      return ["Enter an amount"];
-    }
-    if (!toAmount || toAmount.eq(0)) {
-      return ["Enter an amount"];
-    }
-
-    const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
-    if (!fromTokenInfo || !fromTokenInfo.minPrice) {
-      return ["Incorrect network"];
-    }
-    if (
-      fromTokenInfo &&
-      fromTokenInfo.balance &&
-      fromAmount &&
-      fromAmount.gt(fromTokenInfo.balance)
-    ) {
-      return [`Insufficient ${fromTokenInfo.symbol} balance`];
-    }
-
-    const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
-
-    if (type !== MARKET) {
-      if (!triggerRatioValue || triggerRatio.eq(0)) {
-        return ["Enter a price"];
-      }
-
-      const currentRate = getExchangeRate(fromTokenInfo, toTokenInfo);
-      if (currentRate && currentRate.lt(triggerRatio)) {
-        return [`Price ${triggerRatioInverted ? "below" : "above"} Mark Price`];
-      }
-    }
-
-    if (
-      !isWrapOrUnwrap &&
-      toToken &&
-      toTokenAddress !== USDG_ADDRESS &&
-      toTokenInfo &&
-      toTokenInfo.availableAmount &&
-      toAmount.gt(toTokenInfo.availableAmount)
-    ) {
-      return ["Insufficient liquidity"];
-    }
-    if (
-      !isWrapOrUnwrap &&
-      toAmount &&
-      toTokenInfo.bufferAmount &&
-      toTokenInfo.poolAmount &&
-      toTokenInfo.bufferAmount.gt(toTokenInfo.poolAmount.sub(toAmount))
-    ) {
-      return ["Insufficient liquidity"];
-    }
-
-    if (
-      fromUsdMin &&
-      fromTokenInfo.maxUsdgAmount &&
-      fromTokenInfo.maxUsdgAmount.gt(0) &&
-      fromTokenInfo.usdgAmount &&
-      fromTokenInfo.maxPrice
-    ) {
-      const usdgFromAmount = adjustForDecimals(
-        fromUsdMin,
-        USD_DECIMALS,
-        USDG_DECIMALS
-      );
-      const nextUsdgAmount = fromTokenInfo.usdgAmount.add(usdgFromAmount);
-
-      if (nextUsdgAmount.gt(fromTokenInfo.maxUsdgAmount)) {
-        return [`${fromTokenInfo.symbol} pool exceeded`];
-      }
-    }
-
-    return [false];
-  };
-
-  const getError = () => {
-    if (mode !== SWAP) {
-      return getLeverageError();
-    }
-    return getSwapError()
-  };
 
   const isPrimaryEnabled = () => {
     if (!active) { return true }
-    const [error, modal] = getError()
-    if (error && !modal) { return false }
+    if (mode !== POOL) {
+      const [error, modal] = getLeverageError()
+      if (error && !modal) { return false }
+    }
     if (needOrderBookApproval && isWaitingForPluginApproval) { return false }
     if ((needApproval && isWaitingForApproval) || isApproving) { return false }
     if (isApproving) { return false }
     if (isSubmitting) { return false }
-
     return true;
   };
 
   const getPrimaryText = () => {
-    if (!active) { return "Connect Wallet";}
-    const [error, modal] = getError();
-    if (error && !modal) { return error;}
+    if (!active) { return "Connect Wallet"; }
+    if (mode !== POOL) {
+      const [error, modal] = getLeverageError()
+      if (error && !modal) { return error }
+    }
 
     if (needApproval && isWaitingForApproval) {
       return "Waiting for Approval";
@@ -1592,14 +1341,7 @@ const SwapComponent = props => {
     if (type !== MARKET)
       return `Create ${type} Order`;
 
-    if (mode === SWAP) {
-      if (toUsdMax && toUsdMax.lt(fromUsdMin.mul(95).div(100))) {
-        return "High Slippage, Swap Anyway";
-      }
-      return "Swap";
-    }
-
-    if (mode === LONG) {
+    if (isLong) {
       const indexTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
       if (indexTokenInfo && indexTokenInfo.minPrice) {
         const { amount: nextToAmount } = getNextToAmount(
@@ -1651,9 +1393,10 @@ const SwapComponent = props => {
       return;
     }
 
+    // TODO terms and condition pop up, we dont have it now
     if (needOrderBookApproval) {
       setOrdersToaOpen(true);
-      return;
+      // return;
     }
 
     if (needApproval) {
@@ -1661,27 +1404,10 @@ const SwapComponent = props => {
       return;
     }
 
-    const [, modal, errorCode] = getError();
-
-    if (modal) {
-      setModalError(errorCode);
-      return;
-    }
-
-    if (mode === SWAP) {
-      if (
-        fromTokenAddress === AddressZero &&
-        toTokenAddress === nativeTokenAddress
-      ) {
-        wrap();
-        return;
-      }
-
-      if (
-        fromTokenAddress === nativeTokenAddress &&
-        toTokenAddress === AddressZero
-      ) {
-        unwrap();
+    if (mode !== POOL) {
+      const [, modal, errorCode] = getLeverageError()
+      if (modal) {
+        setModalError(errorCode);
         return;
       }
     }
@@ -1691,10 +1417,10 @@ const SwapComponent = props => {
 
   let hasZeroBorrowFee = false;
   let borrowFeeText;
-  if (mode === LONG && toTokenInfo && toTokenInfo.fundingRate) {
+  if (isLong && toTokenInfo && toTokenInfo.fundingRate) {
     borrowFeeText = formatAmount(toTokenInfo.fundingRate, 4, 4) + "% / 1h";
   }
-  if (mode === SHORT && shortCollateralToken && shortCollateralToken.fundingRate) {
+  if (isShort && shortCollateralToken && shortCollateralToken.fundingRate) {
     borrowFeeText =
       formatAmount(shortCollateralToken.fundingRate, 4, 4) + "% / 1h";
   }
@@ -1755,111 +1481,85 @@ const SwapComponent = props => {
 
   let payBalance = "$0.00"
   let receiveBalance = "$0.00"
-  let leverageLabel = ""
-  let leverageValue = ""
-  if(fromUsdMin) {
+  if (fromUsdMin) {
     payBalance = `$${formatAmount(fromUsdMin, USD_DECIMALS, 2, true, 0)}`
   }
   if (toUsdMax) {
     receiveBalance = `$${formatAmount(toUsdMax, USD_DECIMALS, 2, true)}`
   }
-  if(mode !== SWAP && isLeverageSliderEnabled) {
-    leverageLabel = "Leverage: "
-    leverageValue = `${parseFloat(leverageOption).toFixed(2)}x`
-  }
 
   // Glp Swap Component
-  const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
-  const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([tempChainID, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(tempLibrary, ReaderV2, [tokensForBalanceAndSupplyQuery]),
+  // const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
+  // const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([chainId, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
+  //   fetcher: fetcher(library, ReaderV2, [tokensForBalanceAndSupplyQuery]),
+  // })
+  // const { data: aums, mutate: updateAums } = useSWR([chainId, glpManagerAddress, "getAums"], {
+  //   fetcher: fetcher(library, GlpManager),
+  // })
+  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, glpAddress, "balanceOf", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, Glp),
   })
-  const { data: aums, mutate: updateAums } = useSWR([tempChainID, glpManagerAddress, "getAums"], {
-    fetcher: fetcher(tempLibrary, GlpManager),
-  })
-  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([tempChainID, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(tempLibrary, RewardTracker),
-  })
-  const { data: reservedAmount, mutate: updateReservedAmount } = useSWR([tempChainID, glpVesterAddress, "pairAmounts", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(tempLibrary, Vester),
-  })
-  const { gmxPrice, mutate: updateGmxPrice } = useGmxPrice(tempChainID, { arbitrum: tempLibrary }, active)
-  const rewardTrackersForStakingInfo = [ stakedGlpTrackerAddress, feeGlpTrackerAddress ]
-  const { data: stakingInfo, mutate: updateStakingInfo } = useSWR([tempChainID, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(tempLibrary, RewardReader, [rewardTrackersForStakingInfo]),
-  })
-  const [glpValue, setGlpValue] = useState("")
-  const glpAmount = parseValue(glpValue, GLP_DECIMALS)
+  // const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
+  //   fetcher: fetcher(library, RewardTracker),
+  // })
+  // const { data: reservedAmount, mutate: updateReservedAmount } = useSWR([chainId, glpVesterAddress, "pairAmounts", account || PLACEHOLDER_ACCOUNT], {
+  //   fetcher: fetcher(library, Vester),
+  // })
+  // const { gmxPrice, mutate: updateGmxPrice } = useGmxPrice(chainId, { arbitrum: library }, active)
+  // const rewardTrackersForStakingInfo = [ stakedGlpTrackerAddress, feeGlpTrackerAddress ]
+  // const { data: stakingInfo, mutate: updateStakingInfo } = useSWR([chainId, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT], {
+  //   fetcher: fetcher(library, RewardReader, [rewardTrackersForStakingInfo]),
+  // })
 
-  const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
-  const glp_usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
-  let aum
-  if (aums && aums.length > 0) {
-    aum = isBuying ? aums[0] : aums[1]
-  }
-  const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  const { data: glpSupply, mutate: updateGlpSupply } = useSWR([chainId, glpAddress, "totalSupply"], {
+    fetcher: fetcher(library, Glp),
+  })
+  // const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
+  // const glp_usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
+  // let aum
+  // if (aums && aums.length > 0) {
+  //   aum = isBuying ? aums[0] : aums[1]
+  // }
+  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsda", true], {
+    fetcher: fetcher(library, GlpManager),
+  })
+  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0) ) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  // const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   let glpBalanceUsd
   if (glpBalance) {
     glpBalanceUsd = glpBalance.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
   }
-  const glpSupplyUsd = glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
-
-  let reserveAmountUsd
-  if (reservedAmount) {
-    reserveAmountUsd = reservedAmount.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
-  }
-
+  const glpSupplyUsd = glpSupply ? glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS)) : bigNumberify(0)
   const glp_infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
 
   return (
-    <div>
-      <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}>
+    <div className={styles.mainContent}>
+      <AcyPerpetualCard style={{ backgroundColor: 'transparent' }}>
         <div className={styles.modeSelector}>
-          <Radio.Group defaultValue={LONG} buttonStyle="solid" onChange={modeSelect}>
-            <StyledRadioButton value={LONG} className={styles.modeSubOption}>
-              Long
-            </StyledRadioButton>
-            <StyledRadioButton value={SHORT} className={styles.modeSubOption}>
-              Short
-            </StyledRadioButton>
-            <StyledRadioButton value={SWAP} className={styles.modeSubOption}>
-              Swap
-            </StyledRadioButton>
-            <StyledRadioButton value={POOL} className={styles.modeSubOption}>
-              Pool
-            </StyledRadioButton>
-          </Radio.Group>
-
-          {/* <Tabs onChange={modeSelect} type="card">
-            <TabPane tab="Long" key='Long' />
-            <TabPane tab="Short" key='Short' />
-            <TabPane tab="Swap" key='Swap' />
-          </Tabs>  */}
+          <PerpetualTabs
+            option={mode}
+            options={perpetualMode}
+            onChange={modeSelect}
+          />
         </div>
 
         {mode !== POOL ?
           <>
-            <div>
-              <Tabs 
-                defaultActiveKey={MARKET} 
+            <div className={styles.typeSelector}>
+              <PerpetualTabs
+                option={type}
+                options={perpetualType}
+                type="inline"
                 onChange={typeSelect}
-                size={'small'}
-                tabBarGutter={0}
-                type={'line'}
-                tabPosition={'top'}
-                tabBarStyle={{ border: '0px black' }}
-              // animated={false}
-              >
-                {perpetualType.map(i => (
-                  <TabPane tab={<span>{i.name}{' '}</span>} key={i.id} />
-                ))}
-              </Tabs>
+                style={{height:'30px'}}
+              />
             </div>
 
             <BuyInputSection
               token={fromToken}
-              tokenlist={tokens}
+              tokenlist={tokens.filter(token => !token.isWrapped)}
               topLeftLabel="Pay"
-              balance={payBalance} 
+              balance={payBalance}
               topRightLabel='Balance: '
               tokenBalance={formatAmount(fromBalance, fromToken.decimals, 4, true)}
               inputValue={fromValue}
@@ -1867,22 +1567,22 @@ const SwapComponent = props => {
               onSelectToken={selectFromToken}
             />
 
-            <div className={styles.arrow} onClick={switchTokens}>
+            {/* <div className={styles.arrow} onClick={switchTokens}>
               <Icon style={{ fontSize: '16px' }} type="arrow-down" />
-            </div>
+            </div> */}
 
             <BuyInputSection
               token={toToken}
               tokenlist={toTokens}
               topLeftLabel={getTokenLabel()}
-              balance={receiveBalance} 
-              topRightLabel={leverageLabel}
-              tokenBalance={leverageValue}
+              balance={receiveBalance}
+              // topRightLabel={leverageLabel}
+              // tokenBalance={leverageValue}
               inputValue={toValue}
               onInputValueChange={onToValueChange}
               onSelectToken={selectToToken}
             />
-          
+
             {type === LIMIT &&
               <div className={styles.priceBox}>
                 <PriceBox
@@ -1899,118 +1599,121 @@ const SwapComponent = props => {
             }
 
             {/* Leverage Slider */}
-            {(mode === LONG || mode === SHORT) &&
+            {(isLong || isShort) &&
               <AcyDescriptions>
-                <div className={styles.breakdownTopContainer}>
+                <div className={styles.leverageContainer}>
                   <div className={styles.slippageContainer}>
-                    <span style={{ fontWeight: 600 }}>Leverage</span>
-                    {isLeverageSliderEnabled &&
-                      <div className={styles.leverageInputContainer}>
-                        <button 
-                          className={styles.leverageButton}
-                          onClick={()=>{
-                            if(leverageOption > 1.1) {
-                              setLeverageOption((parseFloat(leverageOption)-0.1).toFixed(1))
-                            }
-                          }}
-                        >
-                          <span> - </span>
-                        </button>
-                        <input
-                          type="number"
-                          min={1.1}
-                          max={30.5}
-                          value={leverageOption} 
-                          onChange={e => {
-                            let val = parseFloat(e.target.value.replace(/^(-)*(\d+)\.(\d).*$/, '$1$2.$3')).toFixed(1)
-                            if(val >= 1.1 && val <= 30.5){
-                              setLeverageOption(val)
-                            }
-                          }} 
-                          className={styles.leverageInput}
-                        />
-                        <button 
-                          className={styles.leverageButton}
-                          onClick={()=>{
-                            if(leverageOption < 30.5) {
-                              setLeverageOption((parseFloat(leverageOption)+0.1).toFixed(1))
-                            }
-                          }}
-                        >
-                          <span> + </span>
-                        </button>
-                      </div>
-                    }
-                    <Checkbox
-                      checked={isLeverageSliderEnabled}
-                      onChange={()=>{
-                        setIsLeverageSliderEnabled(!isLeverageSliderEnabled)
-                      }}
-                    />
+                    <div className={styles.leverageLabel}>
+                      <span>Leverage</span>
+                      {isLeverageSliderEnabled &&
+                        <div className={styles.leverageInputContainer}>
+                          <button
+                            className={styles.leverageButton}
+                            onClick={() => {
+                              if (leverageOption > 0.1) {
+                                setLeverageOption((parseFloat(leverageOption) - 0.1).toFixed(1))
+                              }
+                            }}
+                          >
+                            <span> - </span>
+                          </button>
+                          <input
+                            type="number"
+                            min={0.1}
+                            max={30.5}
+                            value={leverageOption}
+                            onChange={e => {
+                              let val = parseFloat(e.target.value.replace(/^(-)*(\d+)\.(\d).*$/, '$1$2.$3')).toFixed(1)
+                              if (val >= 0.1 && val <= 30.5) {
+                                setLeverageOption(val)
+                              }
+                            }}
+                            className={styles.leverageInput}
+                          />
+                          <button
+                            className={styles.leverageButton}
+                            onClick={() => {
+                              if (leverageOption < 30.5) {
+                                setLeverageOption((parseFloat(leverageOption) + 0.1).toFixed(1))
+                              }
+                            }}
+                          >
+                            <span> + </span>
+                          </button>
+                        </div>
+                      }
+                    </div>
+                    {/* <div className={styles.checkbox}>
+                      <StyledCheckbox
+                        checked={isLeverageSliderEnabled}
+                        onChange={() => {
+                          setIsLeverageSliderEnabled(!isLeverageSliderEnabled)
+                        }}
+                      />
+                    </div> */}
                   </div>
                   {isLeverageSliderEnabled &&
                     <span className={styles.leverageSlider}>
-                      <StyledSlider 
-                        min={1.1} 
-                        max={30.5} 
+                      <StyledSlider
+                        min={0.1}
+                        max={30.5}
                         step={0.1}
-                        marks={leverageMarks} 
-                        value={leverageOption} 
-                        onChange={value => setLeverageOption(value)} 
-                        defaultValue={leverageOption} 
-                        style={{ color: 'red' }} 
+                        marks={leverageMarks}
+                        value={leverageOption}
+                        onChange={value => setLeverageOption(value)}
+                        defaultValue={leverageOption}
+                        style={{ color: 'red' }}
                       />
-                    </span>}
+                    </span>
+                  }
                 </div>
               </AcyDescriptions>
             }
 
-            <div>
-              <AcyButton 
+            <div className={styles.centerButton}>
+              <AcyPerpetualButton
+                // <AcyButton
                 style={{ marginTop: '25px' }}
-                onClick={onClickPrimary} 
+                onClick={onClickPrimary}
                 disabled={!isPrimaryEnabled()}
               >
                 {getPrimaryText()}
-              </AcyButton>
+              </AcyPerpetualButton>
+              {/* </AcyButton> */}
             </div>
           </> :
           <>
-            <GlpSwapBox isBuying={isBuying} setIsBuying={setIsBuying} />
+            <GlpSwapBox
+              isBuying={isBuying}
+              setIsBuying={setIsBuying}
+              swapTokenAddress={swapTokenAddress}
+              setSwapTokenAddress={setSwapTokenAddress}
+              isWaitingForApproval={glp_isWaitingForApproval}
+              setIsWaitingForApproval={glp_setIsWaitingForApproval}
+              setPendingTxns={setPendingTxns}
+            />
           </>
         }
 
-      </AcyCard>
-      
+      </AcyPerpetualCard>
+
       {/* Long/Short Detail card  */}
-      {(mode === LONG || mode === SHORT) &&
+      {(isLong || isShort) &&
         <>
-          <AcyCard style={{ backgroundColor: '#1B1B1C', padding: '10px' }}>
-          
+          <AcyPerpetualCard style={{ backgroundColor: 'transparent', padding: '10px' }}>
+
             {/* Profits In */}
-            {mode === LONG && (
+            {isLong && (
               <div className={styles.detailCard}>
                 <div className={styles.label}>Profits In</div>
-                <div className={styles.value}>{toToken.symbol}</div>
+                <div className={styles.value}>{collateralToken.symbol}</div>
               </div>
             )}
-            {mode === SHORT && (
+            {isShort && (
               <div className={styles.detailCard}>
                 <div className={styles.label}>Profits In</div>
                 <div className={styles.TooltipHandle}>
-                  <span onClick={()=>{setVisible(true)}}>{shortCollateralToken.symbol}</span>
-                  <TokenSelectorModal
-                    onCancel={() => {
-                      setVisible(false)
-                    }} 
-                    width={400} 
-                    visible={visible} 
-                    onCoinClick={token => {
-                      setVisible(false)
-                      setShortCollateralAddress(token.address)
-                    }}
-                    tokenlist={stableTokens}
-                  />
+                  <span>{shortCollateralToken.symbol}</span>
                 </div>
               </div>
             )}
@@ -2019,10 +1722,10 @@ const SwapComponent = props => {
             <div className={styles.detailCard}>
               <div className={styles.label}>Leverage</div>
               <div className={styles.value}>
-                {hasExistingPosition && 
-                  toAmount && 
-                  toAmount.gt(0) && 
-                  `${formatAmount(existingPosition.leverage, 4, 2)}x →` 
+                {hasExistingPosition &&
+                  toAmount &&
+                  toAmount.gt(0) &&
+                  `${formatAmount(existingPosition.leverage, 4, 2)}x →`
                 }
                 {toAmount &&
                   leverage &&
@@ -2037,10 +1740,10 @@ const SwapComponent = props => {
             <div className={styles.detailCard}>
               <div className={styles.label}>Entry Price</div>
               <div className={styles.value}>
-                {hasExistingPosition && 
-                toAmount && 
-                toAmount.gt(0) &&
-                `$${formatAmount(existingPosition.averagePrice, USD_DECIMALS, 2, true)} →`
+                {hasExistingPosition &&
+                  toAmount &&
+                  toAmount.gt(0) &&
+                  `$${formatAmount(existingPosition.averagePrice, USD_DECIMALS, 2, true)} →`
                 }
                 {nextAveragePrice &&
                   `$${formatAmount(nextAveragePrice, USD_DECIMALS, 2, true)}`}
@@ -2052,13 +1755,13 @@ const SwapComponent = props => {
             <div className={styles.detailCard}>
               <div className={styles.label}>Liq. Price</div>
               <div className={styles.value}>
-                {hasExistingPosition && 
-                toAmount && 
-                toAmount.gt(0) && 
-                `$${formatAmount(existingLiquidationPrice, USD_DECIMALS, 2, true)} →`
+                {hasExistingPosition &&
+                  toAmount &&
+                  toAmount.gt(0) &&
+                  `$${formatAmount(existingLiquidationPrice, USD_DECIMALS, 2, true)} →`
                 }
                 {toAmount && displayLiquidationPrice &&
-                `$${formatAmount(displayLiquidationPrice, USD_DECIMALS, 2, true)}`
+                  `$${formatAmount(displayLiquidationPrice, USD_DECIMALS, 2, true)}`
                 }
                 {!toAmount && displayLiquidationPrice && `-`}
                 {!displayLiquidationPrice && `-`}
@@ -2070,10 +1773,10 @@ const SwapComponent = props => {
               <div className={styles.label}>Fees</div>
               <div className={styles.value}>
                 {!feesUsd && "-"}
-                { feesUsd &&
-                  <Tooltip 
-                    placement='bottomLeft' 
-                    color='#b5b5b6' 
+                {feesUsd &&
+                  <Tooltip
+                    placement='bottomLeft'
+                    color='#b5b5b6'
                     mouseEnterDelay={0.5}
                     title={() => {
                       return (
@@ -2081,7 +1784,7 @@ const SwapComponent = props => {
                           {swapFees && (
                             <div>
                               {collateralToken.symbol} is required for
-                              collateral. 
+                              collateral.
                               <br /><br />
                               Swap {fromToken.symbol} to{" "}
                               {collateralToken.symbol} Fee: $
@@ -2104,18 +1807,13 @@ const SwapComponent = props => {
                 }
               </div>
             </div>
-           
-            <div className={styles.cardDivider} />
-            <div className={styles.detailCard}>
-              <div className={styles.label}>{mode}&nbsp;{toToken.symbol}</div>
-            </div>
-            
+
             {/* Entry Price */}
             <div className={styles.detailCard}>
               <div className={styles.label}>Entry Price</div>
-              <Tooltip 
-                placement='bottomLeft' 
-                color='#b5b5b6' 
+              <Tooltip
+                placement='bottomLeft'
+                color='#b5b5b6'
                 mouseEnterDelay={0.5}
                 title={() => {
                   return (
@@ -2137,7 +1835,7 @@ const SwapComponent = props => {
                 }}
               >
                 <div className={styles.TooltipHandle}>
-                  {`${formatAmount(entryMarkPrice, USD_DECIMALS, 2,true)} USD`}
+                  {`${formatAmount(entryMarkPrice, USD_DECIMALS, 2, true)} USD`}
                 </div>
               </Tooltip>
             </div>
@@ -2145,9 +1843,9 @@ const SwapComponent = props => {
             {/* Exit Price */}
             <div className={styles.detailCard}>
               <div className={styles.label}>Exit Price</div>
-              <Tooltip 
-                placement='bottomLeft' 
-                color='#b5b5b6' 
+              <Tooltip
+                placement='bottomLeft'
+                color='#b5b5b6'
                 mouseEnterDelay={0.5}
                 title={() => {
                   return (
@@ -2174,18 +1872,18 @@ const SwapComponent = props => {
             {/* Borrow Fee */}
             <div className={styles.detailCard}>
               <div className={styles.label}>Borrow Fee</div>
-              <Tooltip 
-                placement='bottomLeft' 
-                color='#b5b5b6' 
+              <Tooltip
+                placement='bottomLeft'
+                color='#b5b5b6'
                 mouseEnterDelay={0.5}
                 title={() => {
                   return (
                     <>
                       {hasZeroBorrowFee && (
                         <div>
-                          {mode === LONG &&
+                          {isLong &&
                             "There are more shorts than longs, borrow fees for longing is currently zero"}
-                          {mode === SHORT &&
+                          {isShort &&
                             "There are more longs than shorts, borrow fees for shorting is currently zero"}
                         </div>
                       )}
@@ -2194,7 +1892,7 @@ const SwapComponent = props => {
                           The borrow fee is calculated as (assets borrowed) /
                           (total assets in pool) * 0.01% per hour.
                           <br /><br />
-                          {mode === SHORT &&
+                          {isShort &&
                             `You can change the "Profits In" token above to find lower fees`}
                         </div>
                       )}
@@ -2213,71 +1911,96 @@ const SwapComponent = props => {
             </div>
 
             {/* Available Liquidity */}
-            {mode === SHORT && toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) && 
-            <div className={styles.detailCard}>
-              <div className={styles.label}>Available Liquidity</div>
-              <Tooltip 
-                placement='bottomLeft' 
-                color='#b5b5b6' 
-                mouseEnterDelay={0.5}
-                title={() => {
-                  return (
-                    <>
-                      Max {toTokenInfo.symbol} short capacity: ${formatAmount(toTokenInfo.maxGlobalShortSize, USD_DECIMALS, 2, true)}
-                      <br /><br />
-                      Current {toTokenInfo.symbol} shorts: ${formatAmount(toTokenInfo.globalShortSize, USD_DECIMALS, 2, true)}
-                      <br />
-                    </>
-                  )
-                }}
-              >
-                <div className={styles.TooltipHandle}>
-                  {formatAmount(toTokenInfo.maxAvailableShort, USD_DECIMALS, 2, true)}
-                </div>
-              </Tooltip>
-            </div>
+            {isShort && toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) &&
+              <div className={styles.detailCard}>
+                <div className={styles.label}>Available Liquidity</div>
+                <Tooltip
+                  placement='bottomLeft'
+                  color='#b5b5b6'
+                  mouseEnterDelay={0.5}
+                  title={() => {
+                    return (
+                      <>
+                        Max {toTokenInfo.symbol} short capacity: ${formatAmount(toTokenInfo.maxGlobalShortSize, USD_DECIMALS, 2, true)}
+                        <br /><br />
+                        Current {toTokenInfo.symbol} shorts: ${formatAmount(toTokenInfo.globalShortSize, USD_DECIMALS, 2, true)}
+                        <br />
+                      </>
+                    )
+                  }}
+                >
+                  <div className={styles.TooltipHandle}>
+                    {formatAmount(toTokenInfo.maxAvailableShort, USD_DECIMALS, 2, true)}
+                  </div>
+                </Tooltip>
+              </div>
             }
 
-          </AcyCard>
+          </AcyPerpetualCard>
         </>
       }
 
-      {mode === SWAP &&
-        <DetailBox
-          leverage={leverage}
-          shortOrLong={mode}
-          marketOrLimit={type}
-          profitsIn={profitsIn}
-          entryPriceLimit={entryPriceLimit}
-          liqPrice={liqPrice}
-          entryPriceMarket={entryPriceMarket}
-          exitPrice={exitPrice}
-          borrowFee={borrowFee}
-          token1Symbol={toToken.symbol}
-          fromUsdMin={fromUsdMin}
-          toUsdMax={toUsdMax}
-          toTokenInfo={toTokenInfo}
-          triggerPriceValue={triggerPriceValue}
-        />
+      {/* Swap detail box */}
+      {mode === POOL &&
+        <>
+          <GlpSwapDetailBox
+            isBuying={isBuying}
+            setIsBuying={setIsBuying}
+            tokens={tokens}
+            infoTokens={glp_infoTokens}
+            glpPrice={glpPrice}
+            glpBalance={glpBalance}
+            glpBalanceUsd={glpBalanceUsd}
+            // reservedAmount={reservedAmount}
+            // reserveAmountUsd={reserveAmountUsd}
+            // stakingInfo={stakingInfo}
+            glpSupply={glpSupply}
+            glpSupplyUsd={glpSupplyUsd}
+          // gmxPrice={gmxPrice}
+          />
+        </>
       }
 
-      {mode === POOL &&
-        <GlpSwapDetailBox 
-          isBuying={isBuying}
-          setIsBuying={setIsBuying}
-          tokens={tokens}
-          infoTokens={glp_infoTokens}
-          glpPrice={glpPrice}
-          glpBalance={glpBalance}
-          glpBalanceUsd={glpBalanceUsd}
-          reservedAmount={reservedAmount}
-          reserveAmountUsd={reserveAmountUsd}
-          stakingInfo={stakingInfo}
-          glpSupply={glpSupply}
-          glpSupplyUsd={glpSupplyUsd}
-          gmxPrice={gmxPrice}
+
+      {isConfirming && (
+        <ConfirmationBox
+          fromToken={fromToken}
+          fromTokenInfo={fromTokenInfo}
+          toToken={toToken}
+          toTokenInfo={toTokenInfo}
+          isLong={isLong}
+          isMarketOrder={type === MARKET}
+          type={type}
+          isHigherSlippageAllowed={isHigherSlippageAllowed}
+          setIsHigherSlippageAllowed={setIsHigherSlippageAllowed}
+          isShort={isShort}
+          toAmount={toAmount}
+          fromAmount={fromAmount}
+          onConfirmationClick={onConfirmationClick}
+          setIsConfirming={setIsConfirming}
+          shortCollateralAddress={shortCollateralAddress}
+          hasExistingPosition={hasExistingPosition}
+          leverage={leverage}
+          existingPosition={existingPosition}
+          existingLiquidationPrice={existingLiquidationPrice}
+          displayLiquidationPrice={displayLiquidationPrice}
+          shortCollateralToken={shortCollateralToken}
+          isPendingConfirmation={isPendingConfirmation}
+          triggerPriceUsd={triggerPriceUsd}
+          triggerRatio={triggerRatio}
+          fees={fees}
+          feesUsd={feesUsd}
+          isSubmitting={isSubmitting}
+          fromUsdMin={fromUsdMin}
+          toUsdMax={toUsdMax}
+          nextAveragePrice={nextAveragePrice}
+          collateralTokenAddress={collateralTokenAddress}
+          feeBps={feeBps}
+          chainId={chainId}
+          orders={orders}
         />
-      }
+      )}
+
     </div>
   );
 };

@@ -7,10 +7,12 @@ import {
   USD_DECIMALS,
   CHART_PERIODS,
   formatAmount
-} from '../utils/Helpers'
+} from '../utils'
 import {
   chainlinkClient
 } from './common'
+
+import {constantInstance} from "@/constants"
 
 const BigNumber = ethers.BigNumber
 
@@ -59,15 +61,17 @@ function fillGaps(prices, periodSeconds) {
   return newPrices
 }
 
+// not in use anymore
 async function getChartPricesFromStats(chainId, symbol, period) {
   if (['WBTC', 'WETH', 'WAVAX'].includes(symbol)) {
     symbol = symbol.substr(1)
   }
-  const hostname = 'https://stats.gmx.io/'
+  const {backendPrefix: hostname} = constantInstance.perpetuals;
   // const hostname = 'http://localhost:3113/'
   const timeDiff = CHART_PERIODS[period] * 3000
   const from = Math.floor(Date.now() / 1000 - timeDiff)
-  const url = `${hostname}api/candles/${symbol}?preferableChainId=${chainId}&period=${period}&from=${from}&preferableSource=fast`
+  const to = Math.floor(Date.now() / 1000);
+  const url = `${hostname}/candles/${symbol}?preferableChainId=${chainId}&period=${period}&from=${from}&to=${to}&preferableSource=chainlink`
   const TIMEOUT = 5000
   const res = await new Promise((resolve, reject) => {
     setTimeout(() => reject(new Error(`request timeout ${url}`)), TIMEOUT)
@@ -193,17 +197,22 @@ export function useChartPrices(chainId, symbol, isStable, period, currentAverage
   let { data: prices, mutate: updatePrices } = useSWR(swrKey, {
     fetcher: async (...args) => {
       try {
-        return await getChartPricesFromStats(chainId, symbol, period)
+        console.log("swrKey: ", swrKey);
+        // TODO: TESTING
+        // chainId is fixed to be 56 for testing
+        const res =  await getChartPricesFromStats(56, symbol, period);
+        console.log("swrKey: ", swrKey, "fetched data: ", res);
+        return res;
       } catch (ex) {
-        console.warn(ex)
-        console.warn('Switching to graph chainlink data')
-        try {
-          return await getChainlinkChartPricesFromGraph(symbol, period)
-        } catch (ex2) {
-          console.warn('getChainlinkChartPricesFromGraph failed')
-          console.warn(ex2)
-          return []
-        }
+        console.warn('getChartPricesFromBackend failed: ', ex)
+        // console.warn('Switching to graph chainlink data')
+      //   try {
+      //     return await getChainlinkChartPricesFromGraph(symbol, period)
+      //   } catch (ex2) {
+      //     console.warn('getChainlinkChartPricesFromGraph failed')
+      //     console.warn(ex2)
+      //     return []
+      //   }
       }
     },
     dedupingInterval: 60000,
