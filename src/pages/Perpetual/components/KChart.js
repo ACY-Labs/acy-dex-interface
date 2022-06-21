@@ -152,6 +152,9 @@ const KChart=(props)=> {
         case "5m":
           seconds = 5*60;
           break;
+        case "1m":
+          seconds = 60;
+          break;
       }
     return seconds;
   }
@@ -180,7 +183,6 @@ const KChart=(props)=> {
   useEffect(async () => {
     // let chart;
     if (currentChart) {
-
     }
 
     chart = createChart(
@@ -214,7 +216,7 @@ const KChart=(props)=> {
 
     // const series = chart.addCandlestickSeries(getSeriesOptions())
     setCurrentSeries(candleSeries);
-  },[])
+  }, [])
 
   useEffect(() => {
     console.log("hereim second useeffect")
@@ -232,6 +234,7 @@ const KChart=(props)=> {
 
   //reload when new timescale or token selected
   useEffect(async () => {
+
     if (currentChart == undefined) {
       return;
     } 
@@ -265,7 +268,10 @@ const KChart=(props)=> {
     updateChart(chart);
     setCurrentSeries(candleSeries);
     
-  },[props.activeToken1.symbol, props.activeTimeScale])
+    props.setUpdatingKchartsFlag(false);
+    console.log('finish get kcharts data');
+
+  }, [props.activeToken1.symbol, props.activeTimeScale])
 
   useEffect(() => {
     if (!currentChart) { return; }

@@ -384,8 +384,8 @@ const AcyLiquidityPositions = (props) => {
       }
       const fetchTask = [];
       for (let pairAddr of pools) {
-        const token0addr = supportedTokens.findIndex(item => item.address === pairAddr.token0);
-        const token1addr = supportedTokens.findIndex(item => item.address === pairAddr.token1);
+        const token0addr = supportedTokens.findIndex(item => item.address.toLowerCase() === pairAddr.token0.toLowerCase());
+        const token1addr = supportedTokens.findIndex(item => item.address.toLowerCase() === pairAddr.token1.toLowerCase());
 
         const { address: token0Address, symbol: token0Symbol, decimals: token0Decimal } = tokens[token0addr];
         const { address: token1Address, symbol: token1Symbol, decimals: token1Decimal } = tokens[token1addr];

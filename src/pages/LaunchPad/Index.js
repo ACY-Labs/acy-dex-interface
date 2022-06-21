@@ -14,8 +14,10 @@ import { getProjects } from '@/services/api';
 import ExpandingContent from './components/ExpandedContent';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { useWeb3React } from '@web3-react/core';
-import { API_URL } from '@/constants';
+// import { API_URL } from '@/constants';
 import moment from 'moment';
+
+const API_URL = () => "https://api.acy.finance/bsc-main/api";
 
 const { Meta } = Card;
 
@@ -43,7 +45,10 @@ const Pool = props => {
 
   // project variables
   useEffect(() => {
-    console.log("api url", API_URL())
+    
+    console.log("api url", API_URL());
+    console.log("actual request");
+
     getProjects(API_URL())
       .then(res => {
         if (res) {

@@ -50,14 +50,38 @@ export default [
         ],
       },
       {
-        path: '/perpetual',
-        name: 'Perpetual',
-        component: './Perpetual/Index',
-      },
-      {
         path: '/exchange',
         name: 'Exchange',
         component: './Swap/Index',
+      },
+      {
+        path: '/future',
+        name: 'Future',
+        component: './Perpetual/Index',
+      },
+      {
+        path: '/',
+        name: 'Option',
+      },
+      {
+        path: '/launchpad',
+        name: 'Launchpad',
+        hideChildrenInMenu: true,
+        routes: [
+          {
+            path: '/launchpad',
+            component: './LaunchPad/Index',
+          },
+          {
+            path: '/launchpad/project/:projectId',
+            component: './LaunchPad/LaunchpadProject',
+          },
+        ],
+      },
+      {
+        path: '/stablecoin',
+        name: 'StableCoin',
+        component: './StableCoin/Index',
       },
       {
         path: '/liquidity',
@@ -70,41 +94,27 @@ export default [
         component: './Farms/',
       },
       {
-        path: '/stablecoin',
-        name: 'StableCoin',
-        component: './StableCoin/Index',
+        path: '/stats/future',
+        name: 'Statistics',
+        component: './Stats/Perpetual/Index',
+        // routes:[
+        //   {
+        //     path:'/stats/perpetual',
+        //     name:'Perpetual',
+        //     component:'./Stats/Perpetual/Index'
+        //   },
+        //   {
+        //     path:'/stats/stablecoin',
+        //     name:'StableCoin',
+        //     component:'./Stats/StableCoin/stats'
+        //   }
+        // ]
       },
       {
-        path: '/stats',
-        name: 'Stats',
-        // component: './stats/stats',
-        routes:[
-          {
-            path:'/stats/perpetual',
-            name:'Perpetual',
-            component:'./Stats/Perpetual/Index'
-          },
-          {
-            path:'/stats/stablecoin',
-            name:'StableCoin',
-            component:'./Stats/StableCoin/stats'
-          }
-        ]
-      },
-      {
-        path: '/launchpad',
-        name: 'Launch',
-        hideChildrenInMenu: true,
-        routes: [
-          {
-            path: '/launchpad',
-            component: './LaunchPad/Index',
-          },
-          {
-            path: '/launchpad/project/:projectId',
-            component: './LaunchPad/LaunchpadProject',
-          },
-        ],
+        path: './stats/stablecoin',
+        name:'Statistics',
+        component: './Stats/StableCoin/stats',
+        hideInMenu: true,
       },
       {
         path: '/transaction/:id?',

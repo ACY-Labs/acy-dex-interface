@@ -89,8 +89,8 @@ const PolygonTestNetFarmSetting: FarmSetting = {
     BLOCKS_PER_YEAR: calcBlocksPerPeriod('year', 2),
     BLOCKS_PER_MONTH: calcBlocksPerPeriod('month', 2),
     RPC_URL: "https://matic-mumbai.chainstacklabs.com",
-    // API_URL: "https://api.acy.finance/polygon-test/api",
-    API_URL: "http://localhost:3001/polygon-test/api",
+    API_URL: "https://api.acy.finance/polygon-test/api",
+    // API_URL: "http://localhost:3001/polygon-test/api",
     // API_URL: "http://147.182.251.92:3001/polygon-test/api"  // testing with test server
 }
 

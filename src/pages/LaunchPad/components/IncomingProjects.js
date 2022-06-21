@@ -72,9 +72,9 @@ const IncomingProjects = ({ data, openProject }) => {
                       projectID={obj.projectID}
                       start={obj.saleStart}
                       ddl={obj.saleEnd}
-                      raise={nFormatter(obj.totalRaise, 3) + " USDT"}
+                      raise={nFormatter(obj.totalRaise, 3) + ' ' + obj.mainCoin}
                       sales={nFormatter(obj.totalSale, 3) + ' ' + obj.projectToken}
-                      rate={'1 ' + obj.projectToken + ' = ' + obj.tokenPrice.toString() + ' USDT'}
+                      rate={'1 ' + obj.projectToken + ' = ' + obj.tokenPrice.toString() + ' ' + obj.mainCoin}
                       title={obj.projectName}
                       isUpcoming
                       tokenLogoUrl={obj.projectTokenUrl}

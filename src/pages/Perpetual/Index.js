@@ -1072,66 +1072,12 @@ const Swap = props => {
   }
     
   const placementChange = e => {
+    if(updatingKchartsFlag) return;
+
+    setUpdatingKchartsFlag(true);
     setPlacement(e.target.value);
     setActiveTimeScale(e.target.value);
   };
-
-  // const chartPanes = [
-  //   { title: 'BTC ', content: 'BTC', key: 'BTC', closable: false },
-  //   { title: 'ETH', content: 'ETH', key: 'ETH' },
-  //   // { title: 'Tab 3', content: 'Content of Tab 3', key: '3'},
-  // ];
- 
-
-  // const [activeKey, setActiveKey] = useState(chartPanes[0].key);
-  // const [panes, setPanes] = useState(chartPanes);
-  // const newTabIndex = useRef(0);
-
-  // const onChange = (newActiveKey) => {
-  //   setActiveKey(newActiveKey);
-  //   setActiveToken1((supportedTokens.filter(ele => ele.symbol == newActiveKey))[0])
-  // };
-  // const add = () => {
-  //   const newActiveKey = `newTab${newTabIndex.current++}`;
-  //   const newPanes = [...panes];
-  //   newPanes.push({
-  //     title: 'New Tab',
-  //     content: 'Content of new Tab',
-  //     key: newActiveKey,
-  //   });
-  //   setPanes(newPanes);
-  //   setActiveKey(newActiveKey);
-  // };
-
-  // const remove = (targetKey) => {
-  //   let newActiveKey = activeKey;
-  //   let lastIndex = -1;
-  //   panes.forEach((pane, i) => {
-  //     if (pane.key === targetKey) {
-  //       lastIndex = i - 1;
-  //     }
-  //   });
-  //   const newPanes = panes.filter((pane) => pane.key !== targetKey);
-
-  //   if (newPanes.length && newActiveKey === targetKey) {
-  //     if (lastIndex >= 0) {
-  //       newActiveKey = newPanes[lastIndex].key;
-  //     } else {
-  //       newActiveKey = newPanes[0].key;
-  //     }
-  //   }
-
-  //   setPanes(newPanes);
-  //   setActiveKey(newActiveKey);
-  // };
-
-  // const onEdit = (targetKey, action) => {
-  //   if (action === 'add') {
-  //     add();
-  //   } else {
-  //     remove(targetKey);
-  //   }
-  // };
 
   // let options = supportedTokens;
   // const menu = (

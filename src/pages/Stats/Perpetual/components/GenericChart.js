@@ -99,7 +99,7 @@ export default function GenericChart(props) {
   return <ChartWrapper title={title} loading={loading} data={data} csvFields={csvFields}>
     <ResponsiveContainer width="100%" height={height}>
       {React.createElement(ChartComponent, { data, syncId }, [
-        <CartesianGrid strokeDasharray="10 10" key="a" />,
+        <CartesianGrid strokeDasharray="3 3" stroke='#333333' key="a" />,
         <XAxis dataKey={xaxisDataKey} tickFormatter={xaxisTickFormatter} minTickGap={30} key="b" />,
         <YAxis domain={yaxisDomain} dataKey={yaxisDataKey} tickFormatter={yaxisTickFormatter} key="c" />,
         (

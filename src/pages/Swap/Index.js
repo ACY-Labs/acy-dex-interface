@@ -21,7 +21,7 @@ import AcyRoutingChart from '@/components/AcyRoutingChart';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
 import { uniqueFun } from '@/utils/utils';
-import {getTransactionsByAccount,appendNewSwapTx} from '@/utils/txData';
+import { getTransactionsByAccount, appendNewSwapTx } from '@/utils/txData';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import { fetchGeneralTokenInfo, marketClient, fetchTokenDaySimple } from '../Market/Data/index.js';
 import SwapComponent from '@/components/SwapComponent';
@@ -33,22 +33,23 @@ import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
 import { API_URL, useConstantLoader } from '@/constants';
-import {useConnectWallet} from '@/components/ConnectWallet';
+import { useConnectWallet } from '@/components/ConnectWallet';
 import useSWR from 'swr';
-import {TxFetcher} from '@/utils/utils';
+import { TxFetcher } from '@/utils/utils';
+import SankeyGraph from './components/SankeyGraph'
 
 const { AcyTabPane } = AcyTabs;
 function getTIMESTAMP(time) {
-    var date = new Date(time);
-    var year = date.getFullYear(time);
-    var month = ("0" + (date.getMonth(time) + 1)).substr(-2);
-    var day = ("0" + date.getDate(time)).substr(-2);
-    var hour = ("0" + date.getHours(time)).substr(-2);
-    var minutes = ("0" + date.getMinutes(time)).substr(-2);
-    var seconds = ("0" + date.getSeconds(time)).substr(-2);
-  
-    return hour + ":" + minutes + ":" + seconds;
-    // return `${year}-${month}-${day}`;
+  var date = new Date(time);
+  var year = date.getFullYear(time);
+  var month = ("0" + (date.getMonth(time) + 1)).substr(-2);
+  var day = ("0" + date.getDate(time)).substr(-2);
+  var hour = ("0" + date.getHours(time)).substr(-2);
+  var minutes = ("0" + date.getMinutes(time)).substr(-2);
+  var seconds = ("0" + date.getSeconds(time)).substr(-2);
+
+  return hour + ":" + minutes + ":" + seconds;
+  // return `${year}-${month}-${day}`;
 
 }
 function abbrNumber(number) {
@@ -87,8 +88,8 @@ const defaultData = [
   ['2000-06-05', 116],
   ['2000-06-06', 129],
   ['2000-06-07', 135],
-  
-  
+
+
 ];
 const StyledCard = styled(AcyCard)`
   background: transparent;
@@ -103,7 +104,7 @@ const StyledCard = styled(AcyCard)`
 `;
 
 const Swap = props => {
-  const {account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix}} = useConstantLoader();
+  const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
   ////console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
   // 当 chainId 发生切换时，就更新 url
@@ -148,7 +149,7 @@ const Swap = props => {
 
   // useSWR hook example - needs further implementation in backend
   const txListUrl = `${apiUrlPrefix}/txlist/all?`
-  const {data : txList , mutate : updateTxList} = useSWR([txListUrl],{
+  const { data: txList, mutate: updateTxList } = useSWR([txListUrl], {
     fetcher: TxFetcher(account),
     // refreshInterval: 1000,
   })
@@ -202,22 +203,22 @@ const Swap = props => {
   // connect to provider, listen for wallet to connect
   const connectWalletByLocalStorage = useConnectWallet();
   useMemo(() => {
-    if(!account){
+    if (!account) {
       //console.log('ymj connect');
       connectWalletByLocalStorage();
-     }
+    }
     //console.log('ymj connect', account);
-    getTransactionsByAccount(account,library,'SWAP').then(data =>{
+    getTransactionsByAccount(account, library, 'SWAP').then(data => {
       ////console.log("found this tx dataa::::::", data);
       setTransactionList(data);
-      if(account) setTableLoading(false);
+      if (account) setTableLoading(false);
     })
   }, [account]);
 
 
-  
 
-  
+
+
   // 时间段选择
   const onhandPeriodTimeChoose = periodTimeName => {
     let pt;
@@ -286,7 +287,7 @@ const Swap = props => {
         token1: activeToken1
       }
     });
-    const dayLength = 24*60/5;
+    const dayLength = 24 * 60 / 5;
     // const dayLength = 5;
     let reverseFlag = false;
     // timeMark one record the latest transaction time
@@ -296,8 +297,7 @@ const Swap = props => {
     let timeData = [];
     let A = activeToken0.symbol;
     let B = activeToken1.symbol;
-    if(A>B)
-    {
+    if (A > B) {
       let temp = B;
       B = A;
       A = temp;
@@ -306,80 +306,80 @@ const Swap = props => {
     ////console.log(A,B);
     ////console.log("fetching the swap Rate data!!!!!!!!!!!!!!!!");
     axios.get(
-      `${apiUrlPrefix}/chart/getRate`, {params : {token0 : A , token1 : B}}
+      `${apiUrlPrefix}/chart/getRate`, { params: { token0: A, token1: B } }
     ).then(res => {
       //console.log("response",res.data);
-      if(res.data){
-      const historyData = res.data.History;
-      timeMark = historyData[historyData.length-1].time;
-      timeMark2 = historyData[0].time
+      if (res.data) {
+        const historyData = res.data.History;
+        timeMark = historyData[historyData.length - 1].time;
+        timeMark2 = historyData[0].time
 
-      let date = new Date(timeMark*60*1000);
-      // var options = { weekday: 'long'};
-      // setActiveRate(new Intl.DateTimeFormat('en-US', options).format(date));
+        let date = new Date(timeMark * 60 * 1000);
+        // var options = { weekday: 'long'};
+        // setActiveRate(new Intl.DateTimeFormat('en-US', options).format(date));
 
-      for (let i = 0; i < historyData.length; i++) {
-  
-        while(i < 0) i++;
-        const element = historyData[i];
-        // timeData.push(element.time);
-        timeData.push(element);
-        // var time = element.time*60*1000
-        // var date = new Date(time);
-        // var dateString = date.toString();
-        // //console.log("Time : " + date);
-        
-      };
-        
-      //add 0 to the chartdata array
-      const addData = []
-      for (let i = timeMark - 24*60; i < timeMark2; i = i+5) {
-        let temp2 = [(i*60*1000),  0 ] ;
-        addData.push(temp2);
-      } 
-      //console.log("timemark",timeMark - 24*60,timeMark2);
-      //console.log("addData",addData);
+        for (let i = 0; i < historyData.length; i++) {
+
+          while (i < 0) i++;
+          const element = historyData[i];
+          // timeData.push(element.time);
+          timeData.push(element);
+          // var time = element.time*60*1000
+          // var date = new Date(time);
+          // var dateString = date.toString();
+          // //console.log("Time : " + date);
+
+        };
+
+        //add 0 to the chartdata array
+        const addData = []
+        for (let i = timeMark - 24 * 60; i < timeMark2; i = i + 5) {
+          let temp2 = [(i * 60 * 1000), 0];
+          addData.push(temp2);
+        }
+        //console.log("timemark",timeMark - 24*60,timeMark2);
+        //console.log("addData",addData);
 
 
-      // drawing chart
-          //console.log("timeData",timeData);
-          const tempChart = [];
-          for (let a = 0; a < timeData.length; a++) {
-            if(timeData[a].time > timeMark - 24*60){
-            const time = timeData[a].time*60*1000;
+        // drawing chart
+        //console.log("timeData",timeData);
+        const tempChart = [];
+        for (let a = 0; a < timeData.length; a++) {
+          if (timeData[a].time > timeMark - 24 * 60) {
+            const time = timeData[a].time * 60 * 1000;
             let date = new Date(time);
             let dateString = date.getMinutes();
             let temp;
-            if(reverseFlag)
-            temp = [time, 1.0/timeData[a].exchangeRate ] ;
+            if (reverseFlag)
+              temp = [time, 1.0 / timeData[a].exchangeRate];
             else
-            temp = [time,timeData[a].exchangeRate ] ;
+              temp = [time, timeData[a].exchangeRate];
             tempChart.push(temp);
-            
+
           }
         }
-          //console.log("CHARTING!!!!!!!!!!!",tempChart);
+        //console.log("CHARTING!!!!!!!!!!!",tempChart);
 
-          const finalChartData = addData.concat(tempChart);
-          //console.log("finalChartData", finalChartData);
-          setChartData(finalChartData);
-    }
-      else{
+        const finalChartData = addData.concat(tempChart);
+        //console.log("finalChartData", finalChartData);
+        setChartData(finalChartData);
+      }
+      else {
         setActiveRate("No this pair data yet");
         setChartData([]);
       }
 
     })
-     
 
-      //console.log("chartdata");
-      //console.log(timeData);
-   
+
+    //console.log("chartdata");
+    //console.log(timeData);
+
   }, [activeToken0, activeToken1]);
   // workaround way to get USD price (put token1 as USDC)
   // NEEDS ETHEREUM ADDRESS, RINKEBY DOES NOT WORK HERE
   const getRoutePrice = (token0Address, token1Address) => {
-    if(!token0Address || !token1Address) return;    
+    if (!token0Address || !token1Address) return;
 
     axios
       .post(
@@ -447,10 +447,10 @@ const Swap = props => {
       setActiveToken1(tempSwapToken);
     }
     //parse input data from transaction list
-    
+
 
     return [
-      <div style={{width: "100%"}}>
+      <div style={{ width: "100%" }}>
         <div className={styles.maintitle}>
           <div className={styles.lighttitle} style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }} onClick={swapTokenPosition}>
             <img
@@ -470,7 +470,7 @@ const Swap = props => {
           </div>
 
         </div>
-        <div style={{display: "flex", justifyContent: "space-between"}}>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div className={styles.secondarytitle}>
             <span className={styles.lighttitle}>{activeRate}</span>{' '}
             <span className={styles.percentage}>{activeAbsoluteChange}</span>
@@ -529,11 +529,11 @@ const Swap = props => {
   const updateTransactionList = async (receipt) => {
     setTableLoading(true);
     //console.log("updating list");
-    appendNewSwapTx(refContainer.current,receipt,account,library).then((data) => {
-      if(data && data.length > 0) setTransactionList(data);
+    appendNewSwapTx(refContainer.current, receipt, account, library).then((data) => {
+      if (data && data.length > 0) setTransactionList(data);
       setTableLoading(false);
     })
-    
+
   }
 
 
@@ -559,49 +559,45 @@ const Swap = props => {
   useEffect(() => {
     if (!chartData.length)
       return;
-    const lastDataIndex = chartData.length-1;
+    const lastDataIndex = chartData.length - 1;
     updateActiveChartData(chartData[lastDataIndex][1], lastDataIndex);
   }, [chartData])
- 
+
   return (
     <PageHeaderWrapper>
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
           <div className={`${styles.colItem} ${styles.priceChart}`}>
-            <StyledCard title={lineTitleRender()}>
-              <div
-                style={{
-                  // width: '100%',
-                  // marginRight: "30px"
-                }}
-              >
-                <div
-                  style={{
-                    height: '400px',
-                  }}
-                  className={styles.showPeriodOnHover}
-                >
-                  <AcyPriceChart 
-                    data={chartData}
-                    format={format}
-                    showXAxis
-                    // showGradient
-                    lineColor="#e29227"
-                    range={range}
-                    showTooltip={true}
-                    onHover={(data, dataIndex) => updateActiveChartData(data, dataIndex)}
-                  />
-
+            <AcyCard style={{ backgroundColor: 'transparent', padding: '0 150px', paddingTop: '20px', border: 'none' }}>
+              <SankeyGraph />
+            </AcyCard>
+            <div className={styles.exchangeBottomWrapper}>
+              <div className={styles.exchangeItem}>
+                {/* <h3>
+                  <AcyIcon.MyIcon width={30} type="arrow" />
+                  <span className={styles.span}>TRANSACTION HISTORY</span>
+                </h3> */}
+                <div className={`${styles.colItem}`}>
+                    <a className={`${styles.colItem} ${styles.optionTab}`}>All Orders</a>
+                    <a className={`${styles.colItem} ${styles.optionTab}`}>My Orders</a>
                 </div>
+                {account && tableLoading ? (
+                  <h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>
+                ) : (
+                  <StakeHistoryTable
+                    isMobile={isMobile}
+                    dataSource={transactionList}
+                  />
+                )}
               </div>
-            </StyledCard> 
-          </div> 
-          
+            </div>
+          </div>
+
           {/* <div>
             Hello: {history.location.pathname}
           </div> */}
           <div className={`${styles.colItem} ${styles.swapComponent}`} >
-            <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
+            <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', border: 'none' }}>
               <div className={styles.trade}>
                 <SwapComponent
                   onSelectToken0={token => {
@@ -619,96 +615,55 @@ const Swap = props => {
 
         </div>
 
-        <div className={styles.exchangeBottomWrapper}>
-          {/* {isReceiptObtained && (
-          <div className={styles.exchangeItem}>
-            <h3>
-              <AcyIcon.MyIcon width={30} type="arrow" />
-              <span className={styles.span}>FLASH ROUTE</span>
-            </h3>
-            <div>
-              {isReceiptObtained ? (
-                <AcyRoutingChart data={routeData} />
-              ) : (
-                <div
-                  style={{
-                    width: '100%',
-                    padding: '30px',
-                    fontWeight: 600,
-                    textAlign: 'center',
-                  }}
-                >
-                  The routing will be shown here after a receipt is obtained.
-                </div>
-              )}
-            </div>
+        <AcyModal onCancel={onCancel} width={600} visible={visible}>
+          <div className={styles.title}>
+            <AcyIcon name="back" /> Select a token
           </div>
-        )} */}
-        <div className={styles.exchangeItem}>
-          <h3>
-            <AcyIcon.MyIcon width={30} type="arrow" />
-            <span className={styles.span}>TRANSACTION HISTORY</span>
-          </h3>
-          { account&&tableLoading ? (
-          <h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>
-          ) : (
-          <StakeHistoryTable
-            isMobile={isMobile}
-            dataSource={transactionList}
-          />
-          )}
-        </div>
-      </div>
+          <div className={styles.search}>
+            <AcyInput
+              placeholder="Enter the token symbol or address"
+              suffix={<AcyIcon name="search" />}
+            />
+          </div>
+          <div className={styles.coinList}>
+            <AcyTabs>
+              <AcyTabPane tab="All" key="1">
+                <AcyCoinItem />
+                <AcyCoinItem />
+                <AcyCoinItem />
+                <AcyCoinItem />
+              </AcyTabPane>
+              <AcyTabPane tab="Favorite" key="2" />
+              <AcyTabPane tab="Index" key="3" />
+              <AcyTabPane tab="Synth" key="4" />
+            </AcyTabs>
+          </div>
+        </AcyModal>
 
-      <AcyModal onCancel={onCancel} width={600} visible={visible}>
-        <div className={styles.title}>
-          <AcyIcon name="back" /> Select a token
-        </div>
-        <div className={styles.search}>
-          <AcyInput
-            placeholder="Enter the token symbol or address"
-            suffix={<AcyIcon name="search" />}
-          />
-        </div>
-        <div className={styles.coinList}>
-          <AcyTabs>
-            <AcyTabPane tab="All" key="1">
-              <AcyCoinItem />
-              <AcyCoinItem />
-              <AcyCoinItem />
-              <AcyCoinItem />
-            </AcyTabPane>
-            <AcyTabPane tab="Favorite" key="2" />
-            <AcyTabPane tab="Index" key="3" />
-            <AcyTabPane tab="Synth" key="4" />
-          </AcyTabs>
-        </div>
-      </AcyModal>
+        <AcyConfirm
+          onCancel={onHandModalConfirmOrder}
+          title="Comfirm Order"
+          visible={visibleConfirmOrder}
+        >
+          <div className={styles.confirm}>
+            <p>ETH： 566.228</p>
+            <p>BTC：2.669</p>
+            <p>Price：212.123</p>
+            <p>Price Impact：2.232%</p>
+            <p>Liquidity Provide Fee: 0.321%</p>
+            <p>Alpha: 0.371%</p>
+            <p>Maximum sold: 566.221</p>
+            <Button size="large" type="primary">
+              Confirm
+            </Button>
+          </div>
+        </AcyConfirm>
 
-      <AcyConfirm
-        onCancel={onHandModalConfirmOrder}
-        title="Comfirm Order"
-        visible={visibleConfirmOrder}
-      >
-        <div className={styles.confirm}>
-          <p>ETH： 566.228</p>
-          <p>BTC：2.669</p>
-          <p>Price：212.123</p>
-          <p>Price Impact：2.232%</p>
-          <p>Liquidity Provide Fee: 0.321%</p>
-          <p>Alpha: 0.371%</p>
-          <p>Maximum sold: 566.221</p>
-          <Button size="large" type="primary">
-            Confirm
-          </Button>
-        </div>
-      </AcyConfirm>
+        <AcyApprove
+          onCancel={() => setVisibleLoading(false)}
+          visible={visibleLoading}
+        />
 
-      <AcyApprove
-        onCancel={() => setVisibleLoading(false)}
-        visible={visibleLoading}
-      />
-      
       </div>
     </PageHeaderWrapper>
   );
