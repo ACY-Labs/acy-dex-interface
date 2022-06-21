@@ -631,9 +631,7 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
             token.maxPrice = vaultTokenInfo[i * vaultPropsLength + 8];
             token.guaranteedUsd = 0;
 
-            token.availableUsd = token.isStable
-                ? token.poolAmount.mul(token.minPrice).div(expandDecimals(1, token.decimals))
-                : token.availableAmount.mul(token.minPrice).div(expandDecimals(1, token.decimals))
+            token.availableUsd = token.availableAmount.mul(token.minPrice).div(expandDecimals(1, token.decimals))
 
             token.managedUsd = token.availableUsd.add(token.guaranteedUsd)
             token.managedAmount = token.managedUsd.mul(expandDecimals(1, token.decimals)).div(token.minPrice)
