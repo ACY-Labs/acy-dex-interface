@@ -1266,11 +1266,6 @@ const SwapComponent = props => {
       if (toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) && sizeUsd.gt(toTokenInfo.maxAvailableShort)) {
         return [`Max ${toTokenInfo.symbol} short exceeded`]
       }
-
-      stableTokenAmount = stableTokenAmount.add(sizeTokens)
-      if (stableTokenAmount.gt(shortCollateralToken.availableAmount)) {
-        return [`Insufficient liquidity, change "Profits In" 3`];
-      }
     }
 
     return [false];
