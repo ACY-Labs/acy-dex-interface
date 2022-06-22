@@ -19,7 +19,7 @@ import { isMobile } from 'react-device-detect';
 import ConnectWallet from './ConnectWallet';
 import axios from 'axios';
 
-import { useConstantLoader } from '@/constants';
+import { getGlobalTokenList, useConstantLoader } from '@/constants';
 
 import { useConnectWallet } from '@/components/ConnectWallet';
 
@@ -42,7 +42,6 @@ const MarketIndex = props => {
   const [ovrFeeChange, setovrFeeChange] = useState(0.0);
   const [transactions, settransactions] = useState(null);
   const [tokenInfo, settokenInfo] = useState([]);
-  const [coinList, setCoinList] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
 
   const [poolInfo, setpoolInfo] = useState([]);
@@ -121,33 +120,33 @@ const MarketIndex = props => {
     // });
 
     // fetch coin list
-    const apiUrlPrefix = "https://api.coingecko.com/api/v3"
-    axios.get(
-      `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false`
-    ).then(data => {
-      setCoinList(data.data)
-      console.log('joy init coin list', data.data)
-    })
-      .catch(e => {
-        console.log(e);
-      });
+    // const apiUrlPrefix = "https://api.coingecko.com/api/v3"
+    // axios.get(
+    //   `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=500&page=1&sparkline=false`
+    // ).then(data => {
+    //   setCoinList(data.data)
+    //   console.log('joy init coin list', data.data)
+    // })
+    //   .catch(e => {
+    //     console.log(e);
+    //   });
 
   }, [chainId, marketNetwork]);
 
-  
-function fetchMarketList() {
-  const apiUrlPrefix = "https://api.coingecko.com/api/v3"
-  axios.get(
-    `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=${currentPage + 1}&sparkline=false`
-  ).then(data => {
-    setCoinList(coinList.concat(data.data))
-    setCurrentPage(currentPage + 1)
-    console.log('joy fetching market list', data.data)
-  })
-    .catch(e => {
-      console.log(e);
-    });
-}
+
+  // function fetchMarketList() {
+  //   const apiUrlPrefix = "https://api.coingecko.com/api/v3"
+  //   axios.get(
+  //     `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=${currentPage + 1}&sparkline=false`
+  //   ).then(data => {
+  //     setCoinList(coinList.concat(data.data))
+  //     setCurrentPage(currentPage + 1)
+  //     console.log('joy fetching market list', data.data)
+  //   })
+  //     .catch(e => {
+  //       console.log(e);
+  //     });
+  // }
 
 
   const onLineGraphHover = (newData, newIndex) => {
@@ -165,10 +164,12 @@ function fetchMarketList() {
     setmarketNetwork(index);
   }
 
+  const coinList = getGlobalTokenList()
+
   return (
-    <div className={styles.marketRoot}>
-      <ConnectWallet />
-      {/* <MarketSearchBar
+      <div className={styles.marketRoot}>
+        <ConnectWallet />
+        {/* <MarketSearchBar
         className={styles.searchBar}
         // dataSourceCoin={dataSourceCoin}
         dataSourceCoin={coinList}
@@ -179,16 +180,16 @@ function fetchMarketList() {
         networkShow={true}
       /> */}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <h2>Cryptocurrencies</h2>
-      </div>
-      {coinList.length > 0 ? (
-        <CurrencyTable dataSourceCoin={coinList} fetchMarketList={fetchMarketList} />
-      ) : (
-        <Icon type="loading" />
-      )}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <h2>Cryptocurrencies</h2>
+        </div>
+        {coinList.length > 0 ? (
+          <CurrencyTable dataSourceCoin={coinList} />
+        ) : (
+          <Icon type="loading" />
+        )}
 
-      {/* <div className={styles.chartsMain}>
+        {/* <div className={styles.chartsMain}>
         <div className={styles.chartSectionMain}>
           {chartData.tvl.length > 0 ? (
             <>
@@ -310,8 +311,8 @@ function fetchMarketList() {
         <TransactionTable dataSourceTransaction={transactions} />
       )} 
       */}
-      <div style={{ height: '20px' }} />
-    </div>
+        <div style={{ height: '20px' }} />
+      </div>
   );
 
 }

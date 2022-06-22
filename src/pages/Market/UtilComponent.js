@@ -980,11 +980,11 @@ export function CurrencyTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableHeader}>
-              <AcyTokenIcon symbol={entry.image} />
+              <AcyTokenIcon symbol={entry.logoURI} />
               <Link
                 style={{ color: 'white' }}
                 className={styles.coinName}
-                // to={`/market/info/token/${entry.address}`}
+                to={`/exchange#${entry.symbol}`}
                 tokenData={entry}
               >
                 {entry.name}
@@ -1188,7 +1188,7 @@ export function CurrencyTable(props) {
               <a
                 className={styles.tableSeeMore}
                 onClick={() => {
-                  props.fetchMarketList()
+                  // props.fetchMarketList()
                   setTokenDisplayNumber(tokenDisplayNumber + 100);
                 }}
               >

@@ -13,40 +13,40 @@ import PerpetualSelector from './perpetuals';
 import SDK_SETTING from './sdk_setting';
 import GAS_TOKEN_SYMBOL from "./gas_token";
 import { JsonRpcProvider } from "@ethersproject/providers";
+import axios from 'axios';
 
 
 export const supportedChainIds = [56, 97, 137, 42161, 80001];
 const defaultLibrary = new JsonRpcProvider('https://bsc-dataseed1.defibit.io/');
 
-function replaceUrlParam(url, paramName, paramValue)
-{
+function replaceUrlParam(url, paramName, paramValue) {
     if (paramValue == null) {
         paramValue = '';
     }
-    var pattern = new RegExp('\\b('+paramName+'=).*?(&|#|$)');
-    if (url.search(pattern)>=0) {
-        return url.replace(pattern,'$1' + paramValue + '$2');
+    var pattern = new RegExp('\\b(' + paramName + '=).*?(&|#|$)');
+    if (url.search(pattern) >= 0) {
+        return url.replace(pattern, '$1' + paramValue + '$2');
     }
-    url = url.replace(/[?#]$/,'');
-    return url + (url.indexOf('?')>0 ? '&' : '?') + paramName + '=' + paramValue;
+    url = url.replace(/[?#]$/, '');
+    return url + (url.indexOf('?') > 0 ? '&' : '?') + paramName + '=' + paramValue;
 }
 
 
 // mapping for chainId and names
 const urlChainName2ChainId = (urlChainName) => {
     let urlChainId = -1;
-    switch(urlChainName) {
-        case "bsc": 
+    switch (urlChainName) {
+        case "bsc":
             urlChainId = 56; break;
-        case "bsctest": 
+        case "bsctest":
             urlChainId = 97; break;
-        case "polygon": 
+        case "polygon":
             urlChainId = 137; break;
-        case "mumbai": 
+        case "mumbai":
             urlChainId = 80001; break;
         case "arbitrum":
             urlChainId = 42161; break;
-        default: 
+        default:
             urlChainId = -1;
     }
     return urlChainId;
@@ -54,19 +54,19 @@ const urlChainName2ChainId = (urlChainName) => {
 
 const chainId2UrlChainName = (chainId) => {
     let chainName = "bsc";
-    switch(chainId) {
-        case 56: 
-          chainName = "bsc"; break;
-        case 97: 
+    switch (chainId) {
+        case 56:
+            chainName = "bsc"; break;
+        case 97:
             chainName = "bsctest"; break;
-        case 137: 
-          chainName = "polygon"; break;
-        case 80001: 
+        case 137:
+            chainName = "polygon"; break;
+        case 80001:
             chainName = "mumbai"; break;
         case 42161:
             chainName = "arbitrum"; break;
-        default: 
-          chainName = "other";
+        default:
+            chainName = "other";
     }
     return chainName;
 }
@@ -101,7 +101,7 @@ export let constantInstance = {
     'marketNetwork': 56,
     'marketAPISetting': FarmSettingSelector(56),
     'marketTokenList': TokenListSelector(56),
-    'globalSettings' : GlobalSettingsSelector(56),
+    'globalSettings': GlobalSettingsSelector(56),
     'perpetuals': PerpetualSelector(initialChainId),
 };
 
@@ -155,7 +155,7 @@ export const ConstantLoader = (chainId = 56, marketChainId = 56) => {
         'gasTokenSymbol': GAS_TOKEN_SYMBOL[fallbackChainId],
         'marketAPISetting': FarmSettingSelector(marketNetwork),
         'marketTokenList': TokenListSelector(marketNetwork),
-        'globalSettings' : GlobalSettingsSelector(fallbackChainId),
+        'globalSettings': GlobalSettingsSelector(fallbackChainId),
         'perpetuals': PerpetualSelector(initialChainId)
     };
 
@@ -165,50 +165,50 @@ export const ConstantLoader = (chainId = 56, marketChainId = 56) => {
 
 const networkParams = {
     "0x38": {
-      chainId: '0x38',
-      chainName: 'Binance Smart Chain Netwaok',
-      nativeCurrency: {
-        name: 'Binance',
-        symbol: 'BNB', // 2-6 characters long
-        decimals: 18
-      },
-      blockExplorerUrls: ['https://bscscan.com'],
-      rpcUrls: ['https://bsc-dataseed.binance.org/'],
+        chainId: '0x38',
+        chainName: 'Binance Smart Chain Netwaok',
+        nativeCurrency: {
+            name: 'Binance',
+            symbol: 'BNB', // 2-6 characters long
+            decimals: 18
+        },
+        blockExplorerUrls: ['https://bscscan.com'],
+        rpcUrls: ['https://bsc-dataseed.binance.org/'],
     },
     "0x61": {
-      chainId: '0x61',
-      chainName: 'Binance Smart Chain Testnet',
-      nativeCurrency: {
-        name: 'Binance',
-        symbol: 'BNB', // 2-6 characters long
-        decimals: 18
-      },
-      blockExplorerUrls: ['https://testnet.bscscan.com'],
-      rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
+        chainId: '0x61',
+        chainName: 'Binance Smart Chain Testnet',
+        nativeCurrency: {
+            name: 'Binance',
+            symbol: 'BNB', // 2-6 characters long
+            decimals: 18
+        },
+        blockExplorerUrls: ['https://testnet.bscscan.com'],
+        rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
     },
     "0x89": {
-      chainId: '0x89',
-      chainName: 'Polygon',
-      nativeCurrency: {
-        name: 'Matic',
-        symbol: 'MATIC', // 2-6 characters long
-        decimals: 18
-      },
-      blockExplorerUrls: ['https://polygonscan.com/'],
-      rpcUrls: ['https://polygon-rpc.com/'],
+        chainId: '0x89',
+        chainName: 'Polygon',
+        nativeCurrency: {
+            name: 'Matic',
+            symbol: 'MATIC', // 2-6 characters long
+            decimals: 18
+        },
+        blockExplorerUrls: ['https://polygonscan.com/'],
+        rpcUrls: ['https://polygon-rpc.com/'],
     },
     "0xA4B1": {
         chainId: '0xA4B1',
         chainName: 'Arbitrum',
         nativeCurrency: {
-          name: 'ETH',
-          symbol: 'ETH', // 2-6 characters long
-          decimals: 18
+            name: 'ETH',
+            symbol: 'ETH', // 2-6 characters long
+            decimals: 18
         },
         blockExplorerUrls: ['https://arbiscan.io/'],
         rpcUrls: ['https://arb1.arbitrum.io/rpc'],
-      },
-  };
+    },
+};
 
 
 // import constant to react component
@@ -251,17 +251,16 @@ export const useConstantLoader = () => {
             //     },
             // })
 
-            function replaceUrlParam(url, paramName, paramValue)
-            {
+            function replaceUrlParam(url, paramName, paramValue) {
                 if (paramValue == null) {
                     paramValue = '';
                 }
-                var pattern = new RegExp('\\b('+paramName+'=).*?(&|#|$)');
-                if (url.search(pattern)>=0) {
-                    return url.replace(pattern,'$1' + paramValue + '$2');
+                var pattern = new RegExp('\\b(' + paramName + '=).*?(&|#|$)');
+                if (url.search(pattern) >= 0) {
+                    return url.replace(pattern, '$1' + paramValue + '$2');
                 }
-                url = url.replace(/[?#]$/,'');
-                return url + (url.indexOf('?')>0 ? '&' : '?') + paramName + '=' + paramValue;
+                url = url.replace(/[?#]$/, '');
+                return url + (url.indexOf('?') > 0 ? '&' : '?') + paramName + '=' + paramValue;
             }
             const urlWithNewChain = replaceUrlParam(window.location.href, "chain", chainName);
             // window.location.replace(urlWithNewChain);
@@ -370,7 +369,7 @@ export const useConstantLoader = () => {
 
 
 
-    
+
     // // 如果手动修改 url 的 chainId，就触发切换 chain network 的请求
     // // @TODO: 用户还没 connect 钱包时不要触发 request
     // useEffect(() => {
@@ -386,4 +385,37 @@ export const useConstantLoader = () => {
     // }, [history.location.query])
 
     return constant;
+}
+
+export const getGlobalTokenList = () => {
+    const [tokenList, setTokenList] = useState([])
+
+    useEffect(() => {
+        const apiUrlPrefix = "https://api.coingecko.com/api/v3"
+        axios.get(
+            `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=500&page=1&sparkline=false`
+        ).then(data => {
+            let tmp = []
+            data.data.map(token => {
+                tmp.push({
+                    name: token.name,
+                    symbol: token.symbol,
+                    logoURI: token.image,
+                    current_price: token.current_price,
+                    price_change_percentage_24h: token.price_change_percentage_24h,
+                    total_volume: token.total_volume,
+                    market_cap: token.market_cap,
+                    max_supply: token.max_supply,
+                    total_supply: token.total_supply,
+                })
+            })
+            setTokenList(tmp)
+            console.log('joy init tokenList', data.data)
+        })
+            .catch(e => {
+                console.log(e);
+            });
+    }, []);
+
+    return tokenList
 }
