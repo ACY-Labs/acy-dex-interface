@@ -168,7 +168,7 @@ export default class BaseMenu extends PureComponent {
         </SubMenu>
       );
     }
-    return <Menu.Item key={item.path}>{this.getMenuItemPath(item)}</Menu.Item>
+    return <Menu.Item key={item.path} style={{marginTop: item.name == 'Liquidity' ? '30px' : '0'}}>{this.getMenuItemPath(item)}</Menu.Item>
   };
 
   /**

@@ -190,15 +190,17 @@ export const SearchBar = props => {
 
     useEffect(() => {
         // fetch coin list
-        const apiUrlPrefix = "https://api.coingecko.com/api/v3"
-        axios.get(
-            `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false`
-        ).then(data => {
-            setDataSourceCoin(data.data)
-        })
-        .catch(e => {
-            console.log(e);
-        });
+        for (let i = 1; i <= 10; i++) {
+            const apiUrlPrefix = "https://api.coingecko.com/api/v3"
+            axios.get(
+                `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=${i}&sparkline=false`
+            ).then(data => {
+                setDataSourceCoin(dataSourceCoin.concat(data.data))
+            })
+            .catch(e => {
+                console.log(e);
+            });
+        }
     }, [chainId, marketNetwork]);
 
     // fetch searchcoinresults
@@ -478,6 +480,7 @@ export const SearchBar = props => {
                                             borderRadius: '5px',
                                             border: '1px solid #333333',
                                             paddingLeft: '20px',
+                                            height: '50%',
                                         }}
                                         onFocus={onSearchFocus}
                                         onChange={onInput}
