@@ -110,7 +110,6 @@ export async  function fetchMarketData () {
     let request = `${apiUrlPrefix}/poolchart/historical/all`;
     let response = await fetch(request);
     let data = await response.json();
-    console.log("BUG HERE:",request,data)
     return parseMarketData(data.data);
   }catch (e){
     console.log('service not available yet',e);

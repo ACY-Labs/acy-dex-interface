@@ -334,7 +334,6 @@ const SwapComponent = props => {
         updateTotalTokenWeights()
         updateUsdgSupply()
         updateOrderBookApproved()
-        console.log("BLOCK HERE:")
       }
       library.on('block', onBlock)
       return () => {
@@ -386,6 +385,7 @@ const SwapComponent = props => {
   // default collateral address on ARBITRUM
   
   const [shortCollateralAddress, setShortCollateralAddress] = useState(fromTokenAddress);
+
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   console.log("test multichain: tokens", infoTokens, tokens)
   const fromToken = perpetuals.getToken(fromTokenAddress);
@@ -418,9 +418,10 @@ const SwapComponent = props => {
   const toUsdMax = getUsd(toAmount, toTokenAddress, true, infoTokens, type, triggerPriceUsd);
 
   const indexTokenAddress = toTokenAddress === AddressZero ? nativeTokenAddress : toTokenAddress;
-  const collateralTokenAddress = isLong
-    ? indexTokenAddress
-    : shortCollateralAddress;
+  // const collateralTokenAddress = isLong
+  //   ? indexTokenAddress
+  //   : shortCollateralAddress;
+  const collateralTokenAddress = shortCollateralAddress;
   const collateralToken = perpetuals.getToken(collateralTokenAddress);
 
   const [triggerRatioValue, setTriggerRatioValue] = useState("");
@@ -839,6 +840,10 @@ const SwapComponent = props => {
     }
   };
 
+  const getToUsdAmount = () => {
+
+  }
+
   useEffect(() => {
     console.log("update from token 1: ", fromTokenAddress)
   }, [fromTokenAddress])
@@ -924,7 +929,7 @@ const SwapComponent = props => {
     const indexTokenAddress = toTokenAddress === AddressZero ? nativeTokenAddress : toTokenAddress;
     let path = [indexTokenAddress]; // assume long
     if (toTokenAddress !== fromTokenAddress) {
-      path = [tokenAddress0, indexTokenAddress];
+      path = [tokenAddress0];
     }
 
     if (fromTokenAddress === AddressZero && toTokenAddress === nativeTokenAddress) {
@@ -1005,7 +1010,6 @@ const SwapComponent = props => {
       USD_DECIMALS,
       2
     )} USD.`;
-    
     Api.callContract(chainId, contract, method, params, {
       value,
       setPendingTxns,
@@ -1134,22 +1138,23 @@ const SwapComponent = props => {
       if (fromTokenAddress !== toTokenAddress) {
         const { amount: swapAmount } = getNextToAmount(
           chainId,
-          fromAmount,
-          fromTokenAddress,
+          toAmount,
           toTokenAddress,
+          fromTokenAddress,
           infoTokens,
           undefined,
           undefined,
           usdgSupply,
           totalTokenWeights
         );
+        
         requiredAmount = requiredAmount.add(swapAmount);
-
+        console.log("DEBUG HERE2:", requiredAmount.toString(), fromTokenInfo.availableAmount.toString(), leverageOption)
         if (
           toToken &&
           toTokenAddress !== USDG_ADDRESS &&
-          toTokenInfo.availableAmount &&
-          requiredAmount.gt(toTokenInfo.availableAmount)
+          fromTokenInfo.availableAmount &&
+          requiredAmount.gt(fromTokenInfo.availableAmount)
         ) {
           return ["Insufficient liquidity"];
         }
@@ -1205,7 +1210,6 @@ const SwapComponent = props => {
           totalTokenWeights
         );
         stableTokenAmount = nextToAmount;
-        console.log("test here2 ", stableTokenAmount, shortCollateralToken, infoTokens, vaultTokenInfo, shortCollateralAddress)
         if (stableTokenAmount.gt(shortCollateralToken.availableAmount)) {
           return [`Insufficient liquidity, change "Profits In" 1`];
         }
@@ -1262,11 +1266,11 @@ const SwapComponent = props => {
       const sizeTokens = sizeUsd
         .mul(expandDecimals(1, shortCollateralToken.decimals))
         .div(shortCollateralToken.minPrice);
-
-      if (toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) && sizeUsd.gt(toTokenInfo.maxAvailableShort)) {
-        return [`Max ${toTokenInfo.symbol} short exceeded`]
-      }
-
+      // no more this short limits
+      // if (toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) && sizeUsd.gt(toTokenInfo.maxAvailableShort)) {
+      //   return [`Max ${toTokenInfo.symbol} short exceeded`]
+      // }
+      console.log("DEBUG HERE3:", stableTokenAmount, sizeTokens.toString(), shortCollateralToken)
       stableTokenAmount = stableTokenAmount.add(sizeTokens)
       if (stableTokenAmount.gt(shortCollateralToken.availableAmount)) {
         return [`Insufficient liquidity, change "Profits In" 3`];
@@ -1702,7 +1706,7 @@ const SwapComponent = props => {
             {isLong && (
               <div className={styles.detailCard}>
                 <div className={styles.label}>Profits In</div>
-                <div className={styles.value}>{toToken.symbol}</div>
+                <div className={styles.value}>{collateralToken.symbol}</div>
               </div>
             )}
             {isShort && (

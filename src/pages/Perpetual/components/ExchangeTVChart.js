@@ -37,6 +37,8 @@ const PRICE_LINE_TEXT_WIDTH = 15;
 
 const timezoneOffset = -new Date().getTimezoneOffset() * 60;
 
+const BinancePriceApi = 'https://api.acy.finance/polygon-test';
+
 export function getChartToken(swapOption, fromToken, toToken, chainId) {
   console.log("swapOption: ", swapOption)
   if (!fromToken || !toToken) {
@@ -148,13 +150,6 @@ export default function ExchangeTVChart(props) {
     orders,
     setToTokenAddress
   } = props
-  useEffect(() => {
-    // TODO: wait for backend deployment so this could be updated
-    axios.get("http://localhost:3001/polygon-test/api/cexPrices/binanceHistoricalPrice?symbol=BTCUSDT&interval=1m").then(res => {
-      const data = res.data
-      console.log("this is the test cors data: ", data)
-    })
-  }, [])
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
 
@@ -253,6 +248,7 @@ export default function ExchangeTVChart(props) {
       console.log("ws received: ", candleData.time, candleData.close)
       currentSeries.update(candleData)
       setLastCandle(candleData);
+      console.log("hereim see currentseries", currentSeries)
     });
     cleaner.current = clean;
     console.log("added new candles subscription for ", pairName)
@@ -263,7 +259,7 @@ export default function ExchangeTVChart(props) {
       // REACT BUG?
       console.log("fetchPrevAndSubscribe again: ", chartToken.symbol)
       // Binance data is independent of chain, so here we can fill in any chain name
-      const prevData = await axios.get(`http://localhost:3001/polygon-test/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`).then(res => res.data);
+      const prevData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`).then(res => res.data);
       console.log("prev data: ", prevData)
       currentSeries.setData(prevData);      
 
