@@ -48,24 +48,20 @@ export const tokenDecimals = {
 }
 
 export const tokenSymbols = {
-  // Arbitrum
-  '0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f': 'BTC',
-  '0x82af49447d8a07e3bd95bd0d56f35241523fbab1': 'ETH',
-  '0xf97f4df75117a78c1a5a0dbb814af92458539fb4': 'LINK',
-  '0xfa7f8980b0f1e64a2062791cc3b0871572f1f7f0': 'UNI',
-  '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8': 'USDC',
-  '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9': 'USDT',
-  '0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a': 'MIM',
-  '0x17fc002b466eec40dae837fc4be5c67993ddbd6f': 'FRAX',
-  '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1': 'DAI',
+  // Polygon mumbai (testnet), in lower case
+  '0x05d6f705c80d9f812d9bc1a142a655cdb25e2571': 'BTC',
+  '0xebc8428dc717d440d5dece1547456b115b868f0e': 'ETH',
+  '0x7a96316b13bd7d0529e701d2ed8b9fc4e4fd8696': 'USDC',
+  '0x158653b66fd72555f68edf983736781e471639cc': 'USDT',
+  '0x9c3c9283d3e44854697cd22d3faa240cfb032889': 'MATIC'
 
   // Avalanche
-  '0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7': 'AVAX',
-  '0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab': 'WETH.e',
-  '0x50b7545627a5162f82a992c33b87adc75187b218': 'WBTC.e',
-  '0x130966628846bfd36ff31a822705796e8cb8c18d': 'MIM',
-  '0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664': 'USDC.e',
-  '0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e': 'USDC'
+  // '0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7': 'AVAX',
+  // '0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab': 'WETH.e',
+  // '0x50b7545627a5162f82a992c33b87adc75187b218': 'WBTC.e',
+  // '0x130966628846bfd36ff31a822705796e8cb8c18d': 'MIM',
+  // '0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664': 'USDC.e',
+  // '0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e': 'USDC'
 }
 
 function getTokenDecimals(token) {
@@ -132,7 +128,7 @@ export function useCoingeckoPrices(symbol, { from = FIRST_DATE_TS } = {}) {
 
     const ret = res.prices.map(item => {
       // -1 is for shifting to previous day
-      // because CG uses first price of the day, but for GLP we store last price of the day
+      // because CG uses first price of the day, but for ALP we store last price of the day
       const timestamp = item[0] - 1
       const groupTs = parseInt(timestamp / 1000 / 86400) * 86400
       return {
@@ -151,7 +147,7 @@ function getImpermanentLoss(change) {
 } 
 
 function getChainSubgraph(chainName) {
-  return chainName === "arbitrum" ? "gmx-io/gmx-stats" : "gmx-io/gmx-avalanche-stats"
+  return chainName === "arbitrum" ? "nearrainbow/acysubgraph" : "nearrainbow/acysubgraph"
 }
 
 export function useGraph(querySource, { subgraph = null, subgraphUrl = null, chainName = "arbitrum" } = {}) {
@@ -430,17 +426,17 @@ export function useTradersData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = 
   }) : null
 
   if (data) {
-    const maxProfit = maxBy(data, item => item.profit).profit
-    const maxLoss = minBy(data, item => item.loss).loss
+    const maxProfit = maxBy(data, item => item.profit)?.profit ?? 0
+    const maxLoss = minBy(data, item => item.loss)?.loss ?? 0
     const maxProfitLoss = Math.max(maxProfit, -maxLoss)
 
-    const maxPnl = maxBy(data, item => item.pnl).pnl
-    const minPnl = minBy(data, item => item.pnl).pnl
-    const maxCumulativePnl = maxBy(data, item => item.pnlCumulative).pnlCumulative
-    const minCumulativePnl = minBy(data, item => item.pnlCumulative).pnlCumulative
+    const maxPnl = maxBy(data, item => item.pnl)?.pnl ?? 0
+    const minPnl = minBy(data, item => item.pnl)?.pnl ?? 0
+    const maxCumulativePnl = maxBy(data, item => item.pnlCumulative)?.pnlCumulative ?? 0
+    const minCumulativePnl = minBy(data, item => item.pnlCumulative)?.pnlCumulative ?? 0
 
-    const profitCumulative = data[data.length - 1].profitCumulative
-    const lossCumulative = data[data.length - 1].lossCumulative
+    const profitCumulative = data[data.length - 1]?.profitCumulative ?? 0
+    const lossCumulative = data[data.length - 1]?.lossCumulative ?? 0
     const stats = {
       maxProfit,
       maxLoss,
@@ -678,9 +674,9 @@ export function useUsersData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "a
   return [data, loading, error]
 }
 
-export function useFundingRateData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "arbitrum" } = {}) {
+export function useBorrowRateData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "arbitrum" } = {}) {
   const query = `{
-    fundingRates(
+    borrowRates(
       first: 1000,
       orderBy: timestamp,
       orderDirection: desc,
@@ -689,9 +685,9 @@ export function useFundingRateData({ from = FIRST_DATE_TS, to = NOW_TS, chainNam
       id,
       token,
       timestamp,
-      startFundingRate,
+      startBorrowRate,
       startTimestamp,
-      endFundingRate,
+      endBorrowRate,
       endTimestamp
     }
   }`
@@ -703,25 +699,24 @@ export function useFundingRateData({ from = FIRST_DATE_TS, to = NOW_TS, chainNam
       return null
     }
 
-    const groups = graphData.fundingRates.reduce((memo, item) => {
-      const symbol = tokenSymbols[item.token]
+    const groups = graphData.borrowRates.reduce((memo, item) => {
+      const symbol = tokenSymbols[item.token];
       memo[item.timestamp] = memo[item.timestamp] || {
         timestamp: item.timestamp
       }
       const group = memo[item.timestamp]
       const timeDelta = parseInt((item.endTimestamp - item.startTimestamp) / 3600) * 3600
 
-      let fundingRate = 0
-      if (item.endFundingRate && item.startFundingRate) {
-        const fundingDelta = item.endFundingRate - item.startFundingRate
+      let borrowRate = 0
+      if (item.endBorrowRate && item.startBorrowRate) {
+        const fundingDelta = item.endBorrowRate - item.startBorrowRate
         const divisor = timeDelta / 86400
-        fundingRate = fundingDelta / divisor / 10000 * 365
+        borrowRate = fundingDelta / divisor / 10000 * 365
       }
-      group[symbol] = fundingRate
+      group[symbol] = borrowRate
       return memo
     }, {})
-
-    return fillNa(sortBy(Object.values(groups), 'timestamp'), ['ETH', 'USDC', 'USDT', 'BTC', 'LINK', 'UNI', 'MIM'])
+    return fillNa(sortBy(Object.values(groups), 'timestamp'), ['ETH', 'USDC', 'USDT', 'BTC', 'MATIC'])
   }, [graphData])
 
   return [data, loading, error]
@@ -860,24 +855,24 @@ export function useFeesData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "ar
 
 export function useAumPerformanceData({ from = FIRST_DATE_TS, to = NOW_TS, groupPeriod }) {
   const [feesData, feesLoading] = useFeesData({ from, to, groupPeriod })
-  const [glpData, glpLoading] = useGlpData({ from, to, groupPeriod })
+  const [alpData, alpLoading] = useAlpData({ from, to, groupPeriod })
   const [volumeData, volumeLoading] = useVolumeData({ from, to, groupPeriod })
 
   const dailyCoef = 86400 / groupPeriod
 
   const data = useMemo(() => {
-    if (!feesData || !glpData || !volumeData) {
+    if (!feesData || !alpData || !volumeData) {
       return null
     }
 
     const ret = feesData.map((feeItem, i) => {
-      const glpItem = glpData[i]
+      const alpItem = alpData[i]
       const volumeItem = volumeData[i]
-      let apr = (feeItem?.all && glpItem?.aum) ? feeItem.all /  glpItem.aum * 100 * 365 * dailyCoef : null
+      let apr = (feeItem?.all && alpItem?.aum) ? feeItem.all /  alpItem.aum * 100 * 365 * dailyCoef : null
       if (apr > 10000) {
         apr = null
       }
-      let usage = (volumeItem?.all && glpItem?.aum) ? volumeItem.all / glpItem.aum * 100 * dailyCoef : null
+      let usage = (volumeItem?.all && alpItem?.aum) ? volumeItem.all / alpItem.aum * 100 * dailyCoef : null
       if (usage > 10000) {
         usage = null
       }
@@ -893,66 +888,66 @@ export function useAumPerformanceData({ from = FIRST_DATE_TS, to = NOW_TS, group
     const averageUsage = ret.reduce((memo, item) => item.usage + memo, 0) / ret.length
     ret.forEach(item => item.averageUsage = averageUsage)
     return ret
-  }, [feesData, glpData, volumeData])
+  }, [feesData, alpData, volumeData])
 
-  return [data, feesLoading || glpLoading || volumeLoading]
+  return [data, feesLoading || alpLoading || volumeLoading]
 }
 
-export function useGlpData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "arbitrum" } = {}) {
+export function useAlpData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "arbitrum" } = {}) {
   const timestampProp = chainName === 'arbitrum' ? 'id' : 'timestamp'
   const query = `{
-    glpStats(
+    alpStats(
       first: 1000
       orderBy: ${timestampProp}
       orderDirection: desc
       where: {period: daily, ${timestampProp}_gte: ${from}, ${timestampProp}_lte: ${to}}
     ) {
       ${timestampProp}
-      aumInUsdg
-      glpSupply
+      aumInUsda
+      alpSupply
       distributedUsd
       distributedEth
     }
   }`
   let [data, loading, error] = useGraph(query, { chainName })
 
-  let cumulativeDistributedUsdPerGlp = 0
-  let cumulativeDistributedEthPerGlp = 0
-  const glpChartData = useMemo(() => {
+  let cumulativeDistributedUsdPerAlp = 0
+  let cumulativeDistributedEthPerAlp = 0
+  const alpChartData = useMemo(() => {
     if (!data) {
       return null
     }
 
     const getTimestamp = item => item.timestamp || parseInt(item[timestampProp])
     
-    let prevGlpSupply
+    let prevAlpSupply
     let prevAum
-    return sortBy(data.glpStats, item => item[timestampProp]).filter(item => item[timestampProp] % 86400 === 0).reduce((memo, item) => {
+    return sortBy(data.alpStats, item => item[timestampProp]).filter(item => item[timestampProp] % 86400 === 0).reduce((memo, item) => {
       const last = memo[memo.length - 1]
 
-      const aum = Number(item.aumInUsdg) / 1e18
-      const glpSupply = Number(item.glpSupply) / 1e18
+      const aum = Number(item.aumInUsda) / 1e18
+      const alpSupply = Number(item.alpSupply) / 1e18
 
       const distributedUsd = Number(item.distributedUsd) / 1e30
-      const distributedUsdPerGlp = (distributedUsd / glpSupply) || 0
-      cumulativeDistributedUsdPerGlp += distributedUsdPerGlp
+      const distributedUsdPerAlp = (distributedUsd / alpSupply) || 0
+      cumulativeDistributedUsdPerAlp += distributedUsdPerAlp
 
       const distributedEth = Number(item.distributedEth) / 1e18
-      const distributedEthPerGlp = (distributedEth / glpSupply) || 0
-      cumulativeDistributedEthPerGlp += distributedEthPerGlp
+      const distributedEthPerAlp = (distributedEth / alpSupply) || 0
+      cumulativeDistributedEthPerAlp += distributedEthPerAlp
 
-      const glpPrice = aum / glpSupply
+      const alpPrice = aum / alpSupply
       const timestamp = parseInt(item[timestampProp])
 
       const newItem = {
         timestamp,
         aum,
-        glpSupply,
-        glpPrice,
-        cumulativeDistributedEthPerGlp,
-        cumulativeDistributedUsdPerGlp,
-        distributedUsdPerGlp,
-        distributedEthPerGlp
+        alpSupply,
+        alpPrice,
+        cumulativeDistributedEthPerAlp,
+        cumulativeDistributedUsdPerAlp,
+        distributedUsdPerAlp,
+        distributedEthPerAlp
       }
 
       if (last && last.timestamp === timestamp) {
@@ -963,38 +958,38 @@ export function useGlpData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "arb
 
       return memo
     }, []).map(item => {
-      let { glpSupply, aum } = item
-      if (!glpSupply) {
-        glpSupply = prevGlpSupply
+      let { alpSupply, aum } = item
+      if (!alpSupply) {
+        alpSupply = prevAlpSupply
       }
       if (!aum) {
         aum = prevAum
       }
-      item.glpSupplyChange = prevGlpSupply ? (glpSupply - prevGlpSupply) / prevGlpSupply * 100 : 0
-      if (item.glpSupplyChange > 1000) item.glpSupplyChange = 0
+      item.alpSupplyChange = prevAlpSupply ? (alpSupply - prevAlpSupply) / prevAlpSupply * 100 : 0
+      if (item.alpSupplyChange > 1000) item.alpSupplyChange = 0
       item.aumChange = prevAum ? (aum - prevAum) / prevAum * 100 : 0
       if (item.aumChange > 1000) item.aumChange = 0
-      prevGlpSupply = glpSupply
+      prevAlpSupply = alpSupply
       prevAum = aum
       return item
     })
 
   }, [data])
 
-  return [glpChartData, loading, error]
+  return [alpChartData, loading, error]
 }
 
-export function useGlpPerformanceData(glpData, feesData, { from = FIRST_DATE_TS, chainName = "arbitrum" } = {}) {
+export function useAlpPerformanceData(alpData, feesData, { from = FIRST_DATE_TS, chainName = "arbitrum" } = {}) {
   const [btcPrices] = useCoingeckoPrices('BTC', { from })
   const [ethPrices] = useCoingeckoPrices('ETH', { from })
   const [avaxPrices] = useCoingeckoPrices('AVAX', { from })
 
-  const glpPerformanceChartData = useMemo(() => {
-    if (!btcPrices || !ethPrices || !avaxPrices || !glpData || !feesData) {
+  const alpPerformanceChartData = useMemo(() => {
+    if (!btcPrices || !ethPrices || !avaxPrices || !alpData || !feesData) {
       return null
     }
 
-    const glpDataById = glpData.reduce((memo, item) => {
+    const alpDataById = alpData.reduce((memo, item) => {
       memo[item.timestamp] = item
       return memo
     }, {})
@@ -1007,23 +1002,23 @@ export function useGlpPerformanceData(glpData, feesData, { from = FIRST_DATE_TS,
     const BTC_WEIGHT = 0.25
     const ETH_WEIGHT = 0.25
     const STABLE_WEIGHT = 1 - BTC_WEIGHT - ETH_WEIGHT
-    const GLP_START_PRICE = glpDataById[btcPrices[0].timestamp]?.glpPrice || 1.19
+    const ALP_START_PRICE = alpDataById[btcPrices[0].timestamp]?.alpPrice || 1.19
 
     const btcFirstPrice = btcPrices[0]?.value
     const ethFirstPrice = ethPrices[0]?.value
     const avaxFirstPrice = avaxPrices[0]?.value
 
-    const indexBtcCount = GLP_START_PRICE * BTC_WEIGHT / btcFirstPrice
-    const indexEthCount = GLP_START_PRICE * ETH_WEIGHT / ethFirstPrice
+    const indexBtcCount = ALP_START_PRICE * BTC_WEIGHT / btcFirstPrice
+    const indexEthCount = ALP_START_PRICE * ETH_WEIGHT / ethFirstPrice
 
-    const lpBtcCount = GLP_START_PRICE * 0.5 / btcFirstPrice
-    const lpEthCount = GLP_START_PRICE * 0.5 / ethFirstPrice
-    const lpAvaxCount = GLP_START_PRICE * 0.5 / avaxFirstPrice
+    const lpBtcCount = ALP_START_PRICE * 0.5 / btcFirstPrice
+    const lpEthCount = ALP_START_PRICE * 0.5 / ethFirstPrice
+    const lpAvaxCount = ALP_START_PRICE * 0.5 / avaxFirstPrice
 
     const ret = []
-    let cumulativeFeesPerGlp = 0
-    let cumulativeEsgmxRewardsPerGlp = 0
-    let lastGlpPrice = 0
+    let cumulativeFeesPerAlp = 0
+    let cumulativeEsgmxRewardsPerAlp = 0
+    let lastAlpPrice = 0
 
     let prevEthPrice = 3400
     let prevAvaxPrice = 1000
@@ -1035,40 +1030,40 @@ export function useGlpPerformanceData(glpData, feesData, { from = FIRST_DATE_TS,
       prevEthPrice = ethPrice
 
       const timestampGroup = parseInt(btcPrices[i].timestamp / 86400) * 86400
-      const glpItem = glpDataById[timestampGroup]
-      const glpPrice = glpItem?.glpPrice ?? lastGlpPrice
-      lastGlpPrice = glpPrice
-      const glpSupply = glpDataById[timestampGroup]?.glpSupply
+      const alpItem = alpDataById[timestampGroup]
+      const alpPrice = alpItem?.alpPrice ?? lastAlpPrice
+      lastAlpPrice = alpPrice
+      const alpSupply = alpDataById[timestampGroup]?.alpSupply
       const dailyFees = feesDataById[timestampGroup]?.all
-      const syntheticPrice = indexBtcCount * btcPrice + indexEthCount * ethPrice + GLP_START_PRICE * STABLE_WEIGHT
-      const lpBtcPrice = (lpBtcCount * btcPrice + GLP_START_PRICE / 2) * (1 + getImpermanentLoss(btcPrice / btcFirstPrice))
-      const lpEthPrice = (lpEthCount * ethPrice + GLP_START_PRICE / 2) * (1 + getImpermanentLoss(ethPrice / ethFirstPrice))
-      const lpAvaxPrice = (lpAvaxCount * avaxPrice + GLP_START_PRICE / 2) * (1 + getImpermanentLoss(avaxPrice / avaxFirstPrice))
+      const syntheticPrice = indexBtcCount * btcPrice + indexEthCount * ethPrice + ALP_START_PRICE * STABLE_WEIGHT
+      const lpBtcPrice = (lpBtcCount * btcPrice + ALP_START_PRICE / 2) * (1 + getImpermanentLoss(btcPrice / btcFirstPrice))
+      const lpEthPrice = (lpEthCount * ethPrice + ALP_START_PRICE / 2) * (1 + getImpermanentLoss(ethPrice / ethFirstPrice))
+      const lpAvaxPrice = (lpAvaxCount * avaxPrice + ALP_START_PRICE / 2) * (1 + getImpermanentLoss(avaxPrice / avaxFirstPrice))
 
-      if (dailyFees && glpSupply) {
-        const INCREASED_GLP_REWARDS_TIMESTAMP = 1635714000
-        const GLP_REWARDS_SHARE = timestampGroup >= INCREASED_GLP_REWARDS_TIMESTAMP ? 0.7 : 0.5
-        const collectedFeesPerGlp = dailyFees / glpSupply * GLP_REWARDS_SHARE
-        cumulativeFeesPerGlp += collectedFeesPerGlp
+      if (dailyFees && alpSupply) {
+        const INCREASED_ALP_REWARDS_TIMESTAMP = 1635714000
+        const ALP_REWARDS_SHARE = timestampGroup >= INCREASED_ALP_REWARDS_TIMESTAMP ? 0.7 : 0.5
+        const collectedFeesPerAlp = dailyFees / alpSupply * ALP_REWARDS_SHARE
+        cumulativeFeesPerAlp += collectedFeesPerAlp
 
-        cumulativeEsgmxRewardsPerGlp += glpPrice * 0.8 / 365
+        cumulativeEsgmxRewardsPerAlp += alpPrice * 0.8 / 365
       }
 
-      let glpPlusFees = glpPrice
-      if (glpPrice && glpSupply && cumulativeFeesPerGlp) {
-        glpPlusFees = glpPrice + cumulativeFeesPerGlp
+      let alpPlusFees = alpPrice
+      if (alpPrice && alpSupply && cumulativeFeesPerAlp) {
+        alpPlusFees = alpPrice + cumulativeFeesPerAlp
       }
 
-      let glpApr
-      let glpPlusDistributedUsd
-      let glpPlusDistributedEth
-      if (glpItem) {
-        if (glpItem.cumulativeDistributedUsdPerGlp) {
-          glpPlusDistributedUsd = glpPrice + glpItem.cumulativeDistributedUsdPerGlp
-          // glpApr = glpItem.distributedUsdPerGlp / glpPrice * 365 * 100 // incorrect?
+      let alpApr
+      let alpPlusDistributedUsd
+      let alpPlusDistributedEth
+      if (alpItem) {
+        if (alpItem.cumulativeDistributedUsdPerAlp) {
+          alpPlusDistributedUsd = alpPrice + alpItem.cumulativeDistributedUsdPerAlp
+          // alpApr = alpItem.distributedUsdPerAlp / alpPrice * 365 * 100 // incorrect?
         }
-        if (glpItem.cumulativeDistributedEthPerGlp) {
-          glpPlusDistributedEth = glpPrice + glpItem.cumulativeDistributedEthPerGlp * ethPrice
+        if (alpItem.cumulativeDistributedEthPerAlp) {
+          alpPlusDistributedEth = alpPrice + alpItem.cumulativeDistributedEthPerAlp * ethPrice
         }
       }
 
@@ -1078,31 +1073,31 @@ export function useGlpPerformanceData(glpData, feesData, { from = FIRST_DATE_TS,
         lpBtcPrice,
         lpEthPrice,
         lpAvaxPrice,
-        glpPrice,
+        alpPrice,
         btcPrice,
         ethPrice,
-        glpPlusFees,
-        glpPlusDistributedUsd,
-        glpPlusDistributedEth,
+        alpPlusFees,
+        alpPlusDistributedUsd,
+        alpPlusDistributedEth,
 
-        performanceLpEth: (glpPrice / lpEthPrice * 100).toFixed(1),
-        performanceLpEthCollectedFees: (glpPlusFees / lpEthPrice * 100).toFixed(1),
-        performanceLpEthDistributedUsd: (glpPlusDistributedUsd / lpEthPrice * 100).toFixed(1),
-        performanceLpEthDistributedEth: (glpPlusDistributedEth / lpEthPrice * 100).toFixed(1),
+        performanceLpEth: (alpPrice / lpEthPrice * 100).toFixed(1),
+        performanceLpEthCollectedFees: (alpPlusFees / lpEthPrice * 100).toFixed(1),
+        performanceLpEthDistributedUsd: (alpPlusDistributedUsd / lpEthPrice * 100).toFixed(1),
+        performanceLpEthDistributedEth: (alpPlusDistributedEth / lpEthPrice * 100).toFixed(1),
 
-        performanceLpBtcCollectedFees: (glpPlusFees / lpBtcPrice * 100).toFixed(1),
+        performanceLpBtcCollectedFees: (alpPlusFees / lpBtcPrice * 100).toFixed(1),
 
-        performanceSynthetic: (glpPrice / syntheticPrice * 100).toFixed(1),
-        performanceSyntheticCollectedFees: (glpPlusFees / syntheticPrice * 100).toFixed(1),
-        performanceSyntheticDistributedUsd: (glpPlusDistributedUsd / syntheticPrice * 100).toFixed(1),
-        performanceSyntheticDistributedEth: (glpPlusDistributedEth / syntheticPrice * 100).toFixed(1),
+        performanceSynthetic: (alpPrice / syntheticPrice * 100).toFixed(1),
+        performanceSyntheticCollectedFees: (alpPlusFees / syntheticPrice * 100).toFixed(1),
+        performanceSyntheticDistributedUsd: (alpPlusDistributedUsd / syntheticPrice * 100).toFixed(1),
+        performanceSyntheticDistributedEth: (alpPlusDistributedEth / syntheticPrice * 100).toFixed(1),
 
-        glpApr
+        alpApr
       })
     }
 
     return ret
-  }, [btcPrices, ethPrices, glpData, feesData])
+  }, [btcPrices, ethPrices, alpData, feesData])
 
-  return [glpPerformanceChartData]
+  return [alpPerformanceChartData]
 }

@@ -48,12 +48,12 @@ import {
   useTotalVolumeFromServer,
   useVolumeDataFromServer,
   useFeesData,
-  useGlpData,
+  useAlpData,
   useAumPerformanceData,
-  useGlpPerformanceData,
+  useAlpPerformanceData,
   useTradersData,
   useSwapSources,
-  useFundingRateData,
+  useBorrowRateData,
   useUsersData,
   useLastSubgraphBlock,
   useLastBlock
@@ -82,7 +82,7 @@ const Stats = (props) => {
 
   const params = { from, to, groupPeriod }
 
-  const [fundingRateData, fundingRateLoading] = useFundingRateData(params)
+  const [borrowRateData, borrowRateLoading] = useBorrowRateData(params)
   const [volumeData, volumeLoading] = useVolumeDataFromServer(params)
   const [totalVolume] = useTotalVolumeFromServer()
   const totalVolumeDelta = useMemo(() => {
@@ -102,18 +102,18 @@ const Stats = (props) => {
     return [total, delta]
   }, [feesData])
 
-  const [glpData, glpLoading] = useGlpData(params)
+  const [alpData, alpLoading] = useAlpData(params)
   const [totalAum, totalAumDelta] = useMemo(() => {
-    if (!glpData) {
+    if (!alpData) {
       return []
     }
-    const total = glpData[glpData.length - 1]?.aum
-    const delta = total - glpData[glpData.length - 2]?.aum
+    const total = alpData[alpData.length - 1]?.aum
+    const delta = total - alpData[alpData.length - 2]?.aum
     return [total, delta]
-  }, [glpData])
+  }, [alpData])
 
   const [aumPerformanceData, aumPerformanceLoading] = useAumPerformanceData(params)
-  const [glpPerformanceData, glpPerformanceLoading] = useGlpPerformanceData(glpData, feesData, params)
+  const [alpPerformanceData, alpPerformanceLoading] = useAlpPerformanceData(alpData, feesData, params)
 
   const [tradersData, tradersLoading] = useTradersData(params)
   const [openInterest, openInterestDelta] = useMemo(() => {
@@ -225,7 +225,7 @@ const Stats = (props) => {
           </div>
           <div className="chart-cell stats">
             {totalAum ? <>
-              <div className="total-stat-label">GLP Pool</div>
+              <div className="total-stat-label">ALP Pool</div>
               <div className="total-stat-value">
                 {formatNumber(totalAum, { currency: true })}
                 <span className={cx("total-stat-delta", (totalAumDelta > 0 ? 'plus' : 'minus'))} title="Change since previous day">{totalAumDelta > 0 ? '+' : ''}{formatNumber(totalAumDelta, { currency: true, compact: true })}</span>
@@ -290,9 +290,9 @@ const Stats = (props) => {
             /> */}
           </div>
           <div className="chart-cell">
-            <ChartWrapper title="AUM & Glp Supply" loading={glpLoading} data={glpData} csvFields={[{ key: 'aum' }, { key: 'glpSupply' }]}>
+            <ChartWrapper title="AUM & Alp Supply" loading={alpLoading} data={alpData} csvFields={[{ key: 'aum' }, { key: 'alpSupply' }]}>
               <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-                <LineChart data={glpData} syncId="syncGlp">
+                <LineChart data={alpData} syncId="syncAlp">
                   <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
                   <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
                   <YAxis dataKey="aum" tickFormatter={yaxisFormatter} width={YAXIS_WIDTH} />
@@ -303,24 +303,24 @@ const Stats = (props) => {
                   />
                   <Legend />
                   <Line isAnimationActive={false} type="monotone" strokeWidth={2} unit="$" dot={false} dataKey="aum" stackId="a" name="AUM" stroke={COLORS[0]} />
-                  <Line isAnimationActive={false} type="monotone" strokeWidth={2} dot={false} dataKey="glpSupply" stackId="a" name="Glp Supply" stroke={COLORS[1]} />
+                  <Line isAnimationActive={false} type="monotone" strokeWidth={2} dot={false} dataKey="alpSupply" stackId="a" name="Alp Supply" stroke={COLORS[1]} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartWrapper>
           </div>
           <div className="chart-cell">
             <ChartWrapper
-              title="Glp Price Comparison"
-              loading={glpLoading}
-              data={glpPerformanceData}
-              csvFields={[{ key: 'syntheticPrice' }, { key: 'glpPrice' }, { key: 'glpPlusFees' }, { key: 'lpBtcPrice' }, { key: 'lpEthPrice' }]}
+              title="Alp Price Comparison"
+              loading={alpLoading}
+              data={alpPerformanceData}
+              csvFields={[{ key: 'syntheticPrice' }, { key: 'alpPrice' }, { key: 'alpPlusFees' }, { key: 'lpBtcPrice' }, { key: 'lpEthPrice' }]}
             >
               <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-                <LineChart data={glpPerformanceData} syncId="syncGlp">
+                <LineChart data={alpPerformanceData} syncId="syncAlp">
                   <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
                   <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
                   <YAxis dataKey="performanceSyntheticCollectedFees" domain={[60, 210]} unit="%" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
-                  <YAxis dataKey="glpPrice" domain={[0.4, 1.7]} orientation="right" yAxisId="right" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
+                  <YAxis dataKey="alpPrice" domain={[0.4, 1.7]} orientation="right" yAxisId="right" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
                   <Tooltip
                     formatter={tooltipFormatterNumber}
                     labelFormatter={tooltipLabelFormatter}
@@ -332,26 +332,26 @@ const Stats = (props) => {
                   <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceSyntheticCollectedFees" name="% Index (w/ fees)" stroke={COLORS[0]} />
 
                   <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="syntheticPrice" name="Index Price" stroke={COLORS[2]} />
-                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="glpPrice" name="Glp Price" stroke={COLORS[1]} strokeWidth={1} />
-                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="glpPlusFees" name="Glp w/ fees" stroke={COLORS[3]} strokeWidth={1} />
+                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPrice" name="Alp Price" stroke={COLORS[1]} strokeWidth={1} />
+                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPlusFees" name="Alp w/ fees" stroke={COLORS[3]} strokeWidth={1} />
                   <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpBtcPrice" name="LP BTC-USDC" stroke={COLORS[2]} />
                   <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpEthPrice" name="LP ETH-USDC" stroke={COLORS[4]} />
                 </LineChart>
               </ResponsiveContainer>
               <div className="chart-description">
                 <p>
-                  <span style={{ color: COLORS[3] }}>Glp with fees</span> is based on GLP share of fees received and excluding esGMX rewards<br />
-                  <span style={{ color: COLORS[0] }}>% of Index (with fees)</span> is Glp with fees / Index Price * 100<br />
-                  <span style={{ color: COLORS[4] }}>% of LP ETH-USDC (with fees)</span> is Glp Price with fees / LP ETH-USDC * 100<br />
+                  <span style={{ color: COLORS[3] }}>Alp with fees</span> is based on ALP share of fees received and excluding esGMX rewards<br />
+                  <span style={{ color: COLORS[0] }}>% of Index (with fees)</span> is Alp with fees / Index Price * 100<br />
+                  <span style={{ color: COLORS[4] }}>% of LP ETH-USDC (with fees)</span> is Alp Price with fees / LP ETH-USDC * 100<br />
                   <span style={{ color: COLORS[2] }}>Index Price</span> is 25% BTC, 25% ETH, 50% USDC
                 </p>
               </div>
             </ChartWrapper>
           </div>
           {isExperiment && <div className="chart-cell experiment">
-            <ChartWrapper title="Performance vs. Index" loading={glpLoading}>
+            <ChartWrapper title="Performance vs. Index" loading={alpLoading}>
               <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-                <LineChart data={glpPerformanceData} syncId="syncGlp">
+                <LineChart data={alpPerformanceData} syncId="syncAlp">
                   <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
                   <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
                   <YAxis dataKey="performanceSyntheticCollectedFees" domain={[80, 120]} unit="%" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
@@ -370,9 +370,9 @@ const Stats = (props) => {
             </ChartWrapper>
           </div>}
           {isExperiment && <div className="chart-cell experiment">
-            <ChartWrapper title="Performance vs. ETH LP" loading={glpLoading}>
+            <ChartWrapper title="Performance vs. ETH LP" loading={alpLoading}>
               <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-                <LineChart data={glpPerformanceData} syncId="syncGlp">
+                <LineChart data={alpPerformanceData} syncId="syncAlp">
                   <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
                   <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
                   <YAxis dataKey="performanceLpEthCollectedFees" domain={[80, 120]} unit="%" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
@@ -455,13 +455,13 @@ const Stats = (props) => {
           </div>
           <div className="chart-cell">
             <GenericChart
-              loading={fundingRateLoading}
+              loading={borrowRateLoading}
               title="Borrowing Rate Annualized"
-              data={fundingRateData}
+              data={borrowRateData}
               yaxisDataKey="ETH"
               yaxisTickFormatter={yaxisFormatterPercent}
               tooltipFormatter={tooltipFormatterPercent}
-              items={[{ key: 'ETH' }, { key: 'BTC' }, { key: 'UNI' }, { key: 'LINK' }, { key: 'USDC' }, { key: 'USDT' }, { key: 'MIM' }, { key: 'FRAX', color: mode == "dark" ? "#FFF" : "#000" }, { key: 'DAI' }]}
+              items={[{ key: 'ETH' }, { key: 'BTC' }, { key: 'USDC' }, { key: 'USDT' }, { key: 'MATIC' }]}
               type="Line"
               yaxisDomain={[0, 90 /* ~87% is a maximum yearly borrow rate */]}
               isCoinChart={true}
@@ -479,7 +479,7 @@ const Stats = (props) => {
           </div>
           <div className="chart-cell">
             <GenericChart
-              syncId="syncGlp"
+              syncId="syncAlp"
               loading={aumPerformanceLoading}
               title="AUM Performance Annualized"
               data={aumPerformanceData}
@@ -487,13 +487,13 @@ const Stats = (props) => {
               yaxisTickFormatter={yaxisFormatterPercent}
               tooltipFormatter={tooltipFormatterPercent}
               items={[{ key: 'apr', name: 'APR', color: COLORS[0] }]}
-              description="Formula = Daily Fees / GLP Pool * 365 days * 100"
+              description="Formula = Daily Fees / ALP Pool * 365 days * 100"
               type="Composed"
             />
           </div>
           <div className="chart-cell">
             <GenericChart
-              syncId="syncGlp"
+              syncId="syncAlp"
               loading={aumPerformanceLoading}
               title="AUM Daily Usage"
               data={aumPerformanceData}
@@ -501,13 +501,13 @@ const Stats = (props) => {
               yaxisTickFormatter={yaxisFormatterPercent}
               tooltipFormatter={tooltipFormatterPercent}
               items={[{ key: 'usage', name: 'Daily Usage', color: COLORS[4] }]}
-              description="Formula = Daily Volume / GLP Pool * 100"
+              description="Formula = Daily Volume / ALP Pool * 100"
               type="Composed"
             />
           </div>
           <div className="chart-cell">
             <GenericChart
-              syncId="syncGlp"
+              syncId="syncAlp"
               loading={usersLoading}
               title="Unique Users"
               data={usersData}
@@ -518,14 +518,14 @@ const Stats = (props) => {
               items={[
                 { key: 'uniqueSwapCount', name: 'Swaps' },
                 { key: 'uniqueMarginCount', name: 'Margin trading' },
-                { key: 'uniqueMintBurnCount', name: 'Mint & Burn GLP' }
+                { key: 'uniqueMintBurnCount', name: 'Mint & Burn ALP' }
               ]}
               type="Composed"
             />
           </div>
           <div className="chart-cell">
             <GenericChart
-              syncId="syncGlp"
+              syncId="syncAlp"
               loading={usersLoading}
               title="New Users"
               data={usersData?.map(item => ({ ...item, all: item.newCount }))}
@@ -545,7 +545,7 @@ const Stats = (props) => {
           </div>
           <div className="chart-cell">
             <GenericChart
-              syncId="syncGlp"
+              syncId="syncAlp"
               loading={usersLoading}
               title="New vs. Existing Users"
               data={usersData?.map(item => ({ ...item, all: item.uniqueCount }))}
@@ -564,7 +564,7 @@ const Stats = (props) => {
           </div>
           <div className="chart-cell">
             <GenericChart
-              syncId="syncGlp"
+              syncId="syncAlp"
               loading={usersLoading}
               title="User Actions"
               data={(usersData || []).map(item => ({ ...item, all: item.actionCount }))}
@@ -572,7 +572,7 @@ const Stats = (props) => {
               yaxisTickFormatter={yaxisFormatterNumber}
               tooltipFormatter={tooltipFormatterNumber}
               tooltipLabelFormatter={tooltipLabelFormatterUnits}
-              items={[{ key: 'actionSwapCount', name: 'Swaps' }, { key: 'actionMarginCount', name: 'Margin trading' }, { key: 'actionMintBurnCount', name: 'Mint & Burn GLP' }]}
+              items={[{ key: 'actionSwapCount', name: 'Swaps' }, { key: 'actionMarginCount', name: 'Margin trading' }, { key: 'actionMintBurnCount', name: 'Mint & Burn ALP' }]}
               type="Composed"
             />
           </div>
