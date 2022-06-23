@@ -897,8 +897,9 @@ export const formatAmount = (amount, tokenDecimals, displayDecimals, useCommas, 
       displayDecimals = 4
   }
   // console.log("hereim formatamount 4", amount);
-
+  console.log("TEST BUG in:", amount)
   let amountStr = ethers.utils.formatUnits(amount, tokenDecimals)
+  console.log("TEST BUG out:", amount)
   amountStr = limitDecimals(amountStr, displayDecimals)
   // console.log("hereim formatamount 5", amount);
 
@@ -999,16 +1000,16 @@ function getNewPositionInfo(position, collateralDelta, method, keepLeverage) {
         if (!keepLeverage) {
 
             return {
-                'Size': formatAmount(newSize, USD_DECIMALS, 2, null, true),
-                'Leverage': formatAmount(newLeverage, 4, 2, null, true),
-                'Liq. Price': formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)
+                'Size': `$${formatAmount(newSize, USD_DECIMALS, 2, null, true)}`,
+                'Leverage': `${formatAmount(newLeverage, 4, 2, null, true)}x`,
+                'Liq. Price': `$${formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)}`
             }
 
         }
         return {
-            'Size': formatAmount(newSize, USD_DECIMALS, 2, null, true),
-            'Collateral': formatAmount(newCollateral, USD_DECIMALS, 2, null, true),
-            'Liq. Price': formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)
+            'Size': `$${formatAmount(newSize, USD_DECIMALS, 2, null, true)}`,
+            'Collateral': `$${formatAmount(newCollateral, USD_DECIMALS, 2, null, true)}`,
+            'Liq. Price': `$${formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)}`
         }
 
 
@@ -1044,9 +1045,9 @@ function getNewPositionInfo(position, collateralDelta, method, keepLeverage) {
     let newCollateral = method == 'Deposit' ? position.collateral.add(collateralDelta) : position.collateral.sub(collateralDelta);
 
     return {
-        'Collateral': formatAmount(newCollateral, USD_DECIMALS, 2, null, true),
-        'Leverage': formatAmount(newLeverage, 4, 2, null, true),
-        'Liq. Price': formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)
+        'Collateral': `$${formatAmount(newCollateral, USD_DECIMALS, 2, null, true)}`,
+        'Leverage': `${formatAmount(newLeverage, 4, 2, null, true)}x`,
+        'Liq. Price': `$${formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)}`
     }
 
 }
@@ -1054,15 +1055,15 @@ function getNewPositionInfo(position, collateralDelta, method, keepLeverage) {
 
 // converts a current position into a new one according to the input ammount (USD)
 export function mapPositionData(position, mode, inputAmount, keepLeverage) {
-
+    console.log("POSITION HERE:", position)
     switch (mode) {
         case 'none':
             return {
-                'Size': formatAmount(position.size, USD_DECIMALS, 2, null, true),
-                'Collateral': formatAmount(position.collateral, USD_DECIMALS, 2, null, true),
-                'Leverage': formatAmount(position.leverage, 4, 2, null, true),
-                'Mark Price': formatAmount(position.markPrice, USD_DECIMALS, 2, null, true),
-                'Liq. Price': formatAmount(position.liqPrice, USD_DECIMALS, 2, null, true)
+                'Size':  `$${formatAmount(position.size, USD_DECIMALS, 2, null, true)}`,
+                'Collateral': `$${formatAmount(position.collateral, USD_DECIMALS, 2, null, true)}`,
+                'Leverage': `${formatAmount(position.leverage, 4, 2, null, true)}x`,
+                'Mark Price': `$${formatAmount(position.markPrice, USD_DECIMALS, 2, null, true)}`,
+                'Liq. Price': `$${formatAmount(position.liqPrice, USD_DECIMALS, 2, null, true)}`
             }
         case 'Deposit':
             return getNewPositionInfo(position, inputAmount, 'Deposit');

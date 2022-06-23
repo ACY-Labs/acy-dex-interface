@@ -11,16 +11,20 @@ import { findTokenWithSymbol } from '@/utils/txData';
 import { constantInstance } from '@/constants';
 import { getUserTokenBalance } from '@/acy-dex-swap/utils';
 import { formatAmount, mapPositionData, USD_DECIMALS,parseValue } from '@/acy-dex-futures/utils';
-import { getAllSuportedTokensPrice } from '@/acy-dex-swap/utils';
+import { getAllSupportedTokensPrice } from '@/acy-dex-swap/utils';
+import { expandDecimals, bigNumberify, shouldRaiseGasError, getTokenInfo} from '@/acy-dex-futures/utils';
 import Router from "@/acy-dex-futures/abis/Router";
+import * as Api from '@/acy-dex-futures/Api';
 
-const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) => {
+
+const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, setPendingTxns, infoTokens, ...props }) => {
   const {
     account,
     chainId,
     library,
     farmSetting: { API_URL: apiUrlPrefix, NATIVE_CURRENCY: nativeToken },
     farmSetting: { INITIAL_ALLOWED_SLIPPAGE },
+    perpetuals
   } = useConstantLoader();
   const [fromToken, setFromToken] = useState({ symbol: 'ACY' });
   const [editIsLong, setEditIsLong] = useState(false);
@@ -34,6 +38,8 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
   const [fromAmountUSD, setFromAmountUSD] = useState(0);
   const { AddressZero } = ethers.constants;
   const nativeTokenAddress = findTokenWithSymbol(nativeToken).address;
+
+  const routerAddress = perpetuals.getContract("Router")
 
   const mode = useRef();
   mode.current = barOption;
@@ -51,12 +57,12 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
         if (fromAmount == 0) setFromAmountUSD(0);
         else if (!fromToken) setFromAmountUSD(0);
 
-        const tokenPriceList = await getAllSuportedTokensPrice();
+        const tokenPriceList = await getAllSupportedTokensPrice();
         const tokenPrice = tokenPriceList[fromToken.symbol];
         const tokenAmountUSD = tokenPrice * fromAmount;
 
         setFromAmountUSD(tokenAmountUSD.toFixed(2));
-        const collateralDelta = parseValue(tokenAmountUSD, USD_DECIMALS);
+        const collateralDelta = parseValue(fromAmount, USD_DECIMALS);
         setNewPositionInfo(mapPositionData(Position, mode.current, collateralDelta));
       }
     },
@@ -123,7 +129,7 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
 
   const setDepositMode = async () => {
     setBarOption('Deposit');
-    setFromToken(Position.indexToken);
+    setFromToken(Position.collateralToken);
     setMaxFromAmount(
       parseFloat(
         await getUserTokenBalance(fromToken, chainId, account, library).catch(e => {
@@ -180,6 +186,11 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
 
   const onClickMain = async () => {
     lockButton(2);
+    const indexTokenAddress =
+        Position.indexToken.address === AddressZero
+          ? nativeTokenAddress
+          : Position.indexToken.address;
+    const collateralTokenAddress = Position.collateralToken.address
     if (mode.current == 'Deposit') {
       //perform deposit collateral
       const tokenAddress0 =
@@ -187,49 +198,46 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
           ? nativeTokenAddress
           : Position.collateralToken.address;
       const path = [tokenAddress0];
-      const indexTokenAddress =
-        Position.indexToken.address === AddressZero
-          ? nativeTokenAddress
-          : Position.indexToken.address;
+      
 
       const priceBasisPoints = Position.isLong ? 11000 : 9000;
       const priceLimit = Position.indexToken.maxPrice.mul(priceBasisPoints).div(10000);
 
       //format amount
-      const amount = parseValue(fromAmount, USD_DECIMALS);
+      const amount = parseValue(fromAmount, Position.collateralToken.decimals);
 
-      let params = [path, indexTokenAddress, amount, 0, 0, position.isLong, priceLimit];
+      let params = [path, indexTokenAddress, amount, 0, 0, Position.isLong, priceLimit];
 
       let method = 'increasePosition';
       let value = bigNumberify(0);
       if (collateralTokenAddress === AddressZero) {
         method = 'increasePositionETH';
         value = amount;
-        params = [path, indexTokenAddress, 0, 0, position.isLong, priceLimit];
+        params = [path, indexTokenAddress, 0, 0, Position.isLong, priceLimit];
       }
 
       if (shouldRaiseGasError(getTokenInfo(infoTokens, collateralTokenAddress), amount)) {
-        setIsSwapping(false);
+        // setIsSwapping(false);
         helperToast.error(`Leave at least ${formatAmount(DUST_BNB, 18, 3)} ETH for gas`);
         return;
       }
 
       const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner());
-      callContract(chainId, contract, method, params, {
+      Api.callContract(chainId, contract, method, params, {
         value,
         sentMsg: 'Deposit submitted!',
-        successMsg: `Deposited ${formatAmount(fromAmount, position.collateralToken.decimals, 4)} ${
-          position.collateralToken.symbol
-        } into ${position.indexToken.symbol} ${position.isLong ? 'Long' : 'Short'}`,
+        successMsg: `Deposited ${formatAmount(amount, Position.collateralToken.decimals, 4)} ${
+          Position.collateralToken.symbol
+        } into ${Position.indexToken.symbol} ${Position.isLong ? 'Long' : 'Short'}`,
         failMsg: 'Deposit failed',
         setPendingTxns,
       })
         .then(async res => {
-          setFromValue('');
-          setIsVisible(false);
+          // setFromValue('');
+          // setIsVisible(false);
         })
         .finally(() => {
-          setIsSwapping(false);
+          // setIsSwapping(false);
         });
     } else {
       //perform withdraw collateral
@@ -245,9 +253,9 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
       let params = [
         tokenAddress0,
         indexTokenAddress,
-        fromAmount,
+        amount,
         0,
-        position.isLong,
+        Position.isLong,
         account,
         priceLimit,
       ];
@@ -255,22 +263,21 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
         collateralTokenAddress === AddressZero || collateralTokenAddress === nativeTokenAddress
           ? 'decreasePositionETH'
           : 'decreasePosition';
-
       const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner());
-      callContract(chainId, contract, method, params, {
+      Api.callContract(chainId, contract, method, params, {
         sentMsg: 'Withdrawal submitted!',
-        successMsg: `Withdrew ${formatAmount(fromAmount, USD_DECIMALS, 2)} USD from ${
-          position.indexToken.symbol
-        } ${position.isLong ? 'Long' : 'Short'}.`,
+        successMsg: `Withdrew ${formatAmount(amount, USD_DECIMALS, 2)} USD from ${
+          Position.indexToken.symbol
+        } ${Position.isLong ? 'Long' : 'Short'}.`,
         failMsg: 'Withdrawal failed.',
         setPendingTxns,
       })
         .then(async res => {
-          setFromValue('');
-          setIsVisible(false);
+          // setFromValue('');
+          // setIsVisible(false);
         })
         .finally(() => {
-          setIsSwapping(false);
+          // setIsSwapping(false);
         });
     }
   };
@@ -310,14 +317,14 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
         title={
           barOption == 'Deposit'
             ? `Balance : ${maxFromAmount.toFixed(5)}`
-            : `Max : ${maxFromAmount.toFixed(5)}`
+            : `Max : $${maxFromAmount.toFixed(5)}`
         }
-        logoURI={fromToken.logoURI}
-        coin={fromToken.symbol}
+        logoURI={barOption == 'Deposit'?fromToken.logoURI:null}
+        coin={barOption == 'Deposit'?fromToken.symbol:"USD"}
         yuan="566.228"
         dollar={`${maxFromAmount}`}
         token={fromAmount}
-        showBalance={true}
+        showBalance={barOption == 'Deposit'?true: false}
         onChoseToken={async () => {
           // onClickCoin();
           // setBefore(true);
@@ -338,7 +345,7 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
                 <div className={styles.infoBoxValue}>
                   <div>
                     <div className={styles.inlineInfoBlock}>
-                      ${positionInfo[key]}
+                      {positionInfo[key]}
                       <svg className={styles.infoBoxTransitionArrow}>
                         <path
                           fill-rule="evenodd"
@@ -350,7 +357,7 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, ...props }) 
                   </div>
                 </div>
               ) : (
-                <div className={styles.infoBoxValue}>${positionInfo[key]}</div>
+                <div className={styles.infoBoxValue}>{positionInfo[key]}</div>
               )}
             </div>
           );

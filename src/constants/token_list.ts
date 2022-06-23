@@ -478,7 +478,34 @@ const PolygonTestNetTokenList: Array<TokenInfo> = [
     decimals: 18,
     logoURI: 'https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=014',
     idOnCoingecko: "binancecoin",
-  }
+  },
+  {
+    name: 'Wrapped BTC',
+    symbol: 'BTC',
+    address: '0x05d6f705C80d9F812d9bc1A142A655CDb25e2571',
+    isStable: false,
+    decimals: 8,
+    logoURI: 'https://cryptologos.cc/logos/bitcoin-btc-logo.svg?v=014',
+    idOnCoingecko: "wrapped-bitcoin",
+  },
+  {
+    name: 'Wrapped ETH',
+    symbol: 'ETH',
+    address: '0xeBC8428DC717D440d5deCE1547456B115b868F0e',
+    isStable: false,
+    decimals: 18,
+    logoURI: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=014',
+    idOnCoingecko: "weth",
+  },
+  {
+    name: 'USD Coin',
+    symbol: 'USDC',
+    address: '0x7a96316B13bD7d0529e701d2ED8b9fC4E4fd8696',//0xe9e7cea3dedca5984780bafc599bd69add087d56
+    isStable: true,
+    decimals: 6,
+    logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
+    idOnCoingecko: "usd-coin",
+  },
 ];
 
 const ArbitrumMainNetTokenList = [

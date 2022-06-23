@@ -15,7 +15,7 @@ import { formatAmount , getLiquidationPrice, USD_DECIMALS } from '@/acy-dex-futu
 
 const PositionsTable = props => {
   const [displayNumber, setDisplayNumber] = useState(5);
-  const { dataSource, isMobile } = props;
+  const { dataSource, isMobile, setPendingTxns, infoTokens } = props;
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isCloseModalVisible, setIsCloseModalVisible] = useState(false);
   const [isCreateOrderModalVisible, setIsCreateOrderModalVisible] = useState(false);
@@ -95,7 +95,14 @@ const PositionsTable = props => {
       dataIndex: 'collateral',
       align : 'left',
       render: (text,record) => {
-        return <div className={styles.tableEntryBig}>$ {formatAmount(text, USD_DECIMALS, 2, null , true)}</div>;
+        console.log("PRINT HERE:", record)
+        return <div>
+          <div className={styles.tableEntryBig}>
+          <img src={record.collateralToken.logoURI} style={{ width: '20px', marginRight: '0.4rem' }} />
+            {record.collateralToken.symbol}
+          </div>
+          <div className={styles.tableEntryBig}>$ {formatAmount(text, USD_DECIMALS, 2, null , true)}</div>
+        </div>;
       }
     },
     {
@@ -224,7 +231,10 @@ const PositionsTable = props => {
       <AcyEditPositionModal 
         Position = {selectedPosition}
         isModalVisible={isEditModalVisible}
-        onCancel = {() => setIsEditModalVisible(false)}/>
+        onCancel = {() => setIsEditModalVisible(false)}
+        setPendingTxns={setPendingTxns}
+        infoTokens = {infoTokens}
+      />
       <AcyClosePositionModal 
         Position = {selectedPosition}
         isModalVisible={isCloseModalVisible}

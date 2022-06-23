@@ -44,7 +44,7 @@ const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props })
   const [fromAmount, setFromAmount] = useState('');
   const [fromAmountUSD, setFromAmountUSD] = useState(0);
   const [maxFromAmount, setMaxFromAmount] = useState(0);
-  const [keepLeverage, setKeepLeverage] = useState(false);
+  const [keepLeverage, setKeepLeverage] = useState(true);
   const [buttonContent, setButtonContent] = useState('Enter Amount');
   const [buttonIsEnabled, setButtonIsEnabled] = useState(false);
   
@@ -122,19 +122,18 @@ const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props })
     <AcyModal backgroundColor="#0e0304" width={400} visible={isModalVisible} onCancel={handleCancel}>
       <div className={styles.modalTitle} >Close {editIsLong ? 'Long' : 'Short'} {Position && Position.indexToken.symbol}</div>
       <AcyCuarrencyCard
-              icon={fromToken.symbol}
-              title={`Max ${Position && formatAmount(Position.size, USD_DECIMALS, 2, null , true)}`}
-              logoURI={fromToken.logoURI}
-              coin={fromToken.symbol}
+              icon={'USD'}
+              title={`Max: $${Position && formatAmount(Position.size, USD_DECIMALS, 2, null , true)}`}
+              coin={'USD'}
               yuan="566.228"
               dollar={`${maxFromAmount}`}
-              token={fromAmount}
+              // token={fromAmount}
               showBalance={true}
               onChangeToken={e => {
                 setFromAmount(e);
                 onInputChanged(e, maxFromAmount);
               }}
-              isLocked={false}
+              isLocked={true}
               library={library}
             />
         <div className={styles.checkboxContainer}>
@@ -166,7 +165,6 @@ const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props })
                         <div className={styles.infoBoxValue}>
                             <div>
                               <div className={styles.inlineInfoBlock}>
-                                $ 
                                 {positionInfo[key]}
                                 <svg className={styles.infoBoxTransitionArrow}>
                                   <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"></path>
@@ -177,7 +175,6 @@ const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props })
                         </div> 
                       :
                         <div className={styles.infoBoxValue}>
-                          $ 
                          {positionInfo[key]}
                         </div> }
                   </div> } )
