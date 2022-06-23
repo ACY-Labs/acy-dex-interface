@@ -152,8 +152,6 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, setPendingTx
   };
 
   const onInputChanged = (input, maxFromAmount) => {
-    //check if input is legit
-    console.log('input has changed', maxFromAmount, input);
 
     if (input == '') {
       lockButton(0);
@@ -249,7 +247,6 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, setPendingTx
       const priceBasisPoints = Position.isLong ? 9000 : 11000;
       const priceLimit = Position.indexToken.maxPrice.mul(priceBasisPoints).div(10000); //UNCOMMENT THIS WHEN REAL POSITION READY
       const amount = parseValue(fromAmount, USD_DECIMALS);
-      console.log('printing constants', path, amount, priceBasisPoints);
       let params = [
         tokenAddress0,
         indexTokenAddress,
@@ -328,6 +325,10 @@ const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, setPendingTx
         onChoseToken={async () => {
           // onClickCoin();
           // setBefore(true);
+        }}
+        onClickTitle={ () => {
+          setFromAmount(maxFromAmount)
+          onInputChanged(maxFromAmount, maxFromAmount);
         }}
         onChangeToken={e => {
           setFromAmount(e);

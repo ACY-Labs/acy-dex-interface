@@ -9,12 +9,14 @@ import {
     AcyDescriptions,
     AcyButton
 } from '@/components/Acy';
-
+import { ethers } from 'ethers';
 import { useConstantLoader } from '@/constants';
 import classNames from 'classnames';
 import { findTokenWithSymbol } from '@/utils/txData';
 import { getUserTokenBalance } from '@/acy-dex-swap/utils';
-import { formatAmount, USD_DECIMALS, mapPositionData, parseValue } from '@/acy-dex-futures/utils';
+import { formatAmount, USD_DECIMALS, mapPositionData, parseValue, bigNumberify } from '@/acy-dex-futures/utils';
+import Router from "@/acy-dex-futures/abis/Router";
+import * as Api from '@/acy-dex-futures/Api';
 
 import { makeStyles } from "@material-ui/styles";
 
@@ -34,9 +36,16 @@ const useStyles = makeStyles({
   thumb: {},
 });
 
-const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props }) => {
+const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, setPendingTxns, ...props }) => {
   const classes = useStyles();
-  const { account, chainId, library, farmSetting: { API_URL: apiUrlPrefix }, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader()
+  const { account, chainId, library, 
+    farmSetting: { 
+      API_URL: apiUrlPrefix,  
+      NATIVE_CURRENCY: nativeToken,
+     INITIAL_ALLOWED_SLIPPAGE
+    }, 
+    perpetuals ,
+  } = useConstantLoader()
   const [fromToken, setFromToken] = useState({symbol : 'ACY'});
   const [editIsLong, setEditIsLong] = useState(false);
   const [positionInfo, setPositionInfo] = useState({});
@@ -47,6 +56,10 @@ const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props })
   const [keepLeverage, setKeepLeverage] = useState(true);
   const [buttonContent, setButtonContent] = useState('Enter Amount');
   const [buttonIsEnabled, setButtonIsEnabled] = useState(false);
+
+  const { AddressZero } = ethers.constants;
+  const nativeTokenAddress = findTokenWithSymbol(nativeToken).address;
+  const routerAddress = perpetuals.getContract("Router")
   
   useEffect(() => {
 
@@ -118,24 +131,79 @@ const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props })
     resetParams();
   }
 
+  const onClickMain = async () => {
+    lockButton(2);
+    const indexTokenAddress =
+        Position.indexToken.address === AddressZero
+          ? nativeTokenAddress
+          : Position.indexToken.address;
+    const collateralTokenAddress = Position.collateralToken.address
+    //perform withdraw collateral
+    const tokenAddress0 =
+      Position.collateralToken.address === AddressZero
+        ? nativeTokenAddress
+        : Position.collateralToken.address;
+    const path = [tokenAddress0];
+    const priceBasisPoints = Position.isLong ? 9000 : 11000;
+    const priceLimit = Position.indexToken.maxPrice.mul(priceBasisPoints).div(10000); //UNCOMMENT THIS WHEN REAL POSITION READY
+    const amount = fromAmount== maxFromAmount? Position.size:parseValue(fromAmount, USD_DECIMALS);
+    const ratio = fromAmount/maxFromAmount * 10000
+    const collateralDelta = keepLeverage ?  Position.collateral.mul(parseInt(ratio)).div(10000) : 0
+    
+    let params = [
+      tokenAddress0,
+      indexTokenAddress,
+      collateralDelta,
+      amount,
+      Position.isLong,
+      account,
+      priceLimit,
+    ];
+    let method =
+      collateralTokenAddress === AddressZero || collateralTokenAddress === nativeTokenAddress
+        ? 'decreasePositionETH'
+        : 'decreasePosition';
+
+    const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner());
+    Api.callContract(chainId, contract, method, params, {
+      sentMsg: 'Withdrawal submitted!',
+      successMsg: `Withdrew ${formatAmount(amount, USD_DECIMALS, 2)} USD from ${
+        Position.indexToken.symbol
+      } ${Position.isLong ? 'Long' : 'Short'}.`,
+      failMsg: 'Withdrawal failed.',
+      setPendingTxns,
+    })
+      .then(async res => {
+        // setFromValue('');
+        // setIsVisible(false);
+      })
+      .finally(() => {
+        // setIsSwapping(false);
+      });
+  };
+
   return (
     <AcyModal backgroundColor="#0e0304" width={400} visible={isModalVisible} onCancel={handleCancel}>
       <div className={styles.modalTitle} >Close {editIsLong ? 'Long' : 'Short'} {Position && Position.indexToken.symbol}</div>
       <AcyCuarrencyCard
-              icon={'USD'}
-              title={`Max: $${Position && formatAmount(Position.size, USD_DECIMALS, 2, null , true)}`}
-              coin={'USD'}
-              yuan="566.228"
-              dollar={`${maxFromAmount}`}
-              // token={fromAmount}
-              showBalance={true}
-              onChangeToken={e => {
-                setFromAmount(e);
-                onInputChanged(e, maxFromAmount);
-              }}
-              isLocked={true}
-              library={library}
-            />
+          icon={'USD'}
+          title={`Max: $${Position && formatAmount(Position.size, USD_DECIMALS, 2, null , true)}`}
+          coin={'USD'}
+          yuan="566.228"
+          dollar={`${maxFromAmount}`}
+          token={fromAmount}
+          showBalance={true}
+          onChangeToken={e => {
+            setFromAmount(e);
+            onInputChanged(e, maxFromAmount);
+          }}
+          isLocked={true}
+          library={library}
+          onClickTitle={ () => {
+            setFromAmount(maxFromAmount)
+            onInputChanged(maxFromAmount, maxFromAmount);
+          }}
+        />
         <div className={styles.checkboxContainer}>
         <span>Keep Leverage at {positionInfo.Leverage}x</span>
         <Switch
@@ -185,7 +253,7 @@ const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, ...props })
           variant="sucess"
           disabled={!buttonIsEnabled}
           onClick = {() => {
-            console.log("PERFORM ACTION");
+            onClickMain();
           }}
           >
         {buttonContent}

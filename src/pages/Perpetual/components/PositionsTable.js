@@ -238,7 +238,9 @@ const PositionsTable = props => {
       <AcyClosePositionModal 
         Position = {selectedPosition}
         isModalVisible={isCloseModalVisible}
-        onCancel = {() => setIsCloseModalVisible(false)}/>
+        onCancel = {() => setIsCloseModalVisible(false)}
+        setPendingTxns={setPendingTxns}
+        />
       <AcyCreateOrderModal 
         Position = {selectedPosition}
         isModalVisible={isCreateOrderModalVisible}
