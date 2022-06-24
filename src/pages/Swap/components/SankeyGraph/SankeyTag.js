@@ -3,7 +3,7 @@ import * as d3 from './d3'
 import * as d3sankey from './d3-sankey';
 
 const size = {
-  width: 700,
+  width: 1000,
   height: 50
 };
 
@@ -13,16 +13,16 @@ const Tag = ({ data, width, length, colors }) => {
   return (
     <>
       <rect
-        x={20 + (data.index % 7) * 100}
-        y={10 + Math.floor(data.index / 7) * 20}
+        x={Math.floor(1000 / length) + (data.index % length) * 100}
+        y={10 + Math.floor(data.index / length) * 20}
         width={15}
         height={15}
         fill={colors(0.05 + 0.95 * (data.index) / length)}
         data-index={data.index}
       />
       <text
-        x={40 + (data.index % 7) * 100}
-        y={18 + Math.floor(data.index / 7) * 20}
+        x={Math.floor(1000 / length) + 20 + (data.index % length) * 100}
+        y={18 + Math.floor(data.index / length) * 20}
         style={{
           fill: d3.rgb("white"),
           alignmentBaseline: "middle",

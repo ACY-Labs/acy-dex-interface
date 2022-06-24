@@ -26,7 +26,7 @@ import {
 import { PriceBox } from './components/PriceBox';
 import ConfirmationBox from './components/ConfirmationBox';
 import { GlpSwapBox, GlpSwapDetailBox } from './components/GlpSwapBox'
-import PerpTabs from './components/PerpTabs/PerpTabs'
+import PerpetualTabs from './components/PerpetualTabs'
 import { MARKET, LIMIT, LONG, SHORT, SWAP, POOL, DEFAULT_HIGHER_SLIPPAGE_AMOUNT } from './constant'
 
 import {
@@ -92,6 +92,8 @@ import { constantInstance } from '@/constants';
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 
 import styled from "styled-components";
+
+import { JsonRpcProvider } from "@ethersproject/providers";
 
 const { AddressZero } = ethers.constants;
 
@@ -198,10 +200,18 @@ const SwapComponent = props => {
   } = useConstantLoader(props);
 
   const {
+    swapOption: mode,
+    setSwapOption: setMode,
     activeToken0,
     setActiveToken0,
     activeToken1,
     setActiveToken1,
+
+    toTokenAddress,
+    setToTokenAddress,
+    fromTokenAddress,
+    setFromTokenAddress,
+
     positionsMap,
     pendingTxns,
     setPendingTxns,
@@ -228,7 +238,6 @@ const SwapComponent = props => {
   const connectWalletByLocalStorage = useConnectWallet();
   const { active, activate } = useWeb3React();
 
-  const [mode, setMode] = useState(LONG);
   const [type, setType] = useState(MARKET);
   const [fromValue, setFromValue] = useState("");
   const [toValue, setToValue] = useState("");
@@ -258,7 +267,6 @@ const SwapComponent = props => {
 
   const isLong = mode === LONG;
   const isShort = mode === SHORT;
-  const isSwap = mode === SWAP;
 
   if (isLong) {
     toTokens = indexTokens;
@@ -267,10 +275,10 @@ const SwapComponent = props => {
     toTokens = shortableTokens;
   }
 
-  const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
+  // const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
   const initialToToken = perpetuals.getTokenBySymBol("BTC").address;
   console.log("initialToToken: ", initialToToken, chainId)
-  const [toTokenAddress, setToTokenAddress] = useState(initialToToken);
+  // const [toTokenAddress, setToTokenAddress] = useState(initialToToken);
   // const [fromTokenInfo, setFromTokenInfo] = useState();
   // const [toTokenInfo, setToTokenInfo] = useState();
   // const [fees, setFees] = useState(0.1);
@@ -291,6 +299,10 @@ const SwapComponent = props => {
   const orderBookAddress = perpetuals.getContract("OrderBook")
   const glpManagerAddress = perpetuals.getContract("GlpManager")
   const glpAddress = perpetuals.getContract("GLP")
+
+  const { farmSetting: { RPC_URL }} = useConstantLoader();
+  const provider = new JsonRpcProvider(RPC_URL, chainId);
+
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
   })
@@ -311,8 +323,29 @@ const SwapComponent = props => {
     fetcher: fetcher(library, Router)
   });
   console.log("test orderbook approved: ", routerAddress, account, orderBookAddress, orderBookApproved)
+
+  useEffect(() => {
+    if (active) {
+      function onBlock() {
+        updateVaultTokenInfo()
+        updateTokenBalances()
+        // updatePositionData(undefined, true)
+        updateFundingRateInfo()
+        updateTotalTokenWeights()
+        updateUsdgSupply()
+        updateOrderBookApproved()
+      }
+      library.on('block', onBlock)
+      return () => {
+        library.removeListener('block', onBlock)
+      }
+    }
+  }, [active, library, chainId,
+      updateVaultTokenInfo, updateTokenBalances, updateFundingRateInfo, updateTotalTokenWeights, updateUsdgSupply,
+      updateOrderBookApproved])
+
   const tokenAllowanceAddress = fromTokenAddress === AddressZero ? nativeTokenAddress : fromTokenAddress;
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
     fetcher: fetcher(library, Glp)
   });
 
@@ -351,8 +384,8 @@ const SwapComponent = props => {
 
   // default collateral address on ARBITRUM
   
-  const shortCollateralAddressInitAddr = perpetuals.getTokenBySymBol("USDT").address;
-  const [shortCollateralAddress, setShortCollateralAddress] = useState(shortCollateralAddressInitAddr);
+  const [shortCollateralAddress, setShortCollateralAddress] = useState(fromTokenAddress);
+
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   console.log("test multichain: tokens", infoTokens, tokens)
   const fromToken = perpetuals.getToken(fromTokenAddress);
@@ -376,6 +409,7 @@ const SwapComponent = props => {
     fromAmount &&
     fromAmount.gt(tokenAllowance) &&
     !isWrapOrUnwrap;
+  console.log("needApproval? ", needApproval)
   const prevFromTokenAddress = usePrevious(fromTokenAddress);
   const prevNeedApproval = usePrevious(needApproval);
   const prevToTokenAddress = usePrevious(toTokenAddress);
@@ -384,9 +418,10 @@ const SwapComponent = props => {
   const toUsdMax = getUsd(toAmount, toTokenAddress, true, infoTokens, type, triggerPriceUsd);
 
   const indexTokenAddress = toTokenAddress === AddressZero ? nativeTokenAddress : toTokenAddress;
-  const collateralTokenAddress = isLong
-    ? indexTokenAddress
-    : shortCollateralAddress;
+  // const collateralTokenAddress = isLong
+  //   ? indexTokenAddress
+  //   : shortCollateralAddress;
+  const collateralTokenAddress = shortCollateralAddress;
   const collateralToken = perpetuals.getToken(collateralTokenAddress);
 
   const [triggerRatioValue, setTriggerRatioValue] = useState("");
@@ -415,10 +450,18 @@ const SwapComponent = props => {
   };
 
   const leverageMarks = {
-    2: {
+    // 0.1: {
+    //   style: { color: '#b5b6b6', },
+    //   label: '0.1x'
+    // },
+    1: {
       style: { color: '#b5b6b6', },
-      label: '2x'
+      label: '1x'
     },
+    // 2: {
+    //   style: { color: '#b5b6b6', },
+    //   label: '2x'
+    // },
     5: {
       style: { color: '#b5b6b6', },
       label: '5x'
@@ -446,6 +489,7 @@ const SwapComponent = props => {
   };
 
   const [leverageOption, setLeverageOption] = useLocalStorageSerializeKey([chainId, "Exchange-swap-leverage-option"], "2");
+  useEffect(() => console.log("leverageOption ", leverageOption), [leverageOption])
   const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useLocalStorageSerializeKey([chainId, "Exchange-swap-leverage-slider-enabled"], true);
   const hasLeverageOption = isLeverageSliderEnabled && !isNaN(parseFloat(leverageOption));
 
@@ -480,6 +524,7 @@ const SwapComponent = props => {
   useEffect(() => {
     if (active) {
       function onBlock() {
+        console.log("onBlock, updateTokenAllowance");
         updateTokenAllowance(undefined, true);
       }
       library.on("block", onBlock);
@@ -785,26 +830,38 @@ const SwapComponent = props => {
 
   const selectFromToken = symbol => {
     const token = getTokenfromSymbol(tokens, symbol)
-    setFromTokenAddress(token.address);
+    setFromTokenAddress(mode, token.address);
+    console.log("update from token: ", symbol, token, mode);
+    setActiveToken0((tokens.filter(ele => ele.symbol === symbol))[0]);
     setIsWaitingForApproval(false);
-    if (isShort && token.isStable) {
+    if (isShort) {
+      console.log("is short and changed short collateral token to ", token.address)
       setShortCollateralAddress(token.address);
     }
   };
+
+  const getToUsdAmount = () => {
+
+  }
+
+  useEffect(() => {
+    console.log("update from token 1: ", fromTokenAddress)
+  }, [fromTokenAddress])
 
   useEffect(() => {
     const fromToken = getTokenfromSymbol(tokens, activeToken0.symbol)
     const toToken = getTokenfromSymbol(tokens, activeToken1.symbol)
 
-    setFromTokenAddress(fromToken.address);
-    setToTokenAddress(toToken.address);
+    setFromTokenAddress(mode, fromToken.address);
+    setToTokenAddress(mode, toToken.address);
 
   }, [activeToken0, activeToken1])
 
-
+  console.log("show this")
   const selectToToken = symbol => {
     const token = getTokenfromSymbol(tokens, symbol)
-    setToTokenAddress(token.address);
+    console.log("selectToToken symbol and address", symbol, token.address)
+    setToTokenAddress(mode, token.address);
     setActiveToken1((tokens.filter(ele => ele.symbol === symbol))[0]);
   };
 
@@ -872,7 +929,7 @@ const SwapComponent = props => {
     const indexTokenAddress = toTokenAddress === AddressZero ? nativeTokenAddress : toTokenAddress;
     let path = [indexTokenAddress]; // assume long
     if (toTokenAddress !== fromTokenAddress) {
-      path = [tokenAddress0, indexTokenAddress];
+      path = [tokenAddress0];
     }
 
     if (fromTokenAddress === AddressZero && toTokenAddress === nativeTokenAddress) {
@@ -945,7 +1002,7 @@ const SwapComponent = props => {
     }
 
     console.log("increasePosition 2: ", params);
-    const contract = new ethers.Contract(routerAddress, Router, library.getSigner());
+    const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner());
     const indexToken = getTokenInfo(infoTokens, indexTokenAddress);
     const tokenSymbol = indexToken.isWrapped ? getConstant(chainId, "nativeTokenSymbol") : indexToken.symbol;
     const successMsg = `Requested increase of ${tokenSymbol} ${isLong ? "Long" : "Short"} by ${formatAmount(
@@ -953,7 +1010,6 @@ const SwapComponent = props => {
       USD_DECIMALS,
       2
     )} USD.`;
-    
     Api.callContract(chainId, contract, method, params, {
       value,
       setPendingTxns,
@@ -996,7 +1052,7 @@ const SwapComponent = props => {
   const perpetualMode = [LONG, SHORT, POOL];
   const perpetualType = [MARKET, LIMIT]
 
-  // LONG or SHORT
+  // LONG or SHORT or POOL
   const modeSelect = (input) => {
     setMode(input);
     onChangeMode(input);
@@ -1018,12 +1074,11 @@ const SwapComponent = props => {
     }
     setIsWaitingForApproval(false);
 
-    setFromTokenAddress(toTokenAddress)
-    setToTokenAddress(fromTokenAddress)
+    setFromTokenAddress(mode, toTokenAddress)
+    setToTokenAddress(mode, fromTokenAddress)
   };
 
   const getLeverageError = useCallback(() => {
-
     if (!toAmount || toAmount.eq(0)) {
       return ["Enter an amount"];
     }
@@ -1061,8 +1116,8 @@ const SwapComponent = props => {
       return ["Min order: 10 USD"];
     }
 
-    if (leverage && leverage.lt(1.1 * BASIS_POINTS_DIVISOR)) {
-      return ["Min leverage: 1.1x"];
+    if (leverage && leverage.lt(0.1 * BASIS_POINTS_DIVISOR)) {
+      return ["Min leverage: 0.1x"];
     }
 
     if (leverage && leverage.gt(30.5 * BASIS_POINTS_DIVISOR)) {
@@ -1083,22 +1138,23 @@ const SwapComponent = props => {
       if (fromTokenAddress !== toTokenAddress) {
         const { amount: swapAmount } = getNextToAmount(
           chainId,
-          fromAmount,
-          fromTokenAddress,
+          toAmount,
           toTokenAddress,
+          fromTokenAddress,
           infoTokens,
           undefined,
           undefined,
           usdgSupply,
           totalTokenWeights
         );
+        
         requiredAmount = requiredAmount.add(swapAmount);
-
+        console.log("DEBUG HERE2:", requiredAmount.toString(), fromTokenInfo.availableAmount.toString(), leverageOption)
         if (
           toToken &&
           toTokenAddress !== USDG_ADDRESS &&
-          toTokenInfo.availableAmount &&
-          requiredAmount.gt(toTokenInfo.availableAmount)
+          fromTokenInfo.availableAmount &&
+          requiredAmount.gt(fromTokenInfo.availableAmount)
         ) {
           return ["Insufficient liquidity"];
         }
@@ -1155,7 +1211,7 @@ const SwapComponent = props => {
         );
         stableTokenAmount = nextToAmount;
         if (stableTokenAmount.gt(shortCollateralToken.availableAmount)) {
-          return [`Insufficient liquidity, change "Profits In"`];
+          return [`Insufficient liquidity, change "Profits In" 1`];
         }
 
         if (
@@ -1167,7 +1223,7 @@ const SwapComponent = props => {
         ) {
           // suggest swapping to collateralToken
           return [
-            `Insufficient liquidity, change "Profits In"`,
+            `Insufficient liquidity, change "Profits In" 2`,
             true,
             "BUFFER"
           ];
@@ -1210,14 +1266,14 @@ const SwapComponent = props => {
       const sizeTokens = sizeUsd
         .mul(expandDecimals(1, shortCollateralToken.decimals))
         .div(shortCollateralToken.minPrice);
-
-      if (toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) && sizeUsd.gt(toTokenInfo.maxAvailableShort)) {
-        return [`Max ${toTokenInfo.symbol} short exceeded`]
-      }
-
+      // no more this short limits
+      // if (toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) && sizeUsd.gt(toTokenInfo.maxAvailableShort)) {
+      //   return [`Max ${toTokenInfo.symbol} short exceeded`]
+      // }
+      console.log("DEBUG HERE3:", stableTokenAmount, sizeTokens.toString(), shortCollateralToken)
       stableTokenAmount = stableTokenAmount.add(sizeTokens)
       if (stableTokenAmount.gt(shortCollateralToken.availableAmount)) {
-        return [`Insufficient liquidity, change "Profits In"`];
+        return [`Insufficient liquidity, change "Profits In" 3`];
       }
     }
 
@@ -1464,7 +1520,7 @@ const SwapComponent = props => {
   // if (aums && aums.length > 0) {
   //   aum = isBuying ? aums[0] : aums[1]
   // }
-  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsdg", true], {
+  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsda", true], {
     fetcher: fetcher(library, GlpManager),
   })
   const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0) ) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
@@ -1480,7 +1536,7 @@ const SwapComponent = props => {
     <div className={styles.mainContent}>
       <AcyPerpetualCard style={{ backgroundColor: 'transparent' }}>
         <div className={styles.modeSelector}>
-          <PerpTabs
+          <PerpetualTabs
             option={mode}
             options={perpetualMode}
             onChange={modeSelect}
@@ -1490,11 +1546,12 @@ const SwapComponent = props => {
         {mode !== POOL ?
           <>
             <div className={styles.typeSelector}>
-              <PerpTabs
+              <PerpetualTabs
                 option={type}
                 options={perpetualType}
                 type="inline"
                 onChange={typeSelect}
+                style={{height:'30px'}}
               />
             </div>
 
@@ -1553,7 +1610,7 @@ const SwapComponent = props => {
                           <button
                             className={styles.leverageButton}
                             onClick={() => {
-                              if (leverageOption > 1.1) {
+                              if (leverageOption > 0.1) {
                                 setLeverageOption((parseFloat(leverageOption) - 0.1).toFixed(1))
                               }
                             }}
@@ -1562,12 +1619,12 @@ const SwapComponent = props => {
                           </button>
                           <input
                             type="number"
-                            min={1.1}
+                            min={0.1}
                             max={30.5}
                             value={leverageOption}
                             onChange={e => {
                               let val = parseFloat(e.target.value.replace(/^(-)*(\d+)\.(\d).*$/, '$1$2.$3')).toFixed(1)
-                              if (val >= 1.1 && val <= 30.5) {
+                              if (val >= 0.1 && val <= 30.5) {
                                 setLeverageOption(val)
                               }
                             }}
@@ -1598,7 +1655,7 @@ const SwapComponent = props => {
                   {isLeverageSliderEnabled &&
                     <span className={styles.leverageSlider}>
                       <StyledSlider
-                        min={1.1}
+                        min={0.1}
                         max={30.5}
                         step={0.1}
                         marks={leverageMarks}
@@ -1649,7 +1706,7 @@ const SwapComponent = props => {
             {isLong && (
               <div className={styles.detailCard}>
                 <div className={styles.label}>Profits In</div>
-                <div className={styles.value}>{toToken.symbol}</div>
+                <div className={styles.value}>{collateralToken.symbol}</div>
               </div>
             )}
             {isShort && (
@@ -1911,7 +1968,6 @@ const SwapComponent = props => {
           fromTokenInfo={fromTokenInfo}
           toToken={toToken}
           toTokenInfo={toTokenInfo}
-          isSwap={isSwap}
           isLong={isLong}
           isMarketOrder={type === MARKET}
           type={type}

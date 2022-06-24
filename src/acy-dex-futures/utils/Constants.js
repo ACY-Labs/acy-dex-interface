@@ -43,7 +43,7 @@ const constants = {
     nativeTokenSymbol: "MATIC",
     defaultCollateralSymbol: "BUSD",
     defaultFlagOrdersEnabled: true,
-    positionReaderPropsLength: 8,
+    positionReaderPropsLength: 9,
     v2: false,
     SWAP_ORDER_EXECUTION_GAS_FEE: ARBITRUM_ORDER_EXECUTION_GAS_PRICE.mul(SWAP_ORDER_EXECUTION_GAS_LIMIT),
     INCREASE_ORDER_EXECUTION_GAS_FEE: ARBITRUM_ORDER_EXECUTION_GAS_PRICE.mul(INCREASE_ORDER_EXECUTION_GAS_LIMIT),

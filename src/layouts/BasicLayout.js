@@ -15,6 +15,7 @@ import Authorized from '@/utils/Authorized';
 import logo from '../assets/logo.png';
 import Footer from './Footer';
 import Header from './Header';
+import SideMenu from './SideMenu';
 import Sidebar from './Sidebar';
 import Context from './MenuContext';
 import PageLoading from '@/components/PageLoading';
@@ -234,8 +235,9 @@ const  BasicLayout =props=> {
           } 
           className={styles[bgColor]}
         >
-          <Header menuData={menuData} handleMenuCollapse={handleMenuCollapse} logo={logo} isMobile={isMobile} {...props} />
+          <SideMenu menuData={menuData} handleMenuCollapse={handleMenuCollapse} logo={logo} isMobile={isMobile} {...props} />
           <Content className={styles.content} style={contentStyle}>
+            <Header menuData={menuData} handleMenuCollapse={handleMenuCollapse} logo={logo} isMobile={isMobile} {...props} />
             {children}
           </Content>
           {/* <Footer /> */}

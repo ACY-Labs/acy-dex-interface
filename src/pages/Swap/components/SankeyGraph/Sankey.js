@@ -3,8 +3,8 @@ import * as d3 from './d3'
 import * as d3sankey from './d3-sankey';
 
 const size = {
-  width: 700,
-  height: 300
+  width: 1000,
+  height: 400
 };
 
 const Rect = ({ index, x0, x1, y0, y1, name, value, length, colors }) => {

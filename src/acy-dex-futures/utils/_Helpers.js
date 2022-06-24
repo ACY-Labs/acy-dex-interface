@@ -80,6 +80,8 @@ export const DEFAULT_MAX_USDG_AMOUNT = expandDecimals(200 * 1000 * 1000, 18);
 export const TAX_BASIS_POINTS = 50;
 export const STABLE_TAX_BASIS_POINTS = 5;
 export const MINT_BURN_FEE_BASIS_POINTS = 25;
+export const MINT_FEE_BASIS_POINTS = 20;
+export const BURN_FEE_BASIS_POINTS = 30;
 export const SWAP_FEE_BASIS_POINTS = 25;
 export const STABLE_SWAP_FEE_BASIS_POINTS = 1;
 export const MARGIN_FEE_BASIS_POINTS = 10;
@@ -492,7 +494,7 @@ export function getBuyGlpToAmount(
   const feeBasisPoints = getFeeBasisPoints(
     swapToken,
     usdgAmount,
-    MINT_BURN_FEE_BASIS_POINTS,
+    MINT_FEE_BASIS_POINTS,
     TAX_BASIS_POINTS,
     true,
     usdgSupply,
@@ -539,7 +541,7 @@ export function getSellGlpFromAmount(
   const feeBasisPoints = getFeeBasisPoints(
     swapToken,
     usdgAmount,
-    MINT_BURN_FEE_BASIS_POINTS,
+    BURN_FEE_BASIS_POINTS,
     TAX_BASIS_POINTS,
     false,
     usdgSupply,
@@ -585,7 +587,7 @@ export function getBuyGlpFromAmount(
   const feeBasisPoints = getFeeBasisPoints(
     fromToken,
     usdgAmount,
-    MINT_BURN_FEE_BASIS_POINTS,
+    MINT_FEE_BASIS_POINTS,
     TAX_BASIS_POINTS,
     true,
     usdgSupply,
@@ -631,7 +633,7 @@ export function getSellGlpToAmount(
   const feeBasisPoints = getFeeBasisPoints(
     fromToken,
     usdgAmount,
-    MINT_BURN_FEE_BASIS_POINTS,
+    BURN_FEE_BASIS_POINTS,
     TAX_BASIS_POINTS,
     false,
     usdgSupply,
@@ -2404,13 +2406,13 @@ export function getInfoTokens(
       token.usdgAmount = vaultTokenInfo[i * vaultPropsLength + 2];
       token.redemptionAmount = vaultTokenInfo[i * vaultPropsLength + 3];
       token.weight = vaultTokenInfo[i * vaultPropsLength + 4];
-      token.bufferAmount = vaultTokenInfo[i * vaultPropsLength + 5];
-      token.maxUsdgAmount = vaultTokenInfo[i * vaultPropsLength + 6];
-      token.globalShortSize = vaultTokenInfo[i * vaultPropsLength + 7];
-      token.maxGlobalShortSize = vaultTokenInfo[i * vaultPropsLength + 8];
-      token.minPrice = vaultTokenInfo[i * vaultPropsLength + 9];
-      token.maxPrice = vaultTokenInfo[i * vaultPropsLength + 10];
-      token.guaranteedUsd = vaultTokenInfo[i * vaultPropsLength + 11];
+      token.bufferAmount = 0;
+      token.maxUsdgAmount = 0;
+      token.globalShortSize = 0;
+      token.maxGlobalShortSize = 0;
+      token.minPrice = vaultTokenInfo[i * vaultPropsLength + 7];
+      token.maxPrice = vaultTokenInfo[i * vaultPropsLength + 8];
+      token.guaranteedUsd = 0;
 
       token.maxAvailableShort = bigNumberify(0);
       if (token.maxGlobalShortSize.gt(0)) {

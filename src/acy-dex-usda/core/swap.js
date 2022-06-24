@@ -91,7 +91,6 @@ export async function swapGetEstimated(
     setSwapButtonContent('swap');
     setSwapButtonState(true);
   } catch (e) {
-    console.log("TEST ERROR HERE:", e);
     setSwapButtonState(false);
   }
   if (!userHasSufficientBalance) {
