@@ -526,7 +526,6 @@ const Swap = props => {
   // this are new states for PERPETUAL
   const [tableContent, setTableContent] = useState(POSITIONS);
   const [positionsData, setPositionsData] = useState([]);
-  const [ordersData, setOrdersData] = useState([]);
   const { active, activate } = useWeb3React();
   const [placement, setPlacement] = useState('5m');
   const [high24, setHigh24] = useState(0);
@@ -673,37 +672,10 @@ const Swap = props => {
     }
     setPositionsData(samplePositionsData);
 
-    const sampleOrdersData = [
-      {
-        type: "Litmit/Long",
-        order: {
-          amountIn: 100,
-          fromTokenSymbol: "USDT",
-          amountOut: 50,
-          toTokenSymbol: "ACY"
-        },
-        price: 100,
-        markPrice: 105,
-      },
-      {
-        type: "Swap",
-        order: {
-          amountIn: 100,
-          fromTokenSymbol: "USDT",
-          amountOut: 50,
-          toTokenSymbol: "ACY"
-        },
-        price: 100,
-        markPrice: 105,
-      }
-    ]
-    setOrdersData(sampleOrdersData)
-
   }, [chainId])
 
   useEffect(() => {
     library.on('block', (blockNum) => {
-      console.log("HERE: ", blockNum)
       updateVaultTokenInfo()
       updateTokenBalances()
       updatePositionData()
@@ -904,33 +876,6 @@ const Swap = props => {
     ];
   };
 
-  const RenderTable = () => {
-    if (tableContent === POSITIONS) {
-      return (
-        <PositionsTable
-          isMobile={isMobile}
-          dataSource={positions}
-          setPendingTxns={setPendingTxns}
-          infoTokens={infoTokens}
-        />
-      )
-    } else if (tableContent === ACTIONS) {
-      return (
-        <ActionHistoryTable
-          isMobile={isMobile}
-          dataSource={positionsData}
-        />
-      )
-    } else if (tableContent === ORDERS) {
-      return (
-        <OrderTable
-          isMobile={isMobile}
-          dataSource={orders}
-          infoTokens={infoTokens}
-        />
-      )
-    }
-  }
 
   const selectTime = pt => {
     const dateSwitchFunctions = {
@@ -1250,7 +1195,28 @@ const Swap = props => {
                     <a className={`${styles.colItem} ${styles.optionTab}`} onClick={() => { setTableContent(ACTIONS) }}>Actions </a>
                   </div>
                   <div className={styles.positionsTable}>
-                    <RenderTable />
+                    { tableContent == POSITIONS && (
+                      <PositionsTable
+                        isMobile={isMobile}
+                        dataSource={positions}
+                        setPendingTxns={setPendingTxns}
+                        infoTokens={infoTokens}
+                    />
+                    )} 
+                    { tableContent == ORDERS && (
+                      <OrderTable
+                        isMobile={isMobile}
+                        dataSource={orders}
+                        infoTokens={infoTokens}
+                      />
+                    )}
+                    { tableContent == ACTIONS && (
+                      <ActionHistoryTable
+                        isMobile={isMobile}
+                        dataSource={positionsData}
+                      />
+                    )}
+                     
                   </div>
                 </div>
               </AcyPerpetualCard>
