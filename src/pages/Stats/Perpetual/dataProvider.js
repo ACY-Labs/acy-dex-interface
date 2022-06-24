@@ -775,7 +775,7 @@ export function useVolumeData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "
       }
     })
   }, [graphData])
-
+  console.log("volumeChartData:2",data);
   return [data, loading, error]
 }
 
@@ -850,6 +850,80 @@ export function useFeesData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "ar
       .filter(item => item.timestamp >= from)
   }, [feesData])
   console.log("feesChartData:",feesChartData?feesChartData.slice(0,10): null);
+  return [feesChartData, loading, error]
+}
+
+export function useVolumesData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "arbitrum" } = {}) {
+  const PROPS = 'margin liquidation swap mint burn'.split(' ')
+  const feesQuery = `{
+    volumeStats(
+      first: 1000
+      orderBy: id
+      orderDirection: desc
+      where: { period: daily, id_gte: ${from}, id_lte: ${to} }
+    ) {
+      id
+      margin
+      liquidation
+      swap
+      mint
+      burn
+      ${chainName === "avalanche" ? "timestamp" : ""}
+    }
+  }`
+  let [feesData, loading, error] = useGraph(feesQuery, {
+    chainName
+  })
+
+  const feesChartData = useMemo(() => {
+    if (!feesData) {
+      return null
+    }
+
+    let chartData = sortBy(feesData.feeStats, 'id').map(item => {
+      const ret = { timestamp: item.timestamp || item.id };
+
+      PROPS.forEach(prop => {
+        if (item[prop]) {
+          ret[prop] = item[prop] / 1e30
+        }
+      })
+
+      ret.liquidation = item.liquidation / 1e30 - item.margin / 1e30
+      ret.all = PROPS.reduce((memo, prop) => memo + ret[prop], 0)
+      return ret
+    })
+
+    let cumulative = 0
+    const cumulativeByTs = {}
+    return chain(chartData)
+      .groupBy(item => item.timestamp)
+      .map((values, timestamp) => {
+        const all = sumBy(values, 'all')
+        cumulative += all
+
+        let movingAverageAll
+        const movingAverageTs = timestamp - MOVING_AVERAGE_PERIOD
+        if (movingAverageTs in cumulativeByTs) {
+          movingAverageAll = (cumulative - cumulativeByTs[movingAverageTs]) / MOVING_AVERAGE_DAYS
+        }
+
+        const ret = {
+          timestamp: Number(timestamp),
+          all,
+          cumulative,
+          movingAverageAll
+        }
+        PROPS.forEach(prop => {
+           ret[prop] = sumBy(values, prop)
+        })
+        cumulativeByTs[timestamp] = cumulative
+        return ret
+      })
+      .value()
+      .filter(item => item.timestamp >= from)
+  }, [feesData])
+  console.log("volumeChartData:",feesChartData?feesChartData.slice(0,10): null);
   return [feesChartData, loading, error]
 }
 
@@ -999,6 +1073,8 @@ export function useAlpPerformanceData(alpData, feesData, { from = FIRST_DATE_TS,
       return memo
     })
 
+    console.log("alpDataById HERE: ", alpData, alpDataById)
+
     const BTC_WEIGHT = 0.25
     const ETH_WEIGHT = 0.25
     const STABLE_WEIGHT = 1 - BTC_WEIGHT - ETH_WEIGHT
@@ -1099,5 +1175,65 @@ export function useAlpPerformanceData(alpData, feesData, { from = FIRST_DATE_TS,
     return ret
   }, [btcPrices, ethPrices, alpData, feesData])
 
+  return [alpPerformanceChartData]
+}
+
+export function useAlpPriceData(alpData, feesData, { from = FIRST_DATE_TS, chainName = "arbitrum" } = {}) {
+
+
+  const alpPerformanceChartData = useMemo(() => {
+    if (!alpData || !feesData) {
+      return null
+    }
+
+    const alpDataById = alpData.reduce((memo, item) => {
+      memo[item.timestamp] = item
+      return memo
+    }, {})
+
+    const feesDataById = feesData.reduce((memo, item) => {
+      memo[item.timestamp] = item
+      return memo
+    })
+    
+
+    const ret = []
+    let cumulativeFeesPerAlp = 0
+    let lastAlpPrice = 0
+
+    for (let i = 0; i < alpData.length; i++) {
+
+      const timestampGroup = alpData[i].timestamp
+      const alpItem = alpDataById[timestampGroup]
+      const alpPrice = alpItem?.alpPrice ?? lastAlpPrice
+      lastAlpPrice = alpPrice
+      const alpSupply = alpDataById[timestampGroup]?.alpSupply
+      const dailyFees = feesDataById[timestampGroup]?.all
+
+
+      if (dailyFees && alpSupply) {
+        const INCREASED_ALP_REWARDS_TIMESTAMP = 1635714000
+        const ALP_REWARDS_SHARE = timestampGroup >= INCREASED_ALP_REWARDS_TIMESTAMP ? 0.7 : 0.5
+        const collectedFeesPerAlp = dailyFees / alpSupply * ALP_REWARDS_SHARE
+        cumulativeFeesPerAlp += collectedFeesPerAlp
+
+      }
+
+      let alpPlusFees = alpPrice
+      if (alpPrice && alpSupply && cumulativeFeesPerAlp) {
+        alpPlusFees = alpPrice + cumulativeFeesPerAlp
+      }
+
+
+      ret.push({
+        timestamp: alpData[i].timestamp,
+        alpPrice,
+        alpPlusFees,
+      })
+    }
+
+    return ret
+  }, [alpData, feesData])
+  console.log("alp price HERE:", alpPerformanceChartData)
   return [alpPerformanceChartData]
 }

@@ -56,7 +56,10 @@ import {
   useBorrowRateData,
   useUsersData,
   useLastSubgraphBlock,
-  useLastBlock
+  useLastBlock,
+  useVolumesData,
+  useVolumeData,
+  useAlpPriceData
 } from './dataProvider'
 
 const { BigNumber } = ethers
@@ -82,8 +85,10 @@ const Stats = (props) => {
 
   const params = { from, to, groupPeriod }
 
+  
+
   const [borrowRateData, borrowRateLoading] = useBorrowRateData(params)
-  const [volumeData, volumeLoading] = useVolumeDataFromServer(params)
+  const [volumeData, volumeLoading] = useVolumeData(params)
   const [totalVolume] = useTotalVolumeFromServer()
   const totalVolumeDelta = useMemo(() => {
     if (!volumeData) {
@@ -92,6 +97,7 @@ const Stats = (props) => {
     return volumeData[volumeData.length - 1].all
   }, [volumeData])
 
+  const [volumeTest, volumeTestLoading] = useVolumesData(params)
   const [feesData, feesLoading] = useFeesData(params)
   const [totalFees, totalFeesDelta] = useMemo(() => {
     if (!feesData) {
@@ -114,6 +120,7 @@ const Stats = (props) => {
 
   const [aumPerformanceData, aumPerformanceLoading] = useAumPerformanceData(params)
   const [alpPerformanceData, alpPerformanceLoading] = useAlpPerformanceData(alpData, feesData, params)
+  const [alpPriceData, alpPriceDataLoading] = useAlpPriceData(alpData, feesData, params)
 
   const [tradersData, tradersLoading] = useTradersData(params)
   const [openInterest, openInterestDelta] = useMemo(() => {
@@ -312,11 +319,11 @@ const Stats = (props) => {
             <ChartWrapper
               title="Alp Price Comparison"
               loading={alpLoading}
-              data={alpPerformanceData}
+              data={alpPriceData}
               csvFields={[{ key: 'syntheticPrice' }, { key: 'alpPrice' }, { key: 'alpPlusFees' }, { key: 'lpBtcPrice' }, { key: 'lpEthPrice' }]}
             >
               <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-                <LineChart data={alpPerformanceData} syncId="syncAlp">
+                <LineChart data={alpPriceData} syncId="syncAlp">
                   <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
                   <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
                   <YAxis dataKey="performanceSyntheticCollectedFees" domain={[60, 210]} unit="%" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
@@ -327,23 +334,23 @@ const Stats = (props) => {
                     contentStyle={{ textAlign: 'left' }}
                   />
                   <Legend />
-                  <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceLpBtcCollectedFees" name="% LP BTC-USDC (w/ fees)" stroke={COLORS[2]} />
+                  {/* <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceLpBtcCollectedFees" name="% LP BTC-USDC (w/ fees)" stroke={COLORS[2]} />
                   <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceLpEthCollectedFees" name="% LP ETH-USDC (w/ fees)" stroke={COLORS[4]} />
-                  <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceSyntheticCollectedFees" name="% Index (w/ fees)" stroke={COLORS[0]} />
+                  <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceSyntheticCollectedFees" name="% Index (w/ fees)" stroke={COLORS[0]} /> */}
 
-                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="syntheticPrice" name="Index Price" stroke={COLORS[2]} />
+                  {/* <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="syntheticPrice" name="Index Price" stroke={COLORS[2]} /> */}
                   <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPrice" name="Alp Price" stroke={COLORS[1]} strokeWidth={1} />
                   <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPlusFees" name="Alp w/ fees" stroke={COLORS[3]} strokeWidth={1} />
-                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpBtcPrice" name="LP BTC-USDC" stroke={COLORS[2]} />
-                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpEthPrice" name="LP ETH-USDC" stroke={COLORS[4]} />
+                  {/* <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpBtcPrice" name="LP BTC-USDC" stroke={COLORS[2]} />
+                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpEthPrice" name="LP ETH-USDC" stroke={COLORS[4]} /> */}
                 </LineChart>
               </ResponsiveContainer>
               <div className="chart-description">
                 <p>
                   <span style={{ color: COLORS[3] }}>Alp with fees</span> is based on ALP share of fees received and excluding esGMX rewards<br />
-                  <span style={{ color: COLORS[0] }}>% of Index (with fees)</span> is Alp with fees / Index Price * 100<br />
+                  {/* <span style={{ color: COLORS[0] }}>% of Index (with fees)</span> is Alp with fees / Index Price * 100<br />
                   <span style={{ color: COLORS[4] }}>% of LP ETH-USDC (with fees)</span> is Alp Price with fees / LP ETH-USDC * 100<br />
-                  <span style={{ color: COLORS[2] }}>Index Price</span> is 25% BTC, 25% ETH, 50% USDC
+                  <span style={{ color: COLORS[2] }}>Index Price</span> is 25% BTC, 25% ETH, 50% USDC */}
                 </p>
               </div>
             </ChartWrapper>
@@ -576,14 +583,14 @@ const Stats = (props) => {
               type="Composed"
             />
           </div>
-          <div className="chart-cell">
+          {/* <div className="chart-cell">
             <GenericChart
               loading={swapSourcesLoading}
               title="Swap Sources"
               data={swapSources}
               items={swapSourcesKeys.map(key => ({ key }))}
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
