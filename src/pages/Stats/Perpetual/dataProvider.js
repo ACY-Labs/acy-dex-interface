@@ -621,7 +621,6 @@ export function useVolumeDataFromServer({ from = FIRST_DATE_TS, to = NOW_TS, cha
       }
     })
   }, [data, from, to])
-  console.log("VOLUME:", [ret, loading]);
   return [ret, loading]
 }
 
@@ -775,7 +774,6 @@ export function useVolumeData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "
       }
     })
   }, [graphData])
-  console.log("volumeChartData:2",data);
   return [data, loading, error]
 }
 
@@ -849,7 +847,6 @@ export function useFeesData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "ar
       .value()
       .filter(item => item.timestamp >= from)
   }, [feesData])
-  console.log("feesChartData:",feesChartData?feesChartData.slice(0,10): null);
   return [feesChartData, loading, error]
 }
 
@@ -923,7 +920,6 @@ export function useVolumesData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = 
       .value()
       .filter(item => item.timestamp >= from)
   }, [feesData])
-  console.log("volumeChartData:",feesChartData?feesChartData.slice(0,10): null);
   return [feesChartData, loading, error]
 }
 
@@ -1073,7 +1069,6 @@ export function useAlpPerformanceData(alpData, feesData, { from = FIRST_DATE_TS,
       return memo
     })
 
-    console.log("alpDataById HERE: ", alpData, alpDataById)
 
     const BTC_WEIGHT = 0.25
     const ETH_WEIGHT = 0.25
@@ -1234,6 +1229,5 @@ export function useAlpPriceData(alpData, feesData, { from = FIRST_DATE_TS, chain
 
     return ret
   }, [alpData, feesData])
-  console.log("alp price HERE:", alpPerformanceChartData)
   return [alpPerformanceChartData]
 }

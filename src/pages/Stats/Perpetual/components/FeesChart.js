@@ -27,7 +27,7 @@ export default function FeesChart(props) {
   } = props
 
   const csvFields = [
-    {key: 'swap', name: 'Swap'},
+    // {key: 'swap', name: 'Swap'},
     {key: 'margin', name: 'Margin trading'},
     {key: 'mint', name: 'Mint ALP'},
     {key: 'burn', name: 'Burn ALP'},
@@ -48,7 +48,7 @@ export default function FeesChart(props) {
           contentStyle={{ textAlign: 'left' }}
         />
         <Legend />
-        <Bar isAnimationActive={false} type="monotone" dataKey="swap" stackId="a" name="Swap" fill={COLORS[0]} />
+        {/* <Bar isAnimationActive={false} type="monotone" dataKey="swap" stackId="a" name="Swap" fill={COLORS[0]} /> */}
         <Bar isAnimationActive={false} type="monotone" dataKey="mint" stackId="a" name="Mint ALP" fill={COLORS[1]} />
         <Bar isAnimationActive={false} type="monotone" dataKey="burn" stackId="a" name="Burn ALP" fill={COLORS[2]} />
         <Bar isAnimationActive={false} type="monotone" dataKey="liquidation" stackId="a" name="Liquidation" fill={COLORS[3]} />
