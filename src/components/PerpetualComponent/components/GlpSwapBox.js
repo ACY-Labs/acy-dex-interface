@@ -319,17 +319,17 @@ export const GlpSwapBox = (props) => {
     if (active) {
       library.on('block', () => {
         console.log("update on block: ", tokenAllowance, tokenAllowanceAddress)
-        updateVaultTokenInfo(undefined, true)
-        updateTokenBalances(undefined, true)
+        updateVaultTokenInfo()
+        updateTokenBalances()
         // updateBalancesAndSupplies(undefined, true)
         // updateAums(undefined, true)
-        updateTotalTokenWeights(undefined, true)
-        updateTokenAllowance(undefined, true)
-        updateLastPurchaseTime(undefined, true)
+        updateTotalTokenWeights()
+        updateTokenAllowance()
+        updateLastPurchaseTime()
         // updateStakingInfo(undefined, true)
         // updateGmxPrice(undefined, true)
         // updateReservedAmount(undefined, true)
-        updateGlpBalance(undefined, true)
+        updateGlpBalance()
       })
       return () => {
         library.removeAllListeners('block')

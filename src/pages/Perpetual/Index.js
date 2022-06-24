@@ -348,7 +348,6 @@ export function getPositionQuery(tokens, nativeTokenAddress) {
   const collateralTokens = []
   const indexTokens = []
   const isLong = []
-  console.log("TOKENS HERE: ", tokens)
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i]
     if (token.isStable) { continue }
@@ -401,7 +400,6 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
   const propsLength = getConstant(chainId, "positionReaderPropsLength")
   // const propsLength = 9;
 
-  console.log('TESTING  getPositions', positionData )
   const positions = []
   const positionsMap = {}
   // 
@@ -480,7 +478,6 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
     position.liqPrice = getLiquidationPrice(position)
   }
 
-   console.log("positions HERE: ", positions)
 
   return { positions, positionsMap }
 }
@@ -577,7 +574,6 @@ const Swap = props => {
   const fromTokenAddress = tokenSelection[swapOption].from
   const toTokenAddress = tokenSelection[swapOption].to
 
-  console.log("debug perpetual page, toTokenAddress: ", toTokenAddress)
 
   const { perpetuals } = useConstantLoader()
   const readerAddress = perpetuals.getContract("Reader")
@@ -594,7 +590,6 @@ const Swap = props => {
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
   const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
 
-  console.log("positionQuery HERE: ", positionQuery);
 
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
@@ -650,7 +645,6 @@ const Swap = props => {
   useEffect(() => {
     if (!supportedTokens) return
 
-    console.log("resetting page states")
     // reset on chainId change => supportedTokens change
     setPricePoint(0);
     setPastToken1('ETH');
@@ -681,6 +675,17 @@ const Swap = props => {
 
     const sampleOrdersData = [
       {
+        type: "Litmit/Long",
+        order: {
+          amountIn: 100,
+          fromTokenSymbol: "USDT",
+          amountOut: 50,
+          toTokenSymbol: "ACY"
+        },
+        price: 100,
+        markPrice: 105,
+      },
+      {
         type: "Swap",
         order: {
           amountIn: 100,
@@ -698,6 +703,7 @@ const Swap = props => {
 
   useEffect(() => {
     library.on('block', (blockNum) => {
+      console.log("HERE: ", blockNum)
       updateVaultTokenInfo()
       updateTokenBalances()
       updatePositionData()
@@ -771,7 +777,7 @@ const Swap = props => {
         `${apiUrlPrefix}/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
       )
       .then(data => {
-        console.log(data);
+
       });
   }
 
@@ -815,9 +821,7 @@ const Swap = props => {
 
   useEffect(async () => {
     let currentTime = getCurrentTime();
-    console.log("hereim current time", getCurrentTime())
     let previousTime = currentTime - 24*60*60 ;
-    console.log("hereim previous time", previousTime)
 
     let data24 = await getKChartData(activeToken1.symbol, "56", "5m", previousTime.toString(), currentTime.toString(), "chainlink");
     let high24 = 0;
@@ -921,7 +925,8 @@ const Swap = props => {
       return (
         <OrderTable
           isMobile={isMobile}
-          dataSource={ordersData}
+          dataSource={orders}
+          infoTokens={infoTokens}
         />
       )
     }
@@ -943,8 +948,7 @@ const Swap = props => {
 
   const onClickDropdown = e => {
     // console.log("hereim dropdown", e.key);
-    console.log("hereim dropdown", e); 
-    console.log("hereim dropdown supprted", supportedTokens);   
+ 
     setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
   };
 

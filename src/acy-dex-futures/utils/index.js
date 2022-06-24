@@ -74,6 +74,10 @@ export const AVALANCHE = 43114;
 export const ARBITRUM_TESTNET = 421611;
 export const ARBITRUM = 42161;
 
+export const SWAP = "Swap";
+export const INCREASE = "Increase";
+export const DECREASE = "Decrease";
+
 const supportedChainIds = [ARBITRUM];
 const injectedConnector = new InjectedConnector({
   supportedChainIds
@@ -555,7 +559,6 @@ export const getInjectedHandler = activate => {
       if (e instanceof UnsupportedChainIdError) {
         return;
       }
-      console.log(e.toString());
     });
   };
   return fn;
@@ -610,13 +613,10 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
         }
         infoTokens[token.address] = token
     }
-    // console.log("hereim whitelisted", vaultTokenInfo)
     for (let i = 0; i < whitelistedTokens.length; i++) {
         const token = JSON.parse(JSON.stringify(whitelistedTokens[i]))
-        // console.log("hereim vault above", vaultTokenInfo)
 
         if (vaultTokenInfo) {
-          // console.log("hereim vault", vaultTokenInfo)
             token.poolAmount = vaultTokenInfo[i * vaultPropsLength];
             token.reservedAmount = vaultTokenInfo[i * vaultPropsLength + 1];
             token.availableAmount = token.poolAmount.sub(token.reservedAmount);
@@ -670,22 +670,6 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
       const provider = getProvider(library, chainId);
       const orderBookContract = new ethers.Contract(orderBookAddress, OrderBook.abi, provider);
       const orderBookReaderContract = new ethers.Contract(orderBookReaderAddress, OrderBookReader.abi, provider);
-
-      const fetchIndexesFromServer = () => {
-        const ordersIndexesUrl = `${getServerBaseUrl(chainId)}/orders_indices?account=${account}`;
-        return fetch(ordersIndexesUrl)
-          .then(async (res) => {
-            const json = await res.json();
-            const ret = {};
-            for (const key of Object.keys(json)) {
-              ret[key.toLowerCase()] = json[key].map((val) => parseInt(val.value));
-            }
-
-            return ret;
-          })
-          .catch(() => ({ swap: [], increase: [], decrease: [] }));
-      };
-
       const fetchLastIndex = async (type) => {
         const method = type.toLowerCase() + "OrdersIndex";
         return await orderBookContract[method](account).then((res) => bigNumberify(res._hex).toNumber());
@@ -697,7 +681,7 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
           fetchLastIndex("increase"),
           fetchLastIndex("decrease"),
         ]);
-
+        
         return { swap, increase, decrease };
       };
 
@@ -711,40 +695,168 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
         return _indexes;
       };
 
-      const getIndexes = (knownIndexes, lastIndex) => {
-        if (knownIndexes.length === 0) {
-          return getRange(lastIndex);
-        }
-        return [
-          ...knownIndexes,
-          ...getRange(lastIndex, knownIndexes[knownIndexes.length - 1] + 1).sort((a, b) => b - a),
-        ];
-      };
-
-      const getOrders = async (method, knownIndexes, lastIndex, parseFunc) => {
-        const indexes = getIndexes(knownIndexes, lastIndex);
+      const getOrders = async (method, lastIndex, parseFunc) => {
+        const indexes = getRange(lastIndex);
         const ordersData = await orderBookReaderContract[method](orderBookAddress, account, indexes);
         const orders = parseFunc(chainId, ordersData, account, indexes);
-
         return orders;
       };
 
       try {
-        const [serverIndexes, lastIndexes] = await Promise.all([fetchIndexesFromServer(), fetchLastIndexes()]);
+        const lastIndexes = await fetchLastIndexes();
         const [swapOrders = [], increaseOrders = [], decreaseOrders = []] = await Promise.all([
-          getOrders("getSwapOrders", serverIndexes.swap, lastIndexes.swap, parseSwapOrdersData),
-          getOrders("getIncreaseOrders", serverIndexes.increase, lastIndexes.increase, parseIncreaseOrdersData),
-          getOrders("getDecreaseOrders", serverIndexes.decrease, lastIndexes.decrease, parseDecreaseOrdersData),
+          getOrders("getSwapOrders", lastIndexes.swap, parseSwapOrdersData),
+          getOrders("getIncreaseOrders", lastIndexes.increase, parseIncreaseOrdersData),
+          getOrders("getDecreaseOrders", lastIndexes.decrease, parseDecreaseOrdersData),
         ]);
+        
         return [...swapOrders, ...increaseOrders, ...decreaseOrders];
       } catch (ex) {
         console.error(ex);
       }
     },
   });
+  
+  
 
   return [orders, updateOrders];
 
+}
+
+function parseSwapOrdersData(chainId, swapOrdersData, account, indexes) {
+  if (!swapOrdersData || !swapOrdersData.length) {
+    return [];
+  }
+
+  const extractor = sliced => {
+    const triggerAboveThreshold = sliced[6].toString() === "1";
+    const shouldUnwrap = sliced[7].toString() === "1";
+
+    return {
+      path: [sliced[0], sliced[1], sliced[2]].filter(
+        address => address !== AddressZero
+      ),
+      amountIn: sliced[3],
+      minOut: sliced[4],
+      triggerRatio: sliced[5],
+      triggerAboveThreshold,
+      type: SWAP,
+      shouldUnwrap
+    };
+  };
+  return _parseOrdersData(
+    swapOrdersData,
+    account,
+    indexes,
+    extractor,
+    5,
+    3
+  ).filter(order => {
+    return order.path.every(token => constantInstance.perpetuals.isValidToken(token));
+  });
+}
+
+function parseIncreaseOrdersData(
+  chainId,
+  increaseOrdersData,
+  account,
+  indexes
+) {
+  const extractor = sliced => {
+    const isLong = sliced[5].toString() === "1";
+    return {
+      purchaseToken: sliced[0],
+      collateralToken: sliced[1],
+      indexToken: sliced[2],
+      purchaseTokenAmount: sliced[3],
+      sizeDelta: sliced[4],
+      isLong,
+      triggerPrice: sliced[6],
+      triggerAboveThreshold: sliced[7].toString() === "1",
+      type: INCREASE
+    };
+  };
+  return _parseOrdersData(
+    increaseOrdersData,
+    account,
+    indexes,
+    extractor,
+    5,
+    3
+  ).filter(order => {
+    return (
+      constantInstance.perpetuals.isValidToken(order.purchaseToken) &&
+      constantInstance.perpetuals.isValidToken(order.collateralToken) &&
+      constantInstance.perpetuals.isValidToken(order.indexToken)
+    );
+  });
+}
+
+function parseDecreaseOrdersData(
+  chainId,
+  decreaseOrdersData,
+  account,
+  indexes
+) {
+  const extractor = sliced => {
+    const isLong = sliced[4].toString() === "1";
+    return {
+      collateralToken: sliced[0],
+      indexToken: sliced[1],
+      collateralDelta: sliced[2],
+      sizeDelta: sliced[3],
+      isLong,
+      triggerPrice: sliced[5],
+      triggerAboveThreshold: sliced[6].toString() === "1",
+      type: DECREASE
+    };
+  };
+  return _parseOrdersData(
+    decreaseOrdersData,
+    account,
+    indexes,
+    extractor,
+    5,
+    2
+  ).filter(order => {
+    return (
+      constantInstance.perpetuals.isValidToken(order.collateralToken) &&
+      constantInstance.perpetuals.isValidToken(order.indexToken)
+    );
+  });
+}
+
+function _parseOrdersData(
+  ordersData,
+  account,
+  indexes,
+  extractor,
+  uintPropsLength,
+  addressPropsLength
+) {
+  if (!ordersData || ordersData.length === 0) {
+    return [];
+  }
+  const [uintProps, addressProps] = ordersData;
+  const count = uintProps.length / uintPropsLength;
+
+  const orders = [];
+  for (let i = 0; i < count; i++) {
+    const sliced = addressProps
+      .slice(addressPropsLength * i, addressPropsLength * (i + 1))
+      .concat(uintProps.slice(uintPropsLength * i, uintPropsLength * (i + 1)));
+
+    if (sliced[0] === AddressZero && sliced[1] === AddressZero) {
+      continue;
+    }
+
+    const order = extractor(sliced);
+    order.index = indexes[i];
+    order.account = account;
+    orders.push(order);
+  }
+
+  return orders;
 }
 
 export function getProvider(library, chainId) {
@@ -763,7 +875,6 @@ export function getOrderKey(order) {
 
 export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   // eslint-disable-next-line
-  console.log("CALL CONTRACT:", library, contractInfo, additionalArgs)
   const [chainId, arg0, arg1, ...params] = args
   const provider = getProvider(library, chainId);
   const method = ethers.utils.isAddress(arg0) ? arg1 : arg0
@@ -881,37 +992,28 @@ export const padDecimals = (amount, minDecimals) => {
     return amountStr
   }
 export const formatAmount = (amount, tokenDecimals, displayDecimals, useCommas, defaultValue) => {
-  // console.log("hereim formatamount 1", amount);
 
   if (!defaultValue) {
       defaultValue = "..."
   }
-  // console.log("hereim formatamount 2", amount);
 
   if (amount === undefined || amount.toString().length === 0) {
       return defaultValue
   }
-  // console.log("hereim formatamount 3", amount);
 
   if (displayDecimals === undefined) {
       displayDecimals = 4
   }
-  // console.log("hereim formatamount 4", amount);
-  console.log("TEST BUG in:", amount)
   let amountStr = ethers.utils.formatUnits(amount, tokenDecimals)
-  console.log("TEST BUG out:", amount)
   amountStr = limitDecimals(amountStr, displayDecimals)
-  // console.log("hereim formatamount 5", amount);
 
   if (displayDecimals !== 0) {
       amountStr = padDecimals(amountStr, displayDecimals)
   }
-  // console.log("hereim formatamount 6", amount);
 
   if (useCommas) {
       return numberWithCommas(amountStr)
   }
-  // console.log("hereim formatamount 7", amount);
 
   return amountStr
 }
@@ -1026,8 +1128,6 @@ function getNewPositionInfo(position, collateralDelta, method, keepLeverage) {
         increaseCollateral: method == 'Deposit'
     });
 
-    console.log("collateral delta : ", collateralDelta.toString());
-    console.log("new liq price", newLiqPrice);
     let newLeverage = getLeverage({
         size: position.size,
         collateral: position.collateral,
@@ -1040,7 +1140,6 @@ function getNewPositionInfo(position, collateralDelta, method, keepLeverage) {
         includeDelta: false
     });
 
-    console.log("collateral delta : ", position.collateral.toString());
 
     let newCollateral = method == 'Deposit' ? position.collateral.add(collateralDelta) : position.collateral.sub(collateralDelta);
 
@@ -1055,7 +1154,6 @@ function getNewPositionInfo(position, collateralDelta, method, keepLeverage) {
 
 // converts a current position into a new one according to the input ammount (USD)
 export function mapPositionData(position, mode, inputAmount, keepLeverage) {
-    console.log("POSITION HERE:", position)
     switch (mode) {
         case 'none':
             return {
@@ -1469,12 +1567,10 @@ export function getNextToAmount(
     const toToken = getTokenInfo(infoTokens, toTokenAddress);
 
     if (fromToken.isNative && toToken.isWrapped) {
-        console.log("ymj test 1", fromAmount)
         return { amount: fromAmount };
     }
 
     if (fromToken.isWrapped && toToken.isNative) {
-        console.log("ymj test 2")
         return { amount: fromAmount };
     }
 
@@ -1496,7 +1592,6 @@ export function getNextToAmount(
 
         if (ratio && !ratio.isZero()) {
             const toAmount = toAmountBasedOnRatio;
-            console.log("ymj test")
             return {
                 amount: adjustDecimals(
                     toAmount
@@ -1508,14 +1603,6 @@ export function getNextToAmount(
         }
 
         const toAmount = fromAmount.mul(fromToken.minPrice).div(PRECISION);
-        console.log("ymj test", {
-            amount: adjustDecimals(
-                toAmount
-                    .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
-                    .div(BASIS_POINTS_DIVISOR)
-            ),
-            feeBasisPoints
-        });
         return {
             amount: adjustDecimals(
                 toAmount

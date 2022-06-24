@@ -36,6 +36,7 @@ const StakeHistoryTable = props => {
       ),
       dataIndex: 'totalToken',
       key: 'totalToken',
+      align: 'left',
       render: (text, record) => {
         return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
       }
@@ -48,6 +49,7 @@ const StakeHistoryTable = props => {
       ),
       dataIndex: 'inputTokenNum',
       key: 'inputTokenNum',
+      align: 'left',
       render: (text,record) => {
         return <div className={styles.tableData}>{abbrNumber(text)} {record.inputTokenSymbol}</div>;
       }
@@ -60,6 +62,7 @@ const StakeHistoryTable = props => {
       ),
       dataIndex: 'outTokenNum',
       key: 'outTokenNum',
+      align: 'left',
       render: (text, record) => {
         return <div className={styles.tableData}>{abbrNumber(text)} {record.outTokenSymbol}</div>;
       }

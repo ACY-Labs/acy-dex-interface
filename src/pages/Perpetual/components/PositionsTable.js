@@ -95,7 +95,6 @@ const PositionsTable = props => {
       dataIndex: 'collateral',
       align : 'left',
       render: (text,record) => {
-        console.log("PRINT HERE:", record)
         return <div>
           <div className={styles.tableEntryBig}>
           <img src={record.collateralToken.logoURI} style={{ width: '20px', marginRight: '0.4rem' }} />
@@ -244,7 +243,9 @@ const PositionsTable = props => {
       <AcyCreateOrderModal 
         Position = {selectedPosition}
         isModalVisible={isCreateOrderModalVisible}
-        onCancel = {() => setIsCreateOrderModalVisible(false)}/>
+        onCancel = {() => setIsCreateOrderModalVisible(false)}
+        setPendingTxns={setPendingTxns}
+        />
     </div>
     
   );

@@ -205,7 +205,7 @@ const AcyClosePositionModal = ({ Position, isModalVisible, onCancel, setPendingT
           }}
         />
         <div className={styles.checkboxContainer}>
-        <span>Keep Leverage at {positionInfo.Leverage}x</span>
+        <span>Keep Leverage at {positionInfo.Leverage}</span>
         <Switch
               name="checkboxP"  
               size="small"  
