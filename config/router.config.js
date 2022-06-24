@@ -60,8 +60,9 @@ export default [
         component: './Perpetual/Index',
       },
       {
-        path: '/',
+        path: '/option',
         name: 'Option',
+        component: './Option/Index',
       },
       {
         path: '/launchpad',

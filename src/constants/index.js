@@ -399,7 +399,7 @@ export const getGlobalTokenList = () => {
             data.data.map(token => {
                 tmp.push({
                     name: token.name,
-                    symbol: token.symbol,
+                    symbol: token.symbol.toUpperCase(),
                     logoURI: token.image,
                     current_price: token.current_price,
                     price_change_percentage_24h: token.price_change_percentage_24h,

@@ -54,6 +54,7 @@ import { getTransactionsByAccount, appendNewSwapTx, findTokenWithSymbol } from '
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import { getConstant } from '@/acy-dex-futures/utils/Constants'
 import PerpetualComponent from '@/components/PerpetualComponent';
+import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { GlpSwapTokenTable } from '@/components/PerpetualComponent/components/GlpSwapBox'
 // import Kchart from './components/Kchart';
@@ -1070,7 +1071,7 @@ const Swap = props => {
   //   // setActiveTimeScale(e.target.value);
   // };
   const onClickSetActiveToken = (e) => {
-    // console.log("hereim see click token", e)
+    console.log("hereim see click token", e)
     setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
   }
     
@@ -1159,14 +1160,26 @@ const Swap = props => {
   //   setActiveToken1(option);
   // }
 
+  const [kchartTab, setKchartTab] = useState("BTC")
+  const kChartTabs = ["BTC", "ETH"]
+  const selectChart = item => {
+    setKchartTab(item)
+    onClickSetActiveToken(item)
+  }
 
   return (
     <PageHeaderWrapper>
       <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
+        
             <div className={styles.chartTokenSelectorTab}>
+              <PerpetualTabs
+                option={kchartTab}
+                options={kChartTabs}
+                onChange={selectChart}
+              />
             {/* <StyledTokenSelect value={tokenPlacements} onChange={tokenPlacementChange}> */}
-              <StyledButton value="BTC" onClick={() => onClickSetActiveToken("BTC")} style={{ fontFamily:"Karla, sans-serif", height:"50px", background: "#0e0304", borderColor: "#0e0304" }}> 
+              {/* <StyledButton value="BTC" onClick={() => onClickSetActiveToken("BTC")} style={{ fontFamily:"Karla, sans-serif", height:"50px", background: "#0e0304", borderColor: "#0e0304" }}> 
                   <Row>
                     <Col span={12} style={{ lineHeight: "25px", fontSize: "1.5rem" }} >BTC</Col>
                     <Col span={12}>
@@ -1183,7 +1196,7 @@ const Swap = props => {
                       <Row span={30}>+3.74%</Row>
                     </Col>
                   </Row>
-              </StyledButton>
+              </StyledButton> */}
             {/* </StyledTokenSelect> */}
 
               {/* <StyledChartTab type="editable-card" onChange={onChange} activeKey={activeKey} 

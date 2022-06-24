@@ -617,6 +617,7 @@ const SwapComponent = props => {
           setExactIn(true);
           console.log("current t0 amount", e)
           t0Changed(e);
+          props.showGraph("Routes")
         }}
         library={library}
       />

@@ -26,6 +26,7 @@ import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import { fetchGeneralTokenInfo, marketClient, fetchTokenDaySimple } from '../Market/Data/index.js';
 import SwapComponent from '@/components/SwapComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
 import axios from 'axios';
 import moment from 'moment';
 import StakeHistoryTable from './components/StakeHistoryTable';
@@ -563,14 +564,31 @@ const Swap = props => {
     updateActiveChartData(chartData[lastDataIndex][1], lastDataIndex);
   }, [chartData])
 
+  const [graphType, setGraphType] = useState("Candlestick")
+  const graphTypes = ["Routes", "Candlestick"]
+  const showGraph = item => {
+    setGraphType(item)
+  }
+
   return (
     <PageHeaderWrapper>
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
           <div className={`${styles.colItem} ${styles.priceChart}`}>
-            <AcyCard style={{ backgroundColor: 'transparent', padding: '0 150px', paddingTop: '20px', border: 'none' }}>
-              <SankeyGraph />
-            </AcyCard>
+            <div className={styles.graphTab}>
+              <PerpetualTabs
+                option={graphType}
+                options={graphTypes}
+                onChange={showGraph}
+              />
+            </div>
+            <div style={{ padding: '20px', borderTop: '0.75px solid #333333' }}>
+              {graphType == "Routes" ?
+                <SankeyGraph />
+                :
+                <div>Kchart here</div>
+              }
+            </div>
             <div className={styles.exchangeBottomWrapper}>
               <div className={styles.exchangeItem}>
                 {/* <h3>
@@ -578,8 +596,8 @@ const Swap = props => {
                   <span className={styles.span}>TRANSACTION HISTORY</span>
                 </h3> */}
                 <div className={`${styles.colItem}`}>
-                    {/* <a className={`${styles.colItem} ${styles.optionTab}`}>All Orders</a> */}
-                    <a className={`${styles.colItem} ${styles.optionTab}`}>My Orders</a>
+                  {/* <a className={`${styles.colItem} ${styles.optionTab}`}>All Orders</a> */}
+                  <a className={`${styles.colItem} ${styles.optionTab}`}>My Orders</a>
                 </div>
                 {account && tableLoading ? (
                   <h2 style={{ textAlign: "center", color: "white" }}>Loading <Icon type="loading" /></h2>
@@ -605,9 +623,9 @@ const Swap = props => {
                   }}
                   onSelectToken1={token => {
                     setActiveToken1(token);
-
                   }}
                   onGetReceipt={onGetReceipt}
+                  showGraph={showGraph}
                 />
               </div>
             </AcyCard>
