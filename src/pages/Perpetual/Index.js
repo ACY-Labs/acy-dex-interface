@@ -164,41 +164,7 @@ const StyledCard = styled(AcyCard)`
   }
     
 `;
-const StyledLayout = styled(Layout)`
-  .ant-layout{
-    background: #0e0304 !important;
-    width: 50px;
-  }
-  .ant-layout-sider{
-    background: #0e0304 !important;
-    height: 40px;
-    width: 80px;
-  }
-  .ant-layout-sider ant-layout-sider-dark{
-    flex: 0 0 65px !important;
-    max-width: 65px !important;
-    min-width: 65px !important;
-    width: 65px !important;
-  }
-  .ant-radio-button-wrapper{
-    background: #0e0304;
-  }
-  .ant-layout-header{
-    height: 20px;
-    background: #0e0304 !important;
-    color: #b5b5b6;
-    line-height: 20px;
-    padding: 0 0;
-  }
-  .ant-layout-footer{
-    height: 20px;
-    background: #0e0304 !important;
-    color: #b5b5b6;
-    line-height: 20px;
-    padding: 0 0;
 
-  }
-`
 const StyledButton = styled(Button)`
   .ant-btn{
     height: 50px !important;
@@ -271,64 +237,6 @@ const StyledSelect = styled(Radio.Group)`
   
 `;
 
-
-const StyledChartTab = styled(Tabs)`
-
-`
-
-const StyledDropdown = styled(Dropdown)`
-  .ant-select-dropdown-menu {
-    max-height: none !important;
-    overflow-y: visible !important;
-  }
-  .ant-select-arrow {
-    color: white;
-  }
-  .ant-select-selection {
-    background-color: transparent !important;
-    border: 0.75px solid #232323;
-    border-radius: 5px;
-    height: 2.4rem;
-    width: 95px;
-    padding: 2px 6px;
-    font-size: 15px;
-    font-weight: 200;
-    color: white;
-    overflow: inherit;
-    margin-right: 10px;
-  }
-  site-dropdown-context-menu ant-dropdown-trigger
-  .ant-select-dropdown-menu,
-  .ant-select-dropdown-menu-root,
-  .ant-select-dropdown-menu-vertical{
-    max-height: none !important;
-    color: transparent;
-  }
-  .ant-select-dropdown-menu-item-active:not(.ant-select-dropdown-menu-item-disabled) {
-    background-color: transparent !important;
-  }
-  .ant-select-dropdown-menu-item {
-    color: #fff !important;
-    }
-  .dropdown-style {
-    .ant-select-dropdown-menu {
-    background: #1F1F26;
-    border: solid 1px #32323a;
-    }
-    .ant-select-dropdown-menu-item {
-    color: #b5b5b6 !important;
-    }
-    .ant-select-dropdown-menu-item:hover {
-    background: #32323a;
-    }
-    .ant-select-dropdown-menu-item-selected {
-    background: #fff;
-    }
-    .ant-select-dropdown-menu-item-active {
-    background: #32323a;
-    }
-  }
-`;
 
 function getFundingFee(data) {
   let { entryFundingRate, cumulativeFundingRate, size } = data
