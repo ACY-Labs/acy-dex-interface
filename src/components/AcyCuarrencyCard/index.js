@@ -19,6 +19,7 @@ const AcyCuarrencyCard = ({
   isLocked,
   inputColor,
   library,
+  onClickTitle,
   ...rest
 }) => {
   const [light, setLight] = useState(false);
@@ -87,7 +88,9 @@ const AcyCuarrencyCard = ({
           ? <div className={classname(styles.cua_group, styles.bonus)}>{rest.bonus > 0 ? "+" + rest.bonus : rest.bonus}</div>
           : null}
         <div className={styles.cua_bottomContainer}>
-          <div className={styles.cua_blanace}>{title || ''}</div>
+          <div className={styles.cua_blanace}
+          onClick={onClickTitle}
+          >{title || ''}</div>
           <div>{rest.showBalance && !isNaN(usdValue) ? `$ ${usdValue}` : null}</div>
         </div>
       </div>

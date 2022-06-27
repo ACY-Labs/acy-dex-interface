@@ -2,7 +2,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-computed-key */
 import { Menu, Dropdown, message, Radio, Spin, Tabs, Layout } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
+import { ConsoleSqlOutlined, DownOutlined } from '@ant-design/icons';
 import { useWeb3React } from '@web3-react/core';
 import React, { Component, useState, useEffect, useRef, useCallback, useMemo, useHistory } from 'react';
 import { connect } from 'umi';
@@ -44,13 +44,14 @@ import {
   getDeltaStr,
   useLocalStorageByChainId,
   useAccountOrders,
-  formatAmount
+  formatAmount,
+  
 } from '@/acy-dex-futures/utils';
 
 import { approvePlugin } from '@/acy-dex-futures/Api'
 import Media from 'react-media';
 import { uniqueFun } from '@/utils/utils';
-import { getTransactionsByAccount, appendNewSwapTx, findTokenWithSymbol } from '@/utils/txData';
+import { getTransactionsByAccount, appendNewSwapTx, findTokenWithSymbol, findTokenWithAddress } from '@/utils/txData';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import { getConstant } from '@/acy-dex-futures/utils/Constants'
 import PerpetualComponent from '@/components/PerpetualComponent';
@@ -346,32 +347,51 @@ const getTokenAddress = (token, nativeTokenAddress) => {
 
 export function getPositionQuery(tokens, nativeTokenAddress) {
   const collateralTokens = []
+  const indexTokens = []
   const isLong = []
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i]
+    if (token.isStable) { continue }
+    // if (token.isWrapped) { continue }
+    if (token.isNative) { continue }
+
+    for (let j = 0; j < tokens.length; j++) {
+      const collateral = tokens[j]
+      if (collateral.isNative) { continue }
+      collateralTokens.push(collateral.address)
+      indexTokens.push(getTokenAddress(token, nativeTokenAddress))
+      isLong.push(true)
+    }
+  }
 
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i]
     if (token.isStable) { continue }
-    if (token.isWrapped) { continue }
+    // if (token.isWrapped) { continue }
     if (token.isNative) { continue }
 
-    collateralTokens.push(getTokenAddress(token, nativeTokenAddress))
-    indexTokens.push(getTokenAddress(token, nativeTokenAddress))
-    isLong.push(true)
-  }
-
-  for (let i = 0; i < tokens.length; i++) {
-    const stableToken = tokens[i]
-    if (!stableToken.isStable) { continue }
-
     for (let j = 0; j < tokens.length; j++) {
-      const token = tokens[j]
-      if (token.isStable) { continue }
-      if (token.isWrapped) { continue }
-      collateralTokens.push(stableToken.address)
+      const collateral = tokens[j]
+      if (collateral.isNative) { continue }
+      collateralTokens.push(collateral.address)
       indexTokens.push(getTokenAddress(token, nativeTokenAddress))
       isLong.push(false)
     }
   }
+
+  // for (let i = 0; i < tokens.length; i++) {
+  //   const stableToken = tokens[i]
+  //   if (!stableToken.isStable) { continue }
+
+    // for (let j = 0; j < tokens.length; j++) {
+    //   const token = tokens[j]
+    //   if (token.isStable) { continue }
+    //   if (token.isWrapped) { continue }
+    //   collateralTokens.push(stableToken.address)
+    //   indexTokens.push(getTokenAddress(token, nativeTokenAddress))
+    //   isLong.push(false)
+    // }
+  // }
 
   return { collateralTokens, indexTokens, isLong }
 }
@@ -381,20 +401,19 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
   const propsLength = getConstant(chainId, "positionReaderPropsLength")
   // const propsLength = 9;
 
-  console.log('TESTING  getPositions', propsLength, infoTokens )
   const positions = []
   const positionsMap = {}
   // 
-  // if (!positionData) {
-  if (true) {
+  if (!positionData) {
+  // if (true) {
     return { positions, positionsMap }
   }
   const { collateralTokens, indexTokens, isLong } = positionQuery
   for (let i = 0; i < collateralTokens.length; i+=1) {
     const collateralToken = getTokenInfo(infoTokens, collateralTokens[i], true, nativeTokenAddress);
-    collateralToken.logoURI = findTokenWithSymbol(collateralToken.symbol).logoURI;
+    collateralToken.logoURI = findTokenWithAddress(collateralToken.address).logoURI;
     indexToken = getTokenInfo(infoTokens, indexTokens[i], true, nativeTokenAddress)
-    indexToken.logoURI = findTokenWithSymbol(collateralToken).logoURI;
+    indexToken.logoURI = findTokenWithAddress(indexToken.address).logoURI;
     const key = getPositionKey(collateralTokens[i], indexTokens[i], isLong[i])
 
     const position = {
@@ -457,7 +476,9 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
     if (position.size.gt(0)) {
       positions.push(position)
     }
+    position.liqPrice = getLiquidationPrice(position)
   }
+
 
   return { positions, positionsMap }
 }
@@ -506,7 +527,6 @@ const Swap = props => {
   // this are new states for PERPETUAL
   const [tableContent, setTableContent] = useState(POSITIONS);
   const [positionsData, setPositionsData] = useState([]);
-  const [ordersData, setOrdersData] = useState([]);
   const { active, activate } = useWeb3React();
   const [placement, setPlacement] = useState('5m');
   const [high24, setHigh24] = useState(0);
@@ -554,7 +574,6 @@ const Swap = props => {
   const fromTokenAddress = tokenSelection[swapOption].from
   const toTokenAddress = tokenSelection[swapOption].to
 
-  console.log("debug perpetual page, toTokenAddress: ", toTokenAddress)
 
   const { perpetuals } = useConstantLoader()
   const readerAddress = perpetuals.getContract("Reader")
@@ -570,6 +589,7 @@ const Swap = props => {
   const whitelistedTokens = supportedTokens.filter(token => token.symbol !== "USDG");
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
   const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
+
 
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
@@ -625,7 +645,6 @@ const Swap = props => {
   useEffect(() => {
     if (!supportedTokens) return
 
-    console.log("resetting page states")
     // reset on chainId change => supportedTokens change
     setPricePoint(0);
     setPastToken1('ETH');
@@ -653,21 +672,6 @@ const Swap = props => {
       item['liqPrice'] = getLiquidationPrice(item);
     }
     setPositionsData(samplePositionsData);
-
-    const sampleOrdersData = [
-      {
-        type: "Swap",
-        order: {
-          amountIn: 100,
-          fromTokenSymbol: "USDT",
-          amountOut: 50,
-          toTokenSymbol: "ACY"
-        },
-        price: 100,
-        markPrice: 105,
-      }
-    ]
-    setOrdersData(sampleOrdersData)
 
   }, [chainId])
 
@@ -746,7 +750,7 @@ const Swap = props => {
         `${apiUrlPrefix}/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
       )
       .then(data => {
-        console.log(data);
+
       });
   }
 
@@ -790,9 +794,7 @@ const Swap = props => {
 
   useEffect(async () => {
     let currentTime = getCurrentTime();
-    console.log("hereim current time", getCurrentTime())
     let previousTime = currentTime - 24*60*60 ;
-    console.log("hereim previous time", previousTime)
 
     let data24 = await getKChartData(activeToken1.symbol, "56", "5m", previousTime.toString(), currentTime.toString(), "chainlink");
     let high24 = 0;
@@ -875,30 +877,6 @@ const Swap = props => {
     ];
   };
 
-  const RenderTable = () => {
-    if (tableContent === POSITIONS) {
-      return (
-        <PositionsTable
-          isMobile={isMobile}
-          dataSource={positions}
-        />
-      )
-    } else if (tableContent === ACTIONS) {
-      return (
-        <ActionHistoryTable
-          isMobile={isMobile}
-          dataSource={positionsData}
-        />
-      )
-    } else if (tableContent === ORDERS) {
-      return (
-        <OrderTable
-          isMobile={isMobile}
-          dataSource={ordersData}
-        />
-      )
-    }
-  }
 
   const selectTime = pt => {
     const dateSwitchFunctions = {
@@ -916,8 +894,7 @@ const Swap = props => {
 
   const onClickDropdown = e => {
     // console.log("hereim dropdown", e.key);
-    console.log("hereim dropdown", e); 
-    console.log("hereim dropdown supprted", supportedTokens);   
+ 
     setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
   };
 
@@ -1289,7 +1266,28 @@ const Swap = props => {
                     <a className={`${styles.colItem} ${styles.optionTab}`} onClick={() => { setTableContent(ACTIONS) }}>Actions </a>
                   </div>
                   <div className={styles.positionsTable}>
-                    <RenderTable />
+                    { tableContent == POSITIONS && (
+                      <PositionsTable
+                        isMobile={isMobile}
+                        dataSource={positions}
+                        setPendingTxns={setPendingTxns}
+                        infoTokens={infoTokens}
+                    />
+                    )} 
+                    { tableContent == ORDERS && (
+                      <OrderTable
+                        isMobile={isMobile}
+                        dataSource={orders}
+                        infoTokens={infoTokens}
+                      />
+                    )}
+                    { tableContent == ACTIONS && (
+                      <ActionHistoryTable
+                        isMobile={isMobile}
+                        dataSource={positionsData}
+                      />
+                    )}
+                     
                   </div>
                 </div>
               </AcyPerpetualCard>

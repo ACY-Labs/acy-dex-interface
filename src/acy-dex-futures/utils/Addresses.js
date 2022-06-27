@@ -64,9 +64,10 @@ const CONTRACTS = {
     NATIVE_TOKEN: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
     GlpManager: '0x267DE43231876eEeB9a3E81ADc5AE65e976B4b60',
     RewardRouter: '0x17458037fF1DE8a3Ee251eDB329f25717F48E8c7',
-    OrderBook: '0xD7483f983E226392c5BaC3ee2B11c6b7e00a5900',
+    OrderBook: '0xDbF5F6861f1F69Fc834BA9Ea8233085baeD4657c',
     Router: '0x7eE375b63dbDA21F87fdD1A730072829Bb7bf209',
     GLP: '0x53a2eD45d06518f903782134aB28C0E99E3C3A13',
+    OrderBookReader: "0xd489dE0A1822a7bBAe616012a7C4a33da110aEA3"
   },
   421611: { // arbitrum testnet
     Vault: "0xA4704fBfaf7c89511668052931Ba0f1816D2c9d3",
@@ -163,7 +164,6 @@ const CONTRACTS = {
 
 export function getContractAddress(chainId, name) {
 
-  // console.log("getContractAddress, chainID", chainId, "name", name);
   if (!CONTRACTS[chainId]) {
     // console.log(`Unknown chainId ${chainId}`);
   }
