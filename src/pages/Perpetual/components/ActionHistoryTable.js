@@ -92,15 +92,16 @@ const StakeHistoryTable = props => {
   ]
   const sampleStakeHistoryMobileColumns = [
     {
-      title: 'Swap',
+      title: 'Action',
       key: 'fromforto',
-      render: record =>`${record.action} ${record.token1Symbol} and ${record.token2Symbol}`
+      render: record =>`${record.action} ${record.amount}`
     },
     
     {
       title: 'Time',
-      dataIndex: 'transactionTime',
-      key: 'transactionTime'
+      dataIndex: 'timestamp',
+      key: 'transactionTime',
+      render: (text, record) =>`${formatDateTime(text)}`
     },
   ]
   return (
