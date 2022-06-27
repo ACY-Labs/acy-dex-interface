@@ -6,24 +6,33 @@ import formatNumber from 'accounting-js/lib/formatNumber.js';
 import  { abbrNumber } from '../../Market/Util.js';
 import { constantInstance } from '@/constants';
 import { sortTableTime } from '../utils'
+import { useActionData, formatDateTime, formatAmount, getExplorerUrl } from '@/acy-dex-futures/utils';
+import { useConstantLoader } from '@/constants';
+
 
 const StakeHistoryTable = props => {
-  const [stakeDisplayNumber, setStakeDisplayNumber] = useState(5);
+  const [stakeDisplayNumber, setStakeDisplayNumber] = useState(7);
   const { dataSource, isMobile } = props;
+  const {chainId} = useConstantLoader();
+  const [data, loading] = useActionData()
+
+  const getWallet = (wallet) => {
+    return wallet.substr(0,5) + "......" + wallet.substr(-4,4)
+  }
 
   const sampleStakeHistoryColumns = [
     {
       title: (
         <div className={styles.tableDataFirstColumn}>
-          Swap
+          Wallet
         </div>
       ),
-      dataIndex: '',
+      dataIndex: 'account',
       key: 'fromforto',
       render: (text, record) => {
         return (
         <div className={styles.tableDataFirstColumn}>
-          Swap {record.inputTokenSymbol} for {record.outTokenSymbol} {record.FA ? " (FA)" : ""}
+          {getWallet(text)}
           </div>
         );
       }
@@ -31,40 +40,41 @@ const StakeHistoryTable = props => {
     {
       title: (
         <div className={styles.tableData}>
-          Total Amount
+          Action
         </div>
       ),
-      dataIndex: 'totalToken',
-      key: 'totalToken',
-      align: 'left',
+      dataIndex: 'action',
+      key: 'action',
+      align : 'left',
       render: (text, record) => {
-        return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
+        return <div className={styles.tableData}>{text}</div>;
       }
     },
     {
       title: (
         <div className={styles.tableData}>
-          Token Amount
+          Amount
         </div>
       ),
-      dataIndex: 'inputTokenNum',
-      key: 'inputTokenNum',
-      align: 'left',
+      dataIndex: 'amount',
+      key: 'toAmount',
+      align : 'left',
       render: (text,record) => {
-        return <div className={styles.tableData}>{abbrNumber(text)} {record.inputTokenSymbol}</div>;
+        return <div className={styles.tableData}>{text}</div>;
       }
     },
     {
       title: (
         <div className={styles.tableData}>
-          Token Amount
+          Price
         </div>
       ),
-      dataIndex: 'outTokenNum',
-      key: 'outTokenNum',
-      align: 'left',
+      dataIndex: 'price',
+      key: 'price',
+      align : 'left',
       render: (text, record) => {
-        return <div className={styles.tableData}>{abbrNumber(text)} {record.outTokenSymbol}</div>;
+        const price = text/1e30;
+        return <div className={styles.tableData}>{text}</div>;
       }
     },
     {
@@ -73,10 +83,10 @@ const StakeHistoryTable = props => {
           Time
         </div>
       ),
-      dataIndex: 'transactionTime',
+      dataIndex: 'timestamp',
       key: 'transactionTime',
       render: (text, record) => {
-        return <div className={styles.tableData}>{text}</div>;
+        return <div className={styles.tableData}>{formatDateTime(text)}</div>;
       }
     },
   ]
@@ -95,41 +105,41 @@ const StakeHistoryTable = props => {
   ]
   return (
     <div className={styles.nobgTable}>
-      <Table
+      { !loading && (
+        <Table
         columns={ isMobile&&sampleStakeHistoryMobileColumns || sampleStakeHistoryColumns }
-        dataSource={ sortTableTime(dataSource, 'transactionTime', true).slice(0, stakeDisplayNumber + 1) }
+        dataSource={  sortTableTime(data, 'timestamp', true).slice(0, stakeDisplayNumber + 1) }
         className={ styles.tableStyle }
         pagination={ false }
         onRow={record => {
-          if (record.FA) {
             return {
               onClick: event => {
                 // 跳转到eths
-                window.open(`#/transaction/${record.hash}`);
+                window.open(`${getExplorerUrl(chainId)}tx/${record.hash}`);
               }, // 点击行
             };
-          } else {
-            return {
-              onClick: event => {
-                // 跳转到eths
-                window.open(`${constantInstance.scanUrlPrefix.scanUrl}/tx/${record.hash}`);
-              }, // 点击行
-            };
-          }
-          
         }}
         footer={() => (
           <div className={styles.tableSeeMoreWrapper}>
             <a
               className={styles.tableSeeMore}
-              onClick={() => setStakeDisplayNumber(prevState => prevState + 5)}
-            >
-              See More...
+              onClick={() => {
+                if(stakeDisplayNumber < data.length) {
+                  setStakeDisplayNumber(prevState => prevState + 7)
+                }
+              }
+               
+              }
+            > 
+            {stakeDisplayNumber < data.length ? "See More...": "No more data"}
+              
             </a>
           </div>
         )}
       />
-    </div>
+      )}
+      </div>
+      
     
   );
 };

@@ -18,6 +18,9 @@ import { useLocalStorage } from "react-use";
 import { constantInstance, useConstantLoader } from '@/constants';
 import { format as formatDateFn } from "date-fns";
 import { BURN_FEE_BASIS_POINTS, MINT_FEE_BASIS_POINTS } from './_Helpers';
+import { useGraph } from '@/pages/Stats/Perpetual/dataProvider';
+import { sortBy} from 'lodash'
+import { TOKEN_LIST } from '@/constants';
 export const MARKET = 'Market';
 export const LIMIT = 'Limit';
 export const LONG = 'Long';
@@ -1901,4 +1904,183 @@ export function formatDateTime(time) {
 }
 export function formatDate(time) {
   return formatDateFn(time * 1000, "dd MMM yyyy");
+}
+
+const NOW_TS = parseInt(Date.now() / 1000)
+const FIRST_DATE_TS = parseInt(+(new Date(2021, 7, 31)) / 1000)
+
+
+export function useActionData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "arbitrum" } = {}) {
+	const PROPS = 'margin liquidation swap mint burn'.split(' ')
+  const timestampProp = "timestamp"
+  const query = `{
+    contractTransactions(
+      first: 50,
+      orderBy: ${timestampProp},
+      orderDirection: desc
+    ) {
+      account
+      fromAmount
+      fromToken
+      id
+      isBuy
+      price
+      timestamp
+      toAmount
+      toToken
+      type
+    }
+  }`
+  const [graphData, loading, error] = useGraph(query, { chainName })
+
+  let data
+  if (graphData) {
+    data = sortBy(graphData.contractTransactions, item => item.id)
+  }
+  let data2
+  if (graphData) {
+    data2 = sortBy(graphData.contractTransactions, item => item.timestamp).map(value => {
+      const fromToken = getToken(value.fromToken)
+      const toToken = getToken(value.toToken)
+      const isLong = value.isBuy?'Long':'Short'
+      const priceAbove =  value.price > 0 ?">":"<";
+      const tem = BigNumber.from(value.price)
+      const price = `$${formatAmount(tem.abs(), USD_DECIMALS, 2, true)}`
+      const size = `$${formatAmount(value.toAmount, USD_DECIMALS, 2, true)}` // if size 
+      if(value.type == "increasePosition" ) {
+        return {
+          account: value.account,
+          action: `Increase ${toToken.symbol} ${isLong}`,
+          amount: size, 
+          price: price,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "decreasePosition") {
+        return {
+          account: value.account,
+          action: `Decrease ${toToken.symbol} ${isLong}`,
+          amount: size, 
+          price: price,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "liquidatePosition") {
+        return {
+          account: value.account,
+          action: `Liquidate  ${toToken.symbol} ${isLong}`,
+          amount: size, 
+          price: price,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "addLiquidity") {
+        return {
+          account: value.account,
+          action: `Add Liquidity`,
+          amount: formatTokenAmount(value.fromToken, value.fromAmount), // to do here
+          price: '-',
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "removeLiquidity") {
+        return {
+          account: value.account,
+          action: `Remove Liquidity`,
+          amount: formatTokenAmount(value.toToken, value.toAmount), // to do here
+          price: '-',
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "createIncreaseOrder") {
+        return {
+          account: value.account,
+          action: `Create Increase ${toToken.symbol} ${isLong} Order`,
+          amount: size, 
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "cancelIncreaseOrder") {
+        return {
+          account: value.account,
+          action: `Cancel Increase ${toToken.symbol} ${isLong} Order`,
+          amount: size,
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "updateIncreaseOrder") {
+        return {
+          account: value.account,
+          action: `Update Increase ${toToken.symbol} ${isLong} Order`,
+          amount: size, 
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "executeIncreaseOrder") {
+        return {
+          account: value.account,
+          action: `Execute increase ${toToken.symbol} ${isLong} Order`,
+          amount: size, 
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "createDecreaseOrder") {
+        return {
+          account: value.account,
+          action: `Create Decrease ${toToken.symbol} ${isLong} Order`,
+          amount: size, 
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "cancelDecreaseOrder") {
+        return {
+          account: value.account,
+          action: `Cancel Decrease ${toToken.symbol} ${isLong} Order`,
+          amount: size,
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "updateDecreaseOrder") {
+        return {
+          account: value.account,
+          action: `Update decrease ${toToken.symbol} ${isLong} Order`,
+          amount: size,
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "executeDecreaseOrder") {
+        return {
+          account: value.account,
+          action: `Execute decrease ${toToken.symbol} ${isLong} Order`,
+          amount: size, // to do here
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } 
+    })
+  }
+  return [data2, loading, error]
+}
+
+function formatTokenAmount(address, amount) {
+  const token = getToken(address)
+  return `${formatAmount(amount, token.decimals, 2, true)} ${token.symbol}`
+}
+
+function getToken(address) {
+  const supportedTokens = TOKEN_LIST();
+  for (let j = 0; j < supportedTokens.length; j++) {
+    if (address.toLowerCase() === supportedTokens[j].address.toLowerCase()) {
+      return supportedTokens[j];
+    }
+  }
+  return supportedTokens[0]
 }
