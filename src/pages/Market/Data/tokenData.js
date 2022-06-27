@@ -41,29 +41,6 @@ export async function fetchTokenInfo(client, tokenAddress, timestamp) {
   return data.tokens[0];
 }
 
-export async function fetchCoinList () {
-  /**
-   * name
-   * symbol
-   * image
-   * current_price
-   * price_change_percentage_24h
-   * market_cap
-   * fully_diluted_valuation
-   * total_volume
-   */
-   const apiUrlPrefix = "https://api.coingecko.com/api/v3"
-   axios.get(
-     `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false`
-   ).then(data => {
-     return data.data;
-   })
-   .catch(e => {
-     console.log(e);
-     return [];
-   });
-}
-
 export async function fetchTokenDayData(tokenId) {
   //const uniqueTokens = TOKENLIST();
   const uniqueTokens = MARKET_TOKEN_LIST();

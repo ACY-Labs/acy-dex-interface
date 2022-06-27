@@ -33,6 +33,7 @@ import axios from 'axios';
 import { useWeb3React } from '@web3-react/core';
 import { binance,injected } from '@/connectors';
 import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import {
   Error,
@@ -81,7 +82,7 @@ import { Row, Col, Button, Input, Icon } from 'antd';
 import { Alert } from 'antd';
 import spinner from '@/assets/loading.svg';
 import moment from 'moment';
-import {useConstantLoader} from '@/constants';
+import {useConstantLoader, getGlobalTokenList} from '@/constants';
 import {useConnectWallet} from '@/components/ConnectWallet';
 
 
@@ -158,8 +159,6 @@ const SwapComponent = props => {
   const [showDescription, setShowDescription] = useState(false);
   const connectWalletByLocalStorage = useConnectWallet();
 
-  const [coinList, setCoinList] = useState([])
-
   useEffect(() => {
     if (!INITIAL_TOKEN_LIST) return
     console.log("resetting page states, new swapComponent token0, token1", INITIAL_TOKEN_LIST[0], INITIAL_TOKEN_LIST[1])
@@ -266,24 +265,24 @@ const SwapComponent = props => {
     setShowDescription(false);
   }, [chainId])
 
-  useEffect(() => {
-    const apiUrlPrefix = "https://api.coingecko.com/api/v3"
-    axios.get(
-      `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false`
-    ).then(data => {
-      // setCoinList(data.data)
-      data.data.map(token => {
-        coinList.push({
-          name: token.name,
-          symbol: token.symbol,
-          logoURI: token.image,
-        })
-      })
-    })
-    .catch(e => {
-      console.log(e);
-    });
-  }, [chainId])
+  // useEffect(() => {
+  //   const apiUrlPrefix = "https://api.coingecko.com/api/v3"
+  //   axios.get(
+  //     `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=500&page=1&sparkline=false`
+  //   ).then(data => {
+  //     // setCoinList(data.data)
+  //     data.data.map(token => {
+  //       coinList.push({
+  //         name: token.name,
+  //         symbol: token.symbol,
+  //         logoURI: token.image,
+  //       })
+  //     })
+  //   })
+  //   .catch(e => {
+  //     console.log(e);
+  //   });
+  // }, [chainId])
 
   // connect to page model, reflect changes of pair ratio in this component
   useEffect(() => {
@@ -589,6 +588,13 @@ const SwapComponent = props => {
 
   useEffect(() => console.log("test slippage: ", slippageTolerance), [slippageTolerance]);
 
+  const history = useHistory()
+  const coinList = getGlobalTokenList()
+  useEffect(() => {
+    const hash = history.location.hash.replace('#', '').split('?')[0]
+    setToken0(coinList.filter(coin => coin.symbol.toLowerCase() == hash.toLowerCase())[0])
+  }, [history.location.hash, coinList])
+
   return (
     <div className={styles.sc}>
       <AcyCuarrencyCard
@@ -611,6 +617,7 @@ const SwapComponent = props => {
           setExactIn(true);
           console.log("current t0 amount", e)
           t0Changed(e);
+          props.showGraph("Routes")
         }}
         library={library}
       />

@@ -164,7 +164,7 @@ const AcyConnectWallet = props => {
           </div>
           ||
           <div className={styles.address} onClick={onClick}>
-            {account && sortAddress(account) || 'Connect'}
+            {account && sortAddress(account) || 'Connect Wallet'}
           </div>
         }
       </div>
@@ -187,7 +187,7 @@ const AcyConnectWallet = props => {
             </div>
             ||
             <div className={styles.address} onClick={onClick}>
-              {account && sortAddress(account) || 'Connect'}
+              {account && sortAddress(account) || 'Connect Wallet'}
             </div>
           }
         </div>

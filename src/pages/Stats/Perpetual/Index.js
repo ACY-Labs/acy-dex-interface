@@ -191,7 +191,7 @@ const Stats = (props) => {
           <a
             className={`${styles.colItem} ${styles.optionTab}`}
             onClick={() => {
-              history.push('/stats/stablecoin')
+              history.push('/statistics/stablecoin')
             }}
           >
             StableCoin

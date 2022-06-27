@@ -5,7 +5,7 @@ import Animate from 'rc-animate';
 import { connect } from 'umi';
 import { history } from 'umi';
 import GlobalHeader from '@/components/GlobalHeader';
-import TopNavHeader from '@/components/TopNavHeader';
+import TopNavHeader from '@/components/TopNavHeader/sideNav';
 import styles from './Header.less';
 
 const { Header } = Layout;
@@ -120,10 +120,10 @@ class HeaderView extends PureComponent {
     const isTop = layout === 'topmenu';
     const width = this.getHeadWidth();
     const HeaderDom = visible ? (
-      <Header style={{ padding: 0, width, height: '50px', borderBottom: '0.75px solid #333333' }} className={fixedHeader ? styles.fixedHeader : ''}>
+      <Header style={{ padding: 0, width: '70px', height: '100%', fontSize: '12px' }} className={fixedHeader ? styles.fixedHeader : ''}>
         <TopNavHeader
           theme={navTheme}
-          mode="horizontal"
+          mode="inline"
           onCollapse={handleMenuCollapse}
           onNoticeClear={this.handleNoticeClear}
           onMenuClick={this.handleMenuClick}
