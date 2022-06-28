@@ -188,7 +188,9 @@ export const SearchBar = props => {
   const [localToken, setLocalToken] = useState([]);
   const [localPool, setLocalPool] = useState([]);
 
+  console.log("hereim before SB");
   const dataSourceCoin = getGlobalTokenList()
+  console.log("hereim before SB", dataSourceCoin);
   const [marketNetwork, setmarketNetwork] = useState('');
   const { chainId } = useConstantLoader();
 

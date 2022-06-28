@@ -15,6 +15,7 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
+import { ARBITRUM_DEFAULT_COLLATERAL_SYMBOL } from '@/acy-dex-futures/utils';
 import Media from 'react-media';
 import AcyPieChart from '@/components/AcyPieChartAlpha';
 import AcyRoutingChart from '@/components/AcyRoutingChart';
@@ -33,12 +34,16 @@ import StakeHistoryTable from './components/StakeHistoryTable';
 import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
-import { API_URL, useConstantLoader } from '@/constants';
+import { API_URL, useConstantLoader, getGlobalTokenList } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import useSWR from 'swr';
 import { TxFetcher } from '@/utils/utils';
-import SankeyGraph from './components/SankeyGraph'
+import SankeyGraph from './components/SankeyGraph';
+import ExchangeTVChart from '../Perpetual/components/ExchangeTVChart';
+import { ethers } from 'ethers'
 
+
+const { AddressZero } = ethers.constants
 const { AcyTabPane } = AcyTabs;
 function getTIMESTAMP(time) {
   var date = new Date(time);
@@ -104,8 +109,13 @@ const StyledCard = styled(AcyCard)`
     
 `;
 
+
 const Swap = props => {
   const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
+  
+  console.log("hereim befoere swap coinlist");
+  const coinList = getGlobalTokenList()
+  console.log("hereim swap coinlist successful", coinList);
   ////console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
   // 当 chainId 发生切换时，就更新 url
@@ -157,6 +167,57 @@ const Swap = props => {
 
   const txref = useRef();
   txref.current = txList;
+
+//   console.log("hereim see coinList", coinList)  
+//   const defaultTokenSelection = useMemo(() => ({
+//     ["Pool"]: {
+//       from: AddressZero,
+//       to: getTokenBySymbol(coinList, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
+//     },
+//     ["Long"]: {
+//       from: AddressZero,
+//       to: AddressZero,
+//     },
+//     ["Short"]: {
+//       from: getTokenBySymbol(coinList, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
+//       to: AddressZero,
+//     }
+//   }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
+// // }), [chainId])
+
+// function getTokenBySymbol(tokenlist, symbol) {
+//   console.log("hereim see gettokenbysymbol tokenlist.symbol, symbol", tokenlist, symbol)
+//   for (let i = 0; i < tokenlist.length; i++) {
+//     if (tokenlist[i].symbol === symbol) {
+//       return tokenlist[i]
+//     }
+//   }
+//   return undefined
+// }
+
+
+//   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
+//   const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
+
+//   const setFromTokenAddress = useCallback((selectedSwapOption, address) => {
+//     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
+//     newTokenSelection[selectedSwapOption].from = address
+//     setTokenSelection(newTokenSelection)
+//   }, [tokenSelection, setTokenSelection])
+
+//   const setToTokenAddress = useCallback((selectedSwapOption, address) => {
+//     // console.log("hereim see tokenSelection", tokenSelection)
+//     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
+//     newTokenSelection[selectedSwapOption].to = address
+//     setTokenSelection(newTokenSelection)
+//   }, [tokenSelection, setTokenSelection])
+
+//   const fromTokenAddress = tokenSelection[swapOption].from
+//   const toTokenAddress = tokenSelection[swapOption].to
+
+//   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
+
+
 
   ////console.log('printing tx lists', txList);
 
@@ -430,7 +491,6 @@ const Swap = props => {
   // }
 
   const lineTitleRender = () => {
-
     let token0logo = null;
     let token1logo = null;
     for (let j = 0; j < supportedTokens.length; j++) {
@@ -586,6 +646,18 @@ const Swap = props => {
               {graphType == "Routes" ?
                 <SankeyGraph />
                 :
+                // <ExchangeTVChart 
+                //   swapOption={'LONG'}
+                //   fromTokenAddress={fromTokenAddress}
+                //   toTokenAddress={toTokenAddress}
+                //   period={'5m'}
+                //   infoTokens={infoTokens}
+                //   chainId={chainId}
+                //   positions={positions}
+                //   // savedShouldShowPositionLines,
+                //   orders={orders}
+                //   setToTokenAddress={setToTokenAddress}
+                //   />
                 <div>Kchart here</div>
               }
             </div>

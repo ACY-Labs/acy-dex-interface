@@ -68,6 +68,7 @@ export default function Sankey(props) {
 
   if (props.data) {
     graph.current = sankey(props.data);
+    console.log("hereim sankey", props.data)
     const { links, nodes } = graph.current;
 
     return (

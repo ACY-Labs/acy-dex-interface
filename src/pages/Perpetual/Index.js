@@ -297,6 +297,7 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
   if (true) {
     return { positions, positionsMap }
   }
+  
   const { collateralTokens, indexTokens, isLong } = positionQuery
   for (let i = 0; i < collateralTokens.length; i+=1) {
     const collateralToken = getTokenInfo(infoTokens, collateralTokens[i], true, nativeTokenAddress);
@@ -824,8 +825,8 @@ const Swap = props => {
 
   const onClickDropdown = e => {
     // console.log("hereim dropdown", e.key);
-    console.log("hereim dropdown", e); 
-    console.log("hereim dropdown supprted", supportedTokens);   
+    // console.log("hereim dropdown", e); 
+    // console.log("hereim dropdown supprted", supportedTokens);   
     setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
   };
 
@@ -1068,10 +1069,10 @@ const Swap = props => {
   //   setActiveToken1(option);
   // }
 
-  const [kchartTab, setKchartTab] = useState("BTC")
+  const [kChartTab, setKChartTab] = useState("BTC")
   const kChartTabs = ["BTC", "ETH"]
   const selectChart = item => {
-    setKchartTab(item)
+    setKChartTab(item)
     onClickSetActiveToken(item)
   }
 
@@ -1082,7 +1083,7 @@ const Swap = props => {
         
             <div className={styles.chartTokenSelectorTab}>
               <PerpetualTabs
-                option={kchartTab}
+                option={kChartTab}
                 options={kChartTabs}
                 onChange={selectChart}
               />

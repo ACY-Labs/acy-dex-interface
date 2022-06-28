@@ -389,12 +389,15 @@ export const useConstantLoader = () => {
 
 export const getGlobalTokenList = () => {
     const [tokenList, setTokenList] = useState([])
+    console.log("hereim getglobal tokenlist")
 
     useEffect(() => {
         const apiUrlPrefix = "https://api.coingecko.com/api/v3"
+        console.log("hereim before axios")
         axios.get(
             `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=500&page=1&sparkline=false`
         ).then(data => {
+            console.log("hereim after axios")
             let tmp = []
             data.data.map(token => {
                 tmp.push({
@@ -410,7 +413,7 @@ export const getGlobalTokenList = () => {
                 })
             })
             setTokenList(tmp)
-            console.log('joy init tokenList', data.data)
+            console.log('hereim init tokenList', data.data)
         })
             .catch(e => {
                 console.log(e);
