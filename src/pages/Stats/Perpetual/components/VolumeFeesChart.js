@@ -103,9 +103,8 @@ const VolumeFeesChart = props => {
     // setSelectedIndex(1);
     return `
       <span style="color :#b5b5b6"> ${formatFullTimestamp(data[idx].timestamp)} , ${formatCurrency(data[idx].all)}</span></br>
-      <span style="color :${COLORS[0]}">Swap  : ${data[idx].swap?formatCurrency(data[idx].swap): "-"}</span></br>
-      <span style="color :${COLORS[1]}">Mint  GLP  : ${data[idx].mint?formatCurrency(data[idx].mint): "-"}</span></br>
-      <span style="color :${COLORS[2]}">Burn GLP  : ${data[idx].burn?formatCurrency(data[idx].burn): "-"}</span></br>
+      <span style="color :${COLORS[1]}">Mint  ALP  : ${data[idx].mint?formatCurrency(data[idx].mint): "-"}</span></br>
+      <span style="color :${COLORS[2]}">Burn ALP  : ${data[idx].burn?formatCurrency(data[idx].burn): "-"}</span></br>
       <span style="color :${COLORS[3]}">Liquidation  : ${data[idx].liquidation?formatCurrency(data[idx].liquidation): "-"}</span></br>
       <span style="color :${COLORS[4]}">Margin trading  : ${data[idx].margin?formatCurrency(data[idx].margin): "-"}</span></br>
       <span style="color :${COLORS[0]}">Cumulative  : ${data[idx].cumulative?formatCurrency(data[idx].cumulative): "-"}</span></br>
@@ -148,9 +147,7 @@ const VolumeFeesChart = props => {
     var cumulative = chartData.map(function(item) {
         return parseInt(item.cumulative);
     });
-    var valueList = chartData.map(function(item) {
-      return parseInt(item.swap);
-    });
+
     var valueList2 = chartData.map(function(item) {
       return parseInt(item.mint);
     }); 
@@ -171,7 +168,7 @@ const VolumeFeesChart = props => {
         top: 'top',
       },
       legend: {
-        data: ['Swap', 'Mint GLP', 'Burn GLP', 'Liquidation', 'Margin trading', 'Cumulative'],
+        data: ['Mint ALP', 'Burn ALP', 'Liquidation', 'Margin trading', 'Cumulative'],
         top: 'bottom',
         textStyle: {
             color: '#FFF',
@@ -219,24 +216,10 @@ const VolumeFeesChart = props => {
       ],
       series: [
         {
-          data: valueList,
-          type: 'bar',
-          stack: true,
-          name: "Swap",
-          smooth: 1, //true 为平滑曲线，false为直线
-          showSymbol: false, //是否默认展示圆点
-          itemStyle: {
-            normal: {
-              color: COLORS[0],
-              width: 2,
-            },
-          },
-        },
-        {
             data: valueList2,
             type: 'bar',
             stack: true,
-            name: "Mint GLP",
+            name: "Mint ALP",
             smooth: 1, //true 为平滑曲线，false为直线
             showSymol: false, //是否默认展示圆点
             itemStyle: {
@@ -249,7 +232,7 @@ const VolumeFeesChart = props => {
           {
             data: valueList3,
             type: 'bar',
-            name: "Burn GLP",
+            name: "Burn ALP",
             stack: true,
             smooth: 1, //true 为平滑曲线，false为直线
             showSymol: false, //是否默认展示圆点
