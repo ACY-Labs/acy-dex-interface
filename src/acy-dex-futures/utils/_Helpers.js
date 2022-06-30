@@ -1841,25 +1841,6 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
         provider
       );
 
-      const fetchIndexesFromServer = () => {
-        const ordersIndexesUrl = `${getServerBaseUrl(
-          chainId
-        )}/orders_indices?account=${account}`;
-        return fetch(ordersIndexesUrl)
-          .then(async res => {
-            const json = await res.json();
-            const ret = {};
-            for (const key of Object.keys(json)) {
-              ret[key.toLowerCase()] = json[key].map(val =>
-                parseInt(val.value)
-              );
-            }
-
-            return ret;
-          })
-          .catch(() => ({ swap: [], increase: [], decrease: [] }));
-      };
-
       const fetchLastIndex = async type => {
         const method = type.toLowerCase() + "OrdersIndex";
         return await orderBookContract[method](account).then(res =>
@@ -1900,8 +1881,8 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
         ];
       };
 
-      const getOrders = async (method, knownIndexes, lastIndex, parseFunc) => {
-        const indexes = getIndexes(knownIndexes, lastIndex);
+      const getOrders = async (method, lastIndex, parseFunc) => {
+        const indexes = getRange(lastIndex);
         const ordersData = await orderBookReaderContract[method](
           orderBookAddress,
           account,
@@ -1913,10 +1894,7 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
       };
 
       try {
-        const [serverIndexes, lastIndexes] = await Promise.all([
-          fetchIndexesFromServer(),
-          fetchLastIndexes()
-        ]);
+        const lastIndexes = await Promise.all(fetchLastIndexes());
         const [
           swapOrders = [],
           increaseOrders = [],
@@ -1924,19 +1902,16 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
         ] = await Promise.all([
           getOrders(
             "getSwapOrders",
-            serverIndexes.swap,
             lastIndexes.swap,
             parseSwapOrdersData
           ),
           getOrders(
             "getIncreaseOrders",
-            serverIndexes.increase,
             lastIndexes.increase,
             parseIncreaseOrdersData
           ),
           getOrders(
             "getDecreaseOrders",
-            serverIndexes.decrease,
             lastIndexes.decrease,
             parseDecreaseOrdersData
           )

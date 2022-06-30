@@ -18,6 +18,9 @@ import { useLocalStorage } from "react-use";
 import { constantInstance, useConstantLoader } from '@/constants';
 import { format as formatDateFn } from "date-fns";
 import { BURN_FEE_BASIS_POINTS, MINT_FEE_BASIS_POINTS } from './_Helpers';
+import { useGraph } from '@/pages/Stats/Perpetual/dataProvider';
+import { sortBy} from 'lodash'
+import { TOKEN_LIST } from '@/constants';
 export const MARKET = 'Market';
 export const LIMIT = 'Limit';
 export const LONG = 'Long';
@@ -73,6 +76,10 @@ export const POLYGON_TESTNET = 80001;
 export const AVALANCHE = 43114;
 export const ARBITRUM_TESTNET = 421611;
 export const ARBITRUM = 42161;
+
+export const SWAP = "Swap";
+export const INCREASE = "Increase";
+export const DECREASE = "Decrease";
 
 const supportedChainIds = [ARBITRUM];
 const injectedConnector = new InjectedConnector({
@@ -555,7 +562,6 @@ export const getInjectedHandler = activate => {
       if (e instanceof UnsupportedChainIdError) {
         return;
       }
-      console.log(e.toString());
     });
   };
   return fn;
@@ -610,13 +616,10 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
         }
         infoTokens[token.address] = token
     }
-    // console.log("hereim whitelisted", vaultTokenInfo)
     for (let i = 0; i < whitelistedTokens.length; i++) {
         const token = JSON.parse(JSON.stringify(whitelistedTokens[i]))
-        // console.log("hereim vault above", vaultTokenInfo)
 
         if (vaultTokenInfo) {
-          // console.log("hereim vault", vaultTokenInfo)
             token.poolAmount = vaultTokenInfo[i * vaultPropsLength];
             token.reservedAmount = vaultTokenInfo[i * vaultPropsLength + 1];
             token.availableAmount = token.poolAmount.sub(token.reservedAmount);
@@ -670,22 +673,6 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
       const provider = getProvider(library, chainId);
       const orderBookContract = new ethers.Contract(orderBookAddress, OrderBook.abi, provider);
       const orderBookReaderContract = new ethers.Contract(orderBookReaderAddress, OrderBookReader.abi, provider);
-
-      const fetchIndexesFromServer = () => {
-        const ordersIndexesUrl = `${getServerBaseUrl(chainId)}/orders_indices?account=${account}`;
-        return fetch(ordersIndexesUrl)
-          .then(async (res) => {
-            const json = await res.json();
-            const ret = {};
-            for (const key of Object.keys(json)) {
-              ret[key.toLowerCase()] = json[key].map((val) => parseInt(val.value));
-            }
-
-            return ret;
-          })
-          .catch(() => ({ swap: [], increase: [], decrease: [] }));
-      };
-
       const fetchLastIndex = async (type) => {
         const method = type.toLowerCase() + "OrdersIndex";
         return await orderBookContract[method](account).then((res) => bigNumberify(res._hex).toNumber());
@@ -697,7 +684,7 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
           fetchLastIndex("increase"),
           fetchLastIndex("decrease"),
         ]);
-
+        
         return { swap, increase, decrease };
       };
 
@@ -711,40 +698,168 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
         return _indexes;
       };
 
-      const getIndexes = (knownIndexes, lastIndex) => {
-        if (knownIndexes.length === 0) {
-          return getRange(lastIndex);
-        }
-        return [
-          ...knownIndexes,
-          ...getRange(lastIndex, knownIndexes[knownIndexes.length - 1] + 1).sort((a, b) => b - a),
-        ];
-      };
-
-      const getOrders = async (method, knownIndexes, lastIndex, parseFunc) => {
-        const indexes = getIndexes(knownIndexes, lastIndex);
+      const getOrders = async (method, lastIndex, parseFunc) => {
+        const indexes = getRange(lastIndex);
         const ordersData = await orderBookReaderContract[method](orderBookAddress, account, indexes);
         const orders = parseFunc(chainId, ordersData, account, indexes);
-
         return orders;
       };
 
       try {
-        const [serverIndexes, lastIndexes] = await Promise.all([fetchIndexesFromServer(), fetchLastIndexes()]);
+        const lastIndexes = await fetchLastIndexes();
         const [swapOrders = [], increaseOrders = [], decreaseOrders = []] = await Promise.all([
-          getOrders("getSwapOrders", serverIndexes.swap, lastIndexes.swap, parseSwapOrdersData),
-          getOrders("getIncreaseOrders", serverIndexes.increase, lastIndexes.increase, parseIncreaseOrdersData),
-          getOrders("getDecreaseOrders", serverIndexes.decrease, lastIndexes.decrease, parseDecreaseOrdersData),
+          getOrders("getSwapOrders", lastIndexes.swap, parseSwapOrdersData),
+          getOrders("getIncreaseOrders", lastIndexes.increase, parseIncreaseOrdersData),
+          getOrders("getDecreaseOrders", lastIndexes.decrease, parseDecreaseOrdersData),
         ]);
+        
         return [...swapOrders, ...increaseOrders, ...decreaseOrders];
       } catch (ex) {
         console.error(ex);
       }
     },
   });
+  
+  
 
   return [orders, updateOrders];
 
+}
+
+function parseSwapOrdersData(chainId, swapOrdersData, account, indexes) {
+  if (!swapOrdersData || !swapOrdersData.length) {
+    return [];
+  }
+
+  const extractor = sliced => {
+    const triggerAboveThreshold = sliced[6].toString() === "1";
+    const shouldUnwrap = sliced[7].toString() === "1";
+
+    return {
+      path: [sliced[0], sliced[1], sliced[2]].filter(
+        address => address !== AddressZero
+      ),
+      amountIn: sliced[3],
+      minOut: sliced[4],
+      triggerRatio: sliced[5],
+      triggerAboveThreshold,
+      type: SWAP,
+      shouldUnwrap
+    };
+  };
+  return _parseOrdersData(
+    swapOrdersData,
+    account,
+    indexes,
+    extractor,
+    5,
+    3
+  ).filter(order => {
+    return order.path.every(token => constantInstance.perpetuals.isValidToken(token));
+  });
+}
+
+function parseIncreaseOrdersData(
+  chainId,
+  increaseOrdersData,
+  account,
+  indexes
+) {
+  const extractor = sliced => {
+    const isLong = sliced[5].toString() === "1";
+    return {
+      purchaseToken: sliced[0],
+      collateralToken: sliced[1],
+      indexToken: sliced[2],
+      purchaseTokenAmount: sliced[3],
+      sizeDelta: sliced[4],
+      isLong,
+      triggerPrice: sliced[6],
+      triggerAboveThreshold: sliced[7].toString() === "1",
+      type: INCREASE
+    };
+  };
+  return _parseOrdersData(
+    increaseOrdersData,
+    account,
+    indexes,
+    extractor,
+    5,
+    3
+  ).filter(order => {
+    return (
+      constantInstance.perpetuals.isValidToken(order.purchaseToken) &&
+      constantInstance.perpetuals.isValidToken(order.collateralToken) &&
+      constantInstance.perpetuals.isValidToken(order.indexToken)
+    );
+  });
+}
+
+function parseDecreaseOrdersData(
+  chainId,
+  decreaseOrdersData,
+  account,
+  indexes
+) {
+  const extractor = sliced => {
+    const isLong = sliced[4].toString() === "1";
+    return {
+      collateralToken: sliced[0],
+      indexToken: sliced[1],
+      collateralDelta: sliced[2],
+      sizeDelta: sliced[3],
+      isLong,
+      triggerPrice: sliced[5],
+      triggerAboveThreshold: sliced[6].toString() === "1",
+      type: DECREASE
+    };
+  };
+  return _parseOrdersData(
+    decreaseOrdersData,
+    account,
+    indexes,
+    extractor,
+    5,
+    2
+  ).filter(order => {
+    return (
+      constantInstance.perpetuals.isValidToken(order.collateralToken) &&
+      constantInstance.perpetuals.isValidToken(order.indexToken)
+    );
+  });
+}
+
+function _parseOrdersData(
+  ordersData,
+  account,
+  indexes,
+  extractor,
+  uintPropsLength,
+  addressPropsLength
+) {
+  if (!ordersData || ordersData.length === 0) {
+    return [];
+  }
+  const [uintProps, addressProps] = ordersData;
+  const count = uintProps.length / uintPropsLength;
+
+  const orders = [];
+  for (let i = 0; i < count; i++) {
+    const sliced = addressProps
+      .slice(addressPropsLength * i, addressPropsLength * (i + 1))
+      .concat(uintProps.slice(uintPropsLength * i, uintPropsLength * (i + 1)));
+
+    if (sliced[0] === AddressZero && sliced[1] === AddressZero) {
+      continue;
+    }
+
+    const order = extractor(sliced);
+    order.index = indexes[i];
+    order.account = account;
+    orders.push(order);
+  }
+
+  return orders;
 }
 
 export function getProvider(library, chainId) {
@@ -763,7 +878,6 @@ export function getOrderKey(order) {
 
 export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   // eslint-disable-next-line
-  console.log("CALL CONTRACT:", library, contractInfo, additionalArgs)
   const [chainId, arg0, arg1, ...params] = args
   const provider = getProvider(library, chainId);
   const method = ethers.utils.isAddress(arg0) ? arg1 : arg0
@@ -881,36 +995,28 @@ export const padDecimals = (amount, minDecimals) => {
     return amountStr
   }
 export const formatAmount = (amount, tokenDecimals, displayDecimals, useCommas, defaultValue) => {
-  // console.log("hereim formatamount 1", amount);
 
   if (!defaultValue) {
       defaultValue = "..."
   }
-  // console.log("hereim formatamount 2", amount);
 
   if (amount === undefined || amount.toString().length === 0) {
       return defaultValue
   }
-  // console.log("hereim formatamount 3", amount);
 
   if (displayDecimals === undefined) {
       displayDecimals = 4
   }
-  // console.log("hereim formatamount 4", amount);
-
   let amountStr = ethers.utils.formatUnits(amount, tokenDecimals)
   amountStr = limitDecimals(amountStr, displayDecimals)
-  // console.log("hereim formatamount 5", amount);
 
   if (displayDecimals !== 0) {
       amountStr = padDecimals(amountStr, displayDecimals)
   }
-  // console.log("hereim formatamount 6", amount);
 
   if (useCommas) {
       return numberWithCommas(amountStr)
   }
-  // console.log("hereim formatamount 7", amount);
 
   return amountStr
 }
@@ -999,16 +1105,16 @@ function getNewPositionInfo(position, collateralDelta, method, keepLeverage) {
         if (!keepLeverage) {
 
             return {
-                'Size': formatAmount(newSize, USD_DECIMALS, 2, null, true),
-                'Leverage': formatAmount(newLeverage, 4, 2, null, true),
-                'Liq. Price': formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)
+                'Size': `$${formatAmount(newSize, USD_DECIMALS, 2, null, true)}`,
+                'Leverage': `${formatAmount(newLeverage, 4, 2, null, true)}x`,
+                'Liq. Price': `$${formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)}`
             }
 
         }
         return {
-            'Size': formatAmount(newSize, USD_DECIMALS, 2, null, true),
-            'Collateral': formatAmount(newCollateral, USD_DECIMALS, 2, null, true),
-            'Liq. Price': formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)
+            'Size': `$${formatAmount(newSize, USD_DECIMALS, 2, null, true)}`,
+            'Collateral': `$${formatAmount(newCollateral, USD_DECIMALS, 2, null, true)}`,
+            'Liq. Price': `$${formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)}`
         }
 
 
@@ -1025,8 +1131,6 @@ function getNewPositionInfo(position, collateralDelta, method, keepLeverage) {
         increaseCollateral: method == 'Deposit'
     });
 
-    console.log("collateral delta : ", collateralDelta.toString());
-    console.log("new liq price", newLiqPrice);
     let newLeverage = getLeverage({
         size: position.size,
         collateral: position.collateral,
@@ -1039,14 +1143,13 @@ function getNewPositionInfo(position, collateralDelta, method, keepLeverage) {
         includeDelta: false
     });
 
-    console.log("collateral delta : ", position.collateral.toString());
 
     let newCollateral = method == 'Deposit' ? position.collateral.add(collateralDelta) : position.collateral.sub(collateralDelta);
 
     return {
-        'Collateral': formatAmount(newCollateral, USD_DECIMALS, 2, null, true),
-        'Leverage': formatAmount(newLeverage, 4, 2, null, true),
-        'Liq. Price': formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)
+        'Collateral': `$${formatAmount(newCollateral, USD_DECIMALS, 2, null, true)}`,
+        'Leverage': `${formatAmount(newLeverage, 4, 2, null, true)}x`,
+        'Liq. Price': `$${formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)}`
     }
 
 }
@@ -1054,15 +1157,14 @@ function getNewPositionInfo(position, collateralDelta, method, keepLeverage) {
 
 // converts a current position into a new one according to the input ammount (USD)
 export function mapPositionData(position, mode, inputAmount, keepLeverage) {
-
     switch (mode) {
         case 'none':
             return {
-                'Size': formatAmount(position.size, USD_DECIMALS, 2, null, true),
-                'Collateral': formatAmount(position.collateral, USD_DECIMALS, 2, null, true),
-                'Leverage': formatAmount(position.leverage, 4, 2, null, true),
-                'Mark Price': formatAmount(position.markPrice, USD_DECIMALS, 2, null, true),
-                'Liq. Price': formatAmount(position.liqPrice, USD_DECIMALS, 2, null, true)
+                'Size':  `$${formatAmount(position.size, USD_DECIMALS, 2, null, true)}`,
+                'Collateral': `$${formatAmount(position.collateral, USD_DECIMALS, 2, null, true)}`,
+                'Leverage': `${formatAmount(position.leverage, 4, 2, null, true)}x`,
+                'Mark Price': `$${formatAmount(position.markPrice, USD_DECIMALS, 2, null, true)}`,
+                'Liq. Price': `$${formatAmount(position.liqPrice, USD_DECIMALS, 2, null, true)}`
             }
         case 'Deposit':
             return getNewPositionInfo(position, inputAmount, 'Deposit');
@@ -1468,12 +1570,10 @@ export function getNextToAmount(
     const toToken = getTokenInfo(infoTokens, toTokenAddress);
 
     if (fromToken.isNative && toToken.isWrapped) {
-        console.log("ymj test 1", fromAmount)
         return { amount: fromAmount };
     }
 
     if (fromToken.isWrapped && toToken.isNative) {
-        console.log("ymj test 2")
         return { amount: fromAmount };
     }
 
@@ -1495,7 +1595,6 @@ export function getNextToAmount(
 
         if (ratio && !ratio.isZero()) {
             const toAmount = toAmountBasedOnRatio;
-            console.log("ymj test")
             return {
                 amount: adjustDecimals(
                     toAmount
@@ -1507,14 +1606,6 @@ export function getNextToAmount(
         }
 
         const toAmount = fromAmount.mul(fromToken.minPrice).div(PRECISION);
-        console.log("ymj test", {
-            amount: adjustDecimals(
-                toAmount
-                    .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
-                    .div(BASIS_POINTS_DIVISOR)
-            ),
-            feeBasisPoints
-        });
         return {
             amount: adjustDecimals(
                 toAmount
@@ -1813,4 +1904,183 @@ export function formatDateTime(time) {
 }
 export function formatDate(time) {
   return formatDateFn(time * 1000, "dd MMM yyyy");
+}
+
+const NOW_TS = parseInt(Date.now() / 1000)
+const FIRST_DATE_TS = parseInt(+(new Date(2021, 7, 31)) / 1000)
+
+
+export function useActionData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "arbitrum" } = {}) {
+	const PROPS = 'margin liquidation swap mint burn'.split(' ')
+  const timestampProp = "timestamp"
+  const query = `{
+    contractTransactions(
+      first: 50,
+      orderBy: ${timestampProp},
+      orderDirection: desc
+    ) {
+      account
+      fromAmount
+      fromToken
+      id
+      isBuy
+      price
+      timestamp
+      toAmount
+      toToken
+      type
+    }
+  }`
+  const [graphData, loading, error] = useGraph(query, { chainName })
+
+  let data
+  if (graphData) {
+    data = sortBy(graphData.contractTransactions, item => item.id)
+  }
+  let data2
+  if (graphData) {
+    data2 = sortBy(graphData.contractTransactions, item => item.timestamp).map(value => {
+      const fromToken = getToken(value.fromToken)
+      const toToken = getToken(value.toToken)
+      const isLong = value.isBuy?'Long':'Short'
+      const priceAbove =  value.price > 0 ?">":"<";
+      const tem = BigNumber.from(value.price)
+      const price = `$${formatAmount(tem.abs(), USD_DECIMALS, 2, true)}`
+      const size = `$${formatAmount(value.toAmount, USD_DECIMALS, 2, true)}` // if size 
+      if(value.type == "increasePosition" ) {
+        return {
+          account: value.account,
+          action: `Increase ${toToken.symbol} ${isLong}`,
+          amount: size, 
+          price: price,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "decreasePosition") {
+        return {
+          account: value.account,
+          action: `Decrease ${toToken.symbol} ${isLong}`,
+          amount: size, 
+          price: price,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "liquidatePosition") {
+        return {
+          account: value.account,
+          action: `Liquidate  ${toToken.symbol} ${isLong}`,
+          amount: size, 
+          price: price,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "addLiquidity") {
+        return {
+          account: value.account,
+          action: `Add Liquidity`,
+          amount: formatTokenAmount(value.fromToken, value.fromAmount), // to do here
+          price: '-',
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "removeLiquidity") {
+        return {
+          account: value.account,
+          action: `Remove Liquidity`,
+          amount: formatTokenAmount(value.toToken, value.toAmount), // to do here
+          price: '-',
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "createIncreaseOrder") {
+        return {
+          account: value.account,
+          action: `Create Increase ${toToken.symbol} ${isLong} Order`,
+          amount: size, 
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "cancelIncreaseOrder") {
+        return {
+          account: value.account,
+          action: `Cancel Increase ${toToken.symbol} ${isLong} Order`,
+          amount: size,
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "updateIncreaseOrder") {
+        return {
+          account: value.account,
+          action: `Update Increase ${toToken.symbol} ${isLong} Order`,
+          amount: size, 
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "executeIncreaseOrder") {
+        return {
+          account: value.account,
+          action: `Execute increase ${toToken.symbol} ${isLong} Order`,
+          amount: size, 
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "createDecreaseOrder") {
+        return {
+          account: value.account,
+          action: `Create Decrease ${toToken.symbol} ${isLong} Order`,
+          amount: size, 
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "cancelDecreaseOrder") {
+        return {
+          account: value.account,
+          action: `Cancel Decrease ${toToken.symbol} ${isLong} Order`,
+          amount: size,
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "updateDecreaseOrder") {
+        return {
+          account: value.account,
+          action: `Update decrease ${toToken.symbol} ${isLong} Order`,
+          amount: size,
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } else if(value.type == "executeDecreaseOrder") {
+        return {
+          account: value.account,
+          action: `Execute decrease ${toToken.symbol} ${isLong} Order`,
+          amount: size, // to do here
+          price: `${priceAbove} ${price}`,
+          timestamp: value.timestamp,
+          hash: value.id
+        };
+      } 
+    })
+  }
+  return [data2, loading, error]
+}
+
+function formatTokenAmount(address, amount) {
+  const token = getToken(address)
+  return `${formatAmount(amount, token.decimals, 2, true)} ${token.symbol}`
+}
+
+function getToken(address) {
+  const supportedTokens = TOKEN_LIST();
+  for (let j = 0; j < supportedTokens.length; j++) {
+    if (address.toLowerCase() === supportedTokens[j].address.toLowerCase()) {
+      return supportedTokens[j];
+    }
+  }
+  return supportedTokens[0]
 }

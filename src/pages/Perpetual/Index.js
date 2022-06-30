@@ -2,7 +2,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-computed-key */
 import { Menu, Dropdown, message, Radio, Spin, Tabs, Layout } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
+import { ConsoleSqlOutlined, DownOutlined } from '@ant-design/icons';
 import { useWeb3React } from '@web3-react/core';
 import React, { Component, useState, useEffect, useRef, useCallback, useMemo, useHistory } from 'react';
 import { connect } from 'umi';
@@ -44,13 +44,14 @@ import {
   getDeltaStr,
   useLocalStorageByChainId,
   useAccountOrders,
-  formatAmount
+  formatAmount,
+
 } from '@/acy-dex-futures/utils';
 
 import { approvePlugin } from '@/acy-dex-futures/Api'
 import Media from 'react-media';
 import { uniqueFun } from '@/utils/utils';
-import { getTransactionsByAccount, appendNewSwapTx, findTokenWithSymbol } from '@/utils/txData';
+import { getTransactionsByAccount, appendNewSwapTx, findTokenWithSymbol, findTokenWithAddress } from '@/utils/txData';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import { getConstant } from '@/acy-dex-futures/utils/Constants'
 import PerpetualComponent from '@/components/PerpetualComponent';
@@ -254,32 +255,51 @@ const getTokenAddress = (token, nativeTokenAddress) => {
 
 export function getPositionQuery(tokens, nativeTokenAddress) {
   const collateralTokens = []
+  const indexTokens = []
   const isLong = []
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i]
+    if (token.isStable) { continue }
+    // if (token.isWrapped) { continue }
+    if (token.isNative) { continue }
+
+    for (let j = 0; j < tokens.length; j++) {
+      const collateral = tokens[j]
+      if (collateral.isNative) { continue }
+      collateralTokens.push(collateral.address)
+      indexTokens.push(getTokenAddress(token, nativeTokenAddress))
+      isLong.push(true)
+    }
+  }
 
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i]
     if (token.isStable) { continue }
-    if (token.isWrapped) { continue }
+    // if (token.isWrapped) { continue }
     if (token.isNative) { continue }
 
-    collateralTokens.push(getTokenAddress(token, nativeTokenAddress))
-    indexTokens.push(getTokenAddress(token, nativeTokenAddress))
-    isLong.push(true)
-  }
-
-  for (let i = 0; i < tokens.length; i++) {
-    const stableToken = tokens[i]
-    if (!stableToken.isStable) { continue }
-
     for (let j = 0; j < tokens.length; j++) {
-      const token = tokens[j]
-      if (token.isStable) { continue }
-      if (token.isWrapped) { continue }
-      collateralTokens.push(stableToken.address)
+      const collateral = tokens[j]
+      if (collateral.isNative) { continue }
+      collateralTokens.push(collateral.address)
       indexTokens.push(getTokenAddress(token, nativeTokenAddress))
       isLong.push(false)
     }
   }
+
+  // for (let i = 0; i < tokens.length; i++) {
+  //   const stableToken = tokens[i]
+  //   if (!stableToken.isStable) { continue }
+
+  // for (let j = 0; j < tokens.length; j++) {
+  //   const token = tokens[j]
+  //   if (token.isStable) { continue }
+  //   if (token.isWrapped) { continue }
+  //   collateralTokens.push(stableToken.address)
+  //   indexTokens.push(getTokenAddress(token, nativeTokenAddress))
+  //   isLong.push(false)
+  // }
+  // }
 
   return { collateralTokens, indexTokens, isLong }
 }
@@ -289,21 +309,20 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
   const propsLength = getConstant(chainId, "positionReaderPropsLength")
   // const propsLength = 9;
 
-  console.log('TESTING  getPositions', propsLength, infoTokens )
   const positions = []
   const positionsMap = {}
   // 
-  // if (!positionData) {
-  if (true) {
+  if (!positionData) {
+    // if (true) {
     return { positions, positionsMap }
   }
-  
+
   const { collateralTokens, indexTokens, isLong } = positionQuery
-  for (let i = 0; i < collateralTokens.length; i+=1) {
+  for (let i = 0; i < collateralTokens.length; i += 1) {
     const collateralToken = getTokenInfo(infoTokens, collateralTokens[i], true, nativeTokenAddress);
-    collateralToken.logoURI = findTokenWithSymbol(collateralToken.symbol).logoURI;
+    collateralToken.logoURI = findTokenWithAddress(collateralToken.address).logoURI;
     indexToken = getTokenInfo(infoTokens, indexTokens[i], true, nativeTokenAddress)
-    indexToken.logoURI = findTokenWithSymbol(collateralToken).logoURI;
+    indexToken.logoURI = findTokenWithAddress(indexToken.address).logoURI;
     const key = getPositionKey(collateralTokens[i], indexTokens[i], isLong[i])
 
     const position = {
@@ -366,7 +385,9 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
     if (position.size.gt(0)) {
       positions.push(position)
     }
+    position.liqPrice = getLiquidationPrice(position)
   }
+
 
   return { positions, positionsMap }
 }
@@ -415,7 +436,6 @@ const Swap = props => {
   // this are new states for PERPETUAL
   const [tableContent, setTableContent] = useState(POSITIONS);
   const [positionsData, setPositionsData] = useState([]);
-  const [ordersData, setOrdersData] = useState([]);
   const { active, activate } = useWeb3React();
   const [placement, setPlacement] = useState('5m');
   const [high24, setHigh24] = useState(0);
@@ -424,7 +444,7 @@ const Swap = props => {
   const [percentage24, setPercentage24] = useState(0);
   const [currentAveragePrice, setCurrentAveragePrice] = useState(0);
   const tokens = supportedTokens;
-  
+
   const defaultTokenSelection = useMemo(() => ({
     ["Pool"]: {
       from: AddressZero,
@@ -441,7 +461,7 @@ const Swap = props => {
       to: AddressZero,
     }
   }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
-// }), [chainId])
+  // }), [chainId])
 
 
   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
@@ -463,7 +483,6 @@ const Swap = props => {
   const fromTokenAddress = tokenSelection[swapOption].from
   const toTokenAddress = tokenSelection[swapOption].to
 
-  console.log("debug perpetual page, toTokenAddress: ", toTokenAddress)
 
   const { perpetuals } = useConstantLoader()
   const readerAddress = perpetuals.getContract("Reader")
@@ -480,10 +499,11 @@ const Swap = props => {
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
   const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
 
+
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
   })
-  const { data: positionData, mutate: updatePositionData } = useSWR([chainId, readerAddress, "getPositions", vaultAddress, account],{
+  const { data: positionData, mutate: updatePositionData } = useSWR([chainId, readerAddress, "getPositions", vaultAddress, account], {
     fetcher: fetcher(library, Reader, [positionQuery.collateralTokens, positionQuery.indexTokens, positionQuery.isLong]),
   })
   const tokenAddresses = tokens.map(token => token.address)
@@ -502,8 +522,8 @@ const Swap = props => {
   const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
     fetcher: fetcher(library, Glp),
   })
-  
-  const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR(account && [ chainId, routerAddress, "approvedPlugins", account, orderBookAddress], {
+
+  const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR(account && [chainId, routerAddress, "approvedPlugins", account, orderBookAddress], {
     fetcher: fetcher(library, Router)
   });
 
@@ -534,7 +554,6 @@ const Swap = props => {
   useEffect(() => {
     if (!supportedTokens) return
 
-    console.log("resetting page states")
     // reset on chainId change => supportedTokens change
     setPricePoint(0);
     setPastToken1('ETH');
@@ -562,21 +581,6 @@ const Swap = props => {
       item['liqPrice'] = getLiquidationPrice(item);
     }
     setPositionsData(samplePositionsData);
-
-    const sampleOrdersData = [
-      {
-        type: "Swap",
-        order: {
-          amountIn: 100,
-          fromTokenSymbol: "USDT",
-          amountOut: 50,
-          toTokenSymbol: "ACY"
-        },
-        price: 100,
-        markPrice: 105,
-      }
-    ]
-    setOrdersData(sampleOrdersData)
 
   }, [chainId])
 
@@ -655,28 +659,28 @@ const Swap = props => {
         `${apiUrlPrefix}/chart/swap?token0=${token0Address}&token1=${token1Address}&range=1D`
       )
       .then(data => {
-        console.log(data);
+
       });
   }
 
   const getCurrentTime = () => {
-    let currentTime = Math.floor(new Date().getTime()/1000);
+    let currentTime = Math.floor(new Date().getTime() / 1000);
     return currentTime;
   }
-  const getFromTime = ( currentTime ) => {
-    let fromTime = currentTime - 100* 24* 60* 60;
+  const getFromTime = (currentTime) => {
+    let fromTime = currentTime - 100 * 24 * 60 * 60;
     // console.log("hereim from time", fromTime);
     return fromTime;
   }
 
- 
+
   // useEffect(async () => {
   //   let currentTime = getCurrentTime();
   //   let previous24 = currentTime - 24*60*60;    
   //   console.log("hereim time", previous24, currentTime);
   //   let data24 = await getKChartData(activeToken1.symbol, "56", "1d", previous24.toString(), currentTime.toString(), "chainlink");
   //   console.log("hereim data24", data24);
-    
+
   //   let high24 = 0;
   //   let low24 = 0;
   //   let deltaPrice24 = 0;
@@ -689,7 +693,7 @@ const Swap = props => {
   //     currentAveragePrice = ((high24+low24)/2);
   //     percentage = Math.round((currentAveragePrice - deltaPrice24) *100 / currentAveragePrice *100)/100;
   //   }
-    
+
   //   setHigh24(high24);
   //   setLow24(low24);
   //   setDeltaPrice24(deltaPrice24);
@@ -699,9 +703,7 @@ const Swap = props => {
 
   useEffect(async () => {
     let currentTime = getCurrentTime();
-    console.log("hereim current time", getCurrentTime())
-    let previousTime = currentTime - 24*60*60 ;
-    console.log("hereim previous time", previousTime)
+    let previousTime = currentTime - 24 * 60 * 60;
 
     let data24 = await getKChartData(activeToken1.symbol, "56", "5m", previousTime.toString(), currentTime.toString(), "chainlink");
     let high24 = 0;
@@ -712,20 +714,20 @@ const Swap = props => {
     let highArr = [];
     let lowArr = [];
     if (data24.length > 0) {
-      for (let i=1; i < data24.length; i++){
+      for (let i = 1; i < data24.length; i++) {
         highArr.push(data24[i].high);
         lowArr.push(data24[i].low);
       }
       high24 = Math.max(...highArr);
       low24 = Math.min(...lowArr);
-      high24 = Math.round(high24*100)/100;
-      low24 = Math.round(low24*100)/100;
+      high24 = Math.round(high24 * 100) / 100;
+      low24 = Math.round(low24 * 100) / 100;
 
       deltaPrice24 = Math.round(data24[0].open * 100) / 100;
-      average = Math.round( ((high24+low24)/2) *100)/100;
-      percentage = Math.round((average - deltaPrice24) *100 / average *100)/100;
+      average = Math.round(((high24 + low24) / 2) * 100) / 100;
+      percentage = Math.round((average - deltaPrice24) * 100 / average * 100) / 100;
     }
-    
+
     setHigh24(high24);
     setLow24(low24);
     setDeltaPrice24(deltaPrice24);
@@ -784,30 +786,6 @@ const Swap = props => {
     ];
   };
 
-  const RenderTable = () => {
-    if (tableContent === POSITIONS) {
-      return (
-        <PositionsTable
-          isMobile={isMobile}
-          dataSource={positions}
-        />
-      )
-    } else if (tableContent === ACTIONS) {
-      return (
-        <ActionHistoryTable
-          isMobile={isMobile}
-          dataSource={positionsData}
-        />
-      )
-    } else if (tableContent === ORDERS) {
-      return (
-        <OrderTable
-          isMobile={isMobile}
-          dataSource={ordersData}
-        />
-      )
-    }
-  }
 
   const selectTime = pt => {
     const dateSwitchFunctions = {
@@ -938,7 +916,7 @@ const Swap = props => {
   const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsda", true], {
     fetcher: fetcher(library, GlpManager),
   })
-  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0) ) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0)) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   // const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   let glpBalanceUsd
   if (glpBalance) {
@@ -955,11 +933,11 @@ const Swap = props => {
   }
 
   const { Option } = Select;
-  
+
   const [updatingKchartsFlag, setUpdatingKchartsFlag] = useState(false);
 
-//charttokenselection
-  const { Header, Footer, Sider, Content } = Layout; 
+  //charttokenselection
+  const { Header, Footer, Sider, Content } = Layout;
 
   // const tokenPlacements = ['BTC', 'ETH'];
 
@@ -983,9 +961,9 @@ const Swap = props => {
     console.log("hereim see click token", e)
     setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
   }
-    
+
   const placementChange = e => {
-    if(updatingKchartsFlag) return;
+    if (updatingKchartsFlag) return;
 
     setUpdatingKchartsFlag(true);
     setPlacement(e.target.value);
@@ -1079,16 +1057,16 @@ const Swap = props => {
   return (
     <PageHeaderWrapper>
       <div className={styles.main}>
-      <div className={styles.rowFlexContainer}>
-        
-            <div className={styles.chartTokenSelectorTab}>
-              <PerpetualTabs
-                option={kChartTab}
-                options={kChartTabs}
-                onChange={selectChart}
-              />
+        <div className={styles.rowFlexContainer}>
+
+          <div className={styles.chartTokenSelectorTab}>
+            <PerpetualTabs
+              option={kChartTab}
+              options={kChartTabs}
+              onChange={selectChart}
+            />
             {/* <StyledTokenSelect value={tokenPlacements} onChange={tokenPlacementChange}> */}
-              {/* <StyledButton value="BTC" onClick={() => onClickSetActiveToken("BTC")} style={{ fontFamily:"Karla, sans-serif", height:"50px", background: "#0e0304", borderColor: "#0e0304" }}> 
+            {/* <StyledButton value="BTC" onClick={() => onClickSetActiveToken("BTC")} style={{ fontFamily:"Karla, sans-serif", height:"50px", background: "#0e0304", borderColor: "#0e0304" }}> 
                   <Row>
                     <Col span={12} style={{ lineHeight: "25px", fontSize: "1.5rem" }} >BTC</Col>
                     <Col span={12}>
@@ -1108,7 +1086,7 @@ const Swap = props => {
               </StyledButton> */}
             {/* </StyledTokenSelect> */}
 
-              {/* <StyledChartTab type="editable-card" onChange={onChange} activeKey={activeKey} 
+            {/* <StyledChartTab type="editable-card" onChange={onChange} activeKey={activeKey} 
               // <StyledChartTab type="editable-card" onChange={onChange} activeKey={activeKey} onEdit={onEdit}
                 style={{ background:'black', width:'100%', height:'45px'}}>
                 {panes.map((pane) => (
@@ -1118,14 +1096,14 @@ const Swap = props => {
                   </TabPane>
                 ))}
               </StyledChartTab> */}
-        
-            </div>
-            <div className={styles.timeSelector}>
-              
+
+          </div>
+          <div className={styles.timeSelector}>
 
 
-              
-                {/* <div className={styles.tokenSelector}>
+
+
+            {/* <div className={styles.tokenSelector}>
                   {/* <Select 
                     value={activeToken1.symbol} 
                     onChange={onClickDropdown}                  
@@ -1135,55 +1113,55 @@ const Swap = props => {
                       <Option className={styles.optionItem} value={option.symbol}>{option.symbol} / USD</Option>
                     ))}
                   </Select> */}
-                {/* </div> */}
-                {/* {lineTitleRender()
+            {/* </div> */}
+            {/* {lineTitleRender()
                 }  */}
-                {/* <PerpetualTimeSelector
+            {/* <PerpetualTimeSelector
                   option={placement}
                   options={placements}
                   onChange={placementChange}
                   // style={{ height: '10px'}}
                 /> */}
-                <StyledSelect value={placement} onChange={placementChange} 
-                  style={{ width:'50%', height:'23px'}}>
-                  <Radio.Button value="1m" style={{width:'9%'}}>1m</Radio.Button>
-                  <Radio.Button value="5m" style={{width:'9%'}}>5m</Radio.Button>
-                  <Radio.Button value="15m" style={{width:'9%'}}>15m</Radio.Button>
-                  <Radio.Button value="30m" style={{width:'9%'}}>30m</Radio.Button>
-                  <Radio.Button value="1h" style={{width:'9%'}}>1h</Radio.Button>
-                  <Radio.Button value="2h" style={{width:'9%'}}>2h</Radio.Button>
-                  <Radio.Button value="4h" style={{width:'9%'}}>4h</Radio.Button>
-                  <Radio.Button value="1d" style={{width:'9%'}}>1D</Radio.Button>
-                  <Radio.Button value="1w" style={{width:'9%'}}>1W</Radio.Button>
-                </StyledSelect>
-            </div>
+            <StyledSelect value={placement} onChange={placementChange}
+              style={{ width: '100%', height: '23px', paddingRight: '50%', borderBottom: '0.75px solid #333333' }}>
+              <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
+              <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>
+              <Radio.Button value="15m" style={{ width: '9%', textAlign: 'center' }}>15m</Radio.Button>
+              <Radio.Button value="30m" style={{ width: '9%', textAlign: 'center' }}>30m</Radio.Button>
+              <Radio.Button value="1h" style={{ width: '9%', textAlign: 'center' }}>1h</Radio.Button>
+              <Radio.Button value="2h" style={{ width: '9%', textAlign: 'center' }}>2h</Radio.Button>
+              <Radio.Button value="4h" style={{ width: '9%', textAlign: 'center' }}>4h</Radio.Button>
+              <Radio.Button value="1d" style={{ width: '9%', textAlign: 'center' }}>1D</Radio.Button>
+              <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
+            </StyledSelect>
+          </div>
           {/* K chart */}
-              
-              
+
+
           <div className={styles.kchartBox}>
             <div style={{ backgroundColor: '#0E0304', margin: '10px', height: "450px", display: "flex", flexDirection: "column" }}>
-            
+
               <div className={`${styles.colItem} ${styles.priceChart}`} style={{ flex: 1 }}>
                 {
                   // currentAveragePrice === 0 ?
                   // <Spin/>
                   // // : <KChart activeToken0={activeToken0} activeToken1={activeToken1} activeTimeScale={activeTimeScale} currentAveragePrice={currentAveragePrice} />
                   // :
-                  <ExchangeTVChart 
-                  swapOption={swapOption}
-                  fromTokenAddress={fromTokenAddress}
-                  toTokenAddress={toTokenAddress}
-                  period={placement}
-                  infoTokens={infoTokens}
-                  chainId={chainId}
-                  positions={positions}
-                  // savedShouldShowPositionLines,
-                  orders={orders}
-                  setToTokenAddress={setToTokenAddress}
+                  <ExchangeTVChart
+                    swapOption={swapOption}
+                    fromTokenAddress={fromTokenAddress}
+                    toTokenAddress={toTokenAddress}
+                    period={placement}
+                    infoTokens={infoTokens}
+                    chainId={chainId}
+                    positions={positions}
+                    // savedShouldShowPositionLines,
+                    orders={orders}
+                    setToTokenAddress={setToTokenAddress}
                   />
                 }
               </div>
-            </div> 
+            </div>
 
           </div>
 
@@ -1198,7 +1176,28 @@ const Swap = props => {
                     <a className={`${styles.colItem} ${styles.optionTab}`} onClick={() => { setTableContent(ACTIONS) }}>Actions </a>
                   </div>
                   <div className={styles.positionsTable}>
-                    <RenderTable />
+                    {tableContent == POSITIONS && (
+                      <PositionsTable
+                        isMobile={isMobile}
+                        dataSource={positions}
+                        setPendingTxns={setPendingTxns}
+                        infoTokens={infoTokens}
+                      />
+                    )}
+                    {tableContent == ORDERS && (
+                      <OrderTable
+                        isMobile={isMobile}
+                        dataSource={orders}
+                        infoTokens={infoTokens}
+                      />
+                    )}
+                    {tableContent == ACTIONS && (
+                      <ActionHistoryTable
+                        isMobile={isMobile}
+                        dataSource={positionsData}
+                      />
+                    )}
+
                   </div>
                 </div>
               </AcyPerpetualCard>

@@ -1134,7 +1134,7 @@ const SwapComponent = props => {
     }
 
     if (isLong) {
-      let requiredAmount = toAmount;
+      
       if (fromTokenAddress !== toTokenAddress) {
         const { amount: swapAmount } = getNextToAmount(
           chainId,
@@ -1148,8 +1148,8 @@ const SwapComponent = props => {
           totalTokenWeights
         );
         
-        requiredAmount = requiredAmount.add(swapAmount);
-        console.log("DEBUG HERE2:", requiredAmount.toString(), fromTokenInfo.availableAmount.toString(), leverageOption)
+        // requiredAmount = requiredAmount.add(swapAmount);
+        let requiredAmount = fromAmount.mul(parseInt(leverageOption*100)).div(100);
         if (
           toToken &&
           toTokenAddress !== USDG_ADDRESS &&

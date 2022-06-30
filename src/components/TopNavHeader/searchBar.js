@@ -486,6 +486,7 @@ export const SearchBar = props => {
                         border: '1px solid #333333',
                         paddingLeft: '20px',
                         height: '50%',
+                        fontSize: '14px',
                       }}
                       onFocus={onSearchFocus}
                       onChange={onInput}

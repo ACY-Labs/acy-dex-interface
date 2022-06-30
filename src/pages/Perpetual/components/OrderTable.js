@@ -6,38 +6,84 @@ import formatNumber from 'accounting-js/lib/formatNumber.js';
 import  { abbrNumber } from '../../Market/Util.js';
 import { constantInstance } from '@/constants';
 import { sortTableTime } from '../utils'
+import { formatAmount, USD_DECIMALS, getTokenInfo } from '@/acy-dex-futures/utils';
 
 const OrderTable = props => {
-  const { dataSource, isMobile } = props;
+
+  const { dataSource, isMobile, infoTokens } = props;
   const [ orderDisplayNumber, setOrderDisplayNumber ] = useState(5);
 
   const sampleOrderColumns = [
     {
       title: 'Type',
       dataIndex: 'type',
+      align: 'left',
+      render: (text, record) => {
+        if(text == "Increase") {
+          if(record.isLong) {
+            return <div className={styles.tableEntryGreen}> Litmit / Long </div>;
+          } else {
+            return <div className={styles.tableEntryRed}> Litmit / Short </div>;
+          }
+          
+        } else if(text == "Decrease") {
+          if(record.isLong && record.triggerAboveThreshold || !record.isLong && !record.triggerAboveThreshold) {
+            return <div className={styles.tableEntryGreen}> Take Profit </div>;
+          } else {
+            return <div className={styles.tableEntryRed}> Stop Loss </div>;
+          }
+        }
+        
+      }
     },
     {
       title: 'Order',
       dataIndex: 'order',
       align: 'left',
       render: (text, record) => {
-        return <div className={styles.tableData}>Swap {record.order.fromTokenSymbol} (${abbrNumber(record.order.amountIn)}) for {record.order.toTokenSymbol} (${record.order.amountOut})</div>;
+        const indexToken = getTokenInfo(infoTokens,record.indexToken)
+        
+        if(record.type == "Increase") {
+          const purchaseToken = getTokenInfo(infoTokens, record.purchaseToken)
+          return <div>
+            <div className={styles.tableData}>
+              {record.type} {indexToken.symbol} {record.isLong ? "Long" : "Short"}
+              &nbsp;by ${formatAmount(record.sizeDelta, USD_DECIMALS, 2, true)}
+            </div>
+            <div className={styles.tableData}>
+              Collateral: {formatAmount(record.purchaseTokenAmount, purchaseToken.decimals, 2, true)} {purchaseToken.symbol}
+            </div>
+          </div>
+          
+        } else if(record.type == "Decrease") {
+          const collateralToken = getTokenInfo(infoTokens, record.collateralToken)
+          return <div>
+            <div className={styles.tableData}>
+              {record.type} {indexToken.symbol} {record.isLong ? "Long" : "Short"}
+              &nbsp;by ${formatAmount(record.sizeDelta, USD_DECIMALS, 2, true)}
+            </div>
+            <div className={styles.tableData}>
+              Withdraw collateral: ${formatAmount(record.collateralDelta, USD_DECIMALS, 2, true)} {collateralToken.symbol}
+            </div>
+          </div>
+        }
       }
     },
     {
       title: 'Trigger Price',
-      dataIndex: 'price',
+      dataIndex: 'triggerPrice',
       align: 'left',
       render: (text, record) => {
-        return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
+        return <div className={styles.tableData}> {record.triggerAboveThreshold? ">": "<"} $ {formatAmount(text, USD_DECIMALS, 2, false)}</div>;
       }
     },
     {
       title: 'Mark Price',
-      dataIndex: 'markPrice',
+      dataIndex: 'triggerPrice',
       align: 'left',
       render: (text, record) => {
-        return <div className={styles.tableData}>$ {abbrNumber(text)}</div>;
+        const indexToken = getTokenInfo(infoTokens,record.indexToken)
+        return <div className={styles.tableData}>$ {formatAmount(indexToken.maxPrice, USD_DECIMALS, 2, false)}</div>;
       }
     },
   ]

@@ -368,7 +368,7 @@ export async function createIncreaseOrder(
   triggerPrice,
   opts = {}
 ) {
-  invariant(!isLong || indexTokenAddress === collateralTokenAddress, "invalid token addresses")
+  // invariant(!isLong || indexTokenAddress === collateralTokenAddress, "invalid token addresses")
   invariant(indexTokenAddress !== AddressZero, "indexToken is 0")
   invariant(collateralTokenAddress !== AddressZero, "collateralToken is 0")
 
@@ -399,7 +399,6 @@ export async function createIncreaseOrder(
 
   const orderBookAddress = getContract(chainId, "OrderBook")
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner())
-
   return callContract(chainId, contract, 'createIncreaseOrder', params, opts)
 }
 
@@ -415,7 +414,7 @@ export async function createDecreaseOrder(
   triggerAboveThreshold,
   opts = {}
 ) {
-  invariant(!isLong || indexTokenAddress === collateralTokenAddress, "invalid token addresses")
+  // invariant(!isLong || indexTokenAddress === collateralTokenAddress, "invalid token addresses")
   invariant(indexTokenAddress !== AddressZero, "indexToken is 0")
   invariant(collateralTokenAddress !== AddressZero, "collateralToken is 0")
 
@@ -433,7 +432,6 @@ export async function createDecreaseOrder(
   opts.value = executionFee
   const orderBookAddress = getContract(chainId, "OrderBook")
   const contract = new ethers.Contract(orderBookAddress, OrderBook.abi, library.getSigner())
-
   return callContract(chainId, contract, 'createDecreaseOrder', params, opts)
 }
 
