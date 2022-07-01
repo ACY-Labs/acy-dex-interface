@@ -39,15 +39,11 @@ const timezoneOffset = -new Date().getTimezoneOffset() * 60;
 
 const BinancePriceApi = 'https://api.acy.finance/polygon-test';
 
-export function getChartToken(swapOption, fromToken, toToken, chainId) {
-  console.log("swapOption: ", swapOption)
+export function getChartToken(fromToken, toToken, chainId) {
   if (!fromToken || !toToken) {
     return;
   }
 
-  if (swapOption !== SWAP) {
-    return toToken;
-  }
 
   if (fromToken.isUsdg && toToken.isUsdg) {
     return constantInstance.perpetuals.tokenList.find((t) => t.isStable);
@@ -139,15 +135,15 @@ const getChartOptions = (width, height) => ({
 
 export default function ExchangeTVChart(props) {
   const {
-    swapOption,
+    // swapOption,
     fromTokenAddress,
     toTokenAddress,
     period,
     infoTokens,
     chainId,
-    positions,
+    // positions,
     // savedShouldShowPositionLines,
-    orders,
+    // orders,
     setToTokenAddress
   } = props
   const [currentChart, setCurrentChart] = useState();
@@ -164,22 +160,24 @@ export default function ExchangeTVChart(props) {
   const fromToken = getTokenInfo(infoTokens, fromTokenAddress)
   const toToken = getTokenInfo(infoTokens, toTokenAddress)
   // console.log("chart debug: infotokens", infoTokens, toTokenAddress, fromToken, toToken)
+  console.log("hereim in swap kchart", fromToken, toToken)
 
   const [chartToken, setChartToken] = useState({
     maxPrice: null,
     minPrice: null
   })
   useEffect(() => {
-    const tmp = getChartToken(swapOption, fromToken, toToken, chainId)
+    const tmp = getChartToken(fromToken, toToken, chainId)
     setChartToken(tmp)
   }, [fromToken, toToken, chainId])
+
 
   const symbol = chartToken ? (chartToken.isWrapped ? chartToken.baseSymbol : chartToken.symbol) : undefined;
   const marketName = chartToken ? symbol + "_USD" : undefined;
   const previousMarketName = usePrevious(marketName);
 
   // const currentOrders = useMemo(() => {
-  //   if (swapOption === SWAP || !chartToken) {
+  //   if (!chartToken) {
   //     return [];
   //   }
 
@@ -193,7 +191,7 @@ export default function ExchangeTVChart(props) {
   //     const indexToken = constantInstance.perpetuals.getToken(order.indexToken);
   //     return order.indexToken === chartToken.address || (chartToken.isNative && indexToken.isWrapped);
   //   });
-  // }, [orders, chartToken, swapOption, chainId]);
+  // }, [orders, chartToken, chainId]);
 
   const ref = useRef(null);
   const chartRef = useRef(null);
@@ -237,7 +235,7 @@ export default function ExchangeTVChart(props) {
   
     // subscribe to websocket for the future price update
     const clean = client.ws.candles(pairName, period, (res) => {
-      console.log("res: ", res)
+      console.log("res Swap: ", res)
       const candleData = {
         time: res.startTime / 1000,   // make it in seconds
         open: res.open,
@@ -332,7 +330,7 @@ export default function ExchangeTVChart(props) {
       return;
     }
     const resizeChart = () => {
-      currentChart.resize(chartRef.current.offsetWidth, chartRef.current.offsetHeight);
+      currentChart.resize(chartRef.current.offsetWidth, 470);
       console.log("debug chart: resize ", chartRef.current.offsetWidth, chartRef.current.offsetHeight)
     };
     resizeChart();

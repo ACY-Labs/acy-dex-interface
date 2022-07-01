@@ -484,7 +484,7 @@ const SwapComponent = props => {
         alert('Please connect to your account');
       } else {
         console.log('SET TOKEN 0');
-        console.log(onSelectToken0);
+        console.log("onselect token0", token);
         onSelectToken0(token);
         setToken0(token);
         setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
@@ -494,6 +494,7 @@ const SwapComponent = props => {
       if (account == undefined) {
         alert('Please connect to your account');
       } else {
+        console.log("onselect token1", token);
         onSelectToken1(token);
         setToken1(token);
         setToken1Balance(await getUserTokenBalance(token, chainId, account, library));

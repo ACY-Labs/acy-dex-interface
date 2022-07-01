@@ -63,7 +63,9 @@ export const CHART_PERIODS = {
   "1m": 60, 
   "5m": 60 * 5,
   "15m": 60 * 15,
+  "30m": 60 * 30,
   "1h": 60 * 60,
+  "2h": 60 * 60 * 2,
   "4h": 60 * 60 * 4,
   "1d": 60 * 60 * 24,
   "1w": 60 * 60 * 24 * 7
@@ -651,6 +653,8 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
 
         infoTokens[token.address] = token
     }
+
+    // console.log("hereim see infoTokens", infoTokens)
 
     return infoTokens
 }

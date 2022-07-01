@@ -474,7 +474,6 @@ const Swap = props => {
   }, [tokenSelection, setTokenSelection])
 
   const setToTokenAddress = useCallback((selectedSwapOption, address) => {
-    // console.log("hereim see tokenSelection", tokenSelection)
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
     newTokenSelection[selectedSwapOption].to = address
     setTokenSelection(newTokenSelection)
@@ -962,11 +961,14 @@ const Swap = props => {
   }
     
   const placementChange = e => {
-    if(updatingKchartsFlag) return;
+    // if(updatingKchartsFlag) {
+    //   return;
+    // }
 
-    setUpdatingKchartsFlag(true);
+    // setUpdatingKchartsFlag(true);
     setPlacement(e.target.value);
     setActiveTimeScale(e.target.value);
+    console.log("hereim button triggered", e.target.value)
   };
 
   const chartPanes = [
