@@ -707,7 +707,7 @@ function getTokenBySymbol(tokenlist, symbol) {
                       setToTokenAddress={setToTokenAddress}
                     />
                   }
-                  </div>
+                </div>
                 // <div>Kchart here</div>
               }
             </div>
