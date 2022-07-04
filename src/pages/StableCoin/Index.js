@@ -65,7 +65,7 @@ const StableCoin = props => {
   }
 
   const { perpetuals } = useConstantLoader()
-  const readerAddress = perpetuals.getContract("Reader")  
+  const readerAddress = perpetuals.getContract("Reader")
   const vaultAddress = perpetuals.getContract("Vault")
   const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
 
@@ -87,7 +87,7 @@ const StableCoin = props => {
       to: AddressZero,
     }
   }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
-  
+
 
   const tokenAddresses = tokens.map(token => token.address)
   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
@@ -128,38 +128,26 @@ const StableCoin = props => {
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
           <div className={`${styles.colItem} ${styles.priceChart}`}>
-            <div className={styles.graphTab}>
-              <PerpetualTabs
-                option={graphType}
-                options={graphTypes}
-                onChange={showGraph}
+            {/* <div className={styles.dataBlock}> */}
+            <div >
+              <ExchangeTVChart
+                swapOption={'LONG'}
+                fromTokenAddress={"0x0000000000000000000000000000000000000000"}
+                toTokenAddress={"0x05d6f705C80d9F812d9bc1A142A655CDb25e2571"}
+                period={'5m'}
+                infoTokens={infoTokens}
+                chainId={chainId}
+                // positions={positions}
+                // savedShouldShowPositionLines,
+                // orders={orders}
+                setToTokenAddress={setToTokenAddress}
               />
             </div>
-            {/* <div className={styles.dataBlock}> */}
-            <div>
-              {graphType == "StableCoin" ? 
-              <div>
+            <div className={styles.bottomWrapper}>
+              <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
                 <AccountBox />
                 <ExchangeTable />
-              </div>
-              :
-              <div>
-                {
-                  <ExchangeTVChart 
-                    swapOption={'LONG'}
-                    fromTokenAddress={"0x0000000000000000000000000000000000000000"}
-                    toTokenAddress={"0x05d6f705C80d9F812d9bc1A142A655CDb25e2571"}
-                    period={'5m'}
-                    infoTokens={infoTokens}
-                    chainId={chainId}
-                    // positions={positions}
-                    // savedShouldShowPositionLines,
-                    // orders={orders}
-                    setToTokenAddress={setToTokenAddress}
-                  />
-                }
-              </div>
-            }
+              </AcyCard>
             </div>
           </div>
 

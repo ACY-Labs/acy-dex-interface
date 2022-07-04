@@ -112,16 +112,16 @@ export class SmallTable extends React.Component {
     if (this.state.mode == 'token') {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <AcyTokenIcon symbol={entry.image} width={20} />
+          {/* <AcyTokenIcon symbol={entry.image} width={20} /> */}
           <Link
             style={{ color: 'white' }}
             className={styles.coinName}
-            // to={`/market/info/token/${entry.address}`}
+          // to={`/market/info/token/${entry.address}`}
           >
             {entry.symbol}
           </Link>
           <div style={{ width: 5 }}></div>
-          <span className={styles.coinShort}> ({entry.name})</span>
+          <span className={styles.coinShort}> {entry.name} </span>
           {/* Watchlist star */}
           {/* <AcyIcon
             name={watchlistManagerToken.getData().includes(entry.address) ? 'star_active' : 'star'}
@@ -418,39 +418,41 @@ export function TokenTable(props) {
   }
 
   return (
-    <Table
-      dataSource={sortTable(props.dataSourceCoin, currentKey, tokenSortAscending).slice(
-        0,
-        tokenDisplayNumber + 1
-      )}
-      columns={columnsCoin(tokenSortAscending, () => {
-        setTokenSortAscending(!tokenSortAscending);
-      }).filter(item => item.visible == true)}
-      pagination={false}
-      style={{
-        marginBottom: '20px',
-        cursor: isHover ? 'pointer' : 'default',
-      }}
-      onRowClick={(record, index, event) => {
-        navHistory.push(`/market/info/token/${record.address}`);
-      }}
-      onRowMouseEnter={() => setIsHover(true)}
-      onRowMouseLeave={() => setIsHover(false)}
-      footer={() => (
-        <div className={styles.tableSeeMoreWrapper}>
-          {props.dataSourceCoin.slice(0, tokenDisplayNumber + 1).length > tokenDisplayNumber && (
-            <a
-              className={styles.tableSeeMore}
-              onClick={() => {
-                setTokenDisplayNumber(tokenDisplayNumber + 5);
-              }}
-            >
-              See More...
-            </a>
-          )}
-        </div>
-      )}
-    />
+    <div className={styles.nobgTable}>
+      <Table
+        dataSource={sortTable(props.dataSourceCoin, currentKey, tokenSortAscending).slice(
+          0,
+          tokenDisplayNumber + 1
+        )}
+        columns={columnsCoin(tokenSortAscending, () => {
+          setTokenSortAscending(!tokenSortAscending);
+        }).filter(item => item.visible == true)}
+        pagination={false}
+        style={{
+          marginBottom: '20px',
+          cursor: isHover ? 'pointer' : 'default',
+        }}
+        onRowClick={(record, index, event) => {
+          navHistory.push(`/market/info/token/${record.address}`);
+        }}
+        onRowMouseEnter={() => setIsHover(true)}
+        onRowMouseLeave={() => setIsHover(false)}
+        footer={() => (
+          <div className={styles.tableSeeMoreWrapper}>
+            {props.dataSourceCoin.slice(0, tokenDisplayNumber + 1).length > tokenDisplayNumber && (
+              <a
+                className={styles.tableSeeMore}
+                onClick={() => {
+                  setTokenDisplayNumber(tokenDisplayNumber + 5);
+                }}
+              >
+                See More...
+              </a>
+            )}
+          </div>
+        )}
+      />
+    </div>
   );
 }
 
@@ -614,39 +616,41 @@ export function PoolTable(props) {
   }
 
   return (
-    <Table
-      dataSource={sortTable(props.dataSourcePool, currentKey, poolSortAscending).slice(
-        0,
-        poolDisplayNumber + 1
-      )}
-      columns={columnsPool(poolSortAscending, () => {
-        setPoolSortAscending(!poolSortAscending);
-      }).filter(item => item.visible == true)}
-      pagination={false}
-      onRowMouseEnter={() => setIsHover(true)}
-      onRowMouseLeave={() => setIsHover(false)}
-      onRowClick={(record, index, event) => {
-        navHistory.push(`/market/info/pool/${record.pairAddr}`);
-      }}
-      style={{
-        marginBottom: '20px',
-        cursor: isHover ? 'pointer' : 'default',
-      }}
-      footer={() => (
-        <div className={styles.tableSeeMoreWrapper}>
-          {props.dataSourcePool.slice(0, poolDisplayNumber + 1).length > poolDisplayNumber && (
-            <a
-              className={styles.tableSeeMore}
-              onClick={() => {
-                setPoolDisplayNumber(poolDisplayNumber + 5);
-              }}
-            >
-              See More...
-            </a>
-          )}
-        </div>
-      )}
-    />
+    <div className={styles.nobgTable}>
+      <Table
+        dataSource={sortTable(props.dataSourcePool, currentKey, poolSortAscending).slice(
+          0,
+          poolDisplayNumber + 1
+        )}
+        columns={columnsPool(poolSortAscending, () => {
+          setPoolSortAscending(!poolSortAscending);
+        }).filter(item => item.visible == true)}
+        pagination={false}
+        onRowMouseEnter={() => setIsHover(true)}
+        onRowMouseLeave={() => setIsHover(false)}
+        onRowClick={(record, index, event) => {
+          navHistory.push(`/market/info/pool/${record.pairAddr}`);
+        }}
+        style={{
+          marginBottom: '20px',
+          cursor: isHover ? 'pointer' : 'default',
+        }}
+        footer={() => (
+          <div className={styles.tableSeeMoreWrapper}>
+            {props.dataSourcePool.slice(0, poolDisplayNumber + 1).length > poolDisplayNumber && (
+              <a
+                className={styles.tableSeeMore}
+                onClick={() => {
+                  setPoolDisplayNumber(poolDisplayNumber + 5);
+                }}
+              >
+                See More...
+              </a>
+            )}
+          </div>
+        )}
+      />
+    </div>
   );
 }
 
@@ -890,43 +894,45 @@ export function TransactionTable(props) {
   //
 
   return (
-    <Table
-      dataSource={sortTable(
-        filterTransaction(props.dataSourceTransaction, transactionView),
-        currentKey,
-        transactionSortAscending
-      ).slice(0, transactionDisplayNumber + 1)}
-      columns={transactionHeader(
-        transactionView,
-        onClickTransaction,
-        transactionSortAscending,
-        () => {
-          setTransactionSortAscending(!transactionSortAscending);
-        }
-      ).filter(item => item.visible == true)}
-      pagination={false}
-      locale={{ emptyText: 'No Data' }}
-      style={{
-        marginBottom: '20px',
-      }}
-      footer={() => (
-        <div className={styles.tableSeeMoreWrapper}>
-          {filterTransaction(props.dataSourceTransaction, transactionView).slice(
-            0,
-            transactionDisplayNumber + 1
-          ).length > transactionDisplayNumber && (
-              <a
-                className={styles.tableSeeMore}
-                onClick={() => {
-                  setTransactionDisplayNumber(transactionDisplayNumber + 5);
-                }}
-              >
-                See More...
-              </a>
-            )}
-        </div>
-      )}
-    />
+    <div className={styles.nobgTable}>
+      <Table
+        dataSource={sortTable(
+          filterTransaction(props.dataSourceTransaction, transactionView),
+          currentKey,
+          transactionSortAscending
+        ).slice(0, transactionDisplayNumber + 1)}
+        columns={transactionHeader(
+          transactionView,
+          onClickTransaction,
+          transactionSortAscending,
+          () => {
+            setTransactionSortAscending(!transactionSortAscending);
+          }
+        ).filter(item => item.visible == true)}
+        pagination={false}
+        locale={{ emptyText: 'No Data' }}
+        style={{
+          marginBottom: '20px',
+        }}
+        footer={() => (
+          <div className={styles.tableSeeMoreWrapper}>
+            {filterTransaction(props.dataSourceTransaction, transactionView).slice(
+              0,
+              transactionDisplayNumber + 1
+            ).length > transactionDisplayNumber && (
+                <a
+                  className={styles.tableSeeMore}
+                  onClick={() => {
+                    setTransactionDisplayNumber(transactionDisplayNumber + 5);
+                  }}
+                >
+                  See More...
+                </a>
+              )}
+          </div>
+        )}
+      />
+    </div>
   );
 }
 
@@ -1117,9 +1123,9 @@ export function CurrencyTable(props) {
         render: (text, entry) => {
           // Fully-diluted market cap (FDMC) = price x max supply. If max supply is null, FDMC = price x total supply
           let val
-          if(entry.max_supply !== null) {
+          if (entry.max_supply !== null) {
             val = `$${abbrNumber(entry.max_supply * entry.current_price)}`
-          } else if(entry.total_supply !== null) {
+          } else if (entry.total_supply !== null) {
             val = `$${abbrNumber(entry.total_supply * entry.current_price)}`
           } else {
             val = '-'
@@ -1135,26 +1141,26 @@ export function CurrencyTable(props) {
         key: 'favourite',
         render: (text, entry) => {
           return (
-          <div
-            onClick={() => {
-              console.log('favTokenList', entry, favTokenList)
-              if (favTokenList.includes(entry)) {
-                setFavTokenList(favTokenList.filter(value => value != entry))
-              } else {
-                favTokenList.push(entry)
-              }
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              style={{ height: '1.25rem' }}
-              className={styles.favButton}
-              viewBox="0 0 20 20"
-              fill={favTokenList.includes(entry) ? "#EB5C20" : "currentColor"}
+            <div
+              onClick={() => {
+                console.log('favTokenList', entry, favTokenList)
+                if (favTokenList.includes(entry)) {
+                  setFavTokenList(favTokenList.filter(value => value != entry))
+                } else {
+                  favTokenList.push(entry)
+                }
+              }}
             >
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ height: '1.25rem' }}
+                className={styles.favButton}
+                viewBox="0 0 20 20"
+                fill={favTokenList.includes(entry) ? "#EB5C20" : "currentColor"}
+              >
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </div>
           )
         },
         visible: isDesktop(),
@@ -1281,12 +1287,12 @@ export const MarketSearchBar = props => {
     setSearchQuery(e.target.value);
     const key = 'volume24h'
     setSearchCoinReturns(
-      // localToken.filter(
-      //   token => token.short.includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase())
-      // )
-      props.dataSourceCoin.filter(
-        token => token.symbol.includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase())
+      localToken.filter(
+        token => token.short.includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase())
       )
+      // props.dataSourceCoin.filter(
+      //   token => token.symbol.includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase())
+      // )
     );
     setSearchPoolReturns(
       localPool.filter(
