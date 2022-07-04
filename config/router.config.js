@@ -95,6 +95,12 @@ export default [
         component: './Farms/',
       },
       {
+        path: './statistics/market',
+        name:'Statistics',
+        component: './Stats/Market/Index',
+        hideInMenu: true,
+      },
+      {
         path: '/statistics/future',
         name: 'Statistics',
         component: './Stats/Perpetual/Index',

@@ -85,7 +85,7 @@ const Stats = (props) => {
 
   const params = { from, to, groupPeriod }
 
-  
+
 
   const [borrowRateData, borrowRateLoading] = useBorrowRateData(params)
   const [volumeData, volumeLoading] = useVolumeData(params)
@@ -187,6 +187,14 @@ const Stats = (props) => {
           </p>
         }
         <div className={`${styles.colItem}`}>
+          <a
+            className={`${styles.colItem} ${styles.optionTab}`}
+            onClick={() => {
+              history.push('/statistics/market')
+            }}
+          >
+            Market
+          </a>
           <a className={`${styles.colItem} ${styles.optionTabSelected}`}>Future</a>
           <a
             className={`${styles.colItem} ${styles.optionTab}`}
