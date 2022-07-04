@@ -437,7 +437,7 @@ const Swap = props => {
   const [tableContent, setTableContent] = useState(POSITIONS);
   const [positionsData, setPositionsData] = useState([]);
   const { active, activate } = useWeb3React();
-  const [placement, setPlacement] = useState('5m');
+  // const [placement, setPlacement] = useState('5m');
   const [high24, setHigh24] = useState(0);
   const [low24, setLow24] = useState(0);
   const [deltaPrice24, setDeltaPrice24] = useState(0);
@@ -960,15 +960,15 @@ const Swap = props => {
     setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
   }
 
-  const placementChange = e => {
-    // if(updatingKchartsFlag) {
-    //   return;
-    // }
-    // setUpdatingKchartsFlag(true);
-    setPlacement(e.target.value);
-    setActiveTimeScale(e.target.value);
-    console.log("hereim button triggered", e.target.value)
-  };
+  // const placementChange = e => {
+  //   // if(updatingKchartsFlag) {
+  //   //   return;
+  //   // }
+  //   // setUpdatingKchartsFlag(true);
+  //   setPlacement(e.target.value);
+  //   setActiveTimeScale(e.target.value);
+  //   console.log("hereim button triggered", e.target.value)
+  // };
 
   const chartPanes = [
     { title: 'BTC', content: 'BTC', key: 'BTC', closable: false },
@@ -1136,7 +1136,7 @@ const Swap = props => {
                     swapOption={swapOption}
                     fromTokenAddress={fromTokenAddress}
                     toTokenAddress={toTokenAddress}
-                    period={placement}
+                    // period={placement}
                     infoTokens={infoTokens}
                     chainId={chainId}
                     positions={positions}

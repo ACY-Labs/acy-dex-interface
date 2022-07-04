@@ -169,7 +169,7 @@ export default function ExchangeTVChart(props) {
     // swapOption,
     fromTokenAddress,
     toTokenAddress,
-    period,
+    // time,
     infoTokens,
     chainId,
     // positions,
@@ -180,7 +180,7 @@ export default function ExchangeTVChart(props) {
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [activeTimeScale, setActiveTimeScale] = useState("5m");
-  const [placement, setPlacement] = useState('5m');
+  const [period, setPeriod] = useState('5m');
 
 //   let [period, setPeriod] = useLocalStorageSerializeKey([chainId, "Chart-period"], DEFAULT_PERIOD);
 //   if (!(period in CHART_PERIODS)) {
@@ -519,7 +519,7 @@ export default function ExchangeTVChart(props) {
     //   return;
     // }
     // setUpdatingKchartsFlag(true);
-    setPlacement(e.target.value);
+    setPeriod(e.target.value);
     setActiveTimeScale(e.target.value);
     console.log("hereim button triggered", e.target.value)
   };
@@ -537,7 +537,7 @@ export default function ExchangeTVChart(props) {
             <div>
               {/* <div className="ExchangeChart-info-label">24h Change</div> */}
                 {/* <div className={styles.timeSelector}> */}
-                  <StyledSelect value={placement} onChange={placementChange}
+                  <StyledSelect value={period} onChange={placementChange}
                     style={{ width: '100%', height: '23px', paddingRight: '50%' }}>
                     <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
                     <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>

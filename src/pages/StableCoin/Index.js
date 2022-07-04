@@ -134,7 +134,7 @@ const StableCoin = props => {
                 swapOption={'LONG'}
                 fromTokenAddress={"0x0000000000000000000000000000000000000000"}
                 toTokenAddress={"0x05d6f705C80d9F812d9bc1A142A655CDb25e2571"}
-                period={'5m'}
+                // period={'5m'}
                 infoTokens={infoTokens}
                 chainId={chainId}
                 // positions={positions}
