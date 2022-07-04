@@ -1,6 +1,6 @@
 import { useWeb3React } from '@web3-react/core';
 import { supportedTokens } from '@/acy-dex-usda/utils/address';
-import { useConstantLoader } from '@/constants';
+// import { useConstantLoader } from '@/constants';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import styles from './styles.less';
 import { connect } from 'umi';
@@ -11,10 +11,23 @@ import { AcyCard } from '@/components/Acy';
 import SwapComponent from './components/stableCoinComponent';
 import { APYtable } from './components/apytable';
 import { AccountBox } from './components/accountBox';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
+import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
+import { ethers } from 'ethers'
+import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
+import { useConstantLoader, constantInstance } from '@/constants';
+import { ARBITRUM_DEFAULT_COLLATERAL_SYMBOL } from '@/acy-dex-futures/utils';
+import { fetcher, getInfoTokens, expandDecimals, useLocalStorageByChainId } from '@/acy-dex-futures/utils';
+import useSWR from 'swr';
+
 
 const StableCoin = props => {
   const { account, library, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader(props);
+  // const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
+  const { AddressZero } = ethers.constants
+
+
   // TODO: TESTING
   const chainId = 137;
   const { dispatch } = props
@@ -45,6 +58,69 @@ const StableCoin = props => {
     })
   }, [activeToken0, activeToken1]);
 
+  const [graphType, setGraphType] = useState("StableCoin")
+  const graphTypes = ["StableCoin", "Candlestick"]
+  const showGraph = item => {
+    setGraphType(item)
+  }
+
+  const { perpetuals } = useConstantLoader()
+  const readerAddress = perpetuals.getContract("Reader")  
+  const vaultAddress = perpetuals.getContract("Vault")
+  const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
+
+  const tokens = constantInstance.perpetuals.tokenList;
+  const whitelistedTokens = tokens.filter(token => token.symbol !== "USDG");
+  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
+
+  const defaultTokenSelection = useMemo(() => ({
+    ["Pool"]: {
+      from: AddressZero,
+      to: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
+    },
+    ["Long"]: {
+      from: AddressZero,
+      to: AddressZero,
+    },
+    ["Short"]: {
+      from: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
+      to: AddressZero,
+    }
+  }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
+  
+
+  const tokenAddresses = tokens.map(token => token.address)
+  const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
+
+
+  const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account], {
+    fetcher: fetcher(library, Reader, [tokenAddresses]),
+  })
+  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
+    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
+  })
+  const { data: fundingRateInfo, mutate: updateFundingRateInfo } = useSWR(account && [chainId, readerAddress, "getFundingRates"], {
+    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
+  })
+
+  const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
+  console.log("hereim swap infotokens", infoTokens)
+
+  const setToTokenAddress = useCallback((selectedSwapOption, address) => {
+    const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
+    newTokenSelection[selectedSwapOption].to = address
+    setTokenSelection(newTokenSelection)
+  }, [tokenSelection, setTokenSelection])
+
+  function getTokenBySymbol(tokenlist, symbol) {
+    for (let i = 0; i < tokenlist.length; i++) {
+      if (tokenlist[i].symbol === symbol) {
+        return tokenlist[i]
+      }
+    }
+    return undefined
+  }
+
   return (
     <PageHeaderWrapper>
       {/* <Banner /> */}
@@ -52,9 +128,38 @@ const StableCoin = props => {
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
           <div className={`${styles.colItem} ${styles.priceChart}`}>
-            <div className={styles.dataBlock}>
-              <AccountBox />
-              <ExchangeTable />
+            <div className={styles.graphTab}>
+              <PerpetualTabs
+                option={graphType}
+                options={graphTypes}
+                onChange={showGraph}
+              />
+            </div>
+            {/* <div className={styles.dataBlock}> */}
+            <div>
+              {graphType == "StableCoin" ? 
+              <div>
+                <AccountBox />
+                <ExchangeTable />
+              </div>
+              :
+              <div>
+                {
+                  <ExchangeTVChart 
+                    swapOption={'LONG'}
+                    fromTokenAddress={"0x0000000000000000000000000000000000000000"}
+                    toTokenAddress={"0x05d6f705C80d9F812d9bc1A142A655CDb25e2571"}
+                    period={'5m'}
+                    infoTokens={infoTokens}
+                    chainId={chainId}
+                    // positions={positions}
+                    // savedShouldShowPositionLines,
+                    // orders={orders}
+                    setToTokenAddress={setToTokenAddress}
+                  />
+                }
+              </div>
+            }
             </div>
           </div>
 
