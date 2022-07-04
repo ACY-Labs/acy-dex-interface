@@ -83,7 +83,7 @@ const Option = props => {
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
         <div className={`${styles.colItem} ${styles.priceChart}`}>
-          <div style={{ padding: '20px', borderTop: '0.75px solid #333333' }}>
+          <div style={{ borderTop: '0.75px solid #333333' }}>
             <ExchangeTVChart
               swapOption={'LONG'}
               fromTokenAddress={"0x0000000000000000000000000000000000000000"}
