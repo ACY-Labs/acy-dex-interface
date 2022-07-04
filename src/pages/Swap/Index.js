@@ -688,7 +688,7 @@ function getTokenBySymbol(tokenlist, symbol) {
                 onChange={showGraph}
               />
             </div>
-            <div style={{ padding: '20px', borderTop: '0.75px solid #333333' }}>
+            <div style={{ borderTop: '0.75px solid #333333' }}>
               {graphType == "Routes" ?
                 <SankeyGraph />
                 :

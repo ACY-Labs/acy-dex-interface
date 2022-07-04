@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import cx from "classnames";
 
-import { Spin } from 'antd';
+import { Spin, Radio, Button } from 'antd';
+
+import styles from './styles.less';
+import styled from "styled-components";
+
 
 import { createChart } from "lightweight-charts";
 
@@ -38,6 +42,33 @@ const PRICE_LINE_TEXT_WIDTH = 15;
 const timezoneOffset = -new Date().getTimezoneOffset() * 60;
 
 const BinancePriceApi = 'https://api.acy.finance/polygon-test';
+
+const StyledSelect = styled(Radio.Group)`
+  .ant-radio-button-wrapper{
+    background: transparent !important;
+    height: 22px;
+    font-size: 0.7rem;
+    padding: 0 0.1rem;
+    border: 0.75px solid #333333;
+    border-radius: 0 0 0 0;
+    line-height: 22px;
+    color: #b5b5b6;
+  }
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled){
+    color: #ffffff;
+    box-shadow: 0 0 0 0 #0e0304;
+    border-color: #333333;
+  }
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover{
+    color: #ffffff;
+  }
+  .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before{
+    background-color: #0e0304 !important;
+  }
+  .ant-radio-button-wrapper:not(:first-child)::before{
+    background-color: transparent;
+  }
+`;
 
 export function getChartToken(swapOption, fromToken, toToken, chainId) {
   console.log("swapOption: ", swapOption)
@@ -152,6 +183,7 @@ export default function ExchangeTVChart(props) {
   } = props
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
+  const [activeTimeScale, setActiveTimeScale] = useState("5m");
 
 //   let [period, setPeriod] = useLocalStorageSerializeKey([chainId, "Chart-period"], DEFAULT_PERIOD);
 //   if (!(period in CHART_PERIODS)) {
@@ -159,6 +191,8 @@ export default function ExchangeTVChart(props) {
 //   }
 
   const [hoveredCandlestick, setHoveredCandlestick] = useState();
+  const [placement, setPlacement] = useState('5m');
+
 
   // 1. 这里的token是包含价格的结构体
   const fromToken = getTokenInfo(infoTokens, fromTokenAddress)
@@ -490,11 +524,36 @@ export default function ExchangeTVChart(props) {
   //   setToTokenAddress(swapOption, token.address)
   // }
 
+  const placementChange = e => {
+    // if(updatingKchartsFlag) {
+    //   return;
+    // }
+    // setUpdatingKchartsFlag(true);
+    setPlacement(e.target.value);
+    setActiveTimeScale(e.target.value);
+    console.log("hereim button triggered", e.target.value)
+  };
+
   return (
     <div className="ExchangeChart tv" ref={ref} style={{ height: "100%", width: "100%"}}>
       <div className="ExchangeChart-top App-box App-box-border">
         <div className="ExchangeChart-top-inner">
           <div>
+            {/* <div className="ExchangeChart-info-label">24h Change</div> */}
+              {/* <div className={styles.timeSelector}> */}
+                <StyledSelect value={placement} onChange={placementChange}
+                  style={{ width: '100%', height: '23px', paddingRight: '50%' }}>
+                  <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
+                  <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>
+                  <Radio.Button value="15m" style={{ width: '9%', textAlign: 'center' }}>15m</Radio.Button>
+                  <Radio.Button value="30m" style={{ width: '9%', textAlign: 'center' }}>30m</Radio.Button>
+                  <Radio.Button value="1h" style={{ width: '9%', textAlign: 'center' }}>1h</Radio.Button>
+                  <Radio.Button value="2h" style={{ width: '9%', textAlign: 'center' }}>2h</Radio.Button>
+                  <Radio.Button value="4h" style={{ width: '9%', textAlign: 'center' }}>4h</Radio.Button>
+                  <Radio.Button value="1d" style={{ width: '9%', textAlign: 'center' }}>1D</Radio.Button>
+                  <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
+                </StyledSelect>
+              {/* </div> */}
             {/* <div className="ExchangeChart-title">
               <ChartTokenSelector
                 chainId={chainId}

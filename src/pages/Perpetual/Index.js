@@ -964,7 +964,6 @@ const Swap = props => {
     // if(updatingKchartsFlag) {
     //   return;
     // }
-
     // setUpdatingKchartsFlag(true);
     setPlacement(e.target.value);
     setActiveTimeScale(e.target.value);
@@ -1086,23 +1085,8 @@ const Swap = props => {
                   </Row>
               </StyledButton> */}
             {/* </StyledTokenSelect> */}
-
-            {/* <StyledChartTab type="editable-card" onChange={onChange} activeKey={activeKey} 
-              // <StyledChartTab type="editable-card" onChange={onChange} activeKey={activeKey} onEdit={onEdit}
-                style={{ background:'black', width:'100%', height:'45px'}}>
-                {panes.map((pane) => (
-                  <TabPane tab={pane.title} key={pane.key} closable={pane.closable}
-                    style={{ background:'black', width:'100%', height:'45px'}}>
-                    {pane.content}
-                  </TabPane>
-                ))}
-              </StyledChartTab> */}
-
           </div>
-          <div className={styles.timeSelector}>
-
-
-
+          {/* <div className={styles.timeSelector}> */}
 
             {/* <div className={styles.tokenSelector}>
                   {/* <Select 
@@ -1123,7 +1107,7 @@ const Swap = props => {
                   onChange={placementChange}
                   // style={{ height: '10px'}}
                 /> */}
-            <StyledSelect value={placement} onChange={placementChange}
+            {/* <StyledSelect value={placement} onChange={placementChange}
               style={{ width: '100%', height: '23px', paddingRight: '50%', borderBottom: '0.75px solid #333333' }}>
               <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
               <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>
@@ -1134,13 +1118,13 @@ const Swap = props => {
               <Radio.Button value="4h" style={{ width: '9%', textAlign: 'center' }}>4h</Radio.Button>
               <Radio.Button value="1d" style={{ width: '9%', textAlign: 'center' }}>1D</Radio.Button>
               <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
-            </StyledSelect>
-          </div>
+            </StyledSelect> */}
+          {/* </div> */}
           {/* K chart */}
 
 
           <div className={styles.kchartBox}>
-            <div style={{ backgroundColor: '#0E0304', margin: '10px', height: "450px", display: "flex", flexDirection: "column" }}>
+            <div style={{ backgroundColor: '#0E0304', height: "450px", display: "flex", flexDirection: "column", marginBottom:"30px" }}>
 
               <div className={`${styles.colItem} ${styles.priceChart}`} style={{ flex: 1 }}>
                 {
