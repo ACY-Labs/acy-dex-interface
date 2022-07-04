@@ -807,7 +807,7 @@ const GlobalHeaderRight = props => {
 
   return (
     <div className={className}>
-      <Row wrap={false} style={{display: "inline-flex", fontSize: "0.7rem", marginLeft:"10rem"}}>
+      <Row wrap={false} style={{display: "inline-flex", fontSize: "0.7rem"}}>
         <Col flex="none">
           {/* <Button onClick={deactivateTest}>disconnected</Button> */}
           <Dropdown

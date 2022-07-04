@@ -136,7 +136,7 @@ const OptionComponent = props => {
 
   return (
     <div className={styles.main}>
-      <AcyPerpetualCard style={{ backgroundColor: 'transparent', borderBottom: 'none' }}>
+      <AcyPerpetualCard style={{ backgroundColor: 'transparent', border: 'none', margin: '-8px' }}>
         <div className={styles.modeSelector}>
           <PerpetualTabs
             option={mode}
