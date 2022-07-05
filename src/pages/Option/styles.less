@@ -1,0 +1,55 @@
+.main {
+  margin: 0;
+  z-index: 0;
+  color: #b6b5b5;
+  font-weight: 400;
+  display: flex;
+  position: relative;
+  font-family: "Karla", sans-serif;
+}
+
+.rowFlexContainer {
+  display: flex;
+  width: 100%;
+  margin: auto;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+@media screen and (min-width: 1024px) {
+  .rowFlexContainer {
+    min-width: 310px;
+    flex-wrap: nowrap;
+  }
+
+  .priceChart {
+    border-right: 0.75px solid #333333;
+    order: 1;
+    flex: 2;
+  }
+
+  .optionComponent {
+    order: 2;
+    flex: 1;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .main {
+    min-width: 370px;
+    width: 65%;
+  }
+
+  .colItem {
+    margin: 0 0.5rem;
+    width: 100%;
+  }
+
+  .priceChart {
+    order: 2;
+  }
+
+  .optionComponent {
+    order: 1;
+  }
+}

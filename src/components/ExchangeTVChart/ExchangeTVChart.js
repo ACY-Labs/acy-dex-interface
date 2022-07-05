@@ -3,9 +3,8 @@ import cx from "classnames";
 
 import { Spin, Radio, Button } from 'antd';
 
-import styles from './styles.less';
+// import styles from './styles.less';
 import styled from "styled-components";
-
 
 import { createChart } from "lightweight-charts";
 
@@ -34,14 +33,6 @@ import './ExchangeTVChart.css';
 ////// Binance CEX price source
 import axios from "axios";
 import Binance from "binance-api-node";
-const client = Binance();
-////// End of price source
-
-const PRICE_LINE_TEXT_WIDTH = 15;
-
-const timezoneOffset = -new Date().getTimezoneOffset() * 60;
-
-const BinancePriceApi = 'https://api.acy.finance/polygon-test';
 
 const StyledSelect = styled(Radio.Group)`
   .ant-radio-button-wrapper{
@@ -70,15 +61,20 @@ const StyledSelect = styled(Radio.Group)`
   }
 `;
 
-export function getChartToken(swapOption, fromToken, toToken, chainId) {
-  console.log("swapOption: ", swapOption)
+const client = Binance();
+////// End of price source
+
+const PRICE_LINE_TEXT_WIDTH = 15;
+
+const timezoneOffset = -new Date().getTimezoneOffset() * 60;
+
+const BinancePriceApi = 'https://api.acy.finance/polygon-test';
+
+export function getChartToken(fromToken, toToken, chainId) {
   if (!fromToken || !toToken) {
     return;
   }
 
-  if (swapOption !== SWAP) {
-    return toToken;
-  }
 
   if (fromToken.isUsdg && toToken.isUsdg) {
     return constantInstance.perpetuals.tokenList.find((t) => t.isStable);
@@ -170,20 +166,21 @@ const getChartOptions = (width, height) => ({
 
 export default function ExchangeTVChart(props) {
   const {
-    swapOption,
+    // swapOption,
     fromTokenAddress,
     toTokenAddress,
     period,
     infoTokens,
     chainId,
-    positions,
+    // positions,
     // savedShouldShowPositionLines,
-    orders,
+    // orders,
     setToTokenAddress
   } = props
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [activeTimeScale, setActiveTimeScale] = useState("5m");
+  const [placement, setPlacement] = useState('5m');
 
 //   let [period, setPeriod] = useLocalStorageSerializeKey([chainId, "Chart-period"], DEFAULT_PERIOD);
 //   if (!(period in CHART_PERIODS)) {
@@ -191,29 +188,29 @@ export default function ExchangeTVChart(props) {
 //   }
 
   const [hoveredCandlestick, setHoveredCandlestick] = useState();
-  const [placement, setPlacement] = useState('5m');
-
 
   // 1. 这里的token是包含价格的结构体
   const fromToken = getTokenInfo(infoTokens, fromTokenAddress)
   const toToken = getTokenInfo(infoTokens, toTokenAddress)
   // console.log("chart debug: infotokens", infoTokens, toTokenAddress, fromToken, toToken)
+  console.log("hereim in swap kchart", fromToken, toToken)
 
   const [chartToken, setChartToken] = useState({
     maxPrice: null,
     minPrice: null
   })
   useEffect(() => {
-    const tmp = getChartToken(swapOption, fromToken, toToken, chainId)
+    const tmp = getChartToken(fromToken, toToken, chainId)
     setChartToken(tmp)
   }, [fromToken, toToken, chainId])
+
 
   const symbol = chartToken ? (chartToken.isWrapped ? chartToken.baseSymbol : chartToken.symbol) : undefined;
   const marketName = chartToken ? symbol + "_USD" : undefined;
   const previousMarketName = usePrevious(marketName);
 
   // const currentOrders = useMemo(() => {
-  //   if (swapOption === SWAP || !chartToken) {
+  //   if (!chartToken) {
   //     return [];
   //   }
 
@@ -227,7 +224,7 @@ export default function ExchangeTVChart(props) {
   //     const indexToken = constantInstance.perpetuals.getToken(order.indexToken);
   //     return order.indexToken === chartToken.address || (chartToken.isNative && indexToken.isWrapped);
   //   });
-  // }, [orders, chartToken, swapOption, chainId]);
+  // }, [orders, chartToken, chainId]);
 
   const ref = useRef(null);
   const chartRef = useRef(null);
@@ -271,7 +268,7 @@ export default function ExchangeTVChart(props) {
   
     // subscribe to websocket for the future price update
     const clean = client.ws.candles(pairName, period, (res) => {
-      console.log("res: ", res)
+      console.log("res Swap: ", res)
       const candleData = {
         time: res.startTime / 1000,   // make it in seconds
         open: res.open,
@@ -366,7 +363,7 @@ export default function ExchangeTVChart(props) {
       return;
     }
     const resizeChart = () => {
-      currentChart.resize(chartRef.current.offsetWidth, chartRef.current.offsetHeight);
+      currentChart.resize(chartRef.current.offsetWidth, 470);
       console.log("debug chart: resize ", chartRef.current.offsetWidth, chartRef.current.offsetHeight)
     };
     resizeChart();
@@ -517,13 +514,6 @@ export default function ExchangeTVChart(props) {
   if (!chartToken) {
     return null;
   }
-
-  // const onSelectToken = (token) => {
-  //   const tmp = getTokenInfo(infoTokens, token.address)
-  //   setChartToken(tmp)
-  //   setToTokenAddress(swapOption, token.address)
-  // }
-
   const placementChange = e => {
     // if(updatingKchartsFlag) {
     //   return;
@@ -534,26 +524,44 @@ export default function ExchangeTVChart(props) {
     console.log("hereim button triggered", e.target.value)
   };
 
+  // const onSelectToken = (token) => {
+  //   const tmp = getTokenInfo(infoTokens, token.address)
+  //   setChartToken(tmp)
+  //   setToTokenAddress(swapOption, token.address)
+  // }
+
   return (
     <div className="ExchangeChart tv" ref={ref} style={{ height: "100%", width: "100%"}}>
       <div className="ExchangeChart-top App-box App-box-border">
         <div className="ExchangeChart-top-inner">
-          <div>
-            {/* <div className="ExchangeChart-info-label">24h Change</div> */}
-              {/* <div className={styles.timeSelector}> */}
-                <StyledSelect value={placement} onChange={placementChange}
-                  style={{ width: '100%', height: '23px', paddingRight: '50%' }}>
-                  <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
-                  <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>
-                  <Radio.Button value="15m" style={{ width: '9%', textAlign: 'center' }}>15m</Radio.Button>
-                  <Radio.Button value="30m" style={{ width: '9%', textAlign: 'center' }}>30m</Radio.Button>
-                  <Radio.Button value="1h" style={{ width: '9%', textAlign: 'center' }}>1h</Radio.Button>
-                  <Radio.Button value="2h" style={{ width: '9%', textAlign: 'center' }}>2h</Radio.Button>
-                  <Radio.Button value="4h" style={{ width: '9%', textAlign: 'center' }}>4h</Radio.Button>
-                  <Radio.Button value="1d" style={{ width: '9%', textAlign: 'center' }}>1D</Radio.Button>
-                  <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
-                </StyledSelect>
-              {/* </div> */}
+            <div>
+              {/* <div className="ExchangeChart-info-label">24h Change</div> */}
+                {/* <div className={styles.timeSelector}> */}
+                  <StyledSelect value={placement} onChange={placementChange}
+                    style={{ width: '100%', height: '23px', paddingRight: '50%' }}>
+                    <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
+                    <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>
+                    <Radio.Button value="15m" style={{ width: '9%', textAlign: 'center' }}>15m</Radio.Button>
+                    <Radio.Button value="30m" style={{ width: '9%', textAlign: 'center' }}>30m</Radio.Button>
+                    <Radio.Button value="1h" style={{ width: '9%', textAlign: 'center' }}>1h</Radio.Button>
+                    <Radio.Button value="2h" style={{ width: '9%', textAlign: 'center' }}>2h</Radio.Button>
+                    <Radio.Button value="4h" style={{ width: '9%', textAlign: 'center' }}>4h</Radio.Button>
+                    <Radio.Button value="1d" style={{ width: '9%', textAlign: 'center' }}>1D</Radio.Button>
+                    <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
+                  </StyledSelect>
+                {/* </div> */}
+              {/* <div className="ExchangeChart-title">
+                <ChartTokenSelector
+                  chainId={chainId}
+                  selectedToken={chartToken}
+                  swapOption={swapOption}
+                  infoTokens={infoTokens}
+                  onSelectToken={onSelectToken}
+                  className="chart-token-selector"
+                />
+              </div> */}
+            </div>
+          {/* <div> */}
             {/* <div className="ExchangeChart-title">
               <ChartTokenSelector
                 chainId={chainId}
@@ -564,7 +572,7 @@ export default function ExchangeTVChart(props) {
                 className="chart-token-selector"
               />
             </div> */}
-          </div>
+          {/* </div> */}
 					{/* <div>
 						<div className="ExchangeChart-main-price">{chartToken.maxPrice && formatAmount(chartToken.maxPrice, USD_DECIMALS, 2)}</div>
 						<div className="ExchangeChart-info-label">${chartToken.minPrice && formatAmount(chartToken.minPrice, USD_DECIMALS, 2)}</div>

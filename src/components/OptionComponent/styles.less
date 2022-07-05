@@ -1,0 +1,131 @@
+.main {
+  font-family: "Karla", sans-serif;
+}
+
+.modeSelector {
+  height: 60px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.rowFlexContainer {
+  padding: 10px;
+
+  .title {
+    color: white;
+    font-size: 14px;
+  }
+}
+
+.leverageContainer {
+  margin-bottom: 40px;
+
+  .slippageContainer {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+  }
+
+  .leverageLabel {
+    display: flex;
+    align-items: center;
+  }
+
+  .leverageInputContainer {
+    display: flex;
+    margin-left: 20px;
+  }
+
+  .leverageButton {
+    align-items: center;
+    font-size: 18px;
+    font-weight: 500;
+    border: 0.75px solid #232323;
+    background-color: transparent;
+    color: #b5b5b6;
+    outline: none;
+    cursor: pointer;
+    user-select: none;
+    height: 2.4rem;
+    width: auto;
+    padding: 0 8px;
+    justify-content: space-between;
+    line-height: inherit;
+  }
+
+  .leverageInput {
+    color: #b5b5b6;
+    border: 0.75px solid #232323;
+    background-color: transparent;
+    font-size: 16px;
+    text-align: center;
+  }
+
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  margin-top: 10px;
+  padding: 10px;
+  border: 0.75px solid #232323;
+
+  .inputLabel {
+    margin-left: 10px;
+  }
+}
+
+.optionInput {
+  color: #fff;
+  width: 0;
+  position: relative;
+  font-weight: 500;
+  outline: none;
+  flex: 1 1 auto;
+  height: unset;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  font-size: 22px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0;
+  appearance: textfield;
+  text-align: right;
+}
+
+.buttonContainer {
+  display: flex;
+  margin-top: 50px;
+  justify-content: space-between;
+
+  .percentageButton {
+    border: 0.75px solid #333333;
+    background-color: transparent;
+    width: 100%;
+    height: 50px;
+    color: white;
+
+    &:hover{
+      cursor: pointer;
+      border: 1px solid white;
+    }
+  }
+
+  .percentageButtonActive {
+    border: 0.75px solid white;
+    background-color: transparent;
+    width: 100%;
+    height: 50px;
+    color: white;
+
+    &:hover{
+      cursor: pointer;
+      border: 1px solid white;
+    }
+  }
+}

@@ -27,15 +27,16 @@
   .Tab.block .Tab-option:hover {
     /* color: rgba(255, 255, 255, 1); */
     /* background: linear-gradient(90deg, #1b1b1c 0%, #1b1b1c 100%); */
-    background: #636366 !important;
+    background: #29292c !important;
   }
   
   .Tab.block .Tab-option.active {
     opacity: 1;
     pointer-events: none;
-    background: #636366 !important;
+    background: #29292c !important;
     border: 0.75px solid #0E0304;
     color: rgba(255, 255, 255, 0.9);
+    /* border-radius: 8px 8px -8px 0; */
   }
   
   .Tab.block .Tab-option.active .Tab-option-icon {

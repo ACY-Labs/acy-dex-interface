@@ -45,7 +45,7 @@ import {
   useLocalStorageByChainId,
   useAccountOrders,
   formatAmount,
-  
+
 } from '@/acy-dex-futures/utils';
 
 import { approvePlugin } from '@/acy-dex-futures/Api'
@@ -196,41 +196,7 @@ const StyledCard = styled(AcyCard)`
   }
     
 `;
-const StyledLayout = styled(Layout)`
-  .ant-layout{
-    background: #0e0304 !important;
-    width: 50px;
-  }
-  .ant-layout-sider{
-    background: #0e0304 !important;
-    height: 40px;
-    width: 80px;
-  }
-  .ant-layout-sider ant-layout-sider-dark{
-    flex: 0 0 65px !important;
-    max-width: 65px !important;
-    min-width: 65px !important;
-    width: 65px !important;
-  }
-  .ant-radio-button-wrapper{
-    background: #0e0304;
-  }
-  .ant-layout-header{
-    height: 20px;
-    background: #0e0304 !important;
-    color: #b5b5b6;
-    line-height: 20px;
-    padding: 0 0;
-  }
-  .ant-layout-footer{
-    height: 20px;
-    background: #0e0304 !important;
-    color: #b5b5b6;
-    line-height: 20px;
-    padding: 0 0;
 
-  }
-`
 const StyledButton = styled(Button)`
   .ant-btn{
     height: 50px !important;
@@ -304,64 +270,6 @@ const StyledSelect = styled(Radio.Group)`
 `;
 
 
-const StyledChartTab = styled(Tabs)`
-
-`
-
-const StyledDropdown = styled(Dropdown)`
-  .ant-select-dropdown-menu {
-    max-height: none !important;
-    overflow-y: visible !important;
-  }
-  .ant-select-arrow {
-    color: white;
-  }
-  .ant-select-selection {
-    background-color: transparent !important;
-    border: 0.75px solid #232323;
-    border-radius: 5px;
-    height: 2.4rem;
-    width: 95px;
-    padding: 2px 6px;
-    font-size: 15px;
-    font-weight: 200;
-    color: white;
-    overflow: inherit;
-    margin-right: 10px;
-  }
-  site-dropdown-context-menu ant-dropdown-trigger
-  .ant-select-dropdown-menu,
-  .ant-select-dropdown-menu-root,
-  .ant-select-dropdown-menu-vertical{
-    max-height: none !important;
-    color: transparent;
-  }
-  .ant-select-dropdown-menu-item-active:not(.ant-select-dropdown-menu-item-disabled) {
-    background-color: transparent !important;
-  }
-  .ant-select-dropdown-menu-item {
-    color: #fff !important;
-    }
-  .dropdown-style {
-    .ant-select-dropdown-menu {
-    background: #1F1F26;
-    border: solid 1px #32323a;
-    }
-    .ant-select-dropdown-menu-item {
-    color: #b5b5b6 !important;
-    }
-    .ant-select-dropdown-menu-item:hover {
-    background: #32323a;
-    }
-    .ant-select-dropdown-menu-item-selected {
-    background: #fff;
-    }
-    .ant-select-dropdown-menu-item-active {
-    background: #32323a;
-    }
-  }
-`;
-
 function getFundingFee(data) {
   let { entryFundingRate, cumulativeFundingRate, size } = data
   if (entryFundingRate && cumulativeFundingRate) {
@@ -414,14 +322,14 @@ export function getPositionQuery(tokens, nativeTokenAddress) {
   //   const stableToken = tokens[i]
   //   if (!stableToken.isStable) { continue }
 
-    // for (let j = 0; j < tokens.length; j++) {
-    //   const token = tokens[j]
-    //   if (token.isStable) { continue }
-    //   if (token.isWrapped) { continue }
-    //   collateralTokens.push(stableToken.address)
-    //   indexTokens.push(getTokenAddress(token, nativeTokenAddress))
-    //   isLong.push(false)
-    // }
+  // for (let j = 0; j < tokens.length; j++) {
+  //   const token = tokens[j]
+  //   if (token.isStable) { continue }
+  //   if (token.isWrapped) { continue }
+  //   collateralTokens.push(stableToken.address)
+  //   indexTokens.push(getTokenAddress(token, nativeTokenAddress))
+  //   isLong.push(false)
+  // }
   // }
 
   return { collateralTokens, indexTokens, isLong }
@@ -436,11 +344,12 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
   const positionsMap = {}
   // 
   if (!positionData) {
-  // if (true) {
+    // if (true) {
     return { positions, positionsMap }
   }
+
   const { collateralTokens, indexTokens, isLong } = positionQuery
-  for (let i = 0; i < collateralTokens.length; i+=1) {
+  for (let i = 0; i < collateralTokens.length; i += 1) {
     const collateralToken = getTokenInfo(infoTokens, collateralTokens[i], true, nativeTokenAddress);
     collateralToken.logoURI = findTokenWithAddress(collateralToken.address).logoURI;
     indexToken = getTokenInfo(infoTokens, indexTokens[i], true, nativeTokenAddress)
@@ -566,7 +475,7 @@ const Swap = props => {
   const [percentage24, setPercentage24] = useState(0);
   const [currentAveragePrice, setCurrentAveragePrice] = useState(0);
   const tokens = supportedTokens;
-  
+
   const defaultTokenSelection = useMemo(() => ({
     ["Pool"]: {
       from: AddressZero,
@@ -583,7 +492,7 @@ const Swap = props => {
       to: AddressZero,
     }
   }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
-// }), [chainId])
+  // }), [chainId])
 
 
   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
@@ -596,7 +505,6 @@ const Swap = props => {
   }, [tokenSelection, setTokenSelection])
 
   const setToTokenAddress = useCallback((selectedSwapOption, address) => {
-    // console.log("hereim see tokenSelection", tokenSelection)
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
     newTokenSelection[selectedSwapOption].to = address
     setTokenSelection(newTokenSelection)
@@ -625,7 +533,7 @@ const Swap = props => {
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
   })
-  const { data: positionData, mutate: updatePositionData } = useSWR([chainId, readerAddress, "getPositions", vaultAddress, account],{
+  const { data: positionData, mutate: updatePositionData } = useSWR([chainId, readerAddress, "getPositions", vaultAddress, account], {
     fetcher: fetcher(library, Reader, [positionQuery.collateralTokens, positionQuery.indexTokens, positionQuery.isLong]),
   })
   const tokenAddresses = tokens.map(token => token.address)
@@ -644,8 +552,8 @@ const Swap = props => {
   const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
     fetcher: fetcher(library, Glp),
   })
-  
-  const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR(account && [ chainId, routerAddress, "approvedPlugins", account, orderBookAddress], {
+
+  const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR(account && [chainId, routerAddress, "approvedPlugins", account, orderBookAddress], {
     fetcher: fetcher(library, Router)
   });
 
@@ -801,23 +709,23 @@ const Swap = props => {
   }
 
   const getCurrentTime = () => {
-    let currentTime = Math.floor(new Date().getTime()/1000);
+    let currentTime = Math.floor(new Date().getTime() / 1000);
     return currentTime;
   }
-  const getFromTime = ( currentTime ) => {
-    let fromTime = currentTime - 100* 24* 60* 60;
+  const getFromTime = (currentTime) => {
+    let fromTime = currentTime - 100 * 24 * 60 * 60;
     // console.log("hereim from time", fromTime);
     return fromTime;
   }
 
- 
+
   // useEffect(async () => {
   //   let currentTime = getCurrentTime();
   //   let previous24 = currentTime - 24*60*60;    
   //   console.log("hereim time", previous24, currentTime);
   //   let data24 = await getKChartData(activeToken1.symbol, "56", "1d", previous24.toString(), currentTime.toString(), "chainlink");
   //   console.log("hereim data24", data24);
-    
+
   //   let high24 = 0;
   //   let low24 = 0;
   //   let deltaPrice24 = 0;
@@ -830,7 +738,7 @@ const Swap = props => {
   //     currentAveragePrice = ((high24+low24)/2);
   //     percentage = Math.round((currentAveragePrice - deltaPrice24) *100 / currentAveragePrice *100)/100;
   //   }
-    
+
   //   setHigh24(high24);
   //   setLow24(low24);
   //   setDeltaPrice24(deltaPrice24);
@@ -840,7 +748,7 @@ const Swap = props => {
 
   useEffect(async () => {
     let currentTime = getCurrentTime();
-    let previousTime = currentTime - 24*60*60 ;
+    let previousTime = currentTime - 24 * 60 * 60;
 
     let data24 = await getKChartData(activeToken1.symbol, "56", "5m", previousTime.toString(), currentTime.toString(), "chainlink");
     let high24 = 0;
@@ -851,20 +759,20 @@ const Swap = props => {
     let highArr = [];
     let lowArr = [];
     if (data24.length > 0) {
-      for (let i=1; i < data24.length; i++){
+      for (let i = 1; i < data24.length; i++) {
         highArr.push(data24[i].high);
         lowArr.push(data24[i].low);
       }
       high24 = Math.max(...highArr);
       low24 = Math.min(...lowArr);
-      high24 = Math.round(high24*100)/100;
-      low24 = Math.round(low24*100)/100;
+      high24 = Math.round(high24 * 100) / 100;
+      low24 = Math.round(low24 * 100) / 100;
 
       deltaPrice24 = Math.round(data24[0].open * 100) / 100;
-      average = Math.round( ((high24+low24)/2) *100)/100;
-      percentage = Math.round((average - deltaPrice24) *100 / average *100)/100;
+      average = Math.round(((high24 + low24) / 2) * 100) / 100;
+      percentage = Math.round((average - deltaPrice24) * 100 / average * 100) / 100;
     }
-    
+
     setHigh24(high24);
     setLow24(low24);
     setDeltaPrice24(deltaPrice24);
@@ -1052,7 +960,7 @@ const Swap = props => {
   const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsda", true], {
     fetcher: fetcher(library, GlpManager),
   })
-  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0) ) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0)) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   // const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   let glpBalanceUsd
   if (glpBalance) {
@@ -1069,11 +977,11 @@ const Swap = props => {
   }
 
   const { Option } = Select;
-  
+
   const [updatingKchartsFlag, setUpdatingKchartsFlag] = useState(false);
 
-//charttokenselection
-  const { Header, Footer, Sider, Content } = Layout; 
+  //charttokenselection
+  const { Header, Footer, Sider, Content } = Layout;
 
   // const tokenPlacements = ['BTC', 'ETH'];
 
@@ -1097,13 +1005,15 @@ const Swap = props => {
     console.log("hereim see click token", e)
     setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
   }
-    
-  const placementChange = e => {
-    if(updatingKchartsFlag) return;
 
-    setUpdatingKchartsFlag(true);
+  const placementChange = e => {
+    // if(updatingKchartsFlag) {
+    //   return;
+    // }
+    // setUpdatingKchartsFlag(true);
     setPlacement(e.target.value);
     setActiveTimeScale(e.target.value);
+    console.log("hereim button triggered", e.target.value)
   };
 
   const chartPanes = [
@@ -1183,10 +1093,10 @@ const Swap = props => {
   //   setActiveToken1(option);
   // }
 
-  const [kchartTab, setKchartTab] = useState("BTC")
+  const [kChartTab, setKChartTab] = useState("BTC")
   const kChartTabs = ["BTC", "ETH"]
   const selectChart = item => {
-    setKchartTab(item)
+    setKChartTab(item)
     onClickSetActiveToken(item)
   }
 
@@ -1194,100 +1104,90 @@ const Swap = props => {
     <PageHeaderWrapper>
       
       <div className={styles.main}>
-      <div className={styles.rowFlexContainer}>
-      { swapOption == 'Pool' && (
-        <div>
-          <div className={styles.chart}>
-            <ChartWrapper
-              title="Alp Price Comparison"
-              loading={alpLoading}
-              data={alpPriceData}
-              csvFields={[{ key: 'syntheticPrice' }, { key: 'alpPrice' }, { key: 'alpPlusFees' }, { key: 'lpBtcPrice' }, { key: 'lpEthPrice' }]}
-            >
-              <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-                <LineChart data={alpPriceData} syncId="syncAlp">
-                  <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
-                  <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
-                  <YAxis dataKey="performanceSyntheticCollectedFees" domain={[60, 210]} unit="%" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
-                  <YAxis dataKey="alpPrice" domain={[0.4, 1.7]} orientation="right" yAxisId="right" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
-                  <Tooltip
-                    formatter={tooltipFormatterNumber}
-                    labelFormatter={tooltipLabelFormatter}
-                    contentStyle={{ textAlign: 'left' }}
-                  />
-                  <Legend />
-                  {/* <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceLpBtcCollectedFees" name="% LP BTC-USDC (w/ fees)" stroke={COLORS[2]} />
-                  <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceLpEthCollectedFees" name="% LP ETH-USDC (w/ fees)" stroke={COLORS[4]} />
-                  <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceSyntheticCollectedFees" name="% Index (w/ fees)" stroke={COLORS[0]} /> */}
-
-                  {/* <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="syntheticPrice" name="Index Price" stroke={COLORS[2]} /> */}
-                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPrice" name="Alp Price" stroke={COLORS[1]} strokeWidth={1} />
-                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPlusFees" name="Alp w/ fees" stroke={COLORS[3]} strokeWidth={1} />
-                  {/* <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpBtcPrice" name="LP BTC-USDC" stroke={COLORS[2]} />
-                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpEthPrice" name="LP ETH-USDC" stroke={COLORS[4]} /> */}
-                </LineChart>
-              </ResponsiveContainer>
-              <div className="chart-description">
-                <p>
-                  <span style={{ color: COLORS[3] }}>Alp with fees</span> is based on ALP share of fees received and excluding esGMX rewards<br />
-                  {/* <span style={{ color: COLORS[0] }}>% of Index (with fees)</span> is Alp with fees / Index Price * 100<br />
-                  <span style={{ color: COLORS[4] }}>% of LP ETH-USDC (with fees)</span> is Alp Price with fees / LP ETH-USDC * 100<br />
-                  <span style={{ color: COLORS[2] }}>Index Price</span> is 25% BTC, 25% ETH, 50% USDC */}
-                </p>
+        <div className={styles.rowFlexContainer}>
+          { swapOption != "Pool" && (
+            <div>
+              <div className={styles.chartTokenSelectorTab}>
+                <PerpetualTabs
+                  option={kChartTab}
+                  options={kChartTabs}
+                  onChange={selectChart}
+                />
               </div>
-            </ChartWrapper>
-          </div>
-        </div>
-      )}
-      { swapOption != 'Pool' && (
-        <div>
-        <div className={styles.chartTokenSelectorTab}>
-              <PerpetualTabs
-                option={kchartTab}
-                options={kChartTabs}
-                onChange={selectChart}
-              />
-            </div>
-            <div className={styles.timeSelector}>
-                <StyledSelect value={placement} onChange={placementChange} 
-                  style={{ width:'50%', height:'23px'}}>
-                  <Radio.Button value="1m" style={{width:'9%'}}>1m</Radio.Button>
-                  <Radio.Button value="5m" style={{width:'9%'}}>5m</Radio.Button>
-                  <Radio.Button value="15m" style={{width:'9%'}}>15m</Radio.Button>
-                  <Radio.Button value="30m" style={{width:'9%'}}>30m</Radio.Button>
-                  <Radio.Button value="1h" style={{width:'9%'}}>1h</Radio.Button>
-                  <Radio.Button value="2h" style={{width:'9%'}}>2h</Radio.Button>
-                  <Radio.Button value="4h" style={{width:'9%'}}>4h</Radio.Button>
-                  <Radio.Button value="1d" style={{width:'9%'}}>1D</Radio.Button>
-                  <Radio.Button value="1w" style={{width:'9%'}}>1W</Radio.Button>
-                </StyledSelect>
-            </div>
-              
-              
-          <div className={styles.kchartBox}>
-            <div style={{ backgroundColor: '#0E0304', margin: '10px', height: "450px", display: "flex", flexDirection: "column" }}>
-            
-              <div className={`${styles.colItem} ${styles.priceChart}`} style={{ flex: 1 }}>
-                {
-                  <ExchangeTVChart 
-                  swapOption={swapOption}
-                  fromTokenAddress={fromTokenAddress}
-                  toTokenAddress={toTokenAddress}
-                  period={placement}
-                  infoTokens={infoTokens}
-                  chainId={chainId}
-                  positions={positions}
-                  // savedShouldShowPositionLines,
-                  orders={orders}
-                  setToTokenAddress={setToTokenAddress}
-                  />
-                }
-              </div>
-            </div> 
 
-          </div>
-          </div>
-      )}
+              <div className={styles.kchartBox}>
+                <div style={{ backgroundColor: '#0E0304', height: "450px", display: "flex", flexDirection: "column", marginBottom:"30px" }}>
+
+                  <div className={`${styles.colItem} ${styles.priceChart}`} style={{ flex: 1 }}>
+                    {
+                      // currentAveragePrice === 0 ?
+                      // <Spin/>
+                      // // : <KChart activeToken0={activeToken0} activeToken1={activeToken1} activeTimeScale={activeTimeScale} currentAveragePrice={currentAveragePrice} />
+                      // :
+                      <ExchangeTVChart
+                        swapOption={swapOption}
+                        fromTokenAddress={fromTokenAddress}
+                        toTokenAddress={toTokenAddress}
+                        period={placement}
+                        infoTokens={infoTokens}
+                        chainId={chainId}
+                        positions={positions}
+                        // savedShouldShowPositionLines,
+                        orders={orders}
+                        setToTokenAddress={setToTokenAddress}
+                      />
+                    }
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          )}
+          { swapOption == 'Pool' && (
+            <div>
+              <div className={styles.chart}>
+                <ChartWrapper
+                  title="Alp Price Comparison"
+                  loading={alpLoading}
+                  data={alpPriceData}
+                  // csvFields={[{ key: 'syntheticPrice' }, { key: 'alpPrice' }, { key: 'alpPlusFees' }, { key: 'lpBtcPrice' }, { key: 'lpEthPrice' }]}
+                >
+                  <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+                    <LineChart data={alpPriceData} syncId="syncAlp">
+                      <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
+                      <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
+                      <YAxis dataKey="performanceSyntheticCollectedFees" domain={[60, 210]} unit="%" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
+                      <YAxis dataKey="alpPrice" domain={[0.4, 1.7]} orientation="right" yAxisId="right" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
+                      <Tooltip
+                        formatter={tooltipFormatterNumber}
+                        labelFormatter={tooltipLabelFormatter}
+                        contentStyle={{ textAlign: 'left' }}
+                      />
+                      <Legend />
+                      {/* <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceLpBtcCollectedFees" name="% LP BTC-USDC (w/ fees)" stroke={COLORS[2]} />
+                      <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceLpEthCollectedFees" name="% LP ETH-USDC (w/ fees)" stroke={COLORS[4]} />
+                      <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceSyntheticCollectedFees" name="% Index (w/ fees)" stroke={COLORS[0]} /> */}
+
+                      {/* <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="syntheticPrice" name="Index Price" stroke={COLORS[2]} /> */}
+                      <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPrice" name="Alp Price" stroke={COLORS[1]} strokeWidth={1} />
+                      <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPlusFees" name="Alp w/ fees" stroke={COLORS[3]} strokeWidth={1} />
+                      {/* <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpBtcPrice" name="LP BTC-USDC" stroke={COLORS[2]} />
+                      <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpEthPrice" name="LP ETH-USDC" stroke={COLORS[4]} /> */}
+                    </LineChart>
+                  </ResponsiveContainer>
+                  <div className="chart-description">
+                    <p>
+                      <span style={{ color: COLORS[3] }}>Alp with fees</span> is based on ALP share of fees received<br />
+                      {/* <span style={{ color: COLORS[0] }}>% of Index (with fees)</span> is Alp with fees / Index Price * 100<br />
+                      <span style={{ color: COLORS[4] }}>% of LP ETH-USDC (with fees)</span> is Alp Price with fees / LP ETH-USDC * 100<br />
+                      <span style={{ color: COLORS[2] }}>Index Price</span> is 25% BTC, 25% ETH, 50% USDC */}
+                    </p>
+                  </div>
+                </ChartWrapper>
+              </div>
+            </div>
+          )}
+          
           {/* Position table */}
           {!showTokenTable ?
             <>
@@ -1299,28 +1199,28 @@ const Swap = props => {
                     <a className={`${styles.colItem} ${styles.optionTab}`} onClick={() => { setTableContent(ACTIONS) }}>Actions </a>
                   </div>
                   <div className={styles.positionsTable}>
-                    { tableContent == POSITIONS && (
+                    {tableContent == POSITIONS && (
                       <PositionsTable
                         isMobile={isMobile}
                         dataSource={positions}
                         setPendingTxns={setPendingTxns}
                         infoTokens={infoTokens}
-                    />
-                    )} 
-                    { tableContent == ORDERS && (
+                      />
+                    )}
+                    {tableContent == ORDERS && (
                       <OrderTable
                         isMobile={isMobile}
                         dataSource={orders}
                         infoTokens={infoTokens}
                       />
                     )}
-                    { tableContent == ACTIONS && (
+                    {tableContent == ACTIONS && (
                       <ActionHistoryTable
                         isMobile={isMobile}
                         dataSource={positionsData}
                       />
                     )}
-                     
+
                   </div>
                 </div>
               </AcyPerpetualCard>

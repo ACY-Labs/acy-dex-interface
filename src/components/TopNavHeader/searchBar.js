@@ -188,7 +188,9 @@ export const SearchBar = props => {
   const [localToken, setLocalToken] = useState([]);
   const [localPool, setLocalPool] = useState([]);
 
+  console.log("hereim before SB");
   const dataSourceCoin = getGlobalTokenList()
+  console.log("hereim before SB", dataSourceCoin);
   const [marketNetwork, setmarketNetwork] = useState('');
   const { chainId } = useConstantLoader();
 
@@ -484,6 +486,7 @@ export const SearchBar = props => {
                         border: '1px solid #333333',
                         paddingLeft: '20px',
                         height: '50%',
+                        fontSize: '14px',
                       }}
                       onFocus={onSearchFocus}
                       onChange={onInput}
