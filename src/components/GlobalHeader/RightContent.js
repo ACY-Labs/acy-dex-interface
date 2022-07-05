@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage, connect } from 'umi';
-import { Spin, Tag, Menu, Icon, Dropdown, Button, Space, Modal, message } from 'antd';
+import { Spin, Tag, Menu, Icon, Dropdown, Button, Space, Modal, message, Row, Col } from 'antd';
 
 import moment from 'moment';
 import groupBy from 'lodash/groupBy';
@@ -807,31 +807,36 @@ const GlobalHeaderRight = props => {
 
   return (
     <div className={className}>
-      {/* <Button onClick={deactivateTest}>disconnected</Button> */}
-      <Dropdown
-        overlay={networkListInCardList}
-        trigger={['click']}
-        placement="bottomLeft"
-      //className={styles.networkButton}
-      >
-        <div type="primary" shape="round" className={styles.networkButton}>
-          {[networkList[networkListIndex]].map(item => (
-            <div>
-              <AcyIcon.MyIcon type={item.icon} /> {item.name} <DownOutlined /></div>
-            //<Icon><DownOutlined /></Icon>
-          ))}
-        </div>
-      </Dropdown>
-
-      {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
-      <AcyConnectWallet
-        chainId={chainId} // this is the chainId from useWeb3React
-        isMobile={isMobile}
-        onClick={onhandMetaMask}
-        pendingLength={
-          props.transaction.transactions.length
-        }
-      />
+      <Row wrap={false} style={{display: "inline-flex", fontSize: "0.7rem"}}>
+        <Col flex="none">
+          {/* <Button onClick={deactivateTest}>disconnected</Button> */}
+          <Dropdown
+            overlay={networkListInCardList}
+            trigger={['click']}
+            placement="bottomLeft"  
+          //className={styles.networkButton}
+          >
+            <div type="primary" shape="round" className={styles.networkButton}>
+              {[networkList[networkListIndex]].map(item => (
+                <div>
+                  <AcyIcon.MyIcon type={item.icon} /> {item.name} <DownOutlined /></div>
+                //<Icon><DownOutlined /></Icon>
+              ))}
+            </div>
+          </Dropdown>
+        </Col>
+        <Col flex="auto">
+        {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
+          <AcyConnectWallet
+            chainId={chainId} // this is the chainId from useWeb3React
+            isMobile={isMobile}
+            onClick={onhandMetaMask}
+            pendingLength={
+              props.transaction.transactions.length
+            }
+          />
+        </Col>
+      </Row>
 
 
       {false && (

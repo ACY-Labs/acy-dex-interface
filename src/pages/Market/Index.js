@@ -165,6 +165,8 @@ const MarketIndex = props => {
   }
 
   const coinList = getGlobalTokenList()
+  console.log("hereim market coinlist", coinList)
+
 
   return (
       <div className={styles.marketRoot}>

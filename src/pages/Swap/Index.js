@@ -1,5 +1,5 @@
 import { useWeb3React } from '@web3-react/core';
-import React, { Component, useState, useEffect, useRef, useMemo } from 'react';
+import React, { Component, useState, useEffect, useRef, useMemo, useCallback } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { connect, history } from 'umi';
 import { Button, Row, Col, Icon, Skeleton, Card } from 'antd';
@@ -15,6 +15,7 @@ import {
   AcyConfirm,
   AcyApprove,
 } from '@/components/Acy';
+import { ARBITRUM_DEFAULT_COLLATERAL_SYMBOL } from '@/acy-dex-futures/utils';
 import Media from 'react-media';
 import AcyPieChart from '@/components/AcyPieChartAlpha';
 import AcyRoutingChart from '@/components/AcyRoutingChart';
@@ -33,12 +34,20 @@ import StakeHistoryTable from './components/StakeHistoryTable';
 import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
-import { API_URL, useConstantLoader } from '@/constants';
+import { API_URL, useConstantLoader, getGlobalTokenList, constantInstance } from '@/constants';
+import { fetcher, getInfoTokens, expandDecimals, useLocalStorageByChainId } from '@/acy-dex-futures/utils';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import useSWR from 'swr';
 import { TxFetcher } from '@/utils/utils';
-import SankeyGraph from './components/SankeyGraph'
+import SankeyGraph from './components/SankeyGraph';
+// import ExchangeTVChart from '@/pages/Perpetual/components/ExchangeTVChart';
+import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
+import { ethers } from 'ethers'
+import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
 
+
+
+const { AddressZero } = ethers.constants
 const { AcyTabPane } = AcyTabs;
 function getTIMESTAMP(time) {
   var date = new Date(time);
@@ -104,8 +113,13 @@ const StyledCard = styled(AcyCard)`
     
 `;
 
+
 const Swap = props => {
   const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
+  
+  // console.log("hereim befoere swap coinlist");
+  const coinList = getGlobalTokenList()
+  // console.log("hereim swap coinlist successful", coinList);
   ////console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
   // 当 chainId 发生切换时，就更新 url
@@ -148,6 +162,47 @@ const Swap = props => {
   const [transactionNum, setTransactionNum] = useState(0);
   const { activate } = useWeb3React();
 
+  const { perpetuals } = useConstantLoader()
+  const readerAddress = perpetuals.getContract("Reader")  
+  const vaultAddress = perpetuals.getContract("Vault")
+  const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
+
+  const tokens = constantInstance.perpetuals.tokenList;
+  const whitelistedTokens = tokens.filter(token => token.symbol !== "USDG");
+  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
+
+  const defaultTokenSelection = useMemo(() => ({
+    ["Pool"]: {
+      from: AddressZero,
+      to: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
+      // to: getTokenBySymbol(tokens, 'BTC').address,
+    },
+    ["Long"]: {
+      from: AddressZero,
+      to: AddressZero,
+    },
+    ["Short"]: {
+      from: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
+      // from: getTokenBySymbol(tokens, 'BTC').address,
+      to: AddressZero,
+    }
+  }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
+  
+
+  const tokenAddresses = tokens.map(token => token.address)
+  const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
+
+
+  const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account], {
+    fetcher: fetcher(library, Reader, [tokenAddresses]),
+  })
+  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
+    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
+  })
+  const { data: fundingRateInfo, mutate: updateFundingRateInfo } = useSWR(account && [chainId, readerAddress, "getFundingRates"], {
+    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
+  })
+
   // useSWR hook example - needs further implementation in backend
   const txListUrl = `${apiUrlPrefix}/txlist/all?`
   const { data: txList, mutate: updateTxList } = useSWR([txListUrl], {
@@ -157,6 +212,58 @@ const Swap = props => {
 
   const txref = useRef();
   txref.current = txList;
+
+
+  const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
+  console.log("hereim swap infotokens", infoTokens)
+
+  const setToTokenAddress = useCallback((selectedSwapOption, address) => {
+    const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
+    newTokenSelection[selectedSwapOption].to = address
+    setTokenSelection(newTokenSelection)
+  }, [tokenSelection, setTokenSelection])
+
+//   console.log("hereim see coinList", coinList)  
+
+// function getTokenBySymbol(tokenlist, symbol) {
+//   console.log("hereim see gettokenbysymbol tokenlist.symbol, symbol", tokenlist, symbol)
+//   for (let i = 0; i < tokenlist.length; i++) {
+//     if (tokenlist[i].symbol === symbol) {
+//       return tokenlist[i]
+//     }
+//   }
+//   return undefined
+// }
+
+
+//   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
+//   const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
+
+//   const setFromTokenAddress = useCallback((selectedSwapOption, address) => {
+//     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
+//     newTokenSelection[selectedSwapOption].from = address
+//     setTokenSelection(newTokenSelection)
+//   }, [tokenSelection, setTokenSelection])
+
+//   const setToTokenAddress = useCallback((selectedSwapOption, address) => {
+//     // console.log("hereim see tokenSelection", tokenSelection)
+//     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
+//     newTokenSelection[selectedSwapOption].to = address
+//     setTokenSelection(newTokenSelection)
+//   }, [tokenSelection, setTokenSelection])
+
+//   const fromTokenAddress = tokenSelection[swapOption].from
+//   const toTokenAddress = tokenSelection[swapOption].to
+
+function getTokenBySymbol(tokenlist, symbol) {
+  for (let i = 0; i < tokenlist.length; i++) {
+    if (tokenlist[i].symbol === symbol) {
+      return tokenlist[i]
+    }
+  }
+  return undefined
+}
+
 
   ////console.log('printing tx lists', txList);
 
@@ -430,7 +537,6 @@ const Swap = props => {
   // }
 
   const lineTitleRender = () => {
-
     let token0logo = null;
     let token1logo = null;
     for (let j = 0; j < supportedTokens.length; j++) {
@@ -582,11 +688,27 @@ const Swap = props => {
                 onChange={showGraph}
               />
             </div>
-            <div style={{ padding: '20px', borderTop: '0.75px solid #333333' }}>
+            <div style={{ borderTop: '0.75px solid #333333' }}>
               {graphType == "Routes" ?
                 <SankeyGraph />
                 :
-                <div>Kchart here</div>
+                <div>
+                  {
+                    <ExchangeTVChart 
+                      swapOption={'LONG'}
+                      fromTokenAddress={"0x0000000000000000000000000000000000000000"}
+                      toTokenAddress={"0x05d6f705C80d9F812d9bc1A142A655CDb25e2571"}
+                      period={'5m'}
+                      infoTokens={infoTokens}
+                      chainId={chainId}
+                      // positions={positions}
+                      // savedShouldShowPositionLines,
+                      // orders={orders}
+                      setToTokenAddress={setToTokenAddress}
+                    />
+                  }
+                </div>
+                // <div>Kchart here</div>
               }
             </div>
             <div className={styles.exchangeBottomWrapper}>
