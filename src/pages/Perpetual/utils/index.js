@@ -52,3 +52,4 @@ export async function getKChartData(tokenSymbol, preferableChainId, period, from
     });
   return kchartdata;
 }
+

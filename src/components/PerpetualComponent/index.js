@@ -226,7 +226,6 @@ const SwapComponent = props => {
     setIsPendingConfirmation,
     isBuying,
     setIsBuying,
-    onChangeMode,
     swapTokenAddress,
     setSwapTokenAddress,
     glp_isWaitingForApproval,
@@ -1055,7 +1054,6 @@ const SwapComponent = props => {
   // LONG or SHORT or POOL
   const modeSelect = (input) => {
     setMode(input);
-    onChangeMode(input);
   }
 
   // MARKET or LIMIT
