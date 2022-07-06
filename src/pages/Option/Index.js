@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import useSWR from 'swr';
 import AcyCard from '@/components/AcyCard';
 import OptionComponent from '@/components/OptionComponent'
+import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { fetcher, getInfoTokens, expandDecimals, useLocalStorageByChainId } from '@/acy-dex-futures/utils';
 // import { API_URL, useConstantLoader, getGlobalTokenList, constantInstance } from '@/constants';
@@ -62,7 +63,6 @@ const Option = props => {
   })
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
-  console.log("hereim swap infotokens", infoTokens)
 
   const setToTokenAddress = useCallback((selectedSwapOption, address) => {
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
@@ -78,10 +78,27 @@ const Option = props => {
     }
     return undefined
   }
+  const [kChartTab, setKChartTab] = useState("BTC")
+  const kChartTabs = ["BTC", "ETH"]
+  const selectChart = item => {
+    setKChartTab(item)
+    onClickSetActiveToken(item)
+  }
+  const onClickSetActiveToken = (e) => {
+    console.log("hereim see click token", e)
+    setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
+  }
 
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
+        <div className={styles.chartTokenSelectorTab}>
+            <PerpetualTabs
+              option={kChartTab}
+              options={kChartTabs}
+              onChange={selectChart}
+            />
+          </div>
         <div className={`${styles.colItem} ${styles.priceChart}`}>
           <div style={{ borderTop: '0.75px solid #333333' }}>
             <ExchangeTVChart

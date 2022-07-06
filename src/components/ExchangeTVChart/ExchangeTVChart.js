@@ -121,7 +121,8 @@ const getChartOptions = (width, height) => ({
   layout: {
     backgroundColor: "rgba(255, 255, 255, 0)",
     textColor: "#ccc",
-    fontFamily: "Relative",
+    fontFamily: "Karla, sans-serif", 
+    // fontFamily: "Karla", 
   },
   localization: {
     // https://github.com/tradingview/lightweight-charts/blob/master/docs/customization.md#time-format
@@ -177,6 +178,8 @@ export default function ExchangeTVChart(props) {
     // orders,
     setToTokenAddress
   } = props
+  // console.log("hereyou props", fromTokenAddress);
+  // console.log("hereyou props", toTokenAddress);
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [activeTimeScale, setActiveTimeScale] = useState("5m");

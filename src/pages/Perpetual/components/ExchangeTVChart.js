@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import cx from "classnames";
 
-import { Spin, Radio, Button } from 'antd';
+import { Spin, Radio, Button, Row, Col } from 'antd';
 
 import styles from './styles.less';
 import styled from "styled-components";
@@ -125,7 +125,7 @@ const getChartOptions = (width, height) => ({
   layout: {
     backgroundColor: "rgba(255, 255, 255, 0)",
     textColor: "#ccc",
-    fontFamily: "Relative",
+    fontFamily: "Karla 300", 
   },
   localization: {
     // https://github.com/tradingview/lightweight-charts/blob/master/docs/customization.md#time-format
@@ -136,12 +136,14 @@ const getChartOptions = (width, height) => ({
   grid: {
     vertLines: {
       visible: true,
-      color: "rgba(35, 38, 59, 1)",
-      style: 2,
+      // color: "rgba(27, 27, 27, 1)",
+      color: "#1b1b1b",
+      style: 0,
     },
     horzLines: {
       visible: true,
-      color: "rgba(35, 38, 59, 1)",
+      // color: "rgba(35, 38, 59, 1)",
+      color: "#1b1b1b", 
       style: 2,
     },
   },
@@ -346,7 +348,7 @@ export default function ExchangeTVChart(props) {
 
     const chart = createChart(
       chartRef.current,
-      getChartOptions(chartRef.current.offsetWidth, chartRef.current.offsetHeight)
+      getChartOptions(chartRef.current.offsetWidth, 460)
     );
 
     chart.subscribeCrosshairMove(onCrosshairMove);
@@ -366,7 +368,7 @@ export default function ExchangeTVChart(props) {
       return;
     }
     const resizeChart = () => {
-      currentChart.resize(chartRef.current.offsetWidth, chartRef.current.offsetHeight);
+      currentChart.resize(chartRef.current.offsetWidth, 460);
       console.log("debug chart: resize ", chartRef.current.offsetWidth, chartRef.current.offsetHeight)
     };
     resizeChart();
@@ -538,9 +540,11 @@ export default function ExchangeTVChart(props) {
     <div className="ExchangeChart tv" ref={ref} style={{ height: "100%", width: "100%"}}>
       <div className="ExchangeChart-top App-box App-box-border">
         <div className="ExchangeChart-top-inner">
-          <div>
-            {/* <div className="ExchangeChart-info-label">24h Change</div> */}
-              {/* <div className={styles.timeSelector}> */}
+          <div >
+            <Row>
+              <Col span={"50%"}>  
+              {/* <div className="ExchangeChart-info-label">24h Change</div> */}
+                {/* <div className={styles.timeSelector}> */}
                 <StyledSelect value={period} onChange={placementChange}
                   style={{ width: '100%', height: '23px', paddingRight: '50%' }}>
                   <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
@@ -553,6 +557,11 @@ export default function ExchangeTVChart(props) {
                   <Radio.Button value="1d" style={{ width: '9%', textAlign: 'center' }}>1D</Radio.Button>
                   <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
                 </StyledSelect>
+              </Col> 
+              <Col span={"50%"}>
+                24h Change +21411 +2.241%
+              </Col>
+            </Row>
               {/* </div> */}
             {/* <div className="ExchangeChart-title">
               <ChartTokenSelector
