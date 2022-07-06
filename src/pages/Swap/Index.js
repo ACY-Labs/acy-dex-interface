@@ -238,26 +238,6 @@ const Swap = props => {
 //   return undefined
 // }
 
-
-//   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
-//   const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
-
-//   const setFromTokenAddress = useCallback((selectedSwapOption, address) => {
-//     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
-//     newTokenSelection[selectedSwapOption].from = address
-//     setTokenSelection(newTokenSelection)
-//   }, [tokenSelection, setTokenSelection])
-
-//   const setToTokenAddress = useCallback((selectedSwapOption, address) => {
-//     // console.log("hereim see tokenSelection", tokenSelection)
-//     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
-//     newTokenSelection[selectedSwapOption].to = address
-//     setTokenSelection(newTokenSelection)
-//   }, [tokenSelection, setTokenSelection])
-
-//   const fromTokenAddress = tokenSelection[swapOption].from
-//   const toTokenAddress = tokenSelection[swapOption].to
-
 function getTokenBySymbol(tokenlist, symbol) {
   for (let i = 0; i < tokenlist.length; i++) {
     if (tokenlist[i].symbol === symbol) {

@@ -459,7 +459,7 @@ const Swap = props => {
       from: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
       // from: getTokenBySymbol(tokens, 'BTC').address,
       to: AddressZero,
-    }
+    },
   }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
   // }), [chainId])
 
@@ -479,6 +479,7 @@ const Swap = props => {
     setTokenSelection(newTokenSelection)
   }, [tokenSelection, setTokenSelection])
 
+  console.log("hereim tokenselection", tokenSelection, " ", swapOption, " ", tokenSelection[swapOption])
   const fromTokenAddress = tokenSelection[swapOption].from
   const toTokenAddress = tokenSelection[swapOption].to
 
@@ -1047,10 +1048,25 @@ const Swap = props => {
   //   setActiveToken1(option);
   // }
 
-  const [kChartTab, setKChartTab] = useState("BTC")
-  const kChartTabs = ["BTC", "ETH"]
-  const selectChart = item => {
-    setKChartTab(item)
+  const [KChartTokenMATIC, setKChartTokenMATIC] = useState("BTC")
+  const [KChartTokenETH, setKChartTokenETH] = useState("BTC")
+  const [KChartTokenBSC, setKChartTokenBSC] = useState("BTC")
+  const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
+  const KChartTokenListETH = ["BTC", "ETH"]
+  const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
+  const selectChartMATIC = item => {
+    console.log("hereim future chain", chainId)
+    setKChartTokenMATIC(item)
+    onClickSetActiveToken(item)
+  }
+  const selectChartETH = item => {
+    console.log("hereim future chain", chainId)
+    setKChartTokenETH(item)
+    onClickSetActiveToken(item)
+  }
+  const selectChartBSC = item => {
+    console.log("hereim future chain", chainId)
+    setKChartTokenBSC(item)
     onClickSetActiveToken(item)
   }
 
@@ -1060,11 +1076,28 @@ const Swap = props => {
         <div className={styles.rowFlexContainer}>
 
           <div className={styles.chartTokenSelectorTab}>
-            <PerpetualTabs
-              option={kChartTab}
-              options={kChartTabs}
-              onChange={selectChart}
-            />
+            { chainId === 56 || chainId === 97 ?  
+                <PerpetualTabs
+                option={KChartTokenBSC}
+                options={KChartTokenListBSC}
+                onChange={selectChartBSC}
+                />
+              :
+               chainId === 137 || chainId ===80001 ? 
+               <PerpetualTabs
+               option={KChartTokenMATIC}
+               options={KChartTokenListMATIC}
+               onChange={selectChartMATIC}
+               />
+                :
+                <PerpetualTabs
+                option={KChartTokenETH}
+                options={KChartTokenListETH}
+                onChange={selectChartETH}
+              />
+                
+            }
+            
             {/* <StyledTokenSelect value={tokenPlacements} onChange={tokenPlacementChange}> */}
             {/* <StyledButton value="BTC" onClick={() => onClickSetActiveToken("BTC")} style={{ fontFamily:"Karla, sans-serif", height:"50px", background: "#0e0304", borderColor: "#0e0304" }}> 
                   <Row>
