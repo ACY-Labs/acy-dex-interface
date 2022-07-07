@@ -1096,7 +1096,7 @@ const Swap = props => {
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
           { swapOption != "Pool" && (
-            <div>
+            <div style={{ padding: "0 0 3rem" }}>
               <div className={styles.chartTokenSelectorTab}>
                 <PerpetualTabs
                   option={kChartTab}
