@@ -1006,16 +1006,6 @@ const Swap = props => {
     setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
   }
 
-  const placementChange = e => {
-    // if(updatingKchartsFlag) {
-    //   return;
-    // }
-    // setUpdatingKchartsFlag(true);
-    setPlacement(e.target.value);
-    setActiveTimeScale(e.target.value);
-    console.log("hereim button triggered", e.target.value)
-  };
-
   const chartPanes = [
     { title: 'BTC', content: 'BTC', key: 'BTC', closable: false },
     { title: 'ETH', content: 'ETH', key: 'ETH' },
@@ -1128,7 +1118,6 @@ const Swap = props => {
                         swapOption={swapOption}
                         fromTokenAddress={fromTokenAddress}
                         toTokenAddress={toTokenAddress}
-                        period={placement}
                         infoTokens={infoTokens}
                         chainId={chainId}
                         positions={positions}
