@@ -43,6 +43,7 @@ import VolumeChart from './components/VolumeChart'
 import FeesChart from './components/FeesChart'
 import GenericChart from './components/GenericChart'
 import VolumeFeesChart from './components/VolumeFeesChart';
+import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
 
 import {
   useTotalVolumeFromServer,
@@ -175,9 +176,22 @@ const Stats = (props) => {
 
   const history = useHistory()
 
+  const [statsType, setStatsType] = useState("Future")
+  const statsTypes = ["Market", "Future", "StableCoin"]
+  const onChangeStats = item => {
+    history.push('/statistics/' + item.toLowerCase())
+  }
+
   return (
-    <div className='container'>
-      <div className="Home">
+    <div className={styles.container}>
+      <div className={styles.statsTab}>
+        <PerpetualTabs
+          option={statsType}
+          options={statsTypes}
+          onChange={onChangeStats}
+        />
+      </div>
+      <div className={styles.Home}>
         {/* <h1>Analytics / Arbitrum</h1> */}
         {lastSubgraphBlock && lastBlock &&
           <p className={cx('page-description', { warning: isObsolete })} style={{ marginTop: '-1rem' }}>
@@ -186,25 +200,6 @@ const Stats = (props) => {
             &nbsp;at block <a target="_blank" href={`https://arbiscan.io/block/${lastSubgraphBlock.number}`}>{lastSubgraphBlock.number}</a>
           </p>
         }
-        <div className={`${styles.colItem}`}>
-          <a
-            className={`${styles.colItem} ${styles.optionTab}`}
-            onClick={() => {
-              history.push('/statistics/market')
-            }}
-          >
-            Market
-          </a>
-          <a className={`${styles.colItem} ${styles.optionTabSelected}`}>Future</a>
-          <a
-            className={`${styles.colItem} ${styles.optionTab}`}
-            onClick={() => {
-              history.push('/statistics/stablecoin')
-            }}
-          >
-            StableCoin
-          </a>
-        </div>
         {showForm &&
           <div className="form">
             <p>

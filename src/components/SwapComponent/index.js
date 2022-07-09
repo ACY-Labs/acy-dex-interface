@@ -212,78 +212,6 @@ const SwapComponent = props => {
     setShowDescription(false);
   }, [chainId])
 
-  useEffect(() => {
-    if (!INITIAL_TOKEN_LIST) return
-    console.log("resetting page states, new swapComponent token0, token1", INITIAL_TOKEN_LIST[0], INITIAL_TOKEN_LIST[1])
-    setVisible(null);
-      // 选择货币前置和后置
-    setBefore(true);
-      // 交易对前置货币
-    setToken0(INITIAL_TOKEN_LIST[0]);
-      // 交易对后置货币
-    setToken1(INITIAL_TOKEN_LIST[1]);
-      // 交易对前置货币余额
-    setToken0Balance('0');
-      // 交易对后置货币余额
-    setToken1Balance('0');
-      // 交易对前置货币兑换量
-    setToken0Amount('');
-      // 交易对后置货币兑换量
-    setToken1Amount('');
-      // 交易中用户使用Flash Arbitrage的额外获利
-    setBonus0(null);
-    setBonus1(null);
-    setToken0BalanceShow(false);
-    setToken1BalanceShow(false);
-    setSlippageTolerance(INITIAL_ALLOWED_SLIPPAGE / 100);
-    setInputSlippageTol(INITIAL_ALLOWED_SLIPPAGE / 100);
-    setSlippageError('');
-    setDeadline();
-    setExactIn(true);
-    setNeedApprove(false);
-    setApproveAmount('0');
-    setApproveButtonStatus(true);
-      // Breakdown shows the estimated information for swap
-      // let [estimatedStatus,setEstimatedStatus]=useState();
-    setSwapBreakdown();
-    setSwapButtonState(false);
-    setSwapButtonContent('Connect to Wallet');
-    setSwapStatus();
-    setPair();
-    setRoute();
-    setTrade();
-    setSlippageAdjustedAmount();
-    setMinAmountOut();
-    setMaxAmountIn();
-    setWethContract();
-    setWrappedAmount();
-    setShowSpinner(false);
-    setMethodName();
-    setIsUseArb(false);
-    setMidTokenAddress();
-    setPoolExist(true);
-    setShowDescription(false);
-  }, [chainId])
-
-  // useEffect(() => {
-  //   const apiUrlPrefix = "https://api.coingecko.com/api/v3"
-  //   axios.get(
-  //     `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=500&page=1&sparkline=false`
-  //   ).then(data => {
-  //     // setCoinList(data.data)
-  //     data.data.map(token => {
-  //       coinList.push({
-  //         name: token.name,
-  //         symbol: token.symbol,
-  //         logoURI: token.image,
-  //       })
-  //     })
-  //   })
-  //   .catch(e => {
-  //     console.log(e);
-  //   });
-  // }, [chainId])
-
   // connect to page model, reflect changes of pair ratio in this component
   useEffect(() => {
     const { swap: { token0: modelToken0, token1: modelToken1 } } = props;
@@ -591,9 +519,10 @@ const SwapComponent = props => {
 
   const history = useHistory()
   const coinList = getGlobalTokenList()
+
   useEffect(() => {
     const hash = history.location.hash.replace('#', '').split('?')[0]
-    setToken0(coinList.filter(coin => coin.symbol.toLowerCase() == hash.toLowerCase())[0])
+    hash ? setToken0(coinList.filter(coin => coin.symbol.toLowerCase() == hash.toLowerCase())[0]) : setToken0(INITIAL_TOKEN_LIST[0])
   }, [history.location.hash, coinList])
 
   return (
@@ -820,7 +749,7 @@ const SwapComponent = props => {
       </AcyDescriptions>
 
       <TokenSelectorModal
-        onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} sideComponent={true} tokenlist={coinList}
+        onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} sideComponent={true} 
       />
     </div>
   );
