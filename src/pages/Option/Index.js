@@ -92,15 +92,15 @@ const Option = props => {
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
-        <div className={styles.chartTokenSelectorTab}>
-            <PerpetualTabs
-              option={kChartTab}
-              options={kChartTabs}
-              onChange={selectChart}
-            />
-          </div>
+        {/* <div className={styles.chartTokenSelectorTab}>
+          <PerpetualTabs
+            option={kChartTab}
+            options={kChartTabs}
+            onChange={selectChart}
+          />
+        </div> */}
         <div className={`${styles.colItem} ${styles.priceChart}`}>
-          <div style={{ borderTop: '0.75px solid #333333' }}>
+          {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
             <ExchangeTVChart
               swapOption={'LONG'}
               fromTokenAddress={"0x0000000000000000000000000000000000000000"}
@@ -113,7 +113,6 @@ const Option = props => {
               // orders={orders}
               setToTokenAddress={setToTokenAddress}
             />
-          </div>
         </div>
 
         <div className={`${styles.colItem} ${styles.optionComponent}`}>
