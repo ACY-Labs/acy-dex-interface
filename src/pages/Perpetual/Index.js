@@ -1173,7 +1173,7 @@ const Swap = props => {
                     </ResponsiveContainer>
                     <div className="chart-description">
                       <p>
-                        <span style={{ color: COLORS[3] }}>Alp with fees</span> is based on ALP share of fees received<br />
+                        {/* <span style={{ color: COLORS[3] }}>Alp with fees</span> is based on ALP share of fees received<br /> */}
                         {/* <span style={{ color: COLORS[0] }}>% of Index (with fees)</span> is Alp with fees / Index Price * 100<br />
                       <span style={{ color: COLORS[4] }}>% of LP ETH-USDC (with fees)</span> is Alp Price with fees / LP ETH-USDC * 100<br />
                       <span style={{ color: COLORS[2] }}>Index Price</span> is 25% BTC, 25% ETH, 50% USDC */}

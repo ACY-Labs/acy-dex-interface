@@ -16,16 +16,20 @@ import { getUserTokenBalance } from '@/acy-dex-swap/utils';
 import { asyncForEach } from "@/utils/asynctools";
 import { processString } from "@/components/AcyCoinItem";
 import styles from "./styles.less";
-import {useConstantLoader} from '@/constants';
+import {useConstantLoader, getGlobalTokenList} from '@/constants';
 
-const TokenSelectorModal = ({ onCancel, visible, onCoinClick, tokenlist, sideComponent }) => {
-    const {account, library, chainId, tokenList: TOKEN_LIST} = useConstantLoader();
+const TokenSelectorModal = ({ onCancel, visible, onCoinClick, sideComponent }) => {
+    const {account, library, chainId } = useConstantLoader();
     
-    const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
+    // const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
+    const tokenlist = getGlobalTokenList()
+    useEffect(() => {
+        setInitTokenList(tokenlist)
+    }, [tokenlist])
 
     const [currentPanel, setCurrentPanel] = useState("selectToken");
 
-    const [initTokenList, setInitTokenList] = useState(INITIAL_TOKEN_LIST);
+    const [initTokenList, setInitTokenList] = useState(tokenlist);
     const [customTokenList, setCustomTokenList] = useState([]);
     const [tokenSearchInput, setTokenSearchInput] = useState('');
     const [favTokenList, setFavTokenList] = useState([]);
@@ -33,11 +37,11 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick, tokenlist, sideCom
     const [tokenBalanceDict, setTokenBalanceDict] = useState({});
 
     useEffect(() => {
-        if (!INITIAL_TOKEN_LIST) return
+        if (!tokenlist) return
 
-        console.log("resetting page states in TokenSelectorModal", INITIAL_TOKEN_LIST)
+        console.log("resetting page states in TokenSelectorModal", tokenlist)
         setCurrentPanel("selectToken");
-        setInitTokenList(INITIAL_TOKEN_LIST);
+        setInitTokenList(tokenlist);
         setCustomTokenList([]);
         setTokenSearchInput('');
         setFavTokenList([]);
@@ -48,7 +52,7 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick, tokenlist, sideCom
         const localTokenList = JSON.parse(localStorage.getItem('customTokenList')) || [];
         setCustomTokenList(localTokenList);
         //combine initTokenList and customTokenList
-        const totalTokenList = [...localTokenList, ...INITIAL_TOKEN_LIST];
+        const totalTokenList = [...localTokenList, ...tokenlist];
         console.log("resetting tokenSelectorModal new renderTokenList", totalTokenList)
         //read the fav tokens code in storage
         var favTokenSymbol = JSON.parse(localStorage.getItem('tokens_symbol'));
@@ -79,7 +83,7 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick, tokenlist, sideCom
     const onTokenSearchChange = e => {
         setTokenSearchInput(e.target.value);
         setInitTokenList(
-            INITIAL_TOKEN_LIST.filter(token => token.symbol.toUpperCase().includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase()))
+            tokenlist.filter(token => token.symbol.toUpperCase().includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase()))
         );
     };
 
@@ -110,8 +114,8 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick, tokenlist, sideCom
     useEffect(() => {
         console.log("tokenselectormodal refreshed because now on ", library, account, chainId, )
         if (!library || !account || !chainId) return;
-        if(INITIAL_TOKEN_LIST) {
-            initTokenBalanceDict(INITIAL_TOKEN_LIST);
+        if(tokenlist) {
+            initTokenBalanceDict(tokenlist);
         }
     }, [account, chainId])
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'umi';
 import styled from 'styled-components';
-import { Slider } from 'antd';
+import { Slider, Input, Button } from 'antd';
 import { useConstantLoader } from '@/constants';
 import { useLocalStorageSerializeKey } from '@/acy-dex-futures/utils';
 import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
@@ -24,6 +24,7 @@ const OptionComponent = props => {
     account,
     library,
     chainId,
+    farmSetting: {INITIAL_ALLOWED_SLIPPAGE}
   } = useConstantLoader(props);
 
   const optionMode = ['Buy', 'Sell']
@@ -134,6 +135,15 @@ const OptionComponent = props => {
 
   }
 
+  const [showDescription, setShowDescription] = useState(false);
+  const [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
+  const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
+  const [slippageError, setSlippageError] = useState('');
+  const [deadline, setDeadline] = useState();
+  useEffect(() => {
+    setShowDescription(false)
+  }, [chainId, mode])
+
   return (
     <div className={styles.main}>
       <AcyPerpetualCard style={{ backgroundColor: 'transparent', border: 'none', margin: '-8px' }}>
@@ -155,66 +165,13 @@ const OptionComponent = props => {
               placeholder="0.0"
               className={styles.optionInput}
               value={volume}
-              onChange={e => { setVolume(e.target.value) }}
+              onChange={e => { 
+                setVolume(e.target.value) 
+                setShowDescription(true)
+              }}
             />
             <span className={styles.inputLabel}>USD</span>
           </div>
-
-          <AcyDescriptions>
-            <div className={styles.leverageContainer}>
-              <div className={styles.slippageContainer}>
-                <div className={styles.leverageLabel}>
-                  <span>Leverage</span>
-                  <div className={styles.leverageInputContainer}>
-                    <button
-                      className={styles.leverageButton}
-                      onClick={() => {
-                        if (leverageOption > 0.1) {
-                          setLeverageOption((parseFloat(leverageOption) - 0.1).toFixed(1))
-                        }
-                      }}
-                    >
-                      <span> - </span>
-                    </button>
-                    <input
-                      type="number"
-                      value={leverageOption}
-                      onChange={e => {
-                        let val = parseFloat(e.target.value)
-                        if (val < 0.1) {
-                          setLeverageOption(0.1)
-                        } else if (val >= 0.1 && val <= 30.5) {
-                          setLeverageOption(Math.round(val * 10) / 10)
-                        } else {
-                          setLeverageOption(30.5)
-                        }
-                      }}
-                      className={styles.leverageInput}
-                    />
-                    <button
-                      className={styles.leverageButton}
-                      onClick={() => {
-                        if (leverageOption < 30.5) {
-                          setLeverageOption((parseFloat(leverageOption) + 0.1).toFixed(1))
-                        }
-                      }}
-                    >
-                      <span> + </span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <StyledSlider
-                min={0.1}
-                max={30.5}
-                step={0.1}
-                marks={leverageMarks}
-                value={leverageOption}
-                onChange={value => setLeverageOption(value)}
-                defaultValue={leverageOption}
-              />
-            </div>
-          </AcyDescriptions>
 
           <div className={styles.buttonContainer}>
             {getPercentageButton('25%')}
@@ -222,6 +179,68 @@ const OptionComponent = props => {
             {getPercentageButton('75%')}
             {getPercentageButton('100%')}
           </div>
+
+          {showDescription ?
+            <AcyDescriptions>
+              <div className={styles.breakdownTopContainer}>
+                <div className={styles.slippageContainer}>
+                  <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+                    <Input
+                      className={styles.input}
+                      value={inputSlippageTol || ''}
+                      onChange={e => {
+                        setInputSlippageTol(e.target.value);
+                      }}
+                      suffix={<strong>%</strong>}
+                    />
+                    <Button
+                      type="primary"
+                      style={{
+                        marginLeft: '10px',
+                        background: '#2e3032',
+                        borderColor: 'transparent',
+                      }}
+                      onClick={() => {
+                        if (isNaN(inputSlippageTol)) {
+                          setSlippageError('Please input valid slippage value!');
+                        } else {
+                          setSlippageError('');
+                          setSlippageTolerance(parseFloat(inputSlippageTol));
+                        }
+                      }}
+                    >
+                      Set
+                    </Button>
+                  </div>
+                  {slippageError.length > 0 && (
+                    <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
+                  )}
+                </div>
+                <div className={styles.slippageContainer}>
+                  <span style={{ fontWeight: 600, marginBottom: '10px' }}>Transaction deadline</span>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      height: '33.6px',
+                      marginTop: '10px',
+                    }}
+                  >
+                    <Input
+                      className={styles.input}
+                      type="number"
+                      value={Number(deadline).toString()}
+                      onChange={e => setDeadline(e.target.valueAsNumber || 0)}
+                      placeholder={30}
+                      suffix={<strong>minutes</strong>}
+                    />
+                  </div>
+                </div>
+              </div>
+            </AcyDescriptions>
+            : null}
+
           <AcyPerpetualButton
             style={{ margin: '25px 0 0 0', width: '100%' }}
             onClick={onClickPrimary}
