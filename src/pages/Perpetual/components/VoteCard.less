@@ -1,0 +1,107 @@
+.tableHeader,
+.tableHeaderFirst {
+    cursor: pointer;
+    background-color: transparent;
+}
+
+.tableHeader:hover,
+.tableHeaderFirst:hover {
+    color: #e29227;
+}
+
+.TooltipHandle {
+    border-bottom: 1px dotted;
+}
+
+.tableData {
+    text-align: right;
+    background-color: transparent;
+}
+
+.tableDataFirstColumn {
+    text-align: left;
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+}
+
+.tableSeeMoreWrapper {
+    text-align: center;
+    width: 100%;
+    background-color: transparent;
+}
+
+.tableSeeMore {
+    font-size: 16px;
+}
+
+.buywith {
+    text-align: center;
+
+}
+
+.nobgTable{
+    :global{
+      .ant-table-placeholder{
+        background: transparent !important;
+      }
+      .ant-table-thead > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-tbody > tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-thead > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td, .ant-table-tbody > tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected) > td {
+        background:  transparent !important;
+        // cursor: pointer;
+      }
+      .ant-table-thead > tr{
+        background:  transparent !important;
+      }
+      .ant-table-tbody > tr{
+        background:  transparent !important;
+      }
+      .ant-table-thead > tr > th{
+        text-align: left !important;
+        background:  transparent !important;
+      }
+      .ant-table-footer{
+        background:  transparent !important;
+      }
+      .ant-table-tbody > tr{
+        &:active{
+          background: #2f3135  !important;
+        }
+      }
+    }
+  }
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  padding: 2px;
+  border: 0.75px solid #232323;
+  width: 80%;
+
+  .inputLabel {
+    margin-left: 5px;
+    margin-right: 3px;
+  }
+}
+
+.optionInput {
+  color: #fff;
+  width: 0;
+  position: relative;
+  font-weight: 400;
+  outline: none;
+  flex: 1 1 auto;
+  height: unset;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0;
+  appearance: textfield;
+  text-align: right;
+}

@@ -71,6 +71,7 @@ import { useConnectWallet } from '@/components/ConnectWallet';
 import PositionsTable from './components/PositionsTable';
 import ActionHistoryTable from './components/ActionHistoryTable';
 import OrderTable from './components/OrderTable'
+import VoteCard from './components/VoteCard'
 
 /// THIS SECTION IS FOR TESTING SWR AND GMX CONTRACT
 import { fetcher } from '@/acy-dex-futures/utils';
@@ -1290,7 +1291,18 @@ const Swap = props => {
                 </div>
                 {poolGraphTab == "Vote" &&
                   <div>
-                    Vote @ JianAn
+                    <VoteCard
+                      isBuying={isBuying}
+                      setIsBuying={setIsBuying}
+                      setSwapTokenAddress={setSwapTokenAddress}
+                      setIsWaitingForApproval={setIsWaitingForApproval}
+                      tokenList={glp_tokenList}
+                      infoTokens={infoTokens}
+                      glpAmount={glpAmount}
+                      glpPrice={glpPrice}
+                      usdgSupply={glpUsdgSupply}
+                      totalTokenWeights={totalTokenWeights}
+                    />
                   </div>}
                 {poolGraphTab == "Action" &&
                   <div>Action</div>}
