@@ -113,36 +113,36 @@ export default function TokenTable(props) {
         visible: isDesktop(),
       },
       // Buttons
-      {
-        title: <div className={styles.tableHeader}> </div>,
-        // dataIndex: '',
-        // key: '',
-        render: (text, entry) => (
-          <div className={styles.tableHeader}>
-            {isBuying &&
-              <AcyButton
-                className={styles.buywith}
-                onClick={() => {
-                  onClickSelectToken(entry)
-                }}
-              >
-                Buy with {entry.symbol}
-              </AcyButton>
-            }
-            {!isBuying &&
-              <AcyButton
-                className={styles.buywith}
-                onClick={() => {
-                  onClickSelectToken(entry)
-                }}
-              >
-                Sell with {entry.symbol}
-              </AcyButton>
-            }
-          </div>
-        ),
-        visible: true,
-      },
+      // {
+      //   title: <div className={styles.tableHeader}> </div>,
+      //   // dataIndex: '',
+      //   // key: '',
+      //   render: (text, entry) => (
+      //     <div className={styles.tableHeader}>
+      //       {isBuying &&
+      //         <AcyButton
+      //           className={styles.buywith}
+      //           onClick={() => {
+      //             onClickSelectToken(entry)
+      //           }}
+      //         >
+      //           Buy with {entry.symbol}
+      //         </AcyButton>
+      //       }
+      //       {!isBuying &&
+      //         <AcyButton
+      //           className={styles.buywith}
+      //           onClick={() => {
+      //             onClickSelectToken(entry)
+      //           }}
+      //         >
+      //           Sell with {entry.symbol}
+      //         </AcyButton>
+      //       }
+      //     </div>
+      //   ),
+      //   visible: true,
+      // },
     ];
   }
 
@@ -155,25 +155,10 @@ export default function TokenTable(props) {
         }, props.isBuying, props.onClickSelectToken).filter(item => item.visible === true)}
         pagination={false}
         style={{
-          marginBottom: '20px',
           cursor: isHover ? 'pointer' : 'default',
         }}
         onRowMouseEnter={() => setIsHover(true)}
         onRowMouseLeave={() => setIsHover(false)}
-        footer={() => (
-          <div className={styles.tableSeeMoreWrapper}>
-            {props.dataSourceCoin.slice(0, tokenDisplayNumber + 1).length > tokenDisplayNumber && (
-              <a
-                className={styles.tableSeeMore}
-                onClick={() => {
-                  setTokenDisplayNumber(tokenDisplayNumber + 5);
-                }}
-              >
-                See More...
-              </a>
-            )}
-          </div>
-        )}
       />
     </div>
   );
