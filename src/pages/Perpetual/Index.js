@@ -281,6 +281,7 @@ const getTokenAddress = (token, nativeTokenAddress) => {
   if (token.address === AddressZero) {
     return nativeTokenAddress
   }
+  console.log("hereim gettokenaddr", token)
   return token.address
 }
 
@@ -468,7 +469,7 @@ const Swap = props => {
   const [tableContent, setTableContent] = useState(POSITIONS);
   const [positionsData, setPositionsData] = useState([]);
   const { active, activate } = useWeb3React();
-  // const [placement, setPlacement] = useState('5m');
+  const [placement, setPlacement] = useState('5m');
   const [high24, setHigh24] = useState(0);
   const [low24, setLow24] = useState(0);
   const [deltaPrice24, setDeltaPrice24] = useState(0);
@@ -510,9 +511,8 @@ const Swap = props => {
     setTokenSelection(newTokenSelection)
   }, [tokenSelection, setTokenSelection])
 
-  const fromTokenAddress = tokenSelection[swapOption].from
-  const toTokenAddress = tokenSelection[swapOption].to
-
+  const fromTokenAddress = tokenSelection[swapOption].from.toLowerCase()
+  const toTokenAddress = tokenSelection[swapOption].to.toLowerCase()
 
   const { perpetuals } = useConstantLoader()
   const readerAddress = perpetuals.getContract("Reader")
@@ -1065,17 +1065,17 @@ const Swap = props => {
   // let options = supportedTokens;
   // const menu = (
   //   <div className={styles.tokenSelector}>
-  //     <Menu onClick={onClickDropdown}>
-  //       {
+      // <Menu onClick={onClickDropdown}>
+      //   {
 
-  //         // supportedTokens.filter(token => !token.symbol !== 'USDT').map((option) => (
-  //         //   <Menu.Item key={option.symbol}>
-  //         //     <span>{option.symbol} / USD</span> 
-  //         //     {/* for showing before hover */}
-  //         //   </Menu.Item>
-  //         // ))
-  //       }
-  //     </Menu>
+      //     // supportedTokens.filter(token => !token.symbol !== 'USDT').map((option) => (
+      //     //   <Menu.Item key={option.symbol}>
+      //     //     <span>{option.symbol} / USD</span> 
+      //     //     {/* for showing before hover */}
+      //     //   </Menu.Item>
+      //     // ))
+      //   }
+      // </Menu>
   //   </div>
   // );
 
@@ -1091,17 +1091,14 @@ const Swap = props => {
   const KChartTokenListETH = ["BTC", "ETH"]
   const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
   const selectChartMATIC = item => {
-    console.log("hereim future chain", chainId)
     setKChartTokenMATIC(item)
     onClickSetActiveToken(item)
   }
   const selectChartETH = item => {
-    console.log("hereim future chain", chainId)
     setKChartTokenETH(item)
     onClickSetActiveToken(item)
   }
   const selectChartBSC = item => {
-    console.log("hereim future chain", chainId)
     setKChartTokenBSC(item)
     onClickSetActiveToken(item)
   }
@@ -1138,20 +1135,18 @@ const Swap = props => {
               </div>
 
                 <div style={{ backgroundColor: 'black', height: "450px", display: "flex", flexDirection: "column", marginBottom:"30px" }}>
-
-                 
-                      <ExchangeTVChart
-                        swapOption={swapOption}
-                        fromTokenAddress={fromTokenAddress}
-                        toTokenAddress={toTokenAddress}
-                        // period={placement}
-                        infoTokens={infoTokens}
-                        chainId={chainId}
-                        positions={positions}
-                        // savedShouldShowPositionLines,
-                        orders={orders}
-                        setToTokenAddress={setToTokenAddress}
-                      />
+                  <ExchangeTVChart
+                    swapOption={swapOption}
+                    fromTokenAddress={fromTokenAddress}
+                    toTokenAddress={toTokenAddress}
+                    // period={placement}
+                    infoTokens={infoTokens}
+                    chainId={chainId}
+                    positions={positions}
+                    // savedShouldShowPositionLines,
+                    orders={orders}
+                    setToTokenAddress={setToTokenAddress}
+                  />
                     
                 </div>
               </div>

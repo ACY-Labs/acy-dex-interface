@@ -1,6 +1,8 @@
 import { useWeb3React } from '@web3-react/core';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import useSWR from 'swr';
+import { DownOutlined } from '@ant-design/icons';
+import { Menu, Dropdown, Space, Row, Col } from 'antd';
 import AcyCard from '@/components/AcyCard';
 import OptionComponent from '@/components/OptionComponent'
 import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
@@ -12,6 +14,7 @@ import { ARBITRUM_DEFAULT_COLLATERAL_SYMBOL } from '@/acy-dex-futures/utils';
 import { ethers } from 'ethers'
 import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
 
+// import styled from "styled-components";
 import styles from './styles.less'
 
 const Option = props => {
@@ -22,6 +25,14 @@ const Option = props => {
   const [mode, setMode] = useState('Buy')
   const [volume, setVolume] = useState(0)
   const [percentage, setPercentage] = useState('')
+
+  const chainTokenList = getSupportedInfoTokens(supportedTokens)
+
+  const [activeToken1, setActiveToken1] = useState(chainTokenList[1]);
+  const [activeToken0, setActiveToken0] = useState(chainTokenList[0]);
+
+  const [fromTokenAddress, setFromTokenAddress] = useState(activeToken0.address);
+  const [toTokenAddress, setToTokenAddress] = useState("");
 
   const { perpetuals } = useConstantLoader()
   const readerAddress = perpetuals.getContract("Reader")
@@ -64,56 +75,128 @@ const Option = props => {
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
 
-  const setToTokenAddress = useCallback((selectedSwapOption, address) => {
-    const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
-    newTokenSelection[selectedSwapOption].to = address
-    setTokenSelection(newTokenSelection)
-  }, [tokenSelection, setTokenSelection])
+  function getSupportedInfoTokens(tokenlist) {
+    let supportedList = []
+    for (let i = 0; i < tokenlist.length; i++) {
+      tokenlist[i].address = tokenlist[i].address.toLowerCase()
+      if (tokenlist[i].symbol == 'BTC' || tokenlist[i].symbol == "ETH" || tokenlist[i].symbol == "USDT") {
+        supportedList.push(tokenlist[i])
+      }
+    }
+    return supportedList
+  }
+
 
   function getTokenBySymbol(tokenlist, symbol) {
     for (let i = 0; i < tokenlist.length; i++) {
+      tokenlist[i].address = tokenlist[i].address.toLowerCase()
       if (tokenlist[i].symbol === symbol) {
         return tokenlist[i]
       }
     }
     return undefined
   }
-  const [kChartTab, setKChartTab] = useState("BTC")
-  const kChartTabs = ["BTC", "ETH"]
-  const selectChart = item => {
-    setKChartTab(item)
-    onClickSetActiveToken(item)
+
+  const getActiveTokenAddr = (symbol) => {
+    let tmp = getTokenBySymbol(chainTokenList, symbol);
+    return tmp.address
   }
-  const onClickSetActiveToken = (e) => {
-    console.log("hereim see click token", e)
-    setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
-  }
+  const onClickDropdownBTC = e => {
+    let tmp = optionsBTC[e.key]
+    setActiveToken1(chainTokenList[1]);
+  };
+  const onClickDropdownETH = e => {
+    let tmp = optionsETH[e.key]
+    setActiveToken1(chainTokenList[2]);
+  };
+  useEffect(() => {
+    setToTokenAddress(getActiveTokenAddr(activeToken1.symbol))
+  }, [activeToken1])
+
+  let optionsBTC = [
+    { name: "BTC 1000000", tokenSymbol: "BTC", optionSymbol: "1000000" },
+    { name: "BTC 500000", tokenSymbol: "BTC", optionSymbol: "500000" },
+    { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000" },
+  ];
+  let optionsETH = [
+    { name: "ETH 10000", tokenSymbol: "ETH", optionSymbol: "10000" },
+    { name: "ETH 5000", tokenSymbol: "ETH", optionSymbol: "5000" },
+    { name: "ETH 1000", tokenSymbol: "ETH", optionSymbol: "1000" },
+  ];
 
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
-        {/* <div className={styles.chartTokenSelectorTab}>
-          <PerpetualTabs
-            option={kChartTab}
-            options={kChartTabs}
-            onChange={selectChart}
-          />
-        </div> */}
         <div className={`${styles.colItem} ${styles.priceChart}`}>
-          {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
-            <ExchangeTVChart
-              swapOption={'LONG'}
-              fromTokenAddress={"0x0000000000000000000000000000000000000000"}
-              toTokenAddress={"0x05d6f705C80d9F812d9bc1A142A655CDb25e2571"}
-              // period={'5m'}
-              infoTokens={infoTokens}
-              chainId={chainId}
-              // positions={positions}
-              // savedShouldShowPositionLines,
-              // orders={orders}
-              setToTokenAddress={setToTokenAddress}
-            />
+          <div>
+            <div className={styles.chartTokenSelectorTab}>
+              <Row>
+                <Col span={12} >
+                  <Dropdown overlay={
+                    <Menu onClick={onClickDropdownBTC} style={{ backgroundColor: 'black' }}>
+                      {
+                        optionsBTC.map((option, index) => (
+                          <Menu.Item key={index} >
+                            <span >{option.name} </span>
+                          </Menu.Item>
+                        ))
+                      }
+                    </Menu>
+                  } trigger={['click']}>
+                    <a >
+                      <div>
+                        BTC <DownOutlined />
+                      </div>
+                    </a>
+                  </Dropdown>
+                </Col>
+
+                <Col span={12}>
+                  <Dropdown overlay={
+                    <Menu onClick={onClickDropdownETH} style={{ backgroundColor: 'black' }}>
+                      {
+                        optionsETH.map((option, index) => (
+                          <Menu.Item key={index}>
+                            <span>{option.name} </span>
+                          </Menu.Item>
+                        ))
+                      }
+                    </Menu>
+                  } trigger={['click']}>
+                    <a >
+                      <div>
+                        ETH <DownOutlined />
+                      </div>
+                    </a>
+                  </Dropdown>
+                </Col>
+
+              </Row>
+
+              {/* <PerpetualTabs
+                option={kChartTab}
+                options={kChartTabs}
+                onChange={selectChart}
+              /> */}
+            </div>
+            <div style={{ backgroundColor: 'black', height: "450px", display: "flex", flexDirection: "column", marginBottom: "30px" }}>
+              {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
+              <ExchangeTVChart
+                swapOption={'LONG'}
+                fromTokenAddress={fromTokenAddress}
+                toTokenAddress={toTokenAddress}
+                // period={'5m'}
+                infoTokens={chainTokenList}
+                chainId={chainId}
+                // positions={positions}
+                // savedShouldShowPositionLines,
+                // orders={orders}
+                setToTokenAddress={setToTokenAddress}
+              />
+            </div>
+          </div>
         </div>
+
 
         <div className={`${styles.colItem} ${styles.optionComponent}`}>
           <AcyCard style={{ backgroundColor: 'transparent', border: 'none' }}>

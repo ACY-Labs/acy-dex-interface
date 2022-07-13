@@ -384,7 +384,6 @@ export const useConstantLoader = () => {
     //         }
     //     }
     // }, [history.location.query])
-
     return constant;
 }
 

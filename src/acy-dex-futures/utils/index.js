@@ -608,7 +608,9 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
     const infoTokens = {}
 
     for (let i = 0; i < tokens.length; i++) {
-        const token = JSON.parse(JSON.stringify(tokens[i]))
+      const token = JSON.parse(JSON.stringify(tokens[i]))
+      tokens[i].address = tokens[i].address.toLowerCase()
+      token.address = token.address.toLowerCase()
         if (tokenBalances) {
             token.balance = tokenBalances[i]
         }
@@ -616,7 +618,7 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
             token.minPrice = expandDecimals(1, USD_DECIMALS)
             token.maxPrice = expandDecimals(1, USD_DECIMALS)
         }
-        infoTokens[token.address] = token
+        infoTokens[token.address.toLowerCase()] = token
     }
     for (let i = 0; i < whitelistedTokens.length; i++) {
         const token = JSON.parse(JSON.stringify(whitelistedTokens[i]))

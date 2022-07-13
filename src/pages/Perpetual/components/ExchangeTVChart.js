@@ -199,7 +199,6 @@ export default function ExchangeTVChart(props) {
   // 1. 这里的token是包含价格的结构体
   const fromToken = getTokenInfo(infoTokens, fromTokenAddress)
   const toToken = getTokenInfo(infoTokens, toTokenAddress)
-  // console.log("chart debug: infotokens", infoTokens, toTokenAddress, fromToken, toToken)
 
   const [chartToken, setChartToken] = useState({
     maxPrice: null,
