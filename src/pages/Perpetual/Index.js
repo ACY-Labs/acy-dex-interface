@@ -997,16 +997,6 @@ const Swap = props => {
     setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
   }
 
-  const placementChange = e => {
-    // if(updatingKchartsFlag) {
-    //   return;
-    // }
-    // setUpdatingKchartsFlag(true);
-    setPlacement(e.target.value);
-    setActiveTimeScale(e.target.value);
-    console.log("hereim button triggered", e.target.value)
-  };
-
   const chartPanes = [
     { title: 'BTC', content: 'BTC', key: 'BTC', closable: false },
     { title: 'ETH', content: 'ETH', key: 'ETH' },
@@ -1065,17 +1055,17 @@ const Swap = props => {
   // let options = supportedTokens;
   // const menu = (
   //   <div className={styles.tokenSelector}>
-      // <Menu onClick={onClickDropdown}>
-      //   {
+  // <Menu onClick={onClickDropdown}>
+  //   {
 
-      //     // supportedTokens.filter(token => !token.symbol !== 'USDT').map((option) => (
-      //     //   <Menu.Item key={option.symbol}>
-      //     //     <span>{option.symbol} / USD</span> 
-      //     //     {/* for showing before hover */}
-      //     //   </Menu.Item>
-      //     // ))
-      //   }
-      // </Menu>
+  //     // supportedTokens.filter(token => !token.symbol !== 'USDT').map((option) => (
+  //     //   <Menu.Item key={option.symbol}>
+  //     //     <span>{option.symbol} / USD</span> 
+  //     //     {/* for showing before hover */}
+  //     //   </Menu.Item>
+  //     // ))
+  //   }
+  // </Menu>
   //   </div>
   // );
 
@@ -1119,26 +1109,26 @@ const Swap = props => {
             <div className={`${styles.colItem} ${styles.priceChart}`}>
               <div>
                 <div className={styles.chartTokenSelectorTab}>
-                { chainId === 56 || chainId === 97 ?  
-                  <PerpetualTabs
-                  option={KChartTokenBSC}
-                  options={KChartTokenListBSC}
-                  onChange={selectChartBSC}
-                  />
-                :
-                  chainId === 137 || chainId ===80001 ? 
-                  <PerpetualTabs
-                  option={KChartTokenMATIC}
-                  options={KChartTokenListMATIC}
-                  onChange={selectChartMATIC}
-                  />
-                    :
+                  {chainId === 56 || chainId === 97 ?
                     <PerpetualTabs
-                    option={KChartTokenETH}
-                    options={KChartTokenListETH}
-                    onChange={selectChartETH}
-                  />
-                }
+                      option={KChartTokenBSC}
+                      options={KChartTokenListBSC}
+                      onChange={selectChartBSC}
+                    />
+                    :
+                    chainId === 137 || chainId === 80001 ?
+                      <PerpetualTabs
+                        option={KChartTokenMATIC}
+                        options={KChartTokenListMATIC}
+                        onChange={selectChartMATIC}
+                      />
+                      :
+                      <PerpetualTabs
+                        option={KChartTokenETH}
+                        options={KChartTokenListETH}
+                        onChange={selectChartETH}
+                      />
+                  }
                 </div>
 
                 <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column" }}>

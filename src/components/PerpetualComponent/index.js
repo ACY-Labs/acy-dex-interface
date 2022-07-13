@@ -1707,7 +1707,7 @@ const SwapComponent = props => {
             {isLong && (
               <div className={styles.detailCard}>
                 <div className={styles.label}>Profits In</div>
-                <div className={styles.value}>{collateralToken.symbol}</div>
+                <div className={styles.value}>{fromToken.symbol}</div>
               </div>
             )}
             {isShort && (

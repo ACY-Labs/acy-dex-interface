@@ -185,7 +185,6 @@ export default function ExchangeTVChart(props) {
   } = props
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
-  const [activeTimeScale, setActiveTimeScale] = useState("5m");
 
 //   let [period, setPeriod] = useLocalStorageSerializeKey([chainId, "Chart-period"], DEFAULT_PERIOD);
 //   if (!(period in CHART_PERIODS)) {
@@ -298,10 +297,7 @@ export default function ExchangeTVChart(props) {
       console.log("prev data: ", prevData)
       currentSeries.setData(prevData);      
 
-      if (!chartInited) {
-        scaleChart();
-        setChartInited(true);
-      }
+      scaleChart();
     }
   
     fetchPrevAndSubscribe()
@@ -526,13 +522,8 @@ export default function ExchangeTVChart(props) {
   // }
 
   const placementChange = e => {
-    // if(updatingKchartsFlag) {
-    //   return;
-    // }
-    // setUpdatingKchartsFlag(true);
     setPeriod(e.target.value);
-    setActiveTimeScale(e.target.value);
-    console.log("hereim button triggered", e.target.value)
+    console.log("hereim button triggered perp", e.target.value)
   };
 
   return (
