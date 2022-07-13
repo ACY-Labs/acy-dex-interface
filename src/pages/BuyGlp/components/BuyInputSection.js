@@ -26,6 +26,16 @@ export default function BuyInputSection(props) {
     token 
   } = props
 
+  const logoURI = {
+    'MATIC': 'https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png?1624446912',
+    'WMATIC': 'https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png?1624446912',
+    'BTC': 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579',
+    'ETH': 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
+    'USDC': 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389',
+    'USDT': 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
+    'BNB': 'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png?1644979850',
+  }
+
   return (
     <div className={styles.buyInput}>
       <div className={styles.swapSectionTop}>
@@ -47,7 +57,10 @@ export default function BuyInputSection(props) {
                 dropdownClassName={styles.dropDownMenu}
               >
                 {tokenlist.map(coin => (
-                  <Option className={styles.optionItem} value={coin.symbol}>{coin.symbol}</Option>
+                  <Option className={styles.optionItem} value={coin.symbol}>
+                    <img src={logoURI[coin.symbol]} style={{ width: '20px', height:'20px', marginRight: '0.5rem' }} />
+                    {coin.symbol}
+                  </Option>
                 ))}
               </Select>
             </div>
