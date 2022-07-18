@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import {Table} from 'antd'
+import React, { useEffect, useState, useMemo } from 'react';
+import {Table, Button} from 'antd'
+import {clsx} from 'clsx'
 import {
     getTokenInfo,
     formatAmount,
@@ -30,7 +31,6 @@ const VoteCard = (props) => {
     } = props
 
     const tokenListData = []
-    const newTokenListData = []
     let totalPool = 0
     tokenList.map((token) => {
         const tokenInfo = getTokenInfo(infoTokens, token.address)
@@ -52,7 +52,27 @@ const VoteCard = (props) => {
         tData.poolPercent = parseFloat(tData.pool.replace(",",""))/totalPool*100
         return tData;
     })
-    console.log('AAAAAAAAAAAA',tokenListData,totalPool)
+    const [weight, setWeight] = useState({})
+    const [confirmation, setConfirmation] = useState({})
+    const handleChange = e => {
+        const {name, value} = e.target
+        setWeight(prevWeight => ({
+            ...prevWeight,
+            [name]: value
+        }))
+    }
+    const unusedWeight = useMemo(() => {
+        return(
+            100 - 
+            Object.values(weight).reduce((accumulator,value) => {
+
+                return (parseFloat(accumulator) + parseFloat(
+                    value ? value : 0
+                    ))
+                .toFixed(2)
+            },0)
+        )
+    },[weight])
     function columnsCoin(){
         return [
             {
@@ -93,7 +113,7 @@ const VoteCard = (props) => {
                 width: '15%',
             },
             {
-                title: <div className={styles.tableHeaderFirst}> Pool Percentage </div>,
+                title: <div className={styles.tableHeaderFirst}> Current Weight </div>,
                 dataIndex: 'poolPercent',
                 key: 'poolPercent',
                 className: 'leftAlignTableHeader',
@@ -104,7 +124,7 @@ const VoteCard = (props) => {
                 width: '25%',
             },
             {
-                title: <div className={styles.tableHeaderFirst}> Vote </div>,
+                title: <div className={styles.tableHeaderFirst}> Vote Weight </div>,
                 //dataIndex: 'poolPercent',
                 //key: 'poolPercent',
                 //className: 'leftAlignTableHeader',
@@ -115,7 +135,11 @@ const VoteCard = (props) => {
                         min="0"
                         placeholder="0.0"
                         className={styles.optionInput}
-
+                        value={weight[entry.name]}
+                        name={entry.name}
+                        onChange={handleChange}
+                        disabled={confirmation[entry.name]}
+                        max="30"
                         />
                         <span className={styles.inputLabel}>%</span>
                     </div>
@@ -153,6 +177,18 @@ const VoteCard = (props) => {
                     </div>
                 )}
             />
+            <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '10px' }}>
+                <h4 style={{marginTop:'4px'}}>Unused Weight : {unusedWeight}%</h4>
+                <Button
+                    type="primary"
+                    style={{
+                      marginLeft: '10px',
+                      background: '#2e3032',
+                      borderColor: 'transparent',
+                      width: '30%'
+                    }}
+                >Vote</Button>
+            </div>
         </div>
         </>
     );
