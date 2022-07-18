@@ -282,6 +282,7 @@ const getTokenAddress = (token, nativeTokenAddress) => {
   if (token.address === AddressZero) {
     return nativeTokenAddress
   }
+  console.log("hereim gettokenaddr", token)
   return token.address
 }
 
@@ -511,9 +512,8 @@ const Swap = props => {
     setTokenSelection(newTokenSelection)
   }, [tokenSelection, setTokenSelection])
 
-  const fromTokenAddress = tokenSelection[swapOption].from
-  const toTokenAddress = tokenSelection[swapOption].to
-
+  const fromTokenAddress = tokenSelection[swapOption].from.toLowerCase()
+  const toTokenAddress = tokenSelection[swapOption].to.toLowerCase()
 
   const { perpetuals } = useConstantLoader()
   const readerAddress = perpetuals.getContract("Reader")
@@ -998,16 +998,6 @@ const Swap = props => {
     setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
   }
 
-  const placementChange = e => {
-    // if(updatingKchartsFlag) {
-    //   return;
-    // }
-    // setUpdatingKchartsFlag(true);
-    setPlacement(e.target.value);
-    setActiveTimeScale(e.target.value);
-    console.log("hereim button triggered", e.target.value)
-  };
-
   const chartPanes = [
     { title: 'BTC', content: 'BTC', key: 'BTC', closable: false },
     { title: 'ETH', content: 'ETH', key: 'ETH' },
@@ -1063,13 +1053,42 @@ const Swap = props => {
     }
   };
 
-  const [kChartTab, setKChartTab] = useState("BTC")
-  const kChartTabs = ["BTC", "ETH"]
-  const selectChart = item => {
-    setKChartTab(item)
+  // let options = supportedTokens;
+  // const menu = (
+  //   <div className={styles.tokenSelector}>
+  // <Menu onClick={onClickDropdown}>
+  //   {
+
+  //     // supportedTokens.filter(token => !token.symbol !== 'USDT').map((option) => (
+  //     //   <Menu.Item key={option.symbol}>
+  //     //     <span>{option.symbol} / USD</span> 
+  //     //     {/* for showing before hover */}
+  //     //   </Menu.Item>
+  //     // ))
+  //   }
+  // </Menu>
+  //   </div>
+  // );
+
+
+  const [KChartTokenMATIC, setKChartTokenMATIC] = useState("BTC")
+  const [KChartTokenETH, setKChartTokenETH] = useState("BTC")
+  const [KChartTokenBSC, setKChartTokenBSC] = useState("BTC")
+  const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
+  const KChartTokenListETH = ["BTC", "ETH"]
+  const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
+  const selectChartMATIC = item => {
+    setKChartTokenMATIC(item)
     onClickSetActiveToken(item)
   }
-
+  const selectChartETH = item => {
+    setKChartTokenETH(item)
+    onClickSetActiveToken(item)
+  }
+  const selectChartBSC = item => {
+    setKChartTokenBSC(item)
+    onClickSetActiveToken(item)
+  }
   const [poolTab, setPoolTab] = useState("ALP Price")
   const poolTabs = ["ALP Price", "Portfolio", "Details"]
   const selectPool = item => {
@@ -1091,11 +1110,26 @@ const Swap = props => {
             <div className={`${styles.colItem} ${styles.priceChart}`}>
               <div>
                 <div className={styles.chartTokenSelectorTab}>
-                  <PerpetualTabs
-                    option={kChartTab}
-                    options={kChartTabs}
-                    onChange={selectChart}
-                  />
+                  {chainId === 56 || chainId === 97 ?
+                    <PerpetualTabs
+                      option={KChartTokenBSC}
+                      options={KChartTokenListBSC}
+                      onChange={selectChartBSC}
+                    />
+                    :
+                    chainId === 137 || chainId === 80001 ?
+                      <PerpetualTabs
+                        option={KChartTokenMATIC}
+                        options={KChartTokenListMATIC}
+                        onChange={selectChartMATIC}
+                      />
+                      :
+                      <PerpetualTabs
+                        option={KChartTokenETH}
+                        options={KChartTokenListETH}
+                        onChange={selectChartETH}
+                      />
+                  }
                 </div>
 
                 <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column" }}>
@@ -1103,7 +1137,7 @@ const Swap = props => {
                     swapOption={swapOption}
                     fromTokenAddress={fromTokenAddress}
                     toTokenAddress={toTokenAddress}
-                    period={placement}
+                    // period={placement}
                     infoTokens={infoTokens}
                     chainId={chainId}
                     positions={positions}
