@@ -600,11 +600,12 @@
     width: 100%;
     padding: 20px;
     overflow: hidden;
-    border: 0.75px solid #333333;
+    border-bottom: 0.75px solid #333333;
+    border-right: 0.75px solid #333333;
   }
 
   .statstitle {
-    font-size: 1.1rem;
+    font-size: 16px;
     line-height: 1.355rem;
     letter-spacing: 0px;
     color: #FFFFFF;
@@ -629,14 +630,42 @@
 
     .label {
       color: #a9a9b0;
-      font-size: 1rem;
+      font-size: 15px;
       opacity: 1;
     }
 
     .value {
       color: #a9a9b0;
-      font-size: 1rem;
+      font-size: 15px;
       opacity: 1;
+    }
+  }
+
+  .GlpSwapstatsmark {
+    display: flex;
+
+    .GlpSwapstatsicon {
+      position: relative;
+      margin-right: 0.5rem;
+      display: flex;
+    }
+
+    .GlpSwapinfo {
+      margin-left: 2.5rem;
+
+      .statstitle {
+        font-size: 1.1rem;
+        line-height: 1.355rem;
+        letter-spacing: 0px;
+        color: #FFFFFF;
+      }
+
+      .statssubtitle {
+        font-size: 0.774rem;
+        line-height: 1rem;
+        letter-spacing: 0px;
+        color: #a9a9b0;
+      }
     }
   }
 }

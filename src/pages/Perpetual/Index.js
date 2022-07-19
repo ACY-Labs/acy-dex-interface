@@ -72,6 +72,7 @@ import PositionsTable from './components/PositionsTable';
 import ActionHistoryTable from './components/ActionHistoryTable';
 import OrderTable from './components/OrderTable'
 import VoteCard from './components/VoteCard'
+import glp40Icon from '@/pages/BuyGlp/components/ic_glp_40.svg'
 
 /// THIS SECTION IS FOR TESTING SWR AND GMX CONTRACT
 import { fetcher } from '@/acy-dex-futures/utils';
@@ -1090,13 +1091,13 @@ const Swap = props => {
     onClickSetActiveToken(item)
   }
   const [poolTab, setPoolTab] = useState("ALP Price")
-  const poolTabs = ["ALP Price", "Portfolio", "Details"]
+  const poolTabs = ["ALP Price", "Portfolio"]
   const selectPool = item => {
     setPoolTab(item)
   }
 
-  const [poolGraphTab, setPoolGraphTab] = useState("Vote")
-  const poolGraphTabs = ["Vote", "Action"]
+  const [poolGraphTab, setPoolGraphTab] = useState("Action")
+  const poolGraphTabs = ["Action"]
   const selectPoolGraph = item => {
     setPoolGraphTab(item)
   }
@@ -1239,80 +1240,115 @@ const Swap = props => {
                     </ChartWrapper>
                   </div>}
                 {poolTab == "Portfolio" &&
-                  <div className={styles.portfolio}>
-                    <div className={styles.statsContainer}>
-                      <div className={styles.statstitle}>Overview</div>
-                      <div className={styles.statsdivider} />
-                      <div className={styles.statscontent}>
-                        <div className={styles.statsRow}>
-                          <div className={styles.label}>AUM</div>
-                          <div className={styles.value}>XXX</div>
+                  <>
+                    <div className={styles.portfolio}>
+                      <div className={styles.statsContainer}>
+                        <div className={styles.statstitle}>Overview</div>
+                        <div className={styles.statsdivider} />
+                        <div className={styles.statscontent}>
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>AUM</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>ALP Pool</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>24h Volume</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Long Position</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Short Position</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Fees</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Total Fees</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Total Volume</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Floor Price Fund</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
                         </div>
 
-                        <div className={styles.statsRow}>
-                          <div className={styles.label}>GLP Pool</div>
-                          <div className={styles.value}>XXX</div>
-                        </div>
-
-                        <div className={styles.statsRow}>
-                          <div className={styles.label}>24h Volume</div>
-                          <div className={styles.value}>XXX</div>
-                        </div>
-
-                        <div className={styles.statsRow}>
-                          <div className={styles.label}>Long Position</div>
-                          <div className={styles.value}>XXX</div>
-                        </div>
-
-                        <div className={styles.statsRow}>
-                          <div className={styles.label}>Short Position</div>
-                          <div className={styles.value}>XXX</div>
-                        </div>
-
-                        <div className={styles.statsRow}>
-                          <div className={styles.label}>Fees</div>
-                          <div className={styles.value}>XXX</div>
-                        </div>
                       </div>
+                      <div className={styles.statsContainer}>
+                        <div className={styles.GlpSwapstatsmark}>
+                          <div className={styles.GlpSwapstatsicon}>
+                            <img src={glp40Icon} alt="glp40Icon" />
+                          </div>
+                          <div className={styles.GlpSwapinfo}>
+                            <div className={styles.statstitle}>ALP</div>
+                            <div className={styles.statssubtitle}>ALP</div>
+                          </div>
+                        </div>
+                        <div className={styles.statsdivider} />
+                        <div className={styles.statscontent}>
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Price</div>
+                            <div className={styles.value}>${formatAmount(glpPrice, GLP_DECIMALS, 2, true)}</div>
+                          </div>
 
-                    </div>
-                    <div className={styles.statsContainer}>
-                      <div className={styles.statstitle}>Total Stats</div>
-                      <div className={styles.statsdivider} />
-                      <div className={styles.statscontent}>
-                        <div className={styles.statsRow}>
-                          <div className={styles.label}>Total Fees</div>
-                          <div className={styles.value}>XXX</div>
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Supply</div>
+                            <div className={styles.value}>{formatAmount(glpSupply, GLP_DECIMALS, 4, true)} ALP (${formatAmount(glpSupplyUsd, GLP_DECIMALS, 2, true)})</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Total Staked</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Market Cap</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Stablecoin Percentage</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
                         </div>
 
-                        <div className={styles.statsRow}>
-                          <div className={styles.label}>Total Volume</div>
-                          <div className={styles.value}>XXX</div>
-                        </div>
-
-                        <div className={styles.statsRow}>
-                          <div className={styles.label}>Floor Price Fund</div>
-                          <div className={styles.value}>XXX</div>
-                        </div>
                       </div>
-
                     </div>
-                  </div>}
-                {poolTab == "Details" &&
-                  <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
-                    <GlpSwapTokenTable
-                      isBuying={isBuying}
-                      setIsBuying={setIsBuying}
-                      setSwapTokenAddress={setSwapTokenAddress}
-                      setIsWaitingForApproval={setIsWaitingForApproval}
-                      tokenList={glp_tokenList}
-                      infoTokens={infoTokens}
-                      glpAmount={glpAmount}
-                      glpPrice={glpPrice}
-                      usdgSupply={glpUsdgSupply}
-                      totalTokenWeights={totalTokenWeights}
-                    />
-                  </AcyCard>}
+                    <AcyCard style={{ backgroundColor: 'transparent' }}>
+                      <GlpSwapTokenTable
+                        isBuying={isBuying}
+                        setIsBuying={setIsBuying}
+                        setSwapTokenAddress={setSwapTokenAddress}
+                        setIsWaitingForApproval={setIsWaitingForApproval}
+                        tokenList={glp_tokenList}
+                        infoTokens={infoTokens}
+                        glpAmount={glpAmount}
+                        glpPrice={glpPrice}
+                        usdgSupply={glpUsdgSupply}
+                        totalTokenWeights={totalTokenWeights}
+                      />
+                    </AcyCard>
+                  </>}
               </div>
 
               <div className={styles.bottomWrapper}>
@@ -1323,21 +1359,6 @@ const Swap = props => {
                     onChange={selectPoolGraph}
                   />
                 </div>
-                {poolGraphTab == "Vote" &&
-                  <div>
-                    <VoteCard
-                      isBuying={isBuying}
-                      setIsBuying={setIsBuying}
-                      setSwapTokenAddress={setSwapTokenAddress}
-                      setIsWaitingForApproval={setIsWaitingForApproval}
-                      tokenList={glp_tokenList}
-                      infoTokens={infoTokens}
-                      glpAmount={glpAmount}
-                      glpPrice={glpPrice}
-                      usdgSupply={glpUsdgSupply}
-                      totalTokenWeights={totalTokenWeights}
-                    />
-                  </div>}
                 {poolGraphTab == "Action" &&
                   <div>Action</div>}
               </div>
