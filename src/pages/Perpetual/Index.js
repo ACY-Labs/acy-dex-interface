@@ -1072,22 +1072,13 @@ const Swap = props => {
   // );
 
 
-  const [KChartTokenMATIC, setKChartTokenMATIC] = useState("BTC")
-  const [KChartTokenETH, setKChartTokenETH] = useState("BTC")
-  const [KChartTokenBSC, setKChartTokenBSC] = useState("BTC")
   const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
   const KChartTokenListETH = ["BTC", "ETH"]
   const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
-  const selectChartMATIC = item => {
-    setKChartTokenMATIC(item)
-    onClickSetActiveToken(item)
-  }
-  const selectChartETH = item => {
-    setKChartTokenETH(item)
-    onClickSetActiveToken(item)
-  }
-  const selectChartBSC = item => {
-    setKChartTokenBSC(item)
+  const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBSC
+                          : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
+                          : KChartTokenListETH
+  const selectChartToken = item => {
     onClickSetActiveToken(item)
   }
   const [poolTab, setPoolTab] = useState("ALP Price")
@@ -1111,26 +1102,11 @@ const Swap = props => {
             <div className={`${styles.colItem} ${styles.priceChart}`}>
               <div>
                 <div className={styles.chartTokenSelectorTab}>
-                  {chainId === 56 || chainId === 97 ?
-                    <PerpetualTabs
-                      option={KChartTokenBSC}
-                      options={KChartTokenListBSC}
-                      onChange={selectChartBSC}
-                    />
-                    :
-                    chainId === 137 || chainId === 80001 ?
-                      <PerpetualTabs
-                        option={KChartTokenMATIC}
-                        options={KChartTokenListMATIC}
-                        onChange={selectChartMATIC}
-                      />
-                      :
-                      <PerpetualTabs
-                        option={KChartTokenETH}
-                        options={KChartTokenListETH}
-                        onChange={selectChartETH}
-                      />
-                  }
+                  <PerpetualTabs
+                    option={activeToken1.symbol}
+                    options={KChartTokenList}
+                    onChange={selectChartToken}
+                  />
                 </div>
 
                 <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column" }}>
