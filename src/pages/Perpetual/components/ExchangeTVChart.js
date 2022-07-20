@@ -42,6 +42,7 @@ const PRICE_LINE_TEXT_WIDTH = 15;
 const timezoneOffset = -new Date().getTimezoneOffset() * 60;
 
 const BinancePriceApi = 'https://api.acy.finance/polygon-test';
+const BinanceDeltaApi = 'https://api.binance.com'
 
 const StyledSelect = styled(Radio.Group)`
   .ant-radio-button-wrapper{
@@ -194,6 +195,9 @@ export default function ExchangeTVChart(props) {
   const [hoveredCandlestick, setHoveredCandlestick] = useState();
   // const [placement, setPlacement] = useState('5m');
   const [period, setPeriod] = useState('5m');
+  const [priceChangeDelta, setPriceChangeDelta] = useState();
+  const [priceChangePercentDelta, setPriceChangePercentDelta] = useState();
+  const [deltaIsMinus, setDeltaIsMinus] = useState();
 
   // 1. 这里的token是包含价格的结构体
   const fromToken = getTokenInfo(infoTokens, fromTokenAddress)
@@ -299,12 +303,36 @@ export default function ExchangeTVChart(props) {
 
       scaleChart();
     }
+    const fetchDeltaPriceChange = async () => {
+      // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
+      // SHOULD DO THIS BEFORE SUBSCRIBE, HOWEVER MOVING SUBSCRIBE TO AFTER THIS BLOCK OF CODE WILL CAUSE THE SUBSCRIPTION GOES ON FOREVER
+      // REACT BUG?
+      console.log("fetchDeltaPriceChange again: ", chartToken.symbol)
+      // Binance data is independent of chain, so here we can fill in any chain name
+      const prevDeltaData = await axios.get(`${BinanceDeltaApi}/api/v3/ticker/24hr?symbol=${pairName}`).then(res => res.data);
+      let delta = prevDeltaData.priceChange
+      let deltaPercent = prevDeltaData.priceChangePercent
+      // delta = "-3452.0000"
+      // deltaPercent = "-6.432"
+      if ( delta && delta[0] == "-") {
+        setDeltaIsMinus(true)
+        let negativePriceChange = delta.substring(1)
+        let negativePriceChangePercent = deltaPercent.substring(1)
+        setPriceChangeDelta(parseFloat(negativePriceChange).toFixed(2))
+        setPriceChangePercentDelta(parseFloat(negativePriceChangePercent).toFixed(3))
+      }
+      else if (delta && delta[0] != "-") {
+        setDeltaIsMinus(false)
+        let positivePricechange = delta
+        let positivePricechangePercent = deltaPercent
+        setPriceChangeDelta(parseFloat(positivePricechange).toFixed(2))
+        setPriceChangePercentDelta(parseFloat(positivePricechangePercent).toFixed(3))
+      }
+    }
   
     fetchPrevAndSubscribe()
+    fetchDeltaPriceChange()
   }, [chartToken.symbol, period])
-  ///// end of binance data source
-
-  
 
   // 设置chart的鼠标移动时的回调函数。evt是event的意思。
   const onCrosshairMove = useCallback(
@@ -548,9 +576,11 @@ export default function ExchangeTVChart(props) {
                   <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
                 </StyledSelect>
               </Col> 
-              <Col span={"50%"}>
-                24h Change +21411 +2.241%
-              </Col>
+              {deltaIsMinus ?
+              <Col span={"50%"} style={{color: '#FA3C58'}}> -${priceChangeDelta}    -{priceChangePercentDelta}% </Col>
+              :
+              <Col span={"50%"} style={{color: '#10CC83'}}> +${priceChangeDelta}    +{priceChangePercentDelta}% </Col>
+              }
             </Row>
               {/* </div> */}
             {/* <div className="ExchangeChart-title">
