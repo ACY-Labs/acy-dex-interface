@@ -150,16 +150,7 @@ const StableCoin = props => {
               <div style={{ backgroundColor: 'black', height: "450px", display: "flex", flexDirection: "column", marginBottom: "30px" }}>
                 {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
                 <ExchangeTVChart
-                  swapOption={'LONG'}
-                  fromTokenAddress={"0x0000000000000000000000000000000000000000"}
-                  toTokenAddress={"0x05d6f705c80d9f812d9bc1a142a655cdb25e2571"}
-                  // period={'5m'}
-                  infoTokens={infoTokens}
-                  chainId={chainId}
-                  // positions={positions}
-                  // savedShouldShowPositionLines,
-                  // orders={orders}
-                  setToTokenAddress={setToTokenAddress}
+                  chartTokenSymbol="USDC"
                 />
               </div>
             </div>

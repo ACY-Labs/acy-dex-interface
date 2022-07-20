@@ -75,35 +75,6 @@ const timezoneOffset = -new Date().getTimezoneOffset() * 60;
 
 const BinancePriceApi = 'https://api.acy.finance/polygon-test';
 
-export function getChartToken(fromToken, toToken, chainId) {
-  if (!fromToken || !toToken) {
-    return;
-  }
-
-  if (fromToken.isUsdg && toToken.isUsdg) {
-    return constantInstance.perpetuals.tokenList.find((t) => t.isStable);
-  }
-  if (fromToken.isUsdg) {
-    return toToken;
-  }
-  if (toToken.isUsdg) {
-    return fromToken;
-  }
-
-  if (fromToken.isStable && toToken.isStable) {
-    return toToken;
-  }
-  if (fromToken.isStable) {
-    return toToken;
-  }
-  if (toToken.isStable) {
-    return fromToken;
-  }
-  console.log("hereim chart global getcharttoken", toToken)
-
-  return toToken;
-}
-
 const DEFAULT_PERIOD = "4h";
 
 const getSeriesOptions = () => ({
@@ -172,79 +143,23 @@ const getChartOptions = (width, height) => ({
 
 export default function ExchangeTVChart(props) {
   const {
-    // swapOption,
-    fromTokenAddress,
-    toTokenAddress,
-    // time,
-    infoTokens,
-    chainId,
-    // positions,
-    // savedShouldShowPositionLines,
-    // orders,
-    setToTokenAddress
+    chartTokenSymbol,
   } = props
-  // console.log("hereyou props", fromTokenAddress);
-  // console.log("hereyou props", toTokenAddress);
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [activeTimeScale, setActiveTimeScale] = useState("5m");
   const [period, setPeriod] = useState('5m');
 
-//   let [period, setPeriod] = useLocalStorageSerializeKey([chainId, "Chart-period"], DEFAULT_PERIOD);
-//   if (!(period in CHART_PERIODS)) {
-//     period = DEFAULT_PERIOD;
-//   }
-
   const [hoveredCandlestick, setHoveredCandlestick] = useState();
 
-  // 1. 这里的token是包含价格的结构体
-  const fromToken = getTokenByAddress(infoTokens, fromTokenAddress)
-  const toToken = getTokenByAddress(infoTokens, toTokenAddress)
-  console.log("hereim chart global tokens address:", fromTokenAddress, "toTokenAddress:", toTokenAddress)
-  console.log("hereim chart global tokens totoken:", toToken, "fromtoken:", fromToken, "infotokens:", infoTokens)
-
-  const [chartToken, setChartToken] = useState({
-    maxPrice: null,
-    minPrice: null
-  })
-  useEffect(() => {
-    let tmp;
-    if (toToken && fromToken){
-      tmp = getChartToken(fromToken, toToken, chainId)
-      console.log("hereim chart global tmp", tmp, " ", fromToken, " ", toToken, " ", chainId)
-      setChartToken(tmp)
-    }
-  }, [fromToken, toToken, chainId])
 
 
-  const symbol = chartToken ? (chartToken.isWrapped ? chartToken.baseSymbol : chartToken.symbol) : undefined;
-  const marketName = chartToken ? symbol + "_USD" : undefined;
+  const symbol = chartTokenSymbol || "BTC";
+  const marketName = symbol + "_USD";
   const previousMarketName = usePrevious(marketName);
-
-  // const currentOrders = useMemo(() => {
-  //   if (!chartToken) {
-  //     return [];
-  //   }
-
-  //   return orders.filter((order) => {
-  //     if (order.type === SWAP) {
-  //       // we can't show non-stable to non-stable swap orders with existing charts
-  //       // so to avoid users confusion we'll show only long/short orders
-  //       return false;
-  //     }
-
-  //     const indexToken = constantInstance.perpetuals.getToken(order.indexToken);
-  //     return order.indexToken === chartToken.address || (chartToken.isNative && indexToken.isWrapped);
-  //   });
-  // }, [orders, chartToken, chainId]);
 
   const ref = useRef(null);
   const chartRef = useRef(null);
-
-  // 2. 计算买卖中间价（maxPrice + minPrice）/ 2
-  const currentAveragePrice =
-    chartToken.maxPrice && chartToken.minPrice ? chartToken.maxPrice.add(chartToken.minPrice).div(2) : null;
-  
   
   const [chartInited, setChartInited] = useState(false);
   useEffect(() => {
@@ -264,8 +179,8 @@ export default function ExchangeTVChart(props) {
   const [lastCandle, setLastCandle] = useState({})
   const cleaner = useRef()
   useEffect(() => {
-    const symbol = chartToken.symbol;
-    console.log("bin chart token: ", chartToken, symbol)
+    const symbol = chartTokenSymbol;
+    console.log("bin chart token: ", symbol)
     if (!symbol)
       return
     const pairName = `${symbol}USDT`;
@@ -300,7 +215,7 @@ export default function ExchangeTVChart(props) {
       // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
       // SHOULD DO THIS BEFORE SUBSCRIBE, HOWEVER MOVING SUBSCRIBE TO AFTER THIS BLOCK OF CODE WILL CAUSE THE SUBSCRIPTION GOES ON FOREVER
       // REACT BUG?
-      console.log("fetchPrevAndSubscribe again: ", chartToken.symbol)
+      console.log("fetchPrevAndSubscribe again: ", chartTokenSymbol)
       // Binance data is independent of chain, so here we can fill in any chain name
       const prevData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`).then(res => res.data);
       console.log("prev data: ", prevData)
@@ -313,7 +228,7 @@ export default function ExchangeTVChart(props) {
     }
   
     fetchPrevAndSubscribe()
-  }, [chartToken.symbol, period])
+  }, [chartTokenSymbol, period])
   ///// end of binance data source
 
   
@@ -523,7 +438,7 @@ export default function ExchangeTVChart(props) {
   //   }
   // }
 
-  if (!chartToken) {
+  if (!chartTokenSymbol) {
     return null;
   }
   const placementChange = e => {
@@ -561,20 +476,6 @@ export default function ExchangeTVChart(props) {
   //   setChartToken(tmp)
   //   setToTokenAddress(swapOption, token.address)
   // }
-
-  function getTokenByAddress(tokenlist, address) {
-    console.log("hereim chart global gettokenbyaddr", Object.keys(tokenlist).length, address)
-    let keys = Object.keys(tokenlist)
-    for (let i = 0; i < keys.length; i++) {
-      console.log("hereim chart global gettokenbyaddr in for", tokenlist, tokenlist[keys[i]], address)
-      tokenlist[keys[i]].address = tokenlist[keys[i]].address.toLowerCase()      
-      if (tokenlist[keys[i]].address === address) {
-        console.log("hereim chart global gettokenbyaddr in if", tokenlist[keys[i]].address, address)
-        return tokenlist[keys[i]]
-      }
-    }
-    return undefined
-  }
 
   return (
     <div className="ExchangeChart tv" ref={ref} style={{ height: "100%", width: "100%"}}>
