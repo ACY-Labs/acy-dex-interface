@@ -200,6 +200,7 @@ export default function ExchangeTVChart(props) {
   // 1. 这里的token是包含价格的结构体
   const fromToken = getTokenByAddress(infoTokens, fromTokenAddress)
   const toToken = getTokenByAddress(infoTokens, toTokenAddress)
+  console.log("hereim chart global tokens address:", fromTokenAddress, "toTokenAddress:", toTokenAddress)
   console.log("hereim chart global tokens totoken:", toToken, "fromtoken:", fromToken, "infotokens:", infoTokens)
 
   const [chartToken, setChartToken] = useState({
@@ -562,10 +563,14 @@ export default function ExchangeTVChart(props) {
   // }
 
   function getTokenByAddress(tokenlist, address) {
-    for (let i = 0; i < tokenlist.length; i++) {
-      tokenlist[i].address = tokenlist[i].address.toLowerCase()
-      if (tokenlist[i].address === address) {
-        return tokenlist[i]
+    console.log("hereim chart global gettokenbyaddr", Object.keys(tokenlist).length, address)
+    let keys = Object.keys(tokenlist)
+    for (let i = 0; i < keys.length; i++) {
+      console.log("hereim chart global gettokenbyaddr in for", tokenlist, tokenlist[keys[i]], address)
+      tokenlist[keys[i]].address = tokenlist[keys[i]].address.toLowerCase()      
+      if (tokenlist[keys[i]].address === address) {
+        console.log("hereim chart global gettokenbyaddr in if", tokenlist[keys[i]].address, address)
+        return tokenlist[keys[i]]
       }
     }
     return undefined
@@ -578,17 +583,7 @@ export default function ExchangeTVChart(props) {
             <div>
               {/* <div className="ExchangeChart-info-label">24h Change</div> */}
                 {/* <div className={styles.timeSelector}> */}
-                  {/* <div className={styles.buttonContainer} style={{width: "50%"}}>
-                    {getTimescaleButton('1m')}
-                    {getTimescaleButton('5m')}
-                    {getTimescaleButton('15m')}
-                    {getTimescaleButton('30m')}
-                    {getTimescaleButton('1h')}
-                    {getTimescaleButton('2h')}
-                    {getTimescaleButton('4h')}
-                    {getTimescaleButton('1d')}                    
-                    {getTimescaleButton('1w')}
-                  </div> */}
+                  
                   <StyledSelect value={period} onChange={placementChange}
                     style={{ width: '100%', height: '20px', paddingRight: '50%' }}>
                     <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>

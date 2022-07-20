@@ -698,10 +698,10 @@ function getTokenBySymbol(tokenlist, symbol) {
                 <div>
                   {
                     <ExchangeTVChart 
-                      swapOption={'LONG'}
+                      // swapOption={'LONG'}
                       fromTokenAddress={"0x0000000000000000000000000000000000000000"}//platformList[chainId][activeToken0.name]}
-                      toTokenAddress={"0x0000000000000000000000000000000000000000"}//platformList[chainId][activeToken1.name]}
-                      period={'5m'}
+                      toTokenAddress={"0x05d6f705c80d9f812d9bc1a142a655cdb25e2571"}//platformList[chainId][activeToken1.name]}
+                      // period={'5m'}
                       infoTokens={infoTokens}
                       chainId={chainId}
                       // positions={positions}
