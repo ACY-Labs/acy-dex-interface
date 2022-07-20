@@ -152,7 +152,7 @@ const StableCoin = props => {
                 <ExchangeTVChart
                   swapOption={'LONG'}
                   fromTokenAddress={"0x0000000000000000000000000000000000000000"}
-                  toTokenAddress={"0x05d6f705C80d9F812d9bc1A142A655CDb25e2571"}
+                  toTokenAddress={"0x05d6f705c80d9f812d9bc1a142a655cdb25e2571"}
                   // period={'5m'}
                   infoTokens={infoTokens}
                   chainId={chainId}
