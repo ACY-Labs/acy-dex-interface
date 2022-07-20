@@ -179,6 +179,9 @@ export default function ExchangeTVChart(props) {
   const [lastCandle, setLastCandle] = useState({})
   const cleaner = useRef()
   useEffect(() => {
+    if (!currentSeries)
+      return;
+
     const symbol = chartTokenSymbol;
     console.log("bin chart token: ", symbol)
     if (!symbol)
@@ -228,7 +231,7 @@ export default function ExchangeTVChart(props) {
     }
   
     fetchPrevAndSubscribe()
-  }, [chartTokenSymbol, period])
+  }, [currentSeries, chartTokenSymbol, period])
   ///// end of binance data source
 
   
