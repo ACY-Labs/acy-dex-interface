@@ -185,6 +185,7 @@ for (let j = 0; j < CHAIN_IDS.length; j++) {
   TOKENS_BY_SYMBOL_MAP[chainId] = {};
   for (let i = 0; i < TOKENS[chainId].length; i++) {
     const token = TOKENS[chainId][i];
+    token.address = token.address.toLowerCase()
     TOKENS_MAP[chainId][token.address] = token;
     TOKENS_BY_SYMBOL_MAP[chainId][token.symbol] = token;
   }

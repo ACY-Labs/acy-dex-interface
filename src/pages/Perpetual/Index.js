@@ -71,6 +71,8 @@ import { useConnectWallet } from '@/components/ConnectWallet';
 import PositionsTable from './components/PositionsTable';
 import ActionHistoryTable from './components/ActionHistoryTable';
 import OrderTable from './components/OrderTable'
+import VoteCard from './components/VoteCard'
+import glp40Icon from '@/pages/BuyGlp/components/ic_glp_40.svg'
 
 /// THIS SECTION IS FOR TESTING SWR AND GMX CONTRACT
 import { fetcher } from '@/acy-dex-futures/utils';
@@ -281,6 +283,7 @@ const getTokenAddress = (token, nativeTokenAddress) => {
   if (token.address === AddressZero) {
     return nativeTokenAddress
   }
+  console.log("hereim gettokenaddr", token)
   return token.address
 }
 
@@ -510,9 +513,8 @@ const Swap = props => {
     setTokenSelection(newTokenSelection)
   }, [tokenSelection, setTokenSelection])
 
-  const fromTokenAddress = tokenSelection[swapOption].from
-  const toTokenAddress = tokenSelection[swapOption].to
-
+  const fromTokenAddress = tokenSelection[swapOption].from.toLowerCase()
+  const toTokenAddress = tokenSelection[swapOption].to.toLowerCase()
 
   const { perpetuals } = useConstantLoader()
   const readerAddress = perpetuals.getContract("Reader")
@@ -578,7 +580,7 @@ const Swap = props => {
 
   const [alpPriceData, alpPriceDataLoading] = useAlpPriceData(alpData, feesData, params)
 
-  
+
 
 
   const approveOrderBook = () => {
@@ -848,7 +850,7 @@ const Swap = props => {
 
   const onClickDropdown = e => {
     // console.log("hereim dropdown", e.key);
- 
+
     setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
   };
 
@@ -913,7 +915,6 @@ const Swap = props => {
 
   // Glp Swap
   const [isBuying, setIsBuying] = useState(true)
-  const [showTokenTable, setShowTokenTable] = useState(false)
   const [swapTokenAddress, setSwapTokenAddress] = useState(tokens[0].address)
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
   // const history = useHistory()
@@ -967,14 +968,6 @@ const Swap = props => {
     glpBalanceUsd = glpBalance.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
   }
   const glpSupplyUsd = glpSupply ? glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS)) : bigNumberify(0)
-
-  const onChangeMode = (mode) => {
-    if (mode === "Pool") {
-      setShowTokenTable(true)
-    } else {
-      setShowTokenTable(false)
-    }
-  }
 
   const { Option } = Select;
 
@@ -1064,261 +1057,358 @@ const Swap = props => {
   // let options = supportedTokens;
   // const menu = (
   //   <div className={styles.tokenSelector}>
-  //     <Menu onClick={onClickDropdown}>
-  //       {
+  // <Menu onClick={onClickDropdown}>
+  //   {
 
-  //         // supportedTokens.filter(token => !token.symbol !== 'USDT').map((option) => (
-  //         //   <Menu.Item key={option.symbol}>
-  //         //     <span>{option.symbol} / USD</span> 
-  //         //     {/* for showing before hover */}
-  //         //   </Menu.Item>
-  //         // ))
-  //       }
-  //     </Menu>
+  //     // supportedTokens.filter(token => !token.symbol !== 'USDT').map((option) => (
+  //     //   <Menu.Item key={option.symbol}>
+  //     //     <span>{option.symbol} / USD</span> 
+  //     //     {/* for showing before hover */}
+  //     //   </Menu.Item>
+  //     // ))
+  //   }
+  // </Menu>
   //   </div>
   // );
 
-  // function onChange (value) {
-  //   // console.log("hereim onchange",value);
-  //   setActiveToken1(option);
-  // }
 
-  const [kChartTab, setKChartTab] = useState("BTC")
-  const kChartTabs = ["BTC", "ETH"]
-  const selectChart = item => {
-    setKChartTab(item)
+  const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
+  const KChartTokenListETH = ["BTC", "ETH"]
+  const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
+  const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBSC
+                          : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
+                          : KChartTokenListETH
+  const selectChartToken = item => {
     onClickSetActiveToken(item)
+  }
+  const [poolTab, setPoolTab] = useState("ALP Price")
+  const poolTabs = ["ALP Price", "Portfolio"]
+  const selectPool = item => {
+    setPoolTab(item)
+  }
+
+  const [poolGraphTab, setPoolGraphTab] = useState("Action")
+  const poolGraphTabs = ["Action"]
+  const selectPoolGraph = item => {
+    setPoolGraphTab(item)
   }
 
   return (
     <PageHeaderWrapper>
-      
+
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
-          { swapOption != "Pool" && (
-            <div style={{ padding: "0 0 3rem" }}>
-              <div className={styles.chartTokenSelectorTab}>
-                <PerpetualTabs
-                  option={kChartTab}
-                  options={kChartTabs}
-                  onChange={selectChart}
-                />
-              </div>
-
-              <div className={styles.kchartBox}>
-                <div style={{ backgroundColor: '#0E0304', height: "450px", display: "flex", flexDirection: "column", marginBottom:"30px" }}>
-
-                  <div className={`${styles.colItem} ${styles.priceChart}`} style={{ flex: 1 }}>
-                    {
-                      // currentAveragePrice === 0 ?
-                      // <Spin/>
-                      // // : <KChart activeToken0={activeToken0} activeToken1={activeToken1} activeTimeScale={activeTimeScale} currentAveragePrice={currentAveragePrice} />
-                      // :
-                      <ExchangeTVChart
-                        swapOption={swapOption}
-                        fromTokenAddress={fromTokenAddress}
-                        toTokenAddress={toTokenAddress}
-                        infoTokens={infoTokens}
-                        chainId={chainId}
-                        positions={positions}
-                        // savedShouldShowPositionLines,
-                        orders={orders}
-                        setToTokenAddress={setToTokenAddress}
-                      />
-                    }
-                  </div>
+          {swapOption != "Pool" && (
+            <div className={`${styles.colItem} ${styles.priceChart}`}>
+              <div>
+                <div className={styles.chartTokenSelectorTab}>
+                  <PerpetualTabs
+                    option={activeToken1.symbol}
+                    options={KChartTokenList}
+                    onChange={selectChartToken}
+                  />
                 </div>
 
+                <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column" }}>
+                  <ExchangeTVChart
+                    swapOption={swapOption}
+                    fromTokenAddress={fromTokenAddress}
+                    toTokenAddress={toTokenAddress}
+                    // period={placement}
+                    infoTokens={infoTokens}
+                    chainId={chainId}
+                    positions={positions}
+                    // savedShouldShowPositionLines,
+                    orders={orders}
+                    setToTokenAddress={setToTokenAddress}
+                  />
+                </div>
+              </div>
+
+              <div className={styles.bottomWrapper}>
+                <div className={styles.chartTokenSelectorTab}>
+                  <PerpetualTabs
+                    option={tableContent}
+                    options={[POSITIONS, ORDERS, ACTIONS]}
+                    onChange={item => { setTableContent(item) }}
+                  />
+                </div>
+                <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
+                  <div className={`${styles.colItem} ${styles.priceChart}`}>
+                    <div className={styles.positionsTable}>
+                      {tableContent == POSITIONS && (
+                        <PositionsTable
+                          isMobile={isMobile}
+                          dataSource={positions}
+                          setPendingTxns={setPendingTxns}
+                          infoTokens={infoTokens}
+                        />
+                      )}
+                      {tableContent == ORDERS && (
+                        <OrderTable
+                          isMobile={isMobile}
+                          dataSource={orders}
+                          infoTokens={infoTokens}
+                        />
+                      )}
+                      {tableContent == ACTIONS && (
+                        <ActionHistoryTable
+                          isMobile={isMobile}
+                          dataSource={positionsData}
+                        />
+                      )}
+
+                    </div>
+                  </div>
+                </AcyCard>
               </div>
             </div>
           )}
-          { swapOption == 'Pool' && (
-            <div>
-              <div className={styles.chart}>
-                <ChartWrapper
-                  title="Alp Price Comparison"
-                  loading={alpLoading}
-                  data={alpPriceData}
-                  // csvFields={[{ key: 'syntheticPrice' }, { key: 'alpPrice' }, { key: 'alpPlusFees' }, { key: 'lpBtcPrice' }, { key: 'lpEthPrice' }]}
-                >
-                  <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-                    <LineChart data={alpPriceData} syncId="syncAlp">
-                      <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
-                      <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
-                      <YAxis dataKey="performanceSyntheticCollectedFees" domain={[60, 210]} unit="%" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
-                      <YAxis dataKey="alpPrice" domain={[0.4, 1.7]} orientation="right" yAxisId="right" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
-                      <Tooltip
-                        formatter={tooltipFormatterNumber}
-                        labelFormatter={tooltipLabelFormatter}
-                        contentStyle={{ textAlign: 'left' }}
-                      />
-                      <Legend />
-                      {/* <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceLpBtcCollectedFees" name="% LP BTC-USDC (w/ fees)" stroke={COLORS[2]} />
+          {swapOption == 'Pool' && (
+            <div className={`${styles.colItem} ${styles.priceChart}`}>
+              <div>
+                <div className={styles.chartTokenSelectorTab}>
+                  <PerpetualTabs
+                    option={poolTab}
+                    options={poolTabs}
+                    onChange={selectPool}
+                  />
+                </div>
+                {poolTab == "ALP Price" &&
+                  <div className={styles.chart}>
+                    <ChartWrapper
+                      title="ALP Price Comparison"
+                      loading={alpLoading}
+                      data={alpPriceData}
+                    // csvFields={[{ key: 'syntheticPrice' }, { key: 'alpPrice' }, { key: 'alpPlusFees' }, { key: 'lpBtcPrice' }, { key: 'lpEthPrice' }]}
+                    >
+                      <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+                        <LineChart data={alpPriceData} syncId="syncAlp">
+                          <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
+                          <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
+                          <YAxis dataKey="performanceSyntheticCollectedFees" domain={[60, 210]} unit="%" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
+                          <YAxis dataKey="alpPrice" domain={[0.4, 1.7]} orientation="right" yAxisId="right" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
+                          <Tooltip
+                            formatter={tooltipFormatterNumber}
+                            labelFormatter={tooltipLabelFormatter}
+                            contentStyle={{ textAlign: 'left' }}
+                          />
+                          <Legend />
+                          {/* <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceLpBtcCollectedFees" name="% LP BTC-USDC (w/ fees)" stroke={COLORS[2]} />
                       <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceLpEthCollectedFees" name="% LP ETH-USDC (w/ fees)" stroke={COLORS[4]} />
                       <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceSyntheticCollectedFees" name="% Index (w/ fees)" stroke={COLORS[0]} /> */}
 
-                      {/* <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="syntheticPrice" name="Index Price" stroke={COLORS[2]} /> */}
-                      <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPrice" name="Alp Price" stroke={COLORS[1]} strokeWidth={1} />
-                      <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPlusFees" name="Alp w/ fees" stroke={COLORS[3]} strokeWidth={1} />
-                      {/* <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpBtcPrice" name="LP BTC-USDC" stroke={COLORS[2]} />
+                          {/* <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="syntheticPrice" name="Index Price" stroke={COLORS[2]} /> */}
+                          <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPrice" name="ALP Price" stroke={COLORS[1]} />
+                          <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPlusFees" name="ALP w/ fees" stroke={COLORS[3]} />
+                          {/* <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpBtcPrice" name="LP BTC-USDC" stroke={COLORS[2]} />
                       <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpEthPrice" name="LP ETH-USDC" stroke={COLORS[4]} /> */}
-                    </LineChart>
-                  </ResponsiveContainer>
-                  <div className="chart-description">
-                    <p>
-                      <span style={{ color: COLORS[3] }}>Alp with fees</span> is based on ALP share of fees received<br />
-                      {/* <span style={{ color: COLORS[0] }}>% of Index (with fees)</span> is Alp with fees / Index Price * 100<br />
+                        </LineChart>
+                      </ResponsiveContainer>
+                      <div className="chart-description">
+                        <p>
+                          {/* <span style={{ color: COLORS[3] }}>Alp with fees</span> is based on ALP share of fees received<br /> */}
+                          {/* <span style={{ color: COLORS[0] }}>% of Index (with fees)</span> is Alp with fees / Index Price * 100<br />
                       <span style={{ color: COLORS[4] }}>% of LP ETH-USDC (with fees)</span> is Alp Price with fees / LP ETH-USDC * 100<br />
                       <span style={{ color: COLORS[2] }}>Index Price</span> is 25% BTC, 25% ETH, 50% USDC */}
-                    </p>
-                  </div>
-                </ChartWrapper>
+                        </p>
+                      </div>
+                    </ChartWrapper>
+                  </div>}
+                {poolTab == "Portfolio" &&
+                  <>
+                    <div className={styles.portfolio}>
+                      <div className={styles.statsContainer}>
+                        <div className={styles.statstitle}>Overview</div>
+                        <div className={styles.statsdivider} />
+                        <div className={styles.statscontent}>
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>AUM</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>ALP Pool</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>24h Volume</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Long Position</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Short Position</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Fees</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Total Fees</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Total Volume</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Floor Price Fund</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                        </div>
+
+                      </div>
+                      <div className={styles.statsContainer}>
+                        <div className={styles.GlpSwapstatsmark}>
+                          <div className={styles.GlpSwapstatsicon}>
+                            <img src={glp40Icon} alt="glp40Icon" />
+                          </div>
+                          <div className={styles.GlpSwapinfo}>
+                            <div className={styles.statstitle}>ALP</div>
+                            <div className={styles.statssubtitle}>ALP</div>
+                          </div>
+                        </div>
+                        <div className={styles.statsdivider} />
+                        <div className={styles.statscontent}>
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Price</div>
+                            <div className={styles.value}>${formatAmount(glpPrice, GLP_DECIMALS, 2, true)}</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Supply</div>
+                            <div className={styles.value}>{formatAmount(glpSupply, GLP_DECIMALS, 4, true)} ALP (${formatAmount(glpSupplyUsd, GLP_DECIMALS, 2, true)})</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Total Staked</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Market Cap</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+
+                          <div className={styles.statsRow}>
+                            <div className={styles.label}>Stablecoin Percentage</div>
+                            <div className={styles.value}>XXX</div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                    <AcyCard style={{ backgroundColor: 'transparent' }}>
+                      <GlpSwapTokenTable
+                        isBuying={isBuying}
+                        setIsBuying={setIsBuying}
+                        setSwapTokenAddress={setSwapTokenAddress}
+                        setIsWaitingForApproval={setIsWaitingForApproval}
+                        tokenList={glp_tokenList}
+                        infoTokens={infoTokens}
+                        glpAmount={glpAmount}
+                        glpPrice={glpPrice}
+                        usdgSupply={glpUsdgSupply}
+                        totalTokenWeights={totalTokenWeights}
+                      />
+                    </AcyCard>
+                  </>}
+              </div>
+
+              <div className={styles.bottomWrapper}>
+                <div className={styles.chartTokenSelectorTab}>
+                  <PerpetualTabs
+                    option={poolGraphTab}
+                    options={poolGraphTabs}
+                    onChange={selectPoolGraph}
+                  />
+                </div>
+                {poolGraphTab == "Action" &&
+                  <div>Action</div>}
               </div>
             </div>
           )}
-          
-          {/* Position table */}
-          {!showTokenTable ?
-            <>
-              <AcyPerpetualCard style={{ backgroundColor: '#0E0304', padding: '10px' }}>
-                <div className={`${styles.colItem} ${styles.priceChart}`}>
-                  <div className={`${styles.colItem}`}>
-                    <a className={`${styles.colItem} ${styles.optionTab}`} onClick={() => { setTableContent(POSITIONS) }}>Positions</a>
-                    <a className={`${styles.colItem} ${styles.optionTab}`} onClick={() => { setTableContent(ORDERS) }}>Orders</a>
-                    <a className={`${styles.colItem} ${styles.optionTab}`} onClick={() => { setTableContent(ACTIONS) }}>Actions </a>
-                  </div>
-                  <div className={styles.positionsTable}>
-                    {tableContent == POSITIONS && (
-                      <PositionsTable
-                        isMobile={isMobile}
-                        dataSource={positions}
-                        setPendingTxns={setPendingTxns}
-                        infoTokens={infoTokens}
-                      />
-                    )}
-                    {tableContent == ORDERS && (
-                      <OrderTable
-                        isMobile={isMobile}
-                        dataSource={orders}
-                        infoTokens={infoTokens}
-                      />
-                    )}
-                    {tableContent == ACTIONS && (
-                      <ActionHistoryTable
-                        isMobile={isMobile}
-                        dataSource={positionsData}
-                      />
-                    )}
 
-                  </div>
-                </div>
-              </AcyPerpetualCard>
-            </> :
-            <>
-              <GlpSwapTokenTable
-                isBuying={isBuying}
-                setIsBuying={setIsBuying}
-                setSwapTokenAddress={setSwapTokenAddress}
-                setIsWaitingForApproval={setIsWaitingForApproval}
-                tokenList={glp_tokenList}
-                infoTokens={infoTokens}
-                glpAmount={glpAmount}
-                glpPrice={glpPrice}
-                usdgSupply={glpUsdgSupply}
-                totalTokenWeights={totalTokenWeights}
-              />
-            </>}
-
-            
-
-          {/* <div className={styles.rowFlexContainer}>
-                <div className={`${styles.colItem}`}>
-                  <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(POSITIONS)}}>Positions</a>
-                  <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(ORDERS)}}>Orders</a>
-                  <a className={`${styles.colItem} ${styles.optionTab}`} onClick={()=>{setTableContent(ACTIONS)}}>Actions </a>
-                </div>
-              </div> */}
-
-          {/* <div className={styles.rowFlexContainer}>
-                <div className={`${styles.colItem} ${styles.priceChart}`}>
-                  <div className={styles.positionsTable}>
-                    <RenderTable/>
-                  </div>
-                </div>
-                <div className={styles.exchangeItem}>
-                </div>
-          </div> */}
-
-          <AcyModal onCancel={onCancel} width={600} visible={visible}>
-            <div className={styles.title}>
-              <AcyIcon name="back" /> Select a token
-            </div>
-            <div className={styles.search}>
-              <AcyInput
-                placeholder="Enter the token symbol or address"
-                suffix={<AcyIcon name="search" />}
-              />
-            </div>
-            <div className={styles.coinList}>
-              <AcyTabs>
-                <AcyTabPane tab="All" key="1">
-                  <AcyCoinItem />
-                  <AcyCoinItem />
-                  <AcyCoinItem />
-                  <AcyCoinItem />
-                </AcyTabPane>
-                <AcyTabPane tab="Favorite" key="2" />
-                <AcyTabPane tab="Index" key="3" />
-                <AcyTabPane tab="Synth" key="4" />
-              </AcyTabs>
-            </div>
-          </AcyModal>
-          <AcyApprove
-            onCancel={() => setVisibleLoading(false)}
-            visible={visibleLoading}
-          />
+          <div className={`${styles.colItem} ${styles.perpetualComponent}`}>
+            <PerpetualComponent
+              swapOption={swapOption}
+              setSwapOption={setSwapOption}
+              activeToken0={activeToken0}
+              setActiveToken0={setActiveToken0}
+              activeToken1={activeToken1}
+              setActiveToken1={setActiveToken1}
+              fromTokenAddress={fromTokenAddress}
+              setFromTokenAddress={setFromTokenAddress}
+              toTokenAddress={toTokenAddress}
+              setToTokenAddress={setToTokenAddress}
+              positionsMap={positionsMap}
+              pendingTxns={pendingTxns}
+              setPendingTxns={setPendingTxns}
+              savedIsPnlInLeverage={savedIsPnlInLeverage}
+              approveOrderBook={approveOrderBook}
+              isWaitingForPluginApproval={isWaitingForPluginApproval}
+              setIsWaitingForPluginApproval={setIsWaitingForPluginApproval}
+              isPluginApproving={isPluginApproving}
+              isConfirming={isConfirming}
+              setIsConfirming={setIsConfirming}
+              isPendingConfirmation={isPendingConfirmation}
+              setIsPendingConfirmation={setIsPendingConfirmation}
+              isBuying={isBuying}
+              setIsBuying={setIsBuying}
+              swapTokenAddress={swapTokenAddress}
+              setSwapTokenAddress={setSwapTokenAddress}
+              glp_isWaitingForApproval={isWaitingForApproval}
+              glp_setIsWaitingForApproval={setIsWaitingForApproval}
+              orders={orders}
+            />
+          </div>
 
         </div>
-        {/* <div className={styles.rowFlexContainer}> */}
-        {/* Perpetual Component */}
-        <div className={styles.perpetualComponent}>
-          <PerpetualComponent
-            swapOption={swapOption}
-            setSwapOption={setSwapOption}
-            activeToken0={activeToken0}
-            setActiveToken0={setActiveToken0}
-            activeToken1={activeToken1}
-            setActiveToken1={setActiveToken1}
-            fromTokenAddress={fromTokenAddress}
-            setFromTokenAddress={setFromTokenAddress}
-            toTokenAddress={toTokenAddress}
-            setToTokenAddress={setToTokenAddress}
-            positionsMap={positionsMap}
-            pendingTxns={pendingTxns}
-            setPendingTxns={setPendingTxns}
-            savedIsPnlInLeverage={savedIsPnlInLeverage}
-            approveOrderBook={approveOrderBook}
-            isWaitingForPluginApproval={isWaitingForPluginApproval}
-            setIsWaitingForPluginApproval={setIsWaitingForPluginApproval}
-            isPluginApproving={isPluginApproving}
-            isConfirming={isConfirming}
-            setIsConfirming={setIsConfirming}
-            isPendingConfirmation={isPendingConfirmation}
-            setIsPendingConfirmation={setIsPendingConfirmation}
-            isBuying={isBuying}
-            setIsBuying={setIsBuying}
-            onChangeMode={onChangeMode}
-            swapTokenAddress={swapTokenAddress}
-            setSwapTokenAddress={setSwapTokenAddress}
-            glp_isWaitingForApproval={isWaitingForApproval}
-            glp_setIsWaitingForApproval={setIsWaitingForApproval}
-            orders={orders}
-          />
-          
-        </div>
+
+        <AcyModal onCancel={onCancel} width={600} visible={visible}>
+          <div className={styles.title}>
+            <AcyIcon name="back" /> Select a token
+          </div>
+          <div className={styles.search}>
+            <AcyInput
+              placeholder="Enter the token symbol or address"
+              suffix={<AcyIcon name="search" />}
+            />
+          </div>
+          <div className={styles.coinList}>
+            <AcyTabs>
+              <AcyTabPane tab="All" key="1">
+                <AcyCoinItem />
+                <AcyCoinItem />
+                <AcyCoinItem />
+                <AcyCoinItem />
+              </AcyTabPane>
+              <AcyTabPane tab="Favorite" key="2" />
+              <AcyTabPane tab="Index" key="3" />
+              <AcyTabPane tab="Synth" key="4" />
+            </AcyTabs>
+          </div>
+        </AcyModal>
+        <AcyApprove
+          onCancel={() => setVisibleLoading(false)}
+          visible={visibleLoading}
+        />
+
       </div>
       {/* </div> */}
-      
+
     </PageHeaderWrapper>
   );
 }

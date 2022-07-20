@@ -21,6 +21,7 @@ import ConnectWallet from '@/pages/Market/ConnectWallet';
 import { useConstantLoader } from '@/constants';
 
 import { useConnectWallet } from '@/components/ConnectWallet';
+import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
 
 
 const Stats = props => {
@@ -136,159 +137,155 @@ const Stats = props => {
 
   const history = useHistory()
 
+  const [statsType, setStatsType] = useState("Market")
+  const statsTypes = ["Market", "Future", "StableCoin"]
+  const onChangeStats = item => {
+    history.push('/statistics/' + item.toLowerCase())
+  }
+
   return (
     <div className={styles.marketRoot}>
-      <div className={`${styles.colItem}`}>
-        <a className={`${styles.colItem} ${styles.optionTabSelected}`}>Market</a>
-        <a
-          className={`${styles.colItem} ${styles.optionTab}`}
-          onClick={() => {
-            history.push('/statistics/future')
-          }}
-        >
-          Future
-        </a>
-        <a
-          className={`${styles.colItem} ${styles.optionTab}`}
-          onClick={() => {
-            history.push('/statistics/stablecoin')
-          }}
-        >
-          StableCoin
-        </a>
+      <div className={styles.statsTab}>
+        <PerpetualTabs
+          option={statsType}
+          options={statsTypes}
+          onChange={onChangeStats}
+        />
       </div>
-      <ConnectWallet />
-      <MarketSearchBar
-        className={styles.searchBar}
-        dataSourceCoin={dataSourceCoin}
-        dataSourcePool={dataSourcePool}
-        account={account}
-        visible={true}
-        getNetwork={getNetwork}
-        networkShow={true}
-      />
-      <div className={styles.chartsMain}>
-        <div className={styles.chartSectionMain}>
-          {chartData.tvl.length > 0 ? (
-            <>
-              <div className={styles.graphStats}>
-                <div className={styles.statName}>TVL</div>
-                <div className={styles.statValue}>$ {selectedDataLine}</div>
-                <div className={styles.statName}>
-                  {chartData.tvl[selectedIndexLine][0]}
+      <div className={styles.marketContent}>
+        <ConnectWallet />
+        <MarketSearchBar
+          className={styles.searchBar}
+          dataSourceCoin={dataSourceCoin}
+          dataSourcePool={dataSourcePool}
+          account={account}
+          visible={true}
+          getNetwork={getNetwork}
+          networkShow={true}
+        />
+        <div className={styles.chartsMain}>
+          <div className={styles.chartSectionMain}>
+            {chartData.tvl.length > 0 ? (
+              <>
+                <div className={styles.graphStats}>
+                  <div className={styles.statName}>TVL</div>
+                  <div className={styles.statValue}>$ {selectedDataLine}</div>
+                  <div className={styles.statName}>
+                    {chartData.tvl[selectedIndexLine][0]}
+                  </div>
                 </div>
-              </div>
-              <div className={styles.chartWrapper}>
-                <AcyLineChart
-                  data={chartData.tvl}
-                  onHover={onLineGraphHover}
-                  showXAxis={true}
-                  showGradient={true}
-                  lineColor="#e29227"
-                  bgColor="#2f313500"
-                />
-              </div>
-            </>
-          ) : (
-            <Icon type="loading" />
-          )}
-        </div>
-        <div className={styles.chartSectionMain}>
-          {chartData.volume24h.length > 0 ? (
-            <>
-              <div className={styles.graphStats}>
-                <div className={styles.statName}>VOLUME 24H</div>
-                <div className={styles.statValue}>{`$ ${selectedDataBar}`}</div>
-                <div className={styles.statName}>
-                  {chartData.volume24h[selectedIndexBar][0]}
+                <div className={styles.chartWrapper}>
+                  <AcyLineChart
+                    data={chartData.tvl}
+                    onHover={onLineGraphHover}
+                    showXAxis={true}
+                    showGradient={true}
+                    lineColor="#e29227"
+                    bgColor="#2f313500"
+                  />
                 </div>
-              </div>
-              <div className={styles.chartWrapper}>
-                <AcyBarChart
-                  data={chartData.volume24h}
-                  showXAxis
-                  barColor="#1c9965"
-                  onHover={onBarGraphHover}
-                />
-              </div>
-            </>
-          ) : (
-            <Icon type="loading" />
-          )}
+              </>
+            ) : (
+              <Icon type="loading" />
+            )}
+          </div>
+          <div className={styles.chartSectionMain}>
+            {chartData.volume24h.length > 0 ? (
+              <>
+                <div className={styles.graphStats}>
+                  <div className={styles.statName}>VOLUME 24H</div>
+                  <div className={styles.statValue}>{`$ ${selectedDataBar}`}</div>
+                  <div className={styles.statName}>
+                    {chartData.volume24h[selectedIndexBar][0]}
+                  </div>
+                </div>
+                <div className={styles.chartWrapper}>
+                  <AcyBarChart
+                    data={chartData.volume24h}
+                    showXAxis
+                    barColor="#1c9965"
+                    onHover={onBarGraphHover}
+                  />
+                </div>
+              </>
+            ) : (
+              <Icon type="loading" />
+            )}
+          </div>
         </div>
+        {overallVolume !== -1 && overallTvl !== -1 && !isMobile ? (
+          <Row className={styles.marketOverview} justify="space-around">
+            <Col span={8}>
+              Volume 24H <strong style={{ color: "white" }}>$ {overallVolume}</strong>{' '}
+              <span
+                className={
+                  ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
+                }
+              >
+                {ovrVolChange} %
+              </span>
+            </Col>
+            <Col span={8}>
+              Fees 24H <strong style={{ color: "white" }}>$ {overallFees} </strong> <span
+                className={
+                  ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
+                }
+              >
+                {ovrVolChange} %
+              </span>
+            </Col>
+            <Col span={8}>
+              TVL <strong style={{ color: "white" }}>$ {overallTvl}</strong>{' '}
+              <span
+                className={
+                  ovrTvlChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
+                }
+              >
+                {ovrTvlChange} %
+              </span>
+            </Col>
+          </Row>
+        ) : (
+          !isMobile && <Icon type="loading" />
+        )}
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <h2>Top Tokens</h2>
+          <h3>
+            <Link style={{ color: '#b5b5b6' }} /*to="/market/list/token"*/>
+              Explore
+            </Link>
+          </h3>
+        </div>
+        {tokenInfo.length > 0 ? (
+          <TokenTable dataSourceCoin={tokenInfo} />
+        ) : (
+          <Icon type="loading" />
+        )}
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <h2>Top Pools</h2>
+          <h3>
+            <Link style={{ color: '#b5b5b6' }} /*to="/market/list/pool"*/>
+              Explore
+            </Link>
+          </h3>
+        </div>
+
+        {poolInfo.length > 0 ? (
+          <PoolTable dataSourcePool={poolInfo} />
+        ) : (
+          <Icon type="loading" />
+        )}
+
+        <h2>Transactions</h2>
+        {!transactions ? (
+          <Icon type="loading" />
+        ) : (
+          <TransactionTable dataSourceTransaction={transactions} />
+        )}
+        <div style={{ height: '20px' }} />
       </div>
-      {overallVolume !== -1 && overallTvl !== -1 && !isMobile ? (
-        <Row className={styles.marketOverview} justify="space-around">
-          <Col span={8}>
-            Volume 24H <strong style={{ color: "white" }}>$ {overallVolume}</strong>{' '}
-            <span
-              className={
-                ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
-              }
-            >
-              {ovrVolChange} %
-            </span>
-          </Col>
-          <Col span={8}>
-            Fees 24H <strong style={{ color: "white" }}>$ {overallFees} </strong> <span
-              className={
-                ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
-              }
-            >
-              {ovrVolChange} %
-            </span>
-          </Col>
-          <Col span={8}>
-            TVL <strong style={{ color: "white" }}>$ {overallTvl}</strong>{' '}
-            <span
-              className={
-                ovrTvlChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
-              }
-            >
-              {ovrTvlChange} %
-            </span>
-          </Col>
-        </Row>
-      ) : (
-        !isMobile && <Icon type="loading" />
-      )}
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <h2>Top Tokens</h2>
-        <h3>
-          <Link style={{ color: '#b5b5b6' }} /*to="/market/list/token"*/>
-            Explore
-          </Link>
-        </h3>
-      </div>
-      {tokenInfo.length > 0 ? (
-        <TokenTable dataSourceCoin={tokenInfo} />
-      ) : (
-        <Icon type="loading" />
-      )}
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <h2>Top Pools</h2>
-        <h3>
-          <Link style={{ color: '#b5b5b6' }} /*to="/market/list/pool"*/>
-            Explore
-          </Link>
-        </h3>
-      </div>
-
-      {poolInfo.length > 0 ? (
-        <PoolTable dataSourcePool={poolInfo} />
-      ) : (
-        <Icon type="loading" />
-      )}
-
-      <h2>Transactions</h2>
-      {!transactions ? (
-        <Icon type="loading" />
-      ) : (
-        <TransactionTable dataSourceTransaction={transactions} />
-      )}
-      <div style={{ height: '20px' }} />
     </div>
   );
 

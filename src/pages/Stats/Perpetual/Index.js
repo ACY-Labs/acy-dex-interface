@@ -43,6 +43,7 @@ import VolumeChart from './components/VolumeChart'
 import FeesChart from './components/FeesChart'
 import GenericChart from './components/GenericChart'
 import VolumeFeesChart from './components/VolumeFeesChart';
+import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
 
 import {
   useTotalVolumeFromServer,
@@ -175,9 +176,22 @@ const Stats = (props) => {
 
   const history = useHistory()
 
+  const [statsType, setStatsType] = useState("Future")
+  const statsTypes = ["Market", "Future", "StableCoin"]
+  const onChangeStats = item => {
+    history.push('/statistics/' + item.toLowerCase())
+  }
+
   return (
-    <div className='container'>
-      <div className="Home">
+    <div className={styles.container}>
+      <div className={styles.statsTab}>
+        <PerpetualTabs
+          option={statsType}
+          options={statsTypes}
+          onChange={onChangeStats}
+        />
+      </div>
+      <div className={styles.Home}>
         {/* <h1>Analytics / Arbitrum</h1> */}
         {lastSubgraphBlock && lastBlock &&
           <p className={cx('page-description', { warning: isObsolete })} style={{ marginTop: '-1rem' }}>
@@ -186,25 +200,6 @@ const Stats = (props) => {
             &nbsp;at block <a target="_blank" href={`https://arbiscan.io/block/${lastSubgraphBlock.number}`}>{lastSubgraphBlock.number}</a>
           </p>
         }
-        <div className={`${styles.colItem}`}>
-          <a
-            className={`${styles.colItem} ${styles.optionTab}`}
-            onClick={() => {
-              history.push('/statistics/market')
-            }}
-          >
-            Market
-          </a>
-          <a className={`${styles.colItem} ${styles.optionTabSelected}`}>Future</a>
-          <a
-            className={`${styles.colItem} ${styles.optionTab}`}
-            onClick={() => {
-              history.push('/statistics/stablecoin')
-            }}
-          >
-            StableCoin
-          </a>
-        </div>
         {showForm &&
           <div className="form">
             <p>
@@ -305,7 +300,7 @@ const Stats = (props) => {
             /> */}
           </div>
           <div className="chart-cell">
-            <ChartWrapper title="AUM & Alp Supply" loading={alpLoading} data={alpData} csvFields={[{ key: 'aum' }, { key: 'alpSupply' }]}>
+            <ChartWrapper title="AUM & ALP Supply" loading={alpLoading} data={alpData} csvFields={[{ key: 'aum' }, { key: 'alpSupply' }]}>
               <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
                 <LineChart data={alpData} syncId="syncAlp">
                   <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
@@ -318,14 +313,14 @@ const Stats = (props) => {
                   />
                   <Legend />
                   <Line isAnimationActive={false} type="monotone" strokeWidth={2} unit="$" dot={false} dataKey="aum" stackId="a" name="AUM" stroke={COLORS[0]} />
-                  <Line isAnimationActive={false} type="monotone" strokeWidth={2} dot={false} dataKey="alpSupply" stackId="a" name="Alp Supply" stroke={COLORS[1]} />
+                  <Line isAnimationActive={false} type="monotone" strokeWidth={2} dot={false} dataKey="alpSupply" stackId="a" name="ALP Supply" stroke={COLORS[1]} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartWrapper>
           </div>
           <div className="chart-cell">
             <ChartWrapper
-              title="Alp Price Comparison"
+              title="ALP Price Comparison"
               loading={alpLoading}
               data={alpPriceData}
               csvFields={[{ key: 'syntheticPrice' }, { key: 'alpPrice' }, { key: 'alpPlusFees' }, { key: 'lpBtcPrice' }, { key: 'lpEthPrice' }]}
@@ -347,15 +342,15 @@ const Stats = (props) => {
                   <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceSyntheticCollectedFees" name="% Index (w/ fees)" stroke={COLORS[0]} /> */}
 
                   {/* <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="syntheticPrice" name="Index Price" stroke={COLORS[2]} /> */}
-                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPrice" name="Alp Price" stroke={COLORS[1]} strokeWidth={1} />
-                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPlusFees" name="Alp w/ fees" stroke={COLORS[3]} strokeWidth={1} />
+                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPrice" name="ALP Price" stroke={COLORS[1]} strokeWidth={1} />
+                  <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPlusFees" name="ALP w/ fees" stroke={COLORS[3]} strokeWidth={1} />
                   {/* <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpBtcPrice" name="LP BTC-USDC" stroke={COLORS[2]} />
                   <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpEthPrice" name="LP ETH-USDC" stroke={COLORS[4]} /> */}
                 </LineChart>
               </ResponsiveContainer>
               <div className="chart-description">
                 <p>
-                  <span style={{ color: COLORS[3] }}>Alp with fees</span> is based on ALP share of fees received and excluding esGMX rewards<br />
+                  <span style={{ color: COLORS[3] }}>ALP with fees</span> is based on ALP share of fees received and excluding esGMX rewards<br />
                   {/* <span style={{ color: COLORS[0] }}>% of Index (with fees)</span> is Alp with fees / Index Price * 100<br />
                   <span style={{ color: COLORS[4] }}>% of LP ETH-USDC (with fees)</span> is Alp Price with fees / LP ETH-USDC * 100<br />
                   <span style={{ color: COLORS[2] }}>Index Price</span> is 25% BTC, 25% ETH, 50% USDC */}

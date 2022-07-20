@@ -3,7 +3,7 @@ import cx from "classnames";
 
 import { Spin, Radio, Button } from 'antd';
 
-// import styles from './styles.less';
+// import styles from './ExchangeTVChart.css';
 import styled from "styled-components";
 
 import { createChart } from "lightweight-charts";
@@ -37,24 +37,29 @@ import Binance from "binance-api-node";
 const StyledSelect = styled(Radio.Group)`
   .ant-radio-button-wrapper{
     background: transparent !important;
-    height: 22px;
-    font-size: 0.7rem;
+    height: 20px;
+    font-size: 0.65rem;
     padding: 0 0.1rem;
     border: 0.75px solid #333333;
     border-radius: 0 0 0 0;
-    line-height: 22px;
+    line-height: 20px;
     color: #b5b5b6;
+    
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled){
     color: #ffffff;
-    box-shadow: 0 0 0 0 #0e0304;
-    border-color: #333333;
+    box-shadow: 0 0 0 0 black;
+    // border-color: #333333;
+    border-color: #ffffff;
+
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover{
     color: #ffffff;
+    border: 0.75px solid #ffffff;
+    border-color: #ffffff !important;
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before{
-    background-color: #0e0304 !important;
+    background-color: black !important;
   }
   .ant-radio-button-wrapper:not(:first-child)::before{
     background-color: transparent;
@@ -75,7 +80,6 @@ export function getChartToken(fromToken, toToken, chainId) {
     return;
   }
 
-
   if (fromToken.isUsdg && toToken.isUsdg) {
     return constantInstance.perpetuals.tokenList.find((t) => t.isStable);
   }
@@ -95,7 +99,8 @@ export function getChartToken(fromToken, toToken, chainId) {
   if (toToken.isStable) {
     return fromToken;
   }
-  
+  console.log("hereim chart global getcharttoken", toToken)
+
   return toToken;
 }
 
@@ -121,7 +126,8 @@ const getChartOptions = (width, height) => ({
   layout: {
     backgroundColor: "rgba(255, 255, 255, 0)",
     textColor: "#ccc",
-    fontFamily: "Relative",
+    fontFamily: "Karla, sans-serif", 
+    // fontFamily: "Karla", 
   },
   localization: {
     // https://github.com/tradingview/lightweight-charts/blob/master/docs/customization.md#time-format
@@ -169,7 +175,7 @@ export default function ExchangeTVChart(props) {
     // swapOption,
     fromTokenAddress,
     toTokenAddress,
-    period,
+    // time,
     infoTokens,
     chainId,
     // positions,
@@ -177,10 +183,12 @@ export default function ExchangeTVChart(props) {
     // orders,
     setToTokenAddress
   } = props
+  // console.log("hereyou props", fromTokenAddress);
+  // console.log("hereyou props", toTokenAddress);
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [activeTimeScale, setActiveTimeScale] = useState("5m");
-  const [placement, setPlacement] = useState('5m');
+  const [period, setPeriod] = useState('5m');
 
 //   let [period, setPeriod] = useLocalStorageSerializeKey([chainId, "Chart-period"], DEFAULT_PERIOD);
 //   if (!(period in CHART_PERIODS)) {
@@ -190,18 +198,22 @@ export default function ExchangeTVChart(props) {
   const [hoveredCandlestick, setHoveredCandlestick] = useState();
 
   // 1. 这里的token是包含价格的结构体
-  const fromToken = getTokenInfo(infoTokens, fromTokenAddress)
-  const toToken = getTokenInfo(infoTokens, toTokenAddress)
-  // console.log("chart debug: infotokens", infoTokens, toTokenAddress, fromToken, toToken)
-  console.log("hereim in swap kchart", fromToken, toToken)
+  const fromToken = getTokenByAddress(infoTokens, fromTokenAddress)
+  const toToken = getTokenByAddress(infoTokens, toTokenAddress)
+  console.log("hereim chart global tokens address:", fromTokenAddress, "toTokenAddress:", toTokenAddress)
+  console.log("hereim chart global tokens totoken:", toToken, "fromtoken:", fromToken, "infotokens:", infoTokens)
 
   const [chartToken, setChartToken] = useState({
     maxPrice: null,
     minPrice: null
   })
   useEffect(() => {
-    const tmp = getChartToken(fromToken, toToken, chainId)
-    setChartToken(tmp)
+    let tmp;
+    if (toToken && fromToken){
+      tmp = getChartToken(fromToken, toToken, chainId)
+      console.log("hereim chart global tmp", tmp, " ", fromToken, " ", toToken, " ", chainId)
+      setChartToken(tmp)
+    }
   }, [fromToken, toToken, chainId])
 
 
@@ -519,16 +531,50 @@ export default function ExchangeTVChart(props) {
     //   return;
     // }
     // setUpdatingKchartsFlag(true);
-    setPlacement(e.target.value);
+    setPeriod(e.target.value);
     setActiveTimeScale(e.target.value);
     console.log("hereim button triggered", e.target.value)
   };
+
+  // const getTimescaleButton = value => {
+  //   if (period != value) {
+  //     return (
+  //       <button
+  //         className={styles.timescaleButton}
+  //         onClick={() => { setPeriod(value) }}>
+  //         {value}
+  //       </button>
+  //     )
+  //   } else {
+  //     return (
+  //       <button
+  //         className={styles.timescaleButtonActive}
+  //         onClick={() => { setPeriod(value) }}>
+  //         {value}
+  //       </button>
+  //     )
+  //   }
+  // }
 
   // const onSelectToken = (token) => {
   //   const tmp = getTokenInfo(infoTokens, token.address)
   //   setChartToken(tmp)
   //   setToTokenAddress(swapOption, token.address)
   // }
+
+  function getTokenByAddress(tokenlist, address) {
+    console.log("hereim chart global gettokenbyaddr", Object.keys(tokenlist).length, address)
+    let keys = Object.keys(tokenlist)
+    for (let i = 0; i < keys.length; i++) {
+      console.log("hereim chart global gettokenbyaddr in for", tokenlist, tokenlist[keys[i]], address)
+      tokenlist[keys[i]].address = tokenlist[keys[i]].address.toLowerCase()      
+      if (tokenlist[keys[i]].address === address) {
+        console.log("hereim chart global gettokenbyaddr in if", tokenlist[keys[i]].address, address)
+        return tokenlist[keys[i]]
+      }
+    }
+    return undefined
+  }
 
   return (
     <div className="ExchangeChart tv" ref={ref} style={{ height: "100%", width: "100%"}}>
@@ -537,8 +583,9 @@ export default function ExchangeTVChart(props) {
             <div>
               {/* <div className="ExchangeChart-info-label">24h Change</div> */}
                 {/* <div className={styles.timeSelector}> */}
-                  <StyledSelect value={placement} onChange={placementChange}
-                    style={{ width: '100%', height: '23px', paddingRight: '50%' }}>
+                  
+                  <StyledSelect value={period} onChange={placementChange}
+                    style={{ width: '100%', height: '20px', paddingRight: '50%' }}>
                     <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
                     <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>
                     <Radio.Button value="15m" style={{ width: '9%', textAlign: 'center' }}>15m</Radio.Button>

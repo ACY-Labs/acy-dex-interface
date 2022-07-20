@@ -547,7 +547,7 @@ const DaoTableRow = props => {
         }}
       >
         {/* <div className={`${styles.colItem} ${styles.swapComponent}`} > */}
-            <AcyCard style={{ backgroundColor: '#0e0304', padding: '10px' }}>
+            <AcyCard style={{ backgroundColor: 'black', padding: '10px' }}>
               <div className={styles.trade}>
                 <SwapComponent
                   onSelectToken0={token => {

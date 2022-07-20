@@ -226,7 +226,6 @@ const SwapComponent = props => {
     setIsPendingConfirmation,
     isBuying,
     setIsBuying,
-    onChangeMode,
     swapTokenAddress,
     setSwapTokenAddress,
     glp_isWaitingForApproval,
@@ -1055,7 +1054,6 @@ const SwapComponent = props => {
   // LONG or SHORT or POOL
   const modeSelect = (input) => {
     setMode(input);
-    onChangeMode(input);
   }
 
   // MARKET or LIMIT
@@ -1619,13 +1617,16 @@ const SwapComponent = props => {
                           </button>
                           <input
                             type="number"
-                            min={0.1}
-                            max={30.5}
                             value={leverageOption}
                             onChange={e => {
-                              let val = parseFloat(e.target.value.replace(/^(-)*(\d+)\.(\d).*$/, '$1$2.$3')).toFixed(1)
-                              if (val >= 0.1 && val <= 30.5) {
-                                setLeverageOption(val)
+                              // let val = parseFloat(e.target.value.replace(/^(-)*(\d+)\.(\d).*$/, '$1$2.$3')).toFixed(1)
+                              let val = parseFloat(e.target.value)
+                              if (val < 0.1) {
+                                setLeverageOption(0.1)
+                              } else if (val >= 0.1 && val <= 30.5) {
+                                setLeverageOption(Math.round(val*10)/10)
+                              } else {
+                                setLeverageOption(30.5)
                               }
                             }}
                             className={styles.leverageInput}
