@@ -558,31 +558,34 @@ export default function ExchangeTVChart(props) {
     <div className="ExchangeChart tv" ref={ref} style={{ height: "100%", width: "100%"}}>
       <div className="ExchangeChart-top App-box App-box-border">
         <div className="ExchangeChart-top-inner">
-          <div >
-            <Row>
-              <Col span={"50%"}>  
+          <div class="grid-container-element">
+            <div className="timeSelector" style={{float: "left"}}>
               {/* <div className="ExchangeChart-info-label">24h Change</div> */}
-                {/* <div className={styles.timeSelector}> */}
-                <StyledSelect value={period} onChange={placementChange}
-                  style={{ width: '100%', height: '23px', paddingRight: '50%' }}>
-                  <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
-                  <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>
-                  <Radio.Button value="15m" style={{ width: '9%', textAlign: 'center' }}>15m</Radio.Button>
-                  <Radio.Button value="30m" style={{ width: '9%', textAlign: 'center' }}>30m</Radio.Button>
-                  <Radio.Button value="1h" style={{ width: '9%', textAlign: 'center' }}>1h</Radio.Button>
-                  <Radio.Button value="2h" style={{ width: '9%', textAlign: 'center' }}>2h</Radio.Button>
-                  <Radio.Button value="4h" style={{ width: '9%', textAlign: 'center' }}>4h</Radio.Button>
-                  <Radio.Button value="1d" style={{ width: '9%', textAlign: 'center' }}>1D</Radio.Button>
-                  <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
-                </StyledSelect>
-              </Col> 
-              {deltaIsMinus ?
-              <Col span={"50%"} style={{color: '#FA3C58'}}> -${priceChangeDelta}    -{priceChangePercentDelta}% </Col>
-              :
-              <Col span={"50%"} style={{color: '#10CC83'}}> +${priceChangeDelta}    +{priceChangePercentDelta}% </Col>
-              }
-            </Row>
-              {/* </div> */}
+              <StyledSelect value={period} onChange={placementChange}
+                style={{ width:'200%', height: '23px' }}>
+                <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
+                <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>
+                <Radio.Button value="15m" style={{ width: '9%', textAlign: 'center' }}>15m</Radio.Button>
+                <Radio.Button value="30m" style={{ width: '9%', textAlign: 'center' }}>30m</Radio.Button>
+                <Radio.Button value="1h" style={{ width: '9%', textAlign: 'center' }}>1h</Radio.Button>
+                <Radio.Button value="2h" style={{ width: '9%', textAlign: 'center' }}>2h</Radio.Button>
+                <Radio.Button value="4h" style={{ width: '9%', textAlign: 'center' }}>4h</Radio.Button>
+                <Radio.Button value="1d" style={{ width: '9%', textAlign: 'center' }}>1D</Radio.Button>
+                <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
+              </StyledSelect>
+            </div>
+            {deltaIsMinus ?
+            <div style={{float: "right", paddingRight: "1rem", color:"#FA3C58"}}>
+            -${priceChangeDelta} -{priceChangePercentDelta}% 
+            </div>
+            :
+            <div style={{float: "right", paddingRight: "1rem", color: '#46E3AE'}}>
+              +${priceChangeDelta} +{priceChangePercentDelta}%
+            </div>
+            }
+          </div>
+
+            {/* </div> */}
             {/* <div className="ExchangeChart-title">
               <ChartTokenSelector
                 chainId={chainId}
@@ -593,7 +596,6 @@ export default function ExchangeTVChart(props) {
                 className="chart-token-selector"
               />
             </div> */}
-          </div>
 					{/* <div>
 						<div className="ExchangeChart-main-price">{chartToken.maxPrice && formatAmount(chartToken.maxPrice, USD_DECIMALS, 2)}</div>
 						<div className="ExchangeChart-info-label">${chartToken.minPrice && formatAmount(chartToken.minPrice, USD_DECIMALS, 2)}</div>
