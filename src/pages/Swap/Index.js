@@ -116,7 +116,7 @@ const StyledCard = styled(AcyCard)`
 
 const Swap = props => {
   const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
-  
+
   // console.log("hereim befoere swap coinlist");
   const coinList = getGlobalTokenList()
   // console.log("hereyou see tokens coinlist", coinList)
@@ -166,7 +166,7 @@ const Swap = props => {
   const { activate } = useWeb3React();
 
   const { perpetuals } = useConstantLoader()
-  const readerAddress = perpetuals.getContract("Reader")  
+  const readerAddress = perpetuals.getContract("Reader")
   const vaultAddress = perpetuals.getContract("Vault")
   const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
 
@@ -190,7 +190,7 @@ const Swap = props => {
       to: AddressZero,
     }
   }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
-  
+
 
   const tokenAddresses = tokens.map(token => token.address)
   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
@@ -226,46 +226,46 @@ const Swap = props => {
     setTokenSelection(newTokenSelection)
   }, [tokenSelection, setTokenSelection])
 
-//   console.log("hereim see coinList", coinList)  
+  //   console.log("hereim see coinList", coinList)  
 
-// function getTokenBySymbol(tokenlist, symbol) {
-//   console.log("hereim see gettokenbysymbol tokenlist.symbol, symbol", tokenlist, symbol)
-//   for (let i = 0; i < tokenlist.length; i++) {
-//     if (tokenlist[i].symbol === symbol) {
-//       return tokenlist[i]
-//     }
-//   }
-//   return undefined
-// }
+  // function getTokenBySymbol(tokenlist, symbol) {
+  //   console.log("hereim see gettokenbysymbol tokenlist.symbol, symbol", tokenlist, symbol)
+  //   for (let i = 0; i < tokenlist.length; i++) {
+  //     if (tokenlist[i].symbol === symbol) {
+  //       return tokenlist[i]
+  //     }
+  //   }
+  //   return undefined
+  // }
 
 
-//   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
-//   const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
+  //   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
+  //   const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
 
-//   const setFromTokenAddress = useCallback((selectedSwapOption, address) => {
-//     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
-//     newTokenSelection[selectedSwapOption].from = address
-//     setTokenSelection(newTokenSelection)
-//   }, [tokenSelection, setTokenSelection])
+  //   const setFromTokenAddress = useCallback((selectedSwapOption, address) => {
+  //     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
+  //     newTokenSelection[selectedSwapOption].from = address
+  //     setTokenSelection(newTokenSelection)
+  //   }, [tokenSelection, setTokenSelection])
 
-//   const setToTokenAddress = useCallback((selectedSwapOption, address) => {
-//     // console.log("hereim see tokenSelection", tokenSelection)
-//     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
-//     newTokenSelection[selectedSwapOption].to = address
-//     setTokenSelection(newTokenSelection)
-//   }, [tokenSelection, setTokenSelection])
+  //   const setToTokenAddress = useCallback((selectedSwapOption, address) => {
+  //     // console.log("hereim see tokenSelection", tokenSelection)
+  //     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
+  //     newTokenSelection[selectedSwapOption].to = address
+  //     setTokenSelection(newTokenSelection)
+  //   }, [tokenSelection, setTokenSelection])
 
-//   const fromTokenAddress = tokenSelection[swapOption].from
-//   const toTokenAddress = tokenSelection[swapOption].to
+  //   const fromTokenAddress = tokenSelection[swapOption].from
+  //   const toTokenAddress = tokenSelection[swapOption].to
 
-function getTokenBySymbol(tokenlist, symbol) {
-  for (let i = 0; i < tokenlist.length; i++) {
-    if (tokenlist[i].symbol === symbol) {
-      return tokenlist[i]
+  function getTokenBySymbol(tokenlist, symbol) {
+    for (let i = 0; i < tokenlist.length; i++) {
+      if (tokenlist[i].symbol === symbol) {
+        return tokenlist[i]
+      }
     }
+    return undefined
   }
-  return undefined
-}
 
 
   ////console.log('printing tx lists', txList);
@@ -760,31 +760,6 @@ function getTokenBySymbol(tokenlist, symbol) {
           </div>
 
         </div>
-
-        <AcyModal onCancel={onCancel} width={600} visible={visible}>
-          <div className={styles.title}>
-            <AcyIcon name="back" /> Select a token
-          </div>
-          <div className={styles.search}>
-            <AcyInput
-              placeholder="Enter the token symbol or address"
-              suffix={<AcyIcon name="search" />}
-            />
-          </div>
-          <div className={styles.coinList}>
-            <AcyTabs>
-              <AcyTabPane tab="All" key="1">
-                <AcyCoinItem />
-                <AcyCoinItem />
-                <AcyCoinItem />
-                <AcyCoinItem />
-              </AcyTabPane>
-              <AcyTabPane tab="Favorite" key="2" />
-              <AcyTabPane tab="Index" key="3" />
-              <AcyTabPane tab="Synth" key="4" />
-            </AcyTabs>
-          </div>
-        </AcyModal>
 
         <AcyConfirm
           onCancel={onHandModalConfirmOrder}
