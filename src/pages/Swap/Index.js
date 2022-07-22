@@ -34,7 +34,7 @@ import StakeHistoryTable from './components/StakeHistoryTable';
 import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
-import { API_URL, useConstantLoader, getGlobalTokenList, constantInstance } from '@/constants';
+import { API_URL, useConstantLoader, getGlobalTokenList, constantInstance, getGlobalTokenPlatformList } from '@/constants';
 import { fetcher, getInfoTokens, expandDecimals, useLocalStorageByChainId } from '@/acy-dex-futures/utils';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import useSWR from 'swr';
@@ -119,6 +119,9 @@ const Swap = props => {
   
   // console.log("hereim befoere swap coinlist");
   const coinList = getGlobalTokenList()
+  // console.log("hereyou see tokens coinlist", coinList)
+  const platformList = getGlobalTokenPlatformList()
+  // console.log("hereyou see tokens platformlist", platformList)
   // console.log("hereim swap coinlist successful", coinList);
   ////console.log("@/ inside swap:", supportedTokens, apiUrlPrefix)
 
@@ -693,20 +696,9 @@ function getTokenBySymbol(tokenlist, symbol) {
                 <SankeyGraph />
                 :
                 <div>
-                  {
-                    <ExchangeTVChart 
-                      swapOption={'LONG'}
-                      fromTokenAddress={"0x0000000000000000000000000000000000000000"}
-                      toTokenAddress={"0x05d6f705C80d9F812d9bc1A142A655CDb25e2571"}
-                      period={'5m'}
-                      infoTokens={infoTokens}
-                      chainId={chainId}
-                      // positions={positions}
-                      // savedShouldShowPositionLines,
-                      // orders={orders}
-                      setToTokenAddress={setToTokenAddress}
-                    />
-                  }
+                  <ExchangeTVChart 
+                    chartTokenSymbol="BTC" 
+                  />
                 </div>
                 // <div>Kchart here</div>
               }
@@ -741,6 +733,9 @@ function getTokenBySymbol(tokenlist, symbol) {
               <div className={styles.trade}>
                 <SwapComponent
                   onSelectToken0={token => {
+                    // console.log("hereyou active0", platformList[chainId][(token.symbol)])
+                    // console.log("hereyou active0 chainid", chainId, " ", platformList[chainId])
+                    // console.log("hereyou active0 token symbol", (token.symbol).toLowerCase())
                     setActiveToken0(token);
                   }}
                   onSelectToken1={token => {

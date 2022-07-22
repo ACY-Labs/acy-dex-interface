@@ -365,6 +365,7 @@ export const useConstantLoader = () => {
                 // changeUrlChainId(nextChainId)
             })
         }
+
     }, [])
 
 
@@ -383,24 +384,41 @@ export const useConstantLoader = () => {
     //         }
     //     }
     // }, [history.location.query])
-
     return constant;
 }
 
 export const getGlobalTokenList = () => {
     const [tokenList, setTokenList] = useState([])
-    console.log("hereim getglobal tokenlist")
+    const [platformList, setPlatformList] = useState({})
+    let responseTokenList;
+    let responsePlatformList;
+
 
     useEffect(() => {
+        let tmpTokenList = []
+        let tmpPlatformList = {
+            1: {}, // eth
+            56: {}, // bsc
+            137: {}, // polygon
+            // 80001: {}, // mumbai
+        }
         const apiUrlPrefix = "https://api.coingecko.com/api/v3"
-        console.log("hereim before axios")
-        axios.get(
-            `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=500&page=1&sparkline=false`
-        ).then(data => {
-            console.log("hereim after axios")
-            let tmp = []
-            data.data.map(token => {
-                tmp.push({
+
+        let tokenListURL = `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=500&page=1&sparkline=false`
+        let platformListURL = `https://api.coingecko.com/api/v3/coins/list?include_platform=true`
+
+        let requestTokenList = axios.get(tokenListURL)
+        let requestPlatfromList = axios.get(platformListURL)
+
+        axios.all(
+            [requestTokenList, requestPlatfromList]
+        ).then(
+            axios.spread((...responses) => {
+            responseTokenList = responses[0];
+            responsePlatformList = responses[1];
+            //tokenlist data management
+            responseTokenList.data.map(token => {
+                tmpTokenList.push({
                     name: token.name,
                     symbol: token.symbol.toUpperCase(),
                     logoURI: token.image,
@@ -412,13 +430,216 @@ export const getGlobalTokenList = () => {
                     total_supply: token.total_supply,
                 })
             })
-            setTokenList(tmp)
-            console.log('hereim init tokenList', data.data)
-        })
-            .catch(e => {
-                console.log(e);
-            });
+            setTokenList(tmpTokenList)
+            console.log('hereim check init tokenList', tmpTokenList)
+
+            //platform list data management
+            console.log('hereim check response platform', responsePlatformList)
+            // console.log('hereim check platform if', responsePlatformList.data)
+
+            // console.log('hereim check platform if', Object.keys(responsePlatformList.data.platforms).length)
+            let checkLength = []
+            responsePlatformList.data.map(token => {
+                // console.log('hereim check platform ', token.platforms)
+
+                if (Object.keys(token.platforms).length) {
+                    // console.log('hereim check platform ', token.platforms)
+                    for (let i = 0; i < tmpTokenList.length; i ++) {
+                        if(token.symbol.toUpperCase() == tmpTokenList[i].symbol) {
+
+                            if (token.platforms["ethereum"]){
+                                tmpPlatformList[1][token.symbol] = {
+                                    // id: token.id,
+                                    symbol: token.symbol.toUpperCase(),
+                                    name: token.name,
+                                    address: token.platforms["ethereum"],
+                                }
+                            }
+                            if (token.platforms["binance-smart-chain"]){
+                                tmpPlatformList[56][token.symbol] = {
+                                    // id: token.id,
+                                    symbol: token.symbol.toUpperCase(),
+                                    name: token.name,
+                                    address: token.platforms["binance-smart-chain"],
+                                }
+                            }
+                            if(token.platforms["polygon-pos"]) {
+                                tmpPlatformList[137][token.symbol] = {
+                                    // id: token.id,
+                                    symbol: token.symbol.toUpperCase(),
+                                    name: token.name,
+                                    address: token.platforms["polygon-pos"],
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+                
+            })
+
+            setPlatformList(tmpPlatformList);
+            console.log("hereim check tmp platform list", tmpPlatformList, " ", Object.keys(tmpPlatformList[1]).length)
+            // console.log("hereim check tmp platform list", tmpPlatformList)
+
+            })
+        ) .catch(errors => {
+            console.error(errors);
+        });
+            // console.log("hereim check response lists", responseTokenList, " ", responsePlatformList);
+
+
+
+        // axios.get(
+        //     `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=500&page=1&sparkline=false`
+        // ).then(data => {
+        //     data.data.map(token => {
+        //         tmpTokenList.push({
+        //             name: token.name,
+        //             symbol: token.symbol.toUpperCase(),
+        //             logoURI: token.image,
+        //             current_price: token.current_price,
+        //             price_change_percentage_24h: token.price_change_percentage_24h,
+        //             total_volume: token.total_volume,
+        //             market_cap: token.market_cap,
+        //             max_supply: token.max_supply,
+        //             total_supply: token.total_supply,
+        //         })
+        //     })
+        //     setTokenList(tmpTokenList)
+        //     console.log('joy init tokenList', data.data)
+        // })
+        // .catch(e => {
+        //     console.log(e);
+        // });
+
+
+        // // const apiUrlPrefix = "https://api.coingecko.com/api/v3"
+        // axios.get(
+        //     `https://api.coingecko.com/api/v3/coins/list?include_platform=true`
+        // ).then(list => {
+        //     console.log("hereim see in then datas", list.data)
+        //     let tmpPlatformList = {
+        //         1: {}, // eth
+        //         56: {}, // bsc
+        //         137: {}, // polygon
+        //         // 80001: {}, // mumbai
+        //     }
+        //     list.data.map(token => {
+        //         console.log("hereimyou");
+        //         for (let i = 0; i < tmpTokenList.length; i ++) {
+        //             console.log("hereimyou", token.symbol.toUpperCase(), " ", tmpTokenList[i].symbol)
+        //             if(token.symbol.toUpperCase() == tmpTokenList[i].symbol) {
+        //                 if(token.platforms["ethereum"]) {
+        //                     tmpPlatformList[1][token.symbol] = {
+        //                         // id: token.id,
+        //                         symbol: token.symbol.toUpperCase(),
+        //                         name: token.name,
+        //                         address: token.platforms["ethereum"],
+        //                     }
+        //                 }
+        //                 if(token.platforms["polygon-pos"]) {
+        //                     tmpPlatformList[137][token.symbol] = {
+        //                         // id: token.id,
+        //                         symbol: token.symbol.toUpperCase(),
+        //                         name: token.name,
+        //                         address: token.platforms["polygon-pos"],
+        //                     }
+        //                 }
+        //                 if(token.platforms["binance-smart-chain"]) {
+        //                     tmpPlatformList[56][token.symbol] = {
+        //                         // id: token.id,
+        //                         symbol: token.symbol.toUpperCase(),
+        //                         name: token.name,
+        //                         address: token.platforms["binance-smart-chain"],
+        //                     }
+        //                 }
+        //                 break;
+        //             }
+        //         }
+        //     })
+
+        //     console.log("hereyou platformlist", platformList);
+
+
+        //     // if (tmp.platforms)
+        //     // console.log("hereim see list data", tmp.platforms.binance-smart-chain)
+        //     setPlatformList(tmpPlatformList);
+        //     // console.log('hereim init platform', list.list)
+        // })
+        // .catch(e => {
+        //     console.log(e);
+        // });
+
     }, []);
 
     return tokenList
+}
+export const getGlobalTokenPlatformList = () => {
+    const [platformList, setPlatformList] = useState({})
+
+    // useEffect(() => {
+    //     // const apiUrlPrefix = "https://api.coingecko.com/api/v3"
+    //     axios.get(
+    //         `https://api.coingecko.com/api/v3/coins/list?include_platform=true`
+    //     ).then(list => {
+    //         console.log("hereim see in then datas", list.data)
+    //         let tokenlist_tmp = {
+    //             1: {}, // eth
+    //             56: {}, // bsc
+    //             137: {}, // polygon
+    //             // 80001: {}, // mumbai
+    //         }
+    //         console.log("hereimyou");
+    //         const tokenlist = getGlobalTokenList();
+    //         console.log("hereimyou", tokenlist.length);
+    //         console.log("hereyou", list.data.length);
+    //         list.data.map(token => {
+    //             console.log("hereimyou");
+    //             for (let i = 0; i < tokenlist.length; i ++) {
+    //                 console.log("hereimyou", token.symbol.toUpperCase(), " ", element.symbol)
+    //                 if(token.symbol.toUpperCase() == element.symbol) {
+    //                     if(token.platforms["ethereum"]) {
+    //                         tokenlist_tmp[1][token.symbol] = {
+    //                             // id: token.id,
+    //                             symbol: token.symbol.toUpperCase(),
+    //                             name: token.name,
+    //                             address: token.platforms["ethereum"],
+    //                         }
+    //                     }
+    //                     if(token.platforms["polygon-pos"]) {
+    //                         tokenlist_tmp[137][token.symbol] = {
+    //                             // id: token.id,
+    //                             symbol: token.symbol.toUpperCase(),
+    //                             name: token.name,
+    //                             address: token.platforms["polygon-pos"],
+    //                         }
+    //                     }
+    //                     if(token.platforms["binance-smart-chain"]) {
+    //                         tokenlist_tmp[56][token.symbol] = {
+    //                             // id: token.id,
+    //                             symbol: token.symbol.toUpperCase(),
+    //                             name: token.name,
+    //                             address: token.platforms["binance-smart-chain"],
+    //                         }
+    //                     }
+    //                     break;
+    //                 }
+    //             }
+    //         })
+
+    //         console.log("hereyou", tokenlist_tmp);
+
+
+    //         // if (tmp.platforms)
+    //         // console.log("hereim see list data", tmp.platforms.binance-smart-chain)
+    //         setPlatformList(tokenlist_tmp);
+    //         // console.log('hereim init platform', list.list)
+    //     })
+    //         .catch(e => {
+    //             console.log(e);
+    //         });
+    // }, []);
+
+    return platformList
 }

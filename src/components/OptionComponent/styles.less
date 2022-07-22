@@ -59,6 +59,7 @@
     background-color: transparent;
     font-size: 16px;
     text-align: center;
+    width: 40%;
   }
 
 }
@@ -110,7 +111,7 @@
     height: 50px;
     color: white;
 
-    &:hover{
+    &:hover {
       cursor: pointer;
       border: 1px solid white;
     }
@@ -123,9 +124,28 @@
     height: 50px;
     color: white;
 
-    &:hover{
+    &:hover {
       cursor: pointer;
       border: 1px solid white;
     }
+  }
+}
+
+.slippageContainer{
+  margin-top: 20px;
+  margin-bottom: 20px;
+  :global{
+    .ant-input-affix-wrapper {
+      background-color: black;
+      border: 0.75px solid #333333;
+      border-radius: 5px;
+    }
+    .ant-input{
+      background-color: black;
+    }
+  }
+
+  .input{
+    flex: 1 1 auto;
   }
 }

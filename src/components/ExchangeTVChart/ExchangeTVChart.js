@@ -3,7 +3,7 @@ import cx from "classnames";
 
 import { Spin, Radio, Button } from 'antd';
 
-// import styles from './styles.less';
+// import styles from './ExchangeTVChart.css';
 import styled from "styled-components";
 
 import { createChart } from "lightweight-charts";
@@ -37,24 +37,29 @@ import Binance from "binance-api-node";
 const StyledSelect = styled(Radio.Group)`
   .ant-radio-button-wrapper{
     background: transparent !important;
-    height: 22px;
-    font-size: 0.7rem;
+    height: 20px;
+    font-size: 0.65rem;
     padding: 0 0.1rem;
     border: 0.75px solid #333333;
     border-radius: 0 0 0 0;
-    line-height: 22px;
+    line-height: 20px;
     color: #b5b5b6;
+    
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled){
     color: #ffffff;
-    box-shadow: 0 0 0 0 #0e0304;
-    border-color: #333333;
+    box-shadow: 0 0 0 0 black;
+    // border-color: #333333;
+    border-color: #ffffff;
+
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover{
     color: #ffffff;
+    border: 0.75px solid #ffffff;
+    border-color: #ffffff !important;
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before{
-    background-color: #0e0304 !important;
+    background-color: black !important;
   }
   .ant-radio-button-wrapper:not(:first-child)::before{
     background-color: transparent;
@@ -69,35 +74,6 @@ const PRICE_LINE_TEXT_WIDTH = 15;
 const timezoneOffset = -new Date().getTimezoneOffset() * 60;
 
 const BinancePriceApi = 'https://api.acy.finance/polygon-test';
-
-export function getChartToken(fromToken, toToken, chainId) {
-  if (!fromToken || !toToken) {
-    return;
-  }
-
-
-  if (fromToken.isUsdg && toToken.isUsdg) {
-    return constantInstance.perpetuals.tokenList.find((t) => t.isStable);
-  }
-  if (fromToken.isUsdg) {
-    return toToken;
-  }
-  if (toToken.isUsdg) {
-    return fromToken;
-  }
-
-  if (fromToken.isStable && toToken.isStable) {
-    return toToken;
-  }
-  if (fromToken.isStable) {
-    return toToken;
-  }
-  if (toToken.isStable) {
-    return fromToken;
-  }
-  
-  return toToken;
-}
 
 const DEFAULT_PERIOD = "4h";
 
@@ -121,7 +97,8 @@ const getChartOptions = (width, height) => ({
   layout: {
     backgroundColor: "rgba(255, 255, 255, 0)",
     textColor: "#ccc",
-    fontFamily: "Relative",
+    fontFamily: "Karla, sans-serif", 
+    // fontFamily: "Karla", 
   },
   localization: {
     // https://github.com/tradingview/lightweight-charts/blob/master/docs/customization.md#time-format
@@ -166,73 +143,23 @@ const getChartOptions = (width, height) => ({
 
 export default function ExchangeTVChart(props) {
   const {
-    // swapOption,
-    fromTokenAddress,
-    toTokenAddress,
-    period,
-    infoTokens,
-    chainId,
-    // positions,
-    // savedShouldShowPositionLines,
-    // orders,
-    setToTokenAddress
+    chartTokenSymbol,
   } = props
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [activeTimeScale, setActiveTimeScale] = useState("5m");
-  const [placement, setPlacement] = useState('5m');
-
-//   let [period, setPeriod] = useLocalStorageSerializeKey([chainId, "Chart-period"], DEFAULT_PERIOD);
-//   if (!(period in CHART_PERIODS)) {
-//     period = DEFAULT_PERIOD;
-//   }
+  const [period, setPeriod] = useState('5m');
 
   const [hoveredCandlestick, setHoveredCandlestick] = useState();
 
-  // 1. 这里的token是包含价格的结构体
-  const fromToken = getTokenInfo(infoTokens, fromTokenAddress)
-  const toToken = getTokenInfo(infoTokens, toTokenAddress)
-  // console.log("chart debug: infotokens", infoTokens, toTokenAddress, fromToken, toToken)
-  console.log("hereim in swap kchart", fromToken, toToken)
-
-  const [chartToken, setChartToken] = useState({
-    maxPrice: null,
-    minPrice: null
-  })
-  useEffect(() => {
-    const tmp = getChartToken(fromToken, toToken, chainId)
-    setChartToken(tmp)
-  }, [fromToken, toToken, chainId])
 
 
-  const symbol = chartToken ? (chartToken.isWrapped ? chartToken.baseSymbol : chartToken.symbol) : undefined;
-  const marketName = chartToken ? symbol + "_USD" : undefined;
+  const symbol = chartTokenSymbol || "BTC";
+  const marketName = symbol + "_USD";
   const previousMarketName = usePrevious(marketName);
-
-  // const currentOrders = useMemo(() => {
-  //   if (!chartToken) {
-  //     return [];
-  //   }
-
-  //   return orders.filter((order) => {
-  //     if (order.type === SWAP) {
-  //       // we can't show non-stable to non-stable swap orders with existing charts
-  //       // so to avoid users confusion we'll show only long/short orders
-  //       return false;
-  //     }
-
-  //     const indexToken = constantInstance.perpetuals.getToken(order.indexToken);
-  //     return order.indexToken === chartToken.address || (chartToken.isNative && indexToken.isWrapped);
-  //   });
-  // }, [orders, chartToken, chainId]);
 
   const ref = useRef(null);
   const chartRef = useRef(null);
-
-  // 2. 计算买卖中间价（maxPrice + minPrice）/ 2
-  const currentAveragePrice =
-    chartToken.maxPrice && chartToken.minPrice ? chartToken.maxPrice.add(chartToken.minPrice).div(2) : null;
-  
   
   const [chartInited, setChartInited] = useState(false);
   useEffect(() => {
@@ -252,8 +179,11 @@ export default function ExchangeTVChart(props) {
   const [lastCandle, setLastCandle] = useState({})
   const cleaner = useRef()
   useEffect(() => {
-    const symbol = chartToken.symbol;
-    console.log("bin chart token: ", chartToken, symbol)
+    if (!currentSeries)
+      return;
+
+    const symbol = chartTokenSymbol;
+    console.log("bin chart token: ", symbol)
     if (!symbol)
       return
     const pairName = `${symbol}USDT`;
@@ -288,7 +218,7 @@ export default function ExchangeTVChart(props) {
       // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
       // SHOULD DO THIS BEFORE SUBSCRIBE, HOWEVER MOVING SUBSCRIBE TO AFTER THIS BLOCK OF CODE WILL CAUSE THE SUBSCRIPTION GOES ON FOREVER
       // REACT BUG?
-      console.log("fetchPrevAndSubscribe again: ", chartToken.symbol)
+      console.log("fetchPrevAndSubscribe again: ", chartTokenSymbol)
       // Binance data is independent of chain, so here we can fill in any chain name
       const prevData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`).then(res => res.data);
       console.log("prev data: ", prevData)
@@ -301,7 +231,7 @@ export default function ExchangeTVChart(props) {
     }
   
     fetchPrevAndSubscribe()
-  }, [chartToken.symbol, period])
+  }, [currentSeries, chartTokenSymbol, period])
   ///// end of binance data source
 
   
@@ -511,7 +441,7 @@ export default function ExchangeTVChart(props) {
   //   }
   // }
 
-  if (!chartToken) {
+  if (!chartTokenSymbol) {
     return null;
   }
   const placementChange = e => {
@@ -519,10 +449,30 @@ export default function ExchangeTVChart(props) {
     //   return;
     // }
     // setUpdatingKchartsFlag(true);
-    setPlacement(e.target.value);
+    setPeriod(e.target.value);
     setActiveTimeScale(e.target.value);
     console.log("hereim button triggered", e.target.value)
   };
+
+  // const getTimescaleButton = value => {
+  //   if (period != value) {
+  //     return (
+  //       <button
+  //         className={styles.timescaleButton}
+  //         onClick={() => { setPeriod(value) }}>
+  //         {value}
+  //       </button>
+  //     )
+  //   } else {
+  //     return (
+  //       <button
+  //         className={styles.timescaleButtonActive}
+  //         onClick={() => { setPeriod(value) }}>
+  //         {value}
+  //       </button>
+  //     )
+  //   }
+  // }
 
   // const onSelectToken = (token) => {
   //   const tmp = getTokenInfo(infoTokens, token.address)
@@ -537,8 +487,9 @@ export default function ExchangeTVChart(props) {
             <div>
               {/* <div className="ExchangeChart-info-label">24h Change</div> */}
                 {/* <div className={styles.timeSelector}> */}
-                  <StyledSelect value={placement} onChange={placementChange}
-                    style={{ width: '100%', height: '23px', paddingRight: '50%' }}>
+                  
+                  <StyledSelect value={period} onChange={placementChange}
+                    style={{ width: '100%', height: '20px', paddingRight: '50%' }}>
                     <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
                     <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>
                     <Radio.Button value="15m" style={{ width: '9%', textAlign: 'center' }}>15m</Radio.Button>

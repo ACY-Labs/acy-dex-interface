@@ -1,17 +1,20 @@
-.statsPage{
-    font-family: "Karla", sans-serif;
-    font-size: 1.875rem;
-    line-height: 2.25rem;
-  }
-  .container{
-    margin:auto;
-    // max-width: calc(100% - 20px * 2);
-    max-width: 960px;
-    padding-left: 20px;
-    padding-right: 20px;
-    width: 100%;
+.statsPage {
+  font-family: "Karla", sans-serif;
+  font-size: 1.875rem;
+  // line-height: 2.25rem;
 }
-.tittle{
+
+.container {
+  // margin:auto;
+  // max-width: 960px;
+  // padding-left: 20px;
+  // padding-right: 20px;
+  // width: 100%;
+  padding: 50px;
+  padding-right: 20%;
+}
+
+.tittle {
   padding-right: 10%;
   color: #EB5C20;
   line-height: 100%;
@@ -20,15 +23,18 @@
 
   // max-width: 960px;
 }
-.content{
+
+.content {
   padding-top: 45px;
   color: white;
 }
-.iframeHolder{
+
+.iframeHolder {
   position: relative;
-        width: 100%;
+  width: 100%;
 }
-.columns{
+
+.columns {
   width: 100%;
 }
 
@@ -41,41 +47,52 @@
 }
 
 .optionTab {
-  margin : 10px;
+  margin: 10px;
   font-size: 16px;
-  color : #acacae;
-  cursor : pointer;
+  color: #acacae;
+  cursor: pointer;
+
   &:hover {
     filter: brightness(1.5);
   }
 }
 
 .optionTabSelected {
-  margin : 10px;
+  margin: 10px;
   padding-right: 20px;
   font-size: 16px;
-  color : white;
+  color: white;
   font-weight: 600;
 }
 
 @media (min-width: 768px) {
   .columns {
-      display: flex;
+    display: flex;
   }
+
   .columns .module {
-      width: calc(50% - 20px / 2)
+    width: calc(50% - 20px / 2)
   }
+
   .columns .module:not(:first-of-type) {
-      margin-left: 20px;
+    margin-left: 20px;
   }
+
   .value-calculations .columns .module {
-      margin: 0;
-      width: 100%;
+    margin: 0;
+    width: 100%;
   }
+
   .logs .filters {
-      margin-left: auto;
+    margin-left: auto;
   }
+
   .logs .filters a {
-      margin-left: 20px;
+    margin-left: 20px;
   }
+}
+
+.statsTab {
+  padding-right: 70%;
+  border: 0.75px solid #333333;
 }

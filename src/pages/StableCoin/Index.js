@@ -120,6 +120,16 @@ const StableCoin = props => {
     }
     return undefined
   }
+  const [kChartTab, setKChartTab] = useState("BTC")
+  const kChartTabs = ["BTC", "ETH"]
+  const selectChart = item => {
+    setKChartTab(item)
+    onClickSetActiveToken(item)
+  }
+  const onClickSetActiveToken = (e) => {
+    console.log("hereim see click token", e)
+    setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
+  }
 
   return (
     <PageHeaderWrapper>
@@ -128,20 +138,21 @@ const StableCoin = props => {
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
           <div className={`${styles.colItem} ${styles.priceChart}`}>
-            {/* <div className={styles.dataBlock}> */}
-            <div style={{ padding: '20px' }}>
-              <ExchangeTVChart
-                swapOption={'LONG'}
-                fromTokenAddress={"0x0000000000000000000000000000000000000000"}
-                toTokenAddress={"0x05d6f705C80d9F812d9bc1A142A655CDb25e2571"}
-                period={'5m'}
-                infoTokens={infoTokens}
-                chainId={chainId}
-                // positions={positions}
-                // savedShouldShowPositionLines,
-                // orders={orders}
-                setToTokenAddress={setToTokenAddress}
-              />
+            <div>
+
+              <div className={styles.chartTokenSelectorTab}>
+                <PerpetualTabs
+                  option={kChartTab}
+                  options={kChartTabs}
+                  onChange={selectChart}
+                />
+              </div>
+              <div style={{ backgroundColor: 'black', height: "450px", display: "flex", flexDirection: "column", marginBottom: "30px" }}>
+                {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
+                <ExchangeTVChart
+                  chartTokenSymbol="USDC"
+                />
+              </div>
             </div>
             <div className={styles.bottomWrapper}>
               <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>

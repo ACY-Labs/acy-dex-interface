@@ -288,7 +288,7 @@ const GlobalHeaderRight = props => {
   // 通知钱包连接成功
   const checkChainNetwork = (chainId) => {
     if (!chainId) {
-      switchEthereumChain("0x38"); //返回默认56链
+      // switchEthereumChain("0x38"); //返回默认56链
       return
     }
     console.log("networkChanged:", chainId)

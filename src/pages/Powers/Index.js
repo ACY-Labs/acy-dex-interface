@@ -17,7 +17,7 @@ import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
 // import styled from "styled-components";
 import styles from './styles.less'
 
-const Option = props => {
+const Powers = props => {
   const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
 
   const { AddressZero } = ethers.constants
@@ -128,66 +128,8 @@ const Option = props => {
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
         <div className={`${styles.colItem} ${styles.priceChart}`}>
-          <div>
-            <div className={styles.chartTokenSelectorTab}>
-              <Row>
-                <Col span={12} >
-                  <Dropdown overlay={
-                    <Menu onClick={onClickDropdownBTC} style={{ backgroundColor: 'black' }}>
-                      {
-                        optionsBTC.map((option, index) => (
-                          <Menu.Item key={index} >
-                            <span >{option.name} </span>
-                          </Menu.Item>
-                        ))
-                      }
-                    </Menu>
-                  } trigger={['click']}>
-                    <a >
-                      <div>
-                        BTC <DownOutlined />
-                      </div>
-                    </a>
-                  </Dropdown>
-                </Col>
-
-                <Col span={12}>
-                  <Dropdown overlay={
-                    <Menu onClick={onClickDropdownETH} style={{ backgroundColor: 'black' }}>
-                      {
-                        optionsETH.map((option, index) => (
-                          <Menu.Item key={index}>
-                            <span>{option.name} </span>
-                          </Menu.Item>
-                        ))
-                      }
-                    </Menu>
-                  } trigger={['click']}>
-                    <a >
-                      <div>
-                        ETH <DownOutlined />
-                      </div>
-                    </a>
-                  </Dropdown>
-                </Col>
-
-              </Row>
-
-              {/* <PerpetualTabs
-                option={kChartTab}
-                options={kChartTabs}
-                onChange={selectChart}
-              /> */}
-            </div>
-            <div style={{ backgroundColor: 'black', height: "450px", display: "flex", flexDirection: "column", marginBottom: "30px" }}>
-              {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
-              <ExchangeTVChart
-                chartTokenSymbol="BTC"
-              />
-            </div>
-          </div>
+          {/* todo: add chart */}
         </div>
-
 
         <div className={`${styles.colItem} ${styles.optionComponent}`}>
           <AcyCard style={{ backgroundColor: 'transparent', border: 'none' }}>
@@ -202,9 +144,8 @@ const Option = props => {
           </AcyCard>
         </div>
       </div>
-
     </div>
   );
 }
 
-export default Option
+export default Powers

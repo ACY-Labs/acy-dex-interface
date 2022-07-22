@@ -14,7 +14,7 @@
 }
 
 .tableData {
-    text-align: left;
+    text-align: right;
     background-color: transparent;
 }
 
@@ -70,12 +70,38 @@
     }
   }
 
-  .optionInput {
-    color: #fff;
-    width: 70px;
-    border: solid 0.75px #333333;
-    border-radius: 10;
-    background-color: transparent;
-    text-align: center;
-    margin-right: 8px;
+.inputContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  padding: 2px;
+  border: 0.75px solid #232323;
+  width: 80%;
+
+  .inputLabel {
+    margin-left: 5px;
+    margin-right: 3px;
   }
+}
+
+.optionInput {
+  color: #fff;
+  width: 0;
+  position: relative;
+  font-weight: 400;
+  outline: none;
+  flex: 1 1 auto;
+  height: unset;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0;
+  appearance: textfield;
+  text-align: right;
+}

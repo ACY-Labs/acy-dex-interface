@@ -1,4 +1,5 @@
 import { connect } from "umi";
+import { useState } from 'react';
 import Media from 'react-media';
 import styles from './style.less';
 import { Graphics } from "./components/graphics"
@@ -6,6 +7,7 @@ import { VaultCard } from "./components/vaultCard";
 import { StartegyCard } from "./components/strategyCard";
 import { ValueCalculations } from "./components/valueCalculations"
 import { useHistory } from 'react-router-dom'
+import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
 
 const stats = (props) => {
   /* #region  graph */
@@ -109,9 +111,15 @@ const stats = (props) => {
 
   const history = useHistory()
 
+  const [statsType, setStatsType] = useState("StableCoin")
+  const statsTypes = ["Market", "Future", "StableCoin"]
+  const onChangeStats = item => {
+    history.push('/statistics/' + item.toLowerCase())
+  }
+
   return (
     <div className={styles.statsPage}>
-      <div className={`${styles.colItem}`}>
+      {/* <div className={`${styles.colItem}`}>
         <div
           className={styles.optionTab}
           onClick={() => {
@@ -129,10 +137,17 @@ const stats = (props) => {
           Future
         </div>
         <div className={styles.optionTabSelected}> StableCoin </div>
-      </div>
+      </div> */}
       {/* <div className={styles.tittle}>
                 USDA ANALYTICS
             </div> */}
+      <div className={styles.statsTab}>
+        <PerpetualTabs
+          option={statsType}
+          options={statsTypes}
+          onChange={onChangeStats}
+        />
+      </div>
       <div className={`${styles.content} ${styles.container}`}>
         <div className={styles.graph} >
           <Graphics {...graphData1}></Graphics>
