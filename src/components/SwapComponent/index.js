@@ -86,6 +86,7 @@ import {useConstantLoader, getGlobalTokenList} from '@/constants';
 import {useConnectWallet} from '@/components/ConnectWallet';
 import { asyncForEach } from "@/utils/asynctools";
 import { processString } from "@/components/AcyCoinItem";
+import TokenSelectorDrawer from '../TokenSelectorDrawer';
 
 
 
@@ -527,110 +528,6 @@ const SwapComponent = props => {
     hash ? setToken0(coinList.filter(coin => coin.symbol.toLowerCase() == hash.toLowerCase())[0]) : setToken0(INITIAL_TOKEN_LIST[0])
   }, [history.location.hash, coinList])
 
-  // token selector here
-  const [initTokenList, setInitTokenList] = useState(coinList);
-  const [customTokenList, setCustomTokenList] = useState([]);
-  const [tokenSearchInput, setTokenSearchInput] = useState('');
-  const [favTokenList, setFavTokenList] = useState([]);
-  const [tokenBalanceDict, setTokenBalanceDict] = useState({});
-
-  useEffect(() => {
-    if (!coinList) return
-
-    console.log("resetting page states in TokenSelectorModal", coinList)
-    setInitTokenList(coinList);
-    setCustomTokenList([]);
-    setTokenSearchInput('');
-    setFavTokenList([]);
-    setTokenBalanceDict({});
-    //// normal things happen after this line
-
-    //read customTokenList from storage
-    const localTokenList = JSON.parse(localStorage.getItem('customTokenList')) || [];
-    setCustomTokenList(localTokenList);
-    //combine initTokenList and customTokenList
-    const totalTokenList = [...localTokenList, ...coinList];
-    console.log("resetting tokenSelectorModal new renderTokenList", totalTokenList)
-    //read the fav tokens code in storage
-    var favTokenSymbol = JSON.parse(localStorage.getItem('tokens_symbol'));
-    //set to fav token
-    if (favTokenSymbol != null) {
-        setFavTokenList(
-            initTokenList.filter(token => favTokenSymbol.includes(token.symbol))
-        );
-    }
-}, [chainId]);
-
-useEffect(() => {
-  // focus search input every time token modal is opened.
-  // setTimeout is used as a workaround as document.getElementById always return null without  some delay.
-  const focusSearchInput = () =>
-      document.getElementById('liquidity-token-search-input').focus();
-  if (visible === true) setTimeout(focusSearchInput, 100);
-}, [visible])
-
-// method to update the value of token search input field,
-// and filter the token list based on the comparison of the value of search input field and token symbol.
-const onTokenSearchChange = e => {
-  setTokenSearchInput(e.target.value);
-  setInitTokenList(
-    coinList.filter(token => token.symbol.toUpperCase().includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase()))
-  );
-};
-
-const initTokenBalanceDict = (tokenList) => {
-  console.log('Init Token Balance!!!! with chainId, TokenList', chainId, tokenList);        
-  const newTokenBalanceDict = {};
-  asyncForEach(tokenList, async(element, index) => {
-      console.log("dispatched async", element)
-      const token = element;
-      var { address, symbol, decimals } = token; 
-      const bal = await getUserTokenBalance(
-          { address, symbol, decimals },
-          chainId,
-          account,
-          library
-      ).catch(err => {
-          newTokenBalanceDict[token.symbol] = 0;
-          console.log("Failed to load balance, error param: ", address, symbol, decimals, err);
-      })
-
-      const balString = processString(bal);
-      newTokenBalanceDict[token.symbol] = balString;
-      return balString;
-  })
-  setTokenBalanceDict(newTokenBalanceDict);
-}
-
-useEffect(() => {
-  setInitTokenList(coinList)
-}, [coinList])
-
-useEffect(() => {
-  console.log("tokenselectormodal refreshed because now on ", library, account, chainId, )
-  if (!library || !account || !chainId) return;
-  if(coinList) {
-      initTokenBalanceDict(coinList);
-  }
-}, [account, chainId])
-
-const setTokenAsFav = token => {
-  setFavTokenList(prevState => {
-      const prevFavTokenList = [...prevState];
-      if (prevFavTokenList.includes(token)) {
-          var tokens = prevFavTokenList.filter(value => value != token);
-          localStorage.setItem('token', JSON.stringify(tokens.map(e => e.addressOnEth)));
-          localStorage.setItem('tokens_symbol', JSON.stringify(tokens.map(e => e.symbol)));
-          return tokens
-      }
-      prevFavTokenList.push(token);
-      localStorage.setItem('token', JSON.stringify(prevFavTokenList.map(e => e.addressOnEth)));
-      localStorage.setItem('tokens_symbol', JSON.stringify(prevFavTokenList.map(e => e.symbol)));
-
-      return prevFavTokenList;
-  });
-};
-
   return (
     <div className={styles.sc}>
       <AcyCuarrencyCard
@@ -858,72 +755,7 @@ const setTokenAsFav = token => {
         onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} sideComponent={true} 
       /> */}
 
-    <Drawer
-        title="Select a Token"
-        placement="right"
-        className={styles.drawer}
-        getContainer={false}
-        onClose={onCancel}
-        visible={visible}
-        width={550}
-      >
-        <div className={styles.tokenselector}>
-        <div className={styles.search}>
-          <Input
-            size="large"
-            style={{
-              backgroundColor: 'black',
-              borderRadius: '40px',
-              border: '1px solid #333333',
-            }}
-            placeholder="Enter the token symbol or address"
-            value={tokenSearchInput}
-            onChange={onTokenSearchChange}
-            id="liquidity-token-search-input"
-            autoComplete="off"
-          />
-        </div>
-        
-        <div className={styles.coinList}>
-          <AcyTabs>
-            <AcyTabPane tab="All" key="1">
-            {initTokenList.length ? initTokenList.map((token, index) => {
-              return (
-                <AcyCoinItem
-                  data={token}
-                  key={index}
-                  customIcon={false}
-                  clickCallback={() => setTokenAsFav(token)}
-                  selectToken={() => {
-                    onCoinClick(token);
-                  }}
-                  isFav={favTokenList.includes(token)}
-                  constBal={ token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null }
-                />
-              );})
-              : <div className={styles.textCenter} >No matching result</div>}
-            </AcyTabPane>
-
-            <AcyTabPane tab="Favorite" key="2">
-              {favTokenList.length ? favTokenList.map((supToken, index) => (
-              <AcyCoinItem
-                data={supToken}
-                key={index}
-                selectToken={() => {
-                  onCoinClick(supToken);
-                }}
-                customIcon={false}
-                index={index}
-                clickCallback={() => setTokenAsFav(supToken)}
-                isFav={favTokenList.includes(supToken)}
-              />
-            ))
-            : <div className={styles.textCenter} >No matching result</div>}
-            </AcyTabPane>
-          </AcyTabs>
-        </div>
-      </div>
-      </Drawer>
+      <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} />
 
     </div>
   );
