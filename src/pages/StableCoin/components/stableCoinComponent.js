@@ -16,6 +16,7 @@ import {
   AcySmallButton,
 } from '@/components/Acy';
 import TokenSelectorModal from './tokenSelectorModal';
+import TokenSelectorDrawer from '@/components/TokenSelectorDrawer';
 import { supportedTokens } from '@/acy-dex-usda/utils/address';
 import AcyCuarrencyCard from './acyCuarrencyCard'
 import { connect } from 'umi';
@@ -44,7 +45,7 @@ import { swapGetEstimated, swap } from '../../../acy-dex-usda/core/swap';
 
 import ERC20ABI from '@/abis/ERC20.json';
 import WETHABI from '@/abis/WETH.json';
-import { SCAN_URL_PREFIX, SCAN_NAME } from '@/constants';
+import { SCAN_URL_PREFIX, SCAN_NAME, getGlobalTokenList } from '@/constants';
 
 
 import {
@@ -351,6 +352,9 @@ const SwapComponent = props => {
     setIsMax(false)
   };
 
+  let coinList = getGlobalTokenList()
+  coinList = coinList.filter(token => token.symbol == "USDT" || token.symbol == 'USDC' || token.symbol == 'BTC' || token.symbol == 'ETH')
+
   return (
     <div className={styles.sc}>
       <AcyCuarrencyCard
@@ -530,9 +534,12 @@ const SwapComponent = props => {
         {swapStatus && <AcyDescriptions.Item> {swapStatus} </AcyDescriptions.Item>}
       </AcyDescriptions>
 
-      <TokenSelectorModal
+      {/* <TokenSelectorModal
         onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} sideComponent={true}
-      />
+      /> */}
+
+      <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} simple={true} coinList={coinList} />
+
     </div>
   );
 };

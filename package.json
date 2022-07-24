@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@acyswap/sdk": "^1.1.5",
+    "@ant-design/charts": "^1.4.2",
     "@ant-design/icons": "^4.7.0",
     "@antv/data-set": "^0.10.0",
     "@apollo/client": "^3.4.11",
@@ -62,6 +63,7 @@
     "@web3-react/walletconnect-connector": "^6.2.6",
     "@web3-react/walletlink-connector": "^6.2.6",
     "accounting-js": "^1.1.1",
+    "ant-design-pro": "^2.3.2",
     "antd": "^3.26.20",
     "apollo-boost": "^0.4.9",
     "axios": "^0.18.1",

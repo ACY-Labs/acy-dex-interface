@@ -81,7 +81,7 @@ function MarketTokenInfo(props) {
   }
 
   const redirectToLiq = useCallback(() => navHistory.push('/liquidity'), [history]);
-  const redirectToEx = useCallback(() => navHistory.push('/exchange'), [history]);
+  const redirectToEx = useCallback(() => navHistory.push('/trade'), [history]);
 
   const toggleWatchlist = data => {
     let oldArray = watchlistManagerToken.getData();

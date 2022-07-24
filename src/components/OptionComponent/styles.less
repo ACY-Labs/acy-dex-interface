@@ -131,21 +131,63 @@
   }
 }
 
-.slippageContainer{
+.slippageContainer {
   margin-top: 20px;
   margin-bottom: 20px;
-  :global{
+
+  :global {
     .ant-input-affix-wrapper {
       background-color: black;
       border: 0.75px solid #333333;
       border-radius: 5px;
     }
-    .ant-input{
+
+    .ant-input {
       background-color: black;
     }
   }
 
-  .input{
+  .input {
     flex: 1 1 auto;
   }
+}
+
+.accountInfo {
+  margin-top: 50px;
+  margin-left: 30px;
+  display: flex;
+  justify-content: space-evenly;
+
+  .statstitle {
+    font-size: 16px;
+    line-height: 1.355rem;
+    letter-spacing: 0px;
+    color: #FFFFFF;
+  }
+
+  .statsdivider {
+    height: 0.75px;
+    background: #333333;
+    margin: 0.7rem -1rem;
+  }
+
+  .statscontent {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+  }
+
+  .statsRow {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-column-gap: 1rem;
+    padding: unset;
+    color: #a9a9b0;
+    font-size: 15px;
+    opacity: 1;    
+  }
+}
+
+.gauge{
+  width: 300px;
 }

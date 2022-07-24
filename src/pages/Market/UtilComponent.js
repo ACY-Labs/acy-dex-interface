@@ -990,7 +990,7 @@ export function CurrencyTable(props) {
               <Link
                 style={{ color: 'white' }}
                 className={styles.coinName}
-                to={`/exchange#${entry.symbol}`}
+                to={`/trade#${entry.symbol}`}
                 tokenData={entry}
               >
                 {entry.name}

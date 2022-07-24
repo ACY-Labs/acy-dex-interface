@@ -49,8 +49,8 @@ const Sidebar = (props) => {
     if (e.key === 'launch') {
       history.push('/launchpad');
     }
-    if (e.key === 'exchange') {
-      history.push('/exchange')
+    if (e.key === 'trade') {
+      history.push('/trade')
     }
     // if (key === 'triggerError') {
     //   history.push('/exception/trigger');
@@ -135,9 +135,9 @@ const Sidebar = (props) => {
             <Menu.Item key="1">Market</Menu.Item>
             <Menu.Item key="2">Perpetual</Menu.Item>
             <Menu.Item key="3">Stats</Menu.Item>
-            <Menu.Item key="exchange">
+            <Menu.Item key="trade">
               <Icon type='money-collect' />
-              Exchange
+              Trade
             </Menu.Item>
           </SubMenu>
 
@@ -178,9 +178,9 @@ const Sidebar = (props) => {
               </span>}
           >
             <Menu.Item key="1">Market</Menu.Item>
-            <Menu.Item key="exchange">
+            <Menu.Item key="trade">
               <Icon type='money-collect' />
-              Exchange
+              Trade
             </Menu.Item>
           </SubMenu>
         </Menu>
