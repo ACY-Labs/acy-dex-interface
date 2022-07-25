@@ -132,12 +132,12 @@ function getNativeToken(tokenlist) {
 
 export const GlpSwapBox = (props) => {
 
-  const { 
-    isBuying, 
-    setIsBuying, 
-    swapTokenAddress, 
+  const {
+    isBuying,
+    setIsBuying,
+    swapTokenAddress,
     setSwapTokenAddress,
-    isWaitingForApproval, 
+    isWaitingForApproval,
     setIsWaitingForApproval,
     setPendingTxns
   } = props
@@ -197,7 +197,7 @@ export const GlpSwapBox = (props) => {
     fetcher: fetcher(library, Vault),
   })
   const tokenAllowanceAddress = swapTokenAddress === AddressZero ? nativeTokenAddress : swapTokenAddress
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress,"allowance", account || PLACEHOLDER_ACCOUNT, glpManagerAddress], {
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, glpManagerAddress], {
     fetcher: fetcher(library, Glp)
   });
   const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR([chainId, glpManagerAddress, "lastAddedAt", account || PLACEHOLDER_ACCOUNT], {
@@ -244,7 +244,7 @@ export const GlpSwapBox = (props) => {
   })
   // const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
   // const usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
-  
+
   // let aum
   // if (aums && aums.length > 0) {
   //   aum = isBuying ? aums[0] : aums[1]
@@ -336,13 +336,13 @@ export const GlpSwapBox = (props) => {
       }
     }
   }, [active, library, chainId,
-    updateVaultTokenInfo, 
-    updateTokenBalances, 
+    updateVaultTokenInfo,
+    updateTokenBalances,
     // updateBalancesAndSupplies,
     // updateAums, 
-    updateTotalTokenWeights, 
+    updateTotalTokenWeights,
     updateTokenAllowance,
-    updateLastPurchaseTime, 
+    updateLastPurchaseTime,
     // updateStakingInfo, 
     // updateGmxPrice,
     // updateReservedAmount, 
@@ -845,6 +845,7 @@ export const GlpSwapTokenTable = (props) => {
   }
 
   const tokenListData = []
+  let totalPool = 0
   tokenList.map((token) => {
     let tokenFeeBps
     if (isBuying) {
@@ -879,7 +880,7 @@ export const GlpSwapTokenTable = (props) => {
       symbol: token.symbol,
       price: formatKeyAmount(tokenInfo, "minPrice", USD_DECIMALS, 2, true),
       pool: formatAmount(managedUsd, USD_DECIMALS, 2, true),
-      wallet: `${formatKeyAmount(tokenInfo, "balance", tokenInfo.decimals, 2, true)  } ${  tokenInfo.symbol  } ($${  formatAmount(balanceUsd, USD_DECIMALS, 2, true)  })`,
+      wallet: `${formatKeyAmount(tokenInfo, "balance", tokenInfo.decimals, 2, true)} ${tokenInfo.symbol} ($${formatAmount(balanceUsd, USD_DECIMALS, 2, true)})`,
       fees: formatAmount(tokenFeeBps, 2, 2, true, "-") + ((tokenFeeBps !== undefined && tokenFeeBps.toString().length > 0) ? "%" : "")
     } : {
       address: token.address,
@@ -887,20 +888,29 @@ export const GlpSwapTokenTable = (props) => {
       symbol: token.symbol,
       price: formatKeyAmount(tokenInfo, "minPrice", USD_DECIMALS, 2, true),
       available: `${formatKeyAmount(tokenInfo, "availableAmount", token.decimals, 2, true)} ${token.symbol} ($${formatAmount(availableAmountUsd, USD_DECIMALS, 2, true)})`,
-      wallet: `${formatKeyAmount(tokenInfo, "balance", tokenInfo.decimals, 2, true)  } ${  tokenInfo.symbol  } ($${  formatAmount(balanceUsd, USD_DECIMALS, 2, true)}`,
+      wallet: `${formatKeyAmount(tokenInfo, "balance", tokenInfo.decimals, 2, true)} ${tokenInfo.symbol} ($${formatAmount(balanceUsd, USD_DECIMALS, 2, true)}`,
       fees: formatAmount(tokenFeeBps, 2, 2, true, "-") + ((tokenFeeBps !== undefined && tokenFeeBps.toString().length > 0) ? "%" : "")
     }
-
+    if (isBuying) {
+      totalPool += parseFloat(tData.pool.replace(",", ""))
+    }
     tokenListData.push(tData)
   })
+
+  if (isBuying) {
+    tokenListData.map((tData) => {
+      tData.poolPercent = parseFloat(tData.pool.replace(",", "")) / totalPool * 100
+      return tData;
+    })
+  }
 
   return (
     <>
       {tokenListData.length > 0
         ? (<TokenTable
-            dataSourceCoin={tokenListData}
-            isBuying={isBuying}
-            onClickSelectToken={onSelectSwapToken}
+          dataSourceCoin={tokenListData}
+          isBuying={isBuying}
+          onClickSelectToken={onSelectSwapToken}
         />)
         : (<Icon type="loading" />)}
     </>

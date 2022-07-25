@@ -730,7 +730,7 @@ const Allocation = ({
         <span>Increase Your Allocation Amount:</span>
         <br />
         <span className='tool-tip-content'>
-          1.Increase your trading volume @ <Link to="/#/exchange" target="_blank">Exchange</Link>
+          1.Increase your trading volume @ <Link to="/#/trade" target="_blank">Trade</Link>
         </span>
         <br />
         <span className='tool-tip-content'>
@@ -738,7 +738,7 @@ const Allocation = ({
         </span>
         <br />
         <span className='tool-tip-content'>
-          3.Buy and hold more $ACY @ <Link to="/#/exchange" target="_blank">Exchange</Link>
+          3.Buy and hold more $ACY @ <Link to="/#/trade" target="_blank">Trade</Link>
         </span>
       </div>
     )
@@ -748,9 +748,9 @@ const Allocation = ({
     return (
       <div className='bonus-instruction-container'>
         <ul>
-          <li>Increase your @<Link to="/#/exchange" target="_blank">Exchange</Link> volume</li>
+          <li>Increase your @<Link to="/#/trade" target="_blank">Trade</Link> volume</li>
           <li>Increase your @<Link to="/#/liquidity" target="_blank">Liquidity</Link></li>
-          <li>Buy and hold more <Link to="/#/exchange" target="_blank">$ACY</Link></li>
+          <li>Buy and hold more <Link to="/#/trade" target="_blank">$ACY</Link></li>
         </ul>
       </div>
     )

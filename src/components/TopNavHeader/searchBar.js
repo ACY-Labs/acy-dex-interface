@@ -108,7 +108,7 @@ export class SmallTable extends React.Component {
           <Link
             style={{ color: 'white' }}
             className={styles.coinName}
-            to={`/exchange#${entry.symbol}`}
+            to={`/trade#${entry.symbol}`}
             onClick={()=>{
               this.props.setVisibleSearchBar(false)
               this.props.setSearchQuery('')

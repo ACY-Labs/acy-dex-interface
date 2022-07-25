@@ -78,12 +78,15 @@ import { parseUnits } from '@ethersproject/units';
 import { hexlify } from '@ethersproject/bytes';
 
 const { AcyTabPane } = AcyTabs;
-import { Row, Col, Button, Input, Icon } from 'antd';
+import { Row, Col, Button, Input, Icon, Drawer } from 'antd';
 import { Alert } from 'antd';
 import spinner from '@/assets/loading.svg';
 import moment from 'moment';
 import {useConstantLoader, getGlobalTokenList} from '@/constants';
 import {useConnectWallet} from '@/components/ConnectWallet';
+import { asyncForEach } from "@/utils/asynctools";
+import { processString } from "@/components/AcyCoinItem";
+import TokenSelectorDrawer from '../TokenSelectorDrawer';
 
 
 
@@ -748,9 +751,12 @@ const SwapComponent = props => {
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
-      <TokenSelectorModal
+      {/* <TokenSelectorModal
         onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} sideComponent={true} 
-      />
+      /> */}
+
+      <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} />
+
     </div>
   );
 };

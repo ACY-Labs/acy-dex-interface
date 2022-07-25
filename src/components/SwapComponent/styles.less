@@ -2,35 +2,42 @@
   width: 200px;
   font-family: "Karla", sans-serif;
 }
+
 .maintitle {
   font-size: 28px;
   font-weight: 400;
   margin-bottom: 11px;
   color: #929298;
 }
+
 .lighttitle {
   color: #b5b5b6;
 }
+
 .secondarytitle {
   font-size: 28px;
   font-weight: 400;
   color: #929298;
+
   .percentage {
     margin: 0 30px;
   }
 }
+
 .smalltitle {
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
   color: #b5b5b6;
 }
+
 .pt {
   flex: auto;
   display: flex;
   align-items: center;
   justify-content: flex-end;
 }
+
 .trade {
   display: flex;
   justify-content: space-around;
@@ -43,27 +50,33 @@
   font-weight: 400;
   color: #b5b6b6;
   text-align: center;
+
   p {
     text-align: left;
     margin-bottom: 14px;
+
     &:nth-last-child(2) {
       margin-bottom: 51px;
     }
   }
 }
+
 .pool {
   display: flex;
+
   .bigtitle {
     font-size: 18px;
     font-weight: 600;
     color: #eb5c20;
   }
+
   .value {
     font-size: 14px;
     font-weight: 400;
     color: #b5b6b6;
   }
 }
+
 .arrow {
   padding: 4px;
   border-radius: 100%;
@@ -76,6 +89,7 @@
   background-color: black;
   border: 4px solid rgb(25, 27, 31);
   z-index: 2;
+
   &:hover {
     cursor: pointer;
     opacity: 0.9;
@@ -110,6 +124,7 @@
   from {
     transform: rotateZ(0deg);
   }
+
   from {
     transform: rotateZ(360deg);
   }
@@ -123,21 +138,104 @@
   animation-timing-function: linear;
 }
 
-.slippageContainer{
+.slippageContainer {
   margin-top: 20px;
   margin-bottom: 20px;
-  :global{
+
+  :global {
     .ant-input-affix-wrapper {
       background-color: black;
       border: 0.75px solid #333333;
       border-radius: 5px;
     }
-    .ant-input{
+
+    .ant-input {
       background-color: black;
     }
   }
 }
 
-.input{
+.input {
   flex: 1 1 auto;
+}
+
+.tokenselector {
+  .title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 52px;
+    color: #b5b6b6;
+    font-family: "Karla", sans-serif;
+  }
+
+  .search {
+    margin-top: 12px;
+    font-family: "Karla", sans-serif;
+  }
+
+  .coinList {
+    width: 100%;
+    padding: 20px 0;
+    font-family: "Karla", sans-serif;
+  }
+
+  .manageCoinList {
+    font-family: "Karla", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+    &:hover {
+      color: #eb5c20;
+    }
+  }
+
+  .textCenter {
+    font-family: "Karla", sans-serif;
+    justify-content: center;
+    display: flex;
+    padding: 24px;
+  }
+}
+
+.drawer {
+  .title {
+    display: flex;
+    justify-content: space-between;
+    color: #999999;
+    font-size: 0.875rem;
+  }
+
+  hr {
+    border: none;
+    height: 1px;
+    flex-shrink: 0;
+    background-color: #323232;
+  }
+
+  :global {
+    .ant-drawer-content-wrapper {
+      height: 100% !important;
+    }
+
+    .ant-drawer-wrapper-body {
+      background-color: black;
+    }
+
+    .ant-drawer-header {
+      border: 0;
+      background-color: black;
+    }
+
+    .ant-drawer-header-title {
+      flex-direction: row-reverse;
+    }
+
+    .ant-drawer-title,
+    .ant-drawer-close {
+      color: #ffffff;
+      text-align: left;
+    }
+  }
 }

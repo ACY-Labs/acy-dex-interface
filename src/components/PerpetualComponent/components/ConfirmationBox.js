@@ -490,7 +490,9 @@ export default function ConfirmationBox(props) {
                 {constantInstance.perpetuals.getToken(shortCollateralAddress).symbol}
               </ExchangeInfoRow>
             )}
-            {isLong && <ExchangeInfoRow isImportant={true} label="Profits In" value={shortCollateralToken.symbol} />}
+            {isLong && 
+              <ExchangeInfoRow isImportant={true} label="Profits In" value={fromToken.symbol} />
+            }
             <ExchangeInfoRow label="Leverage">
               {hasExistingPosition && toAmount && toAmount.gt(0) && (
                 <div className={styles.inlineBlock}>

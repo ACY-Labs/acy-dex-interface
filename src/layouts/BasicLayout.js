@@ -101,7 +101,7 @@ const  BasicLayout =props=> {
     if(pathname.indexOf('/market')>-1){
       setBgColor('marketRadialBg');
     }
-    if(pathname.indexOf('/exchange')>-1){
+    if(pathname.indexOf('/trade')>-1){
       setBgColor('radialBg');
     }
     if(pathname.indexOf('/liquidity')>-1){
