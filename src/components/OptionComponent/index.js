@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'umi';
 import styled from 'styled-components';
 import { Slider, Input, Button } from 'antd';
-import { Gauge } from 'ant-design-pro/lib/Charts';
 import { useConstantLoader } from '@/constants';
 import { useLocalStorageSerializeKey } from '@/acy-dex-futures/utils';
 import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
 import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
+import AccountInfoGauge from '../AccountInfoGauge';
 
 import styles from './styles.less';
 
@@ -19,6 +19,7 @@ const OptionComponent = props => {
     setVolume,
     percentage,
     setPercentage,
+    powers,
   } = props
 
   const {
@@ -251,47 +252,8 @@ const OptionComponent = props => {
 
         </div>
 
-        <div className={styles.accountInfo}>
-          <div className={styles.details}>
-            <div className={styles.statstitle}>Account Info</div>
-            <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                Dynamic Effective Balance
-              </div>
-              <div className={styles.statsRow}>
-                ——
-              </div>
-              <div className={styles.statsRow}>
-                Margin Usage
-              </div>
-              <div className={styles.statsRow}>
-                ——
-              </div>
-              <div className={styles.statsRow}>
-                Available Margin
-              </div>
-              <div className={styles.statsRow}>
-                ——
-              </div>
-            </div>
-          </div>
-          <div className={styles.gauge}>
-            <Gauge
-              autoFit={true}
-              percent={70}
-              color='l(0) 0:#5d7cef 1:#e35767'
-            />
-          </div>
-        </div>
+        {!powers && <AccountInfoGauge />}
 
-        <div className={styles.buttonContainer} style={{marginTop: '20px'}}>
-          <AcyPerpetualButton>
-            DEPOSIT
-          </AcyPerpetualButton>
-          <AcyPerpetualButton>
-            WITHDRAW
-          </AcyPerpetualButton>
-        </div>
       </AcyPerpetualCard>
     </div>
   );

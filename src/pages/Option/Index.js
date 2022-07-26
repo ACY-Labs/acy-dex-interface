@@ -25,6 +25,7 @@ const Option = props => {
   const [mode, setMode] = useState('Buy')
   const [volume, setVolume] = useState(0)
   const [percentage, setPercentage] = useState('')
+  const [tableContent, setTableContent] = useState("Positions");
 
   const chainTokenList = getSupportedInfoTokens(supportedTokens)
 
@@ -179,7 +180,7 @@ const Option = props => {
                 onChange={selectChart}
               /> */}
             </div>
-            <div style={{ backgroundColor: 'black', height: "450px", display: "flex", flexDirection: "column", marginBottom: "30px" }}>
+            <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
               <ExchangeTVChart
                 swapOption={'LONG'}
@@ -195,8 +196,29 @@ const Option = props => {
               />
             </div>
           </div>
-        </div>
 
+          <div className={styles.bottomWrapper}>
+            <div className={styles.bottomTab}>
+              <PerpetualTabs
+                option={tableContent}
+                options={["Positions", "Orders"]}
+                onChange={item => { setTableContent(item) }}
+              />
+            </div>
+          </div>
+          <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
+            <div className={`${styles.colItem} ${styles.priceChart}`}>
+              <div className={styles.positionsTable}>
+                {tableContent == "Positions" && (
+                  <div>POSITIONS</div>
+                )}
+                {tableContent == "Orders" && (
+                  <div>ORDERS</div>
+                )}
+              </div>
+            </div>
+          </AcyCard>
+        </div>
 
         <div className={`${styles.colItem} ${styles.optionComponent}`}>
           <AcyCard style={{ backgroundColor: 'transparent', border: 'none' }}>

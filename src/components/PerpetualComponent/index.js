@@ -90,6 +90,7 @@ import { useConnectWallet } from '@/components/ConnectWallet';
 import { AcyRadioButton } from '@/components/AcyRadioButton';
 import { constantInstance } from '@/constants';
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
+import AccountInfoGauge from '../AccountInfoGauge';
 
 import styled from "styled-components";
 
@@ -1936,7 +1937,9 @@ const SwapComponent = props => {
                 </Tooltip>
               </div>
             }
-
+            
+            <AccountInfoGauge />
+          
           </AcyPerpetualCard>
         </>
       }
