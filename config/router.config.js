@@ -13,7 +13,7 @@ export default [
     component: '../layouts/BasicLayout',
     Routes: ['src/pages/Authorized'],
     routes: [
-      { path: '/', redirect: '/exchange' },
+      { path: '/', redirect: '/trade' },
       {
         path: '/market',
         name: 'Market',
@@ -50,8 +50,8 @@ export default [
         ],
       },
       {
-        path: '/exchange',
-        name: 'Exchange',
+        path: '/trade',
+        name: 'Trade',
         component: './Swap/Index',
       },
       {

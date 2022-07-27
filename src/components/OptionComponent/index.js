@@ -6,6 +6,7 @@ import { useConstantLoader } from '@/constants';
 import { useLocalStorageSerializeKey } from '@/acy-dex-futures/utils';
 import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
 import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
+import AccountInfoGauge from '../AccountInfoGauge';
 
 import styles from './styles.less';
 
@@ -18,13 +19,14 @@ const OptionComponent = props => {
     setVolume,
     percentage,
     setPercentage,
+    powers,
   } = props
 
   const {
     account,
     library,
     chainId,
-    farmSetting: {INITIAL_ALLOWED_SLIPPAGE}
+    farmSetting: { INITIAL_ALLOWED_SLIPPAGE }
   } = useConstantLoader(props);
 
   const optionMode = ['Buy', 'Sell']
@@ -165,8 +167,8 @@ const OptionComponent = props => {
               placeholder="0.0"
               className={styles.optionInput}
               value={volume}
-              onChange={e => { 
-                setVolume(e.target.value) 
+              onChange={e => {
+                setVolume(e.target.value)
                 setShowDescription(true)
               }}
             />
@@ -249,6 +251,9 @@ const OptionComponent = props => {
           </AcyPerpetualButton>
 
         </div>
+
+        {!powers && <AccountInfoGauge />}
+
       </AcyPerpetualCard>
     </div>
   );

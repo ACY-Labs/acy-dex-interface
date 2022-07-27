@@ -100,11 +100,9 @@
 }
 
 .dropDownMenu {
-  :global {
-    font-family: "Karla", sans-serif;
-    background-color: black !important;
-    text-align: center;
-  }
+  font-family: "Karla", sans-serif;
+  background-color: black;
+  text-align: center;
 }
 
 .optionItem {
@@ -115,8 +113,7 @@
   height: 2.4rem;
   display: flex;
   &:hover {
-    filter: brightness(1.5);
-    background: #4f4f4f;
+    background-color: #323232 !important;
   }
 }
 
@@ -127,7 +124,7 @@
     margin-top: 2px;
     padding: 4px 0;
     width: 120px;
-    padding-left: 10px;
+    // padding-left: 10px;
     overflow: auto;
     list-style: none;
     outline: none;
@@ -140,7 +137,7 @@
       color: white;
     }
     .ant-select-selection {
-      background-color: transparent !important;
+      background-color: transparent;
       border: 0.75px solid #232323;
       border-radius: 5px;
       height: 2.4rem;

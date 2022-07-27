@@ -2,7 +2,7 @@ import { useWeb3React } from '@web3-react/core';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import useSWR from 'swr';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
-import { Menu, Dropdown, Space, Row, Col, Button } from 'antd';
+import { Menu, Dropdown, Space, Row, Col, Button, Select } from 'antd';
 import AcyCard from '@/components/AcyCard';
 import OptionComponent from '@/components/OptionComponent'
 import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
@@ -62,6 +62,7 @@ const Option = props => {
   const [mode, setMode] = useState('Buy')
   const [volume, setVolume] = useState(0)
   const [percentage, setPercentage] = useState('')
+  const [tableContent, setTableContent] = useState("Positions");
 
   const chainTokenList = getSupportedInfoTokens(supportedTokens)
 
@@ -192,7 +193,8 @@ const Option = props => {
             <div className={styles.chartTokenSelectorTab}>
               <Row>
                 <Col span={12} >
-                  <Dropdown  
+                  <div className={styles.tokenSelector} >
+                  {/* <Dropdown  
                     dropdownClassName={styles.dropDownMenu}
                   overlay={
                     <Menu className={styles.optionItem} onClick={onClickDropdownBTC} style={{ backgroundColor: 'black' }}>
@@ -211,7 +213,22 @@ const Option = props => {
                       BTC {expandBTC?<DownOutlined />: <UpOutlined/>}
                     </div>
                   </a>  
-                  </Dropdown>
+                  </Dropdown> */}
+                  <Select  
+                    value={"BTC"}
+                    onChange={onClickDropdownBTC}
+                    dropdownClassName={styles.dropDownMenu}
+                    // style={{}}
+                    >
+                    {
+                    optionsBTC.map((option, index) => (
+                      <Option  className={styles.optionItem} value={option.name} >
+                        {option.name}
+                      </Option>
+                    ))
+                    }
+                  </Select>
+                  </div>
                 </Col>
 
                 <Col span={12}>
@@ -242,7 +259,7 @@ const Option = props => {
                 onChange={selectChart}
               /> */}
             </div>
-            <div style={{ backgroundColor: 'black', height: "450px", display: "flex", flexDirection: "column", marginBottom: "30px" }}>
+            <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
               <ExchangeTVChart
                 chartTokenSymbol="BTC"
@@ -250,8 +267,29 @@ const Option = props => {
               />
             </div>
           </div>
-        </div>
 
+          <div className={styles.bottomWrapper}>
+            <div className={styles.bottomTab}>
+              <PerpetualTabs
+                option={tableContent}
+                options={["Positions", "Orders"]}
+                onChange={item => { setTableContent(item) }}
+              />
+            </div>
+          </div>
+          <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
+            <div className={`${styles.colItem} ${styles.priceChart}`}>
+              <div className={styles.positionsTable}>
+                {tableContent == "Positions" && (
+                  <div>POSITIONS</div>
+                )}
+                {tableContent == "Orders" && (
+                  <div>ORDERS</div>
+                )}
+              </div>
+            </div>
+          </AcyCard>
+        </div>
 
         <div className={`${styles.colItem} ${styles.optionComponent}`}>
           <AcyCard style={{ backgroundColor: 'transparent', border: 'none' }}>

@@ -14,6 +14,20 @@
   margin: auto;
   flex-wrap: wrap;
   justify-content: space-between;
+
+  .bottomWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+
+    .bottomTab {
+      border-top: 0.75px solid #444444;
+      border-bottom: 0.75px solid #444444;
+      padding-right: 60%;
+      margin-bottom: 0px;
+      font-size: 5px;
+    }
+  }
 }
 
 @media screen and (min-width: 1024px) {
@@ -53,6 +67,7 @@
     order: 1;
   }
 }
+
 .chartTokenSelectorTab {
   border-color:#29292C;
   width: 30%;
@@ -80,11 +95,9 @@
 }
 
 .dropDownMenu {
-  :global {
-    font-family: "Karla", sans-serif;
-    background-color: black !important;
-    text-align: center;
-  }
+  font-family: "Karla", sans-serif;
+  background-color: black;
+  text-align: center;
 }
 
 .optionItem {
@@ -95,7 +108,44 @@
   height: 2.4rem;
   display: flex;
   &:hover {
-    filter: brightness(0.5);
-    background: #001;
+    background-color: #323232 !important;
+  }
+}
+:global {
+  .ant-select-dropdown-menu {
+    border: 0.75px solid #333333 !important;
+    border-radius: 5px !important;
+    margin-top: 2px;
+    padding: 4px 0;
+    width: 120px;
+    // padding-left: 10px;
+    overflow: auto;
+    list-style: none;
+    outline: none;
+  }
+}
+.tokenSelector {
+  :global {
+    .ant-select-arrow {
+      color: white;
+    }
+    .ant-select-selection {
+      background-color: black;
+      border: 0.75px solid #232323;
+      border-radius: 5px;
+      height: 2.4rem;
+      width: 120px;
+      padding: 2px 0px;
+      font-size: 15px;
+      font-weight: 200;
+      color: white;
+      overflow: inherit;
+      margin-right: 10px;
+      box-shadow: none;
+    }
+  }
+  .ant-select .ant-select-enabled .ant-select-open .ant-select-focused {
+    background-color: #29292C;
+
   }
 }

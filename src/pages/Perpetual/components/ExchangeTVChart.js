@@ -313,7 +313,8 @@ export default function ExchangeTVChart(props) {
       console.log("hjhjhj prev data: ", prevData)
 
       //calculate 24h price change, use 5m data as chart is initiated with timescale 5m
-      if( period == '5m'){
+      if( prevData && period != '1m' && period != '1w' ){
+        console.log("hjhjhj in if ")
         getDeltaPriceChange(prevData)
       }
 
@@ -327,15 +328,15 @@ export default function ExchangeTVChart(props) {
   const getDeltaPriceChange =  (prevData) => {
     console.log("hjhjhj prev data in get: ", prevData)
     let timeNow = getCurrentTimestamp()
-    console.log("hjhjhj currentseries curtime now", timeNow, "period", period, CHART_PERIODS[period])
+    // console.log("hjhjhj currentseries curtime now", timeNow, "period", period, CHART_PERIODS[period])
     let forwardArr = 86400 / CHART_PERIODS[period]
     let arrIndex = 999 - forwardArr
-    console.log("hjhjhj prev data 1000 ", typeof prevData[999].close, prevData[arrIndex])
-    let today = prevData[999].close
-    let yesterday = prevData[arrIndex].close
-    // setCurPrice(parseFloat(today).toFixed(2))
-    let deltaPercent = (today - yesterday) / yesterday * 100 ;
-    console.log("hjhjhj prev data 1000 ", deltaPercent)
+    console.log("hjhjhj prev data check error: ", prevData[999].time, CHART_PERIODS[period], forwardArr, prevData[arrIndex].time)
+
+    // let arrIndex = 279
+    let today = prevData[999].open
+    let yesterday = prevData[arrIndex].open
+    let deltaPercent = ((today - yesterday) / yesterday * 100).toString() ;
     if (deltaPercent && deltaPercent[0] == "-") {
       setDeltaIsMinus(true)
       let negativeCurrentPrice = today

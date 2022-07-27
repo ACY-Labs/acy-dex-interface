@@ -43,6 +43,7 @@ const PositionsTable = props => {
           return (
           <div>
             <div className={styles.tableEntryBig}>
+              <img src={record.collateralToken.logoURI} style={{ width: '20px', marginRight: '0.4rem' }} />
               {record.indexToken.symbol}
             </div>
             <div>

@@ -1,0 +1,40 @@
+.drawer {
+    .title {
+      display: flex;
+      justify-content: space-between;
+      color: #999999;
+      font-size: 0.875rem;
+    }
+  
+    hr {
+      border: none;
+      height: 1px;
+      flex-shrink: 0;
+      background-color: #323232;
+    }
+  
+    :global {
+      .ant-drawer-content-wrapper {
+        height: 100% !important;
+      }
+  
+      .ant-drawer-wrapper-body {
+        background-color: black;
+      }
+  
+      .ant-drawer-header {
+        border: 0;
+        background-color: black;
+      }
+  
+      .ant-drawer-header-title {
+        flex-direction: row-reverse;
+      }
+  
+      .ant-drawer-title,
+      .ant-drawer-close {
+        color: #ffffff;
+        text-align: left;
+      }
+    }
+  }
