@@ -173,6 +173,7 @@ const Swap = props => {
   const tokens = constantInstance.perpetuals.tokenList;
   const whitelistedTokens = tokens.filter(token => token.symbol !== "USDG");
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
+  const [tokenData, setTokenData] = useState("BTC")
 
   const defaultTokenSelection = useMemo(() => ({
     ["Pool"]: {
@@ -226,6 +227,10 @@ const Swap = props => {
     setTokenSelection(newTokenSelection)
   }, [tokenSelection, setTokenSelection])
 
+  const passTokenData = (token) => {
+    setTokenData(token);
+  };
+
 //   console.log("hereim see coinList", coinList)  
 
 // function getTokenBySymbol(tokenlist, symbol) {
@@ -266,7 +271,6 @@ function getTokenBySymbol(tokenlist, symbol) {
   }
   return undefined
 }
-
 
   ////console.log('printing tx lists', txList);
 
@@ -673,8 +677,8 @@ function getTokenBySymbol(tokenlist, symbol) {
     updateActiveChartData(chartData[lastDataIndex][1], lastDataIndex);
   }, [chartData])
 
-  const [graphType, setGraphType] = useState("Candlestick")
-  const graphTypes = ["Routes", "Candlestick"]
+  const [graphType, setGraphType] = useState(tokenData)
+  const graphTypes = ["Routes", tokenData]
   const showGraph = item => {
     setGraphType(item)
   }
@@ -698,6 +702,7 @@ function getTokenBySymbol(tokenlist, symbol) {
                 <div>
                   <ExchangeTVChart 
                     chartTokenSymbol="BTC" 
+                    passTokenData={passTokenData}
                   />
                 </div>
                 // <div>Kchart here</div>

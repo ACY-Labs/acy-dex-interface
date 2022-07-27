@@ -34,6 +34,8 @@ const StableCoin = props => {
   const tokenlist = supportedTokens[chainId]
   const [activeToken0, setActiveToken0] = useState(tokenlist[0]);
   const [activeToken1, setActiveToken1] = useState(tokenlist[2]);;
+  const [tokenData, setTokenData] = useState("BTC")
+
 
   const onGetReceipt = async (receipt, library, account) => {
     // updateTransactionList(receipt);
@@ -88,6 +90,9 @@ const StableCoin = props => {
     }
   }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
 
+  const passTokenData = (token) => {
+    setTokenData(token);
+  };
 
   const tokenAddresses = tokens.map(token => token.address)
   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
@@ -151,6 +156,7 @@ const StableCoin = props => {
                 {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
                 <ExchangeTVChart
                   chartTokenSymbol="USDC"
+                  passTokenData={passTokenData}
                 />
               </div>
             </div>

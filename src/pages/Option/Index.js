@@ -1,12 +1,13 @@
 import { useWeb3React } from '@web3-react/core';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import useSWR from 'swr';
-import { DownOutlined } from '@ant-design/icons';
-import { Menu, Dropdown, Space, Row, Col } from 'antd';
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import { Menu, Dropdown, Space, Row, Col, Button } from 'antd';
 import AcyCard from '@/components/AcyCard';
 import OptionComponent from '@/components/OptionComponent'
 import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
+
 import { fetcher, getInfoTokens, expandDecimals, useLocalStorageByChainId } from '@/acy-dex-futures/utils';
 // import { API_URL, useConstantLoader, getGlobalTokenList, constantInstance } from '@/constants';
 import { useConstantLoader, constantInstance } from '@/constants';
@@ -14,8 +15,44 @@ import { ARBITRUM_DEFAULT_COLLATERAL_SYMBOL } from '@/acy-dex-futures/utils';
 import { ethers } from 'ethers'
 import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
 
-// import styled from "styled-components";
+import styled from "styled-components";
 import styles from './styles.less'
+import { symbol } from 'prop-types';
+
+const StyledDropdown = styled(Dropdown)`
+.ant-dropdown-menu-item, .ant-dropdown-menu-submenu-title{
+  margin = 5px !important;
+  font-size: 1.1rem;
+}
+`
+// const StyledButton = styled(Button)`
+// .ant-btn{
+//   background-color: black !important;
+//   border-radius: 0px !important;
+// }
+// .ant-btn-primary:hover, .ant-btn-primary:focus{
+//   color: #fff;
+//   background-color: #29292C;
+//   border-color: #29292C;
+// }
+// .ant-btn, .ant-btn:active, .ant-btn:focus{
+//   background-color: #29292C;
+//   color: #fff !important;
+// }
+// .ant-btn:hover, .ant-btn:focus, .ant-btn:active, .ant-btn.active{
+//   background-color: #29292C;
+//   color: #fff !important;
+// }
+// .ant-btn:hover, .ant-btn:focus{
+//   background-color: #29292C;
+//   color: #fff !important;
+// }
+// .ant-btn-primary:active{
+// color: #fff;
+// background-color: #29292C;
+// border-color: #fff !important;
+// }
+// `
 
 const Option = props => {
   const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
@@ -33,6 +70,9 @@ const Option = props => {
 
   const [fromTokenAddress, setFromTokenAddress] = useState(activeToken0.address);
   const [toTokenAddress, setToTokenAddress] = useState("");
+  const [tokenData, setTokenData] = useState("BTC")
+  const [expandBTC, setExpandBTC] = useState(true)
+  const [expandETH, setExpandETH] = useState(true)
 
   const { perpetuals } = useConstantLoader()
   const readerAddress = perpetuals.getContract("Reader")
@@ -75,6 +115,10 @@ const Option = props => {
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
 
+  const passTokenData = (token) => {
+    setTokenData(token);
+  };
+
   function getSupportedInfoTokens(tokenlist) {
     let supportedList = []
     for (let i = 0; i < tokenlist.length; i++) {
@@ -109,6 +153,12 @@ const Option = props => {
     let tmp = optionsETH[e.key]
     setActiveToken1(chainTokenList[2]);
   };
+  const handleArrowBTC=()=>{
+    setExpandBTC(!expandBTC)
+  }
+  const handleArrowETH=()=>{
+    setExpandETH(!expandETH)
+  }
   useEffect(() => {
     setToTokenAddress(getActiveTokenAddr(activeToken1.symbol))
   }, [activeToken1])
@@ -124,6 +174,16 @@ const Option = props => {
     { name: "ETH 1000", tokenSymbol: "ETH", optionSymbol: "1000" },
   ];
 
+  const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
+  const KChartTokenListETH = ["BTC", "ETH"]
+  const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
+  const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBSC
+    : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
+    : KChartTokenListETH
+  const selectChartToken = item => {
+    console.log("hjhjhj select char token" ,item)  
+  }
+
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
@@ -132,8 +192,10 @@ const Option = props => {
             <div className={styles.chartTokenSelectorTab}>
               <Row>
                 <Col span={12} >
-                  <Dropdown overlay={
-                    <Menu onClick={onClickDropdownBTC} style={{ backgroundColor: 'black' }}>
+                  <Dropdown  
+                    dropdownClassName={styles.dropDownMenu}
+                  overlay={
+                    <Menu className={styles.optionItem} onClick={onClickDropdownBTC} style={{ backgroundColor: 'black' }}>
                       {
                         optionsBTC.map((option, index) => (
                           <Menu.Item key={index} >
@@ -142,12 +204,13 @@ const Option = props => {
                         ))
                       }
                     </Menu>
-                  } trigger={['click']}>
-                    <a >
-                      <div>
-                        BTC <DownOutlined />
-                      </div>
-                    </a>
+                  } trigger={['click']} onClick={handleArrowBTC}
+                  >
+                  <a >
+                    <div>
+                      BTC {expandBTC?<DownOutlined />: <UpOutlined/>}
+                    </div>
+                  </a>  
                   </Dropdown>
                 </Col>
 
@@ -162,12 +225,12 @@ const Option = props => {
                         ))
                       }
                     </Menu>
-                  } trigger={['click']}>
-                    <a >
-                      <div>
-                        ETH <DownOutlined />
-                      </div>
-                    </a>
+                  } trigger={['click']} onClick={handleArrowETH}>
+                  <a >
+                    <div>
+                      ETH {expandETH?<DownOutlined />: <UpOutlined/>}
+                    </div>
+                  </a>
                   </Dropdown>
                 </Col>
 
@@ -183,6 +246,7 @@ const Option = props => {
               {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
               <ExchangeTVChart
                 chartTokenSymbol="BTC"
+                passTokenData={passTokenData}
               />
             </div>
           </div>

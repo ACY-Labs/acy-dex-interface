@@ -37,29 +37,26 @@ import Binance from "binance-api-node";
 const StyledSelect = styled(Radio.Group)`
   .ant-radio-button-wrapper{
     background: transparent !important;
-    height: 20px;
-    font-size: 0.65rem;
+    height: 22px;
+    font-size: 0.7rem;
     padding: 0 0.1rem;
     border: 0.75px solid #333333;
     border-radius: 0 0 0 0;
-    line-height: 20px;
+    line-height: 22px;
     color: #b5b5b6;
-    
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled){
     color: #ffffff;
     box-shadow: 0 0 0 0 black;
-    // border-color: #333333;
-    border-color: #ffffff;
-
+    border-color: #333333;
+    background-color: #29292c !important;
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover{
     color: #ffffff;
-    border: 0.75px solid #ffffff;
-    border-color: #ffffff !important;
+    background-color: #29292c !important;
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before{
-    background-color: black !important;
+    background-color: #black !important;
   }
   .ant-radio-button-wrapper:not(:first-child)::before{
     background-color: transparent;
@@ -97,8 +94,7 @@ const getChartOptions = (width, height) => ({
   layout: {
     backgroundColor: "rgba(255, 255, 255, 0)",
     textColor: "#ccc",
-    fontFamily: "Karla, sans-serif", 
-    // fontFamily: "Karla", 
+    fontFamily: "Karla 300", 
   },
   localization: {
     // https://github.com/tradingview/lightweight-charts/blob/master/docs/customization.md#time-format
@@ -109,12 +105,14 @@ const getChartOptions = (width, height) => ({
   grid: {
     vertLines: {
       visible: true,
-      color: "rgba(35, 38, 59, 1)",
-      style: 2,
+      // color: "rgba(27, 27, 27, 1)",
+      color: "#1b1b1b",
+      style: 0,
     },
     horzLines: {
       visible: true,
-      color: "rgba(35, 38, 59, 1)",
+      // color: "rgba(35, 38, 59, 1)",
+      color: "#1b1b1b", 
       style: 2,
     },
   },
@@ -143,7 +141,7 @@ const getChartOptions = (width, height) => ({
 
 export default function ExchangeTVChart(props) {
   const {
-    chartTokenSymbol,
+    chartTokenSymbol, passTokenData
   } = props
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
@@ -153,7 +151,7 @@ export default function ExchangeTVChart(props) {
   const [hoveredCandlestick, setHoveredCandlestick] = useState();
 
 
-
+  
   const symbol = chartTokenSymbol || "BTC";
   const marketName = symbol + "_USD";
   const previousMarketName = usePrevious(marketName);
@@ -162,6 +160,11 @@ export default function ExchangeTVChart(props) {
   const chartRef = useRef(null);
   
   const [chartInited, setChartInited] = useState(false);
+  
+  useEffect(() => {
+    passTokenData(symbol);
+  }, []);
+
   useEffect(() => {
     if (marketName !== previousMarketName) {
       setChartInited(false);
