@@ -598,7 +598,8 @@ export default function ExchangeTVChart(props) {
                 ${curPrice} -{priceChangePercentDelta}%
               </div>
               :
-              <div style={{ float: "right", paddingRight: "1rem", wordSpacing: "0.5rem", color: '#46E3AE' }}>
+              //green, up
+              <div style={{ float: "right", paddingRight: "1rem", wordSpacing: "0.5rem", color: '#46E3AE' }}> 
                 ${curPrice} +{priceChangePercentDelta}%
               </div>
             }

@@ -154,10 +154,10 @@ const Option = props => {
     let tmp = optionsETH[e.key]
     setActiveToken1(chainTokenList[2]);
   };
-  const handleArrowBTC=()=>{
+  const handleArrowBTC = () => {
     setExpandBTC(!expandBTC)
   }
-  const handleArrowETH=()=>{
+  const handleArrowETH = () => {
     setExpandETH(!expandETH)
   }
   useEffect(() => {
@@ -165,14 +165,17 @@ const Option = props => {
   }, [activeToken1])
 
   let optionsBTC = [
-    { name: "BTC 1000000", tokenSymbol: "BTC", optionSymbol: "1000000" },
-    { name: "BTC 500000", tokenSymbol: "BTC", optionSymbol: "500000" },
-    { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000" },
+    { name: "BTC-1000000", tokenSymbol: "BTC", optionSymbol: "1000000", type:"C" },
+    { name: "BTC-1000000", tokenSymbol: "BTC", optionSymbol: "1000000", type:"P" },
+    { name: "BTC-500000", tokenSymbol: "BTC", optionSymbol: "500000", type:"C"},
+    { name: "BTC-500000", tokenSymbol: "BTC", optionSymbol: "500000", type:"P"},
+    { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type:"C" },
+    { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type:"P" },
   ];
   let optionsETH = [
-    { name: "ETH 10000", tokenSymbol: "ETH", optionSymbol: "10000" },
-    { name: "ETH 5000", tokenSymbol: "ETH", optionSymbol: "5000" },
-    { name: "ETH 1000", tokenSymbol: "ETH", optionSymbol: "1000" },
+    { name: "ETH-10000", tokenSymbol: "ETH", optionSymbol: "10000" },
+    { name: "ETH-5000", tokenSymbol: "ETH", optionSymbol: "5000" },
+    { name: "ETH-1000", tokenSymbol: "ETH", optionSymbol: "1000" },
   ];
 
   const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
@@ -180,9 +183,9 @@ const Option = props => {
   const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
   const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBSC
     : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
-    : KChartTokenListETH
+      : KChartTokenListETH
   const selectChartToken = item => {
-    console.log("hjhjhj select char token" ,item)  
+    console.log("hjhjhj select char token", item)
   }
 
   return (
@@ -192,63 +195,51 @@ const Option = props => {
           <div>
             <div className={styles.chartTokenSelectorTab}>
               <Row>
-                <Col span={12} >
+                <Col span={12}  >
                   <div className={styles.tokenSelector} >
-                  {/* <Dropdown  
-                    dropdownClassName={styles.dropDownMenu}
-                  overlay={
-                    <Menu className={styles.optionItem} onClick={onClickDropdownBTC} style={{ backgroundColor: 'black' }}>
-                      {
-                        optionsBTC.map((option, index) => (
-                          <Menu.Item key={index} >
-                            <span >{option.name} </span>
-                          </Menu.Item>
-                        ))
-                      }
-                    </Menu>
-                  } trigger={['click']} onClick={handleArrowBTC}
-                  >
-                  <a >
-                    <div>
-                      BTC {expandBTC?<DownOutlined />: <UpOutlined/>}
-                    </div>
-                  </a>  
-                  </Dropdown> */}
-                  <Select  
-                    value={"BTC"}
-                    onChange={onClickDropdownBTC}
-                    dropdownClassName={styles.dropDownMenu}
+
+                    <Select
+                      value={"BTC"}
+                      onChange={onClickDropdownBTC}
+                      dropdownClassName={styles.dropDownMenu}
                     // style={{}}
                     >
-                    {
-                    optionsBTC.map((option, index) => (
-                      <Option  className={styles.optionItem} value={option.name} >
-                        {option.name}
-                      </Option>
-                    ))
-                    }
-                  </Select>
+                      {
+                        optionsBTC.map((option) => (
+                          <Option className={styles.optionItem} value={option.name} >
+                            <Row>
+                              <Col >{option.tokenSymbol}-{option.optionSymbol}-{option.type}</Col>
+                              {option.type == "C" ? 
+                                <Col style={{fontSize:"0.9rem", float:"right", color:"#FA3C58"}}>$200 -3.4%</Col>
+                              :
+                                <Col style={{fontSize:"0.9rem", float:"right", color:"#46E3AE"}}>$200 +3.4%</Col>
+                              }
+                            </Row>
+                          </Option>
+                        ))
+                      }
+                    </Select>
                   </div>
                 </Col>
 
                 <Col span={12}>
-                  <Dropdown overlay={
-                    <Menu onClick={onClickDropdownETH} style={{ backgroundColor: 'black' }}>
+                  <div className={styles.tokenSelector} >
+
+                    <Select
+                      value={"ETH"}
+                      onChange={onClickDropdownETH}
+                      dropdownClassName={styles.dropDownMenu}
+                    // style={{}}
+                    >
                       {
                         optionsETH.map((option, index) => (
-                          <Menu.Item key={index}>
-                            <span>{option.name} </span>
-                          </Menu.Item>
+                          <Option className={styles.optionItem} value={option.name} >
+                            {option.name}
+                          </Option>
                         ))
                       }
-                    </Menu>
-                  } trigger={['click']} onClick={handleArrowETH}>
-                  <a >
-                    <div>
-                      ETH {expandETH?<DownOutlined />: <UpOutlined/>}
-                    </div>
-                  </a>
-                  </Dropdown>
+                    </Select>
+                  </div>
                 </Col>
 
               </Row>
