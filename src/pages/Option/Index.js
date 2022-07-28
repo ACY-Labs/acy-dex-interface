@@ -183,16 +183,7 @@ const Option = props => {
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
               <ExchangeTVChart
-                swapOption={'LONG'}
-                fromTokenAddress={fromTokenAddress}
-                toTokenAddress={toTokenAddress}
-                // period={'5m'}
-                infoTokens={chainTokenList}
-                chainId={chainId}
-                // positions={positions}
-                // savedShouldShowPositionLines,
-                // orders={orders}
-                setToTokenAddress={setToTokenAddress}
+                chartTokenSymbol="BTC"
               />
             </div>
           </div>
