@@ -158,13 +158,12 @@ const OptionComponent = props => {
         </div>
 
         <div className={styles.rowFlexContainer}>
-          <span className={styles.title}>Set Volume</span>
 
           <div className={styles.inputContainer}>
             <input
               type="number"
               min="0"
-              placeholder="0.0"
+              placeholder="Amount"
               className={styles.optionInput}
               value={volume}
               onChange={e => {

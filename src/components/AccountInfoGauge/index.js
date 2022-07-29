@@ -7,6 +7,14 @@ import styles from './styles.less';
 
 const AccountInfoGauge = props => {
 
+  const onClickDeposit = () => {
+    
+  }
+
+  const onClickWithdraw = () => {
+
+  }
+
   return (
     <div className={styles.main}>
       <div className={styles.accountInfo}>
@@ -43,10 +51,10 @@ const AccountInfoGauge = props => {
       </div>
 
       <div className={styles.buttonContainer} style={{ marginTop: '20px' }}>
-        <AcyPerpetualButton>
+        <AcyPerpetualButton onClick={onClickDeposit}>
           DEPOSIT
         </AcyPerpetualButton>
-        <AcyPerpetualButton>
+        <AcyPerpetualButton onClick={onClickWithdraw}>
           WITHDRAW
         </AcyPerpetualButton>
       </div>
