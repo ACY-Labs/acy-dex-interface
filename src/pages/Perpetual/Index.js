@@ -1093,6 +1093,43 @@ const Swap = props => {
     setPoolGraphTab(item)
   }
 
+  // Portfolio
+  let glpMarketCap
+  if(glpPrice && glpSupply) {
+    glpMarketCap = glpPrice.mul(glpSupply).div(expandDecimals(1, GLP_DECIMALS));
+  }
+
+  let adjustedUsdgSupply = bigNumberify(0);
+  for (let i = 0; i < glp_tokenList.length; i++) {
+    const token = tokens[i];
+    const tokenInfo = infoTokens[token.address];
+    console.log('joy tokenInfo', tokenInfo, tokenInfo.usdgAmount)
+    if (tokenInfo && tokenInfo.usdgAmount) {
+      adjustedUsdgSupply = adjustedUsdgSupply.add(tokenInfo.usdgAmount);
+    }
+  }
+
+  let stableGlp = 0;
+  let totalGlp = 0;
+  // let glpPool = glp_tokenList.map((token) => {
+  //   const tokenInfo = infoTokens[token.address]; //todo: infoTokens
+  //   if (tokenInfo.usdgAmount && adjustedUsdgSupply) {
+  //     const currentWeightBps = tokenInfo.usdgAmount.mul(BASIS_POINTS_DIVISOR).div(adjustedUsdgSupply);
+  //     if (tokenInfo.isStable) {
+  //       stableGlp += parseFloat(`${formatAmount(currentWeightBps, 2, 2, false)}`);
+  //     }
+  //     totalGlp += parseFloat(`${formatAmount(currentWeightBps, 2, 2, false)}`);
+  //     return {
+  //       fullname: token.name,
+  //       name: token.symbol,
+  //       value: parseFloat(`${formatAmount(currentWeightBps, 2, 2, false)}`),
+  //     };
+  //   }
+  //   return null;
+  // });
+
+  let stablePercentage = totalGlp > 0 ? ((stableGlp * 100) / totalGlp).toFixed(2) : "0.0";
+
   return (
     <PageHeaderWrapper>
 
@@ -1294,17 +1331,17 @@ const Swap = props => {
 
                           <div className={styles.statsRow}>
                             <div className={styles.label}>Total Staked</div>
-                            <div className={styles.value}>XXX</div>
+                            <div className={styles.value}>${formatAmount(glpMarketCap, USD_DECIMALS, 0, true)}</div>
                           </div>
 
                           <div className={styles.statsRow}>
                             <div className={styles.label}>Market Cap</div>
-                            <div className={styles.value}>XXX</div>
+                            <div className={styles.value}>${formatAmount(glpMarketCap, USD_DECIMALS, 0, true)}</div>
                           </div>
 
                           <div className={styles.statsRow}>
                             <div className={styles.label}>Stablecoin Percentage</div>
-                            <div className={styles.value}>XXX</div>
+                            <div className={styles.value}>{stablePercentage}%</div>
                           </div>
                         </div>
 

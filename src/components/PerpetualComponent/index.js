@@ -300,7 +300,7 @@ const SwapComponent = props => {
   const glpManagerAddress = perpetuals.getContract("GlpManager")
   const glpAddress = perpetuals.getContract("GLP")
 
-  const { farmSetting: { RPC_URL }} = useConstantLoader();
+  const { farmSetting: { RPC_URL } } = useConstantLoader();
   const provider = new JsonRpcProvider(RPC_URL, chainId);
 
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
@@ -341,15 +341,15 @@ const SwapComponent = props => {
       }
     }
   }, [active, library, chainId,
-      updateVaultTokenInfo, updateTokenBalances, updateFundingRateInfo, updateTotalTokenWeights, updateUsdgSupply,
-      updateOrderBookApproved])
+    updateVaultTokenInfo, updateTokenBalances, updateFundingRateInfo, updateTotalTokenWeights, updateUsdgSupply,
+    updateOrderBookApproved])
 
   const tokenAllowanceAddress = fromTokenAddress === AddressZero ? nativeTokenAddress : fromTokenAddress;
   const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
     fetcher: fetcher(library, Glp)
   });
 
-  console.log("test needOrderBookApproval: ", type!==MARKET, !orderBookApproved)
+  console.log("test needOrderBookApproval: ", type !== MARKET, !orderBookApproved)
   const needOrderBookApproval = type !== MARKET && !orderBookApproved;
   const prevNeedOrderBookApproval = usePrevious(needOrderBookApproval);
 
@@ -380,17 +380,17 @@ const SwapComponent = props => {
     setTriggerRatioValue(evt.target.value || "");
   };
 
-  
+
 
   // default collateral address on ARBITRUM
-  
+
   const [shortCollateralAddress, setShortCollateralAddress] = useState(fromTokenAddress);
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   console.log("test multichain: tokens", infoTokens, tokens)
   const fromToken = perpetuals.getToken(fromTokenAddress);
   const toToken = perpetuals.getToken(toTokenAddress);
-  
+
   const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
   const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
   const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
@@ -984,11 +984,11 @@ const SwapComponent = props => {
       priceLimit, // _acceptablePrice
     ];
 
-    let method = "increasePosition";	
-    let value = bigNumberify(0);	
-    if (fromTokenAddress === AddressZero) {	
-      method = "increasePositionETH";	
-      value = boundedFromAmount;	
+    let method = "increasePosition";
+    let value = bigNumberify(0);
+    if (fromTokenAddress === AddressZero) {
+      method = "increasePositionETH";
+      value = boundedFromAmount;
       params = [path, indexTokenAddress, 0, toUsdMax, isLong, priceLimit];
     }
 
@@ -1019,7 +1019,7 @@ const SwapComponent = props => {
     })
       .then(async () => {
         setIsConfirming(false);
-        
+
       })
       .finally(() => {
         setIsConfirming(false);
@@ -1133,7 +1133,7 @@ const SwapComponent = props => {
     }
 
     if (isLong) {
-      
+
       if (fromTokenAddress !== toTokenAddress) {
         const { amount: swapAmount } = getNextToAmount(
           chainId,
@@ -1146,9 +1146,9 @@ const SwapComponent = props => {
           usdgSupply,
           totalTokenWeights
         );
-        
+
         // requiredAmount = requiredAmount.add(swapAmount);
-        let requiredAmount = fromAmount.mul(parseInt(leverageOption*100)).div(100);
+        let requiredAmount = fromAmount.mul(parseInt(leverageOption * 100)).div(100);
         if (
           toToken &&
           toTokenAddress !== USDG_ADDRESS &&
@@ -1522,7 +1522,7 @@ const SwapComponent = props => {
   const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsda", true], {
     fetcher: fetcher(library, GlpManager),
   })
-  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0) ) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
+  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0)) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   // const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   let glpBalanceUsd
   if (glpBalance) {
@@ -1533,7 +1533,7 @@ const SwapComponent = props => {
 
   return (
     <div className={styles.mainContent}>
-      <AcyPerpetualCard style={{ backgroundColor: 'transparent' }}>
+      <AcyPerpetualCard style={{ backgroundColor: 'transparent', height: '1100px' }}>
         <div className={styles.modeSelector}>
           <PerpetualTabs
             option={mode}
@@ -1550,7 +1550,7 @@ const SwapComponent = props => {
                 options={perpetualType}
                 type="inline"
                 onChange={typeSelect}
-                style={{height:'30px'}}
+                style={{ height: '30px' }}
               />
             </div>
 
@@ -1625,7 +1625,7 @@ const SwapComponent = props => {
                               if (val < 0.1) {
                                 setLeverageOption(0.1)
                               } else if (val >= 0.1 && val <= 30.5) {
-                                setLeverageOption(Math.round(val*10)/10)
+                                setLeverageOption(Math.round(val * 10) / 10)
                               } else {
                                 setLeverageOption(30.5)
                               }
@@ -1697,225 +1697,120 @@ const SwapComponent = props => {
           </>
         }
 
-      </AcyPerpetualCard>
+        {/* Long/Short Detail card  */}
+        {(isLong || isShort) &&
+          <>
+            <AcyPerpetualCard style={{ backgroundColor: 'transparent', padding: '10px', border: 'none', marginTop: '50px' }}>
 
-      {/* Long/Short Detail card  */}
-      {(isLong || isShort) &&
-        <>
-          <AcyPerpetualCard style={{ backgroundColor: 'transparent', padding: '10px' }}>
+              {/* Profits In */}
+              {isLong && (
+                <div className={styles.detailCard}>
+                  <div className={styles.label}>Profits In</div>
+                  <div className={styles.value}>{fromToken.symbol}</div>
+                </div>
+              )}
+              {isShort && (
+                <div className={styles.detailCard}>
+                  <div className={styles.label}>Profits In</div>
+                  <div className={styles.TooltipHandle}>
+                    <span>{shortCollateralToken.symbol}</span>
+                  </div>
+                </div>
+              )}
 
-            {/* Profits In */}
-            {isLong && (
+              {/* Leverage */}
               <div className={styles.detailCard}>
-                <div className={styles.label}>Profits In</div>
-                <div className={styles.value}>{fromToken.symbol}</div>
-              </div>
-            )}
-            {isShort && (
-              <div className={styles.detailCard}>
-                <div className={styles.label}>Profits In</div>
-                <div className={styles.TooltipHandle}>
-                  <span>{shortCollateralToken.symbol}</span>
+                <div className={styles.label}>Leverage</div>
+                <div className={styles.value}>
+                  {hasExistingPosition &&
+                    toAmount &&
+                    toAmount.gt(0) &&
+                    `${formatAmount(existingPosition.leverage, 4, 2)}x →`
+                  }
+                  {toAmount &&
+                    leverage &&
+                    leverage.gt(0) &&
+                    `${formatAmount(leverage, 4, 2)}x`}
+                  {!toAmount && leverage && leverage.gt(0) && `-`}
+                  {leverage && leverage.eq(0) && `-`}
                 </div>
               </div>
-            )}
 
-            {/* Leverage */}
-            <div className={styles.detailCard}>
-              <div className={styles.label}>Leverage</div>
-              <div className={styles.value}>
-                {hasExistingPosition &&
-                  toAmount &&
-                  toAmount.gt(0) &&
-                  `${formatAmount(existingPosition.leverage, 4, 2)}x →`
-                }
-                {toAmount &&
-                  leverage &&
-                  leverage.gt(0) &&
-                  `${formatAmount(leverage, 4, 2)}x`}
-                {!toAmount && leverage && leverage.gt(0) && `-`}
-                {leverage && leverage.eq(0) && `-`}
+              {/* Entry Price */}
+              <div className={styles.detailCard}>
+                <div className={styles.label}>Entry Price</div>
+                <div className={styles.value}>
+                  {hasExistingPosition &&
+                    toAmount &&
+                    toAmount.gt(0) &&
+                    `$${formatAmount(existingPosition.averagePrice, USD_DECIMALS, 2, true)} →`
+                  }
+                  {nextAveragePrice &&
+                    `$${formatAmount(nextAveragePrice, USD_DECIMALS, 2, true)}`}
+                  {!nextAveragePrice && `-`}
+                </div>
               </div>
-            </div>
 
-            {/* Entry Price */}
-            <div className={styles.detailCard}>
-              <div className={styles.label}>Entry Price</div>
-              <div className={styles.value}>
-                {hasExistingPosition &&
-                  toAmount &&
-                  toAmount.gt(0) &&
-                  `$${formatAmount(existingPosition.averagePrice, USD_DECIMALS, 2, true)} →`
-                }
-                {nextAveragePrice &&
-                  `$${formatAmount(nextAveragePrice, USD_DECIMALS, 2, true)}`}
-                {!nextAveragePrice && `-`}
+              {/* Liq. Price */}
+              <div className={styles.detailCard}>
+                <div className={styles.label}>Liq. Price</div>
+                <div className={styles.value}>
+                  {hasExistingPosition &&
+                    toAmount &&
+                    toAmount.gt(0) &&
+                    `$${formatAmount(existingLiquidationPrice, USD_DECIMALS, 2, true)} →`
+                  }
+                  {toAmount && displayLiquidationPrice &&
+                    `$${formatAmount(displayLiquidationPrice, USD_DECIMALS, 2, true)}`
+                  }
+                  {!toAmount && displayLiquidationPrice && `-`}
+                  {!displayLiquidationPrice && `-`}
+                </div>
               </div>
-            </div>
 
-            {/* Liq. Price */}
-            <div className={styles.detailCard}>
-              <div className={styles.label}>Liq. Price</div>
-              <div className={styles.value}>
-                {hasExistingPosition &&
-                  toAmount &&
-                  toAmount.gt(0) &&
-                  `$${formatAmount(existingLiquidationPrice, USD_DECIMALS, 2, true)} →`
-                }
-                {toAmount && displayLiquidationPrice &&
-                  `$${formatAmount(displayLiquidationPrice, USD_DECIMALS, 2, true)}`
-                }
-                {!toAmount && displayLiquidationPrice && `-`}
-                {!displayLiquidationPrice && `-`}
-              </div>
-            </div>
-
-            {/* Fees */}
-            <div className={styles.detailCard}>
-              <div className={styles.label}>Fees</div>
-              <div className={styles.value}>
-                {!feesUsd && "-"}
-                {feesUsd &&
-                  <Tooltip
-                    placement='bottomLeft'
-                    color='#b5b5b6'
-                    mouseEnterDelay={0.5}
-                    title={() => {
-                      return (
-                        <>
-                          {swapFees && (
+              {/* Fees */}
+              <div className={styles.detailCard}>
+                <div className={styles.label}>Fees</div>
+                <div className={styles.value}>
+                  {!feesUsd && "-"}
+                  {feesUsd &&
+                    <Tooltip
+                      placement='bottomLeft'
+                      color='#b5b5b6'
+                      mouseEnterDelay={0.5}
+                      title={() => {
+                        return (
+                          <>
+                            {swapFees && (
+                              <div>
+                                {collateralToken.symbol} is required for
+                                collateral.
+                                <br /><br />
+                                Swap {fromToken.symbol} to{" "}
+                                {collateralToken.symbol} Fee: $
+                                {formatAmount(swapFees, USD_DECIMALS, 2, true)}
+                                <br /><br />
+                              </div>
+                            )}
                             <div>
-                              {collateralToken.symbol} is required for
-                              collateral.
-                              <br /><br />
-                              Swap {fromToken.symbol} to{" "}
-                              {collateralToken.symbol} Fee: $
-                              {formatAmount(swapFees, USD_DECIMALS, 2, true)}
-                              <br /><br />
+                              Position Fee (0.08% of position size): $
+                              {formatAmount(positionFee, USD_DECIMALS, 2, true)}
                             </div>
-                          )}
-                          <div>
-                            Position Fee (0.08% of position size): $
-                            {formatAmount(positionFee, USD_DECIMALS, 2, true)}
-                          </div>
-                        </>
-                      )
-                    }}
-                  >
-                    <div className={styles.TooltipHandle}>
-                      ${formatAmount(feesUsd, USD_DECIMALS, 2, true)}
-                    </div>
-                  </Tooltip>
-                }
+                          </>
+                        )
+                      }}
+                    >
+                      <div className={styles.TooltipHandle}>
+                        ${formatAmount(feesUsd, USD_DECIMALS, 2, true)}
+                      </div>
+                    </Tooltip>
+                  }
+                </div>
               </div>
-            </div>
 
-            {/* Entry Price */}
-            <div className={styles.detailCard}>
-              <div className={styles.label}>Entry Price</div>
-              <Tooltip
-                placement='bottomLeft'
-                color='#b5b5b6'
-                mouseEnterDelay={0.5}
-                title={() => {
-                  return (
-                    <>
-                      The position will be opened at{" "}
-                      {formatAmount(entryMarkPrice, USD_DECIMALS, 2, true)} USD
-                      with a max slippage of{" "}
-                      {parseFloat(savedSlippageAmount / 100.0).toFixed(2)}%.
-                      <br /><br />
-                      The slippage amount can be configured under Settings,
-                      found by clicking on your address at the top right of the
-                      page after connecting your wallet.
-                      <br /><br />
-                      <a href="https://gmxio.gitbook.io/gmx/trading#opening-a-position" target="_blank" rel="noopener noreferrer">
-                        More Info
-                      </a>
-                    </>
-                  )
-                }}
-              >
-                <div className={styles.TooltipHandle}>
-                  {`${formatAmount(entryMarkPrice, USD_DECIMALS, 2, true)} USD`}
-                </div>
-              </Tooltip>
-            </div>
-
-            {/* Exit Price */}
-            <div className={styles.detailCard}>
-              <div className={styles.label}>Exit Price</div>
-              <Tooltip
-                placement='bottomLeft'
-                color='#b5b5b6'
-                mouseEnterDelay={0.5}
-                title={() => {
-                  return (
-                    <>
-                      If you have an existing position, the position will be
-                      closed at{" "}
-                      {formatAmount(entryMarkPrice, USD_DECIMALS, 2, true)} USD.
-                      <br /><br />
-                      This exit price will change with the price of the asset.
-                      <br /><br />
-                      <a href="https://gmxio.gitbook.io/gmx/trading#opening-a-position" target="_blank" rel="noopener noreferrer">
-                        More Info
-                      </a>
-                    </>
-                  )
-                }}
-              >
-                <div className={styles.TooltipHandle}>
-                  {`${formatAmount(exitMarkPrice, USD_DECIMALS, 2, true)} USD`}
-                </div>
-              </Tooltip>
-            </div>
-
-            {/* Borrow Fee */}
-            <div className={styles.detailCard}>
-              <div className={styles.label}>Borrow Fee</div>
-              <Tooltip
-                placement='bottomLeft'
-                color='#b5b5b6'
-                mouseEnterDelay={0.5}
-                title={() => {
-                  return (
-                    <>
-                      {hasZeroBorrowFee && (
-                        <div>
-                          {isLong &&
-                            "There are more shorts than longs, borrow fees for longing is currently zero"}
-                          {isShort &&
-                            "There are more longs than shorts, borrow fees for shorting is currently zero"}
-                        </div>
-                      )}
-                      {!hasZeroBorrowFee && (
-                        <div>
-                          The borrow fee is calculated as (assets borrowed) /
-                          (total assets in pool) * 0.01% per hour.
-                          <br /><br />
-                          {isShort &&
-                            `You can change the "Profits In" token above to find lower fees`}
-                        </div>
-                      )}
-                      <br />
-                      <a href="https://gmxio.gitbook.io/gmx/trading#opening-a-position" target="_blank" rel="noopener noreferrer">
-                        More Info
-                      </a>
-                    </>
-                  )
-                }}
-              >
-                <div className={styles.TooltipHandle}>
-                  {borrowFeeText}
-                </div>
-              </Tooltip>
-            </div>
-
-            {/* Available Liquidity */}
-            {isShort && toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) &&
+              {/* Entry Price */}
               <div className={styles.detailCard}>
-                <div className={styles.label}>Available Liquidity</div>
+                <div className={styles.label}>Entry Price</div>
                 <Tooltip
                   placement='bottomLeft'
                   color='#b5b5b6'
@@ -1923,48 +1818,152 @@ const SwapComponent = props => {
                   title={() => {
                     return (
                       <>
-                        Max {toTokenInfo.symbol} short capacity: ${formatAmount(toTokenInfo.maxGlobalShortSize, USD_DECIMALS, 2, true)}
+                        The position will be opened at{" "}
+                        {formatAmount(entryMarkPrice, USD_DECIMALS, 2, true)} USD
+                        with a max slippage of{" "}
+                        {parseFloat(savedSlippageAmount / 100.0).toFixed(2)}%.
                         <br /><br />
-                        Current {toTokenInfo.symbol} shorts: ${formatAmount(toTokenInfo.globalShortSize, USD_DECIMALS, 2, true)}
-                        <br />
+                        The slippage amount can be configured under Settings,
+                        found by clicking on your address at the top right of the
+                        page after connecting your wallet.
+                        <br /><br />
+                        <a href="https://gmxio.gitbook.io/gmx/trading#opening-a-position" target="_blank" rel="noopener noreferrer">
+                          More Info
+                        </a>
                       </>
                     )
                   }}
                 >
                   <div className={styles.TooltipHandle}>
-                    {formatAmount(toTokenInfo.maxAvailableShort, USD_DECIMALS, 2, true)}
+                    {`${formatAmount(entryMarkPrice, USD_DECIMALS, 2, true)} USD`}
                   </div>
                 </Tooltip>
               </div>
-            }
-            
-            <AccountInfoGauge />
-          
-          </AcyPerpetualCard>
-        </>
-      }
 
-      {/* Swap detail box */}
-      {mode === POOL &&
-        <>
-          <GlpSwapDetailBox
-            isBuying={isBuying}
-            setIsBuying={setIsBuying}
-            tokens={tokens}
-            infoTokens={glp_infoTokens}
-            glpPrice={glpPrice}
-            glpBalance={glpBalance}
-            glpBalanceUsd={glpBalanceUsd}
-            // reservedAmount={reservedAmount}
-            // reserveAmountUsd={reserveAmountUsd}
-            // stakingInfo={stakingInfo}
-            glpSupply={glpSupply}
-            glpSupplyUsd={glpSupplyUsd}
-          // gmxPrice={gmxPrice}
-          />
-        </>
-      }
+              {/* Exit Price */}
+              <div className={styles.detailCard}>
+                <div className={styles.label}>Exit Price</div>
+                <Tooltip
+                  placement='bottomLeft'
+                  color='#b5b5b6'
+                  mouseEnterDelay={0.5}
+                  title={() => {
+                    return (
+                      <>
+                        If you have an existing position, the position will be
+                        closed at{" "}
+                        {formatAmount(entryMarkPrice, USD_DECIMALS, 2, true)} USD.
+                        <br /><br />
+                        This exit price will change with the price of the asset.
+                        <br /><br />
+                        <a href="https://gmxio.gitbook.io/gmx/trading#opening-a-position" target="_blank" rel="noopener noreferrer">
+                          More Info
+                        </a>
+                      </>
+                    )
+                  }}
+                >
+                  <div className={styles.TooltipHandle}>
+                    {`${formatAmount(exitMarkPrice, USD_DECIMALS, 2, true)} USD`}
+                  </div>
+                </Tooltip>
+              </div>
 
+              {/* Borrow Fee */}
+              <div className={styles.detailCard}>
+                <div className={styles.label}>Borrow Fee</div>
+                <Tooltip
+                  placement='bottomLeft'
+                  color='#b5b5b6'
+                  mouseEnterDelay={0.5}
+                  title={() => {
+                    return (
+                      <>
+                        {hasZeroBorrowFee && (
+                          <div>
+                            {isLong &&
+                              "There are more shorts than longs, borrow fees for longing is currently zero"}
+                            {isShort &&
+                              "There are more longs than shorts, borrow fees for shorting is currently zero"}
+                          </div>
+                        )}
+                        {!hasZeroBorrowFee && (
+                          <div>
+                            The borrow fee is calculated as (assets borrowed) /
+                            (total assets in pool) * 0.01% per hour.
+                            <br /><br />
+                            {isShort &&
+                              `You can change the "Profits In" token above to find lower fees`}
+                          </div>
+                        )}
+                        <br />
+                        <a href="https://gmxio.gitbook.io/gmx/trading#opening-a-position" target="_blank" rel="noopener noreferrer">
+                          More Info
+                        </a>
+                      </>
+                    )
+                  }}
+                >
+                  <div className={styles.TooltipHandle}>
+                    {borrowFeeText}
+                  </div>
+                </Tooltip>
+              </div>
+
+              {/* Available Liquidity */}
+              {isShort && toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) &&
+                <div className={styles.detailCard}>
+                  <div className={styles.label}>Available Liquidity</div>
+                  <Tooltip
+                    placement='bottomLeft'
+                    color='#b5b5b6'
+                    mouseEnterDelay={0.5}
+                    title={() => {
+                      return (
+                        <>
+                          Max {toTokenInfo.symbol} short capacity: ${formatAmount(toTokenInfo.maxGlobalShortSize, USD_DECIMALS, 2, true)}
+                          <br /><br />
+                          Current {toTokenInfo.symbol} shorts: ${formatAmount(toTokenInfo.globalShortSize, USD_DECIMALS, 2, true)}
+                          <br />
+                        </>
+                      )
+                    }}
+                  >
+                    <div className={styles.TooltipHandle}>
+                      {formatAmount(toTokenInfo.maxAvailableShort, USD_DECIMALS, 2, true)}
+                    </div>
+                  </Tooltip>
+                </div>
+              }
+
+              <AccountInfoGauge />
+
+            </AcyPerpetualCard>
+          </>
+        }
+
+        {/* Swap detail box */}
+        {mode === POOL &&
+          <>
+            <GlpSwapDetailBox
+              isBuying={isBuying}
+              setIsBuying={setIsBuying}
+              tokens={tokens}
+              infoTokens={glp_infoTokens}
+              glpPrice={glpPrice}
+              glpBalance={glpBalance}
+              glpBalanceUsd={glpBalanceUsd}
+              // reservedAmount={reservedAmount}
+              // reserveAmountUsd={reserveAmountUsd}
+              // stakingInfo={stakingInfo}
+              glpSupply={glpSupply}
+              glpSupplyUsd={glpSupplyUsd}
+            // gmxPrice={gmxPrice}
+            />
+          </>
+        }
+
+      </AcyPerpetualCard>
 
       {isConfirming && (
         <ConfirmationBox
