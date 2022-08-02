@@ -1322,6 +1322,7 @@ const Swap = props => {
                         glpPrice={glpPrice}
                         usdgSupply={glpUsdgSupply}
                         totalTokenWeights={totalTokenWeights}
+                        account={account}
                       />
                     </AcyCard>
                   </>}
