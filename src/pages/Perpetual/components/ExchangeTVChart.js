@@ -312,6 +312,7 @@ export default function ExchangeTVChart(props) {
       currentSeries.setData(prevData);
       console.log("hjhjhj prev data: ", prevData)
 
+
       //calculate 24h price change, use 5m data as chart is initiated with timescale 5m
       if( prevData && period != '1m' && period != '1w' ){
         console.log("hjhjhj in if ")

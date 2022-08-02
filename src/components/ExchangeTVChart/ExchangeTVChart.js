@@ -219,7 +219,6 @@ export default function ExchangeTVChart(props) {
       console.log("ws received: ", candleData.time, candleData.close)
       currentSeries.update(candleData)
       setLastCandle(candleData);
-      // console.log("hereim see currentseries", currentSeries)
     });
     cleaner.current = clean;
     console.log("added new candles subscription for ", pairName)
@@ -231,8 +230,11 @@ export default function ExchangeTVChart(props) {
       console.log("fetchPrevAndSubscribe again: ", chartTokenSymbol)
       // Binance data is independent of chain, so here we can fill in any chain name
       const prevData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`).then(res => res.data);
-      console.log("prev data: ", prevData)
-      currentSeries.setData(prevData);      
+      // const secondData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=BNBUSDT&interval=${period}`).then(res => res.data);
+      currentSeries.setData(prevData);
+      console.log("hjhjhj prev data: ", prevData)
+      // console.log("hjhjhj prev data second: ", secondData)
+      // console.log("prev data: ", prevData)
 
       //calculate 24h price change, use 5m data as chart is initiated with timescale 5m
       if( prevData && period != '1m' && period != '1w' ){
