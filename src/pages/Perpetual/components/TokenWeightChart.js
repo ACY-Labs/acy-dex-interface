@@ -60,12 +60,14 @@ const TokenWeightChart = (props) => {
             fill: '#fff',
           },
         },
-        height: 100
+        height: 150,
+        animation: false
     };
     console.log("CCCCC",tokenList)
     return <Bar {...config}/>
 }
 
-export default memo(TokenWeightChart, (pre, next) => { 
-    return _.isEqual(pre.data, next.data);
-  });
+export default TokenWeightChart;
+// export default memo(TokenWeightChart, (pre, next) => { 
+//     return _.isEqual(pre.data, next.data);
+//   });
