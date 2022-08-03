@@ -44,6 +44,7 @@ import SankeyGraph from './components/SankeyGraph';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { ethers } from 'ethers'
 import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
+import { areaRadial } from './components/SankeyGraph/d3.js';
 
 
 
@@ -175,26 +176,27 @@ const Swap = props => {
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
   const [tokenData, setTokenData] = useState("BTC")
 
-  const defaultTokenSelection = useMemo(() => ({
-    ["Pool"]: {
-      from: AddressZero,
-      to: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
-      // to: getTokenBySymbol(tokens, 'BTC').address,
-    },
-    ["Long"]: {
-      from: AddressZero,
-      to: AddressZero,
-    },
-    ["Short"]: {
-      from: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
-      // from: getTokenBySymbol(tokens, 'BTC').address,
-      to: AddressZero,
-    }
-  }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
+  // console.log("hjhjhj exchange error", ARBITRUM_DEFAULT_COLLATERAL_SYMBOL)
+  // const defaultTokenSelection = useMemo(() => ({
+  //   ["Pool"]: {
+  //     from: AddressZero,
+  //     to: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
+  //     // to: getTokenBySymbol(tokens, 'BTC').address,
+  //   },
+  //   ["Long"]: {
+  //     from: AddressZero,
+  //     to: AddressZero,
+  //   },
+  //   ["Short"]: {
+  //     from: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
+  //     // from: getTokenBySymbol(tokens, 'BTC').address,
+  //     to: AddressZero,
+  //   }
+  // }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
 
 
   const tokenAddresses = tokens.map(token => token.address)
-  const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
+  // const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
 
 
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account], {
@@ -221,11 +223,11 @@ const Swap = props => {
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
   console.log("hereim swap infotokens", infoTokens)
 
-  const setToTokenAddress = useCallback((selectedSwapOption, address) => {
-    const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
-    newTokenSelection[selectedSwapOption].to = address
-    setTokenSelection(newTokenSelection)
-  }, [tokenSelection, setTokenSelection])
+  // const setToTokenAddress = useCallback((selectedSwapOption, address) => {
+  //   const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
+  //   newTokenSelection[selectedSwapOption].to = address
+  //   setTokenSelection(newTokenSelection)
+  // }, [tokenSelection, setTokenSelection])
 
   const passTokenData = (token) => {
     setTokenData(token);

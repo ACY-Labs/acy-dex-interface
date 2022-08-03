@@ -146,8 +146,10 @@ function getCurrentTimestamp () {
 
 export default function ExchangeTVChart(props) {
   const {
-    chartTokenSymbol, passTokenData
+    chartTokenSymbol, 
+    passTokenData
   } = props
+  console.log("hjhjhj swap chart props", chartTokenSymbol, passTokenData)
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [activeTimeScale, setActiveTimeScale] = useState("5m");
@@ -168,9 +170,9 @@ export default function ExchangeTVChart(props) {
   
   const [chartInited, setChartInited] = useState(false);
   
-  useEffect(() => {
-    passTokenData(symbol);
-  }, []);
+  // useEffect(() => {
+  //   passTokenData(symbol);
+  // }, []);
 
   useEffect(() => {
     if (marketName !== previousMarketName) {
