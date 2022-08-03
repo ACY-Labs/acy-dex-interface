@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import {Table, Button} from 'antd'
+import {Table, Button, InputNumber} from 'antd'
 import {clsx} from 'clsx'
 import {
     getTokenInfo,
@@ -54,12 +54,38 @@ const VoteCard = (props) => {
     })
     const [weight, setWeight] = useState({})
     const [confirmation, setConfirmation] = useState({})
-    const handleChange = e => {
+    const handleChange = (e) => {
         const {name, value} = e.target
         setWeight(prevWeight => ({
             ...prevWeight,
             [name]: value
         }))
+        // if (unusedWeight > 0){
+        //     setWeight(prevWeight => ({
+        //         ...prevWeight,
+        //         [name]: value
+        //     }))
+        // }else{
+        //     setWeight(prevWeight => ({
+        //         ...prevWeight,
+        //         [name]: 0
+        //     }))
+        // }
+    }
+    const handleBlur = (e) => {
+        const {name, value} = e.target
+        if (value < 0 || isNaN(value)){
+            setWeight(prevWeight => ({
+                ...prevWeight,
+                [name]: 0
+                }))
+        }
+        if (unusedWeight < 0){
+            setWeight(prevWeight => ({
+                ...prevWeight,
+                [name]: parseFloat(value)+parseFloat(unusedWeight)
+                }))
+        }
     }
     const unusedWeight = useMemo(() => {
         return(
@@ -72,6 +98,9 @@ const VoteCard = (props) => {
                 .toFixed(2)
             },0)
         )
+    },[weight])
+    const buttonDisabled = useMemo(() => {
+        return unusedWeight==0? false : true
     },[weight])
     function columnsCoin(){
         return [
@@ -138,9 +167,24 @@ const VoteCard = (props) => {
                         value={weight[entry.name]}
                         name={entry.name}
                         onChange={handleChange}
+                        onBlur={handleBlur}
                         disabled={confirmation[entry.name]}
-                        max="30"
                         />
+                        {/* <InputNumber
+                        bordered={false}
+                        controls={false}
+                        value={weight[entry.name]}
+                        onChange={(val)=>{
+                            this.handleChange(entry.name,val)
+                        }}
+                        // disabled={confirmation[entry.name]}
+                        min={0}
+                        // max={unusedWeight+weight[entry.name]}
+                        max={weight[entry.name]}
+                        // max={30}
+                        step={0.1}
+                        size="small"
+                        /> */}
                         <span className={styles.inputLabel}>%</span>
                     </div>
                 ),
@@ -183,10 +227,12 @@ const VoteCard = (props) => {
                     type="primary"
                     style={{
                       marginLeft: '10px',
-                      background: '#2e3032',
-                      borderColor: 'transparent',
+                      background: 'transparent',
+                      borderColor: '#2e3032',
+                      color: '#b5b5b6',
                       width: '30%'
                     }}
+                    disabled={buttonDisabled}
                 >Vote</Button>
             </div>
         </div>

@@ -58,6 +58,7 @@ import PerpetualComponent from '@/components/PerpetualComponent';
 import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { GlpSwapTokenTable } from '@/components/PerpetualComponent/components/GlpSwapBox'
+import TokenWeightChart from './components/TokenWeightChart'
 // import Kchart from './components/Kchart';
 import KChart from './components/KChart';
 import ExchangeTVChart from './components/ExchangeTVChart';
@@ -1344,7 +1345,11 @@ const Swap = props => {
                             <div className={styles.value}>{stablePercentage}%</div>
                           </div>
                         </div>
-
+                        {/* Bar Chart */}
+                        <TokenWeightChart
+                          tokenList={glp_tokenList}
+                          infoTokens={infoTokens}
+                        />
                       </div>
                     </div>
                     <AcyCard style={{ backgroundColor: 'transparent' }}>
@@ -1359,6 +1364,7 @@ const Swap = props => {
                         glpPrice={glpPrice}
                         usdgSupply={glpUsdgSupply}
                         totalTokenWeights={totalTokenWeights}
+                        account={account}
                       />
                     </AcyCard>
                   </>}
