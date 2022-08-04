@@ -293,6 +293,17 @@ export default function ExchangeTVChart(props) {
       currentSeries.update(candleData)
       setLastCandle(candleData);
       
+      console.log("print currentSeries", currentSeries);
+
+      // HOW TO GET CHART DATA
+      const ticks = currentSeries.Kn?.Bt?.Xr;
+      console.log("chartData: ", ticks);
+      const oldestTick = ticks[0];
+      const latestTick = ticks[ticks.length - 1];
+      if (oldestTick) {
+        console.log(`oldest tick: Open=${oldestTick.St[0]}, timestamp=${oldestTick.rt.So}`)
+      }
+    });
     cleaner.current = clean;
     console.log("added new candles subscription for ", pairName)
 
@@ -300,7 +311,7 @@ export default function ExchangeTVChart(props) {
     //   let timeNow = getCurrentTimestamp()
     //   let forwardArr = 86400 / CHART_PERIODS[period]
     // }
-  });
+  
    
     const fetchPrevAndSubscribe = async () => {
       // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
