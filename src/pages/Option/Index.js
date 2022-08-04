@@ -84,24 +84,24 @@ const Option = props => {
   const whitelistedTokens = tokens.filter(token => token.symbol !== "USDG");
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
 
-  const defaultTokenSelection = useMemo(() => ({
-    ["Pool"]: {
-      from: AddressZero,
-      to: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
-    },
-    ["Long"]: {
-      from: AddressZero,
-      to: AddressZero,
-    },
-    ["Short"]: {
-      from: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
-      to: AddressZero,
-    }
-  }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
+  // const defaultTokenSelection = useMemo(() => ({
+  //   ["Pool"]: {
+  //     from: AddressZero,
+  //     to: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
+  //   },
+  //   ["Long"]: {
+  //     from: AddressZero,
+  //     to: AddressZero,
+  //   },
+  //   ["Short"]: {
+  //     from: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
+  //     to: AddressZero,
+  //   }
+  // }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
 
 
   const tokenAddresses = tokens.map(token => token.address)
-  const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
+  // const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
 
 
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account], {

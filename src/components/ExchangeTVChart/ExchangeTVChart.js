@@ -149,7 +149,7 @@ export default function ExchangeTVChart(props) {
     chartTokenSymbol, 
     passTokenData
   } = props
-  console.log("hjhjhj swap chart props", chartTokenSymbol, passTokenData)
+  // console.log("hjhjhj swap chart props", chartTokenSymbol, passTokenData)
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [activeTimeScale, setActiveTimeScale] = useState("5m");
