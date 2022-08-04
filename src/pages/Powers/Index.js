@@ -2,7 +2,7 @@ import { useWeb3React } from '@web3-react/core';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import useSWR from 'swr';
 import { DownOutlined } from '@ant-design/icons';
-import { Menu, Dropdown, Space, Row, Col } from 'antd';
+import { Menu, Dropdown, Space, Row, Col, Button, Select } from 'antd';
 import AcyCard from '@/components/AcyCard';
 import OptionComponent from '@/components/OptionComponent'
 import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
@@ -43,24 +43,24 @@ const Powers = props => {
   const whitelistedTokens = tokens.filter(token => token.symbol !== "USDG");
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
 
-  const defaultTokenSelection = useMemo(() => ({
-    ["Pool"]: {
-      from: AddressZero,
-      to: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
-    },
-    ["Long"]: {
-      from: AddressZero,
-      to: AddressZero,
-    },
-    ["Short"]: {
-      from: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
-      to: AddressZero,
-    }
-  }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
+  // const defaultTokenSelection = useMemo(() => ({
+  //   ["Pool"]: {
+  //     from: AddressZero,
+  //     to: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
+  //   },
+  //   ["Long"]: {
+  //     from: AddressZero,
+  //     to: AddressZero,
+  //   },
+  //   ["Short"]: {
+  //     from: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
+  //     to: AddressZero,
+  //   }
+  // }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
 
 
   const tokenAddresses = tokens.map(token => token.address)
-  const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
+  // const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
 
 
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account], {
@@ -74,6 +74,10 @@ const Powers = props => {
   })
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
+
+  const passTokenData = (token) => {
+    setTokenData(token);
+  };
 
   function getSupportedInfoTokens(tokenlist) {
     let supportedList = []
@@ -109,26 +113,185 @@ const Powers = props => {
     let tmp = optionsETH[e.key]
     setActiveToken1(chainTokenList[2]);
   };
+  const onClickDropdownMATIC = e => {
+    let tmp = optionsMATIC[e.key]
+    setActiveToken1(chainTokenList[3]);
+  };
+  const handleArrowBTC = () => {
+    setExpandBTC(!expandBTC)
+  }
+  const handleArrowETH = () => {
+    setExpandETH(!expandETH)
+  }
+  const handleArrowMATIC = () => {
+    setExpandMATIC(!expandMATIC)
+  }
   useEffect(() => {
     setToTokenAddress(getActiveTokenAddr(activeToken1.symbol))
   }, [activeToken1])
 
   let optionsBTC = [
-    { name: "BTC 1000000", tokenSymbol: "BTC", optionSymbol: "1000000" },
-    { name: "BTC 500000", tokenSymbol: "BTC", optionSymbol: "500000" },
-    { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000" },
+    { name: "BTC-1000000", tokenSymbol: "BTC", optionSymbol: "1000000", type: "C" },
+    { name: "BTC-1000000", tokenSymbol: "BTC", optionSymbol: "1000000", type: "P" },
+    { name: "BTC-500000", tokenSymbol: "BTC", optionSymbol: "500000", type: "C" },
+    { name: "BTC-500000", tokenSymbol: "BTC", optionSymbol: "500000", type: "P" },
+    { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "C" },
+    { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "P" },
   ];
   let optionsETH = [
-    { name: "ETH 10000", tokenSymbol: "ETH", optionSymbol: "10000" },
-    { name: "ETH 5000", tokenSymbol: "ETH", optionSymbol: "5000" },
-    { name: "ETH 1000", tokenSymbol: "ETH", optionSymbol: "1000" },
+    { name: "ETH-10000", tokenSymbol: "ETH", optionSymbol: "10000", type: "C" },
+    { name: "ETH-10000", tokenSymbol: "ETH", optionSymbol: "10000", type: "P" },
+    { name: "ETH-5000", tokenSymbol: "ETH", optionSymbol: "5000", type: "C" },
+    { name: "ETH-5000", tokenSymbol: "ETH", optionSymbol: "5000", type: "P" },
+    { name: "ETH-1000", tokenSymbol: "ETH", optionSymbol: "1000", type: "C" },
+    { name: "ETH-1000", tokenSymbol: "ETH", optionSymbol: "1000", type: "P" },
   ];
+  let optionsMATIC = [
+    { name: "MATIC-10000", tokenSymbol: "MATIC", optionSymbol: "10", type: "C" },
+    { name: "MATIC-10000", tokenSymbol: "MATIC", optionSymbol: "10", type: "P" },
+    { name: "MATIC-5000", tokenSymbol: "MATIC", optionSymbol: "1", type: "C" },
+    { name: "MATIC-5000", tokenSymbol: "MATIC", optionSymbol: "1", type: "P" },
+    { name: "MATIC-1000", tokenSymbol: "MATIC", optionSymbol: "0.01", type: "C" },
+    { name: "MATIC-1000", tokenSymbol: "MATIC", optionSymbol: "0.01", type: "P" },
+  ];
+
+  const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
+  const KChartTokenListETH = ["BTC", "ETH"]
+  const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
+  const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBSC
+    : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
+      : KChartTokenListETH
+  const selectChartToken = item => {
+    console.log("hjhjhj select char token", item)
+  }
+  console.log("hjhjhj option token chainid", chainId)
 
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
         <div className={`${styles.colItem} ${styles.priceChart}`}>
-          {/* todo: add chart */}
+          <div>
+            <div className={styles.chartTokenSelectorTab}>
+              <Row>
+                <Col span={8}  >
+                  <div className={styles.tokenSelector} >
+
+                    <Select
+                      value={"BTC"}
+                      onChange={onClickDropdownBTC}
+                      dropdownClassName={styles.dropDownMenu}
+                      dropdownMenuStyle={{ width: "20rem" }}
+                      dropdownMatchSelectWidth={false}
+                    >
+                      {
+                        optionsBTC.map((option) => (
+                          <Option className={styles.optionItem} value={option.name} style={{ width: "20rem" }}>
+                            <Col span={12}>{option.tokenSymbol}-{option.optionSymbol}-{option.type}</Col>
+                            {option.type == "C" ?
+                              <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
+                              // <div style={{ fontSize: "0.9rem", float: "right", color: "#FA3C58" }}> $200 -3.4%</div>
+                              :
+                              <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
+                              // <div style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</div>
+                            }
+                          </Option>
+                        ))
+                      }
+                    </Select>
+                  </div>
+                </Col>
+
+                <Col span={8}>
+                  <div className={styles.tokenSelector} >
+
+                    <Select
+                      value={"ETH"}
+                      onChange={onClickDropdownETH}
+                      dropdownClassName={styles.dropDownMenu}
+                      dropdownMenuStyle={{ width: "20rem" }}
+                      dropdownMatchSelectWidth={false}
+                      dropdownAlign={{ offset: [-160, 4] }}
+                    >
+                      {
+                        optionsETH.map((option, index) => (
+                          <Option className={styles.optionItem} value={option.name} style={{ width: "20rem" }}>
+                            <Col span={12}>{option.tokenSymbol}-{option.optionSymbol}-{option.type}</Col>
+                            {option.type == "C" ?
+                              <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
+                              :
+                              <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
+                            }
+                          </Option>
+                        ))
+                      }
+                    </Select>
+                  </div>
+                </Col>
+                <Col span={8}>
+                  <div className={styles.tokenSelector} >
+                    {chainId === 137 || chainId === 80001 ?
+                      <Select
+                        value={"MATIC"}
+                        onChange={onClickDropdownETH}
+                        dropdownClassName={styles.dropDownMenu}
+                        dropdownMenuStyle={{ width: "20rem" }}
+                        dropdownMatchSelectWidth={false}
+                        dropdownAlign={{ offset: [-160, 4] }}
+                      >
+                        {
+                          optionsMATIC.map((option, index) => (
+                            <Option className={styles.optionItem} value={option.name} style={{ width: "20rem" }}>
+                              <Col span={12}>{option.tokenSymbol}-{option.optionSymbol}-{option.type}</Col>
+                              {option.type == "C" ?
+                                <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
+                                :
+                                <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
+                              }
+                            </Option>
+                          ))
+                        }
+                      </Select>
+                      :
+                      chainId === 56 || chainId === 97
+                        ?
+                        <Select
+                          value={"BSC"}
+                          onChange={onClickDropdownETH}
+                          dropdownClassName={styles.dropDownMenu}
+                          dropdownMenuStyle={{ width: "20rem" }}
+                          dropdownMatchSelectWidth={false}
+                          dropdownAlign={{ offset: [-160, 4] }}
+                        >
+                          {
+                            optionsETH.map((option, index) => (
+                              <Option className={styles.optionItem} value={option.name} >
+                                {option.name}
+                              </Option>
+                            ))
+                          }
+                        </Select>
+                        :
+                        <div></div>
+                    }
+                  </div>
+                </Col>
+
+              </Row>
+
+              {/* <PerpetualTabs
+                option={kChartTab}
+                options={kChartTabs}
+                onChange={selectChart}
+              /> */}
+            </div>
+            <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
+              {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
+              <ExchangeTVChart
+                chartTokenSymbol="BTC"
+                passTokenData={passTokenData}
+              />
+            </div>
+          </div>        
         </div>
 
         <div className={`${styles.colItem} ${styles.optionComponent}`}>

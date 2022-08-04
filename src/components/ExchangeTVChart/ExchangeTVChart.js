@@ -91,6 +91,14 @@ const getSeriesOptions = () => ({
 const getChartOptions = (width, height) => ({
   width,
   height,
+  watermark: {
+		visible: true,
+		fontSize: 40,
+		horzAlign: 'center',
+		vertAlign: 'center',
+		color: 'rgba(255, 255, 255, 0.2)',
+		text: 'TestNet',
+	},
   layout: {
     backgroundColor: "rgba(255, 255, 255, 0)",
     textColor: "#ccc",
