@@ -292,6 +292,7 @@ export default function ExchangeTVChart(props) {
       console.log("ws received: ", candleData.time, candleData.close)
       currentSeries.update(candleData)
       setLastCandle(candleData);
+      console.log("print currentSeries", currentSeries);
       
       console.log("print currentSeries", currentSeries);
 
