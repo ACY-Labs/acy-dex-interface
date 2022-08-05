@@ -1,6 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable camelcase */
-/* eslint-disable no-useless-computed-key */
 import { Menu, Dropdown, message, Radio, Spin, Tabs, Layout } from 'antd';
 import { ConsoleSqlOutlined, DownOutlined } from '@ant-design/icons';
 import { useWeb3React } from '@web3-react/core';
@@ -23,7 +20,7 @@ import {
 } from '@/components/Acy';
 import { PriceBox } from './components/PriceBox';
 import { DetailBox } from './components/DetailBox';
-import Portfolio from './components/Portfolio';
+import AcyPool from '@/components/AcyPool';
 import {
   ACTIONS,
   ORDERS,
@@ -570,21 +567,6 @@ const Swap = props => {
   const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
   const [isPluginApproving, setIsPluginApproving] = useState(false);
 
-  // for stats alp price
-  const NOW = Math.floor(Date.now() / 1000)
-  const DEFAULT_GROUP_PERIOD = 86400
-  const [groupPeriod, setGroupPeriod] = useState(DEFAULT_GROUP_PERIOD)
-
-  const params = { undefined, NOW, groupPeriod }
-
-  const [feesData, feesLoading] = useFeesData(params)
-  const [alpData, alpLoading] = useAlpData(params)
-
-  const [alpPriceData, alpPriceDataLoading] = useAlpPriceData(alpData, feesData, params)
-
-
-
-
   const approveOrderBook = () => {
     setIsPluginApproving(true)
     return approvePlugin(chainId, orderBookAddress, {
@@ -915,62 +897,6 @@ const Swap = props => {
     updateActiveChartData(chartData[lastDataIndex][1], lastDataIndex);
   }, [chartData])
 
-  // Glp Swap
-  const [isBuying, setIsBuying] = useState(true)
-  const [swapTokenAddress, setSwapTokenAddress] = useState(tokens[0].address)
-  const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
-  // const history = useHistory()
-  // useEffect(() => {
-  //   const hash = history.location.hash.replace('#', '')
-  //   const buying = !(hash === 'redeem') 
-  //   setIsBuying(buying)
-  // }, [history.location.hash])
-
-  const glp_tokenList = whitelistedTokens.filter(t => !t.isWrapped)
-  // const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
-  // const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([chainId, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
-  //   fetcher: fetcher(library, ReaderV2, [tokensForBalanceAndSupplyQuery]),
-  // })
-  // const { data: aums, mutate: updateAums } = useSWR([chainId, glpManagerAddress, "getAums"], {
-  //   fetcher: fetcher(library, GlpManager),
-  // })
-  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, glpAddress, "balanceOf", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, Glp),
-  })
-  // const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
-  //   fetcher: fetcher(library, RewardTracker),
-  // })
-  const [glpValue, setGlpValue] = useState("")
-  const glpAmount = parseValue(glpValue, GLP_DECIMALS)
-
-  const { data: glpSupply, mutate: updateGlpSupply } = useSWR([chainId, glpAddress, "totalSupply"], {
-    fetcher: fetcher(library, Glp),
-  })
-  // todo: usdgSupply -> vaultUtil
-  // const { data: glpUsdgSupply, mutate: updateGlpUsdgSupply } = useSWR([chainId, vaultAddress, "vaultUtils"], {
-  //   fetcher: fetcher(library, Vault),
-  // })
-  const { data: glpUsdgSupply, mutate: updateGlpUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
-    fetcher: fetcher(library, Usdg),
-  })
-  // const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
-  // const glp_usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
-  // let aum
-  // if (aums && aums.length > 0) {
-  //   aum = isBuying ? aums[0] : aums[1]
-  // }
-
-  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsda", true], {
-    fetcher: fetcher(library, GlpManager),
-  })
-  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0)) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
-  // const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
-  let glpBalanceUsd
-  if (glpBalance) {
-    glpBalanceUsd = glpBalance.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
-  }
-  const glpSupplyUsd = glpSupply ? glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS)) : bigNumberify(0)
-
   const { Option } = Select;
 
   const [updatingKchartsFlag, setUpdatingKchartsFlag] = useState(false);
@@ -1166,101 +1092,9 @@ const Swap = props => {
               </div>
             </div>
           )}
-          {swapOption == 'Pool' && (
-            <div className={`${styles.colItem} ${styles.priceChart}`}>
-              <div>
-                <div className={styles.chartTokenSelectorTab}>
-                  <PerpetualTabs
-                    option={poolTab}
-                    options={poolTabs}
-                    onChange={selectPool}
-                  />
-                </div>
-                {poolTab == "ALP Price" &&
-                  <div className={styles.chart}>
-                    <ChartWrapper
-                      title="ALP Price Comparison"
-                      loading={alpLoading}
-                      data={alpPriceData}
-                    // csvFields={[{ key: 'syntheticPrice' }, { key: 'alpPrice' }, { key: 'alpPlusFees' }, { key: 'lpBtcPrice' }, { key: 'lpEthPrice' }]}
-                    >
-                      <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-                        <LineChart data={alpPriceData} syncId="syncAlp">
-                          <CartesianGrid strokeDasharray="3 3" stroke='#333333' />
-                          <XAxis dataKey="timestamp" tickFormatter={tooltipLabelFormatter} minTickGap={30} />
-                          <YAxis dataKey="performanceSyntheticCollectedFees" domain={[60, 210]} unit="%" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
-                          <YAxis dataKey="alpPrice" domain={[0.4, 1.7]} orientation="right" yAxisId="right" tickFormatter={yaxisFormatterNumber} width={YAXIS_WIDTH} />
-                          <Tooltip
-                            formatter={tooltipFormatterNumber}
-                            labelFormatter={tooltipLabelFormatter}
-                            contentStyle={{ textAlign: 'left' }}
-                          />
-                          <Legend />
-                          {/* <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceLpBtcCollectedFees" name="% LP BTC-USDC (w/ fees)" stroke={COLORS[2]} />
-                      <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceLpEthCollectedFees" name="% LP ETH-USDC (w/ fees)" stroke={COLORS[4]} />
-                      <Line dot={false} isAnimationActive={false} type="monotone" unit="%" strokeWidth={2} dataKey="performanceSyntheticCollectedFees" name="% Index (w/ fees)" stroke={COLORS[0]} /> */}
-
-                          {/* <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="syntheticPrice" name="Index Price" stroke={COLORS[2]} /> */}
-                          <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPrice" name="ALP Price" stroke={COLORS[1]} />
-                          <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="alpPlusFees" name="ALP w/ fees" stroke={COLORS[12]} />
-                          {/* <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpBtcPrice" name="LP BTC-USDC" stroke={COLORS[2]} />
-                      <Line isAnimationActive={false} type="monotone" unit="$" strokeWidth={1} yAxisId="right" dot={false} dataKey="lpEthPrice" name="LP ETH-USDC" stroke={COLORS[4]} /> */}
-                        </LineChart>
-                      </ResponsiveContainer>
-                      <div className="chart-description">
-                        <p>
-                          {/* <span style={{ color: COLORS[3] }}>Alp with fees</span> is based on ALP share of fees received<br /> */}
-                          {/* <span style={{ color: COLORS[0] }}>% of Index (with fees)</span> is Alp with fees / Index Price * 100<br />
-                      <span style={{ color: COLORS[4] }}>% of LP ETH-USDC (with fees)</span> is Alp Price with fees / LP ETH-USDC * 100<br />
-                      <span style={{ color: COLORS[2] }}>Index Price</span> is 25% BTC, 25% ETH, 50% USDC */}
-                        </p>
-                      </div>
-                    </ChartWrapper>
-                  </div>}
-                {poolTab == "Portfolio" &&
-                  <>
-                    <Portfolio 
-                      chainId={chainId}
-                      glpPrice={glpPrice}
-                      glpSupply={glpSupply}
-                      glpSupplyUsd={glpSupplyUsd}
-                      tokens={tokens}
-                      tokenList={glp_tokenList}
-                      vaultTokenInfo={vaultTokenInfo}
-                      aum={aumInUsdg}
-                      infoTokens={infoTokens}
-                    />
-                    <AcyCard style={{ backgroundColor: 'transparent' }}>
-                      <GlpSwapTokenTable
-                        isBuying={isBuying}
-                        setIsBuying={setIsBuying}
-                        setSwapTokenAddress={setSwapTokenAddress}
-                        setIsWaitingForApproval={setIsWaitingForApproval}
-                        tokenList={glp_tokenList}
-                        infoTokens={infoTokens}
-                        glpAmount={glpAmount}
-                        glpPrice={glpPrice}
-                        usdgSupply={glpUsdgSupply}
-                        totalTokenWeights={totalTokenWeights}
-                        account={account}
-                      />
-                    </AcyCard>
-                  </>}
-              </div>
-
-              <div className={styles.bottomWrapper}>
-                <div className={styles.chartTokenSelectorTab}>
-                  <PerpetualTabs
-                    option={poolGraphTab}
-                    options={poolGraphTabs}
-                    onChange={selectPoolGraph}
-                  />
-                </div>
-                {poolGraphTab == "Action" &&
-                  <div>Action</div>}
-              </div>
-            </div>
-          )}
+          {swapOption == "Pool" &&
+            <AcyPool />
+          }
 
           <div className={`${styles.colItem} ${styles.perpetualComponent}`}>
             <PerpetualComponent
@@ -1286,12 +1120,6 @@ const Swap = props => {
               setIsConfirming={setIsConfirming}
               isPendingConfirmation={isPendingConfirmation}
               setIsPendingConfirmation={setIsPendingConfirmation}
-              isBuying={isBuying}
-              setIsBuying={setIsBuying}
-              swapTokenAddress={swapTokenAddress}
-              setSwapTokenAddress={setSwapTokenAddress}
-              glp_isWaitingForApproval={isWaitingForApproval}
-              glp_setIsWaitingForApproval={setIsWaitingForApproval}
               orders={orders}
             />
           </div>
