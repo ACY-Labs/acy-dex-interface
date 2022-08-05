@@ -23,6 +23,7 @@ import {
 } from '@/components/Acy';
 import { PriceBox } from './components/PriceBox';
 import { DetailBox } from './components/DetailBox';
+import Portfolio from './components/Portfolio';
 import {
   ACTIONS,
   ORDERS,
@@ -1094,43 +1095,6 @@ const Swap = props => {
     setPoolGraphTab(item)
   }
 
-  // Portfolio
-  let glpMarketCap
-  if(glpPrice && glpSupply) {
-    glpMarketCap = glpPrice.mul(glpSupply).div(expandDecimals(1, GLP_DECIMALS));
-  }
-
-  let adjustedUsdgSupply = bigNumberify(0);
-  for (let i = 0; i < glp_tokenList.length; i++) {
-    const token = tokens[i];
-    const tokenInfo = infoTokens[token.address];
-    console.log('joy tokenInfo', tokenInfo, tokenInfo.usdgAmount)
-    if (tokenInfo && tokenInfo.usdgAmount) {
-      adjustedUsdgSupply = adjustedUsdgSupply.add(tokenInfo.usdgAmount);
-    }
-  }
-
-  let stableGlp = 0;
-  let totalGlp = 0;
-  // let glpPool = glp_tokenList.map((token) => {
-  //   const tokenInfo = infoTokens[token.address]; //todo: infoTokens
-  //   if (tokenInfo.usdgAmount && adjustedUsdgSupply) {
-  //     const currentWeightBps = tokenInfo.usdgAmount.mul(BASIS_POINTS_DIVISOR).div(adjustedUsdgSupply);
-  //     if (tokenInfo.isStable) {
-  //       stableGlp += parseFloat(`${formatAmount(currentWeightBps, 2, 2, false)}`);
-  //     }
-  //     totalGlp += parseFloat(`${formatAmount(currentWeightBps, 2, 2, false)}`);
-  //     return {
-  //       fullname: token.name,
-  //       name: token.symbol,
-  //       value: parseFloat(`${formatAmount(currentWeightBps, 2, 2, false)}`),
-  //     };
-  //   }
-  //   return null;
-  // });
-
-  let stablePercentage = totalGlp > 0 ? ((stableGlp * 100) / totalGlp).toFixed(2) : "0.0";
-
   return (
     <PageHeaderWrapper>
 
@@ -1255,103 +1219,17 @@ const Swap = props => {
                   </div>}
                 {poolTab == "Portfolio" &&
                   <>
-                    <div className={styles.portfolio}>
-                      <div className={styles.statsContainer}>
-                        <div className={styles.statstitle}>Overview</div>
-                        <div className={styles.statsdivider} />
-                        <div className={styles.statscontent}>
-                          <div className={styles.statsRow}>
-                            <div className={styles.label}>AUM</div>
-                            <div className={styles.value}>XXX</div>
-                          </div>
-
-                          <div className={styles.statsRow}>
-                            <div className={styles.label}>ALP Pool</div>
-                            <div className={styles.value}>XXX</div>
-                          </div>
-
-                          <div className={styles.statsRow}>
-                            <div className={styles.label}>24h Volume</div>
-                            <div className={styles.value}>XXX</div>
-                          </div>
-
-                          <div className={styles.statsRow}>
-                            <div className={styles.label}>Long Position</div>
-                            <div className={styles.value}>XXX</div>
-                          </div>
-
-                          <div className={styles.statsRow}>
-                            <div className={styles.label}>Short Position</div>
-                            <div className={styles.value}>XXX</div>
-                          </div>
-
-                          <div className={styles.statsRow}>
-                            <div className={styles.label}>Fees</div>
-                            <div className={styles.value}>XXX</div>
-                          </div>
-
-                          <div className={styles.statsRow}>
-                            <div className={styles.label}>Total Fees</div>
-                            <div className={styles.value}>XXX</div>
-                          </div>
-
-                          <div className={styles.statsRow}>
-                            <div className={styles.label}>Total Volume</div>
-                            <div className={styles.value}>XXX</div>
-                          </div>
-
-                          <div className={styles.statsRow}>
-                            <div className={styles.label}>Floor Price Fund</div>
-                            <div className={styles.value}>XXX</div>
-                          </div>
-
-                        </div>
-
-                      </div>
-                      <div className={styles.statsContainer}>
-                        <div className={styles.GlpSwapstatsmark}>
-                          <div className={styles.GlpSwapstatsicon}>
-                            <img src={glp40Icon} alt="glp40Icon" />
-                          </div>
-                          <div className={styles.GlpSwapinfo}>
-                            <div className={styles.statstitle}>ALP</div>
-                            <div className={styles.statssubtitle}>ALP</div>
-                          </div>
-                        </div>
-                        <div className={styles.statsdivider} />
-                        <div className={styles.statscontent}>
-                          <div className={styles.statsRow}>
-                            <div className={styles.label}>Price</div>
-                            <div className={styles.value}>${formatAmount(glpPrice, GLP_DECIMALS, 2, true)}</div>
-                          </div>
-
-                          <div className={styles.statsRow}>
-                            <div className={styles.label}>Supply</div>
-                            <div className={styles.value}>{formatAmount(glpSupply, GLP_DECIMALS, 4, true)} ALP (${formatAmount(glpSupplyUsd, GLP_DECIMALS, 2, true)})</div>
-                          </div>
-
-                          <div className={styles.statsRow}>
-                            <div className={styles.label}>Total Staked</div>
-                            <div className={styles.value}>${formatAmount(glpMarketCap, USD_DECIMALS, 0, true)}</div>
-                          </div>
-
-                          <div className={styles.statsRow}>
-                            <div className={styles.label}>Market Cap</div>
-                            <div className={styles.value}>${formatAmount(glpMarketCap, USD_DECIMALS, 0, true)}</div>
-                          </div>
-
-                          <div className={styles.statsRow}>
-                            <div className={styles.label}>Stablecoin Percentage</div>
-                            <div className={styles.value}>{stablePercentage}%</div>
-                          </div>
-                        </div>
-                        {/* Bar Chart */}
-                        <TokenWeightChart
-                          tokenList={glp_tokenList}
-                          infoTokens={infoTokens}
-                        />
-                      </div>
-                    </div>
+                    <Portfolio 
+                      chainId={chainId}
+                      glpPrice={glpPrice}
+                      glpSupply={glpSupply}
+                      glpSupplyUsd={glpSupplyUsd}
+                      tokens={tokens}
+                      tokenList={glp_tokenList}
+                      vaultTokenInfo={vaultTokenInfo}
+                      aum={aumInUsdg}
+                      infoTokens={infoTokens}
+                    />
                     <AcyCard style={{ backgroundColor: 'transparent' }}>
                       <GlpSwapTokenTable
                         isBuying={isBuying}
