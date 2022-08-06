@@ -7,6 +7,7 @@ import AcyCard from '@/components/AcyCard';
 import OptionComponent from '@/components/OptionComponent'
 import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
+import AcyPool from '@/components/AcyPool';
 
 import { fetcher, getInfoTokens, expandDecimals, useLocalStorageByChainId } from '@/acy-dex-futures/utils';
 // import { API_URL, useConstantLoader, getGlobalTokenList, constantInstance } from '@/constants';
@@ -210,152 +211,152 @@ const Option = props => {
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
-        <div className={`${styles.colItem} ${styles.priceChart}`}>
-          <div>
-            <div className={styles.chartTokenSelectorTab}>
-              <Row>
-                <Col span={8}  >
-                  <div className={styles.tokenSelector} >
+        {mode == 'Pool'
+          ?
+          <AcyPool />
+          :
+          <div className={`${styles.colItem} ${styles.priceChart}`}>
+            <div>
+              <div className={styles.chartTokenSelectorTab}>
+                <Row>
+                  <Col span={8}  >
+                    <div className={styles.tokenSelector} >
 
-                    <Select
-                      value={"BTC"}
-                      onChange={onClickDropdownBTC}
-                      dropdownClassName={styles.dropDownMenu}
-                      dropdownMenuStyle={{ width: "20rem" }}
-                      dropdownMatchSelectWidth={false}
-                    >
-                      {
-                        optionsBTC.map((option) => (
-                          <Option className={styles.optionItem} value={option.name} style={{ width: "20rem" }}>
-                              <Col span={12}>{option.tokenSymbol}-{option.optionSymbol}-{option.type}</Col>
-                                {option.type == "C" ?
-                                  <Col span={6} offset={5} style={{fontSize:"0.9rem", float:"right", color:"#FA3C58"}}>$200 -3.4%</Col> 
-                                  // <div style={{ fontSize: "0.9rem", float: "right", color: "#FA3C58" }}> $200 -3.4%</div>
-                                :
-                                <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
-                                  // <div style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</div>
-                                } 
-                          </Option>
-                        ))
-                        }
-                    </Select>
-                  </div>
-                </Col>
-
-                <Col span={8}>
-                  <div className={styles.tokenSelector} >
-
-                    <Select
-                      value={"ETH"}
-                      onChange={onClickDropdownETH}
-                      dropdownClassName={styles.dropDownMenu}
-                      dropdownMenuStyle={{ width: "20rem" }}
-                      dropdownMatchSelectWidth={false} 
-                      dropdownAlign={{ offset: [-160, 4] }}
-                      >
-                      {
-                        optionsETH.map((option, index) => (
-                        <Option className={styles.optionItem} value={option.name} style={{ width: "20rem" }}>
-                          <Col span={12}>{option.tokenSymbol}-{option.optionSymbol}-{option.type}</Col>
-                            {option.type == "C" ?
-                              <Col span={6} offset={5} style={{fontSize:"0.9rem", float:"right", color:"#FA3C58"}}>$200 -3.4%</Col> 
-                            :
-                            <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
-                            } 
-                        </Option>
-                        ))
-                      }
-                    </Select>
-                  </div>
-                </Col>
-                <Col span={8}>
-                  <div className={styles.tokenSelector} >
-                    { chainId === 137 || chainId === 80001 ?
-                    <Select
-                      value={"MATIC"}
-                      onChange={onClickDropdownETH}
-                      dropdownClassName={styles.dropDownMenu}
-                      dropdownMenuStyle={{ width: "20rem" }}
-                      dropdownMatchSelectWidth={false} 
-                      dropdownAlign={{ offset: [-160, 4] }}
-                      >
-                      {
-                        optionsMATIC.map((option, index) => (
-                          <Option className={styles.optionItem} value={option.name} style={{ width: "20rem" }}>
-                          <Col span={12}>{option.tokenSymbol}-{option.optionSymbol}-{option.type}</Col>
-                            {option.type == "C" ?
-                              <Col span={6} offset={5} style={{fontSize:"0.9rem", float:"right", color:"#FA3C58"}}>$200 -3.4%</Col> 
-                            :
-                            <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
-                            } 
-                        </Option>
-                        ))
-                      }
-                    </Select>
-                    :
-                      chainId === 56 || chainId === 97
-                      ?
                       <Select
-                        value={"BSC"}
-                        onChange={onClickDropdownETH}
+                        value={"BTC"}
+                        onChange={onClickDropdownBTC}
                         dropdownClassName={styles.dropDownMenu}
                         dropdownMenuStyle={{ width: "20rem" }}
-                        dropdownMatchSelectWidth={false} 
-                        dropdownAlign={{ offset: [-160, 4] }}
-                        >
+                        dropdownMatchSelectWidth={false}
+                      >
                         {
-                          optionsETH.map((option, index) => (
-                            <Option className={styles.optionItem} value={option.name} >
-                              {option.name}
+                          optionsBTC.map((option) => (
+                            <Option className={styles.optionItem} value={option.name} style={{ width: "20rem" }}>
+                              <Col span={12}>{option.tokenSymbol}-{option.optionSymbol}-{option.type}</Col>
+                              {option.type == "C" ?
+                                <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
+                                // <div style={{ fontSize: "0.9rem", float: "right", color: "#FA3C58" }}> $200 -3.4%</div>
+                                :
+                                <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
+                                // <div style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</div>
+                              }
                             </Option>
                           ))
                         }
                       </Select>
-                      :
-                      <div></div>
-                    }
-                  </div>
-                </Col>
+                    </div>
+                  </Col>
 
-              </Row>
+                  <Col span={8}>
+                    <div className={styles.tokenSelector} >
 
-              {/* <PerpetualTabs
-                option={kChartTab}
-                options={kChartTabs}
-                onChange={selectChart}
-              /> */}
-            </div>
-            <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
-              {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
-              <ExchangeTVChart
-                chartTokenSymbol="BTC"
-                passTokenData={passTokenData}
-              />
-            </div>
-          </div>
+                      <Select
+                        value={"ETH"}
+                        onChange={onClickDropdownETH}
+                        dropdownClassName={styles.dropDownMenu}
+                        dropdownMenuStyle={{ width: "20rem" }}
+                        dropdownMatchSelectWidth={false}
+                        dropdownAlign={{ offset: [-160, 4] }}
+                      >
+                        {
+                          optionsETH.map((option, index) => (
+                            <Option className={styles.optionItem} value={option.name} style={{ width: "20rem" }}>
+                              <Col span={12}>{option.tokenSymbol}-{option.optionSymbol}-{option.type}</Col>
+                              {option.type == "C" ?
+                                <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
+                                :
+                                <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
+                              }
+                            </Option>
+                          ))
+                        }
+                      </Select>
+                    </div>
+                  </Col>
+                  <Col span={8}>
+                    <div className={styles.tokenSelector} >
+                      {chainId === 137 || chainId === 80001 ?
+                        <Select
+                          value={"MATIC"}
+                          onChange={onClickDropdownETH}
+                          dropdownClassName={styles.dropDownMenu}
+                          dropdownMenuStyle={{ width: "20rem" }}
+                          dropdownMatchSelectWidth={false}
+                          dropdownAlign={{ offset: [-160, 4] }}
+                        >
+                          {
+                            optionsMATIC.map((option, index) => (
+                              <Option className={styles.optionItem} value={option.name} style={{ width: "20rem" }}>
+                                <Col span={12}>{option.tokenSymbol}-{option.optionSymbol}-{option.type}</Col>
+                                {option.type == "C" ?
+                                  <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
+                                  :
+                                  <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
+                                }
+                              </Option>
+                            ))
+                          }
+                        </Select>
+                        :
+                        chainId === 56 || chainId === 97
+                          ?
+                          <Select
+                            value={"BSC"}
+                            onChange={onClickDropdownETH}
+                            dropdownClassName={styles.dropDownMenu}
+                            dropdownMenuStyle={{ width: "20rem" }}
+                            dropdownMatchSelectWidth={false}
+                            dropdownAlign={{ offset: [-160, 4] }}
+                          >
+                            {
+                              optionsETH.map((option, index) => (
+                                <Option className={styles.optionItem} value={option.name} >
+                                  {option.name}
+                                </Option>
+                              ))
+                            }
+                          </Select>
+                          :
+                          <div></div>
+                      }
+                    </div>
+                  </Col>
 
-          <div className={styles.bottomWrapper}>
-            <div className={styles.bottomTab}>
-              <PerpetualTabs
-                option={tableContent}
-                options={["Positions", "Orders"]}
-                onChange={item => { setTableContent(item) }}
-              />
-            </div>
-          </div>
-          <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
-            <div className={`${styles.colItem} ${styles.priceChart}`}>
-              <div className={styles.positionsTable}>
-                {tableContent == "Positions" && (
-                  <div>POSITIONS</div>
-                )}
-                {tableContent == "Orders" && (
-                  <div>ORDERS</div>
-                )}
+                </Row>
+
+              </div>
+              <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
+                {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
+                <ExchangeTVChart
+                  chartTokenSymbol="BTC"
+                  passTokenData={passTokenData}
+                />
               </div>
             </div>
-          </AcyCard>
-        </div>
+
+            <div className={styles.bottomWrapper}>
+              <div className={styles.bottomTab}>
+                <PerpetualTabs
+                  option={tableContent}
+                  options={["Positions", "Orders"]}
+                  onChange={item => { setTableContent(item) }}
+                />
+              </div>
+            </div>
+            <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
+              <div className={`${styles.colItem} ${styles.priceChart}`}>
+                <div className={styles.positionsTable}>
+                  {tableContent == "Positions" && (
+                    <div>POSITIONS</div>
+                  )}
+                  {tableContent == "Orders" && (
+                    <div>ORDERS</div>
+                  )}
+                </div>
+              </div>
+            </AcyCard>
+          </div>
+        }
 
         <div className={`${styles.colItem} ${styles.optionComponent}`}>
           <AcyCard style={{ backgroundColor: 'transparent', border: 'none' }}>

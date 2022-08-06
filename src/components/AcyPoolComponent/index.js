@@ -72,7 +72,6 @@ const AcyPoolComponent = props => {
         setSwapTokenAddress={setSwapTokenAddress}
         isWaitingForApproval={isWaitingForApproval}
         setIsWaitingForApproval={setIsWaitingForApproval}
-        setPendingTxns={props.setPendingTxns}
       />
 
       <GlpSwapDetailBox

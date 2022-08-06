@@ -1856,7 +1856,7 @@ const SwapComponent = props => {
         }
 
         {mode === POOL &&
-          <AcyPoolComponent setPendingTxns={setPendingTxns} />
+          <AcyPoolComponent />
         }
 
       </AcyPerpetualCard>

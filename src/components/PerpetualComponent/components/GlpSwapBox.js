@@ -139,7 +139,6 @@ export const GlpSwapBox = (props) => {
     setSwapTokenAddress,
     isWaitingForApproval,
     setIsWaitingForApproval,
-    setPendingTxns
   } = props
 
   const { account } = useConstantLoader(props)
