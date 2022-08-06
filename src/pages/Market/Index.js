@@ -1,66 +1,17 @@
-import { AcyBarChart, AcyLineChart } from '@/components/Acy';
-import { Col, Icon, Row, Button } from 'antd';
-import React, { Component, useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { useWeb3React } from '@web3-react/core';
-import {
-  fetchGeneralPoolInfoDay,
-  fetchGeneralTokenInfo,
-  fetchGlobalTransaction,
-  fetchMarketData,
-  marketClient,
-} from './Data/index.js';
-import { dataSourceCoin, dataSourcePool } from './SampleData.js';
-import styles from './styles.less';
-import { abbrNumber, FEE_PERCENT } from './Util.js';
-import { MarketSearchBar, PoolTable, TokenTable, TransactionTable, CurrencyTable } from './UtilComponent.js';
-import { JsonRpcProvider } from "@ethersproject/providers";
-import { isMobile } from 'react-device-detect';
+import React, { useState, useEffect } from 'react';
 import ConnectWallet from './ConnectWallet';
-import axios from 'axios';
-
-import { getGlobalTokenList, useConstantLoader } from '@/constants';
-
+import { useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
+import { PairsTable } from './TableComponent';
+// import { CurrencyTable } from './UtilComponent.js';
+// import { Icon } from 'antd';
+
+import styles from './styles.less';
 
 const MarketIndex = props => {
-  const [visible, setVisible] = useState(true);
-  const [tabIndex, setTabIndex] = useState(0);
-  const [selectedIndexLine, setselectedIndexLine] = useState(0);
-  const [selectedDataLine, setselectedDataLine] = useState(0);
-  const [selectedIndexBar, setselectedIndexBar] = useState(0);
-  const [selectedDataBar, setselectedDataBar] = useState(0);
-  const [chartData, setchartData] = useState({
-    tvl: [],
-    volume24h: [],
-  });
-  const [overallVolume, setoverallVolume] = useState(-1);
-  const [overallTvl, setoverallTvl] = useState(-1);
-  const [overallFees, setoverallFees] = useState(-1);
-  const [ovrVolChange, setovrVolChange] = useState(0.0);
-  const [ovrTvlChange, setovrTvlChange] = useState(0.0);
-  const [ovrFeeChange, setovrFeeChange] = useState(0.0);
-  const [transactions, settransactions] = useState(null);
-  const [tokenInfo, settokenInfo] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1)
 
-  const [poolInfo, setpoolInfo] = useState([]);
-
-  const [tokenError, settokenError] = useState('');
-
-  const [pullError, setpullError] = useState('');
-  const [transactionError, settransactionError] = useState('');
-
-  const [barChartError, setbarChartError] = useState('');
-
-  const [lineChartError, setlineChartError] = useState('');
-  const [overviewError, setoverviewError] = useState('');
-
-  const [marketNetwork, setmarketNetwork] = useState('');
-
-  const { activate } = useWeb3React();
   const { account, library, chainId } = useConstantLoader();
-
+  const [mode, setMode] = useState('pairs')
 
   // connect to provider, listen for wallet to connect
   const connectWalletByLocalStorage = useConnectWallet();
@@ -74,451 +25,284 @@ const MarketIndex = props => {
     }
   }, []);
 
-  useEffect(() => {
-    // fetchGlobalTransaction().then(globalTransactions => {
-    //   console.log('globaltransaction', globalTransactions);
-    //   if (globalTransactions) settransactions(globalTransactions);
-    // });
+  // .logoURI, .name
+  // .exchange, price, price_24h
+  // volume, swaps
+  // liquidity, fdv
 
-    // fetchGeneralPoolInfoDay().then(poolInfo => {
-    //   if (poolInfo) setpoolInfo(poolInfo);
-    // });
-
-    // // fetch token info
-    // fetchGeneralTokenInfo().then(tokenInfo => {
-    //   if (tokenInfo) settokenInfo(tokenInfo);
-    //   console.log("token to render", tokenInfo)
-    // });
-
-    // // fetch market data
-    // console.log("BUG HERE:");
-    // fetchMarketData().then(dataDict => {
-    //   console.log("BUG HERE2:", dataDict);
-    //   if (dataDict) {
-    //     let volumeChange =
-    //       (dataDict.volume24h[dataDict.tvl.length - 1][1] -
-    //         dataDict.volume24h[dataDict.tvl.length - 2][1]) /
-    //       dataDict.volume24h[dataDict.tvl.length - 2][1];
-
-    //     let tvlChange =
-    //       (dataDict.tvl[dataDict.tvl.length - 1][1] - dataDict.tvl[dataDict.tvl.length - 2][1]) /
-    //       dataDict.tvl[dataDict.tvl.length - 2][1];
-
-    //     let fee = dataDict.volume24h[dataDict.tvl.length - 1][1] * FEE_PERCENT
-    //     setchartData(dataDict);
-    //     setoverallVolume(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));
-    //     setoverallTvl(abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]));
-    //     setoverallFees(abbrNumber(fee));
-    //     setovrVolChange((volumeChange * 100).toFixed(2));
-    //     setovrFeeChange((volumeChange * 100).toFixed(2));
-    //     setovrTvlChange((tvlChange * 100).toFixed(2));
-    //     setselectedIndexLine(dataDict.tvl.length - 1);
-    //     setselectedDataLine(abbrNumber(dataDict.tvl[dataDict.tvl.length - 1][1]));
-    //     setselectedIndexBar(dataDict.volume24h.length - 1);
-    //     setselectedDataBar(abbrNumber(dataDict.volume24h[dataDict.tvl.length - 1][1]));
-    //   }
-    // });
-
-    // fetch coin list
-    // const apiUrlPrefix = "https://api.coingecko.com/api/v3"
-    // axios.get(
-    //   `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=500&page=1&sparkline=false`
-    // ).then(data => {
-    //   setCoinList(data.data)
-    //   console.log('joy init coin list', data.data)
-    // })
-    //   .catch(e => {
-    //     console.log(e);
-    //   });
-
-  }, [chainId, marketNetwork]);
-
-
-  // function fetchMarketList() {
-  //   const apiUrlPrefix = "https://api.coingecko.com/api/v3"
-  //   axios.get(
-  //     `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=${currentPage + 1}&sparkline=false`
-  //   ).then(data => {
-  //     setCoinList(coinList.concat(data.data))
-  //     setCurrentPage(currentPage + 1)
-  //     console.log('joy fetching market list', data.data)
-  //   })
-  //     .catch(e => {
-  //       console.log(e);
-  //     });
-  // }
-
-
-  const onLineGraphHover = (newData, newIndex) => {
-    setselectedDataLine(abbrNumber(newData));
-    setselectedIndexLine(newIndex);
-  };
-
-  const onBarGraphHover = (newData, newIndex) => {
-    setselectedDataBar(abbrNumber(newData));
-    setselectedIndexBar(newIndex);
-  };
-  const getNetwork = (index) => {
-    // 输出接收到子组件的参数
-    console.log(index);
-    setmarketNetwork(index);
-  }
-
-  const coinList = getGlobalTokenList()
-  console.log("hereim market coinlist", coinList)
-
+  const test_pairs = [
+    {
+      name: 'USDT/WBNB',
+      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
+      exchange: 'Pancakeswap v2',
+      price: '$315.31',
+      price_24h: '-0.56%',
+      volume: '$31.66M',
+      swaps: '70.15K',
+      liquidity: '167.55M',
+      fdv: '$1223.66B'
+    },
+    {
+      name: 'USDC/OP',
+      logoURI: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389',
+      exchange: 'Velodrome',
+      price: '$1.9125',
+      price_24h: '-2.76%',
+      volume: '$18.89M',
+      swaps: '69.30K',
+      liquidity: '-',
+      fdv: '$8.20B'
+    },
+    {
+      name: 'BUSD/WBNB',
+      logoURI: 'https://assets.coingecko.com/coins/images/9576/large/BUSD.png?1568947766',
+      exchange: 'Pancakeswap v2',
+      price: '$314.76',
+      price_24h: '-0.77%',
+      volume: '$31.50M',
+      swaps: '55.37K',
+      liquidity: '179.72M',
+      fdv: '$1527.01B'
+    },
+  ]
 
   return (
-      <div className={styles.marketRoot}>
-        <ConnectWallet />
-        {/* <MarketSearchBar
-        className={styles.searchBar}
-        // dataSourceCoin={dataSourceCoin}
-        dataSourceCoin={coinList}
-        dataSourcePool={dataSourcePool}
-        account={account}
-        visible={true}
-        getNetwork={getNetwork}
-        networkShow={true}
-      /> */}
+    <div className={styles.marketRoot}>
+      <ConnectWallet />
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <h2>Cryptocurrencies</h2>
-        </div>
-        {coinList.length > 0 ? (
-          <CurrencyTable dataSourceCoin={coinList} />
-        ) : (
-          <Icon type="loading" />
-        )}
+      <div className={styles.chartGrid}>
 
-        {/* <div className={styles.chartsMain}>
-        <div className={styles.chartSectionMain}>
-          {chartData.tvl.length > 0 ? (
-            <>
-              <div className={styles.graphStats}>
-                <div className={styles.statName}>TVL</div>
-                <div className={styles.statValue}>$ {selectedDataLine}</div>
-                <div className={styles.statName}>
-                  {chartData.tvl[selectedIndexLine][0]}
-                </div>
+        {/* Live Pairs */}
+        <div className={styles.chartCell}>
+          <div className={styles.statsContainer}>
+            <div className={styles.statstitle}>
+              Live Pairs
+              <span className={styles.seeMore} onClick={() => { setMode('Live Pairs') }}>
+                More >
+              </span>
+            </div>
+            <div className={styles.statsdivider} />
+
+            <div className={styles.statscontent}>
+              <div className={styles.statsRow}>
+                <div className={styles.label}>1. WETH/</div>
+                <div className={styles.value}>XXX</div>
               </div>
-              <div className={styles.chartWrapper}>
-                <AcyLineChart
-                  data={chartData.tvl}
-                  onHover={onLineGraphHover}
-                  showXAxis={true}
-                  showGradient={true}
-                  lineColor="#e29227"
-                  bgColor="#2f313500"
-                />
+
+              <div className={styles.statsRow}>
+                <div className={styles.label}>2. WETH/MOWO</div>
+                <div className={styles.value}>XXX</div>
               </div>
-            </>
-          ) : (
-            <Icon type="loading" />
-          )}
+
+              <div className={styles.statsRow}>
+                <div className={styles.label}>3. WETH/Cocaine Inu</div>
+                <div className={styles.value}>XXX</div>
+              </div>
+            </div>
+
+          </div>
         </div>
-        <div className={styles.chartSectionMain}>
-          {chartData.volume24h.length > 0 ? (
-            <>
-              <div className={styles.graphStats}>
-                <div className={styles.statName}>VOLUME 24H</div>
-                <div className={styles.statValue}>{`$ ${selectedDataBar}`}</div>
-                <div className={styles.statName}>
-                  {chartData.volume24h[selectedIndexBar][0]}
-                </div>
+
+        {/* Top Volume */}
+        <div className={styles.chartCell}>
+          <div className={styles.statsContainer}>
+            <div className={styles.statstitle}>
+              Top Volume
+              <span className={styles.seeMore} onClick={() => { setMode('Top Volume') }}>
+                More >
+              </span>
+            </div>
+
+            <div className={styles.statsdivider} />
+
+            <div className={styles.statscontent}>
+              <div className={styles.statsRow}>
+                <div className={styles.label}>1. ETH</div>
+                <div className={styles.value}>XXX</div>
               </div>
-              <div className={styles.chartWrapper}>
-                <AcyBarChart
-                  data={chartData.volume24h}
-                  showXAxis
-                  barColor="#1c9965"
-                  onHover={onBarGraphHover}
-                />
+
+              <div className={styles.statsRow}>
+                <div className={styles.label}>2. USDC</div>
+                <div className={styles.value}>XXX</div>
               </div>
-            </>
-          ) : (
-            <Icon type="loading" />
-          )}
+
+              <div className={styles.statsRow}>
+                <div className={styles.label}>3. USDT</div>
+                <div className={styles.value}>XXX</div>
+              </div>
+
+            </div>
+
+          </div>
         </div>
+
+        {/* Trending */}
+        <div className={styles.chartCell}>
+          <div className={styles.statsContainer}>
+            <div className={styles.statstitle}>
+              Trending
+              <span className={styles.seeMore} onClick={() => { setMode('Trending') }}>
+                More >
+              </span>
+            </div>
+
+            <div className={styles.statsdivider} />
+
+            <div className={styles.statscontent}>
+              <div className={styles.statsRow}>
+                <div className={styles.label}>1. MARSRICE BSC</div>
+                <div className={styles.value}>XXX</div>
+              </div>
+
+              <div className={styles.statsRow}>
+                <div className={styles.label}>2. OHM</div>
+                <div className={styles.value}>XXX</div>
+              </div>
+
+              <div className={styles.statsRow}>
+                <div className={styles.label}>3. DRX ARBI</div>
+                <div className={styles.value}>XXX</div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        {/* Winners */}
+        <div className={styles.chartCell}>
+          <div className={styles.statsContainer}>
+            <div className={styles.statstitle}>
+              Winners
+              <span className={styles.seeMore} onClick={() => { setMode('Winners') }}>
+                More >
+              </span>
+            </div>
+
+            <div className={styles.statsdivider} />
+
+            <div className={styles.statscontent}>
+              <div className={styles.statsRow}>
+                <div className={styles.label}>1. WETH/</div>
+                <div className={styles.value}>XXX</div>
+              </div>
+
+              <div className={styles.statsRow}>
+                <div className={styles.label}>2. WETH/CHIRP</div>
+                <div className={styles.value}>XXX</div>
+              </div>
+
+              <div className={styles.statsRow}>
+                <div className={styles.label}>3. WETH/XNOM</div>
+                <div className={styles.value}>XXX</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Losers */}
+        <div className={styles.chartCell}>
+          <div className={styles.statsContainer}>
+            <div className={styles.statstitle}>
+              Losers
+              <span className={styles.seeMore} onClick={() => { setMode('Losers') }}>
+                More >
+              </span>
+            </div>
+
+            <div className={styles.statsdivider} />
+
+            <div className={styles.statscontent}>
+              <div className={styles.statsRow}>
+                <div className={styles.label}>1. BUSD/WNFTC</div>
+                <div className={styles.value}>XXX</div>
+              </div>
+
+              <div className={styles.statsRow}>
+                <div className={styles.label}>2. USDT/CS</div>
+                <div className={styles.value}>XXX</div>
+              </div>
+
+              <div className={styles.statsRow}>
+                <div className={styles.label}>3. WBNB/MINE</div>
+                <div className={styles.value}>XXX</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
-      {overallVolume !== -1 && overallTvl !== -1 && !isMobile ? (
-        <Row className={styles.marketOverview} justify="space-around">
-          <Col span={8}>
-            Volume 24H <strong style={{color: "white"}}>$ {overallVolume}</strong>{' '}
-            <span
-              className={
-                ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
-              }
-            >
-              {ovrVolChange} %
-            </span>
-          </Col>
-          <Col span={8}>
-            Fees 24H <strong style={{color: "white"}}>$ {overallFees} </strong> <span
-              className={
-                ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
-              }
-            >
-              {ovrVolChange} %
-            </span>
-          </Col>
-          <Col span={8}>
-            TVL <strong style={{color: "white"}}>$ {overallTvl}</strong>{' '}
-            <span
-              className={
-                ovrTvlChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
-              }
-            >
-              {ovrTvlChange} %
-            </span>
-          </Col>
-        </Row>
-      ) : (
-        !isMobile && <Icon type="loading" />
-      )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <h2>Top Tokens</h2>
-        <h3>
-          <Link style={{ color: '#b5b5b6' }} >
-            Explore
-          </Link>
-        </h3>
+      <div className={styles.tableToggleButtonContainer}>
+        <button
+          type="button"
+          className={styles.leftToggleButton}
+          style={{ backgroundColor: mode == 'Pairs' ? "#2e3032" : "transparent", color: mode == 'Pairs' ? "white" : "", border: '0.75px solid #333333' }}
+          onClick={() => { setMode('Pairs') }}
+        >
+          Pairs
+        </button>
+        <button
+          type="button"
+          className={styles.middleToggleButton}
+          style={{ backgroundColor: mode == 'Live Pairs' ? "#2e3032" : "transparent", color: mode == 'Live Pairs' ? "white" : "", border: '0.75px solid #333333' }}
+          onClick={() => { setMode('Live Pairs') }}
+        >
+          Live Pairs
+        </button>
+        <button
+          type="button"
+          className={styles.middleToggleButton}
+          style={{ backgroundColor: mode == 'Top Volume' ? "#2e3032" : "transparent", color: mode == 'Top Volume' ? "white" : "", border: '0.75px solid #333333' }}
+          onClick={() => { setMode('Top Volume') }}
+        >
+          Top Volume
+        </button>
+        <button
+          type="button"
+          className={styles.middleToggleButton}
+          style={{ backgroundColor: mode == 'Trending' ? "#2e3032" : "transparent", color: mode == 'Trending' ? "white" : "", border: '0.75px solid #333333' }}
+          onClick={() => { setMode('Trending') }}
+        >
+          Trending
+        </button>
+        <button
+          type="button"
+          className={styles.middleToggleButton}
+          style={{ backgroundColor: mode == 'Winners' ? "#2e3032" : "transparent", color: mode == 'Winners' ? "white" : "", border: '0.75px solid #333333' }}
+          onClick={() => { setMode('Winners') }}
+        >
+          Winners
+        </button>
+        <button
+          type="button"
+          className={styles.rightToggleButton}
+          style={{ backgroundColor: mode == 'Losers' ? "#2e3032" : "transparent", color: mode == 'Losers' ? "white" : "", border: '0.75px solid #333333' }}
+          onClick={() => { setMode('Losers') }}
+        >
+          Losers
+        </button>
       </div>
-      {tokenInfo.length > 0 ? (
-        <TokenTable dataSourceCoin={tokenInfo} />
+
+      {mode == 'Pairs' && <PairsTable dataSource={test_pairs} />}
+
+
+
+
+
+      {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <h2>Cryptocurrencies</h2>
+      </div>
+      {coinList.length > 0 ? (
+        <CurrencyTable dataSourceCoin={coinList} />
       ) : (
         <Icon type="loading" />
-      )}
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <h2>Top Pools</h2>
-        <h3>
-          <Link style={{ color: '#b5b5b6' }} >
-            Explore
-          </Link>
-        </h3>
-      </div>
-
-      {poolInfo.length > 0 ? (
-        <PoolTable dataSourcePool={poolInfo} />
-      ) : (
-        <Icon type="loading" />
-      )}
-
-      <h2>Transactions</h2>
-      {!transactions ? (
-        <Icon type="loading" />
-      ) : (
-        <TransactionTable dataSourceTransaction={transactions} />
-      )} 
-      */}
-        <div style={{ height: '20px' }} />
-      </div>
+      )} */}
+    </div>
   );
 
 }
-
-// export class MarketIndex extends Component {
-//   constructor(props) {
-//     super(props);
-//   }
-
-//   state = {
-//     visible: true,
-//     tabIndex: 0,
-//     selectedIndexLine: 0,
-//     selectedDataLine: 0,
-//     selectedIndexBar: 0,
-//     selectedDataBar: 0,
-
-//     // dictionary for the tvl and volume chart
-//     chartData: {
-//       tvl: [],
-//       volume24h: [],
-//     },
-
-//     // overall chart data
-//     overallVolume: -1,
-//     overallTvl: -1,
-//     overallFees: -1,
-//     ovrVolChange: 0.0,
-//     ovrTvlChange: 0.0,
-//     ovrFeeChange: 0.0,
-
-//     // transaction data
-//     transactions: [],
-
-//     // token data
-//     tokenInfo: [],
-
-//     // pool data
-//     poolInfo: [],
-
-//     // error messages
-//     tokenError: '',
-//     pullError: '',
-//     transactionError: '',
-//     barChartError: '',
-//     lineChartError: '',
-//     overviewError: '',
-//   };
-
-//   componentDidMount() {
-//     // fetch pool data
-
-//   }
-
-//   onLineGraphHover = (newData, newIndex) => {
-//     this.setState({
-//       selectedDataLine: abbrNumber(newData),
-//       selectedIndexLine: newIndex,
-//     });
-//   };
-
-//   onBarGraphHover = (newData, newIndex) => {
-//     this.setState({
-//       selectedDataBar: abbrNumber(newData),
-//       selectedIndexBar: newIndex,
-//     });
-//   };
-
-//   render() {
-//     const { visible, visibleSearchBar, tabIndex, transactionView } = this.state;
-//     const { library } = ConnectWallet();
-//     return (
-//       <div className={styles.marketRoot}>
-//         <ConnectWallet/>
-//         <MarketSearchBar
-//           dataSourceCoin={dataSourceCoin}
-//           dataSourcePool={dataSourcePool}
-//           visible={true}
-//         />
-//         <div className={styles.chartsMain}>
-//           <div className={styles.chartSectionMain}>
-//             {this.state.chartData.tvl.length > 0 ? (
-//               <>
-//                 <div className={styles.graphStats}>
-//                   <div className={styles.statName}>TVL</div>
-//                   <div className={styles.statValue}>$ {this.state.selectedDataLine}</div>
-//                   <div className={styles.statName}>
-//                     {this.state.chartData.tvl[this.state.selectedIndexLine][0]}
-//                   </div>
-//                 </div>
-//                 <div className={styles.chartWrapper}>
-//                   <AcyLineChart
-//                     data={this.state.chartData.tvl}
-//                     onHover={this.onLineGraphHover}
-//                     showXAxis={true}
-//                     showGradient={true}
-//                     lineColor="#e29227"
-//                     bgColor="#2f313500"
-//                   />
-//                 </div>
-//               </>
-//             ) : (
-//               <Icon type="loading" />
-//             )}
-//           </div>
-//           <div className={styles.chartSectionMain}>
-//             {this.state.chartData.volume24h.length > 0 ? (
-//               <>
-//                 <div className={styles.graphStats}>
-//                   <div className={styles.statName}>VOLUME 24H</div>
-//                   <div className={styles.statValue}>{`$ ${this.state.selectedDataBar}`}</div>
-//                   <div className={styles.statName}>
-//                     {this.state.chartData.volume24h[this.state.selectedIndexBar][0]}
-//                   </div>
-//                 </div>
-//                 <div className={styles.chartWrapper}>
-//                   <AcyBarChart
-//                     data={this.state.chartData.volume24h}
-//                     showXAxis
-//                     barColor="#1c9965"
-//                     onHover={this.onBarGraphHover}
-//                   />
-//                 </div>
-//               </>
-//             ) : (
-//               <Icon type="loading" />
-//             )}
-//           </div>
-//         </div>
-//         {this.state.overallVolume !== -1 && this.state.overallTvl !== -1 && !isMobile ? (
-//           <Row className={styles.marketOverview} justify="space-around">
-//             <Col span={8}>
-//               Volume 24H <strong style={{color: "white"}}>$ {this.state.overallVolume}</strong>{' '}
-//               <span
-//                 className={
-//                   this.state.ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
-//                 }
-//               >
-//                 {this.state.ovrVolChange} %
-//               </span>
-//             </Col>
-//             <Col span={8}>
-//               Fees 24H <strong style={{color: "white"}}>$ {this.state.overallFees} </strong> <span
-//                 className={
-//                   this.state.ovrVolChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
-//                 }
-//               >
-//                 {this.state.ovrVolChange} %
-//               </span>
-//             </Col>
-//             <Col span={8}>
-//               TVL <strong style={{color: "white"}}>$ {this.state.overallTvl}</strong>{' '}
-//               <span
-//                 className={
-//                   this.state.ovrTvlChange >= 0 ? styles.priceChangeUp : styles.priceChangeDown
-//                 }
-//               >
-//                 {this.state.ovrTvlChange} %
-//               </span>
-//             </Col>
-//           </Row>
-//         ) : (
-//           !isMobile && <Icon type="loading" />
-//         )}
-
-//         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-//           <h2>Top Tokens</h2>
-//           <h3>
-//             <Link style={{ color: '#b5b5b6' }} to="/market/list/token">
-//               Explore
-//             </Link>
-//           </h3>
-//         </div>
-//         {this.state.tokenInfo.length > 0 ? (
-//           <TokenTable dataSourceCoin={this.state.tokenInfo} />
-//         ) : (
-//           <Icon type="loading" />
-//         )}
-
-//         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-//           <h2>Top Pools</h2>
-//           <h3>
-//             <Link style={{ color: '#b5b5b6' }} to="/market/list/pool">
-//               Explore
-//             </Link>
-//           </h3>
-//         </div>
-
-//         {this.state.poolInfo.length > 0 ? (
-//           <PoolTable dataSourcePool={this.state.poolInfo} />
-//         ) : (
-//           <Icon type="loading" />
-//         )}
-
-//         <h2>Transactions</h2>
-//         {this.state.transactions.length > 0 ? (
-//           <TransactionTable dataSourceTransaction={this.state.transactions} />
-//         ) : (
-//           <Icon type="loading" />
-//         )}
-//         <div style={{ height: '20px' }} />
-//       </div>
-//     );
-//   }
-// }
 
 export default MarketIndex;
