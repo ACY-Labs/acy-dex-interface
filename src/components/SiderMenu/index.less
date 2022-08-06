@@ -10,6 +10,7 @@
   transition: all 0.3s;
   background: #002140;
   overflow: hidden;
+  margin-bottom: 30px;
   img {
     display: inline-block;
     vertical-align: middle;
@@ -97,7 +98,14 @@
 
 .menuItem {
   display: flex;
-  flex-direction: column;
+  // flex-direction: column;
   color: #b5b6b6;
   font-weight: normal;
+}
+
+.itemHover{
+  padding-left: 10px;
+  &:hover {
+    background-color: rgb(44, 47, 54);
+  }
 }
