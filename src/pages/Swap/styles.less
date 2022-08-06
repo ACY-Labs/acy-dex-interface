@@ -12,22 +12,27 @@
   margin: auto;
   flex-wrap: wrap;
   justify-content: space-between;
+
+  .bottomWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+  }
 }
 
 @media screen and (min-width: 1024px) {
   .rowFlexContainer {
-    // width: 30%;
     min-width: 310px;
     flex-wrap: nowrap;
   }
   .priceChart {
-    border-right: 0.75px solid #333333;
     order: 1;
     flex: 2;
   }
   .swapComponent {
     order: 2;
     flex: 1;
+    border-left: 0.75px solid #333333;
   }
 }
 
@@ -45,6 +50,7 @@
   }
   .swapComponent {
     order: 1;
+    border-left: 0.75px solid #333333;
   }
 }
 
@@ -92,47 +98,11 @@
   justify-content: flex-end;
   // opacity: 0;
 }
-.exchangeBottomWrapper {
-  // width: 65%;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: stretch;
-}
 // .showPeriodOnHover:hover .pt {
 //   opacity: 1;
 //   transition: opacity 1s;
 // }
 
-.exchangeBottomWrapper{
-  .exchangeItem{
-    width: 100%;
-    padding: 20px 30px;
-    border-top: 0.75px solid #333333;
-    h3{
-      font-size: 20px;
-      margin-top: 0px;
-      display: flex;
-      &:hover{
-        color: #eb5c20;
-        transform: translate(10px,0);
-        transition-duration: 0.5s;
-      }
-      .span{
-        transform: translate(0,3px);
-      }
-    }
-  }
-
-  .optionTab {
-    margin : 10px;
-    color : #b5b5b6;
-    cursor : pointer;
-    &:hover {
-      filter: brightness(1.5);
-    }
-}
-}
 .title {
   font-size: 18px;
   font-weight: 600;
@@ -185,19 +155,8 @@
 }
 
 @media (max-width: 768px) {
-  // .main {
-  //   padding: 0 40px;
-  // }
-  .exchangeBottomWrapper{
-    width: 100%;
-    padding: 0 40px;
-  }
   .option {
     padding: 0 40px;
-  }
-  .exchangeBottomWrapper > div {
-    padding: 4% 40px 4% 40px;
-    width: 100%;
   }
 }
 .routing {
@@ -393,3 +352,10 @@
   width: 25%;
 }
 
+.chartTokenSelectorTab {
+  border-top: 0.75px solid #444444;
+  border-bottom: 0.75px solid #444444;
+  padding-right: 60%;
+  margin-bottom: 0px;
+  font-size: 5px;
+}

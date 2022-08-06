@@ -21,7 +21,7 @@ import AcyPieChart from '@/components/AcyPieChartAlpha';
 import AcyRoutingChart from '@/components/AcyRoutingChart';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseUnits } from '@ethersproject/units';
-import { uniqueFun } from '@/utils/utils';
+import { totalInUSD, uniqueFun } from '@/utils/utils';
 import { getTransactionsByAccount, appendNewSwapTx } from '@/utils/txData';
 import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import { fetchGeneralTokenInfo, marketClient, fetchTokenDaySimple } from '../Market/Data/index.js';
@@ -45,7 +45,7 @@ import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { ethers } from 'ethers'
 import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
 import { areaRadial } from './components/SankeyGraph/d3.js';
-
+import { TradeHistoryTable, PoolsActivityTable } from './components/TableComponent.js';
 
 
 const { AddressZero } = ethers.constants
@@ -158,6 +158,7 @@ const Swap = props => {
   const [transactionList, setTransactionList] = useState([]);
   const [tableLoading, setTableLoading] = useState(true);
   const [transactionNum, setTransactionNum] = useState(0);
+  const [tableContent, setTableContent] = useState('Trade History');
   const { activate } = useWeb3React();
 
   const { perpetuals } = useConstantLoader()
@@ -679,38 +680,117 @@ const Swap = props => {
     setGraphType(item)
   }
 
+  const test_tradeHistory = [
+    {
+      date: '2022-08-06 22:47:42',
+      type: 'buy',
+      price: '$0.06212',
+      price_bnb: '0.0001959',
+      amount_mine: '5145.58',
+      total_bnb: '1.00',
+      maker: '0x522351493F2bc0Dd02498741Fb78696D6943D4f0',
+    },
+    {
+      date: '2022-08-06 22:45:45',
+      type: 'sell',
+      price: '$0.06083',
+      price_bnb: '0.0001918',
+      amount_mine: '1312.06',
+      total_bnb: '0.2517',
+      maker: '0x73d0451D4137DD57D145F27cE6E9207D1da39309',
+    },
+    {
+      date: '2022-08-06 22:42:48',
+      type: 'buy',
+      price: '$0.05996',
+      price_bnb: '0.0001892',
+      amount_mine: '3717.88',
+      total_bnb: '0.7000',
+      maker: '0x10ED43C718714eb63d5aA57B78B54704E256024E',
+    }
+  ]
+
+  const test_poolsActivity = [
+    {
+      type: 'remove',
+      fromSymbol: 'BONE',
+      fromAmount: '22.11',
+      toSymbol: 'ETH',
+      toAmount: '0.0125323',
+      token_value: '$21.49',
+      ago: '4min',
+    },
+    {
+      type: 'add',
+      fromSymbol: 'USDC',
+      fromAmount: '99.99',
+      toSymbol: 'ETH',
+      toAmount: '0.0046699',
+      token_value: '$8',
+      ago: '5min',
+    },
+    {
+      type: 'add',
+      fromSymbol: 'SYN',
+      fromAmount: '4.427',
+      toSymbol: 'ETH',
+      toAmount: '3.7',
+      token_value: '$6346',
+      ago: '6min',
+    },
+  ]
+
   return (
     <PageHeaderWrapper>
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
           <div className={`${styles.colItem} ${styles.priceChart}`}>
-            <div className={styles.graphTab}>
-              <PerpetualTabs
-                option={graphType}
-                options={graphTypes}
-                onChange={showGraph}
-              />
+
+            <div>
+              <div className={styles.chartTokenSelectorTab}>
+                <PerpetualTabs
+                  option={graphType}
+                  options={graphTypes}
+                  onChange={showGraph}
+                />
+              </div>
+
+              <div style={{ borderTop: '0.75px solid #333333' }}>
+                {graphType == "Routes" ?
+                  <SankeyGraph />
+                  :
+                  <div>
+                    <ExchangeTVChart
+                      chartTokenSymbol="BTC"
+                      passTokenData={passTokenData}
+                    />
+                  </div>
+                }
+              </div>
             </div>
-            <div style={{ borderTop: '0.75px solid #333333' }}>
-              {graphType == "Routes" ?
-                <SankeyGraph />
-                :
-                <div>
-                  <ExchangeTVChart
-                    chartTokenSymbol="BTC"
-                    passTokenData={passTokenData}
-                  />
+
+            <div className={styles.bottomWrapper}>
+              <div className={styles.chartTokenSelectorTab}>
+                <PerpetualTabs
+                  option={tableContent}
+                  options={['Trade History', 'Pools Activity']}
+                  onChange={item => { setTableContent(item) }}
+                />
+              </div>
+              <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
+                <div className={`${styles.colItem} ${styles.priceChart}`}>
+                  <div className={styles.positionsTable}>
+                    {tableContent == 'Trade History' && (
+                      <TradeHistoryTable dataSource={test_tradeHistory} />
+                    )}
+                    {tableContent == 'Pools Activity' && (
+                      <PoolsActivityTable dataSource={test_poolsActivity} />
+                    )}
+                  </div>
                 </div>
-              }
-            </div>
-            <div className={styles.exchangeBottomWrapper}>
-              <div className={styles.exchangeItem}>
-                {/* <h3>
-                  <AcyIcon.MyIcon width={30} type="arrow" />
-                  <span className={styles.span}>TRANSACTION HISTORY</span>
-                </h3> */}
+              </AcyCard>
+              {/* <div className={styles.exchangeItem}>
                 <div className={`${styles.colItem}`}>
-                  {/* <a className={`${styles.colItem} ${styles.optionTab}`}>All Orders</a> */}
                   <a className={`${styles.colItem} ${styles.optionTab}`}>My Orders</a>
                 </div>
                 {account && tableLoading ? (
@@ -722,12 +802,11 @@ const Swap = props => {
                   />
                 )}
               </div>
+            </div> */}
             </div>
+
           </div>
 
-          {/* <div>
-            Hello: {history.location.pathname}
-          </div> */}
           <div className={`${styles.colItem} ${styles.swapComponent}`} >
             <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', border: 'none' }}>
               <div className={styles.trade}>
@@ -748,32 +827,31 @@ const Swap = props => {
             </AcyCard>
           </div>
 
+          <AcyConfirm
+            onCancel={onHandModalConfirmOrder}
+            title="Comfirm Order"
+            visible={visibleConfirmOrder}
+          >
+            <div className={styles.confirm}>
+              <p>ETH： 566.228</p>
+              <p>BTC：2.669</p>
+              <p>Price：212.123</p>
+              <p>Price Impact：2.232%</p>
+              <p>Liquidity Provide Fee: 0.321%</p>
+              <p>Alpha: 0.371%</p>
+              <p>Maximum sold: 566.221</p>
+              <Button size="large" type="primary">
+                Confirm
+              </Button>
+            </div>
+          </AcyConfirm>
+
+          <AcyApprove
+            onCancel={() => setVisibleLoading(false)}
+            visible={visibleLoading}
+          />
+
         </div>
-
-        <AcyConfirm
-          onCancel={onHandModalConfirmOrder}
-          title="Comfirm Order"
-          visible={visibleConfirmOrder}
-        >
-          <div className={styles.confirm}>
-            <p>ETH： 566.228</p>
-            <p>BTC：2.669</p>
-            <p>Price：212.123</p>
-            <p>Price Impact：2.232%</p>
-            <p>Liquidity Provide Fee: 0.321%</p>
-            <p>Alpha: 0.371%</p>
-            <p>Maximum sold: 566.221</p>
-            <Button size="large" type="primary">
-              Confirm
-            </Button>
-          </div>
-        </AcyConfirm>
-
-        <AcyApprove
-          onCancel={() => setVisibleLoading(false)}
-          visible={visibleLoading}
-        />
-
       </div>
     </PageHeaderWrapper>
   );
