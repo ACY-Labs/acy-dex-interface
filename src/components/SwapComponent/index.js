@@ -79,7 +79,7 @@ import {useConnectWallet} from '@/components/ConnectWallet';
 import { asyncForEach } from "@/utils/asynctools";
 import { processString } from "@/components/AcyCoinItem";
 import TokenSelectorDrawer from '../TokenSelectorDrawer';
-
+import DetailBox from './components/DetailBox';
 
 
 // var CryptoJS = require("crypto-js");
@@ -740,6 +740,20 @@ const SwapComponent = props => {
           </AcyPerpetualButton>
         </div>
       }
+
+      <DetailBox />
+
+      <div style={{padding: '10px', display: 'flex', fontSize: '15px'}}>
+        <div style={{color: 'white', fontWeight: '400', marginRight: '10px'}}>DAImond</div>
+        <div style={{marginRight: '10px'}}>
+          <span style={{marginRight: '5px'}}>Token: 0x712...3c51</span>
+          <svg xmlns="http://www.w3.org/2000/svg" className={styles.copyAddress} viewBox="0 0 50 50"><path d="M9 43.95q-1.2 0-2.1-.9-.9-.9-.9-2.1V10.8h3v30.15h23.7v3Zm6-6q-1.2 0-2.1-.9-.9-.9-.9-2.1v-28q0-1.2.9-2.1.9-.9 2.1-.9h22q1.2 0 2.1.9.9.9.9 2.1v28q0 1.2-.9 2.1-.9.9-2.1.9Zm0-3h22v-28H15v28Zm0 0v-28 28Z"/></svg>
+        </div>
+        <div>
+          <span style={{marginRight: '5px'}}>Pair: 0x523...557f</span>
+          <svg xmlns="http://www.w3.org/2000/svg" className={styles.copyAddress} viewBox="0 0 50 50"><path d="M9 43.95q-1.2 0-2.1-.9-.9-.9-.9-2.1V10.8h3v30.15h23.7v3Zm6-6q-1.2 0-2.1-.9-.9-.9-.9-2.1v-28q0-1.2.9-2.1.9-.9 2.1-.9h22q1.2 0 2.1.9.9.9.9 2.1v28q0 1.2-.9 2.1-.9.9-2.1.9Zm0-3h22v-28H15v28Zm0 0v-28 28Z"/></svg>
+        </div>
+      </div>
 
       <AcyDescriptions>
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}

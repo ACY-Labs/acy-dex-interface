@@ -243,3 +243,55 @@
     }
   }
 }
+
+.statsContainer {
+  padding: 10px;
+  overflow: hidden;
+  margin-top: 50px;
+}
+
+.statstitle {
+  font-size: 16px;
+  line-height: 1.355rem;
+  letter-spacing: 0px;
+  color: #FFFFFF;
+}
+
+.statsdivider {
+  height: 0.75px;
+  background: #333333;
+  margin: 0.7rem -1rem;
+}
+
+.statscontent {
+  display: flex;
+  flex-direction: column;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-column-gap: 1rem;
+  padding: unset;
+
+  .label {
+    color: #a9a9b0;
+    font-size: 15px;
+    opacity: 1;
+  }
+
+  .value {
+    color: #a9a9b0;
+    font-size: 15px;
+    opacity: 1;
+  }
+}
+
+.copyAddress {
+  height: 15px;
+  fill: #a9a9b0;
+  &:hover {
+    fill: white;
+    cursor: pointer;
+  }
+}
