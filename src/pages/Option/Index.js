@@ -1,8 +1,8 @@
 import { useWeb3React } from '@web3-react/core';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import useSWR from 'swr';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
-import { Menu, Dropdown, Space, Row, Col, Button, Select } from 'antd';
+import { Menu, Dropdown, Space, Row, Col, Button, Select, Drawer } from 'antd';
 import AcyCard from '@/components/AcyCard';
 import OptionComponent from '@/components/OptionComponent'
 import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
@@ -19,40 +19,25 @@ import styled from "styled-components";
 import styles from './styles.less'
 import { symbol } from 'prop-types';
 
-const StyledDropdown = styled(Dropdown)`
-.ant-dropdown-menu-item, .ant-dropdown-menu-submenu-title{
-  margin = 5px !important;
-  font-size: 1.1rem;
-}
+
+const StyledDrawer = styled(Drawer)`
+  .ant-drawer{
+    border-radius: 0px;
+    border: 0.75px solid #232323;
+  }
+  .ant-drawer-header{
+    background-color: black;
+    // border-bottom: 0.75px solid #232323;
+  }
+  .ant-drawer-content{
+    background-color: black;
+    border: 0.75px solid #232323;
+    
+  }
+  ant-drawer-content-wrapper{
+    transform: translateY(0%);
+  }
 `
-// const StyledButton = styled(Button)`
-// .ant-btn{
-//   background-color: black !important;
-//   border-radius: 0px !important;
-// }
-// .ant-btn-primary:hover, .ant-btn-primary:focus{
-//   color: #fff;
-//   background-color: #29292C;
-//   border-color: #29292C;
-// }
-// .ant-btn, .ant-btn:active, .ant-btn:focus{
-//   background-color: #29292C;
-//   color: #fff !important;
-// }
-// .ant-btn:hover, .ant-btn:focus, .ant-btn:active, .ant-btn.active{
-//   background-color: #29292C;
-//   color: #fff !important;
-// }
-// .ant-btn:hover, .ant-btn:focus{
-//   background-color: #29292C;
-//   color: #fff !important;
-// }
-// .ant-btn-primary:active{
-// color: #fff;
-// background-color: #29292C;
-// border-color: #fff !important;
-// }
-// `
 
 const Option = props => {
   const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
@@ -65,15 +50,17 @@ const Option = props => {
   const [tableContent, setTableContent] = useState("Positions");
 
   const chainTokenList = getSupportedInfoTokens(supportedTokens)
-
-  const [activeToken1, setActiveToken1] = useState(chainTokenList[1]);
-  const [activeToken0, setActiveToken0] = useState(chainTokenList[0]);
+  const [activeToken1, setActiveToken1] = useState(chainTokenList[2]);
+  const [activeToken0, setActiveToken0] = useState(chainTokenList[1]);
 
   const [fromTokenAddress, setFromTokenAddress] = useState(activeToken0.address);
   const [toTokenAddress, setToTokenAddress] = useState("");
   const [tokenData, setTokenData] = useState("BTC")
-  const [expandBTC, setExpandBTC] = useState(true)
-  const [expandETH, setExpandETH] = useState(true)
+
+  const [visibleBTC, setVisibleBTC] = useState(false);
+  const [visibleETH, setVisibleETH] = useState(false);
+  const [visibleMATIC, setVisibleMATIC] = useState(false);
+  const [visibleBNB, setVisibleBNB] = useState(false);
 
   const { perpetuals } = useConstantLoader()
   const readerAddress = perpetuals.getContract("Reader")
@@ -124,7 +111,7 @@ const Option = props => {
     let supportedList = []
     for (let i = 0; i < tokenlist.length; i++) {
       tokenlist[i].address = tokenlist[i].address.toLowerCase()
-      if (tokenlist[i].symbol == 'BTC' || tokenlist[i].symbol == "ETH" || tokenlist[i].symbol == "USDT") {
+      if (tokenlist[i].symbol == 'BTC' || tokenlist[i].symbol == "ETH" || tokenlist[i].symbol == "USDT" || tokenlist[i].symbol == "MATIC") {
         supportedList.push(tokenlist[i])
       }
     }
@@ -141,32 +128,41 @@ const Option = props => {
     }
     return undefined
   }
+  const chartPanes = [
+    { title: 'BTC', content: 'BTC', key: 'BTC', closable: false },
+    { title: 'ETH', content: 'ETH', key: 'ETH' },
+    // { title: 'Tab 3', content: 'Content of Tab 3', key: '3'},
+  ];
+  const [activeKey, setActiveKey] = useState(chartPanes[0].key);
+  const [panes, setPanes] = useState(chartPanes);
+  const newTabIndex = useRef(0);
+
+  const onChange = (newActiveKey) => {
+    // setActiveKey(newActiveKey);
+    setActiveToken1((chainTokenList.filter(ele => ele.symbol == newActiveKey))[0])
+  };
 
   const getActiveTokenAddr = (symbol) => {
     let tmp = getTokenBySymbol(chainTokenList, symbol);
     return tmp.address
   }
   const onClickDropdownBTC = e => {
-    let tmp = optionsBTC[e.key]
-    setActiveToken1(chainTokenList[1]);
-  };
-  const onClickDropdownETH = e => {
-    let tmp = optionsETH[e.key]
+    let tmp = optionsBTC[e.name]
     setActiveToken1(chainTokenList[2]);
   };
-  const onClickDropdownMATIC = e => {
-    let tmp = optionsMATIC[e.key]
+  const onClickDropdownETH = e => {
+    let tmp = optionsETH[e.name]
     setActiveToken1(chainTokenList[3]);
   };
-  const handleArrowBTC = () => {
-    setExpandBTC(!expandBTC)
-  }
-  const handleArrowETH = () => {
-    setExpandETH(!expandETH)
-  }
-  const handleArrowMATIC = () => {
-    setExpandMATIC(!expandMATIC)
-  }
+  const onClickDropdownMATIC = e => {
+    let tmp = optionsMATIC[e.name]
+    setActiveToken1(chainTokenList[0]);
+  };
+  // const onClickDropdownBSC = e => {
+  //   let tmp = optionsBSC[e.name]
+  //   setActiveToken1(chainTokenList[3]);
+  // };
+
   useEffect(() => {
     setToTokenAddress(getActiveTokenAddr(activeToken1.symbol))
   }, [activeToken1])
@@ -176,6 +172,8 @@ const Option = props => {
     { name: "BTC-1000000", tokenSymbol: "BTC", optionSymbol: "1000000", type: "P" },
     { name: "BTC-500000", tokenSymbol: "BTC", optionSymbol: "500000", type: "C" },
     { name: "BTC-500000", tokenSymbol: "BTC", optionSymbol: "500000", type: "P" },
+    // { name: "BTC-300000", tokenSymbol: "BTC", optionSymbol: "300000", type: "C" },
+    // { name: "BTC-300000", tokenSymbol: "BTC", optionSymbol: "300000", type: "P" },
     { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "C" },
     { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "P" },
   ];
@@ -202,10 +200,49 @@ const Option = props => {
   const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBSC
     : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
       : KChartTokenListETH
+  const selectTab = item => {
+    setActiveToken1((chainTokenList.filter(ele => ele.symbol == item))[0])
+    switch (item) {
+      case "BTC":
+        setVisibleBTC(true);
+        setVisibleETH(false);
+        setVisibleMATIC(false);
+        setVisibleBNB(false);
+        break;
+      case "ETH":
+        setVisibleBTC(false);
+        setVisibleETH(true);
+        setVisibleMATIC(false);
+        setVisibleBNB(false);
+        break;
+      case "MATIC":
+        setVisibleBTC(false);
+        setVisibleETH(false);
+        setVisibleMATIC(true);
+        setVisibleBNB(false);
+        break;
+      default:
+        break;
+    }
+  }
   const selectChartToken = item => {
     console.log("hjhjhj select char token", item)
   }
-  console.log("hjhjhj option token chainid", chainId)
+
+  const onCloseBTC = () => {
+    console.log("hjhjhj close btc")
+    setVisibleBTC(false);
+  };
+  const onCloseETH = () => {
+    setVisibleETH(false);
+  };
+  const onCloseBNB = () => {
+    setVisibleBNB(false);
+  };
+  const onCloseMATIC = () => {
+    setVisibleMATIC(false);
+  };
+
 
   return (
     <div className={styles.main}>
@@ -214,117 +251,113 @@ const Option = props => {
           <div>
             <div className={styles.chartTokenSelectorTab}>
               <Row>
-                <Col span={8}  >
-                  <div className={styles.tokenSelector} >
-
-                    <Select
-                      value={"BTC"}
-                      onChange={onClickDropdownBTC}
-                      dropdownClassName={styles.dropDownMenu}
-                      dropdownMenuStyle={{ width: "20rem" }}
-                      dropdownMatchSelectWidth={false}
-                    >
-                      {
-                        optionsBTC.map((option) => (
-                          <Option className={styles.optionItem} value={option.name} style={{ width: "20rem" }}>
-                              <Col span={12}>{option.tokenSymbol}-{option.optionSymbol}-{option.type}</Col>
-                                {option.type == "C" ?
-                                  <Col span={6} offset={5} style={{fontSize:"0.9rem", float:"right", color:"#FA3C58"}}>$200 -3.4%</Col> 
-                                  // <div style={{ fontSize: "0.9rem", float: "right", color: "#FA3C58" }}> $200 -3.4%</div>
-                                :
-                                <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
-                                  // <div style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</div>
-                                } 
-                          </Option>
-                        ))
-                        }
-                    </Select>
-                  </div>
-                </Col>
-
-                <Col span={8}>
-                  <div className={styles.tokenSelector} >
-
-                    <Select
-                      value={"ETH"}
-                      onChange={onClickDropdownETH}
-                      dropdownClassName={styles.dropDownMenu}
-                      dropdownMenuStyle={{ width: "20rem" }}
-                      dropdownMatchSelectWidth={false} 
-                      dropdownAlign={{ offset: [-160, 4] }}
-                      >
-                      {
-                        optionsETH.map((option, index) => (
-                        <Option className={styles.optionItem} value={option.name} style={{ width: "20rem" }}>
-                          <Col span={12}>{option.tokenSymbol}-{option.optionSymbol}-{option.type}</Col>
-                            {option.type == "C" ?
-                              <Col span={6} offset={5} style={{fontSize:"0.9rem", float:"right", color:"#FA3C58"}}>$200 -3.4%</Col> 
-                            :
-                            <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
-                            } 
-                        </Option>
-                        ))
-                      }
-                    </Select>
-                  </div>
-                </Col>
-                <Col span={8}>
-                  <div className={styles.tokenSelector} >
-                    { chainId === 137 || chainId === 80001 ?
-                    <Select
-                      value={"MATIC"}
-                      onChange={onClickDropdownETH}
-                      dropdownClassName={styles.dropDownMenu}
-                      dropdownMenuStyle={{ width: "20rem" }}
-                      dropdownMatchSelectWidth={false} 
-                      dropdownAlign={{ offset: [-160, 4] }}
-                      >
-                      {
-                        optionsMATIC.map((option, index) => (
-                          <Option className={styles.optionItem} value={option.name} style={{ width: "20rem" }}>
-                          <Col span={12}>{option.tokenSymbol}-{option.optionSymbol}-{option.type}</Col>
-                            {option.type == "C" ?
-                              <Col span={6} offset={5} style={{fontSize:"0.9rem", float:"right", color:"#FA3C58"}}>$200 -3.4%</Col> 
-                            :
-                            <Col span={6} offset={5} style={{ fontSize: "0.9rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
-                            } 
-                        </Option>
-                        ))
-                      }
-                    </Select>
-                    :
-                      chainId === 56 || chainId === 97
-                      ?
-                      <Select
-                        value={"BSC"}
-                        onChange={onClickDropdownETH}
-                        dropdownClassName={styles.dropDownMenu}
-                        dropdownMenuStyle={{ width: "20rem" }}
-                        dropdownMatchSelectWidth={false} 
-                        dropdownAlign={{ offset: [-160, 4] }}
-                        >
-                        {
-                          optionsETH.map((option, index) => (
-                            <Option className={styles.optionItem} value={option.name} >
-                              {option.name}
-                            </Option>
-                          ))
-                        }
-                      </Select>
-                      :
-                      <div></div>
-                    }
-                  </div>
-                </Col>
-
+                <PerpetualTabs
+                  option={activeToken1.symbol}
+                  options={KChartTokenList}
+                  onChange={selectTab}
+                />
               </Row>
 
-              {/* <PerpetualTabs
-                option={kChartTab}
-                options={kChartTabs}
-                onChange={selectChart}
-              /> */}
+              {visibleBTC ?
+                <Row>
+                  <Col>
+                    <div className={styles.tokenSelector} >
+                      <StyledDrawer
+                        className={styles.drawerContent}
+                        placement="bottom"
+                        closable={false}
+                        onClose={onCloseBTC}
+                        visible={visibleBTC}
+                        getContainer={false}
+                        closeIcon={false}
+                        height={"517px"}
+                        style={{ width: "20rem" }}
+                      >
+                        <div className={styles.optionslist}>
+                          {optionsBTC.map((option) => (
+                            <div
+                              className={styles.item}
+                              onClick={() => onClickDropdownBTC(option)}
+                            >
+                              {option.tokenSymbol}-{option.optionSymbol}-{option.type}
+                              {option.type == "C" ?
+                                <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
+                                :
+                                <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
+                              }
+                            </div>
+                          ))}
+                        </div>
+                      </StyledDrawer>
+                    </div>
+                  </Col>
+                </Row> : null}
+
+              {visibleETH ?
+                <Row>
+                  <Col>
+                    <StyledDrawer
+                      className={styles.drawerContent}
+                      placement="bottom"
+                      onClose={onCloseETH}
+                      visible={visibleETH}
+                      getContainer={false}
+                      closeIcon={false}
+                      height={"517px"}
+                      style={{ width: "20rem" }}
+                    >
+                      <div className={styles.optionslist}>
+                        {optionsETH.map((option) => (
+                          <div
+                            className={styles.item}
+                            onClick={() => onClickDropdownETH(option)}
+                          >
+                            {option.tokenSymbol}-{option.optionSymbol}-{option.type}
+                            {option.type == "C" ?
+                              <Col span={6} offset={2} style={{ fontSize: "0.8rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
+                              :
+                              <Col span={6} offset={2} style={{ fontSize: "0.8rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
+                            }
+                          </div>
+                        ))}
+                      </div>
+                    </StyledDrawer>
+                  </Col>
+                </Row> : null}
+
+              {visibleMATIC ?
+                <Row>
+                  <Col>
+                    <StyledDrawer
+                      className={styles.drawerContent}
+                      placement="bottom"
+                      onClose={onCloseMATIC}
+                      visible={visibleMATIC}
+                      getContainer={false}
+                      closeIcon={false}
+                      height={"517px"}
+                      style={{ width: "20rem", left: "10rem" }}
+                    >
+                      <div className={styles.optionslist}>
+                        {optionsMATIC.map((option) => (
+                          <div
+                            className={styles.item}
+                            onClick={() => onClickDropdownMATIC(option)}
+                          >
+                            {option.tokenSymbol}-{option.optionSymbol}-{option.type}
+                            {option.type == "C" ?
+                              <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
+                              :
+                              <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
+                            }
+                          </div>
+                        ))}
+                      </div>
+                    </StyledDrawer>
+                  </Col>
+                </Row> : null}
             </div>
+
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
               <ExchangeTVChart

@@ -55,11 +55,11 @@
 }
 
 .chartTokenSelectorTab {
-  border-color:#29292C;
-  width: max-content;
-  font-size: 1rem;
-  background-color: black;
-  // padding: 0.5rem 0rem 0.5rem 2rem;
+  border-top: 0.75px solid #444444;
+  border-bottom: 0.75px solid #444444;
+  padding-right: 60%;
+  margin-bottom: 0px;
+  font-size: 5px;
 }
 .dropdownStyle {
   .ant-menu-item a {
@@ -145,3 +145,38 @@
     background-color: white;
     }
 }
+.drawerContent{
+  // .ant-drawer-content{
+    // position: relative;
+    position: absolute;
+    top: 520px;
+    right: -10rem;
+    // overflow: visible;
+  // }
+}
+
+.optionslist {
+  font-size: 1.3rem;
+  .item {
+    display: flex;
+    justify-content: space-between;
+    border-radius: 5px;
+    padding: 10px 0px;
+    line-height: 36px;
+    font-size: 1.2rem;
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    & > div {
+        display: flex;
+        align-items: center;
+        img {
+          width: 30px;
+          margin-right: 5px;
+        }
+        p {
+          margin: 0;
+        }
+      }
+    }
+  }
