@@ -303,8 +303,6 @@ export default function ExchangeTVChart(props) {
       setLastCandle(candleData);
       console.log("print currentSeries", currentSeries);
       
-      console.log("print currentSeries", currentSeries);
-
       // HOW TO GET CHART DATA
       const ticks = currentSeries.Kn?.Bt?.Xr;
       //St: open high low close; rt[So]: time
@@ -321,9 +319,7 @@ export default function ExchangeTVChart(props) {
     });
     cleaner.current = clean;
     console.log("added new candles subscription for ", pairName)
-    //calculate 24h price change, use 5m data as chart is initiated with timescale 5m
     
-   
     const fetchPrevAndSubscribe = async () => {
       // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
       // SHOULD DO THIS BEFORE SUBSCRIBE, HOWEVER MOVING SUBSCRIBE TO AFTER THIS BLOCK OF CODE WILL CAUSE THE SUBSCRIPTION GOES ON FOREVER
@@ -349,7 +345,6 @@ export default function ExchangeTVChart(props) {
     let forwardArr = 86400 / CHART_PERIODS[period]
     let arrIndex = 999 - forwardArr
 
-    // let arrIndex = 279
     const latestTick = data[data.length - 1]?.St[0];
     let yesterday = data[data.length - 1 - forwardArr]?.St[0]
     

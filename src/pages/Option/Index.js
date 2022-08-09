@@ -7,6 +7,7 @@ import AcyCard from '@/components/AcyCard';
 import OptionComponent from '@/components/OptionComponent'
 import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
+import AcyPool from '@/components/AcyPool';
 
 import { fetcher, getInfoTokens, expandDecimals, useLocalStorageByChainId } from '@/acy-dex-futures/utils';
 // import { API_URL, useConstantLoader, getGlobalTokenList, constantInstance } from '@/constants';
@@ -247,37 +248,106 @@ const Option = props => {
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
-        <div className={`${styles.colItem} ${styles.priceChart}`}>
-          <div>
-            <div className={styles.chartTokenSelectorTab}>
-              <Row>
-                <PerpetualTabs
-                  option={activeToken1.symbol}
-                  options={KChartTokenList}
-                  onChange={selectTab}
-                />
-              </Row>
-
-              {visibleBTC ?
+        {mode == 'Pool'
+          ?
+          <AcyPool />
+          :
+          <div className={`${styles.colItem} ${styles.priceChart}`}>
+            <div>
+              <div className={styles.chartTokenSelectorTab}>
                 <Row>
-                  <Col>
-                    <div className={styles.tokenSelector} >
+                  <PerpetualTabs
+                    option={activeToken1.symbol}
+                    options={KChartTokenList}
+                    onChange={selectTab}
+                  />
+                </Row>
+
+                {visibleBTC ?
+                  <Row>
+                    <Col>
+                      <div className={styles.tokenSelector} >
+                        <StyledDrawer
+                          className={styles.drawerContent}
+                          placement="bottom"
+                          closable={false}
+                          onClose={onCloseBTC}
+                          visible={visibleBTC}
+                          getContainer={false}
+                          closeIcon={false}
+                          height={"517px"}
+                          style={{ width: "20rem" }}
+                        >
+                          <div className={styles.optionslist}>
+                            {optionsBTC.map((option) => (
+                              <div
+                                className={styles.item}
+                                onClick={() => onClickDropdownBTC(option)}
+                              >
+                                {option.tokenSymbol}-{option.optionSymbol}-{option.type}
+                                {option.type == "C" ?
+                                  <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
+                                  :
+                                  <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
+                                }
+                              </div>
+                            ))}
+                          </div>
+                        </StyledDrawer>
+                      </div>
+                    </Col>
+                  </Row> : null}
+
+                {visibleETH ?
+                  <Row>
+                    <Col>
                       <StyledDrawer
                         className={styles.drawerContent}
                         placement="bottom"
-                        closable={false}
-                        onClose={onCloseBTC}
-                        visible={visibleBTC}
+                        onClose={onCloseETH}
+                        visible={visibleETH}
                         getContainer={false}
                         closeIcon={false}
                         height={"517px"}
                         style={{ width: "20rem" }}
                       >
                         <div className={styles.optionslist}>
-                          {optionsBTC.map((option) => (
+                          {optionsETH.map((option) => (
                             <div
                               className={styles.item}
-                              onClick={() => onClickDropdownBTC(option)}
+                              onClick={() => onClickDropdownETH(option)}
+                            >
+                              {option.tokenSymbol}-{option.optionSymbol}-{option.type}
+                              {option.type == "C" ?
+                                <Col span={6} offset={2} style={{ fontSize: "0.8rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
+                                :
+                                <Col span={6} offset={2} style={{ fontSize: "0.8rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
+                              }
+                            </div>
+                          ))}
+                        </div>
+                      </StyledDrawer>
+                    </Col>
+                  </Row> : null}
+
+                {visibleMATIC ?
+                  <Row>
+                    <Col>
+                      <StyledDrawer
+                        className={styles.drawerContent}
+                        placement="bottom"
+                        onClose={onCloseMATIC}
+                        visible={visibleMATIC}
+                        getContainer={false}
+                        closeIcon={false}
+                        height={"517px"}
+                        style={{ width: "20rem", left: "10rem" }}
+                      >
+                        <div className={styles.optionslist}>
+                          {optionsMATIC.map((option) => (
+                            <div
+                              className={styles.item}
+                              onClick={() => onClickDropdownMATIC(option)}
                             >
                               {option.tokenSymbol}-{option.optionSymbol}-{option.type}
                               {option.type == "C" ?
@@ -289,75 +359,12 @@ const Option = props => {
                           ))}
                         </div>
                       </StyledDrawer>
-                    </div>
-                  </Col>
-                </Row> : null}
+                    </Col>
+                  </Row> : null}
+              </div>
 
-              {visibleETH ?
-                <Row>
-                  <Col>
-                    <StyledDrawer
-                      className={styles.drawerContent}
-                      placement="bottom"
-                      onClose={onCloseETH}
-                      visible={visibleETH}
-                      getContainer={false}
-                      closeIcon={false}
-                      height={"517px"}
-                      style={{ width: "20rem" }}
-                    >
-                      <div className={styles.optionslist}>
-                        {optionsETH.map((option) => (
-                          <div
-                            className={styles.item}
-                            onClick={() => onClickDropdownETH(option)}
-                          >
-                            {option.tokenSymbol}-{option.optionSymbol}-{option.type}
-                            {option.type == "C" ?
-                              <Col span={6} offset={2} style={{ fontSize: "0.8rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
-                              :
-                              <Col span={6} offset={2} style={{ fontSize: "0.8rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
-                            }
-                          </div>
-                        ))}
-                      </div>
-                    </StyledDrawer>
-                  </Col>
-                </Row> : null}
-
-              {visibleMATIC ?
-                <Row>
-                  <Col>
-                    <StyledDrawer
-                      className={styles.drawerContent}
-                      placement="bottom"
-                      onClose={onCloseMATIC}
-                      visible={visibleMATIC}
-                      getContainer={false}
-                      closeIcon={false}
-                      height={"517px"}
-                      style={{ width: "20rem", left: "10rem" }}
-                    >
-                      <div className={styles.optionslist}>
-                        {optionsMATIC.map((option) => (
-                          <div
-                            className={styles.item}
-                            onClick={() => onClickDropdownMATIC(option)}
-                          >
-                            {option.tokenSymbol}-{option.optionSymbol}-{option.type}
-                            {option.type == "C" ?
-                              <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
-                              :
-                              <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
-                            }
-                          </div>
-                        ))}
-                      </div>
-                    </StyledDrawer>
-                  </Col>
-                </Row> : null}
+              {/* </div> */}
             </div>
-
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
               <ExchangeTVChart
@@ -365,30 +372,30 @@ const Option = props => {
                 passTokenData={passTokenData}
               />
             </div>
-          </div>
 
-          <div className={styles.bottomWrapper}>
-            <div className={styles.bottomTab}>
-              <PerpetualTabs
-                option={tableContent}
-                options={["Positions", "Orders"]}
-                onChange={item => { setTableContent(item) }}
-              />
-            </div>
-          </div>
-          <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
-            <div className={`${styles.colItem} ${styles.priceChart}`}>
-              <div className={styles.positionsTable}>
-                {tableContent == "Positions" && (
-                  <div>POSITIONS</div>
-                )}
-                {tableContent == "Orders" && (
-                  <div>ORDERS</div>
-                )}
+            <div className={styles.bottomWrapper}>
+              <div className={styles.bottomTab}>
+                <PerpetualTabs
+                  option={tableContent}
+                  options={["Positions", "Orders"]}
+                  onChange={item => { setTableContent(item) }}
+                />
               </div>
             </div>
-          </AcyCard>
-        </div>
+            <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
+              <div className={`${styles.colItem} ${styles.priceChart}`}>
+                <div className={styles.positionsTable}>
+                  {tableContent == "Positions" && (
+                    <div>POSITIONS</div>
+                  )}
+                  {tableContent == "Orders" && (
+                    <div>ORDERS</div>
+                  )}
+                </div>
+              </div>
+            </AcyCard>
+          </div >
+        }
 
         <div className={`${styles.colItem} ${styles.optionComponent}`}>
           <AcyCard style={{ backgroundColor: 'transparent', border: 'none' }}>
@@ -402,9 +409,8 @@ const Option = props => {
             />
           </AcyCard>
         </div>
-      </div>
-
-    </div>
+      </div >
+    </div >
   );
 }
 

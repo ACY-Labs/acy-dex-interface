@@ -259,11 +259,7 @@ export default function ExchangeTVChart(props) {
       // console.log("hjhjhj prev data second: ", secondData)
       // console.log("prev data: ", prevData)
 
-      //calculate 24h price change, use 5m data as chart is initiated with timescale 5m
-      if( prevData && period != '1m' && period != '1w' ){
-        console.log("hjhjhj in if ")
-        getDeltaPriceChange(prevData)
-      }
+
 
       if (!chartInited) {
         scaleChart();

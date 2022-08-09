@@ -1,23 +1,3 @@
-/* eslint-disable no-restricted-globals */
-/* eslint-disable react/no-unescaped-entities */
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/button-has-type */
-/* eslint-disable arrow-body-style */
-/* eslint-disable no-unneeded-ternary */
-/* eslint-disable prefer-template */
-/* eslint-disable no-inner-declarations */
-/* eslint-disable radix */
-/* eslint-disable no-plusplus */
-/* eslint-disable prefer-const */
-/* eslint-disable consistent-return */
-/* eslint-disable react/jsx-curly-brace-presence */
-/* eslint-disable no-shadow */
-/* eslint-disable no-use-before-define */
-/* eslint-disable react/destructuring-assignment */
-/* eslint-disable camelcase */
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable import/order */
-/* eslint-disable import/extensions */
 import {
   AcyPerpetualCard,
   AcyDescriptions,
@@ -25,7 +5,6 @@ import {
 } from '@/components/Acy';
 import { PriceBox } from './components/PriceBox';
 import ConfirmationBox from './components/ConfirmationBox';
-import { GlpSwapBox, GlpSwapDetailBox } from './components/GlpSwapBox'
 import PerpetualTabs from './components/PerpetualTabs'
 import { MARKET, LIMIT, LONG, SHORT, SWAP, POOL, DEFAULT_HIGHER_SLIPPAGE_AMOUNT } from './constant'
 
@@ -68,7 +47,6 @@ import { getConstant } from '@/acy-dex-futures/utils/Constants'
 import Reader from '@/acy-dex-futures/abis/Reader.json'
 import Vault from '@/acy-dex-futures/abis/Vault.json'
 import Router from '@/acy-dex-futures/abis/Router.json'
-import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
 import Glp from '@/acy-dex-futures/abis/Glp.json'
 import useSWR from 'swr'
 
@@ -91,6 +69,7 @@ import { AcyRadioButton } from '@/components/AcyRadioButton';
 import { constantInstance } from '@/constants';
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 import AccountInfoGauge from '../AccountInfoGauge';
+import AcyPoolComponent from '../AcyPoolComponent';
 
 import styled from "styled-components";
 
@@ -225,12 +204,6 @@ const SwapComponent = props => {
     setIsConfirming,
     isPendingConfirmation,
     setIsPendingConfirmation,
-    isBuying,
-    setIsBuying,
-    swapTokenAddress,
-    setSwapTokenAddress,
-    glp_isWaitingForApproval,
-    glp_setIsWaitingForApproval,
     orders,
     minExecutionFee
   } = props;
@@ -297,11 +270,6 @@ const SwapComponent = props => {
   const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
   const routerAddress = perpetuals.getContract("Router")
   const orderBookAddress = perpetuals.getContract("OrderBook")
-  const glpManagerAddress = perpetuals.getContract("GlpManager")
-  const glpAddress = perpetuals.getContract("GLP")
-
-  const { farmSetting: { RPC_URL } } = useConstantLoader();
-  const provider = new JsonRpcProvider(RPC_URL, chainId);
 
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
@@ -1487,50 +1455,6 @@ const SwapComponent = props => {
     receiveBalance = `$${formatAmount(toUsdMax, USD_DECIMALS, 2, true)}`
   }
 
-  // Glp Swap Component
-  // const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
-  // const { data: balancesAndSupplies, mutate: updateBalancesAndSupplies } = useSWR([chainId, readerAddress, "getTokenBalancesWithSupplies", account || PLACEHOLDER_ACCOUNT], {
-  //   fetcher: fetcher(library, ReaderV2, [tokensForBalanceAndSupplyQuery]),
-  // })
-  // const { data: aums, mutate: updateAums } = useSWR([chainId, glpManagerAddress, "getAums"], {
-  //   fetcher: fetcher(library, GlpManager),
-  // })
-  const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, glpAddress, "balanceOf", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, Glp),
-  })
-  // const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, feeGlpTrackerAddress, "stakedAmounts", account || PLACEHOLDER_ACCOUNT], {
-  //   fetcher: fetcher(library, RewardTracker),
-  // })
-  // const { data: reservedAmount, mutate: updateReservedAmount } = useSWR([chainId, glpVesterAddress, "pairAmounts", account || PLACEHOLDER_ACCOUNT], {
-  //   fetcher: fetcher(library, Vester),
-  // })
-  // const { gmxPrice, mutate: updateGmxPrice } = useGmxPrice(chainId, { arbitrum: library }, active)
-  // const rewardTrackersForStakingInfo = [ stakedGlpTrackerAddress, feeGlpTrackerAddress ]
-  // const { data: stakingInfo, mutate: updateStakingInfo } = useSWR([chainId, rewardReaderAddress, "getStakingInfo", account || PLACEHOLDER_ACCOUNT], {
-  //   fetcher: fetcher(library, RewardReader, [rewardTrackersForStakingInfo]),
-  // })
-
-  const { data: glpSupply, mutate: updateGlpSupply } = useSWR([chainId, glpAddress, "totalSupply"], {
-    fetcher: fetcher(library, Glp),
-  })
-  // const glpSupply = balancesAndSupplies ? balancesAndSupplies[1] : bigNumberify(0)
-  // const glp_usdgSupply = balancesAndSupplies ? balancesAndSupplies[3] : bigNumberify(0)
-  // let aum
-  // if (aums && aums.length > 0) {
-  //   aum = isBuying ? aums[0] : aums[1]
-  // }
-  const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsda", true], {
-    fetcher: fetcher(library, GlpManager),
-  })
-  const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0)) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
-  // const glpPrice = (aum && aum.gt(0) && glpSupply.gt(0)) ? aum.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
-  let glpBalanceUsd
-  if (glpBalance) {
-    glpBalanceUsd = glpBalance.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
-  }
-  const glpSupplyUsd = glpSupply ? glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS)) : bigNumberify(0)
-  const glp_infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
-
   return (
     <div className={styles.mainContent}>
       <AcyPerpetualCard style={{ backgroundColor: 'transparent', height: '1100px' }}>
@@ -1542,7 +1466,7 @@ const SwapComponent = props => {
           />
         </div>
 
-        {mode !== POOL ?
+        {mode !== POOL &&
           <>
             <div className={styles.typeSelector}>
               <PerpetualTabs
@@ -1567,8 +1491,8 @@ const SwapComponent = props => {
             />
 
             {/* <div className={styles.arrow} onClick={switchTokens}>
-              <Icon style={{ fontSize: '16px' }} type="arrow-down" />
-            </div> */}
+          <Icon style={{ fontSize: '16px' }} type="arrow-down" />
+        </div> */}
 
             <BuyInputSection
               token={toToken}
@@ -1646,13 +1570,13 @@ const SwapComponent = props => {
                       }
                     </div>
                     {/* <div className={styles.checkbox}>
-                      <StyledCheckbox
-                        checked={isLeverageSliderEnabled}
-                        onChange={() => {
-                          setIsLeverageSliderEnabled(!isLeverageSliderEnabled)
-                        }}
-                      />
-                    </div> */}
+                  <StyledCheckbox
+                    checked={isLeverageSliderEnabled}
+                    onChange={() => {
+                      setIsLeverageSliderEnabled(!isLeverageSliderEnabled)
+                    }}
+                  />
+                </div> */}
                   </div>
                   {isLeverageSliderEnabled &&
                     <span className={styles.leverageSlider}>
@@ -1683,17 +1607,6 @@ const SwapComponent = props => {
               </AcyPerpetualButton>
               {/* </AcyButton> */}
             </div>
-          </> :
-          <>
-            <GlpSwapBox
-              isBuying={isBuying}
-              setIsBuying={setIsBuying}
-              swapTokenAddress={swapTokenAddress}
-              setSwapTokenAddress={setSwapTokenAddress}
-              isWaitingForApproval={glp_isWaitingForApproval}
-              setIsWaitingForApproval={glp_setIsWaitingForApproval}
-              setPendingTxns={setPendingTxns}
-            />
           </>
         }
 
@@ -1942,25 +1855,8 @@ const SwapComponent = props => {
           </>
         }
 
-        {/* Swap detail box */}
         {mode === POOL &&
-          <>
-            <GlpSwapDetailBox
-              isBuying={isBuying}
-              setIsBuying={setIsBuying}
-              tokens={tokens}
-              infoTokens={glp_infoTokens}
-              glpPrice={glpPrice}
-              glpBalance={glpBalance}
-              glpBalanceUsd={glpBalanceUsd}
-              // reservedAmount={reservedAmount}
-              // reserveAmountUsd={reserveAmountUsd}
-              // stakingInfo={stakingInfo}
-              glpSupply={glpSupply}
-              glpSupplyUsd={glpSupplyUsd}
-            // gmxPrice={gmxPrice}
-            />
-          </>
+          <AcyPoolComponent />
         }
 
       </AcyPerpetualCard>
