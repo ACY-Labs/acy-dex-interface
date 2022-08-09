@@ -54,7 +54,7 @@ const TokenWeightChart = (props) => {
           position: 'middle',
           content: (item) => {
             let percent = (item.pool*100).toFixed(2)
-            return percent!=0 ? percent+"%" : ""
+            return percent>5 ? percent+"%" : ""
           },
           style: {
             fill: '#fff',
