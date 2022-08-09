@@ -303,26 +303,23 @@ export default function ExchangeTVChart(props) {
       setLastCandle(candleData);
       console.log("print currentSeries", currentSeries);
       
-      console.log("print currentSeries", currentSeries);
-
       // HOW TO GET CHART DATA
       const ticks = currentSeries.Kn?.Bt?.Xr;
+      //St: open high low close; rt[So]: time
       console.log("chartData: ", ticks);
       const oldestTick = ticks[0];
       const latestTick = ticks[ticks.length - 1];
       if (oldestTick) {
         console.log(`oldest tick: Open=${oldestTick.St[0]}, timestamp=${oldestTick.rt.So}`)
       }
+      if( ticks && period != '1m' && period != '1w' ){
+        console.log("hjhjhj in if ", ticks)
+        getDeltaPriceChange(ticks)
+      }
     });
     cleaner.current = clean;
     console.log("added new candles subscription for ", pairName)
-
-    // if (Object.keys(currentSeries.cM.yM.Xw).length){
-    //   let timeNow = getCurrentTimestamp()
-    //   let forwardArr = 86400 / CHART_PERIODS[period]
-    // }
-  
-   
+    
     const fetchPrevAndSubscribe = async () => {
       // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
       // SHOULD DO THIS BEFORE SUBSCRIBE, HOWEVER MOVING SUBSCRIBE TO AFTER THIS BLOCK OF CODE WILL CAUSE THE SUBSCRIPTION GOES ON FOREVER
@@ -330,15 +327,9 @@ export default function ExchangeTVChart(props) {
       console.log("fetchPrevAndSubscribe again: ", chartToken.symbol)
       // Binance data is independent of chain, so here we can fill in any chain name
       const prevData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`).then(res => res.data);
+      console.log("hjhjhj prev data check error: ", prevData)
+
       currentSeries.setData(prevData);
-      console.log("hjhjhj prev data: ", prevData)
-
-
-      //calculate 24h price change, use 5m data as chart is initiated with timescale 5m
-      if( prevData && period != '1m' && period != '1w' ){
-        console.log("hjhjhj in if ")
-        getDeltaPriceChange(prevData)
-      }
 
       scaleChart();
     }
@@ -347,28 +338,28 @@ export default function ExchangeTVChart(props) {
     // fetchDeltaPriceChange()
   }, [chartToken.symbol, period])
 
-  const getDeltaPriceChange =  (prevData) => {
-    console.log("hjhjhj prev data in get: ", prevData)
+  const getDeltaPriceChange =  (data) => {
+    console.log("hjhjhj prev data in get: ", data)
     let timeNow = getCurrentTimestamp()
     // console.log("hjhjhj currentseries curtime now", timeNow, "period", period, CHART_PERIODS[period])
     let forwardArr = 86400 / CHART_PERIODS[period]
     let arrIndex = 999 - forwardArr
-    console.log("hjhjhj prev data check error: ", prevData[999].time, CHART_PERIODS[period], forwardArr, prevData[arrIndex].time)
 
-    // let arrIndex = 279
-    let today = prevData[999].open
-    let yesterday = prevData[arrIndex].open
-    let deltaPercent = ((today - yesterday) / yesterday * 100).toString() ;
+    const latestTick = data[data.length - 1]?.St[0];
+    let yesterday = data[data.length - 1 - forwardArr]?.St[0]
+    
+    let deltaPercent = ((latestTick - yesterday) / yesterday * 100).toString() ;
+    // console.log("hjhjhj tick data check error: ", latestTick, yesterday, deltaPercent)
     if (deltaPercent && deltaPercent[0] == "-") {
       setDeltaIsMinus(true)
-      let negativeCurrentPrice = today
+      let negativeCurrentPrice = latestTick
       let negativePriceChangePercent = deltaPercent.substring(1)
       setCurPrice(parseFloat(negativeCurrentPrice).toFixed(2))
       setPriceChangePercentDelta(parseFloat(negativePriceChangePercent).toFixed(3))
     }
     else {
       setDeltaIsMinus(false)
-      let positiveCurrentPrice = today
+      let positiveCurrentPrice = latestTick
       let positivePricechangePercent = deltaPercent
       setCurPrice(parseFloat(positiveCurrentPrice).toFixed(2))
       setPriceChangePercentDelta(parseFloat(positivePricechangePercent).toFixed(3))
