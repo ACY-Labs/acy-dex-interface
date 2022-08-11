@@ -8,20 +8,24 @@
   font-family: "Karla", sans-serif;
 }
 
+.topChart {
+  color: #16182E;
+}
+
 .chartGrid {
   color: #16182E;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   margin-top: 1rem;
+}
 
-  .statsContainer {
-    width: 100%;
-    padding: 20px;
-    overflow: hidden;
-    border: 0.75px solid #333333;
-    border-radius: 5px;
-  }
+.statsContainer {
+  width: 100%;
+  padding: 20px;
+  overflow: hidden;
+  border: 0.75px solid #333333;
+  border-radius: 5px;
 
   .statstitle {
     font-size: 16px;
@@ -30,6 +34,7 @@
     color: #FFFFFF;
     display: grid;
     grid-template-columns: 1fr auto;
+    margin-bottom: 10px;
     
     .seeMore {
       color: #a9a9b0;
@@ -41,30 +46,30 @@
       }
     }
   }
-
+  
   .statsdivider {
     height: 0.75px;
     background: #333333;
     margin: 0.7rem -1rem;
   }
-
+  
   .statscontent {
     display: flex;
     flex-direction: column;
   }
-
+  
   .statsRow {
     display: grid;
     grid-template-columns: 1fr auto;
     grid-column-gap: 1rem;
     padding: unset;
-
+  
     .label {
       color: #a9a9b0;
       font-size: 15px;
       opacity: 1;
     }
-
+  
     .value {
       color: #a9a9b0;
       font-size: 15px;
