@@ -79,6 +79,121 @@ const TokenBanner = ({ posterUrl }) => {
   );
 };
 
+const networkParams = {
+  "0x38": {
+    chainId: '0x38',
+    chainName: 'Binance Smart Chain Netwaok',
+    nativeCurrency: {
+      name: 'Binance',
+      symbol: 'BNB', // 2-6 characters long
+      decimals: 18
+    },
+    blockExplorerUrls: ['https://bscscan.com'],
+    rpcUrls: ['https://bsc-dataseed.binance.org/'],
+  },
+  "0x61": {
+    chainId: '0x61',
+    chainName: 'Binance Smart Chain Testnet',
+    nativeCurrency: {
+      name: 'Binance',
+      symbol: 'BNB', // 2-6 characters long
+      decimals: 18
+    },
+    blockExplorerUrls: ['https://testnet.bscscan.com'],
+    rpcUrls: ['https://data-seed-prebsc-1-s1.binance.org:8545/'],
+  },
+  "0x89": {
+    chainId: '0x89',
+    chainName: 'Polygon',
+    nativeCurrency: {
+      name: 'Matic',
+      symbol: 'MATIC', // 2-6 characters long
+      decimals: 18
+    },
+    blockExplorerUrls: ['https://polygonscan.com/'],
+    rpcUrls: ['https://polygon-rpc.com/'],
+  },
+  "0xA4B1": {
+    chainId: '0xA4B1',
+    chainName: 'Arbitrum',
+    nativeCurrency: {
+      name: 'ETH',
+      symbol: 'ETH', // 2-6 characters long
+      decimals: 18
+    },
+    blockExplorerUrls: ['https://arbiscan.io/'],
+    rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+  },
+};
+
+const switchEthereumChain = async (chainId) => {
+  const chainId_hex = "0x" + chainId.toString(16);
+
+  if (localStorage.getItem("wallet") == "metamask") {
+    try {
+      await ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: chainId_hex }],
+      });
+    } catch (e) {
+      if (e.code === 4902) {
+        try {
+          await ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              networkParams[chainId_hex]
+            ],
+          });
+        } catch (addError) {
+          console.error(addError);
+        }
+      }
+    }
+  }
+  else if (localStorage.getItem("wallet") == "nabox") {
+    try {
+      await NaboxWallet.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: chainId_hex }],
+      });
+    } catch (e) {
+      if (e.code === 4902) {
+        try {
+          await NaboxWallet.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              networkParams[chainId_hex]
+            ],
+          });
+        } catch (addError) {
+          console.error(addError);
+        }
+      }
+    }
+  }
+  else if (localStorage.getItem("wallet") == "binance") {
+    try {
+      await BinanceChain.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: chainId_hex }],
+      });
+    } catch (e) {
+      if (e.code === 4902) {
+        try {
+          await BinanceChain.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              networkParams[chainId_hex]
+            ],
+          });
+        } catch (addError) {
+          console.error(addError);
+        }
+      }
+    }
+  }
+}
+
 const TokenLogoLabel = ({ projectName, tokenLogo, receivedData }) => {
 
   const clickToWebsite = () => {
@@ -1103,6 +1218,11 @@ const LaunchpadProject = () => {
           console.log("fecthing project info ------------111", res.contextData)
           const contextData = JSON.parse(res.contextData);
 
+          res['chainId'] = res.basicInfo.chainId;
+          if (res['chainId'] !== chainId) {
+            switchEthereumChain(res['chainId']);
+          }
+
           res['tokenLabels'] = contextData['tokenLabels'];
           res['projectDescription'] = contextData['projectDescription'];
           res['alreadySale'] = contextData['alreadySale'];
@@ -1139,7 +1259,7 @@ const LaunchpadProject = () => {
           // get state to hide graph and table
           const curT = new Date()
           if (curT < res.scheduleInfo.saleStart) setCompareAlloDate(true)
-          const tokenList = ConstantLoader()['tokenList'];
+          const tokenList = ConstantLoader(res['chainId'])['tokenList'];
           console.log(tokenList);
           const mainCoinInfo = tokenList.find(item => item.symbol == res.basicInfo.mainCoin)
           // const mainCoinInfo = TOKEN_LIST().find(item => item.symbol == res.basicInfo.mainCoin)
