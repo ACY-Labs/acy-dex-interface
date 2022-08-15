@@ -25,6 +25,7 @@ import {
 
 import { SCAN_URL_PREFIX, useConstantLoader, getGlobalTokenList } from "@/constants";
 import { ConsoleSqlOutlined } from '@ant-design/icons';
+import { PairsTable } from './searchModalTables';
 
 
 const { AcyTabPane } = AcyTabs;
@@ -109,7 +110,7 @@ export class SmallTable extends React.Component {
             style={{ color: 'white' }}
             className={styles.coinName}
             to={`/trade#${entry.symbol}`}
-            onClick={()=>{
+            onClick={() => {
               this.props.setVisibleSearchBar(false)
               this.props.setSearchQuery('')
             }}
@@ -455,55 +456,85 @@ export const SearchBar = props => {
     };
   }, []);
 
+  const testPairs = [
+    {
+      name: 'USDT/ACY-ACY',
+      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
+      tokenAddress: '...2882d623e53a',
+      pairAddress: '...6e29394154f7',
+      tx: 23145,
+      chain: 'BNBChain',
+      company: 'ACY Finance',
+    },
+    {
+      name: 'ACY/RUBY-RUBY',
+      logoURI: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389',
+      tokenAddress: '...2882d623e53a',
+      pairAddress: '...6e29394154f7',
+      tx: 23145,
+      chain: 'BNBChain',
+      company: 'ACY Finance',
+    },
+    {
+      name: 'ACY/DXS - DX SPOT',
+      logoURI: 'https://assets.coingecko.com/coins/images/9576/large/BUSD.png?1568947766',
+      tokenAddress: '...2882d623e53a',
+      pairAddress: '...6e29394154f7',
+      tx: 23145,
+      chain: 'BNBChain',
+      company: 'ACY Finance',
+    },
+  ]
+
   // the DOM itself
   return (
-      <div
-        className={styles.marketNavbar}
-        style={{ opacity: visible ? 1 : 0, zIndex: visible ? 10 : -1 }}
-        ref={rootRef}>
-        {/* search bar */}
-        <div className={styles.marketNavbarRight}>
-          <div className={styles.searchSection}>
-            {/* this is the gray background */}
-            {visibleSearchBar && <div className={styles.searchBackground} />}
-            <div ref={outsideClickRef}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexDirection: 'column',
-                  width: '100%',
-                }}
-              >
-                <div className={styles.searchWrapper}>
-                  <div className={styles.searchInnerWrapper}>
-                    <Input
-                      placeholder="Search"
-                      size="large"
-                      style={{
-                        backgroundColor: 'black',
-                        borderRadius: '5px',
-                        border: '1px solid #333333',
-                        paddingLeft: '20px',
-                        height: '50%',
-                        fontSize: '14px',
-                      }}
-                      onFocus={onSearchFocus}
-                      onChange={onInput}
-                      className={styles.searchBar}
-                      value={'' || searchQuery}
-                    />
-                  </div>
+    <div
+      className={styles.marketNavbar}
+      style={{ opacity: visible ? 1 : 0, zIndex: visible ? 10 : -1 }}
+      ref={rootRef}>
+      {/* search bar */}
+      <div className={styles.marketNavbarRight}>
+        <div className={styles.searchSection}>
+          {/* this is the gray background */}
+          {visibleSearchBar && <div className={styles.searchBackground} />}
+          <div ref={outsideClickRef}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                flexDirection: 'column',
+                width: '610px',
+              }}
+            >
+              <div className={styles.searchWrapper}>
+                <div className={styles.searchInnerWrapper}>
+                  <Input
+                    placeholder="Search"
+                    size="large"
+                    style={{
+                      backgroundColor: 'black',
+                      borderRadius: '5px',
+                      border: '1px solid #333333',
+                      paddingLeft: '20px',
+                      height: '50%',
+                      fontSize: '14px',
+                    }}
+                    onFocus={onSearchFocus}
+                    onChange={onInput}
+                    className={styles.searchBar}
+                    value={'' || searchQuery}
+                  />
                 </div>
-                {/* Search modal */}
-                <div style={{ width: '100%', position: 'relative', zIndex: 10 }}>
-                  {visibleSearchBar && (
-                    <div
-                      className={styles.searchModal}
-                      style={{ position: 'absolute', left: 0, right: 0, top: '10px' }}
-                    >
-                      <AcyTabs>
-                        <AcyTabPane tab="Search" key="1">
+              </div>
+              {/* Search modal */}
+              <div style={{ width: '100%', position: 'relative', zIndex: 10 }}>
+                {visibleSearchBar && (
+                  <div
+                    className={styles.searchModal}
+                    style={{ position: 'absolute', left: 0, right: 0, top: '10px' }}
+                  >
+                    <AcyTabs>
+                      {/* <AcyTabPane tab="Search" key="1">
                           {isLoading ? (
                             <Icon type="loading" />
                           ) : (
@@ -522,17 +553,46 @@ export const SearchBar = props => {
                               )}
                             </>
                           )}
-                        </AcyTabPane>
-                      </AcyTabs>
-                    </div>
-                  )}
-                </div>
+                        </AcyTabPane> */}
+                      <AcyTabPane tab="Pairs" key="1">
+                        {isLoading ? (
+                          <Icon type="loading" />
+                        ) : (
+                          <>
+                            {testPairs.length > 0 ? (
+                              <PairsTable
+                                mode="pairs"
+                                data={testPairs}
+                              />
+                            ) : (
+                              <div style={{ fontSize: '16x', margin: '20px' }}>No results</div>
+                            )}
+                          </>
+                        )}
+                      </AcyTabPane>
+                      <AcyTabPane tab="Top Volume" key="2">
+                        <Icon type="loading" />
+                      </AcyTabPane>
+                      <AcyTabPane tab="Trending" key="3">
+                        <Icon type="loading" />
+                      </AcyTabPane>
+                      <AcyTabPane tab="Winners" key="4">
+                        <Icon type="loading" />
+                      </AcyTabPane>
+                      <AcyTabPane tab="Losers" key="5">
+                        <Icon type="loading" />
+                      </AcyTabPane>
+
+                    </AcyTabs>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-
         </div>
 
       </div>
+
+    </div>
   );
 };
