@@ -79,7 +79,7 @@ const VestingSchedule = ({ vestingDate, stageData, vestingClick, receivedData })
                 <div className="vesting-schedule-text">
                   <div className='vesting-percentage-claim-container'>
                     <div className="vesting-percentage-container">
-                      <p className="vesting-percentage">{stageData[index] / totalStageSum * 100}%</p>
+                      <p className="vesting-percentage">{(stageData[index] / totalStageSum * 100).toPrecision(4)}%</p>
                     </div>
                     <div className="vesting-text-container">
                       <p className="vesting-text">

@@ -1056,7 +1056,7 @@ const Allocation = ({
 
             <div className='vesting-trigger-container' onClick={() => setIsClickedVesting(!isClickedVesting)}>
               <div className="text-line-container">
-                <p>Unlock {poolDistributionStage[0]}% at TGE, vesting in {poolDistributionStage.length} stages: </p>
+                <p>Unlock {(poolDistributionStage[0] * 100 / poolDistributionStage.reduce((a, b) => parseInt(a) + parseInt(b), 0)).toPrecision(4)}% at TGE, vesting in {poolDistributionStage.length} stages: </p>
                 <span className="vesting-line" />
 
               </div>
