@@ -182,6 +182,42 @@ const MarketIndex = props => {
       pool_variation: '15.13%',
       pool_remaining: '1.72683 ETH',
     },
+    {
+      name: 'USDC/PANKY',
+      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
+      listed_since: '32s',
+      price: '-',
+      volume: '-',
+      initial_liquidity: '-',
+      total_liquidity: '-',
+      pool_amount: '-',
+      pool_variation: '0%',
+      pool_remaining: '-',
+    },
+    {
+      name: 'WETH/ROWA',
+      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
+      listed_since: '2m 40s',
+      price: '$0.00002431',
+      volume: '-',
+      initial_liquidity: '2022-08-06',
+      total_liquidity: '$5310.16',
+      pool_amount: '1.55 ETH',
+      pool_variation: '0.06%',
+      pool_remaining: '1.6236 ETH',
+    },
+    {
+      name: 'WETH/OYA',
+      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
+      listed_since: '10m 30s',
+      price: '$0.00004183',
+      volume: '-',
+      initial_liquidity: '2022-08-06',
+      total_liquidity: '$5914.87',
+      pool_amount: '1.5 ETH',
+      pool_variation: '15.13%',
+      pool_remaining: '1.72683 ETH',
+    },
   ]
 
   return (
@@ -200,32 +236,7 @@ const MarketIndex = props => {
             </div>
             {/* <div className={styles.statsdivider} /> */}
 
-            <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                <div className={styles.label}>1. WETH/</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>2. WETH/MOWO</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>3. WETH/Cocaine Inu</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>4. WETH/Cocaine Inu</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>5. WETH/Cocaine Inu</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-            </div>
+            <LivePairsTable dataSource={test_livepairs.slice(0, 5)} />
 
           </div>
         </div>
