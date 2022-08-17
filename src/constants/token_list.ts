@@ -25,7 +25,7 @@ const BscMainNetTokenList: Array<TokenInfo> = [
     address: '0xc94595b56e301f3ffedb8ccc2d672882d623e53a',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
+    logoURI: 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/icon_acy.svg',
     idOnCoingecko: "acy-finance",
   },
   {
@@ -157,7 +157,7 @@ const BscTestNetTokenList: Array<TokenInfo> = [
     addressOnEth: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
+    logoURI: 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/icon_acy.svg',
     idOnCoingecko: "acy-finance",
   },
 
@@ -384,7 +384,7 @@ const PolygonMainNetTokenList: Array<TokenInfo> = [
     address: '0x8b1f836491903743fe51acd13f2cc8ab95b270f6',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
+    logoURI: 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/icon_acy.svg',
     idOnCoingecko: "acy-finance",
   },
   {
@@ -458,7 +458,7 @@ const PolygonTestNetTokenList: Array<TokenInfo> = [
     address: '0x95d4aA0324aABbF595F0C01F786c3bAB2A6a1b5e',
     isStable: false,
     decimals: 18,
-    logoURI: 'https://acy.finance/static/media/logo.78c0179c.svg',
+    logoURI: 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/icon_acy.svg',
     idOnCoingecko: "acy-finance",
   },
   {
