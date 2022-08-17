@@ -6,12 +6,16 @@ import React, { useState, useMemo } from 'react'
 import { Icon, Table, Tooltip, Button } from 'antd'
 import className from 'classnames'
 import { AcyTokenIcon, AcyButton } from '@/components/Acy'
+import ExchangeInfoRow from '@/components/PerpetualComponent/components/ExchangeInfoRow'
 import {
   abbrNumber,
   isDesktop,
   sortTable,
 } from '@/pages/Market/Util';
 import styles from './SwapTokenTable.less';
+// import { API_URL } from '@/constants';
+import axios from 'axios'; 
+
 
 export default function TokenTable(props) {
   const [tokenSortAscending, setTokenSortAscending] = useState(true);
@@ -28,6 +32,38 @@ export default function TokenTable(props) {
       }, 0)
     )
   }, [weight])
+
+  const buttonDisabled = useMemo(() => {
+    return unusedWeight==0? false : true
+  },[weight])
+
+  const API_URL = () => { return "http://localhost:3001/bsc-main/api" }
+  const handleClick = (e) => {
+    console.log("LIST",props)
+    let _weight = []
+    for (const [key,value] of Object.entries(weight)){
+      _weight.push({
+        "tokenName":key,
+        "weight":value
+      })
+    }
+    console.log("Weight",_weight)
+    console.log("WalletId",props.account)
+    try{
+      axios.post(
+          `${API_URL()}/vote/addvote?walletId=${props.account}`,{
+            "lpToken":"100",
+            "acyToken":"500",
+            "voteWeight":_weight
+          }
+      ).then((response)=>{
+        console.log(response)
+      })
+    }catch(e){
+        console.log("service not working...")
+    }
+    // LpToken, AcyToken
+  }
 
   function columnsCoin(isAscending, onSortChange, isBuying, onClickSelectToken) {
     return [
@@ -125,6 +161,21 @@ export default function TokenTable(props) {
                   [name]: value
                 }))
               }}
+              onBlur={e => {
+                const { name, value} = e.target
+                if (value < 0 || isNaN(value)){
+                    setWeight(prevWeight => ({
+                        ...prevWeight,
+                        [name]: 0
+                      }))
+                }
+                if (unusedWeight < 0){
+                  setWeight(prevWeight => ({
+                      ...prevWeight,
+                      [name]: parseFloat(value)+parseFloat(unusedWeight)
+                      }))
+                }
+              }}
               disabled={confirmation[entry.name]}
               max="30"
             />
@@ -217,6 +268,8 @@ export default function TokenTable(props) {
             borderColor: 'transparent',
             width: '30%'
           }}
+          disabled={buttonDisabled}
+          onClick={handleClick}
         >Vote</Button>
       </div>
     </div>

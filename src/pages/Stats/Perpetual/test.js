@@ -24,7 +24,8 @@ export const COLORS = [
   '#6464ff',
   'purple',
   'darkgreen',
-  RED
+  RED,
+  '#eb5c20',
 ];
 
 export const COINCOLORS = [

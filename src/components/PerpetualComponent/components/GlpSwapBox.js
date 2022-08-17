@@ -139,7 +139,6 @@ export const GlpSwapBox = (props) => {
     setSwapTokenAddress,
     isWaitingForApproval,
     setIsWaitingForApproval,
-    setPendingTxns
   } = props
 
   const { account } = useConstantLoader(props)
@@ -836,7 +835,8 @@ export const GlpSwapTokenTable = (props) => {
     glpAmount,
     glpPrice,
     usdgSupply,
-    totalTokenWeights
+    totalTokenWeights,
+    account
   } = props
 
   const onSelectSwapToken = (token) => {
@@ -911,6 +911,11 @@ export const GlpSwapTokenTable = (props) => {
           dataSourceCoin={tokenListData}
           isBuying={isBuying}
           onClickSelectToken={onSelectSwapToken}
+          glpAmount={glpAmount}
+          glpPrice={glpPrice}
+          usdgSupply={usdgSupply}
+          totalTokenWeights={totalTokenWeights}
+          account={account}
         />)
         : (<Icon type="loading" />)}
     </>

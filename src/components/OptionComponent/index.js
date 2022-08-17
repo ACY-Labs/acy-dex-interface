@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'umi';
 import styled from 'styled-components';
 import { Slider, Input, Button } from 'antd';
-import { Gauge } from 'ant-design-pro/lib/Charts';
 import { useConstantLoader } from '@/constants';
 import { useLocalStorageSerializeKey } from '@/acy-dex-futures/utils';
 import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
 import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
+import AccountInfoGauge from '../AccountInfoGauge';
+import AcyPoolComponent from '../AcyPoolComponent';
 
 import styles from './styles.less';
+import AcyPool from '../AcyPool';
 
 const OptionComponent = props => {
 
@@ -19,6 +21,7 @@ const OptionComponent = props => {
     setVolume,
     percentage,
     setPercentage,
+    powers,
   } = props
 
   const {
@@ -28,11 +31,8 @@ const OptionComponent = props => {
     farmSetting: { INITIAL_ALLOWED_SLIPPAGE }
   } = useConstantLoader(props);
 
-  const optionMode = ['Buy', 'Sell']
-  const modeSelect = mode => {
-    setMode(mode)
-  }
-
+  const optionMode = ['Buy', 'Sell', 'Pool']
+  
   const [leverageOption, setLeverageOption] = useLocalStorageSerializeKey([chainId, "Option-leverage-value"], "2");
   const leverageMarks = {
     1: {
@@ -152,146 +152,113 @@ const OptionComponent = props => {
           <PerpetualTabs
             option={mode}
             options={optionMode}
-            onChange={modeSelect}
+            onChange={(mode)=>{setMode(mode)}}
           />
         </div>
 
-        <div className={styles.rowFlexContainer}>
-          <span className={styles.title}>Set Volume</span>
+        {mode == 'Pool'
+          ?
+            <AcyPoolComponent />
+          :
+          <>
+            <div className={styles.rowFlexContainer}>
 
-          <div className={styles.inputContainer}>
-            <input
-              type="number"
-              min="0"
-              placeholder="0.0"
-              className={styles.optionInput}
-              value={volume}
-              onChange={e => {
-                setVolume(e.target.value)
-                setShowDescription(true)
-              }}
-            />
-            <span className={styles.inputLabel}>USD</span>
-          </div>
+              <div className={styles.inputContainer}>
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Amount"
+                  className={styles.optionInput}
+                  value={volume}
+                  onChange={e => {
+                    setVolume(e.target.value)
+                    setShowDescription(true)
+                  }}
+                />
+                <span className={styles.inputLabel}>USD</span>
+              </div>
 
-          <div className={styles.buttonContainer}>
-            {getPercentageButton('25%')}
-            {getPercentageButton('50%')}
-            {getPercentageButton('75%')}
-            {getPercentageButton('100%')}
-          </div>
+              <div className={styles.buttonContainer}>
+                {getPercentageButton('25%')}
+                {getPercentageButton('50%')}
+                {getPercentageButton('75%')}
+                {getPercentageButton('100%')}
+              </div>
 
-          {showDescription ?
-            <AcyDescriptions>
-              <div className={styles.breakdownTopContainer}>
-                <div className={styles.slippageContainer}>
-                  <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-                    <Input
-                      className={styles.input}
-                      value={inputSlippageTol || ''}
-                      onChange={e => {
-                        setInputSlippageTol(e.target.value);
-                      }}
-                      suffix={<strong>%</strong>}
-                    />
-                    <Button
-                      type="primary"
-                      style={{
-                        marginLeft: '10px',
-                        background: '#2e3032',
-                        borderColor: 'transparent',
-                      }}
-                      onClick={() => {
-                        if (isNaN(inputSlippageTol)) {
-                          setSlippageError('Please input valid slippage value!');
-                        } else {
-                          setSlippageError('');
-                          setSlippageTolerance(parseFloat(inputSlippageTol));
-                        }
-                      }}
-                    >
-                      Set
-                    </Button>
+              {showDescription ?
+                <AcyDescriptions>
+                  <div className={styles.breakdownTopContainer}>
+                    <div className={styles.slippageContainer}>
+                      <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+                        <Input
+                          className={styles.input}
+                          value={inputSlippageTol || ''}
+                          onChange={e => {
+                            setInputSlippageTol(e.target.value);
+                          }}
+                          suffix={<strong>%</strong>}
+                        />
+                        <Button
+                          type="primary"
+                          style={{
+                            marginLeft: '10px',
+                            background: '#2e3032',
+                            borderColor: 'transparent',
+                          }}
+                          onClick={() => {
+                            if (isNaN(inputSlippageTol)) {
+                              setSlippageError('Please input valid slippage value!');
+                            } else {
+                              setSlippageError('');
+                              setSlippageTolerance(parseFloat(inputSlippageTol));
+                            }
+                          }}
+                        >
+                          Set
+                        </Button>
+                      </div>
+                      {slippageError.length > 0 && (
+                        <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
+                      )}
+                    </div>
+                    <div className={styles.slippageContainer}>
+                      <span style={{ fontWeight: 600, marginBottom: '10px' }}>Transaction deadline</span>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          height: '33.6px',
+                          marginTop: '10px',
+                        }}
+                      >
+                        <Input
+                          className={styles.input}
+                          type="number"
+                          value={Number(deadline).toString()}
+                          onChange={e => setDeadline(e.target.valueAsNumber || 0)}
+                          placeholder={30}
+                          suffix={<strong>minutes</strong>}
+                        />
+                      </div>
+                    </div>
                   </div>
-                  {slippageError.length > 0 && (
-                    <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
-                  )}
-                </div>
-                <div className={styles.slippageContainer}>
-                  <span style={{ fontWeight: 600, marginBottom: '10px' }}>Transaction deadline</span>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      height: '33.6px',
-                      marginTop: '10px',
-                    }}
-                  >
-                    <Input
-                      className={styles.input}
-                      type="number"
-                      value={Number(deadline).toString()}
-                      onChange={e => setDeadline(e.target.valueAsNumber || 0)}
-                      placeholder={30}
-                      suffix={<strong>minutes</strong>}
-                    />
-                  </div>
-                </div>
-              </div>
-            </AcyDescriptions>
-            : null}
+                </AcyDescriptions>
+                : null}
 
-          <AcyPerpetualButton
-            style={{ margin: '25px 0 0 0', width: '100%' }}
-            onClick={onClickPrimary}
-          >
-            {getPrimaryText()}
-          </AcyPerpetualButton>
+              <AcyPerpetualButton
+                style={{ margin: '25px 0 0 0', width: '100%' }}
+                onClick={onClickPrimary}
+              >
+                {getPrimaryText()}
+              </AcyPerpetualButton>
 
-        </div>
-
-        <div className={styles.accountInfo}>
-          <div className={styles.details}>
-            <div className={styles.statstitle}>Account Info</div>
-            <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                Dynamic Effective Balance
-              </div>
-              <div className={styles.statsRow}>
-                ——
-              </div>
-              <div className={styles.statsRow}>
-                Margin Usage
-              </div>
-              <div className={styles.statsRow}>
-                ——
-              </div>
-              <div className={styles.statsRow}>
-                Available Margin
-              </div>
-              <div className={styles.statsRow}>
-                ——
-              </div>
             </div>
-          </div>
-          <div className={styles.gauge}>
-            <Gauge
-              autoFit={true}
-              percent={70}
-              color='l(0) 0:#5d7cef 1:#e35767'
-            />
-          </div>
-        </div>
 
-        <div className={styles.buttonContainer} style={{marginTop: '20px'}}>
-          <AcyPerpetualButton>
-            DEPOSIT
-          </AcyPerpetualButton>
-          <AcyPerpetualButton>
-            WITHDRAW
-          </AcyPerpetualButton>
-        </div>
+            {!powers && <AccountInfoGauge />}
+          </>
+        }
+
       </AcyPerpetualCard>
     </div>
   );

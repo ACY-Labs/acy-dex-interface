@@ -37,29 +37,26 @@ import Binance from "binance-api-node";
 const StyledSelect = styled(Radio.Group)`
   .ant-radio-button-wrapper{
     background: transparent !important;
-    height: 20px;
-    font-size: 0.65rem;
+    height: 22px;
+    font-size: 0.7rem;
     padding: 0 0.1rem;
     border: 0.75px solid #333333;
     border-radius: 0 0 0 0;
-    line-height: 20px;
+    line-height: 22px;
     color: #b5b5b6;
-    
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled){
     color: #ffffff;
     box-shadow: 0 0 0 0 black;
-    // border-color: #333333;
-    border-color: #ffffff;
-
+    border-color: #333333;
+    background-color: #29292c !important;
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover{
     color: #ffffff;
-    border: 0.75px solid #ffffff;
-    border-color: #ffffff !important;
+    background-color: #29292c !important;
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before{
-    background-color: black !important;
+    background-color: #black !important;
   }
   .ant-radio-button-wrapper:not(:first-child)::before{
     background-color: transparent;
@@ -94,11 +91,18 @@ const getSeriesOptions = () => ({
 const getChartOptions = (width, height) => ({
   width,
   height,
+  watermark: {
+		visible: true,
+		fontSize: 40,
+		horzAlign: 'center',
+		vertAlign: 'center',
+		color: 'rgba(255, 255, 255, 0.2)',
+		text: 'TestNet',
+	},
   layout: {
     backgroundColor: "rgba(255, 255, 255, 0)",
     textColor: "#ccc",
-    fontFamily: "Karla, sans-serif", 
-    // fontFamily: "Karla", 
+    fontFamily: "Karla 300", 
   },
   localization: {
     // https://github.com/tradingview/lightweight-charts/blob/master/docs/customization.md#time-format
@@ -109,12 +113,14 @@ const getChartOptions = (width, height) => ({
   grid: {
     vertLines: {
       visible: true,
-      color: "rgba(35, 38, 59, 1)",
-      style: 2,
+      // color: "rgba(27, 27, 27, 1)",
+      color: "#1b1b1b",
+      style: 0,
     },
     horzLines: {
       visible: true,
-      color: "rgba(35, 38, 59, 1)",
+      // color: "rgba(35, 38, 59, 1)",
+      color: "#1b1b1b", 
       style: 2,
     },
   },
@@ -141,19 +147,28 @@ const getChartOptions = (width, height) => ({
   },
 });
 
+function getCurrentTimestamp () {
+  let curTime = Math.floor(Date.now() / 1000); 
+  return curTime
+}
+
 export default function ExchangeTVChart(props) {
   const {
-    chartTokenSymbol,
+    chartTokenSymbol, 
+    passTokenData
   } = props
+  // console.log("hjhjhj swap chart props", chartTokenSymbol, passTokenData)
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [activeTimeScale, setActiveTimeScale] = useState("5m");
   const [period, setPeriod] = useState('5m');
 
   const [hoveredCandlestick, setHoveredCandlestick] = useState();
+  const [curPrice, setCurPrice] = useState();
+  const [priceChangePercentDelta, setPriceChangePercentDelta] = useState();
+  const [deltaIsMinus, setDeltaIsMinus] = useState();
 
-
-
+  
   const symbol = chartTokenSymbol || "BTC";
   const marketName = symbol + "_USD";
   const previousMarketName = usePrevious(marketName);
@@ -162,6 +177,11 @@ export default function ExchangeTVChart(props) {
   const chartRef = useRef(null);
   
   const [chartInited, setChartInited] = useState(false);
+  
+  // useEffect(() => {
+  //   passTokenData(symbol);
+  // }, []);
+
   useEffect(() => {
     if (marketName !== previousMarketName) {
       setChartInited(false);
@@ -209,7 +229,19 @@ export default function ExchangeTVChart(props) {
       console.log("ws received: ", candleData.time, candleData.close)
       currentSeries.update(candleData)
       setLastCandle(candleData);
-      // console.log("hereim see currentseries", currentSeries)
+
+      const ticks = currentSeries.Kn?.Bt?.Xr;
+      //St: open high low close; rt[So]: time
+      console.log("chartData: ", ticks);
+      const oldestTick = ticks[0];
+      const latestTick = ticks[ticks.length - 1];
+      if (oldestTick) {
+        console.log(`oldest tick: Open=${oldestTick.St[0]}, timestamp=${oldestTick.rt.So}`)
+      }
+      if( ticks && period != '1m' && period != '1w' ){
+        console.log("hjhjhj in if ", ticks)
+        getDeltaPriceChange(ticks)
+      }
     });
     cleaner.current = clean;
     console.log("added new candles subscription for ", pairName)
@@ -221,8 +253,13 @@ export default function ExchangeTVChart(props) {
       console.log("fetchPrevAndSubscribe again: ", chartTokenSymbol)
       // Binance data is independent of chain, so here we can fill in any chain name
       const prevData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`).then(res => res.data);
-      console.log("prev data: ", prevData)
-      currentSeries.setData(prevData);      
+      // const secondData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=BNBUSDT&interval=${period}`).then(res => res.data);
+      currentSeries.setData(prevData);
+      console.log("hjhjhj prev data: ", prevData)
+      // console.log("hjhjhj prev data second: ", secondData)
+      // console.log("prev data: ", prevData)
+
+
 
       if (!chartInited) {
         scaleChart();
@@ -234,6 +271,33 @@ export default function ExchangeTVChart(props) {
   }, [currentSeries, chartTokenSymbol, period])
   ///// end of binance data source
 
+  const getDeltaPriceChange =  (data) => {
+    console.log("hjhjhj prev data in get: ", data)
+    let timeNow = getCurrentTimestamp()
+    // console.log("hjhjhj currentseries curtime now", timeNow, "period", period, CHART_PERIODS[period])
+    let forwardArr = 86400 / CHART_PERIODS[period]
+    let arrIndex = 999 - forwardArr
+
+    const latestTick = data[data.length - 1]?.St[0];
+    let yesterday = data[data.length - 1 - forwardArr]?.St[0]
+    
+    let deltaPercent = ((latestTick - yesterday) / yesterday * 100).toString() ;
+    // console.log("hjhjhj tick data check error: ", latestTick, yesterday, deltaPercent)
+    if (deltaPercent && deltaPercent[0] == "-") {
+      setDeltaIsMinus(true)
+      let negativeCurrentPrice = latestTick
+      let negativePriceChangePercent = deltaPercent.substring(1)
+      setCurPrice(parseFloat(negativeCurrentPrice).toFixed(2))
+      setPriceChangePercentDelta(parseFloat(negativePriceChangePercent).toFixed(3))
+    }
+    else {
+      setDeltaIsMinus(false)
+      let positiveCurrentPrice = latestTick
+      let positivePricechangePercent = deltaPercent
+      setCurPrice(parseFloat(positiveCurrentPrice).toFixed(2))
+      setPriceChangePercentDelta(parseFloat(positivePricechangePercent).toFixed(3))
+    }
+  }
   
 
   // 设置chart的鼠标移动时的回调函数。evt是event的意思。
@@ -481,39 +545,38 @@ export default function ExchangeTVChart(props) {
   // }
 
   return (
-    <div className="ExchangeChart tv" ref={ref} style={{ height: "100%", width: "100%"}}>
+    <div className="ExchangeChart tv" ref={ref} style={{ height: "100%", width: "100%" }}>
       <div className="ExchangeChart-top App-box App-box-border">
         <div className="ExchangeChart-top-inner">
-            <div>
+          <div class="grid-container-element">
+            <div className="timeSelector" style={{ float: "left" }}>
               {/* <div className="ExchangeChart-info-label">24h Change</div> */}
-                {/* <div className={styles.timeSelector}> */}
-                  
-                  <StyledSelect value={period} onChange={placementChange}
-                    style={{ width: '100%', height: '20px', paddingRight: '50%' }}>
-                    <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
-                    <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>
-                    <Radio.Button value="15m" style={{ width: '9%', textAlign: 'center' }}>15m</Radio.Button>
-                    <Radio.Button value="30m" style={{ width: '9%', textAlign: 'center' }}>30m</Radio.Button>
-                    <Radio.Button value="1h" style={{ width: '9%', textAlign: 'center' }}>1h</Radio.Button>
-                    <Radio.Button value="2h" style={{ width: '9%', textAlign: 'center' }}>2h</Radio.Button>
-                    <Radio.Button value="4h" style={{ width: '9%', textAlign: 'center' }}>4h</Radio.Button>
-                    <Radio.Button value="1d" style={{ width: '9%', textAlign: 'center' }}>1D</Radio.Button>
-                    <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
-                  </StyledSelect>
-                {/* </div> */}
-              {/* <div className="ExchangeChart-title">
-                <ChartTokenSelector
-                  chainId={chainId}
-                  selectedToken={chartToken}
-                  swapOption={swapOption}
-                  infoTokens={infoTokens}
-                  onSelectToken={onSelectToken}
-                  className="chart-token-selector"
-                />
-              </div> */}
+              <StyledSelect value={period} onChange={placementChange}
+                style={{ width: '200%', height: '23px' }}>
+                <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
+                <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>
+                <Radio.Button value="15m" style={{ width: '9%', textAlign: 'center' }}>15m</Radio.Button>
+                <Radio.Button value="30m" style={{ width: '9%', textAlign: 'center' }}>30m</Radio.Button>
+                <Radio.Button value="1h" style={{ width: '9%', textAlign: 'center' }}>1h</Radio.Button>
+                <Radio.Button value="2h" style={{ width: '9%', textAlign: 'center' }}>2h</Radio.Button>
+                <Radio.Button value="4h" style={{ width: '9%', textAlign: 'center' }}>4h</Radio.Button>
+                <Radio.Button value="1d" style={{ width: '9%', textAlign: 'center' }}>1D</Radio.Button>
+                <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
+              </StyledSelect>
             </div>
-          {/* <div> */}
-            {/* <div className="ExchangeChart-title">
+            {deltaIsMinus ?
+              <div style={{ float: "right", paddingRight: "1rem", wordSpacing: "0.5rem", color: "#FA3C58" }}>
+                ${curPrice} -{priceChangePercentDelta}%
+              </div>
+              :
+              <div style={{ float: "right", paddingRight: "1rem", wordSpacing: "0.5rem", color: '#46E3AE' }}>
+                ${curPrice} +{priceChangePercentDelta}%
+              </div>
+            }
+          </div>
+
+          {/* </div> */}
+          {/* <div className="ExchangeChart-title">
               <ChartTokenSelector
                 chainId={chainId}
                 selectedToken={chartToken}
@@ -523,8 +586,7 @@ export default function ExchangeTVChart(props) {
                 className="chart-token-selector"
               />
             </div> */}
-          {/* </div> */}
-					{/* <div>
+          {/* <div>
 						<div className="ExchangeChart-main-price">{chartToken.maxPrice && formatAmount(chartToken.maxPrice, USD_DECIMALS, 2)}</div>
 						<div className="ExchangeChart-info-label">${chartToken.minPrice && formatAmount(chartToken.minPrice, USD_DECIMALS, 2)}</div>
 					</div>
@@ -551,7 +613,7 @@ export default function ExchangeTVChart(props) {
 					</div> */}
         </div>
       </div>
-      <div className="ExchangeChart-bottom App-box App-box-border" style={{ height: "100%", width: "100%"}}>
+      <div className="ExchangeChart-bottom App-box App-box-border" style={{ height: "100%", width: "100%" }}>
         <div className="ExchangeChart-bottom-header">
           <div className="ExchangeChart-bottom-controls">
             {/* <Tab options={Object.keys(CHART_PERIODS)} option={period} setOption={setPeriod} /> */}
@@ -559,7 +621,7 @@ export default function ExchangeTVChart(props) {
           {/* {candleStatsHtml} */}
         </div>
         {!currentChart && <Spin />}
-        <div className="ExchangeChart-bottom-content" ref={chartRef} style={{ height: "100%", width: "100%"}}></div>
+        <div className="ExchangeChart-bottom-content" ref={chartRef} style={{ height: "100%", width: "100%" }}></div>
       </div>
     </div>
   );

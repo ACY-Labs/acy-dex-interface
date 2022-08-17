@@ -57,14 +57,16 @@ const StyledSelect = styled(Radio.Group)`
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled){
     color: #ffffff;
-    box-shadow: 0 0 0 0 #0e0304;
+    box-shadow: 0 0 0 0 black;
     border-color: #333333;
+    background-color: #29292c !important;
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover{
     color: #ffffff;
+    background-color: #29292c !important;
   }
   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before{
-    background-color: #0e0304 !important;
+    background-color: #black !important;
   }
   .ant-radio-button-wrapper:not(:first-child)::before{
     background-color: transparent;
@@ -100,7 +102,7 @@ export function getChartToken(swapOption, fromToken, toToken, chainId) {
   if (toToken.isStable) {
     return fromToken;
   }
-  
+
   return toToken;
 }
 
@@ -123,12 +125,22 @@ const getSeriesOptions = () => ({
 const getChartOptions = (width, height) => ({
   width,
   height,
+  watermark: {
+		visible: true,
+		fontSize: 40,
+		horzAlign: 'center',
+		vertAlign: 'center',
+		color: 'rgba(255, 255, 255, 0.2)',
+		text: 'TestNet',
+
+	},
   layout: {
     backgroundColor: "rgba(255, 255, 255, 0)",
     textColor: "#ccc",
-    fontFamily: "Karla 300", 
+    fontFamily: "Karla 300",
   },
   localization: {
+    Locale: 'en-US',
     // https://github.com/tradingview/lightweight-charts/blob/master/docs/customization.md#time-format
     timeFormatter: (businessDayOrTimestamp) => {
       return formatDateTime(businessDayOrTimestamp);
@@ -144,7 +156,7 @@ const getChartOptions = (width, height) => ({
     horzLines: {
       visible: true,
       // color: "rgba(35, 38, 59, 1)",
-      color: "#1b1b1b", 
+      color: "#1b1b1b",
       style: 2,
     },
   },
@@ -170,6 +182,10 @@ const getChartOptions = (width, height) => ({
     mode: 0,
   },
 });
+function getCurrentTimestamp () {
+  let curTime = Math.floor(Date.now() / 1000); 
+  return curTime
+}
 
 export default function ExchangeTVChart(props) {
   const {
@@ -187,15 +203,15 @@ export default function ExchangeTVChart(props) {
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
 
-//   let [period, setPeriod] = useLocalStorageSerializeKey([chainId, "Chart-period"], DEFAULT_PERIOD);
-//   if (!(period in CHART_PERIODS)) {
-//     period = DEFAULT_PERIOD;
-//   }
+  //   let [period, setPeriod] = useLocalStorageSerializeKey([chainId, "Chart-period"], DEFAULT_PERIOD);
+  //   if (!(period in CHART_PERIODS)) {
+  //     period = DEFAULT_PERIOD;
+  //   }
 
   const [hoveredCandlestick, setHoveredCandlestick] = useState();
   // const [placement, setPlacement] = useState('5m');
   const [period, setPeriod] = useState('5m');
-  const [priceChangeDelta, setPriceChangeDelta] = useState();
+  const [curPrice, setCurPrice] = useState();
   const [priceChangePercentDelta, setPriceChangePercentDelta] = useState();
   const [deltaIsMinus, setDeltaIsMinus] = useState();
 
@@ -239,15 +255,14 @@ export default function ExchangeTVChart(props) {
   // 2. 计算买卖中间价（maxPrice + minPrice）/ 2
   const currentAveragePrice =
     chartToken.maxPrice && chartToken.minPrice ? chartToken.maxPrice.add(chartToken.minPrice).div(2) : null;
-  
-  
+
   const [chartInited, setChartInited] = useState(false);
   useEffect(() => {
     if (marketName !== previousMarketName) {
       setChartInited(false);
     }
   }, [marketName, previousMarketName]);
-
+ 
   // 设置chart的横轴range
   const scaleChart = useCallback(() => {
     const from = Date.now() / 1000 - (7 * 24 * CHART_PERIODS[period]) / 2;
@@ -264,7 +279,7 @@ export default function ExchangeTVChart(props) {
     if (!symbol)
       return
     const pairName = `${symbol}USDT`;
-      
+
     if (cleaner.current) {
       // unsubscribe from previous subscription
       console.log("cleaned previous subscriber: ", cleaner.current)
@@ -272,7 +287,7 @@ export default function ExchangeTVChart(props) {
       // clear chart candles
       currentSeries.setData([]);
     }
-  
+
     // subscribe to websocket for the future price update
     const clean = client.ws.candles(pairName, period, (res) => {
       console.log("res: ", res)
@@ -286,11 +301,25 @@ export default function ExchangeTVChart(props) {
       console.log("ws received: ", candleData.time, candleData.close)
       currentSeries.update(candleData)
       setLastCandle(candleData);
-      // console.log("hereim see currentseries", currentSeries)
+      console.log("print currentSeries", currentSeries);
+      
+      // HOW TO GET CHART DATA
+      const ticks = currentSeries.Kn?.Bt?.Xr;
+      //St: open high low close; rt[So]: time
+      console.log("chartData: ", ticks);
+      const oldestTick = ticks[0];
+      const latestTick = ticks[ticks.length - 1];
+      if (oldestTick) {
+        console.log(`oldest tick: Open=${oldestTick.St[0]}, timestamp=${oldestTick.rt.So}`)
+      }
+      if( ticks && period != '1m' && period != '1w' ){
+        console.log("hjhjhj in if ", ticks)
+        getDeltaPriceChange(ticks)
+      }
     });
     cleaner.current = clean;
     console.log("added new candles subscription for ", pairName)
-  
+    
     const fetchPrevAndSubscribe = async () => {
       // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
       // SHOULD DO THIS BEFORE SUBSCRIBE, HOWEVER MOVING SUBSCRIBE TO AFTER THIS BLOCK OF CODE WILL CAUSE THE SUBSCRIPTION GOES ON FOREVER
@@ -298,41 +327,44 @@ export default function ExchangeTVChart(props) {
       console.log("fetchPrevAndSubscribe again: ", chartToken.symbol)
       // Binance data is independent of chain, so here we can fill in any chain name
       const prevData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`).then(res => res.data);
-      console.log("prev data: ", prevData)
-      currentSeries.setData(prevData);      
+      console.log("hjhjhj prev data check error: ", prevData)
+
+      currentSeries.setData(prevData);
 
       scaleChart();
     }
-    const fetchDeltaPriceChange = async () => {
-      // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
-      // SHOULD DO THIS BEFORE SUBSCRIBE, HOWEVER MOVING SUBSCRIBE TO AFTER THIS BLOCK OF CODE WILL CAUSE THE SUBSCRIPTION GOES ON FOREVER
-      // REACT BUG?
-      console.log("fetchDeltaPriceChange again: ", chartToken.symbol)
-      // Binance data is independent of chain, so here we can fill in any chain name
-      const prevDeltaData = await axios.get(`${BinanceDeltaApi}/api/v3/ticker/24hr?symbol=${pairName}`).then(res => res.data);
-      let delta = prevDeltaData.priceChange
-      let deltaPercent = prevDeltaData.priceChangePercent
-      // delta = "-3452.0000"
-      // deltaPercent = "-6.432"
-      if ( delta && delta[0] == "-") {
-        setDeltaIsMinus(true)
-        let negativePriceChange = delta.substring(1)
-        let negativePriceChangePercent = deltaPercent.substring(1)
-        setPriceChangeDelta(parseFloat(negativePriceChange).toFixed(2))
-        setPriceChangePercentDelta(parseFloat(negativePriceChangePercent).toFixed(3))
-      }
-      else if (delta && delta[0] != "-") {
-        setDeltaIsMinus(false)
-        let positivePricechange = delta
-        let positivePricechangePercent = deltaPercent
-        setPriceChangeDelta(parseFloat(positivePricechange).toFixed(2))
-        setPriceChangePercentDelta(parseFloat(positivePricechangePercent).toFixed(3))
-      }
-    }
-  
+
     fetchPrevAndSubscribe()
-    fetchDeltaPriceChange()
+    // fetchDeltaPriceChange()
   }, [chartToken.symbol, period])
+
+  const getDeltaPriceChange =  (data) => {
+    console.log("hjhjhj prev data in get: ", data)
+    let timeNow = getCurrentTimestamp()
+    // console.log("hjhjhj currentseries curtime now", timeNow, "period", period, CHART_PERIODS[period])
+    let forwardArr = 86400 / CHART_PERIODS[period]
+    let arrIndex = 999 - forwardArr
+
+    const latestTick = data[data.length - 1]?.St[0];
+    let yesterday = data[data.length - 1 - forwardArr]?.St[0]
+    
+    let deltaPercent = ((latestTick - yesterday) / yesterday * 100).toString() ;
+    // console.log("hjhjhj tick data check error: ", latestTick, yesterday, deltaPercent)
+    if (deltaPercent && deltaPercent[0] == "-") {
+      setDeltaIsMinus(true)
+      let negativeCurrentPrice = latestTick
+      let negativePriceChangePercent = deltaPercent.substring(1)
+      setCurPrice(parseFloat(negativeCurrentPrice).toFixed(2))
+      setPriceChangePercentDelta(parseFloat(negativePriceChangePercent).toFixed(3))
+    }
+    else {
+      setDeltaIsMinus(false)
+      let positiveCurrentPrice = latestTick
+      let positivePricechangePercent = deltaPercent
+      setCurPrice(parseFloat(positiveCurrentPrice).toFixed(2))
+      setPriceChangePercentDelta(parseFloat(positivePricechangePercent).toFixed(3))
+    }
+  }
 
   // 设置chart的鼠标移动时的回调函数。evt是event的意思。
   const onCrosshairMove = useCallback(
@@ -359,9 +391,9 @@ export default function ExchangeTVChart(props) {
     },
     [setHoveredCandlestick]
   );
-  
-   // 在第一次得到priceData时，初始化 chart
-   // 【我认为】当currentChart已经有了的时候，即使priceData变化，也不会触发下面的函数。可以用console.log来测试一下。
+
+  // 在第一次得到priceData时，初始化 chart
+  // 【我认为】当currentChart已经有了的时候，即使priceData变化，也不会触发下面的函数。可以用console.log来测试一下。
   useEffect(() => {
     if (!ref.current) {
       return;
@@ -377,14 +409,14 @@ export default function ExchangeTVChart(props) {
     chart.subscribeCrosshairMove(onCrosshairMove);
 
     const series = chart.addCandlestickSeries(getSeriesOptions());
-
+    
     setCurrentChart(chart);
     setCurrentSeries(series);
   }, [ref, onCrosshairMove]);
 
   // 自适应并撑满chartRef这个div的大小。仅当currentChart已经被初始化后，才会被执行。
-	// offsetWidth是一个component的宽度。关于offsetWidth 和 clientWidth 的区别可以参考
-	// https://stackoverflow.com/questions/21064101/understanding-offsetwidth-clientwidth-scrollwidth-and-height-respectively
+  // offsetWidth是一个component的宽度。关于offsetWidth 和 clientWidth 的区别可以参考
+  // https://stackoverflow.com/questions/21064101/understanding-offsetwidth-clientwidth-scrollwidth-and-height-respectively
   useEffect(() => {
     console.log("debug chart: currentChart ", currentChart)
     if (!currentChart) {
@@ -399,63 +431,63 @@ export default function ExchangeTVChart(props) {
     return () => window.removeEventListener("resize", resizeChart);
   }, [currentChart]);
 
-//   // 当用户连接着钱包，有position或者order的时候，会显示入场价+liquidation价格
-//   useEffect(() => {
-//     const lines = [];
-//     if (currentSeries && savedShouldShowPositionLines) {
-//       if (currentOrders && currentOrders.length > 0) {
-//         currentOrders.forEach((order) => {
-//           const indexToken = constantInstance.perpetuals.getToken(order.indexToken);
-//           let tokenSymbol;
-//           if (indexToken && indexToken.symbol) {
-//             tokenSymbol = indexToken.isWrapped ? indexToken.baseSymbol : indexToken.symbol;
-//           }
-//           const title = `${order.type === INCREASE ? "Inc." : "Dec."} ${tokenSymbol} ${
-//             order.isLong ? "Long" : "Short"
-//           }`;
-//           const color = "#3a3e5e";
-//           lines.push(
-//             currentSeries.createPriceLine({
-//               price: parseFloat(formatAmount(order.triggerPrice, USD_DECIMALS, 2)),
-//               color,
-//               title: title.padEnd(PRICE_LINE_TEXT_WIDTH, " "),
-//             })
-//           );
-//         });
-//       }
-//       if (positions && positions.length > 0) {
-//         const color = "#3a3e5e";
+  //   // 当用户连接着钱包，有position或者order的时候，会显示入场价+liquidation价格
+  //   useEffect(() => {
+  //     const lines = [];
+  //     if (currentSeries && savedShouldShowPositionLines) {
+  //       if (currentOrders && currentOrders.length > 0) {
+  //         currentOrders.forEach((order) => {
+  //           const indexToken = constantInstance.perpetuals.getToken(order.indexToken);
+  //           let tokenSymbol;
+  //           if (indexToken && indexToken.symbol) {
+  //             tokenSymbol = indexToken.isWrapped ? indexToken.baseSymbol : indexToken.symbol;
+  //           }
+  //           const title = `${order.type === INCREASE ? "Inc." : "Dec."} ${tokenSymbol} ${
+  //             order.isLong ? "Long" : "Short"
+  //           }`;
+  //           const color = "#3a3e5e";
+  //           lines.push(
+  //             currentSeries.createPriceLine({
+  //               price: parseFloat(formatAmount(order.triggerPrice, USD_DECIMALS, 2)),
+  //               color,
+  //               title: title.padEnd(PRICE_LINE_TEXT_WIDTH, " "),
+  //             })
+  //           );
+  //         });
+  //       }
+  //       if (positions && positions.length > 0) {
+  //         const color = "#3a3e5e";
 
-//         positions.forEach((position) => {
-//           lines.push(
-//             currentSeries.createPriceLine({
-//               price: parseFloat(formatAmount(position.averagePrice, USD_DECIMALS, 2)),
-//               color,
-//               title: `Open ${position.indexToken.symbol} ${position.isLong ? "Long" : "Short"}`.padEnd(
-//                 PRICE_LINE_TEXT_WIDTH,
-//                 " "
-//               ),
-//             })
-//           );
+  //         positions.forEach((position) => {
+  //           lines.push(
+  //             currentSeries.createPriceLine({
+  //               price: parseFloat(formatAmount(position.averagePrice, USD_DECIMALS, 2)),
+  //               color,
+  //               title: `Open ${position.indexToken.symbol} ${position.isLong ? "Long" : "Short"}`.padEnd(
+  //                 PRICE_LINE_TEXT_WIDTH,
+  //                 " "
+  //               ),
+  //             })
+  //           );
 
-//           const liquidationPrice = getLiquidationPrice(position);
-//           lines.push(
-//             currentSeries.createPriceLine({
-//               price: parseFloat(formatAmount(liquidationPrice, USD_DECIMALS, 2)),
-//               color,
-//               title: `Liq. ${position.indexToken.symbol} ${position.isLong ? "Long" : "Short"}`.padEnd(
-//                 PRICE_LINE_TEXT_WIDTH,
-//                 " "
-//               ),
-//             })
-//           );
-//         });
-//       }
-//     }
-//     return () => {
-//       lines.forEach((line) => currentSeries.removePriceLine(line));
-//     };
-//   }, [currentOrders, positions, currentSeries, chainId, savedShouldShowPositionLines]);
+  //           const liquidationPrice = getLiquidationPrice(position);
+  //           lines.push(
+  //             currentSeries.createPriceLine({
+  //               price: parseFloat(formatAmount(liquidationPrice, USD_DECIMALS, 2)),
+  //               color,
+  //               title: `Liq. ${position.indexToken.symbol} ${position.isLong ? "Long" : "Short"}`.padEnd(
+  //                 PRICE_LINE_TEXT_WIDTH,
+  //                 " "
+  //               ),
+  //             })
+  //           );
+  //         });
+  //       }
+  //     }
+  //     return () => {
+  //       lines.forEach((line) => currentSeries.removePriceLine(line));
+  //     };
+  //   }, [currentOrders, positions, currentSeries, chainId, savedShouldShowPositionLines]);
 
   // // 显示OHLC数据, 若使用binance则需要先API获取24h high low, 然后用websocket来更新
   // const candleStatsHtml = useMemo(() => {
@@ -555,14 +587,14 @@ export default function ExchangeTVChart(props) {
   };
 
   return (
-    <div className="ExchangeChart tv" ref={ref} style={{ height: "100%", width: "100%"}}>
+    <div className="ExchangeChart tv" ref={ref} style={{ height: "100%", width: "100%" }}>
       <div className="ExchangeChart-top App-box App-box-border">
         <div className="ExchangeChart-top-inner">
           <div class="grid-container-element">
-            <div className="timeSelector" style={{float: "left"}}>
+            <div className="timeSelector" style={{ float: "left" }}>
               {/* <div className="ExchangeChart-info-label">24h Change</div> */}
               <StyledSelect value={period} onChange={placementChange}
-                style={{ width:'200%', height: '23px' }}>
+                style={{ width: '200%', height: '23px' }}>
                 <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
                 <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>
                 <Radio.Button value="15m" style={{ width: '9%', textAlign: 'center' }}>15m</Radio.Button>
@@ -575,18 +607,19 @@ export default function ExchangeTVChart(props) {
               </StyledSelect>
             </div>
             {deltaIsMinus ?
-            <div style={{float: "right", paddingRight: "1rem", color:"#FA3C58"}}>
-            -${priceChangeDelta} -{priceChangePercentDelta}% 
-            </div>
-            :
-            <div style={{float: "right", paddingRight: "1rem", color: '#46E3AE'}}>
-              +${priceChangeDelta} +{priceChangePercentDelta}%
-            </div>
+              <div style={{ float: "right", paddingRight: "1rem", wordSpacing: "0.5rem", color: "#FA3C58" }}>
+                ${curPrice} -{priceChangePercentDelta}%
+              </div>
+              :
+              //green, up
+              <div style={{ float: "right", paddingRight: "1rem", wordSpacing: "0.5rem", color: '#46E3AE' }}> 
+                ${curPrice} +{priceChangePercentDelta}%
+              </div>
             }
           </div>
 
-            {/* </div> */}
-            {/* <div className="ExchangeChart-title">
+          {/* </div> */}
+          {/* <div className="ExchangeChart-title">
               <ChartTokenSelector
                 chainId={chainId}
                 selectedToken={chartToken}
@@ -596,7 +629,7 @@ export default function ExchangeTVChart(props) {
                 className="chart-token-selector"
               />
             </div> */}
-					{/* <div>
+          {/* <div>
 						<div className="ExchangeChart-main-price">{chartToken.maxPrice && formatAmount(chartToken.maxPrice, USD_DECIMALS, 2)}</div>
 						<div className="ExchangeChart-info-label">${chartToken.minPrice && formatAmount(chartToken.minPrice, USD_DECIMALS, 2)}</div>
 					</div>
@@ -623,7 +656,7 @@ export default function ExchangeTVChart(props) {
 					</div> */}
         </div>
       </div>
-      <div className="ExchangeChart-bottom App-box App-box-border" style={{ height: "100%", width: "100%"}}>
+      <div className="ExchangeChart-bottom App-box App-box-border" style={{ height: "100%", width: "100%" }}>
         <div className="ExchangeChart-bottom-header">
           <div className="ExchangeChart-bottom-controls">
             {/* <Tab options={Object.keys(CHART_PERIODS)} option={period} setOption={setPeriod} /> */}
@@ -631,7 +664,7 @@ export default function ExchangeTVChart(props) {
           {/* {candleStatsHtml} */}
         </div>
         {!currentChart && <Spin />}
-        <div className="ExchangeChart-bottom-content" ref={chartRef} style={{ height: "100%", width: "100%"}}></div>
+        <div className="ExchangeChart-bottom-content" ref={chartRef} style={{ height: "100%", width: "100%" }}></div>
       </div>
     </div>
   );

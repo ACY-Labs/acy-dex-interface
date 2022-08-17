@@ -1,3 +1,127 @@
+// root element
+.marketRoot {
+  padding: 50px;
+  z-index: 0;
+  color: #b5b6b6;
+  margin-bottom: 20px;
+  font-weight: 400;
+  font-family: "Karla", sans-serif;
+}
+
+.topChart {
+  color: #16182E;
+}
+
+.chartGrid {
+  color: #16182E;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.statsContainer {
+  width: 100%;
+  padding: 20px;
+  overflow: hidden;
+  border: 0.75px solid #333333;
+  border-radius: 5px;
+
+  .statstitle {
+    font-size: 16px;
+    line-height: 1.355rem;
+    letter-spacing: 0px;
+    color: #FFFFFF;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    margin-bottom: 10px;
+    
+    .seeMore {
+      color: #a9a9b0;
+      font-size: 14px;
+      cursor: pointer;
+      &:hover {
+        color: white;
+        text-decoration: underline;
+      }
+    }
+  }
+  
+  .statsdivider {
+    height: 0.75px;
+    background: #333333;
+    margin: 0.7rem -1rem;
+  }
+  
+  .statscontent {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .statsRow {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-column-gap: 1rem;
+    padding: unset;
+  
+    .label {
+      color: #a9a9b0;
+      font-size: 15px;
+      opacity: 1;
+    }
+  
+    .value {
+      color: #a9a9b0;
+      font-size: 15px;
+      opacity: 1;
+    }
+  }
+}
+
+.tableToggleButtonContainer {
+  margin-top: 50px;
+  margin-bottom: 30px;
+
+  .leftToggleButton {
+    border: 1px solid transparent;
+    border-radius: 15px 0 0 15px;
+    background-color: #29292c;
+    padding: 0.25rem 1.25rem;
+    margin-right: 0;
+    font-size: 1rem;
+    &:hover {
+      cursor: pointer;
+      color: white;
+    }
+  }
+  
+  .middleToggleButton {
+    border: 1px solid transparent;
+    background-color: #29292c;
+    padding: 0.25rem 1.25rem;
+    margin-right: 0;
+    font-size: 1rem;
+    &:hover {
+      cursor: pointer;
+      color: white;
+    }
+  }
+  
+  .rightToggleButton {
+    border: 1px solid transparent;
+    border-radius: 0 15px 15px 0;
+    background-color: #29292c;
+    padding: 0.25rem 1.25rem;
+    margin-right: 0.5rem;
+    font-size: 1rem;
+    &:hover {
+      cursor: pointer;
+      color: white;
+    }
+  }
+}
+
+
 @import '~antd/lib/style/themes/default.less';
 @cardColor: #2f313583;
 @primary: #e29227;
@@ -6,16 +130,9 @@ a {
   color: @primary
 }
 
-// root element
-.marketRoot {
-  width: 90%;
-  max-width: 1300px;
-  margin: auto;
-  z-index: 0;
-  color: #b5b6b6;
-  margin-top: 50px;
-  margin-bottom: 20px;
-  font-weight: 400;
+.marketContent{
+  padding: 50px;
+  padding-right: 15%;
 }
 
 .marketLink {
@@ -249,7 +366,8 @@ h4 {
   width: 49%;
   height: 40vh;
   max-height: 700px;
-  background-color: @cardColor;
+  background-color: transparent;
+  border: 0.75px solid #333333;
   border-radius: 15px;
   margin-bottom: 10px;
   padding: 15px;
@@ -281,7 +399,8 @@ h4 {
 
 // Market overview
 .marketOverview {
-  background-color: @cardColor;
+  background-color: transparent;
+  border: 0.75px solid #333333;
   color: #b5b6b6;
   padding: 15px;
   border-radius: 15px 15px 15px 15px;
@@ -300,7 +419,7 @@ h4 {
 }
 
 .tableData {
-  text-align:center;
+  text-align: left;
 }
 
 .tableDataFirstColumn {
@@ -754,4 +873,29 @@ h4 {
       }
     }
   }
+}
+
+.colItem {
+  margin: 1rem 0.5rem;
+  width: 100%;
+  text-align: right;
+}
+
+.optionTab {
+  margin : 10px;
+  cursor : pointer;
+  &:hover {
+    filter: brightness(1.5);
+  }
+}
+
+.optionTabSelected {
+  margin : 10px;
+  color : white;
+  font-weight: 600;
+}
+
+.statsTab{
+  padding-right: 70%;
+  border: 0.75px solid #333333;
 }
