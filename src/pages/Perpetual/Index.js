@@ -210,35 +210,6 @@ const StyledButton = styled(Button)`
     margin-left: 0.3rem;
   }
 `
-// const StyledTokenSelect = styled(Radio.Group)`
-// // default
-//   .ant-radio-button-wrapper{
-//     font-size: 1rem;
-//     background-color: #0E0304;
-//     color: #b5b5b6;
-//     border-color: #333333;
-//     height: 45px;
-//     padding: 0 0;
-//     line-height: 45px;
-//     align-items: center;
-//     border-radius: 0px;
-//     width: 250px;
-//   }
-//   .ant-radio-button-wrapper:hover{
-//     color: #ffffff;
-//     background-color: #0E0304;
-//     border: 0px;
-//   }
-//   .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled):hover {
-//     color: #fff;
-//     border: 0px;
-//   }
-//   .ant-radio-button-wrapper:not(:first-child)::before{
-//     border: 0px;
-//     background-color: #0E0304 !important;
-//     border-color: #0E0304;
-//   }
-// `;
 
 const StyledSelect = styled(Radio.Group)`
 

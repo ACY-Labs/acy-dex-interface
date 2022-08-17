@@ -228,7 +228,7 @@ export async function getUserTokenBalance(token, chainId, account, library) {
   if (!token) return;
   // let tokenIsETH = symbol === 'ETH';
   let tokenIsETH = symbol === NATIVE_CURRENCY();
-  
+
   const balance = await getUserTokenBalanceRaw(
     tokenIsETH ? ETHER : new Token(chainId, address, decimals, symbol),
     account,

@@ -90,6 +90,7 @@ export async function swapGetEstimated(
       decimals: inToken0Decimal,
       amount: inToken0Amount,
     } = inputToken0;
+    console.log("swap coinlist inputtoken", inputToken0 )
     let {
       address: inToken1Address,
       symbol: inToken1Symbol,

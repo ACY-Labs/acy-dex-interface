@@ -157,7 +157,7 @@ export default function ExchangeTVChart(props) {
     chartTokenSymbol, 
     passTokenData
   } = props
-  // console.log("hjhjhj swap chart props", chartTokenSymbol, passTokenData)
+  console.log("swap coinlist chart props", chartTokenSymbol)
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [activeTimeScale, setActiveTimeScale] = useState("5m");
@@ -250,7 +250,7 @@ export default function ExchangeTVChart(props) {
       // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
       // SHOULD DO THIS BEFORE SUBSCRIBE, HOWEVER MOVING SUBSCRIBE TO AFTER THIS BLOCK OF CODE WILL CAUSE THE SUBSCRIPTION GOES ON FOREVER
       // REACT BUG?
-      console.log("fetchPrevAndSubscribe again: ", chartTokenSymbol)
+      console.log("swap coinlistfetchPrevAndSubscribe again: ", chartTokenSymbol)
       // Binance data is independent of chain, so here we can fill in any chain name
       const prevData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`).then(res => res.data);
       // const secondData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=BNBUSDT&interval=${period}`).then(res => res.data);

@@ -113,8 +113,8 @@ const Swap = props => {
   const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
 
   // console.log("hereim befoere swap coinlist");
-  // const coinList = getGlobalTokenList()
-  // console.log("hereyou see tokens coinlist", coinList)
+  const coinList = getGlobalTokenList()
+  console.log("swap coinlist see tokens coinlist", coinList)
   // const platformList = getGlobalTokenPlatformList()
   // console.log("hereyou see tokens platformlist", platformList)
   // console.log("hereim swap coinlist successful", coinList);
@@ -223,6 +223,7 @@ const Swap = props => {
   // }, [tokenSelection, setTokenSelection])
 
   const passTokenData = (token) => {
+    console.log("swap coinlist passtokendata token ", token)
     setTokenData(token);
   };
 
@@ -281,7 +282,7 @@ const Swap = props => {
     }
   }, [library])
   // ------------------
-
+  console.log("swap coinlist activetoken", activeToken1)
   useEffect(() => {
     if (!supportedTokens) return
 
@@ -552,6 +553,7 @@ const Swap = props => {
     }
 
     const swapTokenPosition = () => {
+      console.log("swap coinlist swap position", tempSwapToken)
       const tempSwapToken = activeToken0;
       setActiveToken0(activeToken1);
       setActiveToken1(tempSwapToken);
@@ -674,7 +676,7 @@ const Swap = props => {
   }, [chartData])
 
   const [graphType, setGraphType] = useState("BTC")
-  const graphTypes = ["Routes", "BTC"]
+  const graphTypes = ["Routes", activeToken1.symbol]
   const showGraph = item => {
     setGraphType(item)
   }
@@ -697,7 +699,8 @@ const Swap = props => {
                 :
                 <div>
                   <ExchangeTVChart
-                    chartTokenSymbol="BTC"
+                    chartTokenSymbol={activeToken1.symbol}
+                    // chartTokenSymbol="BTC"
                     passTokenData={passTokenData}
                   />
                 </div>

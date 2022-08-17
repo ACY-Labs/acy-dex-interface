@@ -94,8 +94,10 @@ import TokenSelectorDrawer from '../TokenSelectorDrawer';
 const SwapComponent = props => {
   const { account, library, chainId, tokenList: INITIAL_TOKEN_LIST, farmSetting: {INITIAL_ALLOWED_SLIPPAGE}} = useConstantLoader(props);
   const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1=false } = props;
-
   // 选择货币的弹窗
+
+  const coinList = getGlobalTokenList()
+
   const [visible, setVisible] = useState(null);
 
   // 选择货币前置和后置
@@ -521,7 +523,7 @@ const SwapComponent = props => {
   useEffect(() => console.log("test slippage: ", slippageTolerance), [slippageTolerance]);
 
   const history = useHistory()
-  const coinList = getGlobalTokenList()
+  // const coinList = getGlobalTokenList()
 
   useEffect(() => {
     const hash = history.location.hash.replace('#', '').split('?')[0]
