@@ -125,8 +125,8 @@ const StableCoin = props => {
     }
     return undefined
   }
-  const [kChartTab, setKChartTab] = useState("BTC")
-  const kChartTabs = ["BTC", "ETH"]
+  const [kChartTab, setKChartTab] = useState("USDA/USDT")
+  const kChartTabs = ["USDA/USDT", "USDA/USDC"]
   const selectChart = item => {
     setKChartTab(item)
     onClickSetActiveToken(item)

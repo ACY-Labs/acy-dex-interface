@@ -106,7 +106,7 @@ const SwapComponent = props => {
   // 交易对前置货币
   const [token0, setToken0] = useState(INITIAL_TOKEN_LIST[0]);
   // 交易对后置货币
-  const [token1, setToken1] = useState(INITIAL_TOKEN_LIST[1]);
+  const [token1, setToken1] = useState(INITIAL_TOKEN_LIST[3]);
 
   // 交易对前置货币余额
   const [token0Balance, setToken0Balance] = useState('0');
@@ -173,7 +173,7 @@ const SwapComponent = props => {
       // 交易对前置货币
     setToken0(INITIAL_TOKEN_LIST[0]);
       // 交易对后置货币
-    setToken1(INITIAL_TOKEN_LIST[1]);
+    setToken1(INITIAL_TOKEN_LIST[3]);
       // 交易对前置货币余额
     setToken0Balance('0');
       // 交易对后置货币余额
@@ -221,8 +221,8 @@ const SwapComponent = props => {
   useEffect(() => {
     const { swap: { token0: modelToken0, token1: modelToken1 } } = props;
     
-    setToken0(modelToken0);
-    setToken1(modelToken1);
+    // setToken0(modelToken0);
+    // setToken1(modelToken1);
 
     console.log(">> old new token 0/1 compare", token0 == modelToken1, token1 == modelToken0)
     if (token0 == modelToken1 && token1 == modelToken0) {
@@ -233,12 +233,13 @@ const SwapComponent = props => {
     }
   }, [props.swap]);
 
-  useEffect(() => {
-    if(token) {
-      setToken0(token.token0);
-      setToken1(token.token1);
-    }
-  }, [token]);
+  // useEffect(() => {
+  //   console.log("swap coinlist token useeffect", token)
+  //   if(token) {
+  //     setToken0(token.token0);
+  //     setToken1(token.token1);
+  //   }
+  // }, [token]);
 
   
 
@@ -259,7 +260,7 @@ const SwapComponent = props => {
       console.log("try to refresh balance", INITIAL_TOKEN_LIST, token0, token1)
 
       const _token0 = INITIAL_TOKEN_LIST[0];
-      const _token1 = INITIAL_TOKEN_LIST[1];
+      const _token1 = INITIAL_TOKEN_LIST[3];
       setToken0(_token0);
       setToken1(_token1);
       async function refreshBalances() {
