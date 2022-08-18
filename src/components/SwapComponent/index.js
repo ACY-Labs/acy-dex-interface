@@ -93,7 +93,14 @@ import TokenSelectorDrawer from '../TokenSelectorDrawer';
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
   const { account, library, chainId, tokenList: INITIAL_TOKEN_LIST, farmSetting: {INITIAL_ALLOWED_SLIPPAGE}} = useConstantLoader(props);
-  const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1=false } = props;
+  const { 
+    dispatch, 
+    onSelectToken0, 
+    onSelectToken1, 
+    onSelectToken, 
+    token, 
+    isLockedToken1=false 
+  } = props;
   // 选择货币的弹窗
 
   const coinList = getGlobalTokenList()
@@ -450,10 +457,12 @@ const SwapComponent = props => {
     let tempBalance = token1Balance;
 
     setToken1(token0);
+    onSelectToken1(token0);
     setToken1Amount(token0Amount);
     setToken1Balance(token0Balance);
 
     setToken0(tempToken);
+    onSelectToken0(token1);
     setToken0Amount(tempAmount);
     setToken0Balance(tempBalance);
   };

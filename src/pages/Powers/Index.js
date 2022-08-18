@@ -352,6 +352,8 @@ const Powers = props => {
           {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
           <ExchangeTVChart
             chartTokenSymbol="BTC"
+            fromToken={activeToken0.symbol}
+            toToken={activeToken1.symbol}
             passTokenData={passTokenData}
           />
         </div>

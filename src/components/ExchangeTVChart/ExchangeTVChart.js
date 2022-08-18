@@ -154,10 +154,12 @@ function getCurrentTimestamp () {
 
 export default function ExchangeTVChart(props) {
   const {
-    chartTokenSymbol, 
-    passTokenData
+    chartTokenSymbol,
+    fromToken, 
+    toToken,
+    passTokenData, 
   } = props
-  console.log("swap coinlist chart props", chartTokenSymbol)
+  console.log("hjhjhj swap coinlist chart props", fromToken, toToken)
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [activeTimeScale, setActiveTimeScale] = useState("5m");
@@ -167,6 +169,7 @@ export default function ExchangeTVChart(props) {
   const [curPrice, setCurPrice] = useState();
   const [priceChangePercentDelta, setPriceChangePercentDelta] = useState();
   const [deltaIsMinus, setDeltaIsMinus] = useState();
+  // const [pairName, setPairName] = useState("BNBUSDT");
 
   
   const symbol = chartTokenSymbol || "BTC";
@@ -206,7 +209,12 @@ export default function ExchangeTVChart(props) {
     console.log("bin chart token: ", symbol)
     if (!symbol)
       return
-    const pairName = `${symbol}USDT`;
+    const pairName = `${fromToken}${toToken}`;
+    // const pairName = `${symbol}USDT`;
+    // setPairName(`${fromToken}${toToken}`)
+
+
+    console.log("swap coinlist pairname", pairName)
       
     if (cleaner.current) {
       // unsubscribe from previous subscription
@@ -216,49 +224,79 @@ export default function ExchangeTVChart(props) {
       currentSeries.setData([]);
     }
   
-    // subscribe to websocket for the future price update
-    const clean = client.ws.candles(pairName, period, (res) => {
-      console.log("res Swap: ", res)
-      const candleData = {
-        time: res.startTime / 1000,   // make it in seconds
-        open: res.open,
-        high: res.high,
-        low: res.low,
-        close: res.close
-      }
-      console.log("ws received: ", candleData.time, candleData.close)
-      currentSeries.update(candleData)
-      setLastCandle(candleData);
+    // // subscribe to websocket for the future price update
+    // const clean = client.ws.candles(pairName, period, (res) => {
+    //   console.log("res Swap: ", res)
+    //   const candleData = {
+    //     time: res.startTime / 1000,   // make it in seconds
+    //     open: res.open,
+    //     high: res.high,
+    //     low: res.low,
+    //     close: res.close
+    //   }
+    //   console.log("ws received: ", candleData.time, candleData.close)
+    //   currentSeries.update(candleData)
+    //   setLastCandle(candleData);
 
-      const ticks = currentSeries.Kn?.Bt?.Xr;
-      //St: open high low close; rt[So]: time
-      console.log("chartData: ", ticks);
-      const oldestTick = ticks[0];
-      const latestTick = ticks[ticks.length - 1];
-      if (oldestTick) {
-        console.log(`oldest tick: Open=${oldestTick.St[0]}, timestamp=${oldestTick.rt.So}`)
-      }
-      if( ticks && period != '1m' && period != '1w' ){
-        console.log("hjhjhj in if ", ticks)
-        getDeltaPriceChange(ticks)
-      }
-    });
-    cleaner.current = clean;
-    console.log("added new candles subscription for ", pairName)
+    //   const ticks = currentSeries.Kn?.Bt?.Xr;
+    //   //St: open high low close; rt[So]: time
+    //   console.log("chartData: ", ticks);
+    //   const oldestTick = ticks[0];
+    //   const latestTick = ticks[ticks.length - 1];
+    //   if (oldestTick) {
+    //     console.log(`oldest tick: Open=${oldestTick.St[0]}, timestamp=${oldestTick.rt.So}`)
+    //   }
+    //   if( ticks && period != '1m' && period != '1w' ){
+    //     console.log("hjhjhj in if ", ticks)
+    //     getDeltaPriceChange(ticks)
+    //   }
+    // });
+    // cleaner.current = clean;
+    // console.log("added new candles subscription for ", pairName)
   
     const fetchPrevAndSubscribe = async () => {
       // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
       // SHOULD DO THIS BEFORE SUBSCRIBE, HOWEVER MOVING SUBSCRIBE TO AFTER THIS BLOCK OF CODE WILL CAUSE THE SUBSCRIPTION GOES ON FOREVER
       // REACT BUG?
-      console.log("swap coinlistfetchPrevAndSubscribe again: ", chartTokenSymbol)
+      let fromTokenURL = `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${fromToken}USDT&interval=${period}`
+      let toTokenURL = `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`
+
+      let requesetFromTokenData = axios.get(fromTokenURL)
+      let requesetToTokenData = axios.get(toTokenURL)
+
+      let responsePairData=[]; 
+
+      const responseFromTokenData = await axios
+      .get(
+        `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${fromToken}USDT&interval=${period}`,
+      )
+      .then((res) => res.data);
+    const responseToTokenData = await axios
+      .get(
+        `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,
+      ).then((res) => res.data);
+      for (let i=0; i<responseFromTokenData.length; i++){
+        responsePairData.push({
+          time: responseFromTokenData[i].time,
+          open: responseFromTokenData[i].open / responseToTokenData[i].open,
+          high: responseFromTokenData[i].high / responseToTokenData[i].high,
+          low: responseFromTokenData[i].low / responseToTokenData[i].low,
+          close: responseFromTokenData[i].close / responseToTokenData[i].close,
+        });
+      }
+      console.log("swap coinlist fetchPrevAndSubscribe again: ", responseFromTokenData, responseToTokenData, responsePairData)
+        
+      
       // Binance data is independent of chain, so here we can fill in any chain name
-      const prevData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`).then(res => res.data);
-      // const secondData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=BNBUSDT&interval=${period}`).then(res => res.data);
-      currentSeries.setData(prevData);
-      console.log("hjhjhj prev data: ", prevData)
+
+      // const prevData = await axios.get(
+      //   `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`
+      //   ).then(res => res.data)
+      currentSeries.setData(responsePairData);
+      console.log("hjhjhj prev data: ", responsePairData)
       // console.log("hjhjhj prev data second: ", secondData)
       // console.log("prev data: ", prevData)
-
+      getDeltaPriceChange(responsePairData)
 
 
       if (!chartInited) {
@@ -268,18 +306,21 @@ export default function ExchangeTVChart(props) {
     }
   
     fetchPrevAndSubscribe()
-  }, [currentSeries, chartTokenSymbol, period])
+  }, [currentSeries, fromToken, toToken, period])
   ///// end of binance data source
 
   const getDeltaPriceChange =  (data) => {
-    console.log("hjhjhj prev data in get: ", data)
     let timeNow = getCurrentTimestamp()
     // console.log("hjhjhj currentseries curtime now", timeNow, "period", period, CHART_PERIODS[period])
     let forwardArr = 86400 / CHART_PERIODS[period]
     let arrIndex = 999 - forwardArr
 
-    const latestTick = data[data.length - 1]?.St[0];
-    let yesterday = data[data.length - 1 - forwardArr]?.St[0]
+    // const latestTick = data[data.length - 1]?.St[0];
+    // let yesterday = data[data.length - 1 - forwardArr]?.St[0]
+    const latestTick = data[data.length - 1].open;
+    let yesterday = data[data.length - 1 - forwardArr].open;
+    console.log("hjhjhj prev data in get: ", data, latestTick, yesterday)
+
     
     let deltaPercent = ((latestTick - yesterday) / yesterday * 100).toString() ;
     // console.log("hjhjhj tick data check error: ", latestTick, yesterday, deltaPercent)

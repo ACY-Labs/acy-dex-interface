@@ -486,6 +486,7 @@ const Swap = props => {
 
     //console.log("chartdata");
     //console.log(timeData);
+    console.log("hjhjhj swap coinlist activetoekns", activeToken0, activeToken1);
 
   }, [activeToken0, activeToken1]);
   // workaround way to get USD price (put token1 as USDC)
@@ -701,6 +702,8 @@ const Swap = props => {
                   <ExchangeTVChart
                     chartTokenSymbol={activeToken1.symbol}
                     // chartTokenSymbol="BTC"
+                    fromToken={activeToken0.symbol}
+                    toToken={activeToken1.symbol}
                     passTokenData={passTokenData}
                   />
                 </div>
