@@ -241,7 +241,6 @@ const SwapComponent = props => {
   }, [props.swap]);
 
   // useEffect(() => {
-  //   console.log("swap coinlist token useeffect", token)
   //   if(token) {
   //     setToken0(token.token0);
   //     setToken1(token.token1);

@@ -112,9 +112,7 @@ const StyledCard = styled(AcyCard)`
 const Swap = props => {
   const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
 
-  // console.log("hereim befoere swap coinlist");
   const coinList = getGlobalTokenList()
-  console.log("swap coinlist see tokens coinlist", coinList)
   // const platformList = getGlobalTokenPlatformList()
   // console.log("hereyou see tokens platformlist", platformList)
   // console.log("hereim swap coinlist successful", coinList);
@@ -223,7 +221,6 @@ const Swap = props => {
   // }, [tokenSelection, setTokenSelection])
 
   const passTokenData = (token) => {
-    console.log("swap coinlist passtokendata token ", token)
     setTokenData(token);
   };
 
@@ -282,7 +279,6 @@ const Swap = props => {
     }
   }, [library])
   // ------------------
-  console.log("swap coinlist activetoken", activeToken1)
   useEffect(() => {
     if (!supportedTokens) return
 
@@ -486,7 +482,6 @@ const Swap = props => {
 
     //console.log("chartdata");
     //console.log(timeData);
-    console.log("hjhjhj swap coinlist activetoekns", activeToken0, activeToken1);
 
   }, [activeToken0, activeToken1]);
   // workaround way to get USD price (put token1 as USDC)
@@ -704,7 +699,6 @@ const Swap = props => {
                     // chartTokenSymbol="BTC"
                     fromToken={activeToken0.symbol}
                     toToken={activeToken1.symbol}
-                    passTokenData={passTokenData}
                   />
                 </div>
               }

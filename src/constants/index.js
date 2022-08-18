@@ -433,7 +433,6 @@ export const getGlobalTokenList = () => {
                 })
             })
             setTokenList(tmpTokenList)
-            console.log("swap coinlist tmpTokenList", tmpTokenList)
             // console.log('hereim check init tokenList', tmpTokenList)
 
             //platform list data management
