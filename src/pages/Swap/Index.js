@@ -697,6 +697,7 @@ const Swap = props => {
                   <ExchangeTVChart
                     chartTokenSymbol={activeToken1.symbol}
                     // chartTokenSymbol="BTC"
+                    pageName="Swap"
                     fromToken={activeToken0.symbol}
                     toToken={activeToken1.symbol}
                   />

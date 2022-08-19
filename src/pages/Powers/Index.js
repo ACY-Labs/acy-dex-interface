@@ -218,7 +218,6 @@ const Powers = props => {
   }
 
   const onCloseBTC = () => {
-    console.log("hjhjhj close btc")
     setVisibleBTC(false);
   };
   const onCloseETH = () => {
