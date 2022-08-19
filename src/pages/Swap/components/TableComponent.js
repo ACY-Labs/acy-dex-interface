@@ -126,7 +126,7 @@ export function TradeHistoryTable(props) {
         dataIndex: 'maker',
         key: 'maker',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.maker}</div>;
+          return <div className={styles.tableData}>{entry.maker.slice(0,4)}...{entry.maker.slice(entry.maker.length-4,entry.maker.length)}{}</div>;
         },
         visible: true,
       },

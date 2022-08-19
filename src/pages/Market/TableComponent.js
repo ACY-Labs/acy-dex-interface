@@ -390,7 +390,7 @@ export function TopVolumeTable(props) {
             {index + 1}
           </div>
         ),
-        visible: true,
+        visible: props.mode && props.mode == 'simple' ? false : true,
       },
       {
         title: (
@@ -517,7 +517,7 @@ export function TrendingTable(props) {
             {index + 1}
           </div>
         ),
-        visible: true,
+        visible: props.mode && props.mode == 'simple' ? false : true,
       },
       {
         title: (
