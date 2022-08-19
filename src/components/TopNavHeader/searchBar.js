@@ -25,7 +25,7 @@ import {
 
 import { SCAN_URL_PREFIX, useConstantLoader, getGlobalTokenList } from "@/constants";
 import { ConsoleSqlOutlined } from '@ant-design/icons';
-
+import { TopVolumeTable, TrendingTable } from '@/pages/Market/TableComponent';
 
 const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');
@@ -109,7 +109,7 @@ export class SmallTable extends React.Component {
             style={{ color: 'white' }}
             className={styles.coinName}
             to={`/trade#${entry.symbol}`}
-            onClick={()=>{
+            onClick={() => {
               this.props.setVisibleSearchBar(false)
               this.props.setSearchQuery('')
             }}
@@ -118,6 +118,22 @@ export class SmallTable extends React.Component {
           </Link>
           <div style={{ width: 5 }}></div>
           <span className={styles.coinShort}> ({entry.name})</span>
+        </div>
+      );
+    } else if (this.state.mode == 'pairs') {
+      content = (
+        <div className={styles.tableItem}>
+          <AcyTokenIcon symbol={entry.logoURI} />
+          <span className={styles.coinShort}>{entry.name}</span>
+          <div style={{ lineHeight: '30px' }}>
+            <span>Token: {entry.tokenAddress}</span>
+            <span style={{ marginLeft: '10px' }}>|</span>
+            <span style={{ marginLeft: '10px' }}>Pair: {entry.pairAddress}</span>
+            <span style={{ marginLeft: '10px' }}>|</span>
+            <span style={{ marginLeft: '10px' }}>Tx: {entry.tx}</span>
+            <span className={styles.tableItemTag}>{entry.chain}</span>
+            <span className={styles.tableItemTag}>{entry.exchange}</span>
+          </div>
         </div>
       );
     } else {
@@ -149,11 +165,11 @@ export class SmallTable extends React.Component {
     return (
       <table className={styles.smallTable}>
         <tbody>
-          <tr className={styles.smallTableRow}>
+          {/* <tr className={styles.smallTableRow}>
             <td className={styles.smallTableHeader}>
               {this.state.mode == 'token' ? 'Token' : 'Pool'}
             </td>
-          </tr>
+          </tr> */}
 
           {this.state.tableData
             .slice(0, this.state.displayNumber)
@@ -455,55 +471,127 @@ export const SearchBar = props => {
     };
   }, []);
 
+  const testPairs = [
+    {
+      name: 'USDT/ACY-ACY',
+      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
+      tokenAddress: '...2882d623e53a',
+      pairAddress: '...6e29394154f7',
+      tx: 23145,
+      chain: 'BNBChain',
+      exchange: 'ACY Finance',
+    },
+    {
+      name: 'ACY/RUBY-RUBY',
+      logoURI: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389',
+      tokenAddress: '...2882d623e53a',
+      pairAddress: '...6e29394154f7',
+      tx: 23145,
+      chain: 'BNBChain',
+      exchange: 'ACY Finance',
+    },
+    {
+      name: 'ACY/DXS - DX SPOT',
+      logoURI: 'https://assets.coingecko.com/coins/images/9576/large/BUSD.png?1568947766',
+      tokenAddress: '...2882d623e53a',
+      pairAddress: '...6e29394154f7',
+      tx: 23145,
+      chain: 'BNBChain',
+      exchange: 'ACY Finance',
+    },
+  ]
+
+  const testVolume = [
+    {
+      name: 'USDT/WBNB',
+      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
+      exchange: 'Pancakeswap v2',
+      price: '$315.31',
+      price_24h: '-0.56%',
+      price_7d: '-0.56%',
+      price_30d: '-0.56%',
+      volume: '$31.66M',
+      swaps: '70.15K',
+      liquidity: '167.55M',
+      fdv: '$1223.66B'
+    },
+    {
+      name: 'USDC/OP',
+      logoURI: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389',
+      exchange: 'Velodrome',
+      price: '$1.9125',
+      price_24h: '-2.76%',
+      price_7d: '-2.76%',
+      price_30d: '-2.76%',
+      volume: '$18.89M',
+      swaps: '69.30K',
+      liquidity: '-',
+      fdv: '$8.20B'
+    },
+    {
+      name: 'BUSD/WBNB',
+      logoURI: 'https://assets.coingecko.com/coins/images/9576/large/BUSD.png?1568947766',
+      exchange: 'Pancakeswap v2',
+      price: '$314.76',
+      price_24h: '-0.77%',
+      price_7d: '-0.77%',
+      price_30d: '-0.77%',
+      volume: '$31.50M',
+      swaps: '55.37K',
+      liquidity: '179.72M',
+      fdv: '$1527.01B'
+    },
+  ]
+
   // the DOM itself
   return (
-      <div
-        className={styles.marketNavbar}
-        style={{ opacity: visible ? 1 : 0, zIndex: visible ? 10 : -1 }}
-        ref={rootRef}>
-        {/* search bar */}
-        <div className={styles.marketNavbarRight}>
-          <div className={styles.searchSection}>
-            {/* this is the gray background */}
-            {visibleSearchBar && <div className={styles.searchBackground} />}
-            <div ref={outsideClickRef}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexDirection: 'column',
-                  width: '100%',
-                }}
-              >
-                <div className={styles.searchWrapper}>
-                  <div className={styles.searchInnerWrapper}>
-                    <Input
-                      placeholder="Search"
-                      size="large"
-                      style={{
-                        backgroundColor: 'black',
-                        borderRadius: '5px',
-                        border: '1px solid #333333',
-                        paddingLeft: '20px',
-                        height: '50%',
-                        fontSize: '14px',
-                      }}
-                      onFocus={onSearchFocus}
-                      onChange={onInput}
-                      className={styles.searchBar}
-                      value={'' || searchQuery}
-                    />
-                  </div>
+    <div
+      className={styles.marketNavbar}
+      style={{ opacity: visible ? 1 : 0, zIndex: visible ? 10 : -1 }}
+      ref={rootRef}>
+      {/* search bar */}
+      <div className={styles.marketNavbarRight}>
+        <div className={styles.searchSection}>
+          {/* this is the gray background */}
+          {visibleSearchBar && <div className={styles.searchBackground} />}
+          <div ref={outsideClickRef}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                flexDirection: 'column',
+                width: '610px',
+              }}
+            >
+              <div className={styles.searchWrapper}>
+                <div className={styles.searchInnerWrapper}>
+                  <Input
+                    placeholder="Search"
+                    size="large"
+                    style={{
+                      backgroundColor: 'black',
+                      borderRadius: '5px',
+                      border: '1px solid #333333',
+                      paddingLeft: '20px',
+                      height: '50%',
+                      fontSize: '14px',
+                    }}
+                    onFocus={onSearchFocus}
+                    onChange={onInput}
+                    className={styles.searchBar}
+                    value={'' || searchQuery}
+                  />
                 </div>
-                {/* Search modal */}
-                <div style={{ width: '100%', position: 'relative', zIndex: 10 }}>
-                  {visibleSearchBar && (
-                    <div
-                      className={styles.searchModal}
-                      style={{ position: 'absolute', left: 0, right: 0, top: '10px' }}
-                    >
-                      <AcyTabs>
-                        <AcyTabPane tab="Search" key="1">
+              </div>
+              {/* Search modal */}
+              <div style={{ width: '100%', position: 'relative', zIndex: 10 }}>
+                {visibleSearchBar && (
+                  <div
+                    className={styles.searchModal}
+                    style={{ position: 'absolute', left: 0, right: 0, top: '10px' }}
+                  >
+                    <AcyTabs>
+                      {/* <AcyTabPane tab="Search" key="1">
                           {isLoading ? (
                             <Icon type="loading" />
                           ) : (
@@ -522,17 +610,86 @@ export const SearchBar = props => {
                               )}
                             </>
                           )}
-                        </AcyTabPane>
-                      </AcyTabs>
-                    </div>
-                  )}
-                </div>
+                        </AcyTabPane> */}
+                      <AcyTabPane tab="Pairs" key="1">
+                        {isLoading ? (
+                          <Icon type="loading" />
+                        ) : (
+                          <>
+                            {testPairs.length > 0 ? (
+                              <SmallTable
+                                mode="pairs"
+                                data={testPairs}
+                              />
+                            ) : (
+                              <div style={{ fontSize: '16x', margin: '20px' }}>No results</div>
+                            )}
+                          </>
+                        )}
+                      </AcyTabPane>
+                      <AcyTabPane tab="Top Volume" key="2">
+                        {isLoading ? (
+                          <Icon type="loading" />
+                        ) : (
+                          <>
+                            {testVolume.length > 0 ? (
+                              <TopVolumeTable dataSource={testVolume} mode="simple" />
+                            ) : (
+                              <div style={{ fontSize: '16x', margin: '20px' }}>No results</div>
+                            )}
+                          </>
+                        )}
+                      </AcyTabPane>
+                      <AcyTabPane tab="Trending" key="3">
+                        {isLoading ? (
+                          <Icon type="loading" />
+                        ) : (
+                          <>
+                            {testVolume.length > 0 ? (
+                              <TrendingTable dataSource={testVolume} mode="simple" />
+                            ) : (
+                              <div style={{ fontSize: '16x', margin: '20px' }}>No results</div>
+                            )}
+                          </>
+                        )}
+                      </AcyTabPane>
+                      <AcyTabPane tab="Winners" key="4">
+                        {isLoading ? (
+                          <Icon type="loading" />
+                        ) : (
+                          <>
+                            {testVolume.length > 0 ? (
+                              <TopVolumeTable dataSource={testVolume} mode="simple" />
+                            ) : (
+                              <div style={{ fontSize: '16x', margin: '20px' }}>No results</div>
+                            )}
+                          </>
+                        )}
+                      </AcyTabPane>
+                      <AcyTabPane tab="Losers" key="5">
+                        {isLoading ? (
+                          <Icon type="loading" />
+                        ) : (
+                          <>
+                            {testVolume.length > 0 ? (
+                              <TopVolumeTable dataSource={testVolume} mode="simple" />
+                            ) : (
+                              <div style={{ fontSize: '16x', margin: '20px' }}>No results</div>
+                            )}
+                          </>
+                        )}
+                      </AcyTabPane>
+
+                    </AcyTabs>
+                  </div>
+                )}
               </div>
             </div>
           </div>
-
         </div>
 
       </div>
+
+    </div>
   );
 };

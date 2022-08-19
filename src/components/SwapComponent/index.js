@@ -1,11 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-param-reassign */
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable react/react-in-jsx-scope */
-/* eslint-disable no-return-await */
-/* eslint-disable no-restricted-globals */
-/* eslint-disable consistent-return */
 import {
   AcyCard,
   AcyIcon,
@@ -19,7 +11,7 @@ import {
   AcyLineChart,
   AcyConfirm,
   AcyApprove,
-  AcyButton,
+  AcyPerpetualButton,
   AcyDescriptions,
   AcySmallButton,
 } from '@/components/Acy';
@@ -87,7 +79,8 @@ import {useConnectWallet} from '@/components/ConnectWallet';
 import { asyncForEach } from "@/utils/asynctools";
 import { processString } from "@/components/AcyCoinItem";
 import TokenSelectorDrawer from '../TokenSelectorDrawer';
-
+import DetailBox from './components/DetailBox';
+import ScoreBox from './components/ScoreBox';
 
 
 // var CryptoJS = require("crypto-js");
@@ -709,54 +702,60 @@ const SwapComponent = props => {
             {showSpinner && <Icon type="loading" />}
           </AcyButton>{' '}
         </div>
-
-        : <AcyButton
-          style={{ marginTop: '25px' }}
-          disabled={!swapButtonState}
-          onClick={() => {
-            if (account == undefined) {
-              connectWalletByLocalStorage();
-            } else {
-              setSwapButtonState(false);
-              setSwapButtonContent(<>Processing <Icon type="loading" /></>)
-              swap(
-                {
-                  ...token0,
-                  amount: token0Amount,
-                },
-                {
-                  ...token1,
-                  amount: token1Amount,
-                },
-                slippageTolerance * 100,
-                exactIn,
-                chainId,
-                library,
-                account,
-                pair,
-                route,
-                trade,
-                slippageAdjustedAmount,
-                minAmountOut,
-                maxAmountIn,
-                wethContract,
-                wrappedAmount,
-                deadline,
-                setSwapStatus,
-                setSwapButtonContent,
-                setSwapButtonState,
-                swapCallback,
-                methodName,
-                isUseArb,
-                midTokenAddress,
-                poolExist
-              );
-            }
-          }}
-        >
-          {swapButtonContent}
-        </AcyButton>
+        : 
+        <div className={styles.centerButton}>
+          <AcyPerpetualButton
+            style={{ marginTop: '25px' }}
+            disabled={!swapButtonState}
+            onClick={() => {
+              if (account == undefined) {
+                connectWalletByLocalStorage();
+              } else {
+                setSwapButtonState(false);
+                setSwapButtonContent(<>Processing <Icon type="loading" /></>)
+                swap(
+                  {
+                    ...token0,
+                    amount: token0Amount,
+                  },
+                  {
+                    ...token1,
+                    amount: token1Amount,
+                  },
+                  slippageTolerance * 100,
+                  exactIn,
+                  chainId,
+                  library,
+                  account,
+                  pair,
+                  route,
+                  trade,
+                  slippageAdjustedAmount,
+                  minAmountOut,
+                  maxAmountIn,
+                  wethContract,
+                  wrappedAmount,
+                  deadline,
+                  setSwapStatus,
+                  setSwapButtonContent,
+                  setSwapButtonState,
+                  swapCallback,
+                  methodName,
+                  isUseArb,
+                  midTokenAddress,
+                  poolExist
+                );
+              }
+            }}
+          >
+            {swapButtonContent}
+          </AcyPerpetualButton>
+        </div>
       }
+
+      <DetailBox />
+
+      <ScoreBox />
 
       <AcyDescriptions>
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}

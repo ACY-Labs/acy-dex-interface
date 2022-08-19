@@ -975,8 +975,8 @@ const Swap = props => {
   const KChartTokenListETH = ["BTC", "ETH"]
   const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
   const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBSC
-                          : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
-                          : KChartTokenListETH
+    : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
+      : KChartTokenListETH
   const selectChartToken = item => {
     onClickSetActiveToken(item)
   }
@@ -997,7 +997,8 @@ const Swap = props => {
 
       <div className={styles.main}>
         <div className={styles.rowFlexContainer}>
-          {swapOption != "Pool" && (
+          {swapOption != "Pool"
+            ?
             <div className={`${styles.colItem} ${styles.priceChart}`}>
               <div>
                 <div className={styles.chartTokenSelectorTab}>
@@ -1062,8 +1063,7 @@ const Swap = props => {
                 </AcyCard>
               </div>
             </div>
-          )}
-          {swapOption == "Pool" &&
+            :
             <AcyPool />
           }
 

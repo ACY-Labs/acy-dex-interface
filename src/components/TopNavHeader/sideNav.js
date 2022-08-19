@@ -34,7 +34,7 @@ export default class TopNavHeader extends PureComponent {
           <div className={styles.left}>
             <div className={styles.logo} key="logo" id="logo">
               <Link to="/">
-                <AcyIcon name="acy" width={32}/>
+                <AcyIcon name="acy" width={40}/>
               </Link>
             </div>
             <div
