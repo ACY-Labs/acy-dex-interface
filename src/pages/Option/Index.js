@@ -38,6 +38,9 @@ const StyledDrawer = styled(Drawer)`
   ant-drawer-content-wrapper{
     transform: translateY(0%);
   }
+  .ant-drawer-close{
+    color: #b5b5b6;
+  }
 `
 
 const Option = props => {
@@ -227,7 +230,7 @@ const Option = props => {
     }
   }
   const selectChartToken = item => {
-    console.log("hjhjhj select char token", item)
+    // console.log("hjhjhj select char token", item)
   }
 
   const onCloseBTC = () => {
@@ -269,7 +272,6 @@ const Option = props => {
                         <StyledDrawer
                           className={styles.drawerContent}
                           placement="bottom"
-                          closable={false}
                           onClose={onCloseBTC}
                           visible={visibleBTC}
                           getContainer={false}

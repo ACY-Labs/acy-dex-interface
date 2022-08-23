@@ -37,6 +37,9 @@ const StyledDrawer = styled(Drawer)`
   ant-drawer-content-wrapper{
     transform: translateY(0%);
   }
+  .ant-drawer-close{
+    color: #b5b5b6;
+  }
 `
 
 const Powers = props => {
@@ -214,7 +217,7 @@ const Powers = props => {
     }
   }
   const selectChartToken = item => {
-    console.log("hjhjhj select char token", item)
+    // console.log("hjhjhj select char token", item)
   }
 
   const onCloseBTC = () => {
@@ -229,6 +232,7 @@ const Powers = props => {
   const onCloseMATIC = () => {
     setVisibleMATIC(false);
   };
+  
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
@@ -254,8 +258,8 @@ const Powers = props => {
                         <StyledDrawer
                           className={styles.drawerContent}
                           placement="bottom"
-                          closable={false}
                           onClose={onCloseBTC}
+                          // onClose={onClose("BTC")}
                           visible={visibleBTC}
                           getContainer={false}
                           closeIcon={false}
@@ -289,6 +293,7 @@ const Powers = props => {
                         className={styles.drawerContent}
                         placement="bottom"
                         onClose={onCloseETH}
+                        // onClose={onClose("ETH")}
                         visible={visibleETH}
                         getContainer={false}
                         closeIcon={false}
