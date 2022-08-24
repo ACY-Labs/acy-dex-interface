@@ -37,6 +37,8 @@ import styles from './index.less';
 import { ReactComponent as Opera } from './Opera.svg';
 import styled from "styled-components";
 import { disconnect } from 'echarts';
+import { useChainId } from '@/utils/helpers';
+import { useConnectWallet } from '@/components/ConnectWallet';
 
 
 const GlobalHeaderRight = props => {
@@ -48,29 +50,48 @@ const GlobalHeaderRight = props => {
   const [only, setOnly] = useState(true);
   // 连接钱包函数
   const { library } = useConstantLoader();
-  const { account, chainId, activate, deactivate, active } = useWeb3React();
+  const { account, activate, deactivate, active } = useWeb3React();
+  const { chainId } = useChainId();
 
   const [wallet, setWallet] = useState(localStorage.getItem("wallet"));
 
   const [selectedNetwork, setSelectedNetwork] = useState("BSC");
   const [supportedWallets, setSupportWallets] = useState([]);
 
-  // 连接钱包 根据localStorage
   useEffect(() => {
-    setWallet(localStorage.getItem("wallet"))
-    if (!account) {
-      if (!wallet) {
-        console.log("localStroage dosen't exist");
-        localStorage.setItem('wallet', 'binance');
-      }
+    if (window.ethereum) {
+      window.ethereum.on("chainChanged", (newChainId) => {
+        document.location.reload();
+      })
     }
-  }, [account]);
+  }, [])
 
-  useEffect(() => {
-    console.log('test current active', active)
-    if (!active)
-      deactivate();
-  }, [active]);
+  // // auto connect to wallet on page refresh
+  // const connectWalletByLocalStorage = useConnectWallet();
+  // useEffect(() => {
+  //   console.log("right content account ", account)
+  //   if (!account) {
+  //     connectWalletByLocalStorage()
+  //   }
+  // }, [account]);
+
+
+  // // 连接钱包 根据localStorage
+  // useEffect(() => {
+  //   setWallet(localStorage.getItem("wallet"))
+  //   if (!account) {
+  //     if (!wallet) {
+  //       console.log("localStroage dosen't exist");
+  //       localStorage.setItem('wallet', 'binance');
+  //     }
+  //   }
+  // }, [account]);
+
+  // useEffect(() => {
+  //   const newChainId = localStorage.getItem("initialChainId");
+  //   const newHash = `${window.location.hash}?chain=${newChainId}`;
+  //   window.history.replaceState({}, null, newHash);
+  // }, [localStorage.getItem("initialChainId")]);
 
   // 判断设备
   const [userSystem, setuserSystem] = useState("other");
@@ -285,67 +306,71 @@ const GlobalHeaderRight = props => {
     }
     return 1
   }
-  // 通知钱包连接成功
-  const checkChainNetwork = (chainId) => {
-    if (!chainId) {
-      // switchEthereumChain("0x38"); //返回默认56链
-      return
-    }
-    console.log("networkChanged:", chainId)
-    console.log("supported chain?", supportedChainIds, chainId, supportedChainIds.indexOf(chainId) == -1)
-    if (supportedChainIds && supportedChainIds.indexOf(Number(chainId)) == -1) {
-      console.log("ERROR: unsupport NetWork");
-      setIsModalVisible(true);
-      switchEthereumChain("0x38"); //返回默认56链
-    }
-    else if (chainId == 97) {
-      // 测试网 不显示给用户
-      switchEthereumChain("0x61");
-      setNetworkListIndex(0)
-    }
-    else {
-      setIsModalVisible(false);
-      setVisibleMetaMask(false);
-      setNetworkListIndex(n_index(chainId))
-    }
-  }
-  useEffect(() => {
-    // todo....
-    if (account) {
-      console.log(account);
-      setVisibleMetaMask(false);
-    }
-    checkChainNetwork(chainId);
-    // 监听钱包网络变化 metamask
-    if (localStorage.getItem("wallet") == "metamask" || localStorage.getItem("wallet") == "bitkeep") {
-      try {
-        ethereum.on('networkChanged', function (chainId) {
-          checkChainNetwork(chainId);
-        })
-      } catch (error) {
-        console.log("no metamask plugin");
-      }
-    }
-    if (localStorage.getItem("wallet") == "nabox") {
-      // Nabox 监听
-      try {
-        NaboxWallet.on('networkChanged', function (chainId) {
-          checkChainNetwork(chainId);
-        })
-      } catch (error) {
-        console.log("no nabox plugin");
-      }
-    }
-    if (localStorage.getItem("wallet") == "binance") {
-      try {
-        BinanceChain.on('networkChanged', function (chainId) {
-          checkChainNetwork(chainId);
-        })
-      } catch (error) {
-        console.log("no binance plugin");
-      }
-    }
-  }, [account, chainId, supportedChainIds, wallet]);
+  // // 通知钱包连接成功
+  // const checkChainNetwork = (chainId) => {
+  //   if (!chainId) {
+  //     // switchEthereumChain("0x38"); //返回默认56链
+  //     return
+  //   }
+  //   console.log("networkChanged:", chainId)
+  //   console.log("supported chain?", supportedChainIds, chainId, supportedChainIds.indexOf(chainId) == -1)
+  //   if (supportedChainIds && supportedChainIds.indexOf(Number(chainId)) == -1) {
+  //     console.log("ERROR: unsupport NetWork");
+  //     setIsModalVisible(true);
+  //     switchEthereumChain("0x38"); //返回默认56链
+  //   }
+  //   else if (chainId == 97) {
+  //     // 测试网 不显示给用户
+  //     switchEthereumChain("0x61");
+  //     setNetworkListIndex(0)
+  //   }
+  //   else {
+  //     setIsModalVisible(false);
+  //     setVisibleMetaMask(false);
+  //     setNetworkListIndex(n_index(chainId))
+  //   }
+  // }
+  // useEffect(() => {
+  //   // todo....
+  //   if (account) {
+  //     console.log(account);
+  //     setVisibleMetaMask(false);
+  //   }
+  //   // checkChainNetwork(chainId);
+  //   // 监听钱包网络变化 metamask
+  //   if (localStorage.getItem("wallet") == "metamask" || localStorage.getItem("wallet") == "bitkeep") {
+  //     try {
+  //       ethereum.on("chainChanged", (_chainId) => {
+  //         const nextChainId = parseInt(_chainId);
+  //         console.log("initialChainId changed to ", nextChainId);
+  //         localStorage.setItem("initialChainId", nextChainId);
+  //         window.location.reload()
+  //         // checkChainNetwork(chainId);
+  //       })
+  //     } catch (error) {
+  //       console.log("no metamask plugin");
+  //     }
+  //   }
+  //   if (localStorage.getItem("wallet") == "nabox") {
+  //     // Nabox 监听
+  //     try {
+  //       NaboxWallet.on('networkChanged', function (chainId) {
+  //         checkChainNetwork(chainId);
+  //       })
+  //     } catch (error) {
+  //       console.log("no nabox plugin");
+  //     }
+  //   }
+  //   if (localStorage.getItem("wallet") == "binance") {
+  //     try {
+  //       BinanceChain.on('networkChanged', function (chainId) {
+  //         checkChainNetwork(chainId);
+  //       })
+  //     } catch (error) {
+  //       console.log("no binance plugin");
+  //     }
+  //   }
+  // }, [account, chainId, supportedChainIds, wallet]);
   const {
     currentUser,
     fetchingMoreNotices,

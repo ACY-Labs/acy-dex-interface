@@ -21,13 +21,34 @@ import { ARBITRUM_DEFAULT_COLLATERAL_SYMBOL } from '@/acy-dex-futures/utils';
 import { fetcher, getInfoTokens, expandDecimals, useLocalStorageByChainId } from '@/acy-dex-futures/utils';
 import useSWR from 'swr';
 
+import { getContract } from '@/constants/stableCoins';
+import { useChainId } from '@/utils/helpers';
+import { useConnectWallet } from '@/components/ConnectWallet';
+
 
 const StableCoin = props => {
-  const { account, library, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader(props);
+  const { library, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader(props);
   // const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
   const { AddressZero } = ethers.constants
 
+  const {account} = useWeb3React();
+  // auto connect to wallet on page refresh
+  const connectWalletByLocalStorage = useConnectWallet();
+  useEffect(() => {
+    if (!account) {
+      connectWalletByLocalStorage()
+    }
+  }, [account]);
 
+  // test gmx chainId hook
+  const {chainId: chainId2} = useChainId();
+  const readerAddress2 = getContract(chainId2, "Reader");
+  useEffect(() => {
+    console.log("stablecoin multichain readerAddr2 ", readerAddress2)
+  }, [readerAddress2]);
+  useEffect(() => {
+    console.log("stablecoin multichain chainId2 ", chainId2)
+  }, [chainId2]);
   // TODO: TESTING
   const chainId = 137;
   const { dispatch } = props
