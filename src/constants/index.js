@@ -355,22 +355,6 @@ export const useConstantLoader = () => {
     //   }, [chainId])
 
 
-    useEffect(() => {
-        if (window.ethereum) {
-            ethereum.on("chainChanged", (_chainId) => {
-                const nextChainId = parseInt(_chainId);
-                console.log("initialChainId changed to ", nextChainId);
-                localStorage.setItem("initialChainId", nextChainId);
-                window.location.reload()
-                // changeUrlChainId(nextChainId)
-            })
-        }
-
-    }, [])
-
-
-
-
     // // 如果手动修改 url 的 chainId，就触发切换 chain network 的请求
     // // @TODO: 用户还没 connect 钱包时不要触发 request
     // useEffect(() => {
