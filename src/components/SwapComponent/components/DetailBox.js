@@ -15,7 +15,7 @@ const DetailBox = props => {
 
   return (
     <>
-      <div style={{ padding: '10px', display: 'flex', fontSize: '16px', marginTop: '50px' }}>
+      <div style={{ padding: '10px', display: 'flex', fontSize: '15px', marginTop: '50px' }}>
         <div style={{ color: 'white', fontWeight: '400', marginRight: '10px' }}>{pair_name}</div>
         <div style={{ marginRight: '10px' }}>
           <span style={{ marginRight: '5px' }}>Token: {token_address.slice(0,6)}...{token_address.slice(token_address.length-4, token_address.length)}</span>

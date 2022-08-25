@@ -149,7 +149,7 @@ export default class BaseMenu extends PureComponent {
         </SubMenu>
       );
     }
-    return <Menu.Item key={item.path} style={{ marginTop: item.name == 'Liquidity' ? '32px' : '-20px' }}>{this.getMenuItemPath(item)}</Menu.Item>
+    return <Menu.Item key={item.path} style={{ marginTop: item.name == 'StableCoin' ? '32px' : '-20px' }}>{this.getMenuItemPath(item)}</Menu.Item>
   };
 
   getSubMenuOrItem_default = (item, parent) => {
@@ -298,8 +298,7 @@ export default class BaseMenu extends PureComponent {
     const handleMouseLeave = () => {
       this.setState({ visible: false })
     }
-    console.log('joy visible', this.state.visible)
-
+    
     return (
       <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
         <Menu
