@@ -122,7 +122,6 @@ const Option = props => {
     return supportedList
   }
 
-
   function getTokenBySymbol(tokenlist, symbol) {
     for (let i = 0; i < tokenlist.length; i++) {
       tokenlist[i].address = tokenlist[i].address.toLowerCase()
@@ -143,7 +142,6 @@ const Option = props => {
 
   const onChange = (newActiveKey) => {
     // setActiveKey(newActiveKey);
-    console.log("hjhjhj multchain option newActiveKey", newActiveKey)
     setActiveToken1((chainTokenList.filter(ele => ele.symbol == newActiveKey))[0])
   };
 
