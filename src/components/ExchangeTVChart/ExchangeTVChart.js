@@ -170,7 +170,7 @@ export default function ExchangeTVChart(props) {
   const [deltaIsMinus, setDeltaIsMinus] = useState();
   // const [pairName, setPairName] = useState("BNBUSDT");
 
-  const isTick = pageName == "Option" || pageName == "Powers";
+  const isTick = pageName == "Option" || pageName == "Powers" || pageName == "Future";
 
   const symbol = chartTokenSymbol || "BTC";
   const marketName = symbol + "_USD";
