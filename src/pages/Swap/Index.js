@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { connect } from 'umi';
 import { Button } from 'antd';
-import {
-  AcyCard,
-  AcyConfirm,
-  AcyApprove,
-} from '@/components/Acy';
+import { AcyCard, AcyConfirm, AcyApprove,} from '@/components/Acy';
 import Media from 'react-media';
 import { getTransactionsByAccount, appendNewSwapTx } from '@/utils/txData';
 import SwapComponent from '@/components/SwapComponent';
@@ -20,9 +16,13 @@ import { TxFetcher } from '@/utils/utils';
 import SankeyGraph from './components/SankeyGraph';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { TradeHistoryTable, PoolsActivityTable } from './components/TableComponent.js';
+import { useChainId } from '@/utils/helpers';
+import { getTokens } from '@/constants/trade'
 
 const Swap = props => {
-  const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
+  const { account, library, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
+  const { chainId } = useChainId();
+  const supportedTokens = getTokens(chainId);
 
   const [activeToken1, setActiveToken1] = useState(supportedTokens[3]);
   const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
