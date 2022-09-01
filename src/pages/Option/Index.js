@@ -48,34 +48,24 @@ const StyledDrawer = styled(Drawer)`
 
 const Option = props => {
   const { account, library, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
-  let { chainId: chainId2 } = useChainId();
-  let chainId = chainId2;
-  console.log("hjhjhj multchain option usechainId undefined", chainId)
-  if (chainId == undefined || chainId == 56) {
-    chainId = 80001;
-    console.log("hjhjhj multchain option usechainId undefined", chainId)
-  }
-  console.log("hjhjhj multchain option chainId", chainId)
-  const tokensOption = getTokens(chainId);
-  let tokens = getTokens(chainId);
-  console.log("hjhjhj multchain option tokens", tokens)
+  let { chainId } = useChainId();
 
+  let tokens = getTokens(chainId);
 
   const { AddressZero } = ethers.constants
+
+  const { active, activate } = useWeb3React();
 
   const [mode, setMode] = useState('Buy')
   const [volume, setVolume] = useState(0)
   const [percentage, setPercentage] = useState('')
   const [tableContent, setTableContent] = useState("Positions");
 
-  const chainTokenList = getSupportedInfoTokens(tokens)
+
   const [activeToken1, setActiveToken1] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
-  // const [activeToken1, setActiveToken1] = useState(chainTokenList[2]);
 
-  // (chainTokenList.filter(ele => ele.symbol == newActiveKey))[0]
-  const [activeToken0, setActiveToken0] = useState(chainTokenList[1]);
+  const [activeToken0, setActiveToken0] = useState(tokens[1]);
 
-  console.log("hjhjhj multchain option activeToken0", tokens, chainTokenList, activeToken0)
   const [fromTokenAddress, setFromTokenAddress] = useState(activeToken0.address);
   const [toTokenAddress, setToTokenAddress] = useState("");
   const [tokenData, setTokenData] = useState("BTC")
@@ -105,22 +95,27 @@ const Option = props => {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
   })
 
+  useEffect(() => {
+    if (active) {
+      library.on('block', () => {
+        updateVaultTokenInfo(undefined, true)
+        updateTokenBalances(undefined, true)
+        updateFundingRateInfo(undefined, true)
+      })
+      return () => {
+        library.removeAllListeners('block')
+      }
+    }
+  }, [active, library, chainId,
+    updateVaultTokenInfo, updateTokenBalances,
+    updateFundingRateInfo]
+  )
+
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
 
   const passTokenData = (token) => {
     setTokenData(token);
   };
-
-  function getSupportedInfoTokens(tokenlist) {
-    let supportedList = []
-    for (let i = 0; i < tokenlist.length; i++) {
-      tokenlist[i].address = tokenlist[i].address.toLowerCase()
-      if (tokenlist[i].symbol == 'BTC' || tokenlist[i].symbol == "ETH" || tokenlist[i].symbol == "USDT" || tokenlist[i].symbol == "MATIC" || tokenlist[i].symbol == "BNB") {
-        supportedList.push(tokenlist[i])
-      }
-    }
-    return supportedList
-  }
 
   function getTokenBySymbol(tokenlist, symbol) {
     for (let i = 0; i < tokenlist.length; i++) {
@@ -131,43 +126,31 @@ const Option = props => {
     }
     return undefined
   }
-  const chartPanes = [
-    { title: 'BTC', content: 'BTC', key: 'BTC', closable: false },
-    { title: 'ETH', content: 'ETH', key: 'ETH' },
-    // { title: 'Tab 3', content: 'Content of Tab 3', key: '3'},
-  ];
-  const [activeKey, setActiveKey] = useState(chartPanes[0].key);
-  const [panes, setPanes] = useState(chartPanes);
-  const newTabIndex = useRef(0);
-
+  
   const onChange = (newActiveKey) => {
-    // setActiveKey(newActiveKey);
-    setActiveToken1((chainTokenList.filter(ele => ele.symbol == newActiveKey))[0])
+    setActiveToken1((tokens.filter(ele => ele.symbol == newActiveKey))[0])
   };
 
   const getActiveTokenAddr = (symbol) => {
-    let tmp = getTokenBySymbol(chainTokenList, symbol);
+    let tmp = getTokenBySymbol(tokens, symbol);
     return tmp.address
   }
   const onClickDropdownBTC = e => {
     let tmp = optionsBTC[e.name]
-    // setActiveToken1(chainTokenList[2]);
-    setActiveToken1((chainTokenList.filter(ele => ele.symbol == "BTC"))[0]);
-    // (chainTokenList.filter(ele => ele.symbol == newActiveKey))[0]
+    setActiveToken1((tokens.filter(ele => ele.symbol == "BTC"))[0]);
+    // (tokens.filter(ele => ele.symbol == newActiveKey))[0]
   };
   const onClickDropdownETH = e => {
     let tmp = optionsETH[e.name]
-    // setActiveToken1(chainTokenList[3]);
-    setActiveToken1((chainTokenList.filter(ele => ele.symbol == "ETH"))[0]);
+    setActiveToken1((tokens.filter(ele => ele.symbol == "ETH"))[0]);
   };
   const onClickDropdownMATIC = e => {
     let tmp = optionsMATIC[e.name]
-    setActiveToken1((chainTokenList.filter(ele => ele.symbol == "MATIC"))[0]);
-    // setActiveToken1(chainTokenList[0]);
+    setActiveToken1((tokens.filter(ele => ele.symbol == "MATIC"))[0]);
   };
   const onClickDropdownBNB = e => {
     let tmp = optionsBNB[e.name]
-    setActiveToken1(chainTokenList[3]);
+    setActiveToken1((tokens.filter(ele => ele.symbol == "BNB"))[0]);
   };
 
   useEffect(() => {
@@ -216,7 +199,7 @@ const Option = props => {
     : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
       : KChartTokenListETH
   const selectTab = item => {
-    setActiveToken1((chainTokenList.filter(ele => ele.symbol == item))[0])
+    setActiveToken1((tokens.filter(ele => ele.symbol == item))[0])
     switch (item) {
       case "BTC":
         setVisibleBTC(true);
@@ -247,7 +230,6 @@ const Option = props => {
     }
   }
   const selectChartToken = item => {
-    // console.log("hjhjhj select char token", item)
   }
 
   const onCloseBTC = () => {

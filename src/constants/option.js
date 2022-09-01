@@ -21,7 +21,46 @@ const contracts = {
 }
 
 const tokenLists = {
-    56: [],
+    56: [
+        {
+            name: "Binance Coin",
+            symbol: "BNB",
+            decimals: 18,
+            address: ethers.constants.AddressZero,
+            isNative: true,
+            isShortable: true
+        },
+        {
+            name: "Wrapped Bitcoin",
+            symbol: "BTC",
+            decimals: 8,
+            address: "0x6E59735D808E49D050D0CB21b0c9549D379BBB39",
+            isShortable: true
+        },
+        {
+            name: "Wrapped BNB",
+            symbol: "WBNB",
+            decimals: 18,
+            address: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+            isWrapped: true,
+            baseSymbol: "BNB"
+        },
+        {
+            name: "Wrapped ETH",
+            symbol: "ETH",
+            decimals: 18,
+            address: "0xF471F7051D564dE03F3736EeA037D2dA2fa189c1",
+            isShortable: true,
+            isStable: false
+        },
+        {
+            name: "Tether",
+            symbol: "USDT",
+            decimals: 18,
+            address: "0xF82eEeC2C58199cb409788E5D5806727cf549F9f",
+            isStable: true
+        },
+    ],
     97: [
         {
             name: "Binance Coin",

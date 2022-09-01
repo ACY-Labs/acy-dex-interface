@@ -27,11 +27,19 @@ const contracts = {
         GlpManager: '0x267DE43231876eEeB9a3E81ADc5AE65e976B4b60',
         GLP: '0x53a2eD45d06518f903782134aB28C0E99E3C3A13',
         OrderBook: '0xDbF5F6861f1F69Fc834BA9Ea8233085baeD4657c',
-      },
+    },
 }
 
 const tokenLists = {
-    56: [],
+    56: [
+        {
+            name: "USD Coin",
+            symbol: "USDC",
+            decimals: 6,
+            address: "0xE971616d94335dec2E54939118AdFcB68E6dCAd6",
+            isStable: true
+        },
+    ],
     97: [
         {
             name: "Binance Coin",

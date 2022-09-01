@@ -184,7 +184,6 @@ export function getPositionQuery(tokens, nativeTokenAddress) {
 }
 
 export function getPositions(chainId, positionQuery, positionData, infoTokens, includeDelta, nativeTokenAddress) {
-  console.log("hjhjhj multchain error 1 positions")
 
   const propsLength = getConstant(chainId, "positionReaderPropsLength")
   // const propsLength = 9;
@@ -206,7 +205,7 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
     indexToken = getTokenInfo(infoTokens, indexTokens[i], true, nativeTokenAddress)
     indexToken.logoURI = findTokenWithAddress(indexToken.address).logoURI;
     const key = getPositionKey(collateralTokens[i], indexTokens[i], isLong[i])
-    // console.log("hjhjhj multchain error 2 positions", positionData, propsLength, i, positionData[i * propsLength + 6])
+    console.log("hjhjhj multchain error positions", positionData, propsLength, i, positionData[i * propsLength + 6])
 
     const position = {
       key,
@@ -289,17 +288,17 @@ const Swap = props => {
   const { savedIsPnlInLeverage, setSavedIsPnlInLeverage, savedSlippageAmount, pendingTxns, setPendingTxns } = props
 
   const { account, library, farmSetting: { API_URL: apiUrlPrefix }, globalSettings, } = useConstantLoader();
-  let { chainId: chainId2 } = useChainId();
-  let chainId = chainId2;
-  useEffect(() => {
-    // console.log("hjhjhj multchain  chainId2 ", chainId2)
-  }, [chainId2]);
+  let { chainId } = useChainId();
+  // let chainId = chainId2;
+  // useEffect(() => {
+  //   // console.log("hjhjhj multchain  chainId2 ", chainId2)
+  // }, [chainId2]);
   if (chainId == undefined || chainId != 97 && chainId != 80001) {
     console.log("hjhjhj multchain perp chainId undefined", useChainId())
-    chainId = 80001;
+    // chainId = 80001;
   }
   const tokensperp = getTokens(chainId);
-  console.log("hjhjhj multchain perp chainid", chainId, chainId2)
+  console.log("hjhjhj multchain perp chainid", chainId)
 
   const supportedTokens = constantInstance.perpetuals.tokenList;
 
