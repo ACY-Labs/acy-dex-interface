@@ -16,8 +16,9 @@ import {
 } from '@/connectors';
 
 import Login from 'ant-design-pro/lib/Login';
-import { Alert, Checkbox, message } from 'antd';
+import { Alert, Checkbox, message, Image } from 'antd';
 import { DownOutlined, DisconnectOutlined, CheckCircleTwoTone } from '@ant-design/icons';
+import QRCode from '@/components/Acy/qrcode.png';
 
 import {
     AcyCard,
@@ -465,7 +466,7 @@ const WalletLogin = props => {
                         />
                         {loginOption == "Connect Wallet" &&
                             <div styles={{ marginTop: "1rem" }}>
-                                {!account && <div style={{padding:"10px"}}>
+                                {!account && <div style={{ padding: "10px" }}>
                                     <div className={styles.networkTitle}>
                                         <span>1. Select a Network</span>
                                     </div>
@@ -575,7 +576,7 @@ const WalletLogin = props => {
                                         Forgot password
                                     </a>
                                 </div>
-                                <Submit style={{ backgroundColor: "black", border: "0.75px solid #444444", marginLeft: "10rem", width: "100px" }}>Login</Submit>
+                                <Submit style={{ backgroundColor: "black", border: "0.75px solid #444444", float: "right", marginRight: "3rem", width: "100px" }}>Login</Submit>
                                 <div>
                                     <a style={{ float: 'left', marginLeft: "1rem" }} href="">
                                         Register
@@ -583,15 +584,24 @@ const WalletLogin = props => {
                                 </div>
                             </div>}
                         {loginOption == "Mobile" &&
-                            <div style={{ marginTop: "4rem" }}>
-                                <Mobile name="mobile" style={{ width: "90%", height: "4rem", color: "black", marginLeft: "1rem", marginBottom: "1rem" }} />
-                                <Captcha onGetCaptcha={() => console.log('Get captcha!')} name="captcha" style={{ width: "90%", height: "4rem", color: "black", marginLeft: "1rem", marginBottom: "1rem" }} />
+                            <div style={{ marginTop: "1rem" }}>
+                                {/* <Mobile name="mobile" style={{ width: "90%", height: "4rem", color: "black", float: "right", marginRight:"3rem", marginBottom: "1rem" }} />
+                                <Captcha onGetCaptcha={() => console.log('Get captcha!')} name="captcha" style={{ width: "90%", height: "4rem", color: "black", marginLeft: "1rem", marginBottom: "1rem" }} /> */}
+                                <img
+                                className={styles.imgCenter}
+                                    width={200}
+                                    src={QRCode}
+                                    style={{}}
+                                />
+                                <span className={styles.wordCenter} style={{ fontWeight: "bold", fontSize:"1.1rem", marginTop:"1rem"}}>Log in with QR code</span>
+
+                                <span className={styles.wordCenter} style={{padding:"1rem"}}>Scan this code with the Base Wallet mobile app to log in instantly.</span>
                                 <div>
                                     <a style={{ float: 'left', marginLeft: "1rem" }} href="">
                                         Forgot password
                                     </a>
                                 </div>
-                                <Submit style={{ backgroundColor: "black", border: "0.75px solid #444444", marginLeft: "10rem", width: "100px" }}>Login</Submit>
+
                                 <div>
                                     <a style={{ float: 'left', marginLeft: "1rem" }} href="">
                                         Register
