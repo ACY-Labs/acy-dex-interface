@@ -70,6 +70,11 @@ export default [
         component: './Powers/Index',
       },
       {
+        path: '/stablecoin',
+        name: 'StableCoin',
+        component: './StableCoin/Index',
+      },
+      {
         path: '/launchpad',
         name: 'Launchpad',
         hideChildrenInMenu: true,
@@ -83,11 +88,6 @@ export default [
             component: './LaunchPad/LaunchpadProject',
           },
         ],
-      },
-      {
-        path: '/stablecoin',
-        name: 'StableCoin',
-        component: './StableCoin/Index',
       },
       {
         path: '/liquidity',

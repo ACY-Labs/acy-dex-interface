@@ -1,11 +1,12 @@
 import React, { PureComponent } from 'react';
 import classNames from 'classnames';
-import { Menu, Icon } from 'antd';
+import { Menu, Icon, Drawer } from 'antd';
 import { Link } from 'umi';
 import { urlToList } from '../_utils/pathTools';
 import { getMenuMatches } from './SiderMenuUtils';
 import { isUrl } from '@/utils/utils';
 import styles from './index.less';
+import { AcyIcon } from '@/components/Acy';
 
 const { SubMenu } = Menu;
 
@@ -40,7 +41,7 @@ const getMenuIcon = (name, isSelected) => {
   } else if (name == 'Powers') {
     return (
       <svg xmlns="http://www.w3.org/2000/svg" fill={color} style={{ height: '32px' }} viewBox="0 0 50 50">
-        <path d="M10.75 40q-1.1 0-1.925-.825T8 37.25v-26.5q0-1.1.825-1.925T10.75 8h26.5q1.1 0 1.925.825T40 10.75v26.5q0 1.1-.825 1.925T37.25 40Zm22.5-1.55h4q.5 0 .85-.35t.35-.85v-4Zm-22.6 0h5.3l6-6h2.2l-6 6h5.4l6-6h2.15l-6 6h5.4l6-6h1.35v-21.7q0-.5-.35-.85t-.85-.35h-26.5q-.5 0-.85.35t-.35.85V37.4l4.95-4.95h2.15Zm4.1-11.75-1.05-1.05 7.55-7.55 4.25 4.2 7.8-7.8 1 1.05-8.8 8.95-4.25-4.25Zm-5.2 10.55V9.55v28.9-1.2Z"/>
+        <path d="M10.75 40q-1.1 0-1.925-.825T8 37.25v-26.5q0-1.1.825-1.925T10.75 8h26.5q1.1 0 1.925.825T40 10.75v26.5q0 1.1-.825 1.925T37.25 40Zm22.5-1.55h4q.5 0 .85-.35t.35-.85v-4Zm-22.6 0h5.3l6-6h2.2l-6 6h5.4l6-6h2.15l-6 6h5.4l6-6h1.35v-21.7q0-.5-.35-.85t-.85-.35h-26.5q-.5 0-.85.35t-.35.85V37.4l4.95-4.95h2.15Zm4.1-11.75-1.05-1.05 7.55-7.55 4.25 4.2 7.8-7.8 1 1.05-8.8 8.95-4.25-4.25Zm-5.2 10.55V9.55v28.9-1.2Z" />
       </svg>
     )
   } else if (name == 'Launchpad') {
@@ -90,6 +91,9 @@ const getIcon = icon => {
 };
 
 export default class BaseMenu extends PureComponent {
+  state = {
+    visible: false,
+  }
   /**
    * 获得菜单子节点
    * @memberof SiderMenu
@@ -101,6 +105,16 @@ export default class BaseMenu extends PureComponent {
     return menusData
       .filter(item => item.name && !item.hideInMenu)
       .map(item => this.getSubMenuOrItem(item, parent))
+      .filter(item => item);
+  };
+
+  getNavMenuItems_default = (menusData, parent) => {
+    if (!menusData) {
+      return [];
+    }
+    return menusData
+      .filter(item => item.name && !item.hideInMenu)
+      .map(item => this.getSubMenuOrItem_default(item, parent))
       .filter(item => item);
   };
 
@@ -135,7 +149,32 @@ export default class BaseMenu extends PureComponent {
         </SubMenu>
       );
     }
-    return <Menu.Item key={item.path} style={{ marginTop: item.name == 'Liquidity' ? '32px' : '-20px' }}>{this.getMenuItemPath(item)}</Menu.Item>
+    return <Menu.Item key={item.path} style={{ marginTop: item.name == 'StableCoin' ? '32px' : '-20px' }}>{this.getMenuItemPath(item)}</Menu.Item>
+  };
+
+  getSubMenuOrItem_default = (item, parent) => {
+    // doc: add hideChildrenInMenu
+    if (item.children && !item.hideChildrenInMenu && item.children.some(child => child.name)) {
+      const { name } = item;
+      return (
+        <SubMenu
+          title={
+            item.icon ? (
+              <span>
+                {getIcon(item.icon)}
+                <span>{name}</span>
+              </span>
+            ) : (
+              name
+            )
+          }
+          key={item.path}
+        >
+          {this.getNavMenuItems(item.children)}
+        </SubMenu>
+      );
+    }
+    return <Menu.Item key={item.path} style={{ marginTop: '-20px' }}>{this.getMenuItemPath_default(item)}</Menu.Item>
   };
 
   /**
@@ -183,6 +222,45 @@ export default class BaseMenu extends PureComponent {
     );
   };
 
+  getMenuItemPath_default = (item) => {
+    const { name } = item;
+    const itemPath = this.conversionPath(item.path);
+    const icon = getIcon(item.icon);
+    const { target } = item;
+    // Is it a http link
+    if (/^https?:\/\//.test(itemPath)) {
+      return (
+        <a href={itemPath} target={target}>
+          {icon}
+          <span>{name}</span>
+        </a>
+      );
+    }
+    const { location, isMobile, onCollapse } = this.props;
+    let isSelected = this.selectedKeys && this.selectedKeys[0] ? this.selectedKeys[0].indexOf(name.toLowerCase()) == -1 : true
+    if (this.selectedKeys[1]) isSelected = this.selectedKeys[1].split('/')[1].indexOf(name.toLowerCase()) == -1
+    return (
+      <Link
+        to={itemPath}
+        target={target}
+        replace={itemPath === location.pathname}
+        onClick={
+          isMobile
+            ? () => {
+              onCollapse(true);
+            }
+            : undefined
+        }
+      >
+        {/* {icon} */}
+        <div className={styles.menuItemDefault}>
+          <div style={{ height: '22px' }}>{getMenuIcon(name, isSelected)}</div>
+          {/* <span style={{ color: isSelected ? '#b5b6b6' : '#eb5c20' }}>{name}</span> */}
+        </div>
+      </Link>
+    );
+  };
+
   conversionPath = path => {
     if (path && path.indexOf('http') === 0) {
       return path;
@@ -214,19 +292,55 @@ export default class BaseMenu extends PureComponent {
     const cls = classNames(className, {
       'top-nav-menu': mode === 'horizontal',
     });
+    const handleMouseEnter = () => {
+      this.setState({ visible: true })
+    }
+    const handleMouseLeave = () => {
+      this.setState({ visible: false })
+    }
+    
     return (
-      <Menu
-        key="Menu"
-        mode={mode}
-        theme={theme}
-        onOpenChange={handleOpenChange}
-        selectedKeys={this.selectedKeys}
-        style={style}
-        className={cls}
-        {...props}
-      >
-        {this.getNavMenuItems(menuData)}
-      </Menu>
+      <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <Menu
+          key="Menu"
+          mode={mode}
+          theme={theme}
+          onOpenChange={handleOpenChange}
+          selectedKeys={this.selectedKeys}
+          style={style}
+          className={cls}
+          {...props}
+        >
+          {this.getNavMenuItems_default(menuData, true)}
+        </Menu>
+
+        <Drawer
+          className={styles.drawer}
+          placement='left'
+          getContainer={false}
+          visible={this.state.visible}
+          width={140}
+          closable={false}
+        >
+          <div onMouseLeave={handleMouseLeave}>
+            <div className={styles.logo}>
+              <AcyIcon name="acy" width={40} />
+            </div>
+            <Menu
+              key="Menu"
+              mode={mode}
+              theme={theme}
+              onOpenChange={handleOpenChange}
+              selectedKeys={this.selectedKeys}
+              style={style}
+              className={cls}
+              {...props}
+            >
+              {this.getNavMenuItems(menuData)}
+            </Menu>
+          </div>
+        </Drawer>
+      </div>
     );
   }
 }

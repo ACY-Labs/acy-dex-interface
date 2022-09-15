@@ -642,7 +642,11 @@ const SwapComponent = props => {
         </div>
       }
 
-      <DetailBox />
+      <DetailBox 
+        pair_name='DAImond'
+        token_address='0x712ce0de2401e632d75e307ed8325774daaa3c51'
+        pair_address='0x52384e314d18aa160bca9ecf45d03b6f80f9557f'
+      />
 
       <ScoreBox />
 

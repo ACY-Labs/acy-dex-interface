@@ -12,13 +12,16 @@ import AcyPool from '@/components/AcyPool';
 import { fetcher, getInfoTokens, expandDecimals, useLocalStorageByChainId } from '@/acy-dex-futures/utils';
 // import { API_URL, useConstantLoader, getGlobalTokenList, constantInstance } from '@/constants';
 import { useConstantLoader, constantInstance } from '@/constants';
-import { ARBITRUM_DEFAULT_COLLATERAL_SYMBOL } from '@/acy-dex-futures/utils';
 import { ethers } from 'ethers'
 import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
 
+import { useChainId } from '@/utils/helpers';
+import { getTokens, getContract } from '@/constants/option.js';
+
+
 import styled from "styled-components";
 import styles from './styles.less'
-import { symbol } from 'prop-types';
+// import { symbol } from 'prop-types';
 
 
 const StyledDrawer = styled(Drawer)`
@@ -44,18 +47,24 @@ const StyledDrawer = styled(Drawer)`
 `
 
 const Option = props => {
-  const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
+  const { account, library, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
+  let { chainId } = useChainId();
+
+  let tokens = getTokens(chainId);
 
   const { AddressZero } = ethers.constants
+
+  const { active, activate } = useWeb3React();
 
   const [mode, setMode] = useState('Buy')
   const [volume, setVolume] = useState(0)
   const [percentage, setPercentage] = useState('')
   const [tableContent, setTableContent] = useState("Positions");
 
-  const chainTokenList = getSupportedInfoTokens(supportedTokens)
-  const [activeToken1, setActiveToken1] = useState(chainTokenList[2]);
-  const [activeToken0, setActiveToken0] = useState(chainTokenList[1]);
+
+  const [activeToken1, setActiveToken1] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
+
+  const [activeToken0, setActiveToken0] = useState(tokens[1]);
 
   const [fromTokenAddress, setFromTokenAddress] = useState(activeToken0.address);
   const [toTokenAddress, setToTokenAddress] = useState("");
@@ -67,33 +76,14 @@ const Option = props => {
   const [visibleBNB, setVisibleBNB] = useState(false);
 
   const { perpetuals } = useConstantLoader()
-  const readerAddress = perpetuals.getContract("Reader")
-  const vaultAddress = perpetuals.getContract("Vault")
-  const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
+  const readerAddress = getContract(chainId, "Reader")
+  const vaultAddress = getContract(chainId, "Vault")
+  const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
 
-  const tokens = constantInstance.perpetuals.tokenList;
   const whitelistedTokens = tokens.filter(token => token.symbol !== "USDG");
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
 
-  // const defaultTokenSelection = useMemo(() => ({
-  //   ["Pool"]: {
-  //     from: AddressZero,
-  //     to: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
-  //   },
-  //   ["Long"]: {
-  //     from: AddressZero,
-  //     to: AddressZero,
-  //   },
-  //   ["Short"]: {
-  //     from: getTokenBySymbol(tokens, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL).address,
-  //     to: AddressZero,
-  //   }
-  // }), [chainId, ARBITRUM_DEFAULT_COLLATERAL_SYMBOL])
-
-
   const tokenAddresses = tokens.map(token => token.address)
-  // const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
-
 
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
@@ -105,23 +95,27 @@ const Option = props => {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
   })
 
+  useEffect(() => {
+    if (active) {
+      library.on('block', () => {
+        updateVaultTokenInfo(undefined, true)
+        updateTokenBalances(undefined, true)
+        updateFundingRateInfo(undefined, true)
+      })
+      return () => {
+        library.removeAllListeners('block')
+      }
+    }
+  }, [active, library, chainId,
+    updateVaultTokenInfo, updateTokenBalances,
+    updateFundingRateInfo]
+  )
+
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
 
   const passTokenData = (token) => {
     setTokenData(token);
   };
-
-  function getSupportedInfoTokens(tokenlist) {
-    let supportedList = []
-    for (let i = 0; i < tokenlist.length; i++) {
-      tokenlist[i].address = tokenlist[i].address.toLowerCase()
-      if (tokenlist[i].symbol == 'BTC' || tokenlist[i].symbol == "ETH" || tokenlist[i].symbol == "USDT" || tokenlist[i].symbol == "MATIC") {
-        supportedList.push(tokenlist[i])
-      }
-    }
-    return supportedList
-  }
-
 
   function getTokenBySymbol(tokenlist, symbol) {
     for (let i = 0; i < tokenlist.length; i++) {
@@ -132,40 +126,32 @@ const Option = props => {
     }
     return undefined
   }
-  const chartPanes = [
-    { title: 'BTC', content: 'BTC', key: 'BTC', closable: false },
-    { title: 'ETH', content: 'ETH', key: 'ETH' },
-    // { title: 'Tab 3', content: 'Content of Tab 3', key: '3'},
-  ];
-  const [activeKey, setActiveKey] = useState(chartPanes[0].key);
-  const [panes, setPanes] = useState(chartPanes);
-  const newTabIndex = useRef(0);
-
+  
   const onChange = (newActiveKey) => {
-    // setActiveKey(newActiveKey);
-    setActiveToken1((chainTokenList.filter(ele => ele.symbol == newActiveKey))[0])
+    setActiveToken1((tokens.filter(ele => ele.symbol == newActiveKey))[0])
   };
 
   const getActiveTokenAddr = (symbol) => {
-    let tmp = getTokenBySymbol(chainTokenList, symbol);
+    let tmp = getTokenBySymbol(tokens, symbol);
     return tmp.address
   }
   const onClickDropdownBTC = e => {
     let tmp = optionsBTC[e.name]
-    setActiveToken1(chainTokenList[2]);
+    setActiveToken1((tokens.filter(ele => ele.symbol == "BTC"))[0]);
+    // (tokens.filter(ele => ele.symbol == newActiveKey))[0]
   };
   const onClickDropdownETH = e => {
     let tmp = optionsETH[e.name]
-    setActiveToken1(chainTokenList[3]);
+    setActiveToken1((tokens.filter(ele => ele.symbol == "ETH"))[0]);
   };
   const onClickDropdownMATIC = e => {
     let tmp = optionsMATIC[e.name]
-    setActiveToken1(chainTokenList[0]);
+    setActiveToken1((tokens.filter(ele => ele.symbol == "MATIC"))[0]);
   };
-  // const onClickDropdownBSC = e => {
-  //   let tmp = optionsBSC[e.name]
-  //   setActiveToken1(chainTokenList[3]);
-  // };
+  const onClickDropdownBNB = e => {
+    let tmp = optionsBNB[e.name]
+    setActiveToken1((tokens.filter(ele => ele.symbol == "BNB"))[0]);
+  };
 
   useEffect(() => {
     setToTokenAddress(getActiveTokenAddr(activeToken1.symbol))
@@ -190,22 +176,30 @@ const Option = props => {
     { name: "ETH-1000", tokenSymbol: "ETH", optionSymbol: "1000", type: "P" },
   ];
   let optionsMATIC = [
-    { name: "MATIC-10000", tokenSymbol: "MATIC", optionSymbol: "10", type: "C" },
-    { name: "MATIC-10000", tokenSymbol: "MATIC", optionSymbol: "10", type: "P" },
-    { name: "MATIC-5000", tokenSymbol: "MATIC", optionSymbol: "1", type: "C" },
-    { name: "MATIC-5000", tokenSymbol: "MATIC", optionSymbol: "1", type: "P" },
-    { name: "MATIC-1000", tokenSymbol: "MATIC", optionSymbol: "0.01", type: "C" },
-    { name: "MATIC-1000", tokenSymbol: "MATIC", optionSymbol: "0.01", type: "P" },
+    { name: "MATIC-10", tokenSymbol: "MATIC", optionSymbol: "10", type: "C" },
+    { name: "MATIC-10", tokenSymbol: "MATIC", optionSymbol: "10", type: "P" },
+    { name: "MATIC-1", tokenSymbol: "MATIC", optionSymbol: "1", type: "C" },
+    { name: "MATIC-1", tokenSymbol: "MATIC", optionSymbol: "1", type: "P" },
+    { name: "MATIC-0.01", tokenSymbol: "MATIC", optionSymbol: "0.01", type: "C" },
+    { name: "MATIC-0.01", tokenSymbol: "MATIC", optionSymbol: "0.01", type: "P" },
+  ];
+  let optionsBNB = [
+    { name: "BNB-1000", tokenSymbol: "BNB", optionSymbol: "1000", type: "C" },
+    { name: "BNB-1000", tokenSymbol: "BNB", optionSymbol: "1000", type: "P" },
+    { name: "BNB-300", tokenSymbol: "BNB", optionSymbol: "300", type: "C" },
+    { name: "BNB-300", tokenSymbol: "BNB", optionSymbol: "300", type: "P" },
+    { name: "BNB-100", tokenSymbol: "BNB", optionSymbol: "100", type: "C" },
+    { name: "BNB-100", tokenSymbol: "BNB", optionSymbol: "100", type: "P" },
   ];
 
   const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
   const KChartTokenListETH = ["BTC", "ETH"]
-  const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
-  const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBSC
+  const KChartTokenListBNB = ["BTC", "ETH", "BNB"]
+  const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBNB
     : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
       : KChartTokenListETH
   const selectTab = item => {
-    setActiveToken1((chainTokenList.filter(ele => ele.symbol == item))[0])
+    setActiveToken1((tokens.filter(ele => ele.symbol == item))[0])
     switch (item) {
       case "BTC":
         setVisibleBTC(true);
@@ -225,12 +219,17 @@ const Option = props => {
         setVisibleMATIC(true);
         setVisibleBNB(false);
         break;
+      case "BNB":
+        setVisibleBTC(false);
+        setVisibleETH(false);
+        setVisibleMATIC(false);
+        setVisibleBNB(true);
+        break;
       default:
         break;
     }
   }
   const selectChartToken = item => {
-    // console.log("hjhjhj select char token", item)
   }
 
   const onCloseBTC = () => {
@@ -349,6 +348,37 @@ const Option = props => {
                             <div
                               className={styles.item}
                               onClick={() => onClickDropdownMATIC(option)}
+                            >
+                              {option.tokenSymbol}-{option.optionSymbol}-{option.type}
+                              {option.type == "C" ?
+                                <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
+                                :
+                                <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
+                              }
+                            </div>
+                          ))}
+                        </div>
+                      </StyledDrawer>
+                    </Col>
+                  </Row> : null}
+                  {visibleBNB ?
+                  <Row>
+                    <Col>
+                      <StyledDrawer
+                        className={styles.drawerContent}
+                        placement="bottom"
+                        onClose={onCloseBNB}
+                        visible={visibleBNB}
+                        getContainer={false}
+                        closeIcon={false}
+                        height={"517px"}
+                        style={{ width: "20rem", left: "10rem" }}
+                      >
+                        <div className={styles.optionslist}>
+                          {optionsBNB.map((option) => (
+                            <div
+                              className={styles.item}
+                              onClick={() => onClickDropdownBNB(option)}
                             >
                               {option.tokenSymbol}-{option.optionSymbol}-{option.type}
                               {option.type == "C" ?
