@@ -361,8 +361,8 @@ const SwapComponent = props => {
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   console.log("test multichain: tokens", infoTokens, tokens)
-  const fromToken = getToken(chainId, fromTokenAddress);
-  const toToken = getToken(chainId, toTokenAddress);
+  const fromToken = getTokens(chainId, fromTokenAddress);
+  const toToken = getTokens(chainId, toTokenAddress);
 
   const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
   const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);

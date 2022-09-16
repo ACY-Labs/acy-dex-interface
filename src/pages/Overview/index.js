@@ -12,7 +12,6 @@ import {
     FileOutlined
 } from '@ant-design/icons';
 
-import { LivePairsTable, TopVolumeTable, TrendingTable } from './OverviewTable';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import styles from './styles.less'
