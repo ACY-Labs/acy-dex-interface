@@ -71,6 +71,9 @@ import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
 
+import { useChainId } from '@/utils/helpers';
+import { getTokens, getContract } from '@/constants/future.js';
+
 import styled from "styled-components";
 
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -173,11 +176,13 @@ const SwapComponent = props => {
   const {
     account,
     library,
-    chainId,
     tokenList: INITIAL_TOKEN_LIST,
     farmSetting: { INITIAL_ALLOWED_SLIPPAGE },
     perpetuals
   } = useConstantLoader(props);
+
+  const { chainId } = useChainId();
+  const tokens = getTokens(chainId)
 
   const {
     swapOption: mode,
@@ -231,7 +236,7 @@ const SwapComponent = props => {
     allowedSlippage = DEFAULT_HIGHER_SLIPPAGE_AMOUNT;
   }
 
-  const tokens = perpetuals.tokenList;
+  // const tokens = perpetuals.tokenList;
   const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
   const stableTokens = tokens.filter(token => token.isStable);
   const indexTokens = whitelistedTokens.filter(token => !token.isStable && !token.isWrapped);
@@ -264,12 +269,12 @@ const SwapComponent = props => {
 
 
   const tokenAddresses = tokens.map(token => token.address)
-  const readerAddress = perpetuals.getContract("Reader")
-  const vaultAddress = perpetuals.getContract("Vault")
-  const usdgAddress = perpetuals.getContract("USDG")
-  const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
-  const routerAddress = perpetuals.getContract("Router")
-  const orderBookAddress = perpetuals.getContract("OrderBook")
+  const readerAddress = getContract(chainId, "Reader")
+  const vaultAddress = getContract(chainId, "Vault")
+  const usdgAddress = getContract(chainId, "USDG")
+  const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
+  const routerAddress = getContract(chainId, "Router")
+  const orderBookAddress = getContract(chainId, "OrderBook")
 
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
@@ -356,8 +361,8 @@ const SwapComponent = props => {
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   console.log("test multichain: tokens", infoTokens, tokens)
-  const fromToken = perpetuals.getToken(fromTokenAddress);
-  const toToken = perpetuals.getToken(toTokenAddress);
+  const fromToken = getToken(chainId, fromTokenAddress);
+  const toToken = getToken(chainId, toTokenAddress);
 
   const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
   const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);

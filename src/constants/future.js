@@ -145,3 +145,12 @@ export const getTokens = (chainId) => {
 export const getContract = (chainId, name) => {
     return contracts[chainId][name];
 }
+export function getToken(chainId, address) {
+    if (!TOKENS_MAP[chainId]) {
+      throw new Error(`Incorrect chainId ${chainId}`);
+    }
+    if (!TOKENS_MAP[chainId][address]) {
+      throw new Error(`Incorrect address "${address}" for chainId ${chainId}`);
+    }
+    return TOKENS_MAP[chainId][address];
+  }
