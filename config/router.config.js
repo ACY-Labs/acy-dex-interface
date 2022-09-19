@@ -134,6 +134,30 @@ export default [
         hideInMenu: true,
         component: './Transaction/Index',
       },
+      {
+        path: '/overview',
+        name: 'Overview',
+        hideInMenu: true,
+        component: './Overview/Index',
+      },
+      {
+        path: '/login',
+        name: 'Login',
+        hideInMenu: true,
+        component: './WalletLogin/ConnectWallet/Index',
+      },
+      // {
+      //   path: '/login/email',
+      //   name: 'Login',
+      //   hideInMenu: true,
+      //   component: './WalletLogin/Email/Index',
+      // },
+      // {
+      //   path: '/login/phonenumber',
+      //   name: 'Login',
+      //   hideInMenu: true,
+      //   component: './WalletLogin/PhoneNumber/Index',
+      // },
     ],
   },
 ];

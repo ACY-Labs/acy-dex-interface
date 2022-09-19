@@ -3,6 +3,7 @@ import styles from './index.less';
 import { sortAddress } from '@/utils/utils';
 import { useWeb3React } from '@web3-react/core';
 import { useConstantLoader } from "@/constants";
+import { useHistory } from 'react-router-dom';
 
 // 钱包余额显示
 import { asyncForEach } from "@/utils/asynctools";
@@ -27,6 +28,7 @@ const AcyConnectWallet = props => {
 
   console.log("web3 and constant chainId", walletChainId, fallbackChainId)
 
+  const history = useHistory()
 
   const displayedChainId = useMemo(() => {
     // if chainId from useWeb3React and useConstantLoader are different, that means user's wallet is on an unsupported chainId. 
@@ -106,15 +108,15 @@ const AcyConnectWallet = props => {
       }
     })
     var finalBalance = 0;
-    if(balance_t!=0){
-      finalBalance = (balance_t + (balance_b/1000)).toFixed(2).toString() + 'T';
-    }else if(balance_b!=0){
-      finalBalance = (balance_b + (balance_m/1000)).toFixed(2).toString() + 'B';
-    }else if(balance_m!=0){
-      finalBalance = (balance_m + (balance_k/1000)).toFixed(2).toString() + 'M';
-    }else if(balance_k!=0){
-      finalBalance = (balance_k + (balance/1000)).toFixed(2).toString() + 'K';
-    }else{
+    if (balance_t != 0) {
+      finalBalance = (balance_t + (balance_b / 1000)).toFixed(2).toString() + 'T';
+    } else if (balance_b != 0) {
+      finalBalance = (balance_b + (balance_m / 1000)).toFixed(2).toString() + 'B';
+    } else if (balance_m != 0) {
+      finalBalance = (balance_m + (balance_k / 1000)).toFixed(2).toString() + 'M';
+    } else if (balance_k != 0) {
+      finalBalance = (balance_k + (balance / 1000)).toFixed(2).toString() + 'K';
+    } else {
       finalBalance = balance.toFixed(2).toString();
     }
 
@@ -163,9 +165,22 @@ const AcyConnectWallet = props => {
             {pendingLength} Pending <Icon type="redo" spin />
           </div>
           ||
-          <div className={styles.address} onClick={onClick}>
-            {account && sortAddress(account) || 'Connect Wallet'}
+          <div>
+            {/*  <div className={styles.address} onClick={onClick}> */}
+            {account &&
+              <div className={styles.address} onClick={onClick} >
+                {sortAddress(account)}
+              </div>
+            }
+            {!account &&
+              <div className={styles.address} onClick={() => history.push("/login")} >
+                Connect Wallet
+              </div>
+            }
           </div>
+          // <div className={styles.address} onClick={() => history.push("/login")} >
+          //   {account && sortAddress(account) || 'Connect Wallet'}
+          // </div>
         }
       </div>
     )) || (
@@ -186,9 +201,24 @@ const AcyConnectWallet = props => {
               {pendingLength} Pending <Icon type="redo" spin />
             </div>
             ||
-            <div className={styles.address} onClick={onClick}>
-              {account && sortAddress(account) || 'Connect Wallet'}
+            <div>
+              {/*  <div className={styles.address} onClick={onClick}> */}
+              {account &&
+                <div className={styles.address} onClick={onClick} >
+                  {sortAddress(account)}
+                </div>
+              }
+              {!account &&
+                <div className={styles.address} onClick={() => history.push("/login")} >
+                  Connect Wallet
+                </div>
+              }
             </div>
+            // <div className={styles.address} onClick={onClick}>
+            // <div className={styles.address} onClick={() => history.push("/login")} >
+
+            //   {account && sortAddress(account) || 'Connect Wallet'}
+            // </div>
           }
         </div>
       </div>

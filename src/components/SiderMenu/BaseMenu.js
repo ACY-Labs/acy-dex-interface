@@ -12,7 +12,7 @@ const { SubMenu } = Menu;
 
 var currentSelected = 'Market'
 
-const getMenuIcon = (name, isSelected) => {
+export const getMenuIcon = (name, isSelected) => {
   const color = isSelected ? '#b5b6b6' : '#eb5c20'
   if (name == 'Market') {
     return (

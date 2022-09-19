@@ -832,13 +832,13 @@ const GlobalHeaderRight = props => {
 
   return (
     <div className={className}>
-      <Row wrap={false} style={{display: "inline-flex", fontSize: "0.7rem"}}>
+      <Row wrap={false} style={{ display: "inline-flex", fontSize: "0.7rem" }}>
         <Col flex="none">
           {/* <Button onClick={deactivateTest}>disconnected</Button> */}
           <Dropdown
             overlay={networkListInCardList}
             trigger={['click']}
-            placement="bottomLeft"  
+            placement="bottomLeft"
           //className={styles.networkButton}
           >
             <div type="primary" shape="round" className={styles.networkButton}>
@@ -851,7 +851,7 @@ const GlobalHeaderRight = props => {
           </Dropdown>
         </Col>
         <Col flex="auto">
-        {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
+          {/* <AcyIcon onClick={this.onhandConnect} name="acy" /> */}
           <AcyConnectWallet
             chainId={chainId} // this is the chainId from useWeb3React
             isMobile={isMobile}
@@ -917,9 +917,7 @@ const GlobalHeaderRight = props => {
           />
         </Dropdown>
       )}
-
-
-      {!account && <div>
+      {/* {!account && <div>
         <AcyModal width={420} visible={visibleMetaMask} onCancel={onhandCancel}
           bodyStyle={{
             padding: '21px',
@@ -932,7 +930,6 @@ const GlobalHeaderRight = props => {
           <div className={styles.networkTitle}>
             <span>1. Select a Network</span>
           </div>
-          {/*ymj*/}
           <AcyCardList grid={true}>
             {networkList.slice(2,).map((item) => {
               return (
@@ -948,7 +945,6 @@ const GlobalHeaderRight = props => {
                       <svg xmlns="http://www.w3.org/2000/svg" fill="#eb5c20" style={{ height: '18px' }} viewBox="0 0 50 50">
                         <path d="M21.05 33.1 35.2 18.95 32.9 16.7 21.05 28.55 15.05 22.55 12.8 24.8ZM24 44Q19.75 44 16.1 42.475Q12.45 40.95 9.75 38.25Q7.05 35.55 5.525 31.9Q4 28.25 4 24Q4 19.8 5.525 16.15Q7.05 12.5 9.75 9.8Q12.45 7.1 16.1 5.55Q19.75 4 24 4Q28.2 4 31.85 5.55Q35.5 7.1 38.2 9.8Q40.9 12.5 42.45 16.15Q44 19.8 44 24Q44 28.25 42.45 31.9Q40.9 35.55 38.2 38.25Q35.5 40.95 31.85 42.475Q28.2 44 24 44ZM24 24Q24 24 24 24Q24 24 24 24Q24 24 24 24Q24 24 24 24Q24 24 24 24Q24 24 24 24Q24 24 24 24Q24 24 24 24ZM24 41Q31.25 41 36.125 36.125Q41 31.25 41 24Q41 16.75 36.125 11.875Q31.25 7 24 7Q16.75 7 11.875 11.875Q7 16.75 7 24Q7 31.25 11.875 36.125Q16.75 41 24 41Z"/>
                       </svg>
-                      {/* <CheckCircleTwoTone style={{color: '#eb5c20'}} /> */}
                     </span>}
                 </AcyCardList.Thin>
               );
@@ -959,28 +955,7 @@ const GlobalHeaderRight = props => {
             <span style={{ marginLeft: '10px' }}>2. Select a Wallet</span>
           </div>
 
-
-          {/* <AcyCardList>
-          {MetaMask.map(item => (
-            <AcyCardList.Thin onClick={() => item.onClick()}>
-              {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
-                <AcyIcon.MyIcon width={32} type={item.icon} />
-              )}
-              <span className={styles.fontBold}>{item.name}</span>
-            </AcyCardList.Thin>
-          ))}
-          {BinanceWallet.map(item => (
-            <AcyCardList.Thin onClick={() => item.onClick()}>
-              {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
-                <AcyIcon.MyIcon width={32} type={item.icon} />
-              )}
-              <span className={styles.fontBold}>{item.name}</span>
-            </AcyCardList.Thin>
-          ))}
-        </AcyCardList> */}
-
           <AcyCardList grid={true}>
-            { /*ymj */}
             {broswer === 'Opera' && OperaWallet.map((item, index) => {
 
               return (
@@ -1020,17 +995,19 @@ const GlobalHeaderRight = props => {
             })}
           </AcyCardList>
         </AcyModal>
-      </div>}
-      {account && <div>
-        <AcyModal width={200} height={100} visible={visibleMetaMask} onCancel={onhandCancel}
-          bodyStyle={{
-            padding: '21px',
-            background: '#2e3032',
-            borderRadius: ' 20px',
-          }}>
-          <div type="primary" shape="round" className={styles.disconnectBtn} onClick={deactivateTest}><DisconnectOutlined /> Disconnect</div>
-        </AcyModal>
-      </div>}
+          </div>}*/}
+      <div>
+        {account && <div>
+          <AcyModal width={200} height={100} visible={visibleMetaMask} onCancel={onhandCancel}
+            bodyStyle={{
+              padding: '21px',
+              background: '#2e3032',
+              borderRadius: ' 20px',
+            }}>
+            <div type="primary" shape="round" className={styles.disconnectBtn} onClick={deactivateTest}><DisconnectOutlined /> Disconnect</div>
+          </AcyModal>
+        </div>}
+      </div>
 
       {/* 错误弹窗*/}
       <AcyModal width={420} visible={isModalVisible}>
