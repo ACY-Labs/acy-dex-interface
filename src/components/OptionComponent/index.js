@@ -9,7 +9,7 @@ import { getTokens, getContract } from '@/constants/powers.js'
 import { useChainId } from '@/utils/helpers';
 import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from '@/components/ConnectWallet';
-import { PLACEHOLDER_ACCOUNT, useLocalStorageSerializeKey, fetcher, parseValue, approveTokens, getTokenInfo, getInfoTokens, expandDecimals } from '@/acy-dex-futures/utils';
+import { PLACEHOLDER_ACCOUNT, useLocalStorageSerializeKey, fetcher, parseValue, approveTokens, getTokenInfo, getInfoTokens, expandDecimals, bigNumberify } from '@/acy-dex-futures/utils';
 import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
 import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
 import AccountInfoGauge from '../AccountInfoGauge';
@@ -200,8 +200,11 @@ const OptionComponent = props => {
       approveTokens()
       return
     }
-
-    onTrade(symbol, selectedTokenAmount, expandDecimals(50001, 18))
+    if(mode ==' Buy') {
+      onTrade(symbol, selectedTokenAmount, expandDecimals(50001, 18))
+    } else {
+      onTrade(symbol, selectedTokenAmount.mul(bigNumberify(-1)), expandDecimals(50001, 18))
+    }
   }
 
   const [showDescription, setShowDescription] = useState(false);
