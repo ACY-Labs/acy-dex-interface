@@ -1,8 +1,7 @@
 import { useWeb3React } from '@web3-react/core';
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import useSWR from 'swr';
-import { DownOutlined } from '@ant-design/icons';
-import { Menu, Dropdown, Space, Row, Col, Button, Select, Drawer } from 'antd';
+import { Row, Col, Drawer } from 'antd';
 import AcyCard from '@/components/AcyCard';
 import OptionComponent from '@/components/OptionComponent'
 import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
@@ -49,9 +48,7 @@ const Powers = props => {
   let { chainId } = useChainId();
   let tokens = getTokens(chainId);
 
-  const { AddressZero } = ethers.constants
-
-  const { active, activate } = useWeb3React();
+  const { active } = useWeb3React();
 
   const [mode, setMode] = useState('Buy')
   const [volume, setVolume] = useState(0)
@@ -63,14 +60,12 @@ const Powers = props => {
 
   const [fromTokenAddress, setFromTokenAddress] = useState(activeToken0.address);
   const [toTokenAddress, setToTokenAddress] = useState("");
-  const [tokenData, setTokenData] = useState("BTC")
 
   const [visibleBTC, setVisibleBTC] = useState(false);
   const [visibleETH, setVisibleETH] = useState(false);
   const [visibleMATIC, setVisibleMATIC] = useState(false);
   const [visibleBNB, setVisibleBNB] = useState(false);
 
-  const { perpetuals } = useConstantLoader()
   const readerAddress = getContract(chainId, "Reader")
   const vaultAddress = getContract(chainId, "Vault")
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
@@ -106,23 +101,6 @@ const Powers = props => {
     updateFundingRateInfo]
   )
 
-  const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
-
-  const passTokenData = (token) => {
-    setTokenData(token);
-  };
-
-  function getSupportedInfoTokens(tokenlist) {
-    let supportedList = []
-    for (let i = 0; i < tokenlist.length; i++) {
-      tokenlist[i].address = tokenlist[i].address.toLowerCase()
-      if (tokenlist[i].symbol == 'BTC' || tokenlist[i].symbol == "ETH" || tokenlist[i].symbol == "USDT" || tokenlist[i].symbol == "MATIC" || tokenlist[i].symbol == "BNB") {
-        supportedList.push(tokenlist[i])
-      }
-    }
-    return supportedList
-  }
-
   function getTokenBySymbol(tokenlist, symbol) {
     for (let i = 0; i < tokenlist.length; i++) {
       tokenlist[i].address = tokenlist[i].address.toLowerCase()
@@ -132,10 +110,6 @@ const Powers = props => {
     }
     return undefined
   }
-
-  const onChange = (newActiveKey) => {
-    setActiveToken1((tokens.filter(ele => ele.symbol == newActiveKey))[0])
-  };
 
   const getActiveTokenAddr = (symbol) => {
     let tmp = getTokenBySymbol(tokens, symbol);
@@ -233,8 +207,6 @@ const Powers = props => {
       default:
         break;
     }
-  }
-  const selectChartToken = item => {
   }
 
   const onCloseBTC = () => {
@@ -367,7 +339,7 @@ const Powers = props => {
                       </StyledDrawer>
                     </Col>
                   </Row> : null}
-                  {visibleBNB ?
+                {visibleBNB ?
                   <Row>
                     <Col>
                       <StyledDrawer
