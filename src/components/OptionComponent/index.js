@@ -2,36 +2,48 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'umi';
 import styled from 'styled-components';
 import { Slider, Input, Button } from 'antd';
+import { ethers } from 'ethers'
+import useSWR from 'swr'
 import { useConstantLoader } from '@/constants';
-import { useLocalStorageSerializeKey } from '@/acy-dex-futures/utils';
+import { getTokens, getContract } from '@/constants/powers.js'
+import { useChainId } from '@/utils/helpers';
+import { useWeb3React } from '@web3-react/core';
+import { useConnectWallet } from '@/components/ConnectWallet';
+import { PLACEHOLDER_ACCOUNT, useLocalStorageSerializeKey, fetcher, parseValue, approveTokens, getTokenInfo, getInfoTokens, expandDecimals } from '@/acy-dex-futures/utils';
 import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
 import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
+import AcyPool from '../AcyPool';
+import Glp from '@/acy-dex-futures/abis/Glp.json'
+import Token from '@/acy-dex-futures/abis/Token.json'
 
 import styles from './styles.less';
-import AcyPool from '../AcyPool';
+
+const { AddressZero } = ethers.constants;
 
 const OptionComponent = props => {
 
   const {
     mode,
     setMode,
-    volume,
-    setVolume,
     percentage,
     setPercentage,
     selectedToken,
+    symbol,
+    onTrade,
   } = props
 
-  const {
-    account,
-    library,
-    chainId,
-    farmSetting: { INITIAL_ALLOWED_SLIPPAGE }
-  } = useConstantLoader(props);
-
+  const { account,library, farmSetting: { INITIAL_ALLOWED_SLIPPAGE }} = useConstantLoader(props);
+  const { chainId } = useChainId();
+  const connectWalletByLocalStorage = useConnectWallet();
+  const { active, activate } = useWeb3React();
+  
   const optionMode = ['Buy', 'Sell', 'Pool']
+  const [selectedTokenValue, setSelectedTokenValue] = useState("0");
+  const [usdValue, setUsdValue] = useState(0)
+  const [isApproving, setIsApproving] = useState(false)
+  const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
 
   const [leverageOption, setLeverageOption] = useLocalStorageSerializeKey([chainId, "Option-leverage-value"], "2");
   const leverageMarks = {
@@ -124,16 +136,72 @@ const OptionComponent = props => {
     }
   }
 
+  const tokens = getTokens(chainId)
+  const tokenAddresses = tokens.map(token => token.address)
+  const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
+  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
+  const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
+  const routerAddress = getContract(chainId, "Router")
+
+  const tokenAllowanceAddress = selectedToken.address === AddressZero ? nativeTokenAddress : selectedToken.address;
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
+    fetcher: fetcher(library, Glp)
+  });
+
+  const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
+  const needApproval = 
+    selectedToken.address !== AddressZero &&
+    tokenAllowance &&
+    selectedTokenAmount &&
+    selectedTokenAmount.gt(tokenAllowance)
+
+  const approveTokens = () => {
+    setIsApproving(true);
+    const contract = new ethers.Contract(
+      selectedToken.address,
+      Token.abi,
+      library.getSigner()
+    );
+    contract.approve(routerAddress, ethers.constants.MaxUint256)
+      .then(async res => {
+        setIsWaitingForApproval(true)
+        console.log(selectedToken.symbol, 'Approved!')
+      })
+      .catch(e => {
+        console.error(e);
+      })
+      .finally(() => {
+        setIsApproving(false);
+      });
+  }
+
   const getPrimaryText = () => {
-    if (mode == 'Buy') {
-      return 'Buy / Long'
-    } else {
-      return 'Sell / Short'
+    if (!active) {
+      return 'Connect Wallet'
     }
+    if (needApproval && isWaitingForApproval) {
+      return 'Waiting for Approval'
+    }
+    if (isApproving) {
+      return `Approving ${selectedToken.symbol}...`;
+    }
+    if (needApproval) {
+      return `Approve ${selectedToken.symbol}`;
+    }
+    return mode == 'Buy' ? 'Buy / Long' : 'Sell / Short'
   }
 
   const onClickPrimary = () => {
+    if (!account) {
+      connectWalletByLocalStorage()
+      return
+    }
+    if(needApproval) {
+      approveTokens()
+      return
+    }
 
+    onTrade(symbol, selectedTokenAmount, expandDecimals(50001, 18))
   }
 
   const [showDescription, setShowDescription] = useState(false);
@@ -144,8 +212,6 @@ const OptionComponent = props => {
   useEffect(() => {
     setShowDescription(false)
   }, [chainId, mode])
-
-  const [usdValue, setUsdValue] = useState(0)
 
   return (
     <div className={styles.main}>
@@ -171,9 +237,9 @@ const OptionComponent = props => {
                     type="number"
                     placeholder="Amount"
                     className={styles.optionInput}
-                    value={volume}
+                    value={selectedTokenValue}
                     onChange={e => {
-                      setVolume(e.target.value)
+                      setSelectedTokenValue(e.target.value)
                       setShowDescription(true)
                       //todo: get token price
                       setUsdValue(e.target.value)

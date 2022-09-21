@@ -7,12 +7,13 @@ import OptionComponent from '@/components/OptionComponent'
 import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
-
-import { fetcher, getInfoTokens, expandDecimals, useLocalStorageByChainId } from '@/acy-dex-futures/utils';
+import * as Api from '@/acy-dex-futures/Api';
+import { fetcher, getInfoTokens, expandDecimals, useLocalStorageByChainId, bigNumberify } from '@/acy-dex-futures/utils';
 // import { API_URL, useConstantLoader, getGlobalTokenList, constantInstance } from '@/constants';
 import { useConstantLoader, constantInstance } from '@/constants';
 import { ethers } from 'ethers'
 import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
+import Pool from '@/acy-dex-futures/abis/Pool.json'
 
 import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/powers.js';
@@ -51,8 +52,8 @@ const Powers = props => {
   const { active } = useWeb3React();
 
   const [mode, setMode] = useState('Buy')
-  const [volume, setVolume] = useState(0)
   const [percentage, setPercentage] = useState('')
+  const [symbol, setSymbol] = useState('')
 
   // const chainTokenList = getSupportedInfoTokens(tokens)
   const [activeToken0, setActiveToken0] = useState(tokens.filter(token => token.symbol == "ETH")[0]);
@@ -69,6 +70,7 @@ const Powers = props => {
   const readerAddress = getContract(chainId, "Reader")
   const vaultAddress = getContract(chainId, "Vault")
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
+  const poolAddress = getContract(chainId, "pool")
 
   const whitelistedTokens = tokens.filter(token => token.symbol !== "USDG");
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
@@ -222,6 +224,29 @@ const Powers = props => {
     setVisibleMATIC(false);
   };
 
+  const onTrade = async (symbol, amount, priceLimit) => {
+    const contract = new ethers.Contract(poolAddress, Pool.abi, library.getSigner())
+    let method = "trade"
+    let params = [
+      account, 
+      symbol, 
+      amount, 
+      priceLimit, 
+      [], //oracleSignature
+    ]
+
+    let value = bigNumberify(0)
+    const successMsg = `Order Submitted!`
+    Api.callContract(chainId, contract, method, params, {
+      value,
+      sentMsg: `Submitted.`,
+      failMsg: `Failed.`,
+      successMsg,
+    })
+    .then(() => {})
+    .catch(e => {console.log(e)})
+  }
+
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
@@ -259,7 +284,10 @@ const Powers = props => {
                             {optionsBTC.map((option) => (
                               <div
                                 className={styles.item}
-                                onClick={() => onClickDropdownBTC(option)}
+                                onClick={() => {
+                                  onClickDropdownBTC(option)
+                                  setSymbol(option.tokenSymbol+'USD-'+option.optionSymbol+'-'+option.type)
+                                }}
                               >
                                 {option.tokenSymbol}-{option.optionSymbol}-{option.type}
                                 {option.type == "C" ?
@@ -293,7 +321,10 @@ const Powers = props => {
                           {optionsETH.map((option) => (
                             <div
                               className={styles.item}
-                              onClick={() => onClickDropdownETH(option)}
+                              onClick={() => {
+                                onClickDropdownETH(option)
+                                setSymbol(option.tokenSymbol+'USD-'+option.optionSymbol+'-'+option.type)
+                              }}
                             >
                               {option.tokenSymbol}-{option.optionSymbol}-{option.type}
                               {option.type == "C" ?
@@ -325,7 +356,10 @@ const Powers = props => {
                           {optionsMATIC.map((option) => (
                             <div
                               className={styles.item}
-                              onClick={() => onClickDropdownMATIC(option)}
+                              onClick={() => {
+                                onClickDropdownMATIC(option)
+                                setSymbol(option.tokenSymbol+'USD-'+option.optionSymbol+'-'+option.type)
+                              }}
                             >
                               {option.tokenSymbol}-{option.optionSymbol}-{option.type}
                               {option.type == "C" ?
@@ -356,7 +390,10 @@ const Powers = props => {
                           {optionsBNB.map((option) => (
                             <div
                               className={styles.item}
-                              onClick={() => onClickDropdownBNB(option)}
+                              onClick={() => {
+                                onClickDropdownBNB(option)
+                                setSymbol(option.tokenSymbol+'USD-'+option.optionSymbol+'-'+option.type)
+                              }}
                             >
                               {option.tokenSymbol}-{option.optionSymbol}-{option.type}
                               {option.type == "C" ?
@@ -392,11 +429,11 @@ const Powers = props => {
             <OptionComponent
               mode={mode}
               setMode={setMode}
-              volume={volume}
-              setVolume={setVolume}
               percentage={percentage}
               setPercentage={setPercentage}
               selectedToken={activeToken1}
+              symbol={symbol}
+              onTrade={onTrade}
             />
           </AcyCard>
         </div>
