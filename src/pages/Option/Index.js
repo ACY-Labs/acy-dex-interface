@@ -440,6 +440,7 @@ const Option = props => {
               setVolume={setVolume}
               percentage={percentage}
               setPercentage={setPercentage}
+              selectedToken={activeToken1}
             />
           </AcyCard>
         </div>

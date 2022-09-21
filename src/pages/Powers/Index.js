@@ -396,7 +396,7 @@ const Powers = props => {
               setVolume={setVolume}
               percentage={percentage}
               setPercentage={setPercentage}
-              powers={true}
+              selectedToken={activeToken1}
             />
           </AcyCard>
         </div>

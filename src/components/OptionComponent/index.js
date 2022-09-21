@@ -21,7 +21,7 @@ const OptionComponent = props => {
     setVolume,
     percentage,
     setPercentage,
-    powers,
+    selectedToken,
   } = props
 
   const {
@@ -32,7 +32,7 @@ const OptionComponent = props => {
   } = useConstantLoader(props);
 
   const optionMode = ['Buy', 'Sell', 'Pool']
-  
+
   const [leverageOption, setLeverageOption] = useLocalStorageSerializeKey([chainId, "Option-leverage-value"], "2");
   const leverageMarks = {
     1: {
@@ -145,6 +145,8 @@ const OptionComponent = props => {
     setShowDescription(false)
   }, [chainId, mode])
 
+  const [usdValue, setUsdValue] = useState(0)
+
   return (
     <div className={styles.main}>
       <AcyPerpetualCard style={{ backgroundColor: 'transparent', border: 'none', margin: '-8px' }}>
@@ -152,30 +154,43 @@ const OptionComponent = props => {
           <PerpetualTabs
             option={mode}
             options={optionMode}
-            onChange={(mode)=>{setMode(mode)}}
+            onChange={(mode) => { setMode(mode) }}
           />
         </div>
 
         {mode == 'Pool'
           ?
-            <AcyPoolComponent />
+          <AcyPoolComponent />
           :
           <>
             <div className={styles.rowFlexContainer}>
 
-              <div className={styles.inputContainer}>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="Amount"
-                  className={styles.optionInput}
-                  value={volume}
-                  onChange={e => {
-                    setVolume(e.target.value)
-                    setShowDescription(true)
-                  }}
-                />
-                <span className={styles.inputLabel}>USD</span>
+              <div style={{display: 'flex'}}>
+                <div className={styles.inputContainer}>
+                  <input
+                    type="number"
+                    placeholder="Amount"
+                    className={styles.optionInput}
+                    value={volume}
+                    onChange={e => {
+                      setVolume(e.target.value)
+                      setShowDescription(true)
+                      //todo: get token price
+                      setUsdValue(e.target.value)
+                    }}
+                  />
+                  <span className={styles.inputLabel}>{selectedToken.symbol}</span>
+                </div>
+                <div className={styles.inputContainer}>
+                  <input
+                    type="number"
+                    min="0"
+                    className={styles.optionInput}
+                    value={usdValue}
+                    onChange={e => { }}
+                  />
+                  <span className={styles.inputLabel}>USD</span>
+                </div>
               </div>
 
               <div className={styles.buttonContainer}>
@@ -255,7 +270,7 @@ const OptionComponent = props => {
 
             </div>
 
-            {!powers && <AccountInfoGauge />}
+            <AccountInfoGauge />
           </>
         }
 
