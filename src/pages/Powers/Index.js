@@ -287,6 +287,7 @@ const Powers = props => {
                                 onClick={() => {
                                   onClickDropdownBTC(option)
                                   setSymbol(option.tokenSymbol+'USD-'+option.optionSymbol+'-'+option.type)
+                                  onCloseBTC()
                                 }}
                               >
                                 {option.tokenSymbol}-{option.optionSymbol}-{option.type}
@@ -324,6 +325,7 @@ const Powers = props => {
                               onClick={() => {
                                 onClickDropdownETH(option)
                                 setSymbol(option.tokenSymbol+'USD-'+option.optionSymbol+'-'+option.type)
+                                onCloseETH()
                               }}
                             >
                               {option.tokenSymbol}-{option.optionSymbol}-{option.type}
@@ -359,6 +361,7 @@ const Powers = props => {
                               onClick={() => {
                                 onClickDropdownMATIC(option)
                                 setSymbol(option.tokenSymbol+'USD-'+option.optionSymbol+'-'+option.type)
+                                onCloseMATIC()
                               }}
                             >
                               {option.tokenSymbol}-{option.optionSymbol}-{option.type}
@@ -393,6 +396,7 @@ const Powers = props => {
                               onClick={() => {
                                 onClickDropdownBNB(option)
                                 setSymbol(option.tokenSymbol+'USD-'+option.optionSymbol+'-'+option.type)
+                                onCloseBNB()
                               }}
                             >
                               {option.tokenSymbol}-{option.optionSymbol}-{option.type}
