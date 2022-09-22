@@ -129,14 +129,14 @@ const tokenLists = {
             name: "Wrapped Bitcoin",
             symbol: "BTC",
             decimals: 8,
-            address: "0x05d6f705C80d9F812d9bc1A142A655CDb25e2571",
+            address: "0x3c9851dBf202C8917F4d20a3666426d56de0E53b",
             isShortable: true
         },
         {
             name: "Wrapped MATIC",
             symbol: "WMATIC",
             decimals: 18,
-            address: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
+            address: "0x243a88F700a962aE8cdf8039d63b4948DC2B8ef1",
             isWrapped: true,
             baseSymbol: "MATIC"
         },
@@ -144,7 +144,7 @@ const tokenLists = {
             name: "Wrapped ETH",
             symbol: "ETH",
             decimals: 18,
-            address: "0xeBC8428DC717D440d5deCE1547456B115b868F0e",
+            address: "0x5EAf72A6cDC4eFE93f9D4FE891AF8dE498eb1d8c",
             isShortable: true,
             isStable: false
         },
@@ -152,7 +152,7 @@ const tokenLists = {
             name: "Tether",
             symbol: "USDT",
             decimals: 18,
-            address: "0x158653b66fd72555F68eDf983736781E471639Cc",
+            address: "0x3C8e6FCaB51e01bd6e70A8e3d7A579c37d69f971",
             isStable: true
         },
     ],
