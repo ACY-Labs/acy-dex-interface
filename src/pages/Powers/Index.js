@@ -70,10 +70,10 @@ const Powers = props => {
   const [visibleMATIC, setVisibleMATIC] = useState(false);
   const [visibleBNB, setVisibleBNB] = useState(false);
 
-  const { perpetuals } = useConstantLoader()
   const readerAddress = getContract(chainId, "Reader")
   const vaultAddress = getContract(chainId, "Vault")
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
+  const IPoolAddress = getContract(chainId, "PoolImplementation")
 
   const whitelistedTokens = tokens.filter(token => token.symbol !== "USDG");
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
@@ -367,7 +367,7 @@ const Powers = props => {
                       </StyledDrawer>
                     </Col>
                   </Row> : null}
-                  {visibleBNB ?
+                {visibleBNB ?
                   <Row>
                     <Col>
                       <StyledDrawer

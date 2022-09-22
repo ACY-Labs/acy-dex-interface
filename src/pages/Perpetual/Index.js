@@ -295,7 +295,7 @@ const Swap = props => {
   // }, [chainId2]);
   if (chainId == undefined || chainId != 97 && chainId != 80001) {
     console.log("hjhjhj multchain perp chainId undefined", useChainId())
-    // chainId = 80001;
+    chainId = 80001;
   }
   const tokensperp = getTokens(chainId);
   console.log("hjhjhj multchain perp chainid", chainId)

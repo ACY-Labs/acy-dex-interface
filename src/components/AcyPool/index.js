@@ -41,6 +41,8 @@ import ChartWrapper from '@/pages/Stats/Perpetual/components/ChartWrapper';
 import Portfolio from '@/pages/Perpetual/components/Portfolio';
 import { GlpSwapTokenTable } from '../PerpetualComponent/components/GlpSwapBox';
 import { useConstantLoader, constantInstance } from '@/constants';
+import { useChainId } from '@/utils/helpers';
+import { getTokens, getContract } from '@/constants/powers.js';
 
 import styles from './styles.less';
 
@@ -63,11 +65,12 @@ const AcyPool = props => {
   const [alpData, alpLoading] = useAlpData(params)
   const [alpPriceData, alpPriceDataLoading] = useAlpPriceData(alpData, feesData, params)
 
-  const supportedTokens = constantInstance.perpetuals.tokenList;
+  const supportedTokens = getTokens(chainId)
+  const tokens = getTokens(chainId)
+  // const supportedTokens = constantInstance.perpetuals.tokenList;
   const whitelistedTokens = supportedTokens.filter(token => token.symbol !== "USDG");
   const glp_tokenList = whitelistedTokens.filter(t => !t.isWrapped)
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
-  const tokens = supportedTokens;
 
   const [isBuying, setIsBuying] = useState(true)
   const [swapTokenAddress, setSwapTokenAddress] = useState(tokens[0].address)
@@ -76,15 +79,14 @@ const AcyPool = props => {
   const [glpValue, setGlpValue] = useState("")
   const glpAmount = parseValue(glpValue, GLP_DECIMALS)
 
-  const { perpetuals } = useConstantLoader()
-  const readerAddress = perpetuals.getContract("Reader")
-  const vaultAddress = perpetuals.getContract("Vault")
-  const usdgAddress = perpetuals.getContract("USDG")
-  const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
-  const routerAddress = perpetuals.getContract("Router")
-  const glpManagerAddress = perpetuals.getContract("GlpManager")
-  const glpAddress = perpetuals.getContract("GLP")
-  const orderBookAddress = perpetuals.getContract("OrderBook")
+  const vaultAddress = getContract(chainId, "Vault")
+  const usdgAddress = getContract(chainId, "USDG")
+  const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
+  const routerAddress = getContract(chainId, "Router")
+  const glpManagerAddress = getContract(chainId, "GlpManager")
+  const glpAddress = getContract(chainId, "GLP")
+  const orderBookAddress = getContract(chainId, "OrderBook")
+  const readerAddress = getContract(chainId, "Reader")
 
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),

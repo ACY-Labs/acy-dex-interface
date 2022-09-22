@@ -14,21 +14,32 @@ import {
   getInfoTokens,
   bigNumberify,
 } from '@/acy-dex-futures/utils'
+import { useChainId } from '@/utils/helpers';
+import { getTokens, getContract } from '@/constants/powers.js';
 
 import styles from './styles.less';
 
 const AcyPoolComponent = props => {
 
-  const { account, library, chainId, perpetuals } = useConstantLoader();
+  const { account, library, perpetuals } = useConstantLoader();
+  let chainId = 80001;
 
-  const tokens = perpetuals.tokenList;
+  const tokens = getTokens(chainId);
   const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
   const tokenAddresses = tokens.map(token => token.address)
-  const readerAddress = perpetuals.getContract("Reader")
-  const vaultAddress = perpetuals.getContract("Vault")
-  const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
-  const glpManagerAddress = perpetuals.getContract("GlpManager")
-  const glpAddress = perpetuals.getContract("GLP")
+  // const readerAddress = perpetuals.getContract("Reader")
+  // const vaultAddress = perpetuals.getContract("Vault")
+  // const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
+  // const glpManagerAddress = perpetuals.getContract("GlpManager")
+  // const glpAddress = perpetuals.getContract("GLP")
+  const readerAddress = getContract(chainId, "Reader");
+  const vaultAddress = getContract(chainId, "Vault");
+  const usdgAddress = getContract(chainId, "USDG");
+  const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN");
+  const routerAddress = getContract(chainId, "Router");
+  const glpManagerAddress = getContract(chainId, "GlpManager");
+  const glpAddress = getContract(chainId, "GLP");
+  const rewardRouterAddress = getContract(chainId, "RewardRouter");
 
   const [isBuying, setIsBuying] = useState(true)
   const [swapTokenAddress, setSwapTokenAddress] = useState(tokens[0].address)
@@ -61,6 +72,7 @@ const AcyPoolComponent = props => {
     glpBalanceUsd = glpBalance.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
   }
   const glpSupplyUsd = glpSupply ? glpSupply.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS)) : bigNumberify(0)
+  console.log("contract getInfoTokens acy pool comp", tokens)
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, undefined)
 
   return (

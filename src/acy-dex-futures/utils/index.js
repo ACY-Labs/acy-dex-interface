@@ -600,6 +600,7 @@ export function getPositionKey(collateralTokenAddress, indexTokenAddress, isLong
 }
 
 export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo, vaultPropsLength) {
+  console.log("add liquidity token getinfotokens", tokens)
 
     if (!vaultPropsLength) {
         vaultPropsLength = 12

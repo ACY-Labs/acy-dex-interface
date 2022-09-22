@@ -58,11 +58,16 @@ import Vester from '@/acy-dex-futures/abis/Vester.json'
 import RewardRouter from '@/acy-dex-futures/abis/RewardRouter.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
 import { callContract } from '@/acy-dex-futures/Api'
+import * as Api from '@/acy-dex-futures/Api';
 
 import PerpetualTabs from './PerpetualTabs'
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 import TokenTable from '@/pages/BuyGlp/components/SwapTokenTable'
 import glp40Icon from '@/pages/BuyGlp/components/ic_glp_40.svg'
+
+import { useChainId } from '@/utils/helpers';
+import { getTokens, getContract } from '@/constants/powers.js';
+import IPool from '@/abis/future-option-power/IPool.json'
 
 import styles from './GlpSwap.less'
 
@@ -143,14 +148,16 @@ export const GlpSwapBox = (props) => {
 
   const { account } = useConstantLoader(props)
 
-  const { active, activate, library, chainId } = useWeb3React()
+  const chainId = 80001;
+  const { active, activate, library } = useWeb3React()
   const connectWallet = getInjectedHandler(activate)
   const savedSlippageAmount = getSavedSlippageAmount(chainId)
 
   const history = useHistory()
   const tabLabel = isBuying ? 'buy' : 'sell'
 
-  const tokens = constantInstance.perpetuals.tokenList;
+  // const tokens = constantInstance.perpetuals.tokenList;
+  const tokens = getTokens(chainId);
   const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
   const tokenList = whitelistedTokens.filter(t => !t.isWrapped)
 
@@ -167,15 +174,16 @@ export const GlpSwapBox = (props) => {
   // const tokensForBalanceAndSupplyQuery = [stakedGlpTrackerAddress, usdgAddress]
 
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
-  const { perpetuals } = useConstantLoader()
-  const readerAddress = perpetuals.getContract("Reader")
-  const vaultAddress = perpetuals.getContract("Vault")
-  const usdgAddress = perpetuals.getContract("USDG")
-  const nativeTokenAddress = perpetuals.getContract("NATIVE_TOKEN")
-  const routerAddress = perpetuals.getContract("Router")
-  const glpManagerAddress = perpetuals.getContract("GlpManager")
-  const glpAddress = perpetuals.getContract("GLP")
-  const rewardRouterAddress = perpetuals.getContract("RewardRouter")
+  const readerAddress = getContract(chainId, "Reader");
+  const vaultAddress = getContract(chainId, "Vault");
+  const usdgAddress = getContract(chainId, "USDG");
+  const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN");
+  const routerAddress = getContract(chainId, "Router");
+  const glpManagerAddress = getContract(chainId, "GlpManager");
+  const glpAddress = getContract(chainId, "GLP");
+  const rewardRouterAddress = getContract(chainId, "RewardRouter");
+  const IPoolAddress = getContract(chainId, "pool");
+
   const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
     fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
   })
@@ -465,19 +473,17 @@ export const GlpSwapBox = (props) => {
   const buyGlp = () => {
     setIsSubmitting(true)
 
-    const minGlp = glpAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR)
+    let params = [
+      swapTokenAddress, // token address
+      swapAmount, // token amount
+      [], //OracleSignature[] memory oracleSignatures
+    ]
+    console.log("swapTokenAddress", swapTokenAddress)
+    const contract = new ethers.Contract(IPoolAddress, IPool.abi, library.getSigner());
+    const method = "addLiquidity"
 
-    const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner())
-    const method = swapTokenAddress === AddressZero ? "mintAndStakeAlpETH" : "mintAndStakeAlp"
-    const params = swapTokenAddress === AddressZero ? [0, minGlp] : [swapTokenAddress, swapAmount, 0, minGlp]
-    const value = swapTokenAddress === AddressZero ? swapAmount : 0
-    // const contract = new ethers.Contract(glpManagerAddress, GlpManager, library.getSigner())
-    // const method = "addLiquidity"
-    // const params = swapTokenAddress === AddressZero ? [0, minGlp] : [swapTokenAddress, swapAmount, 0, minGlp]
-    // const value = swapTokenAddress === AddressZero ? swapAmount : 0
-
-    callContract(chainId, contract, method, params, {
-      value,
+    Api.callContract(chainId, contract, method, params, {
+      // value,
       sentMsg: "Buy submitted!",
       failMsg: "Buy failed.",
       successMsg: `${parseFloat(glpAmount).toFixed(4)} ALP bought with ${parseFloat(swapAmount).toFixed(4)} ${swapToken.symbol}.`,
@@ -492,17 +498,16 @@ export const GlpSwapBox = (props) => {
   const sellGlp = () => {
     setIsSubmitting(true)
 
-    const minOut = swapAmount.mul(BASIS_POINTS_DIVISOR - savedSlippageAmount).div(BASIS_POINTS_DIVISOR)
+    let params = [
+      swapTokenAddress, // token address
+      swapAmount, // token amount
+      [], //OracleSignature[] memory oracleSignatures
+    ]
+    console.log("swapTokenAddress", swapTokenAddress)
+    const contract = new ethers.Contract(IPoolAddress, IPool.abi, library.getSigner());
+    const method = "removeLiquidity"
 
-    const contract = new ethers.Contract(rewardRouterAddress, RewardRouter.abi, library.getSigner())
-    const method = swapTokenAddress === AddressZero ? "unstakeAndRedeemAlpETH" : "unstakeAndRedeemAlp"
-    const params = swapTokenAddress === AddressZero ? [glpAmount, minOut, account] : [swapTokenAddress, glpAmount, minOut, account]
-    // const contract = new ethers.Contract(glpManagerAddress, GlpManager, library.getSigner())
-    // const method = "removeLiquidity"
-    // const params = swapTokenAddress === AddressZero ? [glpAmount, minOut, account] : [swapTokenAddress, glpAmount, minOut, account]
-    const value = swapTokenAddress === AddressZero ? swapAmount : 0
-
-    callContract(chainId, contract, method, params, {
+    Api.callContract(chainId, contract, method, params, {
       // value,
       sentMsg: "Sell submitted!",
       failMsg: "Sell failed.",
@@ -531,9 +536,9 @@ export const GlpSwapBox = (props) => {
   }
 
   const onClickPrimary = () => {
-
     if (!account) {
       connectWallet()
+      history.push('/login')
       // connectWalletByLocalStorage()
       return
     }
@@ -554,6 +559,8 @@ export const GlpSwapBox = (props) => {
     } else {
       sellGlp()
     }
+
+    // addLiquidity();
   }
 
   const [buySellLabel, setBuySellLabel] = useState("Buy ALP")
@@ -574,6 +581,34 @@ export const GlpSwapBox = (props) => {
       setIsBuying(true)
       setBuySellLabel("Buy ALP")
     }
+  }
+
+  //for contracts 
+
+  const addLiquidity = async () => {
+    console.log("add liquidity")
+    let params = [
+      swapTokenAddress, // token address
+      swapValue, // token amount
+      [], //OracleSignature[] memory oracleSignatures
+    ]
+    console.log("swapTokenAddress", swapTokenAddress)
+    const contract = new ethers.Contract(IPoolAddress, IPool.abi, library.getSigner());
+    let method = "addLiquidity";
+    if (swapTokenAddress === AddressZero) {
+      method = "addLiquidityETH";
+      // params = []
+    }
+  }
+
+  const removeLiquidity = async () => {
+    let params = [
+      swapTokenAddress, // token address
+      swapValue, // token amount
+      [], //OracleSignature[] memory oracleSignatures
+    ]
+    const contract = new ethers.Contract(IPoolAddress, IPool.abi, library.getSigner());
+    let method = "removeLiquidity";
   }
 
   return (

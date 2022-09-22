@@ -32,7 +32,7 @@ const OptionComponent = props => {
   } = useConstantLoader(props);
 
   const optionMode = ['Buy', 'Sell', 'Pool']
-  
+
   const [leverageOption, setLeverageOption] = useLocalStorageSerializeKey([chainId, "Option-leverage-value"], "2");
   const leverageMarks = {
     1: {
@@ -152,13 +152,13 @@ const OptionComponent = props => {
           <PerpetualTabs
             option={mode}
             options={optionMode}
-            onChange={(mode)=>{setMode(mode)}}
+            onChange={(mode) => { setMode(mode) }}
           />
         </div>
 
         {mode == 'Pool'
           ?
-            <AcyPoolComponent />
+          <AcyPoolComponent />
           :
           <>
             <div className={styles.rowFlexContainer}>
