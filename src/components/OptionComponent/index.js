@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'umi';
-import styled from 'styled-components';
-import { Slider, Input, Button } from 'antd';
+import { Input, Button } from 'antd';
 import { ethers } from 'ethers'
 import useSWR from 'swr'
 import { useConstantLoader } from '@/constants';
@@ -9,12 +8,11 @@ import { getTokens, getContract } from '@/constants/powers.js'
 import { useChainId } from '@/utils/helpers';
 import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from '@/components/ConnectWallet';
-import { PLACEHOLDER_ACCOUNT, useLocalStorageSerializeKey, fetcher, parseValue, approveTokens, getTokenInfo, getInfoTokens, expandDecimals, bigNumberify } from '@/acy-dex-futures/utils';
+import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, expandDecimals, bigNumberify } from '@/acy-dex-futures/utils';
 import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
 import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
-import AcyPool from '../AcyPool';
 import Glp from '@/acy-dex-futures/abis/Glp.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
 
@@ -27,8 +25,6 @@ const OptionComponent = props => {
   const {
     mode,
     setMode,
-    percentage,
-    setPercentage,
     selectedToken,
     symbol,
     onTrade,
@@ -37,84 +33,14 @@ const OptionComponent = props => {
   const { account,library, farmSetting: { INITIAL_ALLOWED_SLIPPAGE }} = useConstantLoader(props);
   const { chainId } = useChainId();
   const connectWalletByLocalStorage = useConnectWallet();
-  const { active, activate } = useWeb3React();
+  const { active } = useWeb3React();
   
   const optionMode = ['Buy', 'Sell', 'Pool']
+  const [percentage, setPercentage] = useState('')
   const [selectedTokenValue, setSelectedTokenValue] = useState("0");
   const [usdValue, setUsdValue] = useState(0)
   const [isApproving, setIsApproving] = useState(false)
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
-
-  const [leverageOption, setLeverageOption] = useLocalStorageSerializeKey([chainId, "Option-leverage-value"], "2");
-  const leverageMarks = {
-    1: {
-      style: { color: '#b5b6b6', },
-      label: '1x'
-    },
-    5: {
-      style: { color: '#b5b6b6', },
-      label: '5x'
-    },
-    10: {
-      style: { color: '#b5b6b6', },
-      label: '10x'
-    },
-    15: {
-      style: { color: '#b5b6b6', },
-      label: '15x'
-    },
-    20: {
-      style: { color: '#b5b6b6', },
-      label: '20x'
-    },
-    25: {
-      style: { color: '#b5b6b6', },
-      label: '25x'
-    },
-    30: {
-      style: { color: '#b5b6b6', },
-      label: '30x'
-    }
-  };
-  const StyledSlider = styled(Slider)`
-  .ant-slider-track {
-    background: #929293;
-    height: 3px;
-  }
-  .ant-slider-rail {
-    background: #29292c;
-    height: 3px;
-  }
-  .ant-slider-handle {
-    background: #929293;
-    width: 12px;
-    height: 12px;
-    border: none;
-  }
-  .ant-slider-handle-active {
-    background: #929293;
-    width: 12px;
-    height: 12px;
-    border: none;
-  }
-  .ant-slider-dot {
-    border: 1.5px solid #29292c;
-    border-radius: 1px;
-    background: #29292c;
-    width: 2px;
-    height: 10px;
-  }
-  .ant-slider-dot-active {
-    border: 1.5px solid #929293;
-    border-radius: 1px;
-    background: #929293;
-    width: 2px;
-    height: 10px;
-  }
-  .ant-slider-with-marks {
-      margin-bottom: 50px;
-  }
-`;
 
   const getPercentageButton = value => {
     if (percentage != value) {
@@ -136,10 +62,6 @@ const OptionComponent = props => {
     }
   }
 
-  const tokens = getTokens(chainId)
-  const tokenAddresses = tokens.map(token => token.address)
-  const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
-  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
   const routerAddress = getContract(chainId, "Router")
 

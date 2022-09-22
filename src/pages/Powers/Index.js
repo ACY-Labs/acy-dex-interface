@@ -1,6 +1,4 @@
-import { useWeb3React } from '@web3-react/core';
 import React, { useState, useEffect } from 'react';
-import useSWR from 'swr';
 import { Row, Col, Drawer } from 'antd';
 import AcyCard from '@/components/AcyCard';
 import OptionComponent from '@/components/OptionComponent'
@@ -8,17 +6,13 @@ import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualT
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import * as Api from '@/acy-dex-futures/Api';
-import { fetcher, getInfoTokens, expandDecimals, useLocalStorageByChainId, bigNumberify } from '@/acy-dex-futures/utils';
-// import { API_URL, useConstantLoader, getGlobalTokenList, constantInstance } from '@/constants';
-import { useConstantLoader, constantInstance } from '@/constants';
+import { bigNumberify } from '@/acy-dex-futures/utils';
+import { useConstantLoader } from '@/constants';
 import { ethers } from 'ethers'
-import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
-
 import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/powers.js';
 
-// import styled from "styled-components";
 import styles from './styles.less'
 import styled from "styled-components";
 
@@ -45,98 +39,34 @@ const StyledDrawer = styled(Drawer)`
 `
 
 const Powers = props => {
-  const { account, library, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
+  const { account, library } = useConstantLoader();
   let { chainId } = useChainId();
   let tokens = getTokens(chainId);
 
-  const { active } = useWeb3React();
-
   const [mode, setMode] = useState('Buy')
-  const [percentage, setPercentage] = useState('')
   const [symbol, setSymbol] = useState('')
 
-  // const chainTokenList = getSupportedInfoTokens(tokens)
-  const [activeToken0, setActiveToken0] = useState(tokens.filter(token => token.symbol == "ETH")[0]);
-  const [activeToken1, setActiveToken1] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
-
-  const [fromTokenAddress, setFromTokenAddress] = useState(activeToken0.address);
-  const [toTokenAddress, setToTokenAddress] = useState("");
+  const [activeToken, setActiveToken] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
 
   const [visibleBTC, setVisibleBTC] = useState(false);
   const [visibleETH, setVisibleETH] = useState(false);
   const [visibleMATIC, setVisibleMATIC] = useState(false);
   const [visibleBNB, setVisibleBNB] = useState(false);
 
-  const readerAddress = getContract(chainId, "Reader")
-  const vaultAddress = getContract(chainId, "Vault")
-  const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
   const poolAddress = getContract(chainId, "pool")
 
-  const whitelistedTokens = tokens.filter(token => token.symbol !== "USDG");
-  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
-
-  const tokenAddresses = tokens.map(token => token.address)
-
-  const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account], {
-    fetcher: fetcher(library, Reader, [tokenAddresses]),
-  })
-  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
-    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
-  })
-  const { data: fundingRateInfo, mutate: updateFundingRateInfo } = useSWR(account && [chainId, readerAddress, "getFundingRates"], {
-    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
-  })
-
-  useEffect(() => {
-    if (active) {
-      library.on('block', () => {
-        updateVaultTokenInfo(undefined, true)
-        updateTokenBalances(undefined, true)
-        updateFundingRateInfo(undefined, true)
-      })
-      return () => {
-        library.removeAllListeners('block')
-      }
-    }
-  }, [active, library, chainId,
-    updateVaultTokenInfo, updateTokenBalances,
-    updateFundingRateInfo]
-  )
-
-  function getTokenBySymbol(tokenlist, symbol) {
-    for (let i = 0; i < tokenlist.length; i++) {
-      tokenlist[i].address = tokenlist[i].address.toLowerCase()
-      if (tokenlist[i].symbol === symbol) {
-        return tokenlist[i]
-      }
-    }
-    return undefined
-  }
-
-  const getActiveTokenAddr = (symbol) => {
-    let tmp = getTokenBySymbol(tokens, symbol);
-    return tmp.address
-  }
   const onClickDropdownBTC = e => {
-    let tmp = optionsBTC[e.name]
-    setActiveToken1(tokens.filter(token => token.symbol == "BTC")[0]);
+    setActiveToken(tokens.filter(token => token.symbol == "BTC")[0]);
   };
   const onClickDropdownETH = e => {
-    let tmp = optionsETH[e.name]
-    setActiveToken1(tokens.filter(token => token.symbol == "ETH")[0]);
+    setActiveToken(tokens.filter(token => token.symbol == "ETH")[0]);
   };
   const onClickDropdownMATIC = e => {
-    let tmp = optionsMATIC[e.name]
-    setActiveToken1(tokens.filter(token => token.symbol == "MATIC")[0]);
+    setActiveToken(tokens.filter(token => token.symbol == "MATIC")[0]);
   };
   const onClickDropdownBNB = e => {
-    let tmp = optionsBNB[e.name]
-    setActiveToken1(tokens.filter(token => token.symbol == "BNB")[0]);
+    setActiveToken(tokens.filter(token => token.symbol == "BNB")[0]);
   };
-
-  useEffect(() => {
-    setToTokenAddress(getActiveTokenAddr(activeToken1.symbol))
-  }, [activeToken1])
 
   let optionsBTC = [
     { name: "BTC-1000000", tokenSymbol: "BTC", optionSymbol: "1000000", type: "C" },
@@ -180,7 +110,7 @@ const Powers = props => {
     : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
       : KChartTokenListETH
   const selectTab = item => {
-    setActiveToken1((tokens.filter(ele => ele.symbol == item)[0]))
+    setActiveToken((tokens.filter(ele => ele.symbol == item)[0]))
     switch (item) {
       case "BTC":
         setVisibleBTC(true);
@@ -228,10 +158,10 @@ const Powers = props => {
     const contract = new ethers.Contract(poolAddress, Pool.abi, library.getSigner())
     let method = "trade"
     let params = [
-      account, 
-      symbol, 
-      amount, 
-      priceLimit, 
+      account,
+      symbol,
+      amount,
+      priceLimit,
       [], //oracleSignature
     ]
 
@@ -243,23 +173,21 @@ const Powers = props => {
       failMsg: `Failed.`,
       successMsg,
     })
-    .then(() => {})
-    .catch(e => {console.log(e)})
+      .then(() => { })
+      .catch(e => { console.log(e) })
   }
 
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
-        {mode == 'Pool'
-          ?
+        {mode == 'Pool' ?
           <AcyPool />
-          :
-          <div className={`${styles.colItem} ${styles.priceChart}`}>
+          : <div className={`${styles.colItem} ${styles.priceChart}`}>
             <div>
               <div className={styles.chartTokenSelectorTab}>
                 <Row>
                   <PerpetualTabs
-                    option={activeToken1.symbol}
+                    option={activeToken.symbol}
                     options={KChartTokenList}
                     onChange={selectTab}
                   />
@@ -286,7 +214,7 @@ const Powers = props => {
                                 className={styles.item}
                                 onClick={() => {
                                   onClickDropdownBTC(option)
-                                  setSymbol(option.tokenSymbol+'USD-'+option.optionSymbol+'-'+option.type)
+                                  setSymbol(option.tokenSymbol + 'USD-' + option.optionSymbol + '-' + option.type)
                                   onCloseBTC()
                                 }}
                               >
@@ -324,7 +252,7 @@ const Powers = props => {
                               className={styles.item}
                               onClick={() => {
                                 onClickDropdownETH(option)
-                                setSymbol(option.tokenSymbol+'USD-'+option.optionSymbol+'-'+option.type)
+                                setSymbol(option.tokenSymbol + 'USD-' + option.optionSymbol + '-' + option.type)
                                 onCloseETH()
                               }}
                             >
@@ -360,7 +288,7 @@ const Powers = props => {
                               className={styles.item}
                               onClick={() => {
                                 onClickDropdownMATIC(option)
-                                setSymbol(option.tokenSymbol+'USD-'+option.optionSymbol+'-'+option.type)
+                                setSymbol(option.tokenSymbol + 'USD-' + option.optionSymbol + '-' + option.type)
                                 onCloseMATIC()
                               }}
                             >
@@ -376,6 +304,7 @@ const Powers = props => {
                       </StyledDrawer>
                     </Col>
                   </Row> : null}
+
                 {visibleBNB ?
                   <Row>
                     <Col>
@@ -395,7 +324,7 @@ const Powers = props => {
                               className={styles.item}
                               onClick={() => {
                                 onClickDropdownBNB(option)
-                                setSymbol(option.tokenSymbol+'USD-'+option.optionSymbol+'-'+option.type)
+                                setSymbol(option.tokenSymbol + 'USD-' + option.optionSymbol + '-' + option.type)
                                 onCloseBNB()
                               }}
                             >
@@ -412,15 +341,12 @@ const Powers = props => {
                     </Col>
                   </Row> : null}
               </div>
-
-              {/* </div> */}
             </div>
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
-              {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
               <ExchangeTVChart
                 chartTokenSymbol="BTC"
                 pageName="Powers"
-                fromToken={activeToken1.symbol}
+                fromToken={activeToken.symbol}
                 toToken="USDT"
               />
             </div>
@@ -433,9 +359,7 @@ const Powers = props => {
             <OptionComponent
               mode={mode}
               setMode={setMode}
-              percentage={percentage}
-              setPercentage={setPercentage}
-              selectedToken={activeToken1}
+              selectedToken={activeToken}
               symbol={symbol}
               onTrade={onTrade}
             />
