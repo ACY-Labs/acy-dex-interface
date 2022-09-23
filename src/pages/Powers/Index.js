@@ -9,7 +9,7 @@ import * as Api from '@/acy-dex-futures/Api';
 import { bigNumberify } from '@/acy-dex-futures/utils';
 import { useConstantLoader } from '@/constants';
 import { ethers } from 'ethers'
-import Pool from '@/acy-dex-futures/abis/Pool.json'
+import IPool from '@/abis/future-option-power/IPool.json'
 import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/powers.js';
 
@@ -40,8 +40,8 @@ const StyledDrawer = styled(Drawer)`
 
 const Powers = props => {
   const { account, library } = useConstantLoader();
-  let { chainId } = useChainId();
-  let tokens = getTokens(chainId);
+  const { chainId } = useChainId();
+  const tokens = getTokens(chainId);
 
   const [mode, setMode] = useState('Buy')
   const [symbol, setSymbol] = useState('')
@@ -54,6 +54,10 @@ const Powers = props => {
   const [visibleBNB, setVisibleBNB] = useState(false);
 
   const poolAddress = getContract(chainId, "pool")
+
+  useEffect(()=>{
+    setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
+  }, [tokens])
 
   const onClickDropdownBTC = e => {
     setActiveToken(tokens.filter(token => token.symbol == "BTC")[0]);
@@ -155,7 +159,7 @@ const Powers = props => {
   };
 
   const onTrade = async (symbol, amount, priceLimit) => {
-    const contract = new ethers.Contract(poolAddress, Pool.abi, library.getSigner())
+    const contract = new ethers.Contract(poolAddress, IPool.abi, library.getSigner())
     let method = "trade"
     let params = [
       account,

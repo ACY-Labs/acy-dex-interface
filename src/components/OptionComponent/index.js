@@ -8,13 +8,14 @@ import { getTokens, getContract } from '@/constants/powers.js'
 import { useChainId } from '@/utils/helpers';
 import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from '@/components/ConnectWallet';
-import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, expandDecimals, bigNumberify } from '@/acy-dex-futures/utils';
+import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, expandDecimals, bigNumberify, formatAmount } from '@/acy-dex-futures/utils';
 import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
 import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
 import Glp from '@/acy-dex-futures/abis/Glp.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
+import Reader from '@/abis/future-option-power/Reader.json'
 
 import styles from './styles.less';
 
@@ -62,12 +63,23 @@ const OptionComponent = props => {
     }
   }
 
+  useEffect(()=>{
+    let tokenAmount = (Number(percentage.split('%')[0])/100) * formatAmount(tokenInfo?.filter(item=>item.token == selectedToken.address)[0]?.balance, 18, 2)
+    setSelectedTokenValue(tokenAmount)
+    setUsdValue(tokenAmount * formatAmount(tokenInfo?.filter(item=>item.token == selectedToken.address)[0]?.price, 18, 2))
+  }, [percentage])
+
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
   const routerAddress = getContract(chainId, "Router")
+  const readerAddress = getContract(chainId, "reader")
+  const poolAddress = getContract(chainId, "pool")
 
   const tokenAllowanceAddress = selectedToken.address === AddressZero ? nativeTokenAddress : selectedToken.address;
   const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
     fetcher: fetcher(library, Glp)
+  });
+  const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, Reader)
   });
 
   const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
@@ -166,8 +178,7 @@ const OptionComponent = props => {
                     onChange={e => {
                       setSelectedTokenValue(e.target.value)
                       setShowDescription(true)
-                      //todo: get token price
-                      setUsdValue(e.target.value)
+                      setUsdValue((e.target.value * formatAmount(tokenInfo?.filter(item=>item.token == selectedToken.address)[0]?.price, 18, 2)).toFixed(2))
                     }}
                   />
                   <span className={styles.inputLabel}>{selectedToken.symbol}</span>
