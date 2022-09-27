@@ -73,6 +73,7 @@ const OptionComponent = props => {
   const routerAddress = getContract(chainId, "Router")
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
+  const tokens = getTokens(chainId)
 
   const tokenAllowanceAddress = selectedToken.address === AddressZero ? nativeTokenAddress : selectedToken.address;
   const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
@@ -272,7 +273,7 @@ const OptionComponent = props => {
 
             </div>
 
-            <AccountInfoGauge />
+            <AccountInfoGauge account={account} library={library} tokens={tokens} />
           </>
         }
 
