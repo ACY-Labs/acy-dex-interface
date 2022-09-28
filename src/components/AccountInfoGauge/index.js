@@ -1,17 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from 'antd';
 import { Gauge } from 'ant-design-pro/lib/Charts';
-import { AcyPerpetualButton } from '../Acy';
+import { AcyPerpetualButton, AcyCuarrencyCard } from '../Acy';
+import Modal from '../PerpetualComponent/Modal/Modal';
 
 import styles from './styles.less';
+import TokenSelectorModal from '../TokenSelectorModal';
 
 const AccountInfoGauge = props => {
 
+  const {
+    account,
+    library,
+    tokens,
+  } = props
+
+  const [token, setToken] = useState()
+  const [mode, setMode] = useState('')
+  const [isConfirming, setIsConfirming] = useState(false)
+  const [tokenAmount, setTokenAmount] = useState('');
+  const [visible, setVisible] = useState(false)
+
   const onClickDeposit = () => {
-    
+    setMode('Deposit')
+    setIsConfirming(true)
   }
 
   const onClickWithdraw = () => {
+    setMode('Withdraw')
+    setIsConfirming(true)
+  }
+
+  const getPrimaryText = () => {
+    if(!token) {
+      return 'Select a Token'
+    }
+    if(!tokenAmount) {
+      return 'Enter an Amount'
+    }
+    return mode.toUpperCase()
+  }
+
+  const addMargin = () => {
+
+  }
+
+  const removeMargin = () => {
 
   }
 
@@ -59,6 +93,54 @@ const AccountInfoGauge = props => {
           WITHDRAW
         </AcyPerpetualButton>
       </div>
+
+      {isConfirming &&
+        <div className={styles.ConfirmationBox}>
+          <Modal isVisible={true} setIsVisible={() => { setIsConfirming(false) }} label={'Account '+mode}>
+
+            <div style={{ width: '300px' }}>
+              <AcyCuarrencyCard
+                coin={(token && token.symbol) || 'Select'}
+                logoURI={token && token.logoURI}
+                token={tokenAmount}
+                showBalance={false}
+                onChoseToken={() => {
+                  setVisible(true)
+                }}
+                onChangeToken={e => {
+                  setTokenAmount(e);
+                }}
+                isLocked={false}
+                library={library}
+              />
+            </div>
+
+            <div className={styles.ConfirmationBoxRow}>
+              <button
+                onClick={() => {
+                  mode == 'Deposit' ? addMargin() : removeMargin()
+                  setIsConfirming(false)
+                }}
+                disabled={!token || !tokenAmount}
+                className={styles.ConfirmationBoxButton}
+              >
+                {getPrimaryText()}
+              </button>
+            </div>
+          </Modal>
+        </div>
+      }
+
+      <TokenSelectorModal
+        onCancel={() => setVisible(false)}
+        width={400}
+        visible={visible}
+        onCoinClick={token => {
+          setToken(token)
+          setVisible(false)
+        }}
+        defaultTokens={tokens}
+      />
     </div>
   );
 }

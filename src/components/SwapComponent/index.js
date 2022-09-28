@@ -1,100 +1,35 @@
-import {
-  AcyCard,
-  AcyIcon,
-  AcyPeriodTime,
-  AcyTabs,
-  AcyCuarrencyCard,
-  AcyConnectWalletBig,
-  AcyModal,
-  AcyInput,
-  AcyCoinItem,
-  AcyLineChart,
-  AcyConfirm,
-  AcyApprove,
-  AcyPerpetualButton,
-  AcyDescriptions,
-  AcySmallButton,
-} from '@/components/Acy';
-import TokenSelectorModal from "@/components/TokenSelectorModal";
-
-import { connect } from 'umi';
-import styles from './styles.less';
-import { sortAddress, abbrNumber } from '@/utils/utils';
-import axios from 'axios';
-
-import { useWeb3React } from '@web3-react/core';
-import { binance,injected } from '@/connectors';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
-
-import {
-  Error,
-  approve,
-  calculateGasMargin,
-  checkTokenIsApproved,
-  computeTradePriceBreakdown,
-  getAllowance,
-  getContract,
-  getRouterContract,
-  getUserTokenBalance,
-  getUserTokenBalanceRaw,
-  isZero,
-  supportedTokens,
-  parseArbitrageLog,
-} from '@/acy-dex-swap/utils/index';
-
+import { connect } from 'umi';
+import { approve, getUserTokenBalance } from '@/acy-dex-swap/utils/index';
 import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
-
-import ERC20ABI from '@/abis/ERC20.json';
-import WETHABI from '@/abis/WETH.json';
-
-import {
-  Token,
-  TokenAmount,
-  Pair,
-  TradeType,
-  Route,
-  Trade,
-  Fetcher,
-  Percent,
-  Router,
-  WETH,
-  ETHER,
-  CurrencyAmount,
-  InsufficientReservesError,
-} from '@acyswap/sdk';
-
-import { MaxUint256 } from '@ethersproject/constants';
-import { BigNumber } from '@ethersproject/bignumber';
-import { parseUnits } from '@ethersproject/units';
-import { hexlify } from '@ethersproject/bytes';
-
-const { AcyTabPane } = AcyTabs;
-import { Row, Col, Button, Input, Icon, Drawer } from 'antd';
-import { Alert } from 'antd';
-import spinner from '@/assets/loading.svg';
-import moment from 'moment';
-import {useConstantLoader, getGlobalTokenList} from '@/constants';
-import {useConnectWallet} from '@/components/ConnectWallet';
-import { asyncForEach } from "@/utils/asynctools";
-import { processString } from "@/components/AcyCoinItem";
+import { useConstantLoader, getGlobalTokenList } from '@/constants';
+import { useConnectWallet } from '@/components/ConnectWallet';
+import { useChainId } from '@/utils/helpers';
+import { getTokens } from '@/constants/trade';
+import { AcyCuarrencyCard, AcyPerpetualButton, AcyDescriptions } from '@/components/Acy';
+import { Button, Input, Icon } from 'antd';
 import TokenSelectorDrawer from '../TokenSelectorDrawer';
 import DetailBox from './components/DetailBox';
 import ScoreBox from './components/ScoreBox';
+import styles from './styles.less';
 
 
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
-  const { account, library, chainId, tokenList: INITIAL_TOKEN_LIST, farmSetting: {INITIAL_ALLOWED_SLIPPAGE}} = useConstantLoader(props);
-  const { 
-    dispatch, 
-    onSelectToken0, 
-    onSelectToken1, 
-    onSelectToken, 
-    token, 
-    isLockedToken1=false 
+  const { account, library, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
+  const {
+    dispatch,
+    onSelectToken0,
+    onSelectToken1,
+    onSelectToken,
+    token,
+    isLockedToken1=false
   } = props;
   // 选择货币的弹窗
+
+  const { chainId } = useChainId();
+  const INITIAL_TOKEN_LIST = getTokens(chainId);
 
   const coinList = getGlobalTokenList()
 
@@ -168,21 +103,21 @@ const SwapComponent = props => {
     if (!INITIAL_TOKEN_LIST) return
     console.log("resetting page states, new swapComponent token0, token1", INITIAL_TOKEN_LIST[0], INITIAL_TOKEN_LIST[1])
     setVisible(null);
-      // 选择货币前置和后置
+    // 选择货币前置和后置
     setBefore(true);
-      // 交易对前置货币
+    // 交易对前置货币
     setToken0(INITIAL_TOKEN_LIST[0]);
-      // 交易对后置货币
+    // 交易对后置货币
     setToken1(INITIAL_TOKEN_LIST[3]);
-      // 交易对前置货币余额
+    // 交易对前置货币余额
     setToken0Balance('0');
-      // 交易对后置货币余额
+    // 交易对后置货币余额
     setToken1Balance('0');
-      // 交易对前置货币兑换量
+    // 交易对前置货币兑换量
     setToken0Amount('');
-      // 交易对后置货币兑换量
+    // 交易对后置货币兑换量
     setToken1Amount('');
-      // 交易中用户使用Flash Arbitrage的额外获利
+    // 交易中用户使用Flash Arbitrage的额外获利
     setBonus0(null);
     setBonus1(null);
     setToken0BalanceShow(false);
@@ -195,8 +130,8 @@ const SwapComponent = props => {
     setNeedApprove(false);
     setApproveAmount('0');
     setApproveButtonStatus(true);
-      // Breakdown shows the estimated information for swap
-      // let [estimatedStatus,setEstimatedStatus]=useState();
+    // Breakdown shows the estimated information for swap
+    // let [estimatedStatus,setEstimatedStatus]=useState();
     setSwapBreakdown();
     setSwapButtonState(false);
     setSwapButtonContent('Connect to Wallet');
@@ -220,7 +155,7 @@ const SwapComponent = props => {
   // connect to page model, reflect changes of pair ratio in this component
   useEffect(() => {
     const { swap: { token0: modelToken0, token1: modelToken1 } } = props;
-    
+
     // setToken0(modelToken0);
     // setToken1(modelToken1);
 
@@ -232,21 +167,6 @@ const SwapComponent = props => {
       setToken1Balance(newToken1Balance);
     }
   }, [props.swap]);
-
-  // useEffect(() => {
-  //   if(token) {
-  //     setToken0(token.token0);
-  //     setToken1(token.token1);
-  //   }
-  // }, [token]);
-
-  
-
-  const individualFieldPlaceholder = 'Enter amount';
-  const dependentFieldPlaceholder = 'Estimated value';
-  const slippageTolerancePlaceholder = 'Please input a number from 1.00 to 100.00';
-
-  const { activate } = useWeb3React();
 
   useEffect(
     () => {
@@ -277,99 +197,96 @@ const SwapComponent = props => {
     [account, INITIAL_TOKEN_LIST]
   );
 
-
   // token1Amount is changed according to token0Amount
-  const t0Changed = 
-    async (e) => {
-      if (!token0 || !token1) return;
-      if (!exactIn) return;
-      console.log("passed in t0 amount", e)
-      await swapGetEstimated(
-        {
-          ...token0,
-          amount: e,
-        },
-        {
-          ...token1,
-          amount: token1Amount,
-        },
-        slippageTolerance * 100,
-        exactIn,
-        chainId,
-        library,
-        account,
-        setToken0Amount,
-        setToken1Amount,
-        setBonus0,
-        setBonus1,
-        setNeedApprove,
-        setApproveAmount,
-        setApproveButtonStatus,
-        setSwapBreakdown,
-        setSwapButtonState,
-        setSwapButtonContent,
-        setSwapStatus,
-        setPair,
-        setRoute,
-        setTrade,
-        setSlippageAdjustedAmount,
-        setMinAmountOut,
-        setMaxAmountIn,
-        setWethContract,
-        setWrappedAmount,
-        setMethodName,
-        setIsUseArb,
-        setMidTokenAddress,
-        setPoolExist
-      );
-    }
+  const t0Changed = async (e) => {
+    if (!token0 || !token1) return;
+    if (!exactIn) return;
+    console.log("passed in t0 amount", e)
+    await swapGetEstimated(
+      {
+        ...token0,
+        amount: e,
+      },
+      {
+        ...token1,
+        amount: token1Amount,
+      },
+      slippageTolerance * 100,
+      exactIn,
+      chainId,
+      library,
+      account,
+      setToken0Amount,
+      setToken1Amount,
+      setBonus0,
+      setBonus1,
+      setNeedApprove,
+      setApproveAmount,
+      setApproveButtonStatus,
+      setSwapBreakdown,
+      setSwapButtonState,
+      setSwapButtonContent,
+      setSwapStatus,
+      setPair,
+      setRoute,
+      setTrade,
+      setSlippageAdjustedAmount,
+      setMinAmountOut,
+      setMaxAmountIn,
+      setWethContract,
+      setWrappedAmount,
+      setMethodName,
+      setIsUseArb,
+      setMidTokenAddress,
+      setPoolExist
+    );
+  }
 
   // token0Amount is changed according to token1Amount
-  const t1Changed = 
-    async (e) => {
-      console.log("t1changed")
-      if (!token0 || !token1) return;
-      if (exactIn) return;
-      console.log("t1changed entered", token0Amount, token1Amount)
-      await swapGetEstimated(
-        {
-          ...token0,
-          amount: token0Amount,
-        },
-        {
-          ...token1,
-          amount: e,
-        },
-        slippageTolerance * 100,
-        exactIn,
-        chainId,
-        library,
-        account,
-        setToken0Amount,
-        setToken1Amount,
-        setBonus0,
-        setBonus1,
-        setNeedApprove,
-        setApproveAmount,
-        setApproveButtonStatus,
-        setSwapBreakdown,
-        setSwapButtonState,
-        setSwapButtonContent,
-        setSwapStatus,
-        setPair,
-        setRoute,
-        setTrade,
-        setSlippageAdjustedAmount,
-        setMinAmountOut,
-        setMaxAmountIn,
-        setWethContract,
-        setWrappedAmount,
-        setMethodName,
-        setIsUseArb,
-        setMidTokenAddress,
-        setPoolExist
-      );
-    }
+  const t1Changed = async (e) => {
+    console.log("t1changed")
+    if (!token0 || !token1) return;
+    if (exactIn) return;
+    console.log("t1changed entered", token0Amount, token1Amount)
+    await swapGetEstimated(
+      {
+        ...token0,
+        amount: token0Amount,
+      },
+      {
+        ...token1,
+        amount: e,
+      },
+      slippageTolerance * 100,
+      exactIn,
+      chainId,
+      library,
+      account,
+      setToken0Amount,
+      setToken1Amount,
+      setBonus0,
+      setBonus1,
+      setNeedApprove,
+      setApproveAmount,
+      setApproveButtonStatus,
+      setSwapBreakdown,
+      setSwapButtonState,
+      setSwapButtonContent,
+      setSwapStatus,
+      setPair,
+      setRoute,
+      setTrade,
+      setSlippageAdjustedAmount,
+      setMinAmountOut,
+      setMaxAmountIn,
+      setWethContract,
+      setWrappedAmount,
+      setMethodName,
+      setIsUseArb,
+      setMidTokenAddress,
+      setPoolExist
+    );
+  }
 
   useEffect(
     async () => {
@@ -385,6 +302,7 @@ const SwapComponent = props => {
       account,
     ]
   );
+
   useEffect(
     async () => {
       await t1Changed(token1Amount);
@@ -412,20 +330,16 @@ const SwapComponent = props => {
 
   const onCoinClick = async token => {
     onCancel();
-    if (before) {
-      if (account == undefined) {
-        alert('Please connect to your account');
-      } else {
+    if (account == undefined) {
+      alert('Please connect to your account');
+    } else {
+      if (before) {
         console.log('SET TOKEN 0');
         console.log("onselect token0", token);
         onSelectToken0(token);
         setToken0(token);
         setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
         setToken0BalanceShow(true);
-      }
-    } else {
-      if (account == undefined) {
-        alert('Please connect to your account');
       } else {
         console.log("onselect token1", token);
         onSelectToken1(token);
@@ -490,7 +404,7 @@ const SwapComponent = props => {
       library.getTransactionReceipt(hash).then(async receipt => {
         console.log(`receiptreceipt for ${hash}: `, receipt);
         // receipt is not null when transaction is done
-        if (!receipt) 
+        if (!receipt)
           setTimeout(sti(hash), 500);
         else {
 
@@ -499,11 +413,11 @@ const SwapComponent = props => {
           } else {
 
             props.onGetReceipt(receipt.transactionHash, library, account);
-            
+
             // set button to done and disabled on default
             setSwapButtonContent("Done");
           }
-          
+
           const newData = transactions.filter(item => item.hash != hash);
           dispatch({
             type: 'transaction/addTransaction',
@@ -511,26 +425,75 @@ const SwapComponent = props => {
               transactions: newData
             },
           });
-          
+
         }
       });
     }
     sti(status.hash);
   };
 
-  useEffect(() => {
-    console.log("transactions changed", props.transaction.transactions)
-  }, [props.transaction.transactions]);
-
-  useEffect(() => console.log("test slippage: ", slippageTolerance), [slippageTolerance]);
-
   const history = useHistory()
-  // const coinList = getGlobalTokenList()
-
   useEffect(() => {
     const hash = history.location.hash.replace('#', '').split('?')[0]
     hash ? setToken0(coinList.filter(coin => coin.symbol.toLowerCase() == hash.toLowerCase())[0]) : setToken0(INITIAL_TOKEN_LIST[0])
   }, [history.location.hash, coinList])
+
+  const onClickApprove = async () => {
+    setShowSpinner(true);
+    setApproveButtonStatus(false);
+    const state = await approve(token0.address, approveAmount, library, account);
+    setApproveButtonStatus(true);
+    setShowSpinner(false);
+
+    if (state) {
+      setSwapButtonState(true);
+      setSwapButtonContent('Swap');
+      setApproveButtonStatus(false);
+      setNeedApprove(false);
+      console.log("test needApprove false")
+    }
+  }
+
+  const onConfirmationClick = () => {
+    if (account == undefined) {
+      connectWalletByLocalStorage();
+    } else {
+      setSwapButtonState(false);
+      setSwapButtonContent(<>Processing <Icon type="loading" /></>)
+      swap(
+        {
+          ...token0,
+          amount: token0Amount,
+        },
+        {
+          ...token1,
+          amount: token1Amount,
+        },
+        slippageTolerance * 100,
+        exactIn,
+        chainId,
+        library,
+        account,
+        pair,
+        route,
+        trade,
+        slippageAdjustedAmount,
+        minAmountOut,
+        maxAmountIn,
+        wethContract,
+        wrappedAmount,
+        deadline,
+        setSwapStatus,
+        setSwapButtonContent,
+        setSwapButtonState,
+        swapCallback,
+        methodName,
+        isUseArb,
+        midTokenAddress,
+        poolExist
+      );
+    }
+  }
 
   return (
     <div className={styles.sc}>
@@ -563,10 +526,10 @@ const SwapComponent = props => {
         className={styles.arrow}
         disabled={isLockedToken1}
         onClick={() => {
-          if(!isLockedToken1){
+          if (!isLockedToken1) {
             onSwitchCoinCard();
           }
-          
+
         }}
       >
         <Icon style={{ fontSize: '16px' }} type="arrow-down" />
@@ -600,153 +563,79 @@ const SwapComponent = props => {
       />
 
       {showDescription ?
-      <AcyDescriptions>
-        <div className={styles.breakdownTopContainer}>
-          <div className={styles.slippageContainer}>
-            <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-              {/* <Button
-                    type="link"
-                    style={{ marginRight: '5px' }}
-                    onClick={() => {
-                      setInputSlippageTol(INITIAL_ALLOWED_SLIPPAGE / 100);
-                      setSlippageTolerance(INITIAL_ALLOWED_SLIPPAGE / 100);
-                    }}
-                  >
-                    Auto
-                  </Button> */}
-              <Input
-                className={styles.input}
-                value={inputSlippageTol || ''}
-                onChange={e => {
-                  setInputSlippageTol(e.target.value);
-                }}
-                suffix={<strong>%</strong>}
-              />
-              <Button
-                type="primary"
+        <AcyDescriptions>
+          <div className={styles.breakdownTopContainer}>
+            <div className={styles.slippageContainer}>
+              <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+                <Input
+                  className={styles.input}
+                  value={inputSlippageTol || ''}
+                  onChange={e => {
+                    setInputSlippageTol(e.target.value);
+                  }}
+                  suffix={<strong>%</strong>}
+                />
+                <Button
+                  type="primary"
+                  style={{ marginLeft: '10px', background: '#2e3032', borderColor: 'transparent' }}
+                  onClick={() => {
+                    if (isNaN(inputSlippageTol)) {
+                      setSlippageError('Please input valid slippage value!');
+                    } else {
+                      setSlippageError('');
+                      setSlippageTolerance(parseFloat(inputSlippageTol));
+                    }
+                  }}
+                >
+                  Set
+                </Button>
+              </div>
+              {slippageError.length > 0 && (
+                <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
+              )}
+            </div>
+            <div className={styles.slippageContainer}>
+              <span style={{ fontWeight: 600, marginBottom: '10px' }}>Transaction deadline</span>
+              <div
                 style={{
-                  marginLeft: '10px',
-                  background: '#2e3032',
-                  borderColor: 'transparent',
-                }}
-                onClick={() => {
-                  if (isNaN(inputSlippageTol)) {
-                    setSlippageError('Please input valid slippage value!');
-                  } else {
-                    setSlippageError('');
-                    setSlippageTolerance(parseFloat(inputSlippageTol));
-                  }
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  height: '33.6px',
+                  marginTop: '10px',
                 }}
               >
-                Set
-              </Button>
-            </div>
-            {slippageError.length > 0 && (
-              <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
-            )}
-          </div>
-          <div className={styles.slippageContainer}>
-            <span style={{ fontWeight: 600, marginBottom: '10px' }}>Transaction deadline</span>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                height: '33.6px',
-                marginTop: '10px',
-              }}
-            >
-              <Input 
-                className={styles.input}
-                type="number" 
-                value={Number(deadline).toString()} 
-                onChange={e => setDeadline(e.target.valueAsNumber || 0)} 
-                placeholder={30} 
-                suffix={<strong>minutes</strong>} 
-              />
+                <Input
+                  className={styles.input}
+                  type="number"
+                  value={Number(deadline).toString()}
+                  onChange={e => setDeadline(e.target.valueAsNumber || 0)}
+                  placeholder={30}
+                  suffix={<strong>minutes</strong>}
+                />
+              </div>
             </div>
           </div>
-        </div>
-        {/* <div className={styles.acyDescriptionContainer}>
-              {swapBreakdown.map(info => (
-                <AcyDescriptions.Item>
-                  <div className={styles.acyDescriptionItem}>{info}</div>
-                </AcyDescriptions.Item>
-              ))}
-            </div> */}
-      </AcyDescriptions>
-      : null}
+        </AcyDescriptions>
+        : null}
 
       {needApprove
         ? <div>
           <AcyButton
             style={{ marginTop: '30px' }}
             disabled={!approveButtonStatus}
-            onClick={async () => {
-              setShowSpinner(true);
-              setApproveButtonStatus(false);
-              const state = await approve(token0.address, approveAmount, library, account);
-              setApproveButtonStatus(true);
-              setShowSpinner(false);
-
-              if (state) {
-                setSwapButtonState(true);
-                setSwapButtonContent('Swap');
-                setApproveButtonStatus(false);
-                setNeedApprove(false);
-                console.log("test needApprove false")
-              }
-            }}
+            onClick={onClickApprove}
           >
             Approve{' '}
             {showSpinner && <Icon type="loading" />}
           </AcyButton>{' '}
         </div>
-        : 
+        :
         <div className={styles.centerButton}>
           <AcyPerpetualButton
             style={{ marginTop: '25px' }}
             disabled={!swapButtonState}
-            onClick={() => {
-              if (account == undefined) {
-                connectWalletByLocalStorage();
-              } else {
-                setSwapButtonState(false);
-                setSwapButtonContent(<>Processing <Icon type="loading" /></>)
-                swap(
-                  {
-                    ...token0,
-                    amount: token0Amount,
-                  },
-                  {
-                    ...token1,
-                    amount: token1Amount,
-                  },
-                  slippageTolerance * 100,
-                  exactIn,
-                  chainId,
-                  library,
-                  account,
-                  pair,
-                  route,
-                  trade,
-                  slippageAdjustedAmount,
-                  minAmountOut,
-                  maxAmountIn,
-                  wethContract,
-                  wrappedAmount,
-                  deadline,
-                  setSwapStatus,
-                  setSwapButtonContent,
-                  setSwapButtonState,
-                  swapCallback,
-                  methodName,
-                  isUseArb,
-                  midTokenAddress,
-                  poolExist
-                );
-              }
-            }}
+            onClick={onConfirmationClick}
           >
             {swapButtonContent}
           </AcyPerpetualButton>
@@ -765,10 +654,6 @@ const SwapComponent = props => {
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
-      {/* <TokenSelectorModal
-        onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} sideComponent={true} 
-      /> */}
-
       <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} />
 
     </div>
@@ -782,72 +667,3 @@ export default connect(({ global, transaction, swap, loading }) => ({
   swap,
   loading: loading.global,
 }))(SwapComponent);
-
-
-// if (receipt) {
-//   clearInterval(sti);
-  // const { logs } = receipt;
-  // console.log("logs: ", logs);
-  // const decodedLog = parseArbitrageLog(logs[logs.length - 1]);
-  // console.log('receipt OK, these are logs');
-  // console.log("decodedLog", decodedLog);
-  // decodedLog['transactionHash'] = receipt.transactionHash;
-
-//   props.onGetReceipt(decodedLog, library, account);
-//   let newData = transactions.filter(item => item.hash != status.hash);
-//   let transactionTime = '';
-//   let inputTokenNum;
-//   let outTokenNum;
-//   let totalToken;
-//   let transferHash = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;
-//   await library.getBlock(receipt.logs[0].blockNumber).then(data => {
-//     transactionTime = moment(parseInt(data.timestamp * 1000)).format('YYYY-MM-DD HH:mm:ss');
-//   });
-//   receipt.logs.map(item => {
-//     // debugger
-//     // let topics=hexlify(item.topics[0]).toText();
-//     // let ss=CryptoJS.SHA3.decrypt(item.topics[0]); 
-//     // debugger
-//     if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == inputToken.address) {
-//       // inputtoken 数量
-//       // inputTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0",inputToken.decimals))).toString();
-//       inputTokenNum = item.data / Math.pow(10, inputToken.decimals).toString();
-//       // console.log('inputTokenNum',inputTokenNum)
-//     }
-//     if (item.topics.length == 3 && item.topics[0] == transferHash && item.address == outToken.address) {
-//       // outtoken 数量
-//       // outTokenNum=BigNumber.from(item.data).div(BigNumber.from(parseUnits("1.0", outToken.decimals))).toString();
-//       outTokenNum = item.data / Math.pow(10, outToken.decimals).toString();
-//       // console.log('outputTokenNum',outTokenNum)
-//     }
-//   });
-
-//   setSwapButtonContent("Done");
-  
-//   // 获取美元价值
-//   await axios
-//     .post(
-//       `https://api.acy.finance/api/chart/swap?token0=${inputToken.addressOnEth}&token1=${outToken.addressOnEth
-//       }&range=1D`
-//     )
-//     .then(data => {
-//       // totalToken = abbrNumber(
-//       //   inputTokenNum * data.data.data.swaps[data.data.data.swaps.length - 1].rate
-//       // );
-
-//       // const { swaps } = data.data.data;
-//       // const lastDataPoint = swaps[swaps.length - 1];
-//       // console.log('ROUTE PRICE POINT', lastDataPoint);
-//       // this.setState({
-//       //   pricePoint: lastDataPoint.rate,
-//       // });
-//     });
-
-//   console.log("receipt transactionTime", transactionTime);
-// >>>>>>> e0b545d... (wip) : migration to bsc
-//   dispatch({
-//     type: 'transaction/addTransaction',
-//     payload: {
-//       transactions: newData
-//     },
-//   });
