@@ -13,7 +13,7 @@ import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
 import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
-import Glp from '@/acy-dex-futures/abis/Glp.json'
+import ERC20 from '@/acy-dex-futures/abis/ERC20.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
 import Reader from '@/abis/future-option-power/Reader.json'
 
@@ -31,11 +31,11 @@ const OptionComponent = props => {
     onTrade,
   } = props
 
-  const { account,library, farmSetting: { INITIAL_ALLOWED_SLIPPAGE }} = useConstantLoader(props);
+  const { account, library, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
   const { chainId } = useChainId();
   const connectWalletByLocalStorage = useConnectWallet();
   const { active } = useWeb3React();
-  
+
   const optionMode = ['Buy', 'Sell', 'Pool']
   const [percentage, setPercentage] = useState('')
   const [selectedTokenValue, setSelectedTokenValue] = useState("0");
@@ -63,32 +63,52 @@ const OptionComponent = props => {
     }
   }
 
-  useEffect(()=>{
-    let tokenAmount = (Number(percentage.split('%')[0])/100) * formatAmount(tokenInfo?.filter(item=>item.token == selectedToken.address)[0]?.balance, 18, 2)
+  useEffect(() => {
+    let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(tokenInfo?.filter(item => item.token == selectedToken.address)[0]?.balance, 18, 2)
     setSelectedTokenValue(tokenAmount)
-    setUsdValue(tokenAmount * formatAmount(tokenInfo?.filter(item=>item.token == selectedToken.address)[0]?.price, 18, 2))
+    setUsdValue(tokenAmount * symbolInfo?.markPrice)
   }, [percentage])
 
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
-  const routerAddress = getContract(chainId, "Router")
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
   const tokens = getTokens(chainId)
 
   const tokenAllowanceAddress = selectedToken.address === AddressZero ? nativeTokenAddress : selectedToken.address;
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
-    fetcher: fetcher(library, Glp)
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, poolAddress], {
+    fetcher: fetcher(library, ERC20)
   });
   const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader)
   });
+  const { data: symbolInfo, mutate: updateSymbolInfo } = useSWR([chainId, readerAddress, "getSymbolInfo", poolAddress, symbol, []], {
+    fetcher: fetcher(library, Reader)
+  });
 
   const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
-  const needApproval = 
+  const needApproval =
     selectedToken.address !== AddressZero &&
     tokenAllowance &&
     selectedTokenAmount &&
     selectedTokenAmount.gt(tokenAllowance)
+
+  useEffect(() => {
+    if(selectedToken && isWaitingForApproval && !needApproval) {
+      setIsWaitingForApproval(false)
+    }
+  }, [selectedToken, selectedTokenAmount, needApproval])
+
+  useEffect(() => {
+    if (active) {
+      function onBlock() {
+        updateTokenAllowance(undefined, true);
+      }
+      library.on("block", onBlock);
+      return () => {
+        library.removeListener("block", onBlock);
+      };
+    }
+  }, [active, library, updateTokenAllowance]);
 
   const approveTokens = () => {
     setIsApproving(true);
@@ -97,10 +117,9 @@ const OptionComponent = props => {
       Token.abi,
       library.getSigner()
     );
-    contract.approve(routerAddress, ethers.constants.MaxUint256)
+    contract.approve(poolAddress, ethers.constants.MaxUint256)
       .then(async res => {
         setIsWaitingForApproval(true)
-        console.log(selectedToken.symbol, 'Approved!')
       })
       .catch(e => {
         console.error(e);
@@ -131,11 +150,11 @@ const OptionComponent = props => {
       connectWalletByLocalStorage()
       return
     }
-    if(needApproval) {
+    if (needApproval) {
       approveTokens()
       return
     }
-    if(mode ==' Buy') {
+    if (mode == ' Buy') {
       onTrade(symbol, selectedTokenAmount, expandDecimals(50001, 18))
     } else {
       onTrade(symbol, selectedTokenAmount.mul(bigNumberify(-1)), expandDecimals(50001, 18))
@@ -169,7 +188,7 @@ const OptionComponent = props => {
           <>
             <div className={styles.rowFlexContainer}>
 
-              <div style={{display: 'flex'}}>
+              <div style={{ display: 'flex' }}>
                 <div className={styles.inputContainer}>
                   <input
                     type="number"
@@ -179,7 +198,7 @@ const OptionComponent = props => {
                     onChange={e => {
                       setSelectedTokenValue(e.target.value)
                       setShowDescription(true)
-                      setUsdValue((e.target.value * formatAmount(tokenInfo?.filter(item=>item.token == selectedToken.address)[0]?.price, 18, 2)).toFixed(2))
+                      setUsdValue((e.target.value * symbolInfo?.markPrice).toFixed(2))
                     }}
                   />
                   <span className={styles.inputLabel}>{selectedToken.symbol}</span>
