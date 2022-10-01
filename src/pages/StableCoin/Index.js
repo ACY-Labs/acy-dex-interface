@@ -109,7 +109,6 @@ const StableCoin = props => {
   })
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
-  console.log("hereim swap infotokens", infoTokens)
 
   const setToTokenAddress = useCallback((selectedSwapOption, address) => {
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
@@ -125,15 +124,16 @@ const StableCoin = props => {
     }
     return undefined
   }
-  const [kChartTab, setKChartTab] = useState("BTC")
-  const kChartTabs = ["BTC", "ETH"]
+  const [kChartTab, setKChartTab] = useState("USDA/USDT")
+  const kChartTabs = ["USDA/USDT", "USDA/USDC"]
   const selectChart = item => {
     setKChartTab(item)
     onClickSetActiveToken(item)
   }
   const onClickSetActiveToken = (e) => {
-    console.log("hereim see click token", e)
-    setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
+    console.log("tvchart stablecoin click token", e.substring(5), tokenlist)
+    console.log("tvchart stablecoin see selected", (tokenlist.filter(ele => ele.symbol == e.substring(5)))[0])
+    setActiveToken1((tokenlist.filter(token => token.symbol == e.substring(5)))[0].symbol);
   }
 
   return (
@@ -156,7 +156,9 @@ const StableCoin = props => {
                 {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
                 <ExchangeTVChart
                   chartTokenSymbol="USDC"
-                  passTokenData={passTokenData}
+                  pageName="StableCoin"
+                  fromToken="USDT"
+                  toToken="USDC"                
                 />
               </div>
             </div>

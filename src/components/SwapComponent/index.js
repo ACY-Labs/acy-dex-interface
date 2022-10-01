@@ -86,9 +86,18 @@ import ScoreBox from './components/ScoreBox';
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
   const { account, library, chainId, tokenList: INITIAL_TOKEN_LIST, farmSetting: {INITIAL_ALLOWED_SLIPPAGE}} = useConstantLoader(props);
-  const { dispatch, onSelectToken0, onSelectToken1, onSelectToken, token, isLockedToken1=false } = props;
-
+  const { 
+    dispatch, 
+    onSelectToken0, 
+    onSelectToken1, 
+    onSelectToken, 
+    token, 
+    isLockedToken1=false 
+  } = props;
   // 选择货币的弹窗
+
+  const coinList = getGlobalTokenList()
+
   const [visible, setVisible] = useState(null);
 
   // 选择货币前置和后置
@@ -97,7 +106,7 @@ const SwapComponent = props => {
   // 交易对前置货币
   const [token0, setToken0] = useState(INITIAL_TOKEN_LIST[0]);
   // 交易对后置货币
-  const [token1, setToken1] = useState(INITIAL_TOKEN_LIST[1]);
+  const [token1, setToken1] = useState(INITIAL_TOKEN_LIST[3]);
 
   // 交易对前置货币余额
   const [token0Balance, setToken0Balance] = useState('0');
@@ -164,7 +173,7 @@ const SwapComponent = props => {
       // 交易对前置货币
     setToken0(INITIAL_TOKEN_LIST[0]);
       // 交易对后置货币
-    setToken1(INITIAL_TOKEN_LIST[1]);
+    setToken1(INITIAL_TOKEN_LIST[3]);
       // 交易对前置货币余额
     setToken0Balance('0');
       // 交易对后置货币余额
@@ -212,8 +221,8 @@ const SwapComponent = props => {
   useEffect(() => {
     const { swap: { token0: modelToken0, token1: modelToken1 } } = props;
     
-    setToken0(modelToken0);
-    setToken1(modelToken1);
+    // setToken0(modelToken0);
+    // setToken1(modelToken1);
 
     console.log(">> old new token 0/1 compare", token0 == modelToken1, token1 == modelToken0)
     if (token0 == modelToken1 && token1 == modelToken0) {
@@ -224,12 +233,12 @@ const SwapComponent = props => {
     }
   }, [props.swap]);
 
-  useEffect(() => {
-    if(token) {
-      setToken0(token.token0);
-      setToken1(token.token1);
-    }
-  }, [token]);
+  // useEffect(() => {
+  //   if(token) {
+  //     setToken0(token.token0);
+  //     setToken1(token.token1);
+  //   }
+  // }, [token]);
 
   
 
@@ -250,7 +259,7 @@ const SwapComponent = props => {
       console.log("try to refresh balance", INITIAL_TOKEN_LIST, token0, token1)
 
       const _token0 = INITIAL_TOKEN_LIST[0];
-      const _token1 = INITIAL_TOKEN_LIST[1];
+      const _token1 = INITIAL_TOKEN_LIST[3];
       setToken0(_token0);
       setToken1(_token1);
       async function refreshBalances() {
@@ -440,10 +449,12 @@ const SwapComponent = props => {
     let tempBalance = token1Balance;
 
     setToken1(token0);
+    onSelectToken1(token0);
     setToken1Amount(token0Amount);
     setToken1Balance(token0Balance);
 
     setToken0(tempToken);
+    onSelectToken0(token1);
     setToken0Amount(tempAmount);
     setToken0Balance(tempBalance);
   };
@@ -514,7 +525,7 @@ const SwapComponent = props => {
   useEffect(() => console.log("test slippage: ", slippageTolerance), [slippageTolerance]);
 
   const history = useHistory()
-  const coinList = getGlobalTokenList()
+  // const coinList = getGlobalTokenList()
 
   useEffect(() => {
     const hash = history.location.hash.replace('#', '').split('?')[0]
@@ -742,7 +753,11 @@ const SwapComponent = props => {
         </div>
       }
 
-      <DetailBox />
+      <DetailBox 
+        pair_name='DAImond'
+        token_address='0x712ce0de2401e632d75e307ed8325774daaa3c51'
+        pair_address='0x52384e314d18aa160bca9ecf45d03b6f80f9557f'
+      />
 
       <ScoreBox />
 

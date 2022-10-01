@@ -112,9 +112,7 @@ const StyledCard = styled(AcyCard)`
 const Swap = props => {
   const { account, library, chainId, tokenList: supportedTokens, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
 
-  // console.log("hereim befoere swap coinlist");
-  // const coinList = getGlobalTokenList()
-  // console.log("hereyou see tokens coinlist", coinList)
+  const coinList = getGlobalTokenList()
   // const platformList = getGlobalTokenPlatformList()
   // console.log("hereyou see tokens platformlist", platformList)
   // console.log("hereim swap coinlist successful", coinList);
@@ -145,7 +143,7 @@ const Swap = props => {
   const [isReceiptObtained, setIsReceiptObtained] = useState(false);
   const [routeData, setRouteData] = useState([]);
   const [format, setFormat] = useState('h:mm:ss a');
-  const [activeToken1, setActiveToken1] = useState(supportedTokens[1]);
+  const [activeToken1, setActiveToken1] = useState(supportedTokens[3]);
   const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
   const [activeAbsoluteChange, setActiveAbsoluteChange] = useState('+0.00');
   const [activeRate, setActiveRate] = useState('Not available');
@@ -282,7 +280,6 @@ const Swap = props => {
     }
   }, [library])
   // ------------------
-
   useEffect(() => {
     if (!supportedTokens) return
 
@@ -294,8 +291,8 @@ const Swap = props => {
     setIsReceiptObtained(false);
     setRouteData([]);
     setFormat('h:mm:ss a');
-    setActiveToken1(supportedTokens[1]);
-    setActiveToken0(supportedTokens[0]);
+    // setActiveToken1(supportedTokens[1]);
+    // setActiveToken0(supportedTokens[0]);
     setActiveAbsoluteChange('+0.00');
     setActiveRate('Not available');
     setRange('1D');
@@ -540,64 +537,65 @@ const Swap = props => {
   //     });
   // }
 
-  const lineTitleRender = () => {
-    let token0logo = null;
-    let token1logo = null;
-    for (let j = 0; j < supportedTokens.length; j++) {
-      if (activeToken0.symbol === supportedTokens[j].symbol) {
-        token0logo = supportedTokens[j].logoURI;
-      }
-      if (activeToken1.symbol === supportedTokens[j].symbol) {
-        token1logo = supportedTokens[j].logoURI;
-      }
-    }
+  // const lineTitleRender = () => {
+  //   let token0logo = null;
+  //   let token1logo = null;
+  //   for (let j = 0; j < supportedTokens.length; j++) {
+  //     if (activeToken0.symbol === supportedTokens[j].symbol) {
+  //       token0logo = supportedTokens[j].logoURI;
+  //     }
+  //     if (activeToken1.symbol === supportedTokens[j].symbol) {
+  //       token1logo = supportedTokens[j].logoURI;
+  //     }
+  //   }
 
-    const swapTokenPosition = () => {
-      const tempSwapToken = activeToken0;
-      setActiveToken0(activeToken1);
-      setActiveToken1(tempSwapToken);
-    }
-    //parse input data from transaction list
+  //   const swapTokenPosition = () => {
+  //     console.log("swap coinlist swap position", tempSwapToken)
+  //     const tempSwapToken = activeToken0;
+  //     setActiveToken0(activeToken1);
+  //     setActiveToken1(tempSwapToken);
+  //   }
+  //   //parse input data from transaction list
 
 
-    return [
-      <div style={{ width: "100%" }}>
-        <div className={styles.maintitle}>
-          <div className={styles.lighttitle} style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }} onClick={swapTokenPosition}>
-            <img
-              src={token0logo}
-              alt=""
-              style={{ width: 24, maxWidth: '24px', maxHeight: '24px', marginRight: '0.25rem', marginTop: '0.1rem' }}
-            />
-            <img
-              src={token1logo}
-              alt=""
-              style={{ width: 24, maxHeight: '24px', marginRight: '0.5rem', marginTop: '0.1rem' }}
-            />
-            <span>
-              {activeToken0.symbol}&nbsp;/&nbsp;{activeToken1.symbol}
-            </span>
+  //   return [
+  //     <div style={{ width: "100%" }}>
+  //       <div className={styles.maintitle}>
+  //         <div className={styles.lighttitle} style={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }} onClick={swapTokenPosition}>
+  //           <img
+  //             src={token0logo}
+  //             alt=""
+  //             style={{ width: 24, maxWidth: '24px', maxHeight: '24px', marginRight: '0.25rem', marginTop: '0.1rem' }}
+  //           />
+  //           <img
+  //             src={token1logo}
+  //             alt=""
+  //             style={{ width: 24, maxHeight: '24px', marginRight: '0.5rem', marginTop: '0.1rem' }}
+  //           />
+  //           <span>
+  //             {activeToken0.symbol}&nbsp;/&nbsp;{activeToken1.symbol}
+  //           </span>
 
-          </div>
+  //         </div>
 
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <div className={styles.secondarytitle}>
-            <span className={styles.lighttitle}>{activeRate}</span>{' '}
-            <span className={styles.percentage}>{activeAbsoluteChange}</span>
-          </div>
-          <AcyPeriodTime
-            onhandPeriodTimeChoose={onhandPeriodTimeChoose}
-            className={styles.pt}
-            // times={['1D', '1W', '1M']}
-            // times={['24h', 'Max']}
-            times={['24h']}
+  //       </div>
+  //       <div style={{ display: "flex", justifyContent: "space-between" }}>
+  //         <div className={styles.secondarytitle}>
+  //           <span className={styles.lighttitle}>{activeRate}</span>{' '}
+  //           <span className={styles.percentage}>{activeAbsoluteChange}</span>
+  //         </div>
+  //         <AcyPeriodTime
+  //           onhandPeriodTimeChoose={onhandPeriodTimeChoose}
+  //           className={styles.pt}
+  //           // times={['1D', '1W', '1M']}
+  //           // times={['24h', 'Max']}
+  //           times={['24h']}
 
-          />
-        </div>
-      </div>,
-    ];
-  };
+  //         />
+  //       </div>
+  //     </div>,
+  //   ];
+  // };
 
   const selectTime = pt => {
     const dateSwitchFunctions = {
@@ -675,7 +673,7 @@ const Swap = props => {
   }, [chartData])
 
   const [graphType, setGraphType] = useState("BTC")
-  const graphTypes = ["Routes", "BTC"]
+  const graphTypes = ["Routes", activeToken1.symbol]
   const showGraph = item => {
     setGraphType(item)
   }
@@ -761,8 +759,11 @@ const Swap = props => {
                   :
                   <div>
                     <ExchangeTVChart
-                      chartTokenSymbol="BTC"
-                      passTokenData={passTokenData}
+                      chartTokenSymbol={activeToken1.symbol}
+                      // chartTokenSymbol="BTC"
+                      pageName="Swap"
+                      fromToken={activeToken0.symbol}
+                      toToken={activeToken1.symbol}
                     />
                   </div>
                 }

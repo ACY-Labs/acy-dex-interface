@@ -231,7 +231,6 @@ const Option = props => {
   }
 
   const onCloseBTC = () => {
-    console.log("hjhjhj close btc")
     setVisibleBTC(false);
   };
   const onCloseETH = () => {
@@ -369,6 +368,9 @@ const Option = props => {
               {/* <div style={{ borderTop: '0.75px solid #333333' }}> */}
               <ExchangeTVChart
                 chartTokenSymbol="BTC"
+                pageName="Option"
+                fromToken={activeToken1.symbol}
+                toToken="USDT"
                 passTokenData={passTokenData}
               />
             </div>

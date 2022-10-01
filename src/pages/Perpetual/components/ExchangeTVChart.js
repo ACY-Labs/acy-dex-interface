@@ -313,7 +313,6 @@ export default function ExchangeTVChart(props) {
         console.log(`oldest tick: Open=${oldestTick.St[0]}, timestamp=${oldestTick.rt.So}`)
       }
       if( ticks && period != '1m' && period != '1w' ){
-        console.log("hjhjhj in if ", ticks)
         getDeltaPriceChange(ticks)
       }
     });
@@ -327,7 +326,6 @@ export default function ExchangeTVChart(props) {
       console.log("fetchPrevAndSubscribe again: ", chartToken.symbol)
       // Binance data is independent of chain, so here we can fill in any chain name
       const prevData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`).then(res => res.data);
-      console.log("hjhjhj prev data check error: ", prevData)
 
       currentSeries.setData(prevData);
 
@@ -339,9 +337,7 @@ export default function ExchangeTVChart(props) {
   }, [chartToken.symbol, period])
 
   const getDeltaPriceChange =  (data) => {
-    console.log("hjhjhj prev data in get: ", data)
     let timeNow = getCurrentTimestamp()
-    // console.log("hjhjhj currentseries curtime now", timeNow, "period", period, CHART_PERIODS[period])
     let forwardArr = 86400 / CHART_PERIODS[period]
     let arrIndex = 999 - forwardArr
 
@@ -349,7 +345,6 @@ export default function ExchangeTVChart(props) {
     let yesterday = data[data.length - 1 - forwardArr]?.St[0]
     
     let deltaPercent = ((latestTick - yesterday) / yesterday * 100).toString() ;
-    // console.log("hjhjhj tick data check error: ", latestTick, yesterday, deltaPercent)
     if (deltaPercent && deltaPercent[0] == "-") {
       setDeltaIsMinus(true)
       let negativeCurrentPrice = latestTick

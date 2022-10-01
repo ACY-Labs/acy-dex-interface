@@ -92,17 +92,17 @@ const getChartOptions = (width, height) => ({
   width,
   height,
   watermark: {
-		visible: true,
-		fontSize: 40,
-		horzAlign: 'center',
-		vertAlign: 'center',
-		color: 'rgba(255, 255, 255, 0.2)',
-		text: 'TestNet',
-	},
+    visible: true,
+    fontSize: 40,
+    horzAlign: 'center',
+    vertAlign: 'center',
+    color: 'rgba(255, 255, 255, 0.2)',
+    text: 'TestNet',
+  },
   layout: {
     backgroundColor: "rgba(255, 255, 255, 0)",
     textColor: "#ccc",
-    fontFamily: "Karla 300", 
+    fontFamily: "Karla 300",
   },
   localization: {
     // https://github.com/tradingview/lightweight-charts/blob/master/docs/customization.md#time-format
@@ -120,7 +120,7 @@ const getChartOptions = (width, height) => ({
     horzLines: {
       visible: true,
       // color: "rgba(35, 38, 59, 1)",
-      color: "#1b1b1b", 
+      color: "#1b1b1b",
       style: 2,
     },
   },
@@ -147,17 +147,18 @@ const getChartOptions = (width, height) => ({
   },
 });
 
-function getCurrentTimestamp () {
-  let curTime = Math.floor(Date.now() / 1000); 
+function getCurrentTimestamp() {
+  let curTime = Math.floor(Date.now() / 1000);
   return curTime
 }
 
 export default function ExchangeTVChart(props) {
   const {
-    chartTokenSymbol, 
-    passTokenData
+    chartTokenSymbol,
+    pageName,
+    fromToken,
+    toToken,
   } = props
-  // console.log("hjhjhj swap chart props", chartTokenSymbol, passTokenData)
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [activeTimeScale, setActiveTimeScale] = useState("5m");
@@ -167,17 +168,19 @@ export default function ExchangeTVChart(props) {
   const [curPrice, setCurPrice] = useState();
   const [priceChangePercentDelta, setPriceChangePercentDelta] = useState();
   const [deltaIsMinus, setDeltaIsMinus] = useState();
+  // const [pairName, setPairName] = useState("BNBUSDT");
 
-  
+  const isTick = pageName == "Option" || pageName == "Powers";
+
   const symbol = chartTokenSymbol || "BTC";
   const marketName = symbol + "_USD";
   const previousMarketName = usePrevious(marketName);
 
   const ref = useRef(null);
   const chartRef = useRef(null);
-  
+
   const [chartInited, setChartInited] = useState(false);
-  
+
   // useEffect(() => {
   //   passTokenData(symbol);
   // }, []);
@@ -206,8 +209,9 @@ export default function ExchangeTVChart(props) {
     console.log("bin chart token: ", symbol)
     if (!symbol)
       return
-    const pairName = `${symbol}USDT`;
-      
+    const pairName = `${fromToken}${toToken}`;
+    // const pairName = `${symbol}USDT`;
+
     if (cleaner.current) {
       // unsubscribe from previous subscription
       console.log("cleaned previous subscriber: ", cleaner.current)
@@ -215,74 +219,136 @@ export default function ExchangeTVChart(props) {
       // clear chart candles
       currentSeries.setData([]);
     }
-  
-    // subscribe to websocket for the future price update
-    const clean = client.ws.candles(pairName, period, (res) => {
-      console.log("res Swap: ", res)
-      const candleData = {
-        time: res.startTime / 1000,   // make it in seconds
-        open: res.open,
-        high: res.high,
-        low: res.low,
-        close: res.close
-      }
-      console.log("ws received: ", candleData.time, candleData.close)
-      currentSeries.update(candleData)
-      setLastCandle(candleData);
 
-      const ticks = currentSeries.Kn?.Bt?.Xr;
-      //St: open high low close; rt[So]: time
-      console.log("chartData: ", ticks);
-      const oldestTick = ticks[0];
-      const latestTick = ticks[ticks.length - 1];
-      if (oldestTick) {
-        console.log(`oldest tick: Open=${oldestTick.St[0]}, timestamp=${oldestTick.rt.So}`)
-      }
-      if( ticks && period != '1m' && period != '1w' ){
-        console.log("hjhjhj in if ", ticks)
-        getDeltaPriceChange(ticks)
-      }
-    });
-    cleaner.current = clean;
-    console.log("added new candles subscription for ", pairName)
-  
+    if (isTick) {
+      console.log("tvchart pageName", pageName)
+
+      // subscribe to websocket for the future price update
+      const clean = client.ws.candles(pairName, period, (res) => {
+        console.log("res Swap: ", res)
+        const candleData = {
+          time: res.startTime / 1000,   // make it in seconds
+          open: res.open,
+          high: res.high,
+          low: res.low,
+          close: res.close
+        }
+        console.log("ws received: ", candleData.time, candleData.close)
+        currentSeries.update(candleData)
+        setLastCandle(candleData);
+
+        const ticks = currentSeries.Kn?.Bt?.Xr;
+        //St: open high low close; rt[So]: time
+        console.log("chartData: ", ticks);
+        const oldestTick = ticks[0];
+        const latestTick = ticks[ticks.length - 1];
+        if (oldestTick) {
+          console.log(`oldest tick: Open=${oldestTick.St[0]}, timestamp=${oldestTick.rt.So}`)
+        }
+        if (ticks && period != '1m' && period != '1w') {
+          console.log("hjhjhj in if ", ticks, isTick)
+          getDeltaPriceChange(ticks)
+        }
+      });
+      cleaner.current = clean;
+      console.log("added new candles subscription for ", pairName)
+    }
     const fetchPrevAndSubscribe = async () => {
       // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
       // SHOULD DO THIS BEFORE SUBSCRIBE, HOWEVER MOVING SUBSCRIBE TO AFTER THIS BLOCK OF CODE WILL CAUSE THE SUBSCRIPTION GOES ON FOREVER
       // REACT BUG?
-      console.log("fetchPrevAndSubscribe again: ", chartTokenSymbol)
+      let fromTokenURL = `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${fromToken}USDT&interval=${period}`
+      let toTokenURL = `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`
+      let requesetFromTokenData = axios.get(fromTokenURL)
+      let requesetToTokenData = axios.get(toTokenURL)
+      let responseToTokenData;
+
+      let responsePairData = [];
+      let responseFromTokenData;
+      if (pageName == "StableCoin") {
+        console.log("tvchart stablecoin totoken", toToken)
+        responseFromTokenData = await axios
+          .get(
+            `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,
+          )
+          .then((res) => res.data);
+        console.log("tvchart stablecoin responseFromTokenData stablecoin", responseFromTokenData)
+      }
+      else {
+        responseFromTokenData = await axios
+          .get(
+            `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${fromToken}USDT&interval=${period}`,
+          )
+          .then((res) => res.data);
+      }
+      if (toToken != "USDT") {
+        responseToTokenData = await axios
+          .get(
+            `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,
+          ).then((res) => res.data)
+      }
+      console.log("coin swaplist api", responseFromTokenData, responseToTokenData)
+      for (let i = 0; i < responseFromTokenData.length; i++) {
+        if (toToken != "USDT") {
+          console.log("coin swaplist responsePairData totken usdt", responseFromTokenData)
+          responsePairData.push({
+            time: responseFromTokenData[i].time,
+            open: responseFromTokenData[i].open / responseToTokenData[i].open,
+            high: responseFromTokenData[i].high / responseToTokenData[i].high,
+            low: responseFromTokenData[i].low / responseToTokenData[i].low,
+            close: responseFromTokenData[i].close / responseToTokenData[i].close,
+          })
+        }
+        else {
+          console.log("coin swaplist responsePairData", responseFromTokenData)
+          responsePairData = responseFromTokenData
+        }
+      }
+
+
       // Binance data is independent of chain, so here we can fill in any chain name
-      const prevData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`).then(res => res.data);
-      // const secondData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=BNBUSDT&interval=${period}`).then(res => res.data);
-      currentSeries.setData(prevData);
-      console.log("hjhjhj prev data: ", prevData)
+
+      // const prevData = await axios.get(
+      //   `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`
+      //   ).then(res => res.data)
+      console.log("coin swaplist responsePairData", responsePairData)
+      currentSeries.setData(responsePairData);
+      // console.log("hjhjhj prev data: ", responsePairData)
       // console.log("hjhjhj prev data second: ", secondData)
       // console.log("prev data: ", prevData)
-
-
+      if (!isTick) {
+        getDeltaPriceChange(responsePairData)
+      }
 
       if (!chartInited) {
         scaleChart();
         setChartInited(true);
       }
     }
-  
+
+    console.log("tvchart stablecoin fetch prev called totoken", toToken)
     fetchPrevAndSubscribe()
-  }, [currentSeries, chartTokenSymbol, period])
+  }, [currentSeries, fromToken, toToken, period])
   ///// end of binance data source
 
-  const getDeltaPriceChange =  (data) => {
-    console.log("hjhjhj prev data in get: ", data)
+  const getDeltaPriceChange = (data) => {
     let timeNow = getCurrentTimestamp()
+    let latestTick; let yesterday;
     // console.log("hjhjhj currentseries curtime now", timeNow, "period", period, CHART_PERIODS[period])
     let forwardArr = 86400 / CHART_PERIODS[period]
     let arrIndex = 999 - forwardArr
+    if (!isTick) {
+      latestTick = data[data.length - 1].open;
+      yesterday = data[data.length - 1 - forwardArr].open;
+      console.log("tvchart is swap or stablecoin", isTick)
+    }
+    if (isTick) {
+      latestTick = data[data.length - 1]?.St[0];
+      yesterday = data[data.length - 1 - forwardArr]?.St[0];
+      console.log("tvchart is option or powers", isTick)
+    }
 
-    const latestTick = data[data.length - 1]?.St[0];
-    let yesterday = data[data.length - 1 - forwardArr]?.St[0]
-    
-    let deltaPercent = ((latestTick - yesterday) / yesterday * 100).toString() ;
-    // console.log("hjhjhj tick data check error: ", latestTick, yesterday, deltaPercent)
+    let deltaPercent = ((latestTick - yesterday) / yesterday * 100).toString();
     if (deltaPercent && deltaPercent[0] == "-") {
       setDeltaIsMinus(true)
       let negativeCurrentPrice = latestTick
@@ -298,7 +364,7 @@ export default function ExchangeTVChart(props) {
       setPriceChangePercentDelta(parseFloat(positivePricechangePercent).toFixed(3))
     }
   }
-  
+
 
   // 设置chart的鼠标移动时的回调函数。evt是event的意思。
   const onCrosshairMove = useCallback(
@@ -325,9 +391,9 @@ export default function ExchangeTVChart(props) {
     },
     [setHoveredCandlestick]
   );
-  
-   // 在第一次得到priceData时，初始化 chart
-   // 【我认为】当currentChart已经有了的时候，即使priceData变化，也不会触发下面的函数。可以用console.log来测试一下。
+
+  // 在第一次得到priceData时，初始化 chart
+  // 【我认为】当currentChart已经有了的时候，即使priceData变化，也不会触发下面的函数。可以用console.log来测试一下。
   useEffect(() => {
     if (!ref.current) {
       return;
@@ -349,8 +415,8 @@ export default function ExchangeTVChart(props) {
   }, [ref, onCrosshairMove]);
 
   // 自适应并撑满chartRef这个div的大小。仅当currentChart已经被初始化后，才会被执行。
-	// offsetWidth是一个component的宽度。关于offsetWidth 和 clientWidth 的区别可以参考
-	// https://stackoverflow.com/questions/21064101/understanding-offsetwidth-clientwidth-scrollwidth-and-height-respectively
+  // offsetWidth是一个component的宽度。关于offsetWidth 和 clientWidth 的区别可以参考
+  // https://stackoverflow.com/questions/21064101/understanding-offsetwidth-clientwidth-scrollwidth-and-height-respectively
   useEffect(() => {
     console.log("debug chart: currentChart ", currentChart)
     if (!currentChart) {
@@ -365,63 +431,63 @@ export default function ExchangeTVChart(props) {
     return () => window.removeEventListener("resize", resizeChart);
   }, [currentChart]);
 
-//   // 当用户连接着钱包，有position或者order的时候，会显示入场价+liquidation价格
-//   useEffect(() => {
-//     const lines = [];
-//     if (currentSeries && savedShouldShowPositionLines) {
-//       if (currentOrders && currentOrders.length > 0) {
-//         currentOrders.forEach((order) => {
-//           const indexToken = constantInstance.perpetuals.getToken(order.indexToken);
-//           let tokenSymbol;
-//           if (indexToken && indexToken.symbol) {
-//             tokenSymbol = indexToken.isWrapped ? indexToken.baseSymbol : indexToken.symbol;
-//           }
-//           const title = `${order.type === INCREASE ? "Inc." : "Dec."} ${tokenSymbol} ${
-//             order.isLong ? "Long" : "Short"
-//           }`;
-//           const color = "#3a3e5e";
-//           lines.push(
-//             currentSeries.createPriceLine({
-//               price: parseFloat(formatAmount(order.triggerPrice, USD_DECIMALS, 2)),
-//               color,
-//               title: title.padEnd(PRICE_LINE_TEXT_WIDTH, " "),
-//             })
-//           );
-//         });
-//       }
-//       if (positions && positions.length > 0) {
-//         const color = "#3a3e5e";
+  //   // 当用户连接着钱包，有position或者order的时候，会显示入场价+liquidation价格
+  //   useEffect(() => {
+  //     const lines = [];
+  //     if (currentSeries && savedShouldShowPositionLines) {
+  //       if (currentOrders && currentOrders.length > 0) {
+  //         currentOrders.forEach((order) => {
+  //           const indexToken = constantInstance.perpetuals.getToken(order.indexToken);
+  //           let tokenSymbol;
+  //           if (indexToken && indexToken.symbol) {
+  //             tokenSymbol = indexToken.isWrapped ? indexToken.baseSymbol : indexToken.symbol;
+  //           }
+  //           const title = `${order.type === INCREASE ? "Inc." : "Dec."} ${tokenSymbol} ${
+  //             order.isLong ? "Long" : "Short"
+  //           }`;
+  //           const color = "#3a3e5e";
+  //           lines.push(
+  //             currentSeries.createPriceLine({
+  //               price: parseFloat(formatAmount(order.triggerPrice, USD_DECIMALS, 2)),
+  //               color,
+  //               title: title.padEnd(PRICE_LINE_TEXT_WIDTH, " "),
+  //             })
+  //           );
+  //         });
+  //       }
+  //       if (positions && positions.length > 0) {
+  //         const color = "#3a3e5e";
 
-//         positions.forEach((position) => {
-//           lines.push(
-//             currentSeries.createPriceLine({
-//               price: parseFloat(formatAmount(position.averagePrice, USD_DECIMALS, 2)),
-//               color,
-//               title: `Open ${position.indexToken.symbol} ${position.isLong ? "Long" : "Short"}`.padEnd(
-//                 PRICE_LINE_TEXT_WIDTH,
-//                 " "
-//               ),
-//             })
-//           );
+  //         positions.forEach((position) => {
+  //           lines.push(
+  //             currentSeries.createPriceLine({
+  //               price: parseFloat(formatAmount(position.averagePrice, USD_DECIMALS, 2)),
+  //               color,
+  //               title: `Open ${position.indexToken.symbol} ${position.isLong ? "Long" : "Short"}`.padEnd(
+  //                 PRICE_LINE_TEXT_WIDTH,
+  //                 " "
+  //               ),
+  //             })
+  //           );
 
-//           const liquidationPrice = getLiquidationPrice(position);
-//           lines.push(
-//             currentSeries.createPriceLine({
-//               price: parseFloat(formatAmount(liquidationPrice, USD_DECIMALS, 2)),
-//               color,
-//               title: `Liq. ${position.indexToken.symbol} ${position.isLong ? "Long" : "Short"}`.padEnd(
-//                 PRICE_LINE_TEXT_WIDTH,
-//                 " "
-//               ),
-//             })
-//           );
-//         });
-//       }
-//     }
-//     return () => {
-//       lines.forEach((line) => currentSeries.removePriceLine(line));
-//     };
-//   }, [currentOrders, positions, currentSeries, chainId, savedShouldShowPositionLines]);
+  //           const liquidationPrice = getLiquidationPrice(position);
+  //           lines.push(
+  //             currentSeries.createPriceLine({
+  //               price: parseFloat(formatAmount(liquidationPrice, USD_DECIMALS, 2)),
+  //               color,
+  //               title: `Liq. ${position.indexToken.symbol} ${position.isLong ? "Long" : "Short"}`.padEnd(
+  //                 PRICE_LINE_TEXT_WIDTH,
+  //                 " "
+  //               ),
+  //             })
+  //           );
+  //         });
+  //       }
+  //     }
+  //     return () => {
+  //       lines.forEach((line) => currentSeries.removePriceLine(line));
+  //     };
+  //   }, [currentOrders, positions, currentSeries, chainId, savedShouldShowPositionLines]);
 
   // // 显示OHLC数据, 若使用binance则需要先API获取24h high low, 然后用websocket来更新
   // const candleStatsHtml = useMemo(() => {

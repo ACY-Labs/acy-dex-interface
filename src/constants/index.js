@@ -402,6 +402,7 @@ export const getGlobalTokenList = () => {
             137: {}, // polygon
             // 80001: {}, // mumbai
         }
+        let tmpFullTokenList = []
         const apiUrlPrefix = "https://api.coingecko.com/api/v3"
 
         let tokenListURL = `${apiUrlPrefix}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=500&page=1&sparkline=false`
@@ -428,59 +429,85 @@ export const getGlobalTokenList = () => {
                     market_cap: token.market_cap,
                     max_supply: token.max_supply,
                     total_supply: token.total_supply,
+                    flag: false,
                 })
             })
             setTokenList(tmpTokenList)
-            console.log('hereim check init tokenList', tmpTokenList)
+            // console.log('hereim check init tokenList', tmpTokenList)
 
             //platform list data management
-            console.log('hereim check response platform', responsePlatformList)
+            // console.log('hereim check response platform', responsePlatformList)
             // console.log('hereim check platform if', responsePlatformList.data)
 
             // console.log('hereim check platform if', Object.keys(responsePlatformList.data.platforms).length)
-            let checkLength = []
-            responsePlatformList.data.map(token => {
-                // console.log('hereim check platform ', token.platforms)
+            // let checkLength = []
+            // let p=0; let q = 0; let r = 0; let o = 0;
+            // responsePlatformList.data.map(token => {
+            // console.log('hereim check platform ', token.platforms)
+            //     if (Object.keys(token.platforms).length) {
+            //         // console.log('hereim check platform ', token.platforms)
+            //         for (let i = 0; i < tmpTokenList.length; i ++) {
 
-                if (Object.keys(token.platforms).length) {
-                    // console.log('hereim check platform ', token.platforms)
-                    for (let i = 0; i < tmpTokenList.length; i ++) {
-                        if(token.symbol.toUpperCase() == tmpTokenList[i].symbol) {
+            //             if (token.symbol.toUpperCase() == tmpTokenList[i].symbol.toUpperCase() && token.id.toUpperCase() == tmpTokenList[i].name.toUpperCase()) {
+                            
+            //                 p = p + 1;
+            //                 tmpTokenList[i]["flag"] = true;
+            //                 // console.log("hereim check tmpFullTokenList tmpTokenList[i]", tmpTokenList[i].symbol)
+            //                 // tmpFullTokenList[tmpTokenList[i].symbol] = {}
+            //                 // console.log("hereim check tmpFullTokenList", tmpFullTokenList)
+            //                 tmpFullTokenList[tmpTokenList[i].symbol]= {
+            //                     symbol: token.symbol.toUpperCase(),
+            //                     name: token.name,
+            //                     ethAddress: token.platforms["ethereum"] || undefined,
+            //                     bscAddress: token.platforms["binance-smart-chain"] || undefined,
+            //                     maticAddress: token.platforms["polygon-pos"] || undefined,
+            //                 }
+            //                 if (token.platforms["ethereum"]){
+            //                     o=o+1;
+            //                     tmpPlatformList[1][token.symbol] = {
+            //                         // id: token.id,
+            //                         symbol: token.symbol.toUpperCase(),
+            //                         name: token.name,
+            //                         address: token.platforms["ethereum"],
+            //                     }
+            //                 }
+            //                 if (token.platforms["binance-smart-chain"]){
+            //                     q=q+1;
+            //                     tmpPlatformList[56][token.symbol] = {
+            //                         // id: token.id,
+            //                         symbol: token.symbol.toUpperCase(),
+            //                         name: token.name,
+            //                         address: token.platforms["binance-smart-chain"],
+            //                     }
+            //                 }
+            //                 if(token.platforms["polygon-pos"]) {
+            //                     r=r+1;
+            //                     tmpPlatformList[137][token.symbol] = {
+            //                         // id: token.id,
+            //                         symbol: token.symbol.toUpperCase(),
+            //                         name: token.name,
+            //                         address: token.platforms["polygon-pos"],
+            //                     }
+            //                 }
+            //                 break;
+            //             }
+            //         }
 
-                            if (token.platforms["ethereum"]){
-                                tmpPlatformList[1][token.symbol] = {
-                                    // id: token.id,
-                                    symbol: token.symbol.toUpperCase(),
-                                    name: token.name,
-                                    address: token.platforms["ethereum"],
-                                }
-                            }
-                            if (token.platforms["binance-smart-chain"]){
-                                tmpPlatformList[56][token.symbol] = {
-                                    // id: token.id,
-                                    symbol: token.symbol.toUpperCase(),
-                                    name: token.name,
-                                    address: token.platforms["binance-smart-chain"],
-                                }
-                            }
-                            if(token.platforms["polygon-pos"]) {
-                                tmpPlatformList[137][token.symbol] = {
-                                    // id: token.id,
-                                    symbol: token.symbol.toUpperCase(),
-                                    name: token.name,
-                                    address: token.platforms["polygon-pos"],
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-                
-            })
+            //     }
+            // })
 
-            setPlatformList(tmpPlatformList);
-            console.log("hereim check tmp platform list", tmpPlatformList, " ", Object.keys(tmpPlatformList[1]).length)
-            // console.log("hereim check tmp platform list", tmpPlatformList)
+            // setPlatformList(tmpPlatformList);                            
+            // console.log("hereim check p", p, q, r, o)
+            // for (let m = 0; m<tmpTokenList.length; m++) {
+            //     // if(token.symbol.toUpperCase() == tmpTokenList[i].symbol.toUpperCase()) {
+            //     if (tmpTokenList[m]["flag"] == false){
+            //         // console.log("hereim check unset tokens",tmpTokenList[m], tmpTokenList.length, m)
+            //     }
+
+            // }
+            // console.log('hereim check tmpTokenList', tmpTokenList, Object.keys(tmpTokenList).length)
+            // console.log("hereim check tmpFullTokenList", tmpFullTokenList, Object.keys(tmpFullTokenList).length);
+            // console.log("hereim check tmp platform list", tmpPlatformList, " ", Object.keys(tmpPlatformList[1]).length)
 
             })
         ) .catch(errors => {
@@ -512,7 +539,6 @@ export const getGlobalTokenList = () => {
         // .catch(e => {
         //     console.log(e);
         // });
-
 
         // // const apiUrlPrefix = "https://api.coingecko.com/api/v3"
         // axios.get(
@@ -573,7 +599,9 @@ export const getGlobalTokenList = () => {
 
     }, []);
 
-    return tokenList
+    // return tokenList
+    return TokenListSelector(80001)
+
 }
 export const getGlobalTokenPlatformList = () => {
     const [platformList, setPlatformList] = useState({})

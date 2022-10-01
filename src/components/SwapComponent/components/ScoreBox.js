@@ -29,6 +29,7 @@ const ScoreBox = props => {
           width='120px'
           type="circle"
           strokeColor='green'
+          trailColor='#a9a9b0'
           percent={70}
         />
         <span className={styles.scoreTitle}>ACYscore</span>

@@ -25,8 +25,7 @@ import {
 
 import { SCAN_URL_PREFIX, useConstantLoader, getGlobalTokenList } from "@/constants";
 import { ConsoleSqlOutlined } from '@ant-design/icons';
-import { PairsTable } from './searchModalTables';
-
+import { TopVolumeTable, TrendingTable } from '@/pages/Market/TableComponent';
 
 const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');
@@ -121,6 +120,22 @@ export class SmallTable extends React.Component {
           <span className={styles.coinShort}> ({entry.name})</span>
         </div>
       );
+    } else if (this.state.mode == 'pairs') {
+      content = (
+        <div className={styles.tableItem}>
+          <AcyTokenIcon symbol={entry.logoURI} />
+          <span className={styles.coinShort}>{entry.name}</span>
+          <div style={{ lineHeight: '30px' }}>
+            <span>Token: {entry.tokenAddress}</span>
+            <span style={{ marginLeft: '10px' }}>|</span>
+            <span style={{ marginLeft: '10px' }}>Pair: {entry.pairAddress}</span>
+            <span style={{ marginLeft: '10px' }}>|</span>
+            <span style={{ marginLeft: '10px' }}>Tx: {entry.tx}</span>
+            <span className={styles.tableItemTag}>{entry.chain}</span>
+            <span className={styles.tableItemTag}>{entry.exchange}</span>
+          </div>
+        </div>
+      );
     } else {
       content = (
         <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -150,11 +165,11 @@ export class SmallTable extends React.Component {
     return (
       <table className={styles.smallTable}>
         <tbody>
-          <tr className={styles.smallTableRow}>
+          {/* <tr className={styles.smallTableRow}>
             <td className={styles.smallTableHeader}>
               {this.state.mode == 'token' ? 'Token' : 'Pool'}
             </td>
-          </tr>
+          </tr> */}
 
           {this.state.tableData
             .slice(0, this.state.displayNumber)
@@ -464,7 +479,7 @@ export const SearchBar = props => {
       pairAddress: '...6e29394154f7',
       tx: 23145,
       chain: 'BNBChain',
-      company: 'ACY Finance',
+      exchange: 'ACY Finance',
     },
     {
       name: 'ACY/RUBY-RUBY',
@@ -473,7 +488,7 @@ export const SearchBar = props => {
       pairAddress: '...6e29394154f7',
       tx: 23145,
       chain: 'BNBChain',
-      company: 'ACY Finance',
+      exchange: 'ACY Finance',
     },
     {
       name: 'ACY/DXS - DX SPOT',
@@ -482,7 +497,49 @@ export const SearchBar = props => {
       pairAddress: '...6e29394154f7',
       tx: 23145,
       chain: 'BNBChain',
-      company: 'ACY Finance',
+      exchange: 'ACY Finance',
+    },
+  ]
+
+  const testVolume = [
+    {
+      name: 'USDT/WBNB',
+      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
+      exchange: 'Pancakeswap v2',
+      price: '$315.31',
+      price_24h: '-0.56%',
+      price_7d: '-0.56%',
+      price_30d: '-0.56%',
+      volume: '$31.66M',
+      swaps: '70.15K',
+      liquidity: '167.55M',
+      fdv: '$1223.66B'
+    },
+    {
+      name: 'USDC/OP',
+      logoURI: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389',
+      exchange: 'Velodrome',
+      price: '$1.9125',
+      price_24h: '-2.76%',
+      price_7d: '-2.76%',
+      price_30d: '-2.76%',
+      volume: '$18.89M',
+      swaps: '69.30K',
+      liquidity: '-',
+      fdv: '$8.20B'
+    },
+    {
+      name: 'BUSD/WBNB',
+      logoURI: 'https://assets.coingecko.com/coins/images/9576/large/BUSD.png?1568947766',
+      exchange: 'Pancakeswap v2',
+      price: '$314.76',
+      price_24h: '-0.77%',
+      price_7d: '-0.77%',
+      price_30d: '-0.77%',
+      volume: '$31.50M',
+      swaps: '55.37K',
+      liquidity: '179.72M',
+      fdv: '$1527.01B'
     },
   ]
 
@@ -560,7 +617,7 @@ export const SearchBar = props => {
                         ) : (
                           <>
                             {testPairs.length > 0 ? (
-                              <PairsTable
+                              <SmallTable
                                 mode="pairs"
                                 data={testPairs}
                               />
@@ -571,16 +628,56 @@ export const SearchBar = props => {
                         )}
                       </AcyTabPane>
                       <AcyTabPane tab="Top Volume" key="2">
-                        <Icon type="loading" />
+                        {isLoading ? (
+                          <Icon type="loading" />
+                        ) : (
+                          <>
+                            {testVolume.length > 0 ? (
+                              <TopVolumeTable dataSource={testVolume} mode="simple" />
+                            ) : (
+                              <div style={{ fontSize: '16x', margin: '20px' }}>No results</div>
+                            )}
+                          </>
+                        )}
                       </AcyTabPane>
                       <AcyTabPane tab="Trending" key="3">
-                        <Icon type="loading" />
+                        {isLoading ? (
+                          <Icon type="loading" />
+                        ) : (
+                          <>
+                            {testVolume.length > 0 ? (
+                              <TrendingTable dataSource={testVolume} mode="simple" />
+                            ) : (
+                              <div style={{ fontSize: '16x', margin: '20px' }}>No results</div>
+                            )}
+                          </>
+                        )}
                       </AcyTabPane>
                       <AcyTabPane tab="Winners" key="4">
-                        <Icon type="loading" />
+                        {isLoading ? (
+                          <Icon type="loading" />
+                        ) : (
+                          <>
+                            {testVolume.length > 0 ? (
+                              <TopVolumeTable dataSource={testVolume} mode="simple" />
+                            ) : (
+                              <div style={{ fontSize: '16x', margin: '20px' }}>No results</div>
+                            )}
+                          </>
+                        )}
                       </AcyTabPane>
                       <AcyTabPane tab="Losers" key="5">
-                        <Icon type="loading" />
+                        {isLoading ? (
+                          <Icon type="loading" />
+                        ) : (
+                          <>
+                            {testVolume.length > 0 ? (
+                              <TopVolumeTable dataSource={testVolume} mode="simple" />
+                            ) : (
+                              <div style={{ fontSize: '16x', margin: '20px' }}>No results</div>
+                            )}
+                          </>
+                        )}
                       </AcyTabPane>
 
                     </AcyTabs>
