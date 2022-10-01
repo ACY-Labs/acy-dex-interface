@@ -3,7 +3,7 @@ import { useConstantLoader } from '@/constants';
 import { GlpSwapBox, GlpSwapDetailBox } from '../PerpetualComponent/components/GlpSwapBox';
 import Reader from '@/acy-dex-futures/abis/Reader.json'
 import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
-import Glp from '@/acy-dex-futures/abis/Glp.json'
+import Glp from '@/acy-dex-futures/abis/ERC20.json'
 import useSWR from 'swr'
 import {
   USD_DECIMALS,

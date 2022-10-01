@@ -47,7 +47,7 @@ import { getConstant } from '@/acy-dex-futures/utils/Constants'
 import Reader from '@/acy-dex-futures/abis/Reader.json'
 import Vault from '@/acy-dex-futures/abis/Vault.json'
 import Router from '@/acy-dex-futures/abis/Router.json'
-import Glp from '@/acy-dex-futures/abis/Glp.json'
+import Glp from '@/acy-dex-futures/abis/ERC20.json'
 import useSWR from 'swr'
 
 // swapBox compontent end
