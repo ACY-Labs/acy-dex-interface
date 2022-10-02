@@ -239,14 +239,13 @@ export default function ExchangeTVChart(props) {
 
         const ticks = currentSeries.Kn?.Bt?.Xr;
         //St: open high low close; rt[So]: time
-        console.log("chartData: ", ticks);
+        // console.log("chartData: ", ticks);
         const oldestTick = ticks[0];
         const latestTick = ticks[ticks.length - 1];
         if (oldestTick) {
           console.log(`oldest tick: Open=${oldestTick.St[0]}, timestamp=${oldestTick.rt.So}`)
         }
         if (ticks && period != '1m' && period != '1w') {
-          console.log("hjhjhj in if ", ticks, isTick)
           getDeltaPriceChange(ticks)
         }
       });
@@ -287,10 +286,8 @@ export default function ExchangeTVChart(props) {
             `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,
           ).then((res) => res.data)
       }
-      console.log("coin swaplist api", responseFromTokenData, responseToTokenData)
       for (let i = 0; i < responseFromTokenData.length; i++) {
         if (toToken != "USDT") {
-          console.log("coin swaplist responsePairData totken usdt", responseFromTokenData)
           responsePairData.push({
             time: responseFromTokenData[i].time,
             open: responseFromTokenData[i].open / responseToTokenData[i].open,
@@ -300,7 +297,6 @@ export default function ExchangeTVChart(props) {
           })
         }
         else {
-          console.log("coin swaplist responsePairData", responseFromTokenData)
           responsePairData = responseFromTokenData
         }
       }
@@ -311,7 +307,6 @@ export default function ExchangeTVChart(props) {
       // const prevData = await axios.get(
       //   `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${pairName}&interval=${period}`
       //   ).then(res => res.data)
-      console.log("coin swaplist responsePairData", responsePairData)
       currentSeries.setData(responsePairData);
       // console.log("hjhjhj prev data: ", responsePairData)
       // console.log("hjhjhj prev data second: ", secondData)

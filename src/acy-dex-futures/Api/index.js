@@ -550,7 +550,6 @@ function ToastifyDebug(props) {
 
 export async function callContract(chainId, contract, method, params, opts) {
   try {
-    console.log("contract here 0")
     if (!Array.isArray(params) && typeof params === 'object' && opts === undefined) {
       opts = params
       params = []
@@ -560,8 +559,6 @@ export async function callContract(chainId, contract, method, params, opts) {
     }
     if (!opts.gasLimit) {
       opts.gasLimit = await getGasLimit(contract, method, params, opts.value)
-
-      console.log("contract here 1", opts.gasLimit)
     }
     if (!opts.gasPrice) {
       opts.gasPrice = await getGasPrice(contract.provider, chainId)

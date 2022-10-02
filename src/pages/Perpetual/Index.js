@@ -193,7 +193,6 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
   // 
   if (!positionData) {
     // if (true) { 
-    console.log("hjhjhj multchain error if positions", positions)
 
     return { positions, positionsMap }
   }
@@ -205,7 +204,6 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
     indexToken = getTokenInfo(infoTokens, indexTokens[i], true, nativeTokenAddress)
     indexToken.logoURI = findTokenWithAddress(indexToken.address).logoURI;
     const key = getPositionKey(collateralTokens[i], indexTokens[i], isLong[i])
-    console.log("hjhjhj multchain error positions", positionData, propsLength, i, positionData[i * propsLength + 6])
 
     const position = {
       key,
@@ -269,7 +267,6 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
     }
     position.liqPrice = getLiquidationPrice(position)
   }
-  console.log("hjhjhj multchain error 0 positions", positions)
 
   return { positions, positionsMap }
 }
@@ -294,11 +291,11 @@ const Swap = props => {
   //   // console.log("hjhjhj multchain  chainId2 ", chainId2)
   // }, [chainId2]);
   if (chainId == undefined || chainId != 97 && chainId != 80001) {
-    console.log("hjhjhj multchain perp chainId undefined", useChainId())
+    // console.log("hjhjhj multchain perp chainId undefined", useChainId())
     chainId = 80001;
   }
   const tokensperp = getTokens(chainId);
-  console.log("hjhjhj multchain perp chainid", chainId)
+  // console.log("hjhjhj multchain perp chainid", chainId)
 
   const supportedTokens = constantInstance.perpetuals.tokenList;
 
@@ -322,7 +319,6 @@ const Swap = props => {
   // const tokens = supportedTokens;
   // const tokens = getTokens(chainId) == undefined ? supportedTokens : tokensperp;
   const tokens = getTokens(chainId)
-  console.log("hjhjhj multchain tokens compare supportedTokens", supportedTokens, "multchaintokens:", tokensperp)
   // console.log("hjhjhj multchain tokens which?", tokens)
   // console.log("hjhjhj multchain ARBITRUM_DEFAULT_COLLATERAL_SYMBOL", ARBITRUM_DEFAULT_COLLATERAL_SYMBOL, tokens[0].symbol)
 
@@ -346,7 +342,6 @@ const Swap = props => {
   const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
 
   const setFromTokenAddress = useCallback((selectedSwapOption, address) => {
-    console.log("hjhjhj multchain tokenselection", tokenSelection)
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
     newTokenSelection[selectedSwapOption].from = address
     setTokenSelection(newTokenSelection)
@@ -370,7 +365,6 @@ const Swap = props => {
   const glpManagerAddress = getContract(chainId, "GlpManager")
   const glpAddress = getContract(chainId, "GLP")
   const orderBookAddress = getContract(chainId, "OrderBook")
-  console.log("hjhjhj multchain error check address", chainId, readerAddress, vaultAddress)
 
   //---------- FOR TESTING 
   const whitelistedTokens = tokens.filter(token => token.symbol !== "USDG");
