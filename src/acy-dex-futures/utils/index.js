@@ -40,9 +40,14 @@ const { AddressZero } = ethers.constants
 
 
 export const GLP_COOLDOWN_DURATION = 15 * 60
+export const ALP_COOLDOWN_DURATION = 15 * 60
 export const SECONDS_PER_YEAR = 31536000
 export const GLP_DECIMALS = 18
+export const ALP_DECIMALS = 18
+export const LONGDIGIT = 100000
+export const SHORTDIGIT = 1000
 export const USDG_DECIMALS = 18
+export const USDA_DECIMALS = 18
 export const PLACEHOLDER_ACCOUNT = ethers.Wallet.createRandom().address
 export const PRECISION = expandDecimals(1, USD_DECIMALS)
 export const TAX_BASIS_POINTS = 50
@@ -349,148 +354,120 @@ export function getFeeBasisPoints(
   const taxBps = taxBasisPoints.mul(averageDiff).div(targetAmount);
   return feeBasisPoints.add(taxBps).toNumber();
 }
+const mulNum = 10**12;
 
 export function getBuyGlpToAmount(
   fromAmount,
   swapTokenAddress,
-  infoTokens,
-  glpPrice,
-  usdgSupply,
+  tokens,
+  alpPrice,
   totalTokenWeights
 ) {
   const defaultValue = { amount: bigNumberify(0), feeBasisPoints: 0 };
   if (
     !fromAmount ||
     !swapTokenAddress ||
-    !infoTokens ||
-    !glpPrice ||
-    !usdgSupply ||
+    !tokens ||
+    !alpPrice ||
     !totalTokenWeights
   ) {
     return defaultValue;
   }
 
-  const swapToken = getTokenInfo(infoTokens, swapTokenAddress);
-  if (!swapToken || !swapToken.minPrice) {
+  const swapToken = getTokenfromAddress(tokens, swapTokenAddress);
+  // fromAmount = formatAmountFree(fromAmount, 8)
+
+  if (!swapToken || !swapToken.price) {
     return defaultValue;
   }
 
-  // for BTC example, BTC has 8 decimals on BSC
-  // FIRST line code: glpAmount will be in 8 decimals (in BTC.decimals)
-  // fromAmount = 8 decimals
-  // swapToken.minPrice = 30 decimals 
-  // swapToken.decimals = 8 decimals (variable, depends on particular tokens), so .mul(10**12) to make it to 30 decimals
-  
-  // SECOND line code: glpAmount is converted to GLP_DECIMALS
-  // glpPrice = 18 decimals (fixed)
+  //swapToken.price decimals: 18
+  //fromAmount decimals: 18
+  //swapTokenUSD = token price * input amount, swaptoken total price in usd, decimals: 36
+  //alpPrice decimals: ALP_decimals
+  //alpAmount: amount of alp in return to the input, decimals: 18
 
-  let glpAmount = fromAmount.mul(swapToken.minPrice).div(glpPrice.mul(10**12));
-  glpAmount = adjustForDecimals(glpAmount, swapToken.decimals, GLP_DECIMALS);
-  
-  let usdgAmount = fromAmount.mul(swapToken.minPrice).div(PRECISION);
-  usdgAmount = adjustForDecimals(usdgAmount, swapToken.decimals, USDG_DECIMALS);
-  const feeBasisPoints = getFeeBasisPoints(
-    swapToken,
-    usdgAmount,
-    MINT_FEE_BASIS_POINTS,
-    TAX_BASIS_POINTS,
-    true,
-    usdgSupply,
-    totalTokenWeights
-  );
+  let swapTokenUSD = swapToken.price.mul(fromAmount)
+  alpPrice = parseValue(alpPrice, ALP_DECIMALS)
+  let alpAmount = swapTokenUSD.div(alpPrice);
+  //basisPoint is converted to big number with ALP_DECIMALS, multiplied with alpAmount, later alpAmount is formatted with ALP_DECIMALS
+  const feeBasisPoints = MINT_FEE_BASIS_POINTS;
+  // let basisPoint = (BASIS_POINTS_DIVISOR - feeBasisPoints)/(BASIS_POINTS_DIVISOR);
+  // basisPoint = parseValue(basisPoint, ALP_DECIMALS)
+  alpAmount = alpAmount
+    .mul(BASIS_POINTS_DIVISOR)
+    .div(BASIS_POINTS_DIVISOR - feeBasisPoints);
+  // alpAmount = alpAmount.mul(basisPoint)
+  // alpAmount = formatAmount(alpAmount, 2*ALP_DECIMALS)
+  // alpAmount = parseValue(alpAmount, 18)
 
-  glpAmount = glpAmount
-    .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
-    .div(BASIS_POINTS_DIVISOR);
-
-  return { amount: glpAmount, feeBasisPoints };
+  return { amount: alpAmount, feeBasisPoints };
 }
 
 export function getSellGlpFromAmount(
   toAmount,
   swapTokenAddress,
-  infoTokens,
-  glpPrice,
-  usdgSupply,
+  tokens,
+  alpPrice,
   totalTokenWeights
 ) {
   const defaultValue = { amount: bigNumberify(0), feeBasisPoints: 0 };
   if (
     !toAmount ||
     !swapTokenAddress ||
-    !infoTokens ||
-    !glpPrice ||
-    !usdgSupply ||
+    !tokens ||
+    !alpPrice ||
     !totalTokenWeights
   ) {
     return defaultValue;
   }
 
-  const swapToken = getTokenInfo(infoTokens, swapTokenAddress);
-  if (!swapToken || !swapToken.maxPrice) {
+  const swapToken = getTokenfromAddress(tokens, swapTokenAddress);
+  if (!swapToken || !swapToken.price) {
     return defaultValue;
   }
 
-  let glpAmount = toAmount.mul(swapToken.maxPrice).div(glpPrice.mul(10**12));
-  glpAmount = adjustForDecimals(glpAmount, swapToken.decimals, GLP_DECIMALS);
+  alpPrice = parseValue(alpPrice, ALP_DECIMALS);
+  let alpAmount = toAmount.mul(swapToken.price).div(alpPrice);
+  alpAmount = adjustForDecimals(alpAmount, swapToken.decimals, ALP_DECIMALS);
 
-  let usdgAmount = toAmount.mul(swapToken.maxPrice).div(PRECISION);
-  usdgAmount = adjustForDecimals(usdgAmount, swapToken.decimals, USDG_DECIMALS);
-  const feeBasisPoints = getFeeBasisPoints(
-    swapToken,
-    usdgAmount,
-    BURN_FEE_BASIS_POINTS,
-    TAX_BASIS_POINTS,
-    false,
-    usdgSupply,
-    totalTokenWeights
-  );
+  const feeBasisPoints = BURN_FEE_BASIS_POINTS;
 
-  glpAmount = glpAmount
+  alpAmount = alpAmount
     .mul(BASIS_POINTS_DIVISOR)
     .div(BASIS_POINTS_DIVISOR - feeBasisPoints);
 
-  return { amount: glpAmount, feeBasisPoints };
+  return { amount: alpAmount, feeBasisPoints };
 }
 
 export function getBuyGlpFromAmount(
   toAmount,
   fromTokenAddress,
-  infoTokens,
-  glpPrice,
-  usdgSupply,
+  tokens,
+  alpPrice,
   totalTokenWeights
 ) {
   const defaultValue = { amount: bigNumberify(0) };
   if (
     !toAmount ||
     !fromTokenAddress ||
-    !infoTokens ||
-    !glpPrice ||
-    !usdgSupply ||
+    !tokens ||
+    !alpPrice ||
     !totalTokenWeights
   ) {
     return defaultValue;
   }
 
-  const fromToken = getTokenInfo(infoTokens, fromTokenAddress);
-  if (!fromToken || !fromToken.minPrice) {
+  const fromToken = getTokenfromAddress(tokens, fromTokenAddress);
+  if (!fromToken || !fromToken.price) {
     return defaultValue;
   }
 
-  let fromAmount = toAmount.mul(glpPrice).div(fromToken.minPrice);
-  fromAmount = adjustForDecimals(fromAmount, GLP_DECIMALS, fromToken.decimals);
+  alpPrice = parseValue(alpPrice, ALP_DECIMALS);
+  let fromAmount = toAmount.mul(alpPrice).div(fromToken.price);
+  // fromAmount = adjustForDecimals(fromAmount, ALP_DECIMALS, fromToken.decimals);
 
-  const usdgAmount = toAmount.mul(glpPrice).div(PRECISION);
-  const feeBasisPoints = getFeeBasisPoints(
-    fromToken,
-    usdgAmount,
-    MINT_FEE_BASIS_POINTS,
-    TAX_BASIS_POINTS,
-    true,
-    usdgSupply,
-    totalTokenWeights
-  );
+  const feeBasisPoints = MINT_FEE_BASIS_POINTS;
 
   fromAmount = fromAmount
     .mul(BASIS_POINTS_DIVISOR)
@@ -502,41 +479,31 @@ export function getBuyGlpFromAmount(
 export function getSellGlpToAmount(
   toAmount,
   fromTokenAddress,
-  infoTokens,
-  glpPrice,
-  usdgSupply,
+  tokens,
+  alpPrice,
   totalTokenWeights
 ) {
   const defaultValue = { amount: bigNumberify(0) };
   if (
     !toAmount ||
     !fromTokenAddress ||
-    !infoTokens ||
-    !glpPrice ||
-    !usdgSupply ||
+    !tokens ||
+    !alpPrice ||
     !totalTokenWeights
   ) {
     return defaultValue;
   }
 
-  const fromToken = getTokenInfo(infoTokens, fromTokenAddress);
-  if (!fromToken || !fromToken.maxPrice) {
+  const fromToken = getTokenfromAddress(tokens, fromTokenAddress);
+  if (!fromToken || !fromToken.price) {
     return defaultValue;
   }
 
-  let fromAmount = toAmount.mul(glpPrice).div(fromToken.maxPrice);
-  fromAmount = adjustForDecimals(fromAmount, GLP_DECIMALS, fromToken.decimals);
+  alpPrice = parseValue(alpPrice, ALP_DECIMALS)
+  let fromAmount = toAmount.mul(alpPrice).div(fromToken.price);
+  fromAmount = adjustForDecimals(fromAmount, ALP_DECIMALS, fromToken.decimals);
 
-  const usdgAmount = toAmount.mul(glpPrice).div(PRECISION);
-  const feeBasisPoints = getFeeBasisPoints(
-    fromToken,
-    usdgAmount,
-    BURN_FEE_BASIS_POINTS,
-    TAX_BASIS_POINTS,
-    false,
-    usdgSupply,
-    totalTokenWeights
-  );
+  const feeBasisPoints = BURN_FEE_BASIS_POINTS;
 
   fromAmount = fromAmount
     .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
@@ -569,11 +536,20 @@ export const getInjectedHandler = activate => {
   return fn;
 };
 
+//getTokenInfo helps find full info for a token from an array
 export const getTokenInfo = (infoTokens, tokenAddress, replaceNative, nativeTokenAddress) => {
     if (replaceNative && tokenAddress === nativeTokenAddress) {
         return infoTokens[AddressZero]
     }
     return infoTokens[tokenAddress]
+}
+export const  getTokenfromAddress = (tokenlist, tokenAddr) => {
+  for (let i = 0; i < tokenlist.length; i++) {
+    if (tokenlist[i].address === tokenAddr) {
+      return tokenlist[i]
+    }
+  }
+  return undefined
 }
 
 export function getDeltaStr({ delta, deltaPercentage, hasProfit }) {
@@ -656,7 +632,6 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
         infoTokens[token.address] = token
     }
 
-    // console.log("hereim see infoTokens", infoTokens)
 
     return infoTokens
 }
@@ -1756,7 +1731,7 @@ export function getUsd(
     amount,
     tokenAddress,
     max,
-    infoTokens,
+    tokens,
     orderOption,
     triggerPriceUsd
 ) {
@@ -1766,7 +1741,7 @@ export function getUsd(
     if (tokenAddress === USDG_ADDRESS) {
         return amount.mul(PRECISION).div(expandDecimals(1, 18));
     }
-    const info = getTokenInfo(infoTokens, tokenAddress);
+    const info = getTokenfromAddress(tokens, tokenAddress);
     const price = getTriggerPrice(
         tokenAddress,
         max,
@@ -1796,13 +1771,10 @@ function getTriggerPrice(
     if (!info) {
         return;
     }
-    if (max && !info.maxPrice) {
+    if ( !info.price) {
         return;
     }
-    if (!max && !info.minPrice) {
-        return;
-    }
-    return max ? info.maxPrice : info.minPrice;
+    return info.price;
 }
 export const formatAmountFree = (amount, tokenDecimals, displayDecimals) => {
     if (!amount) {

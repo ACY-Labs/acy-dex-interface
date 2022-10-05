@@ -16,6 +16,7 @@ import { useConnectWallet } from '@/components/ConnectWallet';
 import { useWeb3React } from '@web3-react/core';
 // import { API_URL } from '@/constants';
 import moment from 'moment';
+import TokenListManager from '@/components/TokenSelectorModal/TokenListManager';
 
 const API_URL = () => "https://api.acy.finance/bsc-main/api";
 
@@ -63,6 +64,7 @@ const Pool = props => {
             else if (obj.projectStatus === 'Ended') newEndedData.push(obj);
           });
           console.log(API_URL());
+          console.log("hj check tokenlist", res);
 
           // "2/22/2022 00:00:00 "
           // TODO: fault in backend but parse it in frontend for now

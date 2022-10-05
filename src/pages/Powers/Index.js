@@ -308,7 +308,6 @@ const Powers = props => {
                       </StyledDrawer>
                     </Col>
                   </Row> : null}
-
                 {visibleBNB ?
                   <Row>
                     <Col>
