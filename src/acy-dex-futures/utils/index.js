@@ -632,7 +632,6 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
         infoTokens[token.address] = token
     }
 
-    // console.log("hereim see infoTokens", infoTokens)
 
     return infoTokens
 }

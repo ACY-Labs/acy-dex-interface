@@ -42,7 +42,7 @@ const AcyPoolComponent = props => {
   const rewardRouterAddress = getContract(chainId, "RewardRouter");
 
   const [isBuying, setIsBuying] = useState(true)
-  const [swapTokenAddress, setSwapTokenAddress] = useState(tokens[0].address)
+  const [swapTokenAddress, setSwapTokenAddress] = useState(tokens[1].address)
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
 
   const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)

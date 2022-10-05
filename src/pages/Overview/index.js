@@ -2,7 +2,7 @@ import { useWeb3React } from '@web3-react/core';
 import { StylesContext } from '@material-ui/styles';
 import { Layout, Menu, Row, Col, Button, Modal, Input, Select, Divider, Table } from 'antd';
 import React from 'react';
-import { useEffect, useState } from 'react';    
+import { useEffect, useState } from 'react';
 
 import { useConstantLoader } from '@/constants';
 import { useChainId } from '@/utils/helpers';
@@ -22,67 +22,91 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import styles from './styles.less'
 import { PlusCircleTwoTone, MinusCircleTwoTone } from "@ant-design/icons";
 import { getMenuIcon } from '@/components/SiderMenu/BaseMenu.js';
-import { getToken } from '@/constants/future';
-// import {btcIcon} from '/btc.svg';
-// import { maticIcon } from "https://cryptologos.cc/logos/polygon-matic-logo.svg?v=017";
+// import * as trade from '@/constants/trade.js';
+import * as future from '@/constants/future.js';
+import * as powers from '@/constants/powers.js';
+import * as option from '@/constants/option.js';
+import * as launchpad from '@/constants/launchpad.js';
+// import * as stablecoin from '@/constants/stablecoin.js';
 
-const { Header, Footer, Sider, Content } = Layout;
 const { Option } = Select;
-
 
 const Overview = props => {
 
+    //functionalles and data
     const { account, library, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
     let { chainId } = useChainId();
     const { active, activate } = useWeb3React();
 
-    console.log("overview account", account, chainId)
+    chainId = 80001;
 
+
+    // const tradeTokenList = trade.getTokens(chainId);
+    const futureTokenList = future.getTokens(chainId);
+    const optionsTokenList = option.getTokens(chainId);
+    const powersTokenList = powers.getTokens(chainId);
+    const launchPadTokenList = launchpad.getTokens(chainId);
+    // const StableCoinTokenList = stablecoin.getTokens(chainId);
+    // const LaunchPadTokenList = launchpad.getTokens(chainId);
+    const [activeTokenList, setActiveTokenList] = useState(futureTokenList);
+
+    const tokenList = {
+        //trade: tradeTokenList,
+        "Trade": futureTokenList,
+        "Future": futureTokenList,
+        "Options": optionsTokenList,
+        "Powers": powersTokenList,
+        "StableCoin": powersTokenList, //TODO
+        "Launchpad": launchPadTokenList,
+        //StableCoin: StableCoinTokenList,
+        //LaunchPad: LaunchPadTokenList,
+    }
+    const copy = value => {
+        navigator.clipboard.writeText(value)
+    }
+    useEffect(() => {
+        if (active) {
+            library.on('block', () => {
+                // setActiveNetwork(networkName(chainId));
+                // updateLastPurchaseTime(undefined, true)
+            })
+            return () => {
+                library.removeAllListeners('block')
+            }
+        }
+    }, [active, library, chainId])
+
+    //UI
+    // const [selectedToken, setSelectedToken] = useState("ETH")
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentTransaction, setCurrentTransaction] = useState("Deposit");
-    const [activeFromPage, setActiveFromPage] = useState("Deposit");
-    const [activeToPage, setActiveToPage] = useState("Withdraw");
+    const [activeFromPage, setActiveFromPage] = useState("Trade");
+    const [activeToPage, setActiveToPage] = useState("");
     const [activeToken, setActiveToken] = useState("new");
-    // const [selectedToken, setSelectedToken] = useState("ETH")
-
     const [state, setState] = useState
         ({
             value: '',
             copied: false,
         });
 
-        useEffect(() => {
-            if (active) {
-                library.on('block', () => {
-                // setActiveNetwork(networkName(chainId));
-                // updateLastPurchaseTime(undefined, true)
-              })
-              return () => {
-                library.removeAllListeners('block')
-              }
-            }
-          }, [active, library, chainId,])
-
-    const showModal = (type, token) => {
-        // setSelectedToken(token);
+    const showModal = (type, token, pageName) => {
+        setActiveFromPage(pageName)
         setActiveToken(token)
         setCurrentTransaction(type);
         setIsModalOpen(true);
+        setActiveTokenList(tokenList[pageName])
+        // console.log("hj check tokenlist ", pageName, tokenList.Powers, typeof tokenList)
     };
-
-    const handleOk = () => {
-        setIsModalOpen(false);
-    };
-
     const handleCancel = () => {
         setIsModalOpen(false);
     };
-    const handleOnClick = (type) => {
-        setIsModalOpen(true)
-    }
-
-    const selectPage = page => {
+    // frompage is the default page in deposit,withdraw,send; and is frompage in transfer
+    const selectFromPage = page => {
         setActiveFromPage(page);
+    }
+    //only transfer has this
+    const selectToPage = page => {
+        setActiveToPage(page);
     }
     const selectToken = token => {
         console.log("select token ", token)
@@ -92,17 +116,9 @@ const Overview = props => {
         console.log("select network ", network)
         // setActiveToken(token);
     }
+    //TODO
     const currentAddress = "0x0000000000000000000000000000000000000000"
 
-    const tokenImgURL = {
-        'MATIC': 'https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png?1624446912',
-        'BTC': 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579',
-        'ETH': 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
-        'USDC': 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389',
-        'USDT': 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-        'BNB': 'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png?1644979850',
-        'ACY': 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/icon_acy.svg',
-    }
     const networkName = {
         '80001': "Mumbai",
         '137': "Polygon",
@@ -110,27 +126,32 @@ const Overview = props => {
         '56': "Binance Smart Chain Mainnet",
     }
     const getNetworkName = () => {
-        console.log("overview networkname", chainId, networkName[chainId])
         return networkName[chainId];
     }
-    const getTokenImg = token => {
-        console.log("tokenImgURL.token", token.name, tokenImgURL[token.name])
-        return tokenImgURL[token.name]
-    }
-
-    const tokens = [
-        "BTC", "ETH", "ACY", "BNB", "MATIC"
-    ]
     const pages = ["Trade", "Future", "Options", "Powers", "StableCoin", "Launchpad"];
     const networks = ["Binance Smart Chain Testnet", "Mumbai", "Ethereum"]
+    const tokenImgURL = {
+        'MATIC': 'https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png?1624446912',
+        'WMATIC': 'https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png?1624446912',
+        'BTC': 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579',
+        'ETH': 'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880',
+        'USDC': 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389',
+        'USDT': 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
+        'BNB': 'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png?1644979850',
+        'ACY': 'https://storageapi.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/icon_acy.svg',
+    }
+    const getTokenImg = token => {
+        return tokenImgURL[token.name]
+    }
+    
 
     const getPrimaryText = () => {
         if (account == undefined) {
-          return "Connect Wallet"
+            return "Connect Wallet"
         } else {
-          return 'Confirm'
+            return 'Confirm'
         }
-      }
+    }
 
     const pageNameList = (
         <div className={styles.networkListBlock}>
@@ -217,16 +238,16 @@ const Overview = props => {
             render: (text, entry) => {
                 return <div className={styles.tableData} style={{ float: "right" }}>
                     {/* <Button className={styles.button} onClick={() => { showModal("Deposit", entry.name) }}> */}
-                    <Button className={styles.button} onClick={() => { showModal("Deposit", "") }}>
+                    <Button className={styles.button} onClick={() => { showModal("Deposit", "", entry.name) }}>
                         Deposit
                     </Button>
-                    <Button className={styles.button} onClick={() => { showModal("Withdraw", "") }}>
+                    <Button className={styles.button} onClick={() => { showModal("Withdraw", "", entry.name) }}>
                         Withdraw
                     </Button>
-                    <Button className={styles.button} onClick={() => { showModal("Transfer", "") }}>
+                    <Button className={styles.button} onClick={() => { showModal("Transfer", "", entry.name) }}>
                         Transfer
                     </Button>
-                    <Button className={styles.button} onClick={() => { showModal("Send", "") }}>
+                    <Button className={styles.button} onClick={() => { showModal("Send", "", entry.name) }}>
                         Send
                     </Button>
                 </div>
@@ -347,88 +368,88 @@ const Overview = props => {
             ]
         },
     ];
-
-    const childColumns = [
-        {
-            title: (
-                <div className={styles.tableDataFirstColumn}>  </div>
-            ),
-            key: "key",
-            dataIndex: "key",
-        },
-        {
-            title: (
-                <div className={styles.tableDataFirstColumn}>  </div>
-            ),
-            key: "logoURI",
-            dataIndex: "logoURI",
-            render: (text, entry) => {
-                return <div >{text}</div>;
+    const getChildColumns = (pageName) => {
+        const childColumns = [
+            {
+                title: (
+                    <div className={styles.tableDataFirstColumn}>  </div>
+                ),
+                key: "key",
+                dataIndex: "key",
             },
-        },
-        {
-            title: (
-                <div className={styles.tableDataFirstColumn} style={{ marginLeft: "2rem" }}> Token </div>
-            ),
-            key: "name",
-            dataIndex: "name",
-            render: (text, record) => {
-                return (
-                    <Row style={{ padding: "1rem" }}>
-                        <Col span={8} style={{ marginTop: "1px" }}> <img height={20} src={getTokenImg(record)} /> </Col>
-                        <Col span={14} style={{ fontSize: "1.1rem" }}> {record.name} </Col>
-                    </Row>
-                );
+            {
+                title: (
+                    <div className={styles.tableDataFirstColumn}>  </div>
+                ),
+                key: "logoURI",
+                dataIndex: "logoURI",
+                render: (text, entry) => {
+                    return <div >{text}</div>;
+                },
             },
-        },
-        {
-            title: (
-                <div className={styles.tableHeaderFirst} style={{ marginLeft: "6.5rem" }}> Price </div>
-            ),
-            dataIndex: "price",
-            key: "price",
-            render: (text, entry) => {
-                return <div className={styles.tableData} style={{ marginLeft: "100px" }}>{text}</div>;
+            {
+                title: (
+                    <div className={styles.tableDataFirstColumn} style={{ marginLeft: "2rem" }}> Token </div>
+                ),
+                key: "name",
+                dataIndex: "name",
+                render: (text, record) => {
+                    return (
+                        <Row style={{ padding: "1rem" }}>
+                            <Col span={8} style={{ marginTop: "1px" }}> <img height={20} src={getTokenImg(record)} /> </Col>
+                            <Col span={14} style={{ fontSize: "1.1rem" }}> {record.name} </Col>
+                        </Row>
+                    );
+                },
             },
-        },
-        {
-            title: (
-                <div className={styles.tableHeaderFirst}> Balance </div>
-            ),
-            dataIndex: "balance",
-            key: "balance",
-            render: (text, entry) => {
-                return <div className={styles.tableData}>{text}</div>;
+            {
+                title: (
+                    <div className={styles.tableHeaderFirst} style={{ marginLeft: "6.5rem" }}> Price </div>
+                ),
+                dataIndex: "price",
+                key: "price",
+                render: (text, entry) => {
+                    return <div className={styles.tableData} style={{ marginLeft: "100px" }}>{text}</div>;
+                },
             },
-        },
-        {
-            title: (
-                <div className={styles.tableHeaderFirst}> </div>
-            ),
-            dataIndex: 'button',
-            key: 'button',
-            render: (text, entry) => {
-                return <div className={styles.tableData} style={{ float: "right" }}>
-                    {/* <Button className={styles.button} onClick={() => { showModal("Deposit", entry.name) }}> */}
-                    <Button className={styles.button} onClick={() => { showModal("Deposit", entry.name) }}>
-                        Deposit
-                    </Button>
-                    <Button className={styles.button} onClick={() => { showModal("Withdraw", entry.name) }}>
-                        Withdraw
-                    </Button>
-                    <Button className={styles.button} onClick={() => { showModal("Transfer", entry.name) }}>
-                        Transfer
-                    </Button>
-                    <Button className={styles.button} onClick={() => { showModal("Send", entry.name) }}>
-                        Send
-                    </Button>
-                </div>
+            {
+                title: (
+                    <div className={styles.tableHeaderFirst}> Balance </div>
+                ),
+                dataIndex: "balance",
+                key: "balance",
+                render: (text, entry) => {
+                    return <div className={styles.tableData}>{text}</div>;
+                },
             },
-        },
-    ];
-    const copy = value => {
-        navigator.clipboard.writeText(value)
+            {
+                title: (
+                    <div className={styles.tableHeaderFirst}> </div>
+                ),
+                dataIndex: 'button',
+                key: 'button',
+                render: (text, entry, record) => {
+                    return <div className={styles.tableData} style={{ float: "right" }}>
+                        {/* <Button className={styles.button} onClick={() => { showModal("Deposit", entry.name) }}> */}
+                        <Button className={styles.button} onClick={() => { showModal("Deposit", entry.name, pageName) }}>
+                            Deposit
+                        </Button>
+                        <Button className={styles.button} onClick={() => { showModal("Withdraw", entry.name, pageName) }}>
+                            Withdraw
+                        </Button>
+                        <Button className={styles.button} onClick={() => { showModal("Transfer", entry.name, pageName) }}>
+                            Transfer
+                        </Button>
+                        <Button className={styles.button} onClick={() => { showModal("Send", entry.name, pageName) }}>
+                            Send
+                        </Button>
+                    </div>
+                },
+            },
+        ];
+        return childColumns
     }
+    
 
     return (
         <div className={styles.main}>
@@ -455,7 +476,7 @@ const Overview = props => {
                                             <Select
                                                 defaultValue="Trade"
                                                 // value={fromPage}
-                                                onChange={selectPage}
+                                                onChange={selectFromPage}
                                                 dropdownClassName={styles.dropDownMenu}
                                             >
                                                 {pages.map(page => (
@@ -471,9 +492,9 @@ const Overview = props => {
                                     <Col offset={1} span={10}>
                                         <div className={styles.pageSelector} style={{ width: "" }}>
                                             <Select
-                                                defaultValue="Future"
+                                                defaultValue="Select Page"
                                                 // value={fromPage}
-                                                onChange={selectPage}
+                                                onChange={selectToPage}
                                                 dropdownClassName={styles.dropDownMenu}
                                             >
                                                 {pages.map(page => (
@@ -491,11 +512,11 @@ const Overview = props => {
                                 <Row style={{ marginTop: "10px", marginBottom: "10px" }}> Network </Row>
                                 <Row>
                                     <div className={styles.networkSelector}>
-                                        {account == undefined ? 
+                                        {account == undefined ?
                                             <div className={styles.networkFixed}>
                                                 {getNetworkName()}
                                             </div>
-                                        :
+                                            :
                                             <Select
                                                 defaultValue="Binance Smart Chain Testnet"
                                                 // value={fromPage}
@@ -522,9 +543,9 @@ const Overview = props => {
                                 <div className={styles.networkSelector}>
 
                                     <Select
-                                        defaultValue="Trade"
-                                        // value={fromPage}
-                                        onChange={selectPage}
+                                        // defaultValue="Trade"
+                                        value={activeFromPage}
+                                        onChange={selectFromPage}
                                         dropdownClassName={styles.pageDropDown}
                                     >
                                         {pages.map(page => (
@@ -550,14 +571,15 @@ const Overview = props => {
                                     suffix={
                                         <div className={styles.tokenSelector}>
                                             <Select
+                                                // defaultValue="Select Token"
                                                 value={activeToken}
                                                 onChange={selectToken}
                                                 dropdownClassName={styles.dropDownMenu}
                                             >
-                                                {tokens.map(token => (
-                                                    <Option className={styles.optionItem} value={token}>
-                                                        <Col span={10}> <img src={tokenImgURL[token]} style={{ width: '20px', height: '20px' }} /></Col>
-                                                        <Col offset={1} span={13}> <div> {token}</div> </Col>
+                                                {activeTokenList.map(token => (
+                                                    <Option className={styles.optionItem} value={token.symbol}>
+                                                        <Col span={10}> <img src={tokenImgURL[token.symbol]} style={{ width: '20px', height: '20px' }} /></Col>
+                                                        <Col offset={1} span={13}> <div> {token.symbol}</div> </Col>
                                                     </Option>
                                                 ))}
                                             </Select>
@@ -667,7 +689,7 @@ const Overview = props => {
                                         // <div style={{ background: '#1b1d23' }}>
                                         return <Table
                                             className={styles.childTable}
-                                            columns={childColumns}
+                                            columns={getChildColumns(record.name)}
                                             // showHeader={false}
                                             pagination={false}
                                             dataSource={record.description}
