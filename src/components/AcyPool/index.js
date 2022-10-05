@@ -31,7 +31,7 @@ import {
 import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
 import Vault from '@/acy-dex-futures/abis/Vault.json'
 import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
-import Glp from '@/acy-dex-futures/abis/Glp.json'
+import Glp from '@/acy-dex-futures/abis/ERC20.json'
 import Usdg from "@/acy-dex-futures/abis/Usdg.json"
 
 import useSWR from 'swr'

@@ -54,7 +54,7 @@ import {
 import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
 import Vault from '@/acy-dex-futures/abis/Vault.json'
 import GlpManager from '@/acy-dex-futures/abis/GlpManager.json'
-import Glp from '@/acy-dex-futures/abis/Glp.json'
+import Glp from '@/acy-dex-futures/abis/ERC20.json'
 import Usdg from "@/acy-dex-futures/abis/Usdg.json"
 import Vester from '@/acy-dex-futures/abis/Vester.json'
 import Token from '@/acy-dex-futures/abis/Token.json'

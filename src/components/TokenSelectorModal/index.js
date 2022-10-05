@@ -18,11 +18,11 @@ import { processString } from "@/components/AcyCoinItem";
 import styles from "./styles.less";
 import {useConstantLoader, getGlobalTokenList} from '@/constants';
 
-const TokenSelectorModal = ({ onCancel, visible, onCoinClick, sideComponent }) => {
+const TokenSelectorModal = ({ onCancel, visible, onCoinClick, sideComponent, defaultTokens }) => {
     const {account, library, chainId } = useConstantLoader();
     
     // const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
-    const tokenlist = getGlobalTokenList()
+    const tokenlist = defaultTokens ? defaultTokens : getGlobalTokenList()
     useEffect(() => {
         setInitTokenList(tokenlist)
     }, [tokenlist])

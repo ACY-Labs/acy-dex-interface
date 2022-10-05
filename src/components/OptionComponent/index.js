@@ -1,108 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'umi';
-import styled from 'styled-components';
-import { Slider, Input, Button } from 'antd';
+import { Input, Button } from 'antd';
+import { ethers } from 'ethers'
+import useSWR from 'swr'
 import { useConstantLoader } from '@/constants';
-import { useLocalStorageSerializeKey } from '@/acy-dex-futures/utils';
+import { getTokens, getContract } from '@/constants/powers.js'
+import { useChainId } from '@/utils/helpers';
+import { useWeb3React } from '@web3-react/core';
+import { useConnectWallet } from '@/components/ConnectWallet';
+import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, expandDecimals, bigNumberify, formatAmount } from '@/acy-dex-futures/utils';
 import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
 import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
+import ERC20 from '@/acy-dex-futures/abis/ERC20.json'
+import Token from '@/acy-dex-futures/abis/Token.json'
+import Reader from '@/abis/future-option-power/Reader.json'
 
 import styles from './styles.less';
-import AcyPool from '../AcyPool';
+
+const { AddressZero } = ethers.constants;
 
 const OptionComponent = props => {
 
   const {
     mode,
     setMode,
-    volume,
-    setVolume,
-    percentage,
-    setPercentage,
-    powers,
+    selectedToken,
+    symbol,
+    onTrade,
   } = props
 
-  const {
-    account,
-    library,
-    chainId,
-    farmSetting: { INITIAL_ALLOWED_SLIPPAGE }
-  } = useConstantLoader(props);
+  const { account, library, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
+  const { chainId } = useChainId();
+  const connectWalletByLocalStorage = useConnectWallet();
+  const { active } = useWeb3React();
 
   const optionMode = ['Buy', 'Sell', 'Pool']
-
-  const [leverageOption, setLeverageOption] = useLocalStorageSerializeKey([chainId, "Option-leverage-value"], "2");
-  const leverageMarks = {
-    1: {
-      style: { color: '#b5b6b6', },
-      label: '1x'
-    },
-    5: {
-      style: { color: '#b5b6b6', },
-      label: '5x'
-    },
-    10: {
-      style: { color: '#b5b6b6', },
-      label: '10x'
-    },
-    15: {
-      style: { color: '#b5b6b6', },
-      label: '15x'
-    },
-    20: {
-      style: { color: '#b5b6b6', },
-      label: '20x'
-    },
-    25: {
-      style: { color: '#b5b6b6', },
-      label: '25x'
-    },
-    30: {
-      style: { color: '#b5b6b6', },
-      label: '30x'
-    }
-  };
-  const StyledSlider = styled(Slider)`
-  .ant-slider-track {
-    background: #929293;
-    height: 3px;
-  }
-  .ant-slider-rail {
-    background: #29292c;
-    height: 3px;
-  }
-  .ant-slider-handle {
-    background: #929293;
-    width: 12px;
-    height: 12px;
-    border: none;
-  }
-  .ant-slider-handle-active {
-    background: #929293;
-    width: 12px;
-    height: 12px;
-    border: none;
-  }
-  .ant-slider-dot {
-    border: 1.5px solid #29292c;
-    border-radius: 1px;
-    background: #29292c;
-    width: 2px;
-    height: 10px;
-  }
-  .ant-slider-dot-active {
-    border: 1.5px solid #929293;
-    border-radius: 1px;
-    background: #929293;
-    width: 2px;
-    height: 10px;
-  }
-  .ant-slider-with-marks {
-      margin-bottom: 50px;
-  }
-`;
+  const [percentage, setPercentage] = useState('')
+  const [selectedTokenValue, setSelectedTokenValue] = useState("0");
+  const [usdValue, setUsdValue] = useState(0)
+  const [isApproving, setIsApproving] = useState(false)
+  const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
 
   const getPercentageButton = value => {
     if (percentage != value) {
@@ -124,16 +63,102 @@ const OptionComponent = props => {
     }
   }
 
-  const getPrimaryText = () => {
-    if (mode == 'Buy') {
-      return 'Buy / Long'
-    } else {
-      return 'Sell / Short'
+  useEffect(() => {
+    let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(tokenInfo?.filter(item => item.token == selectedToken.address)[0]?.balance, 18, 2)
+    setSelectedTokenValue(tokenAmount)
+    setUsdValue(tokenAmount * symbolInfo?.markPrice)
+  }, [percentage])
+
+  const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
+  const readerAddress = getContract(chainId, "reader")
+  const poolAddress = getContract(chainId, "pool")
+  const tokens = getTokens(chainId)
+
+  const tokenAllowanceAddress = selectedToken.address === AddressZero ? nativeTokenAddress : selectedToken.address;
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, poolAddress], {
+    fetcher: fetcher(library, ERC20)
+  });
+  const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, Reader)
+  });
+  const { data: symbolInfo, mutate: updateSymbolInfo } = useSWR([chainId, readerAddress, "getSymbolInfo", poolAddress, symbol, []], {
+    fetcher: fetcher(library, Reader)
+  });
+
+  const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
+  const needApproval =
+    selectedToken.address !== AddressZero &&
+    tokenAllowance &&
+    selectedTokenAmount &&
+    selectedTokenAmount.gt(tokenAllowance)
+
+  useEffect(() => {
+    if(selectedToken && isWaitingForApproval && !needApproval) {
+      setIsWaitingForApproval(false)
     }
+  }, [selectedToken, selectedTokenAmount, needApproval])
+
+  useEffect(() => {
+    if (active) {
+      function onBlock() {
+        updateTokenAllowance(undefined, true);
+      }
+      library.on("block", onBlock);
+      return () => {
+        library.removeListener("block", onBlock);
+      };
+    }
+  }, [active, library, updateTokenAllowance]);
+
+  const approveTokens = () => {
+    setIsApproving(true);
+    const contract = new ethers.Contract(
+      selectedToken.address,
+      Token.abi,
+      library.getSigner()
+    );
+    contract.approve(poolAddress, ethers.constants.MaxUint256)
+      .then(async res => {
+        setIsWaitingForApproval(true)
+      })
+      .catch(e => {
+        console.error(e);
+      })
+      .finally(() => {
+        setIsApproving(false);
+      });
+  }
+
+  const getPrimaryText = () => {
+    if (!active) {
+      return 'Connect Wallet'
+    }
+    if (needApproval && isWaitingForApproval) {
+      return 'Waiting for Approval'
+    }
+    if (isApproving) {
+      return `Approving ${selectedToken.symbol}...`;
+    }
+    if (needApproval) {
+      return `Approve ${selectedToken.symbol}`;
+    }
+    return mode == 'Buy' ? 'Buy / Long' : 'Sell / Short'
   }
 
   const onClickPrimary = () => {
-
+    if (!account) {
+      connectWalletByLocalStorage()
+      return
+    }
+    if (needApproval) {
+      approveTokens()
+      return
+    }
+    if (mode == ' Buy') {
+      onTrade(symbol, selectedTokenAmount, expandDecimals(50001, 18))
+    } else {
+      onTrade(symbol, selectedTokenAmount.mul(bigNumberify(-1)), expandDecimals(50001, 18))
+    }
   }
 
   const [showDescription, setShowDescription] = useState(false);
@@ -163,19 +188,31 @@ const OptionComponent = props => {
           <>
             <div className={styles.rowFlexContainer}>
 
-              <div className={styles.inputContainer}>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="Amount"
-                  className={styles.optionInput}
-                  value={volume}
-                  onChange={e => {
-                    setVolume(e.target.value)
-                    setShowDescription(true)
-                  }}
-                />
-                <span className={styles.inputLabel}>USD</span>
+              <div style={{ display: 'flex' }}>
+                <div className={styles.inputContainer}>
+                  <input
+                    type="number"
+                    placeholder="Amount"
+                    className={styles.optionInput}
+                    value={selectedTokenValue}
+                    onChange={e => {
+                      setSelectedTokenValue(e.target.value)
+                      setShowDescription(true)
+                      setUsdValue((e.target.value * symbolInfo?.markPrice).toFixed(2))
+                    }}
+                  />
+                  <span className={styles.inputLabel}>{selectedToken.symbol}</span>
+                </div>
+                <div className={styles.inputContainer}>
+                  <input
+                    type="number"
+                    min="0"
+                    className={styles.optionInput}
+                    value={usdValue}
+                    onChange={e => { }}
+                  />
+                  <span className={styles.inputLabel}>USD</span>
+                </div>
               </div>
 
               <div className={styles.buttonContainer}>
@@ -255,7 +292,7 @@ const OptionComponent = props => {
 
             </div>
 
-            {!powers && <AccountInfoGauge />}
+            <AccountInfoGauge account={account} library={library} tokens={tokens} />
           </>
         }
 
