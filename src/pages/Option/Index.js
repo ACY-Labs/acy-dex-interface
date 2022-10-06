@@ -76,6 +76,8 @@ const Option = props => {
     { name: "BTC-500000", tokenSymbol: "BTC", optionSymbol: "500000", type: "P" },
     // { name: "BTC-300000", tokenSymbol: "BTC", optionSymbol: "300000", type: "C" },
     // { name: "BTC-300000", tokenSymbol: "BTC", optionSymbol: "300000", type: "P" },
+    { name: "BTC 60000", tokenSymbol: "BTC", optionSymbol: "60000", type: "C" },
+    { name: "BTC 60000", tokenSymbol: "BTC", optionSymbol: "60000", type: "P" },
     { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "C" },
     { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "P" },
   ];

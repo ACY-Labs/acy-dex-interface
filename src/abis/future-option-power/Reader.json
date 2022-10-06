@@ -243,6 +243,78 @@
     {
       "inputs": [
         { "internalType": "address", "name": "pool_", "type": "address" },
+        { "internalType": "string", "name": "symbolName", "type": "string" },
+        {
+          "components": [
+            { "internalType": "string", "name": "symbol", "type": "string" },
+            { "internalType": "int256", "name": "indexPrice", "type": "int256" },
+            { "internalType": "int256", "name": "volatility", "type": "int256" }
+          ],
+          "internalType": "struct ISymbolsLens.PriceAndVolatility[]",
+          "name": "pvs",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "getSymbolInfo",
+      "outputs": [
+        {
+          "components": [
+            { "internalType": "string", "name": "category", "type": "string" },
+            { "internalType": "string", "name": "symbol", "type": "string" },
+            { "internalType": "address", "name": "symbolAddress", "type": "address" },
+            { "internalType": "address", "name": "implementation", "type": "address" },
+            { "internalType": "address", "name": "manager", "type": "address" },
+            { "internalType": "address", "name": "oracleManager", "type": "address" },
+            { "internalType": "bytes32", "name": "symbolId", "type": "bytes32" },
+            { "internalType": "int256", "name": "feeRatio", "type": "int256" },
+            { "internalType": "int256", "name": "alpha", "type": "int256" },
+            { "internalType": "int256", "name": "fundingPeriod", "type": "int256" },
+            { "internalType": "int256", "name": "minTradeVolume", "type": "int256" },
+            { "internalType": "int256", "name": "minInitialMarginRatio", "type": "int256" },
+            { "internalType": "int256", "name": "initialMarginRatio", "type": "int256" },
+            { "internalType": "int256", "name": "maintenanceMarginRatio", "type": "int256" },
+            { "internalType": "int256", "name": "pricePercentThreshold", "type": "int256" },
+            { "internalType": "uint256", "name": "timeThreshold", "type": "uint256" },
+            { "internalType": "bool", "name": "isCloseOnly", "type": "bool" },
+            { "internalType": "bytes32", "name": "priceId", "type": "bytes32" },
+            { "internalType": "bytes32", "name": "volatilityId", "type": "bytes32" },
+            { "internalType": "int256", "name": "feeRatioITM", "type": "int256" },
+            { "internalType": "int256", "name": "feeRatioOTM", "type": "int256" },
+            { "internalType": "int256", "name": "strikePrice", "type": "int256" },
+            { "internalType": "bool", "name": "isCall", "type": "bool" },
+            { "internalType": "int256", "name": "netVolume", "type": "int256" },
+            { "internalType": "int256", "name": "netCost", "type": "int256" },
+            { "internalType": "int256", "name": "indexPrice", "type": "int256" },
+            { "internalType": "uint256", "name": "fundingTimestamp", "type": "uint256" },
+            { "internalType": "int256", "name": "cumulativeFundingPerVolume", "type": "int256" },
+            { "internalType": "int256", "name": "tradersPnl", "type": "int256" },
+            { "internalType": "int256", "name": "initialMarginRequired", "type": "int256" },
+            { "internalType": "uint256", "name": "nPositionHolders", "type": "uint256" },
+            { "internalType": "int256", "name": "curIndexPrice", "type": "int256" },
+            { "internalType": "int256", "name": "curVolatility", "type": "int256" },
+            { "internalType": "int256", "name": "curCumulativeFundingPerVolume", "type": "int256" },
+            { "internalType": "int256", "name": "K", "type": "int256" },
+            { "internalType": "int256", "name": "markPrice", "type": "int256" },
+            { "internalType": "int256", "name": "funding", "type": "int256" },
+            { "internalType": "int256", "name": "timeValue", "type": "int256" },
+            { "internalType": "int256", "name": "delta", "type": "int256" },
+            { "internalType": "int256", "name": "u", "type": "int256" },
+            { "internalType": "int256", "name": "power", "type": "int256" },
+            { "internalType": "int256", "name": "hT", "type": "int256" },
+            { "internalType": "int256", "name": "powerPrice", "type": "int256" },
+            { "internalType": "int256", "name": "theoreticalPrice", "type": "int256" }
+          ],
+          "internalType": "struct ISymbolsLens.SymbolInfo",
+          "name": "info",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "pool_", "type": "address" },
         {
           "components": [
             { "internalType": "string", "name": "symbol", "type": "string" },

@@ -63,12 +63,6 @@ const OptionComponent = props => {
     }
   }
 
-  useEffect(() => {
-    let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(tokenInfo?.filter(item => item.token == selectedToken.address)[0]?.balance, 18, 2)
-    setSelectedTokenValue(tokenAmount)
-    setUsdValue(tokenAmount * symbolInfo?.markPrice)
-  }, [percentage])
-
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
@@ -84,6 +78,13 @@ const OptionComponent = props => {
   const { data: symbolInfo, mutate: updateSymbolInfo } = useSWR([chainId, readerAddress, "getSymbolInfo", poolAddress, symbol, []], {
     fetcher: fetcher(library, Reader)
   });
+  console.log('joy',chainId, symbol,symbolInfo?.markPrice,formatAmount(symbolInfo?.markPrice, 18))
+
+  useEffect(() => {
+    let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(tokenInfo?.filter(item => item.token == selectedToken.address)[0]?.balance, 18, 2)
+    setSelectedTokenValue(tokenAmount)
+    setUsdValue((tokenAmount * formatAmount(symbolInfo?.markPrice, 18)).toFixed(2))
+  }, [percentage])
 
   const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
   const needApproval =
@@ -198,7 +199,7 @@ const OptionComponent = props => {
                     onChange={e => {
                       setSelectedTokenValue(e.target.value)
                       setShowDescription(true)
-                      setUsdValue((e.target.value * symbolInfo?.markPrice).toFixed(2))
+                      setUsdValue((e.target.value * formatAmount(symbolInfo?.markPrice, 18)).toFixed(2))
                     }}
                   />
                   <span className={styles.inputLabel}>{selectedToken.symbol}</span>
