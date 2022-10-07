@@ -33,11 +33,26 @@ const contracts = {
 const tokenLists = {
     56: [
         {
+            name: "Binance Coin",
+            symbol: "BNB",
+            decimals: 18,
+            address: ethers.constants.AddressZero,
+            isNative: true,
+            isShortable: true
+        },
+        {
             name: "USD Coin",
             symbol: "USDC",
             decimals: 6,
             address: "0xE971616d94335dec2E54939118AdFcB68E6dCAd6",
             isStable: true
+        },
+        {
+            name: "Wrapped Bitcoin",
+            symbol: "BTC",
+            decimals: 18,
+            address: "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c",
+            isShortable: true
         },
     ],
     97: [
@@ -145,12 +160,7 @@ export const getTokens = (chainId) => {
 export const getContract = (chainId, name) => {
     return contracts[chainId][name];
 }
-export function getToken(chainId, address) {
-    if (!TOKENS_MAP[chainId]) {
-      throw new Error(`Incorrect chainId ${chainId}`);
-    }
-    if (!TOKENS_MAP[chainId][address]) {
-      throw new Error(`Incorrect address "${address}" for chainId ${chainId}`);
-    }
-    return TOKENS_MAP[chainId][address];
-  }
+
+export const getTokenByAddress = (chainId, address) => getTokens(chainId).find(t => t.address.toLowerCase() == address.toLowerCase());
+
+export const getTokenBySymbol = (chainId, symbol) => getTokens(chainId).find(t => t.symbol == symbol);

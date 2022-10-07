@@ -15,7 +15,7 @@ import { getAllSupportedTokensPrice } from '@/acy-dex-swap/utils';
 import { Button, Icon, Tooltip } from 'antd';
 const AcyConnectWallet = props => {
 
-  const { onClick, isMobile, chainId: walletChainId, pendingLength, ...rest } = props;
+  const { onClick, isMobile, chainId, pendingLength, ...rest } = props;
   const { account, chainId: fallbackChainId, library } = useConstantLoader();
   const { tokenList: INITIAL_TOKEN_LIST } = useConstantLoader();
 
@@ -26,19 +26,14 @@ const AcyConnectWallet = props => {
   const [balanceShow, setBalanceShow] = useState('none');
 
 
-  console.log("web3 and constant chainId", walletChainId, fallbackChainId)
-
   const history = useHistory()
 
-  const displayedChainId = useMemo(() => {
-    // if chainId from useWeb3React and useConstantLoader are different, that means user's wallet is on an unsupported chainId. 
-    return walletChainId == fallbackChainId ? walletChainId : undefined
-  }, [walletChainId, fallbackChainId])
+  const displayedChainId = chainId
 
   // 钱包余额
 
   const initTokenBalanceDict = (tokenList) => {
-    console.log('Init Token Balance!!!! with chainId, TokenList', fallbackChainId, tokenList);
+    console.log('Init Token Balance!!!! with chainId, TokenList', chainId, tokenList);
     const newTokenBalanceDict = {};
     //const tokenPriceList = {};
     if (account) {
@@ -48,7 +43,7 @@ const AcyConnectWallet = props => {
         var { address, symbol, decimals } = token;
         const bal = await getUserTokenBalance(
           { address, symbol, decimals },
-          fallbackChainId,
+          chainId,
           account,
           library
         ).catch(err => {
@@ -70,11 +65,11 @@ const AcyConnectWallet = props => {
     });
   }
   useEffect(() => {
-    getAllPrice(library, account, fallbackChainId);
+    getAllPrice(library, account, chainId);
     if (INITIAL_TOKEN_LIST) {
       initTokenBalanceDict(INITIAL_TOKEN_LIST);
     }
-  }, [account, fallbackChainId])
+  }, [account, chainId])
 
   useEffect(() => {
     var balance = 0;
@@ -126,7 +121,7 @@ const AcyConnectWallet = props => {
 
   const chainName = useMemo(() => {
     let chainName;
-    switch (displayedChainId) {
+    switch (chainId) {
       case 137:
       case 80001:
         chainName = 'Polygon'; break;
@@ -140,7 +135,7 @@ const AcyConnectWallet = props => {
         chainName = 'Other'; break;
     }
     return chainName
-  }, [displayedChainId])
+  }, [chainId])
 
   const balanceHandle = async () => {
     if (balanceShow == 'none') {
