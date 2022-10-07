@@ -54,8 +54,6 @@ const Option = props => {
   const [visibleMATIC, setVisibleMATIC] = useState(false);
   const [visibleBNB, setVisibleBNB] = useState(false);
 
-  const poolAddress = getContract(chainId, "pool")
-
   const onClickDropdownBTC = e => {
     setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0]);
   };
@@ -327,10 +325,11 @@ const Option = props => {
             </div>
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               <ExchangeTVChart
-                chartTokenSymbol="BTC"
+                chartTokenSymbol={symbol}
                 pageName="Option"
                 fromToken={activeToken.symbol}
                 toToken="USDT"
+                chainId={chainId}
               />
             </div>
 

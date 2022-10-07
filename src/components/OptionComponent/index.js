@@ -78,7 +78,6 @@ const OptionComponent = props => {
   const { data: symbolInfo, mutate: updateSymbolInfo } = useSWR([chainId, readerAddress, "getSymbolInfo", poolAddress, symbol, []], {
     fetcher: fetcher(library, Reader)
   });
-  console.log('joy',chainId, symbol,symbolInfo?.markPrice,formatAmount(symbolInfo?.markPrice, 18))
 
   useEffect(() => {
     let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(tokenInfo?.filter(item => item.token == selectedToken.address)[0]?.balance, 18, 2)
