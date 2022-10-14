@@ -44,7 +44,7 @@ const Option = props => {
   let tokens = getTokens(chainId);
 
   const [mode, setMode] = useState('Buy')
-  const [symbol, setSymbol] = useState('')
+  const [symbol, setSymbol] = useState('BTCUSD-60000-C')
   const [tableContent, setTableContent] = useState("Positions");
 
   const [activeToken, setActiveToken] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);

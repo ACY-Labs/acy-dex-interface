@@ -578,19 +578,11 @@ const Swap = props => {
 
                 <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column" }}>
                   <ExchangeTVChart
-                    // swapOption={swapOption}
-                    // fromTokenAddress={fromTokenAddress}
-                    // toTokenAddress={toTokenAddress}
-                    // infoTokens={infoTokens}
-                    // chainId={chainId}
-                    // positions={positions}
-                    // savedShouldShowPositionLines,
-                    // orders={orders}
-                    // setToTokenAddress={setToTokenAddress}
-                    chartTokenSymbol="BTC"
-                    pageName="Future"
+                    chartTokenSymbol={activeToken1.symbol}
+                    pageName="Futures"
                     fromToken={activeToken1.symbol}
                     toToken="USDT"
+                    chainId={chainId}
                   />
                 </div>
               </div>
