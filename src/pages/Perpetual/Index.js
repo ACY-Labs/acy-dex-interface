@@ -109,7 +109,7 @@ import {
 } from '@/pages/Stats/Perpetual/test'
 
 import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract, getTokenBySymbol } from '@/constants/future.js';
+import { getTokens, getContract, getTokenBySymbol, getTokenByAddress } from '@/constants/future.js';
 import { leftPad } from 'web3-utils';
 
 let indexToken = []
@@ -270,8 +270,6 @@ const Swap = props => {
   const [isConfirming, setIsConfirming] = useState(false);
   const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
   const [isReceiptObtained, setIsReceiptObtained] = useState(false);
-  const [activeToken1, setActiveToken1] = useState(supportedTokens[1]);
-  const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [transactionList, setTransactionList] = useState([]);
@@ -285,12 +283,8 @@ const Swap = props => {
   //// prepare tokenlist and from/to token given chainId
   const tokens = getTokens(chainId)
 
-  useEffect(() => {
-    const tokens = getTokens(chainId);
-    setActiveToken1(tokens[1]);
-    setActiveToken0(tokens[0]);
-    console.log('test new activeToken0, activetoken1: ', tokens)
-  }, [chainId, setActiveToken0, setActiveToken1])
+  const [fromToken,setFromToken] = useState(tokens[0])
+  const [toToken,setToToken] = useState(tokens[1])
 
   const defaultTokenSelection = useMemo(() => ({
     ["Pool"]: {
@@ -314,12 +308,14 @@ const Swap = props => {
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
     newTokenSelection[selectedSwapOption].from = address
     setTokenSelection(newTokenSelection)
+    setFromToken(getTokenByAddress(chainId,address))
   }, [tokenSelection, setTokenSelection])
 
   const setToTokenAddress = useCallback((selectedSwapOption, address) => {
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
     newTokenSelection[selectedSwapOption].to = address
     setTokenSelection(newTokenSelection)
+    setToToken(getTokenByAddress(chainId,address))
   }, [tokenSelection, setTokenSelection])
 
   const fromTokenAddress = tokenSelection[swapOption].from.toLowerCase()
@@ -485,7 +481,7 @@ const Swap = props => {
 
   const onClickSetActiveToken = (e) => {
     console.log("hereim see click token", e)
-    setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
+    setToTokenAddress(swapOption,getTokenBySymbol(chainId,e).address)  // when click tab change token
   }
 
   const chartPanes = [
@@ -494,11 +490,6 @@ const Swap = props => {
     // { title: 'Tab 3', content: 'Content of Tab 3', key: '3'},
   ];
   const [activeKey, setActiveKey] = useState(chartPanes[0].key);
-
-  const onChange = (newActiveKey) => {
-    setActiveKey(newActiveKey);
-    setActiveToken1((tokens.filter(ele => ele.symbol == newActiveKey))[0])
-  };
 
 
   const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
@@ -533,7 +524,7 @@ const Swap = props => {
               <div>
                 <div className={styles.chartTokenSelectorTab}>
                   <PerpetualTabs
-                    option={activeToken1.symbol}
+                    option={toToken.symbol}
                     options={KChartTokenList}
                     onChange={selectChartToken}
                   />
@@ -552,7 +543,7 @@ const Swap = props => {
                     // setToTokenAddress={setToTokenAddress}
                     chartTokenSymbol="BTC"
                     pageName="Future"
-                    fromToken={activeToken1.symbol}
+                    fromToken={toToken.symbol}
                     toToken="USDT"
                   />
                 </div>
@@ -604,10 +595,6 @@ const Swap = props => {
             <PerpetualComponent
               swapOption={swapOption}
               setSwapOption={setSwapOption}
-              activeToken0={activeToken0}
-              setActiveToken0={setActiveToken0}
-              activeToken1={activeToken1}
-              setActiveToken1={setActiveToken1}
               fromTokenAddress={fromTokenAddress}
               setFromTokenAddress={setFromTokenAddress}
               toTokenAddress={toTokenAddress}

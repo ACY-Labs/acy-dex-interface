@@ -170,10 +170,6 @@ const SwapComponent = props => {
   const {
     swapOption: mode,
     setSwapOption: setMode,
-    activeToken0,
-    setActiveToken0,
-    activeToken1,
-    setActiveToken1,
 
     toTokenAddress,
     setToTokenAddress,
@@ -340,8 +336,8 @@ const SwapComponent = props => {
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   console.log("test multichain: tokens", infoTokens, tokens)
-  const fromToken = getTokens(chainId, fromTokenAddress);
-  const toToken = getTokens(chainId, toTokenAddress);
+  let fromToken = getTokenByAddress(chainId, fromTokenAddress);
+  let toToken = getTokenByAddress(chainId, toTokenAddress);
 
   const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
   const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
@@ -784,7 +780,6 @@ const SwapComponent = props => {
     const token = getTokenBySymbol(chainId, symbol)
     setFromTokenAddress(mode, token.address);
     console.log("update from token: ", symbol, token, mode);
-    setActiveToken0((tokens.filter(ele => ele.symbol === symbol))[0]);
     setIsWaitingForApproval(false);
     if (isShort) {
       console.log("is short and changed short collateral token to ", token.address)
@@ -801,20 +796,18 @@ const SwapComponent = props => {
   }, [fromTokenAddress])
 
   useEffect(() => {
-    const fromToken = getTokenBySymbol(chainId, activeToken0.symbol)
-    const toToken = getTokenBySymbol(chainId, activeToken1.symbol)
-    console.log('test here: ', chainId, getTokens(chainId), activeToken0.symbol)
-    setFromTokenAddress(mode, fromToken.address);
-    setToTokenAddress(mode, toToken.address);
+    fromToken = getTokenByAddress(chainId,fromTokenAddress)
+    toToken = getTokenByAddress(chainId,toTokenAddress)
+    setFromTokenAddress(mode, fromTokenAddress);
+    setToTokenAddress(mode, toTokenAddress);
 
-  }, [chainId, activeToken0, activeToken1])
+  }, [chainId, fromTokenAddress, toTokenAddress])
 
   console.log("show this")
   const selectToToken = symbol => {
     const token = getTokenBySymbol(chainId, symbol)
     console.log("selectToToken symbol and address", symbol, token.address)
     setToTokenAddress(mode, token.address);
-    setActiveToken1((tokens.filter(ele => ele.symbol === symbol))[0]);
   };
 
   const onFromValueChange = e => {
