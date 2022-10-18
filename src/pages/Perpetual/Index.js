@@ -117,7 +117,7 @@ let indexTokens = []
 const { AddressZero } = ethers.constants
 const { AcyTabPane } = AcyTabs;
 
-
+// ----------------- fetch data --------------------
 function getFundingFee(data) {
   let { entryFundingRate, cumulativeFundingRate, size } = data
   if (entryFundingRate && cumulativeFundingRate) {
@@ -267,42 +267,11 @@ const Swap = props => {
 
   const supportedTokens = tokensperp;
 
-  const [isConfirming, setIsConfirming] = useState(false);
-  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
-  const [isReceiptObtained, setIsReceiptObtained] = useState(false);
-  const [visibleLoading, setVisibleLoading] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const [transactionList, setTransactionList] = useState([]);
-  const [tableLoading, setTableLoading] = useState(true);
-
-  // this are new states for PERPETUAL
-  const [tableContent, setTableContent] = useState(POSITIONS);
-  const [positionsData, setPositionsData] = useState([]);
-
-
   //// prepare tokenlist and from/to token given chainId
   const tokens = getTokens(chainId)
 
   const [fromToken,setFromToken] = useState(tokens[0])
   const [toToken,setToToken] = useState(tokens[1])
-
-  const defaultTokenSelection = useMemo(() => ({
-    ["Pool"]: {
-      from: AddressZero,
-      to: getTokenBySymbol(chainId, "USDC").address,
-    },
-    ["Long"]: {
-      from: AddressZero,
-      to: AddressZero,
-    },
-    ["Short"]: {
-      from: getTokenBySymbol(chainId, "USDC").address,
-      to: AddressZero,
-    }
-  }), [chainId])
-
-  const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
-  const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
 
   const setFromTokenAddress = useCallback((selectedSwapOption, address) => {
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
@@ -321,6 +290,39 @@ const Swap = props => {
   const fromTokenAddress = tokenSelection[swapOption].from.toLowerCase()
   const toTokenAddress = tokenSelection[swapOption].to.toLowerCase()
 
+  //// ui
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
+  const [isReceiptObtained, setIsReceiptObtained] = useState(false);
+  const [visibleLoading, setVisibleLoading] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [transactionList, setTransactionList] = useState([]);
+  const [tableLoading, setTableLoading] = useState(true);
+
+  // this are new states for PERPETUAL
+  const [tableContent, setTableContent] = useState(POSITIONS);
+  const [positionsData, setPositionsData] = useState([]);
+
+  //// ui tab
+  const defaultTokenSelection = useMemo(() => ({
+    ["Pool"]: {
+      from: AddressZero,
+      to: getTokenBySymbol(chainId, "USDC").address,
+    },
+    ["Long"]: {
+      from: AddressZero,
+      to: AddressZero,
+    },
+    ["Short"]: {
+      from: getTokenBySymbol(chainId, "USDC").address,
+      to: AddressZero,
+    }
+  }), [chainId])
+
+  const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
+  const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
+
+  
   /// get contract addresses
   // TODO: update and remove unused contracts
   const readerAddress = getContract(chainId, "Reader")
@@ -410,21 +412,8 @@ const Swap = props => {
 
   }, [supportedTokens])
 
-  // useEffect(() => {
-  //   library.on('block', (blockNum) => {
-  //     updateVaultTokenInfo()
-  //     updateTokenBalances()
-  //     updatePositionData()
-  //     updateFundingRateInfo()
-  //     updateTotalTokenWeights()
-  //     updateUsdgSupply()
-  //     updateOrderBookApproved()
-  //   })
-  //   return () => {
-  //     library.removeAllListeners('block');
-  //   }
-  // }, [library])
 
+  //// data
   const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR(account && [`GlpSwap:lastPurchaseTime:${active}`, chainId, glpManagerAddress, "lastAddedAt", account], {
     fetcher: fetcher(library, GlpManager),
   })
@@ -462,7 +451,7 @@ const Swap = props => {
     }
   }, [account]);
 
-
+  // ui
   // 选择Coin
   const onClickCoin = () => {
     setVisible(true);
@@ -491,7 +480,7 @@ const Swap = props => {
   ];
   const [activeKey, setActiveKey] = useState(chartPanes[0].key);
 
-
+  // ui
   const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
   const KChartTokenListETH = ["BTC", "ETH"]
   const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
@@ -501,17 +490,6 @@ const Swap = props => {
   const selectChartToken = item => {
     onClickSetActiveToken(item)
   }
-  // const [poolTab, setPoolTab] = useState("ALP Price")
-  // const poolTabs = ["ALP Price", "Portfolio"]
-  // const selectPool = item => {
-  //   setPoolTab(item)
-  // }
-
-  // const [poolGraphTab, setPoolGraphTab] = useState("Action")
-  // const poolGraphTabs = ["Action"]
-  // const selectPoolGraph = item => {
-  //   setPoolGraphTab(item)
-  // }
 
   return (
     <PageHeaderWrapper>
