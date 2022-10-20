@@ -267,6 +267,9 @@ const Swap = props => {
 
   const supportedTokens = tokensperp;
 
+  const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
+  const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
+  
   //// prepare tokenlist and from/to token given chainId
   const tokens = getTokens(chainId)
 
@@ -319,8 +322,7 @@ const Swap = props => {
     }
   }), [chainId])
 
-  const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
-  const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
+
 
   
   /// get contract addresses
