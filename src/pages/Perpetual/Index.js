@@ -267,6 +267,22 @@ const Swap = props => {
 
   const supportedTokens = tokensperp;
 
+  //// ui tab
+  const defaultTokenSelection = useMemo(() => ({
+    ["Pool"]: {
+      from: AddressZero,
+      to: getTokenBySymbol(chainId, "USDC").address,
+    },
+    ["Long"]: {
+      from: AddressZero,
+      to: AddressZero,
+    },
+    ["Short"]: {
+      from: getTokenBySymbol(chainId, "USDC").address,
+      to: AddressZero,
+    }
+  }), [chainId])
+  
   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
   const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
   
@@ -306,21 +322,7 @@ const Swap = props => {
   const [tableContent, setTableContent] = useState(POSITIONS);
   const [positionsData, setPositionsData] = useState([]);
 
-  //// ui tab
-  const defaultTokenSelection = useMemo(() => ({
-    ["Pool"]: {
-      from: AddressZero,
-      to: getTokenBySymbol(chainId, "USDC").address,
-    },
-    ["Long"]: {
-      from: AddressZero,
-      to: AddressZero,
-    },
-    ["Short"]: {
-      from: getTokenBySymbol(chainId, "USDC").address,
-      to: AddressZero,
-    }
-  }), [chainId])
+  
 
 
 
