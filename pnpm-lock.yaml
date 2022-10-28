@@ -64,7 +64,6 @@ specifiers:
   body-parser: ^1.19.0
   body-scroll-lock: ^4.0.0-beta.0
   bootstrap: ^5.0.2
-  chalk: link:@umijs/deps/compiled/chalk
   check-prettier: ^1.0.1
   classnames: ^2.2.6
   clsx: ^1.2.1
@@ -100,7 +99,6 @@ specifiers:
   fortmatic: ^2.4.0
   framer-motion: ^4.1.17
   gh-pages: ^2.0.1
-  got: link:@umijs/deps/compiled/got
   graphql: ^15.5.3
   graphql-tag: ^2.12.5
   hardhat: ^2.0.0
@@ -322,7 +320,6 @@ devDependencies:
   antd-theme-webpack-plugin: 1.3.9_webpack@4.46.0
   babel-eslint: 10.1.0_eslint@5.16.0
   babel-plugin-transform-remove-console: 6.9.4
-  chalk: link:@umijs/deps/compiled/chalk
   check-prettier: 1.0.3
   compression-webpack-plugin: 5.0.1_webpack@4.46.0
   cross-env: 5.2.1
@@ -338,7 +335,6 @@ devDependencies:
   eslint-plugin-markdown: 1.0.2
   eslint-plugin-react: 7.31.10_eslint@5.16.0
   gh-pages: 2.2.0
-  got: link:@umijs/deps/compiled/got
   husky: 1.3.1
   jest-puppeteer: 3.9.1_puppeteer@1.20.0
   less: 3.13.1
@@ -4847,7 +4843,7 @@ packages:
   /@types/acorn/4.0.6:
     resolution: {integrity: sha512-veQTnWP+1D/xbxVrPC3zHnCZRjSrKfhbMUlEA43iMZLu7EsnTtkJklIuwrCPbOi8YkvDQAiW05VQQFvvz9oieQ==}
     dependencies:
-      '@types/estree': 0.0.41
+      '@types/estree': 1.0.0
     dev: false
 
   /@types/amap-js-api/1.4.10:
@@ -4960,7 +4956,6 @@ packages:
 
   /@types/estree/1.0.0:
     resolution: {integrity: sha512-WulqXMDUTYAXCjZnk6JtIHPigp55cVtDgDrO2gHRwhyJto21+1zbVCtOYB2L1F9w4qCQ0rOGWBnBe0FNTiEJIQ==}
-    dev: true
 
   /@types/express-serve-static-core/4.17.31:
     resolution: {integrity: sha512-DxMhY+NAsTwMMFHBTtJFNp5qiHKJ7TeqOo23zVEM9alT1Ml27Q3xcTH0xwxn7Q0BbMcVEJOs/7aQtUWupUQN3Q==}
@@ -5163,14 +5158,6 @@ packages:
     resolution: {integrity: sha512-D5mHD6TbdV/DNHYsnwBTv+y73ei+mMjrkGrla86HthE4/PVvL1J94Bu3qABU+COXzpL23T1EZapVVpwHuBXiUg==}
     dependencies:
       '@types/history': 5.0.0
-      '@types/react': 16.14.34
-      '@types/react-router': 5.1.12
-    dev: true
-
-  /@types/react-router-dom/5.3.3:
-    resolution: {integrity: sha512-kpqnYK4wcdm5UaWI3fLcELopqLrHgLqNsdpHauzlQktfkHL3npOSwtj1Uz9oKBAzs7lFtVkV8j83voAz2D8fhw==}
-    dependencies:
-      '@types/history': 4.7.11
       '@types/react': 16.14.34
       '@types/react-router': 5.1.19
     dev: true
@@ -6660,14 +6647,8 @@ packages:
   /antd-theme-generator/1.2.11:
     resolution: {integrity: sha512-7A3lXyLb7eD7MXK7aSgZZ4DxQEdhZwyKhzIm70orUZPQJ8N8TWhZphyOWSGCe8yUqGQhi8PcpM2pLmTriZyKBw==}
     dependencies:
-      glob: 7.2.3
-      hash.js: 1.1.7
-      less: 3.13.1
       less-bundle-promise: 1.0.11
-      less-plugin-npm-import: 2.1.0
-      postcss: 6.0.23
       postcss-less: 3.1.4
-      strip-css-comments: 4.1.0
     dev: true
     bundledDependencies:
       - glob
@@ -7198,7 +7179,7 @@ packages:
   /axios/0.21.4:
     resolution: {integrity: sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==}
     dependencies:
-      follow-redirects: 1.15.2
+      follow-redirects: 1.15.2_debug@4.3.4
     transitivePeerDependencies:
       - debug
     dev: false
@@ -7965,7 +7946,7 @@ packages:
       mississippi: 3.0.0
       mkdirp: 0.5.6
       move-concurrently: 1.0.1
-      promise-inflight: 1.0.1
+      promise-inflight: 1.0.1_bluebird@3.7.2
       rimraf: 2.7.1
       ssri: 6.0.2
       unique-filename: 1.1.1
@@ -7988,7 +7969,7 @@ packages:
       minipass-pipeline: 1.2.4
       mkdirp: 1.0.4
       p-map: 4.0.0
-      promise-inflight: 1.0.1
+      promise-inflight: 1.0.1_bluebird@3.7.2
       rimraf: 3.0.2
       ssri: 8.0.1
       tar: 6.1.11
@@ -9283,10 +9264,6 @@ packages:
     resolution: {integrity: sha512-fVjoElzjhCEy+Hbn8KygnmMS7Or0a9sI2UzGwoB7cCtvI1XpVN9GpoYlnb3xt2YV66oXYb1fLJ8GMvP4hdU1RA==}
     dev: false
 
-  /d3-dispatch/2.0.0:
-    resolution: {integrity: sha512-S/m2VsXI7gAti2pBoLClFFTMOO1HTtT0j99AuXLoGFKO6deHDdnv6ZGTxSTTUTgO1zVcv82fCOtDjYK4EECmWA==}
-    dev: false
-
   /d3-dsv/1.0.10:
     resolution: {integrity: sha512-vqklfpxmtO2ZER3fq/B33R/BIz3A1PV0FaZRuFM8w6jLo7sUX1BZDh73fPlr0s327rzq4H6EN1q9U+eCBCSN8g==}
     hasBin: true
@@ -9312,9 +9289,9 @@ packages:
   /d3-force/2.1.1:
     resolution: {integrity: sha512-nAuHEzBqMvpFVMf9OX75d00OxvOXdxY+xECIXjW6Gv8BRrXu6gAWbv/9XKrvfJ5i5DCokDW7RYE50LRoK092ew==}
     dependencies:
-      d3-dispatch: 2.0.0
+      d3-dispatch: 1.0.6
       d3-quadtree: 2.0.0
-      d3-timer: 2.0.0
+      d3-timer: 1.0.10
     dev: false
 
   /d3-format/1.4.5:
@@ -9331,7 +9308,7 @@ packages:
     dependencies:
       commander: 2.20.3
       d3-array: 1.2.4
-      d3-geo: 1.6.4
+      d3-geo: 1.12.1
     dev: false
 
   /d3-geo/1.12.1:
@@ -9474,10 +9451,6 @@ packages:
 
   /d3-timer/1.0.10:
     resolution: {integrity: sha512-B1JDm0XDaQC+uvo4DT79H0XmBskgS3l6Ve+1SBCfxgmtIb1AVrPIoqd+nPSv+loMX8szQ0sVUhGngL7D5QPiXw==}
-    dev: false
-
-  /d3-timer/2.0.0:
-    resolution: {integrity: sha512-TO4VLh0/420Y/9dO3+f9abDEFYeCUr2WZRlxJvbp4HPTQcSylXNiL6yZa9FIUvV1yRiFufl1bszTCLDqv9PWNA==}
     dev: false
 
   /d3-transition/1.3.2:
@@ -10081,7 +10054,7 @@ packages:
       '@babel/runtime': 7.20.0
       '@types/isomorphic-fetch': 0.0.35
       '@types/react-redux': 7.1.24
-      '@types/react-router-dom': 5.3.3
+      '@types/react-router-dom': 5.1.7
       connected-react-router: 6.5.2_hjanq2rhrrf4q4sw3wbo3sabii
       dva-core: 2.0.4_redux@4.2.0
       global: 4.4.0
@@ -11648,7 +11621,7 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /follow-redirects/1.15.2:
+  /follow-redirects/1.15.2_debug@4.3.4:
     resolution: {integrity: sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==}
     engines: {node: '>=4.0'}
     peerDependencies:
@@ -11656,6 +11629,8 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
+    dependencies:
+      debug: 4.3.4
 
   /follow-redirects/1.5.10:
     resolution: {integrity: sha512-0V5l4Cizzvqt5D44aTXbFZz+FtyXV1vrDN6qrelxtfYQKW0KO0W2T/hkE8xvGa/540LkZlkaUjO4ailYTFtHVQ==}
@@ -12642,7 +12617,7 @@ packages:
     engines: {node: '>=8.0.0'}
     dependencies:
       eventemitter3: 4.0.7
-      follow-redirects: 1.15.2
+      follow-redirects: 1.15.2_debug@4.3.4
       requires-port: 1.0.0
     transitivePeerDependencies:
       - debug
@@ -13341,11 +13316,6 @@ packages:
   /is-regexp/1.0.0:
     resolution: {integrity: sha512-7zjFAPO4/gwyQAAgRRmqeEeyIICSdmCqa3tsVHMdBzaXXRiqopZL4Cyghg/XulGWrtABTpbnYYzzIRffLkP4oA==}
     engines: {node: '>=0.10.0'}
-    dev: true
-
-  /is-regexp/2.1.0:
-    resolution: {integrity: sha512-OZ4IlER3zmRIoB9AqNhEggVxqIH4ofDns5nRrPS6yQxXE1TPCUpFznBfRQmQa8uC+pXqjMnukiJBxCisIxiLGA==}
-    engines: {node: '>=6'}
     dev: true
 
   /is-shared-array-buffer/1.0.2:
@@ -14548,14 +14518,6 @@ packages:
   /less-bundle-promise/1.0.11:
     resolution: {integrity: sha512-LozmEciljdXe0CwEH6uWTlpQDlOVM8d3kkj14P+Jeze/AUhaPZs02x6INJh4TYSeO5xw4RxkpzXTELZSkLKC6Q==}
     engines: {node: '>=0.10.0'}
-    dev: true
-
-  /less-plugin-npm-import/2.1.0:
-    resolution: {integrity: sha512-f7pVkEooRq2/jge/M/Y+spoPXj5rRIY30q1as+3kZsDG8Rs+loNJUCVQjzXB9Ao/9FeIJULiq2zrXymv+OMTbw==}
-    engines: {node: '>=0.4.2'}
-    dependencies:
-      promise: 7.0.4
-      resolve: 1.1.7
     dev: true
 
   /less/3.13.1:
@@ -17472,15 +17434,6 @@ packages:
       uniq: 1.0.1
     dev: true
 
-  /postcss/6.0.23:
-    resolution: {integrity: sha512-soOk1h6J3VMTZtVeVpv15/Hpdl2cBLX3CAw4TAbkpTJiNPk9YP/zWcD1ND+xEtvyuuvKzbxliTOIyvkSeSJ6ag==}
-    engines: {node: '>=4.0.0'}
-    dependencies:
-      chalk: 2.4.2
-      source-map: 0.6.1
-      supports-color: 5.5.0
-    dev: true
-
   /postcss/7.0.32:
     resolution: {integrity: sha512-03eXong5NLnNCD05xscnGKGDZ98CyzoqPSMjOe6SuoQY7Z2hIj0Ld1g/O/UQRuOle2aRtiIRDg9tDcTGAkLfKw==}
     engines: {node: '>=6.0.0'}
@@ -17580,13 +17533,15 @@ packages:
     resolution: {integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==}
     engines: {node: '>=0.4.0'}
 
-  /promise-inflight/1.0.1:
+  /promise-inflight/1.0.1_bluebird@3.7.2:
     resolution: {integrity: sha512-6zWPyEOFaQBJYcGMHBKTKJ3u6TBsnMFOIZSa6ce1e/ZrrsOlnHRHbabMjLiBYKp+n44X9eUI6VUPaukCXHuG4g==}
     peerDependencies:
       bluebird: '*'
     peerDependenciesMeta:
       bluebird:
         optional: true
+    dependencies:
+      bluebird: 3.7.2
 
   /promise-to-callback/1.0.0:
     resolution: {integrity: sha512-uhMIZmKM5ZteDMfLgJnoSq9GCwsNKrYau73Awf1jIy6/eUcuuZ3P+CD9zUv0kJsIUbU+x6uLNIhXhLHDs1pNPA==}
@@ -17595,12 +17550,6 @@ packages:
       is-fn: 1.0.0
       set-immediate-shim: 1.0.1
     dev: false
-
-  /promise/7.0.4:
-    resolution: {integrity: sha512-8z1gTSL9cMgqCx8zvMYhzT0eQURAQNSQqR8B2hGfCYkAzt1vjReVdKBv4YwGw3OXAPaxfm4aR0gLoBUon4VmmA==}
-    dependencies:
-      asap: 2.0.6
-    dev: true
 
   /promise/7.3.1:
     resolution: {integrity: sha512-nolQXZ/4L+bP/UGlkfaIujX9BKxGwmQ9OT4mOt5yvy8iK1h3wqTEJCijzGANTCCl9nWjY41juyAn2K3Q1hLLTg==}
@@ -20176,10 +20125,6 @@ packages:
     resolution: {integrity: sha512-ZuF55hVUQaaczgOIwqWzkEcEidmlD/xl44x1UZnhOXcYuFN2S6+rcxpG+C1N3So0wvNI3DmJICUFfu2SxhBmvg==}
     deprecated: https://github.com/lydell/resolve-url#deprecated
 
-  /resolve/1.1.7:
-    resolution: {integrity: sha512-9znBF0vBcaSN3W2j7wKvdERPwqTxSpCq+if5C0WoTCyV9n24rua28jeuQ2pL/HOf+yUe/Mef+H/5p60K0Id3bg==}
-    dev: true
-
   /resolve/1.17.0:
     resolution: {integrity: sha512-ic+7JYiV8Vi2yzQGFWOkiZD5Z9z7O2Zhm9XMaTxdJExKasieFCr+yXZ/WmXsckHiKl12ar0y6XiXDx3m4RHn1w==}
     dependencies:
@@ -21038,7 +20983,7 @@ packages:
     dependencies:
       command-exists: 1.2.9
       commander: 3.0.2
-      follow-redirects: 1.15.2
+      follow-redirects: 1.15.2_debug@4.3.4
       fs-extra: 0.30.0
       js-sha3: 0.8.0
       memorystream: 0.3.1
@@ -21503,13 +21448,6 @@ packages:
   /strip-bom/4.0.0:
     resolution: {integrity: sha512-3xurFv5tEgii33Zi8Jtp55wEIILR9eh34FAW00PZf+JnSsTmV/ioewSgQl97JHvgjoRGwPShsWm+IdrxB35d0w==}
     engines: {node: '>=8'}
-    dev: true
-
-  /strip-css-comments/4.1.0:
-    resolution: {integrity: sha512-azjRwrqk7nK21LU7QuL7DpDyPjvRROQvqPrNyyz6emdzbOh6fsNTvkSvUiThBLzC6+MN90rFu296VbPb/KV+3A==}
-    engines: {node: '>=8'}
-    dependencies:
-      is-regexp: 2.1.0
     dev: true
 
   /strip-eof/1.0.0:

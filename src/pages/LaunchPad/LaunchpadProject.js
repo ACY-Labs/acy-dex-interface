@@ -12,7 +12,6 @@ import ERC20ABI from '@/abis/ERC20.json';
 import { binance, injected } from '@/connectors';
 import { Web3Provider, JsonRpcProvider } from "@ethersproject/providers";
 import './css/LaunchpadProject.css';
-import project from '@/models/project';
 import AllocationIcon from './components/AllocationIcon';
 import PageLoading from '@/components/PageLoading';
 import * as moment from 'moment';
