@@ -1,5 +1,5 @@
 
-const logo = require('./USDA-01.svg');
+import logo from './USDA-01.svg';
 import styles from './banner.less';
 export const Banner = props => {
   //read props

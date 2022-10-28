@@ -1,6 +1,5 @@
 import ERC20ABI from '@/abis/ERC20.json';
 import WETHABI from '@/abis/WETH.json';
-import { get } from '@umijs/deps/compiled/got';
 import { asyncForEach } from "@/utils/asynctools";
 import Eth from "web3-eth";
 import Utils from "web3-utils";

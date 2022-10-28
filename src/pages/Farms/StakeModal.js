@@ -5,7 +5,6 @@ import DatePicker from 'react-datepicker';
 import { AcySmallButtonGroup } from '@/components/AcySmallButton';
 import { useWeb3React } from '@web3-react/core';
 import { deposit, approveLpToken } from '@/acy-dex-swap/core/farms';
-import { white } from '@umijs/deps/compiled/chalk';
 import { Icon } from 'antd';
 import { now } from 'moment';
 import { connect } from 'umi';

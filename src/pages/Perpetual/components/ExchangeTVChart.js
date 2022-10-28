@@ -18,11 +18,11 @@ import {
   CHART_PERIODS,
   getTokenInfo,
   formatAmount,
-  formatDateTime,
   usePrevious,
   getLiquidationPrice,
   useLocalStorageSerializeKey
 } from '@/acy-dex-futures/utils'
+import { formatDateTime } from "@/acy-dex-futures/utils";
 import { useChartPrices } from '@/acy-dex-futures/Api'
 
 import './ExchangeTVChart.css';

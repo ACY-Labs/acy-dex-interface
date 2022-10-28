@@ -13,6 +13,7 @@ export const SWAP = 'Swap';
 export const POOL = 'Pool';
 export const BSC_MAINNET = 56;
 export const POLYGON = 137;
+export const SLIPPAGE_BPS_KEY = 'Slippage_Bps';
 
 // functions needed for constants
 export function bigNumberify(n) {
