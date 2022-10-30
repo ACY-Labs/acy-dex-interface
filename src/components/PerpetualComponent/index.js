@@ -63,16 +63,14 @@ import * as Api from '@/acy-dex-futures/Api';
 import WETHABI from '@/abis/WETH.json';
 
 import { Slider, Checkbox, Tooltip } from 'antd';
-import { useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { AcyRadioButton } from '@/components/AcyRadioButton';
-import { constantInstance } from '@/constants';
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
 
 import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract } from '@/constants/future.js';
+import { getTokens, getTokenBySymbol, getContract, getTokenByAddress } from '@/constants/future.js';
 
 import styled from "styled-components";
 
@@ -161,36 +159,17 @@ function getNextAveragePrice({ size, sizeDelta, hasProfit, delta, nextPrice, isL
   return nextAveragePrice;
 }
 
-function getTokenfromSymbol(tokenlist, symbol) {
-  for (let i = 0; i < tokenlist.length; i++) {
-    if (tokenlist[i].symbol === symbol) {
-      return tokenlist[i]
-    }
-  }
-  return undefined
-}
-
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
-
-  const {
-    account,
-    library,
-    tokenList: INITIAL_TOKEN_LIST,
-    farmSetting: { INITIAL_ALLOWED_SLIPPAGE },
-    perpetuals
-  } = useConstantLoader(props);
-
+  const { account, library, active } = useWeb3React();
   const { chainId } = useChainId();
+  
   const tokens = getTokens(chainId)
+  console.log("test chainId perpetual component", chainId, tokens)
 
   const {
     swapOption: mode,
     setSwapOption: setMode,
-    activeToken0,
-    setActiveToken0,
-    activeToken1,
-    setActiveToken1,
 
     toTokenAddress,
     setToTokenAddress,
@@ -214,7 +193,6 @@ const SwapComponent = props => {
   } = props;
 
   const connectWalletByLocalStorage = useConnectWallet();
-  const { active, activate } = useWeb3React();
 
   const [type, setType] = useState(MARKET);
   const [fromValue, setFromValue] = useState("");
@@ -236,7 +214,6 @@ const SwapComponent = props => {
     allowedSlippage = DEFAULT_HIGHER_SLIPPAGE_AMOUNT;
   }
 
-  // const tokens = perpetuals.tokenList;
   const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
   const stableTokens = tokens.filter(token => token.isStable);
   const indexTokens = whitelistedTokens.filter(token => !token.isStable && !token.isWrapped);
@@ -254,8 +231,6 @@ const SwapComponent = props => {
   }
 
   // const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
-  const initialToToken = perpetuals.getTokenBySymBol("BTC").address;
-  console.log("initialToToken: ", initialToToken, chainId)
   // const [toTokenAddress, setToTokenAddress] = useState(initialToToken);
   // const [fromTokenInfo, setFromTokenInfo] = useState();
   // const [toTokenInfo, setToTokenInfo] = useState();
@@ -361,8 +336,8 @@ const SwapComponent = props => {
 
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
   console.log("test multichain: tokens", infoTokens, tokens)
-  const fromToken = getTokens(chainId, fromTokenAddress);
-  const toToken = getTokens(chainId, toTokenAddress);
+  let fromToken = getTokenByAddress(chainId, fromTokenAddress);
+  let toToken = getTokenByAddress(chainId, toTokenAddress);
 
   const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
   const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
@@ -395,7 +370,7 @@ const SwapComponent = props => {
   //   ? indexTokenAddress
   //   : shortCollateralAddress;
   const collateralTokenAddress = shortCollateralAddress;
-  const collateralToken = perpetuals.getToken(collateralTokenAddress);
+  const collateralToken = getTokenByAddress(chainId, collateralTokenAddress);
 
   const [triggerRatioValue, setTriggerRatioValue] = useState("");
   const triggerRatioInverted = useMemo(() => {
@@ -802,10 +777,9 @@ const SwapComponent = props => {
   }
 
   const selectFromToken = symbol => {
-    const token = getTokenfromSymbol(tokens, symbol)
+    const token = getTokenBySymbol(chainId, symbol)
     setFromTokenAddress(mode, token.address);
     console.log("update from token: ", symbol, token, mode);
-    setActiveToken0((tokens.filter(ele => ele.symbol === symbol))[0]);
     setIsWaitingForApproval(false);
     if (isShort) {
       console.log("is short and changed short collateral token to ", token.address)
@@ -822,20 +796,18 @@ const SwapComponent = props => {
   }, [fromTokenAddress])
 
   useEffect(() => {
-    const fromToken = getTokenfromSymbol(tokens, activeToken0.symbol)
-    const toToken = getTokenfromSymbol(tokens, activeToken1.symbol)
+    fromToken = getTokenByAddress(chainId,fromTokenAddress)
+    toToken = getTokenByAddress(chainId,toTokenAddress)
+    setFromTokenAddress(mode, fromTokenAddress);
+    setToTokenAddress(mode, toTokenAddress);
 
-    setFromTokenAddress(mode, fromToken.address);
-    setToTokenAddress(mode, toToken.address);
-
-  }, [activeToken0, activeToken1])
+  }, [chainId, fromTokenAddress, toTokenAddress])
 
   console.log("show this")
   const selectToToken = symbol => {
-    const token = getTokenfromSymbol(tokens, symbol)
+    const token = getTokenBySymbol(chainId, symbol)
     console.log("selectToToken symbol and address", symbol, token.address)
     setToTokenAddress(mode, token.address);
-    setActiveToken1((tokens.filter(ele => ele.symbol === symbol))[0]);
   };
 
   const onFromValueChange = e => {
@@ -862,7 +834,7 @@ const SwapComponent = props => {
     }
 
     const minOut = 0;
-    const indexToken = perpetuals.getToken(indexTokenAddress);
+    const indexToken = getTokenByAddress(chainId, indexTokenAddress);
     const successMsg = `
       Created limit order for ${indexToken.symbol} ${isLong ? "Long" : "Short"}: ${formatAmount(toUsdMax, USD_DECIMALS, 2)} USD!`;
     return Api.createIncreaseOrder(
