@@ -259,13 +259,22 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
 
 
 const Swap = props => {
-  const { savedIsPnlInLeverage, setSavedIsPnlInLeverage, savedSlippageAmount, pendingTxns, setPendingTxns } = props
+  const {
+    isMobile,
+    transaction: { transactions },
+    swap: { token0, token1 },
+    dispatch,
+    savedIsPnlInLeverage,
+    setSavedIsPnlInLeverage,
+    savedSlippageAmount, 
+    pendingTxns, 
+    setPendingTxns
+  } = props;
+
   const { account, library, active } = useWeb3React();
   let { chainId } = useChainId();
-  const tokensperp = getTokens(chainId);
-  console.log("test chainId perpetual page", chainId, tokensperp)
 
-  const supportedTokens = tokensperp;
+  const supportedTokens = getTokens(chainId);
 
   //// ui tab
   const defaultTokenSelection = useMemo(() => ({
@@ -282,10 +291,16 @@ const Swap = props => {
       to: AddressZero,
     }
   }), [chainId])
-  
+
+  //// ui set token  
   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
   const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
   
+  const onClickSetActiveToken = (e) => {
+    console.log("hereim see click token", e)
+    setToTokenAddress(swapOption,getTokenBySymbol(chainId,e).address)  // when click tab change token
+  }
+
   //// prepare tokenlist and from/to token given chainId
   const tokens = getTokens(chainId)
 
@@ -309,24 +324,7 @@ const Swap = props => {
   const fromTokenAddress = tokenSelection[swapOption].from.toLowerCase()
   const toTokenAddress = tokenSelection[swapOption].to.toLowerCase()
 
-  //// ui
-  const [isConfirming, setIsConfirming] = useState(false);
-  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
-  const [isReceiptObtained, setIsReceiptObtained] = useState(false);
-  const [visibleLoading, setVisibleLoading] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const [transactionList, setTransactionList] = useState([]);
-  const [tableLoading, setTableLoading] = useState(true);
 
-  // this are new states for PERPETUAL
-  const [tableContent, setTableContent] = useState(POSITIONS);
-  const [positionsData, setPositionsData] = useState([]);
-
-  
-
-
-
-  
   /// get contract addresses
   // TODO: update and remove unused contracts
   const readerAddress = getContract(chainId, "Reader")
@@ -335,7 +333,6 @@ const Swap = props => {
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
   const routerAddress = getContract(chainId, "Router")
   const glpManagerAddress = getContract(chainId, "GlpManager")
-  const glpAddress = getContract(chainId, "GLP")
   const orderBookAddress = getContract(chainId, "OrderBook")
 
   //---------- FOR TESTING 
@@ -371,13 +368,16 @@ const Swap = props => {
     fetcher: fetcher(library, Router)
   });
 
+  //// data for position table
   const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
   console.log('test params: ', positionQuery, positionData, infoTokens, true, nativeTokenAddress)
   const { positions, positionsMap } = getPositions(chainId, positionQuery, positionData, infoTokens, true, nativeTokenAddress);
 
+  //// data for order table
   const flagOrdersEnabled = true;
   const [orders] = useAccountOrders(flagOrdersEnabled);
 
+  //// ui for orderbook
   const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
   const [isPluginApproving, setIsPluginApproving] = useState(false);
 
@@ -395,17 +395,23 @@ const Swap = props => {
     })
   }
 
-  //--------- 
+  //// ui
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
+  const [visibleLoading, setVisibleLoading] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [transactionList, setTransactionList] = useState([]);
+  const [tableContent, setTableContent] = useState(POSITIONS);
+  const [positionsData, setPositionsData] = useState([]);
+
   useEffect(() => {
     if (!supportedTokens) return
 
     // reset on chainId change => supportedTokens change
 
-    setIsReceiptObtained(false);
     setVisibleLoading(false);
     setVisible(false);
     setTransactionList([]);
-    setTableLoading(true);
 
     for (let item of samplePositionsData) {
       item['collateralToken'] = findTokenWithSymbol(item.collateralTokenSymbol);
@@ -444,8 +450,8 @@ const Swap = props => {
     updateOrderBookApproved, updateLastPurchaseTime]
   )
 
-  const refContainer = useRef();
-  refContainer.current = transactionList;
+  // const refContainer = useRef();
+  // refContainer.current = transactionList;
 
   // connect to provider, listen for wallet to connect
   const connectWalletByLocalStorage = useConnectWallet();
@@ -456,26 +462,12 @@ const Swap = props => {
   }, [account]);
 
   // ui
-  // 选择Coin
-  const onClickCoin = () => {
-    setVisible(true);
-  };
-
   const onCancel = () => {
     setVisible(false);
   };
 
-  const {
-    isMobile,
-    transaction: { transactions },
-    swap: { token0, token1 },
-    dispatch
-  } = props;
 
-  const onClickSetActiveToken = (e) => {
-    console.log("hereim see click token", e)
-    setToTokenAddress(swapOption,getTokenBySymbol(chainId,e).address)  // when click tab change token
-  }
+
 
   const chartPanes = [
     { title: 'BTC', content: 'BTC', key: 'BTC', closable: false },
