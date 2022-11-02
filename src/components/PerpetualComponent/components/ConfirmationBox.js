@@ -22,7 +22,6 @@ import {
   calculatePositionDelta,
 } from '../constant/index';
 import { formatDateTime } from "@/acy-dex-futures/utils";
-import { useConstantLoader } from '@/constants';
 import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
 import Checkbox from '../Checkbox/Checkbox';

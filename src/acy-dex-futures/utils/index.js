@@ -602,6 +602,7 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
         }
         infoTokens[token.address.toLowerCase()] = token
     }
+    
     for (let i = 0; i < whitelistedTokens.length; i++) {
         const token = JSON.parse(JSON.stringify(whitelistedTokens[i]))
 

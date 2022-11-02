@@ -310,9 +310,6 @@ const Swap = props => {
   const toTokenAddress = tokenSelection[swapOption].to.toLowerCase()
 
   //// ui
-  const [isConfirming, setIsConfirming] = useState(false);
-  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
-  const [isReceiptObtained, setIsReceiptObtained] = useState(false);
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [transactionList, setTransactionList] = useState([]);
@@ -329,6 +326,7 @@ const Swap = props => {
   
   /// get contract addresses
   // TODO: update and remove unused contracts
+  // required contracts: router (add/remove liquidity, add/remove margin), pool (trade), reader
   const readerAddress = getContract(chainId, "Reader")
   const vaultAddress = getContract(chainId, "Vault")
   const usdgAddress = getContract(chainId, "USDG")
@@ -339,24 +337,15 @@ const Swap = props => {
   const orderBookAddress = getContract(chainId, "OrderBook")
 
   //---------- FOR TESTING 
-  const whitelistedTokens = tokens.filter(token => token.symbol !== "USDG");
-  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
-  const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
+  // const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
 
 
-  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
-    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
-  })
-  const { data: positionData, mutate: updatePositionData } = useSWR([chainId, readerAddress, "getPositions", vaultAddress, account], {
-    fetcher: fetcher(library, Reader, [positionQuery.collateralTokens, positionQuery.indexTokens, positionQuery.isLong]),
-  })
+  // const { data: positionData, mutate: updatePositionData } = useSWR([chainId, readerAddress, "getPositions", vaultAddress, account], {
+  //   fetcher: fetcher(library, Reader, [positionQuery.collateralTokens, positionQuery.indexTokens, positionQuery.isLong]),
+  // })
   const tokenAddresses = tokens.map(token => token.address)
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
-  })
-
-  const { data: fundingRateInfo, mutate: updateFundingRateInfo } = useSWR(account && [chainId, readerAddress, "getFundingRates"], {
-    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
   })
 
   const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([chainId, vaultAddress, "totalTokenWeights"], {
@@ -371,10 +360,33 @@ const Swap = props => {
     fetcher: fetcher(library, Router)
   });
 
-  const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
-  console.log('test params: ', positionQuery, positionData, infoTokens, true, nativeTokenAddress)
-  const { positions, positionsMap } = getPositions(chainId, positionQuery, positionData, infoTokens, true, nativeTokenAddress);
+  // const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
+  const infoTokens = {};
+  // console.log('test params: ', positionQuery, positionData, infoTokens, true, nativeTokenAddress)
 
+  // POSITIONS DATA
+  // const { positions, positionsMap } = getPositions(chainId, positionQuery, positionData, infoTokens, true, nativeTokenAddress);
+  // useEffect(() => {
+  //   if (!supportedTokens) return
+
+  //   // reset on chainId change => supportedTokens change
+
+  //   setIsReceiptObtained(false);
+  //   setVisibleLoading(false);
+  //   setVisible(false);
+  //   setTransactionList([]);
+  //   setTableLoading(true);
+
+  //   for (let item of samplePositionsData) {
+  //     item['collateralToken'] = findTokenWithSymbol(item.collateralTokenSymbol);
+  //     item['indexToken'] = findTokenWithSymbol(item.indexTokenSymbol);
+  //     item['liqPrice'] = getLiquidationPrice(item);
+  //   }
+  //   setPositionsData(samplePositionsData);
+
+  // }, [supportedTokens])
+
+  // ORDER BOOK FEATURES, WHICH WE MIGHT NOT SUPPORT AT THE MOMENT
   const flagOrdersEnabled = true;
   const [orders] = useAccountOrders(flagOrdersEnabled);
 
@@ -395,27 +407,6 @@ const Swap = props => {
     })
   }
 
-  //--------- 
-  useEffect(() => {
-    if (!supportedTokens) return
-
-    // reset on chainId change => supportedTokens change
-
-    setIsReceiptObtained(false);
-    setVisibleLoading(false);
-    setVisible(false);
-    setTransactionList([]);
-    setTableLoading(true);
-
-    for (let item of samplePositionsData) {
-      item['collateralToken'] = findTokenWithSymbol(item.collateralTokenSymbol);
-      item['indexToken'] = findTokenWithSymbol(item.indexTokenSymbol);
-      item['liqPrice'] = getLiquidationPrice(item);
-    }
-    setPositionsData(samplePositionsData);
-
-  }, [supportedTokens])
-
 
   //// data
   const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR(account && [`GlpSwap:lastPurchaseTime:${active}`, chainId, glpManagerAddress, "lastAddedAt", account], {
@@ -425,10 +416,8 @@ const Swap = props => {
   useEffect(() => {
     if (active) {
       library.on('block', () => {
-        updateVaultTokenInfo(undefined, true)
-        updatePositionData(undefined, true)
+        // updatePositionData(undefined, true)
         updateTokenBalances(undefined, true)
-        updateFundingRateInfo(undefined, true)
         updateTotalTokenWeights(undefined, true)
         updateUsdgSupply(undefined, true)
         updateOrderBookApproved(undefined, true)
@@ -439,9 +428,12 @@ const Swap = props => {
       }
     }
   }, [active, library, chainId,
-    updateVaultTokenInfo, updatePositionData, updateTokenBalances,
-    updateFundingRateInfo, updateTotalTokenWeights, updateUsdgSupply,
-    updateOrderBookApproved, updateLastPurchaseTime]
+    // updatePositionData,
+    updateTokenBalances,
+    updateTotalTokenWeights,
+    updateUsdgSupply,
+    updateOrderBookApproved,
+    updateLastPurchaseTime]
   )
 
   const refContainer = useRef();
@@ -482,7 +474,6 @@ const Swap = props => {
     { title: 'ETH', content: 'ETH', key: 'ETH' },
     // { title: 'Tab 3', content: 'Content of Tab 3', key: '3'},
   ];
-  const [activeKey, setActiveKey] = useState(chartPanes[0].key);
 
   // ui
   const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
@@ -541,7 +532,7 @@ const Swap = props => {
                 </div>
                 <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
                   <div className={`${styles.colItem} ${styles.priceChart}`}>
-                    <div className={styles.positionsTable}>
+                    {/* <div className={styles.positionsTable}>
                       {tableContent == POSITIONS && (
                         <PositionsTable
                           isMobile={isMobile}
@@ -564,7 +555,7 @@ const Swap = props => {
                         />
                       )}
 
-                    </div>
+                    </div> */}
                   </div>
                 </AcyCard>
               </div>
@@ -581,18 +572,15 @@ const Swap = props => {
               setFromTokenAddress={setFromTokenAddress}
               toTokenAddress={toTokenAddress}
               setToTokenAddress={setToTokenAddress}
-              positionsMap={positionsMap}
+              // positionsMap={positionsMap}
+              positionsMap={{}}
               pendingTxns={pendingTxns}
               setPendingTxns={setPendingTxns}
               savedIsPnlInLeverage={savedIsPnlInLeverage}
-              approveOrderBook={approveOrderBook}
+              // approveOrderBook={approveOrderBook}
               isWaitingForPluginApproval={isWaitingForPluginApproval}
               setIsWaitingForPluginApproval={setIsWaitingForPluginApproval}
               isPluginApproving={isPluginApproving}
-              isConfirming={isConfirming}
-              setIsConfirming={setIsConfirming}
-              isPendingConfirmation={isPendingConfirmation}
-              setIsPendingConfirmation={setIsPendingConfirmation}
               orders={orders}
             />
           </div>
