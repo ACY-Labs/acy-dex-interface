@@ -1,22 +1,12 @@
 import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
-import cx from "classnames";
 import { Spin, Radio, Button } from 'antd';
 import styled from "styled-components";
 import { createChart } from "lightweight-charts";
-import { useConstantLoader, constantInstance } from "@/constants"
 import {
-  USD_DECIMALS,
-  SWAP,
-  INCREASE,
   CHART_PERIODS,
-  getTokenInfo,
-  formatAmount,
   formatDateTime,
   usePrevious,
-  getLiquidationPrice,
-  useLocalStorageSerializeKey
 } from '@/acy-dex-futures/utils'
-import { useChartPrices } from '@/acy-dex-futures/Api'
 import './ExchangeTVChart.css';
 import axios from "axios";
 import Binance from "binance-api-node";
@@ -55,7 +45,7 @@ const client = Binance();
 const PRICE_LINE_TEXT_WIDTH = 15;
 const timezoneOffset = -new Date().getTimezoneOffset() * 60;
 const BinancePriceApi = 'https://api.acy.finance/polygon-test';
-const OptionsPriceApi = 'https://options.acy.finance';
+const OptionsPriceApi = 'https://options.acy.finance/api';
 const DEFAULT_PERIOD = "4h";
 
 const getSeriesOptions = () => ({
@@ -154,7 +144,7 @@ export default function ExchangeTVChart(props) {
   const [deltaIsMinus, setDeltaIsMinus] = useState();
   const [chartInited, setChartInited] = useState(false);
 
-  const isTick = pageName == "Option" || pageName == "Powers" || pageName == "Futures";
+  const isTick = pageName == "Powers";
 
   const symbol = chartTokenSymbol || "BTC";
   const marketName = symbol + "_USD";
@@ -197,54 +187,30 @@ export default function ExchangeTVChart(props) {
     }
 
     if (isTick) {
-      // option/future price update every minute
-      if (pageName == "Option" || pageName == "Futures") {
-        // setInterval(() => {
-        //   axios.get(`${OptionsPriceApi}/api/${pageName.toLowerCase()}?chainId=${chainId}&symbol=${chartTokenSymbol}&period=1m`)
-        //     .then((res) => {
-        //       for (let data in res.data) {
-        //         const candleData = {
-        //           time: data.timestamp,
-        //           open: data.o,
-        //           high: data.h,
-        //           low: data.l,
-        //           close: data.c,
-        //         }
-        //         currentSeries.update(candleData)
-        //         setLastCandle(candleData);
-        //       }
-        //     });
-        // }, 60000);
-      } else {
-        // subscribe to websocket for the future price update
-        const clean = client.ws.candles(pairName, period, (res) => {
-          const candleData = {
-            time: res.startTime / 1000,   // make it in seconds
-            open: res.open,
-            high: res.high,
-            low: res.low,
-            close: res.close
-          }
-          currentSeries.update(candleData)
-          setLastCandle(candleData);
+      // subscribe to websocket for the future price update
+      const clean = client.ws.candles(pairName, period, (res) => {
+        const candleData = {
+          time: res.startTime / 1000,   // make it in seconds
+          open: res.open,
+          high: res.high,
+          low: res.low,
+          close: res.close
+        }
+        currentSeries.update(candleData)
+        setLastCandle(candleData);
 
-          const ticks = currentSeries.Kn?.Bt?.Xr;
-          if (ticks && period != '1m' && period != '1w') {
-            getDeltaPriceChange(ticks)
-          }
-        });
-        cleaner.current = clean;
-      }
+        const ticks = currentSeries.Kn?.Bt?.Xr;
+        if (ticks && period != '1m' && period != '1w') {
+          getDeltaPriceChange(ticks)
+        }
+      });
+      cleaner.current = clean;
     }
 
     const fetchPrevAndSubscribe = async () => {
       // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
       // SHOULD DO THIS BEFORE SUBSCRIBE, HOWEVER MOVING SUBSCRIBE TO AFTER THIS BLOCK OF CODE WILL CAUSE THE SUBSCRIPTION GOES ON FOREVER
       // REACT BUG?
-      let fromTokenURL = `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${fromToken}USDT&interval=${period}`
-      let toTokenURL = `${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`
-      let requesetFromTokenData = axios.get(fromTokenURL)
-      let requesetToTokenData = axios.get(toTokenURL)
       let responseToTokenData;
 
       let responsePairData = [];
@@ -253,10 +219,10 @@ export default function ExchangeTVChart(props) {
         responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,)
           .then((res) => res.data);
       } else if (pageName == "Option") {
-        responseFromTokenData = await axios.get(`${OptionsPriceApi}/api/option?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
+        responseFromTokenData = await axios.get(`${OptionsPriceApi}/option?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
           .then((res) => res.data);
       } else if (pageName == "Futures") {
-        responseFromTokenData = await axios.get(`${OptionsPriceApi}/api/futures?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
+        responseFromTokenData = await axios.get(`${OptionsPriceApi}/futures?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
           .then((res) => res.data);
       } else {
         responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${fromToken}USDT&interval=${period}`,)
@@ -290,8 +256,26 @@ export default function ExchangeTVChart(props) {
       }
 
       // Binance data is independent of chain, so here we can fill in any chain name
-      console.log('joy init', `${OptionsPriceApi}/api/futures?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`, responsePairData)
       currentSeries.setData(responsePairData);
+
+      if (pageName == "Option" || pageName == "Futures") {
+        let from = responsePairData[responsePairData.length - 1].time
+        setInterval(() => {
+          axios.get(`${OptionsPriceApi}/${pageName.toLowerCase()}?chainId=${chainId}&symbol=${chartTokenSymbol}&period=1m&from=${from}`)
+            .then((res) => {
+              for (let i = 1; i < res.data.length; i++) {
+                currentSeries.update({
+                  time: res.data[i].timestamp,
+                  open: res.data[i].o,
+                  high: res.data[i].h,
+                  low: res.data[i].l,
+                  close: res.data[i].c,
+                })
+                from = res.data[i].timestamp
+              }
+            });
+        }, 60000);
+      }
 
       if (!isTick) {
         getDeltaPriceChange(responsePairData)
