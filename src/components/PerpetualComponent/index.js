@@ -63,16 +63,14 @@ import * as Api from '@/acy-dex-futures/Api';
 import WETHABI from '@/abis/WETH.json';
 
 import { Slider, Checkbox, Tooltip } from 'antd';
-import { useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { AcyRadioButton } from '@/components/AcyRadioButton';
-import { constantInstance } from '@/constants';
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
 
 import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract } from '@/constants/future.js';
+import { getTokens, getTokenBySymbol, getContract, getTokenByAddress } from '@/constants/future.js';
 
 import styled from "styled-components";
 
@@ -161,36 +159,16 @@ function getNextAveragePrice({ size, sizeDelta, hasProfit, delta, nextPrice, isL
   return nextAveragePrice;
 }
 
-function getTokenfromSymbol(tokenlist, symbol) {
-  for (let i = 0; i < tokenlist.length; i++) {
-    if (tokenlist[i].symbol === symbol) {
-      return tokenlist[i]
-    }
-  }
-  return undefined
-}
-
-// var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
-
-  const {
-    account,
-    library,
-    tokenList: INITIAL_TOKEN_LIST,
-    farmSetting: { INITIAL_ALLOWED_SLIPPAGE },
-    perpetuals
-  } = useConstantLoader(props);
-
+  const { account, library, active } = useWeb3React();
   const { chainId } = useChainId();
+  
   const tokens = getTokens(chainId)
+  console.log("test chainId perpetual component", chainId, tokens)
 
   const {
     swapOption: mode,
     setSwapOption: setMode,
-    activeToken0,
-    setActiveToken0,
-    activeToken1,
-    setActiveToken1,
 
     toTokenAddress,
     setToTokenAddress,
@@ -205,16 +183,10 @@ const SwapComponent = props => {
     isWaitingForPluginApproval,
     setIsWaitingForPluginApproval,
     isPluginApproving,
-    isConfirming,
-    setIsConfirming,
-    isPendingConfirmation,
-    setIsPendingConfirmation,
     orders,
-    minExecutionFee
   } = props;
 
   const connectWalletByLocalStorage = useConnectWallet();
-  const { active, activate } = useWeb3React();
 
   const [type, setType] = useState(MARKET);
   const [fromValue, setFromValue] = useState("");
@@ -223,7 +195,8 @@ const SwapComponent = props => {
   const [isApproving, setIsApproving] = useState(false);
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // const [isConfirming, setIsConfirming] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
   const [modalError, setModalError] = useState(false);
   const [ordersToaOpen, setOrdersToaOpen] = useState(false);
   const [isHigherSlippageAllowed, setIsHigherSlippageAllowed] = useState(false);
@@ -236,26 +209,18 @@ const SwapComponent = props => {
     allowedSlippage = DEFAULT_HIGHER_SLIPPAGE_AMOUNT;
   }
 
-  // const tokens = perpetuals.tokenList;
-  const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
+  // TODO: check if we need different tokenlist for long and short
+  // check if we even need 2 inputs, or 1 just fine? deri only have 1 to select symbol.
   const stableTokens = tokens.filter(token => token.isStable);
-  const indexTokens = whitelistedTokens.filter(token => !token.isStable && !token.isWrapped);
+  const indexTokens = tokens.filter(token => !token.isStable && !token.isWrapped);
   const shortableTokens = indexTokens.filter(token => token.isShortable);
-  let toTokens = tokens;
 
   const isLong = mode === LONG;
   const isShort = mode === SHORT;
+  let toTokens = tokens;
 
-  if (isLong) {
-    toTokens = indexTokens;
-  }
-  if (isShort) {
-    toTokens = shortableTokens;
-  }
 
   // const [fromTokenAddress, setFromTokenAddress] = useState("0x0000000000000000000000000000000000000000");
-  const initialToToken = perpetuals.getTokenBySymBol("BTC").address;
-  console.log("initialToToken: ", initialToToken, chainId)
   // const [toTokenAddress, setToTokenAddress] = useState(initialToToken);
   // const [fromTokenInfo, setFromTokenInfo] = useState();
   // const [toTokenInfo, setToTokenInfo] = useState();
@@ -264,10 +229,10 @@ const SwapComponent = props => {
   // const [isLeverageSliderEnabled, setIsLeverageSliderEnabled] = useState(true);
   // const [entryPriceLimit, setEntryPriceLimit] = useState(0);
   // const [priceValue, setPriceValue] = useState('');
-  // const [shortCollateralAddress, setShortCollateralAddress] = useState('0xf97f4df75117a78c1A5a0DBb814Af92458539FB4');
   // const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
 
-
+  // TODO: update and remove unused contracts
+  // required contracts: router (add/remove liquidity, add/remove margin), pool (trade), reader
   const tokenAddresses = tokens.map(token => token.address)
   const readerAddress = getContract(chainId, "Reader")
   const vaultAddress = getContract(chainId, "Vault")
@@ -278,13 +243,6 @@ const SwapComponent = props => {
 
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
-  })
-  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address)
-  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
-    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
-  })
-  const { data: fundingRateInfo, mutate: updateFundingRateInfo } = useSWR([chainId, readerAddress, "getFundingRates"], {
-    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
   })
   const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([chainId, vaultAddress, "totalTokenWeights"], {
     fetcher: fetcher(library, Vault),
@@ -300,10 +258,8 @@ const SwapComponent = props => {
   useEffect(() => {
     if (active) {
       function onBlock() {
-        updateVaultTokenInfo()
         updateTokenBalances()
         // updatePositionData(undefined, true)
-        updateFundingRateInfo()
         updateTotalTokenWeights()
         updateUsdgSupply()
         updateOrderBookApproved()
@@ -314,7 +270,7 @@ const SwapComponent = props => {
       }
     }
   }, [active, library, chainId,
-    updateVaultTokenInfo, updateTokenBalances, updateFundingRateInfo, updateTotalTokenWeights, updateUsdgSupply,
+    updateTokenBalances, updateTotalTokenWeights, updateUsdgSupply,
     updateOrderBookApproved])
 
   const tokenAllowanceAddress = fromTokenAddress === AddressZero ? nativeTokenAddress : fromTokenAddress;
@@ -359,10 +315,11 @@ const SwapComponent = props => {
 
   const [shortCollateralAddress, setShortCollateralAddress] = useState(fromTokenAddress);
 
-  const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
+  // const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo)
+  const infoTokens = {}
   console.log("test multichain: tokens", infoTokens, tokens)
-  const fromToken = getTokens(chainId, fromTokenAddress);
-  const toToken = getTokens(chainId, toTokenAddress);
+  let fromToken = getTokenByAddress(chainId, fromTokenAddress);
+  let toToken = getTokenByAddress(chainId, toTokenAddress);
 
   const shortCollateralToken = getTokenInfo(infoTokens, shortCollateralAddress);
   const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
@@ -387,15 +344,13 @@ const SwapComponent = props => {
   const prevNeedApproval = usePrevious(needApproval);
   const prevToTokenAddress = usePrevious(toTokenAddress);
 
+  // TODO: not sure what does these 2 mean?
   const fromUsdMin = getUsd(fromAmount, fromTokenAddress, false, infoTokens);
   const toUsdMax = getUsd(toAmount, toTokenAddress, true, infoTokens, type, triggerPriceUsd);
 
   const indexTokenAddress = toTokenAddress === AddressZero ? nativeTokenAddress : toTokenAddress;
-  // const collateralTokenAddress = isLong
-  //   ? indexTokenAddress
-  //   : shortCollateralAddress;
   const collateralTokenAddress = shortCollateralAddress;
-  const collateralToken = perpetuals.getToken(collateralTokenAddress);
+  const collateralToken = getTokenByAddress(chainId, collateralTokenAddress);
 
   const [triggerRatioValue, setTriggerRatioValue] = useState("");
   const triggerRatioInverted = useMemo(() => {
@@ -507,189 +462,192 @@ const SwapComponent = props => {
     }
   }, [active, library, updateTokenAllowance]);
 
-  useEffect(() => {
-    if (mode !== SHORT) {
-      return;
-    }
-    if (toTokenAddress === prevToTokenAddress) {
-      return;
-    }
-    for (let i = 0; i < stableTokens.length; i++) {
-      const stableToken = stableTokens[i];
-      const key = getPositionKey(
-        stableToken.address,
-        toTokenAddress,
-        false,
-        nativeTokenAddress
-      );
-      const position = positionsMap[key];
-      if (position && position.size && position.size.gt(0)) {
-        setShortCollateralAddress(position.collateralToken.address);
-        return;
-      }
-    }
-  }, [
-    toTokenAddress,
-    prevToTokenAddress,
-    mode,
-    positionsMap,
-    stableTokens,
-    nativeTokenAddress,
-    shortCollateralAddress,
-    setShortCollateralAddress
-  ]);
+  // WE NO LONGER USES COLLATERAL TOKEN CONCEPT
+  // useEffect(() => {
+  //   if (mode !== SHORT) {
+  //     return;
+  //   }
+  //   if (toTokenAddress === prevToTokenAddress) {
+  //     return;
+  //   }
+  //   for (let i = 0; i < stableTokens.length; i++) {
+  //     const stableToken = stableTokens[i];
+  //     const key = getPositionKey(
+  //       stableToken.address,
+  //       toTokenAddress,
+  //       false,
+  //       nativeTokenAddress
+  //     );
+  //     const position = positionsMap[key];
+  //     if (position && position.size && position.size.gt(0)) {
+  //       setShortCollateralAddress(position.collateralToken.address);
+  //       return;
+  //     }
+  //   }
+  // }, [
+  //   toTokenAddress,
+  //   prevToTokenAddress,
+  //   mode,
+  //   positionsMap,
+  //   stableTokens,
+  //   nativeTokenAddress,
+  //   shortCollateralAddress,
+  //   setShortCollateralAddress
+  // ]);
 
-  useEffect(() => {
-    const updateLeverageAmounts = () => {
-      if (!hasLeverageOption) {
-        return;
-      }
-      if (anchorOnFromAmount) {
-        if (!fromAmount) {
-          setToValue("");
-          return;
-        }
+  // TODO: revise this section. Basically it check if FromInput is active, it calculate the value for ToInput, and vice versa
+  // useEffect(() => {
+  //   const updateLeverageAmounts = () => {
+  //     if (!hasLeverageOption) {
+  //       return;
+  //     }
+  //     if (anchorOnFromAmount) {
+  //       if (!fromAmount) {
+  //         setToValue("");
+  //         return;
+  //       }
 
-        const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
-        if (
-          toTokenInfo &&
-          toTokenInfo.maxPrice &&
-          fromUsdMin &&
-          fromUsdMin.gt(0)
-        ) {
-          const leverageMultiplier = parseInt(
-            leverageOption * BASIS_POINTS_DIVISOR
-          );
-          const toTokenPriceUsd =
-            type !== MARKET && triggerPriceUsd && triggerPriceUsd.gt(0)
-              ? triggerPriceUsd
-              : toTokenInfo.maxPrice;
+  //       const toTokenInfo = getTokenInfo(infoTokens, toTokenAddress);
+  //       if (
+  //         toTokenInfo &&
+  //         toTokenInfo.maxPrice &&
+  //         fromUsdMin &&
+  //         fromUsdMin.gt(0)
+  //       ) {
+  //         const leverageMultiplier = parseInt(
+  //           leverageOption * BASIS_POINTS_DIVISOR
+  //         );
+  //         const toTokenPriceUsd =
+  //           type !== MARKET && triggerPriceUsd && triggerPriceUsd.gt(0)
+  //             ? triggerPriceUsd
+  //             : toTokenInfo.maxPrice;
 
-          const { feeBasisPoints } = getNextToAmount(
-            chainId,
-            fromAmount,
-            fromTokenAddress,
-            collateralTokenAddress,
-            infoTokens,
-            undefined,
-            undefined,
-            usdgSupply,
-            totalTokenWeights
-          );
+  //         const { feeBasisPoints } = getNextToAmount(
+  //           chainId,
+  //           fromAmount,
+  //           fromTokenAddress,
+  //           collateralTokenAddress,
+  //           infoTokens,
+  //           undefined,
+  //           undefined,
+  //           usdgSupply,
+  //           totalTokenWeights
+  //         );
 
-          let fromUsdMinAfterFee = fromUsdMin;
-          if (feeBasisPoints) {
-            fromUsdMinAfterFee = fromUsdMin
-              .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
-              .div(BASIS_POINTS_DIVISOR);
-          }
+  //         let fromUsdMinAfterFee = fromUsdMin;
+  //         if (feeBasisPoints) {
+  //           fromUsdMinAfterFee = fromUsdMin
+  //             .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+  //             .div(BASIS_POINTS_DIVISOR);
+  //         }
 
-          const toNumerator = fromUsdMinAfterFee.mul(leverageMultiplier).mul(BASIS_POINTS_DIVISOR)
-          const toDenominator = bigNumberify(MARGIN_FEE_BASIS_POINTS).mul(leverageMultiplier).add(bigNumberify(BASIS_POINTS_DIVISOR).mul(BASIS_POINTS_DIVISOR))
+  //         const toNumerator = fromUsdMinAfterFee.mul(leverageMultiplier).mul(BASIS_POINTS_DIVISOR)
+  //         const toDenominator = bigNumberify(MARGIN_FEE_BASIS_POINTS).mul(leverageMultiplier).add(bigNumberify(BASIS_POINTS_DIVISOR).mul(BASIS_POINTS_DIVISOR))
 
-          const nextToUsd = toNumerator.div(toDenominator)
+  //         const nextToUsd = toNumerator.div(toDenominator)
 
-          const nextToAmount = nextToUsd
-            .mul(expandDecimals(1, toToken.decimals))
-            .div(toTokenPriceUsd);
+  //         const nextToAmount = nextToUsd
+  //           .mul(expandDecimals(1, toToken.decimals))
+  //           .div(toTokenPriceUsd);
 
-          const nextToValue = formatAmountFree(
-            nextToAmount,
-            toToken.decimals,
-            toToken.decimals
-          );
+  //         const nextToValue = formatAmountFree(
+  //           nextToAmount,
+  //           toToken.decimals,
+  //           toToken.decimals
+  //         );
 
-          setToValue(nextToValue);
-        }
-        return;
-      }
+  //         setToValue(nextToValue);
+  //       }
+  //       return;
+  //     }
 
-      if (!toAmount) {
-        setFromValue("");
-        return;
-      }
+  //     if (!toAmount) {
+  //       setFromValue("");
+  //       return;
+  //     }
 
-      const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
-      if (
-        fromTokenInfo &&
-        fromTokenInfo.minPrice &&
-        toUsdMax &&
-        toUsdMax.gt(0)
-      ) {
-        const leverageMultiplier = parseInt(
-          leverageOption * BASIS_POINTS_DIVISOR
-        );
+  //     const fromTokenInfo = getTokenInfo(infoTokens, fromTokenAddress);
+  //     if (
+  //       fromTokenInfo &&
+  //       fromTokenInfo.minPrice &&
+  //       toUsdMax &&
+  //       toUsdMax.gt(0)
+  //     ) {
+  //       const leverageMultiplier = parseInt(
+  //         leverageOption * BASIS_POINTS_DIVISOR
+  //       );
 
-        const baseFromAmountUsd = toUsdMax
-          .mul(BASIS_POINTS_DIVISOR)
-          .div(leverageMultiplier);
+  //       const baseFromAmountUsd = toUsdMax
+  //         .mul(BASIS_POINTS_DIVISOR)
+  //         .div(leverageMultiplier);
 
-        let fees = toUsdMax
-          .mul(MARGIN_FEE_BASIS_POINTS)
-          .div(BASIS_POINTS_DIVISOR);
+  //       let fees = toUsdMax
+  //         .mul(MARGIN_FEE_BASIS_POINTS)
+  //         .div(BASIS_POINTS_DIVISOR);
 
-        const { feeBasisPoints } = getNextToAmount(
-          chainId,
-          fromAmount,
-          fromTokenAddress,
-          collateralTokenAddress,
-          infoTokens,
-          undefined,
-          undefined,
-          usdgSupply,
-          totalTokenWeights
-        );
+  //       const { feeBasisPoints } = getNextToAmount(
+  //         chainId,
+  //         fromAmount,
+  //         fromTokenAddress,
+  //         collateralTokenAddress,
+  //         infoTokens,
+  //         undefined,
+  //         undefined,
+  //         usdgSupply,
+  //         totalTokenWeights
+  //       );
 
-        if (feeBasisPoints) {
-          const swapFees = baseFromAmountUsd
-            .mul(feeBasisPoints)
-            .div(BASIS_POINTS_DIVISOR);
-          fees = fees.add(swapFees);
-        }
+  //       if (feeBasisPoints) {
+  //         const swapFees = baseFromAmountUsd
+  //           .mul(feeBasisPoints)
+  //           .div(BASIS_POINTS_DIVISOR);
+  //         fees = fees.add(swapFees);
+  //       }
 
-        const nextFromUsd = baseFromAmountUsd.add(fees);
+  //       const nextFromUsd = baseFromAmountUsd.add(fees);
 
-        const nextFromAmount = nextFromUsd
-          .mul(expandDecimals(1, fromToken.decimals))
-          .div(fromTokenInfo.minPrice);
+  //       const nextFromAmount = nextFromUsd
+  //         .mul(expandDecimals(1, fromToken.decimals))
+  //         .div(fromTokenInfo.minPrice);
 
-        const nextFromValue = formatAmountFree(
-          nextFromAmount,
-          fromToken.decimals,
-          fromToken.decimals
-        );
+  //       const nextFromValue = formatAmountFree(
+  //         nextFromAmount,
+  //         fromToken.decimals,
+  //         fromToken.decimals
+  //       );
 
-        setFromValue(nextFromValue);
-      }
-    };
+  //       setFromValue(nextFromValue);
+  //     }
+  //   };
 
-    if (isLong || isShort) {
-      updateLeverageAmounts();
-    }
-  }, [
-    mode,
-    type,
-    anchorOnFromAmount,
-    fromAmount,
-    toAmount,
-    fromToken,
-    toToken,
-    fromTokenAddress,
-    toTokenAddress,
-    infoTokens,
-    leverageOption,
-    fromUsdMin,
-    toUsdMax,
-    triggerPriceUsd,
-    triggerRatio,
-    hasLeverageOption,
-    usdgSupply,
-    totalTokenWeights,
-    chainId,
-    collateralTokenAddress,
-    indexTokenAddress
-  ]);
+  //   if (isLong || isShort) {
+  //     updateLeverageAmounts();
+  //   }
+  // }, [
+  //   mode,
+  //   type,
+  //   anchorOnFromAmount,
+  //   fromAmount,
+  //   toAmount,
+  //   fromToken,
+  //   toToken,
+  //   fromTokenAddress,
+  //   toTokenAddress,
+  //   infoTokens,
+  //   leverageOption,
+  //   fromUsdMin,
+  //   toUsdMax,
+  //   triggerPriceUsd,
+  //   triggerRatio,
+  //   hasLeverageOption,
+  //   usdgSupply,
+  //   totalTokenWeights,
+  //   chainId,
+  //   collateralTokenAddress,
+  //   indexTokenAddress
+  // ]);
 
+  // TODO: revise entry price
   let entryMarkPrice;
   let exitMarkPrice;
   if (toTokenInfo) {
@@ -781,6 +739,7 @@ const SwapComponent = props => {
     ? liquidationPrice
     : existingLiquidationPrice;
 
+  // TODO: below calculates the current leverage factor given existing position using GMX method, we need to change it to adapt deri style
   if (hasExistingPosition) {
     const collateralDelta = fromUsdMin ? fromUsdMin : bigNumberify(0);
     const sizeDelta = toUsdMax ? toUsdMax : bigNumberify(0);
@@ -801,42 +760,32 @@ const SwapComponent = props => {
     leverage = bigNumberify(parseInt(leverageOption * BASIS_POINTS_DIVISOR));
   }
 
+  // UI
   const selectFromToken = symbol => {
-    const token = getTokenfromSymbol(tokens, symbol)
+    const token = getTokenBySymbol(chainId, symbol)
     setFromTokenAddress(mode, token.address);
     console.log("update from token: ", symbol, token, mode);
-    setActiveToken0((tokens.filter(ele => ele.symbol === symbol))[0]);
     setIsWaitingForApproval(false);
-    if (isShort) {
-      console.log("is short and changed short collateral token to ", token.address)
-      setShortCollateralAddress(token.address);
-    }
   };
 
-  const getToUsdAmount = () => {
-
-  }
+  const selectToToken = symbol => {
+    const token = getTokenBySymbol(chainId, symbol)
+    console.log("selectToToken symbol and address", symbol, token.address)
+    setToTokenAddress(mode, token.address);
+  };
 
   useEffect(() => {
     console.log("update from token 1: ", fromTokenAddress)
   }, [fromTokenAddress])
 
+  // TODO: is this redundant? seems doing things in selectFromToken()
   useEffect(() => {
-    const fromToken = getTokenfromSymbol(tokens, activeToken0.symbol)
-    const toToken = getTokenfromSymbol(tokens, activeToken1.symbol)
+    fromToken = getTokenByAddress(chainId,fromTokenAddress)
+    toToken = getTokenByAddress(chainId,toTokenAddress)
+    setFromTokenAddress(mode, fromTokenAddress);
+    setToTokenAddress(mode, toTokenAddress);
 
-    setFromTokenAddress(mode, fromToken.address);
-    setToTokenAddress(mode, toToken.address);
-
-  }, [activeToken0, activeToken1])
-
-  console.log("show this")
-  const selectToToken = symbol => {
-    const token = getTokenfromSymbol(tokens, symbol)
-    console.log("selectToToken symbol and address", symbol, token.address)
-    setToTokenAddress(mode, token.address);
-    setActiveToken1((tokens.filter(ele => ele.symbol === symbol))[0]);
-  };
+  }, [chainId, fromTokenAddress, toTokenAddress])
 
   const onFromValueChange = e => {
     setAnchorOnFromAmount(true);
@@ -848,6 +797,7 @@ const SwapComponent = props => {
     setToValue(e.target.value);
   };
 
+  // TODO: revise this logic, adapt to deri contract
   const createIncreaseOrder = () => {
     console.log("inside createIncreaseOrder")
     let path = [fromTokenAddress];
@@ -862,7 +812,7 @@ const SwapComponent = props => {
     }
 
     const minOut = 0;
-    const indexToken = perpetuals.getToken(indexTokenAddress);
+    const indexToken = getTokenByAddress(chainId, indexTokenAddress);
     const successMsg = `
       Created limit order for ${indexToken.symbol} ${isLong ? "Long" : "Short"}: ${formatAmount(toUsdMax, USD_DECIMALS, 2)} USD!`;
     return Api.createIncreaseOrder(
@@ -895,6 +845,7 @@ const SwapComponent = props => {
   };
 
   // refers to gmx 9c6b4a8 commit
+  // TODO: revise this logic, adapt to deri contract
   const increasePosition = async () => {
     console.log("try to increasePosition");
     setIsSubmitting(true);
@@ -1365,7 +1316,7 @@ const SwapComponent = props => {
       return;
     }
 
-    // TODO terms and condition pop up, we dont have it now
+    // TODO: terms and condition pop up, we dont have it now
     if (needOrderBookApproval) {
       setOrdersToaOpen(true);
       // return;
@@ -1384,7 +1335,11 @@ const SwapComponent = props => {
       }
     }
 
-    setIsConfirming(true);
+    // TODO: temporarily disabled the useless confirmation box. 
+    // It is very useful in GMX, containing a lot of info. But we are not clear if we have sufficient data to display at current stage.
+    // this will be in the next release.
+    // setIsConfirming(true);
+    onConfirmationClick();
   };
 
   let hasZeroBorrowFee = false;
@@ -1402,32 +1357,7 @@ const SwapComponent = props => {
   let feeBps;
   let swapFees;
   let positionFee;
-  if (mode === SWAP) {
-    if (fromAmount) {
-      const { feeBasisPoints } = getNextToAmount(
-        chainId,
-        fromAmount,
-        fromTokenAddress,
-        toTokenAddress,
-        infoTokens,
-        undefined,
-        undefined,
-        usdgSupply,
-        totalTokenWeights
-      );
-      if (feeBasisPoints !== undefined) {
-        fees = fromAmount.mul(feeBasisPoints).div(BASIS_POINTS_DIVISOR);
-        const feeTokenPrice =
-          fromTokenInfo.address === USDG_ADDRESS
-            ? expandDecimals(1, USD_DECIMALS)
-            : fromTokenInfo.maxPrice;
-        feesUsd = fees
-          .mul(feeTokenPrice)
-          .div(expandDecimals(1, fromTokenInfo.decimals));
-      }
-      feeBps = feeBasisPoints;
-    }
-  } else if (toUsdMax) {
+  if (toUsdMax) {
     positionFee = toUsdMax
       .mul(MARGIN_FEE_BASIS_POINTS)
       .div(BASIS_POINTS_DIVISOR);
@@ -1471,7 +1401,7 @@ const SwapComponent = props => {
           />
         </div>
 
-        {mode !== POOL &&
+        {mode !== POOL ?
           <>
             <div className={styles.typeSelector}>
               <PerpetualTabs
@@ -1613,6 +1543,7 @@ const SwapComponent = props => {
               {/* </AcyButton> */}
             </div>
           </>
+          : <AcyPoolComponent />
         }
 
         {/* Long/Short Detail card  */}
@@ -1620,7 +1551,7 @@ const SwapComponent = props => {
           <>
             <AcyPerpetualCard style={{ backgroundColor: 'transparent', padding: '10px', border: 'none', marginTop: '50px' }}>
 
-              {/* Profits In */}
+              {/*  *Profits In // TODO: how do user withdraw profit from platform? gmx: decided before trade. deri: calculate usd value
               {isLong && (
                 <div className={styles.detailCard}>
                   <div className={styles.label}>Profits In</div>
@@ -1634,7 +1565,7 @@ const SwapComponent = props => {
                     <span>{shortCollateralToken.symbol}</span>
                   </div>
                 </div>
-              )}
+              )}/}
 
               {/* Leverage */}
               <div className={styles.detailCard}>
@@ -1860,13 +1791,9 @@ const SwapComponent = props => {
           </>
         }
 
-        {mode === POOL &&
-          <AcyPoolComponent />
-        }
-
       </AcyPerpetualCard>
 
-      {isConfirming && (
+      {/* {isConfirming && (
         <ConfirmationBox
           fromToken={fromToken}
           fromTokenInfo={fromTokenInfo}
@@ -1903,7 +1830,7 @@ const SwapComponent = props => {
           chainId={chainId}
           orders={orders}
         />
-      )}
+      )} */}
 
     </div>
   );

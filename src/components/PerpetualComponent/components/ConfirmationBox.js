@@ -19,10 +19,9 @@ import {
   getExchangeRateDisplay,
   DEFAULT_SLIPPAGE_AMOUNT,
   SLIPPAGE_BPS_KEY,
-  formatDateTime,
   calculatePositionDelta,
 } from '../constant/index';
-import { useConstantLoader } from '@/constants';
+import { formatDateTime } from "@/acy-dex-futures/utils";
 import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
 import Checkbox from '../Checkbox/Checkbox';

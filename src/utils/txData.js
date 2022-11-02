@@ -12,7 +12,7 @@ import { useConstantLoader, TOKENLIST, METHOD_LIST, ACTION_LIST, RPC_URL, API_UR
 import { constantInstance } from '@/constants';
 import { FEE_PERCENT } from '@/pages/Market/Util';
 
-var Web3 = require('web3');
+import Web3 from 'web3';
 const FlashArbitrageResultLogs_ABI = ACYV1ROUTER02_ABI[1];
 // TODO :: translate to USD
 

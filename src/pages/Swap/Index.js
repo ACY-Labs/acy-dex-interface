@@ -13,7 +13,7 @@ import { useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import useSWR from 'swr';
 import { TxFetcher } from '@/utils/utils';
-import SankeyGraph from './components/SankeyGraph';
+// import SankeyGraph from './components/SankeyGraph';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { TradeHistoryTable, PoolsActivityTable } from './components/TableComponent.js';
 import { useChainId } from '@/utils/helpers';
@@ -233,7 +233,8 @@ const Swap = props => {
 
               <div style={{ borderTop: '0.75px solid #333333' }}>
                 {graphType == "Routes" ?
-                  <SankeyGraph />
+                  // <SankeyGraph />
+                  <></>
                   :
                   <div>
                     <ExchangeTVChart

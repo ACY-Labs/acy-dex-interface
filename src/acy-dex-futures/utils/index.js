@@ -583,6 +583,12 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
     const fundingRatePropsLength = 2
     const infoTokens = {}
 
+    // token = {
+    //   address,
+    //   balance,
+    //   minPrice,
+    //   maxPrice
+    // }
     for (let i = 0; i < tokens.length; i++) {
       const token = JSON.parse(JSON.stringify(tokens[i]))
       tokens[i].address = tokens[i].address.toLowerCase()
@@ -596,6 +602,7 @@ export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTok
         }
         infoTokens[token.address.toLowerCase()] = token
     }
+    
     for (let i = 0; i < whitelistedTokens.length; i++) {
         const token = JSON.parse(JSON.stringify(whitelistedTokens[i]))
 

@@ -263,7 +263,6 @@ const  BasicLayout =props=> {
 
 export default connect(({ global, setting, menu }) => ({
   collapsed: global.collapsed,
-  account:global.account,
   layout: setting.layout,
   menuData: menu.menuData,
   breadcrumbNameMap: menu.breadcrumbNameMap,
