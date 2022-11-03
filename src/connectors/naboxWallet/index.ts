@@ -1,6 +1,5 @@
 import { AbstractConnectorArguments, ConnectorUpdate } from '@web3-react/types'
 import { AbstractConnector } from '@web3-react/abstract-connector'
-import warning from 'tiny-warning'
 
 import { SendReturnResult, SendReturn, Send, SendOld } from './types'
 
@@ -95,7 +94,7 @@ export class NaboxConnector extends AbstractConnector {
             if ((error as any).code === 4001) {
                 throw new UserRejectedRequestError()
             }
-            warning(false, 'eth_requestAccounts was unsuccessful, falling back to enable')
+            console.warn('eth_requestAccounts was unsuccessful, falling back to enable')
         }
 
 

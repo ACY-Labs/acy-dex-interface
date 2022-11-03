@@ -4,8 +4,8 @@ import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 import { FortmaticConnector } from '@web3-react/fortmatic-connector';
 import { PortisConnector } from '@web3-react/portis-connector';
 import { TorusConnector } from '@web3-react/torus-connector';
-import { LedgerConnector } from '@web3-react/ledger-connector';
-import { TrezorConnector } from '@web3-react/trezor-connector';
+// import { LedgerConnector } from '@web3-react/ledger-connector';
+// import { TrezorConnector } from '@web3-react/trezor-connector';
 import { BscConnector } from '@binance-chain/bsc-connector';
 
 import { FortmaticConnector_test} from './fortmaticToBinance'
@@ -81,15 +81,17 @@ const binance = new BscConnector({
 
 
 // 硬件钱包
-const ledger = new LedgerConnector({
-  chainId: 4,
-  url: RPC_URLS[4],
-  pollingInterval: POLLING_INTERVAL,
-});
+// const ledger = new LedgerConnector({
+//   chainId: 4,
+//   url: RPC_URLS[4],
+//   pollingInterval: POLLING_INTERVAL,
+// });
 
-const trezor = new TrezorConnector({
-  chainId: 4,
-  url: RPC_URLS[4],
-});
+// const trezor = new TrezorConnector({
+//   chainId: 4,
+//   url: RPC_URLS[4],
+// });
+const ledger = null;
+const trezor = null;
 
 export { injected, walletconnect, walletlink, fortmatic, portis, torus, ledger, trezor, binance, nabox };

@@ -85,6 +85,11 @@
           "type": "address"
         },
         {
+          "internalType":"string",
+          "name":"symbolName",
+          "type":"string"
+        },
+        {
           "internalType": "uint256",
           "name": "amount",
           "type": "uint256"

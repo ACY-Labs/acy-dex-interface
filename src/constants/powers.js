@@ -134,7 +134,7 @@ const tokenLists = {
         {
             name: "Wrapped Bitcoin",
             symbol: "BTC",
-            decimals: 8,
+            decimals: 18,
             address: "0x3c9851dBf202C8917F4d20a3666426d56de0E53b",
             logoURI: 'https://cryptologos.cc/logos/bitcoin-btc-logo.svg?v=014',
             isShortable: true

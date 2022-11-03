@@ -68,7 +68,6 @@ const WalletLogin = props => {
 
     useEffect(() => {
         if (active) {
-            console.log("hjhjhj currently active")
             history.push('/overview')
         }
     }, [active])
@@ -344,12 +343,17 @@ const WalletLogin = props => {
             ...values,
             autoLogin: state.autoLogin,
         });
+        if (values.username == 'admin' && values.password == '888888') {
+            console.log("overview is logged in")
+            history.push('/overview')
+        }
         if (state.type === 'tab1') {
             setState(
                 {
                     notice: '',
                 },
                 () => {
+                    
                     if (!err && (values.username !== 'admin' || values.password !== '888888')) {
                         setTimeout(() => {
                             setState({

@@ -18,11 +18,11 @@ import {
   CHART_PERIODS,
   getTokenInfo,
   formatAmount,
-  formatDateTime,
   usePrevious,
   getLiquidationPrice,
   useLocalStorageSerializeKey
 } from '@/acy-dex-futures/utils'
+import { formatDateTime } from "@/acy-dex-futures/utils";
 import { useChartPrices } from '@/acy-dex-futures/Api'
 
 import './ExchangeTVChart.css';
@@ -306,7 +306,7 @@ export default function ExchangeTVChart(props) {
       // HOW TO GET CHART DATA
       const ticks = currentSeries.Kn?.Bt?.Xr;
       //St: open high low close; rt[So]: time
-      console.log("chartData: ", ticks);
+      // console.log("chartData: ", ticks);
       const oldestTick = ticks[0];
       const latestTick = ticks[ticks.length - 1];
       if (oldestTick) {

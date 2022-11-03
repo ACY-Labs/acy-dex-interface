@@ -43,31 +43,21 @@ import {
 
 import { approvePlugin } from '@/acy-dex-futures/Api'
 import Media from 'react-media';
-import { uniqueFun } from '@/utils/utils';
 import { getTransactionsByAccount, appendNewSwapTx, findTokenWithSymbol, findTokenWithAddress } from '@/utils/txData';
-import { getTokenContract } from '@/acy-dex-swap/utils/index';
 import { getConstant } from '@/acy-dex-futures/utils/Constants'
 import PerpetualComponent from '@/components/PerpetualComponent';
 import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { GlpSwapTokenTable } from '@/components/PerpetualComponent/components/GlpSwapBox'
 import TokenWeightChart from './components/TokenWeightChart'
-// import Kchart from './components/Kchart';
-import KChart from './components/KChart';
-// import ExchangeTVChart from './components/ExchangeTVChart';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
-import axios from 'axios';
-import moment from 'moment';
 import styles from './styles.less';
 import { columnsPool } from '../Dao/Util.js';
 import styled from "styled-components";
-import { constantInstance, useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import PositionsTable from './components/PositionsTable';
 import ActionHistoryTable from './components/ActionHistoryTable';
 import OrderTable from './components/OrderTable'
-import VoteCard from './components/VoteCard'
-import glp40Icon from '@/pages/BuyGlp/components/ic_glp_40.svg'
 
 /// THIS SECTION IS FOR TESTING SWR AND GMX CONTRACT
 import { fetcher } from '@/acy-dex-futures/utils';
@@ -86,7 +76,6 @@ import RewardReader from '@/acy-dex-futures/abis/RewardReader.json'
 // import ReaderV2 from '@/acy-dex-futures/abis/ReaderV2.json'
 import { ethers } from 'ethers'
 import useSWR from 'swr'
-import { from, HeuristicFragmentMatcher } from 'apollo-boost';
 
 import { useAlpPriceData, useAlpData, useFeesData } from '@/pages/Stats/Perpetual/dataProvider';
 import ChartWrapper from '@/pages/Stats/Perpetual/components/ChartWrapper';
@@ -120,18 +109,15 @@ import {
 } from '@/pages/Stats/Perpetual/test'
 
 import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract } from '@/constants/future.js';
-// import { getTokens } from '@/constants/future.js';
+import { getTokens, getContract, getTokenBySymbol, getTokenByAddress } from '@/constants/future.js';
 import { leftPad } from 'web3-utils';
 
 let indexToken = []
 let indexTokens = []
 const { AddressZero } = ethers.constants
-// ----------
 const { AcyTabPane } = AcyTabs;
-// const { TabPane } = Tabs;
 
-
+// ----------------- fetch data --------------------
 function getFundingFee(data) {
   let { entryFundingRate, cumulativeFundingRate, size } = data
   if (entryFundingRate && cumulativeFundingRate) {
@@ -193,7 +179,6 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
   // 
   if (!positionData) {
     // if (true) { 
-    console.log("hjhjhj multchain error if positions", positions)
 
     return { positions, positionsMap }
   }
@@ -205,7 +190,6 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
     indexToken = getTokenInfo(infoTokens, indexTokens[i], true, nativeTokenAddress)
     indexToken.logoURI = findTokenWithAddress(indexToken.address).logoURI;
     const key = getPositionKey(collateralTokens[i], indexTokens[i], isLong[i])
-    console.log("hjhjhj multchain error positions", positionData, propsLength, i, positionData[i * propsLength + 6])
 
     const position = {
       key,
@@ -269,46 +253,63 @@ export function getPositions(chainId, positionQuery, positionData, infoTokens, i
     }
     position.liqPrice = getLiquidationPrice(position)
   }
-  console.log("hjhjhj multchain error 0 positions", positions)
 
   return { positions, positionsMap }
-}
-
-function getTokenBySymbol(tokenlist, symbol) {
-  for (let i = 0; i < tokenlist.length; i++) {
-    if (tokenlist[i].symbol === symbol) {
-      return tokenlist[i]
-    }
-  }
-  return undefined
 }
 
 
 const Swap = props => {
   const { savedIsPnlInLeverage, setSavedIsPnlInLeverage, savedSlippageAmount, pendingTxns, setPendingTxns } = props
-
-  const { account, library, farmSetting: { API_URL: apiUrlPrefix }, globalSettings, } = useConstantLoader();
+  const { account, library, active } = useWeb3React();
   let { chainId } = useChainId();
-  // let chainId = chainId2;
-  // useEffect(() => {
-  //   // console.log("hjhjhj multchain  chainId2 ", chainId2)
-  // }, [chainId2]);
-  if (chainId == undefined || chainId != 97 && chainId != 80001) {
-    console.log("hjhjhj multchain perp chainId undefined", useChainId())
-    // chainId = 80001;
-  }
   const tokensperp = getTokens(chainId);
-  console.log("hjhjhj multchain perp chainid", chainId)
+  console.log("test chainId perpetual page", chainId, tokensperp)
 
-  const supportedTokens = constantInstance.perpetuals.tokenList;
+  const supportedTokens = tokensperp;
 
-  const [isConfirming, setIsConfirming] = useState(false);
-  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
-  // const [pastToken1, setPastToken1] = useState('ETH');
-  // const [pastToken0, setPastToken0] = useState('USDC');
-  const [isReceiptObtained, setIsReceiptObtained] = useState(false);
-  const [activeToken1, setActiveToken1] = useState(supportedTokens[1]);
-  const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
+  //// ui tab
+  const defaultTokenSelection = useMemo(() => ({
+    ["Pool"]: {
+      from: AddressZero,
+      to: getTokenBySymbol(chainId, "USDC").address,
+    },
+    ["Long"]: {
+      from: AddressZero,
+      to: AddressZero,
+    },
+    ["Short"]: {
+      from: getTokenBySymbol(chainId, "USDC").address,
+      to: AddressZero,
+    }
+  }), [chainId])
+  
+  const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
+  const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
+  
+  //// prepare tokenlist and from/to token given chainId
+  const tokens = getTokens(chainId)
+
+  const [fromToken,setFromToken] = useState(tokens[0])
+  const [toToken,setToToken] = useState(tokens[1])
+
+  const setFromTokenAddress = useCallback((selectedSwapOption, address) => {
+    const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
+    newTokenSelection[selectedSwapOption].from = address
+    setTokenSelection(newTokenSelection)
+    setFromToken(getTokenByAddress(chainId,address))
+  }, [tokenSelection, setTokenSelection])
+
+  const setToTokenAddress = useCallback((selectedSwapOption, address) => {
+    const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
+    newTokenSelection[selectedSwapOption].to = address
+    setTokenSelection(newTokenSelection)
+    setToToken(getTokenByAddress(chainId,address))
+  }, [tokenSelection, setTokenSelection])
+
+  const fromTokenAddress = tokenSelection[swapOption].from.toLowerCase()
+  const toTokenAddress = tokenSelection[swapOption].to.toLowerCase()
+
+  //// ui
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [transactionList, setTransactionList] = useState([]);
@@ -317,51 +318,15 @@ const Swap = props => {
   // this are new states for PERPETUAL
   const [tableContent, setTableContent] = useState(POSITIONS);
   const [positionsData, setPositionsData] = useState([]);
-  const { active, activate } = useWeb3React();
 
-  // const tokens = supportedTokens;
-  // const tokens = getTokens(chainId) == undefined ? supportedTokens : tokensperp;
-  const tokens = getTokens(chainId)
-  console.log("hjhjhj multchain tokens compare supportedTokens", supportedTokens, "multchaintokens:", tokensperp)
-  // console.log("hjhjhj multchain tokens which?", tokens)
-  // console.log("hjhjhj multchain ARBITRUM_DEFAULT_COLLATERAL_SYMBOL", ARBITRUM_DEFAULT_COLLATERAL_SYMBOL, tokens[0].symbol)
-
-  const defaultTokenSelection = useMemo(() => ({
-    ["Pool"]: {
-      from: AddressZero,
-      to: getTokenBySymbol(tokens, "USDC").address,
-    },
-    ["Long"]: {
-      from: AddressZero,
-      to: AddressZero,
-    },
-    ["Short"]: {
-      from: getTokenBySymbol(tokens, "USDC").address,
-      to: AddressZero,
-    }
-  }), [chainId])
+  
 
 
-  const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
-  const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
 
-  const setFromTokenAddress = useCallback((selectedSwapOption, address) => {
-    console.log("hjhjhj multchain tokenselection", tokenSelection)
-    const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
-    newTokenSelection[selectedSwapOption].from = address
-    setTokenSelection(newTokenSelection)
-  }, [tokenSelection, setTokenSelection])
-
-  const setToTokenAddress = useCallback((selectedSwapOption, address) => {
-    const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
-    newTokenSelection[selectedSwapOption].to = address
-    setTokenSelection(newTokenSelection)
-  }, [tokenSelection, setTokenSelection])
-
-  const fromTokenAddress = tokenSelection[swapOption].from.toLowerCase()
-  const toTokenAddress = tokenSelection[swapOption].to.toLowerCase()
-
-  const { perpetuals } = useConstantLoader()
+  
+  /// get contract addresses
+  // TODO: update and remove unused contracts
+  // required contracts: router (add/remove liquidity, add/remove margin), pool (trade), reader
   const readerAddress = getContract(chainId, "Reader")
   const vaultAddress = getContract(chainId, "Vault")
   const usdgAddress = getContract(chainId, "USDG")
@@ -370,27 +335,17 @@ const Swap = props => {
   const glpManagerAddress = getContract(chainId, "GlpManager")
   const glpAddress = getContract(chainId, "GLP")
   const orderBookAddress = getContract(chainId, "OrderBook")
-  console.log("hjhjhj multchain error check address", chainId, readerAddress, vaultAddress)
 
   //---------- FOR TESTING 
-  const whitelistedTokens = tokens.filter(token => token.symbol !== "USDG");
-  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
-  const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
+  // const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
 
 
-  const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
-    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
-  })
-  const { data: positionData, mutate: updatePositionData } = useSWR([chainId, readerAddress, "getPositions", vaultAddress, account], {
-    fetcher: fetcher(library, Reader, [positionQuery.collateralTokens, positionQuery.indexTokens, positionQuery.isLong]),
-  })
+  // const { data: positionData, mutate: updatePositionData } = useSWR([chainId, readerAddress, "getPositions", vaultAddress, account], {
+  //   fetcher: fetcher(library, Reader, [positionQuery.collateralTokens, positionQuery.indexTokens, positionQuery.isLong]),
+  // })
   const tokenAddresses = tokens.map(token => token.address)
   const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account], {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
-  })
-
-  const { data: fundingRateInfo, mutate: updateFundingRateInfo } = useSWR(account && [chainId, readerAddress, "getFundingRates"], {
-    fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
   })
 
   const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([chainId, vaultAddress, "totalTokenWeights"], {
@@ -405,9 +360,33 @@ const Swap = props => {
     fetcher: fetcher(library, Router)
   });
 
-  const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
-  const { positions, positionsMap } = getPositions(chainId, positionQuery, positionData, infoTokens, true, nativeTokenAddress);
+  // const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
+  const infoTokens = {};
+  // console.log('test params: ', positionQuery, positionData, infoTokens, true, nativeTokenAddress)
 
+  // POSITIONS DATA
+  // const { positions, positionsMap } = getPositions(chainId, positionQuery, positionData, infoTokens, true, nativeTokenAddress);
+  // useEffect(() => {
+  //   if (!supportedTokens) return
+
+  //   // reset on chainId change => supportedTokens change
+
+  //   setIsReceiptObtained(false);
+  //   setVisibleLoading(false);
+  //   setVisible(false);
+  //   setTransactionList([]);
+  //   setTableLoading(true);
+
+  //   for (let item of samplePositionsData) {
+  //     item['collateralToken'] = findTokenWithSymbol(item.collateralTokenSymbol);
+  //     item['indexToken'] = findTokenWithSymbol(item.indexTokenSymbol);
+  //     item['liqPrice'] = getLiquidationPrice(item);
+  //   }
+  //   setPositionsData(samplePositionsData);
+
+  // }, [supportedTokens])
+
+  // ORDER BOOK FEATURES, WHICH WE MIGHT NOT SUPPORT AT THE MOMENT
   const flagOrdersEnabled = true;
   const [orders] = useAccountOrders(flagOrdersEnabled);
 
@@ -428,44 +407,8 @@ const Swap = props => {
     })
   }
 
-  //--------- 
-  useEffect(() => {
-    if (!supportedTokens) return
 
-    // reset on chainId change => supportedTokens change
-
-    setIsReceiptObtained(false);
-    // setActiveToken1(supportedTokens[1]);
-    // setActiveToken0(supportedTokens[0]);
-    setVisibleLoading(false);
-    setVisible(false);
-    setTransactionList([]);
-    setTableLoading(true);
-
-    for (let item of samplePositionsData) {
-      item['collateralToken'] = findTokenWithSymbol(item.collateralTokenSymbol);
-      item['indexToken'] = findTokenWithSymbol(item.indexTokenSymbol);
-      item['liqPrice'] = getLiquidationPrice(item);
-    }
-    setPositionsData(samplePositionsData);
-
-  }, [chainId])
-
-  // useEffect(() => {
-  //   library.on('block', (blockNum) => {
-  //     updateVaultTokenInfo()
-  //     updateTokenBalances()
-  //     updatePositionData()
-  //     updateFundingRateInfo()
-  //     updateTotalTokenWeights()
-  //     updateUsdgSupply()
-  //     updateOrderBookApproved()
-  //   })
-  //   return () => {
-  //     library.removeAllListeners('block');
-  //   }
-  // }, [library])
-
+  //// data
   const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR(account && [`GlpSwap:lastPurchaseTime:${active}`, chainId, glpManagerAddress, "lastAddedAt", account], {
     fetcher: fetcher(library, GlpManager),
   })
@@ -473,10 +416,8 @@ const Swap = props => {
   useEffect(() => {
     if (active) {
       library.on('block', () => {
-        updateVaultTokenInfo(undefined, true)
-        updatePositionData(undefined, true)
+        // updatePositionData(undefined, true)
         updateTokenBalances(undefined, true)
-        updateFundingRateInfo(undefined, true)
         updateTotalTokenWeights(undefined, true)
         updateUsdgSupply(undefined, true)
         updateOrderBookApproved(undefined, true)
@@ -487,9 +428,12 @@ const Swap = props => {
       }
     }
   }, [active, library, chainId,
-    updateVaultTokenInfo, updatePositionData, updateTokenBalances,
-    updateFundingRateInfo, updateTotalTokenWeights, updateUsdgSupply,
-    updateOrderBookApproved, updateLastPurchaseTime]
+    // updatePositionData,
+    updateTokenBalances,
+    updateTotalTokenWeights,
+    updateUsdgSupply,
+    updateOrderBookApproved,
+    updateLastPurchaseTime]
   )
 
   const refContainer = useRef();
@@ -503,7 +447,7 @@ const Swap = props => {
     }
   }, [account]);
 
-
+  // ui
   // 选择Coin
   const onClickCoin = () => {
     setVisible(true);
@@ -522,7 +466,7 @@ const Swap = props => {
 
   const onClickSetActiveToken = (e) => {
     console.log("hereim see click token", e)
-    setActiveToken1((supportedTokens.filter(ele => ele.symbol == e))[0]);
+    setToTokenAddress(swapOption,getTokenBySymbol(chainId,e).address)  // when click tab change token
   }
 
   const chartPanes = [
@@ -530,14 +474,8 @@ const Swap = props => {
     { title: 'ETH', content: 'ETH', key: 'ETH' },
     // { title: 'Tab 3', content: 'Content of Tab 3', key: '3'},
   ];
-  const [activeKey, setActiveKey] = useState(chartPanes[0].key);
 
-  const onChange = (newActiveKey) => {
-    setActiveKey(newActiveKey);
-    setActiveToken1((tokens.filter(ele => ele.symbol == newActiveKey))[0])
-  };
-
-
+  // ui
   const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
   const KChartTokenListETH = ["BTC", "ETH"]
   const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
@@ -547,17 +485,6 @@ const Swap = props => {
   const selectChartToken = item => {
     onClickSetActiveToken(item)
   }
-  // const [poolTab, setPoolTab] = useState("ALP Price")
-  // const poolTabs = ["ALP Price", "Portfolio"]
-  // const selectPool = item => {
-  //   setPoolTab(item)
-  // }
-
-  // const [poolGraphTab, setPoolGraphTab] = useState("Action")
-  // const poolGraphTabs = ["Action"]
-  // const selectPoolGraph = item => {
-  //   setPoolGraphTab(item)
-  // }
 
   return (
     <PageHeaderWrapper>
@@ -570,7 +497,7 @@ const Swap = props => {
               <div>
                 <div className={styles.chartTokenSelectorTab}>
                   <PerpetualTabs
-                    option={activeToken1.symbol}
+                    option={toToken.symbol}
                     options={KChartTokenList}
                     onChange={selectChartToken}
                   />
@@ -578,9 +505,9 @@ const Swap = props => {
 
                 <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column" }}>
                   <ExchangeTVChart
-                    chartTokenSymbol={activeToken1.symbol}
+                    chartTokenSymbol={toToken.symbol}
                     pageName="Futures"
-                    fromToken={activeToken1.symbol}
+                    fromToken={toToken.symbol}
                     toToken="USDT"
                     chainId={chainId}
                   />
@@ -597,7 +524,7 @@ const Swap = props => {
                 </div>
                 <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
                   <div className={`${styles.colItem} ${styles.priceChart}`}>
-                    <div className={styles.positionsTable}>
+                    {/* <div className={styles.positionsTable}>
                       {tableContent == POSITIONS && (
                         <PositionsTable
                           isMobile={isMobile}
@@ -620,7 +547,7 @@ const Swap = props => {
                         />
                       )}
 
-                    </div>
+                    </div> */}
                   </div>
                 </AcyCard>
               </div>
@@ -633,26 +560,19 @@ const Swap = props => {
             <PerpetualComponent
               swapOption={swapOption}
               setSwapOption={setSwapOption}
-              activeToken0={activeToken0}
-              setActiveToken0={setActiveToken0}
-              activeToken1={activeToken1}
-              setActiveToken1={setActiveToken1}
               fromTokenAddress={fromTokenAddress}
               setFromTokenAddress={setFromTokenAddress}
               toTokenAddress={toTokenAddress}
               setToTokenAddress={setToTokenAddress}
-              positionsMap={positionsMap}
+              // positionsMap={positionsMap}
+              positionsMap={{}}
               pendingTxns={pendingTxns}
               setPendingTxns={setPendingTxns}
               savedIsPnlInLeverage={savedIsPnlInLeverage}
-              approveOrderBook={approveOrderBook}
+              // approveOrderBook={approveOrderBook}
               isWaitingForPluginApproval={isWaitingForPluginApproval}
               setIsWaitingForPluginApproval={setIsWaitingForPluginApproval}
               isPluginApproving={isPluginApproving}
-              isConfirming={isConfirming}
-              setIsConfirming={setIsConfirming}
-              isPendingConfirmation={isPendingConfirmation}
-              setIsPendingConfirmation={setIsPendingConfirmation}
               orders={orders}
             />
           </div>

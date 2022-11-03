@@ -315,10 +315,24 @@
     font-family: "Karla", sans-serif;
     background-color: black;
     text-align: center;
-
+    width: 115px;
 }
 
 .dropDownMenu:focus {
+    font-family: "Karla", sans-serif;
+    background-color: black;
+    text-align: center;
+    border-color: black;
+}
+
+.pageDropDown {
+    font-family: "Karla", sans-serif;
+    background-color: black;
+    text-align: center;
+    width: 600px;
+}
+
+.pageDropDown:focus {
     font-family: "Karla", sans-serif;
     background-color: black;
     text-align: center;
@@ -332,10 +346,32 @@
     font-weight: 100;
     height: 2.4rem;
     display: flex;
+    width: 115px;
 
     &:hover {
         background-color: #323232 !important;
     }
+}
+
+.pageItem {
+    :global {
+        .ant-select-selection-selected-value {
+            float: none;
+        }
+    }
+    background-color: black !important;
+    font-family: "Karla", sans-serif;
+    font-size: 13px;
+    font-weight: 100;
+    height: 2.4rem;
+    // display: flex;
+    // width: 400px;
+
+    &:hover {
+        background-color: #323232 !important;
+    }
+
+    
 }
 
 .pageSelector {
@@ -382,7 +418,17 @@
             margin-right: 10px;
             box-shadow: none;
         }
+        .ant-select-selection-selected-value {
+            float: none;
+        }
     }
+}
+.networkFixed{
+    border: 0.75px solid #232323;
+    height: 3rem;
+    line-height: 3rem;
+    font-size: 1rem;
+    padding-left: 1rem;
 }
 
 .tokenSelector {
@@ -397,7 +443,7 @@
             border: 0.75px solid #232323;
             border-radius: 5px;
             height: 1.9rem;
-            width: 70px;
+            width: 115px;
             padding: 2px 0px;
             font-size: 15px;
             font-weight: 200;
@@ -405,6 +451,14 @@
             overflow: inherit;
             margin-top: 1.5rem;
             box-shadow: none;
+
+            &:hover {
+                background-color: #323232 !important;
+            }
+        }
+
+        .ant-select-selection-selected-value {
+            float: none;
         }
     }
 }
@@ -468,28 +522,44 @@
         tr.ant-table-expanded-row:hover {
             background: black;
         }
-        .ant-table-thead > tr > th, .ant-table-tbody > tr > td {
+
+        .ant-table-thead>tr>th,
+        .ant-table-tbody>tr>td {
             padding: 10px 16px;
         }
+
         .ant-table-thead>tr>th,
         .ant-table-tbody>tr>td {
             margin: 10px 50px 10px 20px;
         }
-        .ant-table-thead > tr:first-child > th:first-child {
+
+        .ant-table-thead>tr:first-child>th:first-child {
             border-top-left-radius: 0px;
         }
-        .ant-table-thead > tr:first-child > th:last-child {
+
+        .ant-table-thead>tr:first-child>th:last-child {
             border-top-right-radius: 0px;
         }
     }
 }
+
 .mainTable {
     :global {
-        .ant-table-row-expand-icon{
+        .ant-table-row-expand-icon {
             color: #fff;
             background-color: black;
             background: black;
-            border: 0.75px solid #444444 ;
+            border: 0.75px solid #444444;
         }
+    }
+}
+
+.copyAddress {
+    height: 14px;
+    fill: #a9a9b0;
+
+    &:hover {
+        fill: white;
+        cursor: pointer;
     }
 }
