@@ -44,7 +44,7 @@ const Option = props => {
   let tokens = getTokens(chainId);
 
   const [mode, setMode] = useState('Buy')
-  const [symbol, setSymbol] = useState('')
+  const [symbol, setSymbol] = useState('BTCUSD-60000-C')
   const [tableContent, setTableContent] = useState("Positions");
 
   const [activeToken, setActiveToken] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
@@ -53,8 +53,6 @@ const Option = props => {
   const [visibleETH, setVisibleETH] = useState(false);
   const [visibleMATIC, setVisibleMATIC] = useState(false);
   const [visibleBNB, setVisibleBNB] = useState(false);
-
-  const poolAddress = getContract(chainId, "pool")
 
   const onClickDropdownBTC = e => {
     setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0]);
@@ -76,6 +74,8 @@ const Option = props => {
     { name: "BTC-500000", tokenSymbol: "BTC", optionSymbol: "500000", type: "P" },
     // { name: "BTC-300000", tokenSymbol: "BTC", optionSymbol: "300000", type: "C" },
     // { name: "BTC-300000", tokenSymbol: "BTC", optionSymbol: "300000", type: "P" },
+    { name: "BTC 60000", tokenSymbol: "BTC", optionSymbol: "60000", type: "C" },
+    { name: "BTC 60000", tokenSymbol: "BTC", optionSymbol: "60000", type: "P" },
     { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "C" },
     { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "P" },
   ];
@@ -327,10 +327,11 @@ const Option = props => {
               </div>
               <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
                 <ExchangeTVChart
-                  chartTokenSymbol="BTC"
+                  chartTokenSymbol={symbol}
                   pageName="Option"
                   fromToken={activeToken.symbol}
                   toToken="USDT"
+                  chainId={chainId}
                 />
               </div>
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import * as d3 from './d3'
-import * as d3sankey from './d3-sankey';
+import * as d3 from 'd3'
+import * as d3sankey from 'd3-sankey/dist/d3-sankey';
 
 const size = {
   width: 1000,
