@@ -159,13 +159,11 @@ function getNextAveragePrice({ size, sizeDelta, hasProfit, delta, nextPrice, isL
   return nextAveragePrice;
 }
 
-// var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
   const { account, library, active } = useWeb3React();
   const { chainId } = useChainId();
-  
   const tokens = getTokens(chainId)
-  console.log("test chainId perpetual component", chainId, tokens)
+  // console.log("test chainId perpetual component", chainId, tokens)
 
   const {
     swapOption: mode,
@@ -189,11 +187,12 @@ const SwapComponent = props => {
     isPendingConfirmation,
     setIsPendingConfirmation,
     orders,
-    minExecutionFee
+    // minExecutionFee
   } = props;
 
   const connectWalletByLocalStorage = useConnectWallet();
 
+  //// ui state
   const [type, setType] = useState(MARKET);
   const [fromValue, setFromValue] = useState("");
   const [toValue, setToValue] = useState("");
@@ -202,8 +201,8 @@ const SwapComponent = props => {
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // const [isConfirming, setIsConfirming] = useState(false);
-  const [modalError, setModalError] = useState(false);
-  const [ordersToaOpen, setOrdersToaOpen] = useState(false);
+  // const [modalError, setModalError] = useState(false);
+  // const [ordersToaOpen, setOrdersToaOpen] = useState(false);
   const [isHigherSlippageAllowed, setIsHigherSlippageAllowed] = useState(false);
 
 
@@ -242,7 +241,8 @@ const SwapComponent = props => {
   // const [shortCollateralAddress, setShortCollateralAddress] = useState('0xf97f4df75117a78c1A5a0DBb814Af92458539FB4');
   // const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
 
-
+  
+  // update and remove unused contracts
   const tokenAddresses = tokens.map(token => token.address)
   const readerAddress = getContract(chainId, "Reader")
   const vaultAddress = getContract(chainId, "Vault")
