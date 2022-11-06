@@ -3,21 +3,21 @@ import { Button } from 'antd';
 import { Gauge } from 'ant-design-pro/lib/Charts';
 import { AcyPerpetualButton, AcyCuarrencyCard } from '../Acy';
 import Modal from '../PerpetualComponent/Modal/Modal';
-import { useChainId } from '@/utils/helpers';
-import styles from './styles.less';
 import TokenSelectorModal from '../TokenSelectorModal';
-import { getTokens, getContract } from '@/constants/powers.js';
-import IPool from '@/abis/future-option-power/IPool.json'
-import { ethers } from 'ethers'
-import { bigNumberify,getGasLimit,getGasPrice } from '@/acy-dex-futures/utils';
-import * as Api from '@/acy-dex-futures/Api';
-import Web3 from 'web3'
+import { addMargin, removeMargin } from '@/services/derivatives';
+import { getContract } from '@/constants/future_option_power';
+import { useWeb3React } from '@web3-react/core';
+import { useConnectWallet } from '@/components/ConnectWallet';
+import Router from '@/abis/future-option-power/Router.json'
+
+import styles from './styles.less';
 
 const AccountInfoGauge = props => {
 
   const {
     account,
     library,
+    chainId,
     tokens,
   } = props
 
@@ -26,68 +26,49 @@ const AccountInfoGauge = props => {
   const [isConfirming, setIsConfirming] = useState(false)
   const [tokenAmount, setTokenAmount] = useState('');
   const [visible, setVisible] = useState(false)
-  const { chainId } = useChainId();
-  
 
-  const poolAddress = getContract(chainId, "pool")
+  const routerAddress = getContract(chainId, "router")
+
+  const { active } = useWeb3React();
+  const connectWalletByLocalStorage = useConnectWallet();
 
   const onClickDeposit = () => {
+    if (!account) {
+      connectWalletByLocalStorage()
+      return
+    }
     setMode('Deposit')
     setIsConfirming(true)
   }
 
   const onClickWithdraw = () => {
+    if (!account) {
+      connectWalletByLocalStorage()
+      return
+    }
     setMode('Withdraw')
     setIsConfirming(true)
   }
 
   const getPrimaryText = () => {
-    if(!token) {
+    if (!active) {
+      return 'Connect Wallet'
+    }
+    if (!token) {
       return 'Select a Token'
     }
-    if(!tokenAmount) {
+    if (!tokenAmount) {
       return 'Enter an Amount'
     }
     return mode.toUpperCase()
   }
 
-  const addMargin = async () => {
-    const contract = new ethers.Contract(poolAddress, IPool.abi, library.getSigner())
-
-    let method = "addMargin"
-    let params = [
-      token.address,  //token address
-      token.symbol,  //token symbol
-      ethers.utils.parseUnits(tokenAmount, token.decimals),  //amount
-      [], //oracleSignature
-    ]
-    
-    const successMsg = `Order Submitted!`
-
-    if(token.address===ethers.constants.AddressZero){     // matic in mumbai chain
-      let value = ethers.utils.parseUnits(tokenAmount, token.decimals)
-      console.log("MATIC!",value)
-      Api.callContract(chainId, contract, method, params, {
-        value: value,
-        sentMsg: `Submitted.`,
-        failMsg: `Failed.`,
-        successMsg,
-      })
-        .then(() => { })
-        .catch(e => { console.log(e) })
-    }else{                                               // other ERC20 token, e.g. BTC
-      Api.callContract(chainId, contract, method, params, {
-        sentMsg: `Submitted.`,
-        failMsg: `Failed.`,
-        successMsg,
-      })
-        .then(() => { })
-        .catch(e => { console.log(e) })
+  const setMargin = () => {
+    if (mode == 'Deposit') {
+      addMargin(chainId, library, routerAddress, Router, token, tokenAmount)
+    } else {
+      removeMargin(chainId, library, routerAddress, Router, token, tokenAmount)
     }
-  }
-
-  const removeMargin = () => {
-
   }
 
   return (
@@ -159,7 +140,7 @@ const AccountInfoGauge = props => {
             <div className={styles.ConfirmationBoxRow}>
               <button
                 onClick={() => {
-                  mode == 'Deposit' ? addMargin() : removeMargin()
+                  setMargin()
                   setIsConfirming(false)
                 }}
                 disabled={!token || !tokenAmount}

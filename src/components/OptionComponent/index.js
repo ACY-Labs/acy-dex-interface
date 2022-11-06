@@ -292,7 +292,7 @@ const OptionComponent = props => {
 
             </div>
 
-            <AccountInfoGauge account={account} library={library} tokens={tokens} />
+            <AccountInfoGauge account={account} library={library} chainId={chainId} tokens={tokens} />
           </>
         }
 
