@@ -1400,7 +1400,6 @@ const SwapComponent = props => {
             onChange={modeSelect}
           />
         </div>
-
         {mode !== POOL ?
           <>
             <div className={styles.typeSelector}>
@@ -1760,7 +1759,7 @@ const SwapComponent = props => {
               </div>
 
               {/* Available Liquidity */}
-              {isShort && toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) &&
+              {isShort && toTokenInfo&&toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) &&
                 <div className={styles.detailCard}>
                   <div className={styles.label}>Available Liquidity</div>
                   <Tooltip

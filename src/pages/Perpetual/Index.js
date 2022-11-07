@@ -17,6 +17,8 @@ import {
 import { PriceBox } from './components/PriceBox';
 import { DetailBox } from './components/DetailBox';
 import AcyPool from '@/components/AcyPool';
+import AcySymbolNav from '@/components/AcySymbolNav';
+import AcySymbol from '@/components/AcySymbol';
 import {
   ACTIONS,
   ORDERS,
@@ -282,28 +284,28 @@ const Swap = props => {
       to: AddressZero,
     }
   }), [chainId])
-  
+
   const [tokenSelection, setTokenSelection] = useLocalStorageByChainId(chainId, "Exchange-token-selection-v2", defaultTokenSelection)
   const [swapOption, setSwapOption] = useLocalStorageByChainId(chainId, 'Swap-option-v2', "Long")
-  
+
   //// prepare tokenlist and from/to token given chainId
   const tokens = getTokens(chainId)
 
-  const [fromToken,setFromToken] = useState(tokens[0])
-  const [toToken,setToToken] = useState(tokens[1])
+  const [fromToken, setFromToken] = useState(tokens[0])
+  const [toToken, setToToken] = useState(tokens[1])
 
   const setFromTokenAddress = useCallback((selectedSwapOption, address) => {
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
     newTokenSelection[selectedSwapOption].from = address
     setTokenSelection(newTokenSelection)
-    setFromToken(getTokenByAddress(chainId,address))
+    setFromToken(getTokenByAddress(chainId, address))
   }, [tokenSelection, setTokenSelection])
 
   const setToTokenAddress = useCallback((selectedSwapOption, address) => {
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
     newTokenSelection[selectedSwapOption].to = address
     setTokenSelection(newTokenSelection)
-    setToToken(getTokenByAddress(chainId,address))
+    setToToken(getTokenByAddress(chainId, address))
   }, [tokenSelection, setTokenSelection])
 
   const fromTokenAddress = tokenSelection[swapOption].from.toLowerCase()
@@ -319,11 +321,11 @@ const Swap = props => {
   const [tableContent, setTableContent] = useState(POSITIONS);
   const [positionsData, setPositionsData] = useState([]);
 
-  
 
 
 
-  
+
+
   /// get contract addresses
   // TODO: update and remove unused contracts
   // required contracts: router (add/remove liquidity, add/remove margin), pool (trade), reader
@@ -466,7 +468,7 @@ const Swap = props => {
 
   const onClickSetActiveToken = (e) => {
     console.log("hereim see click token", e)
-    setToTokenAddress(swapOption,getTokenBySymbol(chainId,e).address)  // when click tab change token
+    setToTokenAddress(swapOption, getTokenBySymbol(chainId, e).address)  // when click tab change token
   }
 
   const chartPanes = [
@@ -485,7 +487,12 @@ const Swap = props => {
   const selectChartToken = item => {
     onClickSetActiveToken(item)
   }
-
+  const [latestPrice,setLatestPrice]=useState(0);
+  const [priceChangePercentDelta,setPpriceChangePercentDelta]=useState(0);
+const onChangePrice=(curPrice,change)=>{
+  setLatestPrice(curPrice);
+  setPpriceChangePercentDelta(change);
+}
   return (
     <PageHeaderWrapper>
 
@@ -495,14 +502,21 @@ const Swap = props => {
             ?
             <div className={`${styles.colItem} ${styles.priceChart}`}>
               <div>
-                <div className={styles.chartTokenSelectorTab}>
+                {/* <div className={styles.chartTokenSelectorTab}>
                   <PerpetualTabs
                     option={toToken.symbol}
                     options={KChartTokenList}
                     onChange={selectChartToken}
                   />
-                </div>
-
+                </div> */}
+                <AcySymbolNav data={KChartTokenList} onChange={selectChartToken}/>
+                <AcySymbol 
+                  pairName={toToken.symbol}
+                  // showDrawer={showDrawer}
+                  latestPriceColor={priceChangePercentDelta*1>= 0 && '#0ecc83' ||'#fa3c58'}
+                  latestPrice={latestPrice}
+                  latestPricePercentage={priceChangePercentDelta}
+                />
                 <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column" }}>
                   <ExchangeTVChart
                     chartTokenSymbol={toToken.symbol}
@@ -510,6 +524,7 @@ const Swap = props => {
                     fromToken={toToken.symbol}
                     toToken="USDT"
                     chainId={chainId}
+                    onChangePrice={onChangePrice}
                   />
                 </div>
               </div>

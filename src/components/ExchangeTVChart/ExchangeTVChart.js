@@ -133,6 +133,7 @@ export default function ExchangeTVChart(props) {
     fromToken,
     toToken,
     chainId,
+    onChangePrice
   } = props
 
   const [currentChart, setCurrentChart] = useState();
@@ -312,6 +313,8 @@ export default function ExchangeTVChart(props) {
       let negativePriceChangePercent = deltaPercent.substring(1)
       setCurPrice(parseFloat(negativeCurrentPrice).toFixed(2))
       setPriceChangePercentDelta(parseFloat(negativePriceChangePercent).toFixed(3))
+      onChangePrice&&onChangePrice(parseFloat(negativeCurrentPrice).toFixed(2),"-"+parseFloat(negativePriceChangePercent).toFixed(3));
+
     }
     else {
       setDeltaIsMinus(false)
@@ -319,6 +322,8 @@ export default function ExchangeTVChart(props) {
       let positivePricechangePercent = deltaPercent
       setCurPrice(parseFloat(positiveCurrentPrice).toFixed(2))
       setPriceChangePercentDelta(parseFloat(positivePricechangePercent).toFixed(3))
+      onChangePrice&&onChangePrice(parseFloat(positiveCurrentPrice).toFixed(2),"+"+parseFloat(positivePricechangePercent).toFixed(3));
+    
     }
   }
 
