@@ -13,6 +13,7 @@ import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
 import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
+import Segmented from '../AcySegmented';
 import ERC20 from '@/acy-dex-futures/abis/ERC20.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
 import Reader from '@/abis/future-option-power/Reader.json'
@@ -42,26 +43,6 @@ const OptionComponent = props => {
   const [usdValue, setUsdValue] = useState(0)
   const [isApproving, setIsApproving] = useState(false)
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
-
-  const getPercentageButton = value => {
-    if (percentage != value) {
-      return (
-        <button
-          className={styles.percentageButton}
-          onClick={() => { setPercentage(value) }}>
-          {value}
-        </button>
-      )
-    } else {
-      return (
-        <button
-          className={styles.percentageButtonActive}
-          onClick={() => { setPercentage(value) }}>
-          {value}
-        </button>
-      )
-    }
-  }
 
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
   const readerAddress = getContract(chainId, "reader")
@@ -214,14 +195,9 @@ const OptionComponent = props => {
                   <span className={styles.inputLabel}>USD</span>
                 </div>
               </div>
-
-              <div className={styles.buttonContainer}>
-                {getPercentageButton('25%')}
-                {getPercentageButton('50%')}
-                {getPercentageButton('75%')}
-                {getPercentageButton('100%')}
+              <div style={{margin:'20px 0'}}>
+                <Segmented onChange={(value) => {setPercentage(value)}} options={['10%', '25%', '50%', '75%', '100%']} />
               </div>
-
               {showDescription ?
                 <AcyDescriptions>
                   <div className={styles.breakdownTopContainer}>
