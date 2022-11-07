@@ -4,18 +4,20 @@ import { Input, Button } from 'antd';
 import { ethers } from 'ethers'
 import useSWR from 'swr'
 import { useConstantLoader } from '@/constants';
-import { getTokens, getContract } from '@/constants/powers.js'
+import { getTokens, getContract } from '@/constants/future_option_power.js';
 import { useChainId } from '@/utils/helpers';
 import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, expandDecimals, bigNumberify, formatAmount } from '@/acy-dex-futures/utils';
 import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
+import { approveTokens, trade } from '@/services/derivatives';
 import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
 import ERC20 from '@/acy-dex-futures/abis/ERC20.json'
 import Token from '@/acy-dex-futures/abis/Token.json'
 import Reader from '@/abis/future-option-power/Reader.json'
+import IPool from '@/abis/future-option-power/IPool.json'
 
 import styles from './styles.less';
 
@@ -28,20 +30,71 @@ const OptionComponent = props => {
     setMode,
     selectedToken,
     symbol,
-    onTrade,
   } = props
 
-  const { account, library, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
-  const { chainId } = useChainId();
-  const connectWalletByLocalStorage = useConnectWallet();
-  const { active } = useWeb3React();
+  const { account, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props)
+  const { chainId } = useChainId()
+  const connectWalletByLocalStorage = useConnectWallet()
+  const { active, library } = useWeb3React()
+  const tokens = getTokens(chainId)
+
+  ///////////// read contract /////////////
+
+  const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
+  const readerAddress = getContract(chainId, "reader")
+  const poolAddress = getContract(chainId, "pool")
+
+  const tokenAllowanceAddress = selectedToken.address === AddressZero ? nativeTokenAddress : selectedToken.address;
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, poolAddress], {
+    fetcher: fetcher(library, ERC20)
+  });
+  const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, Reader)
+  });
+  const { data: symbolInfo, mutate: updateSymbolInfo } = useSWR([chainId, readerAddress, "getSymbolInfo", poolAddress, symbol, []], {
+    fetcher: fetcher(library, Reader)
+  });
+
+  useEffect(() => {
+    if (active) {
+      library.on("block", () => {
+        updateTokenAllowance()
+        updateTokenInfo()
+        updateSymbolInfo()
+      });
+      return () => {
+        library.removeListener("block", onBlock);
+      };
+    }
+  }, [
+    active,
+    library,
+    chainId,
+    updateTokenAllowance,
+    updateTokenInfo,
+    updateSymbolInfo,
+  ]);
+
+  ///////////// for UI /////////////
 
   const optionMode = ['Buy', 'Sell', 'Pool']
   const [percentage, setPercentage] = useState('')
-  const [selectedTokenValue, setSelectedTokenValue] = useState("0");
+  const [selectedTokenValue, setSelectedTokenValue] = useState("0")
   const [usdValue, setUsdValue] = useState(0)
   const [isApproving, setIsApproving] = useState(false)
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
+  const [showDescription, setShowDescription] = useState(false)
+  const [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
+  const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
+  const [slippageError, setSlippageError] = useState('')
+  const [deadline, setDeadline] = useState()
+
+  const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
+  const needApproval =
+    selectedToken.address !== AddressZero &&
+    tokenAllowance &&
+    selectedTokenAmount &&
+    selectedTokenAmount.gt(tokenAllowance)
 
   const getPercentageButton = value => {
     if (percentage != value) {
@@ -63,72 +116,6 @@ const OptionComponent = props => {
     }
   }
 
-  const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
-  const readerAddress = getContract(chainId, "reader")
-  const poolAddress = getContract(chainId, "pool")
-  const tokens = getTokens(chainId)
-
-  const tokenAllowanceAddress = selectedToken.address === AddressZero ? nativeTokenAddress : selectedToken.address;
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, poolAddress], {
-    fetcher: fetcher(library, ERC20)
-  });
-  const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, Reader)
-  });
-  const { data: symbolInfo, mutate: updateSymbolInfo } = useSWR([chainId, readerAddress, "getSymbolInfo", poolAddress, symbol, []], {
-    fetcher: fetcher(library, Reader)
-  });
-
-  useEffect(() => {
-    let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(tokenInfo?.filter(item => item.token == selectedToken.address)[0]?.balance, 18, 2)
-    setSelectedTokenValue(tokenAmount)
-    setUsdValue((tokenAmount * formatAmount(symbolInfo?.markPrice, 18)).toFixed(2))
-  }, [percentage])
-
-  const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
-  const needApproval =
-    selectedToken.address !== AddressZero &&
-    tokenAllowance &&
-    selectedTokenAmount &&
-    selectedTokenAmount.gt(tokenAllowance)
-
-  useEffect(() => {
-    if(selectedToken && isWaitingForApproval && !needApproval) {
-      setIsWaitingForApproval(false)
-    }
-  }, [selectedToken, selectedTokenAmount, needApproval])
-
-  useEffect(() => {
-    if (active) {
-      function onBlock() {
-        updateTokenAllowance(undefined, true);
-      }
-      library.on("block", onBlock);
-      return () => {
-        library.removeListener("block", onBlock);
-      };
-    }
-  }, [active, library, updateTokenAllowance]);
-
-  const approveTokens = () => {
-    setIsApproving(true);
-    const contract = new ethers.Contract(
-      selectedToken.address,
-      Token.abi,
-      library.getSigner()
-    );
-    contract.approve(poolAddress, ethers.constants.MaxUint256)
-      .then(async res => {
-        setIsWaitingForApproval(true)
-      })
-      .catch(e => {
-        console.error(e);
-      })
-      .finally(() => {
-        setIsApproving(false);
-      });
-  }
-
   const getPrimaryText = () => {
     if (!active) {
       return 'Connect Wallet'
@@ -145,30 +132,40 @@ const OptionComponent = props => {
     return mode == 'Buy' ? 'Buy / Long' : 'Sell / Short'
   }
 
+  useEffect(() => {
+    setShowDescription(false)
+  }, [chainId, mode])
+
+  useEffect(() => {
+    let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(tokenInfo?.filter(item => item.token == selectedToken.address)[0]?.balance, 18, 2)
+    setSelectedTokenValue(tokenAmount)
+    setUsdValue((tokenAmount * formatAmount(symbolInfo?.markPrice, 18)).toFixed(2))
+  }, [percentage])
+
+  useEffect(() => {
+    if (selectedToken && isWaitingForApproval && !needApproval) {
+      setIsWaitingForApproval(false)
+    }
+  }, [selectedToken, selectedTokenAmount, needApproval])
+
+
+  ///////////// write contract /////////////
+
   const onClickPrimary = () => {
     if (!account) {
       connectWalletByLocalStorage()
       return
     }
     if (needApproval) {
-      approveTokens()
+      approveTokens(library, poolAddress, Token, selectedToken.address, setIsWaitingForApproval, setIsApproving)
       return
     }
     if (mode == ' Buy') {
-      onTrade(symbol, selectedTokenAmount, expandDecimals(50001, 18))
+      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount, expandDecimals(50001, 18))
     } else {
-      onTrade(symbol, selectedTokenAmount.mul(bigNumberify(-1)), expandDecimals(50001, 18))
+      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount.mul(bigNumberify(-1)), expandDecimals(50001, 18))
     }
   }
-
-  const [showDescription, setShowDescription] = useState(false);
-  const [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
-  const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100);
-  const [slippageError, setSlippageError] = useState('');
-  const [deadline, setDeadline] = useState();
-  useEffect(() => {
-    setShowDescription(false)
-  }, [chainId, mode])
 
   return (
     <div className={styles.main}>

@@ -155,10 +155,6 @@ const Option = props => {
     setVisibleMATIC(false);
   };
 
-  const onTrade = async (symbol, amount, priceLimit) => {
-
-  }
-
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
@@ -368,7 +364,6 @@ const Option = props => {
               setMode={setMode}
               selectedToken={activeToken}
               symbol={symbol}
-              onTrade={onTrade}
             />
           </AcyCard>
         </div>

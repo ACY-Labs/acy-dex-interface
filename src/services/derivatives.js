@@ -144,9 +144,7 @@ export async function trade(
 
   const successMsg = `Order Submitted!`
 
-  let value = bigNumberify(0)
   Api.callContract(chainId, contract, method, params, {
-    value,
     sentMsg: `Submitted.`,
     failMsg: `Failed.`,
     successMsg,
