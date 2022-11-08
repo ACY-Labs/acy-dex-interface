@@ -4,7 +4,7 @@ import { Input, Button } from 'antd';
 import { ethers } from 'ethers'
 import useSWR from 'swr'
 import { useConstantLoader } from '@/constants';
-import { getTokens, getContract } from '@/constants/future_option_power.js';
+import { INITIAL_ALLOWED_SLIPPAGE, getTokens, getContract } from '@/constants/future_option_power.js';
 import { useChainId } from '@/utils/helpers';
 import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from '@/components/ConnectWallet';
@@ -32,10 +32,9 @@ const OptionComponent = props => {
     symbol,
   } = props
 
-  const { account, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props)
   const { chainId } = useChainId()
   const connectWalletByLocalStorage = useConnectWallet()
-  const { active, library } = useWeb3React()
+  const { account, active, library } = useWeb3React()
   const tokens = getTokens(chainId)
 
   ///////////// read contract /////////////

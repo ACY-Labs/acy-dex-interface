@@ -23,7 +23,7 @@ const contracts = {
     symbolManagerImplementation: "0xbEe6eDABcC42Ed8c0B46b6fcA8Ec04decaDc0A09",
     alp: "0x002d190863243E09e83245FEE736B0B463Af5a74",
     symbolsLens: "0xE56710F67eAf87Cf998fb3bFf4B1332080942b2F",
-    reader: "0xE74C76425bf0EaBfC88813A0dFf9952d136aA171",
+    reader: "0x7A8C1f316888057d31D6eBEd67A47D00350d1d68",
     router: "0xd2f649eb4ab6399879534756526ac7c3d586be31",
   },
 }
@@ -165,6 +165,8 @@ const tokenLists = {
     },
   ],
 };
+
+export const INITIAL_ALLOWED_SLIPPAGE = 50;
 
 export const getTokens = (chainId) => {
   return tokenLists[chainId];
