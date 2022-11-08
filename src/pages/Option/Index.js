@@ -12,7 +12,8 @@ import { ethers } from 'ethers'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
 import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/option.js';
-
+import AcySymbolNav from '@/components/AcySymbolNav';
+import AcySymbol from '@/components/AcySymbol';
 import styled from "styled-components";
 import styles from './styles.less'
 
@@ -110,6 +111,9 @@ const Option = props => {
   const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBNB
     : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
       : KChartTokenListETH
+  const selectChartToken = item => {
+    // onClickSetActiveToken(item)
+  }
   const selectTab = item => {
     setActiveToken((tokens.filter(ele => ele.symbol == item))[0])
     switch (item) {
@@ -325,6 +329,18 @@ const Option = props => {
                 </div>
 
               </div>
+
+              <AcySymbolNav data={KChartTokenList} onChange={selectChartToken} />
+              <AcySymbol
+                pairName='BTC'
+                // showDrawer={showDrawer}
+                // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                // latestPrice={latestPrice}
+                // latestPricePercentage={priceChangePercentDelt
+                latestPriceColor={1}
+                latestPrice={1}
+                latestPricePercentage={1}
+              />
               <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
                 <ExchangeTVChart
                   chartTokenSymbol={symbol}
