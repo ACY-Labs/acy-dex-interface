@@ -15,6 +15,11 @@ import { getTokens, getContract } from '@/constants/option.js';
 
 import styled from "styled-components";
 import styles from './styles.less'
+import { PositionTable } from '@/components/OptionComponent/TableComponent';
+
+import { fetcher,getProvider } from '@/acy-dex-futures/utils';
+import Reader from '@/abis/future-option-power/Reader.json'
+import useSWR from 'swr'
 
 const StyledDrawer = styled(Drawer)`
   .ant-drawer{
@@ -37,9 +42,54 @@ const StyledDrawer = styled(Drawer)`
     color: #b5b5b6;
   }
 `
+   
+function safeDiv(a, b) {
+    return b==0 ? 0 : a.div(b).toNumber();
+}
+
+export function getPosition(rawPositionData,symbolData) {
+  if (!rawPositionData || !symbolData) {
+    return
+  }
+  let positionQuery = []
+  for(let i = 0; i < rawPositionData.positions.length; i++){
+    const temp = rawPositionData.positions[i]
+    const position = {
+      symbol: temp[1],
+      position: temp[2].toNumber(),
+      entryPrice: safeDiv(temp.cost,temp[2]),
+      markPrice: symbolData.find(obj => {
+        return obj.address === temp[0]
+      }).markPrice,
+      marginUsage: temp[2].toNumber(),
+      unrealizedPnl: temp[2].toNumber(),
+      accountFunding: temp.cumulativeFundingPerVolume.toNumber() * temp[2].toNumber(),
+      type:temp[2].toNumber()>=0?"Long":"Short",
+    };
+    positionQuery.push(position)
+  }
+  return positionQuery;
+}
+
+export function getSymbol(rawSymbolData){
+  if (!rawSymbolData) {
+    return
+  }
+  let symbolQuery = []
+  for(let i = 0; i < rawSymbolData.length; i++){
+    const temp = rawSymbolData[i]
+    const symbol = {
+      symbol: temp[1],
+      address: temp[2],
+      markPrice: temp.markPrice.div(bigNumberify('1000000000000000000')).toNumber()
+    };
+    symbolQuery.push(symbol)
+  }
+  return symbolQuery;
+}
 
 const Option = props => {
-  const { account, library } = useConstantLoader();
+  const { account, library, active } = useConstantLoader();
   let { chainId } = useChainId();
   let tokens = getTokens(chainId);
 
@@ -158,6 +208,41 @@ const Option = props => {
   const onTrade = async (symbol, amount, priceLimit) => {
 
   }
+
+  const poolAddress = getContract(chainId,"Pool")
+  const readerAddress = getContract(chainId,"Reader")
+
+  const { data:rawPositionData,mutate:updatePosition} = useSWR([chainId, readerAddress, 'getTdInfo',poolAddress,account], {
+      fetcher: fetcher(library, Reader)
+  })
+  const { data:rawSymbolData,mutate:updateSymbol} = useSWR([chainId, readerAddress, 'getSymbolsInfo',poolAddress,[]], {
+    fetcher: fetcher(library, Reader)
+  })
+  console.log("POSITION",rawPositionData)
+  console.log("SYMBOL",rawSymbolData)
+
+  const symbolData = getSymbol(rawSymbolData)
+  const positionData = getPosition(rawPositionData,symbolData)
+
+  console.log("POSITIONDATA",positionData)
+  console.log("SYMBOLDATA",symbolData)
+
+  // useEffect(() => {
+  //   if (active) {
+  //     library.on('block', () => {
+  //       updatePosition(undefined, true)
+  //     })
+  //     return () => {
+  //       library.removeAllListeners('block')
+  //     }
+  //   }
+  //   console.log("POSITION2",rawPositionData)
+  //   const positionData = getPosition(rawPositionData)
+  //   console.log("POSITIONDATA2",positionData)
+  // }, [active, library, chainId,
+  //   updatePosition]
+  // )
+  // await getPosition(account,chainId)
 
   return (
     <div className={styles.main}>
@@ -348,7 +433,7 @@ const Option = props => {
                 <div className={`${styles.colItem} ${styles.priceChart}`}>
                   <div className={styles.positionsTable}>
                     {tableContent == "Positions" && (
-                      <div>POSITIONS</div>
+                      <PositionTable dataSource={positionData}/>
                     )}
                     {tableContent == "Orders" && (
                       <div>ORDERS</div>

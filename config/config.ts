@@ -32,7 +32,7 @@ const config: IConfig = {
   dva: {
     hmr: true,
   },
-  mfsu: {},
+  // mfsu: {},
   define: constantConfig,
   // 路由配置
   routes: pageRoutes,
