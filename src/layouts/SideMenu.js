@@ -35,10 +35,11 @@ class HeaderView extends PureComponent {
   getHeadWidth = () => {
     const { isMobile, collapsed, setting } = this.props;
     const { fixedHeader, layout } = setting;
-    if (isMobile || !fixedHeader || layout === 'topmenu') {
-      return '100%';
-    }
-    return collapsed ? 'calc(100% - 80px)' : 'calc(100% - 256px)';
+    // if (isMobile || !fixedHeader || layout === 'topmenu') {
+    //   return '100%';
+    // }
+    return collapsed ? '70px' : '140px';
+    // return '70px';
   };
 
   handleNoticeClear = type => {
@@ -120,7 +121,7 @@ class HeaderView extends PureComponent {
     const isTop = layout === 'topmenu';
     const width = this.getHeadWidth();
     const HeaderDom = visible ? (
-      <Header style={{ padding: 0, width: '70px', height: '100%', fontSize: '12px', background: 'black' }} className={fixedHeader ? styles.fixedHeader : ''} >
+      <Header style={{ padding: 0, width, height: '100%', fontSize: '12px', background: 'black' }} className={fixedHeader ? styles.fixedHeader : ''} >
         <TopNavHeader
           theme={navTheme}
           mode="inline"
