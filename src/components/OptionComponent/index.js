@@ -62,7 +62,7 @@ const OptionComponent = props => {
         updateSymbolInfo()
       });
       return () => {
-        library.removeListener("block", onBlock);
+        library.removeAllListeners('block');
       };
     }
   }, [
@@ -87,6 +87,7 @@ const OptionComponent = props => {
   const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
   const [slippageError, setSlippageError] = useState('')
   const [deadline, setDeadline] = useState()
+  const [marginToken, setMarginToken] = useState(tokens[1])
 
   const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
   const needApproval =
@@ -133,6 +134,7 @@ const OptionComponent = props => {
 
   useEffect(() => {
     setShowDescription(false)
+    setMarginToken(tokens[1])
   }, [chainId, mode])
 
   useEffect(() => {
@@ -288,7 +290,7 @@ const OptionComponent = props => {
 
             </div>
 
-            <AccountInfoGauge account={account} library={library} chainId={chainId} tokens={tokens} />
+            <AccountInfoGauge account={account} library={library} chainId={chainId} tokens={tokens} active={active} token={marginToken} setToken={setMarginToken} />
           </>
         }
 

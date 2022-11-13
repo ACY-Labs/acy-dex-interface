@@ -4,48 +4,62 @@ import { Gauge } from 'ant-design-pro/lib/Charts';
 import { AcyPerpetualButton, AcyCuarrencyCard } from '../Acy';
 import Modal from '../PerpetualComponent/Modal/Modal';
 import TokenSelectorModal from '../TokenSelectorModal';
-import { addMargin, removeMargin } from '@/services/derivatives';
-import { getContract } from '@/constants/future_option_power';
+import { approveTokens, addMargin, removeMargin } from '@/services/derivatives';
+import { getContract, getTokens } from '@/constants/future_option_power';
 import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from '@/components/ConnectWallet';
-import Router from '@/abis/future-option-power/Router.json'
+import { AddressZero } from '@ethersproject/constants';
+import { PLACEHOLDER_ACCOUNT, fetcher, parseValue } from '@/acy-dex-futures/utils'
+import { useChainId } from '@/utils/helpers';
+import useSWR from 'swr';
+import Router from '@/abis/future-option-power/Router.json';
+import ERC20 from '@/abis/future-option-power/ERC20.json';
 
 import styles from './styles.less';
 
 const AccountInfoGauge = props => {
 
   const {
-    account,
-    library,
     chainId,
+    library,
+    account,
+    active,
     tokens,
+    token,
+    setToken,
   } = props
 
-  const [token, setToken] = useState()
+  const connectWalletByLocalStorage = useConnectWallet()
+
   const [mode, setMode] = useState('')
   const [isConfirming, setIsConfirming] = useState(false)
-  const [tokenAmount, setTokenAmount] = useState('');
+  const [tokenValue, setTokenValue] = useState('');
+  const [tokenAmount, setTokenAmount] = useState(parseValue(tokenValue, token?.decimals))
   const [visible, setVisible] = useState(false)
+  const [isApproving, setIsApproving] = useState(false)
+  const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
 
   const routerAddress = getContract(chainId, "router")
+  const poolAddress = getContract(chainId, "pool")
+  const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
 
-  const { active } = useWeb3React();
-  const connectWalletByLocalStorage = useConnectWallet();
+  const tokenAllowanceAddress = token.address === AddressZero ? nativeTokenAddress : token.address;
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
+    fetcher: fetcher(library, ERC20)
+  });
+
+  const needApproval =
+    token.address != AddressZero &&
+    tokenAllowance &&
+    tokenAmount &&
+    tokenAmount.gt(tokenAllowance)
 
   const onClickDeposit = () => {
-    if (!account) {
-      connectWalletByLocalStorage()
-      return
-    }
     setMode('Deposit')
     setIsConfirming(true)
   }
 
   const onClickWithdraw = () => {
-    if (!account) {
-      connectWalletByLocalStorage()
-      return
-    }
     setMode('Withdraw')
     setIsConfirming(true)
   }
@@ -57,19 +71,42 @@ const AccountInfoGauge = props => {
     if (!token) {
       return 'Select a Token'
     }
-    if (!tokenAmount) {
+    if (!tokenValue) {
       return 'Enter an Amount'
+    }
+    if (needApproval && isWaitingForApproval) {
+      return 'Waiting for Approval'
+    }
+    if (isApproving) {
+      return `Approving ${token.symbol}...`;
+    }
+    if (needApproval) {
+      return `Approve ${token.symbol}`;
     }
     return mode.toUpperCase()
   }
 
-  const setMargin = () => {
+  const onClickPrimary = () => {
+    if (!account) {
+      connectWalletByLocalStorage()
+      return
+    }
+    if (needApproval) {
+      approveTokens(library, routerAddress, ERC20, tokenAllowanceAddress, tokenAmount, setIsWaitingForApproval, setIsApproving)
+      return
+    }
     if (mode == 'Deposit') {
-      addMargin(chainId, library, routerAddress, Router, token, tokenAmount)
+      addMargin(chainId, library, routerAddress, Router, token, tokenValue)
     } else {
-      removeMargin(chainId, library, routerAddress, Router, token, tokenAmount)
+      removeMargin(chainId, library, routerAddress, Router, token, tokenValue)
     }
   }
+
+  useEffect(() => {
+    if (token && isWaitingForApproval && !needApproval) {
+      setIsWaitingForApproval(false)
+    }
+  }, [token, tokenAmount, needApproval])
 
   return (
     <div className={styles.main}>
@@ -118,19 +155,20 @@ const AccountInfoGauge = props => {
 
       {isConfirming &&
         <div className={styles.ConfirmationBox}>
-          <Modal isVisible={true} setIsVisible={() => { setIsConfirming(false) }} label={'Account '+mode}>
+          <Modal isVisible={true} setIsVisible={() => { setIsConfirming(false) }} label={'Account ' + mode}>
 
             <div style={{ width: '300px' }}>
               <AcyCuarrencyCard
                 coin={(token && token.symbol) || 'Select'}
                 logoURI={token && token.logoURI}
-                token={tokenAmount}
+                token={tokenValue}
                 showBalance={false}
                 onChoseToken={() => {
                   setVisible(true)
                 }}
                 onChangeToken={e => {
-                  setTokenAmount(e);
+                  setTokenValue(e);
+                  setTokenAmount(parseValue(e, token?.decimals))
                 }}
                 isLocked={false}
                 library={library}
@@ -140,10 +178,10 @@ const AccountInfoGauge = props => {
             <div className={styles.ConfirmationBoxRow}>
               <button
                 onClick={() => {
-                  setMargin()
+                  onClickPrimary()
                   setIsConfirming(false)
                 }}
-                disabled={!token || !tokenAmount}
+                disabled={!token || !tokenValue}
                 className={styles.ConfirmationBoxButton}
               >
                 {getPrimaryText()}
@@ -160,6 +198,7 @@ const AccountInfoGauge = props => {
         onCoinClick={token => {
           setToken(token)
           setVisible(false)
+          setIsWaitingForApproval(false)
         }}
         defaultTokens={tokens}
       />

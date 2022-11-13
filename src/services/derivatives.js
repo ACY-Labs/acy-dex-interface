@@ -22,13 +22,25 @@ export async function addMargin(
 
   const successMsg = `Order Submitted!`
 
-  Api.callContract(chainId, contract, method, params, {
-    sentMsg: `Submitted.`,
-    failMsg: `Failed.`,
-    successMsg,
-  })
-    .then(() => { })
-    .catch(e => { console.log(e) })
+  if (token.address === ethers.constants.AddressZero) {     // native token
+    let value = ethers.utils.parseUnits(tokenAmount, token.decimals)
+    Api.callContract(chainId, contract, method, params, {
+      value: value,
+      sentMsg: `Submitted.`,
+      failMsg: `Failed.`,
+      successMsg,
+    })
+      .then(() => { })
+      .catch(e => { console.log(e) })
+  } else {                                               // other ERC20 token, e.g. BTC
+    Api.callContract(chainId, contract, method, params, {
+      sentMsg: `Submitted.`,
+      failMsg: `Failed.`,
+      successMsg,
+    })
+      .then(() => { })
+      .catch(e => { console.log(e) })
+  }
 
 }
 
@@ -52,13 +64,25 @@ export async function removeMargin(
 
   const successMsg = `Order Submitted!`
 
-  Api.callContract(chainId, contract, method, params, {
-    sentMsg: `Submitted.`,
-    failMsg: `Failed.`,
-    successMsg,
-  })
-    .then(() => { })
-    .catch(e => { console.log(e) })
+  if (token.address === ethers.constants.AddressZero) {     // native token
+    let value = ethers.utils.parseUnits(tokenAmount, token.decimals)
+    Api.callContract(chainId, contract, method, params, {
+      value: value,
+      sentMsg: `Submitted.`,
+      failMsg: `Failed.`,
+      successMsg,
+    })
+      .then(() => { })
+      .catch(e => { console.log(e) })
+  } else {                                               // other ERC20 token, e.g. BTC
+    Api.callContract(chainId, contract, method, params, {
+      sentMsg: `Submitted.`,
+      failMsg: `Failed.`,
+      successMsg,
+    })
+      .then(() => { })
+      .catch(e => { console.log(e) })
+  }
 }
 
 export async function addLiquidity(
@@ -82,14 +106,25 @@ export async function addLiquidity(
 
   const successMsg = `Order Submitted!`
 
-  Api.callContract(chainId, contract, method, params, {
-    sentMsg: `Submitted.`,
-    failMsg: `Failed.`,
-    successMsg,
-  })
-    .then(() => { })
-    .catch(e => { console.log(e) })
-
+  if (token.address === ethers.constants.AddressZero) {     // native token
+    let value = ethers.utils.parseUnits(tokenAmount, token.decimals)
+    Api.callContract(chainId, contract, method, params, {
+      value: value,
+      sentMsg: `Submitted.`,
+      failMsg: `Failed.`,
+      successMsg,
+    })
+      .then(() => { })
+      .catch(e => { console.log(e) })
+  } else {                                               // other ERC20 token, e.g. BTC
+    Api.callContract(chainId, contract, method, params, {
+      sentMsg: `Submitted.`,
+      failMsg: `Failed.`,
+      successMsg,
+    })
+      .then(() => { })
+      .catch(e => { console.log(e) })
+  }
 }
 
 export async function removeLiquidity(
@@ -113,13 +148,25 @@ export async function removeLiquidity(
 
   const successMsg = `Order Submitted!`
 
-  Api.callContract(chainId, contract, method, params, {
-    sentMsg: `Submitted.`,
-    failMsg: `Failed.`,
-    successMsg,
-  })
-    .then(() => { })
-    .catch(e => { console.log(e) })
+  if (token.address === ethers.constants.AddressZero) {     // native token
+    let value = ethers.utils.parseUnits(tokenAmount, token.decimals)
+    Api.callContract(chainId, contract, method, params, {
+      value: value,
+      sentMsg: `Submitted.`,
+      failMsg: `Failed.`,
+      successMsg,
+    })
+      .then(() => { })
+      .catch(e => { console.log(e) })
+  } else {                                               // other ERC20 token, e.g. BTC
+    Api.callContract(chainId, contract, method, params, {
+      sentMsg: `Submitted.`,
+      failMsg: `Failed.`,
+      successMsg,
+    })
+      .then(() => { })
+      .catch(e => { console.log(e) })
+  }
 }
 
 export async function trade(
@@ -144,26 +191,38 @@ export async function trade(
 
   const successMsg = `Order Submitted!`
 
-  Api.callContract(chainId, contract, method, params, {
-    sentMsg: `Submitted.`,
-    failMsg: `Failed.`,
-    successMsg,
-  })
-    .then(() => { })
-    .catch(e => { console.log(e) })
+  if (token.address === ethers.constants.AddressZero) {     // native token
+    let value = ethers.utils.parseUnits(tokenAmount, token.decimals)
+    Api.callContract(chainId, contract, method, params, {
+      value: value,
+      sentMsg: `Submitted.`,
+      failMsg: `Failed.`,
+      successMsg,
+    })
+      .then(() => { })
+      .catch(e => { console.log(e) })
+  } else {                                               // other ERC20 token, e.g. BTC
+    Api.callContract(chainId, contract, method, params, {
+      sentMsg: `Submitted.`,
+      failMsg: `Failed.`,
+      successMsg,
+    })
+      .then(() => { })
+      .catch(e => { console.log(e) })
+  }
 }
 
 export async function approveTokens(
   library,
-  poolAddress,
-  Token,
+  routerAddress,
+  ERC20,
   tokenAddress,
+  tokenAmount,
   setIsWaitingForApproval,
   setIsApproving,
 ) {
-  const contract = new ethers.Contract(tokenAddress, Token.abi, library.getSigner()
-  );
-  contract.approve(poolAddress, ethers.constants.MaxUint256)
+  const contract = new ethers.Contract(tokenAddress, ERC20.abi, library.getSigner());
+  contract.approve(routerAddress, tokenAmount)
     .then(() => { setIsWaitingForApproval(true) })
     .catch(e => { console.error(e) })
     .finally(() => { setIsApproving(false) });
