@@ -14,8 +14,7 @@ import { approveTokens, trade } from '@/services/derivatives';
 import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
-import ERC20 from '@/acy-dex-futures/abis/ERC20.json'
-import Token from '@/acy-dex-futures/abis/Token.json'
+import ERC20 from '@/abis/future-option-power/ERC20.json';
 import Reader from '@/abis/future-option-power/Reader.json'
 import IPool from '@/abis/future-option-power/IPool.json'
 
@@ -28,23 +27,24 @@ const OptionComponent = props => {
   const {
     mode,
     setMode,
+    chainId,
+    tokens,
     selectedToken,
     symbol,
   } = props
 
-  const { chainId } = useChainId()
   const connectWalletByLocalStorage = useConnectWallet()
   const { account, active, library } = useWeb3React()
-  const tokens = getTokens(chainId)
 
   ///////////// read contract /////////////
 
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
+  const routerAddress = getContract(chainId, "router")
 
   const tokenAllowanceAddress = selectedToken.address === AddressZero ? nativeTokenAddress : selectedToken.address;
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, poolAddress], {
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
     fetcher: fetcher(library, ERC20)
   });
   const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
@@ -90,6 +90,8 @@ const OptionComponent = props => {
   const [marginToken, setMarginToken] = useState(tokens[1])
 
   const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
+  const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
+  const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const needApproval =
     selectedToken.address !== AddressZero &&
     tokenAllowance &&
@@ -138,17 +140,19 @@ const OptionComponent = props => {
   }, [chainId, mode])
 
   useEffect(() => {
-    let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(tokenInfo?.filter(item => item.token == selectedToken.address)[0]?.balance, 18, 2)
+    let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(selectedTokenBalance, 18, 2)
     setSelectedTokenValue(tokenAmount)
-    setUsdValue((tokenAmount * formatAmount(symbolInfo?.markPrice, 18)).toFixed(2))
   }, [percentage])
+
+  useEffect(()=>{
+    setUsdValue((selectedTokenValue * selectedTokenPrice).toFixed(2))
+  }, [selectedTokenValue])
 
   useEffect(() => {
     if (selectedToken && isWaitingForApproval && !needApproval) {
       setIsWaitingForApproval(false)
     }
   }, [selectedToken, selectedTokenAmount, needApproval])
-
 
   ///////////// write contract /////////////
 
@@ -158,7 +162,7 @@ const OptionComponent = props => {
       return
     }
     if (needApproval) {
-      approveTokens(library, poolAddress, Token, selectedToken.address, setIsWaitingForApproval, setIsApproving)
+      approveTokens(library, routerAddress, ERC, selectedToken.address, selectedTokenAmount, setIsWaitingForApproval, setIsApproving)
       return
     }
     if (mode == ' Buy') {
@@ -196,7 +200,6 @@ const OptionComponent = props => {
                     onChange={e => {
                       setSelectedTokenValue(e.target.value)
                       setShowDescription(true)
-                      setUsdValue((e.target.value * formatAmount(symbolInfo?.markPrice, 18)).toFixed(2))
                     }}
                   />
                   <span className={styles.inputLabel}>{selectedToken.symbol}</span>

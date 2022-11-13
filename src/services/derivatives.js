@@ -196,26 +196,13 @@ export async function trade(
   ]
 
   const successMsg = `Order Submitted!`
-
-  if (token.address === ethers.constants.AddressZero) {     // native token
-    let value = ethers.utils.parseUnits(tokenAmount, token.decimals)
-    Api.callContract(chainId, contract, method, params, {
-      value: value,
-      sentMsg: `Submitted.`,
-      failMsg: `Failed.`,
-      successMsg,
-    })
-      .then(() => { })
-      .catch(e => { console.log(e) })
-  } else {                                               // other ERC20 token, e.g. BTC
-    Api.callContract(chainId, contract, method, params, {
-      sentMsg: `Submitted.`,
-      failMsg: `Failed.`,
-      successMsg,
-    })
-      .then(() => { })
-      .catch(e => { console.log(e) })
-  }
+  Api.callContract(chainId, contract, method, params, {
+    sentMsg: `Submitted.`,
+    failMsg: `Failed.`,
+    successMsg,
+  })
+    .then(() => { })
+    .catch(e => { console.log(e) })
 }
 
 export async function approveTokens(

@@ -11,7 +11,7 @@ import { useConstantLoader } from '@/constants';
 import { ethers } from 'ethers'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
 import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract } from '@/constants/option.js';
+import { getTokens, getContract } from '@/constants/future_option_power.js';
 
 import styled from "styled-components";
 import styles from './styles.less'
@@ -154,6 +154,10 @@ const Option = props => {
   const onCloseMATIC = () => {
     setVisibleMATIC(false);
   };
+
+  useEffect(()=>{
+    setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
+  }, [chainId, tokens])
 
   return (
     <div className={styles.main}>
@@ -362,6 +366,8 @@ const Option = props => {
             <OptionComponent
               mode={mode}
               setMode={setMode}
+              chainId={chainId}
+              tokens={tokens}
               selectedToken={activeToken}
               symbol={symbol}
             />
