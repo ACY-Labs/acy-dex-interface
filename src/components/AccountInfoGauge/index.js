@@ -92,7 +92,7 @@ const AccountInfoGauge = props => {
       return
     }
     if (needApproval) {
-      approveTokens(library, routerAddress, ERC20, tokenAllowanceAddress, tokenAmount, setIsWaitingForApproval, setIsApproving)
+      approveTokens(library, routerAddress, ERC20, token.address, tokenAmount, setIsWaitingForApproval, setIsApproving)
       return
     }
     if (mode == 'Deposit') {

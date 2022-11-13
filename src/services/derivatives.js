@@ -93,6 +93,7 @@ export async function addLiquidity(
   token,
   tokenAmount,
   minLp,
+  setIsSubmitting,
 ) {
   const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner())
 
@@ -116,6 +117,7 @@ export async function addLiquidity(
     })
       .then(() => { })
       .catch(e => { console.log(e) })
+      .finally(()=>{setIsSubmitting(false)})
   } else {                                               // other ERC20 token, e.g. BTC
     Api.callContract(chainId, contract, method, params, {
       sentMsg: `Submitted.`,
@@ -124,6 +126,7 @@ export async function addLiquidity(
     })
       .then(() => { })
       .catch(e => { console.log(e) })
+      .finally(()=>{setIsSubmitting(false)})
   }
 }
 
@@ -135,6 +138,7 @@ export async function removeLiquidity(
   token,
   tokenAmount,
   minOut,
+  setIsSubmitting,
 ) {
   const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner())
 
@@ -158,6 +162,7 @@ export async function removeLiquidity(
     })
       .then(() => { })
       .catch(e => { console.log(e) })
+      .finally(()=>{setIsSubmitting(false)})
   } else {                                               // other ERC20 token, e.g. BTC
     Api.callContract(chainId, contract, method, params, {
       sentMsg: `Submitted.`,
@@ -166,6 +171,7 @@ export async function removeLiquidity(
     })
       .then(() => { })
       .catch(e => { console.log(e) })
+      .finally(()=>{setIsSubmitting(false)})
   }
 }
 

@@ -28,8 +28,7 @@ import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualT
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection';
 import glp40Icon from '@/pages/BuyGlp/components/ic_glp_40.svg'
 import AcyPerpetualButton from '@/components/PerpetualComponent/components/AcyPerpetualButton';
-import ERC20 from '@/acy-dex-futures/abis/ERC20.json';
-import Token from '@/acy-dex-futures/abis/Token.json';
+import ERC20 from '@/abis/future-option-power/ERC20.json';
 import Router from '@/abis/future-option-power/Router.json';
 import Reader from '@/abis/future-option-power/Reader.json';
 import Alp from '@/abis/future-option-power/Alp.json'
@@ -54,7 +53,10 @@ const AcyPoolComponent = props => {
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
 
   const tokenAllowanceAddress = selectedToken.address === ethers.constants.AddressZero ? nativeTokenAddress : selectedToken.address;
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, poolAddress], {
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
+    fetcher: fetcher(library, ERC20)
+  });
+  const { data: alpAllowance, mutate: updateAlpAllowance } = useSWR([chainId, alpAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
     fetcher: fetcher(library, ERC20)
   });
   const { data: poolInfo, mutate: updatePoolInfo } = useSWR([chainId, readerAddress, "getPoolInfo", poolAddress], {
@@ -100,7 +102,8 @@ const AcyPoolComponent = props => {
   const [mode, setMode] = useState("Buy ALP")
   const [selectedTokenValue, setSelectedTokenValue] = useState(0)
   const [selectedTokenAmount, setSelectedTokenAmount] = useState(parseValue(selectedTokenValue, selectedToken?.decimals))
-  const [alpValue, setAlpValue] = useState("")
+  const [alpValue, setAlpValue] = useState(0)
+  const [alpAmount, setAlpAmount] = useState(parseValue(alpValue, ALP_DECIMALS))
   const [feeBasisPoints, setFeeBasisPoints] = useState("")
   const [payBalance, setPayBalance] = useState('$0.00');
   const [receiveBalance, setReceiveBalance] = useState('$0.00');
@@ -109,14 +112,15 @@ const AcyPoolComponent = props => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
 
-  const needApproval =
-    isBuying &&
+  const needApproval = isBuying ?
     selectedToken.address != ethers.constants.AddressZero &&
     tokenAllowance &&
     selectedTokenAmount &&
     selectedTokenAmount.gt(tokenAllowance)
+    : alpAllowance &&
+    alpAmount &&
+    alpAmount.gt(alpAllowance)
 
-  const alpAmount = parseValue(alpValue, ALP_DECIMALS)
   const alpPrice = poolInfo ? poolInfo.totalSupply.gt(0) ? parseInt(poolInfo.liquidity) / parseInt(poolInfo.totalSupply) : expandDecimals(1, USD_DECIMALS) : 0
   const alpSupplyUsd = alpSupply ? alpSupply.mul(parseValue(alpPrice, ALP_DECIMALS)) : bigNumberify(0)
   const alpBalanceUsd = alpBalance ? alpBalance.mul(parseValue(alpPrice, ALP_DECIMALS)) : bigNumberify(0)
@@ -188,8 +192,8 @@ const AcyPoolComponent = props => {
     const [error, modal] = getError()
     if (error && !modal) { return error }
     if (needApproval && isWaitingForApproval) { return "Waiting for Approval" }
-    if (isApproving) { return `Approving ${selectedToken.symbol}...` }
-    if (needApproval) { return `Approve ${selectedToken.symbol}` }
+    if (isApproving) { return isBuying ? `Approving ${selectedToken.symbol}...` : 'Approving ALP...' }
+    if (needApproval) { return isBuying ? `Approve ${selectedToken.symbol}` : 'Approve ALP' }
     if (isSubmitting) { return isBuying ? `Buying...` : `Selling...` }
 
     return isBuying ? "Buy ALP" : "Sell ALP"
@@ -202,6 +206,20 @@ const AcyPoolComponent = props => {
   useEffect(() => {
     setSelectedTokenAmount(parseValue(selectedTokenValue, selectedToken?.decimals))
   }, [selectedTokenValue])
+
+  useEffect(() => {
+    setAlpAmount(parseValue(alpValue, ALP_DECIMALS))
+  }, [alpValue])
+
+  useEffect(() => {
+    setIsSubmitting(false)
+  }, [chainId, selectedToken, selectedTokenAmount, isBuying])
+
+  useEffect(() => {
+    if (selectedToken && isWaitingForApproval && !needApproval) {
+      setIsWaitingForApproval(false)
+    }
+  }, [selectedToken, selectedTokenAmount, needApproval])
 
   useEffect(() => {
     if (selectedTokenValue == 0) {
@@ -224,12 +242,13 @@ const AcyPoolComponent = props => {
   useEffect(() => {
     if (anchorOnSwapAmount) {
       if (!selectedTokenAmount) {
-        setAlpValue("")
+        setAlpValue(0)
         setFeeBasisPoints("")
         return
       }
       if (isBuying) {
-        let nextAmount = amountUsd?.div(parseValue(alpPrice, ALP_DECIMALS))
+        
+        let nextAmount = alpPrice && amountUsd?.div(parseValue(alpPrice, ALP_DECIMALS))
           .mul(BASIS_POINTS_DIVISOR).div(BASIS_POINTS_DIVISOR - MINT_BURN_FEE_BASIS_POINTS)
 
         let nextValue = formatAmountFree(nextAmount, ALP_DECIMALS, ALP_DECIMALS)
@@ -238,7 +257,7 @@ const AcyPoolComponent = props => {
         setAlpValue(nextValue)
         setFeeBasisPoints(MINT_BURN_FEE_BASIS_POINTS)
       } else {
-        let nextAmount = amountUsd.div(parseValue(alpPrice, ALP_DECIMALS))
+        let nextAmount = alpPrice && amountUsd.div(parseValue(alpPrice, ALP_DECIMALS))
           .mul(expandDecimals(1, selectedToken.decimals)).div(expandDecimals(1, ALP_DECIMALS))
           .mul(BASIS_POINTS_DIVISOR).div(BASIS_POINTS_DIVISOR - BURN_FEE_BASIS_POINTS)
 
@@ -292,14 +311,15 @@ const AcyPoolComponent = props => {
 
   const buyAlp = () => {
     setIsSubmitting(true)
-    const minLp = parseValue(alpValue * 0.995, ALP_DECIMALS)
-    addLiquidity(chainId, library, routerAddress, Router, selectedToken, selectedTokenAmount, minLp)
+    const minLp = parseValue(alpValue * 0.95, ALP_DECIMALS)
+    addLiquidity(chainId, library, routerAddress, Router, selectedToken, selectedTokenAmount, minLp, setIsSubmitting)
   }
 
   const sellAlp = () => {
     setIsSubmitting(true)
-    const minLp = parseValue(alpValue * 0.995, ALP_DECIMALS)
-    removeLiquidity(chainId, library, routerAddress, Router, selectedToken, selectedTokenAmount, outLp)
+    // const minOut = parseValue(alpValue * 0.95, ALP_DECIMALS)
+    const minOut = bigNumberify(0)
+    removeLiquidity(chainId, library, routerAddress, Router, selectedToken, selectedTokenAmount, minOut, setIsSubmitting)
   }
 
   const onClickPrimary = () => {
@@ -308,7 +328,8 @@ const AcyPoolComponent = props => {
       return
     }
     if (needApproval) {
-      approveTokens(library, poolAddress, Token, selectedToken.address, setIsWaitingForApproval, setIsApproving)
+      isBuying ? approveTokens(library, routerAddress, ERC20, selectedToken.address, selectedTokenAmount, setIsWaitingForApproval, setIsApproving)
+      : approveTokens(library, routerAddress, ERC20, alpAddress, alpAmount, setIsWaitingForApproval, setIsApproving)
       return
     }
     const [, modal] = getError()
