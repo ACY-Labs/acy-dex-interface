@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import className from 'classnames';
 import { Divider, Icon, Input, Table, Button, Dropdown } from 'antd';
 import { AcyIcon, AcyTabs, AcyTokenIcon, AcyCardList } from '@/components/Acy';
+import {ClosePositionModal} from '@/components/ClosePositionModal';
 
 import styles from './TableComponent.less'
 
@@ -10,6 +11,7 @@ import styles from './TableComponent.less'
 export function PositionTable(props){
     const [currentKey, setCurrentKey] = useState('');
     const [isHover, setIsHover] = useState(false);
+    const [isCloseModalVisible, setIsCloseModalVisible] = useState(false);
     
     function columnsCoin() {
         return [
@@ -169,7 +171,7 @@ export function PositionTable(props){
                 borderColor: '#8c9196',
                 }}
                 onClick={()=>{
-                    // props.onClosePosition(entry)
+                    setIsCloseModalVisible(true)
                 }}>
                 Close
               </Button>;
@@ -180,19 +182,25 @@ export function PositionTable(props){
 
 
     return (
-        <div className={styles.nobgTable}>
-          <Table
-            dataSource={props.dataSource}
-            columns={columnsCoin().filter(item => item.visible == true)}
-            pagination={false}
-            style={{
-              marginBottom: '20px',
-              cursor: isHover ? 'pointer' : 'default',
-            }}
-            onRowMouseEnter={() => setIsHover(true)}
-            onRowMouseLeave={() => setIsHover(false)}
-            rowKey='id'
-          />
+        <div>
+            <div className={styles.nobgTable}>
+            <Table
+                dataSource={props.dataSource}
+                columns={columnsCoin().filter(item => item.visible == true)}
+                pagination={false}
+                style={{
+                marginBottom: '20px',
+                cursor: isHover ? 'pointer' : 'default',
+                }}
+                onRowMouseEnter={() => setIsHover(true)}
+                onRowMouseLeave={() => setIsHover(false)}
+                rowKey='id'
+            />
+            </div>
+            <ClosePositionModal 
+            isModalVisible={isCloseModalVisible} 
+            onCancel = {() => setIsCloseModalVisible(false)}
+            />
         </div>
       );
 }
