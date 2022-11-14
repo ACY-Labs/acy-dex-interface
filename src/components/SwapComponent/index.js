@@ -13,6 +13,7 @@ import TokenSelectorDrawer from '../TokenSelectorDrawer';
 import DetailBox from './components/DetailBox';
 import ScoreBox from './components/ScoreBox';
 import styles from './styles.less';
+import mockTokenList from './mockTokenList.json';
 
 
 // var CryptoJS = require("crypto-js");
@@ -29,7 +30,9 @@ const SwapComponent = props => {
   // 选择货币的弹窗
 
   const { chainId } = useChainId();
-  const INITIAL_TOKEN_LIST = getTokens(chainId);
+  // const INITIAL_TOKEN_LIST = getTokens(chainId);
+  const INITIAL_TOKEN_LIST = mockTokenList;
+  console.log("token list in TRADE",INITIAL_TOKEN_LIST)
 
   const coinList = getGlobalTokenList()
 

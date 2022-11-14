@@ -16,12 +16,15 @@ import { asyncForEach } from "@/utils/asynctools";
 import { processString } from "@/components/AcyCoinItem";
 import styles from "./styles.less";
 import { useConstantLoader, getGlobalTokenList } from '@/constants';
+import mockTokenList from '@/components/SwapComponent/mockTokenList.json';
 
 const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList }) => {
   const { account, library, chainId } = useConstantLoader();
 
   // const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
-  const tokenlist = coinList ? coinList : getGlobalTokenList()
+  // const tokenlist = coinList ? coinList : getGlobalTokenList()
+  const tokenlist = mockTokenList
+  console.log("Token list in drawer", tokenlist)
   useEffect(() => {
     setInitTokenList(tokenlist)
   }, [tokenlist])
