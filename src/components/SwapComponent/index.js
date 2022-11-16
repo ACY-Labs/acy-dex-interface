@@ -14,6 +14,7 @@ import DetailBox from './components/DetailBox';
 import ScoreBox from './components/ScoreBox';
 import styles from './styles.less';
 import mockTokenList from './mockTokenList.json';
+import axios from 'axios';
 
 
 // var CryptoJS = require("crypto-js");
@@ -30,9 +31,17 @@ const SwapComponent = props => {
   // 选择货币的弹窗
 
   const { chainId } = useChainId();
-  // const INITIAL_TOKEN_LIST = getTokens(chainId);
-  const INITIAL_TOKEN_LIST = mockTokenList;
-  console.log("token list in TRADE",INITIAL_TOKEN_LIST)
+  const getTokenList = async (chainId)=>{
+    try {
+      const res = await fetch("https://stats.acy.finance/api/tokens?chainId=56")
+      const myJson = await res.json()
+      return myJson.data
+    } catch (error) {
+      return
+    }
+  }
+  let INITIAL_TOKEN_LIST = getTokens(chainId);
+  INITIAL_TOKEN_LIST = getTokenList(chainId);
 
   const coinList = getGlobalTokenList()
 
