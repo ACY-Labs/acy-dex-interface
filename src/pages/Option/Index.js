@@ -239,7 +239,7 @@ const Option = props => {
   //   console.log("POSITION2",rawPositionData)
   //   const positionData = getPosition(rawPositionData)
   //   console.log("POSITIONDATA2",positionData)
-  // }, [active, library, chainId,
+  // }, [account,active, library, chainId,
   //   updatePosition]
   // )
   // await getPosition(account,chainId)

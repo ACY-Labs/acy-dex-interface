@@ -12,6 +12,7 @@ export function PositionTable(props){
     const [currentKey, setCurrentKey] = useState('');
     const [isHover, setIsHover] = useState(false);
     const [isCloseModalVisible, setIsCloseModalVisible] = useState(false);
+    const [selectedPosition, setSelectedPosition] = useState();
     
     function columnsCoin() {
         return [
@@ -171,6 +172,7 @@ export function PositionTable(props){
                 borderColor: '#8c9196',
                 }}
                 onClick={()=>{
+                    setSelectedPosition(entry);
                     setIsCloseModalVisible(true)
                 }}>
                 Close
@@ -200,6 +202,7 @@ export function PositionTable(props){
             <ClosePositionModal 
             isModalVisible={isCloseModalVisible} 
             onCancel = {() => setIsCloseModalVisible(false)}
+            position = {selectedPosition}
             />
         </div>
       );
