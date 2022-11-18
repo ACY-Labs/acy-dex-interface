@@ -143,7 +143,7 @@ const Overview = props => {
     const getTokenImg = token => {
         return tokenImgURL[token.name]
     }
-    
+
 
     const getPrimaryText = () => {
         if (account == undefined) {
@@ -449,7 +449,7 @@ const Overview = props => {
         ];
         return childColumns
     }
-    
+
 
     return (
         <div className={styles.main}>
@@ -560,31 +560,62 @@ const Overview = props => {
                             </div>
                         }
 
+                        <Row style={{ fontSize: "1rem", marginTop: "1rem", backgroundColor: "black" }}>Coin</Row>
+                        <Row>
+                            <div className={styles.coin} >
+                                <Select
+                                    // defaultValue="Trade"
+                                    value={activeToken}
+                                    onChange={selectToken}
+                                    dropdownClassName={styles.dropDownMenu}
+                                >
+                                    {activeTokenList.map(token => (
+                                        <Option className={styles.optionItem} value={token.symbol}>
+                                            <Col span={10}> <img src={tokenImgURL[token.symbol]} style={{ width: '20px', height: '20px' }} /></Col>
+                                            <Col offset={1} span={13}> <div> {token.symbol}</div> </Col>
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </div>
+                        </Row>
                         <Row style={{ fontSize: "1rem", marginTop: "1rem", backgroundColor: "black" }}>Amount</Row>
                         <Row>
                             <div className={styles.tokenAmount} >
+                                {/* <Select
+                                    // defaultValue="Select Token"
+                                    value={activeToken}
+                                    onChange={selectToken}
+                                    dropdownClassName={styles.dropDownMenu}
+                                >
+                                    {activeTokenList.map(token => (
+                                        <Option className={styles.optionItem} value={token.symbol}>
+                                            <Col span={10}> <img src={tokenImgURL[token.symbol]} style={{ width: '20px', height: '20px' }} /></Col>
+                                            <Col offset={1} span={13}> <div> {token.symbol}</div> </Col>
+                                        </Option>
+                                    ))}
+                                </Select> */}
                                 <Input
                                     value={0}
                                     onChange={e => {
 
                                     }}
-                                    suffix={
-                                        <div className={styles.tokenSelector}>
-                                            <Select
-                                                // defaultValue="Select Token"
-                                                value={activeToken}
-                                                onChange={selectToken}
-                                                dropdownClassName={styles.dropDownMenu}
-                                            >
-                                                {activeTokenList.map(token => (
-                                                    <Option className={styles.optionItem} value={token.symbol}>
-                                                        <Col span={10}> <img src={tokenImgURL[token.symbol]} style={{ width: '20px', height: '20px' }} /></Col>
-                                                        <Col offset={1} span={13}> <div> {token.symbol}</div> </Col>
-                                                    </Option>
-                                                ))}
-                                            </Select>
-                                        </div>
-                                    }
+                                    // suffix={
+                                    //     <div className={styles.tokenSelector}>
+                                    //         <Select
+                                    //             // defaultValue="Select Token"
+                                    //             value={activeToken}
+                                    //             onChange={selectToken}
+                                    //             dropdownClassName={styles.dropDownMenu}
+                                    //         >
+                                    //             {activeTokenList.map(token => (
+                                    //                 <Option className={styles.optionItem} value={token.symbol}>
+                                    //                     <Col span={10}> <img src={tokenImgURL[token.symbol]} style={{ width: '20px', height: '20px' }} /></Col>
+                                    //                     <Col offset={1} span={13}> <div> {token.symbol}</div> </Col>
+                                    //                 </Option>
+                                    //             ))}
+                                    //         </Select>
+                                    //     </div>
+                                    // }
                                     style={{ height: "2rem" }}
                                 />
                             </div>
