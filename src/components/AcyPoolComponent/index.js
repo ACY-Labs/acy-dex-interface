@@ -145,12 +145,30 @@ const AcyPoolComponent = props => {
 
   const onTokenValueChange = (e) => {
     setAnchorOnSwapAmount(true)
+    if (e.target.value === "") {
+      setSelectedTokenValue("0")
+    }
+    else if (e.target.value[0] === "0") {
+      let num = parseFloat(e.target.value)
+      setSelectedTokenValue(num.toString())
+    }
+    else {
     setSelectedTokenValue(e.target.value)
+    }
   }
 
   const onAlpValueChange = (e) => {
     setAnchorOnSwapAmount(false)
-    setAlpValue(e.target.value)
+    if (e.target.value === "") {
+      setAlpValue("0")
+    }
+    else if (e.target.value[0] === "0") {
+      let num = parseFloat(e.target.value)
+      setAlpValue(num.toString())
+    }
+    else {
+      setAlpValue(e.target.value)
+    }
   }
 
   const onSelectToken = (symbol) => {
