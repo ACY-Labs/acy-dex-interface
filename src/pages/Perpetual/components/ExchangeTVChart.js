@@ -50,7 +50,7 @@ const StyledSelect = styled(Radio.Group)`
     height: 22px;
     font-size: 0.7rem;
     padding: 0 0.1rem;
-    border: 0.75px solid #333333;
+    border: 0;
     border-radius: 0 0 0 0;
     line-height: 22px;
     color: #b5b5b6;
