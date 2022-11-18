@@ -158,30 +158,6 @@ const Powers = props => {
     setVisibleMATIC(false);
   };
 
-  const onTrade = async (symbol, amount, priceLimit) => {
-    const poolAddress = getContract(chainId, "pool")
-    const contract = new ethers.Contract(poolAddress, IPool.abi, library.getSigner())
-    let method = "trade"
-    let params = [
-      account,
-      symbol,
-      amount,
-      priceLimit,
-      [], //oracleSignature
-    ]
-
-    let value = bigNumberify(0)
-    const successMsg = `Order Submitted!`
-    Api.callContract(chainId, contract, method, params, {
-      value,
-      sentMsg: `Submitted.`,
-      failMsg: `Failed.`,
-      successMsg,
-    })
-      .then(() => { })
-      .catch(e => { console.log(e) })
-  }
-
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
@@ -365,7 +341,6 @@ const Powers = props => {
               setMode={setMode}
               selectedToken={activeToken}
               symbol={symbol}
-              onTrade={onTrade}
             />
           </AcyCard>
         </div>

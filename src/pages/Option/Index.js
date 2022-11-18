@@ -11,7 +11,7 @@ import { useConstantLoader } from '@/constants';
 import { ethers } from 'ethers'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
 import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract } from '@/constants/option.js';
+import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
 import styled from "styled-components";
@@ -43,6 +43,7 @@ const Option = props => {
   const { account, library } = useConstantLoader();
   let { chainId } = useChainId();
   let tokens = getTokens(chainId);
+  chainId = 80001
 
   const [mode, setMode] = useState('Buy')
   const [symbol, setSymbol] = useState('BTCUSD-60000-C')
@@ -159,9 +160,9 @@ const Option = props => {
     setVisibleMATIC(false);
   };
 
-  const onTrade = async (symbol, amount, priceLimit) => {
-
-  }
+  useEffect(()=>{
+    setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
+  }, [chainId, tokens])
 
   return (
     <div className={styles.main}>
@@ -382,9 +383,10 @@ const Option = props => {
             <OptionComponent
               mode={mode}
               setMode={setMode}
+              chainId={chainId}
+              tokens={tokens}
               selectedToken={activeToken}
               symbol={symbol}
-              onTrade={onTrade}
             />
           </AcyCard>
         </div>

@@ -17,7 +17,7 @@ import { getContract } from './Addresses';
 import { useLocalStorage } from "react-use";
 import { constantInstance, useConstantLoader } from '@/constants';
 import { format as formatDateFn } from "date-fns";
-import { BURN_FEE_BASIS_POINTS, MINT_FEE_BASIS_POINTS } from './_Helpers';
+import { MINT_FEE_BASIS_POINTS } from './_Helpers';
 import { useGraph } from '@/pages/Stats/Perpetual/dataProvider';
 import { sortBy} from 'lodash'
 import { TOKEN_LIST } from '@/constants';
@@ -52,6 +52,7 @@ export const PLACEHOLDER_ACCOUNT = ethers.Wallet.createRandom().address
 export const PRECISION = expandDecimals(1, USD_DECIMALS)
 export const TAX_BASIS_POINTS = 50
 export const MINT_BURN_FEE_BASIS_POINTS = 20
+export const BURN_FEE_BASIS_POINTS = 30
 export const DEFAULT_MAX_USDG_AMOUNT = expandDecimals(200 * 1000 * 1000, 18)
 export const ARBITRUM_DEFAULT_COLLATERAL_SYMBOL = 'USDC'
 // export const ARBITRUM_DEFAULT_COLLATERAL_ADDRESS = '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'

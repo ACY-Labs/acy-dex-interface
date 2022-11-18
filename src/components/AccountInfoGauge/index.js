@@ -3,33 +3,56 @@ import { Button } from 'antd';
 import { Gauge } from 'ant-design-pro/lib/Charts';
 import { AcyPerpetualButton, AcyCuarrencyCard } from '../Acy';
 import Modal from '../PerpetualComponent/Modal/Modal';
-import { useChainId } from '@/utils/helpers';
-import styles from './styles.less';
 import TokenSelectorModal from '../TokenSelectorModal';
-import { getTokens, getContract } from '@/constants/powers.js';
-import IPool from '@/abis/future-option-power/IPool.json'
-import { ethers } from 'ethers'
-import { bigNumberify,getGasLimit,getGasPrice } from '@/acy-dex-futures/utils';
-import * as Api from '@/acy-dex-futures/Api';
-import Web3 from 'web3'
+import { approveTokens, addMargin, removeMargin } from '@/services/derivatives';
+import { getContract, getTokens } from '@/constants/future_option_power';
+import { useWeb3React } from '@web3-react/core';
+import { useConnectWallet } from '@/components/ConnectWallet';
+import { AddressZero } from '@ethersproject/constants';
+import { PLACEHOLDER_ACCOUNT, fetcher, parseValue } from '@/acy-dex-futures/utils'
+import { useChainId } from '@/utils/helpers';
+import useSWR from 'swr';
+import Router from '@/abis/future-option-power/Router.json';
+import ERC20 from '@/abis/future-option-power/ERC20.json';
+
+import styles from './styles.less';
 
 const AccountInfoGauge = props => {
 
   const {
-    account,
+    chainId,
     library,
+    account,
+    active,
     tokens,
+    token,
+    setToken,
   } = props
 
-  const [token, setToken] = useState()
+  const connectWalletByLocalStorage = useConnectWallet()
+
   const [mode, setMode] = useState('')
   const [isConfirming, setIsConfirming] = useState(false)
-  const [tokenAmount, setTokenAmount] = useState('');
+  const [tokenValue, setTokenValue] = useState('');
+  const [tokenAmount, setTokenAmount] = useState(parseValue(tokenValue, token?.decimals))
   const [visible, setVisible] = useState(false)
-  const { chainId } = useChainId();
-  
+  const [isApproving, setIsApproving] = useState(false)
+  const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
 
+  const routerAddress = getContract(chainId, "router")
   const poolAddress = getContract(chainId, "pool")
+  const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
+
+  const tokenAllowanceAddress = token.address === AddressZero ? nativeTokenAddress : token.address;
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
+    fetcher: fetcher(library, ERC20)
+  });
+
+  const needApproval =
+    token.address != AddressZero &&
+    tokenAllowance &&
+    tokenAmount &&
+    tokenAmount.gt(tokenAllowance)
 
   const onClickDeposit = () => {
     setMode('Deposit')
@@ -42,53 +65,48 @@ const AccountInfoGauge = props => {
   }
 
   const getPrimaryText = () => {
-    if(!token) {
+    if (!active) {
+      return 'Connect Wallet'
+    }
+    if (!token) {
       return 'Select a Token'
     }
-    if(!tokenAmount) {
+    if (!tokenValue) {
       return 'Enter an Amount'
+    }
+    if (needApproval && isWaitingForApproval) {
+      return 'Waiting for Approval'
+    }
+    if (isApproving) {
+      return `Approving ${token.symbol}...`;
+    }
+    if (needApproval) {
+      return `Approve ${token.symbol}`;
     }
     return mode.toUpperCase()
   }
 
-  const addMargin = async () => {
-    const contract = new ethers.Contract(poolAddress, IPool.abi, library.getSigner())
-
-    let method = "addMargin"
-    let params = [
-      token.address,  //token address
-      token.symbol,  //token symbol
-      ethers.utils.parseUnits(tokenAmount, token.decimals),  //amount
-      [], //oracleSignature
-    ]
-    
-    const successMsg = `Order Submitted!`
-
-    if(token.address===ethers.constants.AddressZero){     // matic in mumbai chain
-      let value = ethers.utils.parseUnits(tokenAmount, token.decimals)
-      console.log("MATIC!",value)
-      Api.callContract(chainId, contract, method, params, {
-        value: value,
-        sentMsg: `Submitted.`,
-        failMsg: `Failed.`,
-        successMsg,
-      })
-        .then(() => { })
-        .catch(e => { console.log(e) })
-    }else{                                               // other ERC20 token, e.g. BTC
-      Api.callContract(chainId, contract, method, params, {
-        sentMsg: `Submitted.`,
-        failMsg: `Failed.`,
-        successMsg,
-      })
-        .then(() => { })
-        .catch(e => { console.log(e) })
+  const onClickPrimary = () => {
+    if (!account) {
+      connectWalletByLocalStorage()
+      return
+    }
+    if (needApproval) {
+      approveTokens(library, routerAddress, ERC20, token.address, tokenAmount, setIsWaitingForApproval, setIsApproving)
+      return
+    }
+    if (mode == 'Deposit') {
+      addMargin(chainId, library, routerAddress, Router, token, tokenValue)
+    } else {
+      removeMargin(chainId, library, routerAddress, Router, token, tokenValue)
     }
   }
 
-  const removeMargin = () => {
-
-  }
+  useEffect(() => {
+    if (token && isWaitingForApproval && !needApproval) {
+      setIsWaitingForApproval(false)
+    }
+  }, [token, tokenAmount, needApproval])
 
   return (
     <div className={styles.main}>
@@ -137,19 +155,20 @@ const AccountInfoGauge = props => {
 
       {isConfirming &&
         <div className={styles.ConfirmationBox}>
-          <Modal isVisible={true} setIsVisible={() => { setIsConfirming(false) }} label={'Account '+mode}>
+          <Modal isVisible={true} setIsVisible={() => { setIsConfirming(false) }} label={'Account ' + mode}>
 
             <div style={{ width: '300px' }}>
               <AcyCuarrencyCard
                 coin={(token && token.symbol) || 'Select'}
                 logoURI={token && token.logoURI}
-                token={tokenAmount}
+                token={tokenValue}
                 showBalance={false}
                 onChoseToken={() => {
                   setVisible(true)
                 }}
                 onChangeToken={e => {
-                  setTokenAmount(e);
+                  setTokenValue(e);
+                  setTokenAmount(parseValue(e, token?.decimals))
                 }}
                 isLocked={false}
                 library={library}
@@ -159,10 +178,10 @@ const AccountInfoGauge = props => {
             <div className={styles.ConfirmationBoxRow}>
               <button
                 onClick={() => {
-                  mode == 'Deposit' ? addMargin() : removeMargin()
+                  onClickPrimary()
                   setIsConfirming(false)
                 }}
-                disabled={!token || !tokenAmount}
+                disabled={!token || !tokenValue}
                 className={styles.ConfirmationBoxButton}
               >
                 {getPrimaryText()}
@@ -179,6 +198,7 @@ const AccountInfoGauge = props => {
         onCoinClick={token => {
           setToken(token)
           setVisible(false)
+          setIsWaitingForApproval(false)
         }}
         defaultTokens={tokens}
       />
