@@ -8,7 +8,7 @@ import { INITIAL_ALLOWED_SLIPPAGE, getTokens, getContract } from '@/constants/fu
 import { useChainId } from '@/utils/helpers';
 import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from '@/components/ConnectWallet';
-import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, expandDecimals, bigNumberify, formatAmount } from '@/acy-dex-futures/utils';
+import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, expandDecimals, bigNumberify, formatAmount, BASIS_POINTS_DIVISOR } from '@/acy-dex-futures/utils';
 import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
 import { approveTokens, trade } from '@/services/derivatives';
 import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
@@ -92,12 +92,13 @@ const OptionComponent = props => {
   const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
   const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
   const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
+  const symbolMarkPrice = symbolInfo?.markPrice
   const needApproval =
     selectedToken.address !== AddressZero &&
     tokenAllowance &&
     selectedTokenAmount &&
     selectedTokenAmount.gt(tokenAllowance)
-
+    
   const getPercentageButton = value => {
     if (percentage != value) {
       return (
@@ -137,14 +138,14 @@ const OptionComponent = props => {
   useEffect(() => {
     setShowDescription(false)
     setMarginToken(tokens[1])
-  }, [chainId, mode])
+  }, [chainId, tokens])
 
   useEffect(() => {
     let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(selectedTokenBalance, 18, 2)
     setSelectedTokenValue(tokenAmount)
   }, [percentage])
 
-  useEffect(()=>{
+  useEffect(() => {
     setUsdValue((selectedTokenValue * selectedTokenPrice).toFixed(2))
   }, [selectedTokenValue])
 
@@ -165,10 +166,10 @@ const OptionComponent = props => {
       approveTokens(library, routerAddress, ERC, selectedToken.address, selectedTokenAmount, setIsWaitingForApproval, setIsApproving)
       return
     }
-    if (mode == ' Buy') {
-      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount, expandDecimals(50001, 18))
+    if (mode == 'Buy') {
+      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount, symbolMarkPrice)
     } else {
-      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount.mul(bigNumberify(-1)), expandDecimals(50001, 18))
+      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount.mul(bigNumberify(-1)), symbolMarkPrice)
     }
   }
 
@@ -293,7 +294,16 @@ const OptionComponent = props => {
 
             </div>
 
-            <AccountInfoGauge account={account} library={library} chainId={chainId} tokens={tokens} active={active} token={marginToken} setToken={setMarginToken} />
+            <AccountInfoGauge
+              account={account}
+              library={library}
+              chainId={chainId}
+              tokens={tokens}
+              active={active}
+              token={marginToken}
+              setToken={setMarginToken}
+              symbol={symbol}
+            />
           </>
         }
 

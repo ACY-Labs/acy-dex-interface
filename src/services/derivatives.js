@@ -9,6 +9,7 @@ export async function addMargin(
   Router,
   token,
   tokenAmount,
+  symbol,
 ) {
   const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner())
 
@@ -16,7 +17,7 @@ export async function addMargin(
   let params = [
     token.address,  //token address
     ethers.utils.parseUnits(tokenAmount, token.decimals),  //amount
-    token.symbol,  //token symbol
+    symbol,  //token symbol
     [], //oracleSignature
   ]
 
@@ -51,6 +52,7 @@ export async function removeMargin(
   Router,
   token,
   tokenAmount,
+  symbol,
 ) {
   const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner())
 
@@ -58,7 +60,7 @@ export async function removeMargin(
   let params = [
     token.address,  //token address
     ethers.utils.parseUnits(tokenAmount, token.decimals),  //amount
-    token.symbol,  //token symbol
+    symbol,  //token symbol
     [], //oracleSignature
   ]
 

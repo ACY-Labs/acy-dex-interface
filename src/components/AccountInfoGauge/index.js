@@ -27,6 +27,7 @@ const AccountInfoGauge = props => {
     tokens,
     token,
     setToken,
+    symbol,
   } = props
 
   const connectWalletByLocalStorage = useConnectWallet()
@@ -96,9 +97,9 @@ const AccountInfoGauge = props => {
       return
     }
     if (mode == 'Deposit') {
-      addMargin(chainId, library, routerAddress, Router, token, tokenValue)
+      addMargin(chainId, library, routerAddress, Router, token, tokenValue, symbol)
     } else {
-      removeMargin(chainId, library, routerAddress, Router, token, tokenValue)
+      removeMargin(chainId, library, routerAddress, Router, token, tokenValue, symbol)
     }
   }
 
