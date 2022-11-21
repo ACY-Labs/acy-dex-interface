@@ -41,7 +41,7 @@ const SwapComponent = props => {
     }
   }
   let INITIAL_TOKEN_LIST = getTokens(chainId);
-  INITIAL_TOKEN_LIST = getTokenList(chainId);
+  // INITIAL_TOKEN_LIST = getTokenList(chainId);
 
   const coinList = getGlobalTokenList()
 
