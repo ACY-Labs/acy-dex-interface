@@ -17,7 +17,8 @@ const contracts = {
         Reader: '0xE74C76425bf0EaBfC88813A0dFf9952d136aA171',
         Vault: '0x24B918F5ee6E8Fc464a0fBBf5F5433C39a2e6522',
         NATIVE_TOKEN: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
-        Pool: '0xFd940a610A820b2e72Fd6cAaC4F903646d8906f3'
+        Pool: '0xFd940a610A820b2e72Fd6cAaC4F903646d8906f3',
+        router: "0xd2f649eb4ab6399879534756526ac7c3d586be31",
       },
 }
 

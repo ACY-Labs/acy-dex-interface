@@ -56,6 +56,7 @@ export function getPosition(rawPositionData,symbolData) {
     const temp = rawPositionData.positions[i]
     const position = {
       symbol: temp[1],
+      address: temp[0],
       position: temp[2].toNumber(),
       entryPrice: safeDiv(temp.cost,temp[2]),
       markPrice: symbolData.find(obj => {
@@ -433,7 +434,7 @@ const Option = props => {
                 <div className={`${styles.colItem} ${styles.priceChart}`}>
                   <div className={styles.positionsTable}>
                     {tableContent == "Positions" && (
-                      <PositionTable dataSource={positionData}/>
+                      <PositionTable dataSource={positionData} chainId={chainId}/>
                     )}
                     {tableContent == "Orders" && (
                       <div>ORDERS</div>

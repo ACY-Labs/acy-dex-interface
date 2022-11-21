@@ -10,18 +10,56 @@ import {
     AcyCheckBox,
 } from '@/components/Acy';
 import { ethers } from 'ethers';
+import useSWR from 'swr'
 import { useConstantLoader } from '@/constants';
+import { useConnectWallet } from '@/components/ConnectWallet';
+import { useWeb3React } from '@web3-react/core';
+import { INITIAL_ALLOWED_SLIPPAGE, getTokens, getContract } from '@/constants/option.js';
 import classNames from 'classnames';
-import { formatAmount, USD_DECIMALS, mapPositionData, parseValue, bigNumberify } from '@/acy-dex-futures/utils';
+import {fetcher,formatAmount, USD_DECIMALS, mapPositionData, parseValue, bigNumberify, approveTokens } from '@/acy-dex-futures/utils';
+import ERC20 from '@/abis/ERC20.json';
 
-export const ClosePositionModal = ({isModalVisible,onCancel,position, ...props}) =>{
+const { AddressZero } = ethers.constants;
+
+export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ...props}) =>{
     
     const [percentage, setPercentage] = useState('100%')
     const [mode,setMode] = useState('Market')
     const [isMarket,setMarket] = useState(true)
     const [markPrice,setMarkPrice] = useState()
-    
+    const [tokenAmount,setTokenAmount] = useState()
+    const connectWalletByLocalStorage = useConnectWallet()
+    const { account, active, library } = useWeb3React()
+    const routerAddress = getContract(chainId, "router")
+    const [isApproving, setIsApproving] = useState(false)
+    const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
 
+    if (!position){
+      // return
+      position = {
+        accountFunding: 0,
+        address : "0x09e63267A4b0F7bB45e1ADc6De1B709C1eCE1d67",
+        entryPrice : 0,
+        marginUsage: 0,
+        markPrice: 0,
+        position: 0,
+        symbol: "BTCUSD-60000-C",
+        type: "Long",
+        unrealizedPnl: 0
+      }
+    }
+    const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
+    const tokenAllowanceAddress = position.address === AddressZero ? nativeTokenAddress : position.address;
+    const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account, routerAddress], {
+      fetcher: fetcher(library, ERC20)
+    });
+
+    const needApproval =
+    position.address !== AddressZero &&
+    tokenAllowance &&
+    tokenAmount &&
+    tokenAmount.gt(tokenAllowance)
+    // const needApproval = false
 
     const getPercentageButton = value => {
       if (percentage != value) {
@@ -63,7 +101,7 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position, ...props})
       }
     }
 
-    const handleInputChange = (e) => {
+    const handlePriceChange = (e) => {
       setMarkPrice(e.target.value)
     }
 
@@ -71,6 +109,26 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position, ...props})
       if (isMarket){
         setMarket(false)
         setMarkPrice()
+      }
+    }
+
+    const handleAmountChange = (e) => {
+      setTokenAmount(e.target.value)
+    }
+
+    const onClickPrimary = () => {
+      if(!account){
+        connectWalletByLocalStorage()
+        return
+      }
+      if(needApproval){
+        console.log("This action Need Approval")
+        approveTokens(library, routerAddress, ERC, position.address, tokenAmount, setIsWaitingForApproval, setIsApproving)
+      }
+      if(position.type=="Long"){
+        console.log(position.address,chainId,account,position.symbol,tokenAmount*-1,markPrice)
+      }else{
+        console.log(position.address,chainId,account,position.symbol,tokenAmount,markPrice)
       }
     }
 
@@ -89,11 +147,14 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position, ...props})
         
         <AcyInput className={styles.input}
         value={markPrice}
-        onChange={handleInputChange}
+        onChange={handlePriceChange}
         onFocus={handleInputFocus}
         />
         <div className={styles.modalContent}>Closed Qty</div>
-        <AcyInput className={styles.input}/>
+        <AcyInput className={styles.input}
+        value={tokenAmount}
+        onChange={handleAmountChange}
+        />
         
         <div className={styles.buttonContainer}>
             {getPercentageButton('25%')}
@@ -104,7 +165,7 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position, ...props})
         <div className={styles.buttonContainer}>
         <AcyPerpetualButton
           onClick = {() => {
-            handleCancel();
+            onClickPrimary();
           }}
           
           >Confirm

@@ -9,6 +9,7 @@ import styles from './TableComponent.less'
 
 
 export function PositionTable(props){
+    const {chainId} = props
     const [currentKey, setCurrentKey] = useState('');
     const [isHover, setIsHover] = useState(false);
     const [isCloseModalVisible, setIsCloseModalVisible] = useState(false);
@@ -203,6 +204,7 @@ export function PositionTable(props){
             isModalVisible={isCloseModalVisible} 
             onCancel = {() => setIsCloseModalVisible(false)}
             position = {selectedPosition}
+            chainId = {chainId}
             />
         </div>
       );
