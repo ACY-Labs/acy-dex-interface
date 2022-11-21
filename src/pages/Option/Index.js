@@ -20,6 +20,7 @@ import { PositionTable } from '@/components/OptionComponent/TableComponent';
 import { fetcher,getProvider } from '@/acy-dex-futures/utils';
 import Reader from '@/abis/future-option-power/Reader.json'
 import useSWR from 'swr'
+import { useWeb3React } from '@web3-react/core';
 
 const StyledDrawer = styled(Drawer)`
   .ant-drawer{
@@ -54,6 +55,17 @@ export function getPosition(rawPositionData,symbolData) {
   let positionQuery = []
   for(let i = 0; i < rawPositionData.positions.length; i++){
     const temp = rawPositionData.positions[i]
+    const markPrice = symbolData.find(obj => {
+      return obj.address === temp[0]
+    }).markPrice
+    const initialMarginRatio = symbolData.find(obj => {
+      return obj.address === temp[0]
+    }).initialMarginRatio
+    const indexPrice = symbolData.find(obj => {
+      return obj.address === temp[0]
+    }).indexPrice
+    const marginUsage = Math.abs(temp[2].toNumber() * indexPrice) * initialMarginRatio
+    const unrealizedPnl = temp[2].toNumber() * indexPrice - temp.cost
     const position = {
       symbol: temp[1],
       address: temp[0],
@@ -62,8 +74,12 @@ export function getPosition(rawPositionData,symbolData) {
       markPrice: symbolData.find(obj => {
         return obj.address === temp[0]
       }).markPrice,
-      marginUsage: temp[2].toNumber(),
-      unrealizedPnl: temp[2].toNumber(),
+      marginUsage: symbolData.find(obj => {
+        return obj.address === temp[0]
+      }).initialMarginRatio,
+      unrealizedPnl: symbolData.find(obj => {
+        return obj.address === temp[0]
+      }).indexPrice,
       accountFunding: temp.cumulativeFundingPerVolume.toNumber() * temp[2].toNumber(),
       type:temp[2].toNumber()>=0?"Long":"Short",
     };
@@ -82,7 +98,9 @@ export function getSymbol(rawSymbolData){
     const symbol = {
       symbol: temp[1],
       address: temp[2],
-      markPrice: temp.markPrice.div(bigNumberify('1000000000000000000')).toNumber()
+      markPrice: temp.markPrice.div(bigNumberify('1000000000000000000')).toNumber(),
+      indexPrice: temp.indexPrice.div(bigNumberify('1000000000000000000')).toNumber(),
+      initialMarginRatio: temp.initialMarginRatio.div(bigNumberify('1000000000000000000')).toNumber(),
     };
     symbolQuery.push(symbol)
   }
@@ -90,7 +108,8 @@ export function getSymbol(rawSymbolData){
 }
 
 const Option = props => {
-  const { account, library, active } = useConstantLoader();
+  const { account, library } = useConstantLoader(props);
+  const { active } = useWeb3React()
   let { chainId } = useChainId();
   let tokens = getTokens(chainId);
 
@@ -210,6 +229,8 @@ const Option = props => {
 
   }
 
+  
+  ///// read reader contract, getTdInfo and getSymbolsInfo
   const poolAddress = getContract(chainId,"Pool")
   const readerAddress = getContract(chainId,"Reader")
 
@@ -228,22 +249,20 @@ const Option = props => {
   console.log("POSITIONDATA",positionData)
   console.log("SYMBOLDATA",symbolData)
 
-  // useEffect(() => {
-  //   if (active) {
-  //     library.on('block', () => {
-  //       updatePosition(undefined, true)
-  //     })
-  //     return () => {
-  //       library.removeAllListeners('block')
-  //     }
-  //   }
-  //   console.log("POSITION2",rawPositionData)
-  //   const positionData = getPosition(rawPositionData)
-  //   console.log("POSITIONDATA2",positionData)
-  // }, [account,active, library, chainId,
-  //   updatePosition]
-  // )
-  // await getPosition(account,chainId)
+  useEffect(() => {
+    if (active) {
+      function onBlock() {
+        updatePosition()
+        updateSymbol()
+      }
+      library.on('block', onBlock)
+      return () => {
+        library.removeListener('block', onBlock)
+      }
+    }
+  }, [account,active, library, chainId,
+    updatePosition,updateSymbol]
+  )
 
   return (
     <div className={styles.main}>

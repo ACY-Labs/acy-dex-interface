@@ -23,19 +23,10 @@ const { AddressZero } = ethers.constants;
 
 export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ...props}) =>{
     
-    const [percentage, setPercentage] = useState('100%')
-    const [mode,setMode] = useState('Market')
-    const [isMarket,setMarket] = useState(true)
-    const [markPrice,setMarkPrice] = useState()
-    const [tokenAmount,setTokenAmount] = useState()
     const connectWalletByLocalStorage = useConnectWallet()
     const { account, active, library } = useWeb3React()
-    const routerAddress = getContract(chainId, "router")
-    const [isApproving, setIsApproving] = useState(false)
-    const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
 
     if (!position){
-      // return
       position = {
         accountFunding: 0,
         address : "0x09e63267A4b0F7bB45e1ADc6De1B709C1eCE1d67",
@@ -48,6 +39,9 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
         unrealizedPnl: 0
       }
     }
+
+    //// read contract to check token allowance
+    const routerAddress = getContract(chainId, "router")
     const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
     const tokenAllowanceAddress = position.address === AddressZero ? nativeTokenAddress : position.address;
     const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account, routerAddress], {
@@ -59,7 +53,14 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
     tokenAllowance &&
     tokenAmount &&
     tokenAmount.gt(tokenAllowance)
-    // const needApproval = false
+
+    ///// ui
+    const [percentage, setPercentage] = useState('100%')
+    const [isMarket,setMarket] = useState(true)
+    const [markPrice,setMarkPrice] = useState()
+    const [tokenAmount,setTokenAmount] = useState()
+    const [isApproving, setIsApproving] = useState(false)
+    const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
 
     const getPercentageButton = value => {
       if (percentage != value) {
