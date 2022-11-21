@@ -1,6 +1,6 @@
 import { useWeb3React } from '@web3-react/core';
 import { StylesContext } from '@material-ui/styles';
-import { Layout, Menu, Row, Col, Button, Modal, Input, Select, Divider, Table } from 'antd';
+import { Layout, Menu,AutoComplete, Row, Col, Button, Modal, Input, Select, Divider, Table } from 'antd';
 import React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -149,7 +149,7 @@ const Overview = props => {
         if (account == undefined) {
             return "Connect Wallet"
         } else {
-            return 'Confirm'
+            return currentTransaction;
         }
     }
 
@@ -368,6 +368,8 @@ const Overview = props => {
             ]
         },
     ];
+    const dataSource = [account];
+
     const getChildColumns = (pageName) => {
         const childColumns = [
             {
@@ -458,7 +460,7 @@ const Overview = props => {
                     onCancel={handleCancel}
                     visible={isModalOpen}
                     className={styles.myModal}
-                    style={{ backgroundColor: "black", height: "35rem", borderRadius: "5px" }}
+                    style={{ backgroundColor: "black", minHeight: "35rem", borderRadius: "5px" }}
                 >
                     <div className={styles.modalTitle} style={{ fontSize: "1.8rem", fontWeight: "bold" }}> {currentTransaction} </div>
                     <Divider style={{ height: "0.75px", margin: "10px 0px 6px", background: "#444444" }} />
@@ -538,7 +540,10 @@ const Overview = props => {
                                     : currentTransaction == "Withdraw" ?
                                         <div> <Row style={{ marginTop: "1rem", marginBottom: "10px" }}> Withdraw from </Row> </div>
                                         :
-                                        <div> <Row style={{ marginTop: "1rem", marginBottom: "10px" }}> Send to </Row> </div>
+                                        <div> <Row style={{ marginTop: "1rem", marginBottom: "10px" }}> Send from </Row> </div>
+                                }
+                                {
+
                                 }
                                 <div className={styles.networkSelector}>
 
@@ -559,7 +564,28 @@ const Overview = props => {
 
                             </div>
                         }
-
+                        {
+                            currentTransaction == "Withdraw" &&
+                            <div>
+                                <Row style={{ marginTop: "1rem", marginBottom: "10px" }}>Withdraw to  address </Row>
+                                <Row>
+                                    <div className={styles.coin} >
+                                        <Input />
+                                    </div>
+                                </Row>
+                            </div>
+                        }
+                        {
+                            currentTransaction == "Send" &&
+                            <div>
+                                <Row style={{ marginTop: "1rem", marginBottom: "10px" }}>Send to  address </Row>
+                                <Row>
+                                    <div className={styles.coin} >
+                                        <Input />
+                                    </div>
+                                </Row>
+                            </div>
+                        }
                         <Row style={{ fontSize: "1rem", marginTop: "1rem", backgroundColor: "black" }}>Coin</Row>
                         <Row>
                             <div className={styles.coin} >

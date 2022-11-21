@@ -17,7 +17,7 @@ import { processString } from "@/components/AcyCoinItem";
 import styles from "./styles.less";
 import { useConstantLoader, getGlobalTokenList } from '@/constants';
 
-const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList }) => {
+const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,placement='right' }) => {
   const { account, library, chainId } = useConstantLoader();
 
   // const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
@@ -124,9 +124,9 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList 
   return (
     <Drawer
       title="Select a Token"
-      placement="right"
+      placement={placement}
       className={styles.drawer}
-      getContainer={false}
+      // getContainer={false}
       onClose={onCancel}
       visible={visible}
       width={550}

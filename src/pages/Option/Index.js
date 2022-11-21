@@ -329,18 +329,6 @@ const Option = props => {
                 </div>
 
               </div>
-
-              <AcySymbolNav data={KChartTokenList} onChange={selectChartToken} />
-              <AcySymbol
-                pairName='BTC'
-                // showDrawer={showDrawer}
-                // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
-                // latestPrice={latestPrice}
-                // latestPricePercentage={priceChangePercentDelt
-                latestPriceColor={1}
-                latestPrice={1}
-                latestPricePercentage={1}
-              />
               <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
                 <ExchangeTVChart
                   chartTokenSymbol={symbol}
