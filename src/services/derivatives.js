@@ -217,7 +217,7 @@ export async function approveTokens(
   setIsApproving,
 ) {
   const contract = new ethers.Contract(tokenAddress, ERC20.abi, library.getSigner());
-  contract.approve(routerAddress, tokenAmount)
+  contract.approve(routerAddress, ethers.constants.MaxUint256)
     .then(() => { setIsWaitingForApproval(true) })
     .catch(e => { console.error(e) })
     .finally(() => { setIsApproving(false) });
