@@ -14,7 +14,6 @@ import { approveTokens, trade } from '@/services/derivatives';
 import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
-import ERC20 from '@/abis/future-option-power/ERC20.json';
 import Reader from '@/abis/future-option-power/Reader.json'
 import IPool from '@/abis/future-option-power/IPool.json'
 
@@ -43,10 +42,6 @@ const OptionComponent = props => {
   const poolAddress = getContract(chainId, "pool")
   const routerAddress = getContract(chainId, "router")
 
-  const tokenAllowanceAddress = selectedToken.address === AddressZero ? nativeTokenAddress : selectedToken.address;
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
-    fetcher: fetcher(library, ERC20)
-  });
   const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader)
   });
@@ -57,7 +52,6 @@ const OptionComponent = props => {
   useEffect(() => {
     if (active) {
       library.on("block", () => {
-        updateTokenAllowance()
         updateTokenInfo()
         updateSymbolInfo()
       });
@@ -69,7 +63,6 @@ const OptionComponent = props => {
     active,
     library,
     chainId,
-    updateTokenAllowance,
     updateTokenInfo,
     updateSymbolInfo,
   ]);
@@ -93,11 +86,6 @@ const OptionComponent = props => {
   const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
   const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const symbolMarkPrice = symbolInfo?.markPrice
-  const needApproval =
-    selectedToken.address !== AddressZero &&
-    tokenAllowance &&
-    selectedTokenAmount &&
-    selectedTokenAmount.gt(tokenAllowance)
     
   const getPercentageButton = value => {
     if (percentage != value) {
@@ -123,14 +111,8 @@ const OptionComponent = props => {
     if (!active) {
       return 'Connect Wallet'
     }
-    if (needApproval && isWaitingForApproval) {
-      return 'Waiting for Approval'
-    }
     if (isApproving) {
       return `Approving ${selectedToken.symbol}...`;
-    }
-    if (needApproval) {
-      return `Approve ${selectedToken.symbol}`;
     }
     return mode == 'Buy' ? 'Buy / Long' : 'Sell / Short'
   }
@@ -149,21 +131,11 @@ const OptionComponent = props => {
     setUsdValue((selectedTokenValue * selectedTokenPrice).toFixed(2))
   }, [selectedTokenValue])
 
-  useEffect(() => {
-    if (selectedToken && isWaitingForApproval && !needApproval) {
-      setIsWaitingForApproval(false)
-    }
-  }, [selectedToken, selectedTokenAmount, needApproval])
-
   ///////////// write contract /////////////
 
   const onClickPrimary = () => {
     if (!account) {
       connectWalletByLocalStorage()
-      return
-    }
-    if (needApproval) {
-      approveTokens(library, routerAddress, ERC, selectedToken.address, selectedTokenAmount, setIsWaitingForApproval, setIsApproving)
       return
     }
     if (mode == 'Buy') {
