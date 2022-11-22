@@ -53,10 +53,6 @@ const Powers = props => {
   const [visibleMATIC, setVisibleMATIC] = useState(false);
   const [visibleBNB, setVisibleBNB] = useState(false);
 
-  useEffect(()=>{
-    setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
-  }, [tokens])
-
   const onClickDropdownBTC = e => {
     setActiveToken(tokens.filter(token => token.symbol == "BTC")[0]);
   };
@@ -158,6 +154,10 @@ const Powers = props => {
     setVisibleMATIC(false);
   };
 
+  useEffect(()=>{
+    setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
+  }, [chainId, tokens])
+
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
@@ -182,7 +182,6 @@ const Powers = props => {
                           className={styles.drawerContent}
                           placement="bottom"
                           onClose={onCloseBTC}
-                          // onClose={onClose("BTC")}
                           visible={visibleBTC}
                           getContainer={false}
                           closeIcon={false}
@@ -220,7 +219,6 @@ const Powers = props => {
                         className={styles.drawerContent}
                         placement="bottom"
                         onClose={onCloseETH}
-                        // onClose={onClose("ETH")}
                         visible={visibleETH}
                         getContainer={false}
                         closeIcon={false}
@@ -285,6 +283,7 @@ const Powers = props => {
                       </StyledDrawer>
                     </Col>
                   </Row> : null}
+                  
                 {visibleBNB ?
                   <Row>
                     <Col>
@@ -339,6 +338,8 @@ const Powers = props => {
             <OptionComponent
               mode={mode}
               setMode={setMode}
+              chainId={chainId}
+              tokens={tokens}
               selectedToken={activeToken}
               symbol={symbol}
             />

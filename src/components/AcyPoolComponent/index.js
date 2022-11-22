@@ -37,9 +37,8 @@ import styles from './styles.less';
 
 const AcyPoolComponent = props => {
 
-  const { account } = useConstantLoader(props)
   const { chainId } = useChainId()
-  const { active, library } = useWeb3React()
+  const { account, active, library } = useWeb3React()
   const connectWalletByLocalStorage = useConnectWallet()
   const tokens = getTokens(chainId)
   const [selectedToken, setSelectedToken] = useState(tokens[1])
@@ -329,7 +328,7 @@ const AcyPoolComponent = props => {
     }
     if (needApproval) {
       isBuying ? approveTokens(library, routerAddress, ERC20, selectedToken.address, selectedTokenAmount, setIsWaitingForApproval, setIsApproving)
-      : approveTokens(library, routerAddress, ERC20, alpAddress, alpAmount, setIsWaitingForApproval, setIsApproving)
+      : approveTokens(library, routerAddress, Alp, alpAddress, alpAmount, setIsWaitingForApproval, setIsApproving)
       return
     }
     const [, modal] = getError()
