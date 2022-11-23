@@ -8,7 +8,7 @@ import AcyPool from '@/components/AcyPool';
 import * as Api from '@/acy-dex-futures/Api';
 import { bigNumberify } from '@/acy-dex-futures/utils';
 import { useConstantLoader } from '@/constants';
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
 import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/option.js';
@@ -45,7 +45,7 @@ const StyledDrawer = styled(Drawer)`
 `
    
 function safeDiv(a, b) {
-    return b==0 ? 0 : a.div(b).toNumber();
+    return b==0 ? 0 : a/b;
 }
 
 export function getPosition(rawPositionData,symbolData) {
@@ -55,35 +55,38 @@ export function getPosition(rawPositionData,symbolData) {
   let positionQuery = []
   for(let i = 0; i < rawPositionData.positions.length; i++){
     const temp = rawPositionData.positions[i]
-    const markPrice = symbolData.find(obj => {
-      return obj.address === temp[0]
-    }).markPrice
-    const initialMarginRatio = symbolData.find(obj => {
-      return obj.address === temp[0]
-    }).initialMarginRatio
-    const indexPrice = symbolData.find(obj => {
-      return obj.address === temp[0]
-    }).indexPrice
-    const marginUsage = Math.abs(temp[2].toNumber() * indexPrice) * initialMarginRatio
-    const unrealizedPnl = temp[2].toNumber() * indexPrice - temp.cost
-    const position = {
-      symbol: temp[1],
-      address: temp[0],
-      position: temp[2].toNumber(),
-      entryPrice: safeDiv(temp.cost,temp[2]),
-      markPrice: symbolData.find(obj => {
+    const volume = ethers.utils.formatUnits(temp[2], 18)
+    if (volume!=0){
+
+      const markPrice = symbolData.find(obj => {
         return obj.address === temp[0]
-      }).markPrice,
-      marginUsage: symbolData.find(obj => {
+      }).markPrice
+      const initialMarginRatio = symbolData.find(obj => {
         return obj.address === temp[0]
-      }).initialMarginRatio,
-      unrealizedPnl: symbolData.find(obj => {
+      }).initialMarginRatio
+      const indexPrice = symbolData.find(obj => {
         return obj.address === temp[0]
-      }).indexPrice,
-      accountFunding: temp.cumulativeFundingPerVolume.toNumber() * temp[2].toNumber(),
-      type:temp[2].toNumber()>=0?"Long":"Short",
-    };
-    positionQuery.push(position)
+      }).indexPrice
+      
+      const cost = ethers.utils.formatUnits(temp.cost,18)
+      const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume,18)
+      const marginUsage = Math.abs(volume * indexPrice) * initialMarginRatio
+      const unrealizedPnl = volume * indexPrice - cost
+      const accountFunding = cumulativeFundingPerVolume * volume
+
+      const position = {
+        symbol: temp[1],
+        address: temp[0],
+        position: volume,
+        entryPrice: safeDiv(cost,volume),
+        markPrice: markPrice,
+        marginUsage: marginUsage,
+        unrealizedPnl: unrealizedPnl,
+        accountFunding: accountFunding,
+        type: volume>=0?"Long":"Short",
+      };
+      positionQuery.push(position)
+    }
   }
   return positionQuery;
 }
@@ -98,9 +101,9 @@ export function getSymbol(rawSymbolData){
     const symbol = {
       symbol: temp[1],
       address: temp[2],
-      markPrice: temp.markPrice.div(bigNumberify('1000000000000000000')).toNumber(),
-      indexPrice: temp.indexPrice.div(bigNumberify('1000000000000000000')).toNumber(),
-      initialMarginRatio: temp.initialMarginRatio.div(bigNumberify('1000000000000000000')).toNumber(),
+      markPrice: ethers.utils.formatUnits(temp.markPrice,18),
+      indexPrice: ethers.utils.formatUnits(temp.indexPrice,18),
+      initialMarginRatio: ethers.utils.formatUnits(temp.initialMarginRatio,18), //0.1
     };
     symbolQuery.push(symbol)
   }
@@ -108,7 +111,7 @@ export function getSymbol(rawSymbolData){
 }
 
 const Option = props => {
-  const { account, library } = useConstantLoader(props);
+  const { account, library } = useWeb3React();
   const { active } = useWeb3React()
   let { chainId } = useChainId();
   let tokens = getTokens(chainId);

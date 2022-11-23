@@ -41,18 +41,18 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
     }
 
     //// read contract to check token allowance
-    const routerAddress = getContract(chainId, "router")
-    const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
-    const tokenAllowanceAddress = position.address === AddressZero ? nativeTokenAddress : position.address;
-    const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account, routerAddress], {
-      fetcher: fetcher(library, ERC20)
-    });
+    // const routerAddress = getContract(chainId, "router")
+    // const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
+    // const tokenAllowanceAddress = position.address === AddressZero ? nativeTokenAddress : position.address;
+    // const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account, routerAddress], {
+    //   fetcher: fetcher(library, ERC20)
+    // });
 
-    const needApproval =
-    position.address !== AddressZero &&
-    tokenAllowance &&
-    tokenAmount &&
-    tokenAmount.gt(tokenAllowance)
+    // const needApproval =
+    // position.address !== AddressZero &&
+    // tokenAllowance &&
+    // tokenAmount &&
+    // tokenAmount.gt(tokenAllowance)
 
     ///// ui
     const [percentage, setPercentage] = useState('100%')
@@ -88,6 +88,13 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
       }   
     },[position]);
 
+    useEffect(() => {
+      if(position && percentage){
+        const amount = position.position * parseFloat(percentage) / 100
+        setTokenAmount(amount)
+      }   
+    },[percentage,tokenAmount,position]);
+
     const handleCancel = () => {
       onCancel();
     }
@@ -121,10 +128,6 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
       if(!account){
         connectWalletByLocalStorage()
         return
-      }
-      if(needApproval){
-        console.log("This action Need Approval")
-        approveTokens(library, routerAddress, ERC, position.address, tokenAmount, setIsWaitingForApproval, setIsApproving)
       }
       if(position.type=="Long"){
         console.log(position.address,chainId,account,position.symbol,tokenAmount*-1,markPrice)
