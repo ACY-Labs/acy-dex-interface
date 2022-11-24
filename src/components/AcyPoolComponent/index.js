@@ -128,6 +128,7 @@ const AcyPoolComponent = props => {
   const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const amountUsd = selectedTokenPrice?.mul(selectedTokenAmount)
 
+
   let feePercentageText = formatAmount(feeBasisPoints, 2, 2, true, "-")
   if (feeBasisPoints !== undefined && feeBasisPoints.toString().length > 0) {
     feePercentageText += "%"
@@ -153,7 +154,7 @@ const AcyPoolComponent = props => {
       setSelectedTokenValue(num.toString())
     }
     else {
-    setSelectedTokenValue(e.target.value)
+      setSelectedTokenValue(e.target.value)
     }
   }
 
@@ -265,7 +266,7 @@ const AcyPoolComponent = props => {
         return
       }
       if (isBuying) {
-        
+
         let nextAmount = alpPrice && amountUsd?.div(parseValue(alpPrice, ALP_DECIMALS))
           .mul(BASIS_POINTS_DIVISOR).div(BASIS_POINTS_DIVISOR - MINT_BURN_FEE_BASIS_POINTS)
 
@@ -347,7 +348,7 @@ const AcyPoolComponent = props => {
     }
     if (needApproval) {
       isBuying ? approveTokens(library, routerAddress, ERC20, selectedToken.address, selectedTokenAmount, setIsWaitingForApproval, setIsApproving)
-      : approveTokens(library, routerAddress, ERC20, alpAddress, alpAmount, setIsWaitingForApproval, setIsApproving)
+        : approveTokens(library, routerAddress, ERC20, alpAddress, alpAmount, setIsWaitingForApproval, setIsApproving)
       return
     }
     const [, modal] = getError()
@@ -473,46 +474,46 @@ const AcyPoolComponent = props => {
 
       </div>
 
-      <div className={styles.GlpSwapstatscard}>
-      <div className={styles.GlpSwapstatsmark}>
-        <div className={styles.GlpSwapstatsicon}>
-          <img src={glp40Icon} alt="glp40Icon" />
-        </div>
-        <div className={styles.GlpSwapinfo}>
-          <div className={styles.statstitle}>ALP</div>
-          <div className={styles.statssubtitle}>ALP</div>
-        </div>
-      </div>
-
-      <div className={styles.GlpSwapdivider} />
-
-      <div className={styles.GlpSwapstatscontent}>
-        <div className={styles.GlpSwapcardrow}>
-          <div className={styles.label}>Price</div>
-          <div className={styles.value}>
-            ${alpPrice.toFixed(4)}
+      {/* <div className={styles.GlpSwapstatscard}>
+        <div className={styles.GlpSwapstatsmark}>
+          <div className={styles.GlpSwapstatsicon}>
+            <img src={glp40Icon} alt="glp40Icon" />
+          </div>
+          <div className={styles.GlpSwapinfo}>
+            <div className={styles.statstitle}>ALP</div>
+            <div className={styles.statssubtitle}>ALP</div>
           </div>
         </div>
-        <div className={styles.GlpSwapcardrow}>
-          <div className={styles.label}>Wallet</div>
-          <div className={styles.value}>
-            {formatAmount(alpBalance, ALP_DECIMALS, 4, true)} ALP (${formatAmount(alpBalanceUsd, USD_DECIMALS, 2, true)})
+
+        <div className={styles.GlpSwapdivider} />
+
+        <div className={styles.GlpSwapstatscontent}>
+          <div className={styles.GlpSwapcardrow}>
+            <div className={styles.label}>Price</div>
+            <div className={styles.value}>
+              ${alpPrice.toFixed(4)}
+            </div>
+          </div>
+          <div className={styles.GlpSwapcardrow}>
+            <div className={styles.label}>Wallet</div>
+            <div className={styles.value}>
+              {formatAmount(alpBalance, ALP_DECIMALS, 4, true)} ALP (${formatAmount(alpBalanceUsd, USD_DECIMALS, 2, true)})
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className={styles.GlpSwapdivider} />
+        <div className={styles.GlpSwapdivider} />
 
-      <div className={styles.GlpSwapstatscontent}>
-        <div className={styles.GlpSwapcardrow}>
-          <div className={styles.label}>Total Supply</div>
-          <div className={styles.value}>
-            {formatAmount(alpSupply, ALP_DECIMALS, 4, true)} ALP (${formatAmount(alpSupplyUsd, USD_DECIMALS, 2, true)})
+        <div className={styles.GlpSwapstatscontent}>
+          <div className={styles.GlpSwapcardrow}>
+            <div className={styles.label}>Total Supply</div>
+            <div className={styles.value}>
+              {formatAmount(alpSupply, ALP_DECIMALS, 4, true)} ALP (${formatAmount(alpSupplyUsd, USD_DECIMALS, 2, true)})
+            </div>
           </div>
         </div>
-      </div>
 
-    </div>
+      </div> */}
     </div>
   )
 

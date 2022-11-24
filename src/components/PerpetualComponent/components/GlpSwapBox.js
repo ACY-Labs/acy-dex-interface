@@ -847,9 +847,11 @@ export const GlpSwapTokenTable = (props) => {
     setSwapTokenAddress,
     setIsWaitingForApproval,
     tokenList,
+    tokens,
+    tokenInfo,
     infoTokens,
     glpAmount,
-    glpPrice,
+    alpPrice,
     usdgSupply,
     totalTokenWeights,
     account
@@ -859,16 +861,17 @@ export const GlpSwapTokenTable = (props) => {
     setSwapTokenAddress(token.address)
     setIsWaitingForApproval(false)
   }
+  console.log("check tokenList, tokens, infoTokens", tokenList, tokens, infoTokens)
 
   const tokenListData = []
   let totalPool = 0
   tokenList.map((token) => {
     let tokenFeeBps
     if (isBuying) {
-      const { feeBasisPoints: feeBps } = getBuyGlpFromAmount(glpAmount, token.address, infoTokens, glpPrice, usdgSupply, totalTokenWeights)
+      const { feeBasisPoints: feeBps } = getBuyGlpFromAmount(glpAmount, token.address, infoTokens, alpPrice, usdgSupply, totalTokenWeights)
       tokenFeeBps = feeBps
     } else {
-      const { feeBasisPoints: feeBps } = getSellGlpToAmount(glpAmount, token.address, infoTokens, glpPrice, usdgSupply, totalTokenWeights)
+      const { feeBasisPoints: feeBps } = getSellGlpToAmount(glpAmount, token.address, infoTokens, alpPrice, usdgSupply, totalTokenWeights)
       tokenFeeBps = feeBps
     }
     const tokenInfo = getTokenInfo(infoTokens, token.address)
@@ -928,7 +931,7 @@ export const GlpSwapTokenTable = (props) => {
           isBuying={isBuying}
           onClickSelectToken={onSelectSwapToken}
           glpAmount={glpAmount}
-          glpPrice={glpPrice}
+          alpPrice={alpPrice}
           usdgSupply={usdgSupply}
           totalTokenWeights={totalTokenWeights}
           account={account}
