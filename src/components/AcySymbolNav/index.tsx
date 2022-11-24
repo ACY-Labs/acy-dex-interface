@@ -1,7 +1,7 @@
 import { StarFilled } from '@ant-design/icons';
 import styles from './index.less';
 
-const KpSymbolNav = (props: any) => {
+const AcySymbolNav = (props: any) => {
   const { data,onChange } = props;
   return (
     <div className={styles.sn}>
@@ -31,4 +31,4 @@ const KpSymbolNav = (props: any) => {
     </div>
   );
 };
-export default KpSymbolNav;
+export default AcySymbolNav;

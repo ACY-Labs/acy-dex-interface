@@ -72,7 +72,8 @@ const WalletLogin = props => {
         }
     }, [active])
 
-    const loginOptions = ["Connect Wallet", "Email / Mobile"];
+    // const loginOptions = ["Connect Wallet", "Email / Mobile"];
+    const loginOptions = ["Connect Wallet"];
 
     const onhandCancel = () => {
         setVisibleMetaMask(false);

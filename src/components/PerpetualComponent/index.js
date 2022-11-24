@@ -65,10 +65,12 @@ import WETHABI from '@/abis/WETH.json';
 import { Slider, Checkbox, Tooltip } from 'antd';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { AcyRadioButton } from '@/components/AcyRadioButton';
+import AcyPattern from '@/components/AcyPattern';
+
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
-
+import Segmented from '../AcySegmented';
 import { useChainId } from '@/utils/helpers';
 import { getTokens, getTokenBySymbol, getContract, getTokenByAddress } from '@/constants/future.js';
 
@@ -162,7 +164,7 @@ function getNextAveragePrice({ size, sizeDelta, hasProfit, delta, nextPrice, isL
 const SwapComponent = props => {
   const { account, library, active } = useWeb3React();
   const { chainId } = useChainId();
-  
+
   const tokens = getTokens(chainId)
   console.log("test chainId perpetual component", chainId, tokens)
 
@@ -330,8 +332,8 @@ const SwapComponent = props => {
 
   const fromAmount = parseValue(fromValue, fromToken && fromToken.decimals);
   const toAmount = parseValue(toValue, toToken && toToken.decimals);
-
-  const isPotentialWrap = (fromToken.isNative && toToken.isWrapped) || (fromToken.isWrapped && toToken.isNative);
+  debugger
+  const isPotentialWrap = (fromToken?.isNative && toToken.isWrapped) || (fromToken.isWrapped && toToken?.isNative);
   const isWrapOrUnwrap = mode === SWAP && isPotentialWrap;
   const needApproval =
     fromTokenAddress !== AddressZero &&
@@ -780,8 +782,8 @@ const SwapComponent = props => {
 
   // TODO: is this redundant? seems doing things in selectFromToken()
   useEffect(() => {
-    fromToken = getTokenByAddress(chainId,fromTokenAddress)
-    toToken = getTokenByAddress(chainId,toTokenAddress)
+    fromToken = getTokenByAddress(chainId, fromTokenAddress)
+    toToken = getTokenByAddress(chainId, toTokenAddress)
     setFromTokenAddress(mode, fromTokenAddress);
     setToTokenAddress(mode, toTokenAddress);
 
@@ -1402,6 +1404,77 @@ const SwapComponent = props => {
         </div>
         {mode !== POOL ?
           <>
+            <AcyPattern leverage={<AcyDescriptions>
+              <div className={styles.leverageContainer}>
+                <div className={styles.slippageContainer}>
+                  <div className={styles.leverageLabel}>
+                    <span>Leverage</span>
+                    {isLeverageSliderEnabled &&
+                      <div className={styles.leverageInputContainer}>
+                        <button
+                          className={styles.leverageButton}
+                          onClick={() => {
+                            if (leverageOption > 0.1) {
+                              setLeverageOption((parseFloat(leverageOption) - 0.1).toFixed(1))
+                            }
+                          }}
+                        >
+                          <span> - </span>
+                        </button>
+                        <input
+                          type="number"
+                          value={leverageOption}
+                          onChange={e => {
+                            // let val = parseFloat(e.target.value.replace(/^(-)*(\d+)\.(\d).*$/, '$1$2.$3')).toFixed(1)
+                            let val = parseFloat(e.target.value)
+                            if (val < 0.1) {
+                              setLeverageOption(0.1)
+                            } else if (val >= 0.1 && val <= 30.5) {
+                              setLeverageOption(Math.round(val * 10) / 10)
+                            } else {
+                              setLeverageOption(30.5)
+                            }
+                          }}
+                          className={styles.leverageInput}
+                        />
+                        <button
+                          className={styles.leverageButton}
+                          onClick={() => {
+                            if (leverageOption < 30.5) {
+                              setLeverageOption((parseFloat(leverageOption) + 0.1).toFixed(1))
+                            }
+                          }}
+                        >
+                          <span> + </span>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                  {/* <div className={styles.checkbox}>
+                  <StyledCheckbox
+                    checked={isLeverageSliderEnabled}
+                    onChange={() => {
+                      setIsLeverageSliderEnabled(!isLeverageSliderEnabled)
+                    }}
+                  />
+                </div> */}
+                </div>
+                {isLeverageSliderEnabled &&
+                  <span className={styles.leverageSlider}>
+                    <StyledSlider
+                      min={0.1}
+                      max={30.5}
+                      step={0.1}
+                      marks={leverageMarks}
+                      value={leverageOption}
+                      onChange={value => setLeverageOption(value)}
+                      defaultValue={leverageOption}
+                      style={{ color: 'red' }}
+                    />
+                  </span>
+                }
+              </div>
+            </AcyDescriptions>} />
             <div className={styles.typeSelector}>
               <PerpetualTabs
                 option={type}
@@ -1454,9 +1527,11 @@ const SwapComponent = props => {
                 />
               </div>
             }
-
+            <div style={{ margin: '20px 0' }}>
+              <Segmented options={['10%', '25%', '50%', '75%', '100%']} />
+            </div>
             {/* Leverage Slider */}
-            {(isLong || isShort) &&
+            {(isLong || isShort) && false &&
               <AcyDescriptions>
                 <div className={styles.leverageContainer}>
                   <div className={styles.slippageContainer}>
@@ -1759,7 +1834,7 @@ const SwapComponent = props => {
               </div>
 
               {/* Available Liquidity */}
-              {isShort && toTokenInfo&&toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) &&
+              {isShort && toTokenInfo && toTokenInfo.maxAvailableShort && toTokenInfo.maxAvailableShort.gt(0) &&
                 <div className={styles.detailCard}>
                   <div className={styles.label}>Available Liquidity</div>
                   <Tooltip

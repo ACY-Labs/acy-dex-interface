@@ -12,7 +12,10 @@ import { ethers } from 'ethers'
 import IPool from '@/abis/future-option-power/IPool.json'
 import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/powers.js';
-
+import AcySymbolNav from '@/components/AcySymbolNav';
+import AcySymbol from '@/components/AcySymbol';
+import TokenSelectorDrawer from '@/components/TokenSelectorDrawer';
+import { getGlobalTokenList } from '@/constants';
 import styles from './styles.less'
 import styled from "styled-components";
 
@@ -53,7 +56,7 @@ const Powers = props => {
   const [visibleMATIC, setVisibleMATIC] = useState(false);
   const [visibleBNB, setVisibleBNB] = useState(false);
 
-  useEffect(()=>{
+  useEffect(() => {
     setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
   }, [tokens])
 
@@ -69,6 +72,9 @@ const Powers = props => {
   const onClickDropdownBNB = e => {
     setActiveToken(tokens.filter(token => token.symbol == "BNB")[0]);
   };
+
+  let coinList = getGlobalTokenList()
+  coinList = coinList.filter(token => token.symbol == "USDT" || token.symbol == 'USDC' || token.symbol == 'BTC' || token.symbol == 'ETH')
 
   let optionsBTC = [
     { name: "BTC-1000000", tokenSymbol: "BTC", optionSymbol: "1000000", type: "C" },
@@ -164,7 +170,7 @@ const Powers = props => {
         {mode == 'Pool' ?
           <AcyPool />
           : <div className={`${styles.colItem} ${styles.priceChart}`}>
-            <div>
+            {/* <div>
               <div className={styles.chartTokenSelectorTab}>
                 <Row>
                   <PerpetualTabs
@@ -321,7 +327,20 @@ const Powers = props => {
                     </Col>
                   </Row> : null}
               </div>
-            </div>
+            </div> */}
+            <AcySymbolNav data={KChartTokenList} onChange={selectTab} />
+            <AcySymbol
+              pairName={activeToken.symbol}
+              // showDrawer={onClickCoin}
+              // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+              // latestPrice={latestPrice}
+              // latestPricePercentage={priceChangePercentDelt
+              latestPriceColor={1}
+              latestPrice={1}
+              latestPricePercentage={1}
+              coinList={coinList}
+            />
+            {/* <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onClickCoin} coinList={coinList} /> */}
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               <ExchangeTVChart
                 chartTokenSymbol="BTC"
