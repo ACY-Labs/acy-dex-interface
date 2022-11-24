@@ -13,13 +13,14 @@ import { useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import useSWR from 'swr';
 import { TxFetcher } from '@/utils/utils';
-// import SankeyGraph from './components/SankeyGraph';
+import SankeyGraph from './components/SankeyGraph';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { TradeHistoryTable, PoolsActivityTable } from './components/TableComponent.js';
 import { useChainId } from '@/utils/helpers';
 import { getTokens } from '@/constants/trade'
+import { Snackbar } from '@material-ui/core';
 
 const Swap = props => {
   const { account, library, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
@@ -231,7 +232,7 @@ const Swap = props => {
                   options={graphTypes}
                   onChange={showGraph}
                 /> */}
-              <AcySymbolNav data={['BTC','ETH','BNB']}  onChange={showGraph} />
+              <AcySymbolNav data={['BTC', 'ETH', 'BNB']} onChange={showGraph} />
               <AcySymbol
                 pairName='BTC'
                 // showDrawer={onClickCoin}
@@ -244,19 +245,25 @@ const Swap = props => {
               // coinList={coinList}
               />
               {/* </div> */}
-
               <div style={{ borderTop: '0.75px solid #333333' }}>
                 {graphType == "Routes" ?
                   // <SankeyGraph />
                   <></>
                   :
                   <div>
-                    <ExchangeTVChart
+                    {/* <ExchangeTVChart
                       chartTokenSymbol={activeToken1.symbol}
                       // chartTokenSymbol="BTC"
                       pageName="Swap"
                       fromToken={activeToken0.symbol}
                       toToken={activeToken1.symbol}
+
+                    /> */}
+                    <ExchangeTVChart
+                      chartTokenSymbol="BTC"
+                      pageName="Powers"
+                      fromToken="BTC"
+                      toToken="USDT"
                     />
                   </div>
                 }
@@ -267,13 +274,16 @@ const Swap = props => {
               <div className={styles.chartTokenSelectorTab}>
                 <PerpetualTabs
                   option={tableContent}
-                  options={['Trade History', 'Pools Activity']}
+                  options={['Routes','Trade History', 'Pools Activity']}
                   onChange={item => { setTableContent(item) }}
                 />
               </div>
               <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
                 <div className={`${styles.colItem} ${styles.priceChart}`}>
                   <div className={styles.positionsTable}>
+                    {tableContent == 'Routes' && (
+                      <SankeyGraph />
+                    )}
                     {tableContent == 'Trade History' && (
                       <TradeHistoryTable dataSource={test_tradeHistory} />
                     )}

@@ -330,12 +330,18 @@ const Option = props => {
 
               </div>
               <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
-                <ExchangeTVChart
+                {/* <ExchangeTVChart
                   chartTokenSymbol={symbol}
                   pageName="Option"
                   fromToken={activeToken.symbol}
                   toToken="USDT"
                   chainId={chainId}
+                /> */}
+                <ExchangeTVChart
+                  chartTokenSymbol="BTC"
+                  pageName="Powers"
+                  fromToken="BTC"
+                  toToken="USDT"
                 />
               </div>
 

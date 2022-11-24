@@ -487,12 +487,12 @@ const Swap = props => {
   const selectChartToken = item => {
     onClickSetActiveToken(item)
   }
-  const [latestPrice,setLatestPrice]=useState(0);
-  const [priceChangePercentDelta,setPpriceChangePercentDelta]=useState(0);
-const onChangePrice=(curPrice,change)=>{
-  setLatestPrice(curPrice);
-  setPpriceChangePercentDelta(change);
-}
+  const [latestPrice, setLatestPrice] = useState(0);
+  const [priceChangePercentDelta, setPpriceChangePercentDelta] = useState(0);
+  const onChangePrice = (curPrice, change) => {
+    setLatestPrice(curPrice);
+    setPpriceChangePercentDelta(change);
+  }
   return (
     <PageHeaderWrapper>
 
@@ -509,22 +509,28 @@ const onChangePrice=(curPrice,change)=>{
                     onChange={selectChartToken}
                   />
                 </div> */}
-                <AcySymbolNav data={KChartTokenList} onChange={selectChartToken}/>
-                <AcySymbol 
+                <AcySymbolNav data={KChartTokenList} onChange={selectChartToken} />
+                <AcySymbol
                   pairName={toToken.symbol}
                   // showDrawer={showDrawer}
-                  latestPriceColor={priceChangePercentDelta*1>= 0 && '#0ecc83' ||'#fa3c58'}
+                  latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
                   latestPrice={latestPrice}
                   latestPricePercentage={priceChangePercentDelta}
                 />
                 <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column" }}>
-                  <ExchangeTVChart
+                  {/* <ExchangeTVChart
                     chartTokenSymbol={toToken.symbol}
                     pageName="Futures"
                     fromToken={toToken.symbol}
                     toToken="USDT"
                     chainId={chainId}
                     onChangePrice={onChangePrice}
+                  /> */}
+                  <ExchangeTVChart
+                    chartTokenSymbol="BTC"
+                    pageName="Powers"
+                    fromToken="BTC"
+                    toToken="USDT"
                   />
                 </div>
               </div>
