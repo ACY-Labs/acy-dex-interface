@@ -1,6 +1,6 @@
 
   body {
-    font-size: 0.9rem;
+    
     background: #f6f9ff;
     margin: 0;
     padding: 0;
@@ -192,7 +192,7 @@
   
   .chart-cell .csv-link {
     cursor: pointer;
-    font-size: 0.9rem;
+    
     margin-left: 0.3rem;
     opacity: 0.5;
     display: inline-flex;
@@ -299,7 +299,7 @@
     padding: 0.5rem 1rem;
     display: inline-block;
     vertical-align: middle;
-    font-size: 15px;
+    
     line-height: 1.125rem;
     letter-spacing: 0.47px;
   }

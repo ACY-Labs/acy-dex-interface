@@ -86,7 +86,7 @@ const FollowTelegram = ({
   }
 
   const StyledInput = styled.input`
-  font-size: 15px;
+  
   background-color: inherit;
   color: lighten(#000000, 100%);
   width: 95%;
