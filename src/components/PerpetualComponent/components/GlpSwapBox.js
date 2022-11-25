@@ -290,7 +290,7 @@ export const GlpSwapBox = (props) => {
   // })
 
   // let tokensInfo = getTokenfromAddress(tokens, tokenInfo.map(getTokenInfo).address)
-  console.log("contract update info tokensInfo", tokenInfo)
+  // console.log("contract update info tokensInfo", tokenInfo)
   useEffect(() => {
     if (tokenInfo) {
       tokens = decodeTokenInfo(tokenInfo, tokens)
@@ -846,13 +846,11 @@ export const GlpSwapTokenTable = (props) => {
     setIsBuying,
     setSwapTokenAddress,
     setIsWaitingForApproval,
-    tokenList,
     tokens,
     tokenInfo,
-    infoTokens,
-    glpAmount,
+    alpAmount,
     alpPrice,
-    usdgSupply,
+    // usdgSupply,
     totalTokenWeights,
     account
   } = props
@@ -861,64 +859,67 @@ export const GlpSwapTokenTable = (props) => {
     setSwapTokenAddress(token.address)
     setIsWaitingForApproval(false)
   }
-  console.log("check tokenList, tokens, infoTokens", tokenList, tokens, infoTokens)
 
   const tokenListData = []
   let totalPool = 0
-  tokenList.map((token) => {
+  tokens.map((token) => {
     let tokenFeeBps
     if (isBuying) {
-      const { feeBasisPoints: feeBps } = getBuyGlpFromAmount(glpAmount, token.address, infoTokens, alpPrice, usdgSupply, totalTokenWeights)
+      const { feeBasisPoints: feeBps } = getBuyGlpFromAmount(alpAmount, token.address, tokens, alpPrice, totalTokenWeights)
       tokenFeeBps = feeBps
     } else {
-      const { feeBasisPoints: feeBps } = getSellGlpToAmount(glpAmount, token.address, infoTokens, alpPrice, usdgSupply, totalTokenWeights)
+      const { feeBasisPoints: feeBps } = getSellGlpToAmount(alpAmount, token.address, tokens, alpPrice, totalTokenWeights)
       tokenFeeBps = feeBps
     }
-    const tokenInfo = getTokenInfo(infoTokens, token.address)
-    let managedUsd
-    if (tokenInfo && tokenInfo.managedUsd) {
-      managedUsd = tokenInfo.managedUsd
-    }
-    let availableAmountUsd
-    if (tokenInfo && tokenInfo.minPrice && tokenInfo.availableAmount) {
-      availableAmountUsd = tokenInfo.availableAmount.mul(tokenInfo.minPrice).div(expandDecimals(1, token.decimals))
-    }
-    let balanceUsd
-    if (tokenInfo && tokenInfo.minPrice && tokenInfo.balance) {
-      balanceUsd = tokenInfo.balance.mul(tokenInfo.minPrice).div(expandDecimals(1, token.decimals))
-    }
+    // const tokenInfo = getTokenInfo(infoTokens, token.address)
+    // let managedUsd
+    // if (tokenInfo && tokenInfo.managedUsd) {
+    //   managedUsd = tokenInfo.managedUsd
+    // }
+    // let availableAmountUsd
+    // if (tokenInfo && tokenInfo.minPrice && tokenInfo.availableAmount) {
+    //   availableAmountUsd = tokenInfo.availableAmount.mul(tokenInfo.minPrice).div(expandDecimals(1, token.decimals))
+    // }
+    // let balanceUsd
+    // if (tokenInfo && tokenInfo.minPrice && tokenInfo.balance) {
+    //   balanceUsd = tokenInfo.balance.mul(tokenInfo.minPrice).div(expandDecimals(1, token.decimals))
+    // }
 
-    let maxUsdgAmount = DEFAULT_MAX_USDG_AMOUNT
-    if (tokenInfo.maxUsdgAmount && tokenInfo.maxUsdgAmount.gt(0)) {
-      maxUsdgAmount = tokenInfo.maxUsdgAmount
-    }
-
+    // let maxUsdgAmount = DEFAULT_MAX_USDG_AMOUNT
+    // if (tokenInfo.maxUsdgAmount && tokenInfo.maxUsdgAmount.gt(0)) {
+    //   maxUsdgAmount = tokenInfo.maxUsdgAmount
+    // }
+    let tokenPrice = formatAmount(tokenInfo?.find(item => item.token.toLowerCase() == token.address?.toLowerCase())?.price)
+    let tokenBalance = formatAmount(tokenInfo?.find(item => item.token.toLowerCase() == token.address?.toLowerCase())?.balance)
+    let tokenBalanceUSD = (tokenPrice * tokenBalance).toFixed(4)
     const tData = isBuying ? {
       address: token.address,
       name: token.name,
       symbol: token.symbol,
-      price: formatKeyAmount(tokenInfo, "minPrice", USD_DECIMALS, 2, true),
-      pool: formatAmount(managedUsd, USD_DECIMALS, 2, true),
-      wallet: `${formatKeyAmount(tokenInfo, "balance", tokenInfo.decimals, 2, true)} ${tokenInfo.symbol} ($${formatAmount(balanceUsd, USD_DECIMALS, 2, true)})`,
+      price: tokenPrice,
+      // price: formatKeyAmount(tokenInfo, "minPrice", USD_DECIMALS, 2, true),
+      // pool: formatAmount(managedUsd, USD_DECIMALS, 2, true),
+      wallet: `${tokenBalance} ${token.symbol}\n ($${tokenBalanceUSD})`,
+      // wallet: `${formatKeyAmount(tokenInfo, "balance", tokenInfo.decimals, 2, true)} ${tokenInfo.symbol} ($${formatAmount(balanceUsd, USD_DECIMALS, 2, true)})`,
       fees: formatAmount(tokenFeeBps, 2, 2, true, "-") + ((tokenFeeBps !== undefined && tokenFeeBps.toString().length > 0) ? "%" : "")
     } : {
       address: token.address,
       name: token.name,
       symbol: token.symbol,
-      price: formatKeyAmount(tokenInfo, "minPrice", USD_DECIMALS, 2, true),
-      available: `${formatKeyAmount(tokenInfo, "availableAmount", token.decimals, 2, true)} ${token.symbol} ($${formatAmount(availableAmountUsd, USD_DECIMALS, 2, true)})`,
-      wallet: `${formatKeyAmount(tokenInfo, "balance", tokenInfo.decimals, 2, true)} ${tokenInfo.symbol} ($${formatAmount(balanceUsd, USD_DECIMALS, 2, true)}`,
+      // price: formatKeyAmount(tokenInfo, "minPrice", USD_DECIMALS, 2, true),
+      // available: `${formatKeyAmount(tokenInfo, "availableAmount", token.decimals, 2, true)} ${token.symbol} ($${formatAmount(availableAmountUsd, USD_DECIMALS, 2, true)})`,
+      // wallet: `${formatKeyAmount(tokenInfo, "balance", tokenInfo.decimals, 2, true)} ${tokenInfo.symbol} ($${formatAmount(balanceUsd, USD_DECIMALS, 2, true)}`,
       fees: formatAmount(tokenFeeBps, 2, 2, true, "-") + ((tokenFeeBps !== undefined && tokenFeeBps.toString().length > 0) ? "%" : "")
     }
     if (isBuying) {
-      totalPool += parseFloat(tData.pool.replace(",", ""))
+      // totalPool += parseFloat(tData.pool.replace(",", ""))
     }
     tokenListData.push(tData)
   })
 
   if (isBuying) {
     tokenListData.map((tData) => {
-      tData.poolPercent = parseFloat(tData.pool.replace(",", "")) / totalPool * 100
+      // tData.poolPercent = parseFloat(tData.pool.replace(",", "")) / totalPool * 100
       return tData;
     })
   }
@@ -930,9 +931,8 @@ export const GlpSwapTokenTable = (props) => {
           dataSourceCoin={tokenListData}
           isBuying={isBuying}
           onClickSelectToken={onSelectSwapToken}
-          glpAmount={glpAmount}
+          glpAmount={alpAmount}
           alpPrice={alpPrice}
-          usdgSupply={usdgSupply}
           totalTokenWeights={totalTokenWeights}
           account={account}
         />)

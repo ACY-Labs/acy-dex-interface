@@ -43,7 +43,6 @@ const Portfolio = props => {
     alpBalance,
     alpBalanceUsd,
     tokens,
-    tokenList,
     aum,
   } = props
 
@@ -111,8 +110,8 @@ const Portfolio = props => {
   // console.log('joy', glpMarketCap, formatAmount(glpMarketCap, ALP_DECIMALS, 0, true))
 
   let adjustedUsdgSupply = bigNumberify(0);
-  for (let i = 0; i < tokenList.length; i++) {
-    const token = tokenList[i];
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
     const tokenInfo = tokens[token.address];
     // console.log('joy tokenInfo', tokenInfo, tokenInfo.usdgAmount)
     if (tokenInfo && tokenInfo.usdgAmount) {
@@ -252,7 +251,7 @@ const Portfolio = props => {
           infoTokens={infoTokens}
         /> */}
         <TokenWeightPieChart
-          tokenList={tokenList}
+          tokens={tokens}
         />
       </div>
     </div>

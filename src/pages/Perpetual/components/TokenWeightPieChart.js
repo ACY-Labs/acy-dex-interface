@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Pie } from '@ant-design/plots';
 
 const TokenWeightPieChart = (props) => {
-  const {tokenList} = props
+  const {tokens} = props
   const data = [
     {
       type: 'Token 1',
