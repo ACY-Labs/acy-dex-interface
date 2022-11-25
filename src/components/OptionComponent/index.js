@@ -128,7 +128,7 @@ const OptionComponent = props => {
   }, [percentage])
 
   useEffect(() => {
-    setUsdValue((selectedTokenValue * selectedTokenPrice).toFixed(2))
+    setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18, 2)).toFixed(2))
   }, [selectedTokenValue])
 
   ///////////// write contract /////////////
