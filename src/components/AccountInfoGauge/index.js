@@ -108,7 +108,7 @@ const AccountInfoGauge = props => {
     if (token && isWaitingForApproval && !needApproval) {
       setIsWaitingForApproval(false)
     }
-  }, [token, tokenAmount, needApproval])
+  }, [token, tokenAmount, needApproval, isWaitingForApproval])
 
   return (
     <div className={styles.main}>

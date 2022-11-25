@@ -122,16 +122,16 @@ const OptionComponent = props => {
   useEffect(() => {
     setShowDescription(false)
     setMarginToken(tokens[1])
-  }, [chainId, tokens])
+  }, [tokens])
 
   useEffect(() => {
     let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(selectedTokenBalance, 18, 2)
     setSelectedTokenValue(tokenAmount)
-  }, [percentage])
+  }, [percentage, selectedTokenBalance])
 
   useEffect(() => {
     setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18, 2)).toFixed(2))
-  }, [selectedTokenValue])
+  }, [selectedTokenValue, selectedTokenPrice])
 
   ///////////// write contract /////////////
 

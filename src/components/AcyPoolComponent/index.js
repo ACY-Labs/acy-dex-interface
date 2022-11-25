@@ -204,7 +204,7 @@ const AcyPoolComponent = props => {
 
   useEffect(() => {
     setSelectedTokenAmount(parseValue(selectedTokenValue, selectedToken?.decimals))
-  }, [selectedTokenValue])
+  }, [selectedToken, selectedTokenValue])
 
   useEffect(() => {
     setAlpAmount(parseValue(alpValue, ALP_DECIMALS))
@@ -218,7 +218,7 @@ const AcyPoolComponent = props => {
     if (selectedToken && isWaitingForApproval && !needApproval) {
       setIsWaitingForApproval(false)
     }
-  }, [selectedToken, selectedTokenAmount, needApproval])
+  }, [selectedToken, selectedTokenAmount, needApproval, isWaitingForApproval])
 
   useEffect(() => {
     if (selectedTokenValue == 0) {
@@ -236,7 +236,7 @@ const AcyPoolComponent = props => {
       setPayBalance(`$${formatAmount(pay, selectedToken.decimals * 2, 2, true)}`)
       setReceiveBalance(`$${formatAmount(receive, ALP_DECIMALS * 2, 2, true)}`)
     }
-  }, [selectedToken, selectedTokenValue, alpValue])
+  }, [selectedToken, selectedTokenValue, selectedTokenPrice, alpValue, alpPrice])
 
   useEffect(() => {
     if (anchorOnSwapAmount) {
@@ -246,7 +246,6 @@ const AcyPoolComponent = props => {
         return
       }
       if (isBuying) {
-        
         let nextAmount = alpPrice && amountUsd?.div(parseValue(alpPrice, ALP_DECIMALS))
           .mul(BASIS_POINTS_DIVISOR).div(BASIS_POINTS_DIVISOR - MINT_BURN_FEE_BASIS_POINTS)
 
@@ -301,6 +300,7 @@ const AcyPoolComponent = props => {
     isBuying,
     selectedToken,
     selectedTokenAmount,
+    selectedTokenPrice,
     anchorOnSwapAmount,
     alpAmount,
     alpPrice,

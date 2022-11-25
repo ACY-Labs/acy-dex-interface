@@ -156,7 +156,7 @@ const Powers = props => {
 
   useEffect(()=>{
     setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
-  }, [chainId, tokens])
+  }, [tokens])
 
   return (
     <div className={styles.main}>
