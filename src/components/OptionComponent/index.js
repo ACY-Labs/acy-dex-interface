@@ -9,9 +9,11 @@ import { useChainId } from '@/utils/helpers';
 import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, expandDecimals, bigNumberify, formatAmount, BASIS_POINTS_DIVISOR } from '@/acy-dex-futures/utils';
-import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
+import { AcyDescriptions } from '../Acy';
+import ComponentCard from '../ComponentCard';
+import ComponentButton from '../ComponentButton';
 import { approveTokens, trade } from '@/services/derivatives';
-import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
+import ComponentTabs from '../ComponentTabs';
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
 import Reader from '@/abis/future-option-power/Reader.json'
@@ -147,9 +149,9 @@ const OptionComponent = props => {
 
   return (
     <div className={styles.main}>
-      <AcyPerpetualCard style={{ backgroundColor: 'transparent', border: 'none', margin: '-8px' }}>
+      <ComponentCard style={{ backgroundColor: 'transparent', border: 'none', margin: '-8px' }}>
         <div className={styles.modeSelector}>
-          <PerpetualTabs
+          <ComponentTabs
             option={mode}
             options={optionMode}
             onChange={(mode) => { setMode(mode) }}
@@ -257,12 +259,12 @@ const OptionComponent = props => {
                 </AcyDescriptions>
                 : null}
 
-              <AcyPerpetualButton
+              <ComponentButton
                 style={{ margin: '25px 0 0 0', width: '100%' }}
                 onClick={onClickPrimary}
               >
                 {getPrimaryText()}
-              </AcyPerpetualButton>
+              </ComponentButton>
 
             </div>
 
@@ -279,7 +281,7 @@ const OptionComponent = props => {
           </>
         }
 
-      </AcyPerpetualCard>
+      </ComponentCard>
     </div>
   );
 }

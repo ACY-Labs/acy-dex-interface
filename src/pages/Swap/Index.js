@@ -6,7 +6,7 @@ import Media from 'react-media';
 import { getTransactionsByAccount, appendNewSwapTx } from '@/utils/txData';
 import SwapComponent from '@/components/SwapComponent';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
+import ComponentTabs from '@/components/ComponentTabs';
 import axios from 'axios';
 import styles from './styles.less';
 import { useConstantLoader } from '@/constants';
@@ -224,7 +224,7 @@ const Swap = props => {
 
             <div>
               <div className={styles.chartTokenSelectorTab}>
-                <PerpetualTabs
+                <ComponentTabs
                   option={graphType}
                   options={graphTypes}
                   onChange={showGraph}
@@ -251,7 +251,7 @@ const Swap = props => {
 
             <div className={styles.bottomWrapper}>
               <div className={styles.chartTokenSelectorTab}>
-                <PerpetualTabs
+                <ComponentTabs
                   option={tableContent}
                   options={['Trade History', 'Pools Activity']}
                   onChange={item => { setTableContent(item) }}

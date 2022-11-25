@@ -7,7 +7,7 @@ import { VaultCard } from "./components/vaultCard";
 import { StartegyCard } from "./components/strategyCard";
 import { ValueCalculations } from "./components/valueCalculations"
 import { useHistory } from 'react-router-dom'
-import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
+import ComponentTabs from "@/components/ComponentTabs";
 
 const stats = (props) => {
   /* #region  graph */
@@ -142,7 +142,7 @@ const stats = (props) => {
                 USDA ANALYTICS
             </div> */}
       <div className={styles.statsTab}>
-        <PerpetualTabs
+        <ComponentTabs
           option={statsType}
           options={statsTypes}
           onChange={onChangeStats}

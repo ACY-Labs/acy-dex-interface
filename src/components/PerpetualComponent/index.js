@@ -1,11 +1,11 @@
 import {
-  AcyPerpetualCard,
-  AcyDescriptions,
-  AcyPerpetualButton
+  AcyDescriptions,  
 } from '@/components/Acy';
+import ComponentCard from '../ComponentCard';
+import ComponentButton from '../ComponentButton';
 import { PriceBox } from './components/PriceBox';
 import ConfirmationBox from './components/ConfirmationBox';
-import PerpetualTabs from './components/PerpetualTabs'
+import ComponentTabs from '../ComponentTabs';
 import { MARKET, LIMIT, LONG, SHORT, SWAP, POOL, DEFAULT_HIGHER_SLIPPAGE_AMOUNT } from './constant'
 
 import {
@@ -1392,9 +1392,9 @@ const SwapComponent = props => {
 
   return (
     <div className={styles.mainContent}>
-      <AcyPerpetualCard style={{ backgroundColor: 'transparent', height: '1100px' }}>
+      <ComponentCard style={{ backgroundColor: 'transparent', height: '1100px' }}>
         <div className={styles.modeSelector}>
-          <PerpetualTabs
+          <ComponentTabs
             option={mode}
             options={perpetualMode}
             onChange={modeSelect}
@@ -1404,7 +1404,7 @@ const SwapComponent = props => {
         {mode !== POOL ?
           <>
             <div className={styles.typeSelector}>
-              <PerpetualTabs
+              <ComponentTabs
                 option={type}
                 options={perpetualType}
                 type="inline"
@@ -1532,14 +1532,14 @@ const SwapComponent = props => {
             }
 
             <div className={styles.centerButton}>
-              <AcyPerpetualButton
+              <ComponentButton
                 // <AcyButton
                 style={{ marginTop: '25px' }}
                 onClick={onClickPrimary}
                 disabled={!isPrimaryEnabled()}
               >
                 {getPrimaryText()}
-              </AcyPerpetualButton>
+              </ComponentButton>
               {/* </AcyButton> */}
             </div>
           </>
@@ -1549,7 +1549,7 @@ const SwapComponent = props => {
         {/* Long/Short Detail card  */}
         {(isLong || isShort) &&
           <>
-            <AcyPerpetualCard style={{ backgroundColor: 'transparent', padding: '10px', border: 'none', marginTop: '50px' }}>
+            <ComponentCard style={{ backgroundColor: 'transparent', padding: '10px', border: 'none', marginTop: '50px' }}>
 
               {/*  *Profits In // TODO: how do user withdraw profit from platform? gmx: decided before trade. deri: calculate usd value
               {isLong && (
@@ -1787,11 +1787,11 @@ const SwapComponent = props => {
 
               <AccountInfoGauge />
 
-            </AcyPerpetualCard>
+            </ComponentCard>
           </>
         }
 
-      </AcyPerpetualCard>
+      </ComponentCard>
 
       {/* {isConfirming && (
         <ConfirmationBox

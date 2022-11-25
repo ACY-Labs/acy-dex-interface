@@ -24,10 +24,10 @@ import {
   MINT_BURN_FEE_BASIS_POINTS,
   BURN_FEE_BASIS_POINTS,
 } from '@/acy-dex-futures/utils';
-import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
+import ComponentTabs from '../ComponentTabs';
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection';
 import glp40Icon from '@/pages/BuyGlp/components/ic_glp_40.svg'
-import AcyPerpetualButton from '@/components/PerpetualComponent/components/AcyPerpetualButton';
+import ComponentButton from '../ComponentButton';
 import ERC20 from '@/abis/future-option-power/ERC20.json';
 import Router from '@/abis/future-option-power/Router.json';
 import Reader from '@/abis/future-option-power/Reader.json';
@@ -342,7 +342,7 @@ const AcyPoolComponent = props => {
     <div className={styles.mainContent}>
       <div className="GlpSwap">
         <div className={styles.BuySellSelector}>
-          <PerpetualTabs
+          <ComponentTabs
             option={mode}
             options={['Buy ALP', 'Sell ALP']}
             type="inline"
@@ -443,13 +443,13 @@ const AcyPoolComponent = props => {
         </div>
 
         <div className={styles.centerButton}>
-          <AcyPerpetualButton
+          <ComponentButton
             style={{ marginTop: '25px' }}
             onClick={onClickPrimary}
             disabled={!isPrimaryEnabled()}
           >
             {getPrimaryText()}
-          </AcyPerpetualButton>
+          </ComponentButton>
         </div>
 
       </div>

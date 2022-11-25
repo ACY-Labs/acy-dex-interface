@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from 'antd';
 import { Gauge } from 'ant-design-pro/lib/Charts';
-import { AcyPerpetualButton, AcyCuarrencyCard } from '../Acy';
+import { AcyCuarrencyCard } from '../Acy';
+import ComponentButton from '../ComponentButton';
 import Modal from '../PerpetualComponent/Modal/Modal';
 import TokenSelectorModal from '../TokenSelectorModal';
 import { approveTokens, addMargin, removeMargin } from '@/services/derivatives';
@@ -146,12 +147,12 @@ const AccountInfoGauge = props => {
       </div>
 
       <div className={styles.buttonContainer} style={{ marginTop: '20px' }}>
-        <AcyPerpetualButton onClick={onClickDeposit}>
+        <ComponentButton onClick={onClickDeposit}>
           DEPOSIT
-        </AcyPerpetualButton>
-        <AcyPerpetualButton onClick={onClickWithdraw}>
+        </ComponentButton>
+        <ComponentButton onClick={onClickWithdraw}>
           WITHDRAW
-        </AcyPerpetualButton>
+        </ComponentButton>
       </div>
 
       {isConfirming &&

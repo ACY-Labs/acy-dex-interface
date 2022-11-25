@@ -46,7 +46,7 @@ import Media from 'react-media';
 import { getTransactionsByAccount, appendNewSwapTx, findTokenWithSymbol, findTokenWithAddress } from '@/utils/txData';
 import { getConstant } from '@/acy-dex-futures/utils/Constants'
 import PerpetualComponent from '@/components/PerpetualComponent';
-import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
+import ComponentTabs from '@/components/ComponentTabs';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 import { GlpSwapTokenTable } from '@/components/PerpetualComponent/components/GlpSwapBox'
 import TokenWeightChart from './components/TokenWeightChart'
@@ -496,7 +496,7 @@ const Swap = props => {
             <div className={`${styles.colItem} ${styles.priceChart}`}>
               <div>
                 <div className={styles.chartTokenSelectorTab}>
-                  <PerpetualTabs
+                  <ComponentTabs
                     option={toToken.symbol}
                     options={KChartTokenList}
                     onChange={selectChartToken}
@@ -516,7 +516,7 @@ const Swap = props => {
 
               <div className={styles.bottomWrapper}>
                 <div className={styles.chartTokenSelectorTab}>
-                  <PerpetualTabs
+                  <ComponentTabs
                     option={tableContent}
                     options={[POSITIONS, ORDERS, ACTIONS]}
                     onChange={item => { setTableContent(item) }}

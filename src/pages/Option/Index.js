@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Row, Col, Drawer } from 'antd';
 import AcyCard from '@/components/AcyCard';
 import OptionComponent from '@/components/OptionComponent'
-import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
+import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import * as Api from '@/acy-dex-futures/Api';
@@ -170,7 +170,7 @@ const Option = props => {
               <div>
                 <div className={styles.chartTokenSelectorTab}>
                   <Row>
-                    <PerpetualTabs
+                    <ComponentTabs
                       option={activeToken.symbol}
                       options={KChartTokenList}
                       onChange={selectTab}
@@ -337,7 +337,7 @@ const Option = props => {
 
               <div className={styles.bottomWrapper}>
                 <div className={styles.bottomTab}>
-                  <PerpetualTabs
+                  <ComponentTabs
                     option={tableContent}
                     options={["Positions", "Orders"]}
                     onChange={item => { setTableContent(item) }}

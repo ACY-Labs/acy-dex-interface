@@ -8,7 +8,7 @@ import { useConstantLoader } from '@/constants';
 import { useChainId } from '@/utils/helpers';
 
 import Icon from '@ant-design/icons'
-import { AcyPerpetualButton, AcyModal, AcyCardList, AcyIcon } from '@/components/Acy';
+import { AcyModal, AcyCardList, AcyIcon } from '@/components/Acy';
 import {
     DownOutlined,
     DisconnectOutlined,
