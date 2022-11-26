@@ -44,13 +44,19 @@ import Portfolio from '@/pages/Perpetual/components/Portfolio';
 import { GlpSwapTokenTable } from '../PerpetualComponent/components/GlpSwapBox';
 import { useConstantLoader, constantInstance } from '@/constants';
 import { useChainId } from '@/utils/helpers';
+import { useWeb3React } from '@web3-react/core';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
 
 import styles from './styles.less';
 
 const AcyPool = props => {
 
-  const { account, library, chainId } = useConstantLoader();
+  const { account } = useConstantLoader();
+  // const { chainId } = useChainId()
+
+  //TODO: chainId should be retrieved from useChainId
+  const chainId = 80001
+  const { active, activate, library } = useWeb3React()
 
   const [poolTab, setPoolTab] = useState("ALP Price")
   const poolTabs = ["ALP Price", "Portfolio"]
@@ -67,70 +73,21 @@ const AcyPool = props => {
   const [alpData, alpLoading] = useAlpData(params)
   const [alpPriceData, alpPriceDataLoading] = useAlpPriceData(alpData, feesData, params)
 
-  const supportedTokens = getTokens(chainId)
   const tokens = getTokens(chainId)
-  // const supportedTokens = constantInstance.perpetuals.tokenList;
-  const whitelistedTokens = supportedTokens.filter(token => token.symbol !== "USDG");
-  const glp_tokenList = whitelistedTokens.filter(t => !t.isWrapped)
-  const whitelistedTokenAddresses = whitelistedTokens.map(token => token.address);
 
   const [isBuying, setIsBuying] = useState(true)
   const [swapTokenAddress, setSwapTokenAddress] = useState(tokens[0].address)
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
 
-  // const [glpValue, setGlpValue] = useState("")
-  // const glpAmount = parseValue(glpValue, GLP_DECIMALS)
-
   const [alpValue, setAlpValue] = useState("")
   const alpAmount = parseValue(alpValue, ALP_DECIMALS)
 
-  //TODO: is vault still valid?
-  const vaultAddress = getContract(chainId, "Vault")
-  // const usdgAddress = getContract(chainId, "USDG")
-  // const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
-  // const routerAddress = getContract(chainId, "Router")
-  // const glpManagerAddress = getContract(chainId, "GlpManager")
-  // const glpAddress = getContract(chainId, "GLP")
-  const orderBookAddress = getContract(chainId, "OrderBook")
-  //verified
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
   const alpAddress = getContract(chainId, 'alp')
 
-
-  // const { data: vaultTokenInfo, mutate: updateVaultTokenInfo } = useSWR([chainId, readerAddress, "getFullVaultTokenInfo"], {
-  //   fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, expandDecimals(1, 18), whitelistedTokenAddresses]),
-  // })
-
   const tokenAddresses = tokens.map(token => token.address)
-  // const { data: tokenBalances, mutate: updateTokenBalances } = useSWR([chainId, readerAddress, "getTokenBalances", account], {
-  //   fetcher: fetcher(library, Reader, [tokenAddresses]),
-  // })
-
-  // const { data: fundingRateInfo, mutate: updateFundingRateInfo } = useSWR(account && [chainId, readerAddress, "getFundingRates"], {
-  //   fetcher: fetcher(library, Reader, [vaultAddress, nativeTokenAddress, whitelistedTokenAddresses]),
-  // })
-  //TODO: is vault still valid?
-  const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([chainId, vaultAddress, "totalTokenWeights"], {
-    fetcher: fetcher(library, Vault),
-  })
-
-  // const { data: glpBalance, mutate: updateGlpBalance } = useSWR([chainId, glpAddress, "balanceOf", account || PLACEHOLDER_ACCOUNT], {
-  //   fetcher: fetcher(library, Glp),
-  // })
-
-  // const { data: glpSupply, mutate: updateGlpSupply } = useSWR([chainId, alpAddress, "totalSupply"], {
-  //   fetcher: fetcher(library, Glp),
-  // })
-
-  // const { data: glpUsdgSupply, mutate: updateGlpUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
-  //   fetcher: fetcher(library, Usdg),
-  // })
-
-  // const { data: aumInUsdg, mutate: updateAumInUsdg } = useSWR([chainId, glpManagerAddress, "getAumInUsda", true], {
-  //   fetcher: fetcher(library, GlpManager),
-  // })
-  //verified
+  
   const { data: poolInfo, mutate: updatePoolInfo } = useSWR([chainId, readerAddress, "getPoolInfo", poolAddress], {
     fetcher: fetcher(library, Reader),
   })
@@ -149,27 +106,32 @@ const AcyPool = props => {
     fetcher: fetcher(library, Reader)
   });
 
-  console.log("check matic", tokens, tokenInfo)
+  useEffect(() => {
+    if (active) {
+      library.on('block', () => {
+        updatePoolInfo()
+        updateAlpBalance()
+        updateAlpSupply()
+        updateLpInfo()
+        updateTokenInfo()
+      })
+      return () => {
+        library.removeAllListeners('block')
+      }
+    }
+  }, [active, library, chainId,
+    updatePoolInfo,
+    updateAlpBalance,
+    updateAlpSupply,
+    updateLpInfo,
+    updateTokenInfo,
+  ])
 
-
-  // const glpPrice = (aumInUsdg && aumInUsdg.gt(0) && glpSupply && glpSupply.gt(0)) ? aumInUsdg.mul(expandDecimals(1, GLP_DECIMALS)).div(glpSupply) : expandDecimals(1, USD_DECIMALS)
   const alpPrice = poolInfo ? poolInfo.totalSupply.gt(0) ? parseInt(poolInfo.liquidity) / parseInt(poolInfo.totalSupply) : expandDecimals(1, USD_DECIMALS) : 0
   const alpBalanceUsd = alpBalance ? alpBalance.mul(parseValue(alpPrice, ALP_DECIMALS)) : bigNumberify(0)
   const alpSupplyUsd = alpSupply ? alpSupply.mul(parseValue(alpPrice, ALP_DECIMALS)) : bigNumberify(0)
   const aum = lpInfo ? lpInfo.liquidity : bigNumberify(0)
-  //aumSuppl
-  // const aumSupply = lpInfo ? lpInfo.t/otalSupply : bigNumberify(0)
-  // const aumPrice = lpInfo ? poolInfo ? poolInfo.totalSupply.gt(0) ? parseInt(lpInfo.liquidity) / parseInt(poolInfo.totalSupply) : expandDecimals(1, USD_DECIMALS) : 0 : 0
-
-  // let glpBalanceUsd
-  // if (glpBalance) {
-  //   glpBalanceUsd = glpBalance.mul(glpPrice).div(expandDecimals(1, GLP_DECIMALS))
-  // }
-  
-  // const glpSupplyUsd = glpSupply ? glpSupply.mul(alpPrice).div(expandDecimals(1, ALP_DECIMALS)) : bigNumberify(0)
  
-  // const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
-
   return (
     <div className={`${styles.colItem} ${styles.priceChart}`}>
       <div>
@@ -226,14 +188,10 @@ const AcyPool = props => {
                 setIsBuying={setIsBuying}
                 setSwapTokenAddress={setSwapTokenAddress}
                 setIsWaitingForApproval={setIsWaitingForApproval}
-                // tokenList={glp_tokenList}
                 tokens={tokens}
                 tokenInfo={tokenInfo}
-                // infoTokens={infoTokens}
                 alpAmount={alpAmount}
                 alpPrice={alpPrice}
-                // usdgSupply={glpUsdgSupply}
-                totalTokenWeights={totalTokenWeights}
                 account={account}
               />
             </AcyCard>

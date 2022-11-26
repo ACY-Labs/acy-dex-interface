@@ -146,14 +146,16 @@ const Portfolio = props => {
         <div className={styles.statstitle}>Overview</div>
         <div className={styles.statsdivider} />
         <div className={styles.statscontent}>
-          {alpData && <div className={styles.statsRow}>
-            <div className={styles.label}>Assets Under Management</div>
-            {/* <div className={styles.value}>{formatNumber(alpData[alpData.length - 1].aum, { currency: true })}</div> */}
-            <div className={styles.value}>{formatAmount(aum, ALP_DECIMALS, 4, true)}</div>
-            
+          {alpData && 
+          <div>
+            <div className={styles.statsRow}>
+              <div className={styles.label}>Assets Under Management</div>
+              {/* <div className={styles.value}>{formatNumber(alpData[alpData.length - 1].aum, { currency: true })}</div> */}
+              <div className={styles.value}>{formatAmount(aum, ALP_DECIMALS, 4, true)}</div>
+            </div>
             <div className={styles.statsRow}>
               <div className={styles.label}>APY</div>
-              <div className={styles.value}>      ... %</div>
+              <div className={styles.value}>... %</div>
             </div>
           </div>}
 
