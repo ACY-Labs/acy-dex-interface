@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react'
 import { Select } from 'antd'
 import AcyIcon from '@/components/AcyIcon';
-import {useConstantLoader} from '@/constants';
+import { useConstantLoader } from '@/constants';
 import TokenSelectorModal from "@/components/TokenSelectorModal";
+import TokenSelectorDrawer from '@/components/TokenSelectorDrawer';
 import glp40Icon from './ic_glp_40.svg'
 import styles from './BuyInputSection.less'
 
@@ -12,18 +13,18 @@ const { Option } = Select;
 
 export default function BuyInputSection(props) {
   const { chainId } = useConstantLoader(props)
-  const { 
-    topLeftLabel, 
-    topRightLabel, 
-    isLocked, 
-    inputValue, 
-    onInputValueChange, 
-    staticInput, 
-    balance, 
-    tokenBalance, 
-    onSelectToken, 
-    tokenlist, 
-    token 
+  const {
+    topLeftLabel,
+    topRightLabel,
+    isLocked,
+    inputValue,
+    onInputValueChange,
+    staticInput,
+    balance,
+    tokenBalance,
+    onSelectToken,
+    tokenlist,
+    token
   } = props
 
   const logoURI = {
@@ -35,7 +36,18 @@ export default function BuyInputSection(props) {
     'USDT': 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
     'BNB': 'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png?1644979850',
   }
-
+  // 选择货币的弹窗
+  const [visible, setVisible] = useState(null);
+  const onOpenCoin = () => {
+    setVisible(true);
+  };
+  const onClickCoin = (token) => {
+    setVisible(false);
+    onSelectToken(token.symbol);
+  };
+  const onCancel = () => {
+    setVisible(false);
+  };
   return (
     <div className={styles.buyInput}>
       <div className={styles.swapSectionTop}>
@@ -50,19 +62,24 @@ export default function BuyInputSection(props) {
       <div className={styles.swapSectionBottom}>
         <div className={styles.inputContainer}>
           {!isLocked &&
-            <div className={styles.tokenSelector}>
-              <Select 
-                value={token.symbol} 
-                onChange={onSelectToken}
-                dropdownClassName={styles.dropDownMenu}
-              >
-                {tokenlist.map(coin => (
-                  <Option className={styles.optionItem} value={coin.symbol}>
-                    <img src={logoURI[coin.symbol]} style={{ width: '20px', height:'20px', marginRight: '0.5rem' }} />
-                    {coin.symbol}
-                  </Option>
-                ))}
-              </Select>
+            // <div className={styles.tokenSelector} onClick={onClickCoin}>
+            //   <Select 
+            //     value={token.symbol} 
+            //     onChange={onSelectToken}
+            //     dropdownClassName={styles.dropDownMenu}
+            //   >
+            //     {tokenlist.map(coin => (
+            //       <Option className={styles.optionItem} value={coin.symbol}>
+            //         <img src={logoURI[coin.symbol]} style={{ width: '20px', height:'20px', marginRight: '0.5rem' }} />
+            //         {coin.symbol}
+            //       </Option>
+            //     ))}
+            //   </Select>
+            // </div>
+            <div className={styles.tokenSelector} onClick={onOpenCoin}>
+              <img src={logoURI[token.symbol]} style={{ width: '20px', height: '20px', marginRight: '0.5rem' }} />
+              {token.symbol}
+              <AcyIcon.MyIcon type="triangleGray" width={10} />
             </div>
           }
           {isLocked &&
@@ -79,6 +96,7 @@ export default function BuyInputSection(props) {
           {staticInput && <div className={styles.staticInput}>{inputValue}</div>}
         </div>
       </div>
+      <TokenSelectorDrawer onCancel={onCancel} simple width={400} visible={visible} onCoinClick={onClickCoin} coinList={tokenlist.map(item => { item.logoURI = logoURI[item.symbol]; return item; })} />
     </div>
   )
 }

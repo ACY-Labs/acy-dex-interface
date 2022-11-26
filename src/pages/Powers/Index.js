@@ -164,170 +164,42 @@ const Powers = props => {
     setVisibleMATIC(false);
   };
 
+  const onTrade = async (symbol, amount, priceLimit) => {
+    const poolAddress = getContract(chainId, "pool")
+    const contract = new ethers.Contract(poolAddress, IPool.abi, library.getSigner())
+    let method = "trade"
+    let params = [
+      account,
+      symbol,
+      amount,
+      priceLimit,
+      [], //oracleSignature
+    ]
+
+    let value = bigNumberify(0)
+    const successMsg = `Order Submitted!`
+    Api.callContract(chainId, contract, method, params, {
+      value,
+      sentMsg: `Submitted.`,
+      failMsg: `Failed.`,
+      successMsg,
+    })
+      .then(() => { })
+      .catch(e => { console.log(e) })
+  }
+  const [latestPrice, setLatestPrice] = useState(0);
+  const [priceChangePercentDelta, setPpriceChangePercentDelta] = useState(0);
+  const onChangePrice = (curPrice, change) => {
+    setLatestPrice(curPrice);
+    setPpriceChangePercentDelta(change);
+  }
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
         {mode == 'Pool' ?
           <AcyPool />
           : <div className={`${styles.colItem} ${styles.priceChart}`}>
-            {/* <div>
-              <div className={styles.chartTokenSelectorTab}>
-                <Row>
-                  <PerpetualTabs
-                    option={activeToken.symbol}
-                    options={KChartTokenList}
-                    onChange={selectTab}
-                  />
-                </Row>
 
-                {visibleBTC ?
-                  <Row>
-                    <Col>
-                      <div className={styles.tokenSelector} >
-                        <StyledDrawer
-                          className={styles.drawerContent}
-                          placement="bottom"
-                          onClose={onCloseBTC}
-                          // onClose={onClose("BTC")}
-                          visible={visibleBTC}
-                          getContainer={false}
-                          closeIcon={false}
-                          height={"517px"}
-                          style={{ width: "20rem" }}
-                        >
-                          <div className={styles.optionslist}>
-                            {optionsBTC.map((option) => (
-                              <div
-                                className={styles.item}
-                                onClick={() => {
-                                  onClickDropdownBTC(option)
-                                  setSymbol(option.tokenSymbol + 'USD-' + option.optionSymbol + '-' + option.type)
-                                  onCloseBTC()
-                                }}
-                              >
-                                {option.tokenSymbol}-{option.optionSymbol}-{option.type}
-                                {option.type == "C" ?
-                                  <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
-                                  :
-                                  <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
-                                }
-                              </div>
-                            ))}
-                          </div>
-                        </StyledDrawer>
-                      </div>
-                    </Col>
-                  </Row> : null}
-
-                {visibleETH ?
-                  <Row>
-                    <Col>
-                      <StyledDrawer
-                        className={styles.drawerContent}
-                        placement="bottom"
-                        onClose={onCloseETH}
-                        // onClose={onClose("ETH")}
-                        visible={visibleETH}
-                        getContainer={false}
-                        closeIcon={false}
-                        height={"517px"}
-                        style={{ width: "20rem" }}
-                      >
-                        <div className={styles.optionslist}>
-                          {optionsETH.map((option) => (
-                            <div
-                              className={styles.item}
-                              onClick={() => {
-                                onClickDropdownETH(option)
-                                setSymbol(option.tokenSymbol + 'USD-' + option.optionSymbol + '-' + option.type)
-                                onCloseETH()
-                              }}
-                            >
-                              {option.tokenSymbol}-{option.optionSymbol}-{option.type}
-                              {option.type == "C" ?
-                                <Col span={6} offset={2} style={{ fontSize: "0.8rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
-                                :
-                                <Col span={6} offset={2} style={{ fontSize: "0.8rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
-                              }
-                            </div>
-                          ))}
-                        </div>
-                      </StyledDrawer>
-                    </Col>
-                  </Row> : null}
-
-                {visibleMATIC ?
-                  <Row>
-                    <Col>
-                      <StyledDrawer
-                        className={styles.drawerContent}
-                        placement="bottom"
-                        onClose={onCloseMATIC}
-                        visible={visibleMATIC}
-                        getContainer={false}
-                        closeIcon={false}
-                        height={"517px"}
-                        style={{ width: "20rem", left: "10rem" }}
-                      >
-                        <div className={styles.optionslist}>
-                          {optionsMATIC.map((option) => (
-                            <div
-                              className={styles.item}
-                              onClick={() => {
-                                onClickDropdownMATIC(option)
-                                setSymbol(option.tokenSymbol + 'USD-' + option.optionSymbol + '-' + option.type)
-                                onCloseMATIC()
-                              }}
-                            >
-                              {option.tokenSymbol}-{option.optionSymbol}-{option.type}
-                              {option.type == "C" ?
-                                <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
-                                :
-                                <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
-                              }
-                            </div>
-                          ))}
-                        </div>
-                      </StyledDrawer>
-                    </Col>
-                  </Row> : null}
-                {visibleBNB ?
-                  <Row>
-                    <Col>
-                      <StyledDrawer
-                        className={styles.drawerContent}
-                        placement="bottom"
-                        onClose={onCloseBNB}
-                        visible={visibleBNB}
-                        getContainer={false}
-                        closeIcon={false}
-                        height={"517px"}
-                        style={{ width: "20rem", left: "10rem" }}
-                      >
-                        <div className={styles.optionslist}>
-                          {optionsBNB.map((option) => (
-                            <div
-                              className={styles.item}
-                              onClick={() => {
-                                onClickDropdownBNB(option)
-                                setSymbol(option.tokenSymbol + 'USD-' + option.optionSymbol + '-' + option.type)
-                                onCloseBNB()
-                              }}
-                            >
-                              {option.tokenSymbol}-{option.optionSymbol}-{option.type}
-                              {option.type == "C" ?
-                                <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
-                                :
-                                <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
-                              }
-                            </div>
-                          ))}
-                        </div>
-                      </StyledDrawer>
-                    </Col>
-                  </Row> : null}
-              </div>
-            </div> */}
             <AcySymbolNav data={KChartTokenList} onChange={selectTab} />
             <AcySymbol
               pairName={activeToken.symbol}
@@ -335,10 +207,10 @@ const Powers = props => {
               // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
               // latestPrice={latestPrice}
               // latestPricePercentage={priceChangePercentDelt
-              latestPriceColor={1}
-              latestPrice={1}
-              latestPricePercentage={1}
               coinList={coinList}
+              latestPriceColor={priceChangePercentDelta*1>= 0 && '#0ecc83' ||'#fa3c58'}
+              latestPrice={latestPrice}
+              latestPricePercentage={priceChangePercentDelta}
             />
             {/* <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onClickCoin} coinList={coinList} /> */}
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
@@ -347,6 +219,7 @@ const Powers = props => {
                 pageName="Powers"
                 fromToken={activeToken.symbol}
                 toToken="USDT"
+                onChangePrice={onChangePrice}
               />
             </div>
           </div>

@@ -332,7 +332,6 @@ const SwapComponent = props => {
 
   const fromAmount = parseValue(fromValue, fromToken && fromToken.decimals);
   const toAmount = parseValue(toValue, toToken && toToken.decimals);
-  debugger
   const isPotentialWrap = (fromToken?.isNative && toToken.isWrapped) || (fromToken.isWrapped && toToken?.isNative);
   const isWrapOrUnwrap = mode === SWAP && isPotentialWrap;
   const needApproval =
@@ -1484,7 +1483,6 @@ const SwapComponent = props => {
                 style={{ height: '30px' }}
               />
             </div>
-
             <BuyInputSection
               token={fromToken}
               tokenlist={tokens.filter(token => !token.isWrapped)}
@@ -1496,7 +1494,6 @@ const SwapComponent = props => {
               onInputValueChange={onFromValueChange}
               onSelectToken={selectFromToken}
             />
-
             {/* <div className={styles.arrow} onClick={switchTokens}>
           <Icon style={{ fontSize: '16px' }} type="arrow-down" />
         </div> */}

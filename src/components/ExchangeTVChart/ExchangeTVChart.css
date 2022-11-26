@@ -72,7 +72,7 @@
 .TabBlock{
   display: grid;
   grid-auto-flow: column;
-  font-size: 0.9rem;
+  
   color: rgba(255, 255, 255, 0.7);
   box-shadow: rgba(255, 255, 255, 0.01) 0px 0px 30px 5px inset;
   border-radius: 3px;

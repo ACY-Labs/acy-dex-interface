@@ -2,7 +2,7 @@
     height: 10px !important;
     display: grid;
     grid-auto-flow: column;
-    font-size: 0.9rem;
+    
     border-radius: 3px;
     overflow: hidden;
     color: #ffffffb3;
