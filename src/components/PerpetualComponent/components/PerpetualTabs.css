@@ -9,6 +9,7 @@
   /* background: linear-gradient(90deg, rgb(27 27 28) 0%, rgba(27 27 28) 100%); */
   box-shadow: inset 0px 0px 30px 5px rgba(255, 255, 255, 0.01);
   border-bottom: 1px solid #373738;
+  font-size: 14px;
 }
 
 .Tab-option-icon {
