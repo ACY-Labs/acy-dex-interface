@@ -24,6 +24,7 @@
   padding-right: 1rem;
   cursor: pointer;
   /* border: 0.75px solid #373738; */
+  font-size: 14px;
 }
 
 .Tab.block .Tab-option:hover {
