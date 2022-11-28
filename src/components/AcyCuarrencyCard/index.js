@@ -4,7 +4,7 @@ import AcyIcon from '@/components/AcyIcon';
 import styles from './index.less';
 import classname from 'classnames';
 import Pattern from '@/utils/pattern';
-import { getAllSupportedTokensPrice } from '@/acy-dex-swap/utils';
+import { getAllSupportedTokensPrice,getTokenPrice } from '@/acy-dex-swap/utils';
 
 const AcyCuarrencyCard = ({
   title,
@@ -44,12 +44,14 @@ const AcyCuarrencyCard = ({
     else if (!token)
       setUsdValue(null);
 
-    const tokenPriceList = await getAllSupportedTokensPrice();
-    const tokenPrice = tokenPriceList[coin];
+    // const tokenPriceList = await getAllSupportedTokensPrice();
+    const tokenPrice = await getTokenPrice(coin.address)
+    // const tokenPrice = tokenPriceList[coin];
     const tokenAmountUSD = tokenPrice * token;
     setUsdValue(tokenAmountUSD.toFixed(2));
     console.log("tokenprice, token", tokenPrice, token)
     console.log("test token price: ", coin, tokenPrice);
+    console.log("UsdValue",usdValue)
   }, [coin, token])
 
   const inputRef = React.createRef();

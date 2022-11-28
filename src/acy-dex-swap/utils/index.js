@@ -535,6 +535,24 @@ export async function getAllSupportedTokensPrice(isForMarketPage=false) {
   });
   return tokensPrice;
 }
+
+export async function getTokenPrice(token,chainId){
+  return 0;
+  // wait acy-stats add this API
+  const tokenPrice = await axios.get(
+    `https://stats.acy.finance/api/price?token=${token}&chainId=${chainId}`
+  ).then(
+    (result) => {
+      const data = result.data;
+      return data;
+    }
+  ).catch(
+    (err)=>{
+      return 0;
+    }
+  )
+  return tokenPrice;
+}
 // market 专用
 export async function getAllSupportedTokensPrice_forMarket() {
   return await getAllSupportedTokensPrice(true);

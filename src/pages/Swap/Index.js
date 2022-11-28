@@ -22,10 +22,12 @@ import { getTokens } from '@/constants/trade'
 const Swap = props => {
   const { account, library, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
   const { chainId } = useChainId();
-  const supportedTokens = getTokens(chainId);
+  // const supportedTokens = getTokens(chainId);
+  const INITIAL_TOKEN_LIST = getTokens(chainId);
+  const [supportedTokens,setSupportedTokens] = useState(INITIAL_TOKEN_LIST)
 
-  const [activeToken1, setActiveToken1] = useState(supportedTokens[3]);
-  const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
+  const [activeToken1, setActiveToken1] = useState(supportedTokens[0]);
+  const [activeToken0, setActiveToken0] = useState(supportedTokens[1]);
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
   const [transactionList, setTransactionList] = useState([]);
@@ -285,6 +287,12 @@ const Swap = props => {
                   }}
                   onGetReceipt={onGetReceipt}
                   showGraph={showGraph}
+                  token0={activeToken0}
+                  token1={activeToken1}
+                  setActiveToken0={setActiveToken0}
+                  setActiveToken1={setActiveToken1}
+                  tokenlist={supportedTokens}
+                  setTokenlist={setSupportedTokens}
                 />
               </div>
             </AcyCard>

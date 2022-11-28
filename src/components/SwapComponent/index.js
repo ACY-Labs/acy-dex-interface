@@ -25,22 +25,19 @@ const SwapComponent = props => {
     onSelectToken0,
     onSelectToken1,
     onSelectToken,
-    token,
-    isLockedToken1=false
+    token0,
+    token1,
+    setActiveToken0:setToken0,
+    setActiveToken1:setToken1,
+    isLockedToken1=false,
+    tokenlist:INITIAL_TOKEN_LIST,
+    setTokenlist,
   } = props;
   // 选择货币的弹窗
 
   const { chainId } = useChainId();
-  const getTokenList = async (chainId)=>{
-    try {
-      const res = await fetch("https://stats.acy.finance/api/tokens?chainId=56")
-      const myJson = await res.json()
-      return myJson.data
-    } catch (error) {
-      return
-    }
-  }
-  let INITIAL_TOKEN_LIST = getTokens(chainId);
+  
+  // let INITIAL_TOKEN_LIST = getTokens(chainId);
   // INITIAL_TOKEN_LIST = getTokenList(chainId);
 
   const coinList = getGlobalTokenList()
@@ -51,9 +48,9 @@ const SwapComponent = props => {
   const [before, setBefore] = useState(true);
 
   // 交易对前置货币
-  const [token0, setToken0] = useState(INITIAL_TOKEN_LIST[0]);
-  // 交易对后置货币
-  const [token1, setToken1] = useState(INITIAL_TOKEN_LIST[3]);
+  // const [token0, setToken0] = useState(INITIAL_TOKEN_LIST[0]);
+  // // 交易对后置货币
+  // const [token1, setToken1] = useState(INITIAL_TOKEN_LIST[3]);
 
   // 交易对前置货币余额
   const [token0Balance, setToken0Balance] = useState('0');
@@ -114,6 +111,15 @@ const SwapComponent = props => {
   useEffect(() => {
     if (!INITIAL_TOKEN_LIST) return
     console.log("resetting page states, new swapComponent token0, token1", INITIAL_TOKEN_LIST[0], INITIAL_TOKEN_LIST[1])
+    let temp = axios.get("https://stats.acy.finance/api/tokens?chainId=56"
+    ).then((res)=>{
+      temp = res.data;
+      if(temp.length!=0){
+        console.log("Token1Temp",temp)
+        setTokenlist(temp);
+      }
+      return res.data;
+    })
     setVisible(null);
     // 选择货币前置和后置
     setBefore(true);
@@ -206,7 +212,7 @@ const SwapComponent = props => {
         e => console.log("refrersh balances error", e)
       }
     },
-    [account, INITIAL_TOKEN_LIST]
+    [account]
   );
 
   // token1Amount is changed according to token0Amount
@@ -352,12 +358,14 @@ const SwapComponent = props => {
         setToken0(token);
         setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
         setToken0BalanceShow(true);
+        console.log("Token0Balance",token0Balance)
       } else {
         console.log("onselect token1", token);
         onSelectToken1(token);
         setToken1(token);
         setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
         setToken1BalanceShow(true);
+        console.log("show balance 5",token0BalanceShow)
       }
     }
   };
@@ -518,7 +526,7 @@ const SwapComponent = props => {
         dollar={`${token0Balance}`}
         token={token0Amount}
         bonus={!exactIn && bonus0}
-        showBalance={token1BalanceShow}
+        showBalance={token0BalanceShow}
         onChoseToken={() => {
           onClickCoin();
           setBefore(true);
@@ -666,7 +674,7 @@ const SwapComponent = props => {
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
-      <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} />
+      <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} coinlist={INITIAL_TOKEN_LIST}/>
 
     </div>
   );
