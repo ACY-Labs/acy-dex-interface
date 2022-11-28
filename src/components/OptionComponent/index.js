@@ -128,7 +128,7 @@ const OptionComponent = props => {
   useEffect(() => {
     let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(selectedTokenBalance, 18, 2)
     setSelectedTokenValue(tokenAmount)
-  }, [percentage, selectedTokenBalance])
+  }, [percentage])
 
   useEffect(() => {
     setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18, 2)).toFixed(2))
