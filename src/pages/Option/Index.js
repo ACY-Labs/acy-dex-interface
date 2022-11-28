@@ -12,7 +12,8 @@ import { ethers } from 'ethers'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
 import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
-
+import AcySymbolNav from '@/components/AcySymbolNav';
+import AcySymbol from '@/components/AcySymbol';
 import styled from "styled-components";
 import styles from './styles.less'
 
@@ -110,6 +111,9 @@ const Option = props => {
   const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBNB
     : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
       : KChartTokenListETH
+  const selectChartToken = item => {
+    // onClickSetActiveToken(item)
+  }
   const selectTab = item => {
     setActiveToken((tokens.filter(ele => ele.symbol == item))[0])
     switch (item) {

@@ -83,7 +83,7 @@ const AcyCoinItem = ({
       {/* token icon container. */}
       {/* display default ethereum icon if customIcon is true, else display the relative token icon. */}
       <div className={styles.tokenRowContent} onClick={() => selectToken(data)}>
-        <div style={{ width: "13%" }}>
+        <div style={{ marginRight:'-20px' }}>
           {customIcon ? (
             <AcyIcon name="eth" />
           ) : (

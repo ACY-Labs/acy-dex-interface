@@ -17,7 +17,7 @@ import { processString } from "@/components/AcyCoinItem";
 import styles from "./styles.less";
 import { useConstantLoader, getGlobalTokenList } from '@/constants';
 
-const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList }) => {
+const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,placement='right' }) => {
   const { account, library, chainId } = useConstantLoader();
 
   // const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
@@ -124,9 +124,9 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList 
   return (
     <Drawer
       title="Select a Token"
-      placement="right"
+      placement={placement}
       className={styles.drawer}
-      getContainer={false}
+      // getContainer={false}
       onClose={onCancel}
       visible={visible}
       width={550}
@@ -160,7 +160,7 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList 
               size="large"
               style={{
                 backgroundColor: 'black',
-                borderRadius: '40px',
+                // borderRadius: '40px',
                 border: '1px solid #333333',
               }}
               placeholder="Enter the token symbol or address"
@@ -168,11 +168,32 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList 
               onChange={onTokenSearchChange}
               id="liquidity-token-search-input"
               autoComplete="off"
+              prefix={<Icon type="search"/>}
             />
           </div>
 
           <div className={styles.coinList}>
             <AcyTabs>
+
+
+              <AcyTabPane 
+                tab={<span><Icon type="star" theme="filled" />Favorite</span>} 
+                key="2">
+                {favTokenList.length ? favTokenList.map((supToken, index) => (
+                  <AcyCoinItem
+                    data={supToken}
+                    key={index}
+                    selectToken={() => {
+                      onCoinClick(supToken);
+                    }}
+                    customIcon={false}
+                    index={index}
+                    clickCallback={() => setTokenAsFav(supToken)}
+                    isFav={favTokenList.includes(supToken)}
+                  />
+                ))
+                  : <div className={styles.textCenter} >No matching result</div>}
+              </AcyTabPane>
               <AcyTabPane tab="All" key="1">
                 {initTokenList.length ? initTokenList.map((token, index) => {
                   return (
@@ -189,23 +210,6 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList 
                     />
                   );
                 })
-                  : <div className={styles.textCenter} >No matching result</div>}
-              </AcyTabPane>
-
-              <AcyTabPane tab="Favorite" key="2">
-                {favTokenList.length ? favTokenList.map((supToken, index) => (
-                  <AcyCoinItem
-                    data={supToken}
-                    key={index}
-                    selectToken={() => {
-                      onCoinClick(supToken);
-                    }}
-                    customIcon={false}
-                    index={index}
-                    clickCallback={() => setTokenAsFav(supToken)}
-                    isFav={favTokenList.includes(supToken)}
-                  />
-                ))
                   : <div className={styles.textCenter} >No matching result</div>}
               </AcyTabPane>
             </AcyTabs>

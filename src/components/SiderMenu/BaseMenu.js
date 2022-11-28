@@ -5,6 +5,7 @@ import { Link } from 'umi';
 import { urlToList } from '../_utils/pathTools';
 import { getMenuMatches } from './SiderMenuUtils';
 import { isUrl } from '@/utils/utils';
+import { connect } from 'umi';
 import styles from './index.less';
 import { AcyIcon } from '@/components/Acy';
 
@@ -89,10 +90,12 @@ const getIcon = icon => {
   }
   return icon;
 };
-
+@connect(({ global }) => ({
+  global,
+}))
 export default class BaseMenu extends PureComponent {
   state = {
-    visible: false,
+    visible: true,
   }
   /**
    * 获得菜单子节点
@@ -174,7 +177,7 @@ export default class BaseMenu extends PureComponent {
         </SubMenu>
       );
     }
-    return <Menu.Item key={item.path} style={{ marginTop: '-20px' }}>{this.getMenuItemPath_default(item)}</Menu.Item>
+    return <Menu.Item key={item.path} style={{ marginTop: item.name == 'StableCoin' ? '32px' : '-20px' }}>{this.getMenuItemPath_default(item)}</Menu.Item>
   };
 
   /**
@@ -267,15 +270,21 @@ export default class BaseMenu extends PureComponent {
     }
     return `/${path || ''}`.replace(/\/+/g, '/');
   };
-
+  handleMouseEnter = () => {
+    const { dispatch,global:{collapsed}, } = this.props;
+    dispatch({
+      type: 'global/changeLayoutCollapsed',
+      payload: !collapsed,
+    });
+  }
   render() {
     const {
       openKeys,
       theme,
       mode,
       location: { pathname },
+      global:{collapsed},
       className,
-      collapsed,
     } = this.props;
     // if pathname can't match, use the nearest parent's key
     this.selectedKeys = this.getSelectedMenuKeys(pathname);
@@ -292,29 +301,40 @@ export default class BaseMenu extends PureComponent {
     const cls = classNames(className, {
       'top-nav-menu': mode === 'horizontal',
     });
-    const handleMouseEnter = () => {
-      this.setState({ visible: true })
-    }
-    const handleMouseLeave = () => {
-      this.setState({ visible: false })
-    }
     
     return (
-      <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-        <Menu
-          key="Menu"
-          mode={mode}
-          theme={theme}
-          onOpenChange={handleOpenChange}
-          selectedKeys={this.selectedKeys}
-          style={style}
-          className={cls}
-          {...props}
-        >
-          {this.getNavMenuItems_default(menuData, true)}
-        </Menu>
-
-        <Drawer
+      <div>
+        {collapsed &&
+          <Menu
+            key="Menu"
+            mode={mode}
+            theme={theme}
+            onOpenChange={handleOpenChange}
+            selectedKeys={this.selectedKeys}
+            style={style}
+            className={cls}
+            {...props}
+          >
+            {this.getNavMenuItems_default(menuData, true)}
+          </Menu>
+          ||
+          <Menu
+            key="Menu"
+            mode={mode}
+            theme={theme}
+            onOpenChange={handleOpenChange}
+            selectedKeys={this.selectedKeys}
+            style={style}
+            className={cls}
+            {...props}
+          >
+            {this.getNavMenuItems(menuData)}
+          </Menu>
+        }
+        <div onClick={this.handleMouseEnter} className={styles.menu_switch}>
+          <Icon type={collapsed&&"right"||"left"} />
+        </div>
+        {/* <Drawer
           className={styles.drawer}
           placement='left'
           getContainer={false}
@@ -339,7 +359,7 @@ export default class BaseMenu extends PureComponent {
               {this.getNavMenuItems(menuData)}
             </Menu>
           </div>
-        </Drawer>
+        </Drawer> */}
       </div>
     );
   }

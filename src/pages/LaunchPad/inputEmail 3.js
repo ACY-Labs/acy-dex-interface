@@ -8,7 +8,7 @@ import submit from "@/assets/icon_arrow_submit.svg";
 import hsubmit from "@/assets/icon_arrow_submit_hover.svg";
 
 const StyledInput = styled.input`
-  font-size: 15px;
+  
   background-color: inherit;
   color: lighten(#000000, 100%);
   width: 95%;

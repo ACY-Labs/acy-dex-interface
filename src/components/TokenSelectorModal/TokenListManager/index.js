@@ -20,13 +20,13 @@ const AcyPageHeader = ({ onBack, className: styledClassName, ...props }) => {
 const StyledPageHeader = styled(AcyPageHeader)`
     padding: 0;
     .ant-page-header-heading-title {
-        font-size: 18px;
+        
         font-weight: 600;
         line-height: 52px;
         color: #b5b6b6;
     }
     .ant-page-header-back {
-        font-size: 18px;
+        
         font-weight: 600;
         line-height: 52px;
         margin: 0 16px 0 0;

@@ -17,7 +17,7 @@ const StyledSelect = styled(Radio.Group)`
     height: 22px;
     font-size: 0.7rem;
     padding: 0 0.1rem;
-    border: 0.75px solid #333333;
+    border: 0;
     border-radius: 0 0 0 0;
     line-height: 22px;
     color: #b5b5b6;
@@ -133,6 +133,7 @@ export default function ExchangeTVChart(props) {
     fromToken,
     toToken,
     chainId,
+    onChangePrice
   } = props
 
   const [currentChart, setCurrentChart] = useState();
@@ -312,6 +313,8 @@ export default function ExchangeTVChart(props) {
       let negativePriceChangePercent = deltaPercent.substring(1)
       setCurPrice(parseFloat(negativeCurrentPrice).toFixed(2))
       setPriceChangePercentDelta(parseFloat(negativePriceChangePercent).toFixed(3))
+      onChangePrice&&onChangePrice(parseFloat(negativeCurrentPrice).toFixed(2),"-"+parseFloat(negativePriceChangePercent).toFixed(3));
+
     }
     else {
       setDeltaIsMinus(false)
@@ -319,6 +322,8 @@ export default function ExchangeTVChart(props) {
       let positivePricechangePercent = deltaPercent
       setCurPrice(parseFloat(positiveCurrentPrice).toFixed(2))
       setPriceChangePercentDelta(parseFloat(positivePricechangePercent).toFixed(3))
+      onChangePrice&&onChangePrice(parseFloat(positiveCurrentPrice).toFixed(2),"+"+parseFloat(positivePricechangePercent).toFixed(3));
+    
     }
   }
 
@@ -406,7 +411,7 @@ export default function ExchangeTVChart(props) {
                 <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
               </StyledSelect>
             </div>
-            {deltaIsMinus ?
+            {/* {deltaIsMinus ?
               <div style={{ float: "right", paddingRight: "1rem", wordSpacing: "0.5rem", color: "#FA3C58" }}>
                 ${curPrice} -{priceChangePercentDelta}%
               </div>
@@ -414,7 +419,7 @@ export default function ExchangeTVChart(props) {
               <div style={{ float: "right", paddingRight: "1rem", wordSpacing: "0.5rem", color: '#46E3AE' }}>
                 ${curPrice} +{priceChangePercentDelta}%
               </div>
-            }
+            } */}
           </div>
 
         </div>

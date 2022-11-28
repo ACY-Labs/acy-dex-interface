@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { connect } from 'umi';
 import { Button } from 'antd';
-import { AcyCard, AcyConfirm, AcyApprove,} from '@/components/Acy';
+import { AcyCard, AcyConfirm, AcyApprove, } from '@/components/Acy';
 import Media from 'react-media';
 import { getTransactionsByAccount, appendNewSwapTx } from '@/utils/txData';
 import SwapComponent from '@/components/SwapComponent';
@@ -13,7 +13,9 @@ import { useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import useSWR from 'swr';
 import { TxFetcher } from '@/utils/utils';
-// import SankeyGraph from './components/SankeyGraph';
+import SankeyGraph from './components/SankeyGraph';
+import AcySymbolNav from '@/components/AcySymbolNav';
+import AcySymbol from '@/components/AcySymbol';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { TradeHistoryTable, PoolsActivityTable } from './components/TableComponent.js';
 import { useChainId } from '@/utils/helpers';
@@ -223,13 +225,25 @@ const Swap = props => {
           <div className={`${styles.colItem} ${styles.priceChart}`}>
 
             <div>
-              <div className={styles.chartTokenSelectorTab}>
-                <ComponentTabs
+              {/* <div className={styles.chartTokenSelectorTab}> */}
+              {/* <PerpetualTabs
                   option={graphType}
                   options={graphTypes}
                   onChange={showGraph}
-                />
-              </div>
+                /> */}
+              <AcySymbolNav data={['BTC', 'ETH', 'BNB']} onChange={showGraph} />
+              <AcySymbol
+                pairName='BTC'
+                // showDrawer={onClickCoin}
+                // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                // latestPrice={latestPrice}
+                // latestPricePercentage={priceChangePercentDelt
+                latestPriceColor={1}
+                latestPrice={1}
+                latestPricePercentage={1}
+              // coinList={coinList}
+              />
+              {/* </div> */}
 
               <div style={{ borderTop: '0.75px solid #333333' }}>
                 {graphType == "Routes" ?
@@ -253,13 +267,17 @@ const Swap = props => {
               <div className={styles.chartTokenSelectorTab}>
                 <ComponentTabs
                   option={tableContent}
-                  options={['Trade History', 'Pools Activity']}
+                  options={['Routes', 'Trade History', 'Pools Activity']}
                   onChange={item => { setTableContent(item) }}
                 />
               </div>
               <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
                 <div className={`${styles.colItem} ${styles.priceChart}`}>
                   <div className={styles.positionsTable}>
+
+                    {tableContent == 'Routes' && (
+                      <SankeyGraph />
+                    )}
                     {tableContent == 'Trade History' && (
                       <TradeHistoryTable dataSource={test_tradeHistory} />
                     )}
