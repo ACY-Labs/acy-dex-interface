@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Row, Col, Drawer } from 'antd';
 import AcyCard from '@/components/AcyCard';
 import OptionComponent from '@/components/OptionComponent'
-import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
+import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import * as Api from '@/acy-dex-futures/Api';
@@ -55,10 +55,6 @@ const Powers = props => {
   const [visibleETH, setVisibleETH] = useState(false);
   const [visibleMATIC, setVisibleMATIC] = useState(false);
   const [visibleBNB, setVisibleBNB] = useState(false);
-
-  useEffect(() => {
-    setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
-  }, [tokens])
 
   const onClickDropdownBTC = e => {
     setActiveToken(tokens.filter(token => token.symbol == "BTC")[0]);
@@ -164,35 +160,17 @@ const Powers = props => {
     setVisibleMATIC(false);
   };
 
-  const onTrade = async (symbol, amount, priceLimit) => {
-    const poolAddress = getContract(chainId, "pool")
-    const contract = new ethers.Contract(poolAddress, IPool.abi, library.getSigner())
-    let method = "trade"
-    let params = [
-      account,
-      symbol,
-      amount,
-      priceLimit,
-      [], //oracleSignature
-    ]
+  useEffect(()=>{
+    setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
+  }, [tokens])
 
-    let value = bigNumberify(0)
-    const successMsg = `Order Submitted!`
-    Api.callContract(chainId, contract, method, params, {
-      value,
-      sentMsg: `Submitted.`,
-      failMsg: `Failed.`,
-      successMsg,
-    })
-      .then(() => { })
-      .catch(e => { console.log(e) })
-  }
   const [latestPrice, setLatestPrice] = useState(0);
   const [priceChangePercentDelta, setPpriceChangePercentDelta] = useState(0);
   const onChangePrice = (curPrice, change) => {
     setLatestPrice(curPrice);
     setPpriceChangePercentDelta(change);
   }
+
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
@@ -231,9 +209,10 @@ const Powers = props => {
             <OptionComponent
               mode={mode}
               setMode={setMode}
+              chainId={chainId}
+              tokens={tokens}
               selectedToken={activeToken}
               symbol={symbol}
-              onTrade={onTrade}
             />
           </AcyCard>
         </div>

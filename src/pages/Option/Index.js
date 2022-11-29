@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Row, Col, Drawer } from 'antd';
 import AcyCard from '@/components/AcyCard';
 import OptionComponent from '@/components/OptionComponent'
-import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
+import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import * as Api from '@/acy-dex-futures/Api';
@@ -11,7 +11,7 @@ import { useConstantLoader } from '@/constants';
 import { ethers } from 'ethers'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
 import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract } from '@/constants/option.js';
+import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
 import styled from "styled-components";
@@ -159,9 +159,9 @@ const Option = props => {
     setVisibleMATIC(false);
   };
 
-  const onTrade = async (symbol, amount, priceLimit) => {
-
-  }
+  useEffect(()=>{
+    setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
+  }, [tokens])
 
   return (
     <div className={styles.main}>
@@ -174,7 +174,7 @@ const Option = props => {
               <div>
                 <div className={styles.chartTokenSelectorTab}>
                   <Row>
-                    <PerpetualTabs
+                    <ComponentTabs
                       option={activeToken.symbol}
                       options={KChartTokenList}
                       onChange={selectTab}
@@ -341,7 +341,7 @@ const Option = props => {
 
               <div className={styles.bottomWrapper}>
                 <div className={styles.bottomTab}>
-                  <PerpetualTabs
+                  <ComponentTabs
                     option={tableContent}
                     options={["Positions", "Orders"]}
                     onChange={item => { setTableContent(item) }}
@@ -370,9 +370,10 @@ const Option = props => {
             <OptionComponent
               mode={mode}
               setMode={setMode}
+              chainId={chainId}
+              tokens={tokens}
               selectedToken={activeToken}
               symbol={symbol}
-              onTrade={onTrade}
             />
           </AcyCard>
         </div>
