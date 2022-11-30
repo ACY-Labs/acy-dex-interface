@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Input, Icon } from 'antd';
-import styles from './index.less';
+import  from './index.less';
 
 export default class EditableItem extends PureComponent {
   constructor(props) {

@@ -17,7 +17,8 @@ import { useWeb3React } from '@web3-react/core'
 import useSWR from 'swr'
 import { constantInstance, useConstantLoader } from '@/constants'
 import { useConnectWallet } from '@/components/ConnectWallet'
-import { AcyIcon, AcyTabs, AcyButton, AcyPerpetualButton } from "@/components/Acy"
+import { AcyIcon, AcyTabs, AcyButton } from "@/components/Acy"
+import ComponentButton from '@/components/ComponentButton'
 
 import {
   getTokenInfo,
@@ -61,7 +62,7 @@ import Token from '@/acy-dex-futures/abis/Token.json'
 import { callContract } from '@/acy-dex-futures/Api'
 import * as Api from '@/acy-dex-futures/Api';
 
-import PerpetualTabs from './PerpetualTabs'
+import ComponentTabs from '@/components/ComponentTabs'
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection'
 import TokenTable from '@/pages/BuyGlp/components/SwapTokenTable'
 import glp40Icon from '@/pages/BuyGlp/components/ic_glp_40.svg'
@@ -595,7 +596,7 @@ export const GlpSwapBox = (props) => {
   return (
     <div className="GlpSwap">
       <div className={styles.BuySellSelector}>
-        <PerpetualTabs
+        <ComponentTabs
           option={buySellLabel}
           options={buySellTabs}
           type="inline"
@@ -700,13 +701,13 @@ export const GlpSwapBox = (props) => {
       </div>
 
       <div className={styles.centerButton}>
-        <AcyPerpetualButton
+        <ComponentButton
           style={{ marginTop: '25px' }}
           onClick={onClickPrimary}
           disabled={!isPrimaryEnabled()}
         >
           {getPrimaryText()}
-        </AcyPerpetualButton>
+        </ComponentButton>
       </div>
 
     </div>

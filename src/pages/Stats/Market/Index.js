@@ -21,7 +21,7 @@ import ConnectWallet from '@/pages/Market/ConnectWallet';
 import { useConstantLoader } from '@/constants';
 
 import { useConnectWallet } from '@/components/ConnectWallet';
-import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
+import ComponentTabs from '@/components/ComponentTabs';
 
 
 const Stats = props => {
@@ -146,7 +146,7 @@ const Stats = props => {
   return (
     <div className={styles.marketRoot}>
       <div className={styles.statsTab}>
-        <PerpetualTabs
+        <ComponentTabs
           option={statsType}
           options={statsTypes}
           onChange={onChangeStats}

@@ -2,7 +2,10 @@ import { useWeb3React } from "@web3-react/core";
 
 const RPC_PROVIDERS = {};
 const SELECTED_NETWORK_LOCAL_STORAGE_KEY = "chainId"
-const DEFAULT_CHAIN_ID = 56
+//////////////////////////////////// test only
+// const DEFAULT_CHAIN_ID = 56
+const DEFAULT_CHAIN_ID = 80001
+////////////////////////////////////
 const supportedChainIds = [56, 97, 137, 80001]
 
 export function getProvider(library, chainId) {

@@ -43,7 +43,7 @@ import VolumeChart from './components/VolumeChart'
 import FeesChart from './components/FeesChart'
 import GenericChart from './components/GenericChart'
 import VolumeFeesChart from './components/VolumeFeesChart';
-import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
+import ComponentTabs from '@/components/ComponentTabs';
 
 import {
   useTotalVolumeFromServer,
@@ -185,7 +185,7 @@ const Stats = (props) => {
   return (
     <div className={styles.container}>
       <div className={styles.statsTab}>
-        <PerpetualTabs
+        <ComponentTabs
           option={statsType}
           options={statsTypes}
           onChange={onChangeStats}
