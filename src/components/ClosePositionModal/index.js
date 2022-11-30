@@ -93,7 +93,7 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
         const amount = position.position * parseFloat(percentage) / 100
         setTokenAmount(amount)
       }   
-    },[percentage,tokenAmount,position]);
+    },[percentage,position]);
 
     const handleCancel = () => {
       onCancel();

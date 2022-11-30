@@ -57,16 +57,12 @@ export function getPosition(rawPositionData,symbolData) {
     const temp = rawPositionData.positions[i]
     const volume = ethers.utils.formatUnits(temp[2], 18)
     if (volume!=0){
-
-      const markPrice = symbolData.find(obj => {
+      const symbol = symbolData.find(obj=>{
         return obj.address === temp[0]
-      }).markPrice
-      const initialMarginRatio = symbolData.find(obj => {
-        return obj.address === temp[0]
-      }).initialMarginRatio
-      const indexPrice = symbolData.find(obj => {
-        return obj.address === temp[0]
-      }).indexPrice
+      })
+      const markPrice = symbol.markPrice
+      const initialMarginRatio = symbol.initialMarginRatio
+      const indexPrice = symbol.indexPrice
       
       const cost = ethers.utils.formatUnits(temp.cost,18)
       const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume,18)
