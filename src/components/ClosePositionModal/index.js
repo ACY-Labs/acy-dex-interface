@@ -5,7 +5,7 @@ import {
     AcyModal,
     AcyCuarrencyCard,
     AcyDescriptions,
-    AcyPerpetualButton,
+    AcyButton,
     AcyInput,
     AcyCheckBox,
 } from '@/components/Acy';
@@ -167,20 +167,20 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
             {getPercentageButton('100%')}
         </div>
         <div className={styles.buttonContainer}>
-        <AcyPerpetualButton
+        <Button
           onClick = {() => {
             onClickPrimary();
           }}
-          
+          className={styles.buttonPrimary}
           >Confirm
-        </AcyPerpetualButton>
-        <AcyPerpetualButton
+        </Button>
+        <Button
           onClick = {() => {
             handleCancel();
           }}
-          
+          className={styles.buttonPrimary}
           >Cancel
-        </AcyPerpetualButton>
+        </Button>
         </div>
     </AcyModal>
     );

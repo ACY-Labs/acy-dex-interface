@@ -234,8 +234,8 @@ const Option = props => {
 
   
   ///// read reader contract, getTdInfo and getSymbolsInfo
-  const poolAddress = getContract(chainId,"Pool")
-  const readerAddress = getContract(chainId,"Reader")
+  const poolAddress = getContract(chainId,"pool")
+  const readerAddress = getContract(chainId,"reader")
 
   const { data:rawPositionData,mutate:updatePosition} = useSWR([chainId, readerAddress, 'getTdInfo',poolAddress,account], {
       fetcher: fetcher(library, Reader)
