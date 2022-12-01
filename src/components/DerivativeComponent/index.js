@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'umi';
 import { Input, Button } from 'antd';
-import { ethers } from 'ethers'
 import useSWR from 'swr'
-import { useConstantLoader } from '@/constants';
 import { INITIAL_ALLOWED_SLIPPAGE, getTokens, getContract } from '@/constants/future_option_power.js';
-import { useChainId } from '@/utils/helpers';
 import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from '@/components/ConnectWallet';
-import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, expandDecimals, bigNumberify, formatAmount, BASIS_POINTS_DIVISOR } from '@/acy-dex-futures/utils';
+import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, bigNumberify, formatAmount } from '@/acy-dex-futures/utils';
 import { AcyDescriptions } from '../Acy';
 import ComponentCard from '../ComponentCard';
 import ComponentButton from '../ComponentButton';
@@ -38,10 +34,8 @@ const DerivativeComponent = props => {
 
   ///////////// read contract /////////////
 
-  const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
-  const routerAddress = getContract(chainId, "router")
 
   const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader)
@@ -87,26 +81,6 @@ const DerivativeComponent = props => {
   const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
   const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const symbolMarkPrice = symbolInfo?.markPrice
-    
-  const getPercentageButton = value => {
-    if (percentage != value) {
-      return (
-        <button
-          className={styles.percentageButton}
-          onClick={() => { setPercentage(value) }}>
-          {value}
-        </button>
-      )
-    } else {
-      return (
-        <button
-          className={styles.percentageButtonActive}
-          onClick={() => { setPercentage(value) }}>
-          {value}
-        </button>
-      )
-    }
-  }
 
   const getPrimaryText = () => {
     if (!active) {

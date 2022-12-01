@@ -5,11 +5,6 @@ import DerivativeComponent from '@/components/DerivativeComponent'
 import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
-import * as Api from '@/acy-dex-futures/Api';
-import { bigNumberify } from '@/acy-dex-futures/utils';
-import { useConstantLoader } from '@/constants';
-import { ethers } from 'ethers'
-import Pool from '@/acy-dex-futures/abis/Pool.json'
 import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
@@ -40,7 +35,6 @@ const StyledDrawer = styled(Drawer)`
 `
 
 const Option = props => {
-  const { account, library } = useConstantLoader();
   let { chainId } = useChainId();
   let tokens = getTokens(chainId);
 
