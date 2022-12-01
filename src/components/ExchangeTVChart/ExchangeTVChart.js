@@ -257,7 +257,9 @@ export default function ExchangeTVChart(props) {
       }
 
       // Binance data is independent of chain, so here we can fill in any chain name
-      currentSeries.setData(responsePairData);
+      if(responsePairData && responsePairData[0].time) {
+        currentSeries.setData(responsePairData);
+      }
 
       if (pageName == "Option" || pageName == "Futures") {
         let from = responsePairData[responsePairData.length - 1].time

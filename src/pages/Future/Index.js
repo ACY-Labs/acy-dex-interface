@@ -67,10 +67,11 @@ const Future = props => {
             {/* <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onClickCoin} coinList={coinList} /> */}
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               <ExchangeTVChart
-                chartTokenSymbol="BTC"
-                pageName="Powers"
+                chartTokenSymbol={activeToken.symbol}
+                pageName="Futures"
                 fromToken={activeToken.symbol}
                 toToken="USDT"
+                chainId={chainId}
                 onChangePrice={onChangePrice}
               />
             </div>
