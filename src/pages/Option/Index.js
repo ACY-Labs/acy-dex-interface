@@ -74,7 +74,7 @@ export function getPosition(rawPositionData,symbolData) {
       const position = {
         symbol: temp[1],
         address: temp[0],
-        position: volume,
+        position: Math.abs(volume),
         entryPrice: safeDiv(cost,volume),
         markPrice: markPrice,
         marginUsage: marginUsage,
