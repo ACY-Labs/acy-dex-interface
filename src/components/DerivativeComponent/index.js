@@ -22,9 +22,7 @@ import IPool from '@/abis/future-option-power/IPool.json'
 
 import styles from './styles.less';
 
-const { AddressZero } = ethers.constants;
-
-const OptionComponent = props => {
+const DerivativeComponent = props => {
 
   const {
     mode,
@@ -282,10 +280,4 @@ const OptionComponent = props => {
   );
 }
 
-export default connect(({ global, transaction, swap, loading }) => ({
-  global,
-  transaction,
-  account: global.account,
-  swap,
-  loading: loading.global,
-}))(OptionComponent);
+export default DerivativeComponent
