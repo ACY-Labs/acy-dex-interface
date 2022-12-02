@@ -358,14 +358,12 @@ const SwapComponent = props => {
         setToken0(token);
         setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
         setToken0BalanceShow(true);
-        console.log("Token0Balance",token0Balance)
       } else {
         console.log("onselect token1", token);
         onSelectToken1(token);
         setToken1(token);
         setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
         setToken1BalanceShow(true);
-        console.log("show balance 5",token0BalanceShow)
       }
     }
   };
@@ -520,7 +518,7 @@ const SwapComponent = props => {
       <AcyCuarrencyCard
         icon="eth"
         title={token0BalanceShow && `Balance: ${parseFloat(token0Balance).toFixed(3)}`}
-        coin={(token0 && token0.symbol) || 'Select'}
+        coin={(token0 && token0) || 'Select'}
         logoURI={token0 && token0.logoURI}
         yuan="566.228"
         dollar={`${token0Balance}`}
@@ -558,7 +556,7 @@ const SwapComponent = props => {
       <AcyCuarrencyCard
         icon="eth"
         title={token1BalanceShow && `Balance: ${parseFloat(token1Balance).toFixed(3)}`}
-        coin={(token1 && token1.symbol) || 'Select'}
+        coin={(token1 && token1) || 'Select'}
         logoURI={token1 && token1.logoURI}
         yuan="566.228"
         dollar={`${token1Balance}`}

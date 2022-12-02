@@ -5,6 +5,7 @@ import styles from './index.less';
 import classname from 'classnames';
 import Pattern from '@/utils/pattern';
 import { getAllSupportedTokensPrice,getTokenPrice } from '@/acy-dex-swap/utils';
+import { useChainId } from '@/utils/helpers';
 
 const AcyCuarrencyCard = ({
   title,
@@ -22,6 +23,7 @@ const AcyCuarrencyCard = ({
   onClickTitle,
   ...rest
 }) => {
+  const { chainId } = useChainId();
   const [light, setLight] = useState(false);
   const onChange = e => {
     const check = Pattern.coinNum.test(e.target.value);
@@ -45,7 +47,7 @@ const AcyCuarrencyCard = ({
       setUsdValue(null);
 
     // const tokenPriceList = await getAllSupportedTokensPrice();
-    const tokenPrice = await getTokenPrice(coin.address)
+    const tokenPrice = await getTokenPrice(coin.address,chainId)
     // const tokenPrice = tokenPriceList[coin];
     const tokenAmountUSD = tokenPrice * token;
     setUsdValue(tokenAmountUSD.toFixed(2));
@@ -78,7 +80,7 @@ const AcyCuarrencyCard = ({
             <span className={styles.wrap}>
               <div className={styles.coin}>
                 <img src={logoURI} style={{ width: '24px', marginRight: '0.5rem' }} />
-                <span style={{ margin: '0px 0.25rem' }}>{coin}</span>
+                <span style={{ margin: '0px 0.25rem' }}>{coin.symbol}</span>
               </div>
               {!isLocked && (
                 <AcyIcon.MyIcon type="triangleGray" width={10} />
