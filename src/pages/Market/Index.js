@@ -24,9 +24,8 @@ const MarketIndex = props => {
     let pairs = []
     for (let i = 0; i < pairlist.length; i++) {
       pairs.push({
-        name: pairlist[i].token0 + '/' + pairlist[i].token1,
-        logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-        price: 'undefined',
+        name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
+        price: '$' + (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
         price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         liquidity: pairlist[i].liquidity,
@@ -39,15 +38,12 @@ const MarketIndex = props => {
     pairs = []
     for (let i = 0; i < pairlist.length; i++) {
       pairs.push({
-        name: pairlist[i].token0 + '/' + pairlist[i].token1,
-        logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-        exchange: 'undefined',
-        price: 'undefined',
+        name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
+        price: '$' + (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
         price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         swaps: pairlist[i].txCount,
         liquidity: pairlist[i].liquidity,
-        fdv: 'undefined',
       })
     }
     setWinnersPairs(pairs)
@@ -57,10 +53,9 @@ const MarketIndex = props => {
     pairs = []
     for (let i = 0; i < pairlist.length; i++) {
       pairs.push({
-        name: pairlist[i].token0 + '/' + pairlist[i].token1,
-        logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
+        name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
         exchange: 'undefined',
-        price: 'undefined',
+        price: '$' + (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
         price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         swaps: pairlist[i].txCount,
@@ -74,126 +69,6 @@ const MarketIndex = props => {
   useEffect(() => {
     getPairList()
   }, [])
-
-  const test_pairs = [
-    {
-      name: 'USDT/WBNB', // token0/token1
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      exchange: 'Pancakeswap v2',
-      price: '$315.31',
-      price_24h: '-0.56%',
-      price_7d: '-0.56%',
-      price_30d: '-0.56%',
-      volume: '$31.66M', // $volumeUSD
-      swaps: '70.15K',
-      liquidity: '167.55M', // liquidity
-      fdv: '$1223.66B'
-    },
-    {
-      name: 'USDC/OP',
-      logoURI: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389',
-      exchange: 'Velodrome',
-      price: '$1.9125',
-      price_24h: '-2.76%',
-      price_7d: '-2.76%',
-      price_30d: '-2.76%',
-      volume: '$18.89M',
-      swaps: '69.30K',
-      liquidity: '-',
-      fdv: '$8.20B'
-    },
-    {
-      name: 'BUSD/WBNB',
-      logoURI: 'https://assets.coingecko.com/coins/images/9576/large/BUSD.png?1568947766',
-      exchange: 'Pancakeswap v2',
-      price: '$314.76',
-      price_24h: '-0.77%',
-      price_7d: '-0.77%',
-      price_30d: '-0.77%',
-      volume: '$31.50M',
-      swaps: '55.37K',
-      liquidity: '179.72M',
-      fdv: '$1527.01B'
-    },
-    {
-      name: 'USDT/WBNB',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      exchange: 'Pancakeswap v2',
-      price: '$315.31',
-      price_24h: '-0.56%',
-      price_7d: '-0.56%',
-      price_30d: '-0.56%',
-      volume: '$31.66M',
-      swaps: '70.15K',
-      liquidity: '167.55M',
-      fdv: '$1223.66B'
-    },
-    {
-      name: 'USDC/OP',
-      logoURI: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389',
-      exchange: 'Velodrome',
-      price: '$1.9125',
-      price_24h: '-2.76%',
-      price_7d: '-2.76%',
-      price_30d: '-2.76%',
-      volume: '$18.89M',
-      swaps: '69.30K',
-      liquidity: '-',
-      fdv: '$8.20B'
-    },
-    {
-      name: 'BUSD/WBNB',
-      logoURI: 'https://assets.coingecko.com/coins/images/9576/large/BUSD.png?1568947766',
-      exchange: 'Pancakeswap v2',
-      price: '$314.76',
-      price_24h: '-0.77%',
-      price_7d: '-0.77%',
-      price_30d: '-0.77%',
-      volume: '$31.50M',
-      swaps: '55.37K',
-      liquidity: '179.72M',
-      fdv: '$1527.01B'
-    },
-    {
-      name: 'USDT/WBNB',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      exchange: 'Pancakeswap v2',
-      price: '$315.31',
-      price_24h: '-0.56%',
-      price_7d: '-0.56%',
-      price_30d: '-0.56%',
-      volume: '$31.66M',
-      swaps: '70.15K',
-      liquidity: '167.55M',
-      fdv: '$1223.66B'
-    },
-    {
-      name: 'USDC/OP',
-      logoURI: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389',
-      exchange: 'Velodrome',
-      price: '$1.9125',
-      price_24h: '-2.76%',
-      price_7d: '-2.76%',
-      price_30d: '-2.76%',
-      volume: '$18.89M',
-      swaps: '69.30K',
-      liquidity: '-',
-      fdv: '$8.20B'
-    },
-    {
-      name: 'BUSD/WBNB',
-      logoURI: 'https://assets.coingecko.com/coins/images/9576/large/BUSD.png?1568947766',
-      exchange: 'Pancakeswap v2',
-      price: '$314.76',
-      price_24h: '-0.77%',
-      price_7d: '-0.77%',
-      price_30d: '-0.77%',
-      volume: '$31.50M',
-      swaps: '55.37K',
-      liquidity: '179.72M',
-      fdv: '$1527.01B'
-    },
-  ]
 
   const test_livepairs = [
     {
@@ -395,27 +270,27 @@ const MarketIndex = props => {
             <div className={styles.statscontent}>
               <div className={styles.statsRow}>
                 <div className={styles.label}>1. {winnersPairs[0]?.name}/</div>
-                <div className={styles.value}>{winnersPairs[0]?.volume}</div>
+                <div className={styles.value}>{winnersPairs[0]?.price}</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>2. {winnersPairs[1]?.name}</div>
-                <div className={styles.value}>{winnersPairs[1]?.volume}</div>
+                <div className={styles.value}>{winnersPairs[1]?.price}</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>3. {winnersPairs[2]?.name}</div>
-                <div className={styles.value}>{winnersPairs[2]?.volume}</div>
+                <div className={styles.value}>{winnersPairs[2]?.price}</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>4. {winnersPairs[3]?.name}</div>
-                <div className={styles.value}>{winnersPairs[3]?.volume}</div>
+                <div className={styles.value}>{winnersPairs[3]?.price}</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>5. {winnersPairs[4]?.name}</div>
-                <div className={styles.value}>{winnersPairs[4]?.volume}</div>
+                <div className={styles.value}>{winnersPairs[4]?.price}</div>
               </div>
             </div>
 
@@ -437,27 +312,27 @@ const MarketIndex = props => {
             <div className={styles.statscontent}>
               <div className={styles.statsRow}>
                 <div className={styles.label}>1. {losersPairs[0]?.name}</div>
-                <div className={styles.value}>{losersPairs[0]?.volume}</div>
+                <div className={styles.value}>{losersPairs[0]?.price}</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>2. {losersPairs[1]?.name}</div>
-                <div className={styles.value}>{losersPairs[1]?.volume}</div>
+                <div className={styles.value}>{losersPairs[1]?.price}</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>3. {losersPairs[2]?.name}</div>
-                <div className={styles.value}>{losersPairs[2]?.volume}</div>
+                <div className={styles.value}>{losersPairs[2]?.price}</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>4. {losersPairs[3]?.name}</div>
-                <div className={styles.value}>{losersPairs[3]?.volume}</div>
+                <div className={styles.value}>{losersPairs[3]?.price}</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>5. {losersPairs[4]?.name}</div>
-                <div className={styles.value}>{losersPairs[4]?.volume}</div>
+                <div className={styles.value}>{losersPairs[4]?.price}</div>
               </div>
             </div>
 
@@ -517,12 +392,12 @@ const MarketIndex = props => {
         </button>
       </div>
 
-      {mode == 'Pairs' && <PairsTable dataSource={test_pairs} />}
+      {mode == 'Pairs' && <PairsTable dataSource={topVolumePairs} />}
       {mode == 'Winners' && <PairsTable dataSource={winnersPairs} />}
       {mode == 'Losers' && <PairsTable dataSource={losersPairs} />}
       {mode == 'NewPairs' && <LivePairsTable dataSource={test_livepairs} />}
       {mode == 'TopVolume' && <TopVolumeTable dataSource={topVolumePairs} />}
-      {mode == 'Trending' && <TrendingTable dataSource={test_pairs} />}
+      {mode == 'Trending' && <TrendingTable dataSource={topVolumePairs} />}
 
       {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <h2>Cryptocurrencies</h2>

@@ -41,7 +41,7 @@ export function PairsTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableHeader}>
-              <AcyTokenIcon symbol={entry.logoURI} />
+              {/* <AcyTokenIcon symbol={entry.logoURI} /> */}
               <span style={{marginLeft: '10px'}}>{entry.name}</span>
             </div>
           );
@@ -216,7 +216,7 @@ export function LivePairsTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableHeader}>
-              <AcyTokenIcon symbol={entry.logoURI} />
+              {/* <AcyTokenIcon symbol={entry.logoURI} /> */}
               <span style={{marginLeft: '10px'}}>{entry.name}</span>
             </div>
           );
@@ -407,7 +407,7 @@ export function TopVolumeTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableHeader}>
-              <AcyTokenIcon symbol={entry.logoURI} />
+              {/* <AcyTokenIcon symbol={entry.logoURI} /> */}
               <span style={{marginLeft: '10px'}}>{entry.name}</span>
             </div>
           );
@@ -534,7 +534,7 @@ export function TrendingTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableHeader}>
-              <AcyTokenIcon symbol={entry.logoURI} />
+              {/* <AcyTokenIcon symbol={entry.logoURI} /> */}
               <span style={{marginLeft: '10px'}}>{entry.name}</span>
             </div>
           );
