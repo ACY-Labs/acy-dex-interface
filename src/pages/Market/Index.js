@@ -29,6 +29,7 @@ const MarketIndex = props => {
         price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         liquidity: pairlist[i].liquidity,
+        exchange: pairlist[i].exchange,
       })
     }
     setTopVolumePairs(pairs)
@@ -39,11 +40,13 @@ const MarketIndex = props => {
     for (let i = 0; i < pairlist.length; i++) {
       pairs.push({
         name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
+        exchange: pairlist[i].exchange,
         price: '$' + (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
         price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         swaps: pairlist[i].txCount,
         liquidity: pairlist[i].liquidity,
+        fdv: 'undefined',
       })
     }
     setWinnersPairs(pairs)
@@ -54,7 +57,7 @@ const MarketIndex = props => {
     for (let i = 0; i < pairlist.length; i++) {
       pairs.push({
         name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
-        exchange: 'undefined',
+        exchange: pairlist[i].exchange,
         price: '$' + (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
         price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
