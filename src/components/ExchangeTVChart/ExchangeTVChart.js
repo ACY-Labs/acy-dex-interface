@@ -257,7 +257,7 @@ export default function ExchangeTVChart(props) {
       }
 
       // Binance data is independent of chain, so here we can fill in any chain name
-      if(responsePairData && responsePairData[0].time) {
+      if (responsePairData && responsePairData[0].time) {
         currentSeries.setData(responsePairData);
       }
 
@@ -266,15 +266,17 @@ export default function ExchangeTVChart(props) {
         setInterval(() => {
           axios.get(`${OptionsPriceApi}/${pageName.toLowerCase()}?chainId=${chainId}&symbol=${chartTokenSymbol}&period=1m&from=${from}`)
             .then((res) => {
-              for (let i = 1; i < res.data.length; i++) {
-                currentSeries.update({
-                  time: res.data[i].timestamp,
-                  open: res.data[i].o,
-                  high: res.data[i].h,
-                  low: res.data[i].l,
-                  close: res.data[i].c,
-                })
-                from = res.data[i].timestamp
+              for (let i = 0; i < res.data.length; i++) {
+                if (res.data[i].timestamp > from) {
+                  currentSeries.update({
+                    time: res.data[i].timestamp,
+                    open: res.data[i].o,
+                    high: res.data[i].h,
+                    low: res.data[i].l,
+                    close: res.data[i].c,
+                  })
+                  from = res.data[i].timestamp
+                }
               }
             });
         }, 60000);
@@ -315,7 +317,7 @@ export default function ExchangeTVChart(props) {
       let negativePriceChangePercent = deltaPercent.substring(1)
       setCurPrice(parseFloat(negativeCurrentPrice).toFixed(2))
       setPriceChangePercentDelta(parseFloat(negativePriceChangePercent).toFixed(3))
-      onChangePrice&&onChangePrice(parseFloat(negativeCurrentPrice).toFixed(2),"-"+parseFloat(negativePriceChangePercent).toFixed(3));
+      onChangePrice && onChangePrice(parseFloat(negativeCurrentPrice).toFixed(2), "-" + parseFloat(negativePriceChangePercent).toFixed(3));
 
     }
     else {
@@ -324,8 +326,8 @@ export default function ExchangeTVChart(props) {
       let positivePricechangePercent = deltaPercent
       setCurPrice(parseFloat(positiveCurrentPrice).toFixed(2))
       setPriceChangePercentDelta(parseFloat(positivePricechangePercent).toFixed(3))
-      onChangePrice&&onChangePrice(parseFloat(positiveCurrentPrice).toFixed(2),"+"+parseFloat(positivePricechangePercent).toFixed(3));
-    
+      onChangePrice && onChangePrice(parseFloat(positiveCurrentPrice).toFixed(2), "+" + parseFloat(positivePricechangePercent).toFixed(3));
+
     }
   }
 
