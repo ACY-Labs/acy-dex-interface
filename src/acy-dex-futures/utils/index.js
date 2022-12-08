@@ -94,6 +94,11 @@ const injectedConnector = new InjectedConnector({
   supportedChainIds
 });
 
+const POLYGON_TESTNET_RPC_PROVIDERS = ["https://rpc-mumbai.maticvigil.com"]
+const RPC_PROVIDERS = {
+  [POLYGON_TESTNET]: POLYGON_TESTNET_RPC_PROVIDERS,
+}
+
 export function calculatePositionDelta(
   price,
   { size, collateral, isLong, averagePrice, lastIncreasedTime },
@@ -855,10 +860,8 @@ export function getProvider(library, chainId) {
   if (library) {
     return library.getSigner();
   }
-  // let provider;
-  // provider = _.sample(RPC_PROVIDERS[chainId]);
-  // return new ethers.providers.StaticJsonRpcProvider(provider, { chainId });
-  return new JsonRpcProvider('https://arb1.arbitrum.io/rpc');
+  let provider = _.sample(RPC_PROVIDERS[chainId])
+  return new ethers.providers.StaticJsonRpcProvider(provider, {chainId})
 }
 
 export function getOrderKey(order) {

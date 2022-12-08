@@ -8,14 +8,15 @@ import { INITIAL_ALLOWED_SLIPPAGE, getTokens, getContract } from '@/constants/fu
 import { useChainId } from '@/utils/helpers';
 import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from '@/components/ConnectWallet';
-import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, expandDecimals, bigNumberify, formatAmount } from '@/acy-dex-futures/utils';
-import { AcyPerpetualCard, AcyDescriptions, AcyPerpetualButton } from '../Acy';
+import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, expandDecimals, bigNumberify, formatAmount, BASIS_POINTS_DIVISOR } from '@/acy-dex-futures/utils';
+import { AcyDescriptions } from '../Acy';
+import ComponentCard from '../ComponentCard';
+import ComponentButton from '../ComponentButton';
 import { approveTokens, trade } from '@/services/derivatives';
-import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
+import ComponentTabs from '../ComponentTabs';
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
 import Segmented from '../AcySegmented';
-import ERC20 from '@/abis/future-option-power/ERC20.json';
 import Reader from '@/abis/future-option-power/Reader.json'
 import IPool from '@/abis/future-option-power/IPool.json'
 
@@ -44,10 +45,6 @@ const OptionComponent = props => {
   const poolAddress = getContract(chainId, "pool")
   const routerAddress = getContract(chainId, "router")
 
-  const tokenAllowanceAddress = selectedToken.address === AddressZero ? nativeTokenAddress : selectedToken.address;
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
-    fetcher: fetcher(library, ERC20)
-  });
   const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader)
   });
@@ -58,7 +55,6 @@ const OptionComponent = props => {
   useEffect(() => {
     if (active) {
       library.on("block", () => {
-        updateTokenAllowance()
         updateTokenInfo()
         updateSymbolInfo()
       });
@@ -70,7 +66,6 @@ const OptionComponent = props => {
     active,
     library,
     chainId,
-    updateTokenAllowance,
     updateTokenInfo,
     updateSymbolInfo,
   ]);
@@ -93,12 +88,8 @@ const OptionComponent = props => {
   const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
   const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
   const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
-  const needApproval =
-    selectedToken.address !== AddressZero &&
-    tokenAllowance &&
-    selectedTokenAmount &&
-    selectedTokenAmount.gt(tokenAllowance)
-
+  const symbolMarkPrice = symbolInfo?.markPrice
+    
   const getPercentageButton = value => {
     if (percentage != value) {
       return (
@@ -123,14 +114,8 @@ const OptionComponent = props => {
     if (!active) {
       return 'Connect Wallet'
     }
-    if (needApproval && isWaitingForApproval) {
-      return 'Waiting for Approval'
-    }
     if (isApproving) {
       return `Approving ${selectedToken.symbol}...`;
-    }
-    if (needApproval) {
-      return `Approve ${selectedToken.symbol}`;
     }
     return mode == 'Buy' ? 'Buy / Long' : 'Sell / Short'
   }
@@ -138,22 +123,16 @@ const OptionComponent = props => {
   useEffect(() => {
     setShowDescription(false)
     setMarginToken(tokens[1])
-  }, [chainId, mode])
+  }, [tokens])
 
   useEffect(() => {
     let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(selectedTokenBalance, 18, 2)
     setSelectedTokenValue(tokenAmount)
   }, [percentage])
 
-  useEffect(()=>{
-    setUsdValue((selectedTokenValue * selectedTokenPrice).toFixed(2))
-  }, [selectedTokenValue])
-
   useEffect(() => {
-    if (selectedToken && isWaitingForApproval && !needApproval) {
-      setIsWaitingForApproval(false)
-    }
-  }, [selectedToken, selectedTokenAmount, needApproval])
+    setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18, 2)).toFixed(2))
+  }, [selectedTokenValue, selectedTokenPrice])
 
   ///////////// write contract /////////////
 
@@ -162,22 +141,18 @@ const OptionComponent = props => {
       connectWalletByLocalStorage()
       return
     }
-    if (needApproval) {
-      approveTokens(library, routerAddress, ERC, selectedToken.address, selectedTokenAmount, setIsWaitingForApproval, setIsApproving)
-      return
-    }
-    if (mode == ' Buy') {
-      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount, expandDecimals(50001, 18))
+    if (mode == 'Buy') {
+      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount, symbolMarkPrice?.mul(bigNumberify(10000 + slippageTolerance * 100)).div(bigNumberify(10000)))
     } else {
-      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount.mul(bigNumberify(-1)), expandDecimals(50001, 18))
+      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount.mul(bigNumberify(-1)), symbolMarkPrice?.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000)))
     }
   }
 
   return (
     <div className={styles.main}>
-      <AcyPerpetualCard style={{ backgroundColor: 'transparent', border: 'none', margin: '-8px' }}>
+      <ComponentCard style={{ backgroundColor: 'transparent', border: 'none', margin: '-8px' }}>
         <div className={styles.modeSelector}>
-          <PerpetualTabs
+          <ComponentTabs
             option={mode}
             options={optionMode}
             onChange={(mode) => { setMode(mode) }}
@@ -280,20 +255,29 @@ const OptionComponent = props => {
                 </AcyDescriptions>
                 : null}
 
-              <AcyPerpetualButton
+              <ComponentButton
                 style={{ margin: '25px 0 0 0', width: '100%' }}
                 onClick={onClickPrimary}
               >
                 {getPrimaryText()}
-              </AcyPerpetualButton>
+              </ComponentButton>
 
             </div>
 
-            <AccountInfoGauge account={account} library={library} chainId={chainId} tokens={tokens} active={active} token={marginToken} setToken={setMarginToken} />
+            <AccountInfoGauge
+              account={account}
+              library={library}
+              chainId={chainId}
+              tokens={tokens}
+              active={active}
+              token={marginToken}
+              setToken={setMarginToken}
+              symbol={symbol}
+            />
           </>
         }
 
-      </AcyPerpetualCard>
+      </ComponentCard>
     </div>
   );
 }

@@ -38,7 +38,7 @@ import Alp from '@/abis/future-option-power/Alp.json'
 
 import useSWR from 'swr'
 import AcyCard from '../AcyCard';
-import PerpetualTabs from '../PerpetualComponent/components/PerpetualTabs';
+import ComponentTabs from '../ComponentTabs';
 import ChartWrapper from '@/pages/Stats/Perpetual/components/ChartWrapper';
 import Portfolio from '@/pages/Perpetual/components/Portfolio';
 import { GlpSwapTokenTable } from '../PerpetualComponent/components/GlpSwapBox';
@@ -136,7 +136,7 @@ const AcyPool = props => {
     <div className={`${styles.colItem} ${styles.priceChart}`}>
       <div>
         <div className={styles.chartTokenSelectorTab}>
-          <PerpetualTabs
+          <ComponentTabs
             option={poolTab}
             options={poolTabs}
             onChange={(item)=>{setPoolTab(item)}}
@@ -200,7 +200,7 @@ const AcyPool = props => {
 
       <div className={styles.bottomWrapper}>
         <div className={styles.chartTokenSelectorTab}>
-          <PerpetualTabs
+          <ComponentTabs
             option={poolGraphTab}
             options={poolGraphTabs}
             onChange={(item)=>{setPoolGraphTab(item)}}

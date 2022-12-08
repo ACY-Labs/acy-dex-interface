@@ -50,16 +50,15 @@
     color: #b5b6b6;
     text-align: center;
 
-    p {
-        text-align: left;
-        margin-bottom: 14px;
+  p {
+    text-align: left;
+    margin-bottom: 14px;
 
-        &:nth-last-child(2) {
-            margin-bottom: 51px;
-        }
+    &:nth-last-child(2) {
+      margin-bottom: 51px;
     }
   }
-
+}
 
 .pool {
   display: flex;
@@ -163,15 +162,6 @@
   animation-iteration-count: infinite;
   transform: rotateZ(0deg);
   animation-timing-function: linear;
-}
-
-.slippageContainer {
-  margin-bottom: 25px;
-  margin-top: 25px;
-  margin-left: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .checkbox {
@@ -506,5 +496,26 @@
     margin-right: 1rem;
     display: flex;
     justify-content: flex-end;
+  }
+}
+
+.slippageContainer {
+  padding-top: 10px;
+  margin: 20px 10px;
+
+  :global {
+    .ant-input-affix-wrapper {
+      background-color: black;
+      border: 0.75px solid #333333;
+      border-radius: 5px;
+    }
+
+    .ant-input {
+      background-color: black;
+    }
+  }
+
+  .input {
+    flex: 1 1 auto;
   }
 }

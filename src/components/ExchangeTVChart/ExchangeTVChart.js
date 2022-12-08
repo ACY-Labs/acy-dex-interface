@@ -411,7 +411,7 @@ export default function ExchangeTVChart(props) {
                 <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
               </StyledSelect>
             </div>
-            {deltaIsMinus ?
+            {/* {deltaIsMinus ?
               <div style={{ float: "right", paddingRight: "1rem", wordSpacing: "0.5rem", color: "#FA3C58" }}>
                 ${curPrice} -{priceChangePercentDelta}%
               </div>
@@ -419,7 +419,7 @@ export default function ExchangeTVChart(props) {
               <div style={{ float: "right", paddingRight: "1rem", wordSpacing: "0.5rem", color: '#46E3AE' }}>
                 ${curPrice} +{priceChangePercentDelta}%
               </div>
-            }
+            } */}
           </div>
 
         </div>

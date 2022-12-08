@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { ethers } from 'ethers';
-import { Tooltip } from 'antd'
+import { Tooltip, Input, Button } from 'antd'
 import { useChainId } from '@/utils/helpers';
 import { useWeb3React } from '@web3-react/core';
 import { useConstantLoader } from '@/constants';
-import { getTokens, getContract } from '@/constants/future_option_power.js';
+import { INITIAL_ALLOWED_SLIPPAGE, getTokens, getContract } from '@/constants/future_option_power.js';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { approveTokens, addLiquidity, removeLiquidity } from '@/services/derivatives';
 import {
@@ -24,10 +24,11 @@ import {
   MINT_BURN_FEE_BASIS_POINTS,
   BURN_FEE_BASIS_POINTS,
 } from '@/acy-dex-futures/utils';
-import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
+import { AcyDescriptions } from '../Acy';
+import ComponentTabs from '../ComponentTabs';
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection';
 import glp40Icon from '@/pages/BuyGlp/components/ic_glp_40.svg'
-import AcyPerpetualButton from '@/components/PerpetualComponent/components/AcyPerpetualButton';
+import ComponentButton from '../ComponentButton';
 import ERC20 from '@/abis/future-option-power/ERC20.json';
 import Router from '@/abis/future-option-power/Router.json';
 import Reader from '@/abis/future-option-power/Reader.json';
@@ -37,9 +38,8 @@ import styles from './styles.less';
 
 const AcyPoolComponent = props => {
 
-  const { account } = useConstantLoader(props)
   const { chainId } = useChainId()
-  const { active, library } = useWeb3React()
+  const { account, active, library } = useWeb3React()
   const connectWalletByLocalStorage = useConnectWallet()
   const tokens = getTokens(chainId)
   const [selectedToken, setSelectedToken] = useState(tokens[1])
@@ -111,6 +111,11 @@ const AcyPoolComponent = props => {
   const [isApproving, setIsApproving] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
+  const [showDescription, setShowDescription] = useState(false)
+  const [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
+  const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
+  const [slippageError, setSlippageError] = useState('')
+  const [deadline, setDeadline] = useState()
 
   const needApproval = isBuying ?
     selectedToken.address != ethers.constants.AddressZero &&
@@ -121,7 +126,7 @@ const AcyPoolComponent = props => {
     alpAmount &&
     alpAmount.gt(alpAllowance)
 
-  const alpPrice = poolInfo ? poolInfo.totalSupply.gt(0) ? parseInt(poolInfo.liquidity) / parseInt(poolInfo.totalSupply) : expandDecimals(1, USD_DECIMALS) : 0
+  const alpPrice = poolInfo ? poolInfo.totalSupply.gt(0) ? parseInt(poolInfo.liquidity) / parseInt(poolInfo.totalSupply) : 1 : 0
   const alpSupplyUsd = alpSupply ? alpSupply.mul(parseValue(alpPrice, ALP_DECIMALS)) : bigNumberify(0)
   const alpBalanceUsd = alpBalance ? alpBalance.mul(parseValue(alpPrice, ALP_DECIMALS)) : bigNumberify(0)
   const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
@@ -146,6 +151,7 @@ const AcyPoolComponent = props => {
 
   const onTokenValueChange = (e) => {
     setAnchorOnSwapAmount(true)
+    setShowDescription(true)
     if (e.target.value === "") {
       setSelectedTokenValue("0")
     }
@@ -160,6 +166,7 @@ const AcyPoolComponent = props => {
 
   const onAlpValueChange = (e) => {
     setAnchorOnSwapAmount(false)
+    setShowDescription(true)
     if (e.target.value === "") {
       setAlpValue("0")
     }
@@ -221,6 +228,10 @@ const AcyPoolComponent = props => {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
+
+  useEffect(() => {
+    setShowDescription(false)
+  }, [chainId])
 
   useEffect(() => {
     setSelectedTokenAmount(parseValue(selectedTokenValue, selectedToken?.decimals))
@@ -321,6 +332,7 @@ const AcyPoolComponent = props => {
     isBuying,
     selectedToken,
     selectedTokenAmount,
+    selectedTokenPrice,
     anchorOnSwapAmount,
     alpAmount,
     alpPrice,
@@ -330,15 +342,14 @@ const AcyPoolComponent = props => {
 
   const buyAlp = () => {
     setIsSubmitting(true)
-    const minLp = parseValue(alpValue * 0.95, ALP_DECIMALS)
+    const minLp = parseValue(alpPrice, ALP_DECIMALS)?.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000))
     addLiquidity(chainId, library, routerAddress, Router, selectedToken, selectedTokenAmount, minLp, setIsSubmitting)
   }
 
   const sellAlp = () => {
     setIsSubmitting(true)
-    // const minOut = parseValue(alpValue * 0.95, ALP_DECIMALS)
-    const minOut = bigNumberify(0)
-    removeLiquidity(chainId, library, routerAddress, Router, selectedToken, selectedTokenAmount, minOut, setIsSubmitting)
+    const minOut = selectedTokenAmount.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000))
+    removeLiquidity(chainId, library, routerAddress, Router, selectedToken, alpAmount, minOut, setIsSubmitting)
   }
 
   const onClickPrimary = () => {
@@ -348,7 +359,7 @@ const AcyPoolComponent = props => {
     }
     if (needApproval) {
       isBuying ? approveTokens(library, routerAddress, ERC20, selectedToken.address, selectedTokenAmount, setIsWaitingForApproval, setIsApproving)
-        : approveTokens(library, routerAddress, ERC20, alpAddress, alpAmount, setIsWaitingForApproval, setIsApproving)
+        : approveTokens(library, routerAddress, Alp, alpAddress, alpAmount, setIsWaitingForApproval, setIsApproving)
       return
     }
     const [, modal] = getError()
@@ -362,7 +373,7 @@ const AcyPoolComponent = props => {
     <div className={styles.mainContent}>
       <div className="GlpSwap">
         <div className={styles.BuySellSelector}>
-          <PerpetualTabs
+          <ComponentTabs
             option={mode}
             options={['Buy ALP', 'Sell ALP']}
             type="inline"
@@ -462,14 +473,75 @@ const AcyPoolComponent = props => {
           </div>
         </div>
 
+        {showDescription ?
+          <AcyDescriptions>
+            <div className={styles.breakdownTopContainer}>
+              <div className={styles.slippageContainer}>
+                <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+                  <Input
+                    className={styles.input}
+                    value={inputSlippageTol || ''}
+                    onChange={e => {
+                      setInputSlippageTol(e.target.value);
+                    }}
+                    suffix={<strong>%</strong>}
+                  />
+                  <Button
+                    type="primary"
+                    style={{
+                      marginLeft: '10px',
+                      background: '#2e3032',
+                      borderColor: 'transparent',
+                    }}
+                    onClick={() => {
+                      if (isNaN(inputSlippageTol)) {
+                        setSlippageError('Please input valid slippage value!');
+                      } else {
+                        setSlippageError('');
+                        setSlippageTolerance(parseFloat(inputSlippageTol));
+                      }
+                    }}
+                  >
+                    Set
+                  </Button>
+                </div>
+                {slippageError.length > 0 && (
+                  <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
+                )}
+              </div>
+              <div className={styles.slippageContainer}>
+                <span style={{ fontWeight: 600, marginBottom: '10px' }}>Transaction deadline</span>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    height: '33.6px',
+                    marginTop: '10px',
+                  }}
+                >
+                  <Input
+                    className={styles.input}
+                    type="number"
+                    value={Number(deadline).toString()}
+                    onChange={e => setDeadline(e.target.valueAsNumber || 0)}
+                    placeholder={30}
+                    suffix={<strong>minutes</strong>}
+                  />
+                </div>
+              </div>
+            </div>
+          </AcyDescriptions>
+          : null}
+
         <div className={styles.centerButton}>
-          <AcyPerpetualButton
+          <ComponentButton
             style={{ marginTop: '25px' }}
             onClick={onClickPrimary}
             disabled={!isPrimaryEnabled()}
           >
             {getPrimaryText()}
-          </AcyPerpetualButton>
+          </ComponentButton>
         </div>
 
       </div>

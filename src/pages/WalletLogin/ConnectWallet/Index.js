@@ -30,7 +30,7 @@ import {
     AcyRadioButton,
     AcySeting,
 } from '@/components/Acy';
-import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
+import ComponentTabs from '@/components/ComponentTabs';
 
 import { useChainId } from '@/utils/helpers';
 import { useWeb3React } from '@web3-react/core';
@@ -467,7 +467,7 @@ const WalletLogin = props => {
                                 onTabChange={onTabChange}
                                 onSubmit={onSubmit}
                             >
-                                <PerpetualTabs
+                                <ComponentTabs
                                     option={loginOption}
                                     options={loginOptions}
                                     onChange={onChange}

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from 'antd';
 import { Gauge } from 'ant-design-pro/lib/Charts';
-import { AcyPerpetualButton, AcyCuarrencyCard } from '../Acy';
+import { AcyCuarrencyCard } from '../Acy';
+import ComponentButton from '../ComponentButton';
 import Modal from '../PerpetualComponent/Modal/Modal';
 import TokenSelectorModal from '../TokenSelectorModal';
 import { approveTokens, addMargin, removeMargin } from '@/services/derivatives';
@@ -27,6 +28,7 @@ const AccountInfoGauge = props => {
     tokens,
     token,
     setToken,
+    symbol,
   } = props
 
   const connectWalletByLocalStorage = useConnectWallet()
@@ -96,9 +98,9 @@ const AccountInfoGauge = props => {
       return
     }
     if (mode == 'Deposit') {
-      addMargin(chainId, library, routerAddress, Router, token, tokenValue)
+      addMargin(chainId, library, routerAddress, Router, token, tokenValue, symbol)
     } else {
-      removeMargin(chainId, library, routerAddress, Router, token, tokenValue)
+      removeMargin(chainId, library, routerAddress, Router, token, tokenValue, symbol)
     }
   }
 
@@ -106,7 +108,7 @@ const AccountInfoGauge = props => {
     if (token && isWaitingForApproval && !needApproval) {
       setIsWaitingForApproval(false)
     }
-  }, [token, tokenAmount, needApproval])
+  }, [token, tokenAmount, needApproval, isWaitingForApproval])
 
   return (
     <div className={styles.main}>
@@ -145,12 +147,12 @@ const AccountInfoGauge = props => {
       </div>
 
       <div className={styles.buttonContainer} style={{ marginTop: '20px' }}>
-        <AcyPerpetualButton onClick={onClickDeposit}>
+        <ComponentButton onClick={onClickDeposit}>
           DEPOSIT
-        </AcyPerpetualButton>
-        <AcyPerpetualButton onClick={onClickWithdraw}>
+        </ComponentButton>
+        <ComponentButton onClick={onClickWithdraw}>
           WITHDRAW
-        </AcyPerpetualButton>
+        </ComponentButton>
       </div>
 
       {isConfirming &&
