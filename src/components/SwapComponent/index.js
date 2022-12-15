@@ -15,11 +15,13 @@ import ScoreBox from './components/ScoreBox';
 import styles from './styles.less';
 import mockTokenList from './mockTokenList.json';
 import axios from 'axios';
+import { useWeb3React } from '@web3-react/core';
 
 
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
-  const { account, library, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
+  const { account,library } = useWeb3React();
+  const { farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
   const {
     dispatch,
     onSelectToken0,
