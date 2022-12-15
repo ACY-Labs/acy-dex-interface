@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { connect } from 'umi';
+import { connect, useHistory } from 'umi';
 import { Button } from 'antd';
 import { AcyCard, AcyConfirm, AcyApprove, } from '@/components/Acy';
 import Media from 'react-media';
@@ -20,37 +20,50 @@ import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { TradeHistoryTable, PoolsActivityTable } from './components/TableComponent.js';
 import { useChainId } from '@/utils/helpers';
 import { getTokens } from '@/constants/trade'
+import { useWeb3React } from '@web3-react/core';
+
+const apiUrlPrefix = "https://stats.acy.finance/api"
 
 const Swap = props => {
-  const { account, library, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
+  // const { farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
+  const { account, library, active } = useWeb3React()
   const { chainId } = useChainId();
   const supportedTokens = getTokens(chainId);
 
   const [activeToken1, setActiveToken1] = useState(supportedTokens[3]);
   const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
+  const [token0, setToken0] = useState('BTC')
+  const [token1, setToken1] = useState('USDT')
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
   const [transactionList, setTransactionList] = useState([]);
   const [tableContent, setTableContent] = useState('Trade History');
 
   // useSWR hook example - needs further implementation in backend
-  const txListUrl = `${apiUrlPrefix}/txlist/all?`
-  const { data: txList, mutate: updateTxList } = useSWR([txListUrl], {
-    fetcher: TxFetcher(account),
-    // refreshInterval: 1000,
-  })
+  // const txListUrl = `${apiUrlPrefix}/txlist/all?`
+  // const { data: txList, mutate: updateTxList } = useSWR([txListUrl], {
+  //   fetcher: TxFetcher(account),
+  //   // refreshInterval: 1000,
+  // })
 
-  const txref = useRef();
-  txref.current = txList;
+  // const txref = useRef();
+  // txref.current = txList;
 
   useEffect(() => {
-    library.on('block', (blockNum) => {
-      updateTxList();
-    })
-    return () => {
-      library.removeAllListeners('block');
+    if (active) {
+      library.on("block", () => {
+        // updateTxList()
+      });
+      return () => {
+        library.removeAllListeners('block');
+      };
     }
-  }, [library])
+  }, [
+    active,
+    library,
+    chainId,
+    // updateTxList,
+  ])
 
   useEffect(() => {
     if (!supportedTokens) return
@@ -73,68 +86,80 @@ const Swap = props => {
     })
   }, [account]);
 
+  // useEffect(() => {
+  //   props.dispatch({
+  //     type: "swap/updateTokens",
+  //     payload: {
+  //       token0: activeToken0,
+  //       token1: activeToken1
+  //     }
+  //   });
+  //   // const dayLength = 5;
+  //   let reverseFlag = false;
+  //   // timeMark one record the latest transaction time
+  //   // timeMark two recort the oldest transaction time
+  //   let timeMark = 0;
+  //   let timeMark2 = 0;
+  //   let timeData = [];
+  //   let A = activeToken0.symbol;
+  //   let B = activeToken1.symbol;
+  //   if (A > B) {
+  //     let temp = B;
+  //     B = A;
+  //     A = temp;
+  //     reverseFlag = true;
+  //   }
+  //   axios.get(
+  //     `${apiUrlPrefix}/chart/getRate`, { params: { token0: A, token1: B } }
+  //   ).then(res => {
+  //     if (res.data) {
+  //       const historyData = res.data.History;
+  //       timeMark = historyData[historyData.length - 1].time;
+  //       timeMark2 = historyData[0].time
+
+  //       for (let i = 0; i < historyData.length; i++) {
+
+  //         while (i < 0) i++;
+  //         const element = historyData[i];
+  //         timeData.push(element);
+  //       };
+
+  //       //add 0 to the chartdata array
+  //       const addData = []
+  //       for (let i = timeMark - 24 * 60; i < timeMark2; i = i + 5) {
+  //         let temp2 = [(i * 60 * 1000), 0];
+  //         addData.push(temp2);
+  //       }
+
+  //       // drawing chart
+  //       const tempChart = [];
+  //       for (let a = 0; a < timeData.length; a++) {
+  //         if (timeData[a].time > timeMark - 24 * 60) {
+  //           const time = timeData[a].time * 60 * 1000;
+  //           let temp;
+  //           if (reverseFlag)
+  //             temp = [time, 1.0 / timeData[a].exchangeRate];
+  //           else
+  //             temp = [time, timeData[a].exchangeRate];
+  //           tempChart.push(temp);
+
+  //         }
+  //       }
+  //     }
+
+  //   })
+  // }, [activeToken0, activeToken1]);
+
   useEffect(() => {
-    props.dispatch({
-      type: "swap/updateTokens",
-      payload: {
-        token0: activeToken0,
-        token1: activeToken1
-      }
-    });
-    // const dayLength = 5;
-    let reverseFlag = false;
-    // timeMark one record the latest transaction time
-    // timeMark two recort the oldest transaction time
-    let timeMark = 0;
-    let timeMark2 = 0;
-    let timeData = [];
-    let A = activeToken0.symbol;
-    let B = activeToken1.symbol;
-    if (A > B) {
-      let temp = B;
-      B = A;
-      A = temp;
-      reverseFlag = true;
+    const getTradeHistory = async () => {
+      let address0 = activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address
+      let address1 = activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address
+      let history = await axios.get(`${apiUrlPrefix}/rates?token0=${address0}&token1=${address1}&chainId=${chainId}`)
+        .then((res) => res.data.rates)
+      
     }
-    axios.get(
-      `${apiUrlPrefix}/chart/getRate`, { params: { token0: A, token1: B } }
-    ).then(res => {
-      if (res.data) {
-        const historyData = res.data.History;
-        timeMark = historyData[historyData.length - 1].time;
-        timeMark2 = historyData[0].time
 
-        for (let i = 0; i < historyData.length; i++) {
-
-          while (i < 0) i++;
-          const element = historyData[i];
-          timeData.push(element);
-        };
-
-        //add 0 to the chartdata array
-        const addData = []
-        for (let i = timeMark - 24 * 60; i < timeMark2; i = i + 5) {
-          let temp2 = [(i * 60 * 1000), 0];
-          addData.push(temp2);
-        }
-
-        // drawing chart
-        const tempChart = [];
-        for (let a = 0; a < timeData.length; a++) {
-          if (timeData[a].time > timeMark - 24 * 60) {
-            const time = timeData[a].time * 60 * 1000;
-            let temp;
-            if (reverseFlag)
-              temp = [time, 1.0 / timeData[a].exchangeRate];
-            else
-              temp = [time, timeData[a].exchangeRate];
-            tempChart.push(temp);
-
-          }
-        }
-      }
-
-    })
+    getTradeHistory()
   }, [activeToken0, activeToken1]);
 
   const onHandModalConfirmOrder = falg => {
@@ -145,7 +170,6 @@ const Swap = props => {
     appendNewSwapTx(refContainer.current, receipt, account, library).then((data) => {
       if (data && data.length > 0) setTransactionList(data);
     })
-
   }
 
   const onGetReceipt = async (receipt, library, account) => {
@@ -158,34 +182,33 @@ const Swap = props => {
     setGraphType(item)
   }
 
-  const test_tradeHistory = [
+  const tradeHistory = [ // test
     {
-      date: '2022-08-06 22:47:42',
-      type: 'buy',
-      price: '$0.06212',
-      price_bnb: '0.0001959',
-      amount_mine: '5145.58',
-      total_bnb: '1.00',
-      maker: '0x522351493F2bc0Dd02498741Fb78696D6943D4f0',
+      "timestamp": "1643432398",
+      "transaction": {
+        "id": "0xb2453cf50a8e2de3266e4f9c30f54014b6ce40c41245e75623f8836c0dfc186b",
+        "__typename": "Transaction"
+      },
+      "exchangeRate": "2546.4768322769583634178378858608",
+      "token0Price": "1",
+      "token1Price": "2546.4768322769583634178378858608",
+      "amount0": "-2770.124636",
+      "amount1": "1.09084353784001472",
+      "__typename": "NewSwap"
     },
     {
-      date: '2022-08-06 22:45:45',
-      type: 'sell',
-      price: '$0.06083',
-      price_bnb: '0.0001918',
-      amount_mine: '1312.06',
-      total_bnb: '0.2517',
-      maker: '0x73d0451D4137DD57D145F27cE6E9207D1da39309',
-    },
-    {
-      date: '2022-08-06 22:42:48',
-      type: 'buy',
-      price: '$0.05996',
-      price_bnb: '0.0001892',
-      amount_mine: '3717.88',
-      total_bnb: '0.7000',
-      maker: '0x10ED43C718714eb63d5aA57B78B54704E256024E',
-    }
+      "timestamp": "1643432398",
+      "transaction": {
+        "id": "0x6aaa5f06a90e1d70e87ea1b69ff7d365976e420b9280814ed720012675e15c7f",
+        "__typename": "Transaction"
+      },
+      "exchangeRate": "2546.4768322769583634178378858608",
+      "token0Price": "1",
+      "token1Price": "2546.4768322769583634178378858608",
+      "amount0": "-3011.173734",
+      "amount1": "1.18558533109274368",
+      "__typename": "NewSwap"
+    }, 
   ]
 
   const test_poolsActivity = [
@@ -217,6 +240,16 @@ const Swap = props => {
       ago: '6min',
     },
   ]
+
+  const history = useHistory()
+  useEffect(() => {
+    const hash = history.location.hash.replace('#', '').split('/')
+    // if(hash) {
+    //   setToken0({name: hash[0].replaceAll('%20', ' ')})
+    //   setToken1({name: hash[1].replaceAll('%20', ' ')})
+    // }
+    // console.log('joy hash',hash[0].replaceAll('%20', ' '), hash[1].replaceAll('%20', ' '))
+  }, [history.location.hash])
 
   return (
     <PageHeaderWrapper>
@@ -279,7 +312,10 @@ const Swap = props => {
                       <SankeyGraph />
                     )}
                     {tableContent == 'Trade History' && (
-                      <TradeHistoryTable dataSource={test_tradeHistory} />
+                      <TradeHistoryTable 
+                        dataSource={tradeHistory} 
+                        token0={activeToken0.address < activeToken1.address ? activeToken0.symbol : activeToken1.symbol} 
+                        token1={activeToken0.address < activeToken1.address ? activeToken1.symbol : activeToken0.symbol} />
                     )}
                     {tableContent == 'Pools Activity' && (
                       <PoolsActivityTable dataSource={test_poolsActivity} />

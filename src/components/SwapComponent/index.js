@@ -433,11 +433,11 @@ const SwapComponent = props => {
     sti(status.hash);
   };
 
-  const history = useHistory()
-  useEffect(() => {
-    const hash = history.location.hash.replace('#', '').split('?')[0]
-    hash ? setToken0(coinList.filter(coin => coin.symbol.toLowerCase() == hash.toLowerCase())[0]) : setToken0(INITIAL_TOKEN_LIST[0])
-  }, [history.location.hash, coinList])
+  // const history = useHistory()
+  // useEffect(() => {
+  //   const hash = history.location.hash.replace('#', '').split('?')[0]
+  //   hash ? setToken0(coinList.filter(coin => coin.symbol.toLowerCase() == hash.toLowerCase())[0]) : setToken0(INITIAL_TOKEN_LIST[0])
+  // }, [history.location.hash, coinList])
 
   const onClickApprove = async () => {
     setShowSpinner(true);

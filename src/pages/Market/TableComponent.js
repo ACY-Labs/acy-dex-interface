@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import className from 'classnames';
 import { Divider, Icon, Input, Table, Button, Dropdown } from 'antd';
 import { AcyIcon, AcyTabs, AcyTokenIcon, AcyCardList } from '@/components/Acy';
@@ -374,6 +375,7 @@ export function LivePairsTable(props) {
 export function TopVolumeTable(props) {
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
+  const navHistory = useHistory()
 
   function columnsCoin() {
     return [
@@ -490,6 +492,9 @@ export function TopVolumeTable(props) {
         style={{
           marginBottom: '20px',
           cursor: isHover ? 'pointer' : 'default',
+        }}
+        onRowClick={(record, index, event) => {
+          navHistory.push(`/trade#${record.name}`)
         }}
         onRowMouseEnter={() => setIsHover(true)}
         onRowMouseLeave={() => setIsHover(false)}
