@@ -308,6 +308,7 @@ const SwapComponent = props => {
 
   useEffect(
     async () => {
+      // console.log("t0change")
       await t0Changed(token0Amount);
     },
     [
@@ -323,6 +324,7 @@ const SwapComponent = props => {
 
   useEffect(
     async () => {
+      // console.log("t1change")
       await t1Changed(token1Amount);
     },
     [
@@ -531,13 +533,12 @@ const SwapComponent = props => {
         }}
         onChangeToken={e => {
           setShowDescription(true);
-          setToken0Amount(e);
           setExactIn(true);
-          console.log("current t0 amount", e)
-          t0Changed(e);
           props.showGraph("Routes")
         }}
         library={library}
+        setTokenAmount={setToken0Amount}
+        amountChanged={t0Changed}
       />
 
       <div
@@ -570,14 +571,14 @@ const SwapComponent = props => {
         onChangeToken={e => {
           // setToken1ApproxAmount(e);
           setShowDescription(true)
-          setToken1Amount(e);
           setExactIn(false);
           console.log("test exactin and bonus1", exactIn, bonus0)
           console.log("current token1amount", e)
-          t1Changed(e);
         }}
         isLocked={isLockedToken1}
         library={library}
+        setTokenAmount={setToken1Amount}
+        amountChanged={t1Changed}
       />
 
       {showDescription ?

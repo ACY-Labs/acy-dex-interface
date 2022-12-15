@@ -18,9 +18,11 @@ import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { TradeHistoryTable, PoolsActivityTable } from './components/TableComponent.js';
 import { useChainId } from '@/utils/helpers';
 import { getTokens } from '@/constants/trade'
+import { useWeb3React } from '@web3-react/core';
 
 const Swap = props => {
-  const { account, library, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
+  const { account,library } = useWeb3React();
+  const { farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
   const { chainId } = useChainId();
   // const supportedTokens = getTokens(chainId);
   const INITIAL_TOKEN_LIST = getTokens(chainId);
@@ -41,16 +43,17 @@ const Swap = props => {
   })
 
   const txref = useRef();
-  txref.current = txList;
+  txref.current = txList;0
+  
 
-  useEffect(() => {
-    library.on('block', (blockNum) => {
-      updateTxList();
-    })
-    return () => {
-      library.removeAllListeners('block');
-    }
-  }, [library])
+  // u1012seEffect(() => {
+  //   library.on('block', (blockNum) => {
+  //     updateTxList();
+  //   })
+  //   return () => {
+  //     library.removeAllListeners('block');
+  //   }
+  // }, [library])
 
   useEffect(() => {
     if (!supportedTokens) return

@@ -16,6 +16,8 @@ const AcyCuarrencyCard = ({
   dollar,
   onChoseToken,
   onChangeToken,
+  setTokenAmount,
+  amountChanged,
   token,
   isLocked,
   inputColor,
@@ -25,12 +27,33 @@ const AcyCuarrencyCard = ({
 }) => {
   const { chainId } = useChainId();
   const [light, setLight] = useState(false);
+  const [tokenPrice,setTokenPrice] = useState(0);
+  const [tokenDisplayAmount,setTokenDisplayAmount] = useState(0);
   const onChange = e => {
+    console.log("A",e.target.value);
     const check = Pattern.coinNum.test(e.target.value);
     if (check) {
       onChangeToken && onChangeToken(e.target.value);
+      // setTokenAmount(e.target.value);
+      setTokenDisplayAmount(e.target.value);
     }
+    console.log("B",e.target.value)
   };
+
+  useEffect(()=>{
+    console.log("tokenDisplayAmount1",tokenDisplayAmount)
+    const timeoutId = setTimeout(()=>{
+      console.log("tokenDisplayAmount2",tokenDisplayAmount)
+      setTokenAmount(tokenDisplayAmount)
+      amountChanged(tokenDisplayAmount)
+    },1500)
+    return ()=>clearTimeout(timeoutId)
+  },[tokenDisplayAmount])
+
+  useEffect(()=>{
+    setTokenDisplayAmount(token)
+  },[token])
+
   const onBlur = () => {
     setLight(false);
   };
@@ -40,21 +63,22 @@ const AcyCuarrencyCard = ({
   };
 
   const [usdValue, setUsdValue] = useState(null);
-  useEffect(async () => {
-    if (token == 0)
-      setUsdValue(0);
-    else if (!token)
-      setUsdValue(null);
-
-    // const tokenPriceList = await getAllSupportedTokensPrice();
-    const tokenPrice = await getTokenPrice(coin.address,chainId)
-    // const tokenPrice = tokenPriceList[coin];
-    const tokenAmountUSD = tokenPrice * token;
-    setUsdValue(tokenAmountUSD.toFixed(2));
+  // get token price from backend
+  useEffect(async()=>{
+    const _tokenPrice = await getTokenPrice(coin.address,chainId)
+    setTokenPrice(_tokenPrice)
     console.log("tokenprice, token", tokenPrice, token)
-    console.log("test token price: ", coin, tokenPrice);
+  },[coin])
+  // calculate usd value when user input token amount
+  useEffect(async () => {
+    if (tokenDisplayAmount == 0)
+      setUsdValue(0);
+    else if (!tokenDisplayAmount)
+      setUsdValue(null);
+    const tokenAmountUSD = tokenPrice * tokenDisplayAmount;
+    setUsdValue(tokenAmountUSD.toFixed(2));
     console.log("UsdValue",usdValue)
-  }, [coin, token])
+  }, [coin, tokenDisplayAmount])
 
   const inputRef = React.createRef();
   return (
@@ -73,7 +97,7 @@ const AcyCuarrencyCard = ({
               style={{ color: inputColor }}
               placeholder="0.0"
               bordered={false}
-              value={token}
+              value={tokenDisplayAmount}
               onChange={onChange}
             />
           <button className={styles.switchcoin} onClick={onChoseToken} disabled={isLocked}>
