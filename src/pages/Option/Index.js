@@ -61,9 +61,7 @@ export function getPosition(rawPositionData,symbolData) {
       const symbol = symbolData.find(obj=>{
         return obj.address === temp[0]
       })
-      const markPrice = symbol.markPrice
-      const initialMarginRatio = symbol.initialMarginRatio
-      const indexPrice = symbol.indexPrice
+      const {markPrice,initialMarginRatio,indexPrice} = symbol
       
       const cost = ethers.utils.formatUnits(temp.cost,18)
       const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume,18)
@@ -111,7 +109,8 @@ const Option = props => {
   const { account, library } = useWeb3React();
   const { active } = useWeb3React()
   let { chainId } = useChainId();
-  let tokens = getTokens(chainId);
+  console.log("chainId",chainId)
+  let tokens = getTokens(chainId)?getTokens(chainId):[];
 
   const [mode, setMode] = useState('Buy')
   const [symbol, setSymbol] = useState('BTCUSD-60000-C')
