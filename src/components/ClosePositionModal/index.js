@@ -38,7 +38,8 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
         position: 0,
         symbol: "BTCUSD-60000-C",
         type: "Long",
-        unrealizedPnl: 0
+        unrealizedPnl: 0,
+        minTradeVolume: "0.001"
       }
     }
 
@@ -96,7 +97,7 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
     useEffect(() => {
       if(position && percentage){
         const amount = position.position * parseFloat(percentage) / 100
-        setTokenAmount(amount)
+        handleAmountChange(amount)
       }   
     },[percentage,position]);
 
@@ -125,8 +126,16 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
       }
     }
 
-    const handleAmountChange = (e) => {
-      setTokenAmount(e.target.value)
+    const handleAmountChange = (value) => {
+      const minTradeVolume = position.minTradeVolume
+      if(value%minTradeVolume==0&&value<=position.position){
+        setTokenAmount(value)
+      }else if(value>position.position){
+        setTokenAmount(position.position)
+      }else{
+        setTokenAmount(Math.floor(value/minTradeVolume)*minTradeVolume)
+      }
+      
     }
 
     const onClickPrimary = () => {
@@ -134,6 +143,7 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
         connectWalletByLocalStorage()
         return
       }
+      console.log("amount",ethers.utils.parseUnits(tokenAmount.toString(),18))
       if(position.type=="Long"){  // original Long: Short when close position, negative token amount
         trade(
           chainId,
@@ -182,7 +192,7 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
         <div className={styles.modalContent}>Closed Qty</div>
         <AcyInput className={styles.input}
         value={tokenAmount}
-        onChange={handleAmountChange}
+        onChange={(e)=>handleAmountChange(e.target.value)}
         />
         
         <div className={styles.buttonContainer}>

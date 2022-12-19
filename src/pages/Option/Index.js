@@ -61,7 +61,7 @@ export function getPosition(rawPositionData,symbolData) {
       const symbol = symbolData.find(obj=>{
         return obj.address === temp[0]
       })
-      const {markPrice,initialMarginRatio,indexPrice} = symbol
+      const {markPrice,initialMarginRatio,indexPrice,minTradeVolume} = symbol
       
       const cost = ethers.utils.formatUnits(temp.cost,18)
       const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume,18)
@@ -79,6 +79,7 @@ export function getPosition(rawPositionData,symbolData) {
         unrealizedPnl: unrealizedPnl,
         accountFunding: accountFunding,
         type: volume>=0?"Long":"Short",
+        minTradeVolume: minTradeVolume
       };
       positionQuery.push(position)
     }
@@ -99,6 +100,7 @@ export function getSymbol(rawSymbolData){
       markPrice: ethers.utils.formatUnits(temp.markPrice,18),
       indexPrice: ethers.utils.formatUnits(temp.indexPrice,18),
       initialMarginRatio: ethers.utils.formatUnits(temp.initialMarginRatio,18), //0.1
+      minTradeVolume: ethers.utils.formatUnits(temp.minTradeVolume,18)
     };
     symbolQuery.push(symbol)
   }
