@@ -6,9 +6,10 @@ import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import * as Api from '@/acy-dex-futures/Api';
-import { bigNumberify } from '@/acy-dex-futures/utils';
+import { fetcher, bigNumberify } from '@/acy-dex-futures/utils';
 import { useConstantLoader } from '@/constants';
 import { ethers } from 'ethers'
+import useSWR from 'swr'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
 import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
@@ -17,6 +18,8 @@ import AcySymbol from '@/components/AcySymbol';
 import styled from "styled-components";
 import styles from './styles.less';
 import AcyOptionDrawer from '@/components/AcyOptionDrawer';
+import Reader from '@/abis/future-option-power/Reader.json'
+
 
 const StyledDrawer = styled(Drawer)`
   .ant-drawer{
@@ -46,8 +49,20 @@ const Option = props => {
   let tokens = getTokens(chainId);
   chainId = 80001
 
-  const [mode, setMode] = useState('Buy')
+  const readerAddress = getContract(chainId, "reader")
+  const poolAddress = getContract(chainId, "pool")
+
   const [symbol, setSymbol] = useState('BTCUSD-60000-C')
+
+  const { data: symbolInfo, mutate: updateSymbolInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
+    fetcher: fetcher(library, Reader)
+  });
+  console.log("option symbol symbolInfo:", symbolInfo)
+
+  const option_tokens = symbolInfo.filter(ele=>ele[0] == "option")
+  console.log("option symbol option_tokens:", option_tokens)
+
+  const [mode, setMode] = useState('Buy')
   const [tableContent, setTableContent] = useState("Positions");
 
   const [activeToken, setActiveToken] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);

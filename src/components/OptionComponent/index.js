@@ -89,6 +89,7 @@ const OptionComponent = props => {
   const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
   const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const symbolMarkPrice = symbolInfo?.markPrice
+
     
   const getPercentageButton = value => {
     if (percentage != value) {
