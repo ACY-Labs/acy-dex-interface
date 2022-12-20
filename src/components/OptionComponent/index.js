@@ -170,6 +170,7 @@ const OptionComponent = props => {
                 <div className={styles.inputContainer}>
                   <input
                     type="number"
+                    min="0"
                     placeholder="Amount"
                     className={styles.optionInput}
                     value={selectedTokenValue}

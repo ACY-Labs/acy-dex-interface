@@ -15,7 +15,8 @@ import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
 import styled from "styled-components";
-import styles from './styles.less'
+import styles from './styles.less';
+import AcyOptionDrawer from '@/components/AcyOptionDrawer';
 
 const StyledDrawer = styled(Drawer)`
   .ant-drawer{
@@ -55,6 +56,12 @@ const Option = props => {
   const [visibleETH, setVisibleETH] = useState(false);
   const [visibleMATIC, setVisibleMATIC] = useState(false);
   const [visibleBNB, setVisibleBNB] = useState(false);
+  const [visibleToken, setVisibleToken] = useState({
+    "BTC": false,
+    "ETH": false,
+    "MATIC": false,
+    "BNB": false,
+  })
 
   const onClickDropdownBTC = e => {
     setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0]);
@@ -69,42 +76,79 @@ const Option = props => {
     setActiveToken((tokens.filter(ele => ele.symbol == "BNB"))[0]);
   };
 
-  let optionsBTC = [
-    { name: "BTC-1000000", tokenSymbol: "BTC", optionSymbol: "1000000", type: "C" },
-    { name: "BTC-1000000", tokenSymbol: "BTC", optionSymbol: "1000000", type: "P" },
-    { name: "BTC-500000", tokenSymbol: "BTC", optionSymbol: "500000", type: "C" },
-    { name: "BTC-500000", tokenSymbol: "BTC", optionSymbol: "500000", type: "P" },
-    // { name: "BTC-300000", tokenSymbol: "BTC", optionSymbol: "300000", type: "C" },
-    // { name: "BTC-300000", tokenSymbol: "BTC", optionSymbol: "300000", type: "P" },
-    { name: "BTC 60000", tokenSymbol: "BTC", optionSymbol: "60000", type: "C" },
-    { name: "BTC 60000", tokenSymbol: "BTC", optionSymbol: "60000", type: "P" },
-    { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "C" },
-    { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "P" },
-  ];
-  let optionsETH = [
-    { name: "ETH-10000", tokenSymbol: "ETH", optionSymbol: "10000", type: "C" },
-    { name: "ETH-10000", tokenSymbol: "ETH", optionSymbol: "10000", type: "P" },
-    { name: "ETH-5000", tokenSymbol: "ETH", optionSymbol: "5000", type: "C" },
-    { name: "ETH-5000", tokenSymbol: "ETH", optionSymbol: "5000", type: "P" },
-    { name: "ETH-1000", tokenSymbol: "ETH", optionSymbol: "1000", type: "C" },
-    { name: "ETH-1000", tokenSymbol: "ETH", optionSymbol: "1000", type: "P" },
-  ];
-  let optionsMATIC = [
-    { name: "MATIC-10", tokenSymbol: "MATIC", optionSymbol: "10", type: "C" },
-    { name: "MATIC-10", tokenSymbol: "MATIC", optionSymbol: "10", type: "P" },
-    { name: "MATIC-1", tokenSymbol: "MATIC", optionSymbol: "1", type: "C" },
-    { name: "MATIC-1", tokenSymbol: "MATIC", optionSymbol: "1", type: "P" },
-    { name: "MATIC-0.01", tokenSymbol: "MATIC", optionSymbol: "0.01", type: "C" },
-    { name: "MATIC-0.01", tokenSymbol: "MATIC", optionSymbol: "0.01", type: "P" },
-  ];
-  let optionsBNB = [
-    { name: "BNB-1000", tokenSymbol: "BNB", optionSymbol: "1000", type: "C" },
-    { name: "BNB-1000", tokenSymbol: "BNB", optionSymbol: "1000", type: "P" },
-    { name: "BNB-300", tokenSymbol: "BNB", optionSymbol: "300", type: "C" },
-    { name: "BNB-300", tokenSymbol: "BNB", optionSymbol: "300", type: "P" },
-    { name: "BNB-100", tokenSymbol: "BNB", optionSymbol: "100", type: "C" },
-    { name: "BNB-100", tokenSymbol: "BNB", optionSymbol: "100", type: "P" },
-  ];
+  const optionSymbols = {
+    "BTC": [
+      { name: "BTC-100000", tokenSymbol: "BTC", optionSymbol: "100000", type: "C", date: "20221231" },
+      { name: "BTC-100000", tokenSymbol: "BTC", optionSymbol: "100000", type: "P", date: "20221231" },
+      { name: "BTC-50000", tokenSymbol: "BTC", optionSymbol: "50000", type: "C", date: "20221231" },
+      { name: "BTC-50000", tokenSymbol: "BTC", optionSymbol: "50000", type: "P", date: "20221231" },
+      { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "C", date: "20221231" },
+      { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "P", date: "20221231" },
+      { name: "BTC 5000", tokenSymbol: "BTC", optionSymbol: "5000", type: "C", date: "20221231" },
+      { name: "BTC 5000", tokenSymbol: "BTC", optionSymbol: "5000", type: "P", date: "20221231" },
+    ],
+    "ETH": [
+      { name: "ETH-5000", tokenSymbol: "ETH", optionSymbol: "5000", type: "C" },
+      { name: "ETH-5000", tokenSymbol: "ETH", optionSymbol: "5000", type: "P" },
+      { name: "ETH-1000", tokenSymbol: "ETH", optionSymbol: "1000", type: "C" },
+      { name: "ETH-1000", tokenSymbol: "ETH", optionSymbol: "1000", type: "P" },
+      { name: "ETH-500", tokenSymbol: "ETH", optionSymbol: "500", type: "C" },
+      { name: "ETH-500", tokenSymbol: "ETH", optionSymbol: "500", type: "P" },
+    ],
+    "MATIC": [
+      { name: "MATIC-10", tokenSymbol: "MATIC", optionSymbol: "10", type: "C" },
+      { name: "MATIC-10", tokenSymbol: "MATIC", optionSymbol: "10", type: "P" },
+      { name: "MATIC-1", tokenSymbol: "MATIC", optionSymbol: "1", type: "C" },
+      { name: "MATIC-1", tokenSymbol: "MATIC", optionSymbol: "1", type: "P" },
+      { name: "MATIC-0.01", tokenSymbol: "MATIC", optionSymbol: "0.01", type: "C" },
+      { name: "MATIC-0.01", tokenSymbol: "MATIC", optionSymbol: "0.01", type: "P" },
+    ],
+    "BNB": [
+      { name: "BNB-500", tokenSymbol: "BNB", optionSymbol: "1000", type: "C" },
+      { name: "BNB-500", tokenSymbol: "BNB", optionSymbol: "1000", type: "P" },
+      { name: "BNB-300", tokenSymbol: "BNB", optionSymbol: "300", type: "C" },
+      { name: "BNB-300", tokenSymbol: "BNB", optionSymbol: "300", type: "P" },
+      { name: "BNB-100", tokenSymbol: "BNB", optionSymbol: "100", type: "C" },
+      { name: "BNB-100", tokenSymbol: "BNB", optionSymbol: "100", type: "P" },
+    ]
+  };
+
+  // let optionsBTC = [
+  //   { name: "BTC-1000000", tokenSymbol: "BTC", optionSymbol: "1000000", type: "C" },
+  //   { name: "BTC-1000000", tokenSymbol: "BTC", optionSymbol: "1000000", type: "P" },
+  //   { name: "BTC-500000", tokenSymbol: "BTC", optionSymbol: "500000", type: "C" },
+  //   { name: "BTC-500000", tokenSymbol: "BTC", optionSymbol: "500000", type: "P" },
+  //   // { name: "BTC-300000", tokenSymbol: "BTC", optionSymbol: "300000", type: "C" },
+  //   // { name: "BTC-300000", tokenSymbol: "BTC", optionSymbol: "300000", type: "P" },
+  //   { name: "BTC 60000", tokenSymbol: "BTC", optionSymbol: "60000", type: "C" },
+  //   { name: "BTC 60000", tokenSymbol: "BTC", optionSymbol: "60000", type: "P" },
+  //   { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "C" },
+  //   { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "P" },
+  // ];
+  // let optionsETH = [
+  //   { name: "ETH-10000", tokenSymbol: "ETH", optionSymbol: "10000", type: "C" },
+  //   { name: "ETH-10000", tokenSymbol: "ETH", optionSymbol: "10000", type: "P" },
+  //   { name: "ETH-5000", tokenSymbol: "ETH", optionSymbol: "5000", type: "C" },
+  //   { name: "ETH-5000", tokenSymbol: "ETH", optionSymbol: "5000", type: "P" },
+  //   { name: "ETH-1000", tokenSymbol: "ETH", optionSymbol: "1000", type: "C" },
+  //   { name: "ETH-1000", tokenSymbol: "ETH", optionSymbol: "1000", type: "P" },
+  // ];
+  // let optionsMATIC = [
+  //   { name: "MATIC-10", tokenSymbol: "MATIC", optionSymbol: "10", type: "C" },
+  //   { name: "MATIC-10", tokenSymbol: "MATIC", optionSymbol: "10", type: "P" },
+  //   { name: "MATIC-1", tokenSymbol: "MATIC", optionSymbol: "1", type: "C" },
+  //   { name: "MATIC-1", tokenSymbol: "MATIC", optionSymbol: "1", type: "P" },
+  //   { name: "MATIC-0.01", tokenSymbol: "MATIC", optionSymbol: "0.01", type: "C" },
+  //   { name: "MATIC-0.01", tokenSymbol: "MATIC", optionSymbol: "0.01", type: "P" },
+  // ];
+  // let optionsBNB = [
+  //   { name: "BNB-1000", tokenSymbol: "BNB", optionSymbol: "1000", type: "C" },
+  //   { name: "BNB-1000", tokenSymbol: "BNB", optionSymbol: "1000", type: "P" },
+  //   { name: "BNB-300", tokenSymbol: "BNB", optionSymbol: "300", type: "C" },
+  //   { name: "BNB-300", tokenSymbol: "BNB", optionSymbol: "300", type: "P" },
+  //   { name: "BNB-100", tokenSymbol: "BNB", optionSymbol: "100", type: "C" },
+  //   { name: "BNB-100", tokenSymbol: "BNB", optionSymbol: "100", type: "P" },
+  // ];
 
   const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
   const KChartTokenListETH = ["BTC", "ETH"]
@@ -116,51 +160,81 @@ const Option = props => {
     // onClickSetActiveToken(item)
   }
   const selectTab = item => {
+    console.log("option refactor here")
     setActiveToken((tokens.filter(ele => ele.symbol == item))[0])
-    switch (item) {
-      case "BTC":
-        setVisibleBTC(true);
-        setVisibleETH(false);
-        setVisibleMATIC(false);
-        setVisibleBNB(false);
-        break;
-      case "ETH":
-        setVisibleBTC(false);
-        setVisibleETH(true);
-        setVisibleMATIC(false);
-        setVisibleBNB(false);
-        break;
-      case "MATIC":
-        setVisibleBTC(false);
-        setVisibleETH(false);
-        setVisibleMATIC(true);
-        setVisibleBNB(false);
-        break;
-      case "BNB":
-        setVisibleBTC(false);
-        setVisibleETH(false);
-        setVisibleMATIC(false);
-        setVisibleBNB(true);
-        break;
-      default:
-        break;
-    }
+    let newDict = visibleToken
+    Object.entries(visibleToken).forEach((token) => {
+      token[0] === item
+        ? newDict[token[0]] = true
+        : newDict[token[0]] = false
+    })
+    setVisibleToken(newDict)
   }
+  const onClose = () => {
+    // Object.entries(visibleToken).forEach((token) => {
+    //   let tokenKey = token[0]
+    let newDict = visibleToken
+    newDict[activeToken.symbol] = false
+    setVisibleToken(newDict)
+    console.log("option refactor onclose after", visibleToken, activeToken.symbol, visibleToken[activeToken.symbol])
+    // })
+}
 
-  const onCloseBTC = () => {
-    setVisibleBTC(false);
-  };
-  const onCloseETH = () => {
-    setVisibleETH(false);
-  };
-  const onCloseBNB = () => {
-    setVisibleBNB(false);
-  };
-  const onCloseMATIC = () => {
-    setVisibleMATIC(false);
-  };
+  // const onCloseDrawer = () => {
+  //   Object.entries(visibleToken).forEach((token) => {
+  //     let tokenKey = token[0]
+  //     console.log("option refactor onclose", visibleToken)
 
-  useEffect(()=>{
+  //     setVisibleToken({tokenKey: false})
+  //       // ? newDict[token[0]] = true
+  //       // : newDict[token[0]] = false
+  //   })
+  // }
+
+  // switch (item) {
+  //   case "BTC":
+  //     setVisibleBTC(true);
+  //     setVisibleETH(false);
+  //     setVisibleMATIC(false);
+  //     setVisibleBNB(false);
+  //     break;
+  //   case "ETH":
+  //     setVisibleBTC(false);
+  //     setVisibleETH(true);
+  //     setVisibleMATIC(false);
+  //     setVisibleBNB(false);
+  //     break;
+  //   case "MATIC":
+  //     setVisibleBTC(false);
+  //     setVisibleETH(false);
+  //     setVisibleMATIC(true);
+  //     setVisibleBNB(false);
+  //     break;
+  //   case "BNB":
+  //     setVisibleBTC(false);
+  //     setVisibleETH(false);
+  //     setVisibleMATIC(false);
+  //     setVisibleBNB(true);
+  //     break;
+  //   default:
+  //     break;
+  // }
+
+
+  // const onCloseBTC = () => {
+  //   setVisibleBTC(false);
+  // };
+  // const onCloseETH = () => {
+  //   setVisibleETH(false);
+  // };
+  // const onCloseBNB = () => {
+  //   setVisibleBNB(false);
+  // };
+  // const onCloseMATIC = () => {
+  //   setVisibleMATIC(false);
+  // };
+
+  useEffect(() => {
     setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
   }, [tokens])
 
@@ -181,46 +255,68 @@ const Option = props => {
                       onChange={selectTab}
                     />
                   </Row>
-
-                  {visibleBTC ?
+                  {visibleToken[activeToken.symbol]
+                    ?
                     <Row>
                       <Col>
-                        <div className={styles.tokenSelector} >
-                          <StyledDrawer
-                            className={styles.drawerContent}
-                            placement="bottom"
-                            onClose={onCloseBTC}
-                            visible={visibleBTC}
-                            getContainer={false}
-                            closeIcon={false}
-                            height={"517px"}
-                            style={{ width: "20rem" }}
-                          >
-                            <div className={styles.optionslist}>
-                              {optionsBTC.map((option) => (
-                                <div
-                                  className={styles.item}
-                                  onClick={() => {
-                                    onClickDropdownBTC(option)
-                                    setSymbol(option.tokenSymbol + 'USD-' + option.optionSymbol + '-' + option.type)
-                                    onCloseBTC()
-                                  }}
-                                >
-                                  {option.tokenSymbol}-{option.optionSymbol}-{option.type}
-                                  {option.type == "C" ?
-                                    <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
-                                    :
-                                    <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
-                                  }
-                                </div>
-                              ))}
-                            </div>
-                          </StyledDrawer>
-                        </div>
+                          <AcyOptionDrawer
+                            visibleToken={visibleToken}
+                            setVisibleToken={setVisibleToken}
+                            onClose={onClose}
+                            activeToken={activeToken}
+                            setActiveToken={setActiveToken}
+                            optionSymbols={optionSymbols}
+                          />
                       </Col>
-                    </Row> : null}
+                    </Row>
+                    : null}
+                  {/* {visibleToken["BTC"] ?
+                    // <div>hi</div>
+                    <AcyOptionDrawer
+                      visibleToken={visibleToken}
+                      setVisibleToken={setVisibleToken}
+                      activeToken={activeToken}
+                      optionSymbols={optionSymbols}
+                    />
+                    // <Row>
+                    //   <Col>
+                    //     <div className={styles.tokenSelector} >
+                    //       <StyledDrawer
+                    //         className={styles.drawerContent}
+                    //         placement="bottom"
+                    //         onClose={onCloseBTC}
+                    //         visible={visibleBTC}
+                    //         getContainer={false}
+                    //         closeIcon={false}
+                    //         height={"517px"}
+                    //         style={{ width: "20rem" }}
+                    //       >
+                    //         <div className={styles.optionslist}>
+                    //           {optionsBTC.map((option) => (
+                    //             <div
+                    //               className={styles.item}
+                    //               onClick={() => {
+                    //                 onClickDropdownBTC(option)
+                    //                 setSymbol(option.tokenSymbol + 'USD-' + option.optionSymbol + '-' + option.type)
+                    //                 onCloseBTC()
+                    //               }}
+                    //             >
+                    //               {option.tokenSymbol}-{option.optionSymbol}-{option.type}
+                    //               {option.type == "C" ?
+                    //                 <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#FA3C58" }}>$200 -3.4%</Col>
+                    //                 :
+                    //                 <Col span={6} style={{ fontSize: "0.75rem", float: "right", color: "#46E3AE" }}>$200 +3.4%</Col>
+                    //               }
+                    //             </div>
+                    //           ))}
+                    //         </div>
+                    //       </StyledDrawer>
+                    //     </div>
+                    //   </Col>
+                    // </Row>
+                    : null} */}
 
-                  {visibleETH ?
+                  {/* {visibleETH ?
                     <Row>
                       <Col>
                         <StyledDrawer
@@ -326,7 +422,7 @@ const Option = props => {
                           </div>
                         </StyledDrawer>
                       </Col>
-                    </Row> : null}
+                    </Row> : null} */}
                 </div>
 
               </div>
