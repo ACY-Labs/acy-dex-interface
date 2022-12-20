@@ -89,6 +89,8 @@ const OptionComponent = props => {
   const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
   const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const symbolMarkPrice = symbolInfo?.markPrice
+  const symbolMinTradeVolume = symbolInfo?.minTradeVolume
+  const minTradeVolume = ethers.utils.formatUnits(symbolMinTradeVolume,18)
     
   const getPercentageButton = value => {
     if (percentage != value) {
@@ -127,12 +129,20 @@ const OptionComponent = props => {
 
   useEffect(() => {
     let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(selectedTokenBalance, 18, 2)
-    setSelectedTokenValue(tokenAmount)
+    handleTokenValueChange(tokenAmount)
   }, [percentage])
 
   useEffect(() => {
     setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18, 2)).toFixed(2))
   }, [selectedTokenValue, selectedTokenPrice])
+
+  const handleTokenValueChange = (value) => {
+    if(value%minTradeVolume==0){
+      setSelectedTokenValue(value)
+    }else{
+      setSelectedTokenValue(Math.floor(value/minTradeVolume)*minTradeVolume)
+    } 
+  }
 
   ///////////// write contract /////////////
 
@@ -174,7 +184,8 @@ const OptionComponent = props => {
                     className={styles.optionInput}
                     value={selectedTokenValue}
                     onChange={e => {
-                      setSelectedTokenValue(e.target.value)
+                      // setSelectedTokenValue(e.target.value)
+                      handleTokenValueChange(e.target.value)
                       setShowDescription(true)
                     }}
                   />
