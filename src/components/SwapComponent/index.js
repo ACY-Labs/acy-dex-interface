@@ -29,10 +29,9 @@ const SwapComponent = props => {
   } = props;
   // 选择货币的弹窗
 
-  const { chainId } = useChainId();
+  // test on polygon
+  const chainId = 137;
   const INITIAL_TOKEN_LIST = getTokens(chainId);
-
-  const coinList = getGlobalTokenList()
 
   const [visible, setVisible] = useState(null);
 
@@ -433,12 +432,6 @@ const SwapComponent = props => {
     sti(status.hash);
   };
 
-  // const history = useHistory()
-  // useEffect(() => {
-  //   const hash = history.location.hash.replace('#', '').split('?')[0]
-  //   hash ? setToken0(coinList.filter(coin => coin.symbol.toLowerCase() == hash.toLowerCase())[0]) : setToken0(INITIAL_TOKEN_LIST[0])
-  // }, [history.location.hash, coinList])
-
   const onClickApprove = async () => {
     setShowSpinner(true);
     setApproveButtonStatus(false);
@@ -655,7 +648,7 @@ const SwapComponent = props => {
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
-      <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} />
+      <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} coinList={INITIAL_TOKEN_LIST}/>
 
     </div>
   );

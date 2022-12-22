@@ -27,17 +27,17 @@ const apiUrlPrefix = "https://stats.acy.finance/api"
 const Swap = props => {
   // const { farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
   const { account, library, active } = useWeb3React()
-  const { chainId } = useChainId();
-  const supportedTokens = getTokens(chainId);
+  
+  // test on polygon
+  const chainId = 137;
 
-  const [activeToken1, setActiveToken1] = useState(supportedTokens[3]);
-  const [activeToken0, setActiveToken0] = useState(supportedTokens[0]);
-  const [token0, setToken0] = useState('BTC')
-  const [token1, setToken1] = useState('USDT')
+  const [activeToken1, setActiveToken1] = useState({symbol: "USDC", address: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"});
+  const [activeToken0, setActiveToken0] = useState({symbol: "USDT", address: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"});
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
   const [transactionList, setTransactionList] = useState([]);
   const [tableContent, setTableContent] = useState('Trade History');
+  const [tradeHistory, setTradeHistory] = useState([])
 
   // useSWR hook example - needs further implementation in backend
   // const txListUrl = `${apiUrlPrefix}/txlist/all?`
@@ -66,7 +66,6 @@ const Swap = props => {
   ])
 
   useEffect(() => {
-    if (!supportedTokens) return
     setVisibleLoading(false);
     setVisibleConfirmOrder(false);
     setTransactionList([]);
@@ -156,9 +155,9 @@ const Swap = props => {
       let address1 = activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address
       let history = await axios.get(`${apiUrlPrefix}/rates?token0=${address0}&token1=${address1}&chainId=${chainId}`)
         .then((res) => res.data.rates)
-      
+        .catch((e) => [])
+      setTradeHistory(history)
     }
-
     getTradeHistory()
   }, [activeToken0, activeToken1]);
 
@@ -181,35 +180,6 @@ const Swap = props => {
   const showGraph = item => {
     setGraphType(item)
   }
-
-  const tradeHistory = [ // test
-    {
-      "timestamp": "1643432398",
-      "transaction": {
-        "id": "0xb2453cf50a8e2de3266e4f9c30f54014b6ce40c41245e75623f8836c0dfc186b",
-        "__typename": "Transaction"
-      },
-      "exchangeRate": "2546.4768322769583634178378858608",
-      "token0Price": "1",
-      "token1Price": "2546.4768322769583634178378858608",
-      "amount0": "-2770.124636",
-      "amount1": "1.09084353784001472",
-      "__typename": "NewSwap"
-    },
-    {
-      "timestamp": "1643432398",
-      "transaction": {
-        "id": "0x6aaa5f06a90e1d70e87ea1b69ff7d365976e420b9280814ed720012675e15c7f",
-        "__typename": "Transaction"
-      },
-      "exchangeRate": "2546.4768322769583634178378858608",
-      "token0Price": "1",
-      "token1Price": "2546.4768322769583634178378858608",
-      "amount0": "-3011.173734",
-      "amount1": "1.18558533109274368",
-      "__typename": "NewSwap"
-    }, 
-  ]
 
   const test_poolsActivity = [
     {
@@ -286,10 +256,10 @@ const Swap = props => {
                   <div>
                     <ExchangeTVChart
                       chartTokenSymbol={activeToken1.symbol}
-                      // chartTokenSymbol="BTC"
-                      pageName="Swap"
-                      fromToken={activeToken0.symbol}
-                      toToken={activeToken1.symbol}
+                      pageName="Trade"
+                      fromToken={activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address} 
+                      toToken={activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address}
+                      chainId={chainId}
                     />
                   </div>
                 }
