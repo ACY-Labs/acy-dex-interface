@@ -3,9 +3,7 @@ import AcyButton from '@/components/AcyButton';
 import AcyConnectWallet from '@/components/AcyConnectWallet';
 import AcyConnectWalletBig from '@/components/AcyConnectWalletBig';
 import AcyCard from '@/components/AcyCard';
-// import AcyPerpetualCard from '../AcyCard/perpetual';
-import AcyPerpetualCard from '@/components/PerpetualComponent/components/AcyPerpetualCard';
-import AcyPerpetualButton from '@/components/PerpetualComponent/components/AcyPerpetualButton';
+import ComponentButton from '../ComponentButton';
 import AcyPeriodTime from '@/components/AcyPeriodTime';
 import AcyTabs from '@/components/AcyTabs';
 import AcyCuarrencyCard from '@/components/AcyCuarrencyCard';
@@ -51,7 +49,6 @@ const Acy = {
     AcyConfirm,
     AcyApprove,
     AcyButton,
-    AcyPerpetualButton,
     AcyDescriptions,
     AcySmallButton,
     AcySeting,
@@ -73,7 +70,6 @@ export {
     AcyIcon,
     AcyConnectWallet,
     AcyCard,
-    AcyPerpetualCard,
     AcyPeriodTime,
     AcyCuarrencyCard,
     AcyConnectWalletBig,
@@ -85,7 +81,6 @@ export {
     AcyConfirm,
     AcyApprove,
     AcyButton,
-    AcyPerpetualButton,
     AcyDescriptions,
     AcySmallButton,
     AcySeting,

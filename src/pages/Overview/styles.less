@@ -58,7 +58,7 @@
 }
 
 #components-layout-demo-custom-trigger .trigger {
-    font-size: 18px;
+    
     line-height: 64px;
     padding: 0 16px;
     cursor: pointer;
@@ -146,13 +146,13 @@
 
         .label {
             color: #a9a9b0;
-            font-size: 15px;
+            
             opacity: 1;
         }
 
         .value {
             color: #a9a9b0;
-            font-size: 15px;
+            
             opacity: 1;
         }
     }
@@ -160,7 +160,7 @@
 
 .button {
     background: black;
-    width: 3.6rem;
+    min-width: 3.6rem;
     height: 1.8rem;
     font-size: 0.7rem;
     border: 1px solid #444444;
@@ -199,7 +199,7 @@
 // }
 
 .modalTitle {
-    font-size: 18px;
+    
     font-weight: 600;
     line-height: 52px;
     color: #b5b6b6;
@@ -359,8 +359,10 @@
             float: none;
         }
     }
+
     background-color: black !important;
-    font-family: "Karla", sans-serif;
+    font-family: "Karla",
+    sans-serif;
     font-size: 13px;
     font-weight: 100;
     height: 2.4rem;
@@ -371,7 +373,7 @@
         background-color: #323232 !important;
     }
 
-    
+
 }
 
 .pageSelector {
@@ -418,12 +420,74 @@
             margin-right: 10px;
             box-shadow: none;
         }
+
         .ant-select-selection-selected-value {
             float: none;
         }
     }
 }
-.networkFixed{
+
+.coin {
+    :global {
+        .ant-select-arrow {
+            color: white;
+        }
+
+        .ant-select-selection {
+            background-color: transparent;
+            border: 0.75px solid #232323;
+            border-radius: 5px;
+            height: 3rem;
+            width: 475px;
+            padding: 9px 0px;
+            font-size: 1rem;
+            font-weight: 200;
+            color: white;
+            overflow: inherit;
+            margin-right: 10px;
+            box-shadow: none;
+        }
+
+        .ant-select-auto-complete {
+            background-color: transparent;
+            border: 0.75px solid #232323;
+            border-radius: 5px;
+            height: 3rem;
+            width: 475px;
+            // padding: 9px 0px;
+            font-size: 1rem;
+            font-weight: 200;
+            color: white;
+            overflow: inherit;
+            margin-right: 10px;
+            box-shadow: none;
+        }
+
+        .ant-select-auto-complete.ant-select .ant-input:focus,
+        .ant-select-auto-complete.ant-select .ant-input:hover {
+            border-color: unset;
+            //   border-right-width: 1px !important;
+        }
+        .ant-select-dropdown-menu-item-active:not(.ant-select-dropdown-menu-item-disabled){
+            background:black ;
+        }
+        .ant-select-dropdown-menu-item{
+            background:black ;
+            color: #ffffff;
+        }
+        .ant-select-selection-selected-value {
+            float: none;
+        }
+        .ant-input-affix-wrapper .ant-input:not(:last-child) {
+            // background-color: black;
+            border: 0.75px solid #232323;
+            height: 3rem;
+        }
+
+    }
+}
+
+.networkFixed {
     border: 0.75px solid #232323;
     height: 3rem;
     line-height: 3rem;
@@ -445,7 +509,7 @@
             height: 1.9rem;
             width: 115px;
             padding: 2px 0px;
-            font-size: 15px;
+            
             font-weight: 200;
             color: white;
             overflow: inherit;
@@ -477,13 +541,13 @@
 .myModal {
     :global {
         .ant-modal-body {
-            height: 40rem !important;
+            min-height: 40rem !important;
             border-radius: 5px;
             background-color: black;
         }
 
         .ant-modal-content {
-            height: 40rem !important;
+            min-height: 40rem !important;
             background-color: black;
         }
     }

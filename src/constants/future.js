@@ -54,6 +54,13 @@ const tokenLists = {
             address: "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c",
             isShortable: true
         },
+        {
+            name: "Wrapped ETH",
+            symbol: "ETH",
+            decimals: 18,
+            address: "0xeBC8428DC717D440d5deCE1547456B115b868F0e",
+            isShortable: true
+        }
     ],
     97: [
         {

@@ -484,7 +484,6 @@ export function parseArbitrageLog({ data, topics }) {
   ];
   const iface = new Interface(eventABI);
   let parsedLogs = iface.parseLog({ data, topics }).args;
-  debugger
   const nonZeroToken = [];
   const nonZeroTokenAmount = [];
   console.log(parsedLogs);

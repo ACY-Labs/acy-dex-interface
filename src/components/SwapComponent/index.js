@@ -7,7 +7,8 @@ import { useConstantLoader, getGlobalTokenList } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { useChainId } from '@/utils/helpers';
 import { getTokens } from '@/constants/trade';
-import { AcyCuarrencyCard, AcyPerpetualButton, AcyDescriptions } from '@/components/Acy';
+import { AcyCuarrencyCard, AcyDescriptions } from '@/components/Acy';
+import ComponentButton from '../ComponentButton';
 import { Button, Input, Icon } from 'antd';
 import TokenSelectorDrawer from '../TokenSelectorDrawer';
 import DetailBox from './components/DetailBox';
@@ -653,13 +654,13 @@ const SwapComponent = props => {
         </div>
         :
         <div className={styles.centerButton}>
-          <AcyPerpetualButton
+          <ComponentButton
             style={{ marginTop: '25px' }}
             disabled={!swapButtonState}
             onClick={onConfirmationClick}
           >
             {swapButtonContent}
-          </AcyPerpetualButton>
+          </ComponentButton>
         </div>
       }
 

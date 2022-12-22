@@ -1,8 +1,8 @@
 import { Card } from 'antd';
 import { Children } from 'react';
 import className from 'classnames';
-import styles from './index.less';
-const AcyPerpetualCard = ({ className: styledClassName, ...props }) => {
+import styles from './styles.less';
+const ComponentCard = ({ className: styledClassName, ...props }) => {
     const { max } = props;
     return <Card
         {...props}
@@ -24,4 +24,4 @@ const AcyPerpetualCard = ({ className: styledClassName, ...props }) => {
         {props.children}
     </Card>
 }
-export default AcyPerpetualCard;
+export default ComponentCard;

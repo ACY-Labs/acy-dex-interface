@@ -12,7 +12,7 @@ import SwapComponent from './components/stableCoinComponent';
 import { APYtable } from './components/apytable';
 import { AccountBox } from './components/accountBox';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import PerpetualTabs from '@/components/PerpetualComponent/components/PerpetualTabs';
+import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { ethers } from 'ethers'
 import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
@@ -167,7 +167,7 @@ const StableCoin = props => {
             <div>
 
               <div className={styles.chartTokenSelectorTab}>
-                <PerpetualTabs
+                <ComponentTabs
                   option={kChartTab}
                   options={kChartTabs}
                   onChange={selectChart}

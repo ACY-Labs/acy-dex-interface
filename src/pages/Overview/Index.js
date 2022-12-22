@@ -1,6 +1,6 @@
 import { useWeb3React } from '@web3-react/core';
 import { StylesContext } from '@material-ui/styles';
-import { Layout, Menu, Row, Col, Button, Modal, Input, Select, Divider, Table } from 'antd';
+import { Layout, Menu,AutoComplete, Row, Col, Button, Modal, Input, Select, Divider, Table } from 'antd';
 import React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -8,7 +8,7 @@ import { useConstantLoader } from '@/constants';
 import { useChainId } from '@/utils/helpers';
 
 import Icon from '@ant-design/icons'
-import { AcyPerpetualButton, AcyModal, AcyCardList, AcyIcon } from '@/components/Acy';
+import { AcyModal, AcyCardList, AcyIcon } from '@/components/Acy';
 import {
     DownOutlined,
     DisconnectOutlined,
@@ -143,13 +143,13 @@ const Overview = props => {
     const getTokenImg = token => {
         return tokenImgURL[token.name]
     }
-    
+
 
     const getPrimaryText = () => {
         if (account == undefined) {
             return "Connect Wallet"
         } else {
-            return 'Confirm'
+            return currentTransaction;
         }
     }
 
@@ -368,6 +368,8 @@ const Overview = props => {
             ]
         },
     ];
+    const dataSource = [account];
+
     const getChildColumns = (pageName) => {
         const childColumns = [
             {
@@ -449,7 +451,7 @@ const Overview = props => {
         ];
         return childColumns
     }
-    
+
 
     return (
         <div className={styles.main}>
@@ -458,7 +460,7 @@ const Overview = props => {
                     onCancel={handleCancel}
                     visible={isModalOpen}
                     className={styles.myModal}
-                    style={{ backgroundColor: "black", height: "35rem", borderRadius: "5px" }}
+                    style={{ backgroundColor: "black", minHeight: "35rem", borderRadius: "5px" }}
                 >
                     <div className={styles.modalTitle} style={{ fontSize: "1.8rem", fontWeight: "bold" }}> {currentTransaction} </div>
                     <Divider style={{ height: "0.75px", margin: "10px 0px 6px", background: "#444444" }} />
@@ -538,7 +540,10 @@ const Overview = props => {
                                     : currentTransaction == "Withdraw" ?
                                         <div> <Row style={{ marginTop: "1rem", marginBottom: "10px" }}> Withdraw from </Row> </div>
                                         :
-                                        <div> <Row style={{ marginTop: "1rem", marginBottom: "10px" }}> Send to </Row> </div>
+                                        <div> <Row style={{ marginTop: "1rem", marginBottom: "10px" }}> Send from </Row> </div>
+                                }
+                                {
+
                                 }
                                 <div className={styles.networkSelector}>
 
@@ -559,32 +564,84 @@ const Overview = props => {
 
                             </div>
                         }
-
+                        {
+                            currentTransaction == "Withdraw" &&
+                            <div>
+                                <Row style={{ marginTop: "1rem", marginBottom: "10px" }}>Withdraw to  address </Row>
+                                <Row>
+                                    <div className={styles.coin} >
+                                        <Input />
+                                    </div>
+                                </Row>
+                            </div>
+                        }
+                        {
+                            currentTransaction == "Send" &&
+                            <div>
+                                <Row style={{ marginTop: "1rem", marginBottom: "10px" }}>Send to  address </Row>
+                                <Row>
+                                    <div className={styles.coin} >
+                                        <Input />
+                                    </div>
+                                </Row>
+                            </div>
+                        }
+                        <Row style={{ fontSize: "1rem", marginTop: "1rem", backgroundColor: "black" }}>Coin</Row>
+                        <Row>
+                            <div className={styles.coin} >
+                                <Select
+                                    // defaultValue="Trade"
+                                    value={activeToken}
+                                    onChange={selectToken}
+                                    dropdownClassName={styles.dropDownMenu}
+                                >
+                                    {activeTokenList.map(token => (
+                                        <Option className={styles.optionItem} value={token.symbol}>
+                                            <Col span={10}> <img src={tokenImgURL[token.symbol]} style={{ width: '20px', height: '20px' }} /></Col>
+                                            <Col offset={1} span={13}> <div> {token.symbol}</div> </Col>
+                                        </Option>
+                                    ))}
+                                </Select>
+                            </div>
+                        </Row>
                         <Row style={{ fontSize: "1rem", marginTop: "1rem", backgroundColor: "black" }}>Amount</Row>
                         <Row>
                             <div className={styles.tokenAmount} >
+                                {/* <Select
+                                    // defaultValue="Select Token"
+                                    value={activeToken}
+                                    onChange={selectToken}
+                                    dropdownClassName={styles.dropDownMenu}
+                                >
+                                    {activeTokenList.map(token => (
+                                        <Option className={styles.optionItem} value={token.symbol}>
+                                            <Col span={10}> <img src={tokenImgURL[token.symbol]} style={{ width: '20px', height: '20px' }} /></Col>
+                                            <Col offset={1} span={13}> <div> {token.symbol}</div> </Col>
+                                        </Option>
+                                    ))}
+                                </Select> */}
                                 <Input
                                     value={0}
                                     onChange={e => {
 
                                     }}
-                                    suffix={
-                                        <div className={styles.tokenSelector}>
-                                            <Select
-                                                // defaultValue="Select Token"
-                                                value={activeToken}
-                                                onChange={selectToken}
-                                                dropdownClassName={styles.dropDownMenu}
-                                            >
-                                                {activeTokenList.map(token => (
-                                                    <Option className={styles.optionItem} value={token.symbol}>
-                                                        <Col span={10}> <img src={tokenImgURL[token.symbol]} style={{ width: '20px', height: '20px' }} /></Col>
-                                                        <Col offset={1} span={13}> <div> {token.symbol}</div> </Col>
-                                                    </Option>
-                                                ))}
-                                            </Select>
-                                        </div>
-                                    }
+                                    // suffix={
+                                    //     <div className={styles.tokenSelector}>
+                                    //         <Select
+                                    //             // defaultValue="Select Token"
+                                    //             value={activeToken}
+                                    //             onChange={selectToken}
+                                    //             dropdownClassName={styles.dropDownMenu}
+                                    //         >
+                                    //             {activeTokenList.map(token => (
+                                    //                 <Option className={styles.optionItem} value={token.symbol}>
+                                    //                     <Col span={10}> <img src={tokenImgURL[token.symbol]} style={{ width: '20px', height: '20px' }} /></Col>
+                                    //                     <Col offset={1} span={13}> <div> {token.symbol}</div> </Col>
+                                    //                 </Option>
+                                    //             ))}
+                                    //         </Select>
+                                    //     </div>
+                                    // }
                                     style={{ height: "2rem" }}
                                 />
                             </div>

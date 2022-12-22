@@ -349,7 +349,6 @@ export const useConstantLoader = () => {
 
     // // chainId 有更动时，url 显示的 chainId 也应该修改
     // useEffect(() => {
-    //     // debugger;
     //     changeUrlChainId()
     //     // console.log("current chainId: " , history.location);
     //   }, [chainId])
