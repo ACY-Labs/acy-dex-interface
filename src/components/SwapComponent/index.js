@@ -14,23 +14,34 @@ import TokenSelectorDrawer from '../TokenSelectorDrawer';
 import DetailBox from './components/DetailBox';
 import ScoreBox from './components/ScoreBox';
 import styles from './styles.less';
+import mockTokenList from './mockTokenList.json';
+import axios from 'axios';
+import { useWeb3React } from '@web3-react/core';
 
 
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
-  const { account, library, farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
+  const { account,library } = useWeb3React();
+  const { farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
   const {
     dispatch,
     onSelectToken0,
     onSelectToken1,
     onSelectToken,
-    token,
-    isLockedToken1=false
+    token0,
+    token1,
+    setActiveToken0:setToken0,
+    setActiveToken1:setToken1,
+    isLockedToken1=false,
+    tokenlist:INITIAL_TOKEN_LIST,
+    setTokenlist,
   } = props;
   // 选择货币的弹窗
 
   const { chainId } = useChainId();
-  const INITIAL_TOKEN_LIST = getTokens(chainId);
+  
+  // let INITIAL_TOKEN_LIST = getTokens(chainId);
+  // INITIAL_TOKEN_LIST = getTokenList(chainId);
 
   const coinList = getGlobalTokenList()
 
@@ -40,9 +51,9 @@ const SwapComponent = props => {
   const [before, setBefore] = useState(true);
 
   // 交易对前置货币
-  const [token0, setToken0] = useState(INITIAL_TOKEN_LIST[0]);
-  // 交易对后置货币
-  const [token1, setToken1] = useState(INITIAL_TOKEN_LIST[3]);
+  // const [token0, setToken0] = useState(INITIAL_TOKEN_LIST[0]);
+  // // 交易对后置货币
+  // const [token1, setToken1] = useState(INITIAL_TOKEN_LIST[3]);
 
   // 交易对前置货币余额
   const [token0Balance, setToken0Balance] = useState('0');
@@ -103,6 +114,15 @@ const SwapComponent = props => {
   useEffect(() => {
     if (!INITIAL_TOKEN_LIST) return
     console.log("resetting page states, new swapComponent token0, token1", INITIAL_TOKEN_LIST[0], INITIAL_TOKEN_LIST[1])
+    let temp = axios.get("https://stats.acy.finance/api/tokens?chainId=56"
+    ).then((res)=>{
+      temp = res.data;
+      if(temp.length!=0){
+        console.log("Token1Temp",temp)
+        setTokenlist(temp);
+      }
+      return res.data;
+    })
     setVisible(null);
     // 选择货币前置和后置
     setBefore(true);
@@ -195,7 +215,7 @@ const SwapComponent = props => {
         e => console.log("refrersh balances error", e)
       }
     },
-    [account, INITIAL_TOKEN_LIST]
+    [account]
   );
 
   // token1Amount is changed according to token0Amount
@@ -291,6 +311,7 @@ const SwapComponent = props => {
 
   useEffect(
     async () => {
+      // console.log("t0change")
       await t0Changed(token0Amount);
     },
     [
@@ -306,6 +327,7 @@ const SwapComponent = props => {
 
   useEffect(
     async () => {
+      // console.log("t1change")
       await t1Changed(token1Amount);
     },
     [
@@ -501,26 +523,25 @@ const SwapComponent = props => {
       <AcyCuarrencyCard
         icon="eth"
         title={token0BalanceShow && `Balance: ${parseFloat(token0Balance).toFixed(3)}`}
-        coin={(token0 && token0.symbol) || 'Select'}
+        coin={(token0 && token0) || 'Select'}
         logoURI={token0 && token0.logoURI}
         yuan="566.228"
         dollar={`${token0Balance}`}
         token={token0Amount}
         bonus={!exactIn && bonus0}
-        showBalance={token1BalanceShow}
+        showBalance={token0BalanceShow}
         onChoseToken={() => {
           onClickCoin();
           setBefore(true);
         }}
         onChangeToken={e => {
           setShowDescription(true);
-          setToken0Amount(e);
           setExactIn(true);
-          console.log("current t0 amount", e)
-          t0Changed(e);
           props.showGraph("Routes")
         }}
         library={library}
+        setTokenAmount={setToken0Amount}
+        amountChanged={t0Changed}
       />
 
       <div
@@ -539,7 +560,7 @@ const SwapComponent = props => {
       <AcyCuarrencyCard
         icon="eth"
         title={token1BalanceShow && `Balance: ${parseFloat(token1Balance).toFixed(3)}`}
-        coin={(token1 && token1.symbol) || 'Select'}
+        coin={(token1 && token1) || 'Select'}
         logoURI={token1 && token1.logoURI}
         yuan="566.228"
         dollar={`${token1Balance}`}
@@ -553,14 +574,14 @@ const SwapComponent = props => {
         onChangeToken={e => {
           // setToken1ApproxAmount(e);
           setShowDescription(true)
-          setToken1Amount(e);
           setExactIn(false);
           console.log("test exactin and bonus1", exactIn, bonus0)
           console.log("current token1amount", e)
-          t1Changed(e);
         }}
         isLocked={isLockedToken1}
         library={library}
+        setTokenAmount={setToken1Amount}
+        amountChanged={t1Changed}
       />
 
       {showDescription ?
@@ -655,7 +676,7 @@ const SwapComponent = props => {
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
-      <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} />
+      <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} coinlist={INITIAL_TOKEN_LIST}/>
 
     </div>
   );

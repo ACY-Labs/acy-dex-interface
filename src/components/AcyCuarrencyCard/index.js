@@ -4,7 +4,8 @@ import AcyIcon from '@/components/AcyIcon';
 import styles from './index.less';
 import classname from 'classnames';
 import Pattern from '@/utils/pattern';
-import { getAllSupportedTokensPrice } from '@/acy-dex-swap/utils';
+import { getAllSupportedTokensPrice,getTokenPrice } from '@/acy-dex-swap/utils';
+import { useChainId } from '@/utils/helpers';
 
 const AcyCuarrencyCard = ({
   title,
@@ -15,6 +16,8 @@ const AcyCuarrencyCard = ({
   dollar,
   onChoseToken,
   onChangeToken,
+  setTokenAmount,
+  amountChanged,
   token,
   isLocked,
   inputColor,
@@ -22,13 +25,33 @@ const AcyCuarrencyCard = ({
   onClickTitle,
   ...rest
 }) => {
+  const { chainId } = useChainId();
   const [light, setLight] = useState(false);
+  const [tokenPrice,setTokenPrice] = useState(0);
+  const [tokenDisplayAmount,setTokenDisplayAmount] = useState(0);
   const onChange = e => {
+    console.log("A",e.target.value);
     const check = Pattern.coinNum.test(e.target.value);
     if (check) {
       onChangeToken && onChangeToken(e.target.value);
+      // setTokenAmount(e.target.value);
+      setTokenDisplayAmount(e.target.value);
     }
+    console.log("B",e.target.value)
   };
+
+  useEffect(()=>{
+    const timeoutId = setTimeout(()=>{
+      setTokenAmount(tokenDisplayAmount)
+      amountChanged(tokenDisplayAmount)
+    },1500)
+    return ()=>clearTimeout(timeoutId)
+  },[tokenDisplayAmount])
+
+  useEffect(()=>{
+    setTokenDisplayAmount(token)
+  },[token])
+
   const onBlur = () => {
     setLight(false);
   };
@@ -38,19 +61,22 @@ const AcyCuarrencyCard = ({
   };
 
   const [usdValue, setUsdValue] = useState(null);
-  useEffect(async () => {
-    if (token == 0)
-      setUsdValue(0);
-    else if (!token)
-      setUsdValue(null);
-
-    const tokenPriceList = await getAllSupportedTokensPrice();
-    const tokenPrice = tokenPriceList[coin];
-    const tokenAmountUSD = tokenPrice * token;
-    setUsdValue(tokenAmountUSD.toFixed(2));
+  // get token price from backend
+  useEffect(async()=>{
+    const _tokenPrice = await getTokenPrice(coin.address,chainId)
+    setTokenPrice(_tokenPrice)
     console.log("tokenprice, token", tokenPrice, token)
-    console.log("test token price: ", coin, tokenPrice);
-  }, [coin, token])
+  },[coin])
+  // calculate usd value when user input token amount
+  useEffect(async () => {
+    if (tokenDisplayAmount == 0)
+      setUsdValue(0);
+    else if (!tokenDisplayAmount)
+      setUsdValue(null);
+    const tokenAmountUSD = tokenPrice * tokenDisplayAmount;
+    setUsdValue(tokenAmountUSD.toFixed(2));
+    console.log("UsdValue",usdValue)
+  }, [coin, tokenDisplayAmount])
 
   const inputRef = React.createRef();
   return (
@@ -69,14 +95,14 @@ const AcyCuarrencyCard = ({
               style={{ color: inputColor }}
               placeholder="0.0"
               bordered={false}
-              value={token}
+              value={tokenDisplayAmount}
               onChange={onChange}
             />
           <button className={styles.switchcoin} onClick={onChoseToken} disabled={isLocked}>
             <span className={styles.wrap}>
               <div className={styles.coin}>
                 <img src={logoURI} style={{ width: '24px', marginRight: '0.5rem' }} />
-                <span style={{ margin: '0px 0.25rem' }}>{coin}</span>
+                <span style={{ margin: '0px 0.25rem' }}>{coin.symbol}</span>
               </div>
               {!isLocked && (
                 <AcyIcon.MyIcon type="triangleGray" width={10} />

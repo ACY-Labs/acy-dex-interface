@@ -1,0 +1,70 @@
+.nobgTable {
+  :global {
+    .ant-table-placeholder {
+      background: transparent !important;
+    }
+
+    .ant-table-thead>tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected)>td,
+    .ant-table-tbody>tr.ant-table-row-hover:not(.ant-table-expanded-row):not(.ant-table-row-selected)>td,
+    .ant-table-thead>tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected)>td,
+    .ant-table-tbody>tr:hover:not(.ant-table-expanded-row):not(.ant-table-row-selected)>td {
+      background: transparent !important;
+      // cursor: pointer;
+    }
+
+    .ant-table-thead>tr {
+      background: transparent !important;
+    }
+
+    .ant-table-tbody>tr {
+      background: transparent !important;
+
+      &:hover {
+        background: #222222 !important;
+      }
+    }
+
+    .ant-table-thead>tr>th {
+      text-align: left !important;
+      background: transparent !important;
+    }
+
+    .ant-table-footer {
+      background: transparent !important;
+    }
+
+    .ant-table-tbody>tr {
+      &:active {
+        background: #2f3135 !important;
+      }
+    }
+  }
+}
+
+.tableHeader,
+.tableHeaderFirst {
+  cursor: pointer;
+}
+
+.tableHeader:hover,
+.tableHeaderFirst:hover {
+  color: #e29227;
+}
+
+.tableData {
+  text-align: left;
+}
+
+.tableDataFirstColumn {
+  text-align: left;
+  display: flex;
+  align-items: center;
+}
+
+.function{
+  height: 20px;
+  &:hover {
+    fill: white;
+    cursor: pointer;
+  }
+}
