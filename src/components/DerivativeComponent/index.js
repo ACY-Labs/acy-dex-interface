@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Input, Button } from 'antd';
 import useSWR from 'swr'
+import { ethers } from 'ethers';
 import { INITIAL_ALLOWED_SLIPPAGE, getTokens, getContract } from '@/constants/future_option_power.js';
 import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from '@/components/ConnectWallet';
@@ -81,6 +82,7 @@ const DerivativeComponent = props => {
   const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
   const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const symbolMarkPrice = symbolInfo?.markPrice
+  const symbolMinTradeVolume = symbolInfo?.minTradeVolume
 
   const getPrimaryText = () => {
     if (!active) {
@@ -99,12 +101,21 @@ const DerivativeComponent = props => {
 
   useEffect(() => {
     let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(selectedTokenBalance, 18, 2)
-    setSelectedTokenValue(tokenAmount)
+    handleTokenValueChange(tokenAmount)
   }, [percentage])
 
   useEffect(() => {
     setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18, 2)).toFixed(2))
   }, [selectedTokenValue, selectedTokenPrice])
+
+  const handleTokenValueChange = (value) => {
+    const minTradeVolume = ethers.utils.formatUnits(symbolMinTradeVolume, 18)
+    if(value%minTradeVolume==0){
+      setSelectedTokenValue(value)
+    }else{
+      setSelectedTokenValue(Math.floor(value/minTradeVolume)*minTradeVolume)
+    }
+  }
 
   ///////////// write contract /////////////
 
@@ -146,7 +157,8 @@ const DerivativeComponent = props => {
                     className={styles.optionInput}
                     value={selectedTokenValue}
                     onChange={e => {
-                      setSelectedTokenValue(e.target.value)
+                      // setSelectedTokenValue(e.target.value)
+                      handleTokenValueChange(e.target.value)
                       setShowDescription(true)
                     }}
                   />
