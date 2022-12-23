@@ -17,7 +17,7 @@ import { processString } from "@/components/AcyCoinItem";
 import styles from "./styles.less";
 import { useConstantLoader, getGlobalTokenList } from '@/constants';
 
-const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,placement='right' }) => {
+const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList, placement='right', activeSymbol, selectSymbol, setActiveSymbol }) => {
   const { account, library, chainId } = useConstantLoader();
 
   // const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
@@ -183,8 +183,8 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,
                   <AcyCoinItem
                     data={supToken}
                     key={index}
-                    selectToken={() => {
-                      onCoinClick(supToken);
+                    selectToken={(item) => {
+                      setActiveSymbol(item.name)                    
                     }}
                     customIcon={false}
                     index={index}
@@ -202,8 +202,8 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,
                       key={index}
                       customIcon={false}
                       clickCallback={() => setTokenAsFav(token)}
-                      selectToken={() => {
-                        onCoinClick(token);
+                      selectToken={(item) => {
+                        setActiveSymbol(item.name)
                       }}
                       isFav={favTokenList.includes(token)}
                       constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}

@@ -64,7 +64,7 @@ import OrderTable from './components/OrderTable'
 /// THIS SECTION IS FOR TESTING SWR AND GMX CONTRACT
 import { fetcher } from '@/acy-dex-futures/utils';
 // import PositionRouter from "@/acy-dex-futures/abis/PositionRouter.json";
-import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
+import Reader from '@/abis/future-option-power/Reader.json'
 import Router from '@/acy-dex-futures/abis/Router.json'
 import Vault from '@/acy-dex-futures/abis/Vault.json'
 // import VaultV2 from '@/acy-dex-futures/abis/VaultV2.json'
@@ -111,7 +111,8 @@ import {
 } from '@/pages/Stats/Perpetual/test'
 
 import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract, getTokenBySymbol, getTokenByAddress } from '@/constants/future.js';
+import { getContract } from '@/constants/future_option_power.js';
+import { getTokens, getTokenBySymbol, getTokenByAddress } from '@/constants/future.js';
 import { leftPad } from 'web3-utils';
 
 let indexToken = []
@@ -264,10 +265,11 @@ const Swap = props => {
   const { savedIsPnlInLeverage, setSavedIsPnlInLeverage, savedSlippageAmount, pendingTxns, setPendingTxns } = props
   const { account, library, active } = useWeb3React();
   let { chainId } = useChainId();
-  const tokensperp = getTokens(chainId);
-  console.log("test chainId perpetual page", chainId, tokensperp)
+  console.log("future symbol chainid", chainId)
+  // const tokensperp = getTokens(chainId);
+  // console.log("test chainId perpetual page", chainId, tokensperp)
 
-  const supportedTokens = tokensperp;
+  // const supportedTokens = tokensperp;
 
   //// ui tab
   const defaultTokenSelection = useMemo(() => ({
@@ -329,14 +331,15 @@ const Swap = props => {
   /// get contract addresses
   // TODO: update and remove unused contracts
   // required contracts: router (add/remove liquidity, add/remove margin), pool (trade), reader
-  const readerAddress = getContract(chainId, "Reader")
-  const vaultAddress = getContract(chainId, "Vault")
+  const readerAddress = getContract(chainId, "reader")
+  // const vaultAddress = getContract(chainId, "Vault")
   const usdgAddress = getContract(chainId, "USDG")
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
   const routerAddress = getContract(chainId, "Router")
   const glpManagerAddress = getContract(chainId, "GlpManager")
   const glpAddress = getContract(chainId, "GLP")
   const orderBookAddress = getContract(chainId, "OrderBook")
+  const poolAddress = getContract(chainId, "pool")
 
   //---------- FOR TESTING 
   // const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
@@ -350,9 +353,9 @@ const Swap = props => {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
   })
 
-  const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([chainId, vaultAddress, "totalTokenWeights"], {
-    fetcher: fetcher(library, Vault),
-  })
+  // const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([chainId, vaultAddress, "totalTokenWeights"], {
+  //   fetcher: fetcher(library, Vault),
+  // })
 
   const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
     fetcher: fetcher(library, Glp),
@@ -414,16 +417,29 @@ const Swap = props => {
   const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR(account && [`GlpSwap:lastPurchaseTime:${active}`, chainId, glpManagerAddress, "lastAddedAt", account], {
     fetcher: fetcher(library, GlpManager),
   })
+  const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
+    fetcher: fetcher(library, Reader)
+  });
+  console.log("future symbol symbolInfo:", symbolsInfo)
+
+  const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
+  console.log("future symbol future_tokens:", future_tokens)
+  let future_tokens_symbol = []
+  future_tokens?.forEach(ele=>future_tokens_symbol.push(ele[1]) )  
+  console.log("future symbol future_tokens_symbol:", future_tokens_symbol)
+
+
 
   useEffect(() => {
     if (active) {
       library.on('block', () => {
         // updatePositionData(undefined, true)
         updateTokenBalances(undefined, true)
-        updateTotalTokenWeights(undefined, true)
+        // updateTotalTokenWeights(undefined, true)
         updateUsdgSupply(undefined, true)
         updateOrderBookApproved(undefined, true)
         updateLastPurchaseTime(undefined, true)
+        updateSymbolsInfo(undefined, true)
       })
       return () => {
         library.removeAllListeners('block')
@@ -432,10 +448,11 @@ const Swap = props => {
   }, [active, library, chainId,
     // updatePositionData,
     updateTokenBalances,
-    updateTotalTokenWeights,
+    // updateTotalTokenWeights,
     updateUsdgSupply,
     updateOrderBookApproved,
-    updateLastPurchaseTime]
+    updateLastPurchaseTime,
+    updateSymbolsInfo]
   )
 
   const refContainer = useRef();

@@ -160,7 +160,7 @@ const Powers = props => {
     setVisibleMATIC(false);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
   }, [tokens])
 
@@ -170,7 +170,7 @@ const Powers = props => {
     setLatestPrice(curPrice);
     setPpriceChangePercentDelta(change);
   }
-  
+
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
@@ -186,7 +186,7 @@ const Powers = props => {
               // latestPrice={latestPrice}
               // latestPricePercentage={priceChangePercentDelt
               coinList={coinList}
-              latestPriceColor={priceChangePercentDelta*1>= 0 && '#0ecc83' ||'#fa3c58'}
+              latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
               latestPrice={latestPrice}
               latestPricePercentage={priceChangePercentDelta}
             />
