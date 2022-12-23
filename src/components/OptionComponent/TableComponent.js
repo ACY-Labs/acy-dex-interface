@@ -3,6 +3,7 @@ import className from 'classnames';
 import { Divider, Icon, Input, Table, Button, Dropdown } from 'antd';
 import { AcyIcon, AcyTabs, AcyTokenIcon, AcyCardList } from '@/components/Acy';
 import {ClosePositionModal} from '@/components/ClosePositionModal';
+import {formatNumber} from '@/acy-dex-futures/utils'
 
 import styles from './TableComponent.less'
 
@@ -85,7 +86,8 @@ export function PositionTable(props){
             dataIndex: 'entryPrice',
             // key: 'entryPrice',
             render: (text, entry) => {
-            return <div className={styles.tableData}>{entry.entryPrice}</div>;
+                // let res = formatNumber(entry.entryPrice)
+                return <div className={styles.tableData}>{entry.entryPrice}</div>;
             },
             visible: true,
         },
@@ -101,7 +103,8 @@ export function PositionTable(props){
             dataIndex: 'markPrice',
             // key: 'markPrice',
             render: (text, entry) => {
-            return <div className={styles.tableData}>{entry.markPrice}</div>;
+                let res = formatNumber(entry.markPrice)
+                return <div className={styles.tableData}>{res}</div>;
             },
             visible: true,
         },
@@ -117,7 +120,8 @@ export function PositionTable(props){
             dataIndex: 'marginUsage',
             // key: 'marginUsage',
             render: (text, entry) => {
-            return <div className={styles.tableData}>{entry.marginUsage}</div>;
+                let res = formatNumber(entry.marginUsage)
+                return <div className={styles.tableData}>{res}</div>;
             },
             visible: true,
         },
@@ -133,7 +137,8 @@ export function PositionTable(props){
             dataIndex: 'unrealizedPnl',
             // key: 'unrealizedPnl',
             render: (text, entry) => {
-            return <div className={styles.tableData}>{entry.unrealizedPnl}</div>;
+                let res = formatNumber(entry.unrealizedPnl)
+                return <div className={styles.tableData}>{res}</div>;
             },
             visible: true,
         },

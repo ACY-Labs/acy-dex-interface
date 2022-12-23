@@ -90,7 +90,7 @@ const OptionComponent = props => {
   const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const symbolMarkPrice = symbolInfo?.markPrice
   const symbolMinTradeVolume = symbolInfo?.minTradeVolume
-  const minTradeVolume = ethers.utils.formatUnits(symbolMinTradeVolume,18)
+  const minTradeVolume = symbolMinTradeVolume?ethers.utils.formatUnits(symbolMinTradeVolume,18):0.001
     
   const getPercentageButton = value => {
     if (percentage != value) {

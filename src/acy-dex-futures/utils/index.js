@@ -2073,3 +2073,48 @@ function getToken(address) {
   }
   return supportedTokens[0]
 }
+
+export function formatNumber(number){
+  number = number.toLocaleString('fullwide', {useGrouping:false})
+  let negative = false;
+  if (number<0){
+    negative = true;
+    number = -number;
+  }
+  let dict = {1:"₁",3:"₃",4:"₄",5:"₅",6:"₆",7:"₇",8:"₈",9:"₉",11:"₁₁",13:"₁₃"}
+  let text = number.toString();
+  let result = 0
+  if(parseFloat(text)<0.001){  //0.00000123456
+    let oriLen = text.length; //13
+    let pattern = /0\.0{3,}(.*)/i;
+    let digitPart = text.match(pattern)[1]; //123456
+    let digitLen = digitPart.length;  //6
+    let zeroLen = oriLen-digitLen-2;  //13-6-2=5
+    let temp = text*10**zeroLen;  //0.964789
+    let digit = temp.toPrecision(4)*10000  //9648
+    console.log("zero",zeroLen,typeof(zeroLen))
+    console.log("small",dict[zeroLen])
+    result = "0.0"+dict[zeroLen]+digit
+  }else if(parseFloat(text)<1){  //0.0123456
+    let oriLen = text.length;  //9
+    let pattern = /0\.0{0,}(.*)/i;
+    let digitPart = text.match(pattern)[1];  //123456
+    let digitLen = digitPart.length;  //6
+    let zeroLen = oriLen-digitLen-1;  //9-6-1=2
+    result = parseFloat(text).toPrecision(6-zeroLen);  //0.01234
+  }else if(parseFloat(text)<100000){ //1289.345
+    let sixDigit = parseFloat(text).toPrecision(6);  //1289.34
+    let pattern = /.*\.(.*)/i;
+    let decimalPart = sixDigit.toString().match(pattern)[1];  //34
+    let digitPart = parseFloat(sixDigit).toFixed(0);  //1289
+    let digit = digitPart.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");  //1,289
+    result = digit+"."+decimalPart;  //1,289.34
+  }else{
+    let digit = parseFloat(text).toFixed(0);  //123456789
+    result = digit.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");  //123,456,789
+  }
+  if(negative){
+    result = "-"+result
+  }
+  return result
+}
