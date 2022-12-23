@@ -83,6 +83,7 @@ const DerivativeComponent = props => {
   const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const symbolMarkPrice = symbolInfo?.markPrice
   const symbolMinTradeVolume = symbolInfo?.minTradeVolume
+  const minTradeVolume = symbolMinTradeVolume?ethers.utils.formatUnits(symbolMinTradeVolume, 18):0.001
 
   const getPrimaryText = () => {
     if (!active) {
@@ -109,7 +110,6 @@ const DerivativeComponent = props => {
   }, [selectedTokenValue, selectedTokenPrice])
 
   const handleTokenValueChange = (value) => {
-    const minTradeVolume = ethers.utils.formatUnits(symbolMinTradeVolume, 18)
     if(value%minTradeVolume==0){
       setSelectedTokenValue(value)
     }else{
