@@ -6,44 +6,88 @@ import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import * as Api from '@/acy-dex-futures/Api';
-import { fetcher, bigNumberify } from '@/acy-dex-futures/utils';
-import { useWeb3React } from '@web3-react/core';
+import { fetcher,getProvider, bigNumberify } from '@/acy-dex-futures/utils';
 import { useConstantLoader } from '@/constants';
-import { ethers } from 'ethers'
-import useSWR from 'swr'
+import { BigNumber, ethers } from 'ethers'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
 import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
 import styled from "styled-components";
-import styles from './styles.less';
-import AcyOptionDrawer from '@/components/AcyOptionDrawer';
-import Reader from '@/abis/future-option-power/Reader.json';
-import { set } from '@umijs/deps/compiled/lodash';
+import styles from './styles.less'
+import { PositionTable } from '@/components/OptionComponent/TableComponent';
 
+import Reader from '@/abis/future-option-power/Reader.json'
+import useSWR from 'swr'
+import { useWeb3React } from '@web3-react/core';
+   
+function safeDiv(a, b) {
+    return b==0 ? 0 : a/b;
+}
 
-const StyledDrawer = styled(Drawer)`
-  .ant-drawer{
-    border-radius: 0px;
-    border: 0.75px solid #232323;
+export function getPosition(rawPositionData,symbolData) {
+  if (!rawPositionData || !symbolData) {
+    return
   }
-  .ant-drawer-header{
-    background-color: black;
-    // border-bottom: 0.75px solid #232323;
+  let positionQuery = []
+  for(let i = 0; i < rawPositionData.positions.length; i++){
+    const temp = rawPositionData.positions[i]
+    const volume = ethers.utils.formatUnits(temp[2], 18)
+    if (volume!=0){
+
+      const markPrice = symbolData.find(obj => {
+        return obj.address === temp[0]
+      }).markPrice
+      const initialMarginRatio = symbolData.find(obj => {
+        return obj.address === temp[0]
+      }).initialMarginRatio
+      const indexPrice = symbolData.find(obj => {
+        return obj.address === temp[0]
+      }).indexPrice
+      
+      const cost = ethers.utils.formatUnits(temp.cost,18)
+      const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume,18)
+      const marginUsage = Math.abs(volume * indexPrice) * initialMarginRatio
+      const unrealizedPnl = volume * indexPrice - cost
+      const accountFunding = cumulativeFundingPerVolume * volume
+
+      const position = {
+        symbol: temp[1],
+        address: temp[0],
+        position: volume,
+        entryPrice: safeDiv(cost,volume),
+        markPrice: markPrice,
+        marginUsage: marginUsage,
+        unrealizedPnl: unrealizedPnl,
+        accountFunding: accountFunding,
+        type: volume>=0?"Long":"Short",
+      };
+      positionQuery.push(position)
+    }
   }
-  .ant-drawer-content{
-    background-color: black;
-    border: 0.75px solid #232323;
-    
+  return positionQuery;
+}
+
+export function getSymbol(rawSymbolData){
+  if (!rawSymbolData) {
+    return
   }
-  ant-drawer-content-wrapper{
-    transform: translateY(0%);
+  let symbolQuery = []
+  for(let i = 0; i < rawSymbolData.length; i++){
+    const temp = rawSymbolData[i]
+    const symbol = {
+      tokenname: temp[1]?.substring(0,3),
+      symbol: temp[1],
+      address: temp[2],
+      markPrice: ethers.utils.formatUnits(temp.markPrice,18),
+      indexPrice: ethers.utils.formatUnits(temp.indexPrice,18),
+      initialMarginRatio: ethers.utils.formatUnits(temp.initialMarginRatio,18), //0.1
+    };
+    symbolQuery.push(symbol)
   }
-  .ant-drawer-close{
-    color: #b5b5b6;
-  }
-`
+  return symbolQuery;
+}
 
 const Option = props => {
   const { account, library, active } = useWeb3React();
@@ -52,29 +96,40 @@ const Option = props => {
   let tokens = getTokens(chainId);
   chainId = 80001
 
+  ///data 
+  const [symbol, setSymbol] = useState('BTCUSD-60000-C')
+  ///// read reader contract, getTdInfo and getSymbolsInfo
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
-
-  const [symbol, setSymbol] = useState('BTCUSD-60000-C')
-
-  ///data 
 
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
   console.log("option symbol symbolInfo:", symbolsInfo)
+  const { data:rawPositionData,mutate:updatePosition} = useSWR([chainId, readerAddress, 'getTdInfo',poolAddress,account], {
+    fetcher: fetcher(library, Reader)
+  })
+
+  console.log("POSITION",rawPositionData)
+
+  const symbolData = getSymbol(symbolsInfo)
+  const positionData = getPosition(rawPositionData,symbolData)
+
+  console.log("POSITIONDATA",positionData)
+  console.log("SYMBOLDATA",symbolData)
 
   useEffect(() => {
     if (active) {
       library.on('block', () => {
+        updatePosition()
         updateSymbolsInfo(undefined, true)
       })
       return () => {
-        library.removeAllListeners('block')
+        library.removeListener('block', onBlock)
       }
     }
   }, [active, library, chainId,
-    updateSymbolsInfo]
+    updateSymbolsInfo, updatePosition]
   )
   //option_tokens store every symbols in option and its data 
   const option_tokens = symbolsInfo?.filter(ele => ele[0] == "option")
@@ -230,7 +285,7 @@ const Option = props => {
     setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
   }, [tokens])
 
-
+  
 
   return (
     <div className={styles.main}>
@@ -278,7 +333,7 @@ const Option = props => {
                 <div className={`${styles.colItem} ${styles.priceChart}`}>
                   <div className={styles.positionsTable}>
                     {tableContent == "Positions" && (
-                      <div>POSITIONS</div>
+                      <PositionTable dataSource={positionData} chainId={chainId}/>
                     )}
                     {tableContent == "Orders" && (
                       <div>ORDERS</div>
