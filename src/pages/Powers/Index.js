@@ -180,6 +180,7 @@ const Powers = props => {
 
             <AcySymbolNav data={KChartTokenList} onChange={selectTab} />
             <AcySymbol
+              activeSymbol="BTC-XXX"
               pairName={activeToken.symbol}
               // showDrawer={onClickCoin}
               // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}

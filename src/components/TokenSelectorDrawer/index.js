@@ -224,7 +224,7 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,
                     data={supToken}
                     key={index}
                     selectToken={(item) => {
-                      setActiveSymbol(item.name)                    
+                      setActiveSymbol(item.symbol)                    
                     }}
                     customIcon={false}
                     index={index}
@@ -244,7 +244,7 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,
                         customIcon={false}
                         clickCallback={() => setTokenAsFav(token)}
                         selectToken={(item) => {
-                          setActiveSymbol(item.name)
+                          setActiveSymbol(item.symbol)
                         }}
                         isFav={favTokenList.includes(token)}
                         constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}

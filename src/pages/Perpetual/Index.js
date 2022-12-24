@@ -357,13 +357,13 @@ const Swap = props => {
   //   fetcher: fetcher(library, Vault),
   // })
 
-  const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
-    fetcher: fetcher(library, Glp),
-  })
+  // const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
+  //   fetcher: fetcher(library, Glp),
+  // })
 
-  const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR(account && [chainId, routerAddress, "approvedPlugins", account, orderBookAddress], {
-    fetcher: fetcher(library, Router)
-  });
+  // const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR(account && [chainId, routerAddress, "approvedPlugins", account, orderBookAddress], {
+  //   fetcher: fetcher(library, Router)
+  // });
 
   // const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
   const infoTokens = {};
@@ -398,37 +398,48 @@ const Swap = props => {
   const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
   const [isPluginApproving, setIsPluginApproving] = useState(false);
 
-  const approveOrderBook = () => {
-    setIsPluginApproving(true)
-    return approvePlugin(chainId, orderBookAddress, {
-      library,
-      pendingTxns,
-      setPendingTxns
-    }).then(() => {
-      setIsWaitingForPluginApproval(true)
-      updateOrderBookApproved(undefined, true);
-    }).finally(() => {
-      setIsPluginApproving(false)
-    })
-  }
+  // const approveOrderBook = () => {
+  //   setIsPluginApproving(true)
+  //   return approvePlugin(chainId, orderBookAddress, {
+  //     library,
+  //     pendingTxns,
+  //     setPendingTxns
+  //   }).then(() => {
+  //     setIsWaitingForPluginApproval(true)
+  //     updateOrderBookApproved(undefined, true);
+  //   }).finally(() => {
+  //     setIsPluginApproving(false)
+  //   })
+  // }
 
 
   //// data
-  const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR(account && [`GlpSwap:lastPurchaseTime:${active}`, chainId, glpManagerAddress, "lastAddedAt", account], {
-    fetcher: fetcher(library, GlpManager),
-  })
+  // const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR(account && [`GlpSwap:lastPurchaseTime:${active}`, chainId, glpManagerAddress, "lastAddedAt", account], {
+  //   fetcher: fetcher(library, GlpManager),
+  // })
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
   console.log("future symbol symbolInfo:", symbolsInfo)
 
+  //future_tokens store every symbols in future and its data 
   const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
   console.log("future symbol future_tokens:", future_tokens)
   let future_tokens_symbol = []
-  future_tokens?.forEach(ele=>future_tokens_symbol.push(ele[1]) )  
+  future_tokens?.forEach((ele)=>{
+    future_tokens_symbol.push({
+      name: ele[1],
+      symbol: ele[1].substring(0,3),
+    })
+  })  
   console.log("future symbol future_tokens_symbol:", future_tokens_symbol)
-
-
+  //future_token stores token symbols without duplicates for tab display
+  let future_token = []
+  future_tokens_symbol?.forEach((ele) => {
+    if (!future_token.includes(ele.symbol)){
+      future_token.push(ele.symbol)
+    }
+  })
 
   useEffect(() => {
     if (active) {
@@ -436,9 +447,9 @@ const Swap = props => {
         // updatePositionData(undefined, true)
         updateTokenBalances(undefined, true)
         // updateTotalTokenWeights(undefined, true)
-        updateUsdgSupply(undefined, true)
-        updateOrderBookApproved(undefined, true)
-        updateLastPurchaseTime(undefined, true)
+        // updateUsdgSupply(undefined, true)
+        // updateOrderBookApproved(undefined, true)
+        // updateLastPurchaseTime(undefined, true)
         updateSymbolsInfo(undefined, true)
       })
       return () => {
@@ -449,11 +460,14 @@ const Swap = props => {
     // updatePositionData,
     updateTokenBalances,
     // updateTotalTokenWeights,
-    updateUsdgSupply,
-    updateOrderBookApproved,
-    updateLastPurchaseTime,
+    // updateUsdgSupply,
+    // updateOrderBookApproved,
+    // updateLastPurchaseTime,
     updateSymbolsInfo]
   )
+
+  const [activeSymbol, setActiveSymbol] = useState("BTC")
+  const [activeToken, setActiveToken] = useState("BTC");
 
   const refContainer = useRef();
   refContainer.current = transactionList;
@@ -488,19 +502,19 @@ const Swap = props => {
     setToTokenAddress(swapOption, getTokenBySymbol(chainId, e).address)  // when click tab change token
   }
 
-  const chartPanes = [
-    { title: 'BTC', content: 'BTC', key: 'BTC', closable: false },
-    { title: 'ETH', content: 'ETH', key: 'ETH' },
-    // { title: 'Tab 3', content: 'Content of Tab 3', key: '3'},
-  ];
+  // const chartPanes = [
+  //   { title: 'BTC', content: 'BTC', key: 'BTC', closable: false },
+  //   { title: 'ETH', content: 'ETH', key: 'ETH' },
+  //   // { title: 'Tab 3', content: 'Content of Tab 3', key: '3'},
+  // ];
 
   // ui
-  const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
-  const KChartTokenListETH = ["BTC", "ETH"]
-  const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
-  const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBSC
-    : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
-      : KChartTokenListETH
+  // const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
+  // const KChartTokenListETH = ["BTC", "ETH"]
+  // const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
+  // const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBSC
+  //   : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
+  //     : KChartTokenListETH
   const selectChartToken = item => {
     onClickSetActiveToken(item)
   }
@@ -526,9 +540,11 @@ const onChangePrice=(curPrice,change)=>{
                     onChange={selectChartToken}
                   />
                 </div> */}
-                <AcySymbolNav data={KChartTokenList} onChange={selectChartToken}/>
+                <AcySymbolNav data={future_token} onChange={selectChartToken}/>
                 <AcySymbol 
-                  pairName={toToken.symbol}
+                  activeSymbol={activeSymbol}
+                  setActiveSymbol={setActiveSymbol}
+                  coinList={future_tokens_symbol}
                   // showDrawer={showDrawer}
                   latestPriceColor={priceChangePercentDelta*1>= 0 && '#0ecc83' ||'#fa3c58'}
                   latestPrice={latestPrice}
@@ -538,7 +554,7 @@ const onChangePrice=(curPrice,change)=>{
                   <ExchangeTVChart
                     chartTokenSymbol={toToken.symbol}
                     pageName="Futures"
-                    fromToken={toToken.symbol}
+                    fromToken={toToken}
                     toToken="USDT"
                     chainId={chainId}
                     onChangePrice={onChangePrice}

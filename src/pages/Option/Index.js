@@ -139,15 +139,16 @@ const Option = props => {
   let option_tokens_symbol = []
   option_tokens?.forEach((ele) => {
     option_tokens_symbol.push({
-    symbol : ele[1]?.substring(0,3),
-    name : ele[1]
+    //symbol is displayed
+    symbol : ele[1],
+    name : ele[1]?.substring(0,3)
     })
   })
   //option_token stores token symbols without duplicates for tab display
   let option_token = []
   option_tokens_symbol?.forEach((ele) => {
-    if (!option_token.includes(ele.symbol)){
-      option_token.push(ele.symbol)
+    if (!option_token.includes(ele.name)){
+      option_token.push(ele.name)
     }
   })
   //test data to load the page before contract is read
@@ -181,76 +182,8 @@ const Option = props => {
     setPriceChangePercentDelta(change);
   }
 
-  // const [visibleBTC, setVisibleBTC] = useState(false);
-  // const [visibleETH, setVisibleETH] = useState(false);
-  // const [visibleMATIC, setVisibleMATIC] = useState(false);
-  // const [visibleBNB, setVisibleBNB] = useState(false);
-  // const [visibleToken, setVisibleToken] = useState({
-  //   "BTC": false,
-  //   "ETH": false,
-  //   "MATIC": false,
-  //   "BNB": false,
-  // })
-
   console.log("option refactor see activeSymbol", activeSymbol)
 
-  // const onClickDropdownBTC = e => {
-  //   setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0]);
-  // };
-  // const onClickDropdownETH = e => {
-  //   setActiveToken((tokens.filter(ele => ele.symbol == "ETH"))[0]);
-  // };
-  // const onClickDropdownMATIC = e => {
-  //   setActiveToken((tokens.filter(ele => ele.symbol == "MATIC"))[0]);
-  // };
-  // const onClickDropdownBNB = e => {
-  //   setActiveToken((tokens.filter(ele => ele.symbol == "BNB"))[0]);
-  // };
-
-  const optionSymbols = {
-    "BTC": [
-      { name: "BTC-100000", tokenSymbol: "BTC", optionSymbol: "100000", type: "C", date: "20221231" },
-      { name: "BTC-100000", tokenSymbol: "BTC", optionSymbol: "100000", type: "P", date: "20221231" },
-      { name: "BTC-50000", tokenSymbol: "BTC", optionSymbol: "50000", type: "C", date: "20221231" },
-      { name: "BTC-50000", tokenSymbol: "BTC", optionSymbol: "50000", type: "P", date: "20221231" },
-      { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "C", date: "20221231" },
-      { name: "BTC 10000", tokenSymbol: "BTC", optionSymbol: "10000", type: "P", date: "20221231" },
-      { name: "BTC 5000", tokenSymbol: "BTC", optionSymbol: "5000", type: "C", date: "20221231" },
-      { name: "BTC 5000", tokenSymbol: "BTC", optionSymbol: "5000", type: "P", date: "20221231" },
-    ],
-    "ETH": [
-      { name: "ETH-5000", tokenSymbol: "ETH", optionSymbol: "5000", type: "C" },
-      { name: "ETH-5000", tokenSymbol: "ETH", optionSymbol: "5000", type: "P" },
-      { name: "ETH-1000", tokenSymbol: "ETH", optionSymbol: "1000", type: "C" },
-      { name: "ETH-1000", tokenSymbol: "ETH", optionSymbol: "1000", type: "P" },
-      { name: "ETH-500", tokenSymbol: "ETH", optionSymbol: "500", type: "C" },
-      { name: "ETH-500", tokenSymbol: "ETH", optionSymbol: "500", type: "P" },
-    ],
-    "MATIC": [
-      { name: "MATIC-10", tokenSymbol: "MATIC", optionSymbol: "10", type: "C" },
-      { name: "MATIC-10", tokenSymbol: "MATIC", optionSymbol: "10", type: "P" },
-      { name: "MATIC-1", tokenSymbol: "MATIC", optionSymbol: "1", type: "C" },
-      { name: "MATIC-1", tokenSymbol: "MATIC", optionSymbol: "1", type: "P" },
-      { name: "MATIC-0.01", tokenSymbol: "MATIC", optionSymbol: "0.01", type: "C" },
-      { name: "MATIC-0.01", tokenSymbol: "MATIC", optionSymbol: "0.01", type: "P" },
-    ],
-    "BNB": [
-      { name: "BNB-500", tokenSymbol: "BNB", optionSymbol: "1000", type: "C" },
-      { name: "BNB-500", tokenSymbol: "BNB", optionSymbol: "1000", type: "P" },
-      { name: "BNB-300", tokenSymbol: "BNB", optionSymbol: "300", type: "C" },
-      { name: "BNB-300", tokenSymbol: "BNB", optionSymbol: "300", type: "P" },
-      { name: "BNB-100", tokenSymbol: "BNB", optionSymbol: "100", type: "C" },
-      { name: "BNB-100", tokenSymbol: "BNB", optionSymbol: "100", type: "P" },
-    ]
-  };
-
-
-  // const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
-  // const KChartTokenListETH = ["BTC", "ETH"]
-  // const KChartTokenListBNB = ["BTC", "ETH", "BNB"]
-  // const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBNB
-  //   : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
-  //     : KChartTokenListETH
   const selectChartToken = item => {
     // onClickSetActiveToken(item)
   }
@@ -313,7 +246,7 @@ const Option = props => {
                 <ExchangeTVChart
                   chartTokenSymbol={symbol}
                   pageName="Option"
-                  fromToken={activeToken.symbol}
+                  fromToken={activeToken}
                   toToken="USDT"
                   chainId={chainId}
                   onChangePrice={onChangePrice}
