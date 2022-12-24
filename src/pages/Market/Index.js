@@ -12,7 +12,7 @@ const apiUrlPrefix = "https://stats.acy.finance/api"
 const MarketIndex = props => {
 
   const { account, library } = useWeb3React()
-  const { chainId } = useChainId()
+  const chainId = 137
   const [mode, setMode] = useState('Pairs')
   const [topVolumePairs, setTopVolumePairs] = useState([])
   const [winnersPairs, setWinnersPairs] = useState([])
@@ -25,9 +25,12 @@ const MarketIndex = props => {
     for (let i = 0; i < pairlist.length; i++) {
       pairs.push({
         name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
+        address0: pairlist[i].token0Address,
+        address1: pairlist[i].token1Address,
         price: '$' + (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
         price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
+        swaps: pairlist[i].txCount,
         liquidity: pairlist[i].liquidity,
         exchange: pairlist[i].exchange,
       })
@@ -40,6 +43,8 @@ const MarketIndex = props => {
     for (let i = 0; i < pairlist.length; i++) {
       pairs.push({
         name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
+        address0: pairlist[i].token0Address,
+        address1: pairlist[i].token1Address,
         exchange: pairlist[i].exchange,
         price: '$' + (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
         price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),
@@ -57,6 +62,8 @@ const MarketIndex = props => {
     for (let i = 0; i < pairlist.length; i++) {
       pairs.push({
         name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
+        address0: pairlist[i].token0Address,
+        address1: pairlist[i].token1Address,
         exchange: pairlist[i].exchange,
         price: '$' + (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
         price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),

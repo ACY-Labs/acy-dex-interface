@@ -9,6 +9,7 @@ import styles from './styles.less'
 export function PairsTable(props) {
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
+  const navHistory = useHistory()
 
   function columnsCoin() {
     return [
@@ -145,22 +146,6 @@ export function PairsTable(props) {
         },
         visible: true,
       },
-      {
-        title: (
-          <div
-            className={styles.tableHeader}
-            onClick={() => { setCurrentKey('fdv') }}
-          >
-            FDV
-          </div>
-        ),
-        dataIndex: 'fdv',
-        key: 'fdv',
-        render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.fdv}</div>;
-        },
-        visible: true,
-      }
     ];
   }
 
@@ -173,6 +158,9 @@ export function PairsTable(props) {
         style={{
           marginBottom: '20px',
           cursor: isHover ? 'pointer' : 'default',
+        }}
+        onRowClick={(record, index, event) => {
+          navHistory.push(`/trade#${record.name}&${record.address0}&${record.address1}`)
         }}
         onRowMouseEnter={() => setIsHover(true)}
         onRowMouseLeave={() => setIsHover(false)}
@@ -494,7 +482,7 @@ export function TopVolumeTable(props) {
           cursor: isHover ? 'pointer' : 'default',
         }}
         onRowClick={(record, index, event) => {
-          navHistory.push(`/trade#${record.name}`)
+          navHistory.push(`/trade#${record.name}&${record.address0}&${record.address1}`)
         }}
         onRowMouseEnter={() => setIsHover(true)}
         onRowMouseLeave={() => setIsHover(false)}

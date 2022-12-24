@@ -213,12 +213,11 @@ const Swap = props => {
 
   const history = useHistory()
   useEffect(() => {
-    const hash = history.location.hash.replace('#', '').split('/')
-    // if(hash) {
-    //   setToken0({name: hash[0].replaceAll('%20', ' ')})
-    //   setToken1({name: hash[1].replaceAll('%20', ' ')})
-    // }
-    // console.log('joy hash',hash[0].replaceAll('%20', ' '), hash[1].replaceAll('%20', ' '))
+    const hash = history.location.hash.replace('#', '').split('&')
+    if(history.location.hash) {
+      setActiveToken0({symbol: hash[0].split('/')[0].replaceAll('%20', ' '), address: hash[1]})
+      setActiveToken1({symbol: hash[0].split('/')[1].replaceAll('%20', ' '), address: hash[2]})
+    }
   }, [history.location.hash])
 
   return (
@@ -301,12 +300,13 @@ const Swap = props => {
             <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', border: 'none' }}>
               <div className={styles.trade}>
                 <SwapComponent
-                  onSelectToken0={token => {
-                    setActiveToken0(token);
-                  }}
-                  onSelectToken1={token => {
-                    setActiveToken1(token);
-                  }}
+                  token0={activeToken0}
+                  token1={activeToken1}
+                  onSelectToken0={token => { setActiveToken0(token);}}
+                  onSelectToken1={token => { setActiveToken1(token);}}
+                  account={account}
+                  library={library}
+                  chainId={chainId}
                   onGetReceipt={onGetReceipt}
                   showGraph={showGraph}
                 />
