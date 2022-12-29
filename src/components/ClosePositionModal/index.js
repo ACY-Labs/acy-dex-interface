@@ -6,6 +6,7 @@ import {
     AcyCuarrencyCard,
     AcyDescriptions,
     AcyButton,
+    AcyPerpetualButton,
     AcyInput,
     AcyCheckBox,
 } from '@/components/Acy';
@@ -20,6 +21,7 @@ import {fetcher,formatAmount, USD_DECIMALS, mapPositionData, parseValue, bigNumb
 import ERC20 from '@/abis/ERC20.json';
 import {trade} from '@/services/derivatives'
 import IPool from '@/abis/future-option-power/IPool.json'
+
 
 const { AddressZero } = ethers.constants;
 
@@ -45,6 +47,7 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
 
     /// get contract address
     const poolAddress = getContract(chainId, "pool")
+
 
     //// read contract to check token allowance
     // const routerAddress = getContract(chainId, "router")
@@ -101,6 +104,7 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
       }   
     },[percentage,position]);
 
+
     const handleCancel = () => {
       onCancel();
     }
@@ -126,6 +130,7 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
       }
     }
 
+
     const handleAmountChange = (value) => {
       const minTradeVolume = position.minTradeVolume
       if(value%minTradeVolume==0&&value<=position.position){
@@ -136,6 +141,7 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
         setTokenAmount(Math.floor(value/minTradeVolume)*minTradeVolume)
       }
       
+
     }
 
     const onClickPrimary = () => {

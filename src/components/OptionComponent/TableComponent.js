@@ -5,6 +5,7 @@ import { AcyIcon, AcyTabs, AcyTokenIcon, AcyCardList } from '@/components/Acy';
 import {ClosePositionModal} from '@/components/ClosePositionModal';
 import {formatNumber} from '@/acy-dex-futures/utils'
 
+
 import styles from './TableComponent.less'
 
 
