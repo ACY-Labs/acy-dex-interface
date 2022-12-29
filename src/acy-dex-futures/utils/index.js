@@ -2075,23 +2075,37 @@ function getToken(address) {
 }
 
 export function formatNumber(number){
-  number = number.toLocaleString('fullwide', {useGrouping:false})
+  // number = number.toLocaleString('fullwide', {useGrouping:false})
   let negative = false;
   if (number<0){
     negative = true;
-    number = -number;
+    let pattern = /-(.*)/i;
+    number = number.toString().match(pattern)[1];
+    console.log("NEGATIVE")
   }
-  let dict = {1:"₁",3:"₃",4:"₄",5:"₅",6:"₆",7:"₇",8:"₈",9:"₉",11:"₁₁",13:"₁₃"}
+  let dict = {1:"₁",3:"₃",4:"₄",5:"₅",6:"₆",7:"₇",8:"₈",9:"₉",11:"₁₁",13:"₁₃",14:"₁₄",15:"₁₅",16:"₁₆"}
   let text = number.toString();
   let result = 0
-  if(parseFloat(text)<0.001){  //0.00000123456
+  if(text.includes('e-')){
+  	let pattern = /(.*)e-(.*)/i
+    let digitPart = text.match(pattern)[1]
+    let zeroPart = text.match(pattern)[2]
+    let zeroLen = zeroPart - 1
+    let digit = digitPart.replace(".","")
+    if (digit.length<4){
+    	digit = digit.slice(0,digit.length)
+    }else{
+    	digit = digit.slice(0,4)
+    }
+    result = "0.0"+dict[zeroLen]+digit
+  }else if(parseFloat(text)<0.001){  //0.00000123456
     let oriLen = text.length; //13
     let pattern = /0\.0{3,}(.*)/i;
     let digitPart = text.match(pattern)[1]; //123456
     let digitLen = digitPart.length;  //6
     let zeroLen = oriLen-digitLen-2;  //13-6-2=5
-    let temp = text*10**zeroLen;  //0.964789
-    let digit = temp.toPrecision(4)*10000  //9648
+    let temp = text*10**zeroLen*10000;  //0.964789
+    let digit = temp.toPrecision(4)  //9648
     console.log("zero",zeroLen,typeof(zeroLen))
     console.log("small",dict[zeroLen])
     result = "0.0"+dict[zeroLen]+digit

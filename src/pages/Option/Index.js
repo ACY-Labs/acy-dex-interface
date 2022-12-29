@@ -46,7 +46,12 @@ const StyledDrawer = styled(Drawer)`
 `
    
 function safeDiv(a, b) {
-    return b==0 ? 0 : a/b;
+  console.log("a,b",a,b,a.div(b))
+  return b.isZero() ? BigNumber.from(0) : a.div(b);
+}
+
+function safeDiv2(a, b) {
+  return b==0 ? 0 : a/b;
 }
 
 export function getPosition(rawPositionData,symbolData) {
@@ -67,13 +72,17 @@ export function getPosition(rawPositionData,symbolData) {
       const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume,18)
       const marginUsage = Math.abs(volume * indexPrice) * initialMarginRatio
       const unrealizedPnl = volume * indexPrice - cost
-      const accountFunding = cumulativeFundingPerVolume * volume
+      const _accountFunding = temp.cumulativeFundingPerVolume.mul(temp[2])
+      const accountFunding = ethers.utils.formatUnits(_accountFunding,36)
+      const _entryPrice = safeDiv(temp.cost,temp[2])
+      // const entryPrice = ethers.utils.formatUnits(_entryPrice,0)
+      const entryPrice = safeDiv2(cost,volume)
 
       const position = {
         symbol: temp[1],
         address: temp[0],
         position: Math.abs(volume),
-        entryPrice: safeDiv(cost,volume),
+        entryPrice: entryPrice,
         markPrice: markPrice,
         marginUsage: marginUsage,
         unrealizedPnl: unrealizedPnl,

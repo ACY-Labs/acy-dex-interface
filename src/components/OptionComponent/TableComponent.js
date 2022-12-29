@@ -86,8 +86,8 @@ export function PositionTable(props){
             dataIndex: 'entryPrice',
             // key: 'entryPrice',
             render: (text, entry) => {
-                // let res = formatNumber(entry.entryPrice)
-                return <div className={styles.tableData}>{entry.entryPrice}</div>;
+                let res = formatNumber(entry.entryPrice)
+                return <div className={styles.tableData}>{res}</div>;
             },
             visible: true,
         },
@@ -154,7 +154,8 @@ export function PositionTable(props){
             dataIndex: 'accountFunding',
             // key: 'accountFunding',
             render: (text, entry) => {
-            return <div className={styles.tableData}>{entry.accountFunding}</div>;
+                let res = formatNumber(entry.accountFunding)
+                return <div className={styles.tableData}>{res}</div>;
             },
             visible: true,
         },
