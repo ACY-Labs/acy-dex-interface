@@ -5,12 +5,23 @@ import DerivativeComponent from '@/components/DerivativeComponent'
 import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
+import * as Api from '@/acy-dex-futures/Api';
+import { bigNumberify } from '@/acy-dex-futures/utils';
+import { useConstantLoader } from '@/constants';
+import { BigNumber, ethers } from 'ethers'
+import Pool from '@/acy-dex-futures/abis/Pool.json'
 import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
 import styled from "styled-components";
 import styles from './styles.less'
+import { PositionTable } from '@/components/OptionComponent/TableComponent';
+
+import { fetcher,getProvider } from '@/acy-dex-futures/utils';
+import Reader from '@/abis/future-option-power/Reader.json'
+import useSWR from 'swr'
+import { useWeb3React } from '@web3-react/core';
 
 const StyledDrawer = styled(Drawer)`
   .ant-drawer{
@@ -33,8 +44,76 @@ const StyledDrawer = styled(Drawer)`
     color: #b5b5b6;
   }
 `
+   
+function safeDiv(a, b) {
+    return b==0 ? 0 : a/b;
+}
+
+export function getPosition(rawPositionData,symbolData) {
+  if (!rawPositionData || !symbolData) {
+    return
+  }
+  let positionQuery = []
+  for(let i = 0; i < rawPositionData.positions.length; i++){
+    const temp = rawPositionData.positions[i]
+    const volume = ethers.utils.formatUnits(temp[2], 18)
+    if (volume!=0){
+
+      const markPrice = symbolData.find(obj => {
+        return obj.address === temp[0]
+      }).markPrice
+      const initialMarginRatio = symbolData.find(obj => {
+        return obj.address === temp[0]
+      }).initialMarginRatio
+      const indexPrice = symbolData.find(obj => {
+        return obj.address === temp[0]
+      }).indexPrice
+      
+      const cost = ethers.utils.formatUnits(temp.cost,18)
+      const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume,18)
+      const marginUsage = Math.abs(volume * indexPrice) * initialMarginRatio
+      const unrealizedPnl = volume * indexPrice - cost
+      const accountFunding = cumulativeFundingPerVolume * volume
+
+      const position = {
+        symbol: temp[1],
+        address: temp[0],
+        position: volume,
+        entryPrice: safeDiv(cost,volume),
+        markPrice: markPrice,
+        marginUsage: marginUsage,
+        unrealizedPnl: unrealizedPnl,
+        accountFunding: accountFunding,
+        type: volume>=0?"Long":"Short",
+      };
+      positionQuery.push(position)
+    }
+  }
+  return positionQuery;
+}
+
+export function getSymbol(rawSymbolData){
+  if (!rawSymbolData) {
+    return
+  }
+  let symbolQuery = []
+  for(let i = 0; i < rawSymbolData.length; i++){
+    const temp = rawSymbolData[i]
+    const symbol = {
+      symbol: temp[1],
+      address: temp[2],
+      markPrice: ethers.utils.formatUnits(temp.markPrice,18),
+      indexPrice: ethers.utils.formatUnits(temp.indexPrice,18),
+      initialMarginRatio: ethers.utils.formatUnits(temp.initialMarginRatio,18), //0.1
+    };
+    symbolQuery.push(symbol)
+  }
+  return symbolQuery;
+}
 
 const Option = props => {
+  const { account, library } = useWeb3React();
+  const { active } = useWeb3React()
   let { chainId } = useChainId();
   let tokens = getTokens(chainId);
 
@@ -156,6 +235,41 @@ const Option = props => {
   useEffect(()=>{
     setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
   }, [tokens])
+
+  
+  ///// read reader contract, getTdInfo and getSymbolsInfo
+  const poolAddress = getContract(chainId,"Pool")
+  const readerAddress = getContract(chainId,"Reader")
+
+  const { data:rawPositionData,mutate:updatePosition} = useSWR([chainId, readerAddress, 'getTdInfo',poolAddress,account], {
+      fetcher: fetcher(library, Reader)
+  })
+  const { data:rawSymbolData,mutate:updateSymbol} = useSWR([chainId, readerAddress, 'getSymbolsInfo',poolAddress,[]], {
+    fetcher: fetcher(library, Reader)
+  })
+  console.log("POSITION",rawPositionData)
+  console.log("SYMBOL",rawSymbolData)
+
+  const symbolData = getSymbol(rawSymbolData)
+  const positionData = getPosition(rawPositionData,symbolData)
+
+  console.log("POSITIONDATA",positionData)
+  console.log("SYMBOLDATA",symbolData)
+
+  useEffect(() => {
+    if (active) {
+      function onBlock() {
+        updatePosition()
+        updateSymbol()
+      }
+      library.on('block', onBlock)
+      return () => {
+        library.removeListener('block', onBlock)
+      }
+    }
+  }, [account,active, library, chainId,
+    updatePosition,updateSymbol]
+  )
 
   return (
     <div className={styles.main}>
@@ -346,7 +460,7 @@ const Option = props => {
                 <div className={`${styles.colItem} ${styles.priceChart}`}>
                   <div className={styles.positionsTable}>
                     {tableContent == "Positions" && (
-                      <div>POSITIONS</div>
+                      <PositionTable dataSource={positionData} chainId={chainId}/>
                     )}
                     {tableContent == "Orders" && (
                       <div>ORDERS</div>

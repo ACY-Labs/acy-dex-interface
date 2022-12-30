@@ -9,33 +9,42 @@
 import { useState, useEffect } from "react";
 import { AcyTabs, AcyCoinItem } from "@/components/Acy";
 const { AcyTabPane } = AcyTabs;
-import { Input, Icon, Drawer } from "antd";
+import { Input, Icon, Drawer, Button } from "antd";
 import { useWeb3React } from '@web3-react/core';
 import { getUserTokenBalance } from '@/acy-dex-swap/utils';
 import { asyncForEach } from "@/utils/asynctools";
 import { processString } from "@/components/AcyCoinItem";
 import styles from "./styles.less";
 import { useConstantLoader, getGlobalTokenList } from '@/constants';
+import mockTokenList from '@/components/SwapComponent/mockTokenList.json';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,placement='right' }) => {
   const { account, library, chainId } = useConstantLoader();
 
   // const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
-  const tokenlist = coinList ? coinList : getGlobalTokenList()
+  // const tokenlist = coinList ? coinList : getGlobalTokenList()
+  const tokenlist = coinList ? coinList : mockTokenList
+  // let tokenlist = allTokenlist.slice(0,9)
+  // console.log("Token list in drawer", tokenlist)
   useEffect(() => {
     setInitTokenList(tokenlist)
   }, [tokenlist])
 
+  const [hasMore, setHasMore] = useState(true);
+  const [pageIdx, setPageIdx] = useState(1);
   const [initTokenList, setInitTokenList] = useState(tokenlist);
   const [customTokenList, setCustomTokenList] = useState([]);
   const [tokenSearchInput, setTokenSearchInput] = useState('');
   const [favTokenList, setFavTokenList] = useState([]);
   const { activate } = useWeb3React();
   const [tokenBalanceDict, setTokenBalanceDict] = useState({});
+  const [renderTokenList, setRenderTokenList] = useState(initTokenList.slice(0, 20));
+
 
   useEffect(() => {
     if (!tokenlist) return
-
+    // return
     console.log("resetting page states in TokenSelectorModal", tokenlist)
     setInitTokenList(tokenlist);
     setCustomTokenList([]);
@@ -60,12 +69,36 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,
     }
   }, [chainId]);
 
+  useEffect(()=>{
+    setRenderTokenList(initTokenList.slice(0, 20))
+  },[initTokenList])
+
   const onTokenSearchChange = e => {
+    setPageIdx(1)
     setTokenSearchInput(e.target.value);
-    setInitTokenList(
-      tokenlist.filter(token => token.symbol.toUpperCase().includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase()))
+    let filterTokenList = tokenlist.filter(token => token.symbol.toUpperCase().includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase()))
+    setInitTokenList(filterTokenList)
+    if (filterTokenList.length < 20) {
+      setHasMore(false)
+    }else{
+      setHasMore(true)
+      filterTokenList = filterTokenList.slice(0,20)
+    }
+    setRenderTokenList(
+      filterTokenList
     );
   };
+
+  const loadMore = () => {
+    console.log("load more")
+    if (pageIdx * 20 >= initTokenList.length) {
+      setHasMore(false);
+      return;
+    }
+    setPageIdx(pageIdx + 1);
+    setRenderTokenList(initTokenList.slice(0, (pageIdx+1) * 20));
+  }
+
 
   const initTokenBalanceDict = (tokenList) => {
     console.log('Init Token Balance!!!! with chainId, TokenList', chainId, tokenList);
@@ -95,13 +128,13 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,
     console.log("tokenselectormodal refreshed because now on ", library, account, chainId,)
     if (!library || !account || !chainId) return;
     if (tokenlist) {
-      initTokenBalanceDict(tokenlist);
+      // initTokenBalanceDict(tokenlist);
     }
   }, [account, chainId])
 
-  useEffect(() => {
-    console.log('tokenbalancedict', tokenBalanceDict);
-  }, [tokenBalanceDict])
+  // useEffect(() => {
+  //   console.log('tokenbalancedict', tokenBalanceDict);
+  // }, [tokenBalanceDict])
 
 
   const setTokenAsFav = token => {
@@ -120,6 +153,13 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,
       return prevFavTokenList;
     });
   };
+
+  const fetchData = (page) => {
+    console.log("page",page);
+    const temp = allTokenlist.slice(0,9)
+    tokenlist = [...initTokenList, ...temp];
+    // setInitTokenList(newTokenList);
+  }
 
   return (
     <Drawer
@@ -195,22 +235,58 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,
                   : <div className={styles.textCenter} >No matching result</div>}
               </AcyTabPane>
               <AcyTabPane tab="All" key="1">
-                {initTokenList.length ? initTokenList.map((token, index) => {
-                  return (
-                    <AcyCoinItem
-                      data={token}
-                      key={index}
-                      customIcon={false}
-                      clickCallback={() => setTokenAsFav(token)}
-                      selectToken={() => {
-                        onCoinClick(token);
-                      }}
-                      isFav={favTokenList.includes(token)}
-                      constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}
-                    />
-                  );
-                })
-                  : <div className={styles.textCenter} >No matching result</div>}
+              {renderTokenList.length ? renderTokenList.map((token, index) => {
+                    return (
+                      <AcyCoinItem
+                        hideBalance={true}
+                        data={token}
+                        key={index}
+                        customIcon={false}
+                        clickCallback={() => setTokenAsFav(token)}
+                        selectToken={() => {
+                          onCoinClick(token);
+                        }}
+                        isFav={favTokenList.includes(token)}
+                        constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}
+                      />
+                    );
+                  })
+                    :null}
+                <div className={styles.buttonContainer}>
+                {hasMore?
+                <Button 
+                type="primary"
+                className={styles.buttonCenter}
+                onClick={loadMore}>Load More</Button>
+                :<div className={styles.textCenter} >No more result</div>} 
+                </div>
+                  
+                {/* <InfiniteScroll
+                dataLength={initTokenList.length}
+                next={(page)=>fetchData(page)}
+                hasMore={true}
+                loader={<div className={styles.textCenter} >Loading...</div>}
+                endMessage={
+                  <div className={styles.textCenter} >Yay! You have seen it all</div>
+                }
+                >
+                  {initTokenList.length ? initTokenList.map((token, index) => {
+                    return (
+                      <AcyCoinItem
+                        data={token}
+                        key={index}
+                        customIcon={false}
+                        clickCallback={() => setTokenAsFav(token)}
+                        selectToken={() => {
+                          onCoinClick(token);
+                        }}
+                        isFav={favTokenList.includes(token)}
+                        constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}
+                      />
+                    );
+                  })
+                    : <div className={styles.textCenter} >No matching result</div>}
+                </InfiniteScroll> */}
               </AcyTabPane>
             </AcyTabs>
           </div>
