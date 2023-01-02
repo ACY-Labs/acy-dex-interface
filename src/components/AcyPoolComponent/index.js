@@ -71,6 +71,9 @@ const AcyPoolComponent = props => {
   const { data: alpSupply, mutate: updateAlpSupply } = useSWR([chainId, alpAddress, "totalSupply"], {
     fetcher: fetcher(library, Alp),
   })
+  const { data:symbolsData,mutate:updateSymbolsData} = useSWR([chainId, readerAddress, 'getSymbolsInfo', poolAddress,[]], {
+    fetcher: fetcher(library, Reader)
+  })
 
   useEffect(() => {
     if (active) {
@@ -132,7 +135,7 @@ const AcyPoolComponent = props => {
   const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
   const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const amountUsd = selectedTokenPrice?.mul(selectedTokenAmount)
-
+  const minTradeVolume = formatAmount(symbolsData?.find(item => item.symbol?.toLowerCase() == props.selectedSymbol?.toLowerCase()).minTradeVolume, 18)
 
   let feePercentageText = formatAmount(feeBasisPoints, 2, 2, true, "-")
   if (feeBasisPoints !== undefined && feeBasisPoints.toString().length > 0) {
@@ -159,8 +162,11 @@ const AcyPoolComponent = props => {
       let num = parseFloat(e.target.value)
       setSelectedTokenValue(num.toString())
     }
-    else {
+    else if(e.target.value % minTradeVolume == 0) {
       setSelectedTokenValue(e.target.value)
+    }
+    else {
+      setSelectedTokenValue(Math.floor(e.target.value/minTradeVolume)*minTradeVolume)
     }
   }
 
