@@ -19,7 +19,7 @@ import AcySymbol from '@/components/AcySymbol';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { TradeHistoryTable, PoolsActivityTable } from './components/TableComponent.js';
 import { useChainId } from '@/utils/helpers';
-import { getTokens } from '@/constants/trade'
+import { getTokens } from '@/constants/future_option_power'
 import { useWeb3React } from '@web3-react/core';
 
 const apiUrlPrefix = "https://stats.acy.finance/api"
@@ -30,9 +30,10 @@ const Swap = props => {
   
   // test on polygon
   const chainId = 137;
+  const tokens = getTokens(chainId)
 
-  const [activeToken1, setActiveToken1] = useState({symbol: "USDC", address: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"});
-  const [activeToken0, setActiveToken0] = useState({symbol: "USDT", address: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"});
+  const [activeToken1, setActiveToken1] = useState(tokens[1]);
+  const [activeToken0, setActiveToken0] = useState(tokens[0]);
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
   const [transactionList, setTransactionList] = useState([]);
