@@ -158,10 +158,6 @@ const AcyPoolComponent = props => {
     if (e.target.value === "") {
       setSelectedTokenValue("0")
     }
-    else if (e.target.value[0] === "0") {
-      let num = parseFloat(e.target.value)
-      setSelectedTokenValue(num.toString())
-    }
     else if(e.target.value % minTradeVolume == 0) {
       setSelectedTokenValue(e.target.value)
     }
