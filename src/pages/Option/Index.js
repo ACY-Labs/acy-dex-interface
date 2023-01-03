@@ -48,6 +48,9 @@ const StyledDrawer = styled(Drawer)`
 function safeDiv(a, b) {
   return b.isZero() ? BigNumber.from(0) : a.div(b);
 }
+function safeDiv2(a, b) {
+  return b==0 ? 0 : a/b;
+}
 
 export function getPosition(rawPositionData,symbolData) {
   if (!rawPositionData || !symbolData) {
