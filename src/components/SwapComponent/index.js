@@ -3,10 +3,9 @@ import { useHistory } from 'react-router-dom';
 import { connect } from 'umi';
 import { approve, getUserTokenBalance } from '@/acy-dex-swap/utils/index';
 import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
-import { useConstantLoader, getGlobalTokenList } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { useChainId } from '@/utils/helpers';
-import { getTokens } from '@/constants/trade';
+import { getTokens, INITIAL_ALLOWED_SLIPPAGE } from '@/constants/trade';
 import { AcyCuarrencyCard, AcyDescriptions } from '@/components/Acy';
 import ComponentButton from '../ComponentButton';
 import { Button, Input, Icon } from 'antd';
@@ -30,7 +29,6 @@ const SwapComponent = props => {
   } = props;
   // 选择货币的弹窗
 
-  const { farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
   const tokenlist = getTokens(chainId);
 
   const [visible, setVisible] = useState(null);

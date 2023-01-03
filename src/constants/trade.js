@@ -500,3 +500,5 @@ const tokenLists = {
 export const getTokens = (chainId) => {
   return tokenLists[chainId];
 }
+
+export const INITIAL_ALLOWED_SLIPPAGE = 50;
