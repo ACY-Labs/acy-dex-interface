@@ -27,7 +27,7 @@ const MarketIndex = props => {
         name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
         address0: pairlist[i].token0Address,
         address1: pairlist[i].token1Address,
-        price: '$' + (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
+        price: (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
         price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         swaps: pairlist[i].txCount,
@@ -46,7 +46,7 @@ const MarketIndex = props => {
         address0: pairlist[i].token0Address,
         address1: pairlist[i].token1Address,
         exchange: pairlist[i].exchange,
-        price: '$' + (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
+        price: (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
         price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         swaps: pairlist[i].txCount,
@@ -65,7 +65,7 @@ const MarketIndex = props => {
         address0: pairlist[i].token0Address,
         address1: pairlist[i].token1Address,
         exchange: pairlist[i].exchange,
-        price: '$' + (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
+        price: (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
         price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         swaps: pairlist[i].txCount,
@@ -279,8 +279,8 @@ const MarketIndex = props => {
 
             <div className={styles.statscontent}>
               <div className={styles.statsRow}>
-                <div className={styles.label}>1. {winnersPairs[0]?.name}/</div>
-                <div className={styles.value}>{winnersPairs[0]?.price}</div>
+                <div className={styles.label}>1. {winnersPairs[0]?.name}</div>
+                <div className={styles.value}>{winnersPairs[0]?.price_24h}</div>
               </div>
 
               <div className={styles.statsRow}>
