@@ -116,6 +116,7 @@ const Option = props => {
   const { active } = useWeb3React()
   let { chainId } = useChainId();
   let tokens = getTokens(chainId);
+  chainId = 80001
 
   const [mode, setMode] = useState('Buy')
   const [symbol, setSymbol] = useState('BTCUSD-60000-C')

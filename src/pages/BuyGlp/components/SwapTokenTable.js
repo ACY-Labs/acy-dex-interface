@@ -68,17 +68,17 @@ export default function TokenTable(props) {
   function columnsCoin(isAscending, onSortChange, isBuying, onClickSelectToken) {
     return [
       // # 序号
-      {
-        title: <div className={className(styles.tableHeaderFirst, styles.tableIndex)}> # </div>,
-        key: 'index',
-        width: '6rem',
-        render: (text, record, index) => (
-          <div className={className(styles.tableDataFirstColumn, styles.tableIndex)}>
-            {index + 1}
-          </div>
-        ),
-        visible: isDesktop()
-      },
+      // {
+      //   title: <div className={className(styles.tableHeaderFirst, styles.tableIndex)}> # </div>,
+      //   key: 'index',
+      //   width: '6rem',
+      //   render: (text, record, index) => (
+      //     <div className={className(styles.tableDataFirstColumn, styles.tableIndex)}>
+      //       {index + 1}
+      //     </div>
+      //   ),
+      //   visible: isDesktop()
+      // },
       // Name 标题
       {
         title: <div className={styles.tableHeaderFirst}> Name </div>,
@@ -92,6 +92,7 @@ export default function TokenTable(props) {
           </div>
         ),
         visible: true,
+        width: '15%',
       },
       // Price 价格
       {
@@ -102,6 +103,7 @@ export default function TokenTable(props) {
           return <div className={styles.tableData}>$ {entry.price}</div>
         },
         visible: isDesktop(),
+        width: '15%',
       },
       // Pool
       {
@@ -112,17 +114,19 @@ export default function TokenTable(props) {
           return <div className={styles.tableData}>$ {entry.pool}</div>
         },
         visible: isBuying,
+        width: '13%',
       },
       // Available
-      {
-        title: <div className={styles.tableHeader}> Available </div>,
-        dataIndex: 'available',
-        key: 'available',
-        render: (text, entry) => {
-          return <div className={styles.tableData}>$ {entry.available}</div>
-        },
-        visible: !isBuying,
-      },
+      // {
+      //   title: <div className={styles.tableHeader}> Available </div>,
+      //   dataIndex: 'available',
+      //   key: 'available',
+      //   render: (text, entry) => {
+      //     return <div className={styles.tableData}>$ {entry.available}</div>
+      //   },
+      //   visible: !isBuying,
+      //   width: '25%',
+      // },
       // Wallet
       {
         title: <div className={styles.tableHeader}> Wallet </div>,
@@ -132,6 +136,7 @@ export default function TokenTable(props) {
           return <div className={styles.tableData}> {entry.wallet}</div>
         },
         visible: isDesktop(),
+        width: '25%',
       },
       {
         title: <div className={styles.tableHeader}> Weight </div>,
@@ -141,7 +146,7 @@ export default function TokenTable(props) {
           <div className={styles.tableData}>{entry.poolPercent} %</div>
         ),
         visible: true,
-        width: '25%',
+        width: '13%',
       },
       {
         title: <div className={styles.tableHeaderFirst}> Vote Weight </div>,
@@ -183,7 +188,7 @@ export default function TokenTable(props) {
           </div>
         ),
         visible: true,
-        width: '20%',
+        width: '19%',
       },
       // Fees
       // {
