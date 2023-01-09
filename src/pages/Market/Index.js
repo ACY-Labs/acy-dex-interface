@@ -27,8 +27,8 @@ const MarketIndex = props => {
         name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
         address0: pairlist[i].token0Address,
         address1: pairlist[i].token1Address,
-        price: (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
-        price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),
+        price: (pairlist[i].token0Price / pairlist[i].token1Price).toExponential(2),
+        price_24h: pairlist[i].priceVariation,
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         swaps: pairlist[i].txCount,
         liquidity: pairlist[i].liquidity,
@@ -46,8 +46,8 @@ const MarketIndex = props => {
         address0: pairlist[i].token0Address,
         address1: pairlist[i].token1Address,
         exchange: pairlist[i].exchange,
-        price: (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
-        price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),
+        price: (pairlist[i].token0Price / pairlist[i].token1Price).toExponential(2),
+        price_24h: pairlist[i].priceVariation,
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         swaps: pairlist[i].txCount,
         liquidity: pairlist[i].liquidity,
@@ -65,8 +65,8 @@ const MarketIndex = props => {
         address0: pairlist[i].token0Address,
         address1: pairlist[i].token1Address,
         exchange: pairlist[i].exchange,
-        price: (pairlist[i].token0Price / pairlist[i].token1Price).toFixed(2),
-        price_24h: '$' + parseFloat(pairlist[i].priceVariation).toFixed(4),
+        price: (pairlist[i].token0Price / pairlist[i].token1Price).toExponential(2),
+        price_24h: pairlist[i].priceVariation,
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         swaps: pairlist[i].txCount,
         liquidity: pairlist[i].liquidity,
@@ -280,27 +280,27 @@ const MarketIndex = props => {
             <div className={styles.statscontent}>
               <div className={styles.statsRow}>
                 <div className={styles.label}>1. {winnersPairs[0]?.name}</div>
-                <div className={styles.value}>{winnersPairs[0]?.price_24h}</div>
+                <div className={styles.value}>{(winnersPairs[0]?.price_24h*100).toFixed(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>2. {winnersPairs[1]?.name}</div>
-                <div className={styles.value}>{winnersPairs[1]?.price}</div>
+                <div className={styles.value}>{(winnersPairs[1]?.price_24h*100).toFixed(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>3. {winnersPairs[2]?.name}</div>
-                <div className={styles.value}>{winnersPairs[2]?.price}</div>
+                <div className={styles.value}>{(winnersPairs[2]?.price_24h*100).toFixed(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>4. {winnersPairs[3]?.name}</div>
-                <div className={styles.value}>{winnersPairs[3]?.price}</div>
+                <div className={styles.value}>{(winnersPairs[3]?.price_24h*100).toFixed(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>5. {winnersPairs[4]?.name}</div>
-                <div className={styles.value}>{winnersPairs[4]?.price}</div>
+                <div className={styles.value}>{(winnersPairs[4]?.price_24h*100).toFixed(2)}%</div>
               </div>
             </div>
 
@@ -322,27 +322,27 @@ const MarketIndex = props => {
             <div className={styles.statscontent}>
               <div className={styles.statsRow}>
                 <div className={styles.label}>1. {losersPairs[0]?.name}</div>
-                <div className={styles.value}>{losersPairs[0]?.price}</div>
+                <div className={styles.value}>{(losersPairs[0]?.price_24h*100).toFixed(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>2. {losersPairs[1]?.name}</div>
-                <div className={styles.value}>{losersPairs[1]?.price}</div>
+                <div className={styles.value}>{(losersPairs[1]?.price_24h*100).toFixed(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>3. {losersPairs[2]?.name}</div>
-                <div className={styles.value}>{losersPairs[2]?.price}</div>
+                <div className={styles.value}>{(losersPairs[2]?.price_24h*100).toFixed(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>4. {losersPairs[3]?.name}</div>
-                <div className={styles.value}>{losersPairs[3]?.price}</div>
+                <div className={styles.value}>{(losersPairs[3]?.price_24h*100).toFixed(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>5. {losersPairs[4]?.name}</div>
-                <div className={styles.value}>{losersPairs[4]?.price}</div>
+                <div className={styles.value}>{(losersPairs[4]?.price_24h*100).toFixed(2)}%</div>
               </div>
             </div>
 

@@ -72,16 +72,13 @@ export function PairsTable(props) {
             className={styles.tableHeader}
             onClick={() => { setCurrentKey('price') }}
           >
-            Price
+            Rate
           </div>
         ),
         dataIndex: 'price',
         key: 'price',
         render: (text, entry) => {
-          if(entry.price > 1e9) return <div className={styles.tableData}>${(entry.price/1e9).toFixed(2)}G</div>;
-          if(entry.price > 1e6) return <div className={styles.tableData}>${(entry.price/1e6).toFixed(2)}M</div>;
-          if(entry.price > 1e3) return <div className={styles.tableData}>${(entry.price/1e3).toFixed(2)}K</div>;
-          return <div className={styles.tableData}>${entry.price}</div>;
+          return <div className={styles.tableData}>{entry.price}</div>;
         },
         visible: true,
       },
@@ -97,7 +94,7 @@ export function PairsTable(props) {
         dataIndex: 'price_24h',
         key: 'price_24h',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.price_24h}</div>;
+          return <div className={styles.tableData}>{(entry.price_24h*100).toFixed(2)}%</div>;
         },
         visible: true,
       },
@@ -145,14 +142,6 @@ export function PairsTable(props) {
         dataIndex: 'liquidity',
         key: 'liquidity',
         render: (text, entry) => {
-          // let liquidity = entry.liquidity
-          // let cnt = 0;
-          // while(liquidity > 1e4) {
-          //   liquidity /= 10
-          //   cnt++
-          // }
-          // if(cnt > 0) return <div className={styles.tableData}>{liquidity.toFixed(0)}E{cnt}</div>;
-          // return <div className={styles.tableData}>{liquidity}</div>;
           if(entry.liquidity > 1e12) return <div className={styles.tableData}>{(entry.liquidity/1e12).toFixed(0)}T</div>;
           if(entry.liquidity > 1e9) return <div className={styles.tableData}>{(entry.liquidity/1e9).toFixed(0)}G</div>;
           if(entry.liquidity > 1e6) return <div className={styles.tableData}>{(entry.liquidity/1e6).toFixed(0)}M</div>;
@@ -447,6 +436,10 @@ export function TopVolumeTable(props) {
         dataIndex: 'liquidity',
         key: 'liquidity',
         render: (text, entry) => {
+          if(entry.liquidity > 1e12) return <div className={styles.tableData}>{(entry.liquidity/1e12).toFixed(0)}T</div>;
+          if(entry.liquidity > 1e9) return <div className={styles.tableData}>{(entry.liquidity/1e9).toFixed(0)}G</div>;
+          if(entry.liquidity > 1e6) return <div className={styles.tableData}>{(entry.liquidity/1e6).toFixed(0)}M</div>;
+          if(entry.liquidity > 1e3) return <div className={styles.tableData}>{(entry.liquidity/1e3).toFixed(0)}K</div>;
           return <div className={styles.tableData}>{entry.liquidity}</div>;
         },
         visible: true,
@@ -457,13 +450,13 @@ export function TopVolumeTable(props) {
             className={styles.tableHeader}
             onClick={() => { setCurrentKey('price') }}
           >
-            Price
+            Rate
           </div>
         ),
         dataIndex: 'price',
         key: 'price',
         render: (text, entry) => {
-          return <div className={styles.tableData}>${entry.price}</div>;
+          return <div className={styles.tableData}>{entry.price}</div>;
         },
         visible: true,
       },
@@ -479,7 +472,7 @@ export function TopVolumeTable(props) {
         dataIndex: 'price_24h',
         key: 'price_24h',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.price_24h}</div>;
+          return <div className={styles.tableData}>{(entry.price_24h*100).toFixed(2)}%</div>;
         },
         visible: true,
       },
