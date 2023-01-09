@@ -75,7 +75,12 @@ export function getPosition(rawPositionData,symbolData) {
       const _entryPrice = safeDiv(temp.cost,temp[2])
       // const entryPrice = ethers.utils.formatUnits(_entryPrice,0)
       const entryPrice = safeDiv2(cost,volume)
-
+      let liquidationPrice
+      if (volume >= 0) {
+        liquidationPrice = markPrice * (1 - initialMarginRatio/2) - (marginUsage-cost)/(volume*(1-initialMarginRatio/2))
+      } else {
+        liquidationPrice = markPrice * (1 + initialMarginRatio/2) + (marginUsage-cost)/(volume*(1+initialMarginRatio/2))
+      }
 
       const position = {
         symbol: temp[1],
@@ -87,8 +92,8 @@ export function getPosition(rawPositionData,symbolData) {
         unrealizedPnl: unrealizedPnl,
         accountFunding: accountFunding,
         type: volume>=0?"Long":"Short",
-        minTradeVolume: minTradeVolume
-
+        minTradeVolume: minTradeVolume,
+        liquidationPrice: liquidationPrice,
       };
       positionQuery.push(position)
     }

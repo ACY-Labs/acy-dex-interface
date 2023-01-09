@@ -162,6 +162,23 @@ export function PositionTable(props){
         },
         {
             title: (
+            <div
+                className={styles.tableHeader}
+                // onClick={() => { setCurrentKey('accountFunding') }}
+            >
+                Liquidation Price
+            </div>
+            ),
+            dataIndex: 'liquidationPrice',
+            // key: 'liquidationPrice',
+            render: (text, entry) => {
+                let res = formatNumber(entry.liquidationPrice)
+                return <div className={styles.tableData}>{res}</div>;
+            },
+            visible: true,
+        },
+        {
+            title: (
               <div
                 className={styles.tableHeader}
                 // onClick={() => { setCurrentKey('action') }}
