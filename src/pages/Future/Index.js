@@ -11,8 +11,7 @@ import AcySymbol from '@/components/AcySymbol';
 import { getGlobalTokenList } from '@/constants';
 import styles from './styles.less'
 
-
-const Powers = props => {
+const Future = props => {
   const { chainId } = useChainId();
   const tokens = getTokens(chainId);
 
@@ -29,8 +28,8 @@ const Powers = props => {
   const KChartTokenListBNB = ["BTC", "ETH", "BNB"]
   const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBNB
     : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
-      : KChartTokenListETH
-      
+    : KChartTokenListETH
+
   const selectTab = item => {
     setActiveToken((tokens.filter(ele => ele.symbol == item)[0]))
   }
@@ -45,7 +44,7 @@ const Powers = props => {
     setLatestPrice(curPrice);
     setPpriceChangePercentDelta(change);
   }
-  
+
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
@@ -68,10 +67,11 @@ const Powers = props => {
             {/* <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onClickCoin} coinList={coinList} /> */}
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               <ExchangeTVChart
-                chartTokenSymbol="BTC"
-                pageName="Powers"
+                chartTokenSymbol={activeToken.symbol}
+                pageName="Futures"
                 fromToken={activeToken.symbol}
                 toToken="USDT"
+                chainId={chainId}
                 onChangePrice={onChangePrice}
               />
             </div>
@@ -96,4 +96,4 @@ const Powers = props => {
   );
 }
 
-export default Powers
+export default Future

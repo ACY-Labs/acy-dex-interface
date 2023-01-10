@@ -57,7 +57,7 @@ export default [
       {
         path: '/future',
         name: 'Future',
-        component: './Perpetual/Index',
+        component: './Future/Index',
       },
       {
         path: '/options',
