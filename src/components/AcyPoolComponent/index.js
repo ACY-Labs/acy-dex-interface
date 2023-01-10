@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { ethers } from 'ethers';
-import { Tooltip } from 'antd'
+import { Tooltip, Input, Button } from 'antd'
 import { useChainId } from '@/utils/helpers';
 import { useWeb3React } from '@web3-react/core';
 import { useConstantLoader } from '@/constants';
-import { getTokens, getContract } from '@/constants/future_option_power.js';
+import { INITIAL_ALLOWED_SLIPPAGE, getTokens, getContract } from '@/constants/future_option_power.js';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { approveTokens, addLiquidity, removeLiquidity } from '@/services/derivatives';
 import {
@@ -24,6 +24,7 @@ import {
   MINT_BURN_FEE_BASIS_POINTS,
   BURN_FEE_BASIS_POINTS,
 } from '@/acy-dex-futures/utils';
+import { AcyDescriptions } from '../Acy';
 import ComponentTabs from '../ComponentTabs';
 import BuyInputSection from '@/pages/BuyGlp/components/BuyInputSection';
 import glp40Icon from '@/pages/BuyGlp/components/ic_glp_40.svg'
@@ -70,6 +71,9 @@ const AcyPoolComponent = props => {
   const { data: alpSupply, mutate: updateAlpSupply } = useSWR([chainId, alpAddress, "totalSupply"], {
     fetcher: fetcher(library, Alp),
   })
+  const { data:symbolsData,mutate:updateSymbolsData} = useSWR([chainId, readerAddress, 'getSymbolsInfo', poolAddress,[]], {
+    fetcher: fetcher(library, Reader)
+  })
 
   useEffect(() => {
     if (active) {
@@ -110,6 +114,11 @@ const AcyPoolComponent = props => {
   const [isApproving, setIsApproving] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
+  const [showDescription, setShowDescription] = useState(false)
+  const [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
+  const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
+  const [slippageError, setSlippageError] = useState('')
+  const [deadline, setDeadline] = useState()
 
   const needApproval = isBuying ?
     selectedToken.address != ethers.constants.AddressZero &&
@@ -120,12 +129,13 @@ const AcyPoolComponent = props => {
     alpAmount &&
     alpAmount.gt(alpAllowance)
 
-  const alpPrice = poolInfo ? poolInfo.totalSupply.gt(0) ? parseInt(poolInfo.liquidity) / parseInt(poolInfo.totalSupply) : expandDecimals(1, USD_DECIMALS) : 0
+  const alpPrice = poolInfo ? poolInfo.totalSupply.gt(0) ? parseInt(poolInfo.liquidity) / parseInt(poolInfo.totalSupply) : 1 : 0
   const alpSupplyUsd = alpSupply ? alpSupply.mul(parseValue(alpPrice, ALP_DECIMALS)) : bigNumberify(0)
   const alpBalanceUsd = alpBalance ? alpBalance.mul(parseValue(alpPrice, ALP_DECIMALS)) : bigNumberify(0)
   const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
   const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const amountUsd = selectedTokenPrice?.mul(selectedTokenAmount)
+  const minTradeVolume = formatAmount(symbolsData?.find(item => item.symbol?.toLowerCase() == props.selectedSymbol?.toLowerCase()).minTradeVolume, 18)
 
   let feePercentageText = formatAmount(feeBasisPoints, 2, 2, true, "-")
   if (feeBasisPoints !== undefined && feeBasisPoints.toString().length > 0) {
@@ -144,12 +154,31 @@ const AcyPoolComponent = props => {
 
   const onTokenValueChange = (e) => {
     setAnchorOnSwapAmount(true)
-    setSelectedTokenValue(e.target.value)
+    setShowDescription(true)
+    if (e.target.value === "") {
+      setSelectedTokenValue("0")
+    }
+    else if(e.target.value % minTradeVolume == 0) {
+      setSelectedTokenValue(e.target.value)
+    }
+    else {
+      setSelectedTokenValue(Math.floor(e.target.value/minTradeVolume)*minTradeVolume)
+    }
   }
 
   const onAlpValueChange = (e) => {
     setAnchorOnSwapAmount(false)
-    setAlpValue(e.target.value)
+    setShowDescription(true)
+    if (e.target.value === "") {
+      setAlpValue("0")
+    }
+    else if (e.target.value[0] === "0") {
+      let num = parseFloat(e.target.value)
+      setAlpValue(num.toString())
+    }
+    else {
+      setAlpValue(e.target.value)
+    }
   }
 
   const onSelectToken = (symbol) => {
@@ -203,8 +232,12 @@ const AcyPoolComponent = props => {
   }, [])
 
   useEffect(() => {
+    setShowDescription(false)
+  }, [chainId])
+
+  useEffect(() => {
     setSelectedTokenAmount(parseValue(selectedTokenValue, selectedToken?.decimals))
-  }, [selectedToken, selectedTokenValue])
+  }, [selectedTokenValue])
 
   useEffect(() => {
     setAlpAmount(parseValue(alpValue, ALP_DECIMALS))
@@ -218,7 +251,7 @@ const AcyPoolComponent = props => {
     if (selectedToken && isWaitingForApproval && !needApproval) {
       setIsWaitingForApproval(false)
     }
-  }, [selectedToken, selectedTokenAmount, needApproval, isWaitingForApproval])
+  }, [selectedToken, selectedTokenAmount, needApproval])
 
   useEffect(() => {
     if (selectedTokenValue == 0) {
@@ -236,7 +269,7 @@ const AcyPoolComponent = props => {
       setPayBalance(`$${formatAmount(pay, selectedToken.decimals * 2, 2, true)}`)
       setReceiveBalance(`$${formatAmount(receive, ALP_DECIMALS * 2, 2, true)}`)
     }
-  }, [selectedToken, selectedTokenValue, selectedTokenPrice, alpValue, alpPrice])
+  }, [selectedToken, selectedTokenValue, alpValue])
 
   useEffect(() => {
     if (anchorOnSwapAmount) {
@@ -246,6 +279,7 @@ const AcyPoolComponent = props => {
         return
       }
       if (isBuying) {
+
         let nextAmount = alpPrice && amountUsd?.div(parseValue(alpPrice, ALP_DECIMALS))
           .mul(BASIS_POINTS_DIVISOR).div(BASIS_POINTS_DIVISOR - MINT_BURN_FEE_BASIS_POINTS)
 
@@ -310,15 +344,14 @@ const AcyPoolComponent = props => {
 
   const buyAlp = () => {
     setIsSubmitting(true)
-    const minLp = parseValue(alpValue * 0.95, ALP_DECIMALS)
+    const minLp = parseValue(alpPrice, ALP_DECIMALS)?.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000))
     addLiquidity(chainId, library, routerAddress, Router, selectedToken, selectedTokenAmount, minLp, setIsSubmitting)
   }
 
   const sellAlp = () => {
     setIsSubmitting(true)
-    // const minOut = parseValue(alpValue * 0.95, ALP_DECIMALS)
-    const minOut = bigNumberify(0)
-    removeLiquidity(chainId, library, routerAddress, Router, selectedToken, selectedTokenAmount, minOut, setIsSubmitting)
+    const minOut = selectedTokenAmount.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000))
+    removeLiquidity(chainId, library, routerAddress, Router, selectedToken, alpAmount, minOut, setIsSubmitting)
   }
 
   const onClickPrimary = () => {
@@ -328,7 +361,7 @@ const AcyPoolComponent = props => {
     }
     if (needApproval) {
       isBuying ? approveTokens(library, routerAddress, ERC20, selectedToken.address, selectedTokenAmount, setIsWaitingForApproval, setIsApproving)
-      : approveTokens(library, routerAddress, Alp, alpAddress, alpAmount, setIsWaitingForApproval, setIsApproving)
+        : approveTokens(library, routerAddress, Alp, alpAddress, alpAmount, setIsWaitingForApproval, setIsApproving)
       return
     }
     const [, modal] = getError()
@@ -442,6 +475,67 @@ const AcyPoolComponent = props => {
           </div>
         </div>
 
+        {showDescription ?
+          <AcyDescriptions>
+            <div className={styles.breakdownTopContainer}>
+              <div className={styles.slippageContainer}>
+                <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
+                  <Input
+                    className={styles.input}
+                    value={inputSlippageTol || ''}
+                    onChange={e => {
+                      setInputSlippageTol(e.target.value);
+                    }}
+                    suffix={<strong>%</strong>}
+                  />
+                  <Button
+                    type="primary"
+                    style={{
+                      marginLeft: '10px',
+                      background: '#2e3032',
+                      borderColor: 'transparent',
+                    }}
+                    onClick={() => {
+                      if (isNaN(inputSlippageTol)) {
+                        setSlippageError('Please input valid slippage value!');
+                      } else {
+                        setSlippageError('');
+                        setSlippageTolerance(parseFloat(inputSlippageTol));
+                      }
+                    }}
+                  >
+                    Set
+                  </Button>
+                </div>
+                {slippageError.length > 0 && (
+                  <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
+                )}
+              </div>
+              <div className={styles.slippageContainer}>
+                <span style={{ fontWeight: 600, marginBottom: '10px' }}>Transaction deadline</span>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    height: '33.6px',
+                    marginTop: '10px',
+                  }}
+                >
+                  <Input
+                    className={styles.input}
+                    type="number"
+                    value={Number(deadline).toString()}
+                    onChange={e => setDeadline(e.target.valueAsNumber || 0)}
+                    placeholder={30}
+                    suffix={<strong>minutes</strong>}
+                  />
+                </div>
+              </div>
+            </div>
+          </AcyDescriptions>
+          : null}
+
         <div className={styles.centerButton}>
           <ComponentButton
             style={{ marginTop: '25px' }}
@@ -454,46 +548,46 @@ const AcyPoolComponent = props => {
 
       </div>
 
-      <div className={styles.GlpSwapstatscard}>
-      <div className={styles.GlpSwapstatsmark}>
-        <div className={styles.GlpSwapstatsicon}>
-          <img src={glp40Icon} alt="glp40Icon" />
-        </div>
-        <div className={styles.GlpSwapinfo}>
-          <div className={styles.statstitle}>ALP</div>
-          <div className={styles.statssubtitle}>ALP</div>
-        </div>
-      </div>
-
-      <div className={styles.GlpSwapdivider} />
-
-      <div className={styles.GlpSwapstatscontent}>
-        <div className={styles.GlpSwapcardrow}>
-          <div className={styles.label}>Price</div>
-          <div className={styles.value}>
-            ${alpPrice.toFixed(4)}
+      {/* <div className={styles.GlpSwapstatscard}>
+        <div className={styles.GlpSwapstatsmark}>
+          <div className={styles.GlpSwapstatsicon}>
+            <img src={glp40Icon} alt="glp40Icon" />
+          </div>
+          <div className={styles.GlpSwapinfo}>
+            <div className={styles.statstitle}>ALP</div>
+            <div className={styles.statssubtitle}>ALP</div>
           </div>
         </div>
-        <div className={styles.GlpSwapcardrow}>
-          <div className={styles.label}>Wallet</div>
-          <div className={styles.value}>
-            {formatAmount(alpBalance, ALP_DECIMALS, 4, true)} ALP (${formatAmount(alpBalanceUsd, USD_DECIMALS, 2, true)})
+
+        <div className={styles.GlpSwapdivider} />
+
+        <div className={styles.GlpSwapstatscontent}>
+          <div className={styles.GlpSwapcardrow}>
+            <div className={styles.label}>Price</div>
+            <div className={styles.value}>
+              ${alpPrice.toFixed(4)}
+            </div>
+          </div>
+          <div className={styles.GlpSwapcardrow}>
+            <div className={styles.label}>Wallet</div>
+            <div className={styles.value}>
+              {formatAmount(alpBalance, ALP_DECIMALS, 4, true)} ALP (${formatAmount(alpBalanceUsd, USD_DECIMALS, 2, true)})
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className={styles.GlpSwapdivider} />
+        <div className={styles.GlpSwapdivider} />
 
-      <div className={styles.GlpSwapstatscontent}>
-        <div className={styles.GlpSwapcardrow}>
-          <div className={styles.label}>Total Supply</div>
-          <div className={styles.value}>
-            {formatAmount(alpSupply, ALP_DECIMALS, 4, true)} ALP (${formatAmount(alpSupplyUsd, USD_DECIMALS, 2, true)})
+        <div className={styles.GlpSwapstatscontent}>
+          <div className={styles.GlpSwapcardrow}>
+            <div className={styles.label}>Total Supply</div>
+            <div className={styles.value}>
+              {formatAmount(alpSupply, ALP_DECIMALS, 4, true)} ALP (${formatAmount(alpSupplyUsd, USD_DECIMALS, 2, true)})
+            </div>
           </div>
         </div>
-      </div>
 
-    </div>
+      </div> */}
     </div>
   )
 

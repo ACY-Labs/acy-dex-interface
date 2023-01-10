@@ -144,7 +144,7 @@ const DerivativeComponent = props => {
 
         {mode == 'Pool'
           ?
-          <AcyPoolComponent />
+          <AcyPoolComponent selectedSymbol={symbol}/>
           :
           <>
             <div className={styles.rowFlexContainer}>

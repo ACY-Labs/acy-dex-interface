@@ -45,7 +45,7 @@ const Powers = props => {
     setLatestPrice(curPrice);
     setPpriceChangePercentDelta(change);
   }
-
+  
   return (
     <div className={styles.main}>
       <div className={styles.rowFlexContainer}>
