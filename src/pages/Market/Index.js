@@ -160,7 +160,7 @@ const MarketIndex = props => {
       <ConnectWallet />
 
       {/* New Pairs */}
-      <div className={styles.topChart}>
+      {/* <div className={styles.topChart}>
         <div className={styles.chartCell}>
           <div className={styles.statsContainer}>
             <div className={styles.statstitle}>
@@ -168,14 +168,14 @@ const MarketIndex = props => {
               <span className={styles.seeMore} onClick={() => { setMode('NewPairs') }}>
                 More >
               </span>
-            </div>
+            </div> */}
             {/* <div className={styles.statsdivider} /> */}
 
-            <LivePairsTable dataSource={test_livepairs.slice(0, 5)} />
+            {/* <LivePairsTable dataSource={test_livepairs.slice(0, 5)} />
 
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className={styles.chartGrid}>
 
@@ -223,7 +223,7 @@ const MarketIndex = props => {
         </div>
 
         {/* Trending */}
-        <div className={styles.chartCell}>
+        {/* <div className={styles.chartCell}>
           <div className={styles.statsContainer}>
             <div className={styles.statstitle}>
               Trending
@@ -231,8 +231,6 @@ const MarketIndex = props => {
                 More >
               </span>
             </div>
-
-            {/* <div className={styles.statsdivider} /> */}
 
             <div className={styles.statscontent}>
               <div className={styles.statsRow}>
@@ -263,7 +261,7 @@ const MarketIndex = props => {
             </div>
 
           </div>
-        </div>
+        </div> */}
 
         {/* Winners */}
         <div className={styles.chartCell}>
