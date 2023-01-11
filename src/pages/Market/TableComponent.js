@@ -94,7 +94,7 @@ export function PairsTable(props) {
         dataIndex: 'price_24h',
         key: 'price_24h',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{(entry.price_24h*100).toFixed(2)}%</div>;
+          return <div className={styles.tableData}>{(entry.price_24h*100).toPrecision(2)}%</div>;
         },
         visible: true,
       },

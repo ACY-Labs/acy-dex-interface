@@ -27,7 +27,7 @@ const MarketIndex = props => {
         name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
         address0: pairlist[i].token0Address,
         address1: pairlist[i].token1Address,
-        price: (pairlist[i].token0Price / pairlist[i].token1Price).toExponential(2),
+        price: (pairlist[i].token0Price / pairlist[i].token1Price).toPrecision(2),
         price_24h: pairlist[i].priceVariation,
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         swaps: pairlist[i].txCount,
@@ -46,7 +46,7 @@ const MarketIndex = props => {
         address0: pairlist[i].token0Address,
         address1: pairlist[i].token1Address,
         exchange: pairlist[i].exchange,
-        price: (pairlist[i].token0Price / pairlist[i].token1Price).toExponential(2),
+        price: (pairlist[i].token0Price / pairlist[i].token1Price).toPrecision(2),
         price_24h: pairlist[i].priceVariation,
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         swaps: pairlist[i].txCount,
@@ -65,7 +65,7 @@ const MarketIndex = props => {
         address0: pairlist[i].token0Address,
         address1: pairlist[i].token1Address,
         exchange: pairlist[i].exchange,
-        price: (pairlist[i].token0Price / pairlist[i].token1Price).toExponential(2),
+        price: (pairlist[i].token0Price / pairlist[i].token1Price).toPrecision(2),
         price_24h: pairlist[i].priceVariation,
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         swaps: pairlist[i].txCount,
@@ -278,27 +278,27 @@ const MarketIndex = props => {
             <div className={styles.statscontent}>
               <div className={styles.statsRow}>
                 <div className={styles.label}>1. {winnersPairs[0]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[0]?.price_24h*100).toFixed(2)}%</div>
+                <div className={styles.value}>{(winnersPairs[0]?.price_24h*100).toPrecision(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>2. {winnersPairs[1]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[1]?.price_24h*100).toFixed(2)}%</div>
+                <div className={styles.value}>{(winnersPairs[1]?.price_24h*100).toPrecision(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>3. {winnersPairs[2]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[2]?.price_24h*100).toFixed(2)}%</div>
+                <div className={styles.value}>{(winnersPairs[2]?.price_24h*100).toPrecision(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>4. {winnersPairs[3]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[3]?.price_24h*100).toFixed(2)}%</div>
+                <div className={styles.value}>{(winnersPairs[3]?.price_24h*100).toPrecision(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>5. {winnersPairs[4]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[4]?.price_24h*100).toFixed(2)}%</div>
+                <div className={styles.value}>{(winnersPairs[4]?.price_24h*100).toPrecision(2)}%</div>
               </div>
             </div>
 
@@ -320,27 +320,27 @@ const MarketIndex = props => {
             <div className={styles.statscontent}>
               <div className={styles.statsRow}>
                 <div className={styles.label}>1. {losersPairs[0]?.name}</div>
-                <div className={styles.value}>{(losersPairs[0]?.price_24h*100).toFixed(2)}%</div>
+                <div className={styles.value}>{(losersPairs[0]?.price_24h*100).toPrecision(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>2. {losersPairs[1]?.name}</div>
-                <div className={styles.value}>{(losersPairs[1]?.price_24h*100).toFixed(2)}%</div>
+                <div className={styles.value}>{(losersPairs[1]?.price_24h*100).toPrecision(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>3. {losersPairs[2]?.name}</div>
-                <div className={styles.value}>{(losersPairs[2]?.price_24h*100).toFixed(2)}%</div>
+                <div className={styles.value}>{(losersPairs[2]?.price_24h*100).toPrecision(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>4. {losersPairs[3]?.name}</div>
-                <div className={styles.value}>{(losersPairs[3]?.price_24h*100).toFixed(2)}%</div>
+                <div className={styles.value}>{(losersPairs[3]?.price_24h*100).toPrecision(2)}%</div>
               </div>
 
               <div className={styles.statsRow}>
                 <div className={styles.label}>5. {losersPairs[4]?.name}</div>
-                <div className={styles.value}>{(losersPairs[4]?.price_24h*100).toFixed(2)}%</div>
+                <div className={styles.value}>{(losersPairs[4]?.price_24h*100).toPrecision(2)}%</div>
               </div>
             </div>
 
@@ -358,14 +358,14 @@ const MarketIndex = props => {
         >
           Pairs
         </button>
-        <button
+        {/* <button
           type="button"
           className={styles.middleToggleButton}
           style={{ backgroundColor: mode == 'NewPairs' ? "#2e3032" : "transparent", color: mode == 'LivePairs' ? "white" : "", border: '0.75px solid #333333' }}
           onClick={() => { setMode('NewPairs') }}
         >
           New Pairs
-        </button>
+        </button> */}
         <button
           type="button"
           className={styles.middleToggleButton}
@@ -374,14 +374,14 @@ const MarketIndex = props => {
         >
           Top Volume
         </button>
-        <button
+        {/* <button
           type="button"
           className={styles.middleToggleButton}
           style={{ backgroundColor: mode == 'Trending' ? "#2e3032" : "transparent", color: mode == 'Trending' ? "white" : "", border: '0.75px solid #333333' }}
           onClick={() => { setMode('Trending') }}
         >
           Trending
-        </button>
+        </button> */}
         <button
           type="button"
           className={styles.middleToggleButton}
@@ -403,18 +403,10 @@ const MarketIndex = props => {
       {mode == 'Pairs' && <PairsTable dataSource={topVolumePairs} />}
       {mode == 'Winners' && <PairsTable dataSource={winnersPairs} />}
       {mode == 'Losers' && <PairsTable dataSource={losersPairs} />}
-      {mode == 'NewPairs' && <LivePairsTable dataSource={test_livepairs} />}
+      {/* {mode == 'NewPairs' && <LivePairsTable dataSource={test_livepairs} />} */}
       {mode == 'TopVolume' && <TopVolumeTable dataSource={topVolumePairs} />}
-      {mode == 'Trending' && <TrendingTable dataSource={topVolumePairs} />}
+      {/* {mode == 'Trending' && <TrendingTable dataSource={topVolumePairs} />} */}
 
-      {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <h2>Cryptocurrencies</h2>
-      </div>
-      {coinList.length > 0 ? (
-        <CurrencyTable dataSourceCoin={coinList} />
-      ) : (
-        <Icon type="loading" />
-      )} */}
     </div>
   );
 
