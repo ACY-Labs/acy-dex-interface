@@ -46,6 +46,7 @@ const PRICE_LINE_TEXT_WIDTH = 15;
 const timezoneOffset = -new Date().getTimezoneOffset() * 60;
 const BinancePriceApi = 'https://api.acy.finance/polygon-test';
 const OptionsPriceApi = 'https://options.acy.finance/api';
+const TradePriceApi = 'https://stats.acy.finance/api/rates/candles';
 const DEFAULT_PERIOD = "4h";
 
 const getSeriesOptions = () => ({
@@ -219,23 +220,26 @@ export default function ExchangeTVChart(props) {
       if (pageName == "StableCoin") {
         responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,)
           .then((res) => res.data);
+        if (toToken != "USDT") {
+          responseToTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,)
+            .then((res) => res.data)
+        }
       } else if (pageName == "Option") {
         responseFromTokenData = await axios.get(`${OptionsPriceApi}/option?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
           .then((res) => res.data);
       } else if (pageName == "Futures") {
         responseFromTokenData = await axios.get(`${OptionsPriceApi}/futures?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
           .then((res) => res.data);
+      } else if(pageName == "Trade") {
+        responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromToken}&token1=${toToken}&chainId=${chainId}&period=${period}`)
+          .then((res) => res.data);
       } else {
         responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${fromToken}USDT&interval=${period}`,)
           .then((res) => res.data);
       }
 
-      if (toToken != "USDT") {
-        responseToTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,)
-          .then((res) => res.data)
-      }
       for (let i = 0; i < responseFromTokenData.length; i++) {
-        if (pageName == "Option" || pageName == "Futures") {
+        if (pageName == "Option" || pageName == "Futures" || pageName == "Trade") {
           responsePairData.push({
             time: responseFromTokenData[i].timestamp,
             open: responseFromTokenData[i].o,

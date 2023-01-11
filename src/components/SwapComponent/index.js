@@ -3,10 +3,9 @@ import { useHistory } from 'react-router-dom';
 import { connect } from 'umi';
 import { approve, getUserTokenBalance } from '@/acy-dex-swap/utils/index';
 import { swapGetEstimated, swap } from '@/acy-dex-swap/core/swap';
-import { useConstantLoader, getGlobalTokenList } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { useChainId } from '@/utils/helpers';
-import { getTokens } from '@/constants/trade';
+import { getTokens, INITIAL_ALLOWED_SLIPPAGE } from '@/constants/trade';
 import { AcyCuarrencyCard, AcyDescriptions } from '@/components/Acy';
 import ComponentButton from '../ComponentButton';
 import { Button, Input, Icon } from 'antd';
@@ -21,39 +20,24 @@ import { useWeb3React } from '@web3-react/core';
 
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
-  const { account,library } = useWeb3React();
-  const { farmSetting: { INITIAL_ALLOWED_SLIPPAGE } } = useConstantLoader(props);
-  const {
-    dispatch,
-    onSelectToken0,
-    onSelectToken1,
-    onSelectToken,
+  const {   
     token0,
     token1,
-    setActiveToken0:setToken0,
-    setActiveToken1:setToken1,
+    onSelectToken0,
+    onSelectToken1,
     isLockedToken1=false,
-    tokenlist:INITIAL_TOKEN_LIST,
-    setTokenlist,
+    account,
+    library,
+    chainId,
   } = props;
   // 选择货币的弹窗
 
-  const { chainId } = useChainId();
-  
-  // let INITIAL_TOKEN_LIST = getTokens(chainId);
-  // INITIAL_TOKEN_LIST = getTokenList(chainId);
-
-  const coinList = getGlobalTokenList()
+  const tokenlist = getTokens(chainId);
 
   const [visible, setVisible] = useState(null);
 
   // 选择货币前置和后置
   const [before, setBefore] = useState(true);
-
-  // 交易对前置货币
-  // const [token0, setToken0] = useState(INITIAL_TOKEN_LIST[0]);
-  // // 交易对后置货币
-  // const [token1, setToken1] = useState(INITIAL_TOKEN_LIST[3]);
 
   // 交易对前置货币余额
   const [token0Balance, setToken0Balance] = useState('0');
@@ -112,24 +96,11 @@ const SwapComponent = props => {
   const connectWalletByLocalStorage = useConnectWallet();
 
   useEffect(() => {
-    if (!INITIAL_TOKEN_LIST) return
-    console.log("resetting page states, new swapComponent token0, token1", INITIAL_TOKEN_LIST[0], INITIAL_TOKEN_LIST[1])
-    let temp = axios.get("https://stats.acy.finance/api/tokens?chainId=56"
-    ).then((res)=>{
-      temp = res.data;
-      if(temp.length!=0){
-        console.log("Token1Temp",temp)
-        setTokenlist(temp);
-      }
-      return res.data;
-    })
+    if (!tokenlist) return
+    console.log("resetting page states, new swapComponent token0, token1", tokenlist[0], tokenlist[1])
     setVisible(null);
     // 选择货币前置和后置
     setBefore(true);
-    // 交易对前置货币
-    setToken0(INITIAL_TOKEN_LIST[0]);
-    // 交易对后置货币
-    setToken1(INITIAL_TOKEN_LIST[3]);
     // 交易对前置货币余额
     setToken0Balance('0');
     // 交易对后置货币余额
@@ -177,9 +148,6 @@ const SwapComponent = props => {
   useEffect(() => {
     const { swap: { token0: modelToken0, token1: modelToken1 } } = props;
 
-    // setToken0(modelToken0);
-    // setToken1(modelToken1);
-
     console.log(">> old new token 0/1 compare", token0 == modelToken1, token1 == modelToken0)
     if (token0 == modelToken1 && token1 == modelToken0) {
       const newToken0Balance = token1Balance;
@@ -191,18 +159,16 @@ const SwapComponent = props => {
 
   useEffect(
     () => {
-      console.log("swapComp 239", account, chainId, library)
       if (!account || !chainId || !library) {
         setToken0BalanceShow(false);
         setToken1BalanceShow(false);
         return;
       }
-      console.log("try to refresh balance", INITIAL_TOKEN_LIST, token0, token1)
 
-      const _token0 = INITIAL_TOKEN_LIST[0];
-      const _token1 = INITIAL_TOKEN_LIST[3];
-      setToken0(_token0);
-      setToken1(_token1);
+      const _token0 = tokenlist[0];
+      const _token1 = tokenlist[3];
+      onSelectToken0(_token0);
+      onSelectToken1(_token1);
       async function refreshBalances() {
         setToken0Balance(await getUserTokenBalance(_token0, chainId, account, library).catch(e => console.log("refrersh balances error", e)));
         setToken0BalanceShow(true);
@@ -215,7 +181,7 @@ const SwapComponent = props => {
         e => console.log("refrersh balances error", e)
       }
     },
-    [account]
+    [account, tokenlist]
   );
 
   // token1Amount is changed according to token0Amount
@@ -353,23 +319,14 @@ const SwapComponent = props => {
 
   const onCoinClick = async token => {
     onCancel();
-    if (account == undefined) {
-      alert('Please connect to your account');
+    if (before) {
+      onSelectToken0(token);
+      setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
+      setToken0BalanceShow(true);
     } else {
-      if (before) {
-        console.log('SET TOKEN 0');
-        console.log("onselect token0", token);
-        onSelectToken0(token);
-        setToken0(token);
-        setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
-        setToken0BalanceShow(true);
-      } else {
-        console.log("onselect token1", token);
-        onSelectToken1(token);
-        setToken1(token);
-        setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
-        setToken1BalanceShow(true);
-      }
+      onSelectToken1(token);
+      setToken1Balance(await getUserTokenBalance(token, chainId, account, library));
+      setToken1BalanceShow(true);
     }
   };
 
@@ -385,13 +342,11 @@ const SwapComponent = props => {
     let tempAmount = token1Amount;
     let tempBalance = token1Balance;
 
-    setToken1(token0);
     onSelectToken1(token0);
     setToken1Amount(token0Amount);
     setToken1Balance(token0Balance);
 
-    setToken0(tempToken);
-    onSelectToken0(token1);
+    onSelectToken0(tempToken);
     setToken0Amount(tempAmount);
     setToken0Balance(tempBalance);
   };
@@ -441,25 +396,19 @@ const SwapComponent = props => {
             setSwapButtonContent("Done");
           }
 
-          const newData = transactions.filter(item => item.hash != hash);
-          dispatch({
-            type: 'transaction/addTransaction',
-            payload: {
-              transactions: newData
-            },
-          });
+          // const newData = transactions.filter(item => item.hash != hash);
+          // dispatch({
+          //   type: 'transaction/addTransaction',
+          //   payload: {
+          //     transactions: newData
+          //   },
+          // });
 
         }
       });
     }
     sti(status.hash);
   };
-
-  const history = useHistory()
-  useEffect(() => {
-    const hash = history.location.hash.replace('#', '').split('?')[0]
-    hash ? setToken0(coinList.filter(coin => coin.symbol.toLowerCase() == hash.toLowerCase())[0]) : setToken0(INITIAL_TOKEN_LIST[0])
-  }, [history.location.hash, coinList])
 
   const onClickApprove = async () => {
     setShowSpinner(true);
@@ -676,7 +625,7 @@ const SwapComponent = props => {
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
-      <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} coinlist={INITIAL_TOKEN_LIST}/>
+      <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} coinList={tokenlist}/>
 
     </div>
   );
