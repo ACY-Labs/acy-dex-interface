@@ -164,15 +164,6 @@
   animation-timing-function: linear;
 }
 
-.slippageContainer {
-  margin-bottom: 25px;
-  margin-top: 25px;
-  margin-left: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .checkbox {
   margin-right: 10px;
 }
@@ -195,61 +186,61 @@
 }
 
 .typeSelector {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    padding-left: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding-left: 20px;
 }
 
 .typeSubOption {
-    font-size: 10px;
+  font-size: 10px;
 }
 
 .priceBox {
-    margin-top: 0px;
+  margin-top: 0px;
 }
 
 .describeMain {
-    padding: 10px;
-    margin-top: 4px;
+  padding: 10px;
+  margin-top: 4px;
 }
 
 .describeMainTitle {
-    font-size: 14px;
-    font-weight: bold;
-    border-bottom: 1px solid white;
+  font-size: 14px;
+  font-weight: bold;
+  border-bottom: 1px solid white;
 }
 
 .describeTitle {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 .describeInfo {
-    font-size: 12px;
-    float: right;
+  font-size: 12px;
+  float: right;
 }
 
 .leverageContainer {
-    margin-bottom: 40px;
+  margin-bottom: 40px;
 }
 
 .leverageLabel {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .leverageSlider {
-    color: red;
+  color: red;
 }
 
 .leverageInputContainer {
-    display: flex;
-    // align-items: center;
-    // justify-content: space-between;
-    // position: relative;
-    // overflow: hidden;
-    // width: 50%;
-    margin-left: 20px;
-    // margin-right: 30px;
+  display: flex;
+  // align-items: center;
+  // justify-content: space-between;
+  // position: relative;
+  // overflow: hidden;
+  // width: 50%;
+  margin-left: 20px;
+  // margin-right: 30px;
 }
 
 .leverageButton {
@@ -270,12 +261,12 @@
 }
 
 .leverageInput {
-    color: #b5b5b6;
-    border: 0.75px solid #232323;
-    background-color: transparent;
-    font-size: 16px;
-    text-align: center;
-    width: 40%;
+  color: #b5b5b6;
+  border: 0.75px solid #232323;
+  background-color: transparent;
+  font-size: 16px;
+  text-align: center;
+  width: 40%;
 }
 
 .TooltipHandle {
@@ -505,5 +496,26 @@
     margin-right: 1rem;
     display: flex;
     justify-content: flex-end;
+  }
+}
+
+.slippageContainer {
+  padding-top: 10px;
+  margin: 20px 10px;
+
+  :global {
+    .ant-input-affix-wrapper {
+      background-color: black;
+      border: 0.75px solid #333333;
+      border-radius: 5px;
+    }
+
+    .ant-input {
+      background-color: black;
+    }
+  }
+
+  .input {
+    flex: 1 1 auto;
   }
 }

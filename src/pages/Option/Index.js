@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Drawer } from 'antd';
 import AcyCard from '@/components/AcyCard';
-import OptionComponent from '@/components/OptionComponent'
+import DerivativeComponent from '@/components/DerivativeComponent'
 import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
@@ -126,8 +126,7 @@ const Option = props => {
   const { account, library } = useWeb3React();
   const { active } = useWeb3React()
   let { chainId } = useChainId();
-  console.log("chainId",chainId)
-  let tokens = getTokens(chainId)?getTokens(chainId):[];
+  let tokens = getTokens(chainId);
 
   const [mode, setMode] = useState('Buy')
   const [symbol, setSymbol] = useState('BTCUSD-60000-C')
@@ -488,7 +487,7 @@ const Option = props => {
         {/* RIGHT INTERACTIVE COMPONENT */}
         <div className={`${styles.colItem} ${styles.optionComponent}`}>
           <AcyCard style={{ backgroundColor: 'transparent', border: 'none' }}>
-            <OptionComponent
+            <DerivativeComponent
               mode={mode}
               setMode={setMode}
               chainId={chainId}
