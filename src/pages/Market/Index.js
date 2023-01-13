@@ -17,6 +17,7 @@ const MarketIndex = props => {
   const [topVolumePairs, setTopVolumePairs] = useState([])
   const [winnersPairs, setWinnersPairs] = useState([])
   const [losersPairs, setLosersPairs] = useState([])
+  const [newPairs, setNewPairs] = useState([])
 
   const getPairList = async () => {
     // fetch top volume pair list
@@ -74,93 +75,36 @@ const MarketIndex = props => {
       })
     }
     setLosersPairs(pairs)
+
+    pairlist = await axios.get(`${apiUrlPrefix}/new-pairs?chainId=${chainId}`).then(res => res.data)
+    pairs = []
+    for (let i = 0; i < pairlist.length; i++) {
+      pairs.push({
+        name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
+        address0: pairlist[i].token0Address,
+        address1: pairlist[i].token1Address,
+        exchange: pairlist[i].exchange,
+        price: pairlist[i].token1Price!="0" ? (pairlist[i].token0Price / pairlist[i].token1Price).toPrecision(2) : "-",
+        price_24h: pairlist[i].priceVariation,
+        volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
+        swaps: pairlist[i].txCount,
+        liquidity: pairlist[i].liquidity,
+        createdAt: Date(pairlist[i].createdAtTimestamp),
+      })
+    }
+    setNewPairs(pairs)
   }
 
   useEffect(() => {
     getPairList()
   }, [])
 
-  const test_livepairs = [
-    {
-      name: 'USDC/PANKY',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '32s',
-      price: '-',
-      volume: '-',
-      initial_liquidity: '-',
-      total_liquidity: '-',
-      pool_amount: '-',
-      pool_variation: '0%',
-      pool_remaining: '-',
-    },
-    {
-      name: 'WETH/ROWA',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '2m 40s',
-      price: '$0.00002431',
-      volume: '-',
-      initial_liquidity: '2022-08-06',
-      total_liquidity: '$5310.16',
-      pool_amount: '1.55 ETH',
-      pool_variation: '0.06%',
-      pool_remaining: '1.6236 ETH',
-    },
-    {
-      name: 'WETH/OYA',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '10m 30s',
-      price: '$0.00004183',
-      volume: '-',
-      initial_liquidity: '2022-08-06',
-      total_liquidity: '$5914.87',
-      pool_amount: '1.5 ETH',
-      pool_variation: '15.13%',
-      pool_remaining: '1.72683 ETH',
-    },
-    {
-      name: 'USDC/PANKY',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '32s',
-      price: '-',
-      volume: '-',
-      initial_liquidity: '-',
-      total_liquidity: '-',
-      pool_amount: '-',
-      pool_variation: '0%',
-      pool_remaining: '-',
-    },
-    {
-      name: 'WETH/ROWA',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '2m 40s',
-      price: '$0.00002431',
-      volume: '-',
-      initial_liquidity: '2022-08-06',
-      total_liquidity: '$5310.16',
-      pool_amount: '1.55 ETH',
-      pool_variation: '0.06%',
-      pool_remaining: '1.6236 ETH',
-    },
-    {
-      name: 'WETH/OYA',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '10m 30s',
-      price: '$0.00004183',
-      volume: '-',
-      initial_liquidity: '2022-08-06',
-      total_liquidity: '$5914.87',
-      pool_amount: '1.5 ETH',
-      pool_variation: '15.13%',
-      pool_remaining: '1.72683 ETH',
-    },
-  ]
-
   return (
     <div className={styles.marketRoot}>
       <ConnectWallet />
 
       {/* New Pairs */}
-      {/* <div className={styles.topChart}>
+      <div className={styles.topChart}>
         <div className={styles.chartCell}>
           <div className={styles.statsContainer}>
             <div className={styles.statstitle}>
@@ -168,14 +112,14 @@ const MarketIndex = props => {
               <span className={styles.seeMore} onClick={() => { setMode('NewPairs') }}>
                 More >
               </span>
-            </div> */}
-            {/* <div className={styles.statsdivider} /> */}
+            </div>
+            <div className={styles.statsdivider} />
 
-            {/* <LivePairsTable dataSource={test_livepairs.slice(0, 5)} />
+            <LivePairsTable dataSource={newPairs.slice(0, 5)} />
 
           </div>
         </div>
-      </div> */}
+      </div>
 
       <div className={styles.chartGrid}>
 
@@ -358,14 +302,14 @@ const MarketIndex = props => {
         >
           Pairs
         </button>
-        {/* <button
+        <button
           type="button"
           className={styles.middleToggleButton}
           style={{ backgroundColor: mode == 'NewPairs' ? "#2e3032" : "transparent", color: mode == 'LivePairs' ? "white" : "", border: '0.75px solid #333333' }}
           onClick={() => { setMode('NewPairs') }}
         >
           New Pairs
-        </button> */}
+        </button>
         <button
           type="button"
           className={styles.middleToggleButton}
@@ -403,7 +347,7 @@ const MarketIndex = props => {
       {mode == 'Pairs' && <PairsTable dataSource={topVolumePairs} />}
       {mode == 'Winners' && <PairsTable dataSource={winnersPairs} />}
       {mode == 'Losers' && <PairsTable dataSource={losersPairs} />}
-      {/* {mode == 'NewPairs' && <LivePairsTable dataSource={test_livepairs} />} */}
+      {mode == 'NewPairs' && <LivePairsTable dataSource={newPairs} />}
       {mode == 'TopVolume' && <TopVolumeTable dataSource={topVolumePairs} />}
       {/* {mode == 'Trending' && <TrendingTable dataSource={topVolumePairs} />} */}
 
