@@ -105,7 +105,6 @@ const Option = props => {
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
-  console.log("option symbol symbolInfo:", symbolsInfo)
   const { data:rawPositionData,mutate:updatePosition} = useSWR([chainId, readerAddress, 'getTdInfo',poolAddress,account], {
     fetcher: fetcher(library, Reader)
   })
@@ -133,7 +132,6 @@ const Option = props => {
   )
   //option_tokens store every symbols in option and its data 
   const option_tokens = symbolsInfo?.filter(ele => ele[0] == "option")
-  console.log("option refactor symbol option_tokens:", option_tokens)
   //option_tokens_symbol stores token symbol and option symbol
   //eg. [{symbol: "BTC", name:"BTC-60000-C"}, {symbol: "BTC", name:"BTC-10000-C"}]
   let option_tokens_symbol = []
@@ -167,14 +165,14 @@ const Option = props => {
     },
   ]
   option_tokens_symbol = option_tokens_symbol.length ? option_tokens_symbol : test_symbols
-  console.log("option refactor see option_tokens_symbol:", option_tokens_symbol)
 
   const [mode, setMode] = useState('Buy')
   const [tableContent, setTableContent] = useState("Positions");
 
-  const [activeSymbol, setActiveSymbol] = useState(option_tokens_symbol?.find(ele => ele.symbol == "BTC")?.name)
-  const [activeToken, setActiveToken] = useState(option_tokens_symbol?.find(ele => ele.symbol == "BTC")?.symbol);
-  // console.log("option refactor see set", option_tokens_symbol?.find(ele => ele.symbol == "BTC"))
+  // const [activeSymbol, setActiveSymbol] = useState(option_tokens_symbol?.find(ele => ele.name == "BTC")?.name)
+  // const [activeToken, setActiveToken] = useState(option_tokens_symbol?.find(ele => ele.name == "BTC")?.symbol);
+  const [activeSymbol, setActiveSymbol] = useState(option_tokens_symbol?.find(ele => ele.name == "BTC")?.symbol)
+  const [activeToken, setActiveToken] = useState(option_tokens_symbol?.find(ele => ele.name == "BTC")?.name)
   const [latestPrice, setLatestPrice] = useState(0);
   const [priceChangePercentDelta, setPriceChangePercentDelta] = useState(0);
   const onChangePrice = (curPrice, change) => {
@@ -182,7 +180,6 @@ const Option = props => {
     setPriceChangePercentDelta(change);
   }
 
-  console.log("option refactor see activeSymbol", activeSymbol)
 
   const selectChartToken = item => {
     // onClickSetActiveToken(item)
@@ -214,9 +211,9 @@ const Option = props => {
 
 
 
-  useEffect(() => {
-    setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
-  }, [tokens])
+  // useEffect(() => {
+  //   setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
+  // }, [tokens])
 
   
 

@@ -35,6 +35,8 @@ const OptionComponent = props => {
     symbol,
   } = props
 
+  console.log("option component selectedToken", selectedToken)
+
   const connectWalletByLocalStorage = useConnectWallet()
   const { account, active, library } = useWeb3React()
 
@@ -85,9 +87,9 @@ const OptionComponent = props => {
   const [deadline, setDeadline] = useState()
   const [marginToken, setMarginToken] = useState(tokens[1])
 
-  const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
-  const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
-  const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
+  // const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
+  // const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
+  // const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const symbolMarkPrice = symbolInfo?.markPrice
 
     
@@ -126,14 +128,15 @@ const OptionComponent = props => {
     setMarginToken(tokens[1])
   }, [tokens])
 
-  useEffect(() => {
-    let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(selectedTokenBalance, 18, 2)
-    setSelectedTokenValue(tokenAmount)
-  }, [percentage])
+  // useEffect(() => {
+  //   let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(selectedTokenBalance, 18, 2)
+  //   setSelectedTokenValue(tokenAmount)
+  //   console.log("")
+  // }, [percentage])
 
-  useEffect(() => {
-    setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18, 2)).toFixed(2))
-  }, [selectedTokenValue, selectedTokenPrice])
+  // useEffect(() => {
+  //   setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18, 2)).toFixed(2))
+  // }, [selectedTokenValue, selectedTokenPrice])
 
   ///////////// write contract /////////////
 
@@ -180,14 +183,15 @@ const OptionComponent = props => {
                       setShowDescription(true)
                     }}
                   />
-                  <span className={styles.inputLabel}>{selectedToken.symbol}</span>
+                  <span className={styles.inputLabel}>{selectedToken}</span>
                 </div>
                 <div className={styles.inputContainer}>
                   <input
                     type="number"
                     min="0"
                     className={styles.optionInput}
-                    value={usdValue}
+                    // value={usdValue}
+                    value={"0"}
                     onChange={e => { }}
                   />
                   <span className={styles.inputLabel}>USD</span>

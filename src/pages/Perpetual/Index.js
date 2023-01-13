@@ -266,10 +266,6 @@ const Swap = props => {
   const { account, library, active } = useWeb3React();
   let { chainId } = useChainId();
   console.log("future symbol chainid", chainId)
-  // const tokensperp = getTokens(chainId);
-  // console.log("test chainId perpetual page", chainId, tokensperp)
-
-  // const supportedTokens = tokensperp;
 
   //// ui tab
   const defaultTokenSelection = useMemo(() => ({
@@ -294,7 +290,7 @@ const Swap = props => {
   const tokens = getTokens(chainId)
 
   const [fromToken, setFromToken] = useState(tokens[0])
-  const [toToken, setToToken] = useState(tokens[1])
+  const [toToken, setToToken] = useState(tokens[0])
 
   const setFromTokenAddress = useCallback((selectedSwapOption, address) => {
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
@@ -420,11 +416,9 @@ const Swap = props => {
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
-  console.log("future symbol symbolInfo:", symbolsInfo)
 
   //future_tokens store every symbols in future and its data 
   const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
-  console.log("future symbol future_tokens:", future_tokens)
   let future_tokens_symbol = []
   future_tokens?.forEach((ele)=>{
     future_tokens_symbol.push({
@@ -432,7 +426,6 @@ const Swap = props => {
       symbol: ele[1].substring(0,3),
     })
   })  
-  console.log("future symbol future_tokens_symbol:", future_tokens_symbol)
   //future_token stores token symbols without duplicates for tab display
   let future_token = []
   future_tokens_symbol?.forEach((ele) => {
@@ -502,19 +495,7 @@ const Swap = props => {
     setToTokenAddress(swapOption, getTokenBySymbol(chainId, e).address)  // when click tab change token
   }
 
-  // const chartPanes = [
-  //   { title: 'BTC', content: 'BTC', key: 'BTC', closable: false },
-  //   { title: 'ETH', content: 'ETH', key: 'ETH' },
-  //   // { title: 'Tab 3', content: 'Content of Tab 3', key: '3'},
-  // ];
 
-  // ui
-  // const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
-  // const KChartTokenListETH = ["BTC", "ETH"]
-  // const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
-  // const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBSC
-  //   : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
-  //     : KChartTokenListETH
   const selectChartToken = item => {
     onClickSetActiveToken(item)
   }
