@@ -244,7 +244,7 @@ export function LivePairsTable(props) {
         dataIndex: 'listed_since',
         key: 'listed_since',
         render: (text, entry) => {
-          let listed_since = Date.now() - new Date(entry.createdAt).getTime()
+          let listed_since = Date.now() - entry.createdAt * 1e3
           return <div className={styles.tableData}>{Math.floor(listed_since/1000)}s</div>;
         },
         visible: true,

@@ -76,6 +76,7 @@ const MarketIndex = props => {
     }
     setLosersPairs(pairs)
 
+    // fetch new pairs list
     pairlist = await axios.get(`${apiUrlPrefix}/new-pairs?chainId=${chainId}`).then(res => res.data)
     pairs = []
     for (let i = 0; i < pairlist.length; i++) {
@@ -89,7 +90,7 @@ const MarketIndex = props => {
         volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
         swaps: pairlist[i].txCount,
         liquidity: pairlist[i].liquidity,
-        createdAt: Date(pairlist[i].createdAtTimestamp),
+        createdAt: pairlist[i].createdAtTimestamp,
       })
     }
     setNewPairs(pairs)
