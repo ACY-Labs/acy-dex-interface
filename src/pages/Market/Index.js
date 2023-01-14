@@ -137,31 +137,12 @@ const MarketIndex = props => {
             {/* <div className={styles.statsdivider} /> */}
 
             <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                <div className={styles.label}>1. {topVolumePairs[0]?.name}</div>
-                <div className={styles.value}>{topVolumePairs[0]?.volume}</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>2. {topVolumePairs[1]?.name}</div>
-                <div className={styles.value}>{topVolumePairs[1]?.volume}</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>3. {topVolumePairs[2]?.name}</div>
-                <div className={styles.value}>{topVolumePairs[2]?.volume}</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>4. {topVolumePairs[3]?.name}</div>
-                <div className={styles.value}>{topVolumePairs[3]?.volume}</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>5. {topVolumePairs[4]?.name}</div>
-                <div className={styles.value}>{topVolumePairs[4]?.volume}</div>
-              </div>
-
+              {topVolumePairs.slice(0, 5).map((pair, idx) => pair ? (
+                <div className={styles.statsRow}>
+                  <div className={styles.label}>{idx+1}. {pair.name}</div>
+                  <div className={styles.value}>{pair.volume}</div>
+                </div>) : null
+              )}
             </div>
 
           </div>
@@ -178,31 +159,12 @@ const MarketIndex = props => {
             </div>
 
             <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                <div className={styles.label}>1. MARSRICE BSC</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>2. OHM</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>3. DRX ARBI</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>4. DRX ARBI</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>5. DRX ARBI</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
+              {trendingPairs.slice(0, 5).map((pair, idx) => pair ? (
+                <div className={styles.statsRow}>
+                  <div className={styles.label}>{idx+1}. {pair.name}</div>
+                  <div className={styles.value}>{(pair.price_24h*100).toPrecision(2)}%</div>
+                </div>) : null
+              )}
             </div>
 
           </div>
@@ -221,30 +183,12 @@ const MarketIndex = props => {
             {/* <div className={styles.statsdivider} /> */}
 
             <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                <div className={styles.label}>1. {winnersPairs[0]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[0]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>2. {winnersPairs[1]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[1]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>3. {winnersPairs[2]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[2]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>4. {winnersPairs[3]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[3]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>5. {winnersPairs[4]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[4]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
+              {winnersPairs.slice(0, 5).map((pair, idx) => pair ? (
+                <div className={styles.statsRow}>
+                  <div className={styles.label}>{idx+1}. {pair.name}</div>
+                  <div className={styles.value}>{(pair.price_24h*100).toPrecision(2)}%</div>
+                </div>) : null
+              )}
             </div>
 
           </div>
@@ -263,30 +207,12 @@ const MarketIndex = props => {
             {/* <div className={styles.statsdivider} /> */}
 
             <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                <div className={styles.label}>1. {losersPairs[0]?.name}</div>
-                <div className={styles.value}>{(losersPairs[0]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>2. {losersPairs[1]?.name}</div>
-                <div className={styles.value}>{(losersPairs[1]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>3. {losersPairs[2]?.name}</div>
-                <div className={styles.value}>{(losersPairs[2]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>4. {losersPairs[3]?.name}</div>
-                <div className={styles.value}>{(losersPairs[3]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>5. {losersPairs[4]?.name}</div>
-                <div className={styles.value}>{(losersPairs[4]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
+              {losersPairs.slice(0, 5).map((pair, idx) => pair ? (
+                <div className={styles.statsRow}>
+                  <div className={styles.label}>{idx+1}. {pair.name}</div>
+                  <div className={styles.value}>{(pair.price_24h*100).toPrecision(2)}%</div>
+                </div>) : null
+              )}
             </div>
 
           </div>
