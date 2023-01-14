@@ -52,12 +52,25 @@
 }
 .buttonContainer {
   display : flex;
-  justify-content: space-between;
+  justify-content: space-around;
   margin-top: 1.5rem;
   margin-bottom :  .5rem;
+  // background-color: transparent;
   // margin-left: .5rem;
   // margin-right: .5rem;
+  .buttonPrimary {
+    color: white;
+    background-color: #2f3131;
+    border:transparent;
+    border-radius: 3px;
+    width: 30%;
+    height: 42px;
 
+    &:hover {
+      cursor: pointer;
+      color: white;
+    }
+  }
   .percentageButton {
     border: 0.75px solid #333333;
     background-color: transparent;

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import className from 'classnames';
 import { Divider, Icon, Input, Table, Button, Dropdown } from 'antd';
 import { AcyIcon, AcyTabs, AcyTokenIcon, AcyCardList } from '@/components/Acy';
@@ -8,6 +9,7 @@ import styles from './styles.less'
 export function PairsTable(props) {
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
+  const navHistory = useHistory()
 
   function columnsCoin() {
     return [
@@ -41,7 +43,7 @@ export function PairsTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableHeader}>
-              <AcyTokenIcon symbol={entry.logoURI} />
+              {/* <AcyTokenIcon symbol={entry.logoURI} /> */}
               <span style={{marginLeft: '10px'}}>{entry.name}</span>
             </div>
           );
@@ -70,7 +72,7 @@ export function PairsTable(props) {
             className={styles.tableHeader}
             onClick={() => { setCurrentKey('price') }}
           >
-            Price
+            Rate
           </div>
         ),
         dataIndex: 'price',
@@ -92,7 +94,7 @@ export function PairsTable(props) {
         dataIndex: 'price_24h',
         key: 'price_24h',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.price_24h}</div>;
+          return <div className={styles.tableData}>{(entry.price_24h*100).toPrecision(2)}%</div>;
         },
         visible: true,
       },
@@ -140,26 +142,14 @@ export function PairsTable(props) {
         dataIndex: 'liquidity',
         key: 'liquidity',
         render: (text, entry) => {
+          if(entry.liquidity > 1e12) return <div className={styles.tableData}>{(entry.liquidity/1e12).toFixed(0)}T</div>;
+          if(entry.liquidity > 1e9) return <div className={styles.tableData}>{(entry.liquidity/1e9).toFixed(0)}G</div>;
+          if(entry.liquidity > 1e6) return <div className={styles.tableData}>{(entry.liquidity/1e6).toFixed(0)}M</div>;
+          if(entry.liquidity > 1e3) return <div className={styles.tableData}>{(entry.liquidity/1e3).toFixed(0)}K</div>;
           return <div className={styles.tableData}>{entry.liquidity}</div>;
         },
         visible: true,
       },
-      {
-        title: (
-          <div
-            className={styles.tableHeader}
-            onClick={() => { setCurrentKey('fdv') }}
-          >
-            FDV
-          </div>
-        ),
-        dataIndex: 'fdv',
-        key: 'fdv',
-        render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.fdv}</div>;
-        },
-        visible: true,
-      }
     ];
   }
 
@@ -172,6 +162,9 @@ export function PairsTable(props) {
         style={{
           marginBottom: '20px',
           cursor: isHover ? 'pointer' : 'default',
+        }}
+        onRowClick={(record, index, event) => {
+          navHistory.push(`/trade#${record.name}&${record.address0}&${record.address1}`)
         }}
         onRowMouseEnter={() => setIsHover(true)}
         onRowMouseLeave={() => setIsHover(false)}
@@ -216,7 +209,7 @@ export function LivePairsTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableHeader}>
-              <AcyTokenIcon symbol={entry.logoURI} />
+              {/* <AcyTokenIcon symbol={entry.logoURI} /> */}
               <span style={{marginLeft: '10px'}}>{entry.name}</span>
             </div>
           );
@@ -251,7 +244,7 @@ export function LivePairsTable(props) {
         dataIndex: 'price',
         key: 'price',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.price}</div>;
+          return <div className={styles.tableData}>${entry.price}</div>;
         },
         visible: true,
       },
@@ -374,6 +367,7 @@ export function LivePairsTable(props) {
 export function TopVolumeTable(props) {
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
+  const navHistory = useHistory()
 
   function columnsCoin() {
     return [
@@ -407,7 +401,7 @@ export function TopVolumeTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableHeader}>
-              <AcyTokenIcon symbol={entry.logoURI} />
+              {/* <AcyTokenIcon symbol={entry.logoURI} /> */}
               <span style={{marginLeft: '10px'}}>{entry.name}</span>
             </div>
           );
@@ -442,6 +436,10 @@ export function TopVolumeTable(props) {
         dataIndex: 'liquidity',
         key: 'liquidity',
         render: (text, entry) => {
+          if(entry.liquidity > 1e12) return <div className={styles.tableData}>{(entry.liquidity/1e12).toFixed(0)}T</div>;
+          if(entry.liquidity > 1e9) return <div className={styles.tableData}>{(entry.liquidity/1e9).toFixed(0)}G</div>;
+          if(entry.liquidity > 1e6) return <div className={styles.tableData}>{(entry.liquidity/1e6).toFixed(0)}M</div>;
+          if(entry.liquidity > 1e3) return <div className={styles.tableData}>{(entry.liquidity/1e3).toFixed(0)}K</div>;
           return <div className={styles.tableData}>{entry.liquidity}</div>;
         },
         visible: true,
@@ -452,7 +450,7 @@ export function TopVolumeTable(props) {
             className={styles.tableHeader}
             onClick={() => { setCurrentKey('price') }}
           >
-            Price
+            Rate
           </div>
         ),
         dataIndex: 'price',
@@ -474,7 +472,7 @@ export function TopVolumeTable(props) {
         dataIndex: 'price_24h',
         key: 'price_24h',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.price_24h}</div>;
+          return <div className={styles.tableData}>{(entry.price_24h*100).toFixed(2)}%</div>;
         },
         visible: true,
       },
@@ -490,6 +488,9 @@ export function TopVolumeTable(props) {
         style={{
           marginBottom: '20px',
           cursor: isHover ? 'pointer' : 'default',
+        }}
+        onRowClick={(record, index, event) => {
+          navHistory.push(`/trade#${record.name}&${record.address0}&${record.address1}`)
         }}
         onRowMouseEnter={() => setIsHover(true)}
         onRowMouseLeave={() => setIsHover(false)}
@@ -534,7 +535,7 @@ export function TrendingTable(props) {
         render: (text, entry) => {
           return (
             <div className={styles.tableHeader}>
-              <AcyTokenIcon symbol={entry.logoURI} />
+              {/* <AcyTokenIcon symbol={entry.logoURI} /> */}
               <span style={{marginLeft: '10px'}}>{entry.name}</span>
             </div>
           );
@@ -553,7 +554,7 @@ export function TrendingTable(props) {
         dataIndex: 'price',
         key: 'price',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.price}</div>;
+          return <div className={styles.tableData}>${entry.price}</div>;
         },
         visible: true,
       },

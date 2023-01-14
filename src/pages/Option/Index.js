@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Drawer } from 'antd';
 import AcyCard from '@/components/AcyCard';
-import OptionComponent from '@/components/OptionComponent'
+import DerivativeComponent from '@/components/DerivativeComponent'
 import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
@@ -23,7 +23,10 @@ import useSWR from 'swr'
 import { useWeb3React } from '@web3-react/core';
    
 function safeDiv(a, b) {
-    return b==0 ? 0 : a/b;
+  return b.isZero() ? BigNumber.from(0) : a.div(b);
+}
+function safeDiv2(a, b) {
+  return b==0 ? 0 : a/b;
 }
 
 export function getPosition(rawPositionData,symbolData) {
@@ -35,33 +38,39 @@ export function getPosition(rawPositionData,symbolData) {
     const temp = rawPositionData.positions[i]
     const volume = ethers.utils.formatUnits(temp[2], 18)
     if (volume!=0){
+      const symbol = symbolData.find(obj=>{
+        return obj.address === temp[0]
+      })
+      const {markPrice,initialMarginRatio,indexPrice,minTradeVolume} = symbol
 
-      const markPrice = symbolData.find(obj => {
-        return obj.address === temp[0]
-      }).markPrice
-      const initialMarginRatio = symbolData.find(obj => {
-        return obj.address === temp[0]
-      }).initialMarginRatio
-      const indexPrice = symbolData.find(obj => {
-        return obj.address === temp[0]
-      }).indexPrice
-      
       const cost = ethers.utils.formatUnits(temp.cost,18)
       const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume,18)
       const marginUsage = Math.abs(volume * indexPrice) * initialMarginRatio
       const unrealizedPnl = volume * indexPrice - cost
-      const accountFunding = cumulativeFundingPerVolume * volume
+      const _accountFunding = temp.cumulativeFundingPerVolume.mul(temp[2])
+      const accountFunding = ethers.utils.formatUnits(_accountFunding,36)
+      const _entryPrice = safeDiv(temp.cost,temp[2])
+      // const entryPrice = ethers.utils.formatUnits(_entryPrice,0)
+      const entryPrice = safeDiv2(cost,volume)
+      let liquidationPrice
+      if (volume >= 0) {
+        liquidationPrice = markPrice * (1 - initialMarginRatio/2) - (marginUsage-cost)/(volume*(1-initialMarginRatio/2))
+      } else {
+        liquidationPrice = markPrice * (1 + initialMarginRatio/2) + (marginUsage-cost)/(volume*(1+initialMarginRatio/2))
+      }
 
       const position = {
         symbol: temp[1],
         address: temp[0],
-        position: volume,
-        entryPrice: safeDiv(cost,volume),
+        position: Math.abs(volume),
+        entryPrice: entryPrice,
         markPrice: markPrice,
         marginUsage: marginUsage,
         unrealizedPnl: unrealizedPnl,
         accountFunding: accountFunding,
         type: volume>=0?"Long":"Short",
+        minTradeVolume: minTradeVolume,
+        liquidationPrice: liquidationPrice,
       };
       positionQuery.push(position)
     }
@@ -83,6 +92,8 @@ export function getSymbol(rawSymbolData){
       markPrice: ethers.utils.formatUnits(temp.markPrice,18),
       indexPrice: ethers.utils.formatUnits(temp.indexPrice,18),
       initialMarginRatio: ethers.utils.formatUnits(temp.initialMarginRatio,18), //0.1
+      minTradeVolume: ethers.utils.formatUnits(temp.minTradeVolume,18)
+
     };
     symbolQuery.push(symbol)
   }
@@ -124,7 +135,7 @@ const Option = props => {
         updateSymbolsInfo(undefined, true)
       })
       return () => {
-        library.removeListener('block', onBlock)
+        library.removeAllListeners('block')
       }
     }
   }, [active, library, chainId,
@@ -278,7 +289,7 @@ const Option = props => {
         {/* RIGHT INTERACTIVE COMPONENT */}
         <div className={`${styles.colItem} ${styles.optionComponent}`}>
           <AcyCard style={{ backgroundColor: 'transparent', border: 'none' }}>
-            <OptionComponent
+            <DerivativeComponent
               mode={mode}
               setMode={setMode}
               chainId={chainId}

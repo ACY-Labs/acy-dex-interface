@@ -46,6 +46,7 @@ const PRICE_LINE_TEXT_WIDTH = 15;
 const timezoneOffset = -new Date().getTimezoneOffset() * 60;
 const BinancePriceApi = 'https://api.acy.finance/polygon-test';
 const OptionsPriceApi = 'https://options.acy.finance/api';
+const TradePriceApi = 'https://stats.acy.finance/api/rates/candles';
 const DEFAULT_PERIOD = "4h";
 
 const getSeriesOptions = () => ({
@@ -219,23 +220,26 @@ export default function ExchangeTVChart(props) {
       if (pageName == "StableCoin") {
         responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,)
           .then((res) => res.data);
+        if (toToken != "USDT") {
+          responseToTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,)
+            .then((res) => res.data)
+        }
       } else if (pageName == "Option") {
         responseFromTokenData = await axios.get(`${OptionsPriceApi}/option?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
           .then((res) => res.data);
       } else if (pageName == "Futures") {
         responseFromTokenData = await axios.get(`${OptionsPriceApi}/futures?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
           .then((res) => res.data);
+      } else if(pageName == "Trade") {
+        responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromToken}&token1=${toToken}&chainId=${chainId}&period=${period}`)
+          .then((res) => res.data);
       } else {
         responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${fromToken}USDT&interval=${period}`,)
           .then((res) => res.data);
       }
 
-      if (toToken != "USDT") {
-        responseToTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,)
-          .then((res) => res.data)
-      }
       for (let i = 0; i < responseFromTokenData.length; i++) {
-        if (pageName == "Option" || pageName == "Futures") {
+        if (pageName == "Option" || pageName == "Futures" || pageName == "Trade") {
           responsePairData.push({
             time: responseFromTokenData[i].timestamp,
             open: responseFromTokenData[i].o,
@@ -257,22 +261,26 @@ export default function ExchangeTVChart(props) {
       }
 
       // Binance data is independent of chain, so here we can fill in any chain name
-      currentSeries.setData(responsePairData);
+      if (responsePairData && responsePairData[0].time) {
+        currentSeries.setData(responsePairData);
+      }
 
       if (pageName == "Option" || pageName == "Futures") {
         let from = responsePairData[responsePairData.length - 1].time
         setInterval(() => {
           axios.get(`${OptionsPriceApi}/${pageName.toLowerCase()}?chainId=${chainId}&symbol=${chartTokenSymbol}&period=1m&from=${from}`)
             .then((res) => {
-              for (let i = 1; i < res.data.length; i++) {
-                currentSeries.update({
-                  time: res.data[i].timestamp,
-                  open: res.data[i].o,
-                  high: res.data[i].h,
-                  low: res.data[i].l,
-                  close: res.data[i].c,
-                })
-                from = res.data[i].timestamp
+              for (let i = 0; i < res.data.length; i++) {
+                if (res.data[i].timestamp > from) {
+                  currentSeries.update({
+                    time: res.data[i].timestamp,
+                    open: res.data[i].o,
+                    high: res.data[i].h,
+                    low: res.data[i].l,
+                    close: res.data[i].c,
+                  })
+                  from = res.data[i].timestamp
+                }
               }
             });
         }, 60000);
@@ -313,7 +321,7 @@ export default function ExchangeTVChart(props) {
       let negativePriceChangePercent = deltaPercent.substring(1)
       setCurPrice(parseFloat(negativeCurrentPrice).toFixed(2))
       setPriceChangePercentDelta(parseFloat(negativePriceChangePercent).toFixed(3))
-      onChangePrice&&onChangePrice(parseFloat(negativeCurrentPrice).toFixed(2),"-"+parseFloat(negativePriceChangePercent).toFixed(3));
+      onChangePrice && onChangePrice(parseFloat(negativeCurrentPrice).toFixed(2), "-" + parseFloat(negativePriceChangePercent).toFixed(3));
 
     }
     else {
@@ -322,8 +330,8 @@ export default function ExchangeTVChart(props) {
       let positivePricechangePercent = deltaPercent
       setCurPrice(parseFloat(positiveCurrentPrice).toFixed(2))
       setPriceChangePercentDelta(parseFloat(positivePricechangePercent).toFixed(3))
-      onChangePrice&&onChangePrice(parseFloat(positiveCurrentPrice).toFixed(2),"+"+parseFloat(positivePricechangePercent).toFixed(3));
-    
+      onChangePrice && onChangePrice(parseFloat(positiveCurrentPrice).toFixed(2), "+" + parseFloat(positivePricechangePercent).toFixed(3));
+
     }
   }
 
