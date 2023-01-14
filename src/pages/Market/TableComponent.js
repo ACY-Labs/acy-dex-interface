@@ -262,7 +262,7 @@ export function LivePairsTable(props) {
         dataIndex: 'price',
         key: 'price',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.price}</div>;
+          return <div className={styles.tableData}>${entry.price}</div>;
         },
         visible: true,
       },

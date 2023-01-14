@@ -229,14 +229,14 @@ const MarketIndex = props => {
         >
           Pairs
         </button>
-        <button
+        {/* <button
           type="button"
           className={styles.middleToggleButton}
           style={{ backgroundColor: mode == 'NewPairs' ? "#2e3032" : "transparent", color: mode == 'LivePairs' ? "white" : "", border: '0.75px solid #333333' }}
           onClick={() => { setMode('NewPairs') }}
         >
           New Pairs
-        </button>
+        </button> */}
         <button
           type="button"
           className={styles.middleToggleButton}

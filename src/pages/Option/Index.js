@@ -46,7 +46,10 @@ const StyledDrawer = styled(Drawer)`
 `
    
 function safeDiv(a, b) {
-    return b==0 ? 0 : a/b;
+  return b.isZero() ? BigNumber.from(0) : a.div(b);
+}
+function safeDiv2(a, b) {
+  return b==0 ? 0 : a/b;
 }
 
 export function getPosition(rawPositionData,symbolData) {
@@ -58,33 +61,39 @@ export function getPosition(rawPositionData,symbolData) {
     const temp = rawPositionData.positions[i]
     const volume = ethers.utils.formatUnits(temp[2], 18)
     if (volume!=0){
+      const symbol = symbolData.find(obj=>{
+        return obj.address === temp[0]
+      })
+      const {markPrice,initialMarginRatio,indexPrice,minTradeVolume} = symbol
 
-      const markPrice = symbolData.find(obj => {
-        return obj.address === temp[0]
-      }).markPrice
-      const initialMarginRatio = symbolData.find(obj => {
-        return obj.address === temp[0]
-      }).initialMarginRatio
-      const indexPrice = symbolData.find(obj => {
-        return obj.address === temp[0]
-      }).indexPrice
-      
       const cost = ethers.utils.formatUnits(temp.cost,18)
       const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume,18)
       const marginUsage = Math.abs(volume * indexPrice) * initialMarginRatio
       const unrealizedPnl = volume * indexPrice - cost
-      const accountFunding = cumulativeFundingPerVolume * volume
+      const _accountFunding = temp.cumulativeFundingPerVolume.mul(temp[2])
+      const accountFunding = ethers.utils.formatUnits(_accountFunding,36)
+      const _entryPrice = safeDiv(temp.cost,temp[2])
+      // const entryPrice = ethers.utils.formatUnits(_entryPrice,0)
+      const entryPrice = safeDiv2(cost,volume)
+      let liquidationPrice
+      if (volume >= 0) {
+        liquidationPrice = markPrice * (1 - initialMarginRatio/2) - (marginUsage-cost)/(volume*(1-initialMarginRatio/2))
+      } else {
+        liquidationPrice = markPrice * (1 + initialMarginRatio/2) + (marginUsage-cost)/(volume*(1+initialMarginRatio/2))
+      }
 
       const position = {
         symbol: temp[1],
         address: temp[0],
-        position: volume,
-        entryPrice: safeDiv(cost,volume),
+        position: Math.abs(volume),
+        entryPrice: entryPrice,
         markPrice: markPrice,
         marginUsage: marginUsage,
         unrealizedPnl: unrealizedPnl,
         accountFunding: accountFunding,
         type: volume>=0?"Long":"Short",
+        minTradeVolume: minTradeVolume,
+        liquidationPrice: liquidationPrice,
       };
       positionQuery.push(position)
     }
@@ -105,6 +114,8 @@ export function getSymbol(rawSymbolData){
       markPrice: ethers.utils.formatUnits(temp.markPrice,18),
       indexPrice: ethers.utils.formatUnits(temp.indexPrice,18),
       initialMarginRatio: ethers.utils.formatUnits(temp.initialMarginRatio,18), //0.1
+      minTradeVolume: ethers.utils.formatUnits(temp.minTradeVolume,18)
+
     };
     symbolQuery.push(symbol)
   }
@@ -116,7 +127,6 @@ const Option = props => {
   const { active } = useWeb3React()
   let { chainId } = useChainId();
   let tokens = getTokens(chainId);
-  chainId = 80001
 
   const [mode, setMode] = useState('Buy')
   const [symbol, setSymbol] = useState('BTCUSD-60000-C')
@@ -239,8 +249,9 @@ const Option = props => {
 
   
   ///// read reader contract, getTdInfo and getSymbolsInfo
-  const poolAddress = getContract(chainId,"Pool")
-  const readerAddress = getContract(chainId,"Reader")
+  const poolAddress = getContract(chainId,"pool")
+  const readerAddress = getContract(chainId,"reader")
+
 
   const { data:rawPositionData,mutate:updatePosition} = useSWR([chainId, readerAddress, 'getTdInfo',poolAddress,account], {
       fetcher: fetcher(library, Reader)

@@ -5,6 +5,7 @@ import {
     AcyModal,
     AcyCuarrencyCard,
     AcyDescriptions,
+    AcyButton,
     AcyPerpetualButton,
     AcyInput,
     AcyCheckBox,
@@ -14,10 +15,13 @@ import useSWR from 'swr'
 import { useConstantLoader } from '@/constants';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { useWeb3React } from '@web3-react/core';
-import { INITIAL_ALLOWED_SLIPPAGE, getTokens, getContract } from '@/constants/option.js';
+import { INITIAL_ALLOWED_SLIPPAGE, getTokens, getContract } from '@/constants/future_option_power.js';
 import classNames from 'classnames';
 import {fetcher,formatAmount, USD_DECIMALS, mapPositionData, parseValue, bigNumberify, approveTokens } from '@/acy-dex-futures/utils';
 import ERC20 from '@/abis/ERC20.json';
+import {trade} from '@/services/derivatives'
+import IPool from '@/abis/future-option-power/IPool.json'
+
 
 const { AddressZero } = ethers.constants;
 
@@ -36,9 +40,14 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
         position: 0,
         symbol: "BTCUSD-60000-C",
         type: "Long",
-        unrealizedPnl: 0
+        unrealizedPnl: 0,
+        minTradeVolume: "0.001"
       }
     }
+
+    /// get contract address
+    const poolAddress = getContract(chainId, "pool")
+
 
     //// read contract to check token allowance
     // const routerAddress = getContract(chainId, "router")
@@ -91,9 +100,10 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
     useEffect(() => {
       if(position && percentage){
         const amount = position.position * parseFloat(percentage) / 100
-        setTokenAmount(amount)
+        handleAmountChange(amount)
       }   
-    },[percentage,tokenAmount,position]);
+    },[percentage,position]);
+
 
     const handleCancel = () => {
       onCancel();
@@ -120,8 +130,18 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
       }
     }
 
-    const handleAmountChange = (e) => {
-      setTokenAmount(e.target.value)
+
+    const handleAmountChange = (value) => {
+      const minTradeVolume = position.minTradeVolume
+      if(value%minTradeVolume==0&&value<=position.position){
+        setTokenAmount(value)
+      }else if(value>position.position){
+        setTokenAmount(position.position)
+      }else{
+        setTokenAmount(Math.floor(value/minTradeVolume)*minTradeVolume)
+      }
+      
+
     }
 
     const onClickPrimary = () => {
@@ -129,10 +149,31 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
         connectWalletByLocalStorage()
         return
       }
-      if(position.type=="Long"){
-        console.log(position.address,chainId,account,position.symbol,tokenAmount*-1,markPrice)
+      console.log("amount",ethers.utils.parseUnits(tokenAmount.toString(),18))
+      if(position.type=="Long"){  // original Long: Short when close position, negative token amount
+        trade(
+          chainId,
+          library,
+          poolAddress, 
+          IPool,
+          account,
+          position.symbol,
+          ethers.utils.parseUnits(tokenAmount.toString(),18).mul(bigNumberify(-1)),
+          ethers.utils.parseUnits(markPrice,18).mul(bigNumberify(10000 - INITIAL_ALLOWED_SLIPPAGE * 100)).div(bigNumberify(10000))
+          )
+          onCancel();
       }else{
-        console.log(position.address,chainId,account,position.symbol,tokenAmount,markPrice)
+        trade(    // original Short: Long when close position, positive token amount 
+          chainId,
+          library,
+          poolAddress, 
+          IPool,
+          account,
+          position.symbol,
+          ethers.utils.parseUnits(tokenAmount.toString(),18),
+          ethers.utils.parseUnits(markPrice,18).mul(bigNumberify(10000 + INITIAL_ALLOWED_SLIPPAGE * 100)).div(bigNumberify(10000))
+        )
+        onCancel();
       }
     }
 
@@ -157,7 +198,7 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
         <div className={styles.modalContent}>Closed Qty</div>
         <AcyInput className={styles.input}
         value={tokenAmount}
-        onChange={handleAmountChange}
+        onChange={(e)=>handleAmountChange(e.target.value)}
         />
         
         <div className={styles.buttonContainer}>
@@ -167,20 +208,20 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
             {getPercentageButton('100%')}
         </div>
         <div className={styles.buttonContainer}>
-        <AcyPerpetualButton
+        <Button
           onClick = {() => {
             onClickPrimary();
           }}
-          
+          className={styles.buttonPrimary}
           >Confirm
-        </AcyPerpetualButton>
-        <AcyPerpetualButton
+        </Button>
+        <Button
           onClick = {() => {
             handleCancel();
           }}
-          
+          className={styles.buttonPrimary}
           >Cancel
-        </AcyPerpetualButton>
+        </Button>
         </div>
     </AcyModal>
     );
