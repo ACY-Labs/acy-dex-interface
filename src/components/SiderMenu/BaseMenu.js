@@ -152,7 +152,7 @@ export default class BaseMenu extends PureComponent {
         </SubMenu>
       );
     }
-    return <Menu.Item key={item.path} style={{ marginTop: item.name == 'StableCoin' ? '32px' : '-20px' }}>{this.getMenuItemPath(item)}</Menu.Item>
+    return <Menu.Item key={item.path} style={{ marginTop: item.name == 'Launchpad' ? '32px' : '-20px' }}>{this.getMenuItemPath(item)}</Menu.Item>
   };
 
   getSubMenuOrItem_default = (item, parent) => {
@@ -177,7 +177,7 @@ export default class BaseMenu extends PureComponent {
         </SubMenu>
       );
     }
-    return <Menu.Item key={item.path} style={{ marginTop: item.name == 'StableCoin' ? '32px' : '-20px' }}>{this.getMenuItemPath_default(item)}</Menu.Item>
+    return <Menu.Item key={item.path} style={{ marginTop: item.name == 'Launchpad' ? '32px' : '-20px' }}>{this.getMenuItemPath_default(item)}</Menu.Item>
   };
 
   /**

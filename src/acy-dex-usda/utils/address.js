@@ -16,14 +16,14 @@ export const supportedTokens = {
         logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
         idOnCoingecko: "usd-coin",
     },
-    {
-        name: 'stable coin',
-        symbol: 'USDA',
-        address: '0x45a2DFF9569F7fAA29015897ea956A5A48068273',
-        decimals: 18,
-        logoURI: 'https://storageapi2.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/USDA-min.svg',
-        idOnCoingecko: "tether",
-    }, 
+    // {
+    //     name: 'stable coin',
+    //     symbol: 'USDA',
+    //     address: '0x45a2DFF9569F7fAA29015897ea956A5A48068273',
+    //     decimals: 18,
+    //     logoURI: 'https://storageapi2.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/USDA-min.svg',
+    //     idOnCoingecko: "tether",
+    // }, 
     {
         name: 'Dai Stablecoin',
         symbol: 'DAI',
@@ -49,14 +49,14 @@ export const supportedTokens = {
         logoURI: 'https://storageapi.fleek.co/chwizdo-team-bucket/ACY Token List/USDC.svg',
         idOnCoingecko: "usd-coin",
     },
-    {
-        name: 'stable coin',
-        symbol: 'USDA',
-        address: '0x45a2DFF9569F7fAA29015897ea956A5A48068273',  // to be updated
-        decimals: 18,
-        logoURI: 'https://storageapi2.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/USDA-min.svg',
-        idOnCoingecko: "tether",
-    }, 
+    // {
+    //     name: 'stable coin',
+    //     symbol: 'USDA',
+    //     address: '0x45a2DFF9569F7fAA29015897ea956A5A48068273',  // to be updated
+    //     decimals: 18,
+    //     logoURI: 'https://storageapi2.fleek.co/5bec74db-774b-4b8a-b735-f08a5ec1c1e6-bucket/tokenlist/USDA-min.svg',
+    //     idOnCoingecko: "tether",
+    // }, 
     {
         name: 'Dai Stablecoin',
         symbol: 'DAI',
