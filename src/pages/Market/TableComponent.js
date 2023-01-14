@@ -176,6 +176,7 @@ export function PairsTable(props) {
 export function LivePairsTable(props) {
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
+  const navHistory = useHistory();
 
   function columnsCoin() {
     return [
@@ -377,6 +378,9 @@ export function LivePairsTable(props) {
         style={{
           marginBottom: '20px',
           cursor: isHover ? 'pointer' : 'default',
+        }}
+        onRowClick={(record, index, event) => {
+          navHistory.push(`/trade#${record.name}&${record.address0}&${record.address1}`)
         }}
         onRowMouseEnter={() => setIsHover(true)}
         onRowMouseLeave={() => setIsHover(false)}
