@@ -69,11 +69,11 @@ export default [
         name: 'Powers',
         component: './Powers/Index',
       },
-      {
-        path: '/stablecoin',
-        name: 'StableCoin',
-        component: './StableCoin/Index',
-      },
+      // {
+      //   path: '/stablecoin',
+      //   name: 'StableCoin',
+      //   component: './StableCoin/Index',
+      // },
       {
         path: '/launchpad',
         name: 'Launchpad',
