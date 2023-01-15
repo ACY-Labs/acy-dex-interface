@@ -17,6 +17,7 @@ const MarketIndex = props => {
   const [topVolumePairs, setTopVolumePairs] = useState([])
   const [winnersPairs, setWinnersPairs] = useState([])
   const [losersPairs, setLosersPairs] = useState([])
+  const [newPairs, setNewPairs] = useState([])
 
   const getPairList = async () => {
     // fetch top volume pair list
@@ -74,93 +75,37 @@ const MarketIndex = props => {
       })
     }
     setLosersPairs(pairs)
+
+    // fetch new pairs list
+    pairlist = await axios.get(`${apiUrlPrefix}/new-pairs?chainId=${chainId}`).then(res => res.data)
+    pairs = []
+    for (let i = 0; i < pairlist.length; i++) {
+      pairs.push({
+        name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
+        address0: pairlist[i].token0Address,
+        address1: pairlist[i].token1Address,
+        exchange: pairlist[i].exchange,
+        price: pairlist[i].token1Price!="0" ? (pairlist[i].token0Price / pairlist[i].token1Price).toPrecision(2) : "-",
+        price_24h: pairlist[i].priceVariation,
+        volume: '$' + parseFloat(pairlist[i].volumeUSD).toFixed(2),
+        swaps: pairlist[i].txCount,
+        liquidity: pairlist[i].liquidity,
+        createdAt: pairlist[i].createdAtTimestamp,
+      })
+    }
+    setNewPairs(pairs)
   }
 
   useEffect(() => {
     getPairList()
   }, [])
 
-  const test_livepairs = [
-    {
-      name: 'USDC/PANKY',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '32s',
-      price: '-',
-      volume: '-',
-      initial_liquidity: '-',
-      total_liquidity: '-',
-      pool_amount: '-',
-      pool_variation: '0%',
-      pool_remaining: '-',
-    },
-    {
-      name: 'WETH/ROWA',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '2m 40s',
-      price: '$0.00002431',
-      volume: '-',
-      initial_liquidity: '2022-08-06',
-      total_liquidity: '$5310.16',
-      pool_amount: '1.55 ETH',
-      pool_variation: '0.06%',
-      pool_remaining: '1.6236 ETH',
-    },
-    {
-      name: 'WETH/OYA',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '10m 30s',
-      price: '$0.00004183',
-      volume: '-',
-      initial_liquidity: '2022-08-06',
-      total_liquidity: '$5914.87',
-      pool_amount: '1.5 ETH',
-      pool_variation: '15.13%',
-      pool_remaining: '1.72683 ETH',
-    },
-    {
-      name: 'USDC/PANKY',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '32s',
-      price: '-',
-      volume: '-',
-      initial_liquidity: '-',
-      total_liquidity: '-',
-      pool_amount: '-',
-      pool_variation: '0%',
-      pool_remaining: '-',
-    },
-    {
-      name: 'WETH/ROWA',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '2m 40s',
-      price: '$0.00002431',
-      volume: '-',
-      initial_liquidity: '2022-08-06',
-      total_liquidity: '$5310.16',
-      pool_amount: '1.55 ETH',
-      pool_variation: '0.06%',
-      pool_remaining: '1.6236 ETH',
-    },
-    {
-      name: 'WETH/OYA',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '10m 30s',
-      price: '$0.00004183',
-      volume: '-',
-      initial_liquidity: '2022-08-06',
-      total_liquidity: '$5914.87',
-      pool_amount: '1.5 ETH',
-      pool_variation: '15.13%',
-      pool_remaining: '1.72683 ETH',
-    },
-  ]
-
   return (
     <div className={styles.marketRoot}>
       <ConnectWallet />
 
       {/* New Pairs */}
-      {/* <div className={styles.topChart}>
+      <div className={styles.topChart}>
         <div className={styles.chartCell}>
           <div className={styles.statsContainer}>
             <div className={styles.statstitle}>
@@ -168,14 +113,14 @@ const MarketIndex = props => {
               <span className={styles.seeMore} onClick={() => { setMode('NewPairs') }}>
                 More >
               </span>
-            </div> */}
-            {/* <div className={styles.statsdivider} /> */}
+            </div>
+            <div className={styles.statsdivider} />
 
-            {/* <LivePairsTable dataSource={test_livepairs.slice(0, 5)} />
+            <LivePairsTable dataSource={newPairs.slice(0, 5)} />
 
           </div>
         </div>
-      </div> */}
+      </div>
 
       <div className={styles.chartGrid}>
 
@@ -192,31 +137,12 @@ const MarketIndex = props => {
             {/* <div className={styles.statsdivider} /> */}
 
             <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                <div className={styles.label}>1. {topVolumePairs[0]?.name}</div>
-                <div className={styles.value}>{topVolumePairs[0]?.volume}</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>2. {topVolumePairs[1]?.name}</div>
-                <div className={styles.value}>{topVolumePairs[1]?.volume}</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>3. {topVolumePairs[2]?.name}</div>
-                <div className={styles.value}>{topVolumePairs[2]?.volume}</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>4. {topVolumePairs[3]?.name}</div>
-                <div className={styles.value}>{topVolumePairs[3]?.volume}</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>5. {topVolumePairs[4]?.name}</div>
-                <div className={styles.value}>{topVolumePairs[4]?.volume}</div>
-              </div>
-
+              {topVolumePairs.slice(0, 5).map((pair, idx) => pair ? (
+                <div className={styles.statsRow}>
+                  <div className={styles.label}>{idx+1}. {pair.name}</div>
+                  <div className={styles.value}>{pair.volume}</div>
+                </div>) : null
+              )}
             </div>
 
           </div>
@@ -233,31 +159,12 @@ const MarketIndex = props => {
             </div>
 
             <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                <div className={styles.label}>1. MARSRICE BSC</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>2. OHM</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>3. DRX ARBI</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>4. DRX ARBI</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>5. DRX ARBI</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
+              {trendingPairs.slice(0, 5).map((pair, idx) => pair ? (
+                <div className={styles.statsRow}>
+                  <div className={styles.label}>{idx+1}. {pair.name}</div>
+                  <div className={styles.value}>{(pair.price_24h*100).toPrecision(2)}%</div>
+                </div>) : null
+              )}
             </div>
 
           </div>
@@ -276,30 +183,12 @@ const MarketIndex = props => {
             {/* <div className={styles.statsdivider} /> */}
 
             <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                <div className={styles.label}>1. {winnersPairs[0]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[0]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>2. {winnersPairs[1]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[1]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>3. {winnersPairs[2]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[2]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>4. {winnersPairs[3]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[3]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>5. {winnersPairs[4]?.name}</div>
-                <div className={styles.value}>{(winnersPairs[4]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
+              {winnersPairs.slice(0, 5).map((pair, idx) => pair ? (
+                <div className={styles.statsRow}>
+                  <div className={styles.label}>{idx+1}. {pair.name}</div>
+                  <div className={styles.value}>{(pair.price_24h*100).toPrecision(2)}%</div>
+                </div>) : null
+              )}
             </div>
 
           </div>
@@ -318,30 +207,12 @@ const MarketIndex = props => {
             {/* <div className={styles.statsdivider} /> */}
 
             <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                <div className={styles.label}>1. {losersPairs[0]?.name}</div>
-                <div className={styles.value}>{(losersPairs[0]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>2. {losersPairs[1]?.name}</div>
-                <div className={styles.value}>{(losersPairs[1]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>3. {losersPairs[2]?.name}</div>
-                <div className={styles.value}>{(losersPairs[2]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>4. {losersPairs[3]?.name}</div>
-                <div className={styles.value}>{(losersPairs[3]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>5. {losersPairs[4]?.name}</div>
-                <div className={styles.value}>{(losersPairs[4]?.price_24h*100).toPrecision(2)}%</div>
-              </div>
+              {losersPairs.slice(0, 5).map((pair, idx) => pair ? (
+                <div className={styles.statsRow}>
+                  <div className={styles.label}>{idx+1}. {pair.name}</div>
+                  <div className={styles.value}>{(pair.price_24h*100).toPrecision(2)}%</div>
+                </div>) : null
+              )}
             </div>
 
           </div>
@@ -403,7 +274,7 @@ const MarketIndex = props => {
       {mode == 'Pairs' && <PairsTable dataSource={topVolumePairs} />}
       {mode == 'Winners' && <PairsTable dataSource={winnersPairs} />}
       {mode == 'Losers' && <PairsTable dataSource={losersPairs} />}
-      {/* {mode == 'NewPairs' && <LivePairsTable dataSource={test_livepairs} />} */}
+      {mode == 'NewPairs' && <LivePairsTable dataSource={newPairs} />}
       {mode == 'TopVolume' && <TopVolumeTable dataSource={topVolumePairs} />}
       {/* {mode == 'Trending' && <TrendingTable dataSource={topVolumePairs} />} */}
 

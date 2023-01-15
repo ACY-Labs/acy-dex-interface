@@ -176,6 +176,7 @@ export function PairsTable(props) {
 export function LivePairsTable(props) {
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
+  const navHistory = useHistory();
 
   function columnsCoin() {
     return [
@@ -220,6 +221,22 @@ export function LivePairsTable(props) {
         title: (
           <div
             className={styles.tableHeader}
+            onClick={() => { setCurrentKey('exchange') }}
+          >
+            Exchange
+          </div>
+        ),
+        dataIndex: 'exchange',
+        key: 'exchange',
+        render: (text, entry) => {
+          return <div className={styles.tableData}>{entry.exchange}</div>;
+        },
+        visible: true,
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeader}
             onClick={() => { setCurrentKey('listed_since') }}
           >
             Listed Since
@@ -228,7 +245,8 @@ export function LivePairsTable(props) {
         dataIndex: 'listed_since',
         key: 'listed_since',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.listed_since}</div>;
+          let listed_since = Date.now() - entry.createdAt * 1e3
+          return <div className={styles.tableData}>{Math.floor(listed_since/1000)}s</div>;
         },
         visible: true,
       },
@@ -238,7 +256,7 @@ export function LivePairsTable(props) {
             className={styles.tableHeader}
             onClick={() => { setCurrentKey('price') }}
           >
-            Token Price USD
+            Rate
           </div>
         ),
         dataIndex: 'price',
@@ -268,15 +286,15 @@ export function LivePairsTable(props) {
         title: (
           <div
             className={styles.tableHeader}
-            onClick={() => { setCurrentKey('initial_liquidity') }}
+            onClick={() => { setCurrentKey('swaps') }}
           >
-            Initial Liquidity
+            Total Swaps
           </div>
         ),
-        dataIndex: 'initial_liquidity',
-        key: 'initial_liquidity',
+        dataIndex: 'swaps',
+        key: 'swaps',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.initial_liquidity}</div>;
+          return <div className={styles.tableData}>{entry.swaps}</div>;
         },
         visible: true,
       },
@@ -292,58 +310,62 @@ export function LivePairsTable(props) {
         dataIndex: 'total_liquidity',
         key: 'total_liquidity',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.total_liquidity}</div>;
+          if(entry.liquidity > 1e12) return <div className={styles.tableData}>{(entry.liquidity/1e12).toFixed(0)}T</div>;
+          if(entry.liquidity > 1e9) return <div className={styles.tableData}>{(entry.liquidity/1e9).toFixed(0)}G</div>;
+          if(entry.liquidity > 1e6) return <div className={styles.tableData}>{(entry.liquidity/1e6).toFixed(0)}M</div>;
+          if(entry.liquidity > 1e3) return <div className={styles.tableData}>{(entry.liquidity/1e3).toFixed(0)}K</div>;
+          return <div className={styles.tableData}>{entry.liquidity}</div>;
         },
         visible: true,
       },
-      {
-        title: (
-          <div
-            className={styles.tableHeader}
-            onClick={() => { setCurrentKey('pool_amount') }}
-          >
-            Pool Amount
-          </div>
-        ),
-        dataIndex: 'pool_amount',
-        key: 'pool_amount',
-        render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.pool_amount}</div>;
-        },
-        visible: true,
-      },
-      {
-        title: (
-          <div
-            className={styles.tableHeader}
-            onClick={() => { setCurrentKey('pool_variation') }}
-          >
-            Pool Variation
-          </div>
-        ),
-        dataIndex: 'pool_variation',
-        key: 'pool_variation',
-        render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.pool_variation}</div>;
-        },
-        visible: true,
-      },
-      {
-        title: (
-          <div
-            className={styles.tableHeader}
-            onClick={() => { setCurrentKey('pool_remaining') }}
-          >
-            Pool Remaining
-          </div>
-        ),
-        dataIndex: 'pool_remaining',
-        key: 'pool_remaining',
-        render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.pool_remaining}</div>;
-        },
-        visible: true,
-      }
+      // {
+      //   title: (
+      //     <div
+      //       className={styles.tableHeader}
+      //       onClick={() => { setCurrentKey('pool_amount') }}
+      //     >
+      //       Pool Amount
+      //     </div>
+      //   ),
+      //   dataIndex: 'pool_amount',
+      //   key: 'pool_amount',
+      //   render: (text, entry) => {
+      //     return <div className={styles.tableData}>{entry.pool_amount}</div>;
+      //   },
+      //   visible: true,
+      // },
+      // {
+      //   title: (
+      //     <div
+      //       className={styles.tableHeader}
+      //       onClick={() => { setCurrentKey('pool_variation') }}
+      //     >
+      //       Pool Variation
+      //     </div>
+      //   ),
+      //   dataIndex: 'pool_variation',
+      //   key: 'pool_variation',
+      //   render: (text, entry) => {
+      //     return <div className={styles.tableData}>{entry.pool_variation}</div>;
+      //   },
+      //   visible: true,
+      // },
+      // {
+      //   title: (
+      //     <div
+      //       className={styles.tableHeader}
+      //       onClick={() => { setCurrentKey('pool_remaining') }}
+      //     >
+      //       Pool Remaining
+      //     </div>
+      //   ),
+      //   dataIndex: 'pool_remaining',
+      //   key: 'pool_remaining',
+      //   render: (text, entry) => {
+      //     return <div className={styles.tableData}>{entry.pool_remaining}</div>;
+      //   },
+      //   visible: true,
+      // }
     ];
   }
 
@@ -356,6 +378,9 @@ export function LivePairsTable(props) {
         style={{
           marginBottom: '20px',
           cursor: isHover ? 'pointer' : 'default',
+        }}
+        onRowClick={(record, index, event) => {
+          navHistory.push(`/trade#${record.name}&${record.address0}&${record.address1}`)
         }}
         onRowMouseEnter={() => setIsHover(true)}
         onRowMouseLeave={() => setIsHover(false)}
