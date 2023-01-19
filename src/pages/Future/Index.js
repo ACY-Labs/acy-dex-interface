@@ -10,7 +10,6 @@ import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/powers.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
-import { getGlobalTokenList } from '@/constants';
 import { fetcher } from '@/acy-dex-futures/utils';
 import Reader from '@/abis/future-option-power/Reader.json'
 import styles from './styles.less'
@@ -64,9 +63,6 @@ const Future = props => {
   )
   const [activeSymbol, setActiveSymbol] = useState("BTC")
   const [activeToken, setActiveToken] = useState("BTC");
-
-  let coinList = getGlobalTokenList()
-  coinList = coinList.filter(token => token.symbol == "USDT" || token.symbol == 'USDC' || token.symbol == 'BTC' || token.symbol == 'ETH')
 
   const selectTab = item => {
     setActiveToken((tokens.filter(ele => ele.symbol == item)[0]))

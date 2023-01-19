@@ -295,7 +295,7 @@ const Option = props => {
               chainId={chainId}
               tokens={tokens}
               selectedToken={activeToken}
-              symbol={symbol}
+              symbol={activeSymbol}
             />
           </AcyCard>
         </div>
