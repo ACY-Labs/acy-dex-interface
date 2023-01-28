@@ -150,7 +150,7 @@ const Option = props => {
     option_tokens_symbol.push({
     //symbol is displayed
     symbol : ele[1],
-    name : ele[1]?.substring(0,3)
+    name : ele[1]?.substring(0,3),
     })
   })
   //option_token stores token symbols without duplicates for tab display
