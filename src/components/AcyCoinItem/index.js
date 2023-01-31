@@ -87,6 +87,7 @@ const AcyCoinItem = ({
           {customIcon ? (
             <AcyIcon name="eth" />
           ) : (
+            data.logoURI && 
             <div
               style={{
                 display: 'flex',
