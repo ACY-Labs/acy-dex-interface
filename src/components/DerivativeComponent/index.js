@@ -28,6 +28,7 @@ const DerivativeComponent = props => {
     tokens,
     selectedToken,
     symbol,
+    pageName,
   } = props
 
   const connectWalletByLocalStorage = useConnectWallet()
@@ -150,6 +151,7 @@ const DerivativeComponent = props => {
             <div className={styles.rowFlexContainer}>
 
               <div style={{ display: 'flex' }}>
+                {pageName != "Future" &&
                 <div className={styles.inputContainer}>
                   <input
                     type="number"
@@ -163,14 +165,18 @@ const DerivativeComponent = props => {
                     }}
                   />
                   <span className={styles.inputLabel}>{selectedToken.symbol}</span>
-                </div>
+                </div>}
                 <div className={styles.inputContainer}>
                   <input
                     type="number"
                     min="0"
                     className={styles.optionInput}
                     value={usdValue}
-                    onChange={e => { }}
+                    onChange={e => {
+                      setUsdValue(e.target.value)
+                      setSelectedTokenValue(e.target.value / formatAmount(selectedTokenPrice, 18, 2))
+                      setShowDescription(true)
+                    }}
                   />
                   <span className={styles.inputLabel}>USD</span>
                 </div>

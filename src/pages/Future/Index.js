@@ -88,6 +88,7 @@ const Future = props => {
               tokens={tokens}
               selectedToken={activeToken}
               symbol={symbol}
+              pageName="Future"
             />
           </AcyCard>
         </div>
