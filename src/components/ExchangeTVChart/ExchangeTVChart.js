@@ -10,6 +10,7 @@ import {
 import './ExchangeTVChart.css';
 import axios from "axios";
 import Binance from "binance-api-node";
+import Icon from "antd";
 
 const StyledSelect = styled(Radio.Group)`
   .ant-radio-button-wrapper{
@@ -144,6 +145,7 @@ export default function ExchangeTVChart(props) {
   const [priceChangePercentDelta, setPriceChangePercentDelta] = useState();
   const [deltaIsMinus, setDeltaIsMinus] = useState();
   const [chartInited, setChartInited] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const isTick = pageName == "Powers";
 
@@ -177,6 +179,8 @@ export default function ExchangeTVChart(props) {
   useEffect(() => {
     if (!currentSeries)
       return;
+
+    setIsLoading(true)
 
     const pairName = `${fromToken}${toToken}`;
 
@@ -258,6 +262,7 @@ export default function ExchangeTVChart(props) {
 
       // Binance data is independent of chain, so here we can fill in any chain name
       currentSeries.setData(responsePairData);
+      setIsLoading(false)
 
       if (pageName == "Option" || pageName == "Futures") {
         let from = responsePairData[responsePairData.length - 1].time
@@ -429,7 +434,7 @@ export default function ExchangeTVChart(props) {
           <div className="ExchangeChart-bottom-controls">
           </div>
         </div>
-        {!currentChart && <Spin />}
+        {isLoading && <Spin style={{width: "100%", marginBottom:"-40%" }} />}
         <div className="ExchangeChart-bottom-content" ref={chartRef} style={{ height: "100%", width: "100%" }}></div>
       </div>
     </div>
