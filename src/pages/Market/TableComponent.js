@@ -94,7 +94,12 @@ export function PairsTable(props) {
         dataIndex: 'price_24h',
         key: 'price_24h',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{(entry.price_24h*100).toPrecision(2)}%</div>;
+          let price_24h = (entry.price_24h*100).toPrecision(2)
+          if(price_24h > 0) {
+            return <div className={styles.tableData} style={{color: "green"}}>{price_24h}% ↑</div>
+          } else {
+            return <div className={styles.tableData} style={{color: "red"}}>{price_24h}% ↓</div>
+          }
         },
         visible: true,
       },
@@ -430,6 +435,27 @@ export function TopVolumeTable(props) {
               <span style={{marginLeft: '10px'}}>{entry.name}</span>
             </div>
           );
+        },
+        visible: true,
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => { setCurrentKey('price_24h') }}
+          >
+            24h Price variation
+          </div>
+        ),
+        dataIndex: 'price_24h',
+        key: 'price_24h',
+        render: (text, entry) => {
+          let price_24h = (entry.price_24h*100).toPrecision(2)
+          if(price_24h > 0) {
+            return <div className={styles.tableData} style={{color: "green"}}>{price_24h}% ↑</div>
+          } else {
+            return <div className={styles.tableData} style={{color: "red"}}>{price_24h}% ↓</div>
+          }
         },
         visible: true,
       },
