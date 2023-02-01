@@ -179,6 +179,7 @@ const AccountInfoGauge = props => {
 
             <div className={styles.ConfirmationBoxRow}>
               <button
+                style={{cursor: 'pointer'}}
                 onClick={() => {
                   onClickPrimary()
                   setIsConfirming(false)

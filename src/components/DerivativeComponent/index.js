@@ -19,6 +19,7 @@ import IPool from '@/abis/future-option-power/IPool.json'
 
 import styles from './styles.less';
 import { parse } from 'date-fns';
+import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 const DerivativeComponent = props => {
 
@@ -87,6 +88,7 @@ const DerivativeComponent = props => {
   const symbolMarkPrice = symbolInfo?.markPrice
   const symbolMinTradeVolume = symbolInfo?.minTradeVolume
   const minTradeVolume = symbolMinTradeVolume ? ethers.utils.formatUnits(symbolMinTradeVolume, 18) : 0.001
+  const minTradeDecimal = minTradeVolume? minTradeVolume.toString().includes('.')?minTradeVolume.toString().split('.')[1].length:0:3
 
   const getPrimaryText = () => {
     if (!active) {
@@ -119,20 +121,22 @@ const DerivativeComponent = props => {
     } else {
       setSelectedTokenValue(Math.floor(value / minTradeVolume) * minTradeVolume)
     }
-    console.log("token ui selectedTokenValue", value, selectedTokenValue)
   }
   const handleUsdValueChange = (value) => {
     setUsdValue(value)
-    console.log("derivative usd see symbolMarkPrice", symbolMarkPrice)
-    const bigValue = parseValue(value, 18)
-    // console.log("derivative usd see bigValue", bigValue)
+    // console.log("derivative usd see symbolMarkPrice", symbolMarkPrice)
+    const bigValue = parseValue(value, 18+minTradeDecimal)
     let tokenValue = bigValue?.div(symbolMarkPrice)
-    //selectedTokenAmount is sent to the contract
-    setSelectedTokenAmount(parseValue(tokenValue, selectedToken && selectedToken.decimals))
-    console.log("derivative usd see tokenAmount", parseValue(tokenValue, selectedToken && selectedToken.decimals))
-    tokenValue = formatAmount(tokenValue, 0, 0)
+    tokenValue = formatAmount(tokenValue, minTradeDecimal)
     //selectedTokenValue is for display
-    setSelectedTokenValue(tokenValue)
+    //selectedTokenAmount is sent to contract
+    if(tokenValue%minTradeVolume==0){
+      setSelectedTokenValue(tokenValue)
+      setSelectedTokenAmount(parseValue(tokenValue, selectedToken && selectedToken.decimals))
+    }else{
+      setSelectedTokenValue(Math.floor(tokenValue/minTradeVolume)*minTradeVolume)
+      setSelectedTokenAmount(parseValue(Math.floor(tokenValue/minTradeVolume)*minTradeVolume),  selectedToken && selectedToken.decimals)
+    }
   }
 
   ///////////// write contract /////////////
