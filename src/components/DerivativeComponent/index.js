@@ -174,7 +174,7 @@ const DerivativeComponent = props => {
                     value={usdValue}
                     onChange={e => {
                       setUsdValue(e.target.value)
-                      setSelectedTokenValue(e.target.value / formatAmount(selectedTokenPrice, 18, 2))
+                      handleTokenValueChange(e.target.value / formatAmount(selectedTokenPrice, 18, 2))
                       setShowDescription(true)
                     }}
                   />
