@@ -3,15 +3,17 @@ import { useHistory } from 'react-router-dom';
 import className from 'classnames';
 import { Divider, Icon, Input, Table, Button, Dropdown } from 'antd';
 import { AcyIcon, AcyTabs, AcyTokenIcon, AcyCardList } from '@/components/Acy';
+import { sortPairsTable } from './Util';
 
 import styles from './styles.less'
 
 export function PairsTable(props) {
+  const [tokenSortAscending, setTokenSortAscending] = useState(true)
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
   const navHistory = useHistory()
 
-  function columnsCoin() {
+  function columnsCoin(isAscending, onSortChange) {
     return [
       {
         title: (
@@ -32,9 +34,18 @@ export function PairsTable(props) {
         title: (
           <div
             className={styles.tableHeaderFirst}
-            onClick={() => { setCurrentKey('name') }}
+            onClick={() => { 
+              setCurrentKey('name') 
+              onSortChange()
+            }}
           >
             Pair
+            {currentKey == 'name' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
           </div>
         ),
         dataIndex: 'name',
@@ -54,9 +65,18 @@ export function PairsTable(props) {
         title: (
           <div
             className={styles.tableHeader}
-            onClick={() => { setCurrentKey('exchange') }}
+            onClick={() => { 
+              setCurrentKey('exchange') 
+              onSortChange()
+            }}
           >
             Exchange
+            {currentKey == 'exchange' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
           </div>
         ),
         dataIndex: 'exchange',
@@ -70,9 +90,18 @@ export function PairsTable(props) {
         title: (
           <div
             className={styles.tableHeader}
-            onClick={() => { setCurrentKey('price') }}
+            onClick={() => { 
+              setCurrentKey('price') 
+              onSortChange()
+            }}
           >
             Rate
+            {currentKey == 'price' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
           </div>
         ),
         dataIndex: 'price',
@@ -86,9 +115,18 @@ export function PairsTable(props) {
         title: (
           <div
             className={styles.tableHeader}
-            onClick={() => { setCurrentKey('price_24h') }}
+            onClick={() => { 
+              setCurrentKey('price_24h')
+              onSortChange()
+            }}
           >
             24h Price variation
+            {currentKey == 'price_24h' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
           </div>
         ),
         dataIndex: 'price_24h',
@@ -107,15 +145,24 @@ export function PairsTable(props) {
         title: (
           <div
             className={styles.tableHeader}
-            onClick={() => { setCurrentKey('volume') }}
+            onClick={() => { 
+              setCurrentKey('volume') 
+              onSortChange()
+            }}
           >
             24h Volume
+            {currentKey == 'volume' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
           </div>
         ),
         dataIndex: 'volume',
         key: 'volume',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.volume}</div>;
+          return <div className={styles.tableData}>$ {entry.volume}</div>;
         },
         visible: true,
       },
@@ -123,9 +170,18 @@ export function PairsTable(props) {
         title: (
           <div
             className={styles.tableHeader}
-            onClick={() => { setCurrentKey('swaps') }}
+            onClick={() => { 
+              setCurrentKey('swaps')
+              onSortChange()
+            }}
           >
             24h Swaps
+            {currentKey == 'swaps' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
           </div>
         ),
         dataIndex: 'swaps',
@@ -139,9 +195,18 @@ export function PairsTable(props) {
         title: (
           <div
             className={styles.tableHeader}
-            onClick={() => { setCurrentKey('liquidity') }}
+            onClick={() => { 
+              setCurrentKey('liquidity') 
+              onSortChange()
+            }}
           >
             Total Liquidity
+            {currentKey == 'liquidity' && (
+              <Icon
+                type={!isAscending ? 'arrow-up' : 'arrow-down'}
+                style={{ fontSize: '14px', marginLeft: '4px' }}
+              />
+            )}
           </div>
         ),
         dataIndex: 'liquidity',
@@ -161,8 +226,8 @@ export function PairsTable(props) {
   return (
     <div className={styles.nobgTable}>
       <Table
-        dataSource={props.dataSource}
-        columns={columnsCoin().filter(item => item.visible == true)}
+        dataSource={sortPairsTable(props.dataSource, currentKey, tokenSortAscending)}
+        columns={columnsCoin(tokenSortAscending, ()=>{setTokenSortAscending(!tokenSortAscending)}).filter(item => item.visible == true)}
         pagination={false}
         style={{
           marginBottom: '20px',
@@ -283,7 +348,7 @@ export function LivePairsTable(props) {
         dataIndex: 'volume',
         key: 'volume',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.volume}</div>;
+          return <div className={styles.tableData}>$ {entry.volume}</div>;
         },
         visible: true,
       },
@@ -471,7 +536,7 @@ export function TopVolumeTable(props) {
         dataIndex: 'volume',
         key: 'volume',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.volume}</div>;
+          return <div className={styles.tableData}>$ {entry.volume}</div>;
         },
         visible: true,
       },
@@ -621,7 +686,7 @@ export function TrendingTable(props) {
         dataIndex: 'volume',
         key: 'volume',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.volume}</div>;
+          return <div className={styles.tableData}>$ {entry.volume}</div>;
         },
         visible: true,
       },
