@@ -76,14 +76,11 @@ const OptionComponent = props => {
   const [percentage, setPercentage] = useState('')
   const [selectedTokenValue, setSelectedTokenValue] = useState("0")
   const [usdValue, setUsdValue] = useState(0)
-  const [isApproving, setIsApproving] = useState(false)
-  const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
   const [showDescription, setShowDescription] = useState(false)
   const [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
   const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
   const [slippageError, setSlippageError] = useState('')
   const [deadline, setDeadline] = useState()
-  const [marginToken, setMarginToken] = useState(tokens[1])
 
   const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
   const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
@@ -116,15 +113,11 @@ const OptionComponent = props => {
     if (!active) {
       return 'Connect Wallet'
     }
-    if (isApproving) {
-      return `Approving ${selectedToken.symbol}...`;
-    }
     return mode == 'Buy' ? 'Buy / Long' : 'Sell / Short'
   }
 
   useEffect(() => {
     setShowDescription(false)
-    setMarginToken(tokens[1])
   }, [tokens])
 
   useEffect(() => {
@@ -281,8 +274,6 @@ const OptionComponent = props => {
               chainId={chainId}
               tokens={tokens}
               active={active}
-              token={marginToken}
-              setToken={setMarginToken}
               symbol={symbol}
             />
           </>

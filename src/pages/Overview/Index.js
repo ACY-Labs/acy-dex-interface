@@ -27,6 +27,7 @@ import * as future from '@/constants/future.js';
 import * as powers from '@/constants/powers.js';
 import * as option from '@/constants/option.js';
 import * as launchpad from '@/constants/launchpad.js';
+import DepositWithdrawModal from '@/components/AccountInfoGauge/DepositWithdrawModal';
 // import * as stablecoin from '@/constants/stablecoin.js';
 
 const { Option } = Select;
@@ -88,6 +89,7 @@ const Overview = props => {
             value: '',
             copied: false,
         });
+    const [mode, setMode] = useState('')
 
     const showModal = (type, token, pageName) => {
         setActiveFromPage(pageName)
@@ -238,10 +240,10 @@ const Overview = props => {
             render: (text, entry) => {
                 return <div className={styles.tableData} style={{ float: "right" }}>
                     {/* <Button className={styles.button} onClick={() => { showModal("Deposit", entry.name) }}> */}
-                    <Button className={styles.button} onClick={() => { showModal("Deposit", "", entry.name) }}>
+                    <Button className={styles.button} onClick={() => { setMode("Deposit") }}>
                         Deposit
                     </Button>
-                    <Button className={styles.button} onClick={() => { showModal("Withdraw", "", entry.name) }}>
+                    <Button className={styles.button} onClick={() => { setMode("Withdraw") }}>
                         Withdraw
                     </Button>
                     <Button className={styles.button} onClick={() => { showModal("Transfer", "", entry.name) }}>
@@ -404,16 +406,16 @@ const Overview = props => {
                     );
                 },
             },
-            {
-                title: (
-                    <div className={styles.tableHeaderFirst} style={{ marginLeft: "6.5rem" }}> Price </div>
-                ),
-                dataIndex: "price",
-                key: "price",
-                render: (text, entry) => {
-                    return <div className={styles.tableData} style={{ marginLeft: "100px" }}>{text}</div>;
-                },
-            },
+            // {
+            //     title: (
+            //         <div className={styles.tableHeaderFirst} style={{ marginLeft: "6.5rem" }}> Price </div>
+            //     ),
+            //     dataIndex: "price",
+            //     key: "price",
+            //     render: (text, entry) => {
+            //         return <div className={styles.tableData} style={{ marginLeft: "100px" }}>{text}</div>;
+            //     },
+            // },
             {
                 title: (
                     <div className={styles.tableHeaderFirst}> Balance </div>
@@ -433,10 +435,10 @@ const Overview = props => {
                 render: (text, entry, record) => {
                     return <div className={styles.tableData} style={{ float: "right" }}>
                         {/* <Button className={styles.button} onClick={() => { showModal("Deposit", entry.name) }}> */}
-                        <Button className={styles.button} onClick={() => { showModal("Deposit", entry.name, pageName) }}>
+                        <Button className={styles.button} onClick={() => { setMode("Deposit") }}>
                             Deposit
                         </Button>
-                        <Button className={styles.button} onClick={() => { showModal("Withdraw", entry.name, pageName) }}>
+                        <Button className={styles.button} onClick={() => { setMode("Withdraw") }}>
                             Withdraw
                         </Button>
                         <Button className={styles.button} onClick={() => { showModal("Transfer", entry.name, pageName) }}>
@@ -719,8 +721,8 @@ const Overview = props => {
                                     </div>
                                 </Col>
                                 <Col offset={6} span={5}>
-                                    <Button className={styles.button} onClick={() => { showModal("Deposit") }}>Deposit</Button>
-                                    <Button className={styles.button} onClick={() => { showModal("Withdraw") }}>Withdraw</Button>
+                                    <Button className={styles.button} onClick={() => { setMode("Deposit") }}>Deposit</Button>
+                                    <Button className={styles.button} onClick={() => { setMode("Withdraw") }}>Withdraw</Button>
                                     <Button className={styles.button} onClick={() => { showModal("Transfer") }}>Transfer</Button>
                                     <Button className={styles.button} onClick={() => { showModal("Send") }}>Send</Button>
                                     <div style={{ fontSize: "0.7rem", padding: "5px" }}>Transaction History</div>
@@ -762,6 +764,17 @@ const Overview = props => {
                 </Layout>
 
             </div>
+            {mode != ''&&
+                <DepositWithdrawModal
+                    chainId={chainId}
+                    library={library}
+                    account={account}
+                    active={active}
+                    tokens={activeTokenList}
+                    setIsConfirming={()=>{setMode('')}}
+                    mode={mode}
+                />    
+            }
         </div>
 
 
