@@ -124,7 +124,7 @@ export function getTokenContract(tokenAddress, library, account) {
 }
 
 export function getPairContract(pairAddress, library, account) {
-  return getContract(pairAddress, IUniswapV2PairABI, library, account);
+  return getContract(pairAddress, IUniswapV2PairABI.abi, library, account);
 }
 
 import { getCreate2Address } from "@ethersproject/address";
@@ -503,10 +503,12 @@ export function parseArbitrageLog({ data, topics }) {
   };
 }
 export async function getAllSupportedTokensPrice(isForMarketPage=false) {
+  console.log("dev0")
   const tokenList = isForMarketPage ? MARKET_TOKEN_LIST() : TOKENLIST();
   const chainID = CHAINID();
   const searchIdsArray = tokenList.map(token => token.idOnCoingecko);
   const searchIds = searchIdsArray.join('%2C');
+  console.log("dev 0.1", tokenList, chainID, searchIdsArray, searchIds)
   const tokensPrice = await axios.get(
     `https://api.coingecko.com/api/v3/simple/price?ids=${searchIds}&vs_currencies=usd`
   ).then(async (result) => {
@@ -520,6 +522,7 @@ export async function getAllSupportedTokensPrice(isForMarketPage=false) {
     // // launchpad project token
     // // where tokens is not listed on coinGecko
     // TODO: in future we could remove this block completely. Get price from pool when it's not available on CoinGecko
+    console.log('dev1: ', tokensPrice)
     if (chainID == 56) {
       if (tokensPrice["DXS"] == 0)
         tokensPrice["DXS"] = await getTokenPriceFromPool("DXS", tokensPrice, isForMarketPage);
