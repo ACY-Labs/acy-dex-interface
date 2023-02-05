@@ -72,6 +72,7 @@ const AcySymbol = (props: any) => {
         onCancel={onCancel} 
         width={400} 
         visible={visible} 
+        setVisible={setVisible}
         onCoinClick={onClickCoin} 
         coinList={coinList} 
         activeSymbol={activeSymbol} 

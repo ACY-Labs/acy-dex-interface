@@ -196,7 +196,6 @@ const Option = props => {
     // onClickSetActiveToken(item)
   }
   const selectTab = item => {
-    console.log("option refactor here")
     setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
     // let newDict = visibleToken
     // Object.entries(visibleToken).forEach((token) => {
@@ -207,7 +206,6 @@ const Option = props => {
     // setVisibleToken(newDict)
   }
   const selectSymbol = item =>{
-    console.log("option refactor selectSymbol", item)
     // setActiveSymbol
   }
   // const onClose = () => {
