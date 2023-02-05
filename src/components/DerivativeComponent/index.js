@@ -82,7 +82,6 @@ const DerivativeComponent = props => {
   const [deadline, setDeadline] = useState()
   const [marginToken, setMarginToken] = useState(tokens[1])
 
-  const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
   // const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
   // const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const symbolMarkPrice = symbolInfo?.markPrice
