@@ -107,15 +107,13 @@ const DerivativeComponent = props => {
   }, [percentage])
 
   useEffect(() => {
-    setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18, 2)).toFixed(2))
+    if(pageName != "Future") {
+      setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18)).toFixed(2))
+    }
   }, [selectedTokenValue, selectedTokenPrice])
 
   const handleTokenValueChange = (value) => {
-    if(value%minTradeVolume==0){
-      setSelectedTokenValue(value)
-    }else{
-      setSelectedTokenValue(Math.floor(value/minTradeVolume)*minTradeVolume)
-    }
+    setSelectedTokenValue(value.toFixed(-Math.log10(minTradeVolume)))
   }
 
   ///////////// write contract /////////////
@@ -174,7 +172,7 @@ const DerivativeComponent = props => {
                     value={usdValue}
                     onChange={e => {
                       setUsdValue(e.target.value)
-                      handleTokenValueChange(e.target.value / formatAmount(selectedTokenPrice, 18, 2))
+                      handleTokenValueChange(e.target.value / formatAmount(selectedTokenPrice, 18))
                       setShowDescription(true)
                     }}
                   />
