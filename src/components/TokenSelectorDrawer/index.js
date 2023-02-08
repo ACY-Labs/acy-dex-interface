@@ -19,7 +19,7 @@ import { useConstantLoader, getGlobalTokenList } from '@/constants';
 import mockTokenList from '@/components/SwapComponent/mockTokenList.json';
 // import InfiniteScroll from 'react-infinite-scroll-component';
 
-const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simple, coinList, placement='right', activeSymbol, selectSymbol, setActiveSymbol }) => {
+const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simple, coinList, placement='right', activeSymbol, selectSymbol, setActiveSymbol, pageName }) => {
   const { account, library, chainId } = useConstantLoader();
 
   // const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
@@ -244,9 +244,15 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
                         key={index}
                         customIcon={false}
                         clickCallback={() => setTokenAsFav(token)}
+                        // selectToken={(item) => {
+                        //   setActiveSymbol(item.symbol)
+                        // }}
                         selectToken={(item) => {
+                          if (pageName=="Trade") {onCoinClick(token)}
+                          else {setVisible(false)}
                           setActiveSymbol(item.symbol)
-                          setVisible(false)
+                          // setVisible(false)
+                          // onCoinClick(token);
                         }}
                         isFav={favTokenList.includes(token)}
                         constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}

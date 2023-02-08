@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Row, Col, Drawer } from 'antd';
 import AcyCard from '@/components/AcyCard';
 import DerivativeComponent from '@/components/DerivativeComponent'
@@ -6,7 +6,7 @@ import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import * as Api from '@/acy-dex-futures/Api';
-import { fetcher,getProvider, bigNumberify } from '@/acy-dex-futures/utils';
+import { fetcher, getProvider, bigNumberify } from '@/acy-dex-futures/utils';
 import { useConstantLoader } from '@/constants';
 import { BigNumber, ethers } from 'ethers'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
@@ -21,42 +21,42 @@ import { PositionTable } from '@/components/OptionComponent/TableComponent';
 import Reader from '@/abis/future-option-power/Reader.json'
 import useSWR from 'swr'
 import { useWeb3React } from '@web3-react/core';
-   
+
 function safeDiv(a, b) {
   return b.isZero() ? BigNumber.from(0) : a.div(b);
 }
 function safeDiv2(a, b) {
-  return b==0 ? 0 : a/b;
+  return b == 0 ? 0 : a / b;
 }
 
-export function getPosition(rawPositionData,symbolData) {
+export function getPosition(rawPositionData, symbolData) {
   if (!rawPositionData || !symbolData) {
     return
   }
   let positionQuery = []
-  for(let i = 0; i < rawPositionData.positions.length; i++){
+  for (let i = 0; i < rawPositionData.positions.length; i++) {
     const temp = rawPositionData.positions[i]
     const volume = ethers.utils.formatUnits(temp[2], 18)
-    if (volume!=0){
-      const symbol = symbolData.find(obj=>{
+    if (volume != 0) {
+      const symbol = symbolData.find(obj => {
         return obj.address === temp[0]
       })
-      const {markPrice,initialMarginRatio,indexPrice,minTradeVolume} = symbol
+      const { markPrice, initialMarginRatio, indexPrice, minTradeVolume } = symbol
 
-      const cost = ethers.utils.formatUnits(temp.cost,18)
-      const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume,18)
+      const cost = ethers.utils.formatUnits(temp.cost, 18)
+      const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume, 18)
       const marginUsage = Math.abs(volume * indexPrice) * initialMarginRatio
       const unrealizedPnl = volume * indexPrice - cost
       const _accountFunding = temp.cumulativeFundingPerVolume.mul(temp[2])
-      const accountFunding = ethers.utils.formatUnits(_accountFunding,36)
-      const _entryPrice = safeDiv(temp.cost,temp[2])
+      const accountFunding = ethers.utils.formatUnits(_accountFunding, 36)
+      const _entryPrice = safeDiv(temp.cost, temp[2])
       // const entryPrice = ethers.utils.formatUnits(_entryPrice,0)
-      const entryPrice = safeDiv2(cost,volume)
+      const entryPrice = safeDiv2(cost, volume)
       let liquidationPrice
       if (volume >= 0) {
-        liquidationPrice = markPrice * (1 - initialMarginRatio/2) - (marginUsage-cost)/(volume*(1-initialMarginRatio/2))
+        liquidationPrice = markPrice * (1 - initialMarginRatio / 2) - (marginUsage - cost) / (volume * (1 - initialMarginRatio / 2))
       } else {
-        liquidationPrice = markPrice * (1 + initialMarginRatio/2) + (marginUsage-cost)/(volume*(1+initialMarginRatio/2))
+        liquidationPrice = markPrice * (1 + initialMarginRatio / 2) + (marginUsage - cost) / (volume * (1 + initialMarginRatio / 2))
       }
 
       const position = {
@@ -68,7 +68,7 @@ export function getPosition(rawPositionData,symbolData) {
         marginUsage: marginUsage,
         unrealizedPnl: unrealizedPnl,
         accountFunding: accountFunding,
-        type: volume>=0?"Long":"Short",
+        type: volume >= 0 ? "Long" : "Short",
         minTradeVolume: minTradeVolume,
         liquidationPrice: liquidationPrice,
       };
@@ -78,21 +78,21 @@ export function getPosition(rawPositionData,symbolData) {
   return positionQuery;
 }
 
-export function getSymbol(rawSymbolData){
+export function getSymbol(rawSymbolData) {
   if (!rawSymbolData) {
     return
   }
   let symbolQuery = []
-  for(let i = 0; i < rawSymbolData.length; i++){
+  for (let i = 0; i < rawSymbolData.length; i++) {
     const temp = rawSymbolData[i]
     const symbol = {
-      tokenname: temp[1]?.substring(0,3),
+      tokenname: temp[1]?.substring(0, 3),
       symbol: temp[1],
       address: temp[2],
-      markPrice: ethers.utils.formatUnits(temp.markPrice,18),
-      indexPrice: ethers.utils.formatUnits(temp.indexPrice,18),
-      initialMarginRatio: ethers.utils.formatUnits(temp.initialMarginRatio,18), //0.1
-      minTradeVolume: ethers.utils.formatUnits(temp.minTradeVolume,18)
+      markPrice: ethers.utils.formatUnits(temp.markPrice, 18),
+      indexPrice: ethers.utils.formatUnits(temp.indexPrice, 18),
+      initialMarginRatio: ethers.utils.formatUnits(temp.initialMarginRatio, 18), //0.1
+      minTradeVolume: ethers.utils.formatUnits(temp.minTradeVolume, 18)
 
     };
     symbolQuery.push(symbol)
@@ -116,23 +116,23 @@ const Option = props => {
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
-  const { data:rawPositionData,mutate:updatePosition} = useSWR([chainId, readerAddress, 'getTdInfo',poolAddress,account], {
+  const { data: rawPositionData, mutate: updatePosition } = useSWR([chainId, readerAddress, 'getTdInfo', poolAddress, account], {
     fetcher: fetcher(library, Reader)
   })
 
-  console.log("POSITION",rawPositionData)
+  console.log("POSITION", rawPositionData)
 
   const symbolData = getSymbol(symbolsInfo)
-  const positionData = getPosition(rawPositionData,symbolData)
+  const positionData = getPosition(rawPositionData, symbolData)
 
-  console.log("POSITIONDATA",positionData)
-  console.log("SYMBOLDATA",symbolData)
+  console.log("POSITIONDATA", positionData)
+  console.log("SYMBOLDATA", symbolData)
 
   useEffect(() => {
     if (active) {
       library.on('block', () => {
         updatePosition()
-        updateSymbolsInfo(undefined, true)
+        updateSymbolsInfo()
       })
       return () => {
         library.removeAllListeners('block')
@@ -141,41 +141,69 @@ const Option = props => {
   }, [active, library, chainId,
     updateSymbolsInfo, updatePosition]
   )
+
+  //option_tokens_symbol stores token symbol and option symbol
+  let option_tokens_symbol = []
+  //option_token stores token symbols without duplicates for tab display
+  let option_token = []
   //option_tokens store every symbols in option and its data 
-  const option_tokens = symbolsInfo?.filter(ele => ele[0] == "option")
+  let option_tokens = {}
+
+  useMemo(() => {
+  //option_tokens store every symbols in option and its data 
+  option_tokens = symbolsInfo?.filter(ele => ele[0] == "option")
   //option_tokens_symbol stores token symbol and option symbol
   //eg. [{symbol: "BTC", name:"BTC-60000-C"}, {symbol: "BTC", name:"BTC-10000-C"}]
-  let option_tokens_symbol = []
   option_tokens?.forEach((ele) => {
     option_tokens_symbol.push({
-    //symbol is displayed
-    symbol : ele[1],
-    name : ele[1]?.substring(0,3),
+      //symbol is displayed
+      symbol: ele[1],
+      name: ele[1]?.substring(0, 3),
     })
   })
   //option_token stores token symbols without duplicates for tab display
-  let option_token = []
+  // let option_token = []
   option_tokens_symbol?.forEach((ele) => {
-    if (!option_token.includes(ele.name)){
+    if (!option_token.includes(ele.name)) {
       option_token.push(ele.name)
     }
   })
-  //test data to load the page before contract is read
-  let test_symbols = [
-    {
-      symbol: "BTC",
-      name: "BTC-60000-C",
-    },
-    {
-      symbol: "BTC",
-      name: "BTC-10000-C",
-    },
-    {
-      symbol: "ETH",
-      name: "ETH-1000-C",
-    },
-  ]
-  option_tokens_symbol = option_tokens_symbol.length ? option_tokens_symbol : test_symbols
+  }, [symbolsInfo, option_token, activeSymbol])
+  // //option_tokens store every symbols in option and its data 
+  // const option_tokens = symbolsInfo?.filter(ele => ele[0] == "option")
+  // //option_tokens_symbol stores token symbol and option symbol
+  // //eg. [{symbol: "BTC", name:"BTC-60000-C"}, {symbol: "BTC", name:"BTC-10000-C"}]
+  // let option_tokens_symbol = []
+  // option_tokens?.forEach((ele) => {
+  //   option_tokens_symbol.push({
+  //   //symbol is displayed
+  //   symbol : ele[1],
+  //   name : ele[1]?.substring(0,3),
+  //   })
+  // })
+  // //option_token stores token symbols without duplicates for tab display
+  // let option_token = []
+  // option_tokens_symbol?.forEach((ele) => {
+  //   if (!option_token.includes(ele.name)){
+  //     option_token.push(ele.name)
+  //   }
+  // })
+  // //test data to load the page before contract is read
+  // let test_symbols = [
+  //   {
+  //     symbol: "BTC",
+  //     name: "BTC-60000-C",
+  //   },
+  //   {
+  //     symbol: "BTC",
+  //     name: "BTC-10000-C",
+  //   },
+  //   {
+  //     symbol: "ETH",
+  //     name: "ETH-1000-C",
+  //   },
+  // ]
+  // option_tokens_symbol = option_tokens_symbol.length ? option_tokens_symbol : test_symbols
 
   const [mode, setMode] = useState('Buy')
   const [tableContent, setTableContent] = useState("Positions");
@@ -191,7 +219,6 @@ const Option = props => {
     setPriceChangePercentDelta(change);
   }
 
-
   const selectChartToken = item => {
     // onClickSetActiveToken(item)
   }
@@ -205,7 +232,7 @@ const Option = props => {
     // })
     // setVisibleToken(newDict)
   }
-  const selectSymbol = item =>{
+  const selectSymbol = item => {
     // setActiveSymbol
   }
   // const onClose = () => {
@@ -219,12 +246,12 @@ const Option = props => {
   // }
 
 
-
+  // useEffect(() => {
+  //   setActiveToken(option_tokens_symbol?.find(ele => ele.name == "BTC")?.name)
+  // }, [ activeSymbol])
   // useEffect(() => {
   //   setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
   // }, [tokens])
-
-  
 
   return (
     <div className={styles.main}>
@@ -250,7 +277,7 @@ const Option = props => {
               />
               <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
                 <ExchangeTVChart
-                  chartTokenSymbol={symbol}
+                  chartTokenSymbol={activeSymbol}
                   pageName="Option"
                   fromToken={activeToken}
                   toToken="USDT"
@@ -272,7 +299,7 @@ const Option = props => {
                 <div className={`${styles.colItem} ${styles.priceChart}`}>
                   <div className={styles.positionsTable}>
                     {tableContent == "Positions" && (
-                      <PositionTable dataSource={positionData} chainId={chainId}/>
+                      <PositionTable dataSource={positionData} chainId={chainId} />
                     )}
                     {tableContent == "Orders" && (
                       <div>ORDERS</div>

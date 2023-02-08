@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 import { useWeb3React } from '@web3-react/core';
 import AcyCard from '@/components/AcyCard';
@@ -33,21 +33,43 @@ const Future = props => {
     fetcher: fetcher(library, Reader)
   });
   //future_tokens store every symbols in future and its data 
-  const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
-  let future_tokens_symbol = []
-  future_tokens?.forEach((ele)=>{
-    future_tokens_symbol.push({
-      name: ele[1],
-      symbol: ele[1].substring(0,3),
-    })
-  })  
+  // const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
+  // let future_tokens_symbol = []
+  // future_tokens?.forEach((ele)=>{
+  //   future_tokens_symbol.push({
+  //     name: ele[1],
+  //     symbol: ele[1].substring(0,3),
+  //   })
+  // })  
+  // //future_token stores token symbols without duplicates for tab display
+  // let future_token = []
+  // future_tokens_symbol?.forEach((ele) => {
+  //   if (!future_token.includes(ele.symbol)){
+  //     future_token.push(ele.symbol)
+  //   }
+  // })
+
+  //future_tokens store every symbols in future and its data 
+  let future_tokens = {}
+  let future_tokens_symbol = []    
   //future_token stores token symbols without duplicates for tab display
   let future_token = []
-  future_tokens_symbol?.forEach((ele) => {
-    if (!future_token.includes(ele.symbol)){
-      future_token.push(ele.symbol)
-    }
-  })
+
+  useMemo(() => {
+    future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
+    future_tokens_symbol = []
+    future_tokens?.forEach((ele)=>{
+      future_tokens_symbol.push({
+        name: ele[1],
+        symbol: ele[1].substring(0,3),
+      })
+    })  
+    future_tokens_symbol?.forEach((ele) => {
+      if (!future_token.includes(ele.symbol)){
+        future_token.push(ele.symbol)
+      }
+    })
+  }, [symbolsInfo, activeToken, future_token])
 
   useEffect(() => {
     if (active) {

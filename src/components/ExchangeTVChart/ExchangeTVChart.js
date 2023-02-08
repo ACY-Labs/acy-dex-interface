@@ -232,6 +232,7 @@ export default function ExchangeTVChart(props) {
         responseFromTokenData = await axios.get(`${OptionsPriceApi}/futures?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
           .then((res) => res.data);
       } else if(pageName == "Trade") {
+        console.log("see trade token0", fromToken, toToken, chainId)
         responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromToken}&token1=${toToken}&chainId=${chainId}&period=${period}`)
           .then((res) => res.data);
       } else {
