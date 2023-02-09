@@ -50,26 +50,24 @@ const Future = props => {
   // })
 
   //future_tokens store every symbols in future and its data 
-  let future_tokens = {}
-  let future_tokens_symbol = []    
-  //future_token stores token symbols without duplicates for tab display
-  let future_token = []
-
-  useMemo(() => {
-    future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
-    future_tokens_symbol = []
-    future_tokens?.forEach((ele)=>{
-      future_tokens_symbol.push({
+  const future_tokens_symbol = useMemo(() => {
+    const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
+    return future_tokens?.map((ele) => ({
         name: ele[1],
         symbol: ele[1].substring(0,3),
       })
-    })  
+    )
+  }, [symbolsInfo])
+  //future_token stores token symbols without duplicates for tab display
+  const future_token = useMemo(() => {
+    const res = []
     future_tokens_symbol?.forEach((ele) => {
-      if (!future_token.includes(ele.symbol)){
-        future_token.push(ele.symbol)
+      if (!res.includes(ele.symbol)){
+        res.push(ele.symbol)
       }
     })
-  }, [symbolsInfo, activeToken, future_token])
+    return res
+  }, [future_tokens_symbol])
 
   useEffect(() => {
     if (active) {
