@@ -28,6 +28,7 @@ import * as powers from '@/constants/powers.js';
 import * as option from '@/constants/option.js';
 import * as launchpad from '@/constants/launchpad.js';
 import DepositWithdrawModal from '@/components/AccountInfoGauge/DepositWithdrawModal';
+import TransferModal from '@/components/AccountInfoGauge/TransferModal';
 // import * as stablecoin from '@/constants/stablecoin.js';
 
 const { Option } = Select;
@@ -246,7 +247,7 @@ const Overview = props => {
                     <Button className={styles.button} onClick={() => { setMode("Withdraw") }}>
                         Withdraw
                     </Button>
-                    <Button className={styles.button} onClick={() => { showModal("Transfer", "", entry.name) }}>
+                    <Button className={styles.button} onClick={() => { setMode("Transfer") }}>
                         Transfer
                     </Button>
                     <Button className={styles.button} onClick={() => { showModal("Send", "", entry.name) }}>
@@ -441,7 +442,7 @@ const Overview = props => {
                         <Button className={styles.button} onClick={() => { setMode("Withdraw") }}>
                             Withdraw
                         </Button>
-                        <Button className={styles.button} onClick={() => { showModal("Transfer", entry.name, pageName) }}>
+                        <Button className={styles.button} onClick={() => { setMode("Transfer") }}>
                             Transfer
                         </Button>
                         <Button className={styles.button} onClick={() => { showModal("Send", entry.name, pageName) }}>
@@ -453,7 +454,6 @@ const Overview = props => {
         ];
         return childColumns
     }
-
 
     return (
         <div className={styles.main}>
@@ -723,7 +723,7 @@ const Overview = props => {
                                 <Col offset={6} span={5}>
                                     <Button className={styles.button} onClick={() => { setMode("Deposit") }}>Deposit</Button>
                                     <Button className={styles.button} onClick={() => { setMode("Withdraw") }}>Withdraw</Button>
-                                    <Button className={styles.button} onClick={() => { showModal("Transfer") }}>Transfer</Button>
+                                    <Button className={styles.button} onClick={() => { setMode("Transfer") }}>Transfer</Button>
                                     <Button className={styles.button} onClick={() => { showModal("Send") }}>Send</Button>
                                     <div style={{ fontSize: "0.7rem", padding: "5px" }}>Transaction History</div>
                                 </Col>
@@ -764,7 +764,7 @@ const Overview = props => {
                 </Layout>
 
             </div>
-            {mode != ''&&
+            {(mode == "Deposit" || mode == "Withdraw") &&
                 <DepositWithdrawModal
                     chainId={chainId}
                     library={library}
@@ -774,6 +774,15 @@ const Overview = props => {
                     setIsConfirming={()=>{setMode('')}}
                     mode={mode}
                 />    
+            }
+            {mode == 'Transfer' &&
+                <TransferModal 
+                    chainId={chainId}
+                    library={library}
+                    account={account}
+                    tokens={activeTokenList}
+                    handleCancel={()=>{setMode('')}}
+                />
             }
         </div>
 
