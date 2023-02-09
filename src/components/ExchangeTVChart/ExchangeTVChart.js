@@ -137,6 +137,10 @@ export default function ExchangeTVChart(props) {
     onChangePrice
   } = props
 
+  if (!chartTokenSymbol) {
+    return null;
+  }
+
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [period, setPeriod] = useState('5m');
@@ -154,10 +158,6 @@ export default function ExchangeTVChart(props) {
 
   const ref = useRef(null);
   const chartRef = useRef(null);
-
-  if (!chartTokenSymbol) {
-    return null;
-  }
 
   useEffect(() => {
     if (marketName !== previousMarketName) {
@@ -232,6 +232,7 @@ export default function ExchangeTVChart(props) {
         responseFromTokenData = await axios.get(`${OptionsPriceApi}/futures?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
           .then((res) => res.data);
       } else if(pageName == "Trade") {
+        console.log("see trade token0", fromToken, toToken, chainId)
         responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromToken}&token1=${toToken}&chainId=${chainId}&period=${period}`)
           .then((res) => res.data);
       } else {

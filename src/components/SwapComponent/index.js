@@ -25,6 +25,10 @@ const SwapComponent = props => {
     token1,
     onSelectToken0,
     onSelectToken1,
+    activeSymbol,
+    setActiveSymbol,
+    activeSymbol1,
+    setActiveSymbol1,
     isLockedToken1=false,
     account,
     library,
@@ -625,7 +629,15 @@ const SwapComponent = props => {
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
-      <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onCoinClick} coinList={tokenlist}/>
+      <TokenSelectorDrawer width={400} 
+        visible={visible} 
+        onCancel={onCancel} 
+        onCoinClick={onCoinClick} 
+        coinList={tokenlist} 
+        pageName={"Trade"} 
+        activeSymbol={activeSymbol}
+        setActiveSymbol={setActiveSymbol}
+        />
 
     </div>
   );

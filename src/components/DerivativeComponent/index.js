@@ -18,6 +18,8 @@ import Reader from '@/abis/future-option-power/Reader.json'
 import IPool from '@/abis/future-option-power/IPool.json'
 
 import styles from './styles.less';
+import { parse } from 'date-fns';
+import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 const DerivativeComponent = props => {
 
@@ -45,6 +47,7 @@ const DerivativeComponent = props => {
     fetcher: fetcher(library, Reader)
   });
 
+  console.log("derivative ui symbolInfo", symbolInfo)
   useEffect(() => {
     if (active) {
       library.on("block", () => {
@@ -68,6 +71,7 @@ const DerivativeComponent = props => {
   const optionMode = ['Buy', 'Sell', 'Pool']
   const [percentage, setPercentage] = useState('')
   const [selectedTokenValue, setSelectedTokenValue] = useState("0")
+  const [selectedTokenAmount, setSelectedTokenAmount] = useState(parseValue(selectedTokenValue, selectedToken && selectedToken.decimals))
   const [usdValue, setUsdValue] = useState(0)
   const [isApproving, setIsApproving] = useState(false)
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
@@ -78,12 +82,12 @@ const DerivativeComponent = props => {
   const [deadline, setDeadline] = useState()
   const [marginToken, setMarginToken] = useState(tokens[1])
 
-  const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
-  const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
-  const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
+  // const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
+  // const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const symbolMarkPrice = symbolInfo?.markPrice
   const symbolMinTradeVolume = symbolInfo?.minTradeVolume
-  const minTradeVolume = symbolMinTradeVolume?ethers.utils.formatUnits(symbolMinTradeVolume, 18):0.001
+  const minTradeVolume = symbolMinTradeVolume ? ethers.utils.formatUnits(symbolMinTradeVolume, 18) : 0.001
+  const minTradeDecimal = minTradeVolume? minTradeVolume.toString().includes('.')?minTradeVolume.toString().split('.')[1].length:0:3
 
   const getPrimaryText = () => {
     if (!active) {
@@ -100,20 +104,37 @@ const DerivativeComponent = props => {
     setMarginToken(tokens[1])
   }, [tokens])
 
-  useEffect(() => {
-    let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(selectedTokenBalance, 18, 2)
-    handleTokenValueChange(tokenAmount)
-  }, [percentage])
+  // useEffect(() => {
+  //   let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(selectedTokenBalance, 18, 2)
+  //   handleTokenValueChange(tokenAmount)
+  // }, [percentage])
 
-  useEffect(() => {
-    setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18, 2)).toFixed(2))
-  }, [selectedTokenValue, selectedTokenPrice])
+  // useEffect(() => {
+  // setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18, 2)).toFixed(2))
+  // console.log("derivative usd see usdvalue", (selectedTokenValue * formatAmount(selectedTokenPrice, 18, 2)).toFixed(2), usdValue)
+  // }, [selectedTokenValue, selectedTokenPrice])
 
   const handleTokenValueChange = (value) => {
-    if(value%minTradeVolume==0){
+    if (value % minTradeVolume == 0) {
       setSelectedTokenValue(value)
+    } else {
+      setSelectedTokenValue(Math.floor(value / minTradeVolume) * minTradeVolume)
+    }
+  }
+  const handleUsdValueChange = (value) => {
+    setUsdValue(value)
+    // console.log("derivative usd see symbolMarkPrice", symbolMarkPrice)
+    const bigValue = parseValue(value, 18+minTradeDecimal)
+    let tokenValue = bigValue?.div(symbolMarkPrice)
+    tokenValue = formatAmount(tokenValue, minTradeDecimal)
+    //selectedTokenValue is for display
+    //selectedTokenAmount is sent to contract
+    if(tokenValue%minTradeVolume==0){
+      setSelectedTokenValue(tokenValue)
+      setSelectedTokenAmount(parseValue(tokenValue, selectedToken && selectedToken.decimals))
     }else{
-      setSelectedTokenValue(Math.floor(value/minTradeVolume)*minTradeVolume)
+      setSelectedTokenValue(Math.floor(tokenValue/minTradeVolume)*minTradeVolume)
+      setSelectedTokenAmount(parseValue(Math.floor(tokenValue/minTradeVolume)*minTradeVolume),  selectedToken && selectedToken.decimals)
     }
   }
 
@@ -144,15 +165,16 @@ const DerivativeComponent = props => {
 
         {mode == 'Pool'
           ?
-          <AcyPoolComponent selectedSymbol={symbol}/>
+          <AcyPoolComponent selectedSymbol={symbol} />
           :
           <>
             <div className={styles.rowFlexContainer}>
-
-              <div style={{ display: 'flex' }}>
-                <div className={styles.inputContainer}>
+              <div>
+                {/* <div style={{ display: 'flex' }}> */}
+                {/* <div className={styles.inputContainer}>
                   <input
                     type="number"
+                    min="0"
                     placeholder="Amount"
                     className={styles.optionInput}
                     value={selectedTokenValue}
@@ -162,21 +184,27 @@ const DerivativeComponent = props => {
                       setShowDescription(true)
                     }}
                   />
-                  <span className={styles.inputLabel}>{selectedToken.symbol}</span>
-                </div>
+                  <span className={styles.inputLabel}>{selectedToken}</span>
+                </div> */}
                 <div className={styles.inputContainer}>
                   <input
                     type="number"
                     min="0"
                     className={styles.optionInput}
                     value={usdValue}
-                    onChange={e => { }}
+                    // value={"0"}
+                    onChange={e => {
+                      handleUsdValueChange(e.target.value)
+                      setShowDescription(true)
+                    }}
                   />
                   <span className={styles.inputLabel}>USD</span>
                 </div>
+                <div className={styles.symbolAmount}>= {selectedTokenValue} {symbol}</div>
               </div>
-              <div style={{margin:'20px 0'}}>
-                <Segmented onChange={(value) => {setPercentage(value)}} options={['10%', '25%', '50%', '75%', '100%']} />
+              {/* </div> */}
+              <div style={{ margin: '40px 0' }}>
+                <Segmented onChange={(value) => { setPercentage(value) }} options={['10%', '25%', '50%', '75%', '100%']} />
               </div>
               {showDescription ?
                 <AcyDescriptions>

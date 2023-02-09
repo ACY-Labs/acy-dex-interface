@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { SwapOutlined } from '@ant-design/icons';
+import { SwapOutlined, DownOutlined } from '@ant-design/icons';
 import TokenSelectorDrawer from '@/components/TokenSelectorDrawer';
 import styles from './index.less';
 
 const AcySymbol = (props: any) => {
   const {
-    pairName,
+    activeSymbol,
+    selectSymbol,
+    setActiveSymbol,
     showDrawer,
     latestPriceColor,
     latestPrice,
@@ -20,6 +22,7 @@ const AcySymbol = (props: any) => {
   const onCancel = () => {
     setVisible(false);
   };
+  console.log("ACY symbol activeSymbol", activeSymbol)
   return (
     <>
       <div
@@ -31,10 +34,10 @@ const AcySymbol = (props: any) => {
           borderBottom: ' 1px solid #22252e'
         }}
       >
-        <div className={styles.title}>
-          {pairName}&nbsp;
+        <div className={styles.title} onClick={onClickCoin}>
+          {activeSymbol}<DownOutlined style={{fontSize:"18px", marginLeft:"5px"}}/>&nbsp; 
           <SwapOutlined
-            onClick={onClickCoin}
+            // onClick={onClickCoin}
             style={{ fontSize: '20px', color: '#ffffff', cursor: 'pointer' }}
           />
         </div>
@@ -64,7 +67,17 @@ const AcySymbol = (props: any) => {
         </div>
 
       </div>
-      <TokenSelectorDrawer placement="left" onCancel={onCancel} width={400} visible={visible} onCoinClick={onClickCoin} coinList={coinList} />
+      <TokenSelectorDrawer 
+        placement="left" 
+        onCancel={onCancel} 
+        width={400} 
+        visible={visible} 
+        setVisible={setVisible}
+        onCoinClick={onClickCoin} 
+        coinList={coinList} 
+        activeSymbol={activeSymbol} 
+        selectSymbol={selectSymbol}
+        setActiveSymbol={setActiveSymbol}/>
 
     </>
   );

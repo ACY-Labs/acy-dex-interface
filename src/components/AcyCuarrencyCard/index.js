@@ -40,14 +40,13 @@ const AcyCuarrencyCard = ({
     console.log("B",e.target.value)
   };
 
-  useEffect(()=>{
-    const timeoutId = setTimeout(()=>{
-      // setTokenAmount(tokenDisplayAmount)
-      onChangeToken && onChangeToken(tokenDisplayAmount)
-      amountChanged && amountChanged(tokenDisplayAmount)
-    },1500)
-    return ()=>clearTimeout(timeoutId)
-  },[tokenDisplayAmount])
+  // useEffect(()=>{
+  //   const timeoutId = setTimeout(()=>{
+  //     setTokenAmount(tokenDisplayAmount)
+  //     amountChanged(tokenDisplayAmount)
+  //   },1500)
+  //   return ()=>clearTimeout(timeoutId)
+  // },[tokenDisplayAmount])
 
   useEffect(()=>{
     setTokenDisplayAmount(token)

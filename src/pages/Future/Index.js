@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import useSWR from 'swr';
+import { useWeb3React } from '@web3-react/core';
 import AcyCard from '@/components/AcyCard';
 import DerivativeComponent from '@/components/DerivativeComponent'
 import ComponentTabs from '@/components/ComponentTabs';
@@ -8,35 +10,87 @@ import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/powers.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
-import { getGlobalTokenList } from '@/constants';
+import { fetcher } from '@/acy-dex-futures/utils';
+import Reader from '@/abis/future-option-power/Reader.json'
 import styles from './styles.less'
 
+
 const Future = props => {
-  const { chainId } = useChainId();
+  const { account, library, active } = useWeb3React();
+  let { chainId } = useChainId();
   const tokens = getTokens(chainId);
+  chainId = 80001
 
   const [mode, setMode] = useState('Buy')
   const [symbol, setSymbol] = useState('BTCUSD')
 
-  const [activeToken, setActiveToken] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
+  // const [activeToken, setActiveToken] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
 
-  let coinList = getGlobalTokenList()
-  coinList = coinList.filter(token => token.symbol == "USDT" || token.symbol == 'USDC' || token.symbol == 'BTC' || token.symbol == 'ETH')
+  const readerAddress = getContract(chainId, "reader")
+  const poolAddress = getContract(chainId, "pool")
 
-  const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
-  const KChartTokenListETH = ["BTC", "ETH"]
-  const KChartTokenListBNB = ["BTC", "ETH", "BNB"]
-  const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBNB
-    : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
-    : KChartTokenListETH
+  const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
+    fetcher: fetcher(library, Reader)
+  });
+  //future_tokens store every symbols in future and its data 
+  // const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
+  // let future_tokens_symbol = []
+  // future_tokens?.forEach((ele)=>{
+  //   future_tokens_symbol.push({
+  //     name: ele[1],
+  //     symbol: ele[1].substring(0,3),
+  //   })
+  // })  
+  // //future_token stores token symbols without duplicates for tab display
+  // let future_token = []
+  // future_tokens_symbol?.forEach((ele) => {
+  //   if (!future_token.includes(ele.symbol)){
+  //     future_token.push(ele.symbol)
+  //   }
+  // })
+
+  //future_tokens store every symbols in future and its data 
+  const future_tokens_symbol = useMemo(() => {
+    const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
+    return future_tokens?.map((ele) => ({
+        name: ele[1],
+        symbol: ele[1].substring(0,3),
+      })
+    )
+  }, [symbolsInfo])
+  //future_token stores token symbols without duplicates for tab display
+  const future_token = useMemo(() => {
+    const res = []
+    future_tokens_symbol?.forEach((ele) => {
+      if (!res.includes(ele.symbol)){
+        res.push(ele.symbol)
+      }
+    })
+    return res
+  }, [future_tokens_symbol])
+
+  useEffect(() => {
+    if (active) {
+      library.on('block', () => {
+        updateSymbolsInfo(undefined, true)
+      })
+      return () => {
+        library.removeAllListeners('block')
+      }
+    }
+  }, [active, library, chainId,
+    updateSymbolsInfo]
+  )
+  const [activeSymbol, setActiveSymbol] = useState("BTC")
+  const [activeToken, setActiveToken] = useState("BTC");
 
   const selectTab = item => {
     setActiveToken((tokens.filter(ele => ele.symbol == item)[0]))
   }
 
-  useEffect(()=>{
-    setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
-  }, [tokens])
+  // useEffect(()=>{
+  //   setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
+  // }, [tokens])
 
   const [latestPrice, setLatestPrice] = useState(0);
   const [priceChangePercentDelta, setPpriceChangePercentDelta] = useState(0);
@@ -51,15 +105,11 @@ const Future = props => {
         {mode == 'Pool' ?
           <AcyPool />
           : <div className={`${styles.colItem} ${styles.priceChart}`}>
-
-            <AcySymbolNav data={KChartTokenList} onChange={selectTab} />
+            <AcySymbolNav data={future_token} onChange={selectTab} />
             <AcySymbol
-              pairName={activeToken.symbol}
-              // showDrawer={onClickCoin}
-              // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
-              // latestPrice={latestPrice}
-              // latestPricePercentage={priceChangePercentDelt
-              coinList={coinList}
+              activeSymbol={activeSymbol}
+              setActiveSymbol={setActiveSymbol}
+              coinList={future_tokens_symbol}
               latestPriceColor={priceChangePercentDelta*1>= 0 && '#0ecc83' ||'#fa3c58'}
               latestPrice={latestPrice}
               latestPricePercentage={priceChangePercentDelta}
@@ -67,9 +117,9 @@ const Future = props => {
             {/* <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onClickCoin} coinList={coinList} /> */}
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               <ExchangeTVChart
-                chartTokenSymbol={activeToken.symbol}
+                chartTokenSymbol={activeToken}
                 pageName="Futures"
-                fromToken={activeToken.symbol}
+                fromToken={activeToken}
                 toToken="USDT"
                 chainId={chainId}
                 onChangePrice={onChangePrice}
@@ -77,7 +127,6 @@ const Future = props => {
             </div>
           </div>
         }
-
 
         <div className={`${styles.colItem} ${styles.optionComponent}`}>
           <AcyCard style={{ backgroundColor: 'transparent', border: 'none' }}>

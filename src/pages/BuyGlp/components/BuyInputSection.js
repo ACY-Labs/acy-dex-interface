@@ -92,8 +92,9 @@ export default function BuyInputSection(props) {
               </span>
             </button>
           }
-          {!staticInput && <input type="number" min="0" placeholder="0.0" className={styles.swapInput} value={inputValue} onChange={onInputValueChange} />}
-          {staticInput && <div className={styles.staticInput}>{inputValue}</div>}
+          <input type="number" min="0" placeholder="Amount" className={styles.swapInput} value={inputValue} onChange={onInputValueChange} />
+          {/* {!staticInput && <input type="number" min="0" placeholder="Amount" className={styles.swapInput} value={inputValue} onChange={onInputValueChange} />}
+          {staticInput && <div className={styles.staticInput}>{inputValue}</div>} */}
         </div>
       </div>
       <TokenSelectorDrawer onCancel={onCancel} simple width={400} visible={visible} onCoinClick={onClickCoin} coinList={tokenlist.map(item => { item.logoURI = logoURI[item.symbol]; return item; })} />
