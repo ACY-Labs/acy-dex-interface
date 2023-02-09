@@ -137,6 +137,10 @@ export default function ExchangeTVChart(props) {
     onChangePrice
   } = props
 
+  if (!chartTokenSymbol) {
+    return null;
+  }
+
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [period, setPeriod] = useState('5m');
@@ -154,10 +158,6 @@ export default function ExchangeTVChart(props) {
 
   const ref = useRef(null);
   const chartRef = useRef(null);
-
-  if (!chartTokenSymbol) {
-    return null;
-  }
 
   useEffect(() => {
     if (marketName !== previousMarketName) {
