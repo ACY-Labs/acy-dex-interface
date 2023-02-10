@@ -90,6 +90,9 @@ const DerivativeComponent = props => {
     if (!active) {
       return 'Connect Wallet'
     }
+    if(!selectedTokenValue || selectedTokenValue==0) {
+      return 'Invalid Trade Volume'
+    }
     if (isApproving) {
       return `Approving ${selectedToken.symbol}...`;
     }
@@ -243,9 +246,15 @@ const DerivativeComponent = props => {
                 </AcyDescriptions>
                 : null}
 
+              <div style={{display: 'grid', gridTemplateColumns: '1fr auto', margin: '25px 5px -15px'}}>
+                <span>Trade Volume</span>
+                <span>{selectedTokenValue!="NaN"?selectedTokenValue:0} {selectedToken.symbol}</span>
+              </div>
+
               <ComponentButton
                 style={{ margin: '25px 0 0 0', width: '100%' }}
                 onClick={onClickPrimary}
+                disabled={account && (!selectedTokenValue || selectedTokenValue==0)}
               >
                 {getPrimaryText()}
               </ComponentButton>
