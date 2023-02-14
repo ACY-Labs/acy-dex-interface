@@ -32,6 +32,7 @@ const Future = props => {
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
+
   //future_tokens store every symbols in future and its data 
   // const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
   // let future_tokens_symbol = []

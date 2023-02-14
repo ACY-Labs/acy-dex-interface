@@ -301,7 +301,7 @@ export default function ExchangeTVChart(props) {
     fetchPrevAndSubscribe()
 
     return () => clearInterval(sti)
-  }, [currentSeries, fromToken, toToken, period, chainId])
+  }, [currentSeries, fromToken, toToken, period, chainId, chartTokenSymbol])
   ///// end of binance data source
 
   const getDeltaPriceChange = (data) => {

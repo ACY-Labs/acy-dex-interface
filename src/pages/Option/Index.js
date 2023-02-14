@@ -264,7 +264,6 @@ const Option = props => {
               <AcySymbolNav data={option_token} onChange={selectTab} />
               <AcySymbol
                 activeSymbol={activeSymbol}
-                selectSymbol={selectSymbol}
                 setActiveSymbol={setActiveSymbol}
                 // showDrawer={onClickCoin}
                 // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
