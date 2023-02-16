@@ -179,11 +179,11 @@ const Swap = props => {
     updateTransactionList(receipt);
   };
 
-  const [graphType, setGraphType] = useState("BTC")
-  const graphTypes = ["Routes", activeToken1.symbol]
-  const showGraph = item => {
-    setGraphType(item)
-  }
+  // const [graphType, setGraphType] = useState("BTC")
+  // const graphTypes = ["Routes", activeToken1.symbol]
+  // const showGraph = item => {
+  //   setGraphType(item)
+  // }
 
   const test_poolsActivity = [
     {
@@ -237,7 +237,7 @@ const Swap = props => {
                   options={graphTypes}
                   onChange={showGraph}
                 /> */}
-              <AcySymbolNav data={[activeSymbol, activeSymbol1]} onChange={showGraph} />
+              <AcySymbolNav data={[activeToken0.symbol, activeToken1.symbol]} />
               <AcySymbol
                 activeSymbol={activeSymbol}
                 setActiveSymbol={setActiveSymbol}
@@ -254,10 +254,10 @@ const Swap = props => {
               {/* </div> */}
 
               <div style={{ borderTop: '0.75px solid #333333' }}>
-                {graphType == "Routes" ?
+                {/* {graphType == "Routes" ?
                   // <SankeyGraph />
                   <></>
-                  :
+                  : */}
                   <div>
                     <ExchangeTVChart
                       chartTokenSymbol={activeToken1.symbol}
@@ -267,7 +267,7 @@ const Swap = props => {
                       chainId={chainId}
                     />
                   </div>
-                }
+                {/* } */}
               </div>
             </div>
 
@@ -318,7 +318,7 @@ const Swap = props => {
                   library={library}
                   chainId={chainId}
                   onGetReceipt={onGetReceipt}
-                  showGraph={showGraph}
+                  // showGraph={showGraph}
                 />
               </div>
             </AcyCard>

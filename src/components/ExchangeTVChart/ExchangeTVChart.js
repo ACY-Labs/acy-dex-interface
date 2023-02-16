@@ -10,6 +10,7 @@ import {
 import './ExchangeTVChart.css';
 import axios from "axios";
 import Binance from "binance-api-node";
+import { getTokens } from '@/constants/future_option_power'
 
 const StyledSelect = styled(Radio.Group)`
   .ant-radio-button-wrapper{
@@ -151,7 +152,8 @@ export default function ExchangeTVChart(props) {
   const [chartInited, setChartInited] = useState(false);
 
   const isTick = pageName == "Powers";
-
+  const tokens = getTokens(chainId);
+  console.log("see trade input token", fromToken, toToken)
   const symbol = chartTokenSymbol || "BTC";
   const marketName = symbol + "_USD";
   const previousMarketName = usePrevious(marketName);
@@ -214,10 +216,11 @@ export default function ExchangeTVChart(props) {
       // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
       // SHOULD DO THIS BEFORE SUBSCRIBE, HOWEVER MOVING SUBSCRIBE TO AFTER THIS BLOCK OF CODE WILL CAUSE THE SUBSCRIPTION GOES ON FOREVER
       // REACT BUG?
-      let responseToTokenData;
-
-      let responsePairData = [];
       let responseFromTokenData;
+      let responseToTokenData;
+      let responsePairData = [];
+
+      const USDT_Address = tokens.filter(token=>token.symbol=="USDT")[0].address
       if (pageName == "StableCoin") {
         responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,)
           .then((res) => res.data);
@@ -232,12 +235,25 @@ export default function ExchangeTVChart(props) {
         responseFromTokenData = await axios.get(`${OptionsPriceApi}/futures?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
           .then((res) => res.data);
       } else if(pageName == "Trade") {
-        console.log("see trade token0", fromToken, toToken, chainId)
+        console.log("see trade token0 fromToken:", fromToken, "toToken", toToken,"chainId", chainId)
         responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromToken}&token1=${toToken}&chainId=${chainId}&period=${period}`)
           .then((res) => res.data);
       } else {
         responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${fromToken}USDT&interval=${period}`,)
           .then((res) => res.data);
+      }
+      // console.log("trade responseFromTokenData", responseFromTokenData, Object.keys(responseFromTokenData).length)
+
+      if (Object.keys(responseFromTokenData).length<2 && pageName == 'Trade') {
+        if(fromToken != USDT_Address) {
+          responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromToken}&token1=${USDT_Address}&chainId=${chainId}&period=${period}`)
+            .then((res) => res.data)
+        } else if (toToken != USDT_Address) {
+          responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${toToken}&token1=${USDT_Address}&chainId=${chainId}&period=${period}`)
+            .then((res) => res.data)
+        } else{
+          //here should include error msg as both from token and to token is USDT
+        }
       }
 
       for (let i = 0; i < responseFromTokenData.length; i++) {

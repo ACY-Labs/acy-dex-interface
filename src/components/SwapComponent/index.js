@@ -490,7 +490,7 @@ const SwapComponent = props => {
         onChangeToken={e => {
           setShowDescription(true);
           setExactIn(true);
-          props.showGraph("Routes")
+          // props.showGraph("Routes")
         }}
         library={library}
         setTokenAmount={setToken0Amount}
