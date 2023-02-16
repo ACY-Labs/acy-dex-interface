@@ -181,6 +181,7 @@ export default function ExchangeTVChart(props) {
       return;
 
     setIsLoading(true)
+    currentSeries.setData([]);
 
     const pairName = `${fromToken}${toToken}`;
 
