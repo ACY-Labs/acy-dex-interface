@@ -84,13 +84,13 @@ const DerivativeComponent = props => {
   const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const symbolMarkPrice = symbolInfo?.markPrice
   const symbolMinTradeVolume = symbolInfo?.minTradeVolume
-  const minTradeVolume = symbolMinTradeVolume?ethers.utils.formatUnits(symbolMinTradeVolume, 18):0.001
+  const minTradeVolume = symbolMinTradeVolume ? ethers.utils.formatUnits(symbolMinTradeVolume, 18) : 0.001
 
   const getPrimaryText = () => {
     if (!active) {
       return 'Connect Wallet'
     }
-    if(!selectedTokenValue || selectedTokenValue==0) {
+    if (!selectedTokenValue || selectedTokenValue == 0) {
       return 'Invalid Trade Volume'
     }
     if (isApproving) {
@@ -110,7 +110,7 @@ const DerivativeComponent = props => {
   }, [percentage])
 
   useEffect(() => {
-    if(pageName != "Future") {
+    if (pageName != "Future") {
       setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18)).toFixed(2))
     }
   }, [selectedTokenValue, selectedTokenPrice])
@@ -146,44 +146,67 @@ const DerivativeComponent = props => {
 
         {mode == 'Pool'
           ?
-          <AcyPoolComponent selectedSymbol={symbol}/>
+          <AcyPoolComponent selectedSymbol={symbol} />
           :
           <>
             <div className={styles.rowFlexContainer}>
 
               <div style={{ display: 'flex' }}>
-                {pageName != "Future" &&
-                <div className={styles.inputContainer}>
-                  <input
-                    type="number"
-                    placeholder="Amount"
-                    className={styles.optionInput}
-                    value={selectedTokenValue}
-                    onChange={e => {
-                      // setSelectedTokenValue(e.target.value)
-                      handleTokenValueChange(e.target.value)
-                      setShowDescription(true)
-                    }}
-                  />
-                  <span className={styles.inputLabel}>{selectedToken.symbol}</span>
-                </div>}
-                <div className={styles.inputContainer}>
-                  <input
-                    type="number"
-                    min="0"
-                    className={styles.optionInput}
-                    value={usdValue}
-                    onChange={e => {
-                      setUsdValue(e.target.value)
-                      handleTokenValueChange(e.target.value / formatAmount(selectedTokenPrice, 18))
-                      setShowDescription(true)
-                    }}
-                  />
-                  <span className={styles.inputLabel}>USD</span>
-                </div>
+                {pageName != "Future" ?
+                  <>
+                    <div className={styles.inputContainer}>
+                      <input
+                        type="number"
+                        placeholder="Amount"
+                        className={styles.optionInput}
+                        value={selectedTokenValue}
+                        onChange={e => {
+                          // setSelectedTokenValue(e.target.value)
+                          handleTokenValueChange(e.target.value)
+                          setShowDescription(true)
+                        }}
+                      />
+                      <span className={styles.inputLabel}>{selectedToken.symbol}</span>
+                    </div>
+                    <div className={styles.inputContainer}>
+                      <input
+                        type="number"
+                        min="0"
+                        className={styles.optionInput}
+                        style={{ width: '100%' }}
+                        value={usdValue}
+                        onChange={e => {
+                          setUsdValue(e.target.value)
+                          handleTokenValueChange(e.target.value / formatAmount(selectedTokenPrice, 18))
+                          setShowDescription(true)
+                        }}
+                      />
+                      <span className={styles.inputLabel}>USD</span>
+                    </div>
+                  </>
+                  :
+                  <div className={styles.inputContainer} style={{ display: 'flow-root', textAlignLast: 'right', padding: '8px 10px 6px 10px' }}>
+                    <div style={{ display: 'flex', fontSize: '16px', marginBottom: '3px' }}>
+                      <input
+                        type="number"
+                        min="0"
+                        className={styles.optionInput}
+                        style={{ width: '100%' }}
+                        value={usdValue}
+                        onChange={e => {
+                          setUsdValue(e.target.value)
+                          handleTokenValueChange(e.target.value / formatAmount(selectedTokenPrice, 18))
+                          setShowDescription(true)
+                        }}
+                      />
+                      <span className={styles.inputLabel}>USD</span>
+                    </div>
+                    <span style={{ fontSize: '12px', color: 'gray' }}>{selectedTokenValue != "NaN" ? selectedTokenValue : 0} {selectedToken.symbol}</span>
+                  </div>
+                }
               </div>
-              <div style={{margin:'20px 0'}}>
-                <Segmented onChange={(value) => {setPercentage(value)}} options={['10%', '25%', '50%', '75%', '100%']} />
+              <div style={{ margin: '20px 0' }}>
+                <Segmented onChange={(value) => { setPercentage(value) }} options={['10%', '25%', '50%', '75%', '100%']} />
               </div>
               {showDescription ?
                 <AcyDescriptions>
@@ -222,7 +245,7 @@ const DerivativeComponent = props => {
                         <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
                       )}
                     </div>
-                    <div className={styles.slippageContainer}>
+                    {/* <div className={styles.slippageContainer}>
                       <span style={{ fontWeight: 600, marginBottom: '10px' }}>Transaction deadline</span>
                       <div
                         style={{
@@ -241,20 +264,15 @@ const DerivativeComponent = props => {
                           suffix={<strong>minutes</strong>}
                         />
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </AcyDescriptions>
                 : null}
 
-              <div style={{display: 'grid', gridTemplateColumns: '1fr auto', margin: '25px 5px -15px'}}>
-                <span>Trade Volume</span>
-                <span>{selectedTokenValue!="NaN"?selectedTokenValue:0} {selectedToken.symbol}</span>
-              </div>
-
               <ComponentButton
                 style={{ margin: '25px 0 0 0', width: '100%' }}
                 onClick={onClickPrimary}
-                disabled={account && (!selectedTokenValue || selectedTokenValue==0)}
+                disabled={account && (!selectedTokenValue || selectedTokenValue == 0)}
               >
                 {getPrimaryText()}
               </ComponentButton>
