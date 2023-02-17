@@ -354,13 +354,17 @@ const newGetPoolByFarm = async (farm, tokenPrice, library, account, chainId) => 
   
   const token0 = new Token(null, tokens[0].address, tokens[0].decimals, tokens[0].symbol);
   const token1 = tokens[1]?new Token(null, tokens[1].address, tokens[1].decimals, tokens[1].symbol):null;
+  // for debug purpose, fake a tokenPrices object. (because we exceed the coingecko request limit)
+  tokenPrice[token0.symbol] = 1
+  if (token1) {
+    tokenPrice[token1.symbol] = 1
+  }
   console.log("GET USERPOST:",account, poolId, chainId, library)
   const positions = await farmContract.getUserPositions(account, poolId);
-
   const [stakePosition, pendingReward, rewardsPerBlock, liquidityApr] = await Promise.all([
     getUserStakePosition(poolId, positions, lpToken.decimals, farmContract),
     getUserPending(poolId, positions, rewardTokens, farmContract),
-    getPoolRewardsPerBlock(poolId, rewardTokens, farmContract, tokenPrice),
+    getPoolRewardsPerBlock(poolId, rewardTokens, farmContract),
     calculateVolAndApr(token0, token1, tokenPrice)
   ]);
   console.log("totalRewardPerYear:",rewardsPerBlock);
@@ -540,13 +544,14 @@ const getExpiredTime = (timestamp, lockDuration) => {
 }
 
 const newGetAllPools = async (library, account, chainId) => {
-  const tokenPrice = await getAllSupportedTokensPrice();
-  console.log("tokenPrice:",tokenPrice);
+  // const tokenPrice = await getAllSupportedTokensPrice();
+  // console.log("tokenPrice:",tokenPrice);
   console.log(`${API_URL()}/farm/getAllPools`);
   const allFarm = await axios.get(
     `${API_URL()}/farm/getAllPools`
   ).then(res => res.data).catch(e => console.log("error: ", e));
   console.log("GET ALL FARM:",allFarm);
+  let tokenPrice = {} // debug: placeholder to suppress the undefined error
   if(allFarm.length) {
     const allPoolsPromise = [];
     for(var i=0 ; i< allFarm.length ; i++) {
@@ -558,7 +563,6 @@ const newGetAllPools = async (library, account, chainId) => {
   return null;
 }
 const calculateVolAndApr = async (token0, token1, tokenPrices) => {
-
   console.log("this is", token0, token1)
   if(!token1) return 0;
   return await axios.get(`${API_URL()}/poolchart/pair?token0=${token0.address}&token1=${token1.address}`).then(async (res) => {
@@ -574,15 +578,14 @@ const calculateVolAndApr = async (token0, token1, tokenPrices) => {
     const reserve1Usd = tokenPrices[token1.symbol] * token1Reserve;
     const poolReserveInUsd = reserve0Usd + reserve1Usd;
 
-    console.log("this is test1", tokenPrices, poolReserveInUsd, poolVolumeInUsd)
+    // console.log("this is test1", tokenPrices, poolReserveInUsd, poolVolumeInUsd)
 
     // calculate APR
     const apr = poolVolumeInUsd * 0.3/1000 * 365 / poolReserveInUsd;
     return apr
 
   }).catch(e => {
-    return 0;
-    console.log("fetching pair volume error", e)
+    console.warn(e)
   })
 }
 
