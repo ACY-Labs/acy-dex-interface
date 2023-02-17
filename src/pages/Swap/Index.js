@@ -39,6 +39,7 @@ const Swap = props => {
   const [transactionList, setTransactionList] = useState([]);
   const [tableContent, setTableContent] = useState('Trade History');
   const [tradeHistory, setTradeHistory] = useState([])
+  const [showChart, setShowChart] = useState(true)
 
   // useSWR hook example - needs further implementation in backend
   // const txListUrl = `${apiUrlPrefix}/txlist/all?`
@@ -245,6 +246,8 @@ const Swap = props => {
                 latestPrice={1}
                 latestPricePercentage={1}
               // coinList={coinList}
+                showChart={showChart}
+                setShowChart={()=>setShowChart(!showChart)}
               />
               {/* </div> */}
 
@@ -252,7 +255,7 @@ const Swap = props => {
                 {graphType == "Routes" ?
                   // <SankeyGraph />
                   <></>
-                  :
+                  : showChart && 
                   <div>
                     <ExchangeTVChart
                       chartTokenSymbol={activeToken1.symbol}
