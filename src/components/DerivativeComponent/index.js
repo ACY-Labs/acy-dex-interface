@@ -28,7 +28,6 @@ const DerivativeComponent = props => {
     tokens,
     selectedToken,
     symbol,
-    pageName,
   } = props
 
   const connectWalletByLocalStorage = useConnectWallet()
@@ -109,12 +108,6 @@ const DerivativeComponent = props => {
     handleTokenValueChange(tokenAmount)
   }, [percentage])
 
-  useEffect(() => {
-    if (pageName != "Future") {
-      setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18)).toFixed(2))
-    }
-  }, [selectedTokenValue, selectedTokenPrice])
-
   const handleTokenValueChange = (value) => {
     setSelectedTokenValue(value.toFixed(-Math.log10(minTradeVolume)))
   }
@@ -152,58 +145,24 @@ const DerivativeComponent = props => {
             <div className={styles.rowFlexContainer}>
 
               <div style={{ display: 'flex' }}>
-                {pageName != "Future" ?
-                  <>
-                    <div className={styles.inputContainer}>
-                      <input
-                        type="number"
-                        placeholder="Amount"
-                        className={styles.optionInput}
-                        value={selectedTokenValue}
-                        onChange={e => {
-                          // setSelectedTokenValue(e.target.value)
-                          handleTokenValueChange(e.target.value)
-                          setShowDescription(true)
-                        }}
-                      />
-                      <span className={styles.inputLabel}>{selectedToken.symbol}</span>
-                    </div>
-                    <div className={styles.inputContainer}>
-                      <input
-                        type="number"
-                        min="0"
-                        className={styles.optionInput}
-                        style={{ width: '100%' }}
-                        value={usdValue}
-                        onChange={e => {
-                          setUsdValue(e.target.value)
-                          handleTokenValueChange(e.target.value / formatAmount(selectedTokenPrice, 18))
-                          setShowDescription(true)
-                        }}
-                      />
-                      <span className={styles.inputLabel}>USD</span>
-                    </div>
-                  </>
-                  :
-                  <div className={styles.inputContainer} style={{ display: 'flow-root', textAlignLast: 'right', padding: '8px 10px 6px 10px' }}>
-                    <div style={{ display: 'flex', fontSize: '16px', marginBottom: '3px' }}>
-                      <input
-                        type="number"
-                        min="0"
-                        className={styles.optionInput}
-                        style={{ width: '100%' }}
-                        value={usdValue}
-                        onChange={e => {
-                          setUsdValue(e.target.value)
-                          handleTokenValueChange(e.target.value / formatAmount(selectedTokenPrice, 18))
-                          setShowDescription(true)
-                        }}
-                      />
-                      <span className={styles.inputLabel}>USD</span>
-                    </div>
-                    <span style={{ fontSize: '12px', color: 'gray' }}>{selectedTokenValue != "NaN" ? selectedTokenValue : 0} {selectedToken.symbol}</span>
+                <div className={styles.inputContainer} style={{ display: 'flow-root', textAlignLast: 'right', padding: '8px 10px 6px 10px' }}>
+                  <div style={{ display: 'flex', fontSize: '16px', marginBottom: '3px' }}>
+                    <input
+                      type="number"
+                      min="0"
+                      className={styles.optionInput}
+                      style={{ width: '100%' }}
+                      value={usdValue}
+                      onChange={e => {
+                        setUsdValue(e.target.value)
+                        handleTokenValueChange(e.target.value / formatAmount(selectedTokenPrice, 18))
+                        setShowDescription(true)
+                      }}
+                    />
+                    <span className={styles.inputLabel}>USD</span>
                   </div>
-                }
+                  <span style={{ fontSize: '12px', color: 'gray' }}>{selectedTokenValue != "NaN" ? selectedTokenValue : 0} {selectedToken.symbol}</span>
+                </div>
               </div>
               <div style={{ margin: '20px 0' }}>
                 <Segmented onChange={(value) => { setPercentage(value) }} options={['10%', '25%', '50%', '75%', '100%']} />
