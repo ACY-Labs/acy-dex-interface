@@ -28,6 +28,7 @@ const DerivativeComponent = props => {
     tokens,
     selectedToken,
     symbol,
+    pageName,
   } = props
 
   const connectWalletByLocalStorage = useConnectWallet()
@@ -167,7 +168,7 @@ const DerivativeComponent = props => {
               <div style={{ margin: '20px 0' }}>
                 <Segmented onChange={(value) => { setPercentage(value) }} options={['10%', '25%', '50%', '75%', '100%']} />
               </div>
-              {showDescription ?
+              {showDescription && pageName == "Future" &&
                 <AcyDescriptions>
                   <div className={styles.breakdownTopContainer}>
                     <div className={styles.slippageContainer}>
@@ -226,7 +227,7 @@ const DerivativeComponent = props => {
                     </div> */}
                   </div>
                 </AcyDescriptions>
-                : null}
+                }
 
               <ComponentButton
                 style={{ margin: '25px 0 0 0', width: '100%' }}
