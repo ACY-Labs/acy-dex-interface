@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Button } from 'antd';
+import { Input, Button, Slider } from 'antd';
 import useSWR from 'swr'
 import { ethers } from 'ethers';
 import { INITIAL_ALLOWED_SLIPPAGE, getTokens, getContract } from '@/constants/future_option_power.js';
@@ -16,8 +16,80 @@ import AcyPoolComponent from '../AcyPoolComponent';
 import Segmented from '../AcySegmented';
 import Reader from '@/abis/future-option-power/Reader.json'
 import IPool from '@/abis/future-option-power/IPool.json'
+import styled from "styled-components";
 
 import styles from './styles.less';
+
+const StyledSlider = styled(Slider)`
+  .ant-slider-track {
+    background: #929293;
+    height: 3px;
+  }
+  .ant-slider-rail {
+    background: #29292c;
+    height: 3px;
+  }
+  .ant-slider-handle {
+    background: #929293;
+    width: 12px;
+    height: 12px;
+    border: none;
+  }
+  .ant-slider-handle-active {
+    background: #929293;
+    width: 12px;
+    height: 12px;
+    border: none;
+  }
+  .ant-slider-dot {
+    border: 1.5px solid #29292c;
+    border-radius: 1px;
+    background: #29292c;
+    width: 2px;
+    height: 10px;
+  }
+  .ant-slider-dot-active {
+    border: 1.5px solid #929293;
+    border-radius: 1px;
+    background: #929293;
+    width: 2px;
+    height: 10px;
+  }
+  .ant-slider-with-marks {
+      margin-bottom: 50px;
+  }
+`;
+
+const leverageMarks = {
+  1: {
+    style: { color: '#b5b6b6', },
+    label: '1x'
+  },
+  5: {
+    style: { color: '#b5b6b6', },
+    label: '5x'
+  },
+  10: {
+    style: { color: '#b5b6b6', },
+    label: '10x'
+  },
+  15: {
+    style: { color: '#b5b6b6', },
+    label: '15x'
+  },
+  20: {
+    style: { color: '#b5b6b6', },
+    label: '20x'
+  },
+  25: {
+    style: { color: '#b5b6b6', },
+    label: '25x'
+  },
+  30: {
+    style: { color: '#b5b6b6', },
+    label: '30x'
+  }
+};
 
 const DerivativeComponent = props => {
 
@@ -78,6 +150,7 @@ const DerivativeComponent = props => {
   const [slippageError, setSlippageError] = useState('')
   const [deadline, setDeadline] = useState()
   const [marginToken, setMarginToken] = useState(tokens[1])
+  const [leverageOption, setLeverageOption] = useState("2")
 
   const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
   const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
@@ -227,7 +300,71 @@ const DerivativeComponent = props => {
                     </div> */}
                   </div>
                 </AcyDescriptions>
-                }
+              }
+
+              {pageName == "Future" &&
+                <AcyDescriptions>
+                  <div className={styles.leverageContainer}>
+                    <div className={styles.slippageContainer}>
+                      <div className={styles.leverageLabel}>
+                        <span>Leverage</span>
+                        <div className={styles.leverageInputContainer}>
+                          <button
+                            className={styles.leverageButton}
+                            onClick={() => {
+                              // if (leverageOption > 0.1) {
+                              //   setLeverageOption((parseFloat(leverageOption) - 0.1).toFixed(1))
+                              // }
+                            }}
+                          >
+                            <span> - </span>
+                          </button>
+                          <input
+                            type="number"
+                            value={leverageOption}
+                            onChange={e => {
+                              let val = parseFloat(e.target.value)
+                              if (val < 0.1) {
+                                setLeverageOption(0.1)
+                              } else if (val >= 0.1 && val <= 30.5) {
+                                setLeverageOption(Math.round(val * 10) / 10)
+                              } else {
+                                setLeverageOption(30.5)
+                              }
+                            }}
+                            className={styles.leverageInput}
+                          />
+                          <button
+                            className={styles.leverageButton}
+                            onClick={() => {
+                              if (leverageOption < 30.5) {
+                                setLeverageOption((parseFloat(leverageOption) + 0.1).toFixed(1))
+                              }
+                            }}
+                          >
+                            <span> + </span>
+                          </button>
+                        </div>
+
+                      </div>
+                    </div>
+
+                    <span className={styles.leverageSlider}>
+                      <StyledSlider
+                        min={0.1}
+                        max={30.5}
+                        step={0.1}
+                        marks={leverageMarks}
+                        value={leverageOption}
+                        onChange={value => setLeverageOption(value)}
+                        defaultValue={leverageOption}
+                        style={{ color: 'red' }}
+                      />
+                    </span>
+
+                  </div>
+                </AcyDescriptions>
+              }
 
               <ComponentButton
                 style={{ margin: '25px 0 0 0', width: '100%' }}
