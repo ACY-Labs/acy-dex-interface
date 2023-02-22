@@ -25,7 +25,7 @@ const MarketIndex = props => {
     let pairs = []
     for (let i = 0; i < pairlist.length; i++) {
       pairs.push({
-        name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
+        name: pairlist[i].token0.replace('Wrapped ', 'W').replace('(PoS)', '') + '/' + pairlist[i].token1.replace('Wrapped ', 'W').replace('(PoS)', ''),
         address0: pairlist[i].token0Address,
         address1: pairlist[i].token1Address,
         price: (pairlist[i].token0Price / pairlist[i].token1Price).toPrecision(2),
@@ -43,7 +43,7 @@ const MarketIndex = props => {
     pairs = []
     for (let i = 0; i < pairlist.length; i++) {
       pairs.push({
-        name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
+        name: pairlist[i].token0.replace('Wrapped ', 'W').replace('(PoS)', '') + '/' + pairlist[i].token1.replace('Wrapped ', 'W').replace('(PoS)', ''),
         address0: pairlist[i].token0Address,
         address1: pairlist[i].token1Address,
         exchange: pairlist[i].exchange,
@@ -62,7 +62,7 @@ const MarketIndex = props => {
     pairs = []
     for (let i = 0; i < pairlist.length; i++) {
       pairs.push({
-        name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
+        name: pairlist[i].token0.replace('Wrapped ', 'W').replace('(PoS)', '') + '/' + pairlist[i].token1.replace('Wrapped ', 'W').replace('(PoS)', ''),
         address0: pairlist[i].token0Address,
         address1: pairlist[i].token1Address,
         exchange: pairlist[i].exchange,
@@ -81,7 +81,7 @@ const MarketIndex = props => {
     pairs = []
     for (let i = 0; i < pairlist.length; i++) {
       pairs.push({
-        name: pairlist[i].token0.replace('Wrapped ', 'W') + '/' + pairlist[i].token1.replace('Wrapped ', 'W'),
+        name: pairlist[i].token0.replace('Wrapped ', 'W').replace('(PoS)', '') + '/' + pairlist[i].token1.replace('Wrapped ', 'W').replace('(PoS)', ''),
         address0: pairlist[i].token0Address,
         address1: pairlist[i].token1Address,
         exchange: pairlist[i].exchange,
