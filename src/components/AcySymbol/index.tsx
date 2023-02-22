@@ -46,8 +46,8 @@ const AcySymbol = (props: any) => {
           <div style={{ marginLeft: '20px' }} className={styles.item}>
             <div>24h Change</div>
             {latestPricePercentage > 0 ?
-              <span style={{ color: 'green' }}>{latestPricePercentage}% / $213.15</span>
-              : <span style={{ color: 'red' }}>{latestPricePercentage}% / $213.15</span>
+              <span style={{ color: '#0ecc83' }}>{latestPricePercentage}% / $213.15</span>
+              : <span style={{ color: '#fa3c58' }}>{latestPricePercentage}% / $213.15</span>
             }
           </div>
           <div className={styles.item}>
