@@ -9,6 +9,11 @@ import {
   SwapOutlined,
   FileOutlined
 } from '@ant-design/icons';
+import useSWR from 'swr';
+import Reader from '@/abis/future-option-power/Reader.json'
+import { getContract } from '@/constants/future_option_power.js';
+import { fetcher } from '@/acy-dex-futures/utils';
+import { useWeb3React } from '@web3-react/core';
 
 import * as future from '@/constants/future.js';
 
@@ -28,8 +33,6 @@ const TransferModal = props => {
 
   const [activeToken, setActiveToken] = useState("");
   const [activeSymbol, setActiveSymbol] = useState("");
-
-  const symbolList = ["BTCUSDT", "ETHUSDT", "BTCUSD-50000-C", "BTCUSD-40000-P"]
 
   const selectToken = token => {
     setActiveToken(token);
@@ -55,6 +58,33 @@ const TransferModal = props => {
     }
   }
 
+  const { active, activate } = useWeb3React();
+
+  const readerAddress = getContract(chainId, "reader")
+  const poolAddress = getContract(chainId, "pool")
+
+  const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
+    fetcher: fetcher(library, Reader)
+  });
+  
+  useEffect(() => {
+    if (active) {
+      library.on('block', () => {
+        updateSymbolsInfo(undefined, true)
+
+      })
+      return () => {
+        library.removeAllListeners('block')
+      }
+    }
+  },
+    [active,
+      library,
+      chainId,
+      updateSymbolsInfo,
+    ]
+  )
+
   return (
     <div className={styles.myModal} style={{ borderRadius: "5px" }}>
       <Modal
@@ -73,9 +103,9 @@ const TransferModal = props => {
                 onChange={selectSymbol}
                 dropdownClassName={styles.dropDownMenu}
               >
-                {symbolList.map(symbol => (
-                  <Option className={styles.optionItem} value={symbol}>
-                    <Col offset={1} span={13}> <div> {symbol}</div> </Col>
+                {symbolsInfo?.map(symbolInfo => (
+                  <Option className={styles.optionItem} value={symbolInfo.symbol}>
+                    <Col offset={1} span={13}> <div> {symbolInfo.symbol}</div> </Col>
                   </Option>
                 ))}
               </Select>
