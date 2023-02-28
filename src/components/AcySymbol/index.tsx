@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { SwapOutlined } from '@ant-design/icons';
+import { SwapOutlined, DownOutlined } from '@ant-design/icons';
 import TokenSelectorDrawer from '@/components/TokenSelectorDrawer';
 import styles from './index.less';
 
 const AcySymbol = (props: any) => {
   const {
-    pairName,
+    activeSymbol,
+    selectSymbol,
+    setActiveSymbol,
     showDrawer,
     latestPriceColor,
     latestPrice,
@@ -22,6 +24,7 @@ const AcySymbol = (props: any) => {
   const onCancel = () => {
     setVisible(false);
   };
+  console.log("ACY symbol activeSymbol", activeSymbol)
   return (
     <>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto' }}>
@@ -33,7 +36,7 @@ const AcySymbol = (props: any) => {
           borderBottom: ' 1px solid #22252e'
         }}>
           <div className={styles.title}>
-            {pairName}&nbsp;
+            {activeSymbol}&nbsp;
             <SwapOutlined
               onClick={onClickCoin}
               style={{ fontSize: '20px', color: '#ffffff', cursor: 'pointer' }}
@@ -76,7 +79,17 @@ const AcySymbol = (props: any) => {
           <div style={{ marginRight: '8px', cursor: 'pointer' }} onClick={() => { setShowChart() }}>
             <svg xmlns="http://www.w3.org/2000/svg" height="28" viewBox="0 96 960 960" fill="#b5b6b6"><path d="M480 936 300 756l44-44 136 136 136-136 44 44-180 180ZM344 444l-44-44 180-180 180 180-44 44-136-136-136 136Z" /></svg>          </div>}
       </div>
-      <TokenSelectorDrawer placement="left" onCancel={onCancel} width={400} visible={visible} onCoinClick={onClickCoin} coinList={coinList} />
+      <TokenSelectorDrawer 
+        placement="left" 
+        onCancel={onCancel} 
+        width={400} 
+        visible={visible} 
+        setVisible={setVisible}
+        onCoinClick={onClickCoin} 
+        coinList={coinList} 
+        activeSymbol={activeSymbol} 
+        selectSymbol={selectSymbol}
+        setActiveSymbol={setActiveSymbol}/>
 
     </>
   );

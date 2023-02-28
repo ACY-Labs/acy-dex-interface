@@ -137,6 +137,10 @@ export default function ExchangeTVChart(props) {
     onChangePrice
   } = props
 
+  if (!chartTokenSymbol) {
+    return null;
+  }
+
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
   const [period, setPeriod] = useState('5m');
@@ -154,10 +158,6 @@ export default function ExchangeTVChart(props) {
 
   const ref = useRef(null);
   const chartRef = useRef(null);
-
-  if (!chartTokenSymbol) {
-    return null;
-  }
 
   useEffect(() => {
     if (marketName !== previousMarketName) {
@@ -208,7 +208,8 @@ export default function ExchangeTVChart(props) {
       });
       cleaner.current = clean;
     }
-
+    
+    let sti;
     const fetchPrevAndSubscribe = async () => {
       // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
       // SHOULD DO THIS BEFORE SUBSCRIBE, HOWEVER MOVING SUBSCRIBE TO AFTER THIS BLOCK OF CODE WILL CAUSE THE SUBSCRIPTION GOES ON FOREVER
@@ -231,6 +232,7 @@ export default function ExchangeTVChart(props) {
         responseFromTokenData = await axios.get(`${OptionsPriceApi}/futures?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
           .then((res) => res.data);
       } else if(pageName == "Trade") {
+        console.log("see trade token0", fromToken, toToken, chainId)
         responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromToken}&token1=${toToken}&chainId=${chainId}&period=${period}`)
           .then((res) => res.data);
       } else {
@@ -267,7 +269,7 @@ export default function ExchangeTVChart(props) {
 
       if (pageName == "Option" || pageName == "Futures") {
         let from = responsePairData[responsePairData.length - 1].time
-        setInterval(() => {
+        sti = setInterval(() => {
           axios.get(`${OptionsPriceApi}/${pageName.toLowerCase()}?chainId=${chainId}&symbol=${chartTokenSymbol}&period=1m&from=${from}`)
             .then((res) => {
               for (let i = 0; i < res.data.length; i++) {
@@ -297,6 +299,8 @@ export default function ExchangeTVChart(props) {
     }
 
     fetchPrevAndSubscribe()
+
+    return () => clearInterval(sti)
   }, [currentSeries, fromToken, toToken, period, chainId])
   ///// end of binance data source
 

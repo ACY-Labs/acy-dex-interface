@@ -64,7 +64,7 @@ import OrderTable from './components/OrderTable'
 /// THIS SECTION IS FOR TESTING SWR AND GMX CONTRACT
 import { fetcher } from '@/acy-dex-futures/utils';
 // import PositionRouter from "@/acy-dex-futures/abis/PositionRouter.json";
-import Reader from '@/acy-dex-futures/abis/ReaderV2.json'
+import Reader from '@/abis/future-option-power/Reader.json'
 import Router from '@/acy-dex-futures/abis/Router.json'
 import Vault from '@/acy-dex-futures/abis/Vault.json'
 // import VaultV2 from '@/acy-dex-futures/abis/VaultV2.json'
@@ -111,7 +111,8 @@ import {
 } from '@/pages/Stats/Perpetual/test'
 
 import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract, getTokenBySymbol, getTokenByAddress } from '@/constants/future.js';
+import { getContract } from '@/constants/future_option_power.js';
+import { getTokens, getTokenBySymbol, getTokenByAddress } from '@/constants/future.js';
 import { leftPad } from 'web3-utils';
 
 let indexToken = []
@@ -264,10 +265,7 @@ const Swap = props => {
   const { savedIsPnlInLeverage, setSavedIsPnlInLeverage, savedSlippageAmount, pendingTxns, setPendingTxns } = props
   const { account, library, active } = useWeb3React();
   let { chainId } = useChainId();
-  const tokensperp = getTokens(chainId);
-  console.log("test chainId perpetual page", chainId, tokensperp)
-
-  const supportedTokens = tokensperp;
+  console.log("future symbol chainid", chainId)
 
   //// ui tab
   const defaultTokenSelection = useMemo(() => ({
@@ -292,7 +290,7 @@ const Swap = props => {
   const tokens = getTokens(chainId)
 
   const [fromToken, setFromToken] = useState(tokens[0])
-  const [toToken, setToToken] = useState(tokens[1])
+  const [toToken, setToToken] = useState(tokens[0])
 
   const setFromTokenAddress = useCallback((selectedSwapOption, address) => {
     const newTokenSelection = JSON.parse(JSON.stringify(tokenSelection))
@@ -329,14 +327,15 @@ const Swap = props => {
   /// get contract addresses
   // TODO: update and remove unused contracts
   // required contracts: router (add/remove liquidity, add/remove margin), pool (trade), reader
-  const readerAddress = getContract(chainId, "Reader")
-  const vaultAddress = getContract(chainId, "Vault")
+  const readerAddress = getContract(chainId, "reader")
+  // const vaultAddress = getContract(chainId, "Vault")
   const usdgAddress = getContract(chainId, "USDG")
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
   const routerAddress = getContract(chainId, "Router")
   const glpManagerAddress = getContract(chainId, "GlpManager")
   const glpAddress = getContract(chainId, "GLP")
   const orderBookAddress = getContract(chainId, "OrderBook")
+  const poolAddress = getContract(chainId, "pool")
 
   //---------- FOR TESTING 
   // const positionQuery = getPositionQuery(whitelistedTokens, nativeTokenAddress)
@@ -350,17 +349,17 @@ const Swap = props => {
     fetcher: fetcher(library, Reader, [tokenAddresses]),
   })
 
-  const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([chainId, vaultAddress, "totalTokenWeights"], {
-    fetcher: fetcher(library, Vault),
-  })
+  // const { data: totalTokenWeights, mutate: updateTotalTokenWeights } = useSWR([chainId, vaultAddress, "totalTokenWeights"], {
+  //   fetcher: fetcher(library, Vault),
+  // })
 
-  const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
-    fetcher: fetcher(library, Glp),
-  })
+  // const { data: usdgSupply, mutate: updateUsdgSupply } = useSWR([chainId, usdgAddress, "totalSupply"], {
+  //   fetcher: fetcher(library, Glp),
+  // })
 
-  const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR(account && [chainId, routerAddress, "approvedPlugins", account, orderBookAddress], {
-    fetcher: fetcher(library, Router)
-  });
+  // const { data: orderBookApproved, mutate: updateOrderBookApproved } = useSWR(account && [chainId, routerAddress, "approvedPlugins", account, orderBookAddress], {
+  //   fetcher: fetcher(library, Router)
+  // });
 
   // const infoTokens = getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo);
   const infoTokens = {};
@@ -395,24 +394,44 @@ const Swap = props => {
   const [isWaitingForPluginApproval, setIsWaitingForPluginApproval] = useState(false);
   const [isPluginApproving, setIsPluginApproving] = useState(false);
 
-  const approveOrderBook = () => {
-    setIsPluginApproving(true)
-    return approvePlugin(chainId, orderBookAddress, {
-      library,
-      pendingTxns,
-      setPendingTxns
-    }).then(() => {
-      setIsWaitingForPluginApproval(true)
-      updateOrderBookApproved(undefined, true);
-    }).finally(() => {
-      setIsPluginApproving(false)
-    })
-  }
+  // const approveOrderBook = () => {
+  //   setIsPluginApproving(true)
+  //   return approvePlugin(chainId, orderBookAddress, {
+  //     library,
+  //     pendingTxns,
+  //     setPendingTxns
+  //   }).then(() => {
+  //     setIsWaitingForPluginApproval(true)
+  //     updateOrderBookApproved(undefined, true);
+  //   }).finally(() => {
+  //     setIsPluginApproving(false)
+  //   })
+  // }
 
 
   //// data
-  const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR(account && [`GlpSwap:lastPurchaseTime:${active}`, chainId, glpManagerAddress, "lastAddedAt", account], {
-    fetcher: fetcher(library, GlpManager),
+  // const { data: lastPurchaseTime, mutate: updateLastPurchaseTime } = useSWR(account && [`GlpSwap:lastPurchaseTime:${active}`, chainId, glpManagerAddress, "lastAddedAt", account], {
+  //   fetcher: fetcher(library, GlpManager),
+  // })
+  const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
+    fetcher: fetcher(library, Reader)
+  });
+
+  //future_tokens store every symbols in future and its data 
+  const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
+  let future_tokens_symbol = []
+  future_tokens?.forEach((ele)=>{
+    future_tokens_symbol.push({
+      name: ele[1],
+      symbol: ele[1].substring(0,3),
+    })
+  })  
+  //future_token stores token symbols without duplicates for tab display
+  let future_token = []
+  future_tokens_symbol?.forEach((ele) => {
+    if (!future_token.includes(ele.symbol)){
+      future_token.push(ele.symbol)
+    }
   })
 
   useEffect(() => {
@@ -420,10 +439,11 @@ const Swap = props => {
       library.on('block', () => {
         // updatePositionData(undefined, true)
         updateTokenBalances(undefined, true)
-        updateTotalTokenWeights(undefined, true)
-        updateUsdgSupply(undefined, true)
-        updateOrderBookApproved(undefined, true)
-        updateLastPurchaseTime(undefined, true)
+        // updateTotalTokenWeights(undefined, true)
+        // updateUsdgSupply(undefined, true)
+        // updateOrderBookApproved(undefined, true)
+        // updateLastPurchaseTime(undefined, true)
+        updateSymbolsInfo(undefined, true)
       })
       return () => {
         library.removeAllListeners('block')
@@ -432,11 +452,15 @@ const Swap = props => {
   }, [active, library, chainId,
     // updatePositionData,
     updateTokenBalances,
-    updateTotalTokenWeights,
-    updateUsdgSupply,
-    updateOrderBookApproved,
-    updateLastPurchaseTime]
+    // updateTotalTokenWeights,
+    // updateUsdgSupply,
+    // updateOrderBookApproved,
+    // updateLastPurchaseTime,
+    updateSymbolsInfo]
   )
+
+  const [activeSymbol, setActiveSymbol] = useState("BTC")
+  const [activeToken, setActiveToken] = useState("BTC");
 
   const refContainer = useRef();
   refContainer.current = transactionList;
@@ -471,19 +495,7 @@ const Swap = props => {
     setToTokenAddress(swapOption, getTokenBySymbol(chainId, e).address)  // when click tab change token
   }
 
-  const chartPanes = [
-    { title: 'BTC', content: 'BTC', key: 'BTC', closable: false },
-    { title: 'ETH', content: 'ETH', key: 'ETH' },
-    // { title: 'Tab 3', content: 'Content of Tab 3', key: '3'},
-  ];
 
-  // ui
-  const KChartTokenListMATIC = ["BTC", "ETH", "MATIC"]
-  const KChartTokenListETH = ["BTC", "ETH"]
-  const KChartTokenListBSC = ["BTC", "ETH", "BNB"]
-  const KChartTokenList = chainId === 56 || chainId === 97 ? KChartTokenListBSC
-    : chainId === 137 || chainId === 80001 ? KChartTokenListMATIC
-      : KChartTokenListETH
   const selectChartToken = item => {
     onClickSetActiveToken(item)
   }
@@ -509,9 +521,11 @@ const onChangePrice=(curPrice,change)=>{
                     onChange={selectChartToken}
                   />
                 </div> */}
-                <AcySymbolNav data={KChartTokenList} onChange={selectChartToken}/>
+                <AcySymbolNav data={future_token} onChange={selectChartToken}/>
                 <AcySymbol 
-                  pairName={toToken.symbol}
+                  activeSymbol={activeSymbol}
+                  setActiveSymbol={setActiveSymbol}
+                  coinList={future_tokens_symbol}
                   // showDrawer={showDrawer}
                   latestPriceColor={priceChangePercentDelta*1>= 0 && '#0ecc83' ||'#fa3c58'}
                   latestPrice={latestPrice}
@@ -521,7 +535,7 @@ const onChangePrice=(curPrice,change)=>{
                   <ExchangeTVChart
                     chartTokenSymbol={toToken.symbol}
                     pageName="Futures"
-                    fromToken={toToken.symbol}
+                    fromToken={toToken}
                     toToken="USDT"
                     chainId={chainId}
                     onChangePrice={onChangePrice}

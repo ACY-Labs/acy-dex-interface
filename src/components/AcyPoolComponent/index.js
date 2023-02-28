@@ -137,6 +137,7 @@ const AcyPoolComponent = props => {
   const amountUsd = selectedTokenPrice?.mul(selectedTokenAmount)
   const minTradeVolume = formatAmount(symbolsData?.find(item => item.symbol?.toLowerCase() == props.selectedSymbol?.toLowerCase()).minTradeVolume, 18)
 
+
   let feePercentageText = formatAmount(feeBasisPoints, 2, 2, true, "-")
   if (feeBasisPoints !== undefined && feeBasisPoints.toString().length > 0) {
     feePercentageText += "%"
@@ -153,6 +154,17 @@ const AcyPoolComponent = props => {
   }
 
   const onTokenValueChange = (e) => {
+    let inputString = e.target.value
+    if (inputString === "") {
+      setSelectedTokenValue("0")
+    }
+    else if (inputString[0] === "0" && inputString[1] === "0" && inputString[2] === ".") {
+      setSelectedTokenValue(inputString.substring(1))
+    }
+    else {
+      setSelectedTokenValue(inputString)
+    }
+    setShowDescription(true)
     setAnchorOnSwapAmount(true)
     setShowDescription(true)
     if (e.target.value === "") {
@@ -167,6 +179,16 @@ const AcyPoolComponent = props => {
   }
 
   const onAlpValueChange = (e) => {
+    let inputString = e.target.value
+    if (inputString === "") {
+      setAlpValue("0")
+    }
+    else if (inputString[0] === "0" && inputString[1] === "0" && inputString[2] === ".") {
+      setAlpValue(inputString.substring(1))
+    }
+    else {
+      setAlpValue(inputString)
+    }
     setAnchorOnSwapAmount(false)
     setShowDescription(true)
     if (e.target.value === "") {

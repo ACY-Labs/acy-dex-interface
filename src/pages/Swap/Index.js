@@ -34,6 +34,9 @@ const Swap = props => {
 
   const [activeToken1, setActiveToken1] = useState(tokens[1]);
   const [activeToken0, setActiveToken0] = useState(tokens[0]);
+  const [activeSymbol, setActiveSymbol] = useState("BTC")
+  const [activeSymbol1, setActiveSymbol1] = useState("ETH")
+  const [activeToken, setActiveToken] = useState("BTCUSD");
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
   const [transactionList, setTransactionList] = useState([]);
@@ -229,9 +232,11 @@ const Swap = props => {
                   options={graphTypes}
                   onChange={showGraph}
                 /> */}
-              <AcySymbolNav data={['BTC', 'ETH', 'BNB']} onChange={showGraph} />
+              <AcySymbolNav data={[activeSymbol, activeSymbol1]} onChange={showGraph} />
               <AcySymbol
-                pairName='BTC'
+                activeSymbol={activeSymbol}
+                setActiveSymbol={setActiveSymbol}
+                // pairName='BTC'
                 // showDrawer={onClickCoin}
                 // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
                 // latestPrice={latestPrice}
@@ -300,6 +305,10 @@ const Swap = props => {
                 <SwapComponent
                   token0={activeToken0}
                   token1={activeToken1}
+                  activeSymbol={activeSymbol}
+                  setActiveSymbol={setActiveSymbol}
+                  activeSymbol1={activeSymbol1}
+                  setActiveSymbol1={setActiveSymbol1}
                   onSelectToken0={token => { setActiveToken0(token);}}
                   onSelectToken1={token => { setActiveToken1(token);}}
                   account={account}

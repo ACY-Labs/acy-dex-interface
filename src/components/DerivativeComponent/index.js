@@ -19,6 +19,8 @@ import IPool from '@/abis/future-option-power/IPool.json'
 import styled from "styled-components";
 
 import styles from './styles.less';
+import { parse } from 'date-fns';
+import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 const StyledSlider = styled(Slider)`
   .ant-slider-track {
@@ -141,6 +143,7 @@ const DerivativeComponent = props => {
   const optionMode = ['Buy', 'Sell', 'Pool']
   const [percentage, setPercentage] = useState('')
   const [selectedTokenValue, setSelectedTokenValue] = useState("0")
+  const [selectedTokenAmount, setSelectedTokenAmount] = useState(parseValue(selectedTokenValue, selectedToken && selectedToken.decimals))
   const [usdValue, setUsdValue] = useState(0)
   const [isApproving, setIsApproving] = useState(false)
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
@@ -152,12 +155,12 @@ const DerivativeComponent = props => {
   const [marginToken, setMarginToken] = useState(tokens[1])
   const [leverageOption, setLeverageOption] = useState("2")
 
-  const selectedTokenAmount = parseValue(selectedTokenValue, selectedToken && selectedToken.decimals)
   const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
   const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const symbolMarkPrice = symbolInfo?.markPrice
   const symbolMinTradeVolume = symbolInfo?.minTradeVolume
   const minTradeVolume = symbolMinTradeVolume ? ethers.utils.formatUnits(symbolMinTradeVolume, 18) : 0.001
+  const minTradeDecimal = minTradeVolume? minTradeVolume.toString().includes('.')?minTradeVolume.toString().split('.')[1].length:0:3
 
   const getPrimaryText = () => {
     if (!active) {
@@ -237,6 +240,7 @@ const DerivativeComponent = props => {
                   </div>
                   <span style={{ fontSize: '12px', color: 'gray' }}>{selectedTokenValue != "NaN" ? selectedTokenValue : 0} {selectedToken.symbol}</span>
                 </div>
+                {/* <div className={styles.symbolAmount}>= {selectedTokenValue} {symbol}</div> */}
               </div>
               <div style={{ margin: '20px 0' }}>
                 <Segmented onChange={(value) => { setPercentage(value) }} options={['10%', '25%', '50%', '75%', '100%']} />

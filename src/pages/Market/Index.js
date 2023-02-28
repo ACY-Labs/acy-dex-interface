@@ -19,9 +19,9 @@ const MarketIndex = props => {
   const [winnersPairs, setWinnersPairs] = useState([])
   const [losersPairs, setLosersPairs] = useState([])
   const [newPairs, setNewPairs] = useState([])
-  const [marketType, setMarketType] = useState("Spots Market")
+  const [marketType, setMarketType] = useState("Spots")
 
-  const marketTypes = ["Spots Market", "Futures Market", "Options Market", "Powers Market"]
+  const marketTypes = ["Spots", "Futures", "Options", "Powers"]
 
   const getPairList = async () => {
     // fetch top volume pair list
@@ -114,7 +114,7 @@ const MarketIndex = props => {
         />
       </div>
 
-      {marketType == "Spots Market" &&
+      {marketType == "Spots" &&
         <div className={styles.marketRoot}>
           <ConnectWallet />
 
@@ -162,9 +162,9 @@ const MarketIndex = props => {
               </div>
             </div>
 
-            {/* Trending */}
-            {/* <div className={styles.chartCell}>
-          <div className={styles.statsContainer}>
+        {/* Trending */}
+        {/* <div className={styles.chartCell}>
+\          <div className={styles.statsContainer}>
             <div className={styles.statstitle}>
               Trending
               <span className={styles.seeMore} onClick={() => { setMode('Trending') }}>
