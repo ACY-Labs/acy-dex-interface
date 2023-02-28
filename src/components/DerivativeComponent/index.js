@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Button } from 'antd';
+import { Input, Button, Slider } from 'antd';
 import useSWR from 'swr'
 import { ethers } from 'ethers';
 import { INITIAL_ALLOWED_SLIPPAGE, getTokens, getContract } from '@/constants/future_option_power.js';
@@ -16,10 +16,82 @@ import AcyPoolComponent from '../AcyPoolComponent';
 import Segmented from '../AcySegmented';
 import Reader from '@/abis/future-option-power/Reader.json'
 import IPool from '@/abis/future-option-power/IPool.json'
+import styled from "styled-components";
 
 import styles from './styles.less';
 import { parse } from 'date-fns';
 import { ConsoleSqlOutlined } from '@ant-design/icons';
+
+const StyledSlider = styled(Slider)`
+  .ant-slider-track {
+    background: #929293;
+    height: 3px;
+  }
+  .ant-slider-rail {
+    background: #29292c;
+    height: 3px;
+  }
+  .ant-slider-handle {
+    background: #929293;
+    width: 12px;
+    height: 12px;
+    border: none;
+  }
+  .ant-slider-handle-active {
+    background: #929293;
+    width: 12px;
+    height: 12px;
+    border: none;
+  }
+  .ant-slider-dot {
+    border: 1.5px solid #29292c;
+    border-radius: 1px;
+    background: #29292c;
+    width: 2px;
+    height: 10px;
+  }
+  .ant-slider-dot-active {
+    border: 1.5px solid #929293;
+    border-radius: 1px;
+    background: #929293;
+    width: 2px;
+    height: 10px;
+  }
+  .ant-slider-with-marks {
+      margin-bottom: 50px;
+  }
+`;
+
+const leverageMarks = {
+  1: {
+    style: { color: '#b5b6b6', },
+    label: '1x'
+  },
+  5: {
+    style: { color: '#b5b6b6', },
+    label: '5x'
+  },
+  10: {
+    style: { color: '#b5b6b6', },
+    label: '10x'
+  },
+  15: {
+    style: { color: '#b5b6b6', },
+    label: '15x'
+  },
+  20: {
+    style: { color: '#b5b6b6', },
+    label: '20x'
+  },
+  25: {
+    style: { color: '#b5b6b6', },
+    label: '25x'
+  },
+  30: {
+    style: { color: '#b5b6b6', },
+    label: '30x'
+  }
+};
 
 const DerivativeComponent = props => {
 
@@ -30,6 +102,7 @@ const DerivativeComponent = props => {
     tokens,
     selectedToken,
     symbol,
+    pageName,
   } = props
 
   const connectWalletByLocalStorage = useConnectWallet()
@@ -47,7 +120,6 @@ const DerivativeComponent = props => {
     fetcher: fetcher(library, Reader)
   });
 
-  console.log("derivative ui symbolInfo", symbolInfo)
   useEffect(() => {
     if (active) {
       library.on("block", () => {
@@ -81,9 +153,10 @@ const DerivativeComponent = props => {
   const [slippageError, setSlippageError] = useState('')
   const [deadline, setDeadline] = useState()
   const [marginToken, setMarginToken] = useState(tokens[1])
+  const [leverageOption, setLeverageOption] = useState("2")
 
-  // const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
-  // const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
+  const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
+  const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const symbolMarkPrice = symbolInfo?.markPrice
   const symbolMinTradeVolume = symbolInfo?.minTradeVolume
   const minTradeVolume = symbolMinTradeVolume ? ethers.utils.formatUnits(symbolMinTradeVolume, 18) : 0.001
@@ -92,6 +165,9 @@ const DerivativeComponent = props => {
   const getPrimaryText = () => {
     if (!active) {
       return 'Connect Wallet'
+    }
+    if (!selectedTokenValue || selectedTokenValue == 0) {
+      return 'Invalid Trade Volume'
     }
     if (isApproving) {
       return `Approving ${selectedToken.symbol}...`;
@@ -104,38 +180,13 @@ const DerivativeComponent = props => {
     setMarginToken(tokens[1])
   }, [tokens])
 
-  // useEffect(() => {
-  //   let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(selectedTokenBalance, 18, 2)
-  //   handleTokenValueChange(tokenAmount)
-  // }, [percentage])
-
-  // useEffect(() => {
-  // setUsdValue((selectedTokenValue * formatAmount(selectedTokenPrice, 18, 2)).toFixed(2))
-  // console.log("derivative usd see usdvalue", (selectedTokenValue * formatAmount(selectedTokenPrice, 18, 2)).toFixed(2), usdValue)
-  // }, [selectedTokenValue, selectedTokenPrice])
+  useEffect(() => {
+    let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(selectedTokenBalance, 18, 2)
+    handleTokenValueChange(tokenAmount)
+  }, [percentage])
 
   const handleTokenValueChange = (value) => {
-    if (value % minTradeVolume == 0) {
-      setSelectedTokenValue(value)
-    } else {
-      setSelectedTokenValue(Math.floor(value / minTradeVolume) * minTradeVolume)
-    }
-  }
-  const handleUsdValueChange = (value) => {
-    setUsdValue(value)
-    // console.log("derivative usd see symbolMarkPrice", symbolMarkPrice)
-    const bigValue = parseValue(value, 18+minTradeDecimal)
-    let tokenValue = bigValue?.div(symbolMarkPrice)
-    tokenValue = formatAmount(tokenValue, minTradeDecimal)
-    //selectedTokenValue is for display
-    //selectedTokenAmount is sent to contract
-    if(tokenValue%minTradeVolume==0){
-      setSelectedTokenValue(tokenValue)
-      setSelectedTokenAmount(parseValue(tokenValue, selectedToken && selectedToken.decimals))
-    }else{
-      setSelectedTokenValue(Math.floor(tokenValue/minTradeVolume)*minTradeVolume)
-      setSelectedTokenAmount(parseValue(Math.floor(tokenValue/minTradeVolume)*minTradeVolume),  selectedToken && selectedToken.decimals)
-    }
+    setSelectedTokenValue(value.toFixed(-Math.log10(minTradeVolume)))
   }
 
   ///////////// write contract /////////////
@@ -169,44 +220,32 @@ const DerivativeComponent = props => {
           :
           <>
             <div className={styles.rowFlexContainer}>
-              <div>
-                {/* <div style={{ display: 'flex' }}> */}
-                {/* <div className={styles.inputContainer}>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="Amount"
-                    className={styles.optionInput}
-                    value={selectedTokenValue}
-                    onChange={e => {
-                      // setSelectedTokenValue(e.target.value)
-                      handleTokenValueChange(e.target.value)
-                      setShowDescription(true)
-                    }}
-                  />
-                  <span className={styles.inputLabel}>{selectedToken}</span>
-                </div> */}
-                <div className={styles.inputContainer}>
-                  <input
-                    type="number"
-                    min="0"
-                    className={styles.optionInput}
-                    value={usdValue}
-                    // value={"0"}
-                    onChange={e => {
-                      handleUsdValueChange(e.target.value)
-                      setShowDescription(true)
-                    }}
-                  />
-                  <span className={styles.inputLabel}>USD</span>
+
+              <div style={{ display: 'flex' }}>
+                <div className={styles.inputContainer} style={{ display: 'flow-root', textAlignLast: 'right', padding: '8px 10px 6px 10px' }}>
+                  <div style={{ display: 'flex', fontSize: '16px', marginBottom: '3px' }}>
+                    <input
+                      type="number"
+                      min="0"
+                      className={styles.optionInput}
+                      style={{ width: '100%' }}
+                      value={usdValue}
+                      onChange={e => {
+                        setUsdValue(e.target.value)
+                        handleTokenValueChange(e.target.value / formatAmount(selectedTokenPrice, 18))
+                        setShowDescription(true)
+                      }}
+                    />
+                    <span className={styles.inputLabel}>USD</span>
+                  </div>
+                  <span style={{ fontSize: '12px', color: 'gray' }}>{selectedTokenValue != "NaN" ? selectedTokenValue : 0} {selectedToken.symbol}</span>
                 </div>
-                <div className={styles.symbolAmount}>= {selectedTokenValue} {symbol}</div>
+                {/* <div className={styles.symbolAmount}>= {selectedTokenValue} {symbol}</div> */}
               </div>
-              {/* </div> */}
-              <div style={{ margin: '40px 0' }}>
+              <div style={{ margin: '20px 0' }}>
                 <Segmented onChange={(value) => { setPercentage(value) }} options={['10%', '25%', '50%', '75%', '100%']} />
               </div>
-              {showDescription ?
+              {showDescription && pageName == "Future" &&
                 <AcyDescriptions>
                   <div className={styles.breakdownTopContainer}>
                     <div className={styles.slippageContainer}>
@@ -243,7 +282,7 @@ const DerivativeComponent = props => {
                         <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
                       )}
                     </div>
-                    <div className={styles.slippageContainer}>
+                    {/* <div className={styles.slippageContainer}>
                       <span style={{ fontWeight: 600, marginBottom: '10px' }}>Transaction deadline</span>
                       <div
                         style={{
@@ -262,14 +301,79 @@ const DerivativeComponent = props => {
                           suffix={<strong>minutes</strong>}
                         />
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                 </AcyDescriptions>
-                : null}
+              }
+
+              {pageName == "Future" &&
+                <AcyDescriptions>
+                  <div className={styles.leverageContainer}>
+                    <div className={styles.slippageContainer}>
+                      <div className={styles.leverageLabel}>
+                        <span>Leverage</span>
+                        <div className={styles.leverageInputContainer}>
+                          <button
+                            className={styles.leverageButton}
+                            onClick={() => {
+                              // if (leverageOption > 0.1) {
+                              //   setLeverageOption((parseFloat(leverageOption) - 0.1).toFixed(1))
+                              // }
+                            }}
+                          >
+                            <span> - </span>
+                          </button>
+                          <input
+                            type="number"
+                            value={leverageOption}
+                            onChange={e => {
+                              let val = parseFloat(e.target.value)
+                              if (val < 0.1) {
+                                setLeverageOption(0.1)
+                              } else if (val >= 0.1 && val <= 30.5) {
+                                setLeverageOption(Math.round(val * 10) / 10)
+                              } else {
+                                setLeverageOption(30.5)
+                              }
+                            }}
+                            className={styles.leverageInput}
+                          />
+                          <button
+                            className={styles.leverageButton}
+                            onClick={() => {
+                              if (leverageOption < 30.5) {
+                                setLeverageOption((parseFloat(leverageOption) + 0.1).toFixed(1))
+                              }
+                            }}
+                          >
+                            <span> + </span>
+                          </button>
+                        </div>
+
+                      </div>
+                    </div>
+
+                    <span className={styles.leverageSlider}>
+                      <StyledSlider
+                        min={0.1}
+                        max={30.5}
+                        step={0.1}
+                        marks={leverageMarks}
+                        value={leverageOption}
+                        onChange={value => setLeverageOption(value)}
+                        defaultValue={leverageOption}
+                        style={{ color: 'red' }}
+                      />
+                    </span>
+
+                  </div>
+                </AcyDescriptions>
+              }
 
               <ComponentButton
                 style={{ margin: '25px 0 0 0', width: '100%' }}
                 onClick={onClickPrimary}
+                disabled={account && (!selectedTokenValue || selectedTokenValue == 0)}
               >
                 {getPrimaryText()}
               </ComponentButton>

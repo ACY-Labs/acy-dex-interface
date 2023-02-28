@@ -211,13 +211,15 @@ const Option = props => {
   // const [activeSymbol, setActiveSymbol] = useState(option_tokens_symbol?.find(ele => ele.name == "BTC")?.name)
   // const [activeToken, setActiveToken] = useState(option_tokens_symbol?.find(ele => ele.name == "BTC")?.symbol);
   const [activeSymbol, setActiveSymbol] = useState(option_tokens_symbol?.find(ele => ele.name == "BTC")?.symbol)
-  const [activeToken, setActiveToken] = useState(option_tokens_symbol?.find(ele => ele.name == "BTC")?.name)
+  // const [activeToken, setActiveToken] = useState(option_tokens_symbol?.find(ele => ele.name == "BTC")?.name)
   const [latestPrice, setLatestPrice] = useState(0);
   const [priceChangePercentDelta, setPriceChangePercentDelta] = useState(0);
   const onChangePrice = (curPrice, change) => {
     setLatestPrice(curPrice);
     setPriceChangePercentDelta(change);
   }
+
+  const [activeToken, setActiveToken] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
 
   const selectChartToken = item => {
     // onClickSetActiveToken(item)
@@ -279,7 +281,7 @@ const Option = props => {
                 <ExchangeTVChart
                   chartTokenSymbol={activeSymbol}
                   pageName="Option"
-                  fromToken={activeToken}
+                  fromToken={activeToken.symbol}
                   toToken="USDT"
                   chainId={chainId}
                   onChangePrice={onChangePrice}
