@@ -27,7 +27,7 @@ const apiUrlPrefix = "https://stats.acy.finance/api"
 const Swap = props => {
   // const { farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
   const { account, library, active } = useWeb3React()
-  
+
   // test on polygon
   const chainId = 137;
   const tokens = getTokens(chainId)
@@ -36,7 +36,9 @@ const Swap = props => {
   const [activeToken0, setActiveToken0] = useState(tokens[0]);
   const [activeSymbol, setActiveSymbol] = useState("BTC")
   const [activeSymbol1, setActiveSymbol1] = useState("ETH")
-  const [activeToken, setActiveToken] = useState("BTCUSD");
+  const [activeToken, setActiveToken] = useState(activeToken0.address < activeToken1.address ? activeToken0 : activeToken1);
+  const [hasPair, setHasPair] = useState(true);
+  const [activeExist, setActiveExist] = useState(true);
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
   const [transactionList, setTransactionList] = useState([]);
@@ -154,6 +156,7 @@ const Swap = props => {
   // }, [activeToken0, activeToken1]);
 
   useEffect(() => {
+    console.log("see trade activetoken1 change", activeToken1)
     const getTradeHistory = async () => {
       let address0 = activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address
       let address1 = activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address
@@ -164,6 +167,40 @@ const Swap = props => {
     }
     getTradeHistory()
   }, [activeToken0, activeToken1]);
+
+  //to resolve error that extra str being fetched from url
+  useEffect(() => {
+    console.log("see trade modal select", activeToken0, activeToken1)
+    if (activeToken0.address.length != 42) {
+      setActiveToken0({
+        ...activeToken0,
+        address: activeToken0.address.substring(0, 42),
+        // ...activeToken0        
+      })
+    }
+    if (activeToken1.address.length != 42) {
+      setActiveToken1({
+        ...activeToken1,
+        address: activeToken1.address.substring(0, 42),
+        // ...activeToken1        
+      })
+    }
+  }, [activeToken0, activeToken1])
+
+  useEffect(() => {
+    console.log("see trade modal select", activeToken0, activeToken1, activeToken)
+    
+  }, [activeToken0, activeToken1, activeToken])
+
+  // for activeToken chosen from tokenSelectorModal, set token0 as selected and token1 as USDT
+  // should not be activated when triggered by tab for nopair
+  useEffect(() => {
+    console.log("see trade haspair", hasPair)
+    if (activeToken != activeToken0 && activeToken1 && hasPair) {
+      setActiveToken0(activeToken)
+      setActiveToken1(tokens[0])
+    }
+  }, [activeToken])
 
   const onHandModalConfirmOrder = falg => {
     setVisibleConfirmOrder(!!falg);
@@ -178,6 +215,10 @@ const Swap = props => {
   const onGetReceipt = async (receipt, library, account) => {
     updateTransactionList(receipt);
   };
+
+  const onTabSelect = (e) => {
+    setActiveToken(activeToken0.symbol == e ? activeToken0 : activeToken1)
+  }
 
   // const [graphType, setGraphType] = useState("BTC")
   // const graphTypes = ["Routes", activeToken1.symbol]
@@ -218,9 +259,9 @@ const Swap = props => {
   const history = useHistory()
   useEffect(() => {
     const hash = history.location.hash.replace('#', '').split('&')
-    if(history.location.hash) {
-      setActiveToken0({symbol: hash[0].split('/')[0].replaceAll('%20', ' '), address: hash[1]})
-      setActiveToken1({symbol: hash[0].split('/')[1].replaceAll('%20', ' '), address: hash[2]})
+    if (history.location.hash) {
+      setActiveToken0({ symbol: hash[0].split('/')[0].replaceAll('%20', ' '), address: hash[1] })
+      setActiveToken1({ symbol: hash[0].split('/')[1].replaceAll('%20', ' '), address: hash[2] })
     }
   }, [history.location.hash])
 
@@ -237,38 +278,69 @@ const Swap = props => {
                   options={graphTypes}
                   onChange={showGraph}
                 /> */}
-              <AcySymbolNav data={[activeToken0.symbol, activeToken1.symbol]} />
-              <AcySymbol
-                activeSymbol={activeSymbol}
-                setActiveSymbol={setActiveSymbol}
-                // pairName='BTC'
-                // showDrawer={onClickCoin}
-                // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
-                // latestPrice={latestPrice}
-                // latestPricePercentage={priceChangePercentDelt
-                latestPriceColor={1}
-                latestPrice={1}
-                latestPricePercentage={1}
-              // coinList={coinList}
-              />
+              {hasPair ?
+                <AcySymbol
+                  activeSymbol={activeToken0.address < activeToken1.address ? `${activeToken0.symbol}/${activeToken1.symbol}` : `${activeToken1.symbol}/${activeToken0.symbol}`}
+                  // activeSymbol={activeToken0.symbol}
+                  // setActiveSymbol={setActiveSymbol}
+                  setActiveSymbol={setActiveToken}
+                  pageName={"Trade"}
+                  // pairName='BTC'
+                  // showDrawer={onClickCoin}
+                  // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                  // latestPrice={latestPrice}
+                  // latestPricePercentage={priceChangePercentDelt
+                  latestPriceColor={1}
+                  latestPrice={1}
+                  latestPricePercentage={1}
+                // coinList={coinList}
+                />
+                : <div>
+                  <AcySymbolNav data={[activeToken0.symbol, activeToken1.symbol]} onChange={onTabSelect} />
+                  <AcySymbol
+                    activeSymbol={activeToken.symbol}
+                    pageName="Trade"
+                    // activeSymbol={activeToken0.symbol}
+                    // setActiveSymbol={setActiveSymbol}
+                    setActiveSymbol={setActiveToken}
+                    setActiveToken0={setActiveToken0}
+                    setActiveToken1={setActiveToken1}
+                    // pairName='BTC'
+                    // showDrawer={onClickCoin}
+                    // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                    // latestPrice={latestPrice}
+                    // latestPricePercentage={priceChangePercentDelt
+                    latestPriceColor={1}
+                    latestPrice={1}
+                    latestPricePercentage={1}
+                  // coinList={coinList}
+                  />
+                </div>
+              }
               {/* </div> */}
-
-              <div style={{ borderTop: '0.75px solid #333333' }}>
-                {/* {graphType == "Routes" ?
+              {activeExist ?
+                <div style={{ borderTop: '0.75px solid #333333' }}>
+                  {/* {graphType == "Routes" ?
                   // <SankeyGraph />
                   <></>
                   : */}
                   <div>
+
                     <ExchangeTVChart
                       chartTokenSymbol={activeToken1.symbol}
                       pageName="Trade"
-                      fromToken={activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address} 
+                      fromToken={activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address}
                       toToken={activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address}
                       chainId={chainId}
+                      activeToken={activeToken}
+                      setHasPair={setHasPair}
+                      activeExist={activeExist}
+                      setActiveExist={setActiveExist}
                     />
                   </div>
-                {/* } */}
-              </div>
+                  {/* } */}
+                </div>
+                : <div>Chart Unavailble</div>}
             </div>
 
             <div className={styles.bottomWrapper}>
@@ -287,9 +359,9 @@ const Swap = props => {
                       <SankeyGraph />
                     )}
                     {tableContent == 'Trade History' && (
-                      <TradeHistoryTable 
-                        dataSource={tradeHistory} 
-                        token0={activeToken0.address < activeToken1.address ? activeToken0.symbol : activeToken1.symbol} 
+                      <TradeHistoryTable
+                        dataSource={tradeHistory}
+                        token0={activeToken0.address < activeToken1.address ? activeToken0.symbol : activeToken1.symbol}
                         token1={activeToken0.address < activeToken1.address ? activeToken1.symbol : activeToken0.symbol} />
                     )}
                     {tableContent == 'Pools Activity' && (
@@ -312,13 +384,14 @@ const Swap = props => {
                   setActiveSymbol={setActiveSymbol}
                   activeSymbol1={activeSymbol1}
                   setActiveSymbol1={setActiveSymbol1}
-                  onSelectToken0={token => { setActiveToken0(token);}}
-                  onSelectToken1={token => { setActiveToken1(token);}}
+                  setActiveToken={setActiveToken}
+                  onSelectToken0={token => { setActiveToken0(token); }}
+                  onSelectToken1={token => { setActiveToken1(token); }}
                   account={account}
                   library={library}
                   chainId={chainId}
                   onGetReceipt={onGetReceipt}
-                  // showGraph={showGraph}
+                // showGraph={showGraph}
                 />
               </div>
             </AcyCard>

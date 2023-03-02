@@ -29,6 +29,7 @@ const SwapComponent = props => {
     setActiveSymbol,
     activeSymbol1,
     setActiveSymbol1,
+    setActiveToken,
     isLockedToken1=false,
     account,
     library,
@@ -323,6 +324,7 @@ const SwapComponent = props => {
 
   const onCoinClick = async token => {
     onCancel();
+    setActiveToken(token)
     if (before) {
       onSelectToken0(token);
       setToken0Balance(await getUserTokenBalance(token, chainId, account, library));

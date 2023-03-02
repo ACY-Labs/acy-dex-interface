@@ -6,13 +6,15 @@ import styles from './index.less';
 const AcySymbol = (props: any) => {
   const {
     activeSymbol,
-    selectSymbol,
     setActiveSymbol,
     showDrawer,
     latestPriceColor,
     latestPrice,
     latestPricePercentage,
-    coinList
+    coinList,
+    pageName,
+    setActiveToken0,
+    setActiveToken1,
   } = props;
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
@@ -35,7 +37,7 @@ const AcySymbol = (props: any) => {
         }}
       >
         <div className={styles.title} onClick={onClickCoin}>
-          {activeSymbol}<DownOutlined style={{fontSize:"18px", marginLeft:"5px"}}/>&nbsp; 
+          {activeSymbol}<DownOutlined style={{ fontSize: "18px" }} />&nbsp;
           <SwapOutlined
             // onClick={onClickCoin}
             style={{ fontSize: '20px', color: '#ffffff', cursor: 'pointer' }}
@@ -67,17 +69,19 @@ const AcySymbol = (props: any) => {
         </div>
 
       </div>
-      <TokenSelectorDrawer 
-        placement="left" 
-        onCancel={onCancel} 
-        width={400} 
-        visible={visible} 
+      <TokenSelectorDrawer
+        placement="left"
+        onCancel={onCancel}
+        width={400}
+        visible={visible}
         setVisible={setVisible}
-        onCoinClick={onClickCoin} 
-        coinList={coinList} 
-        activeSymbol={activeSymbol} 
-        selectSymbol={selectSymbol}
-        setActiveSymbol={setActiveSymbol}/>
+        pageName={pageName}
+        onCoinClick={onClickCoin}
+        coinList={coinList}
+        setActiveSymbol={setActiveSymbol}
+        setActiveToken0={setActiveToken0}
+        setActiveToken1={setActiveToken1}
+      />
 
     </>
   );
