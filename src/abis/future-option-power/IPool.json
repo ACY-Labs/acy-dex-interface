@@ -4,6 +4,134 @@
   "sourceName": "contracts/pool/IPool.sol",
   "abi": [
     {
+      "inputs": [
+        {
+          "internalType": "address[8]",
+          "name": "addresses_",
+          "type": "address[8]"
+        },
+        {
+          "internalType": "uint256[7]",
+          "name": "parameters_",
+          "type": "uint256[7]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "int256",
+          "name": "liquidity",
+          "type": "int256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "lpSupply",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "usdAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "mintAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "AddLiquidity",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "sumbol",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "underlying",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "int256",
+          "name": "newMargin",
+          "type": "int256"
+        }
+      ],
+      "name": "AddMargin",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "market",
+          "type": "address"
+        }
+      ],
+      "name": "AddMarket",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "collector",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "CollectProtocolFee",
+      "type": "event"
+    },
+    {
       "anonymous": false,
       "inputs": [
         {
@@ -15,6 +143,125 @@
       ],
       "name": "NewAdmin",
       "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "newImplementation",
+          "type": "address"
+        }
+      ],
+      "name": "NewImplementation",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "newProtocolFeeCollector",
+          "type": "address"
+        }
+      ],
+      "name": "NewProtocolFeeCollector",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "lpAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "int256",
+          "name": "liquidity",
+          "type": "int256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "lpSupply",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "usdAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amountOut",
+          "type": "uint256"
+        }
+      ],
+      "name": "RemoveLiquidity",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "sumbol",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "underlying",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "int256",
+          "name": "newMargin",
+          "type": "int256"
+        }
+      ],
+      "name": "RemoveMargin",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "BASIS_POINTS_DIVISOR",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
       "inputs": [
@@ -61,7 +308,7 @@
               "type": "bytes32"
             }
           ],
-          "internalType": "struct IPool.OracleSignature[]",
+          "internalType": "struct PoolImplementation.OracleSignature[]",
           "name": "oracleSignatures",
           "type": "tuple[]"
         }
@@ -81,13 +328,18 @@
       "inputs": [
         {
           "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
           "name": "underlying",
           "type": "address"
         },
         {
-          "internalType":"string",
-          "name":"symbolName",
-          "type":"string"
+          "internalType": "string",
+          "name": "symbolName",
+          "type": "string"
         },
         {
           "internalType": "uint256",
@@ -127,14 +379,14 @@
               "type": "bytes32"
             }
           ],
-          "internalType": "struct IPool.OracleSignature[]",
+          "internalType": "struct PoolImplementation.OracleSignature[]",
           "name": "oracleSignatures",
           "type": "tuple[]"
         }
       ],
       "name": "addMargin",
       "outputs": [],
-      "stateMutability": "payable",
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -159,8 +411,13 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_token",
+          "name": "token",
           "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "priceSumbolId",
+          "type": "string"
         }
       ],
       "name": "addWhitelistedTokens",
@@ -185,7 +442,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "index",
+          "name": "",
           "type": "uint256"
         }
       ],
@@ -217,6 +474,19 @@
       "inputs": [
         {
           "internalType": "address",
+          "name": "manager",
+          "type": "address"
+        }
+      ],
+      "name": "approvePoolManager",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
           "name": "underlying",
           "type": "address"
         }
@@ -227,29 +497,16 @@
       "type": "function"
     },
     {
-      "inputs": [
+      "inputs": [],
+      "name": "burnFeeBasisPoints",
+      "outputs": [
         {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
         }
       ],
-      "name": "claimVenusLp",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "claimVenusTrader",
-      "outputs": [],
-      "stateMutability": "nonpayable",
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -324,6 +581,78 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "getTokenToUsd",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountUsd",
+          "type": "uint256"
+        }
+      ],
+      "name": "getUsdToToken",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "symbolName",
+          "type": "string"
+        }
+      ],
+      "name": "getUserVault",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "implementation",
       "outputs": [
@@ -339,9 +668,33 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "pTokenId",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "isPoolManager",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "symbolName",
+          "type": "string"
         },
         {
           "components": [
@@ -376,7 +729,7 @@
               "type": "bytes32"
             }
           ],
-          "internalType": "struct IPool.OracleSignature[]",
+          "internalType": "struct PoolImplementation.OracleSignature[]",
           "name": "oracleSignatures",
           "type": "tuple[]"
         }
@@ -384,6 +737,19 @@
       "name": "liquidate",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "liquidationRewardCutRatio",
+      "outputs": [
+        {
+          "internalType": "int256",
+          "name": "",
+          "type": "int256"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -400,6 +766,66 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "lpInfos",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "vault",
+          "type": "address"
+        },
+        {
+          "internalType": "int256",
+          "name": "amountB0",
+          "type": "int256"
+        },
+        {
+          "internalType": "int256",
+          "name": "liquidity",
+          "type": "int256"
+        },
+        {
+          "internalType": "int256",
+          "name": "cumulativePnlPerLiquidity",
+          "type": "int256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "lpTokenAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "lpVault",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "lpsPnl",
       "outputs": [
@@ -407,6 +833,77 @@
           "internalType": "int256",
           "name": "",
           "type": "int256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "markets",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "maxLiquidationReward",
+      "outputs": [
+        {
+          "internalType": "int256",
+          "name": "",
+          "type": "int256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "minLiquidationReward",
+      "outputs": [
+        {
+          "internalType": "int256",
+          "name": "",
+          "type": "int256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "minRatioB0",
+      "outputs": [
+        {
+          "internalType": "int256",
+          "name": "",
+          "type": "int256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "mintFeeBasisPoints",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -427,7 +924,46 @@
     },
     {
       "inputs": [],
+      "name": "oracleManager",
+      "outputs": [
+        {
+          "internalType": "contract IOracleManager",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "poolInitialMarginMultiplier",
+      "outputs": [
+        {
+          "internalType": "int256",
+          "name": "",
+          "type": "int256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "protocolFeeAccrued",
+      "outputs": [
+        {
+          "internalType": "int256",
+          "name": "",
+          "type": "int256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "protocolFeeCollectRatio",
       "outputs": [
         {
           "internalType": "int256",
@@ -460,7 +996,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "amount",
+          "name": "lpAmount",
           "type": "uint256"
         },
         {
@@ -496,7 +1032,7 @@
               "type": "bytes32"
             }
           ],
-          "internalType": "struct IPool.OracleSignature[]",
+          "internalType": "struct PoolImplementation.OracleSignature[]",
           "name": "oracleSignatures",
           "type": "tuple[]"
         }
@@ -516,8 +1052,18 @@
       "inputs": [
         {
           "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
           "name": "underlying",
           "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "symbolName",
+          "type": "string"
         },
         {
           "internalType": "uint256",
@@ -557,7 +1103,7 @@
               "type": "bytes32"
             }
           ],
-          "internalType": "struct IPool.OracleSignature[]",
+          "internalType": "struct PoolImplementation.OracleSignature[]",
           "name": "oracleSignatures",
           "type": "tuple[]"
         }
@@ -571,13 +1117,26 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_token",
+          "name": "token",
           "type": "address"
         }
       ],
       "name": "removeWhitelistedTokens",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "reserveRatioB0",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -594,16 +1153,42 @@
       "type": "function"
     },
     {
-      "inputs": [
+      "inputs": [],
+      "name": "swapper",
+      "outputs": [
         {
-          "internalType": "address",
-          "name": "newImplementation",
+          "internalType": "contract ISwapper",
+          "name": "",
           "type": "address"
         }
       ],
-      "name": "setImplementation",
-      "outputs": [],
-      "stateMutability": "nonpayable",
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "symbolManager",
+      "outputs": [
+        {
+          "internalType": "contract ISymbolManager",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "tokenB0",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -620,6 +1205,19 @@
           "internalType": "bytes32",
           "name": "",
           "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "tokenWETH",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
         }
       ],
       "stateMutability": "view",
@@ -680,7 +1278,7 @@
               "type": "bytes32"
             }
           ],
-          "internalType": "struct IPool.OracleSignature[]",
+          "internalType": "struct PoolImplementation.OracleSignature[]",
           "name": "oracleSignatures",
           "type": "tuple[]"
         }
@@ -688,6 +1286,121 @@
       "name": "trade",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "underlying",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "fromSymbolName",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "toSymbolName",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "oracleSymbolId",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "v",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "r",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "s",
+              "type": "bytes32"
+            }
+          ],
+          "internalType": "struct PoolImplementation.OracleSignature[]",
+          "name": "oracleSignatures",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "transfer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "userVault",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "vaultImplementation",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "vaultTemplate",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
