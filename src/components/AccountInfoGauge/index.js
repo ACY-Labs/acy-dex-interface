@@ -10,7 +10,7 @@ import { getContract, getTokens } from '@/constants/future_option_power';
 import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import { AddressZero } from '@ethersproject/constants';
-import { PLACEHOLDER_ACCOUNT, fetcher, parseValue } from '@/acy-dex-futures/utils'
+import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, formatAmount } from '@/acy-dex-futures/utils'
 import { useChainId } from '@/utils/helpers';
 import useSWR from 'swr';
 import Router from '@/abis/future-option-power/Router.json';
@@ -29,6 +29,8 @@ const AccountInfoGauge = props => {
     token,
     setToken,
     symbol,
+    symbolMargin,
+    symbolMarginUsed,
   } = props
 
   const connectWalletByLocalStorage = useConnectWallet()
@@ -40,6 +42,10 @@ const AccountInfoGauge = props => {
   const [visible, setVisible] = useState(false)
   const [isApproving, setIsApproving] = useState(false)
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
+
+  const margin = formatAmount(symbolMargin, 18)
+  const marginUsed = formatAmount(symbolMarginUsed, 18)
+  const marginRemained = formatAmount(symbolMargin?.sub(symbolMarginUsed), 18)
 
   const routerAddress = getContract(chainId, "router")
   const poolAddress = getContract(chainId, "pool")
@@ -120,19 +126,19 @@ const AccountInfoGauge = props => {
               Dynamic Effective Balance
             </div>
             <div className={styles.statsRow}>
-              ——
+              {margin}
             </div>
             <div className={styles.statsRow}>
               Margin Usage
             </div>
             <div className={styles.statsRow}>
-              ——
+              {marginUsed}
             </div>
             <div className={styles.statsRow}>
               Available Margin
             </div>
             <div className={styles.statsRow}>
-              ——
+              {marginRemained}
             </div>
           </div>
         </div>
@@ -140,7 +146,7 @@ const AccountInfoGauge = props => {
           <Gauge
             title=''
             autoFit={true}
-            percent={70}
+            percent={symbolMargin ? (margin == 0 ? 0 : marginUsed * 100 / margin) : 0}
             color='l(0) 0:#00ff00 1:#ff0000'
           />
         </div>

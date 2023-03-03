@@ -119,12 +119,16 @@ const DerivativeComponent = props => {
   const { data: symbolInfo, mutate: updateSymbolInfo } = useSWR([chainId, readerAddress, "getSymbolInfo", poolAddress, symbol, []], {
     fetcher: fetcher(library, Reader)
   });
+  const { data: tdInfo, mutate: updateTdInfo } = useSWR([chainId, readerAddress, "getTdInfo", poolAddress, account], {
+    fetcher: fetcher(library, Reader)
+  })
 
   useEffect(() => {
     if (active) {
       library.on("block", () => {
         updateTokenInfo()
         updateSymbolInfo()
+        updateTdInfo()
       });
       return () => {
         library.removeAllListeners('block');
@@ -136,6 +140,7 @@ const DerivativeComponent = props => {
     chainId,
     updateTokenInfo,
     updateSymbolInfo,
+    updateTdInfo,
   ]);
 
   ///////////// for UI /////////////
@@ -161,6 +166,8 @@ const DerivativeComponent = props => {
   const symbolMinTradeVolume = symbolInfo?.minTradeVolume
   const minTradeVolume = symbolMinTradeVolume ? ethers.utils.formatUnits(symbolMinTradeVolume, 18) : 0.001
   const minTradeDecimal = minTradeVolume? minTradeVolume.toString().includes('.')?minTradeVolume.toString().split('.')[1].length:0:3
+  const symbolMargin = tdInfo?.positions.find(item => item.symbol.toLowerCase() == symbol.toLowerCase())?.margin
+  const symbolMarginUsed = tdInfo?.positions.find(item => item.symbol.toLowerCase() == symbol.toLowerCase())?.marginUsed
 
   const getPrimaryText = () => {
     if (!active) {
@@ -168,6 +175,9 @@ const DerivativeComponent = props => {
     }
     if (!selectedTokenValue || selectedTokenValue == 0) {
       return 'Invalid Trade Volume'
+    }
+    if(symbolMargin?.isZero() || symbolMargin?.sub(symbolMarginUsed)?.lt(selectedTokenAmount)) {
+      return 'Lack of Margin'
     }
     if (isApproving) {
       return `Approving ${selectedToken.symbol}...`;
@@ -194,6 +204,9 @@ const DerivativeComponent = props => {
   const onClickPrimary = () => {
     if (!account) {
       connectWalletByLocalStorage()
+      return
+    }
+    if(symbolMargin?.isZero() || symbolMargin?.sub(symbolMarginUsed)?.lt(selectedTokenAmount)) {
       return
     }
     if (mode == 'Buy') {
@@ -373,7 +386,7 @@ const DerivativeComponent = props => {
               <ComponentButton
                 style={{ margin: '25px 0 0 0', width: '100%' }}
                 onClick={onClickPrimary}
-                disabled={account && (!selectedTokenValue || selectedTokenValue == 0)}
+                disabled={account && (!selectedTokenValue || selectedTokenValue == 0) && symbolMargin?.isZero() || symbolMargin?.sub(symbolMarginUsed)?.lt(selectedTokenAmount)}
               >
                 {getPrimaryText()}
               </ComponentButton>
@@ -389,6 +402,8 @@ const DerivativeComponent = props => {
               token={marginToken}
               setToken={setMarginToken}
               symbol={symbol}
+              symbolMargin={symbolMargin}
+              symbolMarginUsed={symbolMarginUsed}
             />
           </>
         }
