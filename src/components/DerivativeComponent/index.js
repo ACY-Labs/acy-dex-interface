@@ -145,8 +145,6 @@ const DerivativeComponent = props => {
   const [selectedTokenValue, setSelectedTokenValue] = useState("0")
   const [selectedTokenAmount, setSelectedTokenAmount] = useState(parseValue(selectedTokenValue, selectedToken && selectedToken.decimals))
   const [usdValue, setUsdValue] = useState(0)
-  const [isApproving, setIsApproving] = useState(false)
-  const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
   const [showDescription, setShowDescription] = useState(false)
   const [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
   const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
@@ -177,7 +175,6 @@ const DerivativeComponent = props => {
 
   useEffect(() => {
     setShowDescription(false)
-    setMarginToken(tokens[1])
   }, [tokens])
 
   useEffect(() => {
@@ -386,8 +383,6 @@ const DerivativeComponent = props => {
               chainId={chainId}
               tokens={tokens}
               active={active}
-              token={marginToken}
-              setToken={setMarginToken}
               symbol={symbol}
             />
           </>

@@ -181,33 +181,40 @@ const WalletLogin = props => {
             },
         },
         {
-            name: 'Nabox Wallet',
-            icon: 'Nabox',
+            name: 'AcyWallet',
+            icon: 'AcyWallet',
             onClick: () => {
-                selectWallet('nabox');
-            },
-        },
-        {
-            name: 'Bitkeep Wallet',
-            icon: 'Bitkeep',
-            onClick: () => {
-                selectWallet('bitkeep');
-            },
-        },
-        {
-            name: 'WalletConnect',
-            icon: 'WalletConnect',
-            onClick: () => {
-                selectWallet('walletconnect');
-            },
-        },
-        {
-            name: 'TrustWallet',
-            icon: 'TrustWallet',
-            onClick: () => {
-                selectWallet('walletconnect');
-            },
-        },
+                selectWallet('acywallet')
+            }
+        }
+        // {
+        //     name: 'Nabox Wallet',
+        //     icon: 'Nabox',
+        //     onClick: () => {
+        //         selectWallet('nabox');
+        //     },
+        // },
+        // {
+        //     name: 'Bitkeep Wallet',
+        //     icon: 'Bitkeep',
+        //     onClick: () => {
+        //         selectWallet('bitkeep');
+        //     },
+        // },
+        // {
+        //     name: 'WalletConnect',
+        //     icon: 'WalletConnect',
+        //     onClick: () => {
+        //         selectWallet('walletconnect');
+        //     },
+        // },
+        // {
+        //     name: 'TrustWallet',
+        //     icon: 'TrustWallet',
+        //     onClick: () => {
+        //         selectWallet('walletconnect');
+        //     },
+        // },
 
     ]
     const walletList = [
@@ -524,6 +531,8 @@ const WalletLogin = props => {
                                                     return (
                                                         <AcyCardList.Thin className={styles.networkListLayout} onClick={() => item.onClick()}>
                                                             {(item.svgicon && <Opera width={32} style={{ margin: '5px' }} />) || (
+                                                                item.icon == "AcyWallet" ?
+                                                                <AcyIcon width={32} name="acy" style={{marginRight: '5px'}}/> :
                                                                 <AcyIcon.MyIcon width={32} type={item.icon} />
                                                             )}
                                                             <span className={styles.fontBold}>{item.name}</span>
