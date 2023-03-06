@@ -24,7 +24,7 @@ const Future = props => {
   const [mode, setMode] = useState('Buy')
   const [symbol, setSymbol] = useState('BTCUSD')
 
-  // const [activeToken, setActiveToken] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
+  const [activeToken, setActiveToken] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
 
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
@@ -82,7 +82,7 @@ const Future = props => {
     updateSymbolsInfo]
   )
   const [activeSymbol, setActiveSymbol] = useState("BTC")
-  const [activeToken, setActiveToken] = useState("BTC");
+  // const [activeToken, setActiveToken] = useState("BTC");
 
   const selectTab = item => {
     setActiveToken((tokens.filter(ele => ele.symbol == item)[0]))
@@ -117,9 +117,9 @@ const Future = props => {
             {/* <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onClickCoin} coinList={coinList} /> */}
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               <ExchangeTVChart
-                chartTokenSymbol={activeToken}
+                chartTokenSymbol={activeToken.symbol}
                 pageName="Futures"
-                fromToken={activeToken}
+                fromToken={activeToken.symbol}
                 toToken="USDT"
                 chainId={chainId}
                 onChangePrice={onChangePrice}
@@ -137,6 +137,7 @@ const Future = props => {
               tokens={tokens}
               selectedToken={activeToken}
               symbol={symbol}
+              pageName="Future"
             />
           </AcyCard>
         </div>

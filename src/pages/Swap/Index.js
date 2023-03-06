@@ -42,6 +42,7 @@ const Swap = props => {
   const [transactionList, setTransactionList] = useState([]);
   const [tableContent, setTableContent] = useState('Trade History');
   const [tradeHistory, setTradeHistory] = useState([])
+  const [showChart, setShowChart] = useState(true)
 
   // useSWR hook example - needs further implementation in backend
   // const txListUrl = `${apiUrlPrefix}/txlist/all?`
@@ -188,30 +189,24 @@ const Swap = props => {
   const test_poolsActivity = [
     {
       type: 'remove',
-      fromSymbol: 'BONE',
-      fromAmount: '22.11',
-      toSymbol: 'ETH',
-      toAmount: '0.0125323',
+      token: 'BONE',
+      tokenAmount: '22.11',
+      poolAmount: '0.0125323',
       token_value: '$21.49',
-      ago: '4min',
     },
     {
       type: 'add',
-      fromSymbol: 'USDC',
-      fromAmount: '99.99',
-      toSymbol: 'ETH',
-      toAmount: '0.0046699',
+      token: 'USDC',
+      tokenAmount: '99.99',
+      poolAmount: '0.0046699',
       token_value: '$8',
-      ago: '5min',
     },
     {
       type: 'add',
-      fromSymbol: 'SYN',
-      fromAmount: '4.427',
-      toSymbol: 'ETH',
-      toAmount: '3.7',
+      token: 'SYN',
+      tokenAmount: '4.427',
+      poolAmount: '3.7',
       token_value: '$6346',
-      ago: '6min',
     },
   ]
 
@@ -250,6 +245,8 @@ const Swap = props => {
                 latestPrice={1}
                 latestPricePercentage={1}
               // coinList={coinList}
+                showChart={showChart}
+                setShowChart={()=>setShowChart(!showChart)}
               />
               {/* </div> */}
 
@@ -257,7 +254,7 @@ const Swap = props => {
                 {graphType == "Routes" ?
                   // <SankeyGraph />
                   <></>
-                  :
+                  : showChart && 
                   <div>
                     <ExchangeTVChart
                       chartTokenSymbol={activeToken1.symbol}
@@ -293,7 +290,7 @@ const Swap = props => {
                         token1={activeToken0.address < activeToken1.address ? activeToken1.symbol : activeToken0.symbol} />
                     )}
                     {tableContent == 'Pools Activity' && (
-                      <PoolsActivityTable dataSource={test_poolsActivity} />
+                      <PoolsActivityTable dataSource={test_poolsActivity} pool="ETH"/>
                     )}
                   </div>
                 </div>

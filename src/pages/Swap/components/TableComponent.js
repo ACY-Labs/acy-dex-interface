@@ -24,8 +24,9 @@ export function TradeHistoryTable(props) {
         key: 'date',
         className: 'leftAlignTableHeader',
         render: (text, entry) => {
+          let date = Date(entry.timestamp)
           return (
-            <div className={styles.tableHeader}>{Date(entry.timestamp)}</div>
+            <div className={styles.tableHeader}>{date.split(' GMT')[0].substring(3)}</div>
           );
         },
         visible: true,
@@ -57,7 +58,7 @@ export function TradeHistoryTable(props) {
             className={styles.tableHeader}
             onClick={() => { setCurrentKey('exchange') }}
           >
-            Exchange Rate
+            Rate
           </div>
         ),
         dataIndex: 'exchange',
@@ -191,41 +192,45 @@ export function PoolsActivityTable(props) {
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
 
-  function columnsCoin() {
+  function columnsCoin(pool) {
     return [
       {
-        key: 'index',
-        width: '6rem',
+        title: (
+          <div
+            className={styles.tableHeaderFirst}
+            onClick={() => { setCurrentKey('date') }}
+          >
+            Date
+          </div>
+        ),
+        dataIndex: 'date',
+        key: 'date',
+        className: 'leftAlignTableHeader',
         render: (text, entry) => {
-          if (entry.type == 'add') {
-            return <svg xmlns="http://www.w3.org/2000/svg" style={{ height: '24px' }} fill="green" viewBox="0 0 50 50"><path d="M22.5 38V25.5H10v-3h12.5V10h3v12.5H38v3H25.5V38Z"/></svg>;
-          } else {
-            return <svg xmlns="http://www.w3.org/2000/svg" style={{ height: '24px' }} fill="red" viewBox="0 0 50 50"><path d="M10 25.5v-3h28v3Z"/></svg>;
-          }
+          let date = Date(entry.timestamp)
+          return (
+            <div className={styles.tableHeader}>{date.split(' GMT')[0].substring(3)}</div>
+          );
         },
         visible: true,
       },
       {
         title: (
           <div
-            className={styles.tableHeaderFirst}
-            onClick={() => { setCurrentKey('token_amount') }}
+            className={styles.tableHeader}
+            onClick={() => { setCurrentKey('type') }}
           >
-            Token Amount
+            Type
           </div>
         ),
-        dataIndex: 'token_amount',
-        key: 'token_amount',
-        className: 'leftAlignTableHeader',
+        dataIndex: 'type',
+        key: 'type',
         render: (text, entry) => {
-          return (
-            <div className={styles.tableHeader}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span>{entry.fromAmount} {entry.fromSymbol}</span>
-                <span>{entry.toAmount} {entry.toSymbol}</span>
-              </div>
-            </div>
-          );
+          if (entry.type == 'remove') {
+            return <div className={styles.tableData} style={{ color: 'red' }}>{entry.type}</div>;
+          } else {
+            return <div className={styles.tableData} style={{ color: 'green' }}>{entry.type}</div>;
+          }
         },
         visible: true,
       },
@@ -241,23 +246,53 @@ export function PoolsActivityTable(props) {
         dataIndex: 'token_value',
         key: 'token_value',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.token_value}</div>;
+          return <div className={styles.tableData}>{entry.token_value} {entry.token}</div>;
         },
         visible: true,
       },
       {
         title: (
           <div
-            className={styles.tableHeader}
-            onClick={() => { setCurrentKey('ago') }}
+            className={styles.tableHeaderFirst}
+            onClick={() => { setCurrentKey('amount1') }}
           >
-            Ago
+            Token Amount
           </div>
         ),
-        dataIndex: 'ago',
-        key: 'ago',
+        dataIndex: 'amount0',
+        key: 'amount0',
+        className: 'leftAlignTableHeader',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.ago}</div>;
+          return (
+            <div className={styles.tableHeader}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span>{entry.tokenAmount} {entry.token}</span>
+              </div>
+            </div>
+          );
+        },
+        visible: true,
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeaderFirst}
+            onClick={() => { setCurrentKey('amount1') }}
+          >
+            {pool} Amount
+          </div>
+        ),
+        dataIndex: 'amount1',
+        key: 'amount1',
+        className: 'leftAlignTableHeader',
+        render: (text, entry) => {
+          return (
+            <div className={styles.tableHeader}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span>{entry.poolAmount}</span>
+              </div>
+            </div>
+          );
         },
         visible: true,
       },
@@ -268,7 +303,7 @@ export function PoolsActivityTable(props) {
     <div className={styles.nobgTable}>
       <Table
         dataSource={props.dataSource}
-        columns={columnsCoin().filter(item => item.visible == true)}
+        columns={columnsCoin(props.pool).filter(item => item.visible == true)}
         pagination={false}
         style={{
           marginBottom: '20px',
