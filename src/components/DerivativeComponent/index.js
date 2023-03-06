@@ -169,9 +169,6 @@ const DerivativeComponent = props => {
     if (!selectedTokenValue || selectedTokenValue == 0) {
       return 'Invalid Trade Volume'
     }
-    if (isApproving) {
-      return `Approving ${selectedToken.symbol}...`;
-    }
     return mode == 'Buy' ? 'Buy / Long' : 'Sell / Short'
   }
 
