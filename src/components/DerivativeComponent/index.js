@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Input, Button, Slider } from 'antd';
 import useSWR from 'swr'
 import { ethers } from 'ethers';
 import { INITIAL_ALLOWED_SLIPPAGE, getTokens, getContract } from '@/constants/future_option_power.js';
 import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from '@/components/ConnectWallet';
-import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, bigNumberify, formatAmount } from '@/acy-dex-futures/utils';
+import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, bigNumberify, formatAmount, getOracleSignature } from '@/acy-dex-futures/utils';
 import { AcyDescriptions } from '../Acy';
 import ComponentCard from '../ComponentCard';
 import ComponentButton from '../ComponentButton';
@@ -105,6 +105,8 @@ const DerivativeComponent = props => {
     pageName,
   } = props
 
+  const isOptionPower = useMemo(() => pageName == "Option" || pageName == "Power", [pageName])
+
   const connectWalletByLocalStorage = useConnectWallet()
   const { account, active, library } = useWeb3React()
 
@@ -188,15 +190,22 @@ const DerivativeComponent = props => {
 
   ///////////// write contract /////////////
 
-  const onClickPrimary = () => {
+  const onClickPrimary = async() => {
     if (!account) {
       connectWalletByLocalStorage()
       return
     }
+
+    let oracleSignature = []
+    if (isOptionPower){
+      oracleSignature = await getOracleSignature()
+      // console.log("oracleSignature",oracleSignature)s
+    }
+
     if (mode == 'Buy') {
-      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount, symbolMarkPrice?.mul(bigNumberify(10000 + slippageTolerance * 100)).div(bigNumberify(10000)))
+      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount, symbolMarkPrice?.mul(bigNumberify(10000 + slippageTolerance * 100)).div(bigNumberify(10000)),oracleSignature)
     } else {
-      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount.mul(bigNumberify(-1)), symbolMarkPrice?.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000)))
+      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount.mul(bigNumberify(-1)), symbolMarkPrice?.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000)),oracleSignature)
     }
   }
 

@@ -21,6 +21,7 @@ import { MINT_FEE_BASIS_POINTS } from './_Helpers';
 import { useGraph } from '@/pages/Stats/Perpetual/dataProvider';
 import { sortBy} from 'lodash'
 import { TOKEN_LIST } from '@/constants';
+import axios from 'axios';
 export const MARKET = 'Market';
 export const LIMIT = 'Limit';
 export const LONG = 'Long';
@@ -2131,4 +2132,17 @@ export function formatNumber(number){
     result = "-"+result
   }
   return result
+}
+
+export async function getOracleSignature(){
+  let signatures = await axios.get('https://options.acy.finance/api/oracle-signatures?unsigned=false')
+  .then(function (response) {
+    return response.data
+  })
+  .catch(function (error) {
+    console.log(error);
+    return {}
+  });
+  console.log("signatures",signatures)
+  return signatures
 }

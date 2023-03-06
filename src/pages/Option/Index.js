@@ -322,7 +322,8 @@ const Option = props => {
               chainId={chainId}
               tokens={tokens}
               selectedToken={activeToken}
-              symbol={activeSymbol}
+              symbol={symbol}
+              isOptionPower={true}
             />
           </AcyCard>
         </div>
