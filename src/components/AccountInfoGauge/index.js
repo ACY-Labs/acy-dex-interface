@@ -76,14 +76,14 @@ const AccountInfoGauge = props => {
 
       {isConfirming &&
         <DepositWithdrawModal
-        chainId={chainId}
-        library={library}
-        account={account}
-        active={active}
-        tokens={tokens}
-        symbol={symbol}
-        setIsConfirming={setIsConfirming}
-        mode={mode}
+          chainId={chainId}
+          library={library}
+          account={account}
+          active={active}
+          tokens={tokens}
+          symbol={symbol}
+          setIsConfirming={setIsConfirming}
+          mode={mode}
         />
       }
 

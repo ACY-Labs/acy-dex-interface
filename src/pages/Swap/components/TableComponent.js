@@ -9,7 +9,7 @@ export function TradeHistoryTable(props) {
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
 
-  function columnsCoin() {
+  function columnsCoin(token0, token1) {
     return [
       {
         title: (
@@ -24,8 +24,9 @@ export function TradeHistoryTable(props) {
         key: 'date',
         className: 'leftAlignTableHeader',
         render: (text, entry) => {
+          let date = Date(entry.timestamp)
           return (
-            <div className={styles.tableHeader}>{entry.date}</div>
+            <div className={styles.tableHeader}>{date.split(' GMT')[0].substring(3)}</div>
           );
         },
         visible: true,
@@ -42,10 +43,11 @@ export function TradeHistoryTable(props) {
         dataIndex: 'type',
         key: 'type',
         render: (text, entry) => {
-          if (entry.type == 'sell') {
-            return <div className={styles.tableData} style={{ color: 'red' }}>{entry.type}</div>;
+          let type = entry.amount0 < 0 ? 'buy' : 'sell'
+          if (type == 'sell') {
+            return <div className={styles.tableData} style={{ color: 'red' }}>{type}</div>;
           } else {
-            return <div className={styles.tableData} style={{ color: 'green' }}>{entry.type}</div>;
+            return <div className={styles.tableData} style={{ color: 'green' }}>{type}</div>;
           }
         },
         visible: true,
@@ -54,15 +56,15 @@ export function TradeHistoryTable(props) {
         title: (
           <div
             className={styles.tableHeader}
-            onClick={() => { setCurrentKey('price') }}
+            onClick={() => { setCurrentKey('exchange') }}
           >
-            Price USD
+            Rate
           </div>
         ),
-        dataIndex: 'price',
-        key: 'price',
+        dataIndex: 'exchange',
+        key: 'exchange',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.price}</div>;
+          return <div className={styles.tableData}>{parseFloat(entry.exchangeRate).toFixed(2)}%</div>;
         },
         visible: true,
       },
@@ -70,15 +72,15 @@ export function TradeHistoryTable(props) {
         title: (
           <div
             className={styles.tableHeader}
-            onClick={() => { setCurrentKey('price_bnb') }}
+            onClick={() => { setCurrentKey('price0') }}
           >
-            Price BNB
+            Price {token0}
           </div>
         ),
-        dataIndex: 'price_bnb',
-        key: 'price_bnb',
+        dataIndex: 'price0',
+        key: 'price0',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.price_bnb}</div>;
+          return <div className={styles.tableData}>${parseFloat(entry.token0Price).toFixed(2)}</div>;
         },
         visible: true,
       },
@@ -86,15 +88,15 @@ export function TradeHistoryTable(props) {
         title: (
           <div
             className={styles.tableHeader}
-            onClick={() => { setCurrentKey('amount_mine') }}
+            onClick={() => { setCurrentKey('price1') }}
           >
-            Amount MINE
+            Price {token1}
           </div>
         ),
-        dataIndex: 'amount_mine',
-        key: 'amount_mine',
+        dataIndex: 'price1',
+        key: 'price1',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.amount_mine}</div>;
+          return <div className={styles.tableData}>${parseFloat(entry.token1Price).toFixed(2)}</div>;
         },
         visible: true,
       },
@@ -102,15 +104,31 @@ export function TradeHistoryTable(props) {
         title: (
           <div
             className={styles.tableHeader}
-            onClick={() => { setCurrentKey('total_bnb') }}
+            onClick={() => { setCurrentKey('amount0') }}
           >
-            Total BNB
+            Amount {token0}
           </div>
         ),
-        dataIndex: 'total_bnb',
-        key: 'total_bnb',
+        dataIndex: 'amount0',
+        key: 'amount0',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.total_bnb}</div>;
+          return <div className={styles.tableData}>{parseFloat(entry.amount0).toFixed(2)}</div>;
+        },
+        visible: true,
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeader}
+            onClick={() => { setCurrentKey('amount1') }}
+          >
+            Amount {token1}
+          </div>
+        ),
+        dataIndex: 'amount1',
+        key: 'amount1',
+        render: (text, entry) => {
+          return <div className={styles.tableData}>{parseFloat(entry.amount1).toFixed(2)}</div>;
         },
         visible: true,
       },
@@ -126,30 +144,30 @@ export function TradeHistoryTable(props) {
         dataIndex: 'maker',
         key: 'maker',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.maker.slice(0,4)}...{entry.maker.slice(entry.maker.length-4,entry.maker.length)}</div>;
+          return <div className={styles.tableData}>{entry.transaction.id.slice(0,4)}...{entry.transaction.id.slice(entry.transaction.id.length-4,entry.transaction.id.length)}</div>;
         },
         visible: true,
       },
-      {
-        title: (
-          <div
-            className={styles.tableHeader}
-            onClick={() => { setCurrentKey('clue') }}
-          >
-            Clue
-          </div>
-        ),
-        dataIndex: 'clue',
-        key: 'clue',
-        render: (text, entry) => {
-          return <div style={{display: 'flex'}}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill='#b5b6b6' viewBox="0 0 50 50" className={styles.function}><path d="M30.2 42v-6.25h-7.7v-20.5h-4.65v6.5H4V6h13.85v6.25H30.2V6H44v15.75H30.2v-6.5h-4.7v17.5h4.7v-6.5H44V42ZM7 9v9.75Zm26.2 20.25V39ZM33.2 9v9.75Zm0 9.75H41V9h-7.8Zm0 20.25H41v-9.75h-7.8ZM7 18.75h7.85V9H7Z"/></svg>
-            <svg xmlns="http://www.w3.org/2000/svg" fill='#b5b6b6' viewBox="0 0 50 50" className={styles.function}><path d="M9 39h20V29h10V9H9v30Zm0 3q-1.25 0-2.125-.875T6 39V9q0-1.25.875-2.125T9 6h30q1.25 0 2.125.875T42 9v21L30 42Zm6-15v-3h8.5v3Zm0-8v-3h18v3ZM9 39V9v30Z"/></svg>
-            <svg xmlns="http://www.w3.org/2000/svg" fill='#b5b6b6' viewBox="0 0 50 50" className={styles.function}><path d="M22 40q-.85 0-1.425-.575Q20 38.85 20 38V26L8.05 10.75q-.7-.85-.2-1.8Q8.35 8 9.4 8h29.2q1.05 0 1.55.95t-.2 1.8L28 26v12q0 .85-.575 1.425Q26.85 40 26 40Zm2-13.8L36 11H12Zm0 0Z"/></svg>
-          </div>;
-        },
-        visible: true,
-      },
+      // {
+      //   title: (
+      //     <div
+      //       className={styles.tableHeader}
+      //       onClick={() => { setCurrentKey('clue') }}
+      //     >
+      //       Clue
+      //     </div>
+      //   ),
+      //   dataIndex: 'clue',
+      //   key: 'clue',
+      //   render: (text, entry) => {
+      //     return <div style={{display: 'flex'}}>
+      //       <svg xmlns="http://www.w3.org/2000/svg" fill='#b5b6b6' viewBox="0 0 50 50" className={styles.function}><path d="M30.2 42v-6.25h-7.7v-20.5h-4.65v6.5H4V6h13.85v6.25H30.2V6H44v15.75H30.2v-6.5h-4.7v17.5h4.7v-6.5H44V42ZM7 9v9.75Zm26.2 20.25V39ZM33.2 9v9.75Zm0 9.75H41V9h-7.8Zm0 20.25H41v-9.75h-7.8ZM7 18.75h7.85V9H7Z"/></svg>
+      //       <svg xmlns="http://www.w3.org/2000/svg" fill='#b5b6b6' viewBox="0 0 50 50" className={styles.function}><path d="M9 39h20V29h10V9H9v30Zm0 3q-1.25 0-2.125-.875T6 39V9q0-1.25.875-2.125T9 6h30q1.25 0 2.125.875T42 9v21L30 42Zm6-15v-3h8.5v3Zm0-8v-3h18v3ZM9 39V9v30Z"/></svg>
+      //       <svg xmlns="http://www.w3.org/2000/svg" fill='#b5b6b6' viewBox="0 0 50 50" className={styles.function}><path d="M22 40q-.85 0-1.425-.575Q20 38.85 20 38V26L8.05 10.75q-.7-.85-.2-1.8Q8.35 8 9.4 8h29.2q1.05 0 1.55.95t-.2 1.8L28 26v12q0 .85-.575 1.425Q26.85 40 26 40Zm2-13.8L36 11H12Zm0 0Z"/></svg>
+      //     </div>;
+      //   },
+      //   visible: true,
+      // },
     ];
   }
 
@@ -157,7 +175,7 @@ export function TradeHistoryTable(props) {
     <div className={styles.nobgTable}>
       <Table
         dataSource={props.dataSource}
-        columns={columnsCoin().filter(item => item.visible == true)}
+        columns={columnsCoin(props.token0, props.token1).filter(item => item.visible == true)}
         pagination={false}
         style={{
           marginBottom: '20px',
@@ -174,41 +192,45 @@ export function PoolsActivityTable(props) {
   const [currentKey, setCurrentKey] = useState('');
   const [isHover, setIsHover] = useState(false);
 
-  function columnsCoin() {
+  function columnsCoin(pool) {
     return [
       {
-        key: 'index',
-        width: '6rem',
+        title: (
+          <div
+            className={styles.tableHeaderFirst}
+            onClick={() => { setCurrentKey('date') }}
+          >
+            Date
+          </div>
+        ),
+        dataIndex: 'date',
+        key: 'date',
+        className: 'leftAlignTableHeader',
         render: (text, entry) => {
-          if (entry.type == 'add') {
-            return <svg xmlns="http://www.w3.org/2000/svg" style={{ height: '24px' }} fill="green" viewBox="0 0 50 50"><path d="M22.5 38V25.5H10v-3h12.5V10h3v12.5H38v3H25.5V38Z"/></svg>;
-          } else {
-            return <svg xmlns="http://www.w3.org/2000/svg" style={{ height: '24px' }} fill="red" viewBox="0 0 50 50"><path d="M10 25.5v-3h28v3Z"/></svg>;
-          }
+          let date = Date(entry.timestamp)
+          return (
+            <div className={styles.tableHeader}>{date.split(' GMT')[0].substring(3)}</div>
+          );
         },
         visible: true,
       },
       {
         title: (
           <div
-            className={styles.tableHeaderFirst}
-            onClick={() => { setCurrentKey('token_amount') }}
+            className={styles.tableHeader}
+            onClick={() => { setCurrentKey('type') }}
           >
-            Token Amount
+            Type
           </div>
         ),
-        dataIndex: 'token_amount',
-        key: 'token_amount',
-        className: 'leftAlignTableHeader',
+        dataIndex: 'type',
+        key: 'type',
         render: (text, entry) => {
-          return (
-            <div className={styles.tableHeader}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span>{entry.fromAmount} {entry.fromSymbol}</span>
-                <span>{entry.toAmount} {entry.toSymbol}</span>
-              </div>
-            </div>
-          );
+          if (entry.type == 'remove') {
+            return <div className={styles.tableData} style={{ color: 'red' }}>{entry.type}</div>;
+          } else {
+            return <div className={styles.tableData} style={{ color: 'green' }}>{entry.type}</div>;
+          }
         },
         visible: true,
       },
@@ -224,23 +246,53 @@ export function PoolsActivityTable(props) {
         dataIndex: 'token_value',
         key: 'token_value',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.token_value}</div>;
+          return <div className={styles.tableData}>{entry.token_value} {entry.token}</div>;
         },
         visible: true,
       },
       {
         title: (
           <div
-            className={styles.tableHeader}
-            onClick={() => { setCurrentKey('ago') }}
+            className={styles.tableHeaderFirst}
+            onClick={() => { setCurrentKey('amount1') }}
           >
-            Ago
+            Token Amount
           </div>
         ),
-        dataIndex: 'ago',
-        key: 'ago',
+        dataIndex: 'amount0',
+        key: 'amount0',
+        className: 'leftAlignTableHeader',
         render: (text, entry) => {
-          return <div className={styles.tableData}>{entry.ago}</div>;
+          return (
+            <div className={styles.tableHeader}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span>{entry.tokenAmount} {entry.token}</span>
+              </div>
+            </div>
+          );
+        },
+        visible: true,
+      },
+      {
+        title: (
+          <div
+            className={styles.tableHeaderFirst}
+            onClick={() => { setCurrentKey('amount1') }}
+          >
+            {pool} Amount
+          </div>
+        ),
+        dataIndex: 'amount1',
+        key: 'amount1',
+        className: 'leftAlignTableHeader',
+        render: (text, entry) => {
+          return (
+            <div className={styles.tableHeader}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span>{entry.poolAmount}</span>
+              </div>
+            </div>
+          );
         },
         visible: true,
       },
@@ -251,7 +303,7 @@ export function PoolsActivityTable(props) {
     <div className={styles.nobgTable}>
       <Table
         dataSource={props.dataSource}
-        columns={columnsCoin().filter(item => item.visible == true)}
+        columns={columnsCoin(props.pool).filter(item => item.visible == true)}
         pagination={false}
         style={{
           marginBottom: '20px',

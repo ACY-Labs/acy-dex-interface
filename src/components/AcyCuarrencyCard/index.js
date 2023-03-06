@@ -40,13 +40,13 @@ const AcyCuarrencyCard = ({
     console.log("B",e.target.value)
   };
 
-  useEffect(()=>{
-    const timeoutId = setTimeout(()=>{
-      setTokenAmount && setTokenAmount(tokenDisplayAmount)
-      amountChanged && amountChanged(tokenDisplayAmount)
-    },1500)
-    return ()=>clearTimeout(timeoutId)
-  },[tokenDisplayAmount])
+  // useEffect(()=>{
+  //   const timeoutId = setTimeout(()=>{
+  //     setTokenAmount(tokenDisplayAmount)
+  //     amountChanged(tokenDisplayAmount)
+  //   },1500)
+  //   return ()=>clearTimeout(timeoutId)
+  // },[tokenDisplayAmount])
 
   useEffect(()=>{
     setTokenDisplayAmount(token)
@@ -101,7 +101,7 @@ const AcyCuarrencyCard = ({
           <button className={styles.switchcoin} onClick={onChoseToken} disabled={isLocked}>
             <span className={styles.wrap}>
               <div className={styles.coin}>
-                <img src={logoURI} style={{ width: '24px', marginRight: '0.5rem' }} />
+                {logoURI && <img src={logoURI} style={{ width: '24px', marginRight: '0.5rem' }} />}
                 <span style={{ margin: '0px 0.25rem' }}>{coin.symbol}</span>
               </div>
               {!isLocked && (

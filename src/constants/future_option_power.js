@@ -118,6 +118,10 @@ const tokenLists = {
       isStable: true
     },
   ],
+  137: [
+    {symbol: "USDT", address: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"},
+    {symbol: "USDC", address: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"},
+  ],
   80001: [
     {
       name: "MATIC",

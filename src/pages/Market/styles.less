@@ -15,7 +15,7 @@
 .chartGrid {
   color: #16182E;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   margin-top: 1rem;
 }
@@ -169,9 +169,15 @@ h4 {
   color: #919191;
 }
 
-.tableHeader,
+.tableHeader {
+  cursor: pointer;
+  color: white;
+}
+
 .tableHeaderFirst {
   cursor: pointer;
+  color: white;
+  font-weight: bold;
 }
 
 .tableHeader:hover,
@@ -420,12 +426,14 @@ h4 {
 
 .tableData {
   text-align: left;
+  color: white;
 }
 
 .tableDataFirstColumn {
   text-align: left;
   display: flex;
   align-items: center;
+  color: white;
 }
 
 .percentBadge {

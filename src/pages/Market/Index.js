@@ -1,295 +1,170 @@
 import React, { useState, useEffect } from 'react';
 import ConnectWallet from './ConnectWallet';
-import { useConstantLoader } from '@/constants';
-import { useConnectWallet } from '@/components/ConnectWallet';
+import axios from 'axios';
+import { useWeb3React } from '@web3-react/core';
+import { useChainId } from '@/utils/helpers';
 import { PairsTable, LivePairsTable, TopVolumeTable, TrendingTable } from './TableComponent';
-// import { CurrencyTable } from './UtilComponent.js';
-// import { Icon } from 'antd';
+import ComponentTabs from '@/components/ComponentTabs';
 
 import styles from './styles.less';
 
+const apiUrlPrefix = "https://stats.acy.finance/api"
+
 const MarketIndex = props => {
 
-  const { account, library, chainId } = useConstantLoader();
+  const { account, library } = useWeb3React()
+  const chainId = 137
   const [mode, setMode] = useState('Pairs')
+  const [topVolumePairs, setTopVolumePairs] = useState([])
+  const [winnersPairs, setWinnersPairs] = useState([])
+  const [losersPairs, setLosersPairs] = useState([])
+  const [newPairs, setNewPairs] = useState([])
+  const [marketType, setMarketType] = useState("Spots")
 
-  // connect to provider, listen for wallet to connect
-  const connectWalletByLocalStorage = useConnectWallet();
+  const marketTypes = ["Spots", "Futures", "Options", "Powers"]
+
+  const getPairList = async () => {
+    // fetch top volume pair list
+    let pairlist = await axios.get(`${apiUrlPrefix}/tokens-overview?chainId=${chainId}&orderBy=topvolume`).then(res => res.data).catch(e => { })
+    let pairs = []
+    for (let i = 0; i < pairlist.length; i++) {
+      pairs.push({
+        name: pairlist[i].token0.replace('Wrapped ', 'W').replace('(PoS)', '') + '/' + pairlist[i].token1.replace('Wrapped ', 'W').replace('(PoS)', ''),
+        address0: pairlist[i].token0Address,
+        address1: pairlist[i].token1Address,
+        price: (pairlist[i].token0Price / pairlist[i].token1Price).toPrecision(2),
+        price_24h: pairlist[i].priceVariation,
+        volume: parseFloat(pairlist[i].volumeUSD).toFixed(2),
+        swaps: pairlist[i].txCount,
+        liquidity: pairlist[i].liquidity,
+        exchange: pairlist[i].exchange,
+      })
+    }
+    setTopVolumePairs(pairs)
+
+    // fetch winners pair list
+    pairlist = await axios.get(`${apiUrlPrefix}/tokens-overview?chainId=${chainId}&orderBy=winners`).then(res => res.data)
+    pairs = []
+    for (let i = 0; i < pairlist.length; i++) {
+      pairs.push({
+        name: pairlist[i].token0.replace('Wrapped ', 'W').replace('(PoS)', '') + '/' + pairlist[i].token1.replace('Wrapped ', 'W').replace('(PoS)', ''),
+        address0: pairlist[i].token0Address,
+        address1: pairlist[i].token1Address,
+        exchange: pairlist[i].exchange,
+        price: (pairlist[i].token0Price / pairlist[i].token1Price).toPrecision(2),
+        price_24h: pairlist[i].priceVariation,
+        volume: parseFloat(pairlist[i].volumeUSD).toFixed(2),
+        swaps: pairlist[i].txCount,
+        liquidity: pairlist[i].liquidity,
+        fdv: 'undefined',
+      })
+    }
+    setWinnersPairs(pairs)
+
+    // fetch losers pair list
+    pairlist = await axios.get(`${apiUrlPrefix}/tokens-overview?chainId=${chainId}&orderBy=losers`).then(res => res.data)
+    pairs = []
+    for (let i = 0; i < pairlist.length; i++) {
+      pairs.push({
+        name: pairlist[i].token0.replace('Wrapped ', 'W').replace('(PoS)', '') + '/' + pairlist[i].token1.replace('Wrapped ', 'W').replace('(PoS)', ''),
+        address0: pairlist[i].token0Address,
+        address1: pairlist[i].token1Address,
+        exchange: pairlist[i].exchange,
+        price: (pairlist[i].token0Price / pairlist[i].token1Price).toPrecision(2),
+        price_24h: pairlist[i].priceVariation,
+        volume: parseFloat(pairlist[i].volumeUSD).toFixed(2),
+        swaps: pairlist[i].txCount,
+        liquidity: pairlist[i].liquidity,
+        fdv: 'undefined',
+      })
+    }
+    setLosersPairs(pairs)
+
+    // fetch new pairs list
+    pairlist = await axios.get(`${apiUrlPrefix}/new-pairs?chainId=${chainId}`).then(res => res.data)
+    pairs = []
+    for (let i = 0; i < pairlist.length; i++) {
+      pairs.push({
+        name: pairlist[i].token0.replace('Wrapped ', 'W').replace('(PoS)', '') + '/' + pairlist[i].token1.replace('Wrapped ', 'W').replace('(PoS)', ''),
+        address0: pairlist[i].token0Address,
+        address1: pairlist[i].token1Address,
+        exchange: pairlist[i].exchange,
+        price: pairlist[i].token1Price != "0" ? (pairlist[i].token0Price / pairlist[i].token1Price).toPrecision(2) : "-",
+        price_24h: pairlist[i].priceVariation,
+        volume: parseFloat(pairlist[i].volumeUSD).toFixed(2),
+        swaps: pairlist[i].txCount,
+        liquidity: pairlist[i].liquidity,
+        createdAt: pairlist[i].createdAtTimestamp,
+      })
+    }
+    setNewPairs(pairs)
+  }
 
   useEffect(() => {
-    if (!localStorage.getItem("market")) {
-      localStorage.setItem("market", 56);
-    }
-    if (!account) {
-      connectWalletByLocalStorage();
-    }
-  }, []);
-
-  const test_pairs = [
-    {
-      name: 'USDT/WBNB',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      exchange: 'Pancakeswap v2',
-      price: '$315.31',
-      price_24h: '-0.56%',
-      price_7d: '-0.56%',
-      price_30d: '-0.56%',
-      volume: '$31.66M',
-      swaps: '70.15K',
-      liquidity: '167.55M',
-      fdv: '$1223.66B'
-    },
-    {
-      name: 'USDC/OP',
-      logoURI: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389',
-      exchange: 'Velodrome',
-      price: '$1.9125',
-      price_24h: '-2.76%',
-      price_7d: '-2.76%',
-      price_30d: '-2.76%',
-      volume: '$18.89M',
-      swaps: '69.30K',
-      liquidity: '-',
-      fdv: '$8.20B'
-    },
-    {
-      name: 'BUSD/WBNB',
-      logoURI: 'https://assets.coingecko.com/coins/images/9576/large/BUSD.png?1568947766',
-      exchange: 'Pancakeswap v2',
-      price: '$314.76',
-      price_24h: '-0.77%',
-      price_7d: '-0.77%',
-      price_30d: '-0.77%',
-      volume: '$31.50M',
-      swaps: '55.37K',
-      liquidity: '179.72M',
-      fdv: '$1527.01B'
-    },
-    {
-      name: 'USDT/WBNB',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      exchange: 'Pancakeswap v2',
-      price: '$315.31',
-      price_24h: '-0.56%',
-      price_7d: '-0.56%',
-      price_30d: '-0.56%',
-      volume: '$31.66M',
-      swaps: '70.15K',
-      liquidity: '167.55M',
-      fdv: '$1223.66B'
-    },
-    {
-      name: 'USDC/OP',
-      logoURI: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389',
-      exchange: 'Velodrome',
-      price: '$1.9125',
-      price_24h: '-2.76%',
-      price_7d: '-2.76%',
-      price_30d: '-2.76%',
-      volume: '$18.89M',
-      swaps: '69.30K',
-      liquidity: '-',
-      fdv: '$8.20B'
-    },
-    {
-      name: 'BUSD/WBNB',
-      logoURI: 'https://assets.coingecko.com/coins/images/9576/large/BUSD.png?1568947766',
-      exchange: 'Pancakeswap v2',
-      price: '$314.76',
-      price_24h: '-0.77%',
-      price_7d: '-0.77%',
-      price_30d: '-0.77%',
-      volume: '$31.50M',
-      swaps: '55.37K',
-      liquidity: '179.72M',
-      fdv: '$1527.01B'
-    },
-    {
-      name: 'USDT/WBNB',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      exchange: 'Pancakeswap v2',
-      price: '$315.31',
-      price_24h: '-0.56%',
-      price_7d: '-0.56%',
-      price_30d: '-0.56%',
-      volume: '$31.66M',
-      swaps: '70.15K',
-      liquidity: '167.55M',
-      fdv: '$1223.66B'
-    },
-    {
-      name: 'USDC/OP',
-      logoURI: 'https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389',
-      exchange: 'Velodrome',
-      price: '$1.9125',
-      price_24h: '-2.76%',
-      price_7d: '-2.76%',
-      price_30d: '-2.76%',
-      volume: '$18.89M',
-      swaps: '69.30K',
-      liquidity: '-',
-      fdv: '$8.20B'
-    },
-    {
-      name: 'BUSD/WBNB',
-      logoURI: 'https://assets.coingecko.com/coins/images/9576/large/BUSD.png?1568947766',
-      exchange: 'Pancakeswap v2',
-      price: '$314.76',
-      price_24h: '-0.77%',
-      price_7d: '-0.77%',
-      price_30d: '-0.77%',
-      volume: '$31.50M',
-      swaps: '55.37K',
-      liquidity: '179.72M',
-      fdv: '$1527.01B'
-    },
-  ]
-
-  const test_livepairs = [
-    {
-      name: 'USDC/PANKY',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '32s',
-      price: '-',
-      volume: '-',
-      initial_liquidity: '-',
-      total_liquidity: '-',
-      pool_amount: '-',
-      pool_variation: '0%',
-      pool_remaining: '-',
-    },
-    {
-      name: 'WETH/ROWA',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '2m 40s',
-      price: '$0.00002431',
-      volume: '-',
-      initial_liquidity: '2022-08-06',
-      total_liquidity: '$5310.16',
-      pool_amount: '1.55 ETH',
-      pool_variation: '0.06%',
-      pool_remaining: '1.6236 ETH',
-    },
-    {
-      name: 'WETH/OYA',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '10m 30s',
-      price: '$0.00004183',
-      volume: '-',
-      initial_liquidity: '2022-08-06',
-      total_liquidity: '$5914.87',
-      pool_amount: '1.5 ETH',
-      pool_variation: '15.13%',
-      pool_remaining: '1.72683 ETH',
-    },
-    {
-      name: 'USDC/PANKY',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '32s',
-      price: '-',
-      volume: '-',
-      initial_liquidity: '-',
-      total_liquidity: '-',
-      pool_amount: '-',
-      pool_variation: '0%',
-      pool_remaining: '-',
-    },
-    {
-      name: 'WETH/ROWA',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '2m 40s',
-      price: '$0.00002431',
-      volume: '-',
-      initial_liquidity: '2022-08-06',
-      total_liquidity: '$5310.16',
-      pool_amount: '1.55 ETH',
-      pool_variation: '0.06%',
-      pool_remaining: '1.6236 ETH',
-    },
-    {
-      name: 'WETH/OYA',
-      logoURI: 'https://assets.coingecko.com/coins/images/325/large/Tether-logo.png?1598003707',
-      listed_since: '10m 30s',
-      price: '$0.00004183',
-      volume: '-',
-      initial_liquidity: '2022-08-06',
-      total_liquidity: '$5914.87',
-      pool_amount: '1.5 ETH',
-      pool_variation: '15.13%',
-      pool_remaining: '1.72683 ETH',
-    },
-  ]
+    getPairList()
+  }, [])
 
   return (
-    <div className={styles.marketRoot}>
-      <ConnectWallet />
-
-      {/* New Pairs */}
-      <div className={styles.topChart}>
-        <div className={styles.chartCell}>
-          <div className={styles.statsContainer}>
-            <div className={styles.statstitle}>
-              New Pairs
-              <span className={styles.seeMore} onClick={() => { setMode('NewPairs') }}>
-                More >
-              </span>
-            </div>
-            {/* <div className={styles.statsdivider} /> */}
-
-            <LivePairsTable dataSource={test_livepairs.slice(0, 5)} />
-
-          </div>
-        </div>
+    <div>
+      <div style={{ paddingRight: '60%', border: '0.75px solid #333333' }}>
+        <ComponentTabs
+          option={marketType}
+          options={marketTypes}
+          onChange={item => { setMarketType(item) }}
+        />
       </div>
 
-      <div className={styles.chartGrid}>
+      {marketType == "Spots" &&
+        <div className={styles.marketRoot}>
+          <ConnectWallet />
 
-        {/* Top Volume */}
-        <div className={styles.chartCell}>
-          <div className={styles.statsContainer}>
-            <div className={styles.statstitle}>
-              Top Volume
-              <span className={styles.seeMore} onClick={() => { setMode('TopVolume') }}>
+          {/* New Pairs */}
+          <div className={styles.topChart}>
+            <div className={styles.chartCell}>
+              <div className={styles.statsContainer}>
+                <div className={styles.statstitle}>
+                  New Pairs
+                  <span className={styles.seeMore} onClick={() => { setMode('NewPairs') }}>
                 More >
-              </span>
+                  </span>
+                </div>
+                <div className={styles.statsdivider} />
+
+                <LivePairsTable dataSource={newPairs.slice(0, 5)} />
+
+              </div>
             </div>
-
-            {/* <div className={styles.statsdivider} /> */}
-
-            <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                <div className={styles.label}>1. ETH</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>2. USDC</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>3. USDT</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>4. USDT</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>5. USDT</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-            </div>
-
           </div>
-        </div>
+
+          <div className={styles.chartGrid}>
+
+            {/* Top Volume */}
+            <div className={styles.chartCell}>
+              <div className={styles.statsContainer}>
+                <div className={styles.statstitle}>
+                  Top Volume
+                  <span className={styles.seeMore} onClick={() => { setMode('TopVolume') }}>
+                More >
+                  </span>
+                </div>
+
+                {/* <div className={styles.statsdivider} /> */}
+
+                <div className={styles.statscontent}>
+                  {topVolumePairs.slice(0, 5).map((pair, idx) => pair ? (
+                    <div className={styles.statsRow}>
+                      <div className={styles.label}>{idx + 1}. {pair.name}</div>
+                      <div className={styles.value}>{pair.volume}</div>
+                    </div>) : null
+                  )}
+                </div>
+
+              </div>
+            </div>
 
         {/* Trending */}
-        <div className={styles.chartCell}>
-          <div className={styles.statsContainer}>
+        {/* <div className={styles.chartCell}>
+\          <div className={styles.statsContainer}>
             <div className={styles.statstitle}>
               Trending
               <span className={styles.seeMore} onClick={() => { setMode('Trending') }}>
@@ -297,191 +172,128 @@ const MarketIndex = props => {
               </span>
             </div>
 
-            {/* <div className={styles.statsdivider} /> */}
-
             <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                <div className={styles.label}>1. MARSRICE BSC</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>2. OHM</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>3. DRX ARBI</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>4. DRX ARBI</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>5. DRX ARBI</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
+              {trendingPairs.slice(0, 5).map((pair, idx) => pair ? (
+                <div className={styles.statsRow}>
+                  <div className={styles.label}>{idx+1}. {pair.name}</div>
+                  <div className={styles.value}>{(pair.price_24h*100).toPrecision(2)}%</div>
+                </div>) : null
+              )}
             </div>
 
           </div>
-        </div>
+        </div> */}
 
-        {/* Winners */}
-        <div className={styles.chartCell}>
-          <div className={styles.statsContainer}>
-            <div className={styles.statstitle}>
-              Winners
-              <span className={styles.seeMore} onClick={() => { setMode('Winners') }}>
+            {/* Winners */}
+            <div className={styles.chartCell}>
+              <div className={styles.statsContainer}>
+                <div className={styles.statstitle}>
+                  Winners
+                  <span className={styles.seeMore} onClick={() => { setMode('Winners') }}>
                 More >
-              </span>
-            </div>
+                  </span>
+                </div>
 
-            {/* <div className={styles.statsdivider} /> */}
+                {/* <div className={styles.statsdivider} /> */}
 
-            <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                <div className={styles.label}>1. WETH/</div>
-                <div className={styles.value}>XXX</div>
-              </div>
+                <div className={styles.statscontent}>
+                  {winnersPairs.slice(0, 5).map((pair, idx) => pair ? (
+                    <div className={styles.statsRow}>
+                      <div className={styles.label}>{idx + 1}. {pair.name}</div>
+                      <div className={styles.value}>{(pair.price_24h * 100).toPrecision(2)}%</div>
+                    </div>) : null
+                  )}
+                </div>
 
-              <div className={styles.statsRow}>
-                <div className={styles.label}>2. WETH/CHIRP</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>3. WETH/XNOM</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>4. WETH/XNOM</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>5. WETH/XNOM</div>
-                <div className={styles.value}>XXX</div>
               </div>
             </div>
 
-          </div>
-        </div>
-
-        {/* Losers */}
-        <div className={styles.chartCell}>
-          <div className={styles.statsContainer}>
-            <div className={styles.statstitle}>
-              Losers
-              <span className={styles.seeMore} onClick={() => { setMode('Losers') }}>
+            {/* Losers */}
+            <div className={styles.chartCell}>
+              <div className={styles.statsContainer}>
+                <div className={styles.statstitle}>
+                  Losers
+                  <span className={styles.seeMore} onClick={() => { setMode('Losers') }}>
                 More >
-              </span>
-            </div>
+                  </span>
+                </div>
 
-            {/* <div className={styles.statsdivider} /> */}
+                {/* <div className={styles.statsdivider} /> */}
 
-            <div className={styles.statscontent}>
-              <div className={styles.statsRow}>
-                <div className={styles.label}>1. BUSD/WNFTC</div>
-                <div className={styles.value}>XXX</div>
-              </div>
+                <div className={styles.statscontent}>
+                  {losersPairs.slice(0, 5).map((pair, idx) => pair ? (
+                    <div className={styles.statsRow}>
+                      <div className={styles.label}>{idx + 1}. {pair.name}</div>
+                      <div className={styles.value}>{(pair.price_24h * 100).toPrecision(2)}%</div>
+                    </div>) : null
+                  )}
+                </div>
 
-              <div className={styles.statsRow}>
-                <div className={styles.label}>2. USDT/CS</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>3. WBNB/MINE</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>4. WBNB/MINE</div>
-                <div className={styles.value}>XXX</div>
-              </div>
-
-              <div className={styles.statsRow}>
-                <div className={styles.label}>5. WBNB/MINE</div>
-                <div className={styles.value}>XXX</div>
               </div>
             </div>
 
           </div>
-        </div>
 
-      </div>
-
-      <div className={styles.tableToggleButtonContainer}>
-        <button
-          type="button"
-          className={styles.leftToggleButton}
-          style={{ backgroundColor: mode == 'Pairs' ? "#2e3032" : "transparent", color: mode == 'Pairs' ? "white" : "", border: '0.75px solid #333333' }}
-          onClick={() => { setMode('Pairs') }}
-        >
-          Pairs
-        </button>
-        <button
+          <div className={styles.tableToggleButtonContainer}>
+            <button
+              type="button"
+              className={styles.leftToggleButton}
+              style={{ backgroundColor: mode == 'Pairs' ? "#2e3032" : "transparent", color: mode == 'Pairs' ? "white" : "", border: '0.75px solid #333333' }}
+              onClick={() => { setMode('Pairs') }}
+            >
+              Pairs
+            </button>
+            {/* <button
           type="button"
           className={styles.middleToggleButton}
           style={{ backgroundColor: mode == 'NewPairs' ? "#2e3032" : "transparent", color: mode == 'LivePairs' ? "white" : "", border: '0.75px solid #333333' }}
           onClick={() => { setMode('NewPairs') }}
         >
           New Pairs
-        </button>
-        <button
-          type="button"
-          className={styles.middleToggleButton}
-          style={{ backgroundColor: mode == 'TopVolume' ? "#2e3032" : "transparent", color: mode == 'TopVolume' ? "white" : "", border: '0.75px solid #333333' }}
-          onClick={() => { setMode('TopVolume') }}
-        >
-          Top Volume
-        </button>
-        <button
+        </button> */}
+            <button
+              type="button"
+              className={styles.middleToggleButton}
+              style={{ backgroundColor: mode == 'TopVolume' ? "#2e3032" : "transparent", color: mode == 'TopVolume' ? "white" : "", border: '0.75px solid #333333' }}
+              onClick={() => { setMode('TopVolume') }}
+            >
+              Top Volume
+            </button>
+            {/* <button
           type="button"
           className={styles.middleToggleButton}
           style={{ backgroundColor: mode == 'Trending' ? "#2e3032" : "transparent", color: mode == 'Trending' ? "white" : "", border: '0.75px solid #333333' }}
           onClick={() => { setMode('Trending') }}
         >
           Trending
-        </button>
-        <button
-          type="button"
-          className={styles.middleToggleButton}
-          style={{ backgroundColor: mode == 'Winners' ? "#2e3032" : "transparent", color: mode == 'Winners' ? "white" : "", border: '0.75px solid #333333' }}
-          onClick={() => { setMode('Winners') }}
-        >
-          Winners
-        </button>
-        <button
-          type="button"
-          className={styles.rightToggleButton}
-          style={{ backgroundColor: mode == 'Losers' ? "#2e3032" : "transparent", color: mode == 'Losers' ? "white" : "", border: '0.75px solid #333333' }}
-          onClick={() => { setMode('Losers') }}
-        >
-          Losers
-        </button>
-      </div>
+        </button> */}
+            <button
+              type="button"
+              className={styles.middleToggleButton}
+              style={{ backgroundColor: mode == 'Winners' ? "#2e3032" : "transparent", color: mode == 'Winners' ? "white" : "", border: '0.75px solid #333333' }}
+              onClick={() => { setMode('Winners') }}
+            >
+              Winners
+            </button>
+            <button
+              type="button"
+              className={styles.rightToggleButton}
+              style={{ backgroundColor: mode == 'Losers' ? "#2e3032" : "transparent", color: mode == 'Losers' ? "white" : "", border: '0.75px solid #333333' }}
+              onClick={() => { setMode('Losers') }}
+            >
+              Losers
+            </button>
+          </div>
 
-      {mode == 'Pairs' && <PairsTable dataSource={test_pairs} />}
-      {mode == 'Winners' && <PairsTable dataSource={test_pairs} />}
-      {mode == 'Losers' && <PairsTable dataSource={test_pairs} />}
-      {mode == 'NewPairs' && <LivePairsTable dataSource={test_livepairs} />}
-      {mode == 'TopVolume' && <TopVolumeTable dataSource={test_pairs} />}
-      {mode == 'Trending' && <TrendingTable dataSource={test_pairs} />}
+          {mode == 'Pairs' && <PairsTable dataSource={topVolumePairs} />}
+          {mode == 'Winners' && <PairsTable dataSource={winnersPairs} />}
+          {mode == 'Losers' && <PairsTable dataSource={losersPairs} />}
+          {mode == 'NewPairs' && <LivePairsTable dataSource={newPairs} />}
+          {mode == 'TopVolume' && <TopVolumeTable dataSource={topVolumePairs} />}
+          {/* {mode == 'Trending' && <TrendingTable dataSource={topVolumePairs} />} */}
 
-      {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <h2>Cryptocurrencies</h2>
-      </div>
-      {coinList.length > 0 ? (
-        <CurrencyTable dataSourceCoin={coinList} />
-      ) : (
-        <Icon type="loading" />
-      )} */}
+        </div>}
+
     </div>
   );
 

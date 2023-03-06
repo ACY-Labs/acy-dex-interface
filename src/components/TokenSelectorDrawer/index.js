@@ -17,9 +17,9 @@ import { processString } from "@/components/AcyCoinItem";
 import styles from "./styles.less";
 import { useConstantLoader, getGlobalTokenList } from '@/constants';
 import mockTokenList from '@/components/SwapComponent/mockTokenList.json';
-import InfiniteScroll from 'react-infinite-scroll-component';
+// import InfiniteScroll from 'react-infinite-scroll-component';
 
-const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,placement='right' }) => {
+const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simple, coinList, placement='right', activeSymbol, selectSymbol, setActiveSymbol, pageName }) => {
   const { account, library, chainId } = useConstantLoader();
 
   // const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
@@ -223,8 +223,9 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,
                   <AcyCoinItem
                     data={supToken}
                     key={index}
-                    selectToken={() => {
-                      onCoinClick(supToken);
+                    selectToken={(item) => {
+                      setVisible(false)
+                      setActiveSymbol(item.symbol)                    
                     }}
                     customIcon={false}
                     index={index}
@@ -243,8 +244,15 @@ const TokenSelectorDrawer = ({ onCancel, visible, onCoinClick, simple, coinList,
                         key={index}
                         customIcon={false}
                         clickCallback={() => setTokenAsFav(token)}
-                        selectToken={() => {
-                          onCoinClick(token);
+                        // selectToken={(item) => {
+                        //   setActiveSymbol(item.symbol)
+                        // }}
+                        selectToken={(item) => {
+                          if (pageName=="Trade") {onCoinClick(token)}
+                          else {setVisible(false)}
+                          setActiveSymbol(item.symbol)
+                          // setVisible(false)
+                          // onCoinClick(token);
                         }}
                         isFav={favTokenList.includes(token)}
                         constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}

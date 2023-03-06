@@ -177,7 +177,8 @@ const Stats = (props) => {
   const history = useHistory()
 
   const [statsType, setStatsType] = useState("Future")
-  const statsTypes = ["Market", "Future", "StableCoin"]
+  const statsTypes = ["Market", "Future"]
+  // const statsTypes = ["Market", "Future", "StableCoin"]
   const onChangeStats = item => {
     history.push('/statistics/' + item.toLowerCase())
   }
