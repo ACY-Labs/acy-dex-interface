@@ -38,6 +38,3 @@ screenshot
 .firebase
 node_modules
 .vs/
-
-# environment
-.env
