@@ -36,9 +36,9 @@ const { Option } = Select;
 const Overview = props => {
 
     //functionalles and data
-    const { account, library, farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
+    const { farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
     let { chainId } = useChainId();
-    const { active, activate } = useWeb3React();
+    const { account, library, active, activate } = useWeb3React();
 
     chainId = 80001;
 
@@ -119,8 +119,6 @@ const Overview = props => {
         console.log("select network ", network)
         // setActiveToken(token);
     }
-    //TODO
-    const currentAddress = "0x0000000000000000000000000000000000000000"
 
     const networkName = {
         '80001': "Mumbai",
@@ -377,7 +375,7 @@ const Overview = props => {
         const childColumns = [
             {
                 title: (
-                    <div className={styles.tableDataFirstColumn}>  </div>
+                    <div className={styles.tableDataFirstColumn} style={{marginLeft: '-50px'}}>  </div>
                 ),
                 key: "key",
                 dataIndex: "key",
@@ -707,17 +705,17 @@ const Overview = props => {
                     <Layout style={{ backgroundColor: "black" }}>
                         <Col style={{ padding: "10px", border: "0.75px solid #444444" }}>
                             <Row className={styles.overviewHeader}>
-                                <Col span={3} style={{ fontSize: "2.6rem", marginLeft: "10px" }}>Account</Col>
-                                <Col span={8} style={{ marginTop: "1rem", marginLeft: "10px" }}>
-                                    {/* <CopyToClipboard text={currentAddress}
+                                {/* <Col span={3} style={{ fontSize: "2.6rem", marginLeft: "10px" }}>Account</Col> */}
+                                <Col span={12} style={{ marginTop: "1rem", marginLeft: "10px" }}>
+                                    {/* <CopyToClipboard text={account}
                                         onCopy={() => setState({ copied: true })}>
                                         <span style={{ fontSize: "0.9rem" }}>
-                                            {currentAddress.substring(0, 4)}....{currentAddress.substring(37, 41)}</span>
+                                            {account.substring(0, 4)}....{account.substring(37, 41)}</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" ><path d="M9 43.95q-1.2 0-2.1-.9-.9-.9-.9-2.1V10.8h3v30.15h23.7v3Zm6-6q-1.2 0-2.1-.9-.9-.9-.9-2.1v-28q0-1.2.9-2.1.9-.9 2.1-.9h22q1.2 0 2.1.9.9.9.9 2.1v28q0 1.2-.9 2.1-.9.9-2.1.9Zm0-3h22v-28H15v28Zm0 0v-28 28Z" /></svg>
                                     </CopyToClipboard> */}
                                     <div className={styles.copyAddress}>
-                                        <span style={{ marginRight: '5px', fontSize: "0.9rem" }}>  {currentAddress.slice(0, 6)}...{currentAddress.slice(currentAddress.length - 4, currentAddress.length)}</span>
-                                        <svg height={15} style={{ marginTop: "12px" }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" onClick={() => { copy(currentAddress) }}><path d="M9 43.95q-1.2 0-2.1-.9-.9-.9-.9-2.1V10.8h3v30.15h23.7v3Zm6-6q-1.2 0-2.1-.9-.9-.9-.9-2.1v-28q0-1.2.9-2.1.9-.9 2.1-.9h22q1.2 0 2.1.9.9.9.9 2.1v28q0 1.2-.9 2.1-.9.9-2.1.9Zm0-3h22v-28H15v28Zm0 0v-28 28Z" /></svg>
+                                        <span style={{ marginRight: '5px', fontSize: "0.9rem" }}>  {account.slice(0, 6)}...{account.slice(account.length - 4, account.length)}</span>
+                                        <svg height={15} style={{ marginTop: "12px" }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" onClick={() => { copy(account) }}><path d="M9 43.95q-1.2 0-2.1-.9-.9-.9-.9-2.1V10.8h3v30.15h23.7v3Zm6-6q-1.2 0-2.1-.9-.9-.9-.9-2.1v-28q0-1.2.9-2.1.9-.9 2.1-.9h22q1.2 0 2.1.9.9.9.9 2.1v28q0 1.2-.9 2.1-.9.9-2.1.9Zm0-3h22v-28H15v28Zm0 0v-28 28Z" /></svg>
                                     </div>
                                 </Col>
                                 <Col offset={6} span={5}>
@@ -743,11 +741,11 @@ const Overview = props => {
                                 <Table
                                     columns={columns}
                                     showHeader={false}
-                                    className={styles.mainTable}
+                                    className={styles.nobgTable}
                                     expandedRowRender={record => {
                                         // <div style={{ background: '#1b1d23' }}>
                                         return <Table
-                                            className={styles.childTable}
+                                            className={styles.nobgTable}
                                             columns={getChildColumns(record.name)}
                                             // showHeader={false}
                                             pagination={false}
@@ -757,6 +755,7 @@ const Overview = props => {
                                     dataSource={pageData}
                                     expandIconColumnIndex={0}
                                     expandIconAsCell={false}
+                                    defaultExpandedRowKeys="1"
                                 />
                             </Row>
                         </Col>
