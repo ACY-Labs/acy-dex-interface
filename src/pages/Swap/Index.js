@@ -44,6 +44,12 @@ const Swap = props => {
   const [transactionList, setTransactionList] = useState([]);
   const [tableContent, setTableContent] = useState('Trade History');
   const [tradeHistory, setTradeHistory] = useState([])
+  //for chart 24h data tab
+  const [curPrice, setCurPrice] = useState(0);
+  const [priceDeltaPercent, setPriceDeltaPercent] = useState(0);
+  const [deltaIsMinus, setDeltaIsMinus] = useState(false);
+  const [dailyHigh, setDailyHigh] = useState(0)
+  const [dailyLow, setDailyLow] = useState(0)
 
   // useSWR hook example - needs further implementation in backend
   // const txListUrl = `${apiUrlPrefix}/txlist/all?`
@@ -189,13 +195,12 @@ const Swap = props => {
 
   useEffect(() => {
     console.log("see trade modal select", activeToken0, activeToken1, activeToken)
-    
+
   }, [activeToken0, activeToken1, activeToken])
 
   // for activeToken chosen from tokenSelectorModal, set token0 as selected and token1 as USDT
   // should not be activated when triggered by tab for nopair
   useEffect(() => {
-    console.log("see trade haspair", hasPair)
     if (activeToken != activeToken0 && activeToken1 && hasPair) {
       setActiveToken0(activeToken)
       setActiveToken1(tokens[0])
@@ -287,12 +292,11 @@ const Swap = props => {
                   pageName={"Trade"}
                   // pairName='BTC'
                   // showDrawer={onClickCoin}
-                  // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
-                  // latestPrice={latestPrice}
-                  // latestPricePercentage={priceChangePercentDelt
-                  latestPriceColor={1}
-                  latestPrice={1}
-                  latestPricePercentage={1}
+                  latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                  latestPrice={curPrice}
+                  latestPricePercentage={priceDeltaPercent}
+                  dailyLow={dailyLow}
+                  dailyHigh={dailyHigh}
                 // coinList={coinList}
                 />
                 : <div>
@@ -310,10 +314,11 @@ const Swap = props => {
                     // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
                     // latestPrice={latestPrice}
                     // latestPricePercentage={priceChangePercentDelt
-                    latestPriceColor={1}
-                    latestPrice={1}
-                    latestPricePercentage={1}
-                  // coinList={coinList}
+                    latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                    latestPrice={curPrice}
+                    latestPricePercentage={priceDeltaPercent}
+                    dailyLow={dailyLow}
+                    dailyHigh={dailyHigh}
                   />
                 </div>
               }
@@ -333,9 +338,21 @@ const Swap = props => {
                       toToken={activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address}
                       chainId={chainId}
                       activeToken={activeToken}
+                      //property for trade
                       setHasPair={setHasPair}
                       activeExist={activeExist}
                       setActiveExist={setActiveExist}
+                      //for chart 24 tab
+                      curPrice={curPrice}
+                      setCurPrice={setCurPrice}
+                      priceDeltaPercent={priceDeltaPercent}
+                      setPriceDeltaPercent={setPriceDeltaPercent}
+                      deltaIsMinus={deltaIsMinus}
+                      setDeltaIsMinus={setDeltaIsMinus}
+                      dailyHigh={dailyHigh}
+                      setDailyHigh={setDailyHigh}
+                      dailyLow={dailyLow}
+                      setDailyLow={setDailyLow}
                     />
                   </div>
                   {/* } */}

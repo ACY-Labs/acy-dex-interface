@@ -314,15 +314,14 @@ const Swap = props => {
   const [visible, setVisible] = useState(false);
   const [transactionList, setTransactionList] = useState([]);
   const [tableLoading, setTableLoading] = useState(true);
+  //// chart ui
+  const [curPrice, setCurPrice] = useState(0);
+  const [priceDeltaPercent, setPriceDeltaPercent] = useState(0);
+  const [deltaIsMinus, setDeltaIsMinus] = useState(false);
 
   // this are new states for PERPETUAL
   const [tableContent, setTableContent] = useState(POSITIONS);
   const [positionsData, setPositionsData] = useState([]);
-
-
-
-
-
 
   /// get contract addresses
   // TODO: update and remove unused contracts
@@ -387,6 +386,11 @@ const Swap = props => {
 
   // }, [supportedTokens])
 
+  useEffect(() => {
+    console.log("delta", typeof setDeltaIsMinus)
+    setDeltaIsMinus(false)
+  }, [])
+
   // ORDER BOOK FEATURES, WHICH WE MIGHT NOT SUPPORT AT THE MOMENT
   const flagOrdersEnabled = true;
   const [orders] = useAccountOrders(flagOrdersEnabled);
@@ -418,18 +422,18 @@ const Swap = props => {
   });
 
   //future_tokens store every symbols in future and its data 
-  const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
+  const future_tokens = symbolsInfo?.filter(ele => ele[0] == "futures")
   let future_tokens_symbol = []
-  future_tokens?.forEach((ele)=>{
+  future_tokens?.forEach((ele) => {
     future_tokens_symbol.push({
       name: ele[1],
-      symbol: ele[1].substring(0,3),
+      symbol: ele[1].substring(0, 3),
     })
-  })  
+  })
   //future_token stores token symbols without duplicates for tab display
   let future_token = []
   future_tokens_symbol?.forEach((ele) => {
-    if (!future_token.includes(ele.symbol)){
+    if (!future_token.includes(ele.symbol)) {
       future_token.push(ele.symbol)
     }
   })
@@ -495,16 +499,15 @@ const Swap = props => {
     setToTokenAddress(swapOption, getTokenBySymbol(chainId, e).address)  // when click tab change token
   }
 
-
   const selectChartToken = item => {
     onClickSetActiveToken(item)
   }
-  const [latestPrice,setLatestPrice]=useState(0);
-  const [priceChangePercentDelta,setPpriceChangePercentDelta]=useState(0);
-const onChangePrice=(curPrice,change)=>{
-  setLatestPrice(curPrice);
-  setPpriceChangePercentDelta(change);
-}
+  // const [latestPrice, setLatestPrice] = useState(0);
+  // const [priceChangePercentDelta, setPpriceChangePercentDelta] = useState(0);
+  // const onChangePrice = (curPrice, change) => {
+  //   setLatestPrice(curPrice);
+  //   setPpriceChangePercentDelta(change);
+  // }
   return (
     <PageHeaderWrapper>
 
@@ -521,15 +524,15 @@ const onChangePrice=(curPrice,change)=>{
                     onChange={selectChartToken}
                   />
                 </div> */}
-                <AcySymbolNav data={future_token} onChange={selectChartToken}/>
-                <AcySymbol 
+                <AcySymbolNav data={future_token} onChange={selectChartToken} />
+                <AcySymbol
                   activeSymbol={activeSymbol}
                   setActiveSymbol={setActiveSymbol}
                   coinList={future_tokens_symbol}
                   // showDrawer={showDrawer}
-                  latestPriceColor={priceChangePercentDelta*1>= 0 && '#0ecc83' ||'#fa3c58'}
-                  latestPrice={latestPrice}
-                  latestPricePercentage={priceChangePercentDelta}
+                  latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                  latestPrice={curPrice}
+                  latestPricePercentage={priceDeltaPercent}
                 />
                 <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column" }}>
                   <ExchangeTVChart
@@ -538,7 +541,17 @@ const onChangePrice=(curPrice,change)=>{
                     fromToken={toToken}
                     toToken="USDT"
                     chainId={chainId}
-                    onChangePrice={onChangePrice}
+                    activeToken={toToken}
+                    curPrice={curPrice}
+                    setCurPrice={setCurPrice}
+                    priceDeltaPercent={priceDeltaPercent}
+                    setPriceDeltaPercent={setPriceDeltaPercent}
+                    deltaIsMinus={deltaIsMinus}
+                    setDeltaIsMinus={setDeltaIsMinus}
+                    // onChangePrice={onChangePrice}
+                    setHasPair={true}
+                    activeExist={true}
+                    setActiveExist={""}
                   />
                 </div>
               </div>

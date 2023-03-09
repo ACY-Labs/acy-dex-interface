@@ -15,7 +15,10 @@ const AcySymbol = (props: any) => {
     pageName,
     setActiveToken0,
     setActiveToken1,
+    dailyLow,
+    dailyHigh
   } = props;
+  console.log("trade low", dailyLow, dailyHigh)
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
   const onClickCoin = () => {
@@ -53,11 +56,11 @@ const AcySymbol = (props: any) => {
         </div>
         <div className={styles.item}>
           <div>24H High</div>
-          <span>23212.90</span>
+          <span>{dailyHigh}</span>
         </div>
         <div className={styles.item}>
           <div>24H Low</div>
-          <span>20123.15</span>
+          <span>{dailyLow}</span>
         </div>
         <div className={styles.item}>
           <div>24H Turnover(USDT)</div>

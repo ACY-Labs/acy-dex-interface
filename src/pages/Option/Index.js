@@ -109,6 +109,12 @@ const Option = props => {
 
   ///data 
   const [symbol, setSymbol] = useState('BTCUSD-60000-C')
+  //for chart 24h data tab
+  const [curPrice, setCurPrice] = useState(0);
+  const [priceDeltaPercent, setPriceDeltaPercent] = useState(0);
+  const [deltaIsMinus, setDeltaIsMinus] = useState(false);
+  const [dailyHigh, setDailyHigh] = useState(0)
+  const [dailyLow, setDailyLow] = useState(0)
   ///// read reader contract, getTdInfo and getSymbolsInfo
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
@@ -150,24 +156,24 @@ const Option = props => {
   let option_tokens = {}
 
   useMemo(() => {
-  //option_tokens store every symbols in option and its data 
-  option_tokens = symbolsInfo?.filter(ele => ele[0] == "option")
-  //option_tokens_symbol stores token symbol and option symbol
-  //eg. [{symbol: "BTC", name:"BTC-60000-C"}, {symbol: "BTC", name:"BTC-10000-C"}]
-  option_tokens?.forEach((ele) => {
-    option_tokens_symbol.push({
-      //symbol is displayed
-      symbol: ele[1],
-      name: ele[1]?.substring(0, 3),
+    //option_tokens store every symbols in option and its data 
+    option_tokens = symbolsInfo?.filter(ele => ele[0] == "option")
+    //option_tokens_symbol stores token symbol and option symbol
+    //eg. [{symbol: "BTC", name:"BTC-60000-C"}, {symbol: "BTC", name:"BTC-10000-C"}]
+    option_tokens?.forEach((ele) => {
+      option_tokens_symbol.push({
+        //symbol is displayed
+        symbol: ele[1],
+        name: ele[1]?.substring(0, 3),
+      })
     })
-  })
-  //option_token stores token symbols without duplicates for tab display
-  // let option_token = []
-  option_tokens_symbol?.forEach((ele) => {
-    if (!option_token.includes(ele.name)) {
-      option_token.push(ele.name)
-    }
-  })
+    //option_token stores token symbols without duplicates for tab display
+    // let option_token = []
+    option_tokens_symbol?.forEach((ele) => {
+      if (!option_token.includes(ele.name)) {
+        option_token.push(ele.name)
+      }
+    })
   }, [symbolsInfo, option_token, activeSymbol])
   // //option_tokens store every symbols in option and its data 
   // const option_tokens = symbolsInfo?.filter(ele => ele[0] == "option")
@@ -266,13 +272,12 @@ const Option = props => {
                 activeSymbol={activeSymbol}
                 setActiveSymbol={setActiveSymbol}
                 // showDrawer={onClickCoin}
-                // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
-                // latestPrice={latestPrice}
-                // latestPricePercentage={priceChangePercentDelt
                 coinList={option_tokens_symbol}
-                latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
-                latestPrice={latestPrice}
-                latestPricePercentage={priceChangePercentDelta}
+                latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                latestPrice={curPrice}
+                latestPricePercentage={priceDeltaPercent}
+                dailyLow={dailyLow}
+                dailyHigh={dailyHigh}
               />
               <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
                 <ExchangeTVChart
@@ -281,7 +286,17 @@ const Option = props => {
                   fromToken={activeToken}
                   toToken="USDT"
                   chainId={chainId}
-                  onChangePrice={onChangePrice}
+                  // onChangePrice={onChangePrice}
+                  curPrice={curPrice}
+                  setCurPrice={setCurPrice}
+                  priceDeltaPercent={priceDeltaPercent}
+                  setPriceDeltaPercent={setPriceDeltaPercent}
+                  deltaIsMinus={deltaIsMinus}
+                  setDeltaIsMinus={setDeltaIsMinus}
+                  dailyHigh={dailyHigh}
+                  setDailyHigh={setDailyHigh}
+                  dailyLow={dailyLow}
+                  setDailyLow={setDailyLow}
                 />
               </div>
 

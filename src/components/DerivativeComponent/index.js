@@ -47,7 +47,6 @@ const DerivativeComponent = props => {
     fetcher: fetcher(library, Reader)
   });
 
-  console.log("derivative ui symbolInfo", symbolInfo)
   useEffect(() => {
     if (active) {
       library.on("block", () => {

@@ -1891,6 +1891,10 @@ export function usePrevious(value) {
 export function formatDateTime(time) {
   return formatDateFn(time * 1000, "dd MMM yyyy, h:mm a");
 }
+export function timeToTz(originalTime, timeZone) {
+  const zonedDate = new Date(new Date(originalTime * 1000).toLocaleString('en-US', { timeZone }));
+  return zonedDate.getTime() / 1000;
+}
 export function formatDate(time) {
   return formatDateFn(time * 1000, "dd MMM yyyy");
 }
