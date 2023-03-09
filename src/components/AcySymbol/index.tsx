@@ -18,7 +18,6 @@ const AcySymbol = (props: any) => {
     dailyLow,
     dailyHigh
   } = props;
-  console.log("trade low", dailyLow, dailyHigh)
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
   const onClickCoin = () => {
@@ -51,8 +50,8 @@ const AcySymbol = (props: any) => {
           {Number.parseFloat(latestPrice).toFixed(3)}
         </div>
         <div style={{ marginLeft: '20px' }} className={styles.item}>
-          <div>24h Change%</div>
-          <span style={{ color: latestPriceColor }}>{latestPricePercentage}</span>
+          <div>24h Change %</div>
+          <span style={{ color: latestPriceColor }}>{latestPricePercentage} %</span>
         </div>
         <div className={styles.item}>
           <div>24H High</div>

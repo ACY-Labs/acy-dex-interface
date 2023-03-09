@@ -367,38 +367,40 @@ export default function ExchangeTVChart(props) {
         // Binance data is independent of chain, so here we can fill in any chain name
         if (responsePairData && responsePairData[0].time) {
           currentSeries.setData(responsePairData);
+          setCurPrice(parseFloat(responsePairData[responsePairData.length - 1].close).toFixed(2))
         }
 
-        if (pageName == "Option" || pageName == "Futures") {
-          let from = responsePairData[responsePairData.length - 1].time
-          sti = setInterval(() => {
-            axios.get(`${OptionsPriceApi}/${pageName.toLowerCase()}?chainId=${chainId}&symbol=${chartTokenSymbol}&period=1m&from=${from}`)
-              .then((res) => {
-                for (let i = 0; i < res.data.length; i++) {
-                  if (res.data[i].timestamp > from) {
-                    currentSeries.update({
-                      time: res.data[i].timestamp,
-                      open: res.data[i].o,
-                      high: res.data[i].h,
-                      low: res.data[i].l,
-                      close: res.data[i].c,
-                    })
-                    from = res.data[i].timestamp
-                  }
+      }
+      if (pageName == "Option" || pageName == "Futures") {
+        let from = responsePairData[responsePairData.length - 1].time
+        sti = setInterval(() => {
+          axios.get(`${OptionsPriceApi}/${pageName.toLowerCase()}?chainId=${chainId}&symbol=${chartTokenSymbol}&period=1m&from=${from}`)
+            .then((res) => {
+              for (let i = 0; i < res.data.length; i++) {
+                if (res.data[i].timestamp > from) {
+                  currentSeries.update({
+                    time: res.data[i].timestamp,
+                    open: res.data[i].o,
+                    high: res.data[i].h,
+                    low: res.data[i].l,
+                    close: res.data[i].c,
+                  })
+                  from = res.data[i].timestamp
                 }
-              });
-          }, 60000);
-        }
+              }
+              setCurPrice(parseFloat(res.data[res.data.length - 1].c).toFixed(2))
+            });
+        }, 60000);
+      }
 
-        if (!isTick) {
-          // getDeltaPriceChange(responsePairData)
-          get24Change(responsePairData)
-        }
+      if (!isTick) {
+        // getDeltaPriceChange(responsePairData)
+        get24Change(responsePairData)
+      }
 
-        if (!chartInited) {
-          scaleChart();
-          setChartInited(true);
-        }
+      if (!chartInited) {
+        scaleChart();
+        setChartInited(true);
       }
     }
     fetchPrevAndSubscribe()
@@ -443,7 +445,6 @@ export default function ExchangeTVChart(props) {
       setDeltaIsMinus(true)
       let negativeCurrentPrice = latestTick
       let negativePriceChangePercent = deltaPercent.substring(1)
-      setCurPrice(parseFloat(negativeCurrentPrice).toFixed(2))
       setPriceDeltaPercent(parseFloat(negativePriceChangePercent).toFixed(3))
       // onChangePrice && onChangePrice(parseFloat(negativeCurrentPrice).toFixed(2), "-" + parseFloat(negativePriceChangePercent).toFixed(3));
 
@@ -451,7 +452,7 @@ export default function ExchangeTVChart(props) {
       setDeltaIsMinus(false)
       let positiveCurrentPrice = latestTick
       let positivePricechangePercent = deltaPercent
-      setCurPrice(parseFloat(positiveCurrentPrice).toFixed(2))
+      // setCurPrice(parseFloat(positiveCurrentPrice).toFixed(2))
       setPriceDeltaPercent(parseFloat(positivePricechangePercent).toFixed(3))
       // onChangePrice && onChangePrice(parseFloat(positiveCurrentPrice).toFixed(2), "+" + parseFloat(positivePricechangePercent).toFixed(3));
     }
@@ -532,7 +533,6 @@ export default function ExchangeTVChart(props) {
     chart.subscribeCrosshairMove(onCrosshairMove);
 
     const series = chart.addCandlestickSeries(getSeriesOptions());
-
     setCurrentChart(chart);
     setCurrentSeries(series);
   }, [ref, onCrosshairMove]);
