@@ -47,7 +47,7 @@ const AcySymbol = (props: any) => {
         </div>
         {/* </Dropdown> */}
         <div style={{ color: latestPriceColor, fontSize: '20px' }}>
-          {Number.parseFloat(latestPrice).toFixed(3)}
+          {Number.parseFloat(latestPrice).toFixed(2)}
         </div>
         <div style={{ marginLeft: '20px' }} className={styles.item}>
           <div>24h Change %</div>

@@ -38,6 +38,7 @@ const Future = props => {
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
+  console.log("default provider", symbolsInfo)
 
   //future_tokens store every symbols in future and its data 
   // const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
@@ -127,7 +128,7 @@ const Future = props => {
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               <ExchangeTVChart
                 chartTokenSymbol={activeToken}
-                pageName="Futures"
+                pageName="Future"
                 fromToken={activeToken}
                 toToken="USDT"
                 chainId={chainId}
