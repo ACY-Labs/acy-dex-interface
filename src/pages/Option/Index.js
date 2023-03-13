@@ -115,6 +115,7 @@ const Option = props => {
   const [deltaIsMinus, setDeltaIsMinus] = useState(false);
   const [dailyHigh, setDailyHigh] = useState(0)
   const [dailyLow, setDailyLow] = useState(0)
+  const [dailyVol, setDailyVol] = useState(0)
   ///// read reader contract, getTdInfo and getSymbolsInfo
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
@@ -278,6 +279,7 @@ const Option = props => {
                 latestPricePercentage={priceDeltaPercent}
                 dailyLow={dailyLow}
                 dailyHigh={dailyHigh}
+                dailyVol={dailyVol}
               />
               <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
                 <ExchangeTVChart
@@ -297,6 +299,7 @@ const Option = props => {
                   setDailyHigh={setDailyHigh}
                   dailyLow={dailyLow}
                   setDailyLow={setDailyLow}
+                  setDailyVol={setDailyVol}
                 />
               </div>
 

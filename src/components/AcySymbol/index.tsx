@@ -16,7 +16,8 @@ const AcySymbol = (props: any) => {
     setActiveToken0,
     setActiveToken1,
     dailyLow,
-    dailyHigh
+    dailyHigh,
+    dailyVol
   } = props;
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
@@ -63,7 +64,7 @@ const AcySymbol = (props: any) => {
         </div>
         <div className={styles.item}>
           <div>24H Turnover(USDT)</div>
-          <span>4,598,774,444.16</span>
+          <span>{dailyVol}</span>
         </div>
         <div className={styles.item}>
           <div>Funding Rate/ Countdown</div>

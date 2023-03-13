@@ -83,9 +83,9 @@ const getChartOptions = (width, height) => ({
   },
   localization: {
     // https://github.com/tradingview/lightweight-charts/blob/master/docs/customization.md#time-format
-    timeFormatter: (businessDayOrTimestamp) => {
-      return formatDateTime(businessDayOrTimestamp);
-    },
+    // timeFormatter: (businessDayOrTimestamp) => {
+    //   return formatDateTime(businessDayOrTimestamp);
+    // },
     timescale: {
       // rightOffset: 50,
       // lockVisibleTimeRangeOnResize: !1,
@@ -164,6 +164,7 @@ export default function ExchangeTVChart(props) {
     setDailyHigh,
     dailyLow,
     setDailyLow,
+    setDailyVol,
     //for trade page
     setHasPair,
     activeExist,
@@ -185,11 +186,11 @@ export default function ExchangeTVChart(props) {
 
   let isTick = pageName == "Powers";
   const symbol = chartTokenSymbol || "BTC";
+  console.log("check delta here chartTokenSymbol", chartTokenSymbol, symbol)
   const marketName = symbol + "_USD";
   const previousMarketName = usePrevious(marketName);
-  // let fromToken = from_token.length == 42? from_token : from_token.substring(0, 42)
-  // let toToken = to_token.length == 42? to_token : to_token.substring(0, 42)
-  // console.log("see trade input token", fromToken, toToken, fromToken.length, toToken.length)
+
+  const tzOffset = new Date(Date.now()).getTimezoneOffset() * 60 //using tzoffset to directly change candle timestamp to show correct chart x-axis
 
   const baseTokenAddr = {
     56: [
@@ -203,6 +204,10 @@ export default function ExchangeTVChart(props) {
       { symbol: "WETH", address: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619" }
     ],
   }
+  useEffect(() => {
+    get24Change()
+    console.log("check delta here chartTokenSymbol 00", chartTokenSymbol, symbol)
+  }, [chartTokenSymbol])
   const ref = useRef(null);
   const chartRef = useRef(null);
 
@@ -222,7 +227,8 @@ export default function ExchangeTVChart(props) {
     const num_candles = 100
     const from_time = Math.floor(Date.now() / 1000) - num_candles
     const to_time = Math.floor(Date.now() / 1000)
-    const test_time = Math.floor(Date.now() / 1000) - (100 * CHART_PERIODS[period])
+    //how many candles shown in chart at init
+    const test_time = Math.floor(Date.now() / 1000) - (150 * CHART_PERIODS[period])
     // let tmp_from = Math.floor(Date.now() / 1000) - (25)
     // let tmp_to = Math.floor(Date.now() / 1000 )
     currentChart.timeScale().setVisibleRange({ from: test_time, to: to_time });
@@ -262,7 +268,7 @@ export default function ExchangeTVChart(props) {
         const ticks = currentSeries.Kn?.Bt?.Xr;
         if (ticks && period != '1m' && period != '1w') {
           // getDeltaPriceChange(ticks)
-          get24Change()
+          // get24Change()
         }
       });
       cleaner.current = clean;
@@ -288,7 +294,7 @@ export default function ExchangeTVChart(props) {
       } else if (pageName == "Option") {
         responseFromTokenData = await axios.get(`${OptionsPriceApi}/option?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
           .then((res) => res.data);
-      } else if (pageName == "Future") {
+      } else if (pageName == "Futures") {
         responseFromTokenData = await axios.get(`${OptionsPriceApi}/futures?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
           .then((res) => res.data);
       } else if (pageName == "Trade") {
@@ -346,9 +352,9 @@ export default function ExchangeTVChart(props) {
       // set pair data only when from data exists
       if (activeExist && pageName == 'Trade' || pageName != 'Trade') {
         for (let i = 0; i < responseFromTokenData.length; i++) {
-          if (pageName == "Option" || pageName == "Future" || pageName == "Trade") {
+          if (pageName == "Option" || pageName == "Futures" || pageName == "Trade") {
             responsePairData.push({
-              time: responseFromTokenData[i].timestamp,
+              time: responseFromTokenData[i].timestamp - tzOffset,
               open: responseFromTokenData[i].o,
               high: responseFromTokenData[i].h,
               low: responseFromTokenData[i].l,
@@ -356,14 +362,21 @@ export default function ExchangeTVChart(props) {
             })
           } else if (toToken != "USDT") {
             responsePairData.push({
-              time: responseFromTokenData[i].time,
+              time: responseFromTokenData[i].time - tzOffset,
               open: responseFromTokenData[i].open / responseToTokenData[i].open,
               high: responseFromTokenData[i].high / responseToTokenData[i].high,
               low: responseFromTokenData[i].low / responseToTokenData[i].low,
               close: responseFromTokenData[i].close / responseToTokenData[i].close,
             })
           } else {
-            responsePairData = responseFromTokenData
+            responsePairData.push({
+              time: responseFromTokenData[i].time - tzOffset,
+              open: responseFromTokenData[i].open,
+              high: responseFromTokenData[i].high,
+              low: responseFromTokenData[i].low ,
+              close: responseFromTokenData[i].close,
+            })
+            // responsePairData = responseFromTokenData
           }
         }
         // Binance data is independent of chain, so here we can fill in any chain name
@@ -373,16 +386,15 @@ export default function ExchangeTVChart(props) {
         }
 
       }
-      if (pageName == "Option" || pageName == "Future") {
-        let from = responsePairData[responsePairData.length - 1].time
+      if (pageName == "Option" || pageName == "Futures") {
+        let from = responsePairData[responsePairData.length - 1].time 
         sti_1m = setInterval(() => {
           axios.get(`${OptionsPriceApi}/${pageName.toLowerCase()}?chainId=${chainId}&symbol=${chartTokenSymbol}&period=1m`)
-            .then((res) => {
-              // get24Change()
+            .then((res) => {    
               for (let i = 0; i < res.data.length; i++) {
-                if (res.data[i].timestamp > from) {
+                if (res.data[i].timestamp - tzOffset > from ) {
                   currentSeries.update({
-                    time: res.data[i].timestamp,
+                    time: res.data[i].timestamp - tzOffset,
                     open: res.data[i].o,
                     high: res.data[i].h,
                     low: res.data[i].l,
@@ -395,8 +407,9 @@ export default function ExchangeTVChart(props) {
             });
         }, 60000);
         sti_timescale = setInterval(() => {
+          console.log("check delta in sti_timescale", dailyHigh)
           get24Change()
-        }, CHART_PERIODS[period] * 100);
+        }, CHART_PERIODS[period] * 1000);
       }
 
       if (!isTick) {
@@ -410,7 +423,8 @@ export default function ExchangeTVChart(props) {
       }
     }
     fetchPrevAndSubscribe()
-    get24Change()
+    // get24Change()
+    console.log("check delta here chartTokenSymbol 22", chartTokenSymbol)
 
     return () => clearInterval(sti_1m, sti_timescale)
   }, [currentSeries, fromToken, toToken, period, chainId, chartTokenSymbol])
@@ -418,20 +432,29 @@ export default function ExchangeTVChart(props) {
 
   //for test 24h data retrieval, 24h data will be replaced by data from backend
   const get24Change = async () => {
+    console.log("check delta func called")
+    let tmpPageName //to cope with different api names for future
+    if (pageName == 'Futures') {
+      tmpPageName = 'futureMarket'
+    } else if (pageName == 'Option') {
+      tmpPageName = 'optionMarket'
+    }
     axios.get(`${deltaApi}`)
       .then((res) => {
+        console.log("check delta api", res.data, chartTokenSymbol)
         for (const [page, tokens] of Object.entries(res.data)) {
-          if (page == pageName.toLowerCase().toString() + 'Market') {
+          if (page == tmpPageName) {
             for (const [index, data] of Object.entries(tokens)) {
+              console.log("check delta data", data.highestPrice, chartTokenSymbol.toString())
               if (data.symbol == chartTokenSymbol.toString()) {
                 setDailyHigh(parseFloat(data.highestPrice).toFixed(3))
                 setDailyLow(parseFloat(data.lowestPrice).toFixed(3))
                 setPriceDeltaPercent(parseFloat(data.priceVariation * 100).toFixed(3))
+                setDailyVol(parseFloat(data.volume).toFixed(3))
               }
             }
           }
         }
-
       });
   }
   // const getDeltaPriceChange = (data) => {

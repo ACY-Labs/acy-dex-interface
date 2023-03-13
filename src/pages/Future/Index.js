@@ -29,6 +29,7 @@ const Future = props => {
   const [deltaIsMinus, setDeltaIsMinus] = useState(false);
   const [dailyHigh, setDailyHigh] = useState(0)
   const [dailyLow, setDailyLow] = useState(0)
+  const [dailyVol, setDailyVol] = useState(0)
 
   // const [activeToken, setActiveToken] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
 
@@ -123,12 +124,13 @@ const Future = props => {
               latestPricePercentage={priceDeltaPercent}
               dailyLow={dailyLow}
               dailyHigh={dailyHigh}
+              dailyVol={dailyVol}
             />
             {/* <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onClickCoin} coinList={coinList} /> */}
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               <ExchangeTVChart
                 chartTokenSymbol={activeToken}
-                pageName="Future"
+                pageName="Futures"
                 fromToken={activeToken}
                 toToken="USDT"
                 chainId={chainId}
@@ -143,6 +145,7 @@ const Future = props => {
                 setDailyHigh={setDailyHigh}
                 dailyLow={dailyLow}
                 setDailyLow={setDailyLow}
+                setDailyVol={setDailyVol}
               />
             </div>
           </div>

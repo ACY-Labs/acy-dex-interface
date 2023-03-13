@@ -27,6 +27,7 @@ const TokenSelectorDrawer = ({
   simple,
   coinList,
   placement = 'right',
+  activeSymbol,
   setActiveSymbol,
   pageName,
   setActiveToken0,
@@ -263,6 +264,7 @@ const TokenSelectorDrawer = ({
                       }
                       else {
                         setVisible(false)
+                        console.log("check delta item", item)
                         setActiveSymbol(item.symbol)
                       }
                     }}
