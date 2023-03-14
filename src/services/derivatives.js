@@ -87,6 +87,51 @@ export async function removeMargin(
   }
 }
 
+export async function transfer(
+  chainId,
+  library,
+  routerAddress,
+  Router,
+  token,
+  tokenAmount,
+  fromSymbol,
+  toSymbol,
+) {
+  const contract = new ethers.Contract(routerAddress, Router.abi, library.getSigner())
+
+  let method = "transfer"
+  let params = [
+    token.address,
+    ethers.utils.parseUnits(tokenAmount, token.decimals),
+    fromSymbol,
+    toSymbol,
+    [],
+  ]
+
+  const successMsg = `Order Submitted!`
+
+  if (token.address === ethers.constants.AddressZero) {
+    let value = ethers.utils.parseUnits(tokenAmount, token.decimals)
+    Api.callContract(chainId, contract, method, params, {
+      value: value,
+      senMsg: `Submitted.`,
+      failMsg: `Failed.`,
+      successMsg,
+    })
+      .then(() => { })
+      .catch(e => { console.log(e) })
+  } else {
+    Api.callContract(chainId, contract, method, params, {
+      sentMsg: `Submitted.`,
+      failMsg: `Failed.`,
+      successMsg,
+    })
+      .then(() => { })
+      .catch(e => { console.log(e) })
+  }
+
+}
+
 export async function addLiquidity(
   chainId,
   library,

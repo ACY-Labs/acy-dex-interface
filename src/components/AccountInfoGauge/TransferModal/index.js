@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AcyCardList, AcyIcon } from '@/components/Acy';
 import Modal from '../../PerpetualComponent/Modal/Modal';
-import { Layout, Menu,AutoComplete, Row, Col, Button, Input, Select, Divider, Table } from 'antd';
+import { Layout, Menu, AutoComplete, Row, Col, Button, Input, Select, Divider, Table } from 'antd';
 import {
   DownOutlined,
   DisconnectOutlined,
@@ -14,12 +14,13 @@ import Reader from '@/abis/future-option-power/Reader.json'
 import { getContract } from '@/constants/future_option_power.js';
 import { fetcher } from '@/acy-dex-futures/utils';
 import { useWeb3React } from '@web3-react/core';
-
+import { useConnectWallet } from '@/components/ConnectWallet';
 import * as future from '@/constants/future.js';
 
-import styles from './styles.less';
 import { symbol } from 'prop-types';
-
+import { transfer } from '@/services/derivatives';
+import Router from '@/abis/future-option-power/Router.json';
+import styles from './styles.less';
 
 const TransferModal = props => {
 
@@ -31,15 +32,17 @@ const TransferModal = props => {
     handleCancel,
   } = props
 
-  const [activeToken, setActiveToken] = useState("");
-  const [activeSymbol, setActiveSymbol] = useState("");
+  const [selectedToken, setSelectedToken] = useState("")
+  const [activeToken, setActiveToken] = useState()
+  const [tokenValue, setTokenValue] = useState(0)
+  const [fromSymbol, setFromSymbol] = useState("")
+  const [toSymbol, setToSymbol] = useState("")
 
   const selectToken = token => {
-    setActiveToken(token);
+    setActiveToken(token)
+    setSelectedToken(token.symbol)
   }
-  const selectSymbol = symbol => {
-    setActiveSymbol(symbol);
-  }
+
   const tokenImgURL = {
     'MATIC': 'https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png?1624446912',
     'WMATIC': 'https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png?1624446912',
@@ -52,21 +55,23 @@ const TransferModal = props => {
   }
   const getPrimaryText = () => {
     if (account == undefined) {
-        return "Connect Wallet"
+      return "Connect Wallet"
     } else {
-        return "Transfer"
+      return "Transfer"
     }
   }
 
+  const connectWalletByLocalStorage = useConnectWallet()
   const { active, activate } = useWeb3React();
 
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
+  const routerAddress = getContract(chainId, "router")
 
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
-  
+
   useEffect(() => {
     if (active) {
       library.on('block', () => {
@@ -85,6 +90,14 @@ const TransferModal = props => {
     ]
   )
 
+  const onClickPrimary = () => {
+    if (!account) {
+      connectWalletByLocalStorage()
+      return
+    }
+    transfer(chainId, library, routerAddress, Router, activeToken, tokenValue, fromSymbol, toSymbol)
+  }
+
   return (
     <div className={styles.myModal} style={{ borderRadius: "5px" }}>
       <Modal
@@ -95,12 +108,28 @@ const TransferModal = props => {
         style={{ backgroundColor: "black", minHeight: "35rem", borderRadius: "5px" }}
       >
         <Col>
-        <Row style={{ fontSize: "1rem", backgroundColor: "black" }}>Symbol</Row>
+          <Row style={{ fontSize: "1rem", backgroundColor: "black" }}>From</Row>
           <Row>
             <div className={styles.coin} >
               <Select
-                value={activeSymbol}
-                onChange={selectSymbol}
+                value={fromSymbol}
+                onChange={e=>{setFromSymbol(e)}}
+                dropdownClassName={styles.dropDownMenu}
+              >
+                {symbolsInfo?.map(symbolInfo => (
+                  <Option className={styles.optionItem} value={symbolInfo.symbol}>
+                    <Col offset={1} span={13}> <div> {symbolInfo.symbol}</div> </Col>
+                  </Option>
+                ))}
+              </Select>
+            </div>
+          </Row>
+          <Row style={{ fontSize: "1rem", backgroundColor: "black" }}>To</Row>
+          <Row>
+            <div className={styles.coin} >
+              <Select
+                value={toSymbol}
+                onChange={e=>{setToSymbol(e)}}
                 dropdownClassName={styles.dropDownMenu}
               >
                 {symbolsInfo?.map(symbolInfo => (
@@ -115,13 +144,12 @@ const TransferModal = props => {
           <Row>
             <div className={styles.coin} >
               <Select
-                // defaultValue="Trade"
-                value={activeToken}
+                value={selectedToken}
                 onChange={selectToken}
                 dropdownClassName={styles.dropDownMenu}
               >
                 {tokens.map(token => (
-                  <Option className={styles.optionItem} value={token.symbol}>
+                  <Option className={styles.optionItem} value={token}>
                     <Col span={10}> <img src={tokenImgURL[token.symbol]} style={{ width: '20px', height: '20px' }} /></Col>
                     <Col offset={1} span={13}> <div> {token.symbol}</div> </Col>
                   </Option>
@@ -133,18 +161,16 @@ const TransferModal = props => {
           <Row>
             <div className={styles.tokenAmount} >
               <Input
-                value={0}
-                onChange={e => {
-
-                }}
+                value={tokenValue}
+                onChange={e => {setTokenValue(e.target.value)}}
                 style={{ height: "2rem" }}
               />
             </div>
           </Row>
-          <Row span={24} style={{ fontSize: "1rem", marginTop: "1rem" }}>Available: 0.0000BTC</Row>
+          {/* <Row span={24} style={{ fontSize: "1rem", marginTop: "1rem" }}>Available: 0.0000BTC</Row> */}
 
           <Row span={24} style={{ width: "10rem" }}>
-            <Button className={styles.confirmButton}>
+            <Button className={styles.confirmButton} onClick={onClickPrimary}>
               {getPrimaryText()}
             </Button>
           </Row>

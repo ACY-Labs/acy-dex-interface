@@ -7,7 +7,7 @@ import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract } from '@/constants/powers.js';
+import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
 import { fetcher } from '@/acy-dex-futures/utils';

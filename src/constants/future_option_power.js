@@ -17,13 +17,13 @@ const contracts = {
 
     oracleManager: '0x1F9c627BD3E8ef0b7152e4a3fAbD0B3eF1676821',
     pool: '0x285dc02bC51f2fabCE08F9625B44802019583286',
-    poolImplementation: '0xaB3d8DF435309C475449a836475A9f8154c39194',
+    poolImplementation: '0xc7e11af7478D0b20d0C960008D23C7aA45a9C476',
     symbolManager: "0x9CC0b982f427b1dE01E46610d8247F4b10a81AAf",
     symbolManagerImplementation: "0xbEe6eDABcC42Ed8c0B46b6fcA8Ec04decaDc0A09",
     alp: "0x002d190863243E09e83245FEE736B0B463Af5a74",
     symbolsLens: "0xE56710F67eAf87Cf998fb3bFf4B1332080942b2F",
     reader: "0xb4C9d67c91D7c6ded1A8e92912D2FD71b48167b5",
-    router: "0xd2f649eb4ab6399879534756526ac7c3d586be31",
+    router: "0x97685f833dDFF1Ce50C028Cd795bfF32D6cbbBb9",
   },
 }
 
