@@ -231,6 +231,7 @@ export async function trade(
   symbol,
   amount,
   priceLimit,
+  oracleSignatures
 ) {
   const contract = new ethers.Contract(poolAddress, IPool.abi, library.getSigner())
   let method = "trade"
@@ -239,7 +240,7 @@ export async function trade(
     symbol,
     amount,
     priceLimit,
-    [],   //oracleSignature
+    oracleSignatures,   //oracleSignature
   ]
 
   const successMsg = `Order Submitted!`

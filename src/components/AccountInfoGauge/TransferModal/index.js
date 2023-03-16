@@ -71,7 +71,6 @@ const TransferModal = props => {
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
-
   useEffect(() => {
     if (active) {
       library.on('block', () => {

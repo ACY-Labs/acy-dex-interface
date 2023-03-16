@@ -89,6 +89,7 @@ const Powers = props => {
               tokens={tokens}
               selectedToken={activeToken}
               symbol={symbol}
+              pageName="Option"
             />
           </AcyCard>
         </div>
