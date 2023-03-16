@@ -40,6 +40,9 @@ const Overview = props => {
     let { chainId } = useChainId();
     const { account, library, active, activate } = useWeb3React();
 
+    if (!account)
+        return <>No wallet account connected.</>
+
     chainId = 80001;
 
 
