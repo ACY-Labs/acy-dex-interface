@@ -92,9 +92,6 @@ const getChartOptions = (width, height) => ({
     }
     // timeFormatter: () => {
     //   const currentLocalDate = new Date(Date.now());
-    //   console.log("get local", currentLocalDate.getTimezoneOffset())
-    //   console.log("get tz", Intl.DateTimeFormat().resolvedOptions().timeZone)
-    //   console.log("get tz return", timeToTz(currentLocalDate, Intl.DateTimeFormat().resolvedOptions().timeZone))
     //   return timeToTz(currentLocalDate, Intl.DateTimeFormat().resolvedOptions().timeZone);
     // },
     // localization: {
@@ -177,21 +174,21 @@ export default function ExchangeTVChart(props) {
 
   const [currentChart, setCurrentChart] = useState();
   const [currentSeries, setCurrentSeries] = useState();
+  const [currentChartSeriesInitDone, setCurrentChartSeriesInitDone] = useState(false);
   const [period, setPeriod] = useState('5m');
   const [hoveredCandlestick, setHoveredCandlestick] = useState();
-  // const [curPrice, setCurPrice] = useState();
-  // const [priceChangePercentDelta, setPriceChangePercentDelta] = useState();
-  // const [deltaIsMinus, setDeltaIsMinus] = useState();
   const [chartInited, setChartInited] = useState(false);
 
-  let isTick = pageName == "Powers";
+  const sti_1m = useRef(null);
+  const sti_timescale = useRef(null);
+  const ref = useRef(null);
+  const chartRef = useRef(null);
+
+  const isTick = pageName == "Powers";
   const symbol = chartTokenSymbol || "BTC";
-  console.log("check delta here chartTokenSymbol", chartTokenSymbol, symbol)
   const marketName = symbol + "_USD";
   const previousMarketName = usePrevious(marketName);
-
   const tzOffset = new Date(Date.now()).getTimezoneOffset() * 60 //using tzoffset to directly change candle timestamp to show correct chart x-axis
-
   const baseTokenAddr = {
     56: [
       { symbol: "USDT", address: "0xF82eEeC2C58199cb409788E5D5806727cf549F9f" },
@@ -204,12 +201,10 @@ export default function ExchangeTVChart(props) {
       { symbol: "WETH", address: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619" }
     ],
   }
+
   useEffect(() => {
-    get24Change()
-    console.log("check delta here chartTokenSymbol 00", chartTokenSymbol, symbol)
-  }, [chartTokenSymbol])
-  const ref = useRef(null);
-  const chartRef = useRef(null);
+    get24Change();
+  }, [])
 
   useEffect(() => {
     if (marketName !== previousMarketName) {
@@ -221,7 +216,6 @@ export default function ExchangeTVChart(props) {
   const scaleChart = useCallback(() => {
     // const from = Date.now() / 1000 - (7 * 24 * CHART_PERIODS[period]) / 2;
     // const to = Date.now() / 1000;
-    // console.log("see trade timescale width", from, to, CHART_PERIODS[period])
     // setVisibleLogicalRange
     // currentChart.timeScale().setVisibleRange({ from, to });
     const num_candles = 100
@@ -239,9 +233,11 @@ export default function ExchangeTVChart(props) {
   // Binance data source
   const [lastCandle, setLastCandle] = useState({})
   const cleaner = useRef()
+
   useEffect(() => {
-    if (!currentSeries)
+    if (!currentSeries || !currentChartSeriesInitDone) {
       return;
+    }
 
     const pairName = `${fromToken}${toToken}`;
 
@@ -274,8 +270,6 @@ export default function ExchangeTVChart(props) {
       cleaner.current = clean;
     }
 
-    let sti_1m; //for data needs to be refreshed every minute
-    let sti_timescale; //for data needs to be refreshed every timescale
     const fetchPrevAndSubscribe = async () => {
       // before subscribe to websocket, should prefill the chart with existing history, this can be fetched with normal REST request
       // SHOULD DO THIS BEFORE SUBSCRIBE, HOWEVER MOVING SUBSCRIBE TO AFTER THIS BLOCK OF CODE WILL CAUSE THE SUBSCRIPTION GOES ON FOREVER
@@ -317,7 +311,6 @@ export default function ExchangeTVChart(props) {
         }
         for (let i = 0; i < Object.keys(baseTokenAddr[chainId]).length; i++) {
           if (!Object.keys(responseFromTokenData).length) {
-            console.log("see trade in responseFromTokenData is {}")
             if (fromToken != baseTokenAddr[chainId][i]) {
               try {
                 responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${activeToken.address}&token1=${baseTokenAddr[chainId][i].address}&chainId=${chainId}&period=${period}`)
@@ -387,29 +380,7 @@ export default function ExchangeTVChart(props) {
 
       }
       if (pageName == "Option" || pageName == "Futures") {
-        let from = responsePairData[responsePairData.length - 1].time 
-        sti_1m = setInterval(() => {
-          axios.get(`${OptionsPriceApi}/${pageName.toLowerCase()}?chainId=${chainId}&symbol=${chartTokenSymbol}&period=1m`)
-            .then((res) => {    
-              for (let i = 0; i < res.data.length; i++) {
-                if (res.data[i].timestamp - tzOffset > from ) {
-                  currentSeries.update({
-                    time: res.data[i].timestamp - tzOffset,
-                    open: res.data[i].o,
-                    high: res.data[i].h,
-                    low: res.data[i].l,
-                    close: res.data[i].c,
-                  })
-                  from = res.data[i].timestamp
-                }
-              }
-              setCurPrice(parseFloat(res.data[res.data.length - 1].c).toFixed(2))
-            });
-        }, 60000);
-        sti_timescale = setInterval(() => {
-          console.log("check delta in sti_timescale", dailyHigh)
-          get24Change()
-        }, CHART_PERIODS[period] * 1000);
+        updateInterval();
       }
 
       if (!isTick) {
@@ -423,16 +394,49 @@ export default function ExchangeTVChart(props) {
       }
     }
     fetchPrevAndSubscribe()
-    // get24Change()
-    console.log("check delta here chartTokenSymbol 22", chartTokenSymbol)
-
-    return () => clearInterval(sti_1m, sti_timescale)
-  }, [currentSeries, fromToken, toToken, period, chainId, chartTokenSymbol])
+    get24Change();
+      // clearInterval(sti_timescale);
+  }, [currentChartSeriesInitDone, fromToken, toToken, period, chainId, chartTokenSymbol])
   ///// end of binance data source
+
+  const updateInterval = () => {
+    if (!currentSeries || !currentChartSeriesInitDone) {
+      return;
+    }
+
+    if (sti_1m.current != null) {
+      clearInterval(sti_1m.current);
+    }
+    const from = currentSeries.Kn?.Bt?.Xr[currentSeries.Kn?.Bt?.Xr.length - 1]?.tr?.So 
+    sti_1m.current = setInterval(() => {
+      axios.get(`${OptionsPriceApi}/${pageName.toLowerCase()}?chainId=${chainId}&symbol=${chartTokenSymbol}&period=1m`)
+      .then((res) => {    
+        for (let i = 0; i < res.data.length; i++) {
+          if (res.data[i].timestamp - tzOffset > from ) {
+            currentSeries.update({
+              time: res.data[i].timestamp - tzOffset,
+              open: res.data[i].o,
+              high: res.data[i].h,
+              low: res.data[i].l,
+              close: res.data[i].c,
+            })
+            from = res.data[i].timestamp
+          }
+        }
+        setCurPrice(parseFloat(res.data[res.data.length - 1].c).toFixed(2))
+      });
+    }, 60000);
+    
+    if (sti_timescale.current != null) {
+      clearInterval(sti_timescale.current);
+    }
+    sti_timescale.current = setInterval(() => {
+      get24Change()
+    }, CHART_PERIODS[period] * 1000);
+  }
 
   //for test 24h data retrieval, 24h data will be replaced by data from backend
   const get24Change = async () => {
-    console.log("check delta func called")
     let tmpPageName //to cope with different api names for future
     if (pageName == 'Futures') {
       tmpPageName = 'futureMarket'
@@ -441,12 +445,10 @@ export default function ExchangeTVChart(props) {
     }
     axios.get(`${deltaApi}`)
       .then((res) => {
-        console.log("check delta api", res.data, chartTokenSymbol)
         for (const [page, tokens] of Object.entries(res.data)) {
           if (page == tmpPageName) {
             for (const [index, data] of Object.entries(tokens)) {
-              console.log("check delta data", data.highestPrice, chartTokenSymbol.toString())
-              if (data.symbol == chartTokenSymbol.toString()) {
+              if (data.symbol === chartTokenSymbol.toString()) {
                 setDailyHigh(parseFloat(data.highestPrice).toFixed(3))
                 setDailyLow(parseFloat(data.lowestPrice).toFixed(3))
                 setPriceDeltaPercent(parseFloat(data.priceVariation * 100).toFixed(3))
@@ -531,6 +533,7 @@ export default function ExchangeTVChart(props) {
     const series = chart.addCandlestickSeries(getSeriesOptions());
     setCurrentChart(chart);
     setCurrentSeries(series);
+    setCurrentChartSeriesInitDone(true);
   }, [ref, onCrosshairMove]);
 
   // 自适应并撑满chartRef这个div的大小。仅当currentChart已经被初始化后，才会被执行。
