@@ -202,7 +202,6 @@ const SwapComponent = props => {
   const [modalError, setModalError] = useState(false);
   const [ordersToaOpen, setOrdersToaOpen] = useState(false);
   const [isHigherSlippageAllowed, setIsHigherSlippageAllowed] = useState(false);
-  const [marginToken, setMarginToken] = useState(tokens[1])
 
 
   const savedSlippageAmount = getSavedSlippageAmount(chainId)
@@ -1863,8 +1862,6 @@ const SwapComponent = props => {
                 chainId={chainId}
                 tokens={tokens}
                 active={active}
-                token={marginToken}
-                setToken={setMarginToken}
               />
 
             </ComponentCard>

@@ -7,7 +7,7 @@ import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract } from '@/constants/powers.js';
+import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
 import { fetcher } from '@/acy-dex-futures/utils';
@@ -129,7 +129,8 @@ const Future = props => {
             {/* <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onClickCoin} coinList={coinList} /> */}
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               <ExchangeTVChart
-                chartTokenSymbol={activeToken}
+                // chartTokenSymbol={activeToken}
+                chartTokenSymbol={activeSymbol}
                 pageName="Futures"
                 fromToken={activeToken}
                 toToken="USDT"
@@ -160,6 +161,7 @@ const Future = props => {
               tokens={tokens}
               selectedToken={activeToken}
               symbol={symbol}
+              pageName="Future"
             />
           </AcyCard>
         </div>

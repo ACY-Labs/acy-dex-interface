@@ -338,6 +338,8 @@ const Option = props => {
               tokens={tokens}
               selectedToken={activeToken}
               symbol={activeSymbol}
+              // symbol={symbol}
+              pageName="Option"
             />
           </AcyCard>
         </div>

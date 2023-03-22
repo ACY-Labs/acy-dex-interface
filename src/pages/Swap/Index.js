@@ -39,6 +39,7 @@ const Swap = props => {
   const [activeToken, setActiveToken] = useState(activeToken0.address < activeToken1.address ? activeToken0 : activeToken1);
   const [hasPair, setHasPair] = useState(true);
   const [activeExist, setActiveExist] = useState(true);
+  // const [activeToken, setActiveToken] = useState("BTCUSD");
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
   const [transactionList, setTransactionList] = useState([]);
@@ -50,6 +51,7 @@ const Swap = props => {
   const [deltaIsMinus, setDeltaIsMinus] = useState(false);
   const [dailyHigh, setDailyHigh] = useState(0)
   const [dailyLow, setDailyLow] = useState(0)
+  const [showChart, setShowChart] = useState(true)
 
   // useSWR hook example - needs further implementation in backend
   // const txListUrl = `${apiUrlPrefix}/txlist/all?`
@@ -225,39 +227,33 @@ const Swap = props => {
     setActiveToken(activeToken0.symbol == e ? activeToken0 : activeToken1)
   }
 
-  // const [graphType, setGraphType] = useState("BTC")
-  // const graphTypes = ["Routes", activeToken1.symbol]
-  // const showGraph = item => {
-  //   setGraphType(item)
-  // }
+  const [graphType, setGraphType] = useState("BTC")
+  const graphTypes = ["Routes", activeToken1.symbol]
+  const showGraph = item => {
+    setGraphType(item)
+  }
 
   const test_poolsActivity = [
     {
       type: 'remove',
-      fromSymbol: 'BONE',
-      fromAmount: '22.11',
-      toSymbol: 'ETH',
-      toAmount: '0.0125323',
+      token: 'BONE',
+      tokenAmount: '22.11',
+      poolAmount: '0.0125323',
       token_value: '$21.49',
-      ago: '4min',
     },
     {
       type: 'add',
-      fromSymbol: 'USDC',
-      fromAmount: '99.99',
-      toSymbol: 'ETH',
-      toAmount: '0.0046699',
+      token: 'USDC',
+      tokenAmount: '99.99',
+      poolAmount: '0.0046699',
       token_value: '$8',
-      ago: '5min',
     },
     {
       type: 'add',
-      fromSymbol: 'SYN',
-      fromAmount: '4.427',
-      toSymbol: 'ETH',
-      toAmount: '3.7',
+      token: 'SYN',
+      tokenAmount: '4.427',
+      poolAmount: '3.7',
       token_value: '$6346',
-      ago: '6min',
     },
   ]
 
@@ -297,6 +293,8 @@ const Swap = props => {
                   latestPricePercentage={priceDeltaPercent}
                   dailyLow={dailyLow}
                   dailyHigh={dailyHigh}
+                  showChart={showChart}
+                  setShowChart={()=>setShowChart(!showChart)}
                 // coinList={coinList}
                 />
                 : <div>
@@ -314,21 +312,23 @@ const Swap = props => {
                     // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
                     // latestPrice={latestPrice}
                     // latestPricePercentage={priceChangePercentDelt
-                    latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                    latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
                     latestPrice={curPrice}
                     latestPricePercentage={priceDeltaPercent}
                     dailyLow={dailyLow}
                     dailyHigh={dailyHigh}
+                    showChart={showChart}
+                    setShowChart={()=>setShowChart(!showChart)}
                   />
                 </div>
               }
               {/* </div> */}
               {activeExist ?
                 <div style={{ borderTop: '0.75px solid #333333' }}>
-                  {/* {graphType == "Routes" ?
+                  {graphType == "Routes" ?
                   // <SankeyGraph />
                   <></>
-                  : */}
+                  : showChart && 
                   <div>
 
                     <ExchangeTVChart
@@ -355,7 +355,7 @@ const Swap = props => {
                       setDailyLow={setDailyLow}
                     />
                   </div>
-                  {/* } */}
+                  }
                 </div>
                 : <div>Chart Unavailble</div>}
             </div>
@@ -382,7 +382,7 @@ const Swap = props => {
                         token1={activeToken0.address < activeToken1.address ? activeToken1.symbol : activeToken0.symbol} />
                     )}
                     {tableContent == 'Pools Activity' && (
-                      <PoolsActivityTable dataSource={test_poolsActivity} />
+                      <PoolsActivityTable dataSource={test_poolsActivity} pool="ETH"/>
                     )}
                   </div>
                 </div>

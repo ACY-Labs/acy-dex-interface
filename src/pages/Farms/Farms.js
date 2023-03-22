@@ -133,7 +133,7 @@ const Farms = (props) => {
     try {
       pools = await newGetAllPools(library, account, chainId);
     } catch(e) {
-      console.log("getPools error: ",account,chainId,library,pools);
+      console.log("getPools error: ",account,chainId,library,pools,e);
       return;
     }
     // const pools = await newGetAllPools(library, account, chainId);
@@ -192,7 +192,7 @@ const Farms = (props) => {
     });
     
       if(account != "0x0000000000000000000000000000000000000000") {
-          console.log("TEST newFarmsContents 0:",account,farmsContent,walletConnected)
+          console.log("TEST newFarmsContents 0:", account, farmsContent,walletConnected)
           setFarmsContent(newFarmsContents);
           console.log("TEST newFarmsContents 1:",newFarmsContents);
       } else {
@@ -219,7 +219,8 @@ const Farms = (props) => {
         getPools(provider, account, chainId);
 
       } else {
-        const provider = new JsonRpcProvider(RPC_URL(), chainId);
+        let chainIdTest = 56
+        const provider = new JsonRpcProvider(RPC_URL(), chainIdTest);
         const account = "0x0000000000000000000000000000000000000000";
         setWalletConnected(false);
         getPools(provider, account, chainId);

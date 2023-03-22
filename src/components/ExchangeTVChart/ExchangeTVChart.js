@@ -11,6 +11,7 @@ import {
 import './ExchangeTVChart.css';
 import axios from "axios";
 import Binance from "binance-api-node";
+import Icon from "antd";
 
 const StyledSelect = styled(Radio.Group)`
   .ant-radio-button-wrapper{
@@ -178,6 +179,7 @@ export default function ExchangeTVChart(props) {
   const [period, setPeriod] = useState('5m');
   const [hoveredCandlestick, setHoveredCandlestick] = useState();
   const [chartInited, setChartInited] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const sti_1m = useRef(null);
   const sti_timescale = useRef(null);
@@ -239,6 +241,9 @@ export default function ExchangeTVChart(props) {
       return;
     }
 
+    setIsLoading(true)
+    currentSeries.setData([]);
+
     const pairName = `${fromToken}${toToken}`;
 
     if (cleaner.current) {
@@ -277,7 +282,6 @@ export default function ExchangeTVChart(props) {
       let responseFromTokenData;
       let responseToTokenData;
       let responsePairData = [];
-
       if (pageName == "StableCoin") {
         responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,)
           .then((res) => res.data);
@@ -330,7 +334,12 @@ export default function ExchangeTVChart(props) {
           setActiveExist(true)
         }
       }
-
+      //merging, not sure if this can be here or not
+      // Binance data is independent of chain, so here we can fill in any chain name
+      // if (responsePairData && responsePairData[0].time) {
+      //   currentSeries.setData(responsePairData);
+      //   setIsLoading(false)
+      // }
 
       // if (fromToken != USDT_Address) {
       //   responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromToken}&token1=${USDT_Address}&chainId=${chainId}&period=${period}`)
@@ -375,6 +384,7 @@ export default function ExchangeTVChart(props) {
         // Binance data is independent of chain, so here we can fill in any chain name
         if (responsePairData && responsePairData[0].time) {
           currentSeries.setData(responsePairData);
+          setIsLoading(false)
           setCurPrice(parseFloat(responsePairData[responsePairData.length - 1].close).toFixed(2))
         }
 
@@ -562,14 +572,14 @@ export default function ExchangeTVChart(props) {
           <div class="grid-container-element">
             <div className="timeSelector" style={{ float: "left" }}>
               <StyledSelect value={period} onChange={placementChange}
-                style={{ width: '200%', height: '23px' }}>
+                style={{ width: '400%', height: '23px' }}>
                 <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
                 <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>
                 <Radio.Button value="15m" style={{ width: '9%', textAlign: 'center' }}>15m</Radio.Button>
-                <Radio.Button value="30m" style={{ width: '9%', textAlign: 'center' }}>30m</Radio.Button>
+                {/* <Radio.Button value="30m" style={{ width: '9%', textAlign: 'center' }}>30m</Radio.Button> */}
                 <Radio.Button value="1h" style={{ width: '9%', textAlign: 'center' }}>1h</Radio.Button>
-                <Radio.Button value="2h" style={{ width: '9%', textAlign: 'center' }}>2h</Radio.Button>
-                <Radio.Button value="4h" style={{ width: '9%', textAlign: 'center' }}>4h</Radio.Button>
+                {/* <Radio.Button value="2h" style={{ width: '9%', textAlign: 'center' }}>2h</Radio.Button>
+                <Radio.Button value="4h" style={{ width: '9%', textAlign: 'center' }}>4h</Radio.Button> */}
                 <Radio.Button value="1d" style={{ width: '9%', textAlign: 'center' }}>1D</Radio.Button>
                 <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
               </StyledSelect>
@@ -592,7 +602,7 @@ export default function ExchangeTVChart(props) {
           <div className="ExchangeChart-bottom-controls">
           </div>
         </div>
-        {!currentChart && <Spin />}
+        {isLoading && <Spin style={{width: "100%", marginBottom:"-40%" }} />}
         <div className="ExchangeChart-bottom-content" ref={chartRef} style={{ height: "100%", width: "100%" }}></div>
       </div>
     </div>

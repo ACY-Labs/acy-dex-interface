@@ -625,7 +625,7 @@ const SwapComponent = props => {
         pair_address='0x52384e314d18aa160bca9ecf45d03b6f80f9557f'
       />
 
-      <ScoreBox />
+      {/* <ScoreBox /> */}
 
       <AcyDescriptions>
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}

@@ -104,6 +104,12 @@ function sortString(table, key, isReverse) {
 
 // wrapper sort function
 export function sortTable(table, key, isReverse) {
+  if (key == 'name' || key == 'exchange')
+    return sortString(table, key, isReverse);
+  else return sortTableRegular(table, key, isReverse);
+}
+
+export function sortPairsTable(table, key, isReverse) {
   if (key == 'time') return sortTableTime(table, key, isReverse);
   else if (key == 'name' || key == 'symbol' || key == 'coin1' || key == 'coin2' || key == 'account')
     return sortString(table, key, isReverse);
