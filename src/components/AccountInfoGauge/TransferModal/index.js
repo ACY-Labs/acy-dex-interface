@@ -39,7 +39,6 @@ const TransferModal = props => {
   const [tokenValue, setTokenValue] = useState(0)
   const [fromSymbol, setFromSymbol] = useState("")
   const [toSymbol, setToSymbol] = useState("")
-  const [token, setToken] = useState(whitelistedTokens && whitelistedTokens[0])
 
   const selectToken = token => {
     setActiveToken(token)
@@ -72,9 +71,8 @@ const TransferModal = props => {
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
 
-  const tokenAllowanceAddress = token?.address === AddressZero ? nativeTokenAddress : token?.address;
-  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
-    fetcher: fetcher(library, ERC20)
+  const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
+    fetcher: fetcher(library, Reader)
   });
 
   const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
@@ -90,16 +88,11 @@ const TransferModal = props => {
     }
   })
 
-  console.log("alan", tokenInfo, whitelistedTokens);
-
-  const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
-    fetcher: fetcher(library, Reader)
-  });
   useEffect(() => {
     if (active) {
       library.on('block', () => {
         updateSymbolsInfo(undefined, true)
-
+        updateTokenInfo()
       })
       return () => {
         library.removeAllListeners('block')
