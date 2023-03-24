@@ -16,6 +16,8 @@ import { fetcher } from '@/acy-dex-futures/utils';
 import { useWeb3React } from '@web3-react/core';
 import { useConnectWallet } from '@/components/ConnectWallet';
 import * as future from '@/constants/future.js';
+import { AddressZero } from '@ethersproject/constants';
+import ERC20 from '@/abis/future-option-power/ERC20.json';
 
 import { symbol } from 'prop-types';
 import { transfer } from '@/services/derivatives';
@@ -37,6 +39,7 @@ const TransferModal = props => {
   const [tokenValue, setTokenValue] = useState(0)
   const [fromSymbol, setFromSymbol] = useState("")
   const [toSymbol, setToSymbol] = useState("")
+  const [token, setToken] = useState(whitelistedTokens && whitelistedTokens[0])
 
   const selectToken = token => {
     setActiveToken(token)
@@ -64,9 +67,30 @@ const TransferModal = props => {
   const connectWalletByLocalStorage = useConnectWallet()
   const { active, activate } = useWeb3React();
 
+  const routerAddress = getContract(chainId, "router")
+  const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
-  const routerAddress = getContract(chainId, "router")
+
+  const tokenAllowanceAddress = token?.address === AddressZero ? nativeTokenAddress : token?.address;
+  const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
+    fetcher: fetcher(library, ERC20)
+  });
+
+  const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, Reader)
+  });
+
+  let whitelistedTokens = []
+  tokenInfo?.map(token => {
+    if(tokens.find(t=>{t.address == token.token})) {
+      whitelistedTokens.push({symbol: tokens.find(t=>{t.address == token.token})[0].name, address: tokens.find(t=>{t.address == token.token})[0].address})
+    } else {
+      whitelistedTokens.push({symbol: `${token.token.slice(0,2)}...${token.token.slice(token.token.length-4, token.token.length)}`, address: token.token})
+    }
+  })
+
+  console.log("alan", tokenInfo, whitelistedTokens);
 
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
@@ -148,9 +172,9 @@ const TransferModal = props => {
                 onChange={selectToken}
                 dropdownClassName={styles.dropDownMenu}
               >
-                {tokens.map(token => (
+                {whitelistedTokens.map(token => (
                   <Option className={styles.optionItem} value={token}>
-                    <Col span={10}> <img src={tokenImgURL[token.symbol]} style={{ width: '20px', height: '20px' }} /></Col>
+                    {tokenImgURL[token.symbol] && <Col span={10}> <img src={tokenImgURL[token.symbol]} style={{ width: '20px', height: '20px' }} /></Col>}
                     <Col offset={1} span={13}> <div> {token.symbol}</div> </Col>
                   </Option>
                 ))}
