@@ -164,8 +164,8 @@ const Option = props => {
     option_tokens?.forEach((ele) => {
       option_tokens_symbol.push({
         //symbol is displayed
-        symbol: ele[1],
-        name: ele[1]?.substring(0, 3),
+        symbol: ele[1]?.substring(0, 3),
+        name: ele[1],
       })
     })
     //option_token stores token symbols without duplicates for tab display
@@ -215,9 +215,7 @@ const Option = props => {
   const [mode, setMode] = useState('Buy')
   const [tableContent, setTableContent] = useState("Positions");
 
-  // const [activeSymbol, setActiveSymbol] = useState(option_tokens_symbol?.find(ele => ele.name == "BTC")?.name)
-  // const [activeToken, setActiveToken] = useState(option_tokens_symbol?.find(ele => ele.name == "BTC")?.symbol);
-  const [activeSymbol, setActiveSymbol] = useState(option_tokens_symbol?.find(ele => ele.name == "BTC")?.symbol)
+  const [activeSymbol, setActiveSymbol] = useState('BTCUSD-60000-C')
   const [activeToken, setActiveToken] = useState(option_tokens_symbol?.find(ele => ele.name == "BTC")?.name)
   const [latestPrice, setLatestPrice] = useState(0);
   const [priceChangePercentDelta, setPriceChangePercentDelta] = useState(0);
@@ -230,7 +228,8 @@ const Option = props => {
     // onClickSetActiveToken(item)
   }
   const selectTab = item => {
-    setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
+    setActiveToken(option_tokens_symbol.find(ele => ele.name == item))
+    setActiveSymbol(option_tokens_symbol.find(ele => ele.name == item).name)
     // let newDict = visibleToken
     // Object.entries(visibleToken).forEach((token) => {
     //   token[0] === item
@@ -259,6 +258,7 @@ const Option = props => {
   // useEffect(() => {
   //   setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
   // }, [tokens])
+  console.log("default activesymbol 00", activeSymbol)
 
   return (
     <div className={styles.main}>

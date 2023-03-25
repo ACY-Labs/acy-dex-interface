@@ -257,16 +257,16 @@ const TokenSelectorDrawer = ({
                     key={index}
                     selectToken={(item) => {
                       if (pageName == "Trade") {
-                        onCoinClick(token)
+                        onCoinClick(supToken)
                         setActiveSymbol(item)
-                        setActiveToken0(item)
-                        setActiveToken1(USDT_Token[chainId])
+                        // setActiveToken0(item)
+                        setActiveToken1(USDT_Token[chainId][0])
                       }
-                      else {
-                        setVisible(false)
-                        console.log("check delta item", item)
-                        setActiveSymbol(item.symbol)
+                      else  {
+                        setActiveSymbol(item.name)
                       }
+                      setVisible(false)
+                     
                     }}
                     customIcon={false}
                     index={index}
@@ -292,16 +292,16 @@ const TokenSelectorDrawer = ({
                         if (pageName == "Trade") {
                           onCoinClick(token)
                           setActiveSymbol(item)
-                          console.log("merge conflict setactive0", item)
-                          setActiveToken0(item)
+                          // setActiveToken0(item)
                           setActiveToken1(USDT_Token[chainId][0])
                         }
                         else {
-                          setVisible(false)
-                          setActiveSymbol(item.symbol)
+                          setActiveSymbol(item.name)
                         }
-
-                        // setVisible(false)
+                        // else {
+                        //   setActiveSymbol(item.symbol)
+                        // }
+                        setVisible(false)
                         // onCoinClick(token);
                       }}
                       isFav={favTokenList.includes(token)}

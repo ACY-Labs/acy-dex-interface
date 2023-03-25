@@ -375,7 +375,7 @@ export default function ExchangeTVChart(props) {
               time: responseFromTokenData[i].time - tzOffset,
               open: responseFromTokenData[i].open,
               high: responseFromTokenData[i].high,
-              low: responseFromTokenData[i].low ,
+              low: responseFromTokenData[i].low,
               close: responseFromTokenData[i].close,
             })
             // responsePairData = responseFromTokenData
@@ -405,7 +405,7 @@ export default function ExchangeTVChart(props) {
     }
     fetchPrevAndSubscribe()
     get24Change();
-      // clearInterval(sti_timescale);
+    // clearInterval(sti_timescale);
   }, [currentChartSeriesInitDone, fromToken, toToken, period, chainId, chartTokenSymbol])
   ///// end of binance data source
 
@@ -417,26 +417,26 @@ export default function ExchangeTVChart(props) {
     if (sti_1m.current != null) {
       clearInterval(sti_1m.current);
     }
-    const from = currentSeries.Kn?.Bt?.Xr[currentSeries.Kn?.Bt?.Xr.length - 1]?.tr?.So 
+    const from = currentSeries.Kn?.Bt?.Xr[currentSeries.Kn?.Bt?.Xr.length - 1]?.tr?.So
     sti_1m.current = setInterval(() => {
       axios.get(`${OptionsPriceApi}/${pageName.toLowerCase()}?chainId=${chainId}&symbol=${chartTokenSymbol}&period=1m`)
-      .then((res) => {    
-        for (let i = 0; i < res.data.length; i++) {
-          if (res.data[i].timestamp - tzOffset > from ) {
-            currentSeries.update({
-              time: res.data[i].timestamp - tzOffset,
-              open: res.data[i].o,
-              high: res.data[i].h,
-              low: res.data[i].l,
-              close: res.data[i].c,
-            })
-            from = res.data[i].timestamp
+        .then((res) => {
+          for (let i = 0; i < res.data.length; i++) {
+            if (res.data[i].timestamp - tzOffset > from) {
+              currentSeries.update({
+                time: res.data[i].timestamp - tzOffset,
+                open: res.data[i].o,
+                high: res.data[i].h,
+                low: res.data[i].l,
+                close: res.data[i].c,
+              })
+              from = res.data[i].timestamp
+            }
           }
-        }
-        setCurPrice(parseFloat(res.data[res.data.length - 1].c).toFixed(2))
-      });
+          setCurPrice(parseFloat(res.data[res.data.length - 1].c).toFixed(2))
+        });
     }, 60000);
-    
+
     if (sti_timescale.current != null) {
       clearInterval(sti_timescale.current);
     }
@@ -447,6 +447,7 @@ export default function ExchangeTVChart(props) {
 
   //for test 24h data retrieval, 24h data will be replaced by data from backend
   const get24Change = async () => {
+    console.log("check daily called")
     let tmpPageName //to cope with different api names for future
     if (pageName == 'Futures') {
       tmpPageName = 'futureMarket'
@@ -602,7 +603,7 @@ export default function ExchangeTVChart(props) {
           <div className="ExchangeChart-bottom-controls">
           </div>
         </div>
-        {isLoading && <Spin style={{width: "100%", marginBottom:"-40%" }} />}
+        {isLoading && <Spin style={{ width: "100%", marginBottom: "-40%" }} />}
         <div className="ExchangeChart-bottom-content" ref={chartRef} style={{ height: "100%", width: "100%" }}></div>
       </div>
     </div>

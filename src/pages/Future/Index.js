@@ -31,6 +31,8 @@ const Future = props => {
   const [dailyLow, setDailyLow] = useState(0)
   const [dailyVol, setDailyVol] = useState(0)
 
+  const [activeSymbol, setActiveSymbol] = useState("BTCUSD");
+  const [activeToken, setActiveToken] = useState("BTCUSD");
   // const [activeToken, setActiveToken] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
 
   const readerAddress = getContract(chainId, "reader")
@@ -39,24 +41,6 @@ const Future = props => {
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
-  console.log("default provider", symbolsInfo)
-
-  //future_tokens store every symbols in future and its data 
-  // const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
-  // let future_tokens_symbol = []
-  // future_tokens?.forEach((ele)=>{
-  //   future_tokens_symbol.push({
-  //     name: ele[1],
-  //     symbol: ele[1].substring(0,3),
-  //   })
-  // })  
-  // //future_token stores token symbols without duplicates for tab display
-  // let future_token = []
-  // future_tokens_symbol?.forEach((ele) => {
-  //   if (!future_token.includes(ele.symbol)){
-  //     future_token.push(ele.symbol)
-  //   }
-  // })
 
   //future_tokens store every symbols in future and its data 
   const future_tokens_symbol = useMemo(() => {
@@ -67,17 +51,16 @@ const Future = props => {
     })
     )
   }, [symbolsInfo])
-  //future_token stores token symbols without duplicates for tab display
+  //future_token stores token names without duplicates for tab display
   const future_token = useMemo(() => {
     const res = []
     future_tokens_symbol?.forEach((ele) => {
-      if (!res.includes(ele.symbol)) {
-        res.push(ele.symbol)
+      if (!res.includes(ele.name)) {
+        res.push(ele.name)
       }
     })
     return res
   }, [future_tokens_symbol])
-
   useEffect(() => {
     if (active) {
       library.on('block', () => {
@@ -90,23 +73,18 @@ const Future = props => {
   }, [active, library, chainId,
     updateSymbolsInfo]
   )
-  const [activeSymbol, setActiveSymbol] = useState("BTC")
-  const [activeToken, setActiveToken] = useState("BTC");
 
-  const selectTab = item => {
-    setActiveToken((tokens.filter(ele => ele.symbol == item)[0]))
+  const selectTab = (item) => {
+    setActiveToken(future_tokens_symbol.find(ele => ele.name == item))
+    setActiveSymbol(future_tokens_symbol.find(ele => ele.name == item).name)
   }
-
-  // useEffect(()=>{
-  //   setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
-  // }, [tokens])
 
   const [latestPrice, setLatestPrice] = useState(0);
   const [priceChangePercentDelta, setPpriceChangePercentDelta] = useState(0);
-  const onChangePrice = (curPrice, change) => {
-    setLatestPrice(curPrice);
-    setPpriceChangePercentDelta(change);
-  }
+  // const onChangePrice = (curPrice, change) => {
+  //   setLatestPrice(curPrice);
+  //   setPpriceChangePercentDelta(change);
+  // }
 
   return (
     <div className={styles.main}>
@@ -116,6 +94,7 @@ const Future = props => {
           : <div className={`${styles.colItem} ${styles.priceChart}`}>
             <AcySymbolNav data={future_token} onChange={selectTab} />
             <AcySymbol
+              pageName="Futures"
               activeSymbol={activeSymbol}
               setActiveSymbol={setActiveSymbol}
               coinList={future_tokens_symbol}

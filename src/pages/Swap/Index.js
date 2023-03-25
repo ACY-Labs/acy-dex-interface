@@ -203,6 +203,7 @@ const Swap = props => {
   // for activeToken chosen from tokenSelectorModal, set token0 as selected and token1 as USDT
   // should not be activated when triggered by tab for nopair
   useEffect(() => {
+    console.log("merge conflict activetoken0 set", activeToken)
     if (activeToken != activeToken0 && activeToken1 && hasPair) {
       setActiveToken0(activeToken)
       setActiveToken1(tokens[0])
@@ -261,6 +262,7 @@ const Swap = props => {
   useEffect(() => {
     const hash = history.location.hash.replace('#', '').split('&')
     if (history.location.hash) {
+      console.log("merge conflict historylocation")
       setActiveToken0({ symbol: hash[0].split('/')[0].replaceAll('%20', ' '), address: hash[1] })
       setActiveToken1({ symbol: hash[0].split('/')[1].replaceAll('%20', ' '), address: hash[2] })
     }
@@ -285,6 +287,8 @@ const Swap = props => {
                   // activeSymbol={activeToken0.symbol}
                   // setActiveSymbol={setActiveSymbol}
                   setActiveSymbol={setActiveToken}
+                  setActiveToken0={setActiveToken0}
+                  setActiveToken1={setActiveToken1}
                   pageName={"Trade"}
                   // pairName='BTC'
                   // showDrawer={onClickCoin}
@@ -294,7 +298,7 @@ const Swap = props => {
                   dailyLow={dailyLow}
                   dailyHigh={dailyHigh}
                   showChart={showChart}
-                  setShowChart={()=>setShowChart(!showChart)}
+                  setShowChart={() => setShowChart(!showChart)}
                 // coinList={coinList}
                 />
                 : <div>
@@ -318,7 +322,7 @@ const Swap = props => {
                     dailyLow={dailyLow}
                     dailyHigh={dailyHigh}
                     showChart={showChart}
-                    setShowChart={()=>setShowChart(!showChart)}
+                    setShowChart={() => setShowChart(!showChart)}
                   />
                 </div>
               }
@@ -326,35 +330,35 @@ const Swap = props => {
               {activeExist ?
                 <div style={{ borderTop: '0.75px solid #333333' }}>
                   {graphType == "Routes" ?
-                  // <SankeyGraph />
-                  <></>
-                  : showChart && 
-                  <div>
+                    // <SankeyGraph />
+                    <></>
+                    : showChart &&
+                    <div>
 
-                    <ExchangeTVChart
-                      chartTokenSymbol={activeToken1.symbol}
-                      pageName="Trade"
-                      fromToken={activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address}
-                      toToken={activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address}
-                      chainId={chainId}
-                      activeToken={activeToken}
-                      //property for trade
-                      setHasPair={setHasPair}
-                      activeExist={activeExist}
-                      setActiveExist={setActiveExist}
-                      //for chart 24 tab
-                      curPrice={curPrice}
-                      setCurPrice={setCurPrice}
-                      priceDeltaPercent={priceDeltaPercent}
-                      setPriceDeltaPercent={setPriceDeltaPercent}
-                      deltaIsMinus={deltaIsMinus}
-                      setDeltaIsMinus={setDeltaIsMinus}
-                      dailyHigh={dailyHigh}
-                      setDailyHigh={setDailyHigh}
-                      dailyLow={dailyLow}
-                      setDailyLow={setDailyLow}
-                    />
-                  </div>
+                      <ExchangeTVChart
+                        chartTokenSymbol={activeToken1.symbol}
+                        pageName="Trade"
+                        fromToken={activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address}
+                        toToken={activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address}
+                        chainId={chainId}
+                        activeToken={activeToken}
+                        //property for trade
+                        setHasPair={setHasPair}
+                        activeExist={activeExist}
+                        setActiveExist={setActiveExist}
+                        //for chart 24 tab
+                        curPrice={curPrice}
+                        setCurPrice={setCurPrice}
+                        priceDeltaPercent={priceDeltaPercent}
+                        setPriceDeltaPercent={setPriceDeltaPercent}
+                        deltaIsMinus={deltaIsMinus}
+                        setDeltaIsMinus={setDeltaIsMinus}
+                        dailyHigh={dailyHigh}
+                        setDailyHigh={setDailyHigh}
+                        dailyLow={dailyLow}
+                        setDailyLow={setDailyLow}
+                      />
+                    </div>
                   }
                 </div>
                 : <div>Chart Unavailble</div>}
@@ -382,7 +386,7 @@ const Swap = props => {
                         token1={activeToken0.address < activeToken1.address ? activeToken1.symbol : activeToken0.symbol} />
                     )}
                     {tableContent == 'Pools Activity' && (
-                      <PoolsActivityTable dataSource={test_poolsActivity} pool="ETH"/>
+                      <PoolsActivityTable dataSource={test_poolsActivity} pool="ETH" />
                     )}
                   </div>
                 </div>
