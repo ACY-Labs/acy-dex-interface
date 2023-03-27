@@ -41,17 +41,6 @@ const AccountInfoGauge = props => {
     fetcher: fetcher(library, Reader)
   });
 
-  // const whitelistedTokens = getTokenList.find(t => t.address == getTokenInfoReturnedAddr)?.name || getTokenInfoReturnedAddr
-  let whitelistedTokens = []
-  tokenInfo?.map(token => {
-    console.log('alan', token)
-    if(!tokens.find(t => t.address == token.address)){
-      whitelistedTokens.push(token.address)
-    } else {
-      whitelistedTokens.push(tokens.find(t => t.address == token.address)[0].name)
-    }    
-  })
-
   useEffect(() => {
     if (active) {
       library.on('block', () => {
@@ -68,7 +57,6 @@ const AccountInfoGauge = props => {
       updateTokenInfo,
     ]
   )
-  console.log("alan",tokenInfo, tokens, whitelistedTokens);
 
   return (
     <div className={styles.main}>
