@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AcyCardList, AcyIcon } from '@/components/Acy';
 import Modal from '../../PerpetualComponent/Modal/Modal';
 import { Layout, Menu, AutoComplete, Row, Col, Button, Input, Select, Divider, Table } from 'antd';
@@ -79,14 +79,23 @@ const TransferModal = props => {
     fetcher: fetcher(library, Reader)
   });
 
-  let whitelistedTokens = []
-  tokenInfo?.map(token => {
-    if(tokens.find(t=>{t.address == token.token})) {
-      whitelistedTokens.push({symbol: tokens.find(t=>{t.address == token.token})[0].name, address: tokens.find(t=>{t.address == token.token})[0].address})
-    } else {
-      whitelistedTokens.push({symbol: `${token.token.slice(0,2)}...${token.token.slice(token.token.length-4, token.token.length)}`, address: token.token})
-    }
-  })
+  const whitelistedTokens = useMemo(() => {
+    return tokenInfo?.map(token => {
+      // check if the whitelistedToken addr is found in the frontend constant list
+      const tok = tokens.find(t=>{t.address == token.token})
+      if (tok) {
+        return {
+          symbol: tok[0].name,
+          address: tok[0].address
+        }
+      } else {
+        return {
+          symbol: `${token.token.slice(0,2)}...${token.token.slice(token.token.length-4, token.token.length)}`,
+          address: token.token
+        }
+      }
+    }) || []
+  }, [tokenInfo])
 
   useEffect(() => {
     if (active) {
