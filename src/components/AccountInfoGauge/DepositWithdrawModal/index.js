@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AcyCuarrencyCard } from '../../Acy';
 import Modal from '../../PerpetualComponent/Modal/Modal';
 import TokenSelectorModal from '../../TokenSelectorModal';
@@ -10,6 +10,7 @@ import { PLACEHOLDER_ACCOUNT, fetcher, parseValue } from '@/acy-dex-futures/util
 import useSWR from 'swr';
 import Router from '@/abis/future-option-power/Router.json';
 import ERC20 from '@/abis/future-option-power/ERC20.json';
+import Reader from '@/abis/future-option-power/Reader.json'
 
 import styles from './styles.less';
 
@@ -28,7 +29,7 @@ const DepositWithdrawModal = props => {
 
   const connectWalletByLocalStorage = useConnectWallet()
 
-  const [token, setToken] = useState(tokens[1])
+  const [token, setToken] = useState(whitelistedTokens && whitelistedTokens[0])
   const [tokenValue, setTokenValue] = useState('');
   const [tokenAmount, setTokenAmount] = useState(parseValue(tokenValue, token?.decimals))
   const [visible, setVisible] = useState(false)
@@ -37,14 +38,38 @@ const DepositWithdrawModal = props => {
 
   const routerAddress = getContract(chainId, "router")
   const nativeTokenAddress = getContract(chainId, "NATIVE_TOKEN")
+  const readerAddress = getContract(chainId, "reader")
+  const poolAddress = getContract(chainId, "pool")
 
-  const tokenAllowanceAddress = token.address === AddressZero ? nativeTokenAddress : token.address;
+  const tokenAllowanceAddress = token?.address === AddressZero ? nativeTokenAddress : token?.address;
   const { data: tokenAllowance, mutate: updateTokenAllowance } = useSWR([chainId, tokenAllowanceAddress, "allowance", account || PLACEHOLDER_ACCOUNT, routerAddress], {
     fetcher: fetcher(library, ERC20)
   });
 
+  const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, Reader)
+  });
+
+  const whitelistedTokens = useMemo(() => {
+    return tokenInfo?.map(token => {
+      // check if the whitelistedToken addr is found in the frontend constant list
+      const tok = tokens.find(t=>{t.address == token.token})
+      if (tok) {
+        return {
+          symbol: tok[0].name,
+          address: tok[0].address
+        }
+      } else {
+        return {
+          symbol: `${token.token.slice(0,2)}...${token.token.slice(token.token.length-4, token.token.length)}`,
+          address: token.token
+        }
+      }
+    }) || []
+  }, [tokenInfo])
+
   const needApproval =
-    token.address != AddressZero &&
+    token?.address != AddressZero &&
     tokenAllowance &&
     tokenAmount &&
     tokenAmount.gt(tokenAllowance)
@@ -140,7 +165,7 @@ const DepositWithdrawModal = props => {
           setVisible(false)
           setIsWaitingForApproval(false)
         }}
-        defaultTokens={tokens}
+        defaultTokens={whitelistedTokens}
       />
     </>
   );

@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Gauge } from 'ant-design-pro/lib/Charts';
 import ComponentButton from '../ComponentButton';
 import DepositWithdrawModal from './DepositWithdrawModal';
+import { getContract } from '@/constants/future_option_power.js';
+import useSWR from 'swr';
+import { PLACEHOLDER_ACCOUNT, fetcher } from '@/acy-dex-futures/utils';
+import Reader from '@/abis/future-option-power/Reader.json'
 
 import styles from './styles.less';
+import { offset } from '@popperjs/core';
 
 const AccountInfoGauge = props => {
 
@@ -20,7 +25,7 @@ const AccountInfoGauge = props => {
   const [isConfirming, setIsConfirming] = useState(false)
 
   const onClickDeposit = () => {
-    setMode('Deposit')
+    setMode('Deposit')  
     setIsConfirming(true)
   }
 
@@ -28,6 +33,30 @@ const AccountInfoGauge = props => {
     setMode('Withdraw')
     setIsConfirming(true)
   }
+
+  const readerAddress = getContract(chainId, "reader")
+  const poolAddress = getContract(chainId, "pool")
+
+  const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, Reader)
+  });
+
+  useEffect(() => {
+    if (active) {
+      library.on('block', () => {
+        updateTokenInfo(undefined, true)
+      });
+      return () => {
+        library.removeAllListeners('block')
+      }
+    }
+  },
+    [active,
+      library,
+      chainId,
+      updateTokenInfo,
+    ]
+  )
 
   return (
     <div className={styles.main}>
