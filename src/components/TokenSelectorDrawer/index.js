@@ -292,7 +292,7 @@ const TokenSelectorDrawer = ({
                         if (pageName == "Trade") {
                           onCoinClick(token)
                           setActiveSymbol(item)
-                          // setActiveToken0(item)
+                          setActiveToken0(item)
                           setActiveToken1(USDT_Token[chainId][0])
                         }
                         else {

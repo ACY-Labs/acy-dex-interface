@@ -176,25 +176,6 @@ const Swap = props => {
     getTradeHistory()
   }, [activeToken0, activeToken1]);
 
-  //to resolve error that extra str being fetched from url
-  useEffect(() => {
-    console.log("see trade modal select", activeToken0, activeToken1)
-    if (activeToken0.address.length != 42) {
-      setActiveToken0({
-        ...activeToken0,
-        address: activeToken0.address.substring(0, 42),
-        // ...activeToken0        
-      })
-    }
-    if (activeToken1.address.length != 42) {
-      setActiveToken1({
-        ...activeToken1,
-        address: activeToken1.address.substring(0, 42),
-        // ...activeToken1        
-      })
-    }
-  }, [activeToken0, activeToken1])
-
   useEffect(() => {
     console.log("see trade modal select", activeToken0, activeToken1, activeToken)
 
@@ -202,13 +183,13 @@ const Swap = props => {
 
   // for activeToken chosen from tokenSelectorModal, set token0 as selected and token1 as USDT
   // should not be activated when triggered by tab for nopair
-  useEffect(() => {
-    console.log("merge conflict activetoken0 set", activeToken)
-    if (activeToken != activeToken0 && activeToken1 && hasPair) {
-      setActiveToken0(activeToken)
-      setActiveToken1(tokens[0])
-    }
-  }, [activeToken])
+  // useEffect(() => {
+  //   console.log("check trade activetoken1 useeffect activetoken", tokens[0], activeToken)
+  //   if (activeToken != activeToken0 && activeToken1 && hasPair) {
+  //     setActiveToken0(activeToken)
+  //     setActiveToken1(tokens[0])
+  //   }
+  // }, [activeToken])
 
   const onHandModalConfirmOrder = falg => {
     setVisibleConfirmOrder(!!falg);
@@ -262,9 +243,9 @@ const Swap = props => {
   useEffect(() => {
     const hash = history.location.hash.replace('#', '').split('&')
     if (history.location.hash) {
-      console.log("merge conflict historylocation")
-      setActiveToken0({ symbol: hash[0].split('/')[0].replaceAll('%20', ' '), address: hash[1] })
-      setActiveToken1({ symbol: hash[0].split('/')[1].replaceAll('%20', ' '), address: hash[2] })
+      setActiveToken({ symbol: hash[0].split('/')[0].replaceAll('%20', ' '), address: hash[1].substring(0, 42) })
+      setActiveToken0({ symbol: hash[0].split('/')[0].replaceAll('%20', ' '), address: hash[1].substring(0, 42) })
+      setActiveToken1({ symbol: hash[0].split('/')[1].replaceAll('%20', ' '), address: hash[2].substring(0, 42) })
     }
   }, [history.location.hash])
 
@@ -284,8 +265,6 @@ const Swap = props => {
               {hasPair ?
                 <AcySymbol
                   activeSymbol={activeToken0.address < activeToken1.address ? `${activeToken0.symbol}/${activeToken1.symbol}` : `${activeToken1.symbol}/${activeToken0.symbol}`}
-                  // activeSymbol={activeToken0.symbol}
-                  // setActiveSymbol={setActiveSymbol}
                   setActiveSymbol={setActiveToken}
                   setActiveToken0={setActiveToken0}
                   setActiveToken1={setActiveToken1}
@@ -299,7 +278,6 @@ const Swap = props => {
                   dailyHigh={dailyHigh}
                   showChart={showChart}
                   setShowChart={() => setShowChart(!showChart)}
-                // coinList={coinList}
                 />
                 : <div>
                   <AcySymbolNav data={[activeToken0.symbol, activeToken1.symbol]} onChange={onTabSelect} />
@@ -311,11 +289,6 @@ const Swap = props => {
                     setActiveSymbol={setActiveToken}
                     setActiveToken0={setActiveToken0}
                     setActiveToken1={setActiveToken1}
-                    // pairName='BTC'
-                    // showDrawer={onClickCoin}
-                    // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
-                    // latestPrice={latestPrice}
-                    // latestPricePercentage={priceChangePercentDelt
                     latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
                     latestPrice={curPrice}
                     latestPricePercentage={priceDeltaPercent}
@@ -334,34 +307,27 @@ const Swap = props => {
                     <></>
                     : showChart &&
                     <div>
-
                       <ExchangeTVChart
-                        chartTokenSymbol={activeToken1.symbol}
-                        pageName="Trade"
-                        fromToken={activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address}
-                        toToken={activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address}
                         chainId={chainId}
+                        pageName="Trade"
+                        activeSymbol={activeToken1.symbol}
+                        fromTokenAddr={activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address}
+                        toTokenAddr={activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address}
                         activeToken={activeToken}
                         //property for trade
                         setHasPair={setHasPair}
                         activeExist={activeExist}
                         setActiveExist={setActiveExist}
                         //for chart 24 tab
-                        curPrice={curPrice}
                         setCurPrice={setCurPrice}
-                        priceDeltaPercent={priceDeltaPercent}
                         setPriceDeltaPercent={setPriceDeltaPercent}
-                        deltaIsMinus={deltaIsMinus}
-                        setDeltaIsMinus={setDeltaIsMinus}
-                        dailyHigh={dailyHigh}
                         setDailyHigh={setDailyHigh}
-                        dailyLow={dailyLow}
                         setDailyLow={setDailyLow}
                       />
                     </div>
                   }
                 </div>
-                : <div>Chart Unavailble</div>}
+                : <div style={{width:"100%", height:"100%"}}>Chart Unavailble</div>}
             </div>
 
             <div className={styles.bottomWrapper}>

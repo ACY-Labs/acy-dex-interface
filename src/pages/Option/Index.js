@@ -283,21 +283,12 @@ const Option = props => {
               />
               <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
                 <ExchangeTVChart
-                  chartTokenSymbol={activeSymbol}
-                  pageName="Option"
-                  fromToken={activeToken}
-                  toToken="USDT"
                   chainId={chainId}
-                  // onChangePrice={onChangePrice}
-                  curPrice={curPrice}
+                  pageName="Option"
+                  activeSymbol={activeSymbol}
                   setCurPrice={setCurPrice}
-                  priceDeltaPercent={priceDeltaPercent}
                   setPriceDeltaPercent={setPriceDeltaPercent}
-                  deltaIsMinus={deltaIsMinus}
-                  setDeltaIsMinus={setDeltaIsMinus}
-                  dailyHigh={dailyHigh}
                   setDailyHigh={setDailyHigh}
-                  dailyLow={dailyLow}
                   setDailyLow={setDailyLow}
                   setDailyVol={setDailyVol}
                 />

@@ -108,22 +108,12 @@ const Future = props => {
             {/* <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onClickCoin} coinList={coinList} /> */}
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               <ExchangeTVChart
-                // chartTokenSymbol={activeToken}
-                chartTokenSymbol={activeSymbol}
-                pageName="Futures"
-                fromToken={activeToken}
-                toToken="USDT"
                 chainId={chainId}
-                // onChangePrice={onChangePrice}
-                curPrice={curPrice}
+                pageName="Futures"
+                activeSymbol={activeSymbol}
                 setCurPrice={setCurPrice}
-                priceDeltaPercent={priceDeltaPercent}
                 setPriceDeltaPercent={setPriceDeltaPercent}
-                deltaIsMinus={deltaIsMinus}
-                setDeltaIsMinus={setDeltaIsMinus}
-                dailyHigh={dailyHigh}
                 setDailyHigh={setDailyHigh}
-                dailyLow={dailyLow}
                 setDailyLow={setDailyLow}
                 setDailyVol={setDailyVol}
               />

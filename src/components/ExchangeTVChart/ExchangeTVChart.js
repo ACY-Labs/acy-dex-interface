@@ -144,32 +144,31 @@ function getCurrentTimestamp() {
 
 export default function ExchangeTVChart(props) {
   const {
-    chartTokenSymbol,
-    pageName,
-    fromToken,
-    toToken,
     chainId,
-    activeToken,
-    // onChangePrice,
-    //for 24h change
-    curPrice,
-    setCurPrice,
-    priceDeltaPercent,
-    setPriceDeltaPercent,
-    deltaIsMinus,
-    setDeltaIsMinus,
-    dailyHigh,
-    setDailyHigh,
-    dailyLow,
-    setDailyLow,
-    setDailyVol,
+    pageName,
+    //for Future, Option (and Power) page
+    activeSymbol,
     //for trade page
+    fromTokenAddr,
+    toTokenAddr,
+    activeToken,
     setHasPair,
     activeExist,
     setActiveExist,
+    //for 24h change
+    setCurPrice,
+    setPriceDeltaPercent,
+    setDailyHigh,
+    setDailyLow,
+    setDailyVol,
   } = props
 
-  if (!chartTokenSymbol) {
+  console.log("check trade response props", activeExist)
+  useEffect(()=>{
+    console.log("check trade props child update ", activeExist)
+  }, [activeExist])
+
+  if (!activeSymbol) {
     return null;
   }
 
@@ -187,7 +186,7 @@ export default function ExchangeTVChart(props) {
   const chartRef = useRef(null);
 
   const isTick = pageName == "Powers";
-  const symbol = chartTokenSymbol || "BTC";
+  const symbol = activeSymbol || "BTC";
   const marketName = symbol + "_USD";
   const previousMarketName = usePrevious(marketName);
   const tzOffset = new Date(Date.now()).getTimezoneOffset() * 60 //using tzoffset to directly change candle timestamp to show correct chart x-axis
@@ -244,7 +243,7 @@ export default function ExchangeTVChart(props) {
     setIsLoading(true)
     currentSeries.setData([]);
 
-    const pairName = `${fromToken}${toToken}`;
+    const pairName = `${fromTokenAddr}${toTokenAddr}`;
 
     if (cleaner.current) {
       // unsubscribe from previous subscription
@@ -257,7 +256,7 @@ export default function ExchangeTVChart(props) {
       // subscribe to websocket for the future price update
       const clean = client.ws.candles(pairName, period, (res) => {
         const candleData = {
-          time: res.startTime / 1000,   // make it in seconds
+          time: res.startTime / 1000,
           open: res.open,
           high: res.high,
           low: res.low,
@@ -283,39 +282,40 @@ export default function ExchangeTVChart(props) {
       let responseToTokenData;
       let responsePairData = [];
       if (pageName == "StableCoin") {
-        responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,)
+        responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toTokenAddr}USDT&interval=${period}`,)
           .then((res) => res.data);
-        if (toToken != "USDT") {
-          responseToTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toToken}USDT&interval=${period}`,)
+        if (toTokenAddr != "USDT") {
+          responseToTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${toTokenAddr}USDT&interval=${period}`,)
             .then((res) => res.data)
         }
       } else if (pageName == "Option") {
-        responseFromTokenData = await axios.get(`${OptionsPriceApi}/option?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
+        responseFromTokenData = await axios.get(`${OptionsPriceApi}/option?chainId=${chainId}&symbol=${activeSymbol}&period=${period}`)
           .then((res) => res.data);
       } else if (pageName == "Futures") {
-        responseFromTokenData = await axios.get(`${OptionsPriceApi}/futures?chainId=${chainId}&symbol=${chartTokenSymbol}&period=${period}`)
+        responseFromTokenData = await axios.get(`${OptionsPriceApi}/futures?chainId=${chainId}&symbol=${activeSymbol}&period=${period}`)
           .then((res) => res.data);
       } else if (pageName == "Trade") {
-        responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromToken}&token1=${toToken}&chainId=${chainId}&period=${period}`)
+        responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromTokenAddr}&token1=${toTokenAddr}&chainId=${chainId}&period=${period}`)
           .then((res) => res.data);
       } else {
-        responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${fromToken}USDT&interval=${period}`,)
+        responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${fromTokenAddr}USDT&interval=${period}`,)
           .then((res) => res.data);
       }
       // console.log("trade responseFromTokenData", responseFromTokenData, Object.keys(responseFromTokenData).length)
 
-      if (pageName == 'Trade') {
+      if (pageName === 'Trade') {
         if (!Object.keys(responseFromTokenData).length) {
-          console.log("see trade before for, no pair ", responseFromTokenData)
+          console.log("check trade before iter, no pair ", responseFromTokenData)
           // setActiveExist(false)
           setHasPair(false)
         } else if (Object.keys(responseFromTokenData).length) {
+          console.log("check trade before iter, no pair yes length", Object.keys(responseFromTokenData).length)
           setHasPair(true)
           setActiveExist(true)
         }
         for (let i = 0; i < Object.keys(baseTokenAddr[chainId]).length; i++) {
           if (!Object.keys(responseFromTokenData).length) {
-            if (fromToken != baseTokenAddr[chainId][i]) {
+            if (fromTokenAddr != baseTokenAddr[chainId][i]) {
               try {
                 responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${activeToken.address}&token1=${baseTokenAddr[chainId][i].address}&chainId=${chainId}&period=${period}`)
                   .then((res) => res.data)
@@ -323,12 +323,12 @@ export default function ExchangeTVChart(props) {
               } catch (e) {
                 console.log(baseTokenAddr[i], " pair does not exist! see trade")
               }
-              console.log("see trade try catch responseFromTokenData", responseFromTokenData, baseTokenAddr[chainId][i].symbol, `${TradePriceApi}?token0=${fromToken}&token1=${baseTokenAddr[chainId][i].address}&chainId=${chainId}&period=${period}`)
             }
           }
         }
-        if (!responseFromTokenData || !Object.keys(responseFromTokenData).length) {
-          console.log("see trade no from pair found ", responseFromTokenData, responseToTokenData)
+        console.log("check trade responseFromTokenData ", responseFromTokenData, Object.keys(responseFromTokenData).length)
+        if ( !Object.keys(responseFromTokenData).length) {
+          console.log("check trade response no from pair found ", responseFromTokenData, responseToTokenData)
           setActiveExist(false)
         } else {
           setActiveExist(true)
@@ -341,17 +341,18 @@ export default function ExchangeTVChart(props) {
       //   setIsLoading(false)
       // }
 
-      // if (fromToken != USDT_Address) {
-      //   responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromToken}&token1=${USDT_Address}&chainId=${chainId}&period=${period}`)
+      // if (fromTokenAddr != USDT_Address) {
+      //   responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromTokenAddr}&token1=${USDT_Address}&chainId=${chainId}&period=${period}`)
       //     .then((res) => res.data)
-      // } else if (toToken != USDT_Address) {
-      //   responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${toToken}&token1=${USDT_Address}&chainId=${chainId}&period=${period}`)
+      // } else if (toTokenAddr != USDT_Address) {
+      //   responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${toTokenAddr}&token1=${USDT_Address}&chainId=${chainId}&period=${period}`)
       //     .then((res) => res.data)
       // } else {
       //   //here should include error msg as both from token and to token is USDT
       // }
 
       // set pair data only when from data exists
+      console.log("check trade response bug activeExist", activeExist, pageName)
       if (activeExist && pageName == 'Trade' || pageName != 'Trade') {
         for (let i = 0; i < responseFromTokenData.length; i++) {
           if (pageName == "Option" || pageName == "Futures" || pageName == "Trade") {
@@ -362,7 +363,7 @@ export default function ExchangeTVChart(props) {
               low: responseFromTokenData[i].l,
               close: responseFromTokenData[i].c,
             })
-          } else if (toToken != "USDT") {
+          } else if (toTokenAddr != "USDT") {
             responsePairData.push({
               time: responseFromTokenData[i].time - tzOffset,
               open: responseFromTokenData[i].open / responseToTokenData[i].open,
@@ -381,8 +382,9 @@ export default function ExchangeTVChart(props) {
             // responsePairData = responseFromTokenData
           }
         }
+        console.log("check trade responsePairData", responseFromTokenData, responsePairData, activeExist)
         // Binance data is independent of chain, so here we can fill in any chain name
-        if (responsePairData && responsePairData[0].time) {
+        if (responsePairData && responsePairData[0]?.time) {
           currentSeries.setData(responsePairData);
           setIsLoading(false)
           setCurPrice(parseFloat(responsePairData[responsePairData.length - 1].close).toFixed(2))
@@ -406,7 +408,7 @@ export default function ExchangeTVChart(props) {
     fetchPrevAndSubscribe()
     get24Change();
     // clearInterval(sti_timescale);
-  }, [currentChartSeriesInitDone, fromToken, toToken, period, chainId, chartTokenSymbol])
+  }, [currentChartSeriesInitDone, fromTokenAddr, toTokenAddr, period, chainId, activeSymbol])
   ///// end of binance data source
 
   const updateInterval = () => {
@@ -419,7 +421,7 @@ export default function ExchangeTVChart(props) {
     }
     const from = currentSeries.Kn?.Bt?.Xr[currentSeries.Kn?.Bt?.Xr.length - 1]?.tr?.So
     sti_1m.current = setInterval(() => {
-      axios.get(`${OptionsPriceApi}/${pageName.toLowerCase()}?chainId=${chainId}&symbol=${chartTokenSymbol}&period=1m`)
+      axios.get(`${OptionsPriceApi}/${pageName.toLowerCase()}?chainId=${chainId}&symbol=${activeSymbol}&period=1m`)
         .then((res) => {
           for (let i = 0; i < res.data.length; i++) {
             if (res.data[i].timestamp - tzOffset > from) {
@@ -459,7 +461,7 @@ export default function ExchangeTVChart(props) {
         for (const [page, tokens] of Object.entries(res.data)) {
           if (page == tmpPageName) {
             for (const [index, data] of Object.entries(tokens)) {
-              if (data.symbol === chartTokenSymbol.toString()) {
+              if (data.symbol === activeSymbol.toString()) {
                 setDailyHigh(parseFloat(data.highestPrice).toFixed(3))
                 setDailyLow(parseFloat(data.lowestPrice).toFixed(3))
                 setPriceDeltaPercent(parseFloat(data.priceVariation * 100).toFixed(3))
@@ -470,36 +472,6 @@ export default function ExchangeTVChart(props) {
         }
       });
   }
-  // const getDeltaPriceChange = (data) => {
-  //   let chart1D
-  // if (pageName == 'Trade') {
-  //   chart1D = await axios.get(`${TradePriceApi}?token0=${fromToken}&token1=${toToken}&chainId=${chainId}&period=1d`)
-  //     .then((res) => res.data);
-  // } else if (pageName == 'Futures') {
-  //   chart1D = await axios.get(`${OptionsPriceApi}/futures?chainId=${chainId}&symbol=${chartTokenSymbol}&period=1d`)
-  //     .then((res) => res.data);
-  // } else if (pageName == 'Option') {
-  //   chart1D = await axios.get(`${OptionsPriceApi}/option?chainId=${chainId}&symbol=${chartTokenSymbol}&period=1d`)
-  //     .then((res) => res.data);
-  // }
-  // // parseFloat(chart1D[chart1D.length - 1]?.h).toFixed(3)
-
-  // // let latestTick; let yesterday;
-  // let timeNow = getCurrentTimestamp()
-  // let latestTick; let yesterday;
-  // let forwardArr = 86400 / CHART_PERIODS[period]
-  // let arrIndex = 999 - forwardArr
-  // if (!isTick) {
-  //   latestTick = candles[candles.length - 1]?.close || candles[candles.length - 1]?.c;
-  //   yesterday = candles[candles.length - 1 - forwardArr]?.open || candles[candles.length - 1 - 1440]?.o;
-  // }
-  // else if (isTick) {
-  //   latestTick = candles[candles.length - 1]?.St[0];
-  //   yesterday = candles[candles.length - 1 - forwardArr]?.St[0];
-  // }
-  // let deltaPercent = ((latestTick - yesterday) / yesterday * 100).toString();
-
-  // }
 
   // 设置chart的鼠标移动时的回调函数。evt是event的意思。
   const onCrosshairMove = useCallback(
@@ -577,23 +549,11 @@ export default function ExchangeTVChart(props) {
                 <Radio.Button value="1m" style={{ width: '9%', textAlign: 'center' }}>1m</Radio.Button>
                 <Radio.Button value="5m" style={{ width: '9%', textAlign: 'center' }}>5m</Radio.Button>
                 <Radio.Button value="15m" style={{ width: '9%', textAlign: 'center' }}>15m</Radio.Button>
-                {/* <Radio.Button value="30m" style={{ width: '9%', textAlign: 'center' }}>30m</Radio.Button> */}
                 <Radio.Button value="1h" style={{ width: '9%', textAlign: 'center' }}>1h</Radio.Button>
-                {/* <Radio.Button value="2h" style={{ width: '9%', textAlign: 'center' }}>2h</Radio.Button>
-                <Radio.Button value="4h" style={{ width: '9%', textAlign: 'center' }}>4h</Radio.Button> */}
                 <Radio.Button value="1d" style={{ width: '9%', textAlign: 'center' }}>1D</Radio.Button>
                 <Radio.Button value="1w" style={{ width: '9%', textAlign: 'center' }}>1W</Radio.Button>
               </StyledSelect>
             </div>
-            {/* {deltaIsMinus ?
-              <div style={{ float: "right", paddingRight: "1rem", wordSpacing: "0.5rem", color: "#FA3C58" }}>
-                ${curPrice} -{priceChangePercentDelta}%
-              </div>
-              :
-              <div style={{ float: "right", paddingRight: "1rem", wordSpacing: "0.5rem", color: '#46E3AE' }}>
-                ${curPrice} +{priceChangePercentDelta}%
-              </div>
-            } */}
           </div>
 
         </div>
