@@ -149,8 +149,10 @@ export default function ExchangeTVChart(props) {
     //for Future, Option (and Power) page
     activeSymbol,
     //for trade page
-    fromTokenAddr,
-    toTokenAddr,
+    token0Addr,
+    token1Addr,
+    // fromTokenAddr,
+    // toTokenAddr,
     activeToken,
     setHasPair,
     activeExist,
@@ -163,10 +165,6 @@ export default function ExchangeTVChart(props) {
     setDailyVol,
   } = props
 
-  console.log("check trade response props", activeExist)
-  useEffect(()=>{
-    console.log("check trade props child update ", activeExist)
-  }, [activeExist])
 
   if (!activeSymbol) {
     return null;
@@ -187,6 +185,9 @@ export default function ExchangeTVChart(props) {
 
   const isTick = pageName == "Powers";
   const symbol = activeSymbol || "BTC";
+  const isReciprocal = token0Addr < token1Addr; // check if trade candles need division or not
+  const fromTokenAddr = token0Addr < token1Addr ? token0Addr : token1Addr
+  const toTokenAddr = token0Addr < token1Addr ? token1Addr : token0Addr
   const marketName = symbol + "_USD";
   const previousMarketName = usePrevious(marketName);
   const tzOffset = new Date(Date.now()).getTimezoneOffset() * 60 //using tzoffset to directly change candle timestamp to show correct chart x-axis
@@ -301,15 +302,12 @@ export default function ExchangeTVChart(props) {
         responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${fromTokenAddr}USDT&interval=${period}`,)
           .then((res) => res.data);
       }
-      // console.log("trade responseFromTokenData", responseFromTokenData, Object.keys(responseFromTokenData).length)
 
       if (pageName === 'Trade') {
         if (!Object.keys(responseFromTokenData).length) {
-          console.log("check trade before iter, no pair ", responseFromTokenData)
           // setActiveExist(false)
           setHasPair(false)
         } else if (Object.keys(responseFromTokenData).length) {
-          console.log("check trade before iter, no pair yes length", Object.keys(responseFromTokenData).length)
           setHasPair(true)
           setActiveExist(true)
         }
@@ -326,9 +324,7 @@ export default function ExchangeTVChart(props) {
             }
           }
         }
-        console.log("check trade responseFromTokenData ", responseFromTokenData, Object.keys(responseFromTokenData).length)
-        if ( !Object.keys(responseFromTokenData).length) {
-          console.log("check trade response no from pair found ", responseFromTokenData, responseToTokenData)
+        if (!Object.keys(responseFromTokenData).length) {
           setActiveExist(false)
         } else {
           setActiveExist(true)
@@ -352,10 +348,9 @@ export default function ExchangeTVChart(props) {
       // }
 
       // set pair data only when from data exists
-      console.log("check trade response bug activeExist", activeExist, pageName)
       if (activeExist && pageName == 'Trade' || pageName != 'Trade') {
         for (let i = 0; i < responseFromTokenData.length; i++) {
-          if (pageName == "Option" || pageName == "Futures" || pageName == "Trade") {
+          if (pageName == "Option" || pageName == "Futures" || (pageName === "Trade" && !isReciprocal)) {
             responsePairData.push({
               time: responseFromTokenData[i].timestamp - tzOffset,
               open: responseFromTokenData[i].o,
@@ -363,15 +358,26 @@ export default function ExchangeTVChart(props) {
               low: responseFromTokenData[i].l,
               close: responseFromTokenData[i].c,
             })
-          } else if (toTokenAddr != "USDT") {
+          }
+          else if (pageName === "Trade" && isReciprocal) {
             responsePairData.push({
-              time: responseFromTokenData[i].time - tzOffset,
-              open: responseFromTokenData[i].open / responseToTokenData[i].open,
-              high: responseFromTokenData[i].high / responseToTokenData[i].high,
-              low: responseFromTokenData[i].low / responseToTokenData[i].low,
-              close: responseFromTokenData[i].close / responseToTokenData[i].close,
+              time: responseFromTokenData[i].timestamp - tzOffset,
+              open: responseFromTokenData[i].o === 0 ? 0 : 1 / responseFromTokenData[i].o,
+              high: responseFromTokenData[i].o === 0 ? 0 : 1 / responseFromTokenData[i].h,
+              low: responseFromTokenData[i].o === 0 ? 0 : 1 / responseFromTokenData[i].l,
+              close: responseFromTokenData[i].o === 0 ? 0 : 1 / responseFromTokenData[i].c,
             })
-          } else {
+          }
+          // else if (toTokenAddr != "USDT") {
+          //   responsePairData.push({
+          //     time: responseFromTokenData[i].time - tzOffset,
+          //     open: responseFromTokenData[i].open / responseToTokenData[i].open,
+          //     high: responseFromTokenData[i].high / responseToTokenData[i].high,
+          //     low: responseFromTokenData[i].low / responseToTokenData[i].low,
+          //     close: responseFromTokenData[i].close / responseToTokenData[i].close,
+          //   })
+          // } 
+          else {
             responsePairData.push({
               time: responseFromTokenData[i].time - tzOffset,
               open: responseFromTokenData[i].open,
@@ -382,7 +388,6 @@ export default function ExchangeTVChart(props) {
             // responsePairData = responseFromTokenData
           }
         }
-        console.log("check trade responsePairData", responseFromTokenData, responsePairData, activeExist)
         // Binance data is independent of chain, so here we can fill in any chain name
         if (responsePairData && responsePairData[0]?.time) {
           currentSeries.setData(responsePairData);

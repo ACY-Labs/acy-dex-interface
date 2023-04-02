@@ -290,6 +290,7 @@ const TokenSelectorDrawer = ({
                       // }}
                       selectToken={(item) => {
                         if (pageName == "Trade") {
+                          console.log("check trade logic modal", item, USDT_Token[chainId][0])
                           onCoinClick(token)
                           setActiveSymbol(item)
                           setActiveToken0(item)

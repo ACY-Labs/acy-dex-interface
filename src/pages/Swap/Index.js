@@ -164,7 +164,6 @@ const Swap = props => {
   // }, [activeToken0, activeToken1]);
 
   useEffect(() => {
-    console.log("see trade activetoken1 change", activeToken1)
     const getTradeHistory = async () => {
       let address0 = activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address
       let address1 = activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address
@@ -176,10 +175,6 @@ const Swap = props => {
     getTradeHistory()
   }, [activeToken0, activeToken1]);
 
-  useEffect(() => {
-    console.log("see trade modal select", activeToken0, activeToken1, activeToken)
-
-  }, [activeToken0, activeToken1, activeToken])
 
   // for activeToken chosen from tokenSelectorModal, set token0 as selected and token1 as USDT
   // should not be activated when triggered by tab for nopair
@@ -311,8 +306,11 @@ const Swap = props => {
                         chainId={chainId}
                         pageName="Trade"
                         activeSymbol={activeToken1.symbol}
-                        fromTokenAddr={activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address}
-                        toTokenAddr={activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address}
+                        //the token with smaller addr is fromToken, the bigger one is toToken
+                        token0Addr={activeToken0.address}
+                        token1Addr={activeToken1.address}
+                        // fromTokenAddr={activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address}
+                        // toTokenAddr={activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address}
                         activeToken={activeToken}
                         //property for trade
                         setHasPair={setHasPair}
@@ -327,7 +325,7 @@ const Swap = props => {
                     </div>
                   }
                 </div>
-                : <div style={{width:"100%", height:"100%"}}>Chart Unavailble</div>}
+                : <div className={styles.chartUnavailable}>Chart Unavailble</div>}
             </div>
 
             <div className={styles.bottomWrapper}>
