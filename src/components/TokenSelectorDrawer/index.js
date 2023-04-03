@@ -19,7 +19,7 @@ import { useConstantLoader, getGlobalTokenList } from '@/constants';
 import mockTokenList from '@/components/SwapComponent/mockTokenList.json';
 // import InfiniteScroll from 'react-infinite-scroll-component';
 
-const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simple, coinList, placement='right', activeSymbol, selectSymbol, setActiveSymbol, pageName }) => {
+const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simple, coinList, placement = 'right', pageName, setFavTokens }) => {
   const { account, library, chainId } = useConstantLoader();
 
   // const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
@@ -60,18 +60,18 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
     const totalTokenList = [...localTokenList, ...tokenlist];
     console.log("resetting tokenSelectorModal new renderTokenList", totalTokenList)
     //read the fav tokens code in storage
-    var favTokenSymbol = JSON.parse(localStorage.getItem('tokens_symbol'));
+    var favTokens = JSON.parse(localStorage.getItem('token'));
     //set to fav token
-    if (favTokenSymbol != null) {
+    if (favTokens != null) {
       setFavTokenList(
-        initTokenList.filter(token => favTokenSymbol.includes(token.symbol))
+        initTokenList.filter(token => favTokens.includes(token.address))
       );
     }
   }, [chainId]);
 
-  useEffect(()=>{
+  useEffect(() => {
     setRenderTokenList(initTokenList.slice(0, 20))
-  },[initTokenList])
+  }, [initTokenList])
 
   const onTokenSearchChange = e => {
     setPageIdx(1)
@@ -80,9 +80,9 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
     setInitTokenList(filterTokenList)
     if (filterTokenList.length < 20) {
       setHasMore(false)
-    }else{
+    } else {
       setHasMore(true)
-      filterTokenList = filterTokenList.slice(0,20)
+      filterTokenList = filterTokenList.slice(0, 20)
     }
     setRenderTokenList(
       filterTokenList
@@ -96,7 +96,7 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
       return;
     }
     setPageIdx(pageIdx + 1);
-    setRenderTokenList(initTokenList.slice(0, (pageIdx+1) * 20));
+    setRenderTokenList(initTokenList.slice(0, (pageIdx + 1) * 20));
   }
 
 
@@ -140,23 +140,24 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
   const setTokenAsFav = token => {
     setFavTokenList(prevState => {
       const prevFavTokenList = [...prevState];
-      if (prevFavTokenList.includes(token)) {
-        var tokens = prevFavTokenList.filter(value => value != token);
-        localStorage.setItem('token', JSON.stringify(tokens.map(e => e.addressOnEth)));
+      if (localStorage.getItem('token').includes(token.address)) {
+        var tokens = prevFavTokenList.filter(value => value.address != token.address);
+        localStorage.setItem('token', JSON.stringify(tokens.map(e => e.address)));
         localStorage.setItem('tokens_symbol', JSON.stringify(tokens.map(e => e.symbol)));
+        if(setFavTokens) setFavTokens()
         return tokens
       }
       prevFavTokenList.push(token);
-      localStorage.setItem('token', JSON.stringify(prevFavTokenList.map(e => e.addressOnEth)));
+      localStorage.setItem('token', JSON.stringify(prevFavTokenList.map(e => e.address)));
       localStorage.setItem('tokens_symbol', JSON.stringify(prevFavTokenList.map(e => e.symbol)));
-
+      if(setFavTokens) setFavTokens()
       return prevFavTokenList;
     });
   };
 
   const fetchData = (page) => {
-    console.log("page",page);
-    const temp = allTokenlist.slice(0,9)
+    console.log("page", page);
+    const temp = allTokenlist.slice(0, 9)
     tokenlist = [...initTokenList, ...temp];
     // setInitTokenList(newTokenList);
   }
@@ -208,67 +209,46 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
               onChange={onTokenSearchChange}
               id="liquidity-token-search-input"
               autoComplete="off"
-              prefix={<Icon type="search"/>}
+              prefix={<Icon type="search" />}
             />
           </div>
 
           <div className={styles.coinList}>
             <AcyTabs>
-
-
-              <AcyTabPane 
-                tab={<span><Icon type="star" theme="filled" />Favorite</span>} 
-                key="2">
-                {favTokenList.length ? favTokenList.map((supToken, index) => (
-                  <AcyCoinItem
-                    data={supToken}
-                    key={index}
-                    selectToken={(item) => {
-                      setVisible(false)
-                      setActiveSymbol(item.symbol)                    
-                    }}
-                    customIcon={false}
-                    index={index}
-                    clickCallback={() => setTokenAsFav(supToken)}
-                    isFav={favTokenList.includes(supToken)}
-                  />
-                ))
-                  : <div className={styles.textCenter} >No matching result</div>}
-              </AcyTabPane>
               <AcyTabPane tab="All" key="1">
-              {renderTokenList.length ? renderTokenList.map((token, index) => {
-                    return (
-                      <AcyCoinItem
-                        hideBalance={true}
-                        data={token}
-                        key={index}
-                        customIcon={false}
-                        clickCallback={() => setTokenAsFav(token)}
-                        // selectToken={(item) => {
-                        //   setActiveSymbol(item.symbol)
-                        // }}
-                        selectToken={(item) => {
-                          if (pageName=="Trade") {onCoinClick(token)}
-                          else {setVisible(false)}
-                          setActiveSymbol(item.symbol)
-                          // setVisible(false)
-                          // onCoinClick(token);
-                        }}
-                        isFav={favTokenList.includes(token)}
-                        constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}
-                      />
-                    );
-                  })
-                    :null}
+                {renderTokenList.length ? renderTokenList.map((token, index) => {
+                  return (
+                    <AcyCoinItem
+                      hideBalance={true}
+                      data={token}
+                      key={index}
+                      customIcon={false}
+                      clickCallback={() => setTokenAsFav(token)}
+                      // selectToken={(item) => {
+                      //   setActiveSymbol(item.symbol)
+                      // }}
+                      selectToken={(item) => {
+                        if (pageName == "Trade") { onCoinClick(token) }
+                        else { setVisible(false) }
+                        // setActiveSymbol(item.symbol)
+                        // setVisible(false)
+                        // onCoinClick(token);
+                      }}
+                      isFav={favTokenList.includes(token)}
+                      constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}
+                    />
+                  );
+                })
+                  : null}
                 <div className={styles.buttonContainer}>
-                {hasMore?
-                <Button 
-                type="primary"
-                className={styles.buttonCenter}
-                onClick={loadMore}>Load More</Button>
-                :<div className={styles.textCenter} >No more result</div>} 
+                  {hasMore ?
+                    <Button
+                      type="primary"
+                      className={styles.buttonCenter}
+                      onClick={loadMore}>Load More</Button>
+                    : <div className={styles.textCenter} >No more result</div>}
                 </div>
-                  
+
                 {/* <InfiniteScroll
                 dataLength={initTokenList.length}
                 next={(page)=>fetchData(page)}
@@ -295,6 +275,26 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
                   })
                     : <div className={styles.textCenter} >No matching result</div>}
                 </InfiniteScroll> */}
+              </AcyTabPane>
+
+              <AcyTabPane
+                tab={<span><Icon type="star" theme="filled" />Favorite</span>}
+                key="2">
+                {favTokenList.length ? favTokenList.map((supToken, index) => (
+                  <AcyCoinItem
+                    data={supToken}
+                    key={index}
+                    selectToken={(item) => {
+                      setVisible(false)
+                      // setActiveSymbol(item.symbol)
+                    }}
+                    customIcon={false}
+                    index={index}
+                    clickCallback={() => setTokenAsFav(supToken)}
+                    isFav={favTokenList.includes(supToken)}
+                  />
+                ))
+                  : <div className={styles.textCenter} >No matching result</div>}
               </AcyTabPane>
             </AcyTabs>
           </div>

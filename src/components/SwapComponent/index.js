@@ -25,10 +25,6 @@ const SwapComponent = props => {
     token1,
     onSelectToken0,
     onSelectToken1,
-    activeSymbol,
-    setActiveSymbol,
-    activeSymbol1,
-    setActiveSymbol1,
     isLockedToken1=false,
     account,
     library,
@@ -635,8 +631,6 @@ const SwapComponent = props => {
         onCoinClick={onCoinClick} 
         coinList={tokenlist} 
         pageName={"Trade"} 
-        activeSymbol={activeSymbol}
-        setActiveSymbol={setActiveSymbol}
         />
 
     </div>
