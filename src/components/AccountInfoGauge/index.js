@@ -34,30 +34,6 @@ const AccountInfoGauge = props => {
     setIsConfirming(true)
   }
 
-  const readerAddress = getContract(chainId, "reader")
-  const poolAddress = getContract(chainId, "pool")
-
-  const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, Reader)
-  });
-
-  useEffect(() => {
-    if (active) {
-      library.on('block', () => {
-        updateTokenInfo(undefined, true)
-      });
-      return () => {
-        library.removeAllListeners('block')
-      }
-    }
-  },
-    [active,
-      library,
-      chainId,
-      updateTokenInfo,
-    ]
-  )
-
   return (
     <div className={styles.main}>
       <div className={styles.accountInfo}>

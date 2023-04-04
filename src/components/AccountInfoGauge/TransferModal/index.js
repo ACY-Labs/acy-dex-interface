@@ -79,23 +79,10 @@ const TransferModal = props => {
     fetcher: fetcher(library, Reader)
   });
 
-  const whitelistedTokens = useMemo(() => {
-    return tokenInfo?.map(token => {
-      // check if the whitelistedToken addr is found in the frontend constant list
-      const tok = tokens.find(t=>{t.address == token.token})
-      if (tok) {
-        return {
-          symbol: tok[0].name,
-          address: tok[0].address
-        }
-      } else {
-        return {
-          symbol: `${token.token.slice(0,2)}...${token.token.slice(token.token.length-4, token.token.length)}`,
-          address: token.token
-        }
-      }
-    }) || []
-  }, [tokenInfo])
+  let whitelistedTokens = []
+  tokenInfo?.map(token => {
+    whitelistedTokens.push({ symbol: token.symbol, address: token.token })
+  })
 
   useEffect(() => {
     if (active) {
@@ -138,7 +125,7 @@ const TransferModal = props => {
             <div className={styles.coin} >
               <Select
                 value={fromSymbol}
-                onChange={e=>{setFromSymbol(e)}}
+                onChange={e => { setFromSymbol(e) }}
                 dropdownClassName={styles.dropDownMenu}
               >
                 {symbolsInfo?.map(symbolInfo => (
@@ -154,7 +141,7 @@ const TransferModal = props => {
             <div className={styles.coin} >
               <Select
                 value={toSymbol}
-                onChange={e=>{setToSymbol(e)}}
+                onChange={e => { setToSymbol(e) }}
                 dropdownClassName={styles.dropDownMenu}
               >
                 {symbolsInfo?.map(symbolInfo => (
@@ -187,7 +174,7 @@ const TransferModal = props => {
             <div className={styles.tokenAmount} >
               <Input
                 value={tokenValue}
-                onChange={e => {setTokenValue(e.target.value)}}
+                onChange={e => { setTokenValue(e.target.value) }}
                 style={{ height: "2rem" }}
               />
             </div>
