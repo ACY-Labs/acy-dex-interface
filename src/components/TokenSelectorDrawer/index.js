@@ -37,9 +37,13 @@ const TokenSelectorDrawer = ({
 
   // const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
   // const tokenlist = coinList ? coinList : getGlobalTokenList()
-  const tokenlist = coinList ? coinList : mockTokenList
+
+  //coinList contains 7 tokens, mockTokenList has thousands
+  // const tokenlist = coinList ? coinList : mockTokenList
+  const tokenlist = mockTokenList
+
+  // const tokenlist = mockTokenList
   // let tokenlist = allTokenlist.slice(0,9)
-  // console.log("Token list in drawer", tokenlist)
   useEffect(() => {
     setInitTokenList(tokenlist)
   }, [tokenlist])
@@ -79,7 +83,6 @@ const TokenSelectorDrawer = ({
   useEffect(() => {
     if (!tokenlist) return
     // return
-    console.log("resetting page states in TokenSelectorModal", tokenlist)
     setInitTokenList(tokenlist);
     setCustomTokenList([]);
     setTokenSearchInput('');
@@ -94,11 +97,18 @@ const TokenSelectorDrawer = ({
     const totalTokenList = [...localTokenList, ...tokenlist];
     console.log("resetting tokenSelectorModal new renderTokenList", totalTokenList)
     //read the fav tokens code in storage
-    var favTokenSymbol = JSON.parse(localStorage.getItem('tokens_symbol'));
+    // var favTokenSymbol = JSON.parse(localStorage.getItem('tokens_symbol'));
+    // //set to fav token
+    // if (favTokenSymbol != null) {
+    //   setFavTokenList(
+    //     initTokenList.filter(token => favTokenSymbol.includes(token.symbol))
+    //   );
+    // }
+    var favTokenAddr = JSON.parse(localStorage.getItem('tokens_addr'));
     //set to fav token
-    if (favTokenSymbol != null) {
+    if (favTokenAddr != null) {
       setFavTokenList(
-        initTokenList.filter(token => favTokenSymbol.includes(token.symbol))
+        initTokenList.filter(token => favTokenAddr.includes(token.address))
       );
     }
   }, [chainId]);
@@ -176,13 +186,14 @@ const TokenSelectorDrawer = ({
       const prevFavTokenList = [...prevState];
       if (prevFavTokenList.includes(token)) {
         var tokens = prevFavTokenList.filter(value => value != token);
-        localStorage.setItem('token', JSON.stringify(tokens.map(e => e.addressOnEth)));
-        localStorage.setItem('tokens_symbol', JSON.stringify(tokens.map(e => e.symbol)));
+        localStorage.setItem('tokens_addr', JSON.stringify(tokens.map(e => e.address)));
+        // localStorage.setItem('token', JSON.stringify(tokens.map(e => e.addressOnEth)));
+        localStorage.setItem('tokens_symbol', JSON.stringify(tokens.map(e => e.name)));
         return tokens
       }
       prevFavTokenList.push(token);
-      localStorage.setItem('token', JSON.stringify(prevFavTokenList.map(e => e.addressOnEth)));
-      localStorage.setItem('tokens_symbol', JSON.stringify(prevFavTokenList.map(e => e.symbol)));
+      localStorage.setItem('tokens_addr', JSON.stringify(prevFavTokenList.map(e => e.address)));
+      localStorage.setItem('tokens_symbol', JSON.stringify(prevFavTokenList.map(e => e.name)));
 
       return prevFavTokenList;
     });
@@ -207,6 +218,7 @@ const TokenSelectorDrawer = ({
     >
 
       {simple ?
+        //simple is for options-pool
         <div className={styles.tokenselector}>
           <div className={styles.coinList}>
             {initTokenList.length ? initTokenList.map((token, index) => {
@@ -262,11 +274,11 @@ const TokenSelectorDrawer = ({
                         // setActiveToken0(item)
                         setActiveToken1(USDT_Token[chainId][0])
                       }
-                      else  {
+                      else {
                         setActiveSymbol(item.name)
                       }
                       setVisible(false)
-                     
+
                     }}
                     customIcon={false}
                     index={index}
@@ -290,7 +302,6 @@ const TokenSelectorDrawer = ({
                       // }}
                       selectToken={(item) => {
                         if (pageName == "Trade") {
-                          console.log("check trade logic modal", item, USDT_Token[chainId][0])
                           onCoinClick(token)
                           setActiveSymbol(item)
                           setActiveToken0(item)

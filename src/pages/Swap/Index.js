@@ -370,6 +370,8 @@ const Swap = props => {
                   activeSymbol1={activeSymbol1}
                   setActiveSymbol1={setActiveSymbol1}
                   setActiveToken={setActiveToken}
+                  setActiveToken0={setActiveToken0}
+                  setActiveToken1={setActiveToken1}
                   onSelectToken0={token => { setActiveToken0(token); }}
                   onSelectToken1={token => { setActiveToken1(token); }}
                   account={account}
