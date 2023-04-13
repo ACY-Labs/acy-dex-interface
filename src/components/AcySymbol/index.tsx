@@ -55,22 +55,22 @@ const AcySymbol = (props: any) => {
           </div>
           <div style={{ marginLeft: '20px' }} className={styles.item}>
             <div>24h Change %</div>
-            {latestPricePercentage > 0 ?
-              <span style={{ color: '#0ecc83' }}>{latestPricePercentage} %</span>
-              : <span style={{ color: '#fa3c58' }}>{latestPricePercentage} %</span>
+            {latestPricePercentage >= 0 ?
+              <span style={{ color: '#0ecc83' }}>{pageName === "Trade"?`-`:latestPricePercentage} %</span>
+              : <span style={{ color: '#fa3c58' }}>{pageName === "Trade"?`-`:latestPricePercentage} %</span>
             }
           </div>
           <div className={styles.item}>
             <div>24H High</div>
-            <span>{dailyHigh}</span>
+            <span>{pageName === "Trade"?`-`:dailyHigh}</span>
           </div>
           <div className={styles.item}>
             <div>24H Low</div>
-            <span>{dailyLow}</span>
+            <span>{pageName === "Trade"?`-`:dailyLow}</span>
           </div>
           <div className={styles.item}>
             <div>24H Turnover(USDT)</div>
-            <span>{dailyVol}</span>
+            <span>{pageName === "Trade"?`-`:dailyVol}</span>
           </div>
           <div className={styles.item}>
             <div>Funding / Countdown</div>

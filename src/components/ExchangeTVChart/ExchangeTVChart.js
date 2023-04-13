@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useRef, useCallback, useMemo, createElement } from "react";
 import { Spin, Radio, Button } from 'antd';
 import styled from "styled-components";
 import { createChart } from "lightweight-charts";
@@ -127,6 +127,7 @@ const getChartOptions = (width, height) => ({
     borderVisible: false,
   },
   crosshair: {
+    crosshairMarkerVisible: true,
     horzLine: {
       color: "#aaa",
     },
@@ -154,6 +155,7 @@ export default function ExchangeTVChart(props) {
     // fromTokenAddr,
     // toTokenAddr,
     activeToken,
+    hasPair,
     setHasPair,
     activeExist,
     setActiveExist,
@@ -183,9 +185,13 @@ export default function ExchangeTVChart(props) {
   const ref = useRef(null);
   const chartRef = useRef(null);
 
+  const tooltipDiv = document.createElement("div");
+  tooltipDiv.className = "tooltip";
+
   const isTick = pageName == "Powers";
   const symbol = activeSymbol || "BTC";
   const isReciprocal = token0Addr < token1Addr; // check if trade candles need division or not
+
   const fromTokenAddr = token0Addr < token1Addr ? token0Addr : token1Addr
   const toTokenAddr = token0Addr < token1Addr ? token1Addr : token0Addr
   const marketName = symbol + "_USD";
@@ -208,6 +214,20 @@ export default function ExchangeTVChart(props) {
     get24Change();
   }, [])
 
+
+  useEffect(() => {
+    if (localStorage.getItem("sti_1m")) {
+      clearInterval(localStorage.getItem("sti_1m"))
+    }
+    if (localStorage.getItem("sti_timescale")) {
+      clearInterval(localStorage.getItem("sti_timescale"))
+    }
+  }, [])
+
+  useEffect(() => {
+    console.log("no chart error token addr change token0Addr", token0Addr, " token1Addr:", token1Addr)
+  }, [token0Addr, token1Addr])
+
   useEffect(() => {
     if (marketName !== previousMarketName) {
       setChartInited(false);
@@ -216,6 +236,10 @@ export default function ExchangeTVChart(props) {
 
   // 设置chart的横轴range
   const scaleChart = useCallback(() => {
+    console.log("no chart error hasPair", activeExist)
+    if (!activeExist) {
+      return
+    }
     // const from = Date.now() / 1000 - (7 * 24 * CHART_PERIODS[period]) / 2;
     // const to = Date.now() / 1000;
     // setVisibleLogicalRange
@@ -224,13 +248,13 @@ export default function ExchangeTVChart(props) {
     const from_time = Math.floor(Date.now() / 1000) - num_candles
     const to_time = Math.floor(Date.now() / 1000)
     //how many candles shown in chart at init
-    const test_time = Math.floor(Date.now() / 1000) - (150 * CHART_PERIODS[period])
+    const test_time = Math.floor(Date.now() / 1000) - (60 * CHART_PERIODS[period])
     // let tmp_from = Math.floor(Date.now() / 1000) - (25)
     // let tmp_to = Math.floor(Date.now() / 1000 )
-    currentChart.timeScale().setVisibleRange({ from: test_time, to: to_time });
+    currentChart.timeScale()?.setVisibleRange({ from: test_time - tzOffset, to: to_time - tzOffset });
     // currentChart.timeScale().setVisibleLogicalRange({ from: from_time, to: to_time });
     // currentChart.timeScale().fitContent()
-  }, [currentChart, period, currentSeries]);
+  }, [currentChart, period, currentSeries, token0Addr, token1Addr]);
 
   // Binance data source
   const [lastCandle, setLastCandle] = useState({})
@@ -296,6 +320,7 @@ export default function ExchangeTVChart(props) {
         responseFromTokenData = await axios.get(`${OptionsPriceApi}/futures?chainId=${chainId}&symbol=${activeSymbol}&period=${period}`)
           .then((res) => res.data);
       } else if (pageName == "Trade") {
+        console.log("no chart error url", `${TradePriceApi}?token0=${fromTokenAddr}&token1=${toTokenAddr}&chainId=${chainId}&period=${period}`)
         responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromTokenAddr}&token1=${toTokenAddr}&chainId=${chainId}&period=${period}`)
           .then((res) => res.data);
       } else {
@@ -307,7 +332,9 @@ export default function ExchangeTVChart(props) {
         if (!Object.keys(responseFromTokenData).length) {
           // setActiveExist(false)
           setHasPair(false)
+          console.log("no chart error length==0", responseFromTokenData, hasPair)
         } else if (Object.keys(responseFromTokenData).length) {
+          console.log("no chart error length!=0", responseFromTokenData)
           setHasPair(true)
           setActiveExist(true)
         }
@@ -326,6 +353,7 @@ export default function ExchangeTVChart(props) {
         }
         if (!Object.keys(responseFromTokenData).length) {
           setActiveExist(false)
+          setHasPair(false)
         } else {
           setActiveExist(true)
         }
@@ -391,6 +419,7 @@ export default function ExchangeTVChart(props) {
         // Binance data is independent of chain, so here we can fill in any chain name
         if (responsePairData && responsePairData[0]?.time) {
           currentSeries.setData(responsePairData);
+          console.log("num charts responsePairData:", responsePairData)
           setIsLoading(false)
           setCurPrice(parseFloat(responsePairData[responsePairData.length - 1].close).toFixed(2))
         }
@@ -442,7 +471,9 @@ export default function ExchangeTVChart(props) {
           }
           setCurPrice(parseFloat(res.data[res.data.length - 1].c).toFixed(2))
         });
-    }, 60000);
+      // }, 60000);
+    }, 15000);
+    localStorage.setItem("sti_1m", sti_1m.current)
 
     if (sti_timescale.current != null) {
       clearInterval(sti_timescale.current);
@@ -450,7 +481,10 @@ export default function ExchangeTVChart(props) {
     sti_timescale.current = setInterval(() => {
       get24Change()
     }, CHART_PERIODS[period] * 1000);
+    localStorage.setItem("sti_timescale", sti_timescale.current)
+
   }
+
 
   //for test 24h data retrieval, 24h data will be replaced by data from backend
   const get24Change = async () => {
@@ -479,29 +513,32 @@ export default function ExchangeTVChart(props) {
   }
 
   // 设置chart的鼠标移动时的回调函数。evt是event的意思。
-  const onCrosshairMove = useCallback(
-    (evt) => {
-      if (!evt.time) {
-        setHoveredCandlestick(null);
-        return;
-      }
+  const onCrosshairMove = useCallback((evt) => {
+    if (!evt.time) {
+      setHoveredCandlestick(null);
+      return;
+    }
 
-      // 这个 for loop + break 为什么这么写我还没搞懂
-      for (const point of evt.seriesPrices.values()) {
-        setHoveredCandlestick((hoveredCandlestick) => {
-          if (hoveredCandlestick && hoveredCandlestick.time === evt.time) {
-            // rerender optimisations
-            return hoveredCandlestick;
-          }
-          return {
-            time: evt.time,
-            ...point,
-          };
-        });
-        break;
-      }
-    },
-    [setHoveredCandlestick]
+    // 这个 for loop + break 为什么这么写我还没搞懂
+    for (const point of evt.seriesPrices.values()) {
+      setHoveredCandlestick((hoveredCandlestick) => {
+        if (hoveredCandlestick && hoveredCandlestick.time === evt.time) {
+          tooltipDiv.innerText = `${hoveredCandlestick.time}\nhigh: ${hoveredCandlestick.high.toFixed(4)}\nlow: ${hoveredCandlestick.low.toFixed(4)}\n open: ${hoveredCandlestick.open.toFixed(4)}\n  close: ${hoveredCandlestick.close.toFixed(4)}`;
+          return hoveredCandlestick;
+        }
+        tooltipDiv.style.display = "block";
+        tooltipDiv.style.left = `${evt.point.x}px`;
+        tooltipDiv.style.top = `${evt.point.y}px`;
+        // rerender optimisations
+        return {
+          time: evt.time,
+          ...point,
+        };
+      });
+      break;
+    }
+
+  }, [setHoveredCandlestick]
   );
 
   // 在第一次得到priceData时，初始化 chart
@@ -515,6 +552,8 @@ export default function ExchangeTVChart(props) {
       chartRef.current,
       getChartOptions(chartRef.current.offsetWidth, chartRef.current.offsetHeight)
     );
+
+    chartRef.current.appendChild(tooltipDiv);
 
     chart.subscribeCrosshairMove(onCrosshairMove);
 
