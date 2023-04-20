@@ -96,6 +96,7 @@ const Overview = props => {
       copied: false,
     });
   const [mode, setMode] = useState('')
+  const [selectedSymbol, setSelectedSymbol] = useState('')
 
   const showModal = (type, token, pageName) => {
     setActiveFromPage(pageName)
@@ -365,6 +366,7 @@ const Overview = props => {
         dataIndex: 'button',
         key: 'button',
         render: (text, entry, record) => {
+          setSelectedSymbol(entry.symbol)
           return <div className={styles.tableData} style={{ float: "right" }}>
             <Button className={styles.button} onClick={() => { setMode("Deposit") }}>
               Deposit
@@ -609,6 +611,7 @@ const Overview = props => {
           tokens={activeTokenList}
           setIsConfirming={() => { setMode('') }}
           mode={mode}
+          symbol={selectedSymbol}
         />
       }
       {mode == 'Transfer' &&
@@ -618,6 +621,7 @@ const Overview = props => {
           account={account}
           tokens={activeTokenList}
           handleCancel={() => { setMode('') }}
+          selectedSymbol={selectedSymbol}
         />
       }
     </div>

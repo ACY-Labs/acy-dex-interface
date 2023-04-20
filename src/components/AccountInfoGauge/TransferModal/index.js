@@ -32,12 +32,13 @@ const TransferModal = props => {
     account,
     tokens,
     handleCancel,
+    selectedSymbol,
   } = props
 
   const [selectedToken, setSelectedToken] = useState("")
   const [activeToken, setActiveToken] = useState()
   const [tokenValue, setTokenValue] = useState(0)
-  const [fromSymbol, setFromSymbol] = useState("")
+  const [fromSymbol, setFromSymbol] = useState(selectedSymbol || "")
   const [toSymbol, setToSymbol] = useState("")
 
   const selectToken = token => {
