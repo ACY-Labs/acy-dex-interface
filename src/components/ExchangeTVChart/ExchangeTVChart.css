@@ -83,10 +83,10 @@
 .tooltip {
   position: absolute;
   display: none;
-  width: 100px;
+  width: 120px;
   height: 100px;
   border: 1px solid #828282;
-  background-color: #5b5b5b;
+  background-color: #000000;
   color: #fff;
   text-align: center;
   font-size: 0.8rem;

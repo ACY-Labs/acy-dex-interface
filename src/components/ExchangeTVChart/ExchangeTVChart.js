@@ -506,6 +506,7 @@ export default function ExchangeTVChart(props) {
   const onCrosshairMove = useCallback((evt) => {
     if (!evt.time) {
       setHoveredCandlestick(null);
+      tooltipDiv.style.display = "none";
       return;
     }
 
@@ -513,7 +514,9 @@ export default function ExchangeTVChart(props) {
     for (const point of evt.seriesPrices.values()) {
       setHoveredCandlestick((hoveredCandlestick) => {
         if (hoveredCandlestick && hoveredCandlestick.time === evt.time) {
-          tooltipDiv.innerText = `${hoveredCandlestick.time}\nhigh: ${hoveredCandlestick.high.toFixed(4)}\nlow: ${hoveredCandlestick.low.toFixed(4)}\n open: ${hoveredCandlestick.open.toFixed(4)}\n  close: ${hoveredCandlestick.close.toFixed(4)}`;
+          let date = new Date((hoveredCandlestick.time + tzOffset)*1000)
+          let dateFormat = date.getHours() + ":" + date.getMinutes() + ", "+ date.toLocaleDateString();
+          tooltipDiv.innerText = `${dateFormat}\nhigh: ${hoveredCandlestick.high.toFixed(4)}\nlow: ${hoveredCandlestick.low.toFixed(4)}\nopen: ${hoveredCandlestick.open.toFixed(4)}\nclose: ${hoveredCandlestick.close.toFixed(4)}`;
           return hoveredCandlestick;
         }
         tooltipDiv.style.display = "block";
