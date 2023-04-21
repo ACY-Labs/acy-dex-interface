@@ -41,7 +41,7 @@ const Future = props => {
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
-
+  
   //future_tokens store every symbols in future and its data 
   const future_tokens_symbol = useMemo(() => {
     const future_tokens = symbolsInfo?.filter(ele => ele[0] == "futures")
@@ -51,6 +51,7 @@ const Future = props => {
     })
     )
   }, [symbolsInfo])
+
   //future_token stores token names without duplicates for tab display
   const future_token = useMemo(() => {
     const res = []

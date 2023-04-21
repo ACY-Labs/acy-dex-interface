@@ -30,6 +30,8 @@ const SwapComponent = props => {
     activeSymbol1,
     setActiveSymbol1,
     setActiveToken,
+    activeToken0,
+    activeToken1,
     setActiveToken0,
     setActiveToken1,
     isLockedToken1=false,
@@ -42,6 +44,10 @@ const SwapComponent = props => {
   const tokenlist = getTokens(chainId);
 
   const [visible, setVisible] = useState(null);
+  //if token is selected from the swapcomponent
+  const [isRightSelect, setIsRightSelect] = useState(false);
+  //if fromToken is selected or toToken is selected
+  const [isFromToken, setIsFromToken] = useState(true);
 
   // 选择货币前置和后置
   const [before, setBefore] = useState(true);
@@ -338,7 +344,12 @@ const SwapComponent = props => {
     }
   };
 
-  const onClickCoin = () => {
+  const onClickCoin = (bool) => {
+    if (bool) {
+      setIsFromToken(true)
+    } else {
+      setIsFromToken(false)
+    }
     setVisible(true);
   };
   const onCancel = () => {
@@ -488,7 +499,7 @@ const SwapComponent = props => {
         bonus={!exactIn && bonus0}
         showBalance={token0BalanceShow}
         onChoseToken={() => {
-          onClickCoin();
+          onClickCoin(true);
           setBefore(true);
         }}
         onChangeToken={e => {
@@ -525,7 +536,7 @@ const SwapComponent = props => {
         bonus={exactIn && bonus1}
         showBalance={token1BalanceShow}
         onChoseToken={() => {
-          onClickCoin();
+          onClickCoin(false);
           setBefore(false);
         }}
         onChangeToken={e => {
@@ -642,8 +653,12 @@ const SwapComponent = props => {
         pageName={"Trade"} 
         activeSymbol={activeSymbol}
         setActiveSymbol={setActiveSymbol}
+        activeToken0={activeToken0}
+        activeToken1={activeToken1}
         setActiveToken0={setActiveToken0}
         setActiveToken1={setActiveToken1}
+        isRightSelect={true}
+        isFromToken={isFromToken}
         />
 
     </div>

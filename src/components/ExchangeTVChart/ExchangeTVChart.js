@@ -225,10 +225,6 @@ export default function ExchangeTVChart(props) {
   }, [])
 
   useEffect(() => {
-    console.log("no chart error token addr change token0Addr", token0Addr, " token1Addr:", token1Addr)
-  }, [token0Addr, token1Addr])
-
-  useEffect(() => {
     if (marketName !== previousMarketName) {
       setChartInited(false);
     }
@@ -236,7 +232,6 @@ export default function ExchangeTVChart(props) {
 
   // 设置chart的横轴range
   const scaleChart = useCallback(() => {
-    console.log("no chart error hasPair", activeExist)
     if (!activeExist) {
       return
     }
@@ -251,7 +246,8 @@ export default function ExchangeTVChart(props) {
     const test_time = Math.floor(Date.now() / 1000) - (60 * CHART_PERIODS[period])
     // let tmp_from = Math.floor(Date.now() / 1000) - (25)
     // let tmp_to = Math.floor(Date.now() / 1000 )
-    currentChart.timeScale()?.setVisibleRange({ from: test_time - tzOffset, to: to_time - tzOffset });
+    if ( currentChart?.timeScale()?.setVisibleRange){
+    currentChart.timeScale()?.setVisibleRange({ from: test_time - tzOffset, to: to_time - tzOffset });}
     // currentChart.timeScale().setVisibleLogicalRange({ from: from_time, to: to_time });
     // currentChart.timeScale().fitContent()
   }, [currentChart, period, currentSeries, token0Addr, token1Addr]);
@@ -320,21 +316,17 @@ export default function ExchangeTVChart(props) {
         responseFromTokenData = await axios.get(`${OptionsPriceApi}/futures?chainId=${chainId}&symbol=${activeSymbol}&period=${period}`)
           .then((res) => res.data);
       } else if (pageName == "Trade") {
-        console.log("no chart error url", `${TradePriceApi}?token0=${fromTokenAddr}&token1=${toTokenAddr}&chainId=${chainId}&period=${period}`)
         responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromTokenAddr}&token1=${toTokenAddr}&chainId=${chainId}&period=${period}`)
           .then((res) => res.data);
       } else {
         responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${fromTokenAddr}USDT&interval=${period}`,)
           .then((res) => res.data);
       }
-
       if (pageName === 'Trade') {
         if (!Object.keys(responseFromTokenData).length) {
           // setActiveExist(false)
           setHasPair(false)
-          console.log("no chart error length==0", responseFromTokenData, hasPair)
         } else if (Object.keys(responseFromTokenData).length) {
-          console.log("no chart error length!=0", responseFromTokenData)
           setHasPair(true)
           setActiveExist(true)
         }
@@ -419,7 +411,6 @@ export default function ExchangeTVChart(props) {
         // Binance data is independent of chain, so here we can fill in any chain name
         if (responsePairData && responsePairData[0]?.time) {
           currentSeries.setData(responsePairData);
-          console.log("num charts responsePairData:", responsePairData)
           setIsLoading(false)
           setCurPrice(parseFloat(responsePairData[responsePairData.length - 1].close).toFixed(2))
         }
@@ -488,7 +479,6 @@ export default function ExchangeTVChart(props) {
 
   //for test 24h data retrieval, 24h data will be replaced by data from backend
   const get24Change = async () => {
-    console.log("check daily called")
     let tmpPageName //to cope with different api names for future
     if (pageName == 'Futures') {
       tmpPageName = 'futureMarket'

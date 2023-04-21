@@ -14,6 +14,8 @@ const AcySymbol = (props: any) => {
     latestPricePercentage,
     coinList,
     pageName,
+    activeToken0,
+    activeToken1,
     setActiveToken0,
     setActiveToken1,
     dailyLow,
@@ -98,6 +100,8 @@ const AcySymbol = (props: any) => {
         activeSymbol={activeSymbol}
         selectSymbol={selectSymbol}
         setActiveSymbol={setActiveSymbol}
+        activeToken0={activeToken0}
+        activeToken1={activeToken1}
         setActiveToken0={setActiveToken0}
         setActiveToken1={setActiveToken1}
       />

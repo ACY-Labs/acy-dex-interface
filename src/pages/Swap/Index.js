@@ -247,7 +247,7 @@ const Swap = props => {
   }, [history.location.hash])
 
 
-  useEffect(()=>{
+  useEffect(() => {
     //initialize activeExist to rerender chart and check is chart is available or not
     setActiveExist(true)
   }, [activeToken0, activeToken1])
@@ -266,8 +266,11 @@ const Swap = props => {
                 /> */}
               {hasPair ?
                 <AcySymbol
-                  activeSymbol={activeToken0.address < activeToken1.address ? `${activeToken0.symbol}/${activeToken1.symbol}` : `${activeToken1.symbol}/${activeToken0.symbol}`}
+                  activeSymbol={`${activeToken0.symbol}/${activeToken1.symbol}`}
+                  // activeSymbol={activeToken0.address < activeToken1.address ? `${activeToken0.symbol}/${activeToken1.symbol}` : `${activeToken1.symbol}/${activeToken0.symbol}`}
                   setActiveSymbol={setActiveToken}
+                  activfeToken0={activeToken0}
+                  activeToken1={activeToken1}
                   setActiveToken0={setActiveToken0}
                   setActiveToken1={setActiveToken1}
                   pageName={"Trade"}
@@ -288,6 +291,8 @@ const Swap = props => {
                     pageName="Trade"
                     // activeSymbol={activeToken0.symbol}
                     // setActiveSymbol={setActiveSymbol}
+                    activeToken0={activeToken0}
+                    activeToken1={activeToken1}
                     setActiveSymbol={setActiveToken}
                     setActiveToken0={setActiveToken0}
                     setActiveToken1={setActiveToken1}
@@ -378,6 +383,8 @@ const Swap = props => {
                   activeSymbol1={activeSymbol1}
                   setActiveSymbol1={setActiveSymbol1}
                   setActiveToken={setActiveToken}
+                  activeToken0={activeToken0}
+                  activeToken1={activeToken1}
                   setActiveToken0={setActiveToken0}
                   setActiveToken1={setActiveToken1}
                   onSelectToken0={token => { setActiveToken0(token); }}

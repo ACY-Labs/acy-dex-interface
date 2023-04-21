@@ -30,8 +30,12 @@ const TokenSelectorDrawer = ({
   activeSymbol,
   setActiveSymbol,
   pageName,
+  activeToken0,
+  activeToken1,
   setActiveToken0,
   setActiveToken1,
+  isRightSelect,
+  isFromToken
 }) => {
   const { account, library, chainId } = useConstantLoader();
 
@@ -40,33 +44,26 @@ const TokenSelectorDrawer = ({
 
   //coinList contains 7 tokens, mockTokenList has thousands
   // const tokenlist = coinList ? coinList : mockTokenList
-  const tokenlist = mockTokenList
+  const tokenlist = pageName === "Trade" ? mockTokenList : coinList
 
   // const tokenlist = mockTokenList
   // let tokenlist = allTokenlist.slice(0,9)
   useEffect(() => {
     setInitTokenList(tokenlist)
   }, [tokenlist])
-  const USDT_Token = {
+  const baseTokenAddr = {
     56: [
-      {
-        symbol: "USDT",
-        address: "0xF82eEeC2C58199cb409788E5D5806727cf549F9f"
-      },
+      { symbol: "USDC", address: "0x8965349fb649A33a30cbFDa057D8eC2C48AbE2A2" },
+      { symbol: "USDT", address: "0xF82eEeC2C58199cb409788E5D5806727cf549F9f" },
     ],
     137: [
-      {
-        symbol: "USDT",
-        address: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"
-      }
+      { symbol: "USDC", address: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174" },
+      { symbol: "USDT", address: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f" }
     ],
     80001: [
-      {
-        symbol: "USDT",
-        address: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"
-      }
+      { symbol: "USDC", address: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174" },
+      { symbol: "USDT", address: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f" }
     ]
-
   }
 
   const [hasMore, setHasMore] = useState(true);
@@ -77,7 +74,7 @@ const TokenSelectorDrawer = ({
   const [favTokenList, setFavTokenList] = useState([]);
   const { activate } = useWeb3React();
   const [tokenBalanceDict, setTokenBalanceDict] = useState({});
-  const [renderTokenList, setRenderTokenList] = useState(initTokenList.slice(0, 20));
+  const [renderTokenList, setRenderTokenList] = useState(initTokenList?.slice(0, 20));
 
 
   useEffect(() => {
@@ -114,7 +111,7 @@ const TokenSelectorDrawer = ({
   }, [chainId]);
 
   useEffect(() => {
-    setRenderTokenList(initTokenList.slice(0, 20))
+    setRenderTokenList(initTokenList?.slice(0, 20))
   }, [initTokenList])
 
   const onTokenSearchChange = e => {
@@ -268,15 +265,66 @@ const TokenSelectorDrawer = ({
                     data={supToken}
                     key={index}
                     selectToken={(item) => {
-                      if (pageName == "Trade") {
+                      if (pageName === "Trade") {
                         onCoinClick(supToken)
                         setActiveSymbol(item)
                         // setActiveToken0(item)
-                        setActiveToken1(USDT_Token[chainId][0])
+                        // setActiveToken1(USDT_Token[chainId][0])
+                        if (isRightSelect) {
+                          if (isFromToken) {
+                            if (activeToken0.address < activeToken1.address) {
+                              if (item.address < activeToken1.address) {
+                                setActiveToken0(item)
+                              } else {
+                                setActiveToken0(item)
+                              }
+                            } else {
+                              if (item.address < activeToken0.address) {
+                                setActiveToken1(activeToken0)
+                                setActiveToken0(item)
+                              } else {
+                                setActiveToken1(item)
+                              }
+                            }
+                          } else { // selected toToken
+                            if (activeToken0.address < activeToken1.address) {
+                              if (item.address < activeToken0.address) {
+                                setActiveToken1(activeToken0)
+                                setActiveToken0(item)
+                              } else {
+                                setActiveToken1(item)
+                              }
+                            } else {
+                              if (item.address < activeToken1.address) {
+                                setActiveToken1(activeToken0)
+                                setActiveToken0(item)
+                              } else {
+                                setActiveToken1(item)
+                              }
+                            }
+                          }
+                          if (activeToken0.address === item.address || activeToken1.address === item.address) {
+                            if (item.symbol !== "USDT") {
+                              setActiveToken0(item)
+                              setActiveToken1(baseTokenAddr["137"].find(token => token.symbol === 'USDT'))
+                            }
+                            else {
+                              setActiveToken0(baseTokenAddr["137"].find(token => token.symbol === 'USDT'))
+                              setActiveToken1(baseTokenAddr["137"].find(token => token.symbol === 'USDC'))
+                            }
+                          }
+                        }
+                        else { //selected from left
+                          setActiveToken0(item)
+                          setActiveToken1(baseTokenAddr["137"].find(token => token.symbol === 'USDT'))
+                        }
                       }
-                      else {
+                      else { // page not trade
                         setActiveSymbol(item.name)
                       }
+                      // else {
+                      //   setActiveSymbol(item.symbol)
+                      // }
                       setVisible(false)
 
                     }}
@@ -289,7 +337,7 @@ const TokenSelectorDrawer = ({
                   : <div className={styles.textCenter} >No matching result</div>}
               </AcyTabPane>
               <AcyTabPane tab="All" key="1">
-                {renderTokenList.length ? renderTokenList.map((token, index) => {
+                {renderTokenList?.length && renderTokenList !== undefined ? renderTokenList.map((token, index) => {
                   return (
                     <AcyCoinItem
                       hideBalance={true}
@@ -301,13 +349,61 @@ const TokenSelectorDrawer = ({
                       //   setActiveSymbol(item.symbol)
                       // }}
                       selectToken={(item) => {
-                        if (pageName == "Trade") {
+                        if (pageName === "Trade") {
                           onCoinClick(token)
                           setActiveSymbol(item)
-                          setActiveToken0(item)
-                          setActiveToken1(USDT_Token[chainId][0])
+                          // setActiveToken0(item)
+                          // setActiveToken1(USDT_Token[chainId][0])
+                          if (isRightSelect) {
+                            if (isFromToken) {
+                              if (activeToken0.address < activeToken1.address) {
+                                if (item.address < activeToken1.address) {
+                                  setActiveToken0(item)
+                                } else {
+                                  setActiveToken0(item)
+                                }
+                              } else {
+                                if (item.address < activeToken0.address) {
+                                  setActiveToken1(activeToken0)
+                                  setActiveToken0(item)
+                                } else {
+                                  setActiveToken1(item)
+                                }
+                              }
+                            } else { // selected toToken
+                              if (activeToken0.address < activeToken1.address) {
+                                if (item.address < activeToken0.address) {
+                                  setActiveToken1(activeToken0)
+                                  setActiveToken0(item)
+                                } else {
+                                  setActiveToken1(item)
+                                }
+                              } else {
+                                if (item.address < activeToken1.address) {
+                                  setActiveToken1(activeToken0)
+                                  setActiveToken0(item)
+                                } else {
+                                  setActiveToken1(item)
+                                }
+                              }
+                            }
+                            if (activeToken0.address === item.address || activeToken1.address === item.address) {
+                              if (item.symbol !== "USDT") {
+                                setActiveToken0(item)
+                                setActiveToken1(baseTokenAddr["137"].find(token => token.symbol === 'USDT'))
+                              }
+                              else {
+                                setActiveToken0(baseTokenAddr["137"].find(token => token.symbol === 'USDT'))
+                                setActiveToken1(baseTokenAddr["137"].find(token => token.symbol === 'USDC'))
+                              }
+                            }
+                          }
+                          else { //selected from left
+                            setActiveToken0(item)
+                            setActiveToken1(baseTokenAddr["137"].find(token => token.symbol === 'USDT'))
+                          }
                         }
-                        else {
+                        else { // page not trade
                           setActiveSymbol(item.name)
                         }
                         // else {
