@@ -216,8 +216,8 @@ const Portfolio = props => {
         <div className={styles.statscontent}>
           <div className={styles.statsRow}>
             <div className={styles.label}>Price</div>
-            {/* <div className={styles.value}>${formatAmount(alpPrice, ALP_DECIMALS, 2, true)}</div> */}
-            <div className={styles.value}>${alpPrice.toFixed(6)}</div>
+            <div className={styles.value}>${formatAmount(alpPrice, ALP_DECIMALS, 2, true)}</div>
+            {/* <div className={styles.value}>${alpPrice.toFixed(6)}</div> */}
           </div>
 
           <div className={styles.statsRow}>
