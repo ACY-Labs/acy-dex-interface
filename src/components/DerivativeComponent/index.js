@@ -99,13 +99,9 @@ const DerivativeComponent = props => {
     mode,
     setMode,
     chainId,
-    tokens,
-    selectedToken,
     symbol,
     pageName,
   } = props
-
-  const isOptionPower = useMemo(() => pageName == "Option" || pageName == "Power", [pageName])
 
   const connectWalletByLocalStorage = useConnectWallet()
   const { account, active, library } = useWeb3React()
@@ -115,18 +111,17 @@ const DerivativeComponent = props => {
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
 
-  const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, Reader)
-  });
   const { data: symbolInfo, mutate: updateSymbolInfo } = useSWR([chainId, readerAddress, "getSymbolInfo", poolAddress, symbol, []], {
     fetcher: fetcher(library, Reader)
   });
-
+  const { data: estimateMaxVolume, mutate: updateEstimateMaxVolume } = useSWR([chainId, readerAddress, "estimateMaxVolume", poolAddress, account, symbol, mode == 'Buy'], {
+    fetcher: fetcher(library, Reader)
+  });
   useEffect(() => {
     if (active) {
       library.on("block", () => {
-        updateTokenInfo()
         updateSymbolInfo()
+        updateEstimateMaxVolume()
       });
       return () => {
         library.removeAllListeners('block');
@@ -136,7 +131,6 @@ const DerivativeComponent = props => {
     active,
     library,
     chainId,
-    updateTokenInfo,
     updateSymbolInfo,
   ]);
 
@@ -144,65 +138,90 @@ const DerivativeComponent = props => {
 
   const optionMode = ['Buy', 'Sell', 'Pool']
   const [percentage, setPercentage] = useState('')
-  const [selectedTokenValue, setSelectedTokenValue] = useState("0")
-  const [selectedTokenAmount, setSelectedTokenAmount] = useState(parseValue(selectedTokenValue, selectedToken && selectedToken.decimals))
+  const [tradeVolume, setTradeVolume] = useState(0)
   const [usdValue, setUsdValue] = useState(0)
   const [showDescription, setShowDescription] = useState(false)
   const [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
   const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
   const [slippageError, setSlippageError] = useState('')
-  const [deadline, setDeadline] = useState()
-  const [marginToken, setMarginToken] = useState(tokens[1])
   const [leverageOption, setLeverageOption] = useState("2")
 
-  const selectedTokenPrice = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.price
-  const selectedTokenBalance = tokenInfo?.find(item => item.token?.toLowerCase() == selectedToken.address?.toLowerCase())?.balance
   const symbolMarkPrice = symbolInfo?.markPrice
-  const symbolMinTradeVolume = symbolInfo?.minTradeVolume
-  const minTradeVolume = symbolMinTradeVolume ? ethers.utils.formatUnits(symbolMinTradeVolume, 18) : 0.001
-  const minTradeDecimal = minTradeVolume? minTradeVolume.toString().includes('.')?minTradeVolume.toString().split('.')[1].length:0:3
+  const minTradeVolume = symbolInfo?.minTradeVolume ? ethers.utils.formatUnits(symbolInfo?.minTradeVolume, 18) : 0.001
 
   const getPrimaryText = () => {
     if (!active) {
       return 'Connect Wallet'
     }
-    if (!selectedTokenValue || selectedTokenValue == 0) {
+    if (isValid(tradeVolume)) {
       return 'Invalid Trade Volume'
     }
     return mode == 'Buy' ? 'Buy / Long' : 'Sell / Short'
   }
 
+  const handleUsdValueChange = (usdValue) => {
+    setUsdValue(usdValue)
+    let tokenValue = usdValue / formatAmount(symbolMarkPrice, 18)
+    tokenValue = pageName == 'Future' ? tokenValue * leverageOption : tokenValue
+    let minTokenValue = tokenValue % minTradeVolume == 0 ? tokenValue : tokenValue.toFixed(-Math.log10(minTradeVolume))
+    setTradeVolume(minTokenValue)
+  }
+
+  const isValid = (value) => {
+    if(pageName == 'Future' && value>formatAmount(estimateMaxVolume, 18)) {
+      return false
+    }
+    return value==0 || Math.floor(value % minTradeVolume)!=0
+  }
+
+  useEffect(()=>{
+    if(pageName == 'Future') {
+      handleUsdValueChange(usdValue)
+    }
+  }, [leverageOption])
+
   useEffect(() => {
     setShowDescription(false)
-  }, [tokens])
-
-  useEffect(() => {
-    let tokenAmount = (Number(percentage.split('%')[0]) / 100) * formatAmount(selectedTokenBalance, 18, 2)
-    handleTokenValueChange(tokenAmount)
-  }, [percentage])
-
-  const handleTokenValueChange = (value) => {
-    setSelectedTokenValue(value.toFixed(-Math.log10(minTradeVolume)))
-  }
+  }, [symbol, chainId, mode])
 
   ///////////// write contract /////////////
 
-  const onClickPrimary = async() => {
+  const onClickPrimary = async () => {
     if (!account) {
       connectWalletByLocalStorage()
       return
     }
 
     let oracleSignature = []
-    if (isOptionPower){
+    if (pageName != 'Future') {
       oracleSignature = await getOracleSignature()
-      // console.log("oracleSignature",oracleSignature)s
     }
 
     if (mode == 'Buy') {
-      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount, symbolMarkPrice?.mul(bigNumberify(10000 + slippageTolerance * 100)).div(bigNumberify(10000)),oracleSignature)
+
+      trade(
+        chainId,
+        library,
+        poolAddress,
+        IPool,
+        account,
+        symbol,
+        parseValue(tradeVolume, 18),
+        symbolMarkPrice?.mul(bigNumberify(10000 + slippageTolerance * 100)).div(bigNumberify(10000)),
+        oracleSignature
+      )
     } else {
-      trade(chainId, library, poolAddress, IPool, account, symbol, selectedTokenAmount.mul(bigNumberify(-1)), symbolMarkPrice?.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000)),oracleSignature)
+      trade(
+        chainId,
+        library,
+        poolAddress,
+        IPool,
+        account,
+        symbol,
+        parseValue(-tradeVolume, 18),
+        symbolMarkPrice?.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000)),
+        oracleSignature
+      )
     }
   }
 
@@ -234,20 +253,18 @@ const DerivativeComponent = props => {
                       style={{ width: '100%' }}
                       value={usdValue}
                       onChange={e => {
-                        setUsdValue(e.target.value)
-                        handleTokenValueChange(e.target.value / formatAmount(selectedTokenPrice, 18))
+                        handleUsdValueChange(e.target.value)
                         setShowDescription(true)
                       }}
                     />
                     <span className={styles.inputLabel}>USD</span>
                   </div>
-                  <span style={{ fontSize: '12px', color: 'gray' }}>{selectedTokenValue != "NaN" ? selectedTokenValue : 0} {selectedToken.symbol}</span>
+                  {/* <span style={{ fontSize: '12px', color: 'gray' }}>Trade Volume: {formatAmount(tradeVolume, 18)}</span> */}
                 </div>
-                {/* <div className={styles.symbolAmount}>= {selectedTokenValue} {symbol}</div> */}
               </div>
-              <div style={{ margin: '20px 0' }}>
+              {/* <div style={{ margin: '20px 0' }}>
                 <Segmented onChange={(value) => { setPercentage(value) }} options={['10%', '25%', '50%', '75%', '100%']} />
-              </div>
+              </div> */}
               {showDescription && pageName == "Future" &&
                 <AcyDescriptions>
                   <div className={styles.breakdownTopContainer}>
@@ -285,26 +302,6 @@ const DerivativeComponent = props => {
                         <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
                       )}
                     </div>
-                    {/* <div className={styles.slippageContainer}>
-                      <span style={{ fontWeight: 600, marginBottom: '10px' }}>Transaction deadline</span>
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          height: '33.6px',
-                          marginTop: '10px',
-                        }}
-                      >
-                        <Input
-                          className={styles.input}
-                          type="number"
-                          value={Number(deadline).toString()}
-                          onChange={e => setDeadline(e.target.valueAsNumber || 0)}
-                          placeholder={30}
-                          suffix={<strong>minutes</strong>}
-                        />
-                      </div>
-                    </div> */}
                   </div>
                 </AcyDescriptions>
               }
@@ -319,9 +316,9 @@ const DerivativeComponent = props => {
                           <button
                             className={styles.leverageButton}
                             onClick={() => {
-                              // if (leverageOption > 0.1) {
-                              //   setLeverageOption((parseFloat(leverageOption) - 0.1).toFixed(1))
-                              // }
+                              if (leverageOption > 0.1) {
+                                setLeverageOption((parseFloat(leverageOption) - 0.1).toFixed(1))
+                              }
                             }}
                           >
                             <span> - </span>
@@ -376,7 +373,7 @@ const DerivativeComponent = props => {
               <ComponentButton
                 style={{ margin: '25px 0 0 0', width: '100%' }}
                 onClick={onClickPrimary}
-                disabled={account && (!selectedTokenValue || selectedTokenValue == 0)}
+                disabled={account && isValid(tradeVolume)}
               >
                 {getPrimaryText()}
               </ComponentButton>
@@ -387,7 +384,6 @@ const DerivativeComponent = props => {
               account={account}
               library={library}
               chainId={chainId}
-              tokens={tokens}
               active={active}
               symbol={symbol}
             />

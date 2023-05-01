@@ -77,10 +77,10 @@ const Powers = props => {
 
   let { chainId } = useChainId();
   const tokens = getTokens(chainId);
-  chainId = 80001
 
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
+  
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
@@ -109,8 +109,7 @@ const Powers = props => {
     symbolsInfo?.filter(ele => ele[0] == "power")?.forEach((ele) => {
       power_tokens_symbol.push({
         symbol: ele[1],
-        name: ele[1],
-        address: ele[2],
+        name: ele[1].split('^')[0],
       })
     })
     power_tokens_symbol?.forEach((ele) => {
@@ -123,20 +122,7 @@ const Powers = props => {
   const [mode, setMode] = useState('Buy')
   const [symbol, setSymbol] = useState('BTC^2')
   const [tableContent, setTableContent] = useState("Positions");
-  const [activeToken, setActiveToken] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
   const [activeSymbol, setActiveSymbol] = useState('BTC^2')
-
-  const selectTab = item => {
-    setActiveToken((tokens.filter(ele => ele.symbol == item)[0]))
-  }
-  const selectSymbol = item => {
-    // setActiveSymbol
-  }
-
-  useEffect(() => {
-    setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
-  }, [tokens])
-
   const [latestPrice, setLatestPrice] = useState(0);
   const [priceChangePercentDelta, setPpriceChangePercentDelta] = useState(0);
   const onChangePrice = (curPrice, change) => {
@@ -151,10 +137,9 @@ const Powers = props => {
           {mode == 'Pool' ?
             <AcyPool />
             : <div className={`${styles.colItem} ${styles.priceChart}`}>
-              <AcySymbolNav data={power_token} onChange={selectTab} />
+              <AcySymbolNav data={power_token} />
               <AcySymbol
                 activeSymbol={activeSymbol}
-                selectSymbol={selectSymbol}
                 setActiveSymbol={setActiveSymbol}
                 coinList={power_tokens_symbol}
                 latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
@@ -165,8 +150,6 @@ const Powers = props => {
                 <ExchangeTVChart
                   chartTokenSymbol={activeSymbol}
                   pageName="Powers"
-                  fromToken={activeToken.symbol}
-                  toToken="USDT"
                   chainId={chainId}
                   onChangePrice={onChangePrice}
                 />
@@ -203,8 +186,6 @@ const Powers = props => {
               mode={mode}
               setMode={setMode}
               chainId={chainId}
-              tokens={tokens}
-              selectedToken={activeToken}
               symbol={symbol}
               pageName="Powers"
             />
