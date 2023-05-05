@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Row, Col, Drawer } from 'antd';
 import AcyCard from '@/components/AcyCard';
 import DerivativeComponent from '@/components/DerivativeComponent'
 import ComponentTabs from '@/components/ComponentTabs';
@@ -14,7 +13,6 @@ import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
-import styled from "styled-components";
 import styles from './styles.less'
 import { PositionTable } from '@/components/OptionComponent/TableComponent';
 
@@ -104,7 +102,7 @@ const Option = props => {
   const { account, library, active } = useWeb3React();
 
   let { chainId } = useChainId();
-  let tokens = getTokens(chainId);
+  let tokens = getTokens(chainId); //TO be changed as const
   chainId = 80001
 
   ///data 
@@ -258,7 +256,6 @@ const Option = props => {
   // useEffect(() => {
   //   setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
   // }, [tokens])
-  console.log("default activesymbol 00", activeSymbol)
 
   return (
     <div className={styles.main}>

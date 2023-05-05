@@ -272,35 +272,18 @@ const TokenSelectorDrawer = ({
                         // setActiveToken1(USDT_Token[chainId][0])
                         if (isRightSelect) {
                           if (isFromToken) {
-                            if (activeToken0.address < activeToken1.address) {
-                              if (item.address < activeToken1.address) {
-                                setActiveToken0(item)
-                              } else {
-                                setActiveToken0(item)
-                              }
+                            if (item.address < activeToken1.address) {
+                              setActiveToken0(item)
                             } else {
-                              if (item.address < activeToken0.address) {
-                                setActiveToken1(activeToken0)
-                                setActiveToken0(item)
-                              } else {
-                                setActiveToken1(item)
-                              }
+                              setActiveToken0(activeToken1)
+                              setActiveToken1(item)
                             }
                           } else { // selected toToken
-                            if (activeToken0.address < activeToken1.address) {
-                              if (item.address < activeToken0.address) {
-                                setActiveToken1(activeToken0)
-                                setActiveToken0(item)
-                              } else {
-                                setActiveToken1(item)
-                              }
+                            if (item.address < activeToken0.address) {
+                              setActiveToken1(activeToken0)
+                              setActiveToken0(item)
                             } else {
-                              if (item.address < activeToken1.address) {
-                                setActiveToken1(activeToken0)
-                                setActiveToken0(item)
-                              } else {
-                                setActiveToken1(item)
-                              }
+                              setActiveToken1(item)
                             }
                           }
                           if (activeToken0.address === item.address || activeToken1.address === item.address) {
@@ -356,35 +339,18 @@ const TokenSelectorDrawer = ({
                           // setActiveToken1(USDT_Token[chainId][0])
                           if (isRightSelect) {
                             if (isFromToken) {
-                              if (activeToken0.address < activeToken1.address) {
-                                if (item.address < activeToken1.address) {
-                                  setActiveToken0(item)
-                                } else {
-                                  setActiveToken0(item)
-                                }
+                              if (item.address < activeToken1.address) {
+                                setActiveToken0(item)
                               } else {
-                                if (item.address < activeToken0.address) {
-                                  setActiveToken1(activeToken0)
-                                  setActiveToken0(item)
-                                } else {
-                                  setActiveToken1(item)
-                                }
+                                setActiveToken0(activeToken1)
+                                setActiveToken1(item)
                               }
                             } else { // selected toToken
-                              if (activeToken0.address < activeToken1.address) {
-                                if (item.address < activeToken0.address) {
-                                  setActiveToken1(activeToken0)
-                                  setActiveToken0(item)
-                                } else {
-                                  setActiveToken1(item)
-                                }
+                              if (item.address < activeToken0.address) {
+                                setActiveToken1(activeToken0)
+                                setActiveToken0(item)
                               } else {
-                                if (item.address < activeToken1.address) {
-                                  setActiveToken1(activeToken0)
-                                  setActiveToken0(item)
-                                } else {
-                                  setActiveToken1(item)
-                                }
+                                setActiveToken1(item)
                               }
                             }
                             if (activeToken0.address === item.address || activeToken1.address === item.address) {

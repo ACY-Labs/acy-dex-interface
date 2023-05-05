@@ -322,6 +322,7 @@ const SwapComponent = props => {
 
   useEffect(
     () => {
+      console.log("trade debug SwapButtonContent", account, swapButtonContent)
       if (account == undefined) {
         setSwapButtonState(false);
         setSwapButtonContent('Connect to Wallet');
@@ -519,7 +520,6 @@ const SwapComponent = props => {
           if (!isLockedToken1) {
             onSwitchCoinCard();
           }
-
         }}
       >
         <Icon style={{ fontSize: '16px' }} type="arrow-down" />

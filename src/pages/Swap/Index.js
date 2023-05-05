@@ -32,10 +32,10 @@ const Swap = props => {
   const chainId = 137;
   const tokens = getTokens(chainId)
 
-  const [activeToken1, setActiveToken1] = useState(tokens[1]);
-  const [activeToken0, setActiveToken0] = useState(tokens[0]);
-  const [token0Addr, setToken0Addr] = useState(tokens[0].address);
-  const [token1Addr, setToken1Addr] = useState(tokens[1].address);
+  const [activeToken0, setActiveToken0] = useState(tokens[1]);
+  const [activeToken1, setActiveToken1] = useState(tokens[0]);
+  const [token0Addr, setToken0Addr] = useState(tokens[1].address);
+  const [token1Addr, setToken1Addr] = useState(tokens[0].address);
   const [activeSymbol, setActiveSymbol] = useState("BTC")
   const [activeSymbol1, setActiveSymbol1] = useState("ETH")
   const [activeToken, setActiveToken] = useState(activeToken0.address < activeToken1.address ? activeToken0 : activeToken1);
@@ -251,6 +251,7 @@ const Swap = props => {
     //initialize activeExist to rerender chart and check is chart is available or not
     setActiveExist(true)
   }, [activeToken0, activeToken1])
+
   return (
     <PageHeaderWrapper>
       <div className={styles.main}>
@@ -267,7 +268,6 @@ const Swap = props => {
               {hasPair ?
                 <AcySymbol
                   activeSymbol={`${activeToken0.symbol}/${activeToken1.symbol}`}
-                  // activeSymbol={activeToken0.address < activeToken1.address ? `${activeToken0.symbol}/${activeToken1.symbol}` : `${activeToken1.symbol}/${activeToken0.symbol}`}
                   setActiveSymbol={setActiveToken}
                   activfeToken0={activeToken0}
                   activeToken1={activeToken1}

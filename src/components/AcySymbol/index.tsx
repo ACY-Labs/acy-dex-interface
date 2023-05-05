@@ -32,7 +32,6 @@ const AcySymbol = (props: any) => {
   const onCancel = () => {
     setVisible(false);
   };
-  console.log("ACY symbol activeSymbol", activeSymbol)
   return (
     <>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto' }}>

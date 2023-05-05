@@ -147,7 +147,7 @@ export default function ExchangeTVChart(props) {
   const {
     chainId,
     pageName,
-    //for Future, Option (and Power) page
+    //for Future, Option (and Powers) page
     activeSymbol,
     //for trade page
     token0Addr,
@@ -186,7 +186,7 @@ export default function ExchangeTVChart(props) {
   const chartRef = useRef(null);
 
   const tooltipDiv = document.createElement("div");
-  tooltipDiv.className = "tooltip";
+  tooltipDiv.className = pageName === "Powers" ? "tooltipLong" : "tooltip";
 
   const isTick = pageName == "Powers";
   const symbol = activeSymbol || "BTC";
@@ -246,8 +246,9 @@ export default function ExchangeTVChart(props) {
     const test_time = Math.floor(Date.now() / 1000) - (60 * CHART_PERIODS[period])
     // let tmp_from = Math.floor(Date.now() / 1000) - (25)
     // let tmp_to = Math.floor(Date.now() / 1000 )
-    if ( currentChart?.timeScale()?.setVisibleRange){
-    currentChart.timeScale()?.setVisibleRange({ from: test_time - tzOffset, to: to_time - tzOffset });}
+    if (currentChart?.timeScale()?.setVisibleRange) {
+      currentChart.timeScale()?.setVisibleRange({ from: test_time - tzOffset, to: to_time - tzOffset });
+    }
     // currentChart.timeScale().setVisibleLogicalRange({ from: from_time, to: to_time });
     // currentChart.timeScale().fitContent()
   }, [currentChart, period, currentSeries, token0Addr, token1Addr]);
@@ -312,16 +313,20 @@ export default function ExchangeTVChart(props) {
       } else if (pageName == "Option") {
         responseFromTokenData = await axios.get(`${OptionsPriceApi}/option?chainId=${chainId}&symbol=${activeSymbol}&period=${period}`)
           .then((res) => res.data);
+      } else if (pageName == "Powers") {
+        responseFromTokenData = await axios.get(`${OptionsPriceApi}/power?chainId=${chainId}&symbol=${activeSymbol}&period=${period}`)
+          .then((res) => res.data);
       } else if (pageName == "Futures") {
         responseFromTokenData = await axios.get(`${OptionsPriceApi}/futures?chainId=${chainId}&symbol=${activeSymbol}&period=${period}`)
           .then((res) => res.data);
       } else if (pageName == "Trade") {
-        responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromTokenAddr}&token1=${toTokenAddr}&chainId=${chainId}&period=${period}`)
+        responseFromTokenData = await axios.get(`${TradePriceApi}?token0=${fromTokenAddr}&token1=${toTokenAddr}&chainId=${chainId}&period=${period}`) 
           .then((res) => res.data);
       } else {
         responseFromTokenData = await axios.get(`${BinancePriceApi}/api/cexPrices/binanceHistoricalPrice?symbol=${fromTokenAddr}USDT&interval=${period}`,)
           .then((res) => res.data);
       }
+
       if (pageName === 'Trade') {
         if (!Object.keys(responseFromTokenData).length) {
           // setActiveExist(false)
@@ -370,7 +375,7 @@ export default function ExchangeTVChart(props) {
       // set pair data only when from data exists
       if (activeExist && pageName == 'Trade' || pageName != 'Trade') {
         for (let i = 0; i < responseFromTokenData.length; i++) {
-          if (pageName == "Option" || pageName == "Futures" || (pageName === "Trade" && !isReciprocal)) {
+          if (pageName == "Option" || pageName == "Powers" || pageName == "Futures" || (pageName === "Trade" && !isReciprocal))  {
             responsePairData.push({
               time: responseFromTokenData[i].timestamp - tzOffset,
               open: responseFromTokenData[i].o,
@@ -485,6 +490,9 @@ export default function ExchangeTVChart(props) {
     } else if (pageName == 'Option') {
       tmpPageName = 'optionMarket'
     }
+    else if (pageName == 'Powers') {
+      tmpPageName = 'powerMarket'
+    }
     axios.get(`${deltaApi}`)
       .then((res) => {
         for (const [page, tokens] of Object.entries(res.data)) {
@@ -514,8 +522,8 @@ export default function ExchangeTVChart(props) {
     for (const point of evt.seriesPrices.values()) {
       setHoveredCandlestick((hoveredCandlestick) => {
         if (hoveredCandlestick && hoveredCandlestick.time === evt.time) {
-          let date = new Date((hoveredCandlestick.time + tzOffset)*1000)
-          let dateFormat = date.getHours() + ":" + date.getMinutes() + ", "+ date.toLocaleDateString();
+          let date = new Date((hoveredCandlestick.time + tzOffset) * 1000)
+          let dateFormat = date.getHours() + ":" + date.getMinutes() + ", " + date.toLocaleDateString();
           tooltipDiv.innerText = `${dateFormat}\nhigh: ${hoveredCandlestick.high.toFixed(4)}\nlow: ${hoveredCandlestick.low.toFixed(4)}\nopen: ${hoveredCandlestick.open.toFixed(4)}\nclose: ${hoveredCandlestick.close.toFixed(4)}`;
           return hoveredCandlestick;
         }

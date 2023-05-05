@@ -265,7 +265,6 @@ const Swap = props => {
   const { savedIsPnlInLeverage, setSavedIsPnlInLeverage, savedSlippageAmount, pendingTxns, setPendingTxns } = props
   const { account, library, active } = useWeb3React();
   let { chainId } = useChainId();
-  console.log("future symbol chainid", chainId)
 
   //// ui tab
   const defaultTokenSelection = useMemo(() => ({
