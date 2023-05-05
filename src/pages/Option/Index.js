@@ -36,7 +36,7 @@ export function getPosition(rawPositionData, symbolData) {
   let positionQuery = []
   for (let i = 0; i < rawPositionData.positions.length; i++) {
     const temp = rawPositionData.positions[i]
-    const volume = ethers.utils.formatUnits(temp[2], 18)
+    const volume = ethers.utils.formatUnits(temp.volume, 18)
     if (volume != 0) {
       const symbol = symbolData.find(obj => {
         return obj.address === temp[0]
@@ -47,17 +47,11 @@ export function getPosition(rawPositionData, symbolData) {
       const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume, 18)
       const marginUsage = Math.abs(volume * indexPrice) * initialMarginRatio
       const unrealizedPnl = volume * indexPrice - cost
-      const _accountFunding = temp.cumulativeFundingPerVolume.mul(temp[2])
+      const _accountFunding = temp.cumulativeFundingPerVolume.mul(temp.volume)
       const accountFunding = ethers.utils.formatUnits(_accountFunding, 36)
-      const _entryPrice = safeDiv(temp.cost, temp[2])
-      // const entryPrice = ethers.utils.formatUnits(_entryPrice,0)
+      const _entryPrice = safeDiv(temp.cost, temp.volume)
       const entryPrice = safeDiv2(cost, volume)
-      let liquidationPrice
-      if (volume >= 0) {
-        liquidationPrice = markPrice * (1 - initialMarginRatio / 2) - (marginUsage - cost) / (volume * (1 - initialMarginRatio / 2))
-      } else {
-        liquidationPrice = markPrice * (1 + initialMarginRatio / 2) + (marginUsage - cost) / (volume * (1 + initialMarginRatio / 2))
-      }
+      const liquidationPrice = ethers.utils.formatUnits(temp.liquidationPrice, 18)
 
       const position = {
         symbol: temp[1],
@@ -121,7 +115,7 @@ const Option = props => {
   })
 
   console.log("POSITION", rawPositionData)
-
+  console.log("SYMBOL",symbolsInfo)
   const symbolData = getSymbol(symbolsInfo)
   const positionData = getPosition(rawPositionData, symbolData)
 

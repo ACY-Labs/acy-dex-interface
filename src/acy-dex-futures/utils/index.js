@@ -2076,7 +2076,7 @@ function getToken(address) {
 }
 
 export function formatNumber(number){
-  // number = number.toLocaleString('fullwide', {useGrouping:false})
+  if (number=="0.0"){return number}
   let negative = false;
   if (number<0){
     negative = true;
