@@ -54,6 +54,7 @@ const Swap = props => {
   const [dailyHigh, setDailyHigh] = useState(0)
   const [dailyLow, setDailyLow] = useState(0)
   const [showChart, setShowChart] = useState(true)
+  const [favTokens, setFavTokens] = useState(JSON.parse(localStorage.getItem('tokens_symbol')))
 
   // useSWR hook example - needs further implementation in backend
   // const txListUrl = `${apiUrlPrefix}/txlist/all?`
@@ -264,48 +265,17 @@ const Swap = props => {
                   options={graphTypes}
                   onChange={showGraph}
                 /> */}
-              {hasPair ?
-                <AcySymbol
-                  activeSymbol={`${activeToken0.symbol}/${activeToken1.symbol}`}
-                  // activeSymbol={activeToken0.address < activeToken1.address ? `${activeToken0.symbol}/${activeToken1.symbol}` : `${activeToken1.symbol}/${activeToken0.symbol}`}
-                  setActiveSymbol={setActiveToken}
-                  activfeToken0={activeToken0}
-                  activeToken1={activeToken1}
-                  setActiveToken0={setActiveToken0}
-                  setActiveToken1={setActiveToken1}
-                  pageName={"Trade"}
-                  // pairName='BTC'
-                  // showDrawer={onClickCoin}
-                  latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
-                  latestPrice={curPrice}
-                  latestPricePercentage={priceDeltaPercent}
-                  dailyLow={dailyLow}
-                  dailyHigh={dailyHigh}
-                  showChart={showChart}
-                  setShowChart={() => setShowChart(!showChart)}
-                />
-                : <div>
-                  <AcySymbolNav data={[activeToken0.symbol, activeToken1.symbol]} onChange={onTabSelect} />
-                  <AcySymbol
-                    activeSymbol={activeToken.symbol}
-                    pageName="Trade"
-                    // activeSymbol={activeToken0.symbol}
-                    // setActiveSymbol={setActiveSymbol}
-                    activeToken0={activeToken0}
-                    activeToken1={activeToken1}
-                    setActiveSymbol={setActiveToken}
-                    setActiveToken0={setActiveToken0}
-                    setActiveToken1={setActiveToken1}
-                    latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
-                    latestPrice={curPrice}
-                    latestPricePercentage={priceDeltaPercent}
-                    dailyLow={dailyLow}
-                    dailyHigh={dailyHigh}
-                    showChart={showChart}
-                    setShowChart={() => setShowChart(!showChart)}
-                  />
-                </div>
-              }
+              <AcySymbolNav data={favTokens} onChange={showGraph} />
+              <AcySymbol
+                activeSymbol={activeToken0.symbol}
+                latestPriceColor={1}
+                latestPrice={1}
+                latestPricePercentage={1}
+              // coinList={coinList}
+                showChart={showChart}
+                setShowChart={()=>setShowChart(!showChart)}
+                setFavTokens={()=>{setFavTokens(JSON.parse(localStorage.getItem('tokens_symbol')))}}
+              />
               {/* </div> */}
               {activeExist ?
                 <div style={{ borderTop: '0.75px solid #333333' }}>
@@ -378,17 +348,8 @@ const Swap = props => {
                 <SwapComponent
                   token0={activeToken0}
                   token1={activeToken1}
-                  activeSymbol={activeSymbol}
-                  setActiveSymbol={setActiveSymbol}
-                  activeSymbol1={activeSymbol1}
-                  setActiveSymbol1={setActiveSymbol1}
-                  setActiveToken={setActiveToken}
-                  activeToken0={activeToken0}
-                  activeToken1={activeToken1}
-                  setActiveToken0={setActiveToken0}
-                  setActiveToken1={setActiveToken1}
-                  onSelectToken0={token => { setActiveToken0(token); }}
-                  onSelectToken1={token => { setActiveToken1(token); }}
+                  onSelectToken0={token => { setActiveToken0(token);}}
+                  onSelectToken1={token => { setActiveToken1(token);}}
                   account={account}
                   library={library}
                   chainId={chainId}

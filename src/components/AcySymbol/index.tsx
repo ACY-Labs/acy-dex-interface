@@ -23,6 +23,7 @@ const AcySymbol = (props: any) => {
     dailyVol,
     showChart,
     setShowChart,
+    setFavTokens,
   } = props;
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
@@ -32,7 +33,6 @@ const AcySymbol = (props: any) => {
   const onCancel = () => {
     setVisible(false);
   };
-  console.log("ACY symbol activeSymbol", activeSymbol)
   return (
     <>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto' }}>
@@ -94,17 +94,9 @@ const AcySymbol = (props: any) => {
         width={400}
         visible={visible}
         setVisible={setVisible}
-        pageName={pageName}
-        onCoinClick={onClickCoin}
+        onCoinClick={onClickCoin} 
         coinList={coinList}
-        activeSymbol={activeSymbol}
-        selectSymbol={selectSymbol}
-        setActiveSymbol={setActiveSymbol}
-        activeToken0={activeToken0}
-        activeToken1={activeToken1}
-        setActiveToken0={setActiveToken0}
-        setActiveToken1={setActiveToken1}
-      />
+        setFavTokens={setFavTokens}/>
 
     </>
   );
