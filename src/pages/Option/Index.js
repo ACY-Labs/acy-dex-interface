@@ -49,7 +49,6 @@ export function getPosition(rawPositionData, symbolData) {
       const unrealizedPnl = volume * indexPrice - cost
       const _accountFunding = temp.cumulativeFundingPerVolume.mul(temp.volume)
       const accountFunding = ethers.utils.formatUnits(_accountFunding, 36)
-      const _entryPrice = safeDiv(temp.cost, temp.volume)
       const entryPrice = safeDiv2(cost, volume)
       const liquidationPrice = ethers.utils.formatUnits(temp.liquidationPrice, 18)
 
