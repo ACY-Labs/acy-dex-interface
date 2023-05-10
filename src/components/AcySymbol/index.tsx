@@ -23,6 +23,7 @@ const AcySymbol = (props: any) => {
     dailyVol,
     showChart,
     setShowChart,
+    setFavTokens,
   } = props;
   // 选择货币的弹窗
   const [visible, setVisible] = useState(null);
@@ -57,21 +58,21 @@ const AcySymbol = (props: any) => {
           <div style={{ marginLeft: '20px' }} className={styles.item}>
             <div>24h Change %</div>
             {latestPricePercentage >= 0 ?
-              <span style={{ color: '#0ecc83' }}>{pageName === "Trade"?`-`:latestPricePercentage} %</span>
-              : <span style={{ color: '#fa3c58' }}>{pageName === "Trade"?`-`:latestPricePercentage} %</span>
+              <span style={{ color: '#0ecc83' }}>{pageName === "Trade" ? `-` : latestPricePercentage} %</span>
+              : <span style={{ color: '#fa3c58' }}>{pageName === "Trade" ? `-` : latestPricePercentage} %</span>
             }
           </div>
           <div className={styles.item}>
             <div>24H High</div>
-            <span>{pageName === "Trade"?`-`:dailyHigh}</span>
+            <span>{pageName === "Trade" ? `-` : dailyHigh}</span>
           </div>
           <div className={styles.item}>
             <div>24H Low</div>
-            <span>{pageName === "Trade"?`-`:dailyLow}</span>
+            <span>{pageName === "Trade" ? `-` : dailyLow}</span>
           </div>
           <div className={styles.item}>
             <div>24H Turnover(USDT)</div>
-            <span>{pageName === "Trade"?`-`:dailyVol}</span>
+            <span>{pageName === "Trade" ? `-` : dailyVol}</span>
           </div>
           <div className={styles.item}>
             <div>Funding / Countdown</div>
@@ -88,21 +89,22 @@ const AcySymbol = (props: any) => {
           </div>}
       </div>
       <TokenSelectorDrawer
-        placement="left"
-        onCancel={onCancel}
         width={400}
+        placement="left"
         visible={visible}
         setVisible={setVisible}
-        pageName={pageName}
+        onCancel={onCancel}
         onCoinClick={onClickCoin}
         coinList={coinList}
+        setFavTokens={setFavTokens}
+        pageName={pageName}
         activeSymbol={activeSymbol}
-        selectSymbol={selectSymbol}
         setActiveSymbol={setActiveSymbol}
         activeToken0={activeToken0}
-        activeToken1={activeToken1}
         setActiveToken0={setActiveToken0}
+        activeToken1={activeToken1}
         setActiveToken1={setActiveToken1}
+        isRightSelect={false}
       />
 
     </>

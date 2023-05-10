@@ -32,8 +32,8 @@ const contracts = {
     symbolManager: "0xd85aA6DcaEfECd49C8b64f5888d9961208AF4a19",
     symbolManagerImplementation: "0x639A5C58FEd6319a8414e7F36d512b02e2159a91",
     alp: "0xaC56beE2F6D0cfb9555bdC191DE1C4311C6675da",
-    symbolsLens: "0xE56710F67eAf87Cf998fb3bFf4B1332080942b2F",
-    reader: "0x21de483f50ED649Cc78a7148Aed1cA1D954E3521",
+    symbolsLens: "0x0FDa27b043793e2658Bf0F795400c65aF7Aa8A2A",
+    reader: "0xb3565532BB41e646970D6EDdCf869EAe1A767736",
   },
 }
 

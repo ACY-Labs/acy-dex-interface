@@ -105,8 +105,8 @@ const AcyPoolComponent = props => {
   const [mode, setMode] = useState("Buy ALP")
   const [selectedTokenValue, setSelectedTokenValue] = useState(0)
   const [selectedTokenAmount, setSelectedTokenAmount] = useState(parseValue(selectedTokenValue, selectedToken?.decimals))
-  const [alpValue, setAlpValue] = useState(0)
-  const [alpAmount, setAlpAmount] = useState(parseValue(alpValue, ALP_DECIMALS))
+  const [alpValue, setAlpValue] = useState('0')
+  const [alpAmount, setAlpAmount] = useState(bigNumberify(0))
   const [feeBasisPoints, setFeeBasisPoints] = useState("")
   const [payBalance, setPayBalance] = useState('$0.00');
   const [receiveBalance, setReceiveBalance] = useState('$0.00');
@@ -179,16 +179,6 @@ const AcyPoolComponent = props => {
   }
 
   const onAlpValueChange = (e) => {
-    let inputString = e.target.value
-    if (inputString === "") {
-      setAlpValue("0")
-    }
-    else if (inputString[0] === "0" && inputString[1] === "0" && inputString[2] === ".") {
-      setAlpValue(inputString.substring(1))
-    }
-    else {
-      setAlpValue(inputString)
-    }
     setAnchorOnSwapAmount(false)
     setShowDescription(true)
     if (e.target.value === "") {
@@ -296,7 +286,7 @@ const AcyPoolComponent = props => {
   useEffect(() => {
     if (anchorOnSwapAmount) {
       if (!selectedTokenAmount) {
-        setAlpValue(0)
+        setAlpValue('0')
         setFeeBasisPoints("")
         return
       }
@@ -308,17 +298,17 @@ const AcyPoolComponent = props => {
         let nextValue = formatAmountFree(nextAmount, ALP_DECIMALS, ALP_DECIMALS)
         nextValue = nextValue > 1000 ? Math.round(nextValue * LONGDIGIT) / LONGDIGIT : Math.round(nextValue * SHORTDIGIT) / SHORTDIGIT
 
-        setAlpValue(nextValue)
+        setAlpValue(nextValue.toString())
         setFeeBasisPoints(MINT_BURN_FEE_BASIS_POINTS)
       } else {
-        let nextAmount = alpPrice && amountUsd.div(parseValue(alpPrice, ALP_DECIMALS))
+        let nextAmount = alpPrice && amountUsd?.div(parseValue(alpPrice, ALP_DECIMALS))
           .mul(expandDecimals(1, selectedToken.decimals)).div(expandDecimals(1, ALP_DECIMALS))
           .mul(BASIS_POINTS_DIVISOR).div(BASIS_POINTS_DIVISOR - BURN_FEE_BASIS_POINTS)
 
         let nextValue = formatAmountFree(nextAmount, ALP_DECIMALS, ALP_DECIMALS)
         nextValue = nextValue > 1000 ? Math.round(nextValue * LONGDIGIT) / LONGDIGIT : Math.round(nextValue * SHORTDIGIT) / SHORTDIGIT
 
-        setAlpValue(nextValue)
+        setAlpValue(nextValue.toString())
         setFeeBasisPoints(BURN_FEE_BASIS_POINTS)
       }
       return

@@ -1,31 +1,24 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AcyCard from '@/components/AcyCard';
-import DerivativeComponent from '@/components/DerivativeComponent'
-import ComponentTabs from '@/components/ComponentTabs';
-import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
-import AcyPool from '@/components/AcyPool';
-import * as Api from '@/acy-dex-futures/Api';
-import { fetcher, getProvider, bigNumberify } from '@/acy-dex-futures/utils';
-import { BigNumber, ethers } from 'ethers'
-import Pool from '@/acy-dex-futures/abis/Pool.json'
-import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
+import AcyPool from '@/components/AcyPool';
+import ComponentTabs from '@/components/ComponentTabs';
+import DerivativeComponent from '@/components/DerivativeComponent'
+import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
+import { PositionTable } from '@/components/OptionComponent/TableComponent';
+import * as Api from '@/acy-dex-futures/Api';
+import useSWR from 'swr'
+import { fetcher, getProvider, bigNumberify } from '@/acy-dex-futures/utils';
+import { BigNumber, ethers } from 'ethers'
+import { useChainId } from '@/utils/helpers';
+import { useWeb3React } from '@web3-react/core';
+import Pool from '@/acy-dex-futures/abis/Pool.json'
+import Reader from '@/abis/future-option-power/Reader.json'
+import { getTokens, getContract } from '@/constants/future_option_power.js';
+
 // import { getGlobalTokenList } from '@/constants';
 import styles from './styles.less'
-import { PositionTable } from '@/components/OptionComponent/TableComponent';
-
-import Reader from '@/abis/future-option-power/Reader.json'
-import useSWR from 'swr'
-import { useWeb3React } from '@web3-react/core';
-
-function safeDiv(a, b) {
-  return b.isZero() ? BigNumber.from(0) : a.div(b);
-}
-function safeDiv2(a, b) {
-  return b == 0 ? 0 : a / b;
-}
 
 export function getPosition(rawPositionData, symbolData) {
   if (!rawPositionData || !symbolData) {
@@ -98,6 +91,14 @@ export function getSymbol(rawSymbolData) {
   return symbolQuery;
 }
 
+
+function safeDiv(a, b) {
+  return b.isZero() ? BigNumber.from(0) : a.div(b);
+}
+function safeDiv2(a, b) {
+  return b == 0 ? 0 : a / b;
+}
+
 const Powers = props => {
   const { account, library, active } = useWeb3React();
 
@@ -125,13 +126,10 @@ const Powers = props => {
     fetcher: fetcher(library, Reader)
   })
 
-  console.log("POSITION", rawPositionData)
 
   const symbolData = getSymbol(symbolsInfo)
   const positionData = getPosition(rawPositionData, symbolData)
 
-  console.log("POSITIONDATA", positionData)
-  console.log("SYMBOLDATA", symbolData)
 
   useEffect(() => {
     if (active) {
