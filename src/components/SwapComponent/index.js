@@ -20,15 +20,22 @@ import { useWeb3React } from '@web3-react/core';
 
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
-  const {   
+  const {
+    account,
+    library,
+    chainId,
     token0,
     token1,
     onSelectToken0,
     onSelectToken1,
-    isLockedToken1=false,
-    account,
-    library,
-    chainId,
+    isLockedToken1 = false,
+    activeSymbol,
+    setActiveSymbol,
+    setActiveToken,
+    activeToken0,
+    setActiveToken0,
+    activeToken1,
+    setActiveToken1
   } = props;
   // 选择货币的弹窗
 
@@ -510,7 +517,6 @@ const SwapComponent = props => {
           if (!isLockedToken1) {
             onSwitchCoinCard();
           }
-
         }}
       >
         <Icon style={{ fontSize: '16px' }} type="arrow-down" />
@@ -623,7 +629,7 @@ const SwapComponent = props => {
         </div>
       }
 
-      <DetailBox 
+      <DetailBox
         pair_name='DAImond'
         token_address='0x712ce0de2401e632d75e307ed8325774daaa3c51'
         pair_address='0x52384e314d18aa160bca9ecf45d03b6f80f9557f'
@@ -635,14 +641,22 @@ const SwapComponent = props => {
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
-      <TokenSelectorDrawer width={400} 
-        visible={visible} 
+      <TokenSelectorDrawer width={400}
+        visible={visible}
         setVisible={setVisible}
-        onCancel={onCancel} 
-        onCoinClick={onCoinClick} 
-        coinList={tokenlist} 
-        pageName={"Trade"} 
-        />
+        onCancel={onCancel}
+        onCoinClick={onCoinClick}
+        coinList={tokenlist}
+        pageName={"Trade"}
+        activeSymbol={activeSymbol}
+        setActiveSymbol={setActiveSymbol}
+        activeToken0={activeToken0}
+        setActiveToken0={setActiveToken0}
+        activeToken1={activeToken1}
+        setActiveToken1={setActiveToken1}
+        isRightSelect={true}
+        isFromToken={isFromToken}
+      />
 
     </div>
   );
@@ -651,7 +665,7 @@ const SwapComponent = props => {
 export default connect(({ global, transaction, swap, loading }) => ({
   global,
   transaction,
-  account: global.account,
+  // account: global.account,
   swap,
   loading: loading.global,
 }))(SwapComponent);

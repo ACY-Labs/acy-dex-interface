@@ -42,6 +42,8 @@ const Future = props => {
     fetcher: fetcher(library, Reader)
   });
   
+  console.log("check contract symbolsInfo", symbolsInfo)
+
   //future_tokens store every symbols in future and its data 
   const future_tokens_symbol = useMemo(() => {
     const future_tokens = symbolsInfo?.filter(ele => ele[0] == "futures")

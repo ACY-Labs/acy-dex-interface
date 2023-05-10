@@ -95,3 +95,19 @@
   pointer-events: none;
   z-index: 1000;
 }
+
+.tooltipLong {
+  position: absolute;
+  display: none;
+  width: 150px;
+  height: 100px;
+  border: 1px solid #828282;
+  background-color: #000000;
+  color: #fff;
+  text-align: center;
+  font-size: 0.8rem;
+  line-height: 20px;
+  /* border-radius: 5px; */
+  pointer-events: none;
+  z-index: 1000;
+}

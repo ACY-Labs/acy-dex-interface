@@ -32,10 +32,10 @@ const Swap = props => {
   const chainId = 137;
   const tokens = getTokens(chainId)
 
-  const [activeToken1, setActiveToken1] = useState(tokens[1]);
-  const [activeToken0, setActiveToken0] = useState(tokens[0]);
-  const [token0Addr, setToken0Addr] = useState(tokens[0].address);
-  const [token1Addr, setToken1Addr] = useState(tokens[1].address);
+  const [activeToken0, setActiveToken0] = useState(tokens[1]);
+  const [activeToken1, setActiveToken1] = useState(tokens[0]);
+  const [token0Addr, setToken0Addr] = useState(tokens[1].address);
+  const [token1Addr, setToken1Addr] = useState(tokens[0].address);
   const [activeSymbol, setActiveSymbol] = useState("BTC")
   const [activeSymbol1, setActiveSymbol1] = useState("ETH")
   const [activeToken, setActiveToken] = useState(activeToken0.address < activeToken1.address ? activeToken0 : activeToken1);
@@ -252,6 +252,7 @@ const Swap = props => {
     //initialize activeExist to rerender chart and check is chart is available or not
     setActiveExist(true)
   }, [activeToken0, activeToken1])
+
   return (
     <PageHeaderWrapper>
       <div className={styles.main}>
@@ -265,17 +266,49 @@ const Swap = props => {
                   options={graphTypes}
                   onChange={showGraph}
                 /> */}
-              <AcySymbolNav data={favTokens} onChange={showGraph} />
-              <AcySymbol
-                activeSymbol={activeToken0.symbol}
-                latestPriceColor={1}
-                latestPrice={1}
-                latestPricePercentage={1}
-              // coinList={coinList}
-                showChart={showChart}
-                setShowChart={()=>setShowChart(!showChart)}
-                setFavTokens={()=>{setFavTokens(JSON.parse(localStorage.getItem('tokens_symbol')))}}
-              />
+              {hasPair ?
+                <AcySymbol
+                  activeSymbol={`${activeToken0.symbol}/${activeToken1.symbol}`}
+                  setActiveSymbol={setActiveToken}
+                  activfeToken0={activeToken0}
+                  activeToken1={activeToken1}
+                  setActiveToken0={setActiveToken0}
+                  setActiveToken1={setActiveToken1}
+                  pageName={"Trade"}
+                  // pairName='BTC'
+                  // showDrawer={onClickCoin}
+                  latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                  latestPrice={curPrice}
+                  latestPricePercentage={priceDeltaPercent}
+                  dailyLow={dailyLow}
+                  dailyHigh={dailyHigh}
+                  showChart={showChart}
+                  setShowChart={() => setShowChart(!showChart)}
+                  setFavTokens={()=>{setFavTokens(JSON.parse(localStorage.getItem('tokens_symbol')))}}
+                />
+                : <div>
+                  <AcySymbolNav data={[activeToken0.symbol, activeToken1.symbol]} onChange={onTabSelect} />
+                  <AcySymbol
+                    activeSymbol={activeToken.symbol}
+                    pageName="Trade"
+                    // activeSymbol={activeToken0.symbol}
+                    // setActiveSymbol={setActiveSymbol}
+                    activeToken0={activeToken0}
+                    activeToken1={activeToken1}
+                    setActiveSymbol={setActiveToken}
+                    setActiveToken0={setActiveToken0}
+                    setActiveToken1={setActiveToken1}
+                    latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                    latestPrice={curPrice}
+                    latestPricePercentage={priceDeltaPercent}
+                    dailyLow={dailyLow}
+                    dailyHigh={dailyHigh}
+                    showChart={showChart}
+                    setShowChart={() => setShowChart(!showChart)}
+                    setFavTokens={()=>{setFavTokens(JSON.parse(localStorage.getItem('tokens_symbol')))}}
+                  />
+                </div>
+              }
               {/* </div> */}
               {activeExist ?
                 <div style={{ borderTop: '0.75px solid #333333' }}>
@@ -354,6 +387,13 @@ const Swap = props => {
                   library={library}
                   chainId={chainId}
                   onGetReceipt={onGetReceipt}
+                  activeSymbol={activeSymbol}
+                  activeToken0={activeToken0}
+                  activeToken1={activeToken1}
+                  setActiveToken={setActiveToken}
+                  setActiveToken0={setActiveToken0}
+                  setActiveToken1={setActiveToken1}
+                  setActiveSymbol={setActiveSymbol}
                 // showGraph={showGraph}
                 />
               </div>
