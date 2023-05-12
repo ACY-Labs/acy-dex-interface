@@ -9,7 +9,7 @@ import AcySymbol from '@/components/AcySymbol';
 import { PositionTable } from '@/components/OptionComponent/TableComponent';
 import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
-import { fetcher } from '@/acy-dex-futures/utils';
+import { fetcher, getSymbol, getPosition } from '@/acy-dex-futures/utils';
 import { useWeb3React } from '@web3-react/core';
 import { BigNumber, ethers } from 'ethers'
 import useSWR from 'swr'
@@ -17,60 +17,6 @@ import Reader from '@/abis/future-option-power/Reader.json'
 import styles from './styles.less'
 
 
-function safeDiv(a, b) {
-  return b.isZero() ? BigNumber.from(0) : a.div(b);
-}
-function safeDiv2(a, b) {
-  return b == 0 ? 0 : a / b;
-}
-export function getPosition(rawPositionData, symbolData) {
-  if (!rawPositionData || !symbolData) {
-    return
-  }
-  let positionQuery = []
-  for (let i = 0; i < rawPositionData.positions.length; i++) {
-    const temp = rawPositionData.positions[i]
-    const volume = ethers.utils.formatUnits(temp[2], 18)
-    if (volume != 0) {
-      const symbol = symbolData.find(obj => {
-        return obj.address === temp[0]
-      })
-      const { markPrice, initialMarginRatio, indexPrice, minTradeVolume } = symbol
-
-      const cost = ethers.utils.formatUnits(temp.cost, 18)
-      const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume, 18)
-      const marginUsage = Math.abs(volume * indexPrice) * initialMarginRatio
-      const unrealizedPnl = volume * indexPrice - cost
-      const _accountFunding = temp.cumulativeFundingPerVolume.mul(temp[2])
-      const accountFunding = ethers.utils.formatUnits(_accountFunding, 36)
-      const _entryPrice = safeDiv(temp.cost, temp[2])
-      // const entryPrice = ethers.utils.formatUnits(_entryPrice,0)
-      const entryPrice = safeDiv2(cost, volume)
-      let liquidationPrice
-      if (volume >= 0) {
-        liquidationPrice = markPrice * (1 - initialMarginRatio / 2) - (marginUsage - cost) / (volume * (1 - initialMarginRatio / 2))
-      } else {
-        liquidationPrice = markPrice * (1 + initialMarginRatio / 2) + (marginUsage - cost) / (volume * (1 + initialMarginRatio / 2))
-      }
-
-      const position = {
-        symbol: temp[1],
-        address: temp[0],
-        position: Math.abs(volume),
-        entryPrice: entryPrice,
-        markPrice: markPrice,
-        marginUsage: marginUsage,
-        unrealizedPnl: unrealizedPnl,
-        accountFunding: accountFunding,
-        type: volume >= 0 ? "Long" : "Short",
-        minTradeVolume: minTradeVolume,
-        liquidationPrice: liquidationPrice,
-      };
-      positionQuery.push(position)
-    }
-  }
-  return positionQuery;
-}
 
 const Powers = props => {
   const { account, library, active } = useWeb3React();
@@ -88,7 +34,8 @@ const Powers = props => {
     fetcher: fetcher(library, Reader)
   })
 
-  const positionData = getPosition(rawPositionData,)
+  const symbolData = getSymbol(symbolsInfo)
+  const positionData = getPosition(rawPositionData, symbolData)
 
   useEffect(() => {
     if (active) {

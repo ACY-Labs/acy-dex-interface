@@ -10,9 +10,10 @@ import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
-import { fetcher } from '@/acy-dex-futures/utils';
+import { fetcher, getSymbol, getPosition } from '@/acy-dex-futures/utils';
 import Reader from '@/abis/future-option-power/Reader.json'
 import styles from './styles.less'
+import { PositionTable } from '@/components/OptionComponent/TableComponent';
 
 
 const Future = props => {
@@ -32,6 +33,12 @@ const Future = props => {
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
+  const { data: rawPositionData, mutate: updatePosition } = useSWR([chainId, readerAddress, 'getTdInfo', poolAddress, account], {
+    fetcher: fetcher(library, Reader)
+  })
+  const symbolData = getSymbol(symbolsInfo)
+  const positionData = getPosition(rawPositionData, symbolData)
+  const [tableContent, setTableContent] = useState("Positions");
   //future_tokens store every symbols in future and its data 
   // const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
   // let future_tokens_symbol = []
@@ -73,13 +80,14 @@ const Future = props => {
     if (active) {
       library.on('block', () => {
         updateSymbolsInfo(undefined, true)
+        updatePosition()
       })
       return () => {
         library.removeAllListeners('block')
       }
     }
   }, [active, library, chainId,
-    updateSymbolsInfo]
+    updateSymbolsInfo,updatePosition]
   )
   const [activeSymbol, setActiveSymbol] = useState("BTC")
   // const [activeToken, setActiveToken] = useState("BTC");
@@ -125,6 +133,27 @@ const Future = props => {
                 onChangePrice={onChangePrice}
               />
             </div>
+            <div className={styles.bottomWrapper}>
+                <div className={styles.bottomTab}>
+                  <ComponentTabs
+                    option={tableContent}
+                    options={["Positions", "Orders"]}
+                    onChange={item => { setTableContent(item) }}
+                  />
+                </div>
+              </div>
+              <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
+                <div className={`${styles.colItem} ${styles.priceChart}`}>
+                  <div className={styles.positionsTable}>
+                    {tableContent == "Positions" && (
+                      <PositionTable dataSource={positionData} chainId={chainId} />
+                    )}
+                    {tableContent == "Orders" && (
+                      <div>ORDERS</div>
+                    )}
+                  </div>
+                </div>
+              </AcyCard>
           </div>
         }
 
