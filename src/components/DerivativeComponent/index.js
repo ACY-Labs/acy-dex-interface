@@ -242,8 +242,23 @@ const DerivativeComponent = props => {
           :
           <>
             <div className={styles.rowFlexContainer}>
-
-              <div style={{ display: 'flex' }}>
+              <div>
+                {/* <div style={{ display: 'flex' }}> */}
+                {/* <div className={styles.inputContainer} style={{ display: 'flow-root', textAlignLast: 'right', padding: '8px 10px 6px 10px' }}>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="Amount"
+                    className={styles.optionInput}
+                    value={selectedTokenValue}
+                    onChange={e => {
+                      // setSelectedTokenValue(e.target.value)
+                      handleTokenValueChange(e.target.value)
+                      setShowDescription(true)
+                    }}
+                  />
+                  <span className={styles.inputLabel}>{selectedToken}</span>
+                </div> */}
                 <div className={styles.inputContainer} style={{ display: 'flow-root', textAlignLast: 'right', padding: '8px 10px 6px 10px' }}>
                   <div style={{ display: 'flex', fontSize: '16px', marginBottom: '3px' }}>
                     <input

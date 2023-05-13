@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Row, Col, Drawer } from 'antd';
 import AcyCard from '@/components/AcyCard';
 import DerivativeComponent from '@/components/DerivativeComponent'
 import ComponentTabs from '@/components/ComponentTabs';
@@ -14,7 +13,6 @@ import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
-import styled from "styled-components";
 import styles from './styles.less'
 import { PositionTable } from '@/components/OptionComponent/TableComponent';
 
@@ -104,6 +102,16 @@ const Option = props => {
   const { account, library, active } = useWeb3React();
   let { chainId } = useChainId();
 
+  ///data 
+  const [symbol, setSymbol] = useState('BTCUSD-60000-C')
+  //for chart 24h data tab
+  const [curPrice, setCurPrice] = useState(0);
+  const [priceDeltaPercent, setPriceDeltaPercent] = useState(0);
+  const [deltaIsMinus, setDeltaIsMinus] = useState(false);
+  const [dailyHigh, setDailyHigh] = useState(0)
+  const [dailyLow, setDailyLow] = useState(0)
+  const [dailyVol, setDailyVol] = useState(0)
+  ///// read reader contract, getTdInfo and getSymbolsInfo
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
 
@@ -170,17 +178,28 @@ const Option = props => {
               <AcySymbol
                 activeSymbol={activeSymbol}
                 setActiveSymbol={setActiveSymbol}
+                // showDrawer={onClickCoin}
+                // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                // latestPrice={latestPrice}
+                // latestPricePercentage={priceChangePercentDelt
                 coinList={option_tokens_symbol}
-                latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
-                latestPrice={latestPrice}
-                latestPricePercentage={priceChangePercentDelta}
+                latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                latestPrice={curPrice}
+                latestPricePercentage={priceDeltaPercent}
+                dailyLow={dailyLow}
+                dailyHigh={dailyHigh}
+                dailyVol={dailyVol}
               />
               <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
                 <ExchangeTVChart
-                  chartTokenSymbol={activeSymbol}
-                  pageName="Option"
                   chainId={chainId}
-                  onChangePrice={onChangePrice}
+                  pageName="Option"
+                  activeSymbol={activeSymbol}
+                  setCurPrice={setCurPrice}
+                  setPriceDeltaPercent={setPriceDeltaPercent}
+                  setDailyHigh={setDailyHigh}
+                  setDailyLow={setDailyLow}
+                  setDailyVol={setDailyVol}
                 />
               </div>
 

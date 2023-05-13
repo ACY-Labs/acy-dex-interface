@@ -19,17 +19,53 @@ import { useConstantLoader, getGlobalTokenList } from '@/constants';
 import mockTokenList from '@/components/SwapComponent/mockTokenList.json';
 // import InfiniteScroll from 'react-infinite-scroll-component';
 
-const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simple, coinList, placement='right', setActiveSymbol, pageName }) => {
+const TokenSelectorDrawer = ({ 
+  placement = 'right', 
+  simple, 
+  onCancel, 
+  visible, 
+  setVisible, 
+  pageName,
+  isRightSelect,
+  isFromToken,
+  onCoinClick, 
+  coinList, 
+  selectSymbol, 
+  activeSymbol, 
+  activeToken0,
+  setActiveToken0,
+  activeToken1,
+  setActiveToken1,
+  setActiveSymbol, 
+}) => {
   const { account, library, chainId } = useConstantLoader();
 
   // const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
   // const tokenlist = coinList ? coinList : getGlobalTokenList()
-  const tokenlist = coinList ? coinList : mockTokenList
+
+  //coinList contains 7 tokens, mockTokenList has thousands
+  // const tokenlist = coinList ? coinList : mockTokenList
+  const tokenlist = pageName === "Trade" ? mockTokenList : coinList
+
+  // const tokenlist = mockTokenList
   // let tokenlist = allTokenlist.slice(0,9)
-  // console.log("Token list in drawer", tokenlist)
   useEffect(() => {
     setInitTokenList(tokenlist)
   }, [tokenlist])
+  const baseTokenAddr = {
+    56: [
+      { symbol: "USDC", address: "0x8965349fb649A33a30cbFDa057D8eC2C48AbE2A2" },
+      { symbol: "USDT", address: "0xF82eEeC2C58199cb409788E5D5806727cf549F9f" },
+    ],
+    137: [
+      { symbol: "USDC", address: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174" },
+      { symbol: "USDT", address: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f" }
+    ],
+    80001: [
+      { symbol: "USDC", address: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174" },
+      { symbol: "USDT", address: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f" }
+    ]
+  }
 
   const [hasMore, setHasMore] = useState(true);
   const [pageIdx, setPageIdx] = useState(1);
@@ -39,13 +75,12 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
   const [favTokenList, setFavTokenList] = useState([]);
   const { activate } = useWeb3React();
   const [tokenBalanceDict, setTokenBalanceDict] = useState({});
-  const [renderTokenList, setRenderTokenList] = useState(initTokenList.slice(0, 20));
+  const [renderTokenList, setRenderTokenList] = useState(initTokenList?.slice(0, 20));
 
 
   useEffect(() => {
     if (!tokenlist) return
     // return
-    console.log("resetting page states in TokenSelectorModal", tokenlist)
     setInitTokenList(tokenlist);
     setCustomTokenList([]);
     setTokenSearchInput('');
@@ -69,9 +104,9 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
     }
   }, [chainId]);
 
-  useEffect(()=>{
-    setRenderTokenList(initTokenList.slice(0, 20))
-  },[initTokenList])
+  useEffect(() => {
+    setRenderTokenList(initTokenList?.slice(0, 20))
+  }, [initTokenList])
 
   const onTokenSearchChange = e => {
     setPageIdx(1)
@@ -80,9 +115,9 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
     setInitTokenList(filterTokenList)
     if (filterTokenList.length < 20) {
       setHasMore(false)
-    }else{
+    } else {
       setHasMore(true)
-      filterTokenList = filterTokenList.slice(0,20)
+      filterTokenList = filterTokenList.slice(0, 20)
     }
     setRenderTokenList(
       filterTokenList
@@ -96,7 +131,7 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
       return;
     }
     setPageIdx(pageIdx + 1);
-    setRenderTokenList(initTokenList.slice(0, (pageIdx+1) * 20));
+    setRenderTokenList(initTokenList.slice(0, (pageIdx + 1) * 20));
   }
 
 
@@ -142,21 +177,22 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
       const prevFavTokenList = [...prevState];
       if (prevFavTokenList.includes(token)) {
         var tokens = prevFavTokenList.filter(value => value != token);
-        localStorage.setItem('token', JSON.stringify(tokens.map(e => e.addressOnEth)));
-        localStorage.setItem('tokens_symbol', JSON.stringify(tokens.map(e => e.symbol)));
+        localStorage.setItem('tokens_addr', JSON.stringify(tokens.map(e => e.address)));
+        // localStorage.setItem('token', JSON.stringify(tokens.map(e => e.addressOnEth)));
+        localStorage.setItem('tokens_symbol', JSON.stringify(tokens.map(e => e.name)));
         return tokens
       }
       prevFavTokenList.push(token);
-      localStorage.setItem('token', JSON.stringify(prevFavTokenList.map(e => e.addressOnEth)));
-      localStorage.setItem('tokens_symbol', JSON.stringify(prevFavTokenList.map(e => e.symbol)));
+      localStorage.setItem('tokens_addr', JSON.stringify(prevFavTokenList.map(e => e.address)));
+      localStorage.setItem('tokens_symbol', JSON.stringify(prevFavTokenList.map(e => e.name)));
 
       return prevFavTokenList;
     });
   };
 
   const fetchData = (page) => {
-    console.log("page",page);
-    const temp = allTokenlist.slice(0,9)
+    console.log("page", page);
+    const temp = allTokenlist.slice(0, 9)
     tokenlist = [...initTokenList, ...temp];
     // setInitTokenList(newTokenList);
   }
@@ -173,6 +209,7 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
     >
 
       {simple ?
+        //simple is for options-pool
         <div className={styles.tokenselector}>
           <div className={styles.coinList}>
             {initTokenList.length ? initTokenList.map((token, index) => {
@@ -208,67 +245,83 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
               onChange={onTokenSearchChange}
               id="liquidity-token-search-input"
               autoComplete="off"
-              prefix={<Icon type="search"/>}
+              prefix={<Icon type="search" />}
             />
           </div>
 
           <div className={styles.coinList}>
             <AcyTabs>
 
-
-              <AcyTabPane 
-                tab={<span><Icon type="star" theme="filled" />Favorite</span>} 
-                key="2">
-                {favTokenList.length ? favTokenList.map((supToken, index) => (
-                  <AcyCoinItem
-                    data={supToken}
-                    key={index}
-                    selectToken={(item) => {
-                      setVisible(false)
-                      setActiveSymbol(item.symbol)                    
-                    }}
-                    customIcon={false}
-                    index={index}
-                    clickCallback={() => setTokenAsFav(supToken)}
-                    isFav={favTokenList.includes(supToken)}
-                  />
-                ))
-                  : <div className={styles.textCenter} >No matching result</div>}
-              </AcyTabPane>
               <AcyTabPane tab="All" key="1">
-              {renderTokenList.length ? renderTokenList.map((token, index) => {
-                    return (
-                      <AcyCoinItem
-                        hideBalance={true}
-                        data={token}
-                        key={index}
-                        customIcon={false}
-                        clickCallback={() => setTokenAsFav(token)}
-                        // selectToken={(item) => {
-                        //   setActiveSymbol(item.symbol)
-                        // }}
-                        selectToken={(item) => {
-                          if (pageName=="Trade") {onCoinClick(token)}
-                          else {setVisible(false)}
-                          setActiveSymbol(item.symbol)
-                          // setVisible(false)
-                          // onCoinClick(token);
-                        }}
-                        isFav={favTokenList.includes(token)}
-                        constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}
-                      />
-                    );
-                  })
-                    :null}
+                {renderTokenList?.length && renderTokenList !== undefined ? renderTokenList.map((token, index) => {
+                  return (
+                    <AcyCoinItem
+                      hideBalance={true}
+                      data={token}
+                      key={index}
+                      customIcon={false}
+                      clickCallback={() => setTokenAsFav(token)}
+                      // selectToken={(item) => {
+                      //   setActiveSymbol(item.symbol)
+                      // }}
+                      selectToken={(item) => {
+                        if (pageName === "Trade") {
+                          onCoinClick(token)
+                          setActiveSymbol(item)
+                          // setActiveToken0(item)
+                          // setActiveToken1(USDT_Token[chainId][0])
+                          if (isRightSelect) {
+                            if (isFromToken) {
+                              if (item.address < activeToken1.address) {
+                                setActiveToken0(item)
+                              } else {
+                                setActiveToken0(activeToken1)
+                                setActiveToken1(item)
+                              }
+                            } else { // selected toToken
+                              if (item.address < activeToken0.address) {
+                                setActiveToken1(activeToken0)
+                                setActiveToken0(item)
+                              } else {
+                                setActiveToken1(item)
+                              }
+                            }
+                            if (activeToken0.address === item.address || activeToken1.address === item.address) {
+                              if (item.symbol !== "USDT") {
+                                setActiveToken0(item)
+                                setActiveToken1(baseTokenAddr["137"].find(token => token.symbol === 'USDT'))
+                              }
+                              else {
+                                setActiveToken0(baseTokenAddr["137"].find(token => token.symbol === 'USDT'))
+                                setActiveToken1(baseTokenAddr["137"].find(token => token.symbol === 'USDC'))
+                              }
+                            }
+                          }
+                          else { //selected from left
+                            setActiveToken0(item)
+                            setActiveToken1(baseTokenAddr["137"].find(token => token.symbol === 'USDT'))
+                          }
+                        }
+                        else { // page not trade
+                          setActiveSymbol(item.name)
+                        }
+                        setVisible(false)
+                      }}
+                      isFav={favTokenList.includes(token)}
+                      constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}
+                    />
+                  );
+                })
+                  : null}
                 <div className={styles.buttonContainer}>
-                {hasMore?
-                <Button 
-                type="primary"
-                className={styles.buttonCenter}
-                onClick={loadMore}>Load More</Button>
-                :<div className={styles.textCenter} >No more result</div>} 
+                  {hasMore ?
+                    <Button
+                      type="primary"
+                      className={styles.buttonCenter}
+                      onClick={loadMore}>Load More</Button>
+                    : <div className={styles.textCenter} >No more result</div>}
                 </div>
-                  
+
                 {/* <InfiniteScroll
                 dataLength={initTokenList.length}
                 next={(page)=>fetchData(page)}
@@ -295,6 +348,69 @@ const TokenSelectorDrawer = ({ onCancel, visible, setVisible, onCoinClick, simpl
                   })
                     : <div className={styles.textCenter} >No matching result</div>}
                 </InfiniteScroll> */}
+              </AcyTabPane>
+
+              <AcyTabPane
+                tab={<span><Icon type="star" theme="filled" />Favorite</span>}
+                key="2">
+                {favTokenList.length ? favTokenList.map((supToken, index) => (
+                  <AcyCoinItem
+                    data={supToken}
+                    key={index}
+                    selectToken={(item) => {
+                      if (pageName === "Trade") {
+                        onCoinClick(supToken)
+                        setActiveSymbol(item)
+                        // setActiveToken0(item)
+                        // setActiveToken1(USDT_Token[chainId][0])
+                        if (isRightSelect) {
+                          if (isFromToken) {
+                            if (item.address < activeToken1.address) {
+                              setActiveToken0(item)
+                            } else {
+                              setActiveToken0(activeToken1)
+                              setActiveToken1(item)
+                            }
+                          } else { // selected toToken
+                            if (item.address < activeToken0.address) {
+                              setActiveToken1(activeToken0)
+                              setActiveToken0(item)
+                            } else {
+                              setActiveToken1(item)
+                            }
+                          }
+                          if (activeToken0.address === item.address || activeToken1.address === item.address) {
+                            if (item.symbol !== "USDT") {
+                              setActiveToken0(item)
+                              setActiveToken1(baseTokenAddr["137"].find(token => token.symbol === 'USDT'))
+                            }
+                            else {
+                              setActiveToken0(baseTokenAddr["137"].find(token => token.symbol === 'USDT'))
+                              setActiveToken1(baseTokenAddr["137"].find(token => token.symbol === 'USDC'))
+                            }
+                          }
+                        }
+                        else { //selected from left
+                          setActiveToken0(item)
+                          setActiveToken1(baseTokenAddr["137"].find(token => token.symbol === 'USDT'))
+                        }
+                      }
+                      else { // page not trade
+                        setActiveSymbol(item.name)
+                      }
+                      // else {
+                      //   setActiveSymbol(item.symbol)
+                      // }
+                      setVisible(false)
+                      setActiveSymbol(item.symbol)
+                    }}
+                    customIcon={false}
+                    index={index}
+                    clickCallback={() => setTokenAsFav(supToken)}
+                    isFav={favTokenList.includes(supToken)}
+                  />
+                ))
+                  : <div className={styles.textCenter} >No matching result</div>}
               </AcyTabPane>
             </AcyTabs>
           </div>

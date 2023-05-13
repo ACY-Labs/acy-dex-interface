@@ -22,6 +22,13 @@ const Future = props => {
 
   const [mode, setMode] = useState('Buy')
   const [symbol, setSymbol] = useState('BTCUSD')
+  //for chart 24h data tab
+  const [curPrice, setCurPrice] = useState(0);
+  const [priceDeltaPercent, setPriceDeltaPercent] = useState(0);
+  const [deltaIsMinus, setDeltaIsMinus] = useState(false);
+  const [dailyHigh, setDailyHigh] = useState(0)
+  const [dailyLow, setDailyLow] = useState(0)
+  const [dailyVol, setDailyVol] = useState(0)
 
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
@@ -65,10 +72,6 @@ const Future = props => {
   const [activeSymbol, setActiveSymbol] = useState("BTCUSD")
   const [latestPrice, setLatestPrice] = useState(0);
   const [priceChangePercentDelta, setPpriceChangePercentDelta] = useState(0);
-  const onChangePrice = (curPrice, change) => {
-    setLatestPrice(curPrice);
-    setPpriceChangePercentDelta(change);
-  }
 
   return (
     <div className={styles.main}>
@@ -78,19 +81,27 @@ const Future = props => {
           : <div className={`${styles.colItem} ${styles.priceChart}`}>
             <AcySymbolNav data={future_token} />
             <AcySymbol
+              pageName="Futures"
               activeSymbol={activeSymbol}
               setActiveSymbol={setActiveSymbol}
               coinList={future_tokens_symbol}
-              latestPriceColor={priceChangePercentDelta*1>= 0 && '#0ecc83' ||'#fa3c58'}
-              latestPrice={latestPrice}
-              latestPricePercentage={priceChangePercentDelta}
+              latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+              latestPrice={curPrice}
+              latestPricePercentage={priceDeltaPercent}
+              dailyLow={dailyLow}
+              dailyHigh={dailyHigh}
+              dailyVol={dailyVol}
             />
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               <ExchangeTVChart
-                chartTokenSymbol={activeSymbol.replace('USD', '')}
-                pageName="Futures"
                 chainId={chainId}
-                onChangePrice={onChangePrice}
+                pageName="Futures"
+                activeSymbol={activeSymbol}
+                setCurPrice={setCurPrice}
+                setPriceDeltaPercent={setPriceDeltaPercent}
+                setDailyHigh={setDailyHigh}
+                setDailyLow={setDailyLow}
+                setDailyVol={setDailyVol}
               />
             </div>
           </div>

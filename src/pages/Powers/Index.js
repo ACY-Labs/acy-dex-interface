@@ -1,28 +1,24 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AcyCard from '@/components/AcyCard';
-import DerivativeComponent from '@/components/DerivativeComponent'
-import ComponentTabs from '@/components/ComponentTabs';
-import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
-import AcyPool from '@/components/AcyPool';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
+import AcyPool from '@/components/AcyPool';
+import ComponentTabs from '@/components/ComponentTabs';
+import DerivativeComponent from '@/components/DerivativeComponent'
+import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { PositionTable } from '@/components/OptionComponent/TableComponent';
-import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract } from '@/constants/future_option_power.js';
-import { fetcher } from '@/acy-dex-futures/utils';
-import { useWeb3React } from '@web3-react/core';
-import { BigNumber, ethers } from 'ethers'
+import * as Api from '@/acy-dex-futures/Api';
 import useSWR from 'swr'
+import { fetcher, getProvider, bigNumberify } from '@/acy-dex-futures/utils';
+import { BigNumber, ethers } from 'ethers'
+import { useChainId } from '@/utils/helpers';
+import { useWeb3React } from '@web3-react/core';
+import Pool from '@/acy-dex-futures/abis/Pool.json'
 import Reader from '@/abis/future-option-power/Reader.json'
+import { getTokens, getContract } from '@/constants/future_option_power.js';
+
 import styles from './styles.less'
 
-
-function safeDiv(a, b) {
-  return b.isZero() ? BigNumber.from(0) : a.div(b);
-}
-function safeDiv2(a, b) {
-  return b == 0 ? 0 : a / b;
-}
 export function getPosition(rawPositionData, symbolData) {
   if (!rawPositionData || !symbolData) {
     return
@@ -72,12 +68,52 @@ export function getPosition(rawPositionData, symbolData) {
   return positionQuery;
 }
 
+export function getSymbol(rawSymbolData) {
+  if (!rawSymbolData) {
+    return
+  }
+  let symbolQuery = []
+  for (let i = 0; i < rawSymbolData.length; i++) {
+    const temp = rawSymbolData[i]
+    const symbol = {
+      tokenname: temp[1]?.substring(0, 3),
+      symbol: temp[1],
+      address: temp[2],
+      markPrice: ethers.utils.formatUnits(temp.markPrice, 18),
+      indexPrice: ethers.utils.formatUnits(temp.indexPrice, 18),
+      initialMarginRatio: ethers.utils.formatUnits(temp.initialMarginRatio, 18), //0.1
+      minTradeVolume: ethers.utils.formatUnits(temp.minTradeVolume, 18)
+
+    };
+    symbolQuery.push(symbol)
+  }
+  return symbolQuery;
+}
+
+
+function safeDiv(a, b) {
+  return b.isZero() ? BigNumber.from(0) : a.div(b);
+}
+function safeDiv2(a, b) {
+  return b == 0 ? 0 : a / b;
+}
+
 const Powers = props => {
   const { account, library, active } = useWeb3React();
 
   let { chainId } = useChainId();
   const tokens = getTokens(chainId);
 
+  ///data 
+  const [symbol, setSymbol] = useState('BTC^2')
+  //for chart 24h data tab
+  const [curPrice, setCurPrice] = useState(0);
+  const [priceDeltaPercent, setPriceDeltaPercent] = useState(0);
+  const [deltaIsMinus, setDeltaIsMinus] = useState(false);
+  const [dailyHigh, setDailyHigh] = useState(0)
+  const [dailyLow, setDailyLow] = useState(0)
+  const [dailyVol, setDailyVol] = useState(0)
+  ///// read reader contract, getTdInfo and getSymbolsInfo
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
   
@@ -88,18 +124,23 @@ const Powers = props => {
     fetcher: fetcher(library, Reader)
   })
 
-  const positionData = getPosition(rawPositionData,)
+
+  const symbolData = getSymbol(symbolsInfo)
+  const positionData = getPosition(rawPositionData, symbolData)
+
 
   useEffect(() => {
     if (active) {
       library.on('block', () => {
         updatePosition()
+        updateSymbolsInfo()
       })
       return () => {
         library.removeAllListeners('block')
       }
     }
-  }, [active, library, chainId, updatePosition]
+  }, [active, library, chainId,
+    updateSymbolsInfo, updatePosition]
   )
 
   let power_tokens_symbol = []
@@ -120,7 +161,6 @@ const Powers = props => {
   }, [symbolsInfo, power_token, activeSymbol])
 
   const [mode, setMode] = useState('Buy')
-  const [symbol, setSymbol] = useState('BTC^2')
   const [tableContent, setTableContent] = useState("Positions");
   const [activeSymbol, setActiveSymbol] = useState('BTC^2')
   const [latestPrice, setLatestPrice] = useState(0);
@@ -142,16 +182,23 @@ const Powers = props => {
                 activeSymbol={activeSymbol}
                 setActiveSymbol={setActiveSymbol}
                 coinList={power_tokens_symbol}
-                latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
-                latestPrice={latestPrice}
-                latestPricePercentage={priceChangePercentDelta}
+                latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                latestPrice={curPrice}
+                latestPricePercentage={priceDeltaPercent}
+                dailyLow={dailyLow}
+                dailyHigh={dailyHigh}
+                dailyVol={dailyVol}
               />
               <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
                 <ExchangeTVChart
-                  chartTokenSymbol={activeSymbol}
-                  pageName="Powers"
                   chainId={chainId}
-                  onChangePrice={onChangePrice}
+                  pageName="Powers"
+                  activeSymbol={activeSymbol}
+                  setCurPrice={setCurPrice}
+                  setPriceDeltaPercent={setPriceDeltaPercent}
+                  setDailyHigh={setDailyHigh}
+                  setDailyLow={setDailyLow}
+                  setDailyVol={setDailyVol}
                 />
               </div>
               <div className={styles.bottomWrapper}>
@@ -175,14 +222,14 @@ const Powers = props => {
                   </div>
                 </div>
               </AcyCard>
-            </div >
+            </div>
           }
         </>
 
-
+        {/* RIGHT INTERACTIVE COMPONENT */}
         <div className={`${styles.colItem} ${styles.optionComponent}`}>
           <AcyCard style={{ backgroundColor: 'transparent', border: 'none' }}>
-            <DerivativeComponent
+          <DerivativeComponent
               mode={mode}
               setMode={setMode}
               chainId={chainId}
