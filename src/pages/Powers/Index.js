@@ -104,16 +104,13 @@ const Powers = props => {
 
   let power_tokens_symbol = []
   let power_token = []
-  let power_tokens = {}
 
   useMemo(() => {
-    // todo: change to symbolsInfo from reader contract
-    const symbolsInfo_test = [['power', 'mBTC^2'], ['power', 'mETH^2']]
-    power_tokens = symbolsInfo_test?.filter(ele => ele[0] == "power")
-    power_tokens?.forEach((ele) => {
+    symbolsInfo?.filter(ele => ele[0] == "power")?.forEach((ele) => {
       power_tokens_symbol.push({
         symbol: ele[1],
-        name: ele[1]?.substring(1, 4),
+        name: ele[1],
+        address: ele[2],
       })
     })
     power_tokens_symbol?.forEach((ele) => {
@@ -121,13 +118,13 @@ const Powers = props => {
         power_token.push(ele.name)
       }
     })
-    }, [symbolsInfo, power_token, activeSymbol])
+  }, [symbolsInfo, power_token, activeSymbol])
 
   const [mode, setMode] = useState('Buy')
-  const [symbol, setSymbol] = useState('mBTC^2')
+  const [symbol, setSymbol] = useState('BTC^2')
   const [tableContent, setTableContent] = useState("Positions");
   const [activeToken, setActiveToken] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
-  const [activeSymbol, setActiveSymbol] = useState('mBTC^2')
+  const [activeSymbol, setActiveSymbol] = useState('BTC^2')
 
   const selectTab = item => {
     setActiveToken((tokens.filter(ele => ele.symbol == item)[0]))

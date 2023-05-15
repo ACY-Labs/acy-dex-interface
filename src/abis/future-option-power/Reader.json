@@ -505,6 +505,11 @@
               "internalType": "uint256",
               "name": "balance",
               "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "symbol",
+              "type": "string"
             }
           ],
           "internalType": "struct DeriLens.TokenInfo[]",
@@ -1438,6 +1443,11 @@
               "internalType": "uint256",
               "name": "balance",
               "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "symbol",
+              "type": "string"
             }
           ],
           "internalType": "struct DeriLens.TokenInfo[]",
