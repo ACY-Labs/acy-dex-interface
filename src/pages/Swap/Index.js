@@ -27,7 +27,7 @@ const apiUrlPrefix = "https://stats.acy.finance/api"
 const Swap = props => {
   // const { farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
   const { account, library, active } = useWeb3React()
-  
+
   // test on polygon
   const chainId = 137;
   const tokens = getTokens(chainId)
@@ -182,7 +182,7 @@ const Swap = props => {
   };
 
   const [graphType, setGraphType] = useState("BTC")
-  const graphTypes = ["Routes", activeToken1.symbol]
+  const graphTypes = [activeToken1.symbol]
   const showGraph = item => {
     setGraphType(item)
   }
@@ -214,9 +214,9 @@ const Swap = props => {
   const history = useHistory()
   useEffect(() => {
     const hash = history.location.hash.replace('#', '').split('&')
-    if(history.location.hash) {
-      setActiveToken0({symbol: hash[0].split('/')[0].replaceAll('%20', ' '), address: hash[1]})
-      setActiveToken1({symbol: hash[0].split('/')[1].replaceAll('%20', ' '), address: hash[2]})
+    if (history.location.hash) {
+      setActiveToken0({ symbol: hash[0].split('/')[0].replaceAll('%20', ' '), address: hash[1] })
+      setActiveToken1({ symbol: hash[0].split('/')[1].replaceAll('%20', ' '), address: hash[2] })
     }
   }, [history.location.hash])
 
@@ -227,35 +227,25 @@ const Swap = props => {
           <div className={`${styles.colItem} ${styles.priceChart}`}>
 
             <div>
-              {/* <div className={styles.chartTokenSelectorTab}> */}
-              {/* <PerpetualTabs
-                  option={graphType}
-                  options={graphTypes}
-                  onChange={showGraph}
-                /> */}
               <AcySymbolNav data={favTokens} onChange={showGraph} />
               <AcySymbol
                 activeSymbol={activeToken0.symbol}
                 latestPriceColor={1}
                 latestPrice={1}
                 latestPricePercentage={1}
-              // coinList={coinList}
+                // coinList={coinList}
                 showChart={showChart}
-                setShowChart={()=>setShowChart(!showChart)}
-                setFavTokens={()=>{setFavTokens(JSON.parse(localStorage.getItem('tokens_symbol')))}}
+                setShowChart={() => setShowChart(!showChart)}
+                setFavTokens={() => { setFavTokens(JSON.parse(localStorage.getItem('tokens_symbol'))) }}
               />
-              {/* </div> */}
 
               <div style={{ borderTop: '0.75px solid #333333' }}>
-                {graphType == "Routes" ?
-                  // <SankeyGraph />
-                  <></>
-                  : showChart && 
+                {showChart &&
                   <div>
                     <ExchangeTVChart
                       chartTokenSymbol={activeToken1.symbol}
                       pageName="Trade"
-                      fromToken={activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address} 
+                      fromToken={activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address}
                       toToken={activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address}
                       chainId={chainId}
                     />
@@ -268,7 +258,7 @@ const Swap = props => {
               <div className={styles.chartTokenSelectorTab}>
                 <ComponentTabs
                   option={tableContent}
-                  options={['Routes', 'Trade History', 'Pools Activity']}
+                  options={['Trade History', 'Pools Activity']}
                   onChange={item => { setTableContent(item) }}
                 />
               </div>
@@ -276,17 +266,17 @@ const Swap = props => {
                 <div className={`${styles.colItem} ${styles.priceChart}`}>
                   <div className={styles.positionsTable}>
 
-                    {tableContent == 'Routes' && (
+                    {/* {tableContent == 'Routes' && (
                       <SankeyGraph />
-                    )}
+                    )} */}
                     {tableContent == 'Trade History' && (
-                      <TradeHistoryTable 
-                        dataSource={tradeHistory} 
-                        token0={activeToken0.address < activeToken1.address ? activeToken0.symbol : activeToken1.symbol} 
+                      <TradeHistoryTable
+                        dataSource={tradeHistory}
+                        token0={activeToken0.address < activeToken1.address ? activeToken0.symbol : activeToken1.symbol}
                         token1={activeToken0.address < activeToken1.address ? activeToken1.symbol : activeToken0.symbol} />
                     )}
                     {tableContent == 'Pools Activity' && (
-                      <PoolsActivityTable dataSource={test_poolsActivity} pool="ETH"/>
+                      <PoolsActivityTable dataSource={test_poolsActivity} pool="ETH" />
                     )}
                   </div>
                 </div>
@@ -301,8 +291,8 @@ const Swap = props => {
                 <SwapComponent
                   token0={activeToken0}
                   token1={activeToken1}
-                  onSelectToken0={token => { setActiveToken0(token);}}
-                  onSelectToken1={token => { setActiveToken1(token);}}
+                  onSelectToken0={token => { setActiveToken0(token); }}
+                  onSelectToken1={token => { setActiveToken1(token); }}
                   account={account}
                   library={library}
                   chainId={chainId}
