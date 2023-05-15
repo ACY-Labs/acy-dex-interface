@@ -1,0 +1,285 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "OrderBook",
+  "sourceName": "contracts/orderbook/OrderBook.sol",
+  "abi": [
+    {
+      "inputs": [
+        { "internalType": "address", "name": "_pool", "type": "address" },
+        { "internalType": "address", "name": "_symbolManager", "type": "address" },
+        { "internalType": "uint256", "name": "_minExecutionFee", "type": "uint256" },
+        { "internalType": "address", "name": "_symbolLens", "type": "address" }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "account", "type": "address" },
+        { "indexed": false, "internalType": "uint256", "name": "orderIndex", "type": "uint256" },
+        { "indexed": false, "internalType": "string", "name": "symbolName", "type": "string" },
+        { "indexed": false, "internalType": "int256", "name": "tradeVolume", "type": "int256" },
+        { "indexed": false, "internalType": "uint256", "name": "triggerPrice", "type": "uint256" },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "triggerAboveThreshold",
+          "type": "bool"
+        },
+        { "indexed": false, "internalType": "uint256", "name": "executionFee", "type": "uint256" },
+        { "indexed": false, "internalType": "int256", "name": "priceLimit", "type": "int256" }
+      ],
+      "name": "CancelTradeOrder",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "account", "type": "address" },
+        { "indexed": false, "internalType": "uint256", "name": "orderIndex", "type": "uint256" },
+        { "indexed": false, "internalType": "string", "name": "symbolName", "type": "string" },
+        { "indexed": false, "internalType": "int256", "name": "tradeVolume", "type": "int256" },
+        { "indexed": false, "internalType": "uint256", "name": "triggerPrice", "type": "uint256" },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "triggerAboveThreshold",
+          "type": "bool"
+        },
+        { "indexed": false, "internalType": "uint256", "name": "executionFee", "type": "uint256" },
+        { "indexed": false, "internalType": "int256", "name": "priceLimit", "type": "int256" }
+      ],
+      "name": "CreateTradeOrder",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "account", "type": "address" },
+        { "indexed": false, "internalType": "uint256", "name": "orderIndex", "type": "uint256" },
+        { "indexed": false, "internalType": "string", "name": "symbolName", "type": "string" },
+        { "indexed": false, "internalType": "int256", "name": "tradeVolume", "type": "int256" },
+        { "indexed": false, "internalType": "uint256", "name": "triggerPrice", "type": "uint256" },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "triggerAboveThreshold",
+          "type": "bool"
+        },
+        { "indexed": false, "internalType": "uint256", "name": "executionFee", "type": "uint256" },
+        { "indexed": false, "internalType": "uint256", "name": "curentPrice", "type": "uint256" }
+      ],
+      "name": "ExecuteTradeOrder",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [{ "indexed": false, "internalType": "address", "name": "gov", "type": "address" }],
+      "name": "UpdateGov",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "minExecutionFee",
+          "type": "uint256"
+        }
+      ],
+      "name": "UpdateMinExecutionFee",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "account", "type": "address" },
+        { "indexed": false, "internalType": "uint256", "name": "orderIndex", "type": "uint256" },
+        { "indexed": false, "internalType": "string", "name": "symbolName", "type": "string" },
+        { "indexed": false, "internalType": "int256", "name": "tradeVolume", "type": "int256" },
+        { "indexed": false, "internalType": "uint256", "name": "triggerPrice", "type": "uint256" },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "triggerAboveThreshold",
+          "type": "bool"
+        },
+        { "indexed": false, "internalType": "int256", "name": "priceLimit", "type": "int256" }
+      ],
+      "name": "UpdateTradeOrder",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "PRICE_PRECISION",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "USDA_PRECISION",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256[]", "name": "_tradeOrderIndexes", "type": "uint256[]" }
+      ],
+      "name": "cancelMultiple",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "uint256", "name": "_orderIndex", "type": "uint256" }],
+      "name": "cancelTradeOrder",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "string", "name": "_symbolName", "type": "string" },
+        { "internalType": "int256", "name": "_tradeVolume", "type": "int256" },
+        { "internalType": "uint256", "name": "_triggerPrice", "type": "uint256" },
+        { "internalType": "bool", "name": "_triggerAboveThreshold", "type": "bool" },
+        { "internalType": "int256", "name": "_priceLimit", "type": "int256" }
+      ],
+      "name": "createTradeOrder",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "_address", "type": "address" },
+        { "internalType": "uint256", "name": "_orderIndex", "type": "uint256" },
+        { "internalType": "address payable", "name": "_feeReceiver", "type": "address" }
+      ],
+      "name": "executeTradeOrder",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "_account", "type": "address" },
+        { "internalType": "uint256", "name": "_orderIndex", "type": "uint256" }
+      ],
+      "name": "getTradeOrder",
+      "outputs": [
+        { "internalType": "string", "name": "symbolName", "type": "string" },
+        { "internalType": "int256", "name": "tradeVolume", "type": "int256" },
+        { "internalType": "uint256", "name": "triggerPrice", "type": "uint256" },
+        { "internalType": "bool", "name": "triggerAboveThreshold", "type": "bool" },
+        { "internalType": "uint256", "name": "executionFee", "type": "uint256" },
+        { "internalType": "int256", "name": "priceLimit", "type": "int256" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "gov",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "minExecutionFee",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pool",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "_gov", "type": "address" }],
+      "name": "setGov",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "uint256", "name": "_minExecutionFee", "type": "uint256" }],
+      "name": "setMinExecutionFee",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "symbolManager",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "", "type": "address" },
+        { "internalType": "uint256", "name": "", "type": "uint256" }
+      ],
+      "name": "tradeOrders",
+      "outputs": [
+        { "internalType": "address", "name": "account", "type": "address" },
+        { "internalType": "string", "name": "symbolName", "type": "string" },
+        { "internalType": "int256", "name": "tradeVolume", "type": "int256" },
+        { "internalType": "uint256", "name": "triggerPrice", "type": "uint256" },
+        { "internalType": "bool", "name": "triggerAboveThreshold", "type": "bool" },
+        { "internalType": "uint256", "name": "executionFee", "type": "uint256" },
+        { "internalType": "int256", "name": "priceLimit", "type": "int256" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "name": "tradeOrdersIndex",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "_orderIndex", "type": "uint256" },
+        { "internalType": "int256", "name": "_tradeVolume", "type": "int256" },
+        { "internalType": "uint256", "name": "_triggerPrice", "type": "uint256" },
+        { "internalType": "bool", "name": "_triggerAboveThreshold", "type": "bool" },
+        { "internalType": "int256", "name": "_priceLimit", "type": "int256" }
+      ],
+      "name": "updateTradeOrder",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "string", "name": "symbol", "type": "string" },
+        { "internalType": "uint256", "name": "_triggerPrice", "type": "uint256" },
+        { "internalType": "bool", "name": "_triggerAboveThreshold", "type": "bool" },
+        { "internalType": "bool", "name": "_raise", "type": "bool" }
+      ],
+      "name": "validatePositionOrderPrice",
+      "outputs": [
+        { "internalType": "uint256", "name": "", "type": "uint256" },
+        { "internalType": "bool", "name": "", "type": "bool" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

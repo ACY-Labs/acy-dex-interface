@@ -9,13 +9,14 @@ import { PLACEHOLDER_ACCOUNT, fetcher, parseValue, bigNumberify, formatAmount, g
 import { AcyDescriptions } from '../Acy';
 import ComponentCard from '../ComponentCard';
 import ComponentButton from '../ComponentButton';
-import { approveTokens, trade } from '@/services/derivatives';
+import { approveTokens, trade, createTradeOrder } from '@/services/derivatives';
 import ComponentTabs from '../ComponentTabs';
 import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
 import Segmented from '../AcySegmented';
 import Reader from '@/abis/future-option-power/Reader.json'
 import IPool from '@/abis/future-option-power/IPool.json'
+import OrderBook from '@/abis/future-option-power/OrderBook.json'
 import styled from "styled-components";
 
 import styles from './styles.less';
@@ -110,6 +111,7 @@ const DerivativeComponent = props => {
 
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
+  const orderbookAddress = getContract(chainId, "orderbook")
 
   const { data: symbolInfo, mutate: updateSymbolInfo } = useSWR([chainId, readerAddress, "getSymbolInfo", poolAddress, symbol, []], {
     fetcher: fetcher(library, Reader)
@@ -137,9 +139,11 @@ const DerivativeComponent = props => {
   ///////////// for UI /////////////
 
   const optionMode = ['Buy', 'Sell', 'Pool']
+  const [orderType, setOrderType] = useState('Market')
+  const [limitPrice, setLimitPrice] = useState()
   const [percentage, setPercentage] = useState('')
   const [tradeVolume, setTradeVolume] = useState(0)
-  const [usdValue, setUsdValue] = useState(0)
+  const [usdValue, setUsdValue] = useState()
   const [showDescription, setShowDescription] = useState(false)
   const [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
   const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
@@ -156,6 +160,9 @@ const DerivativeComponent = props => {
     if (isValid(tradeVolume)) {
       return 'Invalid Trade Volume'
     }
+    if (orderType == 'Limit') {
+      return 'Create Limit Order'
+    }
     return mode == 'Buy' ? 'Buy / Long' : 'Sell / Short'
   }
 
@@ -168,14 +175,14 @@ const DerivativeComponent = props => {
   }
 
   const isValid = (value) => {
-    if(pageName == 'Future' && value>formatAmount(estimateMaxVolume, 18)) {
+    if (pageName == 'Future' && value > formatAmount(estimateMaxVolume, 18)) {
       return false
     }
-    return value==0 || Math.floor(value % minTradeVolume)!=0
+    return value == 0 || Math.floor(value % minTradeVolume) != 0
   }
 
-  useEffect(()=>{
-    if(pageName == 'Future') {
+  useEffect(() => {
+    if (pageName == 'Future') {
       handleUsdValueChange(usdValue)
     }
   }, [leverageOption])
@@ -197,8 +204,36 @@ const DerivativeComponent = props => {
       oracleSignature = await getOracleSignature()
     }
 
-    if (mode == 'Buy') {
+    if (orderType == 'Limit') {
+      mode == 'Buy' ?
+        createTradeOrder(
+          chainId,
+          library,
+          orderbookAddress,
+          OrderBook,
+          symbol,
+          parseValue(tradeVolume, 18),
+          parseValue(limitPrice, 18),
+          false,
+          symbolMarkPrice?.mul(bigNumberify(10000 + slippageTolerance * 100)).div(bigNumberify(10000)),
+        )
+        :
+        createTradeOrder(
+          chainId,
+          library,
+          orderbookAddress,
+          OrderBook,
+          symbol,
+          parseValue(-tradeVolume, 18),
+          parseValue(limitPrice, 18),
+          true,
+          symbolMarkPrice?.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000)),
+        )
 
+      return
+    }
+
+    mode == 'Buy' ?
       trade(
         chainId,
         library,
@@ -210,7 +245,7 @@ const DerivativeComponent = props => {
         symbolMarkPrice?.mul(bigNumberify(10000 + slippageTolerance * 100)).div(bigNumberify(10000)),
         oracleSignature
       )
-    } else {
+      :
       trade(
         chainId,
         library,
@@ -222,7 +257,6 @@ const DerivativeComponent = props => {
         symbolMarkPrice?.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000)),
         oracleSignature
       )
-    }
   }
 
   return (
@@ -243,22 +277,14 @@ const DerivativeComponent = props => {
           <>
             <div className={styles.rowFlexContainer}>
               <div>
-                {/* <div style={{ display: 'flex' }}> */}
-                {/* <div className={styles.inputContainer} style={{ display: 'flow-root', textAlignLast: 'right', padding: '8px 10px 6px 10px' }}>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="Amount"
-                    className={styles.optionInput}
-                    value={selectedTokenValue}
-                    onChange={e => {
-                      // setSelectedTokenValue(e.target.value)
-                      handleTokenValueChange(e.target.value)
-                      setShowDescription(true)
-                    }}
+                <div style={{ marginLeft: 10 }}>
+                  <ComponentTabs
+                    option={orderType}
+                    options={['Market', 'Limit']}
+                    type="inline"
+                    onChange={e => { setOrderType(e) }}
                   />
-                  <span className={styles.inputLabel}>{selectedToken}</span>
-                </div> */}
+                </div>
                 <div className={styles.inputContainer} style={{ display: 'flow-root', textAlignLast: 'right', padding: '8px 10px 6px 10px' }}>
                   <div style={{ display: 'flex', fontSize: '16px', marginBottom: '3px' }}>
                     <input
@@ -266,6 +292,7 @@ const DerivativeComponent = props => {
                       min="0"
                       className={styles.optionInput}
                       style={{ width: '100%' }}
+                      placeholder="Size"
                       value={usdValue}
                       onChange={e => {
                         handleUsdValueChange(e.target.value)
@@ -276,10 +303,24 @@ const DerivativeComponent = props => {
                   </div>
                   {/* <span style={{ fontSize: '12px', color: 'gray' }}>Trade Volume: {formatAmount(tradeVolume, 18)}</span> */}
                 </div>
+                {orderType == "Limit" &&
+                  <div className={styles.inputContainer} style={{ display: 'flow-root', textAlignLast: 'right', padding: '8px 10px 6px 10px' }}>
+                    <div style={{ display: 'flex', fontSize: '16px', marginBottom: '3px' }}>
+                      <input
+                        type="number"
+                        min="0"
+                        className={styles.optionInput}
+                        style={{ width: '100%' }}
+                        placeholder="Price"
+                        value={limitPrice}
+                        onChange={e => {
+                          setLimitPrice(e.target.value)
+                        }}
+                      />
+                      <span className={styles.inputLabel}>USD</span>
+                    </div>
+                  </div>}
               </div>
-              {/* <div style={{ margin: '20px 0' }}>
-                <Segmented onChange={(value) => { setPercentage(value) }} options={['10%', '25%', '50%', '75%', '100%']} />
-              </div> */}
               {showDescription && pageName == "Future" &&
                 <AcyDescriptions>
                   <div className={styles.breakdownTopContainer}>
@@ -388,7 +429,7 @@ const DerivativeComponent = props => {
               <ComponentButton
                 style={{ margin: '25px 0 0 0', width: '100%' }}
                 onClick={onClickPrimary}
-                disabled={account && isValid(tradeVolume)}
+                disabled={(account && isValid(tradeVolume)) || !(orderType == 'Market' || limitPrice != '' && limitPrice != '0')}
               >
                 {getPrimaryText()}
               </ComponentButton>

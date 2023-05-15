@@ -253,6 +253,39 @@ export async function trade(
     .catch(e => { console.log(e) })
 }
 
+export async function createTradeOrder(
+  chainId,
+  library,
+  orderbookAddress,
+  OrderBook,
+  symbolName,
+  tradeVolume,
+  triggerPrice,
+  triggerAboveThreshold,
+  priceLimit,
+) {
+
+  const contract = new ethers.Contract(orderbookAddress, OrderBook.abi, library.getSigner())
+  let method = "createTradeOrder"
+  let params = [
+    symbolName,
+    tradeVolume,
+    triggerPrice,
+    triggerAboveThreshold,
+    priceLimit,
+  ]
+
+  const successMsg = `Order Submitted!`
+  Api.callContract(chainId, contract, method, params, {
+    sentMsg: `Submitted.`,
+    failMsg: `Failed.`,
+    successMsg,
+  })
+    .then(() => { })
+    .catch(e => { console.log(e) })
+
+}
+
 export async function approveTokens(
   library,
   routerAddress,
