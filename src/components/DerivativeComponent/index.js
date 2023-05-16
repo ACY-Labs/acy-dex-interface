@@ -119,11 +119,15 @@ const DerivativeComponent = props => {
   const { data: estimateMaxVolume, mutate: updateEstimateMaxVolume } = useSWR([chainId, readerAddress, "estimateMaxVolume", poolAddress, account, symbol, mode == 'Buy'], {
     fetcher: fetcher(library, Reader)
   });
+  const { data: minExecutionFee, mutate: updateMinExecutionFee } = useSWR([chainId, orderbookAddress, "minExecutionFee"], {
+    fetcher: fetcher(library, OrderBook)
+  });
   useEffect(() => {
     if (active) {
       library.on("block", () => {
         updateSymbolInfo()
         updateEstimateMaxVolume()
+        updateMinExecutionFee()
       });
       return () => {
         library.removeAllListeners('block');
@@ -134,6 +138,8 @@ const DerivativeComponent = props => {
     library,
     chainId,
     updateSymbolInfo,
+    updateEstimateMaxVolume,
+    updateMinExecutionFee,
   ]);
 
   ///////////// for UI /////////////
@@ -216,6 +222,7 @@ const DerivativeComponent = props => {
           parseValue(limitPrice, 18),
           false,
           symbolMarkPrice?.mul(bigNumberify(10000 + slippageTolerance * 100)).div(bigNumberify(10000)),
+          minExecutionFee,
         )
         :
         createTradeOrder(
@@ -228,6 +235,7 @@ const DerivativeComponent = props => {
           parseValue(limitPrice, 18),
           true,
           symbolMarkPrice?.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000)),
+          minExecutionFee,
         )
 
       return

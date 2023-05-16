@@ -263,6 +263,7 @@ export async function createTradeOrder(
   triggerPrice,
   triggerAboveThreshold,
   priceLimit,
+  minExecutionFee,
 ) {
 
   const contract = new ethers.Contract(orderbookAddress, OrderBook.abi, library.getSigner())
@@ -280,6 +281,7 @@ export async function createTradeOrder(
     sentMsg: `Submitted.`,
     failMsg: `Failed.`,
     successMsg,
+    value: minExecutionFee,
   })
     .then(() => { })
     .catch(e => { console.log(e) })
