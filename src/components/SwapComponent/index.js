@@ -20,21 +20,32 @@ import { useWeb3React } from '@web3-react/core';
 
 // var CryptoJS = require("crypto-js");
 const SwapComponent = props => {
-  const {   
+  const {
+    account,
+    library,
+    chainId,
     token0,
     token1,
     onSelectToken0,
     onSelectToken1,
-    isLockedToken1=false,
-    account,
-    library,
-    chainId,
+    isLockedToken1 = false,
+    activeSymbol,
+    setActiveSymbol,
+    setActiveToken,
+    activeToken0,
+    setActiveToken0,
+    activeToken1,
+    setActiveToken1
   } = props;
   // 选择货币的弹窗
 
   const tokenlist = getTokens(chainId);
 
   const [visible, setVisible] = useState(null);
+  //if token is selected from the swapcomponent
+  const [isRightSelect, setIsRightSelect] = useState(false);
+  //if fromToken is selected or toToken is selected
+  const [isFromToken, setIsFromToken] = useState(true);
 
   // 选择货币前置和后置
   const [before, setBefore] = useState(true);
@@ -309,6 +320,7 @@ const SwapComponent = props => {
 
   useEffect(
     () => {
+      console.log("trade debug SwapButtonContent", account, swapButtonContent)
       if (account == undefined) {
         setSwapButtonState(false);
         setSwapButtonContent('Connect to Wallet');
@@ -319,6 +331,7 @@ const SwapComponent = props => {
 
   const onCoinClick = async token => {
     onCancel();
+    setActiveToken(token)
     if (before) {
       onSelectToken0(token);
       setToken0Balance(await getUserTokenBalance(token, chainId, account, library));
@@ -330,7 +343,12 @@ const SwapComponent = props => {
     }
   };
 
-  const onClickCoin = () => {
+  const onClickCoin = (bool) => {
+    if (bool) {
+      setIsFromToken(true)
+    } else {
+      setIsFromToken(false)
+    }
     setVisible(true);
   };
   const onCancel = () => {
@@ -480,13 +498,13 @@ const SwapComponent = props => {
         bonus={!exactIn && bonus0}
         showBalance={token0BalanceShow}
         onChoseToken={() => {
-          onClickCoin();
+          onClickCoin(true);
           setBefore(true);
         }}
         onChangeToken={e => {
           setShowDescription(true);
           setExactIn(true);
-          props.showGraph("Routes")
+          // props.showGraph("Routes")
         }}
         library={library}
         setTokenAmount={setToken0Amount}
@@ -500,7 +518,6 @@ const SwapComponent = props => {
           if (!isLockedToken1) {
             onSwitchCoinCard();
           }
-
         }}
       >
         <Icon style={{ fontSize: '16px' }} type="arrow-down" />
@@ -517,7 +534,7 @@ const SwapComponent = props => {
         bonus={exactIn && bonus1}
         showBalance={token1BalanceShow}
         onChoseToken={() => {
-          onClickCoin();
+          onClickCoin(false);
           setBefore(false);
         }}
         onChangeToken={e => {
@@ -613,7 +630,7 @@ const SwapComponent = props => {
         </div>
       }
 
-      <DetailBox 
+      <DetailBox
         pair_name='DAImond'
         token_address='0x712ce0de2401e632d75e307ed8325774daaa3c51'
         pair_address='0x52384e314d18aa160bca9ecf45d03b6f80f9557f'
@@ -625,13 +642,22 @@ const SwapComponent = props => {
         {swapStatus && <AcyDescriptions.Item> {swapStatus}</AcyDescriptions.Item>}
       </AcyDescriptions>
 
-      <TokenSelectorDrawer width={400} 
-        visible={visible} 
-        onCancel={onCancel} 
-        onCoinClick={onCoinClick} 
-        coinList={tokenlist} 
-        pageName={"Trade"} 
-        />
+      <TokenSelectorDrawer width={400}
+        visible={visible}
+        setVisible={setVisible}
+        onCancel={onCancel}
+        onCoinClick={onCoinClick}
+        coinList={tokenlist}
+        pageName={"Trade"}
+        activeSymbol={activeSymbol}
+        setActiveSymbol={setActiveSymbol}
+        activeToken0={activeToken0}
+        setActiveToken0={setActiveToken0}
+        activeToken1={activeToken1}
+        setActiveToken1={setActiveToken1}
+        isRightSelect={true}
+        isFromToken={isFromToken}
+      />
 
     </div>
   );
@@ -640,7 +666,7 @@ const SwapComponent = props => {
 export default connect(({ global, transaction, swap, loading }) => ({
   global,
   transaction,
-  account: global.account,
+  // account: global.account,
   swap,
   loading: loading.global,
 }))(SwapComponent);

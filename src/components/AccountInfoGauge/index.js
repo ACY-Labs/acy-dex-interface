@@ -17,7 +17,6 @@ const AccountInfoGauge = props => {
     library,
     account,
     active,
-    tokens,
     symbol,
   } = props
 
@@ -109,7 +108,6 @@ const AccountInfoGauge = props => {
           library={library}
           account={account}
           active={active}
-          tokens={tokens}
           symbol={symbol}
           setIsConfirming={setIsConfirming}
           mode={mode}
