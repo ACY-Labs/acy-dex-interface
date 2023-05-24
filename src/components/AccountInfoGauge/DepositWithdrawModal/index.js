@@ -21,7 +21,6 @@ const DepositWithdrawModal = props => {
     library,
     account,
     active,
-    tokens,
     symbol,
     setIsConfirming,
     mode,
