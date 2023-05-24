@@ -2166,12 +2166,12 @@ export function getPosition(rawPositionData, symbolData) {
       const symbol = symbolData.find(obj => {
         return obj.address === temp[0]
       })
-      const { markPrice, initialMarginRatio, indexPrice, minTradeVolume } = symbol
+      const { markPrice, initialMarginRatio, indexPrice, curIndexPrice, minTradeVolume } = symbol
 
       const cost = ethers.utils.formatUnits(temp.cost, 18)
       const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume, 18)
-      const marginUsage = Math.abs(volume * indexPrice) * initialMarginRatio
-      const unrealizedPnl = volume * indexPrice - cost
+      const marginUsage = ethers.utils.formatUnits(temp.marginUsed, 18)
+      const unrealizedPnl = volume * curIndexPrice - cost
       const _accountFunding = temp.cumulativeFundingPerVolume.mul(temp.volume)
       const accountFunding = ethers.utils.formatUnits(_accountFunding, 36)
       const entryPrice = safeDiv2(cost, volume)
@@ -2209,6 +2209,7 @@ export function getSymbol(rawSymbolData) {
       address: temp[2],
       markPrice: ethers.utils.formatUnits(temp.markPrice, 18),
       indexPrice: ethers.utils.formatUnits(temp.indexPrice, 18),
+      curIndexPrice: ethers.utils.formatUnits(temp.curIndexPrice, 18),
       initialMarginRatio: ethers.utils.formatUnits(temp.initialMarginRatio, 18), //0.1
       minTradeVolume: ethers.utils.formatUnits(temp.minTradeVolume, 18)
 
