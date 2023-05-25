@@ -159,7 +159,8 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
           account,
           position.symbol,
           ethers.utils.parseUnits(tokenAmount.toString(),18).mul(bigNumberify(-1)),
-          ethers.utils.parseUnits(markPrice,18).mul(bigNumberify(10000 - INITIAL_ALLOWED_SLIPPAGE * 100)).div(bigNumberify(10000))
+          ethers.utils.parseUnits(markPrice,18).mul(bigNumberify(10000 - INITIAL_ALLOWED_SLIPPAGE * 100)).div(bigNumberify(10000)),
+          []
           )
           onCancel();
       }else{
@@ -171,7 +172,8 @@ export const ClosePositionModal = ({isModalVisible,onCancel,position,chainId, ..
           account,
           position.symbol,
           ethers.utils.parseUnits(tokenAmount.toString(),18),
-          ethers.utils.parseUnits(markPrice,18).mul(bigNumberify(10000 + INITIAL_ALLOWED_SLIPPAGE * 100)).div(bigNumberify(10000))
+          ethers.utils.parseUnits(markPrice,18).mul(bigNumberify(10000 + INITIAL_ALLOWED_SLIPPAGE * 100)).div(bigNumberify(10000)),
+          []
         )
         onCancel();
       }
