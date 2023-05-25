@@ -28,7 +28,7 @@ const DepositWithdrawModal = props => {
 
   const connectWalletByLocalStorage = useConnectWallet()
 
-  const [token, setToken] = useState(whitelistedTokens && whitelistedTokens[0])
+  const [token, setToken] = useState()
   const [tokenValue, setTokenValue] = useState('');
   const [tokenAmount, setTokenAmount] = useState(parseValue(tokenValue, token?.decimals))
   const [visible, setVisible] = useState(false)
@@ -103,6 +103,12 @@ const DepositWithdrawModal = props => {
       setIsWaitingForApproval(false)
     }
   }, [token, tokenAmount, needApproval, isWaitingForApproval])
+
+  useEffect(()=>{
+    if(whitelistedTokens.length > 0) {
+      setToken(whitelistedTokens[0])
+    }
+  }, [whitelistedTokens])
 
   return (
     <>

@@ -122,12 +122,16 @@ const DerivativeComponent = props => {
   const { data: minExecutionFee, mutate: updateMinExecutionFee } = useSWR([chainId, orderbookAddress, "minExecutionFee"], {
     fetcher: fetcher(library, OrderBook)
   });
+  const { data: tdInfo, mutate: updateTdInfo } = useSWR([chainId, readerAddress, 'getTdInfo', poolAddress, account], {
+    fetcher: fetcher(library, Reader)
+  })
   useEffect(() => {
     if (active) {
       library.on("block", () => {
         updateSymbolInfo()
         updateEstimateMaxVolume()
         updateMinExecutionFee()
+        updateTdInfo()
       });
       return () => {
         library.removeAllListeners('block');
@@ -140,6 +144,7 @@ const DerivativeComponent = props => {
     updateSymbolInfo,
     updateEstimateMaxVolume,
     updateMinExecutionFee,
+    updateTdInfo,
   ]);
 
   ///////////// for UI /////////////
@@ -158,13 +163,18 @@ const DerivativeComponent = props => {
 
   const symbolMarkPrice = symbolInfo?.markPrice
   const minTradeVolume = symbolInfo?.minTradeVolume ? ethers.utils.formatUnits(symbolInfo?.minTradeVolume, 18) : 0.001
+  const symbolPosition = tdInfo?.positions.find(item => item.symbol == symbol)
+  const totalMargin = formatAmount(symbolPosition?.margin, 18)
+  const usedMargin = formatAmount(symbolPosition?.marginUsed, 18)
 
   const getPrimaryText = () => {
     if (!active) {
       return 'Connect Wallet'
     }
     if (isValid(tradeVolume)) {
-      return 'Invalid Trade Volume'
+      return tradeVolume > totalMargin - usedMargin
+        ? 'Insufficient Margin'
+        : 'Invalid Trade Volume'
     }
     if (orderType == 'Limit') {
       return 'Create Limit Order'
@@ -181,8 +191,11 @@ const DerivativeComponent = props => {
   }
 
   const isValid = (value) => {
+    if (value > (totalMargin - usedMargin)) {
+      return true
+    }
     if (pageName == 'Future' && value > formatAmount(estimateMaxVolume, 18)) {
-      return false
+      return true
     }
     return value == 0 || Math.floor(value % minTradeVolume) != 0
   }
@@ -450,6 +463,8 @@ const DerivativeComponent = props => {
               chainId={chainId}
               active={active}
               symbol={symbol}
+              totalMargin={totalMargin}
+              usedMargin={usedMargin}
             />
           </>
         }
