@@ -7,10 +7,6 @@ import ComponentTabs from '@/components/ComponentTabs';
 import DerivativeComponent from '@/components/DerivativeComponent'
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { PositionTable } from '@/components/OptionComponent/TableComponent';
-import * as Api from '@/acy-dex-futures/Api';
-import useSWR from 'swr'
-import { fetcher, getProvider, bigNumberify } from '@/acy-dex-futures/utils';
-import { BigNumber, ethers } from 'ethers'
 import { useChainId } from '@/utils/helpers';
 import { useWeb3React } from '@web3-react/core';
 import Pool from '@/acy-dex-futures/abis/Pool.json'
@@ -68,36 +64,6 @@ export function getPosition(rawPositionData, symbolData) {
   return positionQuery;
 }
 
-export function getSymbol(rawSymbolData) {
-  if (!rawSymbolData) {
-    return
-  }
-  let symbolQuery = []
-  for (let i = 0; i < rawSymbolData.length; i++) {
-    const temp = rawSymbolData[i]
-    const symbol = {
-      tokenname: temp[1]?.substring(0, 3),
-      symbol: temp[1],
-      address: temp[2],
-      markPrice: ethers.utils.formatUnits(temp.markPrice, 18),
-      indexPrice: ethers.utils.formatUnits(temp.indexPrice, 18),
-      initialMarginRatio: ethers.utils.formatUnits(temp.initialMarginRatio, 18), //0.1
-      minTradeVolume: ethers.utils.formatUnits(temp.minTradeVolume, 18)
-
-    };
-    symbolQuery.push(symbol)
-  }
-  return symbolQuery;
-}
-
-
-function safeDiv(a, b) {
-  return b.isZero() ? BigNumber.from(0) : a.div(b);
-}
-function safeDiv2(a, b) {
-  return b == 0 ? 0 : a / b;
-}
-
 const Powers = props => {
   const { account, library, active } = useWeb3React();
 
@@ -124,10 +90,8 @@ const Powers = props => {
     fetcher: fetcher(library, Reader)
   })
 
-
   const symbolData = getSymbol(symbolsInfo)
   const positionData = getPosition(rawPositionData, symbolData)
-
 
   useEffect(() => {
     if (active) {

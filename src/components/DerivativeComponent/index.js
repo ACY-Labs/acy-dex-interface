@@ -463,8 +463,8 @@ const DerivativeComponent = props => {
               chainId={chainId}
               active={active}
               symbol={symbol}
-              totalMargin={totalMargin}
-              usedMargin={usedMargin}
+              totalMargin={totalMargin != '...' ? totalMargin : null}
+              usedMargin={usedMargin != '...' ? usedMargin : null}
             />
           </>
         }

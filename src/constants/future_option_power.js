@@ -22,7 +22,7 @@ const contracts = {
     symbolManagerImplementation: "0x639A5C58FEd6319a8414e7F36d512b02e2159a91",
     alp: "0xaC56beE2F6D0cfb9555bdC191DE1C4311C6675da",
     symbolsLens: "0x0FDa27b043793e2658Bf0F795400c65aF7Aa8A2A",
-    reader: "0x21de483f50ED649Cc78a7148Aed1cA1D954E3521",
+    reader: "0xb3565532BB41e646970D6EDdCf869EAe1A767736",
     router: "0xcd628fEe33E06d1A53a2fAebe791eD8fB8aC620b",
 
     orderbook: "0x9e6a49898F719B6491A64B2e23Fafa465C5Bd1D1",

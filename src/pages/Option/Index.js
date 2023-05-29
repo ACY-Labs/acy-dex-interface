@@ -5,7 +5,7 @@ import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import * as Api from '@/acy-dex-futures/Api';
-import { fetcher, getProvider, bigNumberify } from '@/acy-dex-futures/utils';
+import { fetcher, getProvider, bigNumberify, getSymbol, getPosition } from '@/acy-dex-futures/utils';
 import { useConstantLoader } from '@/constants';
 import { BigNumber, ethers } from 'ethers'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
@@ -19,84 +19,6 @@ import { PositionTable } from '@/components/OptionComponent/TableComponent';
 import Reader from '@/abis/future-option-power/Reader.json'
 import useSWR from 'swr'
 import { useWeb3React } from '@web3-react/core';
-
-function safeDiv(a, b) {
-  return b.isZero() ? BigNumber.from(0) : a.div(b);
-}
-function safeDiv2(a, b) {
-  return b == 0 ? 0 : a / b;
-}
-
-export function getPosition(rawPositionData, symbolData) {
-  if (!rawPositionData || !symbolData) {
-    return
-  }
-  let positionQuery = []
-  for (let i = 0; i < rawPositionData.positions.length; i++) {
-    const temp = rawPositionData.positions[i]
-    const volume = ethers.utils.formatUnits(temp[2], 18)
-    if (volume != 0) {
-      const symbol = symbolData.find(obj => {
-        return obj.address === temp[0]
-      })
-      const { markPrice, initialMarginRatio, indexPrice, minTradeVolume } = symbol
-
-      const cost = ethers.utils.formatUnits(temp.cost, 18)
-      const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume, 18)
-      const marginUsage = Math.abs(volume * indexPrice) * initialMarginRatio
-      const unrealizedPnl = volume * indexPrice - cost
-      const _accountFunding = temp.cumulativeFundingPerVolume.mul(temp[2])
-      const accountFunding = ethers.utils.formatUnits(_accountFunding, 36)
-      const _entryPrice = safeDiv(temp.cost, temp[2])
-      // const entryPrice = ethers.utils.formatUnits(_entryPrice,0)
-      const entryPrice = safeDiv2(cost, volume)
-      let liquidationPrice
-      if (volume >= 0) {
-        liquidationPrice = markPrice * (1 - initialMarginRatio / 2) - (marginUsage - cost) / (volume * (1 - initialMarginRatio / 2))
-      } else {
-        liquidationPrice = markPrice * (1 + initialMarginRatio / 2) + (marginUsage - cost) / (volume * (1 + initialMarginRatio / 2))
-      }
-
-      const position = {
-        symbol: temp[1],
-        address: temp[0],
-        position: Math.abs(volume),
-        entryPrice: entryPrice,
-        markPrice: markPrice,
-        marginUsage: marginUsage,
-        unrealizedPnl: unrealizedPnl,
-        accountFunding: accountFunding,
-        type: volume >= 0 ? "Long" : "Short",
-        minTradeVolume: minTradeVolume,
-        liquidationPrice: liquidationPrice,
-      };
-      positionQuery.push(position)
-    }
-  }
-  return positionQuery;
-}
-
-export function getSymbol(rawSymbolData) {
-  if (!rawSymbolData) {
-    return
-  }
-  let symbolQuery = []
-  for (let i = 0; i < rawSymbolData.length; i++) {
-    const temp = rawSymbolData[i]
-    const symbol = {
-      tokenname: temp[1]?.substring(0, 3),
-      symbol: temp[1],
-      address: temp[2],
-      markPrice: ethers.utils.formatUnits(temp.markPrice, 18),
-      indexPrice: ethers.utils.formatUnits(temp.indexPrice, 18),
-      initialMarginRatio: ethers.utils.formatUnits(temp.initialMarginRatio, 18), //0.1
-      minTradeVolume: ethers.utils.formatUnits(temp.minTradeVolume, 18)
-
-    };
-    symbolQuery.push(symbol)
-  }
-  return symbolQuery;
-}
 
 const Option = props => {
   const { account, library, active } = useWeb3React();

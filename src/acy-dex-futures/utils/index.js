@@ -2080,7 +2080,7 @@ function getToken(address) {
 }
 
 export function formatNumber(number){
-  // number = number.toLocaleString('fullwide', {useGrouping:false})
+  if (number=="0.0"){return number}
   let negative = false;
   if (number<0){
     negative = true;
@@ -2149,4 +2149,76 @@ export async function getOracleSignature(){
   });
   console.log("signatures",signatures)
   return signatures
+}
+
+function safeDiv(a, b) {
+  return b.isZero() ? BigNumber.from(0) : a.div(b);
+}
+function safeDiv2(a, b) {
+  return b == 0 ? 0 : a / b;
+}
+
+export function getPosition(rawPositionData, symbolData) {
+  if (!rawPositionData || !symbolData) {
+    return
+  }
+  let positionQuery = []
+  for (let i = 0; i < rawPositionData.positions.length; i++) {
+    const temp = rawPositionData.positions[i]
+    const volume = ethers.utils.formatUnits(temp.volume, 18)
+    if (volume != 0) {
+      const symbol = symbolData.find(obj => {
+        return obj.address === temp[0]
+      })
+      const { markPrice, initialMarginRatio, indexPrice, curIndexPrice, minTradeVolume } = symbol
+
+      const cost = ethers.utils.formatUnits(temp.cost, 18)
+      const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume, 18)
+      const marginUsage = ethers.utils.formatUnits(temp.marginUsed, 18)
+      const unrealizedPnl = volume * curIndexPrice - cost
+      const _accountFunding = temp.cumulativeFundingPerVolume.mul(temp.volume)
+      const accountFunding = ethers.utils.formatUnits(_accountFunding, 36)
+      const entryPrice = safeDiv2(cost, volume)
+      const liquidationPrice = ethers.utils.formatUnits(temp.liquidationPrice, 18)
+
+      const position = {
+        symbol: temp[1],
+        address: temp[0],
+        position: Math.abs(volume),
+        entryPrice: entryPrice,
+        markPrice: markPrice,
+        marginUsage: marginUsage,
+        unrealizedPnl: unrealizedPnl,
+        accountFunding: accountFunding,
+        type: volume >= 0 ? "Long" : "Short",
+        minTradeVolume: minTradeVolume,
+        liquidationPrice: liquidationPrice,
+      };
+      positionQuery.push(position)
+    }
+  }
+  return positionQuery;
+}
+
+export function getSymbol(rawSymbolData) {
+  if (!rawSymbolData) {
+    return
+  }
+  let symbolQuery = []
+  for (let i = 0; i < rawSymbolData.length; i++) {
+    const temp = rawSymbolData[i]
+    const symbol = {
+      tokenname: temp[1]?.substring(0, 3),
+      symbol: temp[1],
+      address: temp[2],
+      markPrice: ethers.utils.formatUnits(temp.markPrice, 18),
+      indexPrice: ethers.utils.formatUnits(temp.indexPrice, 18),
+      curIndexPrice: ethers.utils.formatUnits(temp.curIndexPrice, 18),
+      initialMarginRatio: ethers.utils.formatUnits(temp.initialMarginRatio, 18), //0.1
+      minTradeVolume: ethers.utils.formatUnits(temp.minTradeVolume, 18)
+
+    };
+    symbolQuery.push(symbol)
+  }
+  return symbolQuery;
 }

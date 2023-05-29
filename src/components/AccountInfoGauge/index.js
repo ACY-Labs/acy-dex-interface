@@ -24,6 +24,7 @@ const AccountInfoGauge = props => {
 
   const [mode, setMode] = useState('')
   const [isConfirming, setIsConfirming] = useState(false)
+  const percentage = totalMargin && usedMargin ? (totalMargin-usedMargin)/totalMargin * 100 : 0
 
   const onClickDeposit = () => {
     setMode('Deposit')
@@ -89,7 +90,7 @@ const AccountInfoGauge = props => {
           <Gauge
             title=''
             autoFit={true}
-            percent={(totalMargin-usedMargin)/totalMargin * 100}
+            percent={percentage}
             color='l(0) 0:#00ff00 1:#ff0000'
           />
         </div>
