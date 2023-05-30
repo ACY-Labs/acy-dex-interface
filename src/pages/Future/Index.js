@@ -48,7 +48,7 @@ const Future = props => {
   useEffect(() => {
     if (active) {
       library.on('block', () => {
-        updateSymbolsInfo(undefined, true)
+        updateSymbolsInfo()
         updatePosition()
       })
       return () => {
