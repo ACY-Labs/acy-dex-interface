@@ -8,6 +8,7 @@ import { isUrl } from '@/utils/utils';
 import { connect } from 'umi';
 import styles from './index.less';
 import { AcyIcon } from '@/components/Acy';
+import Segmented from '../AcySegmented';
 
 const { SubMenu } = Menu;
 
@@ -96,6 +97,7 @@ const getIcon = icon => {
 export default class BaseMenu extends PureComponent {
   state = {
     visible: true,
+    version: 2,
   }
   /**
    * 获得菜单子节点
@@ -152,7 +154,7 @@ export default class BaseMenu extends PureComponent {
         </SubMenu>
       );
     }
-    return <Menu.Item key={item.path} style={{ marginTop: item.name == 'Launchpad' ? '32px' : '-20px' }}>{this.getMenuItemPath(item)}</Menu.Item>
+    return <Menu.Item key={item.path} style={{ marginTop: -10 }}>{this.getMenuItemPath(item)}</Menu.Item>
   };
 
   getSubMenuOrItem_default = (item, parent) => {
@@ -177,7 +179,7 @@ export default class BaseMenu extends PureComponent {
         </SubMenu>
       );
     }
-    return <Menu.Item key={item.path} style={{ marginTop: item.name == 'Launchpad' ? '32px' : '-20px' }}>{this.getMenuItemPath_default(item)}</Menu.Item>
+    return <Menu.Item key={item.path} style={{ marginTop: -10 }}>{this.getMenuItemPath_default(item)}</Menu.Item>
   };
 
   /**
@@ -271,7 +273,7 @@ export default class BaseMenu extends PureComponent {
     return `/${path || ''}`.replace(/\/+/g, '/');
   };
   handleMouseEnter = () => {
-    const { dispatch,global:{collapsed}, } = this.props;
+    const { dispatch, global: { collapsed }, } = this.props;
     dispatch({
       type: 'global/changeLayoutCollapsed',
       payload: !collapsed,
@@ -283,7 +285,7 @@ export default class BaseMenu extends PureComponent {
       theme,
       mode,
       location: { pathname },
-      global:{collapsed},
+      global: { collapsed },
       className,
     } = this.props;
     // if pathname can't match, use the nearest parent's key
@@ -301,65 +303,56 @@ export default class BaseMenu extends PureComponent {
     const cls = classNames(className, {
       'top-nav-menu': mode === 'horizontal',
     });
-    
+
     return (
       <div>
-        {collapsed &&
-          <Menu
-            key="Menu"
-            mode={mode}
-            theme={theme}
-            onOpenChange={handleOpenChange}
-            selectedKeys={this.selectedKeys}
-            style={style}
-            className={cls}
-            {...props}
-          >
-            {this.getNavMenuItems_default(menuData, true)}
-          </Menu>
-          ||
-          <Menu
-            key="Menu"
-            mode={mode}
-            theme={theme}
-            onOpenChange={handleOpenChange}
-            selectedKeys={this.selectedKeys}
-            style={style}
-            className={cls}
-            {...props}
-          >
-            {this.getNavMenuItems(menuData)}
-          </Menu>
-        }
-        <div onClick={this.handleMouseEnter} className={styles.menu_switch}>
-          <Icon type={collapsed&&"right"||"left"} />
-        </div>
-        {/* <Drawer
-          className={styles.drawer}
-          placement='left'
-          getContainer={false}
-          visible={this.state.visible}
-          width={140}
-          closable={false}
-        >
-          <div onMouseLeave={handleMouseLeave}>
-            <div className={styles.logo}>
-              <AcyIcon name="acy" width={40} />
-            </div>
-            <Menu
-              key="Menu"
-              mode={mode}
-              theme={theme}
-              onOpenChange={handleOpenChange}
-              selectedKeys={this.selectedKeys}
-              style={style}
-              className={cls}
-              {...props}
-            >
-              {this.getNavMenuItems(menuData)}
-            </Menu>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ marginBottom: 350 }}>
+            {collapsed &&
+              <Menu
+                key="Menu"
+                mode={mode}
+                theme={theme}
+                onOpenChange={handleOpenChange}
+                selectedKeys={this.selectedKeys}
+                style={style}
+                className={cls}
+                {...props}
+              >
+                {this.getNavMenuItems_default(menuData.filter(item => item.version == this.state.version), true)}
+              </Menu>
+              ||
+              <Menu
+                key="Menu"
+                mode={mode}
+                theme={theme}
+                onOpenChange={handleOpenChange}
+                selectedKeys={this.selectedKeys}
+                style={style}
+                className={cls}
+                {...props}
+              >
+                {this.getNavMenuItems(menuData.filter(item => item.version == this.state.version))}
+              </Menu>
+            }
           </div>
-        </Drawer> */}
+          <Segmented
+            options={['v1', 'v2']}
+            defaultIndex={1}
+            onChange={e => {
+              this.setState({
+                visible: true,
+                version: e[1].toString(),
+              })
+              e == 'v2' ?
+                window.location.href = '/#/future' :
+                window.location.href = '/#/launchpad'
+            }}
+          />
+        </div>
+        <div onClick={this.handleMouseEnter} className={styles.menu_switch}>
+          <Icon type={collapsed && "right" || "left"} />
+        </div>
       </div>
     );
   }

@@ -13,62 +13,64 @@ export default [
     component: '../layouts/BasicLayout',
     Routes: ['src/pages/Authorized'],
     routes: [
-      { path: '/', redirect: '/trade' },
-      {
-        path: '/market',
-        name: 'Market',
-        hideChildrenInMenu: true,
-        routes: [
-          {
-            path: '/market',
-            component: './Market/Index',
-          },
-          {
-            path: '/market/list/token',
-            component: './Market/TokenList',
-          },
-          {
-            path: '/market/list/pool',
-            component: './Market/PoolList',
-          },
-          {
-            path: '/market/info/token/:address',
-            component: './Market/TokenInfo',
-          },
-          {
-            path: '/market/info/pool/:address',
-            component: './Market/PoolInfo',
-          },
-          {
-            path: '/market/accounts',
-            component: './Market/AccountOverview',
-          },
-          {
-            path: '/market/accounts/:address',
-            component: './Market/AccountInfo',
-          },
-        ],
-      },
-      {
-        path: '/trade',
-        name: 'Trade',
-        component: './Swap/Index',
-      },
+      { path: '/', redirect: '/future' },
+      // {
+      //   path: '/market',
+      //   name: 'Market',
+      //   hideChildrenInMenu: true,
+      //   routes: [
+      //     {
+      //       path: '/market',
+      //       component: './Market/Index',
+      //     },
+      //     {
+      //       path: '/market/list/token',
+      //       component: './Market/TokenList',
+      //     },
+      //     {
+      //       path: '/market/list/pool',
+      //       component: './Market/PoolList',
+      //     },
+      //     {
+      //       path: '/market/info/token/:address',
+      //       component: './Market/TokenInfo',
+      //     },
+      //     {
+      //       path: '/market/info/pool/:address',
+      //       component: './Market/PoolInfo',
+      //     },
+      //     {
+      //       path: '/market/accounts',
+      //       component: './Market/AccountOverview',
+      //     },
+      //     {
+      //       path: '/market/accounts/:address',
+      //       component: './Market/AccountInfo',
+      //     },
+      //   ],
+      // },
+      // {
+      //   path: '/trade',
+      //   name: 'Trade',
+      //   component: './Swap/Index',
+      // },
       {
         path: '/future',
         name: 'Future',
         component: './Future/Index',
+        version: 2,
       },
       {
         path: '/options',
         name: 'Options',
         component: './Option/Index',
+        version: 2,
       },
-      {
-        path: '/powers',
-        name: 'Powers',
-        component: './Powers/Index',
-      },
+      // {
+      //   path: '/powers',
+      //   name: 'Powers',
+      //   component: './Powers/Index',
+      // },
       // {
       //   path: '/stablecoin',
       //   name: 'StableCoin',
@@ -88,16 +90,19 @@ export default [
             component: './LaunchPad/LaunchpadProject',
           },
         ],
+        version: 1,
       },
       {
         path: '/liquidity',
         name: 'Liquidity',
         component: './Liquidity/Index',
+        version: 1,
       },
       {
         path: '/farms',
         name: 'Farm',
         component: './Farms/',
+        version: 1,
       },
       {
         path: './statistics/market',
@@ -121,6 +126,7 @@ export default [
         //     component:'./Stats/StableCoin/stats'
         //   }
         // ]
+        version: 1,
       },
       {
         path: './statistics/stablecoin',
