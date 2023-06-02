@@ -127,9 +127,10 @@ const AcyPool = props => {
     updateTokenInfo,
   ])
 
-  const alpPrice = poolInfo ? poolInfo.totalSupply.gt(0) ? parseInt(poolInfo.liquidity) / parseInt(poolInfo.totalSupply) : expandDecimals(1, USD_DECIMALS) : bigNumberify(0)
-  const alpBalanceUsd = alpBalance ? alpBalance.mul(parseValue(alpPrice, ALP_DECIMALS)) : bigNumberify(0)
-  const alpSupplyUsd = alpSupply ? alpSupply.mul(parseValue(alpPrice, ALP_DECIMALS)) : bigNumberify(0)
+  let alpPrice = poolInfo ? poolInfo.totalSupply.gt(0) ? parseInt(poolInfo.liquidity) / parseInt(poolInfo.totalSupply) : expandDecimals(1, USD_DECIMALS) : bigNumberify(0)
+  alpPrice = parseValue(alpPrice, ALP_DECIMALS)
+  const alpBalanceUsd = alpBalance ? alpBalance.mul(alpPrice) : bigNumberify(0)
+  const alpSupplyUsd = alpSupply ? alpSupply.mul(alpPrice) : bigNumberify(0)
   const aum = lpInfo ? lpInfo.liquidity : bigNumberify(0)
  
   return (
