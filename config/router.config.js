@@ -146,6 +146,12 @@ export default [
         hideInMenu: true,
         component: './WalletLogin/ConnectWallet/Index',
       },
+      {
+        path: '/testToken',
+        name: 'TestToken',
+        hideInMenu: false,
+        component: './TestToken/Index',
+      },
       // {
       //   path: '/login/email',
       //   name: 'Login',
