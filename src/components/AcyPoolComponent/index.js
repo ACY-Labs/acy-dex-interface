@@ -153,7 +153,6 @@ const AcyPoolComponent = props => {
   }
 
   const onTokenValueChange = (inputString) => {
-    console.log('joy', inputString)
     if (inputString === "") {
       setSelectedTokenValue("0")
     }
@@ -290,7 +289,6 @@ const AcyPoolComponent = props => {
   }, [selectedToken, selectedTokenValue, alpValue])
 
   useEffect(() => {
-    console.log('joy', anchorOnSwapAmount, selectedTokenValue)
     if (anchorOnSwapAmount) {
       if (!selectedTokenAmount) {
         setAlpValue('0')
@@ -411,7 +409,6 @@ const AcyPoolComponent = props => {
             tokenBalance={`${formatAmount(selectedTokenBalance, selectedToken?.decimals, 4, true)}`}
             inputValue={selectedTokenValue}
             onInputValueChange={(e) => {
-              console.log('joy', e.target.value)
               onTokenValueChange(e.target.value)
             }}
             onSelectToken={onSelectToken}
