@@ -32,16 +32,27 @@ const Swap = props => {
   const chainId = 137;
   const tokens = getTokens(chainId)
 
-  const [activeToken1, setActiveToken1] = useState(tokens[1]);
-  const [activeToken0, setActiveToken0] = useState(tokens[0]);
+  const [activeToken0, setActiveToken0] = useState(tokens[1]);
+  const [activeToken1, setActiveToken1] = useState(tokens[0]);
+  const [token0Addr, setToken0Addr] = useState(tokens[1].address);
+  const [token1Addr, setToken1Addr] = useState(tokens[0].address);
   const [activeSymbol, setActiveSymbol] = useState("BTC")
   const [activeSymbol1, setActiveSymbol1] = useState("ETH")
-  const [activeToken, setActiveToken] = useState("BTCUSD");
+  const [activeToken, setActiveToken] = useState(activeToken0.address < activeToken1.address ? activeToken0 : activeToken1);
+  const [hasPair, setHasPair] = useState(true);
+  const [activeExist, setActiveExist] = useState(true);
+  // const [activeToken, setActiveToken] = useState("BTCUSD");
   const [visibleLoading, setVisibleLoading] = useState(false);
   const [visibleConfirmOrder, setVisibleConfirmOrder] = useState(false);
   const [transactionList, setTransactionList] = useState([]);
   const [tableContent, setTableContent] = useState('Trade History');
   const [tradeHistory, setTradeHistory] = useState([])
+  //for chart 24h data tab
+  const [curPrice, setCurPrice] = useState(0);
+  const [priceDeltaPercent, setPriceDeltaPercent] = useState(0);
+  const [deltaIsMinus, setDeltaIsMinus] = useState(false);
+  const [dailyHigh, setDailyHigh] = useState(0)
+  const [dailyLow, setDailyLow] = useState(0)
   const [showChart, setShowChart] = useState(true)
   const [favTokens, setFavTokens] = useState(JSON.parse(localStorage.getItem('tokens_symbol')))
 
@@ -167,6 +178,17 @@ const Swap = props => {
     getTradeHistory()
   }, [activeToken0, activeToken1]);
 
+
+  // for activeToken chosen from tokenSelectorModal, set token0 as selected and token1 as USDT
+  // should not be activated when triggered by tab for nopair
+  // useEffect(() => {
+  //   console.log("check trade activetoken1 useeffect activetoken", tokens[0], activeToken)
+  //   if (activeToken != activeToken0 && activeToken1 && hasPair) {
+  //     setActiveToken0(activeToken)
+  //     setActiveToken1(tokens[0])
+  //   }
+  // }, [activeToken])
+
   const onHandModalConfirmOrder = falg => {
     setVisibleConfirmOrder(!!falg);
   };
@@ -180,6 +202,10 @@ const Swap = props => {
   const onGetReceipt = async (receipt, library, account) => {
     updateTransactionList(receipt);
   };
+
+  const onTabSelect = (e) => {
+    setActiveToken(activeToken0.symbol == e ? activeToken0 : activeToken1)
+  }
 
   const [graphType, setGraphType] = useState("BTC")
   const graphTypes = [activeToken1.symbol]
@@ -215,10 +241,17 @@ const Swap = props => {
   useEffect(() => {
     const hash = history.location.hash.replace('#', '').split('&')
     if (history.location.hash) {
-      setActiveToken0({ symbol: hash[0].split('/')[0].replaceAll('%20', ' '), address: hash[1] })
-      setActiveToken1({ symbol: hash[0].split('/')[1].replaceAll('%20', ' '), address: hash[2] })
+      setActiveToken({ symbol: hash[0].split('/')[0].replaceAll('%20', ' '), address: hash[1].substring(0, 42) })
+      setActiveToken0({ symbol: hash[0].split('/')[0].replaceAll('%20', ' '), address: hash[1].substring(0, 42) })
+      setActiveToken1({ symbol: hash[0].split('/')[1].replaceAll('%20', ' '), address: hash[2].substring(0, 42) })
     }
   }, [history.location.hash])
+
+
+  useEffect(() => {
+    //initialize activeExist to rerender chart and check is chart is available or not
+    setActiveExist(true)
+  }, [activeToken0, activeToken1])
 
   return (
     <PageHeaderWrapper>
@@ -227,31 +260,88 @@ const Swap = props => {
           <div className={`${styles.colItem} ${styles.priceChart}`}>
 
             <div>
-              <AcySymbolNav data={favTokens} onChange={showGraph} />
-              <AcySymbol
-                activeSymbol={activeToken0.symbol}
-                latestPriceColor={1}
-                latestPrice={1}
-                latestPricePercentage={1}
-                // coinList={coinList}
-                showChart={showChart}
-                setShowChart={() => setShowChart(!showChart)}
-                setFavTokens={() => { setFavTokens(JSON.parse(localStorage.getItem('tokens_symbol'))) }}
-              />
-
-              <div style={{ borderTop: '0.75px solid #333333' }}>
-                {showChart &&
-                  <div>
-                    <ExchangeTVChart
-                      chartTokenSymbol={activeToken1.symbol}
-                      pageName="Trade"
-                      fromToken={activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address}
-                      toToken={activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address}
-                      chainId={chainId}
-                    />
-                  </div>
-                }
-              </div>
+              {/* <div className={styles.chartTokenSelectorTab}> */}
+              {/* <PerpetualTabs
+                  option={graphType}
+                  options={graphTypes}
+                  onChange={showGraph}
+                /> */}
+              {hasPair ?
+                <AcySymbol
+                  activeSymbol={`${activeToken0.symbol}/${activeToken1.symbol}`}
+                  setActiveSymbol={setActiveToken}
+                  activfeToken0={activeToken0}
+                  activeToken1={activeToken1}
+                  setActiveToken0={setActiveToken0}
+                  setActiveToken1={setActiveToken1}
+                  pageName={"Trade"}
+                  // pairName='BTC'
+                  // showDrawer={onClickCoin}
+                  latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                  latestPrice={curPrice}
+                  latestPricePercentage={priceDeltaPercent}
+                  dailyLow={dailyLow}
+                  dailyHigh={dailyHigh}
+                  showChart={showChart}
+                  setShowChart={() => setShowChart(!showChart)}
+                  setFavTokens={()=>{setFavTokens(JSON.parse(localStorage.getItem('tokens_symbol')))}}
+                />
+                : <div>
+                  <AcySymbolNav data={[activeToken0.symbol, activeToken1.symbol]} onChange={onTabSelect} />
+                  <AcySymbol
+                    activeSymbol={activeToken.symbol}
+                    pageName="Trade"
+                    // activeSymbol={activeToken0.symbol}
+                    // setActiveSymbol={setActiveSymbol}
+                    activeToken0={activeToken0}
+                    activeToken1={activeToken1}
+                    setActiveSymbol={setActiveToken}
+                    setActiveToken0={setActiveToken0}
+                    setActiveToken1={setActiveToken1}
+                    latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+                    latestPrice={curPrice}
+                    latestPricePercentage={priceDeltaPercent}
+                    dailyLow={dailyLow}
+                    dailyHigh={dailyHigh}
+                    showChart={showChart}
+                    setShowChart={() => setShowChart(!showChart)}
+                    setFavTokens={()=>{setFavTokens(JSON.parse(localStorage.getItem('tokens_symbol')))}}
+                  />
+                </div>
+              }
+              {/* </div> */}
+              {activeExist ?
+                <div style={{ borderTop: '0.75px solid #333333' }}>
+                  {graphType == "Routes" ?
+                    // <SankeyGraph />
+                    <></>
+                    : showChart &&
+                    <div>
+                      <ExchangeTVChart
+                        chainId={chainId}
+                        pageName="Trade"
+                        activeSymbol={activeToken1.symbol}
+                        //the token with smaller addr is fromToken, the bigger one is toToken
+                        token0Addr={activeToken0.address}
+                        token1Addr={activeToken1.address}
+                        // fromTokenAddr={activeToken0.address < activeToken1.address ? activeToken0.address : activeToken1.address}
+                        // toTokenAddr={activeToken0.address < activeToken1.address ? activeToken1.address : activeToken0.address}
+                        activeToken={activeToken}
+                        //property for trade
+                        hasPair={hasPair}
+                        setHasPair={setHasPair}
+                        activeExist={activeExist}
+                        setActiveExist={setActiveExist}
+                        //for chart 24 tab
+                        setCurPrice={setCurPrice}
+                        setPriceDeltaPercent={setPriceDeltaPercent}
+                        setDailyHigh={setDailyHigh}
+                        setDailyLow={setDailyLow}
+                      />
+                    </div>
+                  }
+                </div>
+                : <div className={styles.chartUnavailable}>Chart Unavailable</div>}
             </div>
 
             <div className={styles.bottomWrapper}>
@@ -297,7 +387,14 @@ const Swap = props => {
                   library={library}
                   chainId={chainId}
                   onGetReceipt={onGetReceipt}
-                  showGraph={showGraph}
+                  activeSymbol={activeSymbol}
+                  activeToken0={activeToken0}
+                  activeToken1={activeToken1}
+                  setActiveToken={setActiveToken}
+                  setActiveToken0={setActiveToken0}
+                  setActiveToken1={setActiveToken1}
+                  setActiveSymbol={setActiveSymbol}
+                // showGraph={showGraph}
                 />
               </div>
             </AcyCard>

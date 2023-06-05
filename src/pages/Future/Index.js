@@ -10,21 +10,26 @@ import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
-import { fetcher } from '@/acy-dex-futures/utils';
+import { fetcher, getSymbol, getPosition } from '@/acy-dex-futures/utils';
 import Reader from '@/abis/future-option-power/Reader.json'
 import styles from './styles.less'
+import { PositionTable } from '@/components/OptionComponent/TableComponent';
 
 
 const Future = props => {
   const { account, library, active } = useWeb3React();
   let { chainId } = useChainId();
   const tokens = getTokens(chainId);
-  chainId = 80001
 
   const [mode, setMode] = useState('Buy')
   const [symbol, setSymbol] = useState('BTCUSD')
-
-  const [activeToken, setActiveToken] = useState((tokens.filter(ele => ele.symbol == "BTC"))[0]);
+  //for chart 24h data tab
+  const [curPrice, setCurPrice] = useState(0);
+  const [priceDeltaPercent, setPriceDeltaPercent] = useState(0);
+  const [deltaIsMinus, setDeltaIsMinus] = useState(false);
+  const [dailyHigh, setDailyHigh] = useState(0)
+  const [dailyLow, setDailyLow] = useState(0)
+  const [dailyVol, setDailyVol] = useState(0)
 
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
@@ -32,72 +37,50 @@ const Future = props => {
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
-  //future_tokens store every symbols in future and its data 
-  // const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
-  // let future_tokens_symbol = []
-  // future_tokens?.forEach((ele)=>{
-  //   future_tokens_symbol.push({
-  //     name: ele[1],
-  //     symbol: ele[1].substring(0,3),
-  //   })
-  // })  
-  // //future_token stores token symbols without duplicates for tab display
-  // let future_token = []
-  // future_tokens_symbol?.forEach((ele) => {
-  //   if (!future_token.includes(ele.symbol)){
-  //     future_token.push(ele.symbol)
-  //   }
-  // })
-
-  //future_tokens store every symbols in future and its data 
-  const future_tokens_symbol = useMemo(() => {
-    const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
-    return future_tokens?.map((ele) => ({
-        name: ele[1],
-        symbol: ele[1].substring(0,3),
-      })
-    )
-  }, [symbolsInfo])
-  //future_token stores token symbols without duplicates for tab display
-  const future_token = useMemo(() => {
-    const res = []
-    future_tokens_symbol?.forEach((ele) => {
-      if (!res.includes(ele.symbol)){
-        res.push(ele.symbol)
-      }
-    })
-    return res
-  }, [future_tokens_symbol])
+  
+  const { data: rawPositionData, mutate: updatePosition } = useSWR([chainId, readerAddress, 'getTdInfo', poolAddress, account], {
+    fetcher: fetcher(library, Reader)
+  })
+  const symbolData = getSymbol(symbolsInfo)
+  const positionData = getPosition(rawPositionData, symbolData)
+  const [tableContent, setTableContent] = useState("Positions");
 
   useEffect(() => {
     if (active) {
       library.on('block', () => {
         updateSymbolsInfo(undefined, true)
+        updatePosition()
       })
       return () => {
         library.removeAllListeners('block')
       }
     }
   }, [active, library, chainId,
-    updateSymbolsInfo]
+    updateSymbolsInfo,updatePosition]
   )
-  const [activeSymbol, setActiveSymbol] = useState("BTC")
-  // const [activeToken, setActiveToken] = useState("BTC");
 
-  const selectTab = item => {
-    setActiveToken((tokens.filter(ele => ele.symbol == item)[0]))
-  }
+  const future_tokens_symbol = useMemo(() => {
+    const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
+    return future_tokens?.map((ele) => ({
+        symbol: ele[1],
+        name: ele[1].replace('USD', ''),
+      })
+    )
+  }, [symbolsInfo])
 
-  // useEffect(()=>{
-  //   setActiveToken((tokens.filter(ele => ele.symbol == "BTC"))[0])
-  // }, [tokens])
+  const future_token = useMemo(() => {
+    const res = []
+    future_tokens_symbol?.forEach((ele) => {
+      if (!res.includes(ele.name)){
+        res.push(ele.name)
+      }
+    })
+    return res
+  }, [future_tokens_symbol])
 
+  const [activeSymbol, setActiveSymbol] = useState("BTCUSD")
   const [latestPrice, setLatestPrice] = useState(0);
   const [priceChangePercentDelta, setPpriceChangePercentDelta] = useState(0);
-  const onChangePrice = (curPrice, change) => {
-    setLatestPrice(curPrice);
-    setPpriceChangePercentDelta(change);
-  }
 
   return (
     <div className={styles.main}>
@@ -105,26 +88,52 @@ const Future = props => {
         {mode == 'Pool' ?
           <AcyPool />
           : <div className={`${styles.colItem} ${styles.priceChart}`}>
-            <AcySymbolNav data={future_token} onChange={selectTab} />
+            <AcySymbolNav data={future_token} />
             <AcySymbol
+              pageName="Futures"
               activeSymbol={activeSymbol}
               setActiveSymbol={setActiveSymbol}
               coinList={future_tokens_symbol}
-              latestPriceColor={priceChangePercentDelta*1>= 0 && '#0ecc83' ||'#fa3c58'}
-              latestPrice={latestPrice}
-              latestPricePercentage={priceChangePercentDelta}
+              latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
+              latestPrice={curPrice}
+              latestPricePercentage={priceDeltaPercent}
+              dailyLow={dailyLow}
+              dailyHigh={dailyHigh}
+              dailyVol={dailyVol}
             />
-            {/* <TokenSelectorDrawer onCancel={onCancel} width={400} visible={visible} onCoinClick={onClickCoin} coinList={coinList} /> */}
             <div style={{ backgroundColor: 'black', display: "flex", flexDirection: "column", marginBottom: "30px" }}>
               <ExchangeTVChart
-                chartTokenSymbol={activeToken.symbol}
-                pageName="Futures"
-                fromToken={activeToken.symbol}
-                toToken="USDT"
                 chainId={chainId}
-                onChangePrice={onChangePrice}
+                pageName="Futures"
+                activeSymbol={activeSymbol}
+                setCurPrice={setCurPrice}
+                setPriceDeltaPercent={setPriceDeltaPercent}
+                setDailyHigh={setDailyHigh}
+                setDailyLow={setDailyLow}
+                setDailyVol={setDailyVol}
               />
             </div>
+            <div className={styles.bottomWrapper}>
+                <div className={styles.bottomTab}>
+                  <ComponentTabs
+                    option={tableContent}
+                    options={["Positions", "Orders"]}
+                    onChange={item => { setTableContent(item) }}
+                  />
+                </div>
+              </div>
+              <AcyCard style={{ backgroundColor: 'transparent', padding: '10px', width: '100%', borderTop: '0.75px solid #333333', borderRadius: '0' }}>
+                <div className={`${styles.colItem} ${styles.priceChart}`}>
+                  <div className={styles.positionsTable}>
+                    {tableContent == "Positions" && (
+                      <PositionTable dataSource={positionData} chainId={chainId} />
+                    )}
+                    {tableContent == "Orders" && (
+                      <div>ORDERS</div>
+                    )}
+                  </div>
+                </div>
+              </AcyCard>
           </div>
         }
 
@@ -134,8 +143,6 @@ const Future = props => {
               mode={mode}
               setMode={setMode}
               chainId={chainId}
-              tokens={tokens}
-              selectedToken={activeToken}
               symbol={symbol}
               pageName="Future"
             />

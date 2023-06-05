@@ -43,7 +43,7 @@ export default function BuyInputSection(props) {
   };
   const onClickCoin = (token) => {
     setVisible(false);
-    onSelectToken(token.symbol);
+    onSelectToken(token?.symbol);
   };
   const onCancel = () => {
     setVisible(false);
@@ -64,7 +64,7 @@ export default function BuyInputSection(props) {
           {!isLocked &&
             // <div className={styles.tokenSelector} onClick={onClickCoin}>
             //   <Select 
-            //     value={token.symbol} 
+            //     value={token?.symbol} 
             //     onChange={onSelectToken}
             //     dropdownClassName={styles.dropDownMenu}
             //   >
@@ -77,8 +77,8 @@ export default function BuyInputSection(props) {
             //   </Select>
             // </div>
             <div className={styles.tokenSelector} onClick={onOpenCoin}>
-              <img src={logoURI[token.symbol]} style={{ width: '20px', height: '20px', marginRight: '0.5rem' }} />
-              {token.symbol}
+              {logoURI[token?.symbol] && <img src={logoURI[token?.symbol]} style={{ width: '20px', height: '20px', marginRight: '0.5rem' }} />}
+              {token?.symbol}
               <AcyIcon.MyIcon type="triangleGray" width={10} />
             </div>
           }

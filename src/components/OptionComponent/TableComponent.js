@@ -155,8 +155,9 @@ export function PositionTable(props){
             dataIndex: 'accountFunding',
             // key: 'accountFunding',
             render: (text, entry) => {
-                let res = formatNumber(entry.accountFunding)
-                return <div className={styles.tableData}>{res}</div>;
+                return parseFloat(entry.accountFunding) == 0 ?
+                <div className={styles.tableData}>{entry.accountFunding}</div>
+                : <div className={styles.tableData}>{formatNumber(entry.accountFunding)}</div>
             },
             visible: true,
         },
