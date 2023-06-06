@@ -13,7 +13,7 @@ export default [
     component: '../layouts/BasicLayout',
     Routes: ['src/pages/Authorized'],
     routes: [
-      { path: '/', redirect: '/trade' },
+      { path: '/', redirect: '/future' },
       {
         path: '/market',
         name: 'Market',
