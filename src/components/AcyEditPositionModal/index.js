@@ -15,17 +15,16 @@ import { getAllSupportedTokensPrice } from '@/acy-dex-swap/utils';
 import { expandDecimals, bigNumberify, shouldRaiseGasError, getTokenInfo} from '@/acy-dex-futures/utils';
 import Router from "@/acy-dex-futures/abis/Router";
 import * as Api from '@/acy-dex-futures/Api';
+import { useWeb3React } from '@web3-react/core';
 
 
 const AcyEditPositionModal = ({ Position, isModalVisible, onCancel, setPendingTxns, infoTokens, ...props }) => {
   const {
-    account,
-    chainId,
-    library,
     farmSetting: { API_URL: apiUrlPrefix, NATIVE_CURRENCY: nativeToken },
     farmSetting: { INITIAL_ALLOWED_SLIPPAGE },
     perpetuals
   } = useConstantLoader();
+  const {account, chainId, library} = useWeb3React();
   const [fromToken, setFromToken] = useState({ symbol: 'ACY' });
   const [editIsLong, setEditIsLong] = useState(false);
   const [positionInfo, setPositionInfo] = useState({});

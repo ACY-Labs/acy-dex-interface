@@ -17,6 +17,7 @@ import { processString } from "@/components/AcyCoinItem";
 import styles from "./styles.less";
 import { useConstantLoader, getGlobalTokenList } from '@/constants';
 import mockTokenList from '@/components/SwapComponent/mockTokenList.json';
+import { useChainId } from "@/utils/helpers";
 // import InfiniteScroll from 'react-infinite-scroll-component';
 
 const TokenSelectorDrawer = ({ 
@@ -38,7 +39,8 @@ const TokenSelectorDrawer = ({
   setActiveToken1,
   setActiveSymbol, 
 }) => {
-  const { account, library, chainId } = useConstantLoader();
+  const { account, library } = useWeb3React();
+  const { chainId } = useChainId();
 
   // const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
   // const tokenlist = coinList ? coinList : getGlobalTokenList()

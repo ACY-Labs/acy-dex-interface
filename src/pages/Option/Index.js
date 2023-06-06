@@ -6,7 +6,6 @@ import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import * as Api from '@/acy-dex-futures/Api';
 import { fetcher, getProvider, bigNumberify, getSymbol, getPosition } from '@/acy-dex-futures/utils';
-import { useConstantLoader } from '@/constants';
 import { BigNumber, ethers } from 'ethers'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
 import { useChainId } from '@/utils/helpers';

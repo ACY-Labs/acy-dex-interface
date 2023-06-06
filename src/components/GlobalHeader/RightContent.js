@@ -14,7 +14,6 @@ import {
   AcySeting,
 } from '@/components/Acy';
 import { useWeb3React } from '@web3-react/core';
-import { useConstantLoader, supportedChainIds } from '@/constants'
 import {
   injected,
   walletconnect,
@@ -49,8 +48,7 @@ const GlobalHeaderRight = props => {
   const [visibleSetting, setVisibleSetting] = useState(false);
   const [only, setOnly] = useState(true);
   // 连接钱包函数
-  const { library } = useConstantLoader();
-  const { account, activate, deactivate, active } = useWeb3React();
+  const { account, activate, deactivate, active, library } = useWeb3React();
   const { chainId } = useChainId();
 
   const [wallet, setWallet] = useState(localStorage.getItem("wallet"));
@@ -811,9 +809,9 @@ const GlobalHeaderRight = props => {
         <span>Select a Network</span>
       </div>
       <AcyCardList>
-        {networkList.slice(2,).map((item) => {
+        {networkList.slice(2,).map((item, idx) => {
           return (
-            <AcyCardList.Thin className={styles.networkListLayout} onClick={() => item.onClick()}>
+            <AcyCardList.Thin key={idx} className={styles.networkListLayout} onClick={() => item.onClick()}>
               {
                 <AcyIcon.MyIcon width={20} type={item.icon} />
               }
@@ -842,8 +840,8 @@ const GlobalHeaderRight = props => {
           //className={styles.networkButton}
           >
             <div type="primary" shape="round" className={styles.networkButton}>
-              {[networkList[networkListIndex]].map(item => (
-                <div>
+              {[networkList[networkListIndex]].map((item, idx) => (
+                <div key={idx}>
                   <AcyIcon.MyIcon type={item.icon} /> {item.name} <DownOutlined /></div>
                 //<Icon><DownOutlined /></Icon>
               ))}

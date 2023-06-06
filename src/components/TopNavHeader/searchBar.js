@@ -23,9 +23,10 @@ import {
   fetchSearchPoolReturns,
 } from '@/pages/Market/Data';
 
-import { SCAN_URL_PREFIX, useConstantLoader, getGlobalTokenList } from "@/constants";
+import { getGlobalTokenList } from "@/constants";
 import { ConsoleSqlOutlined } from '@ant-design/icons';
 import { TopVolumeTable, TrendingTable } from '@/pages/Market/TableComponent';
+import { useChainId } from '@/utils/helpers';
 
 const { AcyTabPane } = AcyTabs;
 const watchlistManagerToken = new WatchlistManager('token');
@@ -205,10 +206,11 @@ export const SearchBar = props => {
   const [localPool, setLocalPool] = useState([]);
 
   console.log("hereim before SB");
+  console.log("debug dataSourceCoin ", getGlobalTokenList);
   const dataSourceCoin = getGlobalTokenList()
   console.log("hereim before SB", dataSourceCoin);
   const [marketNetwork, setmarketNetwork] = useState('');
-  const { chainId } = useConstantLoader();
+  const { chainId } = useChainId();
 
   // useEffect(() => {
   //     // fetch coin list
@@ -373,9 +375,9 @@ export const SearchBar = props => {
         <span className={styles.networkTitle}>Select Market Network</span>
       </div>
       <AcyCardList>
-        {networkList.map((item) => {
+        {networkList.map((item, idx) => {
           return (
-            <AcyCardList.Thin className={styles.networkListLayout} onClick={() => item.onClick()}>
+            <AcyCardList.Thin key={idx} className={styles.networkListLayout} onClick={() => item.onClick()}>
               {
                 <AcyIcon.MyIcon width={15} type={item.icon} />
               }

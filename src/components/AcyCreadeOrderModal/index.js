@@ -18,6 +18,7 @@ import { formatAmount, mapPositionData, USD_DECIMALS,parseValue } from '@/acy-de
 import { createDecreaseOrder } from '@/acy-dex-futures/Api';
 
 import { makeStyles } from "@material-ui/styles";
+import { useWeb3React } from '@web3-react/core';
 
 const useStyles = makeStyles({
   root: {},
@@ -37,7 +38,8 @@ const useStyles = makeStyles({
 
 const AcyCreateOrderModal = ({ Position, isModalVisible, onCancel, setPendingTxns,...props }) => {
   const classes = useStyles();
-  const { account, chainId, library, farmSetting: { API_URL: apiUrlPrefix,NATIVE_CURRENCY: nativeToken, }, farmSetting: { INITIAL_ALLOWED_SLIPPAGE }, perpetuals } = useConstantLoader()
+  const { farmSetting: { NATIVE_CURRENCY: nativeToken } } = useConstantLoader()
+  const { account, chainId, library } = useWeb3React();
   const [fromToken, setFromToken] = useState({symbol : 'ACY'});
   const [indexToken, setIndexToken] = useState({symbol : 'ACY'});
   const [editIsLong, setEditIsLong] = useState(false);

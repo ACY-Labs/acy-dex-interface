@@ -529,7 +529,7 @@ const ArbitrumMainNetTokenList = [
   },
 ];
 
-const TokenListSelector = (arg: string) => {
+const TokenListSelector = (arg: number) => {
   return {
     56: BscMainNetTokenList,
     97: BscTestNetTokenList,

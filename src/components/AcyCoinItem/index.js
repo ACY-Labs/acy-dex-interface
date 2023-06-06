@@ -4,8 +4,8 @@ import {Icon} from "antd";
 import styles from './style.less';
 import placeholder from '@/pages/Dao/placeholder-round.png';
 import { getUserTokenBalance } from '@/acy-dex-swap/utils';
-import { useConstantLoader } from '@/constants';
 import { BigNumber } from '@ethersproject/bignumber';
+import { useWeb3React } from '@web3-react/core';
 
 // parse number with shortform T,B,M, or return itself.
 export function processString(bal) {
@@ -46,7 +46,7 @@ const AcyCoinItem = ({
   ...rest
 }) => {
   const [balance, setBal] = useState(0);
-  const { account, chainId, library } = useConstantLoader();
+  const { account, chainId, library } = useWeb3React();
   const [showActionButton, setShowActionButton] = useState(false);
   useEffect(() => {
     if (clickCallback !== undefined) setShowActionButton(true);
