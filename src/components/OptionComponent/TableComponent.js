@@ -113,6 +113,23 @@ export function PositionTable(props){
             title: (
             <div
                 className={styles.tableHeader}
+                // onClick={() => { setCurrentKey('marginUsage') }}
+            >
+                Margin Usage
+            </div>
+            ),
+            dataIndex: 'marginUsage',
+            // key: 'marginUsage',
+            render: (text, entry) => {
+                let res = formatNumber(entry.marginUsage)
+                return <div className={styles.tableData}>{res}</div>;
+            },
+            visible: true,
+        },
+        {
+            title: (
+            <div
+                className={styles.tableHeader}
                 // onClick={() => { setCurrentKey('unrealizedPnl') }}
             >
                 Unrealized Pnl
