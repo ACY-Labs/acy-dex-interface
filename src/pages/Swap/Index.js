@@ -208,7 +208,7 @@ const Swap = props => {
   }
 
   const [graphType, setGraphType] = useState("BTC")
-  const graphTypes = ["Routes", activeToken1.symbol]
+  const graphTypes = [activeToken1.symbol]
   const showGraph = item => {
     setGraphType(item)
   }
@@ -348,7 +348,7 @@ const Swap = props => {
               <div className={styles.chartTokenSelectorTab}>
                 <ComponentTabs
                   option={tableContent}
-                  options={['Routes', 'Trade History', 'Pools Activity']}
+                  options={['Trade History', 'Pools Activity']}
                   onChange={item => { setTableContent(item) }}
                 />
               </div>
@@ -356,9 +356,9 @@ const Swap = props => {
                 <div className={`${styles.colItem} ${styles.priceChart}`}>
                   <div className={styles.positionsTable}>
 
-                    {tableContent == 'Routes' && (
+                    {/* {tableContent == 'Routes' && (
                       <SankeyGraph />
-                    )}
+                    )} */}
                     {tableContent == 'Trade History' && (
                       <TradeHistoryTable
                         dataSource={tradeHistory}
@@ -381,8 +381,8 @@ const Swap = props => {
                 <SwapComponent
                   token0={activeToken0}
                   token1={activeToken1}
-                  onSelectToken0={token => { setActiveToken0(token);}}
-                  onSelectToken1={token => { setActiveToken1(token);}}
+                  onSelectToken0={token => { setActiveToken0(token); }}
+                  onSelectToken1={token => { setActiveToken1(token); }}
                   account={account}
                   library={library}
                   chainId={chainId}
