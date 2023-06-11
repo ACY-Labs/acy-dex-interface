@@ -380,8 +380,8 @@ const AcyPoolComponent = props => {
       return
     }
     if (needApproval) {
-      isBuying ? approveTokens(library, routerAddress, ERC20, selectedToken?.address, selectedTokenAmount, setIsWaitingForApproval, setIsApproving)
-        : approveTokens(library, routerAddress, Alp, alpAddress, alpAmount, setIsWaitingForApproval, setIsApproving)
+      isBuying ? approveTokens(chainId, library, routerAddress, ERC20, selectedToken?.address, selectedTokenAmount, setIsWaitingForApproval, setIsApproving)
+        : approveTokens(chainId, library, routerAddress, Alp, alpAddress, alpAmount, setIsWaitingForApproval, setIsApproving)
       return
     }
     const [, modal] = getError()
