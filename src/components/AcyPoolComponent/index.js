@@ -403,8 +403,8 @@ const AcyPoolComponent = props => {
           />
         </div>
 
-        {isBuying &&
-          <BuyInputSection
+        {isBuying
+          ? <BuyInputSection
             token={selectedToken}
             tokenlist={whitelistedTokens}
             topLeftLabel='Pay '
@@ -414,9 +414,8 @@ const AcyPoolComponent = props => {
             inputValue={selectedTokenValue}
             onInputValueChange={onTokenValueChange}
             onSelectToken={onSelectToken}
-          />}
-
-        {!isBuying &&
+          />
+          :
           <BuyInputSection
             token={selectedToken}
             tokenlist={whitelistedTokens}
@@ -427,23 +426,22 @@ const AcyPoolComponent = props => {
             inputValue={alpValue}
             onInputValueChange={onAlpValueChange}
             isLocked={!isBuying}
-          />}
+          />
+        }
 
-        {isBuying &&
-          <BuyInputSection
+        {isBuying
+          ? <BuyInputSection
             token={selectedToken}
             tokenlist={whitelistedTokens}
             topLeftLabel="Receive"
             balance={receiveBalance}
             topRightLabel='Balance: '
-            tokenBalance={`${formatAmount(selectedTokenBalance, ALP_DECIMALS, 4, true)}`}
+            tokenBalance={`${formatAmount(poolInfo?.totalSupply, ALP_DECIMALS, 4, true)}`}
             inputValue={alpValue}
             onInputValueChange={onAlpValueChange}
             isLocked={isBuying}
-          />}
-
-        {!isBuying &&
-          <BuyInputSection
+          />
+          : <BuyInputSection
             token={selectedToken}
             tokenlist={whitelistedTokens}
             topLeftLabel="Receive"
