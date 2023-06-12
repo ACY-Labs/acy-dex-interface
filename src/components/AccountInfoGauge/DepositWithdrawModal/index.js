@@ -88,7 +88,7 @@ const DepositWithdrawModal = props => {
       return
     }
     if (needApproval) {
-      approveTokens(library, routerAddress, ERC20, token.address, tokenAmount, setIsWaitingForApproval, setIsApproving)
+      approveTokens(chainId, library, routerAddress, ERC20, token.address, tokenAmount, setIsWaitingForApproval, setIsApproving)
       return
     }
     if (mode == 'Deposit') {
@@ -131,7 +131,6 @@ const DepositWithdrawModal = props => {
             <button
               onClick={() => {
                 onClickPrimary()
-                setIsConfirming(false)
               }}
               disabled={!token || !tokenValue}
               className={styles.ConfirmationBoxButton}
