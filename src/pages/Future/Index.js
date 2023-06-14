@@ -42,13 +42,13 @@ const Future = props => {
     fetcher: fetcher(library, Reader)
   })
   const symbolData = getSymbol(symbolsInfo)
-  const positionData = getPosition(rawPositionData, symbolData)
+  const positionData = getPosition(rawPositionData, symbolData, 'Futures')
   const [tableContent, setTableContent] = useState("Positions");
 
   useEffect(() => {
     if (active) {
       library.on('block', () => {
-        updateSymbolsInfo(undefined, true)
+        updateSymbolsInfo()
         updatePosition()
       })
       return () => {

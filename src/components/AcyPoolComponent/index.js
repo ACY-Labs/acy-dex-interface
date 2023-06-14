@@ -244,9 +244,6 @@ const AcyPoolComponent = props => {
     return isBuying ? "Buy ALP" : "Sell ALP"
   }
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
 
   useEffect(() => {
     if (whitelistedTokens.length) {
@@ -325,7 +322,9 @@ const AcyPoolComponent = props => {
             topRightLabel='Balance: '
             tokenBalance={`${formatAmount(selectedTokenBalance, selectedToken?.decimals, 4, true)}`}
             inputValue={selectedTokenValue}
-            onInputValueChange={onTokenValueChange}
+            onInputValueChange={(e) => {
+              onTokenValueChange(e.target.value)
+            }}
             onSelectToken={onSelectToken}
           />
           :
@@ -362,7 +361,7 @@ const AcyPoolComponent = props => {
             topRightLabel='Balance: '
             tokenBalance={`${formatAmount(selectedTokenBalance, selectedToken?.decimals, 4, true)}`}
             inputValue={selectedTokenValue}
-            onInputValueChange={onTokenValueChange}
+            onInputValueChange={e => { onTokenValueChange(e.target.value) }}
             onSelectToken={onSelectToken}
           />}
 
