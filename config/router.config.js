@@ -13,11 +13,12 @@ export default [
     component: '../layouts/BasicLayout',
     Routes: ['src/pages/Authorized'],
     routes: [
-      { path: '/', redirect: '/trade' },
+      { path: '/', redirect: '/future' },
       {
         path: '/market',
         name: 'Market',
         hideChildrenInMenu: true,
+        defaultHide: true,
         routes: [
           {
             path: '/market',
@@ -53,6 +54,7 @@ export default [
         path: '/trade',
         name: 'Trade',
         component: './Swap/Index',
+        defaultHide: true,
       },
       {
         path: '/future',
@@ -78,6 +80,7 @@ export default [
         path: '/launchpad',
         name: 'Launchpad',
         hideChildrenInMenu: true,
+        defaultHide: true,
         routes: [
           {
             path: '/launchpad',
@@ -93,11 +96,13 @@ export default [
         path: '/liquidity',
         name: 'Liquidity',
         component: './Liquidity/Index',
+        defaultHide: true,
       },
       {
         path: '/farms',
         name: 'Farm',
         component: './Farms/',
+        defaultHide: true,
       },
       {
         path: './statistics/market',
@@ -109,6 +114,7 @@ export default [
         path: '/statistics/future',
         name: 'Statistics',
         component: './Stats/Perpetual/Index',
+        defaultHide: true,
         // routes:[
         //   {
         //     path:'/stats/perpetual',

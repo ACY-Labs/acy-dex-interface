@@ -1,6 +1,6 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, useState } from 'react';
 import classNames from 'classnames';
-import { Menu, Icon, Drawer } from 'antd';
+import { Menu, Icon, Drawer, Button } from 'antd';
 import { Link } from 'umi';
 import { urlToList } from '../_utils/pathTools';
 import { getMenuMatches } from './SiderMenuUtils';
@@ -101,22 +101,22 @@ export default class BaseMenu extends PureComponent {
    * 获得菜单子节点
    * @memberof SiderMenu
    */
-  getNavMenuItems = (menusData, parent) => {
+  getNavMenuItems = (menusData, parent, defaultHide) => {
     if (!menusData) {
       return [];
     }
     return menusData
-      .filter(item => item.name && !item.hideInMenu)
+      .filter(item => item.name && !item.hideInMenu && (!defaultHide || !item.defaultHide))
       .map(item => this.getSubMenuOrItem(item, parent))
       .filter(item => item);
   };
 
-  getNavMenuItems_default = (menusData, parent) => {
+  getNavMenuItems_default = (menusData, parent, defaultHide) => {
     if (!menusData) {
       return [];
     }
     return menusData
-      .filter(item => item.name && !item.hideInMenu)
+      .filter(item => item.name && !item.hideInMenu && (!defaultHide || !item.defaultHide))
       .map(item => this.getSubMenuOrItem_default(item, parent))
       .filter(item => item);
   };
@@ -152,7 +152,7 @@ export default class BaseMenu extends PureComponent {
         </SubMenu>
       );
     }
-    return <Menu.Item key={item.path} style={{ marginTop: item.name == 'Launchpad' ? '32px' : '-20px' }}>{this.getMenuItemPath(item)}</Menu.Item>
+    return <Menu.Item key={item.path} style={{ marginTop: '-20px' }}>{this.getMenuItemPath(item)}</Menu.Item>
   };
 
   getSubMenuOrItem_default = (item, parent) => {
@@ -177,7 +177,7 @@ export default class BaseMenu extends PureComponent {
         </SubMenu>
       );
     }
-    return <Menu.Item key={item.path} style={{ marginTop: item.name == 'Launchpad' ? '32px' : '-20px' }}>{this.getMenuItemPath_default(item)}</Menu.Item>
+    return <Menu.Item key={item.path} style={{ marginTop: '-20px' }}>{this.getMenuItemPath_default(item)}</Menu.Item>
   };
 
   /**
@@ -271,7 +271,7 @@ export default class BaseMenu extends PureComponent {
     return `/${path || ''}`.replace(/\/+/g, '/');
   };
   handleMouseEnter = () => {
-    const { dispatch,global:{collapsed}, } = this.props;
+    const { dispatch, global: { collapsed, defaultHide }, } = this.props;
     dispatch({
       type: 'global/changeLayoutCollapsed',
       payload: !collapsed,
@@ -283,7 +283,8 @@ export default class BaseMenu extends PureComponent {
       theme,
       mode,
       location: { pathname },
-      global:{collapsed},
+      global: { collapsed, defaultHide },
+      dispatch,
       className,
     } = this.props;
     // if pathname can't match, use the nearest parent's key
@@ -301,7 +302,7 @@ export default class BaseMenu extends PureComponent {
     const cls = classNames(className, {
       'top-nav-menu': mode === 'horizontal',
     });
-    
+
     return (
       <div>
         {collapsed &&
@@ -315,7 +316,7 @@ export default class BaseMenu extends PureComponent {
             className={cls}
             {...props}
           >
-            {this.getNavMenuItems_default(menuData, true)}
+            {this.getNavMenuItems_default(menuData, true, defaultHide)}
           </Menu>
           ||
           <Menu
@@ -328,38 +329,24 @@ export default class BaseMenu extends PureComponent {
             className={cls}
             {...props}
           >
-            {this.getNavMenuItems(menuData)}
+            {this.getNavMenuItems(menuData, false, defaultHide)}
           </Menu>
         }
         <div onClick={this.handleMouseEnter} className={styles.menu_switch}>
-          <Icon type={collapsed&&"right"||"left"} />
+          <Icon type={collapsed && "right" || "left"} />
         </div>
-        {/* <Drawer
-          className={styles.drawer}
-          placement='left'
-          getContainer={false}
-          visible={this.state.visible}
-          width={140}
-          closable={false}
+        <div 
+          className={styles.linkButton}
+          style={{marginTop: defaultHide ? '5rem' : '25rem'}}
+          onClick={() => {
+            dispatch({
+              type: 'global/changeDefaultHide',
+              payload: !defaultHide,
+            });
+          }}
         >
-          <div onMouseLeave={handleMouseLeave}>
-            <div className={styles.logo}>
-              <AcyIcon name="acy" width={40} />
-            </div>
-            <Menu
-              key="Menu"
-              mode={mode}
-              theme={theme}
-              onOpenChange={handleOpenChange}
-              selectedKeys={this.selectedKeys}
-              style={style}
-              className={cls}
-              {...props}
-            >
-              {this.getNavMenuItems(menuData)}
-            </Menu>
-          </div>
-        </Drawer> */}
+          {defaultHide ? 'More' : 'Hide'}
+        </div>
       </div>
     );
   }

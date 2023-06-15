@@ -5,6 +5,7 @@ export default {
 
   state: {
     collapsed: true,
+    defaultHide: true,
     notices: [],
     loadedAllNotices: false,
     account:null
@@ -114,6 +115,12 @@ export default {
       return {
         ...state,
         collapsed: payload,
+      };
+    },
+    changeDefaultHide(state, { payload }) {
+      return {
+        ...state,
+        defaultHide: payload,
       };
     },
     saveNotices(state, { payload }) {
