@@ -24,8 +24,6 @@ const contracts = {
     symbolsLens: "0x5Ac237B55D872076Ee9fA98f7798f42bF9336fAf",
     reader: "0x73298651AEB48344b43a08Fd577350fa4c4E6f8b",
     router: "0xCE0CF7Fd78D44cC2C2C2dB4070FCEb4411cc21A4",
-    // newly deployed contract
-    // 0x71C1C58b8F8E8E41c96d78E5496138BD784ee7C6
 
     orderbook: "0xEBcBcfC385841bF5053d8313AD3f84b6E4A1deb0",
   },

@@ -869,6 +869,10 @@ export function getOrderKey(order) {
   return `${order.type}-${order.account}-${order.index}`;
 }
 
+// example call:
+// const { data, mutate } = useSWR([chainId, contractAddr, "methodName", ...params], {
+//   fetcher: fetcher(library, abiJson)
+// });
 export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   // eslint-disable-next-line
   const [chainId, arg0, arg1, ...params] = args

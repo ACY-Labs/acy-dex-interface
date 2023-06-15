@@ -15,7 +15,7 @@ import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
 import Segmented from '../AcySegmented';
 import Reader from '@/abis/future-option-power/Reader.json'
-import IPool from '@/abis/future-option-power/IPool.json'
+import Pool from '@/abis/future-option-power/IPool.json'
 import OrderBook from '@/abis/future-option-power/OrderBook.json'
 import styled from "styled-components";
 
@@ -113,6 +113,10 @@ const DerivativeComponent = props => {
   const poolAddress = getContract(chainId, "pool")
   const orderbookAddress = getContract(chainId, "orderbook")
 
+  const { data: isWhitelistedLpProvider } = useSWR([chainId, poolAddress, "whitelistedLpProviders", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, Pool)
+  });
+
   const { data: symbolInfo, mutate: updateSymbolInfo } = useSWR([chainId, readerAddress, "getSymbolInfo", poolAddress, symbol, []], {
     fetcher: fetcher(library, Reader)
   });
@@ -148,8 +152,12 @@ const DerivativeComponent = props => {
   ]);
 
   ///////////// for UI /////////////
-
-  const optionMode = ['Buy', 'Sell', 'Pool']
+  // show Pool tab only if wallet is connected and is whitelisted
+  const optionMode = useMemo(() => {
+    if (isWhitelistedLpProvider)
+      return ['Buy', 'Sell', 'Pool']
+    return ['Buy', 'Sell']
+  }, [isWhitelistedLpProvider])
   const [orderType, setOrderType] = useState('Market')
   const [limitPrice, setLimitPrice] = useState()
   const [percentage, setPercentage] = useState('')
