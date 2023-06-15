@@ -108,12 +108,6 @@ const DepositWithdrawModal = props => {
     }
   }, [token, tokenAmount, needApproval, isWaitingForApproval])
 
-  useEffect(()=>{
-    if(whitelistedTokens.length > 0) {
-      setToken(whitelistedTokens[0])
-    }
-  }, [whitelistedTokens])
-
   return (
     <>
       <div className={styles.ConfirmationBox}>

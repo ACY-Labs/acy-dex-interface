@@ -38,13 +38,12 @@ const Future = props => {
     fetcher: fetcher(library, Reader)
   });
   
-  const { data: rawPositionData, mutate: updatePosition } = useSWR([chainId, readerAddress, 'getTdInfo', poolAddress, account], {
+  const { data: rawPositionData, mutate: updatePosition, isValidating: isFetchingPositionData } = useSWR([chainId, readerAddress, 'getTdInfo', poolAddress, account], {
     fetcher: fetcher(library, Reader)
   })
-  const symbolData = getSymbol(symbolsInfo)
-  const positionData = getPosition(rawPositionData, symbolData, 'Futures')
+  const symbolData = useMemo(() => getSymbol(symbolsInfo), [symbolsInfo])
+  const positionData = useMemo(() => getPosition(rawPositionData, symbolData, 'Futures'), [symbolData, rawPositionData])
   const [tableContent, setTableContent] = useState("Positions");
-
   useEffect(() => {
     if (active) {
       library.on('block', () => {

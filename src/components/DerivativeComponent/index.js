@@ -15,7 +15,7 @@ import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
 import Segmented from '../AcySegmented';
 import Reader from '@/abis/future-option-power/Reader.json'
-import Pool from '@/abis/future-option-power/IPool.json'
+import PoolAbi from '@/abis/future-option-power/IPool.json'
 import OrderBook from '@/abis/future-option-power/OrderBook.json'
 import styled from "styled-components";
 
@@ -114,7 +114,7 @@ const DerivativeComponent = props => {
   const orderbookAddress = getContract(chainId, "orderbook")
 
   const { data: isWhitelistedLpProvider } = useSWR([chainId, poolAddress, "whitelistedLpProviders", account || PLACEHOLDER_ACCOUNT], {
-    fetcher: fetcher(library, Pool)
+    fetcher: fetcher(library, PoolAbi)
   });
 
   const { data: symbolInfo, mutate: updateSymbolInfo } = useSWR([chainId, readerAddress, "getSymbolInfo", poolAddress, symbol, []], {
@@ -267,7 +267,7 @@ const DerivativeComponent = props => {
         chainId,
         library,
         poolAddress,
-        IPool,
+        PoolAbi,
         account,
         symbol,
         parseValue(tradeVolume, 18),
@@ -279,7 +279,7 @@ const DerivativeComponent = props => {
         chainId,
         library,
         poolAddress,
-        IPool,
+        PoolAbi,
         account,
         symbol,
         parseValue(-tradeVolume, 18),
