@@ -19,24 +19,24 @@ import { useConstantLoader, getGlobalTokenList } from '@/constants';
 import mockTokenList from '@/components/SwapComponent/mockTokenList.json';
 // import InfiniteScroll from 'react-infinite-scroll-component';
 
-const TokenSelectorDrawer = ({ 
-  placement = 'right', 
-  simple, 
-  onCancel, 
-  visible, 
-  setVisible, 
+const TokenSelectorDrawer = ({
+  placement = 'right',
+  simple,
+  onCancel,
+  visible,
+  setVisible,
   pageName,
   isRightSelect,
   isFromToken,
-  onCoinClick, 
-  coinList, 
-  selectSymbol, 
-  activeSymbol, 
+  onCoinClick,
+  coinList,
+  selectSymbol,
+  activeSymbol,
   activeToken0,
   setActiveToken0,
   activeToken1,
   setActiveToken1,
-  setActiveSymbol, 
+  setActiveSymbol,
 }) => {
   const { account, library, chainId } = useConstantLoader();
 
@@ -171,7 +171,6 @@ const TokenSelectorDrawer = ({
   //   console.log('tokenbalancedict', tokenBalanceDict);
   // }, [tokenBalanceDict])
 
-
   const setTokenAsFav = token => {
     setFavTokenList(prevState => {
       const prevFavTokenList = [...prevState];
@@ -219,8 +218,13 @@ const TokenSelectorDrawer = ({
                   key={index}
                   customIcon={false}
                   clickCallback={() => setTokenAsFav(token)}
-                  selectToken={() => {
-                    onCoinClick(token);
+                  selectToken={(item) => {
+                    if(pageName == 'Options' || pageName == 'Powers') {
+                      setActiveSymbol(item.symbol)
+                      setVisible(false)
+                    } else {
+                      onCoinClick(token)
+                    }
                   }}
                   isFav={favTokenList.includes(token)}
                   constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}
@@ -261,15 +265,9 @@ const TokenSelectorDrawer = ({
                       key={index}
                       customIcon={false}
                       clickCallback={() => setTokenAsFav(token)}
-                      // selectToken={(item) => {
-                      //   setActiveSymbol(item.symbol)
-                      // }}
                       selectToken={(item) => {
                         if (pageName === "Trade") {
                           onCoinClick(token)
-                          setActiveSymbol(item)
-                          // setActiveToken0(item)
-                          // setActiveToken1(USDT_Token[chainId][0])
                           if (isRightSelect) {
                             if (isFromToken) {
                               if (item.address < activeToken1.address) {
@@ -302,9 +300,7 @@ const TokenSelectorDrawer = ({
                             setActiveToken1(baseTokenAddr["137"].find(token => token.symbol === 'USDT'))
                           }
                         }
-                        else { // page not trade
-                          setActiveSymbol(item.name)
-                        }
+                        setActiveSymbol(item.symbol)
                         setVisible(false)
                       }}
                       isFav={favTokenList.includes(token)}
@@ -360,9 +356,6 @@ const TokenSelectorDrawer = ({
                     selectToken={(item) => {
                       if (pageName === "Trade") {
                         onCoinClick(supToken)
-                        setActiveSymbol(item)
-                        // setActiveToken0(item)
-                        // setActiveToken1(USDT_Token[chainId][0])
                         if (isRightSelect) {
                           if (isFromToken) {
                             if (item.address < activeToken1.address) {
@@ -395,12 +388,6 @@ const TokenSelectorDrawer = ({
                           setActiveToken1(baseTokenAddr["137"].find(token => token.symbol === 'USDT'))
                         }
                       }
-                      else { // page not trade
-                        setActiveSymbol(item.name)
-                      }
-                      // else {
-                      //   setActiveSymbol(item.symbol)
-                      // }
                       setVisible(false)
                       setActiveSymbol(item.symbol)
                     }}

@@ -106,9 +106,9 @@ const AcyCoinItem = ({
         </div>
 
         {/* token symbol container. */}
-        <div style={{ width: "20%", color: 'white', fontWeight: '500' }}>{data.symbol}</div>
+        <div style={{ width: "30%", color: 'white', fontWeight: '500' }}>{data.symbol}</div>
 
-        <div style={{ width: "70%", display: "flex", justifyContent: "space-between" }}>
+        <div style={{ width: "60%", display: "flex", justifyContent: "space-between" }}>
           {/* token name container. */}
           <div style={{ minWidth: "20%", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>{data.name}</div>
 

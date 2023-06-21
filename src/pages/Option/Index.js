@@ -98,12 +98,9 @@ const Option = props => {
             : <div className={`${styles.colItem} ${styles.priceChart}`}>
               <AcySymbolNav data={option_token} />
               <AcySymbol
+                pageName="Options"
                 activeSymbol={activeSymbol}
                 setActiveSymbol={setActiveSymbol}
-                // showDrawer={onClickCoin}
-                // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
-                // latestPrice={latestPrice}
-                // latestPricePercentage={priceChangePercentDelt
                 coinList={option_tokens_symbol}
                 latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
                 latestPrice={curPrice}

@@ -36,7 +36,7 @@ const Powers = props => {
   ///// read reader contract, getTdInfo and getSymbolsInfo
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
-  
+
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
@@ -97,6 +97,7 @@ const Powers = props => {
             : <div className={`${styles.colItem} ${styles.priceChart}`}>
               <AcySymbolNav data={power_token} />
               <AcySymbol
+                pageName="Powers"
                 activeSymbol={activeSymbol}
                 setActiveSymbol={setActiveSymbol}
                 coinList={power_tokens_symbol}
@@ -147,7 +148,7 @@ const Powers = props => {
         {/* RIGHT INTERACTIVE COMPONENT */}
         <div className={`${styles.colItem} ${styles.optionComponent}`}>
           <AcyCard style={{ backgroundColor: 'transparent', border: 'none' }}>
-          <DerivativeComponent
+            <DerivativeComponent
               mode={mode}
               setMode={setMode}
               chainId={chainId}
