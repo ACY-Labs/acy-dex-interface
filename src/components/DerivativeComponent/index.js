@@ -192,10 +192,9 @@ const DerivativeComponent = props => {
 
   const handleUsdValueChange = (usdValue) => {
     setUsdValue(usdValue)
-    let tokenValue = usdValue / formatAmount(symbolMarkPrice, 18)
-    tokenValue = pageName == 'Future' ? tokenValue * leverageOption : tokenValue
-    let minTokenValue = tokenValue % minTradeVolume == 0 ? tokenValue : tokenValue.toFixed(-Math.log10(minTradeVolume))
-    setTradeVolume(minTokenValue)
+    const tokenValue = usdValue * leverageOption / formatAmount(symbolMarkPrice, 18)
+    const tokenVolume = tokenValue % minTradeVolume == 0 ? tokenValue : tokenValue.toFixed(-Math.log10(minTradeVolume))
+    setTradeVolume(tokenVolume)
   }
 
   const isValid = (value) => {
@@ -209,9 +208,7 @@ const DerivativeComponent = props => {
   }
 
   useEffect(() => {
-    if (pageName == 'Future') {
-      handleUsdValueChange(usdValue)
-    }
+    handleUsdValueChange(usdValue)
   }, [leverageOption])
 
   useEffect(() => {
@@ -391,69 +388,67 @@ const DerivativeComponent = props => {
                 </AcyDescriptions>
               }
 
-              {pageName == "Future" &&
-                <AcyDescriptions>
-                  <div className={styles.leverageContainer}>
-                    <div className={styles.slippageContainer}>
-                      <div className={styles.leverageLabel}>
-                        <span>Leverage</span>
-                        <div className={styles.leverageInputContainer}>
-                          <button
-                            className={styles.leverageButton}
-                            onClick={() => {
-                              if (leverageOption > 0.1) {
-                                setLeverageOption((parseFloat(leverageOption) - 0.1).toFixed(1))
-                              }
-                            }}
-                          >
-                            <span> - </span>
-                          </button>
-                          <input
-                            type="number"
-                            value={leverageOption}
-                            onChange={e => {
-                              let val = parseFloat(e.target.value)
-                              if (val < 0.1) {
-                                setLeverageOption(0.1)
-                              } else if (val >= 0.1 && val <= 30.5) {
-                                setLeverageOption(Math.round(val * 10) / 10)
-                              } else {
-                                setLeverageOption(30.5)
-                              }
-                            }}
-                            className={styles.leverageInput}
-                          />
-                          <button
-                            className={styles.leverageButton}
-                            onClick={() => {
-                              if (leverageOption < 30.5) {
-                                setLeverageOption((parseFloat(leverageOption) + 0.1).toFixed(1))
-                              }
-                            }}
-                          >
-                            <span> + </span>
-                          </button>
-                        </div>
-
+              <AcyDescriptions>
+                <div className={styles.leverageContainer}>
+                  <div className={styles.slippageContainer}>
+                    <div className={styles.leverageLabel}>
+                      <span>Leverage</span>
+                      <div className={styles.leverageInputContainer}>
+                        <button
+                          className={styles.leverageButton}
+                          onClick={() => {
+                            if (leverageOption > 0.1) {
+                              setLeverageOption((parseFloat(leverageOption) - 0.1).toFixed(1))
+                            }
+                          }}
+                        >
+                          <span> - </span>
+                        </button>
+                        <input
+                          type="number"
+                          value={leverageOption}
+                          onChange={e => {
+                            let val = parseFloat(e.target.value)
+                            if (val < 0.1) {
+                              setLeverageOption(0.1)
+                            } else if (val >= 0.1 && val <= 30.5) {
+                              setLeverageOption(Math.round(val * 10) / 10)
+                            } else {
+                              setLeverageOption(30.5)
+                            }
+                          }}
+                          className={styles.leverageInput}
+                        />
+                        <button
+                          className={styles.leverageButton}
+                          onClick={() => {
+                            if (leverageOption < 30.5) {
+                              setLeverageOption((parseFloat(leverageOption) + 0.1).toFixed(1))
+                            }
+                          }}
+                        >
+                          <span> + </span>
+                        </button>
                       </div>
+
                     </div>
-
-                    <span className={styles.leverageSlider}>
-                      <StyledSlider
-                        min={0.1}
-                        max={30.5}
-                        step={0.1}
-                        marks={leverageMarks}
-                        value={leverageOption}
-                        onChange={value => setLeverageOption(value)}
-                        defaultValue={leverageOption}
-                        style={{ color: 'red' }}
-                      />
-                    </span>
-
                   </div>
-                </AcyDescriptions>
-              }
+
+                  <span className={styles.leverageSlider}>
+                    <StyledSlider
+                      min={0.1}
+                      max={30.5}
+                      step={0.1}
+                      marks={leverageMarks}
+                      value={leverageOption}
+                      onChange={value => setLeverageOption(value)}
+                      defaultValue={leverageOption}
+                      style={{ color: 'red' }}
+                    />
+                  </span>
+
+                </div>
+              </AcyDescriptions>
 
               <ComponentButton
                 style={{ margin: '25px 0 0 0', width: '100%' }}
