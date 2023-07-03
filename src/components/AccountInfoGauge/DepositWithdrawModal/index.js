@@ -28,7 +28,7 @@ const DepositWithdrawModal = props => {
 
   const connectWalletByLocalStorage = useConnectWallet()
 
-  const [token, setToken] = useState(whitelistedTokens && whitelistedTokens[0])
+  const [token, setToken] = useState()
   const [tokenValue, setTokenValue] = useState('');
   const [tokenAmount, setTokenAmount] = useState(parseValue(tokenValue, token?.decimals))
   const [visible, setVisible] = useState(false)
@@ -49,10 +49,14 @@ const DepositWithdrawModal = props => {
     fetcher: fetcher(library, Reader)
   });
 
-  let whitelistedTokens = []
-  tokenInfo?.map(token => {
-    whitelistedTokens.push({ symbol: token.symbol, address: token.token })
-  })
+  useEffect(() => {
+    if (!tokenInfo) return;
+    const firstTokenInList = {
+      ...tokenInfo[0],
+      address: tokenInfo[0].token
+    }
+    setToken(firstTokenInList)
+  }, [setToken, tokenInfo])
 
   const needApproval =
     token?.address != AddressZero &&
@@ -88,7 +92,7 @@ const DepositWithdrawModal = props => {
       return
     }
     if (needApproval) {
-      approveTokens(library, routerAddress, ERC20, token.address, tokenAmount, setIsWaitingForApproval, setIsApproving)
+      approveTokens(chainId, library, routerAddress, ERC20, token.address, tokenAmount, setIsWaitingForApproval, setIsApproving)
       return
     }
     if (mode == 'Deposit') {
@@ -131,7 +135,6 @@ const DepositWithdrawModal = props => {
             <button
               onClick={() => {
                 onClickPrimary()
-                setIsConfirming(false)
               }}
               disabled={!token || !tokenValue}
               className={styles.ConfirmationBoxButton}
@@ -151,7 +154,6 @@ const DepositWithdrawModal = props => {
           setVisible(false)
           setIsWaitingForApproval(false)
         }}
-        defaultTokens={whitelistedTokens}
       />
     </>
   );

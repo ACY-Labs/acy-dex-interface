@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FormattedMessage, connect } from 'umi';
+import { FormattedMessage, connect, useHistory } from 'umi';
 import { Spin, Tag, Menu, Icon, Dropdown, Button, Space, Modal, message, Row, Col } from 'antd';
 
 import moment from 'moment';
@@ -57,6 +57,7 @@ const GlobalHeaderRight = props => {
 
   const [selectedNetwork, setSelectedNetwork] = useState("BSC");
   const [supportedWallets, setSupportWallets] = useState([]);
+  const history = useHistory()
 
   useEffect(() => {
     if (window.ethereum) {
@@ -198,7 +199,6 @@ const GlobalHeaderRight = props => {
   const onhandMetaMask = () => {
     setVisibleMetaMask(true);
     setNetworkListIndex(n_index(chainId));
-    console.log(broswer, 'ymj')
   };
   const onhandCancelMetaMask = () => {
     setVisibleMetaMask(false);
@@ -830,6 +830,11 @@ const GlobalHeaderRight = props => {
     localStorage.setItem("login_status", 'off')
   }
 
+  const redirectToOverview = () => {
+    history.push("/overview")
+    setVisibleMetaMask(false)
+  }
+
   return (
     <div className={className}>
       <Row wrap={false} style={{ display: "inline-flex", fontSize: "0.7rem" }}>
@@ -1004,6 +1009,7 @@ const GlobalHeaderRight = props => {
               background: '#2e3032',
               borderRadius: ' 20px',
             }}>
+              <div type="primary" shape="round" className={styles.disconnectBtn} onClick={redirectToOverview}>Account</div>
             <div type="primary" shape="round" className={styles.disconnectBtn} onClick={deactivateTest}><DisconnectOutlined /> Disconnect</div>
           </AcyModal>
         </div>}

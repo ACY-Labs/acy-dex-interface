@@ -15,7 +15,7 @@ import AccountInfoGauge from '../AccountInfoGauge';
 import AcyPoolComponent from '../AcyPoolComponent';
 import Segmented from '../AcySegmented';
 import Reader from '@/abis/future-option-power/Reader.json'
-import IPool from '@/abis/future-option-power/IPool.json'
+import PoolAbi from '@/abis/future-option-power/IPool.json'
 import OrderBook from '@/abis/future-option-power/OrderBook.json'
 import styled from "styled-components";
 
@@ -113,6 +113,10 @@ const DerivativeComponent = props => {
   const poolAddress = getContract(chainId, "pool")
   const orderbookAddress = getContract(chainId, "orderbook")
 
+  const { data: isWhitelistedLpProvider } = useSWR([chainId, poolAddress, "whitelistedLpProviders", account || PLACEHOLDER_ACCOUNT], {
+    fetcher: fetcher(library, PoolAbi)
+  });
+
   const { data: symbolInfo, mutate: updateSymbolInfo } = useSWR([chainId, readerAddress, "getSymbolInfo", poolAddress, symbol, []], {
     fetcher: fetcher(library, Reader)
   });
@@ -122,12 +126,16 @@ const DerivativeComponent = props => {
   const { data: minExecutionFee, mutate: updateMinExecutionFee } = useSWR([chainId, orderbookAddress, "minExecutionFee"], {
     fetcher: fetcher(library, OrderBook)
   });
+  const { data: tdInfo, mutate: updateTdInfo } = useSWR([chainId, readerAddress, 'getTdInfo', poolAddress, account], {
+    fetcher: fetcher(library, Reader)
+  })
   useEffect(() => {
     if (active) {
       library.on("block", () => {
         updateSymbolInfo()
         updateEstimateMaxVolume()
         updateMinExecutionFee()
+        updateTdInfo()
       });
       return () => {
         library.removeAllListeners('block');
@@ -140,11 +148,16 @@ const DerivativeComponent = props => {
     updateSymbolInfo,
     updateEstimateMaxVolume,
     updateMinExecutionFee,
+    updateTdInfo,
   ]);
 
   ///////////// for UI /////////////
-
-  const optionMode = ['Buy', 'Sell', 'Pool']
+  // show Pool tab only if wallet is connected and is whitelisted
+  const optionMode = useMemo(() => {
+    if (isWhitelistedLpProvider)
+      return ['Buy', 'Sell', 'Pool']
+    return ['Buy', 'Sell']
+  }, [isWhitelistedLpProvider])
   const [orderType, setOrderType] = useState('Market')
   const [limitPrice, setLimitPrice] = useState()
   const [percentage, setPercentage] = useState('')
@@ -158,13 +171,18 @@ const DerivativeComponent = props => {
 
   const symbolMarkPrice = symbolInfo?.markPrice
   const minTradeVolume = symbolInfo?.minTradeVolume ? ethers.utils.formatUnits(symbolInfo?.minTradeVolume, 18) : 0.001
+  const symbolPosition = tdInfo?.positions.find(item => item.symbol == symbol)
+  const totalMargin = formatAmount(symbolPosition?.margin, 18)
+  const usedMargin = formatAmount(symbolPosition?.marginUsed, 18)
 
   const getPrimaryText = () => {
     if (!active) {
       return 'Connect Wallet'
     }
     if (isValid(tradeVolume)) {
-      return 'Invalid Trade Volume'
+      return tradeVolume > totalMargin - usedMargin
+        ? 'Insufficient Margin'
+        : 'Invalid Trade Volume'
     }
     if (orderType == 'Limit') {
       return 'Create Limit Order'
@@ -180,8 +198,11 @@ const DerivativeComponent = props => {
   }
 
   const isValid = (value) => {
+    if (value > (totalMargin - usedMargin)) {
+      return true
+    }
     if (pageName == 'Future' && value > formatAmount(estimateMaxVolume, 18)) {
-      return false
+      return true
     }
     return value == 0 || Math.floor(value % minTradeVolume) != 0
   }
@@ -243,7 +264,7 @@ const DerivativeComponent = props => {
         chainId,
         library,
         poolAddress,
-        IPool,
+        PoolAbi,
         account,
         symbol,
         parseValue(tradeVolume, 18),
@@ -255,7 +276,7 @@ const DerivativeComponent = props => {
         chainId,
         library,
         poolAddress,
-        IPool,
+        PoolAbi,
         account,
         symbol,
         parseValue(-tradeVolume, 18),
@@ -445,6 +466,8 @@ const DerivativeComponent = props => {
               chainId={chainId}
               active={active}
               symbol={symbol}
+              totalMargin={totalMargin != '...' ? totalMargin : null}
+              usedMargin={usedMargin != '...' ? usedMargin : null}
             />
           </>
         }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 import { ethers } from 'ethers';
 import { Tooltip, Input, Button } from 'antd'
@@ -14,7 +14,6 @@ import {
   fetcher,
   expandDecimals,
   formatAmount,
-  formatAmountFree,
   PLACEHOLDER_ACCOUNT,
   ALP_DECIMALS,
   USD_DECIMALS,
@@ -35,6 +34,7 @@ import Reader from '@/abis/future-option-power/Reader.json';
 import Alp from '@/abis/future-option-power/Alp.json'
 
 import styles from './styles.less';
+import { formatUnits, parseUnits } from '@ethersproject/units';
 
 const AcyPoolComponent = props => {
 
@@ -42,7 +42,6 @@ const AcyPoolComponent = props => {
   const { account, active, library } = useWeb3React()
   const connectWalletByLocalStorage = useConnectWallet()
   const [selectedToken, setSelectedToken] = useState()
-  const [whitelistedTokens, setWhitelistedTokens] = useState([])
 
   ///////////// read contract /////////////
 
@@ -75,6 +74,15 @@ const AcyPoolComponent = props => {
     fetcher: fetcher(library, Reader)
   })
 
+  const whitelistedTokens = useMemo(() => {
+    if (!tokenInfo) return []
+
+    const filtered = tokenInfo?.map(token => {
+      return { symbol: token.symbol, address: token.token, balance: token.balance, price: token.price, decimals: 18 }
+    })
+    return filtered
+  }, [tokenInfo])
+
   useEffect(() => {
     if (active) {
       library.on('block', () => {
@@ -100,17 +108,27 @@ const AcyPoolComponent = props => {
   ])
 
   ///////////// for UI /////////////
-
+  const [anchorOnToken0, setAnchorOnToken0] = useState(true)
+  const [mode, setMode] = useState('Buy ALP') // used by ComponentTab
   const [isBuying, setIsBuying] = useState(true)
-  const [mode, setMode] = useState("Buy ALP")
-  const [selectedTokenValue, setSelectedTokenValue] = useState(0)
-  const [selectedTokenAmount, setSelectedTokenAmount] = useState(parseValue(selectedTokenValue, selectedToken?.decimals))
+  const [selectedTokenValue, setSelectedTokenValue] = useState('0')
+  const selectedTokenAmount = useMemo(() => {
+    if (selectedTokenValue && selectedToken) {
+      console.log("selectedToken true")
+      return parseUnits(selectedTokenValue, selectedToken.decimals)
+    }
+    console.log("selectedToken false")
+    return bigNumberify(0);
+  }, [selectedTokenValue, selectedToken])
   const [alpValue, setAlpValue] = useState('0')
-  const [alpAmount, setAlpAmount] = useState(bigNumberify(0))
+  const alpAmount = useMemo(() => {
+    if (alpValue)
+      return parseUnits(alpValue, ALP_DECIMALS)
+    return bigNumberify(0)
+  }, [alpValue])
   const [feeBasisPoints, setFeeBasisPoints] = useState("")
   const [payBalance, setPayBalance] = useState('$0.00');
   const [receiveBalance, setReceiveBalance] = useState('$0.00');
-  const [anchorOnSwapAmount, setAnchorOnSwapAmount] = useState(true)
   const [isApproving, setIsApproving] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isWaitingForApproval, setIsWaitingForApproval] = useState(false)
@@ -120,22 +138,23 @@ const AcyPoolComponent = props => {
   const [slippageError, setSlippageError] = useState('')
   const [deadline, setDeadline] = useState()
 
-  const needApproval = isBuying ?
+  const needApproval = isBuying
+  ?
     selectedToken?.address != ethers.constants.AddressZero &&
     tokenAllowance &&
     selectedTokenAmount &&
-    selectedTokenAmount.gt(tokenAllowance)
-    : alpAllowance &&
+    selectedTokenAmount?.gt(tokenAllowance)
+  : alpAllowance &&
     alpAmount &&
     alpAmount.gt(alpAllowance)
 
-  const alpPrice = poolInfo ? poolInfo.totalSupply.gt(0) ? parseInt(poolInfo.liquidity) / parseInt(poolInfo.totalSupply) : 1 : 0
-  const alpSupplyUsd = alpSupply ? alpSupply.mul(parseValue(alpPrice, ALP_DECIMALS)) : bigNumberify(0)
-  const alpBalanceUsd = alpBalance ? alpBalance.mul(parseValue(alpPrice, ALP_DECIMALS)) : bigNumberify(0)
-  const selectedTokenPrice = selectedToken?.price
-  const selectedTokenBalance = selectedToken?.balance
-  const amountUsd = selectedTokenPrice?.mul(selectedTokenAmount)
-  const minTradeVolume = formatAmount(symbolsData?.find(item => item.symbol?.toLowerCase() == props.selectedSymbol?.toLowerCase()).minTradeVolume, 18)
+  const alpPrice = poolInfo ? poolInfo.totalSupply.gt(0) ? poolInfo.liquidity.div(poolInfo.totalSupply) : bigNumberify(1) : bigNumberify(0)
+  const alpSupplyUsd = alpSupply ? alpSupply.mul(alpPrice) : bigNumberify(0)
+  const alpBalanceUsd = alpBalance ? alpBalance.mul(alpPrice) : bigNumberify(0)
+  const selectedTokenPrice = selectedToken?.price || bigNumberify(0)
+  const selectedTokenBalance = selectedToken?.balance || bigNumberify(0)
+  console.log("debug amountUsd: ", selectedTokenPrice, selectedTokenAmount)
+  const amountUsd = selectedTokenPrice.mul(selectedTokenAmount) || bigNumberify(0)
 
   let feePercentageText = formatAmount(feeBasisPoints, 2, 2, true, "-")
   if (feeBasisPoints !== undefined && feeBasisPoints.toString().length > 0) {
@@ -145,68 +164,55 @@ const AcyPoolComponent = props => {
   const onModeChange = (opt) => {
     if (opt === "Sell ALP") {
       setIsBuying(false)
-      setMode("Sell ALP")
     } else {
       setIsBuying(true)
-      setMode("Buy ALP")
     }
   }
 
+  // token 0 value change
   const onTokenValueChange = (e) => {
-    let inputString = e.target.value
-    if (inputString === "") {
-      setSelectedTokenValue("0")
-    }
-    else if (inputString[0] === "0" && inputString[1] === "0" && inputString[2] === ".") {
-      setSelectedTokenValue(inputString.substring(1))
-    }
-    else {
-      setSelectedTokenValue(inputString)
-    }
+    // setSelectedTokenValue(Math.floor(e.target.value / minTradeVolume) * minTradeVolume)
+    setSelectedTokenValue(e.target.value)
     setShowDescription(true)
-    setAnchorOnSwapAmount(true)
-    setShowDescription(true)
-    if (e.target.value === "") {
-      setSelectedTokenValue("0")
-    }
-    else if (e.target.value % minTradeVolume == 0) {
-      setSelectedTokenValue(e.target.value)
-    }
-    else {
-      setSelectedTokenValue(Math.floor(e.target.value / minTradeVolume) * minTradeVolume)
-    }
   }
+  // effect that calculate corresponding alp output
+  useEffect(() => {
+    // TODO
+    if (!alpPrice.isZero() && amountUsd) {
+      const estimatedAlpOutput = amountUsd.div(alpPrice)
+            .mul(BASIS_POINTS_DIVISOR).div(BASIS_POINTS_DIVISOR - MINT_BURN_FEE_BASIS_POINTS)
+      const c = selectedTokenAmount.mul(2)
+      setAlpValue(formatUnits(estimatedAlpOutput, ALP_DECIMALS).toString())
 
+    }
+  }, [selectedTokenValue])
+  // token 1 value change
   const onAlpValueChange = (e) => {
-    setAnchorOnSwapAmount(false)
+    setAlpValue(e.target.value)
     setShowDescription(true)
-    if (e.target.value === "") {
-      setAlpValue("0")
-    }
-    else if (e.target.value[0] === "0") {
-      let num = parseFloat(e.target.value)
-      setAlpValue(num.toString())
-    }
-    else {
-      setAlpValue(e.target.value)
-    }
   }
+  // effect that calculate corresponding selectedToken output
+  useEffect(() => {
+    // TODO
+  }, [alpValue])
+  
 
   const onSelectToken = (symbol) => {
     setSelectedToken(whitelistedTokens.filter(token => token.symbol == symbol)[0])
     setIsWaitingForApproval(false)
   }
 
+  // TODO:
   const getError = () => {
-    if (!selectedTokenAmount || selectedTokenAmount.eq(0)) { return ["Enter an amount"] }
-    if (!alpAmount || alpAmount.eq(0)) { return ["Enter an amount"] }
+    if (!selectedTokenValue) { return ["Enter an amount"] }
+    if (!alpAmount) { return ["Enter an amount"] }
 
     if (isBuying) {
       if (selectedTokenBalance && selectedTokenAmount && selectedTokenAmount.gt(selectedTokenBalance)) {
         return [`Insufficient ${selectedToken?.symbol} balance`]
       }
     } else {
-      if (poolInfo && poolInfo.totalSupply && alpAmount && alpAmount.gt(poolInfo.totalSupply)) {
+      if (alpBalance && alpAmount && alpAmount.gt(alpBalance)) {
         return [`Insufficient ALP balance`]
       }
       if (poolInfo && selectedTokenAmount && selectedTokenAmount.gt(poolInfo.liquidity)) {
@@ -238,30 +244,19 @@ const AcyPoolComponent = props => {
     return isBuying ? "Buy ALP" : "Sell ALP"
   }
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
 
   useEffect(() => {
-    let tokens = []
-    tokenInfo?.map(token => {
-      tokens.push({ symbol: token.symbol, address: token.token, balance: token.balance, price: token.price, decimals: 18 })
-    })
-    setWhitelistedTokens(tokens)
-    setSelectedToken(whitelistedTokens[0])
-  }, [tokenInfo])
+    if (whitelistedTokens.length) {
+      setSelectedToken(whitelistedTokens[0])
+      console.log("selected token: ", whitelistedTokens[0])
+    }
+
+  }, [whitelistedTokens])
 
   useEffect(() => {
     setShowDescription(false)
   }, [chainId])
 
-  useEffect(() => {
-    setSelectedTokenAmount(parseValue(selectedTokenValue, selectedToken?.decimals))
-  }, [selectedTokenValue])
-
-  useEffect(() => {
-    setAlpAmount(parseValue(alpValue, ALP_DECIMALS))
-  }, [alpValue])
 
   useEffect(() => {
     setIsSubmitting(false)
@@ -273,98 +268,13 @@ const AcyPoolComponent = props => {
     }
   }, [selectedToken, selectedTokenAmount, needApproval])
 
-  useEffect(() => {
-    if (selectedTokenValue == 0) {
-      setPayBalance(`-`)
-    }
-    if (alpValue == '0') {
-      setReceiveBalance(`-`)
-    }
-    if (selectedTokenPrice && selectedTokenValue && alpPrice && alpValue) {
-      let swapBigValue = parseValue(selectedTokenValue, selectedToken?.decimals)
-      let alpBigPrice = parseValue(alpPrice, ALP_DECIMALS)
-      let alpBigValue = parseValue(alpValue, ALP_DECIMALS)
-      let pay = selectedTokenPrice.mul(swapBigValue)
-      let receive = alpBigPrice.mul(alpBigValue)
-      setPayBalance(`$${formatAmount(pay, selectedToken?.decimals * 2, 2, true)}`)
-      setReceiveBalance(`$${formatAmount(receive, ALP_DECIMALS * 2, 2, true)}`)
-    }
-  }, [selectedToken, selectedTokenValue, alpValue])
-
-  useEffect(() => {
-    if (anchorOnSwapAmount) {
-      if (!selectedTokenAmount) {
-        setAlpValue('0')
-        setFeeBasisPoints("")
-        return
-      }
-      if (isBuying) {
-
-        let nextAmount = alpPrice && amountUsd?.div(parseValue(alpPrice, ALP_DECIMALS))
-          .mul(BASIS_POINTS_DIVISOR).div(BASIS_POINTS_DIVISOR - MINT_BURN_FEE_BASIS_POINTS)
-
-        let nextValue = formatAmountFree(nextAmount, ALP_DECIMALS, ALP_DECIMALS)
-        nextValue = nextValue > 1000 ? Math.round(nextValue * LONGDIGIT) / LONGDIGIT : Math.round(nextValue * SHORTDIGIT) / SHORTDIGIT
-
-        setAlpValue(nextValue.toString())
-        setFeeBasisPoints(MINT_BURN_FEE_BASIS_POINTS)
-      } else {
-        let nextAmount = alpPrice && amountUsd?.div(parseValue(alpPrice, ALP_DECIMALS))
-          .mul(expandDecimals(1, selectedToken?.decimals)).div(expandDecimals(1, ALP_DECIMALS))
-          .mul(BASIS_POINTS_DIVISOR).div(BASIS_POINTS_DIVISOR - BURN_FEE_BASIS_POINTS)
-
-        let nextValue = formatAmountFree(nextAmount, ALP_DECIMALS, ALP_DECIMALS)
-        nextValue = nextValue > 1000 ? Math.round(nextValue * LONGDIGIT) / LONGDIGIT : Math.round(nextValue * SHORTDIGIT) / SHORTDIGIT
-
-        setAlpValue(nextValue.toString())
-        setFeeBasisPoints(BURN_FEE_BASIS_POINTS)
-      }
-      return
-    }
-
-    if (!alpAmount) {
-      setSelectedTokenValue("")
-      setFeeBasisPoints("")
-      return
-    }
-
-    if (selectedToken) {
-      if (isBuying) {
-        let nextAmount = alpAmount.mul(parseValue(alpPrice, ALP_DECIMALS)).div(selectedTokenPrice)
-          .mul(BASIS_POINTS_DIVISOR).div(BASIS_POINTS_DIVISOR - MINT_BURN_FEE_BASIS_POINTS)
-
-        let nextValue = formatAmountFree(nextAmount, selectedToken?.decimals, selectedToken?.decimals)
-        nextValue = nextValue > 1000 ? Math.round(nextValue * LONGDIGIT) / LONGDIGIT : Math.round(nextValue * SHORTDIGIT) / SHORTDIGIT
-
-        setSelectedTokenValue(nextValue)
-        setFeeBasisPoints(MINT_BURN_FEE_BASIS_POINTS)
-      } else {
-        let nextAmount = alpAmount.mul(parseValue(alpPrice, ALP_DECIMALS)).div(selectedTokenPrice)
-          .mul(expandDecimals(1, ALP_DECIMALS)).div(expandDecimals(1, selectedToken?.decimals))
-          .mul(BASIS_POINTS_DIVISOR).div(BASIS_POINTS_DIVISOR - BURN_FEE_BASIS_POINTS)
-
-        let nextValue = formatAmountFree(nextAmount, selectedToken?.decimals, selectedToken?.decimals)
-        nextValue = nextValue > 1000 ? Math.round(nextValue * LONGDIGIT) / LONGDIGIT : Math.round(nextValue * SHORTDIGIT) / SHORTDIGIT
-
-        setSelectedTokenValue(nextValue)
-        setFeeBasisPoints(BURN_FEE_BASIS_POINTS)
-      }
-    }
-  }, [
-    isBuying,
-    selectedToken,
-    selectedTokenAmount,
-    selectedTokenPrice,
-    anchorOnSwapAmount,
-    alpAmount,
-    alpPrice,
-  ])
 
   ///////////// write contract /////////////
 
   const buyAlp = () => {
     setIsSubmitting(true)
-    const minLp = parseValue(alpPrice, ALP_DECIMALS)?.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000))
+    // TODO: incorrect minLp, missing volume term in the calculation
+    const minLp = alpPrice.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000))
     addLiquidity(chainId, library, routerAddress, Router, selectedToken, selectedTokenAmount, minLp, setIsSubmitting)
   }
 
@@ -380,8 +290,8 @@ const AcyPoolComponent = props => {
       return
     }
     if (needApproval) {
-      isBuying ? approveTokens(library, routerAddress, ERC20, selectedToken?.address, selectedTokenAmount, setIsWaitingForApproval, setIsApproving)
-        : approveTokens(library, routerAddress, Alp, alpAddress, alpAmount, setIsWaitingForApproval, setIsApproving)
+      isBuying ? approveTokens(chainId, library, routerAddress, ERC20, selectedToken?.address, selectedTokenAmount, setIsWaitingForApproval, setIsApproving)
+        : approveTokens(chainId, library, routerAddress, Alp, alpAddress, alpAmount, setIsWaitingForApproval, setIsApproving)
       return
     }
     const [, modal] = getError()
@@ -403,8 +313,8 @@ const AcyPoolComponent = props => {
           />
         </div>
 
-        {isBuying &&
-          <BuyInputSection
+        {isBuying
+          ? <BuyInputSection
             token={selectedToken}
             tokenlist={whitelistedTokens}
             topLeftLabel='Pay '
@@ -412,11 +322,12 @@ const AcyPoolComponent = props => {
             topRightLabel='Balance: '
             tokenBalance={`${formatAmount(selectedTokenBalance, selectedToken?.decimals, 4, true)}`}
             inputValue={selectedTokenValue}
-            onInputValueChange={onTokenValueChange}
+            onInputValueChange={(e) => {
+              onTokenValueChange(e.target.value)
+            }}
             onSelectToken={onSelectToken}
-          />}
-
-        {!isBuying &&
+          />
+          :
           <BuyInputSection
             token={selectedToken}
             tokenlist={whitelistedTokens}
@@ -427,23 +338,22 @@ const AcyPoolComponent = props => {
             inputValue={alpValue}
             onInputValueChange={onAlpValueChange}
             isLocked={!isBuying}
-          />}
+          />
+        }
 
-        {isBuying &&
-          <BuyInputSection
+        {isBuying
+          ? <BuyInputSection
             token={selectedToken}
             tokenlist={whitelistedTokens}
             topLeftLabel="Receive"
             balance={receiveBalance}
             topRightLabel='Balance: '
-            tokenBalance={`${formatAmount(selectedTokenBalance, ALP_DECIMALS, 4, true)}`}
+            tokenBalance={`${formatAmount(poolInfo?.totalSupply, ALP_DECIMALS, 4, true)}`}
             inputValue={alpValue}
             onInputValueChange={onAlpValueChange}
             isLocked={isBuying}
-          />}
-
-        {!isBuying &&
-          <BuyInputSection
+          />
+          : <BuyInputSection
             token={selectedToken}
             tokenlist={whitelistedTokens}
             topLeftLabel="Receive"
@@ -451,7 +361,7 @@ const AcyPoolComponent = props => {
             topRightLabel='Balance: '
             tokenBalance={`${formatAmount(selectedTokenBalance, selectedToken?.decimals, 4, true)}`}
             inputValue={selectedTokenValue}
-            onInputValueChange={onTokenValueChange}
+            onInputValueChange={e => { onTokenValueChange(e.target.value) }}
             onSelectToken={onSelectToken}
           />}
 

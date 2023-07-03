@@ -45,7 +45,7 @@ const Option = props => {
   })
 
   const symbolData = getSymbol(symbolsInfo)
-  const positionData = getPosition(rawPositionData, symbolData)
+  const positionData = getPosition(rawPositionData, symbolData, 'Options')
 
   useEffect(() => {
     if (active) {

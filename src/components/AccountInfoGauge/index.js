@@ -4,7 +4,7 @@ import ComponentButton from '../ComponentButton';
 import DepositWithdrawModal from './DepositWithdrawModal';
 import { getContract } from '@/constants/future_option_power.js';
 import useSWR from 'swr';
-import { PLACEHOLDER_ACCOUNT, fetcher } from '@/acy-dex-futures/utils';
+import { PLACEHOLDER_ACCOUNT, fetcher, formatAmount } from '@/acy-dex-futures/utils';
 import Reader from '@/abis/future-option-power/Reader.json'
 
 import styles from './styles.less';
@@ -18,13 +18,16 @@ const AccountInfoGauge = props => {
     account,
     active,
     symbol,
+    totalMargin,
+    usedMargin,
   } = props
 
   const [mode, setMode] = useState('')
   const [isConfirming, setIsConfirming] = useState(false)
+  const percentage = totalMargin && usedMargin ? (totalMargin-usedMargin)/totalMargin * 100 : 0
 
   const onClickDeposit = () => {
-    setMode('Deposit')  
+    setMode('Deposit')
     setIsConfirming(true)
   }
 
@@ -43,7 +46,7 @@ const AccountInfoGauge = props => {
   useEffect(() => {
     if (active) {
       library.on('block', () => {
-        updateTokenInfo(undefined, true)
+        updateTokenInfo()
       });
       return () => {
         library.removeAllListeners('block')
@@ -64,22 +67,22 @@ const AccountInfoGauge = props => {
           <div className={styles.statstitle}>Account Info</div>
           <div className={styles.statscontent}>
             <div className={styles.statsRow}>
-              Dynamic Effective Balance
+              Total Margin
             </div>
             <div className={styles.statsRow}>
-              ——
+              ${totalMargin}
             </div>
             <div className={styles.statsRow}>
               Margin Usage
             </div>
             <div className={styles.statsRow}>
-              ——
+              ${usedMargin}
             </div>
             <div className={styles.statsRow}>
               Available Margin
             </div>
             <div className={styles.statsRow}>
-              ——
+              ${totalMargin - usedMargin || '...'}
             </div>
           </div>
         </div>
@@ -87,7 +90,7 @@ const AccountInfoGauge = props => {
           <Gauge
             title=''
             autoFit={true}
-            percent={70}
+            percent={percentage}
             color='l(0) 0:#00ff00 1:#ff0000'
           />
         </div>

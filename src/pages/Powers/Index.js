@@ -8,13 +8,12 @@ import DerivativeComponent from '@/components/DerivativeComponent'
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { PositionTable } from '@/components/OptionComponent/TableComponent';
 import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract } from '@/constants/future_option_power.js';
-import { fetcher, getSymbol, getPosition } from '@/acy-dex-futures/utils';
 import { useWeb3React } from '@web3-react/core';
-import { BigNumber, ethers } from 'ethers'
-import useSWR from 'swr'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
 import Reader from '@/abis/future-option-power/Reader.json'
+import { getTokens, getContract } from '@/constants/future_option_power.js';
+import useSWR from 'swr'
+import { fetcher, getSymbol, getPosition } from '@/acy-dex-futures/utils';
 
 import styles from './styles.less'
 
@@ -45,7 +44,7 @@ const Powers = props => {
   })
 
   const symbolData = getSymbol(symbolsInfo)
-  const positionData = getPosition(rawPositionData, symbolData)
+  const positionData = getPosition(rawPositionData, symbolData, 'Powers')
 
   useEffect(() => {
     if (active) {

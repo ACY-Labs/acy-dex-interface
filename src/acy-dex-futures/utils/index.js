@@ -8,7 +8,7 @@ import Token from "@/acy-dex-futures/abis/Token.json";
 import OrderBook from "@/acy-dex-futures/abis/OrderBook";
 import OrderBookReader from "@/acy-dex-futures/abis/OrderBookReader";
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
-import { InjectedConnector, UserRejectedRequestError as UserRejectedRequestErrorInjected} from "@web3-react/injected-connector";
+import { InjectedConnector, UserRejectedRequestError as UserRejectedRequestErrorInjected } from "@web3-react/injected-connector";
 import { useRef, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import { notification } from 'antd';
@@ -19,7 +19,7 @@ import { constantInstance, useConstantLoader } from '@/constants';
 import { format as formatDateFn } from "date-fns";
 import { MINT_FEE_BASIS_POINTS } from './_Helpers';
 import { useGraph } from '@/pages/Stats/Perpetual/dataProvider';
-import { sortBy} from 'lodash'
+import { sortBy } from 'lodash'
 import { TOKEN_LIST } from '@/constants';
 import axios from 'axios';
 export const MARKET = 'Market';
@@ -67,7 +67,7 @@ export const MIN_PROFIT_TIME = 3 * 60 * 60; // 3 hours
 export const PROFIT_THRESHOLD_BASIS_POINTS = 120;
 export const DUST_BNB = "2000000000000000";
 export const CHART_PERIODS = {
-  "1m": 60, 
+  "1m": 60,
   "5m": 60 * 5,
   "15m": 60 * 15,
   "30m": 60 * 30,
@@ -145,9 +145,9 @@ export function useLocalStorageSerializeKey(key, value, opts) {
 }
 
 export function getSavedSlippageAmount(chainId) {
-  const [ savedSlippageAmount ] =
+  const [savedSlippageAmount] =
     useLocalStorageSerializeKey([chainId, SLIPPAGE_BPS_KEY], DEFAULT_SLIPPAGE_AMOUNT);
-    return savedSlippageAmount
+  return savedSlippageAmount
 }
 
 export function useLocalStorageByChainId(chainId, key, defaultValue) {
@@ -180,19 +180,19 @@ export function useLocalStorageByChainId(chainId, key, defaultValue) {
 }
 
 export function getExchangeRate(tokenAInfo, tokenBInfo, inverted) {
-    if (
-      !tokenAInfo ||
-      !tokenAInfo.minPrice ||
-      !tokenBInfo ||
-      !tokenBInfo.maxPrice
-    ) {
-      return;
-    }
-    if (inverted) {
-      return tokenAInfo.minPrice.mul(PRECISION).div(tokenBInfo.maxPrice);
-    }
-    return tokenBInfo.maxPrice.mul(PRECISION).div(tokenAInfo.minPrice);
+  if (
+    !tokenAInfo ||
+    !tokenAInfo.minPrice ||
+    !tokenBInfo ||
+    !tokenBInfo.maxPrice
+  ) {
+    return;
   }
+  if (inverted) {
+    return tokenAInfo.minPrice.mul(PRECISION).div(tokenBInfo.maxPrice);
+  }
+  return tokenBInfo.maxPrice.mul(PRECISION).div(tokenAInfo.minPrice);
+}
 
 export function adjustForDecimals(amount, divDecimals, mulDecimals) {
   return amount
@@ -361,7 +361,7 @@ export function getFeeBasisPoints(
   const taxBps = taxBasisPoints.mul(averageDiff).div(targetAmount);
   return feeBasisPoints.add(taxBps).toNumber();
 }
-const mulNum = 10**12;
+const mulNum = 10 ** 12;
 
 export function getBuyGlpToAmount(
   fromAmount,
@@ -545,12 +545,12 @@ export const getInjectedHandler = activate => {
 
 //getTokenInfo helps find full info for a token from an array
 export const getTokenInfo = (infoTokens, tokenAddress, replaceNative, nativeTokenAddress) => {
-    if (replaceNative && tokenAddress === nativeTokenAddress) {
-        return infoTokens[AddressZero]
-    }
-    return infoTokens[tokenAddress]
+  if (replaceNative && tokenAddress === nativeTokenAddress) {
+    return infoTokens[AddressZero]
+  }
+  return infoTokens[tokenAddress]
 }
-export const  getTokenfromAddress = (tokenlist, tokenAddr) => {
+export const getTokenfromAddress = (tokenlist, tokenAddr) => {
   for (let i = 0; i < tokenlist.length; i++) {
     if (tokenlist[i].address === tokenAddr) {
       return tokenlist[i]
@@ -560,94 +560,94 @@ export const  getTokenfromAddress = (tokenlist, tokenAddr) => {
 }
 
 export function getDeltaStr({ delta, deltaPercentage, hasProfit }) {
-    let deltaStr
-    let deltaPercentageStr
+  let deltaStr
+  let deltaPercentageStr
 
-    if (delta.gt(0)) {
-        deltaStr = hasProfit ? "+" : "-"
-        deltaPercentageStr = hasProfit ? "+" : "-"
-    } else {
-        deltaStr = "";
-        deltaPercentageStr = "";
-    }
-    deltaStr += `$${formatAmount(delta, USD_DECIMALS, 2, true)}`
-    deltaPercentageStr += `${formatAmount(deltaPercentage, 2, 2)}%`
+  if (delta.gt(0)) {
+    deltaStr = hasProfit ? "+" : "-"
+    deltaPercentageStr = hasProfit ? "+" : "-"
+  } else {
+    deltaStr = "";
+    deltaPercentageStr = "";
+  }
+  deltaStr += `$${formatAmount(delta, USD_DECIMALS, 2, true)}`
+  deltaPercentageStr += `${formatAmount(deltaPercentage, 2, 2)}%`
 
-    return { deltaStr, deltaPercentageStr }
+  return { deltaStr, deltaPercentageStr }
 }
 
 export function getPositionKey(collateralTokenAddress, indexTokenAddress, isLong, nativeTokenAddress) {
-    const tokenAddress0 = collateralTokenAddress === AddressZero ? nativeTokenAddress : collateralTokenAddress
-    const tokenAddress1 = indexTokenAddress === AddressZero ? nativeTokenAddress : indexTokenAddress
-    return tokenAddress0 + ":" + tokenAddress1 + ":" + isLong
+  const tokenAddress0 = collateralTokenAddress === AddressZero ? nativeTokenAddress : collateralTokenAddress
+  const tokenAddress1 = indexTokenAddress === AddressZero ? nativeTokenAddress : indexTokenAddress
+  return tokenAddress0 + ":" + tokenAddress1 + ":" + isLong
 }
 
 export function getInfoTokens(tokens, tokenBalances, whitelistedTokens, vaultTokenInfo, fundingRateInfo, vaultPropsLength) {
 
-    if (!vaultPropsLength) {
-        vaultPropsLength = 12
+  if (!vaultPropsLength) {
+    vaultPropsLength = 12
+  }
+  const fundingRatePropsLength = 2
+  const infoTokens = {}
+
+  // token = {
+  //   address,
+  //   balance,
+  //   minPrice,
+  //   maxPrice
+  // }
+  for (let i = 0; i < tokens.length; i++) {
+    const token = JSON.parse(JSON.stringify(tokens[i]))
+    tokens[i].address = tokens[i].address.toLowerCase()
+    token.address = token.address.toLowerCase()
+    if (tokenBalances) {
+      token.balance = tokenBalances[i]
     }
-    const fundingRatePropsLength = 2
-    const infoTokens = {}
-
-    // token = {
-    //   address,
-    //   balance,
-    //   minPrice,
-    //   maxPrice
-    // }
-    for (let i = 0; i < tokens.length; i++) {
-      const token = JSON.parse(JSON.stringify(tokens[i]))
-      tokens[i].address = tokens[i].address.toLowerCase()
-      token.address = token.address.toLowerCase()
-        if (tokenBalances) {
-            token.balance = tokenBalances[i]
-        }
-        if (token.address === USDG_ADDRESS) {
-            token.minPrice = expandDecimals(1, USD_DECIMALS)
-            token.maxPrice = expandDecimals(1, USD_DECIMALS)
-        }
-        infoTokens[token.address.toLowerCase()] = token
+    if (token.address === USDG_ADDRESS) {
+      token.minPrice = expandDecimals(1, USD_DECIMALS)
+      token.maxPrice = expandDecimals(1, USD_DECIMALS)
     }
-    
-    for (let i = 0; i < whitelistedTokens.length; i++) {
-        const token = JSON.parse(JSON.stringify(whitelistedTokens[i]))
+    infoTokens[token.address.toLowerCase()] = token
+  }
 
-        if (vaultTokenInfo) {
-            token.poolAmount = vaultTokenInfo[i * vaultPropsLength];
-            token.reservedAmount = vaultTokenInfo[i * vaultPropsLength + 1];
-            token.availableAmount = token.poolAmount.sub(token.reservedAmount);
-            token.usdgAmount = vaultTokenInfo[i * vaultPropsLength + 2];
-            token.redemptionAmount = vaultTokenInfo[i * vaultPropsLength + 3];
-            token.weight = vaultTokenInfo[i * vaultPropsLength + 4];
-            token.bufferAmount = 0;
-            token.maxUsdgAmount = 0;
-            token.globalShortSize = 0;
-            token.maxGlobalShortSize = 0;
-            token.minPrice = vaultTokenInfo[i * vaultPropsLength + 7];
-            token.maxPrice = vaultTokenInfo[i * vaultPropsLength + 8];
-            token.guaranteedUsd = 0;
+  for (let i = 0; i < whitelistedTokens.length; i++) {
+    const token = JSON.parse(JSON.stringify(whitelistedTokens[i]))
 
-            token.availableUsd = token.availableAmount.mul(token.minPrice).div(expandDecimals(1, token.decimals))
+    if (vaultTokenInfo) {
+      token.poolAmount = vaultTokenInfo[i * vaultPropsLength];
+      token.reservedAmount = vaultTokenInfo[i * vaultPropsLength + 1];
+      token.availableAmount = token.poolAmount.sub(token.reservedAmount);
+      token.usdgAmount = vaultTokenInfo[i * vaultPropsLength + 2];
+      token.redemptionAmount = vaultTokenInfo[i * vaultPropsLength + 3];
+      token.weight = vaultTokenInfo[i * vaultPropsLength + 4];
+      token.bufferAmount = 0;
+      token.maxUsdgAmount = 0;
+      token.globalShortSize = 0;
+      token.maxGlobalShortSize = 0;
+      token.minPrice = vaultTokenInfo[i * vaultPropsLength + 7];
+      token.maxPrice = vaultTokenInfo[i * vaultPropsLength + 8];
+      token.guaranteedUsd = 0;
 
-            token.managedUsd = token.availableUsd.add(token.guaranteedUsd)
-            token.managedAmount = token.managedUsd.mul(expandDecimals(1, token.decimals)).div(token.minPrice)
-        }
+      token.availableUsd = token.availableAmount.mul(token.minPrice).div(expandDecimals(1, token.decimals))
 
-        if (fundingRateInfo) {
-            token.fundingRate = fundingRateInfo[i * fundingRatePropsLength];
-            token.cumulativeFundingRate = fundingRateInfo[i * fundingRatePropsLength + 1];
-        }
-
-        if (infoTokens[token.address]) {
-            token.balance = infoTokens[token.address].balance
-        }
-
-        infoTokens[token.address] = token
+      token.managedUsd = token.availableUsd.add(token.guaranteedUsd)
+      token.managedAmount = token.managedUsd.mul(expandDecimals(1, token.decimals)).div(token.minPrice)
     }
 
+    if (fundingRateInfo) {
+      token.fundingRate = fundingRateInfo[i * fundingRatePropsLength];
+      token.cumulativeFundingRate = fundingRateInfo[i * fundingRatePropsLength + 1];
+    }
 
-    return infoTokens
+    if (infoTokens[token.address]) {
+      token.balance = infoTokens[token.address].balance
+    }
+
+    infoTokens[token.address] = token
+  }
+
+
+  return infoTokens
 }
 
 // TODO need update to fetch data from subgraph
@@ -656,7 +656,7 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
   const active = true; // this is used in Actions.js so set active to always be true
   const account = overrideAccount || connectedAccount;
 
-  const {chainId} = useConstantLoader();
+  const { chainId } = useConstantLoader();
   const shouldRequest = active && account && flagOrdersEnabled;
 
   const orderBookAddress = getContract(chainId, "OrderBook");
@@ -679,7 +679,7 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
           fetchLastIndex("increase"),
           fetchLastIndex("decrease"),
         ]);
-        
+
         return { swap, increase, decrease };
       };
 
@@ -707,15 +707,15 @@ export function useAccountOrders(flagOrdersEnabled, overrideAccount) {
           getOrders("getIncreaseOrders", lastIndexes.increase, parseIncreaseOrdersData),
           getOrders("getDecreaseOrders", lastIndexes.decrease, parseDecreaseOrdersData),
         ]);
-        
+
         return [...swapOrders, ...increaseOrders, ...decreaseOrders];
       } catch (ex) {
         console.error(ex);
       }
     },
   });
-  
-  
+
+
 
   return [orders, updateOrders];
 
@@ -862,13 +862,17 @@ export function getProvider(library, chainId) {
     return library.getSigner();
   }
   let provider = _.sample(RPC_PROVIDERS[chainId])
-  return new ethers.providers.StaticJsonRpcProvider(provider, {chainId})
+  return new ethers.providers.StaticJsonRpcProvider(provider, { chainId })
 }
 
 export function getOrderKey(order) {
   return `${order.type}-${order.account}-${order.index}`;
 }
 
+// example call:
+// const { data, mutate } = useSWR([chainId, contractAddr, "methodName", ...params], {
+//   fetcher: fetcher(library, abiJson)
+// });
 export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   // eslint-disable-next-line
   const [chainId, arg0, arg1, ...params] = args
@@ -895,7 +899,7 @@ export const fetcher = (library, contractInfo, additionalArgs) => (...args) => {
   if (!library) {
     return
   }
-  return library[method](arg1,...params).catch(onError);;
+  return library[method](arg1, ...params).catch(onError);;
 }
 
 export function getExplorerUrl(chainId) {
@@ -938,77 +942,77 @@ export async function getGasPrice(provider, chainId) {
 }
 
 export async function getGasLimit(contract, method, params = [], value, gasBuffer) {
-    const defaultGasBuffer = 200000;
-    const defaultValue = bigNumberify(0);
+  const defaultGasBuffer = 200000;
+  const defaultValue = bigNumberify(0);
 
-    if (!value) {
-        value = defaultValue;
-    }
+  if (!value) {
+    value = defaultValue;
+  }
 
-    let gasLimit = await contract.estimateGas[method](...params, { value });
+  let gasLimit = await contract.estimateGas[method](...params, { value });
 
-    if (!gasBuffer) {
-        gasBuffer = defaultGasBuffer;
-    }
+  if (!gasBuffer) {
+    gasBuffer = defaultGasBuffer;
+  }
 
-    return gasLimit.add(gasBuffer);
+  return gasLimit.add(gasBuffer);
 }
 export function bigNumberify(n) {
-    return BigNumber.from(n);
+  return BigNumber.from(n);
 }
 
 export const limitDecimals = (amount, maxDecimals) => {
-    let amountStr = amount.toString()
-    if (maxDecimals === undefined) {
-        return amountStr
-    }
-    if (maxDecimals === 0) {
-        return amountStr.split(".")[0]
-    }
-    const dotIndex = amountStr.indexOf(".")
-    if (dotIndex !== -1) {
-        let decimals = amountStr.length - dotIndex - 1
-        if (decimals > maxDecimals) {
-            amountStr = amountStr.substr(0, amountStr.length - (decimals - maxDecimals))
-        }
-    }
-    return amountStr
-}
-export const padDecimals = (amount, minDecimals) => {
-    let amountStr = amount.toString()
-    const dotIndex = amountStr.indexOf(".")
-    if (dotIndex !== -1) {
-        const decimals = amountStr.length - dotIndex - 1
-        if (decimals < minDecimals) {
-            amountStr = amountStr.padEnd(amountStr.length + (minDecimals - decimals), "0")
-        }
-    } else {
-        amountStr = amountStr + ".0000"
-    }
+  let amountStr = amount.toString()
+  if (maxDecimals === undefined) {
     return amountStr
   }
+  if (maxDecimals === 0) {
+    return amountStr.split(".")[0]
+  }
+  const dotIndex = amountStr.indexOf(".")
+  if (dotIndex !== -1) {
+    let decimals = amountStr.length - dotIndex - 1
+    if (decimals > maxDecimals) {
+      amountStr = amountStr.substr(0, amountStr.length - (decimals - maxDecimals))
+    }
+  }
+  return amountStr
+}
+export const padDecimals = (amount, minDecimals) => {
+  let amountStr = amount.toString()
+  const dotIndex = amountStr.indexOf(".")
+  if (dotIndex !== -1) {
+    const decimals = amountStr.length - dotIndex - 1
+    if (decimals < minDecimals) {
+      amountStr = amountStr.padEnd(amountStr.length + (minDecimals - decimals), "0")
+    }
+  } else {
+    amountStr = amountStr + ".0000"
+  }
+  return amountStr
+}
 export const formatAmount = (amount, tokenDecimals, displayDecimals, useCommas, defaultValue) => {
 
   if (!defaultValue) {
-      defaultValue = "..."
+    defaultValue = "..."
   }
 
   if (amount === undefined || amount.toString().length === 0) {
-      return defaultValue
+    return defaultValue
   }
 
   if (displayDecimals === undefined) {
-      displayDecimals = 4
+    displayDecimals = 4
   }
   let amountStr = ethers.utils.formatUnits(amount, tokenDecimals)
   amountStr = limitDecimals(amountStr, displayDecimals)
 
   if (displayDecimals !== 0) {
-      amountStr = padDecimals(amountStr, displayDecimals)
+    amountStr = padDecimals(amountStr, displayDecimals)
   }
 
   if (useCommas) {
-      return numberWithCommas(amountStr)
+    return numberWithCommas(amountStr)
   }
 
   return amountStr
@@ -1016,270 +1020,270 @@ export const formatAmount = (amount, tokenDecimals, displayDecimals, useCommas, 
 
 
 export function numberWithCommas(x) {
-    if (!x) { return "..." }
-    var parts = x.toString().split(".");
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return parts.join(".");
+  if (!x) { return "..." }
+  var parts = x.toString().split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return parts.join(".");
 }
 
 
 export function expandDecimals(n, decimals) {
-    return bigNumberify(n).mul(bigNumberify(10).pow(decimals))
+  return bigNumberify(n).mul(bigNumberify(10).pow(decimals))
 }
 export function getLiquidationPriceFromDelta({ liquidationAmount, size, collateral, averagePrice, isLong }) {
-    if (!size || size.eq(0)) { return }
+  if (!size || size.eq(0)) { return }
 
-    if (liquidationAmount.gt(collateral)) {
-        const liquidationDelta = liquidationAmount.sub(collateral)
-        const priceDelta = liquidationDelta.mul(averagePrice).div(size)
-        return !isLong ? averagePrice.sub(priceDelta) : averagePrice.add(priceDelta)
-    }
-
-    const liquidationDelta = collateral.sub(liquidationAmount)
+  if (liquidationAmount.gt(collateral)) {
+    const liquidationDelta = liquidationAmount.sub(collateral)
     const priceDelta = liquidationDelta.mul(averagePrice).div(size)
+    return !isLong ? averagePrice.sub(priceDelta) : averagePrice.add(priceDelta)
+  }
 
-    return isLong ? averagePrice.sub(priceDelta) : averagePrice.add(priceDelta)
+  const liquidationDelta = collateral.sub(liquidationAmount)
+  const priceDelta = liquidationDelta.mul(averagePrice).div(size)
+
+  return isLong ? averagePrice.sub(priceDelta) : averagePrice.add(priceDelta)
 }
 //fee of holding a position
 export function getPositionFee(size) {
-    if (!size) {
-        return bigNumberify(0);
-    }
-    let myBigNumber = BigNumber.from('0xfbedfa25a3259ab347f7400000');
-    const afterFeeUsd = size.mul(BASIS_POINTS_DIVISOR - MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR)
-    return size.sub(afterFeeUsd)
+  if (!size) {
+    return bigNumberify(0);
+  }
+  let myBigNumber = BigNumber.from('0xfbedfa25a3259ab347f7400000');
+  const afterFeeUsd = size.mul(BASIS_POINTS_DIVISOR - MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR)
+  return size.sub(afterFeeUsd)
 }
 export const parseValue = (value, tokenDecimals) => {
-    const pValue = parseFloat(value)
-    if (isNaN(pValue)) {
-        return undefined
-    }
-    value = limitDecimals(value, tokenDecimals)
-    const amount = ethers.utils.parseUnits(value, tokenDecimals)
-    return bigNumberify(amount)
+  const pValue = parseFloat(value)
+  if (isNaN(pValue)) {
+    return undefined
+  }
+  value = limitDecimals(value, tokenDecimals)
+  const amount = ethers.utils.parseUnits(value, tokenDecimals)
+  return bigNumberify(amount)
 }
 //deposits only act on collateral
 function getNewPositionInfo(position, collateralDelta, method, keepLeverage) {
 
-    if (!collateralDelta) return {};
+  if (!collateralDelta) return {};
 
-    if (collateralDelta <= 0) return {};
+  if (collateralDelta <= 0) return {};
 
-    if (method == 'Close') {
+  if (method == 'Close') {
 
-        const sizeDelta = collateralDelta;
-
-        let newLiqPrice = getLiquidationPrice({
-            isLong: position.isLong,
-            size: position.size,
-            sizeDelta,
-            collateral: position.collateral,
-            averagePrice: position.averagePrice,
-            entryFundingRate: position.entryFundingRate,
-            cumulativeFundingRate: position.cumulativeFundingRate,
-            increaseCollateral: false
-        });
-
-        let newLeverage = getLeverage({
-            size: position.size,
-            sizeDelta,
-            collateral: position.collateral,
-            increaseCollateral: false,
-            entryFundingRate: position.entryFundingRate,
-            cumulativeFundingRate: position.cumulativeFundingRate,
-            hasProfit: position.hasProfit,
-            delta: position.delta,
-            includeDelta: false
-        });
-
-        let newSize = position.size.sub(sizeDelta);
-        let delta = sizeDelta.mul(position.collateral).div(position.size)
-        let newCollateral = position.collateral.sub(delta);
-        if (!keepLeverage) {
-
-            return {
-                'Size': `$${formatAmount(newSize, USD_DECIMALS, 2, null, true)}`,
-                'Leverage': `${formatAmount(newLeverage, 4, 2, null, true)}x`,
-                'Liq. Price': `$${formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)}`
-            }
-
-        }
-        return {
-            'Size': `$${formatAmount(newSize, USD_DECIMALS, 2, null, true)}`,
-            'Collateral': `$${formatAmount(newCollateral, USD_DECIMALS, 2, null, true)}`,
-            'Liq. Price': `$${formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)}`
-        }
-
-
-    }
+    const sizeDelta = collateralDelta;
 
     let newLiqPrice = getLiquidationPrice({
-        isLong: position.isLong,
-        size: position.size,
-        collateral: position.collateral,
-        averagePrice: position.averagePrice,
-        entryFundingRate: position.entryFundingRate,
-        cumulativeFundingRate: position.cumulativeFundingRate,
-        collateralDelta,
-        increaseCollateral: method == 'Deposit'
+      isLong: position.isLong,
+      size: position.size,
+      sizeDelta,
+      collateral: position.collateral,
+      averagePrice: position.averagePrice,
+      entryFundingRate: position.entryFundingRate,
+      cumulativeFundingRate: position.cumulativeFundingRate,
+      increaseCollateral: false
     });
 
     let newLeverage = getLeverage({
-        size: position.size,
-        collateral: position.collateral,
-        collateralDelta,
-        increaseCollateral: method == 'Deposit',
-        entryFundingRate: position.entryFundingRate,
-        cumulativeFundingRate: position.cumulativeFundingRate,
-        hasProfit: position.hasProfit,
-        delta: position.delta,
-        includeDelta: false
+      size: position.size,
+      sizeDelta,
+      collateral: position.collateral,
+      increaseCollateral: false,
+      entryFundingRate: position.entryFundingRate,
+      cumulativeFundingRate: position.cumulativeFundingRate,
+      hasProfit: position.hasProfit,
+      delta: position.delta,
+      includeDelta: false
     });
 
+    let newSize = position.size.sub(sizeDelta);
+    let delta = sizeDelta.mul(position.collateral).div(position.size)
+    let newCollateral = position.collateral.sub(delta);
+    if (!keepLeverage) {
 
-    let newCollateral = method == 'Deposit' ? position.collateral.add(collateralDelta) : position.collateral.sub(collateralDelta);
-
-    return {
-        'Collateral': `$${formatAmount(newCollateral, USD_DECIMALS, 2, null, true)}`,
+      return {
+        'Size': `$${formatAmount(newSize, USD_DECIMALS, 2, null, true)}`,
         'Leverage': `${formatAmount(newLeverage, 4, 2, null, true)}x`,
         'Liq. Price': `$${formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)}`
+      }
+
     }
+    return {
+      'Size': `$${formatAmount(newSize, USD_DECIMALS, 2, null, true)}`,
+      'Collateral': `$${formatAmount(newCollateral, USD_DECIMALS, 2, null, true)}`,
+      'Liq. Price': `$${formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)}`
+    }
+
+
+  }
+
+  let newLiqPrice = getLiquidationPrice({
+    isLong: position.isLong,
+    size: position.size,
+    collateral: position.collateral,
+    averagePrice: position.averagePrice,
+    entryFundingRate: position.entryFundingRate,
+    cumulativeFundingRate: position.cumulativeFundingRate,
+    collateralDelta,
+    increaseCollateral: method == 'Deposit'
+  });
+
+  let newLeverage = getLeverage({
+    size: position.size,
+    collateral: position.collateral,
+    collateralDelta,
+    increaseCollateral: method == 'Deposit',
+    entryFundingRate: position.entryFundingRate,
+    cumulativeFundingRate: position.cumulativeFundingRate,
+    hasProfit: position.hasProfit,
+    delta: position.delta,
+    includeDelta: false
+  });
+
+
+  let newCollateral = method == 'Deposit' ? position.collateral.add(collateralDelta) : position.collateral.sub(collateralDelta);
+
+  return {
+    'Collateral': `$${formatAmount(newCollateral, USD_DECIMALS, 2, null, true)}`,
+    'Leverage': `${formatAmount(newLeverage, 4, 2, null, true)}x`,
+    'Liq. Price': `$${formatAmount(newLiqPrice, USD_DECIMALS, 2, null, true)}`
+  }
 
 }
 
 
 // converts a current position into a new one according to the input ammount (USD)
 export function mapPositionData(position, mode, inputAmount, keepLeverage) {
-    switch (mode) {
-        case 'none':
-            return {
-                'Size':  `$${formatAmount(position.size, USD_DECIMALS, 2, null, true)}`,
-                'Collateral': `$${formatAmount(position.collateral, USD_DECIMALS, 2, null, true)}`,
-                'Leverage': `${formatAmount(position.leverage, 4, 2, null, true)}x`,
-                'Mark Price': `$${formatAmount(position.markPrice, USD_DECIMALS, 2, null, true)}`,
-                'Liq. Price': `$${formatAmount(position.liqPrice, USD_DECIMALS, 2, null, true)}`
-            }
-        case 'Deposit':
-            return getNewPositionInfo(position, inputAmount, 'Deposit');
-        case 'Withdraw':
-            return getNewPositionInfo(position, inputAmount, 'Withdraw');
-        case 'Close':
-            return getNewPositionInfo(position, inputAmount, 'Close', keepLeverage);
-    }
+  switch (mode) {
+    case 'none':
+      return {
+        'Size': `$${formatAmount(position.size, USD_DECIMALS, 2, null, true)}`,
+        'Collateral': `$${formatAmount(position.collateral, USD_DECIMALS, 2, null, true)}`,
+        'Leverage': `${formatAmount(position.leverage, 4, 2, null, true)}x`,
+        'Mark Price': `$${formatAmount(position.markPrice, USD_DECIMALS, 2, null, true)}`,
+        'Liq. Price': `$${formatAmount(position.liqPrice, USD_DECIMALS, 2, null, true)}`
+      }
+    case 'Deposit':
+      return getNewPositionInfo(position, inputAmount, 'Deposit');
+    case 'Withdraw':
+      return getNewPositionInfo(position, inputAmount, 'Withdraw');
+    case 'Close':
+      return getNewPositionInfo(position, inputAmount, 'Close', keepLeverage);
+  }
 }
 
 export function getLiquidationPrice(data) {
-    let { isLong, size, collateral, averagePrice, entryFundingRate, cumulativeFundingRate, sizeDelta, collateralDelta, increaseCollateral, increaseSize } = data
-    if (!size || !collateral || !averagePrice) { return }
+  let { isLong, size, collateral, averagePrice, entryFundingRate, cumulativeFundingRate, sizeDelta, collateralDelta, increaseCollateral, increaseSize } = data
+  if (!size || !collateral || !averagePrice) { return }
 
-    let nextSize = size ? size : bigNumberify(0)
-    let remainingCollateral = collateral
+  let nextSize = size ? size : bigNumberify(0)
+  let remainingCollateral = collateral
 
-    if (sizeDelta) {
-        if (increaseSize) {
-            nextSize = size.add(sizeDelta)
-        } else {
-            if (sizeDelta.gte(size)) {
-                return
-            }
-            nextSize = size.sub(sizeDelta)
-        }
-
-        const marginFee = getMarginFee(sizeDelta)
-        remainingCollateral = remainingCollateral.sub(marginFee)
+  if (sizeDelta) {
+    if (increaseSize) {
+      nextSize = size.add(sizeDelta)
+    } else {
+      if (sizeDelta.gte(size)) {
+        return
+      }
+      nextSize = size.sub(sizeDelta)
     }
 
-    if (collateralDelta) {
-        if (increaseCollateral) {
-            remainingCollateral = remainingCollateral.add(collateralDelta)
-        } else {
-            if (collateralDelta.gte(remainingCollateral)) {
-                return
-            }
-            remainingCollateral = remainingCollateral.sub(collateralDelta)
-        }
+    const marginFee = getMarginFee(sizeDelta)
+    remainingCollateral = remainingCollateral.sub(marginFee)
+  }
+
+  if (collateralDelta) {
+    if (increaseCollateral) {
+      remainingCollateral = remainingCollateral.add(collateralDelta)
+    } else {
+      if (collateralDelta.gte(remainingCollateral)) {
+        return
+      }
+      remainingCollateral = remainingCollateral.sub(collateralDelta)
     }
+  }
 
-    let positionFee = getPositionFee(size).add(LIQUIDATION_FEE)
-    if (entryFundingRate && cumulativeFundingRate) {
-        const fundingFee = size.mul(cumulativeFundingRate.sub(entryFundingRate)).div(FUNDING_RATE_PRECISION)
-        positionFee = positionFee.add(fundingFee)
-    }
+  let positionFee = getPositionFee(size).add(LIQUIDATION_FEE)
+  if (entryFundingRate && cumulativeFundingRate) {
+    const fundingFee = size.mul(cumulativeFundingRate.sub(entryFundingRate)).div(FUNDING_RATE_PRECISION)
+    positionFee = positionFee.add(fundingFee)
+  }
 
-    const liquidationPriceForFees = getLiquidationPriceFromDelta({
-        liquidationAmount: positionFee, size: nextSize, collateral: remainingCollateral, averagePrice, isLong
-    })
+  const liquidationPriceForFees = getLiquidationPriceFromDelta({
+    liquidationAmount: positionFee, size: nextSize, collateral: remainingCollateral, averagePrice, isLong
+  })
 
-    const liquidationPriceForMaxLeverage = getLiquidationPriceFromDelta({
-        liquidationAmount: nextSize.mul(BASIS_POINTS_DIVISOR).div(MAX_LEVERAGE), size: nextSize, collateral: remainingCollateral, averagePrice, isLong
-    })
+  const liquidationPriceForMaxLeverage = getLiquidationPriceFromDelta({
+    liquidationAmount: nextSize.mul(BASIS_POINTS_DIVISOR).div(MAX_LEVERAGE), size: nextSize, collateral: remainingCollateral, averagePrice, isLong
+  })
 
-    if (!liquidationPriceForFees) { return liquidationPriceForMaxLeverage }
-    if (!liquidationPriceForMaxLeverage) { return liquidationPriceForFees }
+  if (!liquidationPriceForFees) { return liquidationPriceForMaxLeverage }
+  if (!liquidationPriceForMaxLeverage) { return liquidationPriceForFees }
 
-    if (isLong) {
-        // return the higher price
-        return liquidationPriceForFees.gt(liquidationPriceForMaxLeverage) ? liquidationPriceForFees : liquidationPriceForMaxLeverage
-    }
+  if (isLong) {
+    // return the higher price
+    return liquidationPriceForFees.gt(liquidationPriceForMaxLeverage) ? liquidationPriceForFees : liquidationPriceForMaxLeverage
+  }
 
-    // return the lower price
-    return liquidationPriceForFees.lt(liquidationPriceForMaxLeverage) ? liquidationPriceForFees : liquidationPriceForMaxLeverage
+  // return the lower price
+  return liquidationPriceForFees.lt(liquidationPriceForMaxLeverage) ? liquidationPriceForFees : liquidationPriceForMaxLeverage
 }
 
 export function getLeverage({ size, sizeDelta, increaseSize, collateral, collateralDelta, increaseCollateral, entryFundingRate, cumulativeFundingRate, hasProfit, delta, includeDelta }) {
-    if (!size && !sizeDelta) { return }
-    if (!collateral && !collateralDelta) { return }
+  if (!size && !sizeDelta) { return }
+  if (!collateral && !collateralDelta) { return }
 
-    let nextSize = size ? size : bigNumberify(0)
-    if (sizeDelta) {
-        if (increaseSize) {
-            nextSize = size.add(sizeDelta)
-        } else {
-            if (sizeDelta.gte(size)) {
-                return
-            }
-            nextSize = size.sub(sizeDelta)
-        }
+  let nextSize = size ? size : bigNumberify(0)
+  if (sizeDelta) {
+    if (increaseSize) {
+      nextSize = size.add(sizeDelta)
+    } else {
+      if (sizeDelta.gte(size)) {
+        return
+      }
+      nextSize = size.sub(sizeDelta)
     }
+  }
 
-    let remainingCollateral = collateral ? collateral : bigNumberify(0)
-    if (collateralDelta) {
-        if (increaseCollateral) {
-            remainingCollateral = collateral.add(collateralDelta)
-        } else {
-            if (collateralDelta.gte(collateral)) {
-                return
-            }
-            remainingCollateral = collateral.sub(collateralDelta)
-        }
+  let remainingCollateral = collateral ? collateral : bigNumberify(0)
+  if (collateralDelta) {
+    if (increaseCollateral) {
+      remainingCollateral = collateral.add(collateralDelta)
+    } else {
+      if (collateralDelta.gte(collateral)) {
+        return
+      }
+      remainingCollateral = collateral.sub(collateralDelta)
     }
+  }
 
-    if (delta && includeDelta) {
-        if (hasProfit) {
-            remainingCollateral = remainingCollateral.add(delta)
-        } else {
-            if (delta.gt(remainingCollateral)) {
-                return
-            }
+  if (delta && includeDelta) {
+    if (hasProfit) {
+      remainingCollateral = remainingCollateral.add(delta)
+    } else {
+      if (delta.gt(remainingCollateral)) {
+        return
+      }
 
-            remainingCollateral = remainingCollateral.sub(delta)
-        }
+      remainingCollateral = remainingCollateral.sub(delta)
     }
+  }
 
-    if (remainingCollateral.eq(0)) { return }
+  if (remainingCollateral.eq(0)) { return }
 
-    remainingCollateral = sizeDelta ? remainingCollateral.mul(BASIS_POINTS_DIVISOR - MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR) : remainingCollateral
-    if (entryFundingRate && cumulativeFundingRate) {
-        const fundingFee = size.mul(cumulativeFundingRate.sub(entryFundingRate)).div(FUNDING_RATE_PRECISION)
-        remainingCollateral = remainingCollateral.sub(fundingFee)
-    }
+  remainingCollateral = sizeDelta ? remainingCollateral.mul(BASIS_POINTS_DIVISOR - MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR) : remainingCollateral
+  if (entryFundingRate && cumulativeFundingRate) {
+    const fundingFee = size.mul(cumulativeFundingRate.sub(entryFundingRate)).div(FUNDING_RATE_PRECISION)
+    remainingCollateral = remainingCollateral.sub(fundingFee)
+  }
 
-    return nextSize.mul(BASIS_POINTS_DIVISOR).div(remainingCollateral)
+  return nextSize.mul(BASIS_POINTS_DIVISOR).div(remainingCollateral)
 }
 
 export function getMarginFee(sizeDelta) {
   if (!sizeDelta) {
-      return bigNumberify(0);
+    return bigNumberify(0);
   }
   const afterFeeUsd = sizeDelta.mul(BASIS_POINTS_DIVISOR - MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR)
   return sizeDelta.sub(afterFeeUsd)
@@ -1307,586 +1311,586 @@ export function getServerBaseUrl(chainId) {
   return "https://gmx-server-mainnet.uw.r.appspot.com";
 }
 
-  const adjustForDecimalsFactory = n => number => {
-    if (n === 0) {
-      return number;
-    }
-    if (n > 0) {
-      return number.mul(expandDecimals(1, n));
-    }
-    return number.div(expandDecimals(1, -n));
-  };
-
-  export function getSwapFeeBasisPoints(isStable) {
-    return isStable ? STABLE_SWAP_FEE_BASIS_POINTS : SWAP_FEE_BASIS_POINTS;
+const adjustForDecimalsFactory = n => number => {
+  if (n === 0) {
+    return number;
   }
-
-  export function getMostAbundantStableToken(chainId, infoTokens) {
-    const tokens = constantInstance.perpetuals.tokenList;
-    const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
-    let availableAmount;
-    let stableToken = whitelistedTokens.find(t => t.isStable);
-    for (let i = 0; i < whitelistedTokens.length; i++) {
-      const info = getTokenInfo(infoTokens, whitelistedTokens[i].address);
-      if (!info.isStable || !info.availableAmount) {
-        continue;
-      }
-  
-      const adjustedAvailableAmount = adjustForDecimals(
-        info.availableAmount,
-        info.decimals,
-        USD_DECIMALS
-      );
-      if (!availableAmount || adjustedAvailableAmount.gt(availableAmount)) {
-        availableAmount = adjustedAvailableAmount;
-        stableToken = info;
-      }
-    }
-    return stableToken;
+  if (n > 0) {
+    return number.mul(expandDecimals(1, n));
   }
+  return number.div(expandDecimals(1, -n));
+};
 
-  export function getNextFromAmount(
-    chainId,
-    toAmount,
-    fromTokenAddress,
-    toTokenAddress,
-    infoTokens,
-    toTokenPriceUsd,
-    ratio,
-    usdgSupply,
-    totalTokenWeights
+export function getSwapFeeBasisPoints(isStable) {
+  return isStable ? STABLE_SWAP_FEE_BASIS_POINTS : SWAP_FEE_BASIS_POINTS;
+}
+
+export function getMostAbundantStableToken(chainId, infoTokens) {
+  const tokens = constantInstance.perpetuals.tokenList;
+  const whitelistedTokens = tokens.filter(t => t.symbol !== "USDG")
+  let availableAmount;
+  let stableToken = whitelistedTokens.find(t => t.isStable);
+  for (let i = 0; i < whitelistedTokens.length; i++) {
+    const info = getTokenInfo(infoTokens, whitelistedTokens[i].address);
+    if (!info.isStable || !info.availableAmount) {
+      continue;
+    }
+
+    const adjustedAvailableAmount = adjustForDecimals(
+      info.availableAmount,
+      info.decimals,
+      USD_DECIMALS
+    );
+    if (!availableAmount || adjustedAvailableAmount.gt(availableAmount)) {
+      availableAmount = adjustedAvailableAmount;
+      stableToken = info;
+    }
+  }
+  return stableToken;
+}
+
+export function getNextFromAmount(
+  chainId,
+  toAmount,
+  fromTokenAddress,
+  toTokenAddress,
+  infoTokens,
+  toTokenPriceUsd,
+  ratio,
+  usdgSupply,
+  totalTokenWeights
 ) {
-    const defaultValue = { amount: bigNumberify(0) };
+  const defaultValue = { amount: bigNumberify(0) };
 
-    if (!toAmount || !fromTokenAddress || !toTokenAddress || !infoTokens) {
-        return defaultValue;
-    }
+  if (!toAmount || !fromTokenAddress || !toTokenAddress || !infoTokens) {
+    return defaultValue;
+  }
 
-    if (fromTokenAddress === toTokenAddress) {
-        return { amount: toAmount };
-    }
+  if (fromTokenAddress === toTokenAddress) {
+    return { amount: toAmount };
+  }
 
-    const fromToken = getTokenInfo(infoTokens, fromTokenAddress);
-    const toToken = getTokenInfo(infoTokens, toTokenAddress);
-  
-    if (fromToken.isNative && toToken.isWrapped) {
-      return { amount: toAmount };
-    }
-  
-    if (fromToken.isWrapped && toToken.isNative) {
-      return { amount: toAmount };
-    }
-  
-    if (!fromToken || !fromToken.minPrice || !toToken || !toToken.maxPrice) {
-        return defaultValue;
-    }
+  const fromToken = getTokenInfo(infoTokens, fromTokenAddress);
+  const toToken = getTokenInfo(infoTokens, toTokenAddress);
 
-    const adjustDecimals = adjustForDecimalsFactory(
-        fromToken.decimals - toToken.decimals
-    );
+  if (fromToken.isNative && toToken.isWrapped) {
+    return { amount: toAmount };
+  }
 
-    let fromAmountBasedOnRatio;
+  if (fromToken.isWrapped && toToken.isNative) {
+    return { amount: toAmount };
+  }
+
+  if (!fromToken || !fromToken.minPrice || !toToken || !toToken.maxPrice) {
+    return defaultValue;
+  }
+
+  const adjustDecimals = adjustForDecimalsFactory(
+    fromToken.decimals - toToken.decimals
+  );
+
+  let fromAmountBasedOnRatio;
+  if (ratio && !ratio.isZero()) {
+    fromAmountBasedOnRatio = toAmount.mul(ratio).div(PRECISION);
+  }
+
+  if (toTokenAddress === USDG_ADDRESS) {
+    const feeBasisPoints = getSwapFeeBasisPoints(fromToken.isStable);
+
     if (ratio && !ratio.isZero()) {
-        fromAmountBasedOnRatio = toAmount.mul(ratio).div(PRECISION);
+      return {
+        amount: adjustDecimals(
+          fromAmountBasedOnRatio
+            .mul(BASIS_POINTS_DIVISOR + feeBasisPoints)
+            .div(BASIS_POINTS_DIVISOR)
+        )
+      };
     }
+    const fromAmount = toAmount.mul(PRECISION).div(fromToken.maxPrice);
+    return {
+      amount: adjustDecimals(
+        fromAmount
+          .mul(BASIS_POINTS_DIVISOR + feeBasisPoints)
+          .div(BASIS_POINTS_DIVISOR)
+      )
+    };
+  }
 
-    if (toTokenAddress === USDG_ADDRESS) {
-        const feeBasisPoints = getSwapFeeBasisPoints(fromToken.isStable);
+  if (fromTokenAddress === USDG_ADDRESS) {
+    const redemptionValue = toToken.redemptionAmount
+      .mul(toToken.maxPrice)
+      .div(expandDecimals(1, toToken.decimals));
+    if (redemptionValue.gt(THRESHOLD_REDEMPTION_VALUE)) {
+      const feeBasisPoints = getSwapFeeBasisPoints(toToken.isStable);
 
-        if (ratio && !ratio.isZero()) {
-            return {
-                amount: adjustDecimals(
-                    fromAmountBasedOnRatio
-                        .mul(BASIS_POINTS_DIVISOR + feeBasisPoints)
-                        .div(BASIS_POINTS_DIVISOR)
-                )
-            };
-        }
-        const fromAmount = toAmount.mul(PRECISION).div(fromToken.maxPrice);
-        return {
-            amount: adjustDecimals(
-                fromAmount
-                    .mul(BASIS_POINTS_DIVISOR + feeBasisPoints)
-                    .div(BASIS_POINTS_DIVISOR)
-            )
-        };
-    }
-
-    if (fromTokenAddress === USDG_ADDRESS) {
-        const redemptionValue = toToken.redemptionAmount
-            .mul(toToken.maxPrice)
-            .div(expandDecimals(1, toToken.decimals));
-        if (redemptionValue.gt(THRESHOLD_REDEMPTION_VALUE)) {
-            const feeBasisPoints = getSwapFeeBasisPoints(toToken.isStable);
-
-            const fromAmount =
-                ratio && !ratio.isZero()
-                    ? fromAmountBasedOnRatio
-                    : toAmount
-                        .mul(expandDecimals(1, toToken.decimals))
-                        .div(toToken.redemptionAmount);
-
-            return {
-                amount: adjustDecimals(
-                    fromAmount
-                        .mul(BASIS_POINTS_DIVISOR + feeBasisPoints)
-                        .div(BASIS_POINTS_DIVISOR)
-                )
-            };
-        }
-
-        const expectedAmount = toAmount.mul(toToken.maxPrice).div(PRECISION);
-
-        const stableToken = getMostAbundantStableToken(chainId, infoTokens);
-        if (!stableToken || stableToken.availableAmount.lt(expectedAmount)) {
-            const feeBasisPoints = getSwapFeeBasisPoints(toToken.isStable);
-
-            const fromAmount =
-                ratio && !ratio.isZero()
-                    ? fromAmountBasedOnRatio
-                    : toAmount
-                        .mul(expandDecimals(1, toToken.decimals))
-                        .div(toToken.redemptionAmount);
-
-            return {
-                amount: adjustDecimals(
-                    fromAmount
-                        .mul(BASIS_POINTS_DIVISOR + feeBasisPoints)
-                        .div(BASIS_POINTS_DIVISOR)
-                )
-            };
-        }
-
-        const feeBasisPoints0 = getSwapFeeBasisPoints(true);
-        const feeBasisPoints1 = getSwapFeeBasisPoints(false);
-
-        if (ratio && !ratio.isZero()) {
-            // apply fees twice usdg -> token1 -> token2
-            const fromAmount = fromAmountBasedOnRatio
-                .mul(BASIS_POINTS_DIVISOR + feeBasisPoints0 + feeBasisPoints1)
-                .div(BASIS_POINTS_DIVISOR);
-            return {
-                amount: adjustDecimals(fromAmount),
-                path: [USDG_ADDRESS, stableToken.address, toToken.address]
-            };
-        }
-
-        // get fromAmount for stableToken => toToken
-        let fromAmount = toAmount.mul(toToken.maxPrice).div(stableToken.minPrice);
-
-        // apply stableToken => toToken fees
-        fromAmount = fromAmount
-            .mul(BASIS_POINTS_DIVISOR + feeBasisPoints1)
-            .div(BASIS_POINTS_DIVISOR);
-
-        // get fromAmount for USDG => stableToken
-        fromAmount = fromAmount.mul(stableToken.maxPrice).div(PRECISION);
-
-        // apply USDG => stableToken fees
-        fromAmount = fromAmount
-            .mul(BASIS_POINTS_DIVISOR + feeBasisPoints0)
-            .div(BASIS_POINTS_DIVISOR);
-
-        return {
-            amount: adjustDecimals(fromAmount),
-            path: [USDG_ADDRESS, stableToken.address, toToken.address]
-        };
-    }
-
-    const fromAmount =
+      const fromAmount =
         ratio && !ratio.isZero()
-            ? fromAmountBasedOnRatio
-            : toAmount.mul(toToken.maxPrice).div(fromToken.minPrice);
+          ? fromAmountBasedOnRatio
+          : toAmount
+            .mul(expandDecimals(1, toToken.decimals))
+            .div(toToken.redemptionAmount);
 
-    let usdgAmount = fromAmount.mul(fromToken.minPrice).div(PRECISION);
-    usdgAmount = adjustForDecimals(usdgAmount, toToken.decimals, USDG_DECIMALS);
-    const swapFeeBasisPoints =
-        fromToken.isStable && toToken.isStable
-            ? STABLE_SWAP_FEE_BASIS_POINTS
-            : SWAP_FEE_BASIS_POINTS;
-    const taxBasisPoints =
-        fromToken.isStable && toToken.isStable
-            ? STABLE_TAX_BASIS_POINTS
-            : TAX_BASIS_POINTS;
-    const feeBasisPoints0 = getFeeBasisPoints(
-        fromToken,
-        usdgAmount,
-        swapFeeBasisPoints,
-        taxBasisPoints,
-        true,
-        usdgSupply,
-        totalTokenWeights
-    );
-    const feeBasisPoints1 = getFeeBasisPoints(
-        toToken,
-        usdgAmount,
-        swapFeeBasisPoints,
-        taxBasisPoints,
-        false,
-        usdgSupply,
-        totalTokenWeights
-    );
-    const feeBasisPoints =
-        feeBasisPoints0 > feeBasisPoints1 ? feeBasisPoints0 : feeBasisPoints1;
+      return {
+        amount: adjustDecimals(
+          fromAmount
+            .mul(BASIS_POINTS_DIVISOR + feeBasisPoints)
+            .div(BASIS_POINTS_DIVISOR)
+        )
+      };
+    }
+
+    const expectedAmount = toAmount.mul(toToken.maxPrice).div(PRECISION);
+
+    const stableToken = getMostAbundantStableToken(chainId, infoTokens);
+    if (!stableToken || stableToken.availableAmount.lt(expectedAmount)) {
+      const feeBasisPoints = getSwapFeeBasisPoints(toToken.isStable);
+
+      const fromAmount =
+        ratio && !ratio.isZero()
+          ? fromAmountBasedOnRatio
+          : toAmount
+            .mul(expandDecimals(1, toToken.decimals))
+            .div(toToken.redemptionAmount);
+
+      return {
+        amount: adjustDecimals(
+          fromAmount
+            .mul(BASIS_POINTS_DIVISOR + feeBasisPoints)
+            .div(BASIS_POINTS_DIVISOR)
+        )
+      };
+    }
+
+    const feeBasisPoints0 = getSwapFeeBasisPoints(true);
+    const feeBasisPoints1 = getSwapFeeBasisPoints(false);
+
+    if (ratio && !ratio.isZero()) {
+      // apply fees twice usdg -> token1 -> token2
+      const fromAmount = fromAmountBasedOnRatio
+        .mul(BASIS_POINTS_DIVISOR + feeBasisPoints0 + feeBasisPoints1)
+        .div(BASIS_POINTS_DIVISOR);
+      return {
+        amount: adjustDecimals(fromAmount),
+        path: [USDG_ADDRESS, stableToken.address, toToken.address]
+      };
+    }
+
+    // get fromAmount for stableToken => toToken
+    let fromAmount = toAmount.mul(toToken.maxPrice).div(stableToken.minPrice);
+
+    // apply stableToken => toToken fees
+    fromAmount = fromAmount
+      .mul(BASIS_POINTS_DIVISOR + feeBasisPoints1)
+      .div(BASIS_POINTS_DIVISOR);
+
+    // get fromAmount for USDG => stableToken
+    fromAmount = fromAmount.mul(stableToken.maxPrice).div(PRECISION);
+
+    // apply USDG => stableToken fees
+    fromAmount = fromAmount
+      .mul(BASIS_POINTS_DIVISOR + feeBasisPoints0)
+      .div(BASIS_POINTS_DIVISOR);
 
     return {
-        amount: adjustDecimals(
-            fromAmount
-                .mul(BASIS_POINTS_DIVISOR)
-                .div(BASIS_POINTS_DIVISOR - feeBasisPoints)
-        ),
-        feeBasisPoints
+      amount: adjustDecimals(fromAmount),
+      path: [USDG_ADDRESS, stableToken.address, toToken.address]
     };
+  }
+
+  const fromAmount =
+    ratio && !ratio.isZero()
+      ? fromAmountBasedOnRatio
+      : toAmount.mul(toToken.maxPrice).div(fromToken.minPrice);
+
+  let usdgAmount = fromAmount.mul(fromToken.minPrice).div(PRECISION);
+  usdgAmount = adjustForDecimals(usdgAmount, toToken.decimals, USDG_DECIMALS);
+  const swapFeeBasisPoints =
+    fromToken.isStable && toToken.isStable
+      ? STABLE_SWAP_FEE_BASIS_POINTS
+      : SWAP_FEE_BASIS_POINTS;
+  const taxBasisPoints =
+    fromToken.isStable && toToken.isStable
+      ? STABLE_TAX_BASIS_POINTS
+      : TAX_BASIS_POINTS;
+  const feeBasisPoints0 = getFeeBasisPoints(
+    fromToken,
+    usdgAmount,
+    swapFeeBasisPoints,
+    taxBasisPoints,
+    true,
+    usdgSupply,
+    totalTokenWeights
+  );
+  const feeBasisPoints1 = getFeeBasisPoints(
+    toToken,
+    usdgAmount,
+    swapFeeBasisPoints,
+    taxBasisPoints,
+    false,
+    usdgSupply,
+    totalTokenWeights
+  );
+  const feeBasisPoints =
+    feeBasisPoints0 > feeBasisPoints1 ? feeBasisPoints0 : feeBasisPoints1;
+
+  return {
+    amount: adjustDecimals(
+      fromAmount
+        .mul(BASIS_POINTS_DIVISOR)
+        .div(BASIS_POINTS_DIVISOR - feeBasisPoints)
+    ),
+    feeBasisPoints
+  };
 }
 
 export function getNextToAmount(
-    chainId,
-    fromAmount,
-    fromTokenAddress,
-    toTokenAddress,
-    infoTokens,
-    toTokenPriceUsd,
-    ratio,
-    usdgSupply,
-    totalTokenWeights
+  chainId,
+  fromAmount,
+  fromTokenAddress,
+  toTokenAddress,
+  infoTokens,
+  toTokenPriceUsd,
+  ratio,
+  usdgSupply,
+  totalTokenWeights
 ) {
-    const defaultValue = { amount: bigNumberify(0) };
-    if (!fromAmount || !fromTokenAddress || !toTokenAddress || !infoTokens) {
-        return defaultValue;
-    }
+  const defaultValue = { amount: bigNumberify(0) };
+  if (!fromAmount || !fromTokenAddress || !toTokenAddress || !infoTokens) {
+    return defaultValue;
+  }
 
-    if (fromTokenAddress === toTokenAddress) {
-        return { amount: fromAmount };
-    }
+  if (fromTokenAddress === toTokenAddress) {
+    return { amount: fromAmount };
+  }
 
-    const fromToken = getTokenInfo(infoTokens, fromTokenAddress);
-    const toToken = getTokenInfo(infoTokens, toTokenAddress);
+  const fromToken = getTokenInfo(infoTokens, fromTokenAddress);
+  const toToken = getTokenInfo(infoTokens, toTokenAddress);
 
-    if (fromToken.isNative && toToken.isWrapped) {
-        return { amount: fromAmount };
-    }
+  if (fromToken.isNative && toToken.isWrapped) {
+    return { amount: fromAmount };
+  }
 
-    if (fromToken.isWrapped && toToken.isNative) {
-        return { amount: fromAmount };
-    }
+  if (fromToken.isWrapped && toToken.isNative) {
+    return { amount: fromAmount };
+  }
 
-    if (!fromToken || !fromToken.minPrice || !toToken || !toToken.maxPrice) {
-        return defaultValue;
-    }
+  if (!fromToken || !fromToken.minPrice || !toToken || !toToken.maxPrice) {
+    return defaultValue;
+  }
 
-    const adjustDecimals = adjustForDecimalsFactory(
-        toToken.decimals - fromToken.decimals
-    );
+  const adjustDecimals = adjustForDecimalsFactory(
+    toToken.decimals - fromToken.decimals
+  );
 
-    let toAmountBasedOnRatio = bigNumberify(0);
+  let toAmountBasedOnRatio = bigNumberify(0);
+  if (ratio && !ratio.isZero()) {
+    toAmountBasedOnRatio = fromAmount.mul(PRECISION).div(ratio);
+  }
+
+  if (toTokenAddress === USDG_ADDRESS) {
+    const feeBasisPoints = getSwapFeeBasisPoints(fromToken.isStable);
+
     if (ratio && !ratio.isZero()) {
-        toAmountBasedOnRatio = fromAmount.mul(PRECISION).div(ratio);
-    }
-
-    if (toTokenAddress === USDG_ADDRESS) {
-        const feeBasisPoints = getSwapFeeBasisPoints(fromToken.isStable);
-
-        if (ratio && !ratio.isZero()) {
-            const toAmount = toAmountBasedOnRatio;
-            return {
-                amount: adjustDecimals(
-                    toAmount
-                        .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
-                        .div(BASIS_POINTS_DIVISOR)
-                ),
-                feeBasisPoints
-            };
-        }
-
-        const toAmount = fromAmount.mul(fromToken.minPrice).div(PRECISION);
-        return {
-            amount: adjustDecimals(
-                toAmount
-                    .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
-                    .div(BASIS_POINTS_DIVISOR)
-            ),
-            feeBasisPoints
-        };
-    }
-
-    if (fromTokenAddress === USDG_ADDRESS) {
-        const redemptionValue = toToken.redemptionAmount
-            .mul(toTokenPriceUsd || toToken.maxPrice)
-            .div(expandDecimals(1, toToken.decimals));
-
-        if (redemptionValue.gt(THRESHOLD_REDEMPTION_VALUE)) {
-            const feeBasisPoints = getSwapFeeBasisPoints(toToken.isStable);
-
-            const toAmount =
-                ratio && !ratio.isZero()
-                    ? toAmountBasedOnRatio
-                    : fromAmount
-                        .mul(toToken.redemptionAmount)
-                        .div(expandDecimals(1, toToken.decimals));
-
-            return {
-                amount: adjustDecimals(
-                    toAmount
-                        .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
-                        .div(BASIS_POINTS_DIVISOR)
-                ),
-                feeBasisPoints
-            };
-        }
-
-        const expectedAmount = fromAmount;
-
-        const stableToken = getMostAbundantStableToken(chainId, infoTokens);
-        if (!stableToken || stableToken.availableAmount.lt(expectedAmount)) {
-            const toAmount =
-                ratio && !ratio.isZero()
-                    ? toAmountBasedOnRatio
-                    : fromAmount
-                        .mul(toToken.redemptionAmount)
-                        .div(expandDecimals(1, toToken.decimals));
-            const feeBasisPoints = getSwapFeeBasisPoints(toToken.isStable);
-            return {
-                amount: adjustDecimals(
-                    toAmount
-                        .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
-                        .div(BASIS_POINTS_DIVISOR)
-                ),
-                feeBasisPoints
-            };
-        }
-
-        const feeBasisPoints0 = getSwapFeeBasisPoints(true);
-        const feeBasisPoints1 = getSwapFeeBasisPoints(false);
-
-        if (ratio && !ratio.isZero()) {
-            const toAmount = toAmountBasedOnRatio
-                .mul(BASIS_POINTS_DIVISOR - feeBasisPoints0 - feeBasisPoints1)
-                .div(BASIS_POINTS_DIVISOR);
-            return {
-                amount: adjustDecimals(toAmount),
-                path: [USDG_ADDRESS, stableToken.address, toToken.address],
-                feeBasisPoints: feeBasisPoints0 + feeBasisPoints1
-            };
-        }
-
-        // get toAmount for USDG => stableToken
-        let toAmount = fromAmount.mul(PRECISION).div(stableToken.maxPrice);
-        // apply USDG => stableToken fees
-        toAmount = toAmount
-            .mul(BASIS_POINTS_DIVISOR - feeBasisPoints0)
-            .div(BASIS_POINTS_DIVISOR);
-
-        // get toAmount for stableToken => toToken
-        toAmount = toAmount
-            .mul(stableToken.minPrice)
-            .div(toTokenPriceUsd || toToken.maxPrice);
-        // apply stableToken => toToken fees
-        toAmount = toAmount
-            .mul(BASIS_POINTS_DIVISOR - feeBasisPoints1)
-            .div(BASIS_POINTS_DIVISOR);
-
-        return {
-            amount: adjustDecimals(toAmount),
-            path: [USDG_ADDRESS, stableToken.address, toToken.address],
-            feeBasisPoints: feeBasisPoints0 + feeBasisPoints1
-        };
-    }
-
-    const toAmount =
-        ratio && !ratio.isZero()
-            ? toAmountBasedOnRatio
-            : fromAmount
-                .mul(fromToken.minPrice)
-                .div(toTokenPriceUsd || toToken.maxPrice);
-
-    let usdgAmount = fromAmount.mul(fromToken.minPrice).div(PRECISION);
-    usdgAmount = adjustForDecimals(usdgAmount, fromToken.decimals, USDG_DECIMALS);
-    const swapFeeBasisPoints =
-        fromToken.isStable && toToken.isStable
-            ? STABLE_SWAP_FEE_BASIS_POINTS
-            : SWAP_FEE_BASIS_POINTS;
-    const taxBasisPoints =
-        fromToken.isStable && toToken.isStable
-            ? STABLE_TAX_BASIS_POINTS
-            : TAX_BASIS_POINTS;
-    const feeBasisPoints0 = getFeeBasisPoints(
-        fromToken,
-        usdgAmount,
-        swapFeeBasisPoints,
-        taxBasisPoints,
-        true,
-        usdgSupply,
-        totalTokenWeights
-    );
-    const feeBasisPoints1 = getFeeBasisPoints(
-        toToken,
-        usdgAmount,
-        swapFeeBasisPoints,
-        taxBasisPoints,
-        false,
-        usdgSupply,
-        totalTokenWeights
-    );
-    const feeBasisPoints =
-        feeBasisPoints0 > feeBasisPoints1 ? feeBasisPoints0 : feeBasisPoints1;
-
-    return {
+      const toAmount = toAmountBasedOnRatio;
+      return {
         amount: adjustDecimals(
-            toAmount
-                .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
-                .div(BASIS_POINTS_DIVISOR)
+          toAmount
+            .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+            .div(BASIS_POINTS_DIVISOR)
         ),
         feeBasisPoints
-    };
-}
-export function getUsd(
-    amount,
-    tokenAddress,
-    max,
-    tokens,
-    orderOption,
-    triggerPriceUsd
-) {
-    if (!amount) {
-        return;
-    }
-    if (tokenAddress === USDG_ADDRESS) {
-        return amount.mul(PRECISION).div(expandDecimals(1, 18));
-    }
-    const info = getTokenfromAddress(tokens, tokenAddress);
-    const price = getTriggerPrice(
-        tokenAddress,
-        max,
-        info,
-        orderOption,
-        triggerPriceUsd
-    );
-    if (!price) {
-        return;
+      };
     }
 
-    return amount.mul(price).div(expandDecimals(1, info.decimals));
+    const toAmount = fromAmount.mul(fromToken.minPrice).div(PRECISION);
+    return {
+      amount: adjustDecimals(
+        toAmount
+          .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+          .div(BASIS_POINTS_DIVISOR)
+      ),
+      feeBasisPoints
+    };
+  }
+
+  if (fromTokenAddress === USDG_ADDRESS) {
+    const redemptionValue = toToken.redemptionAmount
+      .mul(toTokenPriceUsd || toToken.maxPrice)
+      .div(expandDecimals(1, toToken.decimals));
+
+    if (redemptionValue.gt(THRESHOLD_REDEMPTION_VALUE)) {
+      const feeBasisPoints = getSwapFeeBasisPoints(toToken.isStable);
+
+      const toAmount =
+        ratio && !ratio.isZero()
+          ? toAmountBasedOnRatio
+          : fromAmount
+            .mul(toToken.redemptionAmount)
+            .div(expandDecimals(1, toToken.decimals));
+
+      return {
+        amount: adjustDecimals(
+          toAmount
+            .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+            .div(BASIS_POINTS_DIVISOR)
+        ),
+        feeBasisPoints
+      };
+    }
+
+    const expectedAmount = fromAmount;
+
+    const stableToken = getMostAbundantStableToken(chainId, infoTokens);
+    if (!stableToken || stableToken.availableAmount.lt(expectedAmount)) {
+      const toAmount =
+        ratio && !ratio.isZero()
+          ? toAmountBasedOnRatio
+          : fromAmount
+            .mul(toToken.redemptionAmount)
+            .div(expandDecimals(1, toToken.decimals));
+      const feeBasisPoints = getSwapFeeBasisPoints(toToken.isStable);
+      return {
+        amount: adjustDecimals(
+          toAmount
+            .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+            .div(BASIS_POINTS_DIVISOR)
+        ),
+        feeBasisPoints
+      };
+    }
+
+    const feeBasisPoints0 = getSwapFeeBasisPoints(true);
+    const feeBasisPoints1 = getSwapFeeBasisPoints(false);
+
+    if (ratio && !ratio.isZero()) {
+      const toAmount = toAmountBasedOnRatio
+        .mul(BASIS_POINTS_DIVISOR - feeBasisPoints0 - feeBasisPoints1)
+        .div(BASIS_POINTS_DIVISOR);
+      return {
+        amount: adjustDecimals(toAmount),
+        path: [USDG_ADDRESS, stableToken.address, toToken.address],
+        feeBasisPoints: feeBasisPoints0 + feeBasisPoints1
+      };
+    }
+
+    // get toAmount for USDG => stableToken
+    let toAmount = fromAmount.mul(PRECISION).div(stableToken.maxPrice);
+    // apply USDG => stableToken fees
+    toAmount = toAmount
+      .mul(BASIS_POINTS_DIVISOR - feeBasisPoints0)
+      .div(BASIS_POINTS_DIVISOR);
+
+    // get toAmount for stableToken => toToken
+    toAmount = toAmount
+      .mul(stableToken.minPrice)
+      .div(toTokenPriceUsd || toToken.maxPrice);
+    // apply stableToken => toToken fees
+    toAmount = toAmount
+      .mul(BASIS_POINTS_DIVISOR - feeBasisPoints1)
+      .div(BASIS_POINTS_DIVISOR);
+
+    return {
+      amount: adjustDecimals(toAmount),
+      path: [USDG_ADDRESS, stableToken.address, toToken.address],
+      feeBasisPoints: feeBasisPoints0 + feeBasisPoints1
+    };
+  }
+
+  const toAmount =
+    ratio && !ratio.isZero()
+      ? toAmountBasedOnRatio
+      : fromAmount
+        .mul(fromToken.minPrice)
+        .div(toTokenPriceUsd || toToken.maxPrice);
+
+  let usdgAmount = fromAmount.mul(fromToken.minPrice).div(PRECISION);
+  usdgAmount = adjustForDecimals(usdgAmount, fromToken.decimals, USDG_DECIMALS);
+  const swapFeeBasisPoints =
+    fromToken.isStable && toToken.isStable
+      ? STABLE_SWAP_FEE_BASIS_POINTS
+      : SWAP_FEE_BASIS_POINTS;
+  const taxBasisPoints =
+    fromToken.isStable && toToken.isStable
+      ? STABLE_TAX_BASIS_POINTS
+      : TAX_BASIS_POINTS;
+  const feeBasisPoints0 = getFeeBasisPoints(
+    fromToken,
+    usdgAmount,
+    swapFeeBasisPoints,
+    taxBasisPoints,
+    true,
+    usdgSupply,
+    totalTokenWeights
+  );
+  const feeBasisPoints1 = getFeeBasisPoints(
+    toToken,
+    usdgAmount,
+    swapFeeBasisPoints,
+    taxBasisPoints,
+    false,
+    usdgSupply,
+    totalTokenWeights
+  );
+  const feeBasisPoints =
+    feeBasisPoints0 > feeBasisPoints1 ? feeBasisPoints0 : feeBasisPoints1;
+
+  return {
+    amount: adjustDecimals(
+      toAmount
+        .mul(BASIS_POINTS_DIVISOR - feeBasisPoints)
+        .div(BASIS_POINTS_DIVISOR)
+    ),
+    feeBasisPoints
+  };
 }
-function getTriggerPrice(
+export function getUsd(
+  amount,
+  tokenAddress,
+  max,
+  tokens,
+  orderOption,
+  triggerPriceUsd
+) {
+  if (!amount) {
+    return;
+  }
+  if (tokenAddress === USDG_ADDRESS) {
+    return amount.mul(PRECISION).div(expandDecimals(1, 18));
+  }
+  const info = getTokenfromAddress(tokens, tokenAddress);
+  const price = getTriggerPrice(
     tokenAddress,
     max,
     info,
     orderOption,
     triggerPriceUsd
-) {
-    // Limit/stop orders are executed with price specified by user
-    if (orderOption && orderOption !== MARKET && triggerPriceUsd) {
-        return triggerPriceUsd;
-    }
+  );
+  if (!price) {
+    return;
+  }
 
-    // Market orders are executed with current market price
-    if (!info) {
-        return;
-    }
-    if ( !info.price) {
-        return;
-    }
-    return info.price;
+  return amount.mul(price).div(expandDecimals(1, info.decimals));
+}
+function getTriggerPrice(
+  tokenAddress,
+  max,
+  info,
+  orderOption,
+  triggerPriceUsd
+) {
+  // Limit/stop orders are executed with price specified by user
+  if (orderOption && orderOption !== MARKET && triggerPriceUsd) {
+    return triggerPriceUsd;
+  }
+
+  // Market orders are executed with current market price
+  if (!info) {
+    return;
+  }
+  if (!info.price) {
+    return;
+  }
+  return info.price;
 }
 export const formatAmountFree = (amount, tokenDecimals, displayDecimals) => {
-    if (!amount) {
-        return "...";
-    }
-    let amountStr = ethers.utils.formatUnits(amount, tokenDecimals);
-    amountStr = limitDecimals(amountStr, displayDecimals);
-    return trimZeroDecimals(amountStr);
+  if (!amount) {
+    return "...";
+  }
+  let amountStr = ethers.utils.formatUnits(amount, tokenDecimals);
+  amountStr = limitDecimals(amountStr, displayDecimals);
+  return trimZeroDecimals(amountStr);
 };
 export const trimZeroDecimals = amount => {
-    if (parseFloat(amount) === parseInt(amount)) {
-        return parseInt(amount).toString();
-    }
-    return amount;
+  if (parseFloat(amount) === parseInt(amount)) {
+    return parseInt(amount).toString();
+  }
+  return amount;
 };
 //hj ---------------------
 export const shouldRaiseGasError = (token, amount) => {
-    if (!amount) {
-        return false;
-    }
-    if (token.address !== AddressZero) {
-        return false;
-    }
-    if (!token.balance) {
-        return false;
-    }
-    if (amount.gte(token.balance)) {
-        return true;
-    }
-    if (token.balance.sub(amount).lt(DUST_BNB)) {
-        return true;
-    }
+  if (!amount) {
     return false;
+  }
+  if (token.address !== AddressZero) {
+    return false;
+  }
+  if (!token.balance) {
+    return false;
+  }
+  if (amount.gte(token.balance)) {
+    return true;
+  }
+  if (token.balance.sub(amount).lt(DUST_BNB)) {
+    return true;
+  }
+  return false;
 };
 
 export const helperToast = {
-    success: content => {
-      notification.open({
-        message: <div style={{"color": "#c3c5cb"}}>Submitted</div>,
-        description: content,
-        style: {
-          radius: "10px",
-          border: "1px solid #2c2f36",
-          background: "#29292c",
-          color: "#c3c5cb",
-        },
-        onClose: async () => {},
-      });
-        // toast.dismiss();
-        // toast.success(content);
-    },
-    error: content => {
-      notification.open({
-        message: <div style={{"color": "#c3c5cb"}}>Failed</div>,
-        description: content,
-        style: {
-          radius: "10px",
-          border: "1px solid #2c2f36",
-          background: "#29292c",
-          color: "#c3c5cb",
-        },
-        onClose: async () => {},
-      });
-        // toast.dismiss();
-        // toast.error(content);
-    }
+  success: content => {
+    notification.open({
+      message: <div style={{ "color": "#c3c5cb" }}>Submitted</div>,
+      description: content,
+      style: {
+        radius: "10px",
+        border: "1px solid #2c2f36",
+        background: "#29292c",
+        color: "#c3c5cb",
+      },
+      onClose: async () => { },
+    });
+    // toast.dismiss();
+    // toast.success(content);
+  },
+  error: content => {
+    notification.open({
+      message: <div style={{ "color": "#c3c5cb" }}>Failed</div>,
+      description: content,
+      style: {
+        radius: "10px",
+        border: "1px solid #2c2f36",
+        background: "#29292c",
+        color: "#c3c5cb",
+      },
+      onClose: async () => { },
+    });
+    // toast.dismiss();
+    // toast.error(content);
+  }
 };
 
 export const replaceNativeTokenAddress = (path, nativeTokenAddress) => {
-    if (!path) {
-        return;
-    }
+  if (!path) {
+    return;
+  }
 
-    let updatedPath = [];
-    for (let i = 0; i < path.length; i++) {
-        let address = path[i];
-        if (address === AddressZero) {
-            address = nativeTokenAddress;
-        }
-        updatedPath.push(address);
+  let updatedPath = [];
+  for (let i = 0; i < path.length; i++) {
+    let address = path[i];
+    if (address === AddressZero) {
+      address = nativeTokenAddress;
     }
+    updatedPath.push(address);
+  }
 
-    return updatedPath;
+  return updatedPath;
 };
 
 export function isTriggerRatioInverted(fromTokenInfo, toTokenInfo) {
-    if (!toTokenInfo || !fromTokenInfo) return false;
-    if (toTokenInfo.isStable || toTokenInfo.isUsdg) return true;
-    if (toTokenInfo.maxPrice)
-        return toTokenInfo.maxPrice.lt(fromTokenInfo.maxPrice);
-    return false;
+  if (!toTokenInfo || !fromTokenInfo) return false;
+  if (toTokenInfo.isStable || toTokenInfo.isUsdg) return true;
+  if (toTokenInfo.maxPrice)
+    return toTokenInfo.maxPrice.lt(fromTokenInfo.maxPrice);
+  return false;
 }
 
 
 export function usePrevious(value) {
-    const ref = useRef();
-    useEffect(() => {
-        ref.current = value;
-    });
-    return ref.current;
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
 }
 
 export function formatDateTime(time) {
@@ -1905,7 +1909,7 @@ const FIRST_DATE_TS = parseInt(+(new Date(2021, 7, 31)) / 1000)
 
 
 export function useActionData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "arbitrum" } = {}) {
-	const PROPS = 'margin liquidation swap mint burn'.split(' ')
+  const PROPS = 'margin liquidation swap mint burn'.split(' ')
   const timestampProp = "timestamp"
   const query = `{
     contractTransactions(
@@ -1936,39 +1940,39 @@ export function useActionData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "
     data2 = sortBy(graphData.contractTransactions, item => item.timestamp).map(value => {
       const fromToken = getToken(value.fromToken)
       const toToken = getToken(value.toToken)
-      const isLong = value.isBuy?'Long':'Short'
-      const priceAbove =  value.price > 0 ?">":"<";
+      const isLong = value.isBuy ? 'Long' : 'Short'
+      const priceAbove = value.price > 0 ? ">" : "<";
       const tem = BigNumber.from(value.price)
       const price = `$${formatAmount(tem.abs(), USD_DECIMALS, 2, true)}`
       const size = `$${formatAmount(value.toAmount, USD_DECIMALS, 2, true)}` // if size 
-      if(value.type == "increasePosition" ) {
+      if (value.type == "increasePosition") {
         return {
           account: value.account,
           action: `Increase ${toToken.symbol} ${isLong}`,
-          amount: size, 
+          amount: size,
           price: price,
           timestamp: value.timestamp,
           hash: value.id
         };
-      } else if(value.type == "decreasePosition") {
+      } else if (value.type == "decreasePosition") {
         return {
           account: value.account,
           action: `Decrease ${toToken.symbol} ${isLong}`,
-          amount: size, 
+          amount: size,
           price: price,
           timestamp: value.timestamp,
           hash: value.id
         };
-      } else if(value.type == "liquidatePosition") {
+      } else if (value.type == "liquidatePosition") {
         return {
           account: value.account,
           action: `Liquidate  ${toToken.symbol} ${isLong}`,
-          amount: size, 
+          amount: size,
           price: price,
           timestamp: value.timestamp,
           hash: value.id
         };
-      } else if(value.type == "addLiquidity") {
+      } else if (value.type == "addLiquidity") {
         return {
           account: value.account,
           action: `Add Liquidity`,
@@ -1977,7 +1981,7 @@ export function useActionData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "
           timestamp: value.timestamp,
           hash: value.id
         };
-      } else if(value.type == "removeLiquidity") {
+      } else if (value.type == "removeLiquidity") {
         return {
           account: value.account,
           action: `Remove Liquidity`,
@@ -1986,16 +1990,16 @@ export function useActionData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "
           timestamp: value.timestamp,
           hash: value.id
         };
-      } else if(value.type == "createIncreaseOrder") {
+      } else if (value.type == "createIncreaseOrder") {
         return {
           account: value.account,
           action: `Create Increase ${toToken.symbol} ${isLong} Order`,
-          amount: size, 
+          amount: size,
           price: `${priceAbove} ${price}`,
           timestamp: value.timestamp,
           hash: value.id
         };
-      } else if(value.type == "cancelIncreaseOrder") {
+      } else if (value.type == "cancelIncreaseOrder") {
         return {
           account: value.account,
           action: `Cancel Increase ${toToken.symbol} ${isLong} Order`,
@@ -2004,34 +2008,34 @@ export function useActionData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "
           timestamp: value.timestamp,
           hash: value.id
         };
-      } else if(value.type == "updateIncreaseOrder") {
+      } else if (value.type == "updateIncreaseOrder") {
         return {
           account: value.account,
           action: `Update Increase ${toToken.symbol} ${isLong} Order`,
-          amount: size, 
+          amount: size,
           price: `${priceAbove} ${price}`,
           timestamp: value.timestamp,
           hash: value.id
         };
-      } else if(value.type == "executeIncreaseOrder") {
+      } else if (value.type == "executeIncreaseOrder") {
         return {
           account: value.account,
           action: `Execute increase ${toToken.symbol} ${isLong} Order`,
-          amount: size, 
+          amount: size,
           price: `${priceAbove} ${price}`,
           timestamp: value.timestamp,
           hash: value.id
         };
-      } else if(value.type == "createDecreaseOrder") {
+      } else if (value.type == "createDecreaseOrder") {
         return {
           account: value.account,
           action: `Create Decrease ${toToken.symbol} ${isLong} Order`,
-          amount: size, 
+          amount: size,
           price: `${priceAbove} ${price}`,
           timestamp: value.timestamp,
           hash: value.id
         };
-      } else if(value.type == "cancelDecreaseOrder") {
+      } else if (value.type == "cancelDecreaseOrder") {
         return {
           account: value.account,
           action: `Cancel Decrease ${toToken.symbol} ${isLong} Order`,
@@ -2040,7 +2044,7 @@ export function useActionData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "
           timestamp: value.timestamp,
           hash: value.id
         };
-      } else if(value.type == "updateDecreaseOrder") {
+      } else if (value.type == "updateDecreaseOrder") {
         return {
           account: value.account,
           action: `Update decrease ${toToken.symbol} ${isLong} Order`,
@@ -2049,7 +2053,7 @@ export function useActionData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "
           timestamp: value.timestamp,
           hash: value.id
         };
-      } else if(value.type == "executeDecreaseOrder") {
+      } else if (value.type == "executeDecreaseOrder") {
         return {
           account: value.account,
           action: `Execute decrease ${toToken.symbol} ${isLong} Order`,
@@ -2058,7 +2062,7 @@ export function useActionData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "
           timestamp: value.timestamp,
           hash: value.id
         };
-      } 
+      }
     })
   }
   return [data2, loading, error]
@@ -2079,75 +2083,75 @@ function getToken(address) {
   return supportedTokens[0]
 }
 
-export function formatNumber(number){
-  if (number=="0.0"){return number}
+export function formatNumber(number) {
+  if (number == "0.0") { return number }
   let negative = false;
-  if (number<0){
+  if (number < 0) {
     negative = true;
     let pattern = /-(.*)/i;
     number = number.toString().match(pattern)[1];
     console.log("NEGATIVE")
   }
-  let dict = {1:"₁",3:"₃",4:"₄",5:"₅",6:"₆",7:"₇",8:"₈",9:"₉",11:"₁₁",13:"₁₃",14:"₁₄",15:"₁₅",16:"₁₆"}
+  let dict = { 1: "₁", 3: "₃", 4: "₄", 5: "₅", 6: "₆", 7: "₇", 8: "₈", 9: "₉", 11: "₁₁", 13: "₁₃", 14: "₁₄", 15: "₁₅", 16: "₁₆" }
   let text = number.toString();
   let result = 0
-  if(text.includes('e-')){
-  	let pattern = /(.*)e-(.*)/i
+  if (text.includes('e-')) {
+    let pattern = /(.*)e-(.*)/i
     let digitPart = text.match(pattern)[1]
     let zeroPart = text.match(pattern)[2]
     let zeroLen = zeroPart - 1
-    let digit = digitPart.replace(".","")
-    if (digit.length<4){
-    	digit = digit.slice(0,digit.length)
-    }else{
-    	digit = digit.slice(0,4)
+    let digit = digitPart.replace(".", "")
+    if (digit.length < 4) {
+      digit = digit.slice(0, digit.length)
+    } else {
+      digit = digit.slice(0, 4)
     }
-    result = "0.0"+dict[zeroLen]+digit
-  }else if(parseFloat(text)<0.001){  //0.00000123456
+    result = "0.0" + dict[zeroLen] + digit
+  } else if (parseFloat(text) < 0.001) {  //0.00000123456
     let oriLen = text.length; //13
     let pattern = /0\.0{3,}(.*)/i;
     let digitPart = text.match(pattern)[1]; //123456
     let digitLen = digitPart.length;  //6
-    let zeroLen = oriLen-digitLen-2;  //13-6-2=5
-    let temp = text*10**zeroLen*10000;  //0.964789
+    let zeroLen = oriLen - digitLen - 2;  //13-6-2=5
+    let temp = text * 10 ** zeroLen * 10000;  //0.964789
     let digit = temp.toPrecision(4)  //9648
-    console.log("zero",zeroLen,typeof(zeroLen))
-    console.log("small",dict[zeroLen])
-    result = "0.0"+dict[zeroLen]+digit
-  }else if(parseFloat(text)<1){  //0.0123456
+    console.log("zero", zeroLen, typeof (zeroLen))
+    console.log("small", dict[zeroLen])
+    result = "0.0" + dict[zeroLen] + digit
+  } else if (parseFloat(text) < 1) {  //0.0123456
     let oriLen = text.length;  //9
     let pattern = /0\.0{0,}(.*)/i;
     let digitPart = text.match(pattern)[1];  //123456
     let digitLen = digitPart.length;  //6
-    let zeroLen = oriLen-digitLen-1;  //9-6-1=2
-    result = parseFloat(text).toPrecision(6-zeroLen);  //0.01234
-  }else if(parseFloat(text)<100000){ //1289.345
+    let zeroLen = oriLen - digitLen - 1;  //9-6-1=2
+    result = parseFloat(text).toPrecision(6 - zeroLen);  //0.01234
+  } else if (parseFloat(text) < 100000) { //1289.345
     let sixDigit = parseFloat(text).toPrecision(6);  //1289.34
     let pattern = /.*\.(.*)/i;
     let decimalPart = sixDigit.toString().match(pattern)[1];  //34
     let digitPart = parseFloat(sixDigit).toFixed(0);  //1289
     let digit = digitPart.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");  //1,289
-    result = digit+"."+decimalPart;  //1,289.34
-  }else{
+    result = digit + "." + decimalPart;  //1,289.34
+  } else {
     let digit = parseFloat(text).toFixed(0);  //123456789
     result = digit.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");  //123,456,789
   }
-  if(negative){
-    result = "-"+result
+  if (negative) {
+    result = "-" + result
   }
   return result
 }
 
-export async function getOracleSignature(){
+export async function getOracleSignature() {
   let signatures = await axios.get('https://options.acy.finance/api/oracle-signatures?unsigned=false')
-  .then(function (response) {
-    return response.data
-  })
-  .catch(function (error) {
-    console.log(error);
-    return {}
-  });
-  console.log("signatures",signatures)
+    .then(function (response) {
+      return response.data
+    })
+    .catch(function (error) {
+      console.log(error);
+      return {}
+    });
+  console.log("signatures", signatures)
   return signatures
 }
 
@@ -2158,13 +2162,19 @@ function safeDiv2(a, b) {
   return b == 0 ? 0 : a / b;
 }
 
-export function getPosition(rawPositionData, symbolData) {
+export function getPosition(rawPositionData, symbolData, page) {
   if (!rawPositionData || !symbolData) {
     return
   }
   let positionQuery = []
-  for (let i = 0; i < rawPositionData.positions.length; i++) {
-    const temp = rawPositionData.positions[i]
+  const positions =
+    page == 'Options'
+      ? rawPositionData.positions.filter(item => item.symbol.includes('-'))
+      : page == 'Powers' 
+      ? rawPositionData.positions.filter(item => item.symbol.includes('^'))
+      : rawPositionData.positions.filter(item => !item.symbol.includes('^') && !item.symbol.includes('-'))
+  for (let i = 0; i < positions.length; i++) {
+    const temp = positions[i]
     const volume = ethers.utils.formatUnits(temp.volume, 18)
     if (volume != 0) {
       const symbol = symbolData.find(obj => {
