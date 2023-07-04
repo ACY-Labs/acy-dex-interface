@@ -5,7 +5,7 @@ import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import * as Api from '@/acy-dex-futures/Api';
-import { fetcher, getProvider, bigNumberify, getSymbol, getPosition } from '@/acy-dex-futures/utils';
+import { fetcher, getProvider, bigNumberify, getSymbol, getPosition, formatAmount } from '@/acy-dex-futures/utils';
 import { useConstantLoader } from '@/constants';
 import { BigNumber, ethers } from 'ethers'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
@@ -69,6 +69,7 @@ const Option = props => {
       option_tokens_symbol.push({
         symbol: ele[1],
         name: ele[1].split('USD')[0],
+        price: parseFloat(formatAmount(ele?.markPrice, 18)) == 0 ? parseFloat(formatAmount(ele?.markPrice, 18, 8)).toPrecision(2) : formatAmount(ele?.markPrice, 18),
       })
     })
     option_tokens_symbol?.forEach((ele) => {

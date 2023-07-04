@@ -10,7 +10,7 @@ import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
-import { fetcher, getSymbol, getPosition } from '@/acy-dex-futures/utils';
+import { fetcher, getSymbol, getPosition, formatAmount } from '@/acy-dex-futures/utils';
 import Reader from '@/abis/future-option-power/Reader.json'
 import styles from './styles.less'
 import { PositionTable } from '@/components/OptionComponent/TableComponent';
@@ -64,6 +64,7 @@ const Future = props => {
     return future_tokens?.map((ele) => ({
         symbol: ele[1],
         name: ele[1].replace('USD', ''),
+        price: parseFloat(formatAmount(ele?.markPrice, 18)) == 0 ? parseFloat(formatAmount(ele?.markPrice, 18, 8)).toPrecision(2) : formatAmount(ele?.markPrice, 18),
       })
     )
   }, [symbolsInfo])

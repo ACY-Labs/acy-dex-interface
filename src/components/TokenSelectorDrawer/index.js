@@ -30,8 +30,6 @@ const TokenSelectorDrawer = ({
   isFromToken,
   onCoinClick,
   coinList,
-  selectSymbol,
-  activeSymbol,
   activeToken0,
   setActiveToken0,
   activeToken1,
@@ -52,6 +50,7 @@ const TokenSelectorDrawer = ({
   useEffect(() => {
     setInitTokenList(tokenlist)
   }, [tokenlist])
+
   const baseTokenAddr = {
     56: [
       { symbol: "USDC", address: "0x8965349fb649A33a30cbFDa057D8eC2C48AbE2A2" },
@@ -93,7 +92,6 @@ const TokenSelectorDrawer = ({
     setCustomTokenList(localTokenList);
     //combine initTokenList and customTokenList
     const totalTokenList = [...localTokenList, ...tokenlist];
-    console.log("resetting tokenSelectorModal new renderTokenList", totalTokenList)
     //read the fav tokens code in storage
     var favTokenSymbol = JSON.parse(localStorage.getItem('tokens_symbol'));
     //set to fav token
@@ -136,7 +134,6 @@ const TokenSelectorDrawer = ({
 
 
   const initTokenBalanceDict = (tokenList) => {
-    console.log('Init Token Balance!!!! with chainId, TokenList', chainId, tokenList);
     const newTokenBalanceDict = {};
     asyncForEach(tokenList, async (element, index) => {
       console.log("dispatched async", element)
@@ -198,7 +195,7 @@ const TokenSelectorDrawer = ({
 
   return (
     <Drawer
-      title="Select a Token"
+      title={setActiveSymbol ? "Select a Symbol" : "Select a Token"}
       placement={placement}
       className={styles.drawer}
       // getContainer={false}
@@ -211,13 +208,20 @@ const TokenSelectorDrawer = ({
         //simple is for options-pool
         <div className={styles.tokenselector}>
           <div className={styles.coinList}>
+            {pageName == 'Options' &&
+            <div style={{display: 'flex', justifyContent: 'space-between', marginTop: 20, marginBottom: 10}}>
+              <div style={{paddingLeft: 30}}>STRIKE</div>
+              <div style={{paddingRight: 50}}>TYPE</div>
+              <div style={{paddingRight: 60}}>PRICE</div>
+            </div>
+            }
             {initTokenList.length ? initTokenList.map((token, index) => {
               return (
                 <AcyCoinItem
                   data={token}
                   key={index}
                   customIcon={false}
-                  clickCallback={() => setTokenAsFav(token)}
+                  pageName={pageName}
                   selectToken={(item) => {
                     if(pageName == 'Options' || pageName == 'Powers') {
                       setActiveSymbol(item.symbol)
@@ -226,8 +230,6 @@ const TokenSelectorDrawer = ({
                       onCoinClick(token)
                     }
                   }}
-                  isFav={favTokenList.includes(token)}
-                  constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}
                 />
               );
             })
@@ -260,10 +262,10 @@ const TokenSelectorDrawer = ({
                 {renderTokenList?.length && renderTokenList !== undefined ? renderTokenList.map((token, index) => {
                   return (
                     <AcyCoinItem
-                      hideBalance={true}
                       data={token}
                       key={index}
                       customIcon={false}
+                      pageName={pageName}
                       clickCallback={() => setTokenAsFav(token)}
                       selectToken={(item) => {
                         if (pageName === "Trade") {
@@ -304,12 +306,15 @@ const TokenSelectorDrawer = ({
                         setVisible(false)
                       }}
                       isFav={favTokenList.includes(token)}
-                      constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}
+                      constBal={pageName == 'Futures' 
+                      ? '$' + token.price 
+                      : token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}
                     />
                   );
                 })
                   : null}
-                <div className={styles.buttonContainer}>
+
+                <div className={styles.buttonContainer} style={{marginTop: 20}}>
                   {hasMore ?
                     <Button
                       type="primary"
@@ -317,33 +322,6 @@ const TokenSelectorDrawer = ({
                       onClick={loadMore}>Load More</Button>
                     : <div className={styles.textCenter} >No more result</div>}
                 </div>
-
-                {/* <InfiniteScroll
-                dataLength={initTokenList.length}
-                next={(page)=>fetchData(page)}
-                hasMore={true}
-                loader={<div className={styles.textCenter} >Loading...</div>}
-                endMessage={
-                  <div className={styles.textCenter} >Yay! You have seen it all</div>
-                }
-                >
-                  {initTokenList.length ? initTokenList.map((token, index) => {
-                    return (
-                      <AcyCoinItem
-                        data={token}
-                        key={index}
-                        customIcon={false}
-                        clickCallback={() => setTokenAsFav(token)}
-                        selectToken={() => {
-                          onCoinClick(token);
-                        }}
-                        isFav={favTokenList.includes(token)}
-                        constBal={token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null}
-                      />
-                    );
-                  })
-                    : <div className={styles.textCenter} >No matching result</div>}
-                </InfiniteScroll> */}
               </AcyTabPane>
 
               <AcyTabPane
@@ -393,8 +371,10 @@ const TokenSelectorDrawer = ({
                     }}
                     customIcon={false}
                     index={index}
+                    pageName={pageName}
                     clickCallback={() => setTokenAsFav(supToken)}
                     isFav={favTokenList.includes(supToken)}
+                    constBal={pageName == 'Futures' ? '$' + supToken.price : null}
                   />
                 ))
                   : <div className={styles.textCenter} >No matching result</div>}

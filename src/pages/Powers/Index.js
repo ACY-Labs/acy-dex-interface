@@ -9,7 +9,7 @@ import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import { PositionTable } from '@/components/OptionComponent/TableComponent';
 import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
-import { fetcher, getSymbol, getPosition } from '@/acy-dex-futures/utils';
+import { fetcher, getSymbol, getPosition, formatAmount } from '@/acy-dex-futures/utils';
 import { useWeb3React } from '@web3-react/core';
 import { BigNumber, ethers } from 'ethers'
 import useSWR from 'swr'
@@ -69,6 +69,7 @@ const Powers = props => {
       power_tokens_symbol.push({
         symbol: ele[1],
         name: ele[1].split('^')[0],
+        price: parseFloat(formatAmount(ele?.markPrice, 18)) == 0 ? parseFloat(formatAmount(ele?.markPrice, 18, 8)).toPrecision(2) : formatAmount(ele?.markPrice, 18),
       })
     })
     power_tokens_symbol?.forEach((ele) => {
