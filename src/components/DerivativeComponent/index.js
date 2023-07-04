@@ -328,7 +328,7 @@ const DerivativeComponent = props => {
                     </div>
                   </div>}
               </div>
-              {showDescription && pageName == "Future" &&
+              {showDescription &&
                 <div style={{ margin: '20px 0' }}>
                   <div className={styles.slippageTitle} onClick={() => { setShowSlippage(!showSlippage) }}>
                     Slippage Setting
