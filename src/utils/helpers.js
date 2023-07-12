@@ -5,7 +5,7 @@ const RPC_PROVIDERS = {};
 const SELECTED_NETWORK_LOCAL_STORAGE_KEY = "chainId"
 //////////////////////////////////// test only
 // const DEFAULT_CHAIN_ID = 56
-const DEFAULT_CHAIN_ID = 80001
+const DEFAULT_CHAIN_ID = [80001,421613]
 ////////////////////////////////////
 const supportedChainIds = [56, 97, 137, 80001]
 
@@ -51,11 +51,11 @@ export const switchNetwork = async (chainId) => {
 export const useChainId = (defaultChainId = DEFAULT_CHAIN_ID) => {
     let { chainId } = useWeb3React();
     let isFallbackChainId = false
-
-    if (chainId != defaultChainId) {
-        chainId = defaultChainId
+    
+    if (!defaultChainId.includes(chainId)) {
+        chainId = defaultChainId[0]
         isFallbackChainId = true
     }
-
+    console.log("chainId", chainId, "isFallbackChainId", isFallbackChainId)
     return { chainId, isFallbackChainId };
 }
