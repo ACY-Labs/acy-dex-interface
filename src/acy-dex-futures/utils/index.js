@@ -2185,7 +2185,7 @@ export function getPosition(rawPositionData, symbolData, page) {
       const cost = ethers.utils.formatUnits(temp.cost, 18)
       const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume, 18)
       const marginUsage = ethers.utils.formatUnits(temp.marginUsed, 18)
-      const unrealizedPnl = volume * curIndexPrice - cost
+      const unrealizedPnl = temp.traderPnl? ethers.utils.formatUnits(temp.traderPnl) : volume * curIndexPrice - cost
       const _accountFunding = temp.cumulativeFundingPerVolume.mul(temp.volume)
       const accountFunding = ethers.utils.formatUnits(_accountFunding, 36)
       const entryPrice = safeDiv2(cost, volume)
