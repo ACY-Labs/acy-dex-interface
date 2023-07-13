@@ -153,8 +153,9 @@ const AcyPoolComponent = props => {
   const alpBalanceUsd = alpBalance ? alpBalance.mul(alpPrice) : bigNumberify(0)
   const selectedTokenPrice = selectedToken?.price || bigNumberify(0)
   const selectedTokenBalance = selectedToken?.balance || bigNumberify(0)
+  const selectedTokenDecimal = selectedToken?.decimals || 18
   console.log("debug amountUsd: ", selectedTokenPrice, selectedTokenAmount)
-  const amountUsd = selectedTokenPrice.mul(selectedTokenAmount) || bigNumberify(0)
+  const amountUsd = selectedTokenPrice.mul(selectedTokenAmount).div(parseUnits("1",selectedTokenDecimal)) || bigNumberify(0)
 
   let feePercentageText = formatAmount(feeBasisPoints, 2, 2, true, "-")
   if (feeBasisPoints !== undefined && feeBasisPoints.toString().length > 0) {
