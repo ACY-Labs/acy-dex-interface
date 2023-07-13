@@ -110,7 +110,7 @@ const AcyPoolComponent = props => {
   ///////////// for UI /////////////
   const [anchorOnToken0, setAnchorOnToken0] = useState(true)
   const [mode, setMode] = useState('Buy ALP') // used by ComponentTab
-  const [isBuying, setIsBuying] = useState(true)
+  const isBuying = useMemo(() => mode == "Buy ALP", [mode]);
   const [selectedTokenValue, setSelectedTokenValue] = useState('0')
   const selectedTokenAmount = useMemo(() => {
     if (selectedTokenValue && selectedToken) {
@@ -162,11 +162,7 @@ const AcyPoolComponent = props => {
   }
 
   const onModeChange = (opt) => {
-    if (opt === "Sell ALP") {
-      setIsBuying(false)
-    } else {
-      setIsBuying(true)
-    }
+    setMode(opt)
   }
 
   // token 0 value change
@@ -323,7 +319,7 @@ const AcyPoolComponent = props => {
             tokenBalance={`${formatAmount(selectedTokenBalance, selectedToken?.decimals, 4, true)}`}
             inputValue={selectedTokenValue}
             onInputValueChange={(e) => {
-              onTokenValueChange(e.target.value)
+              onTokenValueChange(e)
             }}
             onSelectToken={onSelectToken}
           />
@@ -361,7 +357,7 @@ const AcyPoolComponent = props => {
             topRightLabel='Balance: '
             tokenBalance={`${formatAmount(selectedTokenBalance, selectedToken?.decimals, 4, true)}`}
             inputValue={selectedTokenValue}
-            onInputValueChange={e => { onTokenValueChange(e.target.value) }}
+            onInputValueChange={e => { onTokenValueChange(e) }}
             onSelectToken={onSelectToken}
           />}
 

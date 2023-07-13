@@ -59,6 +59,5 @@ export const useChainId = (defaultChainId = DEFAULT_CHAIN_IDS) => {
             isFallbackChainId = true
     }
 
-    console.log("chainId", chainId, "isFallbackChainId", isFallbackChainId)
     return { chainId, isFallbackChainId };
 }
