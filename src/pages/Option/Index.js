@@ -44,6 +44,8 @@ const Option = props => {
     fetcher: fetcher(library, Reader)
   })
 
+  console.log("debug symbolsInfo: ", symbolsInfo)
+
   const symbolData = getSymbol(symbolsInfo)
   const positionData = getPosition(rawPositionData, symbolData, 'Options')
 
@@ -61,22 +63,26 @@ const Option = props => {
     updateSymbolsInfo, updatePosition]
   )
 
-  let option_tokens_symbol = []
-  let option_token = []
-
-  useMemo(() => {
-    symbolsInfo?.filter(ele => ele[0] == "option")?.forEach((ele) => {
-      option_tokens_symbol.push({
-        symbol: ele[1],
-        name: ele[1].split('USD')[0],
-      })
-    })
-    option_tokens_symbol?.forEach((ele) => {
-      if (!option_token.includes(ele.name)) {
-        option_token.push(ele.name)
+  const option_tokens_symbol = useMemo(() => {
+    const filtered = symbolsInfo?.filter(ele => ele["category"] == "option")
+    return filtered?.map((ele) => {
+      const symbol = ele["symbol"]
+      return {
+        symbol: symbol,
+        name: symbol,
       }
     })
-  }, [symbolsInfo, option_token, activeSymbol])
+  }, [symbolsInfo])
+  
+  const option_token = useMemo(() => {
+    const res = []
+    option_tokens_symbol?.forEach((ele) => {
+      if (!res.includes(ele.name)) {
+        res.push(ele.name)
+      }
+    })
+    return res
+  }, [option_tokens_symbol])
 
   const [mode, setMode] = useState('Buy')
   const [tableContent, setTableContent] = useState("Positions");

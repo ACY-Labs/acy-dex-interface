@@ -60,22 +60,27 @@ const Powers = props => {
     updateSymbolsInfo, updatePosition]
   )
 
-  let power_tokens_symbol = []
-  let power_token = []
 
-  useMemo(() => {
-    symbolsInfo?.filter(ele => ele[0] == "power")?.forEach((ele) => {
-      power_tokens_symbol.push({
-        symbol: ele[1],
-        name: ele[1].split('^')[0],
-      })
-    })
-    power_tokens_symbol?.forEach((ele) => {
-      if (!power_token.includes(ele.name)) {
-        power_token.push(ele.name)
+  const power_tokens_symbol = useMemo(() => {
+    const filtered = symbolsInfo?.filter(ele => ele["category"] == "power")
+    return filtered?.map((ele) => {
+      const symbol = ele["symbol"]
+      return {
+        symbol: symbol,
+        name: symbol,
       }
     })
-  }, [symbolsInfo, power_token, activeSymbol])
+  }, [symbolsInfo])
+
+  const power_token = useMemo(() => {
+    const res = []
+    power_tokens_symbol?.forEach((ele) => {
+      if (!res.includes(ele.name)) {
+        res.push(ele.name)
+      }
+    })
+    return res
+  }, [power_tokens_symbol])
 
   const [mode, setMode] = useState('Buy')
   const [tableContent, setTableContent] = useState("Positions");
