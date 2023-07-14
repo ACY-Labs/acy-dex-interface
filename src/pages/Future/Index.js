@@ -61,10 +61,9 @@ const Future = props => {
 
   const future_tokens_symbol = useMemo(() => {
     const future_tokens = symbolsInfo?.filter(ele=>ele["category"] == "futures")
-    const symbol = ele["symbol"]
     return future_tokens?.map((ele) => ({
-        symbol: symbol,
-        name: symbol,
+        symbol: ele["symbol"],
+        name: ele["symbol"],
       })
     )
   }, [symbolsInfo])
