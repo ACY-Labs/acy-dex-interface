@@ -239,7 +239,7 @@ const DerivativeComponent = props => {
           parseValue(tradeVolume, 18),
           parseValue(limitPrice, 18),
           false,
-          symbolMarkPrice?.mul(bigNumberify(10000 + slippageTolerance * 100)).div(bigNumberify(10000)),
+          parseValue(limitPrice, 18).mul(bigNumberify(10000 + slippageTolerance * 100)).div(bigNumberify(10000)),
           minExecutionFee,
         )
         :
@@ -252,7 +252,7 @@ const DerivativeComponent = props => {
           parseValue(-tradeVolume, 18),
           parseValue(limitPrice, 18),
           true,
-          symbolMarkPrice?.mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000)),
+          parseValue(limitPrice, 18).mul(bigNumberify(10000 - slippageTolerance * 100)).div(bigNumberify(10000)),
           minExecutionFee,
         )
 

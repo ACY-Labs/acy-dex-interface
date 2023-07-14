@@ -1,0 +1,157 @@
+.modalTitle{
+    text-align: left;
+    margin-bottom :  1.5rem;
+    font-weight: 600;
+    font-size: 110%;
+    color:rgba(255, 255, 255, 0.658);
+
+    .modeActive{
+      color: rgba(255, 255, 255, 0.658);
+    }
+    .modeInactive{
+      color: #99999969;
+    }
+}
+.modalContent{
+  margin-bottom :  .5rem;
+  display : flex;
+  justify-content: space-between;
+
+  .checkBox{
+    margin-left: 1.0rem;
+  }
+}
+.input{
+    width: 100%;
+    margin-bottom :  1.0rem;
+    ::placeholder{
+      color: #99999969;
+    }
+}
+.editPositionInfo{
+    margin-top: 2rem;
+    padding: 0.5rem;
+    font-weight: 600;
+    align-items: right;
+}
+.infoSmallBox {
+  display : grid;
+  grid-template-columns: auto auto;
+  font-size: .9rem;
+  margin-bottom: 0.3rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+.infoBoxTitle{
+   font-weight: 400;
+    
+}
+.infoBoxValue{
+  font-weight: 800;
+  text-align: right;
+}
+.buttonContainer {
+  display : flex;
+  justify-content: space-around;
+  margin-top: 1.5rem;
+  margin-bottom :  .5rem;
+  // background-color: transparent;
+  // margin-left: .5rem;
+  // margin-right: .5rem;
+  .buttonPrimary {
+    color: white;
+    background-color: #2f3131;
+    border:transparent;
+    border-radius: 3px;
+    width: 30%;
+    height: 42px;
+
+    &:hover {
+      cursor: pointer;
+      color: white;
+    }
+  }
+  .percentageButton {
+    border: 0.75px solid #333333;
+    background-color: transparent;
+    width: 100%;
+    height: 42px;
+    color: white;
+    font-size: .6rem;
+
+    &:hover {
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.582);
+    }
+  }
+
+  .percentageButtonActive {
+    border: 0.75px solid rgba(255, 255, 255, 0.87);
+    background-color: transparent;
+    width: 100%;
+    height: 42px;
+    color: white;
+    font-size: .6rem;
+
+    &:hover {
+      cursor: pointer;
+      border: 1px solid white;
+    }
+  }
+}
+
+.optionBarContainer{
+  display: grid;
+  grid-template-columns: auto auto;
+  font-size: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.optionBar {
+  text-align: center;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  border-radius: .2rem;
+  background-color: rgb(44, 47, 54);
+  &:hover{
+    cursor : pointer;
+  }
+  &:active{
+    transform: scale(0.90);
+    box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+  }
+}
+.optionBarSelected {
+  background-color: #eb5c20;
+  color: white;
+  font-weight: 600;
+}
+.inlineInfoBlock {
+  opacity: .8;
+  display : inline-block;
+}
+.linediv{
+  margin : auto 5%;
+  border : 1px solid #eb5c20;
+  opacity: .5;
+}
+.checkboxContainer {
+  text-align: right;
+  margin-bottom: 0.3rem;
+  margin-top :0.3rem;
+  font-weight: 500;
+}
+.infoBoxTransitionArrow {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  stroke : currentColor;
+  fill : currentColor ;
+  stroke-width : 0;
+  height : 1em;
+  width : 1em;
+}
+
+.newPriceContainer {
+  text-align: right;
+  margin-bottom: 1rem;
+}

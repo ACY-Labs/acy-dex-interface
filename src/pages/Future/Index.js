@@ -10,10 +10,10 @@ import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
-import { fetcher, getSymbol, getPosition } from '@/acy-dex-futures/utils';
+import { fetcher, getSymbol, getPosition, getLimitOrder } from '@/acy-dex-futures/utils';
 import Reader from '@/abis/future-option-power/Reader.json'
 import styles from './styles.less'
-import { PositionTable } from '@/components/OptionComponent/TableComponent';
+import { PositionTable, OrderTable } from '@/components/OptionComponent/TableComponent';
 
 
 const Future = props => {
@@ -43,6 +43,7 @@ const Future = props => {
   })
   const symbolData = useMemo(() => getSymbol(symbolsInfo), [symbolsInfo])
   const positionData = useMemo(() => getPosition(rawPositionData, symbolData, 'Futures'), [symbolData, rawPositionData])
+  const limitOrderData = getLimitOrder(account,'Futures')
   const [tableContent, setTableContent] = useState("Positions");
   useEffect(() => {
     if (active) {
@@ -128,7 +129,7 @@ const Future = props => {
                       <PositionTable dataSource={positionData} chainId={chainId} />
                     )}
                     {tableContent == "Orders" && (
-                      <div>ORDERS</div>
+                      <OrderTable dataSource={limitOrderData} chainId={chainId} />
                     )}
                   </div>
                 </div>

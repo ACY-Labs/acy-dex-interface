@@ -6,14 +6,14 @@ import AcyPool from '@/components/AcyPool';
 import ComponentTabs from '@/components/ComponentTabs';
 import DerivativeComponent from '@/components/DerivativeComponent'
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
-import { PositionTable } from '@/components/OptionComponent/TableComponent';
+import { PositionTable, OrderTable } from '@/components/OptionComponent/TableComponent';
 import { useChainId } from '@/utils/helpers';
 import { useWeb3React } from '@web3-react/core';
 import Pool from '@/acy-dex-futures/abis/Pool.json'
 import Reader from '@/abis/future-option-power/Reader.json'
 import { getTokens, getContract } from '@/constants/future_option_power.js';
 import useSWR from 'swr'
-import { fetcher, getSymbol, getPosition } from '@/acy-dex-futures/utils';
+import { fetcher, getSymbol, getPosition, getLimitOrder  } from '@/acy-dex-futures/utils';
 
 import styles from './styles.less'
 
@@ -45,6 +45,7 @@ const Powers = props => {
 
   const symbolData = getSymbol(symbolsInfo)
   const positionData = getPosition(rawPositionData, symbolData, 'Powers')
+  const limitOrderData = getLimitOrder(account,'Powers')
 
   useEffect(() => {
     if (active) {
@@ -134,7 +135,7 @@ const Powers = props => {
                       <PositionTable dataSource={positionData} chainId={chainId} />
                     )}
                     {tableContent == "Orders" && (
-                      <div>ORDERS</div>
+                      <OrderTable dataSource={limitOrderData} chainId={chainId} />
                     )}
                   </div>
                 </div>

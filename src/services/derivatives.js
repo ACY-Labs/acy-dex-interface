@@ -288,6 +288,31 @@ export async function createTradeOrder(
 
 }
 
+export async function cancelTradeOrder(
+  chainId,
+  library,
+  orderbookAddress,
+  OrderBook,
+  orderIndex,
+) {
+
+  const contract = new ethers.Contract(orderbookAddress, OrderBook.abi, library.getSigner())
+  let method = "cancelTradeOrder"
+  let params = [
+    orderIndex
+  ]
+
+  const successMsg = `Order Submitted!`
+  Api.callContract(chainId, contract, method, params, {
+    sentMsg: `Submitted.`,
+    failMsg: `Failed.`,
+    successMsg,
+  })
+    .then(() => { })
+    .catch(e => { console.log(e) })
+
+}
+
 export async function approveTokens(
   chainId,
   library,

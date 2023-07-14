@@ -5,7 +5,7 @@ import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import * as Api from '@/acy-dex-futures/Api';
-import { fetcher, getProvider, bigNumberify, getSymbol, getPosition } from '@/acy-dex-futures/utils';
+import { fetcher, getProvider, bigNumberify, getSymbol, getPosition, getLimitOrder } from '@/acy-dex-futures/utils';
 import { useConstantLoader } from '@/constants';
 import { BigNumber, ethers } from 'ethers'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
@@ -14,7 +14,7 @@ import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
 import styles from './styles.less'
-import { PositionTable } from '@/components/OptionComponent/TableComponent';
+import { PositionTable, OrderTable } from '@/components/OptionComponent/TableComponent';
 
 import Reader from '@/abis/future-option-power/Reader.json'
 import useSWR from 'swr'
@@ -46,6 +46,7 @@ const Option = props => {
 
   const symbolData = getSymbol(symbolsInfo)
   const positionData = getPosition(rawPositionData, symbolData, 'Options')
+  const limitOrderData = getLimitOrder(account,'Options')
 
   useEffect(() => {
     if (active) {
@@ -141,7 +142,7 @@ const Option = props => {
                       <PositionTable dataSource={positionData} chainId={chainId} />
                     )}
                     {tableContent == "Orders" && (
-                      <div>ORDERS</div>
+                      <OrderTable dataSource={limitOrderData} chainId={chainId} />
                     )}
                   </div>
                 </div>
