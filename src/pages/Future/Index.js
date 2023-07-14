@@ -60,10 +60,11 @@ const Future = props => {
   )
 
   const future_tokens_symbol = useMemo(() => {
-    const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
+    const future_tokens = symbolsInfo?.filter(ele=>ele["category"] == "futures")
+    const symbol = ele["symbol"]
     return future_tokens?.map((ele) => ({
-        symbol: ele[1],
-        name: ele[1].replace('USD', ''),
+        symbol: symbol,
+        name: symbol,
       })
     )
   }, [symbolsInfo])
@@ -88,7 +89,7 @@ const Future = props => {
         {mode == 'Pool' ?
           <AcyPool />
           : <div className={`${styles.colItem} ${styles.priceChart}`}>
-            <AcySymbolNav data={future_token} />
+            {/* <AcySymbolNav data={future_token} /> */}
             <AcySymbol
               pageName="Futures"
               activeSymbol={activeSymbol}
