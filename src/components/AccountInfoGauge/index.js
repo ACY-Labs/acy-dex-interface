@@ -24,7 +24,8 @@ const AccountInfoGauge = props => {
 
   const [mode, setMode] = useState('')
   const [isConfirming, setIsConfirming] = useState(false)
-  const percentage = totalMargin && usedMargin ? (totalMargin-usedMargin)/totalMargin * 100 : 0
+  const availableMargin = totalMargin && usedMargin && totalMargin != 0 ? totalMargin - usedMargin : 0
+  const percentage = availableMargin && totalMargin != 0 ? availableMargin / totalMargin * 100 : 0
 
   const onClickDeposit = () => {
     setMode('Deposit')
@@ -70,19 +71,19 @@ const AccountInfoGauge = props => {
               Total Margin
             </div>
             <div className={styles.statsRow}>
-              ${totalMargin}
+              ${totalMargin || '0.0000'}
             </div>
             <div className={styles.statsRow}>
               Margin Usage
             </div>
             <div className={styles.statsRow}>
-              ${usedMargin}
+              ${usedMargin || '0.0000'}
             </div>
             <div className={styles.statsRow}>
               Available Margin
             </div>
             <div className={styles.statsRow}>
-              ${totalMargin - usedMargin || '...'}
+              ${availableMargin.toFixed(4)}
             </div>
           </div>
         </div>
