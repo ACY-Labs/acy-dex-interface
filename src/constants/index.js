@@ -82,7 +82,7 @@ const chainName = chainId2UrlChainName(initialChainId);
 const urlWithNewChain = replaceUrlParam(window.location.href, "chain", chainName);
 console.log("test replace url: ", urlWithNewChain)
 // replace url without redirecting, https://stackoverflow.com/a/3503206/10566022
-window.history.replaceState("", "", urlWithNewChain)
+// window.history.replaceState("", "", urlWithNewChain)
 
 // import constant to normal js file
 export let constantInstance = {

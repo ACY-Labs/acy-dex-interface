@@ -242,7 +242,7 @@ export async function trade(
     priceLimit,
     oracleSignatures,   //oracleSignature
   ]
-
+  
   const successMsg = `Order Submitted!`
   Api.callContract(chainId, contract, method, params, {
     sentMsg: `Submitted.`,
@@ -288,7 +288,33 @@ export async function createTradeOrder(
 
 }
 
+export async function cancelTradeOrder(
+  chainId,
+  library,
+  orderbookAddress,
+  OrderBook,
+  orderIndex,
+) {
+
+  const contract = new ethers.Contract(orderbookAddress, OrderBook.abi, library.getSigner())
+  let method = "cancelTradeOrder"
+  let params = [
+    orderIndex
+  ]
+
+  const successMsg = `Order Submitted!`
+  Api.callContract(chainId, contract, method, params, {
+    sentMsg: `Submitted.`,
+    failMsg: `Failed.`,
+    successMsg,
+  })
+    .then(() => { })
+    .catch(e => { console.log(e) })
+
+}
+
 export async function approveTokens(
+  chainId,
   library,
   routerAddress,
   ERC20,
@@ -298,7 +324,19 @@ export async function approveTokens(
   setIsApproving,
 ) {
   const contract = new ethers.Contract(tokenAddress, ERC20.abi, library.getSigner());
-  contract.approve(routerAddress, ethers.constants.MaxUint256)
+
+  let method = "approve"
+  let params = [
+    routerAddress,
+    ethers.constants.MaxUint256
+  ]
+
+  const successMsg = `Order Submitted!`
+  Api.callContract(chainId, contract, method, params, {
+    sentMsg: `Submitted.`,
+    failMsg: `Failed.`,
+    successMsg,
+  })
     .then(() => { setIsWaitingForApproval(true) })
     .catch(e => { console.error(e) })
     .finally(() => { setIsApproving(false) });

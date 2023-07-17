@@ -6,7 +6,7 @@
 // depend on tokenList because renderTokenList relies on the updated tokenList). The two events will trigger line 94 for 2 times,
 // 1st time with a correct chainId but a not-yet-updated renderTokenList, which will result in "balanceOf(address)" error.
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { AcyModal, AcyTabs, AcyCoinItem } from "@/components/Acy";
 const { AcyTabPane } = AcyTabs;
 import TokenListManager from "./TokenListManager";
@@ -16,53 +16,65 @@ import { getUserTokenBalance } from '@/acy-dex-swap/utils';
 import { asyncForEach } from "@/utils/asynctools";
 import { processString } from "@/components/AcyCoinItem";
 import styles from "./styles.less";
-import {useConstantLoader, getGlobalTokenList} from '@/constants';
+import { useConstantLoader, getGlobalTokenList } from '@/constants';
+import { useChainId } from "@/utils/helpers";
+import useSWR from "swr";
+import Reader from '@/abis/future-option-power/Reader.json'
+import { getContract } from "@/constants/future_option_power";
+import { PLACEHOLDER_ACCOUNT, fetcher } from '@/acy-dex-futures/utils';
+import { formatUnits } from "@ethersproject/units";
 
-const TokenSelectorModal = ({ onCancel, visible, onCoinClick, sideComponent, defaultTokens }) => {
-    const {account, library, chainId } = useConstantLoader();
-    
-    // const INITIAL_TOKEN_LIST = tokenlist ? tokenlist : TOKEN_LIST
-    const tokenlist = defaultTokens ? defaultTokens : getGlobalTokenList()
+const TokenSelectorModal = ({ onCancel, visible, onCoinClick, sideComponent }) => {
+    const { account, library } = useWeb3React();
+    const { chainId } = useChainId();
+
+    // TODO: create a separate tokenSelectorModal for depositWithdrawModal, because this current component is used in many obsoleted pages.
+    const readerAddress = getContract(chainId, "reader")
+    const poolAddress = getContract(chainId, "pool")
+
+    const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
+        fetcher: fetcher(library, Reader)
+    });
+
+    console.log("debug tokenInfo: ", tokenInfo)
+
     useEffect(() => {
-        setInitTokenList(tokenlist)
-    }, [tokenlist])
+        if (!library) return;
+
+        library.on('block', () => {
+            updateTokenInfo()
+        });
+        return () => {
+            library.removeAllListeners('block')
+        }
+    },
+        [
+            library,
+            chainId,
+            updateTokenInfo,
+        ]
+    )
 
     const [currentPanel, setCurrentPanel] = useState("selectToken");
-
-    const [initTokenList, setInitTokenList] = useState(tokenlist);
     const [customTokenList, setCustomTokenList] = useState([]);
     const [tokenSearchInput, setTokenSearchInput] = useState('');
     const [favTokenList, setFavTokenList] = useState([]);
-    const { activate } = useWeb3React();
-    const [tokenBalanceDict, setTokenBalanceDict] = useState({});
 
-    useEffect(() => {
-        if (!tokenlist) return
+    const displayTokens = useMemo(() => {
+        if (!tokenInfo) return [];
+        
+        const parsedTokens = tokenInfo.map((token) => {
+            const balanceFloat = formatUnits(token.balance, 18)  // TODO: replace 18 with token.decimals
+            return {
+                ...token,
+                balance: balanceFloat
+            }
+        })
 
-        console.log("resetting page states in TokenSelectorModal", tokenlist)
-        setCurrentPanel("selectToken");
-        setInitTokenList(tokenlist);
-        setCustomTokenList([]);
-        setTokenSearchInput('');
-        setFavTokenList([]);
-        setTokenBalanceDict({});
-        //// normal things happen after this line
-
-        //read customTokenList from storage
-        const localTokenList = JSON.parse(localStorage.getItem('customTokenList')) || [];
-        setCustomTokenList(localTokenList);
-        //combine initTokenList and customTokenList
-        const totalTokenList = [...localTokenList, ...tokenlist];
-        console.log("resetting tokenSelectorModal new renderTokenList", totalTokenList)
-        //read the fav tokens code in storage
-        var favTokenSymbol = JSON.parse(localStorage.getItem('tokens_symbol'));
-        //set to fav token
-        if (favTokenSymbol != null) {
-            setFavTokenList(
-                initTokenList.filter(token => favTokenSymbol.includes(token.symbol))
-            );
-        }
-    }, [chainId]);
+        if (tokenSearchInput)
+            return parsedTokens.filter(token => token.symbol.toLowerCase().includes(tokenSearchInput))
+        return parsedTokens
+    }, [tokenInfo, tokenSearchInput])
 
     useEffect(() => {
         // reset back to selectToken after closing modal
@@ -82,48 +94,9 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick, sideComponent, def
     // and filter the token list based on the comparison of the value of search input field and token symbol.
     const onTokenSearchChange = e => {
         setTokenSearchInput(e.target.value);
-        setInitTokenList(
-            tokenlist.filter(token => token.symbol.toUpperCase().includes(e.target.value.toUpperCase()) || token.name.toUpperCase().includes(e.target.value.toUpperCase()))
-        );
     };
 
-    const initTokenBalanceDict = (tokenList) => {
-        console.log('Init Token Balance!!!! with chainId, TokenList', chainId, tokenList);        
-        const newTokenBalanceDict = {};
-        asyncForEach(tokenList, async(element, index) => {
-            console.log("dispatched async", element)
-            const token = element;
-            var { address, symbol, decimals } = token; 
-            const bal = await getUserTokenBalance(
-                { address, symbol, decimals },
-                chainId,
-                account,
-                library
-            ).catch(err => {
-                newTokenBalanceDict[token.symbol] = 0;
-                console.log("Failed to load balance, error param: ", address, symbol, decimals, err);
-            })
-
-            const balString = processString(bal);
-            newTokenBalanceDict[token.symbol] = balString;
-            return balString;
-        })
-        setTokenBalanceDict(newTokenBalanceDict);
-    }
-
-    useEffect(() => {
-        console.log("tokenselectormodal refreshed because now on ", library, account, chainId, )
-        if (!library || !account || !chainId) return;
-        if(tokenlist) {
-            initTokenBalanceDict(tokenlist);
-        }
-    }, [account, chainId])
-
-    useEffect(() => {
-        console.log('tokenbalancedict', tokenBalanceDict);
-    }, [tokenBalanceDict])
-
-
+    // TODO: save only symbol in localstorage, and useMemo to filter it out
     const setTokenAsFav = token => {
         setFavTokenList(prevState => {
             const prevFavTokenList = [...prevState];
@@ -165,19 +138,18 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick, sideComponent, def
                     <div className={styles.coinList}>
                         <AcyTabs>
                             <AcyTabPane tab="All" key="1">
-                                {initTokenList.length ? initTokenList.map((token, index) => {
+                                {displayTokens.length ? displayTokens.map((token, index) => {
                                     return (
                                         <AcyCoinItem
                                             data={token}
                                             key={index}
                                             customIcon={false}
                                             clickCallback={() => setTokenAsFav(token)}
-                                            // setAsFav={() => console.log('token:',token)}
                                             selectToken={() => {
                                                 onCoinClick(token);
                                             }}
                                             isFav={favTokenList.includes(token)}
-                                            constBal={ token.symbol in tokenBalanceDict ? tokenBalanceDict[token.symbol] : null }
+                                            constBal={token.balance}
                                         />
                                     );
                                 })
@@ -197,6 +169,7 @@ const TokenSelectorModal = ({ onCancel, visible, onCoinClick, sideComponent, def
                                         index={index}
                                         clickCallback={() => setTokenAsFav(supToken)}
                                         isFav={favTokenList.includes(supToken)}
+                                        constBal={supToken.balance}
                                     />
                                 ))
                                     : <div className={styles.textCenter} >No matching result</div>}

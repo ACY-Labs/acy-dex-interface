@@ -1,10 +1,11 @@
 import { useWeb3React } from "@web3-react/core";
+import { helperToast } from "@/acy-dex-futures/utils";
 
 const RPC_PROVIDERS = {};
 const SELECTED_NETWORK_LOCAL_STORAGE_KEY = "chainId"
 //////////////////////////////////// test only
 // const DEFAULT_CHAIN_ID = 56
-const DEFAULT_CHAIN_ID = 80001
+const DEFAULT_CHAIN_IDS = [80001,421613]
 ////////////////////////////////////
 const supportedChainIds = [56, 97, 137, 80001]
 
@@ -18,52 +19,45 @@ export function getProvider(library, chainId) {
     return new ethers.providers.StaticJsonRpcProvider(provider, { chainId });
 }
 
-export const switchNetwork = async (chainId, active) => {
-    if (!active) {
-        // chainId in localStorage allows to switch network even if wallet is not connected
-        // or there is no wallet at all
-        localStorage.setItem(SELECTED_NETWORK_LOCAL_STORAGE_KEY, chainId);
-        document.location.reload();
-        return;
-    }
+export const switchNetwork = async (chainId) => {
+    const chainIdHex = "0x" + chainId.toString(16);
 
     try {
-        const chainIdHex = "0x" + chainId.toString(16);
         await window.ethereum.request({
             method: "wallet_switchEthereumChain",
             params: [{ chainId: chainIdHex }],
         });
-        helperToast.success("Connected to " + getChainName(chainId));
-        return getChainName(chainId);
+        helperToast.success("Connected to " + chainId);
+        return chainId;
     } catch (ex) {
         // https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods
         // This error code indicates that the chain has not been added to MetaMask.
         // 4001 error means user has denied the request
         // If the error code is not 4001, then we need to add the network
         if (ex.code !== 4001) {
-            return await addNetwork(NETWORK_METADATA[chainId]);
+            // return await addNetwork(NETWORK_METADATA[chainId]);
+            const chainListUrl = `https://chainlist.org/?search=${chainId}&testnets=true`
+            helperToast.success(
+                <div>
+                  Please add chain {chainId} to your wallet via <a href={chainListUrl} target="_blank" rel="noopener noreferrer">ChainList</a>
+                </div>
+              );
         }
 
         console.error("error", ex);
     }
 };
 
-export const useChainId = () => {
-    let { chainId } = useWeb3React();
-
-    if (!chainId) {
-        const chainIdFromLocalStorage = localStorage.getItem(SELECTED_NETWORK_LOCAL_STORAGE_KEY);
-        if (chainIdFromLocalStorage) {
-            chainId = parseInt(chainIdFromLocalStorage);
-            if (!chainId) {
-                // localstorage value is invalid
-                localStorage.removeItem(SELECTED_NETWORK_LOCAL_STORAGE_KEY);
-            }
-        }
+export const useChainId = (defaultChainId = DEFAULT_CHAIN_IDS) => {
+    let { chainId, active, deactivate } = useWeb3React();
+    let isFallbackChainId = false
+    
+    if (!Array.isArray(defaultChainId))
+        defaultChainId = [defaultChainId]
+    if (!defaultChainId.includes(chainId)) {
+            chainId = defaultChainId[0]
+            isFallbackChainId = true
     }
 
-    if (!chainId || !supportedChainIds.includes(chainId)) {
-        chainId = DEFAULT_CHAIN_ID;
-    }
-    return { chainId };
+    return { chainId, isFallbackChainId };
 }

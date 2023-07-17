@@ -6,15 +6,14 @@ import AcyPool from '@/components/AcyPool';
 import ComponentTabs from '@/components/ComponentTabs';
 import DerivativeComponent from '@/components/DerivativeComponent'
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
-import { PositionTable } from '@/components/OptionComponent/TableComponent';
+import { PositionTable, OrderTable } from '@/components/OptionComponent/TableComponent';
 import { useChainId } from '@/utils/helpers';
-import { getTokens, getContract } from '@/constants/future_option_power.js';
-import { fetcher, getSymbol, getPosition, formatAmount } from '@/acy-dex-futures/utils';
 import { useWeb3React } from '@web3-react/core';
-import { BigNumber, ethers } from 'ethers'
-import useSWR from 'swr'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
 import Reader from '@/abis/future-option-power/Reader.json'
+import { getTokens, getContract } from '@/constants/future_option_power.js';
+import useSWR from 'swr'
+import { fetcher, getSymbol, getPosition, getLimitOrder, formatAmount } from '@/acy-dex-futures/utils';
 
 import styles from './styles.less'
 
@@ -46,7 +45,8 @@ const Powers = props => {
   console.log("debug symbolsInfo: ", chainId, readerAddress, poolAddress, symbolsInfo)
 
   const symbolData = getSymbol(symbolsInfo)
-  const positionData = getPosition(rawPositionData, symbolData)
+  const positionData = getPosition(rawPositionData, symbolData, 'Powers')
+  const limitOrderData = getLimitOrder(account,'Powers')
 
   useEffect(() => {
     if (active) {
@@ -62,23 +62,28 @@ const Powers = props => {
     updateSymbolsInfo, updatePosition]
   )
 
-  let power_tokens_symbol = []
-  let power_token = []
-
-  useMemo(() => {
-    symbolsInfo?.filter(ele => ele[0] == "power")?.forEach((ele) => {
-      power_tokens_symbol.push({
-        symbol: ele[1],
-        name: ele[1].split('^')[0],
-        price: parseFloat(formatAmount(ele?.markPrice, 18)) == 0 ? parseFloat(formatAmount(ele?.markPrice, 18, 8)).toPrecision(2) : formatAmount(ele?.markPrice, 18),
-      })
-    })
-    power_tokens_symbol?.forEach((ele) => {
-      if (!power_token.includes(ele.name)) {
-        power_token.push(ele.name)
+  const power_tokens_symbol = useMemo(() => {
+    const filtered = symbolsInfo?.filter(ele => ele["category"] == "power")
+    return filtered?.map((ele) => {
+      const symbol = ele["symbol"]
+      const markPrice = ele["markPrice"]
+      return {
+        symbol: symbol,
+        name: symbol,
+        markPrice: parseFloat(formatAmount(markPrice, 18)) == 0 ? parseFloat(formatAmount(markPrice, 18, 8)).toPrecision(2) : formatAmount(markPrice, 18),
       }
     })
-  }, [symbolsInfo, power_token, activeSymbol])
+  }, [symbolsInfo])
+
+  // const power_token = useMemo(() => {
+  //   const res = []
+  //   power_tokens_symbol?.forEach((ele) => {
+  //     if (!res.includes(ele.name)) {
+  //       res.push(ele.name)
+  //     }
+  //   })
+  //   return res
+  // }, [power_tokens_symbol])
 
   const [mode, setMode] = useState('Buy')
   const [tableContent, setTableContent] = useState("Positions");
@@ -97,7 +102,7 @@ const Powers = props => {
           {mode == 'Pool' ?
             <AcyPool />
             : <div className={`${styles.colItem} ${styles.priceChart}`}>
-              <AcySymbolNav data={power_token} />
+              {/* <AcySymbolNav data={power_token} /> */}
               <AcySymbol
                 pageName="Powers"
                 activeSymbol={activeSymbol}
@@ -138,7 +143,7 @@ const Powers = props => {
                       <PositionTable dataSource={positionData} chainId={chainId} />
                     )}
                     {tableContent == "Orders" && (
-                      <div>ORDERS</div>
+                      <OrderTable dataSource={limitOrderData} chainId={chainId} />
                     )}
                   </div>
                 </div>
