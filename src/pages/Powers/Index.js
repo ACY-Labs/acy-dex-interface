@@ -21,7 +21,7 @@ import styles from './styles.less'
 const Powers = props => {
   const { account, library, active } = useWeb3React();
 
-  let { chainId } = useChainId();
+  let { chainId } = useChainId(421613);
   const tokens = getTokens(chainId);
 
   ///data 
@@ -43,6 +43,7 @@ const Powers = props => {
   const { data: rawPositionData, mutate: updatePosition } = useSWR([chainId, readerAddress, 'getTdInfo', poolAddress, account], {
     fetcher: fetcher(library, Reader)
   })
+  console.log("debug symbolsInfo: ", chainId, readerAddress, poolAddress, symbolsInfo)
 
   const symbolData = getSymbol(symbolsInfo)
   const positionData = getPosition(rawPositionData, symbolData)

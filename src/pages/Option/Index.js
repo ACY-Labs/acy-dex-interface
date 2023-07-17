@@ -22,7 +22,7 @@ import { useWeb3React } from '@web3-react/core';
 
 const Option = props => {
   const { account, library, active } = useWeb3React();
-  let { chainId } = useChainId();
+  let { chainId } = useChainId(421613);
 
   ///data 
   const [symbol, setSymbol] = useState('BTCUSD-60000-C')
@@ -43,6 +43,8 @@ const Option = props => {
   const { data: rawPositionData, mutate: updatePosition } = useSWR([chainId, readerAddress, 'getTdInfo', poolAddress, account], {
     fetcher: fetcher(library, Reader)
   })
+
+  console.log("debug symbolsInfo: ", chainId, readerAddress, poolAddress, symbolsInfo)
 
   const symbolData = getSymbol(symbolsInfo)
   const positionData = getPosition(rawPositionData, symbolData)

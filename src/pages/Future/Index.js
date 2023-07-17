@@ -18,7 +18,7 @@ import { PositionTable } from '@/components/OptionComponent/TableComponent';
 
 const Future = props => {
   const { account, library, active } = useWeb3React();
-  let { chainId } = useChainId();
+  let { chainId } = useChainId(421613);
   const tokens = getTokens(chainId);
 
   const [mode, setMode] = useState('Buy')
