@@ -110,7 +110,7 @@ const AcyPoolComponent = props => {
   ///////////// for UI /////////////
   const [anchorOnToken0, setAnchorOnToken0] = useState(true)
   const [mode, setMode] = useState('Buy ALP') // used by ComponentTab
-  const [isBuying, setIsBuying] = useState(true)
+  const isBuying = useMemo(() => mode == "Buy ALP", [mode]);
   const [selectedTokenValue, setSelectedTokenValue] = useState('0')
   const selectedTokenAmount = useMemo(() => {
     if (selectedTokenValue && selectedToken) {
@@ -153,8 +153,9 @@ const AcyPoolComponent = props => {
   const alpBalanceUsd = alpBalance ? alpBalance.mul(alpPrice) : bigNumberify(0)
   const selectedTokenPrice = selectedToken?.price || bigNumberify(0)
   const selectedTokenBalance = selectedToken?.balance || bigNumberify(0)
+  const selectedTokenDecimal = selectedToken?.decimals || 18
   console.log("debug amountUsd: ", selectedTokenPrice, selectedTokenAmount)
-  const amountUsd = selectedTokenPrice.mul(selectedTokenAmount) || bigNumberify(0)
+  const amountUsd = selectedTokenPrice.mul(selectedTokenAmount).div(parseUnits("1",selectedTokenDecimal)) || bigNumberify(0)
 
   let feePercentageText = formatAmount(feeBasisPoints, 2, 2, true, "-")
   if (feeBasisPoints !== undefined && feeBasisPoints.toString().length > 0) {
@@ -162,11 +163,7 @@ const AcyPoolComponent = props => {
   }
 
   const onModeChange = (opt) => {
-    if (opt === "Sell ALP") {
-      setIsBuying(false)
-    } else {
-      setIsBuying(true)
-    }
+    setMode(opt)
   }
 
   // token 0 value change
@@ -323,7 +320,7 @@ const AcyPoolComponent = props => {
             tokenBalance={`${formatAmount(selectedTokenBalance, selectedToken?.decimals, 4, true)}`}
             inputValue={selectedTokenValue}
             onInputValueChange={(e) => {
-              onTokenValueChange(e.target.value)
+              onTokenValueChange(e)
             }}
             onSelectToken={onSelectToken}
           />
@@ -361,7 +358,7 @@ const AcyPoolComponent = props => {
             topRightLabel='Balance: '
             tokenBalance={`${formatAmount(selectedTokenBalance, selectedToken?.decimals, 4, true)}`}
             inputValue={selectedTokenValue}
-            onInputValueChange={e => { onTokenValueChange(e.target.value) }}
+            onInputValueChange={e => { onTokenValueChange(e) }}
             onSelectToken={onSelectToken}
           />}
 

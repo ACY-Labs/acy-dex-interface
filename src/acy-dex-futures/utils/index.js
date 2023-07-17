@@ -9,7 +9,7 @@ import OrderBook from "@/acy-dex-futures/abis/OrderBook";
 import OrderBookReader from "@/acy-dex-futures/abis/OrderBookReader";
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import { InjectedConnector, UserRejectedRequestError as UserRejectedRequestErrorInjected } from "@web3-react/injected-connector";
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 import { toast } from "react-toastify";
 import { notification } from 'antd';
 import useSWR from "swr";
@@ -19,6 +19,7 @@ import { constantInstance, useConstantLoader } from '@/constants';
 import { format as formatDateFn } from "date-fns";
 import { MINT_FEE_BASIS_POINTS } from './_Helpers';
 import { useGraph } from '@/pages/Stats/Perpetual/dataProvider';
+import { gql, ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 import { sortBy } from 'lodash'
 import { TOKEN_LIST } from '@/constants';
 import axios from 'axios';
@@ -2092,7 +2093,7 @@ export function formatNumber(number) {
     number = number.toString().match(pattern)[1];
     console.log("NEGATIVE")
   }
-  let dict = { 1: "₁", 3: "₃", 4: "₄", 5: "₅", 6: "₆", 7: "₇", 8: "₈", 9: "₉", 11: "₁₁", 13: "₁₃", 14: "₁₄", 15: "₁₅", 16: "₁₆" }
+  let dict = { 1: "₁", 2:"₂", 3: "₃", 4: "₄", 5: "₅", 6: "₆", 7: "₇", 8: "₈", 9: "₉", 10:"₁₀", 11: "₁₁", 12:"₁₂", 13: "₁₃", 14: "₁₄", 15: "₁₅", 16: "₁₆" }
   let text = number.toString();
   let result = 0
   if (text.includes('e-')) {
@@ -2185,7 +2186,7 @@ export function getPosition(rawPositionData, symbolData, page) {
       const cost = ethers.utils.formatUnits(temp.cost, 18)
       const cumulativeFundingPerVolume = ethers.utils.formatUnits(temp.cumulativeFundingPerVolume, 18)
       const marginUsage = ethers.utils.formatUnits(temp.marginUsed, 18)
-      const unrealizedPnl = volume * curIndexPrice - cost
+      const unrealizedPnl = temp.traderPnl? ethers.utils.formatUnits(temp.traderPnl) : volume * curIndexPrice - cost
       const _accountFunding = temp.cumulativeFundingPerVolume.mul(temp.volume)
       const accountFunding = ethers.utils.formatUnits(_accountFunding, 36)
       const entryPrice = safeDiv2(cost, volume)
@@ -2231,4 +2232,62 @@ export function getSymbol(rawSymbolData) {
     symbolQuery.push(symbol)
   }
   return symbolQuery;
+}
+
+export function getLimitOrder(account,page){
+  // console.log("account", account)
+  const querySource = `{
+    orders(first: 1000, orderBy: id, orderDirection: desc, 
+      where: {account: "${account?.toLowerCase()}"}) {
+      id
+      account
+      orderIndex
+      symbolName
+      tradeVolume
+      triggerPrice
+      triggerAboveThreshold
+      executionFee
+      priceLimit
+      status
+    }
+  }`
+
+  const query = gql(querySource)
+
+  // if (!subgraphUrl) {
+  //   if (!subgraph) {
+  //     subgraph = getChainSubgraph(chainName)
+  //   }
+  //   subgraphUrl = `https://api.thegraph.com/subgraphs/name/${subgraph}`;
+  // }
+  const apolloOptions = {
+    query: {
+      fetchPolicy: 'no-cache'
+    },
+    watchQuery: {
+      fetchPolicy: 'no-cache'
+    }
+  }
+  const subgraphUrl = 'https://api.thegraph.com/subgraphs/name/linja19/chainlink-price-arbitrumgoerli'
+
+  const client = new ApolloClient({
+    link: new HttpLink({ uri: subgraphUrl, fetch }),
+    cache: new InMemoryCache(),
+    defaultOptions: apolloOptions
+  })
+  const [order,setOrder] = useState()
+  useEffect(() => {
+    client.query({query}).then(rawData => {
+      const data = rawData.data.orders
+      const orders =
+        page == 'Options'
+          ? data.filter(item => item.symbolName.includes('-'))
+          : page == 'Powers' 
+          ? data.filter(item => item.symbolName.includes('^'))
+          : data.filter(item => !item.symbolName.includes('^') && !item.symbolName.includes('-'))
+        setOrder(orders)
+    })
+  }, [account,setOrder])
+  console.log("order", order)
+  return order
 }

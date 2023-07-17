@@ -12,8 +12,9 @@ import {
     nabox,
 } from '@/connectors';
 import { useWeb3React } from '@web3-react/core';
-import { useState, useCallback } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { switchNetwork, useChainId } from '@/utils/helpers';
+import { useHistory } from 'umi';
 
 // // temporarily commented out. Current focus is on Metamask
 // export const useConnectWallet=()=> {
@@ -59,9 +60,24 @@ import { switchNetwork, useChainId } from '@/utils/helpers';
 //     return connectWalletByLocalStorage;
 // }
 
+const usePageDefaultChains = () => {
+    const history = useHistory()
+    const pageName = history.location.pathname
+    const defaultChains = useMemo(() => {
+        const mapping = {
+            "/future": 421613,
+            "/options": 421613,
+            "/powers": 421613,
+        }
+        return mapping[pageName] || 80001
+    }, [pageName])
+    return defaultChains
+}
+
 export const useConnectWallet = () => {
     const { activate } = useWeb3React();
-    const { chainId, isFallbackChainId } = useChainId();
+    const defaultChainId = usePageDefaultChains();
+    const { chainId, isFallbackChainId } = useChainId(defaultChainId);
 
     const connectWallet = useCallback(async () => {
         if (isFallbackChainId) {

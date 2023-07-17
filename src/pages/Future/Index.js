@@ -10,10 +10,10 @@ import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
-import { fetcher, getSymbol, getPosition } from '@/acy-dex-futures/utils';
+import { fetcher, getSymbol, getPosition, getLimitOrder } from '@/acy-dex-futures/utils';
 import Reader from '@/abis/future-option-power/Reader.json'
 import styles from './styles.less'
-import { PositionTable } from '@/components/OptionComponent/TableComponent';
+import { PositionTable, OrderTable } from '@/components/OptionComponent/TableComponent';
 
 
 const Future = props => {
@@ -43,6 +43,7 @@ const Future = props => {
   })
   const symbolData = useMemo(() => getSymbol(symbolsInfo), [symbolsInfo])
   const positionData = useMemo(() => getPosition(rawPositionData, symbolData, 'Futures'), [symbolData, rawPositionData])
+  const limitOrderData = getLimitOrder(account,'Futures')
   const [tableContent, setTableContent] = useState("Positions");
   useEffect(() => {
     if (active) {
@@ -59,12 +60,14 @@ const Future = props => {
   )
 
   const future_tokens_symbol = useMemo(() => {
-    const future_tokens = symbolsInfo?.filter(ele=>ele[0] == "futures")
-    return future_tokens?.map((ele) => ({
-        symbol: ele[1],
-        name: ele[1].replace('USD', ''),
-      })
-    )
+    const future_tokens = symbolsInfo?.filter(ele=>ele["category"] == "futures")
+    return future_tokens?.map((ele) => {
+      const symbol = ele["symbol"]
+      return {
+        symbol: symbol,
+        name: symbol,
+      }
+    })
   }, [symbolsInfo])
 
   const future_token = useMemo(() => {
@@ -87,7 +90,7 @@ const Future = props => {
         {mode == 'Pool' ?
           <AcyPool />
           : <div className={`${styles.colItem} ${styles.priceChart}`}>
-            <AcySymbolNav data={future_token} />
+            {/* <AcySymbolNav data={future_token} /> */}
             <AcySymbol
               pageName="Futures"
               activeSymbol={activeSymbol}
@@ -128,7 +131,7 @@ const Future = props => {
                       <PositionTable dataSource={positionData} chainId={chainId} />
                     )}
                     {tableContent == "Orders" && (
-                      <div>ORDERS</div>
+                      <OrderTable dataSource={limitOrderData} chainId={chainId} />
                     )}
                   </div>
                 </div>

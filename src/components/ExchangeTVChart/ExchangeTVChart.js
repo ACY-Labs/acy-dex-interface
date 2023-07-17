@@ -145,7 +145,7 @@ function getCurrentTimestamp() {
 
 export default function ExchangeTVChart(props) {
   const {
-    chainId,
+    // chainId,
     pageName,
     //for Future, Option (and Powers) page
     activeSymbol,
@@ -167,6 +167,8 @@ export default function ExchangeTVChart(props) {
     setDailyVol,
   } = props
 
+  // TODO: ARBITRUM TESTNET TEMP DEV CONFIG
+  let chainId = 80001
 
   if (!activeSymbol) {
     return null;

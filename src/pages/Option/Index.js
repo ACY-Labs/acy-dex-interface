@@ -5,7 +5,7 @@ import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import * as Api from '@/acy-dex-futures/Api';
-import { fetcher, getProvider, bigNumberify, getSymbol, getPosition } from '@/acy-dex-futures/utils';
+import { fetcher, getProvider, bigNumberify, getSymbol, getPosition, getLimitOrder } from '@/acy-dex-futures/utils';
 import { useConstantLoader } from '@/constants';
 import { BigNumber, ethers } from 'ethers'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
@@ -14,7 +14,7 @@ import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
 import styles from './styles.less'
-import { PositionTable } from '@/components/OptionComponent/TableComponent';
+import { PositionTable, OrderTable } from '@/components/OptionComponent/TableComponent';
 
 import Reader from '@/abis/future-option-power/Reader.json'
 import useSWR from 'swr'
@@ -44,8 +44,11 @@ const Option = props => {
     fetcher: fetcher(library, Reader)
   })
 
+  console.log("debug symbolsInfo: ", symbolsInfo)
+
   const symbolData = getSymbol(symbolsInfo)
   const positionData = getPosition(rawPositionData, symbolData, 'Options')
+  const limitOrderData = getLimitOrder(account,'Options')
 
   useEffect(() => {
     if (active) {
@@ -61,22 +64,26 @@ const Option = props => {
     updateSymbolsInfo, updatePosition]
   )
 
-  let option_tokens_symbol = []
-  let option_token = []
-
-  useMemo(() => {
-    symbolsInfo?.filter(ele => ele[0] == "option")?.forEach((ele) => {
-      option_tokens_symbol.push({
-        symbol: ele[1],
-        name: ele[1].split('USD')[0],
-      })
-    })
-    option_tokens_symbol?.forEach((ele) => {
-      if (!option_token.includes(ele.name)) {
-        option_token.push(ele.name)
+  const option_tokens_symbol = useMemo(() => {
+    const filtered = symbolsInfo?.filter(ele => ele["category"] == "option")
+    return filtered?.map((ele) => {
+      const symbol = ele["symbol"]
+      return {
+        symbol: symbol,
+        name: symbol,
       }
     })
-  }, [symbolsInfo, option_token, activeSymbol])
+  }, [symbolsInfo])
+  
+  const option_token = useMemo(() => {
+    const res = []
+    option_tokens_symbol?.forEach((ele) => {
+      if (!res.includes(ele.name)) {
+        res.push(ele.name)
+      }
+    })
+    return res
+  }, [option_tokens_symbol])
 
   const [mode, setMode] = useState('Buy')
   const [tableContent, setTableContent] = useState("Positions");
@@ -141,7 +148,7 @@ const Option = props => {
                       <PositionTable dataSource={positionData} chainId={chainId} />
                     )}
                     {tableContent == "Orders" && (
-                      <div>ORDERS</div>
+                      <OrderTable dataSource={limitOrderData} chainId={chainId} />
                     )}
                   </div>
                 </div>
