@@ -63,6 +63,7 @@ const Powers = props => {
   )
 
   const power_tokens_symbol = useMemo(() => {
+    if (!symbolsInfo) return []
     const filtered = symbolsInfo?.filter(ele => ele["category"] == "power")
     return filtered?.map((ele) => {
       const symbol = ele["symbol"]

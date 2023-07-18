@@ -84,7 +84,7 @@ export const BSC_TESTNET = 97;
 export const POLYGON_MAINNET = 137;
 export const POLYGON_TESTNET = 80001;
 export const AVALANCHE = 43114;
-export const ARBITRUM_TESTNET = 421611;
+export const ARBITRUM_TESTNET = 421613;
 export const ARBITRUM = 42161;
 
 export const SWAP = "Swap";
@@ -97,8 +97,10 @@ const injectedConnector = new InjectedConnector({
 });
 
 const POLYGON_TESTNET_RPC_PROVIDERS = ["https://rpc-mumbai.maticvigil.com"]
+const ARBITRUM_TESTNET_RPC_PROVIDERS = ["https://arb-goerli.g.alchemy.com/v2/demo"]
 const RPC_PROVIDERS = {
   [POLYGON_TESTNET]: POLYGON_TESTNET_RPC_PROVIDERS,
+  [ARBITRUM_TESTNET]: ARBITRUM_TESTNET_RPC_PROVIDERS,
 }
 
 export function calculatePositionDelta(

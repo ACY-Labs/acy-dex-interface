@@ -65,6 +65,7 @@ const Option = props => {
   )
 
   const option_tokens_symbol = useMemo(() => {
+    if (!symbolsInfo) return []
     const filtered = symbolsInfo?.filter(ele => ele["category"] == "option")
     return filtered?.map((ele) => {
       const symbol = ele["symbol"]
