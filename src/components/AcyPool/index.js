@@ -52,10 +52,8 @@ import styles from './styles.less';
 const AcyPool = props => {
 
   const { account } = useConstantLoader();
-  // const { chainId } = useChainId()
+  const { chainId } = useChainId()
 
-  //TODO: chainId should be retrieved from useChainId
-  const chainId = 80001
   const { active, activate, library } = useWeb3React()
 
   const [poolTab, setPoolTab] = useState("ALP Price")

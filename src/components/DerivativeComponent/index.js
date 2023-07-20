@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Input, Button, Slider } from 'antd';
+import { DownOutlined, UpOutlined } from '@ant-design/icons'
 import useSWR from 'swr'
 import { ethers } from 'ethers';
 import { INITIAL_ALLOWED_SLIPPAGE, getTokens, getContract } from '@/constants/future_option_power.js';
@@ -164,8 +165,8 @@ const DerivativeComponent = props => {
   const [tradeVolume, setTradeVolume] = useState(0)
   const [usdValue, setUsdValue] = useState()
   const [showDescription, setShowDescription] = useState(false)
+  const [showSlippage, setShowSlippage] = useState(false)
   const [slippageTolerance, setSlippageTolerance] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
-  const [inputSlippageTol, setInputSlippageTol] = useState(INITIAL_ALLOWED_SLIPPAGE / 100)
   const [slippageError, setSlippageError] = useState('')
   const [leverageOption, setLeverageOption] = useState("2")
 
@@ -213,6 +214,7 @@ const DerivativeComponent = props => {
 
   useEffect(() => {
     setShowDescription(false)
+    setShowSlippage(false)
   }, [symbol, chainId, mode])
 
   ///////////// write contract /////////////
@@ -347,45 +349,36 @@ const DerivativeComponent = props => {
                     </div>
                   </div>}
               </div>
-              {showDescription && pageName == "Future" &&
-                <AcyDescriptions>
-                  <div className={styles.breakdownTopContainer}>
+              {showDescription &&
+                <div style={{ margin: '20px 0' }}>
+                  <div className={styles.slippageTitle} onClick={() => { setShowSlippage(!showSlippage) }}>
+                    Slippage Setting
+                    {showSlippage ? <UpOutlined style={{ marginLeft: 5 }} /> : <DownOutlined style={{ marginLeft: 5 }} />}
+                  </div>
+                  {showSlippage &&
                     <div className={styles.slippageContainer}>
-                      <span style={{ fontWeight: 600 }}>Slippage tolerance</span>
+                      <span style={{ fontWeight: 300 }}>Slippage tolerance</span>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
                         <Input
                           className={styles.input}
-                          value={inputSlippageTol || ''}
+                          value={slippageTolerance || ''}
                           onChange={e => {
-                            setInputSlippageTol(e.target.value);
-                          }}
-                          suffix={<strong>%</strong>}
-                        />
-                        <Button
-                          type="primary"
-                          style={{
-                            marginLeft: '10px',
-                            background: '#2e3032',
-                            borderColor: 'transparent',
-                          }}
-                          onClick={() => {
-                            if (isNaN(inputSlippageTol)) {
+                            if (isNaN(parseFloat(e.target.value))) {
                               setSlippageError('Please input valid slippage value!');
                             } else {
                               setSlippageError('');
-                              setSlippageTolerance(parseFloat(inputSlippageTol));
+                              setSlippageTolerance(e.target.value);
                             }
                           }}
-                        >
-                          Set
-                        </Button>
+                          suffix={<strong>%</strong>}
+                        />
                       </div>
                       {slippageError.length > 0 && (
                         <span style={{ fontWeight: 600, color: '#c6224e' }}>{slippageError}</span>
                       )}
                     </div>
-                  </div>
-                </AcyDescriptions>
+                  }
+                </div>
               }
 
               <AcyDescriptions>

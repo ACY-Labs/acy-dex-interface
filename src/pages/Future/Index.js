@@ -10,7 +10,7 @@ import { useChainId } from '@/utils/helpers';
 import { getTokens, getContract } from '@/constants/future_option_power.js';
 import AcySymbolNav from '@/components/AcySymbolNav';
 import AcySymbol from '@/components/AcySymbol';
-import { fetcher, getSymbol, getPosition, getLimitOrder } from '@/acy-dex-futures/utils';
+import { fetcher, getSymbol, getPosition, getLimitOrder, formatAmount } from '@/acy-dex-futures/utils';
 import Reader from '@/abis/future-option-power/Reader.json'
 import styles from './styles.less'
 import { PositionTable, OrderTable } from '@/components/OptionComponent/TableComponent';
@@ -18,7 +18,7 @@ import { PositionTable, OrderTable } from '@/components/OptionComponent/TableCom
 
 const Future = props => {
   const { account, library, active } = useWeb3React();
-  let { chainId } = useChainId();
+  let { chainId } = useChainId(421613);
   const tokens = getTokens(chainId);
 
   const [mode, setMode] = useState('Buy')
@@ -60,25 +60,28 @@ const Future = props => {
   )
 
   const future_tokens_symbol = useMemo(() => {
+    if (!symbolsInfo) return []
     const future_tokens = symbolsInfo?.filter(ele=>ele["category"] == "futures")
     return future_tokens?.map((ele) => {
       const symbol = ele["symbol"]
+      const markPrice = ele["markPrice"]
       return {
         symbol: symbol,
         name: symbol,
+        markPrice: parseFloat(formatAmount(markPrice, 18)) == 0 ? parseFloat(formatAmount(markPrice, 18, 8)).toPrecision(2) : formatAmount(markPrice, 18),
       }
     })
   }, [symbolsInfo])
 
-  const future_token = useMemo(() => {
-    const res = []
-    future_tokens_symbol?.forEach((ele) => {
-      if (!res.includes(ele.name)){
-        res.push(ele.name)
-      }
-    })
-    return res
-  }, [future_tokens_symbol])
+  // const future_token = useMemo(() => {
+  //   const res = []
+  //   future_tokens_symbol?.forEach((ele) => {
+  //     if (!res.includes(ele.name)){
+  //       res.push(ele.name)
+  //     }
+  //   })
+  //   return res
+  // }, [future_tokens_symbol])
 
   const [activeSymbol, setActiveSymbol] = useState("BTCUSD")
   const [latestPrice, setLatestPrice] = useState(0);

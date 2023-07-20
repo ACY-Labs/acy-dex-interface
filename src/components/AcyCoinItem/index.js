@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import AcyIcon from '@/components/AcyIcon';
-import {Icon} from "antd";
+import { Icon } from "antd";
 import styles from './style.less';
 import placeholder from '@/pages/Dao/placeholder-round.png';
 import { getUserTokenBalance } from '@/acy-dex-swap/utils';
 import { useConstantLoader } from '@/constants';
 import { BigNumber } from '@ethersproject/bignumber';
+import eth from '@/assets/eth.svg'
 
 // parse number with shortform T,B,M, or return itself.
 export function processString(bal) {
@@ -17,16 +18,16 @@ export function processString(bal) {
 
   let abbrNum = bal.toFixed(2);
   if (bal.toString().split(".")[1] > 3) {
-      abbrNum = bal.toFixed(3)
+    abbrNum = bal.toFixed(3)
   }
   if ((bal / million).toFixed(2) > 1) {
-      abbrNum = (bal / million).toFixed(2) + "M"
+    abbrNum = (bal / million).toFixed(2) + "M"
   }
   if ((bal / billion).toFixed(2) > 1) {
-      abbrNum = (bal / billion).toFixed(2) + "B"
+    abbrNum = (bal / billion).toFixed(2) + "B"
   }
   if ((bal / trillion).toFixed(2) > 1) {
-      abbrNum = (bal / trillion).toFixed(2) + "T"
+    abbrNum = (bal / trillion).toFixed(2) + "T"
   }
   return abbrNum
 }
@@ -43,11 +44,14 @@ const AcyCoinItem = ({
   customIcon = true,
   isFav = false,
   constBal,
+  pageName,
   ...rest
 }) => {
+
   const [balance, setBal] = useState(0);
   const { account, chainId, library } = useConstantLoader();
   const [showActionButton, setShowActionButton] = useState(false);
+
   useEffect(() => {
     if (clickCallback !== undefined) setShowActionButton(true);
     else setShowActionButton(false);
@@ -61,7 +65,7 @@ const AcyCoinItem = ({
       if (!library || !account || !chainId) return;
 
       if (!constBal) {
-        const { address, symbol, decimals } = data; 
+        const { address, symbol, decimals } = data;
         getUserTokenBalance(
           { address, symbol, decimals },
           chainId,
@@ -77,17 +81,18 @@ const AcyCoinItem = ({
     },
     [library, account, chainId]
   );
+
   return (
     // row container that contains the token icon, symbol, name, balance amount, and star icon.
     <div className={styles.tokenRowContainer} {...rest}>
       {/* token icon container. */}
       {/* display default ethereum icon if customIcon is true, else display the relative token icon. */}
       <div className={styles.tokenRowContent} onClick={() => selectToken(data)}>
-        <div style={{ marginRight:'-20px' }}>
+        <div style={{ marginRight: '-20px' }}>
           {customIcon ? (
             <AcyIcon name="eth" />
           ) : (
-            data.logoURI && 
+            data.logoURI &&
             <div
               style={{
                 display: 'flex',
@@ -106,15 +111,36 @@ const AcyCoinItem = ({
         </div>
 
         {/* token symbol container. */}
-        <div style={{ width: "20%", color: 'white', fontWeight: '500' }}>{data.symbol}</div>
+        {pageName ?
+          <div style={{ width: "30%", color: 'white', fontWeight: '500' }}>
+            {data.name == 'BTC' ? <img src='https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579' style={{ width: 25, marginRight: 10 }} /> : <img src={eth} style={{ width: 25, marginRight: 10 }} />}
+            {pageName == 'Options' ? data.symbol?.split('-')[1].split('-')[0] : data.symbol}
+          </div>
+          :
+          <div style={{ width: "30%", color: 'white', fontWeight: '500' }}>{data.symbol}</div>
+        }
 
-        <div style={{ width: "70%", display: "flex", justifyContent: "space-between" }}>
-          {/* token name container. */}
-          <div style={{ minWidth: "20%", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>{data.name}</div>
+        {pageName
+          ?
+          <div style={{ width: "60%", display: "flex", justifyContent: "space-between" }}>
+            <div style={{ minWidth: "20%", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
+              {pageName == 'Options' ?
+                data.symbol?.split('-')[2] == 'P' ? <span style={{ color: '#fa3c58' }}>PUT</span> : <span style={{ color: '#0ecc83' }}>CALL</span>
+                : null
+              }
+            </div>
 
-          {/* token balance container. */}
-          <div hidden={hideBalance} style={{ textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>{constBal ? constBal : balance}</div>
-        </div>
+            <div style={{ paddingRight: 50, color: 'white' }}>${data.price}</div>
+          </div>
+          :
+          <div style={{ width: "60%", display: "flex", justifyContent: "space-between" }}>
+            {/* token name container. */}
+            <div style={{ minWidth: "20%", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>{data.name}</div>
+
+            {/* token balance container. */}
+            <div hidden={hideBalance} style={{ textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>{constBal ? constBal : balance}</div>
+          </div>
+        }
       </div>
 
       {/* star button for user to set token as favourite. */}

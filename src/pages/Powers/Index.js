@@ -13,14 +13,14 @@ import Pool from '@/acy-dex-futures/abis/Pool.json'
 import Reader from '@/abis/future-option-power/Reader.json'
 import { getTokens, getContract } from '@/constants/future_option_power.js';
 import useSWR from 'swr'
-import { fetcher, getSymbol, getPosition, getLimitOrder  } from '@/acy-dex-futures/utils';
+import { fetcher, getSymbol, getPosition, getLimitOrder, formatAmount } from '@/acy-dex-futures/utils';
 
 import styles from './styles.less'
 
 const Powers = props => {
   const { account, library, active } = useWeb3React();
 
-  let { chainId } = useChainId();
+  let { chainId } = useChainId(421613);
   const tokens = getTokens(chainId);
 
   ///data 
@@ -35,13 +35,14 @@ const Powers = props => {
   ///// read reader contract, getTdInfo and getSymbolsInfo
   const readerAddress = getContract(chainId, "reader")
   const poolAddress = getContract(chainId, "pool")
-  
+
   const { data: symbolsInfo, mutate: updateSymbolsInfo } = useSWR([chainId, readerAddress, "getSymbolsInfo", poolAddress, []], {
     fetcher: fetcher(library, Reader)
   });
   const { data: rawPositionData, mutate: updatePosition } = useSWR([chainId, readerAddress, 'getTdInfo', poolAddress, account], {
     fetcher: fetcher(library, Reader)
   })
+  console.log("debug symbolsInfo: ", chainId, readerAddress, poolAddress, symbolsInfo)
 
   const symbolData = getSymbol(symbolsInfo)
   const positionData = getPosition(rawPositionData, symbolData, 'Powers')
@@ -61,27 +62,29 @@ const Powers = props => {
     updateSymbolsInfo, updatePosition]
   )
 
-
   const power_tokens_symbol = useMemo(() => {
+    if (!symbolsInfo) return []
     const filtered = symbolsInfo?.filter(ele => ele["category"] == "power")
     return filtered?.map((ele) => {
       const symbol = ele["symbol"]
+      const markPrice = ele["markPrice"]
       return {
         symbol: symbol,
         name: symbol,
+        markPrice: parseFloat(formatAmount(markPrice, 18)) == 0 ? parseFloat(formatAmount(markPrice, 18, 8)).toPrecision(2) : formatAmount(markPrice, 18),
       }
     })
   }, [symbolsInfo])
 
-  const power_token = useMemo(() => {
-    const res = []
-    power_tokens_symbol?.forEach((ele) => {
-      if (!res.includes(ele.name)) {
-        res.push(ele.name)
-      }
-    })
-    return res
-  }, [power_tokens_symbol])
+  // const power_token = useMemo(() => {
+  //   const res = []
+  //   power_tokens_symbol?.forEach((ele) => {
+  //     if (!res.includes(ele.name)) {
+  //       res.push(ele.name)
+  //     }
+  //   })
+  //   return res
+  // }, [power_tokens_symbol])
 
   const [mode, setMode] = useState('Buy')
   const [tableContent, setTableContent] = useState("Positions");
@@ -100,8 +103,9 @@ const Powers = props => {
           {mode == 'Pool' ?
             <AcyPool />
             : <div className={`${styles.colItem} ${styles.priceChart}`}>
-              <AcySymbolNav data={power_token} />
+              {/* <AcySymbolNav data={power_token} /> */}
               <AcySymbol
+                pageName="Powers"
                 activeSymbol={activeSymbol}
                 setActiveSymbol={setActiveSymbol}
                 coinList={power_tokens_symbol}
@@ -152,7 +156,7 @@ const Powers = props => {
         {/* RIGHT INTERACTIVE COMPONENT */}
         <div className={`${styles.colItem} ${styles.optionComponent}`}>
           <AcyCard style={{ backgroundColor: 'transparent', border: 'none' }}>
-          <DerivativeComponent
+            <DerivativeComponent
               mode={mode}
               setMode={setMode}
               chainId={chainId}

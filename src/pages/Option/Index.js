@@ -5,7 +5,7 @@ import ComponentTabs from '@/components/ComponentTabs';
 import ExchangeTVChart from '@/components/ExchangeTVChart/ExchangeTVChart';
 import AcyPool from '@/components/AcyPool';
 import * as Api from '@/acy-dex-futures/Api';
-import { fetcher, getProvider, bigNumberify, getSymbol, getPosition, getLimitOrder } from '@/acy-dex-futures/utils';
+import { fetcher, getProvider, bigNumberify, getSymbol, getPosition, getLimitOrder, formatAmount } from '@/acy-dex-futures/utils';
 import { useConstantLoader } from '@/constants';
 import { BigNumber, ethers } from 'ethers'
 import Pool from '@/acy-dex-futures/abis/Pool.json'
@@ -22,7 +22,7 @@ import { useWeb3React } from '@web3-react/core';
 
 const Option = props => {
   const { account, library, active } = useWeb3React();
-  let { chainId } = useChainId();
+  let { chainId } = useChainId(421613);
 
   ///data 
   const [symbol, setSymbol] = useState('BTCUSD-60000-C')
@@ -44,7 +44,7 @@ const Option = props => {
     fetcher: fetcher(library, Reader)
   })
 
-  console.log("debug symbolsInfo: ", symbolsInfo)
+  console.log("debug symbolsInfo: ", chainId, readerAddress, poolAddress, symbolsInfo)
 
   const symbolData = getSymbol(symbolsInfo)
   const positionData = getPosition(rawPositionData, symbolData, 'Options')
@@ -65,25 +65,28 @@ const Option = props => {
   )
 
   const option_tokens_symbol = useMemo(() => {
+    if (!symbolsInfo) return []
     const filtered = symbolsInfo?.filter(ele => ele["category"] == "option")
     return filtered?.map((ele) => {
       const symbol = ele["symbol"]
+      const markPrice = ele["markPrice"]
       return {
         symbol: symbol,
         name: symbol,
+        markPrice: parseFloat(formatAmount(markPrice, 18)) == 0 ? parseFloat(formatAmount(markPrice, 18, 8)).toPrecision(2) : formatAmount(markPrice, 18),
       }
     })
   }, [symbolsInfo])
   
-  const option_token = useMemo(() => {
-    const res = []
-    option_tokens_symbol?.forEach((ele) => {
-      if (!res.includes(ele.name)) {
-        res.push(ele.name)
-      }
-    })
-    return res
-  }, [option_tokens_symbol])
+  // const option_token = useMemo(() => {
+  //   const res = []
+  //   option_tokens_symbol?.forEach((ele) => {
+  //     if (!res.includes(ele.name)) {
+  //       res.push(ele.name)
+  //     }
+  //   })
+  //   return res
+  // }, [option_tokens_symbol])
 
   const [mode, setMode] = useState('Buy')
   const [tableContent, setTableContent] = useState("Positions");
@@ -103,14 +106,11 @@ const Option = props => {
           {mode == 'Pool' ?
             <AcyPool />
             : <div className={`${styles.colItem} ${styles.priceChart}`}>
-              <AcySymbolNav data={option_token} />
+              {/* <AcySymbolNav data={option_token} /> */}
               <AcySymbol
+                pageName="Options"
                 activeSymbol={activeSymbol}
                 setActiveSymbol={setActiveSymbol}
-                // showDrawer={onClickCoin}
-                // latestPriceColor={priceChangePercentDelta * 1 >= 0 && '#0ecc83' || '#fa3c58'}
-                // latestPrice={latestPrice}
-                // latestPricePercentage={priceChangePercentDelt
                 coinList={option_tokens_symbol}
                 latestPriceColor={priceDeltaPercent * 1 >= 0 && '#0ecc83' || '#fa3c58'}
                 latestPrice={curPrice}

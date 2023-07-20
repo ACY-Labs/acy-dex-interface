@@ -104,6 +104,7 @@ const AcySymbol = (props: any) => {
         activeToken1={activeToken1}
         setActiveToken1={setActiveToken1}
         isRightSelect={false}
+        simple={pageName == 'Options' || pageName == 'Powers'}
       />
 
     </>
