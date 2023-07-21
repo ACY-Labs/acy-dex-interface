@@ -37,8 +37,8 @@ const contracts = {
     symbolManager: "0x28AE6Ae39C9f5431ec82caC4008d3206d210133b",
     symbolManagerImplementation: "0x95a68beB1b1aFE0A7fA0378dD2c74af0516B1E5A",
     alp: "0xac582b54A4fE361eb3E1aECc95Dc4B2Ee1161706",
-    symbolsLens: "0xEFf71ddF287aD0Cb32310D968e1FA006e8F13721",
-    reader: "0xeC4EEEBD0B2eA356Ae30B0D613B16eaA8aC01c27",
+    symbolsLens: "0x93603F4a3ae3472E177e9848872D7cE3572C30cE",
+    reader: "0xC0CA4C86802414DeD474c69fC6fd98fe252878ec",
     router: "0x5D084F651794A37B0C53f20B657dbB52e0Ee44AF",
 
     orderbook: "0xe44278ACe07452e45373D93e458a00aded87AD8a",
@@ -183,8 +183,22 @@ const tokenLists = {
       address: "0x3C8e6FCaB51e01bd6e70A8e3d7A579c37d69f971",
       logoURI: 'https://storageapi2.fleek.co/chwizdo-team-bucket/ACY Token List/USDT.svg',
       isStable: true
-    },
+    },  
   ],
+  421613: [
+    {
+      name: "Arbitrum Coin",
+      symbol: "ARB",
+      decimals: 18,
+      address: ethers.constants.AddressZero,
+    },
+    {
+      name: "Binance USD",
+      symbol: "BUSD",
+      decimals: 18,
+      address: "0xA0868b1EE3DA3E822cc79fAFDd88594EeaBfB806",
+    }
+  ] 
 };
 
 export const INITIAL_ALLOWED_SLIPPAGE = 50;
