@@ -112,20 +112,22 @@ const AcyPoolComponent = props => {
   const [mode, setMode] = useState('Buy ALP') // used by ComponentTab
   const isBuying = useMemo(() => mode == "Buy ALP", [mode]);
   const [selectedTokenValue, setSelectedTokenValue] = useState('0')
+  const [selectedTokenValueContract,setSelectedTokenValueContract] = useState('0')
   const selectedTokenAmount = useMemo(() => {
-    if (selectedTokenValue && selectedToken) {
+    if (selectedTokenValueContract && selectedToken) {
       console.log("selectedToken true")
-      return parseUnits(selectedTokenValue, selectedToken.decimals)
+      return parseUnits(selectedTokenValueContract, selectedToken.decimals)
     }
     console.log("selectedToken false")
     return bigNumberify(0);
-  }, [selectedTokenValue, selectedToken])
+  }, [selectedTokenValueContract, selectedToken])
   const [alpValue, setAlpValue] = useState('0')
+  const [alpValueContract,setAlpValueContract] = useState('0')
   const alpAmount = useMemo(() => {
-    if (alpValue)
-      return parseUnits(alpValue, ALP_DECIMALS)
+    if (alpValueContract)
+      return parseUnits(alpValueContract, ALP_DECIMALS)
     return bigNumberify(0)
-  }, [alpValue])
+  }, [alpValueContract])
   const [feeBasisPoints, setFeeBasisPoints] = useState("")
   const [payBalance, setPayBalance] = useState('$0.00');
   const [receiveBalance, setReceiveBalance] = useState('$0.00');
@@ -154,7 +156,7 @@ const AcyPoolComponent = props => {
   const selectedTokenPrice = selectedToken?.price || bigNumberify(0)
   const selectedTokenBalance = selectedToken?.balance || bigNumberify(0)
   const selectedTokenDecimal = selectedToken?.decimals || 18
-  console.log("debug amountUsd: ", selectedTokenPrice, selectedTokenAmount)
+  // console.log("debug amountUsd: ", selectedTokenPrice, selectedTokenAmount)
   const amountUsd = selectedTokenPrice.mul(selectedTokenAmount).div(parseUnits("1",selectedTokenDecimal)) || bigNumberify(0)
 
   let feePercentageText = formatAmount(feeBasisPoints, 2, 2, true, "-")
@@ -170,29 +172,53 @@ const AcyPoolComponent = props => {
   const onTokenValueChange = (e) => {
     // setSelectedTokenValue(Math.floor(e.target.value / minTradeVolume) * minTradeVolume)
     setSelectedTokenValue(e.target.value)
+    setSelectedTokenValueContract(e.target.value)
     setShowDescription(true)
   }
   // effect that calculate corresponding alp output
-  useEffect(() => {
+  // useEffect(() => {
     // TODO
-    if (!alpPrice.isZero() && amountUsd) {
-      const estimatedAlpOutput = amountUsd.div(alpPrice)
-            .mul(BASIS_POINTS_DIVISOR).div(BASIS_POINTS_DIVISOR - MINT_BURN_FEE_BASIS_POINTS)
-      const c = selectedTokenAmount.mul(2)
-      setAlpValue(formatUnits(estimatedAlpOutput, ALP_DECIMALS).toString())
+    // if (!alpPrice.isZero() && amountUsd) {
+    //   const estimatedAlpOutput = amountUsd.div(alpPrice)
+    //         .mul(BASIS_POINTS_DIVISOR).div(BASIS_POINTS_DIVISOR - MINT_BURN_FEE_BASIS_POINTS)
+    //   const c = selectedTokenAmount.mul(2)
+    //   setAlpValue(formatUnits(estimatedAlpOutput, ALP_DECIMALS).toString())
 
-    }
-  }, [selectedTokenValue])
+    // }
+  // }, [selectedTokenValue])
   // token 1 value change
   const onAlpValueChange = (e) => {
     setAlpValue(e.target.value)
+    setAlpValueContract(e.target.value)
     setShowDescription(true)
   }
   // effect that calculate corresponding selectedToken output
-  useEffect(() => {
+  // useEffect(() => {
     // TODO
-  }, [alpValue])
+  // }, [alpValue])
   
+  const { data: alpOutput, mutate: updateAlpOutput } = useSWR([chainId, readerAddress, "estimateAlpOutputFromAmountUsd", poolAddress, alpAddress, amountUsd.toString()], {
+    fetcher: fetcher(library, Reader)
+  });
+
+  const { data: amountUsdOutput, mutate: updateTokenOutput } = useSWR([chainId, readerAddress, "estimateAmountUsdOutputFromAlp", poolAddress, alpAddress, alpAmount.toString()], {
+    fetcher: fetcher(library, Reader)
+  });
+
+  useEffect(() => {
+    if (alpOutput) {
+      console.log("alpOutput",formatUnits(alpOutput,18).toString())
+      setAlpValue(formatUnits(alpOutput,18).toString())
+    }
+  }, [alpOutput])
+
+  useEffect(() => {
+    if (amountUsdOutput) {
+      console.log("tokenOutput",amountUsdOutput)
+      const tokenAmount = formatUnits(amountUsdOutput.mul(parseUnits('1',selectedTokenDecimal)).div(selectedTokenPrice),selectedTokenDecimal)
+      setSelectedTokenValue(tokenAmount.toString())
+    }
+  }, [amountUsdOutput])
 
   const onSelectToken = (symbol) => {
     setSelectedToken(whitelistedTokens.filter(token => token.symbol == symbol)[0])
