@@ -40,8 +40,7 @@ const { Option } = Select;
 const Overview = props => {
 
   //functionalles and data
-  const { farmSetting: { API_URL: apiUrlPrefix } } = useConstantLoader();
-  let { chainId } = useChainId();
+  let { chainId } = useChainId(421613);
   const { account, library, active, activate } = useWeb3React();
 
   if (!account)
@@ -65,8 +64,8 @@ const Overview = props => {
     "Futures": futureTokenList,
     "Options": optionsTokenList,
     "Powers": powersTokenList,
-    "StableCoin": powersTokenList, //TODO
-    "Launchpad": launchPadTokenList,
+    // "StableCoin": powersTokenList, //TODO
+    // "Launchpad": launchPadTokenList,
     //StableCoin: StableCoinTokenList,
     //LaunchPad: LaunchPadTokenList,
   }
@@ -87,7 +86,7 @@ const Overview = props => {
 
   //UI
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeFromPage, setActiveFromPage] = useState("Trade");
+  const [activeFromPage, setActiveFromPage] = useState("Futures");
   const [activeToPage, setActiveToPage] = useState("");
   const [activeToken, setActiveToken] = useState("new");
   const [state, setState] = useState
@@ -149,14 +148,6 @@ const Overview = props => {
     return tokenImgURL[token.name]
   }
 
-  const getPrimaryText = () => {
-    if (account == undefined) {
-      return "Connect Wallet"
-    } else {
-      return "Send";
-    }
-  }
-
   const pageNameList = (
     <div className={styles.networkListBlock}>
       <AcyCardList>
@@ -216,29 +207,29 @@ const Overview = props => {
         return <div className={styles.tableData}></div>;
       },
     },
-    {
-      title: (
-        <div className={styles.tableHeaderFirst}> </div>
-      ),
-      dataIndex: 'Button',
-      key: 'Button',
-      render: (text, entry) => {
-        return <div className={styles.tableData} style={{ float: "right" }}>
-          <Button className={styles.button} onClick={() => { setMode("Deposit") }}>
-            Deposit
-          </Button>
-          <Button className={styles.button} onClick={() => { setMode("Withdraw") }}>
-            Withdraw
-          </Button>
-          <Button className={styles.button} onClick={() => { setMode("Transfer") }}>
-            Transfer
-          </Button>
-          <Button className={styles.button} onClick={() => { showModal("Send", "", entry.name) }}>
-            Send
-          </Button>
-        </div>
-      },
-    },
+    // {
+    //   title: (
+    //     <div className={styles.tableHeaderFirst}> </div>
+    //   ),
+    //   dataIndex: 'Button',
+    //   key: 'Button',
+    //   render: (text, entry) => {
+    //     return <div className={styles.tableData} style={{ float: "right" }}>
+    //       <Button className={styles.button} onClick={() => { setMode("Deposit") }}>
+    //         Deposit
+    //       </Button>
+    //       <Button className={styles.button} onClick={() => { setMode("Withdraw") }}>
+    //         Withdraw
+    //       </Button>
+    //       <Button className={styles.button} onClick={() => { setMode("Transfer") }}>
+    //         Transfer
+    //       </Button>
+    //       <Button className={styles.button} onClick={() => { showModal("Send", "", entry.name) }}>
+    //         Send
+    //       </Button>
+    //     </div>
+    //   },
+    // },
 
   ];
   const pageData = [
@@ -309,7 +300,6 @@ const Overview = props => {
       ]
     },
   ];
-  const dataSource = [account];
 
   const getChildColumns = (pageName) => {
     const childColumns = [
@@ -377,9 +367,9 @@ const Overview = props => {
             <Button className={styles.button} onClick={() => { setMode("Transfer") }}>
               Transfer
             </Button>
-            <Button className={styles.button} onClick={() => { showModal("Send", entry.name, pageName) }}>
+            {/* <Button className={styles.button} onClick={() => { showModal("Send", entry.name, pageName) }}>
               Send
-            </Button>
+            </Button> */}
           </div>
         },
       },
@@ -399,123 +389,7 @@ const Overview = props => {
   return (
     <div className={styles.main}>
       <div className={styles.myModal} style={{ borderRadius: "5px" }}>
-        <AcyModal
-          onCancel={handleCancel}
-          visible={isModalOpen}
-          className={styles.myModal}
-          style={{ backgroundColor: "black", minHeight: "35rem", borderRadius: "5px" }}
-        >
-          <div className={styles.modalTitle} style={{ fontSize: "1.8rem", fontWeight: "bold" }}> Send </div>
-          <Divider style={{ height: "0.75px", margin: "10px 0px 6px", background: "#444444" }} />
-          <div style={{ marginBottom: "3rem" }}> </div>
-          <Col>
-            <div>
-              <Row style={{ marginTop: "10px", marginBottom: "10px" }}> Network </Row>
-              <Row>
-                <div className={styles.networkSelector}>
-                  {account == undefined ?
-                    <div className={styles.networkFixed}>
-                      {getNetworkName()}
-                    </div>
-                    :
-                    <Select
-                      defaultValue="Binance Smart Chain Testnet"
-                      // value={fromPage}
-                      onChange={selectNetwork}
-                      dropdownClassName={styles.dropDownMenu}
-                    >
-                      {networks.map(network => (
-                        <Option className={styles.optionItem} value={network}>
-                          {network}
-                        </Option>
-                      ))}
-                    </Select>
-                  }
-                </div>
-              </Row>
-              {/* <Row style={{ fontSize: "1rem", marginTop: "1rem" }}>Page Selection</Row> */}
-              <div> <Row style={{ marginTop: "1rem", marginBottom: "10px" }}> Send from </Row> </div>
-              <div className={styles.networkSelector}>
-                <Select
-                  // defaultValue="Trade"
-                  value={activeFromPage}
-                  onChange={selectFromPage}
-                  dropdownClassName={styles.pageDropDown}
-                >
-                  {pages.map(page => (
-                    <Option className={styles.pageItem} value={page}>
-                      <Col span={1}>{getMenuIcon(page, true)}</Col>
-                      <Col offset={1} span={22}>{page}</Col>
-                    </Option>
-                  ))}
-                </Select>
-              </div>
-
-            </div>
-
-
-            <div>
-              <Row style={{ marginTop: "1rem", marginBottom: "10px" }}>Send to  address </Row>
-              <Row>
-                <div className={styles.coin} >
-                  <Input />
-                </div>
-              </Row>
-            </div>
-
-            <Row style={{ fontSize: "1rem", marginTop: "1rem", backgroundColor: "black" }}>Coin</Row>
-            <Row>
-              <div className={styles.coin} >
-                <Select
-                  // defaultValue="Trade"
-                  value={activeToken}
-                  onChange={selectToken}
-                  dropdownClassName={styles.dropDownMenu}
-                >
-                  {activeTokenList.map(token => (
-                    <Option className={styles.optionItem} value={token.symbol}>
-                      <Col span={10}> <img src={tokenImgURL[token.symbol]} style={{ width: '20px', height: '20px' }} /></Col>
-                      <Col offset={1} span={13}> <div> {token.symbol}</div> </Col>
-                    </Option>
-                  ))}
-                </Select>
-              </div>
-            </Row>
-            <Row style={{ fontSize: "1rem", marginTop: "1rem", backgroundColor: "black" }}>Amount</Row>
-            <Row>
-              <div className={styles.tokenAmount} >
-                <Input
-                  value={0}
-                  onChange={e => {
-
-                  }}
-                  style={{ height: "2rem" }}
-                />
-              </div>
-            </Row>
-            <Row span={24} style={{ fontSize: "1rem", marginTop: "1rem" }}>Available: 0.0000BTC</Row>
-            <div>
-              <Row style={{ fontSize: "1rem", marginTop: "1rem", backgroundColor: "black" }}>Recipient Address</Row>
-              <Row >
-                <div className={styles.tokenAmount} >
-                  <Input
-                    value={"0x"}
-                    onChange={e => {
-
-                    }}
-                    // suffix={   }
-                    style={{ height: "3rem", backgroundColor: "black", border: "0.75px solid #444444" }}
-                  />
-                </div>
-              </Row>
-            </div>
-            <Row span={24} style={{ width: "10rem" }}>
-              <Button className={styles.confirmButton}>
-                {getPrimaryText()}
-              </Button>
-            </Row>
-          </Col>
-        </AcyModal>
+        
       </div>
       <div className={styles.rowFlexContainer}>
         <Layout style={{ height: "100vh", backgroundColor: "black" }}>
@@ -557,8 +431,8 @@ const Overview = props => {
                   <Button className={styles.button} onClick={() => { setMode("Deposit") }}>Deposit</Button>
                   <Button className={styles.button} onClick={() => { setMode("Withdraw") }}>Withdraw</Button>
                   <Button className={styles.button} onClick={() => { setMode("Transfer") }}>Transfer</Button>
-                  <Button className={styles.button} onClick={() => { showModal("Send") }}>Send</Button>
-                  <div style={{ fontSize: "0.7rem", padding: "5px" }}>Transaction History</div>
+                  {/* <Button className={styles.button} onClick={() => { showModal("Send") }}>Send</Button> */}
+                  {/* <div style={{ fontSize: "0.7rem", padding: "5px" }}>Transaction History</div> */}
                 </Col>
               </Row>
               <Row className={styles.totalBalance}>

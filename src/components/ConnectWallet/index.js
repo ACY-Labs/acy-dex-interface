@@ -68,6 +68,7 @@ const usePageDefaultChains = () => {
             "/future": 421613,
             "/options": 421613,
             "/powers": 421613,
+            "/overview": 421613
         }
         return mapping[pageName] || 80001
     }, [pageName])
