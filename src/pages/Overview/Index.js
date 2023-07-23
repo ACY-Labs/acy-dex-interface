@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { useConstantLoader } from '@/constants';
 import { useChainId } from '@/utils/helpers';
+import { helperToast } from '@/acy-dex-futures/utils';
 
 import Icon from '@ant-design/icons'
 import { AcyModal, AcyCardList, AcyIcon } from '@/components/Acy';
@@ -40,37 +41,37 @@ const { Option } = Select;
 const Overview = props => {
 
   //functionalles and data
-  let { chainId } = useChainId(421613);
+  const { chainId } = useChainId(421613);
   const { account, library, active, activate } = useWeb3React();
 
   if (!account)
     return <>No wallet account connected.</>
 
-  chainId = 80001;
 
 
   // const tradeTokenList = trade.getTokens(chainId);
-  const futureTokenList = future.getTokens(chainId);
-  const optionsTokenList = option.getTokens(chainId);
-  const powersTokenList = powers.getTokens(chainId);
-  const launchPadTokenList = launchpad.getTokens(chainId);
+  // const futureTokenList = future.getTokens(chainId);
+  // const optionsTokenList = option.getTokens(chainId);
+  // const powersTokenList = powers.getTokens(chainId);
+  // const launchPadTokenList = launchpad.getTokens(chainId);
   // const StableCoinTokenList = stablecoin.getTokens(chainId);
   // const LaunchPadTokenList = launchpad.getTokens(chainId);
-  const [activeTokenList, setActiveTokenList] = useState(futureTokenList);
+  // const [activeTokenList, setActiveTokenList] = useState(futureTokenList);
 
-  const tokenList = {
-    //trade: tradeTokenList,
-    "Trade": futureTokenList,
-    "Futures": futureTokenList,
-    "Options": optionsTokenList,
-    "Powers": powersTokenList,
-    // "StableCoin": powersTokenList, //TODO
-    // "Launchpad": launchPadTokenList,
-    //StableCoin: StableCoinTokenList,
-    //LaunchPad: LaunchPadTokenList,
-  }
+  // const tokenList = {
+  //   //trade: tradeTokenList,
+  //   "Trade": futureTokenList,
+  //   "Futures": futureTokenList,
+  //   "Options": optionsTokenList,
+  //   "Powers": powersTokenList,
+  //   // "StableCoin": powersTokenList, //TODO
+  //   // "Launchpad": launchPadTokenList,
+  //   //StableCoin: StableCoinTokenList,
+  //   //LaunchPad: LaunchPadTokenList,
+  // }
   const copy = value => {
     navigator.clipboard.writeText(value)
+    helperToast.success(<>Wallet address copied.</>);
   }
   useEffect(() => {
     if (active) {
@@ -82,7 +83,7 @@ const Overview = props => {
         library.removeAllListeners('block')
       }
     }
-  }, [active, library, chainId])
+  }, [updateSymbolsInfo, updateTdInfo, active, library, chainId])
 
   //UI
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -97,12 +98,12 @@ const Overview = props => {
   const [mode, setMode] = useState('')
   const [selectedSymbol, setSelectedSymbol] = useState('')
 
-  const showModal = (type, token, pageName) => {
-    setActiveFromPage(pageName)
-    setActiveToken(token)
-    setIsModalOpen(true);
-    setActiveTokenList(tokenList[pageName])
-  };
+  // const showSendModal = (type, token, pageName) => {
+  //   setActiveFromPage(pageName)
+  //   setActiveToken(token)
+  //   setIsModalOpen(true);
+  //   setActiveTokenList(tokenList[pageName])
+  // };
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -123,17 +124,6 @@ const Overview = props => {
     // setActiveToken(token);
   }
 
-  const networkName = {
-    '80001': "Mumbai",
-    '137': "Polygon",
-    '97': "Binance Smart Chain Testnet",
-    '56': "Binance Smart Chain Mainnet",
-  }
-  const getNetworkName = () => {
-    return networkName[chainId];
-  }
-  const pages = ["Trade", "Futures", "Options", "Powers", "StableCoin", "Launchpad"];
-  const networks = ["Binance Smart Chain Testnet", "Mumbai", "Ethereum"]
   const tokenImgURL = {
     'MATIC': 'https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png?1624446912',
     'WMATIC': 'https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png?1624446912',
@@ -147,20 +137,6 @@ const Overview = props => {
   const getTokenImg = token => {
     return tokenImgURL[token.name]
   }
-
-  const pageNameList = (
-    <div className={styles.networkListBlock}>
-      <AcyCardList>
-        {pages.map((page) => {
-          return (
-            <AcyCardList.Thin className={styles.networkListLayout}>
-              {<span>{page}</span>}
-            </AcyCardList.Thin>
-          );
-        })}
-      </AcyCardList>
-    </div>
-  );
 
   const columns = [
     {
@@ -233,24 +209,24 @@ const Overview = props => {
 
   ];
   const pageData = [
-    {
-      key: 1,
-      name: "Trade",
-      token: "BTC",
-      price: "20000.00",
-      description: [
-        {
-          name: "BNB",
-          price: "$ " + "400",
-          balance: "$ " + "2"
-        },
-        {
-          name: "ETH",
-          price: "$ " + "2000",
-          balance: "$ " + "2.222"
-        },
-      ]
-    },
+    // {
+    //   key: 1,
+    //   name: "Trade",
+    //   token: "BTC",
+    //   price: "20000.00",
+    //   description: [
+    //     {
+    //       name: "BNB",
+    //       price: "$ " + "400",
+    //       balance: "$ " + "2"
+    //     },
+    //     {
+    //       name: "ETH",
+    //       price: "$ " + "2000",
+    //       balance: "$ " + "2.222"
+    //     },
+    //   ]
+    // },
     {
       key: 2,
       name: "Futures",
@@ -262,42 +238,6 @@ const Overview = props => {
     {
       key: 4,
       name: "Powers",
-    },
-    {
-      key: 5,
-      name: "StableCoin",
-      description: [
-        {
-          key: '1',
-          name: "BTC",
-          price: "$ " + "20000",
-          balance: "$ " + "1.111"
-        },
-        {
-          key: '2',
-          name: "ETH",
-          price: "$ " + "2000",
-          balance: "$ " + "2.222"
-        },
-      ]
-    },
-    {
-      key: 6,
-      name: "Launchpad",
-      description: [
-        {
-          key: '1',
-          name: "BTC",
-          price: "$ " + "20000",
-          balance: "$ " + "1.111"
-        },
-        {
-          key: '2',
-          name: "ETH",
-          price: "$ " + "2000",
-          balance: "$ " + "2.222"
-        },
-      ]
     },
   ];
 
@@ -345,8 +285,8 @@ const Overview = props => {
         key: "balance",
         render: (text, entry) => {
           return pageName == 'Futures' || pageName == 'Options' || pageName == 'Powers' ?
-            <div className={styles.tableData}>{formatAmount(tdInfo?.positions?.filter(ele => ele[1] == entry.symbol)[0].margin, 18, 2, true, 0)}</div>
-            : <div className={styles.tableData}>{text}</div>;
+            <div className={styles.tableData}>$ {formatAmount(tdInfo?.positions?.filter(ele => ele[1] == entry.symbol)[0].margin, 18, 2, true, 0)}</div>
+            : <div className={styles.tableData}>$ {text}</div>;
         },
       },
       {
@@ -454,7 +394,7 @@ const Overview = props => {
                   expandedRowRender={record => {
                     // <div style={{ background: '#1b1d23' }}>
                     return <Table
-                      className={styles.nobgTable}
+                      // className={styles.nobgTable}
                       columns={getChildColumns(record.name)}
                       // showHeader={false}
                       pagination={false}
@@ -482,7 +422,6 @@ const Overview = props => {
           library={library}
           account={account}
           active={active}
-          tokens={activeTokenList}
           setIsConfirming={() => { setMode('') }}
           mode={mode}
           symbol={selectedSymbol}
@@ -493,7 +432,6 @@ const Overview = props => {
           chainId={chainId}
           library={library}
           account={account}
-          tokens={activeTokenList}
           handleCancel={() => { setMode('') }}
           selectedSymbol={selectedSymbol}
         />
