@@ -24,8 +24,6 @@ const Option = props => {
   const { account, library, active } = useWeb3React();
   let { chainId } = useChainId(421613);
 
-  ///data 
-  const [symbol, setSymbol] = useState('BTCUSD-60000-C')
   //for chart 24h data tab
   const [curPrice, setCurPrice] = useState(0);
   const [priceDeltaPercent, setPriceDeltaPercent] = useState(0);

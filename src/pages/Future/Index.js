@@ -22,7 +22,6 @@ const Future = props => {
   const tokens = getTokens(chainId);
 
   const [mode, setMode] = useState('Buy')
-  const [symbol, setSymbol] = useState('BTCUSD')
   //for chart 24h data tab
   const [curPrice, setCurPrice] = useState(0);
   const [priceDeltaPercent, setPriceDeltaPercent] = useState(0);
@@ -148,7 +147,7 @@ const Future = props => {
               mode={mode}
               setMode={setMode}
               chainId={chainId}
-              symbol={symbol}
+              symbol={activeSymbol}
               pageName="Future"
             />
           </AcyCard>
