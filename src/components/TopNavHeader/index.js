@@ -49,7 +49,7 @@ export default class TopNavHeader extends PureComponent {
             </div>
           </div> */}
           <div className={styles.left}>
-            <SearchBar className={styles.searchBar} />
+            {/* <SearchBar className={styles.searchBar} /> */}
           </div>
           <RightContent {...this.props} />
         </div>
