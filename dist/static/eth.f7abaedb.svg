@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" data-name="图层 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #f7f7f7;
+      }
+
+      .cls-2 {
+        fill: #8c8c8c;
+      }
+
+      .cls-3 {
+        fill: #141414;
+      }
+
+      .cls-4 {
+        fill: #393939;
+      }
+
+      .cls-5 {
+        fill: #3c3c3b;
+      }
+
+      .cls-6 {
+        fill: #343434;
+      }
+    </style>
+  </defs>
+  <circle class="cls-1" cx="256" cy="256" r="256"/>
+  <g id="Layer_1">
+    <g id="_1421394342400" data-name=" 1421394342400">
+      <g>
+        <polygon class="cls-6" points="255.97 81 253.62 88.98 253.62 320.4 255.97 322.75 363.39 259.25 255.97 81"/>
+        <polygon class="cls-2" points="255.97 81 148.54 259.25 255.97 322.75 255.97 210.42 255.97 81"/>
+        <polygon class="cls-5" points="255.97 343.08 254.65 344.7 254.65 427.14 255.97 431 363.46 279.62 255.97 343.08"/>
+        <polygon class="cls-2" points="255.97 431 255.97 343.08 148.54 279.62 255.97 431"/>
+        <polygon class="cls-3" points="255.97 322.75 363.39 259.25 255.97 210.42 255.97 322.75"/>
+        <polygon class="cls-4" points="148.54 259.25 255.97 322.75 255.97 210.42 148.54 259.25"/>
+      </g>
+    </g>
+  </g>
+</svg>
