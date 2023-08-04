@@ -44,7 +44,7 @@ const AcySymbol = (props: any) => {
         }}
         >
           <div className={styles.title}>
-            {activeSymbol}&nbsp;
+            {activeSymbol.replace('USD', '')}&nbsp;
             <SwapOutlined
               onClick={onClickCoin}
               style={{ fontSize: '20px', color: '#ffffff', cursor: 'pointer' }}

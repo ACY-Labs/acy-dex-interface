@@ -23,8 +23,6 @@ const Powers = props => {
   let { chainId } = useChainId(421613);
   const tokens = getTokens(chainId);
 
-  ///data 
-  const [symbol, setSymbol] = useState('BTC^2')
   //for chart 24h data tab
   const [curPrice, setCurPrice] = useState(0);
   const [priceDeltaPercent, setPriceDeltaPercent] = useState(0);
@@ -160,7 +158,7 @@ const Powers = props => {
               mode={mode}
               setMode={setMode}
               chainId={chainId}
-              symbol={symbol}
+              symbol={activeSymbol}
               pageName="Powers"
             />
           </AcyCard>

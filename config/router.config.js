@@ -14,48 +14,48 @@ export default [
     Routes: ['src/pages/Authorized'],
     routes: [
       { path: '/', redirect: '/future' },
-      {
-        path: '/market',
-        name: 'Market',
-        hideChildrenInMenu: true,
-        defaultHide: true,
-        routes: [
-          {
-            path: '/market',
-            component: './Market/Index',
-          },
-          {
-            path: '/market/list/token',
-            component: './Market/TokenList',
-          },
-          {
-            path: '/market/list/pool',
-            component: './Market/PoolList',
-          },
-          {
-            path: '/market/info/token/:address',
-            component: './Market/TokenInfo',
-          },
-          {
-            path: '/market/info/pool/:address',
-            component: './Market/PoolInfo',
-          },
-          {
-            path: '/market/accounts',
-            component: './Market/AccountOverview',
-          },
-          {
-            path: '/market/accounts/:address',
-            component: './Market/AccountInfo',
-          },
-        ],
-      },
-      {
-        path: '/trade',
-        name: 'Trade',
-        component: './Swap/Index',
-        defaultHide: true,
-      },
+      // {
+      //   path: '/market',
+      //   name: 'Market',
+      //   hideChildrenInMenu: true,
+      //   defaultHide: true,
+      //   routes: [
+      //     {
+      //       path: '/market',
+      //       component: './Market/Index',
+      //     },
+      //     {
+      //       path: '/market/list/token',
+      //       component: './Market/TokenList',
+      //     },
+      //     {
+      //       path: '/market/list/pool',
+      //       component: './Market/PoolList',
+      //     },
+      //     {
+      //       path: '/market/info/token/:address',
+      //       component: './Market/TokenInfo',
+      //     },
+      //     {
+      //       path: '/market/info/pool/:address',
+      //       component: './Market/PoolInfo',
+      //     },
+      //     {
+      //       path: '/market/accounts',
+      //       component: './Market/AccountOverview',
+      //     },
+      //     {
+      //       path: '/market/accounts/:address',
+      //       component: './Market/AccountInfo',
+      //     },
+      //   ],
+      // },
+      // {
+      //   path: '/trade',
+      //   name: 'Trade',
+      //   component: './Swap/Index',
+      //   defaultHide: true,
+      // },
       {
         path: '/future',
         name: 'Future',
@@ -110,30 +110,18 @@ export default [
         component: './Stats/Market/Index',
         hideInMenu: true,
       },
-      {
-        path: '/statistics/future',
-        name: 'Statistics',
-        component: './Stats/Perpetual/Index',
-        defaultHide: true,
-        // routes:[
-        //   {
-        //     path:'/stats/perpetual',
-        //     name:'Perpetual',
-        //     component:'./Stats/Perpetual/Index'
-        //   },
-        //   {
-        //     path:'/stats/stablecoin',
-        //     name:'StableCoin',
-        //     component:'./Stats/StableCoin/stats'
-        //   }
-        // ]
-      },
-      {
-        path: './statistics/stablecoin',
-        name:'Statistics',
-        component: './Stats/StableCoin/stats',
-        hideInMenu: true,
-      },
+      // {
+      //   path: '/statistics/future',
+      //   name: 'Statistics',
+      //   component: './Stats/Perpetual/Index',
+      //   defaultHide: true,
+      // },
+      // {
+      //   path: './statistics/stablecoin',
+      //   name:'Statistics',
+      //   component: './Stats/StableCoin/stats',
+      //   hideInMenu: true,
+      // },
       {
         path: '/transaction/:id?',
         name: 'Transaction',

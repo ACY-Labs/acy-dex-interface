@@ -113,7 +113,7 @@ const AcyCoinItem = ({
         {/* token symbol container. */}
         {pageName ?
           <div style={{ width: "30%", color: 'white', fontWeight: '500' }}>
-            {data.name == 'BTC' ? <img src='https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579' style={{ width: 25, marginRight: 10 }} /> : <img src={eth} style={{ width: 25, marginRight: 10 }} />}
+            {data.symbol.includes('BTC') ? <img src='https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579' style={{ width: 25, marginRight: 10 }} /> : <img src={eth} style={{ width: 25, marginRight: 10 }} />}
             {pageName == 'Options' ? data.symbol?.split('-')[1].split('-')[0] : data.symbol}
           </div>
           :
@@ -130,7 +130,7 @@ const AcyCoinItem = ({
               }
             </div>
 
-            <div style={{ paddingRight: 50, color: 'white' }}>${data.price}</div>
+            <div style={{ paddingRight: 50, color: 'white' }}>${data.markPrice}</div>
           </div>
           :
           <div style={{ width: "60%", display: "flex", justifyContent: "space-between" }}>
