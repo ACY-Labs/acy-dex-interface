@@ -33,12 +33,12 @@ const contracts = {
 
     oracleManager: '0x1553497f478820359852335de50182D72dCaCB0b',
     pool: '0x709eea8f973ce668ccED36e71A634Fe0C2C45FF7',
-    poolImplementation: '0x5129cE242232Bb907882f93487F308C324ef0911',
+    poolImplementation: '0x67C543e7B6D9fb14362A0B7c57efB27f2ae1aB48',
     symbolManager: "0x28AE6Ae39C9f5431ec82caC4008d3206d210133b",
     symbolManagerImplementation: "0x95a68beB1b1aFE0A7fA0378dD2c74af0516B1E5A",
     alp: "0xac582b54A4fE361eb3E1aECc95Dc4B2Ee1161706",
     symbolsLens: "0x93603F4a3ae3472E177e9848872D7cE3572C30cE",
-    reader: "0xC0CA4C86802414DeD474c69fC6fd98fe252878ec",
+    reader: "0xf78dF44E2A910b6B4B8D49451615D6D793f87586",
     router: "0x5D084F651794A37B0C53f20B657dbB52e0Ee44AF",
 
     orderbook: "0xe44278ACe07452e45373D93e458a00aded87AD8a",
@@ -197,7 +197,16 @@ const tokenLists = {
       symbol: "BUSD",
       decimals: 18,
       address: "0xA0868b1EE3DA3E822cc79fAFDd88594EeaBfB806",
-    }
+    },
+    {
+      name: "Wrapped ETH",
+      symbol: "ETH",
+      decimals: 18,
+      address: "0x036ff7176ffFB9Cd025e618ee8088D942C4B6714",
+      logoURI: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=014',
+      isShortable: true,
+      isStable: false    
+    },
   ] 
 };
 

@@ -43,6 +43,7 @@ const Portfolio = props => {
     alpBalance,
     alpBalanceUsd,
     tokens,
+    alpTokenList,
     aum,
   } = props
 
@@ -253,7 +254,7 @@ const Portfolio = props => {
           infoTokens={infoTokens}
         /> */}
         <TokenWeightPieChart
-          tokens={tokens}
+          tokens={alpTokenList}
         />
       </div>
     </div>

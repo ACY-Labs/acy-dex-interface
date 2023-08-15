@@ -146,6 +146,42 @@
           "internalType": "address",
           "name": "pool_",
           "type": "address"
+        }
+      ],
+      "name": "getAlpInfo",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "symbolAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "int256",
+              "name": "volume",
+              "type": "int256"
+            }
+          ],
+          "internalType": "struct DeriLens.AlpInfo[]",
+          "name": "infos",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "pool_",
+          "type": "address"
         },
         {
           "internalType": "address",
@@ -709,67 +745,6 @@
           "internalType": "struct DeriLens.TokenInfo[]",
           "name": "tokenInfo",
           "type": "tuple[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "pool_",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "account_",
-          "type": "address"
-        }
-      ],
-      "name": "getLpInfo",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "address",
-              "name": "account",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "lTokenId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "vault",
-              "type": "address"
-            },
-            {
-              "internalType": "int256",
-              "name": "amountB0",
-              "type": "int256"
-            },
-            {
-              "internalType": "int256",
-              "name": "liquidity",
-              "type": "int256"
-            },
-            {
-              "internalType": "int256",
-              "name": "cumulativePnlPerLiquidity",
-              "type": "int256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "vaultLiquidity",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct DeriLens.LpInfo",
-          "name": "info",
-          "type": "tuple"
         }
       ],
       "stateMutability": "view",

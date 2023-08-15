@@ -72,6 +72,7 @@ const AcyPool = props => {
   const [alpPriceData, alpPriceDataLoading] = useAlpPriceData(alpData, feesData, params)
 
   const tokens = getTokens(chainId)
+  console.log("tokens", tokens)
 
   const [isBuying, setIsBuying] = useState(true)
   const [swapTokenAddress, setSwapTokenAddress] = useState(tokens[0].address)
@@ -103,6 +104,11 @@ const AcyPool = props => {
   const { data: tokenInfo, mutate: updateTokenInfo } = useSWR([chainId, readerAddress, "getTokenInfo", poolAddress, account || PLACEHOLDER_ACCOUNT], {
     fetcher: fetcher(library, Reader)
   });
+
+  const { data: alpTokenList, mutate: updateAlpTokenList } = useSWR([chainId, readerAddress, "getAlpInfo", poolAddress], {
+    fetcher: fetcher(library, Reader)
+  });
+
 
   useEffect(() => {
     if (active) {
@@ -177,7 +183,7 @@ const AcyPool = props => {
               alpBalance={alpBalance}
               alpBalanceUsd={alpBalanceUsd}
               tokens={tokens}
-              tokenList={tokens}
+              alpTokenList={alpTokenList}
               aum={aum}
             />
             <AcyCard style={{ backgroundColor: 'transparent' }}>

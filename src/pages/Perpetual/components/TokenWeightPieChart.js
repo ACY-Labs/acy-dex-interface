@@ -1,35 +1,17 @@
 import React, { useState, useEffect } from 'react';
 // import ReactDOM from 'react-dom';
 import { Pie } from '@ant-design/plots';
+import form from '@/locales/en-US/form';
+import { formatUnits } from '@ethersproject/units';
 
 const TokenWeightPieChart = (props) => {
   const {tokens} = props
-  const data = [
-    {
-      type: 'Token 1',
-      value: 27,
-    },
-    {
-      type: 'Token 2',
-      value: 25,
-    },
-    {
-      type: 'Token 3',
-      value: 18,
-    },
-    {
-      type: 'Token 4',
-      value: 15,
-    },
-    {
-      type: 'Token 5',
-      value: 10,
-    },
-    {
-      type: 'Token 6',
-      value: 5,
-    },
-  ];
+  const data = tokens?.map(token => {
+    return {
+      type: token.symbol,
+      value: parseInt(formatUnits(token.volume, 18)),
+    }
+  })
   const config = {
     appendPadding: 10,
     data,
